@@ -167,6 +167,8 @@ var PMREMGenerator = ( function () {
 
 			}
 
+			shader.dispose();
+
 		},
 
 	};

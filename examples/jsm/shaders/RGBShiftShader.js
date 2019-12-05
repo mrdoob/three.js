@@ -28,8 +28,8 @@ var RGBShiftShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -45,11 +45,11 @@ var RGBShiftShader = {
 
 		"void main() {",
 
-			"vec2 offset = amount * vec2( cos(angle), sin(angle));",
-			"vec4 cr = texture2D(tDiffuse, vUv + offset);",
-			"vec4 cga = texture2D(tDiffuse, vUv);",
-			"vec4 cb = texture2D(tDiffuse, vUv - offset);",
-			"gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
+		"	vec2 offset = amount * vec2( cos(angle), sin(angle));",
+		"	vec4 cr = texture2D(tDiffuse, vUv + offset);",
+		"	vec4 cga = texture2D(tDiffuse, vUv);",
+		"	vec4 cb = texture2D(tDiffuse, vUv - offset);",
+		"	gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
 
 		"}"
 

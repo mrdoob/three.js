@@ -21,6 +21,7 @@
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import { SVGRenderer } from './jsm/renderers/SVGRenderer.js';
@@ -59,7 +60,7 @@
 				}
 
 				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				//
 

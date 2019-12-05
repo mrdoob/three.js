@@ -13,6 +13,7 @@
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import { PVRLoader } from './jsm/loaders/PVRLoader.js';
@@ -46,7 +47,7 @@
 				var onCube2Loaded = function ( texture ) {
 
 					texture.magFilter = THREE.LinearFilter;
-					// texture.minFilter = LinearMipMapNearestFilter;
+					// texture.minFilter = LinearMipmapNearestFilter;
 					texture.minFilter = THREE.LinearFilter;
 					texture.mapping = THREE.CubeReflectionMapping;
 					material8.needsUpdate = true;

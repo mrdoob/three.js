@@ -112,7 +112,7 @@ var APP = {
 
 			if ( renderer.vr.enabled ) {
 
-				dom.appendChild( WEBVR.createButton( renderer ) );
+				dom.appendChild( THREE.WEBVR.createButton( renderer ) );
 
 			}
 

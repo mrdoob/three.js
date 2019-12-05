@@ -13,6 +13,7 @@
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -78,16 +79,16 @@
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var textureMap = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
+				var textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
 
 				// REFLECTION MAP
-				var path = "textures/cube/skybox/";
+				var path = "textures/cube/pisa/";
 				var urls = [
-					path + "px.jpg", path + "nx.jpg",
-					path + "py.jpg", path + "ny.jpg",
-					path + "pz.jpg", path + "nz.jpg"
+					path + "px.png", path + "nx.png",
+					path + "py.png", path + "ny.png",
+					path + "pz.png", path + "nz.png"
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );

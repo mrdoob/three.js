@@ -13,6 +13,7 @@
 		Note: Every second sphere has an IBL environment map on it.</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -67,7 +68,7 @@
 				imgTexture = null;
 
 				new HDRCubeTextureLoader()
-					.setType( THREE.UnsignedByteType )
+					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function ( hdrCubeMap ) {
 
 						var pmremGenerator = new PMREMGenerator( hdrCubeMap );

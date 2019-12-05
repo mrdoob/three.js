@@ -11,24 +11,24 @@
 
 import {
 	BufferGeometry,
-	DefaultLoadingManager,
 	Euler,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
 	LineBasicMaterial,
-	LineSegments
+	LineSegments,
+	Loader
 } from "../../../build/three.module.js";
 
 var GCodeLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 	this.splitLayer = false;
 
 };
 
-GCodeLoader.prototype = {
+GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: GCodeLoader,
 
@@ -43,13 +43,6 @@ GCodeLoader.prototype = {
 			onLoad( self.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -193,7 +186,7 @@ GCodeLoader.prototype = {
 		function addObject( vertex, extruding ) {
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( 'position', new Float32BufferAttribute( vertex, 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertex, 3 ) );
 
 			var segments = new LineSegments( geometry, extruding ? extrudingMaterial : pathMaterial );
 			segments.name = 'layer' + i;
@@ -238,6 +231,6 @@ GCodeLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { GCodeLoader };

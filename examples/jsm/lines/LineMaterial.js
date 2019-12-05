@@ -254,7 +254,9 @@ var LineMaterial = function ( parameters ) {
 		uniforms: UniformsUtils.clone( ShaderLib[ 'line' ].uniforms ),
 
 		vertexShader: ShaderLib[ 'line' ].vertexShader,
-		fragmentShader: ShaderLib[ 'line' ].fragmentShader
+		fragmentShader: ShaderLib[ 'line' ].fragmentShader,
+
+		clipping: true // required for clipping support
 
 	} );
 
@@ -380,22 +382,6 @@ LineMaterial.prototype = Object.create( ShaderMaterial.prototype );
 LineMaterial.prototype.constructor = LineMaterial;
 
 LineMaterial.prototype.isLineMaterial = true;
-
-LineMaterial.prototype.copy = function ( source ) {
-
-	ShaderMaterial.prototype.copy.call( this, source );
-
-	this.color.copy( source.color );
-
-	this.linewidth = source.linewidth;
-
-	this.resolution = source.resolution;
-
-	// todo
-
-	return this;
-
-};
 
 
 export { LineMaterial };

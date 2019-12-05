@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js vr - 360 stereo video</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<!-- WebXR Device API (For Chrome M76+), expires 12/04/2019 -->
+		<meta http-equiv="origin-trial" content="Aq9LklhCLNUveuCr7QTpGpqwCPG817cYHdVyQuJPOZYk47iRB390lUKa5edVmgS1pZSl8HPspElEC/91Fz55dwIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU03NiIsImV4cGlyeSI6MTU3NTQxNzU5OX0=">
+	</head>
+	<body>
+		<div id="container"></div>
+
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> vr - 360 stereo video<br />
+			stereoscopic panoramic render by <a href="http://pedrofe.com/rendering-for-oculus-rift-with-arnold/" target="_blank" rel="noopener">pedrofe</a>. scene from <a href="http://www.meryproject.com/" target="_blank" rel="noopener">mery project</a>.
+		</div>
+
+		<script src="js/vr/HelioWebXRPolyfill.js"></script>
+
+		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
+			<source src="textures/MaryOculus.webm">
+			<source src="textures/MaryOculus.mp4">
+		</video>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { VRButton } from './jsm/webxr/VRButton.js';
+
+			var camera, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+				container.addEventListener( 'click', function () {
+
+					video.play();
+
+				} );
+
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.layers.enable( 1 ); // render left view when no stereo available
+
+				// video
+
+				var video = document.getElementById( 'video' );
+				video.play();
+
+				var texture = new THREE.Texture( video );
+				texture.generateMipmaps = false;
+				texture.minFilter = THREE.NearestFilter;
+				texture.magFilter = THREE.NearestFilter;
+				texture.format = THREE.RGBFormat;
+
+				setInterval( function () {
+
+					if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+
+						texture.needsUpdate = true;
+
+					}
+
+				}, 1000 / 24 );
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x101010 );
+
+				// left
+
+				var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
+				// invert the geometry on the x-axis so that all of the faces point inward
+				geometry.scale( - 1, 1, 1 );
+
+				var uvs = geometry.attributes.uv.array;
+
+				for ( var i = 0; i < uvs.length; i += 2 ) {
+
+					uvs[ i ] *= 0.5;
+
+				}
+
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.rotation.y = - Math.PI / 2;
+				mesh.layers.set( 1 ); // display in left eye only
+				scene.add( mesh );
+
+				// right
+
+				var geometry = new THREE.SphereBufferGeometry( 500, 60, 40 );
+				geometry.scale( - 1, 1, 1 );
+
+				var uvs = geometry.attributes.uv.array;
+
+				for ( var i = 0; i < uvs.length; i += 2 ) {
+
+					uvs[ i ] *= 0.5;
+					uvs[ i ] += 0.5;
+
+				}
+
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+
+				var mesh = new THREE.Mesh( geometry, material );
+				mesh.rotation.y = - Math.PI / 2;
+				mesh.layers.set( 2 ); // display in right eye only
+				scene.add( mesh );
+
+				//
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.vr.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				document.body.appendChild( VRButton.createButton( renderer, { referenceSpaceType: 'local' } ) );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>

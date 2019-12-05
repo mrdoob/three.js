@@ -414,7 +414,7 @@ var CCDIKSolver = ( function () {
 
 				var geometry = new BufferGeometry();
 				var vertices = new Float32Array( ( 2 + ik.links.length ) * 3 );
-				geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
 				return geometry;
 

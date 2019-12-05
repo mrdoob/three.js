@@ -11,15 +11,13 @@ import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { setProjectionFromUnion } from './WebVRUtils.js';
 
-function WebXRManager( renderer ) {
+function WebXRManager( renderer, gl ) {
 
 	var scope = this;
 
-	var gl = renderer.context;
-
 	var session = null;
 
-	var framebufferScaleFactor = 1.0;
+	// var framebufferScaleFactor = 1.0;
 
 	var referenceSpace = null;
 	var referenceSpaceType = 'local-floor';
@@ -27,7 +25,7 @@ function WebXRManager( renderer ) {
 	var pose = null;
 
 	var controllers = [];
-	var inputSources = [];
+	var sortedInputSources = [];
 
 	function isPresenting() {
 
@@ -77,7 +75,7 @@ function WebXRManager( renderer ) {
 
 		for ( var i = 0; i < controllers.length; i ++ ) {
 
-			if ( inputSources[ i ] === event.inputSource ) {
+			if ( sortedInputSources[ i ] === event.inputSource ) {
 
 				controllers[ i ].dispatchEvent( { type: event.type } );
 
@@ -108,9 +106,9 @@ function WebXRManager( renderer ) {
 
 	}
 
-	this.setFramebufferScaleFactor = function ( value ) {
+	this.setFramebufferScaleFactor = function ( /* value */ ) {
 
-		framebufferScaleFactor = value;
+		// framebufferScaleFactor = value;
 
 	};
 
@@ -135,33 +133,53 @@ function WebXRManager( renderer ) {
 			session.addEventListener( 'select', onSessionEvent );
 			session.addEventListener( 'selectstart', onSessionEvent );
 			session.addEventListener( 'selectend', onSessionEvent );
+			session.addEventListener( 'squeeze', onSessionEvent );
+			session.addEventListener( 'squeezestart', onSessionEvent );
+			session.addEventListener( 'squeezeend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
+			// eslint-disable-next-line no-undef
 			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
 			//
 
-			inputSources = session.inputSources;
+			session.addEventListener( 'inputsourceschange', updateInputSources );
 
-			session.addEventListener( 'inputsourceschange', function () {
-
-				inputSources = session.inputSources;
-				console.log( inputSources );
-
-				for ( var i = 0; i < controllers.length; i ++ ) {
-
-					var controller = controllers[ i ];
-					controller.userData.inputSource = inputSources[ i ];
-
-				}
-
-			} );
+			updateInputSources();
 
 		}
 
 	};
+
+	function updateInputSources() {
+
+		for ( var i = 0; i < controllers.length; i ++ ) {
+
+			sortedInputSources[ i ] = findInputSource( i );
+
+		}
+
+	}
+
+	function findInputSource( id ) {
+
+		var inputSources = session.inputSources;
+
+		for ( var i = 0; i < inputSources.length; i ++ ) {
+
+			var inputSource = inputSources[ i ];
+			var handedness = inputSource.handedness;
+
+			if ( id === 0 && ( handedness === 'none' || handedness === 'right' ) ) return inputSource;
+			if ( id === 1 && ( handedness === 'left' ) ) return inputSource;
+
+		}
+
+	}
+
+	//
 
 	function updateCamera( camera, parent ) {
 
@@ -181,38 +199,32 @@ function WebXRManager( renderer ) {
 
 	this.getCamera = function ( camera ) {
 
-		if ( isPresenting() ) {
+		var parent = camera.parent;
+		var cameras = cameraVR.cameras;
 
-			var parent = camera.parent;
-			var cameras = cameraVR.cameras;
+		updateCamera( cameraVR, parent );
 
-			updateCamera( cameraVR, parent );
+		for ( var i = 0; i < cameras.length; i ++ ) {
 
-			for ( var i = 0; i < cameras.length; i ++ ) {
-
-				updateCamera( cameras[ i ], parent );
-
-			}
-
-			// update camera and its children
-
-			camera.matrixWorld.copy( cameraVR.matrixWorld );
-
-			var children = camera.children;
-
-			for ( var i = 0, l = children.length; i < l; i ++ ) {
-
-				children[ i ].updateMatrixWorld( true );
-
-			}
-
-			setProjectionFromUnion( cameraVR, cameraL, cameraR );
-
-			return cameraVR;
+			updateCamera( cameras[ i ], parent );
 
 		}
 
-		return camera;
+		// update camera and its children
+
+		camera.matrixWorld.copy( cameraVR.matrixWorld );
+
+		var children = camera.children;
+
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].updateMatrixWorld( true );
+
+		}
+
+		setProjectionFromUnion( cameraVR, cameraL, cameraR );
+
+		return cameraVR;
 
 	};
 
@@ -260,7 +272,7 @@ function WebXRManager( renderer ) {
 
 			var controller = controllers[ i ];
 
-			var inputSource = inputSources[ i ];
+			var inputSource = sortedInputSources[ i ];
 
 			if ( inputSource ) {
 

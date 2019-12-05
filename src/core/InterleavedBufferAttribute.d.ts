@@ -11,13 +11,15 @@ export class InterleavedBufferAttribute {
 		normalized?: boolean
 	);
 
-	uuid: string;
 	data: InterleavedBuffer;
 	itemSize: number;
 	offset: number;
-	count: number;
 	normalized: boolean;
-	array: any[];
+
+	get count(): number;
+	get array(): ArrayLike<number>;
+
+	isInterleavedBufferAttribute: true;
 
 	getX( index: number ): number;
 	setX( index: number, x: number ): InterleavedBufferAttribute;
@@ -41,9 +43,5 @@ export class InterleavedBufferAttribute {
 		z: number,
 		w: number
 	): InterleavedBufferAttribute;
-	/**
-	 * @deprecated Use {@link InterleavedBufferAttribute#count .count} instead.
-	 */
-	length: number;
 
 }

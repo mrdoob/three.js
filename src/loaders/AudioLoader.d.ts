@@ -1,14 +1,15 @@
+import { Loader } from './Loader';
 import { LoadingManager } from './LoadingManager';
 
-export class AudioLoader {
+export class AudioLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
 
 	load(
 		url: string,
-		onLoad: Function,
-		onPrgress: Function,
-		onError: Function
+		onLoad: ( audioBuffer: AudioBuffer ) => void,
+		onProgress?: ( request: ProgressEvent ) => void,
+		onError?: ( event: ErrorEvent ) => void
 	): void;
 
 }

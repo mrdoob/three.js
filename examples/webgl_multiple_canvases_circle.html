@@ -243,7 +243,7 @@
 			var geometry1 = new THREE.IcosahedronBufferGeometry( radius, 1 );
 
 			var count = geometry1.attributes.position.count;
-			geometry1.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
+			geometry1.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
 
 			var color = new THREE.Color();
 			var positions = geometry1.attributes.position;

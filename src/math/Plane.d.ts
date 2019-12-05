@@ -24,7 +24,7 @@ export class Plane {
 	distanceToSphere( sphere: Sphere ): number;
 	projectPoint( point: Vector3, target: Vector3 ): Vector3;
 	orthoPoint( point: Vector3, target: Vector3 ): Vector3;
-	intersectLine( line: Line3, target: Vector3 ): Vector3;
+	intersectLine( line: Line3, target: Vector3 ): Vector3 | undefined;
 	intersectsLine( line: Line3 ): boolean;
 	intersectsBox( box: Box3 ): boolean;
 	intersectsSphere( sphere: Sphere ): boolean;

@@ -15,6 +15,7 @@
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
@@ -130,11 +131,7 @@
 				controls.zoomSpeed = 5;
 				controls.panSpeed = 2;
 
-				controls.noZoom = false;
-				controls.noPan = false;
-
 				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

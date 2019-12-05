@@ -276,7 +276,6 @@ Ocean.prototype.generateSeedPhaseTexture = function () {
 	this.pingPhaseTexture.wrapS = ClampToEdgeWrapping;
 	this.pingPhaseTexture.wrapT = ClampToEdgeWrapping;
 	this.pingPhaseTexture.type = FloatType;
-	this.pingPhaseTexture.needsUpdate = true;
 
 };
 

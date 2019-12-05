@@ -14,6 +14,7 @@
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -99,12 +100,12 @@
 				// skybox
 
 				var cubeTextureLoader = new THREE.CubeTextureLoader();
-				cubeTextureLoader.setPath( 'textures/cube/skybox/' );
+				cubeTextureLoader.setPath( 'textures/cube/Park2/' );
 
 				var cubeTexture = cubeTextureLoader.load( [
-					'px.jpg', 'nx.jpg',
-					'py.jpg', 'ny.jpg',
-					'pz.jpg', 'nz.jpg',
+					"posx.jpg", "negx.jpg",
+					"posy.jpg", "negy.jpg",
+					"posz.jpg", "negz.jpg"
 				] );
 
 				scene.background = cubeTexture;

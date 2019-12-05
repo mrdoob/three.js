@@ -12,13 +12,14 @@
 		</div>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var scene, renderer;
 			var camera, light;
-			var fnh, vnh;
+			var vnh;
 
 			init();
 			animate();
@@ -125,7 +126,6 @@
 				light.position.y = Math.cos( time * 1.5 ) * 400;
 				light.position.z = Math.cos( time * 1.3 ) * 300;
 
-				if ( fnh ) fnh.update();
 				if ( vnh ) vnh.update();
 
 				renderer.render( scene, camera );

@@ -113,6 +113,9 @@ var d = a.distanceTo( b );
 		Multiplies this vector (with an implicit 1 in the 4th dimension) and m, and divides by perspective.
 		</p>
 
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Multiplies this vector by normal matrix [page:Matrix3 m] and normalizes the result.</p>
+
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>
 		Applies a [page:Quaternion] transform to this vector.
@@ -121,7 +124,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Float angleTo]( [param:Vector3 v] )</h3>
 		<p>
-		Returns the angle between this vector and vector [page:Vector3 v] in radians.
+		Returns the angle between this vector and vector [page:Vector3 v] in radians. Neither this vector nor [page:Vector3 v] can be the zero vector.
 		</p>
 
 		<h3>[method:this ceil]()</h3>
@@ -258,20 +261,20 @@ var d = a.distanceTo( b );
 		<h3>[method:this lerp]( [param:Vector3 v], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector3 v] - [page:Vector3] to interpolate towards.<br />
-		alpha - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
 
 		Linearly interpolate between this vector and [page:Vector3 v], where alpha is the
-		distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector3 v].
+		percent distance along the line - alpha = 0 will be this vector, and alpha = 1 will be [page:Vector3 v].
 		</p>
 
 		<h3>[method:this lerpVectors]( [param:Vector3 v1], [param:Vector3 v2], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector3 v1] - the starting [page:Vector3].<br />
 		[page:Vector3 v2] - [page:Vector3] to interpolate towards.<br />
-		[page:Float alpha] - interpolation factor in the closed interval [0, 1].<br /><br />
+		[page:Float alpha] - interpolation factor, typically in the closed interval [0, 1].<br /><br />
 
 		Sets this vector to be the vector linearly interpolated between [page:Vector3 v1] and
-		[page:Vector3 v2] where alpha is the distance along the line connecting the two vectors
+		[page:Vector3 v2] where alpha is the percent distance along the line connecting the two vectors
 		- alpha = 0 will be [page:Vector3 v1], and alpha = 1 will be [page:Vector3 v2].
 		</p>
 
@@ -320,8 +323,8 @@ var d = a.distanceTo( b );
 		normal from this vector.
 		</p>
 
-		<h3>[method:this projectOnVector]( [param:Vector3] )</h3>
-		<p>[link:https://en.wikipedia.org/wiki/Vector_projection Projects] this vector onto another vector.</p>
+		<h3>[method:this projectOnVector]( [param:Vector3 v] )</h3>
+		<p>[link:https://en.wikipedia.org/wiki/Vector_projection Projects] this vector onto [page:Vector3 v]. [page:Vector3 v] cannot be the zero vector.</p>
 
 		<h3>[method:this reflect]( [param:Vector3 normal] )</h3>
 		<p>
@@ -441,6 +444,8 @@ var d = a.distanceTo( b );
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

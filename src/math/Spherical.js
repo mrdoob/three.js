@@ -7,7 +7,7 @@ import { _Math } from './Math.js';
  * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
  *
  * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
- * The azimuthal angle (theta) is measured from the positive z-axiz.
+ * The azimuthal angle (theta) is measured from the positive z-axis.
  */
 
 function Spherical( radius, phi, theta ) {

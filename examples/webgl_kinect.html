@@ -8,7 +8,7 @@
 	</head>
 	<body>
 
-		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
+		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
 			<source src="textures/kinect.webm">
 			<source src="textures/kinect.mp4">
 		</video>
@@ -69,6 +69,7 @@
 		</script>
 
 		<script type="module">
+
 			import * as THREE from '../build/three.module.js';
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -119,7 +120,7 @@
 
 					}
 
-					geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+					geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 					material = new THREE.ShaderMaterial( {
 

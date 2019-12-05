@@ -2,6 +2,9 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { _Math } from '../math/Math.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
+var _eyeRight = new Matrix4();
+var _eyeLeft = new Matrix4();
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -22,75 +25,78 @@ function StereoCamera() {
 	this.cameraR.layers.enable( 2 );
 	this.cameraR.matrixAutoUpdate = false;
 
+	this._cache = {
+		focus: null,
+		fov: null,
+		aspect: null,
+		near: null,
+		far: null,
+		zoom: null,
+		eyeSep: null
+	};
+
 }
 
 Object.assign( StereoCamera.prototype, {
 
-	update: ( function () {
+	update: function ( camera ) {
 
-		var instance, focus, fov, aspect, near, far, zoom, eyeSep;
+		var cache = this._cache;
 
-		var eyeRight = new Matrix4();
-		var eyeLeft = new Matrix4();
+		var needsUpdate = cache.focus !== camera.focus || cache.fov !== camera.fov ||
+			cache.aspect !== camera.aspect * this.aspect || cache.near !== camera.near ||
+			cache.far !== camera.far || cache.zoom !== camera.zoom || cache.eyeSep !== this.eyeSep;
 
-		return function update( camera ) {
+		if ( needsUpdate ) {
 
-			var needsUpdate = instance !== this || focus !== camera.focus || fov !== camera.fov ||
-												aspect !== camera.aspect * this.aspect || near !== camera.near ||
-												far !== camera.far || zoom !== camera.zoom || eyeSep !== this.eyeSep;
+			cache.focus = camera.focus;
+			cache.fov = camera.fov;
+			cache.aspect = camera.aspect * this.aspect;
+			cache.near = camera.near;
+			cache.far = camera.far;
+			cache.zoom = camera.zoom;
+			cache.eyeSep = this.eyeSep;
 
-			if ( needsUpdate ) {
+			// Off-axis stereoscopic effect based on
+			// http://paulbourke.net/stereographics/stereorender/
 
-				instance = this;
-				focus = camera.focus;
-				fov = camera.fov;
-				aspect = camera.aspect * this.aspect;
-				near = camera.near;
-				far = camera.far;
-				zoom = camera.zoom;
+			var projectionMatrix = camera.projectionMatrix.clone();
+			var eyeSepHalf = cache.eyeSep / 2;
+			var eyeSepOnProjection = eyeSepHalf * cache.near / cache.focus;
+			var ymax = ( cache.near * Math.tan( _Math.DEG2RAD * cache.fov * 0.5 ) ) / cache.zoom;
+			var xmin, xmax;
 
-				// Off-axis stereoscopic effect based on
-				// http://paulbourke.net/stereographics/stereorender/
+			// translate xOffset
 
-				var projectionMatrix = camera.projectionMatrix.clone();
-				eyeSep = this.eyeSep / 2;
-				var eyeSepOnProjection = eyeSep * near / focus;
-				var ymax = ( near * Math.tan( _Math.DEG2RAD * fov * 0.5 ) ) / zoom;
-				var xmin, xmax;
+			_eyeLeft.elements[ 12 ] = - eyeSepHalf;
+			_eyeRight.elements[ 12 ] = eyeSepHalf;
 
-				// translate xOffset
+			// for left eye
 
-				eyeLeft.elements[ 12 ] = - eyeSep;
-				eyeRight.elements[ 12 ] = eyeSep;
+			xmin = - ymax * cache.aspect + eyeSepOnProjection;
+			xmax = ymax * cache.aspect + eyeSepOnProjection;
 
-				// for left eye
+			projectionMatrix.elements[ 0 ] = 2 * cache.near / ( xmax - xmin );
+			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-				xmin = - ymax * aspect + eyeSepOnProjection;
-				xmax = ymax * aspect + eyeSepOnProjection;
+			this.cameraL.projectionMatrix.copy( projectionMatrix );
 
-				projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
-				projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
+			// for right eye
 
-				this.cameraL.projectionMatrix.copy( projectionMatrix );
+			xmin = - ymax * cache.aspect - eyeSepOnProjection;
+			xmax = ymax * cache.aspect - eyeSepOnProjection;
 
-				// for right eye
+			projectionMatrix.elements[ 0 ] = 2 * cache.near / ( xmax - xmin );
+			projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
 
-				xmin = - ymax * aspect - eyeSepOnProjection;
-				xmax = ymax * aspect - eyeSepOnProjection;
+			this.cameraR.projectionMatrix.copy( projectionMatrix );
 
-				projectionMatrix.elements[ 0 ] = 2 * near / ( xmax - xmin );
-				projectionMatrix.elements[ 8 ] = ( xmax + xmin ) / ( xmax - xmin );
+		}
 
-				this.cameraR.projectionMatrix.copy( projectionMatrix );
+		this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeLeft );
+		this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( _eyeRight );
 
-			}
-
-			this.cameraL.matrixWorld.copy( camera.matrixWorld ).multiply( eyeLeft );
-			this.cameraR.matrixWorld.copy( camera.matrixWorld ).multiply( eyeRight );
-
-		};
-
-	} )()
+	}
 
 } );
 

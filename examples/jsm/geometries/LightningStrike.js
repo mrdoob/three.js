@@ -7,7 +7,7 @@
  * Usage
  *
  * var myRay = new LightningStrike( paramsObject );
- * var myRayMesh = new Mesh( myRay, myMaterial );
+ * var myRayMesh = new THREE.Mesh( myRay, myMaterial );
  * scene.add( myRayMesh );
  * ...
  * myRay.update( currentTime );
@@ -103,9 +103,9 @@
 
 import {
 	BufferGeometry,
+	DynamicDrawUsage,
 	Float32BufferAttribute,
 	Math as _Math,
-	Mesh,
 	Uint32BufferAttribute,
 	Vector3
 } from "../../../build/three.module.js";
@@ -429,22 +429,22 @@ LightningStrike.prototype.createMesh = function () {
 	this.setIndex( new Uint32BufferAttribute( this.indices, 1 ) );
 
 	this.positionAttribute = new Float32BufferAttribute( this.vertices, 3 );
-	this.addAttribute( 'position', this.positionAttribute );
+	this.setAttribute( 'position', this.positionAttribute );
 
 	if ( this.generateUVs ) {
 
 		this.uvsAttribute = new Float32BufferAttribute( new Float32Array( this.uvs ), 2 );
-		this.addAttribute( 'uv', this.uvsAttribute );
+		this.setAttribute( 'uv', this.uvsAttribute );
 
 	}
 
 	if ( ! this.isStatic ) {
 
-		this.index.dynamic = true;
-		this.positionAttribute.dynamic = true;
+		this.index.usage = DynamicDrawUsage;
+		this.positionAttribute.usage = DynamicDrawUsage;
 		if ( this.generateUVs ) {
 
-			this.uvsAttribute.dynamic = true;
+			this.uvsAttribute.usage = DynamicDrawUsage;
 
 		}
 
@@ -542,7 +542,7 @@ LightningStrike.prototype.fillMesh = function ( time ) {
 
 };
 
-LightningStrike.prototype.addNewSubray = function ( rayParameters ) {
+LightningStrike.prototype.addNewSubray = function ( /*rayParameters*/ ) {
 
 	return this.subrays[ this.numSubrays ++ ];
 
@@ -794,7 +794,7 @@ LightningStrike.prototype.createTriangleVerticesWithUVs = function ( pos, up, fo
 
 };
 
-LightningStrike.prototype.createPrismFaces = function ( vertex, index ) {
+LightningStrike.prototype.createPrismFaces = function ( vertex/*, index*/ ) {
 
 	var indices = this.indices;
 	var vertex = this.currentVertex - 6;
@@ -841,7 +841,7 @@ LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function () {
 		var childSubraySeed = random1() * ( currentCycle + 1 );
 
 		var isActive = phase % period <= dutyCycle * period;
-		
+
 		var probability = 0;
 
 		if ( isActive ) {

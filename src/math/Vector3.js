@@ -10,6 +10,9 @@ import { Quaternion } from './Quaternion.js';
  * @author WestLangley / http://github.com/WestLangley
  */
 
+var _vector = new Vector3();
+var _quaternion = new Quaternion();
+
 function Vector3( x, y, z ) {
 
 	this.x = x || 0;
@@ -231,35 +234,23 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	applyEuler: function () {
+	applyEuler: function ( euler ) {
 
-		var quaternion = new Quaternion();
+		if ( ! ( euler && euler.isEuler ) ) {
 
-		return function applyEuler( euler ) {
+			console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
 
-			if ( ! ( euler && euler.isEuler ) ) {
+		}
 
-				console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
+		return this.applyQuaternion( _quaternion.setFromEuler( euler ) );
 
-			}
+	},
 
-			return this.applyQuaternion( quaternion.setFromEuler( euler ) );
+	applyAxisAngle: function ( axis, angle ) {
 
-		};
+		return this.applyQuaternion( _quaternion.setFromAxisAngle( axis, angle ) );
 
-	}(),
-
-	applyAxisAngle: function () {
-
-		var quaternion = new Quaternion();
-
-		return function applyAxisAngle( axis, angle ) {
-
-			return this.applyQuaternion( quaternion.setFromAxisAngle( axis, angle ) );
-
-		};
-
-	}(),
+	},
 
 	applyMatrix3: function ( m ) {
 
@@ -271,6 +262,12 @@ Object.assign( Vector3.prototype, {
 		this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
 
 		return this;
+
+	},
+
+	applyNormalMatrix: function ( m ) {
+
+		return this.applyMatrix3( m ).normalize();
 
 	},
 
@@ -535,46 +532,40 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	projectOnVector: function ( vector ) {
+	projectOnVector: function ( v ) {
 
-		var scalar = vector.dot( this ) / vector.lengthSq();
+		// v cannot be the zero v
 
-		return this.copy( vector ).multiplyScalar( scalar );
+		var scalar = v.dot( this ) / v.lengthSq();
+
+		return this.copy( v ).multiplyScalar( scalar );
 
 	},
 
-	projectOnPlane: function () {
+	projectOnPlane: function ( planeNormal ) {
 
-		var v1 = new Vector3();
+		_vector.copy( this ).projectOnVector( planeNormal );
 
-		return function projectOnPlane( planeNormal ) {
+		return this.sub( _vector );
 
-			v1.copy( this ).projectOnVector( planeNormal );
+	},
 
-			return this.sub( v1 );
-
-		};
-
-	}(),
-
-	reflect: function () {
+	reflect: function ( normal ) {
 
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
 
-		var v1 = new Vector3();
+		return this.sub( _vector.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
-		return function reflect( normal ) {
-
-			return this.sub( v1.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
-
-		};
-
-	}(),
+	},
 
 	angleTo: function ( v ) {
 
-		var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
+		var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
+
+		if ( denominator === 0 ) console.error( 'THREE.Vector3: angleTo() can\'t handle zero length vectors.' );
+
+		var theta = this.dot( v ) / denominator;
 
 		// clamp, to handle numerical problems
 

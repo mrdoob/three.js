@@ -22,8 +22,6 @@ function WebVRManager( renderer ) {
 	var device = null;
 	var frameData = null;
 
-	var poseTarget = null;
-
 	var controllers = [];
 	var standingMatrix = new Matrix4();
 	var standingMatrixInverse = new Matrix4();
@@ -42,6 +40,8 @@ function WebVRManager( renderer ) {
 	var matrixWorldInverse = new Matrix4();
 	var tempQuaternion = new Quaternion();
 	var tempPosition = new Vector3();
+
+	var tempCamera = new PerspectiveCamera();
 
 	var cameraL = new PerspectiveCamera();
 	cameraL.viewport = new Vector4();
@@ -104,12 +104,13 @@ function WebVRManager( renderer ) {
 	//
 
 	var triggers = [];
+	var grips = [];
 
 	function findGamepad( id ) {
 
 		var gamepads = navigator.getGamepads && navigator.getGamepads();
 
-		for ( var i = 0, j = 0, l = gamepads.length; i < l; i ++ ) {
+		for ( var i = 0, l = gamepads.length; i < l; i ++ ) {
 
 			var gamepad = gamepads[ i ];
 
@@ -119,9 +120,10 @@ function WebVRManager( renderer ) {
 				gamepad.id.startsWith( 'HTC Vive Focus' ) ||
 				gamepad.id.startsWith( 'Spatial Controller' ) ) ) {
 
-				if ( j === id ) return gamepad;
+				var hand = gamepad.hand;
 
-				j ++;
+				if ( id === 0 && ( hand === '' || hand === 'right' ) ) return gamepad;
+				if ( id === 1 && ( hand === 'left' ) ) return gamepad;
 
 			}
 
@@ -173,6 +175,33 @@ function WebVRManager( renderer ) {
 
 						controller.dispatchEvent( { type: 'selectend' } );
 						controller.dispatchEvent( { type: 'select' } );
+
+					}
+
+				}
+
+				// Grip
+				buttonId = 2;
+
+				if ( grips[ i ] === undefined ) grips[ i ] = false;
+
+				// Skip if the grip button doesn't exist on this controller
+				if ( gamepad.buttons[ buttonId ] !== undefined ) {
+
+					if ( grips[ i ] !== gamepad.buttons[ buttonId ].pressed ) {
+
+						grips[ i ] = gamepad.buttons[ buttonId ].pressed;
+
+						if ( grips[ i ] === true ) {
+
+							controller.dispatchEvent( { type: 'squeezestart' } );
+
+						} else {
+
+							controller.dispatchEvent( { type: 'squeezeend' } );
+							controller.dispatchEvent( { type: 'squeeze' } );
+
+						}
 
 					}
 
@@ -246,24 +275,9 @@ function WebVRManager( renderer ) {
 
 	};
 
-	this.setPoseTarget = function ( object ) {
-
-		if ( object !== undefined ) poseTarget = object;
-
-	};
-
 	this.getCamera = function ( camera ) {
 
 		var userHeight = referenceSpaceType === 'local-floor' ? 1.6 : 0;
-
-		if ( isPresenting() === false ) {
-
-			camera.position.set( 0, userHeight, 0 );
-			camera.rotation.set( 0, 0, 0 );
-
-			return camera;
-
-		}
 
 		device.depthNear = camera.near;
 		device.depthFar = camera.far;
@@ -290,16 +304,14 @@ function WebVRManager( renderer ) {
 
 
 		var pose = frameData.pose;
-		var poseObject = poseTarget !== null ? poseTarget : camera;
 
-		// We want to manipulate poseObject by its position and quaternion components since users may rely on them.
-		poseObject.matrix.copy( standingMatrix );
-		poseObject.matrix.decompose( poseObject.position, poseObject.quaternion, poseObject.scale );
+		tempCamera.matrix.copy( standingMatrix );
+		tempCamera.matrix.decompose( tempCamera.position, tempCamera.quaternion, tempCamera.scale );
 
 		if ( pose.orientation !== null ) {
 
 			tempQuaternion.fromArray( pose.orientation );
-			poseObject.quaternion.multiply( tempQuaternion );
+			tempCamera.quaternion.multiply( tempQuaternion );
 
 		}
 
@@ -308,11 +320,23 @@ function WebVRManager( renderer ) {
 			tempQuaternion.setFromRotationMatrix( standingMatrix );
 			tempPosition.fromArray( pose.position );
 			tempPosition.applyQuaternion( tempQuaternion );
-			poseObject.position.add( tempPosition );
+			tempCamera.position.add( tempPosition );
 
 		}
 
-		poseObject.updateMatrixWorld();
+		tempCamera.updateMatrixWorld();
+
+		//
+
+		camera.matrixWorld.copy( tempCamera.matrixWorld );
+
+		var children = camera.children;
+
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+			children[ i ].updateMatrixWorld( true );
+
+		}
 
 		//
 
@@ -336,7 +360,7 @@ function WebVRManager( renderer ) {
 
 		}
 
-		var parent = poseObject.parent;
+		var parent = camera.parent;
 
 		if ( parent !== null ) {
 

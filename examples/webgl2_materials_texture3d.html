@@ -13,8 +13,6 @@
 	</div>
 	<div id="inset"></div>
 
-	<script src="js/WebGL.js"></script>
-
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
 
@@ -22,6 +20,7 @@
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
 		import { VolumeRenderShader1 } from './jsm/shaders/VolumeShader.js';
+		import { WEBGL } from './jsm/WebGL.js';
 
 		if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -45,7 +44,7 @@
 
 			// Create renderer
 			var canvas = document.createElement( 'canvas' );
-			var context = canvas.getContext( 'webgl2' );
+			var context = canvas.getContext( 'webgl2', { alpha: false, antialias: false } );
 			renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
@@ -92,7 +91,6 @@
 				texture.type = THREE.FloatType;
 				texture.minFilter = texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
-				texture.needsUpdate = true;
 
 				// Colormap textures
 				cmtextures = {

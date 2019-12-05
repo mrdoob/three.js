@@ -41,6 +41,7 @@ var Strings = function ( config ) {
 			'menubar/add/cylinder': 'Cylinder',
 			'menubar/add/ring': 'Ring',
 			'menubar/add/sphere': 'Sphere',
+			'menubar/add/dodecahedron': 'Dodecahedron',
 			'menubar/add/icosahedron': 'Icosahedron',
 			'menubar/add/octahedron': 'Octahedron',
 			'menubar/add/tetrahedron': 'Tetrahedron',
@@ -64,6 +65,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': 'Play',
 
 			'menubar/examples': 'Examples',
+			'menubar/examples/Arkanoid': 'Arkanoid',
+			'menubar/examples/Camera': 'Camera',
+			'menubar/examples/Particles': 'Particles',
+			'menubar/examples/Pong': 'Pong',
+			'menubar/examples/Shaders': 'Shaders',
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
@@ -148,6 +154,9 @@ var Strings = function ( config ) {
 			'sidebar/geometry/geometry/vertices': 'Vertices',
 			'sidebar/geometry/geometry/faces': 'Faces',
 
+			'sidebar/geometry/dodecahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/dodecahedron_geometry/detail': 'Detail',
+
 			'sidebar/geometry/icosahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/icosahedron_geometry/detail': 'Detail',
 
@@ -221,11 +230,12 @@ var Strings = function ( config ) {
 			'sidebar/material/depthPacking': 'Depth Packing',
 			'sidebar/material/roughness': 'Roughness',
 			'sidebar/material/metalness': 'Metalness',
+			'sidebar/material/sheen': 'Sheen',
 			'sidebar/material/emissive': 'Emissive',
 			'sidebar/material/specular': 'Specular',
 			'sidebar/material/shininess': 'Shininess',
-			'sidebar/material/clearcoat': 'ClearCoat',
-			'sidebar/material/clearcoatroughness': 'ClearCoat Roughness',
+			'sidebar/material/clearcoat': 'Clearcoat',
+			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
 			'sidebar/material/vertexcolors': 'Vertex Colors',
 			'sidebar/material/vertexcolors/no': 'No',
 			'sidebar/material/vertexcolors/face': 'Face',
@@ -236,6 +246,7 @@ var Strings = function ( config ) {
 			'sidebar/material/alphamap': 'Alpha Map',
 			'sidebar/material/bumpmap': 'Bump Map',
 			'sidebar/material/normalmap': 'Normal Map',
+			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
 			'sidebar/material/displacemap': 'Displace Map',
 			'sidebar/material/roughmap': 'Rough. Map',
 			'sidebar/material/metalmap': 'Metal. Map',
@@ -274,12 +285,10 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'antialias',
 			'sidebar/project/shadows': 'shadows',
+			'sidebar/project/materials': 'Materials',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
-			'sidebar/settings/theme': 'Theme',
-			'sidebar/settings/theme/light': 'light',
-			'sidebar/settings/theme/dark': 'dark',
 
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
@@ -289,7 +298,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings/viewport/grid': 'Grid',
 
-			'sidebar/history/history': 'HISTORY',
+			'sidebar/history': 'History',
 			'sidebar/history/persistent': 'persistent',
 
 			'toolbar/translate': 'Translate',
@@ -336,6 +345,7 @@ var Strings = function ( config ) {
 			'menubar/add/cylinder': '圆柱体',
 			'menubar/add/ring': '环',
 			'menubar/add/sphere': '球体',
+			'menubar/add/dodecahedron': '十二面体',
 			'menubar/add/icosahedron': '二十面体',
 			'menubar/add/octahedron': '八面体',
 			'menubar/add/tetrahedron': '四面体',
@@ -359,6 +369,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': '启动',
 
 			'menubar/examples': '示例',
+			'menubar/examples/Arkanoid': '打砖块',
+			'menubar/examples/Camera': ' 摄像机',
+			'menubar/examples/Particles': '粒子',
+			'menubar/examples/Pong': '乒乓球',
+			'menubar/examples/Shaders': '着色器',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
@@ -432,6 +447,9 @@ var Strings = function ( config ) {
 
 			'sidebar/geometry/geometry/vertices': '顶点',
 			'sidebar/geometry/geometry/faces': '面',
+
+			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
+			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',
 
 			'sidebar/geometry/icosahedron_geometry/radius': '半径',
 			'sidebar/geometry/icosahedron_geometry/detail': '面片分段',
@@ -507,6 +525,7 @@ var Strings = function ( config ) {
 			'sidebar/material/alphamap': '透明贴图',
 			'sidebar/material/bumpmap': '凹凸贴图',
 			'sidebar/material/normalmap': '法线贴图',
+			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
 			'sidebar/material/displacemap': '置换贴图',
 			'sidebar/material/roughmap': '粗糙贴图',
 			'sidebar/material/metalmap': '金属贴图',
@@ -544,12 +563,10 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
+			'sidebar/project/materials': 'Materials',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
-			'sidebar/settings/theme': '主题',
-			'sidebar/settings/theme/light': '浅色',
-			'sidebar/settings/theme/dark': '深色',
 
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
@@ -559,7 +576,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings/viewport/grid': '网格',
 
-			'sidebar/history/history': '历史记录',
+			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',
 
 			'toolbar/translate': '移动',

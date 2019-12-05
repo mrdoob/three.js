@@ -11,7 +11,7 @@ import {
 	Color,
 	ConeBufferGeometry,
 	CylinderBufferGeometry,
-	DefaultLoadingManager,
+	DataTexture,
 	DoubleSide,
 	FileLoader,
 	Float32BufferAttribute,
@@ -19,6 +19,7 @@ import {
 	Group,
 	LineBasicMaterial,
 	LineSegments,
+	Loader,
 	LoaderUtils,
 	Mesh,
 	MeshBasicMaterial,
@@ -26,6 +27,8 @@ import {
 	Object3D,
 	Points,
 	PointsMaterial,
+	RGBAFormat,
+	RGBFormat,
 	RepeatWrapping,
 	Scene,
 	SphereBufferGeometry,
@@ -52,21 +55,19 @@ var VRMLLoader = ( function () {
 
 	function VRMLLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 	}
 
-	VRMLLoader.prototype = {
+	VRMLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: VRMLLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
-			var path = ( scope.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
+			var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 			var loader = new FileLoader( this.manager );
 			loader.setPath( scope.path );
@@ -75,27 +76,6 @@ var VRMLLoader = ( function () {
 				onLoad( scope.parse( text, path ) );
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -203,8 +183,10 @@ var VRMLLoader = ( function () {
 				//
 
 				var StringLiteral = createToken( { name: "StringLiteral", pattern: /"(:?[^\\"\n\r]+|\\(:?[bfnrtv"\\/]|u[0-9a-fA-F]{4}))*"/ } );
+				var HexLiteral = createToken( { name: 'HexLiteral', pattern: /0[xX][0-9a-fA-F]+/ } );
 				var NumberLiteral = createToken( { name: 'NumberLiteral', pattern: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/ } );
-				var BooleanLiteral = createToken( { name: 'BooleanLiteral', pattern: /TRUE|FALSE/ } );
+				var TrueLiteral = createToken( { name: 'TrueLiteral', pattern: /TRUE/ } );
+				var FalseLiteral = createToken( { name: 'FalseLiteral', pattern: /FALSE/ } );
 				var NullLiteral = createToken( { name: 'NullLiteral', pattern: /NULL/ } );
 				var LSquare = createToken( { name: 'LSquare', pattern: /\[/ } );
 				var RSquare = createToken( { name: 'RSquare', pattern: /]/ } );
@@ -232,13 +214,15 @@ var VRMLLoader = ( function () {
 					USE,
 					ROUTE,
 					TO,
-					BooleanLiteral,
+					TrueLiteral,
+					FalseLiteral,
 					NullLiteral,
 					// the Identifier must appear after the keywords because all keywords are valid identifiers
 					Version,
 					Identifier,
 					RouteIdentifier,
 					StringLiteral,
+					HexLiteral,
 					NumberLiteral,
 					LSquare,
 					RSquare,
@@ -480,15 +464,43 @@ var VRMLLoader = ( function () {
 
 					}
 
-					if ( ctx.BooleanLiteral ) {
+					if ( ctx.HexLiteral ) {
+
+						field.type = 'hex';
+
+						for ( var i = 0, l = ctx.HexLiteral.length; i < l; i ++ ) {
+
+							var hexLiteral = ctx.HexLiteral[ i ];
+
+							field.values.push( hexLiteral.image );
+
+						}
+
+					}
+
+					if ( ctx.TrueLiteral ) {
 
 						field.type = 'boolean';
 
-						for ( var i = 0, l = ctx.BooleanLiteral.length; i < l; i ++ ) {
+						for ( var i = 0, l = ctx.TrueLiteral.length; i < l; i ++ ) {
 
-							var booleanLiteral = ctx.BooleanLiteral[ i ];
+							var trueLiteral = ctx.TrueLiteral[ i ];
 
-							field.values.push( booleanLiteral.image === 'TRUE' );
+							if ( trueLiteral.image === 'TRUE' ) field.values.push( true );
+
+						}
+
+					}
+
+					if ( ctx.FalseLiteral ) {
+
+						field.type = 'boolean';
+
+						for ( var i = 0, l = ctx.FalseLiteral.length; i < l; i ++ ) {
+
+							var falseLiteral = ctx.FalseLiteral[ i ];
+
+							if ( falseLiteral.image === 'FALSE' ) field.values.push( false );
 
 						}
 
@@ -619,7 +631,7 @@ var VRMLLoader = ( function () {
 						break;
 
 					case 'Appearance':
-						build = buildApperanceNode( node );
+						build = buildAppearanceNode( node );
 						break;
 
 					case 'Material':
@@ -628,6 +640,10 @@ var VRMLLoader = ( function () {
 
 					case 'ImageTexture':
 						build = buildImageTextureNode( node );
+						break;
+
+					case 'PixelTexture':
+						build = buildPixelTextureNode( node );
 						break;
 
 					case 'TextureTransform':
@@ -699,7 +715,6 @@ var VRMLLoader = ( function () {
 
 					case 'FontStyle':
 					case 'MovieTexture':
-					case 'PixelTexture':
 
 					case 'ColorInterpolator':
 					case 'CoordinateInterpolator':
@@ -851,11 +866,11 @@ var VRMLLoader = ( function () {
 
 				}
 
+				var radius = 10000;
+
 				// sky
 
 				if ( skyColor ) {
-
-					var radius = 10000;
 
 					var skyGeometry = new SphereBufferGeometry( radius, 32, 16 );
 					var skyMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, depthWrite: false, depthTest: false } );
@@ -947,7 +962,7 @@ var VRMLLoader = ( function () {
 
 				var object;
 
-				if ( geometry ) {
+				if ( geometry && geometry.attributes.position ) {
 
 					var type = geometry._type;
 
@@ -1021,7 +1036,7 @@ var VRMLLoader = ( function () {
 
 					object = new Object3D();
 
-					// if the geometry field is NULL the object is not drawn
+					// if the geometry field is NULL or no vertices are defined the object is not drawn
 
 					object.visible = false;
 
@@ -1031,7 +1046,7 @@ var VRMLLoader = ( function () {
 
 			}
 
-			function buildApperanceNode( node ) {
+			function buildAppearanceNode( node ) {
 
 				var material = new MeshPhongMaterial();
 				var transformData;
@@ -1071,13 +1086,13 @@ var VRMLLoader = ( function () {
 							var textureNode = fieldValues[ 0 ];
 							if ( textureNode !== null ) {
 
-								if ( textureNode.name === 'ImageTexture' ) {
+								if ( textureNode.name === 'ImageTexture' || textureNode.name === 'PixelTexture' ) {
 
 									material.map = getNode( textureNode );
 
 								} else {
 
-									// MovieTexture and PixelTexture not supported yet
+									// MovieTexture not supported yet
 
 								}
 
@@ -1102,12 +1117,45 @@ var VRMLLoader = ( function () {
 
 				// only apply texture transform data if a texture was defined
 
-				if ( material.map && transformData ) {
+				if ( material.map ) {
 
-					material.map.center.copy( transformData.center );
-					material.map.rotation = transformData.rotation;
-					material.map.repeat.copy( transformData.scale );
-					material.map.offset.copy( transformData.translation );
+					// respect VRML lighting model
+
+					if ( material.map.__type ) {
+
+						switch ( material.map.__type ) {
+
+							case TEXTURE_TYPE.INTENSITY_ALPHA:
+								material.opacity = 1; // ignore transparency
+								break;
+
+							case TEXTURE_TYPE.RGB:
+								material.color.set( 0xffffff ); // ignore material color
+								break;
+
+							case TEXTURE_TYPE.RGBA:
+								material.color.set( 0xffffff ); // ignore material color
+								material.opacity = 1; // ignore transparency
+								break;
+
+							default:
+
+						}
+
+						delete material.map.__type;
+
+					}
+
+					// apply texture transform
+
+					if ( transformData ) {
+
+						material.map.center.copy( transformData.center );
+						material.map.rotation = transformData.rotation;
+						material.map.repeat.copy( transformData.scale );
+						material.map.offset.copy( transformData.translation );
+
+					}
 
 				}
 
@@ -1162,6 +1210,163 @@ var VRMLLoader = ( function () {
 				}
 
 				return materialData;
+
+			}
+
+			function parseHexColor( hex, textureType, color ) {
+
+				switch ( textureType ) {
+
+					case TEXTURE_TYPE.INTENSITY:
+						// Intensity texture: A one-component image specifies one-byte hexadecimal or integer values representing the intensity of the image
+						var value = parseInt( hex );
+						color.r = value;
+						color.g = value;
+						color.b = value;
+						break;
+
+					case TEXTURE_TYPE.INTENSITY_ALPHA:
+						// Intensity+Alpha texture: A two-component image specifies the intensity in the first (high) byte and the alpha opacity in the second (low) byte.
+						var value = parseInt( "0x" + hex.substring( 2, 4 ) );
+						color.r = value;
+						color.g = value;
+						color.b = value;
+						color.a = parseInt( "0x" + hex.substring( 4, 6 ) );
+						break;
+
+					case TEXTURE_TYPE.RGB:
+						// RGB texture: Pixels in a three-component image specify the red component in the first (high) byte, followed by the green and blue components
+						color.r = parseInt( "0x" + hex.substring( 2, 4 ) );
+						color.g = parseInt( "0x" + hex.substring( 4, 6 ) );
+						color.b = parseInt( "0x" + hex.substring( 6, 8 ) );
+						break;
+
+					case TEXTURE_TYPE.RGBA:
+						// RGBA texture: Four-component images specify the alpha opacity byte after red/green/blue
+						color.r = parseInt( "0x" + hex.substring( 2, 4 ) );
+						color.g = parseInt( "0x" + hex.substring( 4, 6 ) );
+						color.b = parseInt( "0x" + hex.substring( 6, 8 ) );
+						color.a = parseInt( "0x" + hex.substring( 8, 10 ) );
+						break;
+
+					default:
+
+				}
+
+			}
+
+			function getTextureType( num_components ) {
+
+				var type;
+
+				switch ( num_components ) {
+
+					case 1:
+						type = TEXTURE_TYPE.INTENSITY;
+						break;
+
+					case 2:
+						type = TEXTURE_TYPE.INTENSITY_ALPHA;
+						break;
+
+					case 3:
+						type = TEXTURE_TYPE.RGB;
+						break;
+
+					case 4:
+						type = TEXTURE_TYPE.RGBA;
+						break;
+
+					default:
+
+				}
+
+				return type;
+
+			}
+
+			function buildPixelTextureNode( node ) {
+
+				var texture;
+				var wrapS = RepeatWrapping;
+				var wrapT = RepeatWrapping;
+
+				var fields = node.fields;
+
+				for ( var i = 0, l = fields.length; i < l; i ++ ) {
+
+					var field = fields[ i ];
+					var fieldName = field.name;
+					var fieldValues = field.values;
+
+					switch ( fieldName ) {
+
+						case 'image':
+							var width = fieldValues[ 0 ];
+							var height = fieldValues[ 1 ];
+							var num_components = fieldValues[ 2 ];
+
+							var useAlpha = ( num_components === 2 || num_components === 4 );
+							var textureType = getTextureType( num_components );
+
+							var size = ( ( useAlpha === true ) ? 4 : 3 ) * ( width * height );
+							var data = new Uint8Array( size );
+
+							var color = { r: 0, g: 0, b: 0, a: 0 };
+
+							for ( var j = 3, k = 0, jl = fieldValues.length; j < jl; j ++, k ++ ) {
+
+								parseHexColor( fieldValues[ j ], textureType, color );
+
+								if ( useAlpha === true ) {
+
+									var stride = k * 4;
+
+									data[ stride + 0 ] = color.r;
+									data[ stride + 1 ] = color.g;
+									data[ stride + 2 ] = color.b;
+									data[ stride + 3 ] = color.a;
+
+								} else {
+
+									var stride = k * 3;
+
+									data[ stride + 0 ] = color.r;
+									data[ stride + 1 ] = color.g;
+									data[ stride + 2 ] = color.b;
+
+								}
+
+							}
+
+							texture = new DataTexture( data, width, height, ( useAlpha === true ) ? RGBAFormat : RGBFormat );
+							texture.__type = textureType; // needed for material modifications
+							break;
+
+						case 'repeatS':
+							if ( fieldValues[ 0 ] === false ) wrapS = ClampToEdgeWrapping;
+							break;
+
+						case 'repeatT':
+							if ( fieldValues[ 0 ] === false ) wrapT = ClampToEdgeWrapping;
+							break;
+
+						default:
+							console.warn( 'THREE.VRMLLoader: Unknown field:', fieldName );
+							break;
+
+					}
+
+				}
+
+				if ( texture ) {
+
+					texture.wrapS = wrapS;
+					texture.wrapT = wrapT;
+
+				}
+
+				return texture;
 
 			}
 
@@ -1269,7 +1474,7 @@ var VRMLLoader = ( function () {
 			function buildIndexedFaceSetNode( node ) {
 
 				var color, coord, normal, texCoord;
-				var ccw = true, solid = true, creaseAngle;
+				var ccw = true, solid = true, creaseAngle = 0;
 				var colorIndex, coordIndex, normalIndex, texCoordIndex;
 				var colorPerVertex = true, normalPerVertex = true;
 
@@ -1371,6 +1576,14 @@ var VRMLLoader = ( function () {
 
 				}
 
+				if ( coordIndex === undefined ) {
+
+					console.warn( 'THREE.VRMLLoader: Missing coordIndex.' );
+
+					return new BufferGeometry(); // handle VRML files with incomplete geometry definition
+
+				}
+
 				var triangulatedCoordIndex = triangulateFaceIndex( coordIndex, ccw );
 
 				var positionAttribute;
@@ -1382,7 +1595,7 @@ var VRMLLoader = ( function () {
 
 					if ( colorPerVertex === true ) {
 
-						if ( colorIndex.length > 0 ) {
+						if ( colorIndex && colorIndex.length > 0 ) {
 
 							// if the colorIndex field is not empty, then it is used to choose colors for each vertex of the IndexedFaceSet.
 
@@ -1399,7 +1612,7 @@ var VRMLLoader = ( function () {
 
 					} else {
 
-						if ( colorIndex.length > 0 ) {
+						if ( colorIndex && colorIndex.length > 0 ) {
 
 							// if the colorIndex field is not empty, then they are used to choose one color for each face of the IndexedFaceSet
 
@@ -1427,7 +1640,7 @@ var VRMLLoader = ( function () {
 
 						// consider vertex normals
 
-						if ( normalIndex.length > 0 ) {
+						if ( normalIndex && normalIndex.length > 0 ) {
 
 							// if the normalIndex field is not empty, then it is used to choose normals for each vertex of the IndexedFaceSet.
 
@@ -1446,7 +1659,7 @@ var VRMLLoader = ( function () {
 
 						// consider face normals
 
-						if ( normalIndex.length > 0 ) {
+						if ( normalIndex && normalIndex.length > 0 ) {
 
 							// if the normalIndex field is not empty, then they are used to choose one normal for each face of the IndexedFaceSet
 
@@ -1477,7 +1690,7 @@ var VRMLLoader = ( function () {
 
 					// texture coordinates are always defined on vertex level
 
-					if ( texCoordIndex.length > 0 ) {
+					if ( texCoordIndex && texCoordIndex.length > 0 ) {
 
 						// if the texCoordIndex field is not empty, then it is used to choose texture coordinates for each vertex of the IndexedFaceSet.
 
@@ -1498,13 +1711,13 @@ var VRMLLoader = ( function () {
 				var geometry = new BufferGeometry();
 				positionAttribute = toNonIndexedAttribute( triangulatedCoordIndex, new Float32BufferAttribute( coord, 3 ) );
 
-				geometry.addAttribute( 'position', positionAttribute );
-				geometry.addAttribute( 'normal', normalAttribute );
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'normal', normalAttribute );
 
 				// optional attributes
 
-				if ( colorAttribute ) geometry.addAttribute( 'color', colorAttribute );
-				if ( uvAttribute ) geometry.addAttribute( 'uv', uvAttribute );
+				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
+				if ( uvAttribute ) geometry.setAttribute( 'uv', uvAttribute );
 
 				// "solid" influences the material so let's store it for later use
 
@@ -1625,9 +1838,9 @@ var VRMLLoader = ( function () {
 				var geometry = new BufferGeometry();
 
 				var positionAttribute = toNonIndexedAttribute( expandedLineIndex, new Float32BufferAttribute( coord, 3 ) );
-				geometry.addAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'position', positionAttribute );
 
-				if ( colorAttribute ) geometry.addAttribute( 'color', colorAttribute );
+				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
 
 				geometry._type = 'line';
 
@@ -1681,8 +1894,8 @@ var VRMLLoader = ( function () {
 
 				var geometry = new BufferGeometry();
 
-				geometry.addAttribute( 'position', new Float32BufferAttribute( coord, 3 ) );
-				if ( color ) geometry.addAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
+				geometry.setAttribute( 'position', new Float32BufferAttribute( coord, 3 ) );
+				if ( color ) geometry.setAttribute( 'color', new Float32BufferAttribute( color, 3 ) );
 
 				geometry._type = 'points';
 
@@ -2194,13 +2407,21 @@ var VRMLLoader = ( function () {
 
 			function weightedNormal( normals, vector, creaseAngle ) {
 
-				var normal = vector.clone();
+				var normal = new Vector3();
 
-				for ( var i = 0, l = normals.length; i < l; i ++ ) {
+				if ( creaseAngle === 0 ) {
 
-					if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
+					normal.copy( vector );
 
-						normal.add( normals[ i ] );
+				} else {
+
+					for ( var i = 0, l = normals.length; i < l; i ++ ) {
+
+						if ( normals[ i ].angleTo( vector ) < creaseAngle ) {
+
+							normal.add( normals[ i ] );
+
+						}
 
 					}
 
@@ -2248,83 +2469,69 @@ var VRMLLoader = ( function () {
 			 */
 			function paintFaces( geometry, radius, angles, colors, topDown ) {
 
-				var direction = ( topDown === true ) ? 1 : - 1;
+				// compute threshold values
 
-				var coord = [], A = {}, B = {}, applyColor = false;
+				var thresholds = [];
+				var startAngle = ( topDown === true ) ? 0 : Math.PI;
 
-				for ( var k = 0; k < angles.length; k ++ ) {
+				for ( var i = 0, l = colors.length; i < l; i ++ ) {
 
-					// push the vector at which the color changes
+					var angle = ( i === 0 ) ? 0 : angles[ i - 1 ];
+					angle = ( topDown === true ) ? angle : ( startAngle - angle );
 
-					var vec = {
-						x: direction * ( Math.cos( angles[ k ] ) * radius ),
-						y: direction * ( Math.sin( angles[ k ] ) * radius )
-					};
+					var point = new Vector3();
+					point.setFromSphericalCoords( radius, angle, 0 );
 
-					coord.push( vec );
+					thresholds.push( point );
 
 				}
 
-				var index = geometry.index;
+				// generate vertex colors
+
+				var indices = geometry.index;
 				var positionAttribute = geometry.attributes.position;
 				var colorAttribute = new BufferAttribute( new Float32Array( geometry.attributes.position.count * 3 ), 3 );
 
 				var position = new Vector3();
 				var color = new Color();
 
-				for ( var i = 0; i < index.count; i ++ ) {
+				for ( var i = 0; i < indices.count; i ++ ) {
 
-					var vertexIndex = index.getX( i );
+					var index = indices.getX( i );
+					position.fromBufferAttribute( positionAttribute, index );
 
-					position.fromBufferAttribute( positionAttribute, vertexIndex );
+					var thresholdIndexA, thresholdIndexB;
+					var t = 1;
 
-					for ( var j = 0; j < colors.length; j ++ ) {
+					for ( var j = 1; j < thresholds.length; j ++ ) {
 
-						// linear interpolation between aColor and bColor, calculate proportion
-						// A is previous point (angle)
+						thresholdIndexA = j - 1;
+						thresholdIndexB = j;
 
-						if ( j === 0 ) {
+						var thresholdA = thresholds[ thresholdIndexA ];
+						var thresholdB = thresholds[ thresholdIndexB ];
 
-							A.x = 0;
-							A.y = ( topDown === true ) ? radius : - 1 * radius;
+						if ( topDown === true ) {
+
+							// interpolation for sky color
+
+							if ( position.y <= thresholdA.y && position.y > thresholdB.y ) {
+
+								t = Math.abs( thresholdA.y - position.y ) / Math.abs( thresholdA.y - thresholdB.y );
+
+								break;
+
+							}
 
 						} else {
 
-							A.x = coord[ j - 1 ].x;
-							A.y = coord[ j - 1 ].y;
+							// interpolation for ground color
 
-						}
+							if ( position.y >= thresholdA.y && position.y < thresholdB.y ) {
 
-						// B is current point (angle)
+								t = Math.abs( thresholdA.y - position.y ) / Math.abs( thresholdA.y - thresholdB.y );
 
-						B = coord[ j ];
-
-						if ( B !== undefined ) {
-
-							// p has to be between the points A and B which we interpolate
-
-							applyColor = ( topDown === true ) ? ( position.y <= A.y && position.y > B.y ) : ( position.y >= A.y && position.y < B.y );
-
-							if ( applyColor === true ) {
-
-								var aColor = colors[ j ];
-								var bColor = colors[ j + 1 ];
-
-								// below is simple linear interpolation
-
-								var t = Math.abs( position.y - A.y ) / ( A.y - B.y );
-
-								// to make it faster, you can only calculate this if the y coord changes, the color is the same for points with the same y
-
-								color.copy( aColor ).lerp( bColor, t );
-
-								colorAttribute.setXYZ( vertexIndex, color.r, color.g, color.b );
-
-							} else {
-
-								var colorIndex = ( topDown === true ) ? colors.length - 1 : 0;
-								var c = colors[ colorIndex ];
-								colorAttribute.setXYZ( vertexIndex, c.r, c.g, c.b );
+								break;
 
 							}
 
@@ -2332,9 +2539,16 @@ var VRMLLoader = ( function () {
 
 					}
 
+					var colorA = colors[ thresholdIndexA ];
+					var colorB = colors[ thresholdIndexB ];
+
+					color.copy( colorA ).lerp( colorB, t );
+
+					colorAttribute.setXYZ( index, color.r, color.g, color.b );
+
 				}
 
-				geometry.addAttribute( 'color', colorAttribute );
+				geometry.setAttribute( 'color', colorAttribute );
 
 			}
 
@@ -2363,7 +2577,7 @@ var VRMLLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	function VRMLLexer( tokens ) {
 
@@ -2407,8 +2621,10 @@ var VRMLLoader = ( function () {
 		var Identifier = tokenVocabulary[ 'Identifier' ];
 		var RouteIdentifier = tokenVocabulary[ 'RouteIdentifier' ];
 		var StringLiteral = tokenVocabulary[ 'StringLiteral' ];
+		var HexLiteral = tokenVocabulary[ 'HexLiteral' ];
 		var NumberLiteral = tokenVocabulary[ 'NumberLiteral' ];
-		var BooleanLiteral = tokenVocabulary[ 'BooleanLiteral' ];
+		var TrueLiteral = tokenVocabulary[ 'TrueLiteral' ];
+		var FalseLiteral = tokenVocabulary[ 'FalseLiteral' ];
 		var NullLiteral = tokenVocabulary[ 'NullLiteral' ];
 		var DEF = tokenVocabulary[ 'DEF' ];
 		var USE = tokenVocabulary[ 'USE' ];
@@ -2512,12 +2728,22 @@ var VRMLLoader = ( function () {
 					} },
 					{ ALT: function () {
 
+						$.CONSUME( HexLiteral );
+
+					} },
+					{ ALT: function () {
+
 						$.CONSUME( NumberLiteral );
 
 					} },
 					{ ALT: function () {
 
-						$.CONSUME( BooleanLiteral );
+						$.CONSUME( TrueLiteral );
+
+					} },
+					{ ALT: function () {
+
+						$.CONSUME( FalseLiteral );
 
 					} },
 					{ ALT: function () {
@@ -2551,6 +2777,11 @@ var VRMLLoader = ( function () {
 					{ ALT: function () {
 
 						$.CONSUME( StringLiteral );
+
+					} },
+					{ ALT: function () {
+
+						$.CONSUME( HexLiteral );
 
 					} },
 					{ ALT: function () {
@@ -2594,6 +2825,13 @@ var VRMLLoader = ( function () {
 		this.normal = new Vector3();
 
 	}
+
+	var TEXTURE_TYPE = {
+		INTENSITY: 1,
+		INTENSITY_ALPHA: 2,
+		RGB: 3,
+		RGBA: 4
+	};
 
 	return VRMLLoader;
 

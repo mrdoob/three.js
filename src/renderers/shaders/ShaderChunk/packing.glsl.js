@@ -25,6 +25,14 @@ float unpackRGBAToDepth( const in vec4 v ) {
 	return dot( v, UnpackFactors );
 }
 
+vec4 pack2HalfToRGBA( vec2 v ) {
+	vec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ));
+	return vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w);
+}
+vec2 unpack2HalfToRGBA( vec4 v ) {
+	return vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );
+}
+
 // NOTE: viewZ/eyeZ is < 0 when in front of the camera per OpenGL conventions
 
 float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {

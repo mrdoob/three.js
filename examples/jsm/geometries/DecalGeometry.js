@@ -51,9 +51,9 @@ var DecalGeometry = function ( mesh, position, orientation, size ) {
 
 	// build geometry
 
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	function generate() {
 
@@ -155,6 +155,8 @@ var DecalGeometry = function ( mesh, position, orientation, size ) {
 
 		vertex.applyMatrix4( mesh.matrixWorld );
 		vertex.applyMatrix4( projectorMatrixInverse );
+
+		normal.transformDirection( mesh.matrixWorld );
 
 		decalVertices.push( new DecalVertex( vertex.clone(), normal.clone() ) );
 

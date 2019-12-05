@@ -418,7 +418,6 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.noiseTexture = new DataTexture( data, width, height, RGBAFormat, FloatType );
 		this.noiseTexture.wrapS = RepeatWrapping;
 		this.noiseTexture.wrapT = RepeatWrapping;
-		this.noiseTexture.needsUpdate = true;
 
 	}
 
