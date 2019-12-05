@@ -18,15 +18,10 @@ function WebGLMorphtargets( gl ) {
 
 		var objectInfluences = object.morphTargetInfluences;
 
-		if ( objectInfluences === undefined ) {
+		// When object doesn't have morph target influences defined, we treat it as a 0-length array
+		// This is important to make sure we set up morphTargetBaseInfluence / morphTargetInfluences
 
-			program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', 1.0 );
-			program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluencesZero );
-			return;
-
-		}
-
-		var length = objectInfluences.length;
+		var length = objectInfluences === undefined ? 0 : objectInfluences.length;
 
 		var influences = influencesList[ geometry.id ];
 
