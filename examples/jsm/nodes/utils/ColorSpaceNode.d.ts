@@ -11,7 +11,6 @@ export class ColorSpaceNode extends TempNode {
 	method: string | undefined;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	fromEncoding( encoding: number );
 	fromDecoding( encoding: number );
 	copy( source: ColorSpaceNode ): this;

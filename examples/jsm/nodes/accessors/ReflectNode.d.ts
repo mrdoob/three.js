@@ -10,8 +10,6 @@ export class ReflectNode extends TempNode {
 	scope: string;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
-
 	static CUBE: string;
 	static SPHERE: string;
 	static VECTOR: string;

@@ -19,9 +19,8 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
@@ -133,31 +132,17 @@
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				// Materials
-				var hdrpath = "textures/cube/pisaHDR/";
-				var hdrformat = '.hdr';
-				var hdrUrls = [
-					hdrpath + 'px' + hdrformat, hdrpath + 'nx' + hdrformat,
-					hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
-					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
-				];
-
-				new HDRCubeTextureLoader()
+				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
-					.load( hdrUrls, function ( hdrCubeMap ) {
+					.setPath( 'textures/equirectangular/' )
+					.load( 'pedestrian_overpass_1k.hdr', function ( hdrCubeMap ) {
 
-						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						var pmremGenerator = new PMREMGenerator( renderer );
+						standardMaterial.envMap = pmremGenerator.fromCubemap( hdrCubeMap ).texture;
 						standardMaterial.needsUpdate = true;
 
 						hdrCubeMap.dispose();
 						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
 
 					} );
 

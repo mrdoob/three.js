@@ -159,13 +159,13 @@
 
 				} );
 
-				cubeTexturePassP = new CubeTexturePass( cameraP );
-				composer.addPass( cubeTexturePassP );
+				cubeTexturePassP = null;
 
 				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 
-					cubeTexturePassP.envMap = ldrCubeMap;
+					cubeTexturePassP = new CubeTexturePass( cameraP, ldrCubeMap );
+					composer.insertPass( cubeTexturePassP, 2 );
 
 				} );
 
@@ -222,8 +222,10 @@
 				texturePass.enabled = params.texturePass;
 				texturePass.opacity = params.texturePassOpacity;
 
-				cubeTexturePassP.enabled = params.cubeTexturePass;
-				cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
+				if ( cubeTexturePassP != null ) {
+					cubeTexturePassP.enabled = params.cubeTexturePass;
+					cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
+				}
 
 				renderPass.enabled = params.renderPass;
 

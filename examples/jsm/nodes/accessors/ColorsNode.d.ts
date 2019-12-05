@@ -8,7 +8,6 @@ export class ColorsNode extends TempNode {
 	index: number;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: ColorsNode ): this;
 
 }

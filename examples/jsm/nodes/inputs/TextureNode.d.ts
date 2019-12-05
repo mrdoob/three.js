@@ -19,7 +19,6 @@ export class TextureNode extends InputNode {
 	nodeType: string;
 
 	getTexture( builder: NodeBuilder, output: string ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: TextureNode ): this;
 
 }

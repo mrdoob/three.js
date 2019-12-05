@@ -5,8 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebXR Device API (For Chrome M76+), expires 12/04/2019 -->
-		<meta http-equiv="origin-trial" content="Aq9LklhCLNUveuCr7QTpGpqwCPG817cYHdVyQuJPOZYk47iRB390lUKa5edVmgS1pZSl8HPspElEC/91Fz55dwIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU03NiIsImV4cGlyeSI6MTU3NTQxNzU5OX0=">
 	</head>
 	<body>
 
@@ -26,7 +24,6 @@
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
-			var painter1, painter2;
 
 			var controls;
 
@@ -83,11 +80,11 @@
 
 				//
 
-				painter1 = new TubePainter();
+				var painter1 = new TubePainter();
 				scene.add( painter1.mesh );
 
-				painter2 = new TubePainter();
-				scene.add( painter1.mesh );
+				var painter2 = new TubePainter();
+				scene.add( painter2.mesh );
 
 				//
 
@@ -96,7 +93,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
-				renderer.vr.enabled = true;
+				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
@@ -129,7 +126,7 @@
 
 				}
 
-				controller1 = renderer.vr.getController( 0 );
+				controller1 = renderer.xr.getController( 0 );
 				controller1.addEventListener( 'selectstart', onSelectStart );
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				controller1.addEventListener( 'squeezestart', onSequeezeStart );
@@ -139,7 +136,7 @@
 				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller1 );
 
-				controller2 = renderer.vr.getController( 1 );
+				controller2 = renderer.xr.getController( 1 );
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				controller2.addEventListener( 'squeezestart', onSequeezeStart );

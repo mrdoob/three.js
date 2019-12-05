@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>three.js webgl - instancing - interactive</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
+		#info {
+			background-color: rgba(0,0,0,0.75);
+		}
+		#notSupported {
+			width: 50%;
+			margin: auto;
+			border: 2px red solid;
+			margin-top: 20px;
+			padding: 10px;
+		}
+	</style>
+</head>
+<body>
+
+	<div id="info">
+
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking of geometry instances
+
+		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
+
+		<br/><br/>
+
+		<div>
+
+			<div>
+				number of instances:
+				<select id="instanceCount">
+					<option>100</option>
+					<option>500</option>
+					<option selected>1000</option>
+					<option>2000</option>
+					<option>3000</option>
+					<option>5000</option>
+					<option>10000</option>
+					<option>20000</option>
+					<option>30000</option>
+					<option>50000</option>
+					<option>100000</option>
+				</select>
+			</div>
+
+			<div>
+				method:
+				<select id="method">
+					<option>instanced</option>
+					<option>merged</option>
+					<option selected>singleMaterial</option>
+					<option>multiMaterial</option>
+				</select>
+			</div>
+
+			<div>
+				render continuously:
+				<input id="animate" type="checkbox" />
+			</div>
+
+			<div>
+				override material (only affects singleMaterial):
+				<input id="override" type="checkbox" checked/>
+			</div>
+
+			<div>
+				construct anew(to get additional timings):
+				<button id="construct" type="button">do it</button>
+			</div>
+
+		</div>
+
+		<br/>
+
+		<div>
+
+			<span>Materials: #<span id="materialCount"></span></span>
+
+			&nbsp;&nbsp;&nbsp;
+
+			<span>Objects: #<span id="objectCount"></span></span>
+
+			&nbsp;&nbsp;&nbsp;
+
+			<span>Drawcalls: #<span id="drawcalls"></span></span>
+
+			&nbsp;&nbsp;&nbsp;
+
+			<span>Construction time: <span id="initTime"></span>&nbsp;ms</span>
+
+			&nbsp;&nbsp;&nbsp;
+
+		</div>
+
+	</div>
+
+	<div id="container"></div>
+
+	<script id="vertMerged" type="x-shader/x-vertex">
+		#define SHADER_NAME vertMerged
+
+		precision highp float;
+
+		uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+
+		attribute vec3 position;
+		#ifdef PICKING
+			attribute vec3 pickingColor;
+		#else
+			attribute vec3 color;
+			varying vec3 vPosition;
+		#endif
+
+		varying vec3 vColor;
+
+		void main()	{
+
+			vec3 positionEye = ( modelViewMatrix * vec4( position, 1.0 ) ).xyz;
+
+			#ifdef PICKING
+				vColor = pickingColor;
+			#else
+				vColor = color;
+				vPosition = positionEye;
+			#endif
+
+			gl_Position = projectionMatrix * vec4( positionEye, 1.0 );
+
+		}
+
+	</script>
+
+	<script id="fragMerged" type="x-shader/x-fragment">
+		#define SHADER_NAME fragMerged
+
+		#extension GL_OES_standard_derivatives : enable
+
+		precision highp float;
+
+		varying vec3 vColor;
+
+		#ifndef PICKING
+			varying vec3 vPosition;
+		#endif
+
+		void main()	{
+
+			#ifdef PICKING
+				gl_FragColor = vec4( vColor, 1.0 );
+			#else
+				vec3 fdx = dFdx( vPosition );
+				vec3 fdy = dFdy( vPosition );
+				vec3 normal = normalize( cross( fdx, fdy ) );
+				float diffuse = dot( normal, vec3( 0.0, 0.0, 1.0 ) );
+
+				gl_FragColor = vec4( diffuse * vColor, 1.0 );
+			#endif
+
+		}
+
+	</script>
+
+	<script id="vertInstanced" type="x-shader/x-vertex">
+		#define SHADER_NAME vertInstanced
+
+		precision highp float;
+
+		uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+
+		attribute vec3 position;
+		attribute vec3 mcol0;
+		attribute vec3 mcol1;
+		attribute vec3 mcol2;
+		attribute vec3 mcol3;
+
+		#ifdef PICKING
+			attribute vec3 pickingColor;
+		#else
+			attribute vec3 color;
+			varying vec3 vPosition;
+		#endif
+
+		varying vec3 vColor;
+
+		void main()	{
+
+			mat4 matrix = mat4(
+				vec4( mcol0, 0 ),
+				vec4( mcol1, 0 ),
+				vec4( mcol2, 0 ),
+				vec4( mcol3, 1 )
+			);
+
+			vec3 positionEye = ( modelViewMatrix * matrix * vec4( position, 1.0 ) ).xyz;
+
+			#ifdef PICKING
+				vColor = pickingColor;
+			#else
+				vColor = color;
+				vPosition = positionEye;
+			#endif
+
+			gl_Position = projectionMatrix * vec4( positionEye, 1.0 );
+
+		}
+
+	</script>
+
+	<script id="fragInstanced" type="x-shader/x-fragment">
+		#define SHADER_NAME fragInstanced
+
+		#extension GL_OES_standard_derivatives : enable
+
+		precision highp float;
+
+		varying vec3 vColor;
+
+		#ifndef PICKING
+			varying vec3 vPosition;
+		#endif
+
+		void main()	{
+
+			#ifdef PICKING
+				gl_FragColor = vec4( vColor, 1.0 );
+			#else
+				vec3 fdx = dFdx( vPosition );
+				vec3 fdy = dFdy( vPosition );
+				vec3 normal = normalize( cross( fdx, fdy ) );
+				float diffuse = dot( normal, vec3( 0.0, 0.0, 1.0 ) );
+
+				gl_FragColor = vec4( diffuse * vColor, 1.0 );
+			#endif
+
+		}
+
+	</script>
+
+	<script id="vertMaterial" type="x-shader/x-vertex">
+		#define SHADER_NAME vertMaterial
+
+		precision highp float;
+
+		uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+
+		attribute vec3 position;
+
+		#ifndef PICKING
+			varying vec3 vPosition;
+		#endif
+
+		void main()	{
+
+			vec3 positionEye = ( modelViewMatrix * vec4( position, 1.0 ) ).xyz;
+
+			#ifndef PICKING
+				vPosition = positionEye;
+			#endif
+
+			gl_Position = projectionMatrix * vec4( positionEye, 1.0 );
+
+		}
+
+	</script>
+
+	<script id="fragMaterial" type="x-shader/x-fragment">
+		#define SHADER_NAME fragMaterial
+
+		#extension GL_OES_standard_derivatives : enable
+
+		precision highp float;
+
+		#ifdef PICKING
+			uniform vec3 pickingColor;
+		#else
+			uniform vec3 color;
+			varying vec3 vPosition;
+		#endif
+
+		void main()	{
+
+			#ifdef PICKING
+				gl_FragColor = vec4( pickingColor, 1.0 );
+			#else
+				vec3 fdx = dFdx( vPosition );
+				vec3 fdy = dFdy( vPosition );
+				vec3 normal = normalize( cross( fdx, fdy ) );
+				float diffuse = dot( normal, vec3( 0.0, 0.0, 1.0 ) );
+
+				gl_FragColor = vec4( diffuse * color, 1.0 );
+			#endif
+
+		}
+
+	</script>
+
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { TrackballControls } from './jsm/controls/TrackballControls.js';
+
+		var container, stats;
+		var camera, controls, scene, renderer;
+		var pickingData, pickingRenderTarget, pickingScene;
+		var useOverrideMaterial = true;
+		var singleMaterial, singlePickingMaterial;
+		var highlightBox;
+		var materialList = [];
+		var geometryList = [];
+		var objectCount = 0;
+		var geometrySize = new THREE.Vector3();
+		var mouse = new THREE.Vector2();
+		var scale = 1.03;
+
+		var loader = new THREE.BufferGeometryLoader();
+
+		//create buffer for reading a single pixel
+		var pixelBuffer = new Uint8Array( 4 );
+
+		// gui
+		var instanceCount, method, doAnimate;
+
+		//
+
+		gui();
+		init();
+		initMesh();
+		if ( doAnimate ) animate();
+
+		//
+
+		function gui() {
+
+			var instanceCountElm = document.getElementById( 'instanceCount' );
+
+			instanceCount = parseInt( instanceCountElm.value );
+
+			instanceCountElm.addEventListener( "change", function () {
+
+				instanceCount = parseInt( instanceCountElm.value );
+				initMesh();
+
+			} );
+
+			//
+
+			var methodElm = document.getElementById( 'method' );
+
+			method = methodElm.value;
+
+			methodElm.addEventListener( "change", function () {
+
+				method = methodElm.value;
+				initMesh();
+
+			} );
+
+			//
+
+			var animateElm = document.getElementById( 'animate' );
+
+			doAnimate = animateElm.checked;
+
+			animateElm.addEventListener( "click", function () {
+
+				doAnimate = animateElm.checked;
+				animate();
+
+			} );
+
+			//
+
+			var overrideElm = document.getElementById( 'override' );
+
+			useOverrideMaterial = overrideElm.checked;
+
+			overrideElm.addEventListener( "click", function () {
+
+				useOverrideMaterial = overrideElm.checked;
+				initMesh();
+
+			} );
+
+			//
+
+			var constructElm = document.getElementById( 'construct' );
+
+			constructElm.addEventListener( "click", function () {
+
+				initMesh();
+
+			} );
+
+		}
+
+		function clean() {
+
+			THREE.Cache.clear();
+
+			materialList.forEach( function ( m ) {
+
+				m.dispose();
+
+			} );
+
+			geometryList.forEach( function ( g ) {
+
+				g.dispose();
+
+			} );
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xffffff );
+
+			scene.add( camera );
+			scene.add( highlightBox );
+
+			pickingScene = new THREE.Scene();
+			pickingData = {};
+			materialList = [];
+			geometryList = [];
+			objectCount = 0;
+
+			singleMaterial = undefined;
+			singlePickingMaterial = undefined;
+
+		}
+
+		var randomizeMatrix = function () {
+
+			var position = new THREE.Vector3();
+			var rotation = new THREE.Euler();
+			var quaternion = new THREE.Quaternion();
+			var scale = new THREE.Vector3();
+
+			return function ( matrix ) {
+
+				position.x = Math.random() * 40 - 20;
+				position.y = Math.random() * 40 - 20;
+				position.z = Math.random() * 40 - 20;
+
+				rotation.x = Math.random() * 2 * Math.PI;
+				rotation.y = Math.random() * 2 * Math.PI;
+				rotation.z = Math.random() * 2 * Math.PI;
+
+				quaternion.setFromEuler( rotation );
+
+				scale.x = scale.y = scale.z = Math.random() * 1;
+
+				matrix.compose( position, quaternion, scale );
+
+			};
+
+		}();
+
+		function initMesh() {
+
+			clean();
+
+			// make instances
+			loader.load( 'models/json/suzanne_buffergeometry.json', function ( geo ) {
+
+				geo = geo.toNonIndexed();
+				geo.computeBoundingBox();
+				geo.boundingBox.getSize( geometrySize );
+				geometryList.push( geo );
+
+				var start = window.performance.now();
+
+				switch ( method ) {
+
+					case "merged":
+						makeMerged( geo );
+						break;
+
+					case "instanced":
+						makeInstanced( geo );
+						break;
+
+					case "singleMaterial":
+						makeSingleMaterial( geo );
+						break;
+
+					case "multiMaterial":
+						makeMultiMaterial( geo );
+						break;
+
+				}
+
+				render();
+
+				var end = window.performance.now();
+
+				document.getElementById( 'materialCount' ).innerText = materialList.length;
+				document.getElementById( 'objectCount' ).innerText = objectCount;
+				document.getElementById( 'drawcalls' ).innerText = renderer.info.render.calls;
+				document.getElementById( 'initTime' ).innerText = ( end - start ).toFixed( 2 );
+
+			} );
+
+		}
+
+		function makeMultiMaterial( geo ) {
+
+			// material
+
+			var vert = document.getElementById( 'vertMaterial' ).textContent;
+			var frag = document.getElementById( 'fragMaterial' ).textContent;
+
+			var material = new THREE.RawShaderMaterial( {
+				vertexShader: vert,
+				fragmentShader: frag,
+				uniforms: {
+					color: {
+						value: new THREE.Color()
+					}
+				}
+			} );
+
+			var pickingMaterial = new THREE.RawShaderMaterial( {
+				vertexShader: "#define PICKING\n" + vert,
+				fragmentShader: "#define PICKING\n" + frag,
+				uniforms: {
+					pickingColor: {
+						value: new THREE.Color()
+					}
+				}
+			} );
+
+			// geometry / mesh
+
+			var matrix = new THREE.Matrix4();
+
+			for ( var i = 0; i < instanceCount; i ++ ) {
+
+				var object = new THREE.Mesh( geo, material );
+				objectCount ++;
+				randomizeMatrix( matrix );
+				object.applyMatrix( matrix );
+				var pickingObject = object.clone();
+				objectCount ++;
+
+				object.material = material.clone();
+				object.material.uniforms[ "color" ].value.setHex( Math.random() * 0xffffff );
+				materialList.push( object.material );
+
+				pickingObject.material = pickingMaterial.clone();
+				pickingObject.material.uniforms[ "pickingColor" ].value.setHex( i + 1 );
+				materialList.push( pickingObject.material );
+
+				pickingData[ i + 1 ] = object;
+
+				scene.add( object );
+				pickingScene.add( pickingObject );
+
+			}
+
+			material.dispose();
+			pickingMaterial.dispose();
+
+		}
+
+		function makeSingleMaterial( geo ) {
+
+			// material
+
+			var vert = document.getElementById( 'vertMaterial' ).textContent;
+			var frag = document.getElementById( 'fragMaterial' ).textContent;
+
+			var material = new THREE.RawShaderMaterial( {
+				vertexShader: vert,
+				fragmentShader: frag,
+				uniforms: {
+					"color": {
+						value: new THREE.Color()
+					}
+				}
+			} );
+			materialList.push( material );
+
+			var pickingMaterial = new THREE.RawShaderMaterial( {
+				vertexShader: "#define PICKING\n" + vert,
+				fragmentShader: "#define PICKING\n" + frag,
+				uniforms: {
+					"pickingColor": {
+						value: new THREE.Color()
+					}
+				}
+			} );
+			materialList.push( pickingMaterial );
+
+			if ( useOverrideMaterial ) {
+
+				// make globally available
+				singleMaterial = material;
+				singlePickingMaterial = pickingMaterial;
+
+			}
+
+			// geometry / mesh
+
+			var matrix = new THREE.Matrix4();
+
+			function onBeforeRender( renderer, scene, camera, geometry, material ) {
+
+				var updateList = [];
+				var u = material.uniforms;
+				var d = this.userData;
+
+				if ( u.pickingColor ) {
+
+					u.pickingColor.value.setHex( d.pickingColor );
+					updateList.push( "pickingColor" );
+
+				}
+
+				if ( u.color ) {
+
+					u.color.value.setHex( d.color );
+					updateList.push( "color" );
+
+				}
+
+				if ( updateList.length ) {
+
+					var materialProperties = renderer.properties.get( material );
+
+					if ( materialProperties.program ) {
+
+						var gl = renderer.getContext();
+						var p = materialProperties.program;
+						gl.useProgram( p.program );
+						var pu = p.getUniforms();
+
+						updateList.forEach( function ( name ) {
+
+							pu.setValue( gl, name, u[ name ].value );
+
+						} );
+
+					}
+
+				}
+
+			}
+
+			for ( var i = 0; i < instanceCount; i ++ ) {
+
+				var object = new THREE.Mesh( geo, material );
+				objectCount ++;
+				randomizeMatrix( matrix );
+				object.applyMatrix( matrix );
+
+				var pickingObject;
+				if ( ! useOverrideMaterial ) {
+
+					pickingObject = object.clone();
+					objectCount ++;
+
+				}
+
+				object.material = material;
+				object.userData[ "color" ] = Math.random() * 0xffffff;
+
+				if ( useOverrideMaterial ) {
+
+					object.userData[ "pickingColor" ] = i + 1;
+					object.onBeforeRender = onBeforeRender;
+
+				} else {
+
+					pickingObject.material = pickingMaterial;
+					pickingObject.userData[ "pickingColor" ] = i + 1;
+					pickingObject.onBeforeRender = onBeforeRender;
+
+				}
+
+				pickingData[ i + 1 ] = object;
+
+				scene.add( object );
+				if ( ! useOverrideMaterial ) pickingScene.add( pickingObject );
+
+			}
+
+		}
+
+		function makeMerged( geo ) {
+
+			// material
+
+			var vert = document.getElementById( 'vertMerged' ).textContent;
+			var frag = document.getElementById( 'fragMerged' ).textContent;
+
+			var material = new THREE.RawShaderMaterial( {
+				vertexShader: vert,
+				fragmentShader: frag
+			} );
+			materialList.push( material );
+
+			var pickingMaterial = new THREE.RawShaderMaterial( {
+				vertexShader: "#define PICKING\n" + vert,
+				fragmentShader: "#define PICKING\n" + frag
+			} );
+			materialList.push( pickingMaterial );
+
+			// geometry
+
+			var mgeo = new THREE.BufferGeometry();
+			geometryList.push( mgeo );
+
+			var pos = geo.attributes.position;
+			var posLen = geo.attributes.position.count * 3;
+			var vertices = new THREE.BufferAttribute(
+				new Float32Array( instanceCount * posLen ), 3
+			);
+
+			var vertex = new THREE.Vector3();
+			var matrix = new THREE.Matrix4();
+
+			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
+
+				var offset = i * posLen;
+
+				randomizeMatrix( matrix );
+				var object = new THREE.Object3D();
+				objectCount ++;
+				object.applyMatrix( matrix );
+				pickingData[ i + 1 ] = object;
+				vertices.set( pos.array, offset );
+
+				for ( var k = 0, l = offset; k < posLen; k += 3, l += 3 ) {
+
+					vertex.fromArray( vertices.array, l );
+					vertex.applyMatrix4( matrix );
+					vertex.toArray( vertices.array, l );
+
+				}
+
+			}
+
+			mgeo.setAttribute( 'position', vertices );
+
+			var colCount = posLen / 3;
+			var colors = new THREE.BufferAttribute(
+				new Float32Array( instanceCount * colCount * 3 ), 3
+			);
+			var randCol = function () {
+
+				return Math.random();
+
+			};
+			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
+
+				var r = randCol(), g = randCol(), b = randCol();
+				for ( var j = i * colCount, jl = ( i + 1 ) * colCount; j < jl; j ++ ) {
+
+					colors.setXYZ( j, r, g, b );
+
+				}
+
+			}
+			mgeo.setAttribute( 'color', colors );
+
+			var col = new THREE.Color();
+			var pickingColors = new THREE.BufferAttribute(
+				new Float32Array( instanceCount * colCount * 3 ), 3
+			);
+			for ( var i = 0, ul = instanceCount; i < ul; i ++ ) {
+
+				col.setHex( i + 1 );
+				for ( var j = i * colCount, jl = ( i + 1 ) * colCount; j < jl; j ++ ) {
+
+					pickingColors.setXYZ( j, col.r, col.g, col.b );
+
+				}
+
+			}
+			mgeo.setAttribute( 'pickingColor', pickingColors );
+
+			// mesh
+
+			var mesh = new THREE.Mesh( mgeo, material );
+			scene.add( mesh );
+
+			var pickingMesh = new THREE.Mesh( mgeo, pickingMaterial );
+			pickingScene.add( pickingMesh );
+
+		}
+
+		function makeInstanced( geo ) {
+
+			// material
+
+			var vert = document.getElementById( 'vertInstanced' ).textContent;
+			var frag = document.getElementById( 'fragInstanced' ).textContent;
+
+			var material = new THREE.RawShaderMaterial( {
+				vertexShader: vert,
+				fragmentShader: frag,
+			} );
+			materialList.push( material );
+
+			var pickingMaterial = new THREE.RawShaderMaterial( {
+				vertexShader: "#define PICKING\n" + vert,
+				fragmentShader: "#define PICKING\n" + frag
+			} );
+			materialList.push( pickingMaterial );
+
+			// geometry
+
+			var igeo = new THREE.InstancedBufferGeometry();
+			geometryList.push( igeo );
+
+			var vertices = geo.attributes.position.clone();
+			igeo.setAttribute( 'position', vertices );
+
+			// var matrices = new THREE.InstancedBufferAttribute(
+			// 	new Float32Array( instanceCount * 16 ), 16
+			// );
+			var mcol0 = new THREE.InstancedBufferAttribute(
+				new Float32Array( instanceCount * 3 ), 3
+			);
+			var mcol1 = new THREE.InstancedBufferAttribute(
+				new Float32Array( instanceCount * 3 ), 3
+			);
+			var mcol2 = new THREE.InstancedBufferAttribute(
+				new Float32Array( instanceCount * 3 ), 3
+			);
+			var mcol3 = new THREE.InstancedBufferAttribute(
+				new Float32Array( instanceCount * 3 ), 3
+			);
+			var matrix = new THREE.Matrix4();
+			var me = matrix.elements;
+			for ( var i = 0, ul = mcol0.count; i < ul; i ++ ) {
+
+				randomizeMatrix( matrix );
+				var object = new THREE.Object3D();
+				objectCount ++;
+				object.applyMatrix( matrix );
+				pickingData[ i + 1 ] = object;
+				// matrices.set( matrix.elements, i * 16 );
+				mcol0.setXYZ( i, me[ 0 ], me[ 1 ], me[ 2 ] );
+				mcol1.setXYZ( i, me[ 4 ], me[ 5 ], me[ 6 ] );
+				mcol2.setXYZ( i, me[ 8 ], me[ 9 ], me[ 10 ] );
+				mcol3.setXYZ( i, me[ 12 ], me[ 13 ], me[ 14 ] );
+
+			}
+			// igeo.setAttribute( 'matrix', matrices );
+			igeo.setAttribute( 'mcol0', mcol0 );
+			igeo.setAttribute( 'mcol1', mcol1 );
+			igeo.setAttribute( 'mcol2', mcol2 );
+			igeo.setAttribute( 'mcol3', mcol3 );
+
+			var randCol = function () {
+
+				return Math.random();
+
+			};
+			var colors = new THREE.InstancedBufferAttribute(
+				new Float32Array( instanceCount * 3 ), 3
+			);
+			for ( var i = 0, ul = colors.count; i < ul; i ++ ) {
+
+				colors.setXYZ( i, randCol(), randCol(), randCol() );
+
+			}
+			igeo.setAttribute( 'color', colors );
+
+			var col = new THREE.Color();
+			var pickingColors = new THREE.InstancedBufferAttribute(
+				new Float32Array( instanceCount * 3 ), 3
+			);
+			for ( var i = 0, ul = pickingColors.count; i < ul; i ++ ) {
+
+				col.setHex( i + 1 );
+				pickingColors.setXYZ( i, col.r, col.g, col.b );
+
+			}
+			igeo.setAttribute( 'pickingColor', pickingColors );
+
+			// mesh
+
+			var mesh = new THREE.Mesh( igeo, material );
+			scene.add( mesh );
+
+			var pickingMesh = new THREE.Mesh( igeo, pickingMaterial );
+			pickingScene.add( pickingMesh );
+
+		}
+
+		function init() {
+
+			// camera
+
+			camera = new THREE.PerspectiveCamera(
+				70, window.innerWidth / window.innerHeight, 1, 100
+			);
+			camera.position.z = 40;
+
+			// picking render target
+
+			pickingRenderTarget = new THREE.WebGLRenderTarget(
+				window.innerWidth, window.innerHeight
+			);
+			pickingRenderTarget.texture.generateMipmaps = false;
+			pickingRenderTarget.texture.minFilter = THREE.NearestFilter;
+
+			// highlight box
+
+			highlightBox = new THREE.Mesh(
+				new THREE.BoxBufferGeometry( 1, 1, 1 ),
+				new THREE.MeshLambertMaterial( {
+					emissive: 0xffff00,
+					transparent: true,
+					opacity: 0.5
+				} )
+			);
+
+			// renderer
+
+			container = document.getElementById( "container" );
+			renderer = new THREE.WebGLRenderer( {
+				antialias: true,
+				alpha: true
+			} );
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+
+				document.getElementById( "notSupported" ).style.display = "";
+				return;
+
+			}
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			//renderer.sortObjects = false;
+			container.appendChild( renderer.domElement );
+
+			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+
+				throw 'ANGLE_instanced_arrays not supported';
+
+			}
+
+			// controls
+
+			controls = new TrackballControls( camera, renderer.domElement );
+			controls.staticMoving = true;
+
+			// stats
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			// listeners
+
+			renderer.domElement.addEventListener( 'mousemove', onMouseMove );
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+		}
+
+		//
+
+		function onMouseMove( e ) {
+
+			mouse.x = e.clientX;
+			mouse.y = e.clientY;
+
+			controls.update();
+			requestAnimationFrame( render );
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			pickingRenderTarget.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		function animate() {
+
+			if ( doAnimate ) {
+
+				requestAnimationFrame( animate );
+
+			}
+
+			controls.update();
+			stats.update();
+
+			render();
+
+		}
+
+		function pick() {
+
+			// render the picking scene off-screen
+
+			highlightBox.visible = false;
+
+			renderer.setRenderTarget( pickingRenderTarget );
+
+			if ( singlePickingMaterial ) {
+
+				scene.overrideMaterial = singlePickingMaterial;
+				renderer.render( scene, camera );
+				scene.overrideMaterial = null;
+
+			} else {
+
+				renderer.render( pickingScene, camera );
+
+			}
+
+			// read the pixel under the mouse from the texture
+
+			renderer.readRenderTargetPixels(
+				pickingRenderTarget,
+				mouse.x,
+				pickingRenderTarget.height - mouse.y,
+				1,
+				1,
+				pixelBuffer
+			);
+
+			// interpret the pixel as an ID
+
+			var id =
+				( pixelBuffer[ 0 ] << 16 ) |
+				( pixelBuffer[ 1 ] << 8 ) |
+				( pixelBuffer[ 2 ] );
+
+			var object = pickingData[ id ];
+
+			if ( object ) {
+
+				// move the highlightBox so that it surrounds the picked object
+
+				if ( object.position && object.rotation && object.scale ) {
+
+					highlightBox.position.copy( object.position );
+					highlightBox.rotation.copy( object.rotation );
+
+					highlightBox.scale.copy( object.scale )
+						.multiply( geometrySize )
+						.multiplyScalar( scale );
+
+					highlightBox.visible = true;
+
+				}
+
+			} else {
+
+				highlightBox.visible = false;
+
+			}
+
+		}
+
+		function render() {
+
+			pick();
+			renderer.setRenderTarget( null );
+			renderer.render( scene, camera );
+
+		}
+
+	</script>
+
+</body>
+</html>

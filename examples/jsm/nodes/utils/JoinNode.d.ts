@@ -12,7 +12,6 @@ export class JoinNode extends TempNode {
 	nodeType: string;
 
 	getNumElements(): number;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: JoinNode ): this;
 
 }
