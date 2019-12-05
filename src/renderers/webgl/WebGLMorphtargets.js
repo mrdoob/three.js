@@ -12,7 +12,6 @@ function WebGLMorphtargets( gl ) {
 
 	var influencesList = {};
 	var morphInfluences = new Float32Array( 8 );
-	var morphInfluencesZero = new Float32Array( 8 );
 
 	function update( object, geometry, material, program ) {
 
