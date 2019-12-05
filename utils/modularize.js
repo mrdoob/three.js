@@ -111,7 +111,6 @@ var files = [
 	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/ImprovedNoise.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
-	{ path: 'math/MeshSurfaceSampler.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'misc/CarControls.js', dependencies: [], ignoreList: [] },
