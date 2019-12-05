@@ -12,10 +12,19 @@ function WebGLMorphtargets( gl ) {
 
 	var influencesList = {};
 	var morphInfluences = new Float32Array( 8 );
+	var morphInfluencesZero = new Float32Array( 8 );
 
 	function update( object, geometry, material, program ) {
 
 		var objectInfluences = object.morphTargetInfluences;
+
+		if ( objectInfluences === undefined ) {
+
+			program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', 1.0 );
+			program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluencesZero );
+			return;
+
+		}
 
 		var length = objectInfluences.length;
 
