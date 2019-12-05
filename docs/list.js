@@ -400,8 +400,9 @@ var list = {
 				"ColladaExporter": "examples/en/exporters/ColladaExporter"
 			},
 
-			"Plugins": {
-				"LookupTable": "examples/en/Lut",
+			"Math": {
+				"LookupTable": "examples/en/math/Lut",
+				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
 			},
 
 			"ConvexHull": {
@@ -842,8 +843,9 @@ var list = {
 				"ColladaExporter": "examples/zh/exporters/ColladaExporter"
 			},
 
-			"插件": {
-				"LookupTable": "examples/zh/Lut",
+			"数学库": {
+				"LookupTable": "examples/zh/math/Lut",
+				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
 			},
 
 			"QuickHull": {
