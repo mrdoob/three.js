@@ -50,6 +50,7 @@ var files = {
 		"webgl_instancing_dynamic",
 		"webgl_instancing_interactive",
 		"webgl_instancing_raycast",
+		"webgl_instancing_scatter",
 		"webgl_interactive_buffergeometry",
 		"webgl_interactive_cubes",
 		"webgl_interactive_cubes_gpu",
