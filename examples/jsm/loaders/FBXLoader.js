@@ -1664,7 +1664,8 @@ var FBXLoader = ( function () {
 				var normalAttribute = new Float32BufferAttribute( buffers.normal, 3 );
 
 				var normalMatrix = new Matrix3().getNormalMatrix( preTransform );
-				normalMatrix.applyToBufferAttribute( normalAttribute );
+
+				normalAttribute.applyNormalMatrix( normalMatrix );
 
 				geo.setAttribute( 'normal', normalAttribute );
 
