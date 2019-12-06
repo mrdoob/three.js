@@ -286,6 +286,7 @@ var Strings = function ( config ) {
 			'sidebar/project/antialias': 'antialias',
 			'sidebar/project/shadows': 'shadows',
 			'sidebar/project/materials': 'Materials',
+			'sidebar/project/Assign': 'Assign',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
@@ -563,7 +564,8 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/materials': 'Materials',
+			'sidebar/project/materials': '材质',
+			'sidebar/project/Assign': '应用',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
