@@ -727,7 +727,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( object.morphTargetInfluences ) {
+		if ( material.morphTargets || material.morphNormals ) {
 
 			morphtargets.update( object, geometry, material, program );
 
