@@ -71,7 +71,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Adds v to this vector.
 	 */
-	add( a: Vector3, b?: Vector3 ): this;
+	add( v: Vector3, w?: Vector3 ): this;
 
 	addScalar( s: number ): this;
 
