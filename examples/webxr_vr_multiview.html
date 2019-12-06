@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webxr - multiview</title>
+		<title>three.js vr - multiview</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<style>
@@ -16,8 +16,6 @@
 				color: #48f;
 			}
 		</style>
-		<!-- WebXR Device API (For Chrome M76+), expires 12/04/2019 -->
-		<meta http-equiv="origin-trial" content="Aq9LklhCLNUveuCr7QTpGpqwCPG817cYHdVyQuJPOZYk47iRB390lUKa5edVmgS1pZSl8HPspElEC/91Fz55dwIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU03NiIsImV4cGlyeSI6MTU3NTQxNzU5OX0=">
 	</head>
 	<body>
 		<script type="module">
@@ -64,7 +62,7 @@
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.vr.enabled = true;
+				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				var info = document.createElement( 'div' );
@@ -72,7 +70,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webxr - multiview<br/>';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - multiview<br/>';
 				info.innerHTML += renderer.extensions.get( 'OVR_multiview2' ) ? `<span style="color: #33ff33"><b>OVR_multiview2</b> is supported in your browser</span>` :
 					`<span style="color: #ff3333"><b>OVR_multiview2</b> is not supported or enabled in your browser</span>`;
 

@@ -15,7 +15,7 @@ import { Object3D } from './../core/Object3D';
 import { Material } from './../materials/Material';
 import { Fog } from './../scenes/Fog';
 import { ToneMapping, ShadowMapType, CullFace } from '../constants';
-import { WebVRManager } from '../renderers/webvr/WebVRManager';
+import { WebXRManager } from '../renderers/webvr/WebXRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
@@ -196,7 +196,7 @@ export class WebGLRenderer implements Renderer {
 	renderLists: WebGLRenderLists;
 	state: WebGLState;
 
-	vr: WebVRManager;
+	xr: WebXRManager;
 
 	/**
 	 * Return the WebGL context.
@@ -428,6 +428,11 @@ export class WebGLRenderer implements Renderer {
 	 * @deprecated
 	 */
 	gammaFactor: number;
+
+	/**
+	 * @deprecated Use {@link WebGLRenderer#xr .xr} instead.
+	 */
+	vr: boolean;
 
 	/**
 	 * @deprecated Use {@link WebGLShadowMap#enabled .shadowMap.enabled} instead.

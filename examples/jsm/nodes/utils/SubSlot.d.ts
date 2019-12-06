@@ -7,7 +7,6 @@ export class SubSlots extends TempNode {
 
 	slots: Node[];
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: SubSlots ): this;
 
 }

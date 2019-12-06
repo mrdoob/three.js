@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webxr - dragging</title>
+		<title>three.js vr - dragging</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<!-- WebXR Device API (For Chrome M76+), expires 12/04/2019 -->
-		<meta http-equiv="origin-trial" content="Aq9LklhCLNUveuCr7QTpGpqwCPG817cYHdVyQuJPOZYk47iRB390lUKa5edVmgS1pZSl8HPspElEC/91Fz55dwIAAABTeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJYUkRldmljZU03NiIsImV4cGlyeSI6MTU3NTQxNzU5OX0=">
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webxr - dragging
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> vr - dragging
 		</div>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
@@ -19,6 +17,7 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
 			var container;
@@ -28,7 +27,7 @@
 			var raycaster, intersected = [];
 			var tempMatrix = new THREE.Matrix4();
 
-			var group;
+			var controls, group;
 
 			init();
 			animate();
@@ -43,6 +42,10 @@
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 1.6, 3 );
+
+				controls = new OrbitControls( camera, container );
+				controls.target.set( 0, 1.6, 0 );
+				controls.update();
 
 				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
 				var material = new THREE.MeshStandardMaterial( {
@@ -114,19 +117,19 @@
 				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 				renderer.shadowMap.enabled = true;
-				renderer.vr.enabled = true;
+				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
 				// controllers
 
-				controller1 = renderer.vr.getController( 0 );
+				controller1 = renderer.xr.getController( 0 );
 				controller1.addEventListener( 'selectstart', onSelectStart );
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller1 );
 
-				controller2 = renderer.vr.getController( 1 );
+				controller2 = renderer.xr.getController( 1 );
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller2 );

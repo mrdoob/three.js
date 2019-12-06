@@ -41,7 +41,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			import {
 				StandardNodeMaterial,
@@ -74,13 +73,10 @@
 
 				nodeTextureSize.value = textureSize;
 
-				var pmremGenerator = new PMREMGenerator( hdrCubeMap, undefined, textureSize / 4 );
-				pmremGenerator.update( renderer );
+				var pmremGenerator = new PMREMGenerator( renderer );
+				hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+				pmremGenerator.dispose();
 
-				var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-				pmremCubeUVPacker.update( renderer );
-
-				hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
 				nodeTexture.value = hdrCubeRenderTarget.texture;
 
 				hdrCubeMap.magFilter = THREE.LinearFilter;
@@ -88,9 +84,6 @@
 
 				planeMesh.material.map = hdrCubeRenderTarget.texture;
 				planeMesh.material.needsUpdate = true;
-
-				pmremGenerator.dispose();
-				pmremCubeUVPacker.dispose();
 
 			}
 

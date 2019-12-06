@@ -11,7 +11,6 @@ export class NoiseNode extends TempNode {
 	uv: UVNode | UVTransformNode;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: NoiseNode ): this;
 
 	static Nodes: {

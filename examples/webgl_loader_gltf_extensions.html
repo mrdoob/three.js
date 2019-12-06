@@ -27,7 +27,6 @@
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
@@ -156,25 +155,13 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_2k.hdr', function ( texture ) {
+					.load( 'venice_sunset_1k.hdr', function ( texture ) {
 
-						var options = {
-							minFilter: texture.minFilter,
-							magFilter: texture.magFilter
-						};
-
-						background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
-
-						var pmremGenerator = new PMREMGenerator( background.texture );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
-
+						var pmremGenerator = new PMREMGenerator( renderer );
+						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+
+						background = envMap;
 
 						//
 
