@@ -1613,10 +1613,9 @@ THREE.FBXLoader = ( function () {
 
 			if ( buffers.normal.length > 0 ) {
 
-				var normalAttribute = new THREE.Float32BufferAttribute( buffers.normal, 3 );
-
 				var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
 
+				var normalAttribute = new THREE.Float32BufferAttribute( buffers.normal, 3 );
 				normalAttribute.applyNormalMatrix( normalMatrix );
 
 				geo.setAttribute( 'normal', normalAttribute );
