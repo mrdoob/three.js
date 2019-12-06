@@ -76,7 +76,6 @@ var list = {
 				"Animation": "api/en/constants/Animation",
 				"Core": "api/en/constants/Core",
 				"CustomBlendingEquation": "api/en/constants/CustomBlendingEquations",
-				"DrawModes": "api/en/constants/DrawModes",
 				"Materials": "api/en/constants/Materials",
 				"Renderer": "api/en/constants/Renderer",
 				"Textures": "api/en/constants/Textures"
@@ -301,6 +300,7 @@ var list = {
 			"Objects": {
 				"Bone": "api/en/objects/Bone",
 				"Group": "api/en/objects/Group",
+				"InstancedMesh": "api/en/objects/InstancedMesh",
 				"Line": "api/en/objects/Line",
 				"LineLoop": "api/en/objects/LineLoop",
 				"LineSegments": "api/en/objects/LineSegments",
@@ -400,8 +400,9 @@ var list = {
 				"ColladaExporter": "examples/en/exporters/ColladaExporter"
 			},
 
-			"Plugins": {
-				"LookupTable": "examples/en/Lut",
+			"Math": {
+				"LookupTable": "examples/en/math/Lut",
+				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
 			},
 
 			"ConvexHull": {
@@ -519,7 +520,6 @@ var list = {
 				"Animation": "api/zh/constants/Animation",
 				"Core": "api/zh/constants/Core",
 				"CustomBlendingEquation": "api/zh/constants/CustomBlendingEquations",
-				"DrawModes": "api/zh/constants/DrawModes",
 				"Materials": "api/zh/constants/Materials",
 				"Renderer": "api/zh/constants/Renderer",
 				"Textures": "api/zh/constants/Textures"
@@ -744,6 +744,7 @@ var list = {
 			"物体": {
 				"Bone": "api/zh/objects/Bone",
 				"Group": "api/zh/objects/Group",
+				"InstancedMesh": "api/zh/objects/InstancedMesh",
 				"Line": "api/zh/objects/Line",
 				"LineLoop": "api/zh/objects/LineLoop",
 				"LineSegments": "api/zh/objects/LineSegments",
@@ -842,8 +843,9 @@ var list = {
 				"ColladaExporter": "examples/zh/exporters/ColladaExporter"
 			},
 
-			"插件": {
-				"LookupTable": "examples/zh/Lut",
+			"数学库": {
+				"LookupTable": "examples/zh/math/Lut",
+				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
 			},
 
 			"QuickHull": {

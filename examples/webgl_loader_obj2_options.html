@@ -141,7 +141,7 @@
 
 					let scope = this;
 					function onLoadMtl ( mtlParseResult ) {
-						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
+						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
 
 						let fileLoader = new THREE.FileLoader();
 						fileLoader.setPath( '' );
@@ -173,9 +173,14 @@
 						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
 					}
 
+					let materials = {
+						tester: new THREE.MeshStandardMaterial()
+					};
+
 					let objLoader2Parallel = new OBJLoader2Parallel()
 						.setModelName( modelName )
-						.setCallbackOnLoad( callbackOnLoad );
+						.setCallbackOnLoad( callbackOnLoad )
+						.addMaterials( materials, true );
 
 					let fileLoader = new THREE.FileLoader();
 					fileLoader.setPath( '' );
@@ -207,7 +212,7 @@
 					}
 
 					function onLoadMtl ( mtlParseResult ) {
-						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
+						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
 						objLoader2.load( 'models/obj/male02/male02.obj', callbackOnLoad, null, null, null );
 					}
 
@@ -235,7 +240,7 @@
 						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
 					}
 					function onLoadMtl ( mtlParseResult ) {
-						objLoader2Parallel.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
+						objLoader2Parallel.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
 						objLoader2Parallel.load( 'models/obj/walt/WaltHead.obj', callbackOnLoad );
 					}
 

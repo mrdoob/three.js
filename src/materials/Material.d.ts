@@ -34,10 +34,8 @@ export interface MaterialParameters {
 	depthTest?: boolean;
 	depthWrite?: boolean;
 	fog?: boolean;
-	lights?: boolean;
 	name?: string;
 	opacity?: number;
-	overdraw?: number;
 	polygonOffset?: boolean;
 	polygonOffsetFactor?: number;
 	polygonOffsetUnits?: number;
@@ -196,11 +194,6 @@ export class Material extends EventDispatcher {
 	isMaterial: boolean;
 
 	/**
-	 * Whether the material is affected by lights. Default is true.
-	 */
-	lights: boolean;
-
-	/**
 	 * Material name. Default is an empty string.
 	 */
 	name: string;
@@ -215,11 +208,6 @@ export class Material extends EventDispatcher {
 	 * Opacity. Default is 1.
 	 */
 	opacity: number;
-
-	/**
-	 * Enables/disables overdraw. If greater than zero, polygons are drawn slightly bigger in order to fix antialiasing gaps when using the CanvasRenderer. Default is 0.
-	 */
-	overdraw: number;
 
 	/**
 	 * Whether to use polygon offset. Default is false. This corresponds to the POLYGON_OFFSET_FILL WebGL feature.
@@ -304,6 +292,11 @@ export class Material extends EventDispatcher {
 	 * An object that can be used to store custom data about the Material. It should not hold references to functions as these will not be cloned.
 	 */
 	userData: any;
+
+	/**
+	 * This starts at 0 and counts how many times .needsUpdate is set to true.
+	 */
+	version: number;
 
 	/**
 	 * Return a new material with the same parameters as this material.

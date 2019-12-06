@@ -12,9 +12,15 @@ import {
 
 var FirstPersonControls = function ( object, domElement ) {
 
-	this.object = object;
+	if ( domElement === undefined ) {
 
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+		console.warn( 'THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document;
+
+	}
+
+	this.object = object;
+	this.domElement = domElement;
 
 	// API
 

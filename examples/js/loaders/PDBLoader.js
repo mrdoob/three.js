@@ -136,10 +136,10 @@ THREE.PDBLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			// build geometry
 
-			geometryAtoms.addAttribute( 'position', new THREE.Float32BufferAttribute( verticesAtoms, 3 ) );
-			geometryAtoms.addAttribute( 'color', new THREE.Float32BufferAttribute( colorsAtoms, 3 ) );
+			geometryAtoms.setAttribute( 'position', new THREE.Float32BufferAttribute( verticesAtoms, 3 ) );
+			geometryAtoms.setAttribute( 'color', new THREE.Float32BufferAttribute( colorsAtoms, 3 ) );
 
-			geometryBonds.addAttribute( 'position', new THREE.Float32BufferAttribute( verticesBonds, 3 ) );
+			geometryBonds.setAttribute( 'position', new THREE.Float32BufferAttribute( verticesBonds, 3 ) );
 
 			return build;
 

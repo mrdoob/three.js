@@ -107,8 +107,8 @@
 				// THREE.Line ( THREE.BufferGeometry, THREE.LineBasicMaterial ) - rendered with gl.LINE_STRIP
 
 				var geo = new THREE.BufferGeometry();
-				geo.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-				geo.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geo.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geo.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				matLineBasic = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
 				matLineDashed = new THREE.LineDashedMaterial( { vertexColors: THREE.VertexColors, scale: 2, dashSize: 1, gapSize: 1 } );

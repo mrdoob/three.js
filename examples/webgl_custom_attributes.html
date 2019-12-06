@@ -111,7 +111,7 @@
 
 				}
 
-				geometry.addAttribute( 'displacement', new THREE.BufferAttribute( displacement, 1 ) );
+				geometry.setAttribute( 'displacement', new THREE.BufferAttribute( displacement, 1 ) );
 
 				sphere = new THREE.Mesh( geometry, shaderMaterial );
 				scene.add( sphere );

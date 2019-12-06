@@ -37,7 +37,7 @@
 		] );
 
 		// itemSize = 3 因为每个顶点都是一个三元组。
-		geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
@@ -64,7 +64,7 @@
 		<h3>[property:Object attributes]</h3>
 		<p>
 			通过 hashmap 存储该几何体相关的属性，hashmap 的 id 是当前 attribute 的名称，值是相应的 [page:BufferAttribute buffer]。
-			你可以通过 [page:.addAttribute] 和 [page:.getAttribute] 添加和访问与当前几何体有关的 attribute。
+			你可以通过 [page:.setAttribute] 和 [page:.getAttribute] 添加和访问与当前几何体有关的 attribute。
 		</p>
 
 		<h3>[property:Box3 boundingBox]</h3>
@@ -156,9 +156,9 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] 在该类上可用的所有方法。</h3>
 
-		<h3>[method:BufferGeometry addAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
+		<h3>[method:BufferGeometry setAttribute]( [param:String name], [param:BufferAttribute attribute] )</h3>
 		<p>
-			为当前几何体增加一个 attribute。 的属性，在类的内部，有一个存储 [page:.attributes] 的 hashmap，
+			为当前几何体设置一个 attribute 属性。在类的内部，有一个存储 [page:.attributes] 的 hashmap，
 			通过该 hashmap，遍历 attributes 的速度会更快。而使用该方法，可以向 hashmap 内部增加 attribute。
 			所以，你需要使用该方法来添加 attributes。
 		</p>
@@ -236,7 +236,7 @@
 			几何体中的每个法向量长度将会为 1。这样操作会更正光线在表面的效果。
 		</p>
 
-		<h3>[method:BufferAttribute removeAttribute]( [param:String name] )</h3>
+		<h3>[method:BufferAttribute deleteAttribute]( [param:String name] )</h3>
 		<p>删除具有指定名称的 [page:BufferAttribute attribute]。</p>
 
 		<h3>[method:BufferGeometry rotateX] ( [param:Float radians] )</h3>

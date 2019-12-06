@@ -14,8 +14,6 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { CubemapGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
-
 			var camera, scene, renderer;
 			var cube, sphere, torus, material;
 
@@ -50,14 +48,12 @@
 				// background
 
 				var options = {
-					resolution: 1024,
-
 					generateMipmaps: true,
 					minFilter: THREE.LinearMipmapLinearFilter,
 					magFilter: THREE.LinearFilter
 				};
 
-				scene.background = new CubemapGenerator( renderer ).fromEquirectangular( texture, options );
+				scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
 
 				//
 
@@ -182,25 +178,21 @@
 
 				camera.lookAt( scene.position );
 
-				sphere.visible = false;
-
 				// pingpong
 
 				if ( count % 2 === 0 ) {
 
+					cubeCamera1.update( renderer, scene );
 					material.envMap = cubeCamera1.renderTarget.texture;
-					cubeCamera2.update( renderer, scene );
 
 				} else {
 
+					cubeCamera2.update( renderer, scene );
 					material.envMap = cubeCamera2.renderTarget.texture;
-					cubeCamera1.update( renderer, scene );
 
 				}
 
 				count ++;
-
-				sphere.visible = true;
 
 				renderer.render( scene, camera );
 

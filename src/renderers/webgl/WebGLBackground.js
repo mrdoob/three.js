@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BackSide, FrontSide } from '../../constants.js';
+import { BackSide, FrontSide, CubeUVReflectionMapping } from '../../constants.js';
 import { BoxBufferGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneBufferGeometry } from '../../geometries/PlaneGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
@@ -30,8 +30,8 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 		// Ignore background in AR
 		// TODO: Reconsider this.
 
-		var vr = renderer.vr;
-		var session = vr.getSession && vr.getSession();
+		var xr = renderer.xr;
+		var session = xr.getSession && xr.getSession();
 
 		if ( session && session.environmentBlendMode === 'additive' ) {
 
@@ -60,7 +60,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.isWebGLRenderTargetCube ) ) {
+		if ( background && ( background.isCubeTexture || background.isWebGLRenderTargetCube || background.mapping === CubeUVReflectionMapping ) ) {
 
 			if ( boxMesh === undefined ) {
 
@@ -78,8 +78,8 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 					} )
 				);
 
-				boxMesh.geometry.removeAttribute( 'normal' );
-				boxMesh.geometry.removeAttribute( 'uv' );
+				boxMesh.geometry.deleteAttribute( 'normal' );
+				boxMesh.geometry.deleteAttribute( 'uv' );
 
 				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
 
@@ -92,7 +92,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 					get: function () {
 
-						return this.uniforms.tCube.value;
+						return this.envMap.value;
 
 					}
 
@@ -103,8 +103,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 			}
 
 			var texture = background.isWebGLRenderTargetCube ? background.texture : background;
-			boxMesh.material.uniforms.tCube.value = texture;
-			boxMesh.material.uniforms.tFlip.value = ( background.isWebGLRenderTargetCube ) ? 1 : - 1;
+			boxMesh.material.envMap = texture;
 
 			if ( currentBackground !== background ||
 			     currentBackgroundVersion !== texture.version ) {
@@ -137,7 +136,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 					} )
 				);
 
-				planeMesh.geometry.removeAttribute( 'normal' );
+				planeMesh.geometry.deleteAttribute( 'normal' );
 
 				// enable code injection for non-built-in material
 				Object.defineProperty( planeMesh.material, 'map', {

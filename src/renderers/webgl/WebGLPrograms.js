@@ -9,6 +9,13 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	var programs = [];
 
+	var isWebGL2 = capabilities.isWebGL2;
+	var logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
+	var floatVertexTextures = capabilities.floatVertexTextures;
+	var precision = capabilities.precision;
+	var maxVertexUniforms = capabilities.maxVertexUniforms;
+	var vertexTextures = capabilities.vertexTextures;
+
 	var shaderIDs = {
 		MeshDepthMaterial: 'depth',
 		MeshDistanceMaterial: 'distanceRGBA',
@@ -16,7 +23,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		MeshBasicMaterial: 'basic',
 		MeshLambertMaterial: 'lambert',
 		MeshPhongMaterial: 'phong',
-		MeshToonMaterial: 'phong',
+		MeshToonMaterial: 'toon',
 		MeshStandardMaterial: 'physical',
 		MeshPhysicalMaterial: 'physical',
 		MeshMatcapMaterial: 'matcap',
@@ -28,14 +35,16 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 	};
 
 	var parameterNames = [
-		"precision", "supportsVertexTextures", "map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding",
-		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
+		"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing", "numMultiviewViews",
+		"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding", "envMapCubeUV",
+		"lightMap", "lightMapEncoding", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 		"roughnessMap", "metalnessMap", "gradientMap",
-		"alphaMap", "combine", "vertexColors", "vertexTangents", "fog", "useFog", "fogExp2",
+		"alphaMap", "combine", "vertexColors", "vertexTangents", "vertexUvs", "uvsVertexOnly", "fog", "useFog", "fogExp2",
 		"flatShading", "sizeAttenuation", "logarithmicDepthBuffer", "skinning",
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numHemiLights", "numRectAreaLights",
+		"numDirLightShadows", "numPointLightShadows", "numSpotLightShadows",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
 		"sheen"
@@ -47,7 +56,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		var skeleton = object.skeleton;
 		var bones = skeleton.bones;
 
-		if ( capabilities.floatVertexTextures ) {
+		if ( floatVertexTextures ) {
 
 			return 1024;
 
@@ -60,7 +69,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			//  - limit here is ANGLE's 254 max uniform vectors
 			//    (up to 54 should be safe)
 
-			var nVertexUniforms = capabilities.maxVertexUniforms;
+			var nVertexUniforms = maxVertexUniforms;
 			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
 
 			var maxBones = Math.min( nVertexMatrices, bones.length );
@@ -116,7 +125,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		// (not to blow over maxLights budget)
 
 		var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
-		var precision = capabilities.precision;
 
 		if ( material.precision !== null ) {
 
@@ -131,14 +139,20 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		}
 
 		var currentRenderTarget = renderer.getRenderTarget();
+		var numMultiviewViews = currentRenderTarget && currentRenderTarget.isWebGLMultiviewRenderTarget ? currentRenderTarget.numViews : 0;
 
 		var parameters = {
+
+			isWebGL2: isWebGL2,
 
 			shaderID: shaderID,
 
 			precision: precision,
-			isWebGL2: capabilities.isWebGL2,
-			supportsVertexTextures: capabilities.vertexTextures,
+
+			instancing: object.isInstancedMesh === true,
+
+			supportsVertexTextures: vertexTextures,
+			numMultiviewViews: numMultiviewViews,
 			outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
 			map: !! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map, renderer.gammaInput ),
@@ -149,6 +163,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			envMapEncoding: getTextureEncodingFromMap( material.envMap, renderer.gammaInput ),
 			envMapCubeUV: ( !! material.envMap ) && ( ( material.envMap.mapping === CubeUVReflectionMapping ) || ( material.envMap.mapping === CubeUVRefractionMapping ) ),
 			lightMap: !! material.lightMap,
+			lightMapEncoding: getTextureEncodingFromMap( material.lightMap, renderer.gammaInput ),
 			aoMap: !! material.aoMap,
 			emissiveMap: !! material.emissiveMap,
 			emissiveMapEncoding: getTextureEncodingFromMap( material.emissiveMap, renderer.gammaInput ),
@@ -171,7 +186,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			vertexTangents: ( material.normalMap && material.vertexTangents ),
 			vertexColors: material.vertexColors,
-			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap,
+			vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap || !! material.displacementMap,
+			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap ) && !! material.displacementMap,
 
 			fog: !! fog,
 			useFog: material.fog,
@@ -180,11 +196,11 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			flatShading: material.flatShading,
 
 			sizeAttenuation: material.sizeAttenuation,
-			logarithmicDepthBuffer: capabilities.logarithmicDepthBuffer,
+			logarithmicDepthBuffer: logarithmicDepthBuffer,
 
 			skinning: material.skinning && maxBones > 0,
 			maxBones: maxBones,
-			useVertexTexture: capabilities.floatVertexTextures,
+			useVertexTexture: floatVertexTextures,
 
 			morphTargets: material.morphTargets,
 			morphNormals: material.morphNormals,
@@ -226,7 +242,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	};
 
-	this.getProgramCode = function ( material, parameters ) {
+	this.getProgramCacheKey = function ( material, parameters ) {
 
 		var array = [];
 
@@ -268,18 +284,18 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	};
 
-	this.acquireProgram = function ( material, shader, parameters, code ) {
+	this.acquireProgram = function ( material, shader, parameters, cacheKey ) {
 
 		var program;
 
 		// Check if code has been already compiled
 		for ( var p = 0, pl = programs.length; p < pl; p ++ ) {
 
-			var programInfo = programs[ p ];
+			var preexistingProgram = programs[ p ];
 
-			if ( programInfo.code === code ) {
+			if ( preexistingProgram.cacheKey === cacheKey ) {
 
-				program = programInfo;
+				program = preexistingProgram;
 				++ program.usedTimes;
 
 				break;
@@ -290,7 +306,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, code, material, shader, parameters );
+			program = new WebGLProgram( renderer, extensions, cacheKey, material, shader, parameters );
 			programs.push( program );
 
 		}

@@ -12,18 +12,15 @@ Sidebar.Project = function ( editor ) {
 
 		'WebGLRenderer': THREE.WebGLRenderer,
 		'SVGRenderer': THREE.SVGRenderer,
-		'SoftwareRenderer': THREE.SoftwareRenderer,
 		'RaytracingRenderer': THREE.RaytracingRenderer
 
 	};
 
-	var container = new UI.Panel();
-	container.setBorderTop( '0' );
-	container.setPadding( '0' );
-	container.setPaddingTop( '20px' );
+	var container = new UI.Span();
 
 	var projectsettings = new UI.Panel();
 	projectsettings.setBorderTop( '0' );
+	projectsettings.setPaddingTop( '20px' );
 
 	container.add( projectsettings );
 
@@ -176,7 +173,7 @@ Sidebar.Project = function ( editor ) {
 	var materials = new UI.Panel();
 
 	var headerRow = new UI.Row();
-	headerRow.add( new UI.Text( strings.getKey( 'sidebar/project/materials' ) ) );
+	headerRow.add( new UI.Text( strings.getKey( 'sidebar/project/materials' ).toUpperCase() ) );
 
 	materials.add( headerRow );
 

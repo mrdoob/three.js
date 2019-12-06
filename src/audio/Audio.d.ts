@@ -9,13 +9,15 @@ export class Audio extends Object3D {
 	constructor( listener: AudioListener );
 	type: 'Audio';
 
+	listener: AudioListener;
 	context: AudioContext;
 	gain: GainNode;
 	autoplay: boolean;
-	buffer: null | Audio;
+	buffer: null | AudioBuffer;
 	detune: number;
 	loop: boolean;
-	startTime: number;
+	loopStart: number;
+	loopEnd: number;
 	offset: number;
 	duration: number | undefined;
 	playbackRate: number;
@@ -30,7 +32,7 @@ export class Audio extends Object3D {
 	setMediaElementSource( mediaElement: HTMLMediaElement ): this;
 	setMediaStreamSource( mediaStream: MediaStream ): this;
 	setBuffer( audioBuffer: AudioBuffer ): this;
-	play(): this;
+	play( delay?: number ): this;
 	onEnded(): void;
 	pause(): this;
 	stop(): this;
@@ -39,31 +41,20 @@ export class Audio extends Object3D {
 	setDetune( value: number ): this;
 	getDetune(): number;
 	getFilters(): any[];
-	setFilter( value: any[] ): this;
+	setFilters( value: any[] ): this;
 	getFilter(): any;
 	setFilter( filter: any ): this;
 	setPlaybackRate( value: number ): this;
 	getPlaybackRate(): number;
 	getLoop(): boolean;
-	setLoop( value: boolean ): void;
+	setLoop( value: boolean ): this;
+	setLoopStart( value: number ): this;
+	setLoopEnd( value: number ): this;
 	getVolume(): number;
 	setVolume( value: number ): this;
 	/**
 	 * @deprecated Use {@link AudioLoader} instead.
 	 */
 	load( file: string ): Audio;
-
-}
-
-export class AudioBuffer {
-
-	constructor( context: any );
-
-	context: any;
-	ready: boolean;
-	readyCallbacks: Function[];
-
-	load( file: string ): AudioBuffer;
-	onReady( callback: Function ): void;
 
 }

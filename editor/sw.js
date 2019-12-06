@@ -1,4 +1,4 @@
-// r108
+// r111
 
 const assets = [
 	'./',
@@ -18,7 +18,6 @@ const assets = [
 	'../examples/js/loaders/DRACOLoader.js',
 	'../examples/js/loaders/FBXLoader.js',
 	'../examples/js/loaders/GLTFLoader.js',
-	'../examples/js/loaders/deprecated/LegacyGLTFLoader.js',
 	'../examples/js/loaders/KMZLoader.js',
 	'../examples/js/loaders/MD2Loader.js',
 	'../examples/js/loaders/OBJLoader.js',
@@ -38,7 +37,6 @@ const assets = [
 
 	'../examples/js/renderers/Projector.js',
 	'../examples/js/renderers/RaytracingRenderer.js',
-	'../examples/js/renderers/SoftwareRenderer.js',
 	'../examples/js/renderers/SVGRenderer.js',
 
 	'./manifest.json',
@@ -91,8 +89,6 @@ const assets = [
 	//
 
 	'./css/main.css',
-	'./css/dark.css',
-	'./css/light.css',
 
 	'./js/EditorControls.js',
 	'./js/Storage.js',

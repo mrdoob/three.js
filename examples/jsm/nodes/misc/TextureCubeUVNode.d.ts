@@ -13,8 +13,6 @@ export class TextureCubeUVNode extends TempNode {
 	textureSize: FloatNode;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
-
 	static Nodes: {
 		TextureCubeUVData: StructNode;
 		textureCubeUV: FunctionNode;

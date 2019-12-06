@@ -719,7 +719,7 @@
 				}
 
 				var starGeometry = new THREE.BufferGeometry();
-				starGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( starVertices, 3 ) );
+				starGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( starVertices, 3 ) );
 				var starMesh = new THREE.Mesh( starGeometry, new THREE.MeshBasicMaterial( { color: 0x020900 } ) );
 				starMesh.scale.multiplyScalar( 6 );
 

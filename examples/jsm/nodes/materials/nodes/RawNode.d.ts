@@ -8,7 +8,6 @@ export class RawNode extends Node {
 	value: Node;
 	nodeType: string;
 
-	generate( builder: NodeBuilder ): string;
 	copy( source: RawNode ): this;
 
 }

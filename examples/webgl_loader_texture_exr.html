@@ -51,17 +51,15 @@
 					.setDataType( THREE.FloatType )
 					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
+						// memorial.exr is NPOT
+
 						//console.log( textureData );
 						//console.log( texture );
 
-						texture.minFilter = THREE.NearestFilter;
-						texture.magFilter = THREE.NearestFilter;
-
-						// these setting are currently set correctly by default
-						//texture.encoding = LinearEncoding;
-						//texture.minFilter = LinearMipmapLinearFilter;
+						// EXRLoader sets these default settings
+						//texture.generateMipmaps = false;
+						//texture.minFilter = LinearFilter;
 						//texture.magFilter = LinearFilter;
-						//texture.flipY = true;
 
 						var material = new THREE.MeshBasicMaterial( { map: texture } );
 

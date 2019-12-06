@@ -65,15 +65,6 @@
 				scene.background = new THREE.Color( 0x59472b );
 				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
 
-				controls = new FirstPersonControls( camera );
-
-				controls.lookSpeed = 0.0125;
-				controls.movementSpeed = 500;
-				controls.noFly = false;
-				controls.lookVertical = true;
-
-				controls.lookAt( scene.position );
-
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x444444 );
@@ -111,6 +102,17 @@
 
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFShadowMap;
+
+				// CONTROLS
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+
+				controls.lookSpeed = 0.0125;
+				controls.movementSpeed = 500;
+				controls.noFly = false;
+				controls.lookVertical = true;
+
+				controls.lookAt( scene.position );
 
 				// STATS
 

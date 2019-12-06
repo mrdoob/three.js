@@ -73,7 +73,9 @@
 			Setting this to values greater than 1 will blur the edges of the shadow.<br />
 
 			High values will cause unwanted banding effects in the shadows - a greater [page:.mapSize mapSize]
-			will allow for a higher value to be used here before these effects become visible.<br /><br />
+			will allow for a higher value to be used here before these effects become visible.<br />
+			If [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer PCFSoftShadowMap], it is recommended to
+			leave radius at 1 and increase softness by decreasing [page:.mapSize mapSize] instead.<br /><br />
 
 			Note that this has no effect if the [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer BasicShadowMap].
 		</p>
@@ -86,13 +88,11 @@
 		Used internally by the renderer to extend the shadow map to contain all viewports
 		</p>
 
-		<h3>[method:null updateMatrices]( [param:Light light], [param:Camera viewCamera], [param:number viewportIndex])</h3>
+		<h3>[method:null updateMatrices]( [param:Light light] )</h3>
 		<p>
 		Update the matrices for the camera and shadow, used internally by the renderer.<br /><br />
 
-		light -- the light for which the shadow is being rendered.<br />
-		viewCamera -- the camera view for which the shadow is being rendered.<br />
-		viewportIndex -- calculates the matrix for this viewport
+		light -- the light for which the shadow is being rendered.
 		</p>
 
 		<h3>[method:Frustum getFrustum]()</h3>

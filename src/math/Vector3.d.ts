@@ -71,7 +71,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Adds v to this vector.
 	 */
-	add( a: Vector3, b?: Vector3 ): this;
+	add( v: Vector3, w?: Vector3 ): this;
 
 	addScalar( s: number ): this;
 
@@ -108,6 +108,8 @@ export class Vector3 implements Vector {
 	applyAxisAngle( axis: Vector3, angle: number ): this;
 
 	applyMatrix3( m: Matrix3 ): this;
+
+	applyNormalMatrix( m: Matrix3 ): this;
 
 	applyMatrix4( m: Matrix4 ): this;
 

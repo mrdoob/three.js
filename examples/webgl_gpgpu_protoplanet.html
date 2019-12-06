@@ -383,8 +383,8 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 				particleUniforms = {
 					"texturePosition": { value: null },

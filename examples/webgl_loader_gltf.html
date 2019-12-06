@@ -24,9 +24,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer;
@@ -47,18 +45,13 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
+					.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
-						var cubeGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
-						cubeGenerator.update( renderer );
+						var pmremGenerator = new PMREMGenerator( renderer );
+						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						pmremGenerator.dispose();
 
-						var pmremGenerator = new PMREMGenerator( cubeGenerator.renderTarget.texture );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						scene.background = envMap;
 
 						// model
 
@@ -78,11 +71,6 @@
 							scene.add( gltf.scene );
 
 						} );
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
-
-						scene.background = cubeGenerator.renderTarget;
 
 					} );
 

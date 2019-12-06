@@ -30,7 +30,7 @@ export class OBJLoader2 extends Loader {
 	setPath( path: string ): this;
 	setResourcePath( path: string ): this;
 	setBaseObject3d( baseObject3d: Object3D ): this;
-	addMaterials( materials: object ): this;
+	addMaterials( materials: object, overrideExisting: boolean ): this;
 
 	setCallbackOnAssetAvailable( onAssetAvailable: Function ): this;
 	setCallbackOnProgress( onProgress: Function ): this;

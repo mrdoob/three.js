@@ -54,8 +54,8 @@
 			(将 *enabled* 置为 *false* 不会重置此次动作) <br /><br />
 
 			说明: 将*enabled*置为*true*不会让动画自动重新开始。只有满足以下条件时才会马上重新开始:
-            暂停（[page:.paused paused]）值为*false*, 同时动作没有失效 (执行停止([page:.stop stop])命令或重置([page:.reset reset])命令，
-            且权重([page:.weight weight])和时间比例([page:.timeScale timeScale])都不能为0
+			暂停（[page:.paused paused]）值为*false*, 同时动作没有失效 (执行停止([page:.stop stop])命令或重置([page:.reset reset])命令，
+			且权重([page:.weight weight])和时间比例([page:.timeScale timeScale])都不能为0
 
 		</p>
 
@@ -64,7 +64,7 @@
 			循环模式 (可以通过[page:.setLoop setLoop]改变)。默认值是
 			[page:Animation THREE.LoopRepeat] (重复[page:.repetitions repetitions]次数无穷)<br /><br />
 
-		    必须是以下值之一：<br /><br />
+			必须是以下值之一：<br /><br />
 			[page:Animation THREE.LoopOnce] - 只执行一次 <br />
 			[page:Animation THREE.LoopRepeat] - 重复次数为*repetitions*的值, 且每次循环结束时候将回到起始动作开始下一次循环。 <br />
 			[page:Animation THREE.LoopPingPong] - 重复次数为*repetitions*的值, 且像乒乓球一样在起始点与结束点之间来回循环。
@@ -120,12 +120,12 @@
 
 		<h3>[property:Boolean zeroSlopeAtEnd]</h3>
 		<p>
-            启用平滑插值，无须单独剪辑开始、循环和结束。默认值是*true*
+			启用平滑插值，无须单独剪辑开始、循环和结束。默认值是*true*
 		</p>
 
 		<h3>[property:Boolean zeroSlopeAtStart]</h3>
 		<p>
-            启用平滑插值，无须单独剪辑开始、循环和结束。默认值是*true*
+			启用平滑插值，无须单独剪辑开始、循环和结束。默认值是*true*
 		</p>
 
 
@@ -144,7 +144,7 @@
 
 		<h3>[method:AnimationAction crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
 		<p>
-            在传入的时间段内, 让此动作淡出（[page:.fadeOut fade out]），同时让另一个动作淡入。此方法可链式调用。<br /><br />
+			在传入的时间段内, 让此动作淡出（[page:.fadeOut fade out]），同时让另一个动作淡入。此方法可链式调用。<br /><br />
 			如果warpBoolean值是true, 额外的 [page:.warp warping] (时间比例的渐变)将会被应用。<br /><br />
 
 			说明: 与 *fadeIn*/*fadeOut*一样, 淡入淡出动作开始/结束时的权重是1.
@@ -152,12 +152,12 @@
 
 		<h3>[method:AnimationAction fadeIn]( [param:Number durationInSeconds] )</h3>
 		<p>
-            在传入的时间间隔内，逐渐将此动作的权重（[page:.weight weight]）由0升到1。此方法可链式调用。
+			在传入的时间间隔内，逐渐将此动作的权重（[page:.weight weight]）由0升到1。此方法可链式调用。
 		</p>
 
 		<h3>[method:AnimationAction fadeOut]( [param:Number durationInSeconds] )</h3>
 		<p>
-            在传入的时间间隔内，逐渐将此动作的权重（[page:.weight weight]）由1降至0。此方法可链式调用。
+			在传入的时间间隔内，逐渐将此动作的权重（[page:.weight weight]）由1降至0。此方法可链式调用。
 		</p>
 
 		<h3>[method:Number getEffectiveTimeScale]()</h3>
@@ -177,7 +177,7 @@
 
 		<h3>[method:AnimationMixer getMixer]()</h3>
 		<p>
-            返回负责完成此动作的混合器
+			返回负责完成此动作的混合器
 		</p>
 
 		<h3>[method:Object3D getRoot]()</h3>
@@ -224,7 +224,7 @@
 			[page:.time time]设为0, 中断任何预定的淡入淡出和变形, 以及移除内部循环次数以及延迟启动。<br /><br />
 
 			说明: 停止方法[page:.stop stop]内调用了重置方法（reset）, 但是 .*reset*不会调用 .*stop*。
-            这就表示: 如果你想要这两者, 重置并且停止, 不要调用*reset*; 而应该调用*stop*。
+			这就表示: 如果你想要这两者, 重置并且停止, 不要调用*reset*; 而应该调用*stop*。
 		</p>
 
 		<h3>[method:AnimationAction setDuration]( [param:Number durationInSeconds] )</h3>
@@ -295,7 +295,7 @@
 
 		<h3>[method:AnimationAction warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
 		<p>
-            在传入的事件间隔内，通过逐渐将时间比例[page:.timeScale timeScale]由*startTimeScale*修改至*endTimeScale*来改变回放速度。该方法可被链式调用。
+			在传入的事件间隔内，通过逐渐将时间比例[page:.timeScale timeScale]由*startTimeScale*修改至*endTimeScale*来改变回放速度。该方法可被链式调用。
 		</p>
 
 

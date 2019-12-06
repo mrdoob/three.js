@@ -10,7 +10,6 @@ import {
 	Matrix3,
 	Matrix4,
 	Object3D,
-	REVISION,
 	Vector3,
 	VertexColors
 } from "../../../build/three.module.js";
@@ -31,8 +30,6 @@ SVGObject.prototype = Object.create( Object3D.prototype );
 SVGObject.prototype.constructor = SVGObject;
 
 var SVGRenderer = function () {
-
-	console.log( 'THREE.SVGRenderer', REVISION );
 
 	var _this = this,
 		_renderData, _elements, _lights,
@@ -139,13 +136,13 @@ var SVGRenderer = function () {
 
 	}
 
-	function getSvgColor( color, opacity ) {
+	function getSvgColor( color, opacity, asStroke ) {
 
 		var arg = Math.floor( color.r * 255 ) + ',' + Math.floor( color.g * 255 ) + ',' + Math.floor( color.b * 255 );
 
 		if ( opacity === undefined || opacity === 1 ) return 'rgb(' + arg + ')';
 
-		return 'rgb(' + arg + '); fill-opacity: ' + opacity;
+		return 'rgb(' + arg + ');' + ( asStroke ? 'stroke-opacity' : 'fill-opacity' ) + ':' + opacity;
 
 	}
 
@@ -406,7 +403,7 @@ var SVGRenderer = function () {
 
 		if ( material.isLineBasicMaterial ) {
 
-			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
+			var style = 'fill:none;stroke:' + getSvgColor( material.color, material.opacity, true ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
 
 			if ( material.isLineDashedMaterial ) {
 
@@ -458,7 +455,7 @@ var SVGRenderer = function () {
 
 		} else if ( material.isMeshNormalMaterial ) {
 
-			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix );
+			_normal.copy( element.normalModel ).applyMatrix3( _normalViewMatrix ).normalize();
 
 			_color.setRGB( _normal.x, _normal.y, _normal.z ).multiplyScalar( 0.5 ).addScalar( 0.5 );
 
@@ -466,7 +463,7 @@ var SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			style = 'fill:none;stroke:' + getSvgColor( _color, material.opacity ) + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
+			style = 'fill:none;stroke:' + getSvgColor( _color, material.opacity, true ) + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
 
 		} else {
 

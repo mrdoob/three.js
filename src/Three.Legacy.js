@@ -5,7 +5,12 @@
 import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
-import { FlatShading } from './constants.js';
+import {
+	FlatShading,
+	StaticDrawUsage,
+	DynamicDrawUsage,
+	TrianglesDrawMode
+} from './constants.js';
 import {
 	Float64BufferAttribute,
 	Float32BufferAttribute,
@@ -66,6 +71,7 @@ import { Triangle } from './math/Triangle.js';
 import { Vector2 } from './math/Vector2.js';
 import { Vector3 } from './math/Vector3.js';
 import { Vector4 } from './math/Vector4.js';
+import { Mesh } from './objects/Mesh.js';
 import { LineSegments } from './objects/LineSegments.js';
 import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
@@ -304,7 +310,7 @@ Object.assign( Path.prototype, {
 	fromPoints: function ( points ) {
 
 		console.warn( 'THREE.Path: .fromPoints() has been renamed to .setFromPoints().' );
-		this.setFromPoints( points );
+		return this.setFromPoints( points );
 
 	}
 
@@ -984,6 +990,34 @@ Object.defineProperties( Object3D.prototype, {
 
 } );
 
+Object.assign( Mesh.prototype, {
+
+	setDrawMode: function () {
+
+		console.error( 'THREE.Mesh: .setDrawMode() has been removed. The renderer now always assumes THREE.TrianglesDrawMode. Transform your geometry via BufferGeometryUtils.toTrianglesDrawMode() if necessary.' );
+
+	},
+
+} );
+
+Object.defineProperties( Mesh.prototype, {
+
+	drawMode: {
+		get: function () {
+
+			console.error( 'THREE.Mesh: .drawMode has been removed. The renderer now always assumes THREE.TrianglesDrawMode.' );
+			return TrianglesDrawMode;
+
+		},
+		set: function () {
+
+			console.error( 'THREE.Mesh: .drawMode has been removed. The renderer now always assumes THREE.TrianglesDrawMode. Transform your geometry via BufferGeometryUtils.toTrianglesDrawMode() if necessary.' );
+
+		}
+	}
+
+} );
+
 Object.defineProperties( LOD.prototype, {
 
 	objects: {
@@ -1164,28 +1198,42 @@ Object.defineProperties( BufferAttribute.prototype, {
 			return this.array.length;
 
 		}
+	},
+	dynamic: {
+		get: function () {
+
+			console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+			return this.usage === DynamicDrawUsage;
+
+		},
+		set: function ( /* value */ ) {
+
+			console.warn( 'THREE.BufferAttribute: .dynamic has been deprecated. Use .usage instead.' );
+			this.setUsage( DynamicDrawUsage );
+
+		}
 	}
 
 } );
 
 Object.assign( BufferAttribute.prototype, {
+	setDynamic: function ( value ) {
 
+		console.warn( 'THREE.BufferAttribute: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+		this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+		return this;
+
+	},
 	copyIndicesArray: function ( /* indices */ ) {
 
 		console.error( 'THREE.BufferAttribute: .copyIndicesArray() has been removed.' );
 
 	},
-	setArray: function ( array ) {
+	setArray: function ( /* array */ ) {
 
-		console.warn( 'THREE.BufferAttribute: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
-
-		this.count = array !== undefined ? array.length / this.itemSize : 0;
-		this.array = array;
-
-		return this;
+		console.error( 'THREE.BufferAttribute: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
 
 	}
-
 } );
 
 Object.assign( BufferGeometry.prototype, {
@@ -1194,6 +1242,30 @@ Object.assign( BufferGeometry.prototype, {
 
 		console.warn( 'THREE.BufferGeometry: .addIndex() has been renamed to .setIndex().' );
 		this.setIndex( index );
+
+	},
+	addAttribute: function ( name, attribute ) {
+
+		console.warn( 'THREE.BufferGeometry: .addAttribute() has been renamed to .setAttribute().' );
+
+		if ( ! ( attribute && attribute.isBufferAttribute ) && ! ( attribute && attribute.isInterleavedBufferAttribute ) ) {
+
+			console.warn( 'THREE.BufferGeometry: .addAttribute() now expects ( name, attribute ).' );
+
+			return this.setAttribute( name, new BufferAttribute( arguments[ 1 ], arguments[ 2 ] ) );
+
+		}
+
+		if ( name === 'index' ) {
+
+			console.warn( 'THREE.BufferGeometry.addAttribute: Use .setIndex() for index attribute.' );
+			this.setIndex( attribute );
+
+			return this;
+
+		}
+
+		return this.setAttribute( name, attribute );
 
 	},
 	addDrawCall: function ( start, count, indexOffset ) {
@@ -1222,8 +1294,14 @@ Object.assign( BufferGeometry.prototype, {
 
 		console.warn( 'THREE.BufferGeometry: .computeOffsets() has been removed.' );
 
-	}
+	},
+	removeAttribute: function ( name ) {
 
+		console.warn( 'THREE.BufferGeometry: .removeAttribute() has been renamed to .deleteAttribute().' );
+
+		return this.deleteAttribute( name );
+
+	}
 } );
 
 Object.defineProperties( BufferGeometry.prototype, {
@@ -1247,19 +1325,38 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 } );
 
-Object.assign( InterleavedBuffer.prototype, {
+Object.defineProperties( InterleavedBuffer.prototype, {
 
-	setArray: function ( array ) {
+	dynamic: {
+		get: function () {
 
-		console.warn( 'THREE.InterleavedBuffer: .setArray has been deprecated. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+			return this.usage === DynamicDrawUsage;
 
-		this.count = array !== undefined ? array.length / this.stride : 0;
-		this.array = array;
+		},
+		set: function ( value ) {
 
-		return this;
+			console.warn( 'THREE.InterleavedBuffer: .length has been deprecated. Use .usage instead.' );
+			this.setUsage( value );
 
+		}
 	}
 
+} );
+
+Object.assign( InterleavedBuffer.prototype, {
+	setDynamic: function ( value ) {
+
+		console.warn( 'THREE.InterleavedBuffer: .setDynamic() has been deprecated. Use .setUsage() instead.' );
+		this.setUsage( value === true ? DynamicDrawUsage : StaticDrawUsage );
+		return this;
+
+	},
+	setArray: function ( /* array */ ) {
+
+		console.error( 'THREE.InterleavedBuffer: .setArray has been removed. Use BufferGeometry .setAttribute to replace/resize attribute buffers' );
+
+	}
 } );
 
 //
@@ -1612,6 +1709,14 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			return this.getContext();
 
 		}
+	},
+	vr: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .vr has been removed. Use .xr instead.' );
+			return this.xr;
+
+		}
 	}
 
 } );
@@ -1851,19 +1956,32 @@ Object.defineProperties( WebVRManager.prototype, {
 
 //
 
-Audio.prototype.load = function ( file ) {
+Object.defineProperties( Audio.prototype, {
 
-	console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
-	var scope = this;
-	var audioLoader = new AudioLoader();
-	audioLoader.load( file, function ( buffer ) {
+	load: {
+		value: function ( file ) {
 
-		scope.setBuffer( buffer );
+			console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
+			var scope = this;
+			var audioLoader = new AudioLoader();
+			audioLoader.load( file, function ( buffer ) {
 
-	} );
-	return this;
+				scope.setBuffer( buffer );
 
-};
+			} );
+			return this;
+
+		}
+	},
+	startTime: {
+		set: function () {
+
+			console.warn( 'THREE.Audio: .startTime is now .play( delay ).' );
+
+		}
+	}
+
+} );
 
 AudioAnalyser.prototype.getData = function () {
 

@@ -9,7 +9,7 @@ function DataTexture2DArray( data, width, height, depth ) {
 
 	Texture.call( this, null );
 
-	this.image = { data: data, width: width, height: height, depth: depth };
+	this.image = { data: data || null, width: width || 1, height: height || 1, depth: depth || 1 };
 
 	this.magFilter = NearestFilter;
 	this.minFilter = NearestFilter;

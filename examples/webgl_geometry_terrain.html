@@ -52,10 +52,6 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xbfd1e5 );
 
-				controls = new FirstPersonControls( camera );
-				controls.movementSpeed = 1000;
-				controls.lookSpeed = 0.1;
-
 				var data = generateHeight( worldWidth, worldDepth );
 
 				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
@@ -82,6 +78,10 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 1000;
+				controls.lookSpeed = 0.1;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

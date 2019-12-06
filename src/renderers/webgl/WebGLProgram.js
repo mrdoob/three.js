@@ -255,15 +255,15 @@ function generatePrecision( parameters ) {
 
 	if ( parameters.precision === "highp" ) {
 
-		precisionstring += "\n#define HIGH_PRECISION;";
+		precisionstring += "\n#define HIGH_PRECISION";
 
 	} else if ( parameters.precision === "mediump" ) {
 
-		precisionstring += "\n#define MEDIUM_PRECISION;";
+		precisionstring += "\n#define MEDIUM_PRECISION";
 
 	} else if ( parameters.precision === "lowp" ) {
 
-		precisionstring += "\n#define LOW_PRECISION;";
+		precisionstring += "\n#define LOW_PRECISION";
 
 	}
 
@@ -293,13 +293,13 @@ function generateShadowMapTypeDefine( parameters ) {
 
 }
 
-function generateEnvMapTypeDefine( parameters, material ) {
+function generateEnvMapTypeDefine( parameters ) {
 
 	var envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
 
 	if ( parameters.envMap ) {
 
-		switch ( material.envMap.mapping ) {
+		switch ( parameters.envMapMode ) {
 
 			case CubeReflectionMapping:
 			case CubeRefractionMapping:
@@ -328,13 +328,13 @@ function generateEnvMapTypeDefine( parameters, material ) {
 
 }
 
-function generateEnvMapModeDefine( parameters, material ) {
+function generateEnvMapModeDefine( parameters ) {
 
 	var envMapModeDefine = 'ENVMAP_MODE_REFLECTION';
 
 	if ( parameters.envMap ) {
 
-		switch ( material.envMap.mapping ) {
+		switch ( parameters.envMapMode ) {
 
 			case CubeRefractionMapping:
 			case EquirectangularRefractionMapping:
@@ -349,13 +349,13 @@ function generateEnvMapModeDefine( parameters, material ) {
 
 }
 
-function generateEnvMapBlendingDefine( parameters, material ) {
+function generateEnvMapBlendingDefine( parameters ) {
 
-	var envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
+	var envMapBlendingDefine = 'ENVMAP_BLENDING_NONE';
 
 	if ( parameters.envMap ) {
 
-		switch ( material.combine ) {
+		switch ( parameters.combine ) {
 
 			case MultiplyOperation:
 				envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
@@ -377,7 +377,7 @@ function generateEnvMapBlendingDefine( parameters, material ) {
 
 }
 
-function WebGLProgram( renderer, extensions, code, material, shader, parameters ) {
+function WebGLProgram( renderer, extensions, cacheKey, material, shader, parameters ) {
 
 	var gl = renderer.getContext();
 
@@ -386,9 +386,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 	var vertexShader = shader.vertexShader;
 	var fragmentShader = shader.fragmentShader;
 	var shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
-	var envMapTypeDefine = generateEnvMapTypeDefine( parameters, material );
-	var envMapModeDefine = generateEnvMapModeDefine( parameters, material );
-	var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters, material );
+	var envMapTypeDefine = generateEnvMapTypeDefine( parameters );
+	var envMapModeDefine = generateEnvMapModeDefine( parameters );
+	var envMapBlendingDefine = generateEnvMapBlendingDefine( parameters );
 
 
 	var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
@@ -401,8 +401,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	var prefixVertex, prefixFragment;
 
-	var renderTarget = renderer.getRenderTarget();
-	var numMultiviewViews = renderTarget && renderTarget.isWebGLMultiviewRenderTarget ? renderTarget.numViews : 0;
+	var numMultiviewViews = parameters.numMultiviewViews;
 
 	if ( material.isRawShaderMaterial ) {
 
@@ -441,6 +440,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			customDefines,
 
+			parameters.instancing ? '#define USE_INSTANCING' : '',
 			parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
 
 			'#define GAMMA_FACTOR ' + gammaFactorDefine,
@@ -470,6 +470,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
+			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -488,28 +489,20 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			parameters.logarithmicDepthBuffer ? '#define USE_LOGDEPTHBUF' : '',
 			parameters.logarithmicDepthBuffer && ( parameters.isWebGL2 || extensions.get( 'EXT_frag_depth' ) ) ? '#define USE_LOGDEPTHBUF_EXT' : '',
+
 			'uniform mat4 modelMatrix;',
+			'uniform mat4 modelViewMatrix;',
+			'uniform mat4 projectionMatrix;',
+			'uniform mat4 viewMatrix;',
+			'uniform mat3 normalMatrix;',
 			'uniform vec3 cameraPosition;',
+			'uniform bool isOrthographic;',
 
-			numMultiviewViews > 0 ? [
-				'uniform mat4 modelViewMatrices[' + numMultiviewViews + '];',
-				'uniform mat3 normalMatrices[' + numMultiviewViews + '];',
-				'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
-				'uniform mat4 projectionMatrices[' + numMultiviewViews + '];',
+			'#ifdef USE_INSTANCING',
 
-				'#define modelViewMatrix modelViewMatrices[VIEW_ID]',
-				'#define normalMatrix normalMatrices[VIEW_ID]',
-				'#define viewMatrix viewMatrices[VIEW_ID]',
-				'#define projectionMatrix projectionMatrices[VIEW_ID]'
+			' attribute mat4 instanceMatrix;',
 
-			].join( '\n' ) : [
-
-				'uniform mat4 modelViewMatrix;',
-				'uniform mat4 projectionMatrix;',
-				'uniform mat4 viewMatrix;',
-				'uniform mat3 normalMatrix;',
-
-			].join( '\n' ),
+			'#endif',
 
 			'attribute vec3 position;',
 			'attribute vec3 normal;',
@@ -604,6 +597,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			parameters.vertexTangents ? '#define USE_TANGENT' : '',
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
+			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
@@ -624,14 +618,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			( ( material.extensions ? material.extensions.shaderTextureLOD : false ) || parameters.envMap ) && ( parameters.isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) ) ? '#define TEXTURE_LOD_EXT' : '',
 
+			'uniform mat4 viewMatrix;',
 			'uniform vec3 cameraPosition;',
-
-			numMultiviewViews > 0 ? [
-
-				'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
-				'#define viewMatrix viewMatrices[VIEW_ID]'
-
-			].join( '\n' ) : 'uniform mat4 viewMatrix;',
+			'uniform bool isOrthographic;',
 
 			( parameters.toneMapping !== NoToneMapping ) ? '#define TONE_MAPPING' : '',
 			( parameters.toneMapping !== NoToneMapping ) ? ShaderChunk[ 'tonemapping_pars_fragment' ] : '', // this code is required here because it is used by the toneMapping() function defined below
@@ -639,12 +628,13 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 			parameters.dithering ? '#define DITHERING' : '',
 
-			( parameters.outputEncoding || parameters.mapEncoding || parameters.matcapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding ) ?
+			( parameters.outputEncoding || parameters.mapEncoding || parameters.matcapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding || parameters.lightMapEncoding ) ?
 				ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
 			parameters.mapEncoding ? getTexelDecodingFunction( 'mapTexelToLinear', parameters.mapEncoding ) : '',
 			parameters.matcapEncoding ? getTexelDecodingFunction( 'matcapTexelToLinear', parameters.matcapEncoding ) : '',
 			parameters.envMapEncoding ? getTexelDecodingFunction( 'envMapTexelToLinear', parameters.envMapEncoding ) : '',
 			parameters.emissiveMapEncoding ? getTexelDecodingFunction( 'emissiveMapTexelToLinear', parameters.emissiveMapEncoding ) : '',
+			parameters.lightMapEncoding ? getTexelDecodingFunction( 'lightMapTexelToLinear', parameters.lightMapEncoding ) : '',
 			parameters.outputEncoding ? getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ) : '',
 
 			parameters.depthPacking ? '#define DEPTH_PACKING ' + material.depthPacking : '',
@@ -684,17 +674,9 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 		}
 
 		// GLSL 3.0 conversion
+
 		prefixVertex = [
 			'#version 300 es\n',
-
-			numMultiviewViews > 0 ? [
-
-				'#extension GL_OVR_multiview2 : require',
-				'layout(num_views = ' + numMultiviewViews + ') in;',
-				'#define VIEW_ID gl_ViewID_OVR'
-
-			].join( '\n' ) : '',
-
 			'#define attribute in',
 			'#define varying out',
 			'#define texture2D texture'
@@ -702,12 +684,6 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 		prefixFragment = [
 			'#version 300 es\n',
-			numMultiviewViews > 0 ? [
-
-				'#extension GL_OVR_multiview2 : require',
-				'#define VIEW_ID gl_ViewID_OVR'
-
-			].join( '\n' ) : '',
 			'#define varying in',
 			isGLSL3ShaderMaterial ? '' : 'out highp vec4 pc_fragColor;',
 			isGLSL3ShaderMaterial ? '' : '#define gl_FragColor pc_fragColor',
@@ -722,6 +698,59 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 			'#define texture2DProjGradEXT textureProjGrad',
 			'#define textureCubeGradEXT textureGrad'
 		].join( '\n' ) + '\n' + prefixFragment;
+
+		// Multiview
+
+		if ( numMultiviewViews > 0 ) {
+
+			prefixVertex = prefixVertex.replace(
+				'#version 300 es\n',
+				[
+					'#version 300 es\n',
+					'#extension GL_OVR_multiview2 : require',
+					'layout(num_views = ' + numMultiviewViews + ') in;',
+					'#define VIEW_ID gl_ViewID_OVR'
+				].join( '\n' )
+			);
+
+			prefixVertex = prefixVertex.replace(
+				[
+					'uniform mat4 modelViewMatrix;',
+					'uniform mat4 projectionMatrix;',
+					'uniform mat4 viewMatrix;',
+					'uniform mat3 normalMatrix;'
+				].join( '\n' ),
+				[
+					'uniform mat4 modelViewMatrices[' + numMultiviewViews + '];',
+					'uniform mat4 projectionMatrices[' + numMultiviewViews + '];',
+					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
+					'uniform mat3 normalMatrices[' + numMultiviewViews + '];',
+
+					'#define modelViewMatrix modelViewMatrices[VIEW_ID]',
+					'#define projectionMatrix projectionMatrices[VIEW_ID]',
+					'#define viewMatrix viewMatrices[VIEW_ID]',
+					'#define normalMatrix normalMatrices[VIEW_ID]'
+				].join( '\n' )
+			);
+
+			prefixFragment = prefixFragment.replace(
+				'#version 300 es\n',
+				[
+					'#version 300 es\n',
+					'#extension GL_OVR_multiview2 : require',
+					'#define VIEW_ID gl_ViewID_OVR'
+				].join( '\n' )
+			);
+
+			prefixFragment = prefixFragment.replace(
+				'uniform mat4 viewMatrix;',
+				[
+					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
+					'#define viewMatrix viewMatrices[VIEW_ID]'
+				].join( '\n' )
+			);
+
+		}
 
 	}
 
@@ -860,7 +889,7 @@ function WebGLProgram( renderer, extensions, code, material, shader, parameters 
 
 	this.name = shader.name;
 	this.id = programIdCount ++;
-	this.code = code;
+	this.cacheKey = cacheKey;
 	this.usedTimes = 1;
 	this.program = program;
 	this.vertexShader = glVertexShader;

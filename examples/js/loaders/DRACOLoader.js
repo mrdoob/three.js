@@ -198,7 +198,7 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			var array = attribute.array;
 			var itemSize = attribute.itemSize;
 
-			geometry.addAttribute( name, new THREE.BufferAttribute( array, itemSize ) );
+			geometry.setAttribute( name, new THREE.BufferAttribute( array, itemSize ) );
 
 		}
 
@@ -217,6 +217,14 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			loader.load( url, resolve, undefined, reject );
 
 		} );
+
+	},
+
+	preload: function () {
+
+		this._initDecoder();
+
+		return this;
 
 	},
 

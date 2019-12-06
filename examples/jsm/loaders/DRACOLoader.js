@@ -205,7 +205,7 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var array = attribute.array;
 			var itemSize = attribute.itemSize;
 
-			geometry.addAttribute( name, new BufferAttribute( array, itemSize ) );
+			geometry.setAttribute( name, new BufferAttribute( array, itemSize ) );
 
 		}
 
@@ -224,6 +224,14 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			loader.load( url, resolve, undefined, reject );
 
 		} );
+
+	},
+
+	preload: function () {
+
+		this._initDecoder();
+
+		return this;
 
 	},
 

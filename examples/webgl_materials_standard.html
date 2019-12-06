@@ -21,8 +21,8 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var statsEnabled = true;
 
@@ -101,29 +101,19 @@
 
 					} );
 
-				new THREE.CubeTextureLoader().setPath( './textures/cube/pisaRGBM16/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( rgbmCubeMap ) {
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'venice_sunset_1k.hdr', function ( hdrCubeMap ) {
 
-						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
-						rgbmCubeMap.format = THREE.RGBAFormat;
-
-						var pmremGenerator = new PMREMGenerator( rgbmCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						var rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-						material.envMap = rgbmCubeRenderTarget.texture;
-						material.needsUpdate = true; // is this needed?
-
-						rgbmCubeMap.magFilter = THREE.LinearFilter;
-						rgbmCubeMap.needsUpdate = true;
-						scene.background = rgbmCubeMap;
-
+						var pmremGenerator = new PMREMGenerator( renderer );
+						var hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						hdrCubeMap.dispose();
 						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+
+						material.envMap = hdrCubeRenderTarget.texture;
+
+						scene.background = hdrCubeRenderTarget.texture;
 
 					} );
 

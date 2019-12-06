@@ -265,6 +265,12 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	applyNormalMatrix: function ( m ) {
+
+		return this.applyMatrix3( m ).normalize();
+
+	},
+
 	applyMatrix4: function ( m ) {
 
 		var x = this.x, y = this.y, z = this.z;
@@ -555,9 +561,11 @@ Object.assign( Vector3.prototype, {
 
 	angleTo: function ( v ) {
 
-		// assumes this and v are not the zero vector
+		var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
 
-		var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
+		if ( denominator === 0 ) console.error( 'THREE.Vector3: angleTo() can\'t handle zero length vectors.' );
+
+		var theta = this.dot( v ) / denominator;
 
 		// clamp, to handle numerical problems
 

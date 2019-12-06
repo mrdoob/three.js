@@ -1492,7 +1492,7 @@
 			var group = new Group();
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( 'position', new Float32BufferAttribute( [], 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( [], 3 ) );
 
 			var lineMaterial = new LineBasicMaterial( { color: 0xffffff, transparent: true, opacity: 0.5 } );
 			var meshMaterial = new MeshPhongMaterial( { color: 0x156289, emissive: 0x072534, side: DoubleSide, flatShading: true } );

@@ -140,7 +140,7 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 				var config = this.workerConfig;
 
-				var { width, height, hasAlpha, mipmaps, format } = message;
+				var { width, height, mipmaps, format } = message;
 
 				var texture;
 
@@ -476,8 +476,8 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 				0,
 				mip,
 				config.format,
-				hasAlpha,
-				0
+				0,
+				hasAlpha
 			);
 
 			if ( ! status ) {

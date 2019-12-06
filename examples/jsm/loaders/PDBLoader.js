@@ -143,10 +143,10 @@ PDBLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			// build geometry
 
-			geometryAtoms.addAttribute( 'position', new Float32BufferAttribute( verticesAtoms, 3 ) );
-			geometryAtoms.addAttribute( 'color', new Float32BufferAttribute( colorsAtoms, 3 ) );
+			geometryAtoms.setAttribute( 'position', new Float32BufferAttribute( verticesAtoms, 3 ) );
+			geometryAtoms.setAttribute( 'color', new Float32BufferAttribute( colorsAtoms, 3 ) );
 
-			geometryBonds.addAttribute( 'position', new Float32BufferAttribute( verticesBonds, 3 ) );
+			geometryBonds.setAttribute( 'position', new Float32BufferAttribute( verticesBonds, 3 ) );
 
 			return build;
 
