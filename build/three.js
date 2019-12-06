@@ -9082,6 +9082,8 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
+	var _vector$4 = new Vector3();
+
 	function BufferAttribute( array, itemSize, normalized ) {
 
 		if ( Array.isArray( array ) ) {
@@ -9258,6 +9260,78 @@
 				array[ offset ++ ] = vector.y;
 				array[ offset ++ ] = vector.z;
 				array[ offset ++ ] = vector.w;
+
+			}
+
+			return this;
+
+		},
+
+		applyMatrix3: function ( m ) {
+
+			for ( var i = 0, l = this.count; i < l; i ++ ) {
+
+				_vector$4.x = this.getX( i );
+				_vector$4.y = this.getY( i );
+				_vector$4.z = this.getZ( i );
+
+				_vector$4.applyMatrix3( m );
+
+				this.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
+
+			}
+
+			return this;
+
+		},
+
+		applyMatrix4: function ( m ) {
+
+			for ( var i = 0, l = this.count; i < l; i ++ ) {
+
+				_vector$4.x = this.getX( i );
+				_vector$4.y = this.getY( i );
+				_vector$4.z = this.getZ( i );
+
+				_vector$4.applyMatrix4( m );
+
+				this.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
+
+			}
+
+			return this;
+
+		},
+
+		applyNormalMatrix: function ( m ) {
+
+			for ( var i = 0, l = this.count; i < l; i ++ ) {
+
+				_vector$4.x = this.getX( i );
+				_vector$4.y = this.getY( i );
+				_vector$4.z = this.getZ( i );
+
+				_vector$4.applyNormalMatrix( m );
+
+				this.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
+
+			}
+
+			return this;
+
+		},
+
+		transformDirection: function ( m ) {
+
+			for ( var i = 0, l = this.count; i < l; i ++ ) {
+
+				_vector$4.x = this.getX( i );
+				_vector$4.y = this.getY( i );
+				_vector$4.z = this.getZ( i );
+
+				_vector$4.transformDirection( m );
+
+				this.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
 
 			}
 
@@ -9799,7 +9873,7 @@
 	var _offset = new Vector3();
 	var _box$2 = new Box3();
 	var _boxMorphTargets = new Box3();
-	var _vector$4 = new Vector3();
+	var _vector$5 = new Vector3();
 
 	function BufferGeometry() {
 
@@ -10353,11 +10427,11 @@
 
 						if ( this.morphTargetsRelative ) {
 
-							_vector$4.addVectors( this.boundingBox.min, _box$2.min );
-							this.boundingBox.expandByPoint( _vector$4 );
+							_vector$5.addVectors( this.boundingBox.min, _box$2.min );
+							this.boundingBox.expandByPoint( _vector$5 );
 
-							_vector$4.addVectors( this.boundingBox.max, _box$2.max );
-							this.boundingBox.expandByPoint( _vector$4 );
+							_vector$5.addVectors( this.boundingBox.max, _box$2.max );
+							this.boundingBox.expandByPoint( _vector$5 );
 
 						} else {
 
@@ -10414,11 +10488,11 @@
 
 						if ( this.morphTargetsRelative ) {
 
-							_vector$4.addVectors( _box$2.min, _boxMorphTargets.min );
-							_box$2.expandByPoint( _vector$4 );
+							_vector$5.addVectors( _box$2.min, _boxMorphTargets.min );
+							_box$2.expandByPoint( _vector$5 );
 
-							_vector$4.addVectors( _box$2.max, _boxMorphTargets.max );
-							_box$2.expandByPoint( _vector$4 );
+							_vector$5.addVectors( _box$2.max, _boxMorphTargets.max );
+							_box$2.expandByPoint( _vector$5 );
 
 						} else {
 
@@ -10440,9 +10514,9 @@
 
 				for ( var i = 0, il = position.count; i < il; i ++ ) {
 
-					_vector$4.fromBufferAttribute( position, i );
+					_vector$5.fromBufferAttribute( position, i );
 
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$4 ) );
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$5 ) );
 
 				}
 
@@ -10457,16 +10531,16 @@
 
 						for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
 
-							_vector$4.fromBufferAttribute( morphAttribute, j );
+							_vector$5.fromBufferAttribute( morphAttribute, j );
 
 							if ( morphTargetsRelative ) {
 
 								_offset.fromBufferAttribute( position, j );
-								_vector$4.add( _offset );
+								_vector$5.add( _offset );
 
 							}
 
-							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$4 ) );
+							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$5 ) );
 
 						}
 
@@ -10650,13 +10724,13 @@
 
 			for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
-				_vector$4.x = normals.getX( i );
-				_vector$4.y = normals.getY( i );
-				_vector$4.z = normals.getZ( i );
+				_vector$5.x = normals.getX( i );
+				_vector$5.y = normals.getY( i );
+				_vector$5.z = normals.getZ( i );
 
-				_vector$4.normalize();
+				_vector$5.normalize();
 
-				normals.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
+				normals.setXYZ( i, _vector$5.x, _vector$5.y, _vector$5.z );
 
 			}
 
@@ -13893,7 +13967,7 @@
 	 */
 
 	var _sphere$1 = new Sphere();
-	var _vector$5 = new Vector3();
+	var _vector$6 = new Vector3();
 
 	function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
@@ -14021,11 +14095,11 @@
 
 				// corner at max distance
 
-				_vector$5.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-				_vector$5.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-				_vector$5.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+				_vector$6.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+				_vector$6.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+				_vector$6.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-				if ( plane.distanceToPoint( _vector$5 ) < 0 ) {
+				if ( plane.distanceToPoint( _vector$6 ) < 0 ) {
 
 					return false;
 
@@ -16258,7 +16332,10 @@
 
 			var objectInfluences = object.morphTargetInfluences;
 
-			var length = objectInfluences.length;
+			// When object doesn't have morph target influences defined, we treat it as a 0-length array
+			// This is important to make sure we set up morphTargetBaseInfluence / morphTargetInfluences
+
+			var length = objectInfluences === undefined ? 0 : objectInfluences.length;
 
 			var influences = influencesList[ geometry.id ];
 
@@ -21004,9 +21081,20 @@
 
 		// cordova iOS (as of 5.0) still uses UIWebView, which provides OffscreenCanvas,
 		// also OffscreenCanvas.getContext("webgl"), but not OffscreenCanvas.getContext("2d")!
+		// Some implementations may only implement OffscreenCanvas partially (e.g. lacking 2d).
 
-		var useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
-			&& ( new OffscreenCanvas( 1, 1 ).getContext( "2d" ) ) !== null;
+		var useOffscreenCanvas = false;
+
+		try {
+
+			useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
+				&& ( new OffscreenCanvas( 1, 1 ).getContext( "2d" ) ) !== null;
+
+		} catch ( err ) {
+
+			// Ignore any errors
+
+		}
 
 		function createCanvas( width, height ) {
 
@@ -24220,9 +24308,9 @@
 
 			var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
-			state.setMaterial( material, frontFaceCW );
-
 			var program = setProgram( camera, fog, material, object );
+
+			state.setMaterial( material, frontFaceCW );
 
 			var updateBuffers = false;
 
@@ -24237,7 +24325,7 @@
 
 			}
 
-			if ( object.morphTargetInfluences ) {
+			if ( material.morphTargets || material.morphNormals ) {
 
 				morphtargets.update( object, geometry, material, program );
 
@@ -24965,9 +25053,9 @@
 
 			if ( object.isImmediateRenderObject ) {
 
-				state.setMaterial( material );
-
 				var program = setProgram( camera, scene.fog, material, object );
+
+				state.setMaterial( material );
 
 				_currentGeometryProgram.geometry = null;
 				_currentGeometryProgram.program = null;
@@ -45786,7 +45874,7 @@
 	 * @author bhouston / http://clara.io
 	 */
 
-	var _vector$6 = new Vector2();
+	var _vector$7 = new Vector2();
 
 	function Box2( min, max ) {
 
@@ -45822,7 +45910,7 @@
 
 		setFromCenterAndSize: function ( center, size ) {
 
-			var halfSize = _vector$6.copy( size ).multiplyScalar( 0.5 );
+			var halfSize = _vector$7.copy( size ).multiplyScalar( 0.5 );
 			this.min.copy( center ).sub( halfSize );
 			this.max.copy( center ).add( halfSize );
 
@@ -45972,7 +46060,7 @@
 
 		distanceToPoint: function ( point ) {
 
-			var clampedPoint = _vector$6.copy( point ).clamp( this.min, this.max );
+			var clampedPoint = _vector$7.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
 
 		},
@@ -46411,7 +46499,7 @@
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
-	var _vector$7 = new Vector3();
+	var _vector$8 = new Vector3();
 
 	function SpotLightHelper( light, color ) {
 
@@ -46477,9 +46565,9 @@
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		_vector$7.setFromMatrixPosition( this.light.target.matrixWorld );
+		_vector$8.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		this.cone.lookAt( _vector$7 );
+		this.cone.lookAt( _vector$8 );
 
 		if ( this.color !== undefined ) {
 
@@ -46501,7 +46589,7 @@
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	var _vector$8 = new Vector3();
+	var _vector$9 = new Vector3();
 	var _boneMatrix = new Matrix4();
 	var _matrixWorldInv = new Matrix4();
 
@@ -46586,12 +46674,12 @@
 			if ( bone.parent && bone.parent.isBone ) {
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
-				_vector$8.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j, _vector$8.x, _vector$8.y, _vector$8.z );
+				_vector$9.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j, _vector$9.x, _vector$9.y, _vector$9.z );
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
-				_vector$8.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j + 1, _vector$8.x, _vector$8.y, _vector$8.z );
+				_vector$9.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j + 1, _vector$9.x, _vector$9.y, _vector$9.z );
 
 				j += 2;
 
@@ -46773,7 +46861,7 @@
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	var _vector$9 = new Vector3();
+	var _vector$a = new Vector3();
 	var _color1 = new Color();
 	var _color2 = new Color();
 
@@ -46843,7 +46931,7 @@
 
 		}
 
-		mesh.lookAt( _vector$9.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+		mesh.lookAt( _vector$a.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 
 	};
 
@@ -47442,7 +47530,7 @@
 	 *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
 	 */
 
-	var _vector$a = new Vector3();
+	var _vector$b = new Vector3();
 	var _camera = new Camera();
 
 	function CameraHelper( camera ) {
@@ -47607,7 +47695,7 @@
 
 	function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
-		_vector$a.set( x, y, z ).unproject( camera );
+		_vector$b.set( x, y, z ).unproject( camera );
 
 		var points = pointMap[ point ];
 
@@ -47617,7 +47705,7 @@
 
 			for ( var i = 0, l = points.length; i < l; i ++ ) {
 
-				position.setXYZ( points[ i ], _vector$a.x, _vector$a.y, _vector$a.z );
+				position.setXYZ( points[ i ], _vector$b.x, _vector$b.y, _vector$b.z );
 
 			}
 
