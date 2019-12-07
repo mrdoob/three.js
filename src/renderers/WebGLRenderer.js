@@ -2177,7 +2177,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( uvScaleMap !== undefined ) {
+		if ( uv2ScaleMap !== undefined ) {
 
 			// backwards compatibility
 			if ( uv2ScaleMap.isWebGLRenderTarget ) {
