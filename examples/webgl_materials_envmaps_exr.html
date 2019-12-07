@@ -77,20 +77,13 @@
 
 					pmremGenerator.dispose();
 
-				}
+				};
 
 				new EXRLoader()
 					.setDataType( THREE.FloatType )
 					.load( 'textures/piz_compressed.exr', function ( texture ) {
 
-						var options = {
-							generateMipmaps: false,
-							minFilter: THREE.LinearFilter,
-							magFilter: THREE.LinearFilter
-						};
-
 						exrCubeRenderTarget = pmremGenerator.fromEquirectangular( texture );
-
 						exrBackground = exrCubeRenderTarget.texture;
 
 						texture.dispose();
