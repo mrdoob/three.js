@@ -2171,7 +2171,7 @@ function WebGLRenderer( parameters ) {
 
 			uv2ScaleMap = material.aoMap;
 
-		} else if ( material.lightMap ) { 
+		} else if ( material.lightMap ) {
 
 			uv2ScaleMap = material.lightMap;
 
@@ -2195,6 +2195,7 @@ function WebGLRenderer( parameters ) {
 			uniforms.uv2Transform.value.copy( uv2ScaleMap.matrix );
 
 		}
+
 	}
 
 	function refreshUniformsLine( uniforms, material ) {
