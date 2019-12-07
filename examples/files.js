@@ -225,7 +225,6 @@ var files = {
 		"webgl_shadowmesh",
 		"webgl_skinning_simple",
 		"webgl_sprites",
-		"webgl_terrain_dynamic",
 		"webgl_test_memory",
 		"webgl_test_memory2",
 		"webgl_tonemapping",
