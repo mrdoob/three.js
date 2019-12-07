@@ -12,6 +12,9 @@ const assets = [
 	'../examples/js/libs/chevrotain.min.js',
 	'../examples/js/libs/jszip.min.js',
 	'../examples/js/libs/inflate.min.js',
+	'../examples/js/libs/draco/draco_decoder.js',
+	'../examples/js/libs/draco/draco_decoder.wasm',
+	'../examples/js/libs/draco/draco_wasm_wrapper.js',
 
 	'../examples/js/loaders/AMFLoader.js',
 	'../examples/js/loaders/ColladaLoader.js',
