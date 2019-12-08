@@ -266,6 +266,42 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Export PLY (ASCII)
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/ply' ) );
+	option.onClick( function () {
+
+		var exporter = new THREE.PLYExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveArrayBuffer( result, 'model.ply' );
+
+		} );
+
+	} );
+	options.add( option );
+
+	// Export PLY (Binary)
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/ply_binary' ) );
+	option.onClick( function () {
+
+		var exporter = new THREE.PLYExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveArrayBuffer( result, 'model-binary.ply' );
+
+		}, { binary: true } );
+
+	} );
+	options.add( option );
+
 	// Export STL (ASCII)
 
 	var option = new UI.Row();

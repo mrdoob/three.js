@@ -36,6 +36,7 @@ const assets = [
 	'../examples/js/exporters/ColladaExporter.js',
 	'../examples/js/exporters/GLTFExporter.js',
 	'../examples/js/exporters/OBJExporter.js',
+	'../examples/js/exporters/PLYExporter.js',
 	'../examples/js/exporters/STLExporter.js',
 
 	'../examples/js/renderers/Projector.js',
