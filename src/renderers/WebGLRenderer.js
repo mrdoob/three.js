@@ -742,8 +742,15 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( index !== null && index.count === 0 ) return;
-		if ( position === undefined || position.count === 0 ) return;
+		if ( index === null ) {
+
+			if ( position === undefined || position.count === 0 ) return;
+
+		} else if ( index.count === 0 ) {
+
+			return;
+
+		}
 
 		//
 
