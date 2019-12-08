@@ -1203,24 +1203,26 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	var defaultMaterial;
-
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#default-material
 	 */
-	function createDefaultMaterial() {
+	function createDefaultMaterial( cache ) {
 
-		defaultMaterial = defaultMaterial || new THREE.MeshStandardMaterial( {
-			color: 0xFFFFFF,
-			emissive: 0x000000,
-			metalness: 1,
-			roughness: 1,
-			transparent: false,
-			depthTest: true,
-			side: THREE.FrontSide
-		} );
+		if ( cache[ 'DefaultMaterial' ] === undefined ) {
 
-		return defaultMaterial;
+			cache[ 'DefaultMaterial' ] = new THREE.MeshStandardMaterial( {
+				color: 0xFFFFFF,
+				emissive: 0x000000,
+				metalness: 1,
+				roughness: 1,
+				transparent: false,
+				depthTest: true,
+				side: THREE.FrontSide
+			} );
+
+		}
+
+		return cache[ 'DefaultMaterial' ];
 
 	}
 
@@ -2584,7 +2586,7 @@ THREE.GLTFLoader = ( function () {
 		for ( var i = 0, il = primitives.length; i < il; i ++ ) {
 
 			var material = primitives[ i ].material === undefined
-				? createDefaultMaterial()
+				? createDefaultMaterial( this.cache )
 				: this.getDependency( 'material', primitives[ i ].material );
 
 			pending.push( material );
