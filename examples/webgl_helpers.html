@@ -17,12 +17,12 @@
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			//import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			var scene, renderer;
 			var camera, light;
 			var vnh;
-			//var vth;
+			var vth;
 
 			init();
 			animate();
@@ -62,7 +62,7 @@
 
 					var mesh = gltf.scene.children[ 0 ];
 
-					//BufferGeometryUtils.computeTangents( mesh.geometry ); // generates bad data due to degenerate UVs
+					BufferGeometryUtils.computeTangents( mesh.geometry ); // generates bad data due to degenerate UVs
 
 					var group = new THREE.Group();
 					group.scale.multiplyScalar( 50 );
@@ -76,8 +76,8 @@
 					vnh = new THREE.VertexNormalsHelper( mesh, 5 );
 					scene.add( vnh );
 
-					//vth = new THREE.VertexTangentsHelper( mesh, 5 );
-					//scene.add( vth );
+					vth = new THREE.VertexTangentsHelper( mesh, 5 );
+					scene.add( vth );
 
 					scene.add( new THREE.BoxHelper( mesh ) );
 
@@ -135,7 +135,7 @@
 				light.position.z = Math.cos( time * 1.3 ) * 300;
 
 				if ( vnh ) vnh.update();
-				//if ( vth ) vth.update();
+				if ( vth ) vth.update();
 
 				renderer.render( scene, camera );
 
