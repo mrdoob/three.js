@@ -96,6 +96,14 @@ THREE.BufferGeometryUtils = {
 				( s1 * z2 - s2 * z1 ) * r
 			);
 
+			// silently ignore degenerate uvs/triangles that yield NaN/Infinite intermediary values
+			if ( ! ( isFinite( sdir.x ) && isFinite( sdir.y ) && isFinite( sdir.z ) &&
+					 isFinite( tdir.x ) && isFinite( tdir.y ) && isFinite( tdir.z ) ) ) {
+
+				return;
+
+			}
+
 			tan1[ a ].add( sdir );
 			tan1[ b ].add( sdir );
 			tan1[ c ].add( sdir );
