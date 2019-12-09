@@ -516,6 +516,7 @@ THREE.MD2CharacterComplex = function () {
 			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
 			textures[ i ].mapping = THREE.UVMapping;
 			textures[ i ].name = textureUrls[ i ];
+			textures[ i ].encoding = THREE.sRGBEncoding;
 
 		}
 

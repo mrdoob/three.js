@@ -158,11 +158,6 @@ export class WebGLRenderer implements Renderer {
 	/**
 	 * Default is false.
 	 */
-	gammaInput: boolean;
-
-	/**
-	 * Default is false.
-	 */
 	gammaOutput: boolean;
 
 	physicallyCorrectLights: boolean;
