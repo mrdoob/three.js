@@ -146,8 +146,10 @@ THREE.Minimap = function(renderer, scene, mainCamera, params) {
         minimapCamera.position.set(updatePos.x, updatePos.y, updatePos.z);
         minimapCamera.updateMatrixWorld();
 
-        minimapCamera.backplane.position.set(minimapCamera.position.x, minimapCamera.position.y, minimapCamera.position.z - minimapCamera.far);
+        updatePos = minimapCamera.position.clone().add(up.clone().negate().multiplyScalar(minimapCamera.far));
+        minimapCamera.backplane.position.set(updatePos.x, updatePos.y, updatePos.z);
         minimapCamera.backplane.updateMatrixWorld();
+
 
         var idc = minimapCamera.indicator;
         idcPos = minimapCamera.position.clone().add(up.clone().negate().multiplyScalar(0.02));
