@@ -230,6 +230,7 @@ var files = [
 	{ path: 'utils/BufferGeometryUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/GeometryUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/MathUtils.js', dependencies: [], ignoreList: [] },
+	{ path: 'utils/RoughnessMipmapper.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
