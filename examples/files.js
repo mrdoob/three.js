@@ -128,6 +128,7 @@ var files = {
 		"webgl_lod",
 		"webgl_marchingcubes",
 		"webgl_materials",
+		"webgl_materials_packed_geometry",
 		"webgl_materials_blending",
 		"webgl_materials_blending_custom",
 		"webgl_materials_bumpmap",

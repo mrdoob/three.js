@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>three.js webgl - materials - standard</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+</head>
+
+<body>
+	<div id="info">
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Geometry Packing Example<br />
+	</div>
+
+	<script type="module">
+
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { GeometryPackingUtils, PackedPhongMaterial } from './jsm/utils/GeometryPackingUtils.js';
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+
+		var statsEnabled = true;
+
+		var container, stats, gui;
+
+		var camera, scene, renderer, controls;
+
+		var data = {
+			flatShading: false,
+			basicEncode: false,
+			octEncode: false
+		};
+
+		init();
+		animate();
+
+		function init() {
+
+			GeometryPackingUtils.changeShaderChunk();
+
+			container = document.createElement('div');
+			document.body.appendChild(container);
+
+			renderer = new THREE.WebGLRenderer({ antialias: true });
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
+			container.appendChild(renderer.domElement);
+
+			//
+
+			scene = new THREE.Scene();
+
+			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 1000);
+
+			camera.position.x = 30;
+			camera.position.y = 30;
+			camera.position.z = 30;
+
+			controls = new OrbitControls(camera, renderer.domElement);
+
+			//
+
+			// scene.add(new THREE.HemisphereLight(0x222222, 0x666666, 10));
+			var lights = [];
+			lights[0] = new THREE.PointLight(0xffffff, 1, 0);
+			lights[1] = new THREE.PointLight(0xffffff, 1, 0);
+			lights[2] = new THREE.PointLight(0xffffff, 1, 0);
+
+			lights[0].position.set(0, 2000, 0);
+			lights[1].position.set(1000, 2000, 1000);
+			lights[2].position.set(- 1000, - 2000, - 1000);
+
+			scene.add(lights[0]);
+			// scene.add(lights[1]);
+			// scene.add(lights[2]);
+
+			//
+
+			var lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
+			var meshMaterial = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
+
+			var texture = new THREE.TextureLoader().load("textures/disturb.jpg");
+
+			texture.wrapS = THREE.RepeatWrapping;
+			texture.wrapT = THREE.RepeatWrapping;
+
+			// meshMaterial.map = texture;
+
+			var ballGeom = new THREE.IcosahedronBufferGeometry( 10, 5 );
+			// var ballGeom = new THREE.CylinderBufferGeometry( 5, 5, 20, 32 );
+			// var ballGeom = new THREE.OctahedronBufferGeometry( 10, 4 );
+			// var ballGeom = new THREE.BoxBufferGeometry( 10, 10, 10 );
+			var ballMesh = new THREE.Mesh();
+
+			ballMesh.add(new THREE.LineSegments(ballGeom, lineMaterial));
+			ballMesh.add(new THREE.Mesh(ballGeom, meshMaterial));
+
+			//
+
+			gui = new GUI();
+
+			function generateGeometry() {
+
+				updateGroupGeometry(ballMesh, new THREE.IcosahedronBufferGeometry( 10, 5 ), data);
+
+			}
+
+			function updateMaterial() {
+				ballMesh.children[1].material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
+			}
+
+			var folder = gui.addFolder('THREE.IcosahedronBufferGeometry');
+			folder.open();
+			folder.add(data, 'flatShading', false).onChange(updateMaterial);
+			folder.add(data, 'basicEncode', false).onChange(generateGeometry);
+			folder.add(data, 'octEncode', false).onChange(generateGeometry);
+
+			scene.add(ballMesh);
+
+			camera.lookAt(ballMesh.position);
+
+			//
+
+			if (statsEnabled) {
+
+				stats = new Stats();
+				container.appendChild(stats.dom);
+
+			}
+
+			window.addEventListener('resize', onWindowResize, false);
+
+		}
+
+		//
+
+		function onWindowResize() {
+
+			renderer.setSize(window.innerWidth, window.innerHeight);
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame(animate);
+
+			controls.update();
+			renderer.render(scene, camera);
+
+			if (statsEnabled) stats.update();
+
+		}
+
+		//
+
+		function updateGroupGeometry(mesh, geometry, data) {
+
+			if (geometry.isGeometry) {
+
+				geometry = new THREE.BufferGeometry().fromGeometry(geometry);
+
+				console.warn('THREE.GeometryBrowser: Converted Geometry to BufferGeometry.');
+
+			}
+
+			mesh.children[0].geometry.dispose();
+			mesh.children[1].geometry.dispose();
+
+			mesh.children[0].geometry = new THREE.WireframeGeometry(geometry);
+			mesh.children[1].geometry = geometry;
+
+			var method = "";
+			if (data.basicEncode) {
+				method = "BASIC";
+			} else if (data.octEncode) {
+				method = "OCT";
+			}
+
+			if (method != "") {
+				GeometryPackingUtils.packNormals(mesh.children[1], method);
+			} else {
+				mesh.children[1].material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
+			}
+
+			// these do not update nicely together if shared
+
+		}
+
+
+
+
+	</script>
+
+</body>
+
+</html>
