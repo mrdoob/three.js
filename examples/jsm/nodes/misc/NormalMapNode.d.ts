@@ -13,7 +13,6 @@ export class NormalMapNode extends TempNode {
 	toNormalMap: boolean;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: NormalMapNode ): this;
 
 	static Nodes: {

@@ -105,8 +105,6 @@
 
 					createControls( value ? orthographicCamera : perspectiveCamera );
 
-					render();
-
 				} );
 
 				//
@@ -114,8 +112,6 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				createControls( perspectiveCamera );
-
-				render();
 
 			}
 
@@ -127,12 +123,7 @@
 				controls.zoomSpeed = 1.2;
 				controls.panSpeed = 0.8;
 
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
 				controls.keys = [ 65, 83, 68 ];
-
-				controls.addEventListener( 'change', render );
 
 			}
 
@@ -153,8 +144,6 @@
 
 				controls.handleResize();
 
-				render();
-
 			}
 
 			function animate() {
@@ -164,6 +153,8 @@
 				controls.update();
 
 				stats.update();
+
+				render();
 
 			}
 

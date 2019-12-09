@@ -1175,20 +1175,7 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				if ( mesh.drawMode === THREE.TriangleFanDrawMode ) {
-
-					console.warn( 'GLTFExporter: TriangleFanDrawMode and wireframe incompatible.' );
-					mode = WEBGL_CONSTANTS.TRIANGLE_FAN;
-
-				} else if ( mesh.drawMode === THREE.TriangleStripDrawMode ) {
-
-					mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINE_STRIP : WEBGL_CONSTANTS.TRIANGLE_STRIP;
-
-				} else {
-
-					mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINES : WEBGL_CONSTANTS.TRIANGLES;
-
-				}
+				mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINES : WEBGL_CONSTANTS.TRIANGLES;
 
 			}
 
@@ -1339,14 +1326,18 @@ THREE.GLTFExporter.prototype = {
 						// Clones attribute not to override
 						var relativeAttribute = attribute.clone();
 
-						for ( var j = 0, jl = attribute.count; j < jl; j ++ ) {
+						if ( ! geometry.morphTargetsRelative ) {
 
-							relativeAttribute.setXYZ(
-								j,
-								attribute.getX( j ) - baseAttribute.getX( j ),
-								attribute.getY( j ) - baseAttribute.getY( j ),
-								attribute.getZ( j ) - baseAttribute.getZ( j )
-							);
+							for ( var j = 0, jl = attribute.count; j < jl; j ++ ) {
+
+								relativeAttribute.setXYZ(
+									j,
+									attribute.getX( j ) - baseAttribute.getX( j ),
+									attribute.getY( j ) - baseAttribute.getY( j ),
+									attribute.getZ( j ) - baseAttribute.getZ( j )
+									);
+
+							}
 
 						}
 

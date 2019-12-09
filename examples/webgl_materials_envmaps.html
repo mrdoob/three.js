@@ -105,17 +105,8 @@
 					side: THREE.BackSide
 				} );
 
-				cubeMaterial.uniforms[ "tCube" ].value = textureCube;
-				Object.defineProperty( cubeMaterial, 'map', {
-
-					get: function () {
-
-						return this.uniforms.tCube.value;
-
-					}
-
-				} );
-
+				cubeMaterial.envMap = textureCube;
+				
 				// Skybox
 
 				cubeMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), cubeMaterial );

@@ -1,18 +1,17 @@
 import {
-	Renderer,
-	RenderTarget,
+	WebGLRenderer,
+	WebGLRenderTarget,
 	Texture,
-	CubeTexture
+	CubeTexture,
+	Scene
 } from '../../../src/Three';
 
 export class PMREMGenerator {
 
-	cubeLods:CubeTexture[];
-
-	constructor( sourceTexture:Texture, samplesPerLevel?:number, resolution?:number );
-	update( renderer:Renderer ): void;
-	renderToCubeMapTarget( renderer:Renderer, renderTarget:any ): void;
-	renderToCubeMapTargetFace( renderer:Renderer, renderTarget:RenderTarget, faceIndex:number ): void;
+	constructor( renderer:WebGLRenderer );
+	fromScene( scene:Scene, sigma?:number, near?:number, far?:number ): WebGLRenderTarget;
+	fromEquirectangular( equirectangular:Texture ): WebGLRenderTarget;
+	fromCubemap( cubemap:CubeTexture ): WebGLRenderTarget;
 	dispose(): void;
 
 }

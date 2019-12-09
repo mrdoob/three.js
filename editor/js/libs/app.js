@@ -28,7 +28,7 @@ var APP = {
 			var project = json.project;
 
 			if ( project.shadows ) renderer.shadowMap.enabled = true;
-			if ( project.vr ) renderer.vr.enabled = true;
+			if ( project.vr ) renderer.xr.enabled = true;
 
 			dom.appendChild( renderer.domElement );
 
@@ -110,7 +110,7 @@ var APP = {
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
 
-			if ( renderer.vr.enabled ) {
+			if ( renderer.xr.enabled ) {
 
 				dom.appendChild( THREE.WEBVR.createButton( renderer ) );
 

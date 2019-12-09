@@ -199,7 +199,7 @@ Sidebar.Project = function ( editor ) {
 	buttonsRow.add( addButton );
 	*/
 
-	var assignMaterial = new UI.Button().setLabel( 'Assign' ).setMargin( '0px 5px' );
+	var assignMaterial = new UI.Button().setLabel( strings.getKey( 'sidebar/project/Assign' ) ).setMargin( '0px 5px' );
 	assignMaterial.onClick( function () {
 
 		if ( editor.selected !== null ) {

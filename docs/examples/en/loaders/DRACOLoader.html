@@ -34,7 +34,10 @@
 		var loader = new THREE.DRACOLoader();
 
 		// Specify path to a folder containing WASM/JS decoding libraries.
-		loader.setDecoderPath( '/examples/js/libs/draco' );
+		loader.setDecoderPath( '/examples/js/libs/draco/' );
+
+		// Optional: Pre-fetch Draco WASM/JS module.
+		loader.preload();
 
 		// Load a Draco geometry
 		loader.load(
@@ -126,6 +129,11 @@
 		Sets the maximum number of [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers Web Workers]
 		to be used during decoding. A lower limit may be preferable if workers are also for other tasks
 		in the application.
+		</p>
+
+		<h3>[method:this preload]()</h3>
+		<p>
+		Requests the decoder libraries, if not already loaded.
 		</p>
 
 		<h3>[method:this dispose]()</h3>

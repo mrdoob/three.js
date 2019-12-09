@@ -96,6 +96,14 @@ THREE.BufferGeometryUtils = {
 				( s1 * z2 - s2 * z1 ) * r
 			);
 
+			// silently ignore degenerate uvs/triangles that yield NaN/Infinite intermediary values
+			if ( ! ( isFinite( sdir.x ) && isFinite( sdir.y ) && isFinite( sdir.z ) &&
+					 isFinite( tdir.x ) && isFinite( tdir.y ) && isFinite( tdir.z ) ) ) {
+
+				return;
+
+			}
+
 			tan1[ a ].add( sdir );
 			tan1[ b ].add( sdir );
 			tan1[ c ].add( sdir );
@@ -199,6 +207,8 @@ THREE.BufferGeometryUtils = {
 		var attributes = {};
 		var morphAttributes = {};
 
+		var morphTargetsRelative = geometries[ 0 ].morphTargetsRelative;
+
 		var mergedGeometry = new THREE.BufferGeometry();
 
 		var offset = 0;
@@ -224,6 +234,8 @@ THREE.BufferGeometryUtils = {
 			}
 
 			// gather morph attributes, exit early if they're different
+
+			if ( morphTargetsRelative !== geometry.morphTargetsRelative ) return null;
 
 			for ( var name in geometry.morphAttributes ) {
 
@@ -617,6 +629,117 @@ THREE.BufferGeometryUtils = {
 		result.setIndex( newIndices );
 
 		return result;
+
+	},
+
+	/**
+	 * @param {THREE.BufferGeometry} geometry
+	 * @param {number} drawMode
+	 * @return {THREE.BufferGeometry>}
+	 */
+	toTrianglesDrawMode: function ( geometry, drawMode ) {
+
+		if ( drawMode === THREE.TrianglesDrawMode ) {
+
+			console.warn( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Geometry already defined as triangles.' );
+			return geometry;
+
+		}
+
+		if ( drawMode === THREE.TriangleFanDrawMode || drawMode === THREE.TriangleStripDrawMode ) {
+
+			var index = geometry.getIndex();
+
+			// generate index if not present
+
+			if ( index === null ) {
+
+				var indices = [];
+
+				var position = geometry.getAttribute( 'position' );
+
+				if ( position !== undefined ) {
+
+					for ( var i = 0; i < position.count; i ++ ) {
+
+						indices.push( i );
+
+					}
+
+					geometry.setIndex( indices );
+					index = geometry.getIndex();
+
+				} else {
+
+					console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Undefined position attribute. Processing not possible.' );
+					return geometry;
+
+				}
+
+			}
+
+			//
+
+			var numberOfTriangles = index.count - 2;
+			var newIndices = [];
+
+			if ( drawMode === THREE.TriangleFanDrawMode ) {
+
+				// gl.TRIANGLE_FAN
+
+				for ( var i = 1; i <= numberOfTriangles; i ++ ) {
+
+					newIndices.push( index.getX( 0 ) );
+					newIndices.push( index.getX( i ) );
+					newIndices.push( index.getX( i + 1 ) );
+
+				}
+
+			} else {
+
+				// gl.TRIANGLE_STRIP
+
+				for ( var i = 0; i < numberOfTriangles; i ++ ) {
+
+					if ( i % 2 === 0 ) {
+
+						newIndices.push( index.getX( i ) );
+						newIndices.push( index.getX( i + 1 ) );
+						newIndices.push( index.getX( i + 2 ) );
+
+
+					} else {
+
+						newIndices.push( index.getX( i + 2 ) );
+						newIndices.push( index.getX( i + 1 ) );
+						newIndices.push( index.getX( i ) );
+
+					}
+
+				}
+
+			}
+
+			if ( ( newIndices.length / 3 ) !== numberOfTriangles ) {
+
+				console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unable to generate correct amount of triangles.' );
+
+			}
+
+			// build final geometry
+
+			var newGeometry = geometry.clone();
+			newGeometry.setIndex( newIndices );
+			newGeometry.clearGroups();
+
+			return newGeometry;
+
+		} else {
+
+			console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unknown draw mode:', drawMode );
+			return geometry;
+
+		}
 
 	}
 

@@ -13,3 +13,16 @@ pre.prettyprint, code.prettyprint {
 	background-color: #F5F5F5;
 	font-family: 'Roboto Mono', monospace;
 }
+
+@media (prefers-color-scheme: dark) {
+
+	pre .str, code .str { color: #BB55FF; } /* string */
+	pre .com, code .com { color: #666666; } /* comment */
+	pre .lit, code .lit { color: #ff3399; } /* literal */
+	pre .pln, code .pln { color: #aaaaaa; } /* plaintext */
+
+	pre.prettyprint, code.prettyprint {
+		background-color: #333333;
+	}
+
+}
