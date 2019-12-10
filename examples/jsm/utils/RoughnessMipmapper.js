@@ -35,6 +35,7 @@ var RoughnessMipmapper = ( function () {
 	var RoughnessMipmapper = function ( renderer ) {
 
 		_renderer = renderer;
+		_renderer.compile( _scene, _flatCamera );
 
 	};
 
