@@ -4661,10 +4661,6 @@
           "!type": "bool",
           "!doc": "Defines whether the renderer should auto update objects. Default is true."
         },
-        "gammaInput": {
-          "!type": "bool",
-          "!doc": "Default is false. If set, then it expects that all textures and colors are premultiplied gamma."
-        },
         "gammaOutput": {
           "!type": "bool",
           "!doc": "Default is false.  If set, then it expects that all textures and colors need to be outputted in premultiplied gamma."

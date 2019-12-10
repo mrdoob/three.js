@@ -1717,6 +1717,19 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			return this.xr;
 
 		}
+	},
+	gammaInput: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Please define the correct color spaces for textures via Texture.encoding instead.' );
+			return false;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Please define the correct color spaces for textures via Texture.encoding instead.' );
+
+		}
 	}
 
 } );

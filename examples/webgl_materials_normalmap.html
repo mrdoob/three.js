@@ -85,13 +85,21 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
+				var diffuseMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
+				diffuseMap.encoding = THREE.sRGBEncoding;
+
+				var specularMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" );
+				specularMap.encoding = THREE.sRGBEncoding;
+
+				var normalMap = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xdddddd,
 					specular: 0x222222,
 					shininess: 35,
-					map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
-					specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
-					normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: diffuseMap,
+					specularMap: specularMap,
+					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 0.8, 0.8 )
 				} );
 
@@ -105,10 +113,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				//
-
-				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
 				//

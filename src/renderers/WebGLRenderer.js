@@ -101,7 +101,6 @@ function WebGLRenderer( parameters ) {
 	// physically based shading
 
 	this.gammaFactor = 2.0;	// for backwards compatibility
-	this.gammaInput = false;
 	this.gammaOutput = false;
 
 	// physical lights

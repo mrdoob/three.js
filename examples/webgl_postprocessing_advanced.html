@@ -90,8 +90,11 @@
 
 				//
 
+				var diffuseMap = new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" );
+				diffuseMap.encoding = THREE.sRGBEncoding;
+
 				var materialColor = new THREE.MeshBasicMaterial( {
-					map: new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
+					map: diffuseMap,
 					depthTest: false
 				} );
 
@@ -115,10 +118,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.autoClear = false;
-
-				//
-
-				renderer.gammaInput = true;
 				renderer.gammaOutput = true;
 
 				//
@@ -288,12 +287,15 @@
 
 			function createMesh( geometry, scene, scale ) {
 
+				var diffuseMap = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
+				diffuseMap.encoding = THREE.sRGBEncoding;
+
 				var mat2 = new THREE.MeshPhongMaterial( {
 
 					color: 0x999999,
 					specular: 0x080808,
 					shininess: 20,
-					map: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
+					map: diffuseMap,
 					normalMap: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 

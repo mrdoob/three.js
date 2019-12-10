@@ -106,7 +106,7 @@
 				THREE.DefaultLoadingManager.onLoad = function ( ) {
 
 					pmremGenerator.dispose();
-					
+
 				}
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
@@ -154,7 +154,6 @@
 				container.appendChild( renderer.domElement );
 
 				//renderer.toneMapping = THREE.ReinhardToneMapping;
-				renderer.gammaInput = true; // ???
 				renderer.gammaOutput = true;
 
 				stats = new Stats();
