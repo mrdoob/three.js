@@ -3,7 +3,7 @@
  *
  * This class generates custom mipmaps for a roughness map by encoding the lost variation in the
  * normal map mip levels as increased roughness in the corresponding roughness mip levels. This
- * helps with rendering accuracy for MeshPhysicalMaterial, and also helps with anti-aliasing when
+ * helps with rendering accuracy for MeshStandardMaterial, and also helps with anti-aliasing when
  * using PMREM. If the normal map is larger than the roughness map, the roughness map will be
  * enlarged to match the dimensions of the normal map.
  */
@@ -76,8 +76,8 @@ var RoughnessMipmapper = ( function () {
 				// Setting the render target causes the memory to be allocated.
 				_renderer.setRenderTarget( newRoughnessTarget );
 				material.roughnessMap = newRoughnessTarget.texture;
-				if ( material.metalnessMap != null ) material.metalnessMap = material.roughnessMap;
-				if ( material.aoMap != null ) material.aoMap = material.roughnessMap;
+				if ( material.metalnessMap == roughnessMap ) material.metalnessMap = material.roughnessMap;
+				if ( material.aoMap == roughnessMap ) material.aoMap = material.roughnessMap;
 
 			}
 
