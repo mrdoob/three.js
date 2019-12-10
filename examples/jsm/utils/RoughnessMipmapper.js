@@ -107,6 +107,9 @@ var RoughnessMipmapper = ( function () {
 			if ( roughnessMap !== material.roughnessMap ) roughnessMap.dispose();
 
 			_renderer.autoClear = autoClear;
+			_renderer.setRenderTarget( null );
+			var size = _renderer.getSize( new Vector2() );
+			_renderer.setViewport( 0, 0, size.x, size.y );
 
 		},
 
@@ -151,6 +154,7 @@ uniform sampler2D normalMap;
 uniform vec2 texelSize;
 
 #define ENVMAP_TYPE_CUBE_UV
+vec4 envMapTexelToLinear(vec4 a){return a;}
 #include <cube_uv_reflection_fragment>
 
 void main() {
