@@ -18,7 +18,7 @@ export class FileLoader extends Loader {
 	): any;
 	setMimeType( mimeType: MimeType ): FileLoader;
 	setResponseType( responseType: string ): FileLoader;
-	setWithCredentials( value: string ): FileLoader;
+	setWithCredentials( value: boolean ): FileLoader;
 	setRequestHeader( value: { [header: string]: string } ): FileLoader;
 
 }
