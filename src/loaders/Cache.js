@@ -26,6 +26,7 @@ var Cache = {
 
 			// This ArrayBuffer may be in a detached state, so it's unusable.
 			// A buffer can enter detached state when it is transferred to a worker for example.
+			console.warn( 'THREE.Cache: could not get a loaded ArrayBuffer from cache since it may have been in detached state. This can result from the ArrayBuffer having been transferred to a worker for processing. Cache key: ' + key );
 			this.remove( key );
 
 		}
