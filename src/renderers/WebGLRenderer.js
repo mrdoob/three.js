@@ -1,3 +1,11 @@
+/**
+ * @author supereggbert / http://www.paulbrunt.co.uk/
+ * @author mrdoob / http://mrdoob.com/
+ * @author alteredq / http://alteredqualia.com/
+ * @author szimek / https://github.com/szimek/
+ * @author tschw
+ */
+
 import {
 	RGBAFormat,
 	HalfFloatType,
@@ -38,15 +46,7 @@ import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebGLMultiview } from './webgl/WebGLMultiview.js';
-import { WebXRManager } from './webvr/WebXRManager.js';
-
-/**
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author szimek / https://github.com/szimek/
- * @author tschw
- */
+import { WebXRManager } from './webxr/WebXRManager.js';
 
 function WebGLRenderer( parameters ) {
 

@@ -13,7 +13,7 @@ var VRButton = {
 
 		}
 
-		function showEnterXR( /*device*/ ) {
+		function showEnterVR( /*device*/ ) {
 
 			var currentSession = null;
 
@@ -100,11 +100,11 @@ var VRButton = {
 
 		}
 
-		function showXRNotFound() {
+		function showWebXRNotFound() {
 
 			disableButton();
 
-			button.textContent = 'VR NOT FOUND';
+			button.textContent = 'VR NOT SUPPORTED';
 
 		}
 
@@ -134,15 +134,7 @@ var VRButton = {
 
 			navigator.xr.isSessionSupported( 'immersive-vr' ).then( function ( supported ) {
 
-				if ( supported ) {
-
-					showEnterXR();
-
-				} else {
-
-					showXRNotFound();
-
-				}
+				supported ? showEnterVR() : showWebXRNotFound();
 
 			} );
 
@@ -151,8 +143,17 @@ var VRButton = {
 		} else {
 
 			var message = document.createElement( 'a' );
-			message.href = 'https://immersive-web.github.io/webxr/';
-			message.innerHTML = 'WEBXR NOT SUPPORTED';
+			message.href = 'https://immersiveweb.dev/';
+
+			if ( window.isSecureContext === false ) {
+
+				message.innerHTML = 'WEBXR NEEDS HTTPS'; // TODO Improve message
+
+			} else {
+
+				message.innerHTML = 'WEBXR NOT AVAILABLE';
+
+			}
 
 			message.style.left = 'calc(50% - 90px)';
 			message.style.width = '180px';
