@@ -13,38 +13,6 @@ var VRButton = {
 
 		}
 
-		function showEnterVR( device ) {
-
-			button.style.display = '';
-
-			button.style.cursor = 'pointer';
-			button.style.left = 'calc(50% - 50px)';
-			button.style.width = '100px';
-
-			button.textContent = 'ENTER_VR';
-
-			button.onmouseenter = function () {
-
-				button.style.opacity = '1.0';
-
-			};
-
-			button.onmouseleave = function () {
-
-				button.style.opacity = '0.5';
-
-			};
-
-			button.onclick = function () {
-
-				device.isPresenting ? device.exitPresent() : device.requestPresent( [ { source: renderer.domElement } ] );
-
-			};
-
-			renderer.xr.setDevice( device );
-
-		}
-
 		function showEnterXR( /*device*/ ) {
 
 			var currentSession = null;
@@ -132,16 +100,6 @@ var VRButton = {
 
 		}
 
-		function showVRNotFound() {
-
-			disableButton();
-
-			button.textContent = 'VR NOT FOUND';
-
-			renderer.xr.setDevice( null );
-
-		}
-
 		function showXRNotFound() {
 
 			disableButton();
@@ -187,54 +145,6 @@ var VRButton = {
 				}
 
 			} );
-
-			return button;
-
-		} else if ( 'getVRDisplays' in navigator ) {
-
-			var button = document.createElement( 'button' );
-			button.style.display = 'none';
-
-			stylizeElement( button );
-
-			window.addEventListener( 'vrdisplayconnect', function ( event ) {
-
-				showEnterVR( event.display );
-
-			}, false );
-
-			window.addEventListener( 'vrdisplaydisconnect', function ( /*event*/ ) {
-
-				showVRNotFound();
-
-			}, false );
-
-			window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
-
-				button.textContent = event.display.isPresenting ? 'EXIT_VR' : 'ENTER_VR';
-
-			}, false );
-
-			window.addEventListener( 'vrdisplayactivate', function ( event ) {
-
-				event.display.requestPresent( [ { source: renderer.domElement } ] );
-
-			}, false );
-
-			navigator.getVRDisplays()
-				.then( function ( displays ) {
-
-					if ( displays.length > 0 ) {
-
-						showEnterVR( displays[ 0 ] );
-
-					} else {
-
-						showVRNotFound();
-
-					}
-
-				} ).catch( showVRNotFound );
 
 			return button;
 
