@@ -32,9 +32,33 @@ var GeometryPackingUtils = {
 
             result = new Uint16Array(count * 2);
 
+            for (let idx = 0; idx < array.length; idx += 3) {
+
+                let encoded;
+
+                encoded = uInt16Encode(array[idx], array[idx + 1], array[idx + 2]);
+
+                result[idx / 3 * 2 + 0] = encoded[0];
+                result[idx / 3 * 2 + 1] = encoded[1];
+
+            }
+
         } else if (encodeMethod == "OCT") {
 
             result = new Int8Array(count * 2);
+
+            var oct, dec, best, currentCos, bestCos;
+
+            for (let idx = 0; idx < array.length; idx += 3) {
+
+                let encoded;
+
+                encoded = octEncodeBest(array[idx], array[idx + 1], array[idx + 2]);
+
+                result[idx / 3 * 2 + 0] = encoded[0];
+                result[idx / 3 * 2 + 1] = encoded[1];
+
+            }
 
         } else {
 
@@ -43,40 +67,21 @@ var GeometryPackingUtils = {
         }
 
 
-        for (let idx = 0; idx < array.length; idx += 3) {
-
-            let encoded;
-            if (encodeMethod == "BASIC") {
-
-                encoded = uInt16Encode(array[idx], array[idx + 1], array[idx + 2]);
-
-                result[idx / 3 * 2 + 0] = encoded[0];
-                result[idx / 3 * 2 + 1] = encoded[1];
-
-            } else if (encodeMethod == "OCT") {
-
-                var oct, dec, best, currentCos, bestCos;
-
-                encoded = octEncodeBest(array[idx], array[idx + 1], array[idx + 2]);
-
-                result[idx / 3 * 2 + 0] = encoded[0];
-                result[idx / 3 * 2 + 1] = encoded[1];
-
-            }
-        }
-
         mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
 
+        mesh.geometry.attributes.normal.needsUpdate = true;
         mesh.geometry.attributes.normal.isPacked = true;
         mesh.geometry.attributes.normal.packingMethod = encodeMethod;
 
         // modify material
-        mesh.material = new PackedPhongMaterial().copy(mesh.material);
-        Object.defineProperty(mesh.material.defines, 'USE_PACKED_NORMAL', { value: "" });
-        if (encodeMethod == "BASIC"){
+        if (!(mesh.material instanceof PackedPhongMaterial)) {
+            mesh.material = new PackedPhongMaterial().copy(mesh.material);
+        }
+
+        if (encodeMethod == "BASIC") {
             mesh.material.defines.USE_PACKED_NORMAL = 0;
         }
-        if (encodeMethod == "OCT"){
+        if (encodeMethod == "OCT") {
             mesh.material.defines.USE_PACKED_NORMAL = 1;
         }
 
@@ -129,6 +134,18 @@ var GeometryPackingUtils = {
                 bestCos = currentCos;
             }
 
+            var angle = Math.acos(bestCos) * 180 / Math.PI;
+
+            if (angle > 10){
+                console.log(angle)
+                oct = octEncodeVec3(x, y, z, "floor", "floor"); dec = octDecodeVec2(oct);
+                console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "floor", "floor")))
+                console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "ceil", "floor")))
+                console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "floor", "ceil")))
+                console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "ceil", "ceil")))
+
+            }
+
             return best;
         }
 
@@ -146,8 +163,8 @@ var GeometryPackingUtils = {
             }
 
             return new Int8Array([
-                Math[xfunc](x * 127.5 + (x < 0 ? -1 : 0)),
-                Math[yfunc](y * 127.5 + (y < 0 ? -1 : 0))
+                Math[xfunc](x * 127.5 + (x < 0 ? 1 : 0)),
+                Math[yfunc](y * 127.5 + (y < 0 ? 1 : 0))
             ]);
         }
 
@@ -160,8 +177,9 @@ var GeometryPackingUtils = {
             var z = 1 - Math.abs(x) - Math.abs(y);
 
             if (z < 0) {
+                var tmpx = x;
                 x = (1 - Math.abs(y)) * (x >= 0 ? 1 : -1);
-                y = (1 - Math.abs(x)) * (y >= 0 ? 1 : -1);
+                y = (1 - Math.abs(tmpx)) * (y >= 0 ? 1 : -1);
             }
 
             var length = Math.sqrt(x * x + y * y + z * z);
@@ -179,6 +197,91 @@ var GeometryPackingUtils = {
     },
 
 
+    packPositions: function (mesh) {
+
+        if (!mesh.geometry) {
+            console.error("Mesh must contain geometry property. ");
+        }
+
+        let position = mesh.geometry.attributes.position;
+
+        if (!position) {
+            console.error("Geometry must contain position attribute. ");
+        }
+
+        if (position.isPacked) return;
+
+        if (position.itemSize != 3) {
+            console.error("position.itemSize is not 3, which cannot be packed. ");
+        }
+
+        let array = position.array;
+        let count = position.count;
+
+        let quantized = new Uint16Array(array.length);
+
+        let decodeMat4 = new THREE.Matrix4();
+        let min = new Float32Array(3);
+        let max = new Float32Array(3);
+
+        min[0] = min[1] = min[2] = Number.MAX_VALUE;
+        max[0] = max[1] = max[2] = -Number.MAX_VALUE;
+
+        for (let i = 0; i < array.length; i += 3) {
+            min[0] = Math.min(min[0], array[i + 0]);
+            min[1] = Math.min(min[1], array[i + 1]);
+            min[2] = Math.min(min[2], array[i + 2]);
+            max[0] = Math.max(max[0], array[i + 0]);
+            max[1] = Math.max(max[1], array[i + 1]);
+            max[2] = Math.max(max[2], array[i + 2]);
+        }
+
+        decodeMat4.scale(new THREE.Vector3(
+            (max[0] - min[0]) / 65535,
+            (max[1] - min[1]) / 65535,
+            (max[2] - min[2]) / 65535
+        ));
+
+        decodeMat4.elements[12] = min[0];
+        decodeMat4.elements[13] = min[1];
+        decodeMat4.elements[14] = min[2];
+
+        decodeMat4.transpose();
+
+
+        let multiplier = new Float32Array([
+            max[0] !== min[0] ? 65535 / (max[0] - min[0]) : 0,
+            max[1] !== min[1] ? 65535 / (max[1] - min[1]) : 0,
+            max[2] !== min[2] ? 65535 / (max[2] - min[2]) : 0
+        ]);
+
+        for (let i = 0; i < array.length; i += 3) {
+            quantized[i + 0] = Math.floor((array[i + 0] - min[0]) * multiplier[0]);
+            quantized[i + 1] = Math.floor((array[i + 1] - min[1]) * multiplier[1]);
+            quantized[i + 2] = Math.floor((array[i + 2] - min[2]) * multiplier[2]);
+        }
+
+        // IMPORTANT: calculate original geometry bounding info first, before updating packed positions
+        if (mesh.geometry.boundingBox == null) mesh.geometry.computeBoundingBox();
+        if (mesh.geometry.boundingSphere == null) mesh.geometry.computeBoundingSphere();
+
+        mesh.geometry.setAttribute('position', new THREE.BufferAttribute(quantized, 3));
+        mesh.geometry.attributes.position.isPacked = true;
+        mesh.geometry.attributes.position.needsUpdate = true;
+
+        // modify material
+        if (!(mesh.material instanceof PackedPhongMaterial)) {
+            mesh.material = new PackedPhongMaterial().copy(mesh.material);
+        }
+
+        mesh.material.defines.USE_PACKED_POSITION = 0;
+
+        mesh.material.uniforms.quantizeMat.value = decodeMat4;
+        mesh.material.uniforms.quantizeMat.needsUpdate = true;
+
+    },
+
+
     changeShaderChunk: function () {
 
         THREE.ShaderChunk.beginnormal_vertex = `
@@ -189,25 +292,21 @@ var GeometryPackingUtils = {
         #endif
 
         #ifdef USE_PACKED_NORMAL
-            #ifdef USE_PACKED_NORMAL == 0
+            #ifdef USE_PACKED_NORMAL == 0  // basicEncode
                 float x = objectNormal.x * 2.0 - 1.0;
                 float y = objectNormal.y * 2.0 - 1.0;
                 vec2 scth = vec2(sin(x * PI), cos(x * PI));
                 vec2 scphi = vec2(sqrt(1.0 - y * y), y); 
                 objectNormal = normalize( vec3(scth.y * scphi.x, scth.x * scphi.x, scphi.y) );
-                objectNormal = vec3(0.0, 0.0, 1.0);
             #endif
 
-            #ifdef USE_PACKED_NORMAL == 1
-                float x = objectNormal.x;
-                float y = objectNormal.y;
-                float z = 1.0 - abs(x) - abs(y);
-                if (z < 0.0) { 
-                    x = (1.0 - abs(y)) * (x >= 0.0 ? 1.0 : -1.0);
-                    y = (1.0 - abs(x)) * (y >= 0.0 ? 1.0 : -1.0);
+            #ifdef USE_PACKED_NORMAL == 1  // octEncode
+                vec3 v = vec3(objectNormal.xy, 1.0 - abs(objectNormal.x) - abs(objectNormal.y));
+                if (v.z < 0.0) 
+                {
+                    v.xy = (1.0 - abs(v.yx)) * vec2((v.x >= 0.0) ? +1.0 : -1.0, (v.y >= 0.0) ? +1.0 : -1.0);
                 }
-                float length = sqrt(x * x + y * y + z * z);
-                objectNormal = normalize( vec3(x / length, y / length, z / length) );
+                objectNormal = normalize(v);
             #endif
         #endif
         
@@ -216,11 +315,15 @@ var GeometryPackingUtils = {
 
 };
 
-
+/**
+ * PackedPhongMaterial inherited from THREE.MeshPhongMaterial
+ * 
+ * @param {*} parameters 
+ */
 function PackedPhongMaterial(parameters) {
     THREE.MeshPhongMaterial.call(this);
-    this.defines = { 'USE_PACKED_NORMAL': '' };
-    this.type = 'PackedPhongMaterial'; // IMPORTANT: DO NOT CHANGE THIS TYPE
+    this.defines = {};
+    this.type = 'PackedPhongMaterial';
     this.uniforms = PackedPhongShader.uniforms;
     this.vertexShader = PackedPhongShader.vertexShader;
     this.fragmentShader = PackedPhongShader.fragmentShader;
@@ -233,9 +336,9 @@ var PackedPhongShader = {
 
         THREE.ShaderLib.phong.uniforms,
 
-        // {
-        //     packedNormal: { value: null }
-        // }
+        {
+            quantizeMat: { value: null }
+        }
 
     ]),
 
@@ -262,7 +365,6 @@ var PackedPhongShader = {
         THREE.ShaderChunk.clipping_planes_pars_vertex,
 
         `#ifdef USE_PACKED_NORMAL
-
             vec3 basicDecode(vec3 packedNormal)
             { 
                 float x = packedNormal.x * 2.0 - 1.0;
@@ -274,19 +376,19 @@ var PackedPhongShader = {
 
             vec3 octDecode(vec3 packedNormal)
             { 
-                // float x = packedNormal.x / packedNormal.x < 0.0 ? 127.0 : 128.0;
-                // float y = packedNormal.y / packedNormal.y < 0.0 ? 127.0 : 128.0;
-                float x = packedNormal.x;
-                float y = packedNormal.y;
-                float z = 1.0 - abs(x) - abs(y);
-                if (z < 0.0) { 
-                    x = (1.0 - abs(y)) * (x >= 0.0 ? 1.0 : -1.0);
-                    y = (1.0 - abs(x)) * (y >= 0.0 ? 1.0 : -1.0);
+                vec3 v = vec3(packedNormal.xy, 1.0 - abs(packedNormal.x) - abs(packedNormal.y));
+                if (v.z < 0.0) 
+                {
+                    v.xy = (1.0 - abs(v.yx)) * vec2((v.x >= 0.0) ? +1.0 : -1.0, (v.y >= 0.0) ? +1.0 : -1.0);
                 }
-                float length = sqrt(x * x + y * y + z * z);
-                return normalize( vec3(x / length, y / length, z / length) );
+                return normalize(v);
             } 
+        #endif`,
 
+        `#ifdef USE_PACKED_POSITION
+            #if USE_PACKED_POSITION == 0
+                uniform mat4 quantizeMat;
+            #endif
         #endif`,
 
         "void main() {",
@@ -321,6 +423,13 @@ var PackedPhongShader = {
         "#endif",
 
         THREE.ShaderChunk.begin_vertex,
+
+        `#ifdef USE_PACKED_POSITION
+            #if USE_PACKED_POSITION == 0
+                transformed = ( vec4(transformed, 1.0) * quantizeMat ).xyz;
+            #endif
+        #endif`,
+
         THREE.ShaderChunk.morphtarget_vertex,
         THREE.ShaderChunk.skinning_vertex,
         THREE.ShaderChunk.displacementmap_vertex,

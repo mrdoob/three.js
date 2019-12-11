@@ -32,15 +32,18 @@
 		var data = {
 			flatShading: false,
 			basicEncode: false,
-			octEncode: false
+			octEncode: false, 
+			quantizePosition: false
 		};
+
+		var radius = 100;
 
 		init();
 		animate();
 
 		function init() {
 
-			GeometryPackingUtils.changeShaderChunk();
+			// GeometryPackingUtils.changeShaderChunk();
 
 			container = document.createElement('div');
 			document.body.appendChild(container);
@@ -54,29 +57,27 @@
 
 			scene = new THREE.Scene();
 
-			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 1000);
+			camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 10000000);
 
-			camera.position.x = 30;
-			camera.position.y = 30;
-			camera.position.z = 30;
+			camera.position.x = 3 * radius;
+			camera.position.y = 3 * radius;
+			camera.position.z = 3 * radius;
 
 			controls = new OrbitControls(camera, renderer.domElement);
 
 			//
-
-			// scene.add(new THREE.HemisphereLight(0x222222, 0x666666, 10));
 			var lights = [];
 			lights[0] = new THREE.PointLight(0xffffff, 1, 0);
 			lights[1] = new THREE.PointLight(0xffffff, 1, 0);
 			lights[2] = new THREE.PointLight(0xffffff, 1, 0);
 
-			lights[0].position.set(0, 2000, 0);
-			lights[1].position.set(1000, 2000, 1000);
-			lights[2].position.set(- 1000, - 2000, - 1000);
+			lights[0].position.set(0, 2 * radius, 0);
+			lights[1].position.set(radius, 2 * radius, radius);
+			lights[2].position.set(- radius, - 2 * radius, - radius);
 
 			scene.add(lights[0]);
-			// scene.add(lights[1]);
-			// scene.add(lights[2]);
+			scene.add(lights[1]);
+			scene.add(lights[2]);
 
 			//
 
@@ -90,14 +91,16 @@
 
 			// meshMaterial.map = texture;
 
-			var ballGeom = new THREE.IcosahedronBufferGeometry( 10, 5 );
+			var ballGeom = new THREE.IcosahedronBufferGeometry( radius, 4 );
 			// var ballGeom = new THREE.CylinderBufferGeometry( 5, 5, 20, 32 );
 			// var ballGeom = new THREE.OctahedronBufferGeometry( 10, 4 );
 			// var ballGeom = new THREE.BoxBufferGeometry( 10, 10, 10 );
-			var ballMesh = new THREE.Mesh();
 
-			ballMesh.add(new THREE.LineSegments(ballGeom, lineMaterial));
-			ballMesh.add(new THREE.Mesh(ballGeom, meshMaterial));
+			var ballMesh = new THREE.Mesh(ballGeom, meshMaterial);
+			var ballLineSegments = new THREE.LineSegments(ballGeom, lineMaterial);
+
+			scene.add(ballLineSegments);
+			scene.add(ballMesh);
 
 			//
 
@@ -105,12 +108,12 @@
 
 			function generateGeometry() {
 
-				updateGroupGeometry(ballMesh, new THREE.IcosahedronBufferGeometry( 10, 5 ), data);
+				updateGroupGeometry(ballMesh, ballLineSegments, new THREE.IcosahedronBufferGeometry( radius, 4 ), data);
 
 			}
 
 			function updateMaterial() {
-				ballMesh.children[1].material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
+				ballMesh.material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
 			}
 
 			var folder = gui.addFolder('THREE.IcosahedronBufferGeometry');
@@ -118,6 +121,7 @@
 			folder.add(data, 'flatShading', false).onChange(updateMaterial);
 			folder.add(data, 'basicEncode', false).onChange(generateGeometry);
 			folder.add(data, 'octEncode', false).onChange(generateGeometry);
+			folder.add(data, 'quantizePosition', false).onChange(generateGeometry);
 
 			scene.add(ballMesh);
 
@@ -162,7 +166,7 @@
 
 		//
 
-		function updateGroupGeometry(mesh, geometry, data) {
+		function updateGroupGeometry(mesh, lineSegments, geometry, data) {
 
 			if (geometry.isGeometry) {
 
@@ -172,11 +176,12 @@
 
 			}
 
-			mesh.children[0].geometry.dispose();
-			mesh.children[1].geometry.dispose();
+			lineSegments.geometry.dispose();
+			mesh.geometry.dispose();
 
-			mesh.children[0].geometry = new THREE.WireframeGeometry(geometry);
-			mesh.children[1].geometry = geometry;
+			lineSegments.geometry = new THREE.WireframeGeometry(geometry);
+			mesh.geometry = geometry;
+			mesh.material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
 
 			var method = "";
 			if (data.basicEncode) {
@@ -186,12 +191,16 @@
 			}
 
 			if (method != "") {
-				GeometryPackingUtils.packNormals(mesh.children[1], method);
-			} else {
-				mesh.children[1].material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
+				GeometryPackingUtils.packNormals(mesh, method);
+			} 
+
+			if (data.quantizePosition){
+				GeometryPackingUtils.packPositions(mesh);
 			}
 
-			// these do not update nicely together if shared
+			if (method == "" && !data.quantizePosition) {
+				mesh.material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
+			}
 
 		}
 
