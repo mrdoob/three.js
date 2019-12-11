@@ -7,7 +7,7 @@ var ARButton = {
 
 	createButton: function ( renderer ) {
 
-		function showEnterXR( /*device*/ ) {
+		function showStartAR( /*device*/ ) {
 
 			var currentSession = null;
 
@@ -93,11 +93,11 @@ var ARButton = {
 
 		}
 
-		function showXRNotFound() {
+		function showWebXRNotFound() {
 
 			disableButton();
 
-			button.textContent = 'XR NOT FOUND';
+			button.textContent = 'AR NOT SUPPORTED';
 
 		}
 
@@ -127,15 +127,7 @@ var ARButton = {
 
 			navigator.xr.isSessionSupported( 'immersive-ar' ).then( function ( supported ) {
 
-				if ( supported ) {
-
-					showEnterXR();
-
-				} else {
-
-					showXRNotFound();
-
-				}
+				supported ? showStartAR() : showWebXRNotFound();
 
 			} );
 
@@ -144,7 +136,7 @@ var ARButton = {
 		} else {
 
 			var message = document.createElement( 'a' );
-			message.href = 'https://immersive-web.github.io/webxr/';
+			message.href = 'https://immersiveweb.dev/';
 
 			if ( window.isSecureContext === false ) {
 

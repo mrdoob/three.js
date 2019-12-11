@@ -82,7 +82,6 @@ import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
-import { WebVRManager } from './renderers/webvr/WebVRManager.js';
 import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
@@ -1940,27 +1939,6 @@ Object.defineProperties( WebGLRenderTarget.prototype, {
 
 			console.warn( 'THREE.WebGLRenderTarget: .generateMipmaps is now .texture.generateMipmaps.' );
 			this.texture.generateMipmaps = value;
-
-		}
-	}
-
-} );
-
-//
-
-Object.defineProperties( WebVRManager.prototype, {
-
-	standing: {
-		set: function ( /* value */ ) {
-
-			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
-
-		}
-	},
-	userHeight: {
-		set: function ( /* value */ ) {
-
-			console.warn( 'THREE.WebVRManager: .userHeight has been removed.' );
 
 		}
 	}
