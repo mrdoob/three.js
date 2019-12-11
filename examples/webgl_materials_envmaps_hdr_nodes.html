@@ -154,7 +154,7 @@
 				container.appendChild( renderer.domElement );
 
 				//renderer.toneMapping = THREE.ReinhardToneMapping;
-				renderer.outputEncoding = THREE.GammaEncoding;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
