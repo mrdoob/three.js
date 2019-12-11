@@ -190,7 +190,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.GammaEncoding;
 
 				container.appendChild( renderer.domElement );
 

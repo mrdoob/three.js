@@ -155,7 +155,7 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.GammaEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

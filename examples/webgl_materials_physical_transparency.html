@@ -61,7 +61,7 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.GammaEncoding;
 
 				scene = new THREE.Scene();
 				scene.background = hdrCubeMap;

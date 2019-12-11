@@ -80,7 +80,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.gammaOutput = true;
+			renderer.outputEncoding = THREE.GammaEncoding;
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 

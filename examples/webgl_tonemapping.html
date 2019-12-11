@@ -164,7 +164,7 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.GammaEncoding;
 
 				composer = new EffectComposer( renderer );
 				composer.setSize( window.innerWidth, window.innerHeight );

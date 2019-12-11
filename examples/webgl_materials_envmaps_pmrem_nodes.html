@@ -142,7 +142,7 @@
 				container.appendChild( renderer.domElement );
 
 				//renderer.toneMapping = THREE.ReinhardToneMapping;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.GammaEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

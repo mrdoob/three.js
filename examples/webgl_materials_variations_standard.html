@@ -164,7 +164,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.GammaEncoding;
 				renderer.toneMapping = THREE.Uncharted2ToneMapping;
 				renderer.toneMappingExposure = 0.75;
 

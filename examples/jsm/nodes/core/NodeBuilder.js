@@ -949,9 +949,7 @@ NodeBuilder.prototype = {
 
 	},
 
-	getTextureEncodingFromMap: function ( map, gammaOverrideLinear ) {
-
-		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.context.gamma;
+	getTextureEncodingFromMap: function ( map ) {
 
 		var encoding;
 
@@ -970,8 +968,7 @@ NodeBuilder.prototype = {
 
 		}
 
-		// add backwards compatibility for WebGLRenderer.gammaOutput parameter, should probably be removed at some point.
-		if ( encoding === LinearEncoding && gammaOverrideLinear ) {
+		if ( encoding === LinearEncoding && this.context.gamma ) {
 
 			encoding = GammaEncoding;
 

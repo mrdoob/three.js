@@ -121,6 +121,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.uuid = THREE.Math.generateUUID(); // generate to library
+				renderer.outputEncoding = THREE.GammaEncoding;
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
