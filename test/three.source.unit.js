@@ -266,9 +266,6 @@ import './unit/src/renderers/webgl/WebGLTextures.tests';
 import './unit/src/renderers/webgl/WebGLUniforms.tests';
 import './unit/src/renderers/webgl/WebGLUtils.tests';
 
-//src/renderers/webvr
-import './unit/src/renderers/webvr/WebVRManager.tests';
-
 
 //src/scenes
 import './unit/src/scenes/Fog.tests';
