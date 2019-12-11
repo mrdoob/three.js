@@ -1712,7 +1712,7 @@ Object.defineProperties( WebGLRenderer.prototype, {
 	vr: {
 		get: function () {
 
-			console.warn( 'THREE.WebGLRenderer: .vr has been removed. Use .xr instead.' );
+			console.warn( 'THREE.WebGLRenderer: .vr has been renamed to .xr' );
 			return this.xr;
 
 		}
