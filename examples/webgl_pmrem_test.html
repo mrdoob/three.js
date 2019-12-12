@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js PMREM directional light test</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container">
+			<div id="info">
+				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+				PMREM directional light test <a href="https://github.com/elalish" target="_blank" rel="noopener">Emmett Lalish</a>
+			</div>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+            import { OrbitControls } from './jsm/controls/OrbitControls.js';
+            import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+
+            var scene, camera, controls, renderer;
+            
+			function init() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+				var aspect = width / height;
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( width, height );
+                renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.gammaOutput = true;
+				document.body.appendChild( renderer.domElement );
+
+                window.addEventListener( 'resize', onResize, false );
+                
+				// scene
+
+				scene = new THREE.Scene();
+
+				// camera
+
+				camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
+                camera.position.set( 0, 0, 18 );
+
+                // controls
+                
+                controls = new OrbitControls( camera, renderer.domElement );
+                controls.update();
+
+                // light
+                
+                var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+                var x = 597;
+                var y = 213;
+                var theta = (x + 0.5) * Math.PI / 512;
+                var phi = (y + 0.5) * Math.PI / 512;
+                directionalLight.position.set(
+                    -Math.sin(phi) * Math.cos(theta),
+                    Math.cos(phi),
+                    -Math.sin(phi) * Math.sin(theta));
+                scene.add( directionalLight );
+
+				document.body.addEventListener( 'mouseover', function () {
+
+					scene.traverse( function ( child ) {
+
+						if ( child.isMesh ) {
+
+                            child.material.envMapIntensity = 1;
+                            directionalLight.intensity = 0;
+                        
+                        }
+
+					} );
+
+				} );
+
+				document.body.addEventListener( 'mouseout', function () {
+
+					scene.traverse( function ( child ) {
+
+						if ( child.isMesh ) {
+
+                            child.material.envMapIntensity = 0;
+                            directionalLight.intensity = 1;
+
+                        }
+
+					} );
+
+                } );
+
+			}
+
+			function createObjects() {
+
+                var radianceMap = null;
+                new RGBELoader()
+                    .setDataType( THREE.UnsignedByteType )
+                    .setPath( 'textures/equirectangular/' )
+                    .load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
+
+                        var pmremGenerator = new PMREMGenerator( renderer );
+                        radianceMap = pmremGenerator.fromEquirectangular( texture ).texture;
+                        pmremGenerator.dispose();
+
+                        scene.background = radianceMap;
+
+                        var geometry = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
+
+                        for ( var x = 0; x <= 10; x ++ ) {
+
+                            for ( var y = 0; y <= 2; y ++ ) {
+
+                                var material = new THREE.MeshPhysicalMaterial( {
+                                    roughness: x / 10,
+                                    metalness: y < 1 ? 1 : 0,
+                                    color: y < 2 ? 0xffffff : 0x000000,
+                                    envMap: radianceMap,
+                                    envMapIntensity: 1
+                                } );
+
+                                var mesh = new THREE.Mesh( geometry, material );
+                                mesh.position.x = x - 5;
+                                mesh.position.y = 1 - y;
+                                scene.add( mesh );
+
+                            }
+
+                        }
+
+                } );
+
+			}
+
+			function onResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+
+			}
+
+			function animate() {
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+            }
+            
+			Promise.resolve()
+				.then( init )
+				.then( createObjects )
+				.then( animate );
+
+		</script>
+	</body>
+</html>
