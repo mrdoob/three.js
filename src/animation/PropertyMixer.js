@@ -59,6 +59,42 @@ function PropertyMixer( binding, typeName, valueSize ) {
 			this.buffer = new Array( valueSize * 5 );
 			break;
 
+		case 'v2v':
+			this.buffer = new Array( valueSize * 5 );
+			mixFunction = this._lerp;
+			break;
+
+		case 'v3v':
+			this.buffer = new Array( valueSize * 5 );
+			mixFunction = this._lerp;
+			break;
+
+		case 'v4v':
+			this.buffer = new Array( valueSize * 5 );
+			mixFunction = this._lerp;
+			break;
+
+		case '2fv':
+			this.buffer = new Array( valueSize * 5 );
+			mixFunction = this._lerp;
+			break;
+
+		case '3fv':
+			this.buffer = new Array( valueSize * 5 );
+			mixFunction = this._lerp;
+			break;
+
+		case '4fv':
+			this.buffer = new Array( valueSize * 5 );
+			mixFunction = this._lerp;
+			break;
+
+		case 'iv1'://TODO
+		case 'fv1':
+		case 'iv':
+		case 'm2v':
+		case 'm3v':
+		case 'm4v':
 		default:
 			mixFunction = this._lerp;
 			mixFunctionAdditive = this._lerpAdditive;

@@ -268,7 +268,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		Direct: 0,
 		EntireArray: 1,
 		ArrayElement: 2,
-		HasFromToArray: 3
+		HasFromToArray: 3,
+		UniformArray: 4,
+		UniformVal: 5
 	},
 
 	Versioning: {
@@ -306,6 +308,25 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		function getValue_toArray( buffer, offset ) {
 
 			this.resolvedProperty.toArray( buffer, offset );
+
+		},
+		//UniformArray
+		function getValue_Uniform_array( buffer, offset ) {
+
+			var source = this.resolvedProperty[ this.propertyIndex ].value;
+
+			for ( var i = 0, n = source.length; i !== n; ++ i ) {
+
+				buffer[ offset ++ ] = source[ i ];
+
+			}
+
+		},
+		//UniformVal
+		function getValue_Uniform_Val( buffer, offset ) {
+
+			var source = this.resolvedProperty[ this.propertyIndex ].value;
+			buffer[ offset ] = source;
 
 		}
 
@@ -428,8 +449,77 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			}
 
-		]
+		],
+		 [
 
+			// UniformArray
+
+			function setValue_UniformArray( buffer, offset ) {
+
+				var dest = this.resolvedProperty[ this.propertyIndex ].value;
+
+				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+			},
+
+			function setValue_UniformArray_setNeedsUpdate( buffer, offset ) {
+
+				var dest = this.resolvedProperty[ this.propertyIndex ].value;
+
+				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_UniformArray_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				var dest = this.resolvedProperty[ this.propertyIndex ].value;
+
+				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+
+					dest[ i ] = buffer[ offset ++ ];
+
+				}
+
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		],
+		[
+			//UniformVal
+			function setValue_UniformVal( buffer, offset ) {
+
+				this.resolvedProperty[ this.propertyIndex ].value = buffer[ offset ];
+
+			},
+
+			function setValue_UniformVal_setNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty[ this.propertyIndex ].value = buffer[ offset ];
+				//dest= buffer[ offset];
+				this.targetObject.needsUpdate = true;
+
+			},
+
+			function setValue_UniformVal_setMatrixWorldNeedsUpdate( buffer, offset ) {
+
+				this.resolvedProperty[ this.propertyIndex ].value = buffer[ offset ];
+
+				this.targetObject.matrixWorldNeedsUpdate = true;
+
+			}
+
+		]
 	],
 
 	getValue: function getValue_unbound( targetArray, offset ) {
@@ -455,7 +545,43 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 	// create getter / setter pair for a property in the scene graph
 	bind: function () {
 
-		let targetObject = this.node,
+		function isComplexUniformType( type ) {
+
+			switch ( type ) {
+
+				case 'iv1':
+				case 'fv1':
+				case 'iv':
+				case 'v2v':
+				case 'v3v':
+				case 'v4v':
+				case 'm2v':
+				case 'm3v':
+				case 'm4v':
+					return true;
+				default:
+					return false;
+
+			}
+
+		}
+
+		function isVectorUniform( type ) {
+
+			switch ( type ) {
+
+				case '2fv':
+				case '3fv':
+				case '4fv':
+					return true;
+				default:
+					return false;
+
+			}
+
+		}
+
+		var targetObject = this.node,
 			parsedPath = this.parsedPath,
 
 			objectName = parsedPath.objectName,
@@ -599,6 +725,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		if ( propertyIndex !== undefined ) {
 
+			bindingType = this.BindingType.ArrayElement;
 			// access a sub element of the property array (only primitives are supported right now)
 
 			if ( propertyName === "morphTargetInfluences" ) {
@@ -638,7 +765,16 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			}
 
-			bindingType = this.BindingType.ArrayElement;
+			//Bind Array Uniforms of materials will do simple when needed
+			if ( nodeProperty[ propertyIndex ] ) {
+
+				if ( isComplexUniformType( nodeProperty[ propertyIndex ].type ) )
+					bindingType = this.BindingType.UniformArray;
+				else if ( isVectorUniform( nodeProperty[ propertyIndex ].type ) )
+					bindingType = this.BindingType.UniformVal;
+				versioning = this.Versioning.NeedsUpdate;
+
+			}
 
 			this.resolvedProperty = nodeProperty;
 			this.propertyIndex = propertyIndex;

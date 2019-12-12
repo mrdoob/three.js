@@ -27,6 +27,7 @@ import {
 	MeshBasicMaterial,
 	MeshLambertMaterial,
 	MeshPhongMaterial,
+	ShaderMaterial,
 	OrthographicCamera,
 	PerspectiveCamera,
 	PointLight,
@@ -38,8 +39,15 @@ import {
 	SkinnedMesh,
 	SpotLight,
 	TextureLoader,
+	Vector2,
 	Vector3,
-	VectorKeyframeTrack
+	Vector4,
+	UniformsUtils,
+	UniformsLib,
+	LinearFilter,
+	VectorKeyframeTrack,
+	BooleanKeyframeTrack,
+	UniformKeyframeTrack
 } from "../../../build/three.module.js";
 import { TGALoader } from "../loaders/TGALoader.js";
 
@@ -173,6 +181,35 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function parseBooli( str ) {
+
+			var raw = parseStrings( str );
+			return ( raw[ 0 ] === 'true' || raw[ 0 ] === '1' ) ? 1 : 0;
+
+		}
+
+		function parseBool( str ) {
+
+			var raw = parseStrings( str );
+			return ( raw[ 0 ] === 'true' || raw[ 0 ] === '1' ) ? true : false;
+
+		}
+
+		function parseBools( str ) {
+
+			var raw = parseStrings( str );
+			var array = [];
+
+			for ( var i = 0, l = raw.length; i < l; i ++ ) {
+
+				array.push( parseBool( raw[ i ] ) );
+
+			}
+
+			return array;
+
+		}
+
 		function parseId( text ) {
 
 			return text.substring( 1 );
@@ -258,8 +295,8 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		function getBuild( data, builder ) {
 
 			if ( data.build !== undefined ) return data.build;
-
-			data.build = builder( data );
+			//context = modifier example: for materials what geom_instance does it belong
+			data.build =data.context? builder( data.value, data.context ) :builder( data);
 
 			return data.build;
 
@@ -415,7 +452,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var channels = data.channels;
 			var samplers = data.samplers;
 			var sources = data.sources;
-
+			var mergedAnimations={};
 			for ( var target in channels ) {
 
 				if ( channels.hasOwnProperty( target ) ) {
@@ -425,18 +462,20 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					var inputId = sampler.inputs.INPUT;
 					var outputId = sampler.inputs.OUTPUT;
-
+					var interpolation;
 					var inputSource = sources[ inputId ];
 					var outputSource = sources[ outputId ];
+					if ( sampler.inputs.INTERPOLATION )
+						interpolation = sources[ sampler.inputs.INTERPOLATION ];
+					buildAnimationChannel( channel, inputSource, outputSource, interpolation, mergedAnimations );
 
-					var animation = buildAnimationChannel( channel, inputSource, outputSource );
-
-					createKeyframeTracks( animation, tracks );
+					//createKeyframeTracks( animation, tracks );
 
 				}
 
 			}
 
+			createKeyframeTracks( mergedAnimations, tracks );
 			return tracks;
 
 		}
@@ -447,149 +486,374 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function buildAnimationChannel( channel, inputSource, outputSource ) {
+		function buildTransformChannel( node, channel, inputSource, outputSource, transform, data ) {
 
-			var node = library.nodes[ channel.id ];
-			var object3D = getNode( node.id );
-
-			var transform = node.transforms[ channel.sid ];
-			var defaultMatrix = node.matrix.clone().transpose();
-
-			var time, stride;
-			var i, il, j, jl;
-
-			var data = {};
-
-			// the collada spec allows the animation of data in various ways.
 			// depending on the transform type (matrix, translate, rotate, scale), we execute different logic
-
+				let defaultMatrix = node.matrix.clone();
+				let transposedMat = defaultMatrix.clone().transpose();//three js and collada have diferent representations			
+				let tmpTransl=new Vector3(),tmpQuat=new Quaternion(),tmpScale=new Vector3();
+				defaultMatrix.decompose(tmpTransl,tmpQuat,tmpScale);
 			switch ( transform ) {
 
 				case 'matrix':
+					
+					for ( var i = 0; i < inputSource.array.length; i ++ ) {
 
-					for ( i = 0, il = inputSource.array.length; i < il; i ++ ) {
+						let time = inputSource.array[ i ];
+						let stride = i * outputSource.stride;
 
-						time = inputSource.array[ i ];
-						stride = i * outputSource.stride;
-
-						if ( data[ time ] === undefined ) data[ time ] = {};
+						if ( data[ time ] === undefined ) data[ time ] = {matrix:[]};
 
 						if ( channel.arraySyntax === true ) {
 
 							var value = outputSource.array[ stride ];
 							var index = channel.indices[ 0 ] + 4 * channel.indices[ 1 ];
 
-							data[ time ][ index ] = value;
+							data[ time ].matrix[ index ] = value;
 
 						} else {
 
-							for ( j = 0, jl = outputSource.stride; j < jl; j ++ ) {
+							for (var j = 0; j < outputSource.stride; j ++ ) {
 
-								data[ time ][ j ] = outputSource.array[ stride + j ];
+								data[ time ].matrix[ j ] = outputSource.array[ stride + j ];
 
 							}
 
 						}
 
 					}
+					for ( var i = 0; i < 16; i ++ )
+						transformAnimationData( data, i, transposedMat.elements[ i ] );
 
 					break;
 
 				case 'translate':
-					console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
+					for ( var inputIdx = 0; inputIdx < inputSource.array.length; inputIdx ++ ) {
+						let time = inputSource.array[ inputIdx ];
+						if ( data[ time ] === undefined ) data[ time ] = {translation:null};
+						if(outputSource.stride!=3){
+							console.warn( 'THREE.ColladaLoader: translate should be Vector3.');
+							return;
+						}
+						let stride = inputIdx * outputSource.stride;
+						data[ time ].translation=new Vector3(outputSource.array[ stride],outputSource.array[ stride + 1 ],outputSource.array[ stride + 2]);
+						data[ time ].translation.applyQuaternion(tmpQuat);
+						data[ time ].translation.add(tmpTransl.clone());
+					}
 					break;
 
 				case 'rotate':
-					console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
+					for ( var inputIdx = 0; inputIdx < inputSource.array.length; inputIdx ++ ) {
+						let time = inputSource.array[ inputIdx ];
+						if ( data[ time ] === undefined ) data[ time ] = {quaternion:null};
+						if(outputSource.stride!=4){
+							console.warn( 'THREE.ColladaLoader: Angle rotate should be Vector3.');
+							return;
+						}
+						let stride = inputIdx * outputSource.stride;
+						let baseVec = new Vector3(outputSource.array[ stride],outputSource.array[ stride + 1 ],outputSource.array[ stride + 2]);
+						
+						data[ time ].quaternion =tmpQuat.clone();
+						data[ time ].quaternion.multiply(new Quaternion().setFromAxisAngle(baseVec,_Math.degToRad(outputSource.array[ stride+3])));
+					}
 					break;
 
 				case 'scale':
 					console.warn( 'THREE.ColladaLoader: Animation transform type "%s" not yet implemented.', transform );
 					break;
+				case 'visibility':
+					for ( var inputIdx = 0; inputIdx < inputSource.array.length; inputIdx ++ ) {
+						let time = inputSource.array[ inputIdx ];
+						if ( data[ time ] === undefined ) data[ time ] = {visibility:null};
+						let stride = inputIdx * outputSource.stride;
+						if(outputSource.stride!=1){
+							console.warn( 'THREE.ColladaLoader: visibility should be single int val.');
+							return;
+						}
+						data[ time ].visibility = outputSource.array[ stride];
+					}
+				break;
 
 			}
+		}
+		function parseComplexUniformData (type,outputSource, ndx) {
+	   
+			var result = [];
+			var inneIdx = 0;
+			switch (type) {
+	
+				case 'iv1':
+					ndx *= outputSource.stride;
+					for (var idx = 0; idx < outputSource.stride;idx++){
+						if (outputSource.array[ndx + idx] === 'true')
+							result[idx]= 1;
+						else if (outputSource.array[ndx + idx] === 'false')
+							result[idx]= 0;
+						else
+							result[idx]= outputSource.array[ndxidx + idx];
+					}
+					break;
+				case 'fv1':
+					ndx *= outputSource.stride;
+					for (var idx = 0; idx < outputSource.stride; idx++) {
+							result[idx] = outputSource.array[ndx+idx];
+					}
+					break;
+				case 'iv'://3 ints per step
+					ndx *= outputSource.stride*3;
+					for (var idx = 0; idx < outputSource.stride; idx++) {
+						result[idx] = [outputSource.array[ndx + inneIdx], outputSource.array[ndx + inneIdx + 1], outputSource.array[ndx + inneIdx + 2]];
+						inneIdx += 3;
+					}
+					break;
+				case 'v2v'://2 floats per step
+					ndx *= outputSource.stride*2;
+					for (var idx = 0; idx < outputSource.stride; idx++) {
+						result[idx] = new Vector2(outputSource.array[ndx + inneIdx], outputSource.array[ndx + inneIdx + 1]);
+						inneIdx += 2;
+					}
+					break;
+				case 'v3v'://3 floats per step
+					ndx *= outputSource.stride*3;
+					for (var idx = 0; idx < outputSource.stride; idx ++) {
+						result[idx] = new Vector3(outputSource.array[ndx + inneIdx], outputSource.array[ndx + inneIdx + 1], outputSource.array[ndx + inneIdx + 2]);
+						inneIdx += 3;
+					}
+					break;
+				case 'v4v':
+					ndx *= outputSource.stride*4;
+					for (var idx = 0; idx < outputSource.stride; idx ++) {
+						result[idx] = new Vector4(outputSource.array[ndx + inneIdx], outputSource.array[ndx + inneIdx + 1], outputSource.array[ndx + inneIdx + 2], outputSource.array[ndx + inneIdx + 3]);
+						inneIdx += 4;
+					}
+					break;
+				case 'm2v':
+					ndx *= outputSource.stride*4;
+					for (var idx = 0; idx < outputSource.stride; idx++) {
+						result[idx] = getConvertedMat2(outputSource.array[ndx + idx]);
+						inneIdx += 4;
+					}
+					break;
+				case 'm3v':
+					ndx *= outputSource.stride*9;
+					for (var idx = 0; idx < outputSource.stride; idx++) {
+						result[idx] = getConvertedMat3(outputSource.array[ndx + idx]);
+						inneIdx += 9;
+					}
+					break;
+				case 'm4v':
+					ndx *= outputSource.stride*16;
+					for (var idx = 0; idx <= outputSource.stride; idx++) {
+						result[idx] = getConvertedMat4(outputSource.array[ndx + idx]);
+						inneIdx += 16;
+					}
+					break;
+					
+				default:
+					break;
+			}
+			return result;
+		};
+		function getUniformData (type ,outputSource, ndx) {
+			if (isComplexUniformType(type)){
+				return parseComplexUniformData(type,outputSource, ndx);
+			}
+			else {
+	
+				switch (type) {
+					case '1i':
+						if (outputSource.array[ndx] === 'true')
+							return 1;
+						else if (outputSource.array[ndx] === 'false')
+							return 0;
+						else
+							return outputSource.array[ndx];
+					case '3iv':
+						ndx *= outputSource.stride*3;
+						return [outputSource.array[ndx], outputSource.array[ ndx +1], outputSource.array[ ndx +2]];
+					
+					case '1f':
+						return outputSource.array[ndx];
+					case '2fv':
+						ndx *= outputSource.stride*2;
+						return new Vector2(outputSource.array[ndx], outputSource.array[ndx + 1]);
+					case '3fv':
+						ndx *= outputSource.stride*3;
+						return new Vector3(outputSource.array[ndx], outputSource.array[ndx + 1], outputSource.array[ndx + 2]);
+					case '4fv':
+						ndx *= outputSource.stride*4;
+						return new Vector4(outputSource.array[ndx], outputSource.array[ndx + 1], outputSource.array[ndx + 2], outputSource.array[ndx + 3]);
+					case 'Matrix2fv'://not sure this is supported but webgl does
+						ndx *= outputSource.stride * 4;
+						return getConvertedMat2(outputSource.array[ndx]);
+					case 'Matrix3fv':
+						ndx *= outputSource.stride * 9;
+						return getConvertedMat3(outputSource.array[ndx]);
+					case 'Matrix4fv':
+						ndx *= outputSource.stride * 16;
+						return getConvertedMat4(outputSource.array[ndx]);
+			   
+					default:
+						return null;
+				}
+	
+			}
+	
+		};
+		function buildUniformChannel(targUniforms,channel,inputSource,outputSource,interpolation,data){
+			
+			for(var uni in targUniforms){
+				if(targUniforms[uni].sid==channel.sid){
+					
+					//var res={uniName:channel.sid,value:{}};
+					data[channel.sid]={type: targUniforms[uni].type ,value:{}};
+					for ( var inputIdx = 0; inputIdx < inputSource.array.length; inputIdx ++ ) {
+						let time = inputSource.array[ inputIdx ];
+						data[channel.sid].value[time]=getUniformData(targUniforms[uni].type,outputSource,inputIdx);
+					}
 
-			var keyframes = prepareAnimationData( data, defaultMatrix );
-
-			var animation = {
-				name: object3D.uuid,
-				keyframes: keyframes
-			};
-
-			return animation;
-
+				}
+			}
 		}
 
-		function prepareAnimationData( data, defaultMatrix ) {
+		function buildAnimationChannel( channel, inputSource, outputSource,interpolation , mergedAnimations) {
 
-			var keyframes = [];
+			var node = library.nodes[ channel.id ];
+			var object3D = getNode( node.id );
 
-			// transfer data into a sortable array
-
-			for ( var time in data ) {
-
-				keyframes.push( { time: parseFloat( time ), value: data[ time ] } );
-
+			var transform = node.transforms[ channel.sid ];
+			//var uniform=node.instanceGeometries.material_uniforms;//node.uniforms[ channel.sid ];//uniforms are extraxted from the material of the geometry inside
+			// the collada spec allows the animation of data in various ways.
+			
+			if(!mergedAnimations[object3D.uuid])
+				mergedAnimations[object3D.uuid]={};
+				if(node.build.material)
+					mergedAnimations[object3D.uuid].numMat=node.build.material.length? node.build.material.length : 1;//multiple materials are array in the node else its an object
+				
+			if(transform){
+				if(!mergedAnimations[object3D.uuid].position)
+					mergedAnimations[object3D.uuid].position={}
+				buildTransformChannel(node,channel,inputSource,outputSource,transform,mergedAnimations[object3D.uuid].position);
 			}
-
-			// ensure keyframes are sorted by time
-
-			keyframes.sort( ascending );
-
-			// now we clean up all animation data, so we can use them for keyframe tracks
-
-			for ( var i = 0; i < 16; i ++ ) {
-
-				transformAnimationData( keyframes, i, defaultMatrix.elements[ i ] );
-
+			else {
+				for(var instGeom in node.instanceGeometries){
+					if(!mergedAnimations[object3D.uuid].uniforms)
+						mergedAnimations[object3D.uuid].uniforms={}
+					var uniforms=node.instanceGeometries[instGeom].material_uniforms;
+					
+					buildUniformChannel(uniforms,channel,inputSource , outputSource,interpolation ,mergedAnimations[object3D.uuid].uniforms);
+				}
 			}
+		}
+		function ascending( a, b ) {
 
-			return keyframes;
-
-			// array sort function
-
-			function ascending( a, b ) {
-
-				return a.time - b.time;
-
-			}
+			return a - b;
 
 		}
-
-		var position = new Vector3();
-		var scale = new Vector3();
-		var quaternion = new Quaternion();
-
-		function createKeyframeTracks( animation, tracks ) {
-
-			var keyframes = animation.keyframes;
-			var name = animation.name;
-
+		
+		function createPositionTracks(key,data,tracks){
 			var times = [];
 			var positionData = [];
 			var quaternionData = [];
+			var visibilityData=[];
 			var scaleData = [];
+			var sumPosition = new Vector3();
+			var sumscale = new Vector3();
+			var sumQuaternion = new Quaternion();
+			var keyframe = data.position;
+			var matrix,transl,quat;
 
-			for ( var i = 0, l = keyframes.length; i < l; i ++ ) {
+			times=Object.keys(keyframe);	
+			times.sort(ascending);
+			for(var i in times){
+				var time=times[i];
+				if(keyframe[time]['visibility']!==undefined)
+					visibilityData.push(keyframe[time]['visibility']>0);
+				else{
+					if(keyframe[time]['translation']!==undefined)
+						transl=keyframe[time]['translation'];
+					if(keyframe[time]['quaternion']!==undefined)
+						quat=keyframe[time]['quaternion'];
+					
+					if(keyframe[time]['matrix']!==undefined)
+						matrix=new Matrix4().fromArray( keyframe[time]['matrix']).transpose();
+	
+				
+					else if(matrix){
+						let tmMat=new Matrix4().compose(transl,quat,new Vector3());
+						matrix.multiply(tmMat);						
+						matrix.decompose( sumPosition, sumQuaternion, sumscale );
+						scaleData.push( sumscale.x, sumscale.y, sumscale.z );
+					}
+					else{
+						sumPosition=transl;
+						sumQuaternion=quat;
+						//Todo scale
+					}
+					
+					positionData.push( sumPosition.x, sumPosition.y, sumPosition.z );
+					quaternionData.push( sumQuaternion.x, sumQuaternion.y, sumQuaternion.z, sumQuaternion.w );
+				}
+			}				
+			if ( positionData.length > 0 ) tracks.push( new VectorKeyframeTrack( key + '.position', times, positionData ) );
+			if ( quaternionData.length > 0 ) tracks.push( new QuaternionKeyframeTrack( key + '.quaternion', times, quaternionData ) );
+			if ( scaleData.length > 0 ) tracks.push( new VectorKeyframeTrack( key + '.scale', times, scaleData ) );
+			if ( visibilityData.length > 0 ) tracks.push( new BooleanKeyframeTrack( key + '.visible', times, visibilityData ) );
+			
+		}
 
-				var keyframe = keyframes[ i ];
+		
+		function createUniformsTracks(key,data,tracks){
+			var keyframe = data.uniforms;
 
-				var time = keyframe.time;
-				var value = keyframe.value;
-
-				matrix.fromArray( value ).transpose();
-				matrix.decompose( position, quaternion, scale );
-
-				times.push( time );
-				positionData.push( position.x, position.y, position.z );
-				quaternionData.push( quaternion.x, quaternion.y, quaternion.z, quaternion.w );
-				scaleData.push( scale.x, scale.y, scale.z );
-
+			function makeTrackFromPath(path){
+				for(var uni in keyframe){
+					var times = [];
+					var curentUniAnim=keyframe[uni];
+					times=Object.keys(curentUniAnim.value);
+					times.sort(ascending);
+					var curentTrackData=[];
+					for(var i in times){
+						var time=times[i];
+						if(isComplexUniformType(curentUniAnim.type))
+							curentTrackData.push.apply(curentTrackData,curentUniAnim.value[time]);
+						else
+							curentTrackData.push(curentUniAnim.value[time]);
+					}
+					if ( curentTrackData.length > 0 ) tracks.push( new UniformKeyframeTrack( path+'['+uni+']', times, curentTrackData,curentUniAnim.type));
+				}
 			}
+			if(data.numMat!=1){
+				for(var matIdx=0;matIdx<data.numMat;matIdx++){
+					var trackPath=key + '.material'+'['+matIdx+']'+'.uniforms';	
+					makeTrackFromPath(trackPath);
+				}
+			}
+			else{
+				var trackPath=key + '.material.uniforms';
+				makeTrackFromPath(trackPath);
+			}
+			
+			
+		
+		}
+		function createKeyframeTracks( mergedAnimations, tracks ) {
 
-			if ( positionData.length > 0 ) tracks.push( new VectorKeyframeTrack( name + '.position', times, positionData ) );
-			if ( quaternionData.length > 0 ) tracks.push( new QuaternionKeyframeTrack( name + '.quaternion', times, quaternionData ) );
-			if ( scaleData.length > 0 ) tracks.push( new VectorKeyframeTrack( name + '.scale', times, scaleData ) );
+			
+			for(var key in mergedAnimations){
+				
+				var data = mergedAnimations[key];
+				//var name = key;
+				if(data){
+					//collada supports multiple transformation at the same time we must apply the sum value of them.
+					for ( var animation in data) {
+						if(animation=='position')
+							createPositionTracks(key,data,tracks);							
+						else if(animation=='uniforms')
+							createUniformsTracks(key,data,tracks);
+						}
+				}
+			}
 
 			return tracks;
 
@@ -608,9 +872,9 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				keyframe = keyframes[ i ];
 
-				if ( keyframe.value[ property ] === undefined ) {
+				if ( keyframe.matrix[ property ] === undefined ) {
 
-					keyframe.value[ property ] = null; // mark as missing
+					keyframe.matrix[ property ] = null; // mark as missing
 
 				} else {
 
@@ -628,7 +892,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					keyframe = keyframes[ i ];
 
-					keyframe.value[ property ] = defaultValue;
+					keyframe.matrix[ property ] = defaultValue;
 
 				}
 
@@ -650,21 +914,21 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var keyframe = keyframes[ i ];
 
-				if ( keyframe.value[ property ] === null ) {
+				if ( keyframe.matrix[ property ] === null ) {
 
 					prev = getPrev( keyframes, i, property );
 					next = getNext( keyframes, i, property );
 
 					if ( prev === null ) {
 
-						keyframe.value[ property ] = next.value[ property ];
+						keyframe.matrix[ property ] = next.matrix[ property ];
 						continue;
 
 					}
 
 					if ( next === null ) {
 
-						keyframe.value[ property ] = prev.value[ property ];
+						keyframe.matrix[ property ] = prev.matrix[ property ];
 						continue;
 
 					}
@@ -683,7 +947,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var keyframe = keyframes[ i ];
 
-				if ( keyframe.value[ property ] !== null ) return keyframe;
+				if ( keyframe.matrix[ property ] !== null ) return keyframe;
 
 				i --;
 
@@ -699,7 +963,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var keyframe = keyframes[ i ];
 
-				if ( keyframe.value[ property ] !== null ) return keyframe;
+				if ( keyframe.matrix[ property ] !== null ) return keyframe;
 
 				i ++;
 
@@ -713,12 +977,12 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			if ( ( next.time - prev.time ) === 0 ) {
 
-				key.value[ property ] = prev.value[ property ];
+				key.matrix[ property ] = prev.matrix[ property ];
 				return;
 
 			}
 
-			key.value[ property ] = ( ( key.time - prev.time ) * ( next.value[ property ] - prev.value[ property ] ) / ( next.time - prev.time ) ) + prev.value[ property ];
+			key.matrix[ property ] = ( ( key.time - prev.time ) * ( next.matrix[ property ] - prev.matrix[ property ] ) / ( next.time - prev.time ) ) + prev.matrix[ property ];
 
 		}
 
@@ -1116,7 +1380,10 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					case 'profile_COMMON':
 						data.profile = parseEffectProfileCOMMON( child );
 						break;
-
+					case 'profile_GLSL':
+						data.profile = parseProfileGLSL(child);
+						break;
+					
 				}
 
 			}
@@ -1124,6 +1391,71 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			library.effects[ xml.getAttribute( 'id' ) ] = data;
 
 		}
+		function isComplexUniformType(type) {
+			switch (type) {
+	
+				case 'iv1':
+				case 'fv1':
+				case 'iv':
+				case 'v2v':
+				case 'v3v':
+				case 'v4v':
+				case 'm2v':
+				case 'm3v':
+				case 'm4v':
+					return true;
+				default:
+					return false;
+			}
+		};
+	
+		function isVectorUniform(type) {
+			switch (type) {
+				case '2fv':
+				case '3fv':
+				case '4fv':
+					return true;
+				default:
+					return false;
+			}
+		};
+		function parseGLSLParamType(name){
+			switch (name) {
+				case 'bool':
+					return "1i";
+				case 'int':
+					return "1i";
+				case 'int2':
+					return "2iv";
+				case 'int3':
+					return "3iv";
+				case 'int4':
+					return "4iv";
+				case 'float':
+					return "1f";
+				case 'float2':
+					return "2fv";
+				case 'float3':
+					return "3fv";
+				case 'float4':
+					return "4fv";
+				case 'float2x2'://not sure this is supported but webgl does
+					return "Matrix2fv";
+				case 'float3x3':
+					return "Matrix3fv";
+				case 'float4x4':
+					return "Matrix4fv";
+				case 'float4x2':
+				case 'float2x4':
+					console.warn('WEBGL supports only squre matrixes.');
+					return null;
+				default:
+					console.warn('Not supported uniform type.');
+					return null;
+					
+			}
+	
+		};
 
 		function parseEffectProfileCOMMON( xml ) {
 
@@ -1160,6 +1492,366 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function _attr_as_string( element, name, defaultValue ) {
+
+			if ( element.hasAttribute( name ) ) {
+	
+				return element.getAttribute( name );
+	
+			} else {
+	
+				return defaultValue;
+	
+			}
+	
+		}
+
+		function initRenderPass (element, sidToFind,data) {
+
+			var foundChild = null;
+			for (var pasIdx = 0; pasIdx < element.childNodes.length; pasIdx++) {
+
+				var shaderChild = element.childNodes[pasIdx];
+				for (var shaderIdx = 0; shaderIdx < shaderChild.childNodes.length; shaderIdx++) {
+
+					var shaderSettings = shaderChild.childNodes[shaderIdx];
+					if (shaderSettings.nodeName == 'name') {
+
+						var source = shaderSettings.getAttribute('source');
+						if (source == sidToFind)
+							foundChild = shaderChild;
+
+					}
+					else if (shaderSettings.nodeName == 'bind') {
+
+						var attr=_attr_as_string(shaderSettings , 'symbol', null);
+						if (attr != null) {
+
+							for (var paramIdx = 0; paramIdx < shaderSettings.childNodes.length; paramIdx++) {
+
+								var param = shaderSettings.childNodes[paramIdx];
+								if (param.nodeName == 'param') {
+
+									var ref =_attr_as_string( param,'ref',null);
+									data.boundUniforms[attr] = ref;
+								}
+							}
+
+						}
+					}
+				}
+			}
+
+			if (foundChild!=null)
+				return foundChild.getAttribute('stage');
+			else
+				return null;
+		}
+
+		function parseShader (element, sidToFind, data) {
+			for (var i = 0; i < element.childNodes.length; i++) {
+	
+				var child = element.childNodes[i];
+				if (child.nodeName == 'technique') {
+	
+					for (var childIdx = 0; childIdx < child.childNodes.length; childIdx++) {
+	
+						var passChild = child.childNodes[childIdx];
+						if (passChild.nodeName == "pass") {
+							data.technique.type="pass";
+							return initRenderPass(passChild, sidToFind, data);
+	
+						}
+					}
+				}
+			}
+			return null;
+		};
+
+		function GetGLSLMatTransp(element){
+			for (var index = 0; index < element.childNodes.length; index++) {
+	
+				var child = element.childNodes[index];
+				if (child.nodeType != 1) continue;
+				if (child.nodeName == 'transparent') {
+					var raw = parseStrings(child.textContent);
+					return  (raw[0] === 'true' || raw[0] === '1') ? true : false;
+				}
+			}
+			return false;
+	
+		};
+
+		function parseProfileGLSL(element){
+			var data = {
+				surfaces: {},
+				samplers: {},
+				//uniformsGLSL: {},
+				boundUniforms: {},
+				params : {},
+				technique:{type : null},
+				vertexShader : null,
+				fragmentShader : null,
+				transparent : false
+			};
+			for (var i = 0; i < element.childNodes.length; i++) {
+	
+				var child = element.childNodes[i];
+				if (child.nodeType != 1) continue;
+				var sid = child.getAttribute('sid');
+				switch (child.nodeName){
+					case 'code':
+						var type = parseShader(element, sid, data);
+						if (type == 'VERTEXPROGRAM')
+							data.vertexShader = child.textContent;
+						else if (type == 'FRAGMENTPROGRAM')
+							data.fragmentShader = child.textContent;
+						break;
+					case 'newparam':
+						parseGLSLParameters(child, data, sid);
+						//this.parseNewparam(child);
+						break;
+					case 'extra':
+						for (var index = 0; index < child.childNodes.length; index++) {
+
+							var extraChild=child.childNodes[index];
+							if(extraChild.nodeName=='technique')
+							{
+								var profile =extraChild.getAttribute('profile')
+								if(profile=='three.js')
+								data.transparent=GetGLSLMatTransp(extraChild);
+							}
+						}
+ 						break;
+					default:
+						break;
+				}
+			};
+			
+			return data;
+		}
+		
+		function getConvertedMat2(data) {
+		
+			return  new Float32Array([
+
+				data[0], data[1],
+				data[2],data[3]
+
+			]);
+		}
+
+		function getConvertedMat3(data) {
+
+			return new Matrix3().set(
+				data[0], data[3], data[6],
+				data[1], data[4], data[7],
+				data[2], data[5], data[8]
+				);
+
+		}
+		function getConvertedMat4(data) {
+
+				// First fix rotation and scale
+	
+				// Columns first
+				var arr = [ data[ 0 ], data[ 4 ], data[ 8 ] ];
+				data[ 0 ] = arr[ 0 ];
+				data[ 4 ] = arr[ 1 ];
+				data[ 8 ] = arr[ 2 ];
+				arr = [ data[ 1 ], data[ 5 ], data[ 9 ] ];
+				data[ 1 ] = arr[ 0 ];
+				data[ 5 ] = arr[ 1 ];
+				data[ 9 ] = arr[ 2 ];
+				arr = [ data[ 2 ], data[ 6 ], data[ 10 ] ];
+				data[ 2 ] = arr[ 0 ];
+				data[ 6 ] = arr[ 1 ];
+				data[ 10 ] = arr[ 2 ];
+				// Rows secondtranslate
+				arr = [ data[ 0 ], data[ 1 ], data[ 2 ] ];
+				data[ 0 ] = arr[ 0 ];
+				data[ 1 ] = arr[ 1 ];
+				data[ 2 ] = arr[ 2 ];
+				arr = [ data[ 4 ], data[ 5 ], data[ 6 ] ];
+				data[ 4 ] = arr[ 0 ];
+				data[ 5 ] = arr[ 1 ];
+				data[ 6 ] = arr[ 2 ];
+				arr = [ data[ 8 ], data[ 9 ], data[ 10 ] ];
+				data[ 8 ] = arr[ 0 ];
+				data[ 9 ] = arr[ 1 ];
+				data[ 10 ] = arr[ 2 ];
+	
+				// Now fix translation
+				arr = [ data[ 3 ], data[ 7 ], data[ 11 ] ];
+				data[ 3 ] = arr[ 0 ];
+				data[ 7 ] = arr[ 1 ];
+				data[ 11 ] = arr[ 2 ];
+	
+			return new Matrix4().set(
+				data[0], data[1], data[2], data[3],
+				data[4], data[5], data[6], data[7],
+				data[8], data[9], data[10], data[11],
+				data[12], data[13], data[14], data[15]
+				);
+	
+		}
+		function parseSimpleGLSLParam(name,text) {
+			var param={val:0,type:'int'};
+			switch (name) {
+				case 'bool':
+					param.type = "1i";
+					var raw = parseStrings(text);
+					param.val =parseBooli(raw[0]);
+					break;
+				case 'bool2':
+				case 'bool3':
+				case 'bool4':
+					param.val = parseBools(text);
+					param.type = null;
+					break;
+				case 'int':
+					var raw = parseStrings(text);
+					param.val = parseInt(raw[0]);
+					param.type = "1i";
+					break;
+				case 'int2':
+					param.type = "2iv";
+					param.val = parseInts(text);
+				case 'int3':
+					param.type = "3iv";
+					param.val = parseInts(text);
+				case 'int4':
+					param.type = "4iv";
+					param.val = parseInts(text);
+					break;
+				case 'float':
+					var raw = parseStrings(text);
+					param.type = "1f";
+					param.val = parseFloat(raw[0]);
+					break;
+				case 'float2':
+					param.type = "2fv";
+					var vals = parseFloats(text);
+					param.val = new Vector2(vals[0], vals[1]);
+					break;
+				case 'float3':
+					param.type = "3fv";
+					var vals = parseFloats(text);
+					param.val = new Vector3(vals[0], vals[1], vals[2]);
+					break;
+				case 'float4':
+					param.type = "4fv";
+					var vals = parseFloats(text);
+					param.val = new Vector4(vals[0], vals[1], vals[2], vals[3]);
+					break; 
+				case 'float2x2'://not sure this is supported but webgl does
+					param.type = "Matrix2fv";
+					var data = parseFloats(text);
+					param.val = getConvertedMat2(data);
+				case 'float3x3':
+					param.type = "Matrix3fv";
+					var data = parseFloats(text);
+					param.val = getConvertedMat3(data);
+					break;
+				case 'float4x4':
+					param.type = "Matrix4fv";
+					var data = parseFloats(text);
+					param.val = getConvertedMat4(data);
+					break;
+				case 'float4x2':
+				case 'float2x4':
+					console.warn('WEBGL supports only squre matrixes.');
+					type = null;
+					param.val = null;
+					break;
+				default:
+					type = null;
+					param.val = null;
+					break;
+			}
+			return param;
+		}
+		
+		function parseArrayParam(element) {
+			//single dimension array 
+			//if its needed make it multy dimensional
+			var param={val:[],type:'1i'};
+			for (var index = 0; index < element.childNodes.length; index++) {
+	
+				var child = element.childNodes[index];
+				if (child.nodeType != 1) continue;
+				
+				var singleVal=parseSimpleGLSLParam(child.nodeName, child.textContent);
+				param.val.push(singleVal.val);
+				param.type=singleVal.type;
+			}
+			switch (param.type) {//change collada type with the glsl type mapping
+	
+				case '1i':
+					param.type = "iv1";
+					break;
+	
+				case '1f':
+					param.type = "fv1";
+					break;
+				case '2iv':
+				case '3iv':
+				case '4iv':
+					param.type = "iv";
+					break;
+	
+				case '2fv':
+					param.type = "v2v";
+					break;
+	
+				case '3fv':
+					param.type = "v3v";
+					break;
+	
+				case '4fv':
+					param.type = "v4v";
+					break;
+	
+				case 'Matrix2fv':
+					param.type = "m2v";
+					break;
+				case 'Matrix3fv':
+					param.type = "m3v";
+					break;
+	
+				case 'Matrix4fv':
+					param.type = "m4v";
+					break;
+	
+			}
+			return param;
+		}
+
+		function parseGLSLParameters(element, data, id) {
+	 
+			for (var index = 0 ; index < element.childNodes.length ; index++) {
+				var child = element.childNodes[index];
+				if (child.nodeType != 1) continue;
+				switch(child.nodeName ) {
+					case 'sampler2D':
+					data.samplers[id] = parseEffectSampler(child);
+						return;
+					case 'surface':
+					data.surfaces[id] = parseEffectSurface(child);
+						return;
+					case 'array':
+						var param = parseArrayParam(child);
+						data.params[id] = param;						
+						return;
+					default:
+						var param = parseSimpleGLSLParam(child.nodeName, child.textContent);
+						data.params[id] = param;
+						return;
+				}
+			}
+	
+			return null;
+		}
 		function parseEffectNewparam( xml, data ) {
 
 			var sid = xml.getAttribute( 'sid' );
@@ -1224,6 +1916,12 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					case 'source':
 						data.source = child.textContent;
+						break;
+					case 'wrap_s':
+						data.wrap_s = child.textContent;
+						break;
+					case 'wrap_t':
+						data.wrap_t = child.textContent;
 						break;
 
 				}
@@ -1459,6 +2157,9 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					case 'double_sided':
 						data[ child.nodeName ] = parseInt( child.textContent );
 						break;
+					case 'transparent':
+						data[ child.nodeName ] = parseBool( child.textContent );
+						break;
 
 				}
 
@@ -1485,7 +2186,10 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		function parseMaterial( xml ) {
 
 			var data = {
-				name: xml.getAttribute( 'name' )
+				name: xml.getAttribute( 'name' ),
+				surfaces: {},
+				samplers: {},
+				params:{}
 			};
 
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
@@ -1498,6 +2202,15 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					case 'instance_effect':
 						data.url = parseId( child.getAttribute( 'url' ) );
+
+						for (var index = 0 ;index < child.childNodes.length ; index++) {
+							var effect_child=child.childNodes[index];
+							if (effect_child.nodeType != 1) continue;
+							if (effect_child.nodeName == 'setparam') {
+								var ref = effect_child.getAttribute('ref');//ref is used to identify the parameter in the array
+								parseGLSLParameters(effect_child, data, ref);
+							}
+						}
 						break;
 
 				}
@@ -1529,31 +2242,125 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			return loader;
 
 		}
+		
+		
+		function loatTextureForUniform(sampler, surface) {
 
-		function buildMaterial( data ) {
+			if (surface !== undefined) {
+	
+				var image = getImage(surface.init_from);
+				if (image) {
+					var url;
+					if(path)
+					{
+						var parts = path.split( '/' );
+						parts.pop();
+						let baseUrl = ( parts.length < 1 ? '.' : parts.join( '/' ) ) + '/';
+			
+						url = baseUrl + image;
+					}
+					else
+						url = image;
+	
+					var texture = getTextureLoader(url).load( url);					
+					texture.minFilter = LinearFilter;
+					texture.wrapS = sampler.wrap_s=='WRAP' ? RepeatWrapping : ClampToEdgeWrapping;
+					texture.wrapT = sampler.wrap_t=='WRAP' ? RepeatWrapping : ClampToEdgeWrapping;
+					return texture;
+				}
+			}
+			return null;
+	
+		}
+		function updateSamplerUniforms(effect, instance_effect, uniformsGLSL) {
+
+			for (var boundUniform in effect.boundUniforms) {
+	
+				var samplerId = effect.boundUniforms[boundUniform];	        //EnvSpec1_Uni
+	
+				var sampler = instance_effect.samplers[samplerId];
+				if (sampler == undefined)
+				  sampler = effect.samplers[samplerId];         //newparam in effect
+	
+			  if (sampler !== undefined) {
+	
+				var surface = instance_effect.surfaces[sampler.source];
+				if (surface==undefined)
+					  surface = effect.surfaces[sampler.source];
+	
+				if (surface !== undefined) {
+					var tex = loatTextureForUniform(sampler, surface);
+					uniformsGLSL[boundUniform] = { value: tex };
+				}
+			  }
+			}
+	
+		}
+		function buildMaterial( data ,geomType) {
 
 			var effect = getEffect( data.url );
 			var technique = effect.profile.technique;
 			var extra = effect.profile.extra;
 
 			var material;
+			if(geomType && (geomType=='lines'||geomType=='linestrips'))
+				material = new LineBasicMaterial();
+			else{
+				switch ( technique.type ) {
 
-			switch ( technique.type ) {
-
-				case 'phong':
-				case 'blinn':
-					material = new MeshPhongMaterial();
-					break;
-
-				case 'lambert':
-					material = new MeshLambertMaterial();
-					break;
-
-				default:
-					material = new MeshBasicMaterial();
-					break;
-
+					case 'phong':
+					case 'blinn':
+						material = new MeshPhongMaterial();
+						break;
+	
+					case 'lambert':
+						material = new MeshLambertMaterial();
+						break;
+					case 'pass':
+	
+					var uniformsGLSL = {};
+					uniformsGLSL = UniformsUtils.merge([
+						UniformsLib['lights'], uniformsGLSL]);
+					//<bind symbol="TestParam">  ----->//boundUniform
+					//	<param ref="TestParam_uni"/> ----->this.boundUniforms[boundUniform]
+					//</bind>
+					//<newparam sid="TestParam_uni"> ---->key of uniformsGLSL
+					//  <float>1.0</float>
+					//</newparam>
+			
+					for (var boundUniform in effect.profile.boundUniforms) {
+	
+						var uni_bind=effect.profile.boundUniforms[boundUniform];
+						var uni_data = data.params[uni_bind];
+						if (uni_data == undefined) {
+							uni_data= effect.profile.params[uni_bind];
+							
+						}
+						if (uni_data !== undefined) {
+							if (uni_data.type !== undefined)
+								uniformsGLSL[boundUniform] = { type: uni_data.type, value: uni_data.val };
+							else
+								uniformsGLSL[boundUniform] = { value: uni_data.val };
+						}						
+					}
+	
+					updateSamplerUniforms(effect.profile,data,uniformsGLSL);
+					material = new ShaderMaterial({
+						uniforms: uniformsGLSL,
+						vertexShader: effect.profile.vertexShader,
+						fragmentShader: effect.profile.fragmentShader,
+						transparent: effect.profile.transparent,
+						lights:true
+					});
+					material.transparent=effect.profile.transparent;
+						break;
+					default:
+						material = new MeshBasicMaterial();
+						break;
+	
+				}
 			}
+			
 
 			material.name = data.name || '';
 
@@ -1625,111 +2432,115 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			var parameters = technique.parameters;
+			var parameters = technique.parameters;//glsl dosent have params it has binded uniforms that are in the material
+			if(parameters){
+				for ( var key in parameters ) {
 
-			for ( var key in parameters ) {
+					var parameter = parameters[ key ];
 
-				var parameter = parameters[ key ];
+					switch ( key ) {
 
-				switch ( key ) {
-
-					case 'diffuse':
-						if ( parameter.color ) material.color.fromArray( parameter.color );
-						if ( parameter.texture ) material.map = getTexture( parameter.texture );
-						break;
-					case 'specular':
-						if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
-						if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
-						break;
-					case 'bump':
-						if ( parameter.texture ) material.normalMap = getTexture( parameter.texture );
-						break;
-					case 'ambient':
-						if ( parameter.texture ) material.lightMap = getTexture( parameter.texture );
-						break;
-					case 'shininess':
-						if ( parameter.float && material.shininess ) material.shininess = parameter.float;
-						break;
-					case 'emission':
-						if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
-						if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture );
-						break;
-
-				}
-
-			}
-
-			//
-
-			var transparent = parameters[ 'transparent' ];
-			var transparency = parameters[ 'transparency' ];
-
-			// <transparency> does not exist but <transparent>
-
-			if ( transparency === undefined && transparent ) {
-
-				transparency = {
-					float: 1
-				};
-
-			}
-
-			// <transparent> does not exist but <transparency>
-
-			if ( transparent === undefined && transparency ) {
-
-				transparent = {
-					opaque: 'A_ONE',
-					data: {
-						color: [ 1, 1, 1, 1 ]
-					} };
-
-			}
-
-			if ( transparent && transparency ) {
-
-				// handle case if a texture exists but no color
-
-				if ( transparent.data.texture ) {
-
-					// we do not set an alpha map (see #13792)
-
-					material.transparent = true;
-
-				} else {
-
-					var color = transparent.data.color;
-
-					switch ( transparent.opaque ) {
-
-						case 'A_ONE':
-							material.opacity = color[ 3 ] * transparency.float;
+						case 'diffuse':
+							if ( parameter.color ) material.color.fromArray( parameter.color );
+							if ( parameter.texture ) material.map = getTexture( parameter.texture );
 							break;
-						case 'RGB_ZERO':
-							material.opacity = 1 - ( color[ 0 ] * transparency.float );
+						case 'specular':
+							if ( parameter.color && material.specular ) material.specular.fromArray( parameter.color );
+							if ( parameter.texture ) material.specularMap = getTexture( parameter.texture );
 							break;
-						case 'A_ZERO':
-							material.opacity = 1 - ( color[ 3 ] * transparency.float );
+						case 'bump':
+							if ( parameter.texture ) material.normalMap = getTexture( parameter.texture );
 							break;
-						case 'RGB_ONE':
-							material.opacity = color[ 0 ] * transparency.float;
+						case 'ambient':
+							if ( parameter.texture ) material.lightMap = getTexture( parameter.texture );
 							break;
-						default:
-							console.warn( 'THREE.ColladaLoader: Invalid opaque type "%s" of transparent tag.', transparent.opaque );
+						case 'shininess':
+							if ( parameter.float && material.shininess ) material.shininess = parameter.float;
+							break;
+						case 'emission':
+							if ( parameter.color && material.emissive ) material.emissive.fromArray( parameter.color );
+							if ( parameter.texture ) material.emissiveMap = getTexture( parameter.texture );
+							break;
 
 					}
 
-					if ( material.opacity < 1 ) material.transparent = true;
+				}
+
+				//
+
+				var transparent = parameters[ 'transparent' ];
+				var transparency = parameters[ 'transparency' ];
+
+				// <transparency> does not exist but <transparent>
+
+				if ( transparency === undefined && transparent ) {
+
+					transparency = {
+						float: 1
+					};
 
 				}
 
+				// <transparent> does not exist but <transparency>
+
+				if ( transparent === undefined && transparency ) {
+
+					transparent = {
+						opaque: 'A_ONE',
+						data: {
+							color: [ 1, 1, 1, 1 ]
+						} };
+
+				}
+
+				if ( transparent && transparency ) {
+
+					// handle case if a texture exists but no color
+
+					if ( transparent.data.texture ) {
+
+						// we do not set an alpha map (see #13792)
+
+						material.transparent = true;
+
+					} else {
+
+						var color = transparent.data.color;
+
+						switch ( transparent.opaque ) {
+
+							case 'A_ONE':
+								material.opacity = color[ 3 ] * transparency.float;
+								break;
+							case 'RGB_ZERO':
+								material.opacity = 1 - ( color[ 0 ] * transparency.float );
+								break;
+							case 'A_ZERO':
+								material.opacity = 1 - ( color[ 3 ] * transparency.float );
+								break;
+							case 'RGB_ONE':
+								material.opacity = color[ 0 ] * transparency.float;
+								break;
+							default:
+								console.warn( 'THREE.ColladaLoader: Invalid opaque type "%s" of transparent tag.', transparent.opaque );
+
+						}
+
+						if ( material.opacity < 1 ) material.transparent = true;
+
+					}
+
+				}
 			}
 
 			//
 
-			if ( extra !== undefined && extra.technique !== undefined && extra.technique.double_sided === 1 ) {
+			if ( extra !== undefined && extra.technique !== undefined ) {
 
-				material.side = DoubleSide;
+				if(extra.technique.double_sided === 1 )
+					material.side = DoubleSide;
+				if(extra.technique.transparent)
+					material.transparent =extra.technique.transparent;
 
 			}
 
@@ -1737,9 +2548,9 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		function getMaterial( id ) {
+		function getMaterial( id ,type) {
 
-			return getBuild( library.materials[ id ], buildMaterial );
+			return getBuild( {value:library.materials[ id ] , context:type}, buildMaterial );
 
 		}
 
@@ -2277,6 +3088,14 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			return build;
 
 		}
+		function isCustomtAttribName(semantic) {
+
+			if (semantic != 'POSITION' && semantic != 'NORMAL' && semantic != 'COLOR'
+					   && semantic != 'TEXCOORD' && semantic!='TEXCOORD1') {
+				return true;
+			}
+			return false;
+		};
 
 		function buildGeometryType( primitives, sources, vertices ) {
 
@@ -2287,7 +3106,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var uv = { array: [], stride: 0 };
 			var uv2 = { array: [], stride: 0 };
 			var color = { array: [], stride: 0 };
-
+			var vertAttributes={};
 			var skinIndex = { array: [], stride: 4 };
 			var skinWeight = { array: [], stride: 4 };
 
@@ -2371,13 +3190,13 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							for ( var key in vertices ) {
 
 								var id = vertices[ key ];
-
+								var curSource=sources[ id ];
 								switch ( key ) {
 
 									case 'POSITION':
 										var prevLength = position.array.length;
-										buildGeometryData( primitive, sources[ id ], input.offset, position.array );
-										position.stride = sources[ id ].stride;
+										buildGeometryData( primitive, curSource, input.offset, position.array );
+										position.stride = curSource.stride;
 
 										if ( sources.skinWeights && sources.skinIndices ) {
 
@@ -2405,26 +3224,35 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 										break;
 
 									case 'NORMAL':
-										buildGeometryData( primitive, sources[ id ], input.offset, normal.array );
-										normal.stride = sources[ id ].stride;
+										buildGeometryData( primitive, curSource, input.offset, normal.array );
+										normal.stride = curSource.stride;
 										break;
 
 									case 'COLOR':
-										buildGeometryData( primitive, sources[ id ], input.offset, color.array );
-										color.stride = sources[ id ].stride;
+										buildGeometryData( primitive, curSource, input.offset, color.array );
+										color.stride = curSource.stride;
 										break;
 
 									case 'TEXCOORD':
-										buildGeometryData( primitive, sources[ id ], input.offset, uv.array );
-										uv.stride = sources[ id ].stride;
+										buildGeometryData( primitive, curSource, input.offset, uv.array );
+										uv.stride = curSource.stride;
 										break;
 
 									case 'TEXCOORD1':
-										buildGeometryData( primitive, sources[ id ], input.offset, uv2.array );
-										uv.stride = sources[ id ].stride;
+										buildGeometryData( primitive, curSource, input.offset, uv2.array );
+										uv.stride = curSource.stride;
 										break;
-
+									
 									default:
+									if(isCustomtAttribName(key)){//everything should be custom attrib here i think
+										let custAttr = { array: [], stride: curSource.stride };
+										buildGeometryData( primitive, curSource, input.offset, custAttr.array );
+										if(!vertAttributes[key])
+											vertAttributes[key]=custAttr;
+										else
+											vertAttributes[key].array.push.apply(vertAttributes[key].array,custAttr.array);
+									}
+									else
 										console.warn( 'THREE.ColladaLoader: Semantic "%s" not handled in geometry build process.', key );
 
 								}
@@ -2463,13 +3291,20 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			if ( position.array.length > 0 ) geometry.setAttribute( 'position', new Float32BufferAttribute( position.array, position.stride ) );
 			if ( normal.array.length > 0 ) geometry.setAttribute( 'normal', new Float32BufferAttribute( normal.array, normal.stride ) );
+
 			if ( color.array.length > 0 ) geometry.setAttribute( 'color', new Float32BufferAttribute( color.array, color.stride ) );
 			if ( uv.array.length > 0 ) geometry.setAttribute( 'uv', new Float32BufferAttribute( uv.array, uv.stride ) );
 			if ( uv2.array.length > 0 ) geometry.setAttribute( 'uv2', new Float32BufferAttribute( uv2.array, uv2.stride ) );
 
 			if ( skinIndex.array.length > 0 ) geometry.setAttribute( 'skinIndex', new Float32BufferAttribute( skinIndex.array, skinIndex.stride ) );
 			if ( skinWeight.array.length > 0 ) geometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeight.array, skinWeight.stride ) );
-
+			
+			for(var key in vertAttributes ){
+				var attr=vertAttributes[key];
+				if(attr.array.length>0){
+					geometry.setAttribute( key,new Float32BufferAttribute(attr.array,attr.stride));
+				}
+			}
 			build.data = geometry;
 			build.type = primitives[ 0 ].type;
 			build.materialKeys = materialKeys;
@@ -3210,8 +4045,8 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		var matrix = new Matrix4();
-		var vector = new Vector3();
+		//var matrix = new Matrix4();
+		//var vector = new Vector3();
 
 		function parseNode( xml ) {
 
@@ -3227,9 +4062,11 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				instanceLights: [],
 				instanceGeometries: [],
 				instanceNodes: [],
-				transforms: {}
+				transforms: {},
+				visibility: true
 			};
-
+			let matrix= new Matrix4();
+			let vector= new Vector3();
 			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
 
 				var child = xml.childNodes[ i ];
@@ -3290,6 +4127,27 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						break;
 
 					case 'extra':
+						for (var i = 0; i < child.childNodes.length; i++) {
+
+							var extras = child.childNodes[i];
+							if (extras.nodeType != 1) continue;
+				
+							if (extras.nodeName == 'technique') {
+								var sourceId = extras.getAttribute('profile');
+								if (sourceId === 'FCOLLADA') {//FCOLLADA writes float not bool from the files i have seen
+									for (var j = 0; j < extras.childNodes.length; j++) {
+				
+										var extraItem = extras.childNodes[j];
+										if (extraItem.nodeType != 1) continue;
+										if (extraItem.nodeName == 'visibility'){
+											data.visibility= parseFloat( extraItem.textContent )>0;
+											data.transforms[ 'visibility'] ='visibility';
+										}
+									}
+								}
+							}
+				
+						}
 						break;
 
 					default:
@@ -3318,7 +4176,8 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var data = {
 				id: parseId( xml.getAttribute( 'url' ) ),
 				materials: {},
-				skeletons: []
+				skeletons: [],
+				material_uniforms:[]
 			};
 
 			for ( var i = 0; i < xml.childNodes.length; i ++ ) {
@@ -3326,8 +4185,18 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var child = xml.childNodes[ i ];
 
 				switch ( child.nodeName ) {
-
 					case 'bind_material':
+						let params = child.getElementsByTagName( 'param' );
+						let uniform;
+						for ( var j = 0; j < params.length; j ++ ) {
+							if (isComplexUniformType(params[j].getAttribute('type')))
+								uniform={sid:params[j].getAttribute('sid'),type:params[j].getAttribute('type')};
+							else {
+								var glslType = parseGLSLParamType(params[j].getAttribute('type'));
+								uniform={sid:params[j].getAttribute('sid'),type:glslType};
+							}
+							data.material_uniforms.push(uniform);
+						}
 						var instances = child.getElementsByTagName( 'instance_material' );
 
 						for ( var j = 0; j < instances.length; j ++ ) {
@@ -3640,7 +4509,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var fallbackMaterial = new MeshBasicMaterial( { color: 0xff00ff } );
 
-		function resolveMaterialBinding( keys, instanceMaterials ) {
+		function resolveMaterialBinding( keys,type, instanceMaterials ) {
 
 			var materials = [];
 
@@ -3655,7 +4524,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				} else {
 
-					materials.push( getMaterial( id ) );
+					materials.push( getMaterial( id ,type) );
 
 				}
 
@@ -3673,7 +4542,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var geometry = geometries[ type ];
 
-				var materials = resolveMaterialBinding( geometry.materialKeys, instanceMaterials );
+				var materials = resolveMaterialBinding( geometry.materialKeys,type, instanceMaterials );
 
 				// handle case if no materials are defined
 

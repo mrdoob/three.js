@@ -78,6 +78,7 @@ export { AudioContext } from './audio/AudioContext.js';
 export { AudioAnalyser } from './audio/AudioAnalyser.js';
 export { Audio } from './audio/Audio.js';
 export { VectorKeyframeTrack } from './animation/tracks/VectorKeyframeTrack.js';
+export { UniformKeyframeTrack } from './animation/tracks/UniformKeyframeTrack.js';
 export { StringKeyframeTrack } from './animation/tracks/StringKeyframeTrack.js';
 export { QuaternionKeyframeTrack } from './animation/tracks/QuaternionKeyframeTrack.js';
 export { NumberKeyframeTrack } from './animation/tracks/NumberKeyframeTrack.js';
