@@ -1244,8 +1244,6 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			xr.submitFrame();
-
 		}
 
 		// _gl.finish();
