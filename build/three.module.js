@@ -23157,35 +23157,6 @@ function WebXRManager( renderer, gl ) {
 
 	this.dispose = function () {};
 
-	// DEPRECATED
-
-	this.getStandingMatrix = function () {
-
-		console.warn( 'THREE.WebXRManager: getStandingMatrix() is no longer needed.' );
-		return new Matrix4();
-
-	};
-
-	this.getDevice = function () {
-
-		console.warn( 'THREE.WebXRManager: getDevice() has been deprecated.' );
-
-	};
-
-	this.setDevice = function () {
-
-		console.warn( 'THREE.WebXRManager: setDevice() has been deprecated.' );
-
-	};
-
-	this.setFrameOfReferenceType = function () {
-
-		console.warn( 'THREE.WebXRManager: setFrameOfReferenceType() has been deprecated.' );
-
-	};
-
-	this.submitFrame = function () {};
-
 }
 
 Object.assign( WebXRManager.prototype, EventDispatcher.prototype );
@@ -26153,6 +26124,8 @@ Object.assign( InterleavedBuffer.prototype, {
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
+var _vector$7 = new Vector3();
+
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
 	this.data = interleavedBuffer;
@@ -26190,6 +26163,24 @@ Object.defineProperties( InterleavedBufferAttribute.prototype, {
 Object.assign( InterleavedBufferAttribute.prototype, {
 
 	isInterleavedBufferAttribute: true,
+
+	applyMatrix4: function ( m ) {
+
+		for ( var i = 0, l = this.data.count; i < l; i ++ ) {
+
+			_vector$7.x = this.getX( i );
+			_vector$7.y = this.getY( i );
+			_vector$7.z = this.getZ( i );
+
+			_vector$7.applyMatrix4( m );
+
+			this.setXYZ( i, _vector$7.x, _vector$7.y, _vector$7.z );
+
+		}
+
+		return this;
+
+	},
 
 	setX: function ( index, x ) {
 
@@ -45449,7 +45440,7 @@ Object.assign( Cylindrical.prototype, {
  * @author bhouston / http://clara.io
  */
 
-var _vector$7 = new Vector2();
+var _vector$8 = new Vector2();
 
 function Box2( min, max ) {
 
@@ -45485,7 +45476,7 @@ Object.assign( Box2.prototype, {
 
 	setFromCenterAndSize: function ( center, size ) {
 
-		var halfSize = _vector$7.copy( size ).multiplyScalar( 0.5 );
+		var halfSize = _vector$8.copy( size ).multiplyScalar( 0.5 );
 		this.min.copy( center ).sub( halfSize );
 		this.max.copy( center ).add( halfSize );
 
@@ -45635,7 +45626,7 @@ Object.assign( Box2.prototype, {
 
 	distanceToPoint: function ( point ) {
 
-		var clampedPoint = _vector$7.copy( point ).clamp( this.min, this.max );
+		var clampedPoint = _vector$8.copy( point ).clamp( this.min, this.max );
 		return clampedPoint.sub( point ).length();
 
 	},
@@ -46074,7 +46065,7 @@ VertexTangentsHelper.prototype.update = function () {
  * @author WestLangley / http://github.com/WestLangley
  */
 
-var _vector$8 = new Vector3();
+var _vector$9 = new Vector3();
 
 function SpotLightHelper( light, color ) {
 
@@ -46140,9 +46131,9 @@ SpotLightHelper.prototype.update = function () {
 
 	this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-	_vector$8.setFromMatrixPosition( this.light.target.matrixWorld );
+	_vector$9.setFromMatrixPosition( this.light.target.matrixWorld );
 
-	this.cone.lookAt( _vector$8 );
+	this.cone.lookAt( _vector$9 );
 
 	if ( this.color !== undefined ) {
 
@@ -46164,7 +46155,7 @@ SpotLightHelper.prototype.update = function () {
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-var _vector$9 = new Vector3();
+var _vector$a = new Vector3();
 var _boneMatrix = new Matrix4();
 var _matrixWorldInv = new Matrix4();
 
@@ -46249,12 +46240,12 @@ SkeletonHelper.prototype.updateMatrixWorld = function ( force ) {
 		if ( bone.parent && bone.parent.isBone ) {
 
 			_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
-			_vector$9.setFromMatrixPosition( _boneMatrix );
-			position.setXYZ( j, _vector$9.x, _vector$9.y, _vector$9.z );
+			_vector$a.setFromMatrixPosition( _boneMatrix );
+			position.setXYZ( j, _vector$a.x, _vector$a.y, _vector$a.z );
 
 			_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
-			_vector$9.setFromMatrixPosition( _boneMatrix );
-			position.setXYZ( j + 1, _vector$9.x, _vector$9.y, _vector$9.z );
+			_vector$a.setFromMatrixPosition( _boneMatrix );
+			position.setXYZ( j + 1, _vector$a.x, _vector$a.y, _vector$a.z );
 
 			j += 2;
 
@@ -46436,7 +46427,7 @@ RectAreaLightHelper.prototype.dispose = function () {
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-var _vector$a = new Vector3();
+var _vector$b = new Vector3();
 var _color1 = new Color();
 var _color2 = new Color();
 
@@ -46506,7 +46497,7 @@ HemisphereLightHelper.prototype.update = function () {
 
 	}
 
-	mesh.lookAt( _vector$a.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+	mesh.lookAt( _vector$b.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 
 };
 
@@ -47107,7 +47098,7 @@ DirectionalLightHelper.prototype.update = function () {
  *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
  */
 
-var _vector$b = new Vector3();
+var _vector$c = new Vector3();
 var _camera = new Camera();
 
 function CameraHelper( camera ) {
@@ -47272,7 +47263,7 @@ CameraHelper.prototype.update = function () {
 
 function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
-	_vector$b.set( x, y, z ).unproject( camera );
+	_vector$c.set( x, y, z ).unproject( camera );
 
 	var points = pointMap[ point ];
 
@@ -47282,7 +47273,7 @@ function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
 		for ( var i = 0, l = points.length; i < l; i ++ ) {
 
-			position.setXYZ( points[ i ], _vector$b.x, _vector$b.y, _vector$b.z );
+			position.setXYZ( points[ i ], _vector$c.x, _vector$c.y, _vector$c.z );
 
 		}
 
@@ -49284,7 +49275,7 @@ Object.defineProperties( WebGLRenderer.prototype, {
 	vr: {
 		get: function () {
 
-			console.warn( 'THREE.WebGLRenderer: .vr has been removed. Use .xr instead.' );
+			console.warn( 'THREE.WebGLRenderer: .vr has been renamed to .xr' );
 			return this.xr;
 
 		}
