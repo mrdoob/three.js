@@ -36,10 +36,12 @@
 			var sampler;
 			var count = api.count;
 			var ages = new Float32Array( count );
+			var scales = new Float32Array( count );
 			var dummy = new THREE.Object3D();
 
-			var _sPosition = new THREE.Vector3();
-			var _sNormal = new THREE.Vector3();
+			var _position = new THREE.Vector3();
+			var _normal = new THREE.Vector3();
+			var _scale = new THREE.Vector3();
 
 			// var surfaceGeometry = new THREE.BoxBufferGeometry( 10, 10, 10 ).toNonIndexed();
 			var surfaceGeometry = new THREE.TorusKnotBufferGeometry( 10, 3, 100, 16 ).toNonIndexed();
@@ -48,6 +50,14 @@
 
 			// Source: https://gist.github.com/gre/1650294
 			var easeOutCubic = function ( t ) { return ( -- t ) * t * t + 1; };
+
+			// Scaling curve causes particles to grow quickly, ease gradually into full scale, then
+			// disappear quickly. More of the particle's lifetime is spent around full scale.
+			var scaleCurve = function ( t ) {
+
+				return Math.abs( easeOutCubic( ( t > 0.5 ? 1 - t : t ) * 2 ) );
+
+			};
 
 			var loader = new GLTFLoader();
 
@@ -184,6 +194,7 @@
 				for ( var i = 0; i < count; i ++ ) {
 
 					ages[ i ] = Math.random();
+					scales[ i ] = scaleCurve( ages[ i ] );
 
 					resampleParticle( i );
 
@@ -198,12 +209,12 @@
 
 			function resampleParticle ( i ) {
 
-				sampler.sample( _sPosition, _sNormal );
-				_sNormal.add( _sPosition );
+				sampler.sample( _position, _normal );
+				_normal.add( _position );
 
-				dummy.position.copy( _sPosition );
-				dummy.scale.set( ages[ i ], ages[ i ], ages[ i ] );
-				dummy.lookAt( _sNormal );
+				dummy.position.copy( _position );
+				dummy.scale.set( scales[ i ], scales[ i ], scales[ i ] );
+				dummy.lookAt( _normal );
 				dummy.updateMatrix();
 
 				stemMesh.setMatrixAt( i, dummy.matrix );
@@ -211,13 +222,16 @@
 
 			}
 
-			function updateParticle ( i,  ) {
+			function updateParticle ( i ) {
+
+				// Update lifecycle.
 
 				ages[ i ] += 0.005;
 
 				if ( ages[ i ] >= 1 ) {
 
 					ages[ i ] = 0.001;
+					scales[ i ] = scaleCurve( ages[ i ] );
 
 					resampleParticle( i );
 
@@ -225,13 +239,16 @@
 
 				}
 
-				var scale = Math.abs( easeOutCubic( ( ages[ i ] > 0.5 ? 1 - ages[ i ] : ages[ i ] ) * 2 ) );
+				// Update scale.
+
+				var prevScale = scales[ i ];
+				scales[ i ] = scaleCurve( ages[ i ] );
+				_scale.set( scales[ i ] / prevScale, scales[ i ] / prevScale, scales[ i ] / prevScale );
+
+				// Update transform.
 
 				stemMesh.getMatrixAt( i, dummy.matrix );
-				dummy.matrix.decompose( dummy.position, dummy.quaternion, dummy.scale );
-				dummy.scale.set( scale, scale, scale );
-				dummy.updateMatrix();
-
+				dummy.matrix.scale( _scale );
 				stemMesh.setMatrixAt( i, dummy.matrix );
 				blossomMesh.setMatrixAt( i, dummy.matrix );
 
