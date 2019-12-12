@@ -5,7 +5,6 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { Group } from '../../objects/Group.js';
-import { Matrix4 } from '../../math/Matrix4.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
@@ -368,35 +367,6 @@ function WebXRManager( renderer, gl ) {
 	};
 
 	this.dispose = function () {};
-
-	// DEPRECATED
-
-	this.getStandingMatrix = function () {
-
-		console.warn( 'THREE.WebXRManager: getStandingMatrix() is no longer needed.' );
-		return new Matrix4();
-
-	};
-
-	this.getDevice = function () {
-
-		console.warn( 'THREE.WebXRManager: getDevice() has been deprecated.' );
-
-	};
-
-	this.setDevice = function () {
-
-		console.warn( 'THREE.WebXRManager: setDevice() has been deprecated.' );
-
-	};
-
-	this.setFrameOfReferenceType = function () {
-
-		console.warn( 'THREE.WebXRManager: setFrameOfReferenceType() has been deprecated.' );
-
-	};
-
-	this.submitFrame = function () {};
 
 }
 
