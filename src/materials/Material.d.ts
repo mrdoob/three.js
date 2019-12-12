@@ -126,7 +126,7 @@ export class Material extends EventDispatcher {
 	 * Whether to render the material's color. This can be used in conjunction with a mesh's .renderOrder property to create invisible objects that occlude other objects. Default is true.
 	 */
 	colorWrite: boolean;
-	
+
 	/**
 	 * Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }. 
 	 * The pairs are defined in both vertex and fragment shaders. Default is undefined.
