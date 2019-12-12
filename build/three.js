@@ -24373,8 +24373,6 @@
 
 				}
 
-				xr.submitFrame();
-
 			}
 
 			// _gl.finish();
