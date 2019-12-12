@@ -2593,108 +2593,109 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		return Promise.all( pending ).then( function ( originalMaterials ) {
+		pending.push( parser.loadGeometries( primitives ) );
 
-			return parser.loadGeometries( primitives ).then( function ( geometries ) {
+		return Promise.all( pending ).then( function ( results ) {
 
-				var meshes = [];
+			var materials = results.slice( 0, results.length - 1 );
+			var geometries = results[ results.length - 1 ];
 
-				for ( var i = 0, il = geometries.length; i < il; i ++ ) {
+			var meshes = [];
 
-					var geometry = geometries[ i ];
-					var primitive = primitives[ i ];
+			for ( var i = 0, il = geometries.length; i < il; i ++ ) {
 
-					// 1. create Mesh
+				var geometry = geometries[ i ];
+				var primitive = primitives[ i ];
 
-					var mesh;
+				// 1. create Mesh
 
-					var material = originalMaterials[ i ];
+				var mesh;
 
-					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES ||
-						primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ||
-						primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ||
-						primitive.mode === undefined ) {
+				var material = materials[ i ];
 
-						// .isSkinnedMesh isn't in glTF spec. See .markDefs()
-						mesh = meshDef.isSkinnedMesh === true
-							? new THREE.SkinnedMesh( geometry, material )
-							: new THREE.Mesh( geometry, material );
+				if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLES ||
+					primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ||
+					primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ||
+					primitive.mode === undefined ) {
 
-						if ( mesh.isSkinnedMesh === true && ! mesh.geometry.attributes.skinWeight.normalized ) {
+					// .isSkinnedMesh isn't in glTF spec. See .markDefs()
+					mesh = meshDef.isSkinnedMesh === true
+						? new THREE.SkinnedMesh( geometry, material )
+						: new THREE.Mesh( geometry, material );
 
-							// we normalize floating point skin weight array to fix malformed assets (see #15319)
-							// it's important to skip this for non-float32 data since normalizeSkinWeights assumes non-normalized inputs
-							mesh.normalizeSkinWeights();
+					if ( mesh.isSkinnedMesh === true && ! mesh.geometry.attributes.skinWeight.normalized ) {
 
-						}
-
-						if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
-
-							mesh.geometry = toTrianglesDrawMode( mesh.geometry, THREE.TriangleStripDrawMode );
-
-						} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
-
-							mesh.geometry = toTrianglesDrawMode( mesh.geometry, THREE.TriangleFanDrawMode );
-
-						}
-
-					} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
-
-						mesh = new THREE.LineSegments( geometry, material );
-
-					} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ) {
-
-						mesh = new THREE.Line( geometry, material );
-
-					} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_LOOP ) {
-
-						mesh = new THREE.LineLoop( geometry, material );
-
-					} else if ( primitive.mode === WEBGL_CONSTANTS.POINTS ) {
-
-						mesh = new THREE.Points( geometry, material );
-
-					} else {
-
-						throw new Error( 'THREE.GLTFLoader: Primitive mode unsupported: ' + primitive.mode );
+						// we normalize floating point skin weight array to fix malformed assets (see #15319)
+						// it's important to skip this for non-float32 data since normalizeSkinWeights assumes non-normalized inputs
+						mesh.normalizeSkinWeights();
 
 					}
 
-					if ( Object.keys( mesh.geometry.morphAttributes ).length > 0 ) {
+					if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_STRIP ) {
 
-						updateMorphTargets( mesh, meshDef );
+						mesh.geometry = toTrianglesDrawMode( mesh.geometry, THREE.TriangleStripDrawMode );
+
+					} else if ( primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ) {
+
+						mesh.geometry = toTrianglesDrawMode( mesh.geometry, THREE.TriangleFanDrawMode );
 
 					}
 
-					mesh.name = meshDef.name || ( 'mesh_' + meshIndex );
+				} else if ( primitive.mode === WEBGL_CONSTANTS.LINES ) {
 
-					if ( geometries.length > 1 ) mesh.name += '_' + i;
+					mesh = new THREE.LineSegments( geometry, material );
 
-					assignExtrasToUserData( mesh, meshDef );
+				} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_STRIP ) {
 
-					parser.assignFinalMaterial( mesh );
+					mesh = new THREE.Line( geometry, material );
 
-					meshes.push( mesh );
+				} else if ( primitive.mode === WEBGL_CONSTANTS.LINE_LOOP ) {
 
-				}
+					mesh = new THREE.LineLoop( geometry, material );
 
-				if ( meshes.length === 1 ) {
+				} else if ( primitive.mode === WEBGL_CONSTANTS.POINTS ) {
 
-					return meshes[ 0 ];
+					mesh = new THREE.Points( geometry, material );
 
-				}
+				} else {
 
-				var group = new THREE.Group();
-
-				for ( var i = 0, il = meshes.length; i < il; i ++ ) {
-
-					group.add( meshes[ i ] );
+					throw new Error( 'THREE.GLTFLoader: Primitive mode unsupported: ' + primitive.mode );
 
 				}
 
-				return group;
+				if ( Object.keys( mesh.geometry.morphAttributes ).length > 0 ) {
 
-			} );
+					updateMorphTargets( mesh, meshDef );
+
+				}
+
+				mesh.name = meshDef.name || ( 'mesh_' + meshIndex );
+
+				if ( geometries.length > 1 ) mesh.name += '_' + i;
+
+				assignExtrasToUserData( mesh, meshDef );
+
+				parser.assignFinalMaterial( mesh );
+
+				meshes.push( mesh );
+
+			}
+
+			if ( meshes.length === 1 ) {
+
+				return meshes[ 0 ];
+
+			}
+
+			var group = new THREE.Group();
+
+			for ( var i = 0, il = meshes.length; i < il; i ++ ) {
+
+				group.add( meshes[ i ] );
+
+			}
+
+			return group;
 
 		} );
 
