@@ -21,7 +21,7 @@ var APP = {
 		this.load = function ( json ) {
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.gammaOutput = true;
+			renderer.outputEncoding = THREE.GammaEncoding;
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 

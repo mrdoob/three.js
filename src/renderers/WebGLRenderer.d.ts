@@ -14,7 +14,7 @@ import { WebGLRenderTarget } from './WebGLRenderTarget';
 import { Object3D } from './../core/Object3D';
 import { Material } from './../materials/Material';
 import { Fog } from './../scenes/Fog';
-import { ToneMapping, ShadowMapType, CullFace } from '../constants';
+import { ToneMapping, ShadowMapType, CullFace, TextureEncoding } from '../constants';
 import { WebXRManager } from '../renderers/webxr/WebXRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
 import { Geometry } from './../core/Geometry';
@@ -156,9 +156,9 @@ export class WebGLRenderer implements Renderer {
 	extensions: WebGLExtensions;
 
 	/**
-	 * Default is false.
+	 * Default is LinearEncoding.
 	 */
-	gammaOutput: boolean;
+	outputEncoding: TextureEncoding;
 
 	physicallyCorrectLights: boolean;
 	toneMapping: ToneMapping;

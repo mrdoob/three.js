@@ -11,6 +11,7 @@ import {
 	HalfFloatType,
 	FloatType,
 	UnsignedByteType,
+	LinearEncoding,
 	LinearToneMapping,
 	BackSide
 } from '../constants.js';
@@ -100,7 +101,7 @@ function WebGLRenderer( parameters ) {
 	// physically based shading
 
 	this.gammaFactor = 2.0;	// for backwards compatibility
-	this.gammaOutput = false;
+	this.outputEncoding = LinearEncoding;
 
 	// physical lights
 
@@ -1539,6 +1540,7 @@ function WebGLRenderer( parameters ) {
 			program = programCache.acquireProgram( material, materialProperties.shader, parameters, programCacheKey );
 
 			materialProperties.program = program;
+			materialProperties.outputEncoding = _this.outputEncoding;
 			material.program = program;
 
 		}
@@ -1669,6 +1671,10 @@ function WebGLRenderer( parameters ) {
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
 				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
+
+				material.needsUpdate = true;
+
+			} else if ( materialProperties.outputEncoding !== _this.outputEncoding ) {
 
 				material.needsUpdate = true;
 

@@ -35,6 +35,7 @@
 			import { BleachBypassShader } from './jsm/shaders/BleachBypassShader.js';
 			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
 			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
+			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 
 			var container, stats, loader;
 
@@ -113,7 +114,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-				renderer.gammaOutput = true;
 
 				//
 
@@ -130,10 +130,11 @@
 				var effectBleach = new ShaderPass( BleachBypassShader );
 				var effectColor = new ShaderPass( ColorCorrectionShader );
 				effectFXAA = new ShaderPass( FXAAShader );
+				var gammaCorrection = new ShaderPass( GammaCorrectionShader );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
-				effectBleach.uniforms[ 'opacity' ].value = 0.4;
+				effectBleach.uniforms[ 'opacity' ].value = 0.2;
 
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
@@ -144,6 +145,7 @@
 				composer.addPass( effectFXAA );
 				composer.addPass( effectBleach );
 				composer.addPass( effectColor );
+				composer.addPass( gammaCorrection );
 
 				// EVENTS
 

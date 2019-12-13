@@ -36,6 +36,7 @@
 			import { VerticalBlurShader } from './jsm/shaders/VerticalBlurShader.js';
 			import { SepiaShader } from './jsm/shaders/SepiaShader.js';
 			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
+			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
@@ -118,7 +119,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				renderer.autoClear = false;
-				renderer.gammaOutput = true;
 
 				//
 
@@ -139,6 +139,7 @@
 				var effectBleach = new ShaderPass( shaderBleach );
 				var effectSepia = new ShaderPass( shaderSepia );
 				var effectVignette = new ShaderPass( shaderVignette );
+				var gammaCorrection = new ShaderPass( GammaCorrectionShader );
 				// var effectCopy = new ShaderPass( shaderCopy );
 
 				effectBleach.uniforms[ "opacity" ].value = 0.95;
@@ -206,9 +207,11 @@
 				composer1 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer1.addPass( renderScene );
+				composer1.addPass( gammaCorrection );
 				//composer1.addPass( renderMask );
 				composer1.addPass( effectFilmBW );
 				//composer1.addPass( clearMask );
+
 				composer1.addPass( effectVignette );
 
 				//
@@ -216,6 +219,7 @@
 				composer2 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer2.addPass( renderScene );
+				composer2.addPass( gammaCorrection );
 				composer2.addPass( effectDotScreen );
 				composer2.addPass( renderMask );
 				composer2.addPass( effectColorify1 );
@@ -230,6 +234,7 @@
 				composer3 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer3.addPass( renderScene );
+				composer3.addPass( gammaCorrection );
 				//composer3.addPass( renderMask );
 				composer3.addPass( effectSepia );
 				composer3.addPass( effectFilm );
@@ -241,6 +246,7 @@
 				composer4 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer4.addPass( renderScene );
+				composer4.addPass( gammaCorrection );
 				//composer4.addPass( renderMask );
 				composer4.addPass( effectBloom );
 				composer4.addPass( effectFilm );

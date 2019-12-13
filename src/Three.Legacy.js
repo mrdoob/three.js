@@ -7,6 +7,8 @@ import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
 import {
 	FlatShading,
+	GammaEncoding,
+	LinearEncoding,
 	StaticDrawUsage,
 	DynamicDrawUsage,
 	TrianglesDrawMode
@@ -1727,6 +1729,20 @@ Object.defineProperties( WebGLRenderer.prototype, {
 		set: function () {
 
 			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Please define the correct color spaces for textures via Texture.encoding instead.' );
+
+		}
+	},
+	gammaOutput: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Please use WebGLRenderer.outputEncoding instead.' );
+			return ( this.outputEncoding === GammaEncoding ) ? true : false;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Please use WebGLRenderer.outputEncoding instead.' );
+			this.outputEncoding = ( value === true ) ? GammaEncoding : LinearEncoding;
 
 		}
 	}

@@ -57,7 +57,7 @@
 				envScene.add(mainLight);
 
 				var lightMaterial = new THREE.MeshLambertMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 10 } );
-				
+
 				var light1 = new THREE.Mesh(geometry, lightMaterial);
 				light1.position.set(-5, 2, 0);
 				light1.scale.set(0.1, 1, 1);
@@ -168,7 +168,7 @@
 				container.appendChild( renderer.domElement );
 
 				//renderer.toneMapping = ReinhardToneMapping;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

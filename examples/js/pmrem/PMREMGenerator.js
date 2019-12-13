@@ -261,7 +261,7 @@ THREE.PMREMGenerator = ( function () {
 		var upSign = [ 1, 1, 1, 1, - 1, 1 ];
 		var forwardSign = [ 1, 1, - 1, - 1, - 1, 1 ];
 
-		var gammaOutput = _renderer.gammaOutput;
+		var outputEncoding = _renderer.outputEncoding;
 		var toneMapping = _renderer.toneMapping;
 		var toneMappingExposure = _renderer.toneMappingExposure;
 		var clearColor = _renderer.getClearColor();
@@ -269,7 +269,7 @@ THREE.PMREMGenerator = ( function () {
 
 		_renderer.toneMapping = THREE.LinearToneMapping;
 		_renderer.toneMappingExposure = 1.0;
-		_renderer.gammaOutput = false;
+		_renderer.outputEncoding = THREE.LinearEncoding;
 		scene.scale.z *= - 1;
 
 		var background = scene.background;
@@ -314,7 +314,7 @@ THREE.PMREMGenerator = ( function () {
 
 		_renderer.toneMapping = toneMapping;
 		_renderer.toneMappingExposure = toneMappingExposure;
-		_renderer.gammaOutput = gammaOutput;
+		_renderer.outputEncoding = outputEncoding;
 		_renderer.setClearColor( clearColor, clearAlpha );
 		scene.scale.z *= - 1;
 
@@ -560,8 +560,8 @@ void main() {
         float theta = dTheta * float(dir * i);
         float cosTheta = cos(theta);
         // Rodrigues' axis-angle rotation
-        vec3 sampleDirection = vOutputDirection * cosTheta 
-            + cross(axis, vOutputDirection) * sin(theta) 
+        vec3 sampleDirection = vOutputDirection * cosTheta
+            + cross(axis, vOutputDirection) * sin(theta)
             + axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);
         gl_FragColor.rgb +=
             weights[i] * bilinearCubeUV(envMap, sampleDirection, mipInt);

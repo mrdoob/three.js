@@ -218,7 +218,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.physicallyCorrectLights = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
