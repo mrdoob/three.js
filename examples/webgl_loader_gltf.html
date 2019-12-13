@@ -25,6 +25,7 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer;
@@ -55,6 +56,8 @@
 
 						// model
 
+						var roughnessMipmapper = new RoughnessMipmapper( renderer );
+
 						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
@@ -63,12 +66,15 @@
 								if ( child.isMesh ) {
 
 									child.material.envMap = envMap;
+									roughnessMipmapper.generateMipmaps( child.material );
 
 								}
 
 							} );
 
 							scene.add( gltf.scene );
+
+							roughnessMipmapper.dispose();
 
 						} );
 
