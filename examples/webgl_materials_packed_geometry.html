@@ -31,8 +31,10 @@
 
 		var data = {
 			flatShading: false,
+			wireframe: false, 
 			basicEncode: false,
 			octEncode: false, 
+			defaultEncode: false, 
 			quantizePosition: false
 		};
 
@@ -72,16 +74,19 @@
 			lights[2] = new THREE.PointLight(0xffffff, 1, 0);
 
 			lights[0].position.set(0, 2 * radius, 0);
-			lights[1].position.set(radius, 2 * radius, radius);
-			lights[2].position.set(- radius, - 2 * radius, - radius);
+			lights[1].position.set(2 * radius, - 2 * radius, 2 * radius);
+			lights[2].position.set(- 2 * radius, - 2 * radius, - 2 * radius);
 
 			scene.add(lights[0]);
 			scene.add(lights[1]);
 			scene.add(lights[2]);
 
 			//
+			scene.add(new THREE.AxesHelper(radius * 5));
 
-			var lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
+			//
+
+			var lineMaterial = new THREE.LineBasicMaterial({ color: 0x999999, transparent: true, opacity: 0.5 });
 			var meshMaterial = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
 
 			var texture = new THREE.TextureLoader().load("textures/disturb.jpg");
@@ -98,6 +103,7 @@
 
 			var ballMesh = new THREE.Mesh(ballGeom, meshMaterial);
 			var ballLineSegments = new THREE.LineSegments(ballGeom, lineMaterial);
+			ballLineSegments.visible = data.wireframe;
 
 			scene.add(ballLineSegments);
 			scene.add(ballMesh);
@@ -116,11 +122,17 @@
 				ballMesh.material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
 			}
 
+			function updateLineSegments(){
+				ballLineSegments.visible = data.wireframe;
+			}
+
 			var folder = gui.addFolder('THREE.IcosahedronBufferGeometry');
 			folder.open();
 			folder.add(data, 'flatShading', false).onChange(updateMaterial);
+			folder.add(data, 'wireframe', false).onChange(updateLineSegments);
 			folder.add(data, 'basicEncode', false).onChange(generateGeometry);
 			folder.add(data, 'octEncode', false).onChange(generateGeometry);
+			folder.add(data, 'defaultEncode', false).onChange(generateGeometry);
 			folder.add(data, 'quantizePosition', false).onChange(generateGeometry);
 
 			scene.add(ballMesh);
@@ -188,6 +200,8 @@
 				method = "BASIC";
 			} else if (data.octEncode) {
 				method = "OCT";
+			} else if (data.defaultEncode) {
+				method = "DEFAULT";
 			}
 
 			if (method != "") {

@@ -36,38 +36,74 @@ var GeometryPackingUtils = {
 
                 let encoded;
 
-                encoded = uInt16Encode(array[idx], array[idx + 1], array[idx + 2]);
+                encoded = GeometryEncodingUtils.uInt16Encode(array[idx], array[idx + 1], array[idx + 2]);
 
                 result[idx / 3 * 2 + 0] = encoded[0];
                 result[idx / 3 * 2 + 1] = encoded[1];
 
             }
+
+            mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
 
         } else if (encodeMethod == "OCT") {
 
             result = new Int8Array(count * 2);
 
-            var oct, dec, best, currentCos, bestCos;
-
             for (let idx = 0; idx < array.length; idx += 3) {
 
                 let encoded;
 
-                encoded = octEncodeBest(array[idx], array[idx + 1], array[idx + 2]);
+                encoded = GeometryEncodingUtils.octEncodeBest(array[idx], array[idx + 1], array[idx + 2]);
+
+                let x = encoded[0] / (encoded[0] < 0 ? 128 : 127)
+                let y = encoded[1] / (encoded[1] < 0 ? 128 : 127)
+
+                if ( Math.abs(array[idx + 2]) == 0 ){
+                    console.log([ array[idx], array[idx + 1], array[idx + 2] ], encoded, 
+                        x, 
+                        y,
+                        1-Math.abs(x)-Math.abs(y), 
+                        (1-Math.abs(x)-Math.abs(y))*127, 
+                    )
+                }
 
                 result[idx / 3 * 2 + 0] = encoded[0];
                 result[idx / 3 * 2 + 1] = encoded[1];
 
             }
+
+            mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
+
+        } else if (encodeMethod == "DEFAULT") {
+
+            result = new Uint8Array(count * 3);
+
+            for (let idx = 0; idx < array.length; idx += 3) {
+
+                let encoded;
+
+                encoded = GeometryEncodingUtils.defaultEncode(array[idx], array[idx + 1], array[idx + 2]);
+
+                let decoded = GeometryEncodingUtils.defaultDecode(encoded);
+
+                let angle = Math.acos(Math.min(array[idx] * decoded[0] + array[idx + 1]  * decoded[1] + array[idx + 2] * decoded[2], 1.0)) * 180 / Math.PI;
+
+                Math.abs(array[idx + 2]) < 0.05 && console.log([array[idx], array[idx + 1], array[idx + 2]], encoded, decoded, angle)
+
+
+                result[idx + 0] = encoded[0];
+                result[idx + 1] = encoded[1];
+                result[idx + 2] = encoded[2];
+
+            }
+
+            mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 3, true));
 
         } else {
 
             console.error("Unrecognized encoding method, should be `BASIC` or `OCT`. ");
 
         }
-
-
-        mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
 
         mesh.geometry.attributes.normal.needsUpdate = true;
         mesh.geometry.attributes.normal.isPacked = true;
@@ -84,116 +120,10 @@ var GeometryPackingUtils = {
         if (encodeMethod == "OCT") {
             mesh.material.defines.USE_PACKED_NORMAL = 1;
         }
-
-
-        /**
-         * 
-         * Encoding functions: Basic, OCT
-         * 
-         */
-
-        // for `Basic` encoding
-        function uInt16Encode(x, y, z) {
-            let normal0 = parseInt(0.5 * (1.0 + Math.atan2(y, x) / Math.PI) * 65535);
-            let normal1 = parseInt(0.5 * (1.0 + z) * 65535);
-            return new Uint16Array([normal0, normal1]);
+        if (encodeMethod == "DEFAULT") {
+            mesh.material.defines.USE_PACKED_NORMAL = 2;
         }
 
-        // for `OCT` encoding
-        function octEncodeBest(x, y, z) {
-            // Test various combinations of ceil and floor
-            // to minimize rounding errors
-            best = oct = octEncodeVec3(x, y, z, "floor", "floor");
-            dec = octDecodeVec2(oct);
-            currentCos = bestCos = dot(x, y, z, dec);
-
-            oct = octEncodeVec3(x, y, z, "ceil", "floor");
-            dec = octDecodeVec2(oct);
-            currentCos = dot(x, y, z, dec);
-
-            if (currentCos > bestCos) {
-                best = oct;
-                bestCos = currentCos;
-            }
-
-            oct = octEncodeVec3(x, y, z, "floor", "ceil");
-            dec = octDecodeVec2(oct);
-            currentCos = dot(x, y, z, dec);
-
-            if (currentCos > bestCos) {
-                best = oct;
-                bestCos = currentCos;
-            }
-
-            oct = octEncodeVec3(x, y, z, "ceil", "ceil");
-            dec = octDecodeVec2(oct);
-            currentCos = dot(x, y, z, dec);
-
-            if (currentCos > bestCos) {
-                best = oct;
-                bestCos = currentCos;
-            }
-
-            var angle = Math.acos(bestCos) * 180 / Math.PI;
-
-            if (angle > 10){
-                console.log(angle)
-                oct = octEncodeVec3(x, y, z, "floor", "floor"); dec = octDecodeVec2(oct);
-                console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "floor", "floor")))
-                console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "ceil", "floor")))
-                console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "floor", "ceil")))
-                console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "ceil", "ceil")))
-
-            }
-
-            return best;
-        }
-
-        function octEncodeVec3(x, y, z, xfunc, yfunc) {
-            var x = x / (Math.abs(x) + Math.abs(y) + Math.abs(z));
-            var y = y / (Math.abs(x) + Math.abs(y) + Math.abs(z));
-
-            if (z < 0) {
-                var tempx = x;
-                var tempy = y;
-                tempx = (1 - Math.abs(y)) * (x >= 0 ? 1 : -1);
-                tempy = (1 - Math.abs(x)) * (y >= 0 ? 1 : -1);
-                x = tempx;
-                y = tempy;
-            }
-
-            return new Int8Array([
-                Math[xfunc](x * 127.5 + (x < 0 ? 1 : 0)),
-                Math[yfunc](y * 127.5 + (y < 0 ? 1 : 0))
-            ]);
-        }
-
-        function octDecodeVec2(oct) {
-            var x = oct[0];
-            var y = oct[1];
-            x /= x < 0 ? 127 : 128;
-            y /= y < 0 ? 127 : 128;
-
-            var z = 1 - Math.abs(x) - Math.abs(y);
-
-            if (z < 0) {
-                var tmpx = x;
-                x = (1 - Math.abs(y)) * (x >= 0 ? 1 : -1);
-                y = (1 - Math.abs(tmpx)) * (y >= 0 ? 1 : -1);
-            }
-
-            var length = Math.sqrt(x * x + y * y + z * z);
-
-            return [
-                x / length,
-                y / length,
-                z / length
-            ];
-        }
-
-        function dot(x, y, z, vec3) {
-            return x * vec3[0] + y * vec3[1] + z * vec3[2];
-        }
     },
 
 
@@ -279,41 +209,153 @@ var GeometryPackingUtils = {
         mesh.material.uniforms.quantizeMat.value = decodeMat4;
         mesh.material.uniforms.quantizeMat.needsUpdate = true;
 
-    },
-
-
-    changeShaderChunk: function () {
-
-        THREE.ShaderChunk.beginnormal_vertex = `
-
-        vec3 objectNormal = vec3( normal );
-        #ifdef USE_TANGENT
-            vec3 objectTangent = vec3( tangent.xyz );
-        #endif
-
-        #ifdef USE_PACKED_NORMAL
-            #ifdef USE_PACKED_NORMAL == 0  // basicEncode
-                float x = objectNormal.x * 2.0 - 1.0;
-                float y = objectNormal.y * 2.0 - 1.0;
-                vec2 scth = vec2(sin(x * PI), cos(x * PI));
-                vec2 scphi = vec2(sqrt(1.0 - y * y), y); 
-                objectNormal = normalize( vec3(scth.y * scphi.x, scth.x * scphi.x, scphi.y) );
-            #endif
-
-            #ifdef USE_PACKED_NORMAL == 1  // octEncode
-                vec3 v = vec3(objectNormal.xy, 1.0 - abs(objectNormal.x) - abs(objectNormal.y));
-                if (v.z < 0.0) 
-                {
-                    v.xy = (1.0 - abs(v.yx)) * vec2((v.x >= 0.0) ? +1.0 : -1.0, (v.y >= 0.0) ? +1.0 : -1.0);
-                }
-                objectNormal = normalize(v);
-            #endif
-        #endif
-        
-        `;
     }
 
 };
+
+
+/**
+ * 
+ * Encoding functions: Default, Basic, OCT
+ * 
+ */
+var GeometryEncodingUtils = {
+
+    defaultEncode: function (x, y, z) {
+        let tmpx = parseInt((x + 1) * 0.5 * 255);
+        let tmpy = parseInt((y + 1) * 0.5 * 255);
+        let tmpz = parseInt((z + 1) * 0.5 * 255);
+        return new Uint8Array([tmpx, tmpy, tmpz]);
+    },
+
+    defaultDecode: function (array) {
+        return [
+            ((array[0] / 255) * 2.0) - 1.0,
+            ((array[1] / 255) * 2.0) - 1.0,
+            ((array[2] / 255) * 2.0) - 1.0,
+        ]
+    },
+
+    // for `Basic` encoding
+    uInt16Encode: function (x, y, z) {
+        let normal0 = parseInt(0.5 * (1.0 + Math.atan2(y, x) / Math.PI) * 65535);
+        let normal1 = parseInt(0.5 * (1.0 + z) * 65535);
+        return new Uint16Array([normal0, normal1]);
+    },
+
+    // for `OCT` encoding
+    octEncodeBest: function (x, y, z) {
+        var oct, dec, best, currentCos, bestCos;
+
+        // Test various combinations of ceil and floor
+        // to minimize rounding errors
+        best = oct = octEncodeVec3(x, y, z, "floor", "floor");
+        dec = octDecodeVec2(oct);
+        currentCos = bestCos = dot(x, y, z, dec);
+
+        oct = octEncodeVec3(x, y, z, "ceil", "floor");
+        dec = octDecodeVec2(oct);
+        currentCos = dot(x, y, z, dec);
+
+        if (currentCos > bestCos) {
+            best = oct;
+            bestCos = currentCos;
+        }
+
+        oct = octEncodeVec3(x, y, z, "floor", "ceil");
+        dec = octDecodeVec2(oct);
+        currentCos = dot(x, y, z, dec);
+
+        if (currentCos > bestCos) {
+            best = oct;
+            bestCos = currentCos;
+        }
+
+        oct = octEncodeVec3(x, y, z, "ceil", "ceil");
+        dec = octDecodeVec2(oct);
+        currentCos = dot(x, y, z, dec);
+
+        if (currentCos > bestCos) {
+            best = oct;
+            bestCos = currentCos;
+        }
+
+        var angle = Math.acos(bestCos) * 180 / Math.PI;
+
+        // if (Math.abs(z) < 0.05) {
+        //     console.log(angle)
+        //     console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "floor", "floor")))
+        //     console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "ceil", "floor")))
+        //     console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "floor", "ceil")))
+        //     console.log([x, y, z], octDecodeVec2(octEncodeVec3(x, y, z, "ceil", "ceil")))
+        // }
+
+        return best;
+
+        function octEncodeVec3(x, y, z, xfunc, yfunc) {
+            var x = x / (Math.abs(x) + Math.abs(y) + Math.abs(z));
+            var y = y / (Math.abs(x) + Math.abs(y) + Math.abs(z));
+
+            if (z < 0) {
+                var tempx = x;
+                var tempy = y;
+                tempx = (1 - Math.abs(y)) * (x >= 0 ? 1 : -1);
+                tempy = (1 - Math.abs(x)) * (y >= 0 ? 1 : -1);
+                x = tempx;
+                y = tempy;
+
+                var diff = 1-Math.abs(x)-Math.abs(y);
+                if (diff > 0){
+                    diff += 0.001
+                    x += x > 0 ? diff / 2 : -diff / 2;
+                    y += y > 0 ? diff / 2 : -diff / 2;
+                }
+
+                console.log("z < 0", `z:${z}`, 1-Math.abs(x)-Math.abs(y))
+            }
+
+            return new Int8Array([
+                Math[xfunc](x * 127.5 + (x < 0 ? 1 : 0)),
+                Math[yfunc](y * 127.5 + (y < 0 ? 1 : 0))
+            ]);
+
+            // return new Int8Array([
+            //     parseInt(x * 127.5 + (x < 0 ? 1 : 0)),
+            //     parseInt(y * 127.5 + (y < 0 ? 1 : 0))
+            // ]);
+        }
+
+        function octDecodeVec2(oct) {
+            var x = oct[0];
+            var y = oct[1];
+            x /= x < 0 ? 127 : 128;
+            y /= y < 0 ? 127 : 128;
+
+            var z = 1 - Math.abs(x) - Math.abs(y);
+
+            if (z < 0) {
+                var tmpx = x;
+                x = (1 - Math.abs(y)) * (x >= 0 ? 1 : -1);
+                y = (1 - Math.abs(tmpx)) * (y >= 0 ? 1 : -1);
+            }
+
+            var length = Math.sqrt(x * x + y * y + z * z);
+
+            return [
+                x / length,
+                y / length,
+                z / length
+            ];
+        }
+
+        function dot(x, y, z, vec3) {
+            return x * vec3[0] + y * vec3[1] + z * vec3[2];
+        }
+    }
+
+};
+
+
 
 /**
  * PackedPhongMaterial inherited from THREE.MeshPhongMaterial
@@ -376,13 +418,21 @@ var PackedPhongShader = {
 
             vec3 octDecode(vec3 packedNormal)
             { 
+                // packedNormal = packedNormal / 127.0;
+
                 vec3 v = vec3(packedNormal.xy, 1.0 - abs(packedNormal.x) - abs(packedNormal.y));
                 if (v.z < 0.0) 
                 {
                     v.xy = (1.0 - abs(v.yx)) * vec2((v.x >= 0.0) ? +1.0 : -1.0, (v.y >= 0.0) ? +1.0 : -1.0);
                 }
                 return normalize(v);
-            } 
+            }
+
+            vec3 defaultDecode(vec3 packedNormal)
+            {
+                vec3 v = (packedNormal * 2.0) - 1.0;
+                return normalize(v);
+            }
         #endif`,
 
         `#ifdef USE_PACKED_POSITION
@@ -405,6 +455,10 @@ var PackedPhongShader = {
 
             #if USE_PACKED_NORMAL == 1
                 objectNormal = octDecode(objectNormal);
+            #endif
+
+            #if USE_PACKED_NORMAL == 2
+                objectNormal = defaultDecode(objectNormal);
             #endif
         #endif
 
