@@ -56,7 +56,6 @@ THREE.CSS3DRenderer = function () {
 
 	var domElement = document.createElement( 'div' );
 	domElement.style.overflow = 'hidden';
-	domElement.style.pointerEvents = 'none';
 
 	this.domElement = domElement;
 
@@ -64,6 +63,7 @@ THREE.CSS3DRenderer = function () {
 
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
+	cameraElement.style.pointerEvents = 'none';
 
 	domElement.appendChild( cameraElement );
 
