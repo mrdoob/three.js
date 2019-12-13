@@ -11,7 +11,13 @@
 		<div id="container">
 			<div id="info">
 				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-				PMREM directional light test <a href="https://github.com/elalish" target="_blank" rel="noopener">Emmett Lalish</a>
+                PMREM directional light test <a href="https://github.com/elalish" target="_blank" rel="noopener">Emmett Lalish</a>
+                <br>Top row is white metal
+                <br>Middle row is white dielectric
+                <br>Last row is black dielectric.
+                <br>Mouse-out is a standard Directional Light.
+                <br>Mouse-over is a PMREM of the skybox: a single bright pixel representing the same directional light source.
+                <br>The difference between these renders indicates the error in the PMREM approximations.
 			</div>
 		</div>
 
@@ -37,6 +43,7 @@
 				renderer.setSize( width, height );
                 renderer.setPixelRatio( window.devicePixelRatio );
                 renderer.gammaOutput = true;
+                renderer.physicallyCorrectLights = true;
 				document.body.appendChild( renderer.domElement );
 
                 window.addEventListener( 'resize', onResize, false );
@@ -60,12 +67,14 @@
                 var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
                 var x = 597;
                 var y = 213;
-                var theta = (x + 0.5) * Math.PI / 512;
-                var phi = (y + 0.5) * Math.PI / 512;
+                var theta = ( x + 0.5 ) * Math.PI / 512;
+                var phi = ( y + 0.5 ) * Math.PI / 512;
+
                 directionalLight.position.set(
-                    -Math.sin(phi) * Math.cos(theta),
-                    Math.cos(phi),
-                    -Math.sin(phi) * Math.sin(theta));
+                    - Math.sin( phi ) * Math.cos( theta ),
+                    Math.cos( phi ),
+                    - Math.sin( phi ) * Math.sin( theta ) );
+
                 scene.add( directionalLight );
 
 				document.body.addEventListener( 'mouseover', function () {
@@ -106,7 +115,7 @@
                 new RGBELoader()
                     .setDataType( THREE.UnsignedByteType )
                     .setPath( 'textures/equirectangular/' )
-                    .load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
+                    .load( 'spot1Lux.hdr', function ( texture ) {
 
                         var pmremGenerator = new PMREMGenerator( renderer );
                         radianceMap = pmremGenerator.fromEquirectangular( texture ).texture;
