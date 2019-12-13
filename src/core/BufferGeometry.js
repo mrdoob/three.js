@@ -129,7 +129,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( position !== undefined ) {
 
-			matrix.applyToBufferAttribute( position );
+			position.applyMatrix4( matrix );
+
 			position.needsUpdate = true;
 
 		}
