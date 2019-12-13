@@ -9980,7 +9980,8 @@
 
 			if ( position !== undefined ) {
 
-				matrix.applyToBufferAttribute( position );
+				position.applyMatrix4( matrix );
+
 				position.needsUpdate = true;
 
 			}
@@ -18428,7 +18429,7 @@
 
 		}
 
-		function getTextureEncodingFromMap( map, gammaOverrideLinear ) {
+		function getTextureEncodingFromMap( map ) {
 
 			var encoding;
 
@@ -18444,13 +18445,6 @@
 
 				console.warn( "THREE.WebGLPrograms.getTextureEncodingFromMap: don't use render targets as textures. Use their .texture property instead." );
 				encoding = map.texture.encoding;
-
-			}
-
-			// add backwards compatibility for WebGLRenderer.gammaInput/gammaOutput parameter, should probably be removed at some point.
-			if ( encoding === LinearEncoding && gammaOverrideLinear ) {
-
-				encoding = GammaEncoding;
 
 			}
 
@@ -18494,7 +18488,7 @@
 
 				supportsVertexTextures: vertexTextures,
 				numMultiviewViews: numMultiviewViews,
-				outputEncoding: getTextureEncodingFromMap( ( ! currentRenderTarget ) ? null : currentRenderTarget.texture, renderer.gammaOutput ),
+				outputEncoding: ( currentRenderTarget !== null ) ? getTextureEncodingFromMap( currentRenderTarget.texture ) : renderer.outputEncoding,
 				map: !! material.map,
 				mapEncoding: getTextureEncodingFromMap( material.map ),
 				matcap: !! material.matcap,
@@ -18617,7 +18611,7 @@
 
 			array.push( material.onBeforeCompile.toString() );
 
-			array.push( renderer.gammaOutput );
+			array.push( renderer.outputEncoding );
 
 			array.push( renderer.gammaFactor );
 
@@ -23150,7 +23144,7 @@
 
 			}
 
-			if ( onAnimationFrameCallback ) { onAnimationFrameCallback( time ); }
+			if ( onAnimationFrameCallback ) { onAnimationFrameCallback( time, frame ); }
 
 		}
 
@@ -23229,7 +23223,7 @@
 		// physically based shading
 
 		this.gammaFactor = 2.0;	// for backwards compatibility
-		this.gammaOutput = false;
+		this.outputEncoding = LinearEncoding;
 
 		// physical lights
 
@@ -24668,6 +24662,7 @@
 				program = programCache.acquireProgram( material, materialProperties.shader, parameters, programCacheKey );
 
 				materialProperties.program = program;
+				materialProperties.outputEncoding = _this.outputEncoding;
 				material.program = program;
 
 			}
@@ -24798,6 +24793,10 @@
 				} else if ( materialProperties.numClippingPlanes !== undefined &&
 					( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
 					materialProperties.numIntersection !== _clipping.numIntersection ) ) {
+
+					material.needsUpdate = true;
+
+				} else if ( materialProperties.outputEncoding !== _this.outputEncoding ) {
 
 					material.needsUpdate = true;
 
@@ -49294,6 +49293,20 @@
 			set: function () {
 
 				console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Please define the correct color spaces for textures via Texture.encoding instead.' );
+
+			}
+		},
+		gammaOutput: {
+			get: function () {
+
+				console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Please use WebGLRenderer.outputEncoding instead.' );
+				return ( this.outputEncoding === GammaEncoding ) ? true : false;
+
+			},
+			set: function ( value ) {
+
+				console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Please use WebGLRenderer.outputEncoding instead.' );
+				this.outputEncoding = ( value === true ) ? GammaEncoding : LinearEncoding;
 
 			}
 		}
