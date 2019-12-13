@@ -190,6 +190,10 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
 
+		// dipsose full screen quad
+
+		this.fsQuad.dispose();
+
 	},
 
 	render: function ( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
