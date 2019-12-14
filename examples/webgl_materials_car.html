@@ -73,7 +73,7 @@
 						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
 
-						scene.background = envMap;
+						scene.background = new THREE.CubeTextureBackground( envMap );
 
 						//
 
@@ -125,16 +125,6 @@
 				loader.load( 'models/gltf/ferrari.glb', function ( gltf ) {
 
 					carModel = gltf.scene.children[ 0 ];
-
-					carModel.traverse( function ( child ) {
-
-						if ( child.isMesh ) {
-
-							child.material.envMap = envMap;
-
-						}
-
-					} );
 
 					// shadow
 					var texture = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );

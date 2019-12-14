@@ -52,7 +52,7 @@
 						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
 
-						scene.background = envMap;
+						scene.background = new THREE.CubeTextureBackground( envMap );
 
 						// model
 
@@ -65,7 +65,6 @@
 
 								if ( child.isMesh ) {
 
-									child.material.envMap = envMap;
 									roughnessMipmapper.generateMipmaps( child.material );
 
 								}

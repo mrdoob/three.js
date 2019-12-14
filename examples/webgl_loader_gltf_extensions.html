@@ -30,7 +30,7 @@
 
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
-			var gltf, background, envMap, mixer, gui, extensionControls;
+			var gltf, envMap, mixer, gui, extensionControls;
 
 			var clock = new THREE.Clock();
 
@@ -160,8 +160,6 @@
 						var pmremGenerator = new PMREMGenerator( renderer );
 						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
-
-						background = envMap;
 
 						//
 
@@ -317,19 +315,7 @@
 
 					if ( sceneInfo.addEnvMap ) {
 
-						object.traverse( function ( node ) {
-
-							if ( node.material && ( node.material.isMeshStandardMaterial ||
-								 ( node.material.isShaderMaterial && node.material.envMap !== undefined ) ) ) {
-
-								node.material.envMap = envMap;
-								node.material.envMapIntensity = 1.5; // boombox seems too dark otherwise
-
-							}
-
-						} );
-
-						scene.background = background;
+						scene.background = new THREE.CubeTextureBackground( envMap );
 
 					}
 
