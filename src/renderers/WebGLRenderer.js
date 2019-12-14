@@ -1965,10 +1965,6 @@ function WebGLRenderer( parameters ) {
 				m_uniforms.color.value.copy( material.color );
 				m_uniforms.opacity.value = material.opacity;
 
-			} else if ( material.envMap ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-
 			}
 
 			// RectAreaLight Texture
