@@ -81,8 +81,8 @@ export default QUnit.module( 'Exporters', () => {
 				assert.smartEqual( {
 
 					baseColorFactor: [ 1, 0, 0, 1 ],
-					metallicFactor: 0.5,
-					roughnessFactor: 0.5
+					metallicFactor: 0.0,
+					roughnessFactor: 1.0
 
 				}, material.pbrMetallicRoughness, 'material' );
 
