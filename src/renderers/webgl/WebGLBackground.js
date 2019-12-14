@@ -23,6 +23,79 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 	var currentBackground = null;
 	var currentBackgroundVersion = 0;
 
+	function createBoxMesh() {
+
+		boxMesh = new Mesh(
+			new BoxBufferGeometry( 1, 1, 1 ),
+			new ShaderMaterial( {
+				type: 'BackgroundCubeMaterial',
+				uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
+				vertexShader: ShaderLib.cube.vertexShader,
+				fragmentShader: ShaderLib.cube.fragmentShader,
+				side: BackSide,
+				depthTest: false,
+				depthWrite: false,
+				fog: false
+			} )
+		);
+
+		boxMesh.geometry.deleteAttribute( 'normal' );
+		boxMesh.geometry.deleteAttribute( 'uv' );
+
+		boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
+
+			this.matrixWorld.copyPosition( camera.matrixWorld );
+
+		};
+
+		// enable code injection for non-built-in material
+		Object.defineProperty( boxMesh.material, 'envMap', {
+
+			get: function () {
+
+				return this.uniforms.envMap.value;
+
+			}
+
+		} );
+
+		objects.update( boxMesh );
+
+	}
+
+	function createPlaneMesh() {
+
+		planeMesh = new Mesh(
+			new PlaneBufferGeometry( 2, 2 ),
+			new ShaderMaterial( {
+				type: 'BackgroundMaterial',
+				uniforms: cloneUniforms( ShaderLib.background.uniforms ),
+				vertexShader: ShaderLib.background.vertexShader,
+				fragmentShader: ShaderLib.background.fragmentShader,
+				side: FrontSide,
+				depthTest: false,
+				depthWrite: false,
+				fog: false
+			} )
+		);
+
+		planeMesh.geometry.deleteAttribute( 'normal' );
+
+		// enable code injection for non-built-in material
+		Object.defineProperty( planeMesh.material, 'map', {
+
+			get: function () {
+
+				return this.uniforms.t2D.value;
+
+			}
+
+		} );
+
+		objects.update( planeMesh );
+
+	}
+
 	function render( renderList, scene, camera, forceClear ) {
 
 		var background = scene.background;
@@ -60,55 +133,20 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.isWebGLRenderTargetCube || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background === null ) {
 
-			if ( boxMesh === undefined ) {
+			return;
 
-				boxMesh = new Mesh(
-					new BoxBufferGeometry( 1, 1, 1 ),
-					new ShaderMaterial( {
-						type: 'BackgroundCubeMaterial',
-						uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
-						vertexShader: ShaderLib.cube.vertexShader,
-						fragmentShader: ShaderLib.cube.fragmentShader,
-						side: BackSide,
-						depthTest: false,
-						depthWrite: false,
-						fog: false
-					} )
-				);
+		} else if ( background.isCubeTextureBackground ) {
 
-				boxMesh.geometry.deleteAttribute( 'normal' );
-				boxMesh.geometry.deleteAttribute( 'uv' );
+			if ( boxMesh === undefined ) createBoxMesh();
 
-				boxMesh.onBeforeRender = function ( renderer, scene, camera ) {
-
-					this.matrixWorld.copyPosition( camera.matrixWorld );
-
-				};
-
-				// enable code injection for non-built-in material
-				Object.defineProperty( boxMesh.material, 'envMap', {
-
-					get: function () {
-
-						return this.uniforms.envMap.value;
-
-					}
-
-				} );
-
-				objects.update( boxMesh );
-
-			}
-
-			var texture = background.isWebGLRenderTargetCube ? background.texture : background;
+			var texture = background.texture;
 
 			boxMesh.material.uniforms.envMap.value = texture;
 			boxMesh.material.uniforms.flipEnvMap.value = texture.isCubeTexture ? - 1 : 1;
 
-			if ( currentBackground !== background ||
-			     currentBackgroundVersion !== texture.version ) {
+			if ( currentBackground !== background || currentBackgroundVersion !== texture.version ) {
 
 				boxMesh.material.needsUpdate = true;
 
@@ -120,40 +158,32 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 			// push to the pre-sorted opaque render list
 			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null );
 
-		} else if ( background && background.isTexture ) {
+		} else if ( background.isCubeTexture || background.isWebGLRenderTargetCube || background.mapping === CubeUVReflectionMapping ) {
 
-			if ( planeMesh === undefined ) {
+			// Deprecated
 
-				planeMesh = new Mesh(
-					new PlaneBufferGeometry( 2, 2 ),
-					new ShaderMaterial( {
-						type: 'BackgroundMaterial',
-						uniforms: cloneUniforms( ShaderLib.background.uniforms ),
-						vertexShader: ShaderLib.background.vertexShader,
-						fragmentShader: ShaderLib.background.fragmentShader,
-						side: FrontSide,
-						depthTest: false,
-						depthWrite: false,
-						fog: false
-					} )
-				);
+			if ( boxMesh === undefined ) createBoxMesh();
 
-				planeMesh.geometry.deleteAttribute( 'normal' );
+			var texture = background.isWebGLRenderTargetCube ? background.texture : background;
 
-				// enable code injection for non-built-in material
-				Object.defineProperty( planeMesh.material, 'map', {
+			boxMesh.material.uniforms.envMap.value = texture;
+			boxMesh.material.uniforms.flipEnvMap.value = texture.isCubeTexture ? - 1 : 1;
 
-					get: function () {
+			if ( currentBackground !== background || currentBackgroundVersion !== texture.version ) {
 
-						return this.uniforms.t2D.value;
+				boxMesh.material.needsUpdate = true;
 
-					}
-
-				} );
-
-				objects.update( planeMesh );
+				currentBackground = background;
+				currentBackgroundVersion = texture.version;
 
 			}
+
+			// push to the pre-sorted opaque render list
+			renderList.unshift( boxMesh, boxMesh.geometry, boxMesh.material, 0, 0, null );
+
+		} else if ( background.isTexture ) {
+
+			if ( planeMesh === undefined ) createPlaneMesh();
 
 			planeMesh.material.uniforms.t2D.value = background;
 
@@ -165,8 +195,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			planeMesh.material.uniforms.uvTransform.value.copy( background.matrix );
 
-			if ( currentBackground !== background ||
-				   currentBackgroundVersion !== background.version ) {
+			if ( currentBackground !== background || currentBackgroundVersion !== background.version ) {
 
 				planeMesh.material.needsUpdate = true;
 
