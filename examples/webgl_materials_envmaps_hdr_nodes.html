@@ -1,35 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - node material - hdr environment mapping</title>
+		<title>threejs webgl - materials - hdr environment mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-
-				margin: 0px;
-				overflow: hidden;
-			}
-			a { color: #00f }
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
-			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
+			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
+		</div>
 
 		<script type="module">
 
@@ -41,6 +24,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
+
 			import { MeshStandardNodeMaterial } from './jsm/nodes/Nodes.js';
 
 			var params = {
@@ -50,17 +34,52 @@
 				exposure: 1.0,
 				nodes: true,
 				animate: true,
-				debug: false,
+				debug: false
 			};
 
 			var container, stats;
 			var camera, scene, renderer, controls;
 			var torusMesh, torusMeshNode, planeMesh;
-			var ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
+			var generatedCubeRenderTarget, ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
 			var ldrCubeMap, hdrCubeMap, rgbmCubeMap;
 
 			init();
 			animate();
+
+			function getEnvScene() {
+
+				var envScene = new THREE.Scene();
+
+				var geometry = new THREE.BoxBufferGeometry();
+    			geometry.deleteAttribute('uv');
+    			var roomMaterial = new THREE.MeshStandardMaterial({metalness: 0, side: THREE.BackSide});
+				var room = new THREE.Mesh(geometry, roomMaterial);
+				room.scale.setScalar(10);
+				envScene.add(room);
+
+				var mainLight = new THREE.PointLight(0xffffff, 50, 0, 2);
+				envScene.add(mainLight);
+
+				var lightMaterial = new THREE.MeshLambertMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 10 } );
+
+				var light1 = new THREE.Mesh(geometry, lightMaterial);
+				light1.position.set(-5, 2, 0);
+				light1.scale.set(0.1, 1, 1);
+				envScene.add(light1);
+
+				var light2 = new THREE.Mesh(geometry, lightMaterial);
+				light2.position.set(0, 5, 0);
+				light2.scale.set(1, 0.1, 1);
+				envScene.add(light2);
+
+				var light2 = new THREE.Mesh(geometry, lightMaterial);
+				light2.position.set(2, 1, 5);
+				light2.scale.set(1.5, 2, 0.1);
+				envScene.add(light2);
+
+				return envScene;
+
+			}
 
 			function init() {
 
@@ -74,6 +93,7 @@
 				scene.background = new THREE.Color( 0x000000 );
 
 				renderer = new THREE.WebGLRenderer();
+				renderer.physicallyCorrectLights = true;
 				renderer.toneMapping = THREE.LinearToneMapping;
 
 				//
@@ -97,7 +117,10 @@
 				torusMeshNode = new THREE.Mesh( geometry, material );
 				scene.add( torusMeshNode );
 
-				planeMesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 200, 200 ), new THREE.MeshBasicMaterial() );
+				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var material = new THREE.MeshBasicMaterial();
+
+				planeMesh = new THREE.Mesh( geometry, material );
 				planeMesh.position.y = - 50;
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
@@ -108,6 +131,9 @@
 					pmremGenerator.dispose();
 
 				}
+
+				var envScene = getEnvScene();
+				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
@@ -153,7 +179,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				//renderer.toneMapping = THREE.ReinhardToneMapping;
+				//renderer.toneMapping = ReinhardToneMapping;
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
@@ -167,7 +193,7 @@
 
 				var gui = new GUI();
 
-				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
+				gui.add( params, 'envMap', [ 'Generated', 'LDR', 'HDR', 'RGBM16' ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
 				gui.add( params, 'exposure', 0, 2, 0.01 );
@@ -202,19 +228,23 @@
 
 			function render() {
 
+				torusMesh.visible = ! params.nodes;
+				torusMeshNode.visible = params.nodes;
+
 				torusMesh.material.roughness = params.roughness;
 				torusMesh.material.metalness = params.metalness;
 
 				torusMeshNode.material.roughness = params.roughness;
 				torusMeshNode.material.metalness = params.metalness;
 
-				torusMesh.visible = ! params.nodes;
-				torusMeshNode.visible = params.nodes;
-
 				var renderTarget, cubeMap;
 
 				switch ( params.envMap ) {
 
+					case 'Generated':
+						renderTarget = generatedCubeRenderTarget;
+						cubeMap = generatedCubeRenderTarget.texture;
+						break;
 					case 'LDR':
 						renderTarget = ldrCubeRenderTarget;
 						cubeMap = ldrCubeMap;
