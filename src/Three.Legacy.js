@@ -7,7 +7,7 @@ import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
 import {
 	FlatShading,
-	GammaEncoding,
+	sRGBEncoding,
 	LinearEncoding,
 	StaticDrawUsage,
 	DynamicDrawUsage,
@@ -1722,27 +1722,27 @@ Object.defineProperties( WebGLRenderer.prototype, {
 	gammaInput: {
 		get: function () {
 
-			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Please define the correct color spaces for textures via Texture.encoding instead.' );
+			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Set the encoding for textures via Texture.encoding instead.' );
 			return false;
 
 		},
 		set: function () {
 
-			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Please define the correct color spaces for textures via Texture.encoding instead.' );
+			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Set the encoding for textures via Texture.encoding instead.' );
 
 		}
 	},
 	gammaOutput: {
 		get: function () {
 
-			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Please use WebGLRenderer.outputEncoding instead.' );
-			return ( this.outputEncoding === GammaEncoding ) ? true : false;
+			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Set WebGLRenderer.outputEncoding instead.' );
+			return false;
 
 		},
 		set: function ( value ) {
 
-			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Please use WebGLRenderer.outputEncoding instead.' );
-			this.outputEncoding = ( value === true ) ? GammaEncoding : LinearEncoding;
+			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Set WebGLRenderer.outputEncoding instead.' );
+			this.outputEncoding = ( value === true ) ? sRGBEncoding : LinearEncoding;
 
 		}
 	}

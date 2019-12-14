@@ -141,7 +141,7 @@
 					.setPath( './textures/cube/pisa/' )
 					.load( ldrUrls, function () {
 
-						ldrCubeMap.encoding = THREE.GammaEncoding;
+						ldrCubeMap.encoding = THREE.sRGBEncoding;
 
 						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
 
