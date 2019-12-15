@@ -2295,6 +2295,8 @@ THREE.GLTFLoader = ( function () {
 			var min = accessor.min;
 			var max = accessor.max;
 
+			// glTF requires 'min' and 'max', but VRM (which extends glTF) currently ignores that requirement.
+
 			if ( min !== undefined && max !== undefined ) {
 
 				box.set(
@@ -2328,6 +2330,8 @@ THREE.GLTFLoader = ( function () {
 					var accessor = parser.json.accessors[ target.POSITION ];
 					var min = accessor.min;
 					var max = accessor.max;
+
+					// glTF requires 'min' and 'max', but VRM (which extends glTF) currently ignores that requirement.
 
 					if ( min !== undefined && max !== undefined ) {
 
