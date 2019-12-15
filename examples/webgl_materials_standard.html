@@ -23,6 +23,10 @@
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
+			import * as Nodes from './jsm/nodes/Nodes.js';
+			
+			import { NativeNodeMaterial } from './jsm/nodes/materials/NativeNodeMaterial.js';
+
 			var statsEnabled = true;
 
 			var container, stats;
@@ -62,7 +66,7 @@
 
 				//
 
-				var material = new THREE.MeshStandardMaterial();
+				var material = new NativeNodeMaterial( 'standard' );
 
 				new OBJLoader()
 					.setPath( 'models/obj/cerberus/' )
@@ -74,12 +78,19 @@
 						material.roughness = 1; // attenuates roughnessMap
 						material.metalness = 1; // attenuates metalnessMap
 
-						material.map = loader.load( 'Cerberus_A.jpg' );
+						//material.map = loader.load( 'Cerberus_A.jpg' );
 						// roughness is in G channel, metalness is in B channel
 						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );
 						material.normalMap = loader.load( 'Cerberus_N.jpg' );
 
-						material.map.wrapS = THREE.RepeatWrapping;
+						//material.colorNode = new Nodes.TextureNode( loader.load( 'Cerberus_A.jpg' ) );
+						
+						var uvTransform = new Nodes.UVTransformNode();
+						uvTransform.setUvTransform( 0, 0, 50, 50, 0 );
+						
+						material.colorNode = new Nodes.CheckerNode( uvTransform );
+
+						//material.map.wrapS = THREE.RepeatWrapping;
 						material.roughnessMap.wrapS = THREE.RepeatWrapping;
 						material.metalnessMap.wrapS = THREE.RepeatWrapping;
 						material.normalMap.wrapS = THREE.RepeatWrapping;

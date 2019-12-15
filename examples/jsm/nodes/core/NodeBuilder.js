@@ -94,6 +94,10 @@ function NodeBuilder() {
 
 		"#endif",
 
+	].join( "\n" );
+
+	this.includesCode = [
+
 		"#include <packing>",
 		"#include <common>"
 
@@ -505,10 +509,35 @@ NodeBuilder.prototype = {
 
 	},
 
+	getParsCode: function ( shader ) {
+
+		return [
+			this.prefixCode,
+			this.getVarListCode( this.getVars( 'varying' ), 'varying' ),
+			this.getVarListCode( this.inputs.uniforms[ shader ], 'uniform' ),
+			this.getIncludesCode( 'consts', shader ),
+			this.getIncludesCode( 'structs', shader ),
+			this.getIncludesCode( 'functions', shader )
+		].join( "\n" );
+
+	},
+	
+	getMainCode: function ( shader ) {
+
+		return [
+			this.getVarListCode( this.getVars( shader ) ),
+			this.code[ shader ],
+			this.resultCode[ shader ],
+			this.finalCode[ shader ],
+		].join( "\n" );
+
+	},
+
 	getCode: function ( shader ) {
 
 		return [
 			this.prefixCode,
+			this.includesCode,
 			this.parsCode[ shader ],
 			this.getVarListCode( this.getVars( 'varying' ), 'varying' ),
 			this.getVarListCode( this.inputs.uniforms[ shader ], 'uniform' ),
