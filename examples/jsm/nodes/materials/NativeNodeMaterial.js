@@ -92,11 +92,6 @@ NativeNodeMaterial.prototype.build = function ( shader, renderer ) {
 		builder.getMainCode( 'fragment' ) +
 		shader.fragmentShader.substring( fragmentMainIndex + main.length );
 
-	console.log( builder.getMainCode( 'fragment' ) );
-
-	//var parameters = this.getParameters( builder, renderer );
-	//var defines = this.getDefines( parameters );
-
 }
 
 export { NativeNodeMaterial };
