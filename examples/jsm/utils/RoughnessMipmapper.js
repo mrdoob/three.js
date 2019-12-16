@@ -158,6 +158,34 @@ uniform vec2 texelSize;
 vec4 envMapTexelToLinear(vec4 a){return a;}
 #include <cube_uv_reflection_fragment>
 
+float roughnessToVariance(float roughness) {
+  float variance = 0.0;
+  if (roughness >= r1) {
+    variance = (r0 - roughness) * (v1 - v0) / (r0 - r1) + v0;
+  } else if (roughness >= r4) {
+    variance = (r1 - roughness) * (v4 - v1) / (r1 - r4) + v1;
+  } else if (roughness >= r5) {
+    variance = (r4 - roughness) * (v5 - v4) / (r4 - r5) + v4;
+  } else {
+    float roughness2 = roughness * roughness;
+    variance = 1.79 * roughness2 * roughness2;
+  }
+  return variance;
+}
+float varianceToRoughness(float variance) {
+  float roughness = 0.0;
+  if (variance >= v1) {
+    roughness = (v0 - variance) * (r1 - r0) / (v0 - v1) + r0;
+  } else if (variance >= v4) {
+    roughness = (v1 - variance) * (r4 - r1) / (v1 - v4) + r1;
+  } else if (variance >= v5) {
+    roughness = (v4 - variance) * (r5 - r4) / (v4 - v5) + r4;
+  } else {
+    roughness = pow(0.559 * variance, 0.25);// 0.559 = 1.0 / 1.79
+  }
+  return roughness;
+}
+
 void main() {
     gl_FragColor = texture2D(roughnessMap, vUv, -1.0);
     if (texelSize.x == 0.0) return;
