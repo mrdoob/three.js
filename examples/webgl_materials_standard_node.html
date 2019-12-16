@@ -25,7 +25,7 @@
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
 			
-			import { MeshStandardNodeMaterial } from './jsm/nodes/materials/MeshStandardNodeMaterial.js';
+			import { MeshStandardNodeMaterial } from './jsm/nodes/materials/MeshStandardMaterial.js';
 
 			var statsEnabled = true;
 
@@ -83,12 +83,15 @@
 						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );
 						material.normalMap = loader.load( 'Cerberus_N.jpg' );
 
-						//material.color = new Nodes.TextureNode( loader.load( 'Cerberus_A.jpg' ) );
-						
+						//
+
 						var uvTransform = new Nodes.UVTransformNode();
 						uvTransform.setUvTransform( 0, 0, 50, 50, 0 );
-						
+
 						material.color = new Nodes.CheckerNode( uvTransform );
+						//material.color = new Nodes.TextureNode( loader.load( 'Cerberus_A.jpg' ) );
+
+						//
 
 						//material.map.wrapS = THREE.RepeatWrapping;
 						material.roughnessMap.wrapS = THREE.RepeatWrapping;

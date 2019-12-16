@@ -3,7 +3,8 @@
  */
 
 import { 
-	MeshStandardMaterial
+	MeshStandardMaterial,
+	ShaderChunk
 } from '../../../../build/three.module.js';
 
 import { NodeBuilder } from '../core/NodeBuilder.js';
@@ -58,7 +59,7 @@ MeshStandardNodeMaterial.prototype.build = function ( shader, renderer ) {
 	const main = 'void main() {';
 	
 	var builder = new NodeBuilder();
-	var nodes = new NativeNode( this.shaderLib );
+	var nodes = new NativeNode( 'standard' );
 
 	nodes.color = this.color;
 
@@ -83,4 +84,4 @@ MeshStandardNodeMaterial.prototype.build = function ( shader, renderer ) {
 
 }
 
-export { MeshStandardMaterial };
+export { MeshStandardNodeMaterial };
