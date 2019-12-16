@@ -1264,7 +1264,11 @@ function WebGLRenderer( parameters ) {
 
 			if ( object.isGroup ) {
 
-				groupOrder = object.renderOrder;
+				if ( object.renderOrder !== null ) {
+
+					groupOrder = object.renderOrder;
+
+				}
 
 			} else if ( object.isLOD ) {
 
