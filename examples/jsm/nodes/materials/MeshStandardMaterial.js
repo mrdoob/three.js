@@ -3,13 +3,7 @@
  */
 
 import { 
-	ShaderMaterial, 
-	ShaderLib,
-	ShaderChunk,
-	CubeUVReflectionMapping,
-	CubeUVRefractionMapping,
-	CubeRefractionMapping,
-	EquirectangularRefractionMapping
+	MeshStandardMaterial
 } from '../../../../build/three.module.js';
 
 import { NodeBuilder } from '../core/NodeBuilder.js';
@@ -35,15 +29,9 @@ function parseIncludes( source ) {
 
 }
 
-function NativeNodeMaterial( shaderLib ) {
+function MeshStandardNodeMaterial() {
 
-	this.shaderLib = shaderLib !== undefined ? shaderLib : 'standard';
-
-	ShaderMaterial.call( this, ShaderLib[ this.shaderLib ] );
-
-	this.extensions = { derivatives: true };
-	this.lights = true;
-	this.fog = true;
+	MeshStandardMaterial.call( this );
 
 	this.onBeforeCompile = function ( shader, renderer ) {
 
@@ -59,20 +47,20 @@ function NativeNodeMaterial( shaderLib ) {
 
 }
 
-NativeNodeMaterial.prototype = Object.create( ShaderMaterial.prototype );
-NativeNodeMaterial.prototype.constructor = NativeNodeMaterial;
-NativeNodeMaterial.prototype.type = "NativeNodeMaterial";
+MeshStandardNodeMaterial.prototype = Object.create( MeshStandardMaterial.prototype );
+MeshStandardNodeMaterial.prototype.constructor = MeshStandardNodeMaterial;
+MeshStandardNodeMaterial.prototype.type = "MeshStandardNodeMaterial";
 
-NativeNodeMaterial.prototype.isShaderNodeMaterial = true;
+MeshStandardNodeMaterial.prototype.isShaderNodeMaterial = true;
 
-NativeNodeMaterial.prototype.build = function ( shader, renderer ) {
+MeshStandardNodeMaterial.prototype.build = function ( shader, renderer ) {
 	
 	const main = 'void main() {';
 	
 	var builder = new NodeBuilder();
 	var nodes = new NativeNode( this.shaderLib );
 
-	nodes.color = this.colorNode;
+	nodes.color = this.color;
 
 	builder.setMaterial( this, renderer );
 	builder.build( nodes, nodes );
@@ -83,6 +71,7 @@ NativeNodeMaterial.prototype.build = function ( shader, renderer ) {
 	shader.fragmentShader = parseIncludes( shader.fragmentShader );
 
 	shader.fragmentShader = shader.fragmentShader.replace( 'uniform vec3 diffuse;', 'vec3 diffuse;' );
+	//delete shader.uniforms.diffuse;
 
 	var fragmentMainIndex = shader.fragmentShader.indexOf( main );
 	
@@ -94,4 +83,4 @@ NativeNodeMaterial.prototype.build = function ( shader, renderer ) {
 
 }
 
-export { NativeNodeMaterial };
+export { MeshStandardMaterial };
