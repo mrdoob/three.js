@@ -83,6 +83,7 @@ NativeNodeMaterial.prototype.build = function ( shader, renderer ) {
 	shader.fragmentShader = parseIncludes( shader.fragmentShader );
 
 	shader.fragmentShader = shader.fragmentShader.replace( 'uniform vec3 diffuse;', 'vec3 diffuse;' );
+	delete shader.uniforms.diffuse;
 
 	var fragmentMainIndex = shader.fragmentShader.indexOf( main );
 	
