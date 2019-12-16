@@ -202,7 +202,8 @@ var list = {
 				"RectAreaLightHelper": "api/en/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/en/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/en/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/en/helpers/VertexNormalsHelper"
+				"VertexNormalsHelper": "api/en/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "api/en/helpers/VertexTangentsHelper"
 			},
 
 			"Lights": {
