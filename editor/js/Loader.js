@@ -105,6 +105,30 @@ var Loader = function ( editor ) {
 
 				break;
 
+			case 'drc':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var loader = new THREE.DRACOLoader();
+					loader.setDecoderPath( '../examples/js/libs/draco/' );
+					loader.decodeDracoFile( contents, function ( geometry ) {
+
+						var material = new THREE.MeshStandardMaterial();
+
+						var mesh = new THREE.Mesh( geometry, material );
+						mesh.name = filename;
+
+						editor.execute( new AddObjectCommand( editor, mesh ) );
+
+					} );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
 			case 'fbx':
 
 				reader.addEventListener( 'load', function ( event ) {

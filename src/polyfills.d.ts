@@ -5,7 +5,7 @@ export function log( message?: any, ...optionalParams: any[] ): void;
 
 // typed array parameters
 export type TypedArray =
-	| Int8Array
+	Int8Array
 	| Uint8Array
 	| Uint8ClampedArray
 	| Int16Array

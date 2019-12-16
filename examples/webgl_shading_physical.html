@@ -68,7 +68,7 @@
 
 				// CUBE CAMERA
 
-				cubeCamera = new THREE.CubeCamera( 1, 10000, 128 );
+				cubeCamera = new THREE.CubeCamera( 1, 10000, 128, { encoding: THREE.sRGBEncoding } );
 
 				// TEXTURES
 				var textureLoader = new THREE.TextureLoader();
@@ -78,16 +78,19 @@
 				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
 				textureSquares.magFilter = THREE.NearestFilter;
 				textureSquares.format = THREE.RGBFormat;
+				textureSquares.encoding = THREE.sRGBEncoding;
 
 				var textureNoiseColor = textureLoader.load( "textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
 				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
 				textureNoiseColor.format = THREE.RGBFormat;
+				textureNoiseColor.encoding = THREE.sRGBEncoding;
 
 				var textureLava = textureLoader.load( "textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
 				textureLava.format = THREE.RGBFormat;
+				textureLava.encoding = THREE.sRGBEncoding;
 
 				// GROUND
 
@@ -233,11 +236,7 @@
 
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-				//
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

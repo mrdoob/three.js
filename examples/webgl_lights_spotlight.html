@@ -34,9 +34,7 @@
 				document.body.appendChild( renderer.domElement );
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 

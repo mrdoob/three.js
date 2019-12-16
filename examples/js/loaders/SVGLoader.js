@@ -795,7 +795,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				};
 
 				if ( node.hasAttribute( svgName ) ) style[ jsName ] = adjustFunction( node.getAttribute( svgName ) );
-				if ( node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
+				if ( node.style && node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
 
 			}
 
@@ -1612,23 +1612,31 @@ THREE.SVGLoader.pointsToStrokeWithBuffers = function () {
 
 			if ( joinIsOnLeftSide ) {
 
-				lastInner.toArray( vertices, 0 * 3 );
-				lastInner.toArray( vertices, 3 * 3 );
+				if ( isMiter || initialJoinIsOnLeftSide ) {
 
-				if ( isMiter ) {
+					lastInner.toArray( vertices, 0 * 3 );
+					lastInner.toArray( vertices, 3 * 3 );
 
-					lastOuter.toArray( vertices, 1 * 3 );
+					if ( isMiter ) {
+
+						lastOuter.toArray( vertices, 1 * 3 );
+
+					}
 
 				}
 
 			} else {
 
-				lastInner.toArray( vertices, 1 * 3 );
-				lastInner.toArray( vertices, 3 * 3 );
+				if ( isMiter || ! initialJoinIsOnLeftSide ) {
 
-				if ( isMiter ) {
+					lastInner.toArray( vertices, 1 * 3 );
+					lastInner.toArray( vertices, 3 * 3 );
 
-					lastOuter.toArray( vertices, 0 * 3 );
+					if ( isMiter ) {
+
+						lastOuter.toArray( vertices, 0 * 3 );
+
+					}
 
 				}
 

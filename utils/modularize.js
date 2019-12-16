@@ -216,7 +216,6 @@ var files = [
 	{ path: 'shaders/SobelOperatorShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SSAOShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/TechnicolorShader.js', dependencies: [], ignoreList: [] },
-	{ path: 'shaders/TerrainShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ToneMapShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ToonShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/TranslucentShader.js', dependencies: [], ignoreList: [] },
@@ -236,8 +235,6 @@ var files = [
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
-
-	{ path: 'vr/WebVR.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
 ];

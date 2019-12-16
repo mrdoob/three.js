@@ -1638,7 +1638,7 @@ var FBXLoader = ( function () {
 
 			var positionAttribute = new Float32BufferAttribute( buffers.vertex, 3 );
 
-			preTransform.applyToBufferAttribute( positionAttribute );
+			positionAttribute.applyMatrix4( preTransform );
 
 			geo.setAttribute( 'position', positionAttribute );
 
@@ -1661,10 +1661,10 @@ var FBXLoader = ( function () {
 
 			if ( buffers.normal.length > 0 ) {
 
-				var normalAttribute = new Float32BufferAttribute( buffers.normal, 3 );
-
 				var normalMatrix = new Matrix3().getNormalMatrix( preTransform );
-				normalMatrix.applyToBufferAttribute( normalAttribute );
+
+				var normalAttribute = new Float32BufferAttribute( buffers.normal, 3 );
+				normalAttribute.applyNormalMatrix( normalMatrix );
 
 				geo.setAttribute( 'normal', normalAttribute );
 
@@ -2166,7 +2166,7 @@ var FBXLoader = ( function () {
 			var positionAttribute = new Float32BufferAttribute( morphBuffers.vertex, 3 );
 			positionAttribute.name = name || morphGeoNode.attrName;
 
-			preTransform.applyToBufferAttribute( positionAttribute );
+			positionAttribute.applyMatrix4( preTransform );
 
 			parentGeo.morphAttributes.position.push( positionAttribute );
 

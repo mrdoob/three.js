@@ -21,6 +21,7 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
@@ -46,8 +47,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = 3;
 
@@ -78,7 +78,10 @@
 						material.roughness = 1; // attenuates roughnessMap
 						material.metalness = 1; // attenuates metalnessMap
 
-						//material.map = loader.load( 'Cerberus_A.jpg' );
+						var diffuseMap = loader.load( 'Cerberus_A.jpg' );
+						diffuseMap.encoding = THREE.sRGBEncoding;
+						material.map = diffuseMap;
+
 						// roughness is in G channel, metalness is in B channel
 						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );
 						material.normalMap = loader.load( 'Cerberus_N.jpg' );
@@ -111,22 +114,19 @@
 
 					} );
 
-				new THREE.CubeTextureLoader().setPath( './textures/cube/pisaRGBM16/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( rgbmCubeMap ) {
-
-						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
-						rgbmCubeMap.format = THREE.RGBAFormat;
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'venice_sunset_1k.hdr', function ( hdrCubeMap ) {
 
 						var pmremGenerator = new PMREMGenerator( renderer );
-						var rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
+						var hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						hdrCubeMap.dispose();
 						pmremGenerator.dispose();
 
-						material.envMap = rgbmCubeRenderTarget.texture;
-						material.needsUpdate = true; // is this needed?
+						material.envMap = hdrCubeRenderTarget.texture;
 
-						rgbmCubeMap.magFilter = THREE.LinearFilter;
-						rgbmCubeMap.needsUpdate = true;
-						scene.background = rgbmCubeMap;
+						scene.background = hdrCubeRenderTarget.texture;
 
 					} );
 

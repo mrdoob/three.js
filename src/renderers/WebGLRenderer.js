@@ -1,8 +1,17 @@
+/**
+ * @author supereggbert / http://www.paulbrunt.co.uk/
+ * @author mrdoob / http://mrdoob.com/
+ * @author alteredq / http://alteredqualia.com/
+ * @author szimek / https://github.com/szimek/
+ * @author tschw
+ */
+
 import {
 	RGBAFormat,
 	HalfFloatType,
 	FloatType,
 	UnsignedByteType,
+	LinearEncoding,
 	LinearToneMapping,
 	BackSide
 } from '../constants.js';
@@ -38,16 +47,7 @@ import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebGLMultiview } from './webgl/WebGLMultiview.js';
-import { WebVRManager } from './webvr/WebVRManager.js';
-import { WebXRManager } from './webvr/WebXRManager.js';
-
-/**
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author szimek / https://github.com/szimek/
- * @author tschw
- */
+import { WebXRManager } from './webxr/WebXRManager.js';
 
 function WebGLRenderer( parameters ) {
 
@@ -101,8 +101,7 @@ function WebGLRenderer( parameters ) {
 	// physically based shading
 
 	this.gammaFactor = 2.0;	// for backwards compatibility
-	this.gammaInput = false;
-	this.gammaOutput = false;
+	this.outputEncoding = LinearEncoding;
 
 	// physical lights
 
@@ -306,7 +305,7 @@ function WebGLRenderer( parameters ) {
 
 	// xr
 
-	var xr = ( typeof navigator !== 'undefined' && 'xr' in navigator ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
+	var xr = new WebXRManager( _this, _gl );
 
 	this.xr = xr;
 
@@ -710,9 +709,9 @@ function WebGLRenderer( parameters ) {
 
 		var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
-		state.setMaterial( material, frontFaceCW );
-
 		var program = setProgram( camera, fog, material, object );
+
+		state.setMaterial( material, frontFaceCW );
 
 		var updateBuffers = false;
 
@@ -727,7 +726,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( object.morphTargetInfluences ) {
+		if ( material.morphTargets || material.morphNormals ) {
 
 			morphtargets.update( object, geometry, material, program );
 
@@ -782,17 +781,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		var dataCount = Infinity;
-
-		if ( index !== null ) {
-
-			dataCount = index.count;
-
-		} else if ( position !== undefined ) {
-
-			dataCount = position.count;
-
-		}
+		var dataCount = ( index !== null ) ? index.count : position.count;
 
 		var rangeStart = geometry.drawRange.start * rangeFactor;
 		var rangeCount = geometry.drawRange.count * rangeFactor;
@@ -1256,8 +1245,6 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			xr.submitFrame();
-
 		}
 
 		// _gl.finish();
@@ -1455,9 +1442,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.isImmediateRenderObject ) {
 
-			state.setMaterial( material );
-
 			var program = setProgram( camera, scene.fog, material, object );
+
+			state.setMaterial( material );
 
 			_currentGeometryProgram.geometry = null;
 			_currentGeometryProgram.program = null;
@@ -1553,6 +1540,7 @@ function WebGLRenderer( parameters ) {
 			program = programCache.acquireProgram( material, materialProperties.shader, parameters, programCacheKey );
 
 			materialProperties.program = program;
+			materialProperties.outputEncoding = _this.outputEncoding;
 			material.program = program;
 
 		}
@@ -1683,6 +1671,10 @@ function WebGLRenderer( parameters ) {
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
 				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
+
+				material.needsUpdate = true;
+
+			} else if ( materialProperties.outputEncoding !== _this.outputEncoding ) {
 
 				material.needsUpdate = true;
 
@@ -1973,10 +1965,6 @@ function WebGLRenderer( parameters ) {
 				m_uniforms.color.value.copy( material.color );
 				m_uniforms.opacity.value = material.opacity;
 
-			} else if ( material.envMap ) {
-
-				refreshUniformsCommon( m_uniforms, material );
-
 			}
 
 			// RectAreaLight Texture
@@ -2158,6 +2146,41 @@ function WebGLRenderer( parameters ) {
 			}
 
 			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+
+		}
+
+		// uv repeat and offset setting priorities for uv2
+		// 1. ao map
+		// 2. light map
+
+		var uv2ScaleMap;
+
+		if ( material.aoMap ) {
+
+			uv2ScaleMap = material.aoMap;
+
+		} else if ( material.lightMap ) {
+
+			uv2ScaleMap = material.lightMap;
+
+		}
+
+		if ( uv2ScaleMap !== undefined ) {
+
+			// backwards compatibility
+			if ( uv2ScaleMap.isWebGLRenderTarget ) {
+
+				uv2ScaleMap = uv2ScaleMap.texture;
+
+			}
+
+			if ( uv2ScaleMap.matrixAutoUpdate === true ) {
+
+				uv2ScaleMap.updateMatrix();
+
+			}
+
+			uniforms.uv2Transform.value.copy( uv2ScaleMap.matrix );
 
 		}
 

@@ -111,8 +111,7 @@
 		in linear colorspace, always configure [page:WebGLRenderer] as follows when using glTF:</p>
 
 		<code>
-		renderer.gammaOutput = true;
-		renderer.gammaFactor = 2.2;
+		renderer.outputEncoding = THREE.sRGBEncoding;
 		</code>
 
 		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the

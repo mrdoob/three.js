@@ -43,7 +43,7 @@
 				renderer.toneMapping = THREE.LinearToneMapping;
 			 	renderer.toneMappingExposure = API.exposure;
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// scene
 				scene = new THREE.Scene();

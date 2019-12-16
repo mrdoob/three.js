@@ -106,7 +106,7 @@
 				} );
 
 				cubeMaterial.envMap = textureCube;
-				
+
 				// Skybox
 
 				cubeMesh = new THREE.Mesh( new THREE.BoxBufferGeometry( 100, 100, 100 ), cubeMaterial );
@@ -128,7 +128,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
