@@ -33,77 +33,81 @@
             
 			function init() {
 
-				var width = window.innerWidth;
-				var height = window.innerHeight;
-				var aspect = width / height;
+                var width = window.innerWidth;
+                var height = window.innerHeight;
+                var aspect = width / height;
 
-				// renderer
+                // renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setSize( width, height );
+                renderer = new THREE.WebGLRenderer( { antialias: true } );
                 renderer.setPixelRatio( window.devicePixelRatio );
+                renderer.setSize( width, height );
                 renderer.gammaOutput = true;
                 renderer.physicallyCorrectLights = true;
-				document.body.appendChild( renderer.domElement );
+
+                // tonemapping
+                renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                renderer.toneMappingExposure = 1;
+
+                document.body.appendChild( renderer.domElement );
 
                 window.addEventListener( 'resize', onResize, false );
-                
-				// scene
 
-				scene = new THREE.Scene();
+                // scene
 
-				// camera
+                scene = new THREE.Scene();
 
-				camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
-                camera.position.set( 0, 0, 18 );
+                // camera
+
+                camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
+                updateCamera();
+                camera.position.set( 0, 0, 16 );
 
                 // controls
-                
+
                 controls = new OrbitControls( camera, renderer.domElement );
                 controls.update();
 
                 // light
-                
+
                 var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
                 var x = 597;
                 var y = 213;
                 var theta = ( x + 0.5 ) * Math.PI / 512;
                 var phi = ( y + 0.5 ) * Math.PI / 512;
 
-                directionalLight.position.set(
-                    - Math.sin( phi ) * Math.cos( theta ),
-                    Math.cos( phi ),
-                    - Math.sin( phi ) * Math.sin( theta ) );
+                directionalLight.position.setFromSphericalCoords( 100, - phi, Math.PI/2 - theta );
 
                 scene.add( directionalLight );
+                // scene.add( new THREE.DirectionalLightHelper( directionalLight ) );
 
-				document.body.addEventListener( 'mouseover', function () {
+                document.body.addEventListener( 'mouseover', function () {
 
-					scene.traverse( function ( child ) {
+                    scene.traverse( function ( child ) {
 
-						if ( child.isMesh ) {
+                        if ( child.isMesh ) {
 
                             child.material.envMapIntensity = 1;
                             directionalLight.intensity = 0;
                         
                         }
 
-					} );
+                    } );
 
-				} );
+                } );
 
-				document.body.addEventListener( 'mouseout', function () {
+                document.body.addEventListener( 'mouseout', function () {
 
-					scene.traverse( function ( child ) {
+                    scene.traverse( function ( child ) {
 
-						if ( child.isMesh ) {
+                        if ( child.isMesh ) {
 
                             child.material.envMapIntensity = 0;
                             directionalLight.intensity = 1;
 
                         }
 
-					} );
+                    } );
 
                 } );
 
@@ -114,6 +118,7 @@
                 var radianceMap = null;
                 new RGBELoader()
                     .setDataType( THREE.UnsignedByteType )
+                    // .setDataType( THREE.FloatType )
                     .setPath( 'textures/equirectangular/' )
                     .load( 'spot1Lux.hdr', function ( texture ) {
 
@@ -155,12 +160,21 @@
 				var width = window.innerWidth;
 				var height = window.innerHeight;
 
-				camera.aspect = width / height;
-				camera.updateProjectionMatrix();
+                camera.aspect = width / height;
+				updateCamera();
 
 				renderer.setSize( width, height );
 
-			}
+            }
+            
+            function updateCamera() {
+
+                var horizontalFoV = 40;
+                var verticalFoV = 2 * Math.atan( Math.tan( horizontalFoV / 2 * Math.PI / 180 ) / camera.aspect ) * 180 / Math.PI;
+                camera.fov = verticalFoV;
+				camera.updateProjectionMatrix();
+
+            }
 
 			function animate() {
 
