@@ -51,7 +51,6 @@
 			} from './jsm/nodes/Nodes.js';
 
 			var params = {
-				textureSize: 1024,
 				roughness: 0.0,
 				metalness: 0.0,
 				exposure: 1.0,
@@ -62,16 +61,14 @@
 
 			var container, stats;
 			var camera, scene, renderer, controls;
-			var nodeMaterial, nodeTexture, nodeTextureSize, nodeTextureIntensity, torusMesh, planeMesh;
+			var nodeMaterial, nodeTexture, nodeTextureIntensity, torusMesh, planeMesh;
 			var hdrCubeRenderTarget;
 			var hdrCubeMap;
 
 			init();
 			animate();
 
-			function generate( textureSize ) {
-
-				nodeTextureSize.value = textureSize;
+			function generate() {
 
 				var pmremGenerator = new PMREMGenerator( renderer );
 				hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
@@ -112,10 +109,9 @@
 				nodeMaterial.visible = false;
 
 				nodeTexture = new TextureNode();
-				nodeTextureSize = new FloatNode( 1024 );
 				nodeTextureIntensity = new FloatNode( 1 );
 
-				nodeMaterial.environment = new OperatorNode( new TextureCubeNode( nodeTexture, nodeTextureSize ), nodeTextureIntensity, OperatorNode.MUL );
+				nodeMaterial.environment = new OperatorNode( new TextureCubeNode( nodeTexture ), nodeTextureIntensity, OperatorNode.MUL );
 
 				torusMesh = new THREE.Mesh( geometry, nodeMaterial );
 				scene.add( torusMesh );
@@ -131,7 +127,7 @@
 					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
-						generate( params.textureSize );
+						generate();
 
 						nodeMaterial.visible = true;
 
@@ -155,7 +151,6 @@
 
 				var gui = new GUI();
 
-				gui.add( params, 'textureSize', [ 128, 256, 512, 1024, 2048, 4096 ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
 				gui.add( params, 'exposure', 0, 2, 0.01 );
@@ -194,12 +189,6 @@
 				torusMesh.material.metalness.value = params.metalness;
 
 				nodeTextureIntensity.value = params.intensity;
-
-				if ( nodeTextureSize.value !== params.textureSize ) {
-
-					generate( params.textureSize );
-
-				}
 
 				if ( params.animate ) {
 
