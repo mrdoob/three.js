@@ -2019,15 +2019,19 @@ function WebGLRenderer( parameters ) {
 
 	function refreshUniformsCommon( uniforms, material ) {
 
-		uniforms.opacity.value = material.opacity;
+		if ( uniforms.opacity ) {
 
-		if ( material.color ) {
+			uniforms.opacity.value = material.opacity;
+
+		}
+
+		if ( material.color && uniforms.diffuse ) {
 
 			uniforms.diffuse.value.copy( material.color );
 
 		}
 
-		if ( material.emissive ) {
+		if ( material.emissive && uniforms.emissive ) {
 
 			uniforms.emissive.value.copy( material.emissive ).multiplyScalar( material.emissiveIntensity );
 
@@ -2407,8 +2411,8 @@ function WebGLRenderer( parameters ) {
 
 	function refreshUniformsStandard( uniforms, material ) {
 
-		uniforms.roughness.value = material.roughness;
-		uniforms.metalness.value = material.metalness;
+		if ( uniforms.roughness ) uniforms.roughness.value = material.roughness;
+		if ( uniforms.metalness ) uniforms.metalness.value = material.metalness;
 
 		if ( material.roughnessMap ) {
 
@@ -2465,11 +2469,11 @@ function WebGLRenderer( parameters ) {
 
 		refreshUniformsStandard( uniforms, material );
 
-		uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
+		if ( uniforms.reflectivity ) uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
 
-		uniforms.clearcoat.value = material.clearcoat;
-		uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
-		if ( material.sheen ) uniforms.sheen.value.copy( material.sheen );
+		if ( uniforms.clearcoat ) uniforms.clearcoat.value = material.clearcoat;
+		if ( uniforms.clearcoatRoughness ) uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
+		if ( material.sheen && uniforms.sheen ) uniforms.sheen.value.copy( material.sheen );
 
 		if ( material.clearcoatNormalMap ) {
 
@@ -2484,7 +2488,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		uniforms.transparency.value = material.transparency;
+		if ( uniforms.transparency ) uniforms.transparency.value = material.transparency;
 
 	}
 
