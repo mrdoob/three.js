@@ -185,8 +185,6 @@ TextureCubeUVNode.prototype.bilinearCubeUV = function ( builder, texture, uv, mi
 	this.colorSpaceBR.fromDecoding( builder.getTextureEncodingFromMap( this.value.value ) );
 	this.colorSpaceBR.input.parse( bilinearCubeUV.build( builder ) + '.br' );
 
-	var f = bilinearCubeUV.build( builder ) + '.f';
-
 	// add a custom context for fix incompatibility with the core
 	// include ColorSpace function only for vertex shader (in fragment shader color space functions is added automatically by core)
 	// this should be removed in the future
