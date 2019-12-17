@@ -2262,8 +2262,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( materialDef.name !== undefined ) material.name = materialDef.name;
 
-			// Normal map textures use OpenGL conventions:
-			// https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#materialnormaltexture
+			// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
 			if ( material.normalScale && ! material.vertexTangents ) {
 
 				material.normalScale.y = - material.normalScale.y;
