@@ -66,13 +66,13 @@
 				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 4;
 				controls.maxDistance = 20;
-				controls.update();
 
 				// light
 
-				var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0 ); // set intensity to 0 to start
 				var x = 597;
 				var y = 213;
 				var theta = ( x + 0.5 ) * Math.PI / 512;
@@ -101,6 +101,8 @@
 
 					} );
 
+					render();
+
 				} );
 
 				document.body.addEventListener( 'mouseout', function () {
@@ -115,6 +117,8 @@
 						}
 
 					} );
+
+					render();
 
 				} );
 
@@ -158,6 +162,8 @@
 
 						}
 
+						render();
+
 					} );
 
 			}
@@ -172,6 +178,8 @@
 
 				renderer.setSize( width, height );
 
+				render();
+
 			}
 			
 			function updateCamera() {
@@ -180,12 +188,6 @@
 				var verticalFoV = 2 * Math.atan( Math.tan( horizontalFoV / 2 * Math.PI / 180 ) / camera.aspect ) * 180 / Math.PI;
 				camera.fov = verticalFoV;
 				camera.updateProjectionMatrix();
-
-			}
-
-			function animate() {
-
-				renderer.setAnimationLoop( render );
 
 			}
 
@@ -198,7 +200,7 @@
 			Promise.resolve()
 				.then( init )
 				.then( createObjects )
-				.then( animate );
+				.then( render );
 
 		</script>
 	</body>
