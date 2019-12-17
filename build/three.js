@@ -21861,7 +21861,7 @@
 
 			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-				generateMipmap( 3553, texture, image.width, image.height );
+				generateMipmap( textureType, texture, image.width, image.height );
 
 			}
 
@@ -22930,8 +22930,19 @@
 				session.addEventListener( 'squeezeend', onSessionEvent );
 				session.addEventListener( 'end', onSessionEnd );
 
+				var attributes = gl.getContextAttributes();
+
+				var layerInit = {
+					antialias: attributes.antialias,
+					alpha: attributes.alpha,
+					depth: attributes.depth,
+					stencil: attributes.stencil
+				};
+
 				// eslint-disable-next-line no-undef
-				session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
+				var baseLayer = new XRWebGLLayer( session, gl, layerInit );
+
+				session.updateRenderState( { baseLayer: baseLayer } );
 
 				session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
