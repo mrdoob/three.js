@@ -2305,6 +2305,8 @@ THREE.GLTFLoader = ( function () {
 
 			} else {
 
+				console.warn( 'THREE.GLTFLoader: Missing min/max properties for accessor POSITION.' );
+
 				return;
 
 			}
@@ -2341,6 +2343,10 @@ THREE.GLTFLoader = ( function () {
 						vector.setZ( Math.max( Math.abs( min[ 2 ] ), Math.abs( max[ 2 ] ) ) );
 
 						box.expandByVector( vector );
+
+					} else {
+
+						console.warn( 'THREE.GLTFLoader: Missing min/max properties for accessor POSITION.' );
 
 					}
 
