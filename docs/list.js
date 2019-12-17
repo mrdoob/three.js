@@ -647,7 +647,8 @@ var list = {
 				"RectAreaLightHelper": "api/zh/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/zh/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/zh/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper"
+				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "api/zh/helpers/VertexTangentsHelper"
 			},
 
 			"灯光": {
