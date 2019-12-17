@@ -14,7 +14,7 @@
 				PMREM directional light test <a href="https://github.com/elalish" target="_blank" rel="noopener">Emmett Lalish</a>
 				<br>Top row is white metal
 				<br>Middle row is white dielectric
-				<br>Last row is black dielectric.
+				<br>Bottom row is black dielectric.
 				<br>Mouse-out is a standard Directional Light.
 				<br>Mouse-over is a PMREM of the skybox: a single bright pixel representing the same directional light source.
 				<br>The difference between these renders indicates the error in the PMREM approximations.
@@ -66,6 +66,8 @@
 				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 4;
+				controls.maxDistance = 20;
 				controls.update();
 
 				// light
