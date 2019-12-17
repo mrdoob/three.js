@@ -88,8 +88,6 @@ const assets = [
 	'./js/Player.js',
 	'./js/Script.js',
 
-	'../examples/js/vr/WebVR.js',
-
 	//
 
 	'./css/main.css',
