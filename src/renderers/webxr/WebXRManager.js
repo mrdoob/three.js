@@ -138,7 +138,14 @@ function WebXRManager( renderer, gl ) {
 			session.addEventListener( 'end', onSessionEnd );
 
 			// eslint-disable-next-line no-undef
-			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
+			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl,
+				{
+					antialias: gl.getContextAttributes().antialias,
+					alpha: gl.getContextAttributes().alpha,
+					depth: gl.getContextAttributes().depth,
+					stencil: gl.getContextAttributes().stencil
+				}
+			) } );
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
