@@ -81,6 +81,11 @@
 				scene.add( directionalLight );
 				// scene.add( new THREE.DirectionalLightHelper( directionalLight ) );
 
+				// The spot1Lux HDR environment map is expressed in nits (lux / sr). The directional light has units of lux,
+				// so to match a 1 lux light, we set a single pixel with a value equal to 1 divided by the solid
+				// angle of the pixel in steradians. This image is 1024 x 512,
+				// so the value is 1 / ( sin( phi ) * ( pi / 512 ) ^ 2 ) = 27,490 nits.
+
 				document.body.addEventListener( 'mouseover', function () {
 
 					scene.traverse( function ( child ) {
@@ -121,11 +126,6 @@
 					// .setDataType( THREE.FloatType )
 					.setPath( 'textures/equirectangular/' )
 					.load( 'spot1Lux.hdr', function ( texture ) {
-
-						// This HDR environment map is expressed in nits (lux / sr). The directional light has units of lux,
-						// so to match a 1 lux light, we set a single pixel with a value equal to 1 divided by the solid
-						// angle of the pixel in steradians. This image is 1024 x 512,
-						// so the value is 1 / (pi / 512) ^ 2 = 26,560 nits.
 
 						var pmremGenerator = new PMREMGenerator( renderer );
 						radianceMap = pmremGenerator.fromEquirectangular( texture ).texture;
