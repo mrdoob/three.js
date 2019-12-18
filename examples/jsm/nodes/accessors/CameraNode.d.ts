@@ -19,7 +19,6 @@ export class CameraNode extends TempNode {
 
 	setCamera( camera: Camera ): void;
 	setScope( scope: string ): void;
-	generate( builder: NodeBuilder, output: string ): string;
 	onUpdateFrame( frame: NodeFrame ): void;
 	copy( source: CameraNode ): this;
 

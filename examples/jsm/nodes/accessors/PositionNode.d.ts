@@ -8,7 +8,6 @@ export class PositionNode extends TempNode {
 	scope: string;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: PositionNode ): this;
 
 	static LOCAL: string;

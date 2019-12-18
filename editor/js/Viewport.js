@@ -313,7 +313,7 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
-		renderer.gammaOutput = true;
+		renderer.outputEncoding = THREE.sRGBEncoding;
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 

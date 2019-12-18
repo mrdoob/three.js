@@ -11,7 +11,6 @@ export class LuminanceNode extends TempNode {
 	rgb: Node;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: LuminanceNode ): this;
 
 	static Nodes: {

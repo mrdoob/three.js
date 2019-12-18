@@ -25,7 +25,7 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer;
@@ -46,24 +46,17 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
+					.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
-						var options = {
-							minFilter: texture.minFilter,
-							magFilter: texture.magFilter
-						};
+						var pmremGenerator = new PMREMGenerator( renderer );
+						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						pmremGenerator.dispose();
 
-						scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
-
-						var pmremGenerator = new PMREMGenerator( scene.background.texture );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						scene.background = envMap;
 
 						// model
+
+						var roughnessMipmapper = new RoughnessMipmapper( renderer );
 
 						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
@@ -73,6 +66,7 @@
 								if ( child.isMesh ) {
 
 									child.material.envMap = envMap;
+									roughnessMipmapper.generateMipmaps( child.material );
 
 								}
 
@@ -80,17 +74,16 @@
 
 							scene.add( gltf.scene );
 
-						} );
+							roughnessMipmapper.dispose();
 
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+						} );
 
 					} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );

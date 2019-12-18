@@ -5,15 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				color: #444;
-			}
-			a {
-				color: #44f;
-			}
-		</style>
-
 	</head>
 	<body>
 
@@ -29,10 +20,8 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
-			var scene, camera, renderer, envMap, radianceMap;
-			var right = 8;
+			var scene, camera, renderer, radianceMap;
 
 			function init() {
 
@@ -75,8 +64,8 @@
 
 				// camera
 
-				camera = new THREE.OrthographicCamera( - right, right, right / aspect, - right / aspect, 1, 30 );
-				camera.position.set( 0, 0, 9 );
+				camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
+				camera.position.set( 0, 0, 18 );
 
 			}
 
@@ -110,34 +99,16 @@
 
 			function createEnvironment() {
 
-				var envScene = new THREE.Scene();
-				envScene.background = new THREE.Color( 0xcccccc );
-
-				var cubeCamera = new THREE.CubeCamera( 1, 100, 256, 256 );
-				cubeCamera.update( renderer, envScene );
-
-				envMap = cubeCamera.renderTarget.texture;
-
-				scene.background = envScene.background;
-
-			}
-
-			function getRadiance() {
-
 				return new Promise( function ( resolve ) {
 
-					var pmremGenerator = new PMREMGenerator( envMap );
-					pmremGenerator.update( renderer );
+					var envScene = new THREE.Scene();
+					envScene.background = new THREE.Color( 0xcccccc );
 
-					var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-					pmremCubeUVPacker.update( renderer );
-
-					var cubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
+					var pmremGenerator = new PMREMGenerator( renderer );
+					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 					pmremGenerator.dispose();
-					pmremCubeUVPacker.dispose();
 
-					radianceMap = cubeRenderTarget.texture;
+					scene.background = radianceMap;
 
 					resolve();
 
@@ -147,11 +118,13 @@
 
 			function onResize() {
 
-				var aspect = window.innerWidth / window.innerHeight;
-				camera.top = right / aspect;
-				camera.bottom = - camera.top;
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
-				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				renderer.setSize( width, height );
 
 			}
 
@@ -170,7 +143,6 @@
 			Promise.resolve()
 				.then( init )
 				.then( createEnvironment )
-				.then( getRadiance )
 				.then( createObjects )
 				.then( animate );
 

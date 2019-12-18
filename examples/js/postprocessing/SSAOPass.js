@@ -153,16 +153,16 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		this.ssaoRenderTarget.dispose();
 		this.blurRenderTarget.dispose();
 
-		// dispose geometry
-
-		this.quad.geometry.dispose();
-
 		// dispose materials
 
 		this.normalMaterial.dispose();
 		this.blurMaterial.dispose();
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
+
+		// dipsose full screen quad
+
+		this.fsQuad.dispose();
 
 	},
 

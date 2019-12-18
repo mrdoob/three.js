@@ -943,8 +943,6 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( data.userData !== undefined ) object.userData = data.userData;
 		if ( data.layers !== undefined ) object.layers.mask = data.layers;
 
-		if ( data.drawMode !== undefined ) object.setDrawMode( data.drawMode );
-
 		if ( data.children !== undefined ) {
 
 			var children = data.children;

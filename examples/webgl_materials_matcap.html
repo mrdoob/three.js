@@ -24,8 +24,6 @@
 
 			var mesh, renderer, scene, camera;
 
-			var image;
-
 			var API = {
 				color: 0xffffff,
 				exposure: 1.0
@@ -45,7 +43,7 @@
 				renderer.toneMapping = THREE.LinearToneMapping;
 			 	renderer.toneMappingExposure = API.exposure;
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// scene
 				scene = new THREE.Scene();
@@ -64,23 +62,24 @@
 				var manager = new THREE.LoadingManager( render );
 
 				// matcap
+				var loader = new EXRLoader( manager );
+				var matcap = loader.load( 'textures/matcaps/040full.exr' );
+
+				// normalmap
 				var loader = new THREE.TextureLoader( manager );
-
-				var matcap = loader.load( 'textures/matcaps/matcap-porcelain-white.jpg', function () {
-
-					matcap.encoding = THREE.sRGBEncoding;
-
-				} );
+				var normalmap = loader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 
 				// model
 				new GLTFLoader( manager ).load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
 					mesh = gltf.scene.children[ 0 ];
+					mesh.position.y = - 0.25;
 
 					mesh.material = new THREE.MeshMatcapMaterial( {
 
 						color: API.color,
-						matcap: matcap
+						matcap: matcap,
+						normalMap: normalmap
 
 					} );
 

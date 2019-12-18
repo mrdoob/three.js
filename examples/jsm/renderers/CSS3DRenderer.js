@@ -16,6 +16,7 @@ var CSS3DObject = function ( element ) {
 
 	this.element = element;
 	this.element.style.position = 'absolute';
+	this.element.style.pointerEvents = 'auto';
 
 	this.addEventListener( 'removed', function () {
 
@@ -68,6 +69,7 @@ var CSS3DRenderer = function () {
 
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
+	cameraElement.style.pointerEvents = 'none';
 
 	domElement.appendChild( cameraElement );
 

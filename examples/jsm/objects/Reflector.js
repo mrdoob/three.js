@@ -169,17 +169,17 @@ var Reflector = function ( geometry, options ) {
 
 		var currentRenderTarget = renderer.getRenderTarget();
 
-		var currentVrEnabled = renderer.vr.enabled;
+		var currentXrEnabled = renderer.xr.enabled;
 		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-		renderer.vr.enabled = false; // Avoid camera modification and recursion
+		renderer.xr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
 		renderer.clear();
 		renderer.render( scene, virtualCamera );
 
-		renderer.vr.enabled = currentVrEnabled;
+		renderer.xr.enabled = currentXrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
 		renderer.setRenderTarget( currentRenderTarget );

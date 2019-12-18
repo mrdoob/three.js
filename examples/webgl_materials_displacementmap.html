@@ -112,9 +112,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
@@ -157,6 +155,7 @@
 				];
 
 				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				reflectionCube.encoding = THREE.sRGBEncoding;
 
 				// textures
 

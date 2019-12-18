@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.110.0",
+  "version": "0.111.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "module": "build/three.module.js",
@@ -72,19 +72,19 @@
   "homepage": "https://threejs.org/",
   "devDependencies": {
     "@types/webgl2": "^0.0.5",
-    "@typescript-eslint/eslint-plugin": "^2.4.0",
-    "@typescript-eslint/parser": "^2.4.0",
+    "@typescript-eslint/eslint-plugin": "^2.9.0",
+    "@typescript-eslint/parser": "^2.9.0",
     "concurrently": "^5.0.0",
-    "eslint": "^6.5.1",
+    "eslint": "^6.7.1",
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-html": "^6.0.0",
     "failonlyreporter": "^1.0.0",
     "google-closure-compiler": "20190929.0.0",
-    "http-server": "^0.11.1",
+    "http-server": "^0.12.0",
     "qunit": "^2.9.3",
-    "rollup": "^1.25.1",
+    "rollup": "^1.27.5",
     "rollup-plugin-buble": "^0.19.8",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
   },
   "jspm": {
     "files": [

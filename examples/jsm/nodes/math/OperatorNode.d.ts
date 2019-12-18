@@ -10,7 +10,6 @@ export class OperatorNode extends TempNode {
 	b: Node;
 	op: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: OperatorNode ): this;
 
 	static ADD: string;

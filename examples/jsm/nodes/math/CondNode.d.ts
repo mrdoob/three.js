@@ -14,7 +14,6 @@ export class CondNode extends TempNode {
 	nodeType: string;
 
 	getCondType( builder: NodeBuilder ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: CondNode ): this;
 
 	static EQUAL: string;

@@ -20,9 +20,20 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	// cordova iOS (as of 5.0) still uses UIWebView, which provides OffscreenCanvas,
 	// also OffscreenCanvas.getContext("webgl"), but not OffscreenCanvas.getContext("2d")!
+	// Some implementations may only implement OffscreenCanvas partially (e.g. lacking 2d).
 
-	var useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
-		&& ( new OffscreenCanvas( 1, 1 ).getContext( "2d" ) ) !== null;
+	var useOffscreenCanvas = false;
+
+	try {
+
+		useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
+			&& ( new OffscreenCanvas( 1, 1 ).getContext( "2d" ) ) !== null;
+
+	} catch ( err ) {
+
+		// Ignore any errors
+
+	}
 
 	function createCanvas( width, height ) {
 
@@ -928,7 +939,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-				generateMipmap( _gl.TEXTURE_2D, texture, image.width, image.height );
+				generateMipmap( textureType, texture, image.width, image.height );
 
 			}
 
