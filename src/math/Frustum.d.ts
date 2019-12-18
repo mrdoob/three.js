@@ -26,12 +26,12 @@ export class Frustum {
 	planes: Plane[];
 
 	set(
-		p0?: Plane,
-		p1?: Plane,
-		p2?: Plane,
-		p3?: Plane,
-		p4?: Plane,
-		p5?: Plane
+		p0: Plane,
+		p1: Plane,
+		p2: Plane,
+		p3: Plane,
+		p4: Plane,
+		p5: Plane
 	): Frustum;
 	clone(): this;
 	copy( frustum: Frustum ): this;
