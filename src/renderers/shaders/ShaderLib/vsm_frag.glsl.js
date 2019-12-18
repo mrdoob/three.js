@@ -17,7 +17,7 @@ void main() {
 
     #ifdef HORIZONAL_PASS
 
-      vec2 distribution = unpack2HalfToRGBA ( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( i, 0.0 ) * radius ) / resolution ) );
+      vec2 distribution = unpackRGBATo2Half( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( i, 0.0 ) * radius ) / resolution ) );
       mean += distribution.x;
       squared_mean += distribution.y * distribution.y + distribution.x * distribution.x;
 
