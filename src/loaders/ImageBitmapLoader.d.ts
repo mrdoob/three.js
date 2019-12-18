@@ -1,5 +1,5 @@
 import { Loader } from './Loader';
-import { LoadingManager } from './LoadingManager.js';
+import { LoadingManager } from './LoadingManager';
 
 export class ImageBitmapLoader extends Loader {
 
@@ -10,7 +10,7 @@ export class ImageBitmapLoader extends Loader {
 	setOptions( options: object ): ImageBitmapLoader;
 	load(
 		url: string,
-		onLoad?: ( response: string | ArrayBuffer ) => void,
+		onLoad?: ( response: ImageBitmap ) => void,
 		onProgress?: ( request: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
 	): any;

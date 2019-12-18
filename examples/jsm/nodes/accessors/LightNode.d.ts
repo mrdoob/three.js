@@ -8,7 +8,6 @@ export class LightNode extends TempNode {
 	scope: string;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: LightNode ): this;
 
 	static TOTAL: string;

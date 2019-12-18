@@ -19,6 +19,5 @@ export class TextureCubeNode extends TempNode {
 	nodeType: string;
 
 	generateTextureCubeUV( builder: NodeBuilder, output: string ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 
 }

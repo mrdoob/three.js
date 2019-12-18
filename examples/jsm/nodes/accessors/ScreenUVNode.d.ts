@@ -9,7 +9,6 @@ export class ScreenUVNode extends TempNode {
 	resolution: ResolutionNode;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: ScreenUVNode ): this;
 
 }

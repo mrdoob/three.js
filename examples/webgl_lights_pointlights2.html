@@ -55,6 +55,7 @@
 				texture.repeat.set( 20, 10 );
 				texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 				texture.format = THREE.RGBFormat;
+				texture.encoding = THREE.sRGBEncoding;
 
 				// MATERIALS
 
@@ -133,9 +134,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// CONTROLS
 

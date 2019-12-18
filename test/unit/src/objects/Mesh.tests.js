@@ -29,11 +29,6 @@ export default QUnit.module( 'Objects', () => {
 			assert.ok( false, "everything's gonna be alright" );
 
 		} );
-		QUnit.todo( "setDrawMode", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
 		QUnit.todo( "copy", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );

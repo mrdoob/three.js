@@ -13,7 +13,6 @@ export class BumpMapNode extends TempNode {
 	toNormalMap: boolean;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: BumpMapNode ): this;
 
 	static Nodes: {

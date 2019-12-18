@@ -11,7 +11,6 @@ export class SpecularMIPLevelNode extends TempNode {
 	maxMIPLevel: MaxMIPLevelNode;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: SpecularMIPLevelNode ): this;
 
 	static Nodes: {

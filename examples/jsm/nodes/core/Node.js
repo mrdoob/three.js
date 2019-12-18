@@ -94,6 +94,12 @@ Node.prototype = {
 
 	},
 
+	generate: function ( /* builder, output, uuid, type, ns */ ) {
+
+		// This method needs to be implemented in subclasses
+
+	},
+
 	appendDepsNode: function ( builder, data, output ) {
 
 		data.deps = ( data.deps || 0 ) + 1;

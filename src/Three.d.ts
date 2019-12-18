@@ -86,7 +86,6 @@ export * from './animation/AnimationUtils';
 export * from './animation/AnimationObjectGroup';
 export * from './animation/AnimationMixer';
 export * from './animation/AnimationClip';
-export * from './animation/AnimationAction';
 export * from './core/Uniform';
 export * from './core/InstancedBufferGeometry';
 export * from './core/BufferGeometry';
@@ -173,8 +172,6 @@ export * from './renderers/webgl/WebGLShadowMap';
 export * from './renderers/webgl/WebGLState';
 export * from './renderers/webgl/WebGLTextures';
 export * from './renderers/webgl/WebGLUniforms';
-//export * from './renderers/webgl/WebGLUtils';
-export * from './renderers/webvr/WebVRManager';
 export * from './constants';
 export * from './Three.Legacy';
 

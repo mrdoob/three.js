@@ -503,6 +503,7 @@
 				groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
 				groundTexture.repeat.set( 25, 25 );
 				groundTexture.anisotropy = 16;
+				groundTexture.encoding = THREE.sRGBEncoding;
 
 				var groundMaterial = new THREE.MeshLambertMaterial( { map: groundTexture } );
 
@@ -561,8 +562,7 @@
 
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				renderer.shadowMap.enabled = true;
 

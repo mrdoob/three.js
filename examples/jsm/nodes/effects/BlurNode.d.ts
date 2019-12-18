@@ -24,7 +24,6 @@ export class BlurNode extends TempNode {
 	nodeType: string;
 
 	updateFrame( frame: NodeFrame ): void;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: BlurNode ): this;
 
 	static Nodes: {

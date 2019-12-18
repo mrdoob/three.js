@@ -15,7 +15,6 @@ export class FunctionCallNode extends TempNode {
 	setFunction( func: FunctionNode, inputs?: Node[] ): void;
 	getFunction(): FunctionNode;
 	getType(): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: FunctionCallNode ): this;
 
 }

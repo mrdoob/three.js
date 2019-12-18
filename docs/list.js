@@ -76,7 +76,6 @@ var list = {
 				"Animation": "api/en/constants/Animation",
 				"Core": "api/en/constants/Core",
 				"CustomBlendingEquation": "api/en/constants/CustomBlendingEquations",
-				"DrawModes": "api/en/constants/DrawModes",
 				"Materials": "api/en/constants/Materials",
 				"Renderer": "api/en/constants/Renderer",
 				"Textures": "api/en/constants/Textures"
@@ -203,7 +202,8 @@ var list = {
 				"RectAreaLightHelper": "api/en/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/en/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/en/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/en/helpers/VertexNormalsHelper"
+				"VertexNormalsHelper": "api/en/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "api/en/helpers/VertexTangentsHelper"
 			},
 
 			"Lights": {
@@ -401,8 +401,9 @@ var list = {
 				"ColladaExporter": "examples/en/exporters/ColladaExporter"
 			},
 
-			"Plugins": {
-				"LookupTable": "examples/en/Lut",
+			"Math": {
+				"LookupTable": "examples/en/math/Lut",
+				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
 			},
 
 			"ConvexHull": {
@@ -520,7 +521,6 @@ var list = {
 				"Animation": "api/zh/constants/Animation",
 				"Core": "api/zh/constants/Core",
 				"CustomBlendingEquation": "api/zh/constants/CustomBlendingEquations",
-				"DrawModes": "api/zh/constants/DrawModes",
 				"Materials": "api/zh/constants/Materials",
 				"Renderer": "api/zh/constants/Renderer",
 				"Textures": "api/zh/constants/Textures"
@@ -647,7 +647,8 @@ var list = {
 				"RectAreaLightHelper": "api/zh/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/zh/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/zh/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper"
+				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "api/zh/helpers/VertexTangentsHelper"
 			},
 
 			"灯光": {
@@ -844,8 +845,9 @@ var list = {
 				"ColladaExporter": "examples/zh/exporters/ColladaExporter"
 			},
 
-			"插件": {
-				"LookupTable": "examples/zh/Lut",
+			"数学库": {
+				"LookupTable": "examples/zh/math/Lut",
+				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
 			},
 
 			"QuickHull": {

@@ -86,7 +86,6 @@
 				textureCube.format = THREE.RGBFormat;
 
 				var shader = THREE.ShaderLib[ 'cube' ];
-				shader.uniforms[ 'tCube' ].value = textureCube;
 
 				var skyMaterial = new THREE.ShaderMaterial( {
 
@@ -97,6 +96,8 @@
 					side: THREE.BackSide
 
 				} );
+
+				skyMaterial.envMap = textureCube;
 
 				var sky = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), skyMaterial );
 				scene.add( sky );

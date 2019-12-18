@@ -131,6 +131,7 @@ export { Color } from './math/Color.js';
 export { SphericalHarmonics3 } from './math/SphericalHarmonics3.js';
 export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
 export { VertexNormalsHelper } from './helpers/VertexNormalsHelper.js';
+export { VertexTangentsHelper } from './helpers/VertexTangentsHelper.js';
 export { SpotLightHelper } from './helpers/SpotLightHelper.js';
 export { SkeletonHelper } from './helpers/SkeletonHelper.js';
 export { PointLightHelper } from './helpers/PointLightHelper.js';
