@@ -329,6 +329,13 @@
 		}
 
 		filterInput.value = extractQuery();
+
+		if ( filterInput.value !== '' ) {
+
+			panel.classList.add( 'searchFocused' );
+
+		}
+
 		updateFilter();
 
 		</script>
