@@ -52,11 +52,10 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrCubeMap ) {
+					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
-						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
-						hdrCubeMap.dispose();
+						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+						hdrEquirect.dispose();
 						pmremGenerator.dispose();
 
 						// Materials
@@ -162,6 +161,11 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.Uncharted2ToneMapping;
 				renderer.toneMappingExposure = 0.75;
+
+				//
+
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.prepareFromEquirectangular();
 
 				//
 

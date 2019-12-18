@@ -69,7 +69,6 @@
 					.setPath( 'textures/hdr/' )
 					.load( 'quarry_01_1k.hdr', function ( texture ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
 						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
 
@@ -104,6 +103,9 @@
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.prepareFromEquirectangular();
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

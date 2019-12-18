@@ -157,7 +157,6 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'venice_sunset_1k.hdr', function ( texture ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
 						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
 
@@ -170,6 +169,9 @@
 						animate();
 
 					} );
+
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.prepareFromEquirectangular();
 
 			}
 
