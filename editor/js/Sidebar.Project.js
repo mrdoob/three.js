@@ -52,20 +52,6 @@ Sidebar.Project = function ( editor ) {
 
 	projectsettings.add( editableRow );
 
-	// VR
-
-	var vrRow = new UI.Row();
-	var vr = new UI.Checkbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
-
-		config.setKey( 'project/vr', this.getValue() );
-
-	} );
-
-	vrRow.add( new UI.Text( strings.getKey( 'sidebar/project/vr' ) ).setWidth( '90px' ) );
-	vrRow.add( vr );
-
-	projectsettings.add( vrRow );
-
 	// Renderer
 
 	var options = {};
@@ -199,7 +185,7 @@ Sidebar.Project = function ( editor ) {
 	buttonsRow.add( addButton );
 	*/
 
-	var assignMaterial = new UI.Button().setLabel( 'Assign' ).setMargin( '0px 5px' );
+	var assignMaterial = new UI.Button().setLabel( strings.getKey( 'sidebar/project/Assign' ) ).setMargin( '0px 5px' );
 	assignMaterial.onClick( function () {
 
 		if ( editor.selected !== null ) {

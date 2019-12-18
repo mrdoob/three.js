@@ -22,7 +22,6 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	constructor( parameters: MeshPhysicalMaterialParameters );
 
-	defines: any;
 	reflectivity: number;
 	clearcoat: number;
 	clearcoatRoughness: number;

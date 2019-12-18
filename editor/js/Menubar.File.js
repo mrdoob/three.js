@@ -266,6 +266,42 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Export PLY (ASCII)
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/ply' ) );
+	option.onClick( function () {
+
+		var exporter = new THREE.PLYExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveArrayBuffer( result, 'model.ply' );
+
+		} );
+
+	} );
+	options.add( option );
+
+	// Export PLY (Binary)
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/ply_binary' ) );
+	option.onClick( function () {
+
+		var exporter = new THREE.PLYExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveArrayBuffer( result, 'model-binary.ply' );
+
+		}, { binary: true } );
+
+	} );
+	options.add( option );
+
 	// Export STL (ASCII)
 
 	var option = new UI.Row();
@@ -313,8 +349,6 @@ Menubar.File = function ( editor ) {
 		output.metadata.type = 'App';
 		delete output.history;
 
-		var vr = output.project.vr;
-
 		output = JSON.stringify( output, parseNumber, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
@@ -337,12 +371,6 @@ Menubar.File = function ( editor ) {
 
 			var includes = [];
 
-			if ( vr ) {
-
-				includes.push( '<script src="js/WebVR.js"></script>' );
-
-			}
-
 			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
 
 			var editButton = '';
@@ -359,6 +387,7 @@ Menubar.File = function ( editor ) {
 					'			document.body.appendChild( button );',
 					''
 				].join( '\n' );
+
 			}
 
 			content = content.replace( '\n\t\t\t/* edit button */\n', editButton );
@@ -376,16 +405,6 @@ Menubar.File = function ( editor ) {
 			zip.file( 'js/three.min.js', content );
 
 		} );
-
-		if ( vr ) {
-
-			loader.load( '../examples/js/vr/WebVR.js', function ( content ) {
-
-				zip.file( 'js/WebVR.js', content );
-
-			} );
-
-		}
 
 	} );
 	options.add( option );

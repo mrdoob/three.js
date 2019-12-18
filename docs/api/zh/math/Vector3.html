@@ -121,7 +121,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Float angleTo]( [param:Vector3 v] )</h3>
 		<p>
-		以弧度返回该向量与向量[page:Vector3 v]之间的角度。
+		以弧度返回该向量与向量[page:Vector3 v]之间的角度。 Neither this vector nor [page:Vector3 v] can be the zero vector.
 		</p>
 
 		<h3>[method:this ceil]()</h3>
@@ -320,7 +320,7 @@ var d = a.distanceTo( b );
 		</p>
 
 		<h3>[method:this projectOnVector]( [param:Vector3] )</h3>
-		<p>投影（[link:https://en.wikipedia.org/wiki/Vector_projection Projects]）该向量到另一个向量上。 </p>
+		<p>投影（[link:https://en.wikipedia.org/wiki/Vector_projection Projects]）该向量到向量[page:Vector3 v]上。[page:Vector3 v]不能是零向量。</p>
 
 		<h3>[method:this reflect]( [param:Vector3 normal] )</h3>
 		<p>

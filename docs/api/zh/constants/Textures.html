@@ -63,9 +63,7 @@
 		使用[page:constant MirroredRepeatWrapping]， 纹理将重复到无穷大，在每次重复时将进行镜像。
 	</p>
 
-	<h2>Magnification Filters
-		放大滤镜
-	</h2>
+	<h2>放大滤镜（Magnification Filters）</h2>
 	<code>
 		THREE.NearestFilter
 		THREE.LinearFilter
@@ -80,8 +78,7 @@
 
 	</p>
 
-	<h2>缩小滤镜
-		Minification Filters</h2>
+	<h2>缩小滤镜（Minification Filters）</h2>
 	<code>
 		THREE.NearestFilter
 		THREE.NearestMipmapNearestFilter
@@ -97,20 +94,20 @@
 		除了[page:constant NearestFilter] 和 [page:constant LinearFilter]，
 		下面的四个函数也可以用于缩小：<br /><br />
 
-		[page:constant NearestMipmapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，并以[page:constant
-		NearestFilter]（最靠近像素中心的纹理元素）为标准来生成纹理值。
+		[page:constant NearestMipmapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，
+		并以[page:constant NearestFilter]（最靠近像素中心的纹理元素）为标准来生成纹理值。
 		<br /><br />
 
-		[page:constant NearestMipmapLinearFilter]选择与被纹理化像素的尺寸最接近的两个mipmap，并以[page:constant
-		NearestFilter]为标准来从每个mipmap中生成纹理值。最终的纹理值是这两个值的加权平均值。
+		[page:constant NearestMipmapLinearFilter]选择与被纹理化像素的尺寸最接近的两个mipmap，
+		并以[page:constant NearestFilter]为标准来从每个mipmap中生成纹理值。最终的纹理值是这两个值的加权平均值。
 		<br /><br />
 
-		[page:constant LinearMipmapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，并以[page:constant
-		LinearFilter]（最靠近像素中心的四个纹理元素的加权平均值）为标准来生成纹理值。
+		[page:constant LinearMipmapNearestFilter]选择与被纹理化像素的尺寸最匹配的mipmap，
+		并以[page:constant LinearFilter]（最靠近像素中心的四个纹理元素的加权平均值）为标准来生成纹理值。
 		<br /><br />
 
-		[page:constant LinearMipmapLinearFilter]是默认值，它选择与被纹理化像素的尺寸最接近的两个mipmap，并以[page:constant
-		LinearFilter]为标准来从每个mipmap中生成纹理值。最终的纹理值是这两个值的加权平均值。<br /><br />
+		[page:constant LinearMipmapLinearFilter]是默认值，它选择与被纹理化像素的尺寸最接近的两个mipmap，
+		并以[page:constant LinearFilter]为标准来从每个mipmap中生成纹理值。最终的纹理值是这两个值的加权平均值。<br /><br />
 
 		请查看示例：[example:webgl_materials_texture_filters materials / texture / filters]。
 	</p>
@@ -175,8 +172,8 @@
 
 		<br /><br />
 		请注意，纹理必须具有正确的[page:Texture.type type]设置，正如上一节所描述的那样。
-		请参阅[link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D
-		WebGLRenderingContext.texImage2D]来获得有关详细信息。
+		请参阅[link:https://developer.mozilla.org/en/docs/Web/API/WebGLRenderingContext/texImage2D WebGLRenderingContext.texImage2D]
+		来获得有关详细信息。
 	</p>
 
 	<h2>DDS / ST3C 压缩纹理格式</h2>
@@ -187,9 +184,9 @@
 		THREE.RGBA_S3TC_DXT5_Format
 		</code>
 	<p>
-		要使用[page:CompressedTexture CompressedTexture]中的[page:Texture.format
-		format]属性，需要获得[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/
-		WEBGL_compressed_texture_s3tc]扩展的支持。<br /><br />
+		要使用[page:CompressedTexture CompressedTexture]中的[page:Texture.format format]属性，
+		需要获得[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_s3tc/ WEBGL_compressed_texture_s3tc]
+		扩展的支持。<br /><br />
 
 		通过这个扩展，这里的四种[link:https://en.wikipedia.org/wiki/S3_Texture_Compression S3TC]格式将可以使用：<br />
 
@@ -199,8 +196,7 @@
 		[page:constant RGBA_S3TC_DXT5_Format]：RGBA图像格式的DXT5压缩图像，它也提供了4:1的压缩比，但与DX3格式的不同之处在于其Alpha是如何被压缩的。<br />
 	</p>
 
-	<h2>PVRTC 压缩纹理格式
-		PVRTC Compressed Texture Formats</h2>
+	<h2>PVRTC 压缩纹理格式（PVRTC Compressed Texture Formats）</h2>
 	<code>
 		THREE.RGB_PVRTC_4BPPV1_Format
 		THREE.RGB_PVRTC_2BPPV1_Format
@@ -209,8 +205,8 @@
 		</code>
 	<p>
 		要使用[page:CompressedTexture CompressedTexture]中的[page:Texture.format format]属性，需要获得
-		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/
-		WEBGL_compressed_texture_pvrtc]扩展的支持。<br />
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_pvrtc/ WEBGL_compressed_texture_pvrtc]
+		扩展的支持。<br />
 		PVRTC通常只在具有PowerVR芯片的移动设备上可用，这些设备主要是苹果设备。<br /><br />
 
 
@@ -228,8 +224,8 @@
 		</code>
 	<p>
 		要使用[page:CompressedTexture CompressedTexture]中的[page:Texture.format format]属性，需要获得
-		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/
-		WEBGL_compressed_texture_etc1]扩展的支持。<br /><br />
+		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
+		扩展的支持。<br /><br />
 	</p>
 
 	<h2>编码</h2>

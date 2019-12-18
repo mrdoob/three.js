@@ -44,27 +44,27 @@
 
 		<h2>方法</h2>
 
-		<h3>[method:null moveTo]( [param:Float x], [param:Float y] )</h3>
+		<h3>[method:this moveTo]( [param:Float x], [param:Float y] )</h3>
 		<p>
 		创建一个新的[page:Path]，并在[page:Path]上调用[page:Path.moveTo]( x, y )。
 		</p>
 
-		<h3>[method:null lineTo]( [param:Float x], [param:Float y] )</h3>
+		<h3>[method:this lineTo]( [param:Float x], [param:Float y] )</h3>
 		<p>这一方法从[page:ShapePath.currentPath currentPath]（当前路径）的偏移量创建一条到X和Y的线，并将偏移量更新为X和Y。
 		</p>
 
-		<h3>[method:null quadraticCurveTo]( [param:Float cpX], [param:Float cpY], [param:Float x], [param:Float y] )</h3>
+		<h3>[method:this quadraticCurveTo]( [param:Float cpX], [param:Float cpY], [param:Float x], [param:Float y] )</h3>
 		<p>这一方法从[page:ShapePath.currentPath currentPath]（当前路径）创建一条到X和Y的二次曲线，cpX和cpY作为控制点，
 			并将[page:ShapePath.currentPath currentPath]的偏移量更新为x和y。
 		</p>
 
-		<h3>[method:null bezierCurveTo]( [param:Float cp1X], [param:Float cp1Y], [param:Float cp2X], [param:Float cp2Y], [param:Float x], [param:Float y] )</h3>
+		<h3>[method:this bezierCurveTo]( [param:Float cp1X], [param:Float cp1Y], [param:Float cp2X], [param:Float cp2Y], [param:Float x], [param:Float y] )</h3>
 		<p>
 			这一方法从[page:ShapePath.currentPath currentPath]（当前路径）的偏移量创建一条到X和Y的贝塞尔曲线，
 			cp1X、cp1Y和cp1X、cp1Y为控制点，并将[page:ShapePath.currentPath currentPath]的偏移量更新为x和y。
 		</p>
 
-		<h3>[method:null splineThru] ( [param:Array points] ) </h3>
+		<h3>[method:this splineThru] ( [param:Array points] ) </h3>
 		<p>points - 一个[page:Vector2]数组。</p>
 		<p>
 			连接一个新的[page:SplineCurve]（样条曲线）到[page:ShapePath.currentPath currentPath]（当前路径）。</p>

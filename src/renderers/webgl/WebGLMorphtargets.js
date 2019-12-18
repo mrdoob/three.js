@@ -17,7 +17,10 @@ function WebGLMorphtargets( gl ) {
 
 		var objectInfluences = object.morphTargetInfluences;
 
-		var length = objectInfluences.length;
+		// When object doesn't have morph target influences defined, we treat it as a 0-length array
+		// This is important to make sure we set up morphTargetBaseInfluence / morphTargetInfluences
+
+		var length = objectInfluences === undefined ? 0 : objectInfluences.length;
 
 		var influences = influencesList[ geometry.id ];
 
@@ -70,6 +73,8 @@ function WebGLMorphtargets( gl ) {
 
 		// Add morphAttributes
 
+		var morphInfluencesSum = 0;
+
 		for ( var i = 0; i < 8; i ++ ) {
 
 			var influence = influences[ i ];
@@ -85,6 +90,7 @@ function WebGLMorphtargets( gl ) {
 					if ( morphNormals ) geometry.setAttribute( 'morphNormal' + i, morphNormals[ index ] );
 
 					morphInfluences[ i ] = value;
+					morphInfluencesSum += value;
 					continue;
 
 				}
@@ -95,6 +101,12 @@ function WebGLMorphtargets( gl ) {
 
 		}
 
+		// GLSL shader uses formula baseinfluence * base + sum(target * influence)
+		// This allows us to switch between absolute morphs and relative morphs without changing shader code
+		// When baseinfluence = 1 - sum(influence), the above is equivalent to sum((target - base) * influence)
+		var morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
+
+		program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', morphBaseInfluence );
 		program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluences );
 
 	}

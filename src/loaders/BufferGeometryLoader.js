@@ -88,6 +88,14 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		}
 
+		var morphTargetsRelative = json.data.morphTargetsRelative;
+
+		if ( morphTargetsRelative ) {
+
+			geometry.morphTargetsRelative = true;
+
+		}
+
 		var groups = json.data.groups || json.data.drawcalls || json.data.offsets;
 
 		if ( groups !== undefined ) {

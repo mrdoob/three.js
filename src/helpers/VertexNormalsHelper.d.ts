@@ -13,6 +13,6 @@ export class VertexNormalsHelper extends LineSegments {
 	object: Object3D;
 	size: number;
 
-	update( object?: Object3D ): void;
+	update(): void;
 
 }

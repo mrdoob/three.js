@@ -265,6 +265,12 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	applyNormalMatrix: function ( m ) {
+
+		return this.applyMatrix3( m ).normalize();
+
+	},
+
 	applyMatrix4: function ( m ) {
 
 		var x = this.x, y = this.y, z = this.z;

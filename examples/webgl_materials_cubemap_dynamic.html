@@ -178,25 +178,21 @@
 
 				camera.lookAt( scene.position );
 
-				sphere.visible = false;
-
 				// pingpong
 
 				if ( count % 2 === 0 ) {
 
+					cubeCamera1.update( renderer, scene );
 					material.envMap = cubeCamera1.renderTarget.texture;
-					cubeCamera2.update( renderer, scene );
 
 				} else {
 
+					cubeCamera2.update( renderer, scene );
 					material.envMap = cubeCamera2.renderTarget.texture;
-					cubeCamera1.update( renderer, scene );
 
 				}
 
 				count ++;
-
-				sphere.visible = true;
 
 				renderer.render( scene, camera );
 

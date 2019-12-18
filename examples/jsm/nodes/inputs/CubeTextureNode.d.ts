@@ -14,7 +14,6 @@ export class CubeTextureNode extends InputNode {
 	nodeType: string;
 
 	getTexture( builder: NodeBuilder, output: string ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: CubeTextureNode ): this;
 
 }

@@ -7,8 +7,11 @@ import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
 import {
 	FlatShading,
+	sRGBEncoding,
+	LinearEncoding,
 	StaticDrawUsage,
-	DynamicDrawUsage
+	DynamicDrawUsage,
+	TrianglesDrawMode
 } from './constants.js';
 import {
 	Float64BufferAttribute,
@@ -70,6 +73,7 @@ import { Triangle } from './math/Triangle.js';
 import { Vector2 } from './math/Vector2.js';
 import { Vector3 } from './math/Vector3.js';
 import { Vector4 } from './math/Vector4.js';
+import { Mesh } from './objects/Mesh.js';
 import { LineSegments } from './objects/LineSegments.js';
 import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
@@ -80,7 +84,6 @@ import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 import { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
-import { WebVRManager } from './renderers/webvr/WebVRManager.js';
 import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
@@ -988,6 +991,34 @@ Object.defineProperties( Object3D.prototype, {
 
 } );
 
+Object.assign( Mesh.prototype, {
+
+	setDrawMode: function () {
+
+		console.error( 'THREE.Mesh: .setDrawMode() has been removed. The renderer now always assumes THREE.TrianglesDrawMode. Transform your geometry via BufferGeometryUtils.toTrianglesDrawMode() if necessary.' );
+
+	},
+
+} );
+
+Object.defineProperties( Mesh.prototype, {
+
+	drawMode: {
+		get: function () {
+
+			console.error( 'THREE.Mesh: .drawMode has been removed. The renderer now always assumes THREE.TrianglesDrawMode.' );
+			return TrianglesDrawMode;
+
+		},
+		set: function () {
+
+			console.error( 'THREE.Mesh: .drawMode has been removed. The renderer now always assumes THREE.TrianglesDrawMode. Transform your geometry via BufferGeometryUtils.toTrianglesDrawMode() if necessary.' );
+
+		}
+	}
+
+} );
+
 Object.defineProperties( LOD.prototype, {
 
 	objects: {
@@ -1679,6 +1710,41 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			return this.getContext();
 
 		}
+	},
+	vr: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .vr has been renamed to .xr' );
+			return this.xr;
+
+		}
+	},
+	gammaInput: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Set the encoding for textures via Texture.encoding instead.' );
+			return false;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Set the encoding for textures via Texture.encoding instead.' );
+
+		}
+	},
+	gammaOutput: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Set WebGLRenderer.outputEncoding instead.' );
+			return false;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Set WebGLRenderer.outputEncoding instead.' );
+			this.outputEncoding = ( value === true ) ? sRGBEncoding : LinearEncoding;
+
+		}
 	}
 
 } );
@@ -1889,27 +1955,6 @@ Object.defineProperties( WebGLRenderTarget.prototype, {
 
 			console.warn( 'THREE.WebGLRenderTarget: .generateMipmaps is now .texture.generateMipmaps.' );
 			this.texture.generateMipmaps = value;
-
-		}
-	}
-
-} );
-
-//
-
-Object.defineProperties( WebVRManager.prototype, {
-
-	standing: {
-		set: function ( /* value */ ) {
-
-			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
-
-		}
-	},
-	userHeight: {
-		set: function ( /* value */ ) {
-
-			console.warn( 'THREE.WebVRManager: .userHeight has been removed.' );
 
 		}
 	}
