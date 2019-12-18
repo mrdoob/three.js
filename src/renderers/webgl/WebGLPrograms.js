@@ -269,13 +269,13 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			}
 
+			array.push( renderer.outputEncoding );
+
+			array.push( renderer.gammaFactor );
+
 		}
 
 		array.push( material.onBeforeCompile.toString() );
-
-		array.push( renderer.outputEncoding );
-
-		array.push( renderer.gammaFactor );
 
 		return array.join();
 
