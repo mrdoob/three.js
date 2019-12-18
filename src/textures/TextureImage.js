@@ -16,7 +16,7 @@ function TextureImage( image ) {
 
 Object.assign( TextureImage.prototype, {
 
-	toJSON( meta ) {
+	toJSON: function ( meta ) {
 
 		var isRootObject = ( meta === undefined || typeof meta === 'string' );
 
