@@ -93,7 +93,7 @@ var ARButton = {
 
 		}
 
-		function showWebXRNotFound() {
+		function showARNotSupported() {
 
 			disableButton();
 
@@ -127,9 +127,9 @@ var ARButton = {
 
 			navigator.xr.isSessionSupported( 'immersive-ar' ).then( function ( supported ) {
 
-				supported ? showStartAR() : showWebXRNotFound();
+				supported ? showStartAR() : showARNotSupported();
 
-			} );
+			} ).catch( showARNotSupported );
 
 			return button;
 
