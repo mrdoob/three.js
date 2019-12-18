@@ -160,7 +160,7 @@
 					} );
 
 				var pmremGenerator = new PMREMGenerator( renderer );
-				pmremGenerator.prepareFromCubemap();
+				pmremGenerator.compileCubemapShader();
 
 				var envScene = getEnvScene();
 				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );

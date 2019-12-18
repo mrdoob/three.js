@@ -102,7 +102,7 @@
 				} );
 
 				var pmremGenerator = new PMREMGenerator( renderer );
-				pmremGenerator.prepareFromEquirectangular();
+				pmremGenerator.compileEquirectangularShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

@@ -86,7 +86,7 @@
 				container.appendChild( renderer.domElement );
 
 				var pmremGenerator = new PMREMGenerator( renderer );
-				pmremGenerator.prepareFromEquirectangular();
+				pmremGenerator.compileEquirectangularShader();
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, - 0.2, - 0.2 );

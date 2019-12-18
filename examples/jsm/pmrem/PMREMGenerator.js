@@ -159,7 +159,7 @@ var PMREMGenerator = ( function () {
 		 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
 		 * your texture's network fetch for increased concurrency.
 		 */
-		prepareFromCubemap: function () {
+		compileCubemapShader: function () {
 
 			if ( _cubemapShader == null ) {
 
@@ -174,7 +174,7 @@ var PMREMGenerator = ( function () {
 		 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
 		 * your texture's network fetch for increased concurrency.
 		 */
-		prepareFromEquirectangular: function () {
+		compileEquirectangularShader: function () {
 
 			if ( _equirectShader == null ) {
 
