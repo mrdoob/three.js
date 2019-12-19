@@ -108,7 +108,7 @@ var SidebarHistory = function ( editor ) {
 
 			}
 
-		} )( history.redos, '&nbsp;' );
+		} )( history.redos );
 
 		outliner.setOptions( options );
 

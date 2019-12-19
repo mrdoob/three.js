@@ -341,7 +341,7 @@ Editor.prototype = {
 
 			if ( object.isCamera ) {
 
-				helper = new CameraHelper( object, 1 );
+				helper = new CameraHelper( object );
 
 			} else if ( object.isPointLight ) {
 
