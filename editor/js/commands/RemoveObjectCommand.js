@@ -3,12 +3,14 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+import { ObjectLoader } from '../../../build/three.module.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
  * @constructor
  */
-
 var RemoveObjectCommand = function ( editor, object ) {
 
 	Command.call( this, editor );
@@ -94,7 +96,7 @@ RemoveObjectCommand.prototype = {
 		this.object = this.editor.objectByUuid( json.object.object.uuid );
 		if ( this.object === undefined ) {
 
-			var loader = new THREE.ObjectLoader();
+			var loader = new ObjectLoader();
 			this.object = loader.parse( json.object );
 
 		}
@@ -102,3 +104,5 @@ RemoveObjectCommand.prototype = {
 	}
 
 };
+
+export { RemoveObjectCommand };

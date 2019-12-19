@@ -2,12 +2,36 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import {
+	AnimationMixer,
+	CameraHelper,
+	Color,
+	DirectionalLightHelper,
+	HemisphereLightHelper,
+	Mesh,
+	MeshBasicMaterial,
+	ObjectLoader,
+	PerspectiveCamera,
+	PointLightHelper,
+	Scene,
+	SkeletonHelper,
+	SphereBufferGeometry,
+	SpotLightHelper,
+	Vector3
+} from '../../build/three.module.js';
+
+import { Config } from './Config.js';
+import { Loader } from './Loader.js';
+import { History as _History } from './History.js';
+import { Strings } from './Strings.js';
+import { Storage as _Storage } from './Storage.js';
+
 var Editor = function () {
 
-	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
+	this.DEFAULT_CAMERA = new PerspectiveCamera( 50, 1, 0.01, 1000 );
 	this.DEFAULT_CAMERA.name = 'Camera';
 	this.DEFAULT_CAMERA.position.set( 0, 5, 10 );
-	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
+	this.DEFAULT_CAMERA.lookAt( new Vector3() );
 
 	var Signal = signals.Signal;
 
@@ -74,19 +98,19 @@ var Editor = function () {
 	};
 
 	this.config = new Config();
-	this.history = new History( this );
-	this.storage = new Storage();
+	this.history = new _History( this );
+	this.storage = new _Storage();
 	this.strings = new Strings( this.config );
 
 	this.loader = new Loader( this );
 
 	this.camera = this.DEFAULT_CAMERA.clone();
 
-	this.scene = new THREE.Scene();
+	this.scene = new Scene();
 	this.scene.name = 'Scene';
-	this.scene.background = new THREE.Color( 0xaaaaaa );
+	this.scene.background = new Color( 0xaaaaaa );
 
-	this.sceneHelpers = new THREE.Scene();
+	this.sceneHelpers = new Scene();
 
 	this.object = {};
 	this.geometries = {};
@@ -95,7 +119,7 @@ var Editor = function () {
 	this.scripts = {};
 
 	this.animations = {};
-	this.mixer = new THREE.AnimationMixer( this.scene );
+	this.mixer = new AnimationMixer( this.scene );
 
 	this.selected = null;
 	this.helpers = {};
@@ -308,8 +332,8 @@ Editor.prototype = {
 
 	addHelper: function () {
 
-		var geometry = new THREE.SphereBufferGeometry( 2, 4, 2 );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000, visible: false } );
+		var geometry = new SphereBufferGeometry( 2, 4, 2 );
+		var material = new MeshBasicMaterial( { color: 0xff0000, visible: false } );
 
 		return function ( object ) {
 
@@ -317,27 +341,27 @@ Editor.prototype = {
 
 			if ( object.isCamera ) {
 
-				helper = new THREE.CameraHelper( object, 1 );
+				helper = new CameraHelper( object, 1 );
 
 			} else if ( object.isPointLight ) {
 
-				helper = new THREE.PointLightHelper( object, 1 );
+				helper = new PointLightHelper( object, 1 );
 
 			} else if ( object.isDirectionalLight ) {
 
-				helper = new THREE.DirectionalLightHelper( object, 1 );
+				helper = new DirectionalLightHelper( object, 1 );
 
 			} else if ( object.isSpotLight ) {
 
-				helper = new THREE.SpotLightHelper( object, 1 );
+				helper = new SpotLightHelper( object, 1 );
 
 			} else if ( object.isHemisphereLight ) {
 
-				helper = new THREE.HemisphereLightHelper( object, 1 );
+				helper = new HemisphereLightHelper( object, 1 );
 
 			} else if ( object.isSkinnedMesh ) {
 
-				helper = new THREE.SkeletonHelper( object.skeleton.bones[ 0 ] );
+				helper = new SkeletonHelper( object.skeleton.bones[ 0 ] );
 
 			} else {
 
@@ -346,7 +370,7 @@ Editor.prototype = {
 
 			}
 
-			var picker = new THREE.Mesh( geometry, material );
+			var picker = new Mesh( geometry, material );
 			picker.name = 'picker';
 			picker.userData.object = object;
 			helper.add( picker );
@@ -551,7 +575,7 @@ Editor.prototype = {
 
 	fromJSON: function ( json ) {
 
-		var loader = new THREE.ObjectLoader();
+		var loader = new ObjectLoader();
 
 		// backwards
 
@@ -637,3 +661,5 @@ Editor.prototype = {
 	}
 
 };
+
+export { Editor };

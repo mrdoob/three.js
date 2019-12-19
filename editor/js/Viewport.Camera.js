@@ -2,13 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Viewport.Camera = function ( editor ) {
+import { UISelect } from './libs/ui.js';
+
+var ViewportCamera = function ( editor ) {
 
 	var signals = editor.signals;
 
 	//
 
-	var cameraSelect = new UI.Select();
+	var cameraSelect = new UISelect();
 	cameraSelect.setPosition( 'absolute' );
 	cameraSelect.setRight( '10px' );
 	cameraSelect.setTop( '10px' );
@@ -46,3 +48,5 @@ Viewport.Camera = function ( editor ) {
 	return cameraSelect;
 
 };
+
+export { ViewportCamera };

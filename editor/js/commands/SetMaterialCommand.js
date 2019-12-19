@@ -3,13 +3,15 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+import { ObjectLoader } from '../../../build/three.module.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
  * @param newMaterial THREE.Material
  * @constructor
  */
-
 var SetMaterialCommand = function ( editor, object, newMaterial, materialSlot ) {
 
 	Command.call( this, editor );
@@ -61,11 +63,11 @@ SetMaterialCommand.prototype = {
 		this.oldMaterial = parseMaterial( json.oldMaterial );
 		this.newMaterial = parseMaterial( json.newMaterial );
 
-		function parseMaterial ( json ) {
+		function parseMaterial( json ) {
 
-			var loader = new THREE.ObjectLoader();
+			var loader = new ObjectLoader();
 			var images = loader.parseImages( json.images );
-			var textures  = loader.parseTextures( json.textures, images );
+			var textures = loader.parseTextures( json.textures, images );
 			var materials = loader.parseMaterials( [ json ], textures );
 			return materials[ json.uuid ];
 
@@ -74,3 +76,5 @@ SetMaterialCommand.prototype = {
 	}
 
 };
+
+export { SetMaterialCommand };

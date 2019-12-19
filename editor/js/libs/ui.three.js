@@ -2,9 +2,23 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-UI.Texture = function ( mapping ) {
+import {
+	CanvasTexture,
+	RGBFormat,
+	RGBAFormat,
+ 	Texture,
+	Vector2,
+	Vector3
+} from '../../../build/three.module.js';
 
-	UI.Element.call( this );
+import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
+
+import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
+import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
+
+var UITexture = function ( mapping ) {
+
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -27,7 +41,7 @@ UI.Texture = function ( mapping ) {
 	canvas.style.cursor = 'pointer';
 	canvas.style.marginRight = '5px';
 	canvas.style.border = '1px solid #888';
-	canvas.addEventListener( 'click', function ( event ) {
+	canvas.addEventListener( 'click', function () {
 
 		input.click();
 
@@ -41,6 +55,12 @@ UI.Texture = function ( mapping ) {
 	}, false );
 	dom.appendChild( canvas );
 
+	var name = document.createElement( 'input' );
+	name.disabled = true;
+	name.style.width = '64px';
+	name.style.border = '1px solid #ccc';
+	dom.appendChild( name );
+
 	function loadFile( file ) {
 
 		if ( file.type.match( 'image.*' ) ) {
@@ -51,9 +71,9 @@ UI.Texture = function ( mapping ) {
 
 				reader.addEventListener( 'load', function ( event ) {
 
-					var canvas = new THREE.TGALoader().parse( event.target.result );
+					var canvas = new TGALoader().parse( event.target.result );
 
-					var texture = new THREE.CanvasTexture( canvas, mapping );
+					var texture = new CanvasTexture( canvas, mapping );
 					texture.sourceFile = file.name;
 
 					scope.setValue( texture );
@@ -69,11 +89,11 @@ UI.Texture = function ( mapping ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var image = document.createElement( 'img' );
-					image.addEventListener( 'load', function ( event ) {
+					image.addEventListener( 'load', function () {
 
-						var texture = new THREE.Texture( this, mapping );
+						var texture = new Texture( this, mapping );
 						texture.sourceFile = file.name;
-						texture.format = file.type === 'image/jpeg' ? THREE.RGBFormat : THREE.RGBAFormat;
+						texture.format = file.type === 'image/jpeg' ? RGBFormat : RGBAFormat;
 						texture.needsUpdate = true;
 
 						scope.setValue( texture );
@@ -104,18 +124,19 @@ UI.Texture = function ( mapping ) {
 
 };
 
-UI.Texture.prototype = Object.create( UI.Element.prototype );
-UI.Texture.prototype.constructor = UI.Texture;
+UITexture.prototype = Object.create( UIElement.prototype );
+UITexture.prototype.constructor = UITexture;
 
-UI.Texture.prototype.getValue = function () {
+UITexture.prototype.getValue = function () {
 
 	return this.texture;
 
 };
 
-UI.Texture.prototype.setValue = function ( texture ) {
+UITexture.prototype.setValue = function ( texture ) {
 
 	var canvas = this.dom.children[ 0 ];
+	var name = this.dom.children[ 1 ];
 	var context = canvas.getContext( '2d' );
 
 	if ( texture !== null ) {
@@ -124,21 +145,21 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 		if ( image !== undefined && image.width > 0 ) {
 
-			canvas.title = texture.sourceFile;
+			name.value = texture.sourceFile;
 
 			var scale = canvas.width / image.width;
 			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
 
 		} else {
 
-			canvas.title = texture.sourceFile + ' (error)';
+			name.value = texture.sourceFile + ' (error)';
 			context.clearRect( 0, 0, canvas.width, canvas.height );
 
 		}
 
 	} else {
 
-		canvas.title = 'empty';
+		name.value = '';
 
 		if ( context !== null ) {
 
@@ -154,7 +175,7 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 };
 
-UI.Texture.prototype.setEncoding = function ( encoding ) {
+UITexture.prototype.setEncoding = function ( encoding ) {
 
 	var texture = this.getValue();
 	if ( texture !== null ) {
@@ -167,7 +188,7 @@ UI.Texture.prototype.setEncoding = function ( encoding ) {
 
 };
 
-UI.Texture.prototype.onChange = function ( callback ) {
+UITexture.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
 
@@ -175,11 +196,11 @@ UI.Texture.prototype.onChange = function ( callback ) {
 
 };
 
-// Outliner
+// UIOutliner
 
-UI.Outliner = function ( editor ) {
+var UIOutliner = function ( editor ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -189,6 +210,7 @@ UI.Outliner = function ( editor ) {
 
 	// hack
 	this.scene = editor.scene;
+	this.editor = editor;
 
 	// Prevent native scroll behavior
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -231,10 +253,10 @@ UI.Outliner = function ( editor ) {
 
 };
 
-UI.Outliner.prototype = Object.create( UI.Element.prototype );
-UI.Outliner.prototype.constructor = UI.Outliner;
+UIOutliner.prototype = Object.create( UIElement.prototype );
+UIOutliner.prototype.constructor = UIOutliner;
 
-UI.Outliner.prototype.selectIndex = function ( index ) {
+UIOutliner.prototype.selectIndex = function ( index ) {
 
 	if ( index >= 0 && index < this.options.length ) {
 
@@ -248,7 +270,7 @@ UI.Outliner.prototype.selectIndex = function ( index ) {
 
 };
 
-UI.Outliner.prototype.setOptions = function ( options ) {
+UIOutliner.prototype.setOptions = function ( options ) {
 
 	var scope = this;
 
@@ -272,7 +294,7 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 	var currentDrag;
 
-	function onDrag( event ) {
+	function onDrag() {
 
 		currentDrag = this;
 
@@ -358,7 +380,7 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 		if ( newParentIsChild ) return;
 
-		editor.execute( new MoveObjectCommand( editor, object, newParent, nextObject ) );
+		scope.editor.execute( new MoveObjectCommand( scope.editor, object, newParent, nextObject ) );
 
 		var changeEvent = document.createEvent( 'HTMLEvents' );
 		changeEvent.initEvent( 'change', true, true );
@@ -398,26 +420,26 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 };
 
-UI.Outliner.prototype.getValue = function () {
+UIOutliner.prototype.getValue = function () {
 
 	return this.selectedValue;
 
 };
 
-UI.Outliner.prototype.setValue = function ( value ) {
+UIOutliner.prototype.setValue = function ( value ) {
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
-		var element = this.options[ i ];
+		var UIElement = this.options[ i ];
 
-		if ( element.value === value ) {
+		if ( UIElement.value === value ) {
 
-			element.classList.add( 'active' );
+			UIElement.classList.add( 'active' );
 
 			// scroll into view
 
-			var y = element.offsetTop - this.dom.offsetTop;
-			var bottomY = y + element.offsetHeight;
+			var y = UIElement.offsetTop - this.dom.offsetTop;
+			var bottomY = y + UIElement.offsetHeight;
 			var minScroll = bottomY - this.dom.offsetHeight;
 
 			if ( this.dom.scrollTop > y ) {
@@ -434,7 +456,7 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 		} else {
 
-			element.classList.remove( 'active' );
+			UIElement.classList.remove( 'active' );
 
 		}
 
@@ -446,19 +468,19 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 };
 
-var Points = function ( onAddClicked ) {
+var UIPoints = function ( onAddClicked ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
-	var span = new UI.Span().setDisplay( 'inline-block' );
+	var span = new UISpan().setDisplay( 'inline-block' );
 
-	this.pointsList = new UI.Div();
+	this.pointsList = new UIDiv();
 	span.add( this.pointsList );
 
-	var row = new UI.Row();
+	var row = new UIRow();
 	span.add( row );
 
-	var addPointButton = new UI.Button( '+' ).onClick( onAddClicked );
+	var addPointButton = new UIButton( '+' ).onClick( onAddClicked );
 	row.add( addPointButton );
 
 	this.update = function () {
@@ -479,10 +501,10 @@ var Points = function ( onAddClicked ) {
 
 };
 
-Points.prototype = Object.create( UI.Element.prototype );
-Points.prototype.constructor = Points;
+UIPoints.prototype = Object.create( UIElement.prototype );
+UIPoints.prototype.constructor = UIPoints;
 
-Points.prototype.onChange = function ( callback ) {
+UIPoints.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
 
@@ -490,9 +512,9 @@ Points.prototype.onChange = function ( callback ) {
 
 };
 
-Points.prototype.clear = function () {
+UIPoints.prototype.clear = function () {
 
-	for ( var i = 0; i < this.pointsUI.length; ++ i ) {
+	for ( var i = 0; i < this.pointslength; ++ i ) {
 
 		if ( this.pointsUI[ i ] ) {
 
@@ -506,7 +528,7 @@ Points.prototype.clear = function () {
 
 };
 
-Points.prototype.deletePointRow = function ( idx, dontUpdate ) {
+UIPoints.prototype.deletePointRow = function ( idx, dontUpdate ) {
 
 	if ( ! this.pointsUI[ idx ] ) return;
 
@@ -521,26 +543,26 @@ Points.prototype.deletePointRow = function ( idx, dontUpdate ) {
 
 };
 
-UI.Points2 = function () {
+var UIPoints2 = function () {
 
-	Points.call( this, UI.Points2.addRow.bind( this ) );
+	UIPoints.call( this, UIPoints2.addRow.bind( this ) );
 
 	return this;
 
 };
 
-UI.Points2.prototype = Object.create( Points.prototype );
-UI.Points2.prototype.constructor = UI.Points2;
+UIPoints2.prototype = Object.create( UIPoints.prototype );
+UIPoints2.prototype.constructor = UIPoints2;
 
-UI.Points2.addRow = function () {
+UIPoints2.addRow = function () {
 
-	if ( this.pointsUI.length === 0 ) {
+	if ( this.pointslength === 0 ) {
 
 		this.pointsList.add( this.createPointRow( 0, 0 ) );
 
 	} else {
 
-		var point = this.pointsUI[ this.pointsUI.length - 1 ];
+		var point = this.pointsUI[ this.pointslength - 1 ];
 
 		this.pointsList.add( this.createPointRow( point.x.getValue(), point.y.getValue() ) );
 
@@ -550,20 +572,17 @@ UI.Points2.addRow = function () {
 
 };
 
-UI.Points2.prototype.getValue = function () {
+UIPoints2.prototype.getValue = function () {
 
 	var points = [];
-	var count = 0;
 
-	for ( var i = 0; i < this.pointsUI.length; i ++ ) {
+	for ( var i = 0; i < this.pointslength; i ++ ) {
 
 		var pointUI = this.pointsUI[ i ];
 
 		if ( ! pointUI ) continue;
 
-		points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
-		++ count;
-		pointUI.lbl.setValue( count );
+		points.push( new Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
 
 	}
 
@@ -571,7 +590,7 @@ UI.Points2.prototype.getValue = function () {
 
 };
 
-UI.Points2.prototype.setValue = function ( points ) {
+UIPoints2.prototype.setValue = function ( points ) {
 
 	this.clear();
 
@@ -587,23 +606,23 @@ UI.Points2.prototype.setValue = function ( points ) {
 
 };
 
-UI.Points2.prototype.createPointRow = function ( x, y ) {
+UIPoints2.prototype.createPointRow = function ( x, y ) {
 
-	var pointRow = new UI.Div();
-	var lbl = new UI.Text( this.lastPointIdx + 1 ).setWidth( '20px' );
-	var txtX = new UI.Number( x ).setWidth( '30px' ).onChange( this.update );
-	var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( this.update );
+	var pointRow = new UIDiv();
+	var lbl = new UIText( this.lastPointIdx + 1 ).setWidth( '20px' );
+	var txtX = new UINumber( x ).setWidth( '30px' ).onChange( this.update );
+	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
 
 	var idx = this.lastPointIdx;
 	var scope = this;
-	var btn = new UI.Button( '-' ).onClick( function () {
+	var btn = new UIButton( '-' ).onClick( function () {
 
 		if ( scope.isEditing ) return;
 		scope.deletePointRow( idx );
 
 	} );
 
-	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
+	this.pointspush( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
 	++ this.lastPointIdx;
 	pointRow.add( lbl, txtX, txtY, btn );
 
@@ -611,26 +630,26 @@ UI.Points2.prototype.createPointRow = function ( x, y ) {
 
 };
 
-UI.Points3 = function () {
+var UIPoints3 = function () {
 
-	Points.call( this, UI.Points3.addRow.bind( this ) );
+	UIPoints.call( this, UIPoints3.addRow.bind( this ) );
 
 	return this;
 
 };
 
-UI.Points3.prototype = Object.create( Points.prototype );
-UI.Points3.prototype.constructor = UI.Points3;
+UIPoints3.prototype = Object.create( UIPoints.prototype );
+UIPoints3.prototype.constructor = UIPoints3;
 
-UI.Points3.addRow = function () {
+UIPoints3.addRow = function () {
 
-	if ( this.pointsUI.length === 0 ) {
+	if ( this.pointslength === 0 ) {
 
 		this.pointsList.add( this.createPointRow( 0, 0, 0 ) );
 
 	} else {
 
-		var point = this.pointsUI[ this.pointsUI.length - 1 ];
+		var point = this.pointsUI[ this.pointslength - 1 ];
 
 		this.pointsList.add( this.createPointRow( point.x.getValue(), point.y.getValue(), point.z.getValue() ) );
 
@@ -640,20 +659,17 @@ UI.Points3.addRow = function () {
 
 };
 
-UI.Points3.prototype.getValue = function () {
+UIPoints3.prototype.getValue = function () {
 
 	var points = [];
-	var count = 0;
 
-	for ( var i = 0; i < this.pointsUI.length; i ++ ) {
+	for ( var i = 0; i < this.pointslength; i ++ ) {
 
 		var pointUI = this.pointsUI[ i ];
 
 		if ( ! pointUI ) continue;
 
-		points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
-		++ count;
-		pointUI.lbl.setValue( count );
+		points.push( new Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
 
 	}
 
@@ -661,7 +677,7 @@ UI.Points3.prototype.getValue = function () {
 
 };
 
-UI.Points3.prototype.setValue = function ( points ) {
+UIPoints3.prototype.setValue = function ( points ) {
 
 	this.clear();
 
@@ -677,24 +693,24 @@ UI.Points3.prototype.setValue = function ( points ) {
 
 };
 
-UI.Points3.prototype.createPointRow = function ( x, y, z ) {
+UIPoints3.prototype.createPointRow = function ( x, y, z ) {
 
-	var pointRow = new UI.Div();
-	var lbl = new UI.Text( this.lastPointIdx + 1 ).setWidth( '20px' );
-	var txtX = new UI.Number( x ).setWidth( '30px' ).onChange( this.update );
-	var txtY = new UI.Number( y ).setWidth( '30px' ).onChange( this.update );
-	var txtZ = new UI.Number( z ).setWidth( '30px' ).onChange( this.update );
+	var pointRow = new UIDiv();
+	var lbl = new UIText( this.lastPointIdx + 1 ).setWidth( '20px' );
+	var txtX = new UINumber( x ).setWidth( '30px' ).onChange( this.update );
+	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
+	var txtZ = new UINumber( z ).setWidth( '30px' ).onChange( this.update );
 
 	var idx = this.lastPointIdx;
 	var scope = this;
-	var btn = new UI.Button( '-' ).onClick( function () {
+	var btn = new UIButton( '-' ).onClick( function () {
 
 		if ( scope.isEditing ) return;
 		scope.deletePointRow( idx );
 
 	} );
 
-	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY, z: txtZ } );
+	this.pointspush( { row: pointRow, lbl: lbl, x: txtX, y: txtY, z: txtZ } );
 	++ this.lastPointIdx;
 	pointRow.add( lbl, txtX, txtY, txtZ, btn );
 
@@ -702,33 +718,33 @@ UI.Points3.prototype.createPointRow = function ( x, y, z ) {
 
 };
 
-UI.THREE = {};
+var UIBoolean = function ( boolean, text ) {
 
-UI.THREE.Boolean = function ( boolean, text ) {
-
-	UI.Span.call( this );
+	UISpan.call( this );
 
 	this.setMarginRight( '10px' );
 
-	this.checkbox = new UI.Checkbox( boolean );
-	this.text = new UI.Text( text ).setMarginLeft( '3px' );
+	this.checkbox = new UICheckbox( boolean );
+	this.text = new UIText( text ).setMarginLeft( '3px' );
 
 	this.add( this.checkbox );
 	this.add( this.text );
 
 };
 
-UI.THREE.Boolean.prototype = Object.create( UI.Span.prototype );
-UI.THREE.Boolean.prototype.constructor = UI.THREE.Boolean;
+UIBoolean.prototype = Object.create( UISpan.prototype );
+UIBoolean.prototype.constructor = UIBoolean;
 
-UI.THREE.Boolean.prototype.getValue = function () {
+UIBoolean.prototype.getValue = function () {
 
 	return this.checkbox.getValue();
 
 };
 
-UI.THREE.Boolean.prototype.setValue = function ( value ) {
+UIBoolean.prototype.setValue = function ( value ) {
 
 	return this.checkbox.setValue( value );
 
 };
+
+export { UITexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };

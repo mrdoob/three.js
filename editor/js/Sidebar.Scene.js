@@ -2,12 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Scene = function ( editor ) {
+import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
+import { UIOutliner } from './libs/ui.three.js';
+
+var SidebarScene = function ( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 
@@ -89,7 +92,7 @@ Sidebar.Scene = function ( editor ) {
 
 	var ignoreObjectSelectedSignal = false;
 
-	var outliner = new UI.Outliner( editor );
+	var outliner = new UIOutliner( editor );
 	outliner.setId( 'outliner' );
 	outliner.onChange( function () {
 
@@ -106,7 +109,7 @@ Sidebar.Scene = function ( editor ) {
 
 	} );
 	container.add( outliner );
-	container.add( new UI.Break() );
+	container.add( new UIBreak() );
 
 	// background
 
@@ -116,11 +119,11 @@ Sidebar.Scene = function ( editor ) {
 
 	}
 
-	var backgroundRow = new UI.Row();
+	var backgroundRow = new UIRow();
 
-	var backgroundColor = new UI.Color().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
+	var backgroundColor = new UIColor().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
 
-	backgroundRow.add( new UI.Text( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
+	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundColor );
 
 	container.add( backgroundRow );
@@ -139,8 +142,8 @@ Sidebar.Scene = function ( editor ) {
 
 	}
 
-	var fogTypeRow = new UI.Row();
-	var fogType = new UI.Select().setOptions( {
+	var fogTypeRow = new UIRow();
+	var fogType = new UISelect().setOptions( {
 
 		'None': 'None',
 		'Fog': 'Linear',
@@ -154,35 +157,35 @@ Sidebar.Scene = function ( editor ) {
 
 	} );
 
-	fogTypeRow.add( new UI.Text( strings.getKey( 'sidebar/scene/fog' ) ).setWidth( '90px' ) );
+	fogTypeRow.add( new UIText( strings.getKey( 'sidebar/scene/fog' ) ).setWidth( '90px' ) );
 	fogTypeRow.add( fogType );
 
 	container.add( fogTypeRow );
 
 	// fog color
 
-	var fogPropertiesRow = new UI.Row();
+	var fogPropertiesRow = new UIRow();
 	fogPropertiesRow.setDisplay( 'none' );
 	fogPropertiesRow.setMarginLeft( '90px' );
 	container.add( fogPropertiesRow );
 
-	var fogColor = new UI.Color().setValue( '#aaaaaa' );
+	var fogColor = new UIColor().setValue( '#aaaaaa' );
 	fogColor.onChange( onFogChanged );
 	fogPropertiesRow.add( fogColor );
 
 	// fog near
 
-	var fogNear = new UI.Number( 0.1 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogChanged );
+	var fogNear = new UINumber( 0.1 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogNear );
 
 	// fog far
 
-	var fogFar = new UI.Number( 50 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogChanged );
+	var fogFar = new UINumber( 50 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogFar );
 
 	// fog density
 
-	var fogDensity = new UI.Number( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setStep( 0.001 ).setPrecision( 3 ).onChange( onFogChanged );
+	var fogDensity = new UINumber( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setStep( 0.001 ).setPrecision( 3 ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogDensity );
 
 	//
@@ -303,3 +306,5 @@ Sidebar.Scene = function ( editor ) {
 	return container;
 
 };
+
+export { SidebarScene };

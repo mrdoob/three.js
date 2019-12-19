@@ -3,6 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+import { Vector3 } from '../../../build/three.module.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
@@ -10,7 +13,6 @@
  * @param optionalOldPosition THREE.Vector3
  * @constructor
  */
-
 var SetPositionCommand = function ( editor, object, newPosition, optionalOldPosition ) {
 
 	Command.call( this, editor );
@@ -76,9 +78,11 @@ SetPositionCommand.prototype = {
 		Command.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.oldPosition = new THREE.Vector3().fromArray( json.oldPosition );
-		this.newPosition = new THREE.Vector3().fromArray( json.newPosition );
+		this.oldPosition = new Vector3().fromArray( json.oldPosition );
+		this.newPosition = new Vector3().fromArray( json.newPosition );
 
 	}
 
 };
+
+export { SetPositionCommand };

@@ -5,12 +5,22 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.EditorControls = function ( object, domElement ) {
+import {
+	Box3,
+	EventDispatcher,
+	Matrix3,
+	Sphere,
+	Spherical,
+	Vector2,
+	Vector3
+} from '../../build/three.module.js';
+
+var EditorControls = function ( object, domElement ) {
 
 	// API
 
 	this.enabled = true;
-	this.center = new THREE.Vector3();
+	this.center = new Vector3();
 	this.panSpeed = 0.002;
 	this.zoomSpeed = 0.1;
 	this.rotationSpeed = 0.005;
@@ -18,19 +28,19 @@ THREE.EditorControls = function ( object, domElement ) {
 	// internals
 
 	var scope = this;
-	var vector = new THREE.Vector3();
-	var delta = new THREE.Vector3();
-	var box = new THREE.Box3();
+	var vector = new Vector3();
+	var delta = new Vector3();
+	var box = new Box3();
 
 	var STATE = { NONE: - 1, ROTATE: 0, ZOOM: 1, PAN: 2 };
 	var state = STATE.NONE;
 
 	var center = this.center;
-	var normalMatrix = new THREE.Matrix3();
-	var pointer = new THREE.Vector2();
-	var pointerOld = new THREE.Vector2();
-	var spherical = new THREE.Spherical();
-	var sphere = new THREE.Sphere();
+	var normalMatrix = new Matrix3();
+	var pointer = new Vector2();
+	var pointerOld = new Vector2();
+	var spherical = new Spherical();
+	var sphere = new Sphere();
 
 	// events
 
@@ -221,8 +231,8 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	// touch
 
-	var touches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
-	var prevTouches = [ new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3() ];
+	var touches = [ new Vector3(), new Vector3(), new Vector3() ];
+	var prevTouches = [ new Vector3(), new Vector3(), new Vector3() ];
 
 	var prevDistance = null;
 
@@ -309,5 +319,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 };
 
-THREE.EditorControls.prototype = Object.create( THREE.EventDispatcher.prototype );
-THREE.EditorControls.prototype.constructor = THREE.EditorControls;
+EditorControls.prototype = Object.create( EventDispatcher.prototype );
+EditorControls.prototype.constructor = EditorControls;
+
+export { EditorControls };

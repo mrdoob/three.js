@@ -3,12 +3,14 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+import { ObjectLoader } from '../../../build/three.module.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
  * @constructor
  */
-
 var AddObjectCommand = function ( editor, object ) {
 
 	Command.call( this, editor );
@@ -57,7 +59,7 @@ AddObjectCommand.prototype = {
 
 		if ( this.object === undefined ) {
 
-			var loader = new THREE.ObjectLoader();
+			var loader = new ObjectLoader();
 			this.object = loader.parse( json.object );
 
 		}
@@ -65,3 +67,5 @@ AddObjectCommand.prototype = {
 	}
 
 };
+
+export { AddObjectCommand };

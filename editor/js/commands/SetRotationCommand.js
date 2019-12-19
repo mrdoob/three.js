@@ -3,6 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+import { Euler } from '../../../build/three.module.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
@@ -10,7 +13,6 @@
  * @param optionalOldRotation THREE.Euler
  * @constructor
  */
-
 var SetRotationCommand = function ( editor, object, newRotation, optionalOldRotation ) {
 
 	Command.call( this, editor );
@@ -77,9 +79,11 @@ SetRotationCommand.prototype = {
 		Command.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.oldRotation = new THREE.Euler().fromArray( json.oldRotation );
-		this.newRotation = new THREE.Euler().fromArray( json.newRotation );
+		this.oldRotation = new Euler().fromArray( json.oldRotation );
+		this.newRotation = new Euler().fromArray( json.newRotation );
 
 	}
 
 };
+
+export { SetRotationCommand };

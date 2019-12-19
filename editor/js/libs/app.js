@@ -4,7 +4,9 @@
 
 var APP = {
 
-	Player: function () {
+	Player: function ( THREE ) {
+
+		window.THREE = THREE; // FIX for editor scripts (they require THREE in global namespace)
 
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
@@ -275,3 +277,5 @@ var APP = {
 	}
 
 };
+
+export { APP };
