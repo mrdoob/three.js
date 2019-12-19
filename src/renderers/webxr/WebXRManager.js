@@ -59,6 +59,7 @@ function WebXRManager( renderer, gl ) {
 			controller = new Group();
 			controller.matrixAutoUpdate = false;
 			controller.visible = false;
+			controller.inputSource = sortedInputSources.length > i ? sortedInputSources[i] : null;
 
 			controllers[ id ] = controller;
 
@@ -168,6 +169,13 @@ function WebXRManager( renderer, gl ) {
 		for ( var i = 0; i < controllers.length; i ++ ) {
 
 			sortedInputSources[ i ] = findInputSource( i );
+
+			if (controllers[ i ].inputSource != sortedInputSources[ i ]) {
+
+				controllers[ i ].inputSource = sortedInputSources[ i ];
+				controllers[ i ].dispatchEvent( { type: 'inputsourcechange' } );
+
+			}
 
 		}
 
