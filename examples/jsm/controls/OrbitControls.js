@@ -65,6 +65,8 @@ var OrbitControls = function ( object, domElement ) {
 	// Set to false to disable zooming
 	this.enableZoom = true;
 	this.zoomSpeed = 1.0;
+	// This option enables zooming over cursor point as a center. only for OrthographicCamera
+	this.zoomOverPosition = false;
 
 	// Set to false to disable rotating
 	this.enableRotate = true;
@@ -560,8 +562,55 @@ var OrbitControls = function ( object, domElement ) {
 
 		}
 
+		if (scope.zoomOverPosition && scope.object.isOrthographicCamera) {
+			recalcCameraPositionOnZoom(event, event.deltaY);
+		}
+
 		scope.update();
 
+	}
+
+	function recalcCameraPositionOnZoom(event, deltaY) {
+		let canvas = event.target.tagName === 'CANVAS' && event.target;
+		let canvasOffset = getOffset(canvas);
+
+		let mouseCoordinates = new THREE.Vector3(
+			((event.pageX - canvasOffset.left) / (canvas.clientWidth - 1)) * 2 - 1,
+			-((event.pageY - canvasOffset.top) / (canvas.clientHeight - 1)) * 2 + 1,
+			0
+		);
+
+		let canvasCenterCoordinates = new THREE.Vector3(0, 0, 0);
+
+		// get canvas center coordinates
+		canvasCenterCoordinates.unproject(object);
+
+		// get mouse coordinates
+		mouseCoordinates.unproject(object);
+
+		let dollyScale = getZoomScale();
+		let k = 1 - dollyScale;
+		if (deltaY < 0) {
+			k = 1 - 1 / dollyScale;
+		}
+
+		scope.target.x += (canvasCenterCoordinates.x - mouseCoordinates.x) * k;
+		scope.target.y += (canvasCenterCoordinates.y - mouseCoordinates.y) * k;
+		object.position.x += (canvasCenterCoordinates.x - mouseCoordinates.x) * k;
+		object.position.y += (canvasCenterCoordinates.y - mouseCoordinates.y) * k;
+	}
+
+	function getOffset(elem) {
+		let offset = null;
+		if (elem) {
+			offset = { left: 0, top: 0 };
+			do {
+				offset.top += elem.offsetTop;
+				offset.left += elem.offsetLeft;
+				elem = elem.offsetParent;
+			} while (elem);
+		}
+		return offset;
 	}
 
 	function handleKeyDown( event ) {
