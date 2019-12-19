@@ -10,7 +10,7 @@
 
 <body>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Geometry Packing Example<br />
+		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Geometry Compression Example<br />
 	</div>
 
 	<script type="module">
@@ -20,7 +20,7 @@
 		import Stats from './jsm/libs/stats.module.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { GeometryPackingUtils, PackedPhongMaterial } from './jsm/utils/GeometryPackingUtils.js';
+		import { GeometryCompressionUtils, PackedPhongMaterial } from './jsm/utils/GeometryCompressionUtils.js';
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 
 		var statsEnabled = true;
@@ -29,23 +29,48 @@
 
 		var camera, scene, renderer, controls;
 
+		var lights = [];
+
 		var data = {
 			flatShading: false,
-			wireframe: false, 
-			basicEncode: false,
-			octEncode: false, 
-			defaultEncode: false, 
-			quantizePosition: false
+			wireframe: true,
+			basicEncodeNormal: false,
+			octEncodeNormal: false,
+			defaultEncodeNormal: false,
+			quantizeEncodePosition: false,
+			defaultEncodeUV: false,
+			lightsRotation: 1
 		};
 
+
 		var radius = 100;
+		var detail = 5;
+		var uvScale = [];
+
+		// materials
+		var lineMaterial = new THREE.LineBasicMaterial({ color: 0xaaaaaa, transparent: true, opacity: 0.5 });
+		var meshMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0x111111, flatShading: data.flatShading });
+
+		var texture = new THREE.TextureLoader().load("textures/uv_grid_opengl.jpg");
+		// var texture = new THREE.TextureLoader().load("textures/uv_grid_opengl_8k.jpg");
+		// var texture = new THREE.TextureLoader().load("textures/brick_diffuse.jpg");
+
+		texture.wrapS = THREE.RepeatWrapping;
+		texture.wrapT = THREE.RepeatWrapping;
+
+		// meshMaterial.map = texture;
+
 
 		init();
 		animate();
 
 		function init() {
 
-			// GeometryPackingUtils.changeShaderChunk();
+			//
+
+			// for (let i = 0; i < 1000000; i++) {
+			// 	uvScale.push(Math.random() * 100);
+			// }
 
 			container = document.createElement('div');
 			document.body.appendChild(container);
@@ -68,7 +93,6 @@
 			controls = new OrbitControls(camera, renderer.domElement);
 
 			//
-			var lights = [];
 			lights[0] = new THREE.PointLight(0xffffff, 1, 0);
 			lights[1] = new THREE.PointLight(0xffffff, 1, 0);
 			lights[2] = new THREE.PointLight(0xffffff, 1, 0);
@@ -85,21 +109,7 @@
 			scene.add(new THREE.AxesHelper(radius * 5));
 
 			//
-
-			var lineMaterial = new THREE.LineBasicMaterial({ color: 0x999999, transparent: true, opacity: 0.5 });
-			var meshMaterial = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
-
-			var texture = new THREE.TextureLoader().load("textures/disturb.jpg");
-
-			texture.wrapS = THREE.RepeatWrapping;
-			texture.wrapT = THREE.RepeatWrapping;
-
-			// meshMaterial.map = texture;
-
-			var ballGeom = new THREE.IcosahedronBufferGeometry( radius, 4 );
-			// var ballGeom = new THREE.CylinderBufferGeometry( 5, 5, 20, 32 );
-			// var ballGeom = new THREE.OctahedronBufferGeometry( 10, 4 );
-			// var ballGeom = new THREE.BoxBufferGeometry( 10, 10, 10 );
+			var ballGeom = newGeometry();
 
 			var ballMesh = new THREE.Mesh(ballGeom, meshMaterial);
 			var ballLineSegments = new THREE.LineSegments(ballGeom, lineMaterial);
@@ -112,17 +122,35 @@
 
 			gui = new GUI();
 
+			function newGeometry() {
+				var geom = new THREE.IcosahedronBufferGeometry(radius, detail);
+				// var geom = new THREE.CylinderBufferGeometry( 5, 5, 20, 32 );
+				// var geom = new THREE.OctahedronBufferGeometry( radius, detail );
+				// var geom = new THREE.BoxBufferGeometry(radius, radius, radius, detail, detail, detail);
+
+				// for (let i = 0; i < geom.attributes.uv.array.length; i += 2) {
+				// 	if (i % 13 == 0){
+				// 		geom.attributes.uv.array[i] = geom.attributes.uv.array[i] * uvScale[i];
+				// 	}
+				// }
+
+				return geom;
+			}
+
 			function generateGeometry() {
 
-				updateGroupGeometry(ballMesh, ballLineSegments, new THREE.IcosahedronBufferGeometry( radius, 4 ), data);
-
+				updateGroupGeometry(
+					ballMesh,
+					ballLineSegments,
+					newGeometry(),
+					data);
 			}
 
 			function updateMaterial() {
 				ballMesh.material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
 			}
 
-			function updateLineSegments(){
+			function updateLineSegments() {
 				ballLineSegments.visible = data.wireframe;
 			}
 
@@ -130,10 +158,12 @@
 			folder.open();
 			folder.add(data, 'flatShading', false).onChange(updateMaterial);
 			folder.add(data, 'wireframe', false).onChange(updateLineSegments);
-			folder.add(data, 'basicEncode', false).onChange(generateGeometry);
-			folder.add(data, 'octEncode', false).onChange(generateGeometry);
-			folder.add(data, 'defaultEncode', false).onChange(generateGeometry);
-			folder.add(data, 'quantizePosition', false).onChange(generateGeometry);
+			folder.add(data, 'basicEncodeNormal', false).onChange(generateGeometry);
+			folder.add(data, 'octEncodeNormal', false).onChange(generateGeometry);
+			folder.add(data, 'defaultEncodeNormal', false).onChange(generateGeometry);
+			folder.add(data, 'quantizeEncodePosition', false).onChange(generateGeometry);
+			folder.add(data, 'defaultEncodeUV', false).onChange(generateGeometry);
+			folder.add(data, 'lightsRotation', 1, 10, 1);
 
 			scene.add(ballMesh);
 
@@ -149,6 +179,9 @@
 			}
 
 			window.addEventListener('resize', onWindowResize, false);
+			window.addEventListener('keydown', (event) => {
+				changeLightsPos();
+			}, false);
 
 		}
 
@@ -161,6 +194,15 @@
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
 
+		}
+
+		//
+		function changeLightsPos() {
+			lights.forEach(light => {
+				var direction = light.position.clone();
+				direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), data.lightsRotation / 180 * Math.PI);
+				light.position.add(direction.sub(light.position));
+			});
 		}
 
 		//
@@ -193,27 +235,31 @@
 
 			lineSegments.geometry = new THREE.WireframeGeometry(geometry);
 			mesh.geometry = geometry;
-			mesh.material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
+			mesh.material = meshMaterial;
 
 			var method = "";
-			if (data.basicEncode) {
+			if (data.basicEncodeNormal) {
 				method = "BASIC";
-			} else if (data.octEncode) {
+			} else if (data.octEncodeNormal) {
 				method = "OCT";
-			} else if (data.defaultEncode) {
+			} else if (data.defaultEncodeNormal) {
 				method = "DEFAULT";
 			}
 
 			if (method != "") {
-				GeometryPackingUtils.packNormals(mesh, method);
-			} 
-
-			if (data.quantizePosition){
-				GeometryPackingUtils.packPositions(mesh);
+				GeometryCompressionUtils.packNormals(mesh, method);
 			}
 
-			if (method == "" && !data.quantizePosition) {
-				mesh.material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
+			if (data.quantizeEncodePosition) {
+				GeometryCompressionUtils.packPositions(mesh);
+			}
+
+			if (method == "" && !data.quantizeEncodePosition) {
+				mesh.material = meshMaterial;
+			}
+
+			if (data.defaultEncodeUV) {
+				GeometryCompressionUtils.packUvs(mesh);
 			}
 
 		}
