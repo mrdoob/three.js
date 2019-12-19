@@ -261,7 +261,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
-		if ( ! material.isRawShaderMaterial ) {
+		if ( material.isRawShaderMaterial === undefined ) {
 
 			for ( var i = 0; i < parameterNames.length; i ++ ) {
 
@@ -270,7 +270,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			}
 
 			array.push( renderer.outputEncoding );
-
 			array.push( renderer.gammaFactor );
 
 		}
