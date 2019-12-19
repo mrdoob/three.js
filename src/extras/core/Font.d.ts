@@ -4,6 +4,6 @@ export class Font {
 
 	data: string;
 
-	generateShapes( text: string, size: number, divisions: number ): any[];
+	generateShapes( text: string, size: number ): any[];
 
 }
