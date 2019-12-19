@@ -105,11 +105,10 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', function ( hdrCubeMap ) {
+					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
-						var hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
-						hdrCubeMap.dispose();
+						var hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+						hdrEquirect.dispose();
 						pmremGenerator.dispose();
 
 						material.envMap = hdrCubeRenderTarget.texture;
@@ -117,6 +116,9 @@
 						scene.background = hdrCubeRenderTarget.texture;
 
 					} );
+
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				//
 

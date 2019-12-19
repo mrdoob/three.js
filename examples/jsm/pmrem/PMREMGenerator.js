@@ -91,6 +91,7 @@ var PMREMGenerator = ( function () {
 	var PMREMGenerator = function ( renderer ) {
 
 		_renderer = renderer;
+		_compileMaterial( _blurMaterial );
 
 	};
 
@@ -151,6 +152,36 @@ var PMREMGenerator = ( function () {
 			cubeUVRenderTarget.scissorTest = false;
 
 			return cubeUVRenderTarget;
+
+		},
+
+		/**
+		 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
+		 * your texture's network fetch for increased concurrency.
+		 */
+		compileCubemapShader: function () {
+
+			if ( _cubemapShader == null ) {
+
+				_cubemapShader = _getCubemapShader();
+				_compileMaterial( _cubemapShader );
+
+			}
+
+		},
+
+		/**
+		 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
+		 * your texture's network fetch for increased concurrency.
+		 */
+		compileEquirectangularShader: function () {
+
+			if ( _equirectShader == null ) {
+
+				_equirectShader = _getEquirectShader();
+				_compileMaterial( _equirectShader );
+
+			}
 
 		},
 
@@ -382,6 +413,14 @@ var PMREMGenerator = ( function () {
 		_renderer.setRenderTarget( cubeUVRenderTarget );
 		_setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 		_renderer.render( scene, _flatCamera );
+
+	}
+
+	function _compileMaterial( material ) {
+
+		var tmpScene = new Scene();
+		tmpScene.add( new Mesh( _lodPlanes[ 0 ], material ) );
+		_renderer.compile( tmpScene, _flatCamera );
 
 	}
 

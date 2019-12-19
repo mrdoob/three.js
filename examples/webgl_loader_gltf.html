@@ -48,7 +48,6 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
 						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
 
@@ -85,6 +84,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
+
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, - 0.2, - 0.2 );

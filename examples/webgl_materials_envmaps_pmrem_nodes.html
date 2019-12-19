@@ -68,22 +68,6 @@
 			init();
 			animate();
 
-			function generate() {
-
-				var pmremGenerator = new PMREMGenerator( renderer );
-				hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
-				pmremGenerator.dispose();
-
-				nodeTexture.value = hdrCubeRenderTarget.texture;
-
-				hdrCubeMap.magFilter = THREE.LinearFilter;
-				hdrCubeMap.needsUpdate = true;
-
-				planeMesh.material.map = hdrCubeRenderTarget.texture;
-				planeMesh.material.needsUpdate = true;
-
-			}
-
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -127,11 +111,23 @@
 					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
-						generate();
+						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						pmremGenerator.dispose();
+
+						nodeTexture.value = hdrCubeRenderTarget.texture;
+
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						hdrCubeMap.needsUpdate = true;
+
+						planeMesh.material.map = hdrCubeRenderTarget.texture;
+						planeMesh.material.needsUpdate = true;
 
 						nodeMaterial.visible = true;
 
 					} );
+
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.compileCubemapShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

@@ -37,7 +37,7 @@
 			var spotLight1, spotLight2;
 			var mesh1, mesh2;
 
-			var hdrCubeMap = new RGBELoader()
+			var hdrEquirect = new RGBELoader()
 				.setDataType( THREE.UnsignedByteType )
 				.setPath( 'textures/equirectangular/' )
 				.load( 'pedestrian_overpass_1k.hdr', function ( texture ) {
@@ -64,7 +64,7 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
-				scene.background = hdrCubeMap;
+				scene.background = hdrEquirect;
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 0, 120 );
@@ -72,8 +72,8 @@
 				//
 
 				var pmremGenerator = new PMREMGenerator( renderer );
-				hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
-				hdrCubeMap.dispose();
+				hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+				hdrEquirect.dispose();
 				pmremGenerator.dispose();
 
 				scene.background = hdrCubeRenderTarget.texture;

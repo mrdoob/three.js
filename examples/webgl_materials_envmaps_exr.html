@@ -72,7 +72,6 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				var pmremGenerator = new PMREMGenerator( renderer );
 				THREE.DefaultLoadingManager.onLoad = function ( ) {
 
 					pmremGenerator.dispose();
@@ -101,6 +100,9 @@
 					texture.dispose();
 
 				} );
+
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

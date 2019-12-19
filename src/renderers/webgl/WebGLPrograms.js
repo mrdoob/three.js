@@ -261,17 +261,21 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
-		for ( var i = 0; i < parameterNames.length; i ++ ) {
+		if ( ! material.isRawShaderMaterial ) {
 
-			array.push( parameters[ parameterNames[ i ] ] );
+			for ( var i = 0; i < parameterNames.length; i ++ ) {
+
+				array.push( parameters[ parameterNames[ i ] ] );
+
+			}
+
+			array.push( renderer.outputEncoding );
+
+			array.push( renderer.gammaFactor );
 
 		}
 
 		array.push( material.onBeforeCompile.toString() );
-
-		array.push( renderer.outputEncoding );
-
-		array.push( renderer.gammaFactor );
 
 		return array.join();
 

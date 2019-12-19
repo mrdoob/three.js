@@ -133,7 +133,6 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'spot1Lux.hdr', function ( texture ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
 						radianceMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
 
@@ -165,6 +164,9 @@
 						render();
 
 					} );
+
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 			}
 

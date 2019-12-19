@@ -12,6 +12,8 @@ export class PMREMGenerator {
 	fromScene( scene:Scene, sigma?:number, near?:number, far?:number ): WebGLRenderTarget;
 	fromEquirectangular( equirectangular:Texture ): WebGLRenderTarget;
 	fromCubemap( cubemap:CubeTexture ): WebGLRenderTarget;
+	compileCubemapShader(): void;
+	compileEquirectangularShader(): void;
 	dispose(): void;
 
 }
