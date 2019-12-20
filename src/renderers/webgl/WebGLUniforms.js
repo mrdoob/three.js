@@ -628,8 +628,16 @@ function getPureArraySetter( type ) {
 		case 0x8b5b: return setValueM3Array; // _MAT3
 		case 0x8b5c: return setValueM4Array; // _MAT4
 
-		case 0x8b5e: return setValueT1Array; // SAMPLER_2D
-		case 0x8b60: return setValueT6Array; // SAMPLER_CUBE
+		case 0x8b5e: // SAMPLER_2D
+		case 0x8d66: // SAMPLER_EXTERNAL_OES
+		case 0x8dca: // INT_SAMPLER_2D
+		case 0x8dd2: // UNSIGNED_INT_SAMPLER_2D
+			return setValueT1Array;
+
+		case 0x8b60: // SAMPLER_CUBE
+		case 0x8dcc: // INT_SAMPLER_CUBE
+		case 0x8dd4: // UNSIGNED_SAMPLER_CUBE
+			return setValueT6Array;
 
 		case 0x1404: case 0x8b56: return setValueV1iArray; // INT, BOOL
 		case 0x8b53: case 0x8b57: return setValueV2iArray; // _VEC2
