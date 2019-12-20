@@ -6,7 +6,7 @@ import * as THREE from "../../../build/three.module.js";
 
 var GeometryCompressionUtils = {
 
-    packNormals: function (mesh, encodeMethod) {
+    compressNormals: function (mesh, encodeMethod) {
 
         if (!mesh.geometry) {
             console.error("Mesh must contain geometry property. ");
@@ -28,7 +28,7 @@ var GeometryCompressionUtils = {
         let count = normal.count;
 
         let result;
-        if (encodeMethod == "BASIC") {
+        if (encodeMethod == "ANGLES") {
 
             result = new Uint16Array(count * 2);
 
@@ -44,6 +44,7 @@ var GeometryCompressionUtils = {
             }
 
             mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
+            mesh.geometry.attributes.normal.bytes = result.length * 2;
 
         } else if (encodeMethod == "OCT") {
 
@@ -61,6 +62,7 @@ var GeometryCompressionUtils = {
             }
 
             mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
+            mesh.geometry.attributes.normal.bytes = result.length * 1;
 
         } else if (encodeMethod == "DEFAULT") {
 
@@ -85,10 +87,11 @@ var GeometryCompressionUtils = {
             }
 
             mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 3, true));
+            mesh.geometry.attributes.normal.bytes = result.length * 1;
 
         } else {
 
-            console.error("Unrecognized encoding method, should be `DEFAULT` or `BASIC` or `OCT`. ");
+            console.error("Unrecognized encoding method, should be `DEFAULT` or `ANGLES` or `OCT`. ");
 
         }
 
@@ -101,7 +104,7 @@ var GeometryCompressionUtils = {
             mesh.material = new PackedPhongMaterial().copy(mesh.material);
         }
 
-        if (encodeMethod == "BASIC") {
+        if (encodeMethod == "ANGLES") {
             mesh.material.defines.USE_PACKED_NORMAL = 0;
         }
         if (encodeMethod == "OCT") {
@@ -114,7 +117,7 @@ var GeometryCompressionUtils = {
     },
 
 
-    packPositions: function (mesh) {
+    compressPositions: function (mesh) {
 
         if (!mesh.geometry) {
             console.error("Mesh must contain geometry property. ");
@@ -134,8 +137,9 @@ var GeometryCompressionUtils = {
 
         let array = position.array;
         let count = position.count;
+        let encodingBytes = 2;
 
-        let result = this.EncodingFuncs.quantizedEncode(array, 2);
+        let result = this.EncodingFuncs.quantizedEncode(array, encodingBytes);
 
         let quantized = result.quantized;
         let decodeMat = result.decodeMat;
@@ -147,6 +151,7 @@ var GeometryCompressionUtils = {
         mesh.geometry.setAttribute('position', new THREE.BufferAttribute(quantized, 3));
         mesh.geometry.attributes.position.isPacked = true;
         mesh.geometry.attributes.position.needsUpdate = true;
+        mesh.geometry.attributes.position.bytes = quantized.length * encodingBytes;
 
         // modify material
         if (!(mesh.material instanceof PackedPhongMaterial)) {
@@ -161,7 +166,7 @@ var GeometryCompressionUtils = {
     },
 
 
-    packUvs: function (mesh) {
+    compressUvs: function (mesh) {
 
         if (!mesh.geometry) {
             console.error("Mesh must contain geometry property. ");
@@ -208,6 +213,7 @@ var GeometryCompressionUtils = {
             mesh.geometry.setAttribute('uv', new THREE.BufferAttribute(result, 2, true));
             mesh.geometry.attributes.uv.isPacked = true;
             mesh.geometry.attributes.uv.needsUpdate = true;
+            mesh.geometry.attributes.uv.bytes = result.length * 2;
 
             if (!(mesh.material instanceof PackedPhongMaterial)) {
                 mesh.material = new PackedPhongMaterial().copy(mesh.material);
@@ -223,6 +229,7 @@ var GeometryCompressionUtils = {
             mesh.geometry.setAttribute('uv', new THREE.BufferAttribute(result.quantized, 2));
             mesh.geometry.attributes.uv.isPacked = true;
             mesh.geometry.attributes.uv.needsUpdate = true;
+            mesh.geometry.attributes.uv.bytes = result.quantized.length * 2;
 
             if (!(mesh.material instanceof PackedPhongMaterial)) {
                 mesh.material = new PackedPhongMaterial().copy(mesh.material);

@@ -32,16 +32,16 @@
 		var lights = [];
 
 		var data = {
-			flatShading: false,
-			wireframe: true,
-			basicEncodeNormal: false,
-			octEncodeNormal: false,
+			wireframe: false,
 			defaultEncodeNormal: false,
-			quantizeEncodePosition: false,
+			anglesEncodeNormal: false,
+			octEncodeNormal: false,
+			quantizeEncodePos: false,
 			defaultEncodeUV: false,
-			lightsRotation: 1
+			lightsRotation: 1,
+			totalGPUMemory: "0 bytes"
 		};
-
+		var memoryDisplay;
 
 		var radius = 100;
 		var detail = 5;
@@ -49,7 +49,7 @@
 
 		// materials
 		var lineMaterial = new THREE.LineBasicMaterial({ color: 0xaaaaaa, transparent: true, opacity: 0.5 });
-		var meshMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0x111111, flatShading: data.flatShading });
+		var meshMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0x111111 });
 
 		var texture = new THREE.TextureLoader().load("textures/uv_grid_opengl.jpg");
 		// var texture = new THREE.TextureLoader().load("textures/uv_grid_opengl_8k.jpg");
@@ -58,7 +58,7 @@
 		texture.wrapS = THREE.RepeatWrapping;
 		texture.wrapT = THREE.RepeatWrapping;
 
-		// meshMaterial.map = texture;
+		meshMaterial.map = texture;
 
 
 		init();
@@ -121,6 +121,7 @@
 			//
 
 			gui = new GUI();
+			gui.width = 350;
 
 			function newGeometry() {
 				var geom = new THREE.IcosahedronBufferGeometry(radius, detail);
@@ -146,28 +147,21 @@
 					data);
 			}
 
-			function updateMaterial() {
-				ballMesh.material = new THREE.MeshPhongMaterial({ color: 0x156289, emissive: 0x072534, flatShading: data.flatShading });
-			}
-
 			function updateLineSegments() {
 				ballLineSegments.visible = data.wireframe;
 			}
 
 			var folder = gui.addFolder('THREE.IcosahedronBufferGeometry');
 			folder.open();
-			folder.add(data, 'flatShading', false).onChange(updateMaterial);
 			folder.add(data, 'wireframe', false).onChange(updateLineSegments);
-			folder.add(data, 'basicEncodeNormal', false).onChange(generateGeometry);
-			folder.add(data, 'octEncodeNormal', false).onChange(generateGeometry);
 			folder.add(data, 'defaultEncodeNormal', false).onChange(generateGeometry);
-			folder.add(data, 'quantizeEncodePosition', false).onChange(generateGeometry);
+			folder.add(data, 'anglesEncodeNormal', false).onChange(generateGeometry);
+			folder.add(data, 'octEncodeNormal', false).onChange(generateGeometry);
+			folder.add(data, 'quantizeEncodePos', false).onChange(generateGeometry);
 			folder.add(data, 'defaultEncodeUV', false).onChange(generateGeometry);
-			folder.add(data, 'lightsRotation', 1, 10, 1);
-
-			scene.add(ballMesh);
-
-			camera.lookAt(ballMesh.position);
+			folder.add(data, 'lightsRotation', 0, 10, 1);
+			memoryDisplay = folder.add(data, 'totalGPUMemory', "0 bytes");
+			computeGPUMemory(ballMesh);
 
 			//
 
@@ -179,9 +173,6 @@
 			}
 
 			window.addEventListener('resize', onWindowResize, false);
-			window.addEventListener('keydown', (event) => {
-				changeLightsPos();
-			}, false);
 
 		}
 
@@ -197,10 +188,10 @@
 		}
 
 		//
-		function changeLightsPos() {
+		function updateLightsPossition() {
 			lights.forEach(light => {
 				var direction = light.position.clone();
-				direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), data.lightsRotation / 180 * Math.PI);
+				direction.applyAxisAngle(new THREE.Vector3(1, 1, 0), data.lightsRotation / 180 * Math.PI);
 				light.position.add(direction.sub(light.position));
 			});
 		}
@@ -212,6 +203,8 @@
 			requestAnimationFrame(animate);
 
 			controls.update();
+			updateLightsPossition();
+
 			renderer.render(scene, camera);
 
 			if (statsEnabled) stats.update();
@@ -238,8 +231,8 @@
 			mesh.material = meshMaterial;
 
 			var method = "";
-			if (data.basicEncodeNormal) {
-				method = "BASIC";
+			if (data.anglesEncodeNormal) {
+				method = "ANGLES";
 			} else if (data.octEncodeNormal) {
 				method = "OCT";
 			} else if (data.defaultEncodeNormal) {
@@ -247,21 +240,27 @@
 			}
 
 			if (method != "") {
-				GeometryCompressionUtils.packNormals(mesh, method);
+				GeometryCompressionUtils.compressNormals(mesh, method);
 			}
 
-			if (data.quantizeEncodePosition) {
-				GeometryCompressionUtils.packPositions(mesh);
-			}
-
-			if (method == "" && !data.quantizeEncodePosition) {
-				mesh.material = meshMaterial;
+			if (data.quantizeEncodePos) {
+				GeometryCompressionUtils.compressPositions(mesh);
 			}
 
 			if (data.defaultEncodeUV) {
-				GeometryCompressionUtils.packUvs(mesh);
+				GeometryCompressionUtils.compressUvs(mesh);
 			}
 
+			computeGPUMemory(mesh);
+
+		}
+
+
+		function computeGPUMemory(mesh) {
+			let posBytes = mesh.geometry.attributes.position.bytes || mesh.geometry.attributes.position.array.length * 4;
+			let normBytes = mesh.geometry.attributes.normal.bytes || mesh.geometry.attributes.normal.array.length * 4;
+			let uvBytes = mesh.geometry.attributes.uv.bytes || mesh.geometry.attributes.uv.array.length * 4;
+			memoryDisplay.setValue(posBytes + normBytes + uvBytes + " bytes");
 		}
 
 
