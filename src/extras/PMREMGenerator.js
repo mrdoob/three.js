@@ -59,7 +59,7 @@ var ENCODINGS = {
 	[ RGBM16Encoding ]: 4,
 	[ RGBDEncoding ]: 5,
 	[ GammaEncoding ]: 6
-	};
+};
 
 var _flatCamera = new OrthographicCamera();
 var _blurMaterial = _getBlurShader( MAX_SAMPLES );
@@ -197,7 +197,9 @@ PMREMGenerator.prototype = {
 		if ( _equirectShader != null ) _equirectShader.dispose();
 
 		for ( var i = 0; i < _lodPlanes.length; i ++ ) {
+
 			_lodPlanes[ i ].dispose();
+
 		}
 
 	},
@@ -446,7 +448,7 @@ function _applyPMREM( cubeUVRenderTarget ) {
 	var autoClear = _renderer.autoClear;
 	_renderer.autoClear = false;
 
-		for ( var i = 1; i < TOTAL_LODS; i ++ ) {
+	for ( var i = 1; i < TOTAL_LODS; i ++ ) {
 
 		var sigma = Math.sqrt(
 			_sigmas[ i ] * _sigmas[ i ] -
@@ -526,13 +528,14 @@ function _halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction,
 		var x = i / sigmaPixels;
 		var weight = Math.exp( - x * x / 2 );
 		weights.push( weight );
+
 		if ( i == 0 ) {
 
-				 sum += weight;
+			sum += weight;
 
 		} else if ( i < samples ) {
 
-				sum += 2 * weight;
+			sum += 2 * weight;
 
 		}
 
@@ -606,27 +609,27 @@ ${_getEncodings()}
 
 void main() {
 	gl_FragColor = vec4(0.0);
-		for (int i = 0; i < n; i++) {
-			if (i >= samples)
-				break;
-			for (int dir = -1; dir < 2; dir += 2) {
-				if (i == 0 && dir == 1)
-					continue;
-				vec3 axis = latitudinal ? poleAxis : cross(poleAxis, vOutputDirection);
-				if (all(equal(axis, vec3(0.0))))
-					axis = cross(vec3(0.0, 1.0, 0.0), vOutputDirection);
-				axis = normalize(axis);
-				float theta = dTheta * float(dir * i);
-				float cosTheta = cos(theta);
-				// Rodrigues' axis-angle rotation
-				vec3 sampleDirection = vOutputDirection * cosTheta
-						+ cross(axis, vOutputDirection) * sin(theta)
-						+ axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);
-				gl_FragColor.rgb +=
-						weights[i] * bilinearCubeUV(envMap, sampleDirection, mipInt);
-			}
+	for (int i = 0; i < n; i++) {
+		if (i >= samples)
+			break;
+		for (int dir = -1; dir < 2; dir += 2) {
+			if (i == 0 && dir == 1)
+				continue;
+			vec3 axis = latitudinal ? poleAxis : cross(poleAxis, vOutputDirection);
+			if (all(equal(axis, vec3(0.0))))
+				axis = cross(vec3(0.0, 1.0, 0.0), vOutputDirection);
+			axis = normalize(axis);
+			float theta = dTheta * float(dir * i);
+			float cosTheta = cos(theta);
+			// Rodrigues' axis-angle rotation
+			vec3 sampleDirection = vOutputDirection * cosTheta
+					+ cross(axis, vOutputDirection) * sin(theta)
+					+ axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);
+			gl_FragColor.rgb +=
+					weights[i] * bilinearCubeUV(envMap, sampleDirection, mipInt);
 		}
-		gl_FragColor = linearToOutputTexel(gl_FragColor);
+	}
+	gl_FragColor = linearToOutputTexel(gl_FragColor);
 }
 		`,
 
@@ -787,39 +790,39 @@ uniform int outputEncoding;
 #include <encodings_pars_fragment>
 
 vec4 inputTexelToLinear(vec4 value){
-		if(inputEncoding == 0){
-				return value;
-		}else if(inputEncoding == 1){
-				return sRGBToLinear(value);
-		}else if(inputEncoding == 2){
-				return RGBEToLinear(value);
-		}else if(inputEncoding == 3){
-				return RGBMToLinear(value, 7.0);
-		}else if(inputEncoding == 4){
-				return RGBMToLinear(value, 16.0);
-		}else if(inputEncoding == 5){
-				return RGBDToLinear(value, 256.0);
-		}else{
-				return GammaToLinear(value, 2.2);
-		}
+	if(inputEncoding == 0){
+		return value;
+	}else if(inputEncoding == 1){
+		return sRGBToLinear(value);
+	}else if(inputEncoding == 2){
+		return RGBEToLinear(value);
+	}else if(inputEncoding == 3){
+		return RGBMToLinear(value, 7.0);
+	}else if(inputEncoding == 4){
+		return RGBMToLinear(value, 16.0);
+	}else if(inputEncoding == 5){
+		return RGBDToLinear(value, 256.0);
+	}else{
+		return GammaToLinear(value, 2.2);
+	}
 }
 
 vec4 linearToOutputTexel(vec4 value){
-		if(outputEncoding == 0){
-				return value;
-		}else if(outputEncoding == 1){
-				return LinearTosRGB(value);
-		}else if(outputEncoding == 2){
-				return LinearToRGBE(value);
-		}else if(outputEncoding == 3){
-				return LinearToRGBM(value, 7.0);
-		}else if(outputEncoding == 4){
-				return LinearToRGBM(value, 16.0);
-		}else if(outputEncoding == 5){
-				return LinearToRGBD(value, 256.0);
-		}else{
-				return LinearToGamma(value, 2.2);
-		}
+	if(outputEncoding == 0){
+		return value;
+	}else if(outputEncoding == 1){
+		return LinearTosRGB(value);
+	}else if(outputEncoding == 2){
+		return LinearToRGBE(value);
+	}else if(outputEncoding == 3){
+		return LinearToRGBM(value, 7.0);
+	}else if(outputEncoding == 4){
+		return LinearToRGBM(value, 16.0);
+	}else if(outputEncoding == 5){
+		return LinearToRGBD(value, 256.0);
+	}else{
+		return LinearToGamma(value, 2.2);
+	}
 }
 
 vec4 envMapTexelToLinear(vec4 color) {
