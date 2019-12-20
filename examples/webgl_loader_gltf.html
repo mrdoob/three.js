@@ -51,6 +51,7 @@
 						pmremGenerator.dispose();
 
 						scene.background = envMap;
+						scene.environment = envMap;
 
 						// model
 
@@ -63,7 +64,6 @@
 
 								if ( child.isMesh ) {
 
-									child.material.envMap = envMap;
 									roughnessMipmapper.generateMipmaps( child.material );
 
 								}

@@ -136,8 +136,9 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
 
-						standardMaterial.envMap = pmremGenerator.fromEquirectangular( hdrEquirect ).texture;
-						standardMaterial.needsUpdate = true;
+						scene.environment = pmremGenerator.fromEquirectangular( hdrEquirect ).texture;
+
+						standardMaterial.needsUpdate = true; // TODO(mrdoob) Should WebGLRenderer handle this?
 
 						hdrEquirect.dispose();
 						pmremGenerator.dispose();
@@ -179,7 +180,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
