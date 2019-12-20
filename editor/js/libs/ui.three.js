@@ -2,14 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	CanvasTexture,
-	RGBFormat,
-	RGBAFormat,
- 	Texture,
-	Vector2,
-	Vector3
-} from '../../../build/three.module.js';
+import * as THREE from '../../../build/three.module.js';
 
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 
@@ -73,7 +66,7 @@ var UITexture = function ( mapping ) {
 
 					var canvas = new TGALoader().parse( event.target.result );
 
-					var texture = new CanvasTexture( canvas, mapping );
+					var texture = new THREE.CanvasTexture( canvas, mapping );
 					texture.sourceFile = file.name;
 
 					scope.setValue( texture );
@@ -91,9 +84,9 @@ var UITexture = function ( mapping ) {
 					var image = document.createElement( 'img' );
 					image.addEventListener( 'load', function () {
 
-						var texture = new Texture( this, mapping );
+						var texture = new THREE.Texture( this, mapping );
 						texture.sourceFile = file.name;
-						texture.format = file.type === 'image/jpeg' ? RGBFormat : RGBAFormat;
+						texture.format = file.type === 'image/jpeg' ? THREE.RGBFormat : THREE.RGBAFormat;
 						texture.needsUpdate = true;
 
 						scope.setValue( texture );
@@ -582,7 +575,7 @@ UIPoints2.prototype.getValue = function () {
 
 		if ( ! pointUI ) continue;
 
-		points.push( new Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
+		points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
 
 	}
 
@@ -669,7 +662,7 @@ UIPoints3.prototype.getValue = function () {
 
 		if ( ! pointUI ) continue;
 
-		points.push( new Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
+		points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
 
 	}
 

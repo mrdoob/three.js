@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { Math as _Math } from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIText, UIInput, UIButton, UISpan } from './libs/ui.js';
 
@@ -150,7 +150,7 @@ var SidebarGeometry = function ( editor ) {
 	var geometryUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
 	var geometryUUIDRenew = new UIButton( strings.getKey( 'sidebar/geometry/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
-		geometryUUID.setValue( _Math.generateUUID() );
+		geometryUUID.setValue( THREE.Math.generateUUID() );
 
 		editor.execute( new SetGeometryValueCommand( editor, editor.selected, 'uuid', geometryUUID.getValue() ) );
 

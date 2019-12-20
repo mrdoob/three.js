@@ -46,7 +46,7 @@
 
 		<script type="module">
 
-			import { FileLoader } from '../build/three.module.js';
+			import * as THREE from '../build/three.module.js';
 
 			import { Editor } from './js/Editor.js';
 			import { Viewport } from './js/Viewport.js';
@@ -194,7 +194,7 @@
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
-					var loader = new FileLoader();
+					var loader = new THREE.FileLoader();
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 

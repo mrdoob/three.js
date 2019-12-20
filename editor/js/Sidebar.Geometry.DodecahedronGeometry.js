@@ -2,9 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	DodecahedronBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
@@ -43,7 +41,7 @@ var SidebarGeometryDodecahedronGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new DodecahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.DodecahedronBufferGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );

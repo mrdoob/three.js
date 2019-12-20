@@ -4,7 +4,8 @@
  */
 
 import { Command } from '../Command.js';
-import { Vector3 } from '../../../build/three.module.js';
+
+import * as THREE from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
@@ -79,8 +80,8 @@ SetScaleCommand.prototype = {
 		Command.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.oldScale = new Vector3().fromArray( json.oldScale );
-		this.newScale = new Vector3().fromArray( json.newScale );
+		this.oldScale = new THREE.Vector3().fromArray( json.oldScale );
+		this.newScale = new THREE.Vector3().fromArray( json.newScale );
 
 	}
 

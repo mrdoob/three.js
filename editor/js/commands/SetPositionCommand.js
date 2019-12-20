@@ -4,7 +4,8 @@
  */
 
 import { Command } from '../Command.js';
-import { Vector3 } from '../../../build/three.module.js';
+
+import * as THREE from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
@@ -78,8 +79,8 @@ SetPositionCommand.prototype = {
 		Command.prototype.fromJSON.call( this, json );
 
 		this.object = this.editor.objectByUuid( json.objectUuid );
-		this.oldPosition = new Vector3().fromArray( json.oldPosition );
-		this.newPosition = new Vector3().fromArray( json.newPosition );
+		this.oldPosition = new THREE.Vector3().fromArray( json.oldPosition );
+		this.newPosition = new THREE.Vector3().fromArray( json.newPosition );
 
 	}
 

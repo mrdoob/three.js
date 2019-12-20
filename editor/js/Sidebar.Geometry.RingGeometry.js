@@ -2,9 +2,7 @@
  * @author Temdog007 / http://github.com/Temdog007
  */
 
-import {
-	RingBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
@@ -83,7 +81,7 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new RingBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.RingBufferGeometry(
 			innerRadius.getValue(),
 			outerRadius.getValue(),
 			thetaSegments.getValue(),

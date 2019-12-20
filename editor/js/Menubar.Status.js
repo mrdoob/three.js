@@ -2,9 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	REVISION
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIText } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
@@ -45,7 +43,7 @@ var MenubarStatus = function ( editor ) {
 
 	} );
 
-	var version = new UIText( 'r' + REVISION );
+	var version = new UIText( 'r' + THREE.REVISION );
 	version.setClass( 'title' );
 	version.setOpacity( 0.5 );
 	container.add( version );

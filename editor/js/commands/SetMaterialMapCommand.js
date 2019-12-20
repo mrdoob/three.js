@@ -3,8 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
- import { Command } from '../Command.js';
- import { ObjectLoader } from '../../../build/three.module.js';
+import { Command } from '../Command.js';
+
+import * as THREE from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
@@ -118,7 +119,7 @@ SetMaterialMapCommand.prototype = {
 			var map = null;
 			if ( json !== null ) {
 
-				var loader = new ObjectLoader();
+				var loader = new THREE.ObjectLoader();
 				var images = loader.parseImages( json.images );
 				var textures = loader.parseTextures( [ json ], images );
 				map = textures[ json.uuid ];

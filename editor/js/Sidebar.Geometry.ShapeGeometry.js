@@ -2,10 +2,7 @@
  * @author Temdog007 / http://github.com/Temdog007
  */
 
-import {
-	ExtrudeBufferGeometry,
-	ShapeBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UIButton } from './libs/ui.js';
 
@@ -38,7 +35,7 @@ var SidebarGeometryShapeGeometry = function ( editor, object ) {
 
 	function changeShape() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new ShapeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ShapeBufferGeometry(
 			parameters.shapes,
 			curveSegments.getValue()
 		) ) );
@@ -47,7 +44,7 @@ var SidebarGeometryShapeGeometry = function ( editor, object ) {
 
 	function toExtrude() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new ExtrudeBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeBufferGeometry(
 			parameters.shapes, {
 				curveSegments: curveSegments.getValue()
 			}

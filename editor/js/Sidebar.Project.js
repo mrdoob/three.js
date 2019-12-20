@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { WebGLRenderer } from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { SVGRenderer } from '../../examples/jsm/renderers/SVGRenderer.js';
 import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
@@ -20,7 +20,7 @@ var SidebarProject = function ( editor ) {
 
 	var rendererTypes = {
 
-		'WebGLRenderer': WebGLRenderer,
+		'WebGLRenderer': THREE.WebGLRenderer,
 		'SVGRenderer': SVGRenderer,
 		'RaytracingRenderer': RaytracingRenderer
 

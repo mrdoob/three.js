@@ -2,9 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	CylinderBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
 
@@ -83,7 +81,7 @@ var SidebarGeometryCylinderGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new CylinderBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.CylinderBufferGeometry(
 			radiusTop.getValue(),
 			radiusBottom.getValue(),
 			height.getValue(),

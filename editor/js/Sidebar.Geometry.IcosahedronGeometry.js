@@ -2,9 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	IcosahedronBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
@@ -45,7 +43,7 @@ var SidebarGeometryIcosahedronGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new IcosahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.IcosahedronBufferGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );

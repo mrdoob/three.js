@@ -2,11 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	Euler,
-	Math as _Math,
-	Vector3
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UIInteger, UITextArea, UIText, UINumber } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
@@ -88,7 +84,7 @@ var SidebarObject = function ( editor ) {
 	var objectUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
 	var objectUUIDRenew = new UIButton( strings.getKey( 'sidebar/object/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
-		objectUUID.setValue( _Math.generateUUID() );
+		objectUUID.setValue( THREE.Math.generateUUID() );
 
 		editor.execute( new SetUuidCommand( editor, editor.selected, objectUUID.getValue() ) );
 
@@ -426,21 +422,21 @@ var SidebarObject = function ( editor ) {
 
 		if ( object !== null ) {
 
-			var newPosition = new Vector3( objectPositionX.getValue(), objectPositionY.getValue(), objectPositionZ.getValue() );
+			var newPosition = new THREE.Vector3( objectPositionX.getValue(), objectPositionY.getValue(), objectPositionZ.getValue() );
 			if ( object.position.distanceTo( newPosition ) >= 0.01 ) {
 
 				editor.execute( new SetPositionCommand( editor, object, newPosition ) );
 
 			}
 
-			var newRotation = new Euler( objectRotationX.getValue() * _Math.DEG2RAD, objectRotationY.getValue() * _Math.DEG2RAD, objectRotationZ.getValue() * _Math.DEG2RAD );
+			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.Math.DEG2RAD, objectRotationY.getValue() * THREE.Math.DEG2RAD, objectRotationZ.getValue() * THREE.Math.DEG2RAD );
 			if ( object.rotation.toVector3().distanceTo( newRotation.toVector3() ) >= 0.01 ) {
 
 				editor.execute( new SetRotationCommand( editor, object, newRotation ) );
 
 			}
 
-			var newScale = new Vector3( objectScaleX.getValue(), objectScaleY.getValue(), objectScaleZ.getValue() );
+			var newScale = new THREE.Vector3( objectScaleX.getValue(), objectScaleY.getValue(), objectScaleZ.getValue() );
 			if ( object.scale.distanceTo( newScale ) >= 0.01 ) {
 
 				editor.execute( new SetScaleCommand( editor, object, newScale ) );
@@ -699,9 +695,9 @@ var SidebarObject = function ( editor ) {
 		objectPositionY.setValue( object.position.y );
 		objectPositionZ.setValue( object.position.z );
 
-		objectRotationX.setValue( object.rotation.x * _Math.RAD2DEG );
-		objectRotationY.setValue( object.rotation.y * _Math.RAD2DEG );
-		objectRotationZ.setValue( object.rotation.z * _Math.RAD2DEG );
+		objectRotationX.setValue( object.rotation.x * THREE.Math.RAD2DEG );
+		objectRotationY.setValue( object.rotation.y * THREE.Math.RAD2DEG );
+		objectRotationZ.setValue( object.rotation.z * THREE.Math.RAD2DEG );
 
 		objectScaleX.setValue( object.scale.x );
 		objectScaleY.setValue( object.scale.y );

@@ -2,9 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	FileLoader
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow } from './libs/ui.js';
 
@@ -34,7 +32,7 @@ var MenubarExamples = function ( editor ) {
 		{ title: 'menubar/examples/Shaders', file: 'shaders.app.json' }
 	];
 
-	var loader = new FileLoader();
+	var loader = new THREE.FileLoader();
 
 	for ( var i = 0; i < items.length; i ++ ) {
 

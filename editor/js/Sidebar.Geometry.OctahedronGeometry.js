@@ -2,9 +2,7 @@
  * @author Temdog007 / http://github.com/Temdog007
  */
 
-import {
-	OctahedronBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
@@ -46,7 +44,7 @@ var SidebarGeometryOctahedronGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new OctahedronBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.OctahedronBufferGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );

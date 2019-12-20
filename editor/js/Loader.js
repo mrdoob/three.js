@@ -2,18 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	AnimationMixer,
-	BufferGeometryLoader,
-	Group,
-	LoadingManager,
-	LoaderUtils,
-	Mesh,
-	MeshBasicMaterial,
-	MeshStandardMaterial,
-	ObjectLoader,
-	ShapeBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { AMFLoader } from '../../examples/jsm/loaders/AMFLoader.js';
 import { ColladaLoader } from '../../examples/jsm/loaders/ColladaLoader.js';
@@ -46,7 +35,7 @@ var Loader = function ( editor ) {
 
 			var filesMap = createFileMap( files );
 
-			var manager = new LoadingManager();
+			var manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
 				var file = filesMap[ url ];
@@ -147,9 +136,9 @@ var Loader = function ( editor ) {
 					loader.setDecoderPath( '../examples/js/libs/draco/' );
 					loader.decodeDracoFile( contents, function ( geometry ) {
 
-						var material = new MeshStandardMaterial();
+						var material = new THREE.MeshStandardMaterial();
 
-						var mesh = new Mesh( geometry, material );
+						var mesh = new THREE.Mesh( geometry, material );
 						mesh.name = filename;
 
 						editor.execute( new AddObjectCommand( editor, mesh ) );
@@ -317,13 +306,13 @@ var Loader = function ( editor ) {
 					var contents = event.target.result;
 
 					var geometry = new MD2Loader().parse( contents );
-					var material = new MeshStandardMaterial( {
+					var material = new THREE.MeshStandardMaterial( {
 						morphTargets: true,
 						morphNormals: true
 					} );
 
-					var mesh = new Mesh( geometry, material );
-					mesh.mixer = new AnimationMixer( mesh );
+					var mesh = new THREE.Mesh( geometry, material );
+					mesh.mixer = new THREE.AnimationMixer( mesh );
 					mesh.name = filename;
 
 					editor.addAnimation( mesh, geometry.animations );
@@ -360,9 +349,9 @@ var Loader = function ( editor ) {
 					geometry.sourceType = "ply";
 					geometry.sourceFile = file.name;
 
-					var material = new MeshStandardMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, mesh ) );
@@ -382,9 +371,9 @@ var Loader = function ( editor ) {
 					geometry.sourceType = "stl";
 					geometry.sourceFile = file.name;
 
-					var material = new MeshStandardMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, mesh ) );
@@ -414,7 +403,7 @@ var Loader = function ( editor ) {
 
 					//
 
-					var group = new Group();
+					var group = new THREE.Group();
 					group.scale.multiplyScalar( 0.1 );
 					group.scale.y *= - 1;
 
@@ -422,7 +411,7 @@ var Loader = function ( editor ) {
 
 						var path = paths[ i ];
 
-						var material = new MeshBasicMaterial( {
+						var material = new THREE.MeshBasicMaterial( {
 							color: path.color,
 							depthWrite: false
 						} );
@@ -433,8 +422,8 @@ var Loader = function ( editor ) {
 
 							var shape = shapes[ j ];
 
-							var geometry = new ShapeBufferGeometry( shape );
-							var mesh = new Mesh( geometry, material );
+							var geometry = new THREE.ShapeBufferGeometry( shape );
+							var mesh = new THREE.Mesh( geometry, material );
 
 							group.add( mesh );
 
@@ -459,9 +448,9 @@ var Loader = function ( editor ) {
 					geometry.sourceType = "vtk";
 					geometry.sourceFile = file.name;
 
-					var material = new MeshStandardMaterial();
+					var material = new THREE.MeshStandardMaterial();
 
-					var mesh = new Mesh( geometry, material );
+					var mesh = new THREE.Mesh( geometry, material );
 					mesh.name = filename;
 
 					editor.execute( new AddObjectCommand( editor, mesh ) );
@@ -531,10 +520,10 @@ var Loader = function ( editor ) {
 
 			case 'buffergeometry':
 
-				var loader = new BufferGeometryLoader();
+				var loader = new THREE.BufferGeometryLoader();
 				var result = loader.parse( data );
 
-				var mesh = new Mesh( result );
+				var mesh = new THREE.Mesh( result );
 
 				editor.execute( new AddObjectCommand( editor, mesh ) );
 
@@ -548,7 +537,7 @@ var Loader = function ( editor ) {
 
 			case 'object':
 
-				var loader = new ObjectLoader();
+				var loader = new THREE.ObjectLoader();
 				loader.setResourcePath( scope.texturePath );
 
 				var result = loader.parse( data );
@@ -608,7 +597,7 @@ var Loader = function ( editor ) {
 
 		zip.filter( function ( path, file ) {
 
-			var manager = new LoadingManager();
+			var manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
 				var file = zip.files[ url ];
@@ -684,7 +673,7 @@ var Loader = function ( editor ) {
 
 		} else {
 
-			var magic = LoaderUtils.decodeText( new Uint8Array( contents, 0, 4 ) );
+			var magic = THREE.LoaderUtils.decodeText( new Uint8Array( contents, 0, 4 ) );
 
 			if ( magic === 'glTF' ) {
 
@@ -696,7 +685,7 @@ var Loader = function ( editor ) {
 			} else {
 
 				// contents is a .gltf file
-				resultContent = LoaderUtils.decodeText( new Uint8Array( contents ) );
+				resultContent = THREE.LoaderUtils.decodeText( new Uint8Array( contents ) );
 
 			}
 

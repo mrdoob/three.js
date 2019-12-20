@@ -2,10 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	FileLoader,
-	LoadingManager
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
 import { GLTFExporter } from '../../examples/jsm/exporters/GLTFExporter.js';
@@ -372,13 +369,13 @@ var MenubarFile = function ( editor ) {
 
 		var title = config.getKey( 'project/title' );
 
-		var manager = new LoadingManager( function () {
+		var manager = new THREE.LoadingManager( function () {
 
 			save( zip.generate( { type: 'blob' } ), ( title !== '' ? title : 'untitled' ) + '.zip' );
 
 		} );
 
-		var loader = new FileLoader( manager );
+		var loader = new THREE.FileLoader( manager );
 		loader.load( 'js/libs/app/index.html', function ( content ) {
 
 			content = content.replace( '<!-- title -->', title );

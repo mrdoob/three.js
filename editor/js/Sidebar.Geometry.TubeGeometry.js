@@ -2,10 +2,7 @@
  * @author Temdog007 / http://github.com/Temdog007
  */
 
-import {
-	CatmullRomCurve3,
-	TubeBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UISelect, UICheckbox, UINumber } from './libs/ui.js';
 import { UIPoints3 } from './libs/ui.three.js';
@@ -95,8 +92,8 @@ var SidebarGeometryTubeGeometry = function ( editor, object ) {
 
 		tensionRow.setDisplay( curveType.getValue() == 'catmullrom' ? '' : 'none' );
 
-		editor.execute( new SetGeometryCommand( editor, object, new TubeBufferGeometry(
-			new CatmullRomCurve3( points.getValue(), closed.getValue(), curveType.getValue(), tension.getValue() ),
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TubeBufferGeometry(
+			new THREE.CatmullRomCurve3( points.getValue(), closed.getValue(), curveType.getValue(), tension.getValue() ),
 			tubularSegments.getValue(),
 			radius.getValue(),
 			radialSegments.getValue(),

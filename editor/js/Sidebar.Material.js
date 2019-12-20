@@ -2,28 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	BasicDepthPacking,
-	LineBasicMaterial,
-	LineDashedMaterial,
-	Math as _Math,
-	MeshBasicMaterial,
-	MeshDepthMaterial,
-	MeshNormalMaterial,
-	MeshLambertMaterial,
-	MeshToonMaterial,
-	MeshPhongMaterial,
-	MeshMatcapMaterial,
-	ShaderMaterial,
-	RawShaderMaterial,
-	SpriteMaterial,
-	MeshPhysicalMaterial,
-	ShadowMaterial,
-	MeshStandardMaterial,
-	RGBADepthPacking,
-	SphericalReflectionMapping,
-	sRGBEncoding
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UITexture } from './libs/ui.three.js';
@@ -35,21 +14,21 @@ import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 import { SetMaterialVectorCommand } from './commands/SetMaterialVectorCommand.js';
 
 var materialClasses = {
-	'LineBasicMaterial': LineBasicMaterial,
-	'LineDashedMaterial': LineDashedMaterial,
-	'MeshBasicMaterial': MeshBasicMaterial,
-	'MeshDepthMaterial': MeshDepthMaterial,
-	'MeshNormalMaterial': MeshNormalMaterial,
-	'MeshLambertMaterial': MeshLambertMaterial,
-	'MeshMatcapMaterial': MeshMatcapMaterial,
-	'MeshPhongMaterial': MeshPhongMaterial,
-	'MeshToonMaterial': MeshToonMaterial,
-	'MeshStandardMaterial': MeshStandardMaterial,
-	'MeshPhysicalMaterial': MeshPhysicalMaterial,
-	'RawShaderMaterial': RawShaderMaterial,
-	'ShaderMaterial': ShaderMaterial,
-	'ShadowMaterial': ShadowMaterial,
-	'SpriteMaterial': SpriteMaterial
+	'LineBasicMaterial': THREE.LineBasicMaterial,
+	'LineDashedMaterial': THREE.LineDashedMaterial,
+	'MeshBasicMaterial': THREE.MeshBasicMaterial,
+	'MeshDepthMaterial': THREE.MeshDepthMaterial,
+	'MeshNormalMaterial': THREE.MeshNormalMaterial,
+	'MeshLambertMaterial': THREE.MeshLambertMaterial,
+	'MeshMatcapMaterial': THREE.MeshMatcapMaterial,
+	'MeshPhongMaterial': THREE.MeshPhongMaterial,
+	'MeshToonMaterial': THREE.MeshToonMaterial,
+	'MeshStandardMaterial': THREE.MeshStandardMaterial,
+	'MeshPhysicalMaterial': THREE.MeshPhysicalMaterial,
+	'RawShaderMaterial': THREE.RawShaderMaterial,
+	'ShaderMaterial': THREE.ShaderMaterial,
+	'ShadowMaterial': THREE.ShadowMaterial,
+	'SpriteMaterial': THREE.SpriteMaterial
 };
 
 var SidebarMaterial = function ( editor ) {
@@ -113,7 +92,7 @@ var SidebarMaterial = function ( editor ) {
 	var materialUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
 	var materialUUIDRenew = new UIButton( strings.getKey( 'sidebar/material/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
-		materialUUID.setValue( _Math.generateUUID() );
+		materialUUID.setValue( THREE.Math.generateUUID() );
 		update();
 
 	} );
@@ -286,8 +265,8 @@ var SidebarMaterial = function ( editor ) {
 
 	var materialDepthPackingRow = new UIRow();
 	var materialDepthPacking = new UISelect().setOptions( {
-		[ BasicDepthPacking ]: 'BasicDepthPacking',
-		[ RGBADepthPacking ]: 'RGBADepthPacking'
+		[ THREE.BasicDepthPacking ]: 'BasicDepthPacking',
+		[ THREE.RGBADepthPacking ]: 'RGBADepthPacking'
 	} );
 	materialDepthPacking.onChange( update );
 
@@ -442,7 +421,7 @@ var SidebarMaterial = function ( editor ) {
 
 	var materialEnvMapRow = new UIRow();
 	var materialEnvMapEnabled = new UICheckbox( false ).onChange( update );
-	var materialEnvMap = new UITexture( SphericalReflectionMapping ).onChange( updateMaterial );
+	var materialEnvMap = new UITexture( THREE.SphericalReflectionMapping ).onChange( updateMaterial );
 	var materialReflectivity = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
 
 	materialEnvMapRow.add( new UIText( strings.getKey( 'sidebar/material/envmap' ) ).setWidth( '90px' ) );
@@ -1168,9 +1147,9 @@ var SidebarMaterial = function ( editor ) {
 
 		if ( texture !== null ) {
 
-			if ( texture.encoding !== sRGBEncoding ) {
+			if ( texture.encoding !== THREE.sRGBEncoding ) {
 
-				texture.encoding = sRGBEncoding;
+				texture.encoding = THREE.sRGBEncoding;
 				var object = currentObject;
 				if ( object !== null ) {
 

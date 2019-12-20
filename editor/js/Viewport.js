@@ -2,16 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	Box3,
-	BoxHelper,
-	GridHelper,
-	Vector2,
-	Raycaster,
-	Fog,
-	FogExp2,
-	sRGBEncoding
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
 import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
@@ -50,7 +41,7 @@ var Viewport = function ( editor ) {
 
 	// helpers
 
-	var grid = new GridHelper( 30, 30, 0x444444, 0x888888 );
+	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
 	sceneHelpers.add( grid );
 
 	var array = grid.geometry.attributes.color.array;
@@ -67,9 +58,9 @@ var Viewport = function ( editor ) {
 
 	//
 
-	var box = new Box3();
+	var box = new THREE.Box3();
 
-	var selectionBox = new BoxHelper();
+	var selectionBox = new THREE.BoxHelper();
 	selectionBox.material.depthTest = false;
 	selectionBox.material.transparent = true;
 	selectionBox.visible = false;
@@ -162,8 +153,8 @@ var Viewport = function ( editor ) {
 
 	// object picking
 
-	var raycaster = new Raycaster();
-	var mouse = new Vector2();
+	var raycaster = new THREE.Raycaster();
+	var mouse = new THREE.Vector2();
 
 	// events
 
@@ -177,9 +168,9 @@ var Viewport = function ( editor ) {
 
 	}
 
-	var onDownPosition = new Vector2();
-	var onUpPosition = new Vector2();
-	var onDoubleClickPosition = new Vector2();
+	var onDownPosition = new THREE.Vector2();
+	var onUpPosition = new THREE.Vector2();
+	var onDoubleClickPosition = new THREE.Vector2();
 
 	function getMousePosition( dom, x, y ) {
 
@@ -338,7 +329,7 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
-		renderer.outputEncoding = sRGBEncoding;
+		renderer.outputEncoding = THREE.sRGBEncoding;
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -493,10 +484,10 @@ var Viewport = function ( editor ) {
 					scene.fog = null;
 					break;
 				case 'Fog':
-					scene.fog = new Fog();
+					scene.fog = new THREE.Fog();
 					break;
 				case 'FogExp2':
-					scene.fog = new FogExp2();
+					scene.fog = new THREE.FogExp2();
 					break;
 
 			}

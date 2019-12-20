@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BoxBufferGeometry } from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UINumber, UIInteger } from './libs/ui.js';
 
@@ -81,7 +81,7 @@ var SidebarGeometryBoxGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new BoxBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.BoxBufferGeometry(
 			width.getValue(),
 			height.getValue(),
 			depth.getValue(),

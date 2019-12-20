@@ -4,7 +4,8 @@
  */
 
 import { Command } from '../Command.js';
-import { ObjectLoader } from '../../../build/three.module.js';
+
+import * as THREE from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
@@ -80,7 +81,7 @@ SetGeometryCommand.prototype = {
 
 		function parseGeometry( data ) {
 
-			var loader = new ObjectLoader();
+			var loader = new THREE.ObjectLoader();
 			return loader.parseGeometries( [ data ] )[ data.uuid ];
 
 		}

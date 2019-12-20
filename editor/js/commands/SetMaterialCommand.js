@@ -4,7 +4,8 @@
  */
 
 import { Command } from '../Command.js';
-import { ObjectLoader } from '../../../build/three.module.js';
+
+import * as THREE from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
@@ -65,7 +66,7 @@ SetMaterialCommand.prototype = {
 
 		function parseMaterial( json ) {
 
-			var loader = new ObjectLoader();
+			var loader = new THREE.ObjectLoader();
 			var images = loader.parseImages( json.images );
 			var textures = loader.parseTextures( json.textures, images );
 			var materials = loader.parseMaterials( [ json ], textures );

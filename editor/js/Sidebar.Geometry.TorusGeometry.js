@@ -2,10 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import {
-	Math as _Math,
-	TorusBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
@@ -63,7 +60,7 @@ var SidebarGeometryTorusGeometry = function ( editor, object ) {
 	// arc
 
 	var arcRow = new UIRow();
-	var arc = new UINumber( parameters.arc * _Math.RAD2DEG ).setStep( 10 ).onChange( update );
+	var arc = new UINumber( parameters.arc * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	arcRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/arc' ) ).setWidth( '90px' ) );
 	arcRow.add( arc );
@@ -75,12 +72,12 @@ var SidebarGeometryTorusGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new TorusBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.TorusBufferGeometry(
 			radius.getValue(),
 			tube.getValue(),
 			radialSegments.getValue(),
 			tubularSegments.getValue(),
-			arc.getValue() * _Math.DEG2RAD
+			arc.getValue() * THREE.Math.DEG2RAD
 		) ) );
 
 	}

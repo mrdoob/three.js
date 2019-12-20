@@ -2,9 +2,7 @@
  * @author rfm1201
  */
 
-import {
-	LatheBufferGeometry
-} from '../../build/three.module.js';
+import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 import { UIPoints2 } from './libs/ui.three.js';
@@ -62,7 +60,7 @@ var SidebarGeometryLatheGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new LatheBufferGeometry(
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.LatheBufferGeometry(
 			points.getValue(),
 			segments.getValue(),
 			phiStart.getValue() / 180 * Math.PI,

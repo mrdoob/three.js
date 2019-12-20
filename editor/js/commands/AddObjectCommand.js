@@ -4,7 +4,7 @@
  */
 
 import { Command } from '../Command.js';
-import { ObjectLoader } from '../../../build/three.module.js';
+import * as THREE from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
@@ -59,7 +59,7 @@ AddObjectCommand.prototype = {
 
 		if ( this.object === undefined ) {
 
-			var loader = new ObjectLoader();
+			var loader = new THREE.ObjectLoader();
 			this.object = loader.parse( json.object );
 
 		}
