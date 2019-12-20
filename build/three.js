@@ -47859,7 +47859,9 @@
 			if ( _equirectShader != null ) { _equirectShader.dispose(); }
 
 			for ( var i = 0; i < _lodPlanes.length; i ++ ) {
+
 				_lodPlanes[ i ].dispose();
+
 			}
 
 		},
@@ -48108,7 +48110,7 @@
 		var autoClear = _renderer.autoClear;
 		_renderer.autoClear = false;
 
-			for ( var i = 1; i < TOTAL_LODS; i ++ ) {
+		for ( var i = 1; i < TOTAL_LODS; i ++ ) {
 
 			var sigma = Math.sqrt(
 				_sigmas[ i ] * _sigmas[ i ] -
@@ -48186,13 +48188,14 @@
 			var x = i / sigmaPixels;
 			var weight = Math.exp( - x * x / 2 );
 			weights.push( weight );
+
 			if ( i == 0 ) {
 
-					 sum += weight;
+				sum += weight;
 
 			} else if ( i < samples ) {
 
-					sum += 2 * weight;
+				sum += 2 * weight;
 
 			}
 
@@ -48247,7 +48250,7 @@
 
 			vertexShader: _getCommonVertexShader(),
 
-			fragmentShader: ("\nprecision mediump float;\nprecision mediump int;\nvarying vec3 vOutputDirection;\nuniform sampler2D envMap;\nuniform int samples;\nuniform float weights[n];\nuniform bool latitudinal;\nuniform float dTheta;\nuniform float mipInt;\nuniform vec3 poleAxis;\n\n" + (_getEncodings()) + "\n\n#define ENVMAP_TYPE_CUBE_UV\n#include <cube_uv_reflection_fragment>\n\nvoid main() {\n\tgl_FragColor = vec4(0.0);\n\t\tfor (int i = 0; i < n; i++) {\n\t\t\tif (i >= samples)\n\t\t\t\tbreak;\n\t\t\tfor (int dir = -1; dir < 2; dir += 2) {\n\t\t\t\tif (i == 0 && dir == 1)\n\t\t\t\t\tcontinue;\n\t\t\t\tvec3 axis = latitudinal ? poleAxis : cross(poleAxis, vOutputDirection);\n\t\t\t\tif (all(equal(axis, vec3(0.0))))\n\t\t\t\t\taxis = cross(vec3(0.0, 1.0, 0.0), vOutputDirection);\n\t\t\t\taxis = normalize(axis);\n\t\t\t\tfloat theta = dTheta * float(dir * i);\n\t\t\t\tfloat cosTheta = cos(theta);\n\t\t\t\t// Rodrigues' axis-angle rotation\n\t\t\t\tvec3 sampleDirection = vOutputDirection * cosTheta\n\t\t\t\t\t\t+ cross(axis, vOutputDirection) * sin(theta)\n\t\t\t\t\t\t+ axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);\n\t\t\t\tgl_FragColor.rgb +=\n\t\t\t\t\t\tweights[i] * bilinearCubeUV(envMap, sampleDirection, mipInt);\n\t\t\t}\n\t\t}\n\t\tgl_FragColor = linearToOutputTexel(gl_FragColor);\n}\n\t\t"),
+			fragmentShader: ("\nprecision mediump float;\nprecision mediump int;\nvarying vec3 vOutputDirection;\nuniform sampler2D envMap;\nuniform int samples;\nuniform float weights[n];\nuniform bool latitudinal;\nuniform float dTheta;\nuniform float mipInt;\nuniform vec3 poleAxis;\n\n" + (_getEncodings()) + "\n\n#define ENVMAP_TYPE_CUBE_UV\n#include <cube_uv_reflection_fragment>\n\nvoid main() {\n\tgl_FragColor = vec4(0.0);\n\tfor (int i = 0; i < n; i++) {\n\t\tif (i >= samples)\n\t\t\tbreak;\n\t\tfor (int dir = -1; dir < 2; dir += 2) {\n\t\t\tif (i == 0 && dir == 1)\n\t\t\t\tcontinue;\n\t\t\tvec3 axis = latitudinal ? poleAxis : cross(poleAxis, vOutputDirection);\n\t\t\tif (all(equal(axis, vec3(0.0))))\n\t\t\t\taxis = cross(vec3(0.0, 1.0, 0.0), vOutputDirection);\n\t\t\taxis = normalize(axis);\n\t\t\tfloat theta = dTheta * float(dir * i);\n\t\t\tfloat cosTheta = cos(theta);\n\t\t\t// Rodrigues' axis-angle rotation\n\t\t\tvec3 sampleDirection = vOutputDirection * cosTheta\n\t\t\t\t\t+ cross(axis, vOutputDirection) * sin(theta)\n\t\t\t\t\t+ axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);\n\t\t\tgl_FragColor.rgb +=\n\t\t\t\t\tweights[i] * bilinearCubeUV(envMap, sampleDirection, mipInt);\n\t\t}\n\t}\n\tgl_FragColor = linearToOutputTexel(gl_FragColor);\n}\n\t\t"),
 
 			blending: NoBlending,
 			depthTest: false,
@@ -48323,7 +48326,7 @@
 
 	function _getEncodings() {
 
-		return "\nuniform int inputEncoding;\nuniform int outputEncoding;\n\n#include <encodings_pars_fragment>\n\nvec4 inputTexelToLinear(vec4 value){\n\t\tif(inputEncoding == 0){\n\t\t\t\treturn value;\n\t\t}else if(inputEncoding == 1){\n\t\t\t\treturn sRGBToLinear(value);\n\t\t}else if(inputEncoding == 2){\n\t\t\t\treturn RGBEToLinear(value);\n\t\t}else if(inputEncoding == 3){\n\t\t\t\treturn RGBMToLinear(value, 7.0);\n\t\t}else if(inputEncoding == 4){\n\t\t\t\treturn RGBMToLinear(value, 16.0);\n\t\t}else if(inputEncoding == 5){\n\t\t\t\treturn RGBDToLinear(value, 256.0);\n\t\t}else{\n\t\t\t\treturn GammaToLinear(value, 2.2);\n\t\t}\n}\n\nvec4 linearToOutputTexel(vec4 value){\n\t\tif(outputEncoding == 0){\n\t\t\t\treturn value;\n\t\t}else if(outputEncoding == 1){\n\t\t\t\treturn LinearTosRGB(value);\n\t\t}else if(outputEncoding == 2){\n\t\t\t\treturn LinearToRGBE(value);\n\t\t}else if(outputEncoding == 3){\n\t\t\t\treturn LinearToRGBM(value, 7.0);\n\t\t}else if(outputEncoding == 4){\n\t\t\t\treturn LinearToRGBM(value, 16.0);\n\t\t}else if(outputEncoding == 5){\n\t\t\t\treturn LinearToRGBD(value, 256.0);\n\t\t}else{\n\t\t\t\treturn LinearToGamma(value, 2.2);\n\t\t}\n}\n\nvec4 envMapTexelToLinear(vec4 color) {\n\treturn inputTexelToLinear(color);\n}\n\t";
+		return "\nuniform int inputEncoding;\nuniform int outputEncoding;\n\n#include <encodings_pars_fragment>\n\nvec4 inputTexelToLinear(vec4 value){\n\tif(inputEncoding == 0){\n\t\treturn value;\n\t}else if(inputEncoding == 1){\n\t\treturn sRGBToLinear(value);\n\t}else if(inputEncoding == 2){\n\t\treturn RGBEToLinear(value);\n\t}else if(inputEncoding == 3){\n\t\treturn RGBMToLinear(value, 7.0);\n\t}else if(inputEncoding == 4){\n\t\treturn RGBMToLinear(value, 16.0);\n\t}else if(inputEncoding == 5){\n\t\treturn RGBDToLinear(value, 256.0);\n\t}else{\n\t\treturn GammaToLinear(value, 2.2);\n\t}\n}\n\nvec4 linearToOutputTexel(vec4 value){\n\tif(outputEncoding == 0){\n\t\treturn value;\n\t}else if(outputEncoding == 1){\n\t\treturn LinearTosRGB(value);\n\t}else if(outputEncoding == 2){\n\t\treturn LinearToRGBE(value);\n\t}else if(outputEncoding == 3){\n\t\treturn LinearToRGBM(value, 7.0);\n\t}else if(outputEncoding == 4){\n\t\treturn LinearToRGBM(value, 16.0);\n\t}else if(outputEncoding == 5){\n\t\treturn LinearToRGBD(value, 256.0);\n\t}else{\n\t\treturn LinearToGamma(value, 2.2);\n\t}\n}\n\nvec4 envMapTexelToLinear(vec4 color) {\n\treturn inputTexelToLinear(color);\n}\n\t";
 
 	}
 
