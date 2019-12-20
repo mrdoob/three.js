@@ -200,6 +200,12 @@
 	var DepthFormat = 1026;
 	var DepthStencilFormat = 1027;
 	var RedFormat = 1028;
+	var RedIntegerFormat = 1029;
+	var RGFormat = 1030;
+	var RGIntegerFormat = 1031;
+	var RGBIntegerFormat = 1032;
+	var RGBAIntegerFormat = 1033;
+
 	var RGB_S3TC_DXT1_Format = 33776;
 	var RGBA_S3TC_DXT1_Format = 33777;
 	var RGBA_S3TC_DXT3_Format = 33778;
@@ -2805,6 +2811,7 @@
 		this.anisotropy = anisotropy !== undefined ? anisotropy : 1;
 
 		this.format = format !== undefined ? format : RGBAFormat;
+		this.internalFormat = null;
 		this.type = type !== undefined ? type : UnsignedByteType;
 
 		this.offset = new Vector2( 0, 0 );
@@ -2870,6 +2877,7 @@
 			this.anisotropy = source.anisotropy;
 
 			this.format = source.format;
+			this.internalFormat = source.internalFormat;
 			this.type = source.type;
 
 			this.offset.copy( source.offset );
@@ -17216,8 +17224,16 @@
 			case 0x8b5b: return setValueM3Array; // _MAT3
 			case 0x8b5c: return setValueM4Array; // _MAT4
 
-			case 0x8b5e: return setValueT1Array; // SAMPLER_2D
-			case 0x8b60: return setValueT6Array; // SAMPLER_CUBE
+			case 0x8b5e: // SAMPLER_2D
+			case 0x8d66: // SAMPLER_EXTERNAL_OES
+			case 0x8dca: // INT_SAMPLER_2D
+			case 0x8dd2: // UNSIGNED_INT_SAMPLER_2D
+				return setValueT1Array;
+
+			case 0x8b60: // SAMPLER_CUBE
+			case 0x8dcc: // INT_SAMPLER_CUBE
+			case 0x8dd4: // UNSIGNED_SAMPLER_CUBE
+				return setValueT6Array;
 
 			case 0x1404: case 0x8b56: return setValueV1iArray; // INT, BOOL
 			case 0x8b53: case 0x8b57: return setValueV2iArray; // _VEC2
@@ -21199,9 +21215,17 @@
 
 		}
 
-		function getInternalFormat( glFormat, glType ) {
+		function getInternalFormat( internalFormatName, glFormat, glType ) {
 
 			if ( isWebGL2 === false ) { return glFormat; }
+
+			if ( internalFormatName !== null ) {
+
+				if ( _gl[ internalFormatName ] !== undefined ) { return _gl[ internalFormatName ]; }
+
+				console.warn( 'THREE.WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
+
+			}
 
 			var internalFormat = glFormat;
 
@@ -21489,7 +21513,7 @@
 					supportsMips = isPowerOfTwo( image ) || isWebGL2,
 					glFormat = utils.convert( texture.format ),
 					glType = utils.convert( texture.type ),
-					glInternalFormat = getInternalFormat( glFormat, glType );
+					glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
 				setTextureParameters( 34067, texture, supportsMips );
 
@@ -21708,7 +21732,7 @@
 			var supportsMips = isPowerOfTwo( image ) || isWebGL2,
 				glFormat = utils.convert( texture.format ),
 				glType = utils.convert( texture.type ),
-				glInternalFormat = getInternalFormat( glFormat, glType );
+				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
 			setTextureParameters( textureType, texture, supportsMips );
 
@@ -21881,7 +21905,7 @@
 
 			var glFormat = utils.convert( renderTarget.texture.format );
 			var glType = utils.convert( renderTarget.texture.type );
-			var glInternalFormat = getInternalFormat( glFormat, glType );
+			var glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
 			state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 			_gl.bindFramebuffer( 36160, framebuffer );
 			_gl.framebufferTexture2D( 36160, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
@@ -21931,7 +21955,7 @@
 
 				var glFormat = utils.convert( renderTarget.texture.format );
 				var glType = utils.convert( renderTarget.texture.type );
-				var glInternalFormat = getInternalFormat( glFormat, glType );
+				var glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
 
 				if ( isMultisample ) {
 
@@ -22078,9 +22102,10 @@
 						renderTargetProperties.__webglColorRenderbuffer = _gl.createRenderbuffer();
 
 						_gl.bindRenderbuffer( 36161, renderTargetProperties.__webglColorRenderbuffer );
+
 						var glFormat = utils.convert( renderTarget.texture.format );
 						var glType = utils.convert( renderTarget.texture.type );
-						var glInternalFormat = getInternalFormat( glFormat, glType );
+						var glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
 						var samples = getRenderTargetSamples( renderTarget );
 						_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
@@ -22394,6 +22419,14 @@
 			if ( p === DepthFormat ) { return 6402; }
 			if ( p === DepthStencilFormat ) { return 34041; }
 			if ( p === RedFormat ) { return 6403; }
+
+			// WebGL2 formats.
+
+			if ( p === RedIntegerFormat ) { return 36244; }
+			if ( p === RGFormat ) { return 33319; }
+			if ( p === RGIntegerFormat ) { return 33320; }
+			if ( p === RGBIntegerFormat ) { return 36248; }
+			if ( p === RGBAIntegerFormat ) { return 36249; }
 
 			if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
 				p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
@@ -50030,6 +50063,7 @@
 	exports.REVISION = REVISION;
 	exports.RGBADepthPacking = RGBADepthPacking;
 	exports.RGBAFormat = RGBAFormat;
+	exports.RGBAIntegerFormat = RGBAIntegerFormat;
 	exports.RGBA_ASTC_10x10_Format = RGBA_ASTC_10x10_Format;
 	exports.RGBA_ASTC_10x5_Format = RGBA_ASTC_10x5_Format;
 	exports.RGBA_ASTC_10x6_Format = RGBA_ASTC_10x6_Format;
@@ -50053,17 +50087,21 @@
 	exports.RGBEEncoding = RGBEEncoding;
 	exports.RGBEFormat = RGBEFormat;
 	exports.RGBFormat = RGBFormat;
+	exports.RGBIntegerFormat = RGBIntegerFormat;
 	exports.RGBM16Encoding = RGBM16Encoding;
 	exports.RGBM7Encoding = RGBM7Encoding;
 	exports.RGB_ETC1_Format = RGB_ETC1_Format;
 	exports.RGB_PVRTC_2BPPV1_Format = RGB_PVRTC_2BPPV1_Format;
 	exports.RGB_PVRTC_4BPPV1_Format = RGB_PVRTC_4BPPV1_Format;
 	exports.RGB_S3TC_DXT1_Format = RGB_S3TC_DXT1_Format;
+	exports.RGFormat = RGFormat;
+	exports.RGIntegerFormat = RGIntegerFormat;
 	exports.RawShaderMaterial = RawShaderMaterial;
 	exports.Ray = Ray;
 	exports.Raycaster = Raycaster;
 	exports.RectAreaLight = RectAreaLight;
 	exports.RedFormat = RedFormat;
+	exports.RedIntegerFormat = RedIntegerFormat;
 	exports.ReinhardToneMapping = ReinhardToneMapping;
 	exports.RepeatWrapping = RepeatWrapping;
 	exports.ReplaceStencilOp = ReplaceStencilOp;
