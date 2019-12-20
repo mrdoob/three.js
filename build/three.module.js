@@ -48173,6 +48173,7 @@ function _halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction,
 
 	var weights = [];
 	var sum = 0;
+
 	for ( var i = 0; i < MAX_SAMPLES; ++ i ) {
 
 		var x = i / sigmaPixels;
@@ -48190,7 +48191,12 @@ function _halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction,
 		}
 
 	}
-	weights = weights.map( function ( w ) { return w / sum } );
+
+	for ( var i = 0; i < weights.length; i ++ ) {
+
+		weights[ i ] = weights[ i ] / sum;
+
+	}
 
 	blurUniforms[ 'envMap' ].value = targetIn.texture;
 	blurUniforms[ 'samples' ].value = samples;
