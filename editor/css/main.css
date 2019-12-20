@@ -661,4 +661,12 @@ select {
 		background: #222;
 	}
 
+	.Listbox .ListboxItem:hover {
+		background-color: rgba(21,60,94,0.5);
+	}
+
+	.Listbox .ListboxItem.active {
+		background-color: rgba(21,60,94,1);
+	}
+
 }

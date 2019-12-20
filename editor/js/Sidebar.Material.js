@@ -603,13 +603,14 @@ var SidebarMaterial = function ( editor ) {
 
 				material = new materialClasses[ materialClass.getValue() ]();
 
-				if ( material.type == "RawShaderMaterial" ) {
+				if ( material.type === "RawShaderMaterial" ) {
 
 					material.vertexShader = vertexShaderVariables + material.vertexShader;
 
 				}
 
 				editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
+				editor.addMaterial( material );
 				// TODO Copy other references in the scene graph
 				// keeping name and UUID then.
 				// Also there should be means to create a unique
