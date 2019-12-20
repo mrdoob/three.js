@@ -94,7 +94,7 @@ scene.add( starField );
 		<p>Define whether the material uses morphTargets. Default is false.</p>
 
 		<h3>[property:Number size]</h3>
-		<p>Sets the size of the points. Default is 1.0.</p>
+		<p>Sets the size of the points. Default is 1.0. Will be capped if it exceeds the hardware dependent parameter <a href="https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter">gl.ALIASED_POINT_SIZE_RANGE</a></p>
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
 		<p>Specify whether points' size is attenuated by the camera depth. (Perspective camera only.) Default is true.</p>
