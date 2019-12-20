@@ -128,7 +128,7 @@ var MeshSurfaceSampler = ( function () {
 
 				var mid = Math.floor( ( start + end ) / 2 );
 
-				if ( dist[ mid - 1 ] <= x && dist[ mid ] > x ) {
+				if ( mid === 0 || dist[ mid - 1 ] <= x && dist[ mid ] > x ) {
 
 					index = mid;
 

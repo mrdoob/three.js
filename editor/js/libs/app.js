@@ -21,7 +21,7 @@ var APP = {
 		this.load = function ( json ) {
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.gammaOutput = true;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 
@@ -109,12 +109,6 @@ var APP = {
 			camera = value;
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
-
-			if ( renderer.xr.enabled ) {
-
-				dom.appendChild( THREE.WEBVR.createButton( renderer ) );
-
-			}
 
 		};
 

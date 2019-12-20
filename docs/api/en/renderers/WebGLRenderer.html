@@ -164,13 +164,9 @@
 		<h3>[property:Float gammaFactor]</h3>
 		<p>Default is *2*. </p>
 
-
-		<h3>[property:Boolean gammaInput]</h3>
-		<p>If set, then it expects that all textures and colors are premultiplied gamma. Default is *false*.</p>
-
-
-		<h3>[property:Boolean gammaOutput]</h3>
-		<p>If set, then it expects that all textures and colors need to be outputted in premultiplied gamma. Default is *false*.</p>
+		<h3>[property:number outputEncoding]</h3>
+		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<p>See the [page:Textures texture constants] page for details of other formats.</p>
 
 		<h3>[property:Object info]</h3>
 		<p>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</p>
@@ -475,6 +471,16 @@
 		<p>
 		Enable or disable the scissor test. When this is enabled, only the pixels within the defined
 			scissor area will be affected by further renderer actions.
+		</p>
+
+		<h3>[method:null setOpaqueSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom opaque sort function for the WebGLRenderLists. Pass null to use the default painterSortStable function.
+		</p>
+
+		<h3>[method:null setTransparentSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom transparent sort function for the WebGLRenderLists. Pass null to use the default reversePainterSortStable function.
 		</p>
 
 		<h3>[method:null setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>

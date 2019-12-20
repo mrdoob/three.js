@@ -202,7 +202,8 @@ var list = {
 				"RectAreaLightHelper": "api/en/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/en/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/en/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/en/helpers/VertexNormalsHelper"
+				"VertexNormalsHelper": "api/en/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "api/en/helpers/VertexTangentsHelper"
 			},
 
 			"Lights": {
@@ -646,7 +647,8 @@ var list = {
 				"RectAreaLightHelper": "api/zh/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/zh/helpers/SkeletonHelper",
 				"SpotLightHelper": "api/zh/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper"
+				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "api/zh/helpers/VertexTangentsHelper"
 			},
 
 			"灯光": {

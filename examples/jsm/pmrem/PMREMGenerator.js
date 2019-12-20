@@ -91,6 +91,7 @@ var PMREMGenerator = ( function () {
 	var PMREMGenerator = function ( renderer ) {
 
 		_renderer = renderer;
+		_compileMaterial( _blurMaterial );
 
 	};
 
@@ -151,6 +152,36 @@ var PMREMGenerator = ( function () {
 			cubeUVRenderTarget.scissorTest = false;
 
 			return cubeUVRenderTarget;
+
+		},
+
+		/**
+		 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
+		 * your texture's network fetch for increased concurrency.
+		 */
+		compileCubemapShader: function () {
+
+			if ( _cubemapShader == null ) {
+
+				_cubemapShader = _getCubemapShader();
+				_compileMaterial( _cubemapShader );
+
+			}
+
+		},
+
+		/**
+		 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
+		 * your texture's network fetch for increased concurrency.
+		 */
+		compileEquirectangularShader: function () {
+
+			if ( _equirectShader == null ) {
+
+				_equirectShader = _getEquirectShader();
+				_compileMaterial( _equirectShader );
+
+			}
 
 		},
 
@@ -287,7 +318,7 @@ var PMREMGenerator = ( function () {
 		var upSign = [ 1, 1, 1, 1, - 1, 1 ];
 		var forwardSign = [ 1, 1, - 1, - 1, - 1, 1 ];
 
-		var gammaOutput = _renderer.gammaOutput;
+		var outputEncoding = _renderer.outputEncoding;
 		var toneMapping = _renderer.toneMapping;
 		var toneMappingExposure = _renderer.toneMappingExposure;
 		var clearColor = _renderer.getClearColor();
@@ -295,7 +326,7 @@ var PMREMGenerator = ( function () {
 
 		_renderer.toneMapping = LinearToneMapping;
 		_renderer.toneMappingExposure = 1.0;
-		_renderer.gammaOutput = false;
+		_renderer.outputEncoding = LinearEncoding;
 		scene.scale.z *= - 1;
 
 		var background = scene.background;
@@ -340,7 +371,7 @@ var PMREMGenerator = ( function () {
 
 		_renderer.toneMapping = toneMapping;
 		_renderer.toneMappingExposure = toneMappingExposure;
-		_renderer.gammaOutput = gammaOutput;
+		_renderer.outputEncoding = outputEncoding;
 		_renderer.setClearColor( clearColor, clearAlpha );
 		scene.scale.z *= - 1;
 
@@ -382,6 +413,14 @@ var PMREMGenerator = ( function () {
 		_renderer.setRenderTarget( cubeUVRenderTarget );
 		_setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 		_renderer.render( scene, _flatCamera );
+
+	}
+
+	function _compileMaterial( material ) {
+
+		var tmpScene = new Scene();
+		tmpScene.add( new Mesh( _lodPlanes[ 0 ], material ) );
+		_renderer.compile( tmpScene, _flatCamera );
 
 	}
 
@@ -586,8 +625,8 @@ void main() {
         float theta = dTheta * float(dir * i);
         float cosTheta = cos(theta);
         // Rodrigues' axis-angle rotation
-        vec3 sampleDirection = vOutputDirection * cosTheta 
-            + cross(axis, vOutputDirection) * sin(theta) 
+        vec3 sampleDirection = vOutputDirection * cosTheta
+            + cross(axis, vOutputDirection) * sin(theta)
             + axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);
         gl_FragColor.rgb +=
             weights[i] * bilinearCubeUV(envMap, sampleDirection, mipInt);

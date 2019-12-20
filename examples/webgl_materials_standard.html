@@ -43,8 +43,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = 3;
 
@@ -75,7 +74,9 @@
 						material.roughness = 1; // attenuates roughnessMap
 						material.metalness = 1; // attenuates metalnessMap
 
-						material.map = loader.load( 'Cerberus_A.jpg' );
+						var diffuseMap = loader.load( 'Cerberus_A.jpg' );
+						diffuseMap.encoding = THREE.sRGBEncoding;
+						material.map = diffuseMap;
 						// roughness is in G channel, metalness is in B channel
 						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );
 						material.normalMap = loader.load( 'Cerberus_N.jpg' );
@@ -104,11 +105,10 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', function ( hdrCubeMap ) {
+					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
-						var hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
-						hdrCubeMap.dispose();
+						var hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+						hdrEquirect.dispose();
 						pmremGenerator.dispose();
 
 						material.envMap = hdrCubeRenderTarget.texture;
@@ -116,6 +116,9 @@
 						scene.background = hdrCubeRenderTarget.texture;
 
 					} );
+
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				//
 

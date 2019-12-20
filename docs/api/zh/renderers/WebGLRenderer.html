@@ -143,13 +143,9 @@
 		<h3>[property:Float gammaFactor]</h3>
 		<p>默认是 *2*. </p>
 
-
-		<h3>[property:Boolean gammaInput]</h3>
-		<p>如果设置，那么所有的纹理和颜色都会预乘gamma。 默认值是*false*.</p>
-
-
-		<h3>[property:Boolean gammaOutput]</h3>
-		<p>如果设置, 那么它期望所有纹理和颜色需要乘以gamma输出。 默认值*false*.</p>
+		<h3>[property:number outputEncoding]</h3>
+		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<p>See the [page:Textures texture constants] page for details of other formats.</p>
 
 		<h3>[property:Object info]</h3>
 		<p>一个对象，包含有关图形板内存和渲染过程的一系列统计信息。这些信息可用于调试或仅仅满足下好奇心。改对象包含以下字段:</p>
@@ -218,7 +214,7 @@
 		</p>
 
 		<h3>[property:Boolean shadowMap.enabled]</h3>
-		<p>如果设置, 请在场景中使用阴影贴图。 默认是 *false*</p>
+		<p>如果设置开启，允许在场景中使用阴影贴图。默认是 *false*。</p>
 
 		<h3>[property:Boolean shadowMap.autoUpdate]</h3>
 		<p>启用场景中的阴影自动更新。默认是*true*</p>

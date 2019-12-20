@@ -1,8 +1,17 @@
+/**
+ * @author supereggbert / http://www.paulbrunt.co.uk/
+ * @author mrdoob / http://mrdoob.com/
+ * @author alteredq / http://alteredqualia.com/
+ * @author szimek / https://github.com/szimek/
+ * @author tschw
+ */
+
 import {
 	RGBAFormat,
 	HalfFloatType,
 	FloatType,
 	UnsignedByteType,
+	LinearEncoding,
 	LinearToneMapping,
 	BackSide
 } from '../constants.js';
@@ -38,16 +47,7 @@ import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
 import { WebGLMultiview } from './webgl/WebGLMultiview.js';
-import { WebVRManager } from './webvr/WebVRManager.js';
-import { WebXRManager } from './webvr/WebXRManager.js';
-
-/**
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author szimek / https://github.com/szimek/
- * @author tschw
- */
+import { WebXRManager } from './webxr/WebXRManager.js';
 
 function WebGLRenderer( parameters ) {
 
@@ -101,8 +101,7 @@ function WebGLRenderer( parameters ) {
 	// physically based shading
 
 	this.gammaFactor = 2.0;	// for backwards compatibility
-	this.gammaInput = false;
-	this.gammaOutput = false;
+	this.outputEncoding = LinearEncoding;
 
 	// physical lights
 
@@ -156,6 +155,8 @@ function WebGLRenderer( parameters ) {
 		_height = _canvas.height,
 
 		_pixelRatio = 1,
+		_opaqueSort = null,
+		_transparentSort = null,
 
 		_viewport = new Vector4( 0, 0, _width, _height ),
 		_scissor = new Vector4( 0, 0, _width, _height ),
@@ -306,7 +307,7 @@ function WebGLRenderer( parameters ) {
 
 	// xr
 
-	var xr = ( typeof navigator !== 'undefined' && 'xr' in navigator ) ? new WebXRManager( _this, _gl ) : new WebVRManager( _this );
+	var xr = new WebXRManager( _this, _gl );
 
 	this.xr = xr;
 
@@ -499,6 +500,18 @@ function WebGLRenderer( parameters ) {
 	this.setScissorTest = function ( boolean ) {
 
 		state.setScissorTest( _scissorTest = boolean );
+
+	};
+
+	this.setOpaqueSort = function ( method ) {
+
+		_opaqueSort = method;
+
+	};
+
+	this.setTransparentSort = function ( method ) {
+
+		_transparentSort = method;
 
 	};
 
@@ -1152,7 +1165,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( _this.sortObjects === true ) {
 
-			currentRenderList.sort();
+			currentRenderList.sort( _opaqueSort, _transparentSort );
 
 		}
 
@@ -1245,8 +1258,6 @@ function WebGLRenderer( parameters ) {
 				multiview.detachCamera( camera );
 
 			}
-
-			xr.submitFrame();
 
 		}
 
@@ -1543,6 +1554,7 @@ function WebGLRenderer( parameters ) {
 			program = programCache.acquireProgram( material, materialProperties.shader, parameters, programCacheKey );
 
 			materialProperties.program = program;
+			materialProperties.outputEncoding = _this.outputEncoding;
 			material.program = program;
 
 		}
@@ -1673,6 +1685,10 @@ function WebGLRenderer( parameters ) {
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
 				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
+
+				material.needsUpdate = true;
+
+			} else if ( materialProperties.outputEncoding !== _this.outputEncoding ) {
 
 				material.needsUpdate = true;
 
@@ -1962,10 +1978,6 @@ function WebGLRenderer( parameters ) {
 
 				m_uniforms.color.value.copy( material.color );
 				m_uniforms.opacity.value = material.opacity;
-
-			} else if ( material.envMap ) {
-
-				refreshUniformsCommon( m_uniforms, material );
 
 			}
 

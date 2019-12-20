@@ -87,7 +87,7 @@
 				renderer.shadowMap.enabled = true;
 				renderer.physicallyCorrectLights = true;
 				renderer.gammaFactor = 1.18;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );

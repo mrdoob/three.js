@@ -12,7 +12,6 @@ import { MaterialParameters, Material } from './Material';
  */
 
 export interface ShaderMaterialParameters extends MaterialParameters {
-	defines?: any;
 	uniforms?: any;
 	vertexShader?: string;
 	fragmentShader?: string;
@@ -36,7 +35,6 @@ export class ShaderMaterial extends Material {
 
 	constructor( parameters?: ShaderMaterialParameters );
 
-	defines: any;
 	uniforms: { [uniform: string]: IUniform };
 	vertexShader: string;
 	fragmentShader: string;

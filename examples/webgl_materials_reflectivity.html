@@ -115,19 +115,20 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrCubeMap ) {
+					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
-						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
 						pmremGenerator.dispose();
 
 						gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
 						gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
 
-						hdrCubeMap.dispose();
+						hdrEquirect.dispose();
 
 					} );
 
+				var pmremGenerator = new PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				// Lights
 
@@ -155,7 +156,7 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

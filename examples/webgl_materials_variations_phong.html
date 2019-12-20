@@ -46,6 +46,7 @@
 					.setPath( 'textures/cube/SwedishRoyalCastle/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
 				reflectionCube.format = THREE.RGBFormat;
+				reflectionCube.encoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 				scene.background = reflectionCube;
@@ -54,6 +55,7 @@
 
 				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
+				imgTexture.encoding = THREE.sRGBEncoding;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
@@ -151,9 +153,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

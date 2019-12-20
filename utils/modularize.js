@@ -236,8 +236,6 @@ var files = [
 	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
 
-	{ path: 'vr/WebVR.js', dependencies: [], ignoreList: [] },
-
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
 ];
 

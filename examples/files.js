@@ -386,6 +386,7 @@ var files = {
 	],
 	"tests": [
 		"webgl_furnace_test",
+		"webgl_pmrem_test",
 		"misc_uv_tests"
 	]
 };
