@@ -22,7 +22,6 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var statsEnabled = true;
 
@@ -117,7 +116,7 @@
 
 					} );
 
-				var pmremGenerator = new PMREMGenerator( renderer );
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 				//

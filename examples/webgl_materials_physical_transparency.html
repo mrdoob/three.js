@@ -20,7 +20,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var params = {
 				color: 0xffffff,
@@ -71,7 +70,7 @@
 
 				//
 
-				var pmremGenerator = new PMREMGenerator( renderer );
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
 				hdrEquirect.dispose();
 				pmremGenerator.dispose();

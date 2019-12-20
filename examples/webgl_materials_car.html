@@ -38,8 +38,6 @@
 
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-
 			var camera, scene, renderer;
 			var stats, carModel, materialsLib, envMap;
 
@@ -104,7 +102,7 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
-				var pmremGenerator = new PMREMGenerator( renderer );
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 				stats = new Stats();

@@ -24,7 +24,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var container, stats;
 			var params = {
@@ -127,7 +126,7 @@
 
 					} );
 
-				var pmremGenerator = new PMREMGenerator( renderer );
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 				// Lights

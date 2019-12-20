@@ -23,8 +23,6 @@
 
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-
 			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
@@ -81,7 +79,7 @@
 				var magFilter = pmremCube.magFilter;
 				var generateMipmaps = pmremCube.generateMipmaps;
 
-				var pmremGenerator = new PMREMGenerator( renderer );
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				premTexture = pmremGenerator.fromCubemap( pmremCube ).texture;
 				pmremGenerator.dispose();
 
