@@ -40,7 +40,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			import {
 				StandardNodeMaterial,
@@ -126,7 +125,7 @@
 
 					} );
 
-				var pmremGenerator = new PMREMGenerator( renderer );
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileCubemapShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );

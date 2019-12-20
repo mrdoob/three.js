@@ -27,7 +27,6 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var scene, camera, controls, renderer;
 			
@@ -165,7 +164,7 @@
 
 					} );
 
-				var pmremGenerator = new PMREMGenerator( renderer );
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 			}

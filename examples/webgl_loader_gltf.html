@@ -24,7 +24,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
 			var container, stats, controls;
@@ -85,7 +84,7 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
-				var pmremGenerator = new PMREMGenerator( renderer );
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 				controls = new OrbitControls( camera, renderer.domElement );
