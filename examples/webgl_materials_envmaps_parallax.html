@@ -19,6 +19,7 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RectAreaLightHelper } from './jsm/helpers/RectAreaLightHelper.js';
 			import { RectAreaLightUniformsLib } from './jsm/lights/RectAreaLightUniformsLib.js';
 
 			// shader injection for box projected cube environment mapping
@@ -400,7 +401,7 @@
 				blueRectLight.lookAt( 0, 5, 0 );
 				scene.add( blueRectLight );
 
-				var blueRectLightHelper = new THREE.RectAreaLightHelper( blueRectLight, 0xffffff );
+				var blueRectLightHelper = new RectAreaLightHelper( blueRectLight, 0xffffff );
 				blueRectLight.add( blueRectLightHelper );
 
 				var redRectLight = new THREE.RectAreaLight( 0x9aaeff, intensity, width, height );
@@ -408,7 +409,7 @@
 				redRectLight.lookAt( 0, 5, 0 );
 				scene.add( redRectLight );
 
-				var redRectLightHelper = new THREE.RectAreaLightHelper( redRectLight, 0xffffff );
+				var redRectLightHelper = new RectAreaLightHelper( redRectLight, 0xffffff );
 				redRectLight.add( redRectLightHelper );
 
 				render();
