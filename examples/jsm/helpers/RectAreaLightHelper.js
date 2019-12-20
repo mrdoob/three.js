@@ -6,13 +6,15 @@
  *  This helper must be added as a child of the light
  */
 
-import { Line } from '../objects/Line.js';
-import { Mesh } from '../objects/Mesh.js';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
-import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { BufferGeometry } from '../core/BufferGeometry.js';
-import { BackSide } from '../constants.js';
+import {
+	BackSide,
+	BufferGeometry,
+	Float32BufferAttribute,
+	Line,
+	LineBasicMaterial,
+	Mesh,
+	MeshBasicMaterial
+} from '../../../build/three.module.js';
 
 function RectAreaLightHelper( light, color ) {
 

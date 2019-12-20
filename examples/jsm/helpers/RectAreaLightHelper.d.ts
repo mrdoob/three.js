@@ -1,6 +1,8 @@
-import { RectAreaLight } from './../lights/RectAreaLight';
-import { Color } from './../math/Color';
-import { Line } from '../objects/Line';
+import {
+	Color,
+	Line,
+	RectAreaLight
+} from '../../../src/Three';
 
 export class RectAreaLightHelper extends Line {
 

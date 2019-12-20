@@ -1,5 +1,7 @@
-import { PositionalAudio } from './../audio/PositionalAudio';
-import { Line } from './../objects/Line';
+import {
+	Line,
+	PositionalAudio
+} from '../../../src/Three';
 
 export class PositionalAudioHelper extends Line {
 

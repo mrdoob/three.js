@@ -2,11 +2,13 @@
  * @author Mugen87 / http://github.com/Mugen87
  */
 
-import { BufferGeometry } from '../core/BufferGeometry.js';
-import { BufferAttribute } from '../core/BufferAttribute.js';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
-import { Line } from '../objects/Line.js';
-import { _Math } from '../math/Math.js';
+import {
+	BufferGeometry,
+	BufferAttribute,
+	LineBasicMaterial,
+	Line,
+	Math as _Math
+} from '../../../build/three.module.js';
 
 function PositionalAudioHelper( audio, range, divisionsInnerAngle, divisionsOuterAngle ) {
 
