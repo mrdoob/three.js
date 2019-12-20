@@ -2178,6 +2178,13 @@ var GLTFLoader = ( function () {
 
 		}
 
+		// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
+		if ( material.normalScale && ! useVertexTangents ) {
+
+			material.normalScale.y = - material.normalScale.y;
+
+		}
+
 		mesh.material = material;
 
 	};
@@ -2328,13 +2335,6 @@ var GLTFLoader = ( function () {
 			}
 
 			if ( materialDef.name !== undefined ) material.name = materialDef.name;
-
-			// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
-			if ( material.normalScale && ! material.vertexTangents ) {
-
-				material.normalScale.y = - material.normalScale.y;
-
-			}
 
 			// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
 			if ( material.map ) material.map.encoding = sRGBEncoding;
