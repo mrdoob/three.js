@@ -39,7 +39,7 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var camera, scene, renderer;
-			var stats, carModel, materialsLib, envMap;
+			var stats, carModel, materialsLib;
 
 			var bodyMatSelect = document.getElementById( 'body-mat' );
 			var rimMatSelect = document.getElementById( 'rim-mat' );
@@ -67,10 +67,11 @@
 					.setPath( 'textures/hdr/' )
 					.load( 'quarry_01_1k.hdr', function ( texture ) {
 
-						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
 
 						scene.background = envMap;
+						scene.environment = envMap;
 
 						//
 
@@ -126,16 +127,6 @@
 
 					carModel = gltf.scene.children[ 0 ];
 
-					carModel.traverse( function ( child ) {
-
-						if ( child.isMesh ) {
-
-							child.material.envMap = envMap;
-
-						}
-
-					} );
-
 					// shadow
 					var texture = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );
 					var shadow = new THREE.Mesh(
@@ -185,22 +176,22 @@
 					main: [
 
 						new THREE.MeshStandardMaterial( {
-							color: 0xff4400, envMap: envMap, metalness: 1.0, roughness: 0.2, name: 'orange'
+							color: 0xff4400, metalness: 1.0, roughness: 0.2, name: 'orange'
 						} ),
 						new THREE.MeshStandardMaterial( {
-							color: 0x001166, envMap: envMap, metalness: 1.0, roughness: 0.2, name: 'blue'
+							color: 0x001166, metalness: 1.0, roughness: 0.2, name: 'blue'
 						} ),
 						new THREE.MeshStandardMaterial( {
-							color: 0x990000, envMap: envMap, metalness: 1.0, roughness: 0.2, name: 'red'
+							color: 0x990000, metalness: 1.0, roughness: 0.2, name: 'red'
 						} ),
 						new THREE.MeshStandardMaterial( {
-							color: 0x000000, envMap: envMap, metalness: 1.0, roughness: 0.4, name: 'black'
+							color: 0x000000, metalness: 1.0, roughness: 0.4, name: 'black'
 						} ),
 						new THREE.MeshStandardMaterial( {
-							color: 0xffffff, envMap: envMap, metalness: 0.1, roughness: 0.2, name: 'white'
+							color: 0xffffff, metalness: 0.1, roughness: 0.2, name: 'white'
 						} ),
 						new THREE.MeshStandardMaterial( {
-							color: 0xffffff, envMap: envMap, metalness: 1.0, roughness: 0.2, name: 'metallic'
+							color: 0xffffff, metalness: 1.0, roughness: 0.2, name: 'metallic'
 						} ),
 
 					],
@@ -208,13 +199,13 @@
 					glass: [
 
 						new THREE.MeshPhysicalMaterial( {
-							color: 0xffffff, envMap: envMap, metalness: 1, roughness: 0, transparency: 1.0, transparent: true, name: 'clear'
+							color: 0xffffff, metalness: 1, roughness: 0, transparency: 1.0, transparent: true, name: 'clear'
 						} ),
 						new THREE.MeshPhysicalMaterial( {
-							color: 0x000000, envMap: envMap, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'smoked'
+							color: 0x000000, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'smoked'
 						} ),
 						new THREE.MeshPhysicalMaterial( {
-							color: 0x001133, envMap: envMap, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'blue'
+							color: 0x001133, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'blue'
 						} ),
 
 					],

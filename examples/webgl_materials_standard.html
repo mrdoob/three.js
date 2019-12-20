@@ -87,7 +87,7 @@
 
 						group.traverse( function ( child ) {
 
-							if ( child instanceof THREE.Mesh ) {
+							if ( child.isMesh ) {
 
 								child.material = material;
 
@@ -110,9 +110,8 @@
 						hdrEquirect.dispose();
 						pmremGenerator.dispose();
 
-						material.envMap = hdrCubeRenderTarget.texture;
-
 						scene.background = hdrCubeRenderTarget.texture;
+						scene.environment = hdrCubeRenderTarget.texture;
 
 					} );
 
