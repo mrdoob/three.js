@@ -368,6 +368,7 @@ var list = {
 
 			"Helpers": {
 				"FaceNormalsHelper": "examples/en/helpers/FaceNormalsHelper",
+				"LightProbeHelper": "examples/en/helpers/LightProbeHelper",
 				"PositionalAudioHelper": "examples/en/helpers/PositionalAudioHelper",
 				"RectAreaLightHelper": "examples/en/helpers/RectAreaLightHelper",
 				"VertexNormalsHelper": "examples/en/helpers/VertexNormalsHelper",
@@ -816,6 +817,7 @@ var list = {
 
 			"辅助对象": {
 				"FaceNormalsHelper": "examples/zh/helpers/FaceNormalsHelper",
+				"LightProbeHelper": "examples/zh/helpers/LightProbeHelper",
 				"PositionalAudioHelper": "examples/zh/helpers/PositionalAudioHelper",
 				"RectAreaLightHelper": "examples/zh/helpers/RectAreaLightHelper",
 				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper",
