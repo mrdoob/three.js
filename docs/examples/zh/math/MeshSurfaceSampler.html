@@ -18,7 +18,7 @@
 
 		<code>
 		// Create a sampler for a BufferGeometry surface.
-		var sampler = new THREE.MeshSurfaceSampler( surfaceGeometry )
+		var sampler = new THREE.MeshSurfaceSampler( surfaceMesh )
 			.setWeightAttribute( 'color' )
 			.build();
 
@@ -52,9 +52,9 @@
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:BufferGeometry geometry] )</h3>
+		<h3>[name]( [param:Mesh mesh] )</h3>
 		<p>
-		[page:BufferGeometry geometry] — Surface geometry from which to sample.
+		[page:Mesh mesh] — Surface mesh from which to sample.
 		</p>
 		<p>
 		Creates a new [name]. If the input geometry is indexed, a non-indexed copy is made. After construction, the sampler is not able to return samples until [page:MeshSurfaceSampler.build build] is called.

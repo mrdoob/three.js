@@ -181,7 +181,7 @@
 
 				console.time( '.build()' );
 
-				sampler = new MeshSurfaceSampler( surface.geometry )
+				sampler = new MeshSurfaceSampler( surface )
 					.setWeightAttribute( api.distribution === 'weighted' ? 'uv' : null )
 					.build();
 
