@@ -20,7 +20,9 @@ var MeshSurfaceSampler = ( function () {
 
 	var _face = new Triangle();
 
-	function MeshSurfaceSampler ( geometry ) {
+	function MeshSurfaceSampler ( mesh ) {
+
+		var geometry = mesh.geometry;
 
 		if ( ! geometry.isBufferGeometry || geometry.attributes.position.itemSize !== 3 ) {
 
