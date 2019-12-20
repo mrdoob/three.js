@@ -609,3 +609,5 @@ var Strings = function ( config ) {
 	};
 
 };
+
+export { Strings };
