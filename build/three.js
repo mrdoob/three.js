@@ -45864,238 +45864,6 @@
 	ImmediateRenderObject.prototype.isImmediateRenderObject = true;
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
-	var _v1$5 = new Vector3();
-	var _v2$3 = new Vector3();
-	var _normalMatrix$1 = new Matrix3();
-	var _keys = [ 'a', 'b', 'c' ];
-
-	function VertexNormalsHelper( object, size, hex, linewidth ) {
-
-		this.object = object;
-
-		this.size = ( size !== undefined ) ? size : 1;
-
-		var color = ( hex !== undefined ) ? hex : 0xff0000;
-
-		var width = ( linewidth !== undefined ) ? linewidth : 1;
-
-		//
-
-		var nNormals = 0;
-
-		var objGeometry = this.object.geometry;
-
-		if ( objGeometry && objGeometry.isGeometry ) {
-
-			nNormals = objGeometry.faces.length * 3;
-
-		} else if ( objGeometry && objGeometry.isBufferGeometry ) {
-
-			nNormals = objGeometry.attributes.normal.count;
-
-		}
-
-		//
-
-		var geometry = new BufferGeometry();
-
-		var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
-
-		geometry.setAttribute( 'position', positions );
-
-		LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
-
-		//
-
-		this.matrixAutoUpdate = false;
-
-		this.update();
-
-	}
-
-	VertexNormalsHelper.prototype = Object.create( LineSegments.prototype );
-	VertexNormalsHelper.prototype.constructor = VertexNormalsHelper;
-
-	VertexNormalsHelper.prototype.update = function () {
-
-		this.object.updateMatrixWorld( true );
-
-		_normalMatrix$1.getNormalMatrix( this.object.matrixWorld );
-
-		var matrixWorld = this.object.matrixWorld;
-
-		var position = this.geometry.attributes.position;
-
-		//
-
-		var objGeometry = this.object.geometry;
-
-		if ( objGeometry && objGeometry.isGeometry ) {
-
-			var vertices = objGeometry.vertices;
-
-			var faces = objGeometry.faces;
-
-			var idx = 0;
-
-			for ( var i = 0, l = faces.length; i < l; i ++ ) {
-
-				var face = faces[ i ];
-
-				for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
-
-					var vertex = vertices[ face[ _keys[ j ] ] ];
-
-					var normal = face.vertexNormals[ j ];
-
-					_v1$5.copy( vertex ).applyMatrix4( matrixWorld );
-
-					_v2$3.copy( normal ).applyMatrix3( _normalMatrix$1 ).normalize().multiplyScalar( this.size ).add( _v1$5 );
-
-					position.setXYZ( idx, _v1$5.x, _v1$5.y, _v1$5.z );
-
-					idx = idx + 1;
-
-					position.setXYZ( idx, _v2$3.x, _v2$3.y, _v2$3.z );
-
-					idx = idx + 1;
-
-				}
-
-			}
-
-		} else if ( objGeometry && objGeometry.isBufferGeometry ) {
-
-			var objPos = objGeometry.attributes.position;
-
-			var objNorm = objGeometry.attributes.normal;
-
-			var idx = 0;
-
-			// for simplicity, ignore index and drawcalls, and render every normal
-
-			for ( var j = 0, jl = objPos.count; j < jl; j ++ ) {
-
-				_v1$5.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
-
-				_v2$3.set( objNorm.getX( j ), objNorm.getY( j ), objNorm.getZ( j ) );
-
-				_v2$3.applyMatrix3( _normalMatrix$1 ).normalize().multiplyScalar( this.size ).add( _v1$5 );
-
-				position.setXYZ( idx, _v1$5.x, _v1$5.y, _v1$5.z );
-
-				idx = idx + 1;
-
-				position.setXYZ( idx, _v2$3.x, _v2$3.y, _v2$3.z );
-
-				idx = idx + 1;
-
-			}
-
-		}
-
-		position.needsUpdate = true;
-
-	};
-
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
-	var _v1$6 = new Vector3();
-	var _v2$4 = new Vector3();
-
-	function VertexTangentsHelper( object, size, hex, linewidth ) {
-
-		this.object = object;
-
-		this.size = ( size !== undefined ) ? size : 1;
-
-		var color = ( hex !== undefined ) ? hex : 0x00ffff;
-
-		var width = ( linewidth !== undefined ) ? linewidth : 1;
-
-		//
-
-		var objGeometry = this.object.geometry;
-
-		if ( ! ( objGeometry && objGeometry.isBufferGeometry ) ) {
-
-			console.error( 'THREE.VertexTangentsHelper: geometry not an instance of THREE.BufferGeometry.', objGeometry );
-			return;
-
-		}
-
-		var nTangents = objGeometry.attributes.tangent.count;
-
-		//
-
-		var geometry = new BufferGeometry();
-
-		var positions = new Float32BufferAttribute( nTangents * 2 * 3, 3 );
-
-		geometry.setAttribute( 'position', positions );
-
-		LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
-
-		//
-
-		this.matrixAutoUpdate = false;
-
-		this.update();
-
-	}
-
-	VertexTangentsHelper.prototype = Object.create( LineSegments.prototype );
-	VertexTangentsHelper.prototype.constructor = VertexTangentsHelper;
-
-	VertexTangentsHelper.prototype.update = function () {
-
-		this.object.updateMatrixWorld( true );
-
-		var matrixWorld = this.object.matrixWorld;
-
-		var position = this.geometry.attributes.position;
-
-		//
-
-		var objGeometry = this.object.geometry;
-
-		var objPos = objGeometry.attributes.position;
-
-		var objTan = objGeometry.attributes.tangent;
-
-		var idx = 0;
-
-		// for simplicity, ignore index and drawcalls, and render every tangent
-
-		for ( var j = 0, jl = objPos.count; j < jl; j ++ ) {
-
-			_v1$6.set( objPos.getX( j ), objPos.getY( j ), objPos.getZ( j ) ).applyMatrix4( matrixWorld );
-
-			_v2$4.set( objTan.getX( j ), objTan.getY( j ), objTan.getZ( j ) );
-
-			_v2$4.transformDirection( matrixWorld ).multiplyScalar( this.size ).add( _v1$6 );
-
-			position.setXYZ( idx, _v1$6.x, _v1$6.y, _v1$6.z );
-
-			idx = idx + 1;
-
-			position.setXYZ( idx, _v2$4.x, _v2$4.y, _v2$4.z );
-
-			idx = idx + 1;
-
-		}
-
-		position.needsUpdate = true;
-
-	};
-
-	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author WestLangley / http://github.com/WestLangley
@@ -46382,82 +46150,6 @@
 	};
 
 	/**
-	 * @author abelnation / http://github.com/abelnation
-	 * @author Mugen87 / http://github.com/Mugen87
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
-	 *  This helper must be added as a child of the light
-	 */
-
-	function RectAreaLightHelper( light, color ) {
-
-		this.type = 'RectAreaLightHelper';
-
-		this.light = light;
-
-		this.color = color; // optional hardwired color for the helper
-
-		var positions = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, - 1, 0, 1, 1, 0 ];
-
-		var geometry = new BufferGeometry();
-		geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
-		geometry.computeBoundingSphere();
-
-		var material = new LineBasicMaterial( { fog: false } );
-
-		Line.call( this, geometry, material );
-
-		//
-
-		var positions2 = [ 1, 1, 0, - 1, 1, 0, - 1, - 1, 0, 1, 1, 0, - 1, - 1, 0, 1, - 1, 0 ];
-
-		var geometry2 = new BufferGeometry();
-		geometry2.setAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
-		geometry2.computeBoundingSphere();
-
-		this.add( new Mesh( geometry2, new MeshBasicMaterial( { side: BackSide, fog: false } ) ) );
-
-		this.update();
-
-	}
-
-	RectAreaLightHelper.prototype = Object.create( Line.prototype );
-	RectAreaLightHelper.prototype.constructor = RectAreaLightHelper;
-
-	RectAreaLightHelper.prototype.update = function () {
-
-		this.scale.set( 0.5 * this.light.width, 0.5 * this.light.height, 1 );
-
-		if ( this.color !== undefined ) {
-
-			this.material.color.set( this.color );
-			this.children[ 0 ].material.color.set( this.color );
-
-		} else {
-
-			this.material.color.copy( this.light.color ).multiplyScalar( this.light.intensity );
-
-			// prevent hue shift
-			var c = this.material.color;
-			var max = Math.max( c.r, c.g, c.b );
-			if ( max > 1 ) { c.multiplyScalar( 1 / max ); }
-
-			this.children[ 0 ].material.color.copy( this.material.color );
-
-		}
-
-	};
-
-	RectAreaLightHelper.prototype.dispose = function () {
-
-		this.geometry.dispose();
-		this.material.dispose();
-		this.children[ 0 ].geometry.dispose();
-		this.children[ 0 ].material.dispose();
-
-	};
-
-	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author Mugen87 / https://github.com/Mugen87
@@ -46534,150 +46226,6 @@
 		}
 
 		mesh.lookAt( _vector$b.setFromMatrixPosition( this.light.matrixWorld ).negate() );
-
-	};
-
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
-	function LightProbeHelper( lightProbe, size ) {
-
-		this.lightProbe = lightProbe;
-
-		this.size = size;
-
-		var defines = {};
-		defines[ 'GAMMA_OUTPUT' ] = "";
-
-		// material
-		var material = new ShaderMaterial( {
-
-			defines: defines,
-
-			uniforms: {
-
-				sh: { value: this.lightProbe.sh.coefficients }, // by reference
-
-				intensity: { value: this.lightProbe.intensity }
-
-			},
-
-			vertexShader: [
-
-				'varying vec3 vNormal;',
-
-				'void main() {',
-
-				'	vNormal = normalize( normalMatrix * normal );',
-
-				'	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );',
-
-				'}' ].join( '\n' ),
-
-			fragmentShader: [
-
-				'#define RECIPROCAL_PI 0.318309886',
-
-				'vec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {',
-
-				'	// matrix is assumed to be orthogonal',
-
-				'	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );',
-
-				'}',
-
-				'vec3 linearToOutput( in vec3 a ) {',
-
-				'	#ifdef GAMMA_OUTPUT',
-
-				'		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );',
-
-				'	#else',
-
-				'		return a;',
-
-				'	#endif',
-
-				'}',
-
-				'// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf',
-				'vec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {',
-
-				'	// normal is assumed to have unit length',
-
-				'	float x = normal.x, y = normal.y, z = normal.z;',
-
-				'	// band 0',
-				'	vec3 result = shCoefficients[ 0 ] * 0.886227;',
-
-				'	// band 1',
-				'	result += shCoefficients[ 1 ] * 2.0 * 0.511664 * y;',
-				'	result += shCoefficients[ 2 ] * 2.0 * 0.511664 * z;',
-				'	result += shCoefficients[ 3 ] * 2.0 * 0.511664 * x;',
-
-				'	// band 2',
-				'	result += shCoefficients[ 4 ] * 2.0 * 0.429043 * x * y;',
-				'	result += shCoefficients[ 5 ] * 2.0 * 0.429043 * y * z;',
-				'	result += shCoefficients[ 6 ] * ( 0.743125 * z * z - 0.247708 );',
-				'	result += shCoefficients[ 7 ] * 2.0 * 0.429043 * x * z;',
-				'	result += shCoefficients[ 8 ] * 0.429043 * ( x * x - y * y );',
-
-				'	return result;',
-
-				'}',
-
-				'uniform vec3 sh[ 9 ]; // sh coefficients',
-
-				'uniform float intensity; // light probe intensity',
-
-				'varying vec3 vNormal;',
-
-				'void main() {',
-
-				'	vec3 normal = normalize( vNormal );',
-
-				'	vec3 worldNormal = inverseTransformDirection( normal, viewMatrix );',
-
-				'	vec3 irradiance = shGetIrradianceAt( worldNormal, sh );',
-
-				'	vec3 outgoingLight = RECIPROCAL_PI * irradiance * intensity;',
-
-				'	outgoingLight = linearToOutput( outgoingLight );',
-
-				'	gl_FragColor = vec4( outgoingLight, 1.0 );',
-
-				'}'
-
-			].join( '\n' )
-
-		} );
-
-		var geometry = new SphereBufferGeometry( 1, 32, 16 );
-
-		Mesh.call( this, geometry, material );
-
-		this.onBeforeRender();
-
-	}
-
-	LightProbeHelper.prototype = Object.create( Mesh.prototype );
-	LightProbeHelper.prototype.constructor = LightProbeHelper;
-
-	LightProbeHelper.prototype.dispose = function () {
-
-		this.geometry.dispose();
-		this.material.dispose();
-
-	};
-
-	LightProbeHelper.prototype.onBeforeRender = function () {
-
-		this.position.copy( this.lightProbe.position );
-
-		this.scale.set( 1, 1, 1 ).multiplyScalar( this.size );
-
-		this.material.uniforms.intensity.value = this.lightProbe.intensity;
 
 	};
 
@@ -46833,218 +46381,13 @@
 	PolarGridHelper.prototype.constructor = PolarGridHelper;
 
 	/**
-	 * @author Mugen87 / http://github.com/Mugen87
-	 */
-
-	function PositionalAudioHelper( audio, range, divisionsInnerAngle, divisionsOuterAngle ) {
-
-		this.audio = audio;
-		this.range = range || 1;
-		this.divisionsInnerAngle = divisionsInnerAngle || 16;
-		this.divisionsOuterAngle = divisionsOuterAngle || 2;
-
-		var geometry = new BufferGeometry();
-		var divisions = this.divisionsInnerAngle + this.divisionsOuterAngle * 2;
-		var positions = new Float32Array( ( divisions * 3 + 3 ) * 3 );
-		geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
-
-		var materialInnerAngle = new LineBasicMaterial( { color: 0x00ff00 } );
-		var materialOuterAngle = new LineBasicMaterial( { color: 0xffff00 } );
-
-		Line.call( this, geometry, [ materialOuterAngle, materialInnerAngle ] );
-
-		this.update();
-
-	}
-
-	PositionalAudioHelper.prototype = Object.create( Line.prototype );
-	PositionalAudioHelper.prototype.constructor = PositionalAudioHelper;
-
-	PositionalAudioHelper.prototype.update = function () {
-
-		var audio = this.audio;
-		var range = this.range;
-		var divisionsInnerAngle = this.divisionsInnerAngle;
-		var divisionsOuterAngle = this.divisionsOuterAngle;
-
-		var coneInnerAngle = _Math.degToRad( audio.panner.coneInnerAngle );
-		var coneOuterAngle = _Math.degToRad( audio.panner.coneOuterAngle );
-
-		var halfConeInnerAngle = coneInnerAngle / 2;
-		var halfConeOuterAngle = coneOuterAngle / 2;
-
-		var start = 0;
-		var count = 0;
-		var i, stride;
-
-		var geometry = this.geometry;
-		var positionAttribute = geometry.attributes.position;
-
-		geometry.clearGroups();
-
-		//
-
-		function generateSegment( from, to, divisions, materialIndex ) {
-
-			var step = ( to - from ) / divisions;
-
-			positionAttribute.setXYZ( start, 0, 0, 0 );
-			count ++;
-
-			for ( i = from; i < to; i += step ) {
-
-				stride = start + count;
-
-				positionAttribute.setXYZ( stride, Math.sin( i ) * range, 0, Math.cos( i ) * range );
-				positionAttribute.setXYZ( stride + 1, Math.sin( Math.min( i + step, to ) ) * range, 0, Math.cos( Math.min( i + step, to ) ) * range );
-				positionAttribute.setXYZ( stride + 2, 0, 0, 0 );
-
-				count += 3;
-
-			}
-
-			geometry.addGroup( start, count, materialIndex );
-
-			start += count;
-			count = 0;
-
-		}
-
-		//
-
-		generateSegment( - halfConeOuterAngle, - halfConeInnerAngle, divisionsOuterAngle, 0 );
-		generateSegment( - halfConeInnerAngle, halfConeInnerAngle, divisionsInnerAngle, 1 );
-		generateSegment( halfConeInnerAngle, halfConeOuterAngle, divisionsOuterAngle, 0 );
-
-		//
-
-		positionAttribute.needsUpdate = true;
-
-		if ( coneInnerAngle === coneOuterAngle ) { this.material[ 0 ].visible = false; }
-
-	};
-
-	PositionalAudioHelper.prototype.dispose = function () {
-
-		this.geometry.dispose();
-		this.material[ 0 ].dispose();
-		this.material[ 1 ].dispose();
-
-	};
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
-	var _v1$7 = new Vector3();
-	var _v2$5 = new Vector3();
-	var _normalMatrix$2 = new Matrix3();
-
-	function FaceNormalsHelper( object, size, hex, linewidth ) {
-
-		// FaceNormalsHelper only supports THREE.Geometry
-
-		this.object = object;
-
-		this.size = ( size !== undefined ) ? size : 1;
-
-		var color = ( hex !== undefined ) ? hex : 0xffff00;
-
-		var width = ( linewidth !== undefined ) ? linewidth : 1;
-
-		//
-
-		var nNormals = 0;
-
-		var objGeometry = this.object.geometry;
-
-		if ( objGeometry && objGeometry.isGeometry ) {
-
-			nNormals = objGeometry.faces.length;
-
-		} else {
-
-			console.warn( 'THREE.FaceNormalsHelper: only THREE.Geometry is supported. Use THREE.VertexNormalsHelper, instead.' );
-
-		}
-
-		//
-
-		var geometry = new BufferGeometry();
-
-		var positions = new Float32BufferAttribute( nNormals * 2 * 3, 3 );
-
-		geometry.setAttribute( 'position', positions );
-
-		LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
-
-		//
-
-		this.matrixAutoUpdate = false;
-		this.update();
-
-	}
-
-	FaceNormalsHelper.prototype = Object.create( LineSegments.prototype );
-	FaceNormalsHelper.prototype.constructor = FaceNormalsHelper;
-
-	FaceNormalsHelper.prototype.update = function () {
-
-		this.object.updateMatrixWorld( true );
-
-		_normalMatrix$2.getNormalMatrix( this.object.matrixWorld );
-
-		var matrixWorld = this.object.matrixWorld;
-
-		var position = this.geometry.attributes.position;
-
-		//
-
-		var objGeometry = this.object.geometry;
-
-		var vertices = objGeometry.vertices;
-
-		var faces = objGeometry.faces;
-
-		var idx = 0;
-
-		for ( var i = 0, l = faces.length; i < l; i ++ ) {
-
-			var face = faces[ i ];
-
-			var normal = face.normal;
-
-			_v1$7.copy( vertices[ face.a ] )
-				.add( vertices[ face.b ] )
-				.add( vertices[ face.c ] )
-				.divideScalar( 3 )
-				.applyMatrix4( matrixWorld );
-
-			_v2$5.copy( normal ).applyMatrix3( _normalMatrix$2 ).normalize().multiplyScalar( this.size ).add( _v1$7 );
-
-			position.setXYZ( idx, _v1$7.x, _v1$7.y, _v1$7.z );
-
-			idx = idx + 1;
-
-			position.setXYZ( idx, _v2$5.x, _v2$5.y, _v2$5.z );
-
-			idx = idx + 1;
-
-		}
-
-		position.needsUpdate = true;
-
-	};
-
-	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author mrdoob / http://mrdoob.com/
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
-	var _v1$8 = new Vector3();
-	var _v2$6 = new Vector3();
+	var _v1$5 = new Vector3();
+	var _v2$3 = new Vector3();
 	var _v3$1 = new Vector3();
 
 	function DirectionalLightHelper( light, size, color ) {
@@ -47099,11 +46442,11 @@
 
 	DirectionalLightHelper.prototype.update = function () {
 
-		_v1$8.setFromMatrixPosition( this.light.matrixWorld );
-		_v2$6.setFromMatrixPosition( this.light.target.matrixWorld );
-		_v3$1.subVectors( _v2$6, _v1$8 );
+		_v1$5.setFromMatrixPosition( this.light.matrixWorld );
+		_v2$3.setFromMatrixPosition( this.light.target.matrixWorld );
+		_v3$1.subVectors( _v2$3, _v1$5 );
 
-		this.lightPlane.lookAt( _v2$6 );
+		this.lightPlane.lookAt( _v2$3 );
 
 		if ( this.color !== undefined ) {
 
@@ -47117,7 +46460,7 @@
 
 		}
 
-		this.targetLine.lookAt( _v2$6 );
+		this.targetLine.lookAt( _v2$3 );
 		this.targetLine.scale.z = _v3$1.length();
 
 	};
@@ -50506,7 +49849,6 @@
 	exports.Face3 = Face3;
 	exports.Face4 = Face4;
 	exports.FaceColors = FaceColors;
-	exports.FaceNormalsHelper = FaceNormalsHelper;
 	exports.FileLoader = FileLoader;
 	exports.FlatShading = FlatShading;
 	exports.Float32Attribute = Float32Attribute;
@@ -50575,7 +49917,6 @@
 	exports.LessStencilFunc = LessStencilFunc;
 	exports.Light = Light;
 	exports.LightProbe = LightProbe;
-	exports.LightProbeHelper = LightProbeHelper;
 	exports.LightShadow = LightShadow;
 	exports.Line = Line;
 	exports.Line3 = Line3;
@@ -50679,7 +50020,6 @@
 	exports.PolyhedronBufferGeometry = PolyhedronBufferGeometry;
 	exports.PolyhedronGeometry = PolyhedronGeometry;
 	exports.PositionalAudio = PositionalAudio;
-	exports.PositionalAudioHelper = PositionalAudioHelper;
 	exports.PropertyBinding = PropertyBinding;
 	exports.PropertyMixer = PropertyMixer;
 	exports.QuadraticBezierCurve = QuadraticBezierCurve;
@@ -50723,7 +50063,6 @@
 	exports.Ray = Ray;
 	exports.Raycaster = Raycaster;
 	exports.RectAreaLight = RectAreaLight;
-	exports.RectAreaLightHelper = RectAreaLightHelper;
 	exports.RedFormat = RedFormat;
 	exports.ReinhardToneMapping = ReinhardToneMapping;
 	exports.RepeatWrapping = RepeatWrapping;
@@ -50819,8 +50158,6 @@
 	exports.VectorKeyframeTrack = VectorKeyframeTrack;
 	exports.Vertex = Vertex;
 	exports.VertexColors = VertexColors;
-	exports.VertexNormalsHelper = VertexNormalsHelper;
-	exports.VertexTangentsHelper = VertexTangentsHelper;
 	exports.VideoTexture = VideoTexture;
 	exports.WebGLMultisampleRenderTarget = WebGLMultisampleRenderTarget;
 	exports.WebGLRenderTarget = WebGLRenderTarget;
