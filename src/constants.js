@@ -101,6 +101,11 @@ export var RGBEFormat = RGBAFormat;
 export var DepthFormat = 1026;
 export var DepthStencilFormat = 1027;
 export var RedFormat = 1028;
+export var RedIntegerFormat = 1029;
+export var RGFormat = 1030;
+export var RGIntegerFormat = 1031;
+export var RGBIntegerFormat = 1032;
+export var RGBAIntegerFormat = 1033;
 
 export var RGB_S3TC_DXT1_Format = 33776;
 export var RGBA_S3TC_DXT1_Format = 33777;

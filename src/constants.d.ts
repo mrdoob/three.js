@@ -176,6 +176,11 @@ export const RGBEFormat: PixelFormat;
 export const DepthFormat: PixelFormat;
 export const DepthStencilFormat: PixelFormat;
 export const RedFormat: PixelFormat;
+export const RedIntegerFormat: PixelFormat;
+export const RGFormat: PixelFormat;
+export const RGIntegerFormat: PixelFormat;
+export const RGBIntegerFormat: PixelFormat;
+export const RGBAIntegerFormat: PixelFormat;
 
 // Internal Pixel Formats
 export type PixelFormatGPU =

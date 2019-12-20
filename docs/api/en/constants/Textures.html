@@ -147,6 +147,8 @@
 		<h2>Formats</h2>
 		<code>
 		THREE.AlphaFormat
+		THREE.RedFormat
+		THREE.RedIntegerFormat
 		THREE.RGFormat
 		THREE.RGIntegerFormat
 		THREE.RGBFormat
@@ -164,6 +166,13 @@
 		how elements of a 2d texture, or *texels*, are read by shaders.<br /><br />
 
 		[page:constant AlphaFormat] discards the red, green and blue components and reads just the alpha component.<br /><br />
+
+		[page:constant RedFormat] discards the green and blue components and reads just the red component.<br /><br />
+
+		[page:constant RedIntegerFormat] discards the green and blue components and reads just the red component.
+		The texels are read as integers instead of floating point.
+		(can only be used with a WebGL 2 rendering context).
+		<br /><br />
 
 		[page:constant RGFormat] discards the alpha, and blue components and reads the red, and green components.
 		(can only be used with a WebGL 2 rendering context).
