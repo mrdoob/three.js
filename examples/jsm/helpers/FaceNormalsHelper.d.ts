@@ -1,5 +1,7 @@
-import { Object3D } from './../core/Object3D';
-import { LineSegments } from './../objects/LineSegments';
+import {
+	Object3D,
+	LineSegments
+} from '../../../src/Three';
 
 /**
  * @deprecated Use {@link EdgesGeometry THREE.EdgesGeometry}

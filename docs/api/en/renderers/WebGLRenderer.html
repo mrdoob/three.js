@@ -473,6 +473,16 @@
 			scissor area will be affected by further renderer actions.
 		</p>
 
+		<h3>[method:null setOpaqueSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom opaque sort function for the WebGLRenderLists. Pass null to use the default painterSortStable function.
+		</p>
+
+		<h3>[method:null setTransparentSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom transparent sort function for the WebGLRenderLists. Pass null to use the default reversePainterSortStable function.
+		</p>
+
 		<h3>[method:null setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>
 		<p>
 		Resizes the output canvas to (width, height) with device pixel ratio taken into account,

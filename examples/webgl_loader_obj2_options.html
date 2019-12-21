@@ -56,6 +56,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
+			import { VertexNormalsHelper } from "./jsm/helpers/VertexNormalsHelper.js";
 
 			import { MTLLoader } from "./jsm/loaders/MTLLoader.js";
 			import { MtlObjBridge } from "./jsm/loaders/obj2/bridge/MtlObjBridge.js";
@@ -289,7 +290,7 @@
 						let scale = 200.0;
 						mesh.scale.set( scale, scale, scale );
 						mesh.name = event.detail.meshName;
-						let helper = new THREE.VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
+						let helper = new VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
 						helper.name = 'VertexNormalsHelper';
 
 						override.addMesh( mesh );

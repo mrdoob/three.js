@@ -23,7 +23,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var params = {
 				envMap: 'HDR',
@@ -47,31 +46,31 @@
 				var envScene = new THREE.Scene();
 
 				var geometry = new THREE.BoxBufferGeometry();
-    			geometry.deleteAttribute('uv');
-    			var roomMaterial = new THREE.MeshStandardMaterial({metalness: 0, side: THREE.BackSide});
-				var room = new THREE.Mesh(geometry, roomMaterial);
-				room.scale.setScalar(10);
-				envScene.add(room);
+				geometry.deleteAttribute( 'uv' );
+				var roomMaterial = new THREE.MeshStandardMaterial( { metalness: 0, side: THREE.BackSide } );
+				var room = new THREE.Mesh( geometry, roomMaterial );
+				room.scale.setScalar( 10 );
+				envScene.add( room );
 
-				var mainLight = new THREE.PointLight(0xffffff, 50, 0, 2);
-				envScene.add(mainLight);
+				var mainLight = new THREE.PointLight( 0xffffff, 50, 0, 2 );
+				envScene.add( mainLight );
 
 				var lightMaterial = new THREE.MeshLambertMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 10 } );
 
-				var light1 = new THREE.Mesh(geometry, lightMaterial);
-				light1.position.set(-5, 2, 0);
-				light1.scale.set(0.1, 1, 1);
-				envScene.add(light1);
+				var light1 = new THREE.Mesh( geometry, lightMaterial );
+				light1.position.set( - 5, 2, 0 );
+				light1.scale.set( 0.1, 1, 1 );
+				envScene.add( light1 );
 
-				var light2 = new THREE.Mesh(geometry, lightMaterial);
-				light2.position.set(0, 5, 0);
-				light2.scale.set(1, 0.1, 1);
-				envScene.add(light2);
+				var light2 = new THREE.Mesh( geometry, lightMaterial );
+				light2.position.set( 0, 5, 0 );
+				light2.scale.set( 1, 0.1, 1 );
+				envScene.add( light2 );
 
-				var light2 = new THREE.Mesh(geometry, lightMaterial);
-				light2.position.set(2, 1, 5);
-				light2.scale.set(1.5, 2, 0.1);
-				envScene.add(light2);
+				var light2 = new THREE.Mesh( geometry, lightMaterial );
+				light2.position.set( 2, 1, 5 );
+				light2.scale.set( 1.5, 2, 0.1 );
+				envScene.add( light2 );
 
 				return envScene;
 
@@ -113,15 +112,11 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				var pmremGenerator = new PMREMGenerator( renderer );
 				THREE.DefaultLoadingManager.onLoad = function ( ) {
 
 					pmremGenerator.dispose();
 
-				}
-
-				var envScene = getEnvScene();
-				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );
+				};
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
@@ -162,6 +157,12 @@
 						rgbmCubeMap.needsUpdate = true;
 
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileCubemapShader();
+
+				var envScene = getEnvScene();
+				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

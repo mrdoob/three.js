@@ -125,16 +125,13 @@ import './unit/src/helpers/Box3Helper.tests';
 import './unit/src/helpers/BoxHelper.tests';
 import './unit/src/helpers/CameraHelper.tests';
 import './unit/src/helpers/DirectionalLightHelper.tests';
-import './unit/src/helpers/FaceNormalsHelper.tests';
 import './unit/src/helpers/GridHelper.tests';
 import './unit/src/helpers/HemisphereLightHelper.tests';
 import './unit/src/helpers/PlaneHelper.tests';
 import './unit/src/helpers/PointLightHelper.tests';
 import './unit/src/helpers/PolarGridHelper.tests';
-import './unit/src/helpers/RectAreaLightHelper.tests';
 import './unit/src/helpers/SkeletonHelper.tests';
 import './unit/src/helpers/SpotLightHelper.tests';
-import './unit/src/helpers/VertexNormalsHelper.tests';
 
 
 //src/lights

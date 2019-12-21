@@ -3,6 +3,8 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
 var SetMaterialVectorCommand = function ( editor, object, attributeName, newValue, materialSlot ) {
 
 	Command.call( this, editor );
@@ -70,3 +72,5 @@ SetMaterialVectorCommand.prototype = {
 	}
 
 };
+
+export { SetMaterialVectorCommand };

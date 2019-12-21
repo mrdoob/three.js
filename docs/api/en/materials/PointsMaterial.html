@@ -79,13 +79,6 @@ scene.add( starField );
 		<h3>[property:Color color]</h3>
 		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
 
-		<h3>[property:Boolean isPointsMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are points materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:Texture map]</h3>
 
 		<p>Sets the color of the points using data from a [page:Texture].</p>
@@ -94,7 +87,8 @@ scene.add( starField );
 		<p>Define whether the material uses morphTargets. Default is false.</p>
 
 		<h3>[property:Number size]</h3>
-		<p>Sets the size of the points. Default is 1.0.</p>
+		<p>Sets the size of the points. Default is 1.0.<br/>
+			Will be capped if it exceeds the hardware dependent parameter [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter gl.ALIASED_POINT_SIZE_RANGE].</p>
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
 		<p>Specify whether points' size is attenuated by the camera depth. (Perspective camera only.) Default is true.</p>

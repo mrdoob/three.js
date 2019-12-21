@@ -3,12 +3,14 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-import { Matrix3 } from '../math/Matrix3.js';
-import { Vector3 } from '../math/Vector3.js';
-import { LineSegments } from '../objects/LineSegments.js';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
-import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { BufferGeometry } from '../core/BufferGeometry.js';
+import {
+	BufferGeometry,
+	Float32BufferAttribute,
+	LineSegments,
+	LineBasicMaterial,
+	Matrix3,
+	Vector3
+} from '../../../build/three.module.js';
 
 var _v1 = new Vector3();
 var _v2 = new Vector3();

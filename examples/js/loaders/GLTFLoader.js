@@ -2111,6 +2111,13 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
+		if ( material.normalScale && ! useVertexTangents ) {
+
+			material.normalScale.y = - material.normalScale.y;
+
+		}
+
 		mesh.material = material;
 
 	};
@@ -2291,12 +2298,25 @@ THREE.GLTFLoader = ( function () {
 		if ( attributes.POSITION !== undefined ) {
 
 			var accessor = parser.json.accessors[ attributes.POSITION ];
+
 			var min = accessor.min;
 			var max = accessor.max;
 
-			box.set(
-				new THREE.Vector3( min[ 0 ], min[ 1 ], min[ 2 ] ),
-				new THREE.Vector3( max[ 0 ], max[ 1 ], max[ 2 ] ) );
+			// glTF requires 'min' and 'max', but VRM (which extends glTF) currently ignores that requirement.
+
+			if ( min !== undefined && max !== undefined ) {
+
+				box.set(
+					new THREE.Vector3( min[ 0 ], min[ 1 ], min[ 2 ] ),
+					new THREE.Vector3( max[ 0 ], max[ 1 ], max[ 2 ] ) );
+
+			} else {
+
+				console.warn( 'THREE.GLTFLoader: Missing min/max properties for accessor POSITION.' );
+
+				return;
+
+			}
 
 		} else {
 
@@ -2320,12 +2340,22 @@ THREE.GLTFLoader = ( function () {
 					var min = accessor.min;
 					var max = accessor.max;
 
-					// we need to get max of absolute components because target weight is [-1,1]
-					vector.setX( Math.max( Math.abs( min[ 0 ] ), Math.abs( max[ 0 ] ) ) );
-					vector.setY( Math.max( Math.abs( min[ 1 ] ), Math.abs( max[ 1 ] ) ) );
-					vector.setZ( Math.max( Math.abs( min[ 2 ] ), Math.abs( max[ 2 ] ) ) );
+					// glTF requires 'min' and 'max', but VRM (which extends glTF) currently ignores that requirement.
 
-					box.expandByVector( vector );
+					if ( min !== undefined && max !== undefined ) {
+
+						// we need to get max of absolute components because target weight is [-1,1]
+						vector.setX( Math.max( Math.abs( min[ 0 ] ), Math.abs( max[ 0 ] ) ) );
+						vector.setY( Math.max( Math.abs( min[ 1 ] ), Math.abs( max[ 1 ] ) ) );
+						vector.setZ( Math.max( Math.abs( min[ 2 ] ), Math.abs( max[ 2 ] ) ) );
+
+						box.expandByVector( vector );
+
+					} else {
+
+						console.warn( 'THREE.GLTFLoader: Missing min/max properties for accessor POSITION.' );
+
+					}
 
 				}
 

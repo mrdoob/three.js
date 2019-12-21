@@ -192,17 +192,13 @@ var list = {
 				"Box3Helper": "api/en/helpers/Box3Helper",
 				"CameraHelper": "api/en/helpers/CameraHelper",
 				"DirectionalLightHelper": "api/en/helpers/DirectionalLightHelper",
-				"FaceNormalsHelper": "api/en/helpers/FaceNormalsHelper",
 				"GridHelper": "api/en/helpers/GridHelper",
 				"PolarGridHelper": "api/en/helpers/PolarGridHelper",
-				"PositionalAudioHelper": "api/en/helpers/PositionalAudioHelper",
 				"HemisphereLightHelper": "api/en/helpers/HemisphereLightHelper",
 				"PlaneHelper": "api/en/helpers/PlaneHelper",
 				"PointLightHelper": "api/en/helpers/PointLightHelper",
-				"RectAreaLightHelper": "api/en/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/en/helpers/SkeletonHelper",
-				"SpotLightHelper": "api/en/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/en/helpers/VertexNormalsHelper"
+				"SpotLightHelper": "api/en/helpers/SpotLightHelper"
 			},
 
 			"Lights": {
@@ -368,6 +364,15 @@ var list = {
 				"ConvexBufferGeometry": "examples/en/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry"
+			},
+
+			"Helpers": {
+				"FaceNormalsHelper": "examples/en/helpers/FaceNormalsHelper",
+				"LightProbeHelper": "examples/en/helpers/LightProbeHelper",
+				"PositionalAudioHelper": "examples/en/helpers/PositionalAudioHelper",
+				"RectAreaLightHelper": "examples/en/helpers/RectAreaLightHelper",
+				"VertexNormalsHelper": "examples/en/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "examples/en/helpers/VertexTangentsHelper"
 			},
 
 			"Loaders": {
@@ -636,17 +641,13 @@ var list = {
 				"Box3Helper": "api/zh/helpers/Box3Helper",
 				"CameraHelper": "api/zh/helpers/CameraHelper",
 				"DirectionalLightHelper": "api/zh/helpers/DirectionalLightHelper",
-				"FaceNormalsHelper": "api/zh/helpers/FaceNormalsHelper",
 				"GridHelper": "api/zh/helpers/GridHelper",
 				"PolarGridHelper": "api/zh/helpers/PolarGridHelper",
-				"PositionalAudioHelper": "api/zh/helpers/PositionalAudioHelper",
 				"HemisphereLightHelper": "api/zh/helpers/HemisphereLightHelper",
 				"PlaneHelper": "api/zh/helpers/PlaneHelper",
 				"PointLightHelper": "api/zh/helpers/PointLightHelper",
-				"RectAreaLightHelper": "api/zh/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/zh/helpers/SkeletonHelper",
-				"SpotLightHelper": "api/zh/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper"
+				"SpotLightHelper": "api/zh/helpers/SpotLightHelper"
 			},
 
 			"灯光": {
@@ -812,6 +813,15 @@ var list = {
 				"ConvexBufferGeometry": "examples/zh/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
+			},
+
+			"辅助对象": {
+				"FaceNormalsHelper": "examples/zh/helpers/FaceNormalsHelper",
+				"LightProbeHelper": "examples/zh/helpers/LightProbeHelper",
+				"PositionalAudioHelper": "examples/zh/helpers/PositionalAudioHelper",
+				"RectAreaLightHelper": "examples/zh/helpers/RectAreaLightHelper",
+				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "examples/zh/helpers/VertexTangentsHelper"
 			},
 
 			"加载器": {
