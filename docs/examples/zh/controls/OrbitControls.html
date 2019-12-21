@@ -50,17 +50,17 @@ function animate() {
 }
 		</code>
 
-		<h2>Constructor</h2>
+		<h2>构造函数</h2>
 
 		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
 		<p>
 			[page:Camera object]: （必须）将要被控制的相机。该相机不允许是其他任何对象的子级，除非该对象是场景自身。<br><br>
 
-			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+			[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
 		</p>
 
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Boolean autoRotate]</h3>
 		<p>
@@ -183,7 +183,7 @@ controls.keys = {
 		<h3>
 			[property:Object mouseButtons]</h3>
 		<p>
-			这一对象包含了对用于控制的鼠标按钮的引用。
+			该对象包含由控件所使用的鼠标操作的引用。
 			<code>
 controls.mouseButtons = {
 	LEFT: THREE.MOUSE.ROTATE,
