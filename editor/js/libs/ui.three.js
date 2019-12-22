@@ -9,6 +9,10 @@ import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
 
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
 var UITexture = function ( mapping ) {
 
 	UIElement.call( this );
@@ -39,7 +43,7 @@ var UITexture = function ( mapping ) {
 		input.click();
 
 	}, false );
-	canvas.addEventListener( 'drop', function ( event ) {
+	canvas.addEventListener( 'drop', function () {
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -47,12 +51,6 @@ var UITexture = function ( mapping ) {
 
 	}, false );
 	dom.appendChild( canvas );
-
-	var name = document.createElement( 'input' );
-	name.disabled = true;
-	name.style.width = '64px';
-	name.style.border = '1px solid #ccc';
-	dom.appendChild( name );
 
 	function loadFile( file ) {
 
@@ -129,7 +127,6 @@ UITexture.prototype.getValue = function () {
 UITexture.prototype.setValue = function ( texture ) {
 
 	var canvas = this.dom.children[ 0 ];
-	var name = this.dom.children[ 1 ];
 	var context = canvas.getContext( '2d' );
 
 	if ( texture !== null ) {
@@ -138,21 +135,21 @@ UITexture.prototype.setValue = function ( texture ) {
 
 		if ( image !== undefined && image.width > 0 ) {
 
-			name.value = texture.sourceFile;
+			canvas.title = texture.sourceFile;
 
 			var scale = canvas.width / image.width;
 			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
 
 		} else {
 
-			name.value = texture.sourceFile + ' (error)';
+			canvas.title = texture.sourceFile + ' (error)';
 			context.clearRect( 0, 0, canvas.width, canvas.height );
 
 		}
 
 	} else {
 
-		name.value = '';
+		canvas.title = 'empty';
 
 		if ( context !== null ) {
 
@@ -203,7 +200,6 @@ var UIOutliner = function ( editor ) {
 
 	// hack
 	this.scene = editor.scene;
-	this.editor = editor;
 
 	// Prevent native scroll behavior
 	dom.addEventListener( 'keydown', function ( event ) {
@@ -373,7 +369,7 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 		if ( newParentIsChild ) return;
 
-		scope.editor.execute( new MoveObjectCommand( scope.editor, object, newParent, nextObject ) );
+		editor.execute( new MoveObjectCommand( editor, object, newParent, nextObject ) );
 
 		var changeEvent = document.createEvent( 'HTMLEvents' );
 		changeEvent.initEvent( 'change', true, true );
@@ -423,16 +419,16 @@ UIOutliner.prototype.setValue = function ( value ) {
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
-		var UIElement = this.options[ i ];
+		var element = this.options[ i ];
 
-		if ( UIElement.value === value ) {
+		if ( element.value === value ) {
 
-			UIElement.classList.add( 'active' );
+			element.classList.add( 'active' );
 
 			// scroll into view
 
-			var y = UIElement.offsetTop - this.dom.offsetTop;
-			var bottomY = y + UIElement.offsetHeight;
+			var y = element.offsetTop - this.dom.offsetTop;
+			var bottomY = y + element.offsetHeight;
 			var minScroll = bottomY - this.dom.offsetHeight;
 
 			if ( this.dom.scrollTop > y ) {
@@ -449,7 +445,7 @@ UIOutliner.prototype.setValue = function ( value ) {
 
 		} else {
 
-			UIElement.classList.remove( 'active' );
+			element.classList.remove( 'active' );
 
 		}
 
@@ -507,7 +503,7 @@ UIPoints.prototype.onChange = function ( callback ) {
 
 UIPoints.prototype.clear = function () {
 
-	for ( var i = 0; i < this.pointslength; ++ i ) {
+	for ( var i = 0; i < this.pointsUI.length; ++ i ) {
 
 		if ( this.pointsUI[ i ] ) {
 
@@ -549,13 +545,13 @@ UIPoints2.prototype.constructor = UIPoints2;
 
 UIPoints2.addRow = function () {
 
-	if ( this.pointslength === 0 ) {
+	if ( this.pointsUI.length === 0 ) {
 
 		this.pointsList.add( this.createPointRow( 0, 0 ) );
 
 	} else {
 
-		var point = this.pointsUI[ this.pointslength - 1 ];
+		var point = this.pointsUI[ this.pointsUI.length - 1 ];
 
 		this.pointsList.add( this.createPointRow( point.x.getValue(), point.y.getValue() ) );
 
@@ -568,14 +564,17 @@ UIPoints2.addRow = function () {
 UIPoints2.prototype.getValue = function () {
 
 	var points = [];
+	var count = 0;
 
-	for ( var i = 0; i < this.pointslength; i ++ ) {
+	for ( var i = 0; i < this.pointsUI.length; i ++ ) {
 
 		var pointUI = this.pointsUI[ i ];
 
 		if ( ! pointUI ) continue;
 
 		points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
+		++ count;
+		pointUI.lbl.setValue( count );
 
 	}
 
@@ -615,7 +614,7 @@ UIPoints2.prototype.createPointRow = function ( x, y ) {
 
 	} );
 
-	this.pointspush( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
+	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
 	++ this.lastPointIdx;
 	pointRow.add( lbl, txtX, txtY, btn );
 
@@ -636,13 +635,13 @@ UIPoints3.prototype.constructor = UIPoints3;
 
 UIPoints3.addRow = function () {
 
-	if ( this.pointslength === 0 ) {
+	if ( this.pointsUI.length === 0 ) {
 
 		this.pointsList.add( this.createPointRow( 0, 0, 0 ) );
 
 	} else {
 
-		var point = this.pointsUI[ this.pointslength - 1 ];
+		var point = this.pointsUI[ this.pointsUI.length - 1 ];
 
 		this.pointsList.add( this.createPointRow( point.x.getValue(), point.y.getValue(), point.z.getValue() ) );
 
@@ -655,14 +654,17 @@ UIPoints3.addRow = function () {
 UIPoints3.prototype.getValue = function () {
 
 	var points = [];
+	var count = 0;
 
-	for ( var i = 0; i < this.pointslength; i ++ ) {
+	for ( var i = 0; i < this.pointsUI.length; i ++ ) {
 
 		var pointUI = this.pointsUI[ i ];
 
 		if ( ! pointUI ) continue;
 
 		points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
+		++ count;
+		pointUI.lbl.setValue( count );
 
 	}
 
@@ -703,7 +705,7 @@ UIPoints3.prototype.createPointRow = function ( x, y, z ) {
 
 	} );
 
-	this.pointspush( { row: pointRow, lbl: lbl, x: txtX, y: txtY, z: txtZ } );
+	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY, z: txtZ } );
 	++ this.lastPointIdx;
 	pointRow.add( lbl, txtX, txtY, txtZ, btn );
 
