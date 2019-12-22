@@ -1,5 +1,4 @@
 import { TempNode } from '../core/TempNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 import { FunctionNode } from '../core/FunctionNode';
 import { UVNode } from '../accessors/UVNode';
 import { UVTransformNode } from '../utils/UVTransformNode';

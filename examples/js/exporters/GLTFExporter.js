@@ -1335,7 +1335,7 @@ THREE.GLTFExporter.prototype = {
 									attribute.getX( j ) - baseAttribute.getX( j ),
 									attribute.getY( j ) - baseAttribute.getY( j ),
 									attribute.getZ( j ) - baseAttribute.getZ( j )
-									);
+								);
 
 							}
 

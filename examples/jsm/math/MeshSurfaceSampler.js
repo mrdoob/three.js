@@ -20,7 +20,7 @@ var MeshSurfaceSampler = ( function () {
 
 	var _face = new Triangle();
 
-	function MeshSurfaceSampler ( mesh ) {
+	function MeshSurfaceSampler( mesh ) {
 
 		var geometry = mesh.geometry;
 
@@ -45,7 +45,7 @@ var MeshSurfaceSampler = ( function () {
 
 		this.distribution = null;
 
-	};
+	}
 
 	MeshSurfaceSampler.prototype = {
 
@@ -124,7 +124,7 @@ var MeshSurfaceSampler = ( function () {
 			var start = 0;
 			var end = dist.length - 1;
 
-			var index = -1;
+			var index = - 1;
 
 			while ( start <= end ) {
 
