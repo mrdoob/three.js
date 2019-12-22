@@ -3,6 +3,7 @@ import { MaterialParameters, Material } from './Material';
 import { Texture } from './../textures/Texture';
 
 export interface MeshDepthMaterialParameters extends MaterialParameters {
+	map?: Texture | null;
 	alphaMap?: Texture | null;
 	depthPacking?: DepthPackingStrategies;
 	displacementMap?: Texture | null;
