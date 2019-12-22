@@ -17,6 +17,7 @@ export class MeshDepthMaterial extends Material {
 
 	constructor( parameters?: MeshDepthMaterialParameters );
 
+	map: Texture | null;
 	alphaMap: Texture | null;
 	depthPacking: DepthPackingStrategies;
 	displacementMap: Texture | null;
