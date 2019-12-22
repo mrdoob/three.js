@@ -1,8 +1,6 @@
 import {
 	Object3D,
 	Camera,
-	Vector3,
-	Euler,
 	MOUSE
 } from '../../../src/Three';
 

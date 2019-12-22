@@ -1,7 +1,5 @@
 import {
-	AnimationClip,
-	Scene,
-	Vector3
+	Scene
 } from '../../../src/Three';
 
 export class TimelinerController {

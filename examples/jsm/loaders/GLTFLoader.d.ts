@@ -43,7 +43,7 @@ export class GLTFParser {
 
 	json: any;
 
-	getDependency: (type: string, index: number) => Promise<any>;
-	getDependencies: (type: string) => Promise<any[]>;
+	getDependency: ( type: string, index: number ) => Promise<any>;
+	getDependencies: ( type: string ) => Promise<any[]>;
 
 }

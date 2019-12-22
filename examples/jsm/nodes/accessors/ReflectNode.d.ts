@@ -1,6 +1,3 @@
-import { Vector2 } from '../../../../src/Three';
-
-import { NodeBuilder } from '../core/NodeBuilder';
 import { TempNode } from '../core/TempNode';
 
 export class ReflectNode extends TempNode {
