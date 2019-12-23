@@ -1041,11 +1041,7 @@ GLTFExporter.prototype = {
 
 			}
 
-			if ( material.isMeshBasicMaterial ||
-				material.isLineBasicMaterial ||
-				material.isPointsMaterial ) {
-
-			} else {
+			if ( material.emissive ) {
 
 				// emissiveFactor
 				var emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
