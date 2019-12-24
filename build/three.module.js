@@ -22914,6 +22914,7 @@ function WebXRManager( renderer, gl ) {
 		inputSourcesMap.forEach( function ( controller, inputSource ) {
 
 			controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
+			controller.visible = false;
 
 		} );
 
@@ -23001,8 +23002,6 @@ function WebXRManager( renderer, gl ) {
 	};
 
 	function updateInputSources( event ) {
-
-		console.log( 'inputsourceschange', event, session.inputSources );
 
 		var inputSources = session.inputSources;
 

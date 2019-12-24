@@ -22922,6 +22922,7 @@
 			inputSourcesMap.forEach( function ( controller, inputSource ) {
 
 				controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
+				controller.visible = false;
 
 			} );
 
@@ -23009,8 +23010,6 @@
 		};
 
 		function updateInputSources( event ) {
-
-			console.log( 'inputsourceschange', event, session.inputSources );
 
 			var inputSources = session.inputSources;
 
