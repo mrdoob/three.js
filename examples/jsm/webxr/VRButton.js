@@ -32,7 +32,6 @@ var VRButton = {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
-				renderer.xr.setSession( null );
 				button.textContent = 'ENTER VR';
 
 				currentSession = null;
