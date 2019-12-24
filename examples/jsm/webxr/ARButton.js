@@ -33,7 +33,6 @@ var ARButton = {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
-				renderer.xr.setSession( null );
 				button.textContent = 'START AR';
 
 				currentSession = null;
