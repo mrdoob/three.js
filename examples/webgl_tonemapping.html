@@ -31,7 +31,7 @@
 				opacity: 1.0,
 				roughness: 1.0,
 				bumpScale: 1.0,
-				exposure: 3.0,
+				exposure: 2.0,
 				whitePoint: 5.0,
 				toneMapping: "Uncharted2",
 				renderMode: "Renderer"
@@ -137,8 +137,6 @@
 					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
 
 						scene.environment = pmremGenerator.fromEquirectangular( hdrEquirect ).texture;
-
-						standardMaterial.needsUpdate = true; // TODO(mrdoob) Should WebGLRenderer handle this?
 
 						hdrEquirect.dispose();
 						pmremGenerator.dispose();
