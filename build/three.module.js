@@ -22855,13 +22855,7 @@ function WebXRManager( renderer, gl ) {
 	var pose = null;
 
 	var controllers = [];
-	var sortedInputSources = [];
-
-	function isPresenting() {
-
-		return session !== null && referenceSpace !== null;
-
-	}
+	var inputSourcesMap = new Map();
 
 	//
 
@@ -22880,6 +22874,8 @@ function WebXRManager( renderer, gl ) {
 	//
 
 	this.enabled = false;
+
+	this.isPresenting = false;
 
 	this.getController = function ( id ) {
 
@@ -22903,13 +22899,11 @@ function WebXRManager( renderer, gl ) {
 
 	function onSessionEvent( event ) {
 
-		for ( var i = 0; i < controllers.length; i ++ ) {
+		var controller = inputSourcesMap.get( event.inputSource );
 
-			if ( sortedInputSources[ i ] === event.inputSource ) {
+		if ( controller ) {
 
-				controllers[ i ].dispatchEvent( { type: event.type } );
-
-			}
+			controller.dispatchEvent( { type: event.type } );
 
 		}
 
@@ -22917,11 +22911,23 @@ function WebXRManager( renderer, gl ) {
 
 	function onSessionEnd() {
 
+		inputSourcesMap.forEach( function ( controller, inputSource ) {
+
+			controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
+
+		} );
+
+		inputSourcesMap.clear();
+
+		//
+
 		renderer.setFramebuffer( null );
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
 		scope.dispatchEvent( { type: 'sessionend' } );
+
+		scope.isPresenting = false;
 
 	}
 
@@ -22933,6 +22939,8 @@ function WebXRManager( renderer, gl ) {
 		animation.start();
 
 		scope.dispatchEvent( { type: 'sessionstart' } );
+
+		scope.isPresenting = true;
 
 	}
 
@@ -22988,33 +22996,52 @@ function WebXRManager( renderer, gl ) {
 
 			session.addEventListener( 'inputsourceschange', updateInputSources );
 
-			updateInputSources();
-
 		}
 
 	};
 
-	function updateInputSources() {
+	function updateInputSources( event ) {
 
-		for ( var i = 0; i < controllers.length; i ++ ) {
-
-			sortedInputSources[ i ] = findInputSource( i );
-
-		}
-
-	}
-
-	function findInputSource( id ) {
+		console.log( 'inputsourceschange', event, session.inputSources );
 
 		var inputSources = session.inputSources;
 
-		for ( var i = 0; i < inputSources.length; i ++ ) {
+		// Assign inputSources to available controllers
 
-			var inputSource = inputSources[ i ];
-			var handedness = inputSource.handedness;
+		for ( var i = 0; i < controllers.length; i ++ ) {
 
-			if ( id === 0 && ( handedness === 'none' || handedness === 'right' ) ) return inputSource;
-			if ( id === 1 && ( handedness === 'left' ) ) return inputSource;
+			inputSourcesMap.set( inputSources[ i ], controllers[ i ] );
+
+		}
+
+		// Notify disconnected
+
+		for ( var i = 0; i < event.removed.length; i ++ ) {
+
+			var inputSource = event.removed[ i ];
+			var controller = inputSourcesMap.get( inputSource );
+
+			if ( controller ) {
+
+				controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
+				inputSourcesMap.delete( inputSource );
+
+			}
+
+		}
+
+		// Notify connected
+
+		for ( var i = 0; i < event.added.length; i ++ ) {
+
+			var inputSource = event.added[ i ];
+			var controller = inputSourcesMap.get( inputSource );
+
+			if ( controller ) {
+
+				controller.dispatchEvent( { type: 'connected', data: inputSource } );
+
+			}
 
 		}
 
@@ -23129,8 +23156,6 @@ function WebXRManager( renderer, gl ) {
 
 	};
 
-	this.isPresenting = isPresenting;
-
 	// Animation Loop
 
 	var onAnimationFrameCallback = null;
@@ -23169,11 +23194,13 @@ function WebXRManager( renderer, gl ) {
 
 		//
 
+		var inputSources = session.inputSources;
+
 		for ( var i = 0; i < controllers.length; i ++ ) {
 
 			var controller = controllers[ i ];
 
-			var inputSource = sortedInputSources[ i ];
+			var inputSource = inputSources[ i ];
 
 			if ( inputSource ) {
 
@@ -23183,12 +23210,7 @@ function WebXRManager( renderer, gl ) {
 
 					controller.matrix.fromArray( inputPose.transform.matrix );
 					controller.matrix.decompose( controller.position, controller.rotation, controller.scale );
-
-					if ( inputSource.targetRayMode === 'pointing' ) {
-
-						controller.visible = true;
-
-					}
+					controller.visible = true;
 
 					continue;
 
@@ -23559,7 +23581,7 @@ function WebGLRenderer( parameters ) {
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		if ( xr.isPresenting() ) {
+		if ( xr.isPresenting ) {
 
 			console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
 			return;
@@ -24264,7 +24286,7 @@ function WebGLRenderer( parameters ) {
 
 	function onAnimationFrame( time ) {
 
-		if ( xr.isPresenting() ) return;
+		if ( xr.isPresenting ) return;
 		if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
 
 	}
@@ -24328,7 +24350,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		if ( xr.enabled && xr.isPresenting() ) {
+		if ( xr.enabled && xr.isPresenting ) {
 
 			camera = xr.getCamera( camera );
 
