@@ -172,8 +172,6 @@ function WebXRManager( renderer, gl ) {
 
 	function updateInputSources( event ) {
 
-		console.log( 'inputsourceschange', event, session.inputSources );
-
 		var inputSources = session.inputSources;
 
 		// Assign inputSources to available controllers
