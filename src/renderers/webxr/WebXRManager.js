@@ -83,6 +83,7 @@ function WebXRManager( renderer, gl ) {
 		inputSourcesMap.forEach( function ( controller, inputSource ) {
 
 			controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
+			controller.visible = false;
 
 		} );
 
