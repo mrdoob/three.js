@@ -319,6 +319,7 @@ var files = {
 		"webaudio_visualizer"
 	],
 	"webxr": [
+		"webxr_ar_cones",
 		"webxr_ar_hittest",
 		"webxr_ar_paint",
 		"webxr_vr_ballshooter",
