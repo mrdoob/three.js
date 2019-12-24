@@ -24764,6 +24764,7 @@ function WebGLRenderer( parameters ) {
 			program = programCache.acquireProgram( material, materialProperties.shader, parameters, programCacheKey );
 
 			materialProperties.program = program;
+			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 			materialProperties.outputEncoding = _this.outputEncoding;
 			material.program = program;
 
@@ -24888,6 +24889,10 @@ function WebGLRenderer( parameters ) {
 				material.needsUpdate = true;
 
 			} else if ( material.fog && materialProperties.fog !== fog ) {
+
+				material.needsUpdate = true;
+
+			} else if ( materialProperties.environment !== environment ) {
 
 				material.needsUpdate = true;
 
