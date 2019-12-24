@@ -53,14 +53,16 @@
 
 				//
 
+				var geometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 0.2, 32 ).translate( 0, 0.1, 0 );
+
 				function onSelect() {
 
 					if ( reticle.visible ) {
 
-						var geometry = new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 ).translate( 0, 0.1, 0 );
 						var material = new THREE.MeshPhongMaterial( { color: 0xffffff * Math.random() } );
 						var mesh = new THREE.Mesh( geometry, material );
 						mesh.position.setFromMatrixPosition( reticle.matrix );
+						mesh.scale.y = Math.random() * 2 + 1;
 						scene.add( mesh );
 
 					}
@@ -75,10 +77,10 @@
 
 				ray = new THREE.Ray();
 
-				var geometry = new THREE.RingBufferGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 );
-				var material = new THREE.MeshBasicMaterial();
-
-				reticle = new THREE.Mesh( geometry, material );
+				reticle = new THREE.Mesh(
+					new THREE.RingBufferGeometry( 0.15, 0.2, 32 ).rotateX( - Math.PI / 2 ),
+					new THREE.MeshBasicMaterial()
+				);
 				reticle.matrixAutoUpdate = false;
 				reticle.visible = false;
 				scene.add( reticle );
