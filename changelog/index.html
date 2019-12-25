@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<script>
+			if ( window.location.search.length === 5 ) {
+				var github = 'https://github.com/mrdoob/three.js/releases/tag/';
+				window.location.replace( github + window.location.search.substr( 1, 4 ) );
+			}
+		</script>
+	</head>
+</html>
