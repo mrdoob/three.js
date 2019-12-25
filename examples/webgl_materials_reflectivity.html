@@ -57,7 +57,7 @@
 				gemBackMaterial = new THREE.MeshPhysicalMaterial( {
 					map: null,
 					color: 0x0000ff,
-					metalness: 1.0,
+					metalness: 1,
 					roughness: 0,
 					opacity: 0.5,
 					side: THREE.BackSide,
@@ -70,12 +70,12 @@
 				gemFrontMaterial = new THREE.MeshPhysicalMaterial( {
 					map: null,
 					color: 0x0000ff,
-					metalness: 0.0,
+					metalness: 0,
 					roughness: 0,
-					opacity: 0.15,
+					opacity: 0.25,
 					side: THREE.FrontSide,
 					transparent: true,
-					envMapIntensity: 5,
+					envMapIntensity: 10,
 					premultipliedAlpha: true
 				} );
 
@@ -114,7 +114,7 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
+					.load( 'royal_esplanade_1k.hdr', function ( hdrEquirect ) {
 
 						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
 						pmremGenerator.dispose();
