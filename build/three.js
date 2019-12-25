@@ -22965,6 +22965,12 @@
 
 		};
 
+		this.getReferenceSpace = function () {
+
+			return referenceSpace;
+
+		};
+
 		this.getSession = function () {
 
 			return session;
