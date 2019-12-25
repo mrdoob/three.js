@@ -1,6 +1,5 @@
 import { Camera } from '../../../../src/Three';
 
-import { NodeBuilder } from '../core/NodeBuilder';
 import { NodeFrame } from '../core/NodeFrame';
 import { TempNode } from '../core/TempNode';
 import { FunctionNode } from '../core/FunctionNode';
@@ -19,7 +18,6 @@ export class CameraNode extends TempNode {
 
 	setCamera( camera: Camera ): void;
 	setScope( scope: string ): void;
-	generate( builder: NodeBuilder, output: string ): string;
 	onUpdateFrame( frame: NodeFrame ): void;
 	copy( source: CameraNode ): this;
 

@@ -7,6 +7,7 @@ import {
 	BufferGeometry,
 	Color,
 	DynamicDrawUsage,
+	Matrix4,
 	Mesh,
 	MeshStandardMaterial,
 	Vector3,
@@ -33,8 +34,6 @@ function TubePainter() {
 	geometry.drawRange.count = 0;
 
 	let material = new MeshStandardMaterial( {
-		roughness: 0.9,
-		metalness: 0.0,
 		vertexColors: VertexColors
 	} );
 
@@ -61,6 +60,8 @@ function TubePainter() {
 		return array;
 
 	}
+
+	//
 
 	let vector1 = new Vector3();
 	let vector2 = new Vector3();
@@ -131,38 +132,77 @@ function TubePainter() {
 
 	}
 
+	//
+
+	let up = new Vector3( 0, 1, 0 );
+
+	let point1 = new Vector3();
+	let point2 = new Vector3();
+
+	let matrix1 = new Matrix4();
+	let matrix2 = new Matrix4();
+
+	function moveTo( position ) {
+
+		point1.copy( position );
+		matrix1.lookAt( point2, point1, up );
+
+		point2.copy( position );
+		matrix2.copy( matrix1 );
+
+	}
+
+	function lineTo( position ) {
+
+		point1.copy( position );
+		matrix1.lookAt( point2, point1, up );
+
+		stroke( point1, point2, matrix1, matrix2 );
+
+		point2.copy( point1 );
+		matrix2.copy( matrix1 );
+
+	}
+
 	function setSize( value ) {
 
 		size = value;
 
 	}
 
-	function updateGeometry( start, end ) {
+	//
+
+	let count = 0;
+
+	function update() {
+
+		let start = count;
+		let end = geometry.drawRange.count;
 
 		if ( start === end ) return;
 
-		let offset = start * 3;
-		let count = ( end - start ) * 3;
-
-		positions.updateRange.offset = offset;
-		positions.updateRange.count = count;
+		positions.updateRange.offset = start * 3;
+		positions.updateRange.count = ( end - start ) * 3;
 		positions.needsUpdate = true;
 
-		normals.updateRange.offset = offset;
-		normals.updateRange.count = count;
+		normals.updateRange.offset = start * 3;
+		normals.updateRange.count = ( end - start ) * 3;
 		normals.needsUpdate = true;
 
-		colors.updateRange.offset = offset;
-		colors.updateRange.count = count;
+		colors.updateRange.offset = start * 3;
+		colors.updateRange.count = ( end - start ) * 3;
 		colors.needsUpdate = true;
+
+		count = geometry.drawRange.count;
 
 	}
 
 	return {
 		mesh: mesh,
-		stroke: stroke,
+		moveTo: moveTo,
+		lineTo: lineTo,
 		setSize: setSize,
-		updateGeometry: updateGeometry
+		update: update
 	};
 
 }

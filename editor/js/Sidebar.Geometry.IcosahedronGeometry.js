@@ -2,31 +2,39 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.IcosahedronGeometry = function ( editor, object ) {
+import * as THREE from '../../build/three.module.js';
+
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
+
+import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
+
+var SidebarGeometryIcosahedronGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new UI.Row();
+	var signals = editor.signals;
+
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new UI.Row();
-	var radius = new UI.Number( parameters.radius ).onChange( update );
+	var radiusRow = new UIRow();
+	var radius = new UINumber( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/icosahedron_geometry/radius' ) ).setWidth( '90px' ) );
+	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/radius' ) ).setWidth( '90px' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
 
 	// detail
 
-	var detailRow = new UI.Row();
-	var detail = new UI.Integer( parameters.detail ).setRange( 0, Infinity ).onChange( update );
+	var detailRow = new UIRow();
+	var detail = new UIInteger( parameters.detail ).setRange( 0, Infinity ).onChange( update );
 
-	detailRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/icosahedron_geometry/detail' ) ).setWidth( '90px' ) );
+	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/icosahedron_geometry/detail' ) ).setWidth( '90px' ) );
 	detailRow.add( detail );
 
 	container.add( detailRow );
@@ -35,10 +43,12 @@ Sidebar.Geometry.IcosahedronGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ](
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.IcosahedronBufferGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );
+
+		signals.objectChanged.dispatch( object );
 
 	}
 
@@ -46,4 +56,4 @@ Sidebar.Geometry.IcosahedronGeometry = function ( editor, object ) {
 
 };
 
-Sidebar.Geometry.IcosahedronBufferGeometry = Sidebar.Geometry.IcosahedronGeometry;
+export { SidebarGeometryIcosahedronGeometry };

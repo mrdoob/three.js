@@ -8,7 +8,8 @@ import {
 	MeshLambertMaterial,
 	Object3D,
 	TextureLoader,
-	UVMapping
+	UVMapping,
+	sRGBEncoding
 } from "../../../build/three.module.js";
 import { MD2Loader } from "../loaders/MD2Loader.js";
 import { MorphBlendMesh } from "../misc/MorphBlendMesh.js";
@@ -527,6 +528,7 @@ var MD2CharacterComplex = function () {
 			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
 			textures[ i ].mapping = UVMapping;
 			textures[ i ].name = textureUrls[ i ];
+			textures[ i ].encoding = sRGBEncoding;
 
 		}
 

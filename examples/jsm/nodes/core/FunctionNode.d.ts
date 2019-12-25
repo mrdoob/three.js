@@ -24,7 +24,6 @@ export class FunctionNode extends TempNode {
 	getType( builder: NodeBuilder ): string;
 	getInputByName( name: string ): FunctionNodeInput | undefined;
 	getIncludeByName( name: string ): object | undefined;
-	generate( builder: NodeBuilder, output: string ): string;
 	parse( src: string, includes?: object[], extensions?: object, keywords?: object ): void;
 	copy( source: FunctionNode ): this;
 

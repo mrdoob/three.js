@@ -4,7 +4,9 @@
 
 var APP = {
 
-	Player: function () {
+	Player: function ( THREE ) {
+
+		window.THREE = THREE; // FIX for editor scripts (they require THREE in global namespace)
 
 		var loader = new THREE.ObjectLoader();
 		var camera, scene, renderer;
@@ -21,14 +23,14 @@ var APP = {
 		this.load = function ( json ) {
 
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.gammaOutput = true;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.setClearColor( 0x000000 );
 			renderer.setPixelRatio( window.devicePixelRatio );
 
 			var project = json.project;
 
 			if ( project.shadows ) renderer.shadowMap.enabled = true;
-			if ( project.vr ) renderer.vr.enabled = true;
+			if ( project.vr ) renderer.xr.enabled = true;
 
 			dom.appendChild( renderer.domElement );
 
@@ -109,12 +111,6 @@ var APP = {
 			camera = value;
 			camera.aspect = this.width / this.height;
 			camera.updateProjectionMatrix();
-
-			if ( renderer.vr.enabled ) {
-
-				dom.appendChild( THREE.WEBVR.createButton( renderer ) );
-
-			}
 
 		};
 
@@ -281,3 +277,5 @@ var APP = {
 	}
 
 };
+
+export { APP };

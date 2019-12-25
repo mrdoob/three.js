@@ -147,11 +147,6 @@
 		<h3>[property:Float envMapIntensity]</h3>
 		<p> 通过乘以环境贴图的颜色来缩放环境贴图的效果。</p>
 
-		<h3>[property:Boolean isMeshStandardMaterial]</h3>
-		<p> 用于检查此类或派生类是否为标准网格材质。默认值为 *true*。<br /><br />
-			因为其通常用在内部优化，所以不应该更改该属性值。
-		</p>
-
 
 		<h3>[property:Texture lightMap]</h3>
 		<p>光照贴图。默认值为null。lightMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]纹理属性。</p>
@@ -164,7 +159,7 @@
 
 		<h3>[property:Float metalness]</h3>
 		<p> 材质与金属的相似度。非金属材质，如木材或石材，使用0.0，金属使用1.0，通常没有中间值。
-			默认值为0.5。0.0到1.0之间的值可用于生锈金属的外观。如果还提供了metalnessMap，则两个值相乘。
+			默认值为0.0。0.0到1.0之间的值可用于生锈金属的外观。如果还提供了metalnessMap，则两个值相乘。
 		</p>
 
 		<h3>[property:Texture metalnessMap]</h3>
@@ -197,7 +192,7 @@
 		</p>
 
 		<h3>[property:Float roughness]</h3>
-		<p> 材质的粗糙程度。0.0表示平滑的镜面反射，1.0表示完全漫反射。默认值为0.5。如果还提供roughnessMap，则两个值相乘。
+		<p> 材质的粗糙程度。0.0表示平滑的镜面反射，1.0表示完全漫反射。默认值为1.0。如果还提供roughnessMap，则两个值相乘。
 		</p>
 
 		<h3>[property:Texture roughnessMap]</h3>

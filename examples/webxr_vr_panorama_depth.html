@@ -35,7 +35,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
 
-				var light = new THREE.AmbientLight( 0x404040, 10 );
+				var light = new THREE.AmbientLight( 0xffffff, 1 );
 				scene.add( light );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -85,7 +85,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.vr.enabled = true;
+				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer, { referenceSpaceType: 'local' } ) );
@@ -115,7 +115,7 @@
 
 				// If we are not presenting move the camera a little so the effect is visible
 
-				if ( renderer.vr.isPresenting() === false ) {
+				if ( renderer.xr.isPresenting === false ) {
 
 					var time = clock.getElapsedTime();
 

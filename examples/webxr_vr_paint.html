@@ -24,11 +24,10 @@
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
-			var painter1, painter2;
+
+			var cursor = new THREE.Vector3();
 
 			var controls;
-
-			var up = new THREE.Vector3( 0, 1, 0 );
 
 			init();
 			animate();
@@ -81,10 +80,10 @@
 
 				//
 
-				painter1 = new TubePainter();
+				var painter1 = new TubePainter();
 				scene.add( painter1.mesh );
 
-				painter2 = new TubePainter();
+				var painter2 = new TubePainter();
 				scene.add( painter2.mesh );
 
 				//
@@ -92,9 +91,8 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-				renderer.vr.enabled = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
@@ -127,24 +125,20 @@
 
 				}
 
-				controller1 = renderer.vr.getController( 0 );
+				controller1 = renderer.xr.getController( 0 );
 				controller1.addEventListener( 'selectstart', onSelectStart );
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				controller1.addEventListener( 'squeezestart', onSequeezeStart );
 				controller1.addEventListener( 'squeezeend', onSqueezeEned );
 				controller1.userData.painter = painter1;
-				controller1.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
-				controller1.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller1 );
 
-				controller2 = renderer.vr.getController( 1 );
+				controller2 = renderer.xr.getController( 1 );
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				controller2.addEventListener( 'squeezestart', onSequeezeStart );
 				controller2.addEventListener( 'squeezeend', onSqueezeEned );
 				controller2.userData.painter = painter2;
-				controller2.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
-				controller2.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				scene.add( controller2 );
 
 				//
@@ -182,19 +176,9 @@
 			function handleController( controller ) {
 
 				var userData = controller.userData;
-
-				var point1 = userData.points[ 0 ];
-				var point2 = userData.points[ 1 ];
-
-				var matrix1 = userData.matrices[ 0 ];
-				var matrix2 = userData.matrices[ 1 ];
+				var painter = userData.painter;
 
 				var pivot = controller.getObjectByName( 'pivot' );
-
-				point1.setFromMatrixPosition( pivot.matrixWorld );
-				matrix1.lookAt( point2, point1, up );
-
-				var painter = userData.painter;
 
 				if ( userData.isSqueezing === true ) {
 
@@ -206,18 +190,18 @@
 
 				}
 
+				cursor.setFromMatrixPosition( pivot.matrixWorld );
+
 				if ( userData.isSelecting === true ) {
 
-					var count = painter.mesh.geometry.drawRange.count;
+					painter.lineTo( cursor );
+					painter.update();
 
-					painter.stroke( point1, point2, matrix1, matrix2 );
+				} else {
 
-					painter.updateGeometry( count, painter.mesh.geometry.drawRange.count );
+					painter.moveTo( cursor );
 
 				}
-
-				point2.copy( point1 );
-				matrix2.copy( matrix1 );
 
 			}
 

@@ -16,7 +16,6 @@ export class StructNode extends TempNode {
 
 	getType( builder: NodeBuilder ): string;
 	getInputByName( name: string ): StructNodeInput;
-	generate( builder: NodeBuilder, output: string ): string;
 	parse( src: string ): void;
 
 }

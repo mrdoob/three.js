@@ -1,5 +1,4 @@
 import { TempNode } from '../core/TempNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 
 export class SubSlots extends TempNode {
 
@@ -7,7 +6,6 @@ export class SubSlots extends TempNode {
 
 	slots: Node[];
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: SubSlots ): this;
 
 }

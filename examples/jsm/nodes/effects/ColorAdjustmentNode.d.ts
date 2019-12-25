@@ -1,5 +1,4 @@
 import { TempNode } from '../core/TempNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 import { FloatNode } from '../inputs/FloatNode';
 import { FunctionNode } from '../core/FunctionNode';
 import { Node } from '../core/Node';
@@ -13,7 +12,6 @@ export class ColorAdjustmentNode extends TempNode {
 	method: string;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: ColorAdjustmentNode ): this;
 
 	static Nodes: {
