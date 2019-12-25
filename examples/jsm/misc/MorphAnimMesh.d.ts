@@ -1,4 +1,4 @@
-import { AnimationAction } from '../../../src/animation/AnimationAction'
+import { AnimationAction } from '../../../src/animation/AnimationAction';
 import {
 	AnimationMixer,
 	BufferGeometry,

@@ -1,6 +1,5 @@
 import { Camera } from '../../../../src/Three';
 
-import { NodeBuilder } from '../core/NodeBuilder';
 import { NodeFrame } from '../core/NodeFrame';
 import { TempNode } from '../core/TempNode';
 import { FunctionNode } from '../core/FunctionNode';

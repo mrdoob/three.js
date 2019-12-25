@@ -3,6 +3,6 @@
     "noEmit": true,
   },
   "include": [
-    "../../src/**/*.ts"
+    "../../examples/jsm/**/*.ts"
   ]
 }

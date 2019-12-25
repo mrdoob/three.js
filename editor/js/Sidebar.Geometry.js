@@ -31,23 +31,23 @@ import { SidebarGeometryTorusKnotGeometry } from './Sidebar.Geometry.TorusKnotGe
 import { SidebarGeometryTubeGeometry } from './Sidebar.Geometry.TubeGeometry.js';
 
 var geometryUIClasses = {
-	'BoxGeometry': SidebarGeometryBoxGeometry,
-	'CircleGeometry': SidebarGeometryCircleGeometry,
-	'CylinderGeometry': SidebarGeometryCylinderGeometry,
-	'DodecahedronGeometry': SidebarGeometryDodecahedronGeometry,
-	'ExtrudeGeometry': SidebarGeometryExtrudeGeometry,
-	'IcosahedronGeometry': SidebarGeometryIcosahedronGeometry,
-	'LatheGeometry': SidebarGeometryLatheGeometry,
-	'OctahedronGeometry': SidebarGeometryOctahedronGeometry,
-	'PlaneGeometry': SidebarGeometryPlaneGeometry,
-	'RingGeometry': SidebarGeometryRingGeometry,
-	'ShapeGeometry': SidebarGeometryShapeGeometry,
-	'SphereGeometry': SidebarGeometrySphereGeometry,
+	'BoxBufferGeometry': SidebarGeometryBoxGeometry,
+	'CircleBufferGeometry': SidebarGeometryCircleGeometry,
+	'CylinderBufferGeometry': SidebarGeometryCylinderGeometry,
+	'DodecahedronBufferGeometry': SidebarGeometryDodecahedronGeometry,
+	'ExtrudeBufferGeometry': SidebarGeometryExtrudeGeometry,
+	'IcosahedronBufferGeometry': SidebarGeometryIcosahedronGeometry,
+	'LatheBufferGeometry': SidebarGeometryLatheGeometry,
+	'OctahedronBufferGeometry': SidebarGeometryOctahedronGeometry,
+	'PlaneBufferGeometry': SidebarGeometryPlaneGeometry,
+	'RingBufferGeometry': SidebarGeometryRingGeometry,
+	'ShapeBufferGeometry': SidebarGeometryShapeGeometry,
+	'SphereBufferGeometry': SidebarGeometrySphereGeometry,
 	'TeapotBufferGeometry': SidebarGeometryTeapotBufferGeometry,
-	'TetrahedronGeometry': SidebarGeometryTetrahedronGeometry,
-	'TorusGeometry': SidebarGeometryTorusGeometry,
-	'TorusKnotGeometry': SidebarGeometryTorusKnotGeometry,
-	'TubeGeometry': SidebarGeometryTubeGeometry
+	'TetrahedronBufferGeometry': SidebarGeometryTetrahedronGeometry,
+	'TorusBufferGeometry': SidebarGeometryTorusGeometry,
+	'TorusKnotBufferGeometry': SidebarGeometryTorusKnotGeometry,
+	'TubeBufferGeometry': SidebarGeometryTubeGeometry
 };
 
 var SidebarGeometry = function ( editor ) {

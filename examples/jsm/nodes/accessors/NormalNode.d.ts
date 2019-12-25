@@ -1,4 +1,3 @@
-import { NodeBuilder } from '../core/NodeBuilder';
 import { TempNode } from '../core/TempNode';
 
 export class NormalNode extends TempNode {

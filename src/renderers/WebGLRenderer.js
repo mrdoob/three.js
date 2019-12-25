@@ -382,7 +382,7 @@ function WebGLRenderer( parameters ) {
 
 	this.setSize = function ( width, height, updateStyle ) {
 
-		if ( xr.isPresenting() ) {
+		if ( xr.isPresenting ) {
 
 			console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
 			return;
@@ -1087,7 +1087,7 @@ function WebGLRenderer( parameters ) {
 
 	function onAnimationFrame( time ) {
 
-		if ( xr.isPresenting() ) return;
+		if ( xr.isPresenting ) return;
 		if ( onAnimationFrameCallback ) onAnimationFrameCallback( time );
 
 	}
@@ -1151,7 +1151,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
-		if ( xr.enabled && xr.isPresenting() ) {
+		if ( xr.enabled && xr.isPresenting ) {
 
 			camera = xr.getCamera( camera );
 
@@ -1566,6 +1566,7 @@ function WebGLRenderer( parameters ) {
 			program = programCache.acquireProgram( material, materialProperties.shader, parameters, programCacheKey );
 
 			materialProperties.program = program;
+			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 			materialProperties.outputEncoding = _this.outputEncoding;
 			material.program = program;
 
@@ -1690,6 +1691,10 @@ function WebGLRenderer( parameters ) {
 				material.needsUpdate = true;
 
 			} else if ( material.fog && materialProperties.fog !== fog ) {
+
+				material.needsUpdate = true;
+
+			} else if ( materialProperties.environment !== environment ) {
 
 				material.needsUpdate = true;
 

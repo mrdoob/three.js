@@ -1,7 +1,6 @@
 import { Node } from '../core/Node';
 import { TempNode } from '../core/TempNode';
 import { FunctionNode } from '../core/FunctionNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 
 export class ColorSpaceNode extends TempNode {
 

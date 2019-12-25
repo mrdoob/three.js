@@ -155,7 +155,7 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 				// check if the intersection point is within clip space
 				var zPos = THREE.Math.lerp( start.z, end.z, param );
-				var isInClipSpace = zPos >= -1 && zPos <= 1;
+				var isInClipSpace = zPos >= - 1 && zPos <= 1;
 
 				var isInside = ssOrigin3.distanceTo( closestPoint ) < lineWidth * 0.5;
 
@@ -190,8 +190,8 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 			}
 
-		}
+		};
 
-	} () )
+	}() )
 
 } );

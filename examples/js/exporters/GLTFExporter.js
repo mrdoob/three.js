@@ -1019,11 +1019,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material.isMeshBasicMaterial ||
-				material.isLineBasicMaterial ||
-				material.isPointsMaterial ) {
-
-			} else {
+			if ( material.emissive ) {
 
 				// emissiveFactor
 				var emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
@@ -1335,7 +1331,7 @@ THREE.GLTFExporter.prototype = {
 									attribute.getX( j ) - baseAttribute.getX( j ),
 									attribute.getY( j ) - baseAttribute.getY( j ),
 									attribute.getZ( j ) - baseAttribute.getZ( j )
-									);
+								);
 
 							}
 

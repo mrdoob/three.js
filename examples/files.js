@@ -131,7 +131,6 @@ var files = {
 		"webgl_materials_blending",
 		"webgl_materials_blending_custom",
 		"webgl_materials_bumpmap",
-		"webgl_materials_bumpmap_skin",
 		"webgl_materials_car",
 		"webgl_materials_channels",
 		"webgl_materials_cubemap",
@@ -157,7 +156,6 @@ var files = {
 		"webgl_materials_physical_transparency",
 		"webgl_materials_reflectivity",
 		"webgl_materials_shaders_fresnel",
-		"webgl_materials_skin",
 		"webgl_materials_standard",
 		"webgl_materials_texture_anisotropy",
 		"webgl_materials_texture_canvas",
@@ -321,6 +319,8 @@ var files = {
 		"webaudio_visualizer"
 	],
 	"webxr": [
+		"webxr_ar_cones",
+		"webxr_ar_hittest",
 		"webxr_ar_paint",
 		"webxr_vr_ballshooter",
 		"webxr_vr_cubes",
