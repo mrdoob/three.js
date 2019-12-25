@@ -70,6 +70,8 @@
 						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
 
+						envMap.blurriness = 0.15;
+
 						scene.background = envMap;
 						scene.environment = envMap;
 

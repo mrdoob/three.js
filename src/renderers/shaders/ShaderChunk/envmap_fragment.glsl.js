@@ -4,7 +4,7 @@ export default /* glsl */`
 	#ifdef ENV_WORLDPOS
 
 		vec3 cameraToFrag;
-		
+
 		if ( isOrthographic ) {
 
 			cameraToFrag = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );
@@ -40,7 +40,7 @@ export default /* glsl */`
 
 	#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-		vec4 envColor = textureCubeUV( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), 0.0 );
+		vec4 envColor = textureCubeUV( envMap, vec3( flipEnvMap * reflectVec.x, reflectVec.yz ), envMapBlurriness );
 
 	#elif defined( ENVMAP_TYPE_EQUIREC )
 

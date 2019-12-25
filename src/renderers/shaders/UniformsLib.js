@@ -30,6 +30,7 @@ var UniformsLib = {
 	envmap: {
 
 		envMap: { value: null },
+		envMapBlurriness: { value: 0 },
 		flipEnvMap: { value: - 1 },
 		reflectivity: { value: 1.0 },
 		refractionRatio: { value: 0.98 },

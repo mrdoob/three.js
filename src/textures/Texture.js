@@ -61,6 +61,8 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.flipY = true;
 	this.unpackAlignment = 4;	// valid values: 1, 2, 4, 8 (see http://www.khronos.org/opengles/sdk/docs/man/xhtml/glPixelStorei.xml)
 
+	this.blurriness = 0;
+
 	// Values of encoding !== THREE.LinearEncoding only supported on map, envMap and emissiveMap.
 	//
 	// Also changing the encoding after already used by a Material will not automatically make the Material

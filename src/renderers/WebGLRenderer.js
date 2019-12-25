@@ -2089,6 +2089,7 @@ function WebGLRenderer( parameters ) {
 		if ( envMap ) {
 
 			uniforms.envMap.value = envMap;
+			uniforms.envMapBlurriness.value = envMap.blurriness;
 
 			// don't flip CubeTexture envMaps, flip everything else:
 			//  WebGLRenderTargetCube will be flipped for backwards compatibility

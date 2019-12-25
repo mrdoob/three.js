@@ -105,6 +105,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 			var texture = background.isWebGLRenderTargetCube ? background.texture : background;
 
 			boxMesh.material.uniforms.envMap.value = texture;
+			boxMesh.material.uniforms.envMapBlurriness.value = texture.blurriness;
 			boxMesh.material.uniforms.flipEnvMap.value = texture.isCubeTexture ? - 1 : 1;
 
 			if ( currentBackground !== background ||
