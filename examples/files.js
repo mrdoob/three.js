@@ -48,7 +48,7 @@ var files = {
 		"webgl_geometry_text_stroke",
 		"webgl_helpers",
 		"webgl_instancing_dynamic",
-		"webgl_instancing_interactive",
+		"webgl_instancing_performance",
 		"webgl_instancing_raycast",
 		"webgl_instancing_scatter",
 		"webgl_interactive_buffergeometry",
