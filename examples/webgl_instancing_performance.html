@@ -36,7 +36,6 @@
 
 		var container, stats, gui, guiStatsEl;
 		var camera, controls, scene, renderer, material;
-		var geometryByteLength;
 
 		// gui
 
@@ -120,7 +119,6 @@
 					material = new THREE.MeshNormalMaterial();
 
 					geometry.computeVertexNormals();
-					geometryByteLength = getGeometryByteLength( geometry );
 
 					console.time( api.method + ' (build)'  );
 
@@ -162,10 +160,14 @@
 
 			//
 
+			var geometryByteLength = getGeometryByteLength( geometry );
+
 			guiStatsEl.innerHTML = [
+
 				'<i>GPU draw calls</i>: 1',
 				'<i>GPU memory</i>: ' + formatBytes( api.count * 16 + geometryByteLength, 2 )
-			].join('<br/>');
+
+			].join( '<br/>' );
 
 		}
 
@@ -193,9 +195,11 @@
 			//
 
 			guiStatsEl.innerHTML = [
+
 				'<i>GPU draw calls</i>: 1',
-				'<i>GPU memory</i>: ' + formatBytes( api.count * geometryByteLength, 2 )
-			].join('<br/>');
+				'<i>GPU memory</i>: ' + formatBytes( getGeometryByteLength( mergedGeometry ), 2 )
+
+			].join( '<br/>' );
 
 		}
 
@@ -215,6 +219,8 @@
 			}
 
 			//
+
+			var geometryByteLength = getGeometryByteLength( geometry );
 
 			guiStatsEl.innerHTML = [
 
