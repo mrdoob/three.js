@@ -233,6 +233,7 @@ var UIOutliner = function ( editor ) {
 	}, false );
 
 	this.dom = dom;
+	this.editor = editor;
 
 	this.options = [];
 	this.selectedIndex = - 1;
@@ -369,6 +370,7 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 		if ( newParentIsChild ) return;
 
+		var editor = scope.editor;
 		editor.execute( new MoveObjectCommand( editor, object, newParent, nextObject ) );
 
 		var changeEvent = document.createEvent( 'HTMLEvents' );

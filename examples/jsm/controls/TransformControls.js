@@ -37,6 +37,7 @@ var TransformControls = function ( camera, domElement ) {
 	Object3D.call( this );
 
 	this.visible = false;
+	this.domElement = domElement;
 
 	var _gizmo = new TransformControlsGizmo();
 	this.add( _gizmo );
