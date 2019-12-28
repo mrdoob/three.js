@@ -30,8 +30,6 @@ export class Matrix4 implements Matrix {
 	 */
 	elements: number[];
 
-	isMatrix4: boolean;
-
 	/**
 	 * Sets all fields of this matrix.
 	 */

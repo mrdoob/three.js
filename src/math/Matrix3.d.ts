@@ -10,7 +10,6 @@ export interface Matrix {
 	 * Array with matrix values.
 	 */
 	elements: number[];
-	isMatrix3: boolean;
 
 	/**
 	 * identity():T;
