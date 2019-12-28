@@ -62,6 +62,6 @@ export class Texture extends EventDispatcher {
 	copy( source: Texture ): this;
 	toJSON( meta: any ): any;
 	dispose(): void;
-	transformUv( uv: Vector ): void;
+	transformUv( uv: Vector2 ): Vector2;
 
 }
