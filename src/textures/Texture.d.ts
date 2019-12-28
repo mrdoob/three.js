@@ -54,6 +54,8 @@ export class Texture extends EventDispatcher {
 	encoding: TextureEncoding;
 	version: number;
 	needsUpdate: boolean;
+	isTexture: boolean;
+
 	onUpdate: () => void;
 	static DEFAULT_IMAGE: any;
 	static DEFAULT_MAPPING: any;

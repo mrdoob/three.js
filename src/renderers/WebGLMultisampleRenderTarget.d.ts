@@ -11,4 +11,6 @@ export class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 		options?: WebGLRenderTargetOptions
 	);
 
+	isWebGLMultisampleRenderTarget: boolean;
+
 }

@@ -10,6 +10,7 @@ export class AnimationObjectGroup {
 			inUse: number;
 		};
 	};
+	isAnimationObjectGroup: boolean;
 
 	add( ...args: any[] ): void;
 	remove( ...args: any[] ): void;

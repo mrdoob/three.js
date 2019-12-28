@@ -14,5 +14,6 @@ export class RectAreaLight extends Light {
 	width: number;
 	height: number;
 	intensity: number;
+	isRectAreaLight: boolean;
 
 }

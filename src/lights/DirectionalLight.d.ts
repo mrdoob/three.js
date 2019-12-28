@@ -30,5 +30,6 @@ export class DirectionalLight extends Light {
 	intensity: number;
 
 	shadow: DirectionalLightShadow;
+	isDirectionalLight: boolean;
 
 }

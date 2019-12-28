@@ -25,6 +25,7 @@ export class Quaternion {
 	y: number;
 	z: number;
 	w: number;
+	isQuaternion: boolean;
 
 	/**
 	 * Sets values of this quaternion.

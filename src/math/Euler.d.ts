@@ -10,6 +10,8 @@ export class Euler {
 	y: number;
 	z: number;
 	order: string;
+	isEuler: boolean;
+
 	_onChangeCallback: Function;
 
 	set( x: number, y: number, z: number, order?: string ): Euler;
