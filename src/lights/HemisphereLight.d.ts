@@ -12,6 +12,6 @@ export class HemisphereLight extends Light {
 	skyColor: Color;
 	groundColor: Color;
 	intensity: number;
-	isHemisphereLight: boolean;
+	readonly isHemisphereLight: true;
 
 }

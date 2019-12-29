@@ -25,7 +25,7 @@ export class TransformControls extends Object3D {
 	showX: boolean;
 	showY: boolean;
 	showZ: boolean;
-	isTransformControls: boolean;
+	readonly isTransformControls: true;
 	mouseButtons: {
 		LEFT: MOUSE;
 		MIDDLE: MOUSE;

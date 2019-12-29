@@ -11,7 +11,7 @@ export class Plane {
 
 	normal: Vector3;
 	constant: number;
-	isPlane: boolean;
+	readonly isPlane: true;
 
 	set( normal: Vector3, constant: number ): Plane;
 	setComponents( x: number, y: number, z: number, w: number ): Plane;

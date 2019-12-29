@@ -51,6 +51,6 @@ export class SpotLight extends Light {
 	shadow: SpotLightShadow;
 	power: number;
 	penumbra: number;
-	isSpotLight: boolean;
+	readonly isSpotLight: true;
 
 }

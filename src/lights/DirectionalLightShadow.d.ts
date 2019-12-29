@@ -4,6 +4,6 @@ import { LightShadow } from './LightShadow';
 export class DirectionalLightShadow extends LightShadow {
 
 	camera: OrthographicCamera;
-	isDirectionalLightShadow: boolean;
+	readonly isDirectionalLightShadow: true;
 
 }

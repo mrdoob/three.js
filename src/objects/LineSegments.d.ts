@@ -21,6 +21,6 @@ export class LineSegments extends Line {
 	);
 
 	type: 'LineSegments';
-	isLineSegments: true;
+	readonly isLineSegments: true;
 
 }

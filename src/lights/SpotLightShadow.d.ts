@@ -4,6 +4,6 @@ import { LightShadow } from './LightShadow';
 export class SpotLightShadow extends LightShadow {
 
 	camera: PerspectiveCamera;
-	isSpotLightShadow: true;
+	readonly isSpotLightShadow: true;
 
 }

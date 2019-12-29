@@ -36,7 +36,7 @@ export class WebGLRenderTarget extends EventDispatcher {
 	depthBuffer: boolean;
 	stencilBuffer: boolean;
 	depthTexture: DepthTexture;
-	isWebGLRenderTarget: boolean;
+	readonly isWebGLRenderTarget: true;
 
 	/**
 	 * @deprecated Use {@link Texture#wrapS texture.wrapS} instead.

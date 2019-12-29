@@ -10,7 +10,7 @@ export class Euler {
 	y: number;
 	z: number;
 	order: string;
-	isEuler: boolean;
+	readonly isEuler: true;
 
 	_onChangeCallback: Function;
 

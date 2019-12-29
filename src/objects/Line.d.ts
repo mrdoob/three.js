@@ -17,7 +17,7 @@ export class Line extends Object3D {
 	material: Material | Material[];
 
 	type: 'Line' | 'LineLoop' | 'LineSegments';
-	isLine: true;
+	readonly isLine: true;
 
 	computeLineDistances(): this;
 	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;

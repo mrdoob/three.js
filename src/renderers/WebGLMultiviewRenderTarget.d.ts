@@ -12,7 +12,7 @@ export class WebGLMultiviewRenderTarget extends WebGLRenderTarget {
 		options?: WebGLRenderTargetOptions
 	);
 
-	isWebGLMultiviewRenderTarget: boolean;
+	readonly isWebGLMultiviewRenderTarget: true;
 	setNumViews( numViews: number ): this;
 
 }

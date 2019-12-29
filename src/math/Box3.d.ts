@@ -11,7 +11,7 @@ export class Box3 {
 
 	max: Vector3;
 	min: Vector3;
-	isBox3: boolean;
+	readonly isBox3: true;
 
 	set( min: Vector3, max: Vector3 ): this;
 	setFromArray( array: ArrayLike<number> ): this;

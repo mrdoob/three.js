@@ -11,7 +11,7 @@ export class MultiMaterial extends Material {
 
 	constructor( materials?: Material[] );
 
-	isMultiMaterial: true;
+	readonly isMultiMaterial: true;
 
 	materials: Material[];
 

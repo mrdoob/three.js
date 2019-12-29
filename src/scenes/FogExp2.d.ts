@@ -16,7 +16,7 @@ export class FogExp2 implements IFog {
 	 */
 	density: number;
 
-	isFogExp2: boolean;
+	readonly isFogExp2: true;
 
 	clone(): this;
 	toJSON(): any;

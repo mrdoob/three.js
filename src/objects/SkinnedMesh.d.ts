@@ -17,7 +17,7 @@ export class SkinnedMesh extends Mesh {
 	bindMatrix: Matrix4;
 	bindMatrixInverse: Matrix4;
 	skeleton: Skeleton;
-	isSkinnedMesh: boolean;
+	readonly isSkinnedMesh: true;
 
 	bind( skeleton: Skeleton, bindMatrix?: Matrix4 ): void;
 	pose(): void;
