@@ -8,7 +8,7 @@ export class Node {
 	name: string;
 	type: string | undefined;
 	userData: object;
-  readonly isNode: true;
+	readonly isNode: true;
 	frameId: number | undefined;
 
 	analyze( builder: NodeBuilder, settings?: object ): void;
