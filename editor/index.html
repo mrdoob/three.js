@@ -49,12 +49,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { Editor } from './js/Editor.js';
-			import { Viewport } from './js/Viewport.js';
-			import { Toolbar } from './js/Toolbar.js';
-			import { Script } from './js/Script.js';
-			import { Player } from './js/Player.js';
-			import { Sidebar } from './js/Sidebar.js';
-			import { Menubar } from './js/Menubar.js';
+			import { EditorView } from './js/EditorView.js';
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
@@ -68,24 +63,8 @@
 			//
 
 			var editor = new Editor();
-
-			var viewport = new Viewport( editor );
-			document.body.appendChild( viewport.dom );
-
-			var toolbar = new Toolbar( editor );
-			document.body.appendChild( toolbar.dom );
-
-			var script = new Script( editor );
-			document.body.appendChild( script.dom );
-
-			var player = new Player( editor );
-			document.body.appendChild( player.dom );
-
-			var sidebar = new Sidebar( editor );
-			document.body.appendChild( sidebar.dom );
-
-			var menubar = new Menubar( editor );
-			document.body.appendChild( menubar.dom );
+            var editorview = new EditorView( editor );
+            document.body.appendChild( editorview.dom );
 
 			//
 
