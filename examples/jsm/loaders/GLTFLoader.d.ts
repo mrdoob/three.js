@@ -29,8 +29,8 @@ export interface GLTF {
 export class GLTFLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
-	dracoLoader: DRACOLoader | null;
-	ddsLoader: DDSLoader | null;
+	dracoLoader: DRACOLoader | null;
+	ddsLoader: DDSLoader | null;
 
 	load( url: string, onLoad: ( gltf: GLTF ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 	setDRACOLoader( dracoLoader: DRACOLoader ): GLTFLoader;

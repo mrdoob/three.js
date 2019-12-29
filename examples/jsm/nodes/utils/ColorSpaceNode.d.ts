@@ -7,7 +7,7 @@ export class ColorSpaceNode extends TempNode {
 	constructor( input: Node, method?: string );
 
 	input: Node;
-	method: string | undefined;
+	method: string | undefined;
 	nodeType: string;
 
 	fromEncoding( encoding: number );
