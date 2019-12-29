@@ -10,10 +10,10 @@ export class CameraNode extends TempNode {
 	constructor( scope?: string, camera?: Camera );
 
 	scope: string;
-	near: FloatNode | undefined;
-	far: FloatNode | undefined;
-	camera: Camera | undefined;
-	updateFrame: boolean | undefined;
+	near: FloatNode | undefined;
+	far: FloatNode | undefined;
+	camera: Camera | undefined;
+	updateFrame: boolean | undefined;
 	nodeType: string;
 
 	setCamera( camera: Camera ): void;

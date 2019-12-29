@@ -6,10 +6,10 @@ export class Node {
 
 	uuid: string;
 	name: string;
-	type: string | undefined;
+	type: string | undefined;
 	userData: object;
-	readonly isNode: true;
-	frameId: number | undefined;
+  readonly isNode: true;
+	frameId: number | undefined;
 
 	analyze( builder: NodeBuilder, settings?: object ): void;
 	analyzeAndFlow( builder: NodeBuilder, output: string, settings?: object ): object;
