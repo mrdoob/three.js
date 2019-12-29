@@ -7,7 +7,7 @@ import {
 
 export class MorphBlendMesh extends Mesh {
 
-	constructor( geometry: BufferGeometry | Geometry, material: Material );
+	constructor( geometry: BufferGeometry | Geometry, material: Material );
 	animationsMap: object;
 	animationsList: object[];
 
