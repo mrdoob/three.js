@@ -418,29 +418,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyToBufferAttribute", ( assert ) => {
-
-			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
-			var attr = new Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
-			var expected = new Float32BufferAttribute( [
-				0.1666666716337204, 0.4444444477558136, 0.7222222089767456,
-				0.1599999964237213, 0.4399999976158142, 0.7200000286102295
-			], 3 );
-
-			var applied = a.applyToBufferAttribute( attr );
-
-			assert.strictEqual( expected.count, applied.count, "Applied buffer and expected buffer have the same number of entries" );
-
-			for ( var i = 0, l = expected.count; i < l; i ++ ) {
-
-				assert.ok( Math.abs( applied.getX( i ) - expected.getX( i ) ) <= eps, "Check x" );
-				assert.ok( Math.abs( applied.getY( i ) - expected.getY( i ) ) <= eps, "Check y" );
-				assert.ok( Math.abs( applied.getZ( i ) - expected.getZ( i ) ) <= eps, "Check z" );
-
-			}
-
-		} );
-
 		QUnit.test( "determinant", ( assert ) => {
 
 			var a = new Matrix4();
