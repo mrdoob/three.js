@@ -92,24 +92,6 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
-	applyToBufferAttribute: function ( attribute ) {
-
-		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
-
-			_vector.x = attribute.getX( i );
-			_vector.y = attribute.getY( i );
-			_vector.z = attribute.getZ( i );
-
-			_vector.applyMatrix3( this );
-
-			attribute.setXYZ( i, _vector.x, _vector.y, _vector.z );
-
-		}
-
-		return attribute;
-
-	},
-
 	multiply: function ( m ) {
 
 		return this.multiplyMatrices( this, m );

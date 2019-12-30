@@ -74,18 +74,6 @@ export class Matrix3 implements Matrix {
 	clone(): this;
 	copy( m: Matrix3 ): this;
 	setFromMatrix4( m: Matrix4 ): Matrix3;
-
-	/**
-	 * @deprecated Use {@link Matrix3#applyToBufferAttribute matrix3.applyToBufferAttribute( attribute )} instead.
-	 */
-	applyToBuffer(
-		buffer: BufferAttribute,
-		offset?: number,
-		length?: number
-	): BufferAttribute;
-
-	applyToBufferAttribute( attribute: BufferAttribute ): BufferAttribute;
-
 	multiplyScalar( s: number ): Matrix3;
 	determinant(): number;
 	getInverse( matrix: Matrix3, throwOnDegenerate?: boolean ): Matrix3;
