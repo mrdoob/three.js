@@ -15,5 +15,6 @@ export class AmbientLight extends Light {
 	constructor( color?: Color | string | number, intensity?: number );
 
 	castShadow: boolean;
+	readonly isAmbientLight: true;
 
 }

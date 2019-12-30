@@ -50,7 +50,7 @@ export class Geometry extends EventDispatcher {
 
 	uuid: string;
 
-	isGeometry: boolean;
+	readonly isGeometry: true;
 
 	/**
 	 * Name for this geometry. Default is an empty string.
