@@ -27,7 +27,7 @@ export class Vector3 implements Vector {
 	x: number;
 	y: number;
 	z: number;
-	isVector3: true;
+	readonly isVector3: true;
 
 	/**
 	 * Sets value of this vector.

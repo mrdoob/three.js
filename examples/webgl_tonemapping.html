@@ -31,7 +31,7 @@
 				opacity: 1.0,
 				roughness: 1.0,
 				bumpScale: 1.0,
-				exposure: 3.0,
+				exposure: 2.0,
 				whitePoint: 5.0,
 				toneMapping: "Uncharted2",
 				renderMode: "Renderer"
@@ -134,10 +134,9 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
+					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
-						standardMaterial.envMap = pmremGenerator.fromEquirectangular( hdrEquirect ).texture;
-						standardMaterial.needsUpdate = true;
+						scene.environment = pmremGenerator.fromEquirectangular( hdrEquirect ).texture;
 
 						hdrEquirect.dispose();
 						pmremGenerator.dispose();
@@ -179,7 +178,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

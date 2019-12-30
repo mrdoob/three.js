@@ -1,4 +1,4 @@
-import { Camera, MOUSE, Object3D, TOUCH, Vector3 } from '../../../src/Three';
+import { Camera, MOUSE, TOUCH, Vector3 } from '../../../src/Three';
 
 export class OrbitControls {
 

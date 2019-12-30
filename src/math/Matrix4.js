@@ -415,24 +415,6 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	applyToBufferAttribute: function ( attribute ) {
-
-		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
-
-			_v1.x = attribute.getX( i );
-			_v1.y = attribute.getY( i );
-			_v1.z = attribute.getZ( i );
-
-			_v1.applyMatrix4( this );
-
-			attribute.setXYZ( i, _v1.x, _v1.y, _v1.z );
-
-		}
-
-		return attribute;
-
-	},
-
 	determinant: function () {
 
 		var te = this.elements;

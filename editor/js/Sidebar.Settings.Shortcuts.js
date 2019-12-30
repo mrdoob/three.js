@@ -2,7 +2,11 @@
  * @author TyLindberg / https://github.com/TyLindberg
  */
 
-Sidebar.Settings.Shortcuts = function ( editor ) {
+import { UIDiv, UIBreak, UIText, UIRow, UIInput } from './libs/ui.js';
+
+import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
+
+var SidebarSettingsShortcuts = function ( editor ) {
 
 	var strings = editor.strings;
 
@@ -17,17 +21,17 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 	var config = editor.config;
 	var signals = editor.signals;
 
-	var container = new UI.Div();
-	container.add( new UI.Break() );
+	var container = new UIDiv();
+	container.add( new UIBreak() );
 
 	var shortcuts = [ 'translate', 'rotate', 'scale', 'undo', 'focus' ];
 
 	function createShortcutInput( name ) {
 
 		var configName = 'settings/shortcuts/' + name;
-		var shortcutRow = new UI.Row();
+		var shortcutRow = new UIRow();
 
-		var shortcutInput = new UI.Input().setWidth( '150px' ).setFontSize( '12px' );
+		var shortcutInput = new UIInput().setWidth( '150px' ).setFontSize( '12px' );
 		shortcutInput.setTextTransform( 'lowercase' );
 		shortcutInput.onChange( function () {
 
@@ -78,7 +82,7 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 		}
 
 		shortcutInput.dom.maxLength = 1;
-		shortcutRow.add( new UI.Text( strings.getKey( 'sidebar/settings/shortcuts/' + name ) ).setTextTransform( 'capitalize' ).setWidth( '90px' ) );
+		shortcutRow.add( new UIText( strings.getKey( 'sidebar/settings/shortcuts/' + name ) ).setTextTransform( 'capitalize' ).setWidth( '90px' ) );
 		shortcutRow.add( shortcutInput );
 
 		container.add( shortcutRow );
@@ -167,3 +171,5 @@ Sidebar.Settings.Shortcuts = function ( editor ) {
 	return container;
 
 };
+
+export { SidebarSettingsShortcuts };

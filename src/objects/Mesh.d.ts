@@ -16,7 +16,7 @@ export class Mesh extends Object3D {
 	material: Material | Material[];
 	morphTargetInfluences?: number[];
 	morphTargetDictionary?: { [key: string]: number };
-	isMesh: true;
+	readonly isMesh: true;
 	type: string;
 
 	updateMorphTargets(): void;

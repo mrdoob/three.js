@@ -1,7 +1,6 @@
 import {
 	Camera,
 	Scene,
-	Vector2,
 	WebGLRenderer
 } from '../../../src/Three';
 

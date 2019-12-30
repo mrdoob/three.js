@@ -588,10 +588,10 @@ Object.assign( Matrix3.prototype, {
 		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.' );
 
 	},
-	applyToBuffer: function ( buffer /*, offset, length */ ) {
+	applyToBufferAttribute: function ( attribute ) {
 
-		console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
-		return this.applyToBufferAttribute( buffer );
+		console.warn( 'THREE.Matrix3: .applyToBufferAttribute() has been removed. Use attribute.applyMatrix3( matrix ) instead.' );
+		return attribute.applyMatrix3( this );
 
 	},
 	applyToVector3Array: function ( /* array, offset, length */ ) {
@@ -687,10 +687,10 @@ Object.assign( Matrix4.prototype, {
 		console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 
 	},
-	applyToBuffer: function ( buffer /*, offset, length */ ) {
+	applyToBufferAttribute: function ( attribute ) {
 
-		console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
-		return this.applyToBufferAttribute( buffer );
+		console.warn( 'THREE.Matrix4: .applyToBufferAttribute() has been removed. Use attribute.applyMatrix4( matrix ) instead.' );
+		return attribute.applyMatrix4( this );
 
 	},
 	applyToVector3Array: function ( /* array, offset, length */ ) {

@@ -181,14 +181,12 @@ var Projector = function () {
 		var uvs = [];
 
 		var object = null;
-		var material = null;
 
 		var normalMatrix = new Matrix3();
 
 		function setObject( value ) {
 
 			object = value;
-			material = object.material;
 
 			normalMatrix.getNormalMatrix( object.matrixWorld );
 

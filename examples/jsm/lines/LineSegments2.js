@@ -168,7 +168,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 				// check if the intersection point is within clip space
 				var zPos = _Math.lerp( start.z, end.z, param );
-				var isInClipSpace = zPos >= -1 && zPos <= 1;
+				var isInClipSpace = zPos >= - 1 && zPos <= 1;
 
 				var isInside = ssOrigin3.distanceTo( closestPoint ) < lineWidth * 0.5;
 
@@ -203,9 +203,9 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			}
 
-		}
+		};
 
-	} () )
+	}() )
 
 } );
 

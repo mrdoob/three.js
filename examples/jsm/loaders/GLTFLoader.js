@@ -2178,6 +2178,13 @@ var GLTFLoader = ( function () {
 
 		}
 
+		// https://github.com/mrdoob/three.js/issues/11438#issuecomment-507003995
+		if ( material.normalScale && ! useVertexTangents ) {
+
+			material.normalScale.y = - material.normalScale.y;
+
+		}
+
 		mesh.material = material;
 
 	};
