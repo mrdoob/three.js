@@ -60,7 +60,7 @@ var SidebarGeometryTorusGeometry = function ( editor, object ) {
 	// arc
 
 	var arcRow = new UIRow();
-	var arc = new UINumber( parameters.arc * THREE.Math.RAD2DEG ).setStep( 10 ).onChange( update );
+	var arc = new UINumber( parameters.arc * THREE.MathUtils.RAD2DEG ).setStep( 10 ).onChange( update );
 
 	arcRow.add( new UIText( strings.getKey( 'sidebar/geometry/torus_geometry/arc' ) ).setWidth( '90px' ) );
 	arcRow.add( arc );
@@ -77,7 +77,7 @@ var SidebarGeometryTorusGeometry = function ( editor, object ) {
 			tube.getValue(),
 			radialSegments.getValue(),
 			tubularSegments.getValue(),
-			arc.getValue() * THREE.Math.DEG2RAD
+			arc.getValue() * THREE.MathUtils.DEG2RAD
 		) ) );
 
 	}

@@ -227,7 +227,6 @@ var files = [
 
 	{ path: 'utils/BufferGeometryUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/GeometryUtils.js', dependencies: [], ignoreList: [] },
-	{ path: 'utils/MathUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
@@ -278,14 +277,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 		if ( p1 === '\'' ) return match; // Inside a string
 		if ( classNames.includes( p2 ) ) return `${p2}${p3}`;
 
-		if ( p1 === 'Math' ) {
-
-			coreDependencies[ '_Math' ] = true;
-
-			return '_Math.';
-
-		}
-
 		return match;
 
 	} );
@@ -310,14 +301,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 		if ( p1 === '\'' ) return match; // Inside a string
 		if ( classNames.includes( p2 ) ) return p2;
 
-		if ( p2 === 'Math' || p2 === '_Math' ) {
-
-			coreDependencies[ '_Math' ] = true;
-
-			return '_Math';
-
-		}
-
 		if ( p2 in THREE ) coreDependencies[ p2 ] = true;
 
 		// console.log( match, p2 );
@@ -330,7 +313,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	var keys = Object.keys( coreDependencies )
 		.filter( value => ! classNames.includes( value ) )
-		.map( value => value === '_Math' ? 'Math as _Math' : value )
 		.map( value => '\n\t' + value )
 		.sort()
 		.toString();

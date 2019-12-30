@@ -503,7 +503,7 @@ THREE.RaytracingRendererWorker = function () {
 
 		cameraNormalMatrix.getNormalMatrix( camera.matrixWorld );
 
-		perspective = 0.5 / Math.tan( THREE.Math.degToRad( camera.fov * 0.5 ) ) * canvasHeight;
+		perspective = 0.5 / Math.tan( THREE.MathUtils.degToRad( camera.fov * 0.5 ) ) * canvasHeight;
 
 		objects = scene.children;
 

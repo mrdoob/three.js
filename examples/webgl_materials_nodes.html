@@ -118,7 +118,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.uuid = THREE.Math.generateUUID(); // generate to library
+				renderer.uuid = THREE.MathUtils.generateUUID(); // generate to library
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
@@ -1146,7 +1146,7 @@
 
 						function updateUVTransform() {
 
-							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotate ) );
+							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.MathUtils.degToRad( rotate ) );
 
 						}
 
