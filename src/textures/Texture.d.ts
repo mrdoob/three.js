@@ -1,4 +1,4 @@
-import { Vector2, Vector } from './../math/Vector2';
+import { Vector2 } from './../math/Vector2';
 import { EventDispatcher } from './../core/EventDispatcher';
 import {
 	Mapping,

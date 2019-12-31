@@ -1,13 +1,9 @@
-import { Vector3 } from './Vector3.js';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://clara.io
  * @author tschw
  */
-
-var _vector = new Vector3();
 
 function Matrix3() {
 

@@ -1,7 +1,6 @@
 import { Vector3 } from './Vector3';
 import { Euler } from './Euler';
 import { Quaternion } from './Quaternion';
-import { BufferAttribute } from './../core/BufferAttribute';
 import { Matrix } from './Matrix3';
 /**
  * A 4x4 Matrix.
