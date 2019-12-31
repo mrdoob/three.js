@@ -14,13 +14,9 @@ function LightProbeHelper( lightProbe, size ) {
 
 	this.size = size;
 
-	var defines = {};
-	defines[ 'GAMMA_OUTPUT' ] = "";
-
-	// material
 	var material = new ShaderMaterial( {
 
-		defines: defines,
+		type: 'LightProbeHelperMaterial',
 
 		uniforms: {
 
@@ -53,20 +49,6 @@ function LightProbeHelper( lightProbe, size ) {
 			'	// matrix is assumed to be orthogonal',
 
 			'	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );',
-
-			'}',
-
-			'vec3 linearToOutput( in vec3 a ) {',
-
-			'	#ifdef GAMMA_OUTPUT',
-
-			'		return pow( a, vec3( 1.0 / float( GAMMA_FACTOR ) ) );',
-
-			'	#else',
-
-			'		return a;',
-
-			'	#endif',
 
 			'}',
 
@@ -112,9 +94,7 @@ function LightProbeHelper( lightProbe, size ) {
 
 			'	vec3 outgoingLight = RECIPROCAL_PI * irradiance * intensity;',
 
-			'	outgoingLight = linearToOutput( outgoingLight );',
-
-			'	gl_FragColor = vec4( outgoingLight, 1.0 );',
+			'	gl_FragColor = linearToOutputTexel( vec4( outgoingLight, 1.0 ) );',
 
 			'}'
 
