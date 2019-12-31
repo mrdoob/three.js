@@ -1,5 +1,4 @@
 import { Matrix4 } from './Matrix4';
-import { BufferAttribute } from './../core/BufferAttribute';
 import { Vector3 } from './Vector3';
 
 /**
