@@ -473,11 +473,13 @@ The `RectAreaLight` only works with the `MeshStandardMaterial` and the
 }
 ```
 
-To use the `RectAreaLight` we need to include some extra three.js optional data
+To use the `RectAreaLight` we need to include some extra three.js optional data and we'll
+include the `RectAreaLightHelper` to help us visualize the light
 
 ```js
 import * as THREE from './resources/three/r112/build/three.module.js';
 +import {RectAreaLightUniformsLib} from './resources/threejs/r112/examples/jsm/lights/RectAreaLightUniformsLib.js';
++import {RectAreaLightHelper} from './resources/threejs/r112/examples/jsm/helpers/RectAreaLightHelper.js';
 ```
 
 and we need to call `RectAreaLightUniformsLib.init`
@@ -504,7 +506,7 @@ light.position.set(0, 10, 0);
 +light.rotation.x = THREE.Math.degToRad(-90);
 scene.add(light);
 
-*const helper = new THREE.RectAreaLightHelper(light);
+*const helper = new RectAreaLightHelper(light);
 *light.add(helper);
 ```
 

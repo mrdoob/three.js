@@ -51,8 +51,7 @@ function main() {
     controls.update();
   }
 
-  renderer.gammaInput = true;
-  renderer.gammaOutput = true;
+  renderer.outputEncoding = THREE.GammaEncoding;
   renderer.shadowMap.enabled = true;
 
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);

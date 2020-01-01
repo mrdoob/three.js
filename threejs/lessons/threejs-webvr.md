@@ -1,61 +1,87 @@
-Title: Three.js WebVR
+Title: Three.js VR
 Description: How to use Virtual Reality in Three.js.
-TOC: WebVR - Basics
+TOC: VR - Basics
 
-Making WebVR apps in three.js is pretty simple. You basically just have to tell
-three.js you want to use WebVR. If you think about it a few things about WebVR
+Making a VR app in three.js is pretty simple. You basically just have to tell
+three.js you want to use WebXR. If you think about it a few things about WebXR
 should be clear. Which way the camera is pointing is supplied by the VR system
 itself since the user turns their head to choose a direction to look. Similarly
 the field of view and aspect will be supplied by the VR system since each system
 has a different field of view and display aspect.
 
-Let's take an example from the article on [making a responsive
-webpage](threejs-responsive.html) and make it support VR.
+Let's take an example from the article on [making a responsive webpage](threejs-responsive.html)
+and make it support VR.
 
 Before we get started you're going to need a VR capable device like an Android
-smartphone, Google Daydream, Oculus Go, Oculus Rift, Vive, Samsung Gear VR, an
-iPhone with a [WebVR browser](https://itunes.apple.com/us/app/webvr-browser/id1286543066?mt=8).
+smartphone, Google Daydream, Oculus Go, Oculus Rift, Vive, Samsung Gear VR., an
+iPhone with a [WebXR browser](https://apps.apple.com/us/app/webxr-viewer/id1295998056).
 
 Next, if you are running locally you need to run a simple web server like is
 covered in [the article on setting up](threejs-setup.html). 
 
-You then need to look up the *local* IP address of your computer. On Mac you can
-Option-Click the WiFi controls (assuming you're on Wifi). 
+If the device you are using to view VR is not the same computer you're running
+on you need to serve your webpage via https or else the browser will not allow using
+the WebXR API. Setting up https is a complicated topic but there is a relatively
+simple service with a free level that will make this issue easy called "[ngrok](https://ngrok.com/)".
 
-<div class="threejs_center"><img src="resources/images/ipaddress-macos.png" style="width: 428px;"></div>
+Here are the steps to use it. 
 
-On Windows you can
-[click the Wifi icon in the taskbar and then click "Properties" for a particular
-network connection](https://support.microsoft.com/en-us/help/4026518/windows-10-find-your-ip-address).
+1. [Download ngrok](https://ngrok.com/download)
 
-If you see more than one IP address, local IP addresses most commonly start with
-`10.` or `192.` or `172.`. If you see an address that starts with `127.` that
-address is for your computer only. It's the address the computer can use to talk
-to itself so ignore anything that starts with `127.`.
+2. [Create an ngrok account](https://dashboard.ngrok.com/signup)
 
-On your VR device, first make sure it's connected to the same WiFi as your
-computer. Then, open your browser and type in `http://<ipaddress:port>`. Which
-port depends on what server you're running. If you're using
-[Servez](https://greggman.github.io/servez) or the servez from node.js then
-the port will likely be 8080.
+3. Look up your authtoken
 
-On my computer as I write this article its IP address is `192.168.100.78` and my
-web server is using port 8080 so on my VR device I'd enter
-`http://192.168.100.78:8080` to get the main page of my webserver to appear. If
-you've downloaded these articles and are serving them you should see the front
-page of this website appear. If you're making a new page then you might need to
-add the path to your page for example when entering the URL on your VR device
-something like `http://192.168.100.78:8080/path/to/page.html`
+    You can find it by clicking "auth" on the left
 
-Note that anytime you switch networks your local ip address will change.
-Even on the same network when you re-connect to it your local ip address
-might change so you will need to look it up again and type a different
-address into your VR device.
+    <img src="resources/images/ngrok-auth.png" style="width: 996px;">
 
-Also note that this will likely work on your home network or your work network but
-may likely **not work** at a cafe. The WiFi at many cafe's, especially at large
-chains like Starbucks or McDonalds are configured so that machines on the local
-network can not talk to each other.
+4. Run the ngrok authtoken command.
+
+    In a command line / terminal run the ngrok authtoken command.
+
+    ```
+    ./ngrok authtoken yourngroktokengoeshere
+    ```
+
+    Replace `yourngrontokengoeshere` with the token you looked up step 3.
+    Note: If you're in Windows you will type `ngrok` instead of `./ngrok`
+
+5. Run your web server and note the port number
+
+   Run your server as shown in [the setup article](threejs-setup.html). Note the
+   port the server is running on. If you use the same server mentioned in
+   [that article](threejs-setup.html) the port will probably be 8080
+
+6. Run the ngrok http command
+
+    ```
+    ./ngrok http 8080
+    ```
+
+    Replace your 8080 with the port your webserver is running on
+
+Once you do this you should see something like
+
+```
+ngrok by @inconshreveable     
+
+(Ctrl+C to quit)
+
+Session Status                online
+Account                       Gregg Tavares (Plan: Free)
+Version                       2.3.35
+Region                        United States (us)
+Web Interface                 http://127.0.0.1:4040
+Forwarding                    http://6a4db28f.ngrok.io -> http://localhost:8080
+Forwarding                    https://6a4db28f.ngrok.io -> http://localhost:8080
+
+Connections                   ttl     opn     rt1     rt5     p50     p90
+                              120     0       0.00    0.00    3.84    5.18
+```
+
+You can now connect your VR device's browser to the https url shown.
+**BE SURE TO TYPE `https://` in front of the url!**
 
 If you're really going to do WebVR development another thing you should learn about is
 [remote debugging](https://developers.google.com/web/tools/chrome-devtools/remote-debugging/)
@@ -70,39 +96,30 @@ including three.js
 
 ```js
 import * as THREE from './resources/three/r112/build/three.module.js';
-+import {WEBVR} from './resources/threejs/r112/examples/jsm/vr/WebVR.js';
++import {VRButton} from './resources/threejs/r112/examples/jsm/webxr/VRButton.js';
 ```
 
-Then we need to enable three.js's WebVR support and add its
-WebVR button to our page
+Then we need to enable three.js's WebXR support and add its
+VR button to our page
 
 ```js
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
-+  renderer.vr.enabled = true;
-+  document.body.appendChild(WEBVR.createButton(renderer));
++  renderer.xr.enabled = true;
++  document.body.appendChild(VRButton.createButton(renderer));
 ```
 
-We need to not try to resize when in VR mode as the VR device
-will decide the size
-
-```js
--if (resizeRendererToDisplaySize(renderer)) {
-+if (!renderer.vr.isPresenting() && resizeRendererToDisplaySize(renderer)) {
-```
-
-The last major thing we need to do is let three.js run our
-render loop. Until now we have used a `requestAnimationFrame`
-loop but to support VR we need to let three.js handle our
-render loop for us. We can do that by calling `WebGLRenderer.setAnimationLoop`
-and passing a function to call for the loop.
+We need to let three.js run our render loop. Until now we have used a
+`requestAnimationFrame` loop but to support VR we need to let three.js handle
+our render loop for us. We can do that by calling
+`WebGLRenderer.setAnimationLoop` and passing a function to call for the loop.
 
 ```js
 function render(time) {
   time *= 0.001;
 
-  if (!renderer.vr.isPresenting() && resizeRendererToDisplaySize(renderer)) {
+  if (resizeRendererToDisplaySize(renderer)) {
     const canvas = renderer.domElement;
     camera.aspect = canvas.clientWidth / canvas.clientHeight;
     camera.updateProjectionMatrix();
@@ -124,14 +141,15 @@ function render(time) {
 +renderer.setAnimationLoop(render);
 ```
 
-You'd think that would be it but there is one more detail.
-In VR just like we don't control the field of view and direction
-the camera is looking we also don't control where the camera
-starts. At least not as of three.js r105. The camera is hardcoded
-to default to `x = 0`, `y = 1.6`, `z = 0`
+There is one more detail. We should probably set a camera height
+that's kind of average for a standing user.
 
-Before we had the cubes along the X axis at Y and Z = 0.
-Let's move them to be in front of the default VR camera.
+```js
+const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
++camera.position.set(0, 1.6, 0);
+```
+
+and move the cubes up to be in front of the camera
 
 ```js
 const cube = new THREE.Mesh(geometry, material);
@@ -143,29 +161,17 @@ cube.position.x = x;
 ```
 
 We set them to `z = -2` since the camera will now be at `z = 0` and
-cameras default to looking down the -z axis.
-
-Let's also remove setting our camera's position since three.js
-will override it anyway.
-
-```js
-const fov = 75;
-const aspect = 2;  // the canvas default
-const near = 0.1;
-const far = 5;
-const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
--camera.position.z = 2;
-```
+camera defaults to looking down the -z axis.
 
 This brings up an extremely important point. **Units in VR are in meters**.
 In other words **One Unit = One Meter**. This means the camera is 1.6 meters above 0.
 The cube's centers are 2 meters in front of the camera. Each cube
 is 1x1x1 meter large. This is important because VR needs to adjust things to the
 user *in the real world*. That means we need the units used in three.js to match
-the user's on movements.
+the user's own movements.
 
 And with that we should get 3 spinning cubes in front
-of the camera with a button to enter WebVR.
+of the camera with a button to enter VR.
 
 {{{example url="../threejs-webvr-basic.html" }}}
 
@@ -194,12 +200,12 @@ That's better.
 
 {{{example url="../threejs-webvr-basic-w-background.html" }}}
 
-Note: To actually see WebVR you will need a WebVR compatible device.
-I believe most Android Phones can support WebVR using Chrome or Firefox.
-For iOS you might be able to use this [WebVR App](https://itunes.apple.com/us/app/webvr-browser/id1286543066?mt=8)
-though in general WebVR support on iOS is unsupported as of May 2019.
+Note: To actually see VR you will need a WebXR compatible device.
+I believe most Android Phones can support WebXR using Chrome or Firefox.
+For iOS you might be able to use this [WebXR App](https://apps.apple.com/us/app/webxr-viewer/id1295998056)
+though in general WebXR support on iOS is unsupported as of May 2019.
 
-To use WebVR on Android or iPhone you'll need a *VR Headset*
+To use WebXR on Android or iPhone you'll need a *VR Headset*
 for phones. You can get them for anywhere from $5 for one made of cardboard
 to $100. Unfortunately I don't know which ones to recommend. I've purchased
 6 of them over the years and they are all of varying quality. I've
@@ -291,28 +297,27 @@ There are also 3 basic types of devices.
    6 degree of freedom devices include the Vive and Vive Pro,
    the Oculus Rift and Quest, and I believe all of the Windows MR devices.
 
-With all that covered I don't for sure know which devices will work with WebVR.
+With all that covered I don't for sure know which devices will work with WebXR.
 I'm 99% sure that most Android phones will work when running Chrome. You may
-need to turn on VR support in [`about:flags`](about:flags). I also know Google
-Daydream will also work and similarly you need to enable VR support in
+need to turn on WebXR support in [`about:flags`](about:flags). I also know Google
+Daydream will also work and similarly you need to enable WebXR support in
 [`about:flags`](about:flags). Oculus Rift, Vive, and Vive Pro will work via
 Chrome or Firefox. I'm less sure about Oculus Go and Oculus Quest as both of
 them use custom OSes but according to the internet they both appear to work.
 
-Okay, after that long detour about VR Devices and WebVR
+Okay, after that long detour about VR Devices and WebXR
 there's some things to cover
 
 * Supporting both VR and Non-VR
 
-  AFAICT, at least as of r105, there is no easy way to support
-both VR and non-VR modes with three.js. With VR enabled but not in VR mode
-the camera's position is hard coded to `0, 1.6, 0`. Ideally
+  AFAICT, at least as of r112, there is no easy way to support
+both VR and non-VR modes with three.js. Ideally
 if not in VR mode you'd be able to control the camera using
 whatever means you want, for example the `OrbitControls`,
 and you'd get some kind of event when switching into and
 out of VR mode so that you could turn the controls on/off.
 
-  If three.js adds some support to do both I'll try to update
+If three.js adds some support to do both I'll try to update
 this article. Until then you might need 2 versions of your 
 site OR pass in a flag in the URL, something like
 
@@ -356,24 +361,24 @@ in your code you could use that parameter like this
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
--  renderer.vr.enabled = true;
--  document.body.appendChild(WEBVR.createButton(renderer));
+-  renderer.xr.enabled = true;
+-  document.body.appendChild(VRButton.createButton(renderer));
 
   const fov = 75;
   const aspect = 2;  // the canvas default
   const near = 0.1;
   const far = 5;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(0, 1.6, 0);
 
 +  const params = (new URL(document.location)).searchParams;
 +  const allowvr = params.get('allowvr') === 'true';
 +  if (allowvr) {
-+    renderer.vr.enabled = true;
-+    document.body.appendChild(WEBVR.createButton(renderer));
++    renderer.xr.enabled = true;
++    document.body.appendChild(VRButton.createButton(renderer));
 +    document.querySelector('#vr').style.display = 'none';
 +  } else {
 +    // no VR, add some controls
-+    camera.position.y = 1.6;
 +    const controls = new OrbitControls(camera, canvas);
 +    controls.target.set(0, 1.6, -2);
 +    controls.update();
@@ -408,7 +413,7 @@ be able to click "Enter VR" if you're on a VR device.
   generally do is make it so there are some buttons or objects in the user's view
   and if the user aligns some marker in the center of the display
   on those objects for 1/2 a second or so then that button is clicked.
-  A common UX is to display a small timer will appear over the object indicating
+  A common UX is to display a small timer that will appear over the object indicating
   if you keep the marker there for a moment the object/button will be selected.
 
   Since there is no other input that's about the best you can do
@@ -437,6 +442,6 @@ As you can see getting started in VR is pretty easy but
 actually making something shippable in VR will require
 lots of decision making and design.
 
-This was a pretty brief intro into WebVR with three.js. We'll
-cover some of the input methods in future articles.
+This was a pretty brief intro into VR with three.js. We'll
+cover some of the input methods in [future articles](threejs-webvr-look-to-select.html).
 

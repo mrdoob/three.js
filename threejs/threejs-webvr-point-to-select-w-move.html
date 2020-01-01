@@ -21,20 +21,21 @@
   </body>
 <script type="module">
 import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {WEBVR} from './resources/threejs/r112/examples/jsm/vr/WebVR.js';
+import {VRButton} from './resources/threejs/r112/examples/jsm/webxr/VRButton.js';
 import {SceneUtils} from './resources/threejs/r112/examples/jsm/utils/SceneUtils.js';
 
 function main() {
   const canvas = document.querySelector('#c');
   const renderer = new THREE.WebGLRenderer({canvas});
-  renderer.vr.enabled = true;
-  document.body.appendChild(WEBVR.createButton(renderer));
+  renderer.xr.enabled = true;
+  document.body.appendChild(VRButton.createButton(renderer));
 
   const fov = 75;
   const aspect = 2;  // the canvas default
   const near = 0.1;
   const far = 50;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(0, 1.6, 0);
 
   const scene = new THREE.Scene();
   {
@@ -125,7 +126,7 @@ function main() {
       };
 
       for (let i = 0; i < 2; ++i) {
-        const controller = renderer.vr.getController(i);
+        const controller = renderer.xr.getController(i);
         controller.addEventListener('select', selectListener);
         controller.addEventListener('selectstart', selectListener);
         controller.addEventListener('selectend', endListener);
@@ -215,7 +216,7 @@ function main() {
   function render(time) {
     time *= 0.001;
 
-    if (!renderer.vr.isPresenting() && resizeRendererToDisplaySize(renderer)) {
+    if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();

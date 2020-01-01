@@ -100,7 +100,7 @@ function main() {
   function render(time) {
     time *= 0.001;
 
-    if (!renderer.vr.isPresenting() && resizeRendererToDisplaySize(renderer)) {
+    if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
       const aspect = canvas.clientWidth / canvas.clientHeight;
       camera.left = -aspect;

@@ -1,13 +1,13 @@
-Title: Three.js WebVR - Look to Select
+Title: Three.js VR - Look to Select
 Description: How to implement Look to Select.
-TOC: WebVR - Look To Select
+TOC: VR - Look To Select
 
 **NOTE: The examples on this page require a VR capable
 device. Without one they won't work. See [previous article](threejs-webvr.html)
 as to why**
 
 In the [previous article](threejs-webvr.html) we went over
-a very simple WebVR example using three.js and we discussed
+a very simple VR example using three.js and we discussed
 the various kinds of VR systems.
 
 The simplest and possibly most common is the Google Cardboard style of VR which
@@ -94,7 +94,7 @@ One easy way we could do that is to make a 2 color texture
 and use a texture offset to slide the texture across a model.
 
 Let's do this by itself to see it work before we add it to
-the WebVR example.
+the VR example.
 
 First we make an `OrthographicCamera`
 
@@ -268,7 +268,7 @@ A few things to notice **and try**.
   with a `MeshBasicMaterial` it will look exactly like a ring and the
   texture coordinates go around the ring so it works for our needs.
 
-Let's integrate it with our WebVR code above. 
+Let's integrate it with our VR code above. 
 
 ```js
 class PickHelper {
@@ -469,3 +469,5 @@ And with that we should have a pretty decent *look to select* implementation.
 I hope this example gave some ideas of how to implement a "look to select"
 type of Google Cardboard level UX. Sliding textures using texture coordinates
 offsets is also a commonly useful technique.
+
+Next up [let's allow the user that has a VR controller to point at and move things](threejs-webvr-point-to-select.html).

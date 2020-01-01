@@ -30,7 +30,7 @@
   </body>
 <script type="module">
 import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {WEBVR} from './resources/threejs/r112/examples/jsm/vr/WebVR.js';
+import {VRButton} from './resources/threejs/r112/examples/jsm/webxr/VRButton.js';
 import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
 
 function main() {
@@ -42,16 +42,16 @@ function main() {
   const near = 0.1;
   const far = 5;
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+  camera.position.set(0, 1.6, 0);
 
   const params = (new URL(document.location)).searchParams;
   const allowvr = params.get('allowvr') === 'true';
   if (allowvr) {
-    renderer.vr.enabled = true;
-    document.body.appendChild(WEBVR.createButton(renderer));
+    renderer.xr.enabled = true;
+    document.body.appendChild(VRButton.createButton(renderer));
     document.querySelector('#vr').style.display = 'none';
   } else {
     // no VR, add some controls
-    camera.position.y = 1.6;
     const controls = new OrbitControls(camera, canvas);
     controls.target.set(0, 1.6, -2);
     controls.update();
@@ -118,7 +118,7 @@ function main() {
   function render(time) {
     time *= 0.001;
 
-    if (!renderer.vr.isPresenting() && resizeRendererToDisplaySize(renderer)) {
+    if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement;
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();

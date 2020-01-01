@@ -471,6 +471,7 @@ gui.add(light, 'penumbra', 0, 1, 0.01);
 ```js
 import * as THREE from './resources/three/r112/build/three.module.js';
 +import {RectAreaLightUniformsLib} from './resources/threejs/r112/examples/jsm/lights/RectAreaLightUniformsLib.js';
++import {RectAreaLightHelper} from './resources/threejs/r112/examples/jsm/helpers/RectAreaLightHelper.js';
 ```
 
 ```js
@@ -495,7 +496,7 @@ light.position.set(0, 10, 0);
 +light.rotation.x = THREE.Math.degToRad(30);
 scene.add(light);
 
-*const helper = new THREE.RectAreaLightHelper(light);
+*const helper = new RectAreaLightHelper(light);
 scene.add(helper);
 ```
 

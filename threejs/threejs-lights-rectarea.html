@@ -24,6 +24,7 @@
 import * as THREE from './resources/threejs/r112/build/three.module.js';
 import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
 import {RectAreaLightUniformsLib} from './resources/threejs/r112/examples/jsm/lights/RectAreaLightUniformsLib.js';
+import {RectAreaLightHelper} from './resources/threejs/r112/examples/jsm/helpers/RectAreaLightHelper.js';
 import {GUI} from '../3rdparty/dat.gui.module.js';
 
 function main() {
@@ -128,7 +129,7 @@ function main() {
     light.rotation.x = THREE.Math.degToRad(-90);
     scene.add(light);
 
-    const helper = new THREE.RectAreaLightHelper(light);
+    const helper = new RectAreaLightHelper(light);
     light.add(helper);
 
     function updateLight() {

@@ -1,13 +1,13 @@
-Title: Three.js WebVR - 3DOF Point to Select
+Title: Three.js VR - 3DOF Point to Select
 Description: How to implement 3DOF Point to Select.
-TOC: WebVR - Point To Select
+TOC: VR - Point To Select
 
 **NOTE: The examples on this page require a VR capable
 device with a pointing device. Without one they won't work. See [this article](threejs-webvr.html)
 as to why**
 
 In the [previous article](threejs-webvr-look-to-select.html) we went over
-a very simple WebVR example where we let the user choose things by
+a very simple VR example where we let the user choose things by
 pointing via looking. In this article we will take it one step further
 and let the user choose with a pointing device 
 
@@ -52,7 +52,7 @@ class ControllerPickHelper {
 
     this.controllers = [];
     for (let i = 0; i < 2; ++i) {
-      const controller = renderer.vr.getController(i);
+      const controller = renderer.xr.getController(i);
       scene.add(controller);
 
       const line = new THREE.Line(pointerGeometry);
@@ -90,7 +90,7 @@ class ControllerPickHelper {
 
     this.controllers = [];
     for (let i = 0; i < 2; ++i) {
-      const controller = renderer.vr.getController(i);
+      const controller = renderer.xr.getController(i);
       scene.add(controller);
 
       const line = new THREE.Line(pointerGeometry);
@@ -183,7 +183,7 @@ as our own `select` event.
 
     this.controllers = [];
     for (let i = 0; i < 2; ++i) {
-      const controller = renderer.vr.getController(i);
+      const controller = renderer.xr.getController(i);
 +      controller.addEventListener('select', (event) => {
 +        const controller = event.target;
 +        const selectedObject = this.controllerToObjectMap.get(controller);
@@ -243,7 +243,7 @@ class ControllerPickHelper extends THREE.EventDispatcher {
 +    };
 
     for (let i = 0; i < 2; ++i) {
-      const controller = renderer.vr.getController(i);
+      const controller = renderer.xr.getController(i);
 -      controller.addEventListener('select', (event) => {
 -        const controller = event.target;
 -        const selectedObject = this.controllerToObjectMap.get(event.target);
@@ -277,7 +277,7 @@ class ControllerPickHelper extends THREE.EventDispatcher {
     };
 
     for (let i = 0; i < 2; ++i) {
-      const controller = renderer.vr.getController(i);
+      const controller = renderer.xr.getController(i);
       controller.addEventListener('select', selectListener);
       controller.addEventListener('selectstart', selectListener);
 
@@ -310,7 +310,7 @@ class ControllerPickHelper extends THREE.EventDispatcher {
 +    };
     
     for (let i = 0; i < 2; ++i) {
-      const controller = renderer.vr.getController(i);
+      const controller = renderer.xr.getController(i);
       controller.addEventListener('select', selectListener);
       controller.addEventListener('selectstart', selectListener);
 +      controller.addEventListener('selectend', endListener);
@@ -368,7 +368,7 @@ We need to include them.
 
 ```js
 import * as THREE from './resources/three/r112/build/three.module.js';
-import {WEBVR} from './resources/threejs/r112/examples/jsm/vr/WebVR.js';
+import {VRButton} from './resources/threejs/r112/examples/jsm/webxr/VRButton.js';
 +import {SceneUtils} from './resources/threejs/r112/examples/jsm/utils/SceneUtils.js';
 ```
 
