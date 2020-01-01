@@ -58,7 +58,6 @@ const assets = [
 	'./js/libs/codemirror/mode/javascript.js',
 	'./js/libs/codemirror/mode/glsl.js',
 
-	'./js/libs/system.min.js',
 	'./js/libs/esprima.js',
 	'./js/libs/jsonlint.js',
 	'./js/libs/glslprep.min.js',
