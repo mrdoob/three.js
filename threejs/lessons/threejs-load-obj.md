@@ -46,7 +46,7 @@ that were being added to the scene.
 From that the first thing we need to do is include the `OBJLoader2` loader in our script.
 
 ```js
-import {OBJLoader2} from './resources/threejs/r110/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader2} from './resources/threejs/r112/examples/jsm/loaders/OBJLoader2.js';
 ```
 
 Then to load the .OBJ file we create an instance of `OBJLoader2`,
@@ -143,11 +143,11 @@ Now that we have the textures available we can load the .MTL file.
 First we need to include the `MTLLoader` and the `MtlObjBridge`;
 
 ```js
-import * as THREE from './resources/three/r110/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r110/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader2} from './resources/threejs/r110/examples/jsm/loaders/OBJLoader2.js';
-+import {MTLLoader} from './resources/threejs/r110/examples/jsm/loaders/MTLLoader.js';
-+import {MtlObjBridge} from './resources/threejs/r110/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
+import * as THREE from './resources/three/r112/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import {OBJLoader2} from './resources/threejs/r112/examples/jsm/loaders/OBJLoader2.js';
++import {MTLLoader} from './resources/threejs/r112/examples/jsm/loaders/MTLLoader.js';
++import {MtlObjBridge} from './resources/threejs/r112/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 ```
 
 Then we first load the .MTL file. When it's finished loading we add

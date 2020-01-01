@@ -367,9 +367,9 @@ scene.
 We need to include them.
 
 ```js
-import * as THREE from './resources/three/r110/build/three.module.js';
-import {WEBVR} from './resources/threejs/r110/examples/jsm/vr/WebVR.js';
-+import {SceneUtils} from './resources/threejs/r110/examples/jsm/utils/SceneUtils.js';
+import * as THREE from './resources/three/r112/build/three.module.js';
+import {WEBVR} from './resources/threejs/r112/examples/jsm/vr/WebVR.js';
++import {SceneUtils} from './resources/threejs/r112/examples/jsm/utils/SceneUtils.js';
 ```
 
 And with that we should be able to move the objects around with a 6DOF

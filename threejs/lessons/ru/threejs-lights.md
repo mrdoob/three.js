@@ -29,8 +29,8 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 включить их в нашу страницу.
 
 ```js
-import * as THREE from './resources/three/r110/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r110/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r112/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
 ```
 
 Теперь мы можем использовать их. Мы передаем в `OrbitControls` камеру для 
@@ -469,8 +469,8 @@ gui.add(light, 'penumbra', 0, 1, 0.01);
 Для использования `RectAreaLight` нам нужно включить некоторые дополнительные возможности three.js
 
 ```js
-import * as THREE from './resources/three/r110/build/three.module.js';
-+import {RectAreaLightUniformsLib} from './resources/threejs/r110/examples/jsm/lights/RectAreaLightUniformsLib.js';
+import * as THREE from './resources/three/r112/build/three.module.js';
++import {RectAreaLightUniformsLib} from './resources/threejs/r112/examples/jsm/lights/RectAreaLightUniformsLib.js';
 ```
 
 ```js

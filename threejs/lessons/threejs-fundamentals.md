@@ -41,7 +41,7 @@ and pass it to three.js.
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r110/build/three.module.js';
+import * as THREE from './resources/threejs/r112/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -333,7 +333,7 @@ both
 </p>
 <pre class=prettyprint>
 &lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r110/build/three.module.js';
+import * as THREE from './resources/threejs/r112/build/three.module.js';
 
 ...
 

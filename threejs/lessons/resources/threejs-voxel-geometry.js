@@ -1,5 +1,5 @@
-import * as THREE from '../../resources/threejs/r110/build/three.module.js';
-import {BufferGeometryUtils} from '../../resources/threejs/r110/examples/jsm/utils/BufferGeometryUtils.js';
+import * as THREE from '../../resources/threejs/r112/build/three.module.js';
+import {BufferGeometryUtils} from '../../resources/threejs/r112/examples/jsm/utils/BufferGeometryUtils.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
