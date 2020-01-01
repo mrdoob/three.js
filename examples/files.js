@@ -377,9 +377,6 @@ var files = {
 		"css3d_sprites",
 		"css3d_youtube"
 	],
-	"raytracing": [
-		"raytracing_sandbox"
-	],
 	"svg": [
 		"svg_lines",
 		"svg_sandbox"
