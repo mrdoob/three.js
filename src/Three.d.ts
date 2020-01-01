@@ -1,6 +1,6 @@
 export * from './polyfills';
 export * from './renderers/WebGLMultisampleRenderTarget';
-export * from './renderers/WebGLRenderTargetCube';
+export * from './renderers/WebGLCubeRenderTarget';
 export * from './renderers/WebGLRenderTarget';
 export * from './renderers/WebGLRenderer';
 export * from './renderers/shaders/ShaderLib';

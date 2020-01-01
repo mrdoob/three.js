@@ -82,7 +82,7 @@ import { Skeleton } from './objects/Skeleton.js';
 import { SkinnedMesh } from './objects/SkinnedMesh.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
-import { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
+import { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
@@ -1794,19 +1794,29 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 
 } );
 
+export function WebGLRenderTargetCube( width, height, options ) {
+
+	console.warn( 'THREE.WebGLRenderTargetCube has been renamed to WebGLCubeRenderTarget.' );
+	return new WebGLCubeRenderTarget( width, height, options );
+
+}
+
 //
+/*
+// commenting out for now. added in https://github.com/mrdoob/three.js/pull/15808.
+// todo: handle this legacy warning, or remove it.
 
 Object.defineProperties( WebGLRenderTargetCube.prototype, {
 
 	activeCubeFace: {
-		set: function ( /* value */ ) {
+		set: function () {
 
 			console.warn( 'THREE.WebGLRenderTargetCube: .activeCubeFace has been removed. It is now the second parameter of WebGLRenderer.setRenderTarget().' );
 
 		}
 	},
 	activeMipMapLevel: {
-		set: function ( /* value */ ) {
+		set: function () {
 
 			console.warn( 'THREE.WebGLRenderTargetCube: .activeMipMapLevel has been removed. It is now the third parameter of WebGLRenderer.setRenderTarget().' );
 
@@ -1815,6 +1825,7 @@ Object.defineProperties( WebGLRenderTargetCube.prototype, {
 
 } );
 
+*/
 //
 
 Object.defineProperties( WebGLRenderTarget.prototype, {

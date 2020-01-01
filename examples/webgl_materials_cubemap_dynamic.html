@@ -53,7 +53,7 @@
 					magFilter: THREE.LinearFilter
 				};
 
-				scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
+				scene.background = new THREE.WebGLCubeRenderTarget( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
 
 				//
 
