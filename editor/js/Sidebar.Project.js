@@ -5,7 +5,6 @@
 import * as THREE from '../../build/three.module.js';
 
 import { SVGRenderer } from '../../examples/jsm/renderers/SVGRenderer.js';
-import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
 
 import { UIPanel, UIRow, UIInput, UICheckbox, UISelect, UIText, UIListbox, UISpan, UIButton } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
@@ -21,8 +20,7 @@ var SidebarProject = function ( editor ) {
 	var rendererTypes = {
 
 		'WebGLRenderer': THREE.WebGLRenderer,
-		'SVGRenderer': SVGRenderer,
-		'RaytracingRenderer': RaytracingRenderer
+		'SVGRenderer': SVGRenderer
 
 	};
 
@@ -138,13 +136,6 @@ var SidebarProject = function ( editor ) {
 
 			case 'WebGLRenderer':
 				parameters.antialias = antialias;
-				break;
-
-			case 'RaytracingRenderer':
-				parameters.workers = navigator.hardwareConcurrency || 4;
-				parameters.workerPath = '../examples/js/renderers/RaytracingWorker.js';
-				parameters.randomize = true;
-				parameters.blockSize = 64;
 				break;
 
 		}

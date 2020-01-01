@@ -44,7 +44,6 @@ const assets = [
 	'../examples/jsm/exporters/STLExporter.js',
 
 	'../examples/jsm/renderers/Projector.js',
-	'../examples/jsm/renderers/RaytracingRenderer.js',
 	'../examples/jsm/renderers/SVGRenderer.js',
 
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
