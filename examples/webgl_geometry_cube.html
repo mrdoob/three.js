@@ -33,8 +33,6 @@
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				console.log( THREE.MathUtils.clamp( 0.6, 0, 1 ) );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
