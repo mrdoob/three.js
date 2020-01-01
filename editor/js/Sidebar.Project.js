@@ -66,8 +66,6 @@ var SidebarProject = function ( editor ) {
 
 	for ( var key in rendererTypes ) {
 
-		if ( key.indexOf( 'WebGL' ) >= 0 && System.support.webgl === false ) continue;
-
 		options[ key ] = key;
 
 	}
