@@ -145,8 +145,8 @@ THREE.Fire = function ( geometry, options ) {
 
 	this.field0.background = new THREE.Color( 0x000000 );
 
-	if ( ! THREE.Math.isPowerOfTwo( textureWidth ) ||
-		 ! THREE.Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) ||
+		 ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		this.field0.texture.generateMipmaps = false;
 		this.field1.texture.generateMipmaps = false;

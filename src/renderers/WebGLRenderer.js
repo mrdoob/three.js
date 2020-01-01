@@ -15,7 +15,7 @@ import {
 	LinearToneMapping,
 	BackSide
 } from '../constants.js';
-import { _Math } from '../math/Math.js';
+import { MathUtils } from '../math/MathUtils.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
@@ -1860,7 +1860,7 @@ function WebGLRenderer( parameters ) {
 
 
 						var size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
-						size = _Math.ceilPowerOfTwo( size );
+						size = MathUtils.ceilPowerOfTwo( size );
 						size = Math.max( size, 4 );
 
 						var boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel

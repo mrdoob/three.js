@@ -16,7 +16,7 @@ import {
 	LinearFilter,
 	UVMapping
 } from '../constants.js';
-import { _Math } from '../math/Math.js';
+import { MathUtils } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { ImageUtils } from '../extras/ImageUtils.js';
@@ -27,7 +27,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	Object.defineProperty( this, 'id', { value: textureId ++ } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 
@@ -185,7 +185,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			if ( image.uuid === undefined ) {
 
-				image.uuid = _Math.generateUUID(); // UGH
+				image.uuid = MathUtils.generateUUID(); // UGH
 
 			}
 

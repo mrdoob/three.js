@@ -44,22 +44,22 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 		if ( this.curF % this.randX == 0 || this.goWild == true ) {
 
 			this.uniforms[ 'amount' ].value = Math.random() / 30;
-			this.uniforms[ 'angle' ].value = THREE.Math.randFloat( - Math.PI, Math.PI );
-			this.uniforms[ 'seed_x' ].value = THREE.Math.randFloat( - 1, 1 );
-			this.uniforms[ 'seed_y' ].value = THREE.Math.randFloat( - 1, 1 );
-			this.uniforms[ 'distortion_x' ].value = THREE.Math.randFloat( 0, 1 );
-			this.uniforms[ 'distortion_y' ].value = THREE.Math.randFloat( 0, 1 );
+			this.uniforms[ 'angle' ].value = THREE.MathUtils.randFloat( - Math.PI, Math.PI );
+			this.uniforms[ 'seed_x' ].value = THREE.MathUtils.randFloat( - 1, 1 );
+			this.uniforms[ 'seed_y' ].value = THREE.MathUtils.randFloat( - 1, 1 );
+			this.uniforms[ 'distortion_x' ].value = THREE.MathUtils.randFloat( 0, 1 );
+			this.uniforms[ 'distortion_y' ].value = THREE.MathUtils.randFloat( 0, 1 );
 			this.curF = 0;
 			this.generateTrigger();
 
 		} else if ( this.curF % this.randX < this.randX / 5 ) {
 
 			this.uniforms[ 'amount' ].value = Math.random() / 90;
-			this.uniforms[ 'angle' ].value = THREE.Math.randFloat( - Math.PI, Math.PI );
-			this.uniforms[ 'distortion_x' ].value = THREE.Math.randFloat( 0, 1 );
-			this.uniforms[ 'distortion_y' ].value = THREE.Math.randFloat( 0, 1 );
-			this.uniforms[ 'seed_x' ].value = THREE.Math.randFloat( - 0.3, 0.3 );
-			this.uniforms[ 'seed_y' ].value = THREE.Math.randFloat( - 0.3, 0.3 );
+			this.uniforms[ 'angle' ].value = THREE.MathUtils.randFloat( - Math.PI, Math.PI );
+			this.uniforms[ 'distortion_x' ].value = THREE.MathUtils.randFloat( 0, 1 );
+			this.uniforms[ 'distortion_y' ].value = THREE.MathUtils.randFloat( 0, 1 );
+			this.uniforms[ 'seed_x' ].value = THREE.MathUtils.randFloat( - 0.3, 0.3 );
+			this.uniforms[ 'seed_y' ].value = THREE.MathUtils.randFloat( - 0.3, 0.3 );
 
 		} else if ( this.goWild == false ) {
 
@@ -86,7 +86,7 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 	generateTrigger: function () {
 
-		this.randX = THREE.Math.randInt( 120, 240 );
+		this.randX = THREE.MathUtils.randInt( 120, 240 );
 
 	},
 
@@ -97,7 +97,7 @@ THREE.GlitchPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		for ( var i = 0; i < length; i ++ ) {
 
-			var val = THREE.Math.randFloat( 0, 1 );
+			var val = THREE.MathUtils.randFloat( 0, 1 );
 			data_arr[ i * 3 + 0 ] = val;
 			data_arr[ i * 3 + 1 ] = val;
 			data_arr[ i * 3 + 2 ] = val;

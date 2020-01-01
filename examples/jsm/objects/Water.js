@@ -11,7 +11,7 @@ import {
 	Color,
 	FrontSide,
 	LinearFilter,
-	Math as _Math,
+	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
@@ -76,7 +76,7 @@ var Water = function ( geometry, options ) {
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	if ( ! _Math.isPowerOfTwo( textureWidth ) || ! _Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		renderTarget.texture.generateMipmaps = false;
 

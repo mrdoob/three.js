@@ -379,7 +379,7 @@
 
 	}
 
-	var _Math = {
+	var MathUtils = {
 
 		DEG2RAD: Math.PI / 180,
 		RAD2DEG: 180 / Math.PI,
@@ -483,13 +483,13 @@
 
 		degToRad: function ( degrees ) {
 
-			return degrees * _Math.DEG2RAD;
+			return degrees * MathUtils.DEG2RAD;
 
 		},
 
 		radToDeg: function ( radians ) {
 
-			return radians * _Math.RAD2DEG;
+			return radians * MathUtils.RAD2DEG;
 
 		},
 
@@ -508,6 +508,61 @@
 		floorPowerOfTwo: function ( value ) {
 
 			return Math.pow( 2, Math.floor( Math.log( value ) / Math.LN2 ) );
+
+		},
+
+		setQuaternionFromProperEuler: function ( q, a, b, c, order ) {
+
+			// Intrinsic Proper Euler Angles - see https://en.wikipedia.org/wiki/Euler_angles
+
+			// rotations are applied to the axes in the order specified by 'order'
+			// rotation by angle 'a' is applied first, then by angle 'b', then by angle 'c'
+			// angles are in radians
+
+			var cos = Math.cos;
+			var sin = Math.sin;
+
+			var c2 = cos( b / 2 );
+			var s2 = sin( b / 2 );
+
+			var c13 = cos( ( a + c ) / 2 );
+			var s13 = sin( ( a + c ) / 2 );
+
+			var c1_3 = cos( ( a - c ) / 2 );
+			var s1_3 = sin( ( a - c ) / 2 );
+
+			var c3_1 = cos( ( c - a ) / 2 );
+			var s3_1 = sin( ( c - a ) / 2 );
+
+			if ( order === 'XYX' ) {
+
+				q.set( c2 * s13, s2 * c1_3, s2 * s1_3, c2 * c13 );
+
+			} else if ( order === 'YZY' ) {
+
+				q.set( s2 * s1_3, c2 * s13, s2 * c1_3, c2 * c13 );
+
+			} else if ( order === 'ZXZ' ) {
+
+				q.set( s2 * c1_3, s2 * s1_3, c2 * s13, c2 * c13 );
+
+			} else if ( order === 'XZX' ) {
+
+				q.set( c2 * s13, s2 * s3_1, s2 * c3_1, c2 * c13 );
+
+			} else if ( order === 'YXY' ) {
+
+				q.set( s2 * c3_1, c2 * s13, s2 * s3_1, c2 * c13 );
+
+			} else if ( order === 'ZYZ' ) {
+
+				q.set( s2 * s3_1, s2 * c3_1, c2 * s13, c2 * c13 );
+
+			} else {
+
+				console.warn( 'THREE.MathUtils: .setQuaternionFromProperEuler() encountered an unknown order.' );
+
+			}
 
 		}
 
@@ -1397,7 +1452,7 @@
 
 		angleTo: function ( q ) {
 
-			return 2 * Math.acos( Math.abs( _Math.clamp( this.dot( q ), - 1, 1 ) ) );
+			return 2 * Math.acos( Math.abs( MathUtils.clamp( this.dot( q ), - 1, 1 ) ) );
 
 		},
 
@@ -2203,7 +2258,7 @@
 
 			// clamp, to handle numerical problems
 
-			return Math.acos( _Math.clamp( theta, - 1, 1 ) );
+			return Math.acos( MathUtils.clamp( theta, - 1, 1 ) );
 
 		},
 
@@ -2342,15 +2397,6 @@
 
 	} );
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author bhouston / http://clara.io
-	 * @author tschw
-	 */
-
-	var _vector$1 = new Vector3();
-
 	function Matrix3() {
 
 		this.elements = [
@@ -2431,24 +2477,6 @@
 			);
 
 			return this;
-
-		},
-
-		applyToBufferAttribute: function ( attribute ) {
-
-			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
-
-				_vector$1.x = attribute.getX( i );
-				_vector$1.y = attribute.getY( i );
-				_vector$1.z = attribute.getZ( i );
-
-				_vector$1.applyMatrix3( this );
-
-				attribute.setXYZ( i, _vector$1.x, _vector$1.y, _vector$1.z );
-
-			}
-
-			return attribute;
 
 		},
 
@@ -2793,7 +2821,7 @@
 
 		Object.defineProperty( this, 'id', { value: textureId ++ } );
 
-		this.uuid = _Math.generateUUID();
+		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
 
@@ -2951,7 +2979,7 @@
 
 				if ( image.uuid === undefined ) {
 
-					image.uuid = _Math.generateUUID(); // UGH
+					image.uuid = MathUtils.generateUUID(); // UGH
 
 				}
 
@@ -4288,24 +4316,6 @@
 
 		},
 
-		applyToBufferAttribute: function ( attribute ) {
-
-			for ( var i = 0, l = attribute.count; i < l; i ++ ) {
-
-				_v1.x = attribute.getX( i );
-				_v1.y = attribute.getY( i );
-				_v1.z = attribute.getZ( i );
-
-				_v1.applyMatrix4( this );
-
-				attribute.setXYZ( i, _v1.x, _v1.y, _v1.z );
-
-			}
-
-			return attribute;
-
-		},
-
 		determinant: function () {
 
 			var te = this.elements;
@@ -4923,7 +4933,7 @@
 
 		setFromRotationMatrix: function ( m, order, update ) {
 
-			var clamp = _Math.clamp;
+			var clamp = MathUtils.clamp;
 
 			// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
@@ -5213,7 +5223,7 @@
 
 		Object.defineProperty( this, 'id', { value: _object3DId ++ } );
 
-		this.uuid = _Math.generateUUID();
+		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
 		this.type = 'Object3D';
@@ -6115,7 +6125,7 @@
 		new Vector3()
 	];
 
-	var _vector$2 = new Vector3();
+	var _vector$1 = new Vector3();
 
 	var _box = new Box3();
 
@@ -6244,7 +6254,7 @@
 
 		setFromCenterAndSize: function ( center, size ) {
 
-			var halfSize = _vector$2.copy( size ).multiplyScalar( 0.5 );
+			var halfSize = _vector$1.copy( size ).multiplyScalar( 0.5 );
 
 			this.min.copy( center ).sub( halfSize );
 			this.max.copy( center ).add( halfSize );
@@ -6431,10 +6441,10 @@
 		intersectsSphere: function ( sphere ) {
 
 			// Find the point on the AABB closest to the sphere center.
-			this.clampPoint( sphere.center, _vector$2 );
+			this.clampPoint( sphere.center, _vector$1 );
 
 			// If that point is inside the sphere, the AABB and sphere intersect.
-			return _vector$2.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
+			return _vector$1.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
 
 		},
 
@@ -6553,7 +6563,7 @@
 
 		distanceToPoint: function ( point ) {
 
-			var clampedPoint = _vector$2.copy( point ).clamp( this.min, this.max );
+			var clampedPoint = _vector$1.copy( point ).clamp( this.min, this.max );
 
 			return clampedPoint.sub( point ).length();
 
@@ -6570,7 +6580,7 @@
 
 			this.getCenter( target.center );
 
-			target.radius = this.getSize( _vector$2 ).length() * 0.5;
+			target.radius = this.getSize( _vector$1 ).length() * 0.5;
 
 			return target;
 
@@ -6834,7 +6844,7 @@
 
 	} );
 
-	var _vector$3 = new Vector3();
+	var _vector$2 = new Vector3();
 	var _segCenter = new Vector3();
 	var _segDir = new Vector3();
 	var _diff = new Vector3();
@@ -6903,7 +6913,7 @@
 
 		recast: function ( t ) {
 
-			this.origin.copy( this.at( t, _vector$3 ) );
+			this.origin.copy( this.at( t, _vector$2 ) );
 
 			return this;
 
@@ -6940,7 +6950,7 @@
 
 		distanceSqToPoint: function ( point ) {
 
-			var directionDistance = _vector$3.subVectors( point, this.origin ).dot( this.direction );
+			var directionDistance = _vector$2.subVectors( point, this.origin ).dot( this.direction );
 
 			// point behind the ray
 
@@ -6950,9 +6960,9 @@
 
 			}
 
-			_vector$3.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+			_vector$2.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-			return _vector$3.distanceToSquared( point );
+			return _vector$2.distanceToSquared( point );
 
 		},
 
@@ -7077,9 +7087,9 @@
 
 		intersectSphere: function ( sphere, target ) {
 
-			_vector$3.subVectors( sphere.center, this.origin );
-			var tca = _vector$3.dot( this.direction );
-			var d2 = _vector$3.dot( _vector$3 ) - tca * tca;
+			_vector$2.subVectors( sphere.center, this.origin );
+			var tca = _vector$2.dot( this.direction );
+			var d2 = _vector$2.dot( _vector$2 ) - tca * tca;
 			var radius2 = sphere.radius * sphere.radius;
 
 			if ( d2 > radius2 ) { return null; }
@@ -7249,7 +7259,7 @@
 
 		intersectsBox: function ( box ) {
 
-			return this.intersectBox( box, _vector$3 ) !== null;
+			return this.intersectBox( box, _vector$2 ) !== null;
 
 		},
 
@@ -8030,9 +8040,9 @@
 		setHSL: function ( h, s, l ) {
 
 			// h,s,l ranges are in 0.0 - 1.0
-			h = _Math.euclideanModulo( h, 1 );
-			s = _Math.clamp( s, 0, 1 );
-			l = _Math.clamp( l, 0, 1 );
+			h = MathUtils.euclideanModulo( h, 1 );
+			s = MathUtils.clamp( s, 0, 1 );
+			l = MathUtils.clamp( l, 0, 1 );
 
 			if ( s === 0 ) {
 
@@ -8440,9 +8450,9 @@
 			this.getHSL( _hslA );
 			color.getHSL( _hslB );
 
-			var h = _Math.lerp( _hslA.h, _hslB.h, alpha );
-			var s = _Math.lerp( _hslA.s, _hslB.s, alpha );
-			var l = _Math.lerp( _hslA.l, _hslB.l, alpha );
+			var h = MathUtils.lerp( _hslA.h, _hslB.h, alpha );
+			var s = MathUtils.lerp( _hslA.s, _hslB.s, alpha );
+			var l = MathUtils.lerp( _hslA.l, _hslB.l, alpha );
 
 			this.setHSL( h, s, l );
 
@@ -8560,7 +8570,7 @@
 
 		Object.defineProperty( this, 'id', { value: materialId ++ } );
 
-		this.uuid = _Math.generateUUID();
+		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
 		this.type = 'Material';
@@ -9095,7 +9105,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	var _vector$4 = new Vector3();
+	var _vector$3 = new Vector3();
 
 	function BufferAttribute( array, itemSize, normalized ) {
 
@@ -9284,13 +9294,13 @@
 
 			for ( var i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$4.x = this.getX( i );
-				_vector$4.y = this.getY( i );
-				_vector$4.z = this.getZ( i );
+				_vector$3.x = this.getX( i );
+				_vector$3.y = this.getY( i );
+				_vector$3.z = this.getZ( i );
 
-				_vector$4.applyMatrix3( m );
+				_vector$3.applyMatrix3( m );
 
-				this.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
+				this.setXYZ( i, _vector$3.x, _vector$3.y, _vector$3.z );
 
 			}
 
@@ -9302,13 +9312,13 @@
 
 			for ( var i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$4.x = this.getX( i );
-				_vector$4.y = this.getY( i );
-				_vector$4.z = this.getZ( i );
+				_vector$3.x = this.getX( i );
+				_vector$3.y = this.getY( i );
+				_vector$3.z = this.getZ( i );
 
-				_vector$4.applyMatrix4( m );
+				_vector$3.applyMatrix4( m );
 
-				this.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
+				this.setXYZ( i, _vector$3.x, _vector$3.y, _vector$3.z );
 
 			}
 
@@ -9320,13 +9330,13 @@
 
 			for ( var i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$4.x = this.getX( i );
-				_vector$4.y = this.getY( i );
-				_vector$4.z = this.getZ( i );
+				_vector$3.x = this.getX( i );
+				_vector$3.y = this.getY( i );
+				_vector$3.z = this.getZ( i );
 
-				_vector$4.applyNormalMatrix( m );
+				_vector$3.applyNormalMatrix( m );
 
-				this.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
+				this.setXYZ( i, _vector$3.x, _vector$3.y, _vector$3.z );
 
 			}
 
@@ -9338,13 +9348,13 @@
 
 			for ( var i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$4.x = this.getX( i );
-				_vector$4.y = this.getY( i );
-				_vector$4.z = this.getZ( i );
+				_vector$3.x = this.getX( i );
+				_vector$3.y = this.getY( i );
+				_vector$3.z = this.getZ( i );
 
-				_vector$4.transformDirection( m );
+				_vector$3.transformDirection( m );
 
-				this.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
+				this.setXYZ( i, _vector$3.x, _vector$3.y, _vector$3.z );
 
 			}
 
@@ -9886,13 +9896,13 @@
 	var _offset = new Vector3();
 	var _box$2 = new Box3();
 	var _boxMorphTargets = new Box3();
-	var _vector$5 = new Vector3();
+	var _vector$4 = new Vector3();
 
 	function BufferGeometry() {
 
 		Object.defineProperty( this, 'id', { value: _bufferGeometryId += 2 } );
 
-		this.uuid = _Math.generateUUID();
+		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
 		this.type = 'BufferGeometry';
@@ -10440,11 +10450,11 @@
 
 						if ( this.morphTargetsRelative ) {
 
-							_vector$5.addVectors( this.boundingBox.min, _box$2.min );
-							this.boundingBox.expandByPoint( _vector$5 );
+							_vector$4.addVectors( this.boundingBox.min, _box$2.min );
+							this.boundingBox.expandByPoint( _vector$4 );
 
-							_vector$5.addVectors( this.boundingBox.max, _box$2.max );
-							this.boundingBox.expandByPoint( _vector$5 );
+							_vector$4.addVectors( this.boundingBox.max, _box$2.max );
+							this.boundingBox.expandByPoint( _vector$4 );
 
 						} else {
 
@@ -10501,11 +10511,11 @@
 
 						if ( this.morphTargetsRelative ) {
 
-							_vector$5.addVectors( _box$2.min, _boxMorphTargets.min );
-							_box$2.expandByPoint( _vector$5 );
+							_vector$4.addVectors( _box$2.min, _boxMorphTargets.min );
+							_box$2.expandByPoint( _vector$4 );
 
-							_vector$5.addVectors( _box$2.max, _boxMorphTargets.max );
-							_box$2.expandByPoint( _vector$5 );
+							_vector$4.addVectors( _box$2.max, _boxMorphTargets.max );
+							_box$2.expandByPoint( _vector$4 );
 
 						} else {
 
@@ -10527,9 +10537,9 @@
 
 				for ( var i = 0, il = position.count; i < il; i ++ ) {
 
-					_vector$5.fromBufferAttribute( position, i );
+					_vector$4.fromBufferAttribute( position, i );
 
-					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$5 ) );
+					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$4 ) );
 
 				}
 
@@ -10544,16 +10554,16 @@
 
 						for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
 
-							_vector$5.fromBufferAttribute( morphAttribute, j );
+							_vector$4.fromBufferAttribute( morphAttribute, j );
 
 							if ( morphTargetsRelative ) {
 
 								_offset.fromBufferAttribute( position, j );
-								_vector$5.add( _offset );
+								_vector$4.add( _offset );
 
 							}
 
-							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$5 ) );
+							maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$4 ) );
 
 						}
 
@@ -10737,13 +10747,13 @@
 
 			for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
-				_vector$5.x = normals.getX( i );
-				_vector$5.y = normals.getY( i );
-				_vector$5.z = normals.getZ( i );
+				_vector$4.x = normals.getX( i );
+				_vector$4.y = normals.getY( i );
+				_vector$4.z = normals.getZ( i );
 
-				_vector$5.normalize();
+				_vector$4.normalize();
 
-				normals.setXYZ( i, _vector$5.x, _vector$5.y, _vector$5.z );
+				normals.setXYZ( i, _vector$4.x, _vector$4.y, _vector$4.z );
 
 			}
 
@@ -11571,7 +11581,7 @@
 
 		Object.defineProperty( this, 'id', { value: _geometryId += 2 } );
 
-		this.uuid = _Math.generateUUID();
+		this.uuid = MathUtils.generateUUID();
 
 		this.name = '';
 		this.type = 'Geometry';
@@ -13562,7 +13572,7 @@
 			// see http://www.bobatkins.com/photography/technical/field_of_view.html
 			var vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 
-			this.fov = _Math.RAD2DEG * 2 * Math.atan( vExtentSlope );
+			this.fov = MathUtils.RAD2DEG * 2 * Math.atan( vExtentSlope );
 			this.updateProjectionMatrix();
 
 		},
@@ -13572,7 +13582,7 @@
 		 */
 		getFocalLength: function () {
 
-			var vExtentSlope = Math.tan( _Math.DEG2RAD * 0.5 * this.fov );
+			var vExtentSlope = Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov );
 
 			return 0.5 * this.getFilmHeight() / vExtentSlope;
 
@@ -13580,8 +13590,8 @@
 
 		getEffectiveFOV: function () {
 
-			return _Math.RAD2DEG * 2 * Math.atan(
-				Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom );
+			return MathUtils.RAD2DEG * 2 * Math.atan(
+				Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom );
 
 		},
 
@@ -13679,7 +13689,7 @@
 		updateProjectionMatrix: function () {
 
 			var near = this.near,
-				top = near * Math.tan( _Math.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+				top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom,
 				height = 2 * top,
 				width = this.aspect * height,
 				left = - 0.5 * width,
@@ -13980,7 +13990,7 @@
 	 */
 
 	var _sphere$1 = new Sphere();
-	var _vector$6 = new Vector3();
+	var _vector$5 = new Vector3();
 
 	function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
@@ -14108,11 +14118,11 @@
 
 				// corner at max distance
 
-				_vector$6.x = plane.normal.x > 0 ? box.max.x : box.min.x;
-				_vector$6.y = plane.normal.y > 0 ? box.max.y : box.min.y;
-				_vector$6.z = plane.normal.z > 0 ? box.max.z : box.min.z;
+				_vector$5.x = plane.normal.x > 0 ? box.max.x : box.min.x;
+				_vector$5.y = plane.normal.y > 0 ? box.max.y : box.min.y;
+				_vector$5.z = plane.normal.z > 0 ? box.max.z : box.min.z;
 
-				if ( plane.distanceToPoint( _vector$6 ) < 0 ) {
+				if ( plane.distanceToPoint( _vector$5 ) < 0 ) {
 
 					return false;
 
@@ -21153,7 +21163,7 @@
 					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
 					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
-					var floor = needsPowerOfTwo ? _Math.floorPowerOfTwo : Math.floor;
+					var floor = needsPowerOfTwo ? MathUtils.floorPowerOfTwo : Math.floor;
 
 					var width = floor( scale * image.width );
 					var height = floor( scale * image.height );
@@ -21194,7 +21204,7 @@
 
 		function isPowerOfTwo( image ) {
 
-			return _Math.isPowerOfTwo( image.width ) && _Math.isPowerOfTwo( image.height );
+			return MathUtils.isPowerOfTwo( image.width ) && MathUtils.isPowerOfTwo( image.height );
 
 		}
 
@@ -25072,7 +25082,7 @@
 
 
 							var size = Math.sqrt( bones.length * 4 ); // 4 pixels needed for 1 matrix
-							size = _Math.ceilPowerOfTwo( size );
+							size = MathUtils.ceilPowerOfTwo( size );
 							size = Math.max( size, 4 );
 
 							var boneMatrices = new Float32Array( size * size * 4 ); // 4 floats per RGBA pixel
@@ -26250,7 +26260,7 @@
 	 * @author benaadams / https://twitter.com/ben_a_adams
 	 */
 
-	var _vector$7 = new Vector3();
+	var _vector$6 = new Vector3();
 
 	function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
@@ -26294,13 +26304,13 @@
 
 			for ( var i = 0, l = this.data.count; i < l; i ++ ) {
 
-				_vector$7.x = this.getX( i );
-				_vector$7.y = this.getY( i );
-				_vector$7.z = this.getZ( i );
+				_vector$6.x = this.getX( i );
+				_vector$6.y = this.getY( i );
+				_vector$6.z = this.getZ( i );
 
-				_vector$7.applyMatrix4( m );
+				_vector$6.applyMatrix4( m );
 
-				this.setXYZ( i, _vector$7.x, _vector$7.y, _vector$7.z );
+				this.setXYZ( i, _vector$6.x, _vector$6.y, _vector$6.z );
 
 			}
 
@@ -31521,7 +31531,7 @@
 
 		// clamp phiLength so it's in range of [ 0, 2PI ]
 
-		phiLength = _Math.clamp( phiLength, 0, Math.PI * 2 );
+		phiLength = MathUtils.clamp( phiLength, 0, Math.PI * 2 );
 
 
 		// buffers
@@ -31884,7 +31894,7 @@
 
 		// helper variables
 
-		var thresholdDot = Math.cos( _Math.DEG2RAD * thresholdAngle );
+		var thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
 		var edge = [ 0, 0 ], edges = {}, edge1, edge2;
 		var key, keys = [ 'a', 'b', 'c' ];
 
@@ -34897,7 +34907,7 @@
 		this.tracks = tracks;
 		this.duration = ( duration !== undefined ) ? duration : - 1;
 
-		this.uuid = _Math.generateUUID();
+		this.uuid = MathUtils.generateUUID();
 
 		// this means it should figure out its duration by scanning the tracks
 		if ( this.duration < 0 ) {
@@ -36667,7 +36677,7 @@
 
 					vec.normalize();
 
-					theta = Math.acos( _Math.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+					theta = Math.acos( MathUtils.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 					normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -36681,7 +36691,7 @@
 
 			if ( closed === true ) {
 
-				theta = Math.acos( _Math.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
+				theta = Math.acos( MathUtils.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
 				theta /= segments;
 
 				if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ segments ] ) ) > 0 ) {
@@ -38257,7 +38267,7 @@
 
 		Path.call( this, points );
 
-		this.uuid = _Math.generateUUID();
+		this.uuid = MathUtils.generateUUID();
 
 		this.type = 'Shape';
 
@@ -38594,7 +38604,7 @@
 
 			var camera = this.camera;
 
-			var fov = _Math.RAD2DEG * 2 * light.angle;
+			var fov = MathUtils.RAD2DEG * 2 * light.angle;
 			var aspect = this.mapSize.width / this.mapSize.height;
 			var far = light.distance || camera.far;
 
@@ -41688,7 +41698,7 @@
 				var projectionMatrix = camera.projectionMatrix.clone();
 				var eyeSepHalf = cache.eyeSep / 2;
 				var eyeSepOnProjection = eyeSepHalf * cache.near / cache.focus;
-				var ymax = ( cache.near * Math.tan( _Math.DEG2RAD * cache.fov * 0.5 ) ) / cache.zoom;
+				var ymax = ( cache.near * Math.tan( MathUtils.DEG2RAD * cache.fov * 0.5 ) ) / cache.zoom;
 				var xmin, xmax;
 
 				// translate xOffset
@@ -43436,7 +43446,7 @@
 
 	function AnimationObjectGroup() {
 
-		this.uuid = _Math.generateUUID();
+		this.uuid = MathUtils.generateUUID();
 
 		// cached objects followed by the active ones
 		this._objects = Array.prototype.slice.call( arguments );
@@ -45489,7 +45499,7 @@
 			} else {
 
 				this.theta = Math.atan2( x, z );
-				this.phi = Math.acos( _Math.clamp( y / this.radius, - 1, 1 ) );
+				this.phi = Math.acos( MathUtils.clamp( y / this.radius, - 1, 1 ) );
 
 			}
 
@@ -45566,7 +45576,7 @@
 	 * @author bhouston / http://clara.io
 	 */
 
-	var _vector$8 = new Vector2();
+	var _vector$7 = new Vector2();
 
 	function Box2( min, max ) {
 
@@ -45602,7 +45612,7 @@
 
 		setFromCenterAndSize: function ( center, size ) {
 
-			var halfSize = _vector$8.copy( size ).multiplyScalar( 0.5 );
+			var halfSize = _vector$7.copy( size ).multiplyScalar( 0.5 );
 			this.min.copy( center ).sub( halfSize );
 			this.max.copy( center ).add( halfSize );
 
@@ -45752,7 +45762,7 @@
 
 		distanceToPoint: function ( point ) {
 
-			var clampedPoint = _vector$8.copy( point ).clamp( this.min, this.max );
+			var clampedPoint = _vector$7.copy( point ).clamp( this.min, this.max );
 			return clampedPoint.sub( point ).length();
 
 		},
@@ -45895,7 +45905,7 @@
 
 			if ( clampToLine ) {
 
-				t = _Math.clamp( t, 0, 1 );
+				t = MathUtils.clamp( t, 0, 1 );
 
 			}
 
@@ -45959,7 +45969,7 @@
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
-	var _vector$9 = new Vector3();
+	var _vector$8 = new Vector3();
 
 	function SpotLightHelper( light, color ) {
 
@@ -46025,9 +46035,9 @@
 
 		this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		_vector$9.setFromMatrixPosition( this.light.target.matrixWorld );
+		_vector$8.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		this.cone.lookAt( _vector$9 );
+		this.cone.lookAt( _vector$8 );
 
 		if ( this.color !== undefined ) {
 
@@ -46049,7 +46059,7 @@
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	var _vector$a = new Vector3();
+	var _vector$9 = new Vector3();
 	var _boneMatrix = new Matrix4();
 	var _matrixWorldInv = new Matrix4();
 
@@ -46134,12 +46144,12 @@
 			if ( bone.parent && bone.parent.isBone ) {
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.matrixWorld );
-				_vector$a.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j, _vector$a.x, _vector$a.y, _vector$a.z );
+				_vector$9.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j, _vector$9.x, _vector$9.y, _vector$9.z );
 
 				_boneMatrix.multiplyMatrices( _matrixWorldInv, bone.parent.matrixWorld );
-				_vector$a.setFromMatrixPosition( _boneMatrix );
-				position.setXYZ( j + 1, _vector$a.x, _vector$a.y, _vector$a.z );
+				_vector$9.setFromMatrixPosition( _boneMatrix );
+				position.setXYZ( j + 1, _vector$9.x, _vector$9.y, _vector$9.z );
 
 				j += 2;
 
@@ -46245,7 +46255,7 @@
 	 * @author Mugen87 / https://github.com/Mugen87
 	 */
 
-	var _vector$b = new Vector3();
+	var _vector$a = new Vector3();
 	var _color1 = new Color();
 	var _color2 = new Color();
 
@@ -46315,7 +46325,7 @@
 
 		}
 
-		mesh.lookAt( _vector$b.setFromMatrixPosition( this.light.matrixWorld ).negate() );
+		mesh.lookAt( _vector$a.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 
 	};
 
@@ -46565,7 +46575,7 @@
 	 *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
 	 */
 
-	var _vector$c = new Vector3();
+	var _vector$b = new Vector3();
 	var _camera = new Camera();
 
 	function CameraHelper( camera ) {
@@ -46730,7 +46740,7 @@
 
 	function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
-		_vector$c.set( x, y, z ).unproject( camera );
+		_vector$b.set( x, y, z ).unproject( camera );
 
 		var points = pointMap[ point ];
 
@@ -46740,7 +46750,7 @@
 
 			for ( var i = 0, l = points.length; i < l; i ++ ) {
 
-				position.setXYZ( points[ i ], _vector$c.x, _vector$c.y, _vector$c.z );
+				position.setXYZ( points[ i ], _vector$b.x, _vector$b.y, _vector$b.z );
 
 			}
 
@@ -48227,7 +48237,7 @@
 
 	};
 
-	Object.assign( _Math, {
+	Object.assign( MathUtils, {
 
 		random16: function () {
 
@@ -48239,14 +48249,14 @@
 		nearestPowerOfTwo: function ( value ) {
 
 			console.warn( 'THREE.Math: .nearestPowerOfTwo() has been renamed to .floorPowerOfTwo().' );
-			return _Math.floorPowerOfTwo( value );
+			return MathUtils.floorPowerOfTwo( value );
 
 		},
 
 		nextPowerOfTwo: function ( value ) {
 
 			console.warn( 'THREE.Math: .nextPowerOfTwo() has been renamed to .ceilPowerOfTwo().' );
-			return _Math.ceilPowerOfTwo( value );
+			return MathUtils.ceilPowerOfTwo( value );
 
 		}
 
@@ -48271,10 +48281,10 @@
 			console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.' );
 
 		},
-		applyToBuffer: function ( buffer /*, offset, length */ ) {
+		applyToBufferAttribute: function ( attribute ) {
 
-			console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
-			return this.applyToBufferAttribute( buffer );
+			console.warn( 'THREE.Matrix3: .applyToBufferAttribute() has been removed. Use attribute.applyMatrix3( matrix ) instead.' );
+			return attribute.applyMatrix3( this );
 
 		},
 		applyToVector3Array: function ( /* array, offset, length */ ) {
@@ -48370,10 +48380,10 @@
 			console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 
 		},
-		applyToBuffer: function ( buffer /*, offset, length */ ) {
+		applyToBufferAttribute: function ( attribute ) {
 
-			console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
-			return this.applyToBufferAttribute( buffer );
+			console.warn( 'THREE.Matrix4: .applyToBufferAttribute() has been removed. Use attribute.applyMatrix4( matrix ) instead.' );
+			return attribute.applyMatrix4( this );
 
 		},
 		applyToVector3Array: function ( /* array, offset, length */ ) {
@@ -50038,7 +50048,8 @@
 	exports.MOUSE = MOUSE;
 	exports.Material = Material;
 	exports.MaterialLoader = MaterialLoader;
-	exports.Math = _Math;
+	exports.Math = MathUtils;
+	exports.MathUtils = MathUtils;
 	exports.Matrix3 = Matrix3;
 	exports.Matrix4 = Matrix4;
 	exports.MaxEquation = MaxEquation;

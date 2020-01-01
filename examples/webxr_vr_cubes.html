@@ -230,21 +230,21 @@
 
 					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
 
-						cube.position.x = THREE.Math.clamp( cube.position.x, - 3, 3 );
+						cube.position.x = THREE.MathUtils.clamp( cube.position.x, - 3, 3 );
 						cube.userData.velocity.x = - cube.userData.velocity.x;
 
 					}
 
 					if ( cube.position.y < 0 || cube.position.y > 6 ) {
 
-						cube.position.y = THREE.Math.clamp( cube.position.y, 0, 6 );
+						cube.position.y = THREE.MathUtils.clamp( cube.position.y, 0, 6 );
 						cube.userData.velocity.y = - cube.userData.velocity.y;
 
 					}
 
 					if ( cube.position.z < - 3 || cube.position.z > 3 ) {
 
-						cube.position.z = THREE.Math.clamp( cube.position.z, - 3, 3 );
+						cube.position.z = THREE.MathUtils.clamp( cube.position.z, - 3, 3 );
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}

@@ -3,7 +3,7 @@
  */
 
 import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping } from '../../constants.js';
-import { _Math } from '../../math/Math.js';
+import { MathUtils } from '../../math/MathUtils.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
@@ -65,7 +65,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
 				( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
-				var floor = needsPowerOfTwo ? _Math.floorPowerOfTwo : Math.floor;
+				var floor = needsPowerOfTwo ? MathUtils.floorPowerOfTwo : Math.floor;
 
 				var width = floor( scale * image.width );
 				var height = floor( scale * image.height );
@@ -106,7 +106,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function isPowerOfTwo( image ) {
 
-		return _Math.isPowerOfTwo( image.width ) && _Math.isPowerOfTwo( image.height );
+		return MathUtils.isPowerOfTwo( image.width ) && MathUtils.isPowerOfTwo( image.height );
 
 	}
 

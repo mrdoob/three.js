@@ -38,9 +38,9 @@ var starsGeometry = new THREE.Geometry();
 for ( var i = 0; i < 10000; i ++ ) {
 
 	var star = new THREE.Vector3();
-	star.x = THREE.Math.randFloatSpread( 2000 );
-	star.y = THREE.Math.randFloatSpread( 2000 );
-	star.z = THREE.Math.randFloatSpread( 2000 );
+	star.x = THREE.MathUtils.randFloatSpread( 2000 );
+	star.y = THREE.MathUtils.randFloatSpread( 2000 );
+	star.z = THREE.MathUtils.randFloatSpread( 2000 );
 
 	starsGeometry.vertices.push( star );
 

@@ -11,7 +11,7 @@ import {
 	Color,
 	DataTexture,
 	LinearFilter,
-	Math as _Math,
+	MathUtils,
 	Mesh,
 	NearestFilter,
 	NoToneMapping,
@@ -163,8 +163,8 @@ var Fire = function ( geometry, options ) {
 
 	this.field0.background = new Color( 0x000000 );
 
-	if ( ! _Math.isPowerOfTwo( textureWidth ) ||
-		 ! _Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! MathUtils.isPowerOfTwo( textureWidth ) ||
+		 ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		this.field0.texture.generateMipmaps = false;
 		this.field1.texture.generateMipmaps = false;
