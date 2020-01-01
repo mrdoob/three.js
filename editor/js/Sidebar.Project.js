@@ -4,9 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { SVGRenderer } from '../../examples/jsm/renderers/SVGRenderer.js';
-
-import { UIPanel, UIRow, UIInput, UICheckbox, UISelect, UIText, UIListbox, UISpan, UIButton } from './libs/ui.js';
+import { UIPanel, UIRow, UIInput, UICheckbox, UIText, UIListbox, UISpan, UIButton } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
@@ -16,13 +14,6 @@ var SidebarProject = function ( editor ) {
 	var config = editor.config;
 	var signals = editor.signals;
 	var strings = editor.strings;
-
-	var rendererTypes = {
-
-		'WebGLRenderer': THREE.WebGLRenderer,
-		'SVGRenderer': SVGRenderer
-
-	};
 
 	var container = new UISpan();
 
@@ -62,39 +53,8 @@ var SidebarProject = function ( editor ) {
 
 	// Renderer
 
-	var options = {};
-
-	for ( var key in rendererTypes ) {
-
-		options[ key ] = key;
-
-	}
-
-	var rendererTypeRow = new UIRow();
-	var rendererType = new UISelect().setOptions( options ).setWidth( '150px' ).onChange( function () {
-
-		var value = this.getValue();
-
-		config.setKey( 'project/renderer', value );
-
-		updateRenderer();
-
-	} );
-
-	rendererTypeRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
-	rendererTypeRow.add( rendererType );
-
-	projectsettings.add( rendererTypeRow );
-
-	if ( config.getKey( 'project/renderer' ) !== undefined ) {
-
-		rendererType.setValue( config.getKey( 'project/renderer' ) );
-
-	}
-
-	// Renderer / Antialias
-
-	var rendererPropertiesRow = new UIRow().setMarginLeft( '90px' );
+	var rendererPropertiesRow = new UIRow();
+	rendererPropertiesRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
 
 	var rendererAntialias = new UIBoolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
 
@@ -120,27 +80,16 @@ var SidebarProject = function ( editor ) {
 
 	function updateRenderer() {
 
-		createRenderer( rendererType.getValue(), rendererAntialias.getValue() );
+		createRenderer( rendererAntialias.getValue() );
 
 	}
 
-	function createRenderer( type, antialias, shadows ) {
+	function createRenderer( antialias, shadows ) {
 
-		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
+		var parameters = { antialias: antialias };
+		var renderer = new THREE.WebGLRenderer( parameters );
 
-		var parameters = {};
-
-		switch ( type ) {
-
-			case 'WebGLRenderer':
-				parameters.antialias = antialias;
-				break;
-
-		}
-
-		var renderer = new rendererTypes[ type ]( parameters );
-
-		if ( shadows && renderer.shadowMap ) {
+		if ( shadows ) {
 
 			renderer.shadowMap.enabled = true;
 			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -151,7 +100,7 @@ var SidebarProject = function ( editor ) {
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
+	createRenderer( config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
 
 	// Materials
 
