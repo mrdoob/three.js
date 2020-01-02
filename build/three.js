@@ -369,6 +369,8 @@
 	/**
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author mrdoob / http://mrdoob.com/
+	 * @author WestLangley / http://github.com/WestLangley
+	 * @author thezwap
 	 */
 
 	var _lut = [];
@@ -13794,7 +13796,7 @@
 
 		options = options || { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
-		this.renderTarget = new WebGLRenderTargetCube( cubeResolution, cubeResolution, options );
+		this.renderTarget = new WebGLCubeRenderTarget( cubeResolution, cubeResolution, options );
 		this.renderTarget.texture.name = "CubeCamera";
 
 		this.update = function ( renderer, scene ) {
@@ -13860,18 +13862,18 @@
 	 * @author WestLangley / http://github.com/WestLangley
 	 */
 
-	function WebGLRenderTargetCube( width, height, options ) {
+	function WebGLCubeRenderTarget( width, height, options ) {
 
 		WebGLRenderTarget.call( this, width, height, options );
 
 	}
 
-	WebGLRenderTargetCube.prototype = Object.create( WebGLRenderTarget.prototype );
-	WebGLRenderTargetCube.prototype.constructor = WebGLRenderTargetCube;
+	WebGLCubeRenderTarget.prototype = Object.create( WebGLRenderTarget.prototype );
+	WebGLCubeRenderTarget.prototype.constructor = WebGLCubeRenderTarget;
 
-	WebGLRenderTargetCube.prototype.isWebGLRenderTargetCube = true;
+	WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 
-	WebGLRenderTargetCube.prototype.fromEquirectangularTexture = function ( renderer, texture ) {
+	WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer, texture ) {
 
 		this.texture.type = texture.type;
 		this.texture.format = texture.format;
@@ -15425,7 +15427,7 @@
 
 			}
 
-			if ( background && ( background.isCubeTexture || background.isWebGLRenderTargetCube || background.mapping === CubeUVReflectionMapping ) ) {
+			if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.mapping === CubeUVReflectionMapping ) ) {
 
 				if ( boxMesh === undefined ) {
 
@@ -15467,7 +15469,7 @@
 
 				}
 
-				var texture = background.isWebGLRenderTargetCube ? background.texture : background;
+				var texture = background.isWebGLCubeRenderTarget ? background.texture : background;
 
 				boxMesh.material.uniforms.envMap.value = texture;
 				boxMesh.material.uniforms.flipEnvMap.value = texture.isCubeTexture ? - 1 : 1;
@@ -21374,7 +21376,7 @@
 
 			}
 
-			if ( renderTarget.isWebGLRenderTargetCube ) {
+			if ( renderTarget.isWebGLCubeRenderTarget ) {
 
 				for ( var i = 0; i < 6; i ++ ) {
 
@@ -22005,7 +22007,7 @@
 		// Setup resources for a Depth Texture for a FBO (needs an extension)
 		function setupDepthTexture( framebuffer, renderTarget ) {
 
-			var isCube = ( renderTarget && renderTarget.isWebGLRenderTargetCube );
+			var isCube = ( renderTarget && renderTarget.isWebGLCubeRenderTarget );
 			if ( isCube ) { throw new Error( 'Depth Texture with cube render targets is not supported' ); }
 
 			_gl.bindFramebuffer( 36160, framebuffer );
@@ -22052,7 +22054,7 @@
 
 			var renderTargetProperties = properties.get( renderTarget );
 
-			var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
+			var isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 
 			if ( renderTarget.depthTexture ) {
 
@@ -22100,7 +22102,7 @@
 
 			info.memory.textures ++;
 
-			var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
+			var isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 			var isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
 			var isMultiview = ( renderTarget.isWebGLMultiviewRenderTarget === true );
 			var supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
@@ -22256,7 +22258,7 @@
 
 			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-				var target = renderTarget.isWebGLRenderTargetCube ? 34067 : 3553;
+				var target = renderTarget.isWebGLCubeRenderTarget ? 34067 : 3553;
 				var webglTexture = properties.get( texture ).__webglTexture;
 
 				state.bindTexture( target, webglTexture );
@@ -22345,7 +22347,7 @@
 
 		function safeSetTextureCube( texture, slot ) {
 
-			if ( texture && texture.isWebGLRenderTargetCube ) {
+			if ( texture && texture.isWebGLCubeRenderTarget ) {
 
 				if ( warnedTextureCube === false ) {
 
@@ -22358,7 +22360,7 @@
 
 			}
 
-			// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
+			// currently relying on the fact that WebGLCubeRenderTarget.texture is a Texture and NOT a CubeTexture
 			// TODO: unify these code paths
 			if ( ( texture && texture.isCubeTexture ) ||
 				( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
@@ -22370,7 +22372,7 @@
 
 			} else {
 
-				// assumed: texture property of THREE.WebGLRenderTargetCube
+				// assumed: texture property of THREE.WebGLCubeRenderTarget
 				setTextureCubeDynamic( texture, slot );
 
 			}
@@ -25320,9 +25322,9 @@
 				uniforms.envMap.value = envMap;
 
 				// don't flip CubeTexture envMaps, flip everything else:
-				//  WebGLRenderTargetCube will be flipped for backwards compatibility
-				//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
-				// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
+				//  WebGLCubeRenderTarget will be flipped for backwards compatibility
+				//  WebGLCubeRenderTarget.texture will be flipped because it's a Texture and NOT a CubeTexture
+				// this check must be handled differently, or removed entirely, if WebGLCubeRenderTarget uses a CubeTexture in the future
 				uniforms.flipEnvMap.value = envMap.isCubeTexture ? - 1 : 1;
 
 				uniforms.reflectivity.value = material.reflectivity;
@@ -25911,7 +25913,7 @@
 
 				var __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-				if ( renderTarget.isWebGLRenderTargetCube ) {
+				if ( renderTarget.isWebGLCubeRenderTarget ) {
 
 					framebuffer = __webglFramebuffer[ activeCubeFace || 0 ];
 					isCube = true;
@@ -25969,7 +25971,7 @@
 
 			var framebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
-			if ( renderTarget.isWebGLRenderTargetCube && activeCubeFaceIndex !== undefined ) {
+			if ( renderTarget.isWebGLCubeRenderTarget && activeCubeFaceIndex !== undefined ) {
 
 				framebuffer = framebuffer[ activeCubeFaceIndex ];
 
@@ -49493,26 +49495,12 @@
 
 	} );
 
-	//
+	function WebGLRenderTargetCube( width, height, options ) {
 
-	Object.defineProperties( WebGLRenderTargetCube.prototype, {
+		console.warn( 'THREE.WebGLRenderTargetCube has been renamed to WebGLCubeRenderTarget.' );
+		return new WebGLCubeRenderTarget( width, height, options );
 
-		activeCubeFace: {
-			set: function ( /* value */ ) {
-
-				console.warn( 'THREE.WebGLRenderTargetCube: .activeCubeFace has been removed. It is now the second parameter of WebGLRenderer.setRenderTarget().' );
-
-			}
-		},
-		activeMipMapLevel: {
-			set: function ( /* value */ ) {
-
-				console.warn( 'THREE.WebGLRenderTargetCube: .activeMipMapLevel has been removed. It is now the third parameter of WebGLRenderer.setRenderTarget().' );
-
-			}
-		}
-
-	} );
+	}
 
 	//
 
@@ -50272,6 +50260,7 @@
 	exports.Vertex = Vertex;
 	exports.VertexColors = VertexColors;
 	exports.VideoTexture = VideoTexture;
+	exports.WebGLCubeRenderTarget = WebGLCubeRenderTarget;
 	exports.WebGLMultisampleRenderTarget = WebGLMultisampleRenderTarget;
 	exports.WebGLRenderTarget = WebGLRenderTarget;
 	exports.WebGLRenderTargetCube = WebGLRenderTargetCube;
