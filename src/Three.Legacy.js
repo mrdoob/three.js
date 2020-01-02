@@ -1802,31 +1802,6 @@ export function WebGLRenderTargetCube( width, height, options ) {
 }
 
 //
-/*
-// commenting out for now. added in https://github.com/mrdoob/three.js/pull/15808.
-// todo: handle this legacy warning, or remove it.
-
-Object.defineProperties( WebGLRenderTargetCube.prototype, {
-
-	activeCubeFace: {
-		set: function () {
-
-			console.warn( 'THREE.WebGLRenderTargetCube: .activeCubeFace has been removed. It is now the second parameter of WebGLRenderer.setRenderTarget().' );
-
-		}
-	},
-	activeMipMapLevel: {
-		set: function () {
-
-			console.warn( 'THREE.WebGLRenderTargetCube: .activeMipMapLevel has been removed. It is now the third parameter of WebGLRenderer.setRenderTarget().' );
-
-		}
-	}
-
-} );
-
-*/
-//
 
 Object.defineProperties( WebGLRenderTarget.prototype, {
 
