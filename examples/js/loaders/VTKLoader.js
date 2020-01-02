@@ -92,7 +92,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			for ( var i in lines ) {
 
-				var line = lines[ i ];
+				var line = lines[ i ].trim();
 
 				if ( line.indexOf( 'DATASET' ) === 0 ) {
 
