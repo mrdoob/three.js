@@ -3,11 +3,11 @@
  */
 /* global QUnit */
 
-import { WebGLRenderTargetCube } from '../../../../src/renderers/WebGLRenderTargetCube';
+import { WebGLCubeRenderTarget } from '../../../../src/renderers/WebGLCubeRenderTarget';
 
 export default QUnit.module( 'Renderers', () => {
 
-	QUnit.module( 'WebGLRenderTargetCube', () => {
+	QUnit.module( 'WebGLCubeRenderTarget', () => {
 
 		// INSTANCING
 		QUnit.todo( "Instancing", ( assert ) => {
@@ -17,7 +17,7 @@ export default QUnit.module( 'Renderers', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isWebGLRenderTargetCube", ( assert ) => {
+		QUnit.todo( "isWebGLCubeRenderTarget", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
