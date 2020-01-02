@@ -32,7 +32,6 @@ THREE.SVGRenderer = function () {
 		_directionalLights = new THREE.Color(),
 		_pointLights = new THREE.Color(),
 		_clearColor = new THREE.Color(),
-		_clearAlpha = 1,
 
 		_vector3 = new THREE.Vector3(), // Needed for PointLight
 		_centroid = new THREE.Vector3(),
@@ -79,10 +78,9 @@ THREE.SVGRenderer = function () {
 
 	};
 
-	this.setClearColor = function ( color, alpha ) {
+	this.setClearColor = function ( color ) {
 
 		_clearColor.set( color );
-		_clearAlpha = alpha !== undefined ? alpha : 1;
 
 	};
 

@@ -48,7 +48,6 @@ var SVGRenderer = function () {
 		_directionalLights = new Color(),
 		_pointLights = new Color(),
 		_clearColor = new Color(),
-		_clearAlpha = 1,
 
 		_vector3 = new Vector3(), // Needed for PointLight
 		_centroid = new Vector3(),
@@ -95,10 +94,9 @@ var SVGRenderer = function () {
 
 	};
 
-	this.setClearColor = function ( color, alpha ) {
+	this.setClearColor = function ( color ) {
 
 		_clearColor.set( color );
-		_clearAlpha = alpha !== undefined ? alpha : 1;
 
 	};
 
