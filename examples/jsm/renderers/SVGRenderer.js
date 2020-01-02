@@ -136,22 +136,6 @@ var SVGRenderer = function () {
 
 	}
 
-	function getSvgColor( color ) {
-
-		var arg = Math.floor( color.r * 255 ) + ',' + Math.floor( color.g * 255 ) + ',' + Math.floor( color.b * 255 );
-
-		return 'rgb(' + arg + ')';
-
-	}
-
-	function getSvgOpacity( opacity ) {
-
-		if ( opacity === undefined || opacity === 1 ) return 'none';
-
-		return opacity;
-
-	}
-
 	function convert( c ) {
 
 		return _precision !== null ? c.toFixed( _precision ) : c;
@@ -161,7 +145,7 @@ var SVGRenderer = function () {
 	this.clear = function () {
 
 		removeChildNodes();
-		_svg.style.backgroundColor = getSvgColor( _clearColor ) + ';fill-opacity:' + getSvgOpacity( _clearAlpha );
+		_svg.style.backgroundColor = _clearColor.getStyle();
 
 	};
 
@@ -179,7 +163,7 @@ var SVGRenderer = function () {
 		if ( background && background.isColor ) {
 
 			removeChildNodes();
-			_svg.style.backgroundColor = getSvgColor( background );
+			_svg.style.backgroundColor = background.getStyle();
 
 		} else if ( this.autoClear === true ) {
 
@@ -395,7 +379,7 @@ var SVGRenderer = function () {
 
 		if ( material.isSpriteMaterial || material.isPointsMaterial ) {
 
-			style = 'fill:' + getSvgColor( material.color ) + ';fill-opacity:' + getSvgOpacity( material.opacity );
+			style = 'fill:' + material.color.getStyle() + ';fill-opacity:' + material.opacity;
 
 		}
 
@@ -409,7 +393,7 @@ var SVGRenderer = function () {
 
 		if ( material.isLineBasicMaterial ) {
 
-			var style = 'fill:none;stroke:' + getSvgColor( material.color ) + ';stroke-opacity:' + getSvgOpacity( material.opacity ) + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
+			var style = 'fill:none;stroke:' + material.color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.linewidth + ';stroke-linecap:' + material.linecap;
 
 			if ( material.isLineDashedMaterial ) {
 
@@ -469,11 +453,11 @@ var SVGRenderer = function () {
 
 		if ( material.wireframe ) {
 
-			style = 'fill:none;stroke:' + getSvgColor( _color ) + ';stroke-opacity:' + getSvgOpacity( material.opacity ) + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
+			style = 'fill:none;stroke:' + _color.getStyle() + ';stroke-opacity:' + material.opacity + ';stroke-width:' + material.wireframeLinewidth + ';stroke-linecap:' + material.wireframeLinecap + ';stroke-linejoin:' + material.wireframeLinejoin;
 
 		} else {
 
-			style = 'fill:' + getSvgColor( _color ) + ';fill-opacity:' + getSvgOpacity( material.opacity );
+			style = 'fill:' + _color.getStyle() + ';fill-opacity:' + material.opacity;
 
 		}
 
