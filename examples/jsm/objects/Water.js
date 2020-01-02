@@ -321,6 +321,16 @@ var Water = function ( geometry, options ) {
 
 		renderer.setRenderTarget( currentRenderTarget );
 
+		// Restore viewport
+
+		var viewport = camera.viewport;
+
+		if ( viewport !== undefined ) {
+
+			renderer.state.viewport( viewport );
+
+		}
+
 	};
 
 };
