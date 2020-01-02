@@ -1015,9 +1015,9 @@ var GLTFLoader = ( function () {
 					uniforms.envMapIntensity.value = material.envMapIntensity;
 
 					// don't flip CubeTexture envMaps, flip everything else:
-					//  WebGLRenderTargetCube will be flipped for backwards compatibility
-					//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
-					// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
+					//  WebGLCubeRenderTarget will be flipped for backwards compatibility
+					//  WebGLCubeRenderTarget.texture will be flipped because it's a Texture and NOT a CubeTexture
+					// this check must be handled differently, or removed entirely, if WebGLCubeRenderTarget uses a CubeTexture in the future
 					uniforms.flipEnvMap.value = material.envMap.isCubeTexture ? - 1 : 1;
 
 					uniforms.reflectivity.value = material.reflectivity;
