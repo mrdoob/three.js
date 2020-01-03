@@ -1796,8 +1796,8 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 
 export function WebGLRenderTargetCube( width, height, options ) {
 
-	console.warn( 'THREE.WebGLRenderTargetCube has been renamed to WebGLCubeRenderTarget.' );
-	return new WebGLCubeRenderTarget( width, height, options );
+	console.warn( 'THREE.WebGLRenderTargetCube( width, height, options ) is now WebGLCubeRenderTarget( resolution, options ).' );
+	return new WebGLCubeRenderTarget( width, options );
 
 }
 
