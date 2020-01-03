@@ -62,7 +62,8 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var result;
 
-			var patWord = /^[^0-9.\s-]+/;
+			// pattern for detecting the end of a number sequence
+			var patWord = /^[^\d.\s-]+/;
 
 			// pattern for reading vertices, 3 floats or integers
 			var pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
