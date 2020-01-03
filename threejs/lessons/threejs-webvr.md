@@ -21,67 +21,24 @@ covered in [the article on setting up](threejs-setup.html).
 
 If the device you are using to view VR is not the same computer you're running
 on you need to serve your webpage via https or else the browser will not allow using
-the WebXR API. Setting up https is a complicated topic but there is a relatively
-simple service with a free level that will make this issue easy called "[ngrok](https://ngrok.com/)".
+the WebXR API. The server mentioned in [the article on setting up](threejs-setup.html)
+called [Servez](https://greggman.github.io/servez) has an option to use https. 
+Check it and start the server. 
 
-Here are the steps to use it. 
+<div class="threejs_center"><img src="resources/images/servez-https.png" class="nobg" style="width: 912px;"></div>
 
-1. [Download ngrok](https://ngrok.com/download)
+The note the URLs. You need the one that is your computer's local ipaddress.
+It will usually start with `192`, `172` or `10`. Type that full address, including the `https://` part
+into your VR device's browser. Note: Your computer and your VR device need to be on the same local network
+or WiFi and you probably need to be on a home network. note: Many cafes are setup to disallow this kind of
+machine to machine connection.
 
-2. [Create an ngrok account](https://dashboard.ngrok.com/signup)
+You'll be greeted with an error something like the one below. Click "advanced" and then click
+*proceed*.
 
-3. Look up your authtoken
+<div class="threejs_center"><img src="resources/images/https-warning.gif"></div>
 
-    You can find it by clicking "auth" on the left
-
-    <img src="resources/images/ngrok-auth.png" style="width: 996px;">
-
-4. Run the ngrok authtoken command.
-
-    In a command line / terminal run the ngrok authtoken command.
-
-    ```
-    ./ngrok authtoken yourngroktokengoeshere
-    ```
-
-    Replace `yourngrontokengoeshere` with the token you looked up step 3.
-    Note: If you're in Windows you will type `ngrok` instead of `./ngrok`
-
-5. Run your web server and note the port number
-
-   Run your server as shown in [the setup article](threejs-setup.html). Note the
-   port the server is running on. If you use the same server mentioned in
-   [that article](threejs-setup.html) the port will probably be 8080
-
-6. Run the ngrok http command
-
-    ```
-    ./ngrok http 8080
-    ```
-
-    Replace your 8080 with the port your webserver is running on
-
-Once you do this you should see something like
-
-```
-ngrok by @inconshreveable     
-
-(Ctrl+C to quit)
-
-Session Status                online
-Account                       Gregg Tavares (Plan: Free)
-Version                       2.3.35
-Region                        United States (us)
-Web Interface                 http://127.0.0.1:4040
-Forwarding                    http://6a4db28f.ngrok.io -> http://localhost:8080
-Forwarding                    https://6a4db28f.ngrok.io -> http://localhost:8080
-
-Connections                   ttl     opn     rt1     rt5     p50     p90
-                              120     0       0.00    0.00    3.84    5.18
-```
-
-You can now connect your VR device's browser to the https url shown.
-**BE SURE TO TYPE `https://` in front of the url!**
+Now you can run your examples.
 
 If you're really going to do WebVR development another thing you should learn about is
 [remote debugging](https://developers.google.com/web/tools/chrome-devtools/remote-debugging/)
