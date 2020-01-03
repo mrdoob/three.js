@@ -231,6 +231,8 @@ Editor.prototype = {
 
 	addMaterial: function ( material ) {
 
+		if ( material.uuid in this.materials ) return;
+
 		this.materials[ material.uuid ] = material;
 		this.signals.materialAdded.dispatch();
 
