@@ -62,6 +62,9 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var result;
 
+			// pattern for detecting the end of a number sequence
+			var patWord = /^[^\d.\s-]+/;
+
 			// pattern for reading vertices, 3 floats or integers
 			var pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
 
@@ -114,6 +117,8 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					// get the vertices
 					while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+						if ( patWord.exec( line ) !== null ) break;
 
 						var x = parseFloat( result[ 1 ] );
 						var y = parseFloat( result[ 2 ] );
@@ -193,6 +198,8 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
 
+							if ( patWord.exec( line ) !== null ) break;
+
 							var r = parseFloat( result[ 1 ] );
 							var g = parseFloat( result[ 2 ] );
 							var b = parseFloat( result[ 3 ] );
@@ -205,6 +212,8 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						// Get the normal vectors
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+							if ( patWord.exec( line ) !== null ) break;
 
 							var nx = parseFloat( result[ 1 ] );
 							var ny = parseFloat( result[ 2 ] );
