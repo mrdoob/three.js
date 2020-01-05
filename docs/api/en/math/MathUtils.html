@@ -105,6 +105,19 @@
 		that has zero 1st and 2nd order derivatives at x=0 and x=1.
 		</p>
 
+		<h3>[method:null setQuaternionFromProperEuler]( [param:Quaternion q], [param:Float a], [param:Float b], [param:Float c], [param:String order] )</h3>
+		<p>
+		[page:Quaternion q] - the quaternion to be set<br />
+		[page:Float a] - the rotation applied to the first axis, in radians <br />
+		[page:Float b] - the rotation applied to the second axis, in radians <br />
+		[page:Float c] - the rotation applied to the third axis, in radians <br />
+		[page:String order] - a string specifying the axes order: 'XYX', 'XZX', 'YXY', 'YZY', 'ZXZ', or 'ZYZ'<br /><br />
+
+		Sets quaternion [page:Quaternion q] from the [link:http://en.wikipedia.org/wiki/Euler_angles intrinsic Proper Euler Angles] defined by angles [page:Float a], [page:Float b], and [page:Float c], and order [page:String order].<br />
+
+		Rotations are applied to the axes in the order specified by [page:String order]: rotation by angle [page:Float a] is applied first, then by angle [page:Float b], then by angle [page:Float c]. Angles are in radians.
+		</p>
+
 		<h2>Source</h2>
 
 		<p>
