@@ -7,7 +7,7 @@ import * as THREE from '../../build/three.module.js';
 import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
 import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
 
-import { UIPanel } from './libs/ui.js';
+import { UIPanel } from './libs/ui/index.js';
 
 import { EditorControls } from './EditorControls.js';
 

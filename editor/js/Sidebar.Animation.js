@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIPanel, UIDiv, UIBreak, UISelect, UIButton, UIText } from './libs/ui.js';
+import { UIPanel, UIDiv, UIBreak, UISelect, UIButton, UIText } from './libs/ui/index.js';
 
 var SidebarAnimation = function ( editor ) {
 

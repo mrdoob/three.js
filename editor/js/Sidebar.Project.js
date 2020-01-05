@@ -7,7 +7,7 @@ import * as THREE from '../../build/three.module.js';
 import { SVGRenderer } from '../../examples/jsm/renderers/SVGRenderer.js';
 import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
 
-import { UIPanel, UIRow, UIInput, UICheckbox, UISelect, UIText, UIListbox, UISpan, UIButton } from './libs/ui.js';
+import { UIPanel, UIRow, UIInput, UICheckbox, UISelect, UIText, UIListbox, UISpan, UIButton } from './libs/ui/index.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';

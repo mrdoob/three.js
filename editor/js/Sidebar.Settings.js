@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
+import { UIPanel, UIRow, UISelect, UIText } from './libs/ui/index.js';
 
 import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
 import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';

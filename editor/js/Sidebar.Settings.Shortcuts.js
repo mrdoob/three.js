@@ -2,7 +2,7 @@
  * @author TyLindberg / https://github.com/TyLindberg
  */
 
-import { UIDiv, UIBreak, UIText, UIRow, UIInput } from './libs/ui.js';
+import { UIDiv, UIBreak, UIText, UIRow, UIInput } from './libs/ui/index.js';
 
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 

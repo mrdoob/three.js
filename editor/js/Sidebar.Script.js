@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIPanel, UIBreak, UIText, UIButton, UIRow, UIInput } from './libs/ui.js';
+import { UIPanel, UIBreak, UIText, UIButton, UIRow, UIInput } from './libs/ui/index.js';
 
 import { AddScriptCommand } from './commands/AddScriptCommand.js';
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';

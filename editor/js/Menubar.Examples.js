@@ -4,7 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel, UIRow } from './libs/ui.js';
+import { UIPanel, UIRow } from './libs/ui/index.js';
 
 var MenubarExamples = function ( editor ) {
 

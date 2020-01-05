@@ -4,7 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UISelect, UIText, UINumber } from './libs/ui.js';
+import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UISelect, UIText, UINumber } from './libs/ui/index.js';
 import { UITexture } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';

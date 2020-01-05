@@ -4,7 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
+import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui/index.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 

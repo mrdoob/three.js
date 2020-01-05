@@ -2,7 +2,7 @@
  * @author tschw
  */
 
-import { UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui/index.js';
 
 import { TeapotBufferGeometry } from '../../examples/jsm/geometries/TeapotBufferGeometry.js';
 

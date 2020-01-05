@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIPanel } from './libs/ui.js';
+import { UIPanel } from './libs/ui/index.js';
 
 import { MenubarAdd } from './Menubar.Add.js';
 import { MenubarEdit } from './Menubar.Edit.js';

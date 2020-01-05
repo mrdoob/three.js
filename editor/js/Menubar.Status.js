@@ -4,7 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel, UIText } from './libs/ui.js';
+import { UIPanel, UIText } from './libs/ui/index.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 var MenubarStatus = function ( editor ) {

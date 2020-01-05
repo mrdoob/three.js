@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UISelect } from './libs/ui.js';
+import { UISelect } from './libs/ui/index.js';
 
 var ViewportCamera = function ( editor ) {
 

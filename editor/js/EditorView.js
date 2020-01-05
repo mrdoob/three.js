@@ -1,4 +1,4 @@
-import { UIPanel } from "./libs/ui.js";
+import { UIPanel } from "./libs/ui/index.js";
 import { Viewport } from './Viewport.js';
 import { Toolbar } from './Toolbar.js';
 import { Script } from './Script.js';

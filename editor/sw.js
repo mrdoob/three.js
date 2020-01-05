@@ -84,7 +84,7 @@ const assets = [
 	'./js/libs/tern-threejs/threejs.js',
 
 	'./js/libs/signals.min.js',
-	'./js/libs/ui.js',
+	'./js/libs/ui/index.js',
 	'./js/libs/ui.three.js',
 
 	'./js/libs/app.js',

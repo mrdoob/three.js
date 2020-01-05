@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIPanel, UIRow } from './libs/ui.js';
+import { UIPanel, UIRow } from './libs/ui/index.js';
 
 var MenubarView = function ( editor ) {
 

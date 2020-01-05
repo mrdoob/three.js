@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIRow, UIText } from './libs/ui.js';
+import { UIRow, UIText } from './libs/ui/index.js';
 
 var SidebarGeometryGeometry = function ( editor ) {
 

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UITabbedPanel } from './libs/ui.js';
+import { UITabbedPanel } from './libs/ui/index.js';
 
 import { SidebarObject } from './Sidebar.Object.js';
 import { SidebarGeometry } from './Sidebar.Geometry.js';

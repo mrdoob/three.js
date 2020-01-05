@@ -10,7 +10,7 @@ import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
 import { PLYExporter } from '../../examples/jsm/exporters/PLYExporter.js';
 import { STLExporter } from '../../examples/jsm/exporters/STLExporter.js';
 
-import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
+import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui/index.js';
 
 var MenubarFile = function ( editor ) {
 

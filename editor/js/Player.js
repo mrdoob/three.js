@@ -4,7 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel } from './libs/ui.js';
+import { UIPanel } from './libs/ui/index.js';
 import { APP } from './libs/app.js';
 
 var Player = function ( editor ) {

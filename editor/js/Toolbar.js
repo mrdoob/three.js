@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIPanel, UIButton } from './libs/ui.js';
+import { UIPanel, UIButton } from './libs/ui/index.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 var Toolbar = function ( editor ) {

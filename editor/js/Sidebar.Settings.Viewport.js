@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIDiv, UIBreak, UIText } from './libs/ui.js';
+import { UIDiv, UIBreak, UIText } from './libs/ui/index.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 

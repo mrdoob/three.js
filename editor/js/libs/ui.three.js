@@ -6,7 +6,7 @@ import * as THREE from '../../../build/three.module.js';
 
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 
-import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
+import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui/index.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
 
 /**

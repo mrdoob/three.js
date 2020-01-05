@@ -3,7 +3,7 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-import { UIPanel, UIBreak, UIText } from './libs/ui.js';
+import { UIPanel, UIBreak, UIText } from './libs/ui/index.js';
 import { UIBoolean, UIOutliner } from './libs/ui.three.js';
 
 var SidebarHistory = function ( editor ) {

@@ -4,7 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui/index.js';
 import { UIPoints2 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';

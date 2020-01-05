@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIElement, UIPanel, UIText } from './libs/ui.js';
+import { UIElement, UIPanel, UIText } from './libs/ui/index.js';
 
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';

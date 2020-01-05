@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIRow, UIButton } from './libs/ui.js';
+import { UIRow, UIButton } from './libs/ui/index.js';
 
 var SidebarGeometryModifiers = function ( editor, object ) {
 

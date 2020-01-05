@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIRow, UIText, UISpan, UIBreak } from './libs/ui.js';
+import { UIRow, UIText, UISpan, UIBreak } from './libs/ui/index.js';
 
 var SidebarGeometryBufferGeometry = function ( editor ) {
 
