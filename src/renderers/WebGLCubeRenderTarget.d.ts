@@ -5,7 +5,7 @@ import { Texture } from './../textures/Texture';
 export class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 	constructor(
-		resolution: number,
+		size: number,
 		options?: WebGLRenderTargetOptions
 	);
 

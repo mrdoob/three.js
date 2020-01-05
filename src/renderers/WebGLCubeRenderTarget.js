@@ -12,17 +12,17 @@ import { CubeCamera } from '../cameras/CubeCamera.js';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function WebGLCubeRenderTarget( resolution, options, dummy ) {
+function WebGLCubeRenderTarget( size, options, dummy ) {
 
 	if ( Number.isInteger( options ) ) {
 
-		console.warn( 'THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( resolution, options )' );
+		console.warn( 'THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )' );
 
 		options = dummy;
 
 	}
 
-	WebGLRenderTarget.call( this, resolution, resolution, options );
+	WebGLRenderTarget.call( this, size, size, options );
 
 }
 
