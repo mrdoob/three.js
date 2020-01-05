@@ -1,4 +1,4 @@
-// r112
+// r112.1
 
 const assets = [
 	'./',
@@ -43,10 +43,6 @@ const assets = [
 	'../examples/jsm/exporters/PLYExporter.js',
 	'../examples/jsm/exporters/STLExporter.js',
 
-	'../examples/jsm/renderers/Projector.js',
-	'../examples/jsm/renderers/RaytracingRenderer.js',
-	'../examples/jsm/renderers/SVGRenderer.js',
-
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
 
 	'./manifest.json',
@@ -59,7 +55,6 @@ const assets = [
 	'./js/libs/codemirror/mode/javascript.js',
 	'./js/libs/codemirror/mode/glsl.js',
 
-	'./js/libs/system.min.js',
 	'./js/libs/esprima.js',
 	'./js/libs/jsonlint.js',
 	'./js/libs/glslprep.min.js',

@@ -198,7 +198,7 @@ export class Material extends EventDispatcher {
 	 * Used to check whether this or derived classes are materials. Default is true.
 	 * You should not change this, as it used internally for optimisation.
 	 */
-	isMaterial: boolean;
+	readonly isMaterial: true;
 
 	/**
 	 * Material name. Default is an empty string.

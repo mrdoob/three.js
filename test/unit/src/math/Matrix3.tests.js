@@ -163,18 +163,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyToBufferAttribute", ( assert ) => {
-
-			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
-			var attr = new Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
-			var expected = new Float32Array( [ 8, 20, 32, 12, 30, 48 ] );
-
-			var applied = a.applyToBufferAttribute( attr );
-
-			assert.deepEqual( applied.array, expected, "Check resulting buffer" );
-
-		} );
-
 		QUnit.test( "multiply/premultiply", ( assert ) => {
 
 			// both simply just wrap multiplyMatrices

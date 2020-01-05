@@ -2,7 +2,7 @@ import './polyfills.js';
 import { REVISION } from './constants.js';
 
 export { WebGLMultisampleRenderTarget } from './renderers/WebGLMultisampleRenderTarget.js';
-export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
+export { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 export { WebGLRenderer } from './renderers/WebGLRenderer.js';
 export { ShaderLib } from './renderers/shaders/ShaderLib.js';
@@ -110,7 +110,7 @@ export { DiscreteInterpolant } from './math/interpolants/DiscreteInterpolant.js'
 export { CubicInterpolant } from './math/interpolants/CubicInterpolant.js';
 export { Interpolant } from './math/Interpolant.js';
 export { Triangle } from './math/Triangle.js';
-export { _Math as Math } from './math/Math.js';
+export { MathUtils } from './math/MathUtils.js';
 export { Spherical } from './math/Spherical.js';
 export { Cylindrical } from './math/Cylindrical.js';
 export { Plane } from './math/Plane.js';

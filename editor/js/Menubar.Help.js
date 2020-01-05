@@ -48,4 +48,4 @@ var MenubarHelp = function ( editor ) {
 
 };
 
-export { MenubarHelp };
+export { MenubarHelp };

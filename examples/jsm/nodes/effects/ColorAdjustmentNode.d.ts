@@ -8,7 +8,7 @@ export class ColorAdjustmentNode extends TempNode {
 	constructor( rgb: Node, adjustment?: FloatNode, method?: string );
 
 	rgb: Node;
-	adjustment: FloatNode | undefined;
+	adjustment: FloatNode | undefined;
 	method: string;
 	nodeType: string;
 

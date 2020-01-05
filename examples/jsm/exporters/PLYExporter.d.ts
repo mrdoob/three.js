@@ -9,6 +9,6 @@ export class PLYExporter {
 
 	constructor();
 
-	parse( object: Object3D, onDone: ( res: string ) => void, options: PLYExporterOptions ): string | null;
+	parse( object: Object3D, onDone: ( res: string ) => void, options: PLYExporterOptions ): string | null;
 
 }

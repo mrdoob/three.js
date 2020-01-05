@@ -272,7 +272,7 @@ var list = {
 				"Frustum": "api/en/math/Frustum",
 				"Interpolant": "api/en/math/Interpolant",
 				"Line3": "api/en/math/Line3",
-				"Math": "api/en/math/Math",
+				"MathUtils": "api/en/math/MathUtils",
 				"Matrix3": "api/en/math/Matrix3",
 				"Matrix4": "api/en/math/Matrix4",
 				"Plane": "api/en/math/Plane",
@@ -312,7 +312,7 @@ var list = {
 				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
-				"WebGLRenderTargetCube": "api/en/renderers/WebGLRenderTargetCube"
+				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
 			},
 
 			"Renderers / Shaders": {
@@ -721,7 +721,7 @@ var list = {
 				"Frustum": "api/zh/math/Frustum",
 				"Interpolant": "api/zh/math/Interpolant",
 				"Line3": "api/zh/math/Line3",
-				"Math": "api/zh/math/Math",
+				"MathUtils": "api/zh/math/MathUtils",
 				"Matrix3": "api/zh/math/Matrix3",
 				"Matrix4": "api/zh/math/Matrix4",
 				"Plane": "api/zh/math/Plane",
@@ -761,7 +761,7 @@ var list = {
 				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
-				"WebGLRenderTargetCube": "api/zh/renderers/WebGLRenderTargetCube"
+				"WebGLCubeRenderTarget": "api/zh/renderers/WebGLCubeRenderTarget"
 			},
 
 			"渲染器 / 着色器": {

@@ -67,42 +67,20 @@ THREE.BufferGeometryUtils = {
 			uvB.fromArray( uvs, b * 2 );
 			uvC.fromArray( uvs, c * 2 );
 
-			var x1 = vB.x - vA.x;
-			var x2 = vC.x - vA.x;
+			vB.sub( vA );
+			vC.sub( vA );
 
-			var y1 = vB.y - vA.y;
-			var y2 = vC.y - vA.y;
+			uvB.sub( uvA );
+			uvC.sub( uvA );
 
-			var z1 = vB.z - vA.z;
-			var z2 = vC.z - vA.z;
+			var r = 1.0 / ( uvB.x * uvC.y - uvC.x * uvB.y );
 
-			var s1 = uvB.x - uvA.x;
-			var s2 = uvC.x - uvA.x;
+			// silently ignore degenerate uv triangles having coincident or colinear vertices
 
-			var t1 = uvB.y - uvA.y;
-			var t2 = uvC.y - uvA.y;
+			if ( ! isFinite( r ) ) return;
 
-			var r = 1.0 / ( s1 * t2 - s2 * t1 );
-
-			sdir.set(
-				( t2 * x1 - t1 * x2 ) * r,
-				( t2 * y1 - t1 * y2 ) * r,
-				( t2 * z1 - t1 * z2 ) * r
-			);
-
-			tdir.set(
-				( s1 * x2 - s2 * x1 ) * r,
-				( s1 * y2 - s2 * y1 ) * r,
-				( s1 * z2 - s2 * z1 ) * r
-			);
-
-			// silently ignore degenerate uvs/triangles that yield NaN/Infinite intermediary values
-			if ( ! ( isFinite( sdir.x ) && isFinite( sdir.y ) && isFinite( sdir.z ) &&
-					 isFinite( tdir.x ) && isFinite( tdir.y ) && isFinite( tdir.z ) ) ) {
-
-				return;
-
-			}
+			sdir.copy( vB ).multiplyScalar( uvC.y ).addScaledVector( vC, - uvB.y ).multiplyScalar( r );
+			tdir.copy( vC ).multiplyScalar( uvB.x ).addScaledVector( vB, - uvC.x ).multiplyScalar( r );
 
 			tan1[ a ].add( sdir );
 			tan1[ b ].add( sdir );
@@ -646,7 +624,7 @@ THREE.BufferGeometryUtils = {
 
 		}
 
-		if ( drawMode === THREE.TriangleFanDrawMode || drawMode === THREE.TriangleStripDrawMode ) {
+		if ( drawMode === THREE.TriangleFanDrawMode || drawMode === THREE.TriangleStripDrawMode ) {
 
 			var index = geometry.getIndex();
 

@@ -34,7 +34,7 @@ import {
 	Loader,
 	LoaderUtils,
 	Material,
-	Math as _Math,
+	MathUtils,
 	Matrix4,
 	Mesh,
 	MeshBasicMaterial,
@@ -62,6 +62,7 @@ import {
 	SkinnedMesh,
 	Sphere,
 	SpotLight,
+	TangentSpaceNormalMap,
 	TextureLoader,
 	TriangleFanDrawMode,
 	TriangleStripDrawMode,
@@ -689,6 +690,7 @@ var GLTFLoader = ( function () {
 				'bumpMap',
 				'bumpScale',
 				'normalMap',
+				'normalMapType',
 				'displacementMap',
 				'displacementScale',
 				'displacementBias',
@@ -750,7 +752,11 @@ var GLTFLoader = ( function () {
 				var lightPhysicalFragmentChunk = [
 					'PhysicalMaterial material;',
 					'material.diffuseColor = diffuseColor.rgb;',
-					'material.specularRoughness = clamp( 1.0 - glossinessFactor, 0.04, 1.0 );',
+					'vec3 dxy = max( abs( dFdx( geometryNormal ) ), abs( dFdy( geometryNormal ) ) );',
+					'float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );',
+					'material.specularRoughness = max( 1.0 - glossinessFactor, 0.0525 );// 0.0525 corresponds to the base mip of a 256 cubemap.',
+					'material.specularRoughness += geometryRoughness;',
+					'material.specularRoughness = min( material.specularRoughness, 1.0 );',
 					'material.specularColor = specularFactor.rgb;',
 				].join( '\n' );
 
@@ -855,6 +861,7 @@ var GLTFLoader = ( function () {
 				material.bumpScale = 1;
 
 				material.normalMap = params.normalMap === undefined ? null : params.normalMap;
+				material.normalMapType = TangentSpaceNormalMap;
 
 				if ( params.normalScale ) material.normalScale = params.normalScale;
 
@@ -1008,9 +1015,9 @@ var GLTFLoader = ( function () {
 					uniforms.envMapIntensity.value = material.envMapIntensity;
 
 					// don't flip CubeTexture envMaps, flip everything else:
-					//  WebGLRenderTargetCube will be flipped for backwards compatibility
-					//  WebGLRenderTargetCube.texture will be flipped because it's a Texture and NOT a CubeTexture
-					// this check must be handled differently, or removed entirely, if WebGLRenderTargetCube uses a CubeTexture in the future
+					//  WebGLCubeRenderTarget will be flipped for backwards compatibility
+					//  WebGLCubeRenderTarget.texture will be flipped because it's a Texture and NOT a CubeTexture
+					// this check must be handled differently, or removed entirely, if WebGLCubeRenderTarget uses a CubeTexture in the future
 					uniforms.flipEnvMap.value = material.envMap.isCubeTexture ? - 1 : 1;
 
 					uniforms.reflectivity.value = material.reflectivity;
@@ -2818,7 +2825,7 @@ var GLTFLoader = ( function () {
 
 		if ( cameraDef.type === 'perspective' ) {
 
-			camera = new PerspectiveCamera( _Math.radToDeg( params.yfov ), params.aspectRatio || 1, params.znear || 1, params.zfar || 2e6 );
+			camera = new PerspectiveCamera( MathUtils.radToDeg( params.yfov ), params.aspectRatio || 1, params.znear || 1, params.zfar || 2e6 );
 
 		} else if ( cameraDef.type === 'orthographic' ) {
 
