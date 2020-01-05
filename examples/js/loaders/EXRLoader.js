@@ -767,7 +767,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		}
 
-		function uncompressRaw( info ) {
+		function uncompressRAW( info ) {
 
 			return new DataView( info.array.buffer, info.offset.value, info.size );
 
@@ -822,6 +822,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			var bitmap = new Uint8Array( BITMAP_SIZE );
 
+			// Read range compression data
 			var minNonZero = parseUint16( inDataView, inOffset );
 			var maxNonZero = parseUint16( inDataView, inOffset );
 
@@ -841,11 +842,13 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			}
 
+			// Reverse LUT
 			var lut = new Uint16Array( USHORT_RANGE );
 			reverseLutFromBitmap( bitmap, lut );
 
 			var length = parseUint32( inDataView, inOffset );
 
+			// Huffman decoding
 			hufUncompress( info.array, inDataView, inOffset, length, outBuffer, outOffset, tmpBufSize );
 
 			var pizChannelData = new Array( info.channels );
@@ -865,8 +868,8 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			}
 
+			// Wavelet decoding
 			var fooOffset = 0;
-
 			for ( var i = 0; i < info.channels; i ++ ) {
 
 				for ( var j = 0; j < pizChannelData[ i ].size; ++ j ) {
@@ -884,6 +887,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			}
 
+			// Expand the pixel data to their original range
 			applyLut( lut, outBuffer, outBufferEnd );
 
 			var tmpBuffer = new Uint8Array( outBuffer.buffer.byteLength );
@@ -1215,7 +1219,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			case 'NO_COMPRESSION':
 
 				scanlineBlockSize = 1;
-				uncompress = uncompressRaw;
+				uncompress = uncompressRAW;
 				break;
 
 			case 'RLE_COMPRESSION':
@@ -1364,48 +1368,42 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		};
 
-		if ( EXRHeader.compression === 'NO_COMPRESSION' ||
-			EXRHeader.compression === 'ZIP_COMPRESSION' ||
-			EXRHeader.compression === 'ZIPS_COMPRESSION' ||
-			EXRHeader.compression === 'RLE_COMPRESSION' ||
-			EXRHeader.compression === 'PIZ_COMPRESSION' ) {
+		var line;
+		var size;
+		var viewer;
+		var tmpOffset = { value: 0 };
 
-			var size;
-			var viewer;
-			var tmpOffset = { value: 0 };
+		for ( var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx ++ ) {
 
-			for ( var scanlineBlockIdx = 0; scanlineBlockIdx < height / scanlineBlockSize; scanlineBlockIdx ++ ) {
+			line = parseUint32( bufferDataView, offset ); // line_no
+			size = parseUint32( bufferDataView, offset ); // data_len
 
-				parseUint32( bufferDataView, offset ); // line_no
-				size = parseUint32( bufferDataView, offset ); // data_len
+			compressionInfo.lines = ( line + scanlineBlockSize > height ) ? height - line : scanlineBlockSize;
+			compressionInfo.offset = offset;
+			compressionInfo.size = size;
 
-				compressionInfo.offset = offset;
-				compressionInfo.size = size;
+			viewer = uncompress( compressionInfo );
 
-				viewer = uncompress( compressionInfo );
+			offset.value += size;
 
-				offset.value += size;
+			for ( var line_y = 0; line_y < scanlineBlockSize; line_y ++ ) {
 
-				for ( var line_y = 0; line_y < scanlineBlockSize; line_y ++ ) {
+				var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
 
-					var true_y = line_y + ( scanlineBlockIdx * scanlineBlockSize );
+				if ( true_y >= height ) break;
 
-					if ( true_y >= height ) break;
+				for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
 
-					for ( var channelID = 0; channelID < EXRHeader.channels.length; channelID ++ ) {
+					var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
 
-						var cOff = channelOffsets[ EXRHeader.channels[ channelID ].name ];
+					for ( var x = 0; x < width; x ++ ) {
 
-						for ( var x = 0; x < width; x ++ ) {
+						var idx = ( line_y * ( EXRHeader.channels.length * width ) ) + ( channelID * width ) + x;
+						tmpOffset.value = idx * size_t;
 
-							var idx = ( line_y * ( EXRHeader.channels.length * width ) ) + ( channelID * width ) + x;
-							tmpOffset.value = idx * size_t;
+						var val = getValue( viewer, tmpOffset );
 
-							var val = getValue( viewer, tmpOffset );
-
-							byteArray[ ( ( ( height - 1 - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
-
-						}
+						byteArray[ ( ( ( height - 1 - true_y ) * ( width * numChannels ) ) + ( x * numChannels ) ) + cOff ] = val;
 
 					}
 
