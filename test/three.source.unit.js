@@ -232,7 +232,7 @@ import './unit/src/objects/Sprite.tests';
 //src/renderers
 import './unit/src/renderers/WebGLRenderer.tests';
 import './unit/src/renderers/WebGLRenderTarget.tests';
-import './unit/src/renderers/WebGLRenderTargetCube.tests';
+import './unit/src/renderers/WebGLCubeRenderTarget.tests';
 
 //src/renderers/shaders
 import './unit/src/renderers/shaders/ShaderChunk.tests';
