@@ -1,15 +1,18 @@
-/**
- * @author YY
- */
 
 import * as THREE from "../../../build/three.module.js";
 
+
+/**
+ * @author LeonYuanYao @https://github.com/LeonYuanYao
+ * 
+ * Original Octahedron and Quantization encoding methods from @tsherif https://github.com/tsherif/mesh-quantization-example
+ */
 var GeometryCompressionUtils = {
 
     compressNormals: function (mesh, encodeMethod) {
 
         if (!mesh.geometry) {
-            console.error("Mesh must contain geometry property. ");
+            console.error("Mesh must contain geometry. ");
         }
 
         let normal = mesh.geometry.attributes.normal;
@@ -21,50 +24,14 @@ var GeometryCompressionUtils = {
         if (normal.isPacked) return;
 
         if (normal.itemSize != 3) {
-            console.error("normal.itemSize is not 3, which cannot be packed. ");
+            console.error("normal.itemSize is not 3, which cannot be encoded. ");
         }
 
         let array = normal.array;
         let count = normal.count;
 
         let result;
-        if (encodeMethod == "ANGLES") {
-
-            result = new Uint16Array(count * 2);
-
-            for (let idx = 0; idx < array.length; idx += 3) {
-
-                let encoded;
-
-                encoded = this.EncodingFuncs.uInt16Encode(array[idx], array[idx + 1], array[idx + 2]);
-
-                result[idx / 3 * 2 + 0] = encoded[0];
-                result[idx / 3 * 2 + 1] = encoded[1];
-
-            }
-
-            mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
-            mesh.geometry.attributes.normal.bytes = result.length * 2;
-
-        } else if (encodeMethod == "OCT") {
-
-            result = new Int8Array(count * 2);
-
-            for (let idx = 0; idx < array.length; idx += 3) {
-
-                let encoded;
-
-                encoded = this.EncodingFuncs.octEncodeBest(array[idx], array[idx + 1], array[idx + 2]);
-
-                result[idx / 3 * 2 + 0] = encoded[0];
-                result[idx / 3 * 2 + 1] = encoded[1];
-
-            }
-
-            mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
-            mesh.geometry.attributes.normal.bytes = result.length * 1;
-
-        } else if (encodeMethod == "DEFAULT") {
+        if (encodeMethod == "DEFAULT") {
 
             result = new Uint8Array(count * 3);
 
@@ -74,12 +41,6 @@ var GeometryCompressionUtils = {
 
                 encoded = this.EncodingFuncs.defaultEncode(array[idx], array[idx + 1], array[idx + 2], 1);
 
-                // let decoded = GeometryEncodingUtils.defaultDecode(encoded);
-
-                // let angle = Math.acos(Math.min(array[idx] * decoded[0] + array[idx + 1]  * decoded[1] + array[idx + 2] * decoded[2], 1.0)) * 180 / Math.PI;
-
-                // Math.abs(array[idx + 2]) < 0.05 && console.log([array[idx], array[idx + 1], array[idx + 2]], encoded, decoded, angle)
-
                 result[idx + 0] = encoded[0];
                 result[idx + 1] = encoded[1];
                 result[idx + 2] = encoded[2];
@@ -88,6 +49,60 @@ var GeometryCompressionUtils = {
 
             mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 3, true));
             mesh.geometry.attributes.normal.bytes = result.length * 1;
+
+        } else if (encodeMethod == "OCT1Byte") {
+
+            result = new Int8Array(count * 2);
+
+            for (let idx = 0; idx < array.length; idx += 3) {
+
+                let encoded;
+
+                encoded = this.EncodingFuncs.octEncodeBest(array[idx], array[idx + 1], array[idx + 2], 1);
+
+                result[idx / 3 * 2 + 0] = encoded[0];
+                result[idx / 3 * 2 + 1] = encoded[1];
+
+            }
+
+            mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
+            mesh.geometry.attributes.normal.bytes = result.length * 1;
+
+        } else if (encodeMethod == "OCT2Byte") {
+
+            result = new Int16Array(count * 2);
+
+            for (let idx = 0; idx < array.length; idx += 3) {
+
+                let encoded;
+
+                encoded = this.EncodingFuncs.octEncodeBest(array[idx], array[idx + 1], array[idx + 2], 2);
+
+                result[idx / 3 * 2 + 0] = encoded[0];
+                result[idx / 3 * 2 + 1] = encoded[1];
+
+            }
+
+            mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
+            mesh.geometry.attributes.normal.bytes = result.length * 2;
+
+        } else if (encodeMethod == "ANGLES") {
+
+            result = new Uint16Array(count * 2);
+
+            for (let idx = 0; idx < array.length; idx += 3) {
+
+                let encoded;
+
+                encoded = this.EncodingFuncs.anglesEncode(array[idx], array[idx + 1], array[idx + 2]);
+
+                result[idx / 3 * 2 + 0] = encoded[0];
+                result[idx / 3 * 2 + 1] = encoded[1];
+
+            }
+
+            mesh.geometry.setAttribute('normal', new THREE.BufferAttribute(result, 2, true));
+            mesh.geometry.attributes.normal.bytes = result.length * 2;
 
         } else {
 
@@ -107,7 +122,10 @@ var GeometryCompressionUtils = {
         if (encodeMethod == "ANGLES") {
             mesh.material.defines.USE_PACKED_NORMAL = 0;
         }
-        if (encodeMethod == "OCT") {
+        if (encodeMethod == "OCT1Byte") {
+            mesh.material.defines.USE_PACKED_NORMAL = 1;
+        }
+        if (encodeMethod == "OCT2Byte") {
             mesh.material.defines.USE_PACKED_NORMAL = 1;
         }
         if (encodeMethod == "DEFAULT") {
@@ -120,7 +138,7 @@ var GeometryCompressionUtils = {
     compressPositions: function (mesh) {
 
         if (!mesh.geometry) {
-            console.error("Mesh must contain geometry property. ");
+            console.error("Mesh must contain geometry. ");
         }
 
         let position = mesh.geometry.attributes.position;
@@ -186,10 +204,8 @@ var GeometryCompressionUtils = {
         let count = uvs.count;
 
         for (let i = 0; i < array.length; i++) {
-            // if (array[i] > 1.0) array[i] = array[i] - Math.floor(array[i]);
             range.min = Math.min(range.min, array[i]);
             range.max = Math.max(range.max, array[i]);
-            // console.log(array[i])
         }
 
         console.log(range)
@@ -262,7 +278,7 @@ var GeometryCompressionUtils = {
                 let tmpz = Math.round((z + 1) * 0.5 * 65535);
                 return new Uint16Array([tmpx, tmpy, tmpz]);
             } else {
-                console.error("number of bytes error! ");
+                console.error("number of bytes must be 1 or 2");
             }
         },
 
@@ -280,20 +296,20 @@ var GeometryCompressionUtils = {
                     ((array[2] / 65535) * 2.0) - 1.0,
                 ]
             } else {
-                console.error("number of bytes error! ");
+                console.error("number of bytes must be 1 or 2");
             }
 
         },
 
-        // for `Basic` encoding
-        uInt16Encode: function (x, y, z) {
+        // for `Angles` encoding
+        anglesEncode: function (x, y, z) {
             let normal0 = parseInt(0.5 * (1.0 + Math.atan2(y, x) / Math.PI) * 65535);
             let normal1 = parseInt(0.5 * (1.0 + z) * 65535);
             return new Uint16Array([normal0, normal1]);
         },
 
         // for `OCT` encoding
-        octEncodeBest: function (x, y, z) {
+        octEncodeBest: function (x, y, z, bytes) {
             var oct, dec, best, currentCos, bestCos;
 
             // Test various combinations of ceil and floor
@@ -329,9 +345,6 @@ var GeometryCompressionUtils = {
                 bestCos = currentCos;
             }
 
-            // var angle = Math.acos(bestCos) * 180 / Math.PI;
-            // angle > 1 && console.log(angle)
-
             return best;
 
             function octEncodeVec3(x0, y0, z0, xfunc, yfunc) {
@@ -355,18 +368,34 @@ var GeometryCompressionUtils = {
 
                 }
 
-                return new Int8Array([
-                    Math[xfunc](x * 127.5 + (x < 0 ? 1 : 0)),
-                    Math[yfunc](y * 127.5 + (y < 0 ? 1 : 0))
-                ]);
+                if (bytes == 1) {
+                    return new Int8Array([
+                        Math[xfunc](x * 127.5 + (x < 0 ? 1 : 0)),
+                        Math[yfunc](y * 127.5 + (y < 0 ? 1 : 0))
+                    ]);
+                }
+                if (bytes == 2) {
+                    return new Int16Array([
+                        Math[xfunc](x * 32767.5 + (x < 0 ? 1 : 0)),
+                        Math[yfunc](y * 32767.5 + (y < 0 ? 1 : 0))
+                    ]);
+                }
+
 
             }
 
             function octDecodeVec2(oct) {
                 var x = oct[0];
                 var y = oct[1];
-                x /= x < 0 ? 127 : 128;
-                y /= y < 0 ? 127 : 128;
+
+                if (bytes == 1) {
+                    x /= x < 0 ? 127 : 128;
+                    y /= y < 0 ? 127 : 128;
+                } else if (bytes == 2) {
+                    x /= x < 0 ? 32767 : 32768;
+                    y /= y < 0 ? 32767 : 32768;
+                }
+                
 
                 var z = 1 - Math.abs(x) - Math.abs(y);
 
@@ -450,7 +479,7 @@ var GeometryCompressionUtils = {
                 quantized: quantized,
                 decodeMat: decodeMat
             };
-        }, 
+        },
 
 
         quantizedEncodeUV: function (array, bytes) {
@@ -515,7 +544,7 @@ var GeometryCompressionUtils = {
 
 
 /**
- * PackedPhongMaterial inherited from THREE.MeshPhongMaterial
+ * `PackedPhongMaterial` inherited from THREE.MeshPhongMaterial
  * 
  * @param {*} parameters 
  */
@@ -528,7 +557,7 @@ function PackedPhongMaterial(parameters) {
         THREE.ShaderLib.phong.uniforms,
 
         {
-            quantizeMatPos: { value: null }, 
+            quantizeMatPos: { value: null },
             quantizeMatUV: { value: null }
         }
 
