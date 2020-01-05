@@ -3,12 +3,23 @@ import * as THREE from "../../../build/three.module.js";
 
 
 /**
- * @author LeonYuanYao @https://github.com/LeonYuanYao
+ * @author LeonYuanYao / https://github.com/LeonYuanYao
  * 
- * Original Octahedron and Quantization encoding methods from @tsherif https://github.com/tsherif/mesh-quantization-example
+ * Octahedron and Quantization encodings based on work by:
+ * @auther Tarek Sherif @tsherif
+ * @link https://github.com/tsherif/mesh-quantization-example
+ * 
  */
 var GeometryCompressionUtils = {
 
+    /**
+     * Make the input mesh.geometry's normal attribute encoded and compressed by 3 different methods. 
+     * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the normal data. 
+     *
+     * @param {THREE.Mesh} mesh
+     * @param {String} encodeMethod    "DEFAULT" || "OCT1Byte" || "OCT2Byte" || "ANGLES"
+     * 
+     */
     compressNormals: function (mesh, encodeMethod) {
 
         if (!mesh.geometry) {
@@ -135,6 +146,13 @@ var GeometryCompressionUtils = {
     },
 
 
+    /**
+     * Make the input mesh.geometry's position attribute encoded and compressed. 
+     * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the position data. 
+     *
+     * @param {THREE.Mesh} mesh
+     * 
+     */
     compressPositions: function (mesh) {
 
         if (!mesh.geometry) {
@@ -183,7 +201,13 @@ var GeometryCompressionUtils = {
 
     },
 
-
+    /**
+     * Make the input mesh.geometry's uv attribute encoded and compressed. 
+     * Also will change the mesh.material to `PackedPhongMaterial` which let the vertex shader program decode the uv data. 
+     *
+     * @param {THREE.Mesh} mesh
+     * 
+     */
     compressUvs: function (mesh) {
 
         if (!mesh.geometry) {
@@ -546,7 +570,7 @@ var GeometryCompressionUtils = {
 /**
  * `PackedPhongMaterial` inherited from THREE.MeshPhongMaterial
  * 
- * @param {*} parameters 
+ * @param {Object} parameters 
  */
 function PackedPhongMaterial(parameters) {
     THREE.MeshPhongMaterial.call(this);
