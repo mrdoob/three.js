@@ -3,7 +3,7 @@
  * @author ScieCode / http://github.com/sciecode
  *
  * OpenEXR loader which, currently, supports uncompressed, ZIP(S), RLE and PIZ wavelet compression.
- * Supports reading 16 and 32 bit data format, except for PIZ compression which only reads 16-bit data.
+ * Supports reading 16 and 32 bit data format.
  *
  * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
  * implementation, so I have preserved their copyright notices.
@@ -112,8 +112,6 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 		const SHORT_ZEROCODE_RUN = 59;
 		const LONG_ZEROCODE_RUN = 63;
 		const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
-
-		const BYTES_PER_HALF = 2;
 
 		const ULONG_SIZE = 8;
 		const FLOAT32_SIZE = 4;
@@ -441,7 +439,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
-		function wav2Decode( j, buffer, nx, ox, ny, oy ) {
+		function wav2Decode( buffer, j, nx, ox, ny, oy ) {
 
 			var n = ( nx > ny ) ? ny : nx;
 			var p = 1;
@@ -652,8 +650,9 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
-		function hufUncompress( uInt8Array, inDataView, inOffset, nCompressed, outBuffer, outOffset, nRaw ) {
+		function hufUncompress( uInt8Array, inDataView, inOffset, nCompressed, outBuffer, nRaw ) {
 
+			var outOffset = { value: 0 };
 			var initialInOffset = inOffset.value;
 
 			var im = parseUint32( inDataView, inOffset );
@@ -827,11 +826,25 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			var inDataView = info.viewer;
 			var inOffset = { value: info.offset.value };
 
-			var tmpBufSize = info.width * scanlineBlockSize * ( EXRHeader.channels.length * BYTES_PER_HALF );
+			var tmpBufSize = info.width * scanlineBlockSize * ( EXRHeader.channels.length * info.type );
 			var outBuffer = new Uint16Array( tmpBufSize );
-			var outOffset = { value: 0 };
-
 			var bitmap = new Uint8Array( BITMAP_SIZE );
+
+			// Setup channel info
+			var outBufferEnd = 0;
+			var pizChannelData = new Array( info.channels );
+			for ( var i = 0; i < info.channels; i ++ ) {
+
+				pizChannelData[ i ] = {};
+				pizChannelData[ i ][ 'start' ] = outBufferEnd;
+				pizChannelData[ i ][ 'end' ] = pizChannelData[ i ][ 'start' ];
+				pizChannelData[ i ][ 'nx' ] = info.width;
+				pizChannelData[ i ][ 'ny' ] = info.lines;
+				pizChannelData[ i ][ 'size' ] = info.type;
+
+				outBufferEnd += pizChannelData[ i ].nx * pizChannelData[ i ].ny * pizChannelData[ i ].size;
+
+			}
 
 			// Read range compression data
 			var minNonZero = parseUint16( inDataView, inOffset );
@@ -860,38 +873,22 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			var length = parseUint32( inDataView, inOffset );
 
 			// Huffman decoding
-			hufUncompress( info.array, inDataView, inOffset, length, outBuffer, outOffset, tmpBufSize );
-
-			var pizChannelData = new Array( info.channels );
-
-			var outBufferEnd = 0;
-
-			for ( var i = 0; i < info.channels; i ++ ) {
-
-				pizChannelData[ i ] = {};
-				pizChannelData[ i ][ 'start' ] = outBufferEnd;
-				pizChannelData[ i ][ 'end' ] = pizChannelData[ i ][ 'start' ];
-				pizChannelData[ i ][ 'nx' ] = info.width;
-				pizChannelData[ i ][ 'ny' ] = info.lines;
-				pizChannelData[ i ][ 'size' ] = 1;
-
-				outBufferEnd += pizChannelData[ i ].nx * pizChannelData[ i ].ny * pizChannelData[ i ].size;
-
-			}
+			hufUncompress( info.array, inDataView, inOffset, length, outBuffer, outBufferEnd );
 
 			// Wavelet decoding
-			var fooOffset = 0;
-			for ( var i = 0; i < info.channels; i ++ ) {
+			for ( var i = 0; i < info.channels; ++ i ) {
+
+				var cd = pizChannelData[ i ];
 
 				for ( var j = 0; j < pizChannelData[ i ].size; ++ j ) {
 
-					fooOffset += wav2Decode(
-						j + fooOffset,
+					wav2Decode(
 						outBuffer,
-						pizChannelData[ i ].nx,
-						pizChannelData[ i ].size,
-						pizChannelData[ i ].ny,
-						pizChannelData[ i ].nx * pizChannelData[ i ].size
+						cd.start + j,
+						cd.nx,
+						cd.size,
+						cd.ny,
+						cd.nx * cd.size
 					);
 
 				}
@@ -901,19 +898,21 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			// Expand the pixel data to their original range
 			applyLut( lut, outBuffer, outBufferEnd );
 
-			var tmpBuffer = new Uint8Array( outBuffer.buffer.byteLength );
+			// Rearrange the pixel data into the format expected by the caller.
 			var tmpOffset = 0;
-			var n = info.width * 2;
-
+			var tmpBuffer = new Uint8Array( outBuffer.buffer.byteLength );
 			for ( var y = 0; y < info.lines; y ++ ) {
 
 				for ( var c = 0; c < info.channels; c ++ ) {
 
 					var cd = pizChannelData[ c ];
-					var cp = new Uint8Array( outBuffer.buffer, cd.end * 2 + y * n, n );
+
+					var n = cd.nx * cd.size;
+					var cp = new Uint8Array( outBuffer.buffer, cd.end * INT16_SIZE, n * INT16_SIZE );
 
 					tmpBuffer.set( cp, tmpOffset );
-					tmpOffset += n;
+					tmpOffset += n * INT16_SIZE;
+					cd.end += n;
 
 				}
 
@@ -1369,13 +1368,16 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		var compressionInfo = {
 
-			array: uInt8Array,
-			viewer: bufferDataView,
-			offset: offset,
-			channels: EXRHeader.channels.length,
+			size: 0,
 			width: width,
 			lines: scanlineBlockSize,
-			size: 0
+
+			offset: offset,
+			array: uInt8Array,
+			viewer: bufferDataView,
+
+			type: pixelType,
+			channels: EXRHeader.channels.length,
 
 		};
 
