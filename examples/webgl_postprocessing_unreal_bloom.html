@@ -33,12 +33,10 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
 
 			var scene, camera, controls, pointLight, stats;
-			var composer, renderer, mixer;
+			var renderer, mixer;
 
 			var params = {
 				exposure: 1,
@@ -75,16 +73,12 @@
 			pointLight = new THREE.PointLight( 0xffffff, 1 );
 			camera.add( pointLight );
 
-			var renderScene = new RenderPass( scene, camera );
-
 			var bloomPass = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 1.5, 0.4, 0.85 );
 			bloomPass.threshold = params.bloomThreshold;
 			bloomPass.strength = params.bloomStrength;
 			bloomPass.radius = params.bloomRadius;
 
-			composer = new EffectComposer( renderer );
-			composer.addPass( renderScene );
-			composer.addPass( bloomPass );
+			renderer.setPostProcessing( [ bloomPass ] );
 
 			new GLTFLoader().load( 'models/gltf/PrimaryIonDrive.glb', function ( gltf ) {
 
@@ -140,7 +134,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				composer.setSize( width, height );
 
 			};
 
@@ -155,7 +148,7 @@
 
 				stats.update();
 
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 

@@ -14,11 +14,9 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
 			import { AfterimagePass } from './jsm/postprocessing/AfterimagePass.js';
 
-			var camera, scene, renderer, composer;
+			var camera, scene, renderer;
 			var mesh;
 
 			var afterimagePass;
@@ -53,11 +51,8 @@
 
 				// postprocessing
 
-				composer = new EffectComposer( renderer );
-				composer.addPass( new RenderPass( scene, camera ) );
-
 				afterimagePass = new AfterimagePass();
-				composer.addPass( afterimagePass );
+				renderer.setPostProcessing( [ afterimagePass ] );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -67,7 +62,11 @@
 
 				var gui = new GUI( { name: 'Damp setting' } );
 				gui.add( afterimagePass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
-				gui.add( params, 'enable' );
+				gui.add( params, 'enable' ).onChange( function () {
+
+					renderer.setPostProcessing( params.enable ? [ afterimagePass ] : [] );
+
+				} );
 
 			}
 
@@ -77,7 +76,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -88,15 +86,7 @@
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
 
-				if ( params.enable ) {
-
-					composer.render();
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				renderer.render( scene, camera );
 
 			}
 

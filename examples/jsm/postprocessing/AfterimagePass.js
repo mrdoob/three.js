@@ -6,12 +6,12 @@ import {
 	LinearFilter,
 	MeshBasicMaterial,
 	NearestFilter,
+	Pass,
 	RGBAFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
-import { Pass } from "../postprocessing/Pass.js";
 import { AfterimageShader } from "../shaders/AfterimageShader.js";
 
 var AfterimagePass = function ( damp ) {

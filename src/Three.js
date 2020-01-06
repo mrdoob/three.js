@@ -154,6 +154,10 @@ export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { PMREMGenerator } from './extras/PMREMGenerator.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
+export { Pass } from './renderers/postprocessing/passes/Pass.js';
+export { MaskPass } from './renderers/postprocessing/passes/MaskPass.js';
+export { ShaderPass } from './renderers/postprocessing/passes/ShaderPass.js';
+export { CopyShader } from './renderers/postprocessing/shaders/CopyShader.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';
 

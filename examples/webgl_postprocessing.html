@@ -12,14 +12,10 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
-
 			import { RGBShiftShader } from './jsm/shaders/RGBShiftShader.js';
 			import { DotScreenShader } from './jsm/shaders/DotScreenShader.js';
 
-			var camera, scene, renderer, composer;
+			var camera, scene, renderer;
 			var object, light;
 
 			init();
@@ -65,16 +61,13 @@
 
 				// postprocessing
 
-				composer = new EffectComposer( renderer );
-				composer.addPass( new RenderPass( scene, camera ) );
+				var dotEffect = new THREE.ShaderPass( DotScreenShader );
+				dotEffect.uniforms[ 'scale' ].value = 4;
 
-				var effect = new ShaderPass( DotScreenShader );
-				effect.uniforms[ 'scale' ].value = 4;
-				composer.addPass( effect );
+				var shiftEffect = new THREE.ShaderPass( RGBShiftShader );
+				shiftEffect.uniforms[ 'amount' ].value = 0.0015;
 
-				var effect = new ShaderPass( RGBShiftShader );
-				effect.uniforms[ 'amount' ].value = 0.0015;
-				composer.addPass( effect );
+				renderer.setPostProcessing( [ dotEffect, shiftEffect ] );
 
 				//
 
@@ -88,7 +81,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
 
 			}
 
@@ -99,7 +91,7 @@
 				object.rotation.x += 0.005;
 				object.rotation.y += 0.01;
 
-				composer.render();
+				renderer.render( scene, camera );
 
 			}
 

@@ -2,20 +2,22 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
+import { Clock } from '../../core/Clock.js';
+import { Mesh } from '../../objects/Mesh.js';
+import { OrthographicCamera } from '../../cameras/OrthographicCamera.js';
+import { PlaneBufferGeometry } from '../../geometries/PlaneGeometry.js';
+import { Vector2 } from '../../math/Vector2.js';
+import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
+import { CopyShader } from './shaders/CopyShader.js';
+import { ShaderPass } from './passes/ShaderPass.js';
 import {
-	Clock,
-	LinearFilter,
-	Mesh,
-	OrthographicCamera,
-	PlaneBufferGeometry,
+	ClearMaskPass,
+	MaskPass
+} from './passes/MaskPass.js';
+import { 
 	RGBAFormat,
-	Vector2,
-	WebGLRenderTarget
-} from "../../../build/three.module.js";
-import { CopyShader } from "../shaders/CopyShader.js";
-import { ShaderPass } from "../postprocessing/ShaderPass.js";
-import { MaskPass } from "../postprocessing/MaskPass.js";
-import { ClearMaskPass } from "../postprocessing/MaskPass.js";
+	LinearFilter
+} from '../../constants.js';
 
 var EffectComposer = function ( renderer, renderTarget ) {
 
