@@ -176,6 +176,74 @@ export const RGBEFormat: PixelFormat;
 export const DepthFormat: PixelFormat;
 export const DepthStencilFormat: PixelFormat;
 export const RedFormat: PixelFormat;
+export const RedIntegerFormat: PixelFormat;
+export const RGFormat: PixelFormat;
+export const RGIntegerFormat: PixelFormat;
+export const RGBIntegerFormat: PixelFormat;
+export const RGBAIntegerFormat: PixelFormat;
+
+// Internal Pixel Formats
+export type PixelFormatGPU =
+	'ALPHA'
+	| 'RGB'
+	| 'RGBA'
+	| 'LUMINANCE'
+	| 'LUMINANCE_ALPHA'
+	| 'RED_INTEGER'
+	| 'R8'
+	| 'R8_SNORM'
+	| 'R8I'
+	| 'R8UI'
+	| 'R16I'
+	| 'R16UI'
+	| 'R16F'
+	| 'R32I'
+	| 'R32UI'
+	| 'R32F'
+	| 'RG8'
+	| 'RG8_SNORM'
+	| 'RG8I'
+	| 'RG8UI'
+	| 'RG16I'
+	| 'RG16UI'
+	| 'RG16F'
+	| 'RG32I'
+	| 'RG32UI'
+	| 'RG32F'
+	| 'RGB565'
+	| 'RGB8'
+	| 'RGB8_SNORM'
+	| 'RGB8I'
+	| 'RGB8UI'
+	| 'RGB16I'
+	| 'RGB16UI'
+	| 'RGB16F'
+	| 'RGB32I'
+	| 'RGB32UI'
+	| 'RGB32F'
+	| 'RGB9_E5'
+	| 'SRGB8'
+	| 'R11F_G11F_B10F'
+	| 'RGBA4'
+	| 'RGBA8'
+	| 'RGBA8_SNORM'
+	| 'RGBA8I'
+	| 'RGBA8UI'
+	| 'RGBA16I'
+	| 'RGBA16UI'
+	| 'RGBA16F'
+	| 'RGBA32I'
+	| 'RGBA32UI'
+	| 'RGBA32F'
+	| 'RGB5_A1'
+	| 'RGB10_A2'
+	| 'RGB10_A2UI'
+	| 'SRGB8_ALPHA8'
+	| 'DEPTH_COMPONENT16'
+	| 'DEPTH_COMPONENT24'
+	| 'DEPTH_COMPONENT32F'
+	| 'DEPTH24_STENCIL8'
+	| 'DEPTH32F_STENCIL8';
 
 // Compressed texture formats
 // DDS / ST3C Compressed texture formats

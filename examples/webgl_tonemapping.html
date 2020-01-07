@@ -19,9 +19,7 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
@@ -33,7 +31,7 @@
 				opacity: 1.0,
 				roughness: 1.0,
 				bumpScale: 1.0,
-				exposure: 3.0,
+				exposure: 2.0,
 				whitePoint: 5.0,
 				toneMapping: "Uncharted2",
 				renderMode: "Renderer"
@@ -133,33 +131,20 @@
 				floor.receiveShadow = true;
 				scene.add( floor );
 
-				// Materials
-				var hdrpath = "textures/cube/pisaHDR/";
-				var hdrformat = '.hdr';
-				var hdrUrls = [
-					hdrpath + 'px' + hdrformat, hdrpath + 'nx' + hdrformat,
-					hdrpath + 'py' + hdrformat, hdrpath + 'ny' + hdrformat,
-					hdrpath + 'pz' + hdrformat, hdrpath + 'nz' + hdrformat
-				];
-
-				new HDRCubeTextureLoader()
+				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
-					.load( hdrUrls, function ( hdrCubeMap ) {
+					.setPath( 'textures/equirectangular/' )
+					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
-						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
-						pmremGenerator.update( renderer );
+						scene.environment = pmremGenerator.fromEquirectangular( hdrEquirect ).texture;
 
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						standardMaterial.envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
-						standardMaterial.needsUpdate = true;
-
-						hdrCubeMap.dispose();
+						hdrEquirect.dispose();
 						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
 
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				// Lights
 
@@ -179,7 +164,7 @@
 				renderer.shadowMap.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				composer = new EffectComposer( renderer );
 				composer.setSize( window.innerWidth, window.innerHeight );
@@ -193,7 +178,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -43,9 +43,9 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 		if ( start !== undefined ) {
 
-			matrix.applyToBufferAttribute( start );
+			start.applyMatrix4( matrix );
 
-			matrix.applyToBufferAttribute( end );
+			end.applyMatrix4( matrix );
 
 			start.data.needsUpdate = true;
 
@@ -249,20 +249,6 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 	toJSON: function () {
 
 		// todo
-
-	},
-
-	clone: function () {
-
-		// todo
-
-	},
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
 
 	}
 

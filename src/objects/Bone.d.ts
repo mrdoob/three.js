@@ -5,7 +5,7 @@ import { Object3D } from './../core/Object3D';
 export class Bone extends Object3D {
 
 	constructor();
-	isBone: true;
+	readonly isBone: true;
 	type: 'Bone';
 
 }

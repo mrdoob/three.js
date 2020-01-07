@@ -33,22 +33,23 @@ export class BufferGeometry extends EventDispatcher {
 	uuid: string;
 	name: string;
 	type: string;
-	index: BufferAttribute;
+	index: BufferAttribute | null;
 	attributes: {
 		[name: string]: BufferAttribute | InterleavedBufferAttribute;
 	};
 	morphAttributes: {
 		[name: string]: ( BufferAttribute | InterleavedBufferAttribute )[];
 	};
+	morphTargetsRelative: boolean;
 	groups: { start: number; count: number; materialIndex?: number }[];
 	boundingBox: Box3;
 	boundingSphere: Sphere;
 	drawRange: { start: number; count: number };
 	userData: {[key: string]: any};
-	isBufferGeometry: boolean;
+	readonly isBufferGeometry: true;
 
-	getIndex(): BufferAttribute;
-	setIndex( index: BufferAttribute | number[] ): void;
+	getIndex(): BufferAttribute | null;
+	setIndex( index: BufferAttribute | number[] | null ): void;
 
 	setAttribute( name: string, attribute: BufferAttribute | InterleavedBufferAttribute ): BufferGeometry;
 	getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;

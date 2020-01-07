@@ -190,7 +190,7 @@
 			var canvas5 = document.getElementById( 'canvas5' );
 
 			var fudge = 0.45; // I don't know why this is needed :-(
-			var rot = 30 * THREE.Math.DEG2RAD;
+			var rot = 30 * THREE.MathUtils.DEG2RAD;
 
 			views.push( new View( canvas1, rot * - 2 * fudge ) );
 			views.push( new View( canvas2, rot * - 1 * fudge ) );

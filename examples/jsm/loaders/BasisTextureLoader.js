@@ -132,7 +132,9 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 		var worker;
 		var taskID;
 
-		var texturePending = this._getWorker()
+		var taskCost = buffer.byteLength;
+
+		var texturePending = this._allocateWorker( taskCost )
 			.then( ( _worker ) => {
 
 				worker = _worker;
@@ -141,8 +143,6 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 				return new Promise( ( resolve, reject ) => {
 
 					worker._callbacks[ taskID ] = { resolve, reject };
-					worker._taskCosts[ taskID ] = buffer.byteLength;
-					worker._taskLoad += worker._taskCosts[ taskID ];
 
 					worker.postMessage( { type: 'transcode', id: taskID, buffer }, [ buffer ] );
 
@@ -194,9 +194,8 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 				if ( worker && taskID ) {
 
-					worker._taskLoad -= worker._taskCosts[ taskID ];
+					worker._taskLoad -= taskCost;
 					delete worker._callbacks[ taskID ];
-					delete worker._taskCosts[ taskID ];
 
 				}
 
@@ -208,7 +207,7 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 	_initTranscoder: function () {
 
-		if ( ! this.transcoderBinary ) {
+		if ( ! this.transcoderPending ) {
 
 			// Load transcoder wrapper.
 			var jsLoader = new FileLoader( this.manager );
@@ -252,7 +251,7 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 	},
 
-	_getWorker: function () {
+	_allocateWorker: function ( taskCost ) {
 
 		return this._initTranscoder().then( () => {
 
@@ -261,7 +260,6 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 				var worker = new Worker( this.workerSourceURL );
 
 				worker._callbacks = {};
-				worker._taskCosts = {};
 				worker._taskLoad = 0;
 
 				worker.postMessage( {
@@ -303,7 +301,11 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 			}
 
-			return this.workerPool[ this.workerPool.length - 1 ];
+			var worker = this.workerPool[ this.workerPool.length - 1 ];
+
+			worker._taskLoad += taskCost;
+
+			return worker;
 
 		} );
 

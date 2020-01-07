@@ -58,6 +58,7 @@
 			Examples: [example:webgl_interactive_cubes Raycasting to a Mesh]<br />
 			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera]<br />
 			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry]<br />
+			[example:webgl_instancing_raycast Raycasting to a InstancedMesh]<br />
 			[example:webgl_interactive_lines Raycasting to a Line]<br />
 			[example:webgl_interactive_raycasting_points Raycasting to Points]<br />
 			[example:webgl_geometry_terrain_raycast Terrain raycasting]<br />
@@ -170,7 +171,8 @@
 			[page:Integer faceIndex] – index of the intersected face<br />
 			[page:Object3D object] – the intersected object<br />
 			[page:Vector2 uv] - U,V coordinates at point of intersection<br />
-			[page:Vector2 uv2] - Second set of U,V coordinates at point of intersection
+			[page:Vector2 uv2] - Second set of U,V coordinates at point of intersection<br />
+			[page:Integer instanceId] – The index number of the instance where the ray intersects the InstancedMesh
 		</p>
 		<p>
 		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].

@@ -8,6 +8,7 @@ export let UniformsLib: {
 		opacity: IUniform;
 		map: IUniform;
 		uvTransform: IUniform;
+		uv2Transform: IUniform;
 		alphaMap: IUniform;
 	};
 	specularmap: {

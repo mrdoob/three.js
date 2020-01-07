@@ -13,8 +13,8 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-            使用XMLHttpRequest来加载资源的低级类，并由大多数加载器内部使用。
-            它也可以直接用于加载任何没有对应加载器的文件类型。
+			使用XMLHttpRequest来加载资源的低级类，并由大多数加载器内部使用。
+			它也可以直接用于加载任何没有对应加载器的文件类型。
 		</p>
 
 		<h2>例子</h2>
@@ -50,9 +50,9 @@
 
 		<p>
 			<em>注意:</em>
-            必须启用缓存
+			必须启用缓存
 			<code>THREE.Cache.enabled = true;</code>
-            这是一个全局属性，只需要设置一次，供内部使用FileLoader的所有加载器使用。
+			这是一个全局属性，只需要设置一次，供内部使用FileLoader的所有加载器使用。
 			[page:Cache Cache] 是​​一个缓存模块，用于保存通过此加载器发出的每个请求的响应，因此每个文件都会被请求一次。
 		</p>
 
@@ -82,8 +82,8 @@
 
 		<h3>[property:String withCredentials]</h3>
 		<p>
-            XMLHttpRequest是否使用证书。 请参考 [page:.setWithCredentials].
-            默认为 *undefined*.
+			XMLHttpRequest是否使用证书。 请参考 [page:.setWithCredentials].
+			默认为 *undefined*.
 		</p>
 
 		<h2>方法</h2>
@@ -95,16 +95,16 @@
 				[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
 			[page:Function onLoad] (可选) — 加载完成时将调用。回调参数将是加载的响应。<br />
 			[page:Function onProgress] (可选) — 将在加载过程中进行调用。参数将是XMLHttpRequest实例，
-            其中包含 [page:Integer total] 和 [page:Integer loaded] 字节<br />
+			其中包含 [page:Integer total] 和 [page:Integer loaded] 字节<br />
 			[page:Function onError] (可选) — 在加载错误时被调用。<br /><br />
 
-            加载URL并将响应传递给onLoad函数。
+			加载URL并将响应传递给onLoad函数。
 		</p>
 
 		<h3>[method:FileLoader setMimeType]( [param:String mimeType] )</h3>
 		<p>
-            设置正在加载的文件预期类型 [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
-            。请注意，在许多情况下，这将自动确定，因此默认情况下它是 *undefined* 。
+			设置正在加载的文件预期类型 [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
+			。请注意，在许多情况下，这将自动确定，因此默认情况下它是 *undefined* 。
 		</p>
 
 		<h3>[method:FileLoader setRequestHeader]( [param:object requestHeader] )</h3>
@@ -126,8 +126,8 @@
 
 		<h3>[method:FileLoader setWithCredentials]( [param:Boolean value] )</h3>
 		<p>
-            XMLHttpRequest是否使用cookie、授权头或TLS客户端证书等凭据。 请参考 [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
-            请注意，当您在本地或从同一域加载文件，则该方法无效。
+			XMLHttpRequest是否使用cookie、授权头或TLS客户端证书等凭据。 请参考 [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
+			请注意，当您在本地或从同一域加载文件，则该方法无效。
 		</p>
 
 

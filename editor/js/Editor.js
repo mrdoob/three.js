@@ -2,6 +2,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import * as THREE from '../../build/three.module.js';
+
+import { Config } from './Config.js';
+import { Loader } from './Loader.js';
+import { History as _History } from './History.js';
+import { Strings } from './Strings.js';
+import { Storage as _Storage } from './Storage.js';
+
 var Editor = function () {
 
 	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
@@ -74,8 +82,8 @@ var Editor = function () {
 	};
 
 	this.config = new Config();
-	this.history = new History( this );
-	this.storage = new Storage();
+	this.history = new _History( this );
+	this.storage = new _Storage();
 	this.strings = new Strings( this.config );
 
 	this.loader = new Loader( this );
@@ -223,6 +231,8 @@ Editor.prototype = {
 
 	addMaterial: function ( material ) {
 
+		if ( material.uuid in this.materials ) return;
+
 		this.materials[ material.uuid ] = material;
 		this.signals.materialAdded.dispatch();
 
@@ -317,7 +327,7 @@ Editor.prototype = {
 
 			if ( object.isCamera ) {
 
-				helper = new THREE.CameraHelper( object, 1 );
+				helper = new THREE.CameraHelper( object );
 
 			} else if ( object.isPointLight ) {
 
@@ -637,3 +647,5 @@ Editor.prototype = {
 	}
 
 };
+
+export { Editor };

@@ -1,26 +1,23 @@
-import { WebGLRenderer, WebGLRendererParameters } from './../WebGLRenderer';
-import { ShaderMaterial } from './../../materials/ShaderMaterial';
+import { WebGLRenderer } from './../WebGLRenderer';
 import { WebGLShader } from './WebGLShader';
-import { WebGLExtensions } from './WebGLExtensions';
 import { WebGLUniforms } from './WebGLUniforms';
 
 export class WebGLProgram {
 
 	constructor(
 		renderer: WebGLRenderer,
-		extensions: WebGLExtensions,
 		cacheKey: string,
-		material: ShaderMaterial,
-		shader: WebGLShader,
-		parameters: WebGLRendererParameters
+		parameters: object
 	);
 
+	name: string;
 	id: number;
 	cacheKey: string; // unique identifier for this program, used for looking up compiled programs from cache.
 	usedTimes: number;
 	program: any;
 	vertexShader: WebGLShader;
 	fragmentShader: WebGLShader;
+	numMultiviewViews: number;
 	/**
 	 * @deprecated Use {@link WebGLProgram#getUniforms getUniforms()} instead.
 	 */

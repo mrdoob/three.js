@@ -35,7 +35,7 @@
 		import { Curves } from './jsm/curves/CurveExtras.js';
 
 		// this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
-		var customDepthVertexShader = 
+		var customDepthVertexShader =
 			`
 			// instanced
 			attribute vec3 instanceOffset;
@@ -165,7 +165,7 @@
 			renderer.shadowMap.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
-			renderer.gammaOutput = true;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 
 			scene = new THREE.Scene();
 

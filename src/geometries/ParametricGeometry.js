@@ -33,16 +33,6 @@ function ParametricGeometry( func, slices, stacks ) {
 ParametricGeometry.prototype = Object.create( Geometry.prototype );
 ParametricGeometry.prototype.constructor = ParametricGeometry;
 
-ParametricGeometry.prototype.toJSON = function () {
-
-	var data = Geometry.prototype.toJSON.call( this );
-
-	data.func = this.parameters.func.toString();
-
-	return data;
-
-};
-
 // ParametricBufferGeometry
 
 function ParametricBufferGeometry( func, slices, stacks ) {
@@ -169,14 +159,5 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 ParametricBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
 
-ParametricBufferGeometry.prototype.toJSON = function () {
-
-	var data = BufferGeometry.prototype.toJSON.call( this );
-
-	data.func = this.parameters.func.toString();
-
-	return data;
-
-};
 
 export { ParametricGeometry, ParametricBufferGeometry };

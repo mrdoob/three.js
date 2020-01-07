@@ -259,14 +259,11 @@ h1 a {
 		font-weight: 500;
 		color: var(--text-color);
 		border: 0px;
-		background-color: var(--text-color);
+		background-image: url(ic_arrow_drop_down_black_24dp.svg);
 		background-size: var(--icon-size);
-		-webkit-mask-image: url(ic_arrow_drop_down_black_24dp.svg);
-		-webkit-mask-position: right center;
-		-webkit-mask-repeat: no-repeat;
-		mask-image: url(ic_arrow_drop_down_black_24dp.svg);
-		mask-position: right center;
-		mask-repeat: no-repeat;
+		background-repeat: no-repeat;
+		background-position: right center;
+		background-color: var(--background-color);
 		padding: 2px 24px 4px 24px;
 		-webkit-appearance: none;
 		-moz-appearance: none;

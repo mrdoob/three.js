@@ -1,4 +1,4 @@
-import { _Math } from './Math.js';
+import { MathUtils } from './MathUtils.js';
 import { Quaternion } from './Quaternion.js';
 
 /**
@@ -262,6 +262,12 @@ Object.assign( Vector3.prototype, {
 		this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
 
 		return this;
+
+	},
+
+	applyNormalMatrix: function ( m ) {
+
+		return this.applyMatrix3( m ).normalize();
 
 	},
 
@@ -563,7 +569,7 @@ Object.assign( Vector3.prototype, {
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( _Math.clamp( theta, - 1, 1 ) );
+		return Math.acos( MathUtils.clamp( theta, - 1, 1 ) );
 
 	},
 

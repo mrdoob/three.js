@@ -7,8 +7,11 @@ import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
 import {
 	FlatShading,
+	sRGBEncoding,
+	LinearEncoding,
 	StaticDrawUsage,
-	DynamicDrawUsage
+	DynamicDrawUsage,
+	TrianglesDrawMode
 } from './constants.js';
 import {
 	Float64BufferAttribute,
@@ -60,7 +63,7 @@ import { Box2 } from './math/Box2.js';
 import { Box3 } from './math/Box3.js';
 import { Color } from './math/Color.js';
 import { Line3 } from './math/Line3.js';
-import { _Math } from './math/Math.js';
+import { MathUtils } from './math/MathUtils.js';
 import { Matrix3 } from './math/Matrix3.js';
 import { Matrix4 } from './math/Matrix4.js';
 import { Plane } from './math/Plane.js';
@@ -70,6 +73,7 @@ import { Triangle } from './math/Triangle.js';
 import { Vector2 } from './math/Vector2.js';
 import { Vector3 } from './math/Vector3.js';
 import { Vector4 } from './math/Vector4.js';
+import { Mesh } from './objects/Mesh.js';
 import { LineSegments } from './objects/LineSegments.js';
 import { LOD } from './objects/LOD.js';
 import { Points } from './objects/Points.js';
@@ -78,14 +82,14 @@ import { Skeleton } from './objects/Skeleton.js';
 import { SkinnedMesh } from './objects/SkinnedMesh.js';
 import { WebGLRenderer } from './renderers/WebGLRenderer.js';
 import { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
-import { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
+import { WebGLCubeRenderTarget } from './renderers/WebGLCubeRenderTarget.js';
 import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
-import { WebVRManager } from './renderers/webvr/WebVRManager.js';
 import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
 
 export { BoxGeometry as CubeGeometry };
+export { MathUtils as Math };
 
 export function Face4( a, b, c, d, normal, color, materialIndex ) {
 
@@ -541,7 +545,7 @@ Line3.prototype.center = function ( optionalTarget ) {
 
 };
 
-Object.assign( _Math, {
+Object.assign( MathUtils, {
 
 	random16: function () {
 
@@ -553,14 +557,14 @@ Object.assign( _Math, {
 	nearestPowerOfTwo: function ( value ) {
 
 		console.warn( 'THREE.Math: .nearestPowerOfTwo() has been renamed to .floorPowerOfTwo().' );
-		return _Math.floorPowerOfTwo( value );
+		return MathUtils.floorPowerOfTwo( value );
 
 	},
 
 	nextPowerOfTwo: function ( value ) {
 
 		console.warn( 'THREE.Math: .nextPowerOfTwo() has been renamed to .ceilPowerOfTwo().' );
-		return _Math.ceilPowerOfTwo( value );
+		return MathUtils.ceilPowerOfTwo( value );
 
 	}
 
@@ -585,10 +589,10 @@ Object.assign( Matrix3.prototype, {
 		console.error( 'THREE.Matrix3: .multiplyVector3Array() has been removed.' );
 
 	},
-	applyToBuffer: function ( buffer /*, offset, length */ ) {
+	applyToBufferAttribute: function ( attribute ) {
 
-		console.warn( 'THREE.Matrix3: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
-		return this.applyToBufferAttribute( buffer );
+		console.warn( 'THREE.Matrix3: .applyToBufferAttribute() has been removed. Use attribute.applyMatrix3( matrix ) instead.' );
+		return attribute.applyMatrix3( this );
 
 	},
 	applyToVector3Array: function ( /* array, offset, length */ ) {
@@ -684,10 +688,10 @@ Object.assign( Matrix4.prototype, {
 		console.error( 'THREE.Matrix4: .rotateByAxis() has been removed.' );
 
 	},
-	applyToBuffer: function ( buffer /*, offset, length */ ) {
+	applyToBufferAttribute: function ( attribute ) {
 
-		console.warn( 'THREE.Matrix4: .applyToBuffer() has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.' );
-		return this.applyToBufferAttribute( buffer );
+		console.warn( 'THREE.Matrix4: .applyToBufferAttribute() has been removed. Use attribute.applyMatrix4( matrix ) instead.' );
+		return attribute.applyMatrix4( this );
 
 	},
 	applyToVector3Array: function ( /* array, offset, length */ ) {
@@ -982,6 +986,34 @@ Object.defineProperties( Object3D.prototype, {
 		set: function () {
 
 			console.warn( 'THREE.Object3D: .useQuaternion has been removed. The library now uses quaternions by default.' );
+
+		}
+	}
+
+} );
+
+Object.assign( Mesh.prototype, {
+
+	setDrawMode: function () {
+
+		console.error( 'THREE.Mesh: .setDrawMode() has been removed. The renderer now always assumes THREE.TrianglesDrawMode. Transform your geometry via BufferGeometryUtils.toTrianglesDrawMode() if necessary.' );
+
+	},
+
+} );
+
+Object.defineProperties( Mesh.prototype, {
+
+	drawMode: {
+		get: function () {
+
+			console.error( 'THREE.Mesh: .drawMode has been removed. The renderer now always assumes THREE.TrianglesDrawMode.' );
+			return TrianglesDrawMode;
+
+		},
+		set: function () {
+
+			console.error( 'THREE.Mesh: .drawMode has been removed. The renderer now always assumes THREE.TrianglesDrawMode. Transform your geometry via BufferGeometryUtils.toTrianglesDrawMode() if necessary.' );
 
 		}
 	}
@@ -1679,6 +1711,41 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			return this.getContext();
 
 		}
+	},
+	vr: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .vr has been renamed to .xr' );
+			return this.xr;
+
+		}
+	},
+	gammaInput: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Set the encoding for textures via Texture.encoding instead.' );
+			return false;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaInput has been removed. Set the encoding for textures via Texture.encoding instead.' );
+
+		}
+	},
+	gammaOutput: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Set WebGLRenderer.outputEncoding instead.' );
+			return false;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.WebGLRenderer: .gammaOutput has been removed. Set WebGLRenderer.outputEncoding instead.' );
+			this.outputEncoding = ( value === true ) ? sRGBEncoding : LinearEncoding;
+
+		}
 	}
 
 } );
@@ -1727,26 +1794,12 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 
 } );
 
-//
+export function WebGLRenderTargetCube( width, height, options ) {
 
-Object.defineProperties( WebGLRenderTargetCube.prototype, {
+	console.warn( 'THREE.WebGLRenderTargetCube has been renamed to WebGLCubeRenderTarget.' );
+	return new WebGLCubeRenderTarget( width, height, options );
 
-	activeCubeFace: {
-		set: function ( /* value */ ) {
-
-			console.warn( 'THREE.WebGLRenderTargetCube: .activeCubeFace has been removed. It is now the second parameter of WebGLRenderer.setRenderTarget().' );
-
-		}
-	},
-	activeMipMapLevel: {
-		set: function ( /* value */ ) {
-
-			console.warn( 'THREE.WebGLRenderTargetCube: .activeMipMapLevel has been removed. It is now the third parameter of WebGLRenderer.setRenderTarget().' );
-
-		}
-	}
-
-} );
+}
 
 //
 
@@ -1889,27 +1942,6 @@ Object.defineProperties( WebGLRenderTarget.prototype, {
 
 			console.warn( 'THREE.WebGLRenderTarget: .generateMipmaps is now .texture.generateMipmaps.' );
 			this.texture.generateMipmaps = value;
-
-		}
-	}
-
-} );
-
-//
-
-Object.defineProperties( WebVRManager.prototype, {
-
-	standing: {
-		set: function ( /* value */ ) {
-
-			console.warn( 'THREE.WebVRManager: .standing has been removed.' );
-
-		}
-	},
-	userHeight: {
-		set: function ( /* value */ ) {
-
-			console.warn( 'THREE.WebVRManager: .userHeight has been removed.' );
 
 		}
 	}

@@ -40,23 +40,6 @@
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Object3D]。</p>
 
-		<h3>[property:Integer drawMode]</h3>
-		<p>
-			决定了网格中的三角形将如何从顶点来构造。
-			请参阅draw mode [page:DrawModes constants]（绘图模式常量）来查看其所有可能的值。
-			其默认值是[page:DrawModes TrianglesDrawMode]。
-		</p>
-		<p>
-			A sensible usage of this property is only possible when [page:Mesh.geometry] is of type [page:BufferGeometry BufferGeometry]
-			since the engine always assumes *THREE.TrianglesDrawMode* for [page:Geometry Geometry].
-		</p>
-
-		<h3>[property:Boolean isMesh]</h3>
-		<p>
-			用于检查这个类或者其派生类是否为网格，默认值为*true*。<br /><br />
-			你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
-		</p>
-
 		<h3>[property:Geometry geometry]</h3>
 		<p>
 			[page:Geometry] 或 [page:BufferGeometry] 的实例或者派生类，定义了物体的结构。<br /><br />
@@ -84,9 +67,6 @@
 
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Object3D]。</p>
-
-		<h3>[method:null setDrawMode]( [param:Integer value] )</h3>
-		<p>设置[page:.drawMode drawMode]的值。</p>
 
 		<h3>[method:Mesh clone]()</h3>
 		<p>返回这个[name]对象及其子级的克隆。</p>

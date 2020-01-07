@@ -11,7 +11,7 @@ export class Spherical {
 	set( radius: number, phi: number, theta: number ): this;
 	clone(): this;
 	copy( other: Spherical ): this;
-	makeSafe(): void;
+	makeSafe(): this;
 	setFromVector3( v: Vector3 ): this;
 	setFromCartesianCoords( x: number, y: number, z: number ): this;
 

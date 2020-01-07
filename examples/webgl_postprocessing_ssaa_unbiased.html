@@ -96,7 +96,7 @@
 				cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
 				cameraO.position.z = 7;
 
-				var fov = THREE.Math.degToRad( cameraP.fov );
+				var fov = THREE.MathUtils.degToRad( cameraP.fov );
 				var hyperfocus = ( cameraP.near + cameraP.far ) / 2;
 				var _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
 				cameraO.zoom = height / _height;

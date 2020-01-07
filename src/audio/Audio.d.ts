@@ -9,14 +9,17 @@ export class Audio extends Object3D {
 	constructor( listener: AudioListener );
 	type: 'Audio';
 
+	listener: AudioListener;
 	context: AudioContext;
 	gain: GainNode;
 	autoplay: boolean;
-	buffer: null | Audio;
+	buffer: null | AudioBuffer;
 	detune: number;
 	loop: boolean;
+	loopStart: number;
+	loopEnd: number;
 	offset: number;
-	duration: number | undefined;
+	duration: number | undefined;
 	playbackRate: number;
 	isPlaying: boolean;
 	hasPlaybackControl: boolean;
@@ -38,7 +41,7 @@ export class Audio extends Object3D {
 	setDetune( value: number ): this;
 	getDetune(): number;
 	getFilters(): any[];
-	setFilter( value: any[] ): this;
+	setFilters( value: any[] ): this;
 	getFilter(): any;
 	setFilter( filter: any ): this;
 	setPlaybackRate( value: number ): this;
@@ -53,18 +56,5 @@ export class Audio extends Object3D {
 	 * @deprecated Use {@link AudioLoader} instead.
 	 */
 	load( file: string ): Audio;
-
-}
-
-export class AudioBuffer {
-
-	constructor( context: any );
-
-	context: any;
-	ready: boolean;
-	readyCallbacks: Function[];
-
-	load( file: string ): AudioBuffer;
-	onReady( callback: Function ): void;
 
 }

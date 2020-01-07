@@ -63,13 +63,6 @@ var d = a.distanceTo( b );
 
 		<h2>Properties</h2>
 
-		<h3>[property:Boolean isVector3]</h3>
-		<p>
-			Used to check whether this or derived classes are Vector3s. Default is *true*.<br /><br />
-
-			You should not change this, as it is used internally for optimisation.
-		</p>
-
 		<h3>[property:Float x]</h3>
 
 		<h3>[property:Float y]</h3>
@@ -112,6 +105,9 @@ var d = a.distanceTo( b );
 		<p>
 		Multiplies this vector (with an implicit 1 in the 4th dimension) and m, and divides by perspective.
 		</p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Multiplies this vector by normal matrix [page:Matrix3 m] and normalizes the result.</p>
 
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>

@@ -39,6 +39,8 @@ import lightmap_pars_fragment from './ShaderChunk/lightmap_pars_fragment.glsl.js
 import lights_lambert_vertex from './ShaderChunk/lights_lambert_vertex.glsl.js';
 import lights_pars_begin from './ShaderChunk/lights_pars_begin.glsl.js';
 import envmap_physical_pars_fragment from './ShaderChunk/envmap_physical_pars_fragment.glsl.js';
+import lights_toon_fragment from './ShaderChunk/lights_toon_fragment.glsl.js';
+import lights_toon_pars_fragment from './ShaderChunk/lights_toon_pars_fragment.glsl.js';
 import lights_phong_fragment from './ShaderChunk/lights_phong_fragment.glsl.js';
 import lights_phong_pars_fragment from './ShaderChunk/lights_phong_pars_fragment.glsl.js';
 import lights_physical_fragment from './ShaderChunk/lights_physical_fragment.glsl.js';
@@ -110,6 +112,8 @@ import meshlambert_frag from './ShaderLib/meshlambert_frag.glsl.js';
 import meshlambert_vert from './ShaderLib/meshlambert_vert.glsl.js';
 import meshmatcap_frag from './ShaderLib/meshmatcap_frag.glsl.js';
 import meshmatcap_vert from './ShaderLib/meshmatcap_vert.glsl.js';
+import meshtoon_frag from './ShaderLib/meshtoon_frag.glsl.js';
+import meshtoon_vert from './ShaderLib/meshtoon_vert.glsl.js';
 import meshphong_frag from './ShaderLib/meshphong_frag.glsl.js';
 import meshphong_vert from './ShaderLib/meshphong_vert.glsl.js';
 import meshphysical_frag from './ShaderLib/meshphysical_frag.glsl.js';
@@ -165,6 +169,8 @@ export var ShaderChunk = {
 	lightmap_pars_fragment: lightmap_pars_fragment,
 	lights_lambert_vertex: lights_lambert_vertex,
 	lights_pars_begin: lights_pars_begin,
+	lights_toon_fragment: lights_toon_fragment,
+	lights_toon_pars_fragment: lights_toon_pars_fragment,
 	lights_phong_fragment: lights_phong_fragment,
 	lights_phong_pars_fragment: lights_phong_pars_fragment,
 	lights_physical_fragment: lights_physical_fragment,
@@ -236,6 +242,8 @@ export var ShaderChunk = {
 	meshlambert_vert: meshlambert_vert,
 	meshmatcap_frag: meshmatcap_frag,
 	meshmatcap_vert: meshmatcap_vert,
+	meshtoon_frag: meshtoon_frag,
+	meshtoon_vert: meshtoon_vert,
 	meshphong_frag: meshphong_frag,
 	meshphong_vert: meshphong_vert,
 	meshphysical_frag: meshphysical_frag,

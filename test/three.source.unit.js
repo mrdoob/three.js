@@ -125,16 +125,13 @@ import './unit/src/helpers/Box3Helper.tests';
 import './unit/src/helpers/BoxHelper.tests';
 import './unit/src/helpers/CameraHelper.tests';
 import './unit/src/helpers/DirectionalLightHelper.tests';
-import './unit/src/helpers/FaceNormalsHelper.tests';
 import './unit/src/helpers/GridHelper.tests';
 import './unit/src/helpers/HemisphereLightHelper.tests';
 import './unit/src/helpers/PlaneHelper.tests';
 import './unit/src/helpers/PointLightHelper.tests';
 import './unit/src/helpers/PolarGridHelper.tests';
-import './unit/src/helpers/RectAreaLightHelper.tests';
 import './unit/src/helpers/SkeletonHelper.tests';
 import './unit/src/helpers/SpotLightHelper.tests';
-import './unit/src/helpers/VertexNormalsHelper.tests';
 
 
 //src/lights
@@ -198,7 +195,7 @@ import './unit/src/math/Euler.tests';
 import './unit/src/math/Frustum.tests';
 import './unit/src/math/Interpolant.tests';
 import './unit/src/math/Line3.tests';
-import './unit/src/math/Math.tests';
+import './unit/src/math/MathUtils.tests';
 import './unit/src/math/Matrix3.tests';
 import './unit/src/math/Matrix4.tests';
 import './unit/src/math/Plane.tests';
@@ -235,7 +232,7 @@ import './unit/src/objects/Sprite.tests';
 //src/renderers
 import './unit/src/renderers/WebGLRenderer.tests';
 import './unit/src/renderers/WebGLRenderTarget.tests';
-import './unit/src/renderers/WebGLRenderTargetCube.tests';
+import './unit/src/renderers/WebGLCubeRenderTarget.tests';
 
 //src/renderers/shaders
 import './unit/src/renderers/shaders/ShaderChunk.tests';
@@ -265,9 +262,6 @@ import './unit/src/renderers/webgl/WebGLState.tests';
 import './unit/src/renderers/webgl/WebGLTextures.tests';
 import './unit/src/renderers/webgl/WebGLUniforms.tests';
 import './unit/src/renderers/webgl/WebGLUtils.tests';
-
-//src/renderers/webvr
-import './unit/src/renderers/webvr/WebVRManager.tests';
 
 
 //src/scenes

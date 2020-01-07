@@ -2,13 +2,6 @@ import { Bone } from './Bone';
 import { Matrix4 } from './../math/Matrix4';
 import { DataTexture } from './../textures/DataTexture';
 
-/**
- * @deprecated Use {@link Points THREE.Points} instead.
- */
-/**
- * @deprecated Use {@link Points THREE.Points} instead.
- */
-
 export class Skeleton {
 
 	constructor( bones: Bone[], boneInverses?: Matrix4[] );
