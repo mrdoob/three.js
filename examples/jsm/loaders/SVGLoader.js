@@ -808,19 +808,19 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				};
 
 				if ( node.hasAttribute( svgName ) ) style[ jsName ] = adjustFunction( node.getAttribute( svgName ) );
-				if ( node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
+				if ( node.style && node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
 
 			}
 
 			function clamp( v ) {
 
-				return Math.max( 0, Math.min( 1, v ) );
+				return Math.max( 0, Math.min( 1, parseFloat( v ) ) );
 
 			}
 
 			function positive( v ) {
 
-				return Math.max( 0, v );
+				return Math.max( 0, parseFloat( v ) );
 
 			}
 
@@ -1226,9 +1226,9 @@ SVGLoader.pointsToStroke = function ( points, style, arcDivisions, minDistance )
 	}
 
 	var geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	geometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 	return geometry;
 
@@ -1625,23 +1625,31 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 
 			if ( joinIsOnLeftSide ) {
 
-				lastInner.toArray( vertices, 0 * 3 );
-				lastInner.toArray( vertices, 3 * 3 );
+				if ( isMiter || initialJoinIsOnLeftSide ) {
 
-				if ( isMiter ) {
+					lastInner.toArray( vertices, 0 * 3 );
+					lastInner.toArray( vertices, 3 * 3 );
 
-					lastOuter.toArray( vertices, 1 * 3 );
+					if ( isMiter ) {
+
+						lastOuter.toArray( vertices, 1 * 3 );
+
+					}
 
 				}
 
 			} else {
 
-				lastInner.toArray( vertices, 1 * 3 );
-				lastInner.toArray( vertices, 3 * 3 );
+				if ( isMiter || ! initialJoinIsOnLeftSide ) {
 
-				if ( isMiter ) {
+					lastInner.toArray( vertices, 1 * 3 );
+					lastInner.toArray( vertices, 3 * 3 );
 
-					lastOuter.toArray( vertices, 0 * 3 );
+					if ( isMiter ) {
+
+						lastOuter.toArray( vertices, 0 * 3 );
+
+					}
 
 				}
 

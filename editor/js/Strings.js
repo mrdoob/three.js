@@ -20,6 +20,8 @@ var Strings = function ( config ) {
 			'menubar/file/export/glb': 'Export GLB',
 			'menubar/file/export/gltf': 'Export GLTF',
 			'menubar/file/export/obj': 'Export OBJ',
+			'menubar/file/export/ply': 'Export PLY',
+			'menubar/file/export/ply_binary': 'Export PLY (Binary)',
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
 			'menubar/file/publish': 'Publish',
@@ -65,6 +67,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': 'Play',
 
 			'menubar/examples': 'Examples',
+			'menubar/examples/Arkanoid': 'Arkanoid',
+			'menubar/examples/Camera': 'Camera',
+			'menubar/examples/Particles': 'Particles',
+			'menubar/examples/Pong': 'Pong',
+			'menubar/examples/Shaders': 'Shaders',
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
@@ -281,12 +288,10 @@ var Strings = function ( config ) {
 			'sidebar/project/antialias': 'antialias',
 			'sidebar/project/shadows': 'shadows',
 			'sidebar/project/materials': 'Materials',
+			'sidebar/project/Assign': 'Assign',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
-			'sidebar/settings/theme': 'Theme',
-			'sidebar/settings/theme/light': 'light',
-			'sidebar/settings/theme/dark': 'dark',
 
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
@@ -296,7 +301,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings/viewport/grid': 'Grid',
 
-			'sidebar/history/history': 'HISTORY',
+			'sidebar/history': 'History',
 			'sidebar/history/persistent': 'persistent',
 
 			'toolbar/translate': 'Translate',
@@ -322,6 +327,8 @@ var Strings = function ( config ) {
 			'menubar/file/export/glb': '导出GLB',
 			'menubar/file/export/gltf': '导出GLTF',
 			'menubar/file/export/obj': '导出OBJ',
+			'menubar/file/export/ply': '导出PLY',
+			'menubar/file/export/ply_binary': '导出PLY(二进制)',
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
 			'menubar/file/publish': '发布',
@@ -343,7 +350,7 @@ var Strings = function ( config ) {
 			'menubar/add/cylinder': '圆柱体',
 			'menubar/add/ring': '环',
 			'menubar/add/sphere': '球体',
-			'menubar/add/dodecahedron': 'Dodecahedron',
+			'menubar/add/dodecahedron': '十二面体',
 			'menubar/add/icosahedron': '二十面体',
 			'menubar/add/octahedron': '八面体',
 			'menubar/add/tetrahedron': '四面体',
@@ -367,6 +374,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': '启动',
 
 			'menubar/examples': '示例',
+			'menubar/examples/Arkanoid': '打砖块',
+			'menubar/examples/Camera': ' 摄像机',
+			'menubar/examples/Particles': '粒子',
+			'menubar/examples/Pong': '乒乓球',
+			'menubar/examples/Shaders': '着色器',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
@@ -556,13 +568,11 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/materials': 'Materials',
+			'sidebar/project/materials': '材质',
+			'sidebar/project/Assign': '应用',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
-			'sidebar/settings/theme': '主题',
-			'sidebar/settings/theme/light': '浅色',
-			'sidebar/settings/theme/dark': '深色',
 
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
@@ -572,7 +582,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings/viewport/grid': '网格',
 
-			'sidebar/history/history': '历史记录',
+			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',
 
 			'toolbar/translate': '移动',
@@ -599,3 +609,5 @@ var Strings = function ( config ) {
 	};
 
 };
+
+export { Strings };

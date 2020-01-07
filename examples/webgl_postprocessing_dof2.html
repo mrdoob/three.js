@@ -85,21 +85,7 @@
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.format = THREE.RGBFormat;
 
-				var shader = THREE.ShaderLib[ 'cube' ];
-				shader.uniforms[ 'tCube' ].value = textureCube;
-
-				var skyMaterial = new THREE.ShaderMaterial( {
-
-					fragmentShader: shader.fragmentShader,
-					vertexShader: shader.vertexShader,
-					uniforms: shader.uniforms,
-					depthWrite: false,
-					side: THREE.BackSide
-
-				} );
-
-				var sky = new THREE.Mesh( new THREE.BoxBufferGeometry( 1000, 1000, 1000 ), skyMaterial );
-				scene.add( sky );
+				scene.background = textureCube;
 
 				// plane particles
 
@@ -443,22 +429,17 @@
 
 					var intersects = raycaster.intersectObjects( scene.children, true );
 
+					var targetDistance = ( intersects.length > 0 ) ? intersects[ 0 ].distance : 1000;
 
-					if ( intersects.length > 0 ) {
+					distance += ( targetDistance - distance ) * 0.03;
 
-						var targetDistance = intersects[ 0 ].distance;
+					var sdistance = smoothstep( camera.near, camera.far, distance );
 
-						distance += ( targetDistance - distance ) * 0.03;
+					var ldistance = linearize( 1 - sdistance );
 
-						var sdistance = smoothstep( camera.near, camera.far, distance );
+					postprocessing.bokeh_uniforms[ 'focalDepth' ].value = ldistance;
 
-						var ldistance = linearize( 1 - sdistance );
-
-						postprocessing.bokeh_uniforms[ 'focalDepth' ].value = ldistance;
-
-						effectController[ 'focalDepth' ] = ldistance;
-
-					}
+					effectController[ 'focalDepth' ] = ldistance;
 
 				}
 

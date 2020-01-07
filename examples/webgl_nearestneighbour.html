@@ -72,13 +72,6 @@
 
 				scene = new THREE.Scene();
 
-				controls = new FirstPersonControls( camera );
-				controls.movementSpeed = 100;
-				controls.lookSpeed = 0.1;
-
-				controls.lookAt( 500, 500, 500 );
-
-
 				// add a skybox background
 				var cubeTextureLoader = new THREE.CubeTextureLoader();
 
@@ -98,6 +91,12 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 100;
+				controls.lookSpeed = 0.1;
+
+				controls.lookAt( 500, 500, 500 );
 
 				// create the custom shader
 
@@ -130,8 +129,8 @@
 				alphas = new Float32Array( amountOfParticles );
 
 				_particleGeom = new THREE.BufferGeometry();
-				_particleGeom.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				_particleGeom.addAttribute( 'alpha', new THREE.BufferAttribute( alphas, 1 ) );
+				_particleGeom.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				_particleGeom.setAttribute( 'alpha', new THREE.BufferAttribute( alphas, 1 ) );
 
 				particles = new THREE.Points( _particleGeom, pointShaderMaterial );
 

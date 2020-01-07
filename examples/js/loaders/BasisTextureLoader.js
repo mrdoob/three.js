@@ -119,7 +119,9 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 		var worker;
 		var taskID;
 
-		var texturePending = this._getWorker()
+		var taskCost = buffer.byteLength;
+
+		var texturePending = this._allocateWorker( taskCost )
 			.then( ( _worker ) => {
 
 				worker = _worker;
@@ -128,8 +130,6 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 				return new Promise( ( resolve, reject ) => {
 
 					worker._callbacks[ taskID ] = { resolve, reject };
-					worker._taskCosts[ taskID ] = buffer.byteLength;
-					worker._taskLoad += worker._taskCosts[ taskID ];
 
 					worker.postMessage( { type: 'transcode', id: taskID, buffer }, [ buffer ] );
 
@@ -181,9 +181,8 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 				if ( worker && taskID ) {
 
-					worker._taskLoad -= worker._taskCosts[ taskID ];
+					worker._taskLoad -= taskCost;
 					delete worker._callbacks[ taskID ];
-					delete worker._taskCosts[ taskID ];
 
 				}
 
@@ -195,7 +194,7 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 	_initTranscoder: function () {
 
-		if ( ! this.transcoderBinary ) {
+		if ( ! this.transcoderPending ) {
 
 			// Load transcoder wrapper.
 			var jsLoader = new THREE.FileLoader( this.manager );
@@ -239,7 +238,7 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 	},
 
-	_getWorker: function () {
+	_allocateWorker: function ( taskCost ) {
 
 		return this._initTranscoder().then( () => {
 
@@ -248,7 +247,6 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 				var worker = new Worker( this.workerSourceURL );
 
 				worker._callbacks = {};
-				worker._taskCosts = {};
 				worker._taskLoad = 0;
 
 				worker.postMessage( {
@@ -290,7 +288,11 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 			}
 
-			return this.workerPool[ this.workerPool.length - 1 ];
+			var worker = this.workerPool[ this.workerPool.length - 1 ];
+
+			worker._taskLoad += taskCost;
+
+			return worker;
 
 		} );
 
@@ -476,8 +478,8 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 				0,
 				mip,
 				config.format,
-				hasAlpha,
-				0
+				0,
+				hasAlpha
 			);
 
 			if ( ! status ) {

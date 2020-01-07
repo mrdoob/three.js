@@ -11,7 +11,14 @@ import {
 
 var PointerLockControls = function ( camera, domElement ) {
 
-	this.domElement = domElement || document.body;
+	if ( domElement === undefined ) {
+
+		console.warn( 'THREE.PointerLockControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document.body;
+
+	}
+
+	this.domElement = domElement;
 	this.isLocked = false;
 
 	//

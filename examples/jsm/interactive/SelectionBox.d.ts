@@ -17,7 +17,7 @@ export class SelectionBox {
 	scene: Scene;
 	startPoint: Vector3;
 
-	select( startPoint: Vector3, endPoint: Vector3 ): Mesh[];
+	select( startPoint?: Vector3, endPoint?: Vector3 ): Mesh[];
 	updateFrustum( startPoint: Vector3, endPoint: Vector3 ): void;
 	searchChildInFrustum( frustum: Frustum, object: Object3D ): void;
 

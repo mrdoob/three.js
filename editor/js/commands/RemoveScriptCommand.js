@@ -3,13 +3,14 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
  * @param script javascript object
  * @constructor
  */
-
 var RemoveScriptCommand = function ( editor, object, script ) {
 
 	Command.call( this, editor );
@@ -80,3 +81,5 @@ RemoveScriptCommand.prototype = {
 	}
 
 };
+
+export { RemoveScriptCommand };

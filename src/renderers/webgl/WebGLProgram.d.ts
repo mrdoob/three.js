@@ -9,14 +9,14 @@ export class WebGLProgram {
 	constructor(
 		renderer: WebGLRenderer,
 		extensions: WebGLExtensions,
-		code: string,
+		cacheKey: string,
 		material: ShaderMaterial,
 		shader: WebGLShader,
 		parameters: WebGLRendererParameters
 	);
 
 	id: number;
-	code: string;
+	cacheKey: string; // unique identifier for this program, used for looking up compiled programs from cache.
 	usedTimes: number;
 	program: any;
 	vertexShader: WebGLShader;

@@ -491,7 +491,7 @@ var SimplifyModifier = function () {};
 
 		//
 
-		simplifiedGeometry.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+		simplifiedGeometry.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
 		simplifiedGeometry.setIndex( index );
 
 		return simplifiedGeometry;

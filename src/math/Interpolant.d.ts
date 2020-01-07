@@ -2,13 +2,13 @@ export abstract class Interpolant {
 
 	constructor(
 		parameterPositions: any,
-		samplesValues: any,
+		sampleValues: any,
 		sampleSize: number,
 		resultBuffer?: any
 	);
 
 	parameterPositions: any;
-	samplesValues: any;
+	sampleValues: any;
 	valueSize: number;
 	resultBuffer: any;
 

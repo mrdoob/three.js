@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - materials - car</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #444;
+			}
+			a {
+				color: #08f;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo<br/>
+			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
+			<br><br>
+			<span>Body: <select id="body-mat"></select></span>
+			<span>Details: <select id="rim-mat"></select></span>
+			<span>Glass: <select id="glass-mat"></select></span>
+		</div>
+
+		<div id="container"></div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+
+			var camera, scene, renderer;
+			var stats, carModel, materialsLib;
+
+			var bodyMatSelect = document.getElementById( 'body-mat' );
+			var rimMatSelect = document.getElementById( 'rim-mat' );
+			var glassMatSelect = document.getElementById( 'glass-mat' );
+
+			var carParts = {
+				body: [],
+				rims: [],
+				glass: [],
+			};
+
+			var grid, wheels = [];
+
+			function init() {
+
+				var container = document.getElementById( 'container' );
+
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 200 );
+
+				scene = new THREE.Scene();
+				// scene.fog = new THREE.Fog( 0xd7cbb1, 1, 80 );
+
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/hdr/' )
+					.load( 'quarry_01_1k.hdr', function ( texture ) {
+
+						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						pmremGenerator.dispose();
+
+						scene.background = envMap;
+						scene.environment = envMap;
+
+						//
+
+						initCar();
+						initMaterials();
+						initMaterialSelectionMenus();
+
+					} );
+
+				var ground = new THREE.Mesh(
+					new THREE.PlaneBufferGeometry( 400, 400 ),
+					new THREE.MeshBasicMaterial( { color: 0x6e6a62, depthWrite: false } )
+				);
+				ground.rotation.x = - Math.PI / 2;
+				ground.renderOrder = 1;
+				scene.add( ground );
+
+				grid = new THREE.GridHelper( 400, 80, 0x000000, 0x000000 );
+				grid.material.opacity = 0.1;
+				grid.material.depthWrite = false;
+				grid.material.transparent = true;
+				scene.add( grid );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				renderer.setAnimationLoop( render );
+
+			}
+
+			function initCar() {
+
+				var dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+
+				var loader = new GLTFLoader();
+				loader.setDRACOLoader( dracoLoader );
+
+				loader.load( 'models/gltf/ferrari.glb', function ( gltf ) {
+
+					carModel = gltf.scene.children[ 0 ];
+
+					// shadow
+					var texture = new THREE.TextureLoader().load( 'models/gltf/ferrari_ao.png' );
+					var shadow = new THREE.Mesh(
+						new THREE.PlaneBufferGeometry( 0.655 * 4, 1.3 * 4 ),
+						new THREE.MeshBasicMaterial( {
+							map: texture, opacity: 0.7, transparent: true
+						} )
+					);
+					shadow.rotation.x = - Math.PI / 2;
+					shadow.renderOrder = 2;
+					carModel.add( shadow );
+
+					scene.add( carModel );
+
+					// car parts for material selection
+					carParts.body.push( carModel.getObjectByName( 'body' ) );
+
+					carParts.rims.push(
+						carModel.getObjectByName( 'rim_fl' ),
+						carModel.getObjectByName( 'rim_fr' ),
+						carModel.getObjectByName( 'rim_rr' ),
+						carModel.getObjectByName( 'rim_rl' ),
+						carModel.getObjectByName( 'trim' ),
+					);
+
+					carParts.glass.push(
+						carModel.getObjectByName( 'glass' ),
+					 );
+
+					 wheels.push(
+						 carModel.getObjectByName( 'wheel_fl' ),
+						 carModel.getObjectByName( 'wheel_fr' ),
+						 carModel.getObjectByName( 'wheel_rl' ),
+						 carModel.getObjectByName( 'wheel_rr' )
+					 );
+
+					updateMaterials();
+
+				} );
+
+			}
+
+			function initMaterials() {
+
+				materialsLib = {
+
+					main: [
+
+						new THREE.MeshStandardMaterial( {
+							color: 0xff4400, metalness: 1.0, roughness: 0.2, name: 'orange'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0x001166, metalness: 1.0, roughness: 0.2, name: 'blue'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0x990000, metalness: 1.0, roughness: 0.2, name: 'red'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0x000000, metalness: 1.0, roughness: 0.4, name: 'black'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0xffffff, metalness: 0.1, roughness: 0.2, name: 'white'
+						} ),
+						new THREE.MeshStandardMaterial( {
+							color: 0xffffff, metalness: 1.0, roughness: 0.2, name: 'metallic'
+						} ),
+
+					],
+
+					glass: [
+
+						new THREE.MeshPhysicalMaterial( {
+							color: 0xffffff, metalness: 1, roughness: 0, transparency: 1.0, transparent: true, name: 'clear'
+						} ),
+						new THREE.MeshPhysicalMaterial( {
+							color: 0x000000, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'smoked'
+						} ),
+						new THREE.MeshPhysicalMaterial( {
+							color: 0x001133, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'blue'
+						} ),
+
+					],
+
+				};
+
+			}
+
+			function initMaterialSelectionMenus() {
+
+				function addOption( name, menu ) {
+
+					var option = document.createElement( 'option' );
+					option.text = name;
+					option.value = name;
+					menu.add( option );
+
+				}
+
+				materialsLib.main.forEach( function ( material ) {
+
+					addOption( material.name, bodyMatSelect );
+					addOption( material.name, rimMatSelect );
+
+				} );
+
+				materialsLib.glass.forEach( function ( material ) {
+
+					addOption( material.name, glassMatSelect );
+
+				} );
+
+				bodyMatSelect.selectedIndex = 2;
+				rimMatSelect.selectedIndex = 5;
+				glassMatSelect.selectedIndex = 0;
+
+				bodyMatSelect.addEventListener( 'change', updateMaterials );
+				rimMatSelect.addEventListener( 'change', updateMaterials );
+				glassMatSelect.addEventListener( 'change', updateMaterials );
+
+			}
+
+			// set materials to the current values of the selection menus
+			function updateMaterials() {
+
+				var bodyMat = materialsLib.main[ bodyMatSelect.selectedIndex ];
+				var rimMat = materialsLib.main[ rimMatSelect.selectedIndex ];
+				var glassMat = materialsLib.glass[ glassMatSelect.selectedIndex ];
+
+				carParts.body.forEach( part => part.material = bodyMat );
+				carParts.rims.forEach( part => part.material = rimMat );
+				carParts.glass.forEach( part => part.material = glassMat );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function render() {
+
+				var time = - performance.now() / 1000;
+
+				camera.position.x = Math.cos( time / 10 ) * 6;
+				camera.position.y = 1.5;
+				camera.position.z = Math.sin( time / 10 ) * 6;
+				camera.lookAt( 0, 0.5, 0 );
+
+				for ( var i = 0; i < wheels.length; i ++ ) {
+
+					wheels[ i ].rotation.x = time * Math.PI;
+
+				}
+
+				grid.position.z = - ( time ) % 5;
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+			init();
+
+		</script>
+
+	</body>
+</html>

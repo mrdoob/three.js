@@ -1,5 +1,4 @@
 import { Node } from '../core/Node';
-import { NodeBuilder } from '../core/NodeBuilder';
 
 export class BypassNode extends Node {
 
@@ -9,7 +8,6 @@ export class BypassNode extends Node {
 	value: Node | undefined;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: BypassNode ): this;
 
 }

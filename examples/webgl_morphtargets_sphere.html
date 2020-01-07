@@ -22,11 +22,12 @@
 
 			var container;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			var mesh;
 
 			var sign = 1;
+			var speed = 0.5;
 
 			init();
 			animate();
@@ -39,6 +40,8 @@
 				camera.position.set( 0, 5, 5 );
 
 				scene = new THREE.Scene();
+
+				clock = new THREE.Clock();
 
 				var light = new THREE.PointLight( 0xff2200, 0.7 );
 				light.position.set( 100, 100, 100 );
@@ -106,6 +109,8 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				document.addEventListener( 'visibilitychange', onVisibilityChange );
+
 			}
 
 			function onWindowResize() {
@@ -114,6 +119,20 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function onVisibilityChange() {
+
+				if ( document.hidden === true ) {
+
+					clock.stop();
+
+				} else {
+
+					clock.start();
+
+				}
 
 			}
 
@@ -126,11 +145,15 @@
 
 			function render() {
 
+				var delta = clock.getDelta();
+
 				if ( mesh !== undefined ) {
 
-					mesh.rotation.y += 0.01;
+					var step = delta * speed;
 
-					mesh.morphTargetInfluences[ 1 ] = mesh.morphTargetInfluences[ 1 ] + 0.01 * sign;
+					mesh.rotation.y += step;
+
+					mesh.morphTargetInfluences[ 1 ] = mesh.morphTargetInfluences[ 1 ] + step * sign;
 
 					if ( mesh.morphTargetInfluences[ 1 ] <= 0 || mesh.morphTargetInfluences[ 1 ] >= 1 ) {
 

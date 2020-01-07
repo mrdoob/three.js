@@ -105,16 +105,7 @@
 					side: THREE.BackSide
 				} );
 
-				cubeMaterial.uniforms[ "tCube" ].value = textureCube;
-				Object.defineProperty( cubeMaterial, 'map', {
-
-					get: function () {
-
-						return this.uniforms.tCube.value;
-
-					}
-
-				} );
+				cubeMaterial.envMap = textureCube;
 
 				// Skybox
 
@@ -137,7 +128,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 

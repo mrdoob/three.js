@@ -264,7 +264,7 @@
 
 							}
 
-							bufferGeo.addAttribute( 'curvature', new THREE.BufferAttribute( curvatureAttribute, 1 ) );
+							bufferGeo.setAttribute( 'curvature', new THREE.BufferAttribute( curvatureAttribute, 1 ) );
 
 							//starting filter is to show both concave and convex
 							var curvatureFiltered = new Float32Array( curvatureAttribute );

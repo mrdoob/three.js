@@ -2,7 +2,7 @@ import { WebGLRenderer } from './../WebGLRenderer';
 import { WebGLProgram } from './WebGLProgram';
 import { WebGLCapabilities } from './WebGLCapabilities';
 import { WebGLExtensions } from './WebGLExtensions';
-import { ShaderMaterial } from './../../materials/ShaderMaterial';
+import { Material } from './../../materials/Material';
 
 export class WebGLPrograms {
 
@@ -11,17 +11,17 @@ export class WebGLPrograms {
 	programs: WebGLProgram[];
 
 	getParameters(
-		material: ShaderMaterial,
+		material: Material,
 		lights: any,
 		fog: any,
 		nClipPlanes: number,
 		object: any
 	): any;
-	getProgramCode( material: ShaderMaterial, parameters: any ): string;
+	getProgramCacheKey( material: Material, parameters: any ): string;
 	acquireProgram(
-		material: ShaderMaterial,
+		material: Material,
 		parameters: any,
-		code: string
+		cacheKey: string
 	): WebGLProgram;
 	releaseProgram( program: WebGLProgram ): void;
 

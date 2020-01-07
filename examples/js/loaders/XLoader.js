@@ -972,11 +972,11 @@ THREE.XLoader = ( function () {
 
 				//
 
-				bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
-				bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-				bufferGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-				bufferGeometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
-				bufferGeometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+				bufferGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+				bufferGeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				bufferGeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				bufferGeometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+				bufferGeometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
 
 				this._computeGroups( bufferGeometry, data.materialIndices );
 

@@ -168,7 +168,7 @@ function WireframeGeometry( geometry ) {
 
 	// build geometry
 
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 }
 

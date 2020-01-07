@@ -271,11 +271,11 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var geometry = new BufferGeometry();
 			geometry.setIndex( indices );
-			geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
 			if ( normals.length === positions.length ) {
 
-				geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 			}
 
@@ -285,7 +285,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( colors.length === positions.length ) {
 
-					geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+					geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 				}
 
@@ -312,7 +312,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					}
 
-					geometry.addAttribute( 'color', new Float32BufferAttribute( newColors, 3 ) );
+					geometry.setAttribute( 'color', new Float32BufferAttribute( newColors, 3 ) );
 
 				}
 
@@ -518,11 +518,11 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var geometry = new BufferGeometry();
 			geometry.setIndex( new BufferAttribute( indices, 1 ) );
-			geometry.addAttribute( 'position', new BufferAttribute( points, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( points, 3 ) );
 
 			if ( normals.length === points.length ) {
 
-				geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 			}
 
@@ -1122,11 +1122,11 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var geometry = new BufferGeometry();
 				geometry.setIndex( new BufferAttribute( indices, 1 ) );
-				geometry.addAttribute( 'position', new BufferAttribute( points, 3 ) );
+				geometry.setAttribute( 'position', new BufferAttribute( points, 3 ) );
 
 				if ( normals.length === points.length ) {
 
-					geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+					geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 				}
 

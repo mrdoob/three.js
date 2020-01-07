@@ -62,16 +62,16 @@ scene.background = new THREE.CubeTextureLoader()
 		[page:String urls] — 数组长度为6的图像数组，数组内容为URL，每一个URL用于CubeTexture的每一侧。
 		这些URL将被指定顺序: pos-x, neg-x, pos-y, neg-y, pos-z, neg-z.
 		数组内容也可以为 [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URIs].<br />
-            请注意，一般来说，在立方体贴图坐标系中，当查找positive-z轴时，positive-x表示右侧
-             - 换句话说，此坐标系使用左手坐标系。
+			请注意，一般来说，在立方体贴图坐标系中，当查找positive-z轴时，positive-x表示右侧
+			 - 换句话说，此坐标系使用左手坐标系。
 		由于three.js使用右手坐标系， 环境贴图将在three.js进行pos-x和neg-x进行交互.<br />
 		[page:Function onLoad] —  加载完成时将调用。回调参数是已被加载的[page:Texture texture].<br />
 		[page:Function onProgress] — 将在加载过程中进行调用。参数为XMLHttpRequest实例，
-            其中包含 [page:Integer total] 和 [page:Integer loaded] 字节。<br />
+			其中包含 [page:Integer total] 和 [page:Integer loaded] 字节。<br />
 		[page:Function onError] — 在加载错误时被调用。<br />
 		</p>
 		<p>
-            从URL中进行加载，并将被加载的[page:Texture texture]传递给onLoad。
+			从URL中进行加载，并将被加载的[page:Texture texture]传递给onLoad。
 		</p>
 
 		<h2>源</h2>

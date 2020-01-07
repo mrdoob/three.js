@@ -2,16 +2,32 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import * as THREE from '../../build/three.module.js';
+
+import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
+import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
+
+import { UIPanel } from './libs/ui.js';
+
+import { EditorControls } from './EditorControls.js';
+
+import { ViewportCamera } from './Viewport.Camera.js';
+import { ViewportInfo } from './Viewport.Info.js';
+
+import { SetPositionCommand } from './commands/SetPositionCommand.js';
+import { SetRotationCommand } from './commands/SetRotationCommand.js';
+import { SetScaleCommand } from './commands/SetScaleCommand.js';
+
 var Viewport = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setId( 'viewport' );
 	container.setPosition( 'absolute' );
 
-	container.add( new Viewport.Camera( editor ) );
-	container.add( new Viewport.Info( editor ) );
+	container.add( new ViewportCamera( editor ) );
+	container.add( new ViewportInfo( editor ) );
 
 	//
 
@@ -54,7 +70,7 @@ var Viewport = function ( editor ) {
 	var objectRotationOnDown = null;
 	var objectScaleOnDown = null;
 
-	var transformControls = new THREE.TransformControls( camera, container.dom );
+	var transformControls = new TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
 
 		var object = transformControls.object;
@@ -267,7 +283,7 @@ var Viewport = function ( editor ) {
 	// controls need to be added *after* main logic,
 	// otherwise controls.enabled doesn't work.
 
-	var controls = new THREE.EditorControls( camera, container.dom );
+	var controls = new EditorControls( camera, container.dom );
 	controls.addEventListener( 'change', function () {
 
 		signals.cameraChanged.dispatch( camera );
@@ -313,7 +329,7 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
-		renderer.gammaOutput = true;
+		renderer.outputEncoding = THREE.sRGBEncoding;
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -440,7 +456,7 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.materialChanged.add( function ( material ) {
+	signals.materialChanged.add( function () {
 
 		render();
 
@@ -575,7 +591,7 @@ var Viewport = function ( editor ) {
 		scene.updateMatrixWorld();
 		renderer.render( scene, camera );
 
-		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+		if ( renderer instanceof RaytracingRenderer === false ) {
 
 			if ( camera === editor.camera ) {
 
@@ -591,3 +607,5 @@ var Viewport = function ( editor ) {
 	return container;
 
 };
+
+export { Viewport };
