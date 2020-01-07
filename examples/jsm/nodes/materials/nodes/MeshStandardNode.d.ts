@@ -5,7 +5,7 @@ import {
 
 import { NodeBuilder } from '../../core/NodeBuilder';
 import { StandardNode } from './StandardNode';
-import { PropertyNode } from "../../inputs/PropertyNode";
+import { PropertyNode } from '../../inputs/PropertyNode';
 
 export class MeshStandardNode extends StandardNode {
 

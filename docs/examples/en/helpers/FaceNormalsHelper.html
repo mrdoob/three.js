@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Renders [page:ArrowHelper arrows] to visualize an object's [page:Face3 face] normals.
+			Requires  that face normals have been specified on all 	[page:Face3 faces] or calculated
+			with [page:Geometry.computeFaceNormals computeFaceNormals]. <br /><br />
+
+			Note that this only works with the objects whose geometry is an instance of [page:Geometry].
+			For [page:BufferGeometry] use a [page:VertexNormalsHelper] instead.
+		<p>
+
+
+		<h2>Example</h2>
+
+		<div>[example:webgl_helpers WebGL / helpers]</div>
+
+		<code>
+		geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
+		material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		box = new THREE.Mesh( geometry, material );
+
+		helper = new THREE.FaceNormalsHelper( box, 2, 0x00ff00, 1 );
+
+		scene.add( box );
+		scene.add( helper );
+		</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Object3D object], [param:Number size], [param:Color color], [param:Number linewidth] )</h3>
+		<p>
+		[page:Object3D object] -- object for which to render face normals.<br />
+		[page:Number size] -- (optional) length of the arrows. Default is *1*.<br />
+		[page:Hex color] -- (optional) hex color of the arrows. Default is *0xffff00*.<br />
+		[page:Number linewidth] -- (optional) width of the arrow lines.  Default is *1*.
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:LineSegments] class for common properties.</p>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
+		<p>
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			objects's [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+		<h3>[property:Object3D object]</h3>
+		<p>The object for which the face normals are being visualized.</p>
+
+		<h3>[property:Number size]</h3>
+		<p>Length of the arrows. Default is *1*.</p>
+
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:LineSegments] class for common methods.</p>
+
+
+		<h3>[method:null update]()</h3>
+		<p>Updates the face normal preview based on movement of the object.</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/FaceNormalsHelper.js examples/jsm/helpers/FaceNormalsHelper.js]
+		</p>
+	</body>
+</html>

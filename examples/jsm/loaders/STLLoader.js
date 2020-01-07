@@ -250,12 +250,12 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 			if ( hasColors ) {
 
-				geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 				geometry.hasColors = true;
 				geometry.alpha = alpha;
 
@@ -344,8 +344,8 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 			if ( groupCount > 0 ) {
 

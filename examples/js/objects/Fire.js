@@ -145,8 +145,8 @@ THREE.Fire = function ( geometry, options ) {
 
 	this.field0.background = new THREE.Color( 0x000000 );
 
-	if ( ! THREE.Math.isPowerOfTwo( textureWidth ) ||
-		 ! THREE.Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) ||
+		 ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		this.field0.texture.generateMipmaps = false;
 		this.field1.texture.generateMipmaps = false;
@@ -319,7 +319,7 @@ THREE.Fire = function ( geometry, options ) {
 	this.saveRenderState = function ( renderer ) {
 
 		this.savedRenderTarget = renderer.getRenderTarget();
-		this.savedVrEnabled = renderer.vr.enabled;
+		this.savedXrEnabled = renderer.xr.enabled;
 		this.savedShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 		this.savedAntialias = renderer.antialias;
 		this.savedToneMapping = renderer.toneMapping;
@@ -328,7 +328,7 @@ THREE.Fire = function ( geometry, options ) {
 
 	this.restoreRenderState = function ( renderer ) {
 
-		renderer.vr.enabled = this.savedVrEnabled;
+		renderer.xr.enabled = this.savedXrEnabled;
 		renderer.shadowMap.autoUpdate = this.savedShadowAutoUpdate;
 		renderer.setRenderTarget( this.savedRenderTarget );
 		renderer.antialias = this.savedAntialias;
@@ -445,7 +445,7 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.saveRenderState( renderer );
 
-		renderer.vr.enabled = false; // Avoid camera modification and recursion
+		renderer.xr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 		renderer.antialias = false;
 		renderer.toneMapping = THREE.NoToneMapping;

@@ -383,8 +383,8 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 				particleUniforms = {
 					"texturePosition": { value: null },
@@ -523,7 +523,7 @@
 
 			function getCameraConstant( camera ) {
 
-				return window.innerHeight / ( Math.tan( THREE.Math.DEG2RAD * 0.5 * camera.fov ) / camera.zoom );
+				return window.innerHeight / ( Math.tan( THREE.MathUtils.DEG2RAD * 0.5 * camera.fov ) / camera.zoom );
 
 			}
 

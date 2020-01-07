@@ -1,5 +1,4 @@
 import { TempNode } from '../core/TempNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 import { Node } from '../core/Node';
 
 export class OperatorNode extends TempNode {
@@ -10,7 +9,6 @@ export class OperatorNode extends TempNode {
 	b: Node;
 	op: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: OperatorNode ): this;
 
 	static ADD: string;

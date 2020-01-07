@@ -235,9 +235,9 @@
 
 				}
 
-				bezierGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-				bezierGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-				bezierGeometry.addAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
+				bezierGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				bezierGeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				bezierGeometry.setAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
 
 				geometry = new THREE.ShapeBufferGeometry( convexhullShapeGroup );
 

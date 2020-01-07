@@ -1,5 +1,4 @@
 import {
-	Matrix4,
 	Texture
 } from '../../../../src/Three';
 
@@ -12,14 +11,13 @@ export class TextureNode extends InputNode {
 
 	constructor( value: Texture, uv?: UVNode, bias?: Node, project?: boolean );
 
-	value: Matrix4;
+	value: Texture;
 	uv: UVNode;
-	bias: Matrix4;
+	bias: Node;
 	project: boolean;
 	nodeType: string;
 
 	getTexture( builder: NodeBuilder, output: string ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: TextureNode ): this;
 
 }

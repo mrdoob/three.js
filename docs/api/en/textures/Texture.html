@@ -55,13 +55,6 @@
 		as long as video is playing - the [page:VideoTexture VideoTexture] class handles this automatically.
 		</p>
 
-		<h3>[property:Boolean isTexture]</h3>
-		<p>
-			Used to check whether this or derived classes are Textures. Default is *true*.<br /><br />
-
-			You should not change this, as it is used internally for optimisation.
-		</p>
-
 		<h3>[property:array mipmaps]</h3>
 		<p>
 		Array of user-specified mipmaps (optional).
@@ -124,6 +117,17 @@
 		set this to [page:Textures THREE.RGBFormat] for JPG images. <br /><br />
 
 		See the [page:Textures texture constants] page for details of other formats.
+		</p>
+
+		<h3>[property:String internalFormat]</h3>
+		<p>
+		The default value is obtained using a combination of [page:Texture.format .format] and
+		[page:Texture.type .type].<br />
+
+		The GPU format allows the developer to specify how the data is going to be
+		stored on the GPU.<br /><br />
+
+		See the [page:Textures texture constants] page for details regarding all supported internal formats.
 		</p>
 
 		<h3>[property:number type]</h3>

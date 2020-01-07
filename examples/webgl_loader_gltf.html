@@ -12,7 +12,7 @@
 			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader<br />
 			Battle Damaged Sci-fi Helmet by
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=pedestrian_overpass" target="_blank" rel="noopener">Pedestrian Overpass</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
 		<script type="module">
@@ -24,9 +24,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer;
@@ -40,27 +38,24 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( - 1.8, 0.9, 2.7 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
 
 				scene = new THREE.Scene();
 
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
+					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						var cubeGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
-						cubeGenerator.update( renderer );
+						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						pmremGenerator.dispose();
 
-						var pmremGenerator = new PMREMGenerator( cubeGenerator.renderTarget.texture );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						scene.background = envMap;
+						scene.environment = envMap;
 
 						// model
+
+						var roughnessMipmapper = new RoughnessMipmapper( renderer );
 
 						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
@@ -69,7 +64,7 @@
 
 								if ( child.isMesh ) {
 
-									child.material.envMap = envMap;
+									roughnessMipmapper.generateMipmaps( child.material );
 
 								}
 
@@ -77,23 +72,24 @@
 
 							scene.add( gltf.scene );
 
+							roughnessMipmapper.dispose();
+
 						} );
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
-
-						scene.background = cubeGenerator.renderTarget;
 
 					} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
+
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, - 0.2, - 0.2 );
+				controls.target.set( 0, 0, - 0.2 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );

@@ -358,7 +358,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 			} else if ( next === FACE_ARRAY ) {
 
@@ -382,7 +382,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				}
 
-				geometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 
 			} else if ( next === MESH_MATRIX ) {

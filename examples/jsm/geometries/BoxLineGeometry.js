@@ -64,7 +64,7 @@ var BoxLineGeometry = function ( width, height, depth, widthSegments, heightSegm
 
 	}
 
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 };
 

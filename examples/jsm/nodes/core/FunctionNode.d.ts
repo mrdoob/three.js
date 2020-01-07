@@ -15,16 +15,15 @@ export class FunctionNode extends TempNode {
 	nodeType: string;
 	useKeywords: boolean;
 
-	inputs: FunctionNodeInput[] | undefined;
-	includes: object[] | undefined;
-	extensions: object | undefined;
-	keywords: object | undefined;
+	inputs: FunctionNodeInput[] | undefined;
+	includes: object[] | undefined;
+	extensions: object | undefined;
+	keywords: object | undefined;
 
 	getShared( builder: NodeBuilder, output: string ): boolean;
 	getType( builder: NodeBuilder ): string;
 	getInputByName( name: string ): FunctionNodeInput | undefined;
-	getIncludeByName( name: string ): object | undefined;
-	generate( builder: NodeBuilder, output: string ): string;
+	getIncludeByName( name: string ): object | undefined;
 	parse( src: string, includes?: object[], extensions?: object, keywords?: object ): void;
 	copy( source: FunctionNode ): this;
 

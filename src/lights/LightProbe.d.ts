@@ -5,7 +5,7 @@ export class LightProbe extends Light {
 
 	constructor( sh?: SphericalHarmonics3, intensity?: number );
 
-	isLightProbe: true;
+	readonly isLightProbe: true;
 	sh: SphericalHarmonics3;
 
 }

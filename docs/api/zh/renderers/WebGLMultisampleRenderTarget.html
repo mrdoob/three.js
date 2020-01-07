@@ -11,7 +11,8 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			TODO
+			A special render target that can be used to utilize multi-sampled renderbuffers.
+			Heads up: [name] can only be used with a WebGL 2 rendering context.
 		</p>
 
 
@@ -21,23 +22,25 @@
 		<h3>[name]([param:Number width], [param:Number height], [param:Object options])</h3>
 
 		<p>
-		[page:Float width] - TODO <br />
-		[page:Float height] - TODO<br />
-		[page:Object options] - TODO
+		[page:Float width] - The width of the render target. <br />
+		[page:Float height] - The height of the render target.<br />
+		[page:Object options] - (optional) object that holds texture parameters for an auto-generated target
+		texture and depthBuffer/stencilBuffer booleans.
 		</p>
 
 		<h2>Properties</h2>
 
-		<h3>[property:Number samples]</h3>
+		<h3>[property:number samples]</h3>
 		<p>
-		TODO
+		Specifies the number of samples to be used for the renderbuffer storage. However, the maximum supported
+		size for multisampling is platform dependent and defined via *gl.MAX_SAMPLES*.
 		</p>
 
-		<p>[page:WebGLRenderTarget WebGLRenderTarget] TODO</p>
+		<p>[page:WebGLRenderTarget WebGLRenderTarget] properties are available on this class.</p>
 
 		<h2>Methods</h2>
 
-		<p>[page:WebGLRenderTarget WebGLRenderTarget] TODO</p>
+		<p>[page:WebGLRenderTarget WebGLRenderTarget] methods are available on this class.</p>
 
 		<h2>Source</h2>
 

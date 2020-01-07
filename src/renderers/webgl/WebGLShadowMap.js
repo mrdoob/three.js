@@ -57,7 +57,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 	shadowMaterialHorizonal.defines.HORIZONAL_PASS = 1;
 
 	var fullScreenTri = new BufferGeometry();
-	fullScreenTri.addAttribute(
+	fullScreenTri.setAttribute(
 		"position",
 		new BufferAttribute(
 			new Float32Array( [ - 1, - 1, 0.5, 3, - 1, 0.5, - 1, 3, 0.5 ] ),
@@ -181,7 +181,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				_state.viewport( _viewport );
 
-				shadow.updateMatrices( light, camera, vp );
+				shadow.updateMatrices( light, vp );
 
 				_frustum = shadow.getFrustum();
 

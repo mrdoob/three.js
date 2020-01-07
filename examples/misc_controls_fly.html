@@ -154,8 +154,8 @@
 
 				}
 
-				starsGeometry[ 0 ].addAttribute( 'position', new THREE.Float32BufferAttribute( vertices1, 3 ) );
-				starsGeometry[ 1 ].addAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
+				starsGeometry[ 0 ].setAttribute( 'position', new THREE.Float32BufferAttribute( vertices1, 3 ) );
+				starsGeometry[ 1 ].setAttribute( 'position', new THREE.Float32BufferAttribute( vertices2, 3 ) );
 
 				var stars;
 				var starsMaterials = [
@@ -190,7 +190,7 @@
 
 				//
 
-				controls = new FlyControls( camera );
+				controls = new FlyControls( camera, renderer.domElement );
 
 				controls.movementSpeed = 1000;
 				controls.domElement = renderer.domElement;

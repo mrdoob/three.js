@@ -994,11 +994,11 @@ var XLoader = ( function () {
 
 				//
 
-				bufferGeometry.addAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
-				bufferGeometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-				bufferGeometry.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-				bufferGeometry.addAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
-				bufferGeometry.addAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
+				bufferGeometry.setAttribute( 'position', new Float32BufferAttribute( position, 3 ) );
+				bufferGeometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+				bufferGeometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+				bufferGeometry.setAttribute( 'skinIndex', new Uint16BufferAttribute( skinIndices, 4 ) );
+				bufferGeometry.setAttribute( 'skinWeight', new Float32BufferAttribute( skinWeights, 4 ) );
 
 				this._computeGroups( bufferGeometry, data.materialIndices );
 

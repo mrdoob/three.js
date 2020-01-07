@@ -52,6 +52,9 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			var result;
 
+			// pattern for detecting the end of a number sequence
+			var patWord = /^[^\d.\s-]+/;
+
 			// pattern for reading vertices, 3 floats or integers
 			var pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
 
@@ -92,7 +95,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			for ( var i in lines ) {
 
-				var line = lines[ i ];
+				var line = lines[ i ].trim();
 
 				if ( line.indexOf( 'DATASET' ) === 0 ) {
 
@@ -104,6 +107,8 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 					// get the vertices
 					while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+						if ( patWord.exec( line ) !== null ) break;
 
 						var x = parseFloat( result[ 1 ] );
 						var y = parseFloat( result[ 2 ] );
@@ -183,6 +188,8 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
 
+							if ( patWord.exec( line ) !== null ) break;
+
 							var r = parseFloat( result[ 1 ] );
 							var g = parseFloat( result[ 2 ] );
 							var b = parseFloat( result[ 3 ] );
@@ -195,6 +202,8 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						// Get the normal vectors
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+							if ( patWord.exec( line ) !== null ) break;
 
 							var nx = parseFloat( result[ 1 ] );
 							var ny = parseFloat( result[ 2 ] );
@@ -261,11 +270,11 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			var geometry = new THREE.BufferGeometry();
 			geometry.setIndex( indices );
-			geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
 			if ( normals.length === positions.length ) {
 
-				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 
 			}
 
@@ -275,7 +284,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				if ( colors.length === positions.length ) {
 
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				}
 
@@ -302,7 +311,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 					}
 
-					geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( newColors, 3 ) );
+					geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( newColors, 3 ) );
 
 				}
 
@@ -508,11 +517,11 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			var geometry = new THREE.BufferGeometry();
 			geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
 
 			if ( normals.length === points.length ) {
 
-				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
 			}
 
@@ -1112,11 +1121,11 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				var geometry = new THREE.BufferGeometry();
 				geometry.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( points, 3 ) );
 
 				if ( normals.length === points.length ) {
 
-					geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+					geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
 
 				}
 

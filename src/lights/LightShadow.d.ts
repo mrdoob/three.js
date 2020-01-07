@@ -21,7 +21,7 @@ export class LightShadow {
 	clone( recursive?: boolean ): this;
 	toJSON(): any;
 	getFrustum(): number;
-	updateMatrices( light: Light, viewCamera: Camera, viewportIndex: number ): void;
+	updateMatrices( light: Light, viewportIndex?: number ): void;
 	getViewport( viewportIndex: number ): Vector4;
 	getFrameExtents(): Vector2;
 

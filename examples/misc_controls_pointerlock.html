@@ -96,7 +96,7 @@
 				light.position.set( 0.5, 1, 0.75 );
 				scene.add( light );
 
-				controls = new PointerLockControls( camera );
+				controls = new PointerLockControls( camera, document.body );
 
 				var blocker = document.getElementById( 'blocker' );
 				var instructions = document.getElementById( 'instructions' );
@@ -222,7 +222,7 @@
 
 				}
 
-				floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
 
@@ -244,7 +244,7 @@
 
 				}
 
-				boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				boxGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				for ( var i = 0; i < 500; i ++ ) {
 

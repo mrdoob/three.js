@@ -1,5 +1,5 @@
 import { Path } from './Path.js';
-import { _Math } from '../../math/Math.js';
+import { MathUtils } from '../../math/MathUtils.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -16,7 +16,7 @@ function Shape( points ) {
 
 	Path.call( this, points );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.type = 'Shape';
 
