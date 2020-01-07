@@ -1,4 +1,3 @@
-import { NodeBuilder } from '../core/NodeBuilder';
 import { TempNode } from '../core/TempNode';
 import { Matrix4Node } from './Matrix4Node';
 import { OperatorNode } from '../math/OperatorNode';

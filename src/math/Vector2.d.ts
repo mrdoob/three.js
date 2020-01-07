@@ -138,7 +138,7 @@ export class Vector2 implements Vector {
 	y: number;
 	width: number;
 	height: number;
-	isVector2: true;
+	readonly isVector2: true;
 
 	/**
 	 * Sets value of this vector.

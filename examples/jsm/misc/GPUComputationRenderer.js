@@ -163,8 +163,8 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.init = function () {
 
-		if ( ! renderer.extensions.get( "OES_texture_float" ) &&
-			 ! renderer.capabilities.isWebGL2 ) {
+		if ( ! renderer.capabilities.isWebGL2 &&
+			 ! renderer.extensions.get( "OES_texture_float" ) ) {
 
 			return "No OES_texture_float support for float textures.";
 
@@ -209,7 +209,6 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 							}
 
 						}
-
 						if ( ! found ) {
 
 							return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
@@ -334,11 +333,8 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.createTexture = function () {
 
-		var a = new Float32Array( sizeX * sizeY * 4 );
-		var texture = new DataTexture( a, sizeX, sizeY, RGBAFormat, FloatType );
-		texture.needsUpdate = true;
-
-		return texture;
+		var data = new Float32Array( sizeX * sizeY * 4 );
+		return new DataTexture( data, sizeX, sizeY, RGBAFormat, FloatType );
 
 	};
 

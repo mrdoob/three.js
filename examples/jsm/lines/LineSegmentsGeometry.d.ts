@@ -10,7 +10,7 @@ import {
 export class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	constructor();
-	isLineSegmentsGeometry: boolean;
+	readonly isLineSegmentsGeometry: true;
 
 	applyMatrix( matrix: Matrix4 ): this;
 	computeBoundingBox(): void;

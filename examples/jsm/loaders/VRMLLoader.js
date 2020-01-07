@@ -2072,7 +2072,7 @@ var VRMLLoader = ( function () {
 				// materials can be influenced by the geometry (e.g. vertex normals). cloning is necessary to avoid
 				// any side effects
 
-				return ( build.isObject3D || build.isMaterial ) ? build.clone() : build;
+				return ( build.isObject3D || build.isMaterial ) ? build.clone() : build;
 
 			}
 

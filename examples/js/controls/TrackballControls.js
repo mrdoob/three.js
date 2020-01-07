@@ -358,7 +358,7 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 			_this.object.lookAt( _this.target );
 
-			if ( lastPosition.distanceToSquared( _this.object.position ) > EPS || lastZoom !== _this.object.zoom ) {
+			if ( lastPosition.distanceToSquared( _this.object.position ) > EPS || lastZoom !== _this.object.zoom ) {
 
 				_this.dispatchEvent( changeEvent );
 

@@ -1,6 +1,6 @@
 export namespace ObjectManipulator {
 
-	export function applyProperties(objToAlter: object, params: object, forceCreation: boolean): void;
+	export function applyProperties( objToAlter: object, params: object, forceCreation: boolean ): void;
 
 }
 

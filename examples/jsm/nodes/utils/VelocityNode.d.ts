@@ -17,10 +17,10 @@ export class VelocityNode extends Vector3Node {
 	constructor( target: Object3D, params?: VelocityNodeParams );
 
 	velocity: Vector3;
-	moment: Vector3 | undefined;
-	speed: Vector3 | undefined;
-	springVelocity: Vector3 | undefined;
-	lastVelocity: Vector3 | undefined;
+	moment: Vector3 | undefined;
+	speed: Vector3 | undefined;
+	springVelocity: Vector3 | undefined;
+	lastVelocity: Vector3 | undefined;
 
 	nodeType: string;
 

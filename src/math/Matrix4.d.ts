@@ -1,7 +1,6 @@
 import { Vector3 } from './Vector3';
 import { Euler } from './Euler';
 import { Quaternion } from './Quaternion';
-import { BufferAttribute } from './../core/BufferAttribute';
 import { Matrix } from './Matrix3';
 /**
  * A 4x4 Matrix.
@@ -97,17 +96,6 @@ export class Matrix4 implements Matrix {
 	 * Multiplies this matrix by s.
 	 */
 	multiplyScalar( s: number ): Matrix4;
-
-	/**
-	 * @deprecated Use {@link Matrix4#applyToBufferAttribute matrix4.applyToBufferAttribute( attribute )} instead.
-	 */
-	applyToBuffer(
-		buffer: BufferAttribute,
-		offset?: number,
-		length?: number
-	): BufferAttribute;
-
-	applyToBufferAttribute( attribute: BufferAttribute ): BufferAttribute;
 
 	/**
 	 * Computes determinant of this matrix.

@@ -40,7 +40,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			import {
 				StandardNodeMaterial,
@@ -67,22 +66,6 @@
 
 			init();
 			animate();
-
-			function generate() {
-
-				var pmremGenerator = new PMREMGenerator( renderer );
-				hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
-				pmremGenerator.dispose();
-
-				nodeTexture.value = hdrCubeRenderTarget.texture;
-
-				hdrCubeMap.magFilter = THREE.LinearFilter;
-				hdrCubeMap.needsUpdate = true;
-
-				planeMesh.material.map = hdrCubeRenderTarget.texture;
-				planeMesh.material.needsUpdate = true;
-
-			}
 
 			function init() {
 
@@ -127,11 +110,23 @@
 					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
-						generate();
+						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						pmremGenerator.dispose();
+
+						nodeTexture.value = hdrCubeRenderTarget.texture;
+
+						hdrCubeMap.magFilter = THREE.LinearFilter;
+						hdrCubeMap.needsUpdate = true;
+
+						planeMesh.material.map = hdrCubeRenderTarget.texture;
+						planeMesh.material.needsUpdate = true;
 
 						nodeMaterial.visible = true;
 
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileCubemapShader();
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

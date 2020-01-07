@@ -19,7 +19,7 @@ export class Audio extends Object3D {
 	loopStart: number;
 	loopEnd: number;
 	offset: number;
-	duration: number | undefined;
+	duration: number | undefined;
 	playbackRate: number;
 	isPlaying: boolean;
 	hasPlaybackControl: boolean;

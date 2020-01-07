@@ -17,6 +17,9 @@
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
+			import { VertexNormalsHelper } from './jsm/helpers/VertexNormalsHelper.js';
+			import { VertexTangentsHelper } from './jsm/helpers/VertexTangentsHelper.js';
+
 			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 
 			var scene, renderer;
@@ -73,10 +76,10 @@
 
 					group.add( mesh );
 
-					vnh = new THREE.VertexNormalsHelper( mesh, 5 );
+					vnh = new VertexNormalsHelper( mesh, 5 );
 					scene.add( vnh );
 
-					vth = new THREE.VertexTangentsHelper( mesh, 5 );
+					vth = new VertexTangentsHelper( mesh, 5 );
 					scene.add( vth );
 
 					scene.add( new THREE.BoxHelper( mesh ) );
