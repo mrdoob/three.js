@@ -312,6 +312,13 @@ function WebXRManager( renderer, gl ) {
 
 	this.getCamera = function ( camera ) {
 
+		cameraVR.near = cameraR.near = cameraL.near = camera.near;
+		cameraVR.far = cameraR.far = cameraL.far = camera.far;
+		session.updateRenderState( {
+			depthNear: cameraVR.near,
+			depthFar: cameraVR.far
+		} );
+
 		var parent = camera.parent;
 		var cameras = cameraVR.cameras;
 
