@@ -11,6 +11,7 @@ export class WebXRManager {
 	setReferenceSpaceType( value: string ): void;
 	getSession(): any;
 	setSession( value: any ): void;
+	setCameraClipping( camera: Camera ): void;
 	getCamera( camera: Camera ): Camera;
 	isPresenting: () => boolean;
 	setAnimationLoop( callback: Function ): void;
