@@ -36,6 +36,7 @@
 		var data = {
 			"wireframe": false,
 			"texture": false,
+			"detail": 4,
 			"rotationSpeed": 0.1,
 
 			"quantizeEncodePos": false,
@@ -53,7 +54,6 @@
 
 		// geometry params
 		var radius = 100;
-		var detail = 4;
 
 		// materials
 		var lineMaterial = new THREE.LineBasicMaterial({ color: 0xaaaaaa, transparent: true, opacity: 0.8 });
@@ -121,11 +121,13 @@
 			gui = new GUI();
 			gui.width = 350;
 
+
+			// generateGeometry
 			function newGeometry() {
-				var geom = new THREE.IcosahedronBufferGeometry(radius, detail);
+				var geom = new THREE.IcosahedronBufferGeometry(radius, data.detail);
 				// var geom = new THREE.CylinderBufferGeometry( 5, 5, 20, 32 );
-				// var geom = new THREE.OctahedronBufferGeometry( radius, detail );
-				// var geom = new THREE.BoxBufferGeometry(radius, radius, radius, detail, detail, detail);
+				// var geom = new THREE.OctahedronBufferGeometry( radius, data.detail );
+				// var geom = new THREE.BoxBufferGeometry(radius, radius, radius, data.detail, data.detail, data.detail);
 
 				return geom;
 			}
@@ -139,6 +141,7 @@
 					data);
 			}
 
+			// updateLineSegments
 			function updateLineSegments() {
 				ballLineSegments.visible = data.wireframe;
 			}
@@ -147,6 +150,7 @@
 			folder.open();
 			folder.add(data, 'wireframe', false).onChange(updateLineSegments);
 			folder.add(data, 'texture', false).onChange(generateGeometry);
+			folder.add(data, 'detail', 0, 6, 1).onChange(generateGeometry);
 			folder.add(data, 'rotationSpeed', 0, 0.5, 0.1);
 
 			folder = gui.addFolder('Position Compression');
@@ -240,8 +244,8 @@
 			var normalEncode = "";
 			if (data.oct1bytesEncode) {
 				/**
-				 * Usually it is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
-				 * As it makes vertex data not aligned to a 4 byte boundary which may harm some WebGL implementations and the normal distortion is visible sometimes
+				 * It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
+				 * As it makes vertex data not aligned to a 4 byte boundary which may harm some WebGL implementations and sometimes the normal distortion is visible
 				 * Please refer to @zeux 's comments in https://github.com/mrdoob/three.js/pull/18208
 				 */
 				normalEncode = "OCT1Byte";

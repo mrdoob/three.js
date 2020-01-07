@@ -232,8 +232,6 @@ var GeometryCompressionUtils = {
             range.max = Math.max(range.max, array[i]);
         }
 
-        console.log(range)
-
         let result;
 
         if (range.min >= -1.0 && range.max <= 1.0) {
