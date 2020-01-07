@@ -434,10 +434,10 @@ function _createRenderTarget( params ) {
 function _setViewport( x, y, width, height ) {
 
 	var invDpr = 1.0 / _renderer.getPixelRatio();
-	x *= invDpr;
-	y *= invDpr;
-	width *= invDpr;
-	height *= invDpr;
+	x = ( x + 0.5 ) * invDpr;
+	y = ( y + 0.5 ) * invDpr;
+	width = ( width + 0.5 ) * invDpr;
+	height = ( height + 0.5 ) * invDpr;
 	_renderer.setViewport( x, y, width, height );
 	_renderer.setScissor( x, y, width, height );
 
