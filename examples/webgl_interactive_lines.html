@@ -94,13 +94,15 @@
 
 					var object;
 
+					var lineMaterial = new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
+
 					if ( Math.random() > 0.5 ) {
 
-						object = new THREE.Line( lineGeometry );
+						object = new THREE.Line( lineGeometry, lineMaterial );
 
 					} else {
 
-						object = new THREE.LineSegments( lineGeometry );
+						object = new THREE.LineSegments( lineGeometry, lineMaterial );
 
 					}
 
