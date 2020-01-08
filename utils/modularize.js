@@ -111,6 +111,7 @@ var files = [
 	{ path: 'math/ConvexHull.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/ImprovedNoise.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
+	{ path: 'math/OBB.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
