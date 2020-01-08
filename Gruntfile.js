@@ -134,7 +134,7 @@ module.exports = function(grunt) {
       thumbnailBackground: 'threejsfundamentals-background.jpg',
       text: [
         {
-          font: 'bold 100px sans-serif',
+          font: 'bold 100px lesson-font',
           verticalSpacing: 100,
           offset: [100, 120],
           textAlign: 'left',
@@ -143,7 +143,7 @@ module.exports = function(grunt) {
           textWrapWidth: 1000,
         },
         {
-          font: 'bold 60px sans-serif',
+          font: 'bold 60px lesson-font',
           text: 'threejsfundamentals.org',
           verticalSpacing: 100,
           offset: [-100, -90],
