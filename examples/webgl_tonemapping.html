@@ -48,7 +48,7 @@
 
 			var camera, scene, renderer, mesh;
 			var composer;
-			var standardMaterial, floorMaterial;
+			var standardMaterial;
 
 			init();
 			animate();
@@ -59,7 +59,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
-				camera.position.set( 0.0, 40, 40 * 3.5 );
+				camera.position.set( 120, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -115,30 +115,17 @@
 				mesh.receiveShadow = true;
 				scene.add( mesh );
 
-				floorMaterial = new THREE.MeshStandardMaterial( {
-					map: null,
-					roughnessMap: null,
-					color: 0x888888,
-					metalness: 0.0,
-					roughness: 1.0,
-					side: THREE.BackSide
-				} );
-
-				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
-				var floor = new THREE.Mesh( geometry, floorMaterial );
-				floor.position.y = 50;
-				floor.rotation.x = - Math.PI * 0.5;
-				floor.receiveShadow = true;
-				scene.add( floor );
-
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
+					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						scene.environment = pmremGenerator.fromEquirectangular( hdrEquirect ).texture;
+						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
-						hdrEquirect.dispose();
+						scene.background = envMap;
+						scene.environment = envMap;
+
+						texture.dispose();
 						pmremGenerator.dispose();
 
 					} );
@@ -228,7 +215,11 @@
 
 					renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
 					standardMaterial.needsUpdate = true;
-					floorMaterial.needsUpdate = true;
+
+					// temporary hack to force background shader to recompile
+					scene.background = null;
+					render();
+					scene.background = scene.environment;
 
 				}
 
