@@ -164,11 +164,7 @@ function WebXRManager( renderer, gl ) {
 			// eslint-disable-next-line no-undef
 			var baseLayer = new XRWebGLLayer( session, gl, layerInit );
 
-			session.updateRenderState( {
-				depthNear: cameraVR.near,
-				depthFar: cameraVR.far,
-				baseLayer: baseLayer
-			} );
+			session.updateRenderState( { baseLayer: baseLayer } );
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
@@ -302,13 +298,6 @@ function WebXRManager( renderer, gl ) {
 		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
 
 	}
-
-	this.setCameraClipping = function ( camera ) {
-
-		cameraVR.near = cameraR.near = cameraL.near = camera.near;
-		cameraVR.far = cameraR.far = cameraL.far = camera.far;
-
-	};
 
 	this.getCamera = function ( camera ) {
 
