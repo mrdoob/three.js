@@ -10,6 +10,7 @@ var list = {
 				"Browser support": "manual/en/introduction/Browser-support",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
+				"Typescript setup": "manual/en/introduction/Typescript-setup",
 				"How to use WebGL 2": "manual/en/introduction/How-to-use-WebGL2",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
