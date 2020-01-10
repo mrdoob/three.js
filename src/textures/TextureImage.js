@@ -2,12 +2,12 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-import { _Math } from '../math/Math.js';
+import { MathUtils } from '../math/MathUtils.js';
 import { ImageUtils } from '../extras/ImageUtils.js';
 
 function TextureImage( image ) {
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.image = image;
 	this.version = 0;
