@@ -446,10 +446,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
 
+			var forceUpload = initTexture( textureProperties, texture );
+
 			state.activeTexture( _gl.TEXTURE0 + slot );
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
-
-			var forceUpload = initTexture( textureProperties, texture );
 
 			if ( texture.textureImage.version !== texture.textureImage.__currentVersion || forceUpload === true ) {
 
@@ -755,6 +755,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		array.push( texture.magFilter );
 		array.push( texture.minFilter );
 		array.push( texture.anisotropy );
+		array.push( texture.internalFormat );
 		array.push( texture.format );
 		array.push( texture.type );
 		array.push( texture.generateMipmaps );
