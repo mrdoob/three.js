@@ -38,3 +38,5 @@ Command.prototype.fromJSON = function ( json ) {
 	this.name = json.name;
 
 };
+
+export { Command };

@@ -4,6 +4,8 @@
 
 import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, LinearEncoding, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping } from '../../constants.js';
 import { WebGLProgram } from './WebGLProgram.js';
+import { ShaderLib } from '../shaders/ShaderLib.js';
+import { UniformsUtils } from '../shaders/UniformsUtils.js';
 
 function WebGLPrograms( renderer, extensions, capabilities ) {
 
@@ -50,6 +52,35 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		"sheen"
 	];
 
+	function getShaderObject( material, shaderID ) {
+
+		var shaderobject;
+
+		if ( shaderID ) {
+
+			var shader = ShaderLib[ shaderID ];
+
+			shaderobject = {
+				name: material.type,
+				uniforms: UniformsUtils.clone( shader.uniforms ),
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader
+			};
+
+		} else {
+
+			shaderobject = {
+				name: material.type,
+				uniforms: material.uniforms,
+				vertexShader: material.vertexShader,
+				fragmentShader: material.fragmentShader
+			};
+
+		}
+
+		return shaderobject;
+
+	}
 
 	function allocateBones( object ) {
 
@@ -110,7 +141,12 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	}
 
-	this.getParameters = function ( material, lights, shadows, fog, nClipPlanes, nClipIntersection, object ) {
+	this.getParameters = function ( material, lights, shadows, scene, nClipPlanes, nClipIntersection, object ) {
+
+		var fog = scene.fog;
+		var environment = material.isMeshStandardMaterial ? scene.environment : null;
+
+		var envMap = material.envMap || environment;
 
 		var shaderID = shaderIDs[ material.type ];
 
@@ -131,6 +167,9 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
+		var shaderobject = getShaderObject( material, shaderID );
+		material.onBeforeCompile( shaderobject, renderer );
+
 		var currentRenderTarget = renderer.getRenderTarget();
 		var numMultiviewViews = currentRenderTarget && currentRenderTarget.isWebGLMultiviewRenderTarget ? currentRenderTarget.numViews : 0;
 
@@ -139,6 +178,15 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			isWebGL2: isWebGL2,
 
 			shaderID: shaderID,
+			shaderName: shaderobject.name,
+
+			uniforms: shaderobject.uniforms,
+			vertexShader: shaderobject.vertexShader,
+			fragmentShader: shaderobject.fragmentShader,
+			defines: material.defines,
+
+			isRawShaderMaterial: material.isRawShaderMaterial,
+			isShaderMaterial: material.isShaderMaterial,
 
 			precision: precision,
 
@@ -151,10 +199,10 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			mapEncoding: getTextureEncodingFromMap( material.map ),
 			matcap: !! material.matcap,
 			matcapEncoding: getTextureEncodingFromMap( material.matcap ),
-			envMap: !! material.envMap,
-			envMapMode: material.envMap && material.envMap.mapping,
-			envMapEncoding: getTextureEncodingFromMap( material.envMap ),
-			envMapCubeUV: ( !! material.envMap ) && ( ( material.envMap.mapping === CubeUVReflectionMapping ) || ( material.envMap.mapping === CubeUVRefractionMapping ) ),
+			envMap: !! envMap,
+			envMapMode: envMap && envMap.mapping,
+			envMapEncoding: getTextureEncodingFromMap( envMap ),
+			envMapCubeUV: ( !! envMap ) && ( ( envMap.mapping === CubeUVReflectionMapping ) || ( envMap.mapping === CubeUVRefractionMapping ) ),
 			lightMap: !! material.lightMap,
 			lightMapEncoding: getTextureEncodingFromMap( material.lightMap ),
 			aoMap: !! material.aoMap,
@@ -227,7 +275,20 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			doubleSided: material.side === DoubleSide,
 			flipSided: material.side === BackSide,
 
-			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false
+			depthPacking: ( material.depthPacking !== undefined ) ? material.depthPacking : false,
+
+			index0AttributeName: material.index0AttributeName,
+
+			extensionDerivatives: material.extensions && material.extensions.derivatives,
+			extensionFragDepth: material.extensions && material.extensions.frawbuffers,
+			extensionDrawbuffers: material.extensions && material.extensions.drawbuffers,
+			extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
+
+			renderExtensionFragDepth: extensions.get( 'EXT_frag_depth' ) !== undefined,
+			renderExtensionDrawBuffers: extensions.get( 'WEBGL_draw_buffers' ) !== undefined,
+			renderExtensionShaderTextureLod: extensions.get( 'EXT_shader_texture_lod' ) !== undefined,
+
+			onBeforeCompile: material.onBeforeCompile
 
 		};
 
@@ -235,7 +296,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	};
 
-	this.getProgramCacheKey = function ( material, parameters ) {
+	this.getProgramCacheKey = function ( parameters ) {
 
 		var array = [];
 
@@ -245,39 +306,42 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		} else {
 
-			array.push( material.fragmentShader );
-			array.push( material.vertexShader );
+			array.push( parameters.fragmentShader );
+			array.push( parameters.vertexShader );
 
 		}
 
-		if ( material.defines !== undefined ) {
+		if ( parameters.defines !== undefined ) {
 
-			for ( var name in material.defines ) {
+			for ( var name in parameters.defines ) {
 
 				array.push( name );
-				array.push( material.defines[ name ] );
+				array.push( parameters.defines[ name ] );
 
 			}
 
 		}
 
-		for ( var i = 0; i < parameterNames.length; i ++ ) {
+		if ( parameters.isRawShaderMaterial === undefined ) {
 
-			array.push( parameters[ parameterNames[ i ] ] );
+			for ( var i = 0; i < parameterNames.length; i ++ ) {
+
+				array.push( parameters[ parameterNames[ i ] ] );
+
+			}
+
+			array.push( renderer.outputEncoding );
+			array.push( renderer.gammaFactor );
 
 		}
 
-		array.push( material.onBeforeCompile.toString() );
-
-		array.push( renderer.outputEncoding );
-
-		array.push( renderer.gammaFactor );
+		array.push( parameters.onBeforeCompile.toString() );
 
 		return array.join();
 
 	};
 
-	this.acquireProgram = function ( material, shader, parameters, cacheKey ) {
+	this.acquireProgram = function ( parameters, cacheKey ) {
 
 		var program;
 
@@ -299,7 +363,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, extensions, cacheKey, material, shader, parameters );
+			program = new WebGLProgram( renderer, cacheKey, parameters );
 			programs.push( program );
 
 		}

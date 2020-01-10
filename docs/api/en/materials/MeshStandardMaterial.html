@@ -174,19 +174,12 @@
 		<p>
 		Note: only [link:https://threejs.org/docs/#api/textures/CubeTexture cube environment maps] are supported
 		for MeshStandardMaterial. If you want to use an equirectangular map you will need to use
-		[page:WebGLRenderTargetCube.fromEquirectangularTexture WebGLRenderTargetCube.fromEquirectangularTexture]().
+		[page:WebGLCubeRenderTarget.fromEquirectangularTexture WebGLCubeRenderTarget.fromEquirectangularTexture]().
 		See this [link:https://threejs.org/examples/webgl_materials_envmaps_exr.html example] for details.
 		</p>
 
 		<h3>[property:Float envMapIntensity]</h3>
 		<p>Scales the effect of the environment map by multiplying its color.</p>
-
-		<h3>[property:Boolean isMeshStandardMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are mesh standard materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
 
 
 		<h3>[property:Texture lightMap]</h3>

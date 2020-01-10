@@ -1,14 +1,13 @@
 import { Node } from '../core/Node';
 import { TempNode } from '../core/TempNode';
 import { FunctionNode } from '../core/FunctionNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 
 export class ColorSpaceNode extends TempNode {
 
 	constructor( input: Node, method?: string );
 
 	input: Node;
-	method: string | undefined;
+	method: string | undefined;
 	nodeType: string;
 
 	fromEncoding( encoding: number );

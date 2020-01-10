@@ -10,7 +10,7 @@
 
 import {
 	LinearMipMapLinearFilter,
-	Math as _Math,
+	MathUtils,
 	Mesh,
 	NoBlending,
 	OrthographicCamera,
@@ -53,7 +53,7 @@ var RoughnessMipmapper = ( function () {
 
 			var width = Math.max( roughnessMap.image.width, normalMap.image.width );
 			var height = Math.max( roughnessMap.image.height, normalMap.image.height );
-			if ( ! _Math.isPowerOfTwo( width ) || ! _Math.isPowerOfTwo( height ) ) return;
+			if ( ! MathUtils.isPowerOfTwo( width ) || ! MathUtils.isPowerOfTwo( height ) ) return;
 
 			var autoClear = _renderer.autoClear;
 			_renderer.autoClear = false;

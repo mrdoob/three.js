@@ -148,7 +148,7 @@ export class Object3D extends EventDispatcher {
 	 * Used to check whether this or derived classes are Object3Ds. Default is true.
 	 * You should not change this, as it is used internally for optimisation.
 	 */
-	isObject3D: true;
+	readonly isObject3D: true;
 
 	/**
 	 * Calls before rendering object

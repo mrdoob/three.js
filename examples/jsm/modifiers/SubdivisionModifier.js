@@ -176,7 +176,7 @@ SubdivisionModifier.prototype.modify = function ( geometry ) {
 		oldFaces = geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
 		oldUvs = geometry.faceVertexUvs;
 
-		var hasUvs = oldUvs !== undefined && oldUvs.length > 0;
+		var hasUvs = oldUvs[ 0 ] !== undefined && oldUvs[ 0 ].length > 0;
 
 		if ( hasUvs ) {
 

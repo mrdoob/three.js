@@ -226,7 +226,7 @@ THREE.GLTFExporter.prototype = {
 		 */
 		function isPowerOfTwo( image ) {
 
-			return THREE.Math.isPowerOfTwo( image.width ) && THREE.Math.isPowerOfTwo( image.height );
+			return THREE.MathUtils.isPowerOfTwo( image.width ) && THREE.MathUtils.isPowerOfTwo( image.height );
 
 		}
 
@@ -759,8 +759,8 @@ THREE.GLTFExporter.prototype = {
 
 					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
 
-					canvas.width = THREE.Math.floorPowerOfTwo( canvas.width );
-					canvas.height = THREE.Math.floorPowerOfTwo( canvas.height );
+					canvas.width = THREE.MathUtils.floorPowerOfTwo( canvas.width );
+					canvas.height = THREE.MathUtils.floorPowerOfTwo( canvas.height );
 
 				}
 
@@ -1019,11 +1019,7 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			if ( material.isMeshBasicMaterial ||
-				material.isLineBasicMaterial ||
-				material.isPointsMaterial ) {
-
-			} else {
+			if ( material.emissive ) {
 
 				// emissiveFactor
 				var emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
@@ -1335,7 +1331,7 @@ THREE.GLTFExporter.prototype = {
 									attribute.getX( j ) - baseAttribute.getX( j ),
 									attribute.getY( j ) - baseAttribute.getY( j ),
 									attribute.getZ( j ) - baseAttribute.getZ( j )
-									);
+								);
 
 							}
 
@@ -1506,7 +1502,7 @@ THREE.GLTFExporter.prototype = {
 				gltfCamera.perspective = {
 
 					aspectRatio: camera.aspect,
-					yfov: THREE.Math.degToRad( camera.fov ),
+					yfov: THREE.MathUtils.degToRad( camera.fov ),
 					zfar: camera.far <= 0 ? 0.001 : camera.far,
 					znear: camera.near < 0 ? 0 : camera.near
 

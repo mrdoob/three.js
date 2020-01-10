@@ -20,7 +20,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
@@ -32,7 +31,7 @@
 				opacity: 1.0,
 				roughness: 1.0,
 				bumpScale: 1.0,
-				exposure: 3.0,
+				exposure: 2.0,
 				whitePoint: 5.0,
 				toneMapping: "Uncharted2",
 				renderMode: "Renderer"
@@ -135,16 +134,17 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrCubeMap ) {
+					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
-						standardMaterial.envMap = pmremGenerator.fromCubemap( hdrCubeMap ).texture;
-						standardMaterial.needsUpdate = true;
+						scene.environment = pmremGenerator.fromEquirectangular( hdrEquirect ).texture;
 
-						hdrCubeMap.dispose();
+						hdrEquirect.dispose();
 						pmremGenerator.dispose();
 
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				// Lights
 
@@ -178,7 +178,7 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				new OrbitControls( camera, renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

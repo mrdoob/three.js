@@ -27,10 +27,9 @@
 			var camera, scene, raycaster, renderer;
 
 			var room;
-			var isMouseDown = false;
 
+			var controller, tempMatrix = new THREE.Matrix4();
 			var INTERSECTED;
-			var crosshair;
 
 			init();
 			animate();
@@ -47,22 +46,10 @@
 				camera.position.set( 0, 1.6, 3 );
 				scene.add( camera );
 
-				crosshair = new THREE.Mesh(
-					new THREE.RingBufferGeometry( 0.02, 0.04, 32 ),
-					new THREE.MeshBasicMaterial( {
-						color: 0xffffff,
-						opacity: 0.5,
-						transparent: true
-					} )
-				);
-				crosshair.position.z = - 2;
-				camera.add( crosshair );
-
 				room = new THREE.LineSegments(
-					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ),
+					new BoxLineGeometry( 6, 6, 6, 10, 10, 10 ).translate( 0, 3, 0 ),
 					new THREE.LineBasicMaterial( { color: 0x808080 } )
 				);
-				room.position.y = 3;
 				scene.add( room );
 
 				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
@@ -78,7 +65,7 @@
 					var object = new THREE.Mesh( geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ) );
 
 					object.position.x = Math.random() * 4 - 2;
-					object.position.y = Math.random() * 4 - 2;
+					object.position.y = Math.random() * 4;
 					object.position.z = Math.random() * 4 - 2;
 
 					object.rotation.x = Math.random() * 2 * Math.PI;
@@ -106,52 +93,62 @@
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
-				renderer.domElement.addEventListener( 'mousedown', onMouseDown, false );
-				renderer.domElement.addEventListener( 'mouseup', onMouseUp, false );
-				renderer.domElement.addEventListener( 'touchstart', onMouseDown, false );
-				renderer.domElement.addEventListener( 'touchend', onMouseUp, false );
+				//
+
+				function onSelectStart() {
+
+					this.userData.isSelecting = true;
+
+				}
+
+				function onSelectEnd() {
+
+					this.userData.isSelecting = false;
+
+				}
+
+				controller = renderer.xr.getController( 0 );
+				controller.addEventListener( 'selectstart', onSelectStart );
+				controller.addEventListener( 'selectend', onSelectEnd );
+				controller.addEventListener( 'connected', function ( event ) {
+
+					this.add( buildController( event.data ) );
+
+				} );
+				controller.addEventListener( 'disconnected', function () {
+
+					this.remove( this.children[ 0 ] );
+
+				} );
+				scene.add( controller );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				//
 
-				window.addEventListener( 'vrdisplaypointerrestricted', onPointerRestricted, false );
-				window.addEventListener( 'vrdisplaypointerunrestricted', onPointerUnrestricted, false );
-
 				document.body.appendChild( VRButton.createButton( renderer ) );
 
 			}
 
-			function onMouseDown() {
+			function buildController( data ) {
 
-				isMouseDown = true;
+				switch ( data.targetRayMode ) {
 
-			}
+					case 'tracked-pointer':
 
-			function onMouseUp() {
+						var geometry = new THREE.BufferGeometry();
+						geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 0, 0, - 1 ], 3 ) );
+						geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( [ 0.5, 0.5, 0.5, 0, 0, 0 ], 3 ) );
 
-				isMouseDown = false;
+						var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors, blending: THREE.AdditiveBlending } );
 
-			}
+						return new THREE.Line( geometry, material );
 
-			function onPointerRestricted() {
+					case 'gaze':
 
-				var pointerLockElement = renderer.domElement;
-				if ( pointerLockElement && typeof ( pointerLockElement.requestPointerLock ) === 'function' ) {
-
-					pointerLockElement.requestPointerLock();
-
-				}
-
-			}
-
-			function onPointerUnrestricted() {
-
-				var currentPointerLockElement = document.pointerLockElement;
-				var expectedPointerLockElement = renderer.domElement;
-				if ( currentPointerLockElement && currentPointerLockElement === expectedPointerLockElement && typeof ( document.exitPointerLock ) === 'function' ) {
-
-					document.exitPointerLock();
+						var geometry = new THREE.RingBufferGeometry( 0.02, 0.04, 32 ).translate( 0, 0, - 1 );
+						var material = new THREE.MeshBasicMaterial( { opacity: 0.5, transparent: true } );
+						return new THREE.Mesh( geometry, material );
 
 				}
 
@@ -178,24 +175,26 @@
 
 				var delta = clock.getDelta() * 60;
 
-				if ( isMouseDown === true ) {
+				if ( controller.userData.isSelecting === true ) {
 
 					var cube = room.children[ 0 ];
 					room.remove( cube );
 
-					cube.position.set( 0, 0, - 0.75 );
-					cube.position.applyQuaternion( camera.quaternion );
+					cube.position.copy( controller.position );
 					cube.userData.velocity.x = ( Math.random() - 0.5 ) * 0.02 * delta;
 					cube.userData.velocity.y = ( Math.random() - 0.5 ) * 0.02 * delta;
 					cube.userData.velocity.z = ( Math.random() * 0.01 - 0.05 ) * delta;
-					cube.userData.velocity.applyQuaternion( camera.quaternion );
+					cube.userData.velocity.applyQuaternion( controller.quaternion );
 					room.add( cube );
 
 				}
 
 				// find intersections
 
-				raycaster.setFromCamera( { x: 0, y: 0 }, camera );
+				tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
 
 				var intersects = raycaster.intersectObjects( room.children );
 
@@ -231,21 +230,21 @@
 
 					if ( cube.position.x < - 3 || cube.position.x > 3 ) {
 
-						cube.position.x = THREE.Math.clamp( cube.position.x, - 3, 3 );
+						cube.position.x = THREE.MathUtils.clamp( cube.position.x, - 3, 3 );
 						cube.userData.velocity.x = - cube.userData.velocity.x;
 
 					}
 
-					if ( cube.position.y < - 3 || cube.position.y > 3 ) {
+					if ( cube.position.y < 0 || cube.position.y > 6 ) {
 
-						cube.position.y = THREE.Math.clamp( cube.position.y, - 3, 3 );
+						cube.position.y = THREE.MathUtils.clamp( cube.position.y, 0, 6 );
 						cube.userData.velocity.y = - cube.userData.velocity.y;
 
 					}
 
 					if ( cube.position.z < - 3 || cube.position.z > 3 ) {
 
-						cube.position.z = THREE.Math.clamp( cube.position.z, - 3, 3 );
+						cube.position.z = THREE.MathUtils.clamp( cube.position.z, - 3, 3 );
 						cube.userData.velocity.z = - cube.userData.velocity.z;
 
 					}

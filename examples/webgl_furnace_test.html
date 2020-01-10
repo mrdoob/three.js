@@ -19,8 +19,6 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-
 			var scene, camera, renderer, radianceMap;
 
 			function init() {
@@ -104,7 +102,7 @@
 					var envScene = new THREE.Scene();
 					envScene.background = new THREE.Color( 0xcccccc );
 
-					var pmremGenerator = new PMREMGenerator( renderer );
+					var pmremGenerator = new THREE.PMREMGenerator( renderer );
 					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 					pmremGenerator.dispose();
 

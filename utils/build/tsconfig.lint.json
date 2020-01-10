@@ -3,6 +3,6 @@
     "noEmit": true,
   },
   "include": [
-    "../../**/*.ts"
+    "../../src/**/*.ts"
   ]
 }

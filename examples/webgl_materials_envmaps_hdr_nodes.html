@@ -23,7 +23,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			import { MeshStandardNodeMaterial } from './jsm/nodes/Nodes.js';
 
@@ -125,15 +124,11 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				var pmremGenerator = new PMREMGenerator( renderer );
 				THREE.DefaultLoadingManager.onLoad = function ( ) {
 
 					pmremGenerator.dispose();
 
 				};
-
-				var envScene = getEnvScene();
-				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );
 
 				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
@@ -174,6 +169,12 @@
 						rgbmCubeMap.needsUpdate = true;
 
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileCubemapShader();
+
+				var envScene = getEnvScene();
+				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );

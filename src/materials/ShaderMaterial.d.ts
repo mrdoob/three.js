@@ -58,6 +58,7 @@ export class ShaderMaterial extends Material {
 	};
 	defaultAttributeValues: any;
 	index0AttributeName: string | undefined;
+	uniformsNeedUpdate: boolean;
 
 	setValues( parameters: ShaderMaterialParameters ): void;
 	toJSON( meta: any ): any;

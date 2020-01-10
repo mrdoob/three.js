@@ -148,8 +148,8 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.init = function () {
 
-		if ( ! renderer.extensions.get( "OES_texture_float" ) &&
-			 ! renderer.capabilities.isWebGL2 ) {
+		if ( ! renderer.capabilities.isWebGL2 &&
+			 ! renderer.extensions.get( "OES_texture_float" ) ) {
 
 			return "No OES_texture_float support for float textures.";
 

@@ -35,7 +35,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
 
-				var light = new THREE.AmbientLight( 0x404040, 10 );
+				var light = new THREE.AmbientLight( 0xffffff, 1 );
 				scene.add( light );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -115,7 +115,7 @@
 
 				// If we are not presenting move the camera a little so the effect is visible
 
-				if ( renderer.xr.isPresenting() === false ) {
+				if ( renderer.xr.isPresenting === false ) {
 
 					var time = clock.getElapsedTime();
 

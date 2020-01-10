@@ -163,7 +163,7 @@
 
 					if ( object.position.x < - range || object.position.x > range ) {
 
-						object.position.x = THREE.Math.clamp( object.position.x, - range, range );
+						object.position.x = THREE.MathUtils.clamp( object.position.x, - range, range );
 						object.userData.velocity.x = - object.userData.velocity.x;
 
 					}
@@ -177,7 +177,7 @@
 
 					if ( object.position.z < - range || object.position.z > range ) {
 
-						object.position.z = THREE.Math.clamp( object.position.z, - range, range );
+						object.position.z = THREE.MathUtils.clamp( object.position.z, - range, range );
 						object.userData.velocity.z = - object.userData.velocity.z;
 
 					}

@@ -22,7 +22,6 @@
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var statsEnabled = true;
 
@@ -88,7 +87,7 @@
 
 						group.traverse( function ( child ) {
 
-							if ( child instanceof THREE.Mesh ) {
+							if ( child.isMesh ) {
 
 								child.material = material;
 
@@ -105,18 +104,19 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', function ( hdrCubeMap ) {
+					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
-						var hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
-						hdrCubeMap.dispose();
+						var hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+						hdrEquirect.dispose();
 						pmremGenerator.dispose();
 
-						material.envMap = hdrCubeRenderTarget.texture;
-
 						scene.background = hdrCubeRenderTarget.texture;
+						scene.environment = hdrCubeRenderTarget.texture;
 
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				//
 
