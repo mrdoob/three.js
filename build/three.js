@@ -13503,6 +13503,14 @@
 
 		},
 
+		updateWorldMatrix: function ( updateParents, updateChildren ) {
+
+			Object3D.prototype.updateWorldMatrix.call( this, updateParents, updateChildren );
+
+			this.matrixWorldInverse.getInverse( this.matrixWorld );
+
+		},
+
 		clone: function () {
 
 			return new this.constructor().copy( this );
@@ -23279,10 +23287,9 @@
 
 					var view = views[ i ];
 					var viewport = baseLayer.getViewport( view );
-					var cameraMatrix = view.transform.matrix;
 
 					var camera = cameraVR.cameras[ i ];
-					camera.matrix.fromArray( cameraMatrix );
+					camera.matrix.fromArray( view.transform.matrix );
 					camera.projectionMatrix.fromArray( view.projectionMatrix );
 					camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
