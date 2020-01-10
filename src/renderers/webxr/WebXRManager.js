@@ -251,7 +251,7 @@ function WebXRManager( renderer, gl ) {
 					controller.targetRay.dispatchEvent( { type: 'disconnected', data: inputSource } );
 
 				}
-	
+
 				if ( controller.grip ) {
 
 					controller.grip.dispatchEvent( { type: 'disconnected', data: inputSource } );
@@ -278,7 +278,7 @@ function WebXRManager( renderer, gl ) {
 					controller.targetRay.dispatchEvent( { type: 'connected', data: inputSource } );
 
 				}
-	
+
 				if ( controller.grip ) {
 
 					controller.grip.dispatchEvent( { type: 'connected', data: inputSource } );
