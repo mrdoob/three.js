@@ -340,8 +340,7 @@ const pickHelper = new ControllerPickHelper(scene);
 +      object: selectedObject,
 +      parent: selectedObject.parent,
 +    });
-+    SceneUtils.detach(selectedObject, selectedObject.parent, scene);
-+    SceneUtils.attach(selectedObject, scene, controller);
++    controller.attach(selectedObject);
 +  }
 +});
 +
@@ -350,8 +349,7 @@ const pickHelper = new ControllerPickHelper(scene);
 +  const selection = controllerToSelection.get(controller);
 +  if (selection) {
 +    controllerToSelection.delete(controller);
-+    SceneUtils.detach(selection.object, controller, scene);
-+    SceneUtils.attach(selection.object, scene, selection.parent);
++    selection.parent.attach(selection.object);
 +  }
 +});
 ```
@@ -359,18 +357,10 @@ const pickHelper = new ControllerPickHelper(scene);
 When an object is selected we save off that object and its
 original parent. When the user is done we can put the object back.
 
-We use the `SceneUtils.detach` and `SceneUtils.attach` to re-parent
+We use the `Object3D.attach` to re-parent
 the selected objects. These functions let us change the parent
 of an object without changing its orientation and position in the
 scene. 
-
-We need to include them.
-
-```js
-import * as THREE from './resources/three/r112/build/three.module.js';
-import {VRButton} from './resources/threejs/r112/examples/jsm/webxr/VRButton.js';
-+import {SceneUtils} from './resources/threejs/r112/examples/jsm/utils/SceneUtils.js';
-```
 
 And with that we should be able to move the objects around with a 6DOF
 controller or at least change their orientation with a 3DOF controller

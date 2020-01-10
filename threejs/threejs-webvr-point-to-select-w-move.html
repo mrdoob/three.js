@@ -22,7 +22,6 @@
 <script type="module">
 import * as THREE from './resources/threejs/r112/build/three.module.js';
 import {VRButton} from './resources/threejs/r112/examples/jsm/webxr/VRButton.js';
-import {SceneUtils} from './resources/threejs/r112/examples/jsm/utils/SceneUtils.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -187,8 +186,7 @@ function main() {
         object: selectedObject,
         parent: selectedObject.parent,
       });
-      SceneUtils.detach(selectedObject, selectedObject.parent, scene);
-      SceneUtils.attach(selectedObject, scene, controller);
+      controller.attach(selectedObject);
     }
   });
 
@@ -197,8 +195,7 @@ function main() {
     const selection = controllerToSelection.get(controller);
     if (selection) {
       controllerToSelection.delete(controller);
-      SceneUtils.detach(selection.object, controller, scene);
-      SceneUtils.attach(selection.object, scene, selection.parent);
+      selection.parent.attach(selection.object);
     }
   });
 
