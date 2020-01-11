@@ -6,60 +6,19 @@
 const CodeSerializer = {
 
 	/**
-	 * Serialize an object without specific prototype definition.
-	 *
-	 * @param {String} fullObjectName complete object name
-	 * @param {Object} serializationTarget The object that should be serialized
-	 * @returns {String}
-	 */
-	serializeObject: function ( fullObjectName, serializationTarget ) {
-
-		let objectString = fullObjectName + ' = {\n\n';
-		let part;
-		for ( let name in serializationTarget ) {
-
-			part = serializationTarget[ name ];
-			if ( typeof ( part ) === 'string' || part instanceof String ) {
-
-				part = part.replace( /\n/g, '\\n' );
-				part = part.replace( /\r/g, '\\r' );
-				objectString += '\t' + name + ': "' + part + '",\n';
-
-			} else if ( part instanceof Array ) {
-
-				objectString += '\t' + name + ': [' + part + '],\n';
-
-			} else if ( typeof part === 'object' ) {
-
-				console.log( 'Omitting object "' + name + '" and replace it with empty object.' );
-				objectString += '\t' + name + ': {},\n';
-
-			} else {
-
-				objectString += '\t' + name + ': ' + part + ',\n';
-
-			}
-
-		}
-		objectString += '}\n\n';
-
-		return objectString;
-
-	},
-
-	/**
 	 * Serialize an object with specific prototype definition.
 	 *
-	 * @param {String} fullObjectName Specifies the complete object name
-	 * @param {Object} serializationTarget The object that should be serialized
+	 * @param {Object} targetPrototype The object that should be serialized
+	 * @param {Object} targetPrototypeInstance An instance of the oriobject that should be serialized
 	 * @param {String} [basePrototypeName] Name of the prototype
 	 * @param {Object} [overrideFunctions} Array of {@Link CodeSerializationInstruction} allows to replace or remove function with provided content
 	 *
 	 * @returns {String}
 	 */
-	serializeClass: function ( fullObjectName, serializationTarget, basePrototypeName, overrideFunctions ) {
+	serializeClass: function ( targetPrototype, targetPrototypeInstance, basePrototypeName, overrideFunctions ) {
 
 		let objectPart, constructorString, i, funcInstructions, funcTemp;
+		let fullObjectName = targetPrototypeInstance.constructor.name;
 		let prototypeFunctions = [];
 		let objectProperties = [];
 		let objectFunctions = [];
@@ -67,9 +26,9 @@ const CodeSerializer = {
 
 		if ( ! Array.isArray( overrideFunctions ) ) overrideFunctions = [];
 
-		for ( let name in serializationTarget.prototype ) {
+		for ( let name in targetPrototype.prototype ) {
 
-			objectPart = serializationTarget.prototype[ name ];
+			objectPart = targetPrototype.prototype[ name ];
 			funcInstructions = new CodeSerializationInstruction( name, fullObjectName + '.prototype.' + name );
 			funcInstructions.setCode( objectPart.toString() );
 
@@ -106,9 +65,9 @@ const CodeSerializer = {
 			}
 
 		}
-		for ( let name in serializationTarget ) {
+		for ( let name in targetPrototype ) {
 
-			objectPart = serializationTarget[ name ];
+			objectPart = targetPrototype[ name ];
 			funcInstructions = new CodeSerializationInstruction( name, fullObjectName + '.' + name );
 			if ( typeof objectPart === 'function' ) {
 
