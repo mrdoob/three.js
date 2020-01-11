@@ -118,7 +118,7 @@
 
 				// light
 				probe = new THREE.LightProbe();
-				probe.intensity = 2.0;
+				probe.intensity = API.probeIntensity;
 				scene.add( probe );
 
 				// mesh
@@ -139,10 +139,8 @@
 
 				f1.add( API, 'exposure', 0, 3 )
 					.onChange( () => ( renderer.toneMappingExposure = API.exposure ) );
-
 				f1.add( API, 'probeIntensity', 0, 3 )
 					.onChange( () => ( probe.intensity  = API.probeIntensity ) );
-
 				f1.add( API, 'probeDebug' )
 					.onChange( () => ( probeVolumeHelper.visible  = API.probeDebug ) );
 
@@ -150,14 +148,11 @@
 
 				var f2 = gui.addFolder( 'Rebuild' );
 
-				f2.add( API, 'rows', 0, 32, 1 );
-
-				f2.add( API, 'columns', 0, 32, 1 );
-
-				f2.add( API, 'levels', 0, 32, 1 );
+				f2.add( API, 'rows', 0, 20, 1 );
+				f2.add( API, 'columns', 0, 20, 1 );
+				f2.add( API, 'levels', 0, 20, 1 );
 
 				f2.add( API, 'build' );
-
 				f2.add( API, 'load' );
 
 				//
@@ -250,6 +245,7 @@
 
 			function loadProbeVolume() {
 
+				// TODO: Clean up, use FileLoader.
 				return fetch( 'models/gltf/HallLightTest/irradiance.json' )
 					.then( ( r ) => r.json() )
 					.then( ( data ) => {

@@ -11,6 +11,13 @@ import { LightProbeHelper } from './LightProbeHelper.js';
  * @author Don McCurdy / https://www.donmccurdy.com
  */
 
+// A LightProbeVolumeHelper provides visual debugging information about a
+// LightProbeVolume, displaying each probe and its irradiance data.
+//
+// TODO:
+// - [ ] Using LightProbeHelper for each probe is inefficient. Use InstancedMesh.
+// - [ ] The 'showCells' option helps with arbitrary volumes, but not grids. Remove?
+
 var EDGES = [
 	[ 0, 1 ],
 	[ 0, 2 ],
