@@ -560,7 +560,7 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 
 			generatePrecision( parameters ),
 
-			'#define SHADER_NAME ' + parameters.name,
+			'#define SHADER_NAME ' + parameters.shaderName,
 
 			customDefines,
 
