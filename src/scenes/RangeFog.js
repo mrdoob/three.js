@@ -5,7 +5,7 @@
 
 import { Color } from '../math/Color.js';
 
-function Fog( color, near, far ) {
+function RangeFog( color, near, far ) {
 
 	this.name = '';
 
@@ -16,20 +16,20 @@ function Fog( color, near, far ) {
 
 }
 
-Object.assign( Fog.prototype, {
+Object.assign( RangeFog.prototype, {
 
-	isFog: true,
+	isRangeFog: true,
 
 	clone: function () {
 
-		return new Fog( this.color, this.near, this.far );
+		return new RangeFog( this.color, this.near, this.far );
 
 	},
 
 	toJSON: function ( /* meta */ ) {
 
 		return {
-			type: 'Fog',
+			type: 'RangeFog',
 			color: this.color.getHex(),
 			near: this.near,
 			far: this.far
@@ -39,4 +39,4 @@ Object.assign( Fog.prototype, {
 
 } );
 
-export { Fog };
+export { RangeFog };

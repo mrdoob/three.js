@@ -3,9 +3,9 @@
  */
 /* global QUnit */
 
-import { FogExp2 } from '../../../../src/scenes/FogExp2';
+import { DensityFog } from '../../../../src/scenes/DensityFog';
 
-export default QUnit.module( 'FoxExp2', () => {
+export default QUnit.module( 'DensityFog', () => {
 
 	QUnit.module( 'Scene', () => {
 
@@ -24,7 +24,7 @@ export default QUnit.module( 'FoxExp2', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isFogExp2", ( assert ) => {
+		QUnit.todo( "isDensityFog", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 

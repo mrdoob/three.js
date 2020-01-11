@@ -265,8 +265,8 @@ import './unit/src/renderers/webgl/WebGLUtils.tests';
 
 
 //src/scenes
-import './unit/src/scenes/Fog.tests';
-import './unit/src/scenes/FogExp2.tests';
+import './unit/src/scenes/RangeFog.tests';
+import './unit/src/scenes/DensityFog.tests';
 import './unit/src/scenes/Scene.tests';
 
 

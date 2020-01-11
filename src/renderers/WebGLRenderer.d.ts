@@ -13,7 +13,7 @@ import { Color } from './../math/Color';
 import { WebGLRenderTarget } from './WebGLRenderTarget';
 import { Object3D } from './../core/Object3D';
 import { Material } from './../materials/Material';
-import { Fog } from './../scenes/Fog';
+import { IFog } from './../scenes/IFog';
 import { ToneMapping, ShadowMapType, CullFace, TextureEncoding } from '../constants';
 import { WebXRManager } from '../renderers/webxr/WebXRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
@@ -321,7 +321,7 @@ export class WebGLRenderer implements Renderer {
 
 	renderBufferDirect(
 		camera: Camera,
-		fog: Fog,
+		fog: IFog | null,
 		geometry: Geometry | BufferGeometry,
 		material: Material,
 		object: Object3D,

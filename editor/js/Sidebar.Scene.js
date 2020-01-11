@@ -137,7 +137,8 @@ var SidebarScene = function ( editor ) {
 			fogColor.getHexValue(),
 			fogNear.getValue(),
 			fogFar.getValue(),
-			fogDensity.getValue()
+			fogDensity.getValue(),
+			fogSquared.getValue()
 		);
 
 	}
@@ -146,8 +147,8 @@ var SidebarScene = function ( editor ) {
 	var fogType = new UISelect().setOptions( {
 
 		'None': 'None',
-		'Fog': 'Linear',
-		'FogExp2': 'Exponential'
+		'RangeFog': 'Ranged',
+		'DensityFog': 'Density-based'
 
 	} ).setWidth( '150px' );
 	fogType.onChange( function () {
@@ -187,6 +188,11 @@ var SidebarScene = function ( editor ) {
 
 	var fogDensity = new UINumber( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setStep( 0.001 ).setPrecision( 3 ).onChange( onFogChanged );
 	fogPropertiesRow.add( fogDensity );
+
+	// fog squared
+	
+	var fogSquared = new UI.Checkbox( true ).onChange( onFogChanged );
+	fogPropertiesRow.add( fogSquared );
 
 	//
 
@@ -234,16 +240,17 @@ var SidebarScene = function ( editor ) {
 
 			fogColor.setHexValue( scene.fog.color.getHex() );
 
-			if ( scene.fog.isFog ) {
+			if ( scene.fog.isRangeFog ) {
 
 				fogType.setValue( "Fog" );
 				fogNear.setValue( scene.fog.near );
 				fogFar.setValue( scene.fog.far );
 
-			} else if ( scene.fog.isFogExp2 ) {
+			} else if ( scene.fog.isDensityFog ) {
 
-				fogType.setValue( "FogExp2" );
+				fogType.setValue( "DensityFog" );
 				fogDensity.setValue( scene.fog.density );
+				fogSquared.setValue( scene.fog.squared );
 
 			}
 
@@ -262,9 +269,10 @@ var SidebarScene = function ( editor ) {
 		var type = fogType.getValue();
 
 		fogPropertiesRow.setDisplay( type === 'None' ? 'none' : '' );
-		fogNear.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogFar.setDisplay( type === 'Fog' ? '' : 'none' );
-		fogDensity.setDisplay( type === 'FogExp2' ? '' : 'none' );
+		fogNear.setDisplay( type === 'RangeFog' ? '' : 'none' );
+		fogFar.setDisplay( type === 'RangeFog' ? '' : 'none' );
+		fogDensity.setDisplay( type === 'DensityFog' ? '' : 'none' );
+		fogSquared.setDisplay( type === 'DensityFog' ? '' : 'none' );
 
 	}
 

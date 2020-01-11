@@ -473,7 +473,7 @@ var Viewport = function ( editor ) {
 
 	var currentFogType = null;
 
-	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
+	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity, fogSquared ) {
 
 		if ( currentFogType !== fogType ) {
 
@@ -482,11 +482,11 @@ var Viewport = function ( editor ) {
 				case 'None':
 					scene.fog = null;
 					break;
-				case 'Fog':
-					scene.fog = new THREE.Fog();
+				case 'RangeFog':
+					scene.fog = new THREE.RangeFog();
 					break;
-				case 'FogExp2':
-					scene.fog = new THREE.FogExp2();
+				case 'DensityFog':
+					scene.fog = new THREE.DensityFog();
 					break;
 
 			}
@@ -497,16 +497,17 @@ var Viewport = function ( editor ) {
 
 		if ( scene.fog ) {
 
-			if ( scene.fog.isFog ) {
+			if ( scene.fog.isRangeFog ) {
 
 				scene.fog.color.setHex( fogColor );
 				scene.fog.near = fogNear;
 				scene.fog.far = fogFar;
 
-			} else if ( scene.fog.isFogExp2 ) {
+			} else if ( scene.fog.isDensityFog ) {
 
 				scene.fog.color.setHex( fogColor );
 				scene.fog.density = fogDensity;
+				scene.fog.squared = fogSquared;
 
 			}
 

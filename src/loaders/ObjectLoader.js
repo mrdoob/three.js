@@ -33,8 +33,8 @@ import { LOD } from '../objects/LOD.js';
 import { Mesh } from '../objects/Mesh.js';
 import { SkinnedMesh } from '../objects/SkinnedMesh.js';
 import { Shape } from '../extras/core/Shape.js';
-import { Fog } from '../scenes/Fog.js';
-import { FogExp2 } from '../scenes/FogExp2.js';
+import { RangeFog } from '../scenes/RangeFog.js';
+import { DensityFog } from '../scenes/DensityFog.js';
 import { HemisphereLight } from '../lights/HemisphereLight.js';
 import { SpotLight } from '../lights/SpotLight.js';
 import { PointLight } from '../lights/PointLight.js';
@@ -757,13 +757,15 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( data.fog !== undefined ) {
 
-					if ( data.fog.type === 'Fog' ) {
+					//Convert old fog types silently
 
-						object.fog = new Fog( data.fog.color, data.fog.near, data.fog.far );
+					if ( data.fog.type === 'RangeFog' || data.fog.type === 'Fog' ) {
 
-					} else if ( data.fog.type === 'FogExp2' ) {
+						object.fog = new RangeFog( data.fog.color, data.fog.near, data.fog.far );
 
-						object.fog = new FogExp2( data.fog.color, data.fog.density );
+					} else if ( data.fog.type === 'DensityFog' || data.fog.type === 'FogExp2' ) {
+
+						object.fog = new DensityFog( data.fog.color, data.fog.density, data.fog.type === 'FogExp2' ? true : undefined );
 
 					}
 

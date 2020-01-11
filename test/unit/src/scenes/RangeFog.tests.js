@@ -3,9 +3,9 @@
  */
 /* global QUnit */
 
-import { Fog } from '../../../../src/scenes/Fog';
+import { RangeFog } from '../../../../src/scenes/RangeFog';
 
-export default QUnit.module( 'Fog', () => {
+export default QUnit.module( 'RangeFog', () => {
 
 	QUnit.module( 'Scene', () => {
 
@@ -24,7 +24,7 @@ export default QUnit.module( 'Fog', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isFog", ( assert ) => {
+		QUnit.todo( "isRangeFog", ( assert ) => {
 
 			assert.ok( false, "everything's gonna be alright" );
 
