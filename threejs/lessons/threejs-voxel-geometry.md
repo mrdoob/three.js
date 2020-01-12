@@ -1123,36 +1123,25 @@ function updateCellGeometry(x, y, z) {
   const cellZ = Math.floor(z / cellSize);
   const cellId = world.computeCellId(x, y, z);
   let mesh = cellIdToMesh[cellId];
+  const geometry = mesh ? mesh.geometry : new THREE.BufferGeometry();
+
+  const {positions, normals, uvs, indices} = world.generateGeometryDataForCell(cellX, cellY, cellZ);
+  const positionNumComponents = 3;
+  geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), positionNumComponents));
+  const normalNumComponents = 3;
+  geometry.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(normals), normalNumComponents));
+  const uvNumComponents = 2;
+  geometry.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uvs), uvNumComponents));
+  geometry.setIndex(indices);
+  geometry.computeBoundingSphere();
+
   if (!mesh) {
-    const geometry = new THREE.BufferGeometry();
-    const positionNumComponents = 3;
-    const normalNumComponents = 3;
-    const uvNumComponents = 2;
-
-    geometry.setAttribute(
-        'position',
-        new THREE.BufferAttribute(new Float32Array(0), positionNumComponents));
-    geometry.setAttribute(
-        'normal',
-        new THREE.BufferAttribute(new Float32Array(0), normalNumComponents));
-    geometry.setAttribute(
-        'uv',
-        new THREE.BufferAttribute(new Float32Array(0), uvNumComponents));
-
     mesh = new THREE.Mesh(geometry, material);
     mesh.name = cellId;
     cellIdToMesh[cellId] = mesh;
     scene.add(mesh);
     mesh.position.set(cellX * cellSize, cellY * cellSize, cellZ * cellSize);
   }
-
-  const {positions, normals, uvs, indices} = world.generateGeometryDataForCell(cellX, cellY, cellZ);
-  const geometry = mesh.geometry;
-  geometry.getAttribute('position').setArray(new Float32Array(positions)).needsUpdate = true;
-  geometry.getAttribute('normal').setArray(new Float32Array(normals)).needsUpdate = true;
-  geometry.getAttribute('uv').setArray(new Float32Array(uvs)).needsUpdate = true;
-  geometry.setIndex(indices);
-  geometry.computeBoundingSphere();
 }
 ```
 
