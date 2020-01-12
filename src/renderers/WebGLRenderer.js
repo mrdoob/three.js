@@ -1295,7 +1295,10 @@ function WebGLRenderer( parameters ) {
 
 		if ( postProcessingEnabled ) {
 
-			_runningComposer = true;
+			// TODO: If non-null render target is set by user
+			// the final pass should render to it, not to screen
+
+			_runningComposer = true; // to prevent inifinite loop
 			_composer.render();
 			_runningComposer = false;
 
