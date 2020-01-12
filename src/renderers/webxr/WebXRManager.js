@@ -95,9 +95,9 @@ function WebXRManager( renderer, gl ) {
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
-		scope.dispatchEvent( { type: 'sessionend' } );
-
 		scope.isPresenting = false;
+
+		scope.dispatchEvent( { type: 'sessionend' } );
 
 	}
 
@@ -108,9 +108,9 @@ function WebXRManager( renderer, gl ) {
 		animation.setContext( session );
 		animation.start();
 
-		scope.dispatchEvent( { type: 'sessionstart' } );
-
 		scope.isPresenting = true;
+
+		scope.dispatchEvent( { type: 'sessionstart' } );
 
 	}
 
