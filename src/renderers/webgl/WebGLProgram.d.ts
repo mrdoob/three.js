@@ -15,8 +15,8 @@ export class WebGLProgram {
 	cacheKey: string; // unique identifier for this program, used for looking up compiled programs from cache.
 	usedTimes: number;
 	program: any;
-	vertexShader: string;
-	fragmentShader: string;
+	vertexShader: WebGLShader;
+	fragmentShader: WebGLShader;
 	numMultiviewViews: number;
 	/**
 	 * @deprecated Use {@link WebGLProgram#getUniforms getUniforms()} instead.
