@@ -1,4 +1,5 @@
-import buble from 'rollup-plugin-buble';
+import babel from 'rollup-plugin-babel';
+import classTransform from './class-transform';
 
 function glconstants() {
 
@@ -206,11 +207,12 @@ export default [
 		plugins: [
 			glconstants(),
 			glsl(),
-			buble( {
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+			babel( {
+				babelrc: false,
+				configFile: false,
+				skipPreflightCheck: true,
+				babelHelpers: 'bundled',
+				plugins: [ classTransform ]
 			} )
 		],
 		output: [
