@@ -97,17 +97,16 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 		}
 		if ( codeBuilderInstructions.isSupportsStandardWorker() ) {
 
-			let codeOBJLoader2Parser = CodeSerializer.serializeClass( 'OBJLoader2Parser', OBJLoader2Parser );
-			let codeObjectManipulator = CodeSerializer.serializeObject( 'ObjectManipulator', ObjectManipulator );
-			let codeParserPayloadHandler = CodeSerializer.serializeClass( 'DefaultWorkerPayloadHandler', DefaultWorkerPayloadHandler );
-			let codeWorkerRunner = CodeSerializer.serializeClass( 'WorkerRunner', WorkerRunner );
+			let objectManipulator = new ObjectManipulator();
+			let defaultWorkerPayloadHandler = new DefaultWorkerPayloadHandler( this.parser );
+			let workerRunner = new WorkerRunner( {} );
+			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( OBJLoader2Parser, this.parser ) );
+			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( ObjectManipulator, objectManipulator ) );
+			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( DefaultWorkerPayloadHandler, defaultWorkerPayloadHandler ) );
+			codeBuilderInstructions.addCodeFragment( CodeSerializer.serializeClass( WorkerRunner, workerRunner ) );
 
-			codeBuilderInstructions.addCodeFragment( codeOBJLoader2Parser );
-			codeBuilderInstructions.addCodeFragment( codeObjectManipulator );
-			codeBuilderInstructions.addCodeFragment( codeParserPayloadHandler );
-			codeBuilderInstructions.addCodeFragment( codeWorkerRunner );
-
-			codeBuilderInstructions.addStartCode( 'new WorkerRunner( new DefaultWorkerPayloadHandler( new OBJLoader2Parser() ) );' );
+			let startCode = 'new ' + workerRunner.constructor.name + '( new ' + defaultWorkerPayloadHandler.constructor.name + '( new ' + this.parser.constructor.name + '() ) );';
+			codeBuilderInstructions.addStartCode( startCode );
 
 		}
 		return codeBuilderInstructions;

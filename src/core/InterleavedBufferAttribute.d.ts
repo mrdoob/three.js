@@ -1,4 +1,5 @@
 import { InterleavedBuffer } from './InterleavedBuffer';
+import { Matrix4 } from './../math/Matrix4';
 /**
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBufferAttribute.js">src/core/InterleavedBufferAttribute.js</a>
  */
@@ -19,8 +20,9 @@ export class InterleavedBufferAttribute {
 	get count(): number;
 	get array(): ArrayLike<number>;
 
-	isInterleavedBufferAttribute: true;
+	readonly isInterleavedBufferAttribute: true;
 
+	applyMatrix4( m: Matrix4 ): this;
 	getX( index: number ): number;
 	setX( index: number, x: number ): InterleavedBufferAttribute;
 	getY( index: number ): number;

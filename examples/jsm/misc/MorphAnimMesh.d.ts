@@ -1,4 +1,4 @@
-import { AnimationAction } from '../../../src/animation/AnimationAction'
+import { AnimationAction } from '../../../src/animation/AnimationAction';
 import {
 	AnimationMixer,
 	BufferGeometry,
@@ -9,7 +9,7 @@ import {
 
 export class MorphAnimMesh extends Mesh {
 
-	constructor( geometry: BufferGeometry | Geometry, material: Material );
+	constructor( geometry: BufferGeometry | Geometry, material: Material );
 	mixer: AnimationMixer;
 	activeAction: AnimationAction | null;
 

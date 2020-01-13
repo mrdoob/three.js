@@ -46,10 +46,10 @@ export class BufferGeometry extends EventDispatcher {
 	boundingSphere: Sphere;
 	drawRange: { start: number; count: number };
 	userData: {[key: string]: any};
-	isBufferGeometry: boolean;
+	readonly isBufferGeometry: true;
 
-	getIndex(): BufferAttribute;
-	setIndex( index: BufferAttribute | number[] ): void;
+	getIndex(): BufferAttribute | null;
+	setIndex( index: BufferAttribute | number[] | null ): void;
 
 	setAttribute( name: string, attribute: BufferAttribute | InterleavedBufferAttribute ): BufferGeometry;
 	getAttribute( name: string ): BufferAttribute | InterleavedBufferAttribute;

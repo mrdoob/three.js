@@ -115,12 +115,8 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
-
-				//
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
 
 				//
 

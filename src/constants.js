@@ -1,4 +1,4 @@
-export var REVISION = '111dev';
+export var REVISION = '113dev';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 export var CullFaceNone = 0;
@@ -101,6 +101,12 @@ export var RGBEFormat = RGBAFormat;
 export var DepthFormat = 1026;
 export var DepthStencilFormat = 1027;
 export var RedFormat = 1028;
+export var RedIntegerFormat = 1029;
+export var RGFormat = 1030;
+export var RGIntegerFormat = 1031;
+export var RGBIntegerFormat = 1032;
+export var RGBAIntegerFormat = 1033;
+
 export var RGB_S3TC_DXT1_Format = 33776;
 export var RGBA_S3TC_DXT1_Format = 33777;
 export var RGBA_S3TC_DXT3_Format = 33778;

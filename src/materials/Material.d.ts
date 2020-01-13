@@ -30,6 +30,7 @@ export interface MaterialParameters {
 	clippingPlanes?: Plane[];
 	clipShadows?: boolean;
 	colorWrite?: boolean;
+	defines?: any;
 	depthFunc?: DepthModes;
 	depthTest?: boolean;
 	depthWrite?: boolean;
@@ -127,6 +128,12 @@ export class Material extends EventDispatcher {
 	colorWrite: boolean;
 
 	/**
+	 * Custom defines to be injected into the shader. These are passed in form of an object literal, with key/value pairs. { MY_CUSTOM_DEFINE: '' , PI2: Math.PI * 2 }.
+	 * The pairs are defined in both vertex and fragment shaders. Default is undefined.
+	 */
+	defines: any;
+
+	/**
 	 * Which depth function to use. Default is {@link LessEqualDepth}. See the depth mode constants for all possible values.
 	 */
 	depthFunc: DepthModes;
@@ -191,7 +198,7 @@ export class Material extends EventDispatcher {
 	 * Used to check whether this or derived classes are materials. Default is true.
 	 * You should not change this, as it used internally for optimisation.
 	 */
-	isMaterial: boolean;
+	readonly isMaterial: true;
 
 	/**
 	 * Material name. Default is an empty string.

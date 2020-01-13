@@ -47,11 +47,14 @@ var files = {
 		"webgl_geometry_text_shapes",
 		"webgl_geometry_text_stroke",
 		"webgl_helpers",
-		"webgl_instancing_suzanne",
+		"webgl_instancing_dynamic",
+		"webgl_instancing_modified",
+		"webgl_instancing_performance",
+		"webgl_instancing_raycast",
+		"webgl_instancing_scatter",
 		"webgl_interactive_buffergeometry",
 		"webgl_interactive_cubes",
 		"webgl_interactive_cubes_gpu",
-		"webgl_interactive_instances_gpu",
 		"webgl_interactive_cubes_ortho",
 		"webgl_interactive_lines",
 		"webgl_interactive_points",
@@ -129,8 +132,7 @@ var files = {
 		"webgl_materials_blending",
 		"webgl_materials_blending_custom",
 		"webgl_materials_bumpmap",
-		"webgl_materials_bumpmap_skin",
-		"webgl_materials_cars",
+		"webgl_materials_car",
 		"webgl_materials_channels",
 		"webgl_materials_cubemap",
 		"webgl_materials_cubemap_balls_reflection",
@@ -155,7 +157,6 @@ var files = {
 		"webgl_materials_physical_transparency",
 		"webgl_materials_reflectivity",
 		"webgl_materials_shaders_fresnel",
-		"webgl_materials_skin",
 		"webgl_materials_standard",
 		"webgl_materials_texture_anisotropy",
 		"webgl_materials_texture_canvas",
@@ -223,7 +224,6 @@ var files = {
 		"webgl_shadowmesh",
 		"webgl_skinning_simple",
 		"webgl_sprites",
-		"webgl_terrain_dynamic",
 		"webgl_test_memory",
 		"webgl_test_memory2",
 		"webgl_tonemapping",
@@ -277,10 +277,8 @@ var files = {
 		"webgl_buffergeometry_drawrange",
 		"webgl_buffergeometry_indexed",
 		"webgl_buffergeometry_instancing",
-		"webgl_buffergeometry_instancing2",
 		"webgl_buffergeometry_instancing_billboards",
-		"webgl_buffergeometry_instancing_dynamic",
-		"webgl_buffergeometry_instancing_interleaved_dynamic",
+		"webgl_buffergeometry_instancing_interleaved",
 		"webgl_buffergeometry_instancing_lambert",
 		"webgl_buffergeometry_lines",
 		"webgl_buffergeometry_lines_indexed",
@@ -306,8 +304,7 @@ var files = {
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
 		"webgl_tiled_forward",
-		"webgl_worker_offscreencanvas",
-		"webgldeferred_animation"
+		"webgl_worker_offscreencanvas"
 	],
 	"webgl2": [
 		"webgl2_materials_texture2darray",
@@ -321,21 +318,22 @@ var files = {
 		"webaudio_timing",
 		"webaudio_visualizer"
 	],
-	"webvr": [
-		"webvr_ballshooter",
-		"webvr_cubes",
-		"webvr_dragging",
-		"webvr_lorenzattractor",
-		"webvr_multiview",
-		"webvr_panorama",
-		"webvr_paint",
-		"webvr_rollercoaster",
-		"webvr_sandbox",
-		"webvr_sculpt",
-		"webvr_video",
-		"webvr_vive_paint",
-		"webvr_vive_sculpt",
-		"webvr_6dof_panorama"
+	"webxr": [
+		"webxr_ar_cones",
+		"webxr_ar_hittest",
+		"webxr_ar_paint",
+		"webxr_vr_ballshooter",
+		"webxr_vr_cubes",
+		"webxr_vr_dragging",
+		"webxr_vr_lorenzattractor",
+		"webxr_vr_multiview",
+		"webxr_vr_panorama",
+		"webxr_vr_panorama_depth",
+		"webxr_vr_paint",
+		"webxr_vr_rollercoaster",
+		"webxr_vr_sandbox",
+		"webxr_vr_sculpt",
+		"webxr_vr_video"
 	],
 	"physics": [
 		"webgl_physics_cloth",
@@ -361,6 +359,7 @@ var files = {
 		"misc_exporter_draco",
 		"misc_exporter_gltf",
 		"misc_exporter_obj",
+		"misc_exporter_ply",
 		"misc_exporter_stl",
 		"misc_lookat",
 	],
@@ -377,15 +376,13 @@ var files = {
 		"css3d_sprites",
 		"css3d_youtube"
 	],
-	"raytracing": [
-		"raytracing_sandbox"
-	],
 	"svg": [
 		"svg_lines",
 		"svg_sandbox"
 	],
 	"tests": [
 		"webgl_furnace_test",
+		"webgl_pmrem_test",
 		"misc_uv_tests"
 	]
 };

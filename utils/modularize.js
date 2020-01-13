@@ -69,8 +69,6 @@ var files = [
 	{ path: 'lines/Wireframe.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
 	{ path: 'lines/WireframeGeometry2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
 
-	{ path: 'loaders/deprecated/LegacyGLTFLoader.js', dependencies: [], ignoreList: [ 'AnimationMixer' ] },
-	{ path: 'loaders/deprecated/LegacyJSONLoader.js', dependencies: [], ignoreList: [ 'ObjectLoader' ] },
 	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/AssimpLoader.js', dependencies: [], ignoreList: [] },
@@ -115,8 +113,8 @@ var files = [
 	{ path: 'math/Lut.js', dependencies: [], ignoreList: [] },
 	{ path: 'math/SimplexNoise.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'misc/CarControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/ConvexObjectBreaker.js', dependencies: [ { name: 'ConvexBufferGeometry', path: 'geometries/ConvexGeometry.js' } ], ignoreList: [ 'Matrix4' ] },
+	{ path: 'misc/GPUComputationRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/Gyroscope.js', dependencies: [], ignoreList: [] },
 	{ path: 'misc/MD2Character.js', dependencies: [ { name: 'MD2Loader', path: 'loaders/MD2Loader.js' } ], ignoreList: [] },
 	{ path: 'misc/MD2CharacterComplex.js', dependencies: [ { name: 'MD2Loader', path: 'loaders/MD2Loader.js' }, { name: 'MorphBlendMesh', path: 'misc/MorphBlendMesh.js' } ], ignoreList: [] },
@@ -143,9 +141,6 @@ var files = [
 	{ path: 'objects/Sky.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Water.js', dependencies: [], ignoreList: [] },
 	{ path: 'objects/Water2.js', dependencies: [ { name: 'Reflector', path: 'objects/Reflector.js' }, { name: 'Refractor', path: 'objects/Refractor.js' } ], ignoreList: [] },
-
-	{ path: 'pmrem/PMREMCubeUVPacker.js', dependencies: [], ignoreList: [] },
-	{ path: 'pmrem/PMREMGenerator.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'postprocessing/AdaptiveToneMappingPass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' }, { name: 'LuminosityShader', path: 'shaders/LuminosityShader.js' }, { name: 'ToneMapShader', path: 'shaders/ToneMapShader.js' } ], ignoreList: [] },
 	{ path: 'postprocessing/AfterimagePass.js', dependencies: [ { name: 'Pass', path: 'postprocessing/Pass.js' }, { name: 'AfterimageShader', path: 'shaders/AfterimageShader.js' } ], ignoreList: [] },
@@ -174,9 +169,7 @@ var files = [
 	{ path: 'renderers/CSS2DRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/CSS3DRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [] },
-	{ path: 'renderers/RaytracingRenderer.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
-	{ path: 'renderers/WebGLDeferredRenderer.js', dependencies: [ { name: 'EffectComposer', path: 'postprocessing/EffectComposer.js' }, { name: 'ShaderPass', path: 'postprocessing/ShaderPass.js' }, { name: 'RenderPass', path: 'postprocessing/RenderPass.js' }, { name: 'FXAAShader', path: 'shaders/FXAAShader.js' }, { name: 'CopyShader', path: 'shaders/CopyShader.js' } ], ignoreList: [] },
 
 	{ path: 'shaders/AfterimageShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/BasicShader.js', dependencies: [], ignoreList: [] },
@@ -215,12 +208,10 @@ var files = [
 	{ path: 'shaders/RGBShiftShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SAOShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SepiaShader.js', dependencies: [], ignoreList: [] },
-	{ path: 'shaders/SkinShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SMAAShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SobelOperatorShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/SSAOShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/TechnicolorShader.js', dependencies: [], ignoreList: [] },
-	{ path: 'shaders/TerrainShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ToneMapShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ToonShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/TranslucentShader.js', dependencies: [], ignoreList: [] },
@@ -234,18 +225,11 @@ var files = [
 
 	{ path: 'utils/BufferGeometryUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/GeometryUtils.js', dependencies: [], ignoreList: [] },
-	{ path: 'utils/MathUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/SceneUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/ShadowMapViewer.js', dependencies: [ { name: 'UnpackDepthRGBAShader', path: 'shaders/UnpackDepthRGBAShader.js' } ], ignoreList: [ 'DirectionalLight', 'SpotLight' ] },
 	{ path: 'utils/SkeletonUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/TypedArrayUtils.js', dependencies: [], ignoreList: [] },
 	{ path: 'utils/UVsDebug.js', dependencies: [], ignoreList: [ 'SphereBufferGeometry' ] },
-
-	{ path: 'vr/deprecated/DaydreamController.js', dependencies: [], ignoreList: [] },
-	{ path: 'vr/deprecated/GearVRController.js', dependencies: [], ignoreList: [] },
-	{ path: 'vr/PaintViveController.js', dependencies: [ { name: 'ViveController', path: 'vr/ViveController.js' } ], ignoreList: [] },
-	{ path: 'vr/ViveController.js', dependencies: [], ignoreList: [] },
-	{ path: 'vr/WebVR.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'WebGL.js', dependencies: [], ignoreList: [] },
 ];
@@ -291,14 +275,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 		if ( p1 === '\'' ) return match; // Inside a string
 		if ( classNames.includes( p2 ) ) return `${p2}${p3}`;
 
-		if ( p1 === 'Math' ) {
-
-			coreDependencies[ '_Math' ] = true;
-
-			return '_Math.';
-
-		}
-
 		return match;
 
 	} );
@@ -323,14 +299,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 		if ( p1 === '\'' ) return match; // Inside a string
 		if ( classNames.includes( p2 ) ) return p2;
 
-		if ( p2 === 'Math' || p2 === '_Math' ) {
-
-			coreDependencies[ '_Math' ] = true;
-
-			return '_Math';
-
-		}
-
 		if ( p2 in THREE ) coreDependencies[ p2 ] = true;
 
 		// console.log( match, p2 );
@@ -343,7 +311,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	var keys = Object.keys( coreDependencies )
 		.filter( value => ! classNames.includes( value ) )
-		.map( value => value === '_Math' ? 'Math as _Math' : value )
 		.map( value => '\n\t' + value )
 		.sort()
 		.toString();

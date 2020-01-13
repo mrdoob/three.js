@@ -36,7 +36,7 @@ import {
 	LineBasicMaterial,
 	Loader,
 	LoaderUtils,
-	Math as _Math,
+	MathUtils,
 	Matrix3,
 	Matrix4,
 	Mesh,
@@ -1170,7 +1170,7 @@ var FBXLoader = ( function () {
 
 						if ( lightAttribute.InnerAngle !== undefined ) {
 
-							angle = _Math.degToRad( lightAttribute.InnerAngle.value );
+							angle = MathUtils.degToRad( lightAttribute.InnerAngle.value );
 
 						}
 
@@ -1180,7 +1180,7 @@ var FBXLoader = ( function () {
 							// TODO: this is not correct - FBX calculates outer and inner angle in degrees
 							// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
 							// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-							penumbra = _Math.degToRad( lightAttribute.OuterAngle.value );
+							penumbra = MathUtils.degToRad( lightAttribute.OuterAngle.value );
 							penumbra = Math.max( penumbra, 1 );
 
 						}
@@ -1638,7 +1638,7 @@ var FBXLoader = ( function () {
 
 			var positionAttribute = new Float32BufferAttribute( buffers.vertex, 3 );
 
-			preTransform.applyToBufferAttribute( positionAttribute );
+			positionAttribute.applyMatrix4( preTransform );
 
 			geo.setAttribute( 'position', positionAttribute );
 
@@ -1661,10 +1661,10 @@ var FBXLoader = ( function () {
 
 			if ( buffers.normal.length > 0 ) {
 
-				var normalAttribute = new Float32BufferAttribute( buffers.normal, 3 );
-
 				var normalMatrix = new Matrix3().getNormalMatrix( preTransform );
-				normalMatrix.applyToBufferAttribute( normalAttribute );
+
+				var normalAttribute = new Float32BufferAttribute( buffers.normal, 3 );
+				normalAttribute.applyNormalMatrix( normalMatrix );
 
 				geo.setAttribute( 'normal', normalAttribute );
 
@@ -2166,7 +2166,7 @@ var FBXLoader = ( function () {
 			var positionAttribute = new Float32BufferAttribute( morphBuffers.vertex, 3 );
 			positionAttribute.name = name || morphGeoNode.attrName;
 
-			preTransform.applyToBufferAttribute( positionAttribute );
+			positionAttribute.applyMatrix4( preTransform );
 
 			parentGeo.morphAttributes.position.push( positionAttribute );
 
@@ -2733,19 +2733,19 @@ var FBXLoader = ( function () {
 			if ( curves.x !== undefined ) {
 
 				this.interpolateRotations( curves.x );
-				curves.x.values = curves.x.values.map( _Math.degToRad );
+				curves.x.values = curves.x.values.map( MathUtils.degToRad );
 
 			}
 			if ( curves.y !== undefined ) {
 
 				this.interpolateRotations( curves.y );
-				curves.y.values = curves.y.values.map( _Math.degToRad );
+				curves.y.values = curves.y.values.map( MathUtils.degToRad );
 
 			}
 			if ( curves.z !== undefined ) {
 
 				this.interpolateRotations( curves.z );
-				curves.z.values = curves.z.values.map( _Math.degToRad );
+				curves.z.values = curves.z.values.map( MathUtils.degToRad );
 
 			}
 
@@ -2754,7 +2754,7 @@ var FBXLoader = ( function () {
 
 			if ( preRotation !== undefined ) {
 
-				preRotation = preRotation.map( _Math.degToRad );
+				preRotation = preRotation.map( MathUtils.degToRad );
 				preRotation.push( eulerOrder );
 
 				preRotation = new Euler().fromArray( preRotation );
@@ -2764,7 +2764,7 @@ var FBXLoader = ( function () {
 
 			if ( postRotation !== undefined ) {
 
-				postRotation = postRotation.map( _Math.degToRad );
+				postRotation = postRotation.map( MathUtils.degToRad );
 				postRotation.push( eulerOrder );
 
 				postRotation = new Euler().fromArray( postRotation );
@@ -3995,7 +3995,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.preRotation ) {
 
-			var array = transformData.preRotation.map( _Math.degToRad );
+			var array = transformData.preRotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4003,7 +4003,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.rotation ) {
 
-			var array = transformData.rotation.map( _Math.degToRad );
+			var array = transformData.rotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4011,7 +4011,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.postRotation ) {
 
-			var array = transformData.postRotation.map( _Math.degToRad );
+			var array = transformData.postRotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 

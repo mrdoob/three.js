@@ -10,9 +10,9 @@ export class NodeFrame {
 	constructor( time: number );
 	time: number;
 	id: number;
-	delta: number | undefined;
-	renderer: WebGLRenderer | undefined;
-	renderTexture: Texture | undefined;
+	delta: number | undefined;
+	renderer: WebGLRenderer | undefined;
+	renderTexture: Texture | undefined;
 
 	update( delta: number ): this;
 	setRenderer( renderer: WebGLRenderer ): this;

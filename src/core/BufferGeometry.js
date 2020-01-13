@@ -7,7 +7,7 @@ import { DirectGeometry } from './DirectGeometry.js';
 import { Object3D } from './Object3D.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { _Math } from '../math/Math.js';
+import { MathUtils } from '../math/MathUtils.js';
 import { arrayMax } from '../utils.js';
 
 /**
@@ -28,7 +28,7 @@ function BufferGeometry() {
 
 	Object.defineProperty( this, 'id', { value: _bufferGeometryId += 2 } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.type = 'BufferGeometry';
@@ -129,7 +129,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( position !== undefined ) {
 
-			matrix.applyToBufferAttribute( position );
+			position.applyMatrix4( matrix );
+
 			position.needsUpdate = true;
 
 		}
@@ -140,7 +141,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
-			normalMatrix.applyToBufferAttribute( normal );
+			normal.applyNormalMatrix( normalMatrix );
+
 			normal.needsUpdate = true;
 
 		}
@@ -149,10 +151,8 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( tangent !== undefined ) {
 
-			var normalMatrix = new Matrix3().getNormalMatrix( matrix );
+			tangent.transformDirection( matrix );
 
-			// Tangent is vec4, but the '.w' component is a sign value (+1/-1).
-			normalMatrix.applyToBufferAttribute( tangent );
 			tangent.needsUpdate = true;
 
 		}

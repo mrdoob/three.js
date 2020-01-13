@@ -17,7 +17,7 @@ export class PerspectiveCamera extends Camera {
 
 	type: 'PerspectiveCamera';
 
-	isPerspectiveCamera: true;
+	readonly isPerspectiveCamera: true;
 
 	zoom: number;
 

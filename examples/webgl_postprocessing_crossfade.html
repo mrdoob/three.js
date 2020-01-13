@@ -354,7 +354,7 @@
 					if ( transitionParams.animateTransition ) {
 
 						var t = ( 1 + Math.sin( transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI ) ) / 2;
-						transitionParams.transition = THREE.Math.smoothstep( t, 0.3, 0.7 );
+						transitionParams.transition = THREE.MathUtils.smoothstep( t, 0.3, 0.7 );
 
 						// Change the current alpha texture after each transition
 						if ( transitionParams.loopTexture && ( transitionParams.transition == 0 || transitionParams.transition == 1 ) ) {

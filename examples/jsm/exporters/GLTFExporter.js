@@ -14,7 +14,7 @@ import {
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	LinearMipmapNearestFilter,
-	Math as _Math,
+	MathUtils,
 	MirroredRepeatWrapping,
 	NearestFilter,
 	NearestMipmapLinearFilter,
@@ -23,8 +23,6 @@ import {
 	RGBAFormat,
 	RepeatWrapping,
 	Scene,
-	TriangleFanDrawMode,
-	TriangleStripDrawMode,
 	Vector3
 } from "../../../build/three.module.js";
 
@@ -250,7 +248,7 @@ GLTFExporter.prototype = {
 		 */
 		function isPowerOfTwo( image ) {
 
-			return _Math.isPowerOfTwo( image.width ) && _Math.isPowerOfTwo( image.height );
+			return MathUtils.isPowerOfTwo( image.width ) && MathUtils.isPowerOfTwo( image.height );
 
 		}
 
@@ -783,8 +781,8 @@ GLTFExporter.prototype = {
 
 					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
 
-					canvas.width = _Math.floorPowerOfTwo( canvas.width );
-					canvas.height = _Math.floorPowerOfTwo( canvas.height );
+					canvas.width = MathUtils.floorPowerOfTwo( canvas.width );
+					canvas.height = MathUtils.floorPowerOfTwo( canvas.height );
 
 				}
 
@@ -1043,11 +1041,7 @@ GLTFExporter.prototype = {
 
 			}
 
-			if ( material.isMeshBasicMaterial ||
-				material.isLineBasicMaterial ||
-				material.isPointsMaterial ) {
-
-			} else {
+			if ( material.emissive ) {
 
 				// emissiveFactor
 				var emissive = material.emissive.clone().multiplyScalar( material.emissiveIntensity ).toArray();
@@ -1199,20 +1193,7 @@ GLTFExporter.prototype = {
 
 				}
 
-				if ( mesh.drawMode === TriangleFanDrawMode ) {
-
-					console.warn( 'GLTFExporter: TriangleFanDrawMode and wireframe incompatible.' );
-					mode = WEBGL_CONSTANTS.TRIANGLE_FAN;
-
-				} else if ( mesh.drawMode === TriangleStripDrawMode ) {
-
-					mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINE_STRIP : WEBGL_CONSTANTS.TRIANGLE_STRIP;
-
-				} else {
-
-					mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINES : WEBGL_CONSTANTS.TRIANGLES;
-
-				}
+				mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINES : WEBGL_CONSTANTS.TRIANGLES;
 
 			}
 
@@ -1372,7 +1353,7 @@ GLTFExporter.prototype = {
 									attribute.getX( j ) - baseAttribute.getX( j ),
 									attribute.getY( j ) - baseAttribute.getY( j ),
 									attribute.getZ( j ) - baseAttribute.getZ( j )
-									);
+								);
 
 							}
 
@@ -1543,7 +1524,7 @@ GLTFExporter.prototype = {
 				gltfCamera.perspective = {
 
 					aspectRatio: camera.aspect,
-					yfov: _Math.degToRad( camera.fov ),
+					yfov: MathUtils.degToRad( camera.fov ),
 					zfar: camera.far <= 0 ? 0.001 : camera.far,
 					znear: camera.near < 0 ? 0 : camera.near
 

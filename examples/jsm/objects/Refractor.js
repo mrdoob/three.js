@@ -6,7 +6,7 @@
 import {
 	Color,
 	LinearFilter,
-	Math as _Math,
+	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
@@ -58,7 +58,7 @@ var Refractor = function ( geometry, options ) {
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	if ( ! _Math.isPowerOfTwo( textureWidth ) || ! _Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		renderTarget.texture.generateMipmaps = false;
 
@@ -206,17 +206,17 @@ var Refractor = function ( geometry, options ) {
 		scope.visible = false;
 
 		var currentRenderTarget = renderer.getRenderTarget();
-		var currentVrEnabled = renderer.vr.enabled;
+		var currentXrEnabled = renderer.xr.enabled;
 		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-		renderer.vr.enabled = false; // avoid camera modification
+		renderer.xr.enabled = false; // avoid camera modification
 		renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
 		renderer.clear();
 		renderer.render( scene, virtualCamera );
 
-		renderer.vr.enabled = currentVrEnabled;
+		renderer.xr.enabled = currentXrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 		renderer.setRenderTarget( currentRenderTarget );
 

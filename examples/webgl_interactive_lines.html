@@ -94,13 +94,15 @@
 
 					var object;
 
+					var lineMaterial = new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
+
 					if ( Math.random() > 0.5 ) {
 
-						object = new THREE.Line( lineGeometry );
+						object = new THREE.Line( lineGeometry, lineMaterial );
 
 					} else {
 
-						object = new THREE.LineSegments( lineGeometry );
+						object = new THREE.LineSegments( lineGeometry, lineMaterial );
 
 					}
 
@@ -174,9 +176,9 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				camera.updateMatrixWorld();

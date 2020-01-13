@@ -2,12 +2,14 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Viewport.Info = function ( editor ) {
+import { UIPanel, UIBreak, UIText } from './libs/ui.js';
+
+var ViewportInfo = function ( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setId( 'info' );
 	container.setPosition( 'absolute' );
 	container.setLeft( '10px' );
@@ -15,16 +17,16 @@ Viewport.Info = function ( editor ) {
 	container.setFontSize( '12px' );
 	container.setColor( '#fff' );
 
-	var objectsText = new UI.Text( '0' ).setMarginLeft( '6px' );
-	var verticesText = new UI.Text( '0' ).setMarginLeft( '6px' );
-	var trianglesText = new UI.Text( '0' ).setMarginLeft( '6px' );
+	var objectsText = new UIText( '0' ).setMarginLeft( '6px' );
+	var verticesText = new UIText( '0' ).setMarginLeft( '6px' );
+	var trianglesText = new UIText( '0' ).setMarginLeft( '6px' );
 
-	container.add( new UI.Text( strings.getKey( 'viewport/info/objects' ) ).setTextTransform( 'lowercase' ) );
-	container.add( objectsText, new UI.Break() );
-	container.add( new UI.Text( strings.getKey( 'viewport/info/vertices' ) ).setTextTransform( 'lowercase' ) );
-	container.add( verticesText, new UI.Break() );
-	container.add( new UI.Text( strings.getKey( 'viewport/info/triangles' ) ).setTextTransform( 'lowercase' ) );
-	container.add( trianglesText, new UI.Break() );
+	container.add( new UIText( strings.getKey( 'viewport/info/objects' ) ).setTextTransform( 'lowercase' ) );
+	container.add( objectsText, new UIBreak() );
+	container.add( new UIText( strings.getKey( 'viewport/info/vertices' ) ).setTextTransform( 'lowercase' ) );
+	container.add( verticesText, new UIBreak() );
+	container.add( new UIText( strings.getKey( 'viewport/info/triangles' ) ).setTextTransform( 'lowercase' ) );
+	container.add( trianglesText, new UIBreak() );
 
 	signals.objectAdded.add( update );
 	signals.objectRemoved.add( update );
@@ -86,3 +88,5 @@ Viewport.Info = function ( editor ) {
 	return container;
 
 };
+
+export { ViewportInfo };

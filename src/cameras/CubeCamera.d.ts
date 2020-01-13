@@ -1,4 +1,4 @@
-import { WebGLRenderTargetCube } from './../renderers/WebGLRenderTargetCube';
+import { WebGLCubeRenderTarget } from './../renderers/WebGLCubeRenderTarget';
 import { WebGLRenderTargetOptions } from './../renderers/WebGLRenderTarget';
 import { Scene } from './../scenes/Scene';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
@@ -10,7 +10,7 @@ export class CubeCamera extends Object3D {
 
 	type: 'CubeCamera';
 
-	renderTarget: WebGLRenderTargetCube;
+	renderTarget: WebGLCubeRenderTarget;
 
 	update( renderer: WebGLRenderer, scene: Scene ): void;
 
