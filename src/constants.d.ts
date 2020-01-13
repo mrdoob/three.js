@@ -157,13 +157,10 @@ export const IntType: TextureDataType;
 export const UnsignedIntType: TextureDataType;
 export const FloatType: TextureDataType;
 export const HalfFloatType: TextureDataType;
-
-// Pixel types
-export enum PixelType {}
-export const UnsignedShort4444Type: PixelType;
-export const UnsignedShort5551Type: PixelType;
-export const UnsignedShort565Type: PixelType;
-export const UnsignedInt248Type: PixelType;
+export const UnsignedShort4444Type: TextureDataType;
+export const UnsignedShort5551Type: TextureDataType;
+export const UnsignedShort565Type: TextureDataType;
+export const UnsignedInt248Type: TextureDataType;
 
 // Pixel formats
 export enum PixelFormat {}
