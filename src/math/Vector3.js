@@ -659,6 +659,12 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	setFromMatrix3Column: function ( m, index ) {
+
+		return this.fromArray( m.elements, index * 3 );
+
+	},
+
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
