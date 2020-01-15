@@ -17,20 +17,21 @@
 		<h2>示例</h2>
 
 		<code>
-		// Creating the object whose bounding box we want to compute
-		var sphereObject = new THREE.Mesh( 
-			new THREE.SphereGeometry(), 
-			new THREE.MeshBasicMaterial( 0xff0000 ) 
+		var box = new THREE.Box3();
+
+		var mesh = new THREE.Mesh(
+			new THREE.SphereBufferGeometry(),
+			new THREE.MeshBasicMaterial()
 		);
-		// Creating the actual bounding box with Box3
-		sphereObject.geometry.computeBoundingBox();
-		var box = sphereObject.geometry.boundingBox.clone();
+
+		// ensure the bounding box is computed for its geometry
+		// this should be done only once (assuming static geometries)
+		mesh.geometry.computeBoundingBox();
 
 		// ...
-		
-		// In the animation loop, to keep the bounding box updated after move/rotate/scale operations
-		sphereObject.updateMatrixWorld( true );
-		box.copy( sphereObject.geometry.boundingBox ).applyMatrix4( sphereObject.matrixWorld );
+
+		// in the animation loop, compute the current bounding box with the world matrix
+		box.copy( mesh.geometry.boundingBox ).applyMatrix4( mesh.matrixWorld );
 		</code>
 
 		<h2>构造器（Constructor）</h2>
