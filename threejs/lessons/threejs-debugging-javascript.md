@@ -18,7 +18,7 @@ enormously in your learning.
 
 All browsers have developer tools. 
 [Chrome](https://developers.google.com/web/tools/chrome-devtools/),
-[Firefox](https://developer.mozilla.org/son/docs/Tools), 
+[Firefox](https://developer.mozilla.org/en-US/docs/Tools), 
 [Safari](https://developer.apple.com/safari/tools/), 
 [Edge](https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide).
 

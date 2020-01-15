@@ -1563,7 +1563,7 @@ things. To do that I made a `StatusDisplayHelper` component.
 
 I uses a `PolarGridHelper` to draw a circle around each character
 and it uses html elements to let each character show some status using
-the techniques covered in [the article on aligning html elements to 3D](threejs-align-html-elements-to-3d).
+the techniques covered in [the article on aligning html elements to 3D](threejs-align-html-elements-to-3d.html).
 
 First we need to add some HTML to host these elements
 

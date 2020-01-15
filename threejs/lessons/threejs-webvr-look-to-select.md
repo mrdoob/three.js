@@ -22,7 +22,7 @@ selected.
 Let's implement "look to select"! We'll start with
 [an example from the previous article](threejs-webvr.html)
 and to do it we'll add the `PickHelper` we made in
-[the article on picking](threejs-picking). Here it is.
+[the article on picking](threejs-picking.html). Here it is.
 
 ```js
 class PickHelper {

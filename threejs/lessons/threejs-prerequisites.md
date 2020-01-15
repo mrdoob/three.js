@@ -138,7 +138,7 @@ for (const [key, value] of Object.entries(someObject)) {
 
 ### Use `forEach`, `map`, and `filter`  where useful
 
-Arrays added the functions [`forEach`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach, 
+Arrays added the functions [`forEach`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach), 
 [`map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map), and 
 [`filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter) and
 are used fairly extensively in modern JavaScript.

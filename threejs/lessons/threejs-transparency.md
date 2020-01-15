@@ -8,7 +8,7 @@ First we'll go over the easy part. Let's make a
 scene with 8 cubes placed in a 2x2x2 grid.
 
 We'll start with the example from
-[the article on rendering on demand](threejs-rendering-on-demand.md)
+[the article on rendering on demand](threejs-rendering-on-demand.html)
 which had 3 cubes and modify it to have 8. First
 let's change our `makeInstance` function to take
 an x, y, and z

@@ -18,7 +18,7 @@ re-create the [WebGL Globe](https://globe.chromeexperiments.com/).
 The first thing we need to do is get some data. The WebGL Globe said the data
 they use comes from [SEDAC](http://sedac.ciesin.columbia.edu/gpw/). Checking out
 the site I saw there was [demographic data in a grid
-format](http://sedac.ciesin.columbia.edu/data/set/gpw-v4-basic-demographic-characteristics-rev10).
+format](https://beta.sedac.ciesin.columbia.edu/data/set/gpw-v4-basic-demographic-characteristics-rev10).
 I downloaded the data at 60 minute resolution. Then I took a look at the data
 
 It looks like this
@@ -256,7 +256,7 @@ didn't do this it would scale from the center but we want them to grow away from
 </div>
 
 Of course we could also solve that by parenting the box to more `THREE.Object3D`
-objects like we covered in [scene graphs](threejs-scenegraphs.html) but the more
+objects like we covered in [scene graphs](threejs-scenegraph.html) but the more
 nodes we add to a scene graph the slower it gets.
 
 We also setup this small hierarchy of nodes of `lonHelper`, `latHelper`, and

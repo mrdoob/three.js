@@ -409,7 +409,7 @@ where min, max, lat, lon, are all in latitude and longitude degrees.
 Let's load it up. The code is based on the examples from [optimizing lots of
 objects](threejs-optimize-lots-of-objects.html) though we are not drawing lots
 of objects we'll be using the same solutions for [rendering on
-demand](threejs-rendering-on-demand.htm).
+demand](threejs-rendering-on-demand.html).
 
 The first thing is to make a sphere and use the outline texture.
 

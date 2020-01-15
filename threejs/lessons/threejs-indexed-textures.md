@@ -262,7 +262,7 @@ but what about highlighting the selected countries?
 
 For that we can take inspiration from *paletted graphics*.
 
-[Paletted graphics](https://en.wikipedia.org/wiki/Palette_(computing))
+[Paletted graphics](https://en.wikipedia.org/wiki/Palette_%28computing%29)
 or [Indexed Color](https://en.wikipedia.org/wiki/Indexed_color) is 
 what older systems like the Atari 800, Amiga, NES, 
 Super Nintendo, and even older IBM PCs used. Instead of storing bitmaps

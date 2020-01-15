@@ -456,7 +456,7 @@ we'll eventually have materials that use 4 or 5 textures all at once. 4 textures
 pixels per texture is looking up 32 pixels for ever pixel rendered.
 This can be especially important to consider on mobile devices.
 
-## <a href="uvmanipulation"></a> Repeating, offseting, rotating, wrapping a texture
+## <a name="uvmanipulation"></a> Repeating, offseting, rotating, wrapping a texture
 
 Textures have settings for repeating, offseting, and rotating a texture.
 
