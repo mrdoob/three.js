@@ -244,7 +244,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
           });
         }
 
-        const font = await loadFont('../resources/threejs/fonts/helvetiker_regular.typeface.json');
+        const font = await loadFont('/threejs/resources/threejs/fonts/helvetiker_regular.typeface.json');
         return new THREE.TextBufferGeometry('three.js', {
           font: font,
           size: 3.0,
