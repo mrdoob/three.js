@@ -1648,7 +1648,7 @@ THREE.GLTFExporter.prototype = {
 			var skeleton = object.skeleton;
 			var rootJoint = object.skeleton.bones[ 0 ];
 
-			if ( rootJoint === undefined ) return null;
+			if ( skeleton === undefined || rootJoint === undefined ) return null;
 
 			var joints = [];
 			var inverseBindMatrices = new Float32Array( skeleton.bones.length * 16 );
