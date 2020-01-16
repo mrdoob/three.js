@@ -1646,9 +1646,12 @@ THREE.GLTFExporter.prototype = {
 			var node = outputJSON.nodes[ nodeMap.get( object ) ];
 
 			var skeleton = object.skeleton;
+
+			if ( skeleton === undefined ) return null;
+
 			var rootJoint = object.skeleton.bones[ 0 ];
 
-			if ( skeleton === undefined || rootJoint === undefined ) return null;
+			if ( rootJoint === undefined ) return null;
 
 			var joints = [];
 			var inverseBindMatrices = new Float32Array( skeleton.bones.length * 16 );
