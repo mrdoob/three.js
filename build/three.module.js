@@ -3855,6 +3855,12 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	setFromMatrix3Column: function ( m, index ) {
+
+		return this.fromArray( m.elements, index * 3 );
+
+	},
+
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
@@ -13790,7 +13796,7 @@ function CubeCamera( near, far, cubeResolution, options ) {
 
 	options = options || { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
-	this.renderTarget = new WebGLCubeRenderTarget( cubeResolution, cubeResolution, options );
+	this.renderTarget = new WebGLCubeRenderTarget( cubeResolution, options );
 	this.renderTarget.texture.name = "CubeCamera";
 
 	this.update = function ( renderer, scene ) {
@@ -13856,9 +13862,17 @@ CubeCamera.prototype.constructor = CubeCamera;
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function WebGLCubeRenderTarget( width, height, options ) {
+function WebGLCubeRenderTarget( size, options, dummy ) {
 
-	WebGLRenderTarget.call( this, width, height, options );
+	if ( Number.isInteger( options ) ) {
+
+		console.warn( 'THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )' );
+
+		options = dummy;
+
+	}
+
+	WebGLRenderTarget.call( this, size, size, options );
 
 }
 
@@ -15384,6 +15398,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 	// so we can recompile the material accordingly.
 	var currentBackground = null;
 	var currentBackgroundVersion = 0;
+	var currentTonemapping = null;
 
 	function render( renderList, scene, camera, forceClear ) {
 
@@ -15470,12 +15485,14 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 			boxMesh.material.uniforms.flipEnvMap.value = texture.isCubeTexture ? - 1 : 1;
 
 			if ( currentBackground !== background ||
-			     currentBackgroundVersion !== texture.version ) {
+				currentBackgroundVersion !== texture.version ||
+				currentTonemapping !== renderer.toneMapping ) {
 
 				boxMesh.material.needsUpdate = true;
 
 				currentBackground = background;
 				currentBackgroundVersion = texture.version;
+				currentTonemapping = renderer.toneMapping;
 
 			}
 
@@ -15528,12 +15545,14 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 			planeMesh.material.uniforms.uvTransform.value.copy( background.matrix );
 
 			if ( currentBackground !== background ||
-				   currentBackgroundVersion !== background.version ) {
+				currentBackgroundVersion !== background.version ||
+				currentTonemapping !== renderer.toneMapping ) {
 
 				planeMesh.material.needsUpdate = true;
 
 				currentBackground = background;
 				currentBackgroundVersion = background.version;
+				currentTonemapping = renderer.toneMapping;
 
 			}
 
@@ -18679,9 +18698,9 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			extensionDrawbuffers: material.extensions && material.extensions.drawbuffers,
 			extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
 
-			renderExtensionFragDepth: extensions.get( 'EXT_frag_depth' ) !== undefined,
-			renderExtensionDrawBuffers: extensions.get( 'WEBGL_draw_buffers' ) !== undefined,
-			renderExtensionShaderTextureLod: extensions.get( 'EXT_shader_texture_lod' ) !== undefined,
+			rendererExtensionFragDepth: extensions.get( 'EXT_frag_depth' ) !== undefined,
+			rendererExtensionDrawBuffers: extensions.get( 'WEBGL_draw_buffers' ) !== undefined,
+			rendererExtensionShaderTextureLod: extensions.get( 'EXT_shader_texture_lod' ) !== undefined,
 
 			onBeforeCompile: material.onBeforeCompile
 
@@ -24962,35 +24981,33 @@ function WebGLRenderer( parameters ) {
 
 			if ( materialProperties.program === undefined ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( material.fog && materialProperties.fog !== fog ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.environment !== environment ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
 				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.outputEncoding !== _this.outputEncoding ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			}
 
-		}
-
-		if ( material.version !== materialProperties.__version ) {
+		} else {
 
 			initMaterial( material, scene, object );
 			materialProperties.__version = material.version;
@@ -28195,7 +28212,7 @@ WireframeGeometry.prototype.constructor = WireframeGeometry;
  * @author Mugen87 / https://github.com/Mugen87
  *
  * Parametric Surfaces Geometry
- * based on the brilliant article by @prideout http://prideout.net/blog/?p=44
+ * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
  */
 
 // ParametricGeometry
@@ -48078,8 +48095,8 @@ function Vertex( x, y, z ) {
 
 function DynamicBufferAttribute( array, itemSize ) {
 
-	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
-	return new BufferAttribute( array, itemSize ).setDynamic( true );
+	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setUsage( THREE.DynamicDrawUsage ) instead.' );
+	return new BufferAttribute( array, itemSize ).setUsage( DynamicDrawUsage );
 
 }
 
@@ -49696,8 +49713,8 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 
 function WebGLRenderTargetCube( width, height, options ) {
 
-	console.warn( 'THREE.WebGLRenderTargetCube has been renamed to WebGLCubeRenderTarget.' );
-	return new WebGLCubeRenderTarget( width, height, options );
+	console.warn( 'THREE.WebGLRenderTargetCube( width, height, options ) is now WebGLCubeRenderTarget( size, options ).' );
+	return new WebGLCubeRenderTarget( width, options );
 
 }
 
