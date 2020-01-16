@@ -94,7 +94,8 @@
 					linewidth: 5, // in pixels
 					vertexColors: THREE.VertexColors,
 					//resolution:  // to be set by renderer, eventually
-					dashed: false
+					dashed: false,
+					transparent: true // needed for opacity
 
 				} );
 
@@ -195,6 +196,7 @@
 				var param = {
 					'line type': 0,
 					'width (px)': 5,
+					'opacity': 1,
 					'dashed': false,
 					'dash scale': 1,
 					'dash / gap': 1
@@ -226,6 +228,14 @@
 				gui.add( param, 'width (px)', 1, 10 ).onChange( function ( val ) {
 
 					matLine.linewidth = val;
+
+				} );
+
+				gui.add( param, 'opacity', 0, 1 ).onChange( function ( val ) {
+
+					matLine.opacity = val;
+					matLineBasic.opacity = val;
+					matLineDashed.opacity = val;
 
 				} );
 

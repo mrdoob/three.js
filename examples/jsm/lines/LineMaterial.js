@@ -4,6 +4,7 @@
  * parameters = {
  *  color: <hex>,
  *  linewidth: <float>,
+ *  opacity: <float>,
  *  dashed: <boolean>,
  *  dashScale: <float>,
  *  dashSize: <float>,
@@ -24,6 +25,7 @@ UniformsLib.line = {
 
 	linewidth: { value: 1 },
 	resolution: { value: new Vector2( 1, 1 ) },
+	opacity: { value: 1 },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
 	gapSize: { value: 1 } // todo FIX - maybe change to totalSize
@@ -367,6 +369,24 @@ var LineMaterial = function ( parameters ) {
 			set: function ( value ) {
 
 				this.uniforms.resolution.value.copy( value );
+
+			}
+
+		},
+
+		opacity: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return this.uniforms.opacity.value;
+
+			},
+
+			set: function ( value ) {
+
+				this.uniforms.opacity.value = value;
 
 			}
 
