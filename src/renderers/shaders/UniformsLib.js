@@ -443,9 +443,9 @@ var UniformsLib = {
 
 			onUpdate: function( uniforms, material, renderer ) {
 
-				material.size * renderer.getPixelRatio();
+				uniforms.size.value = material.size * renderer.getPixelRatio();
 
-			} 
+			}
 
 		},
 
