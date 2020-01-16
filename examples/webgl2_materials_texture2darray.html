@@ -62,6 +62,7 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 			import { WEBGL } from './jsm/WebGL.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -76,7 +77,13 @@
 
 			var depthStep = 0.4;
 
+			var params = {
+				DepthValue: 0,
+				Animate: true
+			};
+
 			init();
+			initGUI();
 			animate();
 
 			function init() {
@@ -137,6 +144,27 @@
 
 			}
 
+			function initGUI() {
+
+				var gui = new GUI();
+
+				gui.add( params, 'DepthValue', 0, 109 ).step( 0.4 ).onChange( function ( value ) {
+
+					if ( value > 109.0 || value < 0.0 ) {
+
+						if ( value > 1.0 ) value = 109.0 * 2.0 - value;
+						if ( value < 0.0 ) value = - value;
+
+					}
+
+					mesh.material.uniforms[ "depth" ].value = value;
+
+				} );
+
+				gui.add( params, 'Animate' );
+
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -150,7 +178,7 @@
 
 				requestAnimationFrame( animate );
 
-				if ( mesh ) {
+				if ( mesh && params.Animate ) {
 
 					var value = mesh.material.uniforms[ "depth" ].value;
 
