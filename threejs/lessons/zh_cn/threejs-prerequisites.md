@@ -116,7 +116,7 @@ for (const [key, value] of Object.entries(someObject)) {
 
 ### 使用 `forEach`, `map`, 和 `filter`
 
-数组新增的函数[`forEach`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach、
+数组新增的函数[`forEach`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach)、
 [`map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)和 
 [`filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
 在现代JavaScript中使用都是相当广泛的。
