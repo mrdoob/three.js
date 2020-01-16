@@ -7,6 +7,8 @@ import { Matrix3 } from '../../math/Matrix3.js';
  * Uniforms library for shared webgl shaders
  */
 
+var rendererSize;
+
 function refreshUVTransform2D( uniforms, material ) {
 
 	// uv repeat and offset setting priorities
@@ -43,164 +45,191 @@ var UniformsLib = {
 
 	common: {
 
-		diffuse: { value: new Color( 0xeeeeee ), onUpdate: function( uniforms, material ) {
+		diffuse: {
 
-			if ( material.color ) {
+			value: new Color( 0xeeeeee ),
 
-				uniforms.diffuse.value.copy( material.color );
-				
+			onUpdate: function( uniforms, material ) {
+
+				if ( material.color ) {
+
+					uniforms.diffuse.value.copy( material.color );
+
+				}
+
 			}
 
-		} },
+		},
+
 		opacity: { value: 1.0 },
 
 		map: { value: null },
-		uvTransform: { value: new Matrix3(), onUpdate: function( uniforms, material ) {
 
-			// uv repeat and offset setting priorities
-			// 1. color map
-			// 2. specular map
-			// 3. normal map
-			// 4. bump map
-			// 5. alpha map
-			// 6. emissive map
+		uvTransform: {
 
-			var uvScaleMap;
+			value: new Matrix3(),
 
-			if ( material.map ) {
+			onUpdate: function( uniforms, material ) {
 
-				uvScaleMap = material.map;
+				// uv repeat and offset setting priorities
+				// 1. color map
+				// 2. specular map
+				// 3. normal map
+				// 4. bump map
+				// 5. alpha map
+				// 6. emissive map
 
-			} else if ( material.specularMap ) {
+				var uvScaleMap;
 
-				uvScaleMap = material.specularMap;
+				if ( material.map ) {
 
-			} else if ( material.displacementMap ) {
+					uvScaleMap = material.map;
 
-				uvScaleMap = material.displacementMap;
+				} else if ( material.specularMap ) {
 
-			} else if ( material.normalMap ) {
+					uvScaleMap = material.specularMap;
 
-				uvScaleMap = material.normalMap;
+				} else if ( material.displacementMap ) {
 
-			} else if ( material.bumpMap ) {
+					uvScaleMap = material.displacementMap;
 
-				uvScaleMap = material.bumpMap;
+				} else if ( material.normalMap ) {
 
-			} else if ( material.roughnessMap ) {
+					uvScaleMap = material.normalMap;
 
-				uvScaleMap = material.roughnessMap;
+				} else if ( material.bumpMap ) {
 
-			} else if ( material.metalnessMap ) {
+					uvScaleMap = material.bumpMap;
 
-				uvScaleMap = material.metalnessMap;
+				} else if ( material.roughnessMap ) {
 
-			} else if ( material.alphaMap ) {
+					uvScaleMap = material.roughnessMap;
 
-				uvScaleMap = material.alphaMap;
+				} else if ( material.metalnessMap ) {
 
-			} else if ( material.emissiveMap ) {
+					uvScaleMap = material.metalnessMap;
 
-				uvScaleMap = material.emissiveMap;
+				} else if ( material.alphaMap ) {
 
-			}
+					uvScaleMap = material.alphaMap;
 
-			if ( uvScaleMap !== undefined ) {
+				} else if ( material.emissiveMap ) {
 
-				// backwards compatibility
-				if ( uvScaleMap.isWebGLRenderTarget ) {
-
-					uvScaleMap = uvScaleMap.texture;
+					uvScaleMap = material.emissiveMap;
 
 				}
 
-				if ( uvScaleMap.matrixAutoUpdate === true ) {
+				if ( uvScaleMap !== undefined ) {
 
-					uvScaleMap.updateMatrix();
+					// backwards compatibility
+					if ( uvScaleMap.isWebGLRenderTarget ) {
 
-				}
+						uvScaleMap = uvScaleMap.texture;
 
-				uniforms.uvTransform.value.copy( uvScaleMap.matrix );
+					}
 
-			}
+					if ( uvScaleMap.matrixAutoUpdate === true ) {
 
-		} },
-		uv2Transform: { value: new Matrix3(), onUpdate: function( uniforms, material ) {
+						uvScaleMap.updateMatrix();
 
-			// uv repeat and offset setting priorities for uv2
-			// 1. ao map
-			// 2. light map
+					}
 
-			var uv2ScaleMap;
-
-			if ( material.aoMap ) {
-
-				uv2ScaleMap = material.aoMap;
-
-			} else if ( material.lightMap ) {
-
-				uv2ScaleMap = material.lightMap;
-
-			}
-
-			if ( uv2ScaleMap !== undefined ) {
-
-				// backwards compatibility
-				if ( uv2ScaleMap.isWebGLRenderTarget ) {
-
-					uv2ScaleMap = uv2ScaleMap.texture;
+					uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 				}
 
-				if ( uv2ScaleMap.matrixAutoUpdate === true ) {
+			}
+		},
 
-					uv2ScaleMap.updateMatrix();
+		uv2Transform: {
+
+			value: new Matrix3(),
+
+			onUpdate: function( uniforms, material ) {
+
+				// uv repeat and offset setting priorities for uv2
+				// 1. ao map
+				// 2. light map
+
+				var uv2ScaleMap;
+
+				if ( material.aoMap ) {
+
+					uv2ScaleMap = material.aoMap;
+
+				} else if ( material.lightMap ) {
+
+					uv2ScaleMap = material.lightMap;
 
 				}
 
-				uniforms.uv2Transform.value.copy( uv2ScaleMap.matrix );
+				if ( uv2ScaleMap !== undefined ) {
+
+					// backwards compatibility
+					if ( uv2ScaleMap.isWebGLRenderTarget ) {
+
+						uv2ScaleMap = uv2ScaleMap.texture;
+
+					}
+
+					if ( uv2ScaleMap.matrixAutoUpdate === true ) {
+
+						uv2ScaleMap.updateMatrix();
+
+					}
+
+					uniforms.uv2Transform.value.copy( uv2ScaleMap.matrix );
+
+				}
 
 			}
 
-		} },
+		},
 
-		alphaMap: { value: null },
+		alphaMap: { value: null }
 
 	},
 
 	specularmap: {
 
-		specularMap: { value: null },
+		specularMap: { value: null }
 
 	},
 
 	envmap: {
 
-		envMap: { value: null, onUpdate: function( uniforms, material, renderer, scene ) {
+		envMap: {
 
-			var envMap = material.envMap || scene.environment;
+			value: null,
 
-			uniforms.envMap.value = envMap;
+			onUpdate: function( uniforms, material, renderer, scene ) {
 
-			if ( envMap ) {
+				var envMap = material.envMap || scene.environment;
 
-				// don't flip CubeTexture envMaps, flip everything else:
-				//  WebGLCubeRenderTarget will be flipped for backwards compatibility
-				//  WebGLCubeRenderTarget.texture will be flipped because it's a Texture and NOT a CubeTexture
-				// this check must be handled differently, or removed entirely, if WebGLCubeRenderTarget uses a CubeTexture in the future
-				uniforms.flipEnvMap.value = envMap.isCubeTexture ? - 1 : 1;
+				uniforms.envMap.value = envMap;
 
-				uniforms.reflectivity.value = material.reflectivity;
-				uniforms.refractionRatio.value = material.refractionRatio;
+				if ( envMap ) {
 
-				uniforms.maxMipLevel.value = renderer.properties.get( envMap ).__maxMipLevel;
+					// don't flip CubeTexture envMaps, flip everything else:
+					//  WebGLCubeRenderTarget will be flipped for backwards compatibility
+					//  WebGLCubeRenderTarget.texture will be flipped because it's a Texture and NOT a CubeTexture
+					// this check must be handled differently, or removed entirely, if WebGLCubeRenderTarget uses a CubeTexture in the future
+					uniforms.flipEnvMap.value = envMap.isCubeTexture ? - 1 : 1;
+
+					uniforms.maxMipLevel.value = renderer.properties.get( envMap ).__maxMipLevel;
+
+				}
 
 			}
 
-		} },
+		},
+
 		flipEnvMap: { value: - 1 },
+
 		reflectivity: { value: 1.0 },
+
 		refractionRatio: { value: 0.98 },
+
 		maxMipLevel: { value: 0 }
 
 	},
@@ -221,21 +250,33 @@ var UniformsLib = {
 
 	emissive: {
 
-		emissive: { value: new Color( 0x000000 ), onUpdate: function( uniforms, material ) {
+		emissive: {
 
-			uniforms.emissive.value.copy( material.emissive ).multiplyScalar( material.emissiveIntensity );
+			value: new Color( 0x000000 ),
 
-		} }
+			onUpdate: function( uniforms, material ) {
+
+				uniforms.emissive.value.copy( material.emissive ).multiplyScalar( material.emissiveIntensity );
+
+			}
+
+		}
 
 	},
 
 	shininess: {
 
-		shininess: { value: 30, onUpdate: function( uniforms, material ) {
+		shininess: { 
 
-			uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
+			value: 30,
 
-		} }
+			onUpdate: function( uniforms, material ) {
+
+				uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
+
+			} 
+
+		}
 
 	},
 
@@ -247,26 +288,40 @@ var UniformsLib = {
 
 	bumpmap: {
 
-		bumpMap: { value: null, onUpdate: function( uniforms, material ) {
+		bumpMap: {
 
-			uniforms.bumpMap.value = material.bumpMap;
-			uniforms.bumpScale.value = material.bumpScale;
-			if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
+			value: null, 
 
-		} },
+			onUpdate: function( uniforms, material ) {
+
+				uniforms.bumpMap.value = material.bumpMap;
+				uniforms.bumpScale.value = material.bumpScale;
+				if ( material.side === BackSide ) uniforms.bumpScale.value *= - 1;
+
+			}
+
+		},
+
 		bumpScale: { value: 1 }
 
 	},
 
 	normalmap: {
 
-		normalMap: { value: null, onUpdate: function( uniforms, material ) {
+		normalMap: {
 
-			uniforms.normalMap.value = material.normalMap;
-			uniforms.normalScale.value.copy( material.normalScale );
-			if ( material.side === BackSide ) uniforms.normalScale.value.negate();
+			value: null, 
 
-		} },
+			onUpdate: function( uniforms, material ) {
+
+				uniforms.normalMap.value = material.normalMap;
+				uniforms.normalScale.value.copy( material.normalScale );
+				if ( material.side === BackSide ) uniforms.normalScale.value.negate();
+
+			}
+
+		},
+
 		normalScale: { value: new Vector2( 1, 1 ) }
 
 	},
@@ -379,19 +434,39 @@ var UniformsLib = {
 	points: {
 
 		diffuse: { value: new Color( 0xeeeeee ) },
+
 		opacity: { value: 1.0 },
-		size: { value: 1.0, onUpdate: function( uniforms, material, renderer ) {
 
-			material.size * renderer.getPixelRatio();
+		size: { 
 
-		} },
-		scale: { value: 1.0, onUpdate: function( uniforms, material, renderer ) {
+			value: 1.0,
 
-			uniforms.scale.value = renderer.getSize().y * 0.5;
+			onUpdate: function( uniforms, material, renderer ) {
 
-		} },
+				material.size * renderer.getPixelRatio();
+
+			} 
+
+		},
+
+		scale: {
+
+			value: 1.0,
+
+			onUpdate: function( uniforms, material, renderer ) {
+
+				rendererSize = rendererSize || new Vector2();
+
+				uniforms.scale.value = renderer.getSize( rendererSize ).y * 0.5;
+
+			}
+
+		},
+
 		map: { value: null },
+
 		alphaMap: { value: null },
+
 		uvTransform: { value: new Matrix3(), onUpdate: refreshUVTransform2D }
 
 	},

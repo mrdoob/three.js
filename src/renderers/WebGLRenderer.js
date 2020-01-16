@@ -1951,11 +1951,11 @@ function WebGLRenderer( parameters ) {
 
 				uniform.onUpdate( uniforms, material, _this, scene );
 
-			} else if ( uniform.needsRefresh !== false && material[ property ] !== undefined ) {
+			} else if ( material[ property ] !== undefined ) {
 
 				var value = material[ property ];
 
-				if ( value !== null && typeof value === 'object' && !value.isTexture ) {
+				if ( value !== null && ( value.isVector2 || value.isVector3 || value.isVector4 || value.isMatrix3 || value.isMatrix4 ) ) {
 
 					uniform.value.copy( value );
 
