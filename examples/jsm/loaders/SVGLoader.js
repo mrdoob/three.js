@@ -882,6 +882,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			return array;
 
+
 		}
 
 		// Units
