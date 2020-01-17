@@ -85,7 +85,6 @@ var RoughnessMipmapper = ( function () {
 
 			}
 
-			_renderer.setRenderTarget( _tempTarget );
 			_mipmapMaterial.uniforms.roughnessMap.value = roughnessMap;
 			_mipmapMaterial.uniforms.normalMap.value = normalMap;
 
@@ -104,6 +103,7 @@ var RoughnessMipmapper = ( function () {
 				var viewport = new Vector4( position.x, position.y, width / dpr, height / dpr );
 				_tempTarget.viewport.copy( viewport );
 				_tempTarget.scissor.copy( viewport );
+				_renderer.setRenderTarget( _tempTarget );
 				_renderer.render( _scene, _flatCamera );
 				_renderer.copyFramebufferToTexture( position, material.roughnessMap, mip );
 				_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;

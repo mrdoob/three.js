@@ -344,7 +344,6 @@ function _sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 
 	}
 
-	_renderer.setRenderTarget( cubeUVRenderTarget );
 	for ( var i = 0; i < 6; i ++ ) {
 
 		var col = i % 3;
@@ -366,6 +365,7 @@ function _sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 		}
 		_setViewport( cubeUVRenderTarget,
 			col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
+		_renderer.setRenderTarget( cubeUVRenderTarget );
 		_renderer.render( scene, cubeCamera );
 
 	}
@@ -411,8 +411,8 @@ function _textureToCubeUV( texture, cubeUVRenderTarget ) {
 	uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
 	uniforms[ 'outputEncoding' ].value = ENCODINGS[ texture.encoding ];
 
-	_renderer.setRenderTarget( cubeUVRenderTarget );
 	_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
+	_renderer.setRenderTarget( cubeUVRenderTarget );
 	_renderer.render( scene, _flatCamera );
 
 }
@@ -570,8 +570,8 @@ function _halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction,
 	2 * outputSize *
 		( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
 
-	_renderer.setRenderTarget( targetOut );
 	_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
+	_renderer.setRenderTarget( targetOut );
 	_renderer.render( blurScene, _flatCamera );
 
 }
