@@ -18,7 +18,8 @@ import {
 	RawShaderMaterial,
 	Scene,
 	Vector2,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	Vector4
 } from "../../../build/three.module.js";
 
 var RoughnessMipmapper = ( function () {
@@ -55,6 +56,7 @@ var RoughnessMipmapper = ( function () {
 			var height = Math.max( roughnessMap.image.height, normalMap.image.height );
 			if ( ! MathUtils.isPowerOfTwo( width ) || ! MathUtils.isPowerOfTwo( height ) ) return;
 
+			var oldTarget = _renderer.getRenderTarget();
 			var autoClear = _renderer.autoClear;
 			_renderer.autoClear = false;
 
@@ -63,6 +65,7 @@ var RoughnessMipmapper = ( function () {
 				if ( _tempTarget != null ) _tempTarget.dispose();
 
 				_tempTarget = new WebGLRenderTarget( width, height, { depthBuffer: false, stencilBuffer: false } );
+				_tempTarget.scissorTest = true;
 
 			}
 
@@ -98,7 +101,9 @@ var RoughnessMipmapper = ( function () {
 				texelSize.set( 1.0 / width, 1.0 / height );
 				if ( mip == 0 ) texelSize.set( 0.0, 0.0 );
 
-				_renderer.setViewport( position.x, position.y, width / dpr, height / dpr );
+				var viewport = new Vector4( position.x, position.y, width / dpr, height / dpr );
+				_tempTarget.viewport.copy( viewport );
+				_tempTarget.scissor.copy( viewport );
 				_renderer.render( _scene, _flatCamera );
 				_renderer.copyFramebufferToTexture( position, material.roughnessMap, mip );
 				_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;
@@ -107,10 +112,8 @@ var RoughnessMipmapper = ( function () {
 
 			if ( roughnessMap !== material.roughnessMap ) roughnessMap.dispose();
 
+			_renderer.setRenderTarget( oldTarget );
 			_renderer.autoClear = autoClear;
-			_renderer.setRenderTarget( null );
-			var size = _renderer.getSize( new Vector2() );
-			_renderer.setViewport( 0, 0, size.x, size.y );
 
 		},
 
