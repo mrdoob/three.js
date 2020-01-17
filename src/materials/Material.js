@@ -54,6 +54,8 @@ function Material() {
 	this.clipShadows = false;
 
 	this.shadowSide = null;
+	this.shadowPolygonOffsetFactor = 0;
+	this.shadowPolygonOffsetUnits = 0;
 
 	this.colorWrite = true;
 
@@ -390,6 +392,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.clipShadows = source.clipShadows;
 
 		this.shadowSide = source.shadowSide;
+		this.shadowPolygonOffsetFactor = source.shadowPolygonOffsetFactor;
+		this.shadowPolygonOffsetUnits = source.shadowPolygonOffsetUnits;
 
 		this.colorWrite = source.colorWrite;
 

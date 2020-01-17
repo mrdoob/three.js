@@ -381,6 +381,10 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		}
 
+		result.polygonOffsetFactor = material.shadowPolygonOffsetFactor || 0;
+		result.polygonOffsetUnits = material.shadowPolygonOffsetUnits || 0;
+		result.polygonOffset = result.polygonOffsetFactor !== 0 || result.polygonOffsetUnits !== 0;
+
 		result.clipShadows = material.clipShadows;
 		result.clippingPlanes = material.clippingPlanes;
 		result.clipIntersection = material.clipIntersection;

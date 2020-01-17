@@ -46,6 +46,8 @@ export interface MaterialParameters {
 	flatShading?: boolean;
 	side?: Side;
 	shadowSide?: Side;
+	shadowPolygonOffsetFactor?: number;
+	shadowPolygonOffsetUnits?: number;
 	toneMapped?: boolean;
 	transparent?: boolean;
 	vertexColors?: Colors;
