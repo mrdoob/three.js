@@ -232,7 +232,6 @@
 				probeVolume
 					.makeEmpty()
 					.setFromBounds( bbox, API.rows, API.columns, API.levels )
-					.build()
 					.bake( renderer, scene, cubeCamera, ( p ) => {
 
 						if ( Math.random() > 0.95 ) console.log( 'baking: ' + ( p * 100 ).toFixed( 2 ) + '%' );
@@ -240,6 +239,8 @@
 					} );
 
 				probeVolumeHelper.update();
+
+				return Promise.resolve();
 
 			}
 

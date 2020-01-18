@@ -10,8 +10,6 @@ import {
 
 import { LightProbeGenerator } from './LightProbeGenerator.js';
 
-import { triangulate } from '../libs/delaunay-triangulate.module.js';
-
 /**
  * @author Don McCurdy / https://www.donmccurdy.com
  */
@@ -30,16 +28,25 @@ function LightProbeVolume () {
 
 	this.type = 'LightProbeVolume';
 
-	this.bounds = new Box3();
+	this.probes = [];
 
+	// Grid bounds and per-axis density.
+	this.bounds = new Box3();
 	this.countX = 0;
 	this.countY = 0;
 	this.countZ = 0;
 
-	this.probes = [];
-
+	// List of tetrahedra, with each tetrahedron represented as an index into
+	// the probes list.
 	this.cells = [];
+
+	// 3x3 matrices used to compute the barycentric coordinates for any point, and
+	// to determine whether the point lies within the tetrahedron.
+	// See: https://en.wikipedia.org/wiki/Barycentric_coordinate_system
 	this.cellMatrices = [];
+
+	// Caches the last-known cell for objects on which .update() has previously
+	// been called. Future .update() calls start there first, for efficiency.
 	this.cellCache = new WeakMap();
 
 }
@@ -80,11 +87,22 @@ LightProbeVolume.prototype = Object.assign( Object.create( Object3D.prototype ),
 		var spanY = max.y - min.y;
 		var spanZ = max.z - min.z;
 
+		var cells = [];
+
+		// Maps grid x/y/z coordinates to probe indices.
+		var p = [];
+
 		for ( var x = 0; x < countX; x ++ ) {
+
+			p[x] = [];
 
 			for ( var y = 0; y < countY; y ++ ) {
 
+				p[x][y] = [];
+
 				for ( var z = 0; z < countZ; z ++ ) {
+
+					p[x][y][z] = this.probes.length;
 
 					var probe = new LightProbe();
 
@@ -98,11 +116,29 @@ LightProbeVolume.prototype = Object.assign( Object.create( Object3D.prototype ),
 
 					this.probes.push( probe );
 
+					// Tessellate the grid volume into six tetrahedra per grid cell.
+					// Reference: http://www.iue.tuwien.ac.at/phd/wessner/node32.html
+					if ( x && y && z ) {
+
+						// prism 1
+						cells.push( [ p[ x ][ y ][ z ], p[ x ][ y ][ z - 1 ], p[ x - 1 ][ y ][ z - 1 ], p[ x - 1 ][ y - 1 ][ z - 1 ] ] );
+						cells.push( [ p[ x ][ y ][ z ], p[ x ][ y - 1 ][ z ], p[ x ][ y ][ z - 1 ], p[ x - 1 ][ y - 1 ][ z - 1 ] ] );
+						cells.push( [ p[ x ][ y ][ z - 1 ], p[ x ][ y - 1 ][ z ], p[ x ][ y - 1 ][ z - 1 ], p[ x - 1 ][ y - 1 ][ z - 1 ] ] );
+
+						// prism 2
+						cells.push( [ p[ x ][ y ][ z ], p[ x - 1 ][ y ][ z ], p[ x - 1 ][ y ][ z - 1 ], p[ x - 1 ][ y - 1 ][ z - 1 ] ] );
+						cells.push( [ p[ x ][ y ][ z ], p[ x ][ y - 1 ][ z ], p[ x - 1 ][ y ][ z ], p[ x - 1 ][ y - 1 ][ z - 1 ] ] );
+						cells.push( [ p[ x - 1 ][ y ][ z ], p[ x ][ y - 1 ][ z ], p[ x - 1 ][ y - 1 ][ z ], p[ x - 1 ][ y - 1 ][ z - 1 ] ] );
+
+					}
+
 				}
 
 			}
 
 		}
+
+		this._build( cells );
 
 		return this;
 
@@ -138,16 +174,6 @@ LightProbeVolume.prototype = Object.assign( Object.create( Object3D.prototype ),
 
 	})(),
 
-	build: function () {
-
-		// _build() accepts a 'cells' argument and isn't meant for use outside of
-		// this class. The public build() method takes no arguments.
-		this._build();
-
-		return this;
-
-	},
-
 	_build: function ( cells ) {
 
 		var positions = [];
@@ -158,12 +184,10 @@ LightProbeVolume.prototype = Object.assign( Object.create( Object3D.prototype ),
 
 		}
 
-		this.cells = cells || triangulate( positions );
+		this.cells = cells;
 		this.cellCache = new WeakMap();
 
-		// 3x3 matrices may be used to compute the barycentric coordinates for any
-		// point, or to determine whether the point lies within the tetrahedron.
-		// See: https://en.wikipedia.org/wiki/Barycentric_coordinate_system
+
 		this.cellMatrices = [];
 
 		for ( var i = 0; i < this.cells.length; ++ i ) {
