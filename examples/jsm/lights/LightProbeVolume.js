@@ -154,6 +154,10 @@ LightProbeVolume.prototype = Object.assign( Object.create( Object3D.prototype ),
 			mesh.getWorldPosition( position );
 			this.worldToLocal( position );
 
+			// Cheap, approximate extrapolation. A better method is described in the
+			// Cupisz talk at GDC 2012.
+			position.clamp( this.bounds.min, this.bounds.max );
+
 			var cellIndex = this._findCell( mesh, position );
 
 			if ( cellIndex === undefined ) return this;
