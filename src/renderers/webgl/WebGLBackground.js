@@ -18,8 +18,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 	var planeMesh;
 	var boxMesh;
-	// Store the current background texture and its `version`
-	// so we can recompile the material accordingly.
+
 	var currentBackground = null;
 	var currentBackgroundVersion = 0;
 	var currentTonemapping = null;
@@ -43,15 +42,11 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 		if ( background === null ) {
 
 			setClear( clearColor, clearAlpha );
-			currentBackground = null;
-			currentBackgroundVersion = 0;
 
 		} else if ( background && background.isColor ) {
 
 			setClear( background, 1 );
 			forceClear = true;
-			currentBackground = null;
-			currentBackgroundVersion = 0;
 
 		}
 
