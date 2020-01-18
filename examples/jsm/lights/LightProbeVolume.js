@@ -1,6 +1,7 @@
 /* global triangulate */
 
 import {
+	Box3,
 	Object3D,
 	LightProbe,
 	Matrix3,
@@ -27,15 +28,19 @@ function LightProbeVolume () {
 
 	Object3D.call( this );
 
+	this.type = 'LightProbeVolume';
+
+	this.bounds = new Box3();
+
+	this.countX = 0;
+	this.countY = 0;
+	this.countZ = 0;
+
 	this.probes = [];
 
 	this.cells = [];
-
 	this.cellMatrices = [];
-
 	this.cellCache = new WeakMap();
-
-	this.type = 'LightProbeVolume';
 
 }
 
@@ -45,8 +50,10 @@ LightProbeVolume.prototype = Object.assign( Object.create( Object3D.prototype ),
 
 	isLightProbeVolume: true,
 
-	reset: function () {
+	makeEmpty: function () {
 
+		this.bounds.makeEmpty();
+		this.countX = this.countY = this.countZ = 0;
 		this.probes.length = 0;
 		this.cells.length = 0;
 		this.cellMatrices.length = 0;
@@ -56,12 +63,18 @@ LightProbeVolume.prototype = Object.assign( Object.create( Object3D.prototype ),
 
 	},
 
-	setFromBounds: function ( bbox, countX, countY, countZ ) {
+	setFromBounds: function ( bounds, countX, countY, countZ ) {
 
-		this.reset();
+		this.makeEmpty();
 
-		var min = bbox.min;
-		var max = bbox.max;
+		this.bounds = bounds;
+
+		this.countX = countX;
+		this.countY = countY;
+		this.countZ = countZ;
+
+		var min = bounds.min;
+		var max = bounds.max;
 
 		var spanX = max.x - min.x;
 		var spanY = max.y - min.y;
@@ -305,6 +318,15 @@ LightProbeVolume.prototype = Object.assign( Object.create( Object3D.prototype ),
 
 		var data = Object3D.prototype.toJSON.call( this, meta );
 
+		data.bounds = {
+			min: this.bounds.min.toArray(),
+			max: this.bounds.max.toArray()
+		};
+
+		data.countX = this.countX;
+		data.countY = this.countY;
+		data.countZ = this.countZ;
+
 		data.cells = JSON.parse( JSON.stringify( this.cells ) );
 		data.probes = [];
 
@@ -330,7 +352,16 @@ LightProbeVolume.prototype = Object.assign( Object.create( Object3D.prototype ),
 
 	fromJSON: function ( data ) {
 
-		this.reset();
+		this.makeEmpty();
+
+		this.bounds.set(
+			new Vector3().fromArray( data.bounds.min ),
+			new Vector3().fromArray( data.bounds.max )
+		);
+
+		this.countX = data.countX;
+		this.countY = data.countY;
+		this.countZ = data.countZ;
 
 		var probe;
 

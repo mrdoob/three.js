@@ -230,7 +230,7 @@
 				bbox.min.set( -2.5, -2.5, -15 );
 
 				probeVolume
-					.reset()
+					.makeEmpty()
 					.setFromBounds( bbox, API.rows, API.columns, API.levels )
 					.build()
 					.bake( renderer, scene, cubeCamera, ( p ) => {
@@ -245,13 +245,13 @@
 
 			function loadProbeVolume() {
 
-				// TODO: Clean up, use FileLoader.
+				// TODO(donmccurdy): Clean up, use FileLoader.
 				return fetch( 'models/gltf/HallLightTest/irradiance.json' )
 					.then( ( r ) => r.json() )
 					.then( ( data ) => {
 
 						probeVolume
-							.reset()
+							.makeEmpty()
 							.fromJSON( data );
 
 						probeVolumeHelper.update();
