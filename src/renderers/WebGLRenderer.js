@@ -2058,10 +2058,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.envMap.value = envMap;
 
-			// don't flip CubeTexture envMaps, flip everything else:
-			//  WebGLCubeRenderTarget will be flipped for backwards compatibility
-			//  WebGLCubeRenderTarget.texture will be flipped because it's a Texture and NOT a CubeTexture
-			// this check must be handled differently, or removed entirely, if WebGLCubeRenderTarget uses a CubeTexture in the future
 			uniforms.flipEnvMap.value = envMap.isCubeTexture ? - 1 : 1;
 
 			uniforms.reflectivity.value = material.reflectivity;
