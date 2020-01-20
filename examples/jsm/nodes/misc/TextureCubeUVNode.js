@@ -84,11 +84,14 @@ TextureCubeUVNode.Nodes = ( function () {
 
 	var bilinearCubeUV = new FunctionNode(
 		`TextureCubeUVData bilinearCubeUV(sampler2D envMap, vec3 direction, float mipInt) {
+
 			float face = getFace(direction);
 			float filterInt = max(cubeUV_minMipLevel - mipInt, 0.0);
 			mipInt = max(mipInt, cubeUV_minMipLevel);
 			float faceSize = exp2(mipInt);
+
 			float texelSize = 1.0 / (3.0 * cubeUV_maxTileSize);
+
 			vec2 uv = getUV(direction, face) * (faceSize - 1.0);
 			vec2 f = fract(uv);
 			uv += 0.5 - f;
@@ -103,6 +106,7 @@ TextureCubeUVNode.Nodes = ( function () {
 			uv.y += filterInt * 2.0 * cubeUV_minTileSize;
 			uv.x += 3.0 * max(0.0, cubeUV_maxTileSize - 2.0 * faceSize);
 			uv *= texelSize;
+ 
 			vec4 tl = texture2D(envMap, uv);
 			uv.x += texelSize;
 			vec4 tr = texture2D(envMap, uv);
