@@ -43,6 +43,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 	builder.requires.lights = true;
 
+	builder.extensions.derivatives = true;
 	builder.extensions.shaderTextureLOD = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
@@ -321,10 +322,22 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
+		// anti-aliasing code by @elalish
+
+		output.push(
+			'vec3 dxy = max( abs( dFdx( geometryNormal ) ), abs( dFdy( geometryNormal ) ) );',
+			'float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );',
+		);
+
 		// optimization for now
 
 		output.push(
-			'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor * (1.0 - metalnessFactor)' ) + ';',
+			'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor * ( 1.0 - metalnessFactor )' ) + ';',
+
+			'material.specularRoughness = max( roughnessFactor, 0.0525 );',
+			'material.specularRoughness += geometryRoughness;',
+			'material.specularRoughness = min( material.specularRoughness, 1.0 );',
+			
 			'material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );'
 		);
 
@@ -332,7 +345,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push(
 				clearcoat.code,
-				'material.clearcoat = saturate( ' + clearcoat.result + ' );'
+				'material.clearcoat = saturate( ' + clearcoat.result + ' );' // Burley clearcoat model
 			);
 
 		} else if ( useClearcoat ) {
@@ -345,7 +358,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push(
 				clearcoatRoughness.code,
-				'material.clearcoatRoughness = clamp( ' + clearcoatRoughness.result + ', 0.04, 1.0 );'
+				'material.clearcoatRoughness = max( ' + clearcoatRoughness.result + ', 0.0525 );',
+				'material.clearcoatRoughness += geometryRoughness;',
+				'material.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );'
 			);
 
 		} else if ( useClearcoat ) {
