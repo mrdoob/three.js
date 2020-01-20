@@ -37,16 +37,44 @@ a small three.js app
 
 Things to notice about the diagram above.
 
+* There is a `Renderer`. This is arguably the main object of three.js. You pass a
+  `Scene` and a `Camera` to a `Renderer` and it renders (draws) the portion of
+  the 3D scene that is inside the *frustum* of the camera as a 2D image to a
+  canvas.
+
+* There is a [scenegraph](threejs-scenegraph.html) which is a tree like
+  structure, consisting of various objects like a `Scene` object, multiple
+  `Mesh` objects, `Light` objects, `Group`, `Object3D`, and `Camera` objects. A
+  `Scene` object defines the root of the scenegraph and contains properties like
+  the background color and fog. These objects define a hierarchical parent/child
+  tree like structure and represent where objects appear and how they are
+  oriented. Children are positioned and oriented relative to their parent. For
+  example the wheels on a car might children of the car so that moving and
+  orienting the car's object automatically moves the wheels. You can read more
+  about this in [the article on scenegraphs](threejs-scenegraph.html).
+
+  Note in the diagram `Camera` is half in half out of the scenegraph. This is to
+  represent that in three.js, unlike the other objects, a `Camera` does not have
+  to be in the scenegraph to function. Just like other objects, a `Camera`, as a
+  child of some other object, will move and orient relative to its parent object.
+  There is an example of putting multiple `Camera` objects in a scenegraph at
+  the end of [the article on scenegraphs](threejs-scenegraph.html).
+
+* `Mesh` objects represent drawing a specific `Geometry` with a specific
+   `Material`. Both `Material` objects and `Geometry` objects can be used by
+   multiple `Mesh` objects. For example to draw 2 blue cubes in different
+   locations we could need 2 `Mesh` objects to represent the position and
+   orientation of each cube. We would only need 1 `Geometry` to hold the vertex
+   data for a cube and we would only need 1 `Material` to specify the color
+   blue. Both `Mesh` objects could reference the same`Geometry` object and the
+   same `Material` object.
+
 * `Geometry` objects represent the vertex data of some piece of geometry like
    a sphere, cube, plane, dog, cat, human, tree, building, etc...
-
-   three.js provides many kinds of built in
+   Three.js provides many kinds of built in
    [geometry primitives](threejs-primitives.html). You can also
    [create custom geometry](threejs-custom-geometry.html) as well as
    [load geometry from files](threejs-load-obj.html).
-
-* `Texture` objects generally represent images either [loaded from image files](threejs-textures.html),
-  [generated from a canvas](threejs-canvas-textures.html) or [rendered from another scene](threejs-rendertargets.html).
 
 * `Material` objects represent
   [the surface properties used to draw geometry](threejs-materials.html)
@@ -54,35 +82,10 @@ Things to notice about the diagram above.
   reference one or more `Texture` objects which can be used, for example, 
   to wrap an image onto the surface of a geometry.
 
+* `Texture` objects generally represent images either [loaded from image files](threejs-textures.html),
+  [generated from a canvas](threejs-canvas-textures.html) or [rendered from another scene](threejs-rendertargets.html).
+
 * `Light` objects represent [different kinds of lights](threejs-lights.html).
-
-* `Mesh` objects represent drawing a specific `Geometry` with a specific `Material`.
-   Both `Material` objects and `Geometry` objects can be used by multiple
-   `Mesh` objects. For example to draw 2 blue cubes in different locations
-   we could need 2 `Mesh` objects to represent the position and orientation
-   of each cube. We would only need 1 `Geometry` to hold the vertex data for
-   a cube and we would only need 1 `Material` to specify the color blue.
-   Both `Mesh` objects could reference the same`Geometry` object and the
-   same `Material` object.
-
-* There is a [scenegraph](threejs-scenegraph.html) consisting of various objects
-  including a `Scene` at the root, multiple `Mesh` objects, `Light` objects,
-  `Group` and `Object3D` objects, etc... These objects define a hierarchical
-  relationship and represent where objects appear and how they are oriented. You
-  can read more about this in [the article on scenegraphs](threejs-scenegraph.html).
-  
-  Note that `Camera` is half in half out of the scenegraph. This is because in
-  three.js a `Camera` does not have to be in the scenegraph to function. The
-  advantage to putting it in the scenegraph is you'd get all the benefits of the
-  scenegraph itself letting you more easily position `Camera` objects relative to the
-  motion of other objects in the scene. There is an example of putting cameras
-  in the scenegraph at the end of [the article on scenegraphs](threejs-scenegraph.html).
-
-* There is a `Renderer`
-
-  This is arguably the main object of three.js. You pass a `Scene` and a
-  `Camera` to a `Renderer` and it renders (draws) the portion of the 3D scene
-  that is inside the *frustum* of the camera as a 2D image to a canvas.
 
 Given all of that we're going to make the smallest *"Hello Cube"* setup
 that looks like this
