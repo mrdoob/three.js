@@ -355,9 +355,39 @@ var UniformsLib = {
 	fog: {
 
 		fogDensity: { value: 0.00025 },
+
 		fogNear: { value: 1 },
+
 		fogFar: { value: 2000 },
-		fogColor: { value: new Color( 0xffffff ) }
+
+		fogColor: {
+
+			value: new Color( 0xffffff ), 
+
+			onUpdate: function( uniforms, material, renderer, scene ) {
+
+				var fog = scene.fog;
+
+				if ( fog && material.fog ) {
+
+					uniforms.fogColor.value.copy( fog.color );
+
+					if ( fog.isFog ) {
+
+						uniforms.fogNear.value = fog.near;
+						uniforms.fogFar.value = fog.far;
+
+					} else if ( fog.isFogExp2 ) {
+
+						uniforms.fogDensity.value = fog.density;
+
+					}
+
+				}
+
+			}
+
+		}
 
 	},
 

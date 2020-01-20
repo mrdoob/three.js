@@ -1883,12 +1883,6 @@ function WebGLRenderer( parameters ) {
 
 			// refresh uniforms common to materials
 
-			if ( fog && material.fog ) {
-
-				refreshUniformsFog( m_uniforms, fog );
-
-			}
-
 			refreshUniforms( m_uniforms, material, scene );
 
 			// RectAreaLight Texture
@@ -1966,23 +1960,6 @@ function WebGLRenderer( parameters ) {
 				}
 
 			}
-
-		}
-
-	}
-
-	function refreshUniformsFog( uniforms, fog ) {
-
-		uniforms.fogColor.value.copy( fog.color );
-
-		if ( fog.isFog ) {
-
-			uniforms.fogNear.value = fog.near;
-			uniforms.fogFar.value = fog.far;
-
-		} else if ( fog.isFogExp2 ) {
-
-			uniforms.fogDensity.value = fog.density;
 
 		}
 
