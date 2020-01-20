@@ -88,8 +88,8 @@
 				spotLight.castShadow = true;
 				spotLight.shadow.camera.near = 8;
 				spotLight.shadow.camera.far = 200;
-				spotLight.shadow.mapSize.width = 256;
-				spotLight.shadow.mapSize.height = 256;
+				spotLight.shadow.mapSize.width = 64;
+				spotLight.shadow.mapSize.height = 64;
 				spotLight.shadow.bias = config['Bias'];
 				spotLight.shadow.radius = 2;
 				scene.add( spotLight );
@@ -105,8 +105,8 @@
 				dirLight.shadow.camera.left = - 17;
 				dirLight.shadow.camera.top	= 17;
 				dirLight.shadow.camera.bottom = - 17;
-				dirLight.shadow.mapSize.width = 512;
-				dirLight.shadow.mapSize.height = 512;
+				dirLight.shadow.mapSize.width = 128;
+				dirLight.shadow.mapSize.height = 128;
 				dirLight.shadow.radius = 2;
 				dirLight.shadow.bias = config['Bias'];
 				scene.add( dirLight );
@@ -225,12 +225,14 @@
 
 				renderScene();
 
+				/*
 				torusKnot.rotation.x += 0.25 * delta;
 				torusKnot.rotation.y += 2 * delta;
 				torusKnot.rotation.z += 1 * delta;
 
 				dirGroup.rotation.y += 0.7 * delta;
 				dirLight.position.z = 17 + Math.sin(time*0.001)*5;
+				 */
 
 			}
 
