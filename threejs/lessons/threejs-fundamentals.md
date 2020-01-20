@@ -67,10 +67,11 @@ Things to notice about the diagram above.
 
 * `Material` objects represent
   [the surface properties used to draw the geometry](threejs-materials.html)
-  including things like the color, how shiny it is. A `Material` can also
-  reference one or more `Texture` objects.
+  including things like the color and how shiny it is. A `Material` can also
+  reference one or more `Texture` objects which can be used, for example, 
+  to wrap an image onto the surface of the geometry.
 
-* `Texture` objects generally represent 2D images either [loaded from image files](threejs-textures.html),
+* `Texture` objects generally represent images either [loaded from image files](threejs-textures.html),
   [generated from a canvas](threejs-canvas-textures.html) or [rendered from another scene](threejs-rendertargets.html).
 
 Given all of that we're going to make the smallest *"Hello Cube"* setup
@@ -93,7 +94,6 @@ Modules have the advantage that they can easily import other modules
 they need. That saves us from having to manually load extra scripts
 they are dependent on.
 
-
 Next we need is a `<canvas>` tag so
 
 ```html
@@ -102,7 +102,7 @@ Next we need is a `<canvas>` tag so
 </body>
 ```
 
-Three.js will draw into that canvas so we need to look it up.
+We will ask three.js to draw into that canvas so we need to look it up.
 
 ```html
 <script type="module">
