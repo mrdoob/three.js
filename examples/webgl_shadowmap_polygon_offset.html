@@ -21,20 +21,20 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer, clock, stats;
-			var dirLight, spotLight;
+			var dirLight;
 			var torusKnot, dirGroup;
 			var groundMaterial, objectMaterial;
 
 			var config = {
 				'Bias': 0,
 				ground: {
-					'Offset factor': 4,
-					'Offset units': 3000,
+					'Offset factor': 3,
+					'Offset units': 1000,
 					'Shadow side': 'Front',
 				},
 				objects: {
-					'Offset factor': 4,
-					'Offset units': 3000,
+					'Offset factor': 3,
+					'Offset units': 1000,
 					'Shadow side': 'Back',
 				},
 			};
@@ -46,15 +46,66 @@
 
 				initScene();
 				initMisc();
-				
-				// Init gui
-				var gui = new GUI();
 
+				var presets =
+								{
+									"preset": "Default",
+									"closed": false,
+									"remembered": {
+										"Default": {
+											"0": {
+												"Bias": 0
+											},
+											"1": {
+												"Shadow side": "Front",
+												"Offset factor": 3,
+												"Offset units": 1000
+											},
+											"2": {
+												"Shadow side": "Front",
+												"Offset factor": 3,
+												"Offset units": 1000
+											}
+										},
+										"Bias": {
+											"0": {
+												"Bias": 0.0001
+											},
+											"1": {
+												"Shadow side": "Back",
+												"Offset factor": 0,
+												"Offset units": 0
+											},
+											"2": {
+												"Shadow side": "Back",
+												"Offset factor": 0,
+												"Offset units": 0
+											}
+										}
+									},
+									"folders": {
+										"Ground": {
+											"preset": "Default",
+											"closed": false,
+											"folders": {}
+										},
+										"Object": {
+											"preset": "Default",
+											"closed": false,
+											"folders": {}
+										}
+									}
+								};
+				// Init gui
+				var gui = new GUI({ load: presets, preset: 'Default' });
+
+				gui.remember(config);
+				gui.remember(config.ground);
+				gui.remember(config.objects);
 
 				gui.add( config, 'Bias', -0.001, 0.001, 0.00001 ).min( -0.005 ).max( 0.005 ).onChange( function ( value ) {
 
 					dirLight.shadow.bias = value;
-					spotLight.shadow.bias = value;
 
 				} );
 
@@ -107,7 +158,7 @@
 			function initScene() {
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 0, 10, 30 );
+				camera.position.set( -20, 20, 20 );
 
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xCCCCCC, 50, 100 );
@@ -116,24 +167,9 @@
 
 				scene.add( new THREE.AmbientLight( 0x444444 ) );
 
-				spotLight = new THREE.SpotLight( 0x888888 );
-				spotLight.name = 'Spot Light';
-				spotLight.angle = Math.PI / 5;
-				spotLight.penumbra = 0.3;
-				spotLight.position.set( 8, 10, 5 );
-				spotLight.castShadow = true;
-				spotLight.shadow.camera.near = 8;
-				spotLight.shadow.camera.far = 200;
-				spotLight.shadow.mapSize.width = 64;
-				spotLight.shadow.mapSize.height = 64;
-				spotLight.shadow.bias = config['Bias'];
-				spotLight.shadow.radius = 2;
-				scene.add( spotLight );
-
-
-				dirLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
+				dirLight = new THREE.DirectionalLight( 0xFFFFFF, 2 );
 				dirLight.name = 'Dir. Light';
-				dirLight.position.set( 3, 12, 17 );
+				dirLight.position.set( 8, 5, 20 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 0.1;
 				dirLight.shadow.camera.far = 500;
@@ -141,8 +177,8 @@
 				dirLight.shadow.camera.left = - 17;
 				dirLight.shadow.camera.top	= 17;
 				dirLight.shadow.camera.bottom = - 17;
-				dirLight.shadow.mapSize.width = 128;
-				dirLight.shadow.mapSize.height = 128;
+				dirLight.shadow.mapSize.width = 256;
+				dirLight.shadow.mapSize.height = 256;
 				dirLight.shadow.radius = 2;
 				dirLight.shadow.bias = config['Bias'];
 				scene.add( dirLight );
@@ -153,7 +189,6 @@
 
 				// Geometry
 
-				var geometry = new THREE.TorusKnotBufferGeometry( 25, 8, 75, 20 );
 				objectMaterial = new THREE.MeshPhongMaterial( {
 					color: 0x999999,
 					shininess: 0,
@@ -163,31 +198,46 @@
 					shadowPolygonOffsetUnits: config.objects[ 'Offset units' ]
 				} );
 
-				torusKnot = new THREE.Mesh( geometry, objectMaterial );
-				torusKnot.scale.multiplyScalar( 1 / 18 );
-				torusKnot.position.y = 3;
-				torusKnot.castShadow = true;
-				torusKnot.receiveShadow = true;
-				scene.add( torusKnot );
-
 				var geometry = new THREE.CylinderBufferGeometry( 0.75, 0.75, 7, 32 );
 
 				var pillar1 = new THREE.Mesh( geometry, objectMaterial );
-				pillar1.position.set( 10, 3.5, 10 );
+				pillar1.position.set( 10, 3.5, 1 );
 				pillar1.castShadow = true;
 				pillar1.receiveShadow = true;
 
 				var pillar2 = pillar1.clone();
-				pillar2.position.set( 10, 3.5, -10 );
+				pillar2.position.set( 10, 3.5, -1 );
 				var pillar3 = pillar1.clone();
-				pillar3.position.set( -10, 3.5, 10 );
+				pillar3.position.set( -10, 0.75, 4 );
+				pillar3.rotateX( THREE.MathUtils.degToRad( 90 ) );
 				var pillar4 = pillar1.clone();
-				pillar4.position.set( -10, 3.5, -10 );
+				pillar4.position.set( -10, 3.5, -2 );
 
 				scene.add( pillar1 );
 				scene.add( pillar2 );
 				scene.add( pillar3 );
 				scene.add( pillar4 );
+
+				var geometry = new THREE.BoxBufferGeometry( 0.75, 2, 7 );
+
+				var box1 = new THREE.Mesh( geometry, objectMaterial );
+				box1.position.set( 1.5, 1, 5 );
+				box1.castShadow = true;
+				box1.receiveShadow = true;
+
+				var box2 = box1.clone();
+				box2.position.set( 1.5, 3.5, -2 );
+				box2.rotateX( THREE.MathUtils.degToRad( 90 ) );
+				var box3 = box1.clone();
+				box3.position.set( -1.5, 0.75/2, 5 );
+				box3.rotateZ( THREE.MathUtils.degToRad( 90 ) );
+				var box4 = box1.clone();
+				box4.position.set( -1.5, 1, -5 );
+
+				scene.add( box1 );
+				scene.add( box2 );
+				scene.add( box3 );
+				scene.add( box4 );
 
 				var geometry = new THREE.PlaneBufferGeometry( 200, 200 );
 				groundMaterial = new THREE.MeshPhongMaterial( {
