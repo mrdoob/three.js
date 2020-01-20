@@ -38,7 +38,7 @@ import { Scene } from "../scenes/Scene.js";
 import { Vector2 } from "../math/Vector2.js";
 import { Vector3 } from "../math/Vector3.js";
 import { WebGLRenderTarget } from "../renderers/WebGLRenderTarget.js";
-import { Vector4 } from "../../build/three.module.js";
+import { Vector4 } from "../math/Vector4.js";
 
 var LOD_MIN = 4;
 var LOD_MAX = 8;
