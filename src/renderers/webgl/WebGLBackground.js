@@ -102,7 +102,8 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			boxMesh.material.uniforms.envMap.value = texture;
 			boxMesh.material.uniforms.flipEnvMap.value = texture.isCubeTexture ? - 1 : 1;
-
+			boxMesh.material.uniforms.bgRoughness.value = scene.bgRoughness;
+			
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== texture.version ||
 				currentTonemapping !== renderer.toneMapping ) {

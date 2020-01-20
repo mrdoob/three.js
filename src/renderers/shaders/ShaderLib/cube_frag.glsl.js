@@ -2,7 +2,7 @@ export default /* glsl */`
 
 #include <envmap_common_pars_fragment>
 uniform float opacity;
-
+uniform float bgRoughness;
 varying vec3 vWorldDirection;
 
 #include <cube_uv_reflection_fragment>

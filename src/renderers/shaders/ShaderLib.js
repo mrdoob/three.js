@@ -239,7 +239,8 @@ var ShaderLib = {
 		uniforms: mergeUniforms( [
 			UniformsLib.envmap,
 			{
-				opacity: { value: 1.0 }
+				opacity: { value: 1.0 },
+				bgRoughness: { value: 0.0 }
 			}
 		] ),
 
