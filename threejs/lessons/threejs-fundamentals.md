@@ -49,16 +49,19 @@ Things to notice about the diagram above.
   relationship and represent where objects appear and how they are oriented. You
   can read more about this in [the article on scenegraphs](threejs-scenegraph.html).
   
-  Note that `Camera` is half in half out of the scenegraph. This is because in three.js a
-  `Camera` does not have to be in the scenegraph to function. The advantage to
-  putting it in the scenegraph is you'd get all the benefits of the scenegraph
-  itself letting you more easily put `Camera` objects relative to the motion
-  of other objects in the scene.
+  Note that `Camera` is half in half out of the scenegraph. This is because in
+  three.js a `Camera` does not have to be in the scenegraph to function. The
+  advantage to putting it in the scenegraph is you'd get all the benefits of the
+  scenegraph itself letting you more easily put `Camera` objects relative to the
+  motion of other objects in the scene. There is an example of putting cameras
+  in the scenegraph at the end of [the article on scenegraphs](threejs-scenegraph.html).
 
-* `Mesh` objects each reference a `Geometry` and a `Material`. Both `Material`
-   objects and `Geometry` objects can be shared.
+* `Mesh` objects represent drawing a specific `Geometry` with a specific `Material`.
+   Both `Material` objects and `Geometry` objects can be used by multiple
+   `Mesh` objects.
 
-* `Geometry` objects represent the vertex data of some piece of geometry.
+* `Geometry` objects represent the vertex data of some piece of geometry like
+   a sphere, cube, plane, dog, cat, human, tree, building, etc...
 
    three.js provides many kinds of built in
    [geometry primitives](threejs-primitives.html). You can also
@@ -66,13 +69,15 @@ Things to notice about the diagram above.
    [load geometry from files](threejs-load-obj.html).
 
 * `Material` objects represent
-  [the surface properties used to draw the geometry](threejs-materials.html)
-  including things like the color and how shiny it is. A `Material` can also
+  [the surface properties used to draw geometry](threejs-materials.html)
+  including things like the color to use and how shiny it is. A `Material` can also
   reference one or more `Texture` objects which can be used, for example, 
   to wrap an image onto the surface of the geometry.
 
 * `Texture` objects generally represent images either [loaded from image files](threejs-textures.html),
   [generated from a canvas](threejs-canvas-textures.html) or [rendered from another scene](threejs-rendertargets.html).
+
+* `Light` objects represent [different kinds of lights](threejs-lights.html).
 
 Given all of that we're going to make the smallest *"Hello Cube"* setup
 that looks like this
