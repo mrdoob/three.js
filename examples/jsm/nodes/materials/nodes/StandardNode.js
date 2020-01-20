@@ -17,11 +17,9 @@ function StandardNode() {
 
 	Node.call( this );
 
-	this.color = new ColorNode( 0xEEEEEE );
-	this.roughness = new FloatNode( 0.5 );
-	this.metalness = new FloatNode( 0.5 );
-
-	this.energyPreservation = true;
+	this.color = new ColorNode( 0xFFFFFF );
+	this.roughness = new FloatNode( 1 );
+	this.metalness = new FloatNode( 0 );
 
 }
 
