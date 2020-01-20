@@ -182,11 +182,7 @@ var ShaderLib = {
 
 		uniforms: mergeUniforms( [
 			UniformsLib.common,
-			UniformsLib.displacementmap,
-			{
-				depthOffsetUnits: { value: 0.0 },
-				depthOffsetFactor: { value: 0.0 },
-			}
+			UniformsLib.displacementmap
 		] ),
 
 		vertexShader: ShaderChunk.depth_vert,

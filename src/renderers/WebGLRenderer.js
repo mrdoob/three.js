@@ -1798,6 +1798,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
+
 		}
 
 		// skinning uniforms must be set even if material didn't change
@@ -2541,9 +2542,6 @@ function WebGLRenderer( parameters ) {
 			uniforms.displacementBias.value = material.displacementBias;
 
 		}
-
-		uniforms.depthOffsetUnits.value = material.depthOffsetUnits;
-		uniforms.depthOffsetFactor.value = material.depthOffsetFactor;
 
 	}
 

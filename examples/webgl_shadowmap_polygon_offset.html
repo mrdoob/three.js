@@ -27,8 +27,16 @@
 
 			var config = {
 				'Bias': 0,
-				'Offset factor': 4,
-				'Offset units': 3000,
+				ground: {
+					'Offset factor': 4,
+					'Offset units': 3000,
+					'Shadow side': 'Front',
+				},
+				objects: {
+					'Offset factor': 4,
+					'Offset units': 3000,
+					'Shadow side': 'Back',
+				},
 			};
 
 			init();
@@ -42,6 +50,7 @@
 				// Init gui
 				var gui = new GUI();
 
+
 				gui.add( config, 'Bias', -0.001, 0.001, 0.00001 ).min( -0.005 ).max( 0.005 ).onChange( function ( value ) {
 
 					dirLight.shadow.bias = value;
@@ -49,16 +58,43 @@
 
 				} );
 
-				gui.add( config, 'Offset factor' ).min( -10 ).max( 10 ).onChange( function ( value ) {
+				var groundFolder = gui.addFolder("Ground");
+				var objectFolder = gui.addFolder("Object");
+				groundFolder.open();
+				objectFolder.open();
+
+				groundFolder.add( config.ground, 'Shadow side', ['Front', 'Back'] ).onChange( function ( value ) {
+
+					groundMaterial.shadowSide = value === 'Front' ? THREE.FrontSide : THREE.BackSide;
+
+				} );
+
+				groundFolder.add( config.ground, 'Offset factor' ).min( -10 ).max( 10 ).onChange( function ( value ) {
 
 					groundMaterial.shadowPolygonOffsetFactor = value;
+
+				} );
+
+				groundFolder.add( config.ground, 'Offset units' ).min( -10000 ).max( 10000 ).onChange( function ( value ) {
+
+					groundMaterial.shadowPolygonOffsetUnits = value;
+
+				} );
+
+				objectFolder.add( config.objects, 'Shadow side', ['Front', 'Back'] ).onChange( function ( value ) {
+
+					objectMaterial.shadowSide = value === 'Front' ? THREE.FrontSide : THREE.BackSide;
+
+				} );
+
+				objectFolder.add( config.objects, 'Offset factor' ).min( -10 ).max( 10 ).onChange( function ( value ) {
+
 					objectMaterial.shadowPolygonOffsetFactor = value;
 
 				} );
 
-				gui.add( config, 'Offset units' ).min( -10000 ).max( 10000 ).onChange( function ( value ) {
+				objectFolder.add( config.objects, 'Offset units' ).min( -10000 ).max( 10000 ).onChange( function ( value ) {
 
-					groundMaterial.shadowPolygonOffsetUnits = value;
 					objectMaterial.shadowPolygonOffsetUnits = value;
 
 				} );
@@ -122,9 +158,9 @@
 					color: 0x999999,
 					shininess: 0,
 					specular: 0x222222,
-					shadowSide: THREE.FrontSide,
-					shadowPolygonOffsetFactor: config[ 'Offset factor' ],
-					shadowPolygonOffsetUnits: config[ 'Offset units' ]
+					shadowSide: config.objects[ 'Shadow side' ],
+					shadowPolygonOffsetFactor: config.objects[ 'Offset factor' ],
+					shadowPolygonOffsetUnits: config.objects[ 'Offset units' ]
 				} );
 
 				torusKnot = new THREE.Mesh( geometry, objectMaterial );
@@ -158,9 +194,9 @@
 					color: 0x999999,
 					shininess: 0,
 					specular: 0x111111,
-					shadowSide: THREE.FrontSide,
-					shadowPolygonOffsetFactor: config[ 'Offset factor' ],
-					shadowPolygonOffsetUnits: config[ 'Offset units' ]
+					shadowSide: config.ground[ 'Shadow side' ],
+					shadowPolygonOffsetFactor: config.ground[ 'Offset factor' ],
+					shadowPolygonOffsetUnits: config.ground[ 'Offset units' ]
 				} );
 
 				var ground = new THREE.Mesh( geometry, groundMaterial );
