@@ -49,7 +49,7 @@ var UniformsLib = {
 
 			value: new Color( 0xeeeeee ),
 
-			onUpdate: function( uniforms, material ) {
+			onUpdate: function ( uniforms, material ) {
 
 				if ( material.color ) {
 
@@ -69,7 +69,7 @@ var UniformsLib = {
 
 			value: new Matrix3(),
 
-			onUpdate: function( uniforms, material ) {
+			onUpdate: function ( uniforms, material ) {
 
 				// uv repeat and offset setting priorities
 				// 1. color map
@@ -145,7 +145,7 @@ var UniformsLib = {
 
 			value: new Matrix3(),
 
-			onUpdate: function( uniforms, material ) {
+			onUpdate: function ( uniforms, material ) {
 
 				// uv repeat and offset setting priorities for uv2
 				// 1. ao map
@@ -202,7 +202,7 @@ var UniformsLib = {
 
 			value: null,
 
-			onUpdate: function( uniforms, material, renderer, scene ) {
+			onUpdate: function ( uniforms, material, renderer, scene ) {
 
 				var envMap = material.envMap || scene.environment;
 
@@ -254,7 +254,7 @@ var UniformsLib = {
 
 			value: new Color( 0x000000 ),
 
-			onUpdate: function( uniforms, material ) {
+			onUpdate: function ( uniforms, material ) {
 
 				uniforms.emissive.value.copy( material.emissive ).multiplyScalar( material.emissiveIntensity );
 
@@ -266,15 +266,15 @@ var UniformsLib = {
 
 	shininess: {
 
-		shininess: { 
+		shininess: {
 
 			value: 30,
 
-			onUpdate: function( uniforms, material ) {
+			onUpdate: function ( uniforms, material ) {
 
 				uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 
-			} 
+			}
 
 		}
 
@@ -290,9 +290,9 @@ var UniformsLib = {
 
 		bumpMap: {
 
-			value: null, 
+			value: null,
 
-			onUpdate: function( uniforms, material ) {
+			onUpdate: function ( uniforms, material ) {
 
 				uniforms.bumpMap.value = material.bumpMap;
 				uniforms.bumpScale.value = material.bumpScale;
@@ -310,9 +310,9 @@ var UniformsLib = {
 
 		normalMap: {
 
-			value: null, 
+			value: null,
 
-			onUpdate: function( uniforms, material ) {
+			onUpdate: function ( uniforms, material ) {
 
 				uniforms.normalMap.value = material.normalMap;
 				uniforms.normalScale.value.copy( material.normalScale );
@@ -362,9 +362,9 @@ var UniformsLib = {
 
 		fogColor: {
 
-			value: new Color( 0xffffff ), 
+			value: new Color( 0xffffff ),
 
-			onUpdate: function( uniforms, material, renderer, scene ) {
+			onUpdate: function ( uniforms, material, renderer, scene ) {
 
 				var fog = scene.fog;
 
@@ -467,11 +467,11 @@ var UniformsLib = {
 
 		opacity: { value: 1.0 },
 
-		size: { 
+		size: {
 
 			value: 1.0,
 
-			onUpdate: function( uniforms, material, renderer ) {
+			onUpdate: function ( uniforms, material, renderer ) {
 
 				uniforms.size.value = material.size * renderer.getPixelRatio();
 
@@ -483,7 +483,7 @@ var UniformsLib = {
 
 			value: 1.0,
 
-			onUpdate: function( uniforms, material, renderer ) {
+			onUpdate: function ( uniforms, material, renderer ) {
 
 				rendererSize = rendererSize || new Vector2();
 
