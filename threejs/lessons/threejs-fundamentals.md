@@ -45,20 +45,25 @@ Things to notice about the diagram above.
    [create custom geometry](threejs-custom-geometry.html) as well as
    [load geometry from files](threejs-load-obj.html).
 
+* `Texture` objects generally represent images either [loaded from image files](threejs-textures.html),
+  [generated from a canvas](threejs-canvas-textures.html) or [rendered from another scene](threejs-rendertargets.html).
+
 * `Material` objects represent
   [the surface properties used to draw geometry](threejs-materials.html)
   including things like the color to use and how shiny it is. A `Material` can also
   reference one or more `Texture` objects which can be used, for example, 
-  to wrap an image onto the surface of the geometry.
-
-* `Texture` objects generally represent images either [loaded from image files](threejs-textures.html),
-  [generated from a canvas](threejs-canvas-textures.html) or [rendered from another scene](threejs-rendertargets.html).
+  to wrap an image onto the surface of a geometry.
 
 * `Light` objects represent [different kinds of lights](threejs-lights.html).
 
 * `Mesh` objects represent drawing a specific `Geometry` with a specific `Material`.
    Both `Material` objects and `Geometry` objects can be used by multiple
-   `Mesh` objects.
+   `Mesh` objects. For example to draw 2 blue cubes in different locations
+   we could need 2 `Mesh` objects to represent the position and orientation
+   of each cube. We would only need 1 `Geometry` to hold the vertex data for
+   a cube and we would only need 1 `Material` to specify the color blue.
+   Both `Mesh` objects could reference the same`Geometry` object and the
+   same `Material` object.
 
 * There is a [scenegraph](threejs-scenegraph.html) consisting of various objects
   including a `Scene` at the root, multiple `Mesh` objects, `Light` objects,
@@ -69,15 +74,15 @@ Things to notice about the diagram above.
   Note that `Camera` is half in half out of the scenegraph. This is because in
   three.js a `Camera` does not have to be in the scenegraph to function. The
   advantage to putting it in the scenegraph is you'd get all the benefits of the
-  scenegraph itself letting you more easily put `Camera` objects relative to the
+  scenegraph itself letting you more easily position `Camera` objects relative to the
   motion of other objects in the scene. There is an example of putting cameras
   in the scenegraph at the end of [the article on scenegraphs](threejs-scenegraph.html).
 
 * There is a `Renderer`
 
-  This is arguably the main object of three.js. You pass a `Renderer` a `Scene`
-  and a `Camera` and it renders (draws) the portion of the 3D scene that is inside the 
-  *frustum* of the camera as a 2D image to a canvas.
+  This is arguably the main object of three.js. You pass a `Scene` and a
+  `Camera` to a `Renderer` and it renders (draws) the portion of the 3D scene
+  that is inside the *frustum* of the camera as a 2D image to a canvas.
 
 Given all of that we're going to make the smallest *"Hello Cube"* setup
 that looks like this
