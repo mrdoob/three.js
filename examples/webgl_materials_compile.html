@@ -58,7 +58,6 @@
 			var frame = new NodeFrame();
 			var teapot;
 			var controls;
-			var rtTexture, rtMaterial;
 			var meshes = [];
 
 			document.getElementById( "preload" ).addEventListener( 'click', function () {
@@ -151,20 +150,6 @@
 
 				if ( mesh.material ) mesh.material.dispose();
 
-				if ( rtTexture ) {
-
-					rtTexture.dispose();
-					rtTexture = null;
-
-				}
-
-				if ( rtMaterial ) {
-
-					rtMaterial.dispose();
-					rtMaterial = null;
-
-				}
-
 				var mtl = new PhongNodeMaterial();
 
 				var time = new TimerNode();
@@ -217,8 +202,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				if ( rtTexture ) rtTexture.setSize( width, height );
 
 			}
 
