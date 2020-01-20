@@ -11,9 +11,10 @@ function Scene() {
 	this.type = 'Scene';
 
 	this.background = null;
+	this.bgRoughness = 0.0;
 	this.environment = null;
 	this.fog = null;
-
+	
 	this.overrideMaterial = null;
 
 	this.autoUpdate = true; // checked by the renderer
