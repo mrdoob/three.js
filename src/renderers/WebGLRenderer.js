@@ -1855,6 +1855,13 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( material.isMeshDepthMaterial ) {
+
+			p_uniforms.setValue( _gl, 'depthOffsetUnits', material.depthOffsetUnits );
+			p_uniforms.setValue( _gl, 'depthOffsetFactor', material.depthOffsetFactor );
+
+		}
+
 		if ( refreshMaterial || materialProperties.receiveShadow !== object.receiveShadow ) {
 
 			materialProperties.receiveShadow = object.receiveShadow;
@@ -2534,6 +2541,9 @@ function WebGLRenderer( parameters ) {
 			uniforms.displacementBias.value = material.displacementBias;
 
 		}
+
+		uniforms.depthOffsetUnits.value = material.depthOffsetUnits;
+		uniforms.depthOffsetFactor.value = material.depthOffsetFactor;
 
 	}
 

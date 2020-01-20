@@ -13,6 +13,11 @@ export default /* glsl */`
 #include <logdepthbuf_pars_fragment>
 #include <clipping_planes_pars_fragment>
 
+#ifdef USE_DEPTH_OFFSET
+	uniform float depthOffsetUnits;
+	uniform float depthOffsetFactor;
+#endif
+
 void main() {
 
 	#include <clipping_planes_fragment>
@@ -31,13 +36,26 @@ void main() {
 
 	#include <logdepthbuf_fragment>
 
+	float depth = gl_FragCoord.z;
+
+	#ifdef USE_DEPTH_OFFSET
+		// polygon offset seems not working properly when using ANGLE (OpenGL on top of Direct3D layer)
+		// the shader needs to provide the required functionality instead
+		float dx = dFdx(depth);
+		float dy = dFdy(depth);
+		float d = sqrt(dx*dx + dy*dy);
+
+		float unit = 1e-7; // cca 1 / 2^23
+		depth += d * depthOffsetFactor + depthOffsetUnits * unit;
+	#endif
+
 	#if DEPTH_PACKING == 3200
 
-		gl_FragColor = vec4( vec3( 1.0 - gl_FragCoord.z ), opacity );
+		gl_FragColor = vec4( vec3( 1.0 - depth ), opacity );
 
 	#elif DEPTH_PACKING == 3201
 
-		gl_FragColor = packDepthToRGBA( gl_FragCoord.z );
+		gl_FragColor = packDepthToRGBA( depth );
 
 	#endif
 

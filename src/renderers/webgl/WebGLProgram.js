@@ -635,6 +635,8 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 			parameters.lightMapEncoding ? getTexelDecodingFunction( 'lightMapTexelToLinear', parameters.lightMapEncoding ) : '',
 			parameters.outputEncoding ? getTexelEncodingFunction( 'linearToOutputTexel', parameters.outputEncoding ) : '',
 
+			parameters.depthOffsetFactor || parameters.depthOffsetUnits ? "#define USE_DEPTH_OFFSET" : "",
+
 			parameters.depthPacking ? '#define DEPTH_PACKING ' + parameters.depthPacking : '',
 
 			'\n'

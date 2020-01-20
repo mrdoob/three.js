@@ -36,12 +36,18 @@ function MeshDepthMaterial( parameters ) {
 	this.morphTargets = false;
 
 	this.map = null;
+	this.extensions = {
+		derivatives: true
+	};
 
 	this.alphaMap = null;
 
 	this.displacementMap = null;
 	this.displacementScale = 1;
 	this.displacementBias = 0;
+
+	this.depthOffsetUnits = 0;
+	this.depthOffsetFactor = 0;
 
 	this.wireframe = false;
 	this.wireframeLinewidth = 1;
@@ -77,9 +83,11 @@ MeshDepthMaterial.prototype.copy = function ( source ) {
 	this.wireframe = source.wireframe;
 	this.wireframeLinewidth = source.wireframeLinewidth;
 
+	this.depthOffsetUnits = source.depthOffsetUnits;
+	this.depthOffsetFactor = source.depthOffsetFactor;
+
 	return this;
 
 };
-
 
 export { MeshDepthMaterial };

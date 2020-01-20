@@ -49,7 +49,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		"numDirLightShadows", "numPointLightShadows", "numSpotLightShadows",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
-		"sheen"
+		"sheen",
+		"depthOffsetFactor", "depthOffsetUnits"
 	];
 
 	function getShaderObject( material, shaderID ) {
@@ -265,6 +266,9 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
+
+			depthOffsetFactor: material.depthOffsetFactor,
+			depthOffsetUnits: material.depthOffsetUnits,
 
 			toneMapping: material.toneMapped ? renderer.toneMapping : NoToneMapping,
 			physicallyCorrectLights: renderer.physicallyCorrectLights,
