@@ -1941,21 +1941,25 @@ function WebGLRenderer( parameters ) {
 
 			var uniform = uniforms[ property ];
 
-			if ( uniform.onUpdate ) {
+			if ( uniform.needsUpdate !== false ) {
 
-				uniform.onUpdate( uniforms, material, _this, scene );
+				if ( uniform.onUpdate ) {
 
-			} else if ( material[ property ] !== undefined ) {
+					uniform.onUpdate( uniforms, material, _this, scene );
 
-				var value = material[ property ];
+				} else if ( material[ property ] !== undefined ) {
 
-				if ( value !== null && ( value.isVector2 || value.isVector3 || value.isVector4 || value.isMatrix3 || value.isMatrix4 ) ) {
+					var value = material[ property ];
 
-					uniform.value.copy( value );
+					if ( value !== null && ( value.isVector2 || value.isVector3 || value.isVector4 || value.isMatrix3 || value.isMatrix4 ) ) {
 
-				} else {
+						uniform.value.copy( value );
 
-					uniform.value = value;
+					} else {
+
+						uniform.value = value;
+
+					}
 
 				}
 
