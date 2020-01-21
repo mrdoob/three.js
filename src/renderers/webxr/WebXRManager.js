@@ -40,6 +40,9 @@ function WebXRManager( renderer, gl ) {
 	cameraVR.layers.enable( 1 );
 	cameraVR.layers.enable( 2 );
 
+	var _currentDepthNear = null;
+	var _currentDepthFar = null;
+
 	//
 
 	this.enabled = false;
@@ -300,6 +303,20 @@ function WebXRManager( renderer, gl ) {
 	}
 
 	this.getCamera = function ( camera ) {
+
+		cameraVR.near = cameraR.near = cameraL.near = camera.near;
+		cameraVR.far = cameraR.far = cameraL.far = camera.far;
+		if ( _currentDepthNear !== cameraVR.near || _currentDepthFar !== cameraVR.far ) {
+
+			session.updateRenderState( {
+				depthNear: cameraVR.near,
+				depthFar: cameraVR.far
+			} );
+
+			_currentDepthNear = cameraVR.near;
+			_currentDepthFar = cameraVR.far;
+
+		}
 
 		var parent = camera.parent;
 		var cameras = cameraVR.cameras;
