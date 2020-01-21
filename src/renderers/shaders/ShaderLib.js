@@ -41,9 +41,7 @@ var ShaderLib = {
 			UniformsLib.emissivemap,
 			UniformsLib.fog,
 			UniformsLib.lights,
-			{
-				emissive: { value: new Color( 0x000000 ) }
-			}
+			UniformsLib.emissive
 		] ),
 
 		vertexShader: ShaderChunk.meshlambert_vert,
@@ -65,10 +63,10 @@ var ShaderLib = {
 			UniformsLib.displacementmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
+			UniformsLib.emissive,
+			UniformsLib.shininess,
 			{
-				emissive: { value: new Color( 0x000000 ) },
 				specular: { value: new Color( 0x111111 ) },
-				shininess: { value: 30 }
 			}
 		] ),
 
@@ -92,8 +90,8 @@ var ShaderLib = {
 			UniformsLib.metalnessmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
+			UniformsLib.emissive,
 			{
-				emissive: { value: new Color( 0x000000 ) },
 				roughness: { value: 0.5 },
 				metalness: { value: 0.5 },
 				envMapIntensity: { value: 1 } // temporary
@@ -119,10 +117,10 @@ var ShaderLib = {
 			UniformsLib.gradientmap,
 			UniformsLib.fog,
 			UniformsLib.lights,
+			UniformsLib.emissive,
+			UniformsLib.shininess,
 			{
-				emissive: { value: new Color( 0x000000 ) },
-				specular: { value: new Color( 0x111111 ) },
-				shininess: { value: 30 }
+				specular: { value: new Color( 0x111111 ) }
 			}
 		] ),
 

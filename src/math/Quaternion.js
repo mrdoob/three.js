@@ -5,7 +5,7 @@
  * @author bhouston / http://clara.io
  */
 
-import { _Math } from './Math.js';
+import { MathUtils } from './MathUtils.js';
 
 function Quaternion( x, y, z, w ) {
 
@@ -394,7 +394,7 @@ Object.assign( Quaternion.prototype, {
 
 	angleTo: function ( q ) {
 
-		return 2 * Math.acos( Math.abs( _Math.clamp( this.dot( q ), - 1, 1 ) ) );
+		return 2 * Math.acos( Math.abs( MathUtils.clamp( this.dot( q ), - 1, 1 ) ) );
 
 	},
 

@@ -1,5 +1,5 @@
 import { Vector3 } from './Vector3.js';
-import { _Math } from './Math.js';
+import { MathUtils } from './MathUtils.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -104,7 +104,7 @@ Object.assign( Line3.prototype, {
 
 		if ( clampToLine ) {
 
-			t = _Math.clamp( t, 0, 1 );
+			t = MathUtils.clamp( t, 0, 1 );
 
 		}
 

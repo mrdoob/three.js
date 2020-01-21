@@ -35,7 +35,7 @@
 				using [page:BufferAttribute] instances to define custom attributes.
 			</li>
 			<li>
-				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLRenderTargetCube] instances
+				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLCubeRenderTarget] instances
 				are no longer supposed to be used as uniforms. Their [page:Texture texture] property
 				must be used instead.
 			</li>
@@ -350,13 +350,6 @@ this.extensions = {
 			to bind a generic vertex index to an attribute variable.
 			Default is undefined.
 
-		</p>
-
-		<h3>[property:Boolean isShaderMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are shader materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
 		</p>
 
 		<h3>[property:Boolean lights]</h3>

@@ -29,7 +29,7 @@
 			<li> 从 THREE r72开始，不再支持在ShaderMaterial中直接分配属性。
 				必须使用 [page:BufferGeometry]实例 (而不是 [page:Geometry] 实例)，使用[page:BufferAttribute]实例来定义自定义属性。
 			</li>
-			<li> 从 THREE r77开始，[page:WebGLRenderTarget] 或 [page:WebGLRenderTargetCube] 实例不再被用作uniforms。
+			<li> 从 THREE r77开始，[page:WebGLRenderTarget] 或 [page:WebGLCubeRenderTarget] 实例不再被用作uniforms。
 				必须使用它们的[page:Texture texture] 属性。
 			</li>
 			<li> 内置attributes和uniforms与代码一起传递到shaders。
@@ -312,11 +312,6 @@ this.extensions = {
 		<p> 如果设置，则调用[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bindAttribLocation gl.bindAttribLocation]
 			将通用顶点索引绑定到属性变量。默认值未定义。
 
-		</p>
-
-		<h3>[property:Boolean isShaderMaterial]</h3>
-		<p> 用于检查此类或派生类是否为着色器材质。默认值为 *true*。<br /><br />
-			因为其通常用在内部优化，所以不应该更改该属性值。
 		</p>
 
 		<h3>[property:Boolean lights]</h3>

@@ -14,7 +14,6 @@ var Config = function () {
 		'project/title': '',
 		'project/editable': false,
 
-		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
 
@@ -76,3 +75,5 @@ var Config = function () {
 	};
 
 };
+
+export { Config };

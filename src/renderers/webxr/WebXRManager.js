@@ -24,13 +24,7 @@ function WebXRManager( renderer, gl ) {
 	var pose = null;
 
 	var controllers = [];
-	var sortedInputSources = [];
-
-	function isPresenting() {
-
-		return session !== null && referenceSpace !== null;
-
-	}
+	var inputSourcesMap = new Map();
 
 	//
 
@@ -49,6 +43,8 @@ function WebXRManager( renderer, gl ) {
 	//
 
 	this.enabled = false;
+
+	this.isPresenting = false;
 
 	this.getController = function ( id ) {
 
@@ -72,13 +68,11 @@ function WebXRManager( renderer, gl ) {
 
 	function onSessionEvent( event ) {
 
-		for ( var i = 0; i < controllers.length; i ++ ) {
+		var controller = inputSourcesMap.get( event.inputSource );
 
-			if ( sortedInputSources[ i ] === event.inputSource ) {
+		if ( controller ) {
 
-				controllers[ i ].dispatchEvent( { type: event.type } );
-
-			}
+			controller.dispatchEvent( { type: event.type } );
 
 		}
 
@@ -86,9 +80,22 @@ function WebXRManager( renderer, gl ) {
 
 	function onSessionEnd() {
 
+		inputSourcesMap.forEach( function ( controller, inputSource ) {
+
+			controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
+			controller.visible = false;
+
+		} );
+
+		inputSourcesMap.clear();
+
+		//
+
 		renderer.setFramebuffer( null );
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
+
+		scope.isPresenting = false;
 
 		scope.dispatchEvent( { type: 'sessionend' } );
 
@@ -100,6 +107,8 @@ function WebXRManager( renderer, gl ) {
 
 		animation.setContext( session );
 		animation.start();
+
+		scope.isPresenting = true;
 
 		scope.dispatchEvent( { type: 'sessionstart' } );
 
@@ -114,6 +123,12 @@ function WebXRManager( renderer, gl ) {
 	this.setReferenceSpaceType = function ( value ) {
 
 		referenceSpaceType = value;
+
+	};
+
+	this.getReferenceSpace = function () {
+
+		return referenceSpace;
 
 	};
 
@@ -137,8 +152,19 @@ function WebXRManager( renderer, gl ) {
 			session.addEventListener( 'squeezeend', onSessionEvent );
 			session.addEventListener( 'end', onSessionEnd );
 
+			var attributes = gl.getContextAttributes();
+
+			var layerInit = {
+				antialias: attributes.antialias,
+				alpha: attributes.alpha,
+				depth: attributes.depth,
+				stencil: attributes.stencil
+			};
+
 			// eslint-disable-next-line no-undef
-			session.updateRenderState( { baseLayer: new XRWebGLLayer( session, gl ) } );
+			var baseLayer = new XRWebGLLayer( session, gl, layerInit );
+
+			session.updateRenderState( { baseLayer: baseLayer } );
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
@@ -146,33 +172,50 @@ function WebXRManager( renderer, gl ) {
 
 			session.addEventListener( 'inputsourceschange', updateInputSources );
 
-			updateInputSources();
-
 		}
 
 	};
 
-	function updateInputSources() {
-
-		for ( var i = 0; i < controllers.length; i ++ ) {
-
-			sortedInputSources[ i ] = findInputSource( i );
-
-		}
-
-	}
-
-	function findInputSource( id ) {
+	function updateInputSources( event ) {
 
 		var inputSources = session.inputSources;
 
-		for ( var i = 0; i < inputSources.length; i ++ ) {
+		// Assign inputSources to available controllers
 
-			var inputSource = inputSources[ i ];
-			var handedness = inputSource.handedness;
+		for ( var i = 0; i < controllers.length; i ++ ) {
 
-			if ( id === 0 && ( handedness === 'none' || handedness === 'right' ) ) return inputSource;
-			if ( id === 1 && ( handedness === 'left' ) ) return inputSource;
+			inputSourcesMap.set( inputSources[ i ], controllers[ i ] );
+
+		}
+
+		// Notify disconnected
+
+		for ( var i = 0; i < event.removed.length; i ++ ) {
+
+			var inputSource = event.removed[ i ];
+			var controller = inputSourcesMap.get( inputSource );
+
+			if ( controller ) {
+
+				controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
+				inputSourcesMap.delete( inputSource );
+
+			}
+
+		}
+
+		// Notify connected
+
+		for ( var i = 0; i < event.added.length; i ++ ) {
+
+			var inputSource = event.added[ i ];
+			var controller = inputSourcesMap.get( inputSource );
+
+			if ( controller ) {
+
+				controller.dispatchEvent( { type: 'connected', data: inputSource } );
+
+			}
 
 		}
 
@@ -287,8 +330,6 @@ function WebXRManager( renderer, gl ) {
 
 	};
 
-	this.isPresenting = isPresenting;
-
 	// Animation Loop
 
 	var onAnimationFrameCallback = null;
@@ -308,10 +349,9 @@ function WebXRManager( renderer, gl ) {
 
 				var view = views[ i ];
 				var viewport = baseLayer.getViewport( view );
-				var viewMatrix = view.transform.inverse.matrix;
 
 				var camera = cameraVR.cameras[ i ];
-				camera.matrix.fromArray( viewMatrix ).getInverse( camera.matrix );
+				camera.matrix.fromArray( view.transform.matrix );
 				camera.projectionMatrix.fromArray( view.projectionMatrix );
 				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
@@ -327,11 +367,13 @@ function WebXRManager( renderer, gl ) {
 
 		//
 
+		var inputSources = session.inputSources;
+
 		for ( var i = 0; i < controllers.length; i ++ ) {
 
 			var controller = controllers[ i ];
 
-			var inputSource = sortedInputSources[ i ];
+			var inputSource = inputSources[ i ];
 
 			if ( inputSource ) {
 

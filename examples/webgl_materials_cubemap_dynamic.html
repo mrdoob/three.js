@@ -8,7 +8,7 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
 		<script type="module">
 
@@ -53,7 +53,7 @@
 					magFilter: THREE.LinearFilter
 				};
 
-				scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
+				scene.background = new THREE.WebGLCubeRenderTarget( 1024, options ).fromEquirectangularTexture( renderer, texture );
 
 				//
 
@@ -135,7 +135,7 @@
 
 				var fov = camera.fov + event.deltaY * 0.05;
 
-				camera.fov = THREE.Math.clamp( fov, 10, 75 );
+				camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
 
 				camera.updateProjectionMatrix();
 
@@ -155,8 +155,8 @@
 				lon += .15;
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = THREE.Math.degToRad( 90 - lat );
-				theta = THREE.Math.degToRad( lon );
+				phi = THREE.MathUtils.degToRad( 90 - lat );
+				theta = THREE.MathUtils.degToRad( lon );
 
 				cube.position.x = Math.cos( time * 0.001 ) * 30;
 				cube.position.y = Math.sin( time * 0.001 ) * 30;

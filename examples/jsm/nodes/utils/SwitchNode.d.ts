@@ -1,5 +1,4 @@
 import { Node } from '../core/Node';
-import { NodeBuilder } from '../core/NodeBuilder';
 
 export class SwitchNode extends Node {
 

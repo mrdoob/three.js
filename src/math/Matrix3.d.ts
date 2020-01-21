@@ -1,5 +1,4 @@
 import { Matrix4 } from './Matrix4';
-import { BufferAttribute } from './../core/BufferAttribute';
 import { Vector3 } from './Vector3';
 
 /**
@@ -74,18 +73,6 @@ export class Matrix3 implements Matrix {
 	clone(): this;
 	copy( m: Matrix3 ): this;
 	setFromMatrix4( m: Matrix4 ): Matrix3;
-
-	/**
-	 * @deprecated Use {@link Matrix3#applyToBufferAttribute matrix3.applyToBufferAttribute( attribute )} instead.
-	 */
-	applyToBuffer(
-		buffer: BufferAttribute,
-		offset?: number,
-		length?: number
-	): BufferAttribute;
-
-	applyToBufferAttribute( attribute: BufferAttribute ): BufferAttribute;
-
 	multiplyScalar( s: number ): Matrix3;
 	determinant(): number;
 	getInverse( matrix: Matrix3, throwOnDegenerate?: boolean ): Matrix3;
@@ -99,7 +86,7 @@ export class Matrix3 implements Matrix {
 	/**
 	 * Transposes this matrix into the supplied array r, and returns itself.
 	 */
-	transposeIntoArray( r: number[] ): number[];
+	transposeIntoArray( r: number[] ): Matrix3;
 
 	setUvTransform( tx: number, ty: number, sx: number, sy: number, rotation: number, cx: number, cy: number ): Matrix3;
 

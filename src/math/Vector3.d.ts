@@ -27,7 +27,7 @@ export class Vector3 implements Vector {
 	x: number;
 	y: number;
 	z: number;
-	isVector3: true;
+	readonly isVector3: true;
 
 	/**
 	 * Sets value of this vector.
@@ -244,6 +244,7 @@ export class Vector3 implements Vector {
 	setFromMatrixPosition( m: Matrix4 ): this;
 	setFromMatrixScale( m: Matrix4 ): this;
 	setFromMatrixColumn( matrix: Matrix4, index: number ): this;
+	setFromMatrix3Column( matrix: Matrix3, index: number ): this;
 
 	/**
 	 * Checks for strict equality of this vector and v.

@@ -1,5 +1,4 @@
 import { TempNode } from '../core/TempNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 import { FloatNode } from '../inputs/FloatNode';
 import { FunctionNode } from '../core/FunctionNode';
 import { TextureNode } from '../inputs/TextureNode';

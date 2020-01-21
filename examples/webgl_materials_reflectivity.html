@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Standard Material Reflectivity (reflectance at F0)<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Standard Material Reflectivity (reflectance at F0)<br/>
 			example by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
 		</div>
 
@@ -24,7 +24,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var container, stats;
 			var params = {
@@ -58,7 +57,7 @@
 				gemBackMaterial = new THREE.MeshPhysicalMaterial( {
 					map: null,
 					color: 0x0000ff,
-					metalness: 1.0,
+					metalness: 1,
 					roughness: 0,
 					opacity: 0.5,
 					side: THREE.BackSide,
@@ -71,12 +70,12 @@
 				gemFrontMaterial = new THREE.MeshPhysicalMaterial( {
 					map: null,
 					color: 0x0000ff,
-					metalness: 0.0,
+					metalness: 0,
 					roughness: 0,
-					opacity: 0.15,
+					opacity: 0.25,
 					side: THREE.FrontSide,
 					transparent: true,
-					envMapIntensity: 5,
+					envMapIntensity: 10,
 					premultipliedAlpha: true
 				} );
 
@@ -115,19 +114,20 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_1k.hdr', function ( hdrCubeMap ) {
+					.load( 'royal_esplanade_1k.hdr', function ( hdrEquirect ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
-						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
+						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
 						pmremGenerator.dispose();
 
 						gemFrontMaterial.envMap = gemBackMaterial.envMap = hdrCubeRenderTarget.texture;
 						gemFrontMaterial.needsUpdate = gemBackMaterial.needsUpdate = true;
 
-						hdrCubeMap.dispose();
+						hdrEquirect.dispose();
 
 					} );
 
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				// Lights
 

@@ -20,7 +20,7 @@ export class InterleavedBufferAttribute {
 	get count(): number;
 	get array(): ArrayLike<number>;
 
-	isInterleavedBufferAttribute: true;
+	readonly isInterleavedBufferAttribute: true;
 
 	applyMatrix4( m: Matrix4 ): this;
 	getX( index: number ): number;

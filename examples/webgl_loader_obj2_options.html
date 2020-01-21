@@ -44,7 +44,7 @@
 
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 usage options
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 usage options
 			<div id="feedback"></div>
 		</div>
 
@@ -56,6 +56,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
+			import { VertexNormalsHelper } from "./jsm/helpers/VertexNormalsHelper.js";
 
 			import { MTLLoader } from "./jsm/loaders/MTLLoader.js";
 			import { MtlObjBridge } from "./jsm/loaders/obj2/bridge/MtlObjBridge.js";
@@ -167,9 +168,14 @@
 					let modelName = 'female02_vertex' ;
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
+					let local = new THREE.Object3D();
+					local.name = 'Pivot_female02_vertex';
+					local.position.set( -75, 0, 0 );
+					this.pivot.add( local );
+
 					let scope = this;
 					function callbackOnLoad( object3d, message ) {
-						scope.scene.add( object3d );
+						local.add( object3d );
 						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
 					}
 
@@ -226,7 +232,7 @@
 
 					let local = new THREE.Object3D();
 					local.name = 'Pivot_WaltHead';
-					local.position.set( -125, 50, 0 );
+					local.position.set( -175, 50, 0 );
 					let scale = 0.5;
 					local.scale.set( scale, scale, scale );
 					this.pivot.add( local );
@@ -271,8 +277,8 @@
 
 				useLoadParallelMeshAlter: function () {
 					let local = new THREE.Object3D();
-					local.position.set( 125, 50, 0 );
-					local.name = 'Pivot_vive-controller';
+					local.position.set( 175, -100, 0 );
+					local.name = 'Pivot_ninjaHead';
 					this.pivot.add( local );
 
 					let objLoader2Parallel = new OBJLoader2Parallel()
@@ -286,10 +292,8 @@
 						let override = new LoadedMeshUserOverride( false, true );
 
 						let mesh = new THREE.Mesh( event.detail.bufferGeometry, event.detail.material );
-						let scale = 200.0;
-						mesh.scale.set( scale, scale, scale );
 						mesh.name = event.detail.meshName;
-						let helper = new THREE.VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
+						let helper = new VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
 						helper.name = 'VertexNormalsHelper';
 
 						override.addMesh( mesh );
@@ -304,7 +308,7 @@
 						scope._reportProgress( { detail: { text: 'Loading of ' + objLoader2Parallel.modelName + 'completed: ' + message } } );
 					}
 
-					objLoader2Parallel.load( 'models/obj/vive-controller/vr_controller_vive_1_5.obj', callbackOnLoad );
+					objLoader2Parallel.load( 'models/obj/ninja/ninjaHead_Low.obj', callbackOnLoad );
 				},
 
 				finalize: function () {

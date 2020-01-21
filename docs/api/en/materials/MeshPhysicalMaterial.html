@@ -37,8 +37,10 @@
 		</script>
 
 		<h2>Examples</h2>
-		[example:webgl_materials_variations_physical materials / variations / physical]<br />
-		[example:webgl_materials_reflectivity materials / reflectivity]
+		<p>
+			[example:webgl_materials_variations_physical materials / variations / physical]<br />
+			[example:webgl_materials_reflectivity materials / reflectivity]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -63,13 +65,6 @@
 		<h3>[property:Float clearcoatRoughness]</h3>
 		<p>How rough the clearcoat appears, from *0.0* to *1.0*. Default is *0.0*.</p>
 
-		<h3>[property:Boolean isMeshPhysicalMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are mesh physical materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:Object defines]</h3>
 		<p>An object of the form:
 			<code>
@@ -77,7 +72,7 @@
 
 					'STANDARD': ''
 					'PHYSICAL': '',
-			
+
 				};
 			</code>
 

@@ -44,6 +44,7 @@
 					// var material = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.1, transparent: true } );
 
 					mesh = new THREE.InstancedMesh( geometry, material, count );
+					mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 					scene.add( mesh );
 
 					//

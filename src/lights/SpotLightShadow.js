@@ -1,5 +1,5 @@
 import { LightShadow } from './LightShadow.js';
-import { _Math } from '../math/Math.js';
+import { MathUtils } from '../math/MathUtils.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 
 /**
@@ -22,7 +22,7 @@ SpotLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype 
 
 		var camera = this.camera;
 
-		var fov = _Math.RAD2DEG * 2 * light.angle;
+		var fov = MathUtils.RAD2DEG * 2 * light.angle;
 		var aspect = this.mapSize.width / this.mapSize.height;
 		var far = light.distance || camera.far;
 
