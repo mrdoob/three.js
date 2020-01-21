@@ -3,13 +3,19 @@
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
-const ObjectManipulator = {
+const ObjectManipulator = function () {
+};
+
+ObjectManipulator.prototype = {
+
+	constructor: ObjectManipulator,
 
 	/**
 	 * Applies values from parameter object via set functions or via direct assignment.
 	 *
 	 * @param {Object} objToAlter The objToAlter instance
 	 * @param {Object} params The parameter object
+	 * @param {boolean} forceCreation Force the creation of a property
 	 */
 	applyProperties: function ( objToAlter, params, forceCreation ) {
 
@@ -81,8 +87,9 @@ DefaultWorkerPayloadHandler.prototype = {
 				parser.setLogging( this.logging.enabled, this.logging.debug );
 
 			}
-			ObjectManipulator.applyProperties( parser, payload.params, false );
-			ObjectManipulator.applyProperties( parser, callbacks, false );
+			let objectManipulator = new ObjectManipulator();
+			objectManipulator.applyProperties( parser, payload.params, false );
+			objectManipulator.applyProperties( parser, callbacks, false );
 
 			let arraybuffer = payload.data.input;
 			let executeFunctionName = 'execute';

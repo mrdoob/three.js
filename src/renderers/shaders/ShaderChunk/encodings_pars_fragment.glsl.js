@@ -55,8 +55,8 @@ vec4 LinearToRGBD( in vec4 value, in float maxRange ) {
 	// NOTE: The implementation with min causes the shader to not compile on
 	// a common Alcatel A502DL in Chrome 78/Android 8.1. Some research suggests 
 	// that the chipset is Mediatek MT6739 w/ IMG PowerVR GE8100 GPU.
-	// D = min(floor(D)/255.0, 1.0);
-	D = clamp(floor(D)/255.0, 0.0, 1.0);
+	// D = min( floor( D ) / 255.0, 1.0 );
+	D = clamp( floor( D ) / 255.0, 0.0, 1.0 );
 	return vec4( value.rgb * ( D * ( 255.0 / maxRange ) ), D );
 }
 

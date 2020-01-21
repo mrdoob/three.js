@@ -86,7 +86,7 @@ export class Matrix3 implements Matrix {
 	/**
 	 * Transposes this matrix into the supplied array r, and returns itself.
 	 */
-	transposeIntoArray( r: number[] ): number[];
+	transposeIntoArray( r: number[] ): Matrix3;
 
 	setUvTransform( tx: number, ty: number, sx: number, sy: number, rotation: number, cx: number, cy: number ): Matrix3;
 

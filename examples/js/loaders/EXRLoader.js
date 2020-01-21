@@ -108,6 +108,15 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 		const INT16_SIZE = 2;
 		const INT8_SIZE = 1;
 
+		const STATIC_HUFFMAN = 0;
+		const DEFLATE = 1;
+
+		const UNKNOWN = 0;
+		const LOSSY_DCT = 1;
+		const RLE = 2;
+
+		const logBase = Math.pow( 2.7182818, 2.2 );
+
 		function reverseLutFromBitmap( bitmap, lut ) {
 
 			var k = 0;
@@ -757,12 +766,405 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 					}
 
-
 				}
 
 			}
 
 			return out;
+
+		}
+
+		function lossyDctDecode( cscSet, rowPtrs, channelData, acBuffer, dcBuffer, outBuffer ) {
+
+			var dataView = new DataView( outBuffer.buffer );
+
+			var width = channelData[ cscSet.idx[ 0 ] ].width;
+			var height = channelData[ cscSet.idx[ 0 ] ].height;
+
+			var numComp = 3;
+
+			var numFullBlocksX = Math.floor( width / 8.0 );
+			var numBlocksX = Math.ceil( width / 8.0 );
+			var numBlocksY = Math.ceil( height / 8.0 );
+			var leftoverX = width - ( numBlocksX - 1 ) * 8;
+			var leftoverY = height - ( numBlocksY - 1 ) * 8;
+
+			var currAcComp = { value: 0 };
+			var currDcComp = new Array( numComp );
+			var dctData = new Array( numComp );
+			var halfZigBlock = new Array( numComp );
+			var rowBlock = new Array( numComp );
+			var rowOffsets = new Array( numComp );
+
+			for ( let comp = 0; comp < numComp; ++ comp ) {
+
+				rowOffsets[ comp ] = rowPtrs[ cscSet.idx[ comp ] ];
+				currDcComp[ comp ] = ( comp < 1 ) ? 0 : currDcComp[ comp - 1 ] + numBlocksX * numBlocksY;
+				dctData[ comp ] = new Float32Array( 64 );
+				halfZigBlock[ comp ] = new Uint16Array( 64 );
+				rowBlock[ comp ] = new Uint16Array( numBlocksX * 64 );
+
+			}
+
+			for ( let blocky = 0; blocky < numBlocksY; ++ blocky ) {
+
+				var maxY = 8;
+
+				if ( blocky == numBlocksY - 1 )
+					maxY = leftoverY;
+
+				var maxX = 8;
+
+				for ( let blockx = 0; blockx < numBlocksX; ++ blockx ) {
+
+					if ( blockx == numBlocksX - 1 )
+						maxX = leftoverX;
+
+					for ( let comp = 0; comp < numComp; ++ comp ) {
+
+						halfZigBlock[ comp ].fill( 0 );
+
+						// set block DC component
+						halfZigBlock[ comp ][ 0 ] = dcBuffer[ currDcComp[ comp ] ++ ];
+						// set block AC components
+						unRleAC( currAcComp, acBuffer, halfZigBlock[ comp ] );
+
+						// UnZigZag block to float
+						unZigZag( halfZigBlock[ comp ], dctData[ comp ] );
+						// decode float dct
+						dctInverse( dctData[ comp ] );
+
+					}
+
+					if ( numComp == 3 ) {
+
+						csc709Inverse( dctData );
+
+					}
+
+					for ( let comp = 0; comp < numComp; ++ comp ) {
+
+						convertToHalf( dctData[ comp ], rowBlock[ comp ], blockx * 64 );
+
+					}
+
+				} // blockx
+
+				let offset = 0;
+
+				for ( let comp = 0; comp < numComp; ++ comp ) {
+
+					let type = channelData[ cscSet.idx[ comp ] ].type;
+
+					for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
+
+						offset = rowOffsets[ comp ][ y ];
+
+						for ( let blockx = 0; blockx < numFullBlocksX; ++ blockx ) {
+
+							let src = blockx * 64 + ( ( y & 0x7 ) * 8 );
+
+							dataView.setUint16( offset + 0 * INT16_SIZE * type, rowBlock[ comp ][ src + 0 ], true );
+							dataView.setUint16( offset + 1 * INT16_SIZE * type, rowBlock[ comp ][ src + 1 ], true );
+							dataView.setUint16( offset + 2 * INT16_SIZE * type, rowBlock[ comp ][ src + 2 ], true );
+							dataView.setUint16( offset + 3 * INT16_SIZE * type, rowBlock[ comp ][ src + 3 ], true );
+
+							dataView.setUint16( offset + 4 * INT16_SIZE * type, rowBlock[ comp ][ src + 4 ], true );
+							dataView.setUint16( offset + 5 * INT16_SIZE * type, rowBlock[ comp ][ src + 5 ], true );
+							dataView.setUint16( offset + 6 * INT16_SIZE * type, rowBlock[ comp ][ src + 6 ], true );
+							dataView.setUint16( offset + 7 * INT16_SIZE * type, rowBlock[ comp ][ src + 7 ], true );
+
+							offset += 8 * INT16_SIZE * type;
+
+						}
+
+					}
+
+					// handle partial X blocks
+					if ( numFullBlocksX != numBlocksX ) {
+
+						for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
+
+							let offset = rowOffsets[ comp ][ y ] + 8 * numFullBlocksX * INT16_SIZE * type;
+							let src = numFullBlocksX * 64 + ( ( y & 0x7 ) * 8 );
+
+							for ( let x = 0; x < maxX; ++ x ) {
+
+								dataView.setUint16( offset + x * INT16_SIZE * type, rowBlock[ comp ][ src + x ], true );
+
+							}
+
+						}
+
+					}
+
+				} // comp
+
+			} // blocky
+
+			var halfRow = new Uint16Array( width );
+			var dataView = new DataView( outBuffer.buffer );
+
+			// convert channels back to float, if needed
+			for ( var comp = 0; comp < numComp; ++ comp ) {
+
+				channelData[ cscSet.idx[ comp ] ].decoded = true;
+				var type = channelData[ cscSet.idx[ comp ] ].type;
+
+				if ( channelData[ comp ].type != 2 ) continue;
+
+				for ( var y = 0; y < height; ++ y ) {
+
+					let offset = rowOffsets[ comp ][ y ];
+
+					for ( var x = 0; x < width; ++ x ) {
+
+						halfRow[ x ] = dataView.getUint16( offset + x * INT16_SIZE * type, true );
+
+					}
+
+					for ( var x = 0; x < width; ++ x ) {
+
+						dataView.setFloat32( offset + x * INT16_SIZE * type, decodeFloat16( halfRow[ x ] ), true );
+
+					}
+
+				}
+
+			}
+
+		}
+
+		function unRleAC( currAcComp, acBuffer, halfZigBlock ) {
+
+			var acValue;
+			var dctComp = 1;
+
+			while ( dctComp < 64 ) {
+
+				acValue = acBuffer[ currAcComp.value ];
+
+				if ( acValue == 0xff00 ) {
+
+					dctComp = 64;
+
+				} else if ( acValue >> 8 == 0xff ) {
+
+					dctComp += acValue & 0xff;
+
+				} else {
+
+					halfZigBlock[ dctComp ] = acValue;
+					dctComp ++;
+
+				}
+
+				currAcComp.value ++;
+
+			}
+
+		}
+
+		function unZigZag( src, dst ) {
+
+			dst[ 0 ] = decodeFloat16( src[ 0 ] );
+			dst[ 1 ] = decodeFloat16( src[ 1 ] );
+			dst[ 2 ] = decodeFloat16( src[ 5 ] );
+			dst[ 3 ] = decodeFloat16( src[ 6 ] );
+			dst[ 4 ] = decodeFloat16( src[ 14 ] );
+			dst[ 5 ] = decodeFloat16( src[ 15 ] );
+			dst[ 6 ] = decodeFloat16( src[ 27 ] );
+			dst[ 7 ] = decodeFloat16( src[ 28 ] );
+			dst[ 8 ] = decodeFloat16( src[ 2 ] );
+			dst[ 9 ] = decodeFloat16( src[ 4 ] );
+
+			dst[ 10 ] = decodeFloat16( src[ 7 ] );
+			dst[ 11 ] = decodeFloat16( src[ 13 ] );
+			dst[ 12 ] = decodeFloat16( src[ 16 ] );
+			dst[ 13 ] = decodeFloat16( src[ 26 ] );
+			dst[ 14 ] = decodeFloat16( src[ 29 ] );
+			dst[ 15 ] = decodeFloat16( src[ 42 ] );
+			dst[ 16 ] = decodeFloat16( src[ 3 ] );
+			dst[ 17 ] = decodeFloat16( src[ 8 ] );
+			dst[ 18 ] = decodeFloat16( src[ 12 ] );
+			dst[ 19 ] = decodeFloat16( src[ 17 ] );
+
+			dst[ 20 ] = decodeFloat16( src[ 25 ] );
+			dst[ 21 ] = decodeFloat16( src[ 30 ] );
+			dst[ 22 ] = decodeFloat16( src[ 41 ] );
+			dst[ 23 ] = decodeFloat16( src[ 43 ] );
+			dst[ 24 ] = decodeFloat16( src[ 9 ] );
+			dst[ 25 ] = decodeFloat16( src[ 11 ] );
+			dst[ 26 ] = decodeFloat16( src[ 18 ] );
+			dst[ 27 ] = decodeFloat16( src[ 24 ] );
+			dst[ 28 ] = decodeFloat16( src[ 31 ] );
+			dst[ 29 ] = decodeFloat16( src[ 40 ] );
+
+			dst[ 30 ] = decodeFloat16( src[ 44 ] );
+			dst[ 31 ] = decodeFloat16( src[ 53 ] );
+			dst[ 32 ] = decodeFloat16( src[ 10 ] );
+			dst[ 33 ] = decodeFloat16( src[ 19 ] );
+			dst[ 34 ] = decodeFloat16( src[ 23 ] );
+			dst[ 35 ] = decodeFloat16( src[ 32 ] );
+			dst[ 36 ] = decodeFloat16( src[ 39 ] );
+			dst[ 37 ] = decodeFloat16( src[ 45 ] );
+			dst[ 38 ] = decodeFloat16( src[ 52 ] );
+			dst[ 39 ] = decodeFloat16( src[ 54 ] );
+
+			dst[ 40 ] = decodeFloat16( src[ 20 ] );
+			dst[ 41 ] = decodeFloat16( src[ 22 ] );
+			dst[ 42 ] = decodeFloat16( src[ 33 ] );
+			dst[ 43 ] = decodeFloat16( src[ 38 ] );
+			dst[ 44 ] = decodeFloat16( src[ 46 ] );
+			dst[ 45 ] = decodeFloat16( src[ 51 ] );
+			dst[ 46 ] = decodeFloat16( src[ 55 ] );
+			dst[ 47 ] = decodeFloat16( src[ 60 ] );
+			dst[ 48 ] = decodeFloat16( src[ 21 ] );
+			dst[ 49 ] = decodeFloat16( src[ 34 ] );
+
+			dst[ 50 ] = decodeFloat16( src[ 37 ] );
+			dst[ 51 ] = decodeFloat16( src[ 47 ] );
+			dst[ 52 ] = decodeFloat16( src[ 50 ] );
+			dst[ 53 ] = decodeFloat16( src[ 56 ] );
+			dst[ 54 ] = decodeFloat16( src[ 59 ] );
+			dst[ 55 ] = decodeFloat16( src[ 61 ] );
+			dst[ 56 ] = decodeFloat16( src[ 35 ] );
+			dst[ 57 ] = decodeFloat16( src[ 36 ] );
+			dst[ 58 ] = decodeFloat16( src[ 48 ] );
+			dst[ 59 ] = decodeFloat16( src[ 49 ] );
+
+			dst[ 60 ] = decodeFloat16( src[ 57 ] );
+			dst[ 61 ] = decodeFloat16( src[ 58 ] );
+			dst[ 62 ] = decodeFloat16( src[ 62 ] );
+			dst[ 63 ] = decodeFloat16( src[ 63 ] );
+
+		}
+
+		function dctInverse( data ) {
+
+			const a = 0.5 * Math.cos( 3.14159 / 4.0 );
+			const b = 0.5 * Math.cos( 3.14159 / 16.0 );
+			const c = 0.5 * Math.cos( 3.14159 / 8.0 );
+			const d = 0.5 * Math.cos( 3.0 * 3.14159 / 16.0 );
+			const e = 0.5 * Math.cos( 5.0 * 3.14159 / 16.0 );
+			const f = 0.5 * Math.cos( 3.0 * 3.14159 / 8.0 );
+			const g = 0.5 * Math.cos( 7.0 * 3.14159 / 16.0 );
+
+			var alpha = new Array( 4 );
+			var beta = new Array( 4 );
+			var theta = new Array( 4 );
+			var gamma = new Array( 4 );
+
+			for ( var row = 0; row < 8; ++ row ) {
+
+				var rowPtr = row * 8;
+
+				alpha[ 0 ] = c * data[ rowPtr + 2 ];
+				alpha[ 1 ] = f * data[ rowPtr + 2 ];
+				alpha[ 2 ] = c * data[ rowPtr + 6 ];
+				alpha[ 3 ] = f * data[ rowPtr + 6 ];
+
+				beta[ 0 ] = b * data[ rowPtr + 1 ] + d * data[ rowPtr + 3 ] + e * data[ rowPtr + 5 ] + g * data[ rowPtr + 7 ];
+				beta[ 1 ] = d * data[ rowPtr + 1 ] - g * data[ rowPtr + 3 ] - b * data[ rowPtr + 5 ] - e * data[ rowPtr + 7 ];
+				beta[ 2 ] = e * data[ rowPtr + 1 ] - b * data[ rowPtr + 3 ] + g * data[ rowPtr + 5 ] + d * data[ rowPtr + 7 ];
+				beta[ 3 ] = g * data[ rowPtr + 1 ] - e * data[ rowPtr + 3 ] + d * data[ rowPtr + 5 ] - b * data[ rowPtr + 7 ];
+
+				theta[ 0 ] = a * ( data[ rowPtr + 0 ] + data[ rowPtr + 4 ] );
+				theta[ 3 ] = a * ( data[ rowPtr + 0 ] - data[ rowPtr + 4 ] );
+				theta[ 1 ] = alpha[ 0 ] + alpha[ 3 ];
+				theta[ 2 ] = alpha[ 1 ] - alpha[ 2 ];
+
+				gamma[ 0 ] = theta[ 0 ] + theta[ 1 ];
+				gamma[ 1 ] = theta[ 3 ] + theta[ 2 ];
+				gamma[ 2 ] = theta[ 3 ] - theta[ 2 ];
+				gamma[ 3 ] = theta[ 0 ] - theta[ 1 ];
+
+				data[ rowPtr + 0 ] = gamma[ 0 ] + beta[ 0 ];
+				data[ rowPtr + 1 ] = gamma[ 1 ] + beta[ 1 ];
+				data[ rowPtr + 2 ] = gamma[ 2 ] + beta[ 2 ];
+				data[ rowPtr + 3 ] = gamma[ 3 ] + beta[ 3 ];
+
+				data[ rowPtr + 4 ] = gamma[ 3 ] - beta[ 3 ];
+				data[ rowPtr + 5 ] = gamma[ 2 ] - beta[ 2 ];
+				data[ rowPtr + 6 ] = gamma[ 1 ] - beta[ 1 ];
+				data[ rowPtr + 7 ] = gamma[ 0 ] - beta[ 0 ];
+
+			}
+
+			for ( var column = 0; column < 8; ++ column ) {
+
+				alpha[ 0 ] = c * data[ 16 + column ];
+				alpha[ 1 ] = f * data[ 16 + column ];
+				alpha[ 2 ] = c * data[ 48 + column ];
+				alpha[ 3 ] = f * data[ 48 + column ];
+
+				beta[ 0 ] = b * data[ 8 + column ] + d * data[ 24 + column ] + e * data[ 40 + column ] + g * data[ 56 + column ];
+				beta[ 1 ] = d * data[ 8 + column ] - g * data[ 24 + column ] - b * data[ 40 + column ] - e * data[ 56 + column ];
+				beta[ 2 ] = e * data[ 8 + column ] - b * data[ 24 + column ] + g * data[ 40 + column ] + d * data[ 56 + column ];
+				beta[ 3 ] = g * data[ 8 + column ] - e * data[ 24 + column ] + d * data[ 40 + column ] - b * data[ 56 + column ];
+
+				theta[ 0 ] = a * ( data[ column ] + data[ 32 + column ] );
+				theta[ 3 ] = a * ( data[ column ] - data[ 32 + column ] );
+
+				theta[ 1 ] = alpha[ 0 ] + alpha[ 3 ];
+				theta[ 2 ] = alpha[ 1 ] - alpha[ 2 ];
+
+				gamma[ 0 ] = theta[ 0 ] + theta[ 1 ];
+				gamma[ 1 ] = theta[ 3 ] + theta[ 2 ];
+				gamma[ 2 ] = theta[ 3 ] - theta[ 2 ];
+				gamma[ 3 ] = theta[ 0 ] - theta[ 1 ];
+
+				data[ 0 + column ] = gamma[ 0 ] + beta[ 0 ];
+				data[ 8 + column ] = gamma[ 1 ] + beta[ 1 ];
+				data[ 16 + column ] = gamma[ 2 ] + beta[ 2 ];
+				data[ 24 + column ] = gamma[ 3 ] + beta[ 3 ];
+
+				data[ 32 + column ] = gamma[ 3 ] - beta[ 3 ];
+				data[ 40 + column ] = gamma[ 2 ] - beta[ 2 ];
+				data[ 48 + column ] = gamma[ 1 ] - beta[ 1 ];
+				data[ 56 + column ] = gamma[ 0 ] - beta[ 0 ];
+
+			}
+
+		}
+
+		function csc709Inverse( data ) {
+
+			for ( var i = 0; i < 64; ++ i ) {
+
+				var y = data[ 0 ][ i ];
+				var cb = data[ 1 ][ i ];
+				var cr = data[ 2 ][ i ];
+
+				data[ 0 ][ i ] = y + 1.5747 * cr;
+				data[ 1 ][ i ] = y - 0.1873 * cb - 0.4682 * cr;
+				data[ 2 ][ i ] = y + 1.8556 * cb;
+
+			}
+
+		}
+
+		function convertToHalf( src, dst, idx ) {
+
+			for ( var i = 0; i < 64; ++ i ) {
+
+				dst[ idx + i ] = encodeFloat16( toLinear( src[ i ] ) );
+
+			}
+
+		}
+
+		function toLinear( float ) {
+
+			if ( float <= 1 ) {
+
+				return Math.sign( float ) * Math.pow( Math.abs( float ), 2.2 );
+
+			} else {
+
+				return Math.sign( float ) * Math.pow( logBase, Math.abs( float ) - 1.0 );
+
+			}
 
 		}
 
@@ -911,6 +1313,225 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		}
 
+		function uncompressDWA( info ) {
+
+			var inDataView = info.viewer;
+			var inOffset = { value: info.offset.value };
+			var outBuffer = new Uint8Array( info.width * info.lines * ( EXRHeader.channels.length * info.type * INT16_SIZE ) );
+
+			// Read compression header information
+			var dwaHeader = {
+
+				version: parseInt64( inDataView, inOffset ),
+				unknownUncompressedSize: parseInt64( inDataView, inOffset ),
+				unknownCompressedSize: parseInt64( inDataView, inOffset ),
+				acCompressedSize: parseInt64( inDataView, inOffset ),
+				dcCompressedSize: parseInt64( inDataView, inOffset ),
+				rleCompressedSize: parseInt64( inDataView, inOffset ),
+				rleUncompressedSize: parseInt64( inDataView, inOffset ),
+				rleRawSize: parseInt64( inDataView, inOffset ),
+				totalAcUncompressedCount: parseInt64( inDataView, inOffset ),
+				totalDcUncompressedCount: parseInt64( inDataView, inOffset ),
+				acCompression: parseInt64( inDataView, inOffset )
+
+			};
+
+			if ( dwaHeader.version < 2 )
+				throw 'EXRLoader.parse: ' + EXRHeader.compression + ' version ' + dwaHeader.version + ' is unsupported';
+
+			// Read channel ruleset information
+			var channelRules = new Array();
+			var ruleSize = parseUint16( inDataView, inOffset ) - INT16_SIZE;
+
+			while ( ruleSize > 0 ) {
+
+				var name = parseNullTerminatedString( inDataView.buffer, inOffset );
+				var value = parseUint8( inDataView, inOffset );
+				var compression = ( value >> 2 ) & 3;
+				var csc = ( value >> 4 ) - 1;
+				var index = new Int8Array( [ csc ] )[ 0 ];
+				var type = parseUint8( inDataView, inOffset );
+
+				channelRules.push( {
+					name: name,
+					index: index,
+					type: type,
+					compression: compression,
+				} );
+
+				ruleSize -= name.length + 3;
+
+			}
+
+			// Classify channels
+			var channels = EXRHeader.channels;
+			var channelData = new Array( info.channels );
+
+			for ( var i = 0; i < info.channels; ++ i ) {
+
+				var cd = channelData[ i ] = {};
+				var channel = channels[ i ];
+
+				cd.name = channel.name;
+				cd.compression = UNKNOWN;
+				cd.decoded = false;
+				cd.type = channel.pixelType;
+				cd.pLinear = channel.pLinear;
+				cd.width = info.width;
+				cd.height = info.lines;
+
+			}
+
+			var cscSet = {
+				idx: new Array( 3 )
+			};
+
+			for ( var offset = 0; offset < info.channels; ++ offset ) {
+
+				var cd = channelData[ offset ];
+
+				for ( var i = 0; i < channelRules.length; ++ i ) {
+
+					var rule = channelRules[ i ];
+
+					if ( cd.name == rule.name ) {
+
+						cd.compression = rule.compression;
+
+						if ( rule.index >= 0 ) {
+
+							cscSet.idx[ rule.index ] = offset;
+
+						}
+
+						cd.offset = offset;
+
+					}
+
+				}
+
+			}
+
+			// Read DCT - AC component data
+			if ( dwaHeader.acCompressedSize > 0 ) {
+
+				switch ( dwaHeader.acCompression ) {
+
+					case STATIC_HUFFMAN:
+
+						var acBuffer = new Uint16Array( dwaHeader.totalAcUncompressedCount );
+						hufUncompress( info.array, inDataView, inOffset, dwaHeader.acCompressedSize, acBuffer, dwaHeader.totalAcUncompressedCount );
+						break;
+
+					case DEFLATE:
+
+						var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
+						var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } );
+						var acBuffer = new Uint16Array( inflate.decompress().buffer );
+						inOffset.value += dwaHeader.totalAcUncompressedCount;
+						break;
+
+				}
+
+
+			}
+
+			// Read DCT - DC component data
+			if ( dwaHeader.dcCompressedSize > 0 ) {
+
+				var zlibInfo = {
+					array: info.array,
+					offset: inOffset,
+					size: dwaHeader.dcCompressedSize
+				};
+				var dcBuffer = new Uint16Array( uncompressZIP( zlibInfo ).buffer );
+				inOffset.value += dwaHeader.dcCompressedSize;
+
+			}
+
+			// Read RLE compressed data
+			if ( dwaHeader.rleRawSize > 0 ) {
+
+				var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
+				var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } );
+				var rleBuffer = decodeRunLength( inflate.decompress().buffer );
+
+				inOffset.value += dwaHeader.rleCompressedSize;
+
+			}
+
+			// Prepare outbuffer data offset
+			var outBufferEnd = 0;
+			var rowOffsets = new Array( channelData.length );
+			for ( var i = 0; i < rowOffsets.length; ++ i ) {
+
+				rowOffsets[ i ] = new Array();
+
+			}
+
+			for ( var y = 0; y < info.lines; ++ y ) {
+
+				for ( var chan = 0; chan < channelData.length; ++ chan ) {
+
+					rowOffsets[ chan ].push( outBufferEnd );
+					outBufferEnd += channelData[ chan ].width * info.type * INT16_SIZE;
+
+				}
+
+			}
+
+			// Lossy DCT decode RGB channels
+			lossyDctDecode( cscSet, rowOffsets, channelData, acBuffer, dcBuffer, outBuffer );
+
+			// Decode other channels
+			for ( var i = 0; i < channelData.length; ++ i ) {
+
+				var cd = channelData[ i ];
+
+				if ( cd.decoded ) continue;
+
+				switch ( cd.compression ) {
+
+					case RLE:
+
+						var row = 0;
+						var rleOffset = 0;
+
+						for ( var y = 0; y < info.lines; ++ y ) {
+
+							var rowOffsetBytes = rowOffsets[ i ][ row ];
+
+							for ( var x = 0; x < cd.width; ++ x ) {
+
+								for ( var byte = 0; byte < INT16_SIZE * cd.type; ++ byte ) {
+
+									outBuffer[ rowOffsetBytes ++ ] = rleBuffer[ rleOffset + byte * cd.width * cd.height ];
+
+								}
+
+								rleOffset ++;
+
+							}
+
+							row ++;
+
+						}
+
+						break;
+
+					case LOSSY_DCT: // skip
+
+					default:
+						throw 'EXRLoader.parse: unsupported channel compression';
+
+				}
+
+			}
+
+			return new DataView( outBuffer.buffer );
+
+		}
+
 		function parseNullTerminatedString( buffer, offset ) {
 
 			var uintBuffer = new Uint8Array( buffer );
@@ -984,6 +1605,16 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		}
 
+		function parseInt64( dataView, offset ) {
+
+			var int = Number( dataView.getBigInt64( offset.value, true ) );
+
+			offset.value += ULONG_SIZE;
+
+			return int;
+
+		}
+
 		function parseFloat32( dataView, offset ) {
 
 			var float = dataView.getFloat32( offset.value, true );
@@ -1011,6 +1642,61 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			);
 
 		}
+
+		var encodeFloat16 = ( function () {
+
+			// Source: http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
+
+			var floatView = new Float32Array( 1 );
+			var int32View = new Int32Array( floatView.buffer );
+
+			/* This method is faster than the OpenEXR implementation (very often
+			 * used, eg. in Ogre), with the additional benefit of rounding, inspired
+			 * by James Tursa?s half-precision code. */
+			return function toHalf( val ) {
+
+				floatView[ 0 ] = val;
+				var x = int32View[ 0 ];
+
+				var bits = ( x >> 16 ) & 0x8000; /* Get the sign */
+				var m = ( x >> 12 ) & 0x07ff; /* Keep one extra bit for rounding */
+				var e = ( x >> 23 ) & 0xff; /* Using int is faster here */
+
+				/* If zero, or denormal, or exponent underflows too much for a denormal
+				 * half, return signed zero. */
+				if ( e < 103 ) return bits;
+
+				/* If NaN, return NaN. If Inf or exponent overflow, return Inf. */
+				if ( e > 142 ) {
+
+					bits |= 0x7c00;
+					/* If exponent was 0xff and one mantissa bit was set, it means NaN,
+							 * not Inf, so make sure we set one mantissa bit too. */
+					bits |= ( ( e == 255 ) ? 0 : 1 ) && ( x & 0x007fffff );
+					return bits;
+
+				}
+
+				/* If exponent underflows but not too much, return a denormal */
+				if ( e < 113 ) {
+
+					m |= 0x0800;
+					/* Extra rounding may overflow and set mantissa to 0 and exponent
+					 * to 1, which is OK. */
+					bits |= ( m >> ( 114 - e ) ) + ( ( m >> ( 113 - e ) ) & 1 );
+					return bits;
+
+				}
+
+				bits |= ( ( e - 112 ) << 10 ) | ( m >> 1 );
+				/* Extra rounding. An overflow will set mantissa to 0 and increment
+				 * the exponent, which is OK. */
+				bits += m & 1;
+				return bits;
+
+			};
+
+		} )();
 
 		function parseUint16( dataView, offset ) {
 
@@ -1243,6 +1929,18 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 				scanlineBlockSize = 32;
 				uncompress = uncompressPIZ;
+				break;
+
+			case 'DWAA_COMPRESSION':
+
+				scanlineBlockSize = 32;
+				uncompress = uncompressDWA;
+				break;
+
+			case 'DWAB_COMPRESSION':
+
+				scanlineBlockSize = 256;
+				uncompress = uncompressDWA;
 				break;
 
 			default:

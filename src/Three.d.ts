@@ -150,6 +150,7 @@ export * from './extras/core/CurvePath';
 export * from './extras/core/Curve';
 export * from './extras/ImageUtils';
 export * from './extras/ShapeUtils';
+export * from './extras/PMREMGenerator';
 export * from './renderers/webgl/WebGLBufferRenderer';
 export * from './renderers/webgl/WebGLCapabilities';
 export * from './renderers/webgl/WebGLClipping';

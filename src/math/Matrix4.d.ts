@@ -178,7 +178,7 @@ export class Matrix4 implements Matrix {
 		translation?: Vector3,
 		rotation?: Quaternion,
 		scale?: Vector3
-	): Object[]; // [Vector3, Quaternion, Vector3]
+	): Matrix4;
 
 	/**
 	 * Creates a frustum matrix.

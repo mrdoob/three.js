@@ -178,8 +178,8 @@ export function Vertex( x, y, z ) {
 
 export function DynamicBufferAttribute( array, itemSize ) {
 
-	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setDynamic( true ) instead.' );
-	return new BufferAttribute( array, itemSize ).setDynamic( true );
+	console.warn( 'THREE.DynamicBufferAttribute has been removed. Use new THREE.BufferAttribute().setUsage( THREE.DynamicDrawUsage ) instead.' );
+	return new BufferAttribute( array, itemSize ).setUsage( DynamicDrawUsage );
 
 }
 
@@ -1796,8 +1796,8 @@ Object.defineProperties( WebGLShadowMap.prototype, {
 
 export function WebGLRenderTargetCube( width, height, options ) {
 
-	console.warn( 'THREE.WebGLRenderTargetCube has been renamed to WebGLCubeRenderTarget.' );
-	return new WebGLCubeRenderTarget( width, height, options );
+	console.warn( 'THREE.WebGLRenderTargetCube( width, height, options ) is now WebGLCubeRenderTarget( size, options ).' );
+	return new WebGLCubeRenderTarget( width, options );
 
 }
 

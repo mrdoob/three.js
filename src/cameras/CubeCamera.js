@@ -51,7 +51,7 @@ function CubeCamera( near, far, cubeResolution, options ) {
 
 	options = options || { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
 
-	this.renderTarget = new WebGLCubeRenderTarget( cubeResolution, cubeResolution, options );
+	this.renderTarget = new WebGLCubeRenderTarget( cubeResolution, options );
 	this.renderTarget.texture.name = "CubeCamera";
 
 	this.update = function ( renderer, scene ) {

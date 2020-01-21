@@ -1658,35 +1658,33 @@ function WebGLRenderer( parameters ) {
 
 			if ( materialProperties.program === undefined ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( material.fog && materialProperties.fog !== fog ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.environment !== environment ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
 				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.outputEncoding !== _this.outputEncoding ) {
 
-				material.needsUpdate = true;
+				initMaterial( material, scene, object );
 
 			}
 
-		}
-
-		if ( material.version !== materialProperties.__version ) {
+		} else {
 
 			initMaterial( material, scene, object );
 			materialProperties.__version = material.version;
@@ -2060,10 +2058,6 @@ function WebGLRenderer( parameters ) {
 
 			uniforms.envMap.value = envMap;
 
-			// don't flip CubeTexture envMaps, flip everything else:
-			//  WebGLCubeRenderTarget will be flipped for backwards compatibility
-			//  WebGLCubeRenderTarget.texture will be flipped because it's a Texture and NOT a CubeTexture
-			// this check must be handled differently, or removed entirely, if WebGLCubeRenderTarget uses a CubeTexture in the future
 			uniforms.flipEnvMap.value = envMap.isCubeTexture ? - 1 : 1;
 
 			uniforms.reflectivity.value = material.reflectivity;

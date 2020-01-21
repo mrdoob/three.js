@@ -40,6 +40,9 @@ function WebXRManager( renderer, gl ) {
 	cameraVR.layers.enable( 1 );
 	cameraVR.layers.enable( 2 );
 
+	var _currentDepthNear = null;
+	var _currentDepthFar = null;
+
 	//
 
 	this.enabled = false;
@@ -95,9 +98,9 @@ function WebXRManager( renderer, gl ) {
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
 
-		scope.dispatchEvent( { type: 'sessionend' } );
-
 		scope.isPresenting = false;
+
+		scope.dispatchEvent( { type: 'sessionend' } );
 
 	}
 
@@ -108,9 +111,9 @@ function WebXRManager( renderer, gl ) {
 		animation.setContext( session );
 		animation.start();
 
-		scope.dispatchEvent( { type: 'sessionstart' } );
-
 		scope.isPresenting = true;
+
+		scope.dispatchEvent( { type: 'sessionstart' } );
 
 	}
 
@@ -301,6 +304,23 @@ function WebXRManager( renderer, gl ) {
 
 	this.getCamera = function ( camera ) {
 
+		cameraVR.near = cameraR.near = cameraL.near = camera.near;
+		cameraVR.far = cameraR.far = cameraL.far = camera.far;
+
+		if ( _currentDepthNear !== cameraVR.near || _currentDepthFar !== cameraVR.far ) {
+
+			// Note that the new renderState won't apply until the next frame. See #18320
+
+			session.updateRenderState( {
+				depthNear: cameraVR.near,
+				depthFar: cameraVR.far
+			} );
+
+			_currentDepthNear = cameraVR.near;
+			_currentDepthFar = cameraVR.far;
+
+		}
+
 		var parent = camera.parent;
 		var cameras = cameraVR.cameras;
 
@@ -349,10 +369,9 @@ function WebXRManager( renderer, gl ) {
 
 				var view = views[ i ];
 				var viewport = baseLayer.getViewport( view );
-				var cameraMatrix = view.transform.matrix;
 
 				var camera = cameraVR.cameras[ i ];
-				camera.matrix.fromArray( cameraMatrix );
+				camera.matrix.fromArray( view.transform.matrix );
 				camera.projectionMatrix.fromArray( view.projectionMatrix );
 				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
 
