@@ -1,10 +1,29 @@
-<script src="//cdn.webglstats.com/stat.js" defer="defer" async="async"></script>
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-120733518-1"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+(function() {
+  if (window.location.hostname.indexOf("threejsfundamentals.org") < 0) {
+      return;
+  }
 
-  gtag('config', 'UA-120733518-1');
+  function addScript(src, fn) {
+    const script = document.createElement('script');
+    const firstScript = document.getElementsByTag('script')[0];
+    script.async = true;
+    script.defer = true;
+    if (fn) {
+      script.addEventListener('load', fn);
+    }
+    script.src = src;
+    firstScript.parentNode.insertBefore(script, firstScript);
+  }
+
+  addScript('//cdn.webglstats.com/stat.js');
+  addScript('https://www.googletagmanager.com/gtag/js?id=UA-120733518-1', () => {
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-120733518-1');
+  });
+}());
 </script>
 
