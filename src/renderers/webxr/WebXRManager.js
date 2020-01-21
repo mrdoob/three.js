@@ -308,7 +308,7 @@ function WebXRManager( renderer, gl ) {
 		cameraVR.far = cameraR.far = cameraL.far = camera.far;
 
 		if ( _currentDepthNear !== cameraVR.near || _currentDepthFar !== cameraVR.far ) {
-			
+
 			// Note that the new renderState won't apply until the next frame. See #18320
 
 			session.updateRenderState( {
