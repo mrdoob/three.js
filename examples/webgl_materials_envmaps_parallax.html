@@ -313,7 +313,6 @@
 					//these parameters are for the cubeCamera texture
 					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 200, 100 ) };
 					shader.uniforms.cubeMapPos = { value: new THREE.Vector3( 0, - 50, 0 ) };
-					shader.uniforms.flipEnvMap.value = true;
 
 					//replace shader chunks with box projection chunks
 					shader.vertexShader = 'varying vec3 vWorldPosition;\n' + shader.vertexShader;
