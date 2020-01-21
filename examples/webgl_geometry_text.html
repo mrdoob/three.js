@@ -357,6 +357,8 @@
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
 
+				var triangle = new THREE.Triangle();
+
 				// "fix" side normals by removing z-component of normals for side faces
 				// (this doesn't work well for beveled geometry as then we lose nice curvature around z-axis)
 
@@ -381,7 +383,7 @@
 							var vb = textGeo.vertices[ face.b ];
 							var vc = textGeo.vertices[ face.c ];
 
-							var s = GeometryUtils.triangleArea( va, vb, vc );
+							var s = triangle.set( va, vb, vc ).getArea();
 
 							if ( s > triangleAreaHeuristics ) {
 
