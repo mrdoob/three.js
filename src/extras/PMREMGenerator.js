@@ -38,7 +38,6 @@ import { Scene } from "../scenes/Scene.js";
 import { Vector2 } from "../math/Vector2.js";
 import { Vector3 } from "../math/Vector3.js";
 import { WebGLRenderTarget } from "../renderers/WebGLRenderTarget.js";
-import { Vector4 } from "../math/Vector4.js";
 
 var LOD_MIN = 4;
 var LOD_MAX = 8;
@@ -437,11 +436,8 @@ function _createRenderTarget( params ) {
 
 function _setViewport( target, x, y, width, height ) {
 
-	var viewport = new Vector4( x, y, width, height );
-	viewport.addScalar( 0.5 ).divideScalar( _renderer.getPixelRatio() );
-
-	target.viewport.copy( viewport );
-	target.scissor.copy( viewport );
+	target.viewport.set( x, y, width, height );
+	target.scissor.set( x, y, width, height );
 
 }
 
