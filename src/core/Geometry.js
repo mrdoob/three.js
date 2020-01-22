@@ -67,7 +67,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	isGeometry: true,
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
@@ -116,7 +116,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1.makeRotationX( angle );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -128,7 +128,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1.makeRotationY( angle );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -140,7 +140,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1.makeRotationZ( angle );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -152,7 +152,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1.makeTranslation( x, y, z );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -164,7 +164,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1.makeScale( x, y, z );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -176,7 +176,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_obj.updateMatrix();
 
-		this.applyMatrix( _obj.matrix );
+		this.applyMatrix4( _obj.matrix );
 
 		return this;
 
@@ -351,7 +351,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			0, 0, 0, 1
 		);
 
-		this.applyMatrix( matrix );
+		this.applyMatrix4( matrix );
 
 		return this;
 
