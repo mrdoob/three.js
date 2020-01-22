@@ -11,13 +11,15 @@ import {
 	SphereGeometry,
 } from "../../../build/three.module.js";
 
+import { GLTFLoader } from '../loaders/GLTFLoader.js'
+
 import {
 	Constants as MotionControllerConstants,
 	fetchProfile,
 	MotionController
-} from 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/motion-controllers@0.1.0/dist/motion-controllers.module.js'
+} from '../libs/motion-controllers.module.js'
 
-const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@0.1.0/dist/profiles'
+const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@0.2.0/dist/profiles'
 
 function XRControllerModel( ) {
 
@@ -180,27 +182,27 @@ function findNodes( motionController, scene ) {
 	});
 }
 
-var XRControllerModelLoader = ( function () {
+var XRControllerModelFactory = ( function () {
 
-	function XRControllerModelLoader( gltfLoader ) {
+	function XRControllerModelFactory( gltfLoader = null ) {
 
 		this.gltfLoader = gltfLoader;
 		this.path = DEFAULT_PROFILES_PATH;
 
+		// If a GLTFLoader wasn't supplied to the constructor create a new one.
+		if ( !this.gltfLoader ) {
+
+			this.gltfLoader = new GLTFLoader();
+
+		}
+
 	}
 
-	XRControllerModelLoader.prototype = {
+	XRControllerModelFactory.prototype = {
 
-		constructor: XRControllerModelLoader,
+		constructor: XRControllerModelFactory,
 
-		setGLTFLoader: function ( gltfLoader ) {
-
-			this.gltfLoader = gltfLoader;
-			return this;
-
-		},
-
-		getControllerModel: function ( controller ) {
+		createControllerModel: function ( controller ) {
 
 			if ( !this.gltfLoader ) {
 
@@ -279,8 +281,8 @@ var XRControllerModelLoader = ( function () {
 
 	};
 
-	return XRControllerModelLoader;
+	return XRControllerModelFactory;
 
 } )();
 
-export { XRControllerModelLoader };
+export { XRControllerModelFactory };

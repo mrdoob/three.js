@@ -14,11 +14,10 @@ export class XRControllerModel extends Object3D {
 	setEnvironmentMap( envMap: Texture ): XRControllerModel;
 }
 
-export class XRControllerModelLoader {
+export class XRControllerModelFactory {
 	constructor( gltfLoader?: GLTFLoader );
 	gltfLoader: GLTFLoader | null;
 	path: string;
 
-	setGLTFLoader( gltfLoader: GLTFLoader ): XRControllerModelLoader;
-	getControllerModel( controller: Group ): XRControllerModel;
+	createControllerModel( controller: Group ): XRControllerModel;
 }

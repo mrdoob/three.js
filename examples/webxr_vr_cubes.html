@@ -20,6 +20,7 @@
 
 			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
 			var clock = new THREE.Clock();
 
@@ -121,6 +122,10 @@
 
 				} );
 				scene.add( controller );
+
+				var controllerModelFactory = new XRControllerModelFactory();
+
+				controller.add( controllerModelFactory.createControllerModel( controller ) );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

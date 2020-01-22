@@ -20,6 +20,7 @@
 
 			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
 			var camera, scene, renderer;
 			var controller1, controller2;
@@ -51,8 +52,10 @@
 				room.geometry.translate( 0, 3, 0 );
 				scene.add( room );
 
-				var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				light.position.set( 1, 1, 1 );
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
 				var geometry = new THREE.IcosahedronBufferGeometry( radius, 2 );
@@ -129,6 +132,14 @@
 
 				} );
 				scene.add( controller2 );
+
+				// The XRControllerModelFactory will automatically fetch controller models
+				// that match what the user is holding as closely as possible.
+
+				var controllerModelFactory = new XRControllerModelFactory();
+
+				controller1.add( controllerModelFactory.createControllerModel( controller1 ) );
+				controller2.add( controllerModelFactory.createControllerModel( controller2 ) );
 
 				//
 
