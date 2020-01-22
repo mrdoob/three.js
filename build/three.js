@@ -14444,7 +14444,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLAttributes( gl ) {
+	function WebGLAttributes( gl, capabilities ) {
 
 		var buffers = new WeakMap();
 
@@ -14520,8 +14520,17 @@
 
 			} else {
 
-				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-					array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+				if ( capabilities.isWebGL2 ) {
+
+					gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+						array, updateRange.offset, updateRange.count );
+
+				} else {
+
+					gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+						array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+
+				}
 
 				updateRange.count = - 1; // reset range
 
@@ -23640,7 +23649,7 @@
 			info = new WebGLInfo( _gl );
 			properties = new WebGLProperties();
 			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
-			attributes = new WebGLAttributes( _gl );
+			attributes = new WebGLAttributes( _gl, capabilities );
 			geometries = new WebGLGeometries( _gl, attributes, info );
 			objects = new WebGLObjects( _gl, geometries, attributes, info );
 			morphtargets = new WebGLMorphtargets( _gl );
