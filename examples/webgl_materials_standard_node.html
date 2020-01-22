@@ -21,11 +21,6 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-
-			import * as Nodes from './jsm/nodes/Nodes.js';
-			
-			import { MeshStandardNodeMaterial } from './jsm/nodes/materials/MeshStandardMaterial.js';
 
 			var statsEnabled = true;
 
@@ -66,7 +61,7 @@
 
 				//
 
-				var material = new MeshStandardNodeMaterial();
+				var material = new THREE.MeshStandardMaterial();
 
 				new OBJLoader()
 					.setPath( 'models/obj/cerberus/' )
@@ -75,28 +70,37 @@
 						var loader = new THREE.TextureLoader()
 							.setPath( 'models/obj/cerberus/' );
 
-						material.roughness = 1; // attenuates roughnessMap
-						material.metalness = 1; // attenuates metalnessMap
+						var Cerberus_A = loader.load( 'Cerberus_A.jpg' );
+						var Cerberus_RM = loader.load( 'Cerberus_RM.jpg' );
+						var Cerberus_N = loader.load( 'Cerberus_N.jpg' );
 
-						//material.map = loader.load( 'Cerberus_A.jpg' );
 						// roughness is in G channel, metalness is in B channel
-						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );
-						material.normalMap = loader.load( 'Cerberus_N.jpg' );
-
-						//
-
-						var uvTransform = new Nodes.UVTransformNode();
+						
+						material.roughness = new THREE.SwitchNode( new THREE.TextureNode( Cerberus_RM ), 'g' ); // attenuates roughnessMap
+						material.metalness = new THREE.SwitchNode( new THREE.TextureNode( Cerberus_RM ), 'b' ); // attenuates metalnessMap
+						
+						
+						
+						var uvTransform = new THREE.UVTransformNode();
 						uvTransform.setUvTransform( 0, 0, 50, 50, 0 );
 
-						material.color = new Nodes.CheckerNode( uvTransform );
-						//material.color = new Nodes.TextureNode( loader.load( 'Cerberus_A.jpg' ) );
+						material.diffuse = new THREE.OperatorNode( new THREE.CheckerNode( uvTransform ), new THREE.TextureNode( Cerberus_A ), '*' );
+						//material.diffuse = new THREE.TextureNode( Cerberus_A );
+						
+						// --
+						
+						material.normalMap = Cerberus_N;
+						
+						/*
+						
+						*/
+						//material.diffuse = new THREE.ColorNode( 0xFFFFFF );
 
 						//
 
-						//material.map.wrapS = THREE.RepeatWrapping;
-						material.roughnessMap.wrapS = THREE.RepeatWrapping;
-						material.metalnessMap.wrapS = THREE.RepeatWrapping;
-						material.normalMap.wrapS = THREE.RepeatWrapping;
+						Cerberus_A.wrapS = THREE.RepeatWrapping;
+						Cerberus_RM.wrapS = THREE.RepeatWrapping;
+						Cerberus_N.wrapS = THREE.RepeatWrapping;
 
 						group.traverse( function ( child ) {
 
@@ -120,7 +124,7 @@
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 						rgbmCubeMap.format = THREE.RGBAFormat;
 
-						var pmremGenerator = new PMREMGenerator( renderer );
+						var pmremGenerator = new THREE.PMREMGenerator( renderer );
 						var rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
 						pmremGenerator.dispose();
 
