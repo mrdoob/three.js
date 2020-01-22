@@ -11,15 +11,15 @@ import {
 	SphereGeometry,
 } from "../../../build/three.module.js";
 
-import { GLTFLoader } from '../loaders/GLTFLoader.js'
+import { GLTFLoader } from '../loaders/GLTFLoader.js';
 
 import {
 	Constants as MotionControllerConstants,
 	fetchProfile,
 	MotionController
-} from '../libs/motion-controllers.module.js'
+} from '../libs/motion-controllers.module.js';
 
-const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@0.2.0/dist/profiles'
+const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@0.2.0/dist/profiles';
 
 function XRControllerModel( ) {
 
@@ -182,12 +182,37 @@ function findNodes( motionController, scene ) {
 	});
 }
 
+function addAssetSceneToControllerModel( controllerModel, scene ) {
+	// Find the nodes needed for animation and cache them on the motionController.
+	findNodes( controllerModel.motionController, scene );
+
+	// Apply any environment map that the mesh already has set.
+	if ( controllerModel.envMap ) {
+
+		scene.traverse(( child ) => {
+
+			if ( child.isMesh ) {
+
+				child.material.envMap = controllerModel.envMap;
+				child.material.needsUpdate = true;
+
+			}
+
+		});
+
+	}
+
+	// Add the glTF scene to the controllerModel.
+	controllerModel.add( scene );
+}
+
 var XRControllerModelFactory = ( function () {
 
 	function XRControllerModelFactory( gltfLoader = null ) {
 
 		this.gltfLoader = gltfLoader;
 		this.path = DEFAULT_PROFILES_PATH;
+		this._assetCache = {};
 
 		// If a GLTFLoader wasn't supplied to the constructor create a new one.
 		if ( !this.gltfLoader ) {
@@ -204,18 +229,14 @@ var XRControllerModelFactory = ( function () {
 
 		createControllerModel: function ( controller ) {
 
-			if ( !this.gltfLoader ) {
-
-				throw new Error(`GLTFLoader not set.`);
-
-			}
-
 			const controllerModel = new XRControllerModel();
 			let scene = null;
 
 			controller.addEventListener( 'connected', ( event ) => {
 
 				const xrInputSource = event.data;
+
+				if (xrInputSource.targetRayMode !== 'tracked-pointer' ) return;
 
 				fetchProfile(xrInputSource, this.path).then(({ profile, assetPath }) => {
 
@@ -225,40 +246,39 @@ var XRControllerModelFactory = ( function () {
 						assetPath
 					);
 
-					this.gltfLoader.setPath('');
-					this.gltfLoader.load( controllerModel.motionController.assetUrl, ( asset ) => {
+					let cachedAsset = this._assetCache[controllerModel.motionController.assetUrl];
+					if (cachedAsset) {
 
-						scene = asset.scene;
+						scene = cachedAsset.scene.clone();
 
-						// Find the nodes needed for animation and cache them on the motionController.
-						findNodes( controllerModel.motionController, scene );
+						addAssetSceneToControllerModel(controllerModel, scene);
 
-						// Apply any environment map that the mesh already has set.
-						if ( controllerModel.envMap ) {
+					} else {
 
-							scene.traverse(( child ) => {
+						if ( !this.gltfLoader ) {
 
-								if ( child.isMesh ) {
-
-									child.material.envMap = controllerModel.envMap;
-									child.material.needsUpdate = true;
-
-								}
-
-							});
+							throw new Error(`GLTFLoader not set.`);
 
 						}
 
-						// Add the glTF scene to the controllerModel.
-						controllerModel.add( scene );
+						this.gltfLoader.setPath('');
+						this.gltfLoader.load( controllerModel.motionController.assetUrl, ( asset ) => {
 
-					},
-					null,
-					() => {
+							this._assetCache[controllerModel.motionController.assetUrl] = asset;
 
-						throw new Error(`Asset ${motionController.assetUrl} missing or malformed.`);
+							scene = asset.scene.clone();
 
-					});
+							addAssetSceneToControllerModel(controllerModel, scene);
+
+						},
+						null,
+						() => {
+
+							throw new Error(`Asset ${motionController.assetUrl} missing or malformed.`);
+
+						});
+
+					}
 
 				}).catch((err) => {
 
