@@ -20,6 +20,7 @@ import {
 } from '../libs/motion-controllers.module.js';
 
 const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@0.2.0/dist/profiles';
+const DEFAULT_PROFILE = 'generic-trigger';
 
 function XRControllerModel( ) {
 
@@ -236,9 +237,9 @@ var XRControllerModelFactory = ( function () {
 
 				const xrInputSource = event.data;
 
-				if (xrInputSource.targetRayMode !== 'tracked-pointer' ) return;
+				if (xrInputSource.targetRayMode !== 'tracked-pointer' || !xrInputSource.gamepad ) return;
 
-				fetchProfile(xrInputSource, this.path).then(({ profile, assetPath }) => {
+				fetchProfile( xrInputSource, this.path, DEFAULT_PROFILE ).then(({ profile, assetPath }) => {
 
 					controllerModel.motionController = new MotionController(
 						xrInputSource,
@@ -292,6 +293,7 @@ var XRControllerModelFactory = ( function () {
 
 				controllerModel.motionController = null;
 				controllerModel.remove( scene );
+				scene = null;
 
 			});
 

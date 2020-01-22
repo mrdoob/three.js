@@ -108,12 +108,13 @@
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				controller1.addEventListener( 'connected', function ( event ) {
 
-					this.add( buildController( event.data ) );
+					this.userData.targetMesh = buildController( event.data );
+					this.add( this.userData.targetMesh );
 
 				} );
 				controller1.addEventListener( 'disconnected', function () {
 
-					this.remove( this.children[ 0 ] );
+					this.remove( this.userData.targetMesh );
 
 				} );
 				scene.add( controller1 );
@@ -123,12 +124,13 @@
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				controller2.addEventListener( 'connected', function ( event ) {
 
-					this.add( buildController( event.data ) );
+					this.userData.targetMesh = buildController( event.data );
+					this.add( this.userData.targetMesh );
 
 				} );
 				controller2.addEventListener( 'disconnected', function () {
 
-					this.remove( this.children[ 0 ] );
+					this.remove( this.userData.targetMesh );
 
 				} );
 				scene.add( controller2 );
