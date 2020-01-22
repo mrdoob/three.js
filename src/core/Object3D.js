@@ -127,6 +127,8 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	onBeforeRender: function () {},
 	onAfterRender: function () {},
 
+	onBeforeShadow: function () {},
+
 	applyMatrix: function ( matrix ) {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
