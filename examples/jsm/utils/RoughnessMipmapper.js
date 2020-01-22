@@ -18,8 +18,7 @@ import {
 	RawShaderMaterial,
 	Scene,
 	Vector2,
-	WebGLRenderTarget,
-	Vector4
+	WebGLRenderTarget
 } from "../../../build/three.module.js";
 
 var RoughnessMipmapper = ( function () {
@@ -88,7 +87,6 @@ var RoughnessMipmapper = ( function () {
 			_mipmapMaterial.uniforms.roughnessMap.value = roughnessMap;
 			_mipmapMaterial.uniforms.normalMap.value = normalMap;
 
-			var dpr = _renderer.getPixelRatio();
 			var position = new Vector2( 0, 0 );
 			var texelSize = _mipmapMaterial.uniforms.texelSize.value;
 			for ( var mip = 0; width >= 1 && height >= 1;
@@ -100,9 +98,8 @@ var RoughnessMipmapper = ( function () {
 				texelSize.set( 1.0 / width, 1.0 / height );
 				if ( mip == 0 ) texelSize.set( 0.0, 0.0 );
 
-				var viewport = new Vector4( position.x, position.y, width / dpr, height / dpr );
-				_tempTarget.viewport.copy( viewport );
-				_tempTarget.scissor.copy( viewport );
+				_tempTarget.viewport.set( position.x, position.y, width, height );
+				_tempTarget.scissor.set( position.x, position.y, width, height );
 				_renderer.setRenderTarget( _tempTarget );
 				_renderer.render( _scene, _flatCamera );
 				_renderer.copyFramebufferToTexture( position, material.roughnessMap, mip );
