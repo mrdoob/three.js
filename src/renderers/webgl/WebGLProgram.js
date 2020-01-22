@@ -219,6 +219,39 @@ function includeReplacer( match, include ) {
 
 }
 
+// Resolve nodes
+
+function resolveNodes( string, parameters ) {
+
+	const main = 'void main() {';
+
+	var nodes = parameters.nodes.nodes;
+	
+	// 1 step
+
+	for ( var i = 0; i < nodes.length; i ++ ) {
+
+		var node = nodes[ i ];
+		var regexp = new RegExp(`uniform\\s(\\w+)\\s${node.property};`, 'g')
+
+		string = string.replace( regexp, `$1 ${node.property};` );
+
+	}
+
+	// 2 step
+
+	var mainIndex = string.indexOf( main );
+	
+	string = 
+		parameters.nodes.parsCode + '\n\n\n' +
+		string.substring( 0, mainIndex + main.length ) + '\n' +
+		parameters.nodes.code +
+		string.substring( mainIndex + main.length );
+
+	return string;
+
+}
+
 // Unroll Loops
 
 var loopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
@@ -653,6 +686,12 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
+
+	if (parameters.nodes) {
+		
+		fragmentShader = resolveNodes( fragmentShader, parameters );
+		
+	}
 
 	if ( parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
 

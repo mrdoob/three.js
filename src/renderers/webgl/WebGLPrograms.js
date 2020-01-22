@@ -6,6 +6,7 @@ import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping,
 import { WebGLProgram } from './WebGLProgram.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
+import { NodeBuilder } from '../../nodes/core/NodeBuilder.js';
 
 function WebGLPrograms( renderer, extensions, capabilities ) {
 
@@ -35,6 +36,12 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		ShadowMaterial: 'shadow',
 		SpriteMaterial: 'sprite'
 	};
+
+	// sequence is important
+
+	var propertyNames = [
+		"color", "diffuse", "metalness", "roughness"
+	];
 
 	var parameterNames = [
 		"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing", "numMultiviewViews",
@@ -141,6 +148,80 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	}
 
+	function getNodes( material, shaderobject ) {
+
+		var i;
+		var nodes = [];
+		var uniforms = shaderobject.uniforms;
+
+		for ( i = 0; i < propertyNames.length; i ++ ) {
+
+			var property = propertyNames[ i ],
+				value = material[ property ],
+				uniform = uniforms[ property ];
+
+			if ( value !== undefined && value !== null && value.isNode ) {
+
+				uniform.needsUpdate = false;
+
+				nodes.push( {
+					property: property,
+					value: value
+				} );
+
+			}
+
+		}
+
+		if ( nodes.length > 0 ) {
+			
+			var builder = new NodeBuilder();
+			var code = '';
+			
+			// 1 step - analyze
+			
+			builder.setShader( 'fragment' );
+			
+			for ( i = 0; i < nodes.length; i ++ ) {
+				
+				nodes[i].value.analyze( builder );
+				
+			}
+			
+			// 2 step - build / code generation
+			
+			for ( i = 0; i < nodes.length; i ++ ) {
+				
+				var node = nodes[i];
+				
+				var flow = node.value.flow( builder, builder.getType( uniforms[ node.property ].value ) );
+				
+				if (flow.code) {
+					
+					code += `\t${flow.code};\n`;
+					
+				}
+				
+				code += `\t${node.property} = ${flow.result};\n`;
+				
+			}
+			
+			// 3 step - update uniforms
+			
+			Object.assign( uniforms, builder.uniforms );
+
+			material.defines.USE_UV = '';
+
+			return {
+				nodes: nodes,
+				parsCode: builder.getParsCode( 'fragment' ),
+				code: code
+			};
+
+		}
+
+	}
+
 	this.getParameters = function ( material, lights, shadows, scene, nClipPlanes, nClipIntersection, object ) {
 
 		var fog = scene.fog;
@@ -170,6 +251,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		var shaderobject = getShaderObject( material, shaderID );
 		material.onBeforeCompile( shaderobject, renderer );
 
+		var nodes = getNodes( material, shaderobject );
+
 		var currentRenderTarget = renderer.getRenderTarget();
 		var numMultiviewViews = currentRenderTarget && currentRenderTarget.isWebGLMultiviewRenderTarget ? currentRenderTarget.numViews : 0;
 
@@ -184,6 +267,8 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			vertexShader: shaderobject.vertexShader,
 			fragmentShader: shaderobject.fragmentShader,
 			defines: material.defines,
+
+			nodes: nodes,
 
 			isRawShaderMaterial: material.isRawShaderMaterial,
 			isShaderMaterial: material.isShaderMaterial,
