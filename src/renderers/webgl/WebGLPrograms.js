@@ -210,6 +210,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			
 			Object.assign( uniforms, builder.uniforms );
 
+			material.defines = material.defines || {};
 			material.defines.USE_UV = '';
 
 			return {
