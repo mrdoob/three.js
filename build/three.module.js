@@ -5322,7 +5322,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	onBeforeRender: function () {},
 	onAfterRender: function () {},
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
@@ -5589,7 +5589,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		object.applyMatrix( _m1$1 );
+		object.applyMatrix4( _m1$1 );
 
 		object.updateWorldMatrix( false, false );
 
@@ -10006,7 +10006,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	},
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		var position = this.attributes.position;
 
@@ -10062,7 +10062,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		_m1$2.makeRotationX( angle );
 
-		this.applyMatrix( _m1$2 );
+		this.applyMatrix4( _m1$2 );
 
 		return this;
 
@@ -10074,7 +10074,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		_m1$2.makeRotationY( angle );
 
-		this.applyMatrix( _m1$2 );
+		this.applyMatrix4( _m1$2 );
 
 		return this;
 
@@ -10086,7 +10086,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		_m1$2.makeRotationZ( angle );
 
-		this.applyMatrix( _m1$2 );
+		this.applyMatrix4( _m1$2 );
 
 		return this;
 
@@ -10098,7 +10098,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		_m1$2.makeTranslation( x, y, z );
 
-		this.applyMatrix( _m1$2 );
+		this.applyMatrix4( _m1$2 );
 
 		return this;
 
@@ -10110,7 +10110,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		_m1$2.makeScale( x, y, z );
 
-		this.applyMatrix( _m1$2 );
+		this.applyMatrix4( _m1$2 );
 
 		return this;
 
@@ -10122,7 +10122,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		_obj.updateMatrix();
 
-		this.applyMatrix( _obj.matrix );
+		this.applyMatrix4( _obj.matrix );
 
 		return this;
 
@@ -11629,7 +11629,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	isGeometry: true,
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
@@ -11678,7 +11678,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1$3.makeRotationX( angle );
 
-		this.applyMatrix( _m1$3 );
+		this.applyMatrix4( _m1$3 );
 
 		return this;
 
@@ -11690,7 +11690,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1$3.makeRotationY( angle );
 
-		this.applyMatrix( _m1$3 );
+		this.applyMatrix4( _m1$3 );
 
 		return this;
 
@@ -11702,7 +11702,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1$3.makeRotationZ( angle );
 
-		this.applyMatrix( _m1$3 );
+		this.applyMatrix4( _m1$3 );
 
 		return this;
 
@@ -11714,7 +11714,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1$3.makeTranslation( x, y, z );
 
-		this.applyMatrix( _m1$3 );
+		this.applyMatrix4( _m1$3 );
 
 		return this;
 
@@ -11726,7 +11726,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_m1$3.makeScale( x, y, z );
 
-		this.applyMatrix( _m1$3 );
+		this.applyMatrix4( _m1$3 );
 
 		return this;
 
@@ -11738,7 +11738,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		_obj$1.updateMatrix();
 
-		this.applyMatrix( _obj$1.matrix );
+		this.applyMatrix4( _obj$1.matrix );
 
 		return this;
 
@@ -11913,7 +11913,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			0, 0, 0, 1
 		);
 
-		this.applyMatrix( matrix );
+		this.applyMatrix4( matrix );
 
 		return this;
 
@@ -48881,6 +48881,12 @@ Object.assign( Geometry.prototype, {
 
 		console.error( 'THREE.Geometry: .computeLineDistances() has been removed. Use THREE.Line.computeLineDistances() instead.' );
 
+	},
+	applyMatrix: function ( matrix ) {
+
+		console.warn( 'THREE.Geometry: .applyMatrix() has been renamed to .applyMatrix4().' );
+		return this.applyMatrix4( matrix );
+
 	}
 
 } );
@@ -48907,6 +48913,12 @@ Object.assign( Object3D.prototype, {
 	getWorldRotation: function () {
 
 		console.error( 'THREE.Object3D: .getWorldRotation() has been removed. Use THREE.Object3D.getWorldQuaternion( target ) instead.' );
+
+	},
+	applyMatrix: function ( matrix ) {
+
+		console.warn( 'THREE.Object3D: .applyMatrix() has been renamed to .applyMatrix4().' );
+		return this.applyMatrix4( matrix );
 
 	}
 
@@ -49254,7 +49266,14 @@ Object.assign( BufferGeometry.prototype, {
 
 		return this.deleteAttribute( name );
 
+	},
+	applyMatrix: function ( matrix ) {
+
+		console.warn( 'THREE.BufferGeometry: .applyMatrix() has been renamed to .applyMatrix4().' );
+		return this.applyMatrix4( matrix );
+
 	}
+
 } );
 
 Object.defineProperties( BufferGeometry.prototype, {
