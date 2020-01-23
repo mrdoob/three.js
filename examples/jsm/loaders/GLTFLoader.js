@@ -3194,7 +3194,7 @@ var GLTFLoader = ( function () {
 
 				var matrix = new Matrix4();
 				matrix.fromArray( nodeDef.matrix );
-				node.applyMatrix( matrix );
+				node.applyMatrix4( matrix );
 
 			} else {
 

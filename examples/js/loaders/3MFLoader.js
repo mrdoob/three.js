@@ -1281,7 +1281,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				if ( transform ) {
 
-					object3D.applyMatrix( transform );
+					object3D.applyMatrix4( transform );
 
 				}
 
@@ -1386,7 +1386,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				if ( transform ) {
 
-					object3D.applyMatrix( transform );
+					object3D.applyMatrix4( transform );
 
 				}
 

@@ -242,7 +242,7 @@
 
 			function render() {
 
-				camera.applyMatrix( rotateY );
+				camera.applyMatrix4( rotateY );
 				camera.updateMatrixWorld();
 
 				raycaster.setFromCamera( mouse, camera );

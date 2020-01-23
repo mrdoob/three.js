@@ -822,7 +822,7 @@ THREE.FBXLoader = ( function () {
 
 					var transform = generateTransform( node.userData.transformData );
 
-					node.applyMatrix( transform );
+					node.applyMatrix4( transform );
 
 				}
 

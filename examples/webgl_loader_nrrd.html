@@ -87,7 +87,7 @@
 					cube.visible = false;
 					var box = new THREE.BoxHelper( cube );
 					scene.add( box );
-					box.applyMatrix( volume.matrix );
+					box.applyMatrix4( volume.matrix );
 					scene.add( cube );
 
 					//z plane
