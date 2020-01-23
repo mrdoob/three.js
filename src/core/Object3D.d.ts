@@ -180,7 +180,7 @@ export class Object3D extends EventDispatcher {
 	/**
 	 * This updates the position, rotation and scale with the matrix.
 	 */
-	applyMatrix( matrix: Matrix4 ): void;
+	applyMatrix4( matrix: Matrix4 ): void;
 
 	applyQuaternion( quaternion: Quaternion ): this;
 

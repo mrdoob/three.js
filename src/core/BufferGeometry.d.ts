@@ -63,7 +63,7 @@ export class BufferGeometry extends EventDispatcher {
 	/**
 	 * Bakes matrix transform directly into vertex coordinates.
 	 */
-	applyMatrix( matrix: Matrix4 ): BufferGeometry;
+	applyMatrix4( matrix: Matrix4 ): BufferGeometry;
 
 	rotateX( angle: number ): BufferGeometry;
 	rotateY( angle: number ): BufferGeometry;
