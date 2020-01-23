@@ -56,7 +56,7 @@
 
 			This means that calling
 		<code>
-var m = new Matrix4();
+var m = new THREE.Matrix4();
 
 m.set( 11, 12, 13, 14,
        21, 22, 23, 24,
@@ -96,25 +96,10 @@ m.elements = [ 11, 21, 31, 41,
 		 list of matrix values.
 		</p>
 
-		<h3>[property:Boolean isMatrix4]</h3>
-		<p>
-			Used to check whether this or derived classes are Matrix4s. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 
 
 
 		<h2>Methods</h2>
-
-		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
-		<p>
-		[page:BufferAttribute attribute] - An attribute of floats that represent 3D vectors.<br /><br />
-
-		Multiplies (applies) this matrix to every 3D vector in the [page:BufferAttribute attribute].
-		</p>
-
 
 		<h3>[method:Matrix4 clone]()</h3>
 		<p>Creates a new Matrix4 with identical [page:.elements elements] to this one.</p>
@@ -219,7 +204,7 @@ zAxis = (c, g, k)
 		Sets this matrix as rotation transform around [page:Vector3 axis] by [page:Float theta] radians.<br />
 
 		This is a somewhat controversial but mathematically sound alternative to rotating via [page:Quaternions].
-		See the discussion [link:http://www.gamedev.net/reference/articles/article1199.asp here].
+		See the discussion [link:https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199 here].
 		</p>
 
 		<h3>[method:this makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
@@ -375,6 +360,7 @@ x, y, 1, 0,
 		</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
+		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>
 		<p>
 			Sets the position component for this matrix from vector [page:Vector3 v], without affecting the
 			rest of the matrix - i.e. if the matrix is currently:
@@ -407,6 +393,8 @@ m, n, o, p
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

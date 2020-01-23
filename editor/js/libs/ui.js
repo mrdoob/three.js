@@ -2,15 +2,13 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var UI = {};
-
-UI.Element = function ( dom ) {
+var UIElement = function ( dom ) {
 
 	this.dom = dom;
 
 };
 
-UI.Element.prototype = {
+UIElement.prototype = {
 
 	add: function () {
 
@@ -18,13 +16,13 @@ UI.Element.prototype = {
 
 			var argument = arguments[ i ];
 
-			if ( argument instanceof UI.Element ) {
+			if ( argument instanceof UIElement ) {
 
 				this.dom.appendChild( argument.dom );
 
 			} else {
 
-				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
+				console.error( 'UIElement:', argument, 'is not an instance of UIElement.' );
 
 			}
 
@@ -40,13 +38,13 @@ UI.Element.prototype = {
 
 			var argument = arguments[ i ];
 
-			if ( argument instanceof UI.Element ) {
+			if ( argument instanceof UIElement ) {
 
 				this.dom.removeChild( argument.dom );
 
 			} else {
 
-				console.error( 'UI.Element:', argument, 'is not an instance of UI.Element.' );
+				console.error( 'UIElement:', argument, 'is not an instance of UIElement.' );
 
 			}
 
@@ -74,9 +72,31 @@ UI.Element.prototype = {
 
 	},
 
+	getId: function () {
+
+		return this.dom.id;
+
+	},
+
 	setClass: function ( name ) {
 
 		this.dom.className = name;
+
+		return this;
+
+	},
+
+	addClass: function ( name ) {
+
+		this.dom.classList.add( name );
+
+		return this;
+
+	},
+
+	removeClass: function ( name ) {
+
+		this.dom.classList.remove( name );
 
 		return this;
 
@@ -122,7 +142,7 @@ properties.forEach( function ( property ) {
 
 	var method = 'set' + property.substr( 0, 1 ).toUpperCase() + property.substr( 1, property.length );
 
-	UI.Element.prototype[ method ] = function () {
+	UIElement.prototype[ method ] = function () {
 
 		this.setStyle( property, arguments );
 
@@ -140,7 +160,7 @@ events.forEach( function ( event ) {
 
 	var method = 'on' + event;
 
-	UI.Element.prototype[ method ] = function ( callback ) {
+	UIElement.prototype[ method ] = function ( callback ) {
 
 		this.dom.addEventListener( event.toLowerCase(), callback.bind( this ), false );
 
@@ -150,11 +170,11 @@ events.forEach( function ( event ) {
 
 } );
 
-// Span
+// UISpan
 
-UI.Span = function () {
+var UISpan = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	this.dom = document.createElement( 'span' );
 
@@ -162,14 +182,14 @@ UI.Span = function () {
 
 };
 
-UI.Span.prototype = Object.create( UI.Element.prototype );
-UI.Span.prototype.constructor = UI.Span;
+UISpan.prototype = Object.create( UIElement.prototype );
+UISpan.prototype.constructor = UISpan;
 
-// Div
+// UIDiv
 
-UI.Div = function () {
+var UIDiv = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	this.dom = document.createElement( 'div' );
 
@@ -177,14 +197,14 @@ UI.Div = function () {
 
 };
 
-UI.Div.prototype = Object.create( UI.Element.prototype );
-UI.Div.prototype.constructor = UI.Div;
+UIDiv.prototype = Object.create( UIElement.prototype );
+UIDiv.prototype.constructor = UIDiv;
 
-// Row
+// UIRow
 
-UI.Row = function () {
+var UIRow = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'Row';
@@ -195,14 +215,14 @@ UI.Row = function () {
 
 };
 
-UI.Row.prototype = Object.create( UI.Element.prototype );
-UI.Row.prototype.constructor = UI.Row;
+UIRow.prototype = Object.create( UIElement.prototype );
+UIRow.prototype.constructor = UIRow;
 
-// Panel
+// UIPanel
 
-UI.Panel = function () {
+var UIPanel = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'div' );
 	dom.className = 'Panel';
@@ -213,14 +233,14 @@ UI.Panel = function () {
 
 };
 
-UI.Panel.prototype = Object.create( UI.Element.prototype );
-UI.Panel.prototype.constructor = UI.Panel;
+UIPanel.prototype = Object.create( UIElement.prototype );
+UIPanel.prototype.constructor = UIPanel;
 
-// Text
+// UIText
 
-UI.Text = function ( text ) {
+var UIText = function ( text ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'span' );
 	dom.className = 'Text';
@@ -235,16 +255,16 @@ UI.Text = function ( text ) {
 
 };
 
-UI.Text.prototype = Object.create( UI.Element.prototype );
-UI.Text.prototype.constructor = UI.Text;
+UIText.prototype = Object.create( UIElement.prototype );
+UIText.prototype.constructor = UIText;
 
-UI.Text.prototype.getValue = function () {
+UIText.prototype.getValue = function () {
 
 	return this.dom.textContent;
 
 };
 
-UI.Text.prototype.setValue = function ( value ) {
+UIText.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
@@ -257,13 +277,11 @@ UI.Text.prototype.setValue = function ( value ) {
 };
 
 
-// Input
+// UIInput
 
-UI.Input = function ( text ) {
+var UIInput = function ( text ) {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Input';
@@ -283,16 +301,16 @@ UI.Input = function ( text ) {
 
 };
 
-UI.Input.prototype = Object.create( UI.Element.prototype );
-UI.Input.prototype.constructor = UI.Input;
+UIInput.prototype = Object.create( UIElement.prototype );
+UIInput.prototype.constructor = UIInput;
 
-UI.Input.prototype.getValue = function () {
+UIInput.prototype.getValue = function () {
 
 	return this.dom.value;
 
 };
 
-UI.Input.prototype.setValue = function ( value ) {
+UIInput.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
 
@@ -301,13 +319,11 @@ UI.Input.prototype.setValue = function ( value ) {
 };
 
 
-// TextArea
+// UITextArea
 
-UI.TextArea = function () {
+var UITextArea = function () {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'textarea' );
 	dom.className = 'TextArea';
@@ -338,16 +354,16 @@ UI.TextArea = function () {
 
 };
 
-UI.TextArea.prototype = Object.create( UI.Element.prototype );
-UI.TextArea.prototype.constructor = UI.TextArea;
+UITextArea.prototype = Object.create( UIElement.prototype );
+UITextArea.prototype.constructor = UITextArea;
 
-UI.TextArea.prototype.getValue = function () {
+UITextArea.prototype.getValue = function () {
 
 	return this.dom.value;
 
 };
 
-UI.TextArea.prototype.setValue = function ( value ) {
+UITextArea.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
 
@@ -356,13 +372,11 @@ UI.TextArea.prototype.setValue = function ( value ) {
 };
 
 
-// Select
+// UISelect
 
-UI.Select = function () {
+var UISelect = function () {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'select' );
 	dom.className = 'Select';
@@ -374,10 +388,10 @@ UI.Select = function () {
 
 };
 
-UI.Select.prototype = Object.create( UI.Element.prototype );
-UI.Select.prototype.constructor = UI.Select;
+UISelect.prototype = Object.create( UIElement.prototype );
+UISelect.prototype.constructor = UISelect;
 
-UI.Select.prototype.setMultiple = function ( boolean ) {
+UISelect.prototype.setMultiple = function ( boolean ) {
 
 	this.dom.multiple = boolean;
 
@@ -385,7 +399,7 @@ UI.Select.prototype.setMultiple = function ( boolean ) {
 
 };
 
-UI.Select.prototype.setOptions = function ( options ) {
+UISelect.prototype.setOptions = function ( options ) {
 
 	var selected = this.dom.value;
 
@@ -410,13 +424,13 @@ UI.Select.prototype.setOptions = function ( options ) {
 
 };
 
-UI.Select.prototype.getValue = function () {
+UISelect.prototype.getValue = function () {
 
 	return this.dom.value;
 
 };
 
-UI.Select.prototype.setValue = function ( value ) {
+UISelect.prototype.setValue = function ( value ) {
 
 	value = String( value );
 
@@ -430,13 +444,11 @@ UI.Select.prototype.setValue = function ( value ) {
 
 };
 
-// Checkbox
+// UICheckbox
 
-UI.Checkbox = function ( boolean ) {
+var UICheckbox = function ( boolean ) {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Checkbox';
@@ -449,16 +461,16 @@ UI.Checkbox = function ( boolean ) {
 
 };
 
-UI.Checkbox.prototype = Object.create( UI.Element.prototype );
-UI.Checkbox.prototype.constructor = UI.Checkbox;
+UICheckbox.prototype = Object.create( UIElement.prototype );
+UICheckbox.prototype.constructor = UICheckbox;
 
-UI.Checkbox.prototype.getValue = function () {
+UICheckbox.prototype.getValue = function () {
 
 	return this.dom.checked;
 
 };
 
-UI.Checkbox.prototype.setValue = function ( value ) {
+UICheckbox.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
@@ -471,13 +483,11 @@ UI.Checkbox.prototype.setValue = function ( value ) {
 };
 
 
-// Color
+// UIColor
 
-UI.Color = function () {
+var UIColor = function () {
 
-	UI.Element.call( this );
-
-	var scope = this;
+	UIElement.call( this );
 
 	var dom = document.createElement( 'input' );
 	dom.className = 'Color';
@@ -500,22 +510,22 @@ UI.Color = function () {
 
 };
 
-UI.Color.prototype = Object.create( UI.Element.prototype );
-UI.Color.prototype.constructor = UI.Color;
+UIColor.prototype = Object.create( UIElement.prototype );
+UIColor.prototype.constructor = UIColor;
 
-UI.Color.prototype.getValue = function () {
+UIColor.prototype.getValue = function () {
 
 	return this.dom.value;
 
 };
 
-UI.Color.prototype.getHexValue = function () {
+UIColor.prototype.getHexValue = function () {
 
 	return parseInt( this.dom.value.substr( 1 ), 16 );
 
 };
 
-UI.Color.prototype.setValue = function ( value ) {
+UIColor.prototype.setValue = function ( value ) {
 
 	this.dom.value = value;
 
@@ -523,7 +533,7 @@ UI.Color.prototype.setValue = function ( value ) {
 
 };
 
-UI.Color.prototype.setHexValue = function ( hex ) {
+UIColor.prototype.setHexValue = function ( hex ) {
 
 	this.dom.value = '#' + ( '000000' + hex.toString( 16 ) ).slice( - 6 );
 
@@ -532,11 +542,11 @@ UI.Color.prototype.setHexValue = function ( hex ) {
 };
 
 
-// Number
+// UINumber
 
-UI.Number = function ( number ) {
+var UINumber = function ( number ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -611,7 +621,7 @@ UI.Number = function ( number ) {
 
 	}
 
-	function onMouseUp( event ) {
+	function onMouseUp() {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
@@ -675,20 +685,20 @@ UI.Number = function ( number ) {
 
 	}
 
-	function onChange( event ) {
+	function onChange() {
 
 		scope.setValue( dom.value );
 
 	}
 
-	function onFocus( event ) {
+	function onFocus() {
 
 		dom.style.backgroundColor = '';
 		dom.style.cursor = '';
 
 	}
 
-	function onBlur( event ) {
+	function onBlur() {
 
 		dom.style.backgroundColor = 'transparent';
 		dom.style.cursor = 'col-resize';
@@ -707,16 +717,16 @@ UI.Number = function ( number ) {
 
 };
 
-UI.Number.prototype = Object.create( UI.Element.prototype );
-UI.Number.prototype.constructor = UI.Number;
+UINumber.prototype = Object.create( UIElement.prototype );
+UINumber.prototype.constructor = UINumber;
 
-UI.Number.prototype.getValue = function () {
+UINumber.prototype.getValue = function () {
 
 	return this.value;
 
 };
 
-UI.Number.prototype.setValue = function ( value ) {
+UINumber.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
@@ -736,7 +746,7 @@ UI.Number.prototype.setValue = function ( value ) {
 
 };
 
-UI.Number.prototype.setPrecision = function ( precision ) {
+UINumber.prototype.setPrecision = function ( precision ) {
 
 	this.precision = precision;
 
@@ -744,7 +754,7 @@ UI.Number.prototype.setPrecision = function ( precision ) {
 
 };
 
-UI.Number.prototype.setStep = function ( step ) {
+UINumber.prototype.setStep = function ( step ) {
 
 	this.step = step;
 
@@ -752,7 +762,7 @@ UI.Number.prototype.setStep = function ( step ) {
 
 };
 
-UI.Number.prototype.setRange = function ( min, max ) {
+UINumber.prototype.setRange = function ( min, max ) {
 
 	this.min = min;
 	this.max = max;
@@ -761,7 +771,7 @@ UI.Number.prototype.setRange = function ( min, max ) {
 
 };
 
-UI.Number.prototype.setUnit = function ( unit ) {
+UINumber.prototype.setUnit = function ( unit ) {
 
 	this.unit = unit;
 
@@ -769,11 +779,11 @@ UI.Number.prototype.setUnit = function ( unit ) {
 
 };
 
-// Integer
+// UIInteger
 
-UI.Integer = function ( number ) {
+var UIInteger = function ( number ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -844,7 +854,7 @@ UI.Integer = function ( number ) {
 
 	}
 
-	function onMouseUp( event ) {
+	function onMouseUp() {
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
@@ -858,20 +868,20 @@ UI.Integer = function ( number ) {
 
 	}
 
-	function onChange( event ) {
+	function onChange() {
 
 		scope.setValue( dom.value );
 
 	}
 
-	function onFocus( event ) {
+	function onFocus() {
 
 		dom.style.backgroundColor = '';
 		dom.style.cursor = '';
 
 	}
 
-	function onBlur( event ) {
+	function onBlur() {
 
 		dom.style.backgroundColor = 'transparent';
 		dom.style.cursor = 'col-resize';
@@ -889,16 +899,16 @@ UI.Integer = function ( number ) {
 
 };
 
-UI.Integer.prototype = Object.create( UI.Element.prototype );
-UI.Integer.prototype.constructor = UI.Integer;
+UIInteger.prototype = Object.create( UIElement.prototype );
+UIInteger.prototype.constructor = UIInteger;
 
-UI.Integer.prototype.getValue = function () {
+UIInteger.prototype.getValue = function () {
 
 	return this.value;
 
 };
 
-UI.Integer.prototype.setValue = function ( value ) {
+UIInteger.prototype.setValue = function ( value ) {
 
 	if ( value !== undefined ) {
 
@@ -913,7 +923,7 @@ UI.Integer.prototype.setValue = function ( value ) {
 
 };
 
-UI.Integer.prototype.setStep = function ( step ) {
+UIInteger.prototype.setStep = function ( step ) {
 
 	this.step = parseInt( step );
 
@@ -921,7 +931,7 @@ UI.Integer.prototype.setStep = function ( step ) {
 
 };
 
-UI.Integer.prototype.setRange = function ( min, max ) {
+UIInteger.prototype.setRange = function ( min, max ) {
 
 	this.min = min;
 	this.max = max;
@@ -931,11 +941,11 @@ UI.Integer.prototype.setRange = function ( min, max ) {
 };
 
 
-// Break
+// UIBreak
 
-UI.Break = function () {
+var UIBreak = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'br' );
 	dom.className = 'Break';
@@ -946,15 +956,15 @@ UI.Break = function () {
 
 };
 
-UI.Break.prototype = Object.create( UI.Element.prototype );
-UI.Break.prototype.constructor = UI.Break;
+UIBreak.prototype = Object.create( UIElement.prototype );
+UIBreak.prototype.constructor = UIBreak;
 
 
-// HorizontalRule
+// UIHorizontalRule
 
-UI.HorizontalRule = function () {
+var UIHorizontalRule = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'hr' );
 	dom.className = 'HorizontalRule';
@@ -965,15 +975,15 @@ UI.HorizontalRule = function () {
 
 };
 
-UI.HorizontalRule.prototype = Object.create( UI.Element.prototype );
-UI.HorizontalRule.prototype.constructor = UI.HorizontalRule;
+UIHorizontalRule.prototype = Object.create( UIElement.prototype );
+UIHorizontalRule.prototype.constructor = UIHorizontalRule;
 
 
-// Button
+// UIButton
 
-UI.Button = function ( value ) {
+var UIButton = function ( value ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var dom = document.createElement( 'button' );
 	dom.className = 'Button';
@@ -985,13 +995,298 @@ UI.Button = function ( value ) {
 
 };
 
-UI.Button.prototype = Object.create( UI.Element.prototype );
-UI.Button.prototype.constructor = UI.Button;
+UIButton.prototype = Object.create( UIElement.prototype );
+UIButton.prototype.constructor = UIButton;
 
-UI.Button.prototype.setLabel = function ( value ) {
+UIButton.prototype.setLabel = function ( value ) {
 
 	this.dom.textContent = value;
 
 	return this;
 
 };
+
+
+// UITabbedPanel
+
+var UITabbedPanel = function ( ) {
+
+	UIElement.call( this );
+
+	var dom = document.createElement( 'div' );
+
+	this.dom = dom;
+
+	this.setClass( 'TabbedPanel' );
+
+	this.tabs = [];
+	this.panels = [];
+
+	this.tabsDiv = new UIDiv();
+	this.tabsDiv.setClass( 'Tabs' );
+
+	this.panelsDiv = new UIDiv();
+	this.panelsDiv.setClass( 'Panels' );
+
+	this.add( this.tabsDiv );
+	this.add( this.panelsDiv );
+
+	this.selected = '';
+
+	return this;
+
+};
+
+UITabbedPanel.prototype = Object.create( UIElement.prototype );
+UITabbedPanel.prototype.constructor = UITabbedPanel;
+
+UITabbedPanel.prototype.select = function ( id ) {
+
+	var tab;
+	var panel;
+	var scope = this;
+
+	// Deselect current selection
+	if ( this.selected && this.selected.length ) {
+
+		tab = this.tabs.find( function ( item ) {
+
+			return item.dom.id === scope.selected;
+
+		} );
+		panel = this.panels.find( function ( item ) {
+
+			return item.dom.id === scope.selected;
+
+		} );
+
+		if ( tab ) {
+
+			tab.removeClass( 'selected' );
+
+		}
+
+		if ( panel ) {
+
+			panel.setDisplay( 'none' );
+
+		}
+
+	}
+
+	tab = this.tabs.find( function ( item ) {
+
+		return item.dom.id === id;
+
+	} );
+	panel = this.panels.find( function ( item ) {
+
+		return item.dom.id === id;
+
+	} );
+
+	if ( tab ) {
+
+		tab.addClass( 'selected' );
+
+	}
+
+	if ( panel ) {
+
+		panel.setDisplay( '' );
+
+	}
+
+	this.selected = id;
+
+	return this;
+
+};
+
+UITabbedPanel.prototype.addTab = function ( id, label, items ) {
+
+	var tab = new UITabbedPanel.Tab( label, this );
+	tab.setId( id );
+	this.tabs.push( tab );
+	this.tabsDiv.add( tab );
+
+	var panel = new UIDiv();
+	panel.setId( id );
+	panel.add( items );
+	panel.setDisplay( 'none' );
+	this.panels.push( panel );
+	this.panelsDiv.add( panel );
+
+	this.select( id );
+
+};
+
+UITabbedPanel.Tab = function ( text, parent ) {
+
+	UIText.call( this, text );
+	this.parent = parent;
+
+	this.setClass( 'Tab' );
+
+	var scope = this;
+
+	this.dom.addEventListener( 'click', function () {
+
+		scope.parent.select( scope.dom.id );
+
+	} );
+
+	return this;
+
+};
+
+UITabbedPanel.Tab.prototype = Object.create( UIText.prototype );
+UITabbedPanel.Tab.prototype.constructor = UITabbedPanel.Tab;
+
+// UIListbox
+var UIListbox = function ( ) {
+
+	UIElement.call( this );
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'Listbox';
+	dom.tabIndex = 0;
+
+	this.dom = dom;
+	this.items = [];
+	this.listitems = [];
+	this.selectedIndex = 0;
+	this.selectedValue = null;
+
+	return this;
+
+};
+
+UIListbox.prototype = Object.create( UIElement.prototype );
+UIListbox.prototype.constructor = UIListbox;
+
+UIListbox.prototype.setItems = function ( items ) {
+
+	if ( Array.isArray( items ) ) {
+
+		this.items = items;
+
+	}
+
+	this.render();
+
+};
+
+UIListbox.prototype.render = function ( ) {
+
+	while ( this.listitems.length ) {
+
+		var item = this.listitems[ 0 ];
+
+		item.dom.remove();
+
+		this.listitems.splice( 0, 1 );
+
+	}
+
+	for ( var i = 0; i < this.items.length; i ++ ) {
+
+		var item = this.items[ i ];
+
+		var listitem = new UIListbox.ListboxItem( this );
+		listitem.setId( item.id || `Listbox-${i}` );
+		listitem.setTextContent( item.name || item.type );
+		this.add( listitem );
+
+	}
+
+};
+
+// Assuming user passes valid list items
+UIListbox.prototype.add = function () {
+
+	var items = Array.from( arguments );
+
+	this.listitems = this.listitems.concat( items );
+
+	UIElement.prototype.add.apply( this, items );
+
+};
+
+UIListbox.prototype.selectIndex = function ( index ) {
+
+	if ( index >= 0 && index < this.items.length ) {
+
+		this.setValue( this.listitems[ index ].getId() );
+
+	}
+
+	this.selectedIndex = index;
+
+};
+
+UIListbox.prototype.getValue = function () {
+
+	return this.selectedValue;
+
+};
+
+UIListbox.prototype.setValue = function ( value ) {
+
+	for ( var i = 0; i < this.listitems.length; i ++ ) {
+
+		var element = this.listitems[ i ];
+
+		if ( element.getId() === value ) {
+
+			element.addClass( 'active' );
+
+		} else {
+
+			element.removeClass( 'active' );
+
+		}
+
+	}
+
+	this.selectedValue = value;
+
+	var changeEvent = document.createEvent( 'HTMLEvents' );
+	changeEvent.initEvent( 'change', true, true );
+	this.dom.dispatchEvent( changeEvent );
+
+};
+
+// Listbox Item
+UIListbox.ListboxItem = function ( parent ) {
+
+	UIElement.call( this );
+
+	var dom = document.createElement( 'div' );
+	dom.className = 'ListboxItem';
+
+	this.parent = parent;
+	this.dom = dom;
+
+	var scope = this;
+
+	function onClick() {
+
+		if ( scope.parent ) {
+
+			scope.parent.setValue( scope.getId( ) );
+
+		}
+
+	}
+
+	dom.addEventListener( 'click', onClick, false );
+
+	return this;
+
+};
+
+UIListbox.ListboxItem.prototype = Object.create( UIElement.prototype );
+UIListbox.ListboxItem.prototype.constructor = UIListbox.ListboxItem;
+
+export { UIElement, UISpan, UIDiv, UIRow, UIPanel, UIText, UIInput, UITextArea, UISelect, UICheckbox, UIColor, UINumber, UIInteger, UIBreak, UIHorizontalRule, UIButton, UITabbedPanel, UIListbox };

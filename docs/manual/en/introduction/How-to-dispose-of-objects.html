@@ -11,7 +11,6 @@
 
 <body>
 	<h1>[name]</h1>
-	<br />
 
 	<p>
 		One important aspect in order to improve performance and avoid memory leaks in your application is the disposal of unused library entities.
@@ -91,11 +90,6 @@
 		Yes. It's possible to evaluate [page:WebGLRenderer.info], a special property of the renderer with a series of statistical information about the graphics board memory
 		and the rendering process. Among other things, it tells you have many textures, geometries and shader programs are internally stored. If you notice performance problems
 		in your application, it's a good idea to debug this property in order to easily identify a memory leak.
-	</p>
-
-	<p>
-		Internal resources for a texture are only allocated if the image has fully loaded. If you dispose a texture before the image was loaded,
-		nothing happens. No resources were allocated so there is also no need for clean up.
 	</p>
 
 	<h3>What happens when you call *dispose()* on a texture but the image is not loaded yet?</h3>

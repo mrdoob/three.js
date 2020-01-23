@@ -145,8 +145,8 @@ THREE.Fire = function ( geometry, options ) {
 
 	this.field0.background = new THREE.Color( 0x000000 );
 
-	if ( ! THREE.Math.isPowerOfTwo( textureWidth ) ||
-		 ! THREE.Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) ||
+		 ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		this.field0.texture.generateMipmaps = false;
 		this.field1.texture.generateMipmaps = false;
@@ -319,7 +319,7 @@ THREE.Fire = function ( geometry, options ) {
 	this.saveRenderState = function ( renderer ) {
 
 		this.savedRenderTarget = renderer.getRenderTarget();
-		this.savedVrEnabled = renderer.vr.enabled;
+		this.savedXrEnabled = renderer.xr.enabled;
 		this.savedShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 		this.savedAntialias = renderer.antialias;
 		this.savedToneMapping = renderer.toneMapping;
@@ -328,7 +328,7 @@ THREE.Fire = function ( geometry, options ) {
 
 	this.restoreRenderState = function ( renderer ) {
 
-		renderer.vr.enabled = this.savedVrEnabled;
+		renderer.xr.enabled = this.savedXrEnabled;
 		renderer.shadowMap.autoUpdate = this.savedShadowAutoUpdate;
 		renderer.setRenderTarget( this.savedRenderTarget );
 		renderer.antialias = this.savedAntialias;
@@ -445,7 +445,7 @@ THREE.Fire = function ( geometry, options ) {
 
 		this.saveRenderState( renderer );
 
-		renderer.vr.enabled = false; // Avoid camera modification and recursion
+		renderer.xr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 		renderer.antialias = false;
 		renderer.toneMapping = THREE.NoToneMapping;
@@ -498,11 +498,9 @@ THREE.Fire.SourceShader = {
 
 	uniforms: {
 		'sourceMap': {
-			type: 't',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -557,39 +555,30 @@ THREE.Fire.DiffuseShader = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'diffuse': {
-			type: 'f',
 			value: null
 		},
 		'viscosity': {
-			type: 'f',
 			value: null
 		},
 		'expansion': {
-			type: 'f',
 			value: null
 		},
 		'swirl': {
-			type: 'f',
 			value: null
 		},
 		'drag': {
-			type: 'f',
 			value: null
 		},
 		'burnRate': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -674,23 +663,18 @@ THREE.Fire.DriftShader = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'windVector': {
-			type: 'v2',
 			value: new THREE.Vector2( 0.0, 0.0 )
 		},
 		'airSpeed': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -759,15 +743,12 @@ THREE.Fire.ProjectionShader1 = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -819,15 +800,12 @@ THREE.Fire.ProjectionShader2 = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -880,19 +858,15 @@ THREE.Fire.ProjectionShader3 = {
 
 	uniforms: {
 		'oneOverWidth': {
-			type: 'f',
 			value: null
 		},
 		'oneOverHeight': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		},
 		'projMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -950,23 +924,18 @@ THREE.Fire.ColorShader = {
 
 	uniforms: {
 		'color1': {
-			type: 'c',
 			value: null
 		},
 		'color2': {
-			type: 'c',
 			value: null
 		},
 		'color3': {
-			type: 'c',
 			value: null
 		},
 		'colorBias': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},
@@ -1014,23 +983,18 @@ THREE.Fire.DebugShader = {
 
 	uniforms: {
 		'color1': {
-			type: 'c',
 			value: null
 		},
 		'color2': {
-			type: 'c',
 			value: null
 		},
 		'color3': {
-			type: 'c',
 			value: null
 		},
 		'colorBias': {
-			type: 'f',
 			value: null
 		},
 		'densityMap': {
-			type: 't',
 			value: null
 		}
 	},

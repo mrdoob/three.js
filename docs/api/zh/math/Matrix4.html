@@ -51,7 +51,7 @@
 
 				这意味着
 		<code>
-var m = new Matrix4();
+var m = new THREE.Matrix4();
 
 m.set( 11, 12, 13, 14,
        21, 22, 23, 24,
@@ -88,25 +88,10 @@ m.elements = [ 11, 21, 31, 41,
 		矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
 		</p>
 
-		<h3>[property:Boolean isMatrix4]</h3>
-		<p>
-			用于判定此对象或者此类的派生对象是否是三维矩阵。默认值为 *true*。<br /><br />
-
-			不应该改变该值，因为它在内部用于优化。
-		</p>
-
 
 
 
 		<h2>方法（Methods）</h2>
-
-		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
-		<p>
-		[page:BufferAttribute attribute] - 表示三维向量缓存属性。<br /><br />
-
-		用这个矩阵乘以缓存属性[page:BufferAttribute attribute]里的所有3d向量。
-		</p>
-
 
 		<h3>[method:Matrix4 clone]()</h3>
 		<p>创建一个新的矩阵，元素[page:.elements elements]与该矩阵相同。</p>
@@ -203,7 +188,7 @@ zAxis = (c, g, k)
 
 		设置当前矩阵为围绕轴 [page:Vector3 axis] 旋转量为 [page:Float theta]弧度。<br />
 
-		这是一种有点争议但在数学上可以替代通过四元数[page:Quaternions]旋转的办法。 请参阅此处[link:http://www.gamedev.net/reference/articles/article1199.asp here]的讨论。
+		这是一种有点争议但在数学上可以替代通过四元数[page:Quaternions]旋转的办法。 请参阅此处[link:https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199 here]的讨论。
 		</p>
 
 		<h3>[method:this makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
@@ -356,6 +341,7 @@ x, y, 1, 0,
 		</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
+		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>
 		<p>
 			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:
 <code>
@@ -386,6 +372,8 @@ m, n, o, p
 
 		<h2>源码（Source）</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

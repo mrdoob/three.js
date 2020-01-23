@@ -4,49 +4,18 @@
 		<title>three.js webgl - effects - ascii</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			a {
-				color: #ff0000;
-			}
-
-			#webglmessage a { color:#da0 }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - effects - ascii</div>
-		<script src="../build/three.js"></script>
 
-		<script src="js/controls/TrackballControls.js"></script>
-		<script src="js/effects/AsciiEffect.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { AsciiEffect } from './jsm/effects/AsciiEffect.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
 			var camera, controls, scene, renderer, effect;
 
@@ -86,7 +55,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				effect = new THREE.AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
+				effect = new AsciiEffect( renderer, ' .:-+*=%@#', { invert: true } );
 				effect.setSize( window.innerWidth, window.innerHeight );
 				effect.domElement.style.color = 'white';
 				effect.domElement.style.backgroundColor = 'black';
@@ -96,7 +65,7 @@
 
 				document.body.appendChild( effect.domElement );
 
-				controls = new THREE.TrackballControls( camera, effect.domElement );
+				controls = new TrackballControls( camera, effect.domElement );
 
 				//
 

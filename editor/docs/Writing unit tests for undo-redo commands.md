@@ -68,7 +68,7 @@ test("Test DoSomethingCommand (Undo and Redo)", function() {
     // var perspectiveCamera = aPerspectiveCamera( 'Name your perspectiveCamera' );
 
     // in most cases you'll need to add the object to work with
-    editor.execute( new AddObjectCommand( box ) );
+    editor.execute( new AddObjectCommand( editor, box ) );
 
 
     // your test begins here...

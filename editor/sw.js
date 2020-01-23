@@ -1,50 +1,52 @@
-// r104
+// r112.1
 
-const staticAssets = [
+const assets = [
 	'./',
 
-	'../build/three.js',
-	'../examples/js/libs/system.min.js',
+	'../files/favicon.ico',
 
-	'../examples/js/controls/EditorControls.js',
-	'../examples/js/controls/TransformControls.js',
+	'../build/three.module.js',
+
+	'../examples/jsm/controls/TransformControls.js',
+
+	'../examples/jsm/libs/chevrotain.module.min.js',
+	'../examples/jsm/libs/inflate.module.min.js',
 
 	'../examples/js/libs/jszip.min.js',
-	'../examples/js/libs/inflate.min.js',
+	'../examples/js/libs/draco/draco_decoder.js',
+	'../examples/js/libs/draco/draco_decoder.wasm',
+	'../examples/js/libs/draco/draco_wasm_wrapper.js',
 
-	'../examples/js/loaders/AMFLoader.js',
-	'../examples/js/loaders/AWDLoader.js',
-	'../examples/js/loaders/BabylonLoader.js',
-	'../examples/js/loaders/ColladaLoader.js',
-	'../examples/js/loaders/DRACOLoader.js',
-	'../examples/js/loaders/FBXLoader.js',
-	'../examples/js/loaders/GLTFLoader.js',
-	'../examples/js/loaders/deprecated/LegacyGLTFLoader.js',
-	'../examples/js/loaders/KMZLoader.js',
-	'../examples/js/loaders/MD2Loader.js',
-	'../examples/js/loaders/OBJLoader.js',
-	'../examples/js/loaders/MTLLoader.js',
-	'../examples/js/loaders/PlayCanvasLoader.js',
-	'../examples/js/loaders/PLYLoader.js',
-	'../examples/js/loaders/STLLoader.js',
-	'../examples/js/loaders/SVGLoader.js',
-	'../examples/js/loaders/TGALoader.js',
-	'../examples/js/loaders/TDSLoader.js',
-	'../examples/js/loaders/VRMLLoader.js',
-	'../examples/js/loaders/VTKLoader.js',
-	'../examples/js/loaders/ctm/lzma.js',
-	'../examples/js/loaders/ctm/ctm.js',
-	'../examples/js/loaders/ctm/CTMLoader.js',
+	'../examples/jsm/loaders/AMFLoader.js',
+	'../examples/jsm/loaders/ColladaLoader.js',
+	'../examples/jsm/loaders/DRACOLoader.js',
+	'../examples/jsm/loaders/FBXLoader.js',
+	'../examples/jsm/loaders/GLTFLoader.js',
+	'../examples/jsm/loaders/KMZLoader.js',
+	'../examples/jsm/loaders/MD2Loader.js',
+	'../examples/jsm/loaders/OBJLoader.js',
+	'../examples/jsm/loaders/MTLLoader.js',
+	'../examples/jsm/loaders/PLYLoader.js',
+	'../examples/jsm/loaders/STLLoader.js',
+	'../examples/jsm/loaders/SVGLoader.js',
+	'../examples/jsm/loaders/TGALoader.js',
+	'../examples/jsm/loaders/TDSLoader.js',
+	'../examples/jsm/loaders/VRMLLoader.js',
+	'../examples/jsm/loaders/VTKLoader.js',
 
-	'../examples/js/exporters/ColladaExporter.js',
-	'../examples/js/exporters/GLTFExporter.js',
-	'../examples/js/exporters/OBJExporter.js',
-	'../examples/js/exporters/STLExporter.js',
+	'../examples/jsm/curves/NURBSCurve.js',
+	'../examples/jsm/curves/NURBSUtils.js',
 
-	'../examples/js/renderers/Projector.js',
-	'../examples/js/renderers/RaytracingRenderer.js',
-	'../examples/js/renderers/SoftwareRenderer.js',
-	'../examples/js/renderers/SVGRenderer.js',
+	'../examples/jsm/exporters/ColladaExporter.js',
+	'../examples/jsm/exporters/GLTFExporter.js',
+	'../examples/jsm/exporters/OBJExporter.js',
+	'../examples/jsm/exporters/PLYExporter.js',
+	'../examples/jsm/exporters/STLExporter.js',
+
+	'../examples/jsm/geometries/TeapotBufferGeometry.js',
+
+	'./manifest.json',
+	'./images/icon.png',
 
 	'./js/libs/codemirror/codemirror.css',
 	'./js/libs/codemirror/theme/monokai.css',
@@ -80,21 +82,15 @@ const staticAssets = [
 	'./js/libs/ui.js',
 	'./js/libs/ui.three.js',
 
-	'./js/libs/html2canvas.js',
-	'./js/libs/three.html.js',
-
 	'./js/libs/app.js',
 	'./js/Player.js',
 	'./js/Script.js',
 
-	'../examples/js/vr/WebVR.js',
-
 	//
 
 	'./css/main.css',
-	'./css/dark.css',
-	'./css/light.css',
 
+	'./js/EditorControls.js',
 	'./js/Storage.js',
 
 	'./js/Editor.js',
@@ -106,7 +102,6 @@ const staticAssets = [
 	'./js/Menubar.Edit.js',
 	'./js/Menubar.Add.js',
 	'./js/Menubar.Play.js',
-	// './js/Menubar.View.js',
 	'./js/Menubar.Examples.js',
 	'./js/Menubar.Help.js',
 	'./js/Menubar.Status.js',
@@ -125,13 +120,18 @@ const staticAssets = [
 	'./js/Sidebar.Geometry.BoxGeometry.js',
 	'./js/Sidebar.Geometry.CircleGeometry.js',
 	'./js/Sidebar.Geometry.CylinderGeometry.js',
+	'./js/Sidebar.Geometry.DodecahedronGeometry.js',
+	'./js/Sidebar.Geometry.ExtrudeGeometry.js',
 	'./js/Sidebar.Geometry.IcosahedronGeometry.js',
+	'./js/Sidebar.Geometry.OctahedronGeometry.js',
 	'./js/Sidebar.Geometry.PlaneGeometry.js',
+	'./js/Sidebar.Geometry.RingGeometry.js',
 	'./js/Sidebar.Geometry.SphereGeometry.js',
+	'./js/Sidebar.Geometry.ShapeGeometry.js',
+	'./js/Sidebar.Geometry.TetrahedronGeometry.js',
 	'./js/Sidebar.Geometry.TorusGeometry.js',
 	'./js/Sidebar.Geometry.TorusKnotGeometry.js',
 	'./js/Sidebar.Geometry.TubeGeometry.js',
-	'../examples/js/geometries/TeapotBufferGeometry.js',
 	'./js/Sidebar.Geometry.TeapotBufferGeometry.js',
 	'./js/Sidebar.Geometry.LatheGeometry.js',
 	'./js/Sidebar.Material.js',
@@ -141,6 +141,7 @@ const staticAssets = [
 	'./js/Strings.js',
 	'./js/Toolbar.js',
 	'./js/Viewport.js',
+	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
 
 	'./js/Command.js',
@@ -160,9 +161,10 @@ const staticAssets = [
 	'./js/commands/RemoveScriptCommand.js',
 	'./js/commands/SetScriptValueCommand.js',
 	'./js/commands/SetMaterialCommand.js',
-	'./js/commands/SetMaterialValueCommand.js',
 	'./js/commands/SetMaterialColorCommand.js',
 	'./js/commands/SetMaterialMapCommand.js',
+	'./js/commands/SetMaterialValueCommand.js',
+	'./js/commands/SetMaterialVectorCommand.js',
 	'./js/commands/SetSceneCommand.js',
 
 	//
@@ -175,10 +177,19 @@ const staticAssets = [
 
 ];
 
-self.addEventListener( 'install', async function ( event ) {
+self.addEventListener( 'install', async function () {
 
 	const cache = await caches.open( 'threejs-editor' );
-	cache.addAll( staticAssets );
+
+	assets.forEach( function ( asset ) {
+
+		cache.add( asset ).catch( function () {
+
+			console.error( '[SW] Cound\'t cache:', asset );
+
+		} );
+
+	} );
 
 } );
 
@@ -192,6 +203,14 @@ self.addEventListener( 'fetch', async function ( event ) {
 async function cacheFirst( request ) {
 
 	const cachedResponse = await caches.match( request );
-	return cachedResponse || fetch( request );
+
+	if ( cachedResponse === undefined ) {
+
+		console.error( '[SW] Not cached:', request.url );
+		return fetch( request );
+
+	}
+
+	return cachedResponse;
 
 }

@@ -1,3 +1,5 @@
 export class WebGLShader {
-  constructor(gl: any, type: string, string: string, debug: boolean);
+
+	constructor( gl: WebGLRenderingContext, type: string, string: string );
+
 }

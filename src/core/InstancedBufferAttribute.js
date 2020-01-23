@@ -36,6 +36,18 @@ InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribu
 
 		return this;
 
+	},
+
+	toJSON: function ()	{
+
+		var data = BufferAttribute.prototype.toJSON.call( this );
+
+		data.meshPerAttribute = this.meshPerAttribute;
+
+		data.isInstancedBufferAttribute = true;
+
+		return data;
+
 	}
 
 } );

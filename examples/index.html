@@ -2,30 +2,13 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>three.js / examples</title>
+		<title>three.js examples</title>
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="shortcut icon" href="../files/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
 		<style>
 			#panel #content .link {
 				display: block;
-				text-decoration: none;
-				cursor: pointer;
-			}
-
-			#viewSrcButton {
-				position: fixed;
-				bottom: 20px;
-				right: 20px;
-				padding: 8px;
-				color: #fff;
-				background-color: #555;
-				opacity: 0.7;
-			}
-
-			#viewSrcButton:hover {
-				cursor: pointer;
-				opacity: 1;
 			}
 		</style>
 	</head>
@@ -34,35 +17,50 @@
 		<div id="panel">
 
 			<div id="header">
-
-				<h1><a href="http://threejs.org">three.js</a></h1>
-
-				<img id="expandButton" src="../files/ic_menu_black_24dp.svg">
+				<h1><a href="https://threejs.org">three.js</a></h1>
 
 				<div id="sections">
-					<a href="../docs/">docs</a> <span class="selected">examples</span>
+					<a href="../docs/index.html#manual/introduction/Creating-a-scene">docs</a>
+					<span class="selected">examples</span>
 				</div>
 
-				<input type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false"/>
-
+				<div id="expandButton"></div>
 			</div>
 
-			<div id="content"></div>
+			<div id="panelScrim"></div>
+
+			<div id="contentWrapper">
+
+				<div id="inputWrapper">
+					<input placeholder="" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<div id="exitSearchButton"></div>
+				</div>
+
+				<div id="content"></div>
+			</div>
 
 		</div>
 
 		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
+
+		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
 		<script src="files.js"></script>
 
 		<script>
 
 		function extractQuery() {
+
 			var p = window.location.search.indexOf( '?q=' );
-			if( p !== -1 ) {
+
+			if ( p !== - 1 ) {
+
 				return window.location.search.substr( 3 );
+
 			}
-			return ''
+
+			return '';
+
 		}
 
 		var panel = document.getElementById( 'panel' );
@@ -70,12 +68,23 @@
 		var viewer = document.getElementById( 'viewer' );
 
 		var filterInput = document.getElementById( 'filter' );
+		var exitSearchButton = document.getElementById( 'exitSearchButton' );
 
 		var expandButton = document.getElementById( 'expandButton' );
 		expandButton.addEventListener( 'click', function ( event ) {
+
 			event.preventDefault();
-			panel.classList.toggle( 'collapsed' );
+			panel.classList.toggle( 'open' );
+
 		} );
+
+		var panelScrim = document.getElementById( 'panelScrim' );
+		panelScrim.onclick = function ( event ) {
+
+			event.preventDefault();
+			panel.classList.toggle( 'open' );
+
+		};
 
 		// iOS iframe auto-resize workaround
 
@@ -90,12 +99,8 @@
 		var container = document.createElement( 'div' );
 		content.appendChild( container );
 
-		var viewSrcButton = document.createElement( 'a' );
-		viewSrcButton.id = 'viewSrcButton';
-		viewSrcButton.target = '_blank';
-		viewSrcButton.textContent = 'View source';
+		var viewSrcButton = document.getElementById( 'button' );
 		viewSrcButton.style.display = 'none';
-		document.body.appendChild( viewSrcButton );
 
 		var links = {};
 		var selected = null;
@@ -157,7 +162,7 @@
 			window.location.hash = file;
 			viewer.focus();
 
-			panel.classList.add( 'collapsed' );
+			panel.classList.remove( 'open' );
 
 			selected = file;
 
@@ -168,15 +173,38 @@
 
 		}
 
-		if ( window.location.hash !== '' ) {
+		if ( window.location.hash !== '' && links[ window.location.hash.substring( 1 ) ] ) {
 
 			loadFile( window.location.hash.substring( 1 ) );
 
 		}
 
 		// filter
+		filterInput.onfocus = function ( event ) {
 
-		filterInput.addEventListener( 'input', function( e ) {
+			panel.classList.add( 'searchFocused' );
+
+		};
+
+		filterInput.onblur = function ( event ) {
+
+			if ( filterInput.value === '' ) {
+
+				panel.classList.remove( 'searchFocused' );
+
+			}
+
+		};
+
+		exitSearchButton.onclick = function ( event ) {
+
+			filterInput.value = '';
+			updateFilter();
+			panel.classList.remove( 'searchFocused' );
+
+		};
+
+		filterInput.addEventListener( 'input', function () {
 
 			updateFilter();
 
@@ -185,10 +213,15 @@
 		function updateFilter() {
 
 			var v = filterInput.value;
-			if( v !== '' ) {
-				window.history.replaceState( {} , '', '?q=' + v + window.location.hash );
+
+			if ( v !== '' ) {
+
+				window.history.replaceState( {}, '', '?q=' + v + window.location.hash );
+
 			} else {
-				window.history.replaceState( {} , '', window.location.pathname + window.location.hash );
+
+				window.history.replaceState( {}, '', window.location.pathname + window.location.hash );
+
 			}
 
 			var exp = new RegExp( v, 'gi' );
@@ -209,7 +242,7 @@
 
 		}
 
-		function filterExample( file, exp ){
+		function filterExample( file, exp ) {
 
 			var link = links[ file ];
 			var name = getName( file );
@@ -220,8 +253,10 @@
 
 				link.classList.remove( 'hidden' );
 
-				for( var i = 0; i < res.length; i++ ) {
+				for ( var i = 0; i < res.length; i ++ ) {
+
 					text = name.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
+
 				}
 
 				link.innerHTML = text;
@@ -232,6 +267,7 @@
 				link.innerHTML = name;
 
 			}
+
 		}
 
 		function getName( file ) {
@@ -254,7 +290,7 @@
 
 					var file = section[ i ];
 
-					if ( links[ file ].classList.contains( 'hidden' ) === false ){
+					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
 
 						collapsed = false;
 						break;
@@ -280,6 +316,13 @@
 		}
 
 		filterInput.value = extractQuery();
+
+		if ( filterInput.value !== '' ) {
+
+			panel.classList.add( 'searchFocused' );
+
+		}
+
 		updateFilter();
 
 		</script>

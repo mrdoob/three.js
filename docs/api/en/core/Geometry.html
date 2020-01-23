@@ -98,13 +98,6 @@
 		<h3>[property:Integer id]</h3>
 		<p>Unique number for this geometry instance.</p>
 
-		<h3>[property:Boolean isGeometry]</h3>
-		<p>
-			Used to check whether this or derived classes are Geometries. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:array lineDistances]</h3>
 		<p>
 		An array containing distances between vertices for Line geometries.
@@ -210,7 +203,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>Bakes matrix transform directly into vertex coordinates.</p>
 
 		<h3>[method:Geometry center] ()</h3>
@@ -327,8 +320,10 @@
 		Use [page:Object3D.scale] for typical real-time mesh scaling.
 		</p>
 
-		<h3>[method:JSON toJSON] ( )</h3>
-		<p>Convert the geometry to JSON format.</p>
+		<h3>[method:Object toJSON] ( )</h3>
+		<p>Convert the geometry to JSON format.<br />
+		Convert the geometry to three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format].
+		</p>
 
 		<h3>[method:Geometry translate] ( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
@@ -339,6 +334,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

@@ -12,27 +12,28 @@ THREE.KTXLoader = function ( manager ) {
 
 	THREE.CompressedTextureLoader.call( this, manager );
 
-	this._parser = THREE.KTXLoader.parse;
-
 };
 
-THREE.KTXLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
-THREE.KTXLoader.prototype.constructor = THREE.KTXLoader;
+THREE.KTXLoader.prototype = Object.assign( Object.create( THREE.CompressedTextureLoader.prototype ), {
 
-THREE.KTXLoader.parse = function ( buffer, loadMipmaps ) {
+	constructor: THREE.KTXLoader,
 
-	var ktx = new KhronosTextureContainer( buffer, 1 );
+	parse: function ( buffer, loadMipmaps ) {
 
-	return {
-		mipmaps: ktx.mipmaps( loadMipmaps ),
-		width: ktx.pixelWidth,
-		height: ktx.pixelHeight,
-		format: ktx.glInternalFormat,
-		isCubemap: ktx.numberOfFaces === 6,
-		mipmapCount: ktx.numberOfMipmapLevels
-	};
+		var ktx = new KhronosTextureContainer( buffer, 1 );
 
-};
+		return {
+			mipmaps: ktx.mipmaps( loadMipmaps ),
+			width: ktx.pixelWidth,
+			height: ktx.pixelHeight,
+			format: ktx.glInternalFormat,
+			isCubemap: ktx.numberOfFaces === 6,
+			mipmapCount: ktx.numberOfMipmapLevels
+		};
+
+	}
+
+} );
 
 var KhronosTextureContainer = ( function () {
 
@@ -42,7 +43,7 @@ var KhronosTextureContainer = ( function () {
 	 * @param {boolean} threeDExpected- provision for indicating that data should be a 3D texture, not implemented
 	 * @param {boolean} textureArrayExpected- provision for indicating that data should be a texture array, not implemented
 	 */
-	function KhronosTextureContainer( arrayBuffer, facesExpected, threeDExpected, textureArrayExpected ) {
+	function KhronosTextureContainer( arrayBuffer, facesExpected /*, threeDExpected, textureArrayExpected */ ) {
 
 		this.arrayBuffer = arrayBuffer;
 
@@ -138,13 +139,13 @@ var KhronosTextureContainer = ( function () {
 
 			var imageSize = new Int32Array( this.arrayBuffer, dataOffset, 1 )[ 0 ]; // size per face, since not supporting array cubemaps
 			dataOffset += 4; // size of the image + 4 for the imageSize field
-			
+
 			for ( var face = 0; face < this.numberOfFaces; face ++ ) {
 
 				var byteArray = new Uint8Array( this.arrayBuffer, dataOffset, imageSize );
 
 				mipmaps.push( { "data": byteArray, "width": width, "height": height } );
-				
+
 				dataOffset += imageSize;
 				dataOffset += 3 - ( ( imageSize + 3 ) % 4 ); // add padding for odd sized image
 
