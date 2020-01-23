@@ -483,7 +483,7 @@ function WebXRManager( renderer, gl ) {
 
 				}
 
-				if ( inputSource.gripSpace && controller.grip ) {
+				if ( controller.grip && inputSource.gripSpace ) {
 
 					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
 
