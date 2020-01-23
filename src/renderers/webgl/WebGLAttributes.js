@@ -4,6 +4,8 @@
 
 function WebGLAttributes( gl, capabilities ) {
 
+	var isWebGL2 = capabilities.isWebGL2;
+
 	var buffers = new WeakMap();
 
 	function createBuffer( attribute, bufferType ) {
@@ -78,7 +80,7 @@ function WebGLAttributes( gl, capabilities ) {
 
 		} else {
 
-			if ( capabilities.isWebGL2 ) {
+			if ( isWebGL2 ) {
 
 				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
 					array, updateRange.offset, updateRange.count );
