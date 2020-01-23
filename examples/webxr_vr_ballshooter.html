@@ -24,6 +24,7 @@
 
 			var camera, scene, renderer;
 			var controller1, controller2;
+			var controllerGrip1, controllerGrip2;
 
 			var room;
 
@@ -108,13 +109,12 @@
 				controller1.addEventListener( 'selectend', onSelectEnd );
 				controller1.addEventListener( 'connected', function ( event ) {
 
-					this.userData.targetMesh = buildController( event.data );
-					this.add( this.userData.targetMesh );
+					this.add( buildController( event.data ) );
 
 				} );
 				controller1.addEventListener( 'disconnected', function () {
 
-					this.remove( this.userData.targetMesh );
+					this.remove( this.children[ 0 ] );
 
 				} );
 				scene.add( controller1 );
@@ -124,24 +124,30 @@
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				controller2.addEventListener( 'connected', function ( event ) {
 
-					this.userData.targetMesh = buildController( event.data );
-					this.add( this.userData.targetMesh );
+					this.add( buildController( event.data ) );
 
 				} );
 				controller2.addEventListener( 'disconnected', function () {
 
-					this.remove( this.userData.targetMesh );
+					this.remove( this.children[ 0 ] );
 
 				} );
 				scene.add( controller2 );
 
 				// The XRControllerModelFactory will automatically fetch controller models
-				// that match what the user is holding as closely as possible.
+				// that match what the user is holding as closely as possible. The models
+				// should be attached to the object returned from getControllerGrip in
+				// order to match the orientation of the held device.
 
 				var controllerModelFactory = new XRControllerModelFactory();
 
-				controller1.add( controllerModelFactory.createControllerModel( controller1 ) );
-				controller2.add( controllerModelFactory.createControllerModel( controller2 ) );
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
 
 				//
 

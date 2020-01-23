@@ -29,7 +29,7 @@
 
 			var room;
 
-			var controller, tempMatrix = new THREE.Matrix4();
+			var controller, controllerGrip, tempMatrix = new THREE.Matrix4();
 			var INTERSECTED;
 
 			init();
@@ -113,20 +113,21 @@
 				controller.addEventListener( 'selectend', onSelectEnd );
 				controller.addEventListener( 'connected', function ( event ) {
 
-					this.userData.targetMesh = buildController( event.data );
-					this.add( this.userData.targetMesh );
+					this.add( buildController( event.data ) );
 
 				} );
 				controller.addEventListener( 'disconnected', function () {
 
-					this.remove( this.userData.targetMesh );
+					this.remove( this.children[ 0 ] );
 
 				} );
 				scene.add( controller );
 
 				var controllerModelFactory = new XRControllerModelFactory();
 
-				controller.add( controllerModelFactory.createControllerModel( controller ) );
+				controllerGrip = renderer.xr.getControllerGrip( 0 );
+				controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
+				scene.add( controllerGrip );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

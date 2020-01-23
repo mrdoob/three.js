@@ -24,6 +24,7 @@
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
+			var controllerGrip1, controllerGrip2;
 
 			var raycaster, intersected = [];
 			var tempMatrix = new THREE.Matrix4();
@@ -136,8 +137,13 @@
 
 				var controllerModelFactory = new XRControllerModelFactory();
 
-				controller1.add( controllerModelFactory.createControllerModel( controller1 ) );
-				controller2.add( controllerModelFactory.createControllerModel( controller2 ) );
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
 
 				//
 
