@@ -62,6 +62,7 @@ import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
 import { Box3 } from './math/Box3.js';
 import { Color } from './math/Color.js';
+import { Frustum } from './math/Frustum.js';
 import { Line3 } from './math/Line3.js';
 import { MathUtils } from './math/MathUtils.js';
 import { Matrix3 } from './math/Matrix3.js';
@@ -537,6 +538,13 @@ Object.assign( Box3.prototype, {
 
 	}
 } );
+
+Frustum.prototype.setFromMatrix = function ( m ) {
+
+	console.warn( 'THREE.Frustum: .setFromMatrix() has been renamed to .setFromProjectionMatrix().' );
+	return this.setFromProjectionMatrix( m );
+
+};
 
 Line3.prototype.center = function ( optionalTarget ) {
 
