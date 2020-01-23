@@ -109,7 +109,7 @@
 					quaternion.setFromEuler( rotation );
 					matrix.compose( position, quaternion, scale );
 
-					geometry.applyMatrix( matrix );
+					geometry.applyMatrix4( matrix );
 
 					// give the geometry's vertices a random color, to be displayed
 

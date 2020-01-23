@@ -76,8 +76,8 @@
 					.makeRotationX( Math.PI )
 					.multiply( new THREE.Matrix4().makeScale( 7, 7, 7 ) )
 
-				stemGeometry.applyMatrix( defaultTransform );
-				blossomGeometry.applyMatrix( defaultTransform );
+				stemGeometry.applyMatrix4( defaultTransform );
+				blossomGeometry.applyMatrix4( defaultTransform );
 
 				stemMaterial = _stemMesh.material;
 				blossomMaterial = _blossomMesh.material;

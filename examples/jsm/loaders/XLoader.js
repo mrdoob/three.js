@@ -821,7 +821,7 @@ var XLoader = ( function () {
 				}
 				var b = new Bone();
 				b.name = this._currentFrame.name;
-				b.applyMatrix( this._currentFrame.FrameTransformMatrix );
+				b.applyMatrix4( this._currentFrame.FrameTransformMatrix );
 				b.matrixWorld = b.matrix;
 				b.FrameTransformMatrix = this._currentFrame.FrameTransformMatrix;
 				this._currentFrame.putBone = b;
@@ -1284,7 +1284,7 @@ var XLoader = ( function () {
 						putting = true;
 						var b = new Bone();
 						b.name = this.HieStack[ frame ].name;
-						b.applyMatrix( this.HieStack[ frame ].FrameTransformMatrix );
+						b.applyMatrix4( this.HieStack[ frame ].FrameTransformMatrix );
 						b.matrixWorld = b.matrix;
 						b.FrameTransformMatrix = this.HieStack[ frame ].FrameTransformMatrix;
 						b.pos = new Vector3().setFromMatrixPosition( b.FrameTransformMatrix ).toArray();
@@ -1423,7 +1423,7 @@ var XLoader = ( function () {
 						}
 
 					}
-					mesh.applyMatrix( worldBaseMx );
+					mesh.applyMatrix4( worldBaseMx );
 
 				}
 				this.Meshes.push( mesh );
