@@ -19,7 +19,7 @@ import {
 	MotionController
 } from '../libs/motion-controllers.module.js';
 
-const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@0.2.0/dist/profiles';
+const DEFAULT_PROFILES_PATH = 'https://cdn.jsdelivr.net/npm/@webxr-input-profiles/assets@1.0/dist/profiles';
 const DEFAULT_PROFILE = 'generic-trigger';
 
 function XRControllerModel( ) {

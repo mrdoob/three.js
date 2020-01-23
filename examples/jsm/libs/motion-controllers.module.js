@@ -1,5 +1,5 @@
 /**
- * @webxr-input-profiles/motion-controllers 0.2.0 https://github.com/immersive-web/webxr-input-profiles
+ * @webxr-input-profiles/motion-controllers 1.0.0 https://github.com/immersive-web/webxr-input-profiles
  */
 
 const Constants = {
