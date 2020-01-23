@@ -14061,7 +14061,7 @@ Object.assign( Frustum.prototype, {
 
 	},
 
-	setFromMatrix: function ( m ) {
+	setFromProjectionMatrix: function ( m ) {
 
 		var planes = this.planes;
 		var me = m.elements;
@@ -24625,7 +24625,7 @@ function WebGLRenderer( parameters ) {
 		scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		_frustum.setFromMatrix( _projScreenMatrix );
+		_frustum.setFromProjectionMatrix( _projScreenMatrix );
 
 		_localClippingEnabled = this.localClippingEnabled;
 		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
@@ -38726,7 +38726,7 @@ Object.assign( LightShadow.prototype, {
 		shadowCamera.updateMatrixWorld();
 
 		projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromMatrix( projScreenMatrix );
+		this._frustum.setFromProjectionMatrix( projScreenMatrix );
 
 		shadowMatrix.set(
 			0.5, 0.0, 0.0, 0.5,
@@ -38969,7 +38969,7 @@ PointLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype
 		shadowMatrix.makeTranslation( - lightPositionWorld.x, - lightPositionWorld.y, - lightPositionWorld.z );
 
 		projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		this._frustum.setFromMatrix( projScreenMatrix );
+		this._frustum.setFromProjectionMatrix( projScreenMatrix );
 
 	}
 
@@ -48587,6 +48587,13 @@ Object.assign( Box3.prototype, {
 
 	}
 } );
+
+Frustum.prototype.setFromMatrix = function ( m ) {
+
+	console.warn( 'THREE.Frustum: .setFromMatrix() has been renamed to .setFromProjectionMatrix().' );
+	return this.setFromProjectionMatrix( m );
+
+};
 
 Line3.prototype.center = function ( optionalTarget ) {
 
