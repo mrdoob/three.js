@@ -24525,6 +24525,8 @@
 
 			currentRenderState.setupLights( camera );
 
+			var compiled = {};
+
 			scene.traverse( function ( object ) {
 
 				if ( object.material ) {
@@ -24533,13 +24535,19 @@
 
 						for ( var i = 0; i < object.material.length; i ++ ) {
 
-							initMaterial( object.material[ i ], scene, object );
+							if ( ! object.material[ i ].uuid in compiled ) {
+
+								initMaterial( object.material[ i ], scene, object );
+								compiled[ object.material[ i ].uuid ] = true;
+
+							}
 
 						}
 
-					} else {
+					} else if ( ! object.material.uuid in compiled ) {
 
 						initMaterial( object.material, scene, object );
+						compiled[ object.material.uuid ] = true;
 
 					}
 
@@ -27370,6 +27378,8 @@
 		this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
 
 		this.count = count;
+
+		this.frustumCulled = false;
 
 	}
 
@@ -34762,8 +34772,9 @@
 		// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
 		optimize: function () {
 
-			var times = this.times,
-				values = this.values,
+			// times or values may be shared with other tracks, so overwriting is unsafe
+			var times = AnimationUtils.arraySlice( this.times ),
+				values = AnimationUtils.arraySlice( this.values ),
 				stride = this.getValueSize(),
 
 				smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
@@ -34857,6 +34868,11 @@
 
 				this.times = AnimationUtils.arraySlice( times, 0, writeIndex );
 				this.values = AnimationUtils.arraySlice( values, 0, writeIndex * stride );
+
+			} else {
+
+				this.times = times;
+				this.values = values;
 
 			}
 
