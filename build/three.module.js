@@ -24527,7 +24527,7 @@ function WebGLRenderer( parameters ) {
 
 					for ( var i = 0; i < object.material.length; i ++ ) {
 
-						if ( ! object.material[ i ].uuid in compiled ) {
+						if ( object.material[ i ].uuid in compiled === false ) {
 
 							initMaterial( object.material[ i ], scene, object );
 							compiled[ object.material[ i ].uuid ] = true;
@@ -24536,7 +24536,7 @@ function WebGLRenderer( parameters ) {
 
 					}
 
-				} else if ( ! object.material.uuid in compiled ) {
+				} else if ( object.material.uuid in compiled === false ) {
 
 					initMaterial( object.material, scene, object );
 					compiled[ object.material.uuid ] = true;
