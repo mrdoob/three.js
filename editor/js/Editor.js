@@ -144,7 +144,7 @@ Editor.prototype = {
 
 	//
 
-	addObject: function ( object ) {
+	addObject: function ( object, parent, index ) {
 
 		var scope = this;
 
@@ -158,7 +158,16 @@ Editor.prototype = {
 
 		} );
 
-		this.scene.add( object );
+		if ( parent === undefined ) {
+
+			this.scene.add( object );
+
+		} else {
+
+			parent.children.splice( index, 0, object );
+			object.parent = parent;
+
+		}
 
 		this.signals.objectAdded.dispatch( object );
 		this.signals.sceneGraphChanged.dispatch();
