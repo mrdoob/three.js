@@ -1009,17 +1009,19 @@ var GLTFLoader = ( function () {
 
 				}
 
-				if ( material.envMap ) {
+				var envMap = material.envMap || scene.environment;
 
-					uniforms.envMap.value = material.envMap;
+				if ( envMap ) {
+
+					uniforms.envMap.value = envMap;
 					uniforms.envMapIntensity.value = material.envMapIntensity;
 
-					uniforms.flipEnvMap.value = material.envMap.isCubeTexture ? - 1 : 1;
+					uniforms.flipEnvMap.value = envMap.isCubeTexture ? - 1 : 1;
 
 					uniforms.reflectivity.value = material.reflectivity;
 					uniforms.refractionRatio.value = material.refractionRatio;
 
-					uniforms.maxMipLevel.value = renderer.properties.get( material.envMap ).__maxMipLevel;
+					uniforms.maxMipLevel.value = renderer.properties.get( envMap ).__maxMipLevel;
 
 				}
 
