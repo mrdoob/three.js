@@ -294,6 +294,8 @@ var Viewport = function ( editor ) {
 	signals.editorCleared.add( function () {
 
 		controls.center.set( 0, 0, 0 );
+		currentBackgroundType = null;
+		currentFogType = null;
 		render();
 
 	} );
@@ -461,15 +463,42 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	// fog
+	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundColor ) {
+	var currentBackgroundType = null;
 
-		scene.background.setHex( backgroundColor );
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture ) {
+
+		if ( currentBackgroundType !== backgroundType ) {
+
+			switch ( backgroundType ) {
+
+				case 'None':
+					scene.background = null;
+					break;
+				case 'Color':
+					scene.background = new THREE.Color();
+					break;
+
+			}
+
+		}
+
+		if ( backgroundType === 'Color' ) {
+
+			scene.background.set( backgroundColor );
+
+		} else if ( backgroundType === 'Texture' ) {
+
+			scene.background = backgroundTexture;
+
+		}
 
 		render();
 
 	} );
+
+	// fog
 
 	var currentFogType = null;
 

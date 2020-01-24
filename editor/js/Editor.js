@@ -122,7 +122,8 @@ Editor.prototype = {
 		this.scene.uuid = scene.uuid;
 		this.scene.name = scene.name;
 
-		if ( scene.background !== null ) this.scene.background = scene.background.clone();
+		this.scene.background = ( scene.background !== null ) ? scene.background.clone() : null;
+
 		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
@@ -567,7 +568,7 @@ Editor.prototype = {
 		this.camera.copy( this.DEFAULT_CAMERA );
 		this.scene.name = "Scene";
 		this.scene.userData = {};
-		this.scene.background.setHex( 0xaaaaaa );
+		this.scene.background = new THREE.Color( 0xaaaaaa );
 		this.scene.fog = null;
 
 		var objects = this.scene.children;

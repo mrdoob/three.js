@@ -3,7 +3,7 @@
  */
 
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
-import { UIOutliner } from './libs/ui.three.js';
+import { UIOutliner, UITexture } from './libs/ui.three.js';
 
 var SidebarScene = function ( editor ) {
 
@@ -115,18 +115,67 @@ var SidebarScene = function ( editor ) {
 
 	function onBackgroundChanged() {
 
-		signals.sceneBackgroundChanged.dispatch( backgroundColor.getHexValue() );
+		signals.sceneBackgroundChanged.dispatch(
+			backgroundType.getValue(),
+			backgroundColor.getHexValue(),
+			backgroundTexture.getValue()
+		);
 
 	}
 
 	var backgroundRow = new UIRow();
 
-	var backgroundColor = new UIColor().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
+	var backgroundType = new UISelect().setOptions( {
+
+		'None': 'None',
+		'Color': 'Color',
+		'Texture': 'Texture'
+
+	} ).setWidth( '150px' );
+	backgroundType.onChange( function () {
+
+		onBackgroundChanged();
+		refreshBackgroundUI();
+
+	} );
+	backgroundType.setValue( 'Color' );
 
 	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
-	backgroundRow.add( backgroundColor );
+	backgroundRow.add( backgroundType );
 
 	container.add( backgroundRow );
+
+	//
+
+	var colorRow = new UIRow();
+	colorRow.setMarginLeft( '90px' );
+
+	var backgroundColor = new UIColor().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
+	colorRow.add( backgroundColor );
+
+	container.add( colorRow );
+
+	//
+
+	var textureRow = new UIRow();
+	textureRow.setDisplay( 'none' );
+	textureRow.setMarginLeft( '90px' );
+
+	var backgroundTexture = new UITexture().onChange( onBackgroundChanged );
+	textureRow.add( backgroundTexture );
+
+	container.add( textureRow );
+
+	//
+
+	function refreshBackgroundUI() {
+
+		var type = backgroundType.getValue();
+
+		colorRow.setDisplay( type === 'Color' ? '' : 'none' );
+		textureRow.setDisplay( type === 'Texture' ? '' : 'none' );
+
+	}
 
 	// fog
 
@@ -226,7 +275,23 @@ var SidebarScene = function ( editor ) {
 
 		if ( scene.background ) {
 
-			backgroundColor.setHexValue( scene.background.getHex() );
+			if ( scene.background.isColor ) {
+
+				backgroundType.setValue( "Color" );
+				backgroundColor.setHexValue( scene.background.getHex() );
+				backgroundTexture.setValue( null );
+
+			} else if ( scene.background.isTexture ) {
+
+				backgroundType.setValue( "Texture" );
+				backgroundTexture.setValue( scene.background );
+
+			}
+
+		} else {
+
+			backgroundType.setValue( "None" );
+			backgroundTexture.setValue( null );
 
 		}
 
@@ -253,6 +318,7 @@ var SidebarScene = function ( editor ) {
 
 		}
 
+		refreshBackgroundUI();
 		refreshFogUI();
 
 	}
