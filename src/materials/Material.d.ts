@@ -258,6 +258,12 @@ export class Material extends EventDispatcher {
 	side: Side;
 
 	/**
+	 * Defines which of the face sides will cast shadows. Default is *null*.
+	 * If *null*, the value is opposite that of side, above.
+	 */
+	shadowSide: Side;
+
+	/**
 	 * Defines whether this material is tone mapped according to the renderer's toneMapping setting.
 	 * Default is true.
 	 */
