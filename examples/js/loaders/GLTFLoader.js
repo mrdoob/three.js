@@ -694,6 +694,10 @@ THREE.GLTFLoader = ( function () {
 				specular: {
 					get: function () { return uniforms.specular.value; },
 					set: function ( v ) { uniforms.specular.value = v; }
+        },
+        specularMap: {
+					get: function () { return uniforms.specularMap.value; },
+					set: function ( v ) { uniforms.specularMap.value = v; }
 				},
 				glossiness: {
 					get: function () { return uniforms.glossiness.value; },
@@ -836,46 +840,46 @@ THREE.GLTFLoader = ( function () {
 
 			},
 
-			createMaterial: function ( params ) {
+			createMaterial: function ( materialParams ) {
 
-				var material = new GLTFMeshStandardSGMaterial( params );
+				var material = new GLTFMeshStandardSGMaterial( materialParams );
 				material.fog = true;
 
-				material.color = params.color;
+				material.color = materialParams.color;
 
-				material.map = params.map === undefined ? null : params.map;
+				material.map = materialParams.map === undefined ? null : materialParams.map;
 
 				material.lightMap = null;
 				material.lightMapIntensity = 1.0;
 
-				material.aoMap = params.aoMap === undefined ? null : params.aoMap;
+				material.aoMap = materialParams.aoMap === undefined ? null : materialParams.aoMap;
 				material.aoMapIntensity = 1.0;
 
-				material.emissive = params.emissive;
+				material.emissive = materialParams.emissive;
 				material.emissiveIntensity = 1.0;
-				material.emissiveMap = params.emissiveMap === undefined ? null : params.emissiveMap;
+				material.emissiveMap = materialParams.emissiveMap === undefined ? null : materialParams.emissiveMap;
 
-				material.bumpMap = params.bumpMap === undefined ? null : params.bumpMap;
+				material.bumpMap = materialParams.bumpMap === undefined ? null : materialParams.bumpMap;
 				material.bumpScale = 1;
 
-				material.normalMap = params.normalMap === undefined ? null : params.normalMap;
+				material.normalMap = materialParams.normalMap === undefined ? null : materialParams.normalMap;
 				material.normalMapType = THREE.TangentSpaceNormalMap;
 
-				if ( params.normalScale ) material.normalScale = params.normalScale;
+				if ( materialParams.normalScale ) material.normalScale = materialParams.normalScale;
 
 				material.displacementMap = null;
 				material.displacementScale = 1;
 				material.displacementBias = 0;
 
-				material.specularMap = params.specularMap === undefined ? null : params.specularMap;
-				material.specular = params.specular;
+				material.specularMap = materialParams.specularMap === undefined ? null : materialParams.specularMap;
+				material.specular = materialParams.specular;
 
-				material.glossinessMap = params.glossinessMap === undefined ? null : params.glossinessMap;
-				material.glossiness = params.glossiness;
+				material.glossinessMap = materialParams.glossinessMap === undefined ? null : materialParams.glossinessMap;
+				material.glossiness = materialParams.glossiness;
 
 				material.alphaMap = null;
 
-				material.envMap = params.envMap === undefined ? null : params.envMap;
+				material.envMap = materialParams.envMap === undefined ? null : materialParams.envMap;
 				material.envMapIntensity = 1.0;
 
 				material.refractionRatio = 0.98;
@@ -2000,13 +2004,6 @@ THREE.GLTFLoader = ( function () {
 		if ( material.aoMap && geometry.attributes.uv2 === undefined && geometry.attributes.uv !== undefined ) {
 
 			geometry.setAttribute( 'uv2', new THREE.BufferAttribute( geometry.attributes.uv.array, 2 ) );
-
-		}
-
-		if ( material.isGLTFSpecularGlossinessMaterial ) {
-
-			// for GLTFSpecularGlossinessMaterial(ShaderMaterial) uniforms runtime update
-			mesh.onBeforeRender = extensions[ EXTENSIONS.KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS ].refreshUniforms;
 
 		}
 
