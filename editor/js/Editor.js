@@ -240,16 +240,42 @@ Editor.prototype = {
 
 	addMaterial: function ( material ) {
 
-		if ( material.uuid in this.materials ) return;
+		if ( Array.isArray( material ) ) {
 
-		this.materials[ material.uuid ] = material;
+			for ( var i = 0, l = material.length; i < l; i ++ ) {
+
+				if ( material[ i ].uuid in this.materials ) return;
+				this.materials[ material[ i ].uuid ] = material[ i ];
+
+			}
+
+		} else {
+
+			if ( material.uuid in this.materials ) return;
+			this.materials[ material.uuid ] = material;
+
+		}
+
 		this.signals.materialAdded.dispatch();
 
 	},
 
 	removeMaterial: function ( material ) {
 
-		delete this.materials[ material.uuid ];
+		if ( Array.isArray( material ) ) {
+
+			for ( var i = 0, l = material.length; i < l; i ++ ) {
+
+				delete this.materials[ material[ i ].uuid ];
+
+			}
+
+		} else {
+
+			delete this.materials[ material.uuid ];
+
+		}
+
 		this.signals.materialRemoved.dispatch();
 
 	},
