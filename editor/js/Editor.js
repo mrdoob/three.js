@@ -625,6 +625,8 @@ Editor.prototype = {
 		this.textures = {};
 		this.scripts = {};
 
+		this.materialsRefCounter.clear();
+
 		this.animations = {};
 		this.mixer.stopAllAction();
 
