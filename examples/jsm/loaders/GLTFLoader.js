@@ -759,8 +759,8 @@ var GLTFLoader = ( function () {
 				specular: {
 					get: function () { return uniforms.specular.value; },
 					set: function ( v ) { uniforms.specular.value = v; }
-        },
-        specularMap: {
+				},
+				specularMap: {
 					get: function () { return uniforms.specularMap.value; },
 					set: function ( v ) { uniforms.specularMap.value = v; }
 				},
