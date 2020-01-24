@@ -20,9 +20,11 @@
 
 			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
 			var camera, scene, renderer;
 			var controller1, controller2;
+			var controllerGrip1, controllerGrip2;
 
 			var room;
 
@@ -51,8 +53,10 @@
 				room.geometry.translate( 0, 3, 0 );
 				scene.add( room );
 
-				var light = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				light.position.set( 1, 1, 1 );
+				scene.add( new THREE.HemisphereLight( 0x606060, 0x404040 ) );
+
+				var light = new THREE.DirectionalLight( 0xffffff );
+				light.position.set( 1, 1, 1 ).normalize();
 				scene.add( light );
 
 				var geometry = new THREE.IcosahedronBufferGeometry( radius, 2 );
@@ -79,6 +83,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.xr.enabled = true;
 				document.body.appendChild( renderer.domElement );
 
@@ -129,6 +134,21 @@
 
 				} );
 				scene.add( controller2 );
+
+				// The XRControllerModelFactory will automatically fetch controller models
+				// that match what the user is holding as closely as possible. The models
+				// should be attached to the object returned from getControllerGrip in
+				// order to match the orientation of the held device.
+
+				var controllerModelFactory = new XRControllerModelFactory();
+
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
 
 				//
 

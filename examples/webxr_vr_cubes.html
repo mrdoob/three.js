@@ -20,6 +20,7 @@
 
 			import { BoxLineGeometry } from './jsm/geometries/BoxLineGeometry.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
 			var clock = new THREE.Clock();
 
@@ -28,7 +29,7 @@
 
 			var room;
 
-			var controller, tempMatrix = new THREE.Matrix4();
+			var controller, controllerGrip, tempMatrix = new THREE.Matrix4();
 			var INTERSECTED;
 
 			init();
@@ -90,6 +91,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.xr.enabled = true;
 				container.appendChild( renderer.domElement );
 
@@ -121,6 +123,12 @@
 
 				} );
 				scene.add( controller );
+
+				var controllerModelFactory = new XRControllerModelFactory();
+
+				controllerGrip = renderer.xr.getControllerGrip( 0 );
+				controllerGrip.add( controllerModelFactory.createControllerModel( controllerGrip ) );
+				scene.add( controllerGrip );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
