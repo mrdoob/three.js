@@ -1055,6 +1055,8 @@ function WebGLRenderer( parameters ) {
 
 		currentRenderState.setupLights( camera );
 
+		var compiled = {};
+
 		scene.traverse( function ( object ) {
 
 			if ( object.material ) {
@@ -1063,13 +1065,19 @@ function WebGLRenderer( parameters ) {
 
 					for ( var i = 0; i < object.material.length; i ++ ) {
 
-						initMaterial( object.material[ i ], scene, object );
+						if ( ! object.material[ i ].uuid in compiled ) {
+
+							initMaterial( object.material[ i ], scene, object );
+							compiled[ object.material[ i ].uuid ] = true;
+
+						}
 
 					}
 
-				} else {
+				} else if ( ! object.material.uuid in compiled ) {
 
 					initMaterial( object.material, scene, object );
+					compiled[ object.material.uuid ] = true;
 
 				}
 
