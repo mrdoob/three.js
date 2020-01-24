@@ -3,7 +3,7 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-History = function ( editor ) {
+var History = function ( editor ) {
 
 	this.editor = editor;
 	this.undos = [];
@@ -13,10 +13,6 @@ History = function ( editor ) {
 
 	this.historyDisabled = false;
 	this.config = editor.config;
-
-	//Set editor-reference in Command
-
-	Command( editor );
 
 	// signals
 
@@ -173,7 +169,7 @@ History.prototype = {
 
 		// Append Undos to History
 
-		for ( var i = 0 ; i < this.undos.length; i ++ ) {
+		for ( var i = 0; i < this.undos.length; i ++ ) {
 
 			if ( this.undos[ i ].hasOwnProperty( "json" ) ) {
 
@@ -185,7 +181,7 @@ History.prototype = {
 
 		// Append Redos to History
 
-		for ( var i = 0 ; i < this.redos.length; i ++ ) {
+		for ( var i = 0; i < this.redos.length; i ++ ) {
 
 			if ( this.redos[ i ].hasOwnProperty( "json" ) ) {
 
@@ -321,3 +317,5 @@ History.prototype = {
 	}
 
 };
+
+export { History };

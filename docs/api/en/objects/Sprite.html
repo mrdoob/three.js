@@ -42,13 +42,6 @@ scene.add( sprite );
 		<h2>Properties</h2>
 		<p>See the base [page:Object3D] class for common properties.</p>
 
-		<h3>[property:Boolean isSprite]</h3>
-		<p>
-			Used to check whether this or derived classes are sprites. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 
 		<h3>[property:SpriteMaterial material]</h3>
 		<p>
@@ -78,13 +71,15 @@ scene.add( sprite );
 
 		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
-		Get intersections between a casted ray and this sprite.
-		[page:Raycaster.intersectObject] will call this method.
+		Get intersections between a casted ray and this sprite. [page:Raycaster.intersectObject]() will call this method.
+		The raycaster must be initialized by calling [page:Raycaster.setFromCamera]() before raycasting against sprites.
 		</p>
 
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

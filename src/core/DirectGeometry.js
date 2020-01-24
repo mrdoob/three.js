@@ -264,6 +264,18 @@ Object.assign( DirectGeometry.prototype, {
 		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
 		this.groupsNeedUpdate = geometry.groupsNeedUpdate;
 
+		if ( geometry.boundingSphere !== null ) {
+
+			this.boundingSphere = geometry.boundingSphere.clone();
+
+		}
+
+		if ( geometry.boundingBox !== null ) {
+
+			this.boundingBox = geometry.boundingBox.clone();
+
+		}
+
 		return this;
 
 	}

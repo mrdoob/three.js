@@ -4,40 +4,24 @@
 		<title>three.js webgl - postprocessing - masking</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/shaders/CopyShader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/ClearPass.js"></script>
-		<script src="js/postprocessing/TexturePass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
+			import { TexturePass } from './jsm/postprocessing/TexturePass.js';
+			import { ClearPass } from './jsm/postprocessing/ClearPass.js';
+			import { MaskPass, ClearMaskPass } from './jsm/postprocessing/MaskPass.js';
+			import { CopyShader } from './jsm/shaders/CopyShader.js';
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
-			var composer, renderer;
+			var camera, composer, renderer;
 			var box, torus;
 
 			init();
@@ -45,7 +29,7 @@
 
 			function init() {
 
-				var camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.z = 10;
 
 				var scene1 = new THREE.Scene();
@@ -66,22 +50,21 @@
 
 				//
 
-				var clearPass = new THREE.ClearPass();
+				var clearPass = new ClearPass();
 
-				var clearMaskPass = new THREE.ClearMaskPass();
+				var clearMaskPass = new ClearMaskPass();
 
-				var maskPass1 = new THREE.MaskPass( scene1, camera );
-				var maskPass2 = new THREE.MaskPass( scene2, camera );
+				var maskPass1 = new MaskPass( scene1, camera );
+				var maskPass2 = new MaskPass( scene2, camera );
 
 				var texture1 = new THREE.TextureLoader().load( 'textures/758px-Canestra_di_frutta_(Caravaggio).jpg' );
 				texture1.minFilter = THREE.LinearFilter;
 				var texture2 = new THREE.TextureLoader().load( 'textures/2294472375_24a3b8ef46_o.jpg' );
 
-				var texturePass1 = new THREE.TexturePass( texture1 );
-				var texturePass2 = new THREE.TexturePass( texture2 );
+				var texturePass1 = new TexturePass( texture1 );
+				var texturePass2 = new TexturePass( texture2 );
 
-				var outputPass = new THREE.ShaderPass( THREE.CopyShader );
-				outputPass.renderToScreen = true;
+				var outputPass = new ShaderPass( CopyShader );
 
 				var parameters = {
 					minFilter: THREE.LinearFilter,
@@ -92,7 +75,7 @@
 
 				var renderTarget = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, parameters );
 
-				composer = new THREE.EffectComposer( renderer, renderTarget );
+				composer = new EffectComposer( renderer, renderTarget );
 				composer.addPass( clearPass );
 				composer.addPass( maskPass1 );
 				composer.addPass( texturePass1 );
@@ -101,6 +84,21 @@
 				composer.addPass( texturePass2 );
 				composer.addPass( clearMaskPass );
 				composer.addPass( outputPass );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
 
 			}
 

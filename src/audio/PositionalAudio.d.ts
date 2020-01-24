@@ -1,28 +1,32 @@
 import { AudioListener } from './AudioListener';
 import { Audio } from './Audio';
 
-export class AudioBuffer {
-  constructor(context: any);
+export class AudioWeaken extends Audio {
 
-  context: any;
-  ready: boolean;
-  readyCallbacks: Function[];
+	getOutput(): any;
 
-  load(file: string): AudioBuffer;
-  onReady(callback: Function): void;
 }
 
-export class PositionalAudio extends Audio {
-  constructor(listener: AudioListener);
+export class PositionalAudio extends AudioWeaken {
 
-  panner: PannerNode;
+	constructor( listener: AudioListener );
 
-  setRefDistance(value: number): void;
-  getRefDistance(): number;
-  setRolloffFactor(value: number): void;
-  getRolloffFactor(): number;
-  setDistanceModel(value: number): void;
-  getDistanceModel(): number;
-  setMaxDistance(value: number): void;
-  getMaxDistance(): number;
+	panner: PannerNode;
+
+	getOutput(): PannerNode;
+	setRefDistance( value: number ): this;
+	getRefDistance(): number;
+	setRolloffFactor( value: number ): this;
+	getRolloffFactor(): number;
+	setDistanceModel( value: DistanceModelType ): this;
+	getDistanceModel(): DistanceModelType;
+	setMaxDistance( value: number ): this;
+	getMaxDistance(): number;
+	setDirectionalCone(
+		coneInnerAngle: number,
+		coneOuterAngle: number,
+		coneOuterGain: number
+	): this;
+	updateMatrixWorld( force?: boolean ): void;
+
 }

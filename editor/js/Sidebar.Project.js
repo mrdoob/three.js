@@ -2,106 +2,61 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Project = function ( editor ) {
+import * as THREE from '../../build/three.module.js';
+
+import { UIPanel, UIRow, UIInput, UICheckbox, UIText, UIListbox, UISpan, UIButton } from './libs/ui.js';
+import { UIBoolean } from './libs/ui.three.js';
+
+import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
+
+var SidebarProject = function ( editor ) {
 
 	var config = editor.config;
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var rendererTypes = {
+	var container = new UISpan();
 
-		'WebGLRenderer': THREE.WebGLRenderer,
-		'SVGRenderer': THREE.SVGRenderer,
-		'SoftwareRenderer': THREE.SoftwareRenderer,
-		'RaytracingRenderer': THREE.RaytracingRenderer
+	var projectsettings = new UIPanel();
+	projectsettings.setBorderTop( '0' );
+	projectsettings.setPaddingTop( '20px' );
 
-	};
-
-	var container = new UI.Panel();
-	container.setBorderTop( '0' );
-	container.setPaddingTop( '20px' );
+	container.add( projectsettings );
 
 	// Title
 
-	var titleRow = new UI.Row();
-	var title = new UI.Input( config.getKey( 'project/title' ) ).setLeft( '100px' ).onChange( function () {
+	var titleRow = new UIRow();
+	var title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/title', this.getValue() );
 
 	} );
 
-	titleRow.add( new UI.Text( strings.getKey( 'sidebar/project/title' ) ).setWidth( '90px' ) );
+	titleRow.add( new UIText( strings.getKey( 'sidebar/project/title' ) ).setWidth( '90px' ) );
 	titleRow.add( title );
 
-	container.add( titleRow );
+	projectsettings.add( titleRow );
 
 	// Editable
 
-	var editableRow = new UI.Row();
-	var editable = new UI.Checkbox( config.getKey( 'project/editable' ) ).setLeft( '100px' ).onChange( function () {
+	var editableRow = new UIRow();
+	var editable = new UICheckbox( config.getKey( 'project/editable' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/editable', this.getValue() );
 
 	} );
 
-	editableRow.add( new UI.Text( strings.getKey( 'sidebar/project/editable' ) ).setWidth( '90px' ) );
+	editableRow.add( new UIText( strings.getKey( 'sidebar/project/editable' ) ).setWidth( '90px' ) );
 	editableRow.add( editable );
 
-	container.add( editableRow );
-
-	// VR
-
-	var vrRow = new UI.Row();
-	var vr = new UI.Checkbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
-
-		config.setKey( 'project/vr', this.getValue() );
-
-	} );
-
-	vrRow.add( new UI.Text( strings.getKey( 'sidebar/project/vr' ) ).setWidth( '90px' ) );
-	vrRow.add( vr );
-
-	container.add( vrRow );
+	projectsettings.add( editableRow );
 
 	// Renderer
 
-	var options = {};
+	var rendererPropertiesRow = new UIRow();
+	rendererPropertiesRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
 
-	for ( var key in rendererTypes ) {
-
-		if ( key.indexOf( 'WebGL' ) >= 0 && System.support.webgl === false ) continue;
-
-		options[ key ] = key;
-
-	}
-
-	var rendererTypeRow = new UI.Row();
-	var rendererType = new UI.Select().setOptions( options ).setWidth( '150px' ).onChange( function () {
-
-		var value = this.getValue();
-
-		config.setKey( 'project/renderer', value );
-
-		updateRenderer();
-
-	} );
-
-	rendererTypeRow.add( new UI.Text( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
-	rendererTypeRow.add( rendererType );
-
-	container.add( rendererTypeRow );
-
-	if ( config.getKey( 'project/renderer' ) !== undefined ) {
-
-		rendererType.setValue( config.getKey( 'project/renderer' ) );
-
-	}
-
-	// Renderer / Antialias
-
-	var rendererPropertiesRow = new UI.Row().setMarginLeft( '90px' );
-
-	var rendererAntialias = new UI.THREE.Boolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
+	var rendererAntialias = new UIBoolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/antialias', this.getValue() );
 		updateRenderer();
@@ -111,7 +66,7 @@ Sidebar.Project = function ( editor ) {
 
 	// Renderer / Shadows
 
-	var rendererShadows = new UI.THREE.Boolean( config.getKey( 'project/renderer/shadows' ), strings.getKey( 'sidebar/project/shadows' ) ).onChange( function () {
+	var rendererShadows = new UIBoolean( config.getKey( 'project/renderer/shadows' ), strings.getKey( 'sidebar/project/shadows' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/shadows', this.getValue() );
 		updateRenderer();
@@ -119,46 +74,22 @@ Sidebar.Project = function ( editor ) {
 	} );
 	rendererPropertiesRow.add( rendererShadows );
 
-	rendererPropertiesRow.add( new UI.Break() );
-
-	// Renderer / Gamma input
-
-	var rendererGammaInput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaInput' ), strings.getKey( 'sidebar/project/gammainput' ) ).onChange( function () {
-
-		config.setKey( 'project/renderer/gammaInput', this.getValue() );
-		updateRenderer();
-
-	} );
-	rendererPropertiesRow.add( rendererGammaInput );
-
-	// Renderer / Gamma output
-
-	var rendererGammaOutput = new UI.THREE.Boolean( config.getKey( 'project/renderer/gammaOutput' ), strings.getKey( 'sidebar/project/gammaoutput' ) ).onChange( function () {
-
-		config.setKey( 'project/renderer/gammaOutput', this.getValue() );
-		updateRenderer();
-
-	} );
-	rendererPropertiesRow.add( rendererGammaOutput );
-
-	container.add( rendererPropertiesRow );
+	projectsettings.add( rendererPropertiesRow );
 
 	//
 
 	function updateRenderer() {
 
-		createRenderer( rendererType.getValue(), rendererAntialias.getValue(), rendererShadows.getValue(), rendererGammaInput.getValue(), rendererGammaOutput.getValue() );
+		createRenderer( rendererAntialias.getValue() );
 
 	}
 
-	function createRenderer( type, antialias, shadows, gammaIn, gammaOut ) {
+	function createRenderer( antialias, shadows ) {
 
-		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
+		var parameters = { antialias: antialias };
+		var renderer = new THREE.WebGLRenderer( parameters );
 
-		var renderer = new rendererTypes[ type ]( { antialias: antialias} );
-		renderer.gammaInput = gammaIn;
-		renderer.gammaOutput = gammaOut;
-		if ( shadows && renderer.shadowMap ) {
+		if ( shadows ) {
 
 			renderer.shadowMap.enabled = true;
 			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -169,8 +100,74 @@ Sidebar.Project = function ( editor ) {
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ), config.getKey( 'project/renderer/gammaInput' ), config.getKey( 'project/renderer/gammaOutput' ) );
+	createRenderer( config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
+
+	// Materials
+
+	var materials = new UIPanel();
+
+	var headerRow = new UIRow();
+	headerRow.add( new UIText( strings.getKey( 'sidebar/project/materials' ).toUpperCase() ) );
+
+	materials.add( headerRow );
+
+	var listbox = new UIListbox();
+	signals.materialAdded.add( function () {
+
+		listbox.setItems( Object.values( editor.materials ) );
+
+	} );
+	materials.add( listbox );
+
+	var buttonsRow = new UIRow();
+	buttonsRow.setPadding( '10px 0px' );
+	materials.add( buttonsRow );
+
+	/*
+	var addButton = new UI.Button().setLabel( 'Add' ).setMarginRight( '5px' );
+	addButton.onClick( function () {
+
+		editor.addMaterial( new THREE.MeshStandardMaterial() );
+
+	} );
+	buttonsRow.add( addButton );
+	*/
+
+	var assignMaterial = new UIButton().setLabel( strings.getKey( 'sidebar/project/Assign' ) ).setMargin( '0px 5px' );
+	assignMaterial.onClick( function () {
+
+		if ( editor.selected !== null ) {
+
+			var material = editor.getMaterialById( parseInt( listbox.getValue() ) );
+
+			if ( material !== undefined ) {
+
+				editor.execute( new SetMaterialCommand( editor, editor.selected, material ) );
+
+			}
+
+		}
+
+	} );
+	buttonsRow.add( assignMaterial );
+
+	container.add( materials );
+
+	// events
+
+	signals.objectSelected.add( function ( object ) {
+
+		if ( object !== null ) {
+
+			var index = Object.values( editor.materials ).indexOf( object.material );
+			listbox.selectIndex( index );
+
+		}
+
+	} );
 
 	return container;
 
 };
+
+export { SidebarProject };

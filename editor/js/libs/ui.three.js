@@ -2,9 +2,20 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-UI.Texture = function ( mapping ) {
+import * as THREE from '../../../build/three.module.js';
 
-	UI.Element.call( this );
+import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
+
+import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
+import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+var UITexture = function ( mapping ) {
+
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -27,12 +38,12 @@ UI.Texture = function ( mapping ) {
 	canvas.style.cursor = 'pointer';
 	canvas.style.marginRight = '5px';
 	canvas.style.border = '1px solid #888';
-	canvas.addEventListener( 'click', function ( event ) {
+	canvas.addEventListener( 'click', function () {
 
 		input.click();
 
 	}, false );
-	canvas.addEventListener( 'drop', function ( event ) {
+	canvas.addEventListener( 'drop', function () {
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -40,12 +51,6 @@ UI.Texture = function ( mapping ) {
 
 	}, false );
 	dom.appendChild( canvas );
-
-	var name = document.createElement( 'input' );
-	name.disabled = true;
-	name.style.width = '64px';
-	name.style.border = '1px solid #ccc';
-	dom.appendChild( name );
 
 	function loadFile( file ) {
 
@@ -57,14 +62,14 @@ UI.Texture = function ( mapping ) {
 
 				reader.addEventListener( 'load', function ( event ) {
 
-					var canvas = new THREE.TGALoader().parse( event.target.result );
+					var canvas = new TGALoader().parse( event.target.result );
 
 					var texture = new THREE.CanvasTexture( canvas, mapping );
 					texture.sourceFile = file.name;
 
 					scope.setValue( texture );
 
-					if ( scope.onChangeCallback ) scope.onChangeCallback();
+					if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 				}, false );
 
@@ -75,7 +80,7 @@ UI.Texture = function ( mapping ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var image = document.createElement( 'img' );
-					image.addEventListener( 'load', function( event ) {
+					image.addEventListener( 'load', function () {
 
 						var texture = new THREE.Texture( this, mapping );
 						texture.sourceFile = file.name;
@@ -84,7 +89,7 @@ UI.Texture = function ( mapping ) {
 
 						scope.setValue( texture );
 
-						if ( scope.onChangeCallback ) scope.onChangeCallback();
+						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 					}, false );
 
@@ -110,19 +115,18 @@ UI.Texture = function ( mapping ) {
 
 };
 
-UI.Texture.prototype = Object.create( UI.Element.prototype );
-UI.Texture.prototype.constructor = UI.Texture;
+UITexture.prototype = Object.create( UIElement.prototype );
+UITexture.prototype.constructor = UITexture;
 
-UI.Texture.prototype.getValue = function () {
+UITexture.prototype.getValue = function () {
 
 	return this.texture;
 
 };
 
-UI.Texture.prototype.setValue = function ( texture ) {
+UITexture.prototype.setValue = function ( texture ) {
 
 	var canvas = this.dom.children[ 0 ];
-	var name = this.dom.children[ 1 ];
 	var context = canvas.getContext( '2d' );
 
 	if ( texture !== null ) {
@@ -131,21 +135,21 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 		if ( image !== undefined && image.width > 0 ) {
 
-			name.value = texture.sourceFile;
+			canvas.title = texture.sourceFile;
 
 			var scale = canvas.width / image.width;
 			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
 
 		} else {
 
-			name.value = texture.sourceFile + ' (error)';
+			canvas.title = texture.sourceFile + ' (error)';
 			context.clearRect( 0, 0, canvas.width, canvas.height );
 
 		}
 
 	} else {
 
-		name.value = '';
+		canvas.title = 'empty';
 
 		if ( context !== null ) {
 
@@ -161,7 +165,20 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 };
 
-UI.Texture.prototype.onChange = function ( callback ) {
+UITexture.prototype.setEncoding = function ( encoding ) {
+
+	var texture = this.getValue();
+	if ( texture !== null ) {
+
+		texture.encoding = encoding;
+
+	}
+
+	return this;
+
+};
+
+UITexture.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
 
@@ -169,11 +186,11 @@ UI.Texture.prototype.onChange = function ( callback ) {
 
 };
 
-// Outliner
+// UIOutliner
 
-UI.Outliner = function ( editor ) {
+var UIOutliner = function ( editor ) {
 
-	UI.Element.call( this );
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -188,11 +205,13 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keydown', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 			case 40: // down
 				event.preventDefault();
 				event.stopPropagation();
 				break;
+
 		}
 
 	}, false );
@@ -201,17 +220,20 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keyup', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 				scope.selectIndex( scope.selectedIndex - 1 );
 				break;
 			case 40: // down
 				scope.selectIndex( scope.selectedIndex + 1 );
 				break;
+
 		}
 
 	}, false );
 
 	this.dom = dom;
+	this.editor = editor;
 
 	this.options = [];
 	this.selectedIndex = - 1;
@@ -221,10 +243,10 @@ UI.Outliner = function ( editor ) {
 
 };
 
-UI.Outliner.prototype = Object.create( UI.Element.prototype );
-UI.Outliner.prototype.constructor = UI.Outliner;
+UIOutliner.prototype = Object.create( UIElement.prototype );
+UIOutliner.prototype.constructor = UIOutliner;
 
-UI.Outliner.prototype.selectIndex = function ( index ) {
+UIOutliner.prototype.selectIndex = function ( index ) {
 
 	if ( index >= 0 && index < this.options.length ) {
 
@@ -238,7 +260,7 @@ UI.Outliner.prototype.selectIndex = function ( index ) {
 
 };
 
-UI.Outliner.prototype.setOptions = function ( options ) {
+UIOutliner.prototype.setOptions = function ( options ) {
 
 	var scope = this;
 
@@ -262,7 +284,7 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 	var currentDrag;
 
-	function onDrag( event ) {
+	function onDrag() {
 
 		currentDrag = this;
 
@@ -348,7 +370,8 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 		if ( newParentIsChild ) return;
 
-		editor.execute( new MoveObjectCommand( object, newParent, nextObject ) );
+		var editor = scope.editor;
+		editor.execute( new MoveObjectCommand( editor, object, newParent, nextObject ) );
 
 		var changeEvent = document.createEvent( 'HTMLEvents' );
 		changeEvent.initEvent( 'change', true, true );
@@ -388,13 +411,13 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 };
 
-UI.Outliner.prototype.getValue = function () {
+UIOutliner.prototype.getValue = function () {
 
 	return this.selectedValue;
 
 };
 
-UI.Outliner.prototype.setValue = function ( value ) {
+UIOutliner.prototype.setValue = function ( value ) {
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
@@ -436,33 +459,289 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 };
 
-UI.THREE = {};
+var UIPoints = function ( onAddClicked ) {
 
-UI.THREE.Boolean = function ( boolean, text ) {
+	UIElement.call( this );
 
-	UI.Span.call( this );
+	var span = new UISpan().setDisplay( 'inline-block' );
+
+	this.pointsList = new UIDiv();
+	span.add( this.pointsList );
+
+	var row = new UIRow();
+	span.add( row );
+
+	var addPointButton = new UIButton( '+' ).onClick( onAddClicked );
+	row.add( addPointButton );
+
+	this.update = function () {
+
+		if ( this.onChangeCallback !== null ) {
+
+			this.onChangeCallback();
+
+		}
+
+	}.bind( this );
+
+	this.dom = span.dom;
+	this.pointsUI = [];
+	this.lastPointIdx = 0;
+	this.onChangeCallback = null;
+	return this;
+
+};
+
+UIPoints.prototype = Object.create( UIElement.prototype );
+UIPoints.prototype.constructor = UIPoints;
+
+UIPoints.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+UIPoints.prototype.clear = function () {
+
+	for ( var i = 0; i < this.pointsUI.length; ++ i ) {
+
+		if ( this.pointsUI[ i ] ) {
+
+			this.deletePointRow( i, true );
+
+		}
+
+	}
+
+	this.lastPointIdx = 0;
+
+};
+
+UIPoints.prototype.deletePointRow = function ( idx, dontUpdate ) {
+
+	if ( ! this.pointsUI[ idx ] ) return;
+
+	this.pointsList.remove( this.pointsUI[ idx ].row );
+	this.pointsUI[ idx ] = null;
+
+	if ( dontUpdate !== true ) {
+
+		this.update();
+
+	}
+
+};
+
+var UIPoints2 = function () {
+
+	UIPoints.call( this, UIPoints2.addRow.bind( this ) );
+
+	return this;
+
+};
+
+UIPoints2.prototype = Object.create( UIPoints.prototype );
+UIPoints2.prototype.constructor = UIPoints2;
+
+UIPoints2.addRow = function () {
+
+	if ( this.pointsUI.length === 0 ) {
+
+		this.pointsList.add( this.createPointRow( 0, 0 ) );
+
+	} else {
+
+		var point = this.pointsUI[ this.pointsUI.length - 1 ];
+
+		this.pointsList.add( this.createPointRow( point.x.getValue(), point.y.getValue() ) );
+
+	}
+
+	this.update();
+
+};
+
+UIPoints2.prototype.getValue = function () {
+
+	var points = [];
+	var count = 0;
+
+	for ( var i = 0; i < this.pointsUI.length; i ++ ) {
+
+		var pointUI = this.pointsUI[ i ];
+
+		if ( ! pointUI ) continue;
+
+		points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
+		++ count;
+		pointUI.lbl.setValue( count );
+
+	}
+
+	return points;
+
+};
+
+UIPoints2.prototype.setValue = function ( points ) {
+
+	this.clear();
+
+	for ( var i = 0; i < points.length; i ++ ) {
+
+		var point = points[ i ];
+		this.pointsList.add( this.createPointRow( point.x, point.y ) );
+
+	}
+
+	this.update();
+	return this;
+
+};
+
+UIPoints2.prototype.createPointRow = function ( x, y ) {
+
+	var pointRow = new UIDiv();
+	var lbl = new UIText( this.lastPointIdx + 1 ).setWidth( '20px' );
+	var txtX = new UINumber( x ).setWidth( '30px' ).onChange( this.update );
+	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
+
+	var idx = this.lastPointIdx;
+	var scope = this;
+	var btn = new UIButton( '-' ).onClick( function () {
+
+		if ( scope.isEditing ) return;
+		scope.deletePointRow( idx );
+
+	} );
+
+	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
+	++ this.lastPointIdx;
+	pointRow.add( lbl, txtX, txtY, btn );
+
+	return pointRow;
+
+};
+
+var UIPoints3 = function () {
+
+	UIPoints.call( this, UIPoints3.addRow.bind( this ) );
+
+	return this;
+
+};
+
+UIPoints3.prototype = Object.create( UIPoints.prototype );
+UIPoints3.prototype.constructor = UIPoints3;
+
+UIPoints3.addRow = function () {
+
+	if ( this.pointsUI.length === 0 ) {
+
+		this.pointsList.add( this.createPointRow( 0, 0, 0 ) );
+
+	} else {
+
+		var point = this.pointsUI[ this.pointsUI.length - 1 ];
+
+		this.pointsList.add( this.createPointRow( point.x.getValue(), point.y.getValue(), point.z.getValue() ) );
+
+	}
+
+	this.update();
+
+};
+
+UIPoints3.prototype.getValue = function () {
+
+	var points = [];
+	var count = 0;
+
+	for ( var i = 0; i < this.pointsUI.length; i ++ ) {
+
+		var pointUI = this.pointsUI[ i ];
+
+		if ( ! pointUI ) continue;
+
+		points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
+		++ count;
+		pointUI.lbl.setValue( count );
+
+	}
+
+	return points;
+
+};
+
+UIPoints3.prototype.setValue = function ( points ) {
+
+	this.clear();
+
+	for ( var i = 0; i < points.length; i ++ ) {
+
+		var point = points[ i ];
+		this.pointsList.add( this.createPointRow( point.x, point.y, point.z ) );
+
+	}
+
+	this.update();
+	return this;
+
+};
+
+UIPoints3.prototype.createPointRow = function ( x, y, z ) {
+
+	var pointRow = new UIDiv();
+	var lbl = new UIText( this.lastPointIdx + 1 ).setWidth( '20px' );
+	var txtX = new UINumber( x ).setWidth( '30px' ).onChange( this.update );
+	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
+	var txtZ = new UINumber( z ).setWidth( '30px' ).onChange( this.update );
+
+	var idx = this.lastPointIdx;
+	var scope = this;
+	var btn = new UIButton( '-' ).onClick( function () {
+
+		if ( scope.isEditing ) return;
+		scope.deletePointRow( idx );
+
+	} );
+
+	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY, z: txtZ } );
+	++ this.lastPointIdx;
+	pointRow.add( lbl, txtX, txtY, txtZ, btn );
+
+	return pointRow;
+
+};
+
+var UIBoolean = function ( boolean, text ) {
+
+	UISpan.call( this );
 
 	this.setMarginRight( '10px' );
 
-	this.checkbox = new UI.Checkbox( boolean );
-	this.text = new UI.Text( text ).setMarginLeft( '3px' );
+	this.checkbox = new UICheckbox( boolean );
+	this.text = new UIText( text ).setMarginLeft( '3px' );
 
 	this.add( this.checkbox );
 	this.add( this.text );
 
 };
 
-UI.THREE.Boolean.prototype = Object.create( UI.Span.prototype );
-UI.THREE.Boolean.prototype.constructor = UI.THREE.Boolean;
+UIBoolean.prototype = Object.create( UISpan.prototype );
+UIBoolean.prototype.constructor = UIBoolean;
 
-UI.THREE.Boolean.prototype.getValue = function () {
+UIBoolean.prototype.getValue = function () {
 
 	return this.checkbox.getValue();
 
 };
 
-UI.THREE.Boolean.prototype.setValue = function ( value ) {
+UIBoolean.prototype.setValue = function ( value ) {
 
 	return this.checkbox.setValue( value );
 
 };
+
+export { UITexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };

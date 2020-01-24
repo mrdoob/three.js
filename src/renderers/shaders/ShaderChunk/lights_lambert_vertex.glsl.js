@@ -4,7 +4,7 @@ vec3 diffuse = vec3( 1.0 );
 GeometricContext geometry;
 geometry.position = mvPosition.xyz;
 geometry.normal = normalize( transformedNormal );
-geometry.viewDir = normalize( -mvPosition.xyz );
+geometry.viewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( -mvPosition.xyz );
 
 GeometricContext backGeometry;
 backGeometry.position = geometry.position;
@@ -12,9 +12,11 @@ backGeometry.normal = -geometry.normal;
 backGeometry.viewDir = geometry.viewDir;
 
 vLightFront = vec3( 0.0 );
+vIndirectFront = vec3( 0.0 );
 
 #ifdef DOUBLE_SIDED
 	vLightBack = vec3( 0.0 );
+	vIndirectBack = vec3( 0.0 );
 #endif
 
 IncidentLight directLight;
@@ -103,11 +105,11 @@ vec3 directLightColor_Diffuse;
 	#pragma unroll_loop
 	for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-		vLightFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
+		vIndirectFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
 		#ifdef DOUBLE_SIDED
 
-			vLightBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
+			vIndirectBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );
 
 		#endif
 

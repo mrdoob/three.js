@@ -4,12 +4,13 @@ uniform vec3 emissive;
 uniform float opacity;
 
 varying vec3 vLightFront;
+varying vec3 vIndirectFront;
 
 #ifdef DOUBLE_SIDED
-
 	varying vec3 vLightBack;
-
+	varying vec3 vIndirectBack;
 #endif
+
 
 #include <common>
 #include <packing>
@@ -22,7 +23,9 @@ varying vec3 vLightFront;
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
+#include <envmap_common_pars_fragment>
 #include <envmap_pars_fragment>
+#include <cube_uv_reflection_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>
 #include <fog_pars_fragment>
@@ -50,6 +53,16 @@ void main() {
 
 	// accumulation
 	reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );
+
+	#ifdef DOUBLE_SIDED
+
+		reflectedLight.indirectDiffuse += ( gl_FrontFacing ) ? vIndirectFront : vIndirectBack;
+
+	#else
+
+		reflectedLight.indirectDiffuse += vIndirectFront;
+
+	#endif
 
 	#include <lightmap_fragment>
 
@@ -81,6 +94,5 @@ void main() {
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
 	#include <dithering_fragment>
-
 }
 `;
