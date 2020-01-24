@@ -102,6 +102,8 @@ var Editor = function () {
 	this.textures = {};
 	this.scripts = {};
 
+	this.materialsRefCounter = new Map(); // tracks how often is a material used by a 3D object
+
 	this.animations = {};
 	this.mixer = new THREE.AnimationMixer( this.scene );
 
@@ -216,6 +218,8 @@ Editor.prototype = {
 			scope.removeCamera( child );
 			scope.removeHelper( child );
 
+			if ( child.material !== undefined ) scope.removeMaterial( child.material );
+
 		} );
 
 		object.parent.remove( object );
@@ -244,19 +248,37 @@ Editor.prototype = {
 
 			for ( var i = 0, l = material.length; i < l; i ++ ) {
 
-				if ( material[ i ].uuid in this.materials ) return;
-				this.materials[ material[ i ].uuid ] = material[ i ];
+				this.addMaterialToRefCounter( material[ i ] );
 
 			}
 
 		} else {
 
-			if ( material.uuid in this.materials ) return;
-			this.materials[ material.uuid ] = material;
+			this.addMaterialToRefCounter( material );
 
 		}
 
 		this.signals.materialAdded.dispatch();
+
+	},
+
+	addMaterialToRefCounter: function ( material ) {
+
+		var materialsRefCounter = this.materialsRefCounter;
+
+		var count = materialsRefCounter.get( material );
+
+		if ( count === undefined ) {
+
+			materialsRefCounter.set( material, 1 );
+			this.materials[ material.uuid ] = material;
+
+		} else {
+
+			count ++;
+			materialsRefCounter.set( material, count );
+
+		}
 
 	},
 
@@ -266,17 +288,37 @@ Editor.prototype = {
 
 			for ( var i = 0, l = material.length; i < l; i ++ ) {
 
-				delete this.materials[ material[ i ].uuid ];
+				this.removeMaterialFromRefCounter( material[ i ] );
 
 			}
 
 		} else {
 
-			delete this.materials[ material.uuid ];
+			this.removeMaterialFromRefCounter( material );
 
 		}
 
 		this.signals.materialRemoved.dispatch();
+
+	},
+
+	removeMaterialFromRefCounter: function ( material ) {
+
+		var materialsRefCounter = this.materialsRefCounter;
+
+		var count = materialsRefCounter.get( material );
+		count --;
+
+		if ( count === 0 ) {
+
+			materialsRefCounter.delete( material );
+			delete this.materials[ material.uuid ];
+
+		} else {
+
+			materialsRefCounter.set( material, count );
+
+		}
 
 	},
 
@@ -456,7 +498,7 @@ Editor.prototype = {
 
 		var material = object.material;
 
-		if ( Array.isArray( material ) ) {
+		if ( Array.isArray( material ) && slot !== undefined ) {
 
 			material = material[ slot ];
 
@@ -468,7 +510,7 @@ Editor.prototype = {
 
 	setObjectMaterial: function ( object, slot, newMaterial ) {
 
-		if ( Array.isArray( object.material ) ) {
+		if ( Array.isArray( object.material ) && slot !== undefined ) {
 
 			object.material[ slot ] = newMaterial;
 

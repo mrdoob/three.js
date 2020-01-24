@@ -609,6 +609,18 @@ var SidebarMaterial = function ( editor ) {
 
 				}
 
+				if ( Array.isArray( currentObject.material ) ) {
+
+					// don't remove the entire multi-material. just the material of the selected slot
+
+					editor.removeMaterial( currentObject.material[ currentMaterialSlot ] );
+
+				} else {
+
+					editor.removeMaterial( currentObject.material );
+
+				}
+
 				editor.execute( new SetMaterialCommand( editor, currentObject, material, currentMaterialSlot ), 'New Material: ' + materialClass.getValue() );
 				editor.addMaterial( material );
 				// TODO Copy other references in the scene graph

@@ -112,11 +112,6 @@ var SidebarProject = function ( editor ) {
 	materials.add( headerRow );
 
 	var listbox = new UIListbox();
-	signals.materialAdded.add( function () {
-
-		listbox.setItems( Object.values( editor.materials ) );
-
-	} );
 	materials.add( listbox );
 
 	var buttonsRow = new UIRow();
@@ -136,13 +131,25 @@ var SidebarProject = function ( editor ) {
 	var assignMaterial = new UIButton().setLabel( strings.getKey( 'sidebar/project/Assign' ) ).setMargin( '0px 5px' );
 	assignMaterial.onClick( function () {
 
-		if ( editor.selected !== null ) {
+		var selectedObject = editor.selected;
 
-			var material = editor.getMaterialById( parseInt( listbox.getValue() ) );
+		if ( selectedObject !== null ) {
 
-			if ( material !== undefined ) {
+			var oldMaterial = selectedObject.material;
 
-				editor.execute( new SetMaterialCommand( editor, editor.selected, material ) );
+			// only assing materials to objects with a material property (e.g. avoid assigning material to THREE.Group)
+
+			if ( oldMaterial !== undefined ) {
+
+				var material = editor.getMaterialById( parseInt( listbox.getValue() ) );
+
+				if ( material !== undefined ) {
+
+					editor.removeMaterial( oldMaterial );
+					editor.execute( new SetMaterialCommand( editor, selectedObject, material ) );
+					editor.addMaterial( material );
+
+				}
 
 			}
 
@@ -165,6 +172,15 @@ var SidebarProject = function ( editor ) {
 		}
 
 	} );
+
+	signals.materialAdded.add( refreshMaterialBrowserUI );
+	signals.materialRemoved.add( refreshMaterialBrowserUI );
+
+	function refreshMaterialBrowserUI() {
+
+		listbox.setItems( Object.values( editor.materials ) );
+
+	}
 
 	return container;
 
