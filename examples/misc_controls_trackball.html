@@ -29,9 +29,9 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { TrackballControls } from './jsm/controls/CameraControls.js';
 
-			var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
+			var camera, perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
 			var params = {
 				orthographicCamera: false
@@ -51,6 +51,8 @@
 
 				orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
 				orthographicCamera.position.z = 500;
+
+				camera = perspectiveCamera;
 
 				// world
 
@@ -103,7 +105,9 @@
 
 					controls.dispose();
 
-					createControls( value ? orthographicCamera : perspectiveCamera );
+					camera = ( value ) ? orthographicCamera : perspectiveCamera;
+
+					createControls( camera );
 
 				} );
 
@@ -119,11 +123,11 @@
 
 				controls = new TrackballControls( camera, renderer.domElement );
 
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.keys = [ 65, 83, 68 ];
+				controls.enableDamping = true;
+				controls.minDistance = 100;
+				controls.maxDistance = 1000;
+				controls.minZoom = 0.5;
+				controls.maxZoom = 2;
 
 			}
 
@@ -150,7 +154,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update();
+				controls.update(); // required because damping is enabled
 
 				stats.update();
 
@@ -159,8 +163,6 @@
 			}
 
 			function render() {
-
-				var camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
 
 				renderer.render( scene, camera );
 
