@@ -49,18 +49,6 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-	toJSON: function ( meta ) {
-
-		var data = Object3D.prototype.toJSON.call( this, meta );
-
-		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
-		if ( this.environment !== null ) data.object.environment = this.environment.toJSON( meta );
-		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
-
-		return data;
-
-	},
-
 	dispose: function () {
 
 		this.dispatchEvent( { type: 'dispose' } );

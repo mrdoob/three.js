@@ -126,6 +126,8 @@ Editor.prototype = {
 
 		this.scene.background = ( scene.background !== null ) ? scene.background.clone() : null;
 
+		if ( this.scene.background && this.scene.background.isTexture ) this.scene.background.needsUpdate = true; // cloning a texture does not clone its version
+
 		if ( scene.fog !== null ) this.scene.fog = scene.fog.clone();
 
 		this.scene.userData = JSON.parse( JSON.stringify( scene.userData ) );
@@ -661,7 +663,13 @@ Editor.prototype = {
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		this.setScene( loader.parse( json.scene ) );
+		var scope = this;
+
+		loader.parse( json.scene, function ( scene ) {
+
+			scope.setScene( scene );
+
+		} );
 
 	},
 

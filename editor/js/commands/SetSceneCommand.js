@@ -28,6 +28,22 @@ var SetSceneCommand = function ( editor, scene ) {
 		this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'name', scene.name ) );
 		this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'userData', JSON.parse( JSON.stringify( scene.userData ) ) ) );
 
+		if ( scene.background !== null ) {
+
+			var background = scene.background.clone();
+
+			if ( background.isTexture ) background.needsUpdate = true; // cloning a texture does not clone its version
+
+			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'background', background ) );
+
+		}
+
+		if ( scene.fog !== null ) {
+
+			this.cmdArray.push( new SetValueCommand( this.editor, this.editor.scene, 'fog', scene.fog.clone() ) );
+
+		}
+
 		while ( scene.children.length > 0 ) {
 
 			var child = scene.children.pop();

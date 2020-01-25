@@ -688,6 +688,29 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
+		if ( this.isScene ) {
+
+			var background = this.background;
+
+			if ( background !== null ) {
+
+				if ( background.isColor ) {
+
+					object.background = background.toJSON();
+
+				} else if ( background.isTexture ) {
+
+					object.background = background.toJSON( meta ).uuid;
+
+				}
+
+			}
+
+			if ( this.environment !== null ) object.environment = this.environment.toJSON( meta );
+			if ( this.fog !== null ) object.fog = this.fog.toJSON();
+
+		}
+
 		//
 
 		function serialize( library, element ) {

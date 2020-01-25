@@ -540,17 +540,19 @@ var Loader = function ( editor ) {
 				var loader = new THREE.ObjectLoader();
 				loader.setResourcePath( scope.texturePath );
 
-				var result = loader.parse( data );
+				loader.parse( data, function ( result ) {
 
-				if ( result.isScene ) {
+					if ( result.isScene ) {
 
-					editor.execute( new SetSceneCommand( editor, result ) );
+						editor.execute( new SetSceneCommand( editor, result ) );
 
-				} else {
+					} else {
 
-					editor.execute( new AddObjectCommand( editor, result ) );
+						editor.execute( new AddObjectCommand( editor, result ) );
 
-				}
+					}
+
+				} );
 
 				break;
 
