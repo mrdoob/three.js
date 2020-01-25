@@ -58,8 +58,6 @@ var files = [
 	{ path: 'interactive/SelectionBox.js', dependencies: [], ignoreList: [] },
 	{ path: 'interactive/SelectionHelper.js', dependencies: [], ignoreList: [] },
 
-	{ path: 'libs/three-csm.module.js', dependencies: [], ignoreList: [] },
-
 	{ path: 'lights/LightProbeGenerator.js', dependencies: [], ignoreList: [] },
 	{ path: 'lights/RectAreaLightUniformsLib.js', dependencies: [], ignoreList: [] },
 
