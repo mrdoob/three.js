@@ -288,6 +288,7 @@ var files = {
 		"webgl_buffergeometry_rawshader",
 		"webgl_buffergeometry_selective_draw",
 		"webgl_buffergeometry_uint",
+		"webgl_cascadedshadowmaps",
 		"webgl_custom_attributes",
 		"webgl_custom_attributes_lines",
 		"webgl_custom_attributes_points",
