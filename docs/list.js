@@ -111,7 +111,9 @@ var list = {
 
 			"Extras": {
 				"Earcut": "api/en/extras/Earcut",
-				"ShapeUtils": "api/en/extras/ShapeUtils"
+				"ImageUtils": "api/en/extras/ImageUtils",
+				"PMREMGenerator": "api/en/extras/PMREMGenerator",
+				"ShapeUtils": "api/en/extras/ShapeUtils",
 			},
 
 			"Extras / Core": {
@@ -561,6 +563,8 @@ var list = {
 
 			"附件": {
 				"Earcut": "api/zh/extras/Earcut",
+				"ImageUtils": "api/zh/extras/ImageUtils",
+				"PMREMGenerator": "api/zh/extras/PMREMGenerator",
 				"ShapeUtils": "api/zh/extras/ShapeUtils"
 			},
 
