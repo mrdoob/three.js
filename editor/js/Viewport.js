@@ -591,9 +591,9 @@ var Viewport = function ( editor ) {
 
 	// animations
 
-	var prevTime = performance.now();
+	var clock = new THREE.Clock(); // only used for animations
 
-	function animate( time ) {
+	function animate() {
 
 		requestAnimationFrame( animate );
 
@@ -601,12 +601,10 @@ var Viewport = function ( editor ) {
 
 		if ( mixer.stats.actions.inUse > 0 ) {
 
-			mixer.update( ( time - prevTime ) / 1000 );
+			mixer.update( clock.getDelta() );
 			render();
 
 		}
-
-		prevTime = time;
 
 	}
 
@@ -614,7 +612,12 @@ var Viewport = function ( editor ) {
 
 	//
 
+	var startTime = 0;
+	var endTime = 0;
+
 	function render() {
+
+		startTime = performance.now();
 
 		scene.updateMatrixWorld();
 		renderer.render( scene, camera );
@@ -625,6 +628,10 @@ var Viewport = function ( editor ) {
 			renderer.render( sceneHelpers, camera );
 
 		}
+
+		endTime = performance.now();
+		var frametime = endTime - startTime;
+		editor.signals.sceneRendered.dispatch( frametime );
 
 	}
 

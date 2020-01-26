@@ -311,7 +311,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
-			'viewport/info/triangles': 'Triangles'
+			'viewport/info/triangles': 'Triangles',
+			'viewport/info/frametime': 'Frametime'
 
 		},
 
@@ -592,7 +593,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
-			'viewport/info/triangles': '三角形'
+			'viewport/info/triangles': '三角形',
+			'viewport/info/frametime': 'Frametime'
 
 		}
 
