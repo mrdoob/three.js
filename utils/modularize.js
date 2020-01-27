@@ -25,6 +25,7 @@ var files = [
 	{ path: 'controls/OrbitControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/PointerLockControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/TrackballControls.js', dependencies: [], ignoreList: [] },
+	{ path: 'controls/CameraControls.js', dependencies: [], ignoreList: [] },
 	{ path: 'controls/TransformControls.js', dependencies: [], ignoreList: [] },
 
 	{ path: 'curves/CurveExtras.js', dependencies: [], ignoreList: [] },
