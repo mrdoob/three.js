@@ -18,7 +18,8 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - trackball controls
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - trackball controls<br />
+			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 		</div>
 
 		<script type="module">
@@ -28,9 +29,9 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			import { TrackballControls } from './jsm/controls/CameraControls.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
-			var camera, perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
+			var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
 			var params = {
 				orthographicCamera: false
@@ -50,8 +51,6 @@
 
 				orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
 				orthographicCamera.position.z = 500;
-
-				camera = perspectiveCamera;
 
 				// world
 
@@ -104,9 +103,7 @@
 
 					controls.dispose();
 
-					camera = ( value ) ? orthographicCamera : perspectiveCamera;
-
-					createControls( camera );
+					createControls( value ? orthographicCamera : perspectiveCamera );
 
 				} );
 
@@ -122,11 +119,11 @@
 
 				controls = new TrackballControls( camera, renderer.domElement );
 
-				controls.enableDamping = true;
-				controls.minDistance = 100;
-				controls.maxDistance = 1000;
-				controls.minZoom = 0.5;
-				controls.maxZoom = 2;
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.keys = [ 65, 83, 68 ];
 
 			}
 
@@ -153,7 +150,7 @@
 
 				requestAnimationFrame( animate );
 
-				controls.update(); // required because damping is enabled
+				controls.update();
 
 				stats.update();
 
@@ -162,6 +159,8 @@
 			}
 
 			function render() {
+
+				var camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
 
 				renderer.render( scene, camera );
 
