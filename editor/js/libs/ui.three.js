@@ -6,7 +6,7 @@ import * as THREE from '../../../build/three.module.js';
 
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 
-import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
+import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber, UISelect } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
 
 /**
@@ -179,6 +179,181 @@ UITexture.prototype.setEncoding = function ( encoding ) {
 };
 
 UITexture.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+// UICubeTexture
+
+var UICubeTexture = function () {
+
+	UIElement.call( this );
+
+	var container = new UIDiv();
+
+	this.cubeTexture = null;
+	this.onChangeCallback = null;
+	this.dom = container.dom;
+
+	this.textures = [];
+
+	var scope = this;
+
+	var selectionRow = new UIRow();
+
+	var cubeSideSelect = new UISelect().setOptions( {
+
+		0: 'Positive X',
+		1: 'Negative X',
+		2: 'Positive Y',
+		3: 'Negative Y',
+		4: 'Positive Z',
+		5: 'Negative Z'
+
+	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( refreshUI );
+	cubeSideSelect.setValue( 0 ); // default posX
+
+	selectionRow.add( cubeSideSelect );
+
+	var posXRow = new UIRow();
+	var negXRow = new UIRow();
+	var posYRow = new UIRow();
+	var negYRow = new UIRow();
+	var posZRow = new UIRow();
+	var negZRow = new UIRow();
+
+	var rows = [ posXRow, negXRow, posYRow, negYRow, posZRow, negZRow ];
+
+	var posXTexture = new UITexture().onChange( onTextureChanged );
+	var negXTexture = new UITexture().onChange( onTextureChanged );
+	var posYTexture = new UITexture().onChange( onTextureChanged );
+	var negYTexture = new UITexture().onChange( onTextureChanged );
+	var posZTexture = new UITexture().onChange( onTextureChanged );
+	var negZTexture = new UITexture().onChange( onTextureChanged );
+
+	this.textures.push( posXTexture, negXTexture, posYTexture, negYTexture, posZTexture, negZTexture );
+
+	posXRow.add( posXTexture );
+	negXRow.add( negXTexture );
+	posYRow.add( posYTexture );
+	negYRow.add( negYTexture );
+	posZRow.add( posZTexture );
+	negZRow.add( negZTexture );
+
+	container.add( selectionRow );
+	container.add( ...rows );
+
+	refreshUI();
+
+	function refreshUI() {
+
+		var currentSelection = cubeSideSelect.getValue();
+
+		for ( var i = 0; i < rows.length; i ++ ) {
+
+			rows[ i ].setDisplay( 'none' );
+
+		}
+
+		rows[ currentSelection ].setDisplay( '' );
+
+	}
+
+	function onTextureChanged() {
+
+		var images = [];
+
+		for ( var i = 0; i < scope.textures.length; i ++ ) {
+
+			var texture = scope.textures[ i ].getValue();
+
+			if ( texture !== null ) {
+
+				images.push( texture.image );
+
+			}
+
+		}
+
+		if ( images.length === 6 ) {
+
+			var cubeTexture = new THREE.CubeTexture( images );
+			cubeTexture.encoding = THREE.sRGBEncoding;
+			cubeTexture.needsUpdate = true;
+
+			scope.cubeTexture = cubeTexture;
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback( cubeTexture );
+
+		}
+
+	}
+
+};
+
+UICubeTexture.prototype = Object.create( UIElement.prototype );
+UICubeTexture.prototype.constructor = UICubeTexture;
+
+UICubeTexture.prototype.setEncoding = function ( encoding ) {
+
+	var cubeTexture = this.getValue();
+	if ( cubeTexture !== null ) {
+
+		cubeTexture.encoding = encoding;
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.getValue = function () {
+
+	return this.cubeTexture;
+
+};
+
+UICubeTexture.prototype.setValue = function ( cubeTexture ) {
+
+	this.cubeTexture = cubeTexture;
+
+	if ( cubeTexture !== null ) {
+
+		var images = cubeTexture.image;
+
+		if ( Array.isArray( images ) === true && images.length === 6 ) {
+
+			for ( var i = 0; i < images.length; i ++ ) {
+
+				var image = images[ i ];
+
+				var texture = new THREE.Texture( image );
+				this.textures[ i ].setValue( texture );
+
+			}
+
+		}
+
+	} else {
+
+		var textures = this.textures;
+
+		for ( var i = 0; i < textures.length; i ++ ) {
+
+			textures[ i ].setValue( null );
+
+		}
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
 
@@ -744,4 +919,4 @@ UIBoolean.prototype.setValue = function ( value ) {
 
 };
 
-export { UITexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };
+export { UITexture, UICubeTexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };

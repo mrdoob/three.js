@@ -3,7 +3,7 @@
  */
 
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
-import { UIOutliner, UITexture } from './libs/ui.three.js';
+import { UIOutliner, UITexture, UICubeTexture } from './libs/ui.three.js';
 
 var SidebarScene = function ( editor ) {
 
@@ -118,7 +118,8 @@ var SidebarScene = function ( editor ) {
 		signals.sceneBackgroundChanged.dispatch(
 			backgroundType.getValue(),
 			backgroundColor.getHexValue(),
-			backgroundTexture.getValue()
+			backgroundTexture.getValue(),
+			backgroundCubeTexture.getValue()
 		);
 
 	}
@@ -129,7 +130,8 @@ var SidebarScene = function ( editor ) {
 
 		'None': 'None',
 		'Color': 'Color',
-		'Texture': 'Texture'
+		'Texture': 'Texture',
+		'CubeTexture': 'CubeTexture'
 
 	} ).setWidth( '150px' );
 	backgroundType.onChange( function () {
@@ -168,12 +170,24 @@ var SidebarScene = function ( editor ) {
 
 	//
 
+	var cubeTextureRow = new UIRow();
+	cubeTextureRow.setDisplay( 'none' );
+	cubeTextureRow.setMarginLeft( '90px' );
+
+	var backgroundCubeTexture = new UICubeTexture().onChange( onBackgroundChanged );
+	cubeTextureRow.add( backgroundCubeTexture );
+
+	container.add( cubeTextureRow );
+
+	//
+
 	function refreshBackgroundUI() {
 
 		var type = backgroundType.getValue();
 
 		colorRow.setDisplay( type === 'Color' ? '' : 'none' );
 		textureRow.setDisplay( type === 'Texture' ? '' : 'none' );
+		cubeTextureRow.setDisplay( type === 'CubeTexture' ? '' : 'none' );
 
 	}
 
@@ -280,11 +294,19 @@ var SidebarScene = function ( editor ) {
 				backgroundType.setValue( "Color" );
 				backgroundColor.setHexValue( scene.background.getHex() );
 				backgroundTexture.setValue( null );
+				backgroundCubeTexture.setValue( null );
 
 			} else if ( scene.background.isTexture ) {
 
 				backgroundType.setValue( "Texture" );
 				backgroundTexture.setValue( scene.background );
+				backgroundCubeTexture.setValue( null );
+
+			} else if ( scene.background.isCubeTexture ) {
+
+				backgroundType.setValue( "CubeTexture" );
+				backgroundCubeTexture.setValue( scene.background );
+				backgroundTexture.setValue( null );
 
 			}
 
