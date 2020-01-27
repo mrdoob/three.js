@@ -305,7 +305,7 @@ var d = a.distanceTo( b );
 		<p>
 		[page:Camera camera] — camera to use in the projection.<br /><br />
 
-		[link:https://en.wikipedia.org/wiki/Vector_projection Projects] the vector with the camera.
+		Projects this vector from world space into the camera's normalized device coordinate (NDC) space.
 		</p>
 
 		<h3>[method:this projectOnPlane]( [param:Vector3 planeNormal] )</h3>
@@ -434,8 +434,7 @@ var d = a.distanceTo( b );
 		<p>
 		[page:Camera camera] — camera to use in the projection.<br /><br />
 
-		[link:https://en.wikipedia.org/wiki/Vector_projection Unprojects] the vector with the
-		camera's projection matrix.
+		Projects this vector from the camera's normalized device coordinate (NDC) space into world space.
 		</p>
 
 
