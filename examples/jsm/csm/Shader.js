@@ -91,4 +91,4 @@ uniform float cameraNear;
 uniform float shadowFar;
 #endif
 	` + THREE.ShaderChunk.lights_pars_begin
-}
+};
