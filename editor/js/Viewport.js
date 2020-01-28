@@ -498,6 +498,12 @@ var Viewport = function ( editor ) {
 
 		}
 
+		if ( scene.background !== null && ( scene.background.isTexture || scene.background.isCubeTexture ) ) {
+
+			scene.background.encoding = THREE.sRGBEncoding;
+
+		}
+
 		render();
 
 	} );

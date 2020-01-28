@@ -246,7 +246,6 @@ var UICubeTexture = function () {
 		if ( images.length === 6 ) {
 
 			var cubeTexture = new THREE.CubeTexture( images );
-			cubeTexture.encoding = THREE.sRGBEncoding;
 			cubeTexture.needsUpdate = true;
 
 			scope.cubeTexture = cubeTexture;
