@@ -467,7 +467,7 @@ var Viewport = function ( editor ) {
 
 	var currentBackgroundType = null;
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundCubeTexture ) {
 
 		if ( currentBackgroundType !== backgroundType ) {
 
@@ -491,6 +491,16 @@ var Viewport = function ( editor ) {
 		} else if ( backgroundType === 'Texture' ) {
 
 			scene.background = backgroundTexture;
+
+		} else if ( backgroundType === 'CubeTexture' ) {
+
+			scene.background = backgroundCubeTexture;
+
+		}
+
+		if ( scene.background !== null && ( scene.background.isTexture || scene.background.isCubeTexture ) ) {
+
+			scene.background.encoding = THREE.sRGBEncoding;
 
 		}
 

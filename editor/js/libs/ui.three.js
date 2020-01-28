@@ -186,6 +186,145 @@ UITexture.prototype.onChange = function ( callback ) {
 
 };
 
+// UICubeTexture
+
+var UICubeTexture = function () {
+
+	UIElement.call( this );
+
+	var container = new UIDiv();
+
+	this.cubeTexture = null;
+	this.onChangeCallback = null;
+	this.dom = container.dom;
+
+	this.textures = [];
+
+	var scope = this;
+
+	var pRow = new UIRow();
+	var nRow = new UIRow();
+
+	pRow.add( new UIText( 'P:' ).setWidth( '35px' ) );
+	nRow.add( new UIText( 'N:' ).setWidth( '35px' ) );
+
+	var posXTexture = new UITexture().onChange( onTextureChanged );
+	var negXTexture = new UITexture().onChange( onTextureChanged );
+	var posYTexture = new UITexture().onChange( onTextureChanged );
+	var negYTexture = new UITexture().onChange( onTextureChanged );
+	var posZTexture = new UITexture().onChange( onTextureChanged );
+	var negZTexture = new UITexture().onChange( onTextureChanged );
+
+	this.textures.push( posXTexture, negXTexture, posYTexture, negYTexture, posZTexture, negZTexture );
+
+	pRow.add( posXTexture );
+	pRow.add( posYTexture );
+	pRow.add( posZTexture );
+
+	nRow.add( negXTexture );
+	nRow.add( negYTexture );
+	nRow.add( negZTexture );
+
+	container.add( pRow, nRow );
+
+	function onTextureChanged() {
+
+		var images = [];
+
+		for ( var i = 0; i < scope.textures.length; i ++ ) {
+
+			var texture = scope.textures[ i ].getValue();
+
+			if ( texture !== null ) {
+
+				images.push( texture.image );
+
+			}
+
+		}
+
+		if ( images.length === 6 ) {
+
+			var cubeTexture = new THREE.CubeTexture( images );
+			cubeTexture.needsUpdate = true;
+
+			scope.cubeTexture = cubeTexture;
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback( cubeTexture );
+
+		}
+
+	}
+
+};
+
+UICubeTexture.prototype = Object.create( UIElement.prototype );
+UICubeTexture.prototype.constructor = UICubeTexture;
+
+UICubeTexture.prototype.setEncoding = function ( encoding ) {
+
+	var cubeTexture = this.getValue();
+	if ( cubeTexture !== null ) {
+
+		cubeTexture.encoding = encoding;
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.getValue = function () {
+
+	return this.cubeTexture;
+
+};
+
+UICubeTexture.prototype.setValue = function ( cubeTexture ) {
+
+	this.cubeTexture = cubeTexture;
+
+	if ( cubeTexture !== null ) {
+
+		var images = cubeTexture.image;
+
+		if ( Array.isArray( images ) === true && images.length === 6 ) {
+
+			for ( var i = 0; i < images.length; i ++ ) {
+
+				var image = images[ i ];
+
+				var texture = new THREE.Texture( image );
+				this.textures[ i ].setValue( texture );
+
+			}
+
+		}
+
+	} else {
+
+		var textures = this.textures;
+
+		for ( var i = 0; i < textures.length; i ++ ) {
+
+			textures[ i ].setValue( null );
+
+		}
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
 // UIOutliner
 
 var UIOutliner = function ( editor ) {
@@ -744,4 +883,4 @@ UIBoolean.prototype.setValue = function ( value ) {
 
 };
 
-export { UITexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };
+export { UITexture, UICubeTexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };
