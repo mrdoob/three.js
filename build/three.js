@@ -18733,9 +18733,9 @@
 				extensionDrawbuffers: material.extensions && material.extensions.drawbuffers,
 				extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
 
-				rendererExtensionFragDepth: isWebGL2 || extensions.get( 'EXT_frag_depth' ) !== undefined,
-				rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== undefined,
-				rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== undefined,
+				rendererExtensionFragDepth: isWebGL2 || extensions.get( 'EXT_frag_depth' ) !== null,
+				rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
+				rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
 
 				onBeforeCompile: material.onBeforeCompile
 
