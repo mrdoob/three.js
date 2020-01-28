@@ -4,6 +4,10 @@
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "module": "build/three.module.js",
+  "exports": {
+    "require": "./build/three.js",
+    "import": "./build/three.mjs"
+  },
   "types": "src/Three.d.ts",
   "repository": {
     "type": "git",
