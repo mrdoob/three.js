@@ -6,7 +6,7 @@ import * as THREE from '../../../build/three.module.js';
 
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 
-import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber, UISelect } from './ui.js';
+import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
 import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
 
 /**
@@ -202,30 +202,11 @@ var UICubeTexture = function () {
 
 	var scope = this;
 
-	var selectionRow = new UIRow();
+	var pRow = new UIRow();
+	var nRow = new UIRow();
 
-	var cubeSideSelect = new UISelect().setOptions( {
-
-		0: 'Positive X',
-		1: 'Negative X',
-		2: 'Positive Y',
-		3: 'Negative Y',
-		4: 'Positive Z',
-		5: 'Negative Z'
-
-	} ).setWidth( '150px' ).setFontSize( '12px' ).onChange( refreshUI );
-	cubeSideSelect.setValue( 0 ); // default posX
-
-	selectionRow.add( cubeSideSelect );
-
-	var posXRow = new UIRow();
-	var negXRow = new UIRow();
-	var posYRow = new UIRow();
-	var negYRow = new UIRow();
-	var posZRow = new UIRow();
-	var negZRow = new UIRow();
-
-	var rows = [ posXRow, negXRow, posYRow, negYRow, posZRow, negZRow ];
+	pRow.add( new UIText( 'P:' ).setWidth( '35px' ) );
+	nRow.add( new UIText( 'N:' ).setWidth( '35px' ) );
 
 	var posXTexture = new UITexture().onChange( onTextureChanged );
 	var negXTexture = new UITexture().onChange( onTextureChanged );
@@ -236,31 +217,15 @@ var UICubeTexture = function () {
 
 	this.textures.push( posXTexture, negXTexture, posYTexture, negYTexture, posZTexture, negZTexture );
 
-	posXRow.add( posXTexture );
-	negXRow.add( negXTexture );
-	posYRow.add( posYTexture );
-	negYRow.add( negYTexture );
-	posZRow.add( posZTexture );
-	negZRow.add( negZTexture );
+	pRow.add( posXTexture );
+	pRow.add( posYTexture );
+	pRow.add( posZTexture );
 
-	container.add( selectionRow );
-	container.add( ...rows );
+	nRow.add( negXTexture );
+	nRow.add( negYTexture );
+	nRow.add( negZTexture );
 
-	refreshUI();
-
-	function refreshUI() {
-
-		var currentSelection = cubeSideSelect.getValue();
-
-		for ( var i = 0; i < rows.length; i ++ ) {
-
-			rows[ i ].setDisplay( 'none' );
-
-		}
-
-		rows[ currentSelection ].setDisplay( '' );
-
-	}
+	container.add( pRow, nRow );
 
 	function onTextureChanged() {
 
