@@ -142,10 +142,6 @@ function WebGLLights() {
 		pointShadowMatrix: [],
 		hemi: [],
 
-		numDirectionalShadows: - 1,
-		numPointShadows: - 1,
-		numSpotShadows: - 1
-
 	};
 
 	for ( var i = 0; i < 9; i ++ ) state.probe.push( new Vector3() );
