@@ -25,7 +25,6 @@ var files = {
 		"webgl_geometries_parametric",
 		"webgl_geometry_colors",
 		"webgl_geometry_colors_lookuptable",
-		"webgl_geometry_compression", 
 		"webgl_geometry_convex",
 		"webgl_geometry_cube",
 		"webgl_geometry_dynamic",
@@ -273,6 +272,7 @@ var files = {
 	],
 	"webgl / advanced": [
 		"webgl_buffergeometry",
+		"webgl_buffergeometry_compression",
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",
 		"webgl_buffergeometry_drawrange",
