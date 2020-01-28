@@ -25,6 +25,7 @@ var files = {
 		"webgl_geometries_parametric",
 		"webgl_geometry_colors",
 		"webgl_geometry_colors_lookuptable",
+		"webgl_geometry_compression", 
 		"webgl_geometry_convex",
 		"webgl_geometry_cube",
 		"webgl_geometry_dynamic",
