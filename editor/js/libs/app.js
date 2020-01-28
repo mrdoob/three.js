@@ -4,9 +4,7 @@
 
 var APP = {
 
-	Player: function ( THREE ) {
-
-		window.THREE = THREE; // FIX for editor scripts (they require THREE in global namespace)
+	Player: function () {
 
 		var renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setPixelRatio( window.devicePixelRatio );

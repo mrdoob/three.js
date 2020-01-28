@@ -67,7 +67,9 @@
 			//
 
 			var editor = new Editor();
-			window.editor = editor;
+
+			window.editor = editor; // Expose editor to Console
+			window.THREE = THREE; // Expose THREE to APP Scripts and Console
 
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
