@@ -109,7 +109,7 @@ var CSS2DRenderer = function () {
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], scene, camera );
+			renderObject( object.children[ i ], camera );
 
 		}
 
