@@ -1233,8 +1233,6 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		//
 
-		console.log( 'THREE.SVGLoader' );
-
 		var paths = [];
 
 		var transformStack = [];
@@ -1248,13 +1246,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		var currentTransform = new THREE.Matrix3();
 
-		console.time( 'THREE.SVGLoader: DOMParser' );
-
 		var xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
-
-		console.timeEnd( 'THREE.SVGLoader: DOMParser' );
-
-		console.time( 'THREE.SVGLoader: Parse' );
 
 		parseNode( xml.documentElement, {
 			fill: '#000',
@@ -1269,10 +1261,6 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var data = { paths: paths, xml: xml.documentElement };
 
 		// console.log( paths );
-
-
-		console.timeEnd( 'THREE.SVGLoader: Parse' );
-
 		return data;
 
 	}
