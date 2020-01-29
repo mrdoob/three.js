@@ -1048,8 +1048,6 @@ var LDrawLoader = ( function () {
 
 		objectParse: function ( text ) {
 
-			//console.time( 'LDrawLoader' );
-
 			// Retrieve data from the parent parse scope
 			var parentParseScope = this.getParentParseScope();
 

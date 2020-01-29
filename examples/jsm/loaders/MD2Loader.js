@@ -124,8 +124,6 @@ MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return function ( buffer ) {
 
-			console.time( 'MD2Loader' );
-
 			var data = new DataView( buffer );
 
 			// http://tfc.duke.free.fr/coding/md2-specs-en.html
@@ -378,8 +376,6 @@ MD2Loader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			geometry.morphTargetsRelative = false;
 
 			geometry.animations = AnimationClip.CreateClipsFromMorphTargetSequences( frames, 10 );
-
-			console.timeEnd( 'MD2Loader' );
 
 			return geometry;
 
