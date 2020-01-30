@@ -283,16 +283,27 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			var decompressedSize = sizes[ 1 ];
 			var decompressed = decompressLZF( new Uint8Array( data, PCDheader.headerLen + 8, compressedSize ), decompressedSize );
 			var dataview = new DataView( decompressed.buffer );
+			var tempX,tempY,tempZ;
 
-			var offset = PCDheader.offset;
-
-			for ( var i = 0; i < PCDheader.points; i ++ ) {
+			for ( var i = 0; i < PCDheader.points; i ++ ) {				
 
 				if ( offset.x !== undefined ) {
 
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ 0 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ 1 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ 2 ] * i, this.littleEndian ) );
+					tempX = dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ 0 ] * i, this.littleEndian );
+					tempY = dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ 1 ] * i, this.littleEndian );
+					tempZ = dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ 2 ] * i, this.littleEndian );
+
+					if ( !isNaN(tempX) && !isNaN(tempY) && !isNaN(tempZ)){
+
+						position.push( tempX );
+						position.push( tempY );
+						position.push( tempZ );
+
+					} else {
+
+						continue; // skip rbd and normal_x for this point if the position is not defined.
+
+					}
 
 				}
 
