@@ -4,7 +4,7 @@ import {
 	Camera
 } from '../../../src/Three';
 
-export class CSS2DObject extends Object3D {
+export class CSS2DObject extends Object3D<CSS2DRenderer> {
 
 	constructor( element: HTMLElement );
 	element: HTMLElement;
