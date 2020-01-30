@@ -318,6 +318,12 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.rendererUpdated.add( function () {
+
+		render();
+
+	} );
+
 	signals.rendererChanged.add( function ( newRenderer ) {
 
 		if ( renderer !== null ) {
