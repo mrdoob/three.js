@@ -153,8 +153,8 @@ export class Object3D extends EventDispatcher {
 	/**
 	 * Calls before rendering object
 	 */
-	onBeforeRender: (
-		renderer: WebGLRenderer,
+	onBeforeRender: <Renderer = WebGLRenderer>(
+		renderer: Renderer,
 		scene: Scene,
 		camera: Camera,
 		geometry: Geometry | BufferGeometry,
@@ -165,8 +165,8 @@ export class Object3D extends EventDispatcher {
 	/**
 	 * Calls after rendering object
 	 */
-	onAfterRender: (
-		renderer: WebGLRenderer,
+	onAfterRender: <Renderer = WebGLRenderer>(
+		renderer: Renderer,
 		scene: Scene,
 		camera: Camera,
 		geometry: Geometry | BufferGeometry,
