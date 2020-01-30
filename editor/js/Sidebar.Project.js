@@ -4,7 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel, UIRow, UIInput, UICheckbox, UIText, UIListbox, UISpan, UIButton } from './libs/ui.js';
+import { UIPanel, UIRow, UIInput, UICheckbox, UIText, UIListbox, UISpan, UIButton, UISelect, UINumber } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
@@ -14,6 +14,8 @@ var SidebarProject = function ( editor ) {
 	var config = editor.config;
 	var signals = editor.signals;
 	var strings = editor.strings;
+
+	var currentRenderer = null;
 
 	var container = new UISpan();
 
@@ -56,6 +58,8 @@ var SidebarProject = function ( editor ) {
 	var rendererPropertiesRow = new UIRow();
 	rendererPropertiesRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
 
+	// Renderer / Antialias
+
 	var rendererAntialias = new UIBoolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/antialias', this.getValue() );
@@ -76,31 +80,102 @@ var SidebarProject = function ( editor ) {
 
 	projectsettings.add( rendererPropertiesRow );
 
+	// Tonemapping
+
+	var tonemapping = new UIPanel();
+
+	// Tonemapping / Header
+
+	var headerRow = new UIRow();
+	headerRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ).toUpperCase() ) );
+	tonemapping.add( headerRow );
+
+	// Tonemapping / Type
+
+	var toneMappingTypeRow = new UIRow();
+	var rendererToneMappingTypeLabel = new UIText( strings.getKey( 'sidebar/project/toneMappingType' ) ).setWidth( '90px' );
+
+	var rendererToneMappingTypeSelect = new UISelect().setOptions( {
+		0: 'None',
+		1: 'Linear',
+		2: 'Reinhard',
+		3: 'Uncharted2',
+		4: 'Cineon',
+		5: 'ACESFilmic',
+	} ).setWidth( '150px' ).onChange( function () {
+
+		config.setKey( 'project/renderer/toneMapping', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererToneMappingTypeSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
+	toneMappingTypeRow.add( rendererToneMappingTypeLabel, rendererToneMappingTypeSelect );
+	tonemapping.add( toneMappingTypeRow );
+
+	// Tonemapping / Exposure
+
+	var toneMappingExposureRow = new UIRow();
+	var rendererToneMappingExposureLabel = new UIText( strings.getKey( 'sidebar/project/toneMappingExposure' ) ).setWidth( '90px' );
+	var rendererToneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) ).setRange( 0, 10 ).onChange( function () {
+
+		config.setKey( 'project/renderer/toneMappingExposure', this.getValue() );
+		updateTonemapping();
+
+	} );
+	toneMappingExposureRow.add( rendererToneMappingExposureLabel, rendererToneMappingExposure );
+	tonemapping.add( toneMappingExposureRow );
+
+	// Tonemapping / White Point
+
+	var toneMappingWhitePointRow = new UIRow();
+	var rendererToneMappingWhitePointLabel = new UIText( strings.getKey( 'sidebar/project/toneMappingWhitePoint' ) ).setWidth( '90px' );
+	var rendererToneMappingWhitePoint = new UINumber( config.getKey( 'project/renderer/toneMappingWhitePoint' ) ).setRange( 0, 10 ).onChange( function () {
+
+		config.setKey( 'project/renderer/toneMappingWhitePoint', this.getValue() );
+		updateTonemapping();
+
+	} );
+	toneMappingWhitePointRow.add( rendererToneMappingWhitePointLabel, rendererToneMappingWhitePoint );
+	tonemapping.add( toneMappingWhitePointRow );
+
+	container.add( tonemapping );
+
 	//
 
 	function updateRenderer() {
 
-		createRenderer( rendererAntialias.getValue() );
+		createRenderer( rendererAntialias.getValue(), rendererShadows.getValue(), rendererToneMappingTypeSelect.getValue() );
 
 	}
 
-	function createRenderer( antialias, shadows ) {
+	function createRenderer( antialias, shadows, toneMapping ) {
 
 		var parameters = { antialias: antialias };
-		var renderer = new THREE.WebGLRenderer( parameters );
+		currentRenderer = new THREE.WebGLRenderer( parameters );
 
 		if ( shadows ) {
 
-			renderer.shadowMap.enabled = true;
+			currentRenderer.shadowMap.enabled = true;
 			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 		}
 
-		signals.rendererChanged.dispatch( renderer );
+		currentRenderer.toneMapping = parseFloat( toneMapping );
+
+		signals.rendererChanged.dispatch( currentRenderer );
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
+	function updateTonemapping() {
+
+		currentRenderer.toneMappingExposure = rendererToneMappingExposure.getValue();
+		currentRenderer.toneMappingWhitePoint = rendererToneMappingWhitePoint.getValue();
+
+		signals.rendererUpdated.dispatch();
+
+	}
+
+	createRenderer( config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ), config.getKey( 'project/renderer/toneMapping' ) );
 
 	// Materials
 
