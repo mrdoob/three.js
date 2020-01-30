@@ -4,6 +4,7 @@
 
 import * as THREE from '../../../build/three.module.js';
 
+import { RGBELoader } from '../../../examples/jsm/loaders/RGBELoader.js';
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 
 import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
@@ -101,6 +102,33 @@ var UITexture = function ( mapping ) {
 
 			}
 
+		} else {
+
+			var reader = new FileReader();
+			reader.addEventListener( 'load', function ( event ) {
+
+				if ( file.name.split( '.' ).pop() === 'hdr' ) {
+
+					// assuming RGBE/Radiance HDR iamge format
+
+					var loader = new RGBELoader().setDataType( THREE.UnsignedByteType );
+					loader.load( event.target.result, function ( hdrTexture ) {
+
+						hdrTexture.sourceFile = file.name;
+						hdrTexture.isHDRTexture = true;
+
+						scope.setValue( hdrTexture );
+
+						if ( scope.onChangeCallback ) scope.onChangeCallback( hdrTexture );
+
+					} );
+
+				}
+
+			} );
+
+			reader.readAsDataURL( file );
+
 		}
 
 		form.reset();
@@ -136,9 +164,18 @@ UITexture.prototype.setValue = function ( texture ) {
 		if ( image !== undefined && image.width > 0 ) {
 
 			canvas.title = texture.sourceFile;
-
 			var scale = canvas.width / image.width;
-			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+			if ( image.data === undefined ) {
+
+				context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+			} else {
+
+				var canvas2 = renderToCanvas( texture );
+				context.drawImage( canvas2, 0, 0, image.width * scale, image.height * scale );
+
+			}
 
 		} else {
 
@@ -237,7 +274,7 @@ var UICubeTexture = function () {
 
 			if ( texture !== null ) {
 
-				images.push( texture.image );
+				images.push( texture.isHDRTexture ? texture : texture.image );
 
 			}
 
@@ -247,6 +284,8 @@ var UICubeTexture = function () {
 
 			var cubeTexture = new THREE.CubeTexture( images );
 			cubeTexture.needsUpdate = true;
+
+			if ( images[ 0 ].isHDRTexture ) cubeTexture.isHDRTexture = true;
 
 			scope.cubeTexture = cubeTexture;
 
@@ -882,5 +921,35 @@ UIBoolean.prototype.setValue = function ( value ) {
 	return this.checkbox.setValue( value );
 
 };
+
+var renderer;
+
+function renderToCanvas( texture ) {
+
+	if ( renderer === undefined ) {
+
+		renderer = new THREE.WebGLRenderer( { canvas: new OffscreenCanvas( 1, 1 ) } );
+
+	}
+
+	var image = texture.image;
+
+	renderer.setSize( image.width, image.height, false );
+	renderer.toneMapping = THREE.ReinhardToneMapping;
+	renderer.outputEncoding = THREE.sRGBEncoding;
+
+	var scene = new THREE.Scene();
+	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+	var material = new THREE.MeshBasicMaterial( { map: texture } );
+	var quad = new THREE.PlaneBufferGeometry( 2, 2 );
+	var mesh = new THREE.Mesh( quad, material );
+	scene.add( mesh );
+
+	renderer.render( scene, camera );
+
+	return renderer.domElement;
+
+}
 
 export { UITexture, UICubeTexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };

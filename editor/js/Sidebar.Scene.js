@@ -124,6 +124,23 @@ var SidebarScene = function ( editor ) {
 
 	}
 
+	function onTextureChanged( texture ) {
+
+		texture.encoding = texture.isHDRTexture ? THREE.RGBEEncoding : THREE.sRGBEncoding;
+
+		if ( texture.isCubeTexture && texture.isHDRTexture ) {
+
+			texture.format = THREE.RGBAFormat;
+			texture.minFilter = THREE.NearestFilter;
+			texture.magFilter = THREE.NearestFilter;
+			texture.generateMipmaps = false;
+
+		}
+
+		onBackgroundChanged();
+
+	}
+
 	var backgroundRow = new UIRow();
 
 	var backgroundType = new UISelect().setOptions( {
@@ -163,7 +180,7 @@ var SidebarScene = function ( editor ) {
 	textureRow.setDisplay( 'none' );
 	textureRow.setMarginLeft( '90px' );
 
-	var backgroundTexture = new UITexture().onChange( onBackgroundChanged );
+	var backgroundTexture = new UITexture().onChange( onTextureChanged );
 	textureRow.add( backgroundTexture );
 
 	container.add( textureRow );
@@ -174,7 +191,7 @@ var SidebarScene = function ( editor ) {
 	cubeTextureRow.setDisplay( 'none' );
 	cubeTextureRow.setMarginLeft( '90px' );
 
-	var backgroundCubeTexture = new UICubeTexture().onChange( onBackgroundChanged );
+	var backgroundCubeTexture = new UICubeTexture().onChange( onTextureChanged );
 	cubeTextureRow.add( backgroundCubeTexture );
 
 	container.add( cubeTextureRow );
