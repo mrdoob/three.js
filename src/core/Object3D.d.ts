@@ -20,7 +20,7 @@ export let Object3DIdCount: number;
 /**
  * Base class for scene graph objects
  */
-export class Object3D<Renderer = WebGLRenderer> extends EventDispatcher {
+export class Object3D extends EventDispatcher {
 
 	constructor();
 
@@ -153,7 +153,7 @@ export class Object3D<Renderer = WebGLRenderer> extends EventDispatcher {
 	/**
 	 * Calls before rendering object
 	 */
-	onBeforeRender: (
+	onBeforeRender: <Renderer = WebGLRenderer>(
 		renderer: Renderer,
 		scene: Scene,
 		camera: Camera,
@@ -165,7 +165,7 @@ export class Object3D<Renderer = WebGLRenderer> extends EventDispatcher {
 	/**
 	 * Calls after rendering object
 	 */
-	onAfterRender: (
+	onAfterRender: <Renderer = WebGLRenderer>(
 		renderer: Renderer,
 		scene: Scene,
 		camera: Camera,

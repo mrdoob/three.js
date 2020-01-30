@@ -4,13 +4,13 @@ import {
 	Camera
 } from '../../../src/Three';
 
-export class CSS3DObject extends Object3D<CSS3DRenderer> {
+export class CSS3DObject extends Object3D {
 
 	constructor( element: HTMLElement );
 	element: HTMLElement;
 
-	onBeforeRender: (renderer: CSS3DRenderer, scene: Scene, camera: Camera) => void;
-	onAfterRender: (renderer: CSS3DRenderer, scene: Scene, camera: Camera) => void;
+	onBeforeRender: <Renderer = CSS3DRenderer>(renderer: Renderer, scene: Scene, camera: Camera) => void;
+	onAfterRender: <Renderer = CSS3DRenderer>(renderer: Renderer, scene: Scene, camera: Camera) => void;
 
 }
 
