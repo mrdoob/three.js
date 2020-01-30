@@ -936,6 +936,7 @@ function renderToCanvas( texture ) {
 
 	renderer.setSize( image.width, image.height, false );
 	renderer.toneMapping = THREE.ReinhardToneMapping;
+	renderer.toneMappingExposure = 2;
 	renderer.outputEncoding = THREE.sRGBEncoding;
 
 	var scene = new THREE.Scene();
