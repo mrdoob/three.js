@@ -297,13 +297,27 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var offset = PCDheader.offset;
 
-			for ( var i = 0; i < PCDheader.points; i ++ ) {
+			var tempX,tempY,tempZ;
+
+			for ( var i = 0; i < PCDheader.points; i ++ ) {				
 
 				if ( offset.x !== undefined ) {
 
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ 0 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ 1 ] * i, this.littleEndian ) );
-					position.push( dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ 2 ] * i, this.littleEndian ) );
+					tempX = dataview.getFloat32( ( PCDheader.points * offset.x ) + PCDheader.size[ 0 ] * i, this.littleEndian );
+					tempY = dataview.getFloat32( ( PCDheader.points * offset.y ) + PCDheader.size[ 1 ] * i, this.littleEndian );
+					tempZ = dataview.getFloat32( ( PCDheader.points * offset.z ) + PCDheader.size[ 2 ] * i, this.littleEndian );
+
+					if ( !isNaN(tempX) && !isNaN(tempY) && !isNaN(tempZ)){
+
+						position.push( tempX );
+						position.push( tempY );
+						position.push( tempZ );
+
+					} else {
+
+						continue; // skip rbd and normal_x for this point if the position is not defined.
+
+					}
 
 				}
 
