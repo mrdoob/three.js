@@ -5,8 +5,8 @@
   "main": "build/three.js",
   "module": "build/three.module.js",
   "exports": {
-    "require": "./build/three.js",
-    "import": "./build/three.mjs"
+    "import": "./build/three.mjs",
+    "default": "./build/three.js"
   },
   "types": "src/Three.d.ts",
   "repository": {
