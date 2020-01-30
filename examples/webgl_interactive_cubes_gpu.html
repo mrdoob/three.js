@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking
 		</div>
 
 		<div id="container"></div>
@@ -109,7 +109,7 @@
 					quaternion.setFromEuler( rotation );
 					matrix.compose( position, quaternion, scale );
 
-					geometry.applyMatrix( matrix );
+					geometry.applyMatrix4( matrix );
 
 					// give the geometry's vertices a random color, to be displayed
 

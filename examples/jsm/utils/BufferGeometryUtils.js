@@ -636,7 +636,7 @@ var BufferGeometryUtils = {
 
 		}
 
-		if ( drawMode === TriangleFanDrawMode || drawMode === TriangleStripDrawMode ) {
+		if ( drawMode === TriangleFanDrawMode || drawMode === TriangleStripDrawMode ) {
 
 			var index = geometry.getIndex();
 

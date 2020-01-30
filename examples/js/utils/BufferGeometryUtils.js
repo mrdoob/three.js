@@ -624,7 +624,7 @@ THREE.BufferGeometryUtils = {
 
 		}
 
-		if ( drawMode === THREE.TriangleFanDrawMode || drawMode === THREE.TriangleStripDrawMode ) {
+		if ( drawMode === THREE.TriangleFanDrawMode || drawMode === THREE.TriangleStripDrawMode ) {
 
 			var index = geometry.getIndex();
 

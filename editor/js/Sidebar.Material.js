@@ -92,7 +92,7 @@ var SidebarMaterial = function ( editor ) {
 	var materialUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
 	var materialUUIDRenew = new UIButton( strings.getKey( 'sidebar/material/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
-		materialUUID.setValue( THREE.Math.generateUUID() );
+		materialUUID.setValue( THREE.MathUtils.generateUUID() );
 		update();
 
 	} );
@@ -606,6 +606,18 @@ var SidebarMaterial = function ( editor ) {
 				if ( material.type === "RawShaderMaterial" ) {
 
 					material.vertexShader = vertexShaderVariables + material.vertexShader;
+
+				}
+
+				if ( Array.isArray( currentObject.material ) ) {
+
+					// don't remove the entire multi-material. just the material of the selected slot
+
+					editor.removeMaterial( currentObject.material[ currentMaterialSlot ] );
+
+				} else {
+
+					editor.removeMaterial( currentObject.material );
 
 				}
 

@@ -426,7 +426,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				var inverse = new THREE.Matrix4();
 				inverse.getInverse( matrix, true );
-				geometry.applyMatrix( inverse );
+				geometry.applyMatrix4( inverse );
 
 				matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
 

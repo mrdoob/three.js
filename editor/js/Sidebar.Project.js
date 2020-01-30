@@ -4,10 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { SVGRenderer } from '../../examples/jsm/renderers/SVGRenderer.js';
-import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
-
-import { UIPanel, UIRow, UIInput, UICheckbox, UISelect, UIText, UIListbox, UISpan, UIButton } from './libs/ui.js';
+import { UIPanel, UIRow, UIInput, UICheckbox, UIText, UIListbox, UISpan, UIButton, UISelect, UINumber } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
@@ -18,13 +15,7 @@ var SidebarProject = function ( editor ) {
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var rendererTypes = {
-
-		'WebGLRenderer': THREE.WebGLRenderer,
-		'SVGRenderer': SVGRenderer,
-		'RaytracingRenderer': RaytracingRenderer
-
-	};
+	var currentRenderer = null;
 
 	var container = new UISpan();
 
@@ -64,41 +55,10 @@ var SidebarProject = function ( editor ) {
 
 	// Renderer
 
-	var options = {};
-
-	for ( var key in rendererTypes ) {
-
-		if ( key.indexOf( 'WebGL' ) >= 0 && System.support.webgl === false ) continue;
-
-		options[ key ] = key;
-
-	}
-
-	var rendererTypeRow = new UIRow();
-	var rendererType = new UISelect().setOptions( options ).setWidth( '150px' ).onChange( function () {
-
-		var value = this.getValue();
-
-		config.setKey( 'project/renderer', value );
-
-		updateRenderer();
-
-	} );
-
-	rendererTypeRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
-	rendererTypeRow.add( rendererType );
-
-	projectsettings.add( rendererTypeRow );
-
-	if ( config.getKey( 'project/renderer' ) !== undefined ) {
-
-		rendererType.setValue( config.getKey( 'project/renderer' ) );
-
-	}
+	var rendererPropertiesRow = new UIRow();
+	rendererPropertiesRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
 
 	// Renderer / Antialias
-
-	var rendererPropertiesRow = new UIRow().setMarginLeft( '90px' );
 
 	var rendererAntialias = new UIBoolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
 
@@ -120,49 +80,102 @@ var SidebarProject = function ( editor ) {
 
 	projectsettings.add( rendererPropertiesRow );
 
+	// Tonemapping
+
+	var tonemapping = new UIPanel();
+
+	// Tonemapping / Header
+
+	var headerRow = new UIRow();
+	headerRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ).toUpperCase() ) );
+	tonemapping.add( headerRow );
+
+	// Tonemapping / Type
+
+	var toneMappingTypeRow = new UIRow();
+	var rendererToneMappingTypeLabel = new UIText( strings.getKey( 'sidebar/project/toneMappingType' ) ).setWidth( '90px' );
+
+	var rendererToneMappingTypeSelect = new UISelect().setOptions( {
+		0: 'None',
+		1: 'Linear',
+		2: 'Reinhard',
+		3: 'Uncharted2',
+		4: 'Cineon',
+		5: 'ACESFilmic',
+	} ).setWidth( '150px' ).onChange( function () {
+
+		config.setKey( 'project/renderer/toneMapping', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererToneMappingTypeSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
+	toneMappingTypeRow.add( rendererToneMappingTypeLabel, rendererToneMappingTypeSelect );
+	tonemapping.add( toneMappingTypeRow );
+
+	// Tonemapping / Exposure
+
+	var toneMappingExposureRow = new UIRow();
+	var rendererToneMappingExposureLabel = new UIText( strings.getKey( 'sidebar/project/toneMappingExposure' ) ).setWidth( '90px' );
+	var rendererToneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) ).setRange( 0, 10 ).onChange( function () {
+
+		config.setKey( 'project/renderer/toneMappingExposure', this.getValue() );
+		updateTonemapping();
+
+	} );
+	toneMappingExposureRow.add( rendererToneMappingExposureLabel, rendererToneMappingExposure );
+	tonemapping.add( toneMappingExposureRow );
+
+	// Tonemapping / White Point
+
+	var toneMappingWhitePointRow = new UIRow();
+	var rendererToneMappingWhitePointLabel = new UIText( strings.getKey( 'sidebar/project/toneMappingWhitePoint' ) ).setWidth( '90px' );
+	var rendererToneMappingWhitePoint = new UINumber( config.getKey( 'project/renderer/toneMappingWhitePoint' ) ).setRange( 0, 10 ).onChange( function () {
+
+		config.setKey( 'project/renderer/toneMappingWhitePoint', this.getValue() );
+		updateTonemapping();
+
+	} );
+	toneMappingWhitePointRow.add( rendererToneMappingWhitePointLabel, rendererToneMappingWhitePoint );
+	tonemapping.add( toneMappingWhitePointRow );
+
+	container.add( tonemapping );
+
 	//
 
 	function updateRenderer() {
 
-		createRenderer( rendererType.getValue(), rendererAntialias.getValue() );
+		createRenderer( rendererAntialias.getValue(), rendererShadows.getValue(), rendererToneMappingTypeSelect.getValue() );
 
 	}
 
-	function createRenderer( type, antialias, shadows ) {
+	function createRenderer( antialias, shadows, toneMapping ) {
 
-		rendererPropertiesRow.setDisplay( type === 'WebGLRenderer' ? '' : 'none' );
+		var parameters = { antialias: antialias };
+		currentRenderer = new THREE.WebGLRenderer( parameters );
 
-		var parameters = {};
+		if ( shadows ) {
 
-		switch ( type ) {
-
-			case 'WebGLRenderer':
-				parameters.antialias = antialias;
-				break;
-
-			case 'RaytracingRenderer':
-				parameters.workers = navigator.hardwareConcurrency || 4;
-				parameters.workerPath = '../examples/js/renderers/RaytracingWorker.js';
-				parameters.randomize = true;
-				parameters.blockSize = 64;
-				break;
-
-		}
-
-		var renderer = new rendererTypes[ type ]( parameters );
-
-		if ( shadows && renderer.shadowMap ) {
-
-			renderer.shadowMap.enabled = true;
+			currentRenderer.shadowMap.enabled = true;
 			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 		}
 
-		signals.rendererChanged.dispatch( renderer );
+		currentRenderer.toneMapping = parseFloat( toneMapping );
+
+		signals.rendererChanged.dispatch( currentRenderer );
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer' ), config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
+	function updateTonemapping() {
+
+		currentRenderer.toneMappingExposure = rendererToneMappingExposure.getValue();
+		currentRenderer.toneMappingWhitePoint = rendererToneMappingWhitePoint.getValue();
+
+		signals.rendererUpdated.dispatch();
+
+	}
+
+	createRenderer( config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ), config.getKey( 'project/renderer/toneMapping' ) );
 
 	// Materials
 
@@ -174,11 +187,6 @@ var SidebarProject = function ( editor ) {
 	materials.add( headerRow );
 
 	var listbox = new UIListbox();
-	signals.materialAdded.add( function () {
-
-		listbox.setItems( Object.values( editor.materials ) );
-
-	} );
 	materials.add( listbox );
 
 	var buttonsRow = new UIRow();
@@ -198,13 +206,25 @@ var SidebarProject = function ( editor ) {
 	var assignMaterial = new UIButton().setLabel( strings.getKey( 'sidebar/project/Assign' ) ).setMargin( '0px 5px' );
 	assignMaterial.onClick( function () {
 
-		if ( editor.selected !== null ) {
+		var selectedObject = editor.selected;
 
-			var material = editor.getMaterialById( parseInt( listbox.getValue() ) );
+		if ( selectedObject !== null ) {
 
-			if ( material !== undefined ) {
+			var oldMaterial = selectedObject.material;
 
-				editor.execute( new SetMaterialCommand( editor, editor.selected, material ) );
+			// only assing materials to objects with a material property (e.g. avoid assigning material to THREE.Group)
+
+			if ( oldMaterial !== undefined ) {
+
+				var material = editor.getMaterialById( parseInt( listbox.getValue() ) );
+
+				if ( material !== undefined ) {
+
+					editor.removeMaterial( oldMaterial );
+					editor.execute( new SetMaterialCommand( editor, selectedObject, material ) );
+					editor.addMaterial( material );
+
+				}
 
 			}
 
@@ -227,6 +247,15 @@ var SidebarProject = function ( editor ) {
 		}
 
 	} );
+
+	signals.materialAdded.add( refreshMaterialBrowserUI );
+	signals.materialRemoved.add( refreshMaterialBrowserUI );
+
+	function refreshMaterialBrowserUI() {
+
+		listbox.setItems( Object.values( editor.materials ) );
+
+	}
 
 	return container;
 

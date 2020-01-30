@@ -5,7 +5,6 @@
 import * as THREE from '../../build/three.module.js';
 
 import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
-import { RaytracingRenderer } from '../../examples/jsm/renderers/RaytracingRenderer.js';
 
 import { UIPanel } from './libs/ui.js';
 
@@ -295,6 +294,8 @@ var Viewport = function ( editor ) {
 	signals.editorCleared.add( function () {
 
 		controls.center.set( 0, 0, 0 );
+		currentBackgroundType = null;
+		currentFogType = null;
 		render();
 
 	} );
@@ -314,6 +315,12 @@ var Viewport = function ( editor ) {
 	signals.spaceChanged.add( function ( space ) {
 
 		transformControls.setSpace( space );
+
+	} );
+
+	signals.rendererUpdated.add( function () {
+
+		render();
 
 	} );
 
@@ -462,15 +469,46 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	// fog
+	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundColor ) {
+	var currentBackgroundType = null;
 
-		scene.background.setHex( backgroundColor );
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundCubeTexture ) {
+
+		if ( currentBackgroundType !== backgroundType ) {
+
+			switch ( backgroundType ) {
+
+				case 'None':
+					scene.background = null;
+					break;
+				case 'Color':
+					scene.background = new THREE.Color();
+					break;
+
+			}
+
+		}
+
+		if ( backgroundType === 'Color' ) {
+
+			scene.background.set( backgroundColor );
+
+		} else if ( backgroundType === 'Texture' ) {
+
+			scene.background = backgroundTexture;
+
+		} else if ( backgroundType === 'CubeTexture' ) {
+
+			scene.background = backgroundCubeTexture;
+
+		}
 
 		render();
 
 	} );
+
+	// fog
 
 	var currentFogType = null;
 
@@ -563,9 +601,9 @@ var Viewport = function ( editor ) {
 
 	// animations
 
-	var prevTime = performance.now();
+	var clock = new THREE.Clock(); // only used for animations
 
-	function animate( time ) {
+	function animate() {
 
 		requestAnimationFrame( animate );
 
@@ -573,12 +611,10 @@ var Viewport = function ( editor ) {
 
 		if ( mixer.stats.actions.inUse > 0 ) {
 
-			mixer.update( ( time - prevTime ) / 1000 );
+			mixer.update( clock.getDelta() );
 			render();
 
 		}
-
-		prevTime = time;
 
 	}
 
@@ -586,21 +622,26 @@ var Viewport = function ( editor ) {
 
 	//
 
+	var startTime = 0;
+	var endTime = 0;
+
 	function render() {
+
+		startTime = performance.now();
 
 		scene.updateMatrixWorld();
 		renderer.render( scene, camera );
 
-		if ( renderer instanceof RaytracingRenderer === false ) {
+		if ( camera === editor.camera ) {
 
-			if ( camera === editor.camera ) {
-
-				sceneHelpers.updateMatrixWorld();
-				renderer.render( sceneHelpers, camera );
-
-			}
+			sceneHelpers.updateMatrixWorld();
+			renderer.render( sceneHelpers, camera );
 
 		}
+
+		endTime = performance.now();
+		var frametime = endTime - startTime;
+		editor.signals.sceneRendered.dispatch( frametime );
 
 	}
 

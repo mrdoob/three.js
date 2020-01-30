@@ -17,7 +17,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo<br/>
 			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
 			<br><br>
 			<span>Body: <select id="body-mat"></select></span>
@@ -64,7 +64,7 @@
 
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
-					.setPath( 'textures/hdr/' )
+					.setPath( 'textures/equirectangular/' )
 					.load( 'quarry_01_1k.hdr', function ( texture ) {
 
 						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;

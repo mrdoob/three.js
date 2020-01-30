@@ -4,6 +4,7 @@
 
 import * as THREE from '../../../build/three.module.js';
 
+import { RGBELoader } from '../../../examples/jsm/loaders/RGBELoader.js';
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 
 import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
@@ -101,6 +102,33 @@ var UITexture = function ( mapping ) {
 
 			}
 
+		} else {
+
+			var reader = new FileReader();
+			reader.addEventListener( 'load', function ( event ) {
+
+				if ( file.name.split( '.' ).pop() === 'hdr' ) {
+
+					// assuming RGBE/Radiance HDR iamge format
+
+					var loader = new RGBELoader().setDataType( THREE.UnsignedByteType );
+					loader.load( event.target.result, function ( hdrTexture ) {
+
+						hdrTexture.sourceFile = file.name;
+						hdrTexture.isHDRTexture = true;
+
+						scope.setValue( hdrTexture );
+
+						if ( scope.onChangeCallback ) scope.onChangeCallback( hdrTexture );
+
+					} );
+
+				}
+
+			} );
+
+			reader.readAsDataURL( file );
+
 		}
 
 		form.reset();
@@ -136,9 +164,18 @@ UITexture.prototype.setValue = function ( texture ) {
 		if ( image !== undefined && image.width > 0 ) {
 
 			canvas.title = texture.sourceFile;
-
 			var scale = canvas.width / image.width;
-			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+			if ( image.data === undefined ) {
+
+				context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+			} else {
+
+				var canvas2 = renderToCanvas( texture );
+				context.drawImage( canvas2, 0, 0, image.width * scale, image.height * scale );
+
+			}
 
 		} else {
 
@@ -179,6 +216,147 @@ UITexture.prototype.setEncoding = function ( encoding ) {
 };
 
 UITexture.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+// UICubeTexture
+
+var UICubeTexture = function () {
+
+	UIElement.call( this );
+
+	var container = new UIDiv();
+
+	this.cubeTexture = null;
+	this.onChangeCallback = null;
+	this.dom = container.dom;
+
+	this.textures = [];
+
+	var scope = this;
+
+	var pRow = new UIRow();
+	var nRow = new UIRow();
+
+	pRow.add( new UIText( 'P:' ).setWidth( '35px' ) );
+	nRow.add( new UIText( 'N:' ).setWidth( '35px' ) );
+
+	var posXTexture = new UITexture().onChange( onTextureChanged );
+	var negXTexture = new UITexture().onChange( onTextureChanged );
+	var posYTexture = new UITexture().onChange( onTextureChanged );
+	var negYTexture = new UITexture().onChange( onTextureChanged );
+	var posZTexture = new UITexture().onChange( onTextureChanged );
+	var negZTexture = new UITexture().onChange( onTextureChanged );
+
+	this.textures.push( posXTexture, negXTexture, posYTexture, negYTexture, posZTexture, negZTexture );
+
+	pRow.add( posXTexture );
+	pRow.add( posYTexture );
+	pRow.add( posZTexture );
+
+	nRow.add( negXTexture );
+	nRow.add( negYTexture );
+	nRow.add( negZTexture );
+
+	container.add( pRow, nRow );
+
+	function onTextureChanged() {
+
+		var images = [];
+
+		for ( var i = 0; i < scope.textures.length; i ++ ) {
+
+			var texture = scope.textures[ i ].getValue();
+
+			if ( texture !== null ) {
+
+				images.push( texture.isHDRTexture ? texture : texture.image );
+
+			}
+
+		}
+
+		if ( images.length === 6 ) {
+
+			var cubeTexture = new THREE.CubeTexture( images );
+			cubeTexture.needsUpdate = true;
+
+			if ( images[ 0 ].isHDRTexture ) cubeTexture.isHDRTexture = true;
+
+			scope.cubeTexture = cubeTexture;
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback( cubeTexture );
+
+		}
+
+	}
+
+};
+
+UICubeTexture.prototype = Object.create( UIElement.prototype );
+UICubeTexture.prototype.constructor = UICubeTexture;
+
+UICubeTexture.prototype.setEncoding = function ( encoding ) {
+
+	var cubeTexture = this.getValue();
+	if ( cubeTexture !== null ) {
+
+		cubeTexture.encoding = encoding;
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.getValue = function () {
+
+	return this.cubeTexture;
+
+};
+
+UICubeTexture.prototype.setValue = function ( cubeTexture ) {
+
+	this.cubeTexture = cubeTexture;
+
+	if ( cubeTexture !== null ) {
+
+		var images = cubeTexture.image;
+
+		if ( Array.isArray( images ) === true && images.length === 6 ) {
+
+			for ( var i = 0; i < images.length; i ++ ) {
+
+				var image = images[ i ];
+
+				var texture = new THREE.Texture( image );
+				this.textures[ i ].setValue( texture );
+
+			}
+
+		}
+
+	} else {
+
+		var textures = this.textures;
+
+		for ( var i = 0; i < textures.length; i ++ ) {
+
+			textures[ i ].setValue( null );
+
+		}
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
 
@@ -744,4 +922,35 @@ UIBoolean.prototype.setValue = function ( value ) {
 
 };
 
-export { UITexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };
+var renderer;
+
+function renderToCanvas( texture ) {
+
+	if ( renderer === undefined ) {
+
+		renderer = new THREE.WebGLRenderer( { canvas: new OffscreenCanvas( 1, 1 ) } );
+
+	}
+
+	var image = texture.image;
+
+	renderer.setSize( image.width, image.height, false );
+	renderer.toneMapping = THREE.ReinhardToneMapping;
+	renderer.toneMappingExposure = 2;
+	renderer.outputEncoding = THREE.sRGBEncoding;
+
+	var scene = new THREE.Scene();
+	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+	var material = new THREE.MeshBasicMaterial( { map: texture } );
+	var quad = new THREE.PlaneBufferGeometry( 2, 2 );
+	var mesh = new THREE.Mesh( quad, material );
+	scene.add( mesh );
+
+	renderer.render( scene, camera );
+
+	return renderer.domElement;
+
+}
+
+export { UITexture, UICubeTexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };

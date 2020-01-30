@@ -1305,7 +1305,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( transform ) {
 
-					object3D.applyMatrix( transform );
+					object3D.applyMatrix4( transform );
 
 				}
 
@@ -1410,7 +1410,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( transform ) {
 
-					object3D.applyMatrix( transform );
+					object3D.applyMatrix4( transform );
 
 				}
 

@@ -8,6 +8,12 @@ THREE.SVGLoader = function ( manager ) {
 
 	THREE.Loader.call( this, manager );
 
+	// Default dots per inch
+	this.defaultDPI = 90;
+
+	// Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
+	this.defaultUnit = "px";
+
 };
 
 THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
@@ -29,6 +35,8 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	},
 
 	parse: function ( text ) {
+
+		var scope = this;
 
 		function parseNode( node, style ) {
 
@@ -628,12 +636,12 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		*/
 		function parseRectNode( node ) {
 
-			var x = parseFloat( node.getAttribute( 'x' ) || 0 );
-			var y = parseFloat( node.getAttribute( 'y' ) || 0 );
-			var rx = parseFloat( node.getAttribute( 'rx' ) || 0 );
-			var ry = parseFloat( node.getAttribute( 'ry' ) || 0 );
-			var w = parseFloat( node.getAttribute( 'width' ) );
-			var h = parseFloat( node.getAttribute( 'height' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
+			var y = parseFloatWithUnits( node.getAttribute( 'y' ) || 0 );
+			var rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || 0 );
+			var ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || 0 );
+			var w = parseFloatWithUnits( node.getAttribute( 'width' ) );
+			var h = parseFloatWithUnits( node.getAttribute( 'height' ) );
 
 			var path = new THREE.ShapePath();
 			path.moveTo( x + 2 * rx, y );
@@ -665,8 +673,8 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			function iterator( match, a, b ) {
 
-				var x = parseFloat( a );
-				var y = parseFloat( b );
+				var x = parseFloatWithUnits( a );
+				var y = parseFloatWithUnits( b );
 
 				if ( index === 0 ) {
 
@@ -700,8 +708,8 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			function iterator( match, a, b ) {
 
-				var x = parseFloat( a );
-				var y = parseFloat( b );
+				var x = parseFloatWithUnits( a );
+				var y = parseFloatWithUnits( b );
 
 				if ( index === 0 ) {
 
@@ -733,9 +741,9 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function parseCircleNode( node ) {
 
-			var x = parseFloat( node.getAttribute( 'cx' ) );
-			var y = parseFloat( node.getAttribute( 'cy' ) );
-			var r = parseFloat( node.getAttribute( 'r' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) );
+			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) );
+			var r = parseFloatWithUnits( node.getAttribute( 'r' ) );
 
 			var subpath = new THREE.Path();
 			subpath.absarc( x, y, r, 0, Math.PI * 2 );
@@ -749,10 +757,10 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function parseEllipseNode( node ) {
 
-			var x = parseFloat( node.getAttribute( 'cx' ) );
-			var y = parseFloat( node.getAttribute( 'cy' ) );
-			var rx = parseFloat( node.getAttribute( 'rx' ) );
-			var ry = parseFloat( node.getAttribute( 'ry' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) );
+			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) );
+			var rx = parseFloatWithUnits( node.getAttribute( 'rx' ) );
+			var ry = parseFloatWithUnits( node.getAttribute( 'ry' ) );
 
 			var subpath = new THREE.Path();
 			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
@@ -766,10 +774,10 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function parseLineNode( node ) {
 
-			var x1 = parseFloat( node.getAttribute( 'x1' ) );
-			var y1 = parseFloat( node.getAttribute( 'y1' ) );
-			var x2 = parseFloat( node.getAttribute( 'x2' ) );
-			var y2 = parseFloat( node.getAttribute( 'y2' ) );
+			var x1 = parseFloatWithUnits( node.getAttribute( 'x1' ) );
+			var y1 = parseFloatWithUnits( node.getAttribute( 'y1' ) );
+			var x2 = parseFloatWithUnits( node.getAttribute( 'x2' ) );
+			var y2 = parseFloatWithUnits( node.getAttribute( 'y2' ) );
 
 			var path = new THREE.ShapePath();
 			path.moveTo( x1, y1 );
@@ -801,13 +809,13 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			function clamp( v ) {
 
-				return Math.max( 0, Math.min( 1, parseFloat( v ) ) );
+				return Math.max( 0, Math.min( 1, parseFloatWithUnits( v ) ) );
 
 			}
 
 			function positive( v ) {
 
-				return Math.max( 0, parseFloat( v ) );
+				return Math.max( 0, parseFloatWithUnits( v ) );
 
 			}
 
@@ -855,7 +863,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				}
 
-				array[ i ] = parseFloat( number );
+				array[ i ] = parseFloatWithUnits( number );
 
 			}
 
@@ -863,6 +871,110 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 
 		}
+
+		// Units
+
+		var units = [ 'mm', 'cm', 'in', 'pt', 'pc', 'px' ];
+
+		// Conversion: [ fromUnit ][ toUnit ] (-1 means dpi dependent)
+		var unitConversion = {
+
+			"mm" : {
+				"mm": 1,
+				"cm": 0.1,
+				"in": 1 / 25.4,
+				"pt": 72 / 25.4,
+				"pc": 6 / 25.4,
+				"px": - 1
+			},
+			"cm" : {
+				"mm": 10,
+				"cm": 1,
+				"in": 1 / 2.54,
+				"pt": 72 / 2.54,
+				"pc": 6 / 2.54,
+				"px": - 1
+			},
+			"in" : {
+				"mm": 25.4,
+				"cm": 2.54,
+				"in": 1,
+				"pt": 72,
+				"pc": 6,
+				"px": - 1
+			},
+			"pt" : {
+				"mm": 25.4 / 72,
+				"cm": 2.54 / 72,
+				"in": 1 / 72,
+				"pt": 1,
+				"pc": 6 / 72,
+				"px": - 1
+			},
+			"pc" : {
+				"mm": 25.4 / 6,
+				"cm": 2.54 / 6,
+				"in": 1 / 6,
+				"pt": 72 / 6,
+				"pc": 1,
+				"px": - 1
+			},
+			"px" : {
+				"px": 1
+			}
+
+		};
+
+		function parseFloatWithUnits( string ) {
+
+			var theUnit = "px";
+
+			if ( typeof string === 'string' || string instanceof String ) {
+
+				for ( var i = 0, n = units.length; i < n; i ++ ) {
+
+					var u = units[ i ];
+
+					if ( string.endsWith( u ) ) {
+
+						theUnit = u;
+						string = string.substring( 0, string.length - u.length );
+						break;
+
+					}
+
+				}
+
+			}
+
+			var scale = undefined;
+
+			if ( theUnit === "px" && scope.defaultUnit !== "px" ) {
+
+				// Conversion scale from  pixels to inches, then to default units
+
+				scale = unitConversion[ "in" ][ scope.defaultUnit ] / scope.defaultDPI;
+
+			}
+			else {
+
+				scale = unitConversion[ theUnit ][ scope.defaultUnit ];
+
+				if ( scale < 0 ) {
+
+					// Conversion scale to pixels
+
+					scale = unitConversion[ theUnit ][ "in" ] * scope.defaultDPI;
+
+				}
+
+			}
+
+			return scale * parseFloat( string );
+
+		}
+
+		// Transforms
 
 		function getNodeTransform( node ) {
 
@@ -1121,8 +1233,6 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		//
 
-		console.log( 'THREE.SVGLoader' );
-
 		var paths = [];
 
 		var transformStack = [];
@@ -1136,13 +1246,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		var currentTransform = new THREE.Matrix3();
 
-		console.time( 'THREE.SVGLoader: DOMParser' );
-
 		var xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
-
-		console.timeEnd( 'THREE.SVGLoader: DOMParser' );
-
-		console.time( 'THREE.SVGLoader: Parse' );
 
 		parseNode( xml.documentElement, {
 			fill: '#000',
@@ -1157,10 +1261,6 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var data = { paths: paths, xml: xml.documentElement };
 
 		// console.log( paths );
-
-
-		console.timeEnd( 'THREE.SVGLoader: Parse' );
-
 		return data;
 
 	}

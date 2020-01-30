@@ -577,8 +577,8 @@ THREE.LightningStrike.prototype.fractalRay = function ( time, segmentCallback ) 
 
 		this.randomGenerator.setSeed( subray.seed );
 
-		subray.endPropagationTime = THREE.Math.lerp( subray.birthTime, subray.deathTime, subray.propagationTimeFactor );
-		subray.beginVanishingTime = THREE.Math.lerp( subray.deathTime, subray.birthTime, 1 - subray.vanishingTimeFactor );
+		subray.endPropagationTime = THREE.MathUtils.lerp( subray.birthTime, subray.deathTime, subray.propagationTimeFactor );
+		subray.beginVanishingTime = THREE.MathUtils.lerp( subray.deathTime, subray.birthTime, 1 - subray.vanishingTimeFactor );
 
 		var random1 = this.randomGenerator.random;
 		subray.linPos0.set( random1(), random1(), random1() ).multiplyScalar( 1000 );
@@ -823,7 +823,7 @@ THREE.LightningStrike.prototype.createDefaultSubrayCreationCallbacks = function 
 		var period = lightningStrike.rayParameters.subrayPeriod;
 		var dutyCycle = lightningStrike.rayParameters.subrayDutyCycle;
 
-		var phase0 = ( lightningStrike.rayParameters.isEternal && subray.recursion == 0 ) ? - random1() * period : THREE.Math.lerp( subray.birthTime, subray.endPropagationTime, segment.fraction0 ) - random1() * period;
+		var phase0 = ( lightningStrike.rayParameters.isEternal && subray.recursion == 0 ) ? - random1() * period : THREE.MathUtils.lerp( subray.birthTime, subray.endPropagationTime, segment.fraction0 ) - random1() * period;
 
 		var phase = lightningStrike.time - phase0;
 		var currentCycle = Math.floor( phase / period );

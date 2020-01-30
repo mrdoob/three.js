@@ -4,16 +4,19 @@
 
 var APP = {
 
-	Player: function ( THREE ) {
+	Player: function () {
 
-		window.THREE = THREE; // FIX for editor scripts (they require THREE in global namespace)
+		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.outputEncoding = THREE.sRGBEncoding;
 
 		var loader = new THREE.ObjectLoader();
-		var camera, scene, renderer;
+		var camera, scene;
 
 		var events = {};
 
 		var dom = document.createElement( 'div' );
+		dom.appendChild( renderer.domElement );
 
 		this.dom = dom;
 
@@ -22,17 +25,10 @@ var APP = {
 
 		this.load = function ( json ) {
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.outputEncoding = THREE.sRGBEncoding;
-			renderer.setClearColor( 0x000000 );
-			renderer.setPixelRatio( window.devicePixelRatio );
-
 			var project = json.project;
 
 			if ( project.shadows ) renderer.shadowMap.enabled = true;
 			if ( project.vr ) renderer.xr.enabled = true;
-
-			dom.appendChild( renderer.domElement );
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -210,17 +206,10 @@ var APP = {
 
 		this.dispose = function () {
 
-			while ( dom.children.length ) {
-
-				dom.removeChild( dom.firstChild );
-
-			}
-
 			renderer.dispose();
 
 			camera = undefined;
 			scene = undefined;
-			renderer = undefined;
 
 		};
 

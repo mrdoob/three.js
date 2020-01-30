@@ -48,7 +48,7 @@ var files = {
 		"webgl_geometry_text_stroke",
 		"webgl_helpers",
 		"webgl_instancing_dynamic",
-		"webgl_instancing_interactive",
+		"webgl_instancing_performance",
 		"webgl_instancing_raycast",
 		"webgl_instancing_scatter",
 		"webgl_interactive_buffergeometry",
@@ -271,6 +271,7 @@ var files = {
 	],
 	"webgl / advanced": [
 		"webgl_buffergeometry",
+		"webgl_buffergeometry_compression",
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",
 		"webgl_buffergeometry_drawrange",
@@ -296,6 +297,7 @@ var files = {
 		"webgl_gpgpu_birds",
 		"webgl_gpgpu_water",
 		"webgl_gpgpu_protoplanet",
+		"webgl_instancing_modified",
 		"webgl_lightningstrike",
 		"webgl_lightshafts",
 		"webgl_materials_modified",
@@ -303,8 +305,7 @@ var files = {
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
 		"webgl_tiled_forward",
-		"webgl_worker_offscreencanvas",
-		"webgldeferred_animation"
+		"webgl_worker_offscreencanvas"
 	],
 	"webgl2": [
 		"webgl2_materials_texture2darray",
@@ -375,9 +376,6 @@ var files = {
 		"css3d_sandbox",
 		"css3d_sprites",
 		"css3d_youtube"
-	],
-	"raytracing": [
-		"raytracing_sandbox"
 	],
 	"svg": [
 		"svg_lines",

@@ -14,7 +14,7 @@ import {
 	LinearFilter,
 	LinearMipmapLinearFilter,
 	LinearMipmapNearestFilter,
-	Math as _Math,
+	MathUtils,
 	MirroredRepeatWrapping,
 	NearestFilter,
 	NearestMipmapLinearFilter,
@@ -248,7 +248,7 @@ GLTFExporter.prototype = {
 		 */
 		function isPowerOfTwo( image ) {
 
-			return _Math.isPowerOfTwo( image.width ) && _Math.isPowerOfTwo( image.height );
+			return MathUtils.isPowerOfTwo( image.width ) && MathUtils.isPowerOfTwo( image.height );
 
 		}
 
@@ -781,8 +781,8 @@ GLTFExporter.prototype = {
 
 					console.warn( 'GLTFExporter: Resized non-power-of-two image.', image );
 
-					canvas.width = _Math.floorPowerOfTwo( canvas.width );
-					canvas.height = _Math.floorPowerOfTwo( canvas.height );
+					canvas.width = MathUtils.floorPowerOfTwo( canvas.width );
+					canvas.height = MathUtils.floorPowerOfTwo( canvas.height );
 
 				}
 
@@ -1524,7 +1524,7 @@ GLTFExporter.prototype = {
 				gltfCamera.perspective = {
 
 					aspectRatio: camera.aspect,
-					yfov: _Math.degToRad( camera.fov ),
+					yfov: MathUtils.degToRad( camera.fov ),
 					zfar: camera.far <= 0 ? 0.001 : camera.far,
 					znear: camera.near < 0 ? 0 : camera.near
 
@@ -1668,6 +1668,9 @@ GLTFExporter.prototype = {
 			var node = outputJSON.nodes[ nodeMap.get( object ) ];
 
 			var skeleton = object.skeleton;
+
+			if ( skeleton === undefined ) return null;
+
 			var rootJoint = object.skeleton.bones[ 0 ];
 
 			if ( rootJoint === undefined ) return null;

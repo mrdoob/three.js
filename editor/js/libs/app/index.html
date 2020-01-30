@@ -8,7 +8,7 @@
 		<style>
 			body {
 				font-family: sans-serif;
-				font-size: 13px;
+				font-size: 11px;
 				background-color: #000;
 				margin: 0px;
 				overflow: hidden;
@@ -22,10 +22,12 @@
 			import * as THREE from './js/three.module.js';
 			import { APP } from './js/app.js';
 
+			window.THREE = THREE; // Used by APP Scripts.
+
 			var loader = new THREE.FileLoader();
 			loader.load( 'app.json', function ( text ) {
 
-				var player = new APP.Player( THREE );
+				var player = new APP.Player();
 				player.load( JSON.parse( text ) );
 				player.setSize( window.innerWidth, window.innerHeight );
 				player.play();

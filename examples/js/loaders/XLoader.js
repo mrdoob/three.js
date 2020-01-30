@@ -799,7 +799,7 @@ THREE.XLoader = ( function () {
 				}
 				var b = new THREE.Bone();
 				b.name = this._currentFrame.name;
-				b.applyMatrix( this._currentFrame.FrameTransformMatrix );
+				b.applyMatrix4( this._currentFrame.FrameTransformMatrix );
 				b.matrixWorld = b.matrix;
 				b.FrameTransformMatrix = this._currentFrame.FrameTransformMatrix;
 				this._currentFrame.putBone = b;
@@ -1262,7 +1262,7 @@ THREE.XLoader = ( function () {
 						putting = true;
 						var b = new THREE.Bone();
 						b.name = this.HieStack[ frame ].name;
-						b.applyMatrix( this.HieStack[ frame ].FrameTransformMatrix );
+						b.applyMatrix4( this.HieStack[ frame ].FrameTransformMatrix );
 						b.matrixWorld = b.matrix;
 						b.FrameTransformMatrix = this.HieStack[ frame ].FrameTransformMatrix;
 						b.pos = new THREE.Vector3().setFromMatrixPosition( b.FrameTransformMatrix ).toArray();
@@ -1401,7 +1401,7 @@ THREE.XLoader = ( function () {
 						}
 
 					}
-					mesh.applyMatrix( worldBaseMx );
+					mesh.applyMatrix4( worldBaseMx );
 
 				}
 				this.Meshes.push( mesh );

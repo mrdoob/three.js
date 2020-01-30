@@ -5,9 +5,6 @@
 import { TempNode } from '../core/TempNode.js';
 import { NodeLib } from '../core/NodeLib.js';
 
-var vertexDict = [ 'uv', 'uv2' ],
-	fragmentDict = [ 'vUv', 'vUv2' ];
-
 function UVNode( index ) {
 
 	TempNode.call( this, 'v2', { shared: false } );
@@ -24,7 +21,8 @@ UVNode.prototype.generate = function ( builder, output ) {
 
 	builder.requires.uv[ this.index ] = true;
 
-	var result = builder.isShader( 'vertex' ) ? vertexDict[ this.index ] : fragmentDict[ this.index ];
+	var uvIndex = this.index > 0 ? this.index + 1 : '';
+	var result = builder.isShader( 'vertex' ) ? 'uv' + uvIndex : 'vUv' + uvIndex;
 
 	return builder.format( result, this.getType( builder ), output );
 

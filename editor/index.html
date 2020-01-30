@@ -33,7 +33,6 @@
 		<script src="js/libs/codemirror/mode/javascript.js"></script>
 		<script src="js/libs/codemirror/mode/glsl.js"></script>
 
-		<script src="js/libs/system.min.js"></script>
 		<script src="js/libs/esprima.js"></script>
 		<script src="js/libs/jsonlint.js"></script>
 		<script src="js/libs/glslprep.min.js"></script>
@@ -82,6 +81,9 @@
 			//
 
 			var editor = new Editor();
+
+			window.editor = editor; // Expose editor to Console
+			window.THREE = THREE; // Expose THREE to APP Scripts and Console
 
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );

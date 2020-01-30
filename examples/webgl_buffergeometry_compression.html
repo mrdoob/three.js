@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - buffergeometry - compression</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - BufferGeometry Compression<br />
+			Octahedron and Quantization encoding methods from Tarek Sherif
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GeometryCompressionUtils } from './jsm/utils/GeometryCompressionUtils.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			var statsEnabled = true;
+
+			var container, stats, gui;
+
+			var camera, scene, renderer, controls;
+
+			var lights = [];
+
+			// options
+			var data = {
+				"wireframe": false,
+				"texture": false,
+				"detail": 4,
+				"rotationSpeed": 0.1,
+
+				"quantizeEncodePos": false,
+
+				"defaultEncodeNormal": false,
+				"anglesEncodeNormal": false,
+				"oct1bytesEncode": false,
+				"oct2bytesEncode": false,
+
+				"defaultEncodeUV": false,
+
+				"totalGPUMemory": "0 bytes"
+			};
+			var memoryDisplay;
+
+			// geometry params
+			var radius = 100;
+
+			// materials
+			var lineMaterial = new THREE.LineBasicMaterial( { color: 0xaaaaaa, transparent: true, opacity: 0.8 } );
+			var meshMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111111 } );
+
+			// texture
+			var texture = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+			texture.wrapS = THREE.RepeatWrapping;
+			texture.wrapT = THREE.RepeatWrapping;
+
+			//
+			init();
+			animate();
+
+
+			function init() {
+
+				//
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				//
+
+				scene = new THREE.Scene();
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 10000000 );
+				camera.position.x = 2 * radius;
+				camera.position.y = 2 * radius;
+				camera.position.z = 2 * radius;
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				//
+
+				lights[ 0 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+				lights[ 1 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+				lights[ 2 ] = new THREE.PointLight( 0xffffff, 1, 0 );
+
+				lights[ 0 ].position.set( 0, 2 * radius, 0 );
+				lights[ 1 ].position.set( 2 * radius, - 2 * radius, 2 * radius );
+				lights[ 2 ].position.set( - 2 * radius, - 2 * radius, - 2 * radius );
+
+				scene.add( lights[ 0 ] );
+				scene.add( lights[ 1 ] );
+				scene.add( lights[ 2 ] );
+
+				//
+
+				scene.add( new THREE.AxesHelper( radius * 5 ) );
+
+				//
+
+				var ballGeom = newGeometry();
+
+				var ballMesh = new THREE.Mesh( ballGeom, meshMaterial );
+				var ballLineSegments = new THREE.LineSegments( new THREE.WireframeGeometry( ballGeom ), lineMaterial );
+				ballLineSegments.visible = data.wireframe;
+
+				scene.add( ballMesh );
+				scene.add( ballLineSegments );
+
+				//
+
+				gui = new GUI();
+				gui.width = 350;
+
+				function newGeometry() {
+
+					var geom = new THREE.IcosahedronBufferGeometry( radius, data.detail );
+					// var geom = new THREE.CylinderBufferGeometry( 5, 5, 20, 32 );
+					// var geom = new THREE.OctahedronBufferGeometry( radius, data.detail );
+					// var geom = new THREE.BoxBufferGeometry(radius, radius, radius, data.detail, data.detail, data.detail);
+					return geom;
+
+				}
+
+				function generateGeometry() {
+
+					updateGroupGeometry(
+						ballMesh,
+						ballLineSegments,
+						newGeometry(),
+						data );
+
+				}
+
+				// updateLineSegments
+				function updateLineSegments() {
+
+					ballLineSegments.visible = data.wireframe;
+
+				}
+
+				var folder = gui.addFolder( 'Scene' );
+				folder.open();
+				folder.add( data, 'wireframe', false ).onChange( updateLineSegments );
+				folder.add( data, 'texture', false ).onChange( generateGeometry );
+				folder.add( data, 'detail', 0, 6, 1 ).onChange( generateGeometry );
+				folder.add( data, 'rotationSpeed', 0, 0.5, 0.1 );
+
+				folder = gui.addFolder( 'Position Compression' );
+				folder.open();
+				folder.add( data, 'quantizeEncodePos', false ).onChange( generateGeometry );
+
+				folder = gui.addFolder( 'Normal Compression' );
+				folder.open();
+				folder.add( data, 'defaultEncodeNormal', false ).onChange( generateGeometry );
+				folder.add( data, 'anglesEncodeNormal', false ).onChange( generateGeometry );
+				folder.add( data, 'oct1bytesEncode', false ).onChange( generateGeometry );
+				folder.add( data, 'oct2bytesEncode', false ).onChange( generateGeometry );
+
+				folder = gui.addFolder( 'UV Compression' );
+				folder.open();
+				folder.add( data, 'defaultEncodeUV', false ).onChange( generateGeometry );
+
+				folder = gui.addFolder( 'Memory Info' );
+				folder.open();
+				memoryDisplay = folder.add( data, 'totalGPUMemory', "0 bytes" );
+				computeGPUMemory( ballMesh );
+
+				//
+
+				if ( statsEnabled ) {
+
+					stats = new Stats();
+					container.appendChild( stats.dom );
+
+				}
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			//
+
+			function onWindowResize() {
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+			}
+
+			//
+			function updateLightsPossition() {
+
+				lights.forEach( light => {
+
+					var direction = light.position.clone();
+					direction.applyAxisAngle( new THREE.Vector3( 1, 1, 0 ), data.rotationSpeed / 180 * Math.PI );
+					light.position.add( direction.sub( light.position ) );
+
+				} );
+
+			}
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+				updateLightsPossition();
+
+				renderer.render( scene, camera );
+
+				if ( statsEnabled ) stats.update();
+
+			}
+
+			//
+
+			function updateGroupGeometry( mesh, lineSegments, geometry, data ) {
+
+				if ( geometry.isGeometry ) {
+
+					geometry = new THREE.BufferGeometry().fromGeometry( geometry );
+
+					console.warn( 'THREE.GeometryBrowser: Converted Geometry to BufferGeometry.' );
+
+				}
+
+				lineSegments.geometry.dispose();
+				mesh.geometry.dispose();
+
+				lineSegments.geometry = new THREE.WireframeGeometry( geometry );
+				mesh.geometry = geometry;
+				mesh.material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111111 } );
+				mesh.material.map = data.texture ? texture : null;
+
+				var normalEncode = "";
+
+				if ( data.oct1bytesEncode ) {
+
+					/**
+					 * It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
+					 * As it makes vertex data not aligned to a 4 byte boundary which may harm some WebGL implementations and sometimes the normal distortion is visible
+					 * Please refer to @zeux 's comments in https://github.com/mrdoob/three.js/pull/18208
+					 */
+					normalEncode = "OCT1Byte";
+
+				} else if ( data.oct2bytesEncode ) {
+
+					normalEncode = "OCT2Byte";
+
+				} else if ( data.anglesEncodeNormal ) {
+
+					normalEncode = "ANGLES";
+
+				} else if ( data.defaultEncodeNormal ) {
+
+					normalEncode = "DEFAULT";
+
+				}
+
+				if ( normalEncode != "" ) {
+
+					GeometryCompressionUtils.compressNormals( mesh, normalEncode );
+
+				}
+
+				if ( data.quantizeEncodePos ) {
+
+					GeometryCompressionUtils.compressPositions( mesh );
+
+				}
+
+				if ( data.defaultEncodeUV ) {
+
+					GeometryCompressionUtils.compressUvs( mesh );
+
+				}
+
+				computeGPUMemory( mesh );
+
+			}
+
+
+			function computeGPUMemory( mesh ) {
+
+				let posBytes = mesh.geometry.attributes.position.bytes || mesh.geometry.attributes.position.array.length * 4;
+				let normBytes = mesh.geometry.attributes.normal.bytes || mesh.geometry.attributes.normal.array.length * 4;
+				let uvBytes = mesh.geometry.attributes.uv.bytes || mesh.geometry.attributes.uv.array.length * 4;
+				memoryDisplay.setValue( posBytes + normBytes + uvBytes + " bytes" );
+
+			}
+
+		</script>
+
+	</body>
+</html>

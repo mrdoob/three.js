@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe from cubeCamera
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe from cubeCamera
 		</div>
 
 		<script type="module">
@@ -79,7 +79,7 @@
 
 					cubeCamera.update( renderer, scene );
 
-					lightProbe.copy( LightProbeGenerator.fromRenderTargetCube( renderer, cubeCamera.renderTarget ) );
+					lightProbe.copy( LightProbeGenerator.fromCubeRenderTarget( renderer, cubeCamera.renderTarget ) );
 
 					scene.add( new LightProbeHelper( lightProbe, 5 ) );
 

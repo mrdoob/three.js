@@ -392,7 +392,7 @@ var MenubarFile = function ( editor ) {
 					'',
 					'			var button = document.createElement( \'a\' );',
 					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
-					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 12px 14px; color: #fff; border: 1px solid #fff; border-radius: 4px; text-decoration: none;\';',
+					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
 					'			button.target = \'_blank\';',
 					'			button.textContent = \'EDIT\';',
 					'			document.body.appendChild( button );',

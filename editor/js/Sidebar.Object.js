@@ -84,7 +84,7 @@ var SidebarObject = function ( editor ) {
 	var objectUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
 	var objectUUIDRenew = new UIButton( strings.getKey( 'sidebar/object/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
-		objectUUID.setValue( THREE.Math.generateUUID() );
+		objectUUID.setValue( THREE.MathUtils.generateUUID() );
 
 		editor.execute( new SetUuidCommand( editor, editor.selected, objectUUID.getValue() ) );
 
@@ -429,7 +429,7 @@ var SidebarObject = function ( editor ) {
 
 			}
 
-			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.Math.DEG2RAD, objectRotationY.getValue() * THREE.Math.DEG2RAD, objectRotationZ.getValue() * THREE.Math.DEG2RAD );
+			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.MathUtils.DEG2RAD, objectRotationY.getValue() * THREE.MathUtils.DEG2RAD, objectRotationZ.getValue() * THREE.MathUtils.DEG2RAD );
 			if ( object.rotation.toVector3().distanceTo( newRotation.toVector3() ) >= 0.01 ) {
 
 				editor.execute( new SetRotationCommand( editor, object, newRotation ) );
@@ -695,9 +695,9 @@ var SidebarObject = function ( editor ) {
 		objectPositionY.setValue( object.position.y );
 		objectPositionZ.setValue( object.position.z );
 
-		objectRotationX.setValue( object.rotation.x * THREE.Math.RAD2DEG );
-		objectRotationY.setValue( object.rotation.y * THREE.Math.RAD2DEG );
-		objectRotationZ.setValue( object.rotation.z * THREE.Math.RAD2DEG );
+		objectRotationX.setValue( object.rotation.x * THREE.MathUtils.RAD2DEG );
+		objectRotationY.setValue( object.rotation.y * THREE.MathUtils.RAD2DEG );
+		objectRotationZ.setValue( object.rotation.z * THREE.MathUtils.RAD2DEG );
 
 		objectScaleX.setValue( object.scale.x );
 		objectScaleY.setValue( object.scale.y );

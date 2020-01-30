@@ -298,9 +298,9 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 2 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
-					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 1 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
-					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 0 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 2 ) / 255.0 );
 
 				}
 

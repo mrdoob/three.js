@@ -66,15 +66,18 @@
 				var _stemMesh = gltf.scene.getObjectByName('Stem');
 				var _blossomMesh = gltf.scene.getObjectByName('Blossom');
 
-				stemGeometry = _stemMesh.geometry;
-				blossomGeometry = _blossomMesh.geometry;
+				stemGeometry = new THREE.InstancedBufferGeometry();
+				blossomGeometry = new THREE.InstancedBufferGeometry();
+
+				THREE.BufferGeometry.prototype.copy.call( stemGeometry, _stemMesh.geometry );
+				THREE.BufferGeometry.prototype.copy.call( blossomGeometry, _blossomMesh.geometry );
 
 				var defaultTransform = new THREE.Matrix4()
 					.makeRotationX( Math.PI )
 					.multiply( new THREE.Matrix4().makeScale( 7, 7, 7 ) )
 
-				stemGeometry.applyMatrix( defaultTransform );
-				blossomGeometry.applyMatrix( defaultTransform );
+				stemGeometry.applyMatrix4( defaultTransform );
+				blossomGeometry.applyMatrix4( defaultTransform );
 
 				stemMaterial = _stemMesh.material;
 				blossomMaterial = _blossomMesh.material;
@@ -96,6 +99,10 @@
 
 				stemMesh = new THREE.InstancedMesh( stemGeometry, stemMaterial, count );
 				blossomMesh = new THREE.InstancedMesh( blossomGeometry, blossomMaterial, count );
+
+				// Instance matrices will be updated every frame.
+				stemMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
+				blossomMesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage );
 
 				resample();
 

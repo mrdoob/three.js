@@ -287,6 +287,10 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'antialias',
 			'sidebar/project/shadows': 'shadows',
+			'sidebar/project/toneMapping': 'Tone Mapping',
+			'sidebar/project/toneMappingType': 'Type',
+			'sidebar/project/toneMappingExposure': 'Exposure',
+			'sidebar/project/toneMappingWhitePoint': 'White Point',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
@@ -311,7 +315,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
-			'viewport/info/triangles': 'Triangles'
+			'viewport/info/triangles': 'Triangles',
+			'viewport/info/frametime': 'Frametime'
 
 		},
 
@@ -568,6 +573,10 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
+			'sidebar/project/toneMapping': 'Tone Mapping',
+			'sidebar/project/toneMappingType': 'Type',
+			'sidebar/project/toneMappingExposure': 'Exposure',
+			'sidebar/project/toneMappingWhitePoint': 'White Point',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 
@@ -592,7 +601,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
-			'viewport/info/triangles': '三角形'
+			'viewport/info/triangles': '三角形',
+			'viewport/info/frametime': 'Frametime'
 
 		}
 

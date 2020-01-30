@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - raycasting - points </div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - raycasting - points </div>
 
 		<script type="module">
 
@@ -242,7 +242,7 @@
 
 			function render() {
 
-				camera.applyMatrix( rotateY );
+				camera.applyMatrix4( rotateY );
 				camera.updateMatrixWorld();
 
 				raycaster.setFromCamera( mouse, camera );
