@@ -72,8 +72,8 @@ THREE.WaterRefractionShader = {
 
 		"void main() {",
 
-		" float waveStrength = 0.1;",
-		" float waveSpeed = 0.03;",
+		"	float waveStrength = 0.1;",
+		"	float waveSpeed = 0.03;",
 
 		// simple distortion (ripple) via dudv map (see https://www.youtube.com/watch?v=6B7IF6GOu7s)
 
@@ -83,8 +83,8 @@ THREE.WaterRefractionShader = {
 
 		// new uv coords
 
-		" vec4 uv = vec4( vUvRefraction );",
-		" uv.xy += distortion;",
+		"	vec4 uv = vec4( vUvRefraction );",
+		"	uv.xy += distortion;",
 
 		"	vec4 base = texture2DProj( tDiffuse, uv );",
 
