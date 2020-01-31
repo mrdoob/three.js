@@ -16,45 +16,41 @@ THREE.AfterimageShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying vec2 vUv;
 
-		"varying vec2 vUv;",
+void main() {
 
-		"void main() {",
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+uniform float damp;
 
-	].join( "\n" ),
+uniform sampler2D tOld;
+uniform sampler2D tNew;
 
-	fragmentShader: [
+varying vec2 vUv;
 
-		"uniform float damp;",
+vec4 when_gt( vec4 x, float y ) {
 
-		"uniform sampler2D tOld;",
-		"uniform sampler2D tNew;",
+	return max( sign( x - y ), 0.0 );
 
-		"varying vec2 vUv;",
+}
 
-		"vec4 when_gt( vec4 x, float y ) {",
+void main() {
 
-		"	return max( sign( x - y ), 0.0 );",
+	vec4 texelOld = texture2D( tOld, vUv );
+	vec4 texelNew = texture2D( tNew, vUv );
 
-		"}",
+	texelOld *= damp * when_gt( texelOld, 0.1 );
 
-		"void main() {",
+	gl_FragColor = max(texelNew, texelOld);
 
-		"	vec4 texelOld = texture2D( tOld, vUv );",
-		"	vec4 texelNew = texture2D( tNew, vUv );",
-
-		"	texelOld *= damp * when_gt( texelOld, 0.1 );",
-
-		"	gl_FragColor = max(texelNew, texelOld);",
-
-		"}"
-
-	].join( "\n" )
+}
+`
 
 };

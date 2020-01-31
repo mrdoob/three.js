@@ -13,38 +13,34 @@ THREE.LuminosityShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying vec2 vUv;
 
-		"varying vec2 vUv;",
+void main() {
 
-		"void main() {",
+	vUv = uv;
 
-		"	vUv = uv;",
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+#include <common>
 
-	].join( "\n" ),
+uniform sampler2D tDiffuse;
 
-	fragmentShader: [
+varying vec2 vUv;
 
-		"#include <common>",
+void main() {
 
-		"uniform sampler2D tDiffuse;",
+	vec4 texel = texture2D( tDiffuse, vUv );
 
-		"varying vec2 vUv;",
+	float l = linearToRelativeLuminance( texel.rgb );
 
-		"void main() {",
+	gl_FragColor = vec4( l, l, l, texel.w );
 
-		"	vec4 texel = texture2D( tDiffuse, vUv );",
-
-		"	float l = linearToRelativeLuminance( texel.rgb );",
-
-		"	gl_FragColor = vec4( l, l, l, texel.w );",
-
-		"}"
-
-	].join( "\n" )
+}
+`
 
 };

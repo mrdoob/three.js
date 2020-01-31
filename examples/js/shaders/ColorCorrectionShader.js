@@ -15,36 +15,32 @@ THREE.ColorCorrectionShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying vec2 vUv;
 
-		"varying vec2 vUv;",
+void main() {
 
-		"void main() {",
+	vUv = uv;
 
-		"	vUv = uv;",
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+uniform sampler2D tDiffuse;
+uniform vec3 powRGB;
+uniform vec3 mulRGB;
+uniform vec3 addRGB;
 
-	].join( "\n" ),
+varying vec2 vUv;
 
-	fragmentShader: [
+void main() {
 
-		"uniform sampler2D tDiffuse;",
-		"uniform vec3 powRGB;",
-		"uniform vec3 mulRGB;",
-		"uniform vec3 addRGB;",
+	gl_FragColor = texture2D( tDiffuse, vUv );
+	gl_FragColor.rgb = mulRGB * pow( ( gl_FragColor.rgb + addRGB ), powRGB );
 
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-		"	gl_FragColor = texture2D( tDiffuse, vUv );",
-		"	gl_FragColor.rgb = mulRGB * pow( ( gl_FragColor.rgb + addRGB ), powRGB );",
-
-		"}"
-
-	].join( "\n" )
+}
+`
 
 };

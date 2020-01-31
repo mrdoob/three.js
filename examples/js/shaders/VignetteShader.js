@@ -16,37 +16,34 @@ THREE.VignetteShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying vec2 vUv;
 
-		"varying vec2 vUv;",
+void main() {
 
-		"void main() {",
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+uniform float offset;
+uniform float darkness;
 
-	].join( "\n" ),
+uniform sampler2D tDiffuse;
 
-	fragmentShader: [
+varying vec2 vUv;
 
-		"uniform float offset;",
-		"uniform float darkness;",
+void main() {
 
-		"uniform sampler2D tDiffuse;",
+	// Eskil's vignette
 
-		"varying vec2 vUv;",
+	vec4 texel = texture2D( tDiffuse, vUv );
+	vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );
+	gl_FragColor = vec4( mix( texel.rgb, vec3( 1.0 - darkness ), dot( uv, uv ) ), texel.a );
 
-		"void main() {",
-
-		// Eskil's vignette
-
-		"	vec4 texel = texture2D( tDiffuse, vUv );",
-		"	vec2 uv = ( vUv - vec2( 0.5 ) ) * vec2( offset );",
-		"	gl_FragColor = vec4( mix( texel.rgb, vec3( 1.0 - darkness ), dot( uv, uv ) ), texel.a );",
-
-		/*
+	/*
 		// alternative version from glfx.js
 		// this one makes more "dusty" look (as opposed to "burned")
 
@@ -56,8 +53,7 @@ THREE.VignetteShader = {
 		"	gl_FragColor = color;",
 		*/
 
-		"}"
-
-	].join( "\n" )
+}
+`
 
 };

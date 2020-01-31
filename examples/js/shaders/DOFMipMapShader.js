@@ -17,42 +17,38 @@ THREE.DOFMipMapShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying vec2 vUv;
 
-		"varying vec2 vUv;",
+void main() {
 
-		"void main() {",
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+uniform float focus;
+uniform float maxblur;
 
-	].join( "\n" ),
+uniform sampler2D tColor;
+uniform sampler2D tDepth;
 
-	fragmentShader: [
+varying vec2 vUv;
 
-		"uniform float focus;",
-		"uniform float maxblur;",
+void main() {
 
-		"uniform sampler2D tColor;",
-		"uniform sampler2D tDepth;",
+	vec4 depth = texture2D( tDepth, vUv );
 
-		"varying vec2 vUv;",
+	float factor = depth.x - focus;
 
-		"void main() {",
+	vec4 col = texture2D( tColor, vUv, 2.0 * maxblur * abs( focus - depth.x ) );
 
-		"	vec4 depth = texture2D( tDepth, vUv );",
+	gl_FragColor = col;
+	gl_FragColor.a = 1.0;
 
-		"	float factor = depth.x - focus;",
-
-		"	vec4 col = texture2D( tColor, vUv, 2.0 * maxblur * abs( focus - depth.x ) );",
-
-		"	gl_FragColor = col;",
-		"	gl_FragColor.a = 1.0;",
-
-		"}"
-
-	].join( "\n" )
+}
+`
 
 };

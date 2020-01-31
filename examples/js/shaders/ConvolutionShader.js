@@ -23,48 +23,43 @@ THREE.ConvolutionShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+uniform vec2 uImageIncrement;
 
-		"uniform vec2 uImageIncrement;",
+varying vec2 vUv;
 
-		"varying vec2 vUv;",
+void main() {
 
-		"void main() {",
+	vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"	vUv = uv - ( ( KERNEL_SIZE_FLOAT - 1.0 ) / 2.0 ) * uImageIncrement;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+uniform float cKernel[ KERNEL_SIZE_INT ];
 
-	].join( "\n" ),
+uniform sampler2D tDiffuse;
+uniform vec2 uImageIncrement;
 
-	fragmentShader: [
+varying vec2 vUv;
 
-		"uniform float cKernel[ KERNEL_SIZE_INT ];",
+void main() {
 
-		"uniform sampler2D tDiffuse;",
-		"uniform vec2 uImageIncrement;",
+	vec2 imageCoord = vUv;
+	vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );
 
-		"varying vec2 vUv;",
+	for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {
 
-		"void main() {",
+		sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];
+		imageCoord += uImageIncrement;
 
-		"	vec2 imageCoord = vUv;",
-		"	vec4 sum = vec4( 0.0, 0.0, 0.0, 0.0 );",
+	}
 
-		"	for( int i = 0; i < KERNEL_SIZE_INT; i ++ ) {",
+	gl_FragColor = sum;
 
-		"		sum += texture2D( tDiffuse, imageCoord ) * cKernel[ i ];",
-		"		imageCoord += uImageIncrement;",
-
-		"	}",
-
-		"	gl_FragColor = sum;",
-
-		"}"
-
-
-	].join( "\n" ),
+}
+`,
 
 	buildKernel: function ( sigma ) {
 

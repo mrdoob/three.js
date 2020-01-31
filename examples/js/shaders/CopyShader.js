@@ -13,34 +13,30 @@ THREE.CopyShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying vec2 vUv;
 
-		"varying vec2 vUv;",
+void main() {
 
-		"void main() {",
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+uniform float opacity;
 
-	].join( "\n" ),
+uniform sampler2D tDiffuse;
 
-	fragmentShader: [
+varying vec2 vUv;
 
-		"uniform float opacity;",
+void main() {
 
-		"uniform sampler2D tDiffuse;",
+	vec4 texel = texture2D( tDiffuse, vUv );
+	gl_FragColor = opacity * texel;
 
-		"varying vec2 vUv;",
-
-		"void main() {",
-
-		"	vec4 texel = texture2D( tDiffuse, vUv );",
-		"	gl_FragColor = opacity * texel;",
-
-		"}"
-
-	].join( "\n" )
+}
+`
 
 };

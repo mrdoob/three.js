@@ -13,37 +13,33 @@ THREE.ColorifyShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying vec2 vUv;
 
-		"varying vec2 vUv;",
+void main() {
 
-		"void main() {",
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+uniform vec3 color;
+uniform sampler2D tDiffuse;
 
-	].join( "\n" ),
+varying vec2 vUv;
 
-	fragmentShader: [
+void main() {
 
-		"uniform vec3 color;",
-		"uniform sampler2D tDiffuse;",
+	vec4 texel = texture2D( tDiffuse, vUv );
 
-		"varying vec2 vUv;",
+	vec3 luma = vec3( 0.299, 0.587, 0.114 );
+	float v = dot( texel.xyz, luma );
 
-		"void main() {",
+	gl_FragColor = vec4( v * color, texel.w );
 
-		"	vec4 texel = texture2D( tDiffuse, vUv );",
-
-		"	vec3 luma = vec3( 0.299, 0.587, 0.114 );",
-		"	float v = dot( texel.xyz, luma );",
-
-		"	gl_FragColor = vec4( v * color, texel.w );",
-
-		"}"
-
-	].join( "\n" )
+}
+`
 
 };

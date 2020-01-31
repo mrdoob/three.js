@@ -13,33 +13,29 @@ THREE.GammaCorrectionShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying vec2 vUv;
 
-		"varying vec2 vUv;",
+void main() {
 
-		"void main() {",
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"	vUv = uv;",
-		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+uniform sampler2D tDiffuse;
 
-	].join( "\n" ),
+varying vec2 vUv;
 
-	fragmentShader: [
+void main() {
 
-		"uniform sampler2D tDiffuse;",
+	vec4 tex = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );
 
-		"varying vec2 vUv;",
+	gl_FragColor = LinearTosRGB( tex ); // optional: LinearToGamma( tex, float( GAMMA_FACTOR ) );
 
-		"void main() {",
-
-		"	vec4 tex = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
-
-		"	gl_FragColor = LinearTosRGB( tex );", // optional: LinearToGamma( tex, float( GAMMA_FACTOR ) );
-
-		"}"
-
-	].join( "\n" )
+}
+`
 
 };

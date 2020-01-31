@@ -14,34 +14,30 @@ THREE.PixelShader = {
 
 	},
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying highp vec2 vUv;
 
-		"varying highp vec2 vUv;",
+void main() {
 
-		"void main() {",
+vUv = uv;
+gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-		"vUv = uv;",
-		"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-		"}"
+	fragmentShader: /* glsl */`
+uniform sampler2D tDiffuse;
+uniform float pixelSize;
+uniform vec2 resolution;
 
-	].join( "\n" ),
+varying highp vec2 vUv;
 
-	fragmentShader: [
+void main(){
 
-		"uniform sampler2D tDiffuse;",
-		"uniform float pixelSize;",
-		"uniform vec2 resolution;",
+vec2 dxy = pixelSize / resolution;
+vec2 coord = dxy * floor( vUv / dxy );
+gl_FragColor = texture2D(tDiffuse, coord);
 
-		"varying highp vec2 vUv;",
-
-		"void main(){",
-
-		"vec2 dxy = pixelSize / resolution;",
-		"vec2 coord = dxy * floor( vUv / dxy );",
-		"gl_FragColor = texture2D(tDiffuse, coord);",
-
-		"}"
-
-	].join( "\n" )
+}
+`
 };
