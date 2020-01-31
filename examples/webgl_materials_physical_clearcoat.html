@@ -120,7 +120,9 @@
 								clearcoat: 1.0,
 								normalMap: normalMap4,
 								clearcoatNormalMap: clearcoatNormaMap,
-								clearcoatNormalScale: new THREE.Vector2( 2.0, 2.0 )
+
+								// y scale is negated to compensate for normal map handedness.
+								clearcoatNormalScale: new THREE.Vector2( 2.0, -2.0 )
 							} );
 							var mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = - 100;
@@ -136,7 +138,9 @@
 								normalMap: normalMap2,
 								normalScale: new THREE.Vector2( 0.15, 0.15 ),
 								clearcoatNormalMap: clearcoatNormaMap,
-								clearcoatNormalScale: new THREE.Vector2( 2.0, 2.0 )
+
+								// y scale is negated to compensate for normal map handedness.
+								clearcoatNormalScale: new THREE.Vector2( 2.0, -2.0 )
 							} );
 							var mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = 100;
