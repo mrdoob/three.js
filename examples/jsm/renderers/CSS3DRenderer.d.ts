@@ -9,8 +9,8 @@ export class CSS3DObject extends Object3D {
 	constructor( element: HTMLElement );
 	element: HTMLElement;
 
-	onBeforeRender: <Renderer = CSS3DRenderer>(renderer: Renderer, scene: Scene, camera: Camera) => void;
-	onAfterRender: <Renderer = CSS3DRenderer>(renderer: Renderer, scene: Scene, camera: Camera) => void;
+	onBeforeRender: (renderer: unknown, scene: Scene, camera: Camera) => void;
+	onAfterRender: (renderer: unknown, scene: Scene, camera: Camera) => void;
 
 }
 
