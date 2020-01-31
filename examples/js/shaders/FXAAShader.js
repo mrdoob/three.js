@@ -40,7 +40,7 @@ varying vec2 vUv;
 // FXAA 3.11 implementation by NVIDIA, ported to WebGL by Agost Biro (biro@archilogic.com)
 
 //----------------------------------------------------------------------------------
-// File:        es3-keplerFXAAassetsshaders/FXAA_DefaultES.frag
+// File:        es3-kepler\FXAA\assets\shaders/FXAA_DefaultES.frag
 // SDK Version: v3.00
 // Email:       gameworks@nvidia.com
 // Site:        http://developer.nvidia.com/
@@ -59,7 +59,7 @@ varying vec2 vUv;
 //    contributors may be used to endorse or promote products derived
 //    from this software without specific prior written permission.
 //
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS ``AS IS'' AND ANY
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS \`\`AS IS'' AND ANY
 // EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 // IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 // PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT OWNER OR
