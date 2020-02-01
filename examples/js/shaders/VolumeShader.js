@@ -89,7 +89,7 @@ THREE.VolumeRenderShader1 = {
 				v_position = position;
 				gl_Position = projectionMatrix * viewMatrix * modelMatrix * position4;
 		}
-`,
+	`,
 	fragmentShader: /* glsl */`
 		precision highp float;
 		precision mediump sampler3D;
@@ -320,5 +320,5 @@ THREE.VolumeRenderShader1 = {
 				final_color.a = color.a;
 				return final_color;
 		}
-`
+	`
 };

@@ -9,19 +9,18 @@ THREE.BasicShader = {
 	uniforms: {},
 
 	vertexShader: /* glsl */`
-void main() {
+		void main() {
 
-	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-}
-`,
+		}
+	`,
 
 	fragmentShader: /* glsl */`
-void main() {
+		void main() {
 
-	gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );
+			gl_FragColor = vec4( 1.0, 0.0, 0.0, 0.5 );
 
-}
-`
-
+		}
+	`
 };

@@ -631,9 +631,9 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		}
 
 		/*
-		* According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
-		* rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
-		*/
+		 * According to https://www.w3.org/TR/SVG/shapes.html#RectElementRXAttribute
+		 * rounded corner should be rendered to elliptical arc, but bezier curve does the job well enough
+		 */
 		function parseRectNode( node ) {
 
 			var x = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );

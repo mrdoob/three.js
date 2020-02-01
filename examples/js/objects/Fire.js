@@ -506,46 +506,46 @@ THREE.Fire.SourceShader = {
 	},
 
 	vertexShader: /* glsl */`
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
+		void main() {
 
-     vUv = uv;
+			vUv = uv;
 
-     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-     gl_Position = projectionMatrix * mvPosition;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
 
-}
-`,
+		}
+	`,
 
 	fragmentShader: /* glsl */`
-uniform sampler2D sourceMap;
-uniform sampler2D densityMap;
+		uniform sampler2D sourceMap;
+		uniform sampler2D densityMap;
 
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
-    vec4 source = texture2D( sourceMap, vUv );
-    vec4 current = texture2D( densityMap, vUv );
+		void main() {
+			vec4 source = texture2D( sourceMap, vUv );
+			vec4 current = texture2D( densityMap, vUv );
 
-    vec2 v0 = (current.gb - step(0.5, current.gb)) * 2.0;
-    vec2 v1 = (source.gb - step(0.5, source.gb)) * 2.0;
+			vec2 v0 = (current.gb - step(0.5, current.gb)) * 2.0;
+			vec2 v1 = (source.gb - step(0.5, source.gb)) * 2.0;
 
-    vec2 newVel = v0 + v1;
+			vec2 newVel = v0 + v1;
 
-    newVel = clamp(newVel, -0.99, 0.99);
-    newVel = newVel * 0.5 + step(0.0, -newVel);
+			newVel = clamp(newVel, -0.99, 0.99);
+			newVel = newVel * 0.5 + step(0.0, -newVel);
 
-    float newDensity = source.r + current.a;
-    float newTemp = source.r + current.r;
+			float newDensity = source.r + current.a;
+			float newTemp = source.r + current.r;
 
-    newDensity = clamp(newDensity, 0.0, 1.0);
-    newTemp = clamp(newTemp, 0.0, 1.0);
+			newDensity = clamp(newDensity, 0.0, 1.0);
+			newTemp = clamp(newTemp, 0.0, 1.0);
 
-    gl_FragColor = vec4(newTemp, newVel.xy, newDensity);
+			gl_FragColor = vec4(newTemp, newVel.xy, newDensity);
 
-}
-`
+		}
+	`
 };
 
 
@@ -582,77 +582,77 @@ THREE.Fire.DiffuseShader = {
 	},
 
 	vertexShader: /* glsl */`
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
+		void main() {
 
-     vUv = uv;
+			vUv = uv;
 
-     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-     gl_Position = projectionMatrix * mvPosition;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
 
-}
-`,
+		}
+	`,
 
 	fragmentShader: /* glsl */`
-uniform float oneOverWidth;
-uniform float oneOverHeight;
-uniform float diffuse;
-uniform float viscosity;
-uniform float expansion;
-uniform float swirl;
-uniform float burnRate;
-uniform float drag;
-uniform sampler2D densityMap;
+		uniform float oneOverWidth;
+		uniform float oneOverHeight;
+		uniform float diffuse;
+		uniform float viscosity;
+		uniform float expansion;
+		uniform float swirl;
+		uniform float burnRate;
+		uniform float drag;
+		uniform sampler2D densityMap;
 
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
+		void main() {
 
-    vec4 dC = texture2D( densityMap, vUv );
-    vec4 dL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y) );
-    vec4 dR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y) );
-    vec4 dU = texture2D( densityMap, vec2(vUv.x, vUv.y - oneOverHeight) );
-    vec4 dD = texture2D( densityMap, vec2(vUv.x, vUv.y + oneOverHeight) );
-    vec4 dUL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y - oneOverHeight) );
-    vec4 dUR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y - oneOverHeight) );
-    vec4 dDL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y + oneOverHeight) );
-    vec4 dDR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y + oneOverHeight) );
+			vec4 dC = texture2D( densityMap, vUv );
+			vec4 dL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y) );
+			vec4 dR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y) );
+			vec4 dU = texture2D( densityMap, vec2(vUv.x, vUv.y - oneOverHeight) );
+			vec4 dD = texture2D( densityMap, vec2(vUv.x, vUv.y + oneOverHeight) );
+			vec4 dUL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y - oneOverHeight) );
+			vec4 dUR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y - oneOverHeight) );
+			vec4 dDL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y + oneOverHeight) );
+			vec4 dDR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y + oneOverHeight) );
 
-    dC.yz = (dC.yz - step(0.5, dC.yz)) * 2.0;
-    dL.yz = (dL.yz - step(0.5, dL.yz)) * 2.0;
-    dR.yz = (dR.yz - step(0.5, dR.yz)) * 2.0;
-    dU.yz = (dU.yz - step(0.5, dU.yz)) * 2.0;
-    dD.yz = (dD.yz - step(0.5, dD.yz)) * 2.0;
-    dUL.yz = (dUL.yz - step(0.5, dUL.yz)) * 2.0;
-    dUR.yz = (dUR.yz - step(0.5, dUR.yz)) * 2.0;
-    dDL.yz = (dDL.yz - step(0.5, dDL.yz)) * 2.0;
-    dDR.yz = (dDR.yz - step(0.5, dDR.yz)) * 2.0;
+			dC.yz = (dC.yz - step(0.5, dC.yz)) * 2.0;
+			dL.yz = (dL.yz - step(0.5, dL.yz)) * 2.0;
+			dR.yz = (dR.yz - step(0.5, dR.yz)) * 2.0;
+			dU.yz = (dU.yz - step(0.5, dU.yz)) * 2.0;
+			dD.yz = (dD.yz - step(0.5, dD.yz)) * 2.0;
+			dUL.yz = (dUL.yz - step(0.5, dUL.yz)) * 2.0;
+			dUR.yz = (dUR.yz - step(0.5, dUR.yz)) * 2.0;
+			dDL.yz = (dDL.yz - step(0.5, dDL.yz)) * 2.0;
+			dDR.yz = (dDR.yz - step(0.5, dDR.yz)) * 2.0;
 
-    vec4 result = (dC + vec4(diffuse, viscosity, viscosity, diffuse) * ( dL + dR + dU + dD + dUL + dUR + dDL + dDR )) / (1.0 + 8.0 * vec4(diffuse, viscosity, viscosity, diffuse)) - vec4(0.0, 0.0, 0.0, 0.001);
+			vec4 result = (dC + vec4(diffuse, viscosity, viscosity, diffuse) * ( dL + dR + dU + dD + dUL + dUR + dDL + dDR )) / (1.0 + 8.0 * vec4(diffuse, viscosity, viscosity, diffuse)) - vec4(0.0, 0.0, 0.0, 0.001);
 
-    float temperature = result.r;
-    temperature = clamp(temperature - burnRate, 0.0, 1.0);
+			float temperature = result.r;
+			temperature = clamp(temperature - burnRate, 0.0, 1.0);
 
-    vec2 velocity = result.yz;
+			vec2 velocity = result.yz;
 
-    vec2 expansionVec = vec2(dL.w - dR.w, dU.w - dD.w);
+			vec2 expansionVec = vec2(dL.w - dR.w, dU.w - dD.w);
 
-    vec2 swirlVec = vec2((dL.z - dR.z) * 0.5, (dU.y - dD.y) * 0.5);
+			vec2 swirlVec = vec2((dL.z - dR.z) * 0.5, (dU.y - dD.y) * 0.5);
 
-    velocity = velocity + (1.0 - expansion) * expansionVec + (1.0 - swirl) * swirlVec;
+			velocity = velocity + (1.0 - expansion) * expansionVec + (1.0 - swirl) * swirlVec;
 
-    velocity = velocity - (1.0 - drag) * velocity;
+			velocity = velocity - (1.0 - drag) * velocity;
 
-    gl_FragColor = vec4(temperature, velocity * 0.5 + step(0.0, -velocity), result.w);
+			gl_FragColor = vec4(temperature, velocity * 0.5 + step(0.0, -velocity), result.w);
 
-    gl_FragColor = gl_FragColor * step(oneOverWidth, vUv.x);
-    gl_FragColor = gl_FragColor * step(oneOverHeight, vUv.y);
-    gl_FragColor = gl_FragColor * step(vUv.x, 1.0 - oneOverWidth);
-    gl_FragColor = gl_FragColor * step(vUv.y, 1.0 - oneOverHeight);
+			gl_FragColor = gl_FragColor * step(oneOverWidth, vUv.x);
+			gl_FragColor = gl_FragColor * step(oneOverHeight, vUv.y);
+			gl_FragColor = gl_FragColor * step(vUv.x, 1.0 - oneOverWidth);
+			gl_FragColor = gl_FragColor * step(vUv.y, 1.0 - oneOverHeight);
 
-}
-`
+		}
+	`
 };
 
 THREE.Fire.DriftShader = {
@@ -676,60 +676,60 @@ THREE.Fire.DriftShader = {
 	},
 
 	vertexShader: /* glsl */`
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
+		void main() {
 
-     vUv = uv;
+			vUv = uv;
 
-     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-     gl_Position = projectionMatrix * mvPosition;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
 
-}
-`,
+		}
+	`,
 
 	fragmentShader: /* glsl */`
-uniform float oneOverWidth;
-uniform float oneOverHeight;
-uniform vec2 windVector;
-uniform float airSpeed;
-uniform sampler2D densityMap;
+		uniform float oneOverWidth;
+		uniform float oneOverHeight;
+		uniform vec2 windVector;
+		uniform float airSpeed;
+		uniform sampler2D densityMap;
 
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
-    vec2 velocity = texture2D( densityMap, vUv ).gb;
-    velocity = (velocity - step(0.5, velocity)) * 2.0;
+		void main() {
+			vec2 velocity = texture2D( densityMap, vUv ).gb;
+			velocity = (velocity - step(0.5, velocity)) * 2.0;
 
-    velocity = velocity + windVector;
+			velocity = velocity + windVector;
 
-    vec2 sourcePos = vUv - airSpeed * vec2(oneOverWidth, oneOverHeight) * velocity;
+			vec2 sourcePos = vUv - airSpeed * vec2(oneOverWidth, oneOverHeight) * velocity;
 
-    vec2 units = sourcePos / vec2(oneOverWidth, oneOverHeight);
+			vec2 units = sourcePos / vec2(oneOverWidth, oneOverHeight);
 
-    vec2 intPos = floor(units);
-    vec2 frac = units - intPos;
-    intPos = intPos * vec2(oneOverWidth, oneOverHeight);
+			vec2 intPos = floor(units);
+			vec2 frac = units - intPos;
+			intPos = intPos * vec2(oneOverWidth, oneOverHeight);
 
-    vec4 dX0Y0 = texture2D( densityMap, intPos + vec2(0.0, -oneOverHeight) );
-    vec4 dX1Y0 = texture2D( densityMap, intPos + vec2(oneOverWidth, 0.0) );
-    vec4 dX0Y1 = texture2D( densityMap, intPos + vec2(0.0, oneOverHeight) );
-    vec4 dX1Y1 = texture2D( densityMap, intPos + vec2(oneOverWidth, oneOverHeight) );
+			vec4 dX0Y0 = texture2D( densityMap, intPos + vec2(0.0, -oneOverHeight) );
+			vec4 dX1Y0 = texture2D( densityMap, intPos + vec2(oneOverWidth, 0.0) );
+			vec4 dX0Y1 = texture2D( densityMap, intPos + vec2(0.0, oneOverHeight) );
+			vec4 dX1Y1 = texture2D( densityMap, intPos + vec2(oneOverWidth, oneOverHeight) );
 
 
-    dX0Y0.gb = (dX0Y0.gb - step(0.5, dX0Y0.gb)) * 2.0;
-    dX1Y0.gb = (dX1Y0.gb - step(0.5, dX1Y0.gb)) * 2.0;
-    dX0Y1.gb = (dX0Y1.gb - step(0.5, dX0Y1.gb)) * 2.0;
-    dX1Y1.gb = (dX1Y1.gb - step(0.5, dX1Y1.gb)) * 2.0;
+			dX0Y0.gb = (dX0Y0.gb - step(0.5, dX0Y0.gb)) * 2.0;
+			dX1Y0.gb = (dX1Y0.gb - step(0.5, dX1Y0.gb)) * 2.0;
+			dX0Y1.gb = (dX0Y1.gb - step(0.5, dX0Y1.gb)) * 2.0;
+			dX1Y1.gb = (dX1Y1.gb - step(0.5, dX1Y1.gb)) * 2.0;
 
-    vec4 source = mix(mix(dX0Y0, dX1Y0, frac.x), mix(dX0Y1, dX1Y1, frac.x), frac.y);
+			vec4 source = mix(mix(dX0Y0, dX1Y0, frac.x), mix(dX0Y1, dX1Y1, frac.x), frac.y);
 
-    source.gb = source.gb * 0.5 + step(0.0, -source.gb);
+			source.gb = source.gb * 0.5 + step(0.0, -source.gb);
 
-    gl_FragColor = source;
+			gl_FragColor = source;
 
-}
-`
+		}
+	`
 };
 
 
@@ -748,43 +748,43 @@ THREE.Fire.ProjectionShader1 = {
 	},
 
 	vertexShader: /* glsl */`
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
+		void main() {
 
-     vUv = uv;
+			vUv = uv;
 
-     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-     gl_Position = projectionMatrix * mvPosition;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
 
-}
-`,
+		}
+	`,
 
 	fragmentShader: /* glsl */`
-uniform float oneOverWidth;
-uniform float oneOverHeight;
-uniform sampler2D densityMap;
+		uniform float oneOverWidth;
+		uniform float oneOverHeight;
+		uniform sampler2D densityMap;
 
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
-    float dL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y) ).g;
-    float dR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y) ).g;
-    float dU = texture2D( densityMap, vec2(vUv.x, vUv.y - oneOverHeight) ).b;
-    float dD = texture2D( densityMap, vec2(vUv.x, vUv.y + oneOverHeight) ).b;
+		void main() {
+			float dL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y) ).g;
+			float dR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y) ).g;
+			float dU = texture2D( densityMap, vec2(vUv.x, vUv.y - oneOverHeight) ).b;
+			float dD = texture2D( densityMap, vec2(vUv.x, vUv.y + oneOverHeight) ).b;
 
-    dL = (dL - step(0.5, dL)) * 2.0;
-    dR = (dR - step(0.5, dR)) * 2.0;
-    dU = (dU - step(0.5, dU)) * 2.0;
-    dD = (dD - step(0.5, dD)) * 2.0;
+			dL = (dL - step(0.5, dL)) * 2.0;
+			dR = (dR - step(0.5, dR)) * 2.0;
+			dU = (dU - step(0.5, dU)) * 2.0;
+			dD = (dD - step(0.5, dD)) * 2.0;
 
-    float h = (oneOverWidth + oneOverHeight) * 0.5;
-    float div = -0.5 * h * (dR - dL + dD - dU);
+			float h = (oneOverWidth + oneOverHeight) * 0.5;
+			float div = -0.5 * h * (dR - dL + dD - dU);
 
-    gl_FragColor = vec4( 0.0, 0.0, div * 0.5 + step(0.0, -div), 0.0);
+			gl_FragColor = vec4( 0.0, 0.0, div * 0.5 + step(0.0, -div), 0.0);
 
-}
-`
+		}
+	`
 };
 
 
@@ -803,44 +803,44 @@ THREE.Fire.ProjectionShader2 = {
 	},
 
 	vertexShader: /* glsl */`
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
+		void main() {
 
-     vUv = uv;
+			vUv = uv;
 
-     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-     gl_Position = projectionMatrix * mvPosition;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
 
-}
-`,
+		}
+	`,
 
 	fragmentShader: /* glsl */`
-uniform float oneOverWidth;
-uniform float oneOverHeight;
-uniform sampler2D densityMap;
+		uniform float oneOverWidth;
+		uniform float oneOverHeight;
+		uniform sampler2D densityMap;
 
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
-    float div = texture2D( densityMap, vUv ).b;
-    float pL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y) ).g;
-    float pR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y) ).g;
-    float pU = texture2D( densityMap, vec2(vUv.x, vUv.y - oneOverHeight) ).g;
-    float pD = texture2D( densityMap, vec2(vUv.x, vUv.y + oneOverHeight) ).g;
+		void main() {
+			float div = texture2D( densityMap, vUv ).b;
+			float pL = texture2D( densityMap, vec2(vUv.x - oneOverWidth, vUv.y) ).g;
+			float pR = texture2D( densityMap, vec2(vUv.x + oneOverWidth, vUv.y) ).g;
+			float pU = texture2D( densityMap, vec2(vUv.x, vUv.y - oneOverHeight) ).g;
+			float pD = texture2D( densityMap, vec2(vUv.x, vUv.y + oneOverHeight) ).g;
 
-    float divNorm = (div - step(0.5, div)) * 2.0;
-    pL = (pL - step(0.5, pL)) * 2.0;
-    pR = (pR - step(0.5, pR)) * 2.0;
-    pU = (pU - step(0.5, pU)) * 2.0;
-    pD = (pD - step(0.5, pD)) * 2.0;
+			float divNorm = (div - step(0.5, div)) * 2.0;
+			pL = (pL - step(0.5, pL)) * 2.0;
+			pR = (pR - step(0.5, pR)) * 2.0;
+			pU = (pU - step(0.5, pU)) * 2.0;
+			pD = (pD - step(0.5, pD)) * 2.0;
 
-    float p = (divNorm + pR + pL + pD + pU) * 0.25;
+			float p = (divNorm + pR + pL + pD + pU) * 0.25;
 
-    gl_FragColor = vec4( 0.0, p * 0.5 + step(0.0, -p), div, 0.0);
+			gl_FragColor = vec4( 0.0, p * 0.5 + step(0.0, -p), div, 0.0);
 
-}
-`
+		}
+	`
 };
 
 
@@ -862,50 +862,50 @@ THREE.Fire.ProjectionShader3 = {
 	},
 
 	vertexShader: /* glsl */`
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
+		void main() {
 
-     vUv = uv;
+			vUv = uv;
 
-     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-     gl_Position = projectionMatrix * mvPosition;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
 
-}
-`,
+		}
+	`,
 
 	fragmentShader: /* glsl */`
-uniform float oneOverWidth;
-uniform float oneOverHeight;
-uniform sampler2D densityMap;
-uniform sampler2D projMap;
+		uniform float oneOverWidth;
+		uniform float oneOverHeight;
+		uniform sampler2D densityMap;
+		uniform sampler2D projMap;
 
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
-    vec4 orig = texture2D(densityMap, vUv);
+		void main() {
+			vec4 orig = texture2D(densityMap, vUv);
 
-    float pL = texture2D( projMap, vec2(vUv.x - oneOverWidth, vUv.y) ).g;
-    float pR = texture2D( projMap, vec2(vUv.x + oneOverWidth, vUv.y) ).g;
-    float pU = texture2D( projMap, vec2(vUv.x, vUv.y - oneOverHeight) ).g;
-    float pD = texture2D( projMap, vec2(vUv.x, vUv.y + oneOverHeight) ).g;
+			float pL = texture2D( projMap, vec2(vUv.x - oneOverWidth, vUv.y) ).g;
+			float pR = texture2D( projMap, vec2(vUv.x + oneOverWidth, vUv.y) ).g;
+			float pU = texture2D( projMap, vec2(vUv.x, vUv.y - oneOverHeight) ).g;
+			float pD = texture2D( projMap, vec2(vUv.x, vUv.y + oneOverHeight) ).g;
 
-    float uNorm = (orig.g - step(0.5, orig.g)) * 2.0;
-    float vNorm = (orig.b - step(0.5, orig.b)) * 2.0;
+			float uNorm = (orig.g - step(0.5, orig.g)) * 2.0;
+			float vNorm = (orig.b - step(0.5, orig.b)) * 2.0;
 
-    pL = (pL - step(0.5, pL)) * 2.0;
-    pR = (pR - step(0.5, pR)) * 2.0;
-    pU = (pU - step(0.5, pU)) * 2.0;
-    pD = (pD - step(0.5, pD)) * 2.0;
+			pL = (pL - step(0.5, pL)) * 2.0;
+			pR = (pR - step(0.5, pR)) * 2.0;
+			pU = (pU - step(0.5, pU)) * 2.0;
+			pD = (pD - step(0.5, pD)) * 2.0;
 
-    float h = (oneOverWidth + oneOverHeight) * 0.5;
-    float u = uNorm - (0.5 * (pR - pL) / h);
-    float v = vNorm - (0.5 * (pD - pU) / h);
+			float h = (oneOverWidth + oneOverHeight) * 0.5;
+			float u = uNorm - (0.5 * (pR - pL) / h);
+			float v = vNorm - (0.5 * (pD - pU) / h);
 
-    gl_FragColor = vec4( orig.r, u * 0.5 + step(0.0, -u), v * 0.5 + step(0.0, -v), orig.a);
+			gl_FragColor = vec4( orig.r, u * 0.5 + step(0.0, -u), v * 0.5 + step(0.0, -v), orig.a);
 
-}
-`
+		}
+	`
 };
 
 THREE.Fire.ColorShader = {
@@ -929,39 +929,39 @@ THREE.Fire.ColorShader = {
 	},
 
 	vertexShader: /* glsl */`
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
+		void main() {
 
-     vUv = uv;
+			vUv = uv;
 
-     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-     gl_Position = projectionMatrix * mvPosition;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
 
-}
-`,
+		}
+	`,
 
 	fragmentShader: /* glsl */`
-uniform vec3 color1;
-uniform vec3 color2;
-uniform vec3 color3;
-uniform float colorBias;
-uniform sampler2D densityMap;
+		uniform vec3 color1;
+		uniform vec3 color2;
+		uniform vec3 color3;
+		uniform float colorBias;
+		uniform sampler2D densityMap;
 
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
-    float density = texture2D( densityMap, vUv ).a;
-    float temperature = texture2D( densityMap, vUv ).r;
+		void main() {
+			float density = texture2D( densityMap, vUv ).a;
+			float temperature = texture2D( densityMap, vUv ).r;
 
-    float bias = clamp(colorBias, 0.0001, 0.9999);
+			float bias = clamp(colorBias, 0.0001, 0.9999);
 
-    vec3 blend1 = mix(color3, color2, temperature / bias) * (1.0 - step(bias, temperature));
-    vec3 blend2 = mix(color2, color1, (temperature - bias) / (1.0 - bias) ) * step(bias, temperature);
+			vec3 blend1 = mix(color3, color2, temperature / bias) * (1.0 - step(bias, temperature));
+			vec3 blend2 = mix(color2, color1, (temperature - bias) / (1.0 - bias) ) * step(bias, temperature);
 
-    gl_FragColor = vec4(blend1 + blend2, density);
-}
-`
+			gl_FragColor = vec4(blend1 + blend2, density);
+		}
+	`
 };
 
 
@@ -986,38 +986,38 @@ THREE.Fire.DebugShader = {
 	},
 
 	vertexShader: /* glsl */`
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
+		void main() {
 
-     vUv = uv;
+			vUv = uv;
 
-     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-     gl_Position = projectionMatrix * mvPosition;
+			vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+			gl_Position = projectionMatrix * mvPosition;
 
-}
-`,
+		}
+	`,
 
 	fragmentShader: /* glsl */`
-uniform sampler2D densityMap;
+		uniform sampler2D densityMap;
 
-varying vec2 vUv;
+		varying vec2 vUv;
 
-void main() {
-    float density;
-    density = texture2D( densityMap, vUv ).a;
+		void main() {
+			float density;
+			density = texture2D( densityMap, vUv ).a;
 
-    vec2 vel = texture2D( densityMap, vUv ).gb;
+			vec2 vel = texture2D( densityMap, vUv ).gb;
 
-    vel = (vel - step(0.5, vel)) * 2.0;
+			vel = (vel - step(0.5, vel)) * 2.0;
 
-    float r = density;
-    float g = max(abs(vel.x), density * 0.5);
-    float b = max(abs(vel.y), density * 0.5);
-    float a = max(density * 0.5, max(abs(vel.x), abs(vel.y)));
+			float r = density;
+			float g = max(abs(vel.x), density * 0.5);
+			float b = max(abs(vel.y), density * 0.5);
+			float a = max(density * 0.5, max(abs(vel.x), abs(vel.y)));
 
-    gl_FragColor = vec4(r, g, b, a);
+			gl_FragColor = vec4(r, g, b, a);
 
-}
-`
+		}
+	`
 };
