@@ -26,42 +26,38 @@ THREE.ParallaxBarrierEffect = function ( renderer ) {
 
 		},
 
-		vertexShader: [
+		vertexShader: /* glsl */`
+varying vec2 vUv;
 
-			"varying vec2 vUv;",
+void main() {
 
-			"void main() {",
+	vUv = vec2( uv.x, uv.y );
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			"	vUv = vec2( uv.x, uv.y );",
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-			"}"
+		fragmentShader: /* glsl */`
+uniform sampler2D mapLeft;
+uniform sampler2D mapRight;
+varying vec2 vUv;
 
-		].join( "\n" ),
+void main() {
 
-		fragmentShader: [
+	vec2 uv = vUv;
 
-			"uniform sampler2D mapLeft;",
-			"uniform sampler2D mapRight;",
-			"varying vec2 vUv;",
+	if ( ( mod( gl_FragCoord.y, 2.0 ) ) > 1.00 ) {
 
-			"void main() {",
+		gl_FragColor = texture2D( mapLeft, uv );
 
-			"	vec2 uv = vUv;",
+	} else {
 
-			"	if ( ( mod( gl_FragCoord.y, 2.0 ) ) > 1.00 ) {",
+		gl_FragColor = texture2D( mapRight, uv );
 
-			"		gl_FragColor = texture2D( mapLeft, uv );",
+	}
 
-			"	} else {",
-
-			"		gl_FragColor = texture2D( mapRight, uv );",
-
-			"	}",
-
-			"}"
-
-		].join( "\n" )
+}
+`
 
 	} );
 

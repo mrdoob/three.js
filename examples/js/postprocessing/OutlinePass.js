@@ -393,45 +393,45 @@ THREE.OutlinePass.prototype = Object.assign( Object.create( THREE.Pass.prototype
 				"textureMatrix": { value: null }
 			},
 
-			vertexShader: [
-				'#include <morphtarget_pars_vertex>',
-				'#include <skinning_pars_vertex>',
+			vertexShader: /* glsl */`
+#include <morphtarget_pars_vertex>
+#include <skinning_pars_vertex>
 
-				'varying vec4 projTexCoord;',
-				'varying vec4 vPosition;',
-				'uniform mat4 textureMatrix;',
+varying vec4 projTexCoord;
+varying vec4 vPosition;
+uniform mat4 textureMatrix;
 
-				'void main() {',
+void main() {
 
-				'	#include <skinbase_vertex>',
-				'	#include <begin_vertex>',
-				'	#include <morphtarget_vertex>',
-				'	#include <skinning_vertex>',
-				'	#include <project_vertex>',
+	#include <skinbase_vertex>
+	#include <begin_vertex>
+	#include <morphtarget_vertex>
+	#include <skinning_vertex>
+	#include <project_vertex>
 
-				'	vPosition = mvPosition;',
-				'	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );',
-				'	projTexCoord = textureMatrix * worldPosition;',
+	vPosition = mvPosition;
+	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+	projTexCoord = textureMatrix * worldPosition;
 
-				'}'
-			].join( '\n' ),
+}
+`,
 
-			fragmentShader: [
-				'#include <packing>',
-				'varying vec4 vPosition;',
-				'varying vec4 projTexCoord;',
-				'uniform sampler2D depthTexture;',
-				'uniform vec2 cameraNearFar;',
+			fragmentShader: /* glsl */`
+#include <packing>
+varying vec4 vPosition;
+varying vec4 projTexCoord;
+uniform sampler2D depthTexture;
+uniform vec2 cameraNearFar;
 
-				'void main() {',
+void main() {
 
-				'	float depth = unpackRGBAToDepth(texture2DProj( depthTexture, projTexCoord ));',
-				'	float viewZ = - DEPTH_TO_VIEW_Z( depth, cameraNearFar.x, cameraNearFar.y );',
-				'	float depthTest = (-vPosition.z > viewZ) ? 1.0 : 0.0;',
-				'	gl_FragColor = vec4(0.0, depthTest, 1.0, 1.0);',
+	float depth = unpackRGBAToDepth(texture2DProj( depthTexture, projTexCoord ));
+	float viewZ = - DEPTH_TO_VIEW_Z( depth, cameraNearFar.x, cameraNearFar.y );
+	float depthTest = (-vPosition.z > viewZ) ? 1.0 : 0.0;
+	gl_FragColor = vec4(0.0, depthTest, 1.0, 1.0);
 
-				'}'
-			].join( '\n' )
+}
+`
 
 		} );
 

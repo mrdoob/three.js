@@ -58,43 +58,43 @@ THREE.AdaptiveToneMappingPass = function ( adaptive, resolution ) {
 			"delta": { value: 0.016 },
 			"tau": { value: 1.0 }
 		},
-		vertexShader: [
-			"varying vec2 vUv;",
+		vertexShader: /* glsl */`
+varying vec2 vUv;
 
-			"void main() {",
+void main() {
 
-			"	vUv = uv;",
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			"}"
-		].join( '\n' ),
-		fragmentShader: [
-			"varying vec2 vUv;",
+}
+`,
+		fragmentShader: /* glsl */`
+varying vec2 vUv;
 
-			"uniform sampler2D lastLum;",
-			"uniform sampler2D currentLum;",
-			"uniform float minLuminance;",
-			"uniform float delta;",
-			"uniform float tau;",
+uniform sampler2D lastLum;
+uniform sampler2D currentLum;
+uniform float minLuminance;
+uniform float delta;
+uniform float tau;
 
-			"void main() {",
+void main() {
 
-			"	vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );",
-			"	vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );",
+	vec4 lastLum = texture2D( lastLum, vUv, MIP_LEVEL_1X1 );
+	vec4 currentLum = texture2D( currentLum, vUv, MIP_LEVEL_1X1 );
 
-			"	float fLastLum = max( minLuminance, lastLum.r );",
-			"	float fCurrentLum = max( minLuminance, currentLum.r );",
+	float fLastLum = max( minLuminance, lastLum.r );
+	float fCurrentLum = max( minLuminance, currentLum.r );
 
-			//The adaption seems to work better in extreme lighting differences
-			//if the input luminance is squared.
-			"	fCurrentLum *= fCurrentLum;",
+	//The adaption seems to work better in extreme lighting differences
+	//if the input luminance is squared.
+	fCurrentLum *= fCurrentLum;
 
-			// Adapt the luminance using Pattanaik's technique
-			"	float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));",
-			// "fAdaptedLum = sqrt(fAdaptedLum);",
-			"	gl_FragColor.r = fAdaptedLum;",
-			"}"
-		].join( '\n' )
+	// Adapt the luminance using Pattanaik's technique
+	float fAdaptedLum = fLastLum + (fCurrentLum - fLastLum) * (1.0 - exp(-delta * tau));
+	// "fAdaptedLum = sqrt(fAdaptedLum);",
+	gl_FragColor.r = fAdaptedLum;
+}
+`
 	};
 
 	this.materialAdaptiveLum = new THREE.ShaderMaterial( {

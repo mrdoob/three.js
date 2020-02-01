@@ -54,63 +54,59 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 		},
 
-		vertexShader: [
+		vertexShader: /* glsl */`
+varying vec2 vUv;
 
-			"varying vec2 vUv;",
+void main() {
 
-			"void main() {",
+	vUv = vec2( uv.x, uv.y );
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
-			"	vUv = vec2( uv.x, uv.y );",
-			"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+}
+`,
 
-			"}"
+		fragmentShader: /* glsl */`
+uniform sampler2D mapLeft;
+uniform sampler2D mapRight;
+varying vec2 vUv;
 
-		].join( "\n" ),
+uniform mat3 colorMatrixLeft;
+uniform mat3 colorMatrixRight;
 
-		fragmentShader: [
+// These functions implement sRGB linearization and gamma correction
 
-			"uniform sampler2D mapLeft;",
-			"uniform sampler2D mapRight;",
-			"varying vec2 vUv;",
+float lin( float c ) {
+	return c <= 0.04045 ? c * 0.0773993808 :
+			pow( c * 0.9478672986 + 0.0521327014, 2.4 );
+}
 
-			"uniform mat3 colorMatrixLeft;",
-			"uniform mat3 colorMatrixRight;",
+vec4 lin( vec4 c ) {
+	return vec4( lin( c.r ), lin( c.g ), lin( c.b ), c.a );
+}
 
-			// These functions implement sRGB linearization and gamma correction
-
-			"float lin( float c ) {",
-			"	return c <= 0.04045 ? c * 0.0773993808 :",
-			"			pow( c * 0.9478672986 + 0.0521327014, 2.4 );",
-			"}",
-
-			"vec4 lin( vec4 c ) {",
-			"	return vec4( lin( c.r ), lin( c.g ), lin( c.b ), c.a );",
-			"}",
-
-			"float dev( float c ) {",
-			"	return c <= 0.0031308 ? c * 12.92",
-			"			: pow( c, 0.41666 ) * 1.055 - 0.055;",
-			"}",
+float dev( float c ) {
+	return c <= 0.0031308 ? c * 12.92
+			: pow( c, 0.41666 ) * 1.055 - 0.055;
+}
 
 
-			"void main() {",
+void main() {
 
-			"	vec2 uv = vUv;",
+	vec2 uv = vUv;
 
-			"	vec4 colorL = lin( texture2D( mapLeft, uv ) );",
-			"	vec4 colorR = lin( texture2D( mapRight, uv ) );",
+	vec4 colorL = lin( texture2D( mapLeft, uv ) );
+	vec4 colorR = lin( texture2D( mapRight, uv ) );
 
-			"	vec3 color = clamp(",
-			"			colorMatrixLeft * colorL.rgb +",
-			"			colorMatrixRight * colorR.rgb, 0., 1. );",
+	vec3 color = clamp(
+			colorMatrixLeft * colorL.rgb +
+			colorMatrixRight * colorR.rgb, 0., 1. );
 
-			"	gl_FragColor = vec4(",
-			"			dev( color.r ), dev( color.g ), dev( color.b ),",
-			"			max( colorL.a, colorR.a ) );",
+	gl_FragColor = vec4(
+			dev( color.r ), dev( color.g ), dev( color.b ),
+			max( colorL.a, colorR.a ) );
 
-			"}"
-
-		].join( "\n" )
+}
+`
 
 	} );
 
