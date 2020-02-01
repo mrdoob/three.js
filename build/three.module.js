@@ -91,7 +91,7 @@ if ( Object.assign === undefined ) {
 
 }
 
-var REVISION = '113';
+var REVISION = '114dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 var CullFaceNone = 0;
@@ -1123,6 +1123,18 @@ Object.assign( Matrix3.prototype, {
 		te[ 0 ] = me[ 0 ]; te[ 1 ] = me[ 1 ]; te[ 2 ] = me[ 2 ];
 		te[ 3 ] = me[ 3 ]; te[ 4 ] = me[ 4 ]; te[ 5 ] = me[ 5 ];
 		te[ 6 ] = me[ 6 ]; te[ 7 ] = me[ 7 ]; te[ 8 ] = me[ 8 ];
+
+		return this;
+
+	},
+
+	extractBasis: function ( xAxis, yAxis, zAxis ) {
+
+		var te = this.elements;
+
+		xAxis.fromArray( te, 0 );
+		yAxis.fromArray( te, 3 );
+		zAxis.fromArray( te, 6 );
 
 		return this;
 
