@@ -28,43 +28,41 @@
 
 			var RADIUS = 75;
 
-			THREE.ShaderChunk[ 'lights_pars_begin' ] += [
-				'',
-				'#if defined TILED_FORWARD',
-				'uniform vec4 tileData;',
-				'uniform sampler2D tileTexture;',
-				'uniform sampler2D lightTexture;',
-				'#endif'
-			].join( '\n' );
+			THREE.ShaderChunk[ 'lights_pars_begin' ] += /* glsl */`
+				#if defined TILED_FORWARD
+					uniform vec4 tileData;
+					uniform sampler2D tileTexture;
+					uniform sampler2D lightTexture;
+				#endif
+			`;
 
-			THREE.ShaderChunk[ 'lights_fragment_end' ] += [
-				'',
-				'#if defined TILED_FORWARD',
-				'vec2 tUv = floor(gl_FragCoord.xy / tileData.xy * 32.) / 32. + tileData.zw;',
-				'vec4 tile = texture2D(tileTexture, tUv);',
-				'for (int i=0; i < 4; i++) {',
-				'	float tileVal = tile.x * 255.;',
-				'  	tile.xyzw = tile.yzwx;',
-				'	if(tileVal == 0.){ continue; }',
-				'  	float tileDiv = 128.;',
-				'	for (int j=0; j < 8; j++) {',
-				'  		if (tileVal < tileDiv) {  tileDiv *= 0.5; continue; }',
-				'		tileVal -= tileDiv;',
-				'		tileDiv *= 0.5;',
-				'  		PointLight pointlight;',
-				'		float uvx = (float(8 * i + j) + 0.5) / 32.;',
-				'  		vec4 lightData = texture2D(lightTexture, vec2(uvx, 0.));',
-				'  		vec4 lightColor = texture2D(lightTexture, vec2(uvx, 1.));',
-				'  		pointlight.position = lightData.xyz;',
-				'  		pointlight.distance = lightData.w;',
-				'  		pointlight.color = lightColor.rgb;',
-				'  		pointlight.decay = lightColor.a;',
-				'  		getPointDirectLightIrradiance( pointlight, geometry, directLight );',
-				'		RE_Direct( directLight, geometry, material, reflectedLight );',
-				'	}',
-				'}',
-				'#endif'
-			].join( '\n' );
+			THREE.ShaderChunk[ 'lights_fragment_end' ] += /* glsl */`
+				#if defined TILED_FORWARD
+					vec2 tUv = floor(gl_FragCoord.xy / tileData.xy * 32.) / 32. + tileData.zw;
+					vec4 tile = texture2D(tileTexture, tUv);
+					for (int i=0; i < 4; i++) {
+						float tileVal = tile.x * 255.;
+						tile.xyzw = tile.yzwx;
+						if(tileVal == 0.){ continue; }
+						float tileDiv = 128.;
+						for (int j=0; j < 8; j++) {
+							if (tileVal < tileDiv) {  tileDiv *= 0.5; continue; }
+							tileVal -= tileDiv;
+							tileDiv *= 0.5;
+							PointLight pointlight;
+							float uvx = (float(8 * i + j) + 0.5) / 32.;
+							vec4 lightData = texture2D(lightTexture, vec2(uvx, 0.));
+							vec4 lightColor = texture2D(lightTexture, vec2(uvx, 1.));
+							pointlight.position = lightData.xyz;
+							pointlight.distance = lightData.w;
+							pointlight.color = lightColor.rgb;
+							pointlight.decay = lightColor.a;
+							getPointDirectLightIrradiance( pointlight, geometry, directLight );
+							RE_Direct( directLight, geometry, material, reflectedLight );
+						}
+					}
+				#endif
+			`;
 
 			var lights = [];
 

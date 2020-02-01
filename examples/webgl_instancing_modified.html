@@ -72,25 +72,25 @@
 
 						var material = new THREE.MeshMatcapMaterial( { color: 0xaaaaff, matcap: texture } );
 
-						var colorParsChunk = [
-							'attribute vec3 instanceColor;',
-							'varying vec3 vInstanceColor;',
-							'#include <common>'
-						].join( '\n' );
+						var colorParsChunk = /* glsl */`
+							attribute vec3 instanceColor;
+							varying vec3 vInstanceColor;
+							#include <common>
+						`;
 
-						var instanceColorChunk = [
-							'#include <begin_vertex>',
-							'\tvInstanceColor = instanceColor;'
-						].join( '\n' );
+						var instanceColorChunk = /* glsl */`
+							#include <begin_vertex>
+							vInstanceColor = instanceColor;
+						`;
 
-						var fragmentParsChunk = [
-							'varying vec3 vInstanceColor;',
-							'#include <common>'
-						].join( '\n' );
+						var fragmentParsChunk = /* glsl */`
+							varying vec3 vInstanceColor;
+							#include <common>
+						`;
 
-						var colorChunk = [
-							'vec4 diffuseColor = vec4( diffuse * vInstanceColor, opacity );'
-						].join( '\n' );
+						var colorChunk = /* glsl */`
+							vec4 diffuseColor = vec4( diffuse * vInstanceColor, opacity );
+						`;
 
 						material.onBeforeCompile = function ( shader ) {
 

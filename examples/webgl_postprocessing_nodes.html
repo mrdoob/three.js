@@ -260,13 +260,13 @@
 						var screen = new Nodes.ScreenNode();
 						var sat = new Nodes.FloatNode( 0 );
 
-						var satrgb = new Nodes.FunctionNode( [
-							"vec3 satrgb( vec3 rgb, float adjustment ) {",
-							// include luminance function from LuminanceNode
-							"	vec3 intensity = vec3( luminance( rgb ) );",
-							"	return mix( intensity, rgb, adjustment );",
-							"}"
-						].join( "\n" ), [ Nodes.LuminanceNode.Nodes.luminance ] );
+						var satrgb = new Nodes.FunctionNode( /* glsl */`
+							vec3 satrgb( vec3 rgb, float adjustment ) {
+								// include luminance function from LuminanceNode
+								vec3 intensity = vec3( luminance( rgb ) );
+								return mix( intensity, rgb, adjustment );
+							}
+						`, [ Nodes.LuminanceNode.Nodes.luminance ] );
 
 						var saturation = new Nodes.FunctionCallNode( satrgb );
 						saturation.inputs.rgb = screen;
