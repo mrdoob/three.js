@@ -40,7 +40,7 @@ THREE.TranslucentShader = {
 
 		"varying vec3 vViewPosition;",
 
-		THREE.ShaderChunk[ "common" ],
+		"#include <common>",
 
 		"void main() {",
 
@@ -88,7 +88,7 @@ THREE.TranslucentShader = {
 		"uniform float thicknessAttenuation;",
 		"uniform vec3 thicknessColor;",
 
-		THREE.ShaderChunk[ "lights_pars_begin" ],
+		"#include <lights_pars_begin>",
 
 		"void RE_Direct_Scattering(const in IncidentLight directLight, const in vec2 uv, const in GeometricContext geometry, inout ReflectedLight reflectedLight) {",
 		"	vec3 thickness = thicknessColor * texture2D(thicknessMap, uv).r;",
@@ -107,13 +107,13 @@ THREE.TranslucentShader = {
 		"	vec4 diffuseColor = vec4( diffuse, opacity );",
 		"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 
-		THREE.ShaderChunk[ "map_fragment" ],
-		THREE.ShaderChunk[ "color_fragment" ],
-		THREE.ShaderChunk[ "specularmap_fragment" ],
+		"	#include <map_fragment>",
+		"	#include <color_fragment>",
+		"	#include <specularmap_fragment>",
 
 		"	vec3 totalEmissiveRadiance = emissive;",
 
-		THREE.ShaderChunk[ "lights_phong_fragment" ],
+		"	#include <lights_phong_fragment>",
 
 		// Doing lights fragment begin.
 		"	GeometricContext geometry;",
@@ -190,12 +190,12 @@ THREE.TranslucentShader = {
 		"		vec3 clearcoatRadiance = vec3( 0.0 );",
 
 		"	#endif",
-		THREE.ShaderChunk[ "lights_fragment_end" ],
+		"	#include <lights_fragment_end>",
 
 		"	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;",
 		"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
-		THREE.ShaderChunk[ "encodings_fragment" ],
+		"	#include <encodings_fragment>",
 
 		"}"
 
