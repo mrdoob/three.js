@@ -448,36 +448,38 @@ void main() {
 				"hiddenEdgeColor": { value: new THREE.Vector3( 1.0, 1.0, 1.0 ) },
 			},
 
-			vertexShader:
-				"varying vec2 vUv;\n\
-				void main() {\n\
-					vUv = uv;\n\
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
-				}",
+			vertexShader: /* glsl */`
+varying vec2 vUv;
+void main() {
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+}
+`,
 
-			fragmentShader:
-				"varying vec2 vUv;\
-				uniform sampler2D maskTexture;\
-				uniform vec2 texSize;\
-				uniform vec3 visibleEdgeColor;\
-				uniform vec3 hiddenEdgeColor;\
-				\
-				void main() {\n\
-					vec2 invSize = 1.0 / texSize;\
-					vec4 uvOffset = vec4(1.0, 0.0, 0.0, 1.0) * vec4(invSize, invSize);\
-					vec4 c1 = texture2D( maskTexture, vUv + uvOffset.xy);\
-					vec4 c2 = texture2D( maskTexture, vUv - uvOffset.xy);\
-					vec4 c3 = texture2D( maskTexture, vUv + uvOffset.yw);\
-					vec4 c4 = texture2D( maskTexture, vUv - uvOffset.yw);\
-					float diff1 = (c1.r - c2.r)*0.5;\
-					float diff2 = (c3.r - c4.r)*0.5;\
-					float d = length( vec2(diff1, diff2) );\
-					float a1 = min(c1.g, c2.g);\
-					float a2 = min(c3.g, c4.g);\
-					float visibilityFactor = min(a1, a2);\
-					vec3 edgeColor = 1.0 - visibilityFactor > 0.001 ? visibleEdgeColor : hiddenEdgeColor;\
-					gl_FragColor = vec4(edgeColor, 1.0) * vec4(d);\
-				}"
+			fragmentShader: /* glsl */`
+varying vec2 vUv;
+uniform sampler2D maskTexture;
+uniform vec2 texSize;
+uniform vec3 visibleEdgeColor;
+uniform vec3 hiddenEdgeColor;
+
+void main() {
+	vec2 invSize = 1.0 / texSize;
+	vec4 uvOffset = vec4(1.0, 0.0, 0.0, 1.0) * vec4(invSize, invSize);
+	vec4 c1 = texture2D( maskTexture, vUv + uvOffset.xy);
+	vec4 c2 = texture2D( maskTexture, vUv - uvOffset.xy);
+	vec4 c3 = texture2D( maskTexture, vUv + uvOffset.yw);
+	vec4 c4 = texture2D( maskTexture, vUv - uvOffset.yw);
+	float diff1 = (c1.r - c2.r)*0.5;
+	float diff2 = (c3.r - c4.r)*0.5;
+	float d = length( vec2(diff1, diff2) );
+	float a1 = min(c1.g, c2.g);
+	float a2 = min(c3.g, c4.g);
+	float visibilityFactor = min(a1, a2);
+	vec3 edgeColor = 1.0 - visibilityFactor > 0.001 ? visibleEdgeColor : hiddenEdgeColor;
+	gl_FragColor = vec4(edgeColor, 1.0) * vec4(d);
+}
+`
 		} );
 
 	},
@@ -497,40 +499,43 @@ void main() {
 				"kernelRadius": { value: 1.0 }
 			},
 
-			vertexShader:
-				"varying vec2 vUv;\n\
-				void main() {\n\
-					vUv = uv;\n\
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
-				}",
+			vertexShader: /* glsl */`
+varying vec2 vUv;
+void main() {
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+}
+`,
 
-			fragmentShader:
-				"#include <common>\
-				varying vec2 vUv;\
-				uniform sampler2D colorTexture;\
-				uniform vec2 texSize;\
-				uniform vec2 direction;\
-				uniform float kernelRadius;\
-				\
-				float gaussianPdf(in float x, in float sigma) {\
-					return 0.39894 * exp( -0.5 * x * x/( sigma * sigma))/sigma;\
-				}\
-				void main() {\
-					vec2 invSize = 1.0 / texSize;\
-					float weightSum = gaussianPdf(0.0, kernelRadius);\
-					vec4 diffuseSum = texture2D( colorTexture, vUv) * weightSum;\
-					vec2 delta = direction * invSize * kernelRadius/float(MAX_RADIUS);\
-					vec2 uvOffset = delta;\
-					for( int i = 1; i <= MAX_RADIUS; i ++ ) {\
-						float w = gaussianPdf(uvOffset.x, kernelRadius);\
-						vec4 sample1 = texture2D( colorTexture, vUv + uvOffset);\
-						vec4 sample2 = texture2D( colorTexture, vUv - uvOffset);\
-						diffuseSum += ((sample1 + sample2) * w);\
-						weightSum += (2.0 * w);\
-						uvOffset += delta;\
-					}\
-					gl_FragColor = diffuseSum/weightSum;\
-				}"
+			fragmentShader: /* glsl */`
+#include <common>
+varying vec2 vUv;
+uniform sampler2D colorTexture;
+uniform vec2 texSize;
+uniform vec2 direction;
+uniform float kernelRadius;
+
+float gaussianPdf(in float x, in float sigma) {
+	return 0.39894 * exp( -0.5 * x * x/( sigma * sigma))/sigma;
+}
+
+void main() {
+	vec2 invSize = 1.0 / texSize;
+	float weightSum = gaussianPdf(0.0, kernelRadius);
+	vec4 diffuseSum = texture2D( colorTexture, vUv) * weightSum;
+	vec2 delta = direction * invSize * kernelRadius/float(MAX_RADIUS);
+	vec2 uvOffset = delta;
+	for( int i = 1; i <= MAX_RADIUS; i ++ ) {
+		float w = gaussianPdf(uvOffset.x, kernelRadius);
+		vec4 sample1 = texture2D( colorTexture, vUv + uvOffset);
+		vec4 sample2 = texture2D( colorTexture, vUv - uvOffset);
+		diffuseSum += ((sample1 + sample2) * w);
+		weightSum += (2.0 * w);
+		uvOffset += delta;
+	}
+	gl_FragColor = diffuseSum/weightSum;
+}
+`
 		} );
 
 	},
@@ -549,35 +554,37 @@ void main() {
 				"usePatternTexture": { value: 0.0 }
 			},
 
-			vertexShader:
-				"varying vec2 vUv;\n\
-				void main() {\n\
-					vUv = uv;\n\
-					gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );\n\
-				}",
+			vertexShader: /* glsl */`
+varying vec2 vUv;
+void main() {
+	vUv = uv;
+	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+}
+`,
 
-			fragmentShader:
-				"varying vec2 vUv;\
-				uniform sampler2D maskTexture;\
-				uniform sampler2D edgeTexture1;\
-				uniform sampler2D edgeTexture2;\
-				uniform sampler2D patternTexture;\
-				uniform float edgeStrength;\
-				uniform float edgeGlow;\
-				uniform bool usePatternTexture;\
-				\
-				void main() {\
-					vec4 edgeValue1 = texture2D(edgeTexture1, vUv);\
-					vec4 edgeValue2 = texture2D(edgeTexture2, vUv);\
-					vec4 maskColor = texture2D(maskTexture, vUv);\
-					vec4 patternColor = texture2D(patternTexture, 6.0 * vUv);\
-					float visibilityFactor = 1.0 - maskColor.g > 0.0 ? 1.0 : 0.5;\
-					vec4 edgeValue = edgeValue1 + edgeValue2 * edgeGlow;\
-					vec4 finalColor = edgeStrength * maskColor.r * edgeValue;\
-					if(usePatternTexture)\
-						finalColor += + visibilityFactor * (1.0 - maskColor.r) * (1.0 - patternColor.r);\
-					gl_FragColor = finalColor;\
-				}",
+			fragmentShader: /* glsl */`
+varying vec2 vUv;
+uniform sampler2D maskTexture;
+uniform sampler2D edgeTexture1;
+uniform sampler2D edgeTexture2;
+uniform sampler2D patternTexture;
+uniform float edgeStrength;
+uniform float edgeGlow;
+uniform bool usePatternTexture;
+
+void main() {
+	vec4 edgeValue1 = texture2D(edgeTexture1, vUv);
+	vec4 edgeValue2 = texture2D(edgeTexture2, vUv);
+	vec4 maskColor = texture2D(maskTexture, vUv);
+	vec4 patternColor = texture2D(patternTexture, 6.0 * vUv);
+	float visibilityFactor = 1.0 - maskColor.g > 0.0 ? 1.0 : 0.5;
+	vec4 edgeValue = edgeValue1 + edgeValue2 * edgeGlow;
+	vec4 finalColor = edgeStrength * maskColor.r * edgeValue;
+	if(usePatternTexture)
+		finalColor += + visibilityFactor * (1.0 - maskColor.r) * (1.0 - patternColor.r);
+	gl_FragColor = finalColor;
+}
+`,
 			blending: THREE.AdditiveBlending,
 			depthTest: false,
 			depthWrite: false,
