@@ -617,47 +617,47 @@ THREE.GLTFLoader = ( function () {
 		this.isGLTFSpecularGlossinessMaterial = true;
 
 		//various chunks that need replacing
-		var specularMapParsFragmentChunk = [
-			'#ifdef USE_SPECULARMAP',
-			'	uniform sampler2D specularMap;',
-			'#endif'
-		].join( '\n' );
+		var specularMapParsFragmentChunk = /* glsl */`
+			#ifdef USE_SPECULARMAP
+				uniform sampler2D specularMap;
+			#endif
+		`;
 
-		var glossinessMapParsFragmentChunk = [
-			'#ifdef USE_GLOSSINESSMAP',
-			'	uniform sampler2D glossinessMap;',
-			'#endif'
-		].join( '\n' );
+		var glossinessMapParsFragmentChunk = /* glsl */`
+			#ifdef USE_GLOSSINESSMAP
+				uniform sampler2D glossinessMap;
+			#endif
+		`;
 
-		var specularMapFragmentChunk = [
-			'vec3 specularFactor = specular;',
-			'#ifdef USE_SPECULARMAP',
-			'	vec4 texelSpecular = texture2D( specularMap, vUv );',
-			'	texelSpecular = sRGBToLinear( texelSpecular );',
-			'	// reads channel RGB, compatible with a glTF Specular-Glossiness (RGBA) texture',
-			'	specularFactor *= texelSpecular.rgb;',
-			'#endif'
-		].join( '\n' );
+		var specularMapFragmentChunk = /* glsl */`
+			vec3 specularFactor = specular;
+			#ifdef USE_SPECULARMAP
+				vec4 texelSpecular = texture2D( specularMap, vUv );
+				texelSpecular = sRGBToLinear( texelSpecular );
+				// reads channel RGB, compatible with a glTF Specular-Glossiness (RGBA) texture
+				specularFactor *= texelSpecular.rgb;
+			#endif
+		`;
 
-		var glossinessMapFragmentChunk = [
-			'float glossinessFactor = glossiness;',
-			'#ifdef USE_GLOSSINESSMAP',
-			'	vec4 texelGlossiness = texture2D( glossinessMap, vUv );',
-			'	// reads channel A, compatible with a glTF Specular-Glossiness (RGBA) texture',
-			'	glossinessFactor *= texelGlossiness.a;',
-			'#endif'
-		].join( '\n' );
+		var glossinessMapFragmentChunk = /* glsl */`
+			float glossinessFactor = glossiness;
+			#ifdef USE_GLOSSINESSMAP
+				vec4 texelGlossiness = texture2D( glossinessMap, vUv );
+				// reads channel A, compatible with a glTF Specular-Glossiness (RGBA) texture
+				glossinessFactor *= texelGlossiness.a;
+			#endif
+		`;
 
-		var lightPhysicalFragmentChunk = [
-			'PhysicalMaterial material;',
-			'material.diffuseColor = diffuseColor.rgb;',
-			'vec3 dxy = max( abs( dFdx( geometryNormal ) ), abs( dFdy( geometryNormal ) ) );',
-			'float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );',
-			'material.specularRoughness = max( 1.0 - glossinessFactor, 0.0525 );// 0.0525 corresponds to the base mip of a 256 cubemap.',
-			'material.specularRoughness += geometryRoughness;',
-			'material.specularRoughness = min( material.specularRoughness, 1.0 );',
-			'material.specularColor = specularFactor.rgb;',
-		].join( '\n' );
+		var lightPhysicalFragmentChunk = /* glsl */`
+			PhysicalMaterial material;
+			material.diffuseColor = diffuseColor.rgb;
+			vec3 dxy = max( abs( dFdx( geometryNormal ) ), abs( dFdy( geometryNormal ) ) );
+			float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );
+			material.specularRoughness = max( 1.0 - glossinessFactor, 0.0525 );// 0.0525 corresponds to the base mip of a 256 cubemap.
+			material.specularRoughness += geometryRoughness;
+			material.specularRoughness = min( material.specularRoughness, 1.0 );
+			material.specularColor = specularFactor.rgb;
+		`;
 
 		var uniforms = {
 			specular: { value: new THREE.Color().setHex( 0xffffff ) },
