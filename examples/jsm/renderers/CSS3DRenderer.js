@@ -50,7 +50,7 @@ CSS3DSprite.prototype.constructor = CSS3DSprite;
 
 var CSS3DRenderer = function () {
 
-	var _this = this
+	var _this = this;
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
