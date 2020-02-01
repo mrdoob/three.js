@@ -33,172 +33,169 @@ THREE.TranslucentShader = {
 
 	] ),
 
-	vertexShader: [
+	vertexShader: /* glsl */`
+varying vec3 vNormal;
+varying vec2 vUv;
 
-		"varying vec3 vNormal;",
-		"varying vec2 vUv;",
+varying vec3 vViewPosition;
 
-		"varying vec3 vViewPosition;",
+#include <common>
 
-		"#include <common>",
+void main() {
 
-		"void main() {",
+	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
 
-		"	vec4 worldPosition = modelMatrix * vec4( position, 1.0 );",
+	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-		"	vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );",
+	vViewPosition = -mvPosition.xyz;
 
-		"	vViewPosition = -mvPosition.xyz;",
+	vNormal = normalize( normalMatrix * normal );
 
-		"	vNormal = normalize( normalMatrix * normal );",
+	vUv = uv;
 
-		"	vUv = uv;",
+	gl_Position = projectionMatrix * mvPosition;
 
-		"	gl_Position = projectionMatrix * mvPosition;",
+}
+`,
 
-		"}",
+	fragmentShader: /* glsl */`
+#define USE_UV
+#define USE_MAP
+#define PHONG
+#define TRANSLUCENT
+#include <common>
+#include <bsdfs>
+#include <uv_pars_fragment>
+#include <map_pars_fragment>
+#include <lights_phong_pars_fragment>
 
-	].join( "\n" ),
+varying vec3 vColor;
 
-	fragmentShader: [
-		"#define USE_UV",
-		"#define USE_MAP",
-		"#define PHONG",
-		"#define TRANSLUCENT",
-		"#include <common>",
-		"#include <bsdfs>",
-		"#include <uv_pars_fragment>",
-		"#include <map_pars_fragment>",
-		"#include <lights_phong_pars_fragment>",
+uniform vec3 diffuse;
+uniform vec3 specular;
+uniform vec3 emissive;
+uniform float opacity;
+uniform float shininess;
 
-		"varying vec3 vColor;",
+// Translucency
+uniform sampler2D thicknessMap;
+uniform float thicknessPower;
+uniform float thicknessScale;
+uniform float thicknessDistortion;
+uniform float thicknessAmbient;
+uniform float thicknessAttenuation;
+uniform vec3 thicknessColor;
 
-		"uniform vec3 diffuse;",
-		"uniform vec3 specular;",
-		"uniform vec3 emissive;",
-		"uniform float opacity;",
-		"uniform float shininess;",
+#include <lights_pars_begin>
 
-		// Translucency
-		"uniform sampler2D thicknessMap;",
-		"uniform float thicknessPower;",
-		"uniform float thicknessScale;",
-		"uniform float thicknessDistortion;",
-		"uniform float thicknessAmbient;",
-		"uniform float thicknessAttenuation;",
-		"uniform vec3 thicknessColor;",
+void RE_Direct_Scattering(const in IncidentLight directLight, const in vec2 uv, const in GeometricContext geometry, inout ReflectedLight reflectedLight) {
+	vec3 thickness = thicknessColor * texture2D(thicknessMap, uv).r;
+	vec3 scatteringHalf = normalize(directLight.direction + (geometry.normal * thicknessDistortion));
+	float scatteringDot = pow(saturate(dot(geometry.viewDir, -scatteringHalf)), thicknessPower) * thicknessScale;
+	vec3 scatteringIllu = (scatteringDot + thicknessAmbient) * thickness;
+	reflectedLight.directDiffuse += scatteringIllu * thicknessAttenuation * directLight.color;
+}
 
-		"#include <lights_pars_begin>",
+void main() {
 
-		"void RE_Direct_Scattering(const in IncidentLight directLight, const in vec2 uv, const in GeometricContext geometry, inout ReflectedLight reflectedLight) {",
-		"	vec3 thickness = thicknessColor * texture2D(thicknessMap, uv).r;",
-		"	vec3 scatteringHalf = normalize(directLight.direction + (geometry.normal * thicknessDistortion));",
-		"	float scatteringDot = pow(saturate(dot(geometry.viewDir, -scatteringHalf)), thicknessPower) * thicknessScale;",
-		"	vec3 scatteringIllu = (scatteringDot + thicknessAmbient) * thickness;",
-		"	reflectedLight.directDiffuse += scatteringIllu * thicknessAttenuation * directLight.color;",
-		"}",
+	vec3 normal = normalize( vNormal );
 
-		"void main() {",
+	vec3 viewerDirection = normalize( vViewPosition );
 
-		"	vec3 normal = normalize( vNormal );",
+	vec4 diffuseColor = vec4( diffuse, opacity );
+	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 
-		"	vec3 viewerDirection = normalize( vViewPosition );",
+	#include <map_fragment>
+	#include <color_fragment>
+	#include <specularmap_fragment>
 
-		"	vec4 diffuseColor = vec4( diffuse, opacity );",
-		"	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
+	vec3 totalEmissiveRadiance = emissive;
 
-		"	#include <map_fragment>",
-		"	#include <color_fragment>",
-		"	#include <specularmap_fragment>",
+	#include <lights_phong_fragment>
 
-		"	vec3 totalEmissiveRadiance = emissive;",
+	// Doing lights fragment begin.
+	GeometricContext geometry;
+	geometry.position = - vViewPosition;
+	geometry.normal = normal;
+	geometry.viewDir = normalize( vViewPosition );
 
-		"	#include <lights_phong_fragment>",
+	IncidentLight directLight;
 
-		// Doing lights fragment begin.
-		"	GeometricContext geometry;",
-		"	geometry.position = - vViewPosition;",
-		"	geometry.normal = normal;",
-		"	geometry.viewDir = normalize( vViewPosition );",
+	#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )
 
-		"	IncidentLight directLight;",
+		PointLight pointLight;
 
-		"	#if ( NUM_POINT_LIGHTS > 0 ) && defined( RE_Direct )",
+		#pragma unroll_loop
+		for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
+			pointLight = pointLights[ i ];
+			getPointDirectLightIrradiance( pointLight, geometry, directLight );
 
-		"		PointLight pointLight;",
+			#ifdef USE_SHADOWMAP
+			directLight.color *= all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;
+			#endif
 
-		"		#pragma unroll_loop",
-		"		for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {",
-		"		 	pointLight = pointLights[ i ];",
-		"		 	getPointDirectLightIrradiance( pointLight, geometry, directLight );",
+			RE_Direct( directLight, geometry, material, reflectedLight );
 
-		"			#ifdef USE_SHADOWMAP",
-		"			directLight.color *= all( bvec2( pointLight.shadow, directLight.visible ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;",
-		"			#endif",
+			#if defined( TRANSLUCENT ) && defined( USE_UV )
+			RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);
+			#endif
+		}
 
-		"			RE_Direct( directLight, geometry, material, reflectedLight );",
+		#endif
 
-		"			#if defined( TRANSLUCENT ) && defined( USE_UV )",
-		"			RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);",
-		"			#endif",
-		"		}",
+	#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )
 
-		"		#endif",
+		DirectionalLight directionalLight;
 
-		"	#if ( NUM_DIR_LIGHTS > 0 ) && defined( RE_Direct )",
+		#pragma unroll_loop
+		for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
+			directionalLight = directionalLights[ i ];
+			getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
 
-		"		DirectionalLight directionalLight;",
+			#ifdef USE_SHADOWMAP
+			directLight.color *= all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+			#endif
 
-		"		#pragma unroll_loop",
-		"		for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {",
-		"			directionalLight = directionalLights[ i ];",
-		"			getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );",
+			RE_Direct( directLight, geometry, material, reflectedLight );
 
-		"			#ifdef USE_SHADOWMAP",
-		"			directLight.color *= all( bvec2( directionalLight.shadow, directLight.visible ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;",
-		"			#endif",
+			#if defined( TRANSLUCENT ) && defined( USE_UV )
+			RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);
+			#endif
+		}
 
-		"			RE_Direct( directLight, geometry, material, reflectedLight );",
+	#endif
 
-		"			#if defined( TRANSLUCENT ) && defined( USE_UV )",
-		"			RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);",
-		"			#endif",
-		"		}",
+	#if defined( RE_IndirectDiffuse )
 
-		"	#endif",
+		vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );
 
-		"	#if defined( RE_IndirectDiffuse )",
+		#if ( NUM_HEMI_LIGHTS > 0 )
 
-		"		vec3 irradiance = getAmbientLightIrradiance( ambientLightColor );",
+			#pragma unroll_loop
+			for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
-		"		#if ( NUM_HEMI_LIGHTS > 0 )",
+				irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
-		"			#pragma unroll_loop",
-		"			for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {",
+			}
 
-		"				irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );",
+		#endif
 
-		"			}",
+	#endif
 
-		"		#endif",
+	#if defined( RE_IndirectSpecular )
 
-		"	#endif",
+		vec3 radiance = vec3( 0.0 );
+		vec3 clearcoatRadiance = vec3( 0.0 );
 
-		"	#if defined( RE_IndirectSpecular )",
+	#endif
+	#include <lights_fragment_end>
 
-		"		vec3 radiance = vec3( 0.0 );",
-		"		vec3 clearcoatRadiance = vec3( 0.0 );",
+	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
+	gl_FragColor = vec4( outgoingLight, diffuseColor.a );	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
 
-		"	#endif",
-		"	#include <lights_fragment_end>",
+	#include <encodings_fragment>
 
-		"	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;",
-		"	gl_FragColor = vec4( outgoingLight, diffuseColor.a );",	// TODO, this should be pre-multiplied to allow for bright highlights on very transparent objects
-
-		"	#include <encodings_fragment>",
-
-		"}"
-
-	].join( "\n" ),
+}
+`,
 
 };
