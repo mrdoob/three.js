@@ -510,7 +510,7 @@ THREE.Fire.SourceShader = {
 
 		'void main() {',
 
-		' 	  vUv = uv;',
+		'     vUv = uv;',
 
 		'     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
 		'     gl_Position = projectionMatrix * mvPosition;',
@@ -588,7 +588,7 @@ THREE.Fire.DiffuseShader = {
 
 		'void main() {',
 
-		' 	  vUv = uv;',
+		'     vUv = uv;',
 
 		'     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
 		'     gl_Position = projectionMatrix * mvPosition;',
@@ -684,7 +684,7 @@ THREE.Fire.DriftShader = {
 
 		'void main() {',
 
-		' 	  vUv = uv;',
+		'     vUv = uv;',
 
 		'     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
 		'     gl_Position = projectionMatrix * mvPosition;',
@@ -758,7 +758,7 @@ THREE.Fire.ProjectionShader1 = {
 
 		'void main() {',
 
-		' 	  vUv = uv;',
+		'     vUv = uv;',
 
 		'     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
 		'     gl_Position = projectionMatrix * mvPosition;',
@@ -815,7 +815,7 @@ THREE.Fire.ProjectionShader2 = {
 
 		'void main() {',
 
-		' 	  vUv = uv;',
+		'     vUv = uv;',
 
 		'     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
 		'     gl_Position = projectionMatrix * mvPosition;',
@@ -876,7 +876,7 @@ THREE.Fire.ProjectionShader3 = {
 
 		'void main() {',
 
-		' 	  vUv = uv;',
+		'     vUv = uv;',
 
 		'     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
 		'     gl_Position = projectionMatrix * mvPosition;',
@@ -945,7 +945,7 @@ THREE.Fire.ColorShader = {
 
 		'void main() {',
 
-		' 	  vUv = uv;',
+		'     vUv = uv;',
 
 		'     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
 		'     gl_Position = projectionMatrix * mvPosition;',
@@ -1004,7 +1004,7 @@ THREE.Fire.DebugShader = {
 
 		'void main() {',
 
-		' 	  vUv = uv;',
+		'     vUv = uv;',
 
 		'     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );',
 		'     gl_Position = projectionMatrix * mvPosition;',
