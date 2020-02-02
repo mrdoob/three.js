@@ -3,6 +3,7 @@ import {
 	Matrix3,
 	Matrix4,
 	Plane,
+	Ray,
 	Sphere,
 	Vector3
 } from '../../../src/Three';
@@ -24,6 +25,8 @@ export class OBB {
 	intersectsSphere( sphere: Sphere ): boolean;
 	intersectsOBB( obb: OBB, epsilon: number ): boolean;
 	intersectsPlane( plane: Plane ): boolean;
+	intersectRay( ray: Ray, result: Vector3 ): Vector3 | null;
+	intersectsRay( ray: Ray ): boolean;
 	fromBox3( box3: Box3 ): this;
 	equals( obb: OBB ): boolean;
 	applyMatrix4( matrix: Matrix4 ): this;

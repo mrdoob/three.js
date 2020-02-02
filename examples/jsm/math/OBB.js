@@ -3,8 +3,11 @@
  */
 
 import {
+	Box3,
 	MathUtils,
+	Matrix4,
 	Matrix3,
+	Ray,
 	Vector3
 } from "../../../build/three.module.js";
 
@@ -30,8 +33,13 @@ var xAxis = new Vector3();
 var yAxis = new Vector3();
 var zAxis = new Vector3();
 var v1 = new Vector3();
+var size = new Vector3();
 var closestPoint = new Vector3();
 var rotationMatrix = new Matrix3();
+var aabb = new Box3();
+var matrix = new Matrix4();
+var inverse = new Matrix4();
+var localRay = new Ray();
 
 // OBB
 
@@ -302,6 +310,53 @@ Object.assign( OBB.prototype, {
 
 	},
 
+	/**
+	* Performs a ray/OBB intersection test and stores the intersection point
+	* to the given 3D vector. If no intersection is detected, *null* is returned.
+	*/
+	intersectRay: function ( ray, result ) {
+
+		// the idea is to perform the intersection test in the local space
+		// of the OBB.
+
+		this.getSize( size );
+		aabb.setFromCenterAndSize( v1.set( 0, 0, 0 ), size );
+
+		// create a 4x4 transformation matrix
+
+		matrix4FromRotationMatrix( matrix, this.rotation );
+		matrix.setPosition( this.center );
+
+		// transform ray to the local space of the OBB
+
+		localRay.copy( ray ).applyMatrix4( inverse.getInverse( matrix ) );
+
+		// perform ray <-> AABB intersection test
+
+		if ( localRay.intersectBox( aabb, result ) ) {
+
+			// transform the intersection point back to world space
+
+			return result.applyMatrix4( matrix );
+
+		} else {
+
+			return null;
+
+		}
+
+	},
+
+	/**
+	* Performs a ray/OBB intersection test. Returns either true or false if
+	* there is a intersection or not.
+	*/
+	intersectsRay: function ( ray ) {
+
+		return this.intersectRay( ray, v1 ) !== null;
+
+	},
+
 	fromBox3: function ( box3 ) {
 
 		box3.getCenter( this.center );
@@ -365,6 +420,33 @@ Object.assign( OBB.prototype, {
 	}
 
 } );
+
+function matrix4FromRotationMatrix( matrix4, matrix3 ) {
+
+	var e = matrix4.elements;
+	var me = matrix3.elements;
+
+	e[ 0 ] = me[ 0 ];
+	e[ 1 ] = me[ 1 ];
+	e[ 2 ] = me[ 2 ];
+	e[ 3 ] = 0;
+
+	e[ 4 ] = me[ 3 ];
+	e[ 5 ] = me[ 4 ];
+	e[ 6 ] = me[ 5 ];
+	e[ 7 ] = 0;
+
+	e[ 8 ] = me[ 6 ];
+	e[ 9 ] = me[ 7 ];
+	e[ 10 ] = me[ 8 ];
+	e[ 11 ] = 0;
+
+	e[ 12 ] = 0;
+	e[ 13 ] = 0;
+	e[ 14 ] = 0;
+	e[ 15 ] = 1;
+
+}
 
 var obb = new OBB();
 

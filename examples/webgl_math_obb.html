@@ -30,9 +30,9 @@
 
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, clock, controls, stats;
+			var camera, scene, renderer, clock, controls, stats, raycaster, hitbox;
 
-			var objects = [];
+			var objects = [], mouse = new THREE.Vector2();
 
 			init();
 			animate();
@@ -46,6 +46,8 @@
 				scene.background = new THREE.Color( 0xffffff );
 
 				clock = new THREE.Clock();
+
+				raycaster = new THREE.Raycaster();
 
 				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x222222, 1.5 );
 				hemiLight.position.set( 1, 1, 1 );
@@ -86,6 +88,12 @@
 
 				}
 
+				//
+
+				hitbox = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, wireframe: true } ) );
+
+				//
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -105,6 +113,60 @@
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				document.addEventListener( 'click', onClick, false );
+
+			}
+
+			function onClick( event ) {
+
+				event.preventDefault();
+
+				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera( mouse, camera );
+
+				var intersectionPoint = new THREE.Vector3();
+				var intersections = [];
+
+				for ( var i = 0, il = objects.length; i < il; i ++ ) {
+
+					var object = objects[ i ];
+					var obb = object.userData.obb;
+
+					var ray = raycaster.ray;
+
+					if ( obb.intersectRay( ray, intersectionPoint ) !== null ) {
+
+						var distance = ray.origin.distanceTo( intersectionPoint );
+						intersections.push( { distance: distance, object: object } );
+
+					}
+
+				}
+
+				if ( intersections.length > 0 ) {
+
+					// determine closest intersection and highlight the respective 3D object
+
+					intersections.sort( sortIntersections );
+
+					intersections[ 0 ].object.add( hitbox );
+
+				} else {
+
+					var parent = hitbox.parent;
+
+					if ( parent ) parent.remove( hitbox );
+
+				}
+
+			}
+
+			function sortIntersections( a, b ) {
+
+				return a.distance - b.distance;
 
 			}
 
