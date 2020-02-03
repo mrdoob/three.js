@@ -8,12 +8,18 @@ will hopefully give you some ideas on how to start.
 
 At least at the time I'm writing this article it's probably going to be the
 longest article on this site. It's possible the code here is massively over
-engineered but as I wrote each new feature I'd run into needed a solution I'm
-used to from other games I've written. In other words each new solution seemed
-important so I'll try to show why. Of course the smaller your game the less you
-might need some of the solutions shown here but this is a pretty small game and
-yet with the complexities of 3D characters many things take more organization
-than they might with 2D characters.
+engineered but as I wrote each new feature I'd run into a problem that needed a
+solution I'm used to from other games I've written. In other words each new
+solution seemed important so I'll try to show why. Of course the smaller your
+game the less you might need some of the solutions shown here but this is a
+pretty small game and yet with the complexities of 3D characters many things
+take more organization than they might with 2D characters.
+
+As an example if you're making PacMan in 2D, when PacMan turns a corner
+that happens instantly at 90 degrees. There is no in-between step. But
+in a 3D game often we need the character to rotate over several frames.
+That simple change can add a bunch of complexity and require different
+solutions.
 
 The majority of the code here will not really be three.js and
 that's important to note, **three.js is not a game engine**.
@@ -23,7 +29,7 @@ but it does not provide all the other things needed to make a game.
 No collisions, no physics, no input systems, no path finding, etc, etc...
 So, we'll have to provide those things ourselves.
 
-I ended up writing quite a but of code to make this simple *unfinished* 
+I ended up writing quite a bit of code to make this simple *unfinished* 
 game like thing and again, it's certainly possible I over engineered and there
 are simpler solutions but I feel like I actually didn't write
 enough code and hopefully I can explain what I think is missing.
@@ -263,7 +269,7 @@ function init() {
 }
 ```
 
-Above for each model we clone the `gltf.scene` we loaded and we parent that
+Above, for each model, we clone the `gltf.scene` we loaded and we parent that
 to a new `Object3D`. We need to parent it to another object because when
 we play animations the animation will apply animated positions to the nodes
 in the loaded scene which means we won't have control over those positions.
@@ -274,7 +280,7 @@ An `AnimationMixer` contains 1 or more `AnimationAction`s. An
 have all kinds of settings for playing then chaining to another
 action or cross fading between actions. Let's just get the first 
 `AnimationClip` and create an action for it. The default is for
-an action the play its clip in a loop forever.
+an action to play its clip in a loop forever.
 
 ```js
 +const mixers = [];
@@ -498,7 +504,7 @@ const component = new TypeOfComponent(gameObject);
 gameObject.addComponent(component);
 ```
 
-Is it better that this is shorter and more automated or is it worse
+Is it better that the first way is shorter and more automated or is it worse
 because it looks out of the ordinary? I don't know.
 
 `GameObject.getComponent` looks up components by type. That has
@@ -509,7 +515,7 @@ look up the first one without adding some other API.
 It's common for one component to look up another and when looking them up they
 have to match by type otherwise you might get the wrong one. We could instead
 give each component a name and you could look them up by name. That would be
-more flexible in that could have more than one component of the same type but it
+more flexible in that you could have more than one component of the same type but it
 would also be more tedious. Again, I'm not sure which is better.
 
 On to the components themselves. Here is their base class.
@@ -531,14 +537,14 @@ leave it up to each component to do whatever it wants in its constructor
 knowing that the first argument is always the component's gameobject.
 If it doesn't care about gameobject it wouldn't store it. I kind of feel like this
 common base is good though. It means if you have a reference to a
-component you know you can find it's parent gameobject always and from its
-parent you can easily look up other components as well is look at its
+component you know you can find its parent gameobject always and from its
+parent you can easily look up other components as well as look at its
 transform.
 
 To manage the gameobjects we probably need some kind of gameobject manager. You
 might think we could just keep an array of gameobjects but in a real game the
 components of a gameobject might add and remove other gameobjects at runtime.
-For example a gun gameobject might add a bullet gameobject ever time the gun
+For example a gun gameobject might add a bullet gameobject every time the gun
 fires. A monster gameobject might remove itself if it has been killed. We then
 would have an issue that we might have code like this
 
@@ -982,8 +988,8 @@ parented to something else <a class="footnote" href="#parented" id="parented-bac
 
 We also added a global `moveSpeed` and based a `turnSpeed` on the move speed.
 The turn speed is based on the move speed to try to make sure a character
-can turn sharply enough to meet it's target. If turns speed so too small
-a character will turn around and around circling it's target but never
+can turn sharply enough to meet its target. If `turnSpeed` so too small
+a character will turn around and around circling its target but never
 hitting it. I didn't bother to do the math to calculate the required
 turn speed for a given move speed. I just guessed.
 
@@ -1267,7 +1273,8 @@ class Animal extends Component {
 ```
 
 The code above sets the `AnimationMixer.timeScale` to set the playback
-speed of the animations relative to the move speed.
+speed of the animations relative to the move speed. This way if we
+adjust the move speed the animation will speed up or slow down as well.
 
 To start we could setup one of each type of animal
 
@@ -1551,7 +1558,7 @@ class Player extends Component {
 +    globals.playerRadius = model.size / 2;
 ```
 
-Thinking about now it would probably have been smarter
+Thinking about it now it would probably have been smarter
 for the animals to just target the head of the conga line
 instead of the player specifically. Maybe I'll come back
 and change that later.
@@ -1722,7 +1729,7 @@ And with that we get the kind of start of a game
 
 Originally I set out to make a [snake game](https://www.google.com/search?q=snake+game)
 where as you add animals to your line it gets harder because you need to avoid
-them. I'd also have put some obstacles in the scene and maybe a fence or some
+crashing into them. I'd also have put some obstacles in the scene and maybe a fence or some
 barrier around the perimeter.
 
 Unfortunately the animals are long and thin. From above here's the zebra.
@@ -1775,19 +1782,19 @@ to detect collision.
 If you're looking for a solution some of the three.js examples use
 [ammo.js](https://github.com/kripken/ammo.js/) so that might be one.
 
-One other solution might have been the place the obstacles on a grid
+One other solution might have been to place the obstacles on a grid
 and try to make it so each animal and the player just need to look at
-the grid. What would be performant I felt that's best left as an exercise
+the grid. While that would be performant I felt that's best left as an exercise
 for the reader 😜
 
 One more thing, many game systems have something called [*coroutines*](https://www.google.com/search?q=coroutines).
-Coroutines are routines that and pause while running and continue later.
+Coroutines are routines that can pause while running and continue later.
 
 Let's make the main character emit musical notes like they are leading
 the line by singing. There are many ways we could implement this but for now
 let's do it using coroutines.
 
-First, here's a class the manage coroutines
+First, here's a class to manage coroutines
 
 ```js
 function* waitSeconds(duration) {
@@ -1862,7 +1869,7 @@ It does things similar to `SafeArray` to make sure that it's safe to add or remo
 coroutines while other coroutines are running. It also handles nested coroutines.
 
 To make a coroutine you make a [JavaScript generator function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function*).
-A generator function has preceded by the keyword `function*` (the asterisk is important!)
+A generator function is preceded by the keyword `function*` (the asterisk is important!)
 
 Generator functions can `yield`. For example
 
