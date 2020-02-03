@@ -163,6 +163,7 @@ var SidebarProject = function ( editor ) {
 		currentRenderer = new THREE.WebGLRenderer( parameters );
 		currentPmremGenerator = new THREE.PMREMGenerator( currentRenderer );
 		currentPmremGenerator.compileCubemapShader();
+		currentPmremGenerator.compileEquirectangularShader();
 
 		if ( shadows ) {
 

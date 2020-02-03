@@ -475,7 +475,7 @@ var Viewport = function ( editor ) {
 
 	var currentBackgroundType = null;
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundCubeTexture ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundCubeTexture, backgroundEquirectTexture ) {
 
 		if ( currentBackgroundType !== backgroundType ) {
 
@@ -506,12 +506,32 @@ var Viewport = function ( editor ) {
 
 			if ( backgroundCubeTexture && backgroundCubeTexture.isHDRTexture ) {
 
-				scene.background = pmremGenerator.fromCubemap( backgroundCubeTexture ).texture;
-				scene.environment = scene.background;
+				var texture = pmremGenerator.fromCubemap( backgroundCubeTexture ).texture;
+				texture.isPmremTexture = true;
+
+				scene.background = texture;
+				scene.environment = texture;
 
 			} else {
 
 				scene.background = backgroundCubeTexture;
+				scene.environment = null;
+
+			}
+
+		} else if ( backgroundType === 'Equirect' ) {
+
+			if ( backgroundEquirectTexture && backgroundEquirectTexture.isHDRTexture ) {
+
+				var texture = pmremGenerator.fromEquirectangular( backgroundEquirectTexture ).texture;
+				texture.isPmremTexture = true;
+
+				scene.background = texture;
+				scene.environment = texture;
+
+			} else {
+
+				scene.background = null;
 				scene.environment = null;
 
 			}
