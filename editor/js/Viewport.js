@@ -31,6 +31,7 @@ var Viewport = function ( editor ) {
 	//
 
 	var renderer = null;
+	var pmremGenerator = null;
 
 	var camera = editor.camera;
 	var scene = editor.scene;
@@ -324,7 +325,7 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( newRenderer ) {
+	signals.rendererChanged.add( function ( newRenderer, newPmremGenerator ) {
 
 		if ( renderer !== null ) {
 
@@ -333,6 +334,7 @@ var Viewport = function ( editor ) {
 		}
 
 		renderer = newRenderer;
+		pmremGenerator = newPmremGenerator;
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
@@ -493,14 +495,26 @@ var Viewport = function ( editor ) {
 		if ( backgroundType === 'Color' ) {
 
 			scene.background.set( backgroundColor );
+			scene.environment = null;
 
 		} else if ( backgroundType === 'Texture' ) {
 
 			scene.background = backgroundTexture;
+			scene.environment = null;
 
 		} else if ( backgroundType === 'CubeTexture' ) {
 
-			scene.background = backgroundCubeTexture;
+			if ( backgroundCubeTexture && backgroundCubeTexture.isHDRTexture ) {
+
+				scene.background = pmremGenerator.fromCubemap( backgroundCubeTexture ).texture;
+				scene.environment = scene.background;
+
+			} else {
+
+				scene.background = backgroundCubeTexture;
+				scene.environment = null;
+
+			}
 
 		}
 

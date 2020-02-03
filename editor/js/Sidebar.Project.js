@@ -16,6 +16,7 @@ var SidebarProject = function ( editor ) {
 	var strings = editor.strings;
 
 	var currentRenderer = null;
+	var currentPmremGenerator = null;
 
 	var container = new UISpan();
 
@@ -151,7 +152,17 @@ var SidebarProject = function ( editor ) {
 	function createRenderer( antialias, shadows, toneMapping ) {
 
 		var parameters = { antialias: antialias };
+
+		if ( currentRenderer !== null ) {
+
+			currentRenderer.dispose();
+			currentPmremGenerator.dispose();
+
+		}
+
 		currentRenderer = new THREE.WebGLRenderer( parameters );
+		currentPmremGenerator = new THREE.PMREMGenerator( currentRenderer );
+		currentPmremGenerator.compileCubemapShader();
 
 		if ( shadows ) {
 
@@ -162,7 +173,7 @@ var SidebarProject = function ( editor ) {
 
 		currentRenderer.toneMapping = parseFloat( toneMapping );
 
-		signals.rendererChanged.dispatch( currentRenderer );
+		signals.rendererChanged.dispatch( currentRenderer, currentPmremGenerator );
 
 	}
 
