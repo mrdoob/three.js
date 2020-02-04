@@ -3,9 +3,9 @@ Description: How to implement a 3DLUT Post Process in THREE.js
 TOC: Applying a LUT File for effects
 
 In the last article we went over [post processing](threejs-post-processing.html).
-On of the common ways to post process is called a LUT or 3DLUT. LUT stands for LookUp Table. A 3DLUT is therefore a 3 dimensional look up table.
+One of the common ways to post process is called a LUT or 3DLUT. LUT stands for LookUp Table. A 3DLUT is therefore a 3 dimensional look up table.
 
-How it works is we make a cube of colors. Then we index the cube using the colors of our source image. For each pixel in the original image we look up a position in the cube based on the red, green, and blue colors of the original pixel. The value we pull put of the 3DLUT is the new color.
+How it works is we make a cube of colors. Then we index the cube using the colors of our source image. For each pixel in the original image we look up a position in the cube based on the red, green, and blue colors of the original pixel. The value we pull out of the 3DLUT is the new color.
 
 In Javascript we might do it like this. Imagine the colors are specified in integers from 0 to 255 and we have a large 3 dimensional array 256x256x256 in size. Then for to translate a color through the look up table
 
@@ -45,7 +45,7 @@ We'll also add a background image like we covered in [backgrounds and skyboxs](t
 
 {{{example url="../threejs-postprocessing-3dlut-prep.html" }}}
 
-Now that we have a scene we need a 3DLUT. The simplest 3DLUT is a 2x2x2 identity LUT where *identity* means nothing happens. It's like multiplying by 1 or doing nothign, even though we're looking up colors in the LUT each color in maps to the same color out.
+Now that we have a scene we need a 3DLUT. The simplest 3DLUT is a 2x2x2 identity LUT where *identity* means nothing happens. It's like multiplying by 1 or doing nothing, even though we're looking up colors in the LUT each color in maps to the same color out.
 
 <div class="threejs_center"><img src="resources/images/3dlut-standard-2x2.svg" class="noinvertdark" style="width: 200px"></div>
 
