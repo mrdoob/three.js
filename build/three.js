@@ -1136,11 +1136,9 @@
 
 		extractBasis: function ( xAxis, yAxis, zAxis ) {
 
-			var te = this.elements;
-
-			xAxis.fromArray( te, 0 );
-			yAxis.fromArray( te, 3 );
-			zAxis.fromArray( te, 6 );
+			xAxis.setFromMatrix3Column( this, 0 );
+			yAxis.setFromMatrix3Column( this, 1 );
+			zAxis.setFromMatrix3Column( this, 2 );
 
 			return this;
 
@@ -18407,6 +18405,9 @@
 
 		// clean up
 
+		gl.detachShader( program, glVertexShader );
+		gl.detachShader( program, glFragmentShader );
+
 		gl.deleteShader( glVertexShader );
 		gl.deleteShader( glFragmentShader );
 
@@ -19250,11 +19251,7 @@
 			point: [],
 			pointShadowMap: [],
 			pointShadowMatrix: [],
-			hemi: [],
-
-			numDirectionalShadows: - 1,
-			numPointShadows: - 1,
-			numSpotShadows: - 1
+			hemi: []
 
 		};
 
