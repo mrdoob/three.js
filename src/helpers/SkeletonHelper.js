@@ -85,6 +85,8 @@ function SkeletonHelper( object ) {
 SkeletonHelper.prototype = Object.create( LineSegments.prototype );
 SkeletonHelper.prototype.constructor = SkeletonHelper;
 
+SkeletonHelper.prototype.isSkeletonHelper = true;
+
 SkeletonHelper.prototype.updateMatrixWorld = function ( force ) {
 
 	var bones = this.bones;
