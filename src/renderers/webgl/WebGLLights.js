@@ -140,7 +140,7 @@ function WebGLLights() {
 		point: [],
 		pointShadowMap: [],
 		pointShadowMatrix: [],
-		hemi: [],
+		hemi: []
 
 	};
 
