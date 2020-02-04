@@ -32,6 +32,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: LOD,
 
 	isLOD: true,
+	
+	currentLevel: 0,
 
 	copy: function ( source ) {
 
@@ -146,6 +148,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				}
 
 			}
+			
+			this.currentLevel = i - 1;
 
 			for ( ; i < l; i ++ ) {
 
