@@ -30,10 +30,6 @@ export class WebGLLights {
 		pointShadowMap: Array<any>;
 		pointShadowMatrix: Array<any>;
 		hemi: Array<any>;
-
-		numDirectionalShadows: number;
-		numPointShadows: number;
-		numSpotShadows: number;
 	};
 
 	get( light: any ): any;
