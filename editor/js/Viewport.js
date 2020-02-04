@@ -79,9 +79,11 @@ var Viewport = function ( editor ) {
 
 			selectionBox.setFromObject( object );
 
-			if ( editor.helpers[ object.id ] !== undefined ) {
+			var helper = editor.helpers[ object.id ];
 
-				editor.helpers[ object.id ].update();
+			if ( helper !== undefined && helper.isSkeletonHelper !== true ) {
+
+				helper.update();
 
 			}
 
