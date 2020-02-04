@@ -12,6 +12,7 @@ export class InterleavedBufferAttribute {
 		normalized?: boolean
 	);
 
+	name: string;
 	data: InterleavedBuffer;
 	itemSize: number;
 	offset: number;
@@ -45,5 +46,11 @@ export class InterleavedBufferAttribute {
 		z: number,
 		w: number
 	): InterleavedBufferAttribute;
+	toJSON(): {
+		itemSize: number,
+		type: string,
+		array: number[],
+		normalized: boolean
+	};
 
 }
