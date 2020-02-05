@@ -560,11 +560,9 @@ var SidebarMaterial = function ( editor ) {
 
 	var materialWireframeRow = new UIRow();
 	var materialWireframe = new UICheckbox( false ).onChange( update );
-	var materialWireframeLinewidth = new UINumber( 1 ).setWidth( '60px' ).setRange( 0, 100 ).onChange( update );
 
 	materialWireframeRow.add( new UIText( strings.getKey( 'sidebar/material/wireframe' ) ).setWidth( '90px' ) );
 	materialWireframeRow.add( materialWireframe );
-	materialWireframeRow.add( materialWireframeLinewidth );
 
 	container.add( materialWireframeRow );
 
@@ -1138,12 +1136,6 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
-			if ( material.wireframeLinewidth !== undefined && Math.abs( material.wireframeLinewidth - materialWireframeLinewidth.getValue() ) >= 0.01 ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'wireframeLinewidth', materialWireframeLinewidth.getValue(), currentMaterialSlot ) );
-
-			}
-
 			refreshUI();
 
 		}
@@ -1596,12 +1588,6 @@ var SidebarMaterial = function ( editor ) {
 		if ( material.wireframe !== undefined ) {
 
 			materialWireframe.setValue( material.wireframe );
-
-		}
-
-		if ( material.wireframeLinewidth !== undefined ) {
-
-			materialWireframeLinewidth.setValue( material.wireframeLinewidth );
 
 		}
 
