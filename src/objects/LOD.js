@@ -33,7 +33,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: LOD,
 
 	isLOD: true,
-	
+
 	copy: function ( source ) {
 
 		Object3D.prototype.copy.call( this, source, false );
