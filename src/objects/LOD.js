@@ -14,8 +14,6 @@ function LOD() {
 
 	Object3D.call( this );
 
-	this.currentLevel = 0;
-
 	this.type = 'LOD';
 
 	Object.defineProperties( this, {
@@ -34,6 +32,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: LOD,
 
 	isLOD: true,
+
+	currentLevel: 0,
 
 	copy: function ( source ) {
 
