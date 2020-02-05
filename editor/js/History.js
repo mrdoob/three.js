@@ -204,7 +204,7 @@ History.prototype = {
 		for ( var i = 0; i < json.undos.length; i ++ ) {
 
 			var cmdJSON = json.undos[ i ];
-			var cmd = new Commands[ cmdJSON.type ](); // creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -216,7 +216,7 @@ History.prototype = {
 		for ( var i = 0; i < json.redos.length; i ++ ) {
 
 			var cmdJSON = json.redos[ i ];
-			var cmd = new Commands[ cmdJSON.type ](); // creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
