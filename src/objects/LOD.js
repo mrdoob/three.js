@@ -14,6 +14,8 @@ function LOD() {
 
 	Object3D.call( this );
 
+	this._currentLevel = 0;
+
 	this.type = 'LOD';
 
 	Object.defineProperties( this, {
@@ -32,8 +34,6 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: LOD,
 
 	isLOD: true,
-
-	currentLevel: 0,
 
 	copy: function ( source ) {
 
@@ -78,6 +78,12 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		this.add( object );
 
 		return this;
+
+	},
+
+        getCurrentLevel: function () {
+
+                 return this._currentLevel;
 
 	},
 
@@ -149,7 +155,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			}
 
-			this.currentLevel = i - 1;
+			this._currentLevel = i - 1;
 
 			for ( ; i < l; i ++ ) {
 
