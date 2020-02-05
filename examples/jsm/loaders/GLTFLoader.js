@@ -518,10 +518,6 @@ var GLTFLoader = ( function () {
 				if ( material.map ) material.map.encoding = sRGBEncoding;
 				if ( material.emissiveMap ) material.emissiveMap.encoding = sRGBEncoding;
 
-				assignExtrasToUserData( material, materialDef );
-
-				if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
-
 				return material;
 
 			} );
@@ -1253,13 +1249,13 @@ var GLTFLoader = ( function () {
 
 	}
 
-	function addUnknownExtensionsToUserData( knownExtensions, object, objectDef ) {
+	function addUnknownExtensionsToUserData( knownExtensions, knownExtensionPlugins, object, objectDef ) {
 
 		// Add unknown glTF extensions to an object's userData.
 
 		for ( var name in objectDef.extensions ) {
 
-			if ( knownExtensions[ name ] === undefined ) {
+			if ( knownExtensions[ name ] === undefined && knownExtensionPlugins[ name ] === undefined ) {
 
 				object.userData.gltfExtensions = object.userData.gltfExtensions || {};
 				object.userData.gltfExtensions[ name ] = objectDef.extensions[ name ];
@@ -1479,6 +1475,7 @@ var GLTFLoader = ( function () {
 		var parser = this;
 		var json = this.json;
 		var extensions = this.extensions;
+		var extensionPlugins = this.plugins.extensions;
 
 		// Clear the loader cache
 		this.cache.removeAll();
@@ -1511,11 +1508,13 @@ var GLTFLoader = ( function () {
 				userData: {}
 			};
 
-			addUnknownExtensionsToUserData( extensions, result, json );
+			return parser._onAfter( 'GLTF', result, json );
 
+		} ).then( function ( result ) {
+
+			addUnknownExtensionsToUserData( extensions, extensionPlugins, result, json );
 			assignExtrasToUserData( result, json );
-
-			parser._onAfter( 'GLTF', result, json ).then( onLoad );
+			onLoad( result );
 
 		} ).catch( onError );
 
@@ -1702,6 +1701,8 @@ var GLTFLoader = ( function () {
 		var json = parser.json;
 		var cacheKey = type + ':' + index;
 		var dependency = this.cache.get( cacheKey );
+		var extensions = parser.extensions;
+		var extensionPlugins = parser.plugins.extensions;
 
 		if ( ! dependency ) {
 
@@ -1722,6 +1723,14 @@ var GLTFLoader = ( function () {
 
 						return parser._onAfter( type, scene, sceneDef );
 
+					} ).then( function ( scene ) {
+
+						assignExtrasToUserData( scene, sceneDef );
+
+						if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, extensionPlugins, scene, sceneDef );
+
+						return scene;
+
 					} );
 					break;
 
@@ -1740,6 +1749,14 @@ var GLTFLoader = ( function () {
 
 						return parser._onAfter( type, node, nodeDef );
 
+					} ).then( function ( node ) {
+
+						assignExtrasToUserData( node, nodeDef );
+
+						if ( nodeDef.extensions ) addUnknownExtensionsToUserData( extensions, extensionPlugins, node, nodeDef );
+
+						return node;
+
 					} );
 					break;
 
@@ -1757,6 +1774,24 @@ var GLTFLoader = ( function () {
 					} ).then( function ( mesh ) {
 
 						return parser._onAfter( type, mesh, meshDef );
+
+					} ).then( function ( mesh ) {
+
+						if ( mesh.isGroup ) {
+
+							for ( var i = 0, il = mesh.children.length; i < il; i ++ ) {
+
+								assignExtrasToUserData( mesh.children[ i ], meshDef );
+
+							}
+
+						} else {
+
+							assignExtrasToUserData( mesh, meshDef );
+
+						}
+
+						return mesh;
 
 					} );
 					break;
@@ -1830,6 +1865,14 @@ var GLTFLoader = ( function () {
 
 						return parser._onAfter( type, material, materialDef );
 
+					} ).then( function ( material ) {
+
+						assignExtrasToUserData( material, materialDef );
+
+						if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, extensionPlugins, material, materialDef );
+
+						return material;
+
 					} );
 					break;
 
@@ -1901,6 +1944,12 @@ var GLTFLoader = ( function () {
 					} ).then( function ( camera ) {
 
 						return parser._onAfter( type, camera, cameraDef );
+
+					} ).then( function ( camera ) {
+
+						assignExtrasToUserData( camera, cameraDef );
+
+						return camera;
 
 					} );
 					break;
@@ -2567,10 +2616,6 @@ var GLTFLoader = ( function () {
 			if ( material.map ) material.map.encoding = sRGBEncoding;
 			if ( material.emissiveMap ) material.emissiveMap.encoding = sRGBEncoding;
 
-			assignExtrasToUserData( material, materialDef );
-
-			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
-
 			return material;
 
 		} );
@@ -2712,8 +2757,6 @@ var GLTFLoader = ( function () {
 			pending.push( accessor );
 
 		}
-
-		assignExtrasToUserData( geometry, primitiveDef );
 
 		computeBounds( geometry, primitiveDef, parser );
 
@@ -2884,6 +2927,11 @@ var GLTFLoader = ( function () {
 
 						return parser._onAfter( 'Geometry', geometry, primitive );
 
+					} ).then( function ( geometry ) {
+
+						assignExtrasToUserData( geometry, primitive );
+						return geometry;
+
 					} );
 
 				} );
@@ -3006,8 +3054,6 @@ var GLTFLoader = ( function () {
 
 				if ( geometries.length > 1 ) mesh.name += '_' + i;
 
-				assignExtrasToUserData( mesh, meshDef );
-
 				parser.assignFinalMaterial( mesh );
 
 				meshes.push( mesh );
@@ -3062,8 +3108,6 @@ var GLTFLoader = ( function () {
 		}
 
 		if ( cameraDef.name !== undefined ) camera.name = cameraDef.name;
-
-		assignExtrasToUserData( camera, cameraDef );
 
 		return Promise.resolve( camera );
 
@@ -3403,10 +3447,6 @@ var GLTFLoader = ( function () {
 
 			}
 
-			assignExtrasToUserData( node, nodeDef );
-
-			if ( nodeDef.extensions ) addUnknownExtensionsToUserData( extensions, node, nodeDef );
-
 			if ( nodeDef.matrix !== undefined ) {
 
 				var matrix = new Matrix4();
@@ -3554,10 +3594,6 @@ var GLTFLoader = ( function () {
 
 			var scene = new Scene();
 			if ( sceneDef.name !== undefined ) scene.name = sceneDef.name;
-
-			assignExtrasToUserData( scene, sceneDef );
-
-			if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, scene, sceneDef );
 
 			var nodeIds = sceneDef.nodes || [];
 
