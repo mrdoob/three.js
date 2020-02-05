@@ -56,8 +56,8 @@ var SidebarProject = function ( editor ) {
 
 	// Renderer
 
-	var rendererPropertiesRow = new UIRow();
-	rendererPropertiesRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
+	var rendererPropertiesRow1 = new UIRow();
+	rendererPropertiesRow1.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
 
 	// Renderer / Antialias
 
@@ -67,7 +67,7 @@ var SidebarProject = function ( editor ) {
 		updateRenderer();
 
 	} );
-	rendererPropertiesRow.add( rendererAntialias );
+	rendererPropertiesRow1.add( rendererAntialias );
 
 	// Renderer / Shadows
 
@@ -77,9 +77,24 @@ var SidebarProject = function ( editor ) {
 		updateRenderer();
 
 	} );
-	rendererPropertiesRow.add( rendererShadows );
+	rendererPropertiesRow1.add( rendererShadows );
 
-	projectsettings.add( rendererPropertiesRow );
+	projectsettings.add( rendererPropertiesRow1 );
+
+	// Renderer / Physically Correct lights
+
+	var rendererPropertiesRow2 = new UIRow();
+
+	var rendererPhysicallyCorrectLights = new UIBoolean( config.getKey( 'project/renderer/physicallyCorrectLights' ), strings.getKey( 'sidebar/project/physicallyCorrectLights' ) ).onChange( function () {
+
+		config.setKey( 'project/renderer/physicallyCorrectLights', this.getValue() );
+		updateRenderer();
+
+	} );
+	rendererPhysicallyCorrectLights.setMarginLeft( '90px' );
+	rendererPropertiesRow2.add( rendererPhysicallyCorrectLights );
+
+	projectsettings.add( rendererPropertiesRow2 );
 
 	// Tonemapping
 
@@ -145,11 +160,16 @@ var SidebarProject = function ( editor ) {
 
 	function updateRenderer() {
 
-		createRenderer( rendererAntialias.getValue(), rendererShadows.getValue(), rendererToneMappingTypeSelect.getValue() );
+		createRenderer(
+			rendererAntialias.getValue(),
+			rendererShadows.getValue(),
+			rendererToneMappingTypeSelect.getValue(),
+		 	rendererPhysicallyCorrectLights.getValue()
+		);
 
 	}
 
-	function createRenderer( antialias, shadows, toneMapping ) {
+	function createRenderer( antialias, shadows, toneMapping, physicallyCorrectLights ) {
 
 		var parameters = { antialias: antialias };
 
@@ -173,6 +193,7 @@ var SidebarProject = function ( editor ) {
 		}
 
 		currentRenderer.toneMapping = parseFloat( toneMapping );
+		currentRenderer.physicallyCorrectLights = physicallyCorrectLights;
 
 		signals.rendererChanged.dispatch( currentRenderer, currentPmremGenerator );
 
@@ -187,7 +208,12 @@ var SidebarProject = function ( editor ) {
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ), config.getKey( 'project/renderer/toneMapping' ) );
+	createRenderer(
+		config.getKey( 'project/renderer/antialias' ),
+		config.getKey( 'project/renderer/shadows' ),
+		config.getKey( 'project/renderer/toneMapping' ),
+		config.getKey( 'project/renderer/physicallyCorrectLights' )
+	 );
 
 	// Materials
 
