@@ -250,12 +250,12 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			geometry.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new BufferAttribute( normals, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new BufferAttribute( normals, 3 ) );
 
 			if ( hasColors ) {
 
-				geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 				geometry.hasColors = true;
 				geometry.alpha = alpha;
 
@@ -283,7 +283,6 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var result;
 
-			var groupVertexes = [];
 			var groupCount = 0;
 			var startVertex = 0;
 			var endVertex = 0;
@@ -339,23 +338,16 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
-				groupVertexes.push( { startVertex: startVertex, endVertex: endVertex } );
+				var start = startVertex;
+				var count = endVertex - startVertex;
+
+				geometry.addGroup( start, count, groupCount );
 				groupCount ++;
 
 			}
 
-			geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-			geometry.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-
-			if ( groupCount > 0 ) {
-
-				for ( var i = 0; i < groupVertexes.length; i ++ ) {
-
-					geometry.addGroup( groupVertexes[ i ].startVertex, groupVertexes[ i ].endVertex, i );
-
-				}
-
-			}
+			geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+			geometry.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
 
 			return geometry;
 

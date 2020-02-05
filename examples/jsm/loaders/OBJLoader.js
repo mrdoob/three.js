@@ -27,6 +27,8 @@ var OBJLoader = ( function () {
 	var material_library_pattern = /^mtllib /;
 	// usemtl material_name
 	var material_use_pattern = /^usemtl /;
+	// usemap map_name
+	var map_use_pattern = /^usemap /;
 
 	function ParserState() {
 
@@ -39,6 +41,7 @@ var OBJLoader = ( function () {
 			colors: [],
 			uvs: [],
 
+			materials: {},
 			materialLibraries: [],
 
 			startObject: function ( name, fromDeclaration ) {
@@ -303,6 +306,12 @@ var OBJLoader = ( function () {
 
 				this.addVertex( ia, ib, ic );
 
+				if ( this.colors.length > 0 ) {
+
+					this.addColor( ia, ib, ic );
+
+				}
+
 				if ( ua !== undefined && ua !== '' ) {
 
 					var uvLen = this.uvs.length;
@@ -323,12 +332,6 @@ var OBJLoader = ( function () {
 					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
 
 					this.addNormal( ia, ib, ic );
-
-				}
-
-				if ( this.colors.length > 0 ) {
-
-					this.addColor( ia, ib, ic );
 
 				}
 
@@ -414,8 +417,6 @@ var OBJLoader = ( function () {
 		},
 
 		parse: function ( text ) {
-
-			console.time( 'OBJLoader' );
 
 			var state = new ParserState();
 
@@ -587,6 +588,13 @@ var OBJLoader = ( function () {
 
 					state.materialLibraries.push( line.substring( 7 ).trim() );
 
+				} else if ( map_use_pattern.test( line ) ) {
+
+					// the line is parsed but ignored since the loader assumes textures are defined MTL files
+					// (according to https://www.okino.com/conv/imp_wave.htm, 'usemap' is the old-style Wavefront texture reference method)
+
+					console.warn( 'THREE.OBJLoader: Rendering identifier "usemap" not supported. Textures must be defined in MTL files.' );
+
 				} else if ( lineFirstChar === 's' ) {
 
 					result = line.split( ' ' );
@@ -630,7 +638,7 @@ var OBJLoader = ( function () {
 					// Handle null terminated files without exception
 					if ( line === '\0' ) continue;
 
-					throw new Error( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
+					console.warn( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
 
 				}
 
@@ -655,11 +663,11 @@ var OBJLoader = ( function () {
 
 				var buffergeometry = new BufferGeometry();
 
-				buffergeometry.addAttribute( 'position', new Float32BufferAttribute( geometry.vertices, 3 ) );
+				buffergeometry.setAttribute( 'position', new Float32BufferAttribute( geometry.vertices, 3 ) );
 
 				if ( geometry.normals.length > 0 ) {
 
-					buffergeometry.addAttribute( 'normal', new Float32BufferAttribute( geometry.normals, 3 ) );
+					buffergeometry.setAttribute( 'normal', new Float32BufferAttribute( geometry.normals, 3 ) );
 
 				} else {
 
@@ -670,13 +678,13 @@ var OBJLoader = ( function () {
 				if ( geometry.colors.length > 0 ) {
 
 					hasVertexColors = true;
-					buffergeometry.addAttribute( 'color', new Float32BufferAttribute( geometry.colors, 3 ) );
+					buffergeometry.setAttribute( 'color', new Float32BufferAttribute( geometry.colors, 3 ) );
 
 				}
 
 				if ( geometry.uvs.length > 0 ) {
 
-					buffergeometry.addAttribute( 'uv', new Float32BufferAttribute( geometry.uvs, 2 ) );
+					buffergeometry.setAttribute( 'uv', new Float32BufferAttribute( geometry.uvs, 2 ) );
 
 				}
 
@@ -687,7 +695,8 @@ var OBJLoader = ( function () {
 				for ( var mi = 0, miLen = materials.length; mi < miLen; mi ++ ) {
 
 					var sourceMaterial = materials[ mi ];
-					var material = undefined;
+					var materialHash = sourceMaterial.name + '_' + sourceMaterial.smooth + '_' + hasVertexColors;
+					var material = state.materials[ materialHash ];
 
 					if ( this.materials !== null ) {
 
@@ -699,7 +708,6 @@ var OBJLoader = ( function () {
 							var materialLine = new LineBasicMaterial();
 							Material.prototype.copy.call( materialLine, material );
 							materialLine.color.copy( material.color );
-							materialLine.lights = false;
 							material = materialLine;
 
 						} else if ( isPoints && material && ! ( material instanceof PointsMaterial ) ) {
@@ -708,14 +716,13 @@ var OBJLoader = ( function () {
 							Material.prototype.copy.call( materialPoints, material );
 							materialPoints.color.copy( material.color );
 							materialPoints.map = material.map;
-							materialPoints.lights = false;
 							material = materialPoints;
 
 						}
 
 					}
 
-					if ( ! material ) {
+					if ( material === undefined ) {
 
 						if ( isLine ) {
 
@@ -732,11 +739,12 @@ var OBJLoader = ( function () {
 						}
 
 						material.name = sourceMaterial.name;
+						material.flatShading = sourceMaterial.smooth ? false : true;
+						material.vertexColors = hasVertexColors ? VertexColors : NoColors;
+
+						state.materials[ materialHash ] = material;
 
 					}
-
-					material.flatShading = sourceMaterial.smooth ? false : true;
-					material.vertexColors = hasVertexColors ? VertexColors : NoColors;
 
 					createdMaterials.push( material );
 
@@ -792,8 +800,6 @@ var OBJLoader = ( function () {
 				container.add( mesh );
 
 			}
-
-			console.timeEnd( 'OBJLoader' );
 
 			return container;
 

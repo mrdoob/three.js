@@ -19,9 +19,10 @@
 		<h2>Example</h2>
 
 		<p>
-			[example:webgl_lensflares lensflares]
+			[example:webgl_lensflares WebGL / lensflares]
+		</p>
 
-			<code>
+		<code>
 var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
 
 var textureLoader = new THREE.TextureLoader();
@@ -37,9 +38,7 @@ lensflare.addElement( new THREE.LensflareElement( textureFlare1, 512, 0 ) );
 lensflare.addElement( new THREE.LensflareElement( textureFlare2, 60, 0.6 ) );
 
 light.add( lensflare );
-			</code>
-
-		</p>
+		</code>
 
 		<h2>Constructor</h2>
 
@@ -54,13 +53,6 @@ light.add( lensflare );
 
 		<h2>Properties</h2>
 		<p>See the base [page:Mesh] class for common properties.</p>
-
-		<h3>[property:Boolean isLensflare]</h3>
-		<p>
-			Used to check whether this or derived classes are lensflares. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
 
 
 		<h2>Source</h2>

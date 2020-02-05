@@ -75,13 +75,6 @@ var color = new THREE.Color( 1, 0, 0 );
 
 		<h2>属性（Properties）</h2>
 
-		<h3>[property:Boolean isColor]</h3>
-		<p>
-			用来检测此类或者派生类是否为颜色。默认值是 *true*。<br /><br />
-
-			不应该去改变这个值，因为它在内部用于优化。
-		</p>
-
 		<h3>[property:Float r]</h3>
 		<p>
 			红色通道的值在0到1之间。默认值为1。
@@ -294,6 +287,15 @@ var color = new THREE.Color( 1, 0, 0 );
 		但是alpha通道的值将会被丢弃。<br /><br />
 
 		注意，对于X11颜色名称，多个单词(如暗橙色)变成字符串“darkorange”(全部是小写字母)。
+		</p>
+
+		<h3>[method:Color setColorName]( [param:String style] ) </h3>
+		<p>
+		[page:String style] — color name ( from [link:https://en.wikipedia.org/wiki/X11_color_names#Color_name_chart X11 color names] ).<br /><br />
+
+		Sets this color from a color name. Faster than [page:.setStyle] method if you don't need the other CSS-style formats.<br/><br/>
+
+		For convenience, the list of names is exposed in Color.NAMES as a hash: <code>Color.NAMES.aliceblue // returns 0xF0F8FF</code>
 		</p>
 
 		<h3>[method:Color sub]( [param:Color color] ) </h3>

@@ -8,7 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-        [page:Object3D] &rarr; [page:Light] &rarr;
+		[page:Object3D] &rarr; [page:Light] &rarr;
 
 		<h1>半球光（[name]）</h1>
 
@@ -37,7 +37,7 @@ scene.add( light );
 
 		<h2>构造器（Constructor）</h2>
 		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
-    <p>
+	<p>
 		[page:Integer skyColor] - (可选参数) 天空中发出光线的颜色。 缺省值 0xffffff。<br />
 		[page:Integer groundColor] - (可选参数) 地面发出光线的颜色。 缺省值 0xffffff。<br />
 		[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br /><br />
@@ -66,13 +66,6 @@ scene.add( light );
 		<p>
 			在构造时传递的地面发出光线的颜色。
 			默认会创建 [page:Color] 并设置为白色（0xffffff）。
-		</p>
-
-		<h3>[property:Boolean isHemisphereLight]</h3>
-		<p>
-				用来校验这个类或者派生类是不是半球光。缺省值为 *true*。<br /><br />
-
-				不应该去改变这个变量,因为内部使用这个变量做了些优化的工作。
 		</p>
 
 		<h3>[property:Vector3 position]</h3>

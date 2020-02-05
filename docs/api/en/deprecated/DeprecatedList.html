@@ -55,7 +55,7 @@
 
 
 		<h3>[page:DynamicBufferAttribute]</h3>
-		<p>DynamicBufferAttribute has been removed. Use [page:BufferAttribute.setDynamic]( true ) instead.</p>
+		<p>DynamicBufferAttribute has been removed. Use [page:BufferAttribute.setUsage]( THREE.DynamicDrawUsage ) instead.</p>
 
 		<h3>[page:Int8Attribute]</h3>
 		<p>Int8Attribute has been removed. Use [page:BufferAttributeTypes Int8BufferAttribute] instead.</p>
@@ -152,14 +152,6 @@
 
 
 
-		<h2>Geometry</h2>
-
-		<p>
-			Geometry.computeTangents() has been removed.<br /><br />
-
-			Geometry.computeLineDistances() has been removed. Use [page:Line.computeLineDistances] instead.<br /><br />
-		</p>
-
 		<h3>[page:BufferGeometry]</h3>
 		<p>
 			BufferGeometry.addIndex has been renamed to [page:BufferGeometry.setIndex].<br /><br />
@@ -176,13 +168,25 @@
 
 			BufferGeometry.offsets has been renamed to [page:BufferGeometry.groups].<br /><br />
 
+			BufferGeometry.applyMatrix() has been renamed to [page:BufferGeometry.applyMatrix4]().
 		</p>
+
+
+
 
 		<h3>[page:CubeGeometry]</h3>
 		<p>CubeGeometry has been renamed to [page:BoxGeometry].</p>
 
+
+
 		<h3>[page:Geometry]</h3>
-		<p>Geometry.computeTangents() has been removed.</p>
+		<p>
+			Geometry.computeTangents() has been removed.<br /><br />
+
+			Geometry.computeLineDistances() has been removed. Use [page:Line.computeLineDistances] instead.<br /><br />
+
+			Geometry.applyMatrix() has been renamed to [page:Geometry.applyMatrix4]().
+		</p>
 
 		<h3>[page:GeometryUtils]</h3>
 		<p>
@@ -253,7 +257,7 @@
 		<h3>[page:JSONLoader]</h3>
 		<p>JSONLoader has been removed from core.</p>
 
-		<h2>Maths</h2>
+		<h2>Math</h2>
 
 		<h3>[page:Box2]</h3>
 		<p>
@@ -283,6 +287,9 @@
 		<h3>[page:Face4]</h3>
 		<p>Face4 has been removed. Use [page:Face3] instead.</p>
 
+		<h3>[page:Frustum]</h3>
+		<p>Frustum.setFromMatrix() has been renamed to [page:Frustum.setFromProjectionMatrix]().</p>
+
 		<h3>[page:Line3]</h3>
 		<p>Line3.center has been renamed to [page:Line3.getCenter]().</p>
 
@@ -293,15 +300,15 @@
 
 		<h3>[page:Matrix3]</h3>
 		<p>
-			Matrix3.flattenToArrayOffset is deprecated. Use [page:Matrix3.toArray]() instead.<br /><br />
+			Matrix3.flattenToArrayOffset() is deprecated. Use [page:Matrix3.toArray]() instead.<br /><br />
 
-			Matrix3.multiplyVector3 has been removed. Use vector.applyMatrix3( matrix ) instead.<br /><br />
+			Matrix3.multiplyVector3() has been removed. Use vector.applyMatrix3( matrix ) instead.<br /><br />
 
-			Matrix3.multiplyVector3Array has been renamed to [page:Matrix3.applyToVector3Array]( array ).<br /><br />
+			Matrix3.multiplyVector3Array() has been renamed to [page:Matrix3.applyToVector3Array]( array ).<br /><br />
 
-			Matrix3.applyToBuffer has been removed. Use matrix.applyToBufferAttribute( attribute ) instead.<br /><br />
+			Matrix3.applyToBufferAttribute() has been removed. Use [page:BufferAttribute.applyMatrix3]( matrix ) instead.<br /><br />
 
-			Matrix3.applyToVector3Array has been removed.
+			Matrix3.applyToVector3Array() has been removed.
 		<p>
 
 		<h3>[page:Matrix4]</h3>
@@ -332,7 +339,7 @@
 
 			Matrix4.rotateByAxis() has been removed.<br /><br />
 
-			Matrix4.applyToBuffer() has been removed. Use matrix.applyToBufferAttribute() instead.<br /><br />
+			Matrix4.applyToBufferAttribute() has been removed. Use [page:BufferAttribute.applyMatrix4]( matrix ) instead.<br /><br />
 
 			Matrix4.applyToVector3Array() has been removed.<br /><br />
 
@@ -458,7 +465,10 @@
 
 			Object3D.translate() has been removed. Use [page:Object3D.translateOnAxis]( axis, distance ) instead.<br /><br />
 
-			Object3D.useQuaternion has been removed. The library now uses quaternions by default.
+			Object3D.useQuaternion has been removed. The library now uses quaternions by default.<br /><br />
+
+			Object3D.applyMatrix() has been renamed to [page:Object3D.applyMatrix4]().
+
 		</p>
 
 		<h3>[page:LensFlare]</h3>

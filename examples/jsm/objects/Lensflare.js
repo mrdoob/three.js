@@ -42,14 +42,12 @@ var Lensflare = function () {
 	tempMap.magFilter = NearestFilter;
 	tempMap.wrapS = ClampToEdgeWrapping;
 	tempMap.wrapT = ClampToEdgeWrapping;
-	tempMap.needsUpdate = true;
 
 	var occlusionMap = new DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, RGBFormat );
 	occlusionMap.minFilter = NearestFilter;
 	occlusionMap.magFilter = NearestFilter;
 	occlusionMap.wrapS = ClampToEdgeWrapping;
 	occlusionMap.wrapT = ClampToEdgeWrapping;
-	occlusionMap.needsUpdate = true;
 
 	// material
 
@@ -390,8 +388,8 @@ Lensflare.Geometry = ( function () {
 	var interleavedBuffer = new InterleavedBuffer( float32Array, 5 );
 
 	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-	geometry.addAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-	geometry.addAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+	geometry.setAttribute( 'position', new InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+	geometry.setAttribute( 'uv', new InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
 
 	return geometry;
 

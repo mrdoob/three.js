@@ -109,8 +109,8 @@
 
 					material.extensions.derivatives = true;
 
-					geometry.removeAttribute( 'normal' );
-					geometry.removeAttribute( 'uv' );
+					geometry.deleteAttribute( 'normal' );
+					geometry.deleteAttribute( 'uv' );
 
 					setupAttributes( geometry );
 
@@ -160,7 +160,7 @@
 
 				}
 
-				geometry.addAttribute( 'center', new THREE.BufferAttribute( centers, 3 ) );
+				geometry.setAttribute( 'center', new THREE.BufferAttribute( centers, 3 ) );
 
 			}
 

@@ -97,7 +97,8 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 			var taskConfig = {
 				attributeIDs: this.defaultAttributeIDs,
-				attributeTypes: this.defaultAttributeTypes
+				attributeTypes: this.defaultAttributeTypes,
+				useUniqueIDs: false
 			};
 
 			this.decodeGeometry( buffer, taskConfig )
@@ -113,7 +114,8 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		var taskConfig = {
 			attributeIDs: attributeIDs || this.defaultAttributeIDs,
-			attributeTypes: attributeTypes || this.defaultAttributeTypes
+			attributeTypes: attributeTypes || this.defaultAttributeTypes,
+			useUniqueIDs: !! attributeIDs
 		};
 
 		this.decodeGeometry( buffer, taskConfig ).then( callback );
@@ -121,10 +123,6 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 	},
 
 	decodeGeometry: function ( buffer, taskConfig ) {
-
-		var worker;
-		var taskID = this.workerNextTaskID ++;
-		var taskCost = buffer.byteLength;
 
 		// TODO: For backward-compatibility, support 'attributeTypes' objects containing
 		// references (rather than names) to typed array constructors. These must be
@@ -140,6 +138,43 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			}
 
 		}
+
+		//
+
+		var taskKey = JSON.stringify( taskConfig );
+
+		// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+		// again from this thread.
+		if ( THREE.DRACOLoader.taskCache.has( buffer ) ) {
+
+			var cachedTask = THREE.DRACOLoader.taskCache.get( buffer );
+
+			if ( cachedTask.key === taskKey ) {
+
+				return cachedTask.promise;
+
+			} else if ( buffer.byteLength === 0 ) {
+
+				// Technically, it would be possible to wait for the previous task to complete,
+				// transfer the buffer back, and decode again with the second configuration. That
+				// is complex, and I don't know of any reason to decode a Draco buffer twice in
+				// different ways, so this is left unimplemented.
+				throw new Error(
+
+					'THREE.DRACOLoader: Unable to re-decode a buffer with different ' +
+					'settings. Buffer has already been transferred.'
+
+				);
+
+			}
+
+		}
+
+		//
+
+		var worker;
+		var taskID = this.workerNextTaskID ++;
+		var taskCost = buffer.byteLength;
 
 		// Obtain a worker and assign a task, and construct a geometry instance
 		// when the task completes.
@@ -175,6 +210,14 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 			} );
 
+		// Cache the task result.
+		THREE.DRACOLoader.taskCache.set( buffer, {
+
+			key: taskKey,
+			promise: geometryPending
+
+		} );
+
 		return geometryPending;
 
 	},
@@ -196,7 +239,7 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			var array = attribute.array;
 			var itemSize = attribute.itemSize;
 
-			geometry.addAttribute( name, new THREE.BufferAttribute( array, itemSize ) );
+			geometry.setAttribute( name, new THREE.BufferAttribute( array, itemSize ) );
 
 		}
 
@@ -215,6 +258,14 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			loader.load( url, resolve, undefined, reject );
 
 		} );
+
+	},
+
+	preload: function () {
+
+		this._initDecoder();
+
+		return this;
 
 	},
 
@@ -454,12 +505,32 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 		var geometry = { index: null, attributes: [] };
 
-		// Add attributes of user specified unique id.
+		// Gather all vertex attributes.
 		for ( var attributeName in attributeIDs ) {
 
 			var attributeType = self[ attributeTypes[ attributeName ] ];
-			var attributeId = attributeIDs[ attributeName ];
-			var attribute = decoder.GetAttributeByUniqueId( dracoGeometry, attributeId );
+
+			var attribute;
+			var attributeID;
+
+			// A Draco file may be created with default vertex attributes, whose attribute IDs
+			// are mapped 1:1 from their semantic name (POSITION, NORMAL, ...). Alternatively,
+			// a Draco file may contain a custom set of attributes, identified by known unique
+			// IDs. glTF files always do the latter, and `.drc` files typically do the former.
+			if ( taskConfig.useUniqueIDs ) {
+
+				attributeID = attributeIDs[ attributeName ];
+				attribute = decoder.GetAttributeByUniqueId( dracoGeometry, attributeID );
+
+			} else {
+
+				attributeID = decoder.GetAttributeId( dracoGeometry, draco[ attributeIDs[ attributeName ] ] );
+
+				if ( attributeID === - 1 ) continue;
+
+				attribute = decoder.GetAttribute( dracoGeometry, attributeID );
+
+			}
 
 			geometry.attributes.push( decodeAttribute( draco, decoder, dracoGeometry, attributeName, attributeType, attribute ) );
 
@@ -573,6 +644,8 @@ THREE.DRACOLoader.DRACOWorker = function () {
 	}
 
 };
+
+THREE.DRACOLoader.taskCache = new WeakMap();
 
 /** Deprecated static methods */
 

@@ -35,8 +35,11 @@
 		</script>
 
 		<h2>例子(Examples)</h2>
-		[example:webgl_materials_variations_physical materials / variations / physical]<br />
-		[example:webgl_materials_reflectivity materials / reflectivity]
+
+		<p>
+			[example:webgl_materials_variations_physical materials / variations / physical]<br />
+			[example:webgl_materials_reflectivity materials / reflectivity]
+		</p>
 
 		<h2>构造函数(Constructor)</h2>
 
@@ -58,12 +61,6 @@
 		<h3>[property:Float clearcoatRoughness]</h3>
 		<p> clearcoat看起来的粗糙程度，从*0.0*到*1.0*。默认值为*0.0*。</p>
 
-		<h3>[property:Boolean isMeshPhysicalMaterial]</h3>
-		<p> 用于检查此类或派生类是否为Lambert网格材质。默认值为 *true*。<br /><br />
-
-			因为其通常用在内部优化，所以不应该更改该属性值。
-		</p>
-
 		<h3>[property:Object defines]</h3>
 		<p> 如下形式的对象:
 			<code>
@@ -71,7 +68,7 @@
 
 					'STANDARD': ''
 					'PHYSICAL': '',
-			
+
 				};
 			</code>
 			[page:WebGLRenderer]使用它来选择shaders。

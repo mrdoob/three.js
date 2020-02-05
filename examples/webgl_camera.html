@@ -15,7 +15,7 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras<br/>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras<br/>
 		<b>O</b> orthographic <b>P</b> perspective
 		</div>
 
@@ -109,13 +109,13 @@
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
-					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // x
-					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // y
-					vertices.push( THREE.Math.randFloatSpread( 2000 ) ); // z
+					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // x
+					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // y
+					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // z
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );

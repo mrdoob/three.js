@@ -2,6 +2,10 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
+import {
+	BackSide
+} from '../../../../build/three.module.js';
+
 import { TempNode } from '../core/TempNode.js';
 import { Vector2Node } from '../inputs/Vector2Node.js';
 import { FunctionNode } from '../core/FunctionNode.js';
@@ -20,52 +24,46 @@ function NormalMapNode( value, scale ) {
 
 NormalMapNode.Nodes = ( function () {
 
-	var perturbNormal2Arb = new FunctionNode( 
+	var perturbNormal2Arb = new FunctionNode(
 
-// Per-Pixel Tangent Space Normal Mapping
-// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
-	
-`vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 vUv, vec2 normalScale ) {
+		// Per-Pixel Tangent Space Normal Mapping
+		// http://hacksoflife.blogspot.ch/2009/11/per-pixel-tangent-space-normal-mapping.html
 
-	// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
+		`vec3 perturbNormal2Arb( vec3 eye_pos, vec3 surf_norm, vec3 map, vec2 vUv, vec2 normalScale ) {
 
-	vec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
-	vec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
-	vec2 st0 = dFdx( vUv.st );
-	vec2 st1 = dFdy( vUv.st );
+		// Workaround for Adreno 3XX dFd*( vec3 ) bug. See #9988
 
-	float scale = sign( st1.t * st0.s - st0.t * st1.s ); // we do not care about the magnitude
+		vec3 q0 = vec3( dFdx( eye_pos.x ), dFdx( eye_pos.y ), dFdx( eye_pos.z ) );
+		vec3 q1 = vec3( dFdy( eye_pos.x ), dFdy( eye_pos.y ), dFdy( eye_pos.z ) );
+		vec2 st0 = dFdx( vUv.st );
+		vec2 st1 = dFdy( vUv.st );
 
-	vec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );
-	vec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );
-	vec3 N = normalize( surf_norm );
+		float scale = sign( st1.t * st0.s - st0.t * st1.s ); // we do not care about the magnitude
 
-	vec3 mapN = map * 2.0 - 1.0;
+		vec3 S = normalize( ( q0 * st1.t - q1 * st0.t ) * scale );
+		vec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );
+		vec3 N = normalize( surf_norm );
 
-	mapN.xy *= normalScale;
+		vec3 mapN = map * 2.0 - 1.0;
 
-	#ifdef DOUBLE_SIDED
+		mapN.xy *= normalScale;
 
-		// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
-		// http://hacksoflife.blogspot.com/2009/11/per-pixel-tangent-space-normal-mapping.html?showComment=1522254677437#c5087545147696715943
-		vec3 NfromST = cross( S, T );
-		if( dot( NfromST, N ) > 0.0 ) {
+		#ifdef DOUBLE_SIDED
 
-			S *= -1.0;
-			T *= -1.0;
+			// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
 
-		}
+			if ( dot( cross( S, T ), N ) < 0.0 ) mapN.xy *= - 1.0;
 
-	#else
+		#else
 
-		mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+			mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
 
-	#endif
+		#endif
 
-	mat3 tsn = mat3( S, T, N );
-	return normalize( tsn * mapN );
+		mat3 tsn = mat3( S, T, N );
+		return normalize( tsn * mapN );
 
-}`, null, { derivatives: true } );
+	}`, null, { derivatives: true } );
 
 	return {
 		perturbNormal2Arb: perturbNormal2Arb
@@ -87,11 +85,19 @@ NormalMapNode.prototype.generate = function ( builder, output ) {
 		this.position = this.position || new PositionNode( PositionNode.VIEW );
 		this.uv = this.uv || new UVNode();
 
+		var scale = this.scale.build( builder, 'v2' );
+
+		if ( builder.material.side === BackSide ) {
+
+			scale = '-' + scale;
+
+		}
+
 		return builder.format( perturbNormal2Arb + '( -' + this.position.build( builder, 'v3' ) + ', ' +
 			this.normal.build( builder, 'v3' ) + ', ' +
 			this.value.build( builder, 'v3' ) + ', ' +
 			this.uv.build( builder, 'v2' ) + ', ' +
-			this.scale.build( builder, 'v2' ) + ' )', this.getType( builder ), output );
+			scale + ' )', this.getType( builder ), output );
 
 	} else {
 

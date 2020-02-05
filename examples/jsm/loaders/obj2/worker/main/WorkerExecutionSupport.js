@@ -127,7 +127,7 @@ const WorkerExecutionSupport = function () {
 	this._reset();
 
 };
-WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.0.0';
+WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.1.0';
 console.info( 'Using WorkerSupport version: ' + WorkerExecutionSupport.WORKER_SUPPORT_VERSION );
 
 
@@ -138,7 +138,7 @@ WorkerExecutionSupport.prototype = {
 	_reset: function () {
 
 		this.logging = {
-			enabled: true,
+			enabled: false,
 			debug: false
 		};
 
@@ -437,7 +437,11 @@ WorkerExecutionSupport.prototype = {
 				}
 				if ( this.worker.terminateWorkerOnLoad ) {
 
-					if ( this.worker.logging.enabled ) console.info( 'WorkerSupport [' + workerRunnerName + ']: Run is complete. Terminating application on request!' );
+					if ( this.worker.logging.enabled ) {
+
+						console.info( 'WorkerSupport [' + workerRunnerName + ']: Run is complete. Terminating application on request!' );
+
+					}
 					this.worker.callbacks.terminate();
 
 				}
@@ -454,7 +458,11 @@ WorkerExecutionSupport.prototype = {
 				}
 				if ( this.worker.terminateWorkerOnLoad ) {
 
-					if ( this.worker.logging.enabled ) console.info( 'WorkerSupport [' + workerRunnerName + ']: Run reported error. Terminating application on request!' );
+					if ( this.worker.logging.enabled ) {
+
+						console.info( 'WorkerSupport [' + workerRunnerName + ']: Run reported error. Terminating application on request!' );
+
+					}
 					this.worker.callbacks.terminate();
 
 				}

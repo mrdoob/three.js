@@ -22,7 +22,7 @@
 		<p>[example:misc_controls_pointerlock misc / controls / pointerlock ]</p>
 
 		<code>
-var controls = new PointerLockControls( camera );
+var controls = new PointerLockControls( camera, document.body );
 
 // add event listener to show/hide a UI (e.g. the game's menu)
 
@@ -48,7 +48,7 @@ controls.addEventListener( 'unlock', function () {
 			[page:Camera camera]: The camera of the rendered scene.
 			</p>
 			<p>
-			[page:HTMLDOMElement domElement]: (optional) The HTML element used for event listeners. By default this is the document's body.
+			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
 			</p>
 			<p>
 				Creates a new instance of [name].
@@ -77,7 +77,7 @@ controls.addEventListener( 'unlock', function () {
 		<h3>[property:HTMLDOMElement domElement]</h3>
 		<p>
 			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
-			not set up new event listeners. Default is the document's body.
+			not set up new event listeners.
 		</p>
 
 

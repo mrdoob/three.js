@@ -674,7 +674,7 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 					v4 = v1 + vertPerRow;
 
 					// Normals and UVs cannot be shared. Without clone(), you can see the consequences
-					// of sharing if you call geometry.applyMatrix( matrix ).
+					// of sharing if you call geometry.applyMatrix4( matrix ).
 					if ( notDegenerate( v1, v2, v3 ) ) {
 
 						indices[ indexCount ++ ] = v1;
@@ -702,9 +702,9 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 	}
 
 	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 	this.computeBoundingSphere();
 

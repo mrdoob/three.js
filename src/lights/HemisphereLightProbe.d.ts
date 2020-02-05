@@ -5,6 +5,6 @@ export class HemisphereLightProbe extends LightProbe {
 
 	constructor( skyColor?: Color | string | number, groundColor?: Color | string | number, intensity?: number );
 
-	isHemisphereLightProbe: true;
+	readonly isHemisphereLightProbe: true;
 
 }

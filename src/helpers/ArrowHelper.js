@@ -43,7 +43,7 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 	if ( _lineGeometry === undefined ) {
 
 		_lineGeometry = new BufferGeometry();
-		_lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+		_lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
 		_coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
 		_coneGeometry.translate( 0, - 0.5, 0 );

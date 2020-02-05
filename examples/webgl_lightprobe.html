@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe
 		</div>
 
 		<script type="module">
@@ -49,9 +49,7 @@
 				//renderer.toneMapping = LinearToneMapping;
 			 	//renderer.toneMappingExposure = API.exposure;
 
-				// gamma
-				renderer.gammaOutput = true;
-				renderer.gammaFactor = 2.2; // approximate sRGB
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// scene
 				scene = new THREE.Scene();

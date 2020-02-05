@@ -58,7 +58,9 @@ PointLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype
 
 	isPointLightShadow: true,
 
-	updateMatrices: function ( light, viewCamera, viewportIndex ) {
+	updateMatrices: function ( light, viewportIndex ) {
+
+		if ( viewportIndex === undefined ) viewportIndex = 0;
 
 		var camera = this.camera,
 			shadowMatrix = this.matrix,
@@ -78,7 +80,7 @@ PointLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype
 		shadowMatrix.makeTranslation( - lightPositionWorld.x, - lightPositionWorld.y, - lightPositionWorld.z );
 
 		projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-		this._frustum.setFromMatrix( projScreenMatrix );
+		this._frustum.setFromProjectionMatrix( projScreenMatrix );
 
 	}
 

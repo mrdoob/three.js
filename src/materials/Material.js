@@ -1,6 +1,6 @@
 import { EventDispatcher } from '../core/EventDispatcher.js';
 import { NoColors, FrontSide, FlatShading, NormalBlending, LessEqualDepth, AddEquation, OneMinusSrcAlphaFactor, SrcAlphaFactor, AlwaysStencilFunc, KeepStencilOp } from '../constants.js';
-import { _Math } from '../math/Math.js';
+import { MathUtils } from '../math/MathUtils.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -13,13 +13,12 @@ function Material() {
 
 	Object.defineProperty( this, 'id', { value: materialId ++ } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.type = 'Material';
 
 	this.fog = true;
-	this.lights = true;
 
 	this.blending = NormalBlending;
 	this.side = FrontSide;
@@ -75,7 +74,7 @@ function Material() {
 
 	this.userData = {};
 
-	this.needsUpdate = true;
+	this.version = 0;
 
 }
 
@@ -343,11 +342,11 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.name = source.name;
 
 		this.fog = source.fog;
-		this.lights = source.lights;
 
 		this.blending = source.blending;
 		this.side = source.side;
 		this.flatShading = source.flatShading;
+		this.vertexTangents = source.vertexTangents;
 		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;
@@ -364,7 +363,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.depthTest = source.depthTest;
 		this.depthWrite = source.depthWrite;
 
-		this.stencilWrite = source.stencilWrite;
 		this.stencilWriteMask = source.stencilWriteMask;
 		this.stencilFunc = source.stencilFunc;
 		this.stencilRef = source.stencilRef;
@@ -372,6 +370,26 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.stencilFail = source.stencilFail;
 		this.stencilZFail = source.stencilZFail;
 		this.stencilZPass = source.stencilZPass;
+		this.stencilWrite = source.stencilWrite;
+
+		var srcPlanes = source.clippingPlanes,
+			dstPlanes = null;
+
+		if ( srcPlanes !== null ) {
+
+			var n = srcPlanes.length;
+			dstPlanes = new Array( n );
+
+			for ( var i = 0; i !== n; ++ i )
+				dstPlanes[ i ] = srcPlanes[ i ].clone();
+
+		}
+
+		this.clippingPlanes = dstPlanes;
+		this.clipIntersection = source.clipIntersection;
+		this.clipShadows = source.clipShadows;
+
+		this.shadowSide = source.shadowSide;
 
 		this.colorWrite = source.colorWrite;
 
@@ -392,26 +410,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.userData = JSON.parse( JSON.stringify( source.userData ) );
 
-		this.clipShadows = source.clipShadows;
-		this.clipIntersection = source.clipIntersection;
-
-		var srcPlanes = source.clippingPlanes,
-			dstPlanes = null;
-
-		if ( srcPlanes !== null ) {
-
-			var n = srcPlanes.length;
-			dstPlanes = new Array( n );
-
-			for ( var i = 0; i !== n; ++ i )
-				dstPlanes[ i ] = srcPlanes[ i ].clone();
-
-		}
-
-		this.clippingPlanes = dstPlanes;
-
-		this.shadowSide = source.shadowSide;
-
 		return this;
 
 	},
@@ -424,5 +422,14 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 } );
 
+Object.defineProperty( Material.prototype, 'needsUpdate', {
+
+	set: function ( value ) {
+
+		if ( value === true ) this.version ++;
+
+	}
+
+} );
 
 export { Material };

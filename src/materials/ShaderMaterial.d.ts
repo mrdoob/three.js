@@ -1,4 +1,3 @@
-import { ShaderMaterialParameters } from './ShaderMaterial';
 import { IUniform } from '../renderers/shaders/UniformsLib';
 import { MaterialParameters, Material } from './Material';
 
@@ -13,7 +12,6 @@ import { MaterialParameters, Material } from './Material';
  */
 
 export interface ShaderMaterialParameters extends MaterialParameters {
-	defines?: any;
 	uniforms?: any;
 	vertexShader?: string;
 	fragmentShader?: string;
@@ -25,13 +23,18 @@ export interface ShaderMaterialParameters extends MaterialParameters {
 	skinning?: boolean;
 	morphTargets?: boolean;
 	morphNormals?: boolean;
+	extensions?: {
+		derivatives?: boolean;
+		fragDepth?: boolean;
+		drawBuffers?: boolean;
+		shaderTextureLOD?: boolean;
+	};
 }
 
 export class ShaderMaterial extends Material {
 
 	constructor( parameters?: ShaderMaterialParameters );
 
-	defines: any;
 	uniforms: { [uniform: string]: IUniform };
 	vertexShader: string;
 	fragmentShader: string;
@@ -55,6 +58,7 @@ export class ShaderMaterial extends Material {
 	};
 	defaultAttributeValues: any;
 	index0AttributeName: string | undefined;
+	uniformsNeedUpdate: boolean;
 
 	setValues( parameters: ShaderMaterialParameters ): void;
 	toJSON( meta: any ): any;

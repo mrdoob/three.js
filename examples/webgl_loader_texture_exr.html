@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl EXR texture loader example<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl EXR texture loader example<br/>
 			Image courtesy of <a href="http://www.pauldebevec.com/Research/HDR/" target="_blank" rel="noopener">Paul Debevec</a>.
 		</div>
 
@@ -39,7 +39,7 @@
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 
@@ -51,17 +51,15 @@
 					.setDataType( THREE.FloatType )
 					.load( 'textures/memorial.exr', function ( texture, textureData ) {
 
+						// memorial.exr is NPOT
+
 						//console.log( textureData );
 						//console.log( texture );
 
-						texture.minFilter = THREE.NearestFilter;
-						texture.magFilter = THREE.NearestFilter;
-
-						// these setting are currently set correctly by default
-						//texture.encoding = LinearEncoding;
-						//texture.minFilter = LinearMipmapLinearFilter;
+						// EXRLoader sets these default settings
+						//texture.generateMipmaps = false;
+						//texture.minFilter = LinearFilter;
 						//texture.magFilter = LinearFilter;
-						//texture.flipY = true;
 
 						var material = new THREE.MeshBasicMaterial( { map: texture } );
 

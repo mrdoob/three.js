@@ -50,7 +50,7 @@ export class Geometry extends EventDispatcher {
 
 	uuid: string;
 
-	isGeometry: boolean;
+	readonly isGeometry: true;
 
 	/**
 	 * Name for this geometry. Default is an empty string.
@@ -166,7 +166,7 @@ export class Geometry extends EventDispatcher {
 	/**
 	 * Bakes matrix transform directly into vertex coordinates.
 	 */
-	applyMatrix( matrix: Matrix4 ): Geometry;
+	applyMatrix4( matrix: Matrix4 ): Geometry;
 
 	rotateX( angle: number ): Geometry;
 	rotateY( angle: number ): Geometry;

@@ -121,6 +121,8 @@ function LoadingManager( onLoad, onProgress, onError ) {
 			var regex = handlers[ i ];
 			var loader = handlers[ i + 1 ];
 
+			if ( regex.global ) regex.lastIndex = 0; // see #17920
+
 			if ( regex.test( file ) ) {
 
 				return loader;

@@ -7,9 +7,9 @@ export class AudioLoader extends Loader {
 
 	load(
 		url: string,
-		onLoad: Function,
-		onPrgress: Function,
-		onError: Function
+		onLoad: ( audioBuffer: AudioBuffer ) => void,
+		onProgress?: ( request: ProgressEvent ) => void,
+		onError?: ( event: ErrorEvent ) => void
 	): void;
 
 }

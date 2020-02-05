@@ -17,9 +17,9 @@ DirectionalLightShadow.prototype = Object.assign( Object.create( LightShadow.pro
 
 	isDirectionalLightShadow: true,
 
-	updateMatrices: function ( light, viewCamera, viewportIndex ) {
+	updateMatrices: function ( light ) {
 
-		LightShadow.prototype.updateMatrices.call( this, light, viewCamera, viewportIndex );
+		LightShadow.prototype.updateMatrices.call( this, light );
 
 	}
 

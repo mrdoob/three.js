@@ -399,7 +399,7 @@ THREE.CCDIKSolver = ( function () {
 
 				var geometry = new THREE.BufferGeometry();
 				var vertices = new Float32Array( ( 2 + ik.links.length ) * 3 );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 				return geometry;
 

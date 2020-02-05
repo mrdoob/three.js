@@ -181,14 +181,12 @@ var Projector = function () {
 		var uvs = [];
 
 		var object = null;
-		var material = null;
 
 		var normalMatrix = new Matrix3();
 
 		function setObject( value ) {
 
 			object = value;
-			material = object.material;
 
 			normalMatrix.getNormalMatrix( object.matrixWorld );
 
@@ -438,7 +436,7 @@ var Projector = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_frustum.setFromMatrix( _viewProjectionMatrix );
+		_frustum.setFromProjectionMatrix( _viewProjectionMatrix );
 
 		//
 
@@ -494,6 +492,7 @@ var Projector = function () {
 						if ( material.morphTargets === true ) {
 
 							var morphTargets = geometry.morphAttributes.position;
+							var morphTargetsRelative = geometry.morphTargetsRelative;
 							var morphInfluences = object.morphTargetInfluences;
 
 							for ( var t = 0, tl = morphTargets.length; t < tl; t ++ ) {
@@ -504,9 +503,19 @@ var Projector = function () {
 
 								var target = morphTargets[ t ];
 
-								x += ( target.getX( i / 3 ) - positions[ i ] ) * influence;
-								y += ( target.getY( i / 3 ) - positions[ i + 1 ] ) * influence;
-								z += ( target.getZ( i / 3 ) - positions[ i + 2 ] ) * influence;
+								if ( morphTargetsRelative ) {
+
+									x += target.getX( i / 3 ) * influence;
+									y += target.getY( i / 3 ) * influence;
+									z += target.getZ( i / 3 ) * influence;
+
+								} else {
+
+									x += ( target.getX( i / 3 ) - positions[ i ] ) * influence;
+									y += ( target.getY( i / 3 ) - positions[ i + 1 ] ) * influence;
+									z += ( target.getZ( i / 3 ) - positions[ i + 2 ] ) * influence;
+
+								}
 
 							}
 

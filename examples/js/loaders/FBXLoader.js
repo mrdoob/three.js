@@ -822,7 +822,7 @@ THREE.FBXLoader = ( function () {
 
 					var transform = generateTransform( node.userData.transformData );
 
-					node.applyMatrix( transform );
+					node.applyMatrix4( transform );
 
 				}
 
@@ -883,7 +883,8 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-					model.name = THREE.PropertyBinding.sanitizeNodeName( node.attrName );
+					model.name = node.attrName ? THREE.PropertyBinding.sanitizeNodeName( node.attrName ) : '';
+
 					model.ID = id;
 
 				}
@@ -917,7 +918,8 @@ THREE.FBXLoader = ( function () {
 							bone.matrixWorld.copy( rawBone.transformLink );
 
 							// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
-							bone.name = THREE.PropertyBinding.sanitizeNodeName( name );
+
+							bone.name = name ? THREE.PropertyBinding.sanitizeNodeName( name ) : '';
 							bone.ID = id;
 
 							skeleton.bones[ i ] = bone;
@@ -1120,7 +1122,7 @@ THREE.FBXLoader = ( function () {
 
 						if ( lightAttribute.InnerAngle !== undefined ) {
 
-							angle = THREE.Math.degToRad( lightAttribute.InnerAngle.value );
+							angle = THREE.MathUtils.degToRad( lightAttribute.InnerAngle.value );
 
 						}
 
@@ -1130,7 +1132,7 @@ THREE.FBXLoader = ( function () {
 							// TODO: this is not correct - FBX calculates outer and inner angle in degrees
 							// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
 							// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-							penumbra = THREE.Math.degToRad( lightAttribute.OuterAngle.value );
+							penumbra = THREE.MathUtils.degToRad( lightAttribute.OuterAngle.value );
 							penumbra = Math.max( penumbra, 1 );
 
 						}
@@ -1529,7 +1531,7 @@ THREE.FBXLoader = ( function () {
 		parseMeshGeometry: function ( relationships, geoNode, deformers ) {
 
 			var skeletons = deformers.skeletons;
-			var morphTargets = deformers.morphTargets;
+			var morphTargets = [];
 
 			var modelNodes = relationships.parents.map( function ( parent ) {
 
@@ -1548,13 +1550,15 @@ THREE.FBXLoader = ( function () {
 
 			}, null );
 
-			var morphTarget = relationships.children.reduce( function ( morphTarget, child ) {
+			relationships.children.forEach( function ( child ) {
 
-				if ( morphTargets[ child.ID ] !== undefined ) morphTarget = morphTargets[ child.ID ];
+				if ( deformers.morphTargets[ child.ID ] !== undefined ) {
 
-				return morphTarget;
+					morphTargets.push( deformers.morphTargets[ child.ID ] );
 
-			}, null );
+				}
+
+			} );
 
 			// Assume one model and get the preRotation from that
 			// if there is more than one model associated with the geometry this may cause problems
@@ -1571,12 +1575,12 @@ THREE.FBXLoader = ( function () {
 
 			var transform = generateTransform( transformData );
 
-			return this.genGeometry( geoNode, skeleton, morphTarget, transform );
+			return this.genGeometry( geoNode, skeleton, morphTargets, transform );
 
 		},
 
 		// Generate a THREE.BufferGeometry from a node in FBXTree.Objects.Geometry
-		genGeometry: function ( geoNode, skeleton, morphTarget, preTransform ) {
+		genGeometry: function ( geoNode, skeleton, morphTargets, preTransform ) {
 
 			var geo = new THREE.BufferGeometry();
 			if ( geoNode.attrName ) geo.name = geoNode.attrName;
@@ -1586,21 +1590,21 @@ THREE.FBXLoader = ( function () {
 
 			var positionAttribute = new THREE.Float32BufferAttribute( buffers.vertex, 3 );
 
-			preTransform.applyToBufferAttribute( positionAttribute );
+			positionAttribute.applyMatrix4( preTransform );
 
-			geo.addAttribute( 'position', positionAttribute );
+			geo.setAttribute( 'position', positionAttribute );
 
 			if ( buffers.colors.length > 0 ) {
 
-				geo.addAttribute( 'color', new THREE.Float32BufferAttribute( buffers.colors, 3 ) );
+				geo.setAttribute( 'color', new THREE.Float32BufferAttribute( buffers.colors, 3 ) );
 
 			}
 
 			if ( skeleton ) {
 
-				geo.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
+				geo.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
 
-				geo.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffers.vertexWeights, 4 ) );
+				geo.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( buffers.vertexWeights, 4 ) );
 
 				// used later to bind the skeleton to the model
 				geo.FBX_Deformer = skeleton;
@@ -1609,12 +1613,12 @@ THREE.FBXLoader = ( function () {
 
 			if ( buffers.normal.length > 0 ) {
 
-				var normalAttribute = new THREE.Float32BufferAttribute( buffers.normal, 3 );
-
 				var normalMatrix = new THREE.Matrix3().getNormalMatrix( preTransform );
-				normalMatrix.applyToBufferAttribute( normalAttribute );
 
-				geo.addAttribute( 'normal', normalAttribute );
+				var normalAttribute = new THREE.Float32BufferAttribute( buffers.normal, 3 );
+				normalAttribute.applyNormalMatrix( normalMatrix );
+
+				geo.setAttribute( 'normal', normalAttribute );
 
 			}
 
@@ -1630,7 +1634,7 @@ THREE.FBXLoader = ( function () {
 
 				}
 
-				geo.addAttribute( name, new THREE.Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
+				geo.setAttribute( name, new THREE.Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
 
 			} );
 
@@ -1677,7 +1681,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			this.addMorphTargets( geo, geoNode, morphTarget, preTransform );
+			this.addMorphTargets( geo, geoNode, morphTargets, preTransform );
 
 			return geo;
 
@@ -2050,23 +2054,29 @@ THREE.FBXLoader = ( function () {
 
 		},
 
-		addMorphTargets: function ( parentGeo, parentGeoNode, morphTarget, preTransform ) {
+		addMorphTargets: function ( parentGeo, parentGeoNode, morphTargets, preTransform ) {
 
-			if ( morphTarget === null ) return;
+			if ( morphTargets.length === 0 ) return;
+
+			parentGeo.morphTargetsRelative = true;
 
 			parentGeo.morphAttributes.position = [];
 			// parentGeo.morphAttributes.normal = []; // not implemented
 
 			var self = this;
-			morphTarget.rawTargets.forEach( function ( rawTarget ) {
+			morphTargets.forEach( function ( morphTarget ) {
 
-				var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
+				morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
-				if ( morphGeoNode !== undefined ) {
+					var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
 
-					self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+					if ( morphGeoNode !== undefined ) {
 
-				}
+						self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+
+					}
+
+				} );
 
 			} );
 
@@ -2078,33 +2088,29 @@ THREE.FBXLoader = ( function () {
 		// Normal and position attributes only have data for the vertices that are affected by the morph
 		genMorphGeometry: function ( parentGeo, parentGeoNode, morphGeoNode, preTransform, name ) {
 
-			var morphGeo = new THREE.BufferGeometry();
-			if ( morphGeoNode.attrName ) morphGeo.name = morphGeoNode.attrName;
-
 			var vertexIndices = ( parentGeoNode.PolygonVertexIndex !== undefined ) ? parentGeoNode.PolygonVertexIndex.a : [];
 
-			// make a copy of the parent's vertex positions
-			var vertexPositions = ( parentGeoNode.Vertices !== undefined ) ? parentGeoNode.Vertices.a.slice() : [];
-
-			var morphPositions = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
+			var morphPositionsSparse = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
 			var indices = ( morphGeoNode.Indexes !== undefined ) ? morphGeoNode.Indexes.a : [];
+
+			var length = parentGeo.attributes.position.count * 3;
+			var morphPositions = new Float32Array( length );
 
 			for ( var i = 0; i < indices.length; i ++ ) {
 
 				var morphIndex = indices[ i ] * 3;
 
-				// FBX format uses blend shapes rather than morph targets. This can be converted
-				// by additively combining the blend shape positions with the original geometry's positions
-				vertexPositions[ morphIndex ] += morphPositions[ i * 3 ];
-				vertexPositions[ morphIndex + 1 ] += morphPositions[ i * 3 + 1 ];
-				vertexPositions[ morphIndex + 2 ] += morphPositions[ i * 3 + 2 ];
+				morphPositions[ morphIndex ] = morphPositionsSparse[ i * 3 ];
+				morphPositions[ morphIndex + 1 ] = morphPositionsSparse[ i * 3 + 1 ];
+				morphPositions[ morphIndex + 2 ] = morphPositionsSparse[ i * 3 + 2 ];
 
 			}
 
 			// TODO: add morph normal support
 			var morphGeoInfo = {
 				vertexIndices: vertexIndices,
-				vertexPositions: vertexPositions,
+				vertexPositions: morphPositions,
+
 			};
 
 			var morphBuffers = this.genBuffers( morphGeoInfo );
@@ -2112,7 +2118,7 @@ THREE.FBXLoader = ( function () {
 			var positionAttribute = new THREE.Float32BufferAttribute( morphBuffers.vertex, 3 );
 			positionAttribute.name = name || morphGeoNode.attrName;
 
-			preTransform.applyToBufferAttribute( positionAttribute );
+			positionAttribute.applyMatrix4( preTransform );
 
 			parentGeo.morphAttributes.position.push( positionAttribute );
 
@@ -2298,7 +2304,7 @@ THREE.FBXLoader = ( function () {
 			} );
 
 			var geometry = new THREE.BufferGeometry();
-			geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 			return geometry;
 
@@ -2486,7 +2492,7 @@ THREE.FBXLoader = ( function () {
 
 										var node = {
 
-											modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+											modelName: rawModel.attrName ? THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
 											ID: rawModel.id,
 											initialPosition: [ 0, 0, 0 ],
 											initialRotation: [ 0, 0, 0 ],
@@ -2541,7 +2547,7 @@ THREE.FBXLoader = ( function () {
 
 									var node = {
 
-										modelName: THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+										modelName: rawModel.attrName ? THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
 										morphName: fbxTree.Objects.Deformer[ deformerID ].attrName,
 
 									};
@@ -2679,19 +2685,19 @@ THREE.FBXLoader = ( function () {
 			if ( curves.x !== undefined ) {
 
 				this.interpolateRotations( curves.x );
-				curves.x.values = curves.x.values.map( THREE.Math.degToRad );
+				curves.x.values = curves.x.values.map( THREE.MathUtils.degToRad );
 
 			}
 			if ( curves.y !== undefined ) {
 
 				this.interpolateRotations( curves.y );
-				curves.y.values = curves.y.values.map( THREE.Math.degToRad );
+				curves.y.values = curves.y.values.map( THREE.MathUtils.degToRad );
 
 			}
 			if ( curves.z !== undefined ) {
 
 				this.interpolateRotations( curves.z );
-				curves.z.values = curves.z.values.map( THREE.Math.degToRad );
+				curves.z.values = curves.z.values.map( THREE.MathUtils.degToRad );
 
 			}
 
@@ -2700,7 +2706,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( preRotation !== undefined ) {
 
-				preRotation = preRotation.map( THREE.Math.degToRad );
+				preRotation = preRotation.map( THREE.MathUtils.degToRad );
 				preRotation.push( eulerOrder );
 
 				preRotation = new THREE.Euler().fromArray( preRotation );
@@ -2710,7 +2716,7 @@ THREE.FBXLoader = ( function () {
 
 			if ( postRotation !== undefined ) {
 
-				postRotation = postRotation.map( THREE.Math.degToRad );
+				postRotation = postRotation.map( THREE.MathUtils.degToRad );
 				postRotation.push( eulerOrder );
 
 				postRotation = new THREE.Euler().fromArray( postRotation );
@@ -3941,7 +3947,7 @@ THREE.FBXLoader = ( function () {
 
 		if ( transformData.preRotation ) {
 
-			var array = transformData.preRotation.map( THREE.Math.degToRad );
+			var array = transformData.preRotation.map( THREE.MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -3949,7 +3955,7 @@ THREE.FBXLoader = ( function () {
 
 		if ( transformData.rotation ) {
 
-			var array = transformData.rotation.map( THREE.Math.degToRad );
+			var array = transformData.rotation.map( THREE.MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -3957,7 +3963,7 @@ THREE.FBXLoader = ( function () {
 
 		if ( transformData.postRotation ) {
 
-			var array = transformData.postRotation.map( THREE.Math.degToRad );
+			var array = transformData.postRotation.map( THREE.MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 

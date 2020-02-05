@@ -29,6 +29,12 @@ export default /* glsl */`
 
 		#endif
 
+		#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )
+
+			mat3 vTBN = mat3( tangent, bitangent, normal );
+
+		#endif
+
 	#endif
 
 #endif

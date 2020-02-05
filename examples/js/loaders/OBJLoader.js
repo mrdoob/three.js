@@ -10,6 +10,8 @@ THREE.OBJLoader = ( function () {
 	var material_library_pattern = /^mtllib /;
 	// usemtl material_name
 	var material_use_pattern = /^usemtl /;
+	// usemap map_name
+	var map_use_pattern = /^usemap /;
 
 	function ParserState() {
 
@@ -22,6 +24,7 @@ THREE.OBJLoader = ( function () {
 			colors: [],
 			uvs: [],
 
+			materials: {},
 			materialLibraries: [],
 
 			startObject: function ( name, fromDeclaration ) {
@@ -286,6 +289,12 @@ THREE.OBJLoader = ( function () {
 
 				this.addVertex( ia, ib, ic );
 
+				if ( this.colors.length > 0 ) {
+
+					this.addColor( ia, ib, ic );
+
+				}
+
 				if ( ua !== undefined && ua !== '' ) {
 
 					var uvLen = this.uvs.length;
@@ -306,12 +315,6 @@ THREE.OBJLoader = ( function () {
 					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
 
 					this.addNormal( ia, ib, ic );
-
-				}
-
-				if ( this.colors.length > 0 ) {
-
-					this.addColor( ia, ib, ic );
 
 				}
 
@@ -397,8 +400,6 @@ THREE.OBJLoader = ( function () {
 		},
 
 		parse: function ( text ) {
-
-			console.time( 'OBJLoader' );
 
 			var state = new ParserState();
 
@@ -570,6 +571,13 @@ THREE.OBJLoader = ( function () {
 
 					state.materialLibraries.push( line.substring( 7 ).trim() );
 
+				} else if ( map_use_pattern.test( line ) ) {
+
+					// the line is parsed but ignored since the loader assumes textures are defined MTL files
+					// (according to https://www.okino.com/conv/imp_wave.htm, 'usemap' is the old-style Wavefront texture reference method)
+
+					console.warn( 'THREE.OBJLoader: Rendering identifier "usemap" not supported. Textures must be defined in MTL files.' );
+
 				} else if ( lineFirstChar === 's' ) {
 
 					result = line.split( ' ' );
@@ -613,7 +621,7 @@ THREE.OBJLoader = ( function () {
 					// Handle null terminated files without exception
 					if ( line === '\0' ) continue;
 
-					throw new Error( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
+					console.warn( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
 
 				}
 
@@ -638,11 +646,11 @@ THREE.OBJLoader = ( function () {
 
 				var buffergeometry = new THREE.BufferGeometry();
 
-				buffergeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( geometry.vertices, 3 ) );
+				buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( geometry.vertices, 3 ) );
 
 				if ( geometry.normals.length > 0 ) {
 
-					buffergeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
+					buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
 
 				} else {
 
@@ -653,13 +661,13 @@ THREE.OBJLoader = ( function () {
 				if ( geometry.colors.length > 0 ) {
 
 					hasVertexColors = true;
-					buffergeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( geometry.colors, 3 ) );
+					buffergeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( geometry.colors, 3 ) );
 
 				}
 
 				if ( geometry.uvs.length > 0 ) {
 
-					buffergeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( geometry.uvs, 2 ) );
+					buffergeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( geometry.uvs, 2 ) );
 
 				}
 
@@ -670,7 +678,8 @@ THREE.OBJLoader = ( function () {
 				for ( var mi = 0, miLen = materials.length; mi < miLen; mi ++ ) {
 
 					var sourceMaterial = materials[ mi ];
-					var material = undefined;
+					var materialHash = sourceMaterial.name + '_' + sourceMaterial.smooth + '_' + hasVertexColors;
+					var material = state.materials[ materialHash ];
 
 					if ( this.materials !== null ) {
 
@@ -682,7 +691,6 @@ THREE.OBJLoader = ( function () {
 							var materialLine = new THREE.LineBasicMaterial();
 							THREE.Material.prototype.copy.call( materialLine, material );
 							materialLine.color.copy( material.color );
-							materialLine.lights = false;
 							material = materialLine;
 
 						} else if ( isPoints && material && ! ( material instanceof THREE.PointsMaterial ) ) {
@@ -691,14 +699,13 @@ THREE.OBJLoader = ( function () {
 							THREE.Material.prototype.copy.call( materialPoints, material );
 							materialPoints.color.copy( material.color );
 							materialPoints.map = material.map;
-							materialPoints.lights = false;
 							material = materialPoints;
 
 						}
 
 					}
 
-					if ( ! material ) {
+					if ( material === undefined ) {
 
 						if ( isLine ) {
 
@@ -715,11 +722,12 @@ THREE.OBJLoader = ( function () {
 						}
 
 						material.name = sourceMaterial.name;
+						material.flatShading = sourceMaterial.smooth ? false : true;
+						material.vertexColors = hasVertexColors ? THREE.VertexColors : THREE.NoColors;
+
+						state.materials[ materialHash ] = material;
 
 					}
-
-					material.flatShading = sourceMaterial.smooth ? false : true;
-					material.vertexColors = hasVertexColors ? THREE.VertexColors : THREE.NoColors;
 
 					createdMaterials.push( material );
 
@@ -775,8 +783,6 @@ THREE.OBJLoader = ( function () {
 				container.add( mesh );
 
 			}
-
-			console.timeEnd( 'OBJLoader' );
 
 			return container;
 

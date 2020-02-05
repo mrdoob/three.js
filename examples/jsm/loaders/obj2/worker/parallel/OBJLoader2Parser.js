@@ -8,17 +8,33 @@
  */
 const OBJLoader2Parser = function () {
 
+	this.logging = {
+		enabled: false,
+		debug: false
+	};
+
 	let scope = this;
 	this.callbacks = {
 		onProgress: function ( text ) {
-			scope._onProgress( text )
+
+			scope._onProgress( text );
+
 		},
 		onAssetAvailable: function ( payload ) {
-			scope._onAssetAvailable( payload )
+
+			scope._onAssetAvailable( payload );
+
 		},
 		onError: function ( errorMessage ) {
-			scope._onError( errorMessage )
-		}
+
+			scope._onError( errorMessage );
+
+		},
+		onLoad: function ( object3d, message ) {
+
+			scope._onLoad( object3d, message );
+
+		},
 	};
 	this.contentRef = null;
 	this.legacyMode = false;
@@ -66,11 +82,6 @@ const OBJLoader2Parser = function () {
 		lineByte: 0,
 		currentByte: 0,
 		totalBytes: 0
-	};
-
-	this.logging = {
-		enabled: true,
-		debug: false
 	};
 
 };
@@ -149,19 +160,14 @@ OBJLoader2Parser.prototype = {
 
 	},
 
-	_setMaterials: function ( materials ) {
+	/**
+	 * Clears materials object and sets the new ones.
+	 *
+	 * @param {Object} materials Object with named materials
+	 */
+	setMaterials: function ( materials ) {
 
-		if ( materials === undefined || materials === null ) return;
-
-		for ( let materialName in materials ) {
-
-			if ( materials.hasOwnProperty( materialName ) ) {
-
-				this.materials[ materialName ] = materials[ materialName ];
-
-			}
-
-		}
+ 		this.materials = Object.assign( {}, materials );
 
 	},
 
@@ -217,6 +223,23 @@ OBJLoader2Parser.prototype = {
 	},
 
 	/**
+	 * Register a function that is called when parsing was completed.
+	 *
+	 * @param {Function} onLoad
+	 * @return {OBJLoader2Parser}
+	 */
+	setCallbackOnLoad: function ( onLoad ) {
+
+		if ( onLoad !== null && onLoad !== undefined && onLoad instanceof Function ) {
+
+			this.callbacks.onLoad = onLoad;
+
+		}
+		return this;
+
+	},
+
+	/**
 	 * Announce parse progress feedback which is logged to the console.
 	 * @private
 	 *
@@ -254,6 +277,12 @@ OBJLoader2Parser.prototype = {
 		let errorMessage = 'OBJLoader2Parser does not provide implementation for onAssetAvailable. Aborting...';
 		this.callbacks.onError( errorMessage );
 		throw errorMessage;
+
+	},
+
+	_onLoad: function ( object3d, message ) {
+
+		console.log( "You reached parser default onLoad callback: " + message );
 
 	},
 

@@ -1,4 +1,4 @@
-import { _Math } from './Math.js';
+import { MathUtils } from './MathUtils.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -129,9 +129,9 @@ Object.assign( Color.prototype, {
 	setHSL: function ( h, s, l ) {
 
 		// h,s,l ranges are in 0.0 - 1.0
-		h = _Math.euclideanModulo( h, 1 );
-		s = _Math.clamp( s, 0, 1 );
-		l = _Math.clamp( l, 0, 1 );
+		h = MathUtils.euclideanModulo( h, 1 );
+		s = MathUtils.clamp( s, 0, 1 );
+		l = MathUtils.clamp( l, 0, 1 );
 
 		if ( s === 0 ) {
 
@@ -261,20 +261,28 @@ Object.assign( Color.prototype, {
 
 		if ( style && style.length > 0 ) {
 
-			// color keywords
-			var hex = _colorKeywords[ style ];
+			return this.setColorName( style );
 
-			if ( hex !== undefined ) {
+		}
 
-				// red
-				this.setHex( hex );
+		return this;
 
-			} else {
+	},
 
-				// unknown color
-				console.warn( 'THREE.Color: Unknown color ' + style );
+	setColorName: function ( style ) {
 
-			}
+		// color keywords
+		var hex = _colorKeywords[ style ];
+
+		if ( hex !== undefined ) {
+
+			// red
+			this.setHex( hex );
+
+		} else {
+
+			// unknown color
+			console.warn( 'THREE.Color: Unknown color ' + style );
 
 		}
 
@@ -531,9 +539,9 @@ Object.assign( Color.prototype, {
 		this.getHSL( _hslA );
 		color.getHSL( _hslB );
 
-		var h = _Math.lerp( _hslA.h, _hslB.h, alpha );
-		var s = _Math.lerp( _hslA.s, _hslB.s, alpha );
-		var l = _Math.lerp( _hslA.l, _hslB.l, alpha );
+		var h = MathUtils.lerp( _hslA.h, _hslB.h, alpha );
+		var s = MathUtils.lerp( _hslA.s, _hslB.s, alpha );
+		var l = MathUtils.lerp( _hslA.l, _hslB.l, alpha );
 
 		this.setHSL( h, s, l );
 
@@ -580,5 +588,6 @@ Object.assign( Color.prototype, {
 
 } );
 
+Color.NAMES = _colorKeywords;
 
 export { Color };

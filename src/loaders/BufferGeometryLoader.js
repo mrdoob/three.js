@@ -57,7 +57,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 			var bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
 			var bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
-			geometry.addAttribute( key, bufferAttribute );
+			geometry.setAttribute( key, bufferAttribute );
 
 		}
 
@@ -85,6 +85,14 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 				geometry.morphAttributes[ key ] = array;
 
 			}
+
+		}
+
+		var morphTargetsRelative = json.data.morphTargetsRelative;
+
+		if ( morphTargetsRelative ) {
+
+			geometry.morphTargetsRelative = true;
 
 		}
 

@@ -105,7 +105,7 @@ THREE.OBJExporter.prototype = {
 						normal.z = normals.getZ( i );
 
 						// transfrom the normal to world space
-						normal.applyMatrix3( normalMatrixWorld );
+						normal.applyMatrix3( normalMatrixWorld ).normalize();
 
 						// transform the normal to export format
 						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';

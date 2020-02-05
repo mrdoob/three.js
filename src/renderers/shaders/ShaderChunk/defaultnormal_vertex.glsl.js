@@ -1,5 +1,13 @@
 export default /* glsl */`
-vec3 transformedNormal = normalMatrix * objectNormal;
+vec3 transformedNormal = objectNormal;
+
+#ifdef USE_INSTANCING
+
+	transformedNormal = mat3( instanceMatrix ) * transformedNormal;
+
+#endif
+
+transformedNormal = normalMatrix * transformedNormal;
 
 #ifdef FLIP_SIDED
 
@@ -9,7 +17,7 @@ vec3 transformedNormal = normalMatrix * objectNormal;
 
 #ifdef USE_TANGENT
 
-	vec3 transformedTangent = normalMatrix * objectTangent;
+	vec3 transformedTangent = ( modelViewMatrix * vec4( objectTangent, 0.0 ) ).xyz;
 
 	#ifdef FLIP_SIDED
 

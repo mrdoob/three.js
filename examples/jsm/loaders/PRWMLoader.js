@@ -268,7 +268,7 @@ var PRWMLoader = ( function () {
 			for ( i = 0; i < attributesKey.length; i ++ ) {
 
 				attribute = data.attributes[ attributesKey[ i ] ];
-				bufferGeometry.addAttribute( attributesKey[ i ], new BufferAttribute( attribute.values, attribute.cardinality, attribute.normalized ) );
+				bufferGeometry.setAttribute( attributesKey[ i ], new BufferAttribute( attribute.values, attribute.cardinality, attribute.normalized ) );
 
 			}
 

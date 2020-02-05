@@ -1,12 +1,12 @@
 import {
-  Uniform
+	Uniform
 } from '../../../src/Three';
 
 export const ColorifyShader: {
-  uniforms: {
-    tDiffuse: Uniform;
-    color: Uniform;
-  };
-  vertexShader: string;
-  fragmentShader: string;
+	uniforms: {
+		tDiffuse: Uniform;
+		color: Uniform;
+	};
+	vertexShader: string;
+	fragmentShader: string;
 };

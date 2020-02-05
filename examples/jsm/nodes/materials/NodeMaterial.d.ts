@@ -1,32 +1,32 @@
 import {
-  ShaderMaterial,
-  WebGLRenderer
+	ShaderMaterial,
+	WebGLRenderer
 } from '../../../../src/Three';
 
 import { NodeBuilder } from '../core/NodeBuilder';
 import { NodeFrame } from '../core/NodeFrame';
-import { StandardNode } from './nodes/StandardNode';
-import { PropertyNode } from '../inputs/PropertyNode';
 import { MeshStandardNode } from './nodes/MeshStandardNode';
 import { RawNode } from './nodes/RawNode';
 
 export interface NodeMaterialBuildParams {
-  builder?: NodeBuilder;
-  renderer?: WebGLRenderer;
+	builder?: NodeBuilder;
+	renderer?: WebGLRenderer;
 }
 
 export class NodeMaterial extends ShaderMaterial {
-  constructor(vertex: MeshStandardNode, fragment: MeshStandardNode);
 
-  vertex: MeshStandardNode | RawNode;
-  fragment: MeshStandardNode | RawNode;
+	constructor( vertex: MeshStandardNode, fragment: MeshStandardNode );
 
-  updaters: object[];
+	vertex: MeshStandardNode | RawNode;
+	fragment: MeshStandardNode | RawNode;
 
-  isNodeMaterial: boolean;
-  properties: object;
+	updaters: object[];
 
-  updateFrame(frame: NodeFrame): void;
-  build(params?: NodeMaterialBuildParams): this;
-  copy(source: NodeMaterial): this;
+	readonly isNodeMaterial: true;
+	properties: object;
+
+	updateFrame( frame: NodeFrame ): void;
+	build( params?: NodeMaterialBuildParams ): this;
+	copy( source: NodeMaterial ): this;
+
 }
