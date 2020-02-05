@@ -47,6 +47,8 @@ BoxHelper.prototype.update = function ( object ) {
 
 		_box.setFromObject( this.object );
 
+		this.geometry.boundingBox = null;
+		
 	}
 
 	if ( _box.isEmpty() ) return;
