@@ -59,13 +59,8 @@ scene.add( lod );
 		If set to false, you have to call [page:LOD.update]() in the render loop by yourself.
 		Default is true.
 		</p>
-
-		<h3>[property:integer currentLevel]</h3>
-		<p>
-		The currently active LOD level. As index of the levels array.
-		</p>
-
-		<h3>[property:array levels]</h3>
+			
+                <h3>[property:array levels]</h3>
 		<p>
 		An array of [page:object level] objects<br /><br />
 
@@ -91,6 +86,13 @@ scene.add( lod );
 		Returns a clone of this LOD object and its associated distance specific objects.
 		</p>
 
+
+		<h3>[method:integer getCurrentLevel]()</h3>
+		<p>
+		Get the currently active LOD level. As index of the levels array.
+		</p>
+
+		
 
 		<h3>[method:Object3D getObjectForDistance]( [param:Float distance] )</h3>
 		<p>
