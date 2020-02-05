@@ -7,6 +7,7 @@ import { Object3D } from '../core/Object3D.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
+var _currentLevel = 0;
 var _v1 = new Vector3();
 var _v2 = new Vector3();
 
@@ -33,8 +34,6 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isLOD: true,
 	
-	currentLevel: 0,
-
 	copy: function ( source ) {
 
 		Object3D.prototype.copy.call( this, source, false );
@@ -78,6 +77,12 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		this.add( object );
 
 		return this;
+
+	},
+	
+	getCurrentLevel: function () {
+
+		return _currentLevel;
 
 	},
 
@@ -148,8 +153,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				}
 
 			}
-			
-			this.currentLevel = i - 1;
+
+			_currentLevel = i - 1;
 
 			for ( ; i < l; i ++ ) {
 
