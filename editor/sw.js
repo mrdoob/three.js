@@ -167,6 +167,7 @@ const assets = [
 	'./js/commands/SetMaterialValueCommand.js',
 	'./js/commands/SetMaterialVectorCommand.js',
 	'./js/commands/SetSceneCommand.js',
+	'./js/commands/Commands.js',
 
 	//
 
