@@ -81,9 +81,9 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-        getCurrentLevel: function () {
+	getCurrentLevel: function () {
 
-                 return this._currentLevel;
+		return this._currentLevel;
 
 	},
 
