@@ -41,6 +41,8 @@ var SidebarMaterial = function ( editor ) {
 
 	var currentMaterialSlot = 0;
 
+	var epsilon = 0.01 - Number.EPSILON;
+
 	var container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setDisplay( 'none' );
@@ -635,13 +637,13 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
-			if ( material.roughness !== undefined && Math.abs( material.roughness - materialRoughness.getValue() ) >= 0.01 ) {
+			if ( material.roughness !== undefined && Math.abs( material.roughness - materialRoughness.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'roughness', materialRoughness.getValue(), currentMaterialSlot ) );
 
 			}
 
-			if ( material.metalness !== undefined && Math.abs( material.metalness - materialMetalness.getValue() ) >= 0.01 ) {
+			if ( material.metalness !== undefined && Math.abs( material.metalness - materialMetalness.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'metalness', materialMetalness.getValue(), currentMaterialSlot ) );
 
@@ -677,19 +679,19 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
-			if ( material.shininess !== undefined && Math.abs( material.shininess - materialShininess.getValue() ) >= 0.01 ) {
+			if ( material.shininess !== undefined && Math.abs( material.shininess - materialShininess.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'shininess', materialShininess.getValue(), currentMaterialSlot ) );
 
 			}
 
-			if ( material.clearcoat !== undefined && Math.abs( material.clearcoat - materialClearcoat.getValue() ) >= 0.01 ) {
+			if ( material.clearcoat !== undefined && Math.abs( material.clearcoat - materialClearcoat.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearcoat', materialClearcoat.getValue(), currentMaterialSlot ) );
 
 			}
 
-			if ( material.clearcoatRoughness !== undefined && Math.abs( material.clearcoatRoughness - materialClearcoatRoughness.getValue() ) >= 0.01 ) {
+			if ( material.clearcoatRoughness !== undefined && Math.abs( material.clearcoatRoughness - materialClearcoatRoughness.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearcoatRoughness', materialClearcoatRoughness.getValue(), currentMaterialSlot ) );
 
@@ -1112,7 +1114,7 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
-			if ( material.opacity !== undefined && Math.abs( material.opacity - materialOpacity.getValue() ) >= 0.01 ) {
+			if ( material.opacity !== undefined && Math.abs( material.opacity - materialOpacity.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'opacity', materialOpacity.getValue(), currentMaterialSlot ) );
 
@@ -1124,7 +1126,7 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
-			if ( material.alphaTest !== undefined && Math.abs( material.alphaTest - materialAlphaTest.getValue() ) >= 0.01 ) {
+			if ( material.alphaTest !== undefined && Math.abs( material.alphaTest - materialAlphaTest.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'alphaTest', materialAlphaTest.getValue(), currentMaterialSlot ) );
 
