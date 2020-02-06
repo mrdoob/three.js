@@ -493,6 +493,9 @@ var GLTFLoader = ( function () {
 
 				var material = new MeshBasicMaterial( materialParams );
 
+				// The following common property setup code is duplicated with the one
+				// in .loadMaterial(). Should we expose as a function to remove the duplicated code?
+
 				if ( materialDef.name !== undefined ) material.name = materialDef.name;
 				if ( materialDef.doubleSided === true ) material.side = DoubleSide;
 
@@ -514,9 +517,8 @@ var GLTFLoader = ( function () {
 
 				}
 
-				// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
+				// baseColorTexture uses sRGB encoding.
 				if ( material.map ) material.map.encoding = sRGBEncoding;
-				if ( material.emissiveMap ) material.emissiveMap.encoding = sRGBEncoding;
 
 				return material;
 
@@ -2534,30 +2536,6 @@ var GLTFLoader = ( function () {
 
 		}
 
-		if ( materialDef.doubleSided === true ) {
-
-			materialParams.side = DoubleSide;
-
-		}
-
-		var alphaMode = materialDef.alphaMode || ALPHA_MODES.OPAQUE;
-
-		if ( alphaMode === ALPHA_MODES.BLEND ) {
-
-			materialParams.transparent = true;
-
-		} else {
-
-			materialParams.transparent = false;
-
-			if ( alphaMode === ALPHA_MODES.MASK ) {
-
-				materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
-
-			}
-
-		}
-
 		if ( materialDef.normalTexture !== undefined ) {
 
 			pending.push( parser.assignTexture( materialParams, 'normalMap', materialDef.normalTexture ) );
@@ -2611,6 +2589,25 @@ var GLTFLoader = ( function () {
 			}
 
 			if ( materialDef.name !== undefined ) material.name = materialDef.name;
+			if ( materialDef.doubleSided === true ) material.side = DoubleSide;
+
+			var alphaMode = materialDef.alphaMode || ALPHA_MODES.OPAQUE;
+
+			if ( alphaMode === ALPHA_MODES.BLEND ) {
+
+				material.transparent = true;
+
+			} else {
+
+				material.transparent = false;
+
+				if ( alphaMode === ALPHA_MODES.MASK ) {
+
+					material.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
+
+				}
+
+			}
 
 			// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
 			if ( material.map ) material.map.encoding = sRGBEncoding;
