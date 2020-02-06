@@ -644,16 +644,6 @@ Editor.prototype = {
 	fromJSON: function ( json ) {
 
 		var loader = new THREE.ObjectLoader();
-
-		// backwards
-
-		if ( json.scene === undefined ) {
-
-			this.setScene( loader.parse( json ) );
-			return;
-
-		}
-
 		var camera = loader.parse( json.camera );
 
 		this.camera.copy( camera );
@@ -663,7 +653,11 @@ Editor.prototype = {
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		this.setScene( loader.parse( json.scene ) );
+		loader.parse( json.scene, ( scene ) => {
+
+			this.setScene( scene );
+
+		} );
 
 	},
 
