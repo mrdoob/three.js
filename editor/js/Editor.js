@@ -643,6 +643,8 @@ Editor.prototype = {
 
 	fromJSON: function ( json ) {
 
+		var scope = this;
+
 		var loader = new THREE.ObjectLoader();
 		var camera = loader.parse( json.camera );
 
@@ -653,9 +655,9 @@ Editor.prototype = {
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
 
-		loader.parse( json.scene, ( scene ) => {
+		loader.parse( json.scene, function ( scene ) {
 
-			this.setScene( scene );
+			scope.setScene( scene );
 
 		} );
 
