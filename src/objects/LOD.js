@@ -130,6 +130,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			var distance = _v1.distanceTo( _v2 );
 
+			distance /= camera.zoom;
+
 			levels[ 0 ].object.visible = true;
 
 			for ( var i = 1, l = levels.length; i < l; i ++ ) {
