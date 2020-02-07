@@ -158,7 +158,7 @@ var MenubarEdit = function ( editor ) {
 
 			var material = object.material;
 
-			if ( material.isShaderMaterial ) {
+			if ( material !== undefined && material.isShaderMaterial ) {
 
 				try {
 
