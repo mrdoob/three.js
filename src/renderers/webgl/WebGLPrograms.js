@@ -280,7 +280,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			index0AttributeName: material.index0AttributeName,
 
 			extensionDerivatives: material.extensions && material.extensions.derivatives,
-			extensionFragDepth: material.extensions && material.extensions.frawbuffers,
+			extensionFragDepth: material.extensions && material.extensions.fragDepth,
 			extensionDrawbuffers: material.extensions && material.extensions.drawbuffers,
 			extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
 
