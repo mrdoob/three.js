@@ -554,14 +554,6 @@ var UINumber = function ( number ) {
 	dom.className = 'Number';
 	dom.value = '0.00';
 
-	dom.addEventListener( 'keydown', function ( event ) {
-
-		event.stopPropagation();
-
-		if ( event.keyCode === 13 ) dom.blur();
-
-	}, false );
-
 	this.value = 0;
 
 	this.min = - Infinity;
@@ -570,6 +562,7 @@ var UINumber = function ( number ) {
 	this.precision = 2;
 	this.step = 1;
 	this.unit = '';
+	this.nudge = 0.01;
 
 	this.dom = dom;
 
@@ -705,8 +698,35 @@ var UINumber = function ( number ) {
 
 	}
 
+	function onKeyDown( event ) {
+
+		event.stopPropagation();
+
+		switch ( event.keyCode ) {
+
+			case 13: // enter
+				dom.blur();
+				break;
+
+			case 38: // up
+				event.preventDefault();
+				scope.setValue( scope.getValue() + scope.nudge );
+				dom.dispatchEvent( changeEvent );
+				break;
+
+			case 40: // down
+				event.preventDefault();
+				scope.setValue( scope.getValue() - scope.nudge );
+				dom.dispatchEvent( changeEvent );
+				break;
+
+		}
+
+	}
+
 	onBlur();
 
+	dom.addEventListener( 'keydown', onKeyDown, false );
 	dom.addEventListener( 'mousedown', onMouseDown, false );
 	dom.addEventListener( 'touchstart', onTouchStart, false );
 	dom.addEventListener( 'change', onChange, false );
@@ -762,6 +782,14 @@ UINumber.prototype.setStep = function ( step ) {
 
 };
 
+UINumber.prototype.setNudge = function ( nudge ) {
+
+	this.nudge = nudge;
+
+	return this;
+
+};
+
 UINumber.prototype.setRange = function ( min, max ) {
 
 	this.min = min;
@@ -791,18 +819,13 @@ var UIInteger = function ( number ) {
 	dom.className = 'Number';
 	dom.value = '0';
 
-	dom.addEventListener( 'keydown', function ( event ) {
-
-		event.stopPropagation();
-
-	}, false );
-
 	this.value = 0;
 
 	this.min = - Infinity;
 	this.max = Infinity;
 
 	this.step = 1;
+	this.nudge = 1;
 
 	this.dom = dom;
 
@@ -888,8 +911,35 @@ var UIInteger = function ( number ) {
 
 	}
 
+	function onKeyDown( event ) {
+
+		event.stopPropagation();
+
+		switch ( event.keyCode ) {
+
+			case 13: // enter
+				dom.blur();
+				break;
+
+			case 38: // up
+				event.preventDefault();
+				scope.setValue( scope.getValue() + scope.nudge );
+				dom.dispatchEvent( changeEvent );
+				break;
+
+			case 40: // down
+				event.preventDefault();
+				scope.setValue( scope.getValue() - scope.nudge );
+				dom.dispatchEvent( changeEvent );
+				break;
+
+		}
+
+	}
+
 	onBlur();
 
+	dom.addEventListener( 'keydown', onKeyDown, false );
 	dom.addEventListener( 'mousedown', onMouseDown, false );
 	dom.addEventListener( 'change', onChange, false );
 	dom.addEventListener( 'focus', onFocus, false );
@@ -926,6 +976,14 @@ UIInteger.prototype.setValue = function ( value ) {
 UIInteger.prototype.setStep = function ( step ) {
 
 	this.step = parseInt( step );
+
+	return this;
+
+};
+
+UIInteger.prototype.setNudge = function ( nudge ) {
+
+	this.nudge = nudge;
 
 	return this;
 
