@@ -287,6 +287,7 @@ var SidebarProject = function ( editor ) {
 	} );
 
 	signals.materialAdded.add( refreshMaterialBrowserUI );
+	signals.materialChanged.add( refreshMaterialBrowserUI );
 	signals.materialRemoved.add( refreshMaterialBrowserUI );
 
 	function refreshMaterialBrowserUI() {
