@@ -14,6 +14,7 @@ export interface Intersection {
 	faceIndex?: number;
 	object: Object3D;
 	uv?: Vector2;
+	instanceId?: number;
 }
 
 export interface RaycasterParameters {
