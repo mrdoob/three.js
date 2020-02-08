@@ -49,7 +49,7 @@ import {GUI} from '../../../3rdparty/dat.gui.module.js';
   }
 
   const THREE = {
-    Math: {
+    MathUtils: {
       radToDeg(rad) {
         return rad * 180 / Math.PI;
       },
@@ -65,10 +65,10 @@ import {GUI} from '../../../3rdparty/dat.gui.module.js';
       this.prop = prop;
     }
     get value() {
-      return THREE.Math.radToDeg(this.obj[this.prop]);
+      return THREE.MathUtils.radToDeg(this.obj[this.prop]);
     }
     set value(v) {
-      this.obj[this.prop] = THREE.Math.degToRad(v);
+      this.obj[this.prop] = THREE.MathUtils.degToRad(v);
     }
   }
 

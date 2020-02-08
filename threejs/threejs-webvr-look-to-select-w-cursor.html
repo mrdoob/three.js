@@ -20,8 +20,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {VRButton} from './resources/threejs/r112/examples/jsm/webxr/VRButton.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {VRButton} from './resources/threejs/r113/examples/jsm/webxr/VRButton.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -183,7 +183,7 @@ function main() {
       const fromEnd = this.selectDuration;
       const toStart = -0.5;
       const toEnd = 0.5;
-      this.cursorTexture.offset.x = THREE.Math.mapLinear(
+      this.cursorTexture.offset.x = THREE.MathUtils.mapLinear(
           this.selectTimer,
           fromStart, fromEnd,
           toStart, toEnd);

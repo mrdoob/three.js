@@ -20,8 +20,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -86,7 +86,7 @@ function main() {
 
   function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
     const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
-    const halfFovY = THREE.Math.degToRad(camera.fov * .5);
+    const halfFovY = THREE.MathUtils.degToRad(camera.fov * .5);
     const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
 
     camera.position.copy(boxCenter);

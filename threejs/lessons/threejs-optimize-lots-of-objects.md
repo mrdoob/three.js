@@ -194,7 +194,7 @@ function addBoxes(file) {
   const boxDepth = 1;
   const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
   // make it so it scales away from the positive Z axis
-  geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
+  geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
   // these helpers will make it easy to position the boxes
   // We can rotate the lon helper on its Y axis to the longitude
@@ -217,23 +217,23 @@ function addBoxes(file) {
       }
       const amount = (value - min) / range;
       const material = new THREE.MeshBasicMaterial();
-      const hue = THREE.Math.lerp(0.7, 0.3, amount);
+      const hue = THREE.MathUtils.lerp(0.7, 0.3, amount);
       const saturation = 1;
-      const lightness = THREE.Math.lerp(0.1, 1.0, amount);
+      const lightness = THREE.MathUtils.lerp(0.1, 1.0, amount);
       material.color.setHSL(hue, saturation, lightness);
       const mesh = new THREE.Mesh(geometry, material);
       scene.add(mesh);
 
       // adjust the helpers to point to the latitude and longitude
-      lonHelper.rotation.y = THREE.Math.degToRad(lonNdx + file.xllcorner) + lonFudge;
-      latHelper.rotation.x = THREE.Math.degToRad(latNdx + file.yllcorner) + latFudge;
+      lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
+      latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;
 
       // use the world matrix of the position helper to
       // position this mesh.
       positionHelper.updateWorldMatrix(true, false);
-      mesh.applyMatrix(positionHelper.matrixWorld);
+      mesh.applyMatrix4(positionHelper.matrixWorld);
 
-      mesh.scale.set(0.005, 0.005, THREE.Math.lerp(0.01, 0.5, amount));
+      mesh.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
     });
   });
 }
@@ -345,7 +345,7 @@ function addBoxes(file) {
 -  const boxDepth = 1;
 -  const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
 -  // make it so it scales away from the positive Z axis
--  geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
+-  geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
   // these helpers will make it easy to position the boxes
   // We can rotate the lon helper on its Y axis to the longitude
@@ -374,9 +374,9 @@ function addBoxes(file) {
       const amount = (value - min) / range;
 
 -      const material = new THREE.MeshBasicMaterial();
--      const hue = THREE.Math.lerp(0.7, 0.3, amount);
+-      const hue = THREE.MathUtils.lerp(0.7, 0.3, amount);
 -      const saturation = 1;
--      const lightness = THREE.Math.lerp(0.1, 1.0, amount);
+-      const lightness = THREE.MathUtils.lerp(0.1, 1.0, amount);
 -      material.color.setHSL(hue, saturation, lightness);
 -      const mesh = new THREE.Mesh(geometry, material);
 -      scene.add(mesh);
@@ -387,21 +387,21 @@ function addBoxes(file) {
 +      const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
 
       // adjust the helpers to point to the latitude and longitude
-      lonHelper.rotation.y = THREE.Math.degToRad(lonNdx + file.xllcorner) + lonFudge;
-      latHelper.rotation.x = THREE.Math.degToRad(latNdx + file.yllcorner) + latFudge;
+      lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
+      latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;
 
 -      // use the world matrix of the position helper to
 -      // position this mesh.
 -      positionHelper.updateWorldMatrix(true, false);
--      mesh.applyMatrix(positionHelper.matrixWorld);
+-      mesh.applyMatrix4(positionHelper.matrixWorld);
 -
--      mesh.scale.set(0.005, 0.005, THREE.Math.lerp(0.01, 0.5, amount));
+-      mesh.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
 
 +      // use the world matrix of the origin helper to
 +      // position this geometry
-+      positionHelper.scale.set(0.005, 0.005, THREE.Math.lerp(0.01, 0.5, amount));
++      positionHelper.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
 +      originHelper.updateWorldMatrix(true, false);
-+      geometry.applyMatrix(originHelper.matrixWorld);
++      geometry.applyMatrix4(originHelper.matrixWorld);
 +
 +      geometries.push(geometry);
     });
@@ -429,7 +429,7 @@ them into a single mesh.
 We also need to include the `BufferGeometryUtils`
 
 ```js
-import {BufferGeometryUtils} from './resources/threejs/r112/examples/jsm/utils/BufferGeometryUtils.js';
+import {BufferGeometryUtils} from './resources/threejs/r113/examples/jsm/utils/BufferGeometryUtils.js';
 ```
 
 And now, at least on my machine, I get 60 frames per second
@@ -462,19 +462,19 @@ data.forEach((row, latNdx) => {
     const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
 
     // adjust the helpers to point to the latitude and longitude
-    lonHelper.rotation.y = THREE.Math.degToRad(lonNdx + file.xllcorner) + lonFudge;
-    latHelper.rotation.x = THREE.Math.degToRad(latNdx + file.yllcorner) + latFudge;
+    lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
+    latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;
 
     // use the world matrix of the origin helper to
     // position this geometry
-    positionHelper.scale.set(0.005, 0.005, THREE.Math.lerp(0.01, 0.5, amount));
+    positionHelper.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
     originHelper.updateWorldMatrix(true, false);
-    geometry.applyMatrix(originHelper.matrixWorld);
+    geometry.applyMatrix4(originHelper.matrixWorld);
 
 +    // compute a color
-+    const hue = THREE.Math.lerp(0.7, 0.3, amount);
++    const hue = THREE.MathUtils.lerp(0.7, 0.3, amount);
 +    const saturation = 1;
-+    const lightness = THREE.Math.lerp(0.4, 1.0, amount);
++    const lightness = THREE.MathUtils.lerp(0.4, 1.0, amount);
 +    color.setHSL(hue, saturation, lightness);
 +    // get the colors as an array of values from 0 to 255
 +    const rgb = color.toArray().map(v => v * 255);

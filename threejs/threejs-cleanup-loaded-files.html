@@ -25,8 +25,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {GLTFLoader} from './resources/threejs/r112/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {GLTFLoader} from './resources/threejs/r113/examples/jsm/loaders/GLTFLoader.js';
 
 class ResourceTracker {
   constructor() {
@@ -117,7 +117,7 @@ function main() {
 
   function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
     const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
-    const halfFovY = THREE.Math.degToRad(camera.fov * .5);
+    const halfFovY = THREE.MathUtils.degToRad(camera.fov * .5);
     const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
     // compute a unit vector that points in the direction the camera is now
     // in the xz plane from the center of the box

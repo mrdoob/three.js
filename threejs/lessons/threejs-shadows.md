@@ -221,9 +221,9 @@ function render(time) {
     // yOff is a value that goes from 0 to 1
     const yOff = Math.abs(Math.sin(time * 2 + ndx));
     // move the sphere up and down
-    sphereMesh.position.y = y + THREE.Math.lerp(-2, 2, yOff);
+    sphereMesh.position.y = y + THREE.MathUtils.lerp(-2, 2, yOff);
     // fade the shadow as the sphere goes up
-    shadowMesh.material.opacity = THREE.Math.lerp(1, .25, yOff);
+    shadowMesh.material.opacity = THREE.MathUtils.lerp(1, .25, yOff);
   });
 
   ...

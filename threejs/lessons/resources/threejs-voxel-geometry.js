@@ -1,5 +1,5 @@
-import * as THREE from '../../resources/threejs/r112/build/three.module.js';
-import {BufferGeometryUtils} from '../../resources/threejs/r112/examples/jsm/utils/BufferGeometryUtils.js';
+import * as THREE from '../../resources/threejs/r113/build/three.module.js';
+import {BufferGeometryUtils} from '../../resources/threejs/r113/examples/jsm/utils/BufferGeometryUtils.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
@@ -26,7 +26,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
           for (let z = 0; z < depth; ++z) {
             for (let x = 0; x < width; ++x) {
               const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-              geometry.applyMatrix((new THREE.Matrix4()).makeTranslation(x, y, z));
+              geometry.applyMatrix4((new THREE.Matrix4()).makeTranslation(x, y, z));
               geometries.push(geometry);
             }
           }

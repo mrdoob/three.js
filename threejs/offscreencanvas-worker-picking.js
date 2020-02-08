@@ -2,7 +2,7 @@
 
 /* global importScripts, init, state, pickPosition */
 
-importScripts('resources/threejs/r112/build/three.min.js');
+importScripts('resources/threejs/r113/build/three.min.js');
 importScripts('shared-picking.js');
 
 function size(data) {

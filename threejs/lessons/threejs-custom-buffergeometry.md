@@ -445,7 +445,7 @@ for (let i = 0; i < positions.length; i += 3) {
   const ringU = ringQuadId / segmentsAround;
   const angle = ringU * Math.PI * 2;
   temp.fromArray(normals, i);
-  temp.multiplyScalar(THREE.Math.lerp(1, 1.4, Math.sin(time + ringId + angle) * .5 + .5));
+  temp.multiplyScalar(THREE.MathUtils.lerp(1, 1.4, Math.sin(time + ringId + angle) * .5 + .5));
   temp.toArray(positions, i);
 }
 positionAttribute.needsUpdate = true;

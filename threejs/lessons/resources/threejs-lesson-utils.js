@@ -1,5 +1,5 @@
-import * as THREE from '../../resources/threejs/r112/build/three.module.js';
-import {TrackballControls} from '../../resources/threejs/r112/examples/jsm/controls/TrackballControls.js';
+import * as THREE from '../../resources/threejs/r113/build/three.module.js';
+import {TrackballControls} from '../../resources/threejs/r113/examples/jsm/controls/TrackballControls.js';
 
 export const threejsLessonUtils = {
   init() {
@@ -192,7 +192,7 @@ export const threejsLessonUtils = {
       const aspect = renderInfo.width / renderInfo.height;
       const fovDeg = aspect >= 1
         ? targetFOVDeg
-        : THREE.Math.radToDeg(2 * Math.atan(Math.tan(THREE.Math.degToRad(targetFOVDeg) * .5) / aspect));
+        : THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(targetFOVDeg) * .5) / aspect));
 
       camera.fov = fovDeg;
       camera.aspect = aspect;

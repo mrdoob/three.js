@@ -20,7 +20,7 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -162,7 +162,7 @@ function main() {
       const ringU = ringQuadId / segmentsAround;
       const angle = ringU * Math.PI * 2;
       temp.fromArray(normals, i);
-      temp.multiplyScalar(THREE.Math.lerp(1, 1.4, Math.sin(time + ringId + angle) * .5 + .5));
+      temp.multiplyScalar(THREE.MathUtils.lerp(1, 1.4, Math.sin(time + ringId + angle) * .5 + .5));
       temp.toArray(positions, i);
     }
     positionAttribute.needsUpdate = true;

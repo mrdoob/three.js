@@ -20,7 +20,7 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -112,7 +112,7 @@ function main() {
     const fromEnd = 2;
     const toStart = -0.5;
     const toEnd = 0.5;
-    cursorTexture.offset.x = THREE.Math.mapLinear(
+    cursorTexture.offset.x = THREE.MathUtils.mapLinear(
         time % 2,
         fromStart, fromEnd,
         toStart, toEnd);

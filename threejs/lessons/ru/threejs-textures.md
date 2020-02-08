@@ -502,7 +502,7 @@ someTexture.offset.set(xOffset, yOffset);`
 
 ```js
 someTexture.center.set(.5, .5);
-someTexture.rotation = THREE.Math.degToRad(45); 
+someTexture.rotation = THREE.MathUtils.degToRad(45); 
 ```
 
 Давайте изменим верхний пример выше, чтобы играть с этими значениями
@@ -535,10 +535,10 @@ class DegRadHelper {
     this.prop = prop;
   }
   get value() {
-    return THREE.Math.radToDeg(this.obj[this.prop]);
+    return THREE.MathUtils.radToDeg(this.obj[this.prop]);
   }
   set value(v) {
-    this.obj[this.prop] = THREE.Math.degToRad(v);
+    this.obj[this.prop] = THREE.MathUtils.degToRad(v);
   }
 }
 ```

@@ -29,8 +29,8 @@ an optional feature of three.js so first we need to include them
 in our page
 
 ```js
-import * as THREE from './resources/three/r112/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r113/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
 ```
 
 Then we can use them. We pass the `OrbitControls` a camera to
@@ -477,9 +477,9 @@ To use the `RectAreaLight` we need to include some extra three.js optional data 
 include the `RectAreaLightHelper` to help us visualize the light
 
 ```js
-import * as THREE from './resources/three/r112/build/three.module.js';
-+import {RectAreaLightUniformsLib} from './resources/threejs/r112/examples/jsm/lights/RectAreaLightUniformsLib.js';
-+import {RectAreaLightHelper} from './resources/threejs/r112/examples/jsm/helpers/RectAreaLightHelper.js';
+import * as THREE from './resources/three/r113/build/three.module.js';
++import {RectAreaLightUniformsLib} from './resources/threejs/r113/examples/jsm/lights/RectAreaLightUniformsLib.js';
++import {RectAreaLightHelper} from './resources/threejs/r113/examples/jsm/helpers/RectAreaLightHelper.js';
 ```
 
 and we need to call `RectAreaLightUniformsLib.init`
@@ -503,7 +503,7 @@ const color = 0xFFFFFF;
 +const height = 4;
 *const light = new THREE.RectAreaLight(color, intensity, width, height);
 light.position.set(0, 10, 0);
-+light.rotation.x = THREE.Math.degToRad(-90);
++light.rotation.x = THREE.MathUtils.degToRad(-90);
 scene.add(light);
 
 *const helper = new RectAreaLightHelper(light);

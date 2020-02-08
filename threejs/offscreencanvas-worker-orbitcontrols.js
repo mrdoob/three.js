@@ -2,8 +2,8 @@
 
 /* global importScripts, init, THREE */
 
-importScripts('resources/threejs/r112/build/three.min.js');
-importScripts('resources/threejs/r112/examples/js/controls/OrbitControls.js');
+importScripts('resources/threejs/r113/build/three.min.js');
+importScripts('resources/threejs/r113/examples/js/controls/OrbitControls.js');
 importScripts('shared-orbitcontrols.js');
 
 function noop() {

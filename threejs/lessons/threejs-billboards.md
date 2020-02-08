@@ -179,7 +179,7 @@ in [the article on render targets](threejs-rendertargets.html).
 ```js
 function frameArea(sizeToFitOnScreen, boxSize, boxCenter, camera) {
   const halfSizeToFitOnScreen = sizeToFitOnScreen * 0.5;
-  const halfFovY = THREE.Math.degToRad(camera.fov * .5);
+  const halfFovY = THREE.MathUtils.degToRad(camera.fov * .5);
   const distance = halfSizeToFitOnScreen / Math.tan(halfFovY);
 
   camera.position.copy(boxCenter);

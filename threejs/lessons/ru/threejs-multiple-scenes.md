@@ -472,7 +472,7 @@ document.querySelectorAll('[data-diagram]').forEach((elem) => {
 Сначала мы добавляем скрипт для контролов.
 
 ```js
-import {TrackballControls} from './resources/threejs/r112/examples/jsm/controls/TrackballControls.js';
+import {TrackballControls} from './resources/threejs/r113/examples/jsm/controls/TrackballControls.js';
 ```
 
 И затем мы можем добавить `TrackballControls` к каждой сцене, передавая элемент, связанный с этой сценой.

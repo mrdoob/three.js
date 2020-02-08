@@ -243,10 +243,10 @@ it for skinned animated characters. Fortunately there's a utility function,
 the utils.
 
 ```js
-import * as THREE from './resources/three/r112/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from './resources/threejs/r112/examples/jsm/loaders/GLTFLoader.js';
-+import {SkeletonUtils} from './resources/threejs/r112/examples/jsm/utils/SkeletonUtils.js';
+import * as THREE from './resources/three/r113/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r113/examples/jsm/loaders/GLTFLoader.js';
++import {SkeletonUtils} from './resources/threejs/r113/examples/jsm/utils/SkeletonUtils.js';
 ```
 
 Then we can clone the models we just loaded
@@ -1015,7 +1015,7 @@ class CameraInfo extends Component {
     this.projScreenMatrix.multiplyMatrices(
         camera.projectionMatrix,
         camera.matrixWorldInverse);
-    this.frustum.setFromMatrix(this.projScreenMatrix);
+    this.frustum.setFromProjectionMatrix(this.projScreenMatrix);
   }
 }
 ```
@@ -1410,7 +1410,7 @@ const aimTowardAndGetDistance = function() {
     // make sure we don't turn faster than maxTurn
     const deltaRotation = minMagnitude(deltaRot, maxTurn);
     // keep rotation between 0 and Math.PI * 2
-    source.rotation.y = THREE.Math.euclideanModulo(
+    source.rotation.y = THREE.MathUtils.euclideanModulo(
         source.rotation.y + deltaRotation, Math.PI * 2);
     // return the distance to the target
     return delta.length();
@@ -1680,7 +1680,7 @@ class Animal extends Component {
   }
   update() {
     this.fsm.update();
-+    const dir = THREE.Math.radToDeg(this.gameObject.transform.rotation.y);
++    const dir = THREE.MathUtils.radToDeg(this.gameObject.transform.rotation.y);
 +    this.helper.setState(`${this.fsm.state}:${dir.toFixed(0)}`);
   }
 }
@@ -1690,10 +1690,10 @@ While we're at it lets make it so we can turn them on/off using dat.GUI like
 we've used else where
 
 ```js
-import * as THREE from './resources/three/r112/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from './resources/threejs/r112/examples/jsm/loaders/GLTFLoader.js';
-import {SkeletonUtils} from './resources/threejs/r112/examples/jsm/utils/SkeletonUtils.js';
+import * as THREE from './resources/three/r113/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r113/examples/jsm/loaders/GLTFLoader.js';
+import {SkeletonUtils} from './resources/threejs/r113/examples/jsm/utils/SkeletonUtils.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 

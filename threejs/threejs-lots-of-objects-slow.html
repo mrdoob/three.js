@@ -20,8 +20,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -96,7 +96,7 @@ function main() {
     const boxDepth = 1;
     const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
     // make it so it scales away from the positive Z axis
-    geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
+    geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, 0.5));
 
     // these helpers will make it easy to position the boxes
     // We can rotate the lon helper on its Y axis to the longitude
@@ -119,23 +119,23 @@ function main() {
         }
         const amount = (value - min) / range;
         const material = new THREE.MeshBasicMaterial();
-        const hue = THREE.Math.lerp(0.7, 0.3, amount);
+        const hue = THREE.MathUtils.lerp(0.7, 0.3, amount);
         const saturation = 1;
-        const lightness = THREE.Math.lerp(0.4, 1.0, amount);
+        const lightness = THREE.MathUtils.lerp(0.4, 1.0, amount);
         material.color.setHSL(hue, saturation, lightness);
         const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
 
         // adjust the helpers to point to the latitude and longitude
-        lonHelper.rotation.y = THREE.Math.degToRad(lonNdx + file.xllcorner) + lonFudge;
-        latHelper.rotation.x = THREE.Math.degToRad(latNdx + file.yllcorner) + latFudge;
+        lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
+        latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;
 
         // use the world matrix of the position helper to
         // position this mesh.
         positionHelper.updateWorldMatrix(true, false);
-        mesh.applyMatrix(positionHelper.matrixWorld);
+        mesh.applyMatrix4(positionHelper.matrixWorld);
 
-        mesh.scale.set(0.005, 0.005, THREE.Math.lerp(0.01, 0.5, amount));
+        mesh.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
       });
     });
   }

@@ -21,8 +21,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
 import {GUI} from '../3rdparty/dat.gui.module.js';
 
 function main() {
@@ -101,10 +101,10 @@ function main() {
       this.prop = prop;
     }
     get value() {
-      return THREE.Math.radToDeg(this.obj[this.prop]);
+      return THREE.MathUtils.radToDeg(this.obj[this.prop]);
     }
     set value(v) {
-      this.obj[this.prop] = THREE.Math.degToRad(v);
+      this.obj[this.prop] = THREE.MathUtils.degToRad(v);
     }
   }
 

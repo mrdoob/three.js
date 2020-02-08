@@ -1,4 +1,4 @@
-import * as THREE from '../../resources/threejs/r112/build/three.module.js';
+import * as THREE from '../../resources/threejs/r113/build/three.module.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 import {GUI} from '../../../3rdparty/dat.gui.module.js';
 
@@ -9,10 +9,10 @@ import {GUI} from '../../../3rdparty/dat.gui.module.js';
       this.prop = prop;
     }
     get value() {
-      return THREE.Math.radToDeg(this.obj[this.prop]);
+      return THREE.MathUtils.radToDeg(this.obj[this.prop]);
     }
     set value(v) {
-      this.obj[this.prop] = THREE.Math.degToRad(v);
+      this.obj[this.prop] = THREE.MathUtils.degToRad(v);
     }
   }
 
@@ -21,7 +21,7 @@ import {GUI} from '../../../3rdparty/dat.gui.module.js';
 
     const size = 3;
     const geometry = new THREE.BoxBufferGeometry(size, size, size);
-    geometry.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, zOffset * size));
+    geometry.applyMatrix4(new THREE.Matrix4().makeTranslation(0, 0, zOffset * size));
     const material = new THREE.MeshBasicMaterial({
       color: 'red',
     });
@@ -43,7 +43,7 @@ import {GUI} from '../../../3rdparty/dat.gui.module.js';
     return {
       obj3D: root,
       update: (time) => {
-        const s = THREE.Math.lerp(0.5, 2, Math.sin(time) * .5 + .5);
+        const s = THREE.MathUtils.lerp(0.5, 2, Math.sin(time) * .5 + .5);
         cube.scale.set(s, s, s);
       },
     };

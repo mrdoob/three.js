@@ -149,10 +149,10 @@
     <div id="labels"></div>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from './resources/threejs/r112/examples/jsm/loaders/GLTFLoader.js';
-import {SkeletonUtils} from './resources/threejs/r112/examples/jsm/utils/SkeletonUtils.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r113/examples/jsm/loaders/GLTFLoader.js';
+import {SkeletonUtils} from './resources/threejs/r113/examples/jsm/utils/SkeletonUtils.js';
 import {GUI} from '../3rdparty/dat.gui.module.js';
 
 function main() {
@@ -486,7 +486,7 @@ function main() {
       this.projScreenMatrix.multiplyMatrices(
           camera.projectionMatrix,
           camera.matrixWorldInverse);
-      this.frustum.setFromMatrix(this.projScreenMatrix);
+      this.frustum.setFromProjectionMatrix(this.projScreenMatrix);
     }
   }
 
@@ -651,7 +651,7 @@ function main() {
       // make sure we don't turn faster than maxTurn
       const deltaRotation = minMagnitude(deltaRot, maxTurn);
       // keep rotation between 0 and Math.PI * 2
-      source.rotation.y = THREE.Math.euclideanModulo(
+      source.rotation.y = THREE.MathUtils.euclideanModulo(
           source.rotation.y + deltaRotation, Math.PI * 2);
       // return the distance to the target
       return delta.length();
@@ -742,7 +742,7 @@ function main() {
     }
     update() {
       this.fsm.update();
-      const dir = THREE.Math.radToDeg(this.gameObject.transform.rotation.y);
+      const dir = THREE.MathUtils.radToDeg(this.gameObject.transform.rotation.y);
       this.helper.setState(`${this.fsm.state}:${dir.toFixed(0)}`);
     }
   }

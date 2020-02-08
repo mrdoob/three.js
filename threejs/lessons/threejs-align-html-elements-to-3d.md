@@ -35,8 +35,8 @@ with an example from [the article on responsive pages](threejs-responsive.html)
 We'll add some `OrbitControls` like we did in [the article on lighting](threejs-lights.html).
 
 ```js
-import * as THREE from './resources/three/r112/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r113/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js
@@ -295,7 +295,7 @@ someMesh.updateMatrixWorld();
 
 viewProjection.multiplyMatrices(
     camera.projectionMatrix, camera.matrixWorldInverse);
-frustum.setFromMatrix(viewProjection);
+frustum.setFromProjectionMatrix(viewProjection);
 const inFrustum = frustum.contains(someMesh));
 ```
 
@@ -475,8 +475,8 @@ for (const countryInfo of countryInfos) {
   const {lat, lon, name} = countryInfo;
 
   // adjust the helpers to point to the latitude and longitude
-  lonHelper.rotation.y = THREE.Math.degToRad(lon) + lonFudge;
-  latHelper.rotation.x = THREE.Math.degToRad(lat) + latFudge;
+  lonHelper.rotation.y = THREE.MathUtils.degToRad(lon) + lonFudge;
+  latHelper.rotation.x = THREE.MathUtils.degToRad(lat) + latFudge;
 
   // get the position of the lat/lon
   positionHelper.updateWorldMatrix(true, false);
@@ -675,8 +675,8 @@ for (const countryInfo of countryInfos) {
   const {lat, lon, min, max, name} = countryInfo;
 
   // adjust the helpers to point to the latitude and longitude
-  lonHelper.rotation.y = THREE.Math.degToRad(lon) + lonFudge;
-  latHelper.rotation.x = THREE.Math.degToRad(lat) + latFudge;
+  lonHelper.rotation.y = THREE.MathUtils.degToRad(lon) + lonFudge;
+  latHelper.rotation.x = THREE.MathUtils.degToRad(lat) + latFudge;
 
   // get the position of the lat/lon
   positionHelper.updateWorldMatrix(true, false);
@@ -724,8 +724,8 @@ Finally, since I'm not sure what good values are for these settings lets
 add a GUI so we can play with them
 
 ```js
-import * as THREE from './resources/three/r112/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r113/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 

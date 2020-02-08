@@ -1,4 +1,4 @@
-import * as THREE from '../../resources/threejs/r112/build/three.module.js';
+import * as THREE from '../../resources/threejs/r113/build/three.module.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
@@ -56,7 +56,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         mat.multiply(perspMat);
         mat.multiply(inMat);
 
-        geometry.applyMatrix(mat);
+        geometry.applyMatrix4(mat);
         geometry.computeBoundingBox();
         geometry.center();
         geometry.scale(3, 3, 3);

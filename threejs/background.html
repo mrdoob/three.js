@@ -22,9 +22,9 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
-import {GLTFLoader} from './resources/threejs/r112/examples/jsm/loaders/GLTFLoader.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from './resources/threejs/r113/examples/jsm/loaders/GLTFLoader.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -190,8 +190,8 @@ function main() {
 
     if (resizeRendererToDisplaySize(renderer)) {
       const aspect = canvas.clientWidth / canvas.clientHeight;
-      const fovX = THREE.Math.radToDeg(2 * Math.atan(Math.tan(THREE.Math.degToRad(fov) * 0.5) * aspect));
-      const newFovY = THREE.Math.radToDeg(2 * Math.atan(Math.tan(THREE.Math.degToRad(maxFovX) * .5) / aspect));
+      const fovX = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(fov) * 0.5) * aspect));
+      const newFovY = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(maxFovX) * .5) / aspect));
       camera.fov = fovX > maxFovX ? newFovY : fov;
       camera.aspect = aspect;
       camera.updateProjectionMatrix();

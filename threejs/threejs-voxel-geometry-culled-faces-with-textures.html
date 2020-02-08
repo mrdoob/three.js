@@ -20,8 +20,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
 
 class VoxelWorld {
   constructor(options) {
@@ -35,9 +35,9 @@ class VoxelWorld {
   }
   computeVoxelOffset(x, y, z) {
     const {cellSize, cellSliceSize} = this;
-    const voxelX = THREE.Math.euclideanModulo(x, cellSize) | 0;
-    const voxelY = THREE.Math.euclideanModulo(y, cellSize) | 0;
-    const voxelZ = THREE.Math.euclideanModulo(z, cellSize) | 0;
+    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
+    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
+    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
     return voxelY * cellSliceSize +
            voxelZ * cellSize +
            voxelX;

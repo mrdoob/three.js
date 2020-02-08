@@ -20,9 +20,9 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {BufferGeometryUtils} from './resources/threejs/r112/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {BufferGeometryUtils} from './resources/threejs/r113/examples/jsm/utils/BufferGeometryUtils.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -123,14 +123,14 @@ function main() {
         const geometry = new THREE.BoxBufferGeometry(boxWidth, boxHeight, boxDepth);
 
         // adjust the helpers to point to the latitude and longitude
-        lonHelper.rotation.y = THREE.Math.degToRad(lonNdx + file.xllcorner) + lonFudge;
-        latHelper.rotation.x = THREE.Math.degToRad(latNdx + file.yllcorner) + latFudge;
+        lonHelper.rotation.y = THREE.MathUtils.degToRad(lonNdx + file.xllcorner) + lonFudge;
+        latHelper.rotation.x = THREE.MathUtils.degToRad(latNdx + file.yllcorner) + latFudge;
 
         // use the world matrix of the origin helper to
         // position this geometry
-        positionHelper.scale.set(0.005, 0.005, THREE.Math.lerp(0.01, 0.5, amount));
+        positionHelper.scale.set(0.005, 0.005, THREE.MathUtils.lerp(0.01, 0.5, amount));
         originHelper.updateWorldMatrix(true, false);
-        geometry.applyMatrix(originHelper.matrixWorld);
+        geometry.applyMatrix4(originHelper.matrixWorld);
 
         geometries.push(geometry);
       });

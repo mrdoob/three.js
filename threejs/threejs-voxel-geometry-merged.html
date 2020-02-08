@@ -20,9 +20,9 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r112/build/three.module.js';
-import {BufferGeometryUtils} from './resources/threejs/r112/examples/jsm/utils/BufferGeometryUtils.js';
-import {OrbitControls} from './resources/threejs/r112/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r113/build/three.module.js';
+import {BufferGeometryUtils} from './resources/threejs/r113/examples/jsm/utils/BufferGeometryUtils.js';
+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -60,7 +60,7 @@ function main() {
         //if (y < height) {
         if (height > y && height < y + 1) {
           const geometry = new THREE.BoxBufferGeometry(1, 1, 1);
-          geometry.applyMatrix((new THREE.Matrix4()).makeTranslation(x, y, z));
+          geometry.applyMatrix4((new THREE.Matrix4()).makeTranslation(x, y, z));
           geometries.push(geometry);
         }
       }

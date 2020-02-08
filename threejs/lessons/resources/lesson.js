@@ -243,7 +243,7 @@ $(document).ready(function($){
     Sprite: 'https://threejs.org/docs/#api/objects/Sprite',
     WebGLRenderer: 'https://threejs.org/docs/#api/renderers/WebGLRenderer',
     WebGLRenderTarget: 'https://threejs.org/docs/#api/renderers/WebGLRenderTarget',
-    WebGLRenderTargetCube: 'https://threejs.org/docs/#api/renderers/WebGLRenderTargetCube',
+    WebGLCubeRenderTarget: 'https://threejs.org/docs/#api/renderers/WebGLCubeRenderTarget',
     ShaderChunk: 'https://threejs.org/docs/#api/renderers/shaders/ShaderChunk',
     ShaderLib: 'https://threejs.org/docs/#api/renderers/shaders/ShaderLib',
     UniformsLib: 'https://threejs.org/docs/#api/renderers/shaders/UniformsLib',

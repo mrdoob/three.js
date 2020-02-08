@@ -348,9 +348,9 @@ class VoxelWorld {
 +      return 0;
 +    }
 +    const {cellSize} = this;
-+    const voxelX = THREE.Math.euclideanModulo(x, cellSize) | 0;
-+    const voxelY = THREE.Math.euclideanModulo(y, cellSize) | 0;
-+    const voxelZ = THREE.Math.euclideanModulo(z, cellSize) | 0;
++    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
++    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
++    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
 +    const voxelOffset = voxelY * cellSize * cellSize +
 +                        voxelZ * cellSize +
 +                        voxelX;
@@ -387,9 +387,9 @@ class VoxelWorld {
 +      return;  // TODO: add a new cell?
 +    }
 +    const {cellSize} = this;
-+    const voxelX = THREE.Math.euclideanModulo(x, cellSize) | 0;
-+    const voxelY = THREE.Math.euclideanModulo(y, cellSize) | 0;
-+    const voxelZ = THREE.Math.euclideanModulo(z, cellSize) | 0;
++    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
++    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
++    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
 +    const voxelOffset = voxelY * cellSize * cellSize +
 +                        voxelZ * cellSize +
 +                        voxelX;
@@ -401,9 +401,9 @@ class VoxelWorld {
       return 0;
     }
     const {cellSize} = this;
-    const voxelX = THREE.Math.euclideanModulo(x, cellSize) | 0;
-    const voxelY = THREE.Math.euclideanModulo(y, cellSize) | 0;
-    const voxelZ = THREE.Math.euclideanModulo(z, cellSize) | 0;
+    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
+    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
+    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
     const voxelOffset = voxelY * cellSize * cellSize +
                         voxelZ * cellSize +
                         voxelX;
@@ -436,9 +436,9 @@ class VoxelWorld {
   }
 +  computeVoxelOffset(x, y, z) {
 +    const {cellSize, cellSliceSize} = this;
-+    const voxelX = THREE.Math.euclideanModulo(x, cellSize) | 0;
-+    const voxelY = THREE.Math.euclideanModulo(y, cellSize) | 0;
-+    const voxelZ = THREE.Math.euclideanModulo(z, cellSize) | 0;
++    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
++    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
++    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
 +    return voxelY * cellSliceSize +
 +           voxelZ * cellSize +
 +           voxelX;
@@ -449,9 +449,9 @@ class VoxelWorld {
       return;  // TODO: add a new cell?
     }
 -    const {cellSize} = this;
--    const voxelX = THREE.Math.euclideanModulo(x, cellSize) | 0;
--    const voxelY = THREE.Math.euclideanModulo(y, cellSize) | 0;
--    const voxelZ = THREE.Math.euclideanModulo(z, cellSize) | 0;
+-    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
+-    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
+-    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
 -    const voxelOffset = voxelY * cellSize * cellSize +
 -                        voxelZ * cellSize +
 -                        voxelX;
@@ -464,9 +464,9 @@ class VoxelWorld {
       return 0;
     }
 -    const {cellSize} = this;
--    const voxelX = THREE.Math.euclideanModulo(x, cellSize) | 0;
--    const voxelY = THREE.Math.euclideanModulo(y, cellSize) | 0;
--    const voxelZ = THREE.Math.euclideanModulo(z, cellSize) | 0;
+-    const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
+-    const voxelY = THREE.MathUtils.euclideanModulo(y, cellSize) | 0;
+-    const voxelZ = THREE.MathUtils.euclideanModulo(z, cellSize) | 0;
 -    const voxelOffset = voxelY * cellSize * cellSize +
 -                        voxelZ * cellSize +
 -                        voxelX;
@@ -1096,7 +1096,7 @@ function updateVoxelGeometry(x, y, z) {
 I thought about checking for adjacent cells like 
 
 ```js
-const voxelX = THREE.Math.euclideanModulo(x, cellSize) | 0;
+const voxelX = THREE.MathUtils.euclideanModulo(x, cellSize) | 0;
 if (voxelX === 0) {
   // update cell to the left
 } else if (voxelX === cellSize - 1) {

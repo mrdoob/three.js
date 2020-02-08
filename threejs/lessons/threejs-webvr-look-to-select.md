@@ -187,7 +187,7 @@ function render(time) {
 +  const fromEnd = 2;
 +  const toStart = -0.5;
 +  const toEnd = 0.5;
-+  cursorTexture.offset.x = THREE.Math.mapLinear(
++  cursorTexture.offset.x = THREE.MathUtils.mapLinear(
 +      time % 2,
 +      fromStart, fromEnd,
 +      toStart, toEnd);
@@ -196,7 +196,7 @@ function render(time) {
 }
 ```
 
-`THREE.Math.mapLinear` takes a value that goes between `fromStart` and `fromEnd`
+`THREE.MathUtils.mapLinear` takes a value that goes between `fromStart` and `fromEnd`
 and maps it to a value between `toStart` and `toEnd`. In the case above we're
 taking `time % 2` which means a value that goes from 0 to 2 and maps
 that to a value that goes from -0.5 to 0.5
@@ -360,7 +360,7 @@ class PickHelper {
 +    const fromEnd = this.selectDuration;
 +    const toStart = -0.5;
 +    const toEnd = 0.5;
-+    this.cursorTexture.offset.x = THREE.Math.mapLinear(
++    this.cursorTexture.offset.x = THREE.MathUtils.mapLinear(
 +        this.selectTimer,
 +        fromStart, fromEnd,
 +        toStart, toEnd);
