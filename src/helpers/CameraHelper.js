@@ -12,7 +12,7 @@ import { Camera } from '../cameras/Camera.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LineSegments } from '../objects/LineSegments.js';
 import { Color } from '../math/Color.js';
-import { FaceColors } from '../constants.js';
+import { VertexColors } from '../constants.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
@@ -23,7 +23,7 @@ var _camera = new Camera();
 function CameraHelper( camera ) {
 
 	var geometry = new BufferGeometry();
-	var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: FaceColors } );
+	var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: VertexColors } );
 
 	var vertices = [];
 	var colors = [];
