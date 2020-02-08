@@ -56,62 +56,62 @@ var SidebarProject = function ( editor ) {
 
 	// Renderer
 
-	var rendererPropertiesRow1 = new UIRow();
-	rendererPropertiesRow1.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
+	var rendererPanel = new UIPanel();
+	container.add( rendererPanel );
+
+	var headerRow = new UIRow();
+	headerRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ).toUpperCase() ) );
+	rendererPanel.add( headerRow );
 
 	// Renderer / Antialias
 
-	var rendererAntialias = new UIBoolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
+	var antialiasRow = new UIRow();
+	var antialiasBoolean = new UIBoolean( config.getKey( 'project/renderer/antialias' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/antialias', this.getValue() );
 		updateRenderer();
 
 	} );
-	rendererPropertiesRow1.add( rendererAntialias );
+
+	antialiasRow.add( new UIText( strings.getKey( 'sidebar/project/antialias' ) ).setWidth( '90px' ) );
+	antialiasRow.add( antialiasBoolean );
+
+	rendererPanel.add( antialiasRow );
 
 	// Renderer / Shadows
 
-	var rendererShadows = new UIBoolean( config.getKey( 'project/renderer/shadows' ), strings.getKey( 'sidebar/project/shadows' ) ).onChange( function () {
+	var shadowsRow = new UIRow();
+	var shadowsBoolean = new UIBoolean( config.getKey( 'project/renderer/shadows' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/shadows', this.getValue() );
 		updateRenderer();
 
 	} );
-	rendererPropertiesRow1.add( rendererShadows );
 
-	projectsettings.add( rendererPropertiesRow1 );
+	shadowsRow.add( new UIText( strings.getKey( 'sidebar/project/shadows' ) ).setWidth( '90px' ) );
+	shadowsRow.add( shadowsBoolean );
+
+	rendererPanel.add( shadowsRow );
 
 	// Renderer / Physically Correct lights
 
-	var rendererPropertiesRow2 = new UIRow();
-
-	var rendererPhysicallyCorrectLights = new UIBoolean( config.getKey( 'project/renderer/physicallyCorrectLights' ), strings.getKey( 'sidebar/project/physicallyCorrectLights' ) ).onChange( function () {
+	var physicallyCorrectLightsRow = new UIRow();
+	var physicallyCorrectLightsBoolean = new UIBoolean( config.getKey( 'project/renderer/physicallyCorrectLights' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/physicallyCorrectLights', this.getValue() );
 		updateRenderer();
 
 	} );
-	rendererPhysicallyCorrectLights.setMarginLeft( '90px' );
-	rendererPropertiesRow2.add( rendererPhysicallyCorrectLights );
 
-	projectsettings.add( rendererPropertiesRow2 );
+	physicallyCorrectLightsRow.add( new UIText( strings.getKey( 'sidebar/project/physicallyCorrectLights' ) ).setWidth( '90px' ) );
+	physicallyCorrectLightsRow.add( physicallyCorrectLightsBoolean );
 
-	// Tonemapping
+	rendererPanel.add( physicallyCorrectLightsRow );
 
-	var tonemapping = new UIPanel();
+	// Renderer / Tonemapping
 
-	// Tonemapping / Header
-
-	var headerRow = new UIRow();
-	headerRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ).toUpperCase() ) );
-	tonemapping.add( headerRow );
-
-	// Tonemapping / Type
-
-	var toneMappingTypeRow = new UIRow();
-	var rendererToneMappingTypeLabel = new UIText( strings.getKey( 'sidebar/project/toneMappingType' ) ).setWidth( '90px' );
-
-	var rendererToneMappingTypeSelect = new UISelect().setOptions( {
+	var toneMappingRow = new UIRow();
+	var toneMappingSelect = new UISelect().setOptions( {
 		0: 'None',
 		1: 'Linear',
 		2: 'Reinhard',
@@ -124,47 +124,50 @@ var SidebarProject = function ( editor ) {
 		updateRenderer();
 
 	} );
-	rendererToneMappingTypeSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
-	toneMappingTypeRow.add( rendererToneMappingTypeLabel, rendererToneMappingTypeSelect );
-	tonemapping.add( toneMappingTypeRow );
+	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
+
+	toneMappingRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ) ).setWidth( '90px' ) );
+	toneMappingRow.add( toneMappingSelect );
+
+	rendererPanel.add( toneMappingRow );
 
 	// Tonemapping / Exposure
 
 	var toneMappingExposureRow = new UIRow();
-	var rendererToneMappingExposureLabel = new UIText( strings.getKey( 'sidebar/project/toneMappingExposure' ) ).setWidth( '90px' );
-	var rendererToneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) ).setRange( 0, 10 ).onChange( function () {
+	var toneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) ).setRange( 0, 10 ).onChange( function () {
 
 		config.setKey( 'project/renderer/toneMappingExposure', this.getValue() );
 		updateTonemapping();
 
 	} );
-	toneMappingExposureRow.add( rendererToneMappingExposureLabel, rendererToneMappingExposure );
-	tonemapping.add( toneMappingExposureRow );
+
+	toneMappingExposureRow.add( new UIText( strings.getKey( 'sidebar/project/toneMappingExposure' ) ).setWidth( '90px' ) );
+	toneMappingExposureRow.add( toneMappingExposure );
+	rendererPanel.add( toneMappingExposureRow );
 
 	// Tonemapping / White Point
 
 	var toneMappingWhitePointRow = new UIRow();
-	var rendererToneMappingWhitePointLabel = new UIText( strings.getKey( 'sidebar/project/toneMappingWhitePoint' ) ).setWidth( '90px' );
-	var rendererToneMappingWhitePoint = new UINumber( config.getKey( 'project/renderer/toneMappingWhitePoint' ) ).setRange( 0, 10 ).onChange( function () {
+	var toneMappingWhitePoint = new UINumber( config.getKey( 'project/renderer/toneMappingWhitePoint' ) ).setRange( 0, 10 ).onChange( function () {
 
 		config.setKey( 'project/renderer/toneMappingWhitePoint', this.getValue() );
 		updateTonemapping();
 
 	} );
-	toneMappingWhitePointRow.add( rendererToneMappingWhitePointLabel, rendererToneMappingWhitePoint );
-	tonemapping.add( toneMappingWhitePointRow );
 
-	container.add( tonemapping );
+	toneMappingWhitePointRow.add( new UIText( strings.getKey( 'sidebar/project/toneMappingWhitePoint' ) ).setWidth( '90px' ) );
+	toneMappingWhitePointRow.add( toneMappingWhitePoint );
+	rendererPanel.add( toneMappingWhitePointRow );
 
 	//
 
 	function updateRenderer() {
 
 		createRenderer(
-			rendererAntialias.getValue(),
-			rendererShadows.getValue(),
-			rendererToneMappingTypeSelect.getValue(),
-		 	rendererPhysicallyCorrectLights.getValue()
+			antialiasBoolean.getValue(),
+			shadowsBoolean.getValue(),
+			toneMappingSelect.getValue(),
+			physicallyCorrectLightsBoolean.getValue()
 		);
 
 	}
@@ -201,8 +204,8 @@ var SidebarProject = function ( editor ) {
 
 	function updateTonemapping() {
 
-		currentRenderer.toneMappingExposure = rendererToneMappingExposure.getValue();
-		currentRenderer.toneMappingWhitePoint = rendererToneMappingWhitePoint.getValue();
+		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
+		currentRenderer.toneMappingWhitePoint = toneMappingWhitePoint.getValue();
 
 		signals.rendererUpdated.dispatch();
 
