@@ -265,7 +265,7 @@ export default class CSM {
 	helper( cameraMatrix ) {
 
 		let frustum;
-		let geometry;
+		let geometry, vertices;
 		const material = new THREE.LineBasicMaterial( { color: 0xffffff } );
 		const object = new THREE.Object3D();
 
@@ -273,37 +273,47 @@ export default class CSM {
 
 			frustum = this.frustums[ i ].toSpace( cameraMatrix );
 
-			geometry = new THREE.Geometry();
+			geometry = new THREE.BufferGeometry();
+			vertices = [];
+			
 
 			for ( let i = 0; i < 5; i ++ ) {
 
 				const point = frustum.vertices.near[ i === 4 ? 0 : i ];
-				geometry.vertices.push( new THREE.Vector3( point.x, point.y, point.z ) );
+				vertices.push( point.x, point.y, point.z );
 
 			}
+			
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
 			object.add( new THREE.Line( geometry, material ) );
 
-			geometry = new THREE.Geometry();
+			geometry = new THREE.BufferGeometry();
+			vertices = [];
 
 			for ( let i = 0; i < 5; i ++ ) {
 
 				const point = frustum.vertices.far[ i === 4 ? 0 : i ];
-				geometry.vertices.push( new THREE.Vector3( point.x, point.y, point.z ) );
+				vertices.push( point.x, point.y, point.z );
 
 			}
+			
+			geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
 			object.add( new THREE.Line( geometry, material ) );
 
 			for ( let i = 0; i < 4; i ++ ) {
 
-				geometry = new THREE.Geometry();
+				geometry = new THREE.BufferGeometry();
+				vertices = [];
 
 				const near = frustum.vertices.near[ i ];
 				const far = frustum.vertices.far[ i ];
 
-				geometry.vertices.push( new THREE.Vector3( near.x, near.y, near.z ) );
-				geometry.vertices.push( new THREE.Vector3( far.x, far.y, far.z ) );
+				vertices.push( near.x, near.y, near.z );
+				vertices.push( far.x, far.y, far.z );
+				
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
 				object.add( new THREE.Line( geometry, material ) );
 
