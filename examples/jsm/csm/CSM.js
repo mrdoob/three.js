@@ -133,7 +133,7 @@ export default class CSM {
 
 			for ( let i = 1; i < amount; i ++ ) {
 
-				r.push( lambda * log[ i - 1 ] + ( 1 - lambda ) * uni[ i - 1 ] );
+				r.push( THREE.MathUtils.lerp( uni[ i - 1 ], log[ i - 1 ], lambda ) );
 
 			}
 
