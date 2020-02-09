@@ -95,7 +95,7 @@
 				}
 
 				blossomGeometry.setAttribute( 'color', new THREE.InstancedBufferAttribute( color, 3 ) );
-				blossomMaterial.vertexColors = THREE.VertexColors;
+				blossomMaterial.vertexColors = true;
 
 				stemMesh = new THREE.InstancedMesh( stemGeometry, stemMaterial, count );
 				blossomMesh = new THREE.InstancedMesh( blossomGeometry, blossomMaterial, count );

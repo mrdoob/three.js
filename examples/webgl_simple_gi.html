@@ -159,7 +159,7 @@
 				// sphere
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );

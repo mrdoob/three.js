@@ -48,12 +48,6 @@ export enum Shading {}
 export const FlatShading: Shading;
 export const SmoothShading: Shading;
 
-// colors
-export enum Colors {}
-export const NoColors: Colors;
-export const FaceColors: Colors;
-export const VertexColors: Colors;
-
 // blending modes
 export enum Blending {}
 export const NoBlending: Blending;

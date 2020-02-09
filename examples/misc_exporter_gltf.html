@@ -369,7 +369,7 @@
 				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 				geometry.setDrawRange( 0, numElements );
 
-				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
+				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: true } ) );
 				object.name = 'Custom buffered truncated';
 				object.position.set( 140, - 40, - 200 );
 

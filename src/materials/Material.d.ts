@@ -9,7 +9,6 @@ import {
 	BlendingSrcFactor,
 	DepthModes,
 	Side,
-	Colors,
 	StencilFunc,
 	StencilOp
 } from '../constants';
@@ -48,7 +47,7 @@ export interface MaterialParameters {
 	shadowSide?: Side;
 	toneMapped?: boolean;
 	transparent?: boolean;
-	vertexColors?: Colors;
+	vertexColors?: boolean;
 	vertexTangents?: boolean;
 	visible?: boolean;
 	stencilWrite?: boolean;
@@ -287,9 +286,9 @@ export class Material extends EventDispatcher {
 	uuid: string;
 
 	/**
-	 * Defines whether vertex coloring is used. Default is THREE.NoColors. Other options are THREE.VertexColors and THREE.FaceColors.
+	 * Defines whether vertex coloring is used. Default is false.
 	 */
-	vertexColors: Colors;
+	vertexColors: boolean;
 
 	/**
 	 * Defines whether precomputed vertex tangents are used. Default is false.

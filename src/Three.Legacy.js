@@ -100,8 +100,10 @@ export function Face4( a, b, c, d, normal, color, materialIndex ) {
 }
 
 export var LineStrip = 0;
-
 export var LinePieces = 1;
+export var NoColors = 0;
+export var FaceColors = 1;
+export var VertexColors = 2;
 
 export function MeshFaceMaterial( materials ) {
 

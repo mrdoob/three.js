@@ -116,7 +116,7 @@
 					var meshMaterial = material;
 					if ( geometry.hasColors ) {
 
-						meshMaterial = new THREE.MeshPhongMaterial( { opacity: geometry.alpha, vertexColors: THREE.VertexColors } );
+						meshMaterial = new THREE.MeshPhongMaterial( { opacity: geometry.alpha, vertexColors: true } );
 
 					}
 
