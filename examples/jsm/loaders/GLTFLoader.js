@@ -1891,7 +1891,7 @@ var GLTFLoader = ( function () {
 
 			texture.flipY = false;
 
-			if ( textureDef.name !== undefined ) texture.name = textureDef.name;
+			if ( textureDef.name ) texture.name = textureDef.name;
 
 			// Ignore unknown mime types, like DDS files.
 			if ( source.mimeType in MIME_TYPE_FORMATS ) {
@@ -2228,7 +2228,7 @@ var GLTFLoader = ( function () {
 
 			}
 
-			if ( materialDef.name !== undefined ) material.name = materialDef.name;
+			if ( materialDef.name ) material.name = materialDef.name;
 
 			// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
 			if ( material.map ) material.map.encoding = sRGBEncoding;
@@ -2719,7 +2719,7 @@ var GLTFLoader = ( function () {
 
 		}
 
-		if ( cameraDef.name !== undefined ) camera.name = cameraDef.name;
+		if ( cameraDef.name ) camera.name = cameraDef.name;
 
 		assignExtrasToUserData( camera, cameraDef );
 
@@ -2940,7 +2940,7 @@ var GLTFLoader = ( function () {
 
 			}
 
-			var name = animationDef.name !== undefined ? animationDef.name : 'animation_' + animationIndex;
+			var name = animationDef.name ? animationDef.name : 'animation_' + animationIndex;
 
 			return new AnimationClip( name, undefined, tracks );
 
@@ -3059,7 +3059,7 @@ var GLTFLoader = ( function () {
 
 			}
 
-			if ( nodeDef.name !== undefined ) {
+			if ( nodeDef.name ) {
 
 				node.userData.name = nodeDef.name;
 				node.name = PropertyBinding.sanitizeNodeName( nodeDef.name );
@@ -3217,7 +3217,7 @@ var GLTFLoader = ( function () {
 			var parser = this;
 
 			var scene = new Scene();
-			if ( sceneDef.name !== undefined ) scene.name = sceneDef.name;
+			if ( sceneDef.name ) scene.name = sceneDef.name;
 
 			assignExtrasToUserData( scene, sceneDef );
 
