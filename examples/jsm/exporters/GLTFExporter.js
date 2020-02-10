@@ -1372,7 +1372,7 @@ GLTFExporter.prototype = {
 									attribute.getX( j ) - baseAttribute.getX( j ),
 									attribute.getY( j ) - baseAttribute.getY( j ),
 									attribute.getZ( j ) - baseAttribute.getZ( j )
-									);
+								);
 
 							}
 
@@ -1946,7 +1946,7 @@ GLTFExporter.prototype = {
 
 			if ( scene.userData && Object.keys( scene.userData ).length > 0 ) {
 
-				gltfScene.extras = serializeUserData( scene );
+				gltfScene.extras = serializeUserData( scene, gltfScene );
 
 			}
 
