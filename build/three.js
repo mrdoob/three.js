@@ -115,9 +115,6 @@
 	var DoubleSide = 2;
 	var FlatShading = 1;
 	var SmoothShading = 2;
-	var NoColors = 0;
-	var FaceColors = 1;
-	var VertexColors = 2;
 	var NoBlending = 0;
 	var NormalBlending = 1;
 	var AdditiveBlending = 2;
@@ -8610,7 +8607,7 @@
 		this.side = FrontSide;
 		this.flatShading = false;
 		this.vertexTangents = false;
-		this.vertexColors = NoColors; // THREE.NoColors, THREE.VertexColors, THREE.FaceColors
+		this.vertexColors = false;
 
 		this.opacity = 1;
 		this.transparent = false;
@@ -8835,7 +8832,7 @@
 			if ( this.blending !== NormalBlending ) { data.blending = this.blending; }
 			if ( this.flatShading === true ) { data.flatShading = this.flatShading; }
 			if ( this.side !== FrontSide ) { data.side = this.side; }
-			if ( this.vertexColors !== NoColors ) { data.vertexColors = this.vertexColors; }
+			if ( this.vertexColors ) { data.vertexColors = true; }
 
 			if ( this.opacity < 1 ) { data.opacity = this.opacity; }
 			if ( this.transparent === true ) { data.transparent = this.transparent; }
@@ -27030,7 +27027,7 @@
 				_v1$4.setFromMatrixPosition( camera.matrixWorld );
 				_v2$2.setFromMatrixPosition( this.matrixWorld );
 
-				var distance = _v1$4.distanceTo( _v2$2 );
+				var distance = _v1$4.distanceTo( _v2$2 ) / camera.zoom;
 
 				levels[ 0 ].object.visible = true;
 
@@ -39421,7 +39418,6 @@
 			if ( json.shininess !== undefined ) { material.shininess = json.shininess; }
 			if ( json.clearcoat !== undefined ) { material.clearcoat = json.clearcoat; }
 			if ( json.clearcoatRoughness !== undefined ) { material.clearcoatRoughness = json.clearcoatRoughness; }
-			if ( json.vertexColors !== undefined ) { material.vertexColors = json.vertexColors; }
 			if ( json.fog !== undefined ) { material.fog = json.fog; }
 			if ( json.flatShading !== undefined ) { material.flatShading = json.flatShading; }
 			if ( json.blending !== undefined ) { material.blending = json.blending; }
@@ -39469,6 +39465,20 @@
 			if ( json.toneMapped !== undefined ) { material.toneMapped = json.toneMapped; }
 
 			if ( json.userData !== undefined ) { material.userData = json.userData; }
+
+			if ( json.vertexColors !== undefined ) {
+
+				if ( typeof json.vertexColors === 'number' ) {
+
+					material.vertexColors = ( json.vertexColors > 0 ) ? true : false;
+
+				} else {
+
+					material.vertexColors = json.vertexColors;
+
+				}
+
+			}
 
 			// Shader Material
 
@@ -46375,7 +46385,7 @@
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-		var material = new LineBasicMaterial( { vertexColors: VertexColors, depthTest: false, depthWrite: false, transparent: true } );
+		var material = new LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false, transparent: true } );
 
 		LineSegments.call( this, geometry, material );
 
@@ -46539,7 +46549,7 @@
 		geometry.rotateY( Math.PI * 0.5 );
 
 		this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
-		if ( this.color === undefined ) { this.material.vertexColors = VertexColors; }
+		if ( this.color === undefined ) { this.material.vertexColors = true; }
 
 		var position = geometry.getAttribute( 'position' );
 		var colors = new Float32Array( position.count * 3 );
@@ -46628,7 +46638,7 @@
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-		var material = new LineBasicMaterial( { vertexColors: VertexColors } );
+		var material = new LineBasicMaterial( { vertexColors: true } );
 
 		LineSegments.call( this, geometry, material );
 
@@ -46735,7 +46745,7 @@
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-		var material = new LineBasicMaterial( { vertexColors: VertexColors } );
+		var material = new LineBasicMaterial( { vertexColors: true } );
 
 		LineSegments.call( this, geometry, material );
 
@@ -46845,7 +46855,7 @@
 	function CameraHelper( camera ) {
 
 		var geometry = new BufferGeometry();
-		var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: FaceColors } );
+		var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: true } );
 
 		var vertices = [];
 		var colors = [];
@@ -47379,7 +47389,7 @@
 		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-		var material = new LineBasicMaterial( { vertexColors: VertexColors } );
+		var material = new LineBasicMaterial( { vertexColors: true } );
 
 		LineSegments.call( this, geometry, material );
 
@@ -48053,8 +48063,10 @@
 	}
 
 	var LineStrip = 0;
-
 	var LinePieces = 1;
+	var NoColors = 0;
+	var FaceColors = 1;
+	var VertexColors = 2;
 
 	function MeshFaceMaterial( materials ) {
 
