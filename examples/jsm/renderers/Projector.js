@@ -288,7 +288,7 @@ var Projector = function () {
 
 				_line.material = object.material;
 
-				if ( object.material.vertexColors === true ) {
+				if ( object.material.vertexColors ) {
 
 					_line.vertexColors[ 0 ].fromArray( colors, a * 3 );
 					_line.vertexColors[ 1 ].fromArray( colors, b * 3 );
@@ -342,7 +342,7 @@ var Projector = function () {
 
 				_face.material = material;
 
-				if ( material.vertexColors === true ) {
+				if ( material.vertexColors ) {
 
 					_face.color.fromArray( colors, a * 3 );
 
@@ -852,7 +852,7 @@ var Projector = function () {
 
 							_line.material = object.material;
 
-							if ( object.material.vertexColors === true ) {
+							if ( object.material.vertexColors ) {
 
 								_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
 								_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );

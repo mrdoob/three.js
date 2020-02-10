@@ -415,7 +415,7 @@ var SVGRenderer = function () {
 
 			_color.copy( material.color );
 
-			if ( material.vertexColors === true ) {
+			if ( material.vertexColors ) {
 
 				_color.multiply( element.color );
 
@@ -425,7 +425,7 @@ var SVGRenderer = function () {
 
 			_diffuseColor.copy( material.color );
 
-			if ( material.vertexColors === true ) {
+			if ( material.vertexColors ) {
 
 				_diffuseColor.multiply( element.color );
 
