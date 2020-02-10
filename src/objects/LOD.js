@@ -136,7 +136,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			_v1.setFromMatrixPosition( camera.matrixWorld );
 			_v2.setFromMatrixPosition( this.matrixWorld );
 
-			var distance = _v1.distanceTo( _v2 );
+			var distance = _v1.distanceTo( _v2 ) / camera.zoom;
 
 			levels[ 0 ].object.visible = true;
 
