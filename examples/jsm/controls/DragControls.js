@@ -23,6 +23,7 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 	var _intersection = new Vector3();
 	var _worldPosition = new Vector3();
 	var _inverseMatrix = new Matrix4();
+	var _intersections = [];
 
 	var _selected = null, _hovered = null;
 
@@ -85,13 +86,14 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 		}
 
+		_intersections.length = 0;
+
 		_raycaster.setFromCamera( _mouse, _camera );
+		_raycaster.intersectObjects( _objects, true, _intersections );
 
-		var intersects = _raycaster.intersectObjects( _objects, true );
+		if ( _intersections.length > 0 ) {
 
-		if ( intersects.length > 0 ) {
-
-			var object = intersects[ 0 ].object;
+			var object = _intersections[ 0 ].object;
 
 			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( object.matrixWorld ) );
 
@@ -123,13 +125,14 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 
 		event.preventDefault();
 
+		_intersections.length = 0;
+
 		_raycaster.setFromCamera( _mouse, _camera );
+		_raycaster.intersectObjects( _objects, true, _intersections );
 
-		var intersects = _raycaster.intersectObjects( _objects, true );
+		if ( _intersections.length > 0 ) {
 
-		if ( intersects.length > 0 ) {
-
-			_selected = intersects[ 0 ].object;
+			_selected = _intersections[ 0 ].object;
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
@@ -201,13 +204,14 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 		_mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
 		_mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
 
+		_intersections.length = 0;
+
 		_raycaster.setFromCamera( _mouse, _camera );
+		 _raycaster.intersectObjects( _objects, true, _intersections );
 
-		var intersects = _raycaster.intersectObjects( _objects, true );
+		if ( _intersections.length > 0 ) {
 
-		if ( intersects.length > 0 ) {
-
-			_selected = intersects[ 0 ].object;
+			_selected = _intersections[ 0 ].object;
 
 			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
