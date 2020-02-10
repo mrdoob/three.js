@@ -215,6 +215,8 @@
 	var RGBA_PVRTC_4BPPV1_Format = 35842;
 	var RGBA_PVRTC_2BPPV1_Format = 35843;
 	var RGB_ETC1_Format = 36196;
+	var RGB_ETC2_Format = 37492;
+	var RGBA_ETC2_EAC_Format = 37496;
 	var RGBA_ASTC_4x4_Format = 37808;
 	var RGBA_ASTC_5x4_Format = 37809;
 	var RGBA_ASTC_5x5_Format = 37810;
@@ -18744,8 +18746,8 @@
 				index0AttributeName: material.index0AttributeName,
 
 				extensionDerivatives: material.extensions && material.extensions.derivatives,
-				extensionFragDepth: material.extensions && material.extensions.frawbuffers,
-				extensionDrawbuffers: material.extensions && material.extensions.drawbuffers,
+				extensionFragDepth: material.extensions && material.extensions.fragDepth,
+				extensionDrawbuffers: material.extensions && material.extensions.drawBuffers,
 				extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
 
 				rendererExtensionFragDepth: isWebGL2 || extensions.get( 'EXT_frag_depth' ) !== null,
@@ -22640,6 +22642,19 @@
 				} else {
 
 					return null;
+
+				}
+
+			}
+
+			if ( p === RGB_ETC2_Format || p === RGBA_ETC2_EAC_Format ) {
+
+				extension = extensions.get( 'WEBGL_compressed_texture_etc' );
+
+				if ( extension !== null ) {
+
+					if ( p === RGB_ETC2_Format ) { return extension.COMPRESSED_RGB8_ETC2; }
+					if ( p === RGBA_ETC2_EAC_Format ) { return extension.COMPRESSED_RGBA8_ETC2_EAC; }
 
 				}
 
@@ -26893,6 +26908,8 @@
 
 		Object3D.call( this );
 
+		this._currentLevel = 0;
+
 		this.type = 'LOD';
 
 		Object.defineProperties( this, {
@@ -26955,6 +26972,12 @@
 			this.add( object );
 
 			return this;
+
+		},
+
+		getCurrentLevel: function () {
+
+			return this._currentLevel;
 
 		},
 
@@ -27025,6 +27048,8 @@
 					}
 
 				}
+
+				this._currentLevel = i - 1;
 
 				for ( ; i < l; i ++ ) {
 
@@ -43137,7 +43162,7 @@
 
 		findNode: function ( root, nodeName ) {
 
-			if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
+			if ( ! nodeName || nodeName === "" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
 
 				return root;
 
@@ -46364,6 +46389,8 @@
 
 	SkeletonHelper.prototype = Object.create( LineSegments.prototype );
 	SkeletonHelper.prototype.constructor = SkeletonHelper;
+
+	SkeletonHelper.prototype.isSkeletonHelper = true;
 
 	SkeletonHelper.prototype.updateMatrixWorld = function ( force ) {
 
@@ -50393,6 +50420,7 @@
 	exports.RGBA_ASTC_8x5_Format = RGBA_ASTC_8x5_Format;
 	exports.RGBA_ASTC_8x6_Format = RGBA_ASTC_8x6_Format;
 	exports.RGBA_ASTC_8x8_Format = RGBA_ASTC_8x8_Format;
+	exports.RGBA_ETC2_EAC_Format = RGBA_ETC2_EAC_Format;
 	exports.RGBA_PVRTC_2BPPV1_Format = RGBA_PVRTC_2BPPV1_Format;
 	exports.RGBA_PVRTC_4BPPV1_Format = RGBA_PVRTC_4BPPV1_Format;
 	exports.RGBA_S3TC_DXT1_Format = RGBA_S3TC_DXT1_Format;
@@ -50406,6 +50434,7 @@
 	exports.RGBM16Encoding = RGBM16Encoding;
 	exports.RGBM7Encoding = RGBM7Encoding;
 	exports.RGB_ETC1_Format = RGB_ETC1_Format;
+	exports.RGB_ETC2_Format = RGB_ETC2_Format;
 	exports.RGB_PVRTC_2BPPV1_Format = RGB_PVRTC_2BPPV1_Format;
 	exports.RGB_PVRTC_4BPPV1_Format = RGB_PVRTC_4BPPV1_Format;
 	exports.RGB_S3TC_DXT1_Format = RGB_S3TC_DXT1_Format;
