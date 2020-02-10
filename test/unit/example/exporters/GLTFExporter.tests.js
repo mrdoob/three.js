@@ -19,8 +19,7 @@ import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyf
 import {
 	DoubleSide,
 	InterpolateLinear,
-	InterpolateDiscrete,
-	VertexColors,
+	InterpolateDiscrete
 } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Exporters', () => {
@@ -155,7 +154,7 @@ export default QUnit.module( 'Exporters', () => {
 			geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 			geometry.setDrawRange( 0, 0 );
 
-			var empty = new Mesh( geometry, new MeshBasicMaterial( { side: DoubleSide, vertexColors: VertexColors } ) );
+			var empty = new Mesh( geometry, new MeshBasicMaterial( { side: DoubleSide, vertexColors: true } ) );
 			empty.name = 'Custom buffered empty (drawrange)';
 			scene.add( empty );
 

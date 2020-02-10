@@ -690,7 +690,7 @@ THREE.GLTFLoader = ( function () {
 		/*eslint-disable*/
 		Object.defineProperties(
 			this,
-			{	
+			{
 				specular: {
 					get: function () { return uniforms.specular.value; },
 					set: function ( v ) { uniforms.specular.value = v; }
@@ -1986,7 +1986,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( useSkinning ) cachedMaterial.skinning = true;
 				if ( useVertexTangents ) cachedMaterial.vertexTangents = true;
-				if ( useVertexColors ) cachedMaterial.vertexColors = THREE.VertexColors;
+				if ( useVertexColors ) cachedMaterial.vertexColors = true;
 				if ( useFlatShading ) cachedMaterial.flatShading = true;
 				if ( useMorphTargets ) cachedMaterial.morphTargets = true;
 				if ( useMorphNormals ) cachedMaterial.morphNormals = true;

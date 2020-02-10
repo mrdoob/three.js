@@ -1202,7 +1202,7 @@ THREE.FBXLoader = ( function () {
 
 				materials.forEach( function ( material ) {
 
-					material.vertexColors = THREE.VertexColors;
+					material.vertexColors = true;
 
 				} );
 

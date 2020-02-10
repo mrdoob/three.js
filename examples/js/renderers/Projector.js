@@ -266,7 +266,7 @@ THREE.Projector = function () {
 
 				_line.material = object.material;
 
-				if ( object.material.vertexColors === THREE.VertexColors ) {
+				if ( object.material.vertexColors ) {
 
 					_line.vertexColors[ 0 ].fromArray( colors, a * 3 );
 					_line.vertexColors[ 1 ].fromArray( colors, b * 3 );
@@ -320,7 +320,7 @@ THREE.Projector = function () {
 
 				_face.material = material;
 
-				if ( material.vertexColors === THREE.FaceColors || material.vertexColors === THREE.VertexColors ) {
+				if ( material.vertexColors ) {
 
 					_face.color.fromArray( colors, a * 3 );
 
@@ -830,7 +830,7 @@ THREE.Projector = function () {
 
 							_line.material = object.material;
 
-							if ( object.material.vertexColors === THREE.VertexColors ) {
+							if ( object.material.vertexColors ) {
 
 								_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
 								_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );
