@@ -80,6 +80,23 @@ m.elements = [ 11, 21, 31,
 		<h3>[method:Boolean equals]( [param:Matrix3 m] )</h3>
 		<p>Return true if this matrix and [page:Matrix3 m] are equal.</p>
 
+		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
+		<p>
+		Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] of this
+		matrix into the three axis vectors provided. If this matrix is:
+		<code>
+a, b, c,
+d, e, f,
+g, h, i
+		</code>
+		then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] will be set to:
+		<code>
+xAxis = (a, d, g)
+yAxis = (b, e, h)
+zAxis = (c, f, i)
+		</code>
+		</p>
+
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
 		[page:Array array] - the array to read the elements from.<br />

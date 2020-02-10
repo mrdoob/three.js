@@ -72,6 +72,16 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	extractBasis: function ( xAxis, yAxis, zAxis ) {
+
+		xAxis.setFromMatrix3Column( this, 0 );
+		yAxis.setFromMatrix3Column( this, 1 );
+		zAxis.setFromMatrix3Column( this, 2 );
+
+		return this;
+
+	},
+
 	setFromMatrix4: function ( m ) {
 
 		var me = m.elements;

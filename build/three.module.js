@@ -91,7 +91,7 @@ if ( Object.assign === undefined ) {
 
 }
 
-var REVISION = '113dev';
+var REVISION = '114dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 var CullFaceNone = 0;
@@ -1123,6 +1123,16 @@ Object.assign( Matrix3.prototype, {
 		te[ 0 ] = me[ 0 ]; te[ 1 ] = me[ 1 ]; te[ 2 ] = me[ 2 ];
 		te[ 3 ] = me[ 3 ]; te[ 4 ] = me[ 4 ]; te[ 5 ] = me[ 5 ];
 		te[ 6 ] = me[ 6 ]; te[ 7 ] = me[ 7 ]; te[ 8 ] = me[ 8 ];
+
+		return this;
+
+	},
+
+	extractBasis: function ( xAxis, yAxis, zAxis ) {
+
+		xAxis.setFromMatrix3Column( this, 0 );
+		yAxis.setFromMatrix3Column( this, 1 );
+		zAxis.setFromMatrix3Column( this, 2 );
 
 		return this;
 
@@ -3730,9 +3740,11 @@ Object.assign( Vector3.prototype, {
 
 	projectOnVector: function ( v ) {
 
-		// v cannot be the zero v
+		var denominator = v.lengthSq();
 
-		var scalar = v.dot( this ) / v.lengthSq();
+		if ( denominator === 0 ) return this.set( 0, 0, 0 );
+
+		var scalar = v.dot( this ) / denominator;
 
 		return this.copy( v ).multiplyScalar( scalar );
 
@@ -3759,7 +3771,7 @@ Object.assign( Vector3.prototype, {
 
 		var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
 
-		if ( denominator === 0 ) console.error( 'THREE.Vector3: angleTo() can\'t handle zero length vectors.' );
+		if ( denominator === 0 ) return Math.PI / 2;
 
 		var theta = this.dot( v ) / denominator;
 
@@ -18380,6 +18392,9 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 
 	// clean up
 
+	gl.detachShader( program, glVertexShader );
+	gl.detachShader( program, glFragmentShader );
+
 	gl.deleteShader( glVertexShader );
 	gl.deleteShader( glFragmentShader );
 
@@ -18720,9 +18735,9 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			extensionDrawbuffers: material.extensions && material.extensions.drawbuffers,
 			extensionShaderTextureLOD: material.extensions && material.extensions.shaderTextureLOD,
 
-			rendererExtensionFragDepth: isWebGL2 || extensions.get( 'EXT_frag_depth' ) !== undefined,
-			rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== undefined,
-			rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== undefined,
+			rendererExtensionFragDepth: isWebGL2 || extensions.get( 'EXT_frag_depth' ) !== null,
+			rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
+			rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
 
 			onBeforeCompile: material.onBeforeCompile
 
@@ -19223,11 +19238,7 @@ function WebGLLights() {
 		point: [],
 		pointShadowMap: [],
 		pointShadowMatrix: [],
-		hemi: [],
-
-		numDirectionalShadows: - 1,
-		numPointShadows: - 1,
-		numSpotShadows: - 1
+		hemi: []
 
 	};
 

@@ -12,7 +12,7 @@ import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
 
 /**
  * This is a superefficent class for geometries because it saves all data in buffers.
- * It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the nessecary buffer calculations.
+ * It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the necessary buffer calculations.
  * It is mainly interesting when working with static objects.
  *
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js">src/core/BufferGeometry.js</a>

@@ -19,19 +19,19 @@
 		<h2>Example</h2>
 
 		<code>
-			var path = new THREE.Path();
+		var path = new THREE.Path();
 
-			path.lineTo( 0, 0.8 );
-			path.quadraticCurveTo( 0, 1, 0.2, 1 );
-			path.lineTo( 1, 1 );
+		path.lineTo( 0, 0.8 );
+		path.quadraticCurveTo( 0, 1, 0.2, 1 );
+		path.lineTo( 1, 1 );
 
-			var points = path.getPoints();
+		var points = path.getPoints();
 
-			var geometry = new THREE.BufferGeometry().setFromPoints( points );
-			var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
 
-			var line = new THREE.Line( geometry, material );
-			scene.add( line );
+		var line = new THREE.Line( geometry, material );
+		scene.add( line );
 		</code>
 
 

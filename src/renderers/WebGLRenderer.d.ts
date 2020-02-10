@@ -47,7 +47,7 @@ export interface WebGLRendererParameters {
 	precision?: string;
 
 	/**
-	 * default is true.
+	 * default is false.
 	 */
 	alpha?: boolean;
 

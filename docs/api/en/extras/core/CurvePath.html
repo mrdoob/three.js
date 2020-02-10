@@ -51,7 +51,20 @@
 
 		<h3>[method:Float getCurveLengths]()</h3>
 		<p>Adds together the lengths of the curves in the [page:.curves] array.</p>
+				
+		<h3>[method:Array getPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- number of pieces to divide the curve into. Default is *12*.<br /><br />
 
+			Returns a set of divisions + 1 points using getPoint( t ).
+		</p>
+
+		<h3>[method:Array getSpacedPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- number of pieces to divide the curve into. Default is *40*.<br /><br />
+
+			Returns a set of divisions + 1 equi-spaced points using getPointAt( u ).
+		</p>
 
 		<h2>Source</h2>
 

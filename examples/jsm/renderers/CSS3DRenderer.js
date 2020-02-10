@@ -50,6 +50,8 @@ CSS3DSprite.prototype.constructor = CSS3DSprite;
 
 var CSS3DRenderer = function () {
 
+	var _this = this;
+
 	var _width, _height;
 	var _widthHalf, _heightHalf;
 
@@ -165,9 +167,11 @@ var CSS3DRenderer = function () {
 
 	}
 
-	function renderObject( object, camera, cameraCSSMatrix ) {
+	function renderObject( object, scene, camera, cameraCSSMatrix ) {
 
 		if ( object instanceof CSS3DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			var style;
 
@@ -219,11 +223,13 @@ var CSS3DRenderer = function () {
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera, cameraCSSMatrix );
+			renderObject( object.children[ i ], scene, camera, cameraCSSMatrix );
 
 		}
 
@@ -328,7 +334,7 @@ var CSS3DRenderer = function () {
 
 		}
 
-		renderObject( scene, camera, cameraCSSMatrix );
+		renderObject( scene, scene, camera, cameraCSSMatrix );
 
 		if ( isIE ) {
 

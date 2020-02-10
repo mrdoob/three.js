@@ -1,4 +1,4 @@
-export var REVISION = '113dev';
+export var REVISION = '114dev';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 export var CullFaceNone = 0;
@@ -116,6 +116,8 @@ export var RGB_PVRTC_2BPPV1_Format = 35841;
 export var RGBA_PVRTC_4BPPV1_Format = 35842;
 export var RGBA_PVRTC_2BPPV1_Format = 35843;
 export var RGB_ETC1_Format = 36196;
+export var RGB_ETC2_Format = 37492;
+export var RGBA_ETC2_EAC_Format = 37496;
 export var RGBA_ASTC_4x4_Format = 37808;
 export var RGBA_ASTC_5x4_Format = 37809;
 export var RGBA_ASTC_5x5_Format = 37810;

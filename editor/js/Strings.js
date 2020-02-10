@@ -285,8 +285,12 @@ var Strings = function ( config ) {
 			'sidebar/project/editable': 'Editable',
 			'sidebar/project/vr': 'VR',
 			'sidebar/project/renderer': 'Renderer',
-			'sidebar/project/antialias': 'antialias',
-			'sidebar/project/shadows': 'shadows',
+			'sidebar/project/antialias': 'Antialias',
+			'sidebar/project/shadows': 'Shadows',
+			'sidebar/project/physicallyCorrectLights': 'Physically correct lights',
+			'sidebar/project/toneMapping': 'Tone mapping',
+			'sidebar/project/toneMappingExposure': 'Exposure',
+			'sidebar/project/toneMappingWhitePoint': 'White Point',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
@@ -311,7 +315,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
-			'viewport/info/triangles': 'Triangles'
+			'viewport/info/triangles': 'Triangles',
+			'viewport/info/frametime': 'Frametime'
 
 		},
 
@@ -519,8 +524,8 @@ var Strings = function ( config ) {
 			'sidebar/material/emissive': '自发光',
 			'sidebar/material/specular': '高光',
 			'sidebar/material/shininess': '高光大小',
-			'sidebar/material/clearcoat': '透明贴图',
-			'sidebar/material/clearcoatroughness': '透明贴图粗糙度',
+			'sidebar/material/clearcoat': '透明图层',
+			'sidebar/material/clearcoatroughness': '透明图层粗糙度',
 			'sidebar/material/vertexcolors': '顶点颜色',
 			'sidebar/material/vertexcolors/no': '无',
 			'sidebar/material/vertexcolors/face': '面',
@@ -530,7 +535,7 @@ var Strings = function ( config ) {
 			'sidebar/material/alphamap': '透明贴图',
 			'sidebar/material/bumpmap': '凹凸贴图',
 			'sidebar/material/normalmap': '法线贴图',
-			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
+			'sidebar/material/clearcoatnormalmap': '透明图层法线贴图',
 			'sidebar/material/displacemap': '置换贴图',
 			'sidebar/material/roughmap': '粗糙贴图',
 			'sidebar/material/metalmap': '金属贴图',
@@ -568,6 +573,10 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
+			'sidebar/project/physicallyCorrectLights': '物理光照',
+			'sidebar/project/toneMapping': '色调映射',
+			'sidebar/project/toneMappingExposure': '曝光',
+			'sidebar/project/toneMappingWhitePoint': '白点',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 
@@ -592,7 +601,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
-			'viewport/info/triangles': '三角形'
+			'viewport/info/triangles': '三角形',
+			'viewport/info/frametime': '帧时'
 
 		}
 

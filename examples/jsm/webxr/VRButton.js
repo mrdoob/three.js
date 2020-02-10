@@ -142,14 +142,15 @@ var VRButton = {
 		} else {
 
 			var message = document.createElement( 'a' );
-			message.href = 'https://immersiveweb.dev/';
 
 			if ( window.isSecureContext === false ) {
 
+				message.href = document.location.href.replace( /^http:/, 'https:' );
 				message.innerHTML = 'WEBXR NEEDS HTTPS'; // TODO Improve message
 
 			} else {
 
+				message.href = 'https://immersiveweb.dev/';
 				message.innerHTML = 'WEBXR NOT AVAILABLE';
 
 			}

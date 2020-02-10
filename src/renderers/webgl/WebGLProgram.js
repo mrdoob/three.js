@@ -838,6 +838,9 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 
 	// clean up
 
+	gl.detachShader( program, glVertexShader );
+	gl.detachShader( program, glFragmentShader );
+
 	gl.deleteShader( glVertexShader );
 	gl.deleteShader( glFragmentShader );
 

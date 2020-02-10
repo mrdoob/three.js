@@ -16,6 +16,10 @@ var Config = function () {
 
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
+		'project/renderer/physicallyCorrectLights': false,
+		'project/renderer/toneMapping': 1, // linear
+		'project/renderer/toneMappingExposure': 1,
+		'project/renderer/toneMappingWhitePoint': 1,
 
 		'project/vr': false,
 
