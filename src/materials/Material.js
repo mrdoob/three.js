@@ -249,7 +249,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		if ( this.blending !== NormalBlending ) data.blending = this.blending;
 		if ( this.flatShading === true ) data.flatShading = this.flatShading;
 		if ( this.side !== FrontSide ) data.side = this.side;
-		if ( this.vertexColors === true || this.vertexColors > 0 ) data.vertexColors = true;
+		if ( this.vertexColors ) data.vertexColors = true;
 
 		if ( this.opacity < 1 ) data.opacity = this.opacity;
 		if ( this.transparent === true ) data.transparent = this.transparent;
