@@ -3042,7 +3042,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#scenes
 	 * @param {number} sceneIndex
-	 * @return {Promise<THREE.Scene>}
+	 * @return {Promise<THREE.Group>}
 	 */
 	GLTFParser.prototype.loadScene = function () {
 
@@ -3151,7 +3151,9 @@ THREE.GLTFLoader = ( function () {
 			var sceneDef = this.json.scenes[ sceneIndex ];
 			var parser = this;
 
-			var scene = new THREE.Scene();
+			// Loader returns Group, not Scene.
+			// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
+			var scene = new THREE.Group();
 			if ( sceneDef.name ) scene.name = sceneDef.name;
 
 			assignExtrasToUserData( scene, sceneDef );
