@@ -1,4 +1,4 @@
-Always make your contributions for the latest dev branch, not master./**
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
