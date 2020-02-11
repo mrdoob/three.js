@@ -468,7 +468,7 @@ function WebXRManager( renderer, gl ) {
 			var inputPose = null;
 			var gripPose = null;
 
-			if ( inputSource ) {
+			if ( controller && inputSource ) {
 
 				if ( controller.targetRay ) {
 
@@ -498,13 +498,13 @@ function WebXRManager( renderer, gl ) {
 
 			}
 
-			if ( controller.targetRay ) {
+			if ( controller && controller.targetRay ) {
 
 				controller.targetRay.visible = inputPose !== null;
 
 			}
 
-			if ( controller.grip ) {
+			if ( controller && controller.grip ) {
 
 				controller.grip.visible = gripPose !== null;
 
