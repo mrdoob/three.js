@@ -6,12 +6,10 @@ import {
 	Box2,
 	Camera,
 	Color,
-	FaceColors,
 	Matrix3,
 	Matrix4,
 	Object3D,
-	Vector3,
-	VertexColors
+	Vector3
 } from "../../../build/three.module.js";
 import { Projector } from "../renderers/Projector.js";
 import { RenderableFace } from "../renderers/Projector.js";
@@ -417,7 +415,7 @@ var SVGRenderer = function () {
 
 			_color.copy( material.color );
 
-			if ( material.vertexColors === FaceColors || material.vertexColors === VertexColors ) {
+			if ( material.vertexColors ) {
 
 				_color.multiply( element.color );
 
@@ -427,7 +425,7 @@ var SVGRenderer = function () {
 
 			_diffuseColor.copy( material.color );
 
-			if ( material.vertexColors === FaceColors || material.vertexColors === VertexColors ) {
+			if ( material.vertexColors ) {
 
 				_diffuseColor.multiply( element.color );
 

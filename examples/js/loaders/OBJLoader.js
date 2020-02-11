@@ -723,7 +723,7 @@ THREE.OBJLoader = ( function () {
 
 						material.name = sourceMaterial.name;
 						material.flatShading = sourceMaterial.smooth ? false : true;
-						material.vertexColors = hasVertexColors ? THREE.VertexColors : THREE.NoColors;
+						material.vertexColors = hasVertexColors;
 
 						state.materials[ materialHash ] = material;
 

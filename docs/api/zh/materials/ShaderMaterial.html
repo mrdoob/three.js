@@ -357,11 +357,14 @@ this.extensions = {
 			注意，uniforms逐帧被刷新，所以更新uniform值将立即更新GLSL代码中的相应值。
 		</p>
 
+		<h3>[property:Boolean uniformsNeedUpdate]</h3>
+		<p>
+		Can be used to force a uniform update while changing uniforms in [page:Object3D.onBeforeRender](). Default is *false*.
+		</p>
 
-		<h3>[property:Number vertexColors]</h3>
-		<p> 通过定义*colors*属性的生成方式来定义顶点是如何着色的。
-			可选值为[page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] 和
-			[page:Materials THREE.VertexColors]。 缺省为 THREE.NoColors。
+		<h3>[property:Boolean vertexColors]</h3>
+		<p>
+		Defines whether vertex coloring is used. Default is *false*.
 		</p>
 
 		<h3>[property:String vertexShader]</h3>

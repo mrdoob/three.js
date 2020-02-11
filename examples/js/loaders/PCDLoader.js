@@ -369,7 +369,7 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		if ( color.length > 0 ) {
 
-			material.vertexColors = THREE.VertexColors;
+			material.vertexColors = true;
 
 		} else {
 

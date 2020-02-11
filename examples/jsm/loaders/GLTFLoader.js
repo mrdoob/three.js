@@ -55,7 +55,6 @@ import {
 	RGBAFormat,
 	RGBFormat,
 	RepeatWrapping,
-	Scene,
 	Skeleton,
 	SkinnedMesh,
 	Sphere,
@@ -67,7 +66,6 @@ import {
 	Vector2,
 	Vector3,
 	VectorKeyframeTrack,
-	VertexColors,
 	sRGBEncoding
 } from "../../../build/three.module.js";
 
@@ -810,7 +808,7 @@ var GLTFLoader = ( function () {
 		/*eslint-disable*/
 		Object.defineProperties(
 			this,
-			{	
+			{
 				specular: {
 					get: function () { return uniforms.specular.value; },
 					set: function ( v ) { uniforms.specular.value = v; }
@@ -2442,7 +2440,7 @@ var GLTFLoader = ( function () {
 
 				if ( useSkinning ) cachedMaterial.skinning = true;
 				if ( useVertexTangents ) cachedMaterial.vertexTangents = true;
-				if ( useVertexColors ) cachedMaterial.vertexColors = VertexColors;
+				if ( useVertexColors ) cachedMaterial.vertexColors = true;
 				if ( useFlatShading ) cachedMaterial.flatShading = true;
 				if ( useMorphTargets ) cachedMaterial.morphTargets = true;
 				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
@@ -3481,7 +3479,7 @@ var GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#scenes
 	 * @param {GLTF.definition} sceneDef
-	 * @return {Promise<Scene>}
+	 * @return {Promise<Group>}
 	 */
 	GLTFParser.prototype.loadScene = function () {
 
@@ -3589,7 +3587,9 @@ var GLTFLoader = ( function () {
 			var extensions = this.extensions;
 			var parser = this;
 
-			var scene = new Scene();
+			// Loader returns Group, not Scene.
+			// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
+			var scene = new Group();
 			if ( sceneDef.name ) scene.name = sceneDef.name;
 
 			var nodeIds = sceneDef.nodes || [];

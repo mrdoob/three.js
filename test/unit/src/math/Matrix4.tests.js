@@ -546,7 +546,7 @@ export default QUnit.module( 'Maths', () => {
 			var b = new Vector3( 2, 3, 4 );
 			var c = new Matrix4().set( 1, 0, 0, 2, 0, 1, 0, 3, 0, 0, 1, 4, 0, 0, 0, 1 );
 
-			a.makeTranslation( b );
+			a.makeTranslation( b.x, b.y, b.z );
 			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );
