@@ -1,4 +1,4 @@
-/**
+Always make your contributions for the latest dev branch, not master./**
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -169,10 +169,12 @@ function WebXRManager( renderer, gl ) {
 	this.setFramebufferScaleFactor = function ( value ) {
 
 		framebufferScaleFactor = value;
-		
+
 		// Warn if function is used while presenting
-		if(scope.isPresenting == true){
-		console.warn("WebXRManager: Cannot change framebuffer scale while presenting VR content");
+		if ( scope.isPresenting == true ) {
+
+			console.warn( "WebXRManager: Cannot change framebuffer scale while presenting VR content" );
+
 		}
 
 	};
