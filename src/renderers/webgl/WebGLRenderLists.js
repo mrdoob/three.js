@@ -16,7 +16,7 @@ function painterSortStable( a, b ) {
 
 		return a.program.id - b.program.id;
 
-	} else if ( a.material.id !== b.material.id ) {
+	} else if ( a.material && b.material && a.material.id !== b.material.id ) {
 
 		return a.material.id - b.material.id;
 
@@ -191,6 +191,16 @@ function WebGLRenderList() {
 	function pushRenderGroup( object ) {
 
 		var renderGroupItem = getNextRenderGroupItem( object );
+
+		if ( renderGroupStack.length !== 0 ) {
+
+			renderGroupStack[ renderGroupStack.length - 1 ].opaque.push( renderGroupItem );
+
+		} else {
+
+			opaque.push( renderGroupItem );
+
+		}
 
 		usedRenderGroups.push( renderGroupItem );
 		renderGroupStack.push( renderGroupItem );

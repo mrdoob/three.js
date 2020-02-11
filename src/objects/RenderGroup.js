@@ -14,7 +14,7 @@ RenderGroup.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	excludeTransparent: true,
 
-	isGroup: true
+	isRenderGroup: true
 
 } );
 

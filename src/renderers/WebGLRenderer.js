@@ -1311,6 +1311,7 @@ function WebGLRenderer( parameters ) {
 				}
 
 				currentRenderList.popRenderGroup();
+				return;
 
 			} else if ( object.isLOD ) {
 
