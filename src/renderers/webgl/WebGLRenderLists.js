@@ -57,6 +57,12 @@ function reversePainterSortStable( a, b ) {
 
 function WebGLRenderList() {
 
+	var transparentRenderGroupStack = [];
+	var renderGroupStack = [];
+	var renderGroupItems = [];
+	var usedRenderGroups = [];
+	var renderGroupItemIndex = 0;
+
 	var renderItems = [];
 	var renderItemsIndex = 0;
 
@@ -67,10 +73,46 @@ function WebGLRenderList() {
 
 	function init() {
 
+		renderGroupItemIndex = 0;
 		renderItemsIndex = 0;
 
+		usedRenderGroups.length = 0;
+		renderGroupStack.length = 0;
 		opaque.length = 0;
 		transparent.length = 0;
+
+	}
+
+	function getNextRenderGroupItem( object ) {
+
+		var renderGroupItem = renderGroupItems[ renderGroupItemIndex ];
+
+		if ( renderGroupItem === undefined ) {
+
+			renderGroupItem = {
+
+				isRenderGroupItem: true,
+				id: object.id,
+				renderOrder: object.renderOrder,
+				opaque: [],
+				transparent: []
+
+			};
+
+			renderGroupItems[ renderGroupItemIndex ] = renderGroupItem;
+
+		} else {
+
+			renderGroupItem.id = object.id;
+			renderGroupItem.renderOrder = object.renderOrder;
+			renderGroupItem.opaque.length = 0;
+			renderGroupItem.transparent.length = 0;
+
+		}
+
+		renderGroupItemIndex ++;
+
+		return renderGroupItem
 
 	}
 
@@ -118,7 +160,58 @@ function WebGLRenderList() {
 
 		var renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		( material.transparent === true ? transparent : opaque ).push( renderItem );
+		if ( material.transparent === true ) {
+
+			if ( transparentRenderGroupStack.length !== 0 ) {
+
+				transparentRenderGroupStack[ transparentRenderGroupStack.length - 1 ].transparent.push( renderItem );
+
+			} else {
+
+				transparent.push( renderItem );
+
+			}
+
+		} else {
+
+			if ( renderGroupStack.length !== 0 ) {
+
+				renderGroupStack[ renderGroupStack.length - 1 ].opaque.push( renderItem );
+
+			} else {
+
+				opaque.push( renderItem );
+
+			}
+
+		}
+
+	}
+
+	function pushRenderGroup( object ) {
+
+		var renderGroupItem = getNextRenderGroupItem( object );
+
+		usedRenderGroups.push( renderGroupItem );
+		renderGroupStack.push( renderGroupItem );
+
+		if ( object.excludeTransparent === false ) {
+
+			transparentRenderGroupStack.push( object );
+
+		}
+
+	}
+
+	function popRenderGroup() {
+
+		var removedItem = renderGroupStack.pop();
+
+		if ( transparentRenderGroupStack[ transparentRenderGroupStack.length - 1 ] === removedItem ) {
+
+			transparentRenderGroupStack.pop();
+
+		}
 
 	}
 
@@ -135,6 +228,17 @@ function WebGLRenderList() {
 		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
 
+		for ( var i = 0, l = usedRenderGroups.length; i < l; i ++ ) {
+
+			var renderGroupItem = usedRenderGroups[ i ];
+			var opaque = renderGroupItem.opaque;
+			var transparent = renderGroupItem.transparent;
+
+			if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
+			if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
+
+		}
+
 	}
 
 	return {
@@ -144,6 +248,9 @@ function WebGLRenderList() {
 		init: init,
 		push: push,
 		unshift: unshift,
+
+		pushRenderGroup: pushRenderGroup,
+		popRenderGroup: popRenderGroup,
 
 		sort: sort
 	};

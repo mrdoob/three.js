@@ -1298,6 +1298,22 @@ function WebGLRenderer( parameters ) {
 
 				groupOrder = object.renderOrder;
 
+			} else if ( object.isRenderGroup ) {
+
+				currentRenderList.pushRenderGroup( object );
+
+				var children = object.children;
+
+				for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+					projectObject( children[ i ], camera, groupOrder, sortObjects );
+
+				}
+
+				currentRenderList.popRenderGroup();
+
+			}
+
 			} else if ( object.isLOD ) {
 
 				if ( object.autoUpdate === true ) object.update( camera );
@@ -1422,7 +1438,15 @@ function WebGLRenderer( parameters ) {
 			var material = overrideMaterial === undefined ? renderItem.material : overrideMaterial;
 			var group = renderItem.group;
 
-			if ( camera.isArrayCamera ) {
+			if ( renderItem.isRenderGroupItem ) {
+
+				var opaque = renderItem.opaque;
+				var transparent = renderItem.transparent;
+
+				if ( opaque.length > 0 ) renderObjects( opaque, scene, camera, overrideMaterial );
+				if ( transparent.length > 0 ) renderObjects( transparent, scene, camera, overrideMaterial );
+
+			} else if ( camera.isArrayCamera ) {
 
 				_currentArrayCamera = camera;
 
