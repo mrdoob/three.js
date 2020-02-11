@@ -1,9 +1,9 @@
 import {
 	AnimationClip,
 	Camera,
+	Group,
 	Loader,
-	LoadingManager,
-	Scene
+	LoadingManager
 } from '../../../src/Three';
 
 import { DRACOLoader } from './DRACOLoader';
@@ -11,8 +11,8 @@ import { DDSLoader } from './DDSLoader';
 
 export interface GLTF {
 	animations: AnimationClip[];
-	scene: Scene;
-	scenes: Scene[];
+	scene: Group;
+	scenes: Group[];
 	cameras: Camera[];
 	asset: {
 		copyright?: string;
