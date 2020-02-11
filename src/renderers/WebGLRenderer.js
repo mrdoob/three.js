@@ -1312,8 +1312,6 @@ function WebGLRenderer( parameters ) {
 
 				currentRenderList.popRenderGroup();
 
-			}
-
 			} else if ( object.isLOD ) {
 
 				if ( object.autoUpdate === true ) object.update( camera );
