@@ -231,11 +231,11 @@ function WebGLRenderList() {
 		for ( var i = 0, l = usedRenderGroups.length; i < l; i ++ ) {
 
 			var renderGroupItem = usedRenderGroups[ i ];
-			var opaque = renderGroupItem.opaque;
-			var transparent = renderGroupItem.transparent;
+			var renderGroupOpaque = renderGroupItem.opaque;
+			var renderGroupTransparent = renderGroupItem.transparent;
 
-			if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
-			if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
+			if ( renderGroupOpaque.length > 1 ) renderGroupOpaque.sort( customOpaqueSort || painterSortStable );
+			if ( renderGroupTransparent.length > 1 ) renderGroupTransparent.sort( customTransparentSort || reversePainterSortStable );
 
 		}
 
