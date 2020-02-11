@@ -69,6 +69,9 @@ function WebGLRenderList() {
 	var opaque = [];
 	var transparent = [];
 
+	var currOpaque = opaque;
+	var currTransparent = transparent;
+
 	var defaultProgram = { id: - 1 };
 
 	function init() {
@@ -80,6 +83,9 @@ function WebGLRenderList() {
 		renderGroupStack.length = 0;
 		opaque.length = 0;
 		transparent.length = 0;
+
+		currOpaque = opaque;
+		currTransparent = transparent;
 
 	}
 
@@ -160,31 +166,7 @@ function WebGLRenderList() {
 
 		var renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		if ( material.transparent === true ) {
-
-			if ( transparentRenderGroupStack.length !== 0 ) {
-
-				transparentRenderGroupStack[ transparentRenderGroupStack.length - 1 ].transparent.push( renderItem );
-
-			} else {
-
-				transparent.push( renderItem );
-
-			}
-
-		} else {
-
-			if ( renderGroupStack.length !== 0 ) {
-
-				renderGroupStack[ renderGroupStack.length - 1 ].opaque.push( renderItem );
-
-			} else {
-
-				opaque.push( renderItem );
-
-			}
-
-		}
+		( material.transparent === true ? currTransparent : currOpaque ).push( renderItem );
 
 	}
 
@@ -192,21 +174,15 @@ function WebGLRenderList() {
 
 		var renderGroupItem = getNextRenderGroupItem( object );
 
-		if ( renderGroupStack.length !== 0 ) {
-
-			renderGroupStack[ renderGroupStack.length - 1 ].opaque.push( renderGroupItem );
-
-		} else {
-
-			opaque.push( renderGroupItem );
-
-		}
+		currOpaque.push( renderGroupItem );
+		currOpaque = renderGroupItem.opaque;
 
 		usedRenderGroups.push( renderGroupItem );
 		renderGroupStack.push( renderGroupItem );
 
 		if ( object.excludeTransparent === false ) {
 
+			currTransparent = renderGroupItem.transparent;
 			transparentRenderGroupStack.push( object );
 
 		}
@@ -216,10 +192,18 @@ function WebGLRenderList() {
 	function popRenderGroup() {
 
 		var removedItem = renderGroupStack.pop();
+		currOpaque =
+			renderGroupStack.length ?
+				renderGroupStack[ renderGroupStack.length - 1 ].opaque :
+				opaque;
 
 		if ( transparentRenderGroupStack[ transparentRenderGroupStack.length - 1 ] === removedItem ) {
 
 			transparentRenderGroupStack.pop();
+			currTransparent =
+				transparentRenderGroupStack ?
+					transparentRenderGroupStack[ transparentRenderGroupStack.length - 1 ].transparent :
+					transparent;
 
 		}
 
