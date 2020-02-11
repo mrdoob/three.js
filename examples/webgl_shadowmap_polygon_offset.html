@@ -27,6 +27,7 @@
 
 			var config = {
 				'Bias': 0,
+				'Resolution': 256,
 				ground: {
 					'Offset factor': 3,
 					'Offset units': 1000,
@@ -109,6 +110,15 @@
 
 				} );
 
+				gui.add( config, 'Resolution', [ 256, 512, 1024, 2048] ).onChange( function ( value ) {
+
+					dirLight.shadow.mapSize.width = value;
+					dirLight.shadow.mapSize.height = value;
+					dirLight.shadow.map.dispose();
+					dirLight.shadow.map = null;
+
+				} );
+
 				var groundFolder = gui.addFolder("Ground");
 				var objectFolder = gui.addFolder("Object");
 				groundFolder.open();
@@ -177,10 +187,10 @@
 				dirLight.shadow.camera.left = - 17;
 				dirLight.shadow.camera.top	= 17;
 				dirLight.shadow.camera.bottom = - 17;
-				dirLight.shadow.mapSize.width = 256;
-				dirLight.shadow.mapSize.height = 256;
+				dirLight.shadow.mapSize.width = config[ 'Resolution' ];
+				dirLight.shadow.mapSize.height = config[ 'Resolution' ];
 				dirLight.shadow.radius = 2;
-				dirLight.shadow.bias = config['Bias'];
+				dirLight.shadow.bias = config[ 'Bias' ];
 				scene.add( dirLight );
 
 				dirGroup = new THREE.Group();
