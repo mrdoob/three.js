@@ -892,7 +892,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		// Conversion: [ fromUnit ][ toUnit ] (-1 means dpi dependent)
 		var unitConversion = {
 
-			"mm" : {
+			"mm": {
 				"mm": 1,
 				"cm": 0.1,
 				"in": 1 / 25.4,
@@ -900,7 +900,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				"pc": 6 / 25.4,
 				"px": - 1
 			},
-			"cm" : {
+			"cm": {
 				"mm": 10,
 				"cm": 1,
 				"in": 1 / 2.54,
@@ -908,7 +908,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				"pc": 6 / 2.54,
 				"px": - 1
 			},
-			"in" : {
+			"in": {
 				"mm": 25.4,
 				"cm": 2.54,
 				"in": 1,
@@ -916,7 +916,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				"pc": 6,
 				"px": - 1
 			},
-			"pt" : {
+			"pt": {
 				"mm": 25.4 / 72,
 				"cm": 2.54 / 72,
 				"in": 1 / 72,
@@ -924,7 +924,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				"pc": 6 / 72,
 				"px": - 1
 			},
-			"pc" : {
+			"pc": {
 				"mm": 25.4 / 6,
 				"cm": 2.54 / 6,
 				"in": 1 / 6,
@@ -932,7 +932,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				"pc": 1,
 				"px": - 1
 			},
-			"px" : {
+			"px": {
 				"px": 1
 			}
 
@@ -968,8 +968,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				scale = unitConversion[ "in" ][ scope.defaultUnit ] / scope.defaultDPI;
 
-			}
-			else {
+			} else {
 
 				scale = unitConversion[ theUnit ][ scope.defaultUnit ];
 

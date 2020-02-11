@@ -339,7 +339,7 @@ StandardNode.prototype.build = function ( builder ) {
 			'material.specularRoughness = max( roughnessFactor, 0.0525 );',
 			'material.specularRoughness += geometryRoughness;',
 			'material.specularRoughness = min( material.specularRoughness, 1.0 );',
-			
+
 			'material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );'
 		);
 
