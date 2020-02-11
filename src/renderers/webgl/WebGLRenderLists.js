@@ -118,7 +118,7 @@ function WebGLRenderList() {
 
 		renderGroupItemIndex ++;
 
-		return renderGroupItem
+		return renderGroupItem;
 
 	}
 
