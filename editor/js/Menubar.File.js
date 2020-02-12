@@ -416,6 +416,9 @@ var MenubarFile = function ( editor ) {
 			zip.file( 'js/three.module.js', content );
 
 		} );
+		loader.load( '../examples/jsm/webxr/VRButton.js', function ( content ) {
+			zip.file( 'js/VRButton.js', content );
+		} );
 
 	} );
 	options.add( option );
