@@ -23,7 +23,6 @@ function Material() {
 	this.blending = NormalBlending;
 	this.side = FrontSide;
 	this.flatShading = false;
-	this.vertexTangents = false;
 	this.vertexColors = false;
 
 	this.opacity = 1;
@@ -346,7 +345,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.blending = source.blending;
 		this.side = source.side;
 		this.flatShading = source.flatShading;
-		this.vertexTangents = source.vertexTangents;
 		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;

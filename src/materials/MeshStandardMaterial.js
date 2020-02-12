@@ -110,6 +110,8 @@ function MeshStandardMaterial( parameters ) {
 	this.morphTargets = false;
 	this.morphNormals = false;
 
+	this.vertexTangents = false;
+
 	this.setValues( parameters );
 
 }
@@ -171,6 +173,8 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
+
+	this.vertexTangents = source.vertexTangents;
 
 	return this;
 
