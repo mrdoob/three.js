@@ -1,5 +1,3 @@
-import * as THREE from "../../../build/three.module.js";
-
 /**
  * @author LeonYuanYao / https://github.com/LeonYuanYao
  *
@@ -8,6 +6,18 @@ import * as THREE from "../../../build/three.module.js";
  * @link https://github.com/tsherif/mesh-quantization-example
  *
  */
+
+import {
+	BufferAttribute,
+	Matrix3,
+	Matrix4,
+	MeshPhongMaterial,
+	ShaderChunk,
+	ShaderLib,
+	UniformsUtils,
+	Vector3
+} from "../../../build/three.module.js";
+
 var GeometryCompressionUtils = {
 
 	/**
@@ -62,7 +72,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			mesh.geometry.setAttribute( 'normal', new THREE.BufferAttribute( result, 3, true ) );
+			mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 3, true ) );
 			mesh.geometry.attributes.normal.bytes = result.length * 1;
 
 		} else if ( encodeMethod == "OCT1Byte" ) {
@@ -80,7 +90,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			mesh.geometry.setAttribute( 'normal', new THREE.BufferAttribute( result, 2, true ) );
+			mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
 			mesh.geometry.attributes.normal.bytes = result.length * 1;
 
 		} else if ( encodeMethod == "OCT2Byte" ) {
@@ -98,7 +108,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			mesh.geometry.setAttribute( 'normal', new THREE.BufferAttribute( result, 2, true ) );
+			mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
 			mesh.geometry.attributes.normal.bytes = result.length * 2;
 
 		} else if ( encodeMethod == "ANGLES" ) {
@@ -116,7 +126,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			mesh.geometry.setAttribute( 'normal', new THREE.BufferAttribute( result, 2, true ) );
+			mesh.geometry.setAttribute( 'normal', new BufferAttribute( result, 2, true ) );
 			mesh.geometry.attributes.normal.bytes = result.length * 2;
 
 		} else {
@@ -203,7 +213,7 @@ var GeometryCompressionUtils = {
 		if ( mesh.geometry.boundingBox == null ) mesh.geometry.computeBoundingBox();
 		if ( mesh.geometry.boundingSphere == null ) mesh.geometry.computeBoundingSphere();
 
-		mesh.geometry.setAttribute( 'position', new THREE.BufferAttribute( quantized, 3 ) );
+		mesh.geometry.setAttribute( 'position', new BufferAttribute( quantized, 3 ) );
 		mesh.geometry.attributes.position.isPacked = true;
 		mesh.geometry.attributes.position.needsUpdate = true;
 		mesh.geometry.attributes.position.bytes = quantized.length * encodingBytes;
@@ -274,7 +284,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			mesh.geometry.setAttribute( 'uv', new THREE.BufferAttribute( result, 2, true ) );
+			mesh.geometry.setAttribute( 'uv', new BufferAttribute( result, 2, true ) );
 			mesh.geometry.attributes.uv.isPacked = true;
 			mesh.geometry.attributes.uv.needsUpdate = true;
 			mesh.geometry.attributes.uv.bytes = result.length * 2;
@@ -292,7 +302,7 @@ var GeometryCompressionUtils = {
 			// use quantized encoding method
 			result = this.EncodingFuncs.quantizedEncodeUV( array, 2 );
 
-			mesh.geometry.setAttribute( 'uv', new THREE.BufferAttribute( result.quantized, 2 ) );
+			mesh.geometry.setAttribute( 'uv', new BufferAttribute( result.quantized, 2 ) );
 			mesh.geometry.attributes.uv.isPacked = true;
 			mesh.geometry.attributes.uv.needsUpdate = true;
 			mesh.geometry.attributes.uv.bytes = result.quantized.length * 2;
@@ -534,7 +544,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			let decodeMat = new THREE.Matrix4();
+			let decodeMat = new Matrix4();
 
 			let min = new Float32Array( 3 );
 			let max = new Float32Array( 3 );
@@ -553,7 +563,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			decodeMat.scale( new THREE.Vector3(
+			decodeMat.scale( new Vector3(
 				( max[ 0 ] - min[ 0 ] ) / segments,
 				( max[ 1 ] - min[ 1 ] ) / segments,
 				( max[ 2 ] - min[ 2 ] ) / segments
@@ -608,7 +618,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			let decodeMat = new THREE.Matrix3();
+			let decodeMat = new Matrix3();
 
 			let min = new Float32Array( 2 );
 			let max = new Float32Array( 2 );
@@ -667,12 +677,12 @@ var GeometryCompressionUtils = {
  */
 function PackedPhongMaterial( parameters ) {
 
-	THREE.MeshPhongMaterial.call( this );
+	MeshPhongMaterial.call( this );
 	this.defines = {};
 	this.type = 'PackedPhongMaterial';
-	this.uniforms = THREE.UniformsUtils.merge( [
+	this.uniforms = UniformsUtils.merge( [
 
-		THREE.ShaderLib.phong.uniforms,
+		ShaderLib.phong.uniforms,
 
 		{
 			quantizeMatPos: { value: null },
@@ -690,18 +700,18 @@ function PackedPhongMaterial( parameters ) {
 		"varying vec3 vNormal;",
 		"#endif",
 
-		THREE.ShaderChunk.common,
-		THREE.ShaderChunk.uv_pars_vertex,
-		THREE.ShaderChunk.uv2_pars_vertex,
-		THREE.ShaderChunk.displacementmap_pars_vertex,
-		THREE.ShaderChunk.envmap_pars_vertex,
-		THREE.ShaderChunk.color_pars_vertex,
-		THREE.ShaderChunk.fog_pars_vertex,
-		THREE.ShaderChunk.morphtarget_pars_vertex,
-		THREE.ShaderChunk.skinning_pars_vertex,
-		THREE.ShaderChunk.shadowmap_pars_vertex,
-		THREE.ShaderChunk.logdepthbuf_pars_vertex,
-		THREE.ShaderChunk.clipping_planes_pars_vertex,
+		ShaderChunk.common,
+		ShaderChunk.uv_pars_vertex,
+		ShaderChunk.uv2_pars_vertex,
+		ShaderChunk.displacementmap_pars_vertex,
+		ShaderChunk.envmap_pars_vertex,
+		ShaderChunk.color_pars_vertex,
+		ShaderChunk.fog_pars_vertex,
+		ShaderChunk.morphtarget_pars_vertex,
+		ShaderChunk.skinning_pars_vertex,
+		ShaderChunk.shadowmap_pars_vertex,
+		ShaderChunk.logdepthbuf_pars_vertex,
+		ShaderChunk.clipping_planes_pars_vertex,
 
 		`#ifdef USE_PACKED_NORMAL
 			#if USE_PACKED_NORMAL == 0
@@ -768,7 +778,7 @@ function PackedPhongMaterial( parameters ) {
 
 		"void main() {",
 
-		THREE.ShaderChunk.uv_vertex,
+		ShaderChunk.uv_vertex,
 
 		`#ifdef USE_UV
 			#ifdef USE_PACKED_UV
@@ -776,9 +786,9 @@ function PackedPhongMaterial( parameters ) {
 			#endif
 		#endif`,
 
-		THREE.ShaderChunk.uv2_vertex,
-		THREE.ShaderChunk.color_vertex,
-		THREE.ShaderChunk.beginnormal_vertex,
+		ShaderChunk.uv2_vertex,
+		ShaderChunk.color_vertex,
+		ShaderChunk.beginnormal_vertex,
 
 		`#ifdef USE_PACKED_NORMAL
 			objectNormal = decodeNormal(objectNormal);
@@ -789,16 +799,16 @@ function PackedPhongMaterial( parameters ) {
 		#endif
 		`,
 
-		THREE.ShaderChunk.morphnormal_vertex,
-		THREE.ShaderChunk.skinbase_vertex,
-		THREE.ShaderChunk.skinnormal_vertex,
-		THREE.ShaderChunk.defaultnormal_vertex,
+		ShaderChunk.morphnormal_vertex,
+		ShaderChunk.skinbase_vertex,
+		ShaderChunk.skinnormal_vertex,
+		ShaderChunk.defaultnormal_vertex,
 
 		"#ifndef FLAT_SHADED",
 		"	vNormal = normalize( transformedNormal );",
 		"#endif",
 
-		THREE.ShaderChunk.begin_vertex,
+		ShaderChunk.begin_vertex,
 
 		`#ifdef USE_PACKED_POSITION
 			#if USE_PACKED_POSITION == 0
@@ -806,19 +816,19 @@ function PackedPhongMaterial( parameters ) {
 			#endif
 		#endif`,
 
-		THREE.ShaderChunk.morphtarget_vertex,
-		THREE.ShaderChunk.skinning_vertex,
-		THREE.ShaderChunk.displacementmap_vertex,
-		THREE.ShaderChunk.project_vertex,
-		THREE.ShaderChunk.logdepthbuf_vertex,
-		THREE.ShaderChunk.clipping_planes_vertex,
+		ShaderChunk.morphtarget_vertex,
+		ShaderChunk.skinning_vertex,
+		ShaderChunk.displacementmap_vertex,
+		ShaderChunk.project_vertex,
+		ShaderChunk.logdepthbuf_vertex,
+		ShaderChunk.clipping_planes_vertex,
 
 		"vViewPosition = - mvPosition.xyz;",
 
-		THREE.ShaderChunk.worldpos_vertex,
-		THREE.ShaderChunk.envmap_vertex,
-		THREE.ShaderChunk.shadowmap_vertex,
-		THREE.ShaderChunk.fog_vertex,
+		ShaderChunk.worldpos_vertex,
+		ShaderChunk.envmap_vertex,
+		ShaderChunk.shadowmap_vertex,
+		ShaderChunk.fog_vertex,
 
 		"}",
 	].join( "\n" );
@@ -832,69 +842,69 @@ function PackedPhongMaterial( parameters ) {
 		"uniform float shininess;",
 		"uniform float opacity;",
 
-		THREE.ShaderChunk.common,
-		THREE.ShaderChunk.packing,
-		THREE.ShaderChunk.dithering_pars_fragment,
-		THREE.ShaderChunk.color_pars_fragment,
-		THREE.ShaderChunk.uv_pars_fragment,
-		THREE.ShaderChunk.uv2_pars_fragment,
-		THREE.ShaderChunk.map_pars_fragment,
-		THREE.ShaderChunk.alphamap_pars_fragment,
-		THREE.ShaderChunk.aomap_pars_fragment,
-		THREE.ShaderChunk.lightmap_pars_fragment,
-		THREE.ShaderChunk.emissivemap_pars_fragment,
-		THREE.ShaderChunk.envmap_common_pars_fragment,
-		THREE.ShaderChunk.envmap_pars_fragment,
-		THREE.ShaderChunk.cube_uv_reflection_fragment,
-		THREE.ShaderChunk.fog_pars_fragment,
-		THREE.ShaderChunk.bsdfs,
-		THREE.ShaderChunk.lights_pars_begin,
-		THREE.ShaderChunk.lights_phong_pars_fragment,
-		THREE.ShaderChunk.shadowmap_pars_fragment,
-		THREE.ShaderChunk.bumpmap_pars_fragment,
-		THREE.ShaderChunk.normalmap_pars_fragment,
-		THREE.ShaderChunk.specularmap_pars_fragment,
-		THREE.ShaderChunk.logdepthbuf_pars_fragment,
-		THREE.ShaderChunk.clipping_planes_pars_fragment,
+		ShaderChunk.common,
+		ShaderChunk.packing,
+		ShaderChunk.dithering_pars_fragment,
+		ShaderChunk.color_pars_fragment,
+		ShaderChunk.uv_pars_fragment,
+		ShaderChunk.uv2_pars_fragment,
+		ShaderChunk.map_pars_fragment,
+		ShaderChunk.alphamap_pars_fragment,
+		ShaderChunk.aomap_pars_fragment,
+		ShaderChunk.lightmap_pars_fragment,
+		ShaderChunk.emissivemap_pars_fragment,
+		ShaderChunk.envmap_common_pars_fragment,
+		ShaderChunk.envmap_pars_fragment,
+		ShaderChunk.cube_uv_reflection_fragment,
+		ShaderChunk.fog_pars_fragment,
+		ShaderChunk.bsdfs,
+		ShaderChunk.lights_pars_begin,
+		ShaderChunk.lights_phong_pars_fragment,
+		ShaderChunk.shadowmap_pars_fragment,
+		ShaderChunk.bumpmap_pars_fragment,
+		ShaderChunk.normalmap_pars_fragment,
+		ShaderChunk.specularmap_pars_fragment,
+		ShaderChunk.logdepthbuf_pars_fragment,
+		ShaderChunk.clipping_planes_pars_fragment,
 
 		"void main() {",
 
-		THREE.ShaderChunk.clipping_planes_fragment,
+		ShaderChunk.clipping_planes_fragment,
 
 		"vec4 diffuseColor = vec4( diffuse, opacity );",
 		"ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );",
 		"vec3 totalEmissiveRadiance = emissive;",
 
-		THREE.ShaderChunk.logdepthbuf_fragment,
-		THREE.ShaderChunk.map_fragment,
-		THREE.ShaderChunk.color_fragment,
-		THREE.ShaderChunk.alphamap_fragment,
-		THREE.ShaderChunk.alphatest_fragment,
-		THREE.ShaderChunk.specularmap_fragment,
-		THREE.ShaderChunk.normal_fragment_begin,
-		THREE.ShaderChunk.normal_fragment_maps,
-		THREE.ShaderChunk.emissivemap_fragment,
+		ShaderChunk.logdepthbuf_fragment,
+		ShaderChunk.map_fragment,
+		ShaderChunk.color_fragment,
+		ShaderChunk.alphamap_fragment,
+		ShaderChunk.alphatest_fragment,
+		ShaderChunk.specularmap_fragment,
+		ShaderChunk.normal_fragment_begin,
+		ShaderChunk.normal_fragment_maps,
+		ShaderChunk.emissivemap_fragment,
 
 		// accumulation
-		THREE.ShaderChunk.lights_phong_fragment,
-		THREE.ShaderChunk.lights_fragment_begin,
-		THREE.ShaderChunk.lights_fragment_maps,
-		THREE.ShaderChunk.lights_fragment_end,
+		ShaderChunk.lights_phong_fragment,
+		ShaderChunk.lights_fragment_begin,
+		ShaderChunk.lights_fragment_maps,
+		ShaderChunk.lights_fragment_end,
 
 		// modulation
-		THREE.ShaderChunk.aomap_fragment,
+		ShaderChunk.aomap_fragment,
 
 		"vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;",
 
-		THREE.ShaderChunk.envmap_fragment,
+		ShaderChunk.envmap_fragment,
 
 		"gl_FragColor = vec4( outgoingLight, diffuseColor.a );",
 
-		THREE.ShaderChunk.tonemapping_fragment,
-		THREE.ShaderChunk.encodings_fragment,
-		THREE.ShaderChunk.fog_fragment,
-		THREE.ShaderChunk.premultiplied_alpha_fragment,
-		THREE.ShaderChunk.dithering_fragment,
+		ShaderChunk.tonemapping_fragment,
+		ShaderChunk.encodings_fragment,
+		ShaderChunk.fog_fragment,
+		ShaderChunk.premultiplied_alpha_fragment,
+		ShaderChunk.dithering_fragment,
 		"}",
 	].join( "\n" );
 
@@ -902,6 +912,6 @@ function PackedPhongMaterial( parameters ) {
 
 }
 
-PackedPhongMaterial.prototype = Object.create( THREE.MeshPhongMaterial.prototype );
+PackedPhongMaterial.prototype = Object.create( MeshPhongMaterial.prototype );
 
 export { GeometryCompressionUtils, PackedPhongMaterial };
