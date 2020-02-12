@@ -4,11 +4,10 @@
 
 import {
 	Color,
-	LinearFilter,
 	MeshDepthMaterial,
+	NearestFilter,
 	NoBlending,
 	RGBADepthPacking,
-	RGBFormat,
 	ShaderMaterial,
 	UniformsUtils,
 	WebGLRenderTarget
@@ -33,14 +32,12 @@ var BokehPass = function ( scene, camera, params ) {
 	var width = params.width || window.innerWidth || 1;
 	var height = params.height || window.innerHeight || 1;
 
-	this.renderTargetColor = new WebGLRenderTarget( width, height, {
-		minFilter: LinearFilter,
-		magFilter: LinearFilter,
-		format: RGBFormat
+	this.renderTargetDepth = new WebGLRenderTarget( width, height, {
+		minFilter: NearestFilter,
+		magFilter: NearestFilter,
+		stencilBuffer: false
 	} );
-	this.renderTargetColor.texture.name = "BokehPass.color";
 
-	this.renderTargetDepth = this.renderTargetColor.clone();
 	this.renderTargetDepth.texture.name = "BokehPass.depth";
 
 	// depth material
