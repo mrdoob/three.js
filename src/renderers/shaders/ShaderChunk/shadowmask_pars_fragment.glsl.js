@@ -35,12 +35,12 @@ float getShadowMask() {
 
 	#if NUM_POINT_LIGHT_SHADOWS > 0
 
-	PointLight pointLight;
+	PointLightShadow pointLight;
 
 	#pragma unroll_loop
 	for ( int i = 0; i < NUM_POINT_LIGHT_SHADOWS; i ++ ) {
 
-		pointLight = pointLights[ i ];
+		pointLight = pointLightShadows[ i ];
 		shadow *= all( bvec2( pointLight.shadow, receiveShadow ) ) ? getPointShadow( pointShadowMap[ i ], pointLight.shadowMapSize, pointLight.shadowBias, pointLight.shadowRadius, vPointShadowCoord[ i ], pointLight.shadowCameraNear, pointLight.shadowCameraFar ) : 1.0;
 
 	}

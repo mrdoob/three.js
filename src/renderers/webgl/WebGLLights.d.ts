@@ -27,6 +27,7 @@ export class WebGLLights {
 		spotShadowMatrix: Array<any>;
 		rectArea: Array<any>;
 		point: Array<any>;
+		pointShadow: Array<any>;
 		pointShadowMap: Array<any>;
 		pointShadowMatrix: Array<any>;
 		hemi: Array<any>;

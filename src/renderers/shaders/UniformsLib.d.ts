@@ -100,6 +100,11 @@ export let UniformsLib: {
 				position: {};
 				decay: {};
 				distance: {};
+			};
+		};
+		pointLightShadows: {
+			value: any[];
+			properties: {
 				shadow: {};
 				shadowBias: {};
 				shadowRadius: {};

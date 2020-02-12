@@ -147,8 +147,10 @@ var UniformsLib = {
 			color: {},
 			position: {},
 			decay: {},
-			distance: {},
+			distance: {}
+		} },
 
+		pointLightShadows: { value: [], properties: {
 			shadow: {},
 			shadowBias: {},
 			shadowRadius: {},
