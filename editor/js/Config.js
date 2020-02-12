@@ -13,6 +13,7 @@ var Config = function () {
 
 		'project/title': '',
 		'project/editable': false,
+		'project/webvr': false,
 
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
