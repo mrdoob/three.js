@@ -109,6 +109,8 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( json.morphNormals !== undefined ) material.morphNormals = json.morphNormals;
 		if ( json.dithering !== undefined ) material.dithering = json.dithering;
 
+		if ( json.vertexTangents !== undefined ) material.vertexTangents = json.vertexTangents;
+
 		if ( json.visible !== undefined ) material.visible = json.visible;
 
 		if ( json.toneMapped !== undefined ) material.toneMapped = json.toneMapped;
