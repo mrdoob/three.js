@@ -52,7 +52,6 @@ SwitchNode.prototype.generate = function ( builder, output ) {
 
 		for ( i = 0; i < len; i ++ ) {
 
-			var elm = components.charAt( i );
 			var idx = builder.getIndexByElement( components.charAt( i ) );
 
 			if ( idx > outputLength ) idx = outputLength;

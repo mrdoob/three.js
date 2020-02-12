@@ -6,7 +6,6 @@
 
 import {
 	BufferGeometry,
-	Color,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
@@ -1282,7 +1281,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
 
 	// Param width: Stroke width
-	// Param color: As returned by Color.getStyle()
+	// Param color: As returned by THREE.Color.getStyle()
 	// Param lineJoin: One of "round", "bevel", "miter" or "miter-limit"
 	// Param lineCap: One of "round", "square" or "butt"
 	// Param miterLimit: Maximum join length, in multiples of the "width" parameter (join is truncated if it exceeds that distance)
