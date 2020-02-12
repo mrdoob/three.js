@@ -136,7 +136,7 @@ function main() {
     time *= 0.001;
 
     for (const {elem, fn, ctx} of sceneElements) {
-      // get the viewport relative position opf this element
+      // get the viewport relative position of this element
       const rect = elem.getBoundingClientRect();
       const {left, right, top, bottom, width, height} = rect;
       const rendererCanvas = renderer.domElement;

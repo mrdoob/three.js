@@ -144,7 +144,7 @@ function main() {
     renderer.domElement.style.transform = transform;
 
     for (const {elem, fn} of sceneElements) {
-      // get the viewport relative position opf this element
+      // get the viewport relative position of this element
       const rect = elem.getBoundingClientRect();
       const {left, right, top, bottom, width, height} = rect;
 

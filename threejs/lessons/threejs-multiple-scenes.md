@@ -147,7 +147,7 @@ test with `Renderer.setScissorTest` and then setting both the scissor and the vi
 function renderSceneInfo(sceneInfo) {
   const {scene, camera, elem} = sceneInfo;
 
-  // get the viewport relative position opf this element
+  // get the viewport relative position of this element
   const {left, right, top, bottom, width, height} =
       elem.getBoundingClientRect();
 
@@ -284,7 +284,7 @@ function render(time) {
   renderer.domElement.style.transform = transform;
 
   for (const {elem, fn} of sceneElements) {
-    // get the viewport relative position opf this element
+    // get the viewport relative position of this element
     const rect = elem.getBoundingClientRect();
     const {left, right, top, bottom, width, height} = rect;
 
@@ -630,7 +630,7 @@ function render(time) {
 
 -  for (const {elem, fn} of sceneElements) {
 +  for (const {elem, fn, ctx} of sceneElements) {
-    // get the viewport relative position opf this element
+    // get the viewport relative position of this element
     const rect = elem.getBoundingClientRect();
     const {left, right, top, bottom, width, height} = rect;
 +    const rendererCanvas = renderer.domElement;
