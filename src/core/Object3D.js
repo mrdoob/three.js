@@ -109,7 +109,7 @@ function Object3D() {
 	this.receiveShadow = false;
 
 	this.frustumCulled = true;
-	this.renderOrder = null;
+	this.renderOrder = 0;
 
 	this.userData = {};
 

@@ -1296,7 +1296,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( object.isGroup ) {
 
-				if ( object.renderOrder !== null ) {
+				if ( object.sortChildren ) {
 
 					currentRenderList.pushRenderGroup( object );
 
