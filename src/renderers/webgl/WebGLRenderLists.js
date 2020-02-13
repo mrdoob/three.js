@@ -137,20 +137,22 @@ function WebGLRenderList() {
 
 	}
 
-	// remove any dangling references to make sure no memory is leaked
-	// when the count of objects in a scene is reduced
-	function cleanup() {
+	function finish() {
 
-		for ( var i = renderItemsIndex; i < renderItems.length; i ++ ) {
+		// Clear references from inactive renderItems in the list
+
+		for ( var i = renderItemsIndex, il = renderItems.length; i < il; i ++ ) {
 
 			var renderItem = renderItems[ i ];
+
 			if ( renderItem.id === null ) break;
+
+			renderItem.id = null;
 			renderItem.object = null;
 			renderItem.geometry = null;
 			renderItem.material = null;
-			renderItem.group = null;
 			renderItem.program = null;
-			renderItem.id = null;
+			renderItem.group = null;
 
 		}
 
@@ -163,7 +165,7 @@ function WebGLRenderList() {
 		init: init,
 		push: push,
 		unshift: unshift,
-		cleanup: cleanup,
+		finish: finish,
 
 		sort: sort
 	};
