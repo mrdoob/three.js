@@ -80,7 +80,7 @@
 				var floorMaterial = new THREE.MeshPhongMaterial( { color: '#252a34' } );
 				csm.setupMaterial( floorMaterial );
 
-				var floor = new THREE.Mesh( new THREE.PlaneBufferGeometry( 10000, 10000 ), floorMaterial );
+				var floor = new THREE.Mesh( new THREE.PlaneBufferGeometry( 10000, 10000, 8, 8 ), floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.castShadow = true;
 				floor.receiveShadow = true;
