@@ -417,7 +417,14 @@ var MenubarFile = function ( editor ) {
 
 		} );
 		loader.load( '../examples/jsm/webxr/VRButton.js', function ( content ) {
+
 			zip.file( 'js/VRButton.js', content );
+
+		} );
+		loader.load( '../examples/js/vr/HelioWebXRPolyfill.js', function ( content ) {
+
+			zip.file( 'js/HelioWebXRPolyfill.js', content );
+
 		} );
 
 	} );
