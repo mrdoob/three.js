@@ -18,6 +18,8 @@ Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	sortChildren: false,
 
+	excludeTransparent: true,
+
 	isGroup: true
 
 } );
