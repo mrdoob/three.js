@@ -102,7 +102,6 @@ function ShadowUniformsCache() {
 
 				case 'DirectionalLight':
 					uniforms = {
-						shadow: false,
 						shadowBias: 0,
 						shadowRadius: 1,
 						shadowMapSize: new Vector2()
@@ -111,7 +110,6 @@ function ShadowUniformsCache() {
 
 				case 'SpotLight':
 					uniforms = {
-						shadow: false,
 						shadowBias: 0,
 						shadowRadius: 1,
 						shadowMapSize: new Vector2()
@@ -120,7 +118,6 @@ function ShadowUniformsCache() {
 
 				case 'PointLight':
 					uniforms = {
-						shadow: false,
 						shadowBias: 0,
 						shadowRadius: 1,
 						shadowMapSize: new Vector2(),
@@ -260,7 +257,6 @@ function WebGLLights() {
 
 					var shadowUniforms = shadowCache.get( light );
 
-					shadowUniforms.shadow = light.castShadow;
 					shadowUniforms.shadowBias = shadow.bias;
 					shadowUniforms.shadowRadius = shadow.radius;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
@@ -302,7 +298,6 @@ function WebGLLights() {
 
 					var shadowUniforms = shadowCache.get( light );
 
-					shadowUniforms.shadow = light.castShadow;
 					shadowUniforms.shadowBias = shadow.bias;
 					shadowUniforms.shadowRadius = shadow.radius;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
@@ -368,7 +363,6 @@ function WebGLLights() {
 
 					var shadowUniforms = shadowCache.get( light );
 
-					shadowUniforms.shadow = light.castShadow;
 					shadowUniforms.shadowBias = shadow.bias;
 					shadowUniforms.shadowRadius = shadow.radius;
 					shadowUniforms.shadowMapSize = shadow.mapSize;

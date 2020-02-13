@@ -72,7 +72,6 @@ export let UniformsLib: {
 		directionalLightShadows: {
 			value: any[];
 			properties: {
-				shadow: {};
 				shadowBias: {};
 				shadowRadius: {};
 				shadowMapSize: {};
@@ -95,7 +94,6 @@ export let UniformsLib: {
 		spotLightShadows: {
 			value: any[];
 			properties: {
-				shadow: {};
 				shadowBias: {};
 				shadowRadius: {};
 				shadowMapSize: {};
@@ -115,7 +113,6 @@ export let UniformsLib: {
 		pointLightShadows: {
 			value: any[];
 			properties: {
-				shadow: {};
 				shadowBias: {};
 				shadowRadius: {};
 				shadowMapSize: {};

@@ -66,7 +66,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0
 
 		struct DirectionalLightShadow {
-			int shadow;
 			float shadowBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
@@ -102,7 +101,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	#if defined( USE_SHADOWMAP ) && NUM_POINT_LIGHT_SHADOWS > 0
 
 		struct PointLightShadow {
-			int shadow;
 			float shadowBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
@@ -148,7 +146,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	#if defined( USE_SHADOWMAP ) && NUM_SPOT_LIGHT_SHADOWS > 0
 
 		struct SpotLightShadow {
-			int shadow;
 			float shadowBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
