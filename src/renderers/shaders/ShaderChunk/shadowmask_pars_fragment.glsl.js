@@ -7,12 +7,12 @@ float getShadowMask() {
 
 	#if NUM_DIR_LIGHT_SHADOWS > 0
 
-	DirectionalLight directionalLight;
+	DirectionalLightShadow directionalLight;
 
 	#pragma unroll_loop
 	for ( int i = 0; i < NUM_DIR_LIGHT_SHADOWS; i ++ ) {
 
-		directionalLight = directionalLights[ i ];
+		directionalLight = directionalLightShadows[ i ];
 		shadow *= all( bvec2( directionalLight.shadow, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLight.shadowMapSize, directionalLight.shadowBias, directionalLight.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
 
 	}
@@ -21,12 +21,12 @@ float getShadowMask() {
 
 	#if NUM_SPOT_LIGHT_SHADOWS > 0
 
-	SpotLight spotLight;
+	SpotLightShadow spotLight;
 
 	#pragma unroll_loop
 	for ( int i = 0; i < NUM_SPOT_LIGHT_SHADOWS; i ++ ) {
 
-		spotLight = spotLights[ i ];
+		spotLight = spotLightShadows[ i ];
 		shadow *= all( bvec2( spotLight.shadow, receiveShadow ) ) ? getShadow( spotShadowMap[ i ], spotLight.shadowMapSize, spotLight.shadowBias, spotLight.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
 
 	}

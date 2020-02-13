@@ -67,6 +67,11 @@ export let UniformsLib: {
 			properties: {
 				direction: {};
 				color: {};
+			};
+		};
+		directionalLightShadows: {
+			value: any[];
+			properties: {
 				shadow: {};
 				shadowBias: {};
 				shadowRadius: {};
@@ -85,6 +90,11 @@ export let UniformsLib: {
 				coneCos: {};
 				penumbraCos: {};
 				decay: {};
+			};
+		};
+		spotLightShadows: {
+			value: any[];
+			properties: {
 				shadow: {};
 				shadowBias: {};
 				shadowRadius: {};

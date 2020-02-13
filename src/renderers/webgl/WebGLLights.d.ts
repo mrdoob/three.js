@@ -20,9 +20,11 @@ export class WebGLLights {
 		ambient: Array<number>;
 		probe: Array<any>;
 		directional: Array<any>;
+		directionalShadow: Array<any>;
 		directionalShadowMap: Array<any>;
 		directionalShadowMatrix: Array<any>;
 		spot: Array<any>;
+		spotShadow: Array<any>;
 		spotShadowMap: Array<any>;
 		spotShadowMatrix: Array<any>;
 		rectArea: Array<any>;

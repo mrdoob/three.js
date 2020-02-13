@@ -29,11 +29,6 @@ function UniformsCache() {
 					uniforms = {
 						direction: new Vector3(),
 						color: new Color(),
-
-						shadow: false,
-						shadowBias: 0,
-						shadowRadius: 1,
-						shadowMapSize: new Vector2()
 					};
 					break;
 
@@ -46,11 +41,6 @@ function UniformsCache() {
 						coneCos: 0,
 						penumbraCos: 0,
 						decay: 0,
-
-						shadow: false,
-						shadowBias: 0,
-						shadowRadius: 1,
-						shadowMapSize: new Vector2()
 					};
 					break;
 
@@ -77,7 +67,6 @@ function UniformsCache() {
 						position: new Vector3(),
 						halfWidth: new Vector3(),
 						halfHeight: new Vector3()
-						// TODO (abelnation): set RectAreaLight shadow uniforms
 					};
 					break;
 
@@ -140,6 +129,8 @@ function ShadowUniformsCache() {
 					};
 					break;
 
+				// TODO (abelnation): set RectAreaLight shadow uniforms
+
 			}
 
 			lights[ light.id ] = uniforms;
@@ -187,9 +178,11 @@ function WebGLLights() {
 		ambient: [ 0, 0, 0 ],
 		probe: [],
 		directional: [],
+		directionalShadow: [],
 		directionalShadowMap: [],
 		directionalShadowMatrix: [],
 		spot: [],
+		spotShadow: [],
 		spotShadowMap: [],
 		spotShadowMatrix: [],
 		rectArea: [],
@@ -261,16 +254,18 @@ function WebGLLights() {
 				uniforms.direction.sub( vector3 );
 				uniforms.direction.transformDirection( viewMatrix );
 
-				uniforms.shadow = light.castShadow;
-
 				if ( light.castShadow ) {
 
 					var shadow = light.shadow;
 
-					uniforms.shadowBias = shadow.bias;
-					uniforms.shadowRadius = shadow.radius;
-					uniforms.shadowMapSize = shadow.mapSize;
+					var shadowUniforms = shadowCache.get( light );
 
+					shadowUniforms.shadow = light.castShadow;
+					shadowUniforms.shadowBias = shadow.bias;
+					shadowUniforms.shadowRadius = shadow.radius;
+					shadowUniforms.shadowMapSize = shadow.mapSize;
+
+					state.directionalShadow[ directionalLength ] = shadowUniforms;
 					state.directionalShadowMap[ directionalLength ] = shadowMap;
 					state.directionalShadowMatrix[ directionalLength ] = light.shadow.matrix;
 
@@ -301,16 +296,18 @@ function WebGLLights() {
 				uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
 				uniforms.decay = light.decay;
 
-				uniforms.shadow = light.castShadow;
-
 				if ( light.castShadow ) {
 
 					var shadow = light.shadow;
 
-					uniforms.shadowBias = shadow.bias;
-					uniforms.shadowRadius = shadow.radius;
-					uniforms.shadowMapSize = shadow.mapSize;
+					var shadowUniforms = shadowCache.get( light );
 
+					shadowUniforms.shadow = light.castShadow;
+					shadowUniforms.shadowBias = shadow.bias;
+					shadowUniforms.shadowRadius = shadow.radius;
+					shadowUniforms.shadowMapSize = shadow.mapSize;
+
+					state.spotShadow[ spotLength ] = shadowUniforms;
 					state.spotShadowMap[ spotLength ] = shadowMap;
 					state.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 
@@ -430,9 +427,11 @@ function WebGLLights() {
 			state.point.length = pointLength;
 			state.hemi.length = hemiLength;
 
+			state.directionalShadow.length = numDirectionalShadows;
 			state.directionalShadowMap.length = numDirectionalShadows;
 			state.pointShadow.length = numPointShadows;
 			state.pointShadowMap.length = numPointShadows;
+			state.spotShadow.length = numSpotShadows;
 			state.spotShadowMap.length = numSpotShadows;
 			state.directionalShadowMatrix.length = numDirectionalShadows;
 			state.pointShadowMatrix.length = numPointShadows;

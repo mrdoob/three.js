@@ -114,8 +114,10 @@ var UniformsLib = {
 
 		directionalLights: { value: [], properties: {
 			direction: {},
-			color: {},
+			color: {}
+		} },
 
+		directionalLightShadows: { value: [], properties: {
 			shadow: {},
 			shadowBias: {},
 			shadowRadius: {},
@@ -132,8 +134,10 @@ var UniformsLib = {
 			distance: {},
 			coneCos: {},
 			penumbraCos: {},
-			decay: {},
+			decay: {}
+		} },
 
+		spotLightShadows: { value: [], properties: {
 			shadow: {},
 			shadowBias: {},
 			shadowRadius: {},
