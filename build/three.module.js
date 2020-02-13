@@ -945,9 +945,7 @@ Object.assign( Vector2.prototype, {
 
 		// computes the angle in radians with respect to the positive x-axis
 
-		var angle = Math.atan2( this.y, this.x );
-
-		if ( angle < 0 ) angle += 2 * Math.PI;
+		var angle = Math.atan2( - this.y, - this.x ) + Math.PI;
 
 		return angle;
 
@@ -8600,7 +8598,6 @@ function Material() {
 	this.blending = NormalBlending;
 	this.side = FrontSide;
 	this.flatShading = false;
-	this.vertexTangents = false;
 	this.vertexColors = false;
 
 	this.opacity = 1;
@@ -8923,7 +8920,6 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.blending = source.blending;
 		this.side = source.side;
 		this.flatShading = source.flatShading;
-		this.vertexTangents = source.vertexTangents;
 		this.vertexColors = source.vertexColors;
 
 		this.opacity = source.opacity;
@@ -19032,6 +19028,27 @@ function WebGLRenderList() {
 
 	}
 
+	function finish() {
+
+		// Clear references from inactive renderItems in the list
+
+		for ( var i = renderItemsIndex, il = renderItems.length; i < il; i ++ ) {
+
+			var renderItem = renderItems[ i ];
+
+			if ( renderItem.id === null ) break;
+
+			renderItem.id = null;
+			renderItem.object = null;
+			renderItem.geometry = null;
+			renderItem.material = null;
+			renderItem.program = null;
+			renderItem.group = null;
+
+		}
+
+	}
+
 	return {
 		opaque: opaque,
 		transparent: transparent,
@@ -19039,6 +19056,7 @@ function WebGLRenderList() {
 		init: init,
 		push: push,
 		unshift: unshift,
+		finish: finish,
 
 		sort: sort
 	};
@@ -23010,7 +23028,7 @@ function WebXRManager( renderer, gl ) {
 
 	var session = null;
 
-	// var framebufferScaleFactor = 1.0;
+	var framebufferScaleFactor = 1.0;
 
 	var referenceSpace = null;
 	var referenceSpaceType = 'local-floor';
@@ -23160,9 +23178,16 @@ function WebXRManager( renderer, gl ) {
 
 	}
 
-	this.setFramebufferScaleFactor = function ( /* value */ ) {
+	this.setFramebufferScaleFactor = function ( value ) {
 
-		// framebufferScaleFactor = value;
+		framebufferScaleFactor = value;
+
+		// Warn if function is used while presenting
+		if ( scope.isPresenting == true ) {
+
+			console.warn( "WebXRManager: Cannot change framebuffer scale while presenting VR content" );
+
+		}
 
 	};
 
@@ -23204,7 +23229,8 @@ function WebXRManager( renderer, gl ) {
 				antialias: attributes.antialias,
 				alpha: attributes.alpha,
 				depth: attributes.depth,
-				stencil: attributes.stencil
+				stencil: attributes.stencil,
+				framebufferScaleFactor: framebufferScaleFactor
 			};
 
 			// eslint-disable-next-line no-undef
@@ -24665,6 +24691,8 @@ function WebGLRenderer( parameters ) {
 		currentRenderList.init();
 
 		projectObject( scene, camera, 0, _this.sortObjects );
+
+		currentRenderList.finish();
 
 		if ( _this.sortObjects === true ) {
 
@@ -32903,6 +32931,8 @@ function MeshStandardMaterial( parameters ) {
 	this.morphTargets = false;
 	this.morphNormals = false;
 
+	this.vertexTangents = false;
+
 	this.setValues( parameters );
 
 }
@@ -32964,6 +32994,8 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
+
+	this.vertexTangents = source.vertexTangents;
 
 	return this;
 
@@ -39452,6 +39484,8 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( json.morphNormals !== undefined ) material.morphNormals = json.morphNormals;
 		if ( json.dithering !== undefined ) material.dithering = json.dithering;
 
+		if ( json.vertexTangents !== undefined ) material.vertexTangents = json.vertexTangents;
+
 		if ( json.visible !== undefined ) material.visible = json.visible;
 
 		if ( json.toneMapped !== undefined ) material.toneMapped = json.toneMapped;
@@ -40274,17 +40308,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					case 'Geometry':
 
-						if ( 'THREE' in window && 'LegacyJSONLoader' in THREE ) {
-
-							var geometryLoader = new THREE.LegacyJSONLoader();
-							geometry = geometryLoader.parse( data, this.resourcePath ).geometry;
-
-
-						} else {
-
-							console.error( 'THREE.ObjectLoader: You have to import LegacyJSONLoader in order load geometry data of type "Geometry".' );
-
-						}
+						console.error( 'THREE.ObjectLoader: Loading "Geometry" is not supported anymore.' );
 
 						break;
 
