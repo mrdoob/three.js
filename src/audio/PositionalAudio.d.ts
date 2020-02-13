@@ -1,11 +1,5 @@
 import { AudioListener } from './AudioListener';
-import { Audio } from './Audio';
-
-export class AudioWeaken extends Audio {
-
-	getOutput(): any;
-
-}
+import { AudioWeaken } from './Audio';
 
 export class PositionalAudio extends AudioWeaken {
 

@@ -58,3 +58,9 @@ export class Audio extends Object3D {
 	load( file: string ): Audio;
 
 }
+
+export class AudioWeaken extends Audio {
+
+	getOutput(): any;
+
+}
