@@ -84,6 +84,7 @@ import skinning_vertex from './ShaderChunk/skinning_vertex.glsl.js';
 import skinnormal_vertex from './ShaderChunk/skinnormal_vertex.glsl.js';
 import specularmap_fragment from './ShaderChunk/specularmap_fragment.glsl.js';
 import specularmap_pars_fragment from './ShaderChunk/specularmap_pars_fragment.glsl.js';
+import transparent_fragment from './ShaderChunk/transparent_fragment.glsl.js';
 import tonemapping_fragment from './ShaderChunk/tonemapping_fragment.glsl.js';
 import tonemapping_pars_fragment from './ShaderChunk/tonemapping_pars_fragment.glsl.js';
 import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl.js';
@@ -214,6 +215,7 @@ export var ShaderChunk = {
 	skinnormal_vertex: skinnormal_vertex,
 	specularmap_fragment: specularmap_fragment,
 	specularmap_pars_fragment: specularmap_pars_fragment,
+	transparent_fragment: transparent_fragment,
 	tonemapping_fragment: tonemapping_fragment,
 	tonemapping_pars_fragment: tonemapping_pars_fragment,
 	uv_pars_fragment: uv_pars_fragment,

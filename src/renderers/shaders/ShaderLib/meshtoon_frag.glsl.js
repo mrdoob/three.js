@@ -43,6 +43,7 @@ void main() {
 	#include <color_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <transparent_fragment>
 	#include <specularmap_fragment>
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
