@@ -2170,6 +2170,12 @@ var GLTFLoader = ( function () {
 
 				materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
 
+			} else {
+
+				// for ALPHA_MODES.OPAQUE, we use a negative alphaTest value to enable alphaTesting,
+				// causing the test to always be passed, but also replacing any alpha value with 1.0.
+				materialParams.alphaTest = - 0.5;
+
 			}
 
 		}
