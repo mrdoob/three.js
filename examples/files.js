@@ -303,6 +303,7 @@ var files = {
 		"webgl_lightshafts",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
+		"webgl_shadowmap_csm",
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
 		"webgl_tiled_forward",
