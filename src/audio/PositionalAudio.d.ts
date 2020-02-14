@@ -1,7 +1,7 @@
 import { AudioListener } from './AudioListener';
-import { AudioWeaken } from './Audio';
+import { Audio } from './Audio';
 
-export class PositionalAudio extends AudioWeaken {
+export class PositionalAudio extends Audio<PannerNode> {
 
 	constructor( listener: AudioListener );
 

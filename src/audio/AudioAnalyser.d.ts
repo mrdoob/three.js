@@ -1,8 +1,8 @@
-import { AudioWeaken } from './Audio';
+import { Audio } from './Audio';
 
 export class AudioAnalyser {
 
-	constructor( audio: AudioWeaken, fftSize: number );
+	constructor( audio: Audio<AudioNode>, fftSize: number );
 
 	analyser: AnalyserNode;
 	data: Uint8Array;
