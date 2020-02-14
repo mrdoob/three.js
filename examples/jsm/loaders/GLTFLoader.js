@@ -497,21 +497,15 @@ var GLTFLoader = ( function () {
 				if ( materialDef.name ) material.name = materialDef.name;
 				if ( materialDef.doubleSided === true ) material.side = DoubleSide;
 
-				var alphaMode = materialDef.alphaMode || ALPHA_MODES.OPAQUE;
+				var alphaMode = materialDef.alphaMode;
 
 				if ( alphaMode === ALPHA_MODES.BLEND ) {
 
 					material.transparent = true;
 
-				} else {
+				} else if ( alphaMode === ALPHA_MODES.MASK ) {
 
-					material.transparent = false;
-
-					if ( alphaMode === ALPHA_MODES.MASK ) {
-
-						material.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
-
-					}
+					materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
 
 				}
 
@@ -2589,21 +2583,15 @@ var GLTFLoader = ( function () {
 			if ( materialDef.name ) material.name = materialDef.name;
 			if ( materialDef.doubleSided === true ) material.side = DoubleSide;
 
-			var alphaMode = materialDef.alphaMode || ALPHA_MODES.OPAQUE;
+			var alphaMode = materialDef.alphaMode;
 
 			if ( alphaMode === ALPHA_MODES.BLEND ) {
 
 				material.transparent = true;
 
-			} else {
+			} else if ( alphaMode === ALPHA_MODES.MASK ) {
 
-				material.transparent = false;
-
-				if ( alphaMode === ALPHA_MODES.MASK ) {
-
-					material.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
-
-				}
+				materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
 
 			}
 

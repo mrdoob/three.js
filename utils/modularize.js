@@ -98,7 +98,7 @@ var files = [
 	{ path: 'loaders/PVRLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/RGBELoader.js', dependencies: [], ignoreList: [ 'RGBAFormat' ] },
 	{ path: 'loaders/STLLoader.js', dependencies: [], ignoreList: [ 'Mesh', 'MeshPhongMaterial' ] },
-	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [ 'Color' ] },
 	{ path: 'loaders/TDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TTFLoader.js', dependencies: [], ignoreList: [ 'Font' ] },
