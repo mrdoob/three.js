@@ -182,7 +182,7 @@ var APP = {
 		this.play = function () {
 
 			if ( vrEnabled() ) {
-				document.body.append( vrButton );
+				dom.append( vrButton );
 			}
 
 			prevTime = performance.now();
