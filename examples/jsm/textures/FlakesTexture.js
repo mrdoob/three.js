@@ -2,7 +2,7 @@
  * @author mr.doob / http://mrdoob.com/
  */
 
-class FlakeTexture {
+class FlakesTexture {
 
 	constructor( width = 512, height = 512 ) {
 
@@ -41,4 +41,4 @@ class FlakeTexture {
 
 }
 
-export { FlakeTexture };
+export { FlakesTexture };

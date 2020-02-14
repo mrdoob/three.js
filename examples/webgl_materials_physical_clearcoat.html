@@ -20,7 +20,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 
-			import { FlakeTexture } from './jsm/textures/FlakeTexture.js';
+			import { FlakesTexture } from './jsm/textures/FlakeTexture.js';
 
 			var container, stats;
 
@@ -72,7 +72,7 @@
 
 							var normalMap2 = textureLoader.load( "textures/water/Water_1_M_Normal.jpg" );
 
-							var normalMap3 = new THREE.CanvasTexture( new FlakeTexture() );
+							var normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
 							normalMap3.wrapS = THREE.RepeatWrapping;
 							normalMap3.wrapT = THREE.RepeatWrapping;
 							normalMap3.repeat.x = 10;
