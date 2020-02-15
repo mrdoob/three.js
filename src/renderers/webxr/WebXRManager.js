@@ -221,7 +221,27 @@ function WebXRManager( renderer, gl ) {
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 
 			//
+			var inputSources = session.inputSources;
+			for ( var i = 0; i < controllers.length && i < inputSources.length; i ++ ) {
 
+				inputSourcesMap.set( inputSources[ i ], controllers[ i ] );
+
+				if ( controller ) {
+
+					if ( controller.targetRay ) {
+
+						controller.targetRay.dispatchEvent( { type: 'connected', data: inputSources[ i ] } );
+
+					}
+
+					if ( controller.grip ) {
+
+						controller.grip.dispatchEvent( { type: 'connected', data: inputSources[ i ] } );
+
+					}
+
+				}
+			}
 			session.addEventListener( 'inputsourceschange', updateInputSources );
 
 		}
