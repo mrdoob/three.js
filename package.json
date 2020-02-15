@@ -45,17 +45,19 @@
     }
   },
   "scripts": {
+    "start": "npm run dev",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-test": "rollup -c test/rollup.unit.config.js",
     "build-closure": "rollup -c utils/build/rollup.config.js && google-closure-compiler --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
     "build-examples": "rollup -c utils/build/rollup-examples.config.js",
-    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"http-server -c-1 -p 8080\"",
-    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
-    "start": "npm run dev",
+    "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"serve\"",
+    "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"serve\"",
     "lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
     "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
-    "test": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
-    "travis": "npm run lint && npm test"
+    "test": "npm run test-unit && npm run test-diff",
+    "test-unit": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
+    "test-diff": "node --expose-gc test/diff/puppeteer.js",
+    "make-screenshot": "cross-env MAKE=true npm run test-diff"
   },
   "keywords": [
     "three",
@@ -76,15 +78,20 @@
     "@typescript-eslint/eslint-plugin": "^2.15.0",
     "@typescript-eslint/parser": "^2.15.0",
     "concurrently": "^5.0.2",
+    "cross-env": "^7.0.0",
     "eslint": "^6.8.0",
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-html": "^6.0.0",
     "failonlyreporter": "^1.0.0",
     "google-closure-compiler": "20200101.0.0",
-    "http-server": "^0.12.0",
+    "image-output": "2.4.1",
+    "pixelmatch": "5.1.0",
+    "pngjs": "3.4.0",
+    "puppeteer": "^2.1.1",
     "qunit": "^2.9.3",
     "rollup": "^1.28.0",
     "rollup-plugin-buble": "^0.19.8",
+    "serve": "^11.3.0",
     "typescript": "^3.7.4"
   },
   "jspm": {

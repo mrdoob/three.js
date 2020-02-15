@@ -1,5 +1,27 @@
 language: node_js
-node_js:
-  - node
-script:
-  - npm run travis
+node_js: node
+services: xvfb
+cache: bundler
+
+jobs:
+  include:
+
+    - &lint-n-unit
+      stage: lint & unit
+      name: lint
+      script: npm run lint
+    - <<: *lint-n-unit
+      name: unit
+      script: npm run test-unit
+
+    - &diff
+      stage: diff
+      name: diff
+      script: FORCE_COLOR=0 npm run test-diff
+      env: CI=0
+    - <<: *diff
+      env: CI=1
+    - <<: *diff
+      env: CI=2
+    - <<: *diff
+      env: CI=3
