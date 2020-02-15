@@ -367,6 +367,14 @@ export class WebGLRenderer implements Renderer {
 	getActiveMipmapLevel(): number;
 
 	/**
+	 * Sets the given WebGLFramebuffer. This method can only be used if no render target is set via
+	 * {@link WebGLRenderer#setRenderTarget .setRenderTarget}.
+	 *
+	 * @param value The WebGLFramebuffer.
+	 */
+	setFramebuffer( value: WebGLFramebuffer ): void;
+
+	/**
 	 * Returns the current render target. If no render target is set, null is returned.
 	 */
 	getRenderTarget(): RenderTarget | null;
