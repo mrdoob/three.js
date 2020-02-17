@@ -103,7 +103,7 @@ var SidebarProject = function ( editor ) {
 	//	3: 'VSM'
 	} ).setWidth( '150px' ).onChange( function () {
 
-		config.setKey( 'project/renderer/shadowType', this.getValue() );
+		config.setKey( 'project/renderer/shadowType', parseFloat( this.getValue() ) );
 		updateRenderer();
 
 	} );
@@ -141,8 +141,13 @@ var SidebarProject = function ( editor ) {
 		5: 'ACESFilmic',
 	} ).setWidth( '150px' ).onChange( function () {
 
-		config.setKey( 'project/renderer/toneMapping', this.getValue() );
+		var toneMapping = parseFloat( this.getValue() );
+		config.setKey( 'project/renderer/toneMapping', toneMapping );
 		updateRenderer();
+
+		// WebGLRenderer.whitePoint is only relevant for Uncharted2 tonemapping
+
+		toneMappingWhitePointRow.setDisplay( ( toneMapping === 3 ) ? 'block' : 'none' );
 
 	} );
 	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
@@ -179,6 +184,7 @@ var SidebarProject = function ( editor ) {
 	toneMappingWhitePointRow.add( new UIText( strings.getKey( 'sidebar/project/toneMappingWhitePoint' ) ).setWidth( '90px' ) );
 	toneMappingWhitePointRow.add( toneMappingWhitePoint );
 	rendererPanel.add( toneMappingWhitePointRow );
+	toneMappingWhitePointRow.setDisplay( ( config.getKey( 'project/renderer/toneMapping' ) === 3 ? 'block' : 'none' ) );
 
 	//
 
