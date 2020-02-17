@@ -93,11 +93,6 @@
 		This value shouldn't be negative and should be larger than the near property.
 		</p>
 
-		<h3>[property:float linePrecision]</h3>
-		<p>
-		The precision factor of the raycaster when intersecting [page:Line] objects.
-		</p>
-
 		<h3>[property:float near]</h3>
 		<p>
 		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.
@@ -119,13 +114,14 @@
 			<code>
 {
 	Mesh: {},
-	Line: {},
+	Line: { threshold: 1 },
 	LOD: {},
 	Points: { threshold: 1 },
 	Sprite: {}
 }
 			</code>
 
+		Where threshold is the precision of the raycaster when intersecting objects, in world units.
 		</p>
 
 		<h3>[property:Ray ray]</h3>
