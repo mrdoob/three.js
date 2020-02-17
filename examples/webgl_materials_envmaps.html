@@ -56,16 +56,12 @@
 							 r + "posz.jpg", r + "negz.jpg" ];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.format = THREE.RGBFormat;
-				textureCube.mapping = THREE.CubeReflectionMapping;
 				textureCube.encoding = THREE.sRGBEncoding;
 
 				var textureLoader = new THREE.TextureLoader();
 
 				textureEquirec = textureLoader.load( "textures/2294472375_24a3b8ef46_o.jpg" );
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
-				textureEquirec.magFilter = THREE.LinearFilter;
-				textureEquirec.minFilter = THREE.LinearMipmapLinearFilter;
 				textureEquirec.encoding = THREE.sRGBEncoding;
 
 				textureSphere = textureLoader.load( "textures/metal.jpg" );
