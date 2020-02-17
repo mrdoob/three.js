@@ -570,7 +570,7 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/shadowType': 'Shadow Type',
+			'sidebar/project/shadowType': '阴影类型',
 			'sidebar/project/physicallyCorrectLights': '物理光照',
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/toneMappingExposure': '曝光',
