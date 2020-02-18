@@ -77,6 +77,7 @@ var GLTFLoader = ( function () {
 
 		this.dracoLoader = null;
 		this.ddsLoader = null;
+		this.requestHeader = null;
 
 	}
 
@@ -131,6 +132,12 @@ var GLTFLoader = ( function () {
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 
+			if ( this.requestHeader !== null ) {
+
+				loader.setRequestHeader( this.requestHeader );
+
+			}
+
 			if ( scope.crossOrigin === 'use-credentials' ) {
 
 				loader.setWithCredentials( true );
@@ -156,6 +163,13 @@ var GLTFLoader = ( function () {
 				}
 
 			}, onProgress, _onError );
+
+		},
+
+		setRequestHeader: function ( value ) {
+
+			this.requestHeader = value;
+			return this;
 
 		},
 
