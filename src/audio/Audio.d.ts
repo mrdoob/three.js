@@ -4,7 +4,7 @@ import { AudioContext } from './AudioContext';
 
 // Extras / Audio /////////////////////////////////////////////////////////////////////
 
-export class Audio extends Object3D {
+export class Audio<NodeType extends AudioNode = GainNode> extends Object3D {
 
 	constructor( listener: AudioListener );
 	type: 'Audio';
@@ -27,7 +27,7 @@ export class Audio extends Object3D {
 	source: AudioBufferSourceNode;
 	filters: any[];
 
-	getOutput(): GainNode;
+	getOutput(): NodeType;
 	setNodeSource( audioNode: AudioBufferSourceNode ): this;
 	setMediaElementSource( mediaElement: HTMLMediaElement ): this;
 	setMediaStreamSource( mediaStream: MediaStream ): this;
