@@ -17,7 +17,7 @@ function Raycaster( origin, direction, near, far ) {
 
 	this.params = {
 		Mesh: {},
-		Line: {},
+		Line: { threshold: 1 },
 		LOD: {},
 		Points: { threshold: 1 },
 		Sprite: {}
@@ -63,8 +63,6 @@ function intersectObject( object, raycaster, intersects, recursive ) {
 }
 
 Object.assign( Raycaster.prototype, {
-
-	linePrecision: 1,
 
 	set: function ( origin, direction ) {
 
