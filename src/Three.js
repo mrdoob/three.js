@@ -157,6 +157,8 @@ export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';
 
+export * from './geometries4d/Geometries4D.js';
+
 if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 	/* eslint-disable no-undef */
