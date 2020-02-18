@@ -139,7 +139,7 @@ function findNodes( motionController, scene ) {
 
 			} else {
 
-				console.warn( `Could not find touch dot, ${component.touchPointNodeName}, in touchpad component ${componentId}` );
+				console.warn( `Could not find touch dot, ${component.touchPointNodeName}, in touchpad component ${component.id}` );
 
 			}
 
