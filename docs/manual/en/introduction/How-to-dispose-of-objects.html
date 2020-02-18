@@ -16,7 +16,8 @@
 		One important aspect in order to improve performance and avoid memory leaks in your application is the disposal of unused library entities.
 		Whenever you create an instance of a *three.js* type, you allocate a certain amount of memory. However, *three.js* creates for specific objects
 		like geometries or materials WebGL related entities like buffers or shader programs which are necessary for rendering. It's important to
-		highlight that these objects are not released automatically. Instead, the application has to use a special API in order to free such resources.
+		highlight that while these objects are released automatically, the release is not guaranteed to be in a timely manner.
+		If you want to relase WebGL resources immediately, use a special API in order to free such resources.
 		This guide provides a brief overview about how this API is used and what objects are relevant in this context.
 	</p>
 
@@ -69,19 +70,24 @@
 
 	<h2>FAQ</h2>
 
-	<h3>Why can't *three.js* dispose objects automatically?</h3>
+	<h3>Why can't *three.js* dispose objects immediatelly automatically?</h3>
 
 	<p>
-		This question was asked many times by the community so it's important to clarify this matter. Fact is that *three.js* does not know the lifetime or scope
-		of user-created entities like geometries or materials. This is the responsibility of the application. For example even if a material is currently not used for rendering,
-		it might base necessary for the next frame. So if the application decides that a certain object can be deleted, it has to	notify the engine via calling the respective
-		*dispose()* method.
+
+		Once a user-created entities like geometries or materials is no longer used in your application, it becomes elligible for garbage collection. Once the runtime
+		determines the object should be collected, its corresponding WebGL resources will be disposed. There is no guarantee how often are unused objects reclaimed
+		or that they are reclaimed at all. Most WebGL resources use very little system memory, they use a dedicated graphics adapter video memory instead. It is possible
+		the application will be low on video memory without using much of normal memory. In such situation garbage collection will not happen, the WebGL resources will
+		not be released and the application may experience performance issues.
+
+		So if the application decides that a certain object can be deleted, it is better to notify the engine via calling the respective *dispose()* method.
 	</p>
 
 	<h3>Does removing a mesh from the scene also dispose its geometry and material?</h3>
 
 	<p>
-		No, you have to explicitly dispose the geometry and material via *dispose()*. Keep in mind that geometries and materials can be shared among 3D objects like meshes.
+		Yes, but not in a timely manner. If you want this, you have to explicitly dispose the geometry and material via *dispose()*.
+		Keep in mind that geometries and materials can be shared among 3D objects like meshes.
 	</p>
 
 	<h3>Does *three.js* provide information about the amount of cached objects?</h3>
