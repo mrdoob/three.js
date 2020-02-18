@@ -281,7 +281,7 @@ var XRControllerModelFactory = ( function () {
 						null,
 						() => {
 
-							throw new Error( `Asset ${motionController.assetUrl} missing or malformed.` );
+							throw new Error( `Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
 
 						} );
 
