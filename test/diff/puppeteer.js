@@ -11,14 +11,8 @@ const png = require( 'pngjs' ).PNG;
 const fs = require( 'fs' );
 
 const port = 1234;
-const pixelThreshold = 0.2;
-const maxFailedPixels = 0.05;
-const networkTimeout = 600;
-const networkTax = 2000;                   // additional timeout for resources size
-const pageSizeMinTax = 1.0;                // in mb, when networkTax = 0
-const pageSizeMaxTax = 5.0;                // in mb, when networkTax = networkTax
-const renderTimeout = 1200;
-const maxAttemptId = 3;                    // progresseve attempts
+const pixelThreshold = 0.2;                // threshold error in one pixel
+const maxFailedPixels = 0.05;              // total failed pixels
 
 const exceptionList = [
 
@@ -33,6 +27,14 @@ const exceptionList = [
 	'webgl_effects_ascii'                    // windows fonts not supported
 
 ] : [] );
+
+const networkTimeout = 600;
+const networkTax = 2000;                   // additional timeout for resources size
+const pageSizeMinTax = 1.0;                // in mb, when networkTax = 0
+const pageSizeMaxTax = 5.0;                // in mb, when networkTax = networkTax
+const renderTimeout = 1200;
+const maxAttemptId = 3;                    // progresseve attempts
+const progressFunc = n => 1 + n;
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
@@ -114,7 +116,7 @@ const pup = puppeteer.launch( {
 
 	/* Loop for each file, with CI parallelism */
 
-	let pageSize, file;
+	let pageSize, file, attemptProgress;
 	let failedScreenshots = 0;
 	const isParallel = 'CI' in process.env;
 	const beginId = isParallel ? Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / 4 ) : 0;
@@ -133,6 +135,7 @@ const pup = puppeteer.launch( {
 			/* Load target page */
 
 			file = files[ id ];
+			attemptProgress = progressFunc( attemptId );
 			pageSize = 0;
 			global.gc();
 			global.gc();
@@ -141,7 +144,7 @@ const pup = puppeteer.launch( {
 
 				await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
 					waitUntil: 'networkidle2',
-					timeout: networkTimeout * ( 1 + attemptId )
+					timeout: networkTimeout * attemptProgress
 				} );
 
 			} catch {
@@ -153,7 +156,7 @@ const pup = puppeteer.launch( {
 
 			try {
 
-				await page.evaluate( async ( pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptId ) => {
+				await page.evaluate( async ( pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptProgress ) => {
 
 
 					/* Prepare page */
@@ -169,7 +172,12 @@ const pup = puppeteer.launch( {
 					style.type = 'text/css';
 					style.innerHTML = `body { font size: 0 !important; }
 							#info, button, input, body > div.dg.ac, body > div.lbl { display: none !important; }`;
-					document.getElementsByTagName( 'head' )[ 0 ].appendChild( style );
+					let head = document.getElementsByTagName( 'head' );
+					if ( head.length > 0 ) {
+
+						head[ 0 ].appendChild( style );
+
+					}
 
 					let canvas = document.getElementsByTagName( 'canvas' );
 					for ( let i = 0; i < canvas.length; ++ i ) {
@@ -183,7 +191,7 @@ const pup = puppeteer.launch( {
 					}
 
 					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
-					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * ( 1 + attemptId ) ) );
+					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * attemptProgress ) );
 
 
 					/* Resolve render promise */
@@ -191,10 +199,13 @@ const pup = puppeteer.launch( {
 					window.chromeRenderStarted = true;
 					await new Promise( function( resolve ) {
 
+						if ( typeof performance.wow === 'undefined' ) {
+							performance.wow = performance.now;
+						}
 						let renderStart = performance.wow();
 						let waitingLoop = setInterval( function() {
 
-							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * window.chromeMaxFrameId  * ( 1 + attemptId ) );
+							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * window.chromeMaxFrameId  * attemptProgress );
 							if ( window.chromeRenderFinished || renderEcceded ) {
 
 								if ( renderEcceded ) {
@@ -211,7 +222,7 @@ const pup = puppeteer.launch( {
 
 					} );
 
-				}, pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptId );
+				}, pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptProgress );
 
 			} catch ( e ) {
 
@@ -224,7 +235,7 @@ const pup = puppeteer.launch( {
 				} else {
 
 					console.log( 'Another attempt..' );
-					await new Promise( resolve => setTimeout( resolve, networkTimeout * ( 1 + attemptId ) ) );
+					await new Promise( resolve => setTimeout( resolve, networkTimeout * attemptProgress ) );
 
 				}
 

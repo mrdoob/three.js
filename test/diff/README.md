@@ -15,6 +15,15 @@ npx cross-env VISIBLE=ture npm run test-diff
 ```
 
 ### How it works
+
+|           Travis                        |               Attempts               |
+|-----------------------------------------|--------------------------------------|
+| 61 from 362 failed, time=21:14          | networkidle0 timeout                 |
+| 26 from 362 failed, time=16:22          | with rAF hook                        |
+| 13=1+1+7+4 failed, time=4:26            | with render promise and parallelism  |
+| 4=0+0+2+2 failed, time=5:13             | with network tax and other settings  |
+| 4=0+0+2+2 failed, time=3:26             | with progressive attempts            |
+
 - ci configs with parallelism
 - deterministic random/timer/rAF/video for screenshots
 - increased robustness with hided text, datgui, different flags and timeouts.
@@ -22,7 +31,7 @@ npx cross-env VISIBLE=ture npm run test-diff
 - added 3 progressive attempts for robustness
 
 ### Status
-97% examples are covered with tests. Random robusness in CI ~85%. Robustness on different machines ~97%. For example in Windows webgl_effects_ascii example always fails or on integrated GPU you will have additional artifacts: webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping.
+97% examples are covered with tests. Random robusness in CI >93%. Robustness on different machines ~97%. For example in Windows webgl_effects_ascii example always fails or on integrated GPU you will have additional artifacts: webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping.
 
 ### Probably wrong screenshots
 webgl2_multisampled_renderbuffers, webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc

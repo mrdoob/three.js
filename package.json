@@ -52,9 +52,9 @@
     "build-examples": "rollup -c utils/build/rollup-examples.config.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"serve\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"serve\"",
-    "lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
-    "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
-    "test": "npm run test-unit && npm run test-diff",
+    "test": "npm run test-lint && npm run test-unit",
+    "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
+    "test-lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-unit": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
     "test-diff": "node --expose-gc test/diff/puppeteer.js",
     "make-screenshot": "cross-env MAKE=true npm run test-diff"

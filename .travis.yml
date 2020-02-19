@@ -9,7 +9,7 @@ jobs:
     - &lint-n-unit
       stage: lint & unit
       name: lint
-      script: npm run lint
+      script: npm run test-lint
     - <<: *lint-n-unit
       name: unit
       script: npm run test-unit
@@ -17,11 +17,11 @@ jobs:
     - &diff
       stage: diff
       name: diff
-      script: FORCE_COLOR=0 npm run test-diff
-      env: CI=0
+      script: npm run test-diff
+      env: FORCE_COLOR=0 CI=0
     - <<: *diff
-      env: CI=1
+      env: FORCE_COLOR=0 CI=1
     - <<: *diff
-      env: CI=2
+      env: FORCE_COLOR=0 CI=2
     - <<: *diff
-      env: CI=3
+      env: FORCE_COLOR=0 CI=3
