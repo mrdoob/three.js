@@ -27649,10 +27649,9 @@
 
 		raycast: function ( raycaster, intersects ) {
 
-			var precision = raycaster.linePrecision;
-
 			var geometry = this.geometry;
 			var matrixWorld = this.matrixWorld;
+			var threshold = raycaster.params.Line.threshold;
 
 			// Checking boundingSphere distance to ray
 
@@ -27660,7 +27659,7 @@
 
 			_sphere$2.copy( geometry.boundingSphere );
 			_sphere$2.applyMatrix4( matrixWorld );
-			_sphere$2.radius += precision;
+			_sphere$2.radius += threshold;
 
 			if ( raycaster.ray.intersectsSphere( _sphere$2 ) === false ) { return; }
 
@@ -27669,8 +27668,8 @@
 			_inverseMatrix$1.getInverse( matrixWorld );
 			_ray$1.copy( raycaster.ray ).applyMatrix4( _inverseMatrix$1 );
 
-			var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-			var localPrecisionSq = localPrecision * localPrecision;
+			var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+			var localThresholdSq = localThreshold * localThreshold;
 
 			var vStart = new Vector3();
 			var vEnd = new Vector3();
@@ -27698,7 +27697,7 @@
 
 						var distSq = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-						if ( distSq > localPrecisionSq ) { continue; }
+						if ( distSq > localThresholdSq ) { continue; }
 
 						interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -27730,7 +27729,7 @@
 
 						var distSq = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-						if ( distSq > localPrecisionSq ) { continue; }
+						if ( distSq > localThresholdSq ) { continue; }
 
 						interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -27764,7 +27763,7 @@
 
 					var distSq = _ray$1.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
-					if ( distSq > localPrecisionSq ) { continue; }
+					if ( distSq > localThresholdSq ) { continue; }
 
 					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -45613,7 +45612,7 @@
 
 		this.params = {
 			Mesh: {},
-			Line: {},
+			Line: { threshold: 1 },
 			LOD: {},
 			Points: { threshold: 1 },
 			Sprite: {}
@@ -45659,8 +45658,6 @@
 	}
 
 	Object.assign( Raycaster.prototype, {
-
-		linePrecision: 1,
 
 		set: function ( origin, direction ) {
 
@@ -49347,6 +49344,25 @@
 
 				console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
 				return this.groups;
+
+			}
+		}
+
+	} );
+
+	Object.defineProperties( Raycaster.prototype, {
+
+		linePrecision: {
+			get: function () {
+
+				console.warn( 'THREE.Raycaster: .linePrecision has been deprecated. Use .params.Line.threshold instead.' );
+				return this.params.Line.threshold;
+
+			},
+			set: function ( value ) {
+
+				console.warn( 'THREE.Raycaster: .linePrecision has been deprecated. Use .params.Line.threshold instead.' );
+				this.params.Line.threshold = value;
 
 			}
 		}
