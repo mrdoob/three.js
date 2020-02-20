@@ -41,7 +41,7 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 	function dispose() {
 
-		updateMap.clear();
+		updateMap = new WeakMap();
 
 	}
 
