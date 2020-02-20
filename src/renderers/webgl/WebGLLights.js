@@ -28,7 +28,7 @@ function UniformsCache() {
 				case 'DirectionalLight':
 					uniforms = {
 						direction: new Vector3(),
-						color: new Color(),
+						color: new Color()
 					};
 					break;
 
@@ -40,7 +40,7 @@ function UniformsCache() {
 						distance: 0,
 						coneCos: 0,
 						penumbraCos: 0,
-						decay: 0,
+						decay: 0
 					};
 					break;
 
@@ -49,7 +49,7 @@ function UniformsCache() {
 						position: new Vector3(),
 						color: new Color(),
 						distance: 0,
-						decay: 0,
+						decay: 0
 					};
 					break;
 
@@ -169,7 +169,7 @@ function WebGLLights() {
 
 			numDirectionalShadows: - 1,
 			numPointShadows: - 1,
-			numSpotShadows: - 1,
+			numSpotShadows: - 1
 		},
 
 		ambient: [ 0, 0, 0 ],
