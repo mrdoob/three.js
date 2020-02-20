@@ -2820,6 +2820,8 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if (dstTexture.generateMipmaps) _gl.generateMipmap( _gl.TEXTURE_2D );
+
 		state.unbindTexture();
 
 	};
