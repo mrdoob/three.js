@@ -39,6 +39,7 @@
 		<h2>Examples</h2>
 		<p>
 			[example:webgl_materials_variations_physical materials / variations / physical]<br />
+			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
 			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]
 		</p>
 
@@ -59,11 +60,19 @@
 
 		<h3>[property:Float clearcoat]</h3>
 		<p>
-		Clearcoat level, from *0.0* to *1.0*. Default is *0.0*.
+		Represents the thickness of the clear coat layer, from *0.0* to *1.0*. You can use clear coat related properties to enable multilayer
+		materials that have a thin translucent layer over the base layer. Typical examples for this model are car paints or acrylic.
+		Default is *0.0*.
 		</p>
 
+		<h3>[property:Float clearcoatNormalMap]</h3>
+		<p>Can be used to enable independent normals for the clear coat layer. Default is *null*.</p>
+
+		<h3>[property:Vector2 clearcoatNormalScale]</h3>
+		<p>How much [page:.clearcoatNormalMap] affects the clear coat layer, from *(0,0)* to *(1,1)*. Default is *(1,1)*.</p>
+
 		<h3>[property:Float clearcoatRoughness]</h3>
-		<p>How rough the clearcoat appears, from *0.0* to *1.0*. Default is *0.0*.</p>
+		<p>Roughness of the clear coat layer, from *0.0* to *1.0*. Default is *0.0*.</p>
 
 		<h3>[property:Object defines]</h3>
 		<p>An object of the form:
