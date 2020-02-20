@@ -4,6 +4,7 @@ import { Object3D } from './Object3D';
 import { Vector2 } from './../math/Vector2';
 import { Ray } from './../math/Ray';
 import { Camera } from './../cameras/Camera';
+import { Layers } from './Layers';
 
 export interface Intersection {
 	distance: number;
@@ -61,6 +62,11 @@ export class Raycaster {
 	 * can be set manually or is set when calling "setFromCamera".
 	 */
 	camera: Camera;
+
+	/**
+	 * Used by Raycaster to selectively ignore 3D objects when performing intersection tests.
+	 */
+	layers: Layers;
 
 	params: RaycasterParameters;
 
