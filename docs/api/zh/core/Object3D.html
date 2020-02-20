@@ -59,7 +59,8 @@
 	<h3>[property:Layers layers]</h3>
 	<p>
 		物体的层级关系。
-		物体只有和一个正在使用的[page:Camera]至少在同一个层时才可见。
+		物体只有和一个正在使用的[page:Camera]至少在同一个层时才可见。This property can also be used to filter out
+		unwanted objects in ray-intersection tests when using [page:Raycaster].
 	</p>
 
 	<h3>[property:Matrix4 matrix]</h3>
@@ -199,7 +200,7 @@
 	<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
 	<p>对当前物体应用由四元数所表示的变换。</p>
 
-	
+
 	<h3>[method:this attach]( [param:Object3D object] )</h3>
 	<p>将*object*作为子级来添加到该对象中，同时保持该object的世界变换。</p>
 
