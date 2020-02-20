@@ -2832,6 +2832,14 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.initCubeTexture = function ( texture ) {
+
+		textures.setTextureCube( texture, 0 );
+
+		state.unbindTexture();
+
+	};
+
 	if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
 		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
