@@ -45664,6 +45664,7 @@ function Raycaster( origin, direction, near, far ) {
 	this.near = near || 0;
 	this.far = far || Infinity;
 	this.camera = null;
+	this.layers = new Layers();
 
 	this.params = {
 		Mesh: {},
@@ -45694,9 +45695,11 @@ function ascSort( a, b ) {
 
 function intersectObject( object, raycaster, intersects, recursive ) {
 
-	if ( object.visible === false ) return;
+	if ( object.layers.test( raycaster.layers ) ) {
 
-	object.raycast( raycaster, intersects );
+		object.raycast( raycaster, intersects );
+
+	}
 
 	if ( recursive === true ) {
 
