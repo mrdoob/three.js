@@ -40,7 +40,8 @@
 		<p>
 			[example:webgl_materials_variations_physical materials / variations / physical]<br />
 			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
-			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]
+			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
+			[example:webgl_materials_physical_transparency materials / physical / transparency]
 		</p>
 
 		<h2>Constructor</h2>
@@ -93,6 +94,17 @@
 		Degree of reflectivity, from *0.0* to *1.0*. Default is *0.5*.<br />
 
 		This models the reflectivity of non-metallic materials. It has no effect when [page:MeshStandardMaterial.metalness metalness] is *1.0*
+		</p>
+
+		<h3>[property:Float transparency]</h3>
+		<p>
+		Degree of transparency, from *0.0* to *1.0*. Default is *0.0*.<br />
+		
+		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are mostly transparent.
+		
+		The transparency property can be used to model these materials.<br />
+		
+		When transparency is non-zero, [page:Material.opacity opacity] should be set to *1*.
 		</p>
 
 		<h2>Methods</h2>
