@@ -1414,7 +1414,7 @@ THREE.GLTFLoader = ( function () {
 		// Mark the special nodes/meshes in json for efficient parse
 		this.markDefs();
 
-		this._onBefore( 'GLTF', json ).then( function ( def ) {
+		this._onBefore( 'root', json ).then( function ( def ) {
 
 			json = def;
 			parser.json = json;
@@ -1439,7 +1439,7 @@ THREE.GLTFLoader = ( function () {
 				userData: {}
 			};
 
-			return parser._onAfter( 'GLTF', result, json );
+			return parser._onAfter( 'root', result, json );
 
 		} ).then( function ( result ) {
 
