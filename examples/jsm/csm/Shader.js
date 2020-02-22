@@ -1,3 +1,7 @@
+/**
+ * @author vHawk / https://github.com/vHawk/
+ */
+
 import { ShaderChunk } from '../../../build/three.module.js';
 
 export default {

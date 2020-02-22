@@ -1,3 +1,7 @@
+/**
+ * @author vHawk / https://github.com/vHawk/
+ */
+
 import { MathUtils, Vector3 } from '../../../build/three.module.js';
 import FrustumVertex from './FrustumVertex.js';
 
