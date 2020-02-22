@@ -1,4 +1,19 @@
-import * as THREE from '../../../build/three.module.js';
+/**
+ * @author vHawk / https://github.com/vHawk/
+ */
+
+import {
+	Vector2,
+	Vector3,
+	DirectionalLight,
+	MathUtils,
+	ShaderChunk,
+	LineBasicMaterial,
+	Object3D,
+	BufferGeometry,
+	BufferAttribute,
+	Line
+} from '../../../build/three.module.js';
 import Frustum from './Frustum.js';
 import FrustumBoundingBox from './FrustumBoundingBox.js';
 import Shader from './Shader.js';
@@ -19,7 +34,7 @@ export default class CSM {
 		this.mode = data.mode || 'practical';
 		this.shadowMapSize = data.shadowMapSize || 2048;
 		this.shadowBias = data.shadowBias || 0.000001;
-		this.lightDirection = data.lightDirection || new THREE.Vector3( 1, - 1, 1 ).normalize();
+		this.lightDirection = data.lightDirection || new Vector3( 1, - 1, 1 ).normalize();
 		this.lightIntensity = data.lightIntensity || 1;
 		this.lightNear = data.lightNear || 1;
 		this.lightFar = data.lightFar || 2000;
@@ -41,7 +56,7 @@ export default class CSM {
 
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
-			const light = new THREE.DirectionalLight( 0xffffff, this.lightIntensity );
+			const light = new DirectionalLight( 0xffffff, this.lightIntensity );
 			light.castShadow = true;
 			light.shadow.mapSize.width = this.shadowMapSize;
 			light.shadow.mapSize.height = this.shadowMapSize;
@@ -133,7 +148,7 @@ export default class CSM {
 
 			for ( let i = 1; i < amount; i ++ ) {
 
-				r.push( THREE.MathUtils.lerp( uni[ i - 1 ], log[ i - 1 ], lambda ) );
+				r.push( MathUtils.lerp( uni[ i - 1 ], log[ i - 1 ], lambda ) );
 
 			}
 
@@ -160,7 +175,7 @@ export default class CSM {
 
 			const squaredBBWidth = Math.max( bbox.size.x, bbox.size.y );
 
-			let center = new THREE.Vector3( bbox.center.x, bbox.center.y, bbox.center.z );
+			let center = new Vector3( bbox.center.x, bbox.center.y, bbox.center.z );
 			center.applyMatrix4( light.shadow.camera.matrixWorld );
 
 			light.shadow.camera.left = - squaredBBWidth / 2;
@@ -184,8 +199,8 @@ export default class CSM {
 
 	injectInclude() {
 
-		THREE.ShaderChunk.lights_fragment_begin = Shader.lights_fragment_begin;
-		THREE.ShaderChunk.lights_pars_begin = Shader.lights_pars_begin;
+		ShaderChunk.lights_fragment_begin = Shader.lights_fragment_begin;
+		ShaderChunk.lights_pars_begin = Shader.lights_pars_begin;
 
 	}
 
@@ -201,7 +216,7 @@ export default class CSM {
 
 			let amount = this.breaks[ i ];
 			let prev = this.breaks[ i - 1 ] || 0;
-			breaksVec2.push( new THREE.Vector2( prev, amount ) );
+			breaksVec2.push( new Vector2( prev, amount ) );
 
 		}
 
@@ -239,7 +254,7 @@ export default class CSM {
 
 			let amount = this.breaks[ i ];
 			let prev = this.breaks[ i - 1 ] || 0;
-			breaksVec2.push( new THREE.Vector2( prev, amount ) );
+			breaksVec2.push( new Vector2( prev, amount ) );
 
 		}
 
@@ -266,16 +281,16 @@ export default class CSM {
 
 		let frustum;
 		let geometry, vertices;
-		const material = new THREE.LineBasicMaterial( { color: 0xffffff } );
-		const object = new THREE.Object3D();
+		const material = new LineBasicMaterial( { color: 0xffffff } );
+		const object = new Object3D();
 
 		for ( let i = 0; i < this.frustums.length; i ++ ) {
 
 			frustum = this.frustums[ i ].toSpace( cameraMatrix );
 
-			geometry = new THREE.BufferGeometry();
+			geometry = new BufferGeometry();
 			vertices = [];
-			
+
 
 			for ( let i = 0; i < 5; i ++ ) {
 
@@ -283,12 +298,12 @@ export default class CSM {
 				vertices.push( point.x, point.y, point.z );
 
 			}
-			
-			geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
-			object.add( new THREE.Line( geometry, material ) );
+			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
 
-			geometry = new THREE.BufferGeometry();
+			object.add( new Line( geometry, material ) );
+
+			geometry = new BufferGeometry();
 			vertices = [];
 
 			for ( let i = 0; i < 5; i ++ ) {
@@ -297,14 +312,14 @@ export default class CSM {
 				vertices.push( point.x, point.y, point.z );
 
 			}
-			
-			geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
-			object.add( new THREE.Line( geometry, material ) );
+			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
+
+			object.add( new Line( geometry, material ) );
 
 			for ( let i = 0; i < 4; i ++ ) {
 
-				geometry = new THREE.BufferGeometry();
+				geometry = new BufferGeometry();
 				vertices = [];
 
 				const near = frustum.vertices.near[ i ];
@@ -312,10 +327,10 @@ export default class CSM {
 
 				vertices.push( near.x, near.y, near.z );
 				vertices.push( far.x, far.y, far.z );
-				
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
-				object.add( new THREE.Line( geometry, material ) );
+				geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
+
+				object.add( new Line( geometry, material ) );
 
 			}
 

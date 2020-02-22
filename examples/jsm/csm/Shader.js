@@ -1,4 +1,8 @@
-import * as THREE from '../../../build/three.module.js';
+/**
+ * @author vHawk / https://github.com/vHawk/
+ */
+
+import { ShaderChunk } from '../../../build/three.module.js';
 
 export default {
 	lights_fragment_begin: /* glsl */`
@@ -168,5 +172,5 @@ uniform vec2 CSM_cascades[CSM_CASCADES];
 uniform float cameraNear;
 uniform float shadowFar;
 #endif
-	` + THREE.ShaderChunk.lights_pars_begin
+	` + ShaderChunk.lights_pars_begin
 };
