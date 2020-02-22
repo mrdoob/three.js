@@ -92,11 +92,6 @@
 
 				scene.add( model );
 
-				// Mesh contains self-intersecting semi-transparent faces, which display
-				// z-fighting unless depthWrite is disabled.
-				var core = model.getObjectByName( 'geo1_HoloFillDark_0' );
-				core.material.depthWrite = false;
-
 				mixer = new THREE.AnimationMixer( model );
 				var clip = gltf.animations[ 0 ];
 				mixer.clipAction( clip.optimize() ).play();
