@@ -19,7 +19,8 @@
 
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - drag controls<br />
-			Use "Shift+Click" to add objects to a group. This mode enables group dragging.
+			Use "Shift+Click" to add/remove objects to/from a group.<br />
+			Grouped objects can be transformed as a union.
 		</div>
 
 		<script type="module">
@@ -159,21 +160,25 @@
 					if ( intersections.length > 0 ) {
 
 						var object = intersections[ 0 ].object;
-						object.material.emissive.set( 0xaaaaaa );
-						group.attach( object );
+
+						if ( group.children.includes( object ) === true ) {
+
+							object.material.emissive.set( 0x000000 );
+							scene.attach( object );
+
+						} else {
+
+							object.material.emissive.set( 0xaaaaaa );
+							group.attach( object );
+
+						}
 
 						controls.transformGroup = true;
 						draggableObjects.push( group );
 
-					} else {
+					}
 
-						for ( var i = group.children.length - 1; i >= 0; i -- ) {
-
-							var object = group.children[ i ];
-							object.material.emissive.set( 0x000000 );
-							scene.attach( object );
-
-						}
+					if ( group.children.length === 0 ) {
 
 						controls.transformGroup = false;
 						draggableObjects.push( ...objects );
