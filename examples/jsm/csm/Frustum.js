@@ -1,6 +1,5 @@
 import * as THREE from '../../../build/three.module.js';
 import FrustumVertex from './FrustumVertex.js';
-import { toRad } from './Utils.js';
 
 export default class Frustum {
 
@@ -22,10 +21,10 @@ export default class Frustum {
 
 	getViewSpaceVertices() {
 
-		this.nearPlaneY = this.near * Math.tan( toRad( this.fov / 2 ) );
+		this.nearPlaneY = this.near * Math.tan( THREE.MathUtils.degToRad( this.fov / 2 ) );
 		this.nearPlaneX = this.aspect * this.nearPlaneY;
 
-		this.farPlaneY = this.far * Math.tan( toRad( this.fov / 2 ) );
+		this.farPlaneY = this.far * Math.tan( THREE.MathUtils.degToRad( this.fov / 2 ) );
 		this.farPlaneX = this.aspect * this.farPlaneY;
 
 		// 3 --- 0  vertices.near/far order
