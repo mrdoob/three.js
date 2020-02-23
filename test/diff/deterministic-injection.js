@@ -2,15 +2,14 @@
  * @author munrocket / https://github.com/munrocket
  */
 
-( function() {
-
+( function () {
 
 	/* Deterministic random */
 
 	let seed = Math.PI / 4;
-	window.Math.random = function() {
+	window.Math.random = function () {
 
-		const x = Math.sin( seed++ ) * 10000;
+		const x = Math.sin( seed ++ ) * 10000;
 		return x - Math.floor( x );
 
 	};
@@ -18,7 +17,11 @@
 
 	/* Deterministic timer */
 
-	const now = function() { return frameId * 16; };
+	const now = function () {
+
+		return frameId * 16;
+
+	};
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
 	window.performance.wow = performance.now;
@@ -32,11 +35,11 @@
 	window.chromeRenderStarted = false;
 	window.chromeRenderFinished = false;
 	const RAF = window.requestAnimationFrame;
-	window.requestAnimationFrame = function( cb ) {
+	window.requestAnimationFrame = function ( cb ) {
 
-		if ( !chromeRenderStarted ) {
+		if ( ! chromeRenderStarted ) {
 
-			setTimeout( function() {
+			setTimeout( function () {
 
 				requestAnimationFrame( cb );
 
@@ -44,9 +47,9 @@
 
 		} else {
 
-			RAF( function() {
+			RAF( function () {
 
-				if ( frameId++ < chromeMaxFrameId ) {
+				if ( frameId ++ < chromeMaxFrameId ) {
 
 					cb( now() );
 
@@ -60,24 +63,26 @@
 
 		}
 
-	}
+	};
 
 
 	/* Semi-determitistic video */
 
 	let play = HTMLVideoElement.prototype.play;
-	HTMLVideoElement.prototype.play = async function() {
+	HTMLVideoElement.prototype.play = async function () {
 
 		play.call( this );
 		this.addEventListener( 'timeupdate', () => this.pause() );
 
 		function renew() {
+
 			this.load();
 			play.call( this );
 			RAF( renew );
+
 		}
 		RAF( renew );
 
-	}
+	};
 
 }() );
