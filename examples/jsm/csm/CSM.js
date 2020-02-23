@@ -26,11 +26,8 @@ export default class CSM {
 
 		this.camera = data.camera;
 		this.parent = data.parent;
-		this.fov = data.fov || this.camera.fov;
-		this.near = this.camera.near;
-		this.far = data.far || this.camera.far;
-		this.aspect = data.aspect || this.camera.aspect;
 		this.cascades = data.cascades || 3;
+		this.maxFar = data.maxFar || 100000;
 		this.mode = data.mode || 'practical';
 		this.shadowMapSize = data.shadowMapSize || 2048;
 		this.shadowBias = data.shadowBias || 0.000001;
@@ -75,11 +72,13 @@ export default class CSM {
 
 	initCascades() {
 
+		const camera = this.camera;
+		const far = Math.min(camera.far, this.maxFar);
 		this.mainFrustum = new Frustum( {
-			fov: this.fov,
-			near: this.near,
-			far: this.far,
-			aspect: this.aspect
+			fov: camera.fov,
+			near: camera.near,
+			far: far,
+			aspect: camera.aspect
 		} );
 
 		this.mainFrustum.getViewSpaceVertices();
@@ -90,22 +89,24 @@ export default class CSM {
 
 	getBreaks() {
 
+		const camera = this.camera;
+		const far = Math.min(camera.far, this.maxFar);
 		this.breaks = [];
 
 		switch ( this.mode ) {
 
 			case 'uniform':
-				this.breaks = uniformSplit( this.cascades, this.near, this.far );
+				this.breaks = uniformSplit( this.cascades, camera.near, far );
 				break;
 			case 'logarithmic':
-				this.breaks = logarithmicSplit( this.cascades, this.near, this.far );
+				this.breaks = logarithmicSplit( this.cascades, camera.near, far );
 				break;
 			case 'practical':
-				this.breaks = practicalSplit( this.cascades, this.near, this.far, 0.5 );
+				this.breaks = practicalSplit( this.cascades, camera.near, far, 0.5 );
 				break;
 			case 'custom':
 				if ( this.customSplitsCallback === undefined ) console.error( 'CSM: Custom split scheme callback not defined.' );
-				this.breaks = this.customSplitsCallback( this.cascades, this.near, this.far );
+				this.breaks = this.customSplitsCallback( this.cascades, camera.near, far );
 				break;
 
 		}
@@ -221,12 +222,13 @@ export default class CSM {
 		}
 
 		const self = this;
+		const far = Math.min(this.camera.far, this.maxFar);
 
 		material.onBeforeCompile = function ( shader ) {
 
 			shader.uniforms.CSM_cascades = { value: breaksVec2 };
 			shader.uniforms.cameraNear = { value: self.camera.near };
-			shader.uniforms.shadowFar = { value: self.far };
+			shader.uniforms.shadowFar = { value: far };
 
 			self.materials.push( shader );
 
@@ -236,11 +238,13 @@ export default class CSM {
 
 	updateUniforms() {
 
+		const far = Math.min(this.camera.far, this.maxFar);
+		console.log('HERE', far);
 		for ( let i = 0; i < this.materials.length; i ++ ) {
 
 			this.materials[ i ].uniforms.CSM_cascades.value = this.getExtendedBreaks();
 			this.materials[ i ].uniforms.cameraNear.value = this.camera.near;
-			this.materials[ i ].uniforms.shadowFar.value = this.far;
+			this.materials[ i ].uniforms.shadowFar.value = far;
 
 		}
 
@@ -259,13 +263,6 @@ export default class CSM {
 		}
 
 		return breaksVec2;
-
-	}
-
-	setAspect( aspect ) {
-
-		this.aspect = aspect;
-		this.initCascades();
 
 	}
 

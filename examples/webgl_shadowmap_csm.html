@@ -65,10 +65,7 @@
 				};
 
 				csm = new CSM.default({
-					fov: camera.fov,
-					near: camera.near,
-					far: params.far,
-					aspect: camera.aspect,
+					maxFar: params.far,
 					cascades: 4,
 					mode: params.mode,
 					parent: scene,
@@ -116,7 +113,7 @@
 
 				gui.add( params, 'far', 1, 5000 ).step( 1 ).name( 'shadow far' ).onChange( function ( value ) {
 
-					csm.far = value;
+					csm.maxFar = value;
 					csm.updateFrustums();
 
 				} );
