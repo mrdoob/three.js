@@ -16,8 +16,18 @@ export default class Frustum {
 		this.maxFar = data.maxFar || 10000;
 
 		this.vertices = {
-			near: [],
-			far: []
+			near: [
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3()
+			],
+			far: [
+				new Vector3(),
+				new Vector3(),
+				new Vector3(),
+				new Vector3()
+			]
 		};
 
 	}
@@ -35,24 +45,20 @@ export default class Frustum {
 		// 2 --- 1
 		// clip space spans from [-1, 1]
 
-		this.vertices.near.push(
-			new Vector3( 1, 1, - 1 ),
-			new Vector3( 1, - 1, - 1 ),
-			new Vector3( - 1, - 1, - 1 ),
-			new Vector3( - 1, 1, - 1 )
-		);
+		this.vertices.near[ 0 ] = new Vector3( 1, 1, - 1 );
+		this.vertices.near[ 1 ] = new Vector3( 1, - 1, - 1 );
+		this.vertices.near[ 2 ] = new Vector3( - 1, - 1, - 1 );
+		this.vertices.near[ 3 ] = new Vector3( - 1, 1, - 1 );
 		this.vertices.near.forEach( function( v ) {
 
 			v.applyMatrix4( inverseProjectionMatrix );
 
 		} );
 
-		this.vertices.far.push(
-			new Vector3( 1, 1, 1 ),
-			new Vector3( 1, - 1, 1 ),
-			new Vector3( - 1, - 1, 1 ),
-			new Vector3( - 1, 1, 1 )
-		)
+		this.vertices.far[ 0 ] = new Vector3( 1, 1, 1 );
+		this.vertices.far[ 1 ] = new Vector3( 1, - 1, 1 );
+		this.vertices.far[ 2 ] = new Vector3( - 1, - 1, 1 );
+		this.vertices.far[ 3 ] = new Vector3( - 1, 1, 1 );
 		this.vertices.far.forEach( function( v ) {
 
 			v.applyMatrix4( inverseProjectionMatrix );
@@ -94,7 +100,7 @@ export default class Frustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.near.push( new Vector3().lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i - 1 ] ) );
+					cascade.vertices.near[ j ] = new Vector3().lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i - 1 ] );
 
 				}
 
@@ -112,7 +118,7 @@ export default class Frustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.far.push( new Vector3().lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i ] ) );
+					cascade.vertices.far[ j ] = new Vector3().lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i ] );
 
 				}
 
@@ -135,11 +141,11 @@ export default class Frustum {
 
 			point.set( this.vertices.near[ i ].x, this.vertices.near[ i ].y, this.vertices.near[ i ].z );
 			point.applyMatrix4( cameraMatrix );
-			result.vertices.near.push( point.clone() );
+			result.vertices.near[ i ] = point.clone();
 
 			point.set( this.vertices.far[ i ].x, this.vertices.far[ i ].y, this.vertices.far[ i ].z );
 			point.applyMatrix4( cameraMatrix );
-			result.vertices.far.push( point.clone() );
+			result.vertices.far[ i ] = point.clone();
 
 		}
 
