@@ -25,22 +25,22 @@
 			var renderer, scene, camera, orthoCamera, controls, csm;
 
 			var params = {
-					orthographic: false,
-					far: 1000,
-					mode: 'practical',
-					lightX: - 1,
-					lightY: - 1,
-					lightZ: - 1,
-					margin: 100,
-					lightFar: 5000,
-					lightNear: 1,
-					helper: function () {
+				orthographic: false,
+				far: 1000,
+				mode: 'practical',
+				lightX: - 1,
+				lightY: - 1,
+				lightZ: - 1,
+				margin: 100,
+				lightFar: 5000,
+				lightNear: 1,
+				helper: function () {
 
-						var helper = csm.helper( camera.matrix );
-						scene.add( helper );
+					var helper = csm.helper( camera.matrix );
+					scene.add( helper );
 
-					}
-				};
+				}
+			};
 
 			init();
 			animate();
