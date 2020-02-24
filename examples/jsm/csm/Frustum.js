@@ -84,7 +84,11 @@ export default class Frustum {
 
 			if ( i === 0 ) {
 
-				cascade.vertices.near = this.vertices.near;
+				for ( let j = 0; j < 4; j ++ ) {
+
+					cascade.vertices.near[ j ] = this.vertices.near[ j ].clone();
+
+				}
 
 			} else {
 
@@ -98,7 +102,11 @@ export default class Frustum {
 
 			if ( i === breaks - 1 ) {
 
-				cascade.vertices.far = this.vertices.far;
+				for ( let j = 0; j < 4; j ++ ) {
+
+					cascade.vertices.far[ j ] = this.vertices.far[ j ].clone();
+
+				}
 
 			} else {
 
