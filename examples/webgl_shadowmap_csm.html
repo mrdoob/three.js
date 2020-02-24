@@ -216,9 +216,18 @@
 
 				csm.update( camera.matrix );
 				controls.update();
-				updateOrthoCamera();
-				
-				renderer.render( scene, params.orthographic ? orthoCamera : camera );
+
+				if ( params.orthographic ) {
+
+					updateOrthoCamera();
+					csm.updateFrustums();
+					renderer.render( scene, orthoCamera );
+
+				} else {
+	
+					renderer.render( scene, camera );
+
+				}
 
 			}
 

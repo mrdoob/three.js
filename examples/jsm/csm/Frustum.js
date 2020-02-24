@@ -25,6 +25,9 @@ export default class Frustum {
 	getViewSpaceVertices() {
 
 		const maxFar = this.maxFar;
+		const projectionMatrix = this.projectionMatrix;
+		const isOrthographic = projectionMatrix.elements[ 2 * 4 + 3 ] === 0;
+
 		inverseProjectionMatrix.getInverse( this.projectionMatrix );
 
 		// 3 --- 0  vertices.near/far order
@@ -55,7 +58,15 @@ export default class Frustum {
 			v.applyMatrix4( inverseProjectionMatrix );
 
 			const absZ = Math.abs( v.z );
-			v.multiplyScalar( Math.min( maxFar / absZ, 1.0 ) );
+			if ( isOrthographic ) {
+
+				v.z *= Math.min( maxFar / absZ, 1.0 );
+
+			} else {
+
+				v.multiplyScalar( Math.min( maxFar / absZ, 1.0 ) );
+
+			}
 
 		} );
 
