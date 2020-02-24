@@ -2,8 +2,10 @@
  * @author vHawk / https://github.com/vHawk/
  */
 
-import { MathUtils, Vector3 } from '../../../build/three.module.js';
+import { MathUtils, Vector3, Matrix4 } from '../../../build/three.module.js';
 import FrustumVertex from './FrustumVertex.js';
+
+const inverseProjectionMatrix = new Matrix4();
 
 export default class Frustum {
 
@@ -11,10 +13,8 @@ export default class Frustum {
 
 		data = data || {};
 
-		this.fov = data.fov || 70;
-		this.near = data.near || 0.1;
-		this.far = data.far || 1000;
-		this.aspect = data.aspect || 1;
+		this.projectionMatrix = data.projectionMatrix;
+		this.maxFar = data.maxFar || 10000;
 
 		this.vertices = {
 			near: [],
@@ -25,29 +25,37 @@ export default class Frustum {
 
 	getViewSpaceVertices() {
 
-		this.nearPlaneY = this.near * Math.tan( MathUtils.degToRad( this.fov / 2 ) );
-		this.nearPlaneX = this.aspect * this.nearPlaneY;
-
-		this.farPlaneY = this.far * Math.tan( MathUtils.degToRad( this.fov / 2 ) );
-		this.farPlaneX = this.aspect * this.farPlaneY;
+		const maxFar = this.maxFar;
+		inverseProjectionMatrix.getInverse( this.projectionMatrix );
 
 		// 3 --- 0  vertices.near/far order
 		// |     |
 		// 2 --- 1
+		// clip space spans from [-1, 1]
 
 		this.vertices.near.push(
-			new FrustumVertex( this.nearPlaneX, this.nearPlaneY, - this.near ),
-			new FrustumVertex( this.nearPlaneX, - this.nearPlaneY, - this.near ),
-			new FrustumVertex( - this.nearPlaneX, - this.nearPlaneY, - this.near ),
-			new FrustumVertex( - this.nearPlaneX, this.nearPlaneY, - this.near )
-		);
+			new Vector3( 1, 1, - 1 ),
+			new Vector3( 1, - 1, - 1 ),
+			new Vector3( - 1, - 1, - 1 ),
+			new Vector3( - 1, 1, - 1 )
+		).forEach( function( v ) {
+
+			v.applyMatrix4( inverseProjectionMatrix );
+			v.multiplyScalar( Math.min( v.z / maxFar, 1.0 ) );
+
+		} );
 
 		this.vertices.far.push(
-			new FrustumVertex( this.farPlaneX, this.farPlaneY, - this.far ),
-			new FrustumVertex( this.farPlaneX, - this.farPlaneY, - this.far ),
-			new FrustumVertex( - this.farPlaneX, - this.farPlaneY, - this.far ),
-			new FrustumVertex( - this.farPlaneX, this.farPlaneY, - this.far )
-		);
+			new Vector3( 1, 1, 1 ),
+			new Vector3( 1, - 1, 1 ),
+			new Vector3( - 1, - 1, 1 ),
+			new Vector3( - 1, 1, 1 )
+		).forEach( function( v ) {
+
+			v.applyMatrix4( inverseProjectionMatrix );
+			v.multiplyScalar( Math.min( v.z / maxFar, 1.0 ) );
+
+		} );
 
 		return this.vertices;
 

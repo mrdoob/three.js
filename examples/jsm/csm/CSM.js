@@ -72,6 +72,7 @@ export default class CSM {
 
 	initCascades() {
 
+		// TODO: Handle orthographic camera
 		const camera = this.camera;
 		const far = Math.min(camera.far, this.maxFar);
 		this.mainFrustum = new Frustum( {
@@ -239,7 +240,7 @@ export default class CSM {
 	updateUniforms() {
 
 		const far = Math.min(this.camera.far, this.maxFar);
-		console.log('HERE', far);
+
 		for ( let i = 0; i < this.materials.length; i ++ ) {
 
 			this.materials[ i ].uniforms.CSM_cascades.value = this.getExtendedBreaks();
