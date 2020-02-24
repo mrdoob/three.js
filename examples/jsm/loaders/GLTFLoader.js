@@ -503,6 +503,9 @@ var GLTFLoader = ( function () {
 
 					material.transparent = true;
 
+					// See: https://github.com/mrdoob/three.js/issues/17706
+					materialParams.depthWrite = false;
+
 				} else if ( alphaMode === ALPHA_MODES.MASK ) {
 
 					materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
@@ -2588,6 +2591,9 @@ var GLTFLoader = ( function () {
 			if ( alphaMode === ALPHA_MODES.BLEND ) {
 
 				material.transparent = true;
+
+				// See: https://github.com/mrdoob/three.js/issues/17706
+				materialParams.depthWrite = false;
 
 			} else if ( alphaMode === ALPHA_MODES.MASK ) {
 

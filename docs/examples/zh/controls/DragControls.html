@@ -91,6 +91,12 @@ controls.addEventListener( 'dragend', function ( event ) {
 			Whether or not the controls are enabled.
 		</p>
 
+		<h3>[property:Boolean transformGroup]</h3>
+		<p>
+			This option only works if the [page:DragControls.objects] array contains a single draggable group object.
+			If set to *true*, [name] does not transform individual objects but the entire group. Default is *false*.
+		</p>
+
 		<h2>Methods</h2>
 
 		<p>See the base [page:EventDispatcher] class for common methods.</p>
@@ -108,6 +114,11 @@ controls.addEventListener( 'dragend', function ( event ) {
 		<h3>[method:null dispose] ()</h3>
 		<p>
 			Should be called if the controls is no longer required.
+		</p>
+
+		<h3>[method:Array getObjects] ()</h3>
+		<p>
+			Returns the array of draggable objects.
 		</p>
 
 		<h2>Source</h2>

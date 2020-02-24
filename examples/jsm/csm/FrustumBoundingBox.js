@@ -1,3 +1,7 @@
+/**
+ * @author vHawk / https://github.com/vHawk/
+ */
+
 export default class FrustumBoundingBox {
 
 	constructor() {

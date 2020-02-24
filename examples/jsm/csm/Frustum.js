@@ -1,6 +1,9 @@
-import * as THREE from '../../../build/three.module.js';
+/**
+ * @author vHawk / https://github.com/vHawk/
+ */
+
+import { MathUtils, Vector3 } from '../../../build/three.module.js';
 import FrustumVertex from './FrustumVertex.js';
-import { toRad } from './Utils.js';
 
 export default class Frustum {
 
@@ -22,10 +25,10 @@ export default class Frustum {
 
 	getViewSpaceVertices() {
 
-		this.nearPlaneY = this.near * Math.tan( toRad( this.fov / 2 ) );
+		this.nearPlaneY = this.near * Math.tan( MathUtils.degToRad( this.fov / 2 ) );
 		this.nearPlaneX = this.aspect * this.nearPlaneY;
 
-		this.farPlaneY = this.far * Math.tan( toRad( this.fov / 2 ) );
+		this.farPlaneY = this.far * Math.tan( MathUtils.degToRad( this.fov / 2 ) );
 		this.farPlaneX = this.aspect * this.farPlaneY;
 
 		// 3 --- 0  vertices.near/far order
@@ -97,7 +100,7 @@ export default class Frustum {
 	toSpace( cameraMatrix ) {
 
 		const result = new Frustum();
-		const point = new THREE.Vector3();
+		const point = new Vector3();
 
 		for ( var i = 0; i < 4; i ++ ) {
 

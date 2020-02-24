@@ -93,6 +93,27 @@ var SidebarProject = function ( editor ) {
 
 	rendererPanel.add( shadowsRow );
 
+	// Renderer / Shadow Type
+
+	var shadowTypeRow = new UIRow();
+	var shadowTypeSelect = new UISelect().setOptions( {
+		0: 'Basic',
+		1: 'PCF',
+		2: 'PCF (Soft)',
+	//	3: 'VSM'
+	} ).setWidth( '150px' ).onChange( function () {
+
+		config.setKey( 'project/renderer/shadowType', parseFloat( this.getValue() ) );
+		updateRenderer();
+
+	} );
+	shadowTypeSelect.setValue( config.getKey( 'project/renderer/shadowType' ) );
+
+	shadowTypeRow.add( new UIText( strings.getKey( 'sidebar/project/shadowType' ) ).setWidth( '90px' ) );
+	shadowTypeRow.add( shadowTypeSelect );
+
+	rendererPanel.add( shadowTypeRow );
+
 	// Renderer / Physically Correct lights
 
 	var physicallyCorrectLightsRow = new UIRow();
@@ -120,8 +141,13 @@ var SidebarProject = function ( editor ) {
 		5: 'ACESFilmic',
 	} ).setWidth( '150px' ).onChange( function () {
 
-		config.setKey( 'project/renderer/toneMapping', this.getValue() );
+		var toneMapping = parseFloat( this.getValue() );
+		config.setKey( 'project/renderer/toneMapping', toneMapping );
 		updateRenderer();
+
+		// WebGLRenderer.whitePoint is only relevant for Uncharted2 tonemapping
+
+		toneMappingWhitePointRow.setDisplay( ( toneMapping === 3 ) ? 'block' : 'none' );
 
 	} );
 	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
@@ -158,6 +184,7 @@ var SidebarProject = function ( editor ) {
 	toneMappingWhitePointRow.add( new UIText( strings.getKey( 'sidebar/project/toneMappingWhitePoint' ) ).setWidth( '90px' ) );
 	toneMappingWhitePointRow.add( toneMappingWhitePoint );
 	rendererPanel.add( toneMappingWhitePointRow );
+	toneMappingWhitePointRow.setDisplay( ( config.getKey( 'project/renderer/toneMapping' ) === 3 ? 'block' : 'none' ) );
 
 	//
 
@@ -166,13 +193,14 @@ var SidebarProject = function ( editor ) {
 		createRenderer(
 			antialiasBoolean.getValue(),
 			shadowsBoolean.getValue(),
+			shadowTypeSelect.getValue(),
 			toneMappingSelect.getValue(),
 			physicallyCorrectLightsBoolean.getValue()
 		);
 
 	}
 
-	function createRenderer( antialias, shadows, toneMapping, physicallyCorrectLights ) {
+	function createRenderer( antialias, shadows, shadowType, toneMapping, physicallyCorrectLights ) {
 
 		var parameters = { antialias: antialias };
 
@@ -191,7 +219,7 @@ var SidebarProject = function ( editor ) {
 		if ( shadows ) {
 
 			currentRenderer.shadowMap.enabled = true;
-			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+			currentRenderer.shadowMap.type = parseFloat( shadowType );
 
 		}
 
@@ -214,6 +242,7 @@ var SidebarProject = function ( editor ) {
 	createRenderer(
 		config.getKey( 'project/renderer/antialias' ),
 		config.getKey( 'project/renderer/shadows' ),
+		config.getKey( 'project/renderer/shadowType' ),
 		config.getKey( 'project/renderer/toneMapping' ),
 		config.getKey( 'project/renderer/physicallyCorrectLights' )
 	 );

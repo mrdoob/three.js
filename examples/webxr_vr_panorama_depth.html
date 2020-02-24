@@ -60,7 +60,6 @@
 				loader.load( './textures/kandao3.jpg', function ( texture ) {
 
 					texture.minFilter = THREE.NearestFilter;
-					texture.format = THREE.RGBFormat;
 					texture.generateMipmaps = false;
 					sphere.material.map = texture;
 
@@ -69,7 +68,6 @@
 				loader.load( './textures/kandao3_depthmap.jpg', function ( depth ) {
 
 					depth.minFilter = THREE.NearestFilter;
-					depth.format = THREE.RGBFormat;
 					depth.generateMipmaps = false;
 					sphere.material.displacementMap = depth;
 
