@@ -2896,9 +2896,9 @@ var GLTFLoader = ( function () {
 
 			} else {
 
-				var geometryPromise = this._onBefore( 'Geometry', primitive ).then( function ( primitive ) {
+				var geometryPromise = this._onBefore( 'geometry', primitive ).then( function ( primitive ) {
 
-					return ( parser._on( 'Geometry', primitive ) || Promise.resolve( null ) ).then( function ( geometry ) {
+					return ( parser._on( 'geometry', primitive ) || Promise.resolve( null ) ).then( function ( geometry ) {
 
 						if ( geometry ) return geometry;
 
@@ -2914,7 +2914,7 @@ var GLTFLoader = ( function () {
 
 					} ).then( function ( geometry ) {
 
-						return parser._onAfter( 'Geometry', geometry, primitive );
+						return parser._onAfter( 'geometry', geometry, primitive );
 
 					} ).then( function ( geometry ) {
 
