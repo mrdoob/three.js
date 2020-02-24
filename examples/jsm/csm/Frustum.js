@@ -105,11 +105,11 @@ export default class Frustum {
 
 			point.set( this.vertices.near[ i ].x, this.vertices.near[ i ].y, this.vertices.near[ i ].z );
 			point.applyMatrix4( cameraMatrix );
-			result.vertices.near.push( new Vector3( point.x, point.y, point.z ) );
+			result.vertices.near.push( point.clone() );
 
 			point.set( this.vertices.far[ i ].x, this.vertices.far[ i ].y, this.vertices.far[ i ].z );
 			point.applyMatrix4( cameraMatrix );
-			result.vertices.far.push( new Vector3( point.x, point.y, point.z ) );
+			result.vertices.far.push( point.clone() );
 
 		}
 
