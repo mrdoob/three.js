@@ -1417,20 +1417,15 @@ THREE.GLTFLoader = ( function () {
 		// Mark the special nodes/meshes in json for efficient parse
 		this.markDefs();
 
-		this._onBefore( 'root', json ).then( function ( def ) {
+		this._onBefore( 'root', json );
 
-			json = def;
-			parser.json = json;
+		return Promise.all( [
 
-			return Promise.all( [
+			parser.getDependencies( 'scene' ),
+			parser.getDependencies( 'animation' ),
+			parser.getDependencies( 'camera' ),
 
-				parser.getDependencies( 'scene' ),
-				parser.getDependencies( 'animation' ),
-				parser.getDependencies( 'camera' ),
-
-			] );
-
-		} ).then( function ( dependencies ) {
+		] ).then( function ( dependencies ) {
 
 			var result = {
 				scene: dependencies[ 0 ][ json.scene || 0 ],
@@ -1541,15 +1536,9 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			pending = pending.then( function ( plugin, def ) {
-
-				return plugin[ functionName ]( def, parser );
-
-			}.bind( null, plugin ) );
+			return plugin[ functionName ]( def, parser );
 
 		}
-
-		return pending;
 
 	};
 
@@ -1644,16 +1633,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'scene':
 					var sceneDef = json.scenes[ index ];
-					dependency = this._onBefore( type, sceneDef ).then( function ( def ) {
-
-						sceneDef = def;
-						return parser._on( type, sceneDef );
-
-					} ).then( function ( scene ) {
-
-						return scene || parser.loadScene( sceneDef );
-
-					} ).then( function ( scene ) {
+					this._onBefore( type, sceneDef );
+					dependency = ( this._on( type, sceneDef ) || this.loadScene( sceneDef ) ).then( function ( scene ) {
 
 						return parser._onAfter( type, scene, sceneDef );
 
@@ -1670,16 +1651,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'node':
 					var nodeDef = json.nodes[ index ];
-					dependency = this._onBefore( type, nodeDef ).then( function ( def ) {
-
-						nodeDef = def;
-						return parser._on( type, nodeDef );
-
-					} ).then( function ( node ) {
-
-						return node || parser.loadNode( nodeDef );
-
-					} ).then( function ( node ) {
+					this._onBefore( type, nodeDef );
+					dependency = ( this._on( type, nodeDef ) || this.loadNode( nodeDef ) ).then( function ( node ) {
 
 						return parser._onAfter( type, node, nodeDef );
 
@@ -1696,16 +1669,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'mesh':
 					var meshDef = json.meshes[ index ];
-					dependency = this._onBefore( type, meshDef ).then( function ( def ) {
-
-						meshDef = def;
-						return parser._on( type, meshDef );
-
-					} ).then( function ( mesh ) {
-
-						return mesh || parser.loadMesh( index, meshDef );
-
-					} ).then( function ( mesh ) {
+					this._onBefore( type, meshDef );
+					dependency = ( this._on( type, meshDef ) || this.loadMesh( index, meshDef ) ).then( function ( mesh ) {
 
 						return parser._onAfter( type, mesh, meshDef );
 
@@ -1732,16 +1697,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'accessor':
 					var accessorDef = json.accessors[ index ];
-					dependency = this._onBefore( type, accessorDef ).then( function ( def ) {
-
-						accessorDef = def;
-						return parser._on( type, accessorDef );
-
-					} ).then( function ( accessor ) {
-
-						return accessor || parser.loadAccessor( accessorDef );
-
-					} ).then( function ( accessor ) {
+					this._onBefore( type, accessorDef );
+					dependency = ( this._on( type, accessorDef ) || this.loadAccessor( accessorDef ) ).then( function ( accessor ) {
 
 						return parser._onAfter( type, accessor, accessorDef );
 
@@ -1750,16 +1707,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'bufferView':
 					var bufferViewDef = json.bufferViews[ index ];
-					dependency = this._onBefore( type, bufferViewDef ).then( function ( def ) {
-
-						bufferViewDef = def;
-						return parser._on( type, bufferViewDef );
-
-					} ).then( function ( bufferView ) {
-
-						return bufferView || parser.loadBufferView( bufferViewDef );
-
-					} ).then( function ( bufferView ) {
+					this._onBefore( type, bufferViewDef );
+					dependency = ( this._on( type, bufferViewDef ) || this.loadBufferView( bufferViewDef ) ).then( function ( bufferView ) {
 
 						return parser._onAfter( type, bufferView, bufferViewDef );
 
@@ -1768,16 +1717,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'buffer':
 					var bufferDef = json.buffers[ index ];
-					dependency = this._onBefore( type, bufferDef ).then( function ( def ) {
-
-						bufferDef = def;
-						return parser._on( type, bufferDef );
-
-					} ).then( function ( buffer ) {
-
-						return buffer || parser.loadBuffer( index, bufferDef );
-
-					} ).then( function ( buffer ) {
+					this._onBefore( type, bufferDef );
+					dependency = ( this._on( type, bufferDef ) || this.loadBuffer( index, bufferDef ) ).then( function ( buffer ) {
 
 						return parser._onAfter( type, buffer, bufferDef );
 
@@ -1786,16 +1727,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'material':
 					var materialDef = json.materials[ index ];
-					dependency = this._onBefore( type, materialDef ).then( function ( def ) {
-
-						materialDef = def;
-						return parser._on( type, materialDef );
-
-					} ).then( function ( material ) {
-
-						return material || parser.loadMaterial( materialDef );
-
-					} ).then( function ( material ) {
+					this._onBefore( type, materialDef );
+					dependency = ( this._on( type, materialDef ) || this.loadMaterial( materialDef ) ).then( function ( material ) {
 
 						return parser._onAfter( type, material, materialDef );
 
@@ -1812,16 +1745,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'texture':
 					var textureDef = json.textures[ index ];
-					dependency = this._onBefore( type, textureDef ).then( function ( def ) {
-
-						textureDef = def;
-						return parser._on( type, textureDef );
-
-					} ).then( function ( texture ) {
-
-						return texture || parser.loadTexture( textureDef );
-
-					} ).then( function ( texture ) {
+					this._onBefore( type, textureDef );
+					dependency = ( this._on( type, textureDef ) || this.loadTexture( textureDef ) ).then( function ( texture ) {
 
 						return parser._onAfter( type, texture, textureDef );
 
@@ -1830,16 +1755,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'skin':
 					var skinDef = json.skins[ index ];
-					dependency = this._onBefore( type, skinDef ).then( function ( def ) {
-
-						skinDef = def;
-						return parser._on( type, skinDef );
-
-					} ).then( function ( skin ) {
-
-						return skin || parser.loadSkin( skinDef );
-
-					} ).then( function ( skin ) {
+					this._onBefore( type, skinDef );
+					dependency = ( this._on( type, skinDef ) || this.loadSkin( skinDef ) ).then( function ( skin ) {
 
 						return parser._onAfter( type, skin, skinDef );
 
@@ -1848,16 +1765,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'animation':
 					var animationDef = json.animations[ index ];
-					dependency = this._onBefore( type, animationDef ).then( function ( def ) {
-
-						animationDef = def;
-						return parser._on( type, animationDef );
-
-					} ).then( function ( animation ) {
-
-						return animation || parser.loadAnimation( index, animationDef );
-
-					} ).then( function ( animation ) {
+					this._onBefore( type, animationDef );
+					dependency = ( this._on( type, animationDef ) || this.loadAnimation( index, animationDef ) ).then( function ( animation ) {
 
 						return parser._onAfter( type, animation, animationDef );
 
@@ -1866,16 +1775,8 @@ THREE.GLTFLoader = ( function () {
 
 				case 'camera':
 					var cameraDef = json.cameras[ index ];
-					dependency = this._onBefore( type, cameraDef ).then( function ( def ) {
-
-						cameraDef = def;
-						return parser._on( type, cameraDef );
-
-					} ).then( function ( camera ) {
-
-						return camera || parser.loadCamera( cameraDef );
-
-					} ).then( function ( camera ) {
+					this._onBefore( type, cameraDef );
+					dependency = ( this._on( type, cameraDef ) || this.loadCamera( cameraDef ) ).then( function ( camera ) {
 
 						return parser._onAfter( type, camera, cameraDef );
 
@@ -2229,16 +2130,13 @@ THREE.GLTFLoader = ( function () {
 
 		var parser = this;
 
-		return this._onBefore( 'map', mapDef ).then( function ( def ) {
+		this._onBefore( 'map', mapDef );
 
-			mapDef = def;
-			return parser._on( 'map', mapDef );
+		var texturePromise = this._on( 'map', mapDef );
 
-		} ).then( function ( texture ) {
+		if ( ! texturePromise ) {
 
-			if ( texture ) return texture ;
-
-			return parser.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
+			texturePromise = this.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
 
 				if ( ! texture.isCompressedTexture ) {
 
@@ -2280,7 +2178,9 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
-		} ).then( function ( texture ) {
+		}
+
+		return texturePromise.then( function ( texture ) {
 
 			return parser._onAfter( 'map', texture, mapDef );
 
@@ -2833,11 +2733,13 @@ THREE.GLTFLoader = ( function () {
 
 			} else {
 
-				var geometryPromise = this._onBefore( 'geometry', primitive ).then( function ( primitive ) {
+				this._onBefore( 'geometry', primitive );
 
-					return ( parser._on( 'geometry', primitive ) || Promise.resolve( null ) ).then( function ( geometry ) {
+				var geometryPromise = Promise.resolve( primitive ).then( function ( primitive ) {
 
-						if ( geometry ) return geometry;
+					var geometry = parser._on( 'geometry', primitive );
+
+					if ( ! geometry ) {
 
 						if ( primitive.extensions && primitive.extensions[ EXTENSIONS.KHR_DRACO_MESH_COMPRESSION ] ) {
 
@@ -2847,13 +2749,11 @@ THREE.GLTFLoader = ( function () {
 						}
 
 						// Otherwise create a new geometry
-						return addPrimitiveAttributes( new THREE.BufferGeometry(), primitive, parser );
+						geometry = addPrimitiveAttributes( new THREE.BufferGeometry(), primitive, parser );
 
-					} ).then( function ( geometry ) {
+					}
 
-						return parser._onAfter( 'geometry', geometry, primitive );
-
-					} ).then( function ( geometry ) {
+					return parser._onAfter( 'geometry', geometry, primitive ).then( function ( geometry ) {
 
 						assignExtrasToUserData( geometry, primitive );
 						return geometry;
