@@ -22,32 +22,10 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import * as CSM from './jsm/csm/CSM.js';
 
-			var renderer, scene, camera, controls, csm;
+			var renderer, scene, camera, orthoCamera, controls, csm;
 
-			init();
-			animate();
-
-			function init() {
-				scene = new THREE.Scene();
-				scene.background = new THREE.Color( '#454e61' );
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 5000 );
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-				renderer.shadowMap.enabled = true;
-				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-				controls = new OrbitControls( camera, renderer.domElement );
-				controls.maxPolarAngle = Math.PI / 2;
-				camera.position.set( 60, 60, 0 );
-				controls.target = new THREE.Vector3( -100, 10, 0 );
-				controls.update();
-
-				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
-				scene.add( ambientLight );
-
-				var params = {
+			var params = {
+					orthographic: false,
 					far: 1000,
 					mode: 'practical',
 					lightX: - 1,
@@ -63,6 +41,46 @@
 
 					}
 				};
+
+			init();
+			animate();
+
+			function updateOrthoCamera() {
+
+				var size = controls.target.distanceTo( camera.position );
+				var aspect = camera.aspect;
+
+				orthoCamera.left = size * aspect / - 2;
+				orthoCamera.right = size * aspect / 2;
+
+				orthoCamera.top = size / 2;
+				orthoCamera.bottom = size / - 2;
+				orthoCamera.position.copy( camera.position );
+				orthoCamera.rotation.copy( camera.rotation );
+				orthoCamera.updateProjectionMatrix();
+
+			}
+
+			function init() {
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( '#454e61' );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 5000 );
+				orthoCamera = new THREE.OrthographicCamera();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+				renderer.shadowMap.enabled = true;
+				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.maxPolarAngle = Math.PI / 2;
+				camera.position.set( 60, 60, 0 );
+				controls.target = new THREE.Vector3( -100, 10, 0 );
+				controls.update();
+
+				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
+				scene.add( ambientLight );
 
 				csm = new CSM.default({
 					maxFar: params.far,
@@ -110,6 +128,13 @@
 				}
 
 				var gui = new GUI();
+
+				gui.add( params, 'orthographic' ).onChange( function ( value ) {
+
+					csm.camera = value ? orthoCamera : camera;
+					csm.updateFrustums();
+
+				} );
 
 				gui.add( params, 'far', 1, 5000 ).step( 1 ).name( 'shadow far' ).onChange( function ( value ) {
 
@@ -178,7 +203,7 @@
 					camera.aspect = window.innerWidth / window.innerHeight;
 					camera.updateProjectionMatrix();
 
-					csm.setAspect( camera.aspect );
+					updateOrthoCamera();
 
 					renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -191,8 +216,9 @@
 
 				csm.update( camera.matrix );
 				controls.update();
-
-				renderer.render( scene, camera );
+				updateOrthoCamera();
+				
+				renderer.render( scene, params.orthographic ? orthoCamera : camera );
 
 			}
 
