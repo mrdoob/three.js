@@ -37,10 +37,10 @@ export default class Frustum {
 			new Vector3( 1, - 1, - 1 ),
 			new Vector3( - 1, - 1, - 1 ),
 			new Vector3( - 1, 1, - 1 )
-		).forEach( function( v ) {
+		);
+		this.vertices.near.forEach( function( v ) {
 
 			v.applyMatrix4( inverseProjectionMatrix );
-			v.multiplyScalar( Math.min( v.z / maxFar, 1.0 ) );
 
 		} );
 
@@ -49,10 +49,13 @@ export default class Frustum {
 			new Vector3( 1, - 1, 1 ),
 			new Vector3( - 1, - 1, 1 ),
 			new Vector3( - 1, 1, 1 )
-		).forEach( function( v ) {
+		)
+		this.vertices.far.forEach( function( v ) {
 
 			v.applyMatrix4( inverseProjectionMatrix );
-			v.multiplyScalar( Math.min( v.z / maxFar, 1.0 ) );
+
+			const absZ = Math.abs( v.z );
+			v.multiplyScalar( Math.min( maxFar / absZ, 1.0 ) );
 
 		} );
 

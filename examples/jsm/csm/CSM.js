@@ -72,14 +72,13 @@ export default class CSM {
 
 	initCascades() {
 
-		// TODO: Handle orthographic camera
 		const camera = this.camera;
-		const far = Math.min(camera.far, this.maxFar);
+		camera.updateProjectionMatrix();
 		this.mainFrustum = new Frustum( {
-			fov: camera.fov,
-			near: camera.near,
-			far: far,
-			aspect: camera.aspect
+
+			maxFar: this.maxFar,
+			projectionMatrix: camera.projectionMatrix
+
 		} );
 
 		this.mainFrustum.getViewSpaceVertices();
