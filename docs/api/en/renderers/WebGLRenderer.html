@@ -403,6 +403,9 @@
 		<h3>[method:null initTexture]( [param:Texture texture] )</h3>
 		<p> Initializes the given texture. Useful for preloading a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).</p>
 
+		<h3>[method:null initCubeTexture]( [param:CubeTexture texture] )</h3>
+		<p> Initializes the given cube texture. Can be used to preload a cubemap rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).</p>
+
 		<h3>[method:null resetGLState]( )</h3>
 		<p>Reset the GL state to default. Called internally if the WebGL context is lost.</p>
 

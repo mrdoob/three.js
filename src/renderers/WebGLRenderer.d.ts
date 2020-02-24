@@ -20,6 +20,7 @@ import { RenderTarget } from './webgl/WebGLRenderLists';
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 import { Texture } from '../textures/Texture';
+import { CubeTexture } from '../textures/CubeTexture';
 
 export interface Renderer {
 	domElement: HTMLCanvasElement;
@@ -429,6 +430,13 @@ export class WebGLRenderer implements Renderer {
 	 * @param texture The texture to Initialize.
 	 */
 	initTexture( texture: Texture ): void;
+
+	/**
+	 * Initializes the given cube texture. Can be used to preload a cubemap rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).
+	 *
+	 * @param texture The cube texture to Initialize.
+	 */
+	initCubeTexture( texture: CubeTexture ): void;
 
 	/**
 	 * @deprecated
