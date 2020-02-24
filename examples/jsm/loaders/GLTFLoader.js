@@ -183,6 +183,32 @@ var GLTFLoader = ( function () {
 
 		},
 
+		unregister: function ( plugin ) {
+
+			var extensionName = plugin.extension;
+
+			if ( extensionName ) {
+
+				if ( this.plugins.extensions[ extensionName ] ) {
+
+					delete this.plugins.extensions[ extensionName ];
+
+				} else {
+
+					console.warn( 'THREE.GLTFLoader: No plugin found whose name is ' + extensionName + '.' );
+
+				}
+
+			} else {
+
+				console.warn( 'THREE.GLTFLoader: plugin needs an extension property.' );
+
+			}
+
+			return this;
+
+		},
+
 		setDRACOLoader: function ( dracoLoader ) {
 
 			this.dracoLoader = dracoLoader;
