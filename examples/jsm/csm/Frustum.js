@@ -3,7 +3,6 @@
  */
 
 import { MathUtils, Vector3 } from '../../../build/three.module.js';
-import FrustumVertex from './FrustumVertex.js';
 
 export default class Frustum {
 
@@ -36,17 +35,17 @@ export default class Frustum {
 		// 2 --- 1
 
 		this.vertices.near.push(
-			new FrustumVertex( this.nearPlaneX, this.nearPlaneY, - this.near ),
-			new FrustumVertex( this.nearPlaneX, - this.nearPlaneY, - this.near ),
-			new FrustumVertex( - this.nearPlaneX, - this.nearPlaneY, - this.near ),
-			new FrustumVertex( - this.nearPlaneX, this.nearPlaneY, - this.near )
+			new Vector3( this.nearPlaneX, this.nearPlaneY, - this.near ),
+			new Vector3( this.nearPlaneX, - this.nearPlaneY, - this.near ),
+			new Vector3( - this.nearPlaneX, - this.nearPlaneY, - this.near ),
+			new Vector3( - this.nearPlaneX, this.nearPlaneY, - this.near )
 		);
 
 		this.vertices.far.push(
-			new FrustumVertex( this.farPlaneX, this.farPlaneY, - this.far ),
-			new FrustumVertex( this.farPlaneX, - this.farPlaneY, - this.far ),
-			new FrustumVertex( - this.farPlaneX, - this.farPlaneY, - this.far ),
-			new FrustumVertex( - this.farPlaneX, this.farPlaneY, - this.far )
+			new Vector3( this.farPlaneX, this.farPlaneY, - this.far ),
+			new Vector3( this.farPlaneX, - this.farPlaneY, - this.far ),
+			new Vector3( - this.farPlaneX, - this.farPlaneY, - this.far ),
+			new Vector3( - this.farPlaneX, this.farPlaneY, - this.far )
 		);
 
 		return this.vertices;
@@ -69,7 +68,7 @@ export default class Frustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.near.push( new FrustumVertex().fromLerp( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i - 1 ] ) );
+					cascade.vertices.near.push( new Vector3().lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i - 1 ] ) );
 
 				}
 
@@ -83,7 +82,7 @@ export default class Frustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.far.push( new FrustumVertex().fromLerp( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i ] ) );
+					cascade.vertices.far.push( new Vector3().lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i ] ) );
 
 				}
 
@@ -106,11 +105,11 @@ export default class Frustum {
 
 			point.set( this.vertices.near[ i ].x, this.vertices.near[ i ].y, this.vertices.near[ i ].z );
 			point.applyMatrix4( cameraMatrix );
-			result.vertices.near.push( new FrustumVertex( point.x, point.y, point.z ) );
+			result.vertices.near.push( point.clone() );
 
 			point.set( this.vertices.far[ i ].x, this.vertices.far[ i ].y, this.vertices.far[ i ].z );
 			point.applyMatrix4( cameraMatrix );
-			result.vertices.far.push( new FrustumVertex( point.x, point.y, point.z ) );
+			result.vertices.far.push( point.clone() );
 
 		}
 
