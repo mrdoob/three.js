@@ -11,34 +11,34 @@ const png = require( 'pngjs' ).PNG;
 const fs = require( 'fs' );
 
 const port = 1234;
-const pixelThreshold = 0.2;                // threshold error in one pixel
-const maxFailedPixels = 0.05;              // total failed pixels
+const pixelThreshold = 0.2; // threshold error in one pixel
+const maxFailedPixels = 0.05; // total failed pixels
 
 const exceptionList = [
 
 	'index',
-	'webgl_loader_texture_pvrtc',            // not supported in CI, useless
+	'webgl_loader_texture_pvrtc', // not supported in CI, useless
 	'webgl_materials_envmaps_parallax',
-	'webgl_test_memory2',                    // gives fatal error in puppeteer
-	'webgl_worker_offscreencanvas',          // in a worker, not robust
+	'webgl_test_memory2', // gives fatal error in puppeteer
+	'webgl_worker_offscreencanvas' // in a worker, not robust
 
 ].concat( ( process.platform === "win32" ) ? [
 
-	'webgl_effects_ascii'                    // windows fonts not supported
+	'webgl_effects_ascii' // windows fonts not supported
 
 ] : [] );
 
 const networkTimeout = 600;
-const networkTax = 2000;                   // additional timeout for resources size
-const pageSizeMinTax = 1.0;                // in mb, when networkTax = 0
-const pageSizeMaxTax = 5.0;                // in mb, when networkTax = networkTax
+const networkTax = 2000; // additional timeout for resources size
+const pageSizeMinTax = 1.0; // in mb, when networkTax = 0
+const pageSizeMaxTax = 5.0; // in mb, when networkTax = networkTax
 const renderTimeout = 1200;
-const maxAttemptId = 3;                    // progresseve attempts
+const maxAttemptId = 3; // progresseve attempts
 const progressFunc = n => 1 + n;
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
-console.null = ( msg ) => {};
+console.null = () => {};
 
 
 /* Launch server */
@@ -71,7 +71,7 @@ server.on( 'SIGINT', () => process.exit( 1 ) );
 /* Launch puppeteer with WebGL support in Linux */
 
 const pup = puppeteer.launch( {
-	headless: !process.env.VISIBLE,
+	headless: ! process.env.VISIBLE,
 	args: [
 		'--use-gl=egl',
 		'--no-sandbox',
@@ -106,12 +106,12 @@ const pup = puppeteer.launch( {
 
 	/* Find files */
 
-	const exactList = process.argv.slice(2).map( f => f.replace( '.html', '' ) );
+	const exactList = process.argv.slice( 2 ).map( f => f.replace( '.html', '' ) );
 
 	const files = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => ( process.argv.length > 2 ) ? exactList.includes( f ) : !exceptionList.includes( f ) );
+		.filter( f => ( process.argv.length > 2 ) ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 
 	/* Loop for each file, with CI parallelism */
@@ -182,9 +182,9 @@ const pup = puppeteer.launch( {
 					let canvas = document.getElementsByTagName( 'canvas' );
 					for ( let i = 0; i < canvas.length; ++ i ) {
 
-						if ( canvas[i].height === 48 ) {
+						if ( canvas[ i ].height === 48 ) {
 
-							canvas[i].style.display = 'none';
+							canvas[ i ].style.display = 'none';
 
 						}
 
@@ -197,15 +197,17 @@ const pup = puppeteer.launch( {
 					/* Resolve render promise */
 
 					window.chromeRenderStarted = true;
-					await new Promise( function( resolve ) {
+					await new Promise( function ( resolve ) {
 
 						if ( typeof performance.wow === 'undefined' ) {
+
 							performance.wow = performance.now;
+
 						}
 						let renderStart = performance.wow();
-						let waitingLoop = setInterval( function() {
+						let waitingLoop = setInterval( function () {
 
-							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * window.chromeMaxFrameId  * attemptProgress );
+							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * window.chromeMaxFrameId * attemptProgress );
 							if ( window.chromeRenderFinished || renderEcceded ) {
 
 								if ( renderEcceded ) {
@@ -270,7 +272,7 @@ const pup = puppeteer.launch( {
 						threshold: pixelThreshold,
 						alpha: 0.2,
 						diffMask: process.env.FORCE_COLOR === '0',
-						diffColor: process.env.FORCE_COLOR === '0' ? [255, 255, 255] : [255, 0, 0]
+						diffColor: process.env.FORCE_COLOR === '0' ? [ 255, 255, 255 ] : [ 255, 0, 0 ]
 					} );
 
 				} catch {
@@ -295,7 +297,7 @@ const pup = puppeteer.launch( {
 
 					if ( ++ attemptId === maxAttemptId ) {
 
-						printImage(diff, console);
+						printImage( diff, console );
 						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
 						++ failedScreenshots;
 						continue;
@@ -329,7 +331,7 @@ const pup = puppeteer.launch( {
 		console.red( `TEST FAILED! ${ failedScreenshots } from ${ endId - beginId } screenshots not pass.` );
 		process.exit( 1 );
 
-	} else if ( !process.env.MAKE ) {
+	} else if ( ! process.env.MAKE ) {
 
 		console.green( `TEST PASSED! ${ endId - beginId } screenshots correctly rendered.` );
 
