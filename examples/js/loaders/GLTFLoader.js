@@ -1541,7 +1541,6 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * @param {string} key
 	 * @param {GLTF.definition} def
-	 * @return {Promise<GLTF.definition>}}
 	 */
 	GLTFParser.prototype._onBefore = function ( key, def ) {
 
@@ -1550,7 +1549,6 @@ THREE.GLTFLoader = ( function () {
 		var plugins = this.plugins || {};
 		var extensionPlugins = plugins.extensions || {};
 		var extensions = def.extensions || {};
-		var pending = Promise.resolve( def );
 
 		for ( var extensionName in extensions ) {
 
@@ -1562,7 +1560,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			return plugin[ functionName ]( def, parser );
+			plugin[ functionName ]( def, parser );
 
 		}
 
