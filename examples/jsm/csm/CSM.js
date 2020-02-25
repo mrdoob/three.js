@@ -20,7 +20,7 @@ import FrustumBoundingBox from './FrustumBoundingBox.js';
 import Shader from './Shader.js';
 
 const _cameraToLightMatrix = new Matrix4();
-const _frustum = new Frustum();
+const _lightSpaceFrustum = new Frustum();
 const _center = new Vector3();
 const _bbox = new FrustumBoundingBox();
 
@@ -166,11 +166,11 @@ export default class CSM {
 
 			const light = this.lights[ i ];
 			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
-			this.frustums[ i ].toSpace( _cameraToLightMatrix, _frustum );
+			this.frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
 			light.shadow.camera.updateMatrixWorld( true );
 
-			_bbox.fromFrustum( _frustum );
+			_bbox.fromFrustum( _lightSpaceFrustum );
 			_bbox.getSize();
 			_bbox.getCenter( this.lightMargin );
 
