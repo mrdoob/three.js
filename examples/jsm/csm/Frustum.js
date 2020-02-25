@@ -12,9 +12,6 @@ export default class Frustum {
 
 		data = data || {};
 
-		this.projectionMatrix = data.projectionMatrix;
-		this.maxFar = data.maxFar || 10000;
-
 		this.vertices = {
 			near: [
 				new Vector3(),
@@ -30,15 +27,19 @@ export default class Frustum {
 			]
 		};
 
+		if ( data.projectionMatrix !== undefined ) {
+
+			this.setFromProjectionMatrix( data.projectionMatrix, data.maxFar || 10000 );
+
+		}
+
 	}
 
-	getViewSpaceVertices() {
+	setFromProjectionMatrix( projectionMatrix, maxFar ) {
 
-		const maxFar = this.maxFar;
-		const projectionMatrix = this.projectionMatrix;
 		const isOrthographic = projectionMatrix.elements[ 2 * 4 + 3 ] === 0;
 
-		inverseProjectionMatrix.getInverse( this.projectionMatrix );
+		inverseProjectionMatrix.getInverse( projectionMatrix );
 
 		// 3 --- 0  vertices.near/far order
 		// |     |
@@ -80,13 +81,18 @@ export default class Frustum {
 
 	}
 
-	split( breaks ) {
+	split( breaks, target ) {
 
-		const result = [];
+		while ( breaks.length > target.length ) {
+
+			target.push( new Frustum() );
+
+		}
+		target.length = breaks.length;
 
 		for ( let i = 0; i < breaks.length; i ++ ) {
 
-			const cascade = new Frustum();
+			const cascade = target[ i ];
 
 			if ( i === 0 ) {
 
@@ -124,11 +130,7 @@ export default class Frustum {
 
 			}
 
-			result.push( cascade );
-
 		}
-
-		return result;
 
 	}
 

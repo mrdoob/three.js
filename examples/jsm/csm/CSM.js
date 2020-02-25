@@ -37,6 +37,8 @@ export default class CSM {
 		this.lightFar = data.lightFar || 2000;
 		this.lightMargin = data.lightMargin || 200;
 		this.customSplitsCallback = data.customSplitsCallback;
+		this.mainFrustum = new Frustum();
+		this.frustums = [];
 
 		this.lights = [];
 		this.materials = [];
@@ -74,16 +76,8 @@ export default class CSM {
 
 		const camera = this.camera;
 		camera.updateProjectionMatrix();
-		this.mainFrustum = new Frustum( {
-
-			maxFar: this.maxFar,
-			projectionMatrix: camera.projectionMatrix
-
-		} );
-
-		this.mainFrustum.getViewSpaceVertices();
-
-		this.frustums = this.mainFrustum.split( this.breaks );
+		this.mainFrustum.setFromProjectionMatrix( camera.projectionMatrix, this.maxFar );
+		this.mainFrustum.split( this.breaks, this.frustums );
 
 	}
 
