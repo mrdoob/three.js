@@ -2822,6 +2822,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		// Generate mipmaps only when copying level 0
 		if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
 		state.unbindTexture();
