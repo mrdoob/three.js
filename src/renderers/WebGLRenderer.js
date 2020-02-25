@@ -2803,7 +2803,7 @@ function WebGLRenderer( parameters ) {
 
 	this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level ) {
 
-		if ( level === undefined ) level = 0;
+		level = level || 0;
 
 		var width = srcTexture.image.width;
 		var height = srcTexture.image.height;
@@ -2822,7 +2822,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( _gl.TEXTURE_2D );
+		if ( level == 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( _gl.TEXTURE_2D );
 
 		state.unbindTexture();
 
