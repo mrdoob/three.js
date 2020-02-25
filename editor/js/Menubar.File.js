@@ -14,11 +14,11 @@ import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 var MenubarFile = function ( editor ) {
 
-	var NUMBER_PRECISION = 6;
-
 	function parseNumber( key, value ) {
 
-		return typeof value === 'number' ? parseFloat( value.toFixed( NUMBER_PRECISION ) ) : value;
+		var precision = config.getKey( 'exportPrecision' );
+
+		return typeof value === 'number' ? parseFloat( value.toFixed( precision ) ) : value;
 
 	}
 
