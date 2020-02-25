@@ -2,7 +2,9 @@
  * @author vHawk / https://github.com/vHawk/
  */
 
-import { MathUtils, Vector3 } from '../../../build/three.module.js';
+import { Vector3, Matrix4 } from '../../../build/three.module.js';
+
+const inverseProjectionMatrix = new Matrix4();
 
 export default class Frustum {
 
@@ -10,10 +12,8 @@ export default class Frustum {
 
 		data = data || {};
 
-		this.fov = data.fov || 70;
-		this.near = data.near || 0.1;
-		this.far = data.far || 1000;
-		this.aspect = data.aspect || 1;
+		this.projectionMatrix = data.projectionMatrix;
+		this.maxFar = data.maxFar || 10000;
 
 		this.vertices = {
 			near: [],
@@ -24,29 +24,51 @@ export default class Frustum {
 
 	getViewSpaceVertices() {
 
-		this.nearPlaneY = this.near * Math.tan( MathUtils.degToRad( this.fov / 2 ) );
-		this.nearPlaneX = this.aspect * this.nearPlaneY;
+		const maxFar = this.maxFar;
+		const projectionMatrix = this.projectionMatrix;
+		const isOrthographic = projectionMatrix.elements[ 2 * 4 + 3 ] === 0;
 
-		this.farPlaneY = this.far * Math.tan( MathUtils.degToRad( this.fov / 2 ) );
-		this.farPlaneX = this.aspect * this.farPlaneY;
+		inverseProjectionMatrix.getInverse( this.projectionMatrix );
 
 		// 3 --- 0  vertices.near/far order
 		// |     |
 		// 2 --- 1
+		// clip space spans from [-1, 1]
 
 		this.vertices.near.push(
-			new Vector3( this.nearPlaneX, this.nearPlaneY, - this.near ),
-			new Vector3( this.nearPlaneX, - this.nearPlaneY, - this.near ),
-			new Vector3( - this.nearPlaneX, - this.nearPlaneY, - this.near ),
-			new Vector3( - this.nearPlaneX, this.nearPlaneY, - this.near )
+			new Vector3( 1, 1, - 1 ),
+			new Vector3( 1, - 1, - 1 ),
+			new Vector3( - 1, - 1, - 1 ),
+			new Vector3( - 1, 1, - 1 )
 		);
+		this.vertices.near.forEach( function( v ) {
+
+			v.applyMatrix4( inverseProjectionMatrix );
+
+		} );
 
 		this.vertices.far.push(
-			new Vector3( this.farPlaneX, this.farPlaneY, - this.far ),
-			new Vector3( this.farPlaneX, - this.farPlaneY, - this.far ),
-			new Vector3( - this.farPlaneX, - this.farPlaneY, - this.far ),
-			new Vector3( - this.farPlaneX, this.farPlaneY, - this.far )
-		);
+			new Vector3( 1, 1, 1 ),
+			new Vector3( 1, - 1, 1 ),
+			new Vector3( - 1, - 1, 1 ),
+			new Vector3( - 1, 1, 1 )
+		)
+		this.vertices.far.forEach( function( v ) {
+
+			v.applyMatrix4( inverseProjectionMatrix );
+
+			const absZ = Math.abs( v.z );
+			if ( isOrthographic ) {
+
+				v.z *= Math.min( maxFar / absZ, 1.0 );
+
+			} else {
+
+				v.multiplyScalar( Math.min( maxFar / absZ, 1.0 ) );
+
+			}
+
+		} );
 
 		return this.vertices;
 
