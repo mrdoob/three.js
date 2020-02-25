@@ -45,20 +45,20 @@ export default class Frustum {
 		// 2 --- 1
 		// clip space spans from [-1, 1]
 
-		this.vertices.near[ 0 ] = new Vector3( 1, 1, - 1 );
-		this.vertices.near[ 1 ] = new Vector3( 1, - 1, - 1 );
-		this.vertices.near[ 2 ] = new Vector3( - 1, - 1, - 1 );
-		this.vertices.near[ 3 ] = new Vector3( - 1, 1, - 1 );
+		this.vertices.near[ 0 ].set( 1, 1, - 1 );
+		this.vertices.near[ 1 ].set( 1, - 1, - 1 );
+		this.vertices.near[ 2 ].set( - 1, - 1, - 1 );
+		this.vertices.near[ 3 ].set( - 1, 1, - 1 );
 		this.vertices.near.forEach( function( v ) {
 
 			v.applyMatrix4( inverseProjectionMatrix );
 
 		} );
 
-		this.vertices.far[ 0 ] = new Vector3( 1, 1, 1 );
-		this.vertices.far[ 1 ] = new Vector3( 1, - 1, 1 );
-		this.vertices.far[ 2 ] = new Vector3( - 1, - 1, 1 );
-		this.vertices.far[ 3 ] = new Vector3( - 1, 1, 1 );
+		this.vertices.far[ 0 ].set( 1, 1, 1 );
+		this.vertices.far[ 1 ].set( 1, - 1, 1 );
+		this.vertices.far[ 2 ].set( - 1, - 1, 1 );
+		this.vertices.far[ 3 ].set( - 1, 1, 1 );
 		this.vertices.far.forEach( function( v ) {
 
 			v.applyMatrix4( inverseProjectionMatrix );
@@ -92,7 +92,7 @@ export default class Frustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.near[ j ] = this.vertices.near[ j ].clone();
+					cascade.vertices.near[ j ].copy( this.vertices.near[ j ] );
 
 				}
 
@@ -100,7 +100,7 @@ export default class Frustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.near[ j ] = new Vector3().lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i - 1 ] );
+					cascade.vertices.near[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i - 1 ] );
 
 				}
 
@@ -110,7 +110,7 @@ export default class Frustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.far[ j ] = this.vertices.far[ j ].clone();
+					cascade.vertices.far[ j ].copy( this.vertices.far[ j ] );
 
 				}
 
@@ -118,7 +118,7 @@ export default class Frustum {
 
 				for ( let j = 0; j < 4; j ++ ) {
 
-					cascade.vertices.far[ j ] = new Vector3().lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i ] );
+					cascade.vertices.far[ j ].lerpVectors( this.vertices.near[ j ], this.vertices.far[ j ], breaks[ i ] );
 
 				}
 
