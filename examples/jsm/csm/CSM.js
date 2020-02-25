@@ -21,6 +21,7 @@ import Shader from './Shader.js';
 
 const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new Frustum();
+const _frustum = new Frustum();
 const _center = new Vector3();
 const _bbox = new FrustumBoundingBox();
 
@@ -276,14 +277,13 @@ export default class CSM {
 
 	helper( cameraMatrix ) {
 
-		let frustum;
 		let geometry, vertices;
 		const material = new LineBasicMaterial( { color: 0xffffff } );
 		const object = new Object3D();
 
 		for ( let i = 0; i < this.frustums.length; i ++ ) {
 
-			frustum = this.frustums[ i ].toSpace( cameraMatrix );
+			this.frustums[ i ].toSpace( cameraMatrix, _frustum );
 
 			geometry = new BufferGeometry();
 			vertices = [];
@@ -291,7 +291,7 @@ export default class CSM {
 
 			for ( let i = 0; i < 5; i ++ ) {
 
-				const point = frustum.vertices.near[ i === 4 ? 0 : i ];
+				const point = _frustum.vertices.near[ i === 4 ? 0 : i ];
 				vertices.push( point.x, point.y, point.z );
 
 			}
@@ -305,7 +305,7 @@ export default class CSM {
 
 			for ( let i = 0; i < 5; i ++ ) {
 
-				const point = frustum.vertices.far[ i === 4 ? 0 : i ];
+				const point = _frustum.vertices.far[ i === 4 ? 0 : i ];
 				vertices.push( point.x, point.y, point.z );
 
 			}
@@ -319,8 +319,8 @@ export default class CSM {
 				geometry = new BufferGeometry();
 				vertices = [];
 
-				const near = frustum.vertices.near[ i ];
-				const far = frustum.vertices.far[ i ];
+				const near = _frustum.vertices.near[ i ];
+				const far = _frustum.vertices.far[ i ];
 
 				vertices.push( near.x, near.y, near.z );
 				vertices.push( far.x, far.y, far.z );
