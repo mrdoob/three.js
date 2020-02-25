@@ -24,6 +24,8 @@ const _lightSpaceFrustum = new Frustum();
 const _frustum = new Frustum();
 const _center = new Vector3();
 const _bbox = new FrustumBoundingBox();
+const _uniformArray = [];
+const _logArray = [];
 
 export default class CSM {
 
@@ -46,6 +48,7 @@ export default class CSM {
 		this.customSplitsCallback = data.customSplitsCallback;
 		this.mainFrustum = new Frustum();
 		this.frustums = [];
+		this.breaks = [];
 
 		this.lights = [];
 		this.materials = [];
@@ -92,70 +95,64 @@ export default class CSM {
 
 		const camera = this.camera;
 		const far = Math.min(camera.far, this.maxFar);
-		this.breaks = [];
+		this.breaks.length = 0;
 
 		switch ( this.mode ) {
 
 			case 'uniform':
-				this.breaks = uniformSplit( this.cascades, camera.near, far );
+				uniformSplit( this.cascades, camera.near, far, this.breaks );
 				break;
 			case 'logarithmic':
-				this.breaks = logarithmicSplit( this.cascades, camera.near, far );
+				logarithmicSplit( this.cascades, camera.near, far, this.breaks );
 				break;
 			case 'practical':
-				this.breaks = practicalSplit( this.cascades, camera.near, far, 0.5 );
+				practicalSplit( this.cascades, camera.near, far, 0.5, this.breaks );
 				break;
 			case 'custom':
 				if ( this.customSplitsCallback === undefined ) console.error( 'CSM: Custom split scheme callback not defined.' );
-				this.breaks = this.customSplitsCallback( this.cascades, camera.near, far );
+				this.customSplitsCallback( this.cascades, camera.near, far, this.breaks );
 				break;
 
 		}
 
-		function uniformSplit( amount, near, far ) {
-
-			const r = [];
+		function uniformSplit( amount, near, far, target ) {
 
 			for ( let i = 1; i < amount; i ++ ) {
 
-				r.push( ( near + ( far - near ) * i / amount ) / far );
+				target.push( ( near + ( far - near ) * i / amount ) / far );
 
 			}
 
-			r.push( 1 );
-			return r;
+			target.push( 1 );
 
 		}
 
-		function logarithmicSplit( amount, near, far ) {
-
-			const r = [];
+		function logarithmicSplit( amount, near, far, target ) {
 
 			for ( let i = 1; i < amount; i ++ ) {
 
-				r.push( ( near * ( far / near ) ** ( i / amount ) ) / far );
+				target.push( ( near * ( far / near ) ** ( i / amount ) ) / far );
 
 			}
 
-			r.push( 1 );
-			return r;
+			target.push( 1 );
 
 		}
 
-		function practicalSplit( amount, near, far, lambda ) {
+		function practicalSplit( amount, near, far, lambda, target ) {
 
-			const log = logarithmicSplit( amount, near, far );
-			const uni = uniformSplit( amount, near, far );
-			const r = [];
+			_uniformArray.length = 0;
+			_logArray.length = 0;
+			const log = logarithmicSplit( amount, near, far, _logArray );
+			const uni = uniformSplit( amount, near, far, _uniformArray );
 
 			for ( let i = 1; i < amount; i ++ ) {
 
-				r.push( MathUtils.lerp( uni[ i - 1 ], log[ i - 1 ], lambda ) );
+				target.push( MathUtils.lerp( _uniformArray[ i - 1 ], _logArray[ i - 1 ], lambda ) );
 
 			}
 
-			r.push( 1 );
-			return r;
+			target.push( 1 );
 
 		}
 
