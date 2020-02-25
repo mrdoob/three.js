@@ -1,10 +1,9 @@
 three.js
 ========
 
-[![NPM package][npm]][npm-url]
+[![NPM Package][npm]][npm-url]
+[![NPM Downloads][npm-downloads]][npmtrends-url]
 [![Build Size][build-size]][build-size-url]
-[![Build Status][build-status]][build-status-url]
-[![Dependencies][dependencies]][dependencies-url]
 [![Dev Dependencies][dev-dependencies]][dev-dependencies-url]
 [![Language Grade][lgtm]][lgtm-url]
 
@@ -73,13 +72,11 @@ If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
 
 [npm]: https://img.shields.io/npm/v/three.svg
 [npm-url]: https://www.npmjs.com/package/three
+[npm-downloads]: https://img.shields.io/npm/dw/three
+[npmtrends-url]: https://www.npmtrends.com/three
 [build-size]: https://badgen.net/bundlephobia/minzip/three
 [build-size-url]: https://bundlephobia.com/result?p=three
-[build-status]: https://travis-ci.org/mrdoob/three.js.svg?branch=dev
-[build-status-url]: https://travis-ci.org/mrdoob/three.js
-[dependencies]: https://img.shields.io/david/mrdoob/three.js.svg
-[dependencies-url]: https://david-dm.org/mrdoob/three.js
 [dev-dependencies]: https://img.shields.io/david/dev/mrdoob/three.js.svg
 [dev-dependencies-url]: https://david-dm.org/mrdoob/three.js#info=devDependencies
-[lgtm]: https://img.shields.io/lgtm/grade/javascript/g/mrdoob/three.js.svg?label=code%20quality
+[lgtm]: https://img.shields.io/lgtm/alerts/github/mrdoob/three.js
 [lgtm-url]: https://lgtm.com/projects/g/mrdoob/three.js/
