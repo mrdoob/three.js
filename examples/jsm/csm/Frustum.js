@@ -134,24 +134,19 @@ export default class Frustum {
 
 	}
 
-	toSpace( cameraMatrix ) {
-
-		const result = new Frustum();
-		const point = new Vector3();
+	toSpace( cameraMatrix, target ) {
 
 		for ( var i = 0; i < 4; i ++ ) {
 
-			point.set( this.vertices.near[ i ].x, this.vertices.near[ i ].y, this.vertices.near[ i ].z );
-			point.applyMatrix4( cameraMatrix );
-			result.vertices.near[ i ] = point.clone();
+			target.vertices.near[ i ]
+				.copy( this.vertices.near[ i ] )
+				.applyMatrix4( cameraMatrix );
 
-			point.set( this.vertices.far[ i ].x, this.vertices.far[ i ].y, this.vertices.far[ i ].z );
-			point.applyMatrix4( cameraMatrix );
-			result.vertices.far[ i ] = point.clone();
+			target.vertices.far[ i ]
+				.copy( this.vertices.far[ i ] )
+				.applyMatrix4( cameraMatrix );
 
 		}
-
-		return result;
 
 	}
 

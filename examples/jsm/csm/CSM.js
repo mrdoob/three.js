@@ -12,11 +12,17 @@ import {
 	Object3D,
 	BufferGeometry,
 	BufferAttribute,
-	Line
+	Line,
+	Matrix4
 } from '../../../build/three.module.js';
 import Frustum from './Frustum.js';
 import FrustumBoundingBox from './FrustumBoundingBox.js';
 import Shader from './Shader.js';
+
+const _cameraToLightMatrix = new Matrix4();
+const _frustum = new Frustum();
+const _center = new Vector3();
+const _bbox = new FrustumBoundingBox();
 
 export default class CSM {
 
@@ -158,28 +164,28 @@ export default class CSM {
 
 		for ( let i = 0; i < this.frustums.length; i ++ ) {
 
-			const worldSpaceFrustum = this.frustums[ i ].toSpace( cameraMatrix );
 			const light = this.lights[ i ];
-			const lightSpaceFrustum = worldSpaceFrustum.toSpace( light.shadow.camera.matrixWorldInverse );
+			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
+			this.frustums[ i ].toSpace( _cameraToLightMatrix, _frustum );
 
 			light.shadow.camera.updateMatrixWorld( true );
 
-			const bbox = new FrustumBoundingBox().fromFrustum( lightSpaceFrustum );
-			bbox.getSize();
-			bbox.getCenter( this.lightMargin );
+			_bbox.fromFrustum( _frustum );
+			_bbox.getSize();
+			_bbox.getCenter( this.lightMargin );
 
-			const squaredBBWidth = Math.max( bbox.size.x, bbox.size.y );
+			const squaredBBWidth = Math.max( _bbox.size.x, _bbox.size.y );
 
-			let center = new Vector3( bbox.center.x, bbox.center.y, bbox.center.z );
-			center.applyMatrix4( light.shadow.camera.matrixWorld );
+			_center.copy( _bbox.center );
+			_center.applyMatrix4( light.shadow.camera.matrixWorld );
 
 			light.shadow.camera.left = - squaredBBWidth / 2;
 			light.shadow.camera.right = squaredBBWidth / 2;
 			light.shadow.camera.top = squaredBBWidth / 2;
 			light.shadow.camera.bottom = - squaredBBWidth / 2;
 
-			light.position.copy( center );
-			light.target.position.copy( center );
+			light.position.copy( _center );
+			light.target.position.copy( _center );
 
 			light.target.position.x += this.lightDirection.x;
 			light.target.position.y += this.lightDirection.y;
