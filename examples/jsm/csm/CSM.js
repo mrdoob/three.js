@@ -213,14 +213,7 @@ export default class CSM {
 		material.defines.CSM_CASCADES = this.cascades;
 
 		const breaksVec2 = [];
-
-		for ( let i = 0; i < this.cascades; i ++ ) {
-
-			let amount = this.breaks[ i ];
-			let prev = this.breaks[ i - 1 ] || 0;
-			breaksVec2.push( new Vector2( prev, amount ) );
-
-		}
+		this.getExtendedBreaks( breaksVec2 );
 
 		const self = this;
 		const far = Math.min(this.camera.far, this.maxFar);
@@ -243,27 +236,32 @@ export default class CSM {
 
 		for ( let i = 0; i < this.materials.length; i ++ ) {
 
-			this.materials[ i ].uniforms.CSM_cascades.value = this.getExtendedBreaks();
-			this.materials[ i ].uniforms.cameraNear.value = this.camera.near;
-			this.materials[ i ].uniforms.shadowFar.value = far;
+			const uniforms = this.materials[ i ].uniforms;
+			this.getExtendedBreaks( uniforms.CSM_cascades.value );
+			uniforms.cameraNear.value = this.camera.near;
+			uniforms.shadowFar.value = far;
 
 		}
 
 	}
 
-	getExtendedBreaks() {
+	getExtendedBreaks( target ) {
 
-		let breaksVec2 = [];
+		while ( target.length < this.breaks.length ) {
+
+			target.push( new Vector2() );
+
+		}
+		target.length = this.breaks.length;
 
 		for ( let i = 0; i < this.cascades; i ++ ) {
 
 			let amount = this.breaks[ i ];
 			let prev = this.breaks[ i - 1 ] || 0;
-			breaksVec2.push( new Vector2( prev, amount ) );
+			target[ i ].x = prev;
+			target[ i ].y = amount;
 
 		}
-
-		return breaksVec2;
 
 	}
 
