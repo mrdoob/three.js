@@ -1447,9 +1447,9 @@ THREE.GLTFLoader = ( function () {
 
 		return Promise.all( [
 
-			parser.getDependencies( 'scene' ),
-			parser.getDependencies( 'animation' ),
-			parser.getDependencies( 'camera' ),
+			this.getDependencies( 'scene' ),
+			this.getDependencies( 'animation' ),
+			this.getDependencies( 'camera' ),
 
 		] ).then( function ( dependencies ) {
 
