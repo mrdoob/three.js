@@ -1,19 +1,20 @@
 import { Geometry } from './../core/Geometry';
 import { Material } from './../materials/Material';
+import { MeshBasicMaterial } from './../materials/MeshBasicMaterial';
 import { Raycaster } from './../core/Raycaster';
 import { Object3D } from './../core/Object3D';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Intersection } from '../core/Raycaster';
 
-export class Mesh extends Object3D {
+export class Mesh<
+	TGeometry extends Geometry | BufferGeometry = BufferGeometry,
+	TMaterial extends Material | Material[] = MeshBasicMaterial
+> extends Object3D {
 
-	constructor(
-		geometry?: Geometry | BufferGeometry,
-		material?: Material | Material[]
-	);
+	constructor( geometry?: TGeometry, material?: TMaterial );
 
-	geometry: Geometry | BufferGeometry;
-	material: Material | Material[];
+	geometry: TGeometry;
+	material: TMaterial;
 	morphTargetInfluences?: number[];
 	morphTargetDictionary?: { [key: string]: number };
 	readonly isMesh: true;

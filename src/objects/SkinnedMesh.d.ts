@@ -1,15 +1,19 @@
-import { Geometry } from './../core/Geometry';
 import { Material } from './../materials/Material';
+import { MeshBasicMaterial } from './../materials/MeshBasicMaterial';
+
 import { Matrix4 } from './../math/Matrix4';
 import { Skeleton } from './Skeleton';
 import { Mesh } from './Mesh';
 import { BufferGeometry } from '../core/BufferGeometry';
 
-export class SkinnedMesh extends Mesh {
+export class SkinnedMesh<
+	TGeometry extends BufferGeometry,
+	TMaterial extends Material = MeshBasicMaterial
+> extends Mesh<TGeometry, TMaterial> {
 
 	constructor(
-		geometry?: Geometry | BufferGeometry,
-		material?: Material | Material[],
+		geometry?: TGeometry,
+		material?: TMaterial,
 		useVertexTexture?: boolean
 	);
 

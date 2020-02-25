@@ -1,17 +1,16 @@
-import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Material } from './../materials/Material';
+import { MeshBasicMaterial } from './../materials/MeshBasicMaterial';
 import { BufferAttribute } from './../core/BufferAttribute';
 import { Mesh } from './Mesh';
 import { Matrix4 } from './../math/Matrix4';
 
-export class InstancedMesh extends Mesh {
+export class InstancedMesh<
+	TGeometry extends BufferGeometry,
+	TMaterial extends Material = MeshBasicMaterial
+> extends Mesh<TGeometry, TMaterial> {
 
-	constructor(
-		geometry: Geometry | BufferGeometry,
-		material: Material | Material[],
-		count: number
-	);
+	constructor( geometry: TGeometry, material: TMaterial, count: number );
 
 	count: number;
 	instanceMatrix: BufferAttribute;
