@@ -214,6 +214,7 @@
 
 				requestAnimationFrame( animate );
 
+				camera.updateMatrixWorld();
 				csm.update( camera.matrixWorld );
 				controls.update();
 
