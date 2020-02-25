@@ -2163,9 +2163,9 @@ THREE.GLTFLoader = ( function () {
 
 		var parser = this;
 
-		this._onBefore( 'map', - 1, mapDef );
+		this._onBefore( 'textureInfo', - 1, mapDef );
 
-		var texturePromise = this._on( 'map', - 1, mapDef );
+		var texturePromise = this._on( 'textureInfo', - 1, mapDef );
 
 		if ( ! texturePromise ) {
 
@@ -2215,7 +2215,7 @@ THREE.GLTFLoader = ( function () {
 
 		return texturePromise.then( function ( texture ) {
 
-			return parser._onAfter( 'map', texture, - 1, mapDef );
+			return parser._onAfter( 'textureInfo', texture, - 1, mapDef );
 
 		} ).then( function ( texture ) {
 
