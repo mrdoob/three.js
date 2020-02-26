@@ -11,6 +11,8 @@ import { Plane } from '../../../../src/math/Plane';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Mesh } from '../../../../src/objects/Mesh';
+import { Line } from '../../../../src/objects/Line';
+import { Points } from '../../../../src/objects/Points';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import {
 	BoxGeometry,
@@ -169,6 +171,10 @@ export default QUnit.module( 'Maths', () => {
 			a.setFromObject( object );
 			assert.ok( a.min.equals( new Vector3( - 1, - 1, - 1 ) ), "Correct new minimum" );
 			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Correct new maximum" );
+
+			assert.ok( a.setFromObject( new Mesh() ).isEmpty() === true, "Passed!" );
+			assert.ok( a.setFromObject( new Line() ).isEmpty() === true, "Passed!" );
+			assert.ok( a.setFromObject( new Points() ).isEmpty() === true, "Passed!" );
 
 		} );
 
