@@ -29,15 +29,15 @@ THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
-		var oldOverrideMaterial = this.scene.overrideMaterial;
+		var oldClearColor, oldClearAlpha, oldOverrideMaterial;
 
 		if ( this.overrideMaterial !== undefined ) {
+
+			oldOverrideMaterial = this.scene.overrideMaterial;
 
 			this.scene.overrideMaterial = this.overrideMaterial;
 
 		}
-
-		var oldClearColor, oldClearAlpha;
 
 		if ( this.clearColor ) {
 
@@ -66,7 +66,12 @@ THREE.RenderPass.prototype = Object.assign( Object.create( THREE.Pass.prototype 
 
 		}
 
-		this.scene.overrideMaterial = oldOverrideMaterial;
+		if ( this.overrideMaterial !== undefined ) {
+
+			this.scene.overrideMaterial = oldOverrideMaterial;
+
+		}
+
 		renderer.autoClear = oldAutoClear;
 
 	}
