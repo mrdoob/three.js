@@ -164,20 +164,23 @@ NodeBuilder.prototype = {
 		this.buildShader( 'vertex', vertex );
 		this.buildShader( 'fragment', fragment );
 
-		if ( this.requires.uv[ 0 ] ) {
+		for ( var i = 0; i < this.requires.uv.length; i ++ ) {
 
-			this.addVaryCode( 'varying vec2 vUv;' );
+			if ( this.requires.uv[ i ] ) {
 
-			this.addVertexFinalCode( 'vUv = uv;' );
+				var uvIndex = i > 0 ? i + 1 : '';
 
-		}
+				this.addVaryCode( 'varying vec2 vUv' + uvIndex + ';' );
 
-		if ( this.requires.uv[ 1 ] ) {
+				if ( i > 0 ) {
 
-			this.addVaryCode( 'varying vec2 vUv2;' );
-			this.addVertexParsCode( 'attribute vec2 uv2;' );
+					this.addVertexParsCode( 'attribute vec2 uv' + uvIndex + ';' );
 
-			this.addVertexFinalCode( 'vUv2 = uv2;' );
+				}
+
+				this.addVertexFinalCode( 'vUv' + uvIndex + ' = uv' + uvIndex + ';' );
+
+			}
 
 		}
 
@@ -949,9 +952,7 @@ NodeBuilder.prototype = {
 
 	},
 
-	getTextureEncodingFromMap: function ( map, gammaOverrideLinear ) {
-
-		gammaOverrideLinear = gammaOverrideLinear !== undefined ? gammaOverrideLinear : this.context.gamma && ( this.renderer ? this.renderer.gammaInput : false );
+	getTextureEncodingFromMap: function ( map ) {
 
 		var encoding;
 
@@ -970,8 +971,7 @@ NodeBuilder.prototype = {
 
 		}
 
-		// add backwards compatibility for WebGLRenderer.gammaInput/gammaOutput parameter, should probably be removed at some point.
-		if ( encoding === LinearEncoding && gammaOverrideLinear ) {
+		if ( encoding === LinearEncoding && this.context.gamma ) {
 
 			encoding = GammaEncoding;
 

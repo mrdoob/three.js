@@ -88,25 +88,10 @@ m.elements = [ 11, 21, 31, 41,
 		矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
 		</p>
 
-		<h3>[property:Boolean isMatrix4]</h3>
-		<p>
-			用于判定此对象或者此类的派生对象是否是三维矩阵。默认值为 *true*。<br /><br />
-
-			不应该改变该值，因为它在内部用于优化。
-		</p>
-
 
 
 
 		<h2>方法（Methods）</h2>
-
-		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
-		<p>
-		[page:BufferAttribute attribute] - 表示三维向量缓存属性。<br /><br />
-
-		用这个矩阵乘以缓存属性[page:BufferAttribute attribute]里的所有3d向量。
-		</p>
-
 
 		<h3>[method:Matrix4 clone]()</h3>
 		<p>创建一个新的矩阵，元素[page:.elements elements]与该矩阵相同。</p>

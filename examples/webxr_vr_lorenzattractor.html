@@ -106,7 +106,7 @@
 
 				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var material = new THREE.LineBasicMaterial( { vertexColors: true } );
 
 				attractor = new THREE.Line( geometry, material );
 				attractor.position.set( 0, 1.5, - 2 );

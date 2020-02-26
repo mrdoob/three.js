@@ -29,6 +29,7 @@
 		import * as THREE from '../build/three.module.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { PositionalAudioHelper } from './jsm/helpers/PositionalAudioHelper.js';
 		import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 		var scene, camera, renderer;
@@ -51,7 +52,6 @@
 			var reflectionCube = new THREE.CubeTextureLoader()
 				.setPath( 'textures/cube/SwedishRoyalCastle/' )
 				.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-			reflectionCube.format = THREE.RGBFormat;
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xa0a0a0 );
@@ -99,7 +99,7 @@
 			positionalAudio.setRefDistance( 1 );
 			positionalAudio.setDirectionalCone( 180, 230, 0.1 );
 
-			var helper = new THREE.PositionalAudioHelper( positionalAudio, 0.1 );
+			var helper = new PositionalAudioHelper( positionalAudio, 0.1 );
 			positionalAudio.add( helper );
 
 			//
@@ -144,8 +144,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.gammaOutput = true;
-			renderer.gammaFactor = 2.2;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 

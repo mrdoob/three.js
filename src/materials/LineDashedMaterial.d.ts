@@ -17,7 +17,7 @@ export class LineDashedMaterial extends LineBasicMaterial {
 	scale: number;
 	dashSize: number;
 	gapSize: number;
-	isLineDashedMaterial: boolean;
+	readonly isLineDashedMaterial: true;
 
 	setValues( parameters: LineDashedMaterialParameters ): void;
 

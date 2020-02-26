@@ -130,16 +130,6 @@
 
 
 
-
-
-		<h2>几何体（Geometry）</h2>
-
-		<p>
-			Geometry.computeTangents() 已被删除。<br /><br />
-
-			Geometry.computeLineDistances() 已被删除。 请使用[page:Line.computeLineDistances]。<br /><br />
-		</p>
-
 		<h3>[page:BufferGeometry]</h3>
 		<p>
 			BufferGeometry.addIndex 已被重命名为 [page:BufferGeometry.setIndex]。<br /><br />
@@ -156,13 +146,28 @@
 
 			BufferGeometry.offsets 已被重命名为 [page:BufferGeometry.groups]。<br /><br />
 
+			BufferGeometry.applyMatrix() has been renamed to [page:BufferGeometry.applyMatrix4]().
+
 		</p>
+
+
+
 
 		<h3>[page:CubeGeometry]</h3>
 		<p>CubeGeometry 已被重命名为 [page:BoxGeometry]。</p>
 
+
+
+
 		<h3>[page:Geometry]</h3>
-		<p>Geometry.computeTangents() 已被删除。</p>
+		<p>
+			Geometry.computeTangents() 已被删除。<br /><br />
+
+			Geometry.computeLineDistances() 已被删除。 请使用[page:Line.computeLineDistances]。<br /><br />
+
+			Geometry.applyMatrix() has been renamed to [page:Geometry.applyMatrix4]().
+		</p>
+
 
 		<h3>[page:GeometryUtils]</h3>
 		<p>
@@ -262,6 +267,9 @@
 
 		<h3>[page:Face4]</h3>
 		<p>Face4 已被删除。 请使用[page:Face3]。</p>
+
+		<h3>[page:Frustum]</h3>
+		<p>Frustum.setFromMatrix() has been renamed to [page:Frustum.setFromProjectionMatrix]().</p>
 
 		<h3>[page:Line3]</h3>
 		<p>Line3.center 已被重命名为 [page:Line3.getCenter]()。</p>
@@ -438,7 +446,10 @@
 
 			Object3D.translate() 已被删除。 请使用[page:Object3D.translateOnAxis]( axis, distance )。<br /><br />
 
-			Object3D.useQuaternion 已被删除。 默认情况下，Three.js库是使用quaternions（四元数）的。
+			Object3D.useQuaternion 已被删除。 默认情况下，Three.js库是使用quaternions（四元数）的。<br /><br />
+
+			Object3D.applyMatrix() has been renamed to [page:Object3D.applyMatrix4]().
+
 		</p>
 
 		<h3>[page:LensFlare]</h3>

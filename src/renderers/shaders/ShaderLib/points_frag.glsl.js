@@ -20,15 +20,16 @@ void main() {
 	#include <map_particle_fragment>
 	#include <color_fragment>
 	#include <alphatest_fragment>
+	#include <transparent_fragment>
 
 	outgoingLight = diffuseColor.rgb;
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
-	#include <premultiplied_alpha_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
 	#include <fog_fragment>
+	#include <premultiplied_alpha_fragment>
 
 }
 `;

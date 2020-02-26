@@ -24,6 +24,7 @@ THREE.OBJLoader = ( function () {
 			colors: [],
 			uvs: [],
 
+			materials: {},
 			materialLibraries: [],
 
 			startObject: function ( name, fromDeclaration ) {
@@ -400,8 +401,6 @@ THREE.OBJLoader = ( function () {
 
 		parse: function ( text ) {
 
-			console.time( 'OBJLoader' );
-
 			var state = new ParserState();
 
 			if ( text.indexOf( '\r\n' ) !== - 1 ) {
@@ -622,7 +621,7 @@ THREE.OBJLoader = ( function () {
 					// Handle null terminated files without exception
 					if ( line === '\0' ) continue;
 
-					throw new Error( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
+					console.warn( 'THREE.OBJLoader: Unexpected line: "' + line + '"' );
 
 				}
 
@@ -679,7 +678,8 @@ THREE.OBJLoader = ( function () {
 				for ( var mi = 0, miLen = materials.length; mi < miLen; mi ++ ) {
 
 					var sourceMaterial = materials[ mi ];
-					var material = undefined;
+					var materialHash = sourceMaterial.name + '_' + sourceMaterial.smooth + '_' + hasVertexColors;
+					var material = state.materials[ materialHash ];
 
 					if ( this.materials !== null ) {
 
@@ -705,7 +705,7 @@ THREE.OBJLoader = ( function () {
 
 					}
 
-					if ( ! material ) {
+					if ( material === undefined ) {
 
 						if ( isLine ) {
 
@@ -722,11 +722,12 @@ THREE.OBJLoader = ( function () {
 						}
 
 						material.name = sourceMaterial.name;
+						material.flatShading = sourceMaterial.smooth ? false : true;
+						material.vertexColors = hasVertexColors;
+
+						state.materials[ materialHash ] = material;
 
 					}
-
-					material.flatShading = sourceMaterial.smooth ? false : true;
-					material.vertexColors = hasVertexColors ? THREE.VertexColors : THREE.NoColors;
 
 					createdMaterials.push( material );
 
@@ -782,8 +783,6 @@ THREE.OBJLoader = ( function () {
 				container.add( mesh );
 
 			}
-
-			console.timeEnd( 'OBJLoader' );
 
 			return container;
 

@@ -21,7 +21,7 @@ export class Color {
 	constructor( color?: Color | string | number );
 	constructor( r: number, g: number, b: number );
 
-	isColor: boolean;
+	readonly isColor: true;
 
 	/**
 	 * Red channel value between 0 and 1. Default is 1.

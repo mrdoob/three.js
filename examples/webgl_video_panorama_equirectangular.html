@@ -121,7 +121,7 @@
 
 				distance += event.deltaY * 0.05;
 
-				distance = THREE.Math.clamp( distance, 1, 50 );
+				distance = THREE.MathUtils.clamp( distance, 1, 50 );
 
 			}
 
@@ -135,8 +135,8 @@
 			function update() {
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = THREE.Math.degToRad( 90 - lat );
-				theta = THREE.Math.degToRad( lon );
+				phi = THREE.MathUtils.degToRad( 90 - lat );
+				theta = THREE.MathUtils.degToRad( lon );
 
 				camera.position.x = distance * Math.sin( phi ) * Math.cos( theta );
 				camera.position.y = distance * Math.cos( phi );

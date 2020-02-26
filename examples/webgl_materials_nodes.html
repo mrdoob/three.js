@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material<br />
 			<a id="serialize" href="javascript:void(0);">Serialize and apply</a>
 		</div>
 
@@ -22,8 +22,6 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
-
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			import { NodeMaterialLoader, NodeMaterialLoaderUtils } from './jsm/loaders/NodeMaterialLoader.js';
 
@@ -69,7 +67,7 @@
 
 			}
 
-			var premTexture, pmremCube, pmremGenerator, premSize = 1024;
+			var premTexture, pmremCube;
 
 			function updatePREM( textureCube ) {
 
@@ -81,7 +79,7 @@
 				var magFilter = pmremCube.magFilter;
 				var generateMipmaps = pmremCube.generateMipmaps;
 
-				var pmremGenerator = new PMREMGenerator( renderer );
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				premTexture = pmremGenerator.fromCubemap( pmremCube ).texture;
 				pmremGenerator.dispose();
 
@@ -105,7 +103,6 @@
 				];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls, updatePREM );
-				textureCube.format = THREE.RGBFormat;
 
 				library[ textureCube.uuid ] = textureCube;
 
@@ -120,7 +117,8 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.uuid = THREE.Math.generateUUID(); // generate to library
+				renderer.uuid = THREE.MathUtils.generateUUID(); // generate to library
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				scene = new THREE.Scene();
@@ -1147,7 +1145,7 @@
 
 						function updateUVTransform() {
 
-							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.Math.degToRad( rotate ) );
+							texture.uv.setUvTransform( translate.x, translate.y, scale.x, scale.y, THREE.MathUtils.degToRad( rotate ) );
 
 						}
 

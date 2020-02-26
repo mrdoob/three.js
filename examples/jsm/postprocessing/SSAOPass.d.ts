@@ -21,8 +21,8 @@ export class SSAOPass extends Pass {
 	width: number;
 	height: boolean;
 	clear: boolean;
-	kernelRadius: boolean;
-	kernelSize: boolean;
+	kernelRadius: number;
+	kernelSize: number;
 	kernel: Vector3[];
 	noiseTexture: DataTexture;
 	output: number;

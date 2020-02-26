@@ -23,7 +23,7 @@
 
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - earth [fly controls]<br/>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - earth [fly controls]<br/>
 		<b>WASD</b> move, <b>R|F</b> up | down, <b>Q|E</b> roll, <b>up|down</b> pitch, <b>left|right</b> yaw
 		</div>
 
@@ -83,7 +83,9 @@
 					map: textureLoader.load( "textures/planets/earth_atmos_2048.jpg" ),
 					specularMap: textureLoader.load( "textures/planets/earth_specular_2048.jpg" ),
 					normalMap: textureLoader.load( "textures/planets/earth_normal_2048.jpg" ),
-					normalScale: new THREE.Vector2( 0.85, 0.85 )
+
+					// y scale is negated to compensate for normal map handedness.
+					normalScale: new THREE.Vector2( 0.85, -0.85 )
 
 				} );
 

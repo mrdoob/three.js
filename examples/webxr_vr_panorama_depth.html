@@ -10,7 +10,7 @@
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> vr - panorama with depth<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - panorama with depth<br />
 			Created by <a href="https://orfleisher.com" target="_blank" rel="noopener">@juniorxsound</a>. Panorama from <a href="https://krpano.com/examples/?depthmap" target="_blank" rel="noopener">krpano</a>.
 		</div>
 
@@ -35,7 +35,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
 
-				var light = new THREE.AmbientLight( 0x404040, 10 );
+				var light = new THREE.AmbientLight( 0xffffff, 1 );
 				scene.add( light );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -60,7 +60,6 @@
 				loader.load( './textures/kandao3.jpg', function ( texture ) {
 
 					texture.minFilter = THREE.NearestFilter;
-					texture.format = THREE.RGBFormat;
 					texture.generateMipmaps = false;
 					sphere.material.map = texture;
 
@@ -69,7 +68,6 @@
 				loader.load( './textures/kandao3_depthmap.jpg', function ( depth ) {
 
 					depth.minFilter = THREE.NearestFilter;
-					depth.format = THREE.RGBFormat;
 					depth.generateMipmaps = false;
 					sphere.material.displacementMap = depth;
 
@@ -115,7 +113,7 @@
 
 				// If we are not presenting move the camera a little so the effect is visible
 
-				if ( renderer.xr.isPresenting() === false ) {
+				if ( renderer.xr.isPresenting === false ) {
 
 					var time = clock.getElapsedTime();
 

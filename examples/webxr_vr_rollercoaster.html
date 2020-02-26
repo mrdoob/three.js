@@ -79,7 +79,7 @@
 
 			var geometry = new TreesGeometry( mesh );
 			var material = new THREE.MeshBasicMaterial( {
-				side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+				side: THREE.DoubleSide, vertexColors: true
 			} );
 			var mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );
@@ -129,7 +129,7 @@
 
 			var geometry = new RollerCoasterGeometry( curve, 1500 );
 			var material = new THREE.MeshPhongMaterial( {
-				vertexColors: THREE.VertexColors
+				vertexColors: true
 			} );
 			var mesh = new THREE.Mesh( geometry, material );
 			scene.add( mesh );

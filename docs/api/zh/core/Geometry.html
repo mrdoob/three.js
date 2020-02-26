@@ -96,13 +96,6 @@
 		<h3>[property:Integer id]</h3>
 		<p>当前 geometry 实例的唯一标识符的数。</p>
 
-		<h3>[property:Boolean isGeometry]</h3>
-		<p>
-			用于判断当前类或派生类属于 Geometries。默认值是 *true*。<br /><br />
-
-			你不应该改变该值，该值用于内部优化。
-		</p>
-
 		<h3>[property:array lineDistances]</h3>
 		<p>
 			用于保存线型几何体中每个顶点间距离的。在正确渲染 [page:LineDashedMaterial] 时，需要用到该数据。
@@ -205,7 +198,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] 该类中可用的函数。</h3>
 
-		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p> 将矩阵信息直接应用于几何体顶点坐标。</p>
 
 		<h3>[method:Geometry center] ()</h3>

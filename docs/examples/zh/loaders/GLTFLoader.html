@@ -71,8 +71,8 @@
 				scene.add( gltf.scene );
 
 				gltf.animations; // Array&lt;THREE.AnimationClip&gt;
-				gltf.scene; // THREE.Scene
-				gltf.scenes; // Array&lt;THREE.Scene&gt;
+				gltf.scene; // THREE.Group
+				gltf.scenes; // Array&lt;THREE.Group&gt;
 				gltf.cameras; // Array&lt;THREE.Camera&gt;
 				gltf.asset; // Object
 
@@ -107,8 +107,7 @@
 		颜色空间并显示在屏幕上。除非你需要使用线性颜色空间进行后期处理，否则请在使用glTF的时候将[page:WebGLRenderer]进行如下配置：</p>
 
 		<code>
-		renderer.gammaOutput = true;
-		renderer.gammaFactor = 2.2;
+		renderer.outputEncoding = THREE.sRGBEncoding;
 		</code>
 
 		<p>假设渲染器的配置如上所示，则GLTFLoader将可以正确地自动配置从.gltf或.glb文件中引用的纹理。
@@ -125,7 +124,7 @@
 		<h2>自定义扩展</h2>
 
 		<p>
-			来自未知扩展的元数据会被保存到Object3D、Scene和Material实例中上的“.userData.gltfExtensions”，
+			来自未知扩展的元数据会被保存到Object3D、Group和Material实例中上的“.userData.gltfExtensions”，
 			或被附加到 response “gltf”对象。示例：
 		</p>
 
@@ -195,7 +194,7 @@
 		[page:Function onError] — （可选）若在解析过程发生错误，将被调用的函数。该函数接收error来作为参数。<br />
 		</p>
 		<p>
-		解析基于glTF的ArrayBuffer或<em>JSON</em>字符串，并在完成后触发[page:Function onLoad]回调。[page:Function onLoad]的参数将是一个包含有已加载部分的[page:object]：.[page:Scene scene]、 .[page:Array scenes]、 .[page:Array cameras]、 .[page:Array animations] 和 .[page:Object asset]。
+		解析基于glTF的ArrayBuffer或<em>JSON</em>字符串，并在完成后触发[page:Function onLoad]回调。[page:Function onLoad]的参数将是一个包含有已加载部分的[page:object]：.[page:Group scene]、 .[page:Array scenes]、 .[page:Array cameras]、 .[page:Array animations] 和 .[page:Object asset]。
 		</p>
 
 		<h2>源代码</h2>

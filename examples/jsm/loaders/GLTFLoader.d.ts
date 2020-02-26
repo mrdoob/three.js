@@ -1,9 +1,9 @@
 import {
 	AnimationClip,
 	Camera,
+	Group,
 	Loader,
-	LoadingManager,
-	Scene
+	LoadingManager
 } from '../../../src/Three';
 
 import { DRACOLoader } from './DRACOLoader';
@@ -11,8 +11,8 @@ import { DDSLoader } from './DDSLoader';
 
 export interface GLTF {
 	animations: AnimationClip[];
-	scene: Scene;
-	scenes: Scene[];
+	scene: Group;
+	scenes: Group[];
 	cameras: Camera[];
 	asset: {
 		copyright?: string;
@@ -29,8 +29,8 @@ export interface GLTF {
 export class GLTFLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
-	dracoLoader: DRACOLoader | null;
-	ddsLoader: DDSLoader | null;
+	dracoLoader: DRACOLoader | null;
+	ddsLoader: DDSLoader | null;
 
 	load( url: string, onLoad: ( gltf: GLTF ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 	setDRACOLoader( dracoLoader: DRACOLoader ): GLTFLoader;
@@ -43,7 +43,7 @@ export class GLTFParser {
 
 	json: any;
 
-	getDependency: (type: string, index: number) => Promise<any>;
-	getDependencies: (type: string) => Promise<any[]>;
+	getDependency: ( type: string, index: number ) => Promise<any>;
+	getDependencies: ( type: string ) => Promise<any[]>;
 
 }

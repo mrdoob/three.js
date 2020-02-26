@@ -841,7 +841,7 @@ THREE.VRMLLoader = ( function () {
 					if ( skyColor.length > 3 ) {
 
 						paintFaces( skyGeometry, radius, skyAngle, toColorArray( skyColor ), true );
-						skyMaterial.vertexColors = THREE.VertexColors;
+						skyMaterial.vertexColors = true;
 
 					} else {
 
@@ -861,7 +861,7 @@ THREE.VRMLLoader = ( function () {
 					if ( groundColor.length > 0 ) {
 
 						var groundGeometry = new THREE.SphereBufferGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
-						var groundMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide, vertexColors: THREE.VertexColors, depthWrite: false, depthTest: false } );
+						var groundMaterial = new THREE.MeshBasicMaterial( { fog: false, side: THREE.BackSide, vertexColors: true, depthWrite: false, depthTest: false } );
 
 						paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
 
@@ -935,7 +935,7 @@ THREE.VRMLLoader = ( function () {
 
 						if ( geometry.attributes.color !== undefined ) {
 
-							pointsMaterial.vertexColors = THREE.VertexColors;
+							pointsMaterial.vertexColors = true;
 
 						} else {
 
@@ -957,7 +957,7 @@ THREE.VRMLLoader = ( function () {
 
 						if ( geometry.attributes.color !== undefined ) {
 
-							lineMaterial.vertexColors = THREE.VertexColors;
+							lineMaterial.vertexColors = true;
 
 						} else {
 
@@ -987,7 +987,7 @@ THREE.VRMLLoader = ( function () {
 
 						if ( geometry.attributes.color !== undefined ) {
 
-							material.vertexColors = THREE.VertexColors;
+							material.vertexColors = true;
 
 						}
 
@@ -2035,7 +2035,7 @@ THREE.VRMLLoader = ( function () {
 				// materials can be influenced by the geometry (e.g. vertex normals). cloning is necessary to avoid
 				// any side effects
 
-				return ( build.isObject3D || build.isMaterial ) ? build.clone() : build;
+				return ( build.isObject3D || build.isMaterial ) ? build.clone() : build;
 
 			}
 

@@ -29,7 +29,7 @@
 			<li> 从 THREE r72开始，不再支持在ShaderMaterial中直接分配属性。
 				必须使用 [page:BufferGeometry]实例 (而不是 [page:Geometry] 实例)，使用[page:BufferAttribute]实例来定义自定义属性。
 			</li>
-			<li> 从 THREE r77开始，[page:WebGLRenderTarget] 或 [page:WebGLRenderTargetCube] 实例不再被用作uniforms。
+			<li> 从 THREE r77开始，[page:WebGLRenderTarget] 或 [page:WebGLCubeRenderTarget] 实例不再被用作uniforms。
 				必须使用它们的[page:Texture texture] 属性。
 			</li>
 			<li> 内置attributes和uniforms与代码一起传递到shaders。
@@ -314,11 +314,6 @@ this.extensions = {
 
 		</p>
 
-		<h3>[property:Boolean isShaderMaterial]</h3>
-		<p> 用于检查此类或派生类是否为着色器材质。默认值为 *true*。<br /><br />
-			因为其通常用在内部优化，所以不应该更改该属性值。
-		</p>
-
 		<h3>[property:Boolean lights]</h3>
 		<p> 材质是否受到光照的影响。默认值为 *false*。如果传递与光照相关的uniform数据到这个材质，则为true。默认是false。
 		</p>
@@ -362,11 +357,14 @@ this.extensions = {
 			注意，uniforms逐帧被刷新，所以更新uniform值将立即更新GLSL代码中的相应值。
 		</p>
 
+		<h3>[property:Boolean uniformsNeedUpdate]</h3>
+		<p>
+		Can be used to force a uniform update while changing uniforms in [page:Object3D.onBeforeRender](). Default is *false*.
+		</p>
 
-		<h3>[property:Number vertexColors]</h3>
-		<p> 通过定义*colors*属性的生成方式来定义顶点是如何着色的。
-			可选值为[page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] 和
-			[page:Materials THREE.VertexColors]。 缺省为 THREE.NoColors。
+		<h3>[property:Boolean vertexColors]</h3>
+		<p>
+		Defines whether vertex coloring is used. Default is *false*.
 		</p>
 
 		<h3>[property:String vertexShader]</h3>

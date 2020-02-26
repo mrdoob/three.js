@@ -22,7 +22,7 @@
 
 	<div id="container"></div>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing - lambert shader
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - instancing - lambert shader
 		<div id="notSupported" style="display:none">Sorry your graphics card + browser does not support hardware instancing</div>
 	</div>
 
@@ -35,7 +35,7 @@
 		import { Curves } from './jsm/curves/CurveExtras.js';
 
 		// this is a cut-and-paste of the depth shader -- modified to accommodate instancing for this app
-		var customDepthVertexShader = 
+		var customDepthVertexShader =
 			`
 			// instanced
 			attribute vec3 instanceOffset;
@@ -165,7 +165,7 @@
 			renderer.shadowMap.enabled = true;
 			document.body.appendChild( renderer.domElement );
 
-			renderer.gammaOutput = true;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 
 			scene = new THREE.Scene();
 
@@ -260,7 +260,7 @@
 				combine: THREE.MultiplyOperation,
 				reflectivity: 0.8,
 
-				vertexColors: THREE.VertexColors,
+				vertexColors: true,
 				fog: true
 
 			} );

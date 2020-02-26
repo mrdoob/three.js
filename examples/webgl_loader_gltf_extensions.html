@@ -5,11 +5,16 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: white;
+			}
+		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			<a href="https://github.com/KhronosGroup/glTF" target="_blank" rel="noopener">glTF</a> 2.0 loader<br />
 			<div id="description"></div>
 		</div>
@@ -26,7 +31,6 @@
 			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
@@ -79,21 +83,6 @@
 					shadows: true,
 					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-Draco' ]
 				},
-				Monster: {
-					name: 'Monster',
-					url: './models/gltf/Monster/%s/Monster.gltf',
-					author: '3drt.com',
-					authorURL: 'http://www.3drt.com/downloads.htm',
-					cameraPos: new THREE.Vector3( 3, 1, 7 ),
-					objectScale: new THREE.Vector3( 0.04, 0.04, 0.04 ),
-					objectPosition: new THREE.Vector3( 0.2, 0.1, 0 ),
-					objectRotation: new THREE.Euler( 0, - 3 * Math.PI / 4, 0 ),
-					animationTime: 3,
-					addLights: true,
-					shadows: true,
-					addGround: true,
-					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary', 'glTF-Draco', 'glTF-lights' ]
-				},
 				'Cesium Man': {
 					name: 'Cesium Man',
 					url: './models/gltf/CesiumMan/%s/CesiumMan.gltf',
@@ -129,6 +118,15 @@
 					shadows: true,
 					extensions: [ 'glTF' ]
 				},
+				'Alpha Blend Mode Test': {
+					name: 'Alpha Blend Mode Test',
+					url: './models/gltf/AlphaBlendModeTest/%s/AlphaBlendModeTest.gltf',
+					author: 'Analytical Graphics, Inc.',
+					authorURL: 'https://www.agi.com/home',
+					cameraPos: new THREE.Vector3( 0, 3, 10 ),
+					addEnvMap: true,
+					extensions: [ 'glTF', 'glTF-Embedded', 'glTF-Binary' ]
+				},
 			};
 
 			var state = {
@@ -141,10 +139,10 @@
 
 				container = document.getElementById( 'container' );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { alpha: true, antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.physicallyCorrectLights = true;
 				container.appendChild( renderer.domElement );
 
@@ -157,7 +155,6 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'venice_sunset_1k.hdr', function ( texture ) {
 
-						var pmremGenerator = new PMREMGenerator( renderer );
 						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
 
@@ -170,6 +167,9 @@
 						animate();
 
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 			}
 
@@ -186,7 +186,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.01, 100 );
 				scene.add( camera );
 
 				var spot1;

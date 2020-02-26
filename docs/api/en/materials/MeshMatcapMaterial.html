@@ -96,13 +96,6 @@
 			Without a displacement map set, this value is not applied. Default is 0.
 		</p>
 
-		<h3>[property:Boolean isMeshMatcapMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are mesh Matcap materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:Texture map]</h3>
 		<p>The color map. Default is null. The texture map color is modulated by the diffuse [page:.color].</p>
 
@@ -122,6 +115,8 @@
 		<p>
 			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
 			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
+			In case the material has a normal map authored using the left handed convention, the y component of normalScale
+			should be negated to compensate for the different handedness.
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>

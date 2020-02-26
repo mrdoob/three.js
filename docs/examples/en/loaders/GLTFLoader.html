@@ -72,8 +72,8 @@
 				scene.add( gltf.scene );
 
 				gltf.animations; // Array&lt;THREE.AnimationClip&gt;
-				gltf.scene; // THREE.Scene
-				gltf.scenes; // Array&lt;THREE.Scene&gt;
+				gltf.scene; // THREE.Group
+				gltf.scenes; // Array&lt;THREE.Group&gt;
 				gltf.cameras; // Array&lt;THREE.Camera&gt;
 				gltf.asset; // Object
 
@@ -111,8 +111,7 @@
 		in linear colorspace, always configure [page:WebGLRenderer] as follows when using glTF:</p>
 
 		<code>
-		renderer.gammaOutput = true;
-		renderer.gammaFactor = 2.2;
+		renderer.outputEncoding = THREE.sRGBEncoding;
 		</code>
 
 		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the
@@ -200,7 +199,7 @@
 		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</p>
 		<p>
-		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
+		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Group scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
 		</p>
 
 		<h2>Source</h2>

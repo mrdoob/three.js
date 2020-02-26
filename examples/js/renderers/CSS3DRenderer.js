@@ -10,6 +10,7 @@ THREE.CSS3DObject = function ( element ) {
 
 	this.element = element;
 	this.element.style.position = 'absolute';
+	this.element.style.pointerEvents = 'auto';
 
 	this.addEventListener( 'removed', function () {
 
@@ -43,6 +44,8 @@ THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite;
 
 THREE.CSS3DRenderer = function () {
 
+	var _this = this;
+
 	var _width, _height;
 	var _widthHalf, _heightHalf;
 
@@ -62,6 +65,7 @@ THREE.CSS3DRenderer = function () {
 
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
+	cameraElement.style.pointerEvents = 'none';
 
 	domElement.appendChild( cameraElement );
 
@@ -157,9 +161,11 @@ THREE.CSS3DRenderer = function () {
 
 	}
 
-	function renderObject( object, camera, cameraCSSMatrix ) {
+	function renderObject( object, scene, camera, cameraCSSMatrix ) {
 
 		if ( object instanceof THREE.CSS3DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			var style;
 
@@ -211,11 +217,13 @@ THREE.CSS3DRenderer = function () {
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera, cameraCSSMatrix );
+			renderObject( object.children[ i ], scene, camera, cameraCSSMatrix );
 
 		}
 
@@ -294,8 +302,7 @@ THREE.CSS3DRenderer = function () {
 
 		}
 
-		scene.updateMatrixWorld();
-
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		if ( camera.isOrthographicCamera ) {
@@ -321,7 +328,7 @@ THREE.CSS3DRenderer = function () {
 
 		}
 
-		renderObject( scene, camera, cameraCSSMatrix );
+		renderObject( scene, scene, camera, cameraCSSMatrix );
 
 		if ( isIE ) {
 

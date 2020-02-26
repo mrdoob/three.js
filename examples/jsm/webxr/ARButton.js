@@ -5,9 +5,9 @@
 
 var ARButton = {
 
-	createButton: function ( renderer ) {
+	createButton: function ( renderer, sessionInit = {} ) {
 
-		function showEnterXR( /*device*/ ) {
+		function showStartAR( /*device*/ ) {
 
 			var currentSession = null;
 
@@ -33,7 +33,6 @@ var ARButton = {
 
 				currentSession.removeEventListener( 'end', onSessionEnded );
 
-				renderer.xr.setSession( null );
 				button.textContent = 'START AR';
 
 				currentSession = null;
@@ -66,7 +65,7 @@ var ARButton = {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-ar' ).then( onSessionStarted );
+					navigator.xr.requestSession( 'immersive-ar', sessionInit ).then( onSessionStarted );
 
 				} else {
 
@@ -93,11 +92,11 @@ var ARButton = {
 
 		}
 
-		function showXRNotFound() {
+		function showARNotSupported() {
 
 			disableButton();
 
-			button.textContent = 'XR NOT FOUND';
+			button.textContent = 'AR NOT SUPPORTED';
 
 		}
 
@@ -127,31 +126,24 @@ var ARButton = {
 
 			navigator.xr.isSessionSupported( 'immersive-ar' ).then( function ( supported ) {
 
-				if ( supported ) {
+				supported ? showStartAR() : showARNotSupported();
 
-					showEnterXR();
-
-				} else {
-
-					showXRNotFound();
-
-				}
-
-			} );
+			} ).catch( showARNotSupported );
 
 			return button;
 
 		} else {
 
 			var message = document.createElement( 'a' );
-			message.href = 'https://immersive-web.github.io/webxr/';
 
 			if ( window.isSecureContext === false ) {
 
+				message.href = document.location.href.replace( /^http:/, 'https:' );
 				message.innerHTML = 'WEBXR NEEDS HTTPS'; // TODO Improve message
 
 			} else {
 
+				message.href = 'https://immersiveweb.dev/';
 				message.innerHTML = 'WEBXR NOT AVAILABLE';
 
 			}

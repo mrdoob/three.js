@@ -34,6 +34,7 @@ void main() {
 	#include <map_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
+	#include <transparent_fragment>
 	#include <normal_fragment_begin>
 	#include <normal_fragment_maps>
 
@@ -57,10 +58,10 @@ void main() {
 
 	gl_FragColor = vec4( outgoingLight, diffuseColor.a );
 
-	#include <premultiplied_alpha_fragment>
 	#include <tonemapping_fragment>
 	#include <encodings_fragment>
 	#include <fog_fragment>
+	#include <premultiplied_alpha_fragment>
 
 }
 `;

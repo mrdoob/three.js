@@ -1,6 +1,6 @@
 export interface WebGLCapabilitiesParameters {
-	precision?: any;
-	logarithmicDepthBuffer?: any;
+	precision?: string;
+	logarithmicDepthBuffer?: boolean;
 }
 
 export class WebGLCapabilities {
@@ -11,20 +11,20 @@ export class WebGLCapabilities {
 		parameters: WebGLCapabilitiesParameters
 	);
 
-	isWebGL2: boolean;
-	precision: any;
-	logarithmicDepthBuffer: any;
-	maxTextures: any;
-	maxVertexTextures: any;
-	maxTextureSize: any;
-	maxCubemapSize: any;
-	maxAttributes: any;
-	maxVertexUniforms: any;
-	maxVaryings: any;
-	maxFragmentUniforms: any;
-	vertexTextures: any;
-	floatFragmentTextures: any;
-	floatVertexTextures: any;
+	readonly isWebGL2: true;
+	precision: string;
+	logarithmicDepthBuffer: boolean;
+	maxTextures: number;
+	maxVertexTextures: number;
+	maxTextureSize: number;
+	maxCubemapSize: number;
+	maxAttributes: number;
+	maxVertexUniforms: number;
+	maxVaryings: number;
+	maxFragmentUniforms: number;
+	vertexTextures: boolean;
+	floatFragmentTextures: boolean;
+	floatVertexTextures: boolean;
 
 	getMaxAnisotropy(): number;
 	getMaxPrecision( precision: string ): string;

@@ -34,7 +34,6 @@
 		<p>[example:webgl_rtt rtt ]</p>
 		<p>[example:webgl_shaders_tonemapping shaders / tonemapping ]</p>
 		<p>[example:webgl_shadowmap shadowmap ]</p>
-		<p>[example:webgl_terrain_dynamic terrain / dynamic ]</p>
 
 		<code>var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
 scene.add( camera );</code>
@@ -75,12 +74,6 @@ scene.add( camera );</code>
 			摄像机视锥体远端面，其默认值为*2000*。<br /><br />
 			其值的有效范围介于[page:.near near]（摄像机视锥体近端面）和无穷大之间。
 
-		</p>
-
-		<h3>[property:Boolean isOrthographicCamera]</h3>
-		<p>
-			用于测试这个类或者派生类是否为OrthographicCameras，默认为*true*。<br /><br />
-			你不应当对这个属性进行改变,因为它在内部由渲染器使用，以用于优化。
 		</p>
 
 		<h3>[property:Float left]</h3>

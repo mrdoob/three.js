@@ -5,21 +5,12 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			body {
-				color: #444;
-			}
-			a {
-				color: #44f;
-			}
-		</style>
-
 	</head>
 	<body>
 
 		<div id="container">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test by <a href="https://jsantell.com/" target="_blank" rel="noopener">Jordan Santell</a>
 			</div>
 		</div>
@@ -28,10 +19,7 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-
-			var scene, camera, renderer, envMap, radianceMap;
-			var right = 8;
+			var scene, camera, renderer, radianceMap;
 
 			function init() {
 
@@ -114,7 +102,7 @@
 					var envScene = new THREE.Scene();
 					envScene.background = new THREE.Color( 0xcccccc );
 
-					var pmremGenerator = new PMREMGenerator( renderer );
+					var pmremGenerator = new THREE.PMREMGenerator( renderer );
 					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 					pmremGenerator.dispose();
 

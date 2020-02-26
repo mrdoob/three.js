@@ -13,15 +13,16 @@
 		<h1>镜头光晕（[name]）</h1>
 
 		<p class="desc">
-			创建一个模拟追踪着灯光的镜头光晕。<br /><br />
+			创建一个模拟追踪着灯光的镜头光晕。
 		</p>
 
 		<h2>示例</h2>
 
 		<p>
-			[example:webgl_lensflares lensflares]
+			[example:webgl_lensflares WebGL / lensflares]
+		</p>
 
-			<code>
+		<code>
 var light = new THREE.PointLight( 0xffffff, 1.5, 2000 );
 
 var textureLoader = new THREE.TextureLoader();
@@ -37,9 +38,7 @@ lensflare.addElement( new THREE.LensflareElement( textureFlare1, 512, 0 ) );
 lensflare.addElement( new THREE.LensflareElement( textureFlare2, 60, 0.6 ) );
 
 light.add( lensflare );
-			</code>
-
-		</p>
+		</code>
 
 		<h2>Constructor</h2>
 
@@ -54,13 +53,6 @@ light.add( lensflare );
 
 		<h2>属性</h2>
 		<p>请参阅其基类[page:Mesh]来了解共有属性。</p>
-
-		<h3>[property:Boolean isLensflare]</h3>
-		<p>
-			用于检查这个类或者派生类是否为lensflares，默认为*true*。<br /><br />
-
-			你不应当对这个属性进行改变,因为它在内部使用，以用于优化。
-		</p>
 
 
 		<h2>源代码</h2>

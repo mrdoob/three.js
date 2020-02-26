@@ -25,16 +25,16 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 	isLineSegmentsGeometry: true,
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		var start = this.attributes.instanceStart;
 		var end = this.attributes.instanceEnd;
 
 		if ( start !== undefined ) {
 
-			matrix.applyToBufferAttribute( start );
+			start.applyMatrix4( matrix );
 
-			matrix.applyToBufferAttribute( end );
+			end.applyMatrix4( matrix );
 
 			start.data.needsUpdate = true;
 
@@ -238,6 +238,14 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 	toJSON: function () {
 
 		// todo
+
+	},
+
+	applyMatrix: function ( matrix ) {
+
+		console.warn( 'THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().' );
+
+		return this.applyMatrix4( matrix );
 
 	}
 

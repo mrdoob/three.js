@@ -10,7 +10,7 @@
 <body>
 	<div id="container"></div>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		<a href="https://github.com/google/draco" target="_blank" rel="noopener">DRACO</a> loader
 	</div>
 
@@ -80,8 +80,7 @@
 			renderer = new THREE.WebGLRenderer( { antialias: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.gammaInput = true;
-			renderer.gammaOutput = true;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.shadowMap.enabled = true;
 			container.appendChild( renderer.domElement );
 

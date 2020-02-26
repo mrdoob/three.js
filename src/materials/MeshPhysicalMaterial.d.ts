@@ -15,14 +15,13 @@ export interface MeshPhysicalMaterialParameters
 	sheen?: Color;
 
 	clearcoatNormalScale?: Vector2;
-	clearcoatNormalMap?: Texture | null;
+	clearcoatNormalMap?: Texture | null;
 }
 
 export class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	constructor( parameters: MeshPhysicalMaterialParameters );
 
-	defines: any;
 	reflectivity: number;
 	clearcoat: number;
 	clearcoatRoughness: number;

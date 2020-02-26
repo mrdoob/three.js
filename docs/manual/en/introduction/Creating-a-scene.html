@@ -24,7 +24,7 @@
 				&lt;title&gt;My first three.js app&lt;/title&gt;
 				&lt;style&gt;
 					body { margin: 0; }
-					canvas { width: 100%; height: 100% }
+					canvas { display: block; }
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
@@ -72,7 +72,7 @@
 		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
 
 		<code>
-		var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+		var geometry = new THREE.BoxGeometry();
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var cube = new THREE.Mesh( geometry, material );
 		scene.add( cube );
@@ -126,7 +126,7 @@
 				&lt;title&gt;My first three.js app&lt;/title&gt;
 				&lt;style&gt;
 					body { margin: 0; }
-					canvas { width: 100%; height: 100% }
+					canvas { display: block; }
 				&lt;/style&gt;
 			&lt;/head&gt;
 			&lt;body&gt;
@@ -139,7 +139,7 @@
 					renderer.setSize( window.innerWidth, window.innerHeight );
 					document.body.appendChild( renderer.domElement );
 
-					var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+					var geometry = new THREE.BoxGeometry();
 					var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 					var cube = new THREE.Mesh( geometry, material );
 					scene.add( cube );

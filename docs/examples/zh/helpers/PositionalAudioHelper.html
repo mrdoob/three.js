@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">这一辅助对象显示[page:PositionalAudio]的方向锥。</p>
+
+		<h2>示例</h2>
+
+		<div>[example:webaudio_orientation webaudio / orientation ]</div>
+
+		<h2>示例代码</h2>
+		<code>
+var positionalAudio = new THREE.PositionalAudio( listener );
+positionalAudio.setDirectionalCone( 180, 230, 0.1 );
+
+var helper = new PositionalAudioHelper( positionalAudio );
+positionalAudio.add( helper );
+		</code>
+
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:PositionalAudio audio], [param:Number range] )</h3>
+		<p>
+			[page:PositionalAudio audio] -- 将会被可视化的[page:PositionalAudio]。<br /><br/>
+
+			[page:Number range] -- （可选）方向锥的范围。<br /><br/>
+
+			[page:Number divisionsInnerAngle] -- （可选）方向锥内侧部分的分段数。<br /><br/>
+
+			[page:Number divisionsOuterAngle] -- （可选）方向锥外侧部分的分段数。<br /><br/>
+		</p>
+
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Object3D]。</p>
+
+		<h3>[property:PositionalAudio audio]</h3>
+		<p>将会被可视化的[page:PositionalAudio]。</p>
+
+		<h3>[property:Number range]</h3>
+		<p>方向锥的范围。</p>
+
+		<h3>[property:Number divisionsInnerAngle]</h3>
+		<p>方向锥内侧部分的分段数。</p>
+
+		<h3>[property:Number divisionsOuterAngle]</h3>
+		<p>方向锥外侧部分的分段数。</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Object3D]。</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>废置这一辅助对象。</p>
+
+		<h3>[method:null update]()</h3>
+		<p>更新这一辅助对象。</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/PositionalAudioHelper.js examples/jsm/helpers/PositionalAudioHelper.js]
+		</p>
+	</body>
+</html>

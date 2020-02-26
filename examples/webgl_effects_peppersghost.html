@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="https://en.wikipedia.org/wiki/Pepper%27s_ghost">peppers ghost effect</a> demo <br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="https://en.wikipedia.org/wiki/Pepper%27s_ghost">peppers ghost effect</a> demo <br />
 			<a href="http://www.instructables.com/id/Reflective-Prism/?ALLSTEPS" target="_blank" rel="noopener">how to build the reflective prism</a>
 		</div>
 
@@ -70,7 +70,7 @@
 
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
 				for ( var i = 0; i < 10; i ++ ) {
 

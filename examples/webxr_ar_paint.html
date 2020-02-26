@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - paint
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - paint<br/>Enable chrome://flags/#webxr-ar-module<br/>(Chrome Android 80+)
 		</div>
 
 		<script type="module">
@@ -22,7 +22,7 @@
 			var camera, scene, renderer;
 			var controller, painter;
 
-			var up = new THREE.Vector3( 0, 1, 0 );
+			var cursor = new THREE.Vector3();
 
 			init();
 			animate();
@@ -31,14 +31,6 @@
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
-
-				var info = document.createElement( 'div' );
-				info.style.position = 'absolute';
-				info.style.top = '10px';
-				info.style.width = '100%';
-				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> ar - paint<br/>Enable chrome://flags/#webxr-ar-module<br/>(Chrome 80+)';
-				container.appendChild( info );
 
 				scene = new THREE.Scene();
 
@@ -87,8 +79,6 @@
 				controller = renderer.xr.getController( 0 );
 				controller.addEventListener( 'selectstart', onSelectStart );
 				controller.addEventListener( 'selectend', onSelectEnd );
-				controller.userData.points = [ new THREE.Vector3(), new THREE.Vector3() ];
-				controller.userData.matrices = [ new THREE.Matrix4(), new THREE.Matrix4() ];
 				controller.userData.skipFrames = 0;
 				scene.add( controller );
 
@@ -113,14 +103,7 @@
 
 				var userData = controller.userData;
 
-				var point1 = userData.points[ 0 ];
-				var point2 = userData.points[ 1 ];
-
-				var matrix1 = userData.matrices[ 0 ];
-				var matrix2 = userData.matrices[ 1 ];
-
-				point1.set( 0, 0, - 0.2 ).applyMatrix4( controller.matrixWorld );
-				matrix1.lookAt( point2, point1, up );
+				cursor.set( 0, 0, - 0.2 ).applyMatrix4( controller.matrixWorld );
 
 				if ( userData.isSelecting === true ) {
 
@@ -130,20 +113,16 @@
 
 						userData.skipFrames --;
 
+						painter.moveTo( cursor );
+
 					} else {
 
-						var count = painter.mesh.geometry.drawRange.count;
-
-						painter.stroke( point1, point2, matrix1, matrix2 );
-
-						painter.updateGeometry( count, painter.mesh.geometry.drawRange.count );
+						painter.lineTo( cursor );
+						painter.update();
 
 					}
 
 				}
-
-				point2.copy( point1 );
-				matrix2.copy( matrix1 );
 
 			}
 

@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - VRMLoader<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - VRMLoader<br />
 			Alicia by
 			<a href="https://3d.nicovideo.jp/works/td32797" target="_blank" rel="noopener">Dwango</a> /
 			<a href="http://3d.nicovideo.jp/alicia/rule.html">License</a><br />
@@ -93,7 +93,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );
