@@ -7,7 +7,7 @@ const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const pixelmatch = require( 'pixelmatch' );
 const printImage = require( 'image-output' );
-const png = require( 'pngjs' ).PNG;
+const jimp = require( 'jimp' );
 const fs = require( 'fs' );
 
 const port = 1234;
@@ -35,6 +35,11 @@ const pageSizeMaxTax = 5.0; // in mb, when networkTax = networkTax
 const renderTimeout = 1200;
 const maxAttemptId = 3; // progresseve attempts
 const progressFunc = n => 1 + n;
+
+const width = 800;
+const height = 600;
+const jpgScale = 0.4;
+const jpgQuality = 90;
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
@@ -83,7 +88,7 @@ const pup = puppeteer.launch( {
 	/* Prepare page */
 
 	const page = ( await browser.pages() )[ 0 ];
-	await page.setViewport( { width: 800, height: 600 } );
+	await page.setViewport( { width, height } );
 
 	const injection = fs.readFileSync( 'test/diff/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
@@ -252,7 +257,11 @@ const pup = puppeteer.launch( {
 				/* Make screenshots */
 
 				attemptId = maxAttemptId;
-				await page.screenshot( { path: `./examples/screenshots/${ file }.png` } );
+				let bitmap = ( await jimp.read( await page.screenshot() ) )
+					.write( `./examples/screenshots/${ file }.png`)
+					.scale( jpgScale ).quality( jpgQuality )
+					.write( `./examples/screenshots/${ file }_thumbnail.jpg` ).bitmap;
+				printImage( bitmap, console );
 				console.green( `file: ${ file } generated` );
 
 
@@ -261,9 +270,9 @@ const pup = puppeteer.launch( {
 
 				/* Diff screenshots */
 
-				let actual = png.sync.read( await page.screenshot() );
-				let expected = png.sync.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) );
-				let diff = new png( { width: actual.width, height: actual.height } );
+				let actual = ( await jimp.read( await page.screenshot() ) ).bitmap;
+				let expected = ( await jimp.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) ) ).bitmap;
+				let diff = actual;
 
 				let numFailedPixels;
 				try {
