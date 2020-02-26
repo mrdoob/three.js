@@ -329,7 +329,6 @@ var files = {
 		"webxr_vr_cubes",
 		"webxr_vr_dragging",
 		"webxr_vr_lorenzattractor",
-		"webxr_vr_multiview",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
 		"webxr_vr_paint",
