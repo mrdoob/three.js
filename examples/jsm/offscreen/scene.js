@@ -1,3 +1,5 @@
+import * as THREE from '../../../build/three.module.js';
+
 var camera, scene, renderer, group;
 
 function init( canvas, width, height, pixelRatio, path ) {
@@ -80,3 +82,5 @@ function random() {
 	return x - Math.floor( x );
 
 }
+
+export default init;
