@@ -1,12 +1,12 @@
 import {
-	Object3D
+	Camera
 } from '../../../src/Three';
 
 export class DeviceOrientationControls {
 
-	constructor( object: Object3D );
+	constructor( object: Camera );
 
-	object: Object3D;
+	object: Camera;
 
 	// API
 

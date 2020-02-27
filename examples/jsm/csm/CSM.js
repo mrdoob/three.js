@@ -196,6 +196,7 @@ export default class CSM {
 				squaredBBWidth += margin;
 
 			}
+
 			light.shadow.camera.left = - squaredBBWidth / 2;
 			light.shadow.camera.right = squaredBBWidth / 2;
 			light.shadow.camera.top = squaredBBWidth / 2;

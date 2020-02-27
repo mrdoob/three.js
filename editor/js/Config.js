@@ -8,6 +8,7 @@ var Config = function () {
 
 	var storage = {
 		'language': 'en',
+		'exportPrecision': 6,
 
 		'autosave': true,
 

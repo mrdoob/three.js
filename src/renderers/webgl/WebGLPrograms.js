@@ -37,7 +37,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 	};
 
 	var parameterNames = [
-		"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing", "numMultiviewViews",
+		"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing",
 		"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding", "envMapCubeUV",
 		"lightMap", "lightMapEncoding", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 		"roughnessMap", "metalnessMap", "gradientMap",
@@ -171,7 +171,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		material.onBeforeCompile( shaderobject, renderer );
 
 		var currentRenderTarget = renderer.getRenderTarget();
-		var numMultiviewViews = currentRenderTarget && currentRenderTarget.isWebGLMultiviewRenderTarget ? currentRenderTarget.numViews : 0;
 
 		var parameters = {
 
@@ -193,7 +192,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			instancing: object.isInstancedMesh === true,
 
 			supportsVertexTextures: vertexTextures,
-			numMultiviewViews: numMultiviewViews,
 			outputEncoding: ( currentRenderTarget !== null ) ? getTextureEncodingFromMap( currentRenderTarget.texture ) : renderer.outputEncoding,
 			map: !! material.map,
 			mapEncoding: getTextureEncodingFromMap( material.map ),
