@@ -91,7 +91,8 @@ IncidentLight directLight;
 
 			float dist = min( linearDepth - csmx, csmy - linearDepth );
 			float ratio = clamp( dist / margin, 0.0, 1.0 );
-			if(i < NUM_DIR_LIGHT_SHADOWS) {
+			if( i < NUM_DIR_LIGHT_SHADOWS ) {
+
 				vec3 prevColor = directLight.color;
 				directionalLightShadow = directionalLightShadows[ i ];
 				directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
