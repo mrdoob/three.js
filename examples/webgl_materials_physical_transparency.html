@@ -96,8 +96,8 @@
 					envMap: hdrCubeRenderTarget.texture,
 					envMapIntensity: params.envMapIntensity,
 					depthWrite: false,
-					opacity: 1, // set to 1 when transparency is non-zero
-					transparency: params.transparency,
+					transparency: params.transparency, // use material.transparency for glass materials
+					opacity: 1,                        // set material.opacity to 1 when material.transparency is non-zero
 					transparent: true
 				} );
 
