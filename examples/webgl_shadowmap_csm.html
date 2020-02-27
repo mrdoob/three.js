@@ -130,8 +130,6 @@
 
 				var gui = new GUI();
 
-				window.csm = csm;
-
 				gui.add( params, 'orthographic' ).onChange( function ( value ) {
 
 					csm.camera = value ? orthoCamera : camera;
