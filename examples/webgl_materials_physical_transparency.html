@@ -95,7 +95,8 @@
 					alphaTest: 0.5,
 					envMap: hdrCubeRenderTarget.texture,
 					envMapIntensity: params.envMapIntensity,
-					depthTest: false,
+					depthWrite: false,
+					opacity: 1, // set to 1 when transparency is non-zero
 					transparency: params.transparency,
 					transparent: true
 				} );
