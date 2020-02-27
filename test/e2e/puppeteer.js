@@ -86,7 +86,8 @@ const pup = puppeteer.launch( {
 	const page = ( await browser.pages() )[ 0 ];
 	await page.setViewport( { width: 800, height: 600 } );
 
-	const injection = fs.readFileSync( 'test/diff/deterministic-injection.js', 'utf8' );
+	const cleanPage = fs.readFileSync( 'test/e2e/clean-page.js', 'utf8' );
+	const injection = fs.readFileSync( 'test/e2e/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
 	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
@@ -157,39 +158,15 @@ const pup = puppeteer.launch( {
 
 			try {
 
+
+				/* Render page */
+
+				await page.evaluate( cleanPage );
+
 				await page.evaluate( async ( pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptProgress ) => {
 
 
-					/* Prepare page */
-
-					let button = document.getElementById( 'startButton' );
-					if ( button ) {
-
-						button.click();
-
-					}
-
-					let style = document.createElement( 'style' );
-					style.type = 'text/css';
-					style.innerHTML = `body { font size: 0 !important; }
-							#info, button, input, body > div.dg.ac, body > div.lbl { display: none !important; }`;
-					let head = document.getElementsByTagName( 'head' );
-					if ( head.length > 0 ) {
-
-						head[ 0 ].appendChild( style );
-
-					}
-
-					let canvas = document.getElementsByTagName( 'canvas' );
-					for ( let i = 0; i < canvas.length; ++ i ) {
-
-						if ( canvas[ i ].height === 48 ) {
-
-							canvas[ i ].style.display = 'none';
-
-						}
-
-					}
+					/* Resource timeout */
 
 					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
 					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * attemptProgress ) );
@@ -208,7 +185,7 @@ const pup = puppeteer.launch( {
 						let renderStart = performance.wow();
 						let waitingLoop = setInterval( function () {
 
-							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * window.chromeMaxFrameId * attemptProgress );
+							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * attemptProgress );
 							if ( window.chromeRenderFinished || renderEcceded ) {
 
 								if ( renderEcceded ) {
