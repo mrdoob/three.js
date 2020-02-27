@@ -1,159 +1,692 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js webaudio - visualizer</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
+<head>
+	<title>three.js webaudio - 3D visualizer</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
+	<style>
+		html, body {
+			height: 100%;
+			width: 100%;
+			overflow: hidden;
+			background-color: black;
+		}
 
-		<script id="vertexShader" type="x-shader/x-vertex">
+		#container {
+			height: 100%;
+			width: 100%;
+			background-color: green;
+		}
+	</style>
+</head>
+<body>
+<div id="overlay">
+	<div>
+		<button id="startButton">Click to Play</button>
+		<p>Audio playback requires user interaction.</p>
+	</div>
+</div>
+<div id="container"></div>
+<div id="info">
+	<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio - 3D visualizer<br/>
+	music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a>
+</div>
 
-			varying vec2 vUv;
+<script type="module">
 
-			void main() {
+	import * as THREE from '../build/three.module.js';
+	import { OrbitControls } from './jsm/controls/OrbitControls.js';
+	import { GUI } from './jsm/libs/dat.gui.module.js';
+	import Stats from './jsm/libs/stats.module.js';
 
-				vUv = uv;
+	function ThreeApplication( container ) {
 
-				gl_Position = vec4( position, 1.0 );
+		if ( !container ) {
+			throw new Error( 'Three Application required a container' );
+		}
+
+		this.container = container;
+		this.frameId = null;
+		this.showStats = true;
+
+		initRenderer.call( this );
+		initCamera.call( this );
+		initControls.call( this );
+		initScene.call( this );
+		initWaveform.call( this );
+		//		initWaveformCloud.call( this );
+		initSoundMap.call( this );
+		//		initSoundCloud.call( this );
+		initAudio.call( this );
+		initDatGui.call( this );
+		initStats.call( this );
+		initEvents.call( this );
+
+		function initRenderer() {
+
+			this.renderer = new THREE.WebGLRenderer( { antialias: true } );
+			this.renderer.setPixelRatio( window.devicePixelRatio );
+			this.renderer.setSize( window.innerWidth, window.innerHeight );
+
+			this.container.appendChild( this.renderer.domElement );
+
+		}
+
+		function initCamera() {
+
+			this.camera = new THREE.PerspectiveCamera( 70, this.getAspectRatio(), 0.1, 1000 );
+			this.camera.position.set( 0, 3, 3 );
+
+		}
+
+		function initControls() {
+
+			this.cameraControls = new OrbitControls( this.camera, this.renderer.domElement );
+
+		}
+
+		function initScene() {
+
+			// SCENE
+			this.scene = new THREE.Scene();
+			this.scene.background = new THREE.Color( 0x000000 );
+
+			// LIGHTS
+			this.ambientLight = new THREE.AmbientLight( 0xcccccc );
+			this.ambientLight.name = 'AmbiantLight';
+			this.ambientLight.visible = true;
+			this.scene.add( this.ambientLight );
+
+		}
+
+		function initWaveform() {
+
+			this.useWaveform = true;
+			this.fftWaveformLength = 2048;
+			const halfFftLength = this.fftWaveformLength / 2;
+			this.currentWaveformBufferIndex = 0;
+			this.waveformCycles = 1;
+			this.waveforms = new THREE.Group();
+
+			for ( let waveIndex = 0; waveIndex < this.waveformCycles; waveIndex ++ ) {
+
+				// Using bufferd line
+				const geometry = new THREE.BufferGeometry();
+				const material = new THREE.LineBasicMaterial( {
+					vertexColors: THREE.VertexColors
+				} );
+				const positions = [];
+				const colors = [];
+				const globalOffset = waveIndex * (halfFftLength / 100);
+
+				for ( let x = 0; x < halfFftLength; x ++ ) {
+
+					const globalXPosition = globalOffset + (x / 100);
+					positions.push( globalXPosition, 0, 0 );
+					colors.push( 1, 1, 1 );
+
+				}
+
+				const bufferPositionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
+				bufferPositionAttribute.setUsage( THREE.DynamicDrawUsage );
+				geometry.setAttribute( 'position', bufferPositionAttribute );
+
+				const bufferColorAttribute = new THREE.Float32BufferAttribute( colors, 3 );
+				bufferColorAttribute.setUsage( THREE.DynamicDrawUsage );
+				geometry.setAttribute( 'color', bufferColorAttribute );
+
+				//                            let boundingBoxCenter = new THREE.Vector3()
+				this.waveform = new THREE.Line( geometry, material );
+				//                            this.waveform = new THREE.Points( geometry, material )
+				//                            this.waveform.geometry.computeBoundingBox()
+				//                            this.waveform.geometry.boundingBox.getCenter( boundingBoxCenter )
+				//                            this.waveform.position.x = -boundingBoxCenter.x
+				//                            this.waveform.position.y = 2
+				//                            this.waveform.position.z = -3
+
+				this.waveforms.add( this.waveform );
 
 			}
 
-		</script>
+			const boundingBox = new THREE.Box3();
+			let boundingBoxCenter = new THREE.Vector3();
+			boundingBox.setFromObject( this.waveforms );
+			boundingBox.getCenter( boundingBoxCenter );
 
-		<script id="fragmentShader" type="x-shader/x-fragment">
+			this.waveforms.position.x = - boundingBoxCenter.x;
+			this.waveforms.position.y = 1;
+			this.waveforms.position.z = - 1;
 
-			uniform sampler2D tAudioData;
-			varying vec2 vUv;
+			this.scene.add( this.waveforms );
 
-			void main() {
+		}
 
-				vec3 backgroundColor = vec3( 0.125, 0.125, 0.125 );
-				vec3 color = vec3( 1.0, 1.0, 0.0 );
+		function initWaveformCloud() {
 
-				float f = texture2D( tAudioData, vec2( vUv.x, 0.0 ) ).r;
+			this.useWaveform = true;
 
-				float i = step( vUv.y, f ) * step( f - 0.0125, vUv.y );
+			this.currentWaveformBufferIndex = 0;
+			this.waveformCycles = 200;
+			this.waveforms = new THREE.Group();
 
-				gl_FragColor = vec4( mix( backgroundColor, color, i ), 1.0 );
+			for ( let waveIndex = 0; waveIndex < this.waveformCycles; waveIndex ++ ) {
+
+				// Using bufferd line
+				const geometry = new THREE.BufferGeometry();
+				const material = new THREE.PointsMaterial( {
+					vertexColors: THREE.VertexColors,
+					size: 0.001
+				} );
+				const halfFftLength = this.fftWaveformLength / 2;
+				const positions = [];
+				const colors = [];
+				const globalOffset = waveIndex * (halfFftLength / 1000);
+
+				for ( let x = 0; x < halfFftLength; x ++ ) {
+
+					const globalXPosition = globalOffset + (x / 1000);
+					positions.push( globalXPosition, 0, 0 );
+					colors.push( 1, 1, 1 );
+
+				}
+
+				const bufferPositionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
+				bufferPositionAttribute.setUsage( THREE.DynamicDrawUsage );
+				geometry.setAttribute( 'position', bufferPositionAttribute );
+
+				const bufferColorAttribute = new THREE.Float32BufferAttribute( colors, 3 );
+				bufferColorAttribute.setUsage( THREE.DynamicDrawUsage );
+				geometry.setAttribute( 'color', bufferColorAttribute );
+
+				//                            let boundingBoxCenter = new THREE.Vector3()
+				this.waveform = new THREE.Points( geometry, material );
+				//                            this.waveform = new THREE.Points( geometry, material )
+				//                            this.waveform.geometry.computeBoundingBox()
+				//                            this.waveform.geometry.boundingBox.getCenter( boundingBoxCenter )
+				//                            this.waveform.position.x = -boundingBoxCenter.x
+				//                            this.waveform.position.y = 2
+				//                            this.waveform.position.z = -3
+
+				this.waveforms.add( this.waveform );
 
 			}
 
-		</script>
+			const boundingBox = new THREE.Box3();
+			let boundingBoxCenter = new THREE.Vector3();
+			boundingBox.setFromObject( this.waveforms );
+			boundingBox.getCenter( boundingBoxCenter );
 
-	</head>
-	<body>
-		<div id="overlay">
-			<div>
-				<button id="startButton">Click to Play</button>
-				<p>Audio playback requires user interaction.</p>
-			</div>
-		</div>
-		<div id="container"></div>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio - visualizer<br/>
-			music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a>
-		</div>
+			this.waveforms.position.x = - boundingBoxCenter.x;
+			this.waveforms.position.y = 2;
+			this.waveforms.position.z = - 3;
 
-		<script type="module">
+			this.scene.add( this.waveforms );
 
-			import * as THREE from '../build/three.module.js';
+		}
 
-			var scene, camera, renderer, analyser, uniforms;
+		function initSoundMap() {
 
-			var startButton = document.getElementById( 'startButton' );
-			startButton.addEventListener( 'click', init );
+			this.useSoundMap = true;
+			this.soundMapFftLength = 512;
+			this.soundMapBufferLength = 512;
+			this.currentAudioBufferIndex = 0;
 
-			function init() {
+			// Using bufferd line
+			const geometry = new THREE.BufferGeometry();
+			const material = new THREE.MeshBasicMaterial( {
+				vertexColors: THREE.VertexColors
+			} );
 
-				var fftSize = 128;
+			const halfFftLength = this.soundMapFftLength / 2;
+			const positions = [];
+			const colors = [];
+			const indexes = [];
 
-				//
+			for ( let x = 0; x < this.soundMapBufferLength; x ++ ) {
 
-				var overlay = document.getElementById( 'overlay' );
-				overlay.remove();
+				for ( let z = 0; z < halfFftLength; z ++ ) {
 
-				//
+					positions.push( x / 100, 0, z / 100 );
+					colors.push( 1, 1, 1 );
 
-				var container = document.getElementById( 'container' );
+				}
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.setClearColor( 0x000000 );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				container.appendChild( renderer.domElement );
+				// avoid extra indexes
+				if ( x === this.soundMapBufferLength - 1 ) {
+					break;
+				}
 
-				scene = new THREE.Scene();
+				const globalIndex = (x * halfFftLength);
+				for ( let i = 0; i < halfFftLength - 1; i ++ ) {
 
-				camera = new THREE.Camera();
+					indexes.push( globalIndex + i, globalIndex + i + 1, globalIndex + i + halfFftLength );
+					indexes.push( globalIndex + i + 1, globalIndex + i + halfFftLength + 1, globalIndex + i + halfFftLength );
 
-				//
+				}
 
-				var listener = new THREE.AudioListener();
+			}
 
-				var audio = new THREE.Audio( listener );
+			const bufferPositionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
+			bufferPositionAttribute.setUsage( THREE.DynamicDrawUsage );
+			geometry.setAttribute( 'position', bufferPositionAttribute );
 
-				var mediaElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
-				mediaElement.loop = true;
-				mediaElement.play();
+			const bufferColorAttribute = new THREE.Float32BufferAttribute( colors, 3 );
+			bufferColorAttribute.setUsage( THREE.DynamicDrawUsage );
+			geometry.setAttribute( 'color', bufferColorAttribute );
 
-				audio.setMediaElementSource( mediaElement );
+			geometry.setIndex( indexes );
 
-				analyser = new THREE.AudioAnalyser( audio, fftSize );
+			let boundingBoxCenter = new THREE.Vector3();
+			this.soundMap = new THREE.Mesh( geometry, material );
+			this.soundMap.geometry.computeBoundingBox();
+			this.soundMap.geometry.boundingBox.getCenter( boundingBoxCenter );
+			this.soundMap.position.x = - boundingBoxCenter.x;
+			this.soundMap.position.y = - boundingBoxCenter.y;
+			this.soundMap.position.z = - boundingBoxCenter.z;
 
-				//
+			this.scene.add( this.soundMap );
 
-				uniforms = {
+		}
 
-					tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, THREE.LuminanceFormat ) }
+		function initSoundCloud() {
 
+			this.useSoundMap = true;
+			this.soundMapFftLength = 512;
+			this.soundMapBufferLength = 512;
+			this.currentAudioBufferIndex = 0;
+
+			// Using bufferd line
+			const geometry = new THREE.BufferGeometry();
+			const material = new THREE.PointsMaterial( {
+				vertexColors: THREE.VertexColors,
+				size: 0.01
+			} );
+			const halfFftLength = this.soundMapFftLength / 2;
+			const positions = [];
+			const colors = [];
+
+			for ( let x = 0; x < this.soundMapBufferLength; x ++ ) {
+
+				for ( let z = 0; z < halfFftLength; z ++ ) {
+
+					positions.push( x / 100, 0, z / 100 );
+					colors.push( 1, 1, 1 );
+
+				}
+
+			}
+
+			const bufferPositionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
+			bufferPositionAttribute.setUsage( THREE.DynamicDrawUsage );
+			geometry.setAttribute( 'position', bufferPositionAttribute );
+
+			const bufferColorAttribute = new THREE.Float32BufferAttribute( colors, 3 );
+			bufferColorAttribute.setUsage( THREE.DynamicDrawUsage );
+			geometry.setAttribute( 'color', bufferColorAttribute );
+
+			let boundingBoxCenter = new THREE.Vector3();
+			this.soundMap = new THREE.Points( geometry, material );
+			this.soundMap.geometry.computeBoundingBox();
+			this.soundMap.geometry.boundingBox.getCenter( boundingBoxCenter );
+			this.soundMap.position.x = - boundingBoxCenter.x;
+			this.soundMap.position.y = - boundingBoxCenter.y;
+			this.soundMap.position.z = - boundingBoxCenter.z;
+
+			this.scene.add( this.soundMap );
+
+		}
+
+		function initAudio() {
+
+			this.selectedAudioSource = 'File';
+
+			// Require user gesture
+			//			this.audioListener = new THREE.AudioListener();
+			//			this.audio = new THREE.Audio( this.audioListener );
+			//			this.audioAnalyser = new THREE.AudioAnalyser( this.audio, this.soundMapFftLength );
+			//			this.waveAnalyser = new THREE.AudioAnalyser( this.audio, this.fftWaveformLength );
+
+		}
+
+		function initDatGui() {
+
+			var GuiInterface = function () {
+
+				// Materials
+				this.materials = {
+					Basic: new THREE.MeshBasicMaterial( { side: THREE.DoubleSide } ),
+					Normal: new THREE.MeshNormalMaterial( { side: THREE.DoubleSide } )
 				};
+				this.material = 'Basic';
+				this.displayWireFrame = false;
 
-				var material = new THREE.ShaderMaterial( {
+				// Audio
+				this.audioSource = ['File', 'Microphone'];
+				this.toggleAudio = true;
 
-					uniforms: uniforms,
-					vertexShader: document.getElementById( 'vertexShader' ).textContent,
-					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+			};
+
+			this.interface = new GuiInterface();
+
+			this.gui = new GUI( {
+				width: 320
+			} );
+
+			var folderAudio = this.gui.addFolder( 'Audio' );
+			folderAudio.add( this, 'selectedAudioSource', this.interface.audioSource ).name( 'Audio Source' ).onChange( this.setAudioSource.bind( this ) );
+			folderAudio.add( this.interface, 'toggleAudio' ).name( 'Start/Stop audio' ).onChange( this.toggleAudio.bind( this ) );
+
+			var folderSoundMap = this.gui.addFolder( 'SoundMap' );
+			folderSoundMap.add( this, 'useSoundMap' ).name( 'Active Sound Map' );
+			folderSoundMap.add( this, 'soundMapFftLength' ).name( 'FFT Width' ).onChange( this.updateSoundMap.bind( this ) );
+			folderSoundMap.add( this, 'soundMapBufferLength' ).name( 'Buffer Length' ).onChange( this.updateSoundMap.bind( this ) );
+			folderSoundMap.add( this.interface, 'material', Object.keys( this.interface.materials ) ).name( 'Materials' ).onChange( this.updateMaterial.bind( this ) );
+			folderSoundMap.add( this.interface, 'displayWireFrame' ).name( 'Wireframe' ).onChange( this.updateMaterialWireframe.bind( this ) );
+
+			var folderWaveForm = this.gui.addFolder( 'WaveForm' );
+			folderWaveForm.add( this, 'useWaveform' ).name( 'Active Waveform' );
+		}
+
+		function initEvents() {
+
+			window.addEventListener( 'resize', this.resize.bind( this ), false );
+
+		}
+
+		function initStats() {
+
+			this.showStats = true;
+			this.stats = new Stats();
+			this.container.appendChild( this.stats.dom );
+
+		}
+
+	}
+
+	Object.assign( ThreeApplication.prototype, {
+
+		constructor: ThreeApplication,
+
+		// Audio
+		setAudioSource( source ) {
+
+			this.selectedAudioSource = source;
+			this.updateAudio();
+
+		},
+
+		toggleAudio() {
+
+			if ( this.audioElement.paused ) {
+				this.audioElement.play();
+			} else {
+				this.audioElement.pause();
+			}
+
+		},
+
+		updateAudio() {
+
+			this.audioListener = new THREE.AudioListener();
+
+			if ( this.audio !== undefined ) {
+				this.audio.disconnect();
+			}
+			this.audio = new THREE.Audio( this.audioListener );
+			this.audioAnalyser = new THREE.AudioAnalyser( this.audio, this.soundMapFftLength );
+			this.waveAnalyser = new THREE.AudioAnalyser( this.audio, this.fftWaveformLength );
+
+			if ( this.selectedAudioSource === 'File' ) {
+
+				this.audioElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
+				this.audioElement.loop = true;
+				this.audio.setMediaElementSource( this.audioElement );
+				this.audioElement.play();
+
+			} else {
+
+				navigator.mediaDevices.getUserMedia( { audio: true } ).then( stream => {
+
+					this.audio.setMediaStreamSource( stream );
+
+				} ).catch( err => {
+
+					alert( err );
 
 				} );
 
-				var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+			}
 
-				var mesh = new THREE.Mesh( geometry, material );
-				scene.add( mesh );
+		},
 
-				//
+		// Sound Map
+		updateSoundMap() {
 
-				window.addEventListener( 'resize', onResize, false );
+			// Clean previous soundmap
+			this.soundMap.geometry.dispose();
+			this.soundMap.geometry.deleteAttribute( 'position' );
+			this.soundMap.geometry.deleteAttribute( 'color' );
 
-				animate();
+			// Recreate buffer attributes
+			const halfFftLength = this.soundMapFftLength / 2;
+			const positions = [];
+			const colors = [];
+			const indexes = [];
+
+			for ( let x = 0; x < this.soundMapBufferLength; x ++ ) {
+
+				for ( let z = 0; z < halfFftLength; z ++ ) {
+
+					positions.push( x / 100, 0, z / 100 );
+					colors.push( 1, 1, 1 );
+
+				}
+
+				// avoid extra indexes
+				if ( x === this.soundMapBufferLength - 1 ) {
+					break;
+				}
+
+				const globalIndex = (x * halfFftLength);
+				for ( let i = 0; i < halfFftLength - 1; i ++ ) {
+
+					indexes.push( globalIndex + i, globalIndex + i + 1, globalIndex + i + halfFftLength );
+					indexes.push( globalIndex + i + 1, globalIndex + i + halfFftLength + 1, globalIndex + i + halfFftLength );
+
+				}
 
 			}
 
-			function onResize() {
+			const bufferPositionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
+			bufferPositionAttribute.setUsage( THREE.DynamicDrawUsage );
+			this.soundMap.geometry.setAttribute( 'position', bufferPositionAttribute );
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+			const bufferColorAttribute = new THREE.Float32BufferAttribute( colors, 3 );
+			bufferColorAttribute.setUsage( THREE.DynamicDrawUsage );
+			this.soundMap.geometry.setAttribute( 'color', bufferColorAttribute );
 
+			this.soundMap.geometry.setIndex( indexes );
+
+			// Recentering
+			let boundingBoxCenter = new THREE.Vector3();
+			this.soundMap.geometry.computeBoundingBox();
+			this.soundMap.geometry.boundingBox.getCenter( boundingBoxCenter );
+			this.soundMap.position.x = - boundingBoxCenter.x;
+			this.soundMap.position.y = - boundingBoxCenter.y;
+			this.soundMap.position.z = - boundingBoxCenter.z;
+
+			// Update audioAnalyser
+			this.audioAnalyser.analyser.fftSize = this.soundMapFftLength;
+			this.audioAnalyser.data = new Uint8Array( this.audioAnalyser.analyser.frequencyBinCount );
+
+		},
+
+		updateMaterial() {
+
+			this.soundMap.material = this.interface.materials[ this.interface.material ];
+			this.updateMaterialWireframe();
+			this.soundMap.material.needsUpdate = true;
+
+			this.soundMap.material.vertexColors = THREE.VertexColors;
+			// or
+			//                    if ( this.soundMap.material.color !== undefined ) {
+			//                        this.soundMap.material.color = new THREE.Color( this.interface.materialColor )
+			//                    }
+
+		},
+
+		updateMaterialWireframe() {
+
+			this.soundMap.material.wireframe = this.interface.displayWireFrame;
+
+		},
+
+		// Utils
+		getAspectRatio() {
+
+			return (this.container.offsetHeight === 0) ? 1 : this.container.offsetWidth / this.container.offsetHeight;
+
+		},
+
+		resize() {
+
+			let containerWidth = this.container.offsetWidth;
+			let containerHeight = this.container.offsetHeight;
+
+			this.renderer.setSize( containerWidth, containerHeight, true );
+
+			this.camera.aspect = this.getAspectRatio();
+			this.camera.updateProjectionMatrix();
+
+
+		},
+
+		// Render
+		startRender() {
+
+			if ( this.frameId ) {
+				return;
 			}
 
-			function animate() {
+			this.frameId = window.requestAnimationFrame( this.render.bind( this ) );
 
-				requestAnimationFrame( animate );
+		},
 
-				render();
+		render() {
 
+			if ( this.stats && this.showStats ) {
+				this.stats.begin();
 			}
 
-			function render() {
+			this.frameId = window.requestAnimationFrame( this.render.bind( this ) );
 
-				analyser.getFrequencyData();
+			this.renderWaveForm();
+			this.renderSoundMap();
 
-				uniforms.tAudioData.value.needsUpdate = true;
+			// Render
+			this.renderer.render( this.scene, this.camera );
 
-				renderer.render( scene, camera );
-
+			if ( this.stats && this.showStats ) {
+				this.stats.end();
 			}
 
-		</script>
+		},
 
-	</body>
+		renderWaveForm() {
+
+			if ( !this.useWaveform ) { return; }
+
+			this.waveAnalyser.analyser.getByteTimeDomainData( this.waveAnalyser.data );
+			const waveDatas = this.waveAnalyser.data;
+
+			const waveform = this.waveforms.children[ this.currentWaveformBufferIndex ];
+			const positionBufferAttribute = waveform.geometry.getAttribute( 'position' );
+			const positionBuffer = positionBufferAttribute.array;
+			const colorBufferAttribute = waveform.geometry.getAttribute( 'color' );
+			const colorBuffer = colorBufferAttribute.array;
+
+			for ( let i = 0, bi = 0, dataLength = waveDatas.length; i < dataLength; i ++, bi += 3 ) {
+
+				const waveData = waveDatas[ i ];
+
+				//positionBuffer[ bi + 0 ]
+				positionBuffer[ bi + 1 ] = (waveData / 255);
+				//positionBuffer[ bi + 2 ]
+
+				colorBuffer[ bi + 0 ] = waveData / 255;
+				colorBuffer[ bi + 1 ] = (255 - waveData) / 255;
+				colorBuffer[ bi + 2 ] = 0;
+
+			}
+			positionBufferAttribute.needsUpdate = true;
+			colorBufferAttribute.needsUpdate = true;
+
+			this.currentWaveformBufferIndex ++;
+			if ( this.currentWaveformBufferIndex >= this.waveformCycles ) {
+				this.currentWaveformBufferIndex = 0;
+			}
+
+		},
+
+		renderSoundMap() {
+
+			if ( !this.useSoundMap ) { return; }
+
+			const frequencyDatas = this.audioAnalyser.getFrequencyData();
+
+			const currentZIndexOffset = (this.currentAudioBufferIndex * (this.soundMapFftLength / 2));
+
+			const positionBuffer = this.soundMap.geometry.getAttribute( 'position' );
+			const colorBuffer = this.soundMap.geometry.getAttribute( 'color' );
+
+			for ( let i = 0, dataLength = frequencyDatas.length; i < dataLength; i ++ ) {
+				const fftData = frequencyDatas[ i ];
+				const currentIndex = ((currentZIndexOffset + i) * 3);
+
+				positionBuffer.array[ currentIndex + 1 ] = (fftData / 255);
+
+				colorBuffer.array[ currentIndex + 0 ] = fftData / 255;
+				colorBuffer.array[ currentIndex + 1 ] = (255 - fftData) / 255;
+				colorBuffer.array[ currentIndex + 2 ] = 0;
+			}
+			positionBuffer.needsUpdate = true;
+			colorBuffer.needsUpdate = true;
+			this.soundMap.geometry.computeVertexNormals();
+
+			this.currentAudioBufferIndex ++;
+			if ( this.currentAudioBufferIndex >= this.soundMapBufferLength ) {
+				this.currentAudioBufferIndex = 0;
+			}
+
+		},
+
+		stopRender() {
+
+			window.cancelAnimationFrame( this.frameId );
+			this.frameId = null;
+
+		}
+
+	} );
+
+	///
+
+	const overlay = document.getElementById( 'overlay' );
+	const container = document.getElementById( 'container' );
+	const startButton = document.getElementById( 'startButton' );
+	const app = new ThreeApplication( container );
+
+	startButton.addEventListener( 'click', () => {
+
+		overlay.remove();
+		app.startRender();
+		app.setAudioSource( 'File' );
+
+	} );
+
+</script>
+
+</body>
 </html>
