@@ -78,20 +78,30 @@ IncidentLight directLight;
 	DirectionalLightShadow directionalLightShadow;
 	#endif
 
-	#pragma unroll_loop
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
 		getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
-		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_DIR_LIGHT_SHADOWS )
 
-		directionalLightShadow = directionalLightShadows[ i ];
-		if(linearDepth >= CSM_cascades[UNROLLED_LOOP_INDEX].x && linearDepth < CSM_cascades[UNROLLED_LOOP_INDEX].y) directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+		float margin = ( 0.25 * ( pow( linearDepth, 2.0 ) ) );
+		float csmx = CSM_cascades[ i ].x - margin;
+		float csmy = CSM_cascades[ i ].y + margin;
+		if(i < NUM_DIR_LIGHT_SHADOWS && linearDepth >=csmx - margin && linearDepth < csmy + margin ) {
 
-		#endif
+			float dist = min( linearDepth -csmx, csmy - linearDepth );
+			dist = min( dist / margin, 1.0 );
 
-        if(linearDepth >= CSM_cascades[UNROLLED_LOOP_INDEX].x && (linearDepth < CSM_cascades[UNROLLED_LOOP_INDEX].y || UNROLLED_LOOP_INDEX == CSM_CASCADES - 1)) RE_Direct( directLight, geometry, material, reflectedLight );
+			directionalLightShadow = directionalLightShadows[ i ];
+			float mult = all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
 
+			directLight.color = mix( directLight.color, directLight.color * mult, dist );
+
+		}
+        if(linearDepth >= CSM_cascades[ i ].x && (linearDepth < CSM_cascades[ i ].y ||  i  == CSM_CASCADES - 1)) {
+
+			RE_Direct( directLight, geometry, material, reflectedLight );
+
+		}
 
 
 	}
