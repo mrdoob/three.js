@@ -26,6 +26,7 @@
 
 			var params = {
 				orthographic: false,
+				fade: false,
 				far: 1000,
 				mode: 'practical',
 				lightX: - 1,
@@ -129,10 +130,19 @@
 
 				var gui = new GUI();
 
+				window.csm = csm;
+
 				gui.add( params, 'orthographic' ).onChange( function ( value ) {
 
 					csm.camera = value ? orthoCamera : camera;
 					csm.updateFrustums();
+
+				} );
+
+				gui.add( params, 'fade' ).onChange( function ( value ) { 
+
+					csm.fade = value;
+					csm.updateUniforms();
 
 				} );
 

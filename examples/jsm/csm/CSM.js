@@ -47,11 +47,13 @@ export default class CSM {
 		this.lightFar = data.lightFar || 2000;
 		this.lightMargin = data.lightMargin || 200;
 		this.customSplitsCallback = data.customSplitsCallback;
+		this.fade = false;
 		this.mainFrustum = new Frustum();
 		this.frustums = [];
 		this.breaks = [];
 
 		this.lights = [];
+		this.shaders = [];
 		this.materials = [];
 		this.createLights();
 
@@ -214,6 +216,12 @@ export default class CSM {
 		material.defines.USE_CSM = 1;
 		material.defines.CSM_CASCADES = this.cascades;
 
+		if ( this.fade ) {
+
+			material.defines.CSM_FADE = '';
+
+		}
+
 		const breaksVec2 = [];
 		this.getExtendedBreaks( breaksVec2 );
 
@@ -226,9 +234,10 @@ export default class CSM {
 			shader.uniforms.cameraNear = { value: self.camera.near };
 			shader.uniforms.shadowFar = { value: far };
 
-			self.materials.push( shader );
+			self.shaders.push( shader );
 
 		};
+		this.materials.push( material );
 
 	}
 
@@ -236,12 +245,30 @@ export default class CSM {
 
 		const far = Math.min(this.camera.far, this.maxFar);
 
-		for ( let i = 0; i < this.materials.length; i ++ ) {
+		for ( let i = 0; i < this.shaders.length; i ++ ) {
 
-			const uniforms = this.materials[ i ].uniforms;
+			const shader = this.shaders[ i ];
+			const uniforms = shader.uniforms;
 			this.getExtendedBreaks( uniforms.CSM_cascades.value );
 			uniforms.cameraNear.value = this.camera.near;
 			uniforms.shadowFar.value = far;
+
+		}
+
+		for ( let i = 0; i < this.materials.length; i ++ ) {
+
+			const material = this.materials[ i ];
+			if ( ! this.fade && 'CSM_FADE' in material.defines ) {
+
+				delete material.defines.CSM_FADE;
+				material.needsUpdate = true;
+
+			} else {
+
+				material.defines.CSM_FADE = '';
+				material.needsUpdate = true;
+
+			}
 
 		}
 
