@@ -187,6 +187,7 @@ export default class CSM {
 			let squaredBBWidth = Math.max( _size.x, _size.y );
 			if ( this.fade ) {
 
+				// expand the shadow extents by the fade margin if fade is enabled.
 				const camera = this.camera;
 				const far = Math.max( camera.far, this.maxFar );
 				const linearDepth = frustums[ i ].vertices.far[ 0 ].z / ( far - camera.near );
