@@ -13,17 +13,18 @@ import {
 	BufferGeometry,
 	BufferAttribute,
 	Line,
-	Matrix4
+	Matrix4,
+	Box3
 } from '../../../build/three.module.js';
 import Frustum from './Frustum.js';
-import FrustumBoundingBox from './FrustumBoundingBox.js';
 import Shader from './Shader.js';
 
 const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new Frustum();
 const _frustum = new Frustum();
 const _center = new Vector3();
-const _bbox = new FrustumBoundingBox();
+const _size = new Vector3();
+const _bbox = new Box3();
 
 export default class CSM {
 
@@ -166,20 +167,25 @@ export default class CSM {
 		for ( let i = 0; i < this.frustums.length; i ++ ) {
 
 			const light = this.lights[ i ];
+			light.shadow.camera.updateMatrixWorld( true );
 			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
 			this.frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
-			light.shadow.camera.updateMatrixWorld( true );
+			_bbox.makeEmpty();
+			for ( let j = 0; j < 4; j ++ ) {
 
-			_bbox.fromFrustum( _lightSpaceFrustum );
-			_bbox.getSize();
-			_bbox.getCenter( this.lightMargin );
+				_bbox.expandByPoint( _lightSpaceFrustum.vertices.near[ j ] );
+				_bbox.expandByPoint( _lightSpaceFrustum.vertices.far[ j ] );
 
-			const squaredBBWidth = Math.max( _bbox.size.x, _bbox.size.y );
+			}
 
-			_center.copy( _bbox.center );
+			_bbox.getSize( _size );
+			_bbox.getCenter( _center );
+			_center.z = _bbox.max.z + this.lightMargin;
+
 			_center.applyMatrix4( light.shadow.camera.matrixWorld );
 
+			const squaredBBWidth = Math.max( _size.x, _size.y );
 			light.shadow.camera.left = - squaredBBWidth / 2;
 			light.shadow.camera.right = squaredBBWidth / 2;
 			light.shadow.camera.top = squaredBBWidth / 2;
