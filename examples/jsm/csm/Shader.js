@@ -83,23 +83,38 @@ IncidentLight directLight;
 		directionalLight = directionalLights[ i ];
 		getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );
 
-		float margin = ( 0.25 * ( pow( linearDepth, 2.0 ) ) );
-		float csmx = CSM_cascades[ i ].x - margin;
-		float csmy = CSM_cascades[ i ].y + margin;
-		if(i < NUM_DIR_LIGHT_SHADOWS && linearDepth >=csmx - margin && linearDepth < csmy + margin ) {
+		float margin = 0.25 * pow( linearDepth, 2.0 );
+		float csmx = CSM_cascades[ i ].x - margin / 2.0;
+		float csmy = CSM_cascades[ i ].y + margin / 2.0;
+		float dist = min( linearDepth - csmx, csmy - linearDepth );
+		float ratio = min( dist / margin, 1.0 );
+		if(i < NUM_DIR_LIGHT_SHADOWS && linearDepth >= csmx && linearDepth < csmy ) {
 
-			float dist = min( linearDepth -csmx, csmy - linearDepth );
-			dist = min( dist / margin, 1.0 );
-
+			vec3 prevColor = directLight.color;
 			directionalLightShadow = directionalLightShadows[ i ];
-			float mult = all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+			directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
 
-			directLight.color = mix( directLight.color, directLight.color * mult, dist );
+			if ( i == CSM_CASCADES - 1 && linearDepth > ( csmx + csmy ) / 2.0 ) {
+
+				directLight.color = mix( prevColor, directLight.color, ratio );
+
+			}
 
 		}
-        if(linearDepth >= CSM_cascades[ i ].x && (linearDepth < CSM_cascades[ i ].y ||  i  == CSM_CASCADES - 1)) {
 
+        if(linearDepth >= csmx && (linearDepth < csmy ||  i  == CSM_CASCADES - 1)) {
+
+			ReflectedLight prevLight = reflectedLight;
 			RE_Direct( directLight, geometry, material, reflectedLight );
+
+			if ( i != CSM_CASCADES - 1 || i == CSM_CASCADES - 1 && linearDepth < ( csmx + csmy ) / 2.0 ) {
+
+				reflectedLight.directDiffuse = mix( prevLight.directDiffuse, reflectedLight.directDiffuse, ratio );
+				reflectedLight.directSpecular = mix( prevLight.directSpecular, reflectedLight.directSpecular, ratio );
+				reflectedLight.indirectDiffuse = mix( prevLight.indirectDiffuse, reflectedLight.indirectDiffuse, ratio );
+				reflectedLight.indirectSpecular = mix( prevLight.indirectSpecular, reflectedLight.indirectSpecular, ratio );
+
+			}
 
 		}
 
