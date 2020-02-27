@@ -221,7 +221,7 @@ function includeReplacer( match, include ) {
 
 // Unroll Loops
 
-var loopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
+var loopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+)$/g;
 
 function unrollLoops( string ) {
 
@@ -229,9 +229,33 @@ function unrollLoops( string ) {
 
 }
 
-function loopReplacer( match, start, end, snippet ) {
+function loopReplacer( match, start, end, remainingFile ) {
 
 	var string = '';
+	var snippet = '';
+	var remaining = '';
+	var braceCount = 1;
+	for ( var i = 0, l = remainingFile.length; i < l; i ++ ) {
+
+		if ( remainingFile[ i ] === '{' ) {
+
+			braceCount ++;
+
+		} else if ( remainingFile[ i ] === '}' ) {
+
+			braceCount --;
+
+		}
+
+		if ( braceCount === 0 ) {
+
+			snippet = remainingFile.substring( 0, i );
+			remaining = remainingFile.substring( i + 1 );
+			break;
+
+		}
+
+	}
 
 	for ( var i = parseInt( start ); i < parseInt( end ); i ++ ) {
 
@@ -240,6 +264,8 @@ function loopReplacer( match, start, end, snippet ) {
 			.replace( /UNROLLED_LOOP_INDEX/g, i );
 
 	}
+
+	string += unrollLoops( remaining );
 
 	return string;
 
