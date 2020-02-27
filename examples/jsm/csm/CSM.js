@@ -47,11 +47,13 @@ export default class CSM {
 		this.lightFar = data.lightFar || 2000;
 		this.lightMargin = data.lightMargin || 200;
 		this.customSplitsCallback = data.customSplitsCallback;
+		this.fade = false;
 		this.mainFrustum = new Frustum();
 		this.frustums = [];
 		this.breaks = [];
 
 		this.lights = [];
+		this.shaders = [];
 		this.materials = [];
 		this.createLights();
 
@@ -161,12 +163,13 @@ export default class CSM {
 
 	update( cameraMatrix ) {
 
-		for ( let i = 0; i < this.frustums.length; i ++ ) {
+		const frustums = this.frustums;
+		for ( let i = 0; i < frustums.length; i ++ ) {
 
 			const light = this.lights[ i ];
 			light.shadow.camera.updateMatrixWorld( true );
 			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
-			this.frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
+			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
 			_bbox.makeEmpty();
 			for ( let j = 0; j < 4; j ++ ) {
@@ -179,10 +182,21 @@ export default class CSM {
 			_bbox.getSize( _size );
 			_bbox.getCenter( _center );
 			_center.z = _bbox.max.z + this.lightMargin;
-
 			_center.applyMatrix4( light.shadow.camera.matrixWorld );
 
-			const squaredBBWidth = Math.max( _size.x, _size.y );
+			let squaredBBWidth = Math.max( _size.x, _size.y );
+			if ( this.fade ) {
+
+				// expand the shadow extents by the fade margin if fade is enabled.
+				const camera = this.camera;
+				const far = Math.max( camera.far, this.maxFar );
+				const linearDepth = frustums[ i ].vertices.far[ 0 ].z / ( far - camera.near );
+				const margin = 0.25 * Math.pow( linearDepth, 2.0 ) * ( far - camera.near );
+
+				squaredBBWidth += margin;
+
+			}
+
 			light.shadow.camera.left = - squaredBBWidth / 2;
 			light.shadow.camera.right = squaredBBWidth / 2;
 			light.shadow.camera.top = squaredBBWidth / 2;
@@ -215,6 +229,12 @@ export default class CSM {
 		material.defines.USE_CSM = 1;
 		material.defines.CSM_CASCADES = this.cascades;
 
+		if ( this.fade ) {
+
+			material.defines.CSM_FADE = '';
+
+		}
+
 		const breaksVec2 = [];
 		this.getExtendedBreaks( breaksVec2 );
 
@@ -227,9 +247,10 @@ export default class CSM {
 			shader.uniforms.cameraNear = { value: self.camera.near };
 			shader.uniforms.shadowFar = { value: far };
 
-			self.materials.push( shader );
+			self.shaders.push( shader );
 
 		};
+		this.materials.push( material );
 
 	}
 
@@ -237,12 +258,30 @@ export default class CSM {
 
 		const far = Math.min( this.camera.far, this.maxFar );
 
-		for ( let i = 0; i < this.materials.length; i ++ ) {
+		for ( let i = 0; i < this.shaders.length; i ++ ) {
 
-			const uniforms = this.materials[ i ].uniforms;
+			const shader = this.shaders[ i ];
+			const uniforms = shader.uniforms;
 			this.getExtendedBreaks( uniforms.CSM_cascades.value );
 			uniforms.cameraNear.value = this.camera.near;
 			uniforms.shadowFar.value = far;
+
+		}
+
+		for ( let i = 0; i < this.materials.length; i ++ ) {
+
+			const material = this.materials[ i ];
+			if ( ! this.fade && 'CSM_FADE' in material.defines ) {
+
+				delete material.defines.CSM_FADE;
+				material.needsUpdate = true;
+
+			} else if ( this.fade && ! ( 'CSM_FADE' in material.defines ) ) {
+
+				material.defines.CSM_FADE = '';
+				material.needsUpdate = true;
+
+			}
 
 		}
 
