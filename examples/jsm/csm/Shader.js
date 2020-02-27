@@ -86,38 +86,32 @@ IncidentLight directLight;
 		float margin = 0.25 * pow( linearDepth, 2.0 );
 		float csmx = CSM_cascades[ i ].x - margin / 2.0;
 		float csmy = CSM_cascades[ i ].y + margin / 2.0;
-		float dist = min( linearDepth - csmx, csmy - linearDepth );
-		float ratio = min( dist / margin, 1.0 );
-		if(i < NUM_DIR_LIGHT_SHADOWS && linearDepth >= csmx && linearDepth < csmy ) {
+		if( i < NUM_DIR_LIGHT_SHADOWS && linearDepth >= csmx && ( linearDepth < csmy ||  i == CSM_CASCADES - 1 ) ) {
 
-			vec3 prevColor = directLight.color;
-			directionalLightShadow = directionalLightShadows[ i ];
-			directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+			float dist = min( linearDepth - csmx, csmy - linearDepth );
+			float ratio = clamp( dist / margin, 0.0, 1.0 );
+			if(i < NUM_DIR_LIGHT_SHADOWS) {
+				vec3 prevColor = directLight.color;
+				directionalLightShadow = directionalLightShadows[ i ];
+				directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
 
-			if ( i == CSM_CASCADES - 1 && linearDepth > ( csmx + csmy ) / 2.0 ) {
-
-				directLight.color = mix( prevColor, directLight.color, ratio );
+				bool shouldFadeLastCascade = i == CSM_CASCADES - 1 && linearDepth > ( csmx + csmy ) / 2.0;
+				directLight.color = mix( prevColor, directLight.color, shouldFadeLastCascade ? ratio : 1.0 );
 
 			}
-
-		}
-
-        if(linearDepth >= csmx && (linearDepth < csmy ||  i  == CSM_CASCADES - 1)) {
 
 			ReflectedLight prevLight = reflectedLight;
 			RE_Direct( directLight, geometry, material, reflectedLight );
 
-			if ( i != CSM_CASCADES - 1 || i == CSM_CASCADES - 1 && linearDepth < ( csmx + csmy ) / 2.0 ) {
+			bool shouldBlend = i != CSM_CASCADES - 1 || i == CSM_CASCADES - 1 && linearDepth < ( csmx + csmy ) / 2.0;
+			float blendRatio = shouldBlend ? ratio : 1.0;
 
-				reflectedLight.directDiffuse = mix( prevLight.directDiffuse, reflectedLight.directDiffuse, ratio );
-				reflectedLight.directSpecular = mix( prevLight.directSpecular, reflectedLight.directSpecular, ratio );
-				reflectedLight.indirectDiffuse = mix( prevLight.indirectDiffuse, reflectedLight.indirectDiffuse, ratio );
-				reflectedLight.indirectSpecular = mix( prevLight.indirectSpecular, reflectedLight.indirectSpecular, ratio );
-
-			}
+			reflectedLight.directDiffuse = mix( prevLight.directDiffuse, reflectedLight.directDiffuse, blendRatio );
+			reflectedLight.directSpecular = mix( prevLight.directSpecular, reflectedLight.directSpecular, blendRatio );
+			reflectedLight.indirectDiffuse = mix( prevLight.indirectDiffuse, reflectedLight.indirectDiffuse, blendRatio );
+			reflectedLight.indirectSpecular = mix( prevLight.indirectSpecular, reflectedLight.indirectSpecular, blendRatio );
 
 		}
-
 
 	}
 
