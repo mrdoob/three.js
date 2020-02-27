@@ -235,22 +235,44 @@ function loopReplacer( match, start, end, remainingFile ) {
 	var snippet = '';
 	var remaining = '';
 	var braceCount = 1;
-	for ( var i = 0, l = remainingFile.length; i < l; i ++ ) {
+	var i = 0;
 
-		if ( remainingFile[ i ] === '{' ) {
+	while ( true ) {
+
+		var nextOpen = remainingFile.indexOf( '{', i );
+		var nextClosed = remainingFile.indexOf( '}', i );
+
+		if ( nextOpen === - 1 && nextClosed === - 1 ) {
+
+			snippet = remainingFile;
+			break;
+
+		} else if ( nextClosed === - 1 ) {
 
 			braceCount ++;
+			i = nextOpen + 1;
 
-		} else if ( remainingFile[ i ] === '}' ) {
+		} else if ( nextOpen === - 1 ) {
 
 			braceCount --;
+			i = nextClosed + 1;
+
+		} else if ( nextOpen < nextClosed ) {
+
+			braceCount ++;
+			i = nextOpen + 1;
+
+		} else {
+
+			braceCount --;
+			i = nextClosed + 1;
 
 		}
 
 		if ( braceCount === 0 ) {
 
-			snippet = remainingFile.substring( 0, i );
-			remaining = remainingFile.substring( i + 1 );
+			snippet = remainingFile.substring( 0, i - 1 );
+			remaining = remainingFile.substring( i );
 			break;
 
 		}
