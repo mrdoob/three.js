@@ -485,6 +485,10 @@ var GLTFLoader = ( function () {
 
 		onMaterial: function ( materialIndex, materialDef, parser ) {
 
+			var extensionDef = materialDef.extensions || {};
+
+			if ( extensionDef[ this.extension ] === undefined ) return null;
+
 			var extensions = parser.plugins.extensions;
 			var materialParams = {};
 			var pending = [];
@@ -1608,23 +1612,17 @@ var GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype._onBefore = function ( key, index, def ) {
 
-		var parser = this;
 		var functionName = 'onBefore' + key[ 0 ].toUpperCase() + key.slice( 1 );
 		var plugins = this.plugins || {};
 		var extensionPlugins = plugins.extensions || {};
-		var extensions = def.extensions || {};
 
-		for ( var extensionName in extensions ) {
+		for ( var extensionName in extensionPlugins ) {
 
 			var plugin = extensionPlugins[ extensionName ];
 
-			if ( plugin === undefined || plugin[ functionName ] === undefined ) {
+			if ( plugin[ functionName ] === undefined ) continue;
 
-				continue;
-
-			}
-
-			plugin[ functionName ]( index, def, parser );
+			plugin[ functionName ]( index, def, this );
 
 		}
 
@@ -1639,34 +1637,53 @@ var GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype._onAfter = function ( key, object, index, def ) {
 
-		var parser = this;
 		var functionName = 'onAfter' + key[ 0 ].toUpperCase() + key.slice( 1 );
 		var plugins = this.plugins || {};
 		var extensionPlugins = plugins.extensions || {};
-		var extensions = def.extensions || {};
-		var pending = Promise.resolve( object );
+		var targetPlugins = [];
 
-		for ( var extensionName in extensions ) {
+		for ( var extensionName in extensionPlugins ) {
 
 			var plugin = extensionPlugins[ extensionName ];
 
-			if ( plugin === undefined || plugin[ functionName ] === undefined ) {
+			if ( plugin[ functionName ] !== undefined ) {
 
-				continue;
+				targetPlugins.push( plugin );
 
 			}
 
-			pending = pending.then( function ( plugin, object ) {
+		}
 
-				return plugin[ functionName ]( object, index, def, parser );
+		return _onAfterHelper( targetPlugins, functionName, object, index, def, this );
 
-			}.bind( null, plugin ) );
+	};
+
+	function _onAfterHelper( plugins, functionName, object, index, def, parser ) {
+
+		while ( plugins.length > 0 ) {
+
+			var plugin = plugins.shift();
+			var result = plugin[ functionName ]( object, index, def, parser );
+
+			if ( result instanceof Promise ) {
+
+				object = result;
+
+			} else {
+
+				return result.then( function ( object ) {
+
+					return _onAfterHelper( plugins, object, functionName, index, def, parser );
+
+				} );
+
+			}
 
 		}
 
-		return pending;
+		return Promise.resolve( object );
 
-	};
+	}
 
 	/**
 	 * @param {string} key
@@ -1676,23 +1693,17 @@ var GLTFLoader = ( function () {
 	 */
 	GLTFParser.prototype._on = function ( key, index, def ) {
 
-		var parser = this;
 		var functionName = 'on' + key[ 0 ].toUpperCase() + key.slice( 1 );
 		var plugins = this.plugins || {};
 		var extensionPlugins = plugins.extensions || {};
-		var extensions = def.extensions || {};
 
-		for ( var extensionName in extensions ) {
+		for ( var extensionName in extensionPlugins ) {
 
 			var plugin = extensionPlugins[ extensionName ];
 
-			if ( plugin === undefined || plugin[ functionName ] === undefined ) {
+			if ( plugin[ functionName ] === undefined ) continue;
 
-				continue;
-
-			}
-
-			var result = plugin[ functionName ]( index, def, parser );
+			var result = plugin[ functionName ]( index, def, this );
 
 			if ( result ) return result;
 
