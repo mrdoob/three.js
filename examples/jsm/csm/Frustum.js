@@ -50,7 +50,7 @@ export default class Frustum {
 		this.vertices.near[ 1 ].set( 1, - 1, - 1 );
 		this.vertices.near[ 2 ].set( - 1, - 1, - 1 );
 		this.vertices.near[ 3 ].set( - 1, 1, - 1 );
-		this.vertices.near.forEach( function( v ) {
+		this.vertices.near.forEach( function ( v ) {
 
 			v.applyMatrix4( inverseProjectionMatrix );
 
@@ -60,7 +60,7 @@ export default class Frustum {
 		this.vertices.far[ 1 ].set( 1, - 1, 1 );
 		this.vertices.far[ 2 ].set( - 1, - 1, 1 );
 		this.vertices.far[ 3 ].set( - 1, 1, 1 );
-		this.vertices.far.forEach( function( v ) {
+		this.vertices.far.forEach( function ( v ) {
 
 			v.applyMatrix4( inverseProjectionMatrix );
 

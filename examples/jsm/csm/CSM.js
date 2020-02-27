@@ -95,7 +95,7 @@ export default class CSM {
 	getBreaks() {
 
 		const camera = this.camera;
-		const far = Math.min(camera.far, this.maxFar);
+		const far = Math.min( camera.far, this.maxFar );
 		this.breaks.length = 0;
 
 		switch ( this.mode ) {
@@ -144,8 +144,8 @@ export default class CSM {
 
 			_uniformArray.length = 0;
 			_logArray.length = 0;
-			const log = logarithmicSplit( amount, near, far, _logArray );
-			const uni = uniformSplit( amount, near, far, _uniformArray );
+			logarithmicSplit( amount, near, far, _logArray );
+			uniformSplit( amount, near, far, _uniformArray );
 
 			for ( let i = 1; i < amount; i ++ ) {
 
@@ -219,7 +219,7 @@ export default class CSM {
 		this.getExtendedBreaks( breaksVec2 );
 
 		const self = this;
-		const far = Math.min(this.camera.far, this.maxFar);
+		const far = Math.min( this.camera.far, this.maxFar );
 
 		material.onBeforeCompile = function ( shader ) {
 
@@ -235,7 +235,7 @@ export default class CSM {
 
 	updateUniforms() {
 
-		const far = Math.min(this.camera.far, this.maxFar);
+		const far = Math.min( this.camera.far, this.maxFar );
 
 		for ( let i = 0; i < this.materials.length; i ++ ) {
 

@@ -1156,7 +1156,7 @@ GLTFExporter.prototype = {
 			var meshCacheKeyParts = [ mesh.geometry.uuid ];
 			if ( Array.isArray( mesh.material ) ) {
 
-				for ( var i = 0, l = mesh.material.length; i < l; i++ ) {
+				for ( var i = 0, l = mesh.material.length; i < l; i ++ ) {
 
 					meshCacheKeyParts.push( mesh.material[ i ].uuid	);
 
