@@ -12,9 +12,7 @@ THREE.GLTFLoader = ( function () {
 
 		THREE.Loader.call( this, manager );
 
-		this.plugins = {
-			extensions: {}
-		};
+		this.plugins = {};
 
 		this.dracoLoader = null;
 		this.ddsLoader = null;
@@ -104,15 +102,15 @@ THREE.GLTFLoader = ( function () {
 
 		register: function ( plugin ) {
 
-			var extensionName = plugin.extension;
+			var pluginName = plugin.name;
 
-			if ( extensionName ) {
+			if ( pluginName ) {
 
-				this.plugins.extensions[ extensionName ] = plugin;
+				this.plugins[ pluginName ] = plugin;
 
 			} else {
 
-				console.warn( 'THREE.GLTFLoader: plugin needs an extension property.' );
+				console.warn( 'THREE.GLTFLoader: plugin needs a name property.' );
 
 			}
 
@@ -122,23 +120,23 @@ THREE.GLTFLoader = ( function () {
 
 		unregister: function ( plugin ) {
 
-			var extensionName = plugin.extension;
+			var pluginName = plugin.name;
 
-			if ( extensionName ) {
+			if ( pluginName ) {
 
-				if ( this.plugins.extensions[ extensionName ] ) {
+				if ( this.plugins[ pluginName ] ) {
 
-					delete this.plugins.extensions[ extensionName ];
+					delete this.plugins[ pluginName ];
 
 				} else {
 
-					console.warn( 'THREE.GLTFLoader: No plugin found whose name is ' + extensionName + '.' );
+					console.warn( 'THREE.GLTFLoader: No plugin found whose name is ' + pluginName + '.' );
 
 				}
 
 			} else {
 
-				console.warn( 'THREE.GLTFLoader: plugin needs an extension property.' );
+				console.warn( 'THREE.GLTFLoader: plugin needs a name property.' );
 
 			}
 
@@ -412,7 +410,7 @@ THREE.GLTFLoader = ( function () {
 	 */
 	function GLTFMaterialsUnlitExtension() {
 
-		this.extension = EXTENSIONS.KHR_MATERIALS_UNLIT;
+		this.name = EXTENSIONS.KHR_MATERIALS_UNLIT;
 
 	}
 
@@ -424,9 +422,8 @@ THREE.GLTFLoader = ( function () {
 
 			var extensionDef = materialDef.extensions || {};
 
-			if ( extensionDef[ this.extension ] === undefined ) return null;
+			if ( extensionDef[ this.name ] === undefined ) return null;
 
-			var extensions = parser.plugins.extensions;
 			var materialParams = {};
 			var pending = [];
 
@@ -1411,7 +1408,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.json = json || {};
 		this.extensions = extensions || {};
-		this.plugins = plugins || { extensions: {} };
+		this.plugins = plugins || {};
 		this.options = options || {};
 
 		// loader object cache
@@ -1439,7 +1436,7 @@ THREE.GLTFLoader = ( function () {
 		var parser = this;
 		var json = this.json;
 		var extensions = this.extensions;
-		var extensionPlugins = this.plugins.extensions;
+		var plugins = this.plugins;
 
 		// Clear the loader cache
 		this.cache.removeAll();
@@ -1471,7 +1468,7 @@ THREE.GLTFLoader = ( function () {
 
 		} ).then( function ( result ) {
 
-			addUnknownExtensionsToUserData( extensions, extensionPlugins, result, json );
+			addUnknownExtensionsToUserData( extensions, plugins, result, json );
 			assignExtrasToUserData( result, json );
 			onLoad( result );
 
@@ -1551,11 +1548,10 @@ THREE.GLTFLoader = ( function () {
 
 		var functionName = 'onBefore' + key[ 0 ].toUpperCase() + key.slice( 1 );
 		var plugins = this.plugins || {};
-		var extensionPlugins = plugins.extensions || {};
 
-		for ( var extensionName in extensionPlugins ) {
+		for ( var pluginName in plugins ) {
 
-			var plugin = extensionPlugins[ extensionName ];
+			var plugin = plugins[ pluginName ];
 
 			if ( plugin[ functionName ] === undefined ) continue;
 
@@ -1576,12 +1572,11 @@ THREE.GLTFLoader = ( function () {
 
 		var functionName = 'onAfter' + key[ 0 ].toUpperCase() + key.slice( 1 );
 		var plugins = this.plugins || {};
-		var extensionPlugins = plugins.extensions || {};
 		var targetPlugins = [];
 
-		for ( var extensionName in extensionPlugins ) {
+		for ( var pluginName in plugins ) {
 
-			var plugin = extensionPlugins[ extensionName ];
+			var plugin = plugins[ pluginName ];
 
 			if ( plugin[ functionName ] !== undefined ) {
 
@@ -1632,11 +1627,10 @@ THREE.GLTFLoader = ( function () {
 
 		var functionName = 'on' + key[ 0 ].toUpperCase() + key.slice( 1 );
 		var plugins = this.plugins || {};
-		var extensionPlugins = plugins.extensions || {};
 
-		for ( var extensionName in extensionPlugins ) {
+		for ( var pluginName in plugins ) {
 
-			var plugin = extensionPlugins[ extensionName ];
+			var plugin = plugins[ pluginName ];
 
 			if ( plugin[ functionName ] === undefined ) continue;
 
@@ -1663,7 +1657,7 @@ THREE.GLTFLoader = ( function () {
 		var cacheKey = type + ':' + index;
 		var dependency = this.cache.get( cacheKey );
 		var extensions = parser.extensions;
-		var extensionPlugins = parser.plugins.extensions;
+		var plugins = parser.plugins;
 
 		if ( ! dependency ) {
 
@@ -1680,7 +1674,7 @@ THREE.GLTFLoader = ( function () {
 
 						assignExtrasToUserData( scene, sceneDef );
 
-						if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, extensionPlugins, scene, sceneDef );
+						if ( sceneDef.extensions ) addUnknownExtensionsToUserData( extensions, plugins, scene, sceneDef );
 
 						return scene;
 
@@ -1698,7 +1692,7 @@ THREE.GLTFLoader = ( function () {
 
 						assignExtrasToUserData( node, nodeDef );
 
-						if ( nodeDef.extensions ) addUnknownExtensionsToUserData( extensions, extensionPlugins, node, nodeDef );
+						if ( nodeDef.extensions ) addUnknownExtensionsToUserData( extensions, plugins, node, nodeDef );
 
 						return node;
 
@@ -1774,7 +1768,7 @@ THREE.GLTFLoader = ( function () {
 
 						assignExtrasToUserData( material, materialDef );
 
-						if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, extensionPlugins, material, materialDef );
+						if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, plugins, material, materialDef );
 
 						return material;
 
