@@ -163,12 +163,13 @@ export default class CSM {
 
 	update( cameraMatrix ) {
 
-		for ( let i = 0; i < this.frustums.length; i ++ ) {
+		const frustums = this.frustums;
+		for ( let i = 0; i < frustums.length; i ++ ) {
 
 			const light = this.lights[ i ];
 			light.shadow.camera.updateMatrixWorld( true );
 			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
-			this.frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
+			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
 			_bbox.makeEmpty();
 			for ( let j = 0; j < 4; j ++ ) {
@@ -183,7 +184,17 @@ export default class CSM {
 			_center.z = _bbox.max.z + this.lightMargin;
 			_center.applyMatrix4( light.shadow.camera.matrixWorld );
 
-			const squaredBBWidth = Math.max( _size.x, _size.y );
+			let squaredBBWidth = Math.max( _size.x, _size.y );
+			if ( this.fade ) {
+
+				const camera = this.camera;
+				const far = Math.max( camera.far, this.maxFar );
+				const linearDepth = frustums[ i ].vertices.far[ 0 ].z / ( far - camera.near );
+				const margin = 0.25 * Math.pow( linearDepth, 2.0 ) * ( far - camera.near );
+
+				squaredBBWidth += margin;
+
+			}
 			light.shadow.camera.left = - squaredBBWidth / 2;
 			light.shadow.camera.right = squaredBBWidth / 2;
 			light.shadow.camera.top = squaredBBWidth / 2;
@@ -263,7 +274,7 @@ export default class CSM {
 				delete material.defines.CSM_FADE;
 				material.needsUpdate = true;
 
-			} else {
+			} else if ( this.fade && ! ( 'CSM_FADE' in material.defines ) ) {
 
 				material.defines.CSM_FADE = '';
 				material.needsUpdate = true;
