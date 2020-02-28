@@ -102,7 +102,7 @@ IncidentLight directLight;
 				directionalLightShadow = directionalLightShadows[ i ];
 				directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
 
-				bool shouldFadeLastCascade = i == CSM_CASCADES - 1 && linearDepth > ( csmx + csmy ) / 2.0;
+				bool shouldFadeLastCascade = i == CSM_CASCADES - 1 && linearDepth > cascadeCenter;
 				directLight.color = mix( prevColor, directLight.color, shouldFadeLastCascade ? ratio : 1.0 );
 
 			}
@@ -110,7 +110,7 @@ IncidentLight directLight;
 			ReflectedLight prevLight = reflectedLight;
 			RE_Direct( directLight, geometry, material, reflectedLight );
 
-			bool shouldBlend = i != CSM_CASCADES - 1 || i == CSM_CASCADES - 1 && linearDepth < ( csmx + csmy ) / 2.0;
+			bool shouldBlend = i != CSM_CASCADES - 1 || i == CSM_CASCADES - 1 && linearDepth < cascadeCenter;
 			float blendRatio = shouldBlend ? ratio : 1.0;
 
 			reflectedLight.directDiffuse = mix( prevLight.directDiffuse, reflectedLight.directDiffuse, blendRatio );
