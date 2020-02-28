@@ -187,7 +187,7 @@ export default class CSM {
 
 			}
 
-            let squaredBBWidth = point1.distanceTo( point2 );
+			let squaredBBWidth = point1.distanceTo( point2 );
 			_bbox.makeEmpty();
 			for ( let j = 0; j < 4; j ++ ) {
 
