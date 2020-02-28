@@ -181,9 +181,8 @@ export default class CSM {
 			_bbox.getSize( _size );
 			_bbox.getCenter( _center );
 			_center.z = _bbox.max.z + this.lightMargin;
-			_center.applyMatrix4( light.shadow.camera.matrixWorld );
 
-			let squaredBBWidth = Math.max( _size.x, _size.y );
+			let squaredBBWidth = _lightSpaceFrustum.vertices.far[ 0 ].distanceTo( _lightSpaceFrustum.vertices.far[ 2 ] );
 			if ( this.fade ) {
 
 				// expand the shadow extents by the fade margin if fade is enabled.
@@ -195,6 +194,12 @@ export default class CSM {
 				squaredBBWidth += margin;
 
 			}
+
+			const texelSize = squaredBBWidth / this.shadowMapSize;
+			_center.x = Math.floor( _center.x / texelSize ) * texelSize;
+			_center.y = Math.floor( _center.y / texelSize ) * texelSize;
+			_center.z = Math.floor( _center.z / texelSize ) * texelSize;
+			_center.applyMatrix4( light.shadow.camera.matrixWorld );
 
 			light.shadow.camera.left = - squaredBBWidth / 2;
 			light.shadow.camera.right = squaredBBWidth / 2;
