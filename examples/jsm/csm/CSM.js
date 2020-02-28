@@ -400,7 +400,6 @@ export default class CSM {
 			delete shader.uniforms.cameraNear;
 			delete shader.uniforms.shadowFar;
 
-
 			material.needsUpdate = true;
 
 		} );
