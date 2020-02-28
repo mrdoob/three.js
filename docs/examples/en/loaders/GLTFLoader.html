@@ -62,6 +62,13 @@
 		dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 		loader.setDRACOLoader( dracoLoader );
 
+		// Optional: Provide a compatibility for web worker
+		if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+			var workerLoader = new THREE.CanvasTextureLoader();
+			workerLoader.setOptions( { imageOrientation: 'flipY' } );
+			loader.setTextureLoader( workerLoader );
+		}
+
 		// Load a glTF resource
 		loader.load(
 			// resource URL

@@ -77,6 +77,7 @@ var GLTFLoader = ( function () {
 
 		this.dracoLoader = null;
 		this.ddsLoader = null;
+		this.textureLoader = null;
 
 	}
 
@@ -169,6 +170,13 @@ var GLTFLoader = ( function () {
 		setDDSLoader: function ( ddsLoader ) {
 
 			this.ddsLoader = ddsLoader;
+			return this;
+
+		},
+
+		setTextureLoader: function ( textureLoader ) {
+
+			this.textureLoader = textureLoader;
 			return this;
 
 		},
@@ -269,7 +277,7 @@ var GLTFLoader = ( function () {
 
 			}
 
-			var parser = new GLTFParser( json, extensions, {
+			var parser = new GLTFParser( this.textureLoader || new TextureLoader( this.manager ), json, extensions, {
 
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
@@ -1388,7 +1396,7 @@ var GLTFLoader = ( function () {
 
 	/* GLTF PARSER */
 
-	function GLTFParser( json, extensions, options ) {
+	function GLTFParser( textureLoader, json, extensions, options ) {
 
 		this.json = json || {};
 		this.extensions = extensions || {};
@@ -1400,7 +1408,7 @@ var GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
-		this.textureLoader = new TextureLoader( this.options.manager );
+		this.textureLoader = textureLoader;
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
 		this.fileLoader = new FileLoader( this.options.manager );

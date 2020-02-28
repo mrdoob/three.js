@@ -1,9 +1,10 @@
+import {CanvasTextureLoader} from "../../../src/loaders/CanvasTextureLoader";
 import {
 	AnimationClip,
 	Camera,
 	Group,
 	Loader,
-	LoadingManager
+	LoadingManager, TextureLoader
 } from '../../../src/Three';
 
 import { DRACOLoader } from './DRACOLoader';
@@ -31,10 +32,12 @@ export class GLTFLoader extends Loader {
 	constructor( manager?: LoadingManager );
 	dracoLoader: DRACOLoader | null;
 	ddsLoader: DDSLoader | null;
+	textureLoader: TextureLoader | CanvasTextureLoader;
 
 	load( url: string, onLoad: ( gltf: GLTF ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 	setDRACOLoader( dracoLoader: DRACOLoader ): GLTFLoader;
 	setDDSLoader( ddsLoader: DDSLoader ): GLTFLoader;
+	setTextureLoader( textureLoader: TextureLoader | CanvasTextureLoader ): GLTFLoader;
 	parse( data: ArrayBuffer | string, path: string, onLoad: ( gltf: GLTF ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 
 }

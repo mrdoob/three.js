@@ -226,6 +226,7 @@ var list = {
 				"AudioLoader": "api/en/loaders/AudioLoader",
 				"BufferGeometryLoader": "api/en/loaders/BufferGeometryLoader",
 				"Cache": "api/en/loaders/Cache",
+				"CanvasTextureLoader": "api/en/loaders/CanvasTextureLoader",
 				"CompressedTextureLoader": "api/en/loaders/CompressedTextureLoader",
 				"CubeTextureLoader": "api/en/loaders/CubeTextureLoader",
 				"DataTextureLoader": "api/en/loaders/DataTextureLoader",

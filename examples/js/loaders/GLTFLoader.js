@@ -6,6 +6,8 @@
  * @author Don McCurdy / https://www.donmccurdy.com
  */
 
+import { TextureLoader } from "build/three.module";
+
 THREE.GLTFLoader = ( function () {
 
 	function GLTFLoader( manager ) {
@@ -14,6 +16,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.dracoLoader = null;
 		this.ddsLoader = null;
+		this.textureLoader = null;
 
 	}
 
@@ -106,6 +109,13 @@ THREE.GLTFLoader = ( function () {
 		setDDSLoader: function ( ddsLoader ) {
 
 			this.ddsLoader = ddsLoader;
+			return this;
+
+		},
+
+		setTextureLoader: function ( textureLoader ) {
+
+			this.textureLoader = textureLoader;
 			return this;
 
 		},
@@ -206,7 +216,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			var parser = new GLTFParser( json, extensions, {
+			var parser = new GLTFParser( this.textureLoader || new THREE.TextureLoader( this.manager ), json, extensions, {
 
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
@@ -1325,7 +1335,7 @@ THREE.GLTFLoader = ( function () {
 
 	/* GLTF PARSER */
 
-	function GLTFParser( json, extensions, options ) {
+	function GLTFParser( textureLoader, json, extensions, options ) {
 
 		this.json = json || {};
 		this.extensions = extensions || {};
@@ -1337,7 +1347,7 @@ THREE.GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
-		this.textureLoader = new THREE.TextureLoader( this.options.manager );
+		this.textureLoader = textureLoader;
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
 		this.fileLoader = new THREE.FileLoader( this.options.manager );

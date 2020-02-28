@@ -33,6 +33,7 @@ export * from './textures/Texture';
 export * from './geometries/Geometries';
 export * from './materials/Materials';
 export * from './loaders/AnimationLoader';
+export * from './loaders/CanvasTextureLoader';
 export * from './loaders/CompressedTextureLoader';
 export * from './loaders/DataTextureLoader';
 export * from './loaders/CubeTextureLoader';

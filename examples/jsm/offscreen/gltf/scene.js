@@ -36,12 +36,20 @@ function init( canvas, width, height, pixelRatio, path ) {
 			// use of RoughnessMipmapper is optional
 			var roughnessMipmapper = new RoughnessMipmapper( renderer );
 
-			var loader = new GLTFLoader().setPath( path + 'models/gltf/DamagedHelmet/glTF/' );
+			var loader = new GLTFLoader();
+			if ( typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope ) {
+
+				loader.setTextureLoader( new THREE.CanvasTextureLoader() );
+
+			}
+
+			loader.setPath( path + 'models/gltf/DamagedHelmet/glTF/' );
+
 			loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
 				gltf.scene.traverse( function ( child ) {
 
-					if (child.isMesh) {
+					if ( child.isMesh ) {
 
 						roughnessMipmapper.generateMipmaps( child.material );
 

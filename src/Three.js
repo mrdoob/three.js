@@ -38,6 +38,7 @@ export * from './materials/Materials.js';
 export { AnimationLoader } from './loaders/AnimationLoader.js';
 export { CompressedTextureLoader } from './loaders/CompressedTextureLoader.js';
 export { DataTextureLoader } from './loaders/DataTextureLoader.js';
+export { CanvasTextureLoader } from './loaders/CanvasTextureLoader.js';
 export { CubeTextureLoader } from './loaders/CubeTextureLoader.js';
 export { TextureLoader } from './loaders/TextureLoader.js';
 export { ObjectLoader } from './loaders/ObjectLoader.js';
