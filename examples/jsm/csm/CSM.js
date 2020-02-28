@@ -170,6 +170,10 @@ export default class CSM {
 			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
 			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
+			const farTopRight = _lightSpaceFrustum.vertices.far[ 0 ];
+            const nearBotLeft = _lightSpaceFrustum.vertices.near[ 2 ];
+            let squaredBBWidth = farTopRight.distanceTo( nearBotLeft );
+
 			_bbox.makeEmpty();
 			for ( let j = 0; j < 4; j ++ ) {
 
@@ -178,11 +182,6 @@ export default class CSM {
 
 			}
 
-			_bbox.getSize( _size );
-			_bbox.getCenter( _center );
-			_center.z = _bbox.max.z + this.lightMargin;
-
-			let squaredBBWidth = _lightSpaceFrustum.vertices.far[ 0 ].distanceTo( _lightSpaceFrustum.vertices.near[ 2 ] );
 			if ( this.fade ) {
 
 				// expand the shadow extents by the fade margin if fade is enabled.
@@ -196,6 +195,8 @@ export default class CSM {
 			}
 
 			const texelSize = squaredBBWidth / this.shadowMapSize;
+			_bbox.getCenter( _center );
+			_center.z = _bbox.max.z + this.lightMargin;
 			_center.x = Math.floor( _center.x / texelSize ) * texelSize;
 			_center.y = Math.floor( _center.y / texelSize ) * texelSize;
 			_center.applyMatrix4( light.shadow.camera.matrixWorld );
