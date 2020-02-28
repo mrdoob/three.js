@@ -53,8 +53,7 @@ export default class CSM {
 		this.breaks = [];
 
 		this.lights = [];
-		this.shaders = [];
-		this.materials = [];
+		this.shaders = new Map();
 		this.createLights();
 
 		this.getBreaks();
@@ -238,39 +237,39 @@ export default class CSM {
 		const breaksVec2 = [];
 		this.getExtendedBreaks( breaksVec2 );
 
-		const self = this;
 		const far = Math.min( this.camera.far, this.maxFar );
+		const shaders = this.shaders;
+		const camera = this.camera;
 
 		material.onBeforeCompile = function ( shader ) {
 
 			shader.uniforms.CSM_cascades = { value: breaksVec2 };
-			shader.uniforms.cameraNear = { value: self.camera.near };
+			shader.uniforms.cameraNear = { value: camera.near };
 			shader.uniforms.shadowFar = { value: far };
 
-			self.shaders.push( shader );
+			shaders.set( material, shader );
 
 		};
-		this.materials.push( material );
+		shaders.set( material, null );
 
 	}
 
 	updateUniforms() {
 
 		const far = Math.min( this.camera.far, this.maxFar );
+		const shaders = this.shaders;
 
-		for ( let i = 0; i < this.shaders.length; i ++ ) {
+		shaders.forEach( function ( shader, material ) {
 
-			const shader = this.shaders[ i ];
-			const uniforms = shader.uniforms;
-			this.getExtendedBreaks( uniforms.CSM_cascades.value );
-			uniforms.cameraNear.value = this.camera.near;
-			uniforms.shadowFar.value = far;
+			if ( shader !== null ) {
 
-		}
+				const uniforms = shader.uniforms;
+				this.getExtendedBreaks( uniforms.CSM_cascades.value );
+				uniforms.cameraNear.value = this.camera.near;
+				uniforms.shadowFar.value = far;
 
-		for ( let i = 0; i < this.materials.length; i ++ ) {
+			}
 
-			const material = this.materials[ i ];
 			if ( ! this.fade && 'CSM_FADE' in material.defines ) {
 
 				delete material.defines.CSM_FADE;
@@ -283,7 +282,7 @@ export default class CSM {
 
 			}
 
-		}
+		}, this );
 
 	}
 
