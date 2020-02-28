@@ -235,16 +235,16 @@ export default class CSM {
 		}
 
 		const breaksVec2 = [];
-		this.getExtendedBreaks( breaksVec2 );
-
-		const far = Math.min( this.camera.far, this.maxFar );
+		const self = this;
 		const shaders = this.shaders;
-		const camera = this.camera;
 
 		material.onBeforeCompile = function ( shader ) {
 
+			const far = Math.min( self.camera.far, self.maxFar );
+			self.getExtendedBreaks( breaksVec2 );
+
 			shader.uniforms.CSM_cascades = { value: breaksVec2 };
-			shader.uniforms.cameraNear = { value: camera.near };
+			shader.uniforms.cameraNear = { value: self.camera.near };
 			shader.uniforms.shadowFar = { value: far };
 
 			shaders.set( material, shader );
