@@ -170,15 +170,29 @@ export default class CSM {
 			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
 			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
-			const farTopRight = _lightSpaceFrustum.vertices.far[ 0 ];
-            const nearBotLeft = _lightSpaceFrustum.vertices.near[ 2 ];
-            let squaredBBWidth = farTopRight.distanceTo( nearBotLeft );
+			// Get the two points that represent that furthest points on the frustum assuming
+			// that's either the diagonal across the far plane or the diagonal across the whole
+			// frustum itself.
+			const nearVerts = _lightSpaceFrustum.vertices.near;
+			const farVerts = _lightSpaceFrustum.vertices.far;
+			const point1 = farVerts[ 0 ];
+			let point2;
+			if ( point1.distanceTo( farVerts[ 2 ] ) > point1.distanceTo( nearVerts[ 2 ] ) ) {
 
+				point2 = farVerts[ 2 ];
+
+			} else {
+
+				point2 = nearVerts[ 2 ];
+
+			}
+
+            let squaredBBWidth = point1.distanceTo( point2 );
 			_bbox.makeEmpty();
 			for ( let j = 0; j < 4; j ++ ) {
 
-				_bbox.expandByPoint( _lightSpaceFrustum.vertices.near[ j ] );
-				_bbox.expandByPoint( _lightSpaceFrustum.vertices.far[ j ] );
+				_bbox.expandByPoint( nearVerts[ j ] );
+				_bbox.expandByPoint( farVerts[ j ] );
 
 			}
 
