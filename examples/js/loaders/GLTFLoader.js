@@ -1759,7 +1759,7 @@ THREE.GLTFLoader = ( function () {
 		var options = this.options;
 		var textureLoader = this.textureLoader;
 
-		var URLBuilder = URL || webkitURL;
+		var URLBuilder = typeof URL !== 'undefined' ? URL : webkitURL;
 
 		var textureDef = json.textures[ textureIndex ];
 
