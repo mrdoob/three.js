@@ -56,8 +56,8 @@
     "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
     "test-lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-unit": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
-    "test-diff": "node --expose-gc test/diff/puppeteer.js",
-    "make-screenshot": "cross-env MAKE=true npm run test-diff"
+    "test-e2e": "node --expose-gc test/e2e/puppeteer.js",
+    "make-screenshot": "cross-env MAKE=true npm run test-e2e"
   },
   "keywords": [
     "three",

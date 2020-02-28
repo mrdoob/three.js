@@ -7,21 +7,21 @@ jobs:
   include:
 
     - &lint-n-unit
-      stage: lint & unit
+      stage: Lint & Unit
       name: lint
       script: npm run test-lint
     - <<: *lint-n-unit
       name: unit
       script: npm run test-unit
 
-    - &diff
-      stage: diff
-      name: diff
-      script: npm run test-diff
+    - &e2e
+      stage: E2E
+      name: e2e
+      script: npm run test-e2e
       env: FORCE_COLOR=0 CI=0
-    - <<: *diff
+    - <<: *e2e
       env: FORCE_COLOR=0 CI=1
-    - <<: *diff
+    - <<: *e2e
       env: FORCE_COLOR=0 CI=2
-    - <<: *diff
+    - <<: *e2e
       env: FORCE_COLOR=0 CI=3
