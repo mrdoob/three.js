@@ -1337,8 +1337,7 @@ THREE.GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
-		var isWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
-		this.textureLoader = isWorker ? new THREE.ImageBitmapLoader( this.options.manager ) : new THREE.TextureLoader( this.options.manager );
+		this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
 		this.fileLoader = new THREE.FileLoader( this.options.manager );

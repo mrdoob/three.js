@@ -4,6 +4,7 @@
 
 import { RGBAFormat, RGBFormat } from '../constants.js';
 import { ImageLoader } from './ImageLoader.js';
+import { ImageBitmapLoader } from './ImageBitmapLoader.js';
 import { Texture } from '../textures/Texture.js';
 import { Loader } from './Loader.js';
 
@@ -21,7 +22,8 @@ TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var texture = new Texture();
 
-		var loader = new ImageLoader( this.manager );
+		var isWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+		var loader = isWorker ? new ImageBitmapLoader( this.manager ) : new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 

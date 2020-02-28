@@ -307,7 +307,8 @@ var files = {
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
 		"webgl_tiled_forward",
-		"webgl_worker_offscreencanvas"
+		"webgl_worker_offscreencanvas",
+		"webgl_worker_offscreencanvas_gltf"
 	],
 	"webgl2": [
 		"webgl2_materials_texture2darray",
