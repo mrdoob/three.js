@@ -7,7 +7,7 @@ jobs:
   include:
 
     - &lint-n-unit
-      stage: Lint & Unit
+      stage: lint & unit
       name: lint
       script: npm run test-lint
     - <<: *lint-n-unit
@@ -15,7 +15,7 @@ jobs:
       script: npm run test-unit
 
     - &e2e
-      stage: E2E
+      stage: e2e
       name: e2e
       script: npm run test-e2e
       env: FORCE_COLOR=0 CI=0
