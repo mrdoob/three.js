@@ -77,8 +77,6 @@ var GLTFLoader = ( function () {
 
 		this.dracoLoader = null;
 		this.ddsLoader = null;
-		this.requestHeader = null;
-
 	}
 
 	GLTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
@@ -131,12 +129,7 @@ var GLTFLoader = ( function () {
 
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
-
-			if ( this.requestHeader !== null ) {
-
-				loader.setRequestHeader( this.requestHeader );
-
-			}
+			loader.setRequestHeader( this.requestHeader );
 
 			if ( scope.crossOrigin === 'use-credentials' ) {
 
@@ -163,13 +156,6 @@ var GLTFLoader = ( function () {
 				}
 
 			}, onProgress, _onError );
-
-		},
-
-		setRequestHeader: function ( header ) {
-
-			this.requestHeader = header;
-			return this;
 
 		},
 
@@ -291,12 +277,7 @@ var GLTFLoader = ( function () {
 
 			} );
 
-			if ( this.requestHeader !== null ) {
-
-				parser.fileLoader.setRequestHeader( this.requestHeader );
-
-			}
-
+			parser.fileLoader.setRequestHeader( this.requestHeader );
 			parser.parse( onLoad, onError );
 
 		}

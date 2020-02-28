@@ -14,7 +14,6 @@ THREE.GLTFLoader = ( function () {
 
 		this.dracoLoader = null;
 		this.ddsLoader = null;
-		this.requestHeader = null;
 
 	}
 
@@ -68,12 +67,7 @@ THREE.GLTFLoader = ( function () {
 
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
-
-			if ( this.requestHeader !== null ) {
-
-				loader.setRequestHeader( this.requestHeader );
-
-			}
+			loader.setRequestHeader( this.requestHeader );
 
 			if ( scope.crossOrigin === 'use-credentials' ) {
 
@@ -100,13 +94,6 @@ THREE.GLTFLoader = ( function () {
 				}
 
 			}, onProgress, _onError );
-
-		},
-
-		setRequestHeader: function ( header ) {
-
-			this.requestHeader = header;
-			return this;
 
 		},
 
@@ -228,12 +215,7 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
-			if ( this.requestHeader !== null ) {
-
-				parser.fileLoader.setRequestHeader( this.requestHeader );
-
-			}
-
+			parser.fileLoader.setRequestHeader( this.requestHeader );
 			parser.parse( onLoad, onError );
 
 		}
