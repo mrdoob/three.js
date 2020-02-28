@@ -386,4 +386,26 @@ export default class CSM {
 
 	}
 
+	dispose() {
+
+		const shaders = this.shaders;
+		shaders.forEach( function ( shader, material ) {
+
+			delete material.onBeforeCompile;
+			delete material.defines.USE_CSM;
+			delete material.defines.CSM_CASCADES;
+			delete material.defines.CSM_FADE;
+
+			delete shader.uniforms.CSM_cascades;
+			delete shader.uniforms.cameraNear;
+			delete shader.uniforms.shadowFar;
+
+
+			material.needsUpdate = true;
+
+		} );
+		shaders.clear();
+
+	}
+
 }
