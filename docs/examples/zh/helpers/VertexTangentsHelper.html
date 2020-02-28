@@ -30,7 +30,7 @@
 		var material = new THREE.MeshNormalMaterial();
 		var box = new THREE.Mesh( geometry, material );
 
-		var helper = new THREE.VertexTangentsHelper( box, 1, 0x00ffff, 1 );
+		var helper = new VertexTangentsHelper( box, 1, 0x00ffff, 1 );
 
 		scene.add( box );
 		scene.add( helper );

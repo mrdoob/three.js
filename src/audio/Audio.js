@@ -142,7 +142,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
-			this._pausedAt = ( this.context.currentTime - this._startedAt ) * this.playbackRate;
+			this._pausedAt += Math.max( this.context.currentTime - this._startedAt, 0 ) * this.playbackRate;
 
 			this.source.stop();
 			this.source.onended = null;

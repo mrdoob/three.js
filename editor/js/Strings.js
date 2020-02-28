@@ -295,6 +295,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
+			'sidebar/settings/exportPrecision': 'Export Precision',
 
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
@@ -580,6 +581,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
+			'sidebar/settings/exportPrecision': 'Export Precision',
 
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',

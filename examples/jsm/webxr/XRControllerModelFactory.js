@@ -139,7 +139,7 @@ function findNodes( motionController, scene ) {
 
 			} else {
 
-				console.warn( `Could not find touch dot, ${component.touchPointNodeName}, in touchpad component ${componentId}` );
+				console.warn( `Could not find touch dot, ${component.touchPointNodeName}, in touchpad component ${component.id}` );
 
 			}
 
@@ -281,7 +281,7 @@ var XRControllerModelFactory = ( function () {
 						null,
 						() => {
 
-							throw new Error( `Asset ${motionController.assetUrl} missing or malformed.` );
+							throw new Error( `Asset ${controllerModel.motionController.assetUrl} missing or malformed.` );
 
 						} );
 

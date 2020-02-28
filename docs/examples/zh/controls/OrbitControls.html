@@ -32,7 +32,7 @@ var scene = new THREE.Scene();
 
 var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
-var controls = new THREE.OrbitControls( camera, renderer.domElement );
+var controls = new OrbitControls( camera, renderer.domElement );
 
 //controls.update() must be called after any manual changes to the camera's transform
 camera.position.set( 0, 20, 100 );
@@ -291,7 +291,7 @@ controls.touches = {
 		<h2>源代码</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/OrbitControls.js examples/js/controls/OrbitControls.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js examples/jsm/controls/OrbitControls.js]
 		</p>
 	</body>
 </html>

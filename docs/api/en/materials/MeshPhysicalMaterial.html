@@ -39,7 +39,9 @@
 		<h2>Examples</h2>
 		<p>
 			[example:webgl_materials_variations_physical materials / variations / physical]<br />
-			[example:webgl_materials_reflectivity materials / reflectivity]
+			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
+			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
+			[example:webgl_materials_physical_transparency materials / physical / transparency]
 		</p>
 
 		<h2>Constructor</h2>
@@ -59,11 +61,19 @@
 
 		<h3>[property:Float clearcoat]</h3>
 		<p>
-		Clearcoat level, from *0.0* to *1.0*. Default is *0.0*.
+		Represents the thickness of the clear coat layer, from *0.0* to *1.0*. You can use clear coat related properties to enable multilayer
+		materials that have a thin translucent layer over the base layer. Typical examples for this model are car paints or acrylic.
+		Default is *0.0*.
 		</p>
 
+		<h3>[property:Float clearcoatNormalMap]</h3>
+		<p>Can be used to enable independent normals for the clear coat layer. Default is *null*.</p>
+
+		<h3>[property:Vector2 clearcoatNormalScale]</h3>
+		<p>How much [page:.clearcoatNormalMap] affects the clear coat layer, from *(0,0)* to *(1,1)*. Default is *(1,1)*.</p>
+
 		<h3>[property:Float clearcoatRoughness]</h3>
-		<p>How rough the clearcoat appears, from *0.0* to *1.0*. Default is *0.0*.</p>
+		<p>Roughness of the clear coat layer, from *0.0* to *1.0*. Default is *0.0*.</p>
 
 		<h3>[property:Object defines]</h3>
 		<p>An object of the form:
@@ -84,6 +94,17 @@
 		Degree of reflectivity, from *0.0* to *1.0*. Default is *0.5*.<br />
 
 		This models the reflectivity of non-metallic materials. It has no effect when [page:MeshStandardMaterial.metalness metalness] is *1.0*
+		</p>
+
+		<h3>[property:Float transparency]</h3>
+		<p>
+		Degree of transparency, from *0.0* to *1.0*. Default is *0.0*.<br />
+		
+		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are mostly transparent.
+		
+		The transparency property can be used to model these materials.<br />
+		
+		When transparency is non-zero, [page:Material.opacity opacity] should be set to *1*.
 		</p>
 
 		<h2>Methods</h2>

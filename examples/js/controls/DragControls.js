@@ -52,6 +52,12 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	}
 
+	function getObjects() {
+
+		return _objects;
+
+	}
+
 	function onDocumentMouseMove( event ) {
 
 		event.preventDefault();
@@ -123,7 +129,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		if ( _intersections.length > 0 ) {
 
-			_selected = _intersections[ 0 ].object;
+			_selected = ( scope.transformGroup === true ) ? _objects[ 0 ] : _intersections[ 0 ].object;
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
@@ -202,7 +208,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		if ( _intersections.length > 0 ) {
 
-			_selected = _intersections[ 0 ].object;
+			_selected = ( scope.transformGroup === true ) ? _objects[ 0 ] : _intersections[ 0 ].object;
 
 			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
@@ -243,10 +249,12 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	// API
 
 	this.enabled = true;
+	this.transformGroup = false;
 
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
+	this.getObjects = getObjects;
 
 };
 
