@@ -166,9 +166,9 @@ var GLTFLoader = ( function () {
 
 		},
 
-		setRequestHeader: function ( value ) {
+		setRequestHeader: function ( header ) {
 
-			this.requestHeader = value;
+			this.requestHeader = header;
 			return this;
 
 		},
@@ -290,6 +290,12 @@ var GLTFLoader = ( function () {
 				manager: this.manager
 
 			} );
+
+			if ( this.requestHeader !== null ) {
+
+				parser.fileLoader.setRequestHeader( this.requestHeader );
+
+			}
 
 			parser.parse( onLoad, onError );
 
