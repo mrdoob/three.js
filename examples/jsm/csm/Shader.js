@@ -78,7 +78,7 @@ IncidentLight directLight;
 	DirectionalLightShadow directionalLightShadow;
 	#endif
 
-	#if defined( CSM_FADE )
+	#if defined( USE_SHADOWMAP ) && defined( CSM_FADE )
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
