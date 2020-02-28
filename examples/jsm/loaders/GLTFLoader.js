@@ -19,6 +19,7 @@ import {
 	FileLoader,
 	FrontSide,
 	Group,
+	ImageBitmapLoader,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
 	Interpolant,
@@ -1400,7 +1401,8 @@ var GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
-		this.textureLoader = new TextureLoader( this.options.manager );
+		var isWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+		this.textureLoader = isWorker ? new ImageBitmapLoader( this.options.manager ) : new TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
 		this.fileLoader = new FileLoader( this.options.manager );
@@ -1821,7 +1823,7 @@ var GLTFLoader = ( function () {
 		var options = this.options;
 		var textureLoader = this.textureLoader;
 
-		var URL = window.URL || window.webkitURL;
+		var URLBuilder = URL || webkitURL;
 
 		var textureDef = json.textures[ textureIndex ];
 
@@ -1850,7 +1852,7 @@ var GLTFLoader = ( function () {
 
 				isObjectURL = true;
 				var blob = new Blob( [ bufferView ], { type: source.mimeType } );
-				sourceURI = URL.createObjectURL( blob );
+				sourceURI = URLBuilder.createObjectURL( blob );
 				return sourceURI;
 
 			} );
@@ -1883,7 +1885,7 @@ var GLTFLoader = ( function () {
 
 			if ( isObjectURL === true ) {
 
-				URL.revokeObjectURL( sourceURI );
+				URLBuilder.revokeObjectURL( sourceURI );
 
 			}
 

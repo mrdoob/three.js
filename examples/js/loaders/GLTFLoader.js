@@ -1337,7 +1337,8 @@ THREE.GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
-		this.textureLoader = new THREE.TextureLoader( this.options.manager );
+		var isWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+		this.textureLoader = isWorker ? new THREE.ImageBitmapLoader( this.options.manager ) : new THREE.TextureLoader( this.options.manager );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
 		this.fileLoader = new THREE.FileLoader( this.options.manager );
@@ -1758,7 +1759,7 @@ THREE.GLTFLoader = ( function () {
 		var options = this.options;
 		var textureLoader = this.textureLoader;
 
-		var URL = window.URL || window.webkitURL;
+		var URLBuilder = URL || webkitURL;
 
 		var textureDef = json.textures[ textureIndex ];
 
@@ -1787,7 +1788,7 @@ THREE.GLTFLoader = ( function () {
 
 				isObjectURL = true;
 				var blob = new Blob( [ bufferView ], { type: source.mimeType } );
-				sourceURI = URL.createObjectURL( blob );
+				sourceURI = URLBuilder.createObjectURL( blob );
 				return sourceURI;
 
 			} );
@@ -1820,7 +1821,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( isObjectURL === true ) {
 
-				URL.revokeObjectURL( sourceURI );
+				URLBuilder.revokeObjectURL( sourceURI );
 
 			}
 

@@ -45,8 +45,7 @@ function init( canvas, width, height, pixelRatio, path ) {
 		renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
 		renderer.setPixelRatio( pixelRatio );
 		renderer.setSize( width, height, false );
-
-		animate();
+		renderer.setAnimationLoop( animate );
 
 	} );
 
@@ -58,16 +57,6 @@ function animate() {
 	group.rotation.y = - Date.now() / 4000;
 
 	renderer.render( scene, camera );
-
-	if ( self.requestAnimationFrame ) {
-
-		self.requestAnimationFrame( animate );
-
-	} else {
-
-		// Firefox
-
-	}
 
 }
 

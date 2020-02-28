@@ -308,7 +308,7 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 					fn.substring( fn.indexOf( '{' ) + 1, fn.lastIndexOf( '}' ) )
 				].join( '\n' );
 
-				this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
+				this.workerSourceURL = URL.createObjectURL( new Blob( [ body ], { type: 'text/javascript' } ) );
 
 			} );
 
