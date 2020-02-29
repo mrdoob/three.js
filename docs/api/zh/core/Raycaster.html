@@ -91,13 +91,6 @@
 			这个值不应当为负，并且应当比near属性大。
 		</p>
 
-		<h3>[property:float linePrecision]</h3>
-		<p>
-
-			raycaster与[page:Line]（线）物体相交时的精度因数。
-
-		</p>
-
 		<h3>[property:float near]</h3>
 		<p>
 			raycaster的近距离因数（投射近点）。这个值表明哪些对象可以基于该距离而被raycaster所丢弃。
@@ -112,18 +105,31 @@
 		Defaults to null.
 		</p>
 
+		<h3>[property:Layers layers]</h3>
+		<p>
+		Used by [name] to selectively ignore 3D objects when performing intersection tests. The following code example ensures that
+		only 3D objects on layer *1* will be honored by the instance of [name].
+
+		<code>
+		raycaster.layers.set( 1 );
+		object.layers.enable( 1 );
+		</code>
+
+		</p>
+
 		<h3>[property:Object params]</h3>
 		<p>
 			具有以下属性的对象：<code>
 {
 	Mesh: {},
-	Line: {},
+	Line: { threshold: 1 },
 	LOD: {},
 	Points: { threshold: 1 },
 	Sprite: {}
 }
 			</code>
 
+		Where threshold is the precision of the raycaster when intersecting objects, in world units.
 		</p>
 
 		<h3>[property:Ray ray]</h3>

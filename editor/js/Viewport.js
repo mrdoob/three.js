@@ -31,6 +31,7 @@ var Viewport = function ( editor ) {
 	//
 
 	var renderer = null;
+	var pmremGenerator = null;
 
 	var camera = editor.camera;
 	var scene = editor.scene;
@@ -78,9 +79,11 @@ var Viewport = function ( editor ) {
 
 			selectionBox.setFromObject( object );
 
-			if ( editor.helpers[ object.id ] !== undefined ) {
+			var helper = editor.helpers[ object.id ];
 
-				editor.helpers[ object.id ].update();
+			if ( helper !== undefined && helper.isSkeletonHelper !== true ) {
+
+				helper.update();
 
 			}
 
@@ -324,7 +327,7 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.rendererChanged.add( function ( newRenderer ) {
+	signals.rendererChanged.add( function ( newRenderer, newPmremGenerator ) {
 
 		if ( renderer !== null ) {
 
@@ -333,6 +336,7 @@ var Viewport = function ( editor ) {
 		}
 
 		renderer = newRenderer;
+		pmremGenerator = newPmremGenerator;
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
@@ -473,7 +477,7 @@ var Viewport = function ( editor ) {
 
 	var currentBackgroundType = null;
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundCubeTexture ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundCubeTexture, backgroundEquirectTexture ) {
 
 		if ( currentBackgroundType !== backgroundType ) {
 
@@ -493,14 +497,46 @@ var Viewport = function ( editor ) {
 		if ( backgroundType === 'Color' ) {
 
 			scene.background.set( backgroundColor );
+			scene.environment = null;
 
 		} else if ( backgroundType === 'Texture' ) {
 
 			scene.background = backgroundTexture;
+			scene.environment = null;
 
 		} else if ( backgroundType === 'CubeTexture' ) {
 
-			scene.background = backgroundCubeTexture;
+			if ( backgroundCubeTexture && backgroundCubeTexture.isHDRTexture ) {
+
+				var texture = pmremGenerator.fromCubemap( backgroundCubeTexture ).texture;
+				texture.isPmremTexture = true;
+
+				scene.background = texture;
+				scene.environment = texture;
+
+			} else {
+
+				scene.background = backgroundCubeTexture;
+				scene.environment = null;
+
+			}
+
+		} else if ( backgroundType === 'Equirect' ) {
+
+			if ( backgroundEquirectTexture && backgroundEquirectTexture.isHDRTexture ) {
+
+				var texture = pmremGenerator.fromEquirectangular( backgroundEquirectTexture ).texture;
+				texture.isPmremTexture = true;
+
+				scene.background = texture;
+				scene.environment = texture;
+
+			} else {
+
+				scene.background = null;
+				scene.environment = null;
+
+			}
 
 		}
 

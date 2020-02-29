@@ -5,7 +5,7 @@
 
 var ARButton = {
 
-	createButton: function ( renderer ) {
+	createButton: function ( renderer, sessionInit = {} ) {
 
 		function showStartAR( /*device*/ ) {
 
@@ -65,7 +65,7 @@ var ARButton = {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-ar' ).then( onSessionStarted );
+					navigator.xr.requestSession( 'immersive-ar', sessionInit ).then( onSessionStarted );
 
 				} else {
 

@@ -5,6 +5,7 @@
 
 import {
 	Color,
+	LinearEncoding,
 	LinearFilter,
 	MathUtils,
 	Matrix4,
@@ -35,6 +36,7 @@ var Refractor = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Refractor.RefractorShader;
+	var encoding = options.encoding !== undefined ? options.encoding : LinearEncoding;
 
 	//
 
@@ -53,7 +55,8 @@ var Refractor = function ( geometry, options ) {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBFormat,
-		stencilBuffer: false
+		stencilBuffer: false,
+		encoding: encoding
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );

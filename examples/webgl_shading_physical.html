@@ -76,19 +76,16 @@
 				textureSquares.repeat.set( 50, 50 );
 				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
 				textureSquares.magFilter = THREE.NearestFilter;
-				textureSquares.format = THREE.RGBFormat;
 				textureSquares.encoding = THREE.sRGBEncoding;
 
 				var textureNoiseColor = textureLoader.load( "textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
 				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
-				textureNoiseColor.format = THREE.RGBFormat;
 				textureNoiseColor.encoding = THREE.sRGBEncoding;
 
 				var textureLava = textureLoader.load( "textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
-				textureLava.format = THREE.RGBFormat;
 				textureLava.encoding = THREE.sRGBEncoding;
 
 				// GROUND

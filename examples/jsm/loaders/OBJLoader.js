@@ -13,10 +13,8 @@ import {
 	Material,
 	Mesh,
 	MeshPhongMaterial,
-	NoColors,
 	Points,
-	PointsMaterial,
-	VertexColors
+	PointsMaterial
 } from "../../../build/three.module.js";
 
 var OBJLoader = ( function () {
@@ -740,7 +738,7 @@ var OBJLoader = ( function () {
 
 						material.name = sourceMaterial.name;
 						material.flatShading = sourceMaterial.smooth ? false : true;
-						material.vertexColors = hasVertexColors ? VertexColors : NoColors;
+						material.vertexColors = hasVertexColors;
 
 						state.materials[ materialHash ] = material;
 

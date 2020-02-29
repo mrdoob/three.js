@@ -41,6 +41,8 @@ var SidebarMaterial = function ( editor ) {
 
 	var currentMaterialSlot = 0;
 
+	var epsilon = 0.01 - Number.EPSILON;
+
 	var container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setDisplay( 'none' );
@@ -248,18 +250,22 @@ var SidebarMaterial = function ( editor ) {
 	// vertex colors
 
 	var materialVertexColorsRow = new UIRow();
-	var materialVertexColors = new UISelect().setOptions( {
-
-		0: strings.getKey( 'sidebar/material/vertexcolors/no' ),
-		1: strings.getKey( 'sidebar/material/vertexcolors/face' ),
-		2: strings.getKey( 'sidebar/material/vertexcolors/vertex' )
-
-	} ).onChange( update );
+	var materialVertexColors = new UICheckbox( false ).onChange( update );
 
 	materialVertexColorsRow.add( new UIText( strings.getKey( 'sidebar/material/vertexcolors' ) ).setWidth( '90px' ) );
 	materialVertexColorsRow.add( materialVertexColors );
 
 	container.add( materialVertexColorsRow );
+
+	// vertex tangents
+
+	var materialVertexTangentsRow = new UIRow();
+	var materialVertexTangents = new UICheckbox( false ).onChange( update );
+
+	materialVertexTangentsRow.add( new UIText( strings.getKey( 'sidebar/material/vertextangents' ) ).setWidth( '90px' ) );
+	materialVertexTangentsRow.add( materialVertexTangents );
+
+	container.add( materialVertexTangentsRow );
 
 	// depth packing
 
@@ -560,11 +566,9 @@ var SidebarMaterial = function ( editor ) {
 
 	var materialWireframeRow = new UIRow();
 	var materialWireframe = new UICheckbox( false ).onChange( update );
-	var materialWireframeLinewidth = new UINumber( 1 ).setWidth( '60px' ).setRange( 0, 100 ).onChange( update );
 
 	materialWireframeRow.add( new UIText( strings.getKey( 'sidebar/material/wireframe' ) ).setWidth( '90px' ) );
 	materialWireframeRow.add( materialWireframe );
-	materialWireframeRow.add( materialWireframeLinewidth );
 
 	container.add( materialWireframeRow );
 
@@ -637,13 +641,13 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
-			if ( material.roughness !== undefined && Math.abs( material.roughness - materialRoughness.getValue() ) >= 0.01 ) {
+			if ( material.roughness !== undefined && Math.abs( material.roughness - materialRoughness.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'roughness', materialRoughness.getValue(), currentMaterialSlot ) );
 
 			}
 
-			if ( material.metalness !== undefined && Math.abs( material.metalness - materialMetalness.getValue() ) >= 0.01 ) {
+			if ( material.metalness !== undefined && Math.abs( material.metalness - materialMetalness.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'metalness', materialMetalness.getValue(), currentMaterialSlot ) );
 
@@ -679,19 +683,19 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
-			if ( material.shininess !== undefined && Math.abs( material.shininess - materialShininess.getValue() ) >= 0.01 ) {
+			if ( material.shininess !== undefined && Math.abs( material.shininess - materialShininess.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'shininess', materialShininess.getValue(), currentMaterialSlot ) );
 
 			}
 
-			if ( material.clearcoat !== undefined && Math.abs( material.clearcoat - materialClearcoat.getValue() ) >= 0.01 ) {
+			if ( material.clearcoat !== undefined && Math.abs( material.clearcoat - materialClearcoat.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearcoat', materialClearcoat.getValue(), currentMaterialSlot ) );
 
 			}
 
-			if ( material.clearcoatRoughness !== undefined && Math.abs( material.clearcoatRoughness - materialClearcoatRoughness.getValue() ) >= 0.01 ) {
+			if ( material.clearcoatRoughness !== undefined && Math.abs( material.clearcoatRoughness - materialClearcoatRoughness.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'clearcoatRoughness', materialClearcoatRoughness.getValue(), currentMaterialSlot ) );
 
@@ -699,7 +703,7 @@ var SidebarMaterial = function ( editor ) {
 
 			if ( material.vertexColors !== undefined ) {
 
-				var vertexColors = parseInt( materialVertexColors.getValue() );
+				var vertexColors = materialVertexColors.getValue();
 
 				if ( material.vertexColors !== vertexColors ) {
 
@@ -1114,7 +1118,7 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
-			if ( material.opacity !== undefined && Math.abs( material.opacity - materialOpacity.getValue() ) >= 0.01 ) {
+			if ( material.opacity !== undefined && Math.abs( material.opacity - materialOpacity.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'opacity', materialOpacity.getValue(), currentMaterialSlot ) );
 
@@ -1126,7 +1130,7 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
-			if ( material.alphaTest !== undefined && Math.abs( material.alphaTest - materialAlphaTest.getValue() ) >= 0.01 ) {
+			if ( material.alphaTest !== undefined && Math.abs( material.alphaTest - materialAlphaTest.getValue() ) >= epsilon ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'alphaTest', materialAlphaTest.getValue(), currentMaterialSlot ) );
 
@@ -1135,12 +1139,6 @@ var SidebarMaterial = function ( editor ) {
 			if ( material.wireframe !== undefined && material.wireframe !== materialWireframe.getValue() ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'wireframe', materialWireframe.getValue(), currentMaterialSlot ) );
-
-			}
-
-			if ( material.wireframeLinewidth !== undefined && Math.abs( material.wireframeLinewidth - materialWireframeLinewidth.getValue() ) >= 0.01 ) {
-
-				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'wireframeLinewidth', materialWireframeLinewidth.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -1195,6 +1193,7 @@ var SidebarMaterial = function ( editor ) {
 			'clearcoatRoughness': materialClearcoatRoughnessRow,
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
+			'vertexTangents': materialVertexTangentsRow,
 			'depthPacking': materialDepthPackingRow,
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,
@@ -1596,12 +1595,6 @@ var SidebarMaterial = function ( editor ) {
 		if ( material.wireframe !== undefined ) {
 
 			materialWireframe.setValue( material.wireframe );
-
-		}
-
-		if ( material.wireframeLinewidth !== undefined ) {
-
-			materialWireframeLinewidth.setValue( material.wireframeLinewidth );
 
 		}
 

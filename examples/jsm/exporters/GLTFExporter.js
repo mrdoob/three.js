@@ -1153,10 +1153,25 @@ GLTFExporter.prototype = {
 		 */
 		function processMesh( mesh ) {
 
-			var cacheKey = mesh.geometry.uuid + ':' + mesh.material.uuid;
-			if ( cachedData.meshes.has( cacheKey ) ) {
+			var meshCacheKeyParts = [ mesh.geometry.uuid ];
+			if ( Array.isArray( mesh.material ) ) {
 
-				return cachedData.meshes.get( cacheKey );
+				for ( var i = 0, l = mesh.material.length; i < l; i ++ ) {
+
+					meshCacheKeyParts.push( mesh.material[ i ].uuid	);
+
+				}
+
+			} else {
+
+				meshCacheKeyParts.push( mesh.material.uuid );
+
+			}
+
+			var meshCacheKey = meshCacheKeyParts.join( ':' );
+			if ( cachedData.meshes.has( meshCacheKey ) ) {
+
+				return cachedData.meshes.get( meshCacheKey );
 
 			}
 
@@ -1224,7 +1239,7 @@ GLTFExporter.prototype = {
 
 			}
 
-			// @QUESTION Detect if .vertexColors = THREE.VertexColors?
+			// @QUESTION Detect if .vertexColors = true?
 			// For every attribute create an accessor
 			var modifiedAttribute = null;
 			for ( var attributeName in geometry.attributes ) {
@@ -1481,7 +1496,7 @@ GLTFExporter.prototype = {
 			outputJSON.meshes.push( gltfMesh );
 
 			var index = outputJSON.meshes.length - 1;
-			cachedData.meshes.set( cacheKey, index );
+			cachedData.meshes.set( meshCacheKey, index );
 
 			return index;
 
@@ -1925,12 +1940,6 @@ GLTFExporter.prototype = {
 			if ( scene.name !== '' ) {
 
 				gltfScene.name = scene.name;
-
-			}
-
-			if ( scene.userData && Object.keys( scene.userData ).length > 0 ) {
-
-				gltfScene.extras = serializeUserData( scene );
 
 			}
 

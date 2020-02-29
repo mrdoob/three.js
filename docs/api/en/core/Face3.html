@@ -34,7 +34,7 @@ geometry.vertices.push( new THREE.Vector3(  50, -50, 0 ) );
 geometry.vertices.push( new THREE.Vector3(  50,  50, 0 ) );
 
 //create a new face using vertices 0, 1, 2
-var normal = new THREE.Vector3( 0, 1, 0 ); //optional
+var normal = new THREE.Vector3( 0, 0, 1 ); //optional
 var color = new THREE.Color( 0xffaa00 ); //optional
 var materialIndex = 0; //optional
 var face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
@@ -97,7 +97,7 @@ scene.add( new THREE.Mesh( geometry, material ) );
 		<h3>[property:Color color]</h3>
 		<p>
 		Face color - for this to be used a material's [page:Material.vertexColors vertexColors] property
-		must be set to [page:Materials THREE.FaceColors].
+		must be set to *true*.
 		</p>
 
 		<h3>[property:Array vertexNormals]</h3>
@@ -108,7 +108,7 @@ scene.add( new THREE.Mesh( geometry, material ) );
 		<h3>[property:Array vertexColors]</h3>
 		<p>
 		Array of 3 vertex colors - for these to be used a material's [page:Material.vertexColors vertexColors] property
-		must be set to [page:Materials THREE.VertexColors].
+		must be set to *true*.
 		</p>
 
 

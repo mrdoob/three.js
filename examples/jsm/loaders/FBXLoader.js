@@ -60,7 +60,6 @@ import {
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	VertexColors,
 	sRGBEncoding
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.module.min.js";
@@ -1250,7 +1249,7 @@ var FBXLoader = ( function () {
 
 				materials.forEach( function ( material ) {
 
-					material.vertexColors = VertexColors;
+					material.vertexColors = true;
 
 				} );
 

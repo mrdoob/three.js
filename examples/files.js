@@ -152,9 +152,9 @@ var files = {
 		"webgl_materials_normalmap_object_space",
 		"webgl_materials_parallaxmap",
 		"webgl_materials_physical_clearcoat",
+		"webgl_materials_physical_reflectivity",
 		"webgl_materials_physical_sheen",
 		"webgl_materials_physical_transparency",
-		"webgl_materials_reflectivity",
 		"webgl_materials_shaders_fresnel",
 		"webgl_materials_standard",
 		"webgl_materials_texture_anisotropy",
@@ -173,6 +173,7 @@ var files = {
 		"webgl_materials_video",
 		"webgl_materials_video_webcam",
 		"webgl_materials_wireframe",
+		"webgl_math_obb",
 		"webgl_math_orientation_transform",
 		"webgl_mirror",
 		"webgl_modifier_simplifier",
@@ -302,6 +303,7 @@ var files = {
 		"webgl_lightshafts",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
+		"webgl_shadowmap_csm",
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
 		"webgl_tiled_forward",
@@ -327,7 +329,6 @@ var files = {
 		"webxr_vr_cubes",
 		"webxr_vr_dragging",
 		"webxr_vr_lorenzattractor",
-		"webxr_vr_multiview",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
 		"webxr_vr_paint",
@@ -337,11 +338,12 @@ var files = {
 		"webxr_vr_video"
 	],
 	"physics": [
-		"webgl_physics_cloth",
-		"webgl_physics_convex_break",
-		"webgl_physics_rope",
-		"webgl_physics_terrain",
-		"webgl_physics_volume"
+		"physics_ammo_break",
+		"physics_ammo_cloth",
+		"physics_ammo_rope",
+		"physics_ammo_terrain",
+		"physics_ammo_volume",
+		"physics_cannon_instancing"
 	],
 	"misc": [
 		"misc_animation_authoring",

@@ -61,6 +61,8 @@ var SidebarGeometry = function ( editor ) {
 	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
 
+	var currentGeometryType = null;
+
 	// Actions
 
 	/*
@@ -215,15 +217,21 @@ var SidebarGeometry = function ( editor ) {
 
 			//
 
-			parameters.clear();
+			if ( currentGeometryType !== geometry.type ) {
 
-			if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
+				parameters.clear();
 
-				parameters.add( new SidebarGeometryModifiers( editor, object ) );
+				if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
 
-			} else if ( geometryUIClasses[ geometry.type ] !== undefined ) {
+					parameters.add( new SidebarGeometryModifiers( editor, object ) );
 
-				parameters.add( new geometryUIClasses[ geometry.type ]( editor, object ) );
+				} else if ( geometryUIClasses[ geometry.type ] !== undefined ) {
+
+					parameters.add( new geometryUIClasses[ geometry.type ]( editor, object ) );
+
+				}
+
+				currentGeometryType = geometry.type;
 
 			}
 
@@ -239,7 +247,14 @@ var SidebarGeometry = function ( editor ) {
 
 	}
 
-	signals.objectSelected.add( build );
+	signals.objectSelected.add( function () {
+
+		currentGeometryType = null;
+
+		build();
+
+	} );
+
 	signals.geometryChanged.add( build );
 
 	return container;
