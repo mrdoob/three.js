@@ -135,7 +135,7 @@
 
 			for ( var i = 0; i < section.length; i ++ ) {
 
-				var file = section[ i ];
+				var file = section[ i ].file;
 
 				var link = createLink( file );
 				container.appendChild( link );
@@ -224,7 +224,7 @@
 
 			}
 
-			var exp = new RegExp( v, 'gi' );
+			var regex = new RegExp( v, 'gi' );
 
 			for ( var key in files ) {
 
@@ -232,7 +232,7 @@
 
 				for ( var i = 0; i < section.length; i ++ ) {
 
-					filterExample( section[ i ], exp );
+					filterExample( regex, section[ i ] );
 
 				}
 
@@ -242,11 +242,12 @@
 
 		}
 
-		function filterExample( file, exp ) {
+		function filterExample( regex, example ) {
 
+			var file = example.file;
 			var link = links[ file ];
 			var name = getName( file );
-			var res = file.match( exp );
+			var res = ( file + example.tags ).match( regex );
 			var text;
 
 			if ( res && res.length > 0 ) {
@@ -288,7 +289,7 @@
 
 				for ( var i = 0; i < section.length; i ++ ) {
 
-					var file = section[ i ];
+					var file = section[ i ].file;
 
 					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
 
