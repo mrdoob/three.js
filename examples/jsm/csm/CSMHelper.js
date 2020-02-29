@@ -1,4 +1,4 @@
-import { Group, Mesh, LineSegments, BufferGeometry, LineBasicMaterial, Box3Helper, Box3, PlaneBufferGeometry, MeshBasicMaterial, BufferAttribute } from '../../../build/three.module.js';
+import { Group, Mesh, LineSegments, BufferGeometry, LineBasicMaterial, Box3Helper, Box3, PlaneBufferGeometry, MeshBasicMaterial, BufferAttribute, DoubleSide } from '../../../build/three.module.js';
 
 class CSMHelper extends Group {
 
@@ -37,6 +37,11 @@ class CSMHelper extends Group {
 		const cascadePlanes = this.cascadePlanes;
 		const shadowLines = this.shadowLines;
 
+		this.position.copy( camera.position );
+		this.quaternion.copy( camera.quaternion );
+		this.scale.copy( camera.scale );
+		this.updateMatrixWorld( true );
+
 		while( cascadeLines.length > cascades ) {
 
 			this.remove( cascadeLines.pop() );
@@ -48,7 +53,8 @@ class CSMHelper extends Group {
 		while( cascadeLines.length < cascades ) {
 
 			const cascadeLine = new Box3Helper( new Box3(), 0xffffff );
-			const cascadePlane = new Mesh( new PlaneBufferGeometry(), new MeshBasicMaterial( { transparent: true, opacity: 0.1, depthWrite: false } ) );
+			const planeMat = new MeshBasicMaterial( { transparent: true, opacity: 0.1, depthWrite: false, side: DoubleSide } );
+			const cascadePlane = new Mesh( new PlaneBufferGeometry(), planeMat );
 			const shadowLineGroup = new Group();
 			const shadowLine = new Box3Helper( new Box3(), 0xffff00 );
 			shadowLineGroup.add( shadowLine );
@@ -85,12 +91,14 @@ class CSMHelper extends Group {
 			cascadePlane.scale.z = 1e-4;
 
 			this.remove( shadowLineGroup );
-			shadowCam.matrixWorld.decompose( shadowLineGroup.position, shadowLineGroup.quaternion, shadowLineGroup.scale );
-			shadowCam.updateMatrixWorld( true );
+			shadowLineGroup.position.copy( shadowCam.position );
+			shadowLineGroup.quaternion.copy( shadowCam.quaternion );
+			shadowLineGroup.scale.copy( shadowCam.scale );
+			shadowLineGroup.updateMatrixWorld( true );
 			this.attach( shadowLineGroup );
 
-			shadowLine.box.min.set( shadowCam.bottom, shadowCam.left, shadowCam.near );
-			shadowLine.box.max.set( shadowCam.top, shadowCam.right, shadowCam.far );
+			shadowLine.box.min.set( shadowCam.bottom, shadowCam.left, - shadowCam.far );
+			shadowLine.box.max.set( shadowCam.top, shadowCam.right, - shadowCam.near );
 
 		}
 
@@ -106,10 +114,6 @@ class CSMHelper extends Group {
 		frustumLinePositions.setXYZ( 6, nearVerts[ 2 ].x, nearVerts[ 2 ].y, nearVerts[ 2 ].z );
 		frustumLinePositions.setXYZ( 7, nearVerts[ 1 ].x, nearVerts[ 1 ].y, nearVerts[ 1 ].z );
 		frustumLinePositions.needsUpdate = true;
-
-		this.position.copy( camera.position );
-		this.quaternion.copy( camera.quaternion );
-		this.scale.copy( camera.scale );
 
 	}
 
