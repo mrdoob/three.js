@@ -49,7 +49,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		"numDirLightShadows", "numPointLightShadows", "numSpotLightShadows",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
-		"sheen", "transparent"
+		"sheen"
 	];
 
 	function getShaderObject( material, shaderID ) {
@@ -260,7 +260,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			numClipIntersection: nClipIntersection,
 
 			dithering: material.dithering,
-			transparent: material.transparent,
 
 			shadowMapEnabled: renderer.shadowMap.enabled && shadows.length > 0,
 			shadowMapType: renderer.shadowMap.type,
