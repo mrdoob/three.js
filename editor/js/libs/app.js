@@ -13,11 +13,8 @@ var APP = {
 
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
-		// If VR support is turned on, this button will display
-		// when the player is running.
-		var vrButton;
-		// Returns true if VR support is enabled.
-		var vrEnabled;
+
+		var vrButton = VRButton.createButton( renderer );
 
 		var events = {};
 
@@ -33,13 +30,8 @@ var APP = {
 
 			var project = json.project;
 
-			vrEnabled = () => project.vr;
-
-			if ( project.shadows ) renderer.shadowMap.enabled = true;
-			if ( project.vr ) { 
-				renderer.xr.enabled = true;
-				vrButton = VRButton.createButton( renderer );
-			};
+			renderer.shadowMap.enabled = project.shadows === true;
+			renderer.xr.enabled = project.vr === true;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -181,9 +173,7 @@ var APP = {
 
 		this.play = function () {
 
-			if ( vrEnabled() ) {
-				dom.append( vrButton );
-			}
+			if ( renderer.xr.enabled ) dom.append( vrButton );
 
 			prevTime = performance.now();
 
@@ -204,9 +194,7 @@ var APP = {
 
 		this.stop = function () {
 
-			if ( vrEnabled() ) {
-				vrButton.remove();
-			}
+			if ( renderer.xr.enabled ) vrButton.remove();
 
 			document.removeEventListener( 'keydown', onDocumentKeyDown );
 			document.removeEventListener( 'keyup', onDocumentKeyUp );

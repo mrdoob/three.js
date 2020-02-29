@@ -57,7 +57,7 @@ var SidebarProject = function ( editor ) {
 	// WebVR
 
 	var vrRow = new UIRow();
-	var vr = new UICheckbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function() {
+	var vr = new UICheckbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
 
 		config.setKey( 'project/vr', this.getValue() );
 
