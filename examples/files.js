@@ -338,11 +338,11 @@ var files = {
 		"webxr_vr_video"
 	],
 	"physics": [
-		"webgl_physics_cloth",
-		"webgl_physics_convex_break",
-		"webgl_physics_rope",
-		"webgl_physics_terrain",
-		"webgl_physics_volume"
+		"webgl_physics_ammo_break",
+		"webgl_physics_ammo_cloth",
+		"webgl_physics_ammo_rope",
+		"webgl_physics_ammo_terrain",
+		"webgl_physics_ammo_volume"
 	],
 	"misc": [
 		"misc_animation_authoring",
