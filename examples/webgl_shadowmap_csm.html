@@ -20,7 +20,7 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import * as CSM from './jsm/csm/CSM.js';
+			import { CSM } from './jsm/csm/CSM.js';
 			import { CSMHelper } from './jsm/csm/CSMHelper.js';
 
 			var renderer, scene, camera, orthoCamera, controls, csm, csmHelper;
@@ -84,7 +84,7 @@
 				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
 				scene.add( ambientLight );
 
-				csm = new CSM.default({
+				csm = new CSM({
 					maxFar: params.far,
 					cascades: 4,
 					mode: params.mode,
@@ -95,6 +95,7 @@
 				} );
 
 				csmHelper = new CSMHelper( csm );
+				csmHelper.visible = false;
 				scene.add( csmHelper );
 
 				var floorMaterial = new THREE.MeshPhongMaterial( { color: '#252a34' } );

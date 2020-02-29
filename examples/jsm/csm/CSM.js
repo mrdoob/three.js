@@ -21,7 +21,7 @@ const _bbox = new Box3();
 const _uniformArray = [];
 const _logArray = [];
 
-export default class CSM {
+export class CSM {
 
 	constructor( data ) {
 
