@@ -8,11 +8,6 @@ import {
 	DirectionalLight,
 	MathUtils,
 	ShaderChunk,
-	LineBasicMaterial,
-	Object3D,
-	BufferGeometry,
-	BufferAttribute,
-	Line,
 	Matrix4,
 	Box3
 } from '../../../build/three.module.js';
@@ -21,9 +16,7 @@ import Shader from './Shader.js';
 
 const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new Frustum();
-const _frustum = new Frustum();
 const _center = new Vector3();
-const _size = new Vector3();
 const _bbox = new Box3();
 const _uniformArray = [];
 const _logArray = [];
