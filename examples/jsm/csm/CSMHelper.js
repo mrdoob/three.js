@@ -1,4 +1,4 @@
-import { Group, Mesh, LineSegments, BufferGeometry, LineBasicMaterial, Box3Helper, Box3, PlaneBufferGeometry, MeshBasicMaterial } from '../../../build/three.module.js';
+import { Group, Mesh, LineSegments, BufferGeometry, LineBasicMaterial, Box3Helper, Box3, PlaneBufferGeometry, MeshBasicMaterial, BufferAttribute } from '../../../build/three.module.js';
 
 class CSMHelper extends Group {
 
@@ -12,9 +12,10 @@ class CSMHelper extends Group {
 		const frustumGeometry = new BufferGeometry();
 		frustumGeometry.setIndex( new BufferAttribute( indices, 1 ) );
 		frustumGeometry.setAttribute( 'position', new BufferAttribute( positions, 3, false ) );
-		this.add( frustumGeometry );
+		const frustumLines = new LineSegments( frustumGeometry, new LineBasicMaterial() );
+		this.add( frustumLines );
 
-		this.frustumLines = new LineSegments( frustumGeometry, new LineBasicMaterial() );
+		this.frustumLines = frustumLines;
 		this.cascadeLines = [];
 		this.cascadePlanes = [];
 		this.shadowLines = [];
@@ -24,13 +25,14 @@ class CSMHelper extends Group {
 	update() {
 
 		const csm = this.csm;
+		const camera = csm.camera;
 		const cascades = csm.cascades;
 		const mainFrustum = csm.mainFrustum;
-		const mainFrustumPositions = mainFrustum.geometry.positions;
 		const frustums = csm.frustums;
 		const lights = csm.lights;
 
 		const frustumLines = this.frustumLines;
+		const frustumLinePositions = frustumLines.geometry.getAttribute( 'position' );
 		const cascadeLines = this.cascadeLines;
 		const cascadePlanes = this.cascadePlanes;
 		const shadowLines = this.shadowLines;
@@ -46,14 +48,14 @@ class CSMHelper extends Group {
 		while( cascadeLines.length < cascades ) {
 
 			const cascadeLine = new Box3Helper( new Box3(), 0xffffff );
-			const cascadePlane = new Mesh( new PlaneBufferGeometry(), new MeshBasicMaterial( { transparent: true, opacity: 0.1 } ) );
+			const cascadePlane = new Mesh( new PlaneBufferGeometry(), new MeshBasicMaterial( { transparent: true, opacity: 0.1, depthWrite: false } ) );
 			const shadowLineGroup = new Group();
 			const shadowLine = new Box3Helper( new Box3(), 0xffff00 );
 			shadowLineGroup.add( shadowLine );
 
 			this.add( cascadeLine );
 			this.add( cascadePlane );
-			this.add( shadowLine );
+			this.add( shadowLineGroup );
 
 			cascadeLines.push( cascadeLine );
 			cascadePlanes.push( cascadePlane );
@@ -75,33 +77,39 @@ class CSMHelper extends Group {
 
 			cascadeLine.box.min.copy( farVerts[ 2 ] );
 			cascadeLine.box.max.copy( farVerts[ 0 ] );
+			cascadeLine.box.max.z += 1e-4;
 
 			cascadePlane.position.addVectors( farVerts[ 0 ], farVerts[ 2 ] );
 			cascadePlane.position.multiplyScalar( 0.5 );
 			cascadePlane.scale.subVectors( farVerts[ 0 ], farVerts[ 2 ] );
+			cascadePlane.scale.z = 1e-4;
 
 			this.remove( shadowLineGroup );
 			shadowCam.matrixWorld.decompose( shadowLineGroup.position, shadowLineGroup.quaternion, shadowLineGroup.scale );
+			shadowCam.updateMatrixWorld( true );
 			this.attach( shadowLineGroup );
 
 			shadowLine.box.min.set( shadowCam.bottom, shadowCam.left, shadowCam.near );
 			shadowLine.box.max.set( shadowCam.top, shadowCam.right, shadowCam.far );
 
-			cascadeLine.update();
-			shadowLine.update();
-
 		}
 
-		mainFrustumPositions.setXYZ( 0, farVerts[ 0 ] );
-		mainFrustumPositions.setXYZ( 1, farVerts[ 3 ] );
-		mainFrustumPositions.setXYZ( 2, farVerts[ 2 ] );
-		mainFrustumPositions.setXYZ( 3, farVerts[ 1 ] );
+		const nearVerts = mainFrustum.vertices.near;
+		const farVerts = mainFrustum.vertices.far;
+		frustumLinePositions.setXYZ( 0, farVerts[ 0 ].x, farVerts[ 0 ].y, farVerts[ 0 ].z );
+		frustumLinePositions.setXYZ( 1, farVerts[ 3 ].x, farVerts[ 3 ].y, farVerts[ 3 ].z );
+		frustumLinePositions.setXYZ( 2, farVerts[ 2 ].x, farVerts[ 2 ].y, farVerts[ 2 ].z );
+		frustumLinePositions.setXYZ( 3, farVerts[ 1 ].x, farVerts[ 1 ].y, farVerts[ 1 ].z );
 
-		mainFrustumPositions.setXYZ( 4, nearVerts[ 0 ] );
-		mainFrustumPositions.setXYZ( 5, nearVerts[ 3 ] );
-		mainFrustumPositions.setXYZ( 6, nearVerts[ 2 ] );
-		mainFrustumPositions.setXYZ( 7, nearVerts[ 1 ] );
-		mainFrustumPositions.needsUpdate = true;
+		frustumLinePositions.setXYZ( 4, nearVerts[ 0 ].x, nearVerts[ 0 ].y, nearVerts[ 0 ].z );
+		frustumLinePositions.setXYZ( 5, nearVerts[ 3 ].x, nearVerts[ 3 ].y, nearVerts[ 3 ].z );
+		frustumLinePositions.setXYZ( 6, nearVerts[ 2 ].x, nearVerts[ 2 ].y, nearVerts[ 2 ].z );
+		frustumLinePositions.setXYZ( 7, nearVerts[ 1 ].x, nearVerts[ 1 ].y, nearVerts[ 1 ].z );
+		frustumLinePositions.needsUpdate = true;
+
+		this.position.copy( camera.position );
+		this.quaternion.copy( camera.quaternion );
+		this.scale.copy( camera.scale );
 
 	}
 
