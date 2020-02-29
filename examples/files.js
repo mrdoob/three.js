@@ -388,3 +388,8 @@ var files = {
 		"misc_uv_tests"
 	]
 };
+
+var tags = {
+    "webgl_postprocessing_unreal_bloom": [ "glow" ],
+    "webgl_postprocessing_unreal_bloom_selective": [ "glow" ]
+};
