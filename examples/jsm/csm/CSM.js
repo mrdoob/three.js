@@ -170,20 +170,32 @@ export default class CSM {
 			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
 			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
-			_bbox.makeEmpty();
-			for ( let j = 0; j < 4; j ++ ) {
+			// Get the two points that represent that furthest points on the frustum assuming
+			// that's either the diagonal across the far plane or the diagonal across the whole
+			// frustum itself.
+			const nearVerts = _lightSpaceFrustum.vertices.near;
+			const farVerts = _lightSpaceFrustum.vertices.far;
+			const point1 = farVerts[ 0 ];
+			let point2;
+			if ( point1.distanceTo( farVerts[ 2 ] ) > point1.distanceTo( nearVerts[ 2 ] ) ) {
 
-				_bbox.expandByPoint( _lightSpaceFrustum.vertices.near[ j ] );
-				_bbox.expandByPoint( _lightSpaceFrustum.vertices.far[ j ] );
+				point2 = farVerts[ 2 ];
+
+			} else {
+
+				point2 = nearVerts[ 2 ];
 
 			}
 
-			_bbox.getSize( _size );
-			_bbox.getCenter( _center );
-			_center.z = _bbox.max.z + this.lightMargin;
-			_center.applyMatrix4( light.shadow.camera.matrixWorld );
+			let squaredBBWidth = point1.distanceTo( point2 );
+			_bbox.makeEmpty();
+			for ( let j = 0; j < 4; j ++ ) {
 
-			let squaredBBWidth = Math.max( _size.x, _size.y );
+				_bbox.expandByPoint( nearVerts[ j ] );
+				_bbox.expandByPoint( farVerts[ j ] );
+
+			}
+
 			if ( this.fade ) {
 
 				// expand the shadow extents by the fade margin if fade is enabled.
@@ -195,6 +207,13 @@ export default class CSM {
 				squaredBBWidth += margin;
 
 			}
+
+			const texelSize = squaredBBWidth / this.shadowMapSize;
+			_bbox.getCenter( _center );
+			_center.z = _bbox.max.z + this.lightMargin;
+			_center.x = Math.floor( _center.x / texelSize ) * texelSize;
+			_center.y = Math.floor( _center.y / texelSize ) * texelSize;
+			_center.applyMatrix4( light.shadow.camera.matrixWorld );
 
 			light.shadow.camera.left = - squaredBBWidth / 2;
 			light.shadow.camera.right = squaredBBWidth / 2;
