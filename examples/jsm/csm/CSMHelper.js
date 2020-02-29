@@ -1,4 +1,16 @@
-import { Group, Mesh, LineSegments, BufferGeometry, LineBasicMaterial, Box3Helper, Box3, PlaneBufferGeometry, MeshBasicMaterial, BufferAttribute, DoubleSide } from '../../../build/three.module.js';
+import {
+	Group,
+	Mesh,
+	LineSegments,
+	BufferGeometry,
+	LineBasicMaterial,
+	Box3Helper,
+	Box3,
+	PlaneBufferGeometry,
+	MeshBasicMaterial,
+	BufferAttribute,
+	DoubleSide
+} from '../../../build/three.module.js';
 
 class CSMHelper extends Group {
 
@@ -6,6 +18,9 @@ class CSMHelper extends Group {
 
 		super();
 		this.csm = csm;
+		this.displayFrustum = true;
+		this.displayPlanes = true;
+		this.displayShadowBounds = true;
 
 		const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 		const positions = new Float32Array( 24 );
@@ -19,6 +34,32 @@ class CSMHelper extends Group {
 		this.cascadeLines = [];
 		this.cascadePlanes = [];
 		this.shadowLines = [];
+
+	}
+
+	updateVisibility() {
+
+		const displayFrustum = this.displayFrustum;
+		const displayPlanes = this.displayPlanes;
+		const displayShadowBounds = this.displayShadowBounds;
+
+		const frustumLines = this.frustumLines;
+		const cascadeLines = this.cascadeLines;
+		const cascadePlanes = this.cascadePlanes;
+		const shadowLines = this.shadowLines;
+		for ( let i = 0, l = cascadeLines.length; i < l; i ++ ) {
+
+			const cascadeLine = cascadeLines[ i ];
+			const cascadePlane = cascadePlanes[ i ];
+			const shadowLineGroup = shadowLines[ i ];
+
+			cascadeLine.visible = displayFrustum;
+			cascadePlane.visible = displayFrustum && displayPlanes;
+			shadowLineGroup.visible = displayShadowBounds;
+
+		}
+
+		frustumLines.visible = displayFrustum;
 
 	}
 
