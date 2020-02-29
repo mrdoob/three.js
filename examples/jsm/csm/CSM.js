@@ -333,68 +333,6 @@ export default class CSM {
 
 	}
 
-	helper( cameraMatrix ) {
-
-		let geometry, vertices;
-		const material = new LineBasicMaterial( { color: 0xffffff } );
-		const object = new Object3D();
-
-		for ( let i = 0; i < this.frustums.length; i ++ ) {
-
-			this.frustums[ i ].toSpace( cameraMatrix, _frustum );
-
-			geometry = new BufferGeometry();
-			vertices = [];
-
-
-			for ( let i = 0; i < 5; i ++ ) {
-
-				const point = _frustum.vertices.near[ i === 4 ? 0 : i ];
-				vertices.push( point.x, point.y, point.z );
-
-			}
-
-			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
-
-			object.add( new Line( geometry, material ) );
-
-			geometry = new BufferGeometry();
-			vertices = [];
-
-			for ( let i = 0; i < 5; i ++ ) {
-
-				const point = _frustum.vertices.far[ i === 4 ? 0 : i ];
-				vertices.push( point.x, point.y, point.z );
-
-			}
-
-			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
-
-			object.add( new Line( geometry, material ) );
-
-			for ( let i = 0; i < 4; i ++ ) {
-
-				geometry = new BufferGeometry();
-				vertices = [];
-
-				const near = _frustum.vertices.near[ i ];
-				const far = _frustum.vertices.far[ i ];
-
-				vertices.push( near.x, near.y, near.z );
-				vertices.push( far.x, far.y, far.z );
-
-				geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
-
-				object.add( new Line( geometry, material ) );
-
-			}
-
-		}
-
-		return object;
-
-	}
-
 	remove() {
 
 		for ( let i = 0; i < this.lights.length; i ++ ) {
