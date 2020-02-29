@@ -342,7 +342,8 @@ var files = {
 		"physics_ammo_cloth",
 		"physics_ammo_rope",
 		"physics_ammo_terrain",
-		"physics_ammo_volume"
+		"physics_ammo_volume",
+		"physics_cannon_instancing"
 	],
 	"misc": [
 		"misc_animation_authoring",
