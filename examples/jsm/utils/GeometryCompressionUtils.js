@@ -402,7 +402,7 @@ var GeometryCompressionUtils = {
 			// to minimize rounding errors
 			best = oct = octEncodeVec3(x, y, z, "floor", "floor");
 			dec = octDecodeVec2(oct);
-			currentCos = bestCos = dot(x, y, z, dec);
+			bestCos = dot(x, y, z, dec);
 
 			oct = octEncodeVec3(x, y, z, "ceil", "floor");
 			dec = octDecodeVec2(oct);
