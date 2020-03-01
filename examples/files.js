@@ -216,6 +216,7 @@ var files = {
 		"webgl_shaders_tonemapping",
 		"webgl_shaders_vector",
 		"webgl_shading_physical",
+		"webgl_shadow_contact",
 		"webgl_shadowmap",
 		"webgl_shadowmap_performance",
 		"webgl_shadowmap_pointlight",
