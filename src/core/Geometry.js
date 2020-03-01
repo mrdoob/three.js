@@ -186,7 +186,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var scope = this;
 
-		var indices = geometry.index !== null ? geometry.index.array : undefined;
+		var index = geometry.index !== null ? geometry.index : undefined;
 		var attributes = geometry.attributes;
 
 		if ( attributes.position === undefined ) {
@@ -196,21 +196,21 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		var positions = attributes.position.array;
-		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
-		var colors = attributes.color !== undefined ? attributes.color.array : undefined;
-		var uvs = attributes.uv !== undefined ? attributes.uv.array : undefined;
-		var uvs2 = attributes.uv2 !== undefined ? attributes.uv2.array : undefined;
+		var position = attributes.position;
+		var normal = attributes.normal;
+		var color = attributes.color;
+		var uv = attributes.uv;
+		var uv2 = attributes.uv2;
 
-		if ( uvs2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
+		if ( uv2 !== undefined ) this.faceVertexUvs[ 1 ] = [];
 
-		for ( var i = 0; i < positions.length; i += 3 ) {
+		for ( var i = 0; i < position.count; i ++ ) {
 
-			scope.vertices.push( new Vector3().fromArray( positions, i ) );
+			scope.vertices.push( new Vector3().fromBufferAttribute( position, i ) );
 
-			if ( colors !== undefined ) {
+			if ( color !== undefined ) {
 
-				scope.colors.push( new Color().fromArray( colors, i ) );
+				scope.colors.push( new Color().fromBufferAttribute( color, i ) );
 
 			}
 
@@ -218,37 +218,37 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		function addFace( a, b, c, materialIndex ) {
 
-			var vertexColors = ( colors === undefined ) ? [] : [
+			var vertexColors = ( color === undefined ) ? [] : [
 				scope.colors[ a ].clone(),
 				scope.colors[ b ].clone(),
 				scope.colors[ c ].clone() ];
 
-			var vertexNormals = ( normals === undefined ) ? [] : [
-				new Vector3().fromArray( normals, a * 3 ),
-				new Vector3().fromArray( normals, b * 3 ),
-				new Vector3().fromArray( normals, c * 3 )
+			var vertexNormals = ( normal === undefined ) ? [] : [
+				new Vector3().fromBufferAttribute( normal, a ),
+				new Vector3().fromBufferAttribute( normal, b ),
+				new Vector3().fromBufferAttribute( normal, c )
 			];
 
 			var face = new Face3( a, b, c, vertexNormals, vertexColors, materialIndex );
 
 			scope.faces.push( face );
 
-			if ( uvs !== undefined ) {
+			if ( uv !== undefined ) {
 
 				scope.faceVertexUvs[ 0 ].push( [
-					new Vector2().fromArray( uvs, a * 2 ),
-					new Vector2().fromArray( uvs, b * 2 ),
-					new Vector2().fromArray( uvs, c * 2 )
+					new Vector2().fromBufferAttribute( uv, a ),
+					new Vector2().fromBufferAttribute( uv, b ),
+					new Vector2().fromBufferAttribute( uv, c )
 				] );
 
 			}
 
-			if ( uvs2 !== undefined ) {
+			if ( uv2 !== undefined ) {
 
 				scope.faceVertexUvs[ 1 ].push( [
-					new Vector2().fromArray( uvs2, a * 2 ),
-					new Vector2().fromArray( uvs2, b * 2 ),
-					new Vector2().fromArray( uvs2, c * 2 )
+					new Vector2().fromBufferAttribute( uv2, a ),
+					new Vector2().fromBufferAttribute( uv2, b ),
+					new Vector2().fromBufferAttribute( uv2, c )
 				] );
 
 			}
@@ -268,9 +268,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 				for ( var j = start, jl = start + count; j < jl; j += 3 ) {
 
-					if ( indices !== undefined ) {
+					if ( index !== undefined ) {
 
-						addFace( indices[ j ], indices[ j + 1 ], indices[ j + 2 ], group.materialIndex );
+						addFace( index.getX( j ), index.getX( j + 1 ), index.getX( j + 2 ), group.materialIndex );
 
 					} else {
 
@@ -284,17 +284,17 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		} else {
 
-			if ( indices !== undefined ) {
+			if ( index !== undefined ) {
 
-				for ( var i = 0; i < indices.length; i += 3 ) {
+				for ( var i = 0; i < index.count; i += 3 ) {
 
-					addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+					addFace( index.getX( i ), index.getX( i + 1 ), index.getX( i + 2 ) );
 
 				}
 
 			} else {
 
-				for ( var i = 0; i < positions.length / 3; i += 3 ) {
+				for ( var i = 0; i < position.count; i += 3 ) {
 
 					addFace( i, i + 1, i + 2 );
 

@@ -119,7 +119,7 @@ var color = new THREE.Color( 1, 0, 0 );
 		[page:Float gammaFactor] - (可选参数). 默认值 *2.0*.<br /><br />
 		通过取颜色 [page:.r r], [page:.g g] and [page:.b b] 的 [page:Float gammaFactor] 次方将颜色从伽马空间转换成线性空间。
 		</p>
-		
+
 		<h3>[method:Color convertLinearToGamma]( [param:Float gammaFactor] ) </h3>
 		<p>
 		[page:Float gammaFactor] - (可选参数). 默认值 *2.0*.<br /><br />
@@ -175,6 +175,14 @@ var color = new THREE.Color( 1, 0, 0 );
 		[page:Integer offset] - 数组中可选偏移量<br /><br />
 
 		从格式为[ [page:Float r], [page:Float g], [page:Float b] ]的数组数据中来创建Color对象。
+		</p>
+
+		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
+		<p>
+		[page:BufferAttribute attribute] - the source attribute.<br />
+		[page:Integer index] - index in the attribute.<br /><br />
+
+		Sets this color's components from the [page:BufferAttribute attribute].
 		</p>
 
 		<h3>[method:Integer getHex]()</h3>
