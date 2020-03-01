@@ -23,7 +23,6 @@ const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new Frustum();
 const _frustum = new Frustum();
 const _center = new Vector3();
-const _size = new Vector3();
 const _bbox = new Box3();
 const _uniformArray = [];
 const _logArray = [];
@@ -207,8 +206,9 @@ export default class CSM {
 
 	}
 
-	update( cameraMatrix ) {
+	update() {
 
+		const camera = this.camera;
 		const frustums = this.frustums;
 		for ( let i = 0; i < frustums.length; i ++ ) {
 
@@ -217,7 +217,7 @@ export default class CSM {
 			const texelWidth = ( shadowCam.right - shadowCam.left ) / this.shadowMapSize;
 			const texelHeight = ( shadowCam.top - shadowCam.bottom ) / this.shadowMapSize;
 			light.shadow.camera.updateMatrixWorld( true );
-			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
+			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, camera.matrixWorld );
 			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
 			const nearVerts = _lightSpaceFrustum.vertices.near;

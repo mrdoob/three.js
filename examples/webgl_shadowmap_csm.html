@@ -224,7 +224,7 @@
 				requestAnimationFrame( animate );
 
 				camera.updateMatrixWorld();
-				csm.update( camera.matrixWorld );
+				csm.update();
 				controls.update();
 
 				if ( params.orthographic ) {
