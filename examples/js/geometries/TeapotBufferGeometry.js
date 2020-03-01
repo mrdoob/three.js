@@ -3,9 +3,7 @@
  *
  * Tessellates the famous Utah teapot database by Martin Newell into triangles.
  *
- * THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn )
- *
- * defaults: size = 50, segments = 10, bottom = true, lid = true, body = true,
+ * Parameters: size = 50, segments = 10, bottom = true, lid = true, body = true,
  *   fitLid = false, blinn = true
  *
  * size is a relative scale: I've scaled the teapot to fit vertically between -1 and 1.
@@ -50,7 +48,6 @@
  * See https://en.wikipedia.org/wiki/Utah_teapot for the history of the teapot
  *
  */
-/*global THREE */
 
 THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid, blinn ) {
 
@@ -677,7 +674,7 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 					v4 = v1 + vertPerRow;
 
 					// Normals and UVs cannot be shared. Without clone(), you can see the consequences
-					// of sharing if you call geometry.applyMatrix( matrix ).
+					// of sharing if you call geometry.applyMatrix4( matrix ).
 					if ( notDegenerate( v1, v2, v3 ) ) {
 
 						indices[ indexCount ++ ] = v1;
@@ -705,9 +702,9 @@ THREE.TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLi
 	}
 
 	this.setIndex( new THREE.BufferAttribute( indices, 1 ) );
-	this.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
+	this.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+	this.setAttribute( 'uv', new THREE.BufferAttribute( uvs, 2 ) );
 
 	this.computeBoundingSphere();
 

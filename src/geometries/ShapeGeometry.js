@@ -98,9 +98,9 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 	// build geometry
 
 	this.setIndex( indices );
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	this.addAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
-	this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
+	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'normal', new Float32BufferAttribute( normals, 3 ) );
+	this.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
 
 	// helper functions
@@ -121,17 +121,15 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 			shapeVertices = shapeVertices.reverse();
 
-			// also check if holes are in the opposite direction
+		}
 
-			for ( i = 0, l = shapeHoles.length; i < l; i ++ ) {
+		for ( i = 0, l = shapeHoles.length; i < l; i ++ ) {
 
-				shapeHole = shapeHoles[ i ];
+			shapeHole = shapeHoles[ i ];
 
-				if ( ShapeUtils.isClockWise( shapeHole ) === true ) {
+			if ( ShapeUtils.isClockWise( shapeHole ) === true ) {
 
-					shapeHoles[ i ] = shapeHole.reverse();
-
-				}
+				shapeHoles[ i ] = shapeHole.reverse();
 
 			}
 

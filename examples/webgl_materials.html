@@ -4,29 +4,18 @@
 		<title>three.js webgl - materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl materials
+		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
@@ -64,42 +53,24 @@
 				materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, flatShading: true } ) );
 				materials.push( new THREE.MeshNormalMaterial() );
 				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, transparent: true, blending: THREE.AdditiveBlending } ) );
-				//materials.push( new THREE.MeshBasicMaterial( { color: 0xff0000, blending: THREE.SubtractiveBlending } ) );
-
 				materials.push( new THREE.MeshLambertMaterial( { color: 0xdddddd } ) );
 				materials.push( new THREE.MeshPhongMaterial( { color: 0xdddddd, specular: 0x009900, shininess: 30, map: texture, transparent: true } ) );
 				materials.push( new THREE.MeshNormalMaterial( { flatShading: true } ) );
 				materials.push( new THREE.MeshBasicMaterial( { color: 0xffaa00, wireframe: true } ) );
-
 				materials.push( new THREE.MeshDepthMaterial() );
-
 				materials.push( new THREE.MeshLambertMaterial( { color: 0x666666, emissive: 0xff0000 } ) );
 				materials.push( new THREE.MeshPhongMaterial( { color: 0x000000, specular: 0x666666, emissive: 0xff0000, shininess: 10, opacity: 0.9, transparent: true } ) );
-
 				materials.push( new THREE.MeshBasicMaterial( { map: texture, transparent: true } ) );
 
 				// Spheres geometry
 
-				var geometry = new THREE.SphereGeometry( 70, 32, 16 );
-
-				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-					var face = geometry.faces[ i ];
-					face.materialIndex = Math.floor( Math.random() * materials.length );
-
-				}
-
-				geometry.sortFacesByMaterialIndex();
-
-				objects = [];
+				var geometry = new THREE.SphereBufferGeometry( 70, 32, 16 );
 
 				for ( var i = 0, l = materials.length; i < l; i ++ ) {
 
 					addMesh( geometry, materials[ i ] );
 
 				}
-
-				addMesh( geometry, materials );
 
 				// Lights
 

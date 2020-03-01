@@ -2,22 +2,24 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Geometry.Modifiers = function ( editor, object ) {
+import { UIRow, UIButton } from './libs/ui.js';
+
+var SidebarGeometryModifiers = function ( editor, object ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Row().setPaddingLeft( '90px' );
+	var container = new UIRow().setPaddingLeft( '90px' );
 
 	var geometry = object.geometry;
 
 	// Compute Vertex Normals
 
-	var button = new UI.Button( 'Compute Vertex Normals' );
+	var button = new UIButton( 'Compute Vertex Normals' );
 	button.onClick( function () {
 
 		geometry.computeVertexNormals();
 
-		if ( geometry instanceof THREE.BufferGeometry ) {
+		if ( geometry.isBufferGeometry ) {
 
 			geometry.attributes.normal.needsUpdate = true;
 
@@ -38,3 +40,5 @@ Sidebar.Geometry.Modifiers = function ( editor, object ) {
 	return container;
 
 };
+
+export { SidebarGeometryModifiers };

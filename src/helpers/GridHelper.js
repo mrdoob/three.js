@@ -3,7 +3,6 @@
  */
 
 import { LineSegments } from '../objects/LineSegments.js';
-import { VertexColors } from '../constants.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
@@ -37,16 +36,36 @@ function GridHelper( size, divisions, color1, color2 ) {
 	}
 
 	var geometry = new BufferGeometry();
-	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-	var material = new LineBasicMaterial( { vertexColors: VertexColors } );
+	var material = new LineBasicMaterial( { vertexColors: true } );
 
 	LineSegments.call( this, geometry, material );
 
 }
 
-GridHelper.prototype = Object.create( LineSegments.prototype );
-GridHelper.prototype.constructor = GridHelper;
+GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
+
+	constructor: GridHelper,
+
+	copy: function ( source ) {
+
+		LineSegments.prototype.copy.call( this, source );
+
+		this.geometry.copy( source.geometry );
+		this.material.copy( source.material );
+
+		return this;
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	}
+
+} );
 
 export { GridHelper };

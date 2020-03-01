@@ -35,7 +35,7 @@
 				using [page:BufferAttribute] instances to define custom attributes.
 			</li>
 			<li>
-				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLRenderTargetCube] instances
+				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLCubeRenderTarget] instances
 				are no longer supposed to be used as uniforms. Their [page:Texture texture] property
 				must be used instead.
 			</li>
@@ -96,7 +96,6 @@
 			[example:webgl_materials_parallaxmap webgl / materials / parallaxmap]<br />
 			[example:webgl_materials_shaders_fresnel webgl / materials / shaders / fresnel]<br />
 			[example:webgl_materials_skin webgl / materials / skin]<br />
-			[example:webgl_materials_texture_hdr webgl / materials / texture / hdr]<br />
 			[example:webgl_materials_wireframe webgl / materials / wireframe]<br />
 			[example:webgl_modifier_tessellation webgl / modifier / tessellation]<br />
 			[example:webgl_nearestneighbour webgl / nearestneighbour]<br />
@@ -353,16 +352,6 @@ this.extensions = {
 
 		</p>
 
-		<h3>[property:Boolean isShaderMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are shader materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
-
-
-
 		<h3>[property:Boolean lights]</h3>
 		<p>
 		Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader. Default is false.
@@ -379,13 +368,12 @@ this.extensions = {
 
 		<h3>[property:Boolean morphTargets]</h3>
 		<p>
-		Defines whether the material uses morphTargets; true morphTarget attributes to this shader
+		When set to true, morph target attributes are available in the vertex shader. Default is *false*.
 		</p>
 
 		<h3>[property:boolean morphNormals]</h3>
 		<p>
-			Defines whether the material uses morphNormals. Set as true to pass morphNormal attributes from the [page:Geometry]
-			to the shader. Default is *false*.
+		When set to true, morph normal attributes are available in the vertex shader. Default is *false*.
 		</p>
 
 
@@ -421,12 +409,14 @@ this.extensions = {
 		so updating the value of the uniform will immediately update the value available to the GLSL code.
 		</p>
 
-
-		<h3>[property:Number vertexColors]</h3>
+		<h3>[property:Boolean uniformsNeedUpdate]</h3>
 		<p>
-		Define how the vertices are colored, by defining how the *colors* attribute gets populated.
-		Possible values are [page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] and
-		[page:Materials THREE.VertexColors]. Default is THREE.NoColors.
+		Can be used to force a uniform update while changing uniforms in [page:Object3D.onBeforeRender](). Default is *false*.
+		</p>
+
+		<h3>[property:Boolean vertexColors]</h3>
+		<p>
+		Defines whether vertex coloring is used. Default is *false*.
 		</p>
 
 		<h3>[property:String vertexShader]</h3>
@@ -465,6 +455,8 @@ this.extensions = {
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

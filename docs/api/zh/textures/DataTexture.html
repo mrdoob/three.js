@@ -19,7 +19,7 @@
 
 		<h3>[name]( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy )</h3>
 		<p>
-			The data argument must be an ArrayBuffer or a typed array view.
+			The data argument must be an [link:https://developer.mozilla.org/en-US/docs/Web/API/ArrayBufferView ArrayBufferView].
 			Further parameters correspond to the properties inherited from [page:Texture], where both magFilter and minFilter default to THREE.NearestFilter. The properties flipY and generateMipmaps are intially set to false.
 		</p>
 		<p>
@@ -57,7 +57,6 @@
 		// used the buffer to create a [name]
 
 		var texture = new THREE.DataTexture( data, width, height, THREE.RGBFormat );
-		texture.needsUpdate = true
 		</code>
 
 		<h2>Properties</h2>
@@ -72,6 +71,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

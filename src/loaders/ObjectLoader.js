@@ -13,15 +13,17 @@ import {
 	MirroredRepeatWrapping,
 
 	NearestFilter,
-	NearestMipMapNearestFilter,
-	NearestMipMapLinearFilter,
+	NearestMipmapNearestFilter,
+	NearestMipmapLinearFilter,
 	LinearFilter,
-	LinearMipMapNearestFilter,
-	LinearMipMapLinearFilter
+	LinearMipmapNearestFilter,
+	LinearMipmapLinearFilter
 } from '../constants.js';
+import { BufferAttribute } from '../core/BufferAttribute.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Group } from '../objects/Group.js';
+import { InstancedMesh } from '../objects/InstancedMesh.js';
 import { Sprite } from '../objects/Sprite.js';
 import { Points } from '../objects/Points.js';
 import { Line } from '../objects/Line.js';
@@ -45,12 +47,12 @@ import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
 import { ImageLoader } from './ImageLoader.js';
-import { LoadingManager, DefaultLoadingManager } from './LoadingManager.js';
+import { LoadingManager } from './LoadingManager.js';
 import { AnimationClip } from '../animation/AnimationClip.js';
 import { MaterialLoader } from './MaterialLoader.js';
 import { LoaderUtils } from './LoaderUtils.js';
 import { BufferGeometryLoader } from './BufferGeometryLoader.js';
-import { JSONLoader } from './JSONLoader.js';
+import { Loader } from './Loader.js';
 import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
 import * as Curves from '../extras/curves/Curves.js';
@@ -61,21 +63,20 @@ import * as Curves from '../extras/curves/Curves.js';
 
 function ObjectLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
-	this.resourcePath = '';
+	Loader.call( this, manager );
 
 }
 
-Object.assign( ObjectLoader.prototype, {
+ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
-	crossOrigin: 'anonymous',
+	constructor: ObjectLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var path = ( this.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : this.path;
-		this.resourcePath = this.resourcePath || path;
+		var path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
+		this.resourcePath = this.resourcePath || path;
 
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( this.path );
@@ -101,7 +102,7 @@ Object.assign( ObjectLoader.prototype, {
 
 			if ( metadata === undefined || metadata.type === undefined || metadata.type.toLowerCase() === 'geometry' ) {
 
-				console.error( 'THREE.ObjectLoader: Can\'t load ' + url + '. Use THREE.JSONLoader instead.' );
+				console.error( 'THREE.ObjectLoader: Can\'t load ' + url );
 				return;
 
 			}
@@ -109,27 +110,6 @@ Object.assign( ObjectLoader.prototype, {
 			scope.parse( json, onLoad );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
 
 	},
 
@@ -191,7 +171,6 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( json !== undefined ) {
 
-			var geometryLoader = new JSONLoader();
 			var bufferGeometryLoader = new BufferGeometryLoader();
 
 			for ( var i = 0, l = json.length; i < l; i ++ ) {
@@ -343,6 +322,21 @@ Object.assign( ObjectLoader.prototype, {
 
 						break;
 
+					case 'TubeGeometry':
+					case 'TubeBufferGeometry':
+
+						// This only works for built-in curves (e.g. CatmullRomCurve3).
+						// User defined curves or instances of CurvePath will not be deserialized.
+						geometry = new Geometries[ data.type ](
+							new Curves[ data.path.type ]().fromJSON( data.path ),
+							data.tubularSegments,
+							data.radius,
+							data.radialSegments,
+							data.closed
+						);
+
+						break;
+
 					case 'LatheGeometry':
 					case 'LatheBufferGeometry':
 
@@ -417,6 +411,7 @@ Object.assign( ObjectLoader.prototype, {
 						break;
 
 					case 'BufferGeometry':
+					case 'InstancedBufferGeometry':
 
 						geometry = bufferGeometryLoader.parse( data );
 
@@ -424,7 +419,7 @@ Object.assign( ObjectLoader.prototype, {
 
 					case 'Geometry':
 
-						geometry = geometryLoader.parse( data, this.resourcePath ).geometry;
+						console.error( 'THREE.ObjectLoader: Loading "Geometry" is not supported anymore.' );
 
 						break;
 
@@ -489,8 +484,13 @@ Object.assign( ObjectLoader.prototype, {
 
 				} else {
 
-					materials[ data.uuid ] = loader.parse( data );
-					cache[ data.uuid ] = materials[ data.uuid ];
+					if ( cache[ data.uuid ] === undefined ) {
+
+						cache[ data.uuid ] = loader.parse( data );
+
+					}
+
+					materials[ data.uuid ] = cache[ data.uuid ];
 
 				}
 
@@ -655,12 +655,17 @@ Object.assign( ObjectLoader.prototype, {
 				}
 
 				if ( data.format !== undefined ) texture.format = data.format;
+				if ( data.type !== undefined ) texture.type = data.type;
+				if ( data.encoding !== undefined ) texture.encoding = data.encoding;
 
 				if ( data.minFilter !== undefined ) texture.minFilter = parseConstant( data.minFilter, TEXTURE_FILTER );
 				if ( data.magFilter !== undefined ) texture.magFilter = parseConstant( data.magFilter, TEXTURE_FILTER );
 				if ( data.anisotropy !== undefined ) texture.anisotropy = data.anisotropy;
 
 				if ( data.flipY !== undefined ) texture.flipY = data.flipY;
+
+				if ( data.premultiplyAlpha !== undefined ) texture.premultiplyAlpha = data.premultiplyAlpha;
+				if ( data.unpackAlignment !== undefined ) texture.unpackAlignment = data.unpackAlignment;
 
 				textures[ data.uuid ] = texture;
 
@@ -834,6 +839,18 @@ Object.assign( ObjectLoader.prototype, {
 
 				break;
 
+			case 'InstancedMesh':
+
+				var geometry = getGeometry( data.geometry );
+				var material = getMaterial( data.material );
+				var count = data.count;
+				var instanceMatrix = data.instanceMatrix;
+
+				object = new InstancedMesh( geometry, material, count );
+				object.instanceMatrix = new BufferAttribute( new Float32Array( instanceMatrix.array ), 16 );
+
+				break;
+
 			case 'LOD':
 
 				object = new LOD();
@@ -935,6 +952,8 @@ Object.assign( ObjectLoader.prototype, {
 
 		if ( data.type === 'LOD' ) {
 
+			if ( data.autoUpdate !== undefined ) object.autoUpdate = data.autoUpdate;
+
 			var levels = data.levels;
 
 			for ( var l = 0; l < levels.length; l ++ ) {
@@ -977,11 +996,11 @@ var TEXTURE_WRAPPING = {
 
 var TEXTURE_FILTER = {
 	NearestFilter: NearestFilter,
-	NearestMipMapNearestFilter: NearestMipMapNearestFilter,
-	NearestMipMapLinearFilter: NearestMipMapLinearFilter,
+	NearestMipmapNearestFilter: NearestMipmapNearestFilter,
+	NearestMipmapLinearFilter: NearestMipmapLinearFilter,
 	LinearFilter: LinearFilter,
-	LinearMipMapNearestFilter: LinearMipMapNearestFilter,
-	LinearMipMapLinearFilter: LinearMipMapLinearFilter
+	LinearMipmapNearestFilter: LinearMipmapNearestFilter,
+	LinearMipmapLinearFilter: LinearMipmapLinearFilter
 };
 
 

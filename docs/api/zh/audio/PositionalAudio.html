@@ -22,8 +22,8 @@
 		<h2>示例</h2>
 
 		<p>
-			[example:webaudio_orientation webaudio / orientation ]</br>
-			[example:webaudio_sandbox webaudio / sandbox ]</br>
+			[example:webaudio_orientation webaudio / orientation ]<br />
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
 			[example:webaudio_timing webaudio / timing ]
 		</p>
 
@@ -44,7 +44,7 @@
 		});
 
 		// create an object for the sound to play from
-		var sphere = new THREE.SphereGeometry( 20, 32, 16 );
+		var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
 		var material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
 		var mesh = new THREE.Mesh( sphere, material );
 		scene.add( mesh );
@@ -130,6 +130,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

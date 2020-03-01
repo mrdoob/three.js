@@ -3,14 +3,18 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
+import * as THREE from '../../../build/three.module.js';
+
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @constructor
  */
+var RemoveObjectCommand = function ( editor, object ) {
 
-var RemoveObjectCommand = function ( object ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'RemoveObjectCommand';
 	this.name = 'Remove Object';
@@ -29,40 +33,15 @@ RemoveObjectCommand.prototype = {
 
 	execute: function () {
 
-		var scope = this.editor;
-		this.object.traverse( function ( child ) {
-
-			scope.removeHelper( child );
-
-		} );
-
-		this.parent.remove( this.object );
-		this.editor.select( this.parent );
-
-		this.editor.signals.objectRemoved.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
+		this.editor.removeObject( this.object );
+		this.editor.deselect();
 
 	},
 
 	undo: function () {
 
-		var scope = this.editor;
-
-		this.object.traverse( function ( child ) {
-
-			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
-			if ( child.material !== undefined ) scope.addMaterial( child.material );
-
-			scope.addHelper( child );
-
-		} );
-
-		this.parent.children.splice( this.index, 0, this.object );
-		this.object.parent = this.parent;
+		this.editor.addObject( this.object, this.parent, this.index );
 		this.editor.select( this.object );
-
-		this.editor.signals.objectAdded.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
 
 	},
 
@@ -101,3 +80,5 @@ RemoveObjectCommand.prototype = {
 	}
 
 };
+
+export { RemoveObjectCommand };

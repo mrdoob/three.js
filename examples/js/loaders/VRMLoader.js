@@ -17,16 +17,15 @@ THREE.VRMLoader = ( function () {
 
 		}
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
+
 		this.gltfLoader = new THREE.GLTFLoader( this.manager );
 
 	}
 
-	VRMLoader.prototype = {
+	VRMLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: VRMLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -40,27 +39,6 @@ THREE.VRMLoader = ( function () {
 
 		},
 
-		setCrossOrigin: function ( value ) {
-
-			this.glTFLoader.setCrossOrigin( value );
-			return this;
-
-		},
-
-		setPath: function ( value ) {
-
-			this.glTFLoader.setPath( value );
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.glTFLoader.setResourcePath( value );
-			return this;
-
-		},
-
 		setDRACOLoader: function ( dracoLoader ) {
 
 			this.glTFLoader.setDRACOLoader( dracoLoader );
@@ -70,9 +48,9 @@ THREE.VRMLoader = ( function () {
 
 		parse: function ( gltf, onLoad ) {
 
-			var gltfParser = gltf.parser;
-			var gltfExtensions = gltf.userData.gltfExtensions || {};
-			var vrmExtension = gltfExtensions.VRM || {};
+			// var gltfParser = gltf.parser;
+			// var gltfExtensions = gltf.userData.gltfExtensions || {};
+			// var vrmExtension = gltfExtensions.VRM || {};
 
 			// handle VRM Extension here
 
@@ -80,7 +58,7 @@ THREE.VRMLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return VRMLoader;
 

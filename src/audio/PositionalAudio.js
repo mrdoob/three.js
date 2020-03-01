@@ -7,11 +7,17 @@ import { Quaternion } from '../math/Quaternion.js';
 import { Audio } from './Audio.js';
 import { Object3D } from '../core/Object3D.js';
 
+var _position = new Vector3();
+var _quaternion = new Quaternion();
+var _scale = new Vector3();
+var _orientation = new Vector3();
+
 function PositionalAudio( listener ) {
 
 	Audio.call( this, listener );
 
 	this.panner = this.context.createPanner();
+	this.panner.panningModel = 'HRTF';
 	this.panner.connect( this.gain );
 
 }
@@ -92,47 +98,39 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 	},
 
-	updateMatrixWorld: ( function () {
+	updateMatrixWorld: function ( force ) {
 
-		var position = new Vector3();
-		var quaternion = new Quaternion();
-		var scale = new Vector3();
+		Object3D.prototype.updateMatrixWorld.call( this, force );
 
-		var orientation = new Vector3();
+		if ( this.hasPlaybackControl === true && this.isPlaying === false ) return;
 
-		return function updateMatrixWorld( force ) {
+		this.matrixWorld.decompose( _position, _quaternion, _scale );
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+		_orientation.set( 0, 0, 1 ).applyQuaternion( _quaternion );
 
-			var panner = this.panner;
-			this.matrixWorld.decompose( position, quaternion, scale );
+		var panner = this.panner;
 
-			orientation.set( 0, 0, 1 ).applyQuaternion( quaternion );
+		if ( panner.positionX ) {
 
-			if ( panner.positionX ) {
+			// code path for Chrome and Firefox (see #14393)
 
-				// code path for Chrome and Firefox (see #14393)
+			var endTime = this.context.currentTime + this.listener.timeDelta;
 
-				var endTime = this.context.currentTime + this.listener.timeDelta;
+			panner.positionX.linearRampToValueAtTime( _position.x, endTime );
+			panner.positionY.linearRampToValueAtTime( _position.y, endTime );
+			panner.positionZ.linearRampToValueAtTime( _position.z, endTime );
+			panner.orientationX.linearRampToValueAtTime( _orientation.x, endTime );
+			panner.orientationY.linearRampToValueAtTime( _orientation.y, endTime );
+			panner.orientationZ.linearRampToValueAtTime( _orientation.z, endTime );
 
-				panner.positionX.linearRampToValueAtTime( position.x, endTime );
-				panner.positionY.linearRampToValueAtTime( position.y, endTime );
-				panner.positionZ.linearRampToValueAtTime( position.z, endTime );
-				panner.orientationX.linearRampToValueAtTime( orientation.x, endTime );
-				panner.orientationY.linearRampToValueAtTime( orientation.y, endTime );
-				panner.orientationZ.linearRampToValueAtTime( orientation.z, endTime );
+		} else {
 
-			} else {
+			panner.setPosition( _position.x, _position.y, _position.z );
+			panner.setOrientation( _orientation.x, _orientation.y, _orientation.z );
 
-				panner.setPosition( position.x, position.y, position.z );
-				panner.setOrientation( orientation.x, orientation.y, orientation.z );
+		}
 
-			}
-
-		};
-
-	} )()
-
+	}
 
 } );
 

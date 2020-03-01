@@ -3,7 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-History = function ( editor ) {
+import * as Commands from './commands/Commands.js';
+
+var History = function ( editor ) {
 
 	this.editor = editor;
 	this.undos = [];
@@ -13,10 +15,6 @@ History = function ( editor ) {
 
 	this.historyDisabled = false;
 	this.config = editor.config;
-
-	//Set editor-reference in Command
-
-	Command( editor );
 
 	// signals
 
@@ -173,7 +171,7 @@ History.prototype = {
 
 		// Append Undos to History
 
-		for ( var i = 0 ; i < this.undos.length; i ++ ) {
+		for ( var i = 0; i < this.undos.length; i ++ ) {
 
 			if ( this.undos[ i ].hasOwnProperty( "json" ) ) {
 
@@ -185,7 +183,7 @@ History.prototype = {
 
 		// Append Redos to History
 
-		for ( var i = 0 ; i < this.redos.length; i ++ ) {
+		for ( var i = 0; i < this.redos.length; i ++ ) {
 
 			if ( this.redos[ i ].hasOwnProperty( "json" ) ) {
 
@@ -206,7 +204,7 @@ History.prototype = {
 		for ( var i = 0; i < json.undos.length; i ++ ) {
 
 			var cmdJSON = json.undos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -218,7 +216,7 @@ History.prototype = {
 		for ( var i = 0; i < json.redos.length; i ++ ) {
 
 			var cmdJSON = json.redos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -321,3 +319,5 @@ History.prototype = {
 	}
 
 };
+
+export { History };

@@ -3,114 +3,132 @@
  * This is a class to check whether objects are in a selection area in 3D space
  */
 
-function SelectionBox ( camera, scene, deep ) {
-	
-	this.camera = camera;
-	this.scene = scene;
-	this.startPoint = new THREE.Vector3();
-	this.endPoint = new THREE.Vector3();
-	this.collection = [];
-	this.deep = deep || Number.MAX_VALUE;
-	
-}
+THREE.SelectionBox = ( function () {
 
-SelectionBox.prototype.select = function ( startPoint, endPoint ) {
-	
-	this.startPoint = startPoint || this.startPoint;
-	this.endPoint = endPoint || this.endPoint;
-	this.collection = [];
-    
-	var boxSelectionFrustum = this.createFrustum( this.startPoint, this.endPoint );
-	this.searchChildInFrustum( boxSelectionFrustum, this.scene );
-    
-	return this.collection;
-	
-}
+	var frustum = new THREE.Frustum();
+	var center = new THREE.Vector3();
 
-SelectionBox.prototype.createFrustum = function ( startPoint, endPoint ) {
-	
-	startPoint = startPoint || this.startPoint;
-	endPoint = endPoint || this.endPoint
+	var tmpPoint = new THREE.Vector3();
 
-	this.camera.updateProjectionMatrix();
-	this.camera.updateMatrixWorld();
-	this.camera.updateMatrix();
+	var vecNear = new THREE.Vector3();
+	var vecTopLeft = new THREE.Vector3();
+	var vecTopRight = new THREE.Vector3();
+	var vecDownRight = new THREE.Vector3();
+	var vecDownLeft = new THREE.Vector3();
 
-	var tmpPoint = startPoint.clone();
-	tmpPoint.x = Math.min( startPoint.x, endPoint.x );
-	tmpPoint.y = Math.max( startPoint.y, endPoint.y );
-	endPoint.x = Math.max( startPoint.x, endPoint.x );
-	endPoint.y = Math.min( startPoint.y, endPoint.y );
+	var vectemp1 = new THREE.Vector3();
+	var vectemp2 = new THREE.Vector3();
+	var vectemp3 = new THREE.Vector3();
 
-	var vecNear = this.camera.position.clone();
-	var vecTopLeft = tmpPoint.clone();
-	var vecTopRight = new THREE.Vector3( endPoint.x, tmpPoint.y, 0 );
-	var vecDownRight = endPoint.clone();
-	var vecDownLeft = new THREE.Vector3( tmpPoint.x, endPoint.y, 0 );
-	vecTopLeft.unproject( this.camera );
-	vecTopRight.unproject( this.camera );
-	vecDownRight.unproject( this.camera );
-	vecDownLeft.unproject( this.camera );
+	function SelectionBox( camera, scene, deep ) {
 
-	var vectemp1 = vecTopLeft.clone().sub( vecNear );
-	var vectemp2 = vecTopRight.clone().sub( vecNear );
-	var vectemp3 = vecDownRight.clone().sub( vecNear );
-	vectemp1.normalize();
-	vectemp2.normalize();
-	vectemp3.normalize();
+		this.camera = camera;
+		this.scene = scene;
+		this.startPoint = new THREE.Vector3();
+		this.endPoint = new THREE.Vector3();
+		this.collection = [];
+		this.deep = deep || Number.MAX_VALUE;
 
-	vectemp1.multiplyScalar( this.deep );
-	vectemp2.multiplyScalar( this.deep );
-	vectemp3.multiplyScalar( this.deep );
-	vectemp1.add( vecNear );
-	vectemp2.add( vecNear );
-	vectemp3.add( vecNear );
+	}
 
-	var planeTop = new THREE.Plane();
-	planeTop.setFromCoplanarPoints( vecNear, vecTopLeft, vecTopRight );
-	var planeRight = new THREE.Plane();
-	planeRight.setFromCoplanarPoints( vecNear, vecTopRight, vecDownRight );
-	var planeDown = new THREE.Plane();
-	planeDown.setFromCoplanarPoints( vecDownRight, vecDownLeft, vecNear );
-	var planeLeft = new THREE.Plane();
-	planeLeft.setFromCoplanarPoints( vecDownLeft, vecTopLeft, vecNear );
-	var planeFront = new THREE.Plane();
-	planeFront.setFromCoplanarPoints( vecTopRight, vecDownRight, vecDownLeft );
-	var planeBack = new THREE.Plane();
-	planeBack.setFromCoplanarPoints( vectemp3, vectemp2, vectemp1 );
-	planeBack.normal = planeBack.normal.multiplyScalar( -1 );
+	SelectionBox.prototype.select = function ( startPoint, endPoint ) {
 
-	return new THREE.Frustum( planeTop, planeRight, planeDown, planeLeft, planeFront, planeBack );
+		this.startPoint = startPoint || this.startPoint;
+		this.endPoint = endPoint || this.endPoint;
+		this.collection = [];
 
-}
+		this.updateFrustum( this.startPoint, this.endPoint );
+		this.searchChildInFrustum( frustum, this.scene );
 
-SelectionBox.prototype.searchChildInFrustum = function ( frustum, object ) {
+		return this.collection;
 
-	if ( object instanceof THREE.Mesh ) {
+	};
 
-		if ( object.material !== undefined ) {
+	SelectionBox.prototype.updateFrustum = function ( startPoint, endPoint ) {
 
-			object.geometry.computeBoundingSphere();
-			var center = object.geometry.boundingSphere.center.clone().applyMatrix4( object.matrixWorld );
+		startPoint = startPoint || this.startPoint;
+		endPoint = endPoint || this.endPoint;
 
-			if ( frustum.containsPoint( center ) ) {
+		this.camera.updateProjectionMatrix();
+		this.camera.updateMatrixWorld();
 
-				this.collection.push( object );
+		tmpPoint.copy( startPoint );
+		tmpPoint.x = Math.min( startPoint.x, endPoint.x );
+		tmpPoint.y = Math.max( startPoint.y, endPoint.y );
+		endPoint.x = Math.max( startPoint.x, endPoint.x );
+		endPoint.y = Math.min( startPoint.y, endPoint.y );
+
+		vecNear.copy( this.camera.position );
+		vecTopLeft.copy( tmpPoint );
+		vecTopRight.set( endPoint.x, tmpPoint.y, 0 );
+		vecDownRight.copy( endPoint );
+		vecDownLeft.set( tmpPoint.x, endPoint.y, 0 );
+
+		vecTopLeft.unproject( this.camera );
+		vecTopRight.unproject( this.camera );
+		vecDownRight.unproject( this.camera );
+		vecDownLeft.unproject( this.camera );
+
+		vectemp1.copy( vecTopLeft ).sub( vecNear );
+		vectemp2.copy( vecTopRight ).sub( vecNear );
+		vectemp3.copy( vecDownRight ).sub( vecNear );
+		vectemp1.normalize();
+		vectemp2.normalize();
+		vectemp3.normalize();
+
+		vectemp1.multiplyScalar( this.deep );
+		vectemp2.multiplyScalar( this.deep );
+		vectemp3.multiplyScalar( this.deep );
+		vectemp1.add( vecNear );
+		vectemp2.add( vecNear );
+		vectemp3.add( vecNear );
+
+		var planes = frustum.planes;
+
+		planes[ 0 ].setFromCoplanarPoints( vecNear, vecTopLeft, vecTopRight );
+		planes[ 1 ].setFromCoplanarPoints( vecNear, vecTopRight, vecDownRight );
+		planes[ 2 ].setFromCoplanarPoints( vecDownRight, vecDownLeft, vecNear );
+		planes[ 3 ].setFromCoplanarPoints( vecDownLeft, vecTopLeft, vecNear );
+		planes[ 4 ].setFromCoplanarPoints( vecTopRight, vecDownRight, vecDownLeft );
+		planes[ 5 ].setFromCoplanarPoints( vectemp3, vectemp2, vectemp1 );
+		planes[ 5 ].normal.multiplyScalar( - 1 );
+
+	};
+
+	SelectionBox.prototype.searchChildInFrustum = function ( frustum, object ) {
+
+		if ( object.isMesh ) {
+
+			if ( object.material !== undefined ) {
+
+				object.geometry.computeBoundingSphere();
+
+				center.copy( object.geometry.boundingSphere.center );
+
+				center.applyMatrix4( object.matrixWorld );
+
+				if ( frustum.containsPoint( center ) ) {
+
+					this.collection.push( object );
+
+				}
 
 			}
 
 		}
 
-	}
+		if ( object.children.length > 0 ) {
 
-	if ( object.children.length > 0 ) {
+			for ( var x = 0; x < object.children.length; x ++ ) {
 
-		for ( var x = 0; x < object.children.length; x++ ) {
+				this.searchChildInFrustum( frustum, object.children[ x ] );
 
-			this.searchChildInFrustum( frustum, object.children[x] );
+			}
 
 		}
 
-	}
-    
-}
+	};
+
+	return SelectionBox;
+
+} )();

@@ -18,6 +18,7 @@ THREE.Refractor = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || THREE.Refractor.RefractorShader;
+	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	//
 
@@ -36,12 +37,13 @@ THREE.Refractor = function ( geometry, options ) {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBFormat,
-		stencilBuffer: false
+		stencilBuffer: false,
+		encoding: encoding
 	};
 
 	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	if ( ! THREE.Math.isPowerOfTwo( textureWidth ) || ! THREE.Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		renderTarget.texture.generateMipmaps = false;
 
@@ -56,9 +58,9 @@ THREE.Refractor = function ( geometry, options ) {
 		transparent: true // ensures, refractors are drawn from farthest to closest
 	} );
 
-	this.material.uniforms.color.value = color;
-	this.material.uniforms.tDiffuse.value = renderTarget.texture;
-	this.material.uniforms.textureMatrix.value = textureMatrix;
+	this.material.uniforms[ "color" ].value = color;
+	this.material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
+	this.material.uniforms[ "textureMatrix" ].value = textureMatrix;
 
 	// functions
 
@@ -184,50 +186,38 @@ THREE.Refractor = function ( geometry, options ) {
 
 	//
 
-	var render = ( function () {
+	function render( renderer, scene, camera ) {
 
-		var viewport = new THREE.Vector4();
+		scope.visible = false;
 
-		return function render( renderer, scene, camera ) {
+		var currentRenderTarget = renderer.getRenderTarget();
+		var currentXrEnabled = renderer.xr.enabled;
+		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-			scope.visible = false;
+		renderer.xr.enabled = false; // avoid camera modification
+		renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
-			var currentRenderTarget = renderer.getRenderTarget();
-			var currentVrEnabled = renderer.vr.enabled;
-			var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
+		renderer.setRenderTarget( renderTarget );
+		renderer.clear();
+		renderer.render( scene, virtualCamera );
 
-			renderer.vr.enabled = false; // avoid camera modification
-			renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
+		renderer.xr.enabled = currentXrEnabled;
+		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
+		renderer.setRenderTarget( currentRenderTarget );
 
-			renderer.render( scene, virtualCamera, renderTarget, true );
+		// restore viewport
 
-			renderer.vr.enabled = currentVrEnabled;
-			renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
-			renderer.setRenderTarget( currentRenderTarget );
+		var viewport = camera.viewport;
 
-			// restore viewport
+		if ( viewport !== undefined ) {
 
-			var bounds = camera.bounds;
+			renderer.state.viewport( viewport );
 
-			if ( bounds !== undefined ) {
+		}
 
-				var size = renderer.getSize();
-				var pixelRatio = renderer.getPixelRatio();
+		scope.visible = true;
 
-				viewport.x = bounds.x * size.width * pixelRatio;
-				viewport.y = bounds.y * size.height * pixelRatio;
-				viewport.z = bounds.z * size.width * pixelRatio;
-				viewport.w = bounds.w * size.height * pixelRatio;
-
-				renderer.state.viewport( viewport );
-
-			}
-
-			scope.visible = true;
-
-		};
-
-	} )();
+	}
 
 	//
 
@@ -269,17 +259,14 @@ THREE.Refractor.RefractorShader = {
 	uniforms: {
 
 		'color': {
-			type: 'c',
 			value: null
 		},
 
 		'tDiffuse': {
-			type: 't',
 			value: null
 		},
 
 		'textureMatrix': {
-			type: 'm4',
 			value: null
 		}
 

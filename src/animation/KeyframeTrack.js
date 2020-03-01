@@ -254,7 +254,12 @@ Object.assign( KeyframeTrack.prototype, {
 		if ( from !== 0 || to !== nKeys ) {
 
 			// empty tracks are forbidden, so keep at least one keyframe
-			if ( from >= to ) to = Math.max( to, 1 ), from = to - 1;
+			if ( from >= to ) {
+
+				to = Math.max( to, 1 );
+				from = to - 1;
+
+			}
 
 			var stride = this.getValueSize();
 			this.times = AnimationUtils.arraySlice( times, from, to );
@@ -347,8 +352,9 @@ Object.assign( KeyframeTrack.prototype, {
 	// (0,0,0,0,1,1,1,0,0,0,0,0,0,0) --> (0,0,1,1,0,0)
 	optimize: function () {
 
-		var times = this.times,
-			values = this.values,
+		// times or values may be shared with other tracks, so overwriting is unsafe
+		var times = AnimationUtils.arraySlice( this.times ),
+			values = AnimationUtils.arraySlice( this.values ),
 			stride = this.getValueSize(),
 
 			smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
@@ -443,9 +449,29 @@ Object.assign( KeyframeTrack.prototype, {
 			this.times = AnimationUtils.arraySlice( times, 0, writeIndex );
 			this.values = AnimationUtils.arraySlice( values, 0, writeIndex * stride );
 
+		} else {
+
+			this.times = times;
+			this.values = values;
+
 		}
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		var times = AnimationUtils.arraySlice( this.times, 0 );
+		var values = AnimationUtils.arraySlice( this.values, 0 );
+
+		var TypedKeyframeTrack = this.constructor;
+		var track = new TypedKeyframeTrack( this.name, times, values );
+
+		// Interpolant argument to constructor is not saved, so copy the factory method directly.
+		track.createInterpolant = this.createInterpolant;
+
+		return track;
 
 	}
 

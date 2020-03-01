@@ -2,9 +2,21 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-UI.Texture = function ( mapping ) {
+import * as THREE from '../../../build/three.module.js';
 
-	UI.Element.call( this );
+import { RGBELoader } from '../../../examples/jsm/loaders/RGBELoader.js';
+import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
+
+import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
+import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
+
+/**
+ * @author mrdoob / http://mrdoob.com/
+ */
+
+var UITexture = function ( mapping ) {
+
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -27,12 +39,12 @@ UI.Texture = function ( mapping ) {
 	canvas.style.cursor = 'pointer';
 	canvas.style.marginRight = '5px';
 	canvas.style.border = '1px solid #888';
-	canvas.addEventListener( 'click', function ( event ) {
+	canvas.addEventListener( 'click', function () {
 
 		input.click();
 
 	}, false );
-	canvas.addEventListener( 'drop', function ( event ) {
+	canvas.addEventListener( 'drop', function () {
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -40,12 +52,6 @@ UI.Texture = function ( mapping ) {
 
 	}, false );
 	dom.appendChild( canvas );
-
-	var name = document.createElement( 'input' );
-	name.disabled = true;
-	name.style.width = '64px';
-	name.style.border = '1px solid #ccc';
-	dom.appendChild( name );
 
 	function loadFile( file ) {
 
@@ -57,14 +63,14 @@ UI.Texture = function ( mapping ) {
 
 				reader.addEventListener( 'load', function ( event ) {
 
-					var canvas = new THREE.TGALoader().parse( event.target.result );
+					var canvas = new TGALoader().parse( event.target.result );
 
 					var texture = new THREE.CanvasTexture( canvas, mapping );
 					texture.sourceFile = file.name;
 
 					scope.setValue( texture );
 
-					if ( scope.onChangeCallback ) scope.onChangeCallback();
+					if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 				}, false );
 
@@ -75,7 +81,7 @@ UI.Texture = function ( mapping ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var image = document.createElement( 'img' );
-					image.addEventListener( 'load', function( event ) {
+					image.addEventListener( 'load', function () {
 
 						var texture = new THREE.Texture( this, mapping );
 						texture.sourceFile = file.name;
@@ -84,7 +90,7 @@ UI.Texture = function ( mapping ) {
 
 						scope.setValue( texture );
 
-						if ( scope.onChangeCallback ) scope.onChangeCallback();
+						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
 
 					}, false );
 
@@ -95,6 +101,33 @@ UI.Texture = function ( mapping ) {
 				reader.readAsDataURL( file );
 
 			}
+
+		} else {
+
+			var reader = new FileReader();
+			reader.addEventListener( 'load', function ( event ) {
+
+				if ( file.name.split( '.' ).pop() === 'hdr' ) {
+
+					// assuming RGBE/Radiance HDR iamge format
+
+					var loader = new RGBELoader().setDataType( THREE.UnsignedByteType );
+					loader.load( event.target.result, function ( hdrTexture ) {
+
+						hdrTexture.sourceFile = file.name;
+						hdrTexture.isHDRTexture = true;
+
+						scope.setValue( hdrTexture );
+
+						if ( scope.onChangeCallback ) scope.onChangeCallback( hdrTexture );
+
+					} );
+
+				}
+
+			} );
+
+			reader.readAsDataURL( file );
 
 		}
 
@@ -110,19 +143,18 @@ UI.Texture = function ( mapping ) {
 
 };
 
-UI.Texture.prototype = Object.create( UI.Element.prototype );
-UI.Texture.prototype.constructor = UI.Texture;
+UITexture.prototype = Object.create( UIElement.prototype );
+UITexture.prototype.constructor = UITexture;
 
-UI.Texture.prototype.getValue = function () {
+UITexture.prototype.getValue = function () {
 
 	return this.texture;
 
 };
 
-UI.Texture.prototype.setValue = function ( texture ) {
+UITexture.prototype.setValue = function ( texture ) {
 
 	var canvas = this.dom.children[ 0 ];
-	var name = this.dom.children[ 1 ];
 	var context = canvas.getContext( '2d' );
 
 	if ( texture !== null ) {
@@ -131,21 +163,30 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 		if ( image !== undefined && image.width > 0 ) {
 
-			name.value = texture.sourceFile;
-
+			canvas.title = texture.sourceFile;
 			var scale = canvas.width / image.width;
-			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+			if ( image.data === undefined ) {
+
+				context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+			} else {
+
+				var canvas2 = renderToCanvas( texture );
+				context.drawImage( canvas2, 0, 0, image.width * scale, image.height * scale );
+
+			}
 
 		} else {
 
-			name.value = texture.sourceFile + ' (error)';
+			canvas.title = texture.sourceFile + ' (error)';
 			context.clearRect( 0, 0, canvas.width, canvas.height );
 
 		}
 
 	} else {
 
-		name.value = '';
+		canvas.title = 'empty';
 
 		if ( context !== null ) {
 
@@ -161,7 +202,20 @@ UI.Texture.prototype.setValue = function ( texture ) {
 
 };
 
-UI.Texture.prototype.onChange = function ( callback ) {
+UITexture.prototype.setEncoding = function ( encoding ) {
+
+	var texture = this.getValue();
+	if ( texture !== null ) {
+
+		texture.encoding = encoding;
+
+	}
+
+	return this;
+
+};
+
+UITexture.prototype.onChange = function ( callback ) {
 
 	this.onChangeCallback = callback;
 
@@ -169,11 +223,152 @@ UI.Texture.prototype.onChange = function ( callback ) {
 
 };
 
-// Outliner
+// UICubeTexture
 
-UI.Outliner = function ( editor ) {
+var UICubeTexture = function () {
 
-	UI.Element.call( this );
+	UIElement.call( this );
+
+	var container = new UIDiv();
+
+	this.cubeTexture = null;
+	this.onChangeCallback = null;
+	this.dom = container.dom;
+
+	this.textures = [];
+
+	var scope = this;
+
+	var pRow = new UIRow();
+	var nRow = new UIRow();
+
+	pRow.add( new UIText( 'P:' ).setWidth( '35px' ) );
+	nRow.add( new UIText( 'N:' ).setWidth( '35px' ) );
+
+	var posXTexture = new UITexture().onChange( onTextureChanged );
+	var negXTexture = new UITexture().onChange( onTextureChanged );
+	var posYTexture = new UITexture().onChange( onTextureChanged );
+	var negYTexture = new UITexture().onChange( onTextureChanged );
+	var posZTexture = new UITexture().onChange( onTextureChanged );
+	var negZTexture = new UITexture().onChange( onTextureChanged );
+
+	this.textures.push( posXTexture, negXTexture, posYTexture, negYTexture, posZTexture, negZTexture );
+
+	pRow.add( posXTexture );
+	pRow.add( posYTexture );
+	pRow.add( posZTexture );
+
+	nRow.add( negXTexture );
+	nRow.add( negYTexture );
+	nRow.add( negZTexture );
+
+	container.add( pRow, nRow );
+
+	function onTextureChanged() {
+
+		var images = [];
+
+		for ( var i = 0; i < scope.textures.length; i ++ ) {
+
+			var texture = scope.textures[ i ].getValue();
+
+			if ( texture !== null ) {
+
+				images.push( texture.isHDRTexture ? texture : texture.image );
+
+			}
+
+		}
+
+		if ( images.length === 6 ) {
+
+			var cubeTexture = new THREE.CubeTexture( images );
+			cubeTexture.needsUpdate = true;
+
+			if ( images[ 0 ].isHDRTexture ) cubeTexture.isHDRTexture = true;
+
+			scope.cubeTexture = cubeTexture;
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback( cubeTexture );
+
+		}
+
+	}
+
+};
+
+UICubeTexture.prototype = Object.create( UIElement.prototype );
+UICubeTexture.prototype.constructor = UICubeTexture;
+
+UICubeTexture.prototype.setEncoding = function ( encoding ) {
+
+	var cubeTexture = this.getValue();
+	if ( cubeTexture !== null ) {
+
+		cubeTexture.encoding = encoding;
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.getValue = function () {
+
+	return this.cubeTexture;
+
+};
+
+UICubeTexture.prototype.setValue = function ( cubeTexture ) {
+
+	this.cubeTexture = cubeTexture;
+
+	if ( cubeTexture !== null ) {
+
+		var images = cubeTexture.image;
+
+		if ( Array.isArray( images ) === true && images.length === 6 ) {
+
+			for ( var i = 0; i < images.length; i ++ ) {
+
+				var image = images[ i ];
+
+				var texture = new THREE.Texture( image );
+				this.textures[ i ].setValue( texture );
+
+			}
+
+		}
+
+	} else {
+
+		var textures = this.textures;
+
+		for ( var i = 0; i < textures.length; i ++ ) {
+
+			textures[ i ].setValue( null );
+
+		}
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+// UIOutliner
+
+var UIOutliner = function ( editor ) {
+
+	UIElement.call( this );
 
 	var scope = this;
 
@@ -188,11 +383,13 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keydown', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 			case 40: // down
 				event.preventDefault();
 				event.stopPropagation();
 				break;
+
 		}
 
 	}, false );
@@ -201,17 +398,20 @@ UI.Outliner = function ( editor ) {
 	dom.addEventListener( 'keyup', function ( event ) {
 
 		switch ( event.keyCode ) {
+
 			case 38: // up
 				scope.selectIndex( scope.selectedIndex - 1 );
 				break;
 			case 40: // down
 				scope.selectIndex( scope.selectedIndex + 1 );
 				break;
+
 		}
 
 	}, false );
 
 	this.dom = dom;
+	this.editor = editor;
 
 	this.options = [];
 	this.selectedIndex = - 1;
@@ -221,10 +421,10 @@ UI.Outliner = function ( editor ) {
 
 };
 
-UI.Outliner.prototype = Object.create( UI.Element.prototype );
-UI.Outliner.prototype.constructor = UI.Outliner;
+UIOutliner.prototype = Object.create( UIElement.prototype );
+UIOutliner.prototype.constructor = UIOutliner;
 
-UI.Outliner.prototype.selectIndex = function ( index ) {
+UIOutliner.prototype.selectIndex = function ( index ) {
 
 	if ( index >= 0 && index < this.options.length ) {
 
@@ -238,7 +438,7 @@ UI.Outliner.prototype.selectIndex = function ( index ) {
 
 };
 
-UI.Outliner.prototype.setOptions = function ( options ) {
+UIOutliner.prototype.setOptions = function ( options ) {
 
 	var scope = this;
 
@@ -262,7 +462,7 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 	var currentDrag;
 
-	function onDrag( event ) {
+	function onDrag() {
 
 		currentDrag = this;
 
@@ -322,8 +522,23 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 		} else if ( area > 0.75 ) {
 
-			var nextObject = scene.getObjectById( this.nextSibling.value );
-			moveObject( object, nextObject.parent, nextObject );
+			var nextObject, parent;
+
+			if ( this.nextSibling !== null ) {
+
+				nextObject = scene.getObjectById( this.nextSibling.value );
+				parent = nextObject.parent;
+
+			} else {
+
+				// end of list (no next object)
+
+				nextObject = null;
+				parent = scene.getObjectById( this.value ).parent;
+
+			}
+
+			moveObject( object, parent, nextObject );
 
 		} else {
 
@@ -348,7 +563,8 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 		if ( newParentIsChild ) return;
 
-		editor.execute( new MoveObjectCommand( object, newParent, nextObject ) );
+		var editor = scope.editor;
+		editor.execute( new MoveObjectCommand( editor, object, newParent, nextObject ) );
 
 		var changeEvent = document.createEvent( 'HTMLEvents' );
 		changeEvent.initEvent( 'change', true, true );
@@ -388,13 +604,13 @@ UI.Outliner.prototype.setOptions = function ( options ) {
 
 };
 
-UI.Outliner.prototype.getValue = function () {
+UIOutliner.prototype.getValue = function () {
 
 	return this.selectedValue;
 
 };
 
-UI.Outliner.prototype.setValue = function ( value ) {
+UIOutliner.prototype.setValue = function ( value ) {
 
 	for ( var i = 0; i < this.options.length; i ++ ) {
 
@@ -436,33 +652,320 @@ UI.Outliner.prototype.setValue = function ( value ) {
 
 };
 
-UI.THREE = {};
+var UIPoints = function ( onAddClicked ) {
 
-UI.THREE.Boolean = function ( boolean, text ) {
+	UIElement.call( this );
 
-	UI.Span.call( this );
+	var span = new UISpan().setDisplay( 'inline-block' );
+
+	this.pointsList = new UIDiv();
+	span.add( this.pointsList );
+
+	var row = new UIRow();
+	span.add( row );
+
+	var addPointButton = new UIButton( '+' ).onClick( onAddClicked );
+	row.add( addPointButton );
+
+	this.update = function () {
+
+		if ( this.onChangeCallback !== null ) {
+
+			this.onChangeCallback();
+
+		}
+
+	}.bind( this );
+
+	this.dom = span.dom;
+	this.pointsUI = [];
+	this.lastPointIdx = 0;
+	this.onChangeCallback = null;
+	return this;
+
+};
+
+UIPoints.prototype = Object.create( UIElement.prototype );
+UIPoints.prototype.constructor = UIPoints;
+
+UIPoints.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
+UIPoints.prototype.clear = function () {
+
+	for ( var i = 0; i < this.pointsUI.length; ++ i ) {
+
+		if ( this.pointsUI[ i ] ) {
+
+			this.deletePointRow( i, true );
+
+		}
+
+	}
+
+	this.lastPointIdx = 0;
+
+};
+
+UIPoints.prototype.deletePointRow = function ( idx, dontUpdate ) {
+
+	if ( ! this.pointsUI[ idx ] ) return;
+
+	this.pointsList.remove( this.pointsUI[ idx ].row );
+	this.pointsUI[ idx ] = null;
+
+	if ( dontUpdate !== true ) {
+
+		this.update();
+
+	}
+
+};
+
+var UIPoints2 = function () {
+
+	UIPoints.call( this, UIPoints2.addRow.bind( this ) );
+
+	return this;
+
+};
+
+UIPoints2.prototype = Object.create( UIPoints.prototype );
+UIPoints2.prototype.constructor = UIPoints2;
+
+UIPoints2.addRow = function () {
+
+	if ( this.pointsUI.length === 0 ) {
+
+		this.pointsList.add( this.createPointRow( 0, 0 ) );
+
+	} else {
+
+		var point = this.pointsUI[ this.pointsUI.length - 1 ];
+
+		this.pointsList.add( this.createPointRow( point.x.getValue(), point.y.getValue() ) );
+
+	}
+
+	this.update();
+
+};
+
+UIPoints2.prototype.getValue = function () {
+
+	var points = [];
+	var count = 0;
+
+	for ( var i = 0; i < this.pointsUI.length; i ++ ) {
+
+		var pointUI = this.pointsUI[ i ];
+
+		if ( ! pointUI ) continue;
+
+		points.push( new THREE.Vector2( pointUI.x.getValue(), pointUI.y.getValue() ) );
+		++ count;
+		pointUI.lbl.setValue( count );
+
+	}
+
+	return points;
+
+};
+
+UIPoints2.prototype.setValue = function ( points ) {
+
+	this.clear();
+
+	for ( var i = 0; i < points.length; i ++ ) {
+
+		var point = points[ i ];
+		this.pointsList.add( this.createPointRow( point.x, point.y ) );
+
+	}
+
+	this.update();
+	return this;
+
+};
+
+UIPoints2.prototype.createPointRow = function ( x, y ) {
+
+	var pointRow = new UIDiv();
+	var lbl = new UIText( this.lastPointIdx + 1 ).setWidth( '20px' );
+	var txtX = new UINumber( x ).setWidth( '30px' ).onChange( this.update );
+	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
+
+	var idx = this.lastPointIdx;
+	var scope = this;
+	var btn = new UIButton( '-' ).onClick( function () {
+
+		if ( scope.isEditing ) return;
+		scope.deletePointRow( idx );
+
+	} );
+
+	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY } );
+	++ this.lastPointIdx;
+	pointRow.add( lbl, txtX, txtY, btn );
+
+	return pointRow;
+
+};
+
+var UIPoints3 = function () {
+
+	UIPoints.call( this, UIPoints3.addRow.bind( this ) );
+
+	return this;
+
+};
+
+UIPoints3.prototype = Object.create( UIPoints.prototype );
+UIPoints3.prototype.constructor = UIPoints3;
+
+UIPoints3.addRow = function () {
+
+	if ( this.pointsUI.length === 0 ) {
+
+		this.pointsList.add( this.createPointRow( 0, 0, 0 ) );
+
+	} else {
+
+		var point = this.pointsUI[ this.pointsUI.length - 1 ];
+
+		this.pointsList.add( this.createPointRow( point.x.getValue(), point.y.getValue(), point.z.getValue() ) );
+
+	}
+
+	this.update();
+
+};
+
+UIPoints3.prototype.getValue = function () {
+
+	var points = [];
+	var count = 0;
+
+	for ( var i = 0; i < this.pointsUI.length; i ++ ) {
+
+		var pointUI = this.pointsUI[ i ];
+
+		if ( ! pointUI ) continue;
+
+		points.push( new THREE.Vector3( pointUI.x.getValue(), pointUI.y.getValue(), pointUI.z.getValue() ) );
+		++ count;
+		pointUI.lbl.setValue( count );
+
+	}
+
+	return points;
+
+};
+
+UIPoints3.prototype.setValue = function ( points ) {
+
+	this.clear();
+
+	for ( var i = 0; i < points.length; i ++ ) {
+
+		var point = points[ i ];
+		this.pointsList.add( this.createPointRow( point.x, point.y, point.z ) );
+
+	}
+
+	this.update();
+	return this;
+
+};
+
+UIPoints3.prototype.createPointRow = function ( x, y, z ) {
+
+	var pointRow = new UIDiv();
+	var lbl = new UIText( this.lastPointIdx + 1 ).setWidth( '20px' );
+	var txtX = new UINumber( x ).setWidth( '30px' ).onChange( this.update );
+	var txtY = new UINumber( y ).setWidth( '30px' ).onChange( this.update );
+	var txtZ = new UINumber( z ).setWidth( '30px' ).onChange( this.update );
+
+	var idx = this.lastPointIdx;
+	var scope = this;
+	var btn = new UIButton( '-' ).onClick( function () {
+
+		if ( scope.isEditing ) return;
+		scope.deletePointRow( idx );
+
+	} );
+
+	this.pointsUI.push( { row: pointRow, lbl: lbl, x: txtX, y: txtY, z: txtZ } );
+	++ this.lastPointIdx;
+	pointRow.add( lbl, txtX, txtY, txtZ, btn );
+
+	return pointRow;
+
+};
+
+var UIBoolean = function ( boolean, text ) {
+
+	UISpan.call( this );
 
 	this.setMarginRight( '10px' );
 
-	this.checkbox = new UI.Checkbox( boolean );
-	this.text = new UI.Text( text ).setMarginLeft( '3px' );
+	this.checkbox = new UICheckbox( boolean );
+	this.text = new UIText( text ).setMarginLeft( '3px' );
 
 	this.add( this.checkbox );
 	this.add( this.text );
 
 };
 
-UI.THREE.Boolean.prototype = Object.create( UI.Span.prototype );
-UI.THREE.Boolean.prototype.constructor = UI.THREE.Boolean;
+UIBoolean.prototype = Object.create( UISpan.prototype );
+UIBoolean.prototype.constructor = UIBoolean;
 
-UI.THREE.Boolean.prototype.getValue = function () {
+UIBoolean.prototype.getValue = function () {
 
 	return this.checkbox.getValue();
 
 };
 
-UI.THREE.Boolean.prototype.setValue = function ( value ) {
+UIBoolean.prototype.setValue = function ( value ) {
 
 	return this.checkbox.setValue( value );
 
 };
+
+var renderer;
+
+function renderToCanvas( texture ) {
+
+	if ( renderer === undefined ) {
+
+		renderer = new THREE.WebGLRenderer( { canvas: new OffscreenCanvas( 1, 1 ) } );
+
+	}
+
+	var image = texture.image;
+
+	renderer.setSize( image.width, image.height, false );
+	renderer.toneMapping = THREE.ReinhardToneMapping;
+	renderer.toneMappingExposure = 2;
+	renderer.outputEncoding = THREE.sRGBEncoding;
+
+	var scene = new THREE.Scene();
+	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+	var material = new THREE.MeshBasicMaterial( { map: texture } );
+	var quad = new THREE.PlaneBufferGeometry( 2, 2 );
+	var mesh = new THREE.Mesh( quad, material );
+	scene.add( mesh );
+
+	renderer.render( scene, camera );
+
+	return renderer.domElement;
+
+}
+
+export { UITexture, UICubeTexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };

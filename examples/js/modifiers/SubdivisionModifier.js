@@ -1,4 +1,4 @@
-/*
+/**
  *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
  *	@author centerionware / http://www.centerionware.com
  *
@@ -53,7 +53,6 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 ( function () {
 
 	// Some constants
-	var WARNINGS = ! true; // Set to true for development
 	var ABC = [ 'a', 'b', 'c' ];
 
 
@@ -168,9 +167,19 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 		oldVertices = geometry.vertices; // { x, y, z}
 		oldFaces = geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
-		oldUvs = geometry.faceVertexUvs[ 0 ];
+		oldUvs = geometry.faceVertexUvs;
 
-		var hasUvs = oldUvs !== undefined && oldUvs.length > 0;
+		var hasUvs = oldUvs[ 0 ] !== undefined && oldUvs[ 0 ].length > 0;
+
+		if ( hasUvs ) {
+
+			for ( var j = 0; j < oldUvs.length; j ++ ) {
+
+				newUVs.push( [] );
+
+			}
+
+		}
 
 		/******************************************************
 		 *
@@ -215,7 +224,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 				if ( connectedFaces != 1 ) {
 
-					if ( WARNINGS ) console.warn( 'Subdivision Modifier: Number of connected faces != 2, is: ', connectedFaces, currentEdge );
+					// console.warn( 'Subdivision Modifier: Number of connected faces != 2, is: ', connectedFaces, currentEdge );
 
 				}
 
@@ -292,7 +301,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 				if ( n == 2 ) {
 
-					if ( WARNINGS ) console.warn( '2 connecting edges', connectingEdges );
+					// console.warn( '2 connecting edges', connectingEdges );
 					sourceVertexWeight = 3 / 4;
 					connectingVertexWeight = 1 / 8;
 
@@ -301,11 +310,11 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 				} else if ( n == 1 ) {
 
-					if ( WARNINGS ) console.warn( 'only 1 connecting edge' );
+					// console.warn( 'only 1 connecting edge' );
 
 				} else if ( n == 0 ) {
 
-					if ( WARNINGS ) console.warn( '0 connecting edges' );
+					// console.warn( '0 connecting edges' );
 
 				}
 
@@ -369,21 +378,25 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 
 			if ( hasUvs ) {
 
-				uv = oldUvs[ i ];
+				for ( var j = 0; j < oldUvs.length; j ++ ) {
 
-				x0 = uv[ 0 ];
-				x1 = uv[ 1 ];
-				x2 = uv[ 2 ];
+					uv = oldUvs[ j ][ i ];
 
-				x3.set( midpoint( x0.x, x1.x ), midpoint( x0.y, x1.y ) );
-				x4.set( midpoint( x1.x, x2.x ), midpoint( x1.y, x2.y ) );
-				x5.set( midpoint( x0.x, x2.x ), midpoint( x0.y, x2.y ) );
+					x0 = uv[ 0 ];
+					x1 = uv[ 1 ];
+					x2 = uv[ 2 ];
 
-				newUv( newUVs, x3, x4, x5 );
-				newUv( newUVs, x0, x3, x5 );
+					x3.set( midpoint( x0.x, x1.x ), midpoint( x0.y, x1.y ) );
+					x4.set( midpoint( x1.x, x2.x ), midpoint( x1.y, x2.y ) );
+					x5.set( midpoint( x0.x, x2.x ), midpoint( x0.y, x2.y ) );
 
-				newUv( newUVs, x1, x4, x3 );
-				newUv( newUVs, x2, x5, x4 );
+					newUv( newUVs[ j ], x3, x4, x5 );
+					newUv( newUVs[ j ], x0, x3, x5 );
+
+					newUv( newUVs[ j ], x1, x4, x3 );
+					newUv( newUVs[ j ], x2, x5, x4 );
+
+				}
 
 			}
 
@@ -392,7 +405,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		// Overwrite old arrays
 		geometry.vertices = newVertices;
 		geometry.faces = newFaces;
-		if ( hasUvs ) geometry.faceVertexUvs[ 0 ] = newUVs;
+		if ( hasUvs ) geometry.faceVertexUvs = newUVs;
 
 		// console.log('done');
 

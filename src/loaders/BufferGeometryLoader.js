@@ -3,7 +3,9 @@ import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { FileLoader } from './FileLoader.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
+import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry.js';
+import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -11,11 +13,13 @@ import { DefaultLoadingManager } from './LoadingManager.js';
 
 function BufferGeometryLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( BufferGeometryLoader.prototype, {
+BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: BufferGeometryLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -33,7 +37,7 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 	parse: function ( json ) {
 
-		var geometry = new BufferGeometry();
+		var geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
 
 		var index = json.data.index;
 
@@ -50,8 +54,45 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 			var attribute = attributes[ key ];
 			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+			var bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
+			var bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+			geometry.setAttribute( key, bufferAttribute );
 
-			geometry.addAttribute( key, new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized ) );
+		}
+
+		var morphAttributes = json.data.morphAttributes;
+
+		if ( morphAttributes ) {
+
+			for ( var key in morphAttributes ) {
+
+				var attributeArray = morphAttributes[ key ];
+
+				var array = [];
+
+				for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
+
+					var attribute = attributeArray[ i ];
+					var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+
+					var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+					if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
+					array.push( bufferAttribute );
+
+				}
+
+				geometry.morphAttributes[ key ] = array;
+
+			}
+
+		}
+
+		var morphTargetsRelative = json.data.morphTargetsRelative;
+
+		if ( morphTargetsRelative ) {
+
+			geometry.morphTargetsRelative = true;
 
 		}
 
@@ -85,14 +126,10 @@ Object.assign( BufferGeometryLoader.prototype, {
 
 		}
 
+		if ( json.name ) geometry.name = json.name;
+		if ( json.userData ) geometry.userData = json.userData;
+
 		return geometry;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	}
 

@@ -20,6 +20,8 @@ var Strings = function ( config ) {
 			'menubar/file/export/glb': 'Export GLB',
 			'menubar/file/export/gltf': 'Export GLTF',
 			'menubar/file/export/obj': 'Export OBJ',
+			'menubar/file/export/ply': 'Export PLY',
+			'menubar/file/export/ply_binary': 'Export PLY (Binary)',
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
 			'menubar/file/publish': 'Publish',
@@ -31,6 +33,7 @@ var Strings = function ( config ) {
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
 			'menubar/edit/minify_shaders': 'Minify Shaders',
+			'menubar/edit/fixcolormaps': 'Fix Color Maps',
 
 			'menubar/add': 'Add',
 			'menubar/add/group': 'Group',
@@ -38,9 +41,14 @@ var Strings = function ( config ) {
 			'menubar/add/box': 'Box',
 			'menubar/add/circle': 'Circle',
 			'menubar/add/cylinder': 'Cylinder',
+			'menubar/add/ring': 'Ring',
 			'menubar/add/sphere': 'Sphere',
+			'menubar/add/dodecahedron': 'Dodecahedron',
 			'menubar/add/icosahedron': 'Icosahedron',
+			'menubar/add/octahedron': 'Octahedron',
+			'menubar/add/tetrahedron': 'Tetrahedron',
 			'menubar/add/torus': 'Torus',
+			'menubar/add/tube': 'Tube',
 			'menubar/add/torusknot': 'TorusKnot',
 			'menubar/add/lathe': 'Lathe',
 			'menubar/add/sprite': 'Sprite',
@@ -50,6 +58,7 @@ var Strings = function ( config ) {
 			'menubar/add/hemispherelight': 'HemisphereLight',
 			'menubar/add/ambientlight': 'AmbientLight',
 			'menubar/add/perspectivecamera': 'PerspectiveCamera',
+			'menubar/add/orthographiccamera': 'OrthographicCamera',
 
 			'menubar/status/autosave': 'autosave',
 
@@ -58,6 +67,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': 'Play',
 
 			'menubar/examples': 'Examples',
+			'menubar/examples/Arkanoid': 'Arkanoid',
+			'menubar/examples/Camera': 'Camera',
+			'menubar/examples/Particles': 'Particles',
+			'menubar/examples/Pong': 'Pong',
+			'menubar/examples/Shaders': 'Shaders',
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
@@ -80,6 +94,10 @@ var Strings = function ( config ) {
 			'sidebar/object/rotation': 'Rotation',
 			'sidebar/object/scale': 'Scale',
 			'sidebar/object/fov': 'Fov',
+			'sidebar/object/left': 'Left',
+			'sidebar/object/right': 'Right',
+			'sidebar/object/top': 'Top',
+			'sidebar/object/bottom': 'Bottom',
 			'sidebar/object/near': 'Near',
 			'sidebar/object/far': 'Far',
 			'sidebar/object/intensity': 'Intensity',
@@ -125,11 +143,30 @@ var Strings = function ( config ) {
 			'sidebar/geometry/cylinder_geometry/heightsegments': 'Height segments',
 			'sidebar/geometry/cylinder_geometry/openended': 'Open ended',
 
+			'sidebar/geometry/extrude_geometry/curveSegments': 'Curve Segments',
+			'sidebar/geometry/extrude_geometry/steps': 'Steps',
+			'sidebar/geometry/extrude_geometry/depth': 'Depth',
+			'sidebar/geometry/extrude_geometry/bevelEnabled': 'Bevel?',
+			'sidebar/geometry/extrude_geometry/bevelThickness': 'Thickness',
+			'sidebar/geometry/extrude_geometry/bevelSize': 'Size',
+			'sidebar/geometry/extrude_geometry/bevelOffset': 'Offset',
+			'sidebar/geometry/extrude_geometry/bevelSegments': 'Segments',
+			'sidebar/geometry/extrude_geometry/shape': 'Convert to Shape',
+
 			'sidebar/geometry/geometry/vertices': 'Vertices',
 			'sidebar/geometry/geometry/faces': 'Faces',
 
+			'sidebar/geometry/dodecahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/dodecahedron_geometry/detail': 'Detail',
+
 			'sidebar/geometry/icosahedron_geometry/radius': 'Radius',
 			'sidebar/geometry/icosahedron_geometry/detail': 'Detail',
+
+			'sidebar/geometry/octahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/octahedron_geometry/detail': 'Detail',
+
+			'sidebar/geometry/tetrahedron_geometry/radius': 'Radius',
+			'sidebar/geometry/tetrahedron_geometry/detail': 'Detail',
 
 			'sidebar/geometry/lathe_geometry/segments': 'Segments',
 			'sidebar/geometry/lathe_geometry/phistart': 'Phi start (°)',
@@ -140,6 +177,16 @@ var Strings = function ( config ) {
 			'sidebar/geometry/plane_geometry/height': 'Height',
 			'sidebar/geometry/plane_geometry/widthsegments': 'Width segments',
 			'sidebar/geometry/plane_geometry/heightsegments': 'Height segments',
+
+			'sidebar/geometry/ring_geometry/innerRadius': 'Inner radius',
+			'sidebar/geometry/ring_geometry/outerRadius': 'Outer radius',
+			'sidebar/geometry/ring_geometry/thetaSegments': 'Theta segments',
+			'sidebar/geometry/ring_geometry/phiSegments': 'Phi segments',
+			'sidebar/geometry/ring_geometry/thetastart': 'Theta start',
+			'sidebar/geometry/ring_geometry/thetalength': 'Theta length',
+
+			'sidebar/geometry/shape_geometry/curveSegments': 'Curve Segments',
+			'sidebar/geometry/shape_geometry/extrude': 'Extrude',
 
 			'sidebar/geometry/sphere_geometry/radius': 'Radius',
 			'sidebar/geometry/sphere_geometry/widthsegments': 'Width segments',
@@ -162,6 +209,15 @@ var Strings = function ( config ) {
 			'sidebar/geometry/torusKnot_geometry/p': 'P',
 			'sidebar/geometry/torusKnot_geometry/q': 'Q',
 
+			'sidebar/geometry/tube_geometry/path': 'Path',
+			'sidebar/geometry/tube_geometry/radius': 'Radius',
+			'sidebar/geometry/tube_geometry/tube': 'Tube',
+			'sidebar/geometry/tube_geometry/tubularsegments': 'Tubular segments',
+			'sidebar/geometry/tube_geometry/radialsegments': 'Radial segments',
+			'sidebar/geometry/tube_geometry/closed': 'Closed',
+			'sidebar/geometry/tube_geometry/curvetype': 'Curve Type',
+			'sidebar/geometry/tube_geometry/tension': 'Tension',
+
 			'sidebar/material/new': 'New',
 			'sidebar/material/copy': 'Copy',
 			'sidebar/material/paste': 'Paste',
@@ -173,22 +229,24 @@ var Strings = function ( config ) {
 			'sidebar/material/vertex': 'Vertex',
 			'sidebar/material/fragment': 'fragment',
 			'sidebar/material/color': 'Color',
+			'sidebar/material/depthPacking': 'Depth Packing',
 			'sidebar/material/roughness': 'Roughness',
 			'sidebar/material/metalness': 'Metalness',
+			'sidebar/material/sheen': 'Sheen',
 			'sidebar/material/emissive': 'Emissive',
 			'sidebar/material/specular': 'Specular',
 			'sidebar/material/shininess': 'Shininess',
-			'sidebar/material/clearcoat': 'ClearCoat',
-			'sidebar/material/clearcoatroughness': 'ClearCoat Roughness',
+			'sidebar/material/clearcoat': 'Clearcoat',
+			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
 			'sidebar/material/vertexcolors': 'Vertex Colors',
-			'sidebar/material/vertexcolors/no': 'No',
-			'sidebar/material/vertexcolors/face': 'Face',
-			'sidebar/material/vertexcolors/vertex': 'Vertex',
+			'sidebar/material/vertextangents': 'Vertex Tangents',
 			'sidebar/material/skinning': 'Skinning',
+			'sidebar/material/matcap': 'Matcap',
 			'sidebar/material/map': 'Map',
 			'sidebar/material/alphamap': 'Alpha Map',
 			'sidebar/material/bumpmap': 'Bump Map',
 			'sidebar/material/normalmap': 'Normal Map',
+			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
 			'sidebar/material/displacemap': 'Displace Map',
 			'sidebar/material/roughmap': 'Rough. Map',
 			'sidebar/material/metalmap': 'Metal. Map',
@@ -197,6 +255,7 @@ var Strings = function ( config ) {
 			'sidebar/material/lightmap': 'Light Map',
 			'sidebar/material/aomap': 'AO Map',
 			'sidebar/material/emissivemap': 'Emissive Map',
+			'sidebar/material/gradientmap': 'Gradient Map',
 			'sidebar/material/side': 'Side',
 			'sidebar/material/side/front': 'Front',
 			'sidebar/material/side/back': 'Back',
@@ -224,16 +283,19 @@ var Strings = function ( config ) {
 			'sidebar/project/editable': 'Editable',
 			'sidebar/project/vr': 'VR',
 			'sidebar/project/renderer': 'Renderer',
-			'sidebar/project/antialias': 'antialias',
-			'sidebar/project/shadows': 'shadows',
-			'sidebar/project/gammainput': 'γ input',
-			'sidebar/project/gammaoutput': 'γ output',
+			'sidebar/project/antialias': 'Antialias',
+			'sidebar/project/shadows': 'Shadows',
+			'sidebar/project/shadowType': 'Shadow Type',
+			'sidebar/project/physicallyCorrectLights': 'Physically correct lights',
+			'sidebar/project/toneMapping': 'Tone mapping',
+			'sidebar/project/toneMappingExposure': 'Exposure',
+			'sidebar/project/toneMappingWhitePoint': 'White Point',
+			'sidebar/project/materials': 'Materials',
+			'sidebar/project/Assign': 'Assign',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
-			'sidebar/settings/theme': 'Theme',
-			'sidebar/settings/theme/light': 'light',
-			'sidebar/settings/theme/dark': 'dark',
+			'sidebar/settings/exportPrecision': 'Export Precision',
 
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
@@ -243,7 +305,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings/viewport/grid': 'Grid',
 
-			'sidebar/history/history': 'HISTORY',
+			'sidebar/history': 'History',
 			'sidebar/history/persistent': 'persistent',
 
 			'toolbar/translate': 'Translate',
@@ -253,7 +315,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
-			'viewport/info/triangles': 'Triangles'
+			'viewport/info/triangles': 'Triangles',
+			'viewport/info/frametime': 'Frametime'
 
 		},
 
@@ -269,6 +332,8 @@ var Strings = function ( config ) {
 			'menubar/file/export/glb': '导出GLB',
 			'menubar/file/export/gltf': '导出GLTF',
 			'menubar/file/export/obj': '导出OBJ',
+			'menubar/file/export/ply': '导出PLY',
+			'menubar/file/export/ply_binary': '导出PLY(二进制)',
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
 			'menubar/file/publish': '发布',
@@ -280,6 +345,7 @@ var Strings = function ( config ) {
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
 			'menubar/edit/minify_shaders': '压缩着色器',
+			'menubar/edit/fixcolormaps': '修复颜色贴图',
 
 			'menubar/add': '添加',
 			'menubar/add/group': '组',
@@ -287,10 +353,15 @@ var Strings = function ( config ) {
 			'menubar/add/box': '正方体',
 			'menubar/add/circle': '圆',
 			'menubar/add/cylinder': '圆柱体',
+			'menubar/add/ring': '环',
 			'menubar/add/sphere': '球体',
+			'menubar/add/dodecahedron': '十二面体',
 			'menubar/add/icosahedron': '二十面体',
+			'menubar/add/octahedron': '八面体',
+			'menubar/add/tetrahedron': '四面体',
 			'menubar/add/torus': '圆环体',
 			'menubar/add/torusknot': '环面纽结体',
+			'menubar/add/tube': '管',
 			'menubar/add/lathe': '酒杯',
 			'menubar/add/sprite': '精灵',
 			'menubar/add/pointlight': '点光源',
@@ -299,6 +370,7 @@ var Strings = function ( config ) {
 			'menubar/add/hemispherelight': '半球光',
 			'menubar/add/ambientlight': '环境光',
 			'menubar/add/perspectivecamera': '透视相机',
+			'menubar/add/orthographiccamera': '正交相机',
 
 			'menubar/status/autosave': '自动保存',
 
@@ -307,6 +379,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': '启动',
 
 			'menubar/examples': '示例',
+			'menubar/examples/Arkanoid': '打砖块',
+			'menubar/examples/Camera': ' 摄像机',
+			'menubar/examples/Particles': '粒子',
+			'menubar/examples/Pong': '乒乓球',
+			'menubar/examples/Shaders': '着色器',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
@@ -329,6 +406,10 @@ var Strings = function ( config ) {
 			'sidebar/object/rotation': '旋转',
 			'sidebar/object/scale': '缩放',
 			'sidebar/object/fov': '视角',
+			'sidebar/object/left': '左',
+			'sidebar/object/right': '右',
+			'sidebar/object/top': '上',
+			'sidebar/object/bottom': '下',
 			'sidebar/object/near': '近点',
 			'sidebar/object/far': '远点',
 			'sidebar/object/intensity': '强度',
@@ -377,8 +458,17 @@ var Strings = function ( config ) {
 			'sidebar/geometry/geometry/vertices': '顶点',
 			'sidebar/geometry/geometry/faces': '面',
 
+			'sidebar/geometry/dodecahedron_geometry/radius': '半径',
+			'sidebar/geometry/dodecahedron_geometry/detail': '面片分段',
+
 			'sidebar/geometry/icosahedron_geometry/radius': '半径',
 			'sidebar/geometry/icosahedron_geometry/detail': '面片分段',
+
+			'sidebar/geometry/octahedron_geometry/radius': '半径',
+			'sidebar/geometry/octahedron_geometry/detail': '面片分段',
+
+			'sidebar/geometry/tetrahedron_geometry/radius': '半径',
+			'sidebar/geometry/tetrahedron_geometry/detail': '面片分段',
 
 			'sidebar/geometry/lathe_geometry/segments': '分段',
 			'sidebar/geometry/lathe_geometry/phistart': '经度起点',
@@ -389,6 +479,13 @@ var Strings = function ( config ) {
 			'sidebar/geometry/plane_geometry/height': '长度',
 			'sidebar/geometry/plane_geometry/widthsegments': '宽度分段',
 			'sidebar/geometry/plane_geometry/heightsegments': '长度分段',
+
+			'sidebar/geometry/ring_geometry/innerRadius': '内半径',
+			'sidebar/geometry/ring_geometry/outerRadius': '外半径',
+			'sidebar/geometry/ring_geometry/thetaSegments': '弧度分段',
+			'sidebar/geometry/ring_geometry/phiSegments': '经度分段',
+			'sidebar/geometry/ring_geometry/thetastart': '弧度起点',
+			'sidebar/geometry/ring_geometry/thetalength': '弧度长度',
 
 			'sidebar/geometry/sphere_geometry/radius': '半径',
 			'sidebar/geometry/sphere_geometry/widthsegments': '宽度分段',
@@ -427,17 +524,16 @@ var Strings = function ( config ) {
 			'sidebar/material/emissive': '自发光',
 			'sidebar/material/specular': '高光',
 			'sidebar/material/shininess': '高光大小',
-			'sidebar/material/clearcoat': '透明贴图',
-			'sidebar/material/clearcoatroughness': '透明贴图粗糙度',
+			'sidebar/material/clearcoat': '透明图层',
+			'sidebar/material/clearcoatroughness': '透明图层粗糙度',
 			'sidebar/material/vertexcolors': '顶点颜色',
-			'sidebar/material/vertexcolors/no': '无',
-			'sidebar/material/vertexcolors/face': '面',
-			'sidebar/material/vertexcolors/vertex': '顶点',
+			'sidebar/material/vertextangents': 'Vertex Tangents',
 			'sidebar/material/skinning': '皮肤',
 			'sidebar/material/map': '贴图',
 			'sidebar/material/alphamap': '透明贴图',
 			'sidebar/material/bumpmap': '凹凸贴图',
 			'sidebar/material/normalmap': '法线贴图',
+			'sidebar/material/clearcoatnormalmap': '透明图层法线贴图',
 			'sidebar/material/displacemap': '置换贴图',
 			'sidebar/material/roughmap': '粗糙贴图',
 			'sidebar/material/metalmap': '金属贴图',
@@ -475,14 +571,17 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/gammainput': 'γ输入',
-			'sidebar/project/gammaoutput': 'γ输出',
+			'sidebar/project/shadowType': '阴影类型',
+			'sidebar/project/physicallyCorrectLights': '物理光照',
+			'sidebar/project/toneMapping': '色调映射',
+			'sidebar/project/toneMappingExposure': '曝光',
+			'sidebar/project/toneMappingWhitePoint': '白点',
+			'sidebar/project/materials': '材质',
+			'sidebar/project/Assign': '应用',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
-			'sidebar/settings/theme': '主题',
-			'sidebar/settings/theme/light': '浅色',
-			'sidebar/settings/theme/dark': '深色',
+			'sidebar/settings/exportPrecision': 'Export Precision',
 
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
@@ -492,7 +591,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings/viewport/grid': '网格',
 
-			'sidebar/history/history': '历史记录',
+			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',
 
 			'toolbar/translate': '移动',
@@ -502,7 +601,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
-			'viewport/info/triangles': '三角形'
+			'viewport/info/triangles': '三角形',
+			'viewport/info/frametime': '帧时'
 
 		}
 
@@ -519,3 +619,5 @@ var Strings = function ( config ) {
 	};
 
 };
+
+export { Strings };

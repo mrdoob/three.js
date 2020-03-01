@@ -64,26 +64,7 @@ function MeshMatcapMaterial( parameters ) {
 	this.morphTargets = false;
 	this.morphNormals = false;
 
-	this.lights = false;
-
 	this.setValues( parameters );
-
-	// a matcap is required
-
-	if ( this.matcap === null ) {
-
-		var canvas = document.createElement( 'canvas' );
-		canvas.width = 1;
-		canvas.height = 1;
-
-		var context = canvas.getContext( '2d' );
-
-		context.fillStyle = '#fff';
-		context.fillRect( 0, 0, 1, 1 );
-
-		this.matcap = new THREE.CanvasTexture( canvas );
-
-	}
 
 }
 
