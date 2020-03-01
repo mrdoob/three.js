@@ -588,7 +588,7 @@ Object.assign( Color.prototype, {
 
 		if ( attribute.normalized === true ) {
 
-			// assuming UInt8Array
+			// assuming Uint8Array
 
 			this.r /= 255;
 			this.g /= 255;
