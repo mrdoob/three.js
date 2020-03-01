@@ -17,9 +17,9 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GeometryCompressionUtils } from './jsm/utils/GeometryCompressionUtils.js';
+			import { BufferGeometryUtils } from './jsm/utils/BufferGeometryUtils.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var statsEnabled = true;
@@ -37,14 +37,9 @@
 				"detail": 4,
 				"rotationSpeed": 0.1,
 
-				"quantizeEncodePos": false,
-
-				"defaultEncodeNormal": false,
-				"anglesEncodeNormal": false,
-				"oct1bytesEncode": false,
-				"oct2bytesEncode": false,
-
-				"defaultEncodeUV": false,
+				"QuantizePosEncoding": false,
+				"NormEncodingMethods": "None", // for normal encodings
+				"DefaultUVEncoding": false,
 
 				"totalGPUMemory": "0 bytes"
 			};
@@ -158,19 +153,16 @@
 				folder.add( data, 'rotationSpeed', 0, 0.5, 0.1 );
 
 				folder = gui.addFolder( 'Position Compression' );
+				folder.add( data, 'QuantizePosEncoding', false ).onChange( generateGeometry );
 				folder.open();
-				folder.add( data, 'quantizeEncodePos', false ).onChange( generateGeometry );
 
 				folder = gui.addFolder( 'Normal Compression' );
+				folder.add( data, 'NormEncodingMethods', ["None", "DEFAULT", "OCT1Byte", "OCT2Byte", "ANGLES"] ).onChange( generateGeometry );
 				folder.open();
-				folder.add( data, 'defaultEncodeNormal', false ).onChange( generateGeometry );
-				folder.add( data, 'anglesEncodeNormal', false ).onChange( generateGeometry );
-				folder.add( data, 'oct1bytesEncode', false ).onChange( generateGeometry );
-				folder.add( data, 'oct2bytesEncode', false ).onChange( generateGeometry );
 
 				folder = gui.addFolder( 'UV Compression' );
+				folder.add( data, 'DefaultUVEncoding', false ).onChange( generateGeometry );
 				folder.open();
-				folder.add( data, 'defaultEncodeUV', false ).onChange( generateGeometry );
 
 				folder = gui.addFolder( 'Memory Info' );
 				folder.open();
@@ -237,7 +229,7 @@
 
 					geometry = new THREE.BufferGeometry().fromGeometry( geometry );
 
-					console.warn( 'THREE.GeometryBrowser: Converted Geometry to BufferGeometry.' );
+					console.log( 'THREE.GeometryCompression: Converted Geometry to BufferGeometry.' );
 
 				}
 
@@ -249,44 +241,19 @@
 				mesh.material = new THREE.MeshPhongMaterial( { color: 0xffffff, emissive: 0x111111 } );
 				mesh.material.map = data.texture ? texture : null;
 
-				var normalEncode = "";
-
-				if ( data.oct1bytesEncode ) {
-
-					/**
-					 * It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
-					 * As it makes vertex data not aligned to a 4 byte boundary which may harm some WebGL implementations and sometimes the normal distortion is visible
-					 * Please refer to @zeux 's comments in https://github.com/mrdoob/three.js/pull/18208
-					 */
-					normalEncode = "OCT1Byte";
-
-				} else if ( data.oct2bytesEncode ) {
-
-					normalEncode = "OCT2Byte";
-
-				} else if ( data.anglesEncodeNormal ) {
-
-					normalEncode = "ANGLES";
-
-				} else if ( data.defaultEncodeNormal ) {
-
-					normalEncode = "DEFAULT";
-
-				}
-
-				if ( normalEncode != "" ) {
-
-					GeometryCompressionUtils.compressNormals( mesh, normalEncode );
-
-				}
-
-				if ( data.quantizeEncodePos ) {
+				if ( data["QuantizePosEncoding"] ) {
 
 					GeometryCompressionUtils.compressPositions( mesh );
 
 				}
 
-				if ( data.defaultEncodeUV ) {
+				if ( data["NormEncodingMethods"] !== "None" ) {
+
+					GeometryCompressionUtils.compressNormals( mesh, data["NormEncodingMethods"] );
+
+				}
+
+				if ( data["DefaultUVEncoding"] ) {
 
 					GeometryCompressionUtils.compressUvs( mesh );
 
@@ -298,12 +265,8 @@
 
 
 			function computeGPUMemory( mesh ) {
-
-				let posBytes = mesh.geometry.attributes.position.bytes || mesh.geometry.attributes.position.array.length * 4;
-				let normBytes = mesh.geometry.attributes.normal.bytes || mesh.geometry.attributes.normal.array.length * 4;
-				let uvBytes = mesh.geometry.attributes.uv.bytes || mesh.geometry.attributes.uv.array.length * 4;
-				memoryDisplay.setValue( posBytes + normBytes + uvBytes + " bytes" );
-
+				// Use BufferGeometryUtils to do memory calculation
+				memoryDisplay.setValue( BufferGeometryUtils.estimateBytesUsed(mesh.geometry) + " bytes");
 			}
 
 		</script>
