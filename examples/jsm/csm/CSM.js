@@ -8,11 +8,6 @@ import {
 	DirectionalLight,
 	MathUtils,
 	ShaderChunk,
-	LineBasicMaterial,
-	Object3D,
-	BufferGeometry,
-	BufferAttribute,
-	Line,
 	Matrix4,
 	Box3
 } from '../../../build/three.module.js';
@@ -21,13 +16,12 @@ import Shader from './Shader.js';
 
 const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new Frustum();
-const _frustum = new Frustum();
 const _center = new Vector3();
 const _bbox = new Box3();
 const _uniformArray = [];
 const _logArray = [];
 
-export default class CSM {
+export class CSM {
 
 	constructor( data ) {
 
@@ -344,68 +338,6 @@ export default class CSM {
 		this.initCascades();
 		this.updateShadowBounds();
 		this.updateUniforms();
-
-	}
-
-	helper( cameraMatrix ) {
-
-		let geometry, vertices;
-		const material = new LineBasicMaterial( { color: 0xffffff } );
-		const object = new Object3D();
-
-		for ( let i = 0; i < this.frustums.length; i ++ ) {
-
-			this.frustums[ i ].toSpace( cameraMatrix, _frustum );
-
-			geometry = new BufferGeometry();
-			vertices = [];
-
-
-			for ( let i = 0; i < 5; i ++ ) {
-
-				const point = _frustum.vertices.near[ i === 4 ? 0 : i ];
-				vertices.push( point.x, point.y, point.z );
-
-			}
-
-			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
-
-			object.add( new Line( geometry, material ) );
-
-			geometry = new BufferGeometry();
-			vertices = [];
-
-			for ( let i = 0; i < 5; i ++ ) {
-
-				const point = _frustum.vertices.far[ i === 4 ? 0 : i ];
-				vertices.push( point.x, point.y, point.z );
-
-			}
-
-			geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
-
-			object.add( new Line( geometry, material ) );
-
-			for ( let i = 0; i < 4; i ++ ) {
-
-				geometry = new BufferGeometry();
-				vertices = [];
-
-				const near = _frustum.vertices.near[ i ];
-				const far = _frustum.vertices.far[ i ];
-
-				vertices.push( near.x, near.y, near.z );
-				vertices.push( far.x, far.y, far.z );
-
-				geometry.setAttribute( 'position', new BufferAttribute( new Float32Array( vertices ), 3 ) );
-
-				object.add( new Line( geometry, material ) );
-
-			}
-
-		}
-
-		return object;
 
 	}
 
