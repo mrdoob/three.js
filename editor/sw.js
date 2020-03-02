@@ -101,6 +101,7 @@ const assets = [
 	'./js/Config.js',
 	'./js/History.js',
 	'./js/Loader.js',
+	'./js/LoaderUtils.js',
 	'./js/Menubar.js',
 	'./js/Menubar.File.js',
 	'./js/Menubar.Edit.js',

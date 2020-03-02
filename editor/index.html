@@ -174,7 +174,17 @@
 
 				event.preventDefault();
 
-				editor.loader.loadFiles( event.dataTransfer.files );
+				// DataTransferItemList supports folders
+
+				if ( event.dataTransfer.items ) {
+
+					editor.loader.loadItemList( event.dataTransfer.items );
+
+				} else {
+
+					editor.loader.loadFiles( event.dataTransfer.files );
+
+				}
 
 			}, false );
 
