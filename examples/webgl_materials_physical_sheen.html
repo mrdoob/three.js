@@ -37,7 +37,6 @@
 			var params = {
 				nodeMaterial: true,
 				color: new THREE.Color( 255, 0, 127 ),
-				sheenBRDF: true,
 				sheen: new THREE.Color( 10, 10, 10 ), // corresponds to .04 reflectance
 				roughness: .9,
 				exposure: 2,
@@ -46,7 +45,7 @@
 			// model
 			new FBXLoader().load( 'models/fbx/cloth.fbx', function ( loadedModel ) {
 
-				mesh = loadedModel.children[0];
+				mesh = loadedModel.children[ 0 ];
 
 				init();
 
@@ -75,6 +74,7 @@
 				nodeMaterial.metalness = new Nodes.FloatNode( 0 );
 				nodeMaterial.roughness = new Nodes.FloatNode();
 				nodeMaterial.color = new Nodes.ColorNode( params.color.clone() );
+				nodeMaterial.sheen = new Nodes.ColorNode( params.sheen.clone() );
 
 				//
 
@@ -82,7 +82,7 @@
 					new THREE.SphereBufferGeometry( 1, 100, 100 ),
 					material
 				);
-				scene.add(sphere);
+				scene.add( sphere );
 
 				camera.position.set( - 12, 7, 4 );
 
@@ -120,28 +120,27 @@
 
 				function onUpdate() {
 
-					mesh.material = sphere.material = params.nodeMaterial
-					? nodeMaterial
-					: material;
+					mesh.material = sphere.material = params.nodeMaterial ? nodeMaterial : material;
 
-					material.sheen = params.sheenBRDF
-					? new THREE.Color()
-					: null;
+				}
 
-					material.needsUpdate = true;
+				function onSheenUpdate() {
 
-					nodeMaterial.sheen = params.sheenBRDF
-					? new Nodes.ColorNode( material.sheen )
-					: undefined;
+					var newSheenEnabled = params.color.r > 0 || params.color.g > 0 || params.color.b > 0;
+					var oldSheenEnabled = material.sheen.r > 0 || material.sheen.g > 0 || material.sheen.b > 0;
 
-					nodeMaterial.needsCompile = true;
+					if ( newSheenEnabled !== oldSheenEnabled ) {
+
+						material.needsUpdate = true;
+						nodeMaterial.needsCompile = true;
+
+					}
 
 				}
 
 				gui.add( params, 'nodeMaterial' ).onChange( onUpdate );
 				gui.addColor( params, 'color' );
-				gui.add( params, 'sheenBRDF' ).onChange( onUpdate );
-				gui.addColor( params, 'sheen' );
+				gui.addColor( params, 'sheen' ).onChange( onSheenUpdate );
 				gui.add( params, 'roughness', 0, 1 );
 				gui.add( params, 'exposure', 0, 3 );
 				gui.open();
@@ -172,23 +171,15 @@
 
 			function render() {
 
-				//
-
 				material.color.copy( params.color ).multiplyScalar( 1 / 255 );
+				material.sheen.copy( params.sheen ).multiplyScalar( 1 / 255 );
 				material.roughness = params.roughness;
 
 				//
 
 				nodeMaterial.color.value.copy( material.color );
+				nodeMaterial.sheen.value.copy( params.sheen ).multiplyScalar( 1 / 255 );
 				nodeMaterial.roughness.value = params.roughness;
-
-				//
-
-				if ( params.sheenBRDF ) {
-
-					material.sheen.copy( params.sheen ).multiplyScalar( 1 / 255 );
-
-				}
 
 				//
 

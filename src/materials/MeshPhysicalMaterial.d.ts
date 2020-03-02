@@ -26,7 +26,7 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
 	clearcoat: number;
 	clearcoatRoughness: number;
 
-	sheen: Color | null;
+	sheen: Color;
 
 	clearcoatNormalScale: Vector2;
 	clearcoatNormalMap: Texture | null;
