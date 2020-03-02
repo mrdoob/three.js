@@ -56,6 +56,7 @@
 				camera.position.set( 0.5, 1, 2 );
 
 				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xffffff );
 
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
@@ -103,7 +104,7 @@
 
 
 				// make a plane and make it face up
-				planeGeometry = new THREE.PlaneGeometry( PLANE_WIDTH, PLANE_HEIGHT ).rotateX( Math.PI / 2 );
+				planeGeometry = new THREE.PlaneBufferGeometry( PLANE_WIDTH, PLANE_HEIGHT ).rotateX( Math.PI / 2 );
 				planeMaterial = new THREE.MeshBasicMaterial( {
 					map: renderTarget.texture,
 					opacity: state.opacity,
@@ -128,20 +129,21 @@
 				cameraHelper = new THREE.CameraHelper( shadowCamera );
 
 				// like MeshDepthMaterial, but goes from black to transparent
-				depthMaterial = new THREE.ShaderMaterial( {
-					uniforms: {
-						darkness: { value: state.darkness },
-					},
-					vertexShader: THREE.ShaderChunk[ 'depth_vert' ],
-					fragmentShader: `
+				depthMaterial = new THREE.MeshDepthMaterial();
+				depthMaterial.userData.darkness = { value: state.darkness };
+				depthMaterial.onBeforeCompile = function ( shader ) {
+
+					shader.uniforms.darkness = depthMaterial.userData.darkness;
+					shader.fragmentShader = `
 						#define DEPTH_PACKING 3200
 						uniform float darkness;
-						${THREE.ShaderChunk[ 'depth_frag' ].replace(
+						${shader.fragmentShader.replace(
 					'gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );',
 					'gl_FragColor = vec4( vec3( 0.0 ), ( 1.0 - fragCoordZ ) * darkness );'
 				)}
-					`,
-				} );
+					`;
+
+				};
 				depthMaterial.depthTest = false;
 				depthMaterial.depthWrite = false;
 
@@ -159,7 +161,7 @@
 				gui.add( state, 'blur', 0, 15, 0.1 );
 				gui.add( state, 'darkness', 1, 5, 0.1 ).onChange( function () {
 
-					depthMaterial.uniforms.darkness.value = state.darkness;
+					depthMaterial.userData.darkness.value = state.darkness;
 
 				} );
 				gui.add( state, 'opacity', 0, 1, 0.01 ).onChange( function () {
@@ -183,10 +185,9 @@
 
 				//
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
 				//
