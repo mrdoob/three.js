@@ -1,4 +1,4 @@
-// r114
+// r114.1
 
 const assets = [
 	'./',
@@ -45,6 +45,9 @@ const assets = [
 	'../examples/jsm/exporters/STLExporter.js',
 
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
+
+	'../examples/js/vr/HelioWebXRPolyfill.js',
+	'../examples/jsm/webxr/VRButton.js',
 
 	'./manifest.json',
 	'./images/icon.png',
@@ -98,6 +101,7 @@ const assets = [
 	'./js/Config.js',
 	'./js/History.js',
 	'./js/Loader.js',
+	'./js/LoaderUtils.js',
 	'./js/Menubar.js',
 	'./js/Menubar.File.js',
 	'./js/Menubar.Edit.js',
