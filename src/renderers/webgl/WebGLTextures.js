@@ -285,21 +285,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		if ( renderTarget.isWebGLMultiviewRenderTarget ) {
-
-			_gl.deleteTexture( renderTargetProperties.__webglColorTexture );
-			_gl.deleteTexture( renderTargetProperties.__webglDepthStencilTexture );
-
-			info.memory.textures -= 2;
-
-			for ( var i = 0, il = renderTargetProperties.__webglViewFramebuffers.length; i < il; i ++ ) {
-
-				_gl.deleteFramebuffer( renderTargetProperties.__webglViewFramebuffers[ i ] );
-
-			}
-
-		}
-
 		properties.remove( renderTarget.texture );
 		properties.remove( renderTarget );
 
@@ -1000,7 +985,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 		var isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
-		var isMultiview = ( renderTarget.isWebGLMultiviewRenderTarget === true );
 		var supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		// Setup framebuffer
@@ -1054,48 +1038,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-			} else if ( isMultiview ) {
-
-				var width = renderTarget.width;
-				var height = renderTarget.height;
-				var numViews = renderTarget.numViews;
-
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
-
-				var ext = extensions.get( 'OVR_multiview2' );
-
-				info.memory.textures += 2;
-
-				var colorTexture = _gl.createTexture();
-				_gl.bindTexture( _gl.TEXTURE_2D_ARRAY, colorTexture );
-				_gl.texParameteri( _gl.TEXTURE_2D_ARRAY, _gl.TEXTURE_MAG_FILTER, _gl.NEAREST );
-				_gl.texParameteri( _gl.TEXTURE_2D_ARRAY, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
-				_gl.texImage3D( _gl.TEXTURE_2D_ARRAY, 0, _gl.RGBA8, width, height, numViews, 0, _gl.RGBA, _gl.UNSIGNED_BYTE, null );
-				ext.framebufferTextureMultiviewOVR( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, colorTexture, 0, 0, numViews );
-
-				var depthStencilTexture = _gl.createTexture();
-				_gl.bindTexture( _gl.TEXTURE_2D_ARRAY, depthStencilTexture );
-				_gl.texParameteri( _gl.TEXTURE_2D_ARRAY, _gl.TEXTURE_MAG_FILTER, _gl.NEAREST );
-				_gl.texParameteri( _gl.TEXTURE_2D_ARRAY, _gl.TEXTURE_MIN_FILTER, _gl.NEAREST );
-				_gl.texImage3D( _gl.TEXTURE_2D_ARRAY, 0, _gl.DEPTH24_STENCIL8, width, height, numViews, 0, _gl.DEPTH_STENCIL, _gl.UNSIGNED_INT_24_8, null );
-				ext.framebufferTextureMultiviewOVR( _gl.FRAMEBUFFER, _gl.DEPTH_STENCIL_ATTACHMENT, depthStencilTexture, 0, 0, numViews );
-
-				var viewFramebuffers = new Array( numViews );
-				for ( var i = 0; i < numViews; ++ i ) {
-
-					viewFramebuffers[ i ] = _gl.createFramebuffer();
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, viewFramebuffers[ i ] );
-					_gl.framebufferTextureLayer( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, colorTexture, 0, i );
-
-				}
-
-				renderTargetProperties.__webglColorTexture = colorTexture;
-				renderTargetProperties.__webglDepthStencilTexture = depthStencilTexture;
-				renderTargetProperties.__webglViewFramebuffers = viewFramebuffers;
-
-				_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
-				_gl.bindTexture( _gl.TEXTURE_2D_ARRAY, null );
-
 			}
 
 		}
@@ -1121,7 +1063,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			state.bindTexture( _gl.TEXTURE_CUBE_MAP, null );
 
-		} else if ( ! isMultiview ) {
+		} else {
 
 			state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
 			setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, supportsMips );

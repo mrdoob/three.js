@@ -31,7 +31,7 @@
 		material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		box = new THREE.Mesh( geometry, material );
 
-		helper = new THREE.FaceNormalsHelper( box, 2, 0x00ff00, 1 );
+		helper = new FaceNormalsHelper( box, 2, 0x00ff00, 1 );
 
 		scene.add( box );
 		scene.add( helper );

@@ -329,7 +329,6 @@ var files = {
 		"webxr_vr_cubes",
 		"webxr_vr_dragging",
 		"webxr_vr_lorenzattractor",
-		"webxr_vr_multiview",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
 		"webxr_vr_paint",
@@ -339,11 +338,12 @@ var files = {
 		"webxr_vr_video"
 	],
 	"physics": [
-		"webgl_physics_cloth",
-		"webgl_physics_convex_break",
-		"webgl_physics_rope",
-		"webgl_physics_terrain",
-		"webgl_physics_volume"
+		"physics_ammo_break",
+		"physics_ammo_cloth",
+		"physics_ammo_rope",
+		"physics_ammo_terrain",
+		"physics_ammo_volume",
+		"physics_cannon_instancing"
 	],
 	"misc": [
 		"misc_animation_authoring",

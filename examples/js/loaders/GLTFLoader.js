@@ -461,18 +461,24 @@ THREE.GLTFLoader = ( function () {
 				if ( materialDef.name ) material.name = materialDef.name;
 				if ( materialDef.doubleSided === true ) material.side = THREE.DoubleSide;
 
-				var alphaMode = materialDef.alphaMode;
+				var alphaMode = materialDef.alphaMode || ALPHA_MODES.OPAQUE;
 
 				if ( alphaMode === ALPHA_MODES.BLEND ) {
 
 					material.transparent = true;
 
 					// See: https://github.com/mrdoob/three.js/issues/17706
-					materialParams.depthWrite = false;
+					material.depthWrite = false;
 
-				} else if ( alphaMode === ALPHA_MODES.MASK ) {
+				} else {
 
-					materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
+					material.transparent = false;
+
+					if ( alphaMode === ALPHA_MODES.MASK ) {
+
+						material.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
+
+					}
 
 				}
 
@@ -2242,7 +2248,6 @@ THREE.GLTFLoader = ( function () {
 
 		var geometry = mesh.geometry;
 		var material = mesh.material;
-		var extensions = this.extensions;
 
 		var useVertexTangents = geometry.attributes.tangent !== undefined;
 		var useVertexColors = geometry.attributes.color !== undefined;
@@ -2462,18 +2467,24 @@ THREE.GLTFLoader = ( function () {
 			if ( materialDef.name ) material.name = materialDef.name;
 			if ( materialDef.doubleSided === true ) material.side = THREE.DoubleSide;
 
-			var alphaMode = materialDef.alphaMode;
+			var alphaMode = materialDef.alphaMode || ALPHA_MODES.OPAQUE;
 
 			if ( alphaMode === ALPHA_MODES.BLEND ) {
 
 				material.transparent = true;
 
 				// See: https://github.com/mrdoob/three.js/issues/17706
-				materialParams.depthWrite = false;
+				material.depthWrite = false;
 
-			} else if ( alphaMode === ALPHA_MODES.MASK ) {
+			} else {
 
-				materialParams.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
+				material.transparent = false;
+
+				if ( alphaMode === ALPHA_MODES.MASK ) {
+
+					material.alphaTest = materialDef.alphaCutoff !== undefined ? materialDef.alphaCutoff : 0.5;
+
+				}
 
 			}
 

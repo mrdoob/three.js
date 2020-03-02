@@ -20,11 +20,11 @@
 		var physics;
 
 		// Load MMD resources and instantiate MMDPhysics
-		new THREE.MMDLoader().load(
+		new MMDLoader().load(
 			'models/mmd/miku.pmd',
 			function ( mesh ) {
 
-				physics = new THREE.MMDPhysics( mesh )
+				physics = new MMDPhysics( mesh )
 				scene.add( mesh );
 
 			}
@@ -108,7 +108,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/animation/MMDPhysics.js examples/js/animation/MMDPhysics.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/MMDPhysics.js examples/jsm/animation/MMDPhysics.js]
 		</p>
 	</body>
 </html>

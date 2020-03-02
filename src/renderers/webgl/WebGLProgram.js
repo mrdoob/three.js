@@ -399,8 +399,6 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 
 	var prefixVertex, prefixFragment;
 
-	var numMultiviewViews = parameters.numMultiviewViews;
-
 	if ( parameters.isRawShaderMaterial ) {
 
 		prefixVertex = [
@@ -625,7 +623,6 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 			( parameters.toneMapping !== NoToneMapping ) ? getToneMappingFunction( 'toneMapping', parameters.toneMapping ) : '',
 
 			parameters.dithering ? '#define DITHERING' : '',
-			parameters.transparent ? '#define TRANSPARENT' : '',
 
 			( parameters.outputEncoding || parameters.mapEncoding || parameters.matcapEncoding || parameters.envMapEncoding || parameters.emissiveMapEncoding || parameters.lightMapEncoding ) ?
 				ShaderChunk[ 'encodings_pars_fragment' ] : '', // this code is required here because it is used by the various encoding/decoding function defined below
@@ -697,59 +694,6 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 			'#define texture2DProjGradEXT textureProjGrad',
 			'#define textureCubeGradEXT textureGrad'
 		].join( '\n' ) + '\n' + prefixFragment;
-
-		// Multiview
-
-		if ( numMultiviewViews > 0 ) {
-
-			prefixVertex = prefixVertex.replace(
-				'#version 300 es\n',
-				[
-					'#version 300 es\n',
-					'#extension GL_OVR_multiview2 : require',
-					'layout(num_views = ' + numMultiviewViews + ') in;',
-					'#define VIEW_ID gl_ViewID_OVR'
-				].join( '\n' )
-			);
-
-			prefixVertex = prefixVertex.replace(
-				[
-					'uniform mat4 modelViewMatrix;',
-					'uniform mat4 projectionMatrix;',
-					'uniform mat4 viewMatrix;',
-					'uniform mat3 normalMatrix;'
-				].join( '\n' ),
-				[
-					'uniform mat4 modelViewMatrices[' + numMultiviewViews + '];',
-					'uniform mat4 projectionMatrices[' + numMultiviewViews + '];',
-					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
-					'uniform mat3 normalMatrices[' + numMultiviewViews + '];',
-
-					'#define modelViewMatrix modelViewMatrices[VIEW_ID]',
-					'#define projectionMatrix projectionMatrices[VIEW_ID]',
-					'#define viewMatrix viewMatrices[VIEW_ID]',
-					'#define normalMatrix normalMatrices[VIEW_ID]'
-				].join( '\n' )
-			);
-
-			prefixFragment = prefixFragment.replace(
-				'#version 300 es\n',
-				[
-					'#version 300 es\n',
-					'#extension GL_OVR_multiview2 : require',
-					'#define VIEW_ID gl_ViewID_OVR'
-				].join( '\n' )
-			);
-
-			prefixFragment = prefixFragment.replace(
-				'uniform mat4 viewMatrix;',
-				[
-					'uniform mat4 viewMatrices[' + numMultiviewViews + '];',
-					'#define viewMatrix viewMatrices[VIEW_ID]'
-				].join( '\n' )
-			);
-
-		}
 
 	}
 
@@ -895,7 +839,6 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 	this.program = program;
 	this.vertexShader = glVertexShader;
 	this.fragmentShader = glFragmentShader;
-	this.numMultiviewViews = numMultiviewViews;
 
 	return this;
 
