@@ -23,7 +23,6 @@ const _cameraToLightMatrix = new Matrix4();
 const _lightSpaceFrustum = new Frustum();
 const _frustum = new Frustum();
 const _center = new Vector3();
-const _size = new Vector3();
 const _bbox = new Box3();
 const _uniformArray = [];
 const _logArray = [];
@@ -54,11 +53,9 @@ export default class CSM {
 
 		this.lights = [];
 		this.shaders = new Map();
+
 		this.createLights();
-
-		this.getBreaks();
-		this.initCascades();
-
+		this.updateFrustums();
 		this.injectInclude();
 
 	}
@@ -90,6 +87,55 @@ export default class CSM {
 		camera.updateProjectionMatrix();
 		this.mainFrustum.setFromProjectionMatrix( camera.projectionMatrix, this.maxFar );
 		this.mainFrustum.split( this.breaks, this.frustums );
+
+	}
+
+	updateShadowBounds() {
+
+		const frustums = this.frustums;
+		for ( let i = 0; i < frustums.length; i ++ ) {
+
+			const light = this.lights[ i ];
+			const shadowCam = light.shadow.camera;
+			const frustum = this.frustums[ i ];
+
+			// Get the two points that represent that furthest points on the frustum assuming
+			// that's either the diagonal across the far plane or the diagonal across the whole
+			// frustum itself.
+			const nearVerts = frustum.vertices.near;
+			const farVerts = frustum.vertices.far;
+			const point1 = farVerts[ 0 ];
+			let point2;
+			if ( point1.distanceTo( farVerts[ 2 ] ) > point1.distanceTo( nearVerts[ 2 ] ) ) {
+
+				point2 = farVerts[ 2 ];
+
+			} else {
+
+				point2 = nearVerts[ 2 ];
+
+			}
+
+			let squaredBBWidth = point1.distanceTo( point2 );
+			if ( this.fade ) {
+
+				// expand the shadow extents by the fade margin if fade is enabled.
+				const camera = this.camera;
+				const far = Math.max( camera.far, this.maxFar );
+				const linearDepth = frustum.vertices.far[ 0 ].z / ( far - camera.near );
+				const margin = 0.25 * Math.pow( linearDepth, 2.0 ) * ( far - camera.near );
+
+				squaredBBWidth += margin;
+
+			}
+
+			shadowCam.left = - squaredBBWidth / 2;
+			shadowCam.right = squaredBBWidth / 2;
+			shadowCam.top = squaredBBWidth / 2;
+			shadowCam.bottom = - squaredBBWidth / 2;
+			shadowCam.updateProjectionMatrix();
+
+		}
 
 	}
 
@@ -160,34 +206,22 @@ export default class CSM {
 
 	}
 
-	update( cameraMatrix ) {
+	update() {
 
+		const camera = this.camera;
 		const frustums = this.frustums;
 		for ( let i = 0; i < frustums.length; i ++ ) {
 
 			const light = this.lights[ i ];
+			const shadowCam = light.shadow.camera;
+			const texelWidth = ( shadowCam.right - shadowCam.left ) / this.shadowMapSize;
+			const texelHeight = ( shadowCam.top - shadowCam.bottom ) / this.shadowMapSize;
 			light.shadow.camera.updateMatrixWorld( true );
-			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, cameraMatrix );
+			_cameraToLightMatrix.multiplyMatrices( light.shadow.camera.matrixWorldInverse, camera.matrixWorld );
 			frustums[ i ].toSpace( _cameraToLightMatrix, _lightSpaceFrustum );
 
-			// Get the two points that represent that furthest points on the frustum assuming
-			// that's either the diagonal across the far plane or the diagonal across the whole
-			// frustum itself.
 			const nearVerts = _lightSpaceFrustum.vertices.near;
 			const farVerts = _lightSpaceFrustum.vertices.far;
-			const point1 = farVerts[ 0 ];
-			let point2;
-			if ( point1.distanceTo( farVerts[ 2 ] ) > point1.distanceTo( nearVerts[ 2 ] ) ) {
-
-				point2 = farVerts[ 2 ];
-
-			} else {
-
-				point2 = nearVerts[ 2 ];
-
-			}
-
-			let squaredBBWidth = point1.distanceTo( point2 );
 			_bbox.makeEmpty();
 			for ( let j = 0; j < 4; j ++ ) {
 
@@ -196,29 +230,11 @@ export default class CSM {
 
 			}
 
-			if ( this.fade ) {
-
-				// expand the shadow extents by the fade margin if fade is enabled.
-				const camera = this.camera;
-				const far = Math.max( camera.far, this.maxFar );
-				const linearDepth = frustums[ i ].vertices.far[ 0 ].z / ( far - camera.near );
-				const margin = 0.25 * Math.pow( linearDepth, 2.0 ) * ( far - camera.near );
-
-				squaredBBWidth += margin;
-
-			}
-
-			const texelSize = squaredBBWidth / this.shadowMapSize;
 			_bbox.getCenter( _center );
 			_center.z = _bbox.max.z + this.lightMargin;
-			_center.x = Math.floor( _center.x / texelSize ) * texelSize;
-			_center.y = Math.floor( _center.y / texelSize ) * texelSize;
+			_center.x = Math.floor( _center.x / texelWidth ) * texelWidth;
+			_center.y = Math.floor( _center.y / texelHeight ) * texelHeight;
 			_center.applyMatrix4( light.shadow.camera.matrixWorld );
-
-			light.shadow.camera.left = - squaredBBWidth / 2;
-			light.shadow.camera.right = squaredBBWidth / 2;
-			light.shadow.camera.top = squaredBBWidth / 2;
-			light.shadow.camera.bottom = - squaredBBWidth / 2;
 
 			light.position.copy( _center );
 			light.target.position.copy( _center );
@@ -226,9 +242,6 @@ export default class CSM {
 			light.target.position.x += this.lightDirection.x;
 			light.target.position.y += this.lightDirection.y;
 			light.target.position.z += this.lightDirection.z;
-
-			light.shadow.camera.updateProjectionMatrix();
-			light.shadow.camera.updateMatrixWorld();
 
 		}
 
@@ -329,6 +342,7 @@ export default class CSM {
 
 		this.getBreaks();
 		this.initCascades();
+		this.updateShadowBounds();
 		this.updateUniforms();
 
 	}
