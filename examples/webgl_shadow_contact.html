@@ -37,15 +37,21 @@
 			const CAMERA_HEIGHT = 0.3;
 
 			var state = {
-				blur: 3.5,
-				darkness: 1,
-				opacity: 1,
+				shadow: {
+					blur: 3.5,
+					darkness: 1,
+					opacity: 1,
+				},
+				plane: {
+					color: '#ffffff',
+					opacity: 1,
+				},
 				showWireframe: false,
 			};
 
 			var shadowGroup, renderTarget, renderTargetBlur, shadowCamera, cameraHelper, depthMaterial, horizontalBlurMaterial, verticalBlurMaterial;
 
-			var planeGeometry, planeMaterial, plane, blurPlane;
+			var plane, blurPlane, fillPlane;
 
 			init();
 			animate();
@@ -104,13 +110,13 @@
 
 
 				// make a plane and make it face up
-				planeGeometry = new THREE.PlaneBufferGeometry( PLANE_WIDTH, PLANE_HEIGHT ).rotateX( Math.PI / 2 );
-				planeMaterial = new THREE.MeshBasicMaterial( {
+				var planeGeometry = new THREE.PlaneBufferGeometry( PLANE_WIDTH, PLANE_HEIGHT ).rotateX( Math.PI / 2 );
+				var material = new THREE.MeshBasicMaterial( {
 					map: renderTarget.texture,
-					opacity: state.opacity,
+					opacity: state.shadow.opacity,
 					transparent: true,
 				} );
-				plane = new THREE.Mesh( planeGeometry, planeMaterial );
+				plane = new THREE.Mesh( planeGeometry, material );
 				shadowGroup.add( plane );
 
 				// the y from the texture is flipped!
@@ -121,6 +127,17 @@
 				blurPlane.visible = false;
 				shadowGroup.add( blurPlane );
 
+				// the plane with the color of the ground
+				var material = new THREE.MeshBasicMaterial( {
+					color: state.plane.color,
+					opacity: state.plane.opacity,
+					transparent: true,
+				} );
+				fillPlane = new THREE.Mesh( planeGeometry, material );
+				fillPlane.rotateX( Math.PI );
+				fillPlane.position.y -= 0.00001;
+				shadowGroup.add( fillPlane );
+
 				// the camera to render the depth material from
 				shadowCamera = new THREE.OrthographicCamera( - PLANE_WIDTH / 2, PLANE_WIDTH / 2, PLANE_HEIGHT / 2, - PLANE_HEIGHT / 2, 0, CAMERA_HEIGHT );
 				shadowCamera.rotation.x = Math.PI / 2; // get the camera to look up
@@ -130,12 +147,11 @@
 
 				// like MeshDepthMaterial, but goes from black to transparent
 				depthMaterial = new THREE.MeshDepthMaterial();
-				depthMaterial.userData.darkness = { value: state.darkness };
+				depthMaterial.userData.darkness = { value: state.shadow.darkness };
 				depthMaterial.onBeforeCompile = function ( shader ) {
 
 					shader.uniforms.darkness = depthMaterial.userData.darkness;
 					shader.fragmentShader = `
-						#define DEPTH_PACKING 3200
 						uniform float darkness;
 						${shader.fragmentShader.replace(
 					'gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );',
@@ -156,19 +172,34 @@
 				//
 
 				gui = new GUI();
+				var shadowFolder = gui.addFolder( 'shadow' );
+				shadowFolder.open();
+				var planeFolder = gui.addFolder( 'plane' );
+				planeFolder.open();
 
 
-				gui.add( state, 'blur', 0, 15, 0.1 );
-				gui.add( state, 'darkness', 1, 5, 0.1 ).onChange( function () {
+				shadowFolder.add( state.shadow, 'blur', 0, 15, 0.1 );
+				shadowFolder.add( state.shadow, 'darkness', 1, 5, 0.1 ).onChange( function () {
 
-					depthMaterial.userData.darkness.value = state.darkness;
+					depthMaterial.userData.darkness.value = state.shadow.darkness;
 
 				} );
-				gui.add( state, 'opacity', 0, 1, 0.01 ).onChange( function () {
+				shadowFolder.add( state.shadow, 'opacity', 0, 1, 0.01 ).onChange( function () {
 
-					planeMaterial.opacity = state.opacity;
+					plane.material.opacity = state.shadow.opacity;
 
 				} );
+				planeFolder.addColor( state.plane, 'color' ).onChange( function () {
+
+					fillPlane.material.color = new THREE.Color( state.plane.color );
+
+				} );
+				planeFolder.add( state.plane, 'opacity', 0, 1, 0.01 ).onChange( function () {
+
+					fillPlane.material.opacity = state.plane.opacity;
+
+				} );
+
 				gui.add( state, 'showWireframe', true ).onChange( function () {
 
 					if ( state.showWireframe ) {
@@ -245,10 +276,11 @@
 
 				//
 
-				// remove the background and force the depthMaterial to everything
+				// remove the background
 				var initialBackground = scene.background;
 				scene.background = null;
 
+				// force the depthMaterial to everything
 				cameraHelper.visible = false;
 				scene.overrideMaterial = depthMaterial;
 
@@ -260,11 +292,11 @@
 				scene.overrideMaterial = null;
 				cameraHelper.visible = true;
 
-				blurShadow( state.blur );
+				blurShadow( state.shadow.blur );
 
 				// a second pass to reduce the artifacts
 				// (0.4 is the minimum blur amout so that the artifacts are gone)
-				blurShadow( state.blur * 0.4 );
+				blurShadow( state.shadow.blur * 0.4 );
 
 				// reset and render the normal scene
 				renderer.setRenderTarget( null );
