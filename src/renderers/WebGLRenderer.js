@@ -2429,6 +2429,18 @@ function WebGLRenderer( parameters ) {
 		uniforms.clearcoatRoughness.value = material.clearcoatRoughness;
 		if ( material.sheen ) uniforms.sheen.value.copy( material.sheen );
 
+		if ( material.clearcoatMap ) {
+
+			uniforms.clearcoatMap.value = material.clearcoatMap;
+
+		}
+
+		if ( material.clearcoatRoughnessMap ) {
+
+			uniforms.clearcoatRoughnessMap.value = material.clearcoatRoughnessMap;
+
+		}
+
 		if ( material.clearcoatNormalMap ) {
 
 			uniforms.clearcoatNormalScale.value.copy( material.clearcoatNormalScale );
