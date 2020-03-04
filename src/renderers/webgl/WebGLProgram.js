@@ -221,11 +221,21 @@ function includeReplacer( match, include ) {
 
 // Unroll Loops
 
-var loopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
+var deprecatedUnrollLoopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
+var unrollLoopPattern = /#unroll_loop_start[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}[\s]+?#unroll_loop_end/g
 
 function unrollLoops( string ) {
 
-	return string.replace( loopPattern, loopReplacer );
+	return string
+		.replace( unrollLoopPattern, loopReplacer )
+		.replace( deprecatedUnrollLoopPattern, deprecatedLoopReplacer );
+
+}
+
+function deprecatedLoopReplacer( match, start, end, snippet ) {
+
+	console.warn( 'WebGLProgram: #pragma unroll_loop shader syntax is deprecated. Please use #unroll_loop_start syntax instead.' );
+	return loopReplacer( match, start, end, snippet );
 
 }
 
