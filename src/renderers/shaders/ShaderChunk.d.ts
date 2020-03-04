@@ -43,9 +43,6 @@ export let ShaderChunk: {
 	equirect_vert: string;
 	fog_fragment: string;
 	fog_pars_fragment: string;
-	geometry_decode_pars_vertex: string;
-	geometry_decode_normal_vertex: string;
-	geometry_decode_vertex: string;
 	linedashed_frag: string;
 	linedashed_vert: string;
 	lightmap_fragment: string;
