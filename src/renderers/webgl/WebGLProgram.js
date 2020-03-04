@@ -222,7 +222,7 @@ function includeReplacer( match, include ) {
 // Unroll Loops
 
 var deprecatedUnrollLoopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
-var unrollLoopPattern = /#unroll_loop_start[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}[\s]+?#unroll_loop_end/g
+var unrollLoopPattern = /#unroll_loop_start[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}[\s]+?#unroll_loop_end/g;
 
 function unrollLoops( string ) {
 
