@@ -300,7 +300,6 @@ var files = {
 		"webgl_gpgpu_protoplanet",
 		"webgl_instancing_modified",
 		"webgl_lightningstrike",
-		"webgl_lightshafts",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_csm",
