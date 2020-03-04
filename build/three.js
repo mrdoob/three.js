@@ -5912,6 +5912,22 @@
 
 			}
 
+			if ( this.isScene ) {
+
+				if ( this.background instanceof Color$1 ) {
+
+					object.background = this.background.getHex();
+
+				} else if (this.background && this.background.isTexture) {
+
+					object.background = serialize( meta.textures, this.background );
+
+				}
+
+				if (this.environment && this.environment.isTexture) { object.environment = serialize( meta.textures, this.environment ); }
+
+			}
+
 			if ( this.isMesh || this.isLine || this.isPoints ) {
 
 				object.geometry = serialize( meta.geometries, this.geometry );
@@ -6122,8 +6138,6 @@
 
 			var data = Object3D.prototype.toJSON.call( this, meta );
 
-			if ( this.background !== null ) { data.object.background = this.background.toJSON( meta ); }
-			if ( this.environment !== null ) { data.object.environment = this.environment.toJSON( meta ); }
 			if ( this.fog !== null ) { data.object.fog = this.fog.toJSON(); }
 
 			return data;
@@ -39662,12 +39676,7 @@
 			if ( json.map !== undefined ) { material.map = getTexture( json.map ); }
 			if ( json.matcap !== undefined ) { material.matcap = getTexture( json.matcap ); }
 
-			if ( json.alphaMap !== undefined ) {
-
-				material.alphaMap = getTexture( json.alphaMap );
-				material.transparent = true;
-
-			}
+			if ( json.alphaMap !== undefined ) { material.alphaMap = getTexture( json.alphaMap ); }
 
 			if ( json.bumpMap !== undefined ) { material.bumpMap = getTexture( json.bumpMap ); }
 			if ( json.bumpScale !== undefined ) { material.bumpScale = json.bumpScale; }
@@ -40096,7 +40105,7 @@
 			var textures = this.parseTextures( json.textures, images );
 			var materials = this.parseMaterials( json.materials, textures );
 
-			var object = this.parseObject( json.object, geometries, materials );
+			var object = this.parseObject( json.object, geometries, materials, textures );
 
 			if ( json.animations ) {
 
@@ -40646,7 +40655,7 @@
 
 		},
 
-		parseObject: function ( data, geometries, materials ) {
+		parseObject: function ( data, geometries, materials, textures ) {
 
 			var object;
 
@@ -40698,6 +40707,18 @@
 
 			}
 
+			function getTexture( name ) {
+
+				if ( textures[ name ] === undefined ) {
+
+	        console.warn( 'THREE.ObjectLoader: Undefined texture', name );
+
+	      }
+
+	      return textures[ name ];
+
+			}
+
 			switch ( data.type ) {
 
 				case 'Scene':
@@ -40709,6 +40730,22 @@
 						if ( Number.isInteger( data.background ) ) {
 
 							object.background = new Color( data.background );
+
+						} else {
+
+							object.background = getTexture( data.background );
+
+						}
+
+					}
+
+					if ( data.environment !== undefined ) {
+
+						var texture = getTexture ( data.environment );
+
+						if ( texture instanceof CubeTexture ) {
+
+							object.environment  = texture;
 
 						}
 
@@ -40913,7 +40950,7 @@
 
 				for ( var i = 0; i < children.length; i ++ ) {
 
-					object.add( this.parseObject( children[ i ], geometries, materials ) );
+					object.add( this.parseObject( children[ i ], geometries, materials, textures ) );
 
 				}
 

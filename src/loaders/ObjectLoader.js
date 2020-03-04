@@ -127,7 +127,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var textures = this.parseTextures( json.textures, images );
 		var materials = this.parseMaterials( json.materials, textures );
 
-		var object = this.parseObject( json.object, geometries, materials );
+		var object = this.parseObject( json.object, geometries, materials, textures );
 
 		if ( json.animations ) {
 
@@ -677,7 +677,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
-	parseObject: function ( data, geometries, materials ) {
+	parseObject: function ( data, geometries, materials, textures ) {
 
 		var object;
 
@@ -729,6 +729,18 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function getTexture( name ) {
+
+			if ( textures[ name ] === undefined ) {
+
+        console.warn( 'THREE.ObjectLoader: Undefined texture', name );
+
+      }
+
+      return textures[ name ];
+
+		}
+
 		switch ( data.type ) {
 
 			case 'Scene':
@@ -740,6 +752,22 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					if ( Number.isInteger( data.background ) ) {
 
 						object.background = new Color( data.background );
+
+					} else {
+
+						object.background = getTexture( data.background );
+
+					}
+
+				}
+
+				if ( data.environment !== undefined ) {
+
+					var texture = getTexture ( data.environment );
+
+					if ( texture instanceof CubeTexture ) {
+
+						object.environment  = texture;
 
 					}
 
@@ -944,7 +972,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			for ( var i = 0; i < children.length; i ++ ) {
 
-				object.add( this.parseObject( children[ i ], geometries, materials ) );
+				object.add( this.parseObject( children[ i ], geometries, materials, textures ) );
 
 			}
 
