@@ -361,9 +361,13 @@ export class CSM {
 			delete material.defines.CSM_CASCADES;
 			delete material.defines.CSM_FADE;
 
-			delete shader.uniforms.CSM_cascades;
-			delete shader.uniforms.cameraNear;
-			delete shader.uniforms.shadowFar;
+			if ( shader !== null ) {
+
+				delete shader.uniforms.CSM_cascades;
+				delete shader.uniforms.cameraNear;
+				delete shader.uniforms.shadowFar;
+
+			}
 
 			material.needsUpdate = true;
 
