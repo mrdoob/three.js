@@ -56,7 +56,6 @@
 		initScene.call( this );
 		initWaveform.call( this );
 		initSoundMap.call( this );
-		//		initSoundCloud.call( this );
 		initAudio.call( this );
 		initDatGui.call( this );
 		initStats.call( this );
@@ -224,50 +223,6 @@
 			this.scene.add( this.soundMap );
 
 		}
-
-		function initSoundCloud() {
-
-			this.useSoundMap = true;
-			this.soundMapFftLength = 512;
-			this.soundMapBufferLength = 512;
-			this.currentAudioBufferIndex = 0;
-
-			// Using bufferd line
-			const geometry = new THREE.BufferGeometry();
-			const material = new THREE.PointsMaterial( {
-				vertexColors: THREE.VertexColors,
-				size: 0.01
-			} );
-			const halfFftLength = this.soundMapFftLength / 2;
-			const positions = [];
-			const colors = [];
-
-			for ( let x = 0; x < this.soundMapBufferLength; x ++ ) {
-
-				for ( let z = 0; z < halfFftLength; z ++ ) {
-
-					positions.push( x / 100, 0, z / 100 );
-					colors.push( 1, 1, 1 );
-
-				}
-
-			}
-
-			const bufferPositionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
-			bufferPositionAttribute.setUsage( THREE.DynamicDrawUsage );
-			geometry.setAttribute( 'position', bufferPositionAttribute );
-
-			const bufferColorAttribute = new THREE.Float32BufferAttribute( colors, 3 );
-			bufferColorAttribute.setUsage( THREE.DynamicDrawUsage );
-			geometry.setAttribute( 'color', bufferColorAttribute );
-
-			let boundingBoxCenter = new THREE.Vector3();
-			this.soundMap = new THREE.Points( geometry, material );
-			this.soundMap.geometry.computeBoundingBox();
-			this.soundMap.geometry.boundingBox.getCenter( boundingBoxCenter );
-			this.soundMap.position.x = - boundingBoxCenter.x;
-			this.soundMap.position.y = - boundingBoxCenter.y;
-			this.soundMap.position.z = - boundingBoxCenter.z;
 
 			this.scene.add( this.soundMap );
 
