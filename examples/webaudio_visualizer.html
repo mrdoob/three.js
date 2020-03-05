@@ -244,13 +244,6 @@
 
 			var GuiInterface = function () {
 
-				// Materials
-				this.materials = {
-					Basic: new THREE.MeshBasicMaterial( { side: THREE.DoubleSide } ),
-					Normal: new THREE.MeshNormalMaterial( { side: THREE.DoubleSide } )
-				};
-				this.material = 'Basic';
-
 				// Audio
 				this.audioSource = ['File', 'Microphone'];
 				this.toggleAudio = true;
@@ -272,7 +265,6 @@
 			folderSoundMap.add( this, 'useSoundMap' ).name( 'Active Sound Map' );
 			folderSoundMap.add( this, 'soundMapFftLength' ).name( 'FFT Width' ).onChange( this.updateSoundMap.bind( this ) );
 			folderSoundMap.add( this, 'soundMapBufferLength' ).name( 'Buffer Length' ).onChange( this.updateSoundMap.bind( this ) );
-			folderSoundMap.add( this.interface, 'material', Object.keys( this.interface.materials ) ).name( 'Materials' ).onChange( this.updateMaterial.bind( this ) );
 
 			var folderWaveForm = this.gui.addFolder( 'WaveForm' );
 			folderWaveForm.add( this, 'useWaveform' ).name( 'Active Waveform' );
@@ -409,24 +401,6 @@
 			// Update audioAnalyser
 			this.audioAnalyser.analyser.fftSize = this.soundMapFftLength;
 			this.audioAnalyser.data = new Uint8Array( this.audioAnalyser.analyser.frequencyBinCount );
-
-		},
-
-		updateMaterial() {
-
-			this.soundMap.material = this.interface.materials[ this.interface.material ];
-			this.soundMap.material.needsUpdate = true;
-
-			this.soundMap.material.vertexColors = THREE.VertexColors;
-			// or
-			//                    if ( this.soundMap.material.color !== undefined ) {
-			//                        this.soundMap.material.color = new THREE.Color( this.interface.materialColor )
-			//                    }
-
-		},
-			//            if ( this.soundMap.material.color !== undefined ) {
-			//                this.soundMap.material.color = new THREE.Color( this.interface.materialColor )
-			//            }
 
 		},
 
