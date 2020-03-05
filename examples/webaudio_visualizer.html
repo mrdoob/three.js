@@ -55,7 +55,6 @@
 		initControls.call( this );
 		initScene.call( this );
 		initWaveform.call( this );
-		//		initWaveformCloud.call( this );
 		initSoundMap.call( this );
 		//		initSoundCloud.call( this );
 		initAudio.call( this );
@@ -157,69 +156,6 @@
 			this.waveforms.position.x = - boundingBoxCenter.x;
 			this.waveforms.position.y = 1;
 			this.waveforms.position.z = - 1;
-
-			this.scene.add( this.waveforms );
-
-		}
-
-		function initWaveformCloud() {
-
-			this.useWaveform = true;
-
-			this.currentWaveformBufferIndex = 0;
-			this.waveformCycles = 200;
-			this.waveforms = new THREE.Group();
-
-			for ( let waveIndex = 0; waveIndex < this.waveformCycles; waveIndex ++ ) {
-
-				// Using bufferd line
-				const geometry = new THREE.BufferGeometry();
-				const material = new THREE.PointsMaterial( {
-					vertexColors: THREE.VertexColors,
-					size: 0.001
-				} );
-				const halfFftLength = this.fftWaveformLength / 2;
-				const positions = [];
-				const colors = [];
-				const globalOffset = waveIndex * (halfFftLength / 1000);
-
-				for ( let x = 0; x < halfFftLength; x ++ ) {
-
-					const globalXPosition = globalOffset + (x / 1000);
-					positions.push( globalXPosition, 0, 0 );
-					colors.push( 1, 1, 1 );
-
-				}
-
-				const bufferPositionAttribute = new THREE.Float32BufferAttribute( positions, 3 );
-				bufferPositionAttribute.setUsage( THREE.DynamicDrawUsage );
-				geometry.setAttribute( 'position', bufferPositionAttribute );
-
-				const bufferColorAttribute = new THREE.Float32BufferAttribute( colors, 3 );
-				bufferColorAttribute.setUsage( THREE.DynamicDrawUsage );
-				geometry.setAttribute( 'color', bufferColorAttribute );
-
-				//                            let boundingBoxCenter = new THREE.Vector3()
-				this.waveform = new THREE.Points( geometry, material );
-				//                            this.waveform = new THREE.Points( geometry, material )
-				//                            this.waveform.geometry.computeBoundingBox()
-				//                            this.waveform.geometry.boundingBox.getCenter( boundingBoxCenter )
-				//                            this.waveform.position.x = -boundingBoxCenter.x
-				//                            this.waveform.position.y = 2
-				//                            this.waveform.position.z = -3
-
-				this.waveforms.add( this.waveform );
-
-			}
-
-			const boundingBox = new THREE.Box3();
-			let boundingBoxCenter = new THREE.Vector3();
-			boundingBox.setFromObject( this.waveforms );
-			boundingBox.getCenter( boundingBoxCenter );
-
-			this.waveforms.position.x = - boundingBoxCenter.x;
-			this.waveforms.position.y = 2;
-			this.waveforms.position.z = - 3;
 
 			this.scene.add( this.waveforms );
 
