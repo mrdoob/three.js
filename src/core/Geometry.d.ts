@@ -121,12 +121,12 @@ export class Geometry extends EventDispatcher {
 	/**
 	 * Bounding box.
 	 */
-	boundingBox: Box3;
+	boundingBox: Box3 | null;
 
 	/**
 	 * Bounding sphere.
 	 */
-	boundingSphere: Sphere;
+	boundingSphere: Sphere | null;
 
 	/**
 	 * Set to true if the vertices array has been updated.
