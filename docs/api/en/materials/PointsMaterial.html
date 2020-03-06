@@ -14,6 +14,30 @@
 
 		<p class="desc">The default material used by [page:Points].</p>
 
+		<h2>Code Example</h2>
+		<code>
+		var vertices = [];
+
+		for ( var i = 0; i < 10000; i ++ ) {
+
+			var x = THREE.MathUtils.randFloatSpread( 2000 );
+			var y = THREE.MathUtils.randFloatSpread( 2000 );
+			var z = THREE.MathUtils.randFloatSpread( 2000 );
+
+			vertices.push( x, y, z );
+
+		}
+
+		var geometry = new THREE.BufferGeometry();
+		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+		var material = new THREE.PointsMaterial( { color: 0x888888 } );
+
+		var points = new THREE.Points( geometry, material );
+
+		scene.add( points );
+		</code>
+
 		<h2>Examples</h2>
 		<p>
 			[example:misc_controls_fly misc / controls / fly]<br />
@@ -31,30 +55,7 @@
 			[example:webgl_trails WebGL / trails]
 		</p>
 
-		<code>
-var vertices = [];
-
-for ( var i = 0; i < 10000; i ++ ) {
-
-	var x = THREE.MathUtils.randFloatSpread( 2000 );
-	var y = THREE.MathUtils.randFloatSpread( 2000 );
-	var z = THREE.MathUtils.randFloatSpread( 2000 );
-
-	vertices.push( x, y, z );
-
-}
-
-var geometry = new THREE.BufferGeometry();
-geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-
-var material = new THREE.PointsMaterial( { color: 0x888888 } );
-
-var points = new THREE.Points( geometry, material );
-
-scene.add( points );
-		</code>
-
-		<h3>[name]( [param:Object parameters] )</h3>
+		<h2>[name]( [param:Object parameters] )</h2>
 		<p>
 			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
 			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />

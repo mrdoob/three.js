@@ -14,19 +14,18 @@
 
 		<p class="desc">This helper displays the directional cone of a [page:PositionalAudio].</p>
 
-		<h2>Example</h2>
-
-		<div>[example:webaudio_orientation webaudio / orientation ]</div>
-
 		<h2>Code Example</h2>
 		<code>
-var positionalAudio = new THREE.PositionalAudio( listener );
-positionalAudio.setDirectionalCone( 180, 230, 0.1 );
+		var positionalAudio = new THREE.PositionalAudio( listener );
+		positionalAudio.setDirectionalCone( 180, 230, 0.1 );
 
-var helper = new PositionalAudioHelper( positionalAudio );
-positionalAudio.add( helper );
+		var helper = new PositionalAudioHelper( positionalAudio );
+		positionalAudio.add( helper );
 		</code>
 
+		<h2>Examples</h2>
+
+		<div>[example:webaudio_orientation webaudio / orientation ]</div>
 
 		<h2>Constructor</h2>
 
