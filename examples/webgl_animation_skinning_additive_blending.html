@@ -53,7 +53,7 @@
 				sad_pose: { weight: 0 },
 				agree: { weight: 0 },
 				headShake: { weight: 0 }
-			}
+			};
 			var panelSettings, numAnimations;
 
 			init();
@@ -73,7 +73,7 @@
 				// camera
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				var controls = new OrbitControls( camera, renderer.domElement );
-				camera.position.set( -1, 2, 3 );
+				camera.position.set( - 1, 2, 3 );
 				camera.lookAt( 0, 1, 0 );
 				controls.target = new THREE.Vector3( 0, 1, 0 );
 				controls.update();
@@ -145,7 +145,7 @@
 						} else if ( additiveActions[ name ] ) {
 
 							// Make the clip additive and remove the reference frame
-							
+
 							THREE.AnimationUtils.makeClipAdditive( clip );
 
 							if ( clip.name.endsWith( '_pose' ) ) {
@@ -184,7 +184,7 @@
 				};
 
 				const baseNames = [ 'None', ...Object.keys( baseActions ) ];
-				
+
 				for ( let i = 0, l = baseNames.length; i !== l; ++ i ) {
 
 					const name = baseNames[ i ];
@@ -197,7 +197,7 @@
 
 						prepareCrossFade( currentAction, action, 0.35 );
 
-					}
+					};
 
 					crossFadeControls.push( folder1.add( panelSettings, name ) );
 
@@ -207,7 +207,6 @@
 
 					const settings = additiveActions[ name ];
 
-					const panelName = `modify ${name} weight`;
 					panelSettings[ name ] = settings.weight;
 					folder2.add( panelSettings, name, 0.0, 1.0, 0.01 ).listen().onChange( function ( weight ) {
 
@@ -243,9 +242,10 @@
 
 					const settings = baseActions[ control.property ];
 
-					if ( !settings || !settings.weight ) {
+					if ( ! settings || ! settings.weight ) {
 
 						control.setInactive();
+
 					}
 
 				} );
@@ -255,7 +255,7 @@
 			function activateAction( action ) {
 
 				const clip = action.getClip();
-				const settings = baseActions[ clip.name ] || additiveActions[ clip.name ];	
+				const settings = baseActions[ clip.name ] || additiveActions[ clip.name ];
 				setWeight( action, settings.weight );
 				action.play();
 
@@ -369,7 +369,7 @@
 			// the start action's timeScale to ((start animation's duration) / (end animation's duration))
 
 			function setWeight( action, weight ) {
-				
+
 				action.enabled = true;
 				action.setEffectiveTimeScale( 1 );
 				action.setEffectiveWeight( weight );
