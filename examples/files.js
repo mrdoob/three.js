@@ -216,6 +216,7 @@ var files = {
 		"webgl_shaders_tonemapping",
 		"webgl_shaders_vector",
 		"webgl_shading_physical",
+		"webgl_shadow_contact",
 		"webgl_shadowmap",
 		"webgl_shadowmap_performance",
 		"webgl_shadowmap_pointlight",
@@ -280,7 +281,6 @@ var files = {
 		"webgl_buffergeometry_instancing",
 		"webgl_buffergeometry_instancing_billboards",
 		"webgl_buffergeometry_instancing_interleaved",
-		"webgl_buffergeometry_instancing_lambert",
 		"webgl_buffergeometry_lines",
 		"webgl_buffergeometry_lines_indexed",
 		"webgl_buffergeometry_morphtargets",
@@ -300,7 +300,6 @@ var files = {
 		"webgl_gpgpu_protoplanet",
 		"webgl_instancing_modified",
 		"webgl_lightningstrike",
-		"webgl_lightshafts",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
 		"webgl_shadowmap_csm",
@@ -338,11 +337,12 @@ var files = {
 		"webxr_vr_video"
 	],
 	"physics": [
-		"webgl_physics_cloth",
-		"webgl_physics_convex_break",
-		"webgl_physics_rope",
-		"webgl_physics_terrain",
-		"webgl_physics_volume"
+		"physics_ammo_break",
+		"physics_ammo_cloth",
+		"physics_ammo_rope",
+		"physics_ammo_terrain",
+		"physics_ammo_volume",
+		"physics_cannon_instancing"
 	],
 	"misc": [
 		"misc_animation_authoring",

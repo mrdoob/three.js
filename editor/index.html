@@ -42,6 +42,7 @@
 		<script src="js/libs/ternjs/doc_comment.js"></script>
 		<script src="js/libs/tern-threejs/threejs.js"></script>
 		<script src="js/libs/signals.min.js"></script>
+		<script src="../examples/js/vr/HelioWebXRPolyfill.js"></script>
 
 		<script type="module">
 
@@ -54,6 +55,7 @@
 			import { Player } from './js/Player.js';
 			import { Sidebar } from './js/Sidebar.js';
 			import { Menubar } from './js/Menubar.js';
+			import { VRButton } from '../examples/jsm/webxr/VRButton.js';
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
@@ -70,6 +72,7 @@
 
 			window.editor = editor; // Expose editor to Console
 			window.THREE = THREE; // Expose THREE to APP Scripts and Console
+			window.VRButton = VRButton; // Expose VRButton to APP Scripts
 
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
@@ -171,7 +174,19 @@
 
 				event.preventDefault();
 
-				editor.loader.loadFiles( event.dataTransfer.files );
+				if ( event.dataTransfer.types[ 0 ] === 'text/plain' ) return; // Outliner drop
+
+				if ( event.dataTransfer.items ) {
+
+					// DataTransferItemList supports folders
+
+					editor.loader.loadItemList( event.dataTransfer.items );
+
+				} else {
+
+					editor.loader.loadFiles( event.dataTransfer.files );
+
+				}
 
 			}, false );
 
