@@ -235,6 +235,8 @@
 				this.audioSource = ['File', 'Microphone'];
 				this.toggleAudio = true;
 
+				// FFT
+				this.fftAvailablesValues = [32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768];
 
 			};
 
@@ -250,7 +252,7 @@
 
 			var folderSoundMap = this.gui.addFolder( 'SoundMap' );
 			folderSoundMap.add( this, 'useSoundMap' ).name( 'Active Sound Map' );
-			folderSoundMap.add( this, 'soundMapFftLength' ).name( 'FFT Width' ).onChange( this.updateSoundMap.bind( this ) );
+			folderSoundMap.add( this, 'soundMapFftLength', this.interface.fftAvailablesValues ).name( 'FFT Width' ).onChange( this.updateSoundMap.bind( this ) );
 			folderSoundMap.add( this, 'soundMapBufferLength' ).name( 'Buffer Length' ).onChange( this.updateSoundMap.bind( this ) );
 
 			var folderWaveForm = this.gui.addFolder( 'WaveForm' );
