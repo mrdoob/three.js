@@ -92,9 +92,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			}
 
-			if ( action.isAdditive ) interpolants[ i ].resultBuffer = binding.bufferAdditive;
-
-			else interpolants[ i ].resultBuffer = binding.buffer;
+			interpolants[ i ].resultBuffer = binding.buffer;
 
 		}
 

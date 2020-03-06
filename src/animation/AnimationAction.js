@@ -368,12 +368,7 @@ Object.assign( AnimationAction.prototype, {
 		// note: _updateTime may disable the action resulting in
 		// an effective weight of 0
 
-		var accuFn,
-			weight = this._updateWeight( time );
-
-		if ( this.isAdditive ) accuFn = 'accumulateAdditive';
-
-		else accuFn = 'accumulate';
+		var weight = this._updateWeight( time );
 
 		if ( weight > 0 ) {
 
@@ -383,7 +378,7 @@ Object.assign( AnimationAction.prototype, {
 			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
 
 				interpolants[ j ].evaluate( clipTime );
-				propertyMixers[ j ][ accuFn ]( accuIndex, weight );
+				propertyMixers[ j ].accumulate( accuIndex, weight, this.isAdditive );
 
 			}
 
