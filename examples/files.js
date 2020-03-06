@@ -329,6 +329,7 @@ var files = {
 		"webvr_multiview",
 		"webvr_panorama",
 		"webvr_paint",
+		"webvr_postprocessing",
 		"webvr_rollercoaster",
 		"webvr_sandbox",
 		"webvr_sculpt",
