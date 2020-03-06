@@ -38,6 +38,7 @@
 				normal: new THREE.Vector3()
 			};
 			var mouse = new THREE.Vector2();
+			var intersects = [];
 
 			var textureLoader = new THREE.TextureLoader();
 			var decalDiffuse = textureLoader.load( 'textures/decal/decal-diffuse.png' );
@@ -174,8 +175,7 @@
 					if ( ! mesh ) return;
 
 					raycaster.setFromCamera( mouse, camera );
-
-					var intersects = raycaster.intersectObjects( [ mesh ] );
+					raycaster.intersectObject( mesh, false, intersects );
 
 					if ( intersects.length > 0 ) {
 
@@ -197,6 +197,8 @@
 						positions.needsUpdate = true;
 
 						intersection.intersects = true;
+
+						intersects.length = 0;
 
 					} else {
 

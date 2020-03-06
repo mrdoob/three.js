@@ -17,7 +17,9 @@ const maxFailedPixels = 0.05; // total failed pixels
 const exceptionList = [
 
 	'index',
-	'css3d_youtube',
+	'css3d_youtube', // video tag not deterministic enough
+	'webgl_kinect', // same here
+	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
 	'webgl_materials_envmaps_parallax',
 	'webgl_test_memory2', // gives fatal error in puppeteer
