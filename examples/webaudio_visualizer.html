@@ -47,45 +47,31 @@
 		}
 
 		this.container = container;
-		this.frameId = null;
-		this.showStats = true;
 
-		initRenderer.call( this );
-		initCamera.call( this );
-		initControls.call( this );
-		initScene.call( this );
-		initWaveform.call( this );
-		initSoundMap.call( this );
-		initAudio.call( this );
-		initDatGui.call( this );
-		initStats.call( this );
-		initEvents.call( this );
-
-		function initRenderer() {
+		// initRenderer
+		{
+			this.frameId = null;
 
 			this.renderer = new THREE.WebGLRenderer( { antialias: true } );
 			this.renderer.setPixelRatio( window.devicePixelRatio );
 			this.renderer.setSize( window.innerWidth, window.innerHeight );
 
 			this.container.appendChild( this.renderer.domElement );
-
 		}
 
-		function initCamera() {
-
+		// initCamera
+		{
 			this.camera = new THREE.PerspectiveCamera( 70, this.getAspectRatio(), 0.1, 1000 );
 			this.camera.position.set( 0, 3, 3 );
-
 		}
 
-		function initControls() {
-
-			this.cameraControls = new OrbitControls( this.camera, this.renderer.domElement );
-
+		// initControls
+		{
+			this.controls = new OrbitControls( this.camera, this.renderer.domElement );
 		}
 
-		function initScene() {
-
+		// initScene
+		{
 			// SCENE
 			this.scene = new THREE.Scene();
 			this.scene.background = new THREE.Color( 0x000000 );
@@ -101,8 +87,8 @@
 			this.scene.add( this.dirLight );
 		}
 
-		function initWaveform() {
-
+		// initWaveform
+		{
 			this.useWaveform = true;
 			this.fftWaveformLength = 2048;
 			const halfFftLength = this.fftWaveformLength / 2;
@@ -160,11 +146,10 @@
 			this.waveforms.position.z = - 1;
 
 			this.scene.add( this.waveforms );
-
 		}
 
-		function initSoundMap() {
-
+		// initSoundMap
+		{
 			this.useSoundMap = true;
 			this.soundMapFftLength = 512;
 			this.soundMapBufferLength = 512;
@@ -224,11 +209,10 @@
 			this.soundMap.position.y = - boundingBoxCenter.y;
 			this.soundMap.position.z = - boundingBoxCenter.z;
 			this.scene.add( this.soundMap );
-
 		}
 
-		function initAudio() {
-
+		// initAudio
+		{
 			this.selectedAudioSource = 'File';
 
 			// Require user gesture
@@ -236,11 +220,15 @@
 			//			this.audio = new THREE.Audio( this.audioListener );
 			//			this.audioAnalyser = new THREE.AudioAnalyser( this.audio, this.soundMapFftLength );
 			//			this.waveAnalyser = new THREE.AudioAnalyser( this.audio, this.fftWaveformLength );
-
 		}
 
-		function initDatGui() {
+		// initEvents
+		{
+			window.addEventListener( 'resize', this.resize.bind( this ), false );
+		}
 
+		// initDatGui
+		{
 			var GuiInterface = function () {
 
 				// Audio
@@ -269,18 +257,11 @@
 			folderWaveForm.add( this, 'useWaveform' ).name( 'Active Waveform' );
 		}
 
-		function initEvents() {
-
-			window.addEventListener( 'resize', this.resize.bind( this ), false );
-
-		}
-
-		function initStats() {
-
+		// initStats
+		{
 			this.showStats = true;
 			this.stats = new Stats();
 			this.container.appendChild( this.stats.dom );
-
 		}
 
 	}
