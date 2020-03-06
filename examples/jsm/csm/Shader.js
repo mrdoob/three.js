@@ -86,7 +86,7 @@ IncidentLight directLight;
 	float csmx;
 	float csmy;
 
-	#unroll_loop_start
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
@@ -129,7 +129,7 @@ IncidentLight directLight;
 		}
 
 	}
-	#unroll_loop_end
+	#pragma unroll_loop_end
 	#else
 
 	#pragma unroll_loop
