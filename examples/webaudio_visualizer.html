@@ -164,6 +164,7 @@
 			const halfFftLength = this.soundMapFftLength / 2;
 			const positions = [];
 			const colors = [];
+			const normals = [];
 			const indexes = [];
 
 			for ( let x = 0; x < this.soundMapBufferLength; x ++ ) {
@@ -172,6 +173,7 @@
 
 					positions.push( x / 100, 0, z / 100 );
 					colors.push( 1, 1, 1 );
+					normals.push( 0, 1, 0 );
 
 				}
 
@@ -198,8 +200,10 @@
 			bufferColorAttribute.setUsage( THREE.DynamicDrawUsage );
 			geometry.setAttribute( 'color', bufferColorAttribute );
 
+			const bufferNormalAttribute = new THREE.Float32BufferAttribute( normals, 3 );
+			geometry.setAttribute( 'normal', bufferNormalAttribute );
+
 			geometry.setIndex( indexes );
-			geometry.computeVertexNormals();
 
 			let boundingBoxCenter = new THREE.Vector3();
 			this.soundMap = new THREE.Mesh( geometry, material );
@@ -341,6 +345,7 @@
 			const halfFftLength = this.soundMapFftLength / 2;
 			const positions = [];
 			const colors = [];
+			const normals = [];
 			const indexes = [];
 
 			for ( let x = 0; x < this.soundMapBufferLength; x ++ ) {
@@ -349,6 +354,7 @@
 
 					positions.push( x / 100, 0, z / 100 );
 					colors.push( 1, 1, 1 );
+					normals.push( 0, 1, 0 );
 
 				}
 
@@ -375,8 +381,10 @@
 			bufferColorAttribute.setUsage( THREE.DynamicDrawUsage );
 			this.soundMap.geometry.setAttribute( 'color', bufferColorAttribute );
 
+			const bufferNormalAttribute = new THREE.Float32BufferAttribute( normals, 3 );
+			this.soundMap.geometry.setAttribute( 'normal', bufferNormalAttribute );
+
 			this.soundMap.geometry.setIndex( indexes );
-			this.soundMap.geometry.computeVertexNormals();
 
 			// Recentering
 			let boundingBoxCenter = new THREE.Vector3();
