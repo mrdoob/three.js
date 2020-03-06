@@ -391,10 +391,8 @@
 				vertexColors: THREE.VertexColors
 			} );
 
-
 			// Update audioAnalyser
-			this.audioAnalyser.analyser.fftSize = this.soundMapFftLength;
-			this.audioAnalyser.data = new Uint8Array( this.audioAnalyser.analyser.frequencyBinCount );
+			this.updateAudio();
 
 		},
 
