@@ -142,14 +142,17 @@ var OrbitControls = function ( object, domElement ) {
 
 		var offset = new Vector3();
 
-		// so camera.up is the orbit axis
-		var quat = new Quaternion().setFromUnitVectors( object.up, new Vector3( 0, 1, 0 ) );
-		var quatInverse = quat.clone().inverse();
+		var quat = new Quaternion();
+		var quatInverse = new Quaternion();
 
 		var lastPosition = new Vector3();
 		var lastQuaternion = new Quaternion();
 
 		return function update() {
+
+			// so camera.up is the orbit axis
+			quat.setFromUnitVectors( object.up, new Vector3( 0, 1, 0 ) );
+			quatInverse.copy( quat ).inverse();
 
 			var position = scope.object.position;
 
