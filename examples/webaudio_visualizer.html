@@ -331,6 +331,9 @@
 			this.soundMap.geometry.dispose();
 			this.soundMap.geometry.deleteAttribute( 'position' );
 			this.soundMap.geometry.deleteAttribute( 'color' );
+			this.soundMap.geometry.deleteAttribute( 'normal' );
+			this.soundMap.material.dispose();
+
 
 			// Recreate buffer attributes
 			const halfFftLength = this.soundMapFftLength / 2;
@@ -371,6 +374,7 @@
 			this.soundMap.geometry.setAttribute( 'color', bufferColorAttribute );
 
 			this.soundMap.geometry.setIndex( indexes );
+			this.soundMap.geometry.computeVertexNormals();
 
 			// Recentering
 			let boundingBoxCenter = new THREE.Vector3();
@@ -379,6 +383,12 @@
 			this.soundMap.position.x = - boundingBoxCenter.x;
 			this.soundMap.position.y = - boundingBoxCenter.y;
 			this.soundMap.position.z = - boundingBoxCenter.z;
+
+			// Recreate material
+			this.soundMap.material = new THREE.MeshPhongMaterial( {
+				vertexColors: THREE.VertexColors
+			} );
+
 
 			// Update audioAnalyser
 			this.audioAnalyser.analyser.fftSize = this.soundMapFftLength;
