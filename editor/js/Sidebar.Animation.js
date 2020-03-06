@@ -2,7 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Animation = function ( editor ) {
+import { UIPanel, UIDiv, UIBreak, UISelect, UIButton, UIText } from './libs/ui.js';
+
+var SidebarAnimation = function ( editor ) {
 
 	var signals = editor.signals;
 	var mixer = editor.mixer;
@@ -64,21 +66,23 @@ Sidebar.Animation = function ( editor ) {
 
 	}
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setDisplay( 'none' );
 
-	container.add( new UI.Text( 'Animations' ).setTextTransform( 'uppercase' ) );
-	container.add( new UI.Break() );
-	container.add( new UI.Break() );
+	container.add( new UIText( 'Animations' ).setTextTransform( 'uppercase' ) );
+	container.add( new UIBreak() );
+	container.add( new UIBreak() );
 
-	var div = new UI.Div();
+	var div = new UIDiv();
 	container.add( div );
 
-	var animationsSelect = new UI.Select().setFontSize( '12px' );
+	var animationsSelect = new UISelect().setFontSize( '12px' );
 	div.add( animationsSelect );
-	div.add( new UI.Button( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
-	div.add( new UI.Button( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
+	div.add( new UIButton( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
+	div.add( new UIButton( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
 
 	return container;
 
 };
+
+export { SidebarAnimation };

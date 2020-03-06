@@ -57,6 +57,6 @@ export class AnimationAction {
 	stopWarping(): AnimationAction;
 	getMixer(): AnimationMixer;
 	getClip(): AnimationClip;
-	getRoot(): any;
+	getRoot(): Object3D;
 
 }

@@ -12,8 +12,7 @@ import {
 	Loader,
 	LoaderUtils,
 	Points,
-	PointsMaterial,
-	VertexColors
+	PointsMaterial
 } from "../../../build/three.module.js";
 
 var PCDLoader = function ( manager ) {
@@ -309,9 +308,9 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 2 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
-					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 1 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
-					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 0 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 2 ) / 255.0 );
 
 				}
 
@@ -380,7 +379,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( color.length > 0 ) {
 
-			material.vertexColors = VertexColors;
+			material.vertexColors = true;
 
 		} else {
 

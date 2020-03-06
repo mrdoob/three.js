@@ -13,7 +13,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl normalmap demo.<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl normalmap demo.<br/>
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 
 			<div id="vt">displacement mapping needs vertex textures (GPU with Shader Model 3.0)<br/>
@@ -35,6 +35,7 @@
 			import { BleachBypassShader } from './jsm/shaders/BleachBypassShader.js';
 			import { ColorCorrectionShader } from './jsm/shaders/ColorCorrectionShader.js';
 			import { FXAAShader } from './jsm/shaders/FXAAShader.js';
+			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 
 			var container, stats, loader;
 
@@ -85,13 +86,21 @@
 
 				var textureLoader = new THREE.TextureLoader();
 
+				var diffuseMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
+				diffuseMap.encoding = THREE.sRGBEncoding;
+
+				var specularMap = textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" );
+				specularMap.encoding = THREE.sRGBEncoding;
+
+				var normalMap = textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" );
+
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xdddddd,
 					specular: 0x222222,
 					shininess: 35,
-					map: textureLoader.load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
-					specularMap: textureLoader.load( "models/gltf/LeePerrySmith/Map-SPEC.jpg" ),
-					normalMap: textureLoader.load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
+					map: diffuseMap,
+					specularMap: specularMap,
+					normalMap: normalMap,
 					normalScale: new THREE.Vector2( 0.8, 0.8 )
 				} );
 
@@ -108,11 +117,6 @@
 
 				//
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-
-				//
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
@@ -126,10 +130,11 @@
 				var effectBleach = new ShaderPass( BleachBypassShader );
 				var effectColor = new ShaderPass( ColorCorrectionShader );
 				effectFXAA = new ShaderPass( FXAAShader );
+				var gammaCorrection = new ShaderPass( GammaCorrectionShader );
 
 				effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
 
-				effectBleach.uniforms[ 'opacity' ].value = 0.4;
+				effectBleach.uniforms[ 'opacity' ].value = 0.2;
 
 				effectColor.uniforms[ 'powRGB' ].value.set( 1.4, 1.45, 1.45 );
 				effectColor.uniforms[ 'mulRGB' ].value.set( 1.1, 1.1, 1.1 );
@@ -140,6 +145,7 @@
 				composer.addPass( effectFXAA );
 				composer.addPass( effectBleach );
 				composer.addPass( effectColor );
+				composer.addPass( gammaCorrection );
 
 				// EVENTS
 

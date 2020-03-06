@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl object-space normalmap demo<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl object-space normalmap demo<br />
 			Nefertiti Bust by
 			<a href="http://www.cultlab3d.de/" target="_blank" rel="noopener">CultLab3D</a><br />
 
@@ -33,7 +33,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// scene
 				scene = new THREE.Scene();

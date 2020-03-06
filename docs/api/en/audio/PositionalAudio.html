@@ -44,7 +44,7 @@
 		});
 
 		// create an object for the sound to play from
-		var sphere = new THREE.SphereGeometry( 20, 32, 16 );
+		var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
 		var material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
 		var mesh = new THREE.Mesh( sphere, material );
 		scene.add( mesh );

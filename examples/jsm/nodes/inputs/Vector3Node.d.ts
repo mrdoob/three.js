@@ -5,7 +5,7 @@ import { NodeBuilder } from '../core/NodeBuilder';
 
 export class Vector3Node extends InputNode {
 
-	constructor( x: Vector3 | number, y?: number, z?: number );
+	constructor( x: Vector3 | number, y?: number, z?: number );
 
 	value: Vector3;
 	nodeType: string;

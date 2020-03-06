@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based material<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based material<br/>
 			<a href="http://www.polycount.com/forum/showthread.php?t=130641" target="_blank" rel="noopener">Cerberus(FFVII Gun) model</a> by Andrew Maximov.
 		</div>
 
@@ -21,8 +21,7 @@
 
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var statsEnabled = true;
 
@@ -43,8 +42,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = 3;
 
@@ -75,7 +73,9 @@
 						material.roughness = 1; // attenuates roughnessMap
 						material.metalness = 1; // attenuates metalnessMap
 
-						material.map = loader.load( 'Cerberus_A.jpg' );
+						var diffuseMap = loader.load( 'Cerberus_A.jpg' );
+						diffuseMap.encoding = THREE.sRGBEncoding;
+						material.map = diffuseMap;
 						// roughness is in G channel, metalness is in B channel
 						material.metalnessMap = material.roughnessMap = loader.load( 'Cerberus_RM.jpg' );
 						material.normalMap = loader.load( 'Cerberus_N.jpg' );
@@ -87,7 +87,7 @@
 
 						group.traverse( function ( child ) {
 
-							if ( child instanceof THREE.Mesh ) {
+							if ( child.isMesh ) {
 
 								child.material = material;
 
@@ -101,31 +101,22 @@
 
 					} );
 
-				new THREE.CubeTextureLoader().setPath( './textures/cube/pisaRGBM16/' )
-					.load( [ 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' ], function ( rgbmCubeMap ) {
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
-						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
-						rgbmCubeMap.format = THREE.RGBAFormat;
-
-						var pmremGenerator = new PMREMGenerator( rgbmCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						var rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-						material.envMap = rgbmCubeRenderTarget.texture;
-						material.needsUpdate = true; // is this needed?
-
-						rgbmCubeMap.magFilter = THREE.LinearFilter;
-						rgbmCubeMap.needsUpdate = true;
-						scene.background = rgbmCubeMap;
-
+						var hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+						hdrEquirect.dispose();
 						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+
+						scene.background = hdrCubeRenderTarget.texture;
+						scene.environment = hdrCubeRenderTarget.texture;
 
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				//
 

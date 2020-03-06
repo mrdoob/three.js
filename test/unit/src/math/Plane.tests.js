@@ -126,7 +126,7 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "clone", ( assert ) => {
 
-			var a = new Plane( 2.0, 0.5, 0.25 );
+			var a = new Plane( new Vector3( 2.0, 0.5, 0.25 ) );
 			var b = a.clone();
 
 			assert.ok( a.equals( b ), "clones are equal" );

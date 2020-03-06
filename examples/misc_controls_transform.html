@@ -10,7 +10,7 @@
 
 		<div id="info">
 			"W" translate | "E" rotate | "R" scale | "+" increase size | "-" decrease size<br />
-			"Q" toggle world/local space |  Hold "Ctrl" down to snap to grid<br />
+			"Q" toggle world/local space |  Hold "Shift" down to snap to grid<br />
 			"X" toggle X | "Y" toggle Y | "Z" toggle Z | "Spacebar" toggle enabled
 		</div>
 
@@ -81,9 +81,10 @@
 							control.setSpace( control.space === "local" ? "world" : "local" );
 							break;
 
-						case 17: // Ctrl
+						case 16: // Shift
 							control.setTranslationSnap( 100 );
-							control.setRotationSnap( THREE.Math.degToRad( 15 ) );
+							control.setRotationSnap( THREE.MathUtils.degToRad( 15 ) );
+							control.setScaleSnap( 0.25 );
 							break;
 
 						case 87: // W
@@ -135,6 +136,7 @@
 						case 17: // Ctrl
 							control.setTranslationSnap( null );
 							control.setRotationSnap( null );
+							control.setScaleSnap( null );
 							break;
 
 					}

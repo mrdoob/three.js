@@ -35,7 +35,7 @@
 				using [page:BufferAttribute] instances to define custom attributes.
 			</li>
 			<li>
-				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLRenderTargetCube] instances
+				As of THREE r77, [page:WebGLRenderTarget] or [page:WebGLCubeRenderTarget] instances
 				are no longer supposed to be used as uniforms. Their [page:Texture texture] property
 				must be used instead.
 			</li>
@@ -352,13 +352,6 @@ this.extensions = {
 
 		</p>
 
-		<h3>[property:Boolean isShaderMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are shader materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:Boolean lights]</h3>
 		<p>
 		Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader. Default is false.
@@ -416,12 +409,14 @@ this.extensions = {
 		so updating the value of the uniform will immediately update the value available to the GLSL code.
 		</p>
 
-
-		<h3>[property:Number vertexColors]</h3>
+		<h3>[property:Boolean uniformsNeedUpdate]</h3>
 		<p>
-		Define how the vertices are colored, by defining how the *colors* attribute gets populated.
-		Possible values are [page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] and
-		[page:Materials THREE.VertexColors]. Default is THREE.NoColors.
+		Can be used to force a uniform update while changing uniforms in [page:Object3D.onBeforeRender](). Default is *false*.
+		</p>
+
+		<h3>[property:Boolean vertexColors]</h3>
+		<p>
+		Defines whether vertex coloring is used. Default is *false*.
 		</p>
 
 		<h3>[property:String vertexShader]</h3>

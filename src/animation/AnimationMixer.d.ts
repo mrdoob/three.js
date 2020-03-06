@@ -11,7 +11,7 @@ export class AnimationMixer extends EventDispatcher {
 	timeScale: number;
 
 	clipAction( clip: AnimationClip, root?: Object3D ): AnimationAction;
-	existingAction( clip: AnimationClip, root?: Object3D ): AnimationAction;
+	existingAction( clip: AnimationClip, root?: Object3D ): AnimationAction | null;
 	stopAllAction(): AnimationMixer;
 	update( deltaTime: number ): AnimationMixer;
 	setTime( timeInSeconds: number ): AnimationMixer;

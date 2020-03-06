@@ -174,20 +174,12 @@
 		<h3>[property:Integer id]</h3>
 		<p>Unique number for this material instance.</p>
 
-		<h3>[property:Boolean isMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:String name]</h3>
 		<p>Optional name of the object (doesn't need to be unique). Default is an empty string.</p>
 
 		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-		Specifies that the material needs to be recompiled.<br />
-		This property is automatically set to *true* when instancing a new material.
+		Specifies that the material needs to be recompiled.
 		</p>
 
 		<h3>[property:Float opacity]</h3>
@@ -296,18 +288,14 @@
 		This gets automatically assigned, so this shouldn't be edited.
 		</p>
 
-		<h3>[property:Integer vertexColors]</h3>
+		<h3>[property:Integer version]</h3>
 		<p>
-		Defines whether vertex coloring is used.
-		Default is [page:Materials THREE.NoColors].
-		Other options are [page:Materials THREE.VertexColors] and [page:Materials THREE.FaceColors].
+		This starts at *0* and counts how many times [property:Boolean needsUpdate] is set to *true*.
 		</p>
 
-		<h3>[property:Boolean vertexTangents]</h3>
+		<h3>[property:Boolean vertexColors]</h3>
 		<p>
-		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
-		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
-		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+		Defines whether vertex coloring is used. Default is *false*.
 		</p>
 
 		<h3>[property:Boolean visible]</h3>

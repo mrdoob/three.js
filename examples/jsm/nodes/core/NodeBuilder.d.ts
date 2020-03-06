@@ -143,6 +143,6 @@ export class NodeBuilder {
 	setShader( shader: string ): this;
 	mergeDefines( defines: object ): object;
 	mergeUniform( uniforms: object ): object;
-	getTextureEncodingFromMap( map: Texture, gammaOverrideLinear?: boolean ): TextureEncoding;
+	getTextureEncodingFromMap( map: Texture ): TextureEncoding;
 
 }

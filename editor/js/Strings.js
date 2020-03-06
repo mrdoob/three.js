@@ -20,6 +20,8 @@ var Strings = function ( config ) {
 			'menubar/file/export/glb': 'Export GLB',
 			'menubar/file/export/gltf': 'Export GLTF',
 			'menubar/file/export/obj': 'Export OBJ',
+			'menubar/file/export/ply': 'Export PLY',
+			'menubar/file/export/ply_binary': 'Export PLY (Binary)',
 			'menubar/file/export/stl': 'Export STL',
 			'menubar/file/export/stl_binary': 'Export STL (Binary)',
 			'menubar/file/publish': 'Publish',
@@ -65,6 +67,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': 'Play',
 
 			'menubar/examples': 'Examples',
+			'menubar/examples/Arkanoid': 'Arkanoid',
+			'menubar/examples/Camera': 'Camera',
+			'menubar/examples/Particles': 'Particles',
+			'menubar/examples/Pong': 'Pong',
+			'menubar/examples/Shaders': 'Shaders',
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
@@ -232,9 +239,7 @@ var Strings = function ( config ) {
 			'sidebar/material/clearcoat': 'Clearcoat',
 			'sidebar/material/clearcoatroughness': 'Clearcoat Roughness',
 			'sidebar/material/vertexcolors': 'Vertex Colors',
-			'sidebar/material/vertexcolors/no': 'No',
-			'sidebar/material/vertexcolors/face': 'Face',
-			'sidebar/material/vertexcolors/vertex': 'Vertex',
+			'sidebar/material/vertextangents': 'Vertex Tangents',
 			'sidebar/material/skinning': 'Skinning',
 			'sidebar/material/matcap': 'Matcap',
 			'sidebar/material/map': 'Map',
@@ -278,12 +283,19 @@ var Strings = function ( config ) {
 			'sidebar/project/editable': 'Editable',
 			'sidebar/project/vr': 'VR',
 			'sidebar/project/renderer': 'Renderer',
-			'sidebar/project/antialias': 'antialias',
-			'sidebar/project/shadows': 'shadows',
+			'sidebar/project/antialias': 'Antialias',
+			'sidebar/project/shadows': 'Shadows',
+			'sidebar/project/shadowType': 'Shadow Type',
+			'sidebar/project/physicallyCorrectLights': 'Physically correct lights',
+			'sidebar/project/toneMapping': 'Tone mapping',
+			'sidebar/project/toneMappingExposure': 'Exposure',
+			'sidebar/project/toneMappingWhitePoint': 'White Point',
 			'sidebar/project/materials': 'Materials',
+			'sidebar/project/Assign': 'Assign',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
+			'sidebar/settings/exportPrecision': 'Export Precision',
 
 			'sidebar/settings/shortcuts/translate': 'Translate',
 			'sidebar/settings/shortcuts/rotate': 'Rotate',
@@ -303,7 +315,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': 'Objects',
 			'viewport/info/vertices': 'Vertices',
-			'viewport/info/triangles': 'Triangles'
+			'viewport/info/triangles': 'Triangles',
+			'viewport/info/frametime': 'Frametime'
 
 		},
 
@@ -319,6 +332,8 @@ var Strings = function ( config ) {
 			'menubar/file/export/glb': '导出GLB',
 			'menubar/file/export/gltf': '导出GLTF',
 			'menubar/file/export/obj': '导出OBJ',
+			'menubar/file/export/ply': '导出PLY',
+			'menubar/file/export/ply_binary': '导出PLY(二进制)',
 			'menubar/file/export/stl': '导出STL',
 			'menubar/file/export/stl_binary': '导出STL(二进制)',
 			'menubar/file/publish': '发布',
@@ -364,6 +379,11 @@ var Strings = function ( config ) {
 			'menubar/play/play': '启动',
 
 			'menubar/examples': '示例',
+			'menubar/examples/Arkanoid': '打砖块',
+			'menubar/examples/Camera': ' 摄像机',
+			'menubar/examples/Particles': '粒子',
+			'menubar/examples/Pong': '乒乓球',
+			'menubar/examples/Shaders': '着色器',
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
@@ -504,18 +524,16 @@ var Strings = function ( config ) {
 			'sidebar/material/emissive': '自发光',
 			'sidebar/material/specular': '高光',
 			'sidebar/material/shininess': '高光大小',
-			'sidebar/material/clearcoat': '透明贴图',
-			'sidebar/material/clearcoatroughness': '透明贴图粗糙度',
+			'sidebar/material/clearcoat': '透明图层',
+			'sidebar/material/clearcoatroughness': '透明图层粗糙度',
 			'sidebar/material/vertexcolors': '顶点颜色',
-			'sidebar/material/vertexcolors/no': '无',
-			'sidebar/material/vertexcolors/face': '面',
-			'sidebar/material/vertexcolors/vertex': '顶点',
+			'sidebar/material/vertextangents': 'Vertex Tangents',
 			'sidebar/material/skinning': '皮肤',
 			'sidebar/material/map': '贴图',
 			'sidebar/material/alphamap': '透明贴图',
 			'sidebar/material/bumpmap': '凹凸贴图',
 			'sidebar/material/normalmap': '法线贴图',
-			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
+			'sidebar/material/clearcoatnormalmap': '透明图层法线贴图',
 			'sidebar/material/displacemap': '置换贴图',
 			'sidebar/material/roughmap': '粗糙贴图',
 			'sidebar/material/metalmap': '金属贴图',
@@ -553,10 +571,17 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/materials': 'Materials',
+			'sidebar/project/shadowType': '阴影类型',
+			'sidebar/project/physicallyCorrectLights': '物理光照',
+			'sidebar/project/toneMapping': '色调映射',
+			'sidebar/project/toneMappingExposure': '曝光',
+			'sidebar/project/toneMappingWhitePoint': '白点',
+			'sidebar/project/materials': '材质',
+			'sidebar/project/Assign': '应用',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
+			'sidebar/settings/exportPrecision': 'Export Precision',
 
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
@@ -576,7 +601,8 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': '物体',
 			'viewport/info/vertices': '顶点',
-			'viewport/info/triangles': '三角形'
+			'viewport/info/triangles': '三角形',
+			'viewport/info/frametime': '帧时'
 
 		}
 
@@ -593,3 +619,5 @@ var Strings = function ( config ) {
 	};
 
 };
+
+export { Strings };

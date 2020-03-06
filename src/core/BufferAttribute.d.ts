@@ -1,6 +1,6 @@
-import {
-	Usage
-} from '../constants';
+import { Usage } from '../constants';
+import { Matrix3 } from './../math/Matrix3';
+import { Matrix4 } from './../math/Matrix4';
 
 /**
  * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js">src/core/BufferAttribute.js</a>
@@ -16,54 +16,64 @@ export class BufferAttribute {
 	updateRange: { offset: number; count: number };
 	version: number;
 	normalized: boolean;
-	needsUpdate: boolean;
 	count: number;
-	onUpload: Function;
 
-	setUsage( usage: Usage ): BufferAttribute;
-	clone(): this;
+	set needsUpdate( value: boolean );
+
+	readonly isBufferAttribute: true;
+
+	onUploadCallback: () => void;
+	onUpload( callback: () => void ): this;
+	setUsage( usage: Usage ): this;
+	clone(): BufferAttribute;
 	copy( source: BufferAttribute ): this;
 	copyAt(
 		index1: number,
 		attribute: BufferAttribute,
 		index2: number
-	): BufferAttribute;
-	copyArray( array: ArrayLike<number> ): BufferAttribute;
+	): this;
+	copyArray( array: ArrayLike<number> ): this;
 	copyColorsArray(
 		colors: { r: number; g: number; b: number }[]
-	): BufferAttribute;
-	copyVector2sArray( vectors: { x: number; y: number }[] ): BufferAttribute;
+	): this;
+	copyVector2sArray( vectors: { x: number; y: number }[] ): this;
 	copyVector3sArray(
 		vectors: { x: number; y: number; z: number }[]
-	): BufferAttribute;
+	): this;
 	copyVector4sArray(
 		vectors: { x: number; y: number; z: number; w: number }[]
-	): BufferAttribute;
+	): this;
+	applyMatrix3( m: Matrix3 ): this;
+	applyMatrix4( m: Matrix4 ): this;
+	applyNormalMatrix( m: Matrix3 ): this;
+	transformDirection( m: Matrix4 ): this;
 	set(
 		value: ArrayLike<number> | ArrayBufferView,
 		offset?: number
-	): BufferAttribute;
+	): this;
 	getX( index: number ): number;
-	setX( index: number, x: number ): BufferAttribute;
+	setX( index: number, x: number ): this;
 	getY( index: number ): number;
-	setY( index: number, y: number ): BufferAttribute;
+	setY( index: number, y: number ): this;
 	getZ( index: number ): number;
-	setZ( index: number, z: number ): BufferAttribute;
+	setZ( index: number, z: number ): this;
 	getW( index: number ): number;
-	setW( index: number, z: number ): BufferAttribute;
-	setXY( index: number, x: number, y: number ): BufferAttribute;
-	setXYZ( index: number, x: number, y: number, z: number ): BufferAttribute;
+	setW( index: number, z: number ): this;
+	setXY( index: number, x: number, y: number ): this;
+	setXYZ( index: number, x: number, y: number, z: number ): this;
 	setXYZW(
 		index: number,
 		x: number,
 		y: number,
 		z: number,
 		w: number
-	): BufferAttribute;
-	/**
-	 * @deprecated Use {@link BufferAttribute#count .count} instead.
-	 */
-	length: number;
+	): this;
+	toJSON(): {
+		itemSize: number,
+		type: string,
+		array: number[],
+		normalized: boolean
+	};
 
 }
 

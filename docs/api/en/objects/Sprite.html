@@ -23,7 +23,7 @@
 
 		<code>
 var spriteMap = new THREE.TextureLoader().load( "sprite.png" );
-var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, color: 0xffffff } );
+var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap } );
 var sprite = new THREE.Sprite( spriteMaterial );
 scene.add( sprite );
 		</code>
@@ -41,13 +41,6 @@ scene.add( sprite );
 
 		<h2>Properties</h2>
 		<p>See the base [page:Object3D] class for common properties.</p>
-
-		<h3>[property:Boolean isSprite]</h3>
-		<p>
-			Used to check whether this or derived classes are sprites. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
 
 
 		<h3>[property:SpriteMaterial material]</h3>

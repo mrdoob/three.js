@@ -13,7 +13,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry constructed from geometry<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry constructed from geometry<br/>
 			by <a target="_blank" href="http://callum.com">Callum Prentice</a>
 		</div>
 
@@ -162,7 +162,7 @@
 				bufferGeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 				bufferGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.MeshPhongMaterial( { shininess: 80, vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshPhongMaterial( { shininess: 80, vertexColors: true } );
 
 				var mesh = new THREE.Mesh( bufferGeometry, material );
 				scene.add( mesh );
