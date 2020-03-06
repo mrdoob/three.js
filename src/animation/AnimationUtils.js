@@ -246,11 +246,11 @@ var AnimationUtils = {
 		}
 		const numTracks = clip.tracks.length;
 
-		fps = fps || 30;
+		fps = fps > 0 ? fps : 30;
 		const referenceTime = referenceFrame / fps;
 
 		// Make each track's values relative to the values at the reference frame
-		for ( let i = 0; i !== numTracks; ++ i ) {
+		for ( let i = 0; i < numTracks; ++ i ) {
 
 			const track = clip.tracks[ i ];
 			const trackType = track.ValueTypeName;
@@ -299,7 +299,7 @@ var AnimationUtils = {
 
 			// Subtract the reference value from all of the track values
 
-			for ( let j = 0; j !== numTimes; ++ j ) {
+			for ( let j = 0; j < numTimes; ++ j ) {
 
 				const valueStart = j * valueSize;
 
@@ -318,7 +318,7 @@ var AnimationUtils = {
 				} else {
 
 					// Subtract each value for all other numeric track types
-					for ( let k = 0; k !== valueSize; ++ k ) {
+					for ( let k = 0; k < valueSize; ++ k ) {
 
 						track.values[ valueStart + k ] -= referenceValue[ k ];
 

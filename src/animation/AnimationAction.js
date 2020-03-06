@@ -375,10 +375,23 @@ Object.assign( AnimationAction.prototype, {
 			var interpolants = this._interpolants;
 			var propertyMixers = this._propertyBindings;
 
-			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+			if ( this.isAdditive ) {
 
-				interpolants[ j ].evaluate( clipTime );
-				propertyMixers[ j ].accumulate( accuIndex, weight, this.isAdditive );
+				for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+					interpolants[ j ].evaluate( clipTime );
+					propertyMixers[ j ].accumulateAdditive( weight );
+
+				}
+
+			} else {
+
+				for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+					interpolants[ j ].evaluate( clipTime );
+					propertyMixers[ j ].accumulate( accuIndex, weight, this.isAdditive );
+
+				}
 
 			}
 

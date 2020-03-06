@@ -84,16 +84,8 @@ function PropertyMixer( binding, typeName, valueSize ) {
 
 Object.assign( PropertyMixer.prototype, {
 
-	accumulate: function ( accuIndex, weight, isAdditive = false ) {
-
-		if ( isAdditive ) this._accumulateAdditive( weight );
-
-		else this._accumulate( accuIndex, weight );
-
-	},
-
 	// accumulate data in the 'incoming' region into 'accu<i>'
-	_accumulate: function ( accuIndex, weight ) {
+	accumulate: function ( accuIndex, weight ) {
 
 		// note: happily accumulating nothing when weight = 0, the caller knows
 		// the weight and shouldn't have made the call in the first place
@@ -131,7 +123,7 @@ Object.assign( PropertyMixer.prototype, {
 	},
 
 	// accumulate data in the 'incoming' region into 'add'
-	_accumulateAdditive: function ( weight ) {
+	accumulateAdditive: function ( weight ) {
 
 		var buffer = this.buffer,
 			stride = this.valueSize,

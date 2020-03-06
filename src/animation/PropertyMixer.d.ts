@@ -10,7 +10,8 @@ export class PropertyMixer {
 	useCount: number;
 	referenceCount: number;
 
-	accumulate( accuIndex: number, weight: number, isAdditive?: boolean ): void;
+	accumulate( accuIndex: number, weight: number ): void;
+	accumulateAdditive( weight: number ): void;
 	apply( accuIndex: number ): void;
 	saveOriginalState(): void;
 	restoreOriginalState(): void;
