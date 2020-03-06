@@ -15,45 +15,9 @@ function PropertyMixer( binding, typeName, valueSize ) {
 	this.binding = binding;
 	this.valueSize = valueSize;
 
-	var bufferType = Float64Array,
-		mixFunction,
+	var mixFunction,
 		mixFunctionAdditive;
 
-	switch ( typeName ) {
-
-		case 'quaternion':
-			mixFunction = this._slerp;
-			mixFunctionAdditive = this._slerpAdditive;
-
-			this.bufferAdditive = new bufferType( 16 );
-			this.bufferAdditive.fill( 0 );
-			this.bufferAdditive[ 3 ] = 1;
-			this.bufferAdditive[ 7 ] = 1;
-			this.bufferAdditive[ 11 ] = 1;
-			this.bufferAdditive[ 15 ] = 1;
-			break;
-
-		case 'string':
-		case 'bool':
-			bufferType = Array;
-			mixFunction = this._select;
-
-			// Use the regular mix function for additive on these types,
-			// additive is not relevant for non-numeric types
-			mixFunctionAdditive = this._select;
-			this.bufferAdditive = [];
-			break;
-
-		default:
-			mixFunction = this._lerp;
-			mixFunctionAdditive = this._lerpAdditive;
-
-			this.bufferAdditive = new bufferType( valueSize * 3 );
-			this.bufferAdditive.fill( 0 );
-
-	}
-
-	this.buffer = new bufferType( valueSize * 4 );
 	// buffer layout: [ incoming | accu0 | accu1 | orig ]
 	//
 	// interpolators can use .buffer as their .result
@@ -78,6 +42,41 @@ function PropertyMixer( binding, typeName, valueSize ) {
 	// optional work is only valid for quaternions. It is used to store
 	// intermediate quaternion muliplication results.
 
+	switch ( typeName ) {
+
+		case 'quaternion':
+			mixFunction = this._slerp;
+			mixFunctionAdditive = this._slerpAdditive;
+
+			this.buffer = new Float64Array( 16 );
+			this.bufferAdditive = new Float64Array( 16 );
+			this.bufferAdditive.fill( 0 );
+			this.bufferAdditive[ 3 ] = 1;
+			this.bufferAdditive[ 7 ] = 1;
+			this.bufferAdditive[ 11 ] = 1;
+			this.bufferAdditive[ 15 ] = 1;
+			break;
+
+		case 'string':
+		case 'bool':
+			mixFunction = this._select;
+			this.buffer = new Array( valueSize * 4 );
+
+			// Use the regular mix function and buffer for additive on these types,
+			// additive is not relevant for non-numeric types
+			mixFunctionAdditive = this._select;
+			this.bufferAdditive = this.buffer;
+			break;
+
+		default:
+			mixFunction = this._lerp;
+			mixFunctionAdditive = this._lerpAdditive;
+
+			this.buffer = new Float64Array( valueSize * 4 );
+			this.bufferAdditive = new Float64Array( valueSize * 3 );
+			this.bufferAdditive.fill( 0 );
+
+	}
 
 	this._mixBufferRegion = mixFunction;
 	this._mixBufferRegionAdditive = mixFunctionAdditive;
@@ -130,7 +129,7 @@ Object.assign( PropertyMixer.prototype, {
 
 	},
 
-	accumulateAdditive: function ( weight ) {
+	accumulateAdditive: function ( accuIndex, weight ) {
 
 		// note: happily accumulating nothing when weight = 0, the caller knows
 		// the weight and shouldn't have made the call in the first place
