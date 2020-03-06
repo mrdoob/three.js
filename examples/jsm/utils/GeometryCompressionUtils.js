@@ -30,7 +30,7 @@ var GeometryCompressionUtils = {
 		 */
 	compressNormals: function ( mesh, encodeMethod ) {
 
-		if ( !mesh.geometry ) {
+		if ( ! mesh.geometry ) {
 
 			console.error( "Mesh must contain geometry. " );
 
@@ -38,7 +38,7 @@ var GeometryCompressionUtils = {
 
 		let normal = mesh.geometry.attributes.normal;
 
-		if ( !normal ) {
+		if ( ! normal ) {
 
 			console.error( "Geometry must contain normal attribute. " );
 
@@ -147,7 +147,7 @@ var GeometryCompressionUtils = {
 		mesh.geometry.attributes.normal.packingMethod = encodeMethod;
 
 		// modify material
-		if ( !( mesh.material instanceof PackedPhongMaterial ) ) {
+		if ( ! ( mesh.material instanceof PackedPhongMaterial ) ) {
 
 			mesh.material = new PackedPhongMaterial().copy( mesh.material );
 
@@ -186,7 +186,7 @@ var GeometryCompressionUtils = {
 		 */
 	compressPositions: function ( mesh ) {
 
-		if ( !mesh.geometry ) {
+		if ( ! mesh.geometry ) {
 
 			console.error( "Mesh must contain geometry. " );
 
@@ -194,7 +194,7 @@ var GeometryCompressionUtils = {
 
 		let position = mesh.geometry.attributes.position;
 
-		if ( !position ) {
+		if ( ! position ) {
 
 			console.error( "Geometry must contain position attribute. " );
 
@@ -226,7 +226,7 @@ var GeometryCompressionUtils = {
 		mesh.geometry.attributes.position.bytes = quantized.length * encodingBytes;
 
 		// modify material
-		if ( !( mesh.material instanceof PackedPhongMaterial ) ) {
+		if ( ! ( mesh.material instanceof PackedPhongMaterial ) ) {
 
 			mesh.material = new PackedPhongMaterial().copy( mesh.material );
 
@@ -248,7 +248,7 @@ var GeometryCompressionUtils = {
 		 */
 	compressUvs: function ( mesh ) {
 
-		if ( !mesh.geometry ) {
+		if ( ! mesh.geometry ) {
 
 			console.error( "Mesh must contain geometry property. " );
 
@@ -256,7 +256,7 @@ var GeometryCompressionUtils = {
 
 		let uvs = mesh.geometry.attributes.uv;
 
-		if ( !uvs ) {
+		if ( ! uvs ) {
 
 			console.error( "Geometry must contain uv attribute. " );
 
@@ -296,7 +296,7 @@ var GeometryCompressionUtils = {
 			mesh.geometry.attributes.uv.needsUpdate = true;
 			mesh.geometry.attributes.uv.bytes = result.length * 2;
 
-			if ( !( mesh.material instanceof PackedPhongMaterial ) ) {
+			if ( ! ( mesh.material instanceof PackedPhongMaterial ) ) {
 
 				mesh.material = new PackedPhongMaterial().copy( mesh.material );
 
@@ -314,7 +314,7 @@ var GeometryCompressionUtils = {
 			mesh.geometry.attributes.uv.needsUpdate = true;
 			mesh.geometry.attributes.uv.bytes = result.quantized.length * 2;
 
-			if ( !( mesh.material instanceof PackedPhongMaterial ) ) {
+			if ( ! ( mesh.material instanceof PackedPhongMaterial ) ) {
 
 				mesh.material = new PackedPhongMaterial().copy( mesh.material );
 
@@ -439,7 +439,7 @@ var GeometryCompressionUtils = {
 
 			return best;
 
-			function octEncodeVec3 ( x0, y0, z0, xfunc, yfunc ) {
+			function octEncodeVec3( x0, y0, z0, xfunc, yfunc ) {
 
 				var x = x0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
 				var y = y0 / ( Math.abs( x0 ) + Math.abs( y0 ) + Math.abs( z0 ) );
@@ -483,7 +483,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			function octDecodeVec2 ( oct ) {
+			function octDecodeVec2( oct ) {
 
 				var x = oct[ 0 ];
 				var y = oct[ 1 ];
@@ -521,7 +521,7 @@ var GeometryCompressionUtils = {
 
 			}
 
-			function dot ( x, y, z, vec3 ) {
+			function dot( x, y, z, vec3 ) {
 
 				return x * vec3[ 0 ] + y * vec3[ 1 ] + z * vec3[ 2 ];
 
@@ -680,7 +680,7 @@ var GeometryCompressionUtils = {
  *
  * @param {Object} parameters
  */
-function PackedPhongMaterial ( parameters ) {
+function PackedPhongMaterial( parameters ) {
 
 	MeshPhongMaterial.call( this );
 	this.defines = {};
