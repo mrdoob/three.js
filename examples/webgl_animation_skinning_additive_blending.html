@@ -63,26 +63,6 @@
 				var container = document.getElementById( 'container' );
 				clock = new THREE.Clock();
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.outputEncoding = THREE.sRGBEncoding;
-				renderer.shadowMap.enabled = true;
-				container.appendChild( renderer.domElement );
-
-				// camera
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-				var controls = new OrbitControls( camera, renderer.domElement );
-				camera.position.set( - 1, 2, 3 );
-				camera.lookAt( 0, 1, 0 );
-				controls.target = new THREE.Vector3( 0, 1, 0 );
-				controls.update();
-
-				stats = new Stats();
-				container.appendChild( stats.dom );
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xa0a0a0 );
 				scene.fog = new THREE.Fog( 0xa0a0a0, 10, 50 );
@@ -168,6 +148,26 @@
 					animate();
 
 				} );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.shadowMap.enabled = true;
+				container.appendChild( renderer.domElement );
+
+				// camera
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				var controls = new OrbitControls( camera, renderer.domElement );
+				camera.position.set( - 1, 2, 3 );
+				camera.lookAt( 0, 1, 0 );
+				controls.target = new THREE.Vector3( 0, 1, 0 );
+				controls.update();
+
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
 
