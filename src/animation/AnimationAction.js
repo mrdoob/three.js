@@ -389,7 +389,7 @@ Object.assign( AnimationAction.prototype, {
 				for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
 
 					interpolants[ j ].evaluate( clipTime );
-					propertyMixers[ j ].accumulate( accuIndex, weight, this.isAdditive );
+					propertyMixers[ j ].accumulate( accuIndex, weight );
 
 				}
 
