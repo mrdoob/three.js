@@ -91,11 +91,14 @@
 			this.scene.background = new THREE.Color( 0x000000 );
 
 			// LIGHTS
-			this.ambientLight = new THREE.AmbientLight( 0xcccccc );
+			this.ambientLight = new THREE.AmbientLight( 0xaaaaaa );
 			this.ambientLight.name = 'AmbiantLight';
 			this.ambientLight.visible = true;
 			this.scene.add( this.ambientLight );
 
+			this.dirLight = new THREE.DirectionalLight( 0xffffff, 0.750 );
+			this.dirLight.position.set( - 30, 10, 10 );
+			this.scene.add( this.dirLight );
 		}
 
 		function initWaveform() {
@@ -169,7 +172,7 @@
 
 			// Using bufferd line
 			const geometry = new THREE.BufferGeometry();
-			const material = new THREE.MeshBasicMaterial( {
+			const material = new THREE.MeshPhongMaterial( {
 				vertexColors: THREE.VertexColors
 			} );
 
@@ -211,6 +214,7 @@
 			geometry.setAttribute( 'color', bufferColorAttribute );
 
 			geometry.setIndex( indexes );
+			geometry.computeVertexNormals();
 
 			let boundingBoxCenter = new THREE.Vector3();
 			this.soundMap = new THREE.Mesh( geometry, material );
