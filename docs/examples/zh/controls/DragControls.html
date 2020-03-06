@@ -16,28 +16,29 @@
 		This class can be used to provide a drag'n'drop interaction.
 		</p>
 
-		<h2>Example</h2>
-
-		<p>[example:misc_controls_drag misc / controls / drag ]</p>
+		<h2>代码示例</h2>
 
 		<code>
-var controls = new DragControls( objects, camera, renderer.domElement );
+		var controls = new DragControls( objects, camera, renderer.domElement );
 
-// add event listener to highlight dragged objects
+		// add event listener to highlight dragged objects
 
-controls.addEventListener( 'dragstart', function ( event ) {
+		controls.addEventListener( 'dragstart', function ( event ) {
 
-	event.object.material.emissive.set( 0xaaaaaa );
+			event.object.material.emissive.set( 0xaaaaaa );
 
-} );
+		} );
 
-controls.addEventListener( 'dragend', function ( event ) {
+		controls.addEventListener( 'dragend', function ( event ) {
 
-	event.object.material.emissive.set( 0x000000 );
+			event.object.material.emissive.set( 0x000000 );
 
-} );
-
+		} );
 		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_drag misc / controls / drag ]</p>
 
 		<h2>Constructor</h2>
 

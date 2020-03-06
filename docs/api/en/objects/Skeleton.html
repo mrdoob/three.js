@@ -16,29 +16,30 @@
 		[page:SkinnedMesh].
 		</p>
 
-		<h2>Example</h2>
-<code>
-// Create a simple "arm"
+		<h2>Code Example</h2>
+		<code>
+		// Create a simple "arm"
 
-var bones = [];
+		var bones = [];
 
-var shoulder = new THREE.Bone();
-var elbow = new THREE.Bone();
-var hand = new THREE.Bone();
+		var shoulder = new THREE.Bone();
+		var elbow = new THREE.Bone();
+		var hand = new THREE.Bone();
 
-shoulder.add( elbow );
-elbow.add( hand );
+		shoulder.add( elbow );
+		elbow.add( hand );
 
-bones.push( shoulder );
-bones.push( elbow );
-bones.push( hand );
+		bones.push( shoulder );
+		bones.push( elbow );
+		bones.push( hand );
 
-shoulder.position.y = -5;
-elbow.position.y = 0;
-hand.position.y = 5;
+		shoulder.position.y = -5;
+		elbow.position.y = 0;
+		hand.position.y = 5;
 
-var armSkeleton = new THREE.Skeleton( bones );
-</code>
+		var armSkeleton = new THREE.Skeleton( bones );
+		</code>
+
 		<p>
 			See the [page:SkinnedMesh] page for an example of usage with standard [page:BufferGeometry].
  		</p>

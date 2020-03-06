@@ -18,8 +18,15 @@
 			该光源可以投射阴影 - 跳转至 [page:PointLightShadow] 查看更多细节。
 		</p>
 
+		<h2>代码示例</h2>
 
-		<h2>示例</h2>
+		<code>
+		var light = new THREE.PointLight( 0xff0000, 1, 100 );
+		light.position.set( 50, 50, 50 );
+		scene.add( light );
+		</code>
+
+		<h2>例子</h2>
 
 		<p>
 			[example:webgl_lights_pointlights lights / pointlights ]<br />
@@ -28,13 +35,6 @@
 			[example:webgl_geometry_text geometry / text ]<br />
 			[example:webgl_lensflares lensflares ]
 		</p>
-
-		<code>
-var light = new THREE.PointLight( 0xff0000, 1, 100 );
-light.position.set( 50, 50, 50 );
-scene.add( light );
-		</code>
-
 
 		<h2>构造器（Constructor）</h2>
 

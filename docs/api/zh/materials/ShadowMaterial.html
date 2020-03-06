@@ -16,24 +16,26 @@
 			此材质可以接收阴影，但在其他方面完全透明。
 		</p>
 
-		<h3>例子(Example)</h3>
+		<h2>代码示例</h2>
+
+		<code>
+		var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+		planeGeometry.rotateX( - Math.PI / 2 );
+
+		var planeMaterial = new THREE.ShadowMaterial();
+		planeMaterial.opacity = 0.2;
+
+		var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+		plane.position.y = -200;
+		plane.receiveShadow = true;
+		scene.add( plane );
+		</code>
+
+		<h3>例子</h3>
 
 		<p>
 			[example:webgl_geometry_spline_editor geometry / spline / editor]
 		</p>
-
-		<code>
-var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
-planeGeometry.rotateX( - Math.PI / 2 );
-
-var planeMaterial = new THREE.ShadowMaterial();
-planeMaterial.opacity = 0.2;
-
-var plane = new THREE.Mesh( planeGeometry, planeMaterial );
-plane.position.y = -200;
-plane.receiveShadow = true;
-scene.add( plane );
-		</code>
 
 		<h2>构造函数(Constructor)</h2>
 

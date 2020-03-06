@@ -15,36 +15,36 @@
 			[link:https://github.com/mrdoob/eventdispatcher.js Eventdispatcher on GitHub]
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
-// Adding events to a custom object
+		// Adding events to a custom object
 
-var Car = function () {
+		var Car = function () {
 
-    this.start = function () {
+		    this.start = function () {
 
-        this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+		        this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
 
-    };
+		    };
 
-};
+		};
 
-// Mixing the EventDispatcher.prototype with the custom object prototype
+		// Mixing the EventDispatcher.prototype with the custom object prototype
 
-Object.assign( Car.prototype, EventDispatcher.prototype );
+		Object.assign( Car.prototype, EventDispatcher.prototype );
 
-// Using events with the custom object
+		// Using events with the custom object
 
-var car = new Car();
+		var car = new Car();
 
-car.addEventListener( 'start', function ( event ) {
+		car.addEventListener( 'start', function ( event ) {
 
-    alert( event.message );
+		    alert( event.message );
 
-} );
+		} );
 
-car.start();
+		car.start();
 		</code>
 
 		<h2>Constructor</h2>
