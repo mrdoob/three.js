@@ -11,11 +11,12 @@ import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, L
  *
  */
 
-function AnimationAction( mixer, clip, localRoot ) {
+function AnimationAction( mixer, clip, localRoot, isAdditive = false ) {
 
 	this._mixer = mixer;
 	this._clip = clip;
 	this._localRoot = localRoot || null;
+	this.isAdditive = isAdditive;
 
 	var tracks = clip.tracks,
 		nTracks = tracks.length,
@@ -367,7 +368,21 @@ Object.assign( AnimationAction.prototype, {
 		// note: _updateTime may disable the action resulting in
 		// an effective weight of 0
 
-		var weight = this._updateWeight( time );
+		var accuParamA, accuParamB, accuFn,
+			weight = this._updateWeight( time );
+
+		if ( this.isAdditive ) {
+
+			accuFn = 'accumulateAdditive';
+			accuParamA = weight;
+
+		} else {
+
+			accuFn = 'accumulate';
+			accuParamA = accuIndex;
+			accuParamB = weight;
+
+		}
 
 		if ( weight > 0 ) {
 
@@ -377,7 +392,7 @@ Object.assign( AnimationAction.prototype, {
 			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
 
 				interpolants[ j ].evaluate( clipTime );
-				propertyMixers[ j ].accumulate( accuIndex, weight );
+				propertyMixers[ j ][ accuFn ]( accuParamA, accuParamB );
 
 			}
 

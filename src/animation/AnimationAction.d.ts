@@ -6,8 +6,9 @@ import { Object3D } from '../core/Object3D';
 
 export class AnimationAction {
 
-	constructor( mixer: AnimationMixer, clip: AnimationClip, localRoot?: Object3D );
+	constructor( mixer: AnimationMixer, clip: AnimationClip, localRoot?: Object3D, isAdditive?: boolean );
 
+	isAdditive: boolean;
 	loop: AnimationActionLoopStyles;
 	time: number;
 	timeScale: number;

@@ -92,7 +92,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			}
 
-			interpolants[ i ].resultBuffer = binding.buffer;
+			if ( action.isAdditive ) interpolants[ i ].resultBuffer = binding.bufferAdditive;
+
+			else interpolants[ i ].resultBuffer = binding.buffer;
 
 		}
 
@@ -516,7 +518,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// return an action for a clip optionally using a custom root target
 	// object (this method allocates a lot of dynamic memory in case a
 	// previously unknown clip/root combination is specified)
-	clipAction: function ( clip, optionalRoot ) {
+	clipAction: function ( clip, optionalRoot, isAdditive = false ) {
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
@@ -534,7 +536,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			var existingAction =
 					actionsForClip.actionByRoot[ rootUuid ];
 
-			if ( existingAction !== undefined ) {
+			if ( existingAction !== undefined && existingAction.isAdditive === isAdditive ) {
 
 				return existingAction;
 
@@ -554,7 +556,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		if ( clipObject === null ) return null;
 
 		// allocate all resources required to run it
-		var newAction = new AnimationAction( this, clipObject, optionalRoot );
+		var newAction = new AnimationAction( this, clipObject, optionalRoot, isAdditive );
 
 		this._bindAction( newAction, prototypeAction );
 

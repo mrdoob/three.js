@@ -4,6 +4,8 @@
  * @author David Sarno / http://lighthaus.us/
  */
 
+import { Quaternion } from '../math/Quaternion.js';
+
 var AnimationUtils = {
 
 	// same as Array.prototype.slice, but also works on typed arrays
@@ -228,6 +230,105 @@ var AnimationUtils = {
 		}
 
 		clip.resetDuration();
+
+		return clip;
+
+	},
+
+	makeClipAdditive: function ( sourceClip, referenceFrame = 0, cloneOriginal = false, clonedName, fps = 30 ) {
+
+		let clip = sourceClip;
+		if ( cloneOriginal ) {
+
+			clip = sourceClip.clone();
+			clip.name = clonedName || clip.name;
+
+		}
+		const numTracks = clip.tracks.length;
+
+		fps = fps || 30;
+		const referenceTime = referenceFrame / fps;
+
+		// Make each track's values relative to the values at the reference frame
+		for ( let i = 0; i !== numTracks; ++ i ) {
+
+			const track = clip.tracks[ i ];
+			const trackType = track.ValueTypeName;
+
+			// Skip this track if it's non-numeric
+			if ( trackType === 'bool' || trackType === 'string' ) continue;
+
+			const valueSize = track.getValueSize();
+			const lastIndex = track.times.length - 1;
+			const numTimes = track.times.length;
+			let referenceValue;
+
+			// Find the value to subtract out of the track
+			if ( referenceTime <= track.times[ 0 ] ) {
+
+				// Reference frame is earlier than the first keyframe, so just use the first keyframe
+				referenceValue = AnimationUtils.arraySlice( track.values, 0, track.valueSize );
+
+			} else if ( referenceTime >= track.times[ lastIndex ] ) {
+
+				// Reference frame is after the last keyframe, so just use the last keyframe
+				const startIndex = lastIndex * valueSize;
+				referenceValue = AnimationUtils.arraySlice( track.values, startIndex );
+
+			} else {
+
+				// Interpolate to the reference value
+				const interpolant = track.createInterpolant();
+				interpolant.evaluate( referenceTime );
+				referenceValue = interpolant.resultBuffer;
+
+			}
+
+			// Conjugate the quaternion
+			if ( trackType === 'quaternion' ) {
+
+				const referenceQuat = new Quaternion(
+					referenceValue[ 0 ],
+					referenceValue[ 1 ],
+					referenceValue[ 2 ],
+					referenceValue[ 3 ]
+				).normalize().conjugate();
+				referenceQuat.toArray( referenceValue );
+
+			}
+
+			// Subtract the reference value from all of the track values
+
+			for ( let j = 0; j !== numTimes; ++ j ) {
+
+				const valueStart = j * valueSize;
+
+				if ( trackType === 'quaternion' ) {
+
+					// Multiply the conjugate for quaternion track types
+					Quaternion.multiplyQuaternionsFlat(
+						track.values,
+						valueStart,
+						referenceValue,
+						0,
+						track.values,
+						valueStart
+					);
+
+				} else {
+
+					// Subtract each value for all other numeric track types
+					for ( let k = 0; k !== valueSize; ++ k ) {
+
+						track.values[ valueStart + k ] -= referenceValue[ k ];
+
+					}
+
+				}
+
+			}
+
+		}
 
 		return clip;
 
