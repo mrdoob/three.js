@@ -334,6 +334,8 @@
 			this.soundMap.geometry.deleteAttribute( 'normal' );
 			this.soundMap.material.dispose();
 
+			// Reset cursor
+			this.currentAudioBufferIndex = 0;
 
 			// Recreate buffer attributes
 			const halfFftLength = this.soundMapFftLength / 2;
