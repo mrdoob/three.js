@@ -14,6 +14,7 @@ varying vec3 vViewPosition;
 #endif
 
 #include <common>
+#include <color_pars_fragment>
 #include <uv_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
@@ -32,6 +33,7 @@ void main() {
 
 	#include <logdepthbuf_fragment>
 	#include <map_fragment>
+	#include <color_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
 	#include <normal_fragment_begin>
