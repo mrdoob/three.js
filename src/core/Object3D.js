@@ -706,15 +706,15 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			if ( this.background && this.background.isColor ) {
 
-				object.background = this.background.getHex();
+				object.background = this.background.toJSON();
 
 			} else if ( this.background && this.background.isTexture ) {
 
-				object.background = serialize( meta.textures, this.background );
+				object.background = this.background.toJSON( meta ).uuid;
 
 			}
 
-			if ( this.environment && this.environment.isTexture ) object.environment = serialize( meta.textures, this.environment );
+			if ( this.environment && this.environment.isTexture ) object.environment = this.environment.toJSON( meta ).uuid;
 
 		}
 

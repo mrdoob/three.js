@@ -735,7 +735,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				console.warn( 'THREE.ObjectLoader: Undefined texture', name );
 
-      }
+			}
 
 			return textures[ name ];
 
@@ -761,17 +761,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
-				if ( data.environment !== undefined ) {
-
-					var texture = getTexture( data.environment );
-
-					if ( texture instanceof CubeTexture ) {
-
-						object.environment = texture;
-
-					}
-
-				}
+				if ( data.environment !== undefined ) object.environment = getTexture( data.environment );
 
 				if ( data.fog !== undefined ) {
 
