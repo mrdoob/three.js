@@ -1,5 +1,7 @@
 /**
  * @author Mugen87 / https://github.com/Mugen87
+ *
+ * For best results it's recommended to use SSAOPass with a WebGL 2 rendering context.
  */
 
 THREE.SSAOPass = function ( scene, camera, width, height ) {
@@ -31,7 +33,6 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	// beauty render target with depth buffer
 
 	var depthTexture = new THREE.DepthTexture();
-	depthTexture.type = THREE.UnsignedShortType;
 	depthTexture.minFilter = THREE.NearestFilter;
 	depthTexture.maxFilter = THREE.NearestFilter;
 
@@ -40,7 +41,8 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBAFormat,
 		depthTexture: depthTexture,
-		depthBuffer: true
+		depthBuffer: true,
+		stencilBuffer: false
 	} );
 
 	// normal render target
@@ -48,7 +50,8 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	this.normalRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 		minFilter: THREE.NearestFilter,
 		magFilter: THREE.NearestFilter,
-		format: THREE.RGBAFormat
+		format: THREE.RGBAFormat,
+		stencilBuffer: false
 	} );
 
 	// ssao render target
@@ -56,7 +59,8 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 	this.ssaoRenderTarget = new THREE.WebGLRenderTarget( this.width, this.height, {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
-		format: THREE.RGBAFormat
+		format: THREE.RGBAFormat,
+		stencilBuffer: false
 	} );
 
 	this.blurRenderTarget = this.ssaoRenderTarget.clone();
@@ -167,6 +171,10 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 	},
 
 	render: function ( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
+
+		// configure depthTexture
+
+		this.beautyRenderTarget.depthTexture.type = ( renderer.capabilities.isWebGL2 ) ? THREE.FloatType : THREE.UnsignedShortType;
 
 		// render beauty and depth
 

@@ -1,5 +1,7 @@
 /**
  * @author Mugen87 / https://github.com/Mugen87
+ *
+ * For best results it's recommended to use SSAOPass with a WebGL 2 rendering context.
  */
 
 import {
@@ -61,7 +63,6 @@ var SSAOPass = function ( scene, camera, width, height ) {
 	// beauty render target with depth buffer
 
 	var depthTexture = new DepthTexture();
-	depthTexture.type = UnsignedShortType;
 	depthTexture.minFilter = NearestFilter;
 	depthTexture.maxFilter = NearestFilter;
 
@@ -70,7 +71,8 @@ var SSAOPass = function ( scene, camera, width, height ) {
 		magFilter: LinearFilter,
 		format: RGBAFormat,
 		depthTexture: depthTexture,
-		depthBuffer: true
+		depthBuffer: true,
+		stencilBuffer: false
 	} );
 
 	// normal render target
@@ -78,7 +80,8 @@ var SSAOPass = function ( scene, camera, width, height ) {
 	this.normalRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 		minFilter: NearestFilter,
 		magFilter: NearestFilter,
-		format: RGBAFormat
+		format: RGBAFormat,
+		stencilBuffer: false
 	} );
 
 	// ssao render target
@@ -86,7 +89,8 @@ var SSAOPass = function ( scene, camera, width, height ) {
 	this.ssaoRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
-		format: RGBAFormat
+		format: RGBAFormat,
+		stencilBuffer: false
 	} );
 
 	this.blurRenderTarget = this.ssaoRenderTarget.clone();
@@ -197,6 +201,10 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 	},
 
 	render: function ( renderer, writeBuffer /*, readBuffer, deltaTime, maskActive */ ) {
+
+		// configure depthTexture
+
+		this.beautyRenderTarget.depthTexture.type = ( renderer.capabilities.isWebGL2 ) ? FloatType : UnsignedShortType;
 
 		// render beauty and depth
 
