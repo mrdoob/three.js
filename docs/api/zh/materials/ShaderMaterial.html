@@ -35,7 +35,7 @@
 			<li> 内置attributes和uniforms与代码一起传递到shaders。
 				如果您不希望[page:WebGLProgram]向shader代码添加任何内容，则可以使用[page:RawShaderMaterial]而不是此类。
 			</li>
-			<li> 您可以使用指令#pragma unroll_loop，以便通过shader预处理器在GLSL中展开for循环。
+			<li> 您可以使用指令#pragma unroll_loop_start，#pragma unroll_loop_end 以便通过shader预处理器在GLSL中展开for循环。
 				该指令必须放在循环的正上方。循环格式必须与定义的标准相对应。
 				<ul>
 					<li> 循环必须标准化[link:https://en.wikipedia.org/wiki/Normalized_loop normalized]。
@@ -48,12 +48,13 @@
 					</li>
 				</ul>
 				<code>
-		#pragma unroll_loop
+		#pragma unroll_loop_start
 		for ( int i = 0; i < 10; i ++ ) {
 
 			// ...
 
 		}
+		#pragma unroll_loop_end
 				</code>
 			</li>
 		</ul>

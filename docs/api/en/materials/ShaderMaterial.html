@@ -45,7 +45,7 @@
 				[page:RawShaderMaterial] instead of this class.
 			</li>
 			<li>
-				You can use the directive #pragma unroll_loop in order to unroll a *for* loop in GLSL by the shader preprocessor.
+				You can use the directive #pragma unroll_loop_start and #pragma unroll_loop_end in order to unroll a *for* loop in GLSL by the shader preprocessor.
 				The directive has to be placed right above the loop. The loop formatting has to correspond to a defined standard.
 				<ul>
 					<li>
@@ -59,12 +59,13 @@
 					</li>
 				</ul>
 				<code>
-		#pragma unroll_loop
+		#pragma unroll_loop_start
 		for ( int i = 0; i < 10; i ++ ) {
 
 			// ...
 
 		}
+		#pragma unroll_loop_end
 				</code>
 			</li>
 		</ul>
