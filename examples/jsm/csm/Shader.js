@@ -27,7 +27,7 @@ IncidentLight directLight;
 	PointLightShadow pointLightShadow;
 	#endif
 
-	#pragma unroll_loop
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
 		pointLight = pointLights[ i ];
@@ -42,6 +42,7 @@ IncidentLight directLight;
 		RE_Direct( directLight, geometry, material, reflectedLight );
 
 	}
+	#pragma unroll_loop_end
 
 #endif
 
@@ -52,7 +53,7 @@ IncidentLight directLight;
 	SpotLightShadow spotLightShadow;
 	#endif
 
-	#pragma unroll_loop
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
 		spotLight = spotLights[ i ];
@@ -67,6 +68,7 @@ IncidentLight directLight;
 		RE_Direct( directLight, geometry, material, reflectedLight );
 
 	}
+	#pragma unroll_loop_end
 
 #endif
 
@@ -132,7 +134,7 @@ IncidentLight directLight;
 	#pragma unroll_loop_end
 	#else
 
-	#pragma unroll_loop
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
@@ -148,6 +150,7 @@ IncidentLight directLight;
 		if(linearDepth >= CSM_cascades[UNROLLED_LOOP_INDEX].x && (linearDepth < CSM_cascades[UNROLLED_LOOP_INDEX].y || UNROLLED_LOOP_INDEX == CSM_CASCADES - 1)) RE_Direct( directLight, geometry, material, reflectedLight );
 
 	}
+	#pragma unroll_loop_end
 
 	#endif
 
@@ -161,7 +164,7 @@ IncidentLight directLight;
 	DirectionalLightShadow directionalLightShadow;
 	#endif
 
-	#pragma unroll_loop
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		directionalLight = directionalLights[ i ];
@@ -176,6 +179,7 @@ IncidentLight directLight;
 		RE_Direct( directLight, geometry, material, reflectedLight );
 
 	}
+	#pragma unroll_loop_end
 
 #endif
 
@@ -183,13 +187,14 @@ IncidentLight directLight;
 
 	RectAreaLight rectAreaLight;
 
-	#pragma unroll_loop
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_RECT_AREA_LIGHTS; i ++ ) {
 
 		rectAreaLight = rectAreaLights[ i ];
 		RE_Direct_RectArea( rectAreaLight, geometry, material, reflectedLight );
 
 	}
+	#pragma unroll_loop_end
 
 #endif
 
@@ -203,12 +208,13 @@ IncidentLight directLight;
 
 	#if ( NUM_HEMI_LIGHTS > 0 )
 
-		#pragma unroll_loop
+		#pragma unroll_loop_start
 		for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
 			irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
 
 		}
+		#pragma unroll_loop_end
 
 	#endif
 

@@ -150,7 +150,7 @@ THREE.TranslucentShader = {
 
 		"		DirectionalLight directionalLight;",
 
-		"		#pragma unroll_loop",
+		"		#pragma unroll_loop_start",
 		"		for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {",
 		"			directionalLight = directionalLights[ i ];",
 		"			getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );",
@@ -165,6 +165,7 @@ THREE.TranslucentShader = {
 		"			RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);",
 		"			#endif",
 		"		}",
+		"		#pragma unroll_loop_end",
 
 		"	#endif",
 
