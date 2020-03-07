@@ -247,7 +247,14 @@ var SidebarGeometry = function ( editor ) {
 
 	}
 
-	signals.objectSelected.add( build );
+	signals.objectSelected.add( function () {
+
+		currentGeometryType = null;
+
+		build();
+
+	} );
+
 	signals.geometryChanged.add( build );
 
 	return container;

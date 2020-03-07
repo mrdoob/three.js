@@ -18,6 +18,7 @@ THREE.Reflector = function ( geometry, options ) {
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || THREE.Reflector.ReflectorShader;
 	var recursion = options.recursion !== undefined ? options.recursion : 0;
+	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	//
 
@@ -40,7 +41,8 @@ THREE.Reflector = function ( geometry, options ) {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBFormat,
-		stencilBuffer: false
+		stencilBuffer: false,
+		encoding: encoding
 	};
 
 	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );

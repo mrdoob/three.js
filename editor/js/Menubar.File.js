@@ -14,11 +14,11 @@ import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 var MenubarFile = function ( editor ) {
 
-	var NUMBER_PRECISION = 6;
-
 	function parseNumber( key, value ) {
 
-		return typeof value === 'number' ? parseFloat( value.toFixed( NUMBER_PRECISION ) ) : value;
+		var precision = config.getKey( 'exportPrecision' );
+
+		return typeof value === 'number' ? parseFloat( value.toFixed( precision ) ) : value;
 
 	}
 
@@ -414,6 +414,16 @@ var MenubarFile = function ( editor ) {
 		loader.load( '../build/three.module.js', function ( content ) {
 
 			zip.file( 'js/three.module.js', content );
+
+		} );
+		loader.load( '../examples/jsm/webxr/VRButton.js', function ( content ) {
+
+			zip.file( 'js/VRButton.js', content );
+
+		} );
+		loader.load( '../examples/js/vr/HelioWebXRPolyfill.js', function ( content ) {
+
+			zip.file( 'js/HelioWebXRPolyfill.js', content );
 
 		} );
 

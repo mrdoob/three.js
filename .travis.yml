@@ -14,14 +14,17 @@ jobs:
       name: unit
       script: npm run test-unit
 
-    - &diff
-      stage: diff
-      name: diff
-      script: npm run test-diff
+    - &e2e
+      stage: e2e
+      name: e2e
+      script: npm run test-e2e
       env: FORCE_COLOR=0 CI=0
-    - <<: *diff
+    - <<: *e2e
       env: FORCE_COLOR=0 CI=1
-    - <<: *diff
+    - <<: *e2e
       env: FORCE_COLOR=0 CI=2
-    - <<: *diff
+    - <<: *e2e
       env: FORCE_COLOR=0 CI=3
+
+allow_fails:
+  - e2e

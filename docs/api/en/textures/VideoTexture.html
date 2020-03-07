@@ -18,20 +18,21 @@
 		This is almost the same as the base [page:Texture Texture] class, except that it continuosly sets [page:Texture.needsUpdate needsUpdate] to *true* so that the texture is updated as the video plays. Automatic creation of [page:Texture.mipmaps mipmaps] is also disabled.
 		</p>
 
-		<h2>Example</h2>
-
-		<p>[example:webgl_materials_video materials / video ]</p>
+		<h2>Code Example</h2>
 
 		<code>
-//assuming you have created a HTML video element with id="video"
-var video = document.getElementById( 'video' );
+		//assuming you have created a HTML video element with id="video"
+		var video = document.getElementById( 'video' );
 
-var texture = new THREE.VideoTexture( video );
-texture.minFilter = THREE.LinearFilter;
-texture.magFilter = THREE.LinearFilter;
-texture.format = THREE.RGBFormat;
+		var texture = new THREE.VideoTexture( video );
+		texture.minFilter = THREE.LinearFilter;
+		texture.magFilter = THREE.LinearFilter;
+		texture.format = THREE.RGBFormat;
 		</code>
 
+		<h2>Examples</h2>
+
+		<p>[example:webgl_materials_video materials / video ]</p>
 
 		<h2>Constructor</h2>
 		<h3>[name]( [param:Video video], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>

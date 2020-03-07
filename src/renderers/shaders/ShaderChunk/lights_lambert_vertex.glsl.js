@@ -25,7 +25,7 @@ vec3 directLightColor_Diffuse;
 
 #if NUM_POINT_LIGHTS > 0
 
-	#pragma unroll_loop
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {
 
 		getPointDirectLightIrradiance( pointLights[ i ], geometry, directLight );
@@ -42,12 +42,13 @@ vec3 directLightColor_Diffuse;
 		#endif
 
 	}
+	#pragma unroll_loop_end
 
 #endif
 
 #if NUM_SPOT_LIGHTS > 0
 
-	#pragma unroll_loop
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {
 
 		getSpotDirectLightIrradiance( spotLights[ i ], geometry, directLight );
@@ -63,6 +64,7 @@ vec3 directLightColor_Diffuse;
 
 		#endif
 	}
+	#pragma unroll_loop_end
 
 #endif
 
@@ -80,7 +82,7 @@ vec3 directLightColor_Diffuse;
 
 #if NUM_DIR_LIGHTS > 0
 
-	#pragma unroll_loop
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {
 
 		getDirectionalDirectLightIrradiance( directionalLights[ i ], geometry, directLight );
@@ -97,12 +99,13 @@ vec3 directLightColor_Diffuse;
 		#endif
 
 	}
+	#pragma unroll_loop_end
 
 #endif
 
 #if NUM_HEMI_LIGHTS > 0
 
-	#pragma unroll_loop
+	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {
 
 		vIndirectFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );
@@ -114,6 +117,7 @@ vec3 directLightColor_Diffuse;
 		#endif
 
 	}
+	#pragma unroll_loop_end
 
 #endif
 `;

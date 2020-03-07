@@ -20,7 +20,6 @@ void main() {
 	#include <map_particle_fragment>
 	#include <color_fragment>
 	#include <alphatest_fragment>
-	#include <transparent_fragment>
 
 	outgoingLight = diffuseColor.rgb;
 

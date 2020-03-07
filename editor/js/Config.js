@@ -8,11 +8,13 @@ var Config = function () {
 
 	var storage = {
 		'language': 'en',
+		'exportPrecision': 6,
 
 		'autosave': true,
 
 		'project/title': '',
 		'project/editable': false,
+		'project/vr': false,
 
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,

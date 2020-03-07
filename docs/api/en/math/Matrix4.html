@@ -77,6 +77,24 @@ m.elements = [ 11, 21, 31, 41,
 		code, you'll have to take the [link:https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
 		</p>
 
+		<h2>Extracting position, rotation and scale</h2>
+		<p>
+			There are several options available for extracting position, rotation and scale from a Matrix4.
+			<ul>
+				<li>
+					[page:Vector3.setFromMatrixPosition]: can be used to extract the translation component.
+				</li>
+				<li>
+					[page:Vector3.setFromMatrixScale]: can be used to extract the scale component.
+				</li>
+				<li>
+					[page:Quaternion.setFromRotationMatrix], [page:Euler.setFromRotationMatrix] or [page:.extractRotation extractRotation] can be used to extract the rotation component.
+				</li>
+				<li>
+					[page:.decompose decompose] can be used to extract position, rotation and scale all at once.
+				</li>
+			</ul>
+		</p>
 
 		<h2>Constructor</h2>
 

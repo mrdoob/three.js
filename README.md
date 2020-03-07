@@ -1,10 +1,9 @@
 three.js
 ========
 
-[![NPM package][npm]][npm-url]
+[![NPM Package][npm]][npm-url]
 [![Build Size][build-size]][build-size-url]
-[![Build Status][build-status]][build-status-url]
-[![Dependencies][dependencies]][dependencies-url]
+[![NPM Downloads][npm-downloads]][npmtrends-url]
 [![Dev Dependencies][dev-dependencies]][dev-dependencies-url]
 [![Language Grade][lgtm]][lgtm-url]
 
@@ -18,8 +17,8 @@ The aim of the project is to create an easy to use, lightweight, 3D library with
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
 [Questions](http://stackoverflow.com/questions/tagged/three.js) &mdash;
 [Forum](https://discourse.threejs.org/) &mdash;
-[Gitter](https://gitter.im/mrdoob/three.js) &mdash;
-[Slack](https://join.slack.com/t/threejs/shared_invite/enQtMzYxMzczODM2OTgxLTQ1YmY4YTQxOTFjNDAzYmQ4NjU2YzRhNzliY2RiNDEyYjU2MjhhODgyYWQ5Y2MyZTU3MWNkOGVmOGRhOTQzYTk)
+[Slack](https://join.slack.com/t/threejs/shared_invite/enQtMzYxMzczODM2OTgxLTQ1YmY4YTQxOTFjNDAzYmQ4NjU2YzRhNzliY2RiNDEyYjU2MjhhODgyYWQ5Y2MyZTU3MWNkOGVmOGRhOTQzYTk) &mdash;
+[Discord](https://discordapp.com/invite/HF4UdyF)
 
 ### Usage ###
 
@@ -72,15 +71,13 @@ If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
 [Releases](https://github.com/mrdoob/three.js/releases)
 
 
-[npm]: https://img.shields.io/npm/v/three.svg
+[npm]: https://img.shields.io/npm/v/three
 [npm-url]: https://www.npmjs.com/package/three
 [build-size]: https://badgen.net/bundlephobia/minzip/three
 [build-size-url]: https://bundlephobia.com/result?p=three
-[build-status]: https://travis-ci.org/mrdoob/three.js.svg?branch=dev
-[build-status-url]: https://travis-ci.org/mrdoob/three.js
-[dependencies]: https://img.shields.io/david/mrdoob/three.js.svg
-[dependencies-url]: https://david-dm.org/mrdoob/three.js
-[dev-dependencies]: https://img.shields.io/david/dev/mrdoob/three.js.svg
+[npm-downloads]: https://img.shields.io/npm/dw/three
+[npmtrends-url]: https://www.npmtrends.com/three
+[dev-dependencies]: https://img.shields.io/david/dev/mrdoob/three.js
 [dev-dependencies-url]: https://david-dm.org/mrdoob/three.js#info=devDependencies
-[lgtm]: https://img.shields.io/lgtm/grade/javascript/g/mrdoob/three.js.svg?label=code%20quality
+[lgtm]: https://img.shields.io/lgtm/alerts/github/mrdoob/three.js
 [lgtm-url]: https://lgtm.com/projects/g/mrdoob/three.js/
