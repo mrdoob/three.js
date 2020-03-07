@@ -704,17 +704,17 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( this.isScene ) {
 
-			if ( this.background instanceof Color$1 ) {
+			if ( this.background && this.background.isColor ) {
 
 				object.background = this.background.getHex();
 
-			} else if (this.background && this.background.isTexture) {
+			} else if ( this.background && this.background.isTexture ) {
 
 				object.background = serialize( meta.textures, this.background );
 
 			}
 
-			if (this.environment && this.environment.isTexture) object.environment = serialize( meta.textures, this.environment );
+			if ( this.environment && this.environment.isTexture ) object.environment = serialize( meta.textures, this.environment );
 
 		}
 
