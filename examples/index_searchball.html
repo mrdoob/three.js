@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js examples</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style> body { background-color: #FFF; } </style>
+	</head>
+
+	<body>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { SpiralSphereGeometry } from './jsm/geometries/SpiralSphereGeometry.js';
+
+			var camera, controls, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				//renderer.outputEncoding = THREE.sRGBEncoding;
+				document.body.appendChild( renderer.domElement );
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.set( 0, 1.7, 1.2 );
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+
+				controls.enableDamping = true;
+				controls.dampingFactor = 0.05;
+
+				controls.screenSpacePanning = false;
+				controls.enablePan = false;
+				controls.enableKeys = false;
+
+				controls.minDistance = 1.01;
+				controls.maxDistance = 5;
+
+				// world
+
+				var geometry = new SpiralSphereGeometry( 1, 20, 365, 10, 0.0015 );
+				var texture = new THREE.TextureLoader().load( './screenshots/all_in_one.jpg' );
+				//texture.encoding = THREE.sRGBEncoding;
+				//geometry.computeVertexNormals();
+				var material = new THREE.MeshBasicMaterial( {	map: texture } );
+				var mesh = new THREE.Mesh( geometry, material );
+
+				scene = new THREE.Scene();
+				scene.add( mesh );
+				scene.background = new THREE.Color( 0xffffff );
+
+				// lights
+
+				var light = new THREE.DirectionalLight( 0xffefee );
+				light.position.set( 1, 1, 0 );
+				scene.add( light );
+
+				var light = new THREE.DirectionalLight( 0x2266aa );
+				light.position.set( - 1, - 1, 0 );
+				scene.add( light );
+
+				var light = new THREE.AmbientLight( 0x222222 );
+				scene.add( light );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				controls.update();
+				renderer.render( scene, camera );
+				requestAnimationFrame( animate );
+
+			}
+
+		</script>
+
+	</body>
+</html>

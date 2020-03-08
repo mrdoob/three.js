@@ -17,6 +17,7 @@ const maxFailedPixels = 0.05; // total failed pixels
 const exceptionList = [
 
 	'index',
+	'index_searchball',
 	'css3d_youtube', // video tag not deterministic enough
 	'webgl_kinect', // same here
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
