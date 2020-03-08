@@ -25,6 +25,3 @@ jobs:
       env: FORCE_COLOR=0 CI=2
     - <<: *e2e
       env: FORCE_COLOR=0 CI=3
-
-allow_fails:
-  - e2e
