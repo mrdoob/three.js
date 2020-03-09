@@ -22770,6 +22770,8 @@
 		var controllers = [];
 		var inputSourcesMap = new Map();
 
+		var currentSize = new Vector2(), currentPixelRatio;
+
 		//
 
 		var cameraL = new PerspectiveCamera();
@@ -22887,6 +22889,7 @@
 
 			//
 
+			renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
 			renderer.setFramebuffer( null );
 			renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 			animation.stop();
@@ -22900,6 +22903,9 @@
 		function onRequestReferenceSpace( value ) {
 
 			referenceSpace = value;
+
+			currentPixelRatio = renderer.getPixelRatio();
+			renderer.getSize( currentSize );
 
 			animation.setContext( session );
 			animation.start();
@@ -22968,7 +22974,10 @@
 				// eslint-disable-next-line no-undef
 				var baseLayer = new XRWebGLLayer( session, gl, layerInit );
 
+				// baseLayer will only be applied to the session
+				// when the next XRFrame's callbacks are processed.
 				session.updateRenderState( { baseLayer: baseLayer } );
+				renderer.setDrawingBufferSize( baseLayer.framebufferWidth, baseLayer.framebufferHeight, 1 );
 
 				session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 

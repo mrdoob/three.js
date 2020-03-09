@@ -88,8 +88,8 @@ var EffectComposer = function ( renderer, renderTarget ) {
 
 	}
 
-	renderer.vr.addEventListener( 'sessionstart', onSessionStateChange );
-	renderer.vr.addEventListener( 'sessionend', onSessionStateChange );
+	renderer.xr.addEventListener( 'sessionstart', onSessionStateChange );
+	renderer.xr.addEventListener( 'sessionend', onSessionStateChange );
 
 };
 
@@ -146,16 +146,17 @@ Object.assign( EffectComposer.prototype, {
 
 		var maskActive = false;
 
-		var currentVREnabled = this.renderer.vr.enabled;
+		var currentVREnabled = this.renderer.xr.enabled;
 
-		if ( this.renderer.vr.enabled === true ) {
+		if ( this.renderer.xr.enabled === true ) {
 
-			this.renderer.vr.enabled = false;
+			this.renderer.xr.enabled = false;
 
 		}
 
 		var pass, i, il = this.passes.length;
 
+		var swapped = false;
 		for ( i = 0; i < il; i ++ ) {
 
 			pass = this.passes[ i ];
@@ -172,17 +173,14 @@ Object.assign( EffectComposer.prototype, {
 					var context = this.renderer.getContext();
 					var stencil = this.renderer.state.buffers.stencil;
 
-					//context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
 					stencil.setFunc( context.NOTEQUAL, 1, 0xffffffff );
-
 					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
-
-					//context.stencilFunc( context.EQUAL, 1, 0xffffffff );
 					stencil.setFunc( context.EQUAL, 1, 0xffffffff );
 
 				}
 
 				this.swapBuffers();
+				swapped = !swapped;
 
 			}
 
@@ -202,9 +200,10 @@ Object.assign( EffectComposer.prototype, {
 
 		}
 
+		if (swapped) this.swapBuffers();
 		this.renderer.setRenderTarget( currentRenderTarget );
 
-		this.renderer.vr.enabled = currentVREnabled;
+		this.renderer.xr.enabled = currentVREnabled;
 
 	},
 
