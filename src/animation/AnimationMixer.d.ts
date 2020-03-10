@@ -2,22 +2,23 @@ import { AnimationClip } from './AnimationClip';
 import { AnimationAction } from './AnimationAction';
 import { EventDispatcher } from './../core/EventDispatcher';
 import { Object3D } from '../core/Object3D';
+import { AnimationObjectGroup } from './AnimationObjectGroup';
 
 export class AnimationMixer extends EventDispatcher {
 
-	constructor( root: Object3D );
+	constructor( root: Object3D | AnimationObjectGroup );
 
 	time: number;
 	timeScale: number;
 
-	clipAction( clip: AnimationClip, root?: Object3D ): AnimationAction;
-	existingAction( clip: AnimationClip, root?: Object3D ): AnimationAction | null;
+	clipAction( clip: AnimationClip, root?: Object3D | AnimationObjectGroup ): AnimationAction;
+	existingAction( clip: AnimationClip, root?: Object3D | AnimationObjectGroup ): AnimationAction | null;
 	stopAllAction(): AnimationMixer;
 	update( deltaTime: number ): AnimationMixer;
 	setTime( timeInSeconds: number ): AnimationMixer;
-	getRoot(): Object3D;
+	getRoot(): Object3D | AnimationObjectGroup;
 	uncacheClip( clip: AnimationClip ): void;
-	uncacheRoot( root: Object3D ): void;
-	uncacheAction( clip: AnimationClip, root?: Object3D ): void;
+	uncacheRoot( root: Object3D | AnimationObjectGroup ): void;
+	uncacheAction( clip: AnimationClip, root?: Object3D | AnimationObjectGroup ): void;
 
 }
