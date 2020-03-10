@@ -180,10 +180,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			extensions.get( 'EXT_color_buffer_float' );
 
-		} else if ( internalFormat === _gl.RGB16F || internalFormat === _gl.RGB32F ) {
-
-			console.warn( 'THREE.WebGLRenderer: Floating point textures with RGB format not supported. Please use RGBA instead.' );
-
 		}
 
 		return internalFormat;
