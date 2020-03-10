@@ -35,8 +35,8 @@ with an example from [the article on responsive pages](threejs-responsive.html)
 We'll add some `OrbitControls` like we did in [the article on lighting](threejs-lights.html).
 
 ```js
-import * as THREE from './resources/three/r113/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r114/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r114/examples/jsm/controls/OrbitControls.js';
 ```
 
 ```js
@@ -724,8 +724,8 @@ Finally, since I'm not sure what good values are for these settings lets
 add a GUI so we can play with them
 
 ```js
-import * as THREE from './resources/three/r113/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r114/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r114/examples/jsm/controls/OrbitControls.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 

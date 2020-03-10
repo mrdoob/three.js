@@ -381,8 +381,8 @@ gui.add(new AllMaterialPropertyGUIHelper('transparent', scene), 'value')
 and of course we need to include dat.gui
 
 ```js
-import * as THREE from './resources/three/r113/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/three/r114/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r114/examples/jsm/controls/OrbitControls.js';
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 

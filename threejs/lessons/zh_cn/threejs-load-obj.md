@@ -28,7 +28,7 @@ TOC: 加载 .OBJ 文件
 第一件要做的事就是将`OBJLoader2`添加到代码中。
 
 ```js
-import {OBJLoader2} from './resources/threejs/r113/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader2} from './resources/threejs/r114/examples/jsm/loaders/OBJLoader2.js';
 ```
 
 然后创建`OBJLoader2`的实例并通过URL加载我们的.OBJ文件，并在回调函数中将已加载完的模型添加到场景（scene）里。
@@ -109,11 +109,11 @@ map_Ns windmill_001_base_SPEC.jpg
 首先要引用 `MTLLoader` 和 `MtlObjBridge`;
 
 ```js
-import * as THREE from './resources/three/r113/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r113/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader2} from './resources/threejs/r113/examples/jsm/loaders/OBJLoader2.js';
-+import {MTLLoader} from './resources/threejs/r113/examples/jsm/loaders/MTLLoader.js';
-+import {MtlObjBridge} from './resources/threejs/r113/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
+import * as THREE from './resources/three/r114/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r114/examples/jsm/controls/OrbitControls.js';
+import {OBJLoader2} from './resources/threejs/r114/examples/jsm/loaders/OBJLoader2.js';
++import {MTLLoader} from './resources/threejs/r114/examples/jsm/loaders/MTLLoader.js';
++import {MtlObjBridge} from './resources/threejs/r114/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 ```
 
 然后我们先加载.MTL文件，在它加载完材质后利用`MtlObjBridge`将材质传给`OBJLoader2`，再加载.OBJ文件。

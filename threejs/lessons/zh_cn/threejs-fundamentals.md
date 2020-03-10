@@ -35,7 +35,7 @@ Three.js将会使用这个canvas标签所以我们要先获取它然后传给thr
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r113/build/three.module.js';
+import * as THREE from './resources/threejs/r114/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
