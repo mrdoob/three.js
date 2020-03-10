@@ -985,9 +985,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		// Handles WebGL2 RGBFormat fallback - #18858
 
-		if ( isWebGL2 &&
-			renderTarget.texture.format === RGBFormat &&
-			( renderTarget.texture.type === FloatType || renderTarget.texture.type === HalfFloatType ) ) {
+		if ( isWebGL2 && renderTarget.texture.format === RGBFormat && ( renderTarget.texture.type === FloatType || renderTarget.texture.type === HalfFloatType ) ) {
 
 			renderTarget.texture.format = RGBAFormat;
 
