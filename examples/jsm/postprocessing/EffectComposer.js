@@ -82,7 +82,7 @@ var EffectComposer = function ( renderer, renderTarget ) {
 
 	function onSessionStateChange() {
 
-		renderer.getDrawingBufferSize( rendererSize );
+		renderer.getBufferSize( rendererSize );
 		scope.setPixelRatio( renderer.getPixelRatio() );
 		scope.setSize( rendererSize.x, rendererSize.y );
 
