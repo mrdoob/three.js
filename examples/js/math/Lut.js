@@ -1,24 +1,33 @@
 /**
  * @author daron1337 / http://daron1337.github.io/
  */
+import { Color } from "../../../build/three.module.js";
 
-THREE.Lut = function ( colormap, numberofcolors ) {
+var ColorMapKeywords = {
 
-	this.lut = [];
-	this.setColorMap( colormap, numberofcolors );
-	return this;
+	"rainbow": [[ 0.0, 0x0000FF ], [ 0.2, 0x00FFFF ], [ 0.5, 0x00FF00 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFF0000 ]],
+	"cooltowarm": [[ 0.0, 0x3C4EC2 ], [ 0.2, 0x9BBCFF ], [ 0.5, 0xDCDCDC ], [ 0.8, 0xF6A385 ], [ 1.0, 0xB40426 ]],
+	"blackbody": [[ 0.0, 0x000000 ], [ 0.2, 0x780000 ], [ 0.5, 0xE63200 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFFFFFF ]],
+	"grayscale": [[ 0.0, 0x000000 ], [ 0.2, 0x404040 ], [ 0.5, 0x7F7F80 ], [ 0.8, 0xBFBFBF ], [ 1.0, 0xFFFFFF ]]
 
 };
 
-THREE.Lut.prototype = {
+class Lut {
 
-	constructor: THREE.Lut,
+	constructor( colormap, numberofcolors ) {
 
-	lut: [], map: [], n: 256, minV: 0, maxV: 1,
+		this.lut = [];
+		this.map;
+		this.n = 256;
+		this.minV = 0;
+		this.maxV = 1;
+		this.setColorMap( colormap, numberofcolors );
 
-	set: function ( value ) {
+	}
 
-		if ( value instanceof THREE.Lut ) {
+	set( value ) {
+
+		if ( value instanceof Lut ) {
 
 			this.copy( value );
 
@@ -26,27 +35,27 @@ THREE.Lut.prototype = {
 
 		return this;
 
-	},
+	}
 
-	setMin: function ( min ) {
+	setMin( min ) {
 
 		this.minV = min;
 
 		return this;
 
-	},
+	}
 
-	setMax: function ( max ) {
+	setMax( max ) {
 
 		this.maxV = max;
 
 		return this;
 
-	},
+	}
 
-	setColorMap: function ( colormap, numberofcolors ) {
+	setColorMap( colormap, numberofcolors ) {
 
-		this.map = THREE.ColorMapKeywords[ colormap ] || THREE.ColorMapKeywords.rainbow;
+		this.map = ColorMapKeywords[ colormap ] || ColorMapKeywords.rainbow;
 		this.n = numberofcolors || 32;
 
 		var step = 1.0 / this.n;
@@ -61,8 +70,8 @@ THREE.Lut.prototype = {
 					var min = this.map[ j ][ 0 ];
 					var max = this.map[ j + 1 ][ 0 ];
 
-					var minColor = new THREE.Color( this.map[ j ][ 1 ] );
-					var maxColor = new THREE.Color( this.map[ j + 1 ][ 1 ] );
+					var minColor = new Color( this.map[ j ][ 1 ] );
+					var maxColor = new Color( this.map[ j + 1 ][ 1 ] );
 
 					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
@@ -76,9 +85,9 @@ THREE.Lut.prototype = {
 
 		return this;
 
-	},
+	}
 
-	copy: function ( lut ) {
+	copy( lut ) {
 
 		this.lut = lut.lut;
 		this.map = lut.map;
@@ -88,9 +97,9 @@ THREE.Lut.prototype = {
 
 		return this;
 
-	},
+	}
 
-	getColor: function ( alpha ) {
+	getColor( alpha ) {
 
 		if ( alpha <= this.minV ) {
 
@@ -109,15 +118,15 @@ THREE.Lut.prototype = {
 
 		return this.lut[ colorPosition ];
 
-	},
+	}
 
-	addColorMap: function ( colormapName, arrayOfColors ) {
+	addColorMap( colormapName, arrayOfColors ) {
 
-		THREE.ColorMapKeywords[ colormapName ] = arrayOfColors;
+		ColorMapKeywords[ colormapName ] = arrayOfColors;
 
-	},
+	}
 
-	createCanvas: function () {
+	createCanvas() {
 
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = 1;
@@ -127,9 +136,9 @@ THREE.Lut.prototype = {
 
 		return canvas;
 
-	},
+	}
 
-	updateCanvas: function ( canvas ) {
+	updateCanvas( canvas ) {
 
 		var ctx = canvas.getContext( '2d', { alpha: false } );
 
@@ -150,8 +159,8 @@ THREE.Lut.prototype = {
 					var min = this.map[ j - 1 ][ 0 ];
 					var max = this.map[ j ][ 0 ];
 
-					var minColor = new THREE.Color( this.map[ j - 1 ][ 1 ] );
-					var maxColor = new THREE.Color( this.map[ j ][ 1 ] );
+					var minColor = new Color( this.map[ j - 1 ][ 1 ] );
+					var maxColor = new Color( this.map[ j ][ 1 ] );
 
 					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
@@ -173,13 +182,7 @@ THREE.Lut.prototype = {
 		return canvas;
 
 	}
-};
 
-THREE.ColorMapKeywords = {
+}
 
-	"rainbow": [[ 0.0, 0x0000FF ], [ 0.2, 0x00FFFF ], [ 0.5, 0x00FF00 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFF0000 ]],
-	"cooltowarm": [[ 0.0, 0x3C4EC2 ], [ 0.2, 0x9BBCFF ], [ 0.5, 0xDCDCDC ], [ 0.8, 0xF6A385 ], [ 1.0, 0xB40426 ]],
-	"blackbody": [[ 0.0, 0x000000 ], [ 0.2, 0x780000 ], [ 0.5, 0xE63200 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFFFFFF ]],
-	"grayscale": [[ 0.0, 0x000000 ], [ 0.2, 0x404040 ], [ 0.5, 0x7F7F80 ], [ 0.8, 0xBFBFBF ], [ 1.0, 0xFFFFFF ]]
-
-};
+export { Lut, ColorMapKeywords };

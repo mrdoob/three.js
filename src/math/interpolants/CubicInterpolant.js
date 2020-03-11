@@ -1,6 +1,5 @@
-import { ZeroCurvatureEnding } from '../../constants.js';
+import { ZeroCurvatureEnding, WrapAroundEnding, ZeroSlopeEnding } from '../../constants.js';
 import { Interpolant } from '../Interpolant.js';
-import { WrapAroundEnding, ZeroSlopeEnding } from '../../constants.js';
 
 /**
  * Fast and simple cubic spline interpolant.
@@ -12,29 +11,21 @@ import { WrapAroundEnding, ZeroSlopeEnding } from '../../constants.js';
  * @author tschw
  */
 
-function CubicInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+class CubicInterpolant extends Interpolant {
 
-	Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
+	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
-	this._weightPrev = - 0;
-	this._offsetPrev = - 0;
-	this._weightNext = - 0;
-	this._offsetNext = - 0;
+		super( parameterPositions, sampleValues, sampleSize, resultBuffer );
+		this._weightPrev = - 0;
+		this._offsetPrev = - 0;
+		this._weightNext = - 0;
+		this._offsetNext = - 0;
+		this.endingStart = ZeroCurvatureEnding;
+	  this.endingEnd = ZeroCurvatureEnding;
 
-}
+	}
 
-CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype ), {
-
-	constructor: CubicInterpolant,
-
-	DefaultSettings_: {
-
-		endingStart: ZeroCurvatureEnding,
-		endingEnd: ZeroCurvatureEnding
-
-	},
-
-	intervalChanged_: function ( i1, t0, t1 ) {
+	intervalChanged_( i1, t0, t1 ) {
 
 		var pp = this.parameterPositions,
 			iPrev = i1 - 2,
@@ -45,7 +36,7 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 
 		if ( tPrev === undefined ) {
 
-			switch ( this.getSettings_().endingStart ) {
+			switch ( this.endingStart ) {
 
 				case ZeroSlopeEnding:
 
@@ -75,7 +66,7 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 
 		if ( tNext === undefined ) {
 
-			switch ( this.getSettings_().endingEnd ) {
+			switch ( this.endingEnd ) {
 
 				case ZeroSlopeEnding:
 
@@ -111,9 +102,9 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 		this._offsetPrev = iPrev * stride;
 		this._offsetNext = iNext * stride;
 
-	},
+	}
 
-	interpolate_: function ( i1, t0, t, t1 ) {
+	interpolate_( i1, t0, t, t1 ) {
 
 		var result = this.resultBuffer,
 			values = this.sampleValues,
@@ -150,7 +141,6 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 
 	}
 
-} );
-
+}
 
 export { CubicInterpolant };
