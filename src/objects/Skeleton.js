@@ -168,6 +168,22 @@ Object.assign( Skeleton.prototype, {
 
 		return undefined;
 
+	},
+
+	dispose: function ( name ) {
+
+		if (this.boneTexture) {
+
+			this.boneTexture.dispose();
+
+			this.boneTexture = undefined;
+
+			this.boneMatrices = undefined;
+
+			this.boneTextureSize = undefined;
+		}
+		// developer need to clean skeleton reference
+		this.disposed = true
 	}
 
 } );
