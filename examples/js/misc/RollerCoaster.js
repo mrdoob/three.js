@@ -206,9 +206,9 @@ THREE.RollerCoasterGeometry = function ( curve, divisions ) {
 
 	// console.log( vertices.length );
 
-	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
-	this.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
+	this.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
+	this.setAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
+	this.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 
 };
 
@@ -381,8 +381,8 @@ THREE.RollerCoasterLiftersGeometry = function ( curve, divisions ) {
 
 	}
 
-	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
-	this.addAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
+	this.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
+	this.setAttribute( 'normal', new THREE.BufferAttribute( new Float32Array( normals ), 3 ) );
 
 };
 
@@ -452,7 +452,7 @@ THREE.RollerCoasterShadowGeometry = function ( curve, divisions ) {
 
 	}
 
-	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
+	this.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
 };
 
@@ -483,7 +483,7 @@ THREE.SkyGeometry = function () {
 	}
 
 
-	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
+	this.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
 
 };
 
@@ -536,8 +536,8 @@ THREE.TreesGeometry = function ( landscape ) {
 
 	}
 
-	this.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
-	this.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
+	this.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
+	this.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( colors ), 3 ) );
 
 };
 

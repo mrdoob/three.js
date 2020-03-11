@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - buffergeometry</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - buffergeometry</div>
 
 		<script type="module">
 
@@ -157,15 +157,15 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
-				geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 
 				geometry.computeBoundingSphere();
 
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+					side: THREE.DoubleSide, vertexColors: true
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -178,7 +178,7 @@
 				mouse = new THREE.Vector2();
 
 				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 4 * 3 ), 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( 4 * 3 ), 3 ) );
 
 				var material = new THREE.LineBasicMaterial( { color: 0xffffff, transparent: true } );
 
@@ -259,7 +259,7 @@
 
 					mesh.updateMatrix();
 
-					line.geometry.applyMatrix( mesh.matrix );
+					line.geometry.applyMatrix4( mesh.matrix );
 
 					line.visible = true;
 

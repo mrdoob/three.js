@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - raw shader demo</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - raw shader demo</div>
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -109,8 +109,8 @@
 
 				colorAttribute.normalized = true; // this will map the buffer values to 0.0f - +1.0f in the shader
 
-				geometry.addAttribute( 'position', positionAttribute );
-				geometry.addAttribute( 'color', colorAttribute );
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'color', colorAttribute );
 
 				// material
 

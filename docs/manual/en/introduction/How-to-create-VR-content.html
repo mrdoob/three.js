@@ -20,30 +20,30 @@
 	<h2>Workflow</h2>
 
 	<p>
-		First, you have to include [link:https://github.com/mrdoob/three.js/blob/master/examples/js/vr/WebVR.js WebVR.js]
+		First, you have to include [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/VRButton.js VRButton.js]
 		into your project.
 	</p>
 
 	<code>
-import { WEBVR } from 'three/examples/jsm/vr/WebVR.js';
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 	</code>
 
 	<p>
-		*WEBVR.createButton()* does two important things: It creates a button which indicates
+		*VRButton.createButton()* does two important things: It creates a button which indicates
 		VR compatibility. Besides, it initiates a VR session if the user activates the button. The only thing you have
 		to do is to add the following line of code to your app.
 	</p>
 
 	<code>
-document.body.appendChild( WEBVR.createButton( renderer ) );
+document.body.appendChild( VRButton.createButton( renderer ) );
 	</code>
 
 	<p>
-		Next, you have to tell your instance of *WebGLRenderer* to enable VR rendering.
+		Next, you have to tell your instance of *WebGLRenderer* to enable XR rendering.
 	</p>
 
 	<code>
-renderer.vr.enabled = true;
+renderer.xr.enabled = true;
 	</code>
 
 	<p>
@@ -65,17 +65,17 @@ renderer.setAnimationLoop( function () {
 	<p>
 		Have a look at one of the official WebVR examples to see this workflow in action.<br /><br />
 
-		[example:webvr_ballshooter WebVR / ballshoter]<br />
-		[example:webvr_cubes WebVR / cubes]<br />
-		[example:webvr_dragging WebVR / dragging]<br />
-		[example:webvr_lorenzattractor WebVR / lorenzattractor]<br />
-		[example:webvr_panorama WebVR / panorama]<br />
-		[example:webvr_paint WebVR / paint]<br />
-		[example:webvr_rollercoaster WebVR / rollercoaster]<br />
-		[example:webvr_sandbox WebVR / sandbox]<br />
-		[example:webvr_sculpt WebVR / sculpt]<br />
-		[example:webvr_vive_paint WebVR / vive / paint]<br />
-		[example:webvr_vive_sculpt WebVR / vive / sculpt]<br />
+		[example:webxr_vr_ballshooter WebXR / VR / ballshooter]<br />
+		[example:webxr_vr_cubes WebXR / VR / cubes]<br />
+		[example:webxr_vr_dragging WebXR / VR / dragging]<br />
+		[example:webxr_vr_lorenzattractor WebXR / VR / lorenzattractor]<br />
+		[example:webxr_vr_paint WebXR / VR / paint]<br />
+		[example:webxr_vr_panorama_depth WebXR / VR / panorama_depth]<br />
+		[example:webxr_vr_panorama WebXR / VR / panorama]<br />
+		[example:webxr_vr_rollercoaster WebXR / VR / rollercoaster]<br />
+		[example:webxr_vr_sandbox WebXR / VR / sandbox]<br />
+		[example:webxr_vr_sculpt WebXR / VR / sculpt]<br />
+		[example:webxr_vr_video WebXR / VR / video]
 	</p>
 
 </body>

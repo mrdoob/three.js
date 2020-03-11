@@ -2,17 +2,36 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipmapLinearFilter, NearestMipmapNearestFilter } from '../../constants.js';
-import { _Math } from '../../math/Math.js';
+import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping } from '../../constants.js';
+import { MathUtils } from '../../math/MathUtils.js';
 
 function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
+
+	var isWebGL2 = capabilities.isWebGL2;
+	var maxTextures = capabilities.maxTextures;
+	var maxCubemapSize = capabilities.maxCubemapSize;
+	var maxTextureSize = capabilities.maxTextureSize;
+	var maxSamples = capabilities.maxSamples;
 
 	var _videoTextures = new WeakMap();
 	var _canvas;
 
-	//
+	// cordova iOS (as of 5.0) still uses UIWebView, which provides OffscreenCanvas,
+	// also OffscreenCanvas.getContext("webgl"), but not OffscreenCanvas.getContext("2d")!
+	// Some implementations may only implement OffscreenCanvas partially (e.g. lacking 2d).
 
-	var useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined';
+	var useOffscreenCanvas = false;
+
+	try {
+
+		useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
+			&& ( new OffscreenCanvas( 1, 1 ).getContext( "2d" ) ) !== null;
+
+	} catch ( err ) {
+
+		// Ignore any errors
+
+	}
 
 	function createCanvas( width, height ) {
 
@@ -46,7 +65,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 				( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
 				( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
 
-				var floor = needsPowerOfTwo ? _Math.floorPowerOfTwo : Math.floor;
+				var floor = needsPowerOfTwo ? MathUtils.floorPowerOfTwo : Math.floor;
 
 				var width = floor( scale * image.width );
 				var height = floor( scale * image.height );
@@ -87,13 +106,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function isPowerOfTwo( image ) {
 
-		return _Math.isPowerOfTwo( image.width ) && _Math.isPowerOfTwo( image.height );
+		return MathUtils.isPowerOfTwo( image.width ) && MathUtils.isPowerOfTwo( image.height );
 
 	}
 
 	function textureNeedsPowerOfTwo( texture ) {
 
-		if ( capabilities.isWebGL2 ) return false;
+		if ( isWebGL2 ) return false;
 
 		return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
 			( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
@@ -118,9 +137,17 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function getInternalFormat( glFormat, glType ) {
+	function getInternalFormat( internalFormatName, glFormat, glType ) {
 
-		if ( ! capabilities.isWebGL2 ) return glFormat;
+		if ( isWebGL2 === false ) return glFormat;
+
+		if ( internalFormatName !== null ) {
+
+			if ( _gl[ internalFormatName ] !== undefined ) return _gl[ internalFormatName ];
+
+			console.warn( 'THREE.WebGLRenderer: Attempt to use non-existing WebGL internal format \'' + internalFormatName + '\'' );
+
+		}
 
 		var internalFormat = glFormat;
 
@@ -242,7 +269,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		if ( renderTarget.isWebGLRenderTargetCube ) {
+		if ( renderTarget.isWebGLCubeRenderTarget ) {
 
 			for ( var i = 0; i < 6; i ++ ) {
 
@@ -277,9 +304,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var textureUnit = textureUnits;
 
-		if ( textureUnit >= capabilities.maxTextures ) {
+		if ( textureUnit >= maxTextures ) {
 
-			console.warn( 'THREE.WebGLTextures: Trying to use ' + textureUnit + ' texture units while this GPU supports only ' + capabilities.maxTextures );
+			console.warn( 'THREE.WebGLTextures: Trying to use ' + textureUnit + ' texture units while this GPU supports only ' + maxTextures );
 
 		}
 
@@ -357,104 +384,73 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function setTextureCube( texture, slot ) {
 
+		if ( texture.image.length !== 6 ) return;
+
 		var textureProperties = properties.get( texture );
 
-		if ( texture.image.length === 6 ) {
+		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
 
-			if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
+			initTexture( textureProperties, texture );
 
-				initTexture( textureProperties, texture );
+			state.activeTexture( _gl.TEXTURE0 + slot );
+			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
 
-				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
+			_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
 
-				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
+			var isCompressed = ( texture && ( texture.isCompressedTexture || texture.image[ 0 ].isCompressedTexture ) );
+			var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
 
-				var isCompressed = ( texture && texture.isCompressedTexture );
-				var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
+			var cubeImage = [];
 
-				var cubeImage = [];
+			for ( var i = 0; i < 6; i ++ ) {
 
-				for ( var i = 0; i < 6; i ++ ) {
+				if ( ! isCompressed && ! isDataTexture ) {
 
-					if ( ! isCompressed && ! isDataTexture ) {
+					cubeImage[ i ] = resizeImage( texture.image[ i ], false, true, maxCubemapSize );
 
-						cubeImage[ i ] = resizeImage( texture.image[ i ], false, true, capabilities.maxCubemapSize );
+				} else {
 
-					} else {
-
-						cubeImage[ i ] = isDataTexture ? texture.image[ i ].image : texture.image[ i ];
-
-					}
+					cubeImage[ i ] = isDataTexture ? texture.image[ i ].image : texture.image[ i ];
 
 				}
 
-				var image = cubeImage[ 0 ],
-					supportsMips = isPowerOfTwo( image ) || capabilities.isWebGL2,
-					glFormat = utils.convert( texture.format ),
-					glType = utils.convert( texture.type ),
-					glInternalFormat = getInternalFormat( glFormat, glType );
+			}
 
-				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );
+			var image = cubeImage[ 0 ],
+				supportsMips = isPowerOfTwo( image ) || isWebGL2,
+				glFormat = utils.convert( texture.format ),
+				glType = utils.convert( texture.type ),
+				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
-				var mipmaps = texture.mipmaps;
+			setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, supportsMips );
+
+			var mipmaps;
+
+			if ( isCompressed ) {
 
 				for ( var i = 0; i < 6; i ++ ) {
 
-					if ( ! isCompressed ) {
+					mipmaps = cubeImage[ i ].mipmaps;
 
-						if ( isDataTexture ) {
+					for ( var j = 0; j < mipmaps.length; j ++ ) {
 
-							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
+						var mipmap = mipmaps[ j ];
 
-							for ( var j = 0; j < mipmaps.length; ++ j ) {
+						if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-								var mipmap = mipmaps[ j ];
-								var image = mipmap.image[ i ].image;
+							if ( glFormat !== null ) {
 
-								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, image.width, image.height, 0, glFormat, glType, image.data );
+								state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+
+							} else {
+
+								console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()' );
 
 							}
 
 						} else {
 
-							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
-
-							for ( var j = 0; j < mipmaps.length; ++ j ) {
-
-								var mipmap = mipmaps[ j ];
-
-								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
-
-							}
-
-						}
-
-					} else {
-
-						var mipmaps = cubeImage[ i ].mipmaps;
-
-						for ( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
-
-							var mipmap = mipmaps[ j ];
-
-							if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
-
-								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
-
-									state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
-
-								} else {
-
-									console.warn( 'THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()' );
-
-								}
-
-							} else {
-
-								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
-
-							}
+							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
 
 						}
 
@@ -462,25 +458,62 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				textureProperties.__maxMipLevel = isCompressed ? mipmaps.length - 1 : mipmaps.length;
-
-				if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
-
-					// We assume images for cube map have the same size.
-					generateMipmap( _gl.TEXTURE_CUBE_MAP, texture, image.width, image.height );
-
-				}
-
-				textureProperties.__version = texture.version;
-
-				if ( texture.onUpdate ) texture.onUpdate( texture );
+				textureProperties.__maxMipLevel = mipmaps.length - 1;
 
 			} else {
 
-				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
+				mipmaps = texture.mipmaps;
+
+				for ( var i = 0; i < 6; i ++ ) {
+
+					if ( isDataTexture ) {
+
+						state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
+
+						for ( var j = 0; j < mipmaps.length; j ++ ) {
+
+							var mipmap = mipmaps[ j ];
+							var mipmapImage = mipmap.image[ i ].image;
+
+							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data );
+
+						}
+
+					} else {
+
+						state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+
+						for ( var j = 0; j < mipmaps.length; j ++ ) {
+
+							var mipmap = mipmaps[ j ];
+
+							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+
+						}
+
+					}
+
+				}
+
+				textureProperties.__maxMipLevel = mipmaps.length;
 
 			}
+
+			if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
+
+				// We assume images for cube map have the same size.
+				generateMipmap( _gl.TEXTURE_CUBE_MAP, texture, image.width, image.height );
+
+			}
+
+			textureProperties.__version = texture.version;
+
+			if ( texture.onUpdate ) texture.onUpdate( texture );
+
+		} else {
+
+			state.activeTexture( _gl.TEXTURE0 + slot );
+			state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__webglTexture );
 
 		}
 
@@ -493,23 +526,37 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
-	function setTextureParameters( textureType, texture, supportsMips ) {
+	var wrappingToGL = {
+		[ RepeatWrapping ]: _gl.REPEAT,
+		[ ClampToEdgeWrapping ]: _gl.CLAMP_TO_EDGE,
+		[ MirroredRepeatWrapping ]: _gl.MIRRORED_REPEAT
+	};
 
-		var extension;
+	var filterToGL = {
+		[ NearestFilter ]: _gl.NEAREST,
+		[ NearestMipmapNearestFilter ]: _gl.NEAREST_MIPMAP_NEAREST,
+		[ NearestMipmapLinearFilter ]: _gl.NEAREST_MIPMAP_LINEAR,
+
+		[ LinearFilter ]: _gl.LINEAR,
+		[ LinearMipmapNearestFilter ]: _gl.LINEAR_MIPMAP_NEAREST,
+		[ LinearMipmapLinearFilter ]: _gl.LINEAR_MIPMAP_LINEAR
+	};
+
+	function setTextureParameters( textureType, texture, supportsMips ) {
 
 		if ( supportsMips ) {
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, utils.convert( texture.wrapS ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, utils.convert( texture.wrapT ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, wrappingToGL[ texture.wrapS ] );
+			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, wrappingToGL[ texture.wrapT ] );
 
 			if ( textureType === _gl.TEXTURE_3D || textureType === _gl.TEXTURE_2D_ARRAY ) {
 
-				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, utils.convert( texture.wrapR ) );
+				_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_R, wrappingToGL[ texture.wrapR ] );
 
 			}
 
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, utils.convert( texture.magFilter ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, utils.convert( texture.minFilter ) );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterToGL[ texture.magFilter ] );
+			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterToGL[ texture.minFilter ] );
 
 		} else {
 
@@ -539,12 +586,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		extension = extensions.get( 'EXT_texture_filter_anisotropic' );
+		var extension = extensions.get( 'EXT_texture_filter_anisotropic' );
 
 		if ( extension ) {
 
 			if ( texture.type === FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
-			if ( texture.type === HalfFloatType && ( capabilities.isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
+			if ( texture.type === HalfFloatType && ( isWebGL2 || extensions.get( 'OES_texture_half_float_linear' ) ) === null ) return;
 
 			if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
 
@@ -590,12 +637,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		_gl.pixelStorei( _gl.UNPACK_ALIGNMENT, texture.unpackAlignment );
 
 		var needsPowerOfTwo = textureNeedsPowerOfTwo( texture ) && isPowerOfTwo( texture.image ) === false;
-		var image = resizeImage( texture.image, needsPowerOfTwo, false, capabilities.maxTextureSize );
+		var image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
 
-		var supportsMips = isPowerOfTwo( image ) || capabilities.isWebGL2,
+		var supportsMips = isPowerOfTwo( image ) || isWebGL2,
 			glFormat = utils.convert( texture.format ),
 			glType = utils.convert( texture.type ),
-			glInternalFormat = getInternalFormat( glFormat, glType );
+			glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
 		setTextureParameters( textureType, texture, supportsMips );
 
@@ -609,10 +656,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( texture.type === FloatType ) {
 
-				if ( ! capabilities.isWebGL2 ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
+				if ( isWebGL2 === false ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
 				glInternalFormat = _gl.DEPTH_COMPONENT32F;
 
-			} else if ( capabilities.isWebGL2 ) {
+			} else if ( isWebGL2 ) {
 
 				// WebGL 2.0 requires signed internalformat for glTexImage2D
 				glInternalFormat = _gl.DEPTH_COMPONENT16;
@@ -690,7 +737,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
-					if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
+					if ( glFormat !== null ) {
 
 						state.compressedTexImage2D( _gl.TEXTURE_2D, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
@@ -751,7 +798,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-			generateMipmap( _gl.TEXTURE_2D, texture, image.width, image.height );
+			generateMipmap( textureType, texture, image.width, image.height );
 
 		}
 
@@ -768,7 +815,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var glFormat = utils.convert( renderTarget.texture.format );
 		var glType = utils.convert( renderTarget.texture.type );
-		var glInternalFormat = getInternalFormat( glFormat, glType );
+		var glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
 		state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
@@ -818,7 +865,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			var glFormat = utils.convert( renderTarget.texture.format );
 			var glType = utils.convert( renderTarget.texture.type );
-			var glInternalFormat = getInternalFormat( glFormat, glType );
+			var glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
 
 			if ( isMultisample ) {
 
@@ -841,7 +888,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	// Setup resources for a Depth Texture for a FBO (needs an extension)
 	function setupDepthTexture( framebuffer, renderTarget ) {
 
-		var isCube = ( renderTarget && renderTarget.isWebGLRenderTargetCube );
+		var isCube = ( renderTarget && renderTarget.isWebGLCubeRenderTarget );
 		if ( isCube ) throw new Error( 'Depth Texture with cube render targets is not supported' );
 
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
@@ -888,7 +935,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		var renderTargetProperties = properties.get( renderTarget );
 
-		var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
+		var isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 
 		if ( renderTarget.depthTexture ) {
 
@@ -936,9 +983,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		info.memory.textures ++;
 
-		var isCube = ( renderTarget.isWebGLRenderTargetCube === true );
+		var isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 		var isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
-		var supportsMips = isPowerOfTwo( renderTarget ) || capabilities.isWebGL2;
+		var supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		// Setup framebuffer
 
@@ -958,15 +1005,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			if ( isMultisample ) {
 
-				if ( capabilities.isWebGL2 ) {
+				if ( isWebGL2 ) {
 
 					renderTargetProperties.__webglMultisampledFramebuffer = _gl.createFramebuffer();
 					renderTargetProperties.__webglColorRenderbuffer = _gl.createRenderbuffer();
 
 					_gl.bindRenderbuffer( _gl.RENDERBUFFER, renderTargetProperties.__webglColorRenderbuffer );
+
 					var glFormat = utils.convert( renderTarget.texture.format );
 					var glType = utils.convert( renderTarget.texture.type );
-					var glInternalFormat = getInternalFormat( glFormat, glType );
+					var glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
 					var samples = getRenderTargetSamples( renderTarget );
 					_gl.renderbufferStorageMultisample( _gl.RENDERBUFFER, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
@@ -1044,11 +1092,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function updateRenderTargetMipmap( renderTarget ) {
 
 		var texture = renderTarget.texture;
-		var supportsMips = isPowerOfTwo( renderTarget ) || capabilities.isWebGL2;
+		var supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		if ( textureNeedsGenerateMipmaps( texture, supportsMips ) ) {
 
-			var target = renderTarget.isWebGLRenderTargetCube ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+			var target = renderTarget.isWebGLCubeRenderTarget ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
 			var webglTexture = properties.get( texture ).__webglTexture;
 
 			state.bindTexture( target, webglTexture );
@@ -1063,7 +1111,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.isWebGLMultisampleRenderTarget ) {
 
-			if ( capabilities.isWebGL2 ) {
+			if ( isWebGL2 ) {
 
 				var renderTargetProperties = properties.get( renderTarget );
 
@@ -1091,8 +1139,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function getRenderTargetSamples( renderTarget ) {
 
-		return ( capabilities.isWebGL2 && renderTarget.isWebGLMultisampleRenderTarget ) ?
-			Math.min( capabilities.maxSamples, renderTarget.samples ) : 0;
+		return ( isWebGL2 && renderTarget.isWebGLMultisampleRenderTarget ) ?
+			Math.min( maxSamples, renderTarget.samples ) : 0;
 
 	}
 
@@ -1137,7 +1185,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function safeSetTextureCube( texture, slot ) {
 
-		if ( texture && texture.isWebGLRenderTargetCube ) {
+		if ( texture && texture.isWebGLCubeRenderTarget ) {
 
 			if ( warnedTextureCube === false ) {
 
@@ -1150,7 +1198,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		// currently relying on the fact that WebGLRenderTargetCube.texture is a Texture and NOT a CubeTexture
+		// currently relying on the fact that WebGLCubeRenderTarget.texture is a Texture and NOT a CubeTexture
 		// TODO: unify these code paths
 		if ( ( texture && texture.isCubeTexture ) ||
 			( Array.isArray( texture.image ) && texture.image.length === 6 ) ) {
@@ -1162,7 +1210,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else {
 
-			// assumed: texture property of THREE.WebGLRenderTargetCube
+			// assumed: texture property of THREE.WebGLCubeRenderTarget
 			setTextureCubeDynamic( texture, slot );
 
 		}

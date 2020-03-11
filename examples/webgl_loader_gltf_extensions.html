@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			<a href="https://github.com/KhronosGroup/glTF" target="_blank" rel="noopener">glTF</a> 2.0 loader<br />
 			<div id="description"></div>
 		</div>
@@ -26,9 +26,6 @@
 			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { EquirectangularToCubeGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var orbitControls;
 			var container, camera, scene, renderer, loader;
@@ -146,7 +143,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.physicallyCorrectLights = true;
 				container.appendChild( renderer.domElement );
 
@@ -157,23 +154,12 @@
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_2k.hdr', function ( texture ) {
+					.load( 'venice_sunset_1k.hdr', function ( texture ) {
 
-						var cubeGenerator = new EquirectangularToCubeGenerator( texture, { resolution: 1024 } );
-						cubeGenerator.update( renderer );
-
-						background = cubeGenerator.renderTarget;
-
-						var pmremGenerator = new PMREMGenerator( cubeGenerator.renderTarget.texture );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
-
+						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+
+						background = envMap;
 
 						//
 
@@ -182,6 +168,9 @@
 						animate();
 
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 			}
 
@@ -267,8 +256,10 @@
 
 				loader = new GLTFLoader();
 
-				DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
-				loader.setDRACOLoader( new DRACOLoader() );
+				var dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+				loader.setDRACOLoader( dracoLoader );
+
 				loader.setDDSLoader( new DDSLoader() );
 
 				var url = sceneInfo.url.replace( /%s/g, state.extension );

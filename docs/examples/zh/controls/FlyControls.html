@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] enables a navigation similar to fly modes in DCC tools like Blender. You can arbitrarily transform the camera in
+			3D space without any limitations (e.g. focus on a specific target).
+		</p>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_fly misc / controls / fly ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera object]: The camera to be controlled.
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+			</p>
+			<p>
+				Creates a new instance of [name].
+			</p>
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean autoForward]</h3>
+		<p>
+			If set to *true*, the camera automatically moves forward (and does not stop) when initially translated. Default is *false*.
+		</p>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
+			not set up new event listeners.
+		</p>
+
+		<h3>[property:Boolean dragToLook]</h3>
+		<p>
+			If set to *true*, you can only look around by performing a drag interaction. Default is *false*.
+		</p>
+
+		<h3>[property:Number movementSpeed]</h3>
+		<p>
+			The movement speed. Default is *1*.
+		</p>
+
+		<h3>[property:Camera object]</h3>
+		<p>
+			The camera to be controlled.
+		</p>
+
+		<h3>[property:Number rollSpeed]</h3>
+		<p>
+			The rotation speed. Default is *0.005*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null dispose] ()</h3>
+		<p>
+			Should be called if the controls is no longer required.
+		</p>
+
+		<h3>[method:null update] ( [param:Number delta] )</h3>
+		<p>
+			<p>
+				[page:Number delta]: Time delta value.
+			</p>
+			<p>
+				Updates the controls. Usually called in the animation loop.
+			</p>
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/FlyControls.js examples/jsm/controls/FlyControls.js]
+		</p>
+	</body>
+</html>

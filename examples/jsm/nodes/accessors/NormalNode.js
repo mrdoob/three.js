@@ -9,12 +9,13 @@ function NormalNode( scope ) {
 
 	TempNode.call( this, 'v3' );
 
-	this.scope = scope || NormalNode.LOCAL;
+	this.scope = scope || NormalNode.VIEW;
 
 }
 
 NormalNode.LOCAL = 'local';
 NormalNode.WORLD = 'world';
+NormalNode.VIEW = 'view';
 
 NormalNode.prototype = Object.create( TempNode.prototype );
 NormalNode.prototype.constructor = NormalNode;
@@ -28,15 +29,46 @@ NormalNode.prototype.getShared = function () {
 
 };
 
+NormalNode.prototype.build = function ( builder, output, uuid, ns ) {
+
+	var contextNormal = builder.context[ this.scope + 'Normal' ];
+
+	if ( contextNormal ) {
+
+		return contextNormal.build( builder, output, uuid, ns );
+
+	}
+
+	return TempNode.prototype.build.call( this, builder, output, uuid );
+
+};
+
 NormalNode.prototype.generate = function ( builder, output ) {
 
 	var result;
 
 	switch ( this.scope ) {
 
+		case NormalNode.VIEW:
+
+			if ( builder.isShader( 'vertex' ) ) result = 'transformedNormal';
+			else result = 'geometryNormal';
+
+			break;
+
 		case NormalNode.LOCAL:
 
-			result = 'normal';
+			if ( builder.isShader( 'vertex' ) ) {
+
+				result = 'objectNormal';
+
+			} else {
+
+				builder.requires.normal = true;
+
+				result = 'vObjectNormal';
+
+			}
 
 			break;
 
@@ -44,11 +76,13 @@ NormalNode.prototype.generate = function ( builder, output ) {
 
 			if ( builder.isShader( 'vertex' ) ) {
 
-				result = '( modelMatrix * vec4( objectNormal, 0.0 ) ).xyz';
+				result = 'inverseTransformDirection( transformedNormal, viewMatrix ).xyz';
 
 			} else {
 
-				result = 'inverseTransformDirection( normal, viewMatrix )';
+				builder.requires.worldNormal = true;
+
+				result = 'vWNormal';
 
 			}
 
@@ -86,9 +120,15 @@ NormalNode.prototype.toJSON = function ( meta ) {
 
 };
 
-NodeLib.addKeyword( 'normal', function () {
+NodeLib.addKeyword( 'viewNormal', function () {
 
-	return new NormalNode();
+	return new NormalNode( NormalNode.VIEW );
+
+} );
+
+NodeLib.addKeyword( 'localNormal', function () {
+
+	return new NormalNode( NormalNode.NORMAL );
 
 } );
 

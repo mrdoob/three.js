@@ -77,7 +77,7 @@
 
 		<canvas id="c"></canvas>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements with text - webgl</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple elements with text - webgl</div>
 
 		<script type="module">
 
@@ -147,8 +147,8 @@
 
 					}
 
-					geometry0.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-					geometry1.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices.slice(), 3 ) );
+					geometry0.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+					geometry1.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices.slice(), 3 ) );
 
 					var index = Math.floor( colors.length * Math.random() );
 

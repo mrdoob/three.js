@@ -33,6 +33,7 @@ export enum ShadowMapType {}
 export const BasicShadowMap: ShadowMapType;
 export const PCFShadowMap: ShadowMapType;
 export const PCFSoftShadowMap: ShadowMapType;
+export const VSMShadowMap: ShadowMapType;
 
 // MATERIAL CONSTANTS
 
@@ -46,12 +47,6 @@ export const DoubleSide: Side;
 export enum Shading {}
 export const FlatShading: Shading;
 export const SmoothShading: Shading;
-
-// colors
-export enum Colors {}
-export const NoColors: Colors;
-export const FaceColors: Colors;
-export const VertexColors: Colors;
 
 // blending modes
 export enum Blending {}
@@ -114,6 +109,7 @@ export const LinearToneMapping: ToneMapping;
 export const ReinhardToneMapping: ToneMapping;
 export const Uncharted2ToneMapping: ToneMapping;
 export const CineonToneMapping: ToneMapping;
+export const ACESFilmicToneMapping: ToneMapping;
 
 // Mapping modes
 export enum Mapping {}
@@ -155,13 +151,10 @@ export const IntType: TextureDataType;
 export const UnsignedIntType: TextureDataType;
 export const FloatType: TextureDataType;
 export const HalfFloatType: TextureDataType;
-
-// Pixel types
-export enum PixelType {}
-export const UnsignedShort4444Type: PixelType;
-export const UnsignedShort5551Type: PixelType;
-export const UnsignedShort565Type: PixelType;
-export const UnsignedInt248Type: PixelType;
+export const UnsignedShort4444Type: TextureDataType;
+export const UnsignedShort5551Type: TextureDataType;
+export const UnsignedShort565Type: TextureDataType;
+export const UnsignedInt248Type: TextureDataType;
 
 // Pixel formats
 export enum PixelFormat {}
@@ -174,6 +167,74 @@ export const RGBEFormat: PixelFormat;
 export const DepthFormat: PixelFormat;
 export const DepthStencilFormat: PixelFormat;
 export const RedFormat: PixelFormat;
+export const RedIntegerFormat: PixelFormat;
+export const RGFormat: PixelFormat;
+export const RGIntegerFormat: PixelFormat;
+export const RGBIntegerFormat: PixelFormat;
+export const RGBAIntegerFormat: PixelFormat;
+
+// Internal Pixel Formats
+export type PixelFormatGPU =
+	'ALPHA'
+	| 'RGB'
+	| 'RGBA'
+	| 'LUMINANCE'
+	| 'LUMINANCE_ALPHA'
+	| 'RED_INTEGER'
+	| 'R8'
+	| 'R8_SNORM'
+	| 'R8I'
+	| 'R8UI'
+	| 'R16I'
+	| 'R16UI'
+	| 'R16F'
+	| 'R32I'
+	| 'R32UI'
+	| 'R32F'
+	| 'RG8'
+	| 'RG8_SNORM'
+	| 'RG8I'
+	| 'RG8UI'
+	| 'RG16I'
+	| 'RG16UI'
+	| 'RG16F'
+	| 'RG32I'
+	| 'RG32UI'
+	| 'RG32F'
+	| 'RGB565'
+	| 'RGB8'
+	| 'RGB8_SNORM'
+	| 'RGB8I'
+	| 'RGB8UI'
+	| 'RGB16I'
+	| 'RGB16UI'
+	| 'RGB16F'
+	| 'RGB32I'
+	| 'RGB32UI'
+	| 'RGB32F'
+	| 'RGB9_E5'
+	| 'SRGB8'
+	| 'R11F_G11F_B10F'
+	| 'RGBA4'
+	| 'RGBA8'
+	| 'RGBA8_SNORM'
+	| 'RGBA8I'
+	| 'RGBA8UI'
+	| 'RGBA16I'
+	| 'RGBA16UI'
+	| 'RGBA16F'
+	| 'RGBA32I'
+	| 'RGBA32UI'
+	| 'RGBA32F'
+	| 'RGB5_A1'
+	| 'RGB10_A2'
+	| 'RGB10_A2UI'
+	| 'SRGB8_ALPHA8'
+	| 'DEPTH_COMPONENT16'
+	| 'DEPTH_COMPONENT24'
+	| 'DEPTH_COMPONENT32F'
+	| 'DEPTH24_STENCIL8'
+	| 'DEPTH32F_STENCIL8';
 
 // Compressed texture formats
 // DDS / ST3C Compressed texture formats
@@ -191,6 +252,8 @@ export const RGBA_PVRTC_2BPPV1_Format: CompressedPixelFormat;
 
 // ETC compressed texture formats
 export const RGB_ETC1_Format: CompressedPixelFormat;
+export const RGB_ETC2_Format: CompressedPixelFormat;
+export const RGBA_ETC2_EAC_Format: CompressedPixelFormat;
 
 // ASTC compressed texture formats
 export const RGBA_ASTC_4x4_Format: CompressedPixelFormat;
@@ -207,6 +270,20 @@ export const RGBA_ASTC_10x8_Format: CompressedPixelFormat;
 export const RGBA_ASTC_10x10_Format: CompressedPixelFormat;
 export const RGBA_ASTC_12x10_Format: CompressedPixelFormat;
 export const RGBA_ASTC_12x12_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_4x4_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_5x4_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_5x5_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_6x5_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_6x6_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_8x5_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_8x6_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_8x8_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_10x5_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_10x6_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_10x8_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_10x10_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_12x10_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_12x12_Format: CompressedPixelFormat;
 
 // Loop styles for AnimationAction
 export enum AnimationActionLoopStyles {}
@@ -274,3 +351,15 @@ export const GreaterStencilFunc: StencilFunc;
 export const NotEqualStencilFunc: StencilFunc;
 export const GreaterEqualStencilFunc: StencilFunc;
 export const AlwaysStencilFunc: StencilFunc;
+
+// usage types
+export enum Usage {}
+export const StaticDrawUsage: Usage;
+export const DynamicDrawUsage: Usage;
+export const StreamDrawUsage: Usage;
+export const StaticReadUsage: Usage;
+export const DynamicReadUsage: Usage;
+export const StreamReadUsage: Usage;
+export const StaticCopyUsage: Usage;
+export const DynamicCopyUsage: Usage;
+export const StreamCopyUsage: Usage;

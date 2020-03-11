@@ -27,7 +27,7 @@ export class Vector3 implements Vector {
 	x: number;
 	y: number;
 	z: number;
-	isVector3: true;
+	readonly isVector3: true;
 
 	/**
 	 * Sets value of this vector.
@@ -71,7 +71,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Adds v to this vector.
 	 */
-	add( a: Vector3, b?: Vector3 ): this;
+	add( v: Vector3, w?: Vector3 ): this;
 
 	addScalar( s: number ): this;
 
@@ -108,6 +108,8 @@ export class Vector3 implements Vector {
 	applyAxisAngle( axis: Vector3, angle: number ): this;
 
 	applyMatrix3( m: Matrix3 ): this;
+
+	applyNormalMatrix( m: Matrix3 ): this;
 
 	applyMatrix4( m: Matrix4 ): this;
 
@@ -242,13 +244,26 @@ export class Vector3 implements Vector {
 	setFromMatrixPosition( m: Matrix4 ): this;
 	setFromMatrixScale( m: Matrix4 ): this;
 	setFromMatrixColumn( matrix: Matrix4, index: number ): this;
+	setFromMatrix3Column( matrix: Matrix3, index: number ): this;
 
 	/**
 	 * Checks for strict equality of this vector and v.
 	 */
 	equals( v: Vector3 ): boolean;
 
-	fromArray( xyz: number[], offset?: number ): Vector3;
+	/**
+	 * Sets this vector's x, y and z value from the provided array.
+	 * @param array the source array.
+	 * @param offset (optional) offset into the array. Default is 0.
+	 */
+	fromArray( array: number[], offset?: number ): this;
+
+	/**
+	 * Sets this vector's x, y and z value from the provided array-like.
+	 * @param array the source array-like.
+	 * @param offset (optional) offset into the array-like. Default is 0.
+	 */
+	fromArray( array: ArrayLike<number>, offset?: number ): this;
 
 	/**
 	 * Returns an array [x, y, z], or copies x, y and z into the provided array.
@@ -256,15 +271,15 @@ export class Vector3 implements Vector {
 	 * @param offset (optional) optional offset into the array.
 	 * @return The created or provided array.
 	 */
-	toArray( xyz?: number[], offset?: number ): number[];
+	toArray( array?: number[], offset?: number ): number[];
 
 	/**
 	 * Copies x, y and z into the provided array-like.
 	 * @param array array-like to store the vector to.
-	 * @param offset (optional) optional offset into the array.
+	 * @param offset (optional) optional offset into the array-like.
 	 * @return The provided array-like.
 	 */
-	toArray( xyz: ArrayLike<number>, offset?: number ): ArrayLike<number>;
+	toArray( array: ArrayLike<number>, offset?: number ): ArrayLike<number>;
 
 	fromBufferAttribute(
 		attribute: BufferAttribute,

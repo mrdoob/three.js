@@ -1,19 +1,17 @@
 import { LoadingManager } from './LoadingManager';
+import { Loader } from './Loader';
 import { AnimationClip } from './../animation/AnimationClip';
 
-export class AnimationLoader {
+export class AnimationLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
 
-	manager: LoadingManager;
-
 	load(
 		url: string,
-		onLoad?: ( response: string | ArrayBuffer ) => void,
+		onLoad: ( response: AnimationClip[] ) => void,
 		onProgress?: ( request: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
-	): any;
+	): void;
 	parse( json: any ): AnimationClip[];
-	setPath( path: string ): AnimationLoader;
 
 }

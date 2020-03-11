@@ -1,19 +1,14 @@
 import {
-  Group,
-  LoadingManager
+	Group,
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
-export class FBXLoader {
-  constructor(manager?: LoadingManager);
-  manager: LoadingManager;
-  crossOrigin: string;
-  path: string;
-  resourcePath: string;
+export class FBXLoader extends Loader {
 
-  load(url: string, onLoad: (object: Group) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setPath(path: string) : this;
-  setResourcePath(path: string) : this;
-  setCrossOrigin(value: string): this;
+	constructor( manager?: LoadingManager );
 
-  parse(FBXBuffer: ArrayBuffer | string, path: string) : Group;
+	load( url: string, onLoad: ( object: Group ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	parse( FBXBuffer: ArrayBuffer | string, path: string ) : Group;
+
 }

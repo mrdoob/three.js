@@ -130,10 +130,31 @@ function WebGLRenderList() {
 
 	}
 
-	function sort() {
+	function sort( customOpaqueSort, customTransparentSort ) {
 
-		if ( opaque.length > 1 ) opaque.sort( painterSortStable );
-		if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
+		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
+		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
+
+	}
+
+	function finish() {
+
+		// Clear references from inactive renderItems in the list
+
+		for ( var i = renderItemsIndex, il = renderItems.length; i < il; i ++ ) {
+
+			var renderItem = renderItems[ i ];
+
+			if ( renderItem.id === null ) break;
+
+			renderItem.id = null;
+			renderItem.object = null;
+			renderItem.geometry = null;
+			renderItem.material = null;
+			renderItem.program = null;
+			renderItem.group = null;
+
+		}
 
 	}
 
@@ -144,6 +165,7 @@ function WebGLRenderList() {
 		init: init,
 		push: push,
 		unshift: unshift,
+		finish: finish,
 
 		sort: sort
 	};

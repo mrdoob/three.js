@@ -64,8 +64,6 @@ function MeshMatcapMaterial( parameters ) {
 	this.morphTargets = false;
 	this.morphNormals = false;
 
-	this.lights = false;
-
 	this.setValues( parameters );
 
 }

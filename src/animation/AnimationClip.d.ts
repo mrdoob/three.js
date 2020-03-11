@@ -12,9 +12,11 @@ export class AnimationClip {
 	uuid: string;
 	results: any[];
 
-	resetDuration(): void;
+	resetDuration(): AnimationClip;
 	trim(): AnimationClip;
+	validate(): boolean;
 	optimize(): AnimationClip;
+	clone(): AnimationClip;
 
 	static CreateFromMorphTargetSequence(
 		name: string,

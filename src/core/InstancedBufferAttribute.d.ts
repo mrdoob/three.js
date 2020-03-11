@@ -2,7 +2,7 @@ import { BufferGeometry } from './BufferGeometry';
 import { BufferAttribute } from './BufferAttribute';
 
 /**
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/examples/js/BufferGeometryUtils.js">examples/js/BufferGeometryUtils.js</a>
+ * @see <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/BufferGeometryUtils.js">examples/jsm/utils/BufferGeometryUtils.js</a>
  */
 export namespace BufferGeometryUtils {
 	export function mergeBufferGeometries(

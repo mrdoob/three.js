@@ -1,6 +1,6 @@
 import { AnimationClip } from '../animation/AnimationClip.js';
 import { FileLoader } from './FileLoader.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
 /**
  * @author bhouston / http://clara.io/
@@ -8,11 +8,13 @@ import { DefaultLoadingManager } from './LoadingManager.js';
 
 function AnimationLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( AnimationLoader.prototype, {
+AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+
+	constructor: AnimationLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -41,13 +43,6 @@ Object.assign( AnimationLoader.prototype, {
 		}
 
 		return animations;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	}
 

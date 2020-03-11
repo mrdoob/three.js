@@ -6,7 +6,7 @@
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';
 
 import { AnimationClip } from '../../../../src/animation/AnimationClip';
-import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import { Mesh } from '../../../../src/objects/Mesh';
@@ -19,8 +19,7 @@ import { VectorKeyframeTrack } from '../../../../src/animation/tracks/VectorKeyf
 import {
 	DoubleSide,
 	InterpolateLinear,
-	InterpolateDiscrete,
-	VertexColors,
+	InterpolateDiscrete
 } from '../../../../src/constants.js';
 
 export default QUnit.module( 'Exporters', () => {
@@ -59,7 +58,7 @@ export default QUnit.module( 'Exporters', () => {
 			var done = assert.async();
 
 			var box = new Mesh(
-				new BoxGeometry( 1, 1, 1 ),
+				new BoxBufferGeometry( 1, 1, 1 ),
 				new MeshStandardMaterial( { color: 0xFF0000 } )
 			);
 
@@ -81,8 +80,8 @@ export default QUnit.module( 'Exporters', () => {
 				assert.smartEqual( {
 
 					baseColorFactor: [ 1, 0, 0, 1 ],
-					metallicFactor: 0.5,
-					roughnessFactor: 0.5
+					metallicFactor: 0.0,
+					roughnessFactor: 1.0
 
 				}, material.pbrMetallicRoughness, 'material' );
 
@@ -151,11 +150,11 @@ export default QUnit.module( 'Exporters', () => {
 			var positions = new Float32Array( ( numElements ) * 3 );
 			var colors = new Float32Array( ( numElements ) * 3 );
 
-			geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
-			geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 			geometry.setDrawRange( 0, 0 );
 
-			var empty = new Mesh( geometry, new MeshBasicMaterial( { side: DoubleSide, vertexColors: VertexColors } ) );
+			var empty = new Mesh( geometry, new MeshBasicMaterial( { side: DoubleSide, vertexColors: true } ) );
 			empty.name = 'Custom buffered empty (drawrange)';
 			scene.add( empty );
 
@@ -187,7 +186,7 @@ export default QUnit.module( 'Exporters', () => {
 
 			var geometry = new BufferGeometry();
 			var position = new BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 1, 1, 0, 1 ] ), 3 );
-			geometry.addAttribute( 'position',	position );
+			geometry.setAttribute( 'position',	position );
 			geometry.morphAttributes.position = [ position, position, position, position ];
 
 			var mesh = new Mesh( geometry );
@@ -314,7 +313,7 @@ export default QUnit.module( 'Exporters', () => {
 
 			var geometry = new BufferGeometry();
 			var position = new BufferAttribute( new Float32Array( [ 0, 0, 0, 0, 0, 1, 1, 0, 1 ] ), 3 );
-			geometry.addAttribute( 'position',	position );
+			geometry.setAttribute( 'position',	position );
 			geometry.morphAttributes.position = [ position, position ];
 
 			var mesh = new Mesh( geometry );

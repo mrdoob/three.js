@@ -14,8 +14,8 @@ THREE.LineSegmentsGeometry = function () {
 	var index = [ 0, 2, 1, 2, 3, 1, 2, 4, 3, 4, 5, 3, 4, 6, 5, 6, 7, 5 ];
 
 	this.setIndex( index );
-	this.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-	this.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+	this.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+	this.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
 
 };
 
@@ -25,16 +25,16 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 	isLineSegmentsGeometry: true,
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		var start = this.attributes.instanceStart;
 		var end = this.attributes.instanceEnd;
 
 		if ( start !== undefined ) {
 
-			matrix.applyToBufferAttribute( start );
+			start.applyMatrix4( matrix );
 
-			matrix.applyToBufferAttribute( end );
+			end.applyMatrix4( matrix );
 
 			start.data.needsUpdate = true;
 
@@ -72,8 +72,8 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 		var instanceBuffer = new THREE.InstancedInterleavedBuffer( lineSegments, 6, 1 ); // xyz, xyz
 
-		this.addAttribute( 'instanceStart', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
-		this.addAttribute( 'instanceEnd', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
+		this.setAttribute( 'instanceStart', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 0 ) ); // xyz
+		this.setAttribute( 'instanceEnd', new THREE.InterleavedBufferAttribute( instanceBuffer, 3, 3 ) ); // xyz
 
 		//
 
@@ -100,8 +100,8 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 		var instanceColorBuffer = new THREE.InstancedInterleavedBuffer( colors, 6, 1 ); // rgb, rgb
 
-		this.addAttribute( 'instanceColorStart', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
-		this.addAttribute( 'instanceColorEnd', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
+		this.setAttribute( 'instanceColorStart', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 0 ) ); // rgb
+		this.setAttribute( 'instanceColorEnd', new THREE.InterleavedBufferAttribute( instanceColorBuffer, 3, 3 ) ); // rgb
 
 		return this;
 
@@ -241,17 +241,11 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 	},
 
-	clone: function () {
+	applyMatrix: function ( matrix ) {
 
-		// todo
+		console.warn( 'THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().' );
 
-	},
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
+		return this.applyMatrix4( matrix );
 
 	}
 

@@ -3,20 +3,20 @@
  */
 
 import {
-	DefaultLoadingManager,
 	FileLoader,
 	Group,
+	Loader,
 	LoadingManager
 } from "../../../build/three.module.js";
 import { ColladaLoader } from "../loaders/ColladaLoader.js";
 
 var KMZLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-KMZLoader.prototype = {
+KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: KMZLoader,
 
@@ -32,13 +32,6 @@ KMZLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -117,6 +110,6 @@ KMZLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { KMZLoader };

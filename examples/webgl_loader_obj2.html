@@ -44,7 +44,7 @@
 
 		</div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 direct loader test
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 direct loader test
 			<div id="feedback"></div>
 		</div>
 
@@ -130,7 +130,7 @@
 					let onLoadMtl = function ( mtlParseResult ) {
 						objLoader2.setModelName( modelName );
 						objLoader2.setLogging( true, true );
-						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ) );
+						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
 						objLoader2.load( 'models/obj/female02/female02.obj', callbackOnLoad, null, null, null );
 					};
 					let mtlLoader = new MTLLoader();

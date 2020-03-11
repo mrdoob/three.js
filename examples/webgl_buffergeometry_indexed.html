@@ -14,7 +14,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - indexed</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - indexed</div>
 
 		<script type="module">
 
@@ -106,13 +106,13 @@
 				//
 
 				geometry.setIndex( indices );
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-				geometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				var material = new THREE.MeshPhongMaterial( {
 					side: THREE.DoubleSide,
-					vertexColors: THREE.VertexColors
+					vertexColors: true
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );

@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - particles</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - particles</div>
 
 		<script type="x-shader/x-vertex" id="vertexshader">
 
@@ -102,9 +102,9 @@
 				}
 
 				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
-				geometry.addAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'customColor', new THREE.BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'size', new THREE.BufferAttribute( sizes, 1 ) );
 
 				//
 

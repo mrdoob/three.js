@@ -465,6 +465,20 @@ function setValueV4i( gl, v ) {
 
 }
 
+// uint
+
+function setValueV1ui( gl, v ) {
+
+	var cache = this.cache;
+
+	if ( cache[ 0 ] === v ) return;
+
+	gl.uniform1ui( this.addr, v );
+
+	cache[ 0 ] = v;
+
+}
+
 // Helper to pick the right setter for the singular case
 
 function getSingularSetter( type ) {
@@ -480,15 +494,36 @@ function getSingularSetter( type ) {
 		case 0x8b5b: return setValueM3; // _MAT3
 		case 0x8b5c: return setValueM4; // _MAT4
 
-		case 0x8b5e: case 0x8d66: return setValueT1; // SAMPLER_2D, SAMPLER_EXTERNAL_OES
-		case 0x8b5f: return setValueT3D1; // SAMPLER_3D
-		case 0x8b60: return setValueT6; // SAMPLER_CUBE
-		case 0x8DC1: return setValueT2DArray1; // SAMPLER_2D_ARRAY
-
 		case 0x1404: case 0x8b56: return setValueV1i; // INT, BOOL
 		case 0x8b53: case 0x8b57: return setValueV2i; // _VEC2
 		case 0x8b54: case 0x8b58: return setValueV3i; // _VEC3
 		case 0x8b55: case 0x8b59: return setValueV4i; // _VEC4
+
+		case 0x1405: return setValueV1ui; // UINT
+
+		case 0x8b5e: // SAMPLER_2D
+		case 0x8d66: // SAMPLER_EXTERNAL_OES
+		case 0x8dca: // INT_SAMPLER_2D
+		case 0x8dd2: // UNSIGNED_INT_SAMPLER_2D
+		case 0x8b62: // SAMPLER_2D_SHADOW
+			return setValueT1;
+
+		case 0x8b5f: // SAMPLER_3D
+		case 0x8dcb: // INT_SAMPLER_3D
+		case 0x8dd3: // UNSIGNED_INT_SAMPLER_3D
+			return setValueT3D1;
+
+		case 0x8b60: // SAMPLER_CUBE
+		case 0x8dcc: // INT_SAMPLER_CUBE
+		case 0x8dd4: // UNSIGNED_INT_SAMPLER_CUBE
+		case 0x8dc5: // SAMPLER_CUBE_SHADOW
+			return setValueT6;
+
+		case 0x8dc1: // SAMPLER_2D_ARRAY
+		case 0x8dcf: // INT_SAMPLER_2D_ARRAY
+		case 0x8dd7: // UNSIGNED_INT_SAMPLER_2D_ARRAY
+		case 0x8dc4: // SAMPLER_2D_ARRAY_SHADOW
+			return setValueT2DArray1;
 
 	}
 
@@ -628,13 +663,23 @@ function getPureArraySetter( type ) {
 		case 0x8b5b: return setValueM3Array; // _MAT3
 		case 0x8b5c: return setValueM4Array; // _MAT4
 
-		case 0x8b5e: return setValueT1Array; // SAMPLER_2D
-		case 0x8b60: return setValueT6Array; // SAMPLER_CUBE
-
 		case 0x1404: case 0x8b56: return setValueV1iArray; // INT, BOOL
 		case 0x8b53: case 0x8b57: return setValueV2iArray; // _VEC2
 		case 0x8b54: case 0x8b58: return setValueV3iArray; // _VEC3
 		case 0x8b55: case 0x8b59: return setValueV4iArray; // _VEC4
+
+		case 0x8b5e: // SAMPLER_2D
+		case 0x8d66: // SAMPLER_EXTERNAL_OES
+		case 0x8dca: // INT_SAMPLER_2D
+		case 0x8dd2: // UNSIGNED_INT_SAMPLER_2D
+		case 0x8b62: // SAMPLER_2D_SHADOW
+			return setValueT1Array;
+
+		case 0x8b60: // SAMPLER_CUBE
+		case 0x8dcc: // INT_SAMPLER_CUBE
+		case 0x8dd4: // UNSIGNED_INT_SAMPLER_CUBE
+		case 0x8dc5: // SAMPLER_CUBE_SHADOW
+			return setValueT6Array;
 
 	}
 

@@ -21,10 +21,10 @@
 import {
 	BufferGeometry,
 	Color,
-	DefaultLoadingManager,
 	FileLoader,
 	Float32BufferAttribute,
 	Group,
+	Loader,
 	LoaderUtils,
 	Mesh,
 	MeshPhongMaterial
@@ -32,11 +32,11 @@ import {
 
 var AMFLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-AMFLoader.prototype = {
+AMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: AMFLoader,
 
@@ -52,13 +52,6 @@ AMFLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -475,11 +468,11 @@ AMFLoader.prototype = {
 					var material = objDefaultMaterial;
 
 					newGeometry.setIndex( volume.triangles );
-					newGeometry.addAttribute( 'position', vertices.clone() );
+					newGeometry.setAttribute( 'position', vertices.clone() );
 
 					if ( normals ) {
 
-						newGeometry.addAttribute( 'normal', normals.clone() );
+						newGeometry.setAttribute( 'normal', normals.clone() );
 
 					}
 
@@ -504,6 +497,6 @@ AMFLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { AMFLoader };

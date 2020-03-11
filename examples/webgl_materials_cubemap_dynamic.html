@@ -8,13 +8,11 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - materials - dynamic cube reflection<br/>Photo by <a href="http://www.flickr.com/photos/jonragnarsson/2294472375/" target="_blank" rel="noopener">J&oacute;n Ragnarsson</a>.</div>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
-			import { CubemapGenerator } from './jsm/loaders/EquirectangularToCubeGenerator.js';
 
 			var camera, scene, renderer;
 			var cube, sphere, torus, material;
@@ -50,14 +48,12 @@
 				// background
 
 				var options = {
-					resolution: 1024,
-
 					generateMipmaps: true,
 					minFilter: THREE.LinearMipmapLinearFilter,
 					magFilter: THREE.LinearFilter
 				};
 
-				scene.background = new CubemapGenerator( renderer ).fromEquirectangular( texture, options );
+				scene.background = new THREE.WebGLCubeRenderTarget( 1024, options ).fromEquirectangularTexture( renderer, texture );
 
 				//
 
@@ -139,7 +135,7 @@
 
 				var fov = camera.fov + event.deltaY * 0.05;
 
-				camera.fov = THREE.Math.clamp( fov, 10, 75 );
+				camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
 
 				camera.updateProjectionMatrix();
 
@@ -159,8 +155,8 @@
 				lon += .15;
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = THREE.Math.degToRad( 90 - lat );
-				theta = THREE.Math.degToRad( lon );
+				phi = THREE.MathUtils.degToRad( 90 - lat );
+				theta = THREE.MathUtils.degToRad( lon );
 
 				cube.position.x = Math.cos( time * 0.001 ) * 30;
 				cube.position.y = Math.sin( time * 0.001 ) * 30;
@@ -182,25 +178,21 @@
 
 				camera.lookAt( scene.position );
 
-				sphere.visible = false;
-
 				// pingpong
 
 				if ( count % 2 === 0 ) {
 
+					cubeCamera1.update( renderer, scene );
 					material.envMap = cubeCamera1.renderTarget.texture;
-					cubeCamera2.update( renderer, scene );
 
 				} else {
 
+					cubeCamera2.update( renderer, scene );
 					material.envMap = cubeCamera2.renderTarget.texture;
-					cubeCamera1.update( renderer, scene );
 
 				}
 
 				count ++;
-
-				sphere.visible = true;
 
 				renderer.render( scene, camera );
 

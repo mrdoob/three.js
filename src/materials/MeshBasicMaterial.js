@@ -70,8 +70,6 @@ function MeshBasicMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 
-	this.lights = false;
-
 	this.setValues( parameters );
 
 }

@@ -4,8 +4,6 @@ import { DirectionalLightShadow } from './DirectionalLightShadow';
 import { Light } from './Light';
 
 /**
- * Affects objects using MeshLambertMaterial or MeshPhongMaterial.
- *
  * @example
  * // White directional light at half intensity shining from the top.
  * var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
@@ -30,5 +28,6 @@ export class DirectionalLight extends Light {
 	intensity: number;
 
 	shadow: DirectionalLightShadow;
+	readonly isDirectionalLight: true;
 
 }

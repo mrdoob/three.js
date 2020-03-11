@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Unbiased Manual Supersamling Anti-Aliasing (SSAA) pass by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a><br/><br/>
 			This example shows how to unbias the rounding errors accumulated using high number of SSAA samples on a 8-bit per channel buffer.<br/><br/>
 			Turn off the "unbiased" feature to see the banding that results from accumulated rounding errors.
 		</div>
@@ -96,7 +96,7 @@
 				cameraO = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 3, 10 );
 				cameraO.position.z = 7;
 
-				var fov = THREE.Math.degToRad( cameraP.fov );
+				var fov = THREE.MathUtils.degToRad( cameraP.fov );
 				var hyperfocus = ( cameraP.near + cameraP.far ) / 2;
 				var _height = 2 * Math.tan( fov / 2 ) * hyperfocus;
 				cameraO.zoom = height / _height;

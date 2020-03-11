@@ -20,11 +20,11 @@
 
 THREE.AMFLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 };
 
-THREE.AMFLoader.prototype = {
+THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.AMFLoader,
 
@@ -40,13 +40,6 @@ THREE.AMFLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -463,11 +456,11 @@ THREE.AMFLoader.prototype = {
 					var material = objDefaultMaterial;
 
 					newGeometry.setIndex( volume.triangles );
-					newGeometry.addAttribute( 'position', vertices.clone() );
+					newGeometry.setAttribute( 'position', vertices.clone() );
 
 					if ( normals ) {
 
-						newGeometry.addAttribute( 'normal', normals.clone() );
+						newGeometry.setAttribute( 'normal', normals.clone() );
 
 					}
 
@@ -492,4 +485,4 @@ THREE.AMFLoader.prototype = {
 
 	}
 
-};
+} );

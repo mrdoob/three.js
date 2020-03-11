@@ -1,23 +1,18 @@
 import {
-  LoadingManager
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
 import { GLTFLoader, GLTF } from './GLTFLoader';
 import { DRACOLoader } from './DRACOLoader';
 
-export class VRMLoader {
-  constructor(manager?: LoadingManager);
-  gltfLoader: GLTFLoader;
-  manager: LoadingManager;
-  path: string;
-  resourcePath: string;
-  crossOrigin: string;
+export class VRMLoader extends Loader {
 
-  load(url: string, onLoad: (scene: GLTF) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void) : void;
-  setDRACOLoader(dracoLoader: DRACOLoader): this;
-  setPath(path: string): this;
-  setResourcePath(path: string): this;
-  setCrossOrigin(path: string): this;
+	constructor( manager?: LoadingManager );
+	gltfLoader: GLTFLoader;
 
-  parse(gltf: GLTF, onLoad: (scene: GLTF) => void): void;
+	load( url: string, onLoad: ( scene: GLTF ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
+	parse( gltf: GLTF, onLoad: ( scene: GLTF ) => void ): void;
+	setDRACOLoader( dracoLoader: DRACOLoader ): this;
+
 }

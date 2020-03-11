@@ -30,11 +30,7 @@ THREE.RectAreaLightUniformsLib = {
 		// data textures
 
 		var ltc_1 = new THREE.DataTexture( new Float32Array( LTC_MAT_1 ), 64, 64, THREE.RGBAFormat, THREE.FloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
-
 		var ltc_2 = new THREE.DataTexture( new Float32Array( LTC_MAT_2 ), 64, 64, THREE.RGBAFormat, THREE.FloatType, THREE.UVMapping, THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping, THREE.LinearFilter, THREE.NearestFilter, 1 );
-
-		ltc_1.needsUpdate = true;
-		ltc_2.needsUpdate = true;
 
 		THREE.UniformsLib.LTC_1 = ltc_1;
 		THREE.UniformsLib.LTC_2 = ltc_2;

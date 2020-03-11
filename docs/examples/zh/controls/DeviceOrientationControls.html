@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Can be used to orient the camera based on the mobile device's orientation.
+		</p>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_deviceorientation misc / controls / deviceorientation ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Camera object] )</h3>
+		<p>
+			<p>
+				[page:Camera object]: The camera to be controlled.
+			</p>
+			<p>
+				Creates a new instance of [name].
+			</p>
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Number alphaOffset]</h3>
+		<p>
+			The alpha offset in radians. Default is *0*.
+		</p>
+
+		<h3>[property:Object deviceOrientation]</h3>
+		<p>
+			The current *deviceorientation* event object.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			Whether or not the controls are enabled.
+		</p>
+
+		<h3>[property:Camera object]</h3>
+		<p>
+			The camera to be controlled.
+		</p>
+
+		<h3>[property:Number screenOrientation]</h3>
+		<p>
+			The orientation in degrees (in 90-degree increments) of the viewport relative to the device's natural orientation. Default is *0*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null connect] ()</h3>
+		<p>
+			Adds the event listeners of the controls and enables it.
+		</p>
+
+		<h3>[method:null disconnect] ()</h3>
+		<p>
+			Removes the event listeners of the controls and disables it.
+		</p>
+
+		<h3>[method:null dispose] ()</h3>
+		<p>
+			Should be called if the controls is no longer required.
+		</p>
+
+		<h3>[method:null update] ()</h3>
+		<p>
+			Updates the controls. Usually called in the animation loop.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/DeviceOrientationControls.js examples/jsm/controls/DeviceOrientationControls.js]
+		</p>
+	</body>
+</html>

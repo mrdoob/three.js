@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - vertex colors</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - vertex colors</div>
 
 		<script type="module">
 
@@ -95,7 +95,7 @@
 				var geometry1 = new THREE.IcosahedronBufferGeometry( radius, 1 );
 
 				var count = geometry1.attributes.position.count;
-				geometry1.addAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
+				geometry1.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( count * 3 ), 3 ) );
 
 				var geometry2 = geometry1.clone();
 				var geometry3 = geometry1.clone();
@@ -124,7 +124,7 @@
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xffffff,
 					flatShading: true,
-					vertexColors: THREE.VertexColors,
+					vertexColors: true,
 					shininess: 0
 				} );
 

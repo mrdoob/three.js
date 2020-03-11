@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
 			<button id="export">Export COLLADA</button>
 		</div>
 
@@ -73,8 +73,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
@@ -88,16 +87,18 @@
 				var textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
+				textureMap.encoding = THREE.sRGBEncoding;
 
 				// REFLECTION MAP
-				var path = "textures/cube/skybox/";
+				var path = "textures/cube/pisa/";
 				var urls = [
-					path + "px.jpg", path + "nx.jpg",
-					path + "py.jpg", path + "ny.jpg",
-					path + "pz.jpg", path + "nz.jpg"
+					path + "px.png", path + "nx.png",
+					path + "py.png", path + "ny.png",
+					path + "pz.png", path + "nz.png"
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.encoding = THREE.sRGBEncoding;
 
 				// MATERIALS
 				var materialColor = new THREE.Color();

@@ -10,7 +10,7 @@
 	<body>
 
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br />
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shadowmap - models by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br />
 		move camera with WASD / RF + mouse<br />
 		t: toggle HUD
 		</div>
@@ -65,27 +65,18 @@
 				scene.background = new THREE.Color( 0x59472b );
 				scene.fog = new THREE.Fog( 0x59472b, 1000, FAR );
 
-				controls = new FirstPersonControls( camera );
-
-				controls.lookSpeed = 0.0125;
-				controls.movementSpeed = 500;
-				controls.noFly = false;
-				controls.lookVertical = true;
-
-				controls.lookAt( scene.position );
-
 				// LIGHTS
 
 				var ambient = new THREE.AmbientLight( 0x444444 );
 				scene.add( ambient );
 
-				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 2 );
+				light = new THREE.SpotLight( 0xffffff, 1, 0, Math.PI / 5, 0.3 );
 				light.position.set( 0, 1500, 1000 );
 				light.target.position.set( 0, 0, 0 );
 
 				light.castShadow = true;
-
-				light.shadow = new THREE.LightShadow( new THREE.PerspectiveCamera( 50, 1, 1200, 2500 ) );
+				light.shadow.camera.near = 1200;
+				light.shadow.camera.far = 2500;
 				light.shadow.bias = 0.0001;
 
 				light.shadow.mapSize.width = SHADOW_MAP_WIDTH;
@@ -103,14 +94,24 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
-				renderer.gammaFactor = 2.2;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.autoClear = false;
 
 				//
 
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFShadowMap;
+
+				// CONTROLS
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+
+				controls.lookSpeed = 0.0125;
+				controls.movementSpeed = 500;
+				controls.noFly = false;
+				controls.lookVertical = true;
+
+				controls.lookAt( scene.position );
 
 				// STATS
 

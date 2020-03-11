@@ -8,7 +8,7 @@
 	</head>
 	<body>
 
-		<video id="video" loop muted crossOrigin="anonymous" webkit-playsinline style="display:none">
+		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
 			<source src="textures/kinect.webm">
 			<source src="textures/kinect.mp4">
 		</video>
@@ -90,7 +90,7 @@
 
 				var info = document.createElement( 'div' );
 				info.id = 'info';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - kinect';
 				document.body.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -120,7 +120,7 @@
 
 					}
 
-					geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+					geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 					material = new THREE.ShaderMaterial( {
 

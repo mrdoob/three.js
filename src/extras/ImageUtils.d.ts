@@ -1,12 +1,12 @@
 import { Mapping } from '../constants';
 import { Texture } from '../textures/Texture';
 
-// Extras /////////////////////////////////////////////////////////////////////
-
-/**
- * @deprecated Use {@link TextureLoader} instead.
- */
 export namespace ImageUtils {
+
+	export function getDataURL(
+		image: any,
+	): string;
+
 	/**
 	 * @deprecated
 	 */

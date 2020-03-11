@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - lensflares<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - lensflares<br/>
 			textures from <a href="http://ro.me">ro.me</a><br/>
 			fly with WASD/RF/QE + mouse
 		</div>
@@ -42,14 +42,6 @@
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 15000 );
 				camera.position.z = 250;
-
-				controls = new FlyControls( camera );
-
-				controls.movementSpeed = 2500;
-				controls.domElement = container;
-				controls.rollSpeed = Math.PI / 6;
-				controls.autoForward = false;
-				controls.dragToLook = false;
 
 				// scene
 
@@ -123,12 +115,18 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				//
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				controls = new FlyControls( camera, renderer.domElement );
+
+				controls.movementSpeed = 2500;
+				controls.domElement = container;
+				controls.rollSpeed = Math.PI / 6;
+				controls.autoForward = false;
+				controls.dragToLook = false;
 
 				// stats
 

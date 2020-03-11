@@ -206,7 +206,7 @@ THREE.VolumeSlice.prototype = {
 			this.mesh.geometry = this.geometry;
 			//reset mesh matrix
 			this.mesh.matrix.identity();
-			this.mesh.applyMatrix( this.matrix );
+			this.mesh.applyMatrix4( this.matrix );
 
 		}
 

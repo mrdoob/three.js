@@ -26,9 +26,11 @@ import {
 
 var OrbitControls = function ( object, domElement ) {
 
-	this.object = object;
+	if ( domElement === undefined ) console.warn( 'THREE.OrbitControls: The second parameter "domElement" is now mandatory.' );
+	if ( domElement === document ) console.error( 'THREE.OrbitControls: "document" should not be used as the target "domElement". Please use "renderer.domElement" instead.' );
 
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+	this.object = object;
+	this.domElement = domElement;
 
 	// Set to false to disable this control
 	this.enabled = true;
@@ -266,7 +268,7 @@ var OrbitControls = function ( object, domElement ) {
 		document.removeEventListener( 'mousemove', onMouseMove, false );
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-		window.removeEventListener( 'keydown', onKeyDown, false );
+		scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
 
 		//scope.dispatchEvent( { type: 'dispose' } ); // should this be added here?
 
@@ -388,7 +390,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		return function pan( deltaX, deltaY ) {
 
-			var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+			var element = scope.domElement;
 
 			if ( scope.object.isPerspectiveCamera ) {
 
@@ -492,7 +494,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+		var element = scope.domElement;
 
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
@@ -680,7 +682,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		rotateDelta.subVectors( rotateEnd, rotateStart ).multiplyScalar( scope.rotateSpeed );
 
-		var element = scope.domElement === document ? scope.domElement.body : scope.domElement;
+		var element = scope.domElement;
 
 		rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
@@ -761,7 +763,6 @@ var OrbitControls = function ( object, domElement ) {
 		if ( scope.enabled === false ) return;
 
 		// Prevent the browser from scrolling.
-
 		event.preventDefault();
 
 		// Manually set the focus since calling preventDefault above
@@ -769,119 +770,90 @@ var OrbitControls = function ( object, domElement ) {
 
 		scope.domElement.focus ? scope.domElement.focus() : window.focus();
 
+		var mouseAction;
+
 		switch ( event.button ) {
 
 			case 0:
 
-				switch ( scope.mouseButtons.LEFT ) {
-
-					case MOUSE.ROTATE:
-
-						if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
-
-							if ( scope.enablePan === false ) return;
-
-							handleMouseDownPan( event );
-
-							state = STATE.PAN;
-
-						} else {
-
-							if ( scope.enableRotate === false ) return;
-
-							handleMouseDownRotate( event );
-
-							state = STATE.ROTATE;
-
-						}
-
-						break;
-
-					case MOUSE.PAN:
-
-						if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
-
-							if ( scope.enableRotate === false ) return;
-
-							handleMouseDownRotate( event );
-
-							state = STATE.ROTATE;
-
-						} else {
-
-							if ( scope.enablePan === false ) return;
-
-							handleMouseDownPan( event );
-
-							state = STATE.PAN;
-
-						}
-
-						break;
-
-					default:
-
-						state = STATE.NONE;
-
-				}
-
+				mouseAction = scope.mouseButtons.LEFT;
 				break;
-
 
 			case 1:
 
-				switch ( scope.mouseButtons.MIDDLE ) {
-
-					case MOUSE.DOLLY:
-
-						if ( scope.enableZoom === false ) return;
-
-						handleMouseDownDolly( event );
-
-						state = STATE.DOLLY;
-
-						break;
-
-
-					default:
-
-						state = STATE.NONE;
-
-				}
-
+				mouseAction = scope.mouseButtons.MIDDLE;
 				break;
 
 			case 2:
 
-				switch ( scope.mouseButtons.RIGHT ) {
+				mouseAction = scope.mouseButtons.RIGHT;
+				break;
 
-					case MOUSE.ROTATE:
+			default:
 
-						if ( scope.enableRotate === false ) return;
+				mouseAction = - 1;
 
-						handleMouseDownRotate( event );
+		}
 
-						state = STATE.ROTATE;
+		switch ( mouseAction ) {
 
-						break;
+			case MOUSE.DOLLY:
 
-					case MOUSE.PAN:
+				if ( scope.enableZoom === false ) return;
 
-						if ( scope.enablePan === false ) return;
+				handleMouseDownDolly( event );
 
-						handleMouseDownPan( event );
+				state = STATE.DOLLY;
 
-						state = STATE.PAN;
+				break;
 
-						break;
+			case MOUSE.ROTATE:
 
-					default:
+				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
-						state = STATE.NONE;
+					if ( scope.enablePan === false ) return;
+
+					handleMouseDownPan( event );
+
+					state = STATE.PAN;
+
+				} else {
+
+					if ( scope.enableRotate === false ) return;
+
+					handleMouseDownRotate( event );
+
+					state = STATE.ROTATE;
 
 				}
 
 				break;
+
+			case MOUSE.PAN:
+
+				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+
+					if ( scope.enableRotate === false ) return;
+
+					handleMouseDownRotate( event );
+
+					state = STATE.ROTATE;
+
+				} else {
+
+					if ( scope.enablePan === false ) return;
+
+					handleMouseDownPan( event );
+
+					state = STATE.PAN;
+
+				}
+
+				break;
+
+			default:
+
+				state = STATE.NONE;
 
 		}
 
@@ -974,7 +946,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		event.preventDefault();
+		event.preventDefault(); // prevent scrolling
 
 		switch ( event.touches.length ) {
 
@@ -1060,7 +1032,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		event.preventDefault();
+		event.preventDefault(); // prevent scrolling
 		event.stopPropagation();
 
 		switch ( state ) {
@@ -1144,7 +1116,15 @@ var OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
 
-	window.addEventListener( 'keydown', onKeyDown, false );
+	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
+
+	// make sure element can receive keys.
+
+	if ( scope.domElement.tabIndex === - 1 ) {
+
+		scope.domElement.tabIndex = 0;
+
+	}
 
 	// force an update at start
 
