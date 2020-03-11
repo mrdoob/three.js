@@ -21,6 +21,6 @@ export class Skeleton {
 	clone(): Skeleton;
 	getBoneByName( name: string ): undefined | Bone;
 
-	dispose();
+	dispose() :void ;
 
 }
