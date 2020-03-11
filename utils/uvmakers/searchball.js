@@ -1,4 +1,8 @@
-const puppeteer = require('puppeteer');
+/**
+ * @author munrocket / https://twitter.com/munrocket_twit
+ */
+
+const puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const size = 2048;
@@ -8,34 +12,38 @@ const server = http.createServer( ( request, response ) => handler( request, res
 server.listen( 1234, async () => await pup );
 server.on( 'SIGINT', () => process.exit( 1 ) );
 
-const pup = puppeteer.launch().then( async browser => {
+const pup = puppeteer.launch( { headless: false } ).then( async browser => {
 
 	const page = ( await browser.pages() )[ 0 ];
   await page.setViewport( { width: size, height: size } );
-	await page.goto( 'http://localhost:1234/utils/uvmappers/searchball.html' );
-	await page.screenshot({ path: './examples/screenshots/all_in_one.jpg', fullPage: true, type: 'jpeg', quality: 95, });
+	await page.goto( 'http://localhost:1234/utils/uvmakers/searchball.html' );
+	await page.screenshot( { path: './examples/screenshots/all_in_one.jpg', fullPage: true, type: 'jpeg', quality: 95 } );
 
-	await new Promise( function ( resolve ) {
+	await page.evaluate( async ( renderTimeout ) => {
 
-		let renderStart = performance.wow();
-		let waitingLoop = setInterval( function () {
+		await new Promise( ( resolve ) => {
 
-			let renderEcceded = ( performance.wow() - renderStart > renderTimeout );
-			if ( window.chromeRenderFinished || renderEcceded ) {
+			let renderStart = performance.now();
+			let waitingLoop = setInterval( function () {
 
-				if ( renderEcceded ) {
+				let renderEcceded = ( performance.now() - renderStart > renderTimeout );
+				if ( window.chromeRenderFinished || renderEcceded ) {
 
-					console.error( 'Error. Render timeout exceeded...' );
+					if ( renderEcceded ) {
+
+						console.log( 'Warning. Render timeout exceeded...' );
+
+					}
+					clearInterval( waitingLoop );
+					resolve();
 
 				}
-				clearInterval( waitingLoop );
-				resolve();
 
-			}
+			}, 1000 );
 
-		}, 200 );
+		});
 
-	} );
+	}, renderTimeout );
 
 	server.close();
 	browser.close();

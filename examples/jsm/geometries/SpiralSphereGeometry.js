@@ -1,5 +1,5 @@
 /**
- * @author munrocket / https://github.com/munrocket
+ * @author munrocket / https://twitter.com/munrocket_twit
  */
 
 import {
@@ -7,96 +7,116 @@ import {
 	Float32BufferAttribute
 } from "../../../build/three.module.js";
 
-var SpiralSphereGeometry = function ( radius, turns, tiles, tilesQuads, gap ) {
+var SpiralSphereGeometry = function ( radius, turns, gapX, gapY, tileX, tileY, tiles ) {
 
-	gap = 0.5 * gap;
+	gapX = gapX / turns || 0;
+	gapY = gapY / turns || 0;
+	tileX = tileX || 8;
+	tileY = tileY || 8;
+	tiles = tiles || Math.floor( 4 * turns * turns / Math.PI );
+
 	var vertices = [];
 	var indices = [];
-	var tileIds = [];
+	var ids = [];
 	var uvs = [];
 
 	function parameter( i ) {
 
-		return Math.acos( Math.cos( Math.PI / 2 / turns ) * ( 1 - 2 * i / ( tiles * tilesQuads ) ) )
-			- ( turns + 1 ) * Math.PI / 2 / turns;
+		return Math.acos( Math.cos( Math.PI / 2 / turns ) * ( 1 - 2 * i / ( ( tiles - 2 ) * tileX ) ) )
+				- ( turns + 1 ) * Math.PI / 2 / turns;
 
 	}
 
-	function pushAttibutes( theta, phi, id ) {
+	function pushVert( theta, phi ) {
 
-		var x = Math.cos( theta ) * Math.cos( phi )
-		var y = - Math.sin( theta );
-		var z = Math.cos( theta ) * Math.sin( phi );
+		var x = radius * Math.cos( theta ) * Math.cos( phi )
+		var y = - radius * Math.sin( theta );
+		var z = radius * Math.cos( theta ) * Math.sin( phi );
+		vertices.push( x, y, z );
 
-		vertices.push( radius * x );
-		vertices.push( radius * y );
-		vertices.push( radius * z );
+	}
 
-		var manhattan = Math.abs( x ) + Math.abs( y ) + Math.abs( z );
-		x = x / manhattan;
-		y = y / manhattan;
-		z = - z / manhattan;
+	for ( var id = 0; id < tiles - 2; id ++ ) {
 
-		if ( y < 0 ) {
-			var t = x;
-			x = ( 1 - Math.abs( z ) ) * Math.sign( x );
-			z = ( 1 - Math.abs( t ) ) * Math.sign( z );
+		for ( var i = 0; i <= tileX; i ++ ) {
+
+			var u = i / tileX;
+			var t = parameter( id * tileX + i + 2 * turns * ( gapY - 2 * gapY * u + ( gapY - 2 * gapY * id / ( tiles - 2 ) ) / 3 ) );
+
+			for ( var j = 0; j <= tileY; j ++ ) {
+
+				var v = j / tileY;
+				pushVert( t + gapX - ( 2 * gapX - Math.PI / turns ) * v, ( Math.PI + 2 * t ) * turns );
+				ids.push( id + 1 );
+				uvs.push( u, 1 - v );
+
+			}
+
 		}
 
-		uvs.push( x * 0.5 + 0.5, z * 0.5 + 0.5 );
-		tileIds.push( id );
+		for ( var i = 0; i < tileX; i ++ ) {
+
+			for ( var j = 0; j < tileY; j ++ ) {
+
+				var k = ( tileY + 1 ) * ( id * ( tileX + 1 ) + i ) + j;
+				indices.push( k + tileY + 1, k + 1, k );
+				indices.push( k + tileY + 2, k + 1, k + tileY + 1 );
+
+			}
+
+		}
 
 	}
 
-	for ( var i = 0; i <= tiles * tilesQuads; i ++ ) {
+	/* Special case for the poles */
 
-		var t = parameter( i );
-		var id = Math.floor( i / tilesQuads ) + 1;
-		pushAttibutes( t + gap, turns * Math.PI + 2 * turns * t, id );
-		t += Math.PI / turns ;
-		pushAttibutes( t - gap, turns * Math.PI + 2 * turns * t, id );
+	var iMax = 1 + Math.floor( ( tiles - 2 ) * tileX / 4 *
+			( 1 - Math.sin( ( turns + 3 ) * Math.PI / 2 / turns ) / Math.cos( Math.PI / 2 / turns ) ) );
+	var skip = ( tiles - 2 ) * ( tileX + 1 ) * ( tileY + 1 );
+	var t0 = - Math.PI / 2;
+
+	for ( var pol = 0; pol < 2; pol ++ ) {
+
+		var sign = 1 - 2 * pol;
+
+		for ( var i = 0; i <= iMax; i ++ ) {
+
+			var u = i / iMax;
+			var t = t0 + u * ( Math.PI / turns ) - gapY * u / turns;
+			var t1 = t0 + ( gapX ? gapX * Math.pow( u, 0.15 / gapX ) : 0 );
+			var t2 = Math.max( t0, t - gapX );
+			t2 = ( t1 < t2 ) ? t2 : t1;
+
+			for ( var j = 0; j <= tileY; j ++ ) {
+
+				var v = j / tileY;
+				pushVert( sign * ( t1 * ( 1 - v ) + t2 * v ), turns * ( Math.PI + sign * 2 * t ) );
+				ids.push( pol * ( tiles - 1 ) );
+				uvs.push( u, 1 - pol - sign * v );
+
+			}
+
+		}
+
+		for ( var i = 0; i < iMax; i ++ ) {
+
+			for ( var j = 0; j < tileY; j ++ ) {
+
+				var k = skip + ( tileY + 1 ) * ( pol * ( iMax + 1 ) + i ) + j;
+				indices.push( k + tileY + 1, k + 1, k );
+				indices.push( k + tileY + 2, k + 1, k + tileY + 1 );
+
+			}
+
+		}
 
 	}
-
-	for ( var i = 0; i < 2 * tiles * tilesQuads; i += 2 ) {
-
-		indices.push( i + 3, i + 1, i );
-		indices.push( i + 2, i + 3, i );
-
-	}
-
-	// special case for the poles
-
-	var skip = 2 * tiles * tilesQuads + 2;
-	var count = 0;
-
-	for ( var i = 1; parameter( i ) < parameter( 0 ) + Math.PI / turns; i += 2 ) {
-
-		var t = parameter( i );
-		pushAttibutes( t - gap, turns * Math.PI + 2 * turns * t, 0 );
-		pushAttibutes( gap - t, turns * Math.PI - 2 * turns * t, tiles + 1 );
-		count ++;
-
-	}
-
-	for ( var i = 0; i < count - 1; i ++ ) {
-
-		var j = skip + 2 * i;
-		indices.push( 0, j + 2, j );
-		indices.push( skip - 1, j + 3, j + 1 );
-
-	}
-
-	indices.push( 0, 1, skip + 2 * ( count - 2 ) + 2 );
-	indices.push( skip - 1, skip - 2, skip + 2 * ( count - 1 ) + 1 );
-
-	// build geometry
 
 	var geometry = new BufferGeometry();
 	geometry.setIndex( indices );
 	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	geometry.setAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
-	geometry.setAttribute( 'tile_id', new Float32BufferAttribute( tileIds, 1 ) );
+	geometry.setAttribute( 'id', new Float32BufferAttribute( ids, 1 ) );
 
 	return geometry;
 

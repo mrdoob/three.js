@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<!--
+	@author munrocket / https://twitter.com/munrocket_twit
+-->
 <html lang="en">
 	<head>
 		<title>three.js examples</title>
@@ -10,13 +13,22 @@
 
 	<body>
 
+		<script src="files.js"></script>
+
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SpiralSphereGeometry } from './jsm/geometries/SpiralSphereGeometry.js';
 
-			var camera, controls, scene, renderer;
+			var camera, camPos, controls, scene, renderer;
+
+			var tiles = 0;
+			for ( var key in files ) {
+
+				tiles += files[ key ].length;
+
+			}
 
 			init();
 			animate();
@@ -26,11 +38,11 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				//renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 10 );
-				camera.position.set( 0, 1.7, 1.2 );
+				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camPos = new THREE.Vector3( 0, 1.5, 1 );
+				camera.position.set( camPos.x, camPos.y, camPos.z );
 
 				// controls
 
@@ -43,15 +55,30 @@
 				controls.enablePan = false;
 				controls.enableKeys = false;
 
-				controls.minDistance = 1.01;
-				controls.maxDistance = 5;
+				controls.minDistance = 1.05;
+				controls.maxDistance = 10;
 
-				// world
+				// scene
 
-				var geometry = new SpiralSphereGeometry( 1, 20, 365, 10, 0.0015 );
+				var tSize = Math.ceil( Math.sqrt( tiles ) );
+				var turns = Math.PI / Math.sqrt( 4 * Math.PI / tiles / 800 * 600);
+
+				var geometry = new SpiralSphereGeometry( 1, turns, 0.03, 0.03, 15, 15, tiles );
+				for( var tile = 0; tile < geometry.attributes.id.count; tile ++ ) {
+
+					var id = geometry.attributes.id.array[ tile ];
+					var i = Math.floor( id / tSize );
+					var u0 = id / tSize - i;
+					var v0 = 1. - ( i + 1. ) / tSize;
+
+					geometry.attributes.uv.array[ 2 * tile ] /=  tSize;
+					geometry.attributes.uv.array[ 2 * tile ] += u0;
+					geometry.attributes.uv.array[ 2 * tile + 1 ] /= tSize;
+					geometry.attributes.uv.array[ 2 * tile + 1 ] += v0;
+
+				}
+
 				var texture = new THREE.TextureLoader().load( './screenshots/all_in_one.jpg' );
-				//texture.encoding = THREE.sRGBEncoding;
-				//geometry.computeVertexNormals();
 				var material = new THREE.MeshBasicMaterial( {	map: texture } );
 				var mesh = new THREE.Mesh( geometry, material );
 
@@ -59,21 +86,9 @@
 				scene.add( mesh );
 				scene.background = new THREE.Color( 0xffffff );
 
-				// lights
+				// resize
 
-				var light = new THREE.DirectionalLight( 0xffefee );
-				light.position.set( 1, 1, 0 );
-				scene.add( light );
-
-				var light = new THREE.DirectionalLight( 0x2266aa );
-				light.position.set( - 1, - 1, 0 );
-				scene.add( light );
-
-				var light = new THREE.AmbientLight( 0x222222 );
-				scene.add( light );
-
-				//
-
+				onWindowResize();
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -82,6 +97,13 @@
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
+
+				if ( camera.aspect < 1 ) {
+
+					var q = 1 / camera.aspect;
+					camera.position.set( q * camPos.x, q * camPos.y, q * camPos.z );
+
+				}
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 

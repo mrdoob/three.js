@@ -1,7 +1,10 @@
 <!DOCTYPE html>
+<!--
+	@author munrocket / https://twitter.com/munrocket_twit
+-->
 <html lang="en">
 <head>
-	<title>Octahedron sphere mapping</title>
+	<title>Screenshot tile mapping</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
@@ -13,32 +16,42 @@
 	<div id="container"></div>
 
 	<script id="vertexShader" type="x-shader/x-vertex">
-		attribute vec2 tile_uv;
-		attribute float tile_id;
+		uniform float uSize;
+
 		varying vec2 vUv;
-		varying float vId;
 
-		void main()	{
+		void main()  {
 
-			vUv = tile_uv;
-			vId = tile_id;
-			gl_Position = vec4( uv * 2.0 - 1.0, 0.0, 1.0 );
+			vUv = uv.xy;
+			gl_Position = vec4( position, 1.0 );
 
 		}
 	</script>
 
 	<script id="fragmentShader" type="x-shader/x-fragment">
 		varying vec2 vUv;
-		varying float vId;
-		uniform sampler2D screenshot;
+
 		uniform float uId;
+		uniform float uSize;
+		uniform sampler2D uTile;
 
-		void main()	{
+		void main()  {
 
-			if ( abs( vId - uId ) < 0.3 ) {
-				gl_FragColor = texture2D( screenshot, vUv );
+			vec2 uv = fract( vUv * uSize );
+
+			float u0 = fract( uId / uSize );
+			float u1 = u0 + 1. / uSize;
+			float v0 = 1. - ( floor( uId / uSize ) + 1. ) / uSize;
+			float v1 = v0 + 1. / uSize;
+
+			if ( u0 < vUv.x && vUv.x < u1 && v0 < vUv.y && vUv.y < v1 ) {
+
+				gl_FragColor = texture2D( uTile, uv);
+
 			} else {
-				gl_FragColor = vec4( 0. );
+
+				discard;
+
 			}
 
 		}
@@ -49,123 +62,105 @@
 	<script type="module">
 
 		import * as THREE from '../../build/three.module.js';
-		import { SpiralSphereGeometry } from '../../examples/jsm/geometries/SpiralSphereGeometry.js';
+
+		const resolution = 4096;
 
 		let container, camera, scene, target, geometry, material, mesh, screenshots;
 		let renderer, _scene, _mesh, _material;
 
-		window.chromeRenderFinished = false;
-		let tiles = 365;
-		const turns = 20;
-		const tilesQuads = 100;
-		const gap = 0;
-		const size = 2048;
+		let tiles = 0;
+		let id = 0;
+		for ( var key in files ) {
 
-		init();
-
-		function computeTilesAttributes( tiles, tilesQuads, count ) {
-
-			let tile_uv = [];
-			let tile_id = [];
-
-			for ( let i = 0; i <= tiles * tilesQuads; i ++ ) {
-
-				let tileId = Math.floor( i / tilesQuads ) + 1;
-				let vertId = Math.floor( i % tilesQuads );
-				let x = vertId / tilesQuads;
-				tile_uv.push( x, 1 );
-				tile_uv.push( x, 0 );
-				tile_id.push( tileId, tileId );
-
-			}
-
-			for ( let i = tiles * tilesQuads + 1; i < count; i += 2 ) {
-
-				let x = i / tilesQuads;
-				tile_uv.push( 0, 0 );
-				tile_uv.push( 0, 1 );
-				tile_id.push( 0, 0 );
-
-			}
-
-			return {
-				tile_uv: new THREE.Float32BufferAttribute( tile_uv, 2 ),
-				tile_id: new THREE.Float32BufferAttribute( tile_id, 1 )
-			};
+			tiles += files[ key ].length;
 
 		}
+		const size = Math.ceil( Math.sqrt( tiles ) );
+		window.chromeRenderFinished = false;
+
+		init();
 
 		function init() {
 
 			screenshots = [];
-			for (var key in files) {
-				var section = files[key];
-				for (var i = 0; i < section.length; i++) {
-					screenshots.push(
-						new Promise(
-							resolve => new THREE.TextureLoader()
-								.load( '../../examples/screenshots/' + section[ i ] + '.png', resolve )
-						)
-					);
+
+			for ( var key in files ) {
+
+				var section = files[ key ];
+				for (var i = 0; i < section.length; i ++ ) {
+
+					var file = '../../examples/screenshots/' + section[ i ] + '.png';
+					screenshots.push( new Promise( resolve => new THREE.TextureLoader().load( file, resolve ) ) );
+
 				}
+
 			}
 
 			Promise.all( screenshots ).then( result => {
 
 				screenshots = result;
-				geometry = new SpiralSphereGeometry( 1, turns, tiles, tilesQuads, gap );
-				var attributes = computeTilesAttributes( tiles, tilesQuads, geometry.attributes.uv.count );
-				geometry.setAttribute( 'tile_uv', attributes.tile_uv );
-				geometry.setAttribute( 'tile_id', attributes.tile_id );
+
+				geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 				material = new THREE.ShaderMaterial( {
 					uniforms: {
-						'screenshot': { value: screenshots[ 0 ] },
-						'uId': { value: 0 }
+						'uTile': { value: screenshots[ 0 ] },
+						'uId': { value: 0 },
+						'uSize': { value: size }
 					},
 					vertexShader: document.getElementById( 'vertexShader' ).textContent,
 					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 				} );
 				material.blending = THREE.CustomBlending;
-				material.alphaTest = 0.1;
-				material.needsUpdate = true;
 				mesh = new THREE.Mesh( geometry, material );
 
 				camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
 				scene = new THREE.Scene();
 				scene.add( mesh );
-				target = new THREE.WebGLRenderTarget( size, size, { depthBuffer: false, stencilBuffer: false } );
+				target = new THREE.WebGLRenderTarget( resolution, resolution, { depthBuffer: false, stencilBuffer: false } );
 
 				_material = new THREE.MeshBasicMaterial( { map: target.texture } );
-				_mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
+				_mesh = new THREE.Mesh( geometry, _material );
 				_scene = new THREE.Scene();
 				_scene.add( _mesh );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.setSize( size, size );
+				renderer.setSize( resolution, resolution );
 				renderer.autoClearColor = false;
 				renderer.preserveDrawingBuffer = true;
 
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
-				render();
+				requestAnimationFrame( render );
 
-			})
+			} )
 
 		}
 
 		function render() {
 
-			for (let id = 0; id < tiles; id ++ ) {
-				renderer.setRenderTarget( target );
-				material.uniforms.uId.value = id + 1;
-				material.uniforms.screenshot.value = screenshots[ id ];
-				renderer.render( scene, camera );
+			if ( id < tiles ) {
+
+				for ( let i = 0; i < 40; i++ ) {
+
+					renderer.setRenderTarget( target );
+					material.uniforms.uId.value = id;
+					material.uniforms.uTile.value = screenshots[ id ];
+					renderer.render( scene, camera );
+					id ++;
+
+				}
+
+			} else {
+
+				window.chromeRenderFinished = true;
+
 			}
 
 			renderer.setRenderTarget( null );
 			renderer.render( _scene, camera );
-			window.chromeRenderFinished = true;
+
+			requestAnimationFrame( render );
 
 		}
 
