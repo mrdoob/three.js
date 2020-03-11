@@ -178,15 +178,7 @@ Object.assign( Skeleton.prototype, {
 
 			this.boneTexture = undefined;
 
-			this.boneMatrices = undefined;
-
-			this.boneTextureSize = undefined;
-
 		}
-
-		// developer need to clean skeleton reference
-
-		this.disposed = true;
 
 	}
 
