@@ -1776,14 +1776,14 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.skinning ) {
 
-			p_uniforms.setOptional( _gl, object, 'bindMatrix' );
-			p_uniforms.setOptional( _gl, object, 'bindMatrixInverse' );
-
 			var skeleton = object.skeleton;
 
 			if ( skeleton && !skeleton.disposed ) {
 
 				var bones = skeleton.bones;
+
+				p_uniforms.setOptional( _gl, object, 'bindMatrix' );
+				p_uniforms.setOptional( _gl, object, 'bindMatrixInverse' );	
 
 				if ( capabilities.floatVertexTextures ) {
 
