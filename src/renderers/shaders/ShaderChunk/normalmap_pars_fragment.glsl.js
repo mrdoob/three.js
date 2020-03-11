@@ -1,4 +1,4 @@
-export default /* glsl */ `
+export default /* glsl */`
 #ifdef USE_NORMALMAP
 
 	uniform sampler2D normalMap;
@@ -29,9 +29,9 @@ export default /* glsl */ `
 		float scale = sign( st1.t * st0.s - st0.t * st1.s ); // we do not care about the magnitude
 
 		// This avoids NaNs with degenerate UV coordinates
-        if ( scale == 0.0 ) {
+		if ( scale == 0.0 ) {
 
-            return normalize( surf_norm );
+			return normalize( surf_norm );
 
 		}
 		
