@@ -7,7 +7,7 @@ import {
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Line3,
-	Math as _Math,
+	MathUtils,
 	Matrix4,
 	Mesh,
 	Vector3,
@@ -167,7 +167,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 				line.at( param, closestPoint );
 
 				// check if the intersection point is within clip space
-				var zPos = _Math.lerp( start.z, end.z, param );
+				var zPos = MathUtils.lerp( start.z, end.z, param );
 				var isInClipSpace = zPos >= - 1 && zPos <= 1;
 
 				var isInside = ssOrigin3.distanceTo( closestPoint ) < lineWidth * 0.5;

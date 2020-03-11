@@ -19,21 +19,22 @@
 			so it won't work with [page:Sprite Sprites].
 		</p>
 
-
-		<h2>Example</h2>
-
-		<div>[example:webgl_helpers WebGL / helpers]</div>
-		<div>[example:webgl_loader_nrrd WebGL / loader / nrrd]</div>
-		<div>[example:webgl_buffergeometry_drawcalls advanced / buffergeometry / drawcalls]</div>
-
+		<h2>Code Example</h2>
 
 		<code>
-			var sphere = new THREE.SphereGeometry();
-			var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
-			var box = new THREE.BoxHelper( object, 0xffff00 );
-			scene.add( box );
+		var sphere = new THREE.SphereBufferGeometry();
+		var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
+		var box = new THREE.BoxHelper( object, 0xffff00 );
+		scene.add( box );
 		</code>
 
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_helpers WebGL / helpers]<br/>
+			[example:webgl_loader_nrrd WebGL / loader / nrrd]<br/>
+			[example:webgl_buffergeometry_drawrange WebGL / buffergeometry / drawrange]
+		</p>
 
 		<h2>Constructor</h2>
 

@@ -14,19 +14,17 @@
 
 		<p class="desc">这一辅助对象显示[page:PositionalAudio]的方向锥。</p>
 
-		<h2>示例</h2>
-
-		<div>[example:webaudio_orientation webaudio / orientation ]</div>
-
-		<h2>示例代码</h2>
+		<h2>代码示例</h2>
 		<code>
-var positionalAudio = new THREE.PositionalAudio( listener );
-positionalAudio.setDirectionalCone( 180, 230, 0.1 );
+		var positionalAudio = new THREE.PositionalAudio( listener );
+		positionalAudio.setDirectionalCone( 180, 230, 0.1 );
 
-var helper = new PositionalAudioHelper( positionalAudio );
-positionalAudio.add( helper );
+		var helper = new PositionalAudioHelper( positionalAudio );
+		positionalAudio.add( helper );
 		</code>
 
+		<h2>例子</h2>
+		<div>[example:webaudio_orientation webaudio / orientation ]</div>
 
 		<h2>构造函数</h2>
 

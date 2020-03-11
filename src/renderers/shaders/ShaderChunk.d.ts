@@ -87,7 +87,7 @@ export let ShaderChunk: {
 	normalmap_pars_fragment: string;
 	clearcoat_normal_fragment_begin: string;
 	clearcoat_normal_fragment_maps: string;
-	clearcoat_normalmap_pars_fragment: string;
+	clearcoat_pars_fragment: string;
 	packing: string;
 	points_frag: string;
 	points_vert: string;

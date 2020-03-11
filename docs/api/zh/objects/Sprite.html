@@ -17,11 +17,11 @@
 			精灵不会投射任何阴影，即使设置了<code>castShadow = true</code>也将不会有任何效果。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
 var spriteMap = new THREE.TextureLoader().load( "sprite.png" );
-var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, color: 0xffffff } );
+var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap } );
 var sprite = new THREE.Sprite( spriteMaterial );
 scene.add( sprite );
 		</code>

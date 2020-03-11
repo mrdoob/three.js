@@ -48,12 +48,6 @@ export enum Shading {}
 export const FlatShading: Shading;
 export const SmoothShading: Shading;
 
-// colors
-export enum Colors {}
-export const NoColors: Colors;
-export const FaceColors: Colors;
-export const VertexColors: Colors;
-
 // blending modes
 export enum Blending {}
 export const NoBlending: Blending;
@@ -157,13 +151,10 @@ export const IntType: TextureDataType;
 export const UnsignedIntType: TextureDataType;
 export const FloatType: TextureDataType;
 export const HalfFloatType: TextureDataType;
-
-// Pixel types
-export enum PixelType {}
-export const UnsignedShort4444Type: PixelType;
-export const UnsignedShort5551Type: PixelType;
-export const UnsignedShort565Type: PixelType;
-export const UnsignedInt248Type: PixelType;
+export const UnsignedShort4444Type: TextureDataType;
+export const UnsignedShort5551Type: TextureDataType;
+export const UnsignedShort565Type: TextureDataType;
+export const UnsignedInt248Type: TextureDataType;
 
 // Pixel formats
 export enum PixelFormat {}
@@ -261,6 +252,8 @@ export const RGBA_PVRTC_2BPPV1_Format: CompressedPixelFormat;
 
 // ETC compressed texture formats
 export const RGB_ETC1_Format: CompressedPixelFormat;
+export const RGB_ETC2_Format: CompressedPixelFormat;
+export const RGBA_ETC2_EAC_Format: CompressedPixelFormat;
 
 // ASTC compressed texture formats
 export const RGBA_ASTC_4x4_Format: CompressedPixelFormat;
@@ -277,6 +270,20 @@ export const RGBA_ASTC_10x8_Format: CompressedPixelFormat;
 export const RGBA_ASTC_10x10_Format: CompressedPixelFormat;
 export const RGBA_ASTC_12x10_Format: CompressedPixelFormat;
 export const RGBA_ASTC_12x12_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_4x4_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_5x4_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_5x5_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_6x5_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_6x6_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_8x5_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_8x6_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_8x8_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_10x5_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_10x6_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_10x8_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_10x10_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_12x10_Format: CompressedPixelFormat;
+export const SRGB8_ALPHA8_ASTC_12x12_Format: CompressedPixelFormat;
 
 // Loop styles for AnimationAction
 export enum AnimationActionLoopStyles {}

@@ -42,7 +42,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive lines';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive lines';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -94,13 +94,15 @@
 
 					var object;
 
+					var lineMaterial = new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
+
 					if ( Math.random() > 0.5 ) {
 
-						object = new THREE.Line( lineGeometry );
+						object = new THREE.Line( lineGeometry, lineMaterial );
 
 					} else {
 
-						object = new THREE.LineSegments( lineGeometry );
+						object = new THREE.LineSegments( lineGeometry, lineMaterial );
 
 					}
 
@@ -123,7 +125,7 @@
 				scene.add( parentTransform );
 
 				raycaster = new THREE.Raycaster();
-				raycaster.linePrecision = 3;
+				raycaster.params.Line.threshold = 3;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -174,9 +176,9 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				camera.updateMatrixWorld();

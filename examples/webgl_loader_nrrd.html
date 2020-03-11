@@ -23,7 +23,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			NRRD format loader test
 		</div>
 		<div id="inset"></div>
@@ -87,7 +87,7 @@
 					cube.visible = false;
 					var box = new THREE.BoxHelper( cube );
 					scene.add( box );
-					box.applyMatrix( volume.matrix );
+					box.applyMatrix4( volume.matrix );
 					scene.add( cube );
 
 					//z plane

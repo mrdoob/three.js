@@ -140,7 +140,7 @@
 			请确保将minFilter设置为其中一个MipMap选项，并且未强制禁用mip贴图。</p>
 		<p>
 			注意：MeshStandardMaterial 仅支持[link:https://threejs.org/docs/#api/textures/CubeTexture cube environment maps]。
-			如果要使用equirectangular贴图，则需要使用 [page:WebGLRenderTargetCube.fromEquirectangularTexture WebGLRenderTargetCube.fromEquirectangularTexture]().。
+			如果要使用equirectangular贴图，则需要使用 [page:WebGLCubeRenderTarget.fromEquirectangularTexture WebGLCubeRenderTarget.fromEquirectangularTexture]().。
 			详细信息请参阅此示例[link:https://threejs.org/examples/webgl_materials_envmaps_exr.html example]。
 		</p>
 
@@ -200,6 +200,12 @@
 
 		<h3>[property:Boolean skinning]</h3>
 		<p>材质是否使用蒙皮。默认值为false。</p>
+
+		<h3>[property:Boolean vertexTangents]</h3>
+		<p>	Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
+			are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
+			more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+		</p>
 
 		<h3>[property:Boolean wireframe]</h3>
 		<p>将几何体渲染为线框。默认值为*false*（即渲染为平面多边形）。</p>

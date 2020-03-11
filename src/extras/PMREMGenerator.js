@@ -70,6 +70,8 @@ var { _lodPlanes, _sizeLods, _sigmas } = _createPlanes();
 var _pingPongRenderTarget = null;
 var _renderer = null;
 
+var _oldTarget = null;
+
 // Golden Ratio
 var PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
 var INV_PHI = 1 / PHI;
@@ -107,6 +109,7 @@ PMREMGenerator.prototype = {
 	 */
 	fromScene: function ( scene, sigma = 0, near = 0.1, far = 100 ) {
 
+		_oldTarget = _renderer.getRenderTarget();
 		var cubeUVRenderTarget = _allocateTargets();
 		_sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
 		if ( sigma > 0 ) {
@@ -115,8 +118,7 @@ PMREMGenerator.prototype = {
 
 		}
 		_applyPMREM( cubeUVRenderTarget );
-		_cleanup();
-		cubeUVRenderTarget.scissorTest = false;
+		_cleanup( cubeUVRenderTarget );
 
 		return cubeUVRenderTarget;
 
@@ -144,11 +146,11 @@ PMREMGenerator.prototype = {
 	 */
 	fromCubemap: function ( cubemap ) {
 
+		_oldTarget = _renderer.getRenderTarget();
 		var cubeUVRenderTarget = _allocateTargets( cubemap );
 		_textureToCubeUV( cubemap, cubeUVRenderTarget );
 		_applyPMREM( cubeUVRenderTarget );
-		_cleanup();
-		cubeUVRenderTarget.scissorTest = false;
+		_cleanup( cubeUVRenderTarget );
 
 		return cubeUVRenderTarget;
 
@@ -298,12 +300,13 @@ function _allocateTargets( equirectangular ) {
 
 }
 
-function _cleanup() {
+function _cleanup( outputTarget ) {
 
 	_pingPongRenderTarget.dispose();
-	_renderer.setRenderTarget( null );
-	var size = _renderer.getSize( new Vector2() );
-	_renderer.setViewport( 0, 0, size.x, size.y );
+	_renderer.setRenderTarget( _oldTarget );
+	outputTarget.scissorTest = false;
+	// reset viewport and scissor
+	outputTarget.setSize( outputTarget.width, outputTarget.height );
 
 }
 
@@ -340,7 +343,6 @@ function _sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 
 	}
 
-	_renderer.setRenderTarget( cubeUVRenderTarget );
 	for ( var i = 0; i < 6; i ++ ) {
 
 		var col = i % 3;
@@ -360,8 +362,9 @@ function _sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 			cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 		}
-		_setViewport(
+		_setViewport( cubeUVRenderTarget,
 			col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
+		_renderer.setRenderTarget( cubeUVRenderTarget );
 		_renderer.render( scene, cubeCamera );
 
 	}
@@ -407,8 +410,8 @@ function _textureToCubeUV( texture, cubeUVRenderTarget ) {
 	uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
 	uniforms[ 'outputEncoding' ].value = ENCODINGS[ texture.encoding ];
 
+	_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 	_renderer.setRenderTarget( cubeUVRenderTarget );
-	_setViewport( 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 	_renderer.render( scene, _flatCamera );
 
 }
@@ -431,15 +434,10 @@ function _createRenderTarget( params ) {
 
 }
 
-function _setViewport( x, y, width, height ) {
+function _setViewport( target, x, y, width, height ) {
 
-	var invDpr = 1.0 / _renderer.getPixelRatio();
-	x *= invDpr;
-	y *= invDpr;
-	width *= invDpr;
-	height *= invDpr;
-	_renderer.setViewport( x, y, width, height );
-	_renderer.setScissor( x, y, width, height );
+	target.viewport.set( x, y, width, height );
+	target.scissor.set( x, y, width, height );
 
 }
 
@@ -568,8 +566,8 @@ function _halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction,
 	2 * outputSize *
 		( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
 
+	_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
 	_renderer.setRenderTarget( targetOut );
-	_setViewport( x, y, 3 * outputSize, 2 * outputSize );
 	_renderer.render( blurScene, _flatCamera );
 
 }

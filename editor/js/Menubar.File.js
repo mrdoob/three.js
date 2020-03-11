@@ -14,11 +14,11 @@ import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 var MenubarFile = function ( editor ) {
 
-	var NUMBER_PRECISION = 6;
-
 	function parseNumber( key, value ) {
 
-		return typeof value === 'number' ? parseFloat( value.toFixed( NUMBER_PRECISION ) ) : value;
+		var precision = config.getKey( 'exportPrecision' );
+
+		return typeof value === 'number' ? parseFloat( value.toFixed( precision ) ) : value;
 
 	}
 
@@ -392,7 +392,7 @@ var MenubarFile = function ( editor ) {
 					'',
 					'			var button = document.createElement( \'a\' );',
 					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
-					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 12px 14px; color: #fff; border: 1px solid #fff; border-radius: 4px; text-decoration: none;\';',
+					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
 					'			button.target = \'_blank\';',
 					'			button.textContent = \'EDIT\';',
 					'			document.body.appendChild( button );',
@@ -414,6 +414,16 @@ var MenubarFile = function ( editor ) {
 		loader.load( '../build/three.module.js', function ( content ) {
 
 			zip.file( 'js/three.module.js', content );
+
+		} );
+		loader.load( '../examples/jsm/webxr/VRButton.js', function ( content ) {
+
+			zip.file( 'js/VRButton.js', content );
+
+		} );
+		loader.load( '../examples/js/vr/HelioWebXRPolyfill.js', function ( content ) {
+
+			zip.file( 'js/HelioWebXRPolyfill.js', content );
 
 		} );
 

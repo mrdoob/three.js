@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> vr - dragging
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - dragging
 		</div>
 
 		<script src="js/vr/HelioWebXRPolyfill.js"></script>
@@ -19,10 +19,12 @@
 			import * as THREE from '../build/three.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
+			var controllerGrip1, controllerGrip2;
 
 			var raycaster, intersected = [];
 			var tempMatrix = new THREE.Matrix4();
@@ -132,6 +134,16 @@
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller2 );
+
+				var controllerModelFactory = new XRControllerModelFactory();
+
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
 
 				//
 

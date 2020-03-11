@@ -52,6 +52,19 @@
 		<h3>[method:Float getCurveLengths]()</h3>
 		<p>将[page:.curves]数组中曲线的长度相加。</p>
 
+		<h3>[method:Array getPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- 曲线分段数量。默认值为*12*。<br /><br />
+
+			返回一组使用getPoint( t )获得的divisions + 1个点。
+		</p>
+
+		<h3>[method:Array getSpacedPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- 曲线分段数量。默认值为*40*。<br /><br />
+
+			返回一组使用getPointAt( u )获得的divisions + 1个均分点。
+		</p>
 
 		<h2>源代码</h2>
 

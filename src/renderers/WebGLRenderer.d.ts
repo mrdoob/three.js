@@ -5,6 +5,7 @@ import { WebGLInfo } from './webgl/WebGLInfo';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities';
 import { WebGLProperties } from './webgl/WebGLProperties';
+import { WebGLProgram } from './webgl/WebGLProgram';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists';
 import { WebGLState } from './webgl/WebGLState';
 import { Vector2 } from './../math/Vector2';
@@ -13,7 +14,6 @@ import { Color } from './../math/Color';
 import { WebGLRenderTarget } from './WebGLRenderTarget';
 import { Object3D } from './../core/Object3D';
 import { Material } from './../materials/Material';
-import { Fog } from './../scenes/Fog';
 import { ToneMapping, ShadowMapType, CullFace, TextureEncoding } from '../constants';
 import { WebXRManager } from '../renderers/webxr/WebXRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
@@ -47,7 +47,7 @@ export interface WebGLRendererParameters {
 	precision?: string;
 
 	/**
-	 * default is true.
+	 * default is false.
 	 */
 	alpha?: boolean;
 
@@ -307,21 +307,14 @@ export class WebGLRenderer implements Renderer {
 	resetGLState(): void;
 	dispose(): void;
 
-	/**
-	 * Tells the shadow map plugin to update using the passed scene and camera parameters.
-	 *
-	 * @param scene an instance of Scene
-	 * @param camera — an instance of Camera
-	 */
 	renderBufferImmediate(
 		object: Object3D,
-		program: Object,
-		material: Material
+		program: WebGLProgram,
 	): void;
 
 	renderBufferDirect(
 		camera: Camera,
-		fog: Fog,
+		scene: Scene,
 		geometry: Geometry | BufferGeometry,
 		material: Material,
 		object: Object3D,
@@ -374,6 +367,14 @@ export class WebGLRenderer implements Renderer {
 	getActiveMipmapLevel(): number;
 
 	/**
+	 * Sets the given WebGLFramebuffer. This method can only be used if no render target is set via
+	 * {@link WebGLRenderer#setRenderTarget .setRenderTarget}.
+	 *
+	 * @param value The WebGLFramebuffer.
+	 */
+	setFramebuffer( value: WebGLFramebuffer ): void;
+
+	/**
 	 * Returns the current render target. If no render target is set, null is returned.
 	 */
 	getRenderTarget(): RenderTarget | null;
@@ -387,7 +388,7 @@ export class WebGLRenderer implements Renderer {
 	 * Sets the active render target.
 	 *
 	 * @param renderTarget The {@link WebGLRenderTarget renderTarget} that needs to be activated. When `null` is given, the canvas is set as the active render target instead.
-	 * @param activeCubeFace Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of {@link WebGLRenderTargetCube}.
+	 * @param activeCubeFace Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of {@link WebGLCubeRenderTarget}.
 	 * @param activeMipmapLevel Specifies the active mipmap level.
 	 */
 	setRenderTarget( renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipmapLevel?: number ): void;

@@ -50,15 +50,15 @@
 			#[link:https://github.com/mrdoob/three.js/issues/12788 12788]。
 		</i></p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// Instantiate a loader
-		var loader = new THREE.GLTFLoader();
+		var loader = new GLTFLoader();
 
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
-		var dracoLoader = new THREE.DRACOLoader();
-		dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
+		var dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath( '/examples/jsm/libs/draco/' );
 		loader.setDRACOLoader( dracoLoader );
 
 		// Load a glTF resource
@@ -71,8 +71,8 @@
 				scene.add( gltf.scene );
 
 				gltf.animations; // Array&lt;THREE.AnimationClip&gt;
-				gltf.scene; // THREE.Scene
-				gltf.scenes; // Array&lt;THREE.Scene&gt;
+				gltf.scene; // THREE.Group
+				gltf.scenes; // Array&lt;THREE.Group&gt;
 				gltf.cameras; // Array&lt;THREE.Camera&gt;
 				gltf.asset; // Object
 
@@ -92,7 +92,11 @@
 		);
 		</code>
 
-		[example:webgl_loader_gltf]
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_gltf]
+		</p>
 
 		<h2>浏览器兼容性</h2>
 
@@ -124,7 +128,7 @@
 		<h2>自定义扩展</h2>
 
 		<p>
-			来自未知扩展的元数据会被保存到Object3D、Scene和Material实例中上的“.userData.gltfExtensions”，
+			来自未知扩展的元数据会被保存到Object3D、Group和Material实例中上的“.userData.gltfExtensions”，
 			或被附加到 response “gltf”对象。示例：
 		</p>
 
@@ -178,7 +182,7 @@
 		[page:DRACOLoader dracoLoader] — THREE.DRACOLoader的实例，用于解码使用KHR_draco_mesh_compression扩展压缩过的文件。
 		</p>
 		<p>
-		请参阅[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme]来了解Draco及其解码器的详细信息。
+		请参阅[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/libs/draco#readme readme]来了解Draco及其解码器的详细信息。
 		</p>
 
 		<h3>[method:null setDDSLoader]( [param:DDSLoader ddsLoader] )</h3>
@@ -194,13 +198,13 @@
 		[page:Function onError] — （可选）若在解析过程发生错误，将被调用的函数。该函数接收error来作为参数。<br />
 		</p>
 		<p>
-		解析基于glTF的ArrayBuffer或<em>JSON</em>字符串，并在完成后触发[page:Function onLoad]回调。[page:Function onLoad]的参数将是一个包含有已加载部分的[page:object]：.[page:Scene scene]、 .[page:Array scenes]、 .[page:Array cameras]、 .[page:Array animations] 和 .[page:Object asset]。
+		解析基于glTF的ArrayBuffer或<em>JSON</em>字符串，并在完成后触发[page:Function onLoad]回调。[page:Function onLoad]的参数将是一个包含有已加载部分的[page:object]：.[page:Group scene]、 .[page:Array scenes]、 .[page:Array cameras]、 .[page:Array animations] 和 .[page:Object asset]。
 		</p>
 
 		<h2>源代码</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/GLTFLoader.js examples/js/loaders/GLTFLoader.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/GLTFLoader.js examples/jsm/loaders/GLTFLoader.js]
 		</p>
 	</body>
 </html>

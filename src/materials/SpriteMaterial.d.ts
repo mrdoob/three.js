@@ -19,7 +19,7 @@ export class SpriteMaterial extends Material {
 	alphaMap: Texture | null;
 	rotation: number;
 	sizeAttenuation: boolean;
-	isSpriteMaterial: true;
+	readonly isSpriteMaterial: true;
 
 	setValues( parameters: SpriteMaterialParameters ): void;
 	copy( source: SpriteMaterial ): this;

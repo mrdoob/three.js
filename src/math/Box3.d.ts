@@ -1,3 +1,4 @@
+import { BufferAttribute } from './../core/BufferAttribute';
 import { Vector3 } from './Vector3';
 import { Object3D } from './../core/Object3D';
 import { Sphere } from './Sphere';
@@ -11,9 +12,11 @@ export class Box3 {
 
 	max: Vector3;
 	min: Vector3;
+	readonly isBox3: true;
 
 	set( min: Vector3, max: Vector3 ): this;
 	setFromArray( array: ArrayLike<number> ): this;
+	setFromBufferAttribute( bufferAttribute: BufferAttribute ): this;
 	setFromPoints( points: Vector3[] ): this;
 	setFromCenterAndSize( center: Vector3, size: Vector3 ): this;
 	setFromObject( object: Object3D ): this;

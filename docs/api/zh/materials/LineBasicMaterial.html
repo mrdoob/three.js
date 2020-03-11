@@ -12,9 +12,20 @@
 
 		<h1>基础线条材质（[name]）</h1>
 
-			<p class="desc">一种用于绘制线框样式几何体的材质。</p>
+		<p class="desc">一种用于绘制线框样式几何体的材质。</p>
 
-		<h2>例子(Examples)</h2>
+		<h2>代码示例</h2>
+
+		<code>
+		var material = new THREE.LineBasicMaterial( {
+			color: 0xffffff,
+			linewidth: 1,
+			linecap: 'round', //ignored by WebGLRenderer
+			linejoin:  'round' //ignored by WebGLRenderer
+		} );
+		</code>
+
+		<h2>例子</h2>
 
 		<p>
 			[example:webgl_buffergeometry_drawcalls WebGL / buffergeometry / drawcalls]<br />
@@ -29,19 +40,9 @@
 			[example:webgl_lines_colors WebGL / lines / colors]<br />
 			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
 			[example:webgl_lines_sphere WebGL / lines / sphere]<br />
-			[example:webgl_lines_splines WebGL / lines / splines]<br />
 			[example:webgl_materials WebGL / materials]<br />
 			[example:webgl_physics_rope WebGL / phyics / rope]
 		</p>
-
-		<code>
-var material = new THREE.LineBasicMaterial( {
-	color: 0xffffff,
-	linewidth: 1,
-	linecap: 'round', //ignored by WebGLRenderer
-	linejoin:  'round' //ignored by WebGLRenderer
-} );
-		</code>
 
 		<h2>构造函数(Constructor)</h2>
 

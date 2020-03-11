@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf<br/><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf<br/><br/>
 			<button id="export_scene">Export Scene1</button>
 			<button id="export_scenes">Export Scene1 and THREE.Scene 2</button>
 			<button id="export_object">Export Sphere</button><br/>
@@ -369,7 +369,7 @@
 				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 				geometry.setDrawRange( 0, numElements );
 
-				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
+				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: true } ) );
 				object.name = 'Custom buffered truncated';
 				object.position.set( 140, - 40, - 200 );
 
