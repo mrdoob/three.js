@@ -374,8 +374,7 @@
     // This is a partial file
 
     var realFile = file.backing = srv.findFile(file.name);
-    var offset = file.offset;
-    if (file.offsetLines) offset = {line: file.offsetLines, ch: 0};
+    var offset;
     file.offset = offset = resolvePos(realFile, file.offsetLines == null ? file.offset : {line: file.offsetLines, ch: 0}, true);
     var line = firstLine(file.text);
     var foundPos = findMatchingPosition(line, realFile.text, offset);
@@ -950,7 +949,7 @@
 
   function findRefs(srv, query, file) {
     var expr = findExprOrThrow(file, query, true);
-    if (expr && expr.node.type == "Identifier") {
+    if (expr.node.type == "Identifier") {
       return findRefsToVariable(srv, query, file, expr);
     } else if (expr && expr.node.type == "MemberExpression" && !expr.node.computed) {
       var p = expr.node.property;

@@ -446,8 +446,8 @@ var GeometryCompressionUtils = {
 
 				if ( z < 0 ) {
 
-					var tempx = tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
-					var tempy = tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
+					var tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
+					var tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
 
 					x = tempx;
 					y = tempy;

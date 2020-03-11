@@ -120,7 +120,7 @@ parse: function parse(input) {
         return token;
     }
 
-    var symbol, preErrorSymbol, state, action, a, r, yyval={},p,len,newState, expected;
+    var symbol, preErrorSymbol, state, action, r, yyval={},p,len,newState, expected;
     while (true) {
         // retreive state number from top of stack
         state = stack[stack.length-1];
@@ -329,7 +329,6 @@ next:function () {
             match,
             tempMatch,
             index,
-            col,
             lines;
         if (!this._more) {
             this.yytext = '';
@@ -393,9 +392,8 @@ pushState:function begin(condition) {
         this.begin(condition);
     }});
 lexer.options = {};
-lexer.performAction = function anonymous(yy,yy_,$avoiding_name_collisions,YY_START) {
+lexer.performAction = function anonymous(yy,yy_,$avoiding_name_collisions) {
 
-var YYSTATE=YY_START
 switch($avoiding_name_collisions) {
 case 0:/* skip whitespace */
 break;

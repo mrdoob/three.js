@@ -265,8 +265,7 @@ OBJLoader2.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( urlParts.length > 2 ) {
 
 			filename = urlParts[ urlParts.length - 1 ];
-			let urlPartsPath = urlParts.slice( 0, urlParts.length - 1 ).join( '/' ) + '/';
-			if ( urlPartsPath !== undefined && urlPartsPath !== null ) this.path = urlPartsPath;
+			this.path = urlParts.slice( 0, urlParts.length - 1 ).join( '/' ) + '/';
 
 		}
 		if ( onFileLoadProgress === null || onFileLoadProgress === undefined || ! ( onFileLoadProgress instanceof Function ) ) {
