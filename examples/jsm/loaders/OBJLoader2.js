@@ -9,7 +9,7 @@ import {
 	Loader
 } from "../../../build/three.module.js";
 
-import { OBJLoader2Parser } from "./obj2/worker/parallel/OBJLoader2Parser.js";
+import { OBJLoader2Parser } from "./obj2/OBJLoader2Parser.js";
 import { MeshReceiver } from "./obj2/shared/MeshReceiver.js";
 import { MaterialHandler } from "./obj2/shared/MaterialHandler.js";
 
@@ -43,7 +43,7 @@ const OBJLoader2 = function ( manager ) {
 
 };
 
-OBJLoader2.OBJLOADER2_VERSION = '3.1.1';
+OBJLoader2.OBJLOADER2_VERSION = '3.2.0';
 console.info( 'Using OBJLoader2 version: ' + OBJLoader2.OBJLOADER2_VERSION );
 
 
