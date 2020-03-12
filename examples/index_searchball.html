@@ -23,47 +23,68 @@
 			import { SpiralSphereGeometry } from './jsm/geometries/SpiralSphereGeometry.js';
 
 			var camera, scene, renderer, controls;
-			var mouse, radius, tiles, turns;
+			var radius, tiles, turns;
+			var mouse, mouseDown, mouseTileId;
 
 			init();
 			animate();
 
 			function init() {
 
-				tiles = 0;
-				for ( var key in files ) {
-
-					tiles += files[ key ].length;
-
-				}
-
-				turns = Math.PI / Math.sqrt( 4 * Math.PI / tiles );
-				var size = Math.ceil( Math.sqrt( tiles ) );
-				var gap = 0.03;
-				var subgrid = 10;
-				var cut = 0.02;
+				// init variables
 
 				radius = 1;
-				mouse = new THREE.Vector2();
+				var gap = 0.03;
+				var subgrid = 10;
+				var uvCut = 0.02;
 
-				// scene
+				tiles = [];
+				for ( var key in files ) {
+
+					var section = files[ key ];
+					for ( var i = 0, len = section.length; i < len; i ++ ) {
+
+						tiles.push( section[ i ] );
+
+					}
+
+				}
+				turns = Math.PI / Math.sqrt( 4 * Math.PI / tiles.length / 800 * 600 );
+				var size = Math.ceil( Math.sqrt( tiles.length ) );
+
+				mouseTileId = null;
+				mouse = new THREE.Vector2();
+				mouseDown = new THREE.Vector2();
+
+				// camera
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
 				camera.position.set( 0, 1.5, 1 );
 				camera.matrixWorldNeedsUpdate = true;
+				if ( camera.aspect < 1 ) {
 
-				var geometry = new SpiralSphereGeometry( radius, turns, gap, gap, subgrid, subgrid, tiles );
+					var pos = camera.position.divideScalar( camera.aspect );
+					camera.position.set( pos.x, pos.y, pos.z );
+
+				}
+
+				// scene
+
+				var geometry = new SpiralSphereGeometry( radius, turns, gap, gap, subgrid, subgrid, tiles.length );
 				for( var tile = 0; tile < geometry.attributes.id.count; tile ++ ) {
 
 					var id = geometry.attributes.id.array[ tile ];
 					var i = Math.floor( id / size );
-					var u0 = id / size - i;
-					var v0 = 1. - ( i + 1. ) / size;
 
-					geometry.attributes.uv.array[ 2 * tile ] *= ( 1 - 2 * cut ) / size;
-					geometry.attributes.uv.array[ 2 * tile ] += u0 + cut / size;
-					geometry.attributes.uv.array[ 2 * tile + 1 ] *= ( 1 - 2 * cut ) / size;
-					geometry.attributes.uv.array[ 2 * tile + 1 ] += v0 + cut / size;
+					var u0 = id / size - i + uvCut / size;
+					var v0 = 1. - ( i + 1. ) / size + uvCut / size;
+					var uh = ( 1 - 2 * uvCut ) / size;
+					var vh = ( 1 - 2 * uvCut ) / size;
+
+					geometry.attributes.uv.array[ 2 * tile ] *= uh;
+					geometry.attributes.uv.array[ 2 * tile ] += u0;
+					geometry.attributes.uv.array[ 2 * tile + 1 ] *= vh;
+					geometry.attributes.uv.array[ 2 * tile + 1 ] += v0;
 
 				}
 
@@ -99,21 +120,16 @@
 				controls.minDistance = 1.05;
 				controls.maxDistance = 10;
 
-				// resize
-
-				if ( camera.aspect < 1 ) {
-
-					var pos = camera.position.divideScalar( camera.aspect );
-					camera.position.set( pos.x, pos.y, pos.z );
-
-				}
 				window.addEventListener( 'resize', onWindowResize, false );
+				window.addEventListener( 'mousedown', onMouseDown, false );
 				window.addEventListener( 'mousemove', onMouseMove, false );
-				window.addEventListener( 'click', onMouseClick, false );
+				window.addEventListener( 'mouseup', onMouseUp, false );
+				window.addEventListener( 'touchstart', onTouchStart, false );
+				window.addEventListener( 'touchend', onTouchEnd, false );
 
 			}
 
-			function analyticRaycaster( camera, mouse, radius, turns, tiles ) {
+			function analyticRaycaster() {
 
 				var ray = new THREE.Ray();
 				ray.origin.setFromMatrixPosition( camera.matrixWorld );
@@ -123,23 +139,19 @@
 				var b = 2 * ray.origin.dot( ray.direction );
 				var c = ray.origin.dot( ray.origin ) - radius * radius;
 				var D = b * b - 4 * a * c;
-
-				if ( D < 0 ) {
-
-					return null;
-
-				}
+				if ( D < 0 ) return null;
 
 				var p = new THREE.Vector3();
 				var s = ( - b - Math.sqrt( D ) ) / ( 2 * a );
 				ray.at( s, p );
-				p = new THREE.Spherical().setFromVector3( p );
 
+				p = new THREE.Spherical().setFromVector3( p );
 				p.phi = Math.PI / 2 - p.phi;
 				p.theta = ( Math.PI / 2 - p.theta ) % ( 2 * Math.PI );
+
 				var t = p.theta / 2 / turns + Math.PI / turns *
 						Math.floor( ( turns * ( Math.PI - 2 * p.phi ) - p.theta ) / ( 2 * Math.PI ) ) - Math.PI / 2;
-				return 1 + Math.floor( ( tiles - 2 ) * ( Math.cos( Math.PI / 2 / turns ) -
+				return 1 + Math.floor( ( tiles.length - 2 ) * ( Math.cos( Math.PI / 2 / turns ) -
 						Math.cos( t + ( turns + 1 ) * Math.PI / 2 / turns ) ) / ( 2 * Math.cos( Math.PI / 2 / turns ) ) );
 
 			}
@@ -152,21 +164,56 @@
 
 			}
 
-			function onMouseMove( event ) {
+			function onMouseDown() {
 
-				event.preventDefault();
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-				console.log( analyticRaycaster( camera, mouse, radius, turns, tiles ) );
+				mouseDown.x = mouse.x;
+				mouseDown.y = mouse.y;
 
 			}
 
-			function onMouseClick() {
+			function onMouseMove( e ) {
 
-				var id = analyticRaycaster( camera, mouse, radius, turns, tiles );
-				if ( id !== null ) {
+				mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
+				mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
+				mouseTileId = analyticRaycaster();
 
-					window.alert( id );
+			}
+
+			function onMouseUp( e ) {
+
+				onMouseMove( e );
+				if ( mouseTileId !== null && mouse.distanceTo( mouseDown ) < 0.03 ) {
+
+					window.location.href = tiles[ mouseTileId ];
+
+				}
+
+			}
+
+			function onTouchStart( e ) {
+
+				if ( e.touches.length == 1 ) {
+
+					mouseDown.x = ( e.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
+					mouseDown.y = - ( e.touches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
+
+				}
+
+			}
+
+			function onTouchEnd( e ) {
+
+				if ( e.changedTouches.length == 1 ) {
+
+					mouse.x = ( e.changedTouches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
+					mouse.y = - ( e.changedTouches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
+					mouseTileId = analyticRaycaster();
+
+				}
+
+				if ( mouseTileId !== null && mouse.distanceTo( mouseDown ) < 0.15 ) {
+
+					window.location.href = tiles[ mouseTileId ];
 
 				}
 
