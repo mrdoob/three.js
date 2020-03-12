@@ -1,7 +1,8 @@
-<!DOCTYPE html>
 <!--
 	@author munrocket / https://twitter.com/munrocket_twit
 -->
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>Screenshot tile mapping</title>
@@ -128,6 +129,10 @@
 				renderer.autoClearColor = false;
 				renderer.preserveDrawingBuffer = true;
 
+				renderer.setRenderTarget( target );
+				renderer.setClearColor( new THREE.Color( 0xAAAAAA ), 1 );
+				renderer.clear( true, true, true );
+
 				container = document.getElementById( 'container' );
 				container.appendChild( renderer.domElement );
 
@@ -141,7 +146,7 @@
 
 			if ( id < tiles ) {
 
-				for ( let i = 0; i < 40; i++ ) {
+				for ( let i = 0; i < 2 * size; i ++ ) {
 
 					renderer.setRenderTarget( target );
 					material.uniforms.uId.value = id;

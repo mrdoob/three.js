@@ -83,7 +83,9 @@ var SpiralSphereGeometry = function ( radius, turns, gapX, gapY, tileX, tileY, t
 
 			var u = i / iMax;
 			var t = t0 + u * ( Math.PI / turns ) - gapY * u / turns;
-			var t1 = t0 + ( gapX ? gapX * Math.pow( u, 0.15 / gapX ) : 0 );
+			var gapP = ( gapX > 0 ) ? gapX * Math.pow( u, 0.15 / gapX ) : 0;
+
+			var t1 = t0 + gapP;
 			var t2 = Math.max( t0, t - gapX );
 			t2 = ( t1 < t2 ) ? t2 : t1;
 

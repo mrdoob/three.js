@@ -6,7 +6,7 @@ const puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const size = 2048;
-const renderTimeout = 30000;
+const renderTimeout = 10000;
 
 const server = http.createServer( ( request, response ) => handler( request, response ) );
 server.listen( 1234, async () => await pup );
