@@ -37,9 +37,9 @@
 
 				}
 
-				turns = Math.PI / Math.sqrt( 4 * Math.PI / tiles / 800 * 600 );
+				turns = Math.PI / Math.sqrt( 4 * Math.PI / tiles );
 				var size = Math.ceil( Math.sqrt( tiles ) );
-				var gap = 0.03
+				var gap = 0.03;
 				var subgrid = 10;
 				var cut = 0.02;
 
@@ -79,10 +79,6 @@
 				scene.add( mesh );
 				scene.background = new THREE.Color( 0xFFFFFF );
 
-				var directionalLight = new THREE.DirectionalLight( 0xFFFFFF, 1 );
-				directionalLight.position.set( 1, 1, 1 ).normalize();
-				scene.add( directionalLight );
-
 				// renderer
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -117,7 +113,7 @@
 
 			}
 
-			function quickRaycaster( camera, mouse, radius, turns, tiles ) {
+			function analyticRaycaster( camera, mouse, radius, turns, tiles ) {
 
 				var ray = new THREE.Ray();
 				ray.origin.setFromMatrixPosition( camera.matrixWorld );
@@ -140,12 +136,11 @@
 				p = new THREE.Spherical().setFromVector3( p );
 
 				p.phi = Math.PI / 2 - p.phi;
+				p.theta = ( Math.PI / 2 - p.theta ) % ( 2 * Math.PI );
 				var t = p.theta / 2 / turns + Math.PI / turns *
 						Math.floor( ( turns * ( Math.PI - 2 * p.phi ) - p.theta ) / ( 2 * Math.PI ) ) - Math.PI / 2;
-				var id = 1 + Math.floor( ( tiles - 1 ) * ( Math.cos( Math.PI / 2 / turns ) -
-						Math.cos( t + ( turns + 1) * Math.PI / 2 / turns ) ) / ( 2 * Math.cos( Math.PI / 2 / turns ) ) );
-
-				return id;
+				return 1 + Math.floor( ( tiles - 2 ) * ( Math.cos( Math.PI / 2 / turns ) -
+						Math.cos( t + ( turns + 1 ) * Math.PI / 2 / turns ) ) / ( 2 * Math.cos( Math.PI / 2 / turns ) ) );
 
 			}
 
@@ -162,13 +157,13 @@
 				event.preventDefault();
 				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-				console.log( quickRaycaster( camera, mouse, radius, turns, tiles ) );
+				console.log( analyticRaycaster( camera, mouse, radius, turns, tiles ) );
 
 			}
 
 			function onMouseClick() {
 
-				var id = quickRaycaster( camera, mouse, radius, turns, tiles );
+				var id = analyticRaycaster( camera, mouse, radius, turns, tiles );
 				if ( id !== null ) {
 
 					window.alert( id );
