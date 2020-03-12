@@ -504,7 +504,13 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	getInverse: function ( m ) {
+	getInverse: function ( m, throwOnDegenerate ) {
+
+		if ( throwOnDegenerate !== undefined ) {
+
+			console.warn( "THREE.Matrix4: .getInverse() can no longer be configured to throw on degenerate." );
+
+		}
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 		var te = this.elements,

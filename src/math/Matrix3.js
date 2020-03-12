@@ -164,7 +164,13 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
-	getInverse: function ( matrix ) {
+	getInverse: function ( matrix, throwOnDegenerate ) {
+
+		if ( throwOnDegenerate !== undefined ) {
+
+			console.warn( "THREE.Matrix3: .getInverse() can no longer be configured to throw on degenerate." );
+
+		}
 
 		var me = matrix.elements,
 			te = this.elements,
