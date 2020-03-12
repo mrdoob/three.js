@@ -504,7 +504,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	getInverse: function ( m, throwOnDegenerate ) {
+	getInverse: function ( m ) {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 		var te = this.elements,
@@ -522,23 +522,7 @@ Object.assign( Matrix4.prototype, {
 
 		var det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
-		if ( det === 0 ) {
-
-			var msg = "THREE.Matrix4: .getInverse() can't invert matrix, determinant is 0";
-
-			if ( throwOnDegenerate === true ) {
-
-				throw new Error( msg );
-
-			} else {
-
-				console.warn( msg );
-
-			}
-
-			return this.identity();
-
-		}
+		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 		var detInv = 1 / det;
 
