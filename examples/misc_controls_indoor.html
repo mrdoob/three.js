@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>test_controls</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #viewport {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="viewport"></div>
+
+    <script type="module">
+        import * as THREE from '../build/three.module.js';
+        import { IndoorControls } from './jsm/controls/IndoorControls.js';
+        import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+        import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+
+        var viewport, camera, scene, renderer, controls;
+        var room = new THREE.Object3D();
+        var rooms = [];
+
+        init();
+        animate();
+
+        //场景初始化
+        function init() {
+
+            //新建相机
+            camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
+            camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+            //新建场景
+            scene = new THREE.Scene();
+
+            //加载环境贴图
+            loadEnvironment( './textures/equirectangular/venice_sunset_1k.hdr' ).then( function ( envMap ) {
+
+                scene.background = envMap;
+                scene.environment = envMap;
+
+            } );
+
+            //导入GLTF模型
+            setModels( './models/gltf/meetingRoom_0213/1.gltf' );
+
+            //渲染场景
+            renderer = new THREE.WebGLRenderer( { antialias: true } );
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 0.85;
+            renderer.outputEncoding = THREE.sRGBEncoding;
+
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            viewport = document.getElementById( 'viewport' );
+            viewport.appendChild( renderer.domElement );
+
+            //新建控制器
+            controls = new IndoorControls( camera, renderer.domElement );
+
+            //坐标轴
+            const axes = new THREE.AxesHelper( 200 );
+            scene.add( axes );
+
+            //监听窗口缩放
+            window.addEventListener( 'resize', onWindowResize, false );
+
+            /*//拖动到节点上方时持续触发事件
+            viewport.ondragover = function ( event ) {
+
+                event.preventDefault();
+
+            };
+
+            //拖放完成事件
+            viewport.ondrop = function( event ) {
+
+                event.preventDefault();
+                //clearModels();
+
+                //获取FormData实例
+                let files = event.dataTransfer.files;
+                let formData = new FormData();
+                if ( files.length !== 1 ) {
+                    alert( "请上传单个文件夹!" );
+                    return;
+                }
+                //使用append方法添加文件到file键
+                formData.append( 'file',  files[0] );
+
+                //创建XHR实例
+                let request = new XMLHttpRequest();
+                request.open( 'post', '/uploadGLTF' );
+                request.onload = function () {
+
+                    setModels( './models/temp/' + this.response );
+
+                };
+                //发送请求
+                request.send( formData );
+
+            };*/
+
+        }
+
+        //响应窗口缩放
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize( window.innerWidth, window.innerHeight );
+
+        }
+
+        //加载环境贴图
+        function loadEnvironment( url ) {
+
+            let rgbeLoader = new RGBELoader();
+            rgbeLoader.setDataType( THREE.UnsignedByteType );
+            return new Promise( resolve => {
+
+                rgbeLoader.load( url, function ( texture ) {
+
+                    let pmremGenerator = new THREE.PMREMGenerator( renderer );
+                    pmremGenerator.compileEquirectangularShader();
+
+                    let envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+                    pmremGenerator.dispose();
+
+                    //scene.background = envMap;
+                    //scene.environment = envMap;
+
+                    resolve( envMap );
+
+                } );
+
+            } );
+
+        }
+
+        //导入GLTF模型
+        function setModels( url ) {
+
+            let gltfLoader = new GLTFLoader();
+            gltfLoader.load( url, function ( gltf ) {
+
+                let sceneImport = gltf.scene || gltf.scenes[0];
+
+                sceneImport.traverse( function ( node ) {
+
+                    //设置模型所有节点接收和产生阴影
+                    node.receiveShadow = true;
+                    if ( node.isMesh || node.isLight ) node.castShadow = true;
+
+                    //设置控制器的捕捉对象
+                    if (node.name === 'Plane001_6') controls.ground = node;
+
+                } );
+
+                setModelConfig( sceneImport );
+
+                room = sceneImport;
+                rooms.push( sceneImport );
+                scene.add( sceneImport );
+
+            } );
+
+        }
+
+        //根据模型设置相机和控制器参数
+        function setModelConfig( sceneImport ) {
+
+            //根据导入模型获取范围盒
+            let boxSize = new THREE.Vector3();
+            const roomBox = new THREE.Box3().setFromObject( sceneImport );
+            const size = roomBox.getSize( boxSize ).length();
+            const center = roomBox.getCenter( new THREE.Vector3() );
+
+            camera.near = size / 100;
+            camera.far = size * 100;
+            camera.position.copy( center );
+
+            //物体外部
+            /*camera.position.x += boxSize.x * 0.8;
+            camera.position.y += boxSize.y * 0.8;
+            camera.position.z += boxSize.z * 0.8;
+            camera.lookAt( center );*/
+
+            //物体内部
+            camera.position.y -= boxSize.y * 0.02;
+            let cameraLook = camera.position.clone();
+            cameraLook.x += boxSize.x * 0.02;
+            cameraLook.y -= boxSize.y * 0.02;
+            cameraLook.z += boxSize.z * 0.02;
+            camera.lookAt( cameraLook );
+
+            //controls.update();
+            camera.updateProjectionMatrix();
+
+        }
+
+        //更新动画
+        function animate() {
+
+            requestAnimationFrame( animate );
+
+            //更新控制器
+            controls.update();
+
+            renderer.render( scene, camera );
+
+        }
+    </script>
+</body>
+</html>
