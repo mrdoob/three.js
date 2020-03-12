@@ -74,26 +74,25 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@types/webgl2": "^0.0.5",
-    "@typescript-eslint/eslint-plugin": "^2.15.0",
-    "@typescript-eslint/parser": "^2.15.0",
+    "@typescript-eslint/eslint-plugin": "^2.23.0",
+    "@typescript-eslint/parser": "^2.23.0",
     "concurrently": "^5.0.2",
     "cross-env": "^7.0.0",
     "eslint": "^6.8.0",
     "eslint-config-mdcs": "^4.2.3",
     "eslint-plugin-html": "^6.0.0",
     "failonlyreporter": "^1.0.0",
-    "google-closure-compiler": "20200101.0.0",
+    "google-closure-compiler": "20200224.0.0",
     "http-server": "^0.12.1",
     "image-output": "2.4.1",
     "pixelmatch": "5.1.0",
     "pngjs": "3.4.0",
     "puppeteer": "^2.1.1",
     "qunit": "^2.9.3",
-    "rollup": "^1.28.0",
+    "rollup": "^2.0.5",
     "rollup-plugin-buble": "^0.19.8",
     "serve-handler": "^6.1.2",
-    "typescript": "^3.7.4"
+    "typescript": "^3.8.3"
   },
   "jspm": {
     "files": [
