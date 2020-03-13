@@ -17,7 +17,6 @@ const pup = puppeteer.launch( { headless: false } ).then( async browser => {
 	const page = ( await browser.pages() )[ 0 ];
   await page.setViewport( { width: size, height: size } );
 	await page.goto( 'http://localhost:1234/utils/uvmakers/searchball.html' );
-	await page.screenshot( { path: './examples/screenshots/all_in_one.jpg', fullPage: true, type: 'jpeg', quality: 95 } );
 
 	await page.evaluate( async ( renderTimeout ) => {
 
@@ -39,11 +38,13 @@ const pup = puppeteer.launch( { headless: false } ).then( async browser => {
 
 				}
 
-			}, 1000 );
+			}, 250 );
 
 		});
 
 	}, renderTimeout );
+
+	await page.screenshot( { path: './examples/screenshots/all_in_one.jpg', fullPage: true, type: 'jpeg', quality: 97 } );
 
 	server.close();
 	browser.close();
