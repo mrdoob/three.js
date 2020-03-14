@@ -503,6 +503,7 @@
 			});
 			let folderExecution = gui.addFolder( 'Execution' );
 			handleExecuteLoading = folderExecution.add( wwObjLoader2Control, 'executeLoading' ).name( 'Run' );
+			handleExecuteLoading.domElement.id = 'startButton';
 			folderRenderingOptions.open();
 			folderObjLoader2ParallelOptions.open();
 			folderExecution.open();
