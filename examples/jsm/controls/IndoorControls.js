@@ -4,6 +4,7 @@
  */
 
 import {
+    Color,
     Euler,
     EventDispatcher,
     Raycaster,
@@ -93,6 +94,15 @@ var IndoorControls = function ( camera, domElement ) {
     // 相机按键移动的移动方向向量
     var moveDir = new Vector3();
 
+    // 鼠标在地面时的移动事件
+    var moveEvent = { type: 'move' };
+    // 鼠标点击水平移动事件
+    var moveClickEvent = { type: 'moveclick' };
+    // 鼠标拖拽第一人称旋转事件
+    var rotateDownEvent = { type: 'rotatedown' };
+    // 鼠标释放第一人称旋转事件
+    var rotateUpEvent = { type: 'rotateup' };
+
     function onContextMenu( event ) {
 
         event.preventDefault();
@@ -137,6 +147,14 @@ var IndoorControls = function ( camera, domElement ) {
             // 计算物体和射线的交点信息
             intersects = raycaster.intersectObject( scope.ground, true );
 
+            // 触发鼠标在地面时的移动事件
+            if ( intersects.length > 0 ) {
+
+                moveEvent[ 'intersect' ] = intersects[ 0 ];
+                scope.dispatchEvent( moveEvent );
+
+            }
+
         }
 
     }
@@ -152,7 +170,7 @@ var IndoorControls = function ( camera, domElement ) {
 
             if ( intersects.length === 0 ) return;
 
-            target.copy( intersects[0].point );
+            target.copy( intersects[ 0 ].point );
             target.y = scope.camera.position.y;
 
             if ( target.equals( scope.camera.position ) ) return;
