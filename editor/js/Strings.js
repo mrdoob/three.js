@@ -625,7 +625,7 @@ var Strings = function ( config ) {
 
 			'viewport/info/objects': 'Objets',
 			'viewport/info/vertices': 'Sommets',
-			'viewport/info/triangles': 'Triangles'
+			'viewport/info/triangles': 'Triangles',
 			'viewport/info/frametime': 'Temps de trame'
 		},
 		zh: {
