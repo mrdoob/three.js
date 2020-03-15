@@ -98,6 +98,7 @@ var files = {
 		"webgl_loader_lwo",
 		"webgl_loader_md2",
 		"webgl_loader_md2_control",
+		"webgl_loader_mdd",
 		"webgl_loader_mmd",
 		"webgl_loader_mmd_pose",
 		"webgl_loader_mmd_audio",
