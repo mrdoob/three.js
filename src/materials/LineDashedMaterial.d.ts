@@ -1,4 +1,3 @@
-import { Color } from './../math/Color';
 import { LineBasicMaterial, LineBasicMaterialParameters } from './LineBasicMaterial';
 
 export interface LineDashedMaterialParameters extends LineBasicMaterialParameters {

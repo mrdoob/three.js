@@ -28,9 +28,9 @@ export interface Matrix {
 	determinant(): number;
 
 	/**
-	 * getInverse(matrix:T, throwOnInvertible?:boolean):T;
+	 * getInverse(matrix:T):T;
 	 */
-	getInverse( matrix: Matrix, throwOnInvertible?: boolean ): Matrix;
+	getInverse( matrix: Matrix ): Matrix;
 
 	/**
 	 * transpose():T;

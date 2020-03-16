@@ -13,7 +13,7 @@
  * VPD is a posing data format used in MMD(Miku Miku Dance).
  *
  * MMD official site
- *  - http://www.geocities.jp/higuchuu4/index_e.htm
+ *  - https://sites.google.com/view/evpvp/
  *
  * PMD, VMD format (in Japanese)
  *  - http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4

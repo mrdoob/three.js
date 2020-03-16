@@ -58,7 +58,7 @@ var GeometryCompressionUtils = {
 		let result;
 		if ( encodeMethod == "DEFAULT" ) {
 
-			// TODO: Add 1 byte to the result, making the encoded length to be 4 bytes. 
+			// TODO: Add 1 byte to the result, making the encoded length to be 4 bytes.
 			result = new Uint8Array( count * 3 );
 
 			for ( let idx = 0; idx < array.length; idx += 3 ) {
@@ -268,7 +268,7 @@ var GeometryCompressionUtils = {
 
 		let array = uvs.array;
 
-		for ( let i = 0; i < array.length; i++ ) {
+		for ( let i = 0; i < array.length; i ++ ) {
 
 			range.min = Math.min( range.min, array[ i ] );
 			range.max = Math.max( range.max, array[ i ] );
@@ -838,7 +838,7 @@ function PackedPhongMaterial( parameters ) {
 		"}",
 	].join( "\n" );
 
-	// Use the original MeshPhongMaterial's fragmentShader. 
+	// Use the original MeshPhongMaterial's fragmentShader.
 	this.fragmentShader = [
 		"#define PHONG",
 

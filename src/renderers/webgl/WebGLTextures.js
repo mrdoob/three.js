@@ -180,10 +180,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			extensions.get( 'EXT_color_buffer_float' );
 
-		} else if ( internalFormat === _gl.RGB16F || internalFormat === _gl.RGB32F ) {
-
-			console.warn( 'THREE.WebGLRenderer: Floating point textures with RGB format not supported. Please use RGBA instead.' );
-
 		}
 
 		return internalFormat;
@@ -986,6 +982,16 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		var isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 		var isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
 		var supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
+
+		// Handles WebGL2 RGBFormat fallback - #18858
+
+		if ( isWebGL2 && renderTarget.texture.format === RGBFormat && ( renderTarget.texture.type === FloatType || renderTarget.texture.type === HalfFloatType ) ) {
+
+			renderTarget.texture.format = RGBAFormat;
+
+			console.warn( 'THREE.WebGLRenderer: Rendering to textures with RGB format is not supported. Using RGBA format instead.' );
+
+		}
 
 		// Setup framebuffer
 
