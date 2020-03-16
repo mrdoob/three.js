@@ -4,7 +4,6 @@
  */
 
 import {
-    Color,
     Euler,
     EventDispatcher,
     Raycaster,
@@ -58,6 +57,8 @@ var IndoorControls = function ( camera, domElement ) {
     var isRotating = false;
     // 鼠标的实时移动距离
     var movement = new Vector2();
+    // 鼠标静止时的实时移动距离
+    var movement0 = new Vector2();
     // 鼠标上一帧的实时移动距离
     var prevMovement = new Vector2();
     // 鼠标的实时位置
@@ -83,6 +84,8 @@ var IndoorControls = function ( camera, domElement ) {
     var targetAcc = 0;
     // 匀变速运动时相机的实时速度
     var targetSpeed = 0;
+    // 相机水平移动时将要移动的下一个点
+    var cameraLater = new Vector3();
 
     // 相机的按键移动状态
     var moveForward = false;
@@ -335,7 +338,7 @@ var IndoorControls = function ( camera, domElement ) {
         // 如果鼠标位置更新，则进行第一人称旋转
         if ( isRotating === true ) {
 
-            if ( movement.equals( new Vector2() ) ) movement.copy( prevMovement );
+            if ( movement.equals( movement0 ) ) movement.copy( prevMovement );
 
             euler.setFromQuaternion( scope.camera.quaternion );
 
@@ -355,21 +358,21 @@ var IndoorControls = function ( camera, domElement ) {
 
             } else {
 
-                movement.copy( new Vector2() );
+                movement.copy( movement0 );
 
             }
 
             if ( Math.abs( movement.x ) <= scope.rotatePrecision && Math.abs( movement.y ) <= scope.rotatePrecision ) isRotating = false;
 
             prevMovement.copy( movement );
-            movement.copy( new Vector2() );
+            movement.copy( movement0 );
 
         }
 
         // 如果相机不位于目标点，则进行水平移动
         if ( isMoving === true && target.equals( scope.camera.position ) === false ) {
 
-            var cameraLater = scope.camera.position.clone();
+            cameraLater.copy( scope.camera.position );
 
             // 计算相机水平移动后的位置
             if ( scope.moveAnimate === true ) {
