@@ -56,18 +56,18 @@
         } );
 
         //导入GLTF模型
-        setModels( './models/gltf/Room/scene.gltf' );
+        setModels( './models/gltf/Room.glb' );
 
         //渲染场景
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setSize( window.innerWidth, window.innerHeight );
-        renderer.setPixelRatio( window.devicePixelRatio ); //设置设备像素比，通常用于避免HiDPI设备上绘图模糊
-        renderer.toneMapping = THREE.ACESFilmicToneMapping; //用于在普通计算机显示器或者移动设备屏幕等低动态范围介质上，模拟、逼近高动态范围（HDR）效果
-        renderer.toneMappingExposure = 0.85; //色调映射的曝光级别，默认为1
-        renderer.outputEncoding = THREE.sRGBEncoding; //定义渲染器的输出编码
+        renderer.setPixelRatio( window.devicePixelRatio );
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 0.85;
+        renderer.outputEncoding = THREE.sRGBEncoding;
 
-        renderer.shadowMap.enabled = true; //允许在场景中使用阴影贴图
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap; //使用PCSS算法来过滤阴影映射
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
         viewport = document.getElementById( 'viewport' );
         viewport.appendChild( renderer.domElement );
@@ -98,7 +98,7 @@
         //监听窗口缩放
         window.addEventListener( 'resize', onWindowResize, false );
 
-        //拖动到节点上方时持续触发事件
+        /*//拖动到节点上方时持续触发事件
         viewport.ondragover = function ( event ) {
 
             event.preventDefault();
@@ -132,7 +132,7 @@
             //发送请求
             request.send( formData );
 
-        };
+        };*/
 
     }
 
