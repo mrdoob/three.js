@@ -57,8 +57,8 @@ class ArrowHelper extends Object3D {
 		this.setDirection( dir );
 		this.setLength( length, headLength, headWidth );
 
-  }
-  
+	}
+
 	setDirection( dir ) {
 
 		// dir is assumed to be normalized
@@ -78,8 +78,8 @@ class ArrowHelper extends Object3D {
 
 		}
 
-  }
-  
+	}
+
 	setLength( length, headLength, headWidth ) {
 
 		if ( headLength === undefined )
@@ -92,15 +92,15 @@ class ArrowHelper extends Object3D {
 		this.cone.position.y = length;
 		this.cone.updateMatrix();
 
-  }
-  
+	}
+
 	setColor( color ) {
 
 		this.line.material.color.set( color );
 		this.cone.material.color.set( color );
 
-  }
-  
+	}
+
 	copy( source ) {
 
 		super.copy( source, false );
@@ -108,8 +108,8 @@ class ArrowHelper extends Object3D {
 		this.cone.copy( source.cone );
 		return this;
 
-  }
-  
+	}
+
 	clone() {
 
 		return new ArrowHelper( this.dir, this.origin, this.length, this.color, this.headLength, this.headWidth );
