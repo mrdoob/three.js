@@ -34,16 +34,6 @@
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				hemiLight.position.set( 0, 20, 0 );
-				scene.add( hemiLight );
-
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( - 3, 10, - 10 );
-				scene.add( dirLight );
-
-				//
-
 				var loader = new MDDLoader();
 				loader.load( 'models/mdd/cube.mdd', function ( result ) {
 
@@ -54,7 +44,7 @@
 					var geometry = new THREE.BoxBufferGeometry();
 					geometry.morphAttributes.position = morphTargets; // apply morph targets
 
-					var material = new THREE.MeshPhongMaterial( { morphTargets: true } );
+					var material = new THREE.MeshNormalMaterial( { morphTargets: true } );
 
 					var mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );
