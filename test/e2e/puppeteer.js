@@ -18,6 +18,7 @@ const exceptionList = [
 
 	'index',
 	'css3d_youtube', // video tag not deterministic enough
+	'misc_controls_indoor',
 	'webgl_kinect', // same here
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
