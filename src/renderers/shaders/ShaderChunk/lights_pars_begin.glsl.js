@@ -63,19 +63,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 
 	uniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];
 
-	#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0
-
-		struct DirectionalLightShadow {
-			float shadowBias;
-			float shadowRadius;
-			vec2 shadowMapSize;
-		};
-
-		uniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];
-
-	#endif
-
-
 	void getDirectionalDirectLightIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight ) {
 
 		directLight.color = directionalLight.color;
@@ -97,20 +84,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	};
 
 	uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
-
-	#if defined( USE_SHADOWMAP ) && NUM_POINT_LIGHT_SHADOWS > 0
-
-		struct PointLightShadow {
-			float shadowBias;
-			float shadowRadius;
-			vec2 shadowMapSize;
-			float shadowCameraNear;
-			float shadowCameraFar;
-		};
-
-		uniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];
-
-	#endif
 
 	// directLight is an out parameter as having it as a return value caused compiler errors on some devices
 	void getPointDirectLightIrradiance( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight ) {
@@ -142,18 +115,6 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	};
 
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
-
-	#if defined( USE_SHADOWMAP ) && NUM_SPOT_LIGHT_SHADOWS > 0
-
-		struct SpotLightShadow {
-			float shadowBias;
-			float shadowRadius;
-			vec2 shadowMapSize;
-		};
-
-		uniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];
-
-	#endif
 
 	// directLight is an out parameter as having it as a return value caused compiler errors on some devices
 	void getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight  ) {

@@ -13,6 +13,7 @@ function LightShadow( camera ) {
 	this.camera = camera;
 
 	this.bias = 0;
+	this.normalOffset = 0;
 	this.radius = 1;
 
 	this.mapSize = new Vector2( 512, 512 );
