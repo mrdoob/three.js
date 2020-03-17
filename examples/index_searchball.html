@@ -1,5 +1,7 @@
 <!--
 	@author munrocket / https://twitter.com/munrocket_twit
+
+	Inspired by Callum Prentice, Marco Abrate and Fabrizio Pollastri.
 -->
 
 <!DOCTYPE html>
@@ -14,6 +16,8 @@
 
 	<body>
 
+		<canvas></canvas>
+
 		<script src="files.js"></script>
 
 		<script type="module">
@@ -22,20 +26,20 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { SpiralSphereGeometry } from './jsm/geometries/SpiralSphereGeometry.js';
 
-			var camera, scene, renderer, controls;
+			var canvas, camera, material, scene, renderer, controls;
 			var radius, tiles, turns;
-			var mouse, mouseDown, mouseTileId;
+			var mouse, mouseDown, mouseTileId, uId;
 
 			init();
 			animate();
 
 			function init() {
 
-				// init variables
+				// variables
 
 				radius = 1;
-				var gap = 0.03;
-				var subgrid = 10;
+				var gap = 0.05;
+				var subGrid = 10;
 				var uvCut = 0.02;
 
 				tiles = [];
@@ -50,13 +54,18 @@
 
 				}
 				turns = Math.PI / Math.sqrt( 4 * Math.PI / tiles.length / 800 * 600 );
-				var size = Math.ceil( Math.sqrt( tiles.length ) );
+				var texSize = Math.ceil( Math.sqrt( tiles.length ) );
 
-				mouseTileId = null;
+				uId = { value : - 1 };
+				mouseTileId = - 1;
 				mouse = new THREE.Vector2();
 				mouseDown = new THREE.Vector2();
+				canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
 
-				// camera
+				// scene
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0xFFFFFF );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
 				camera.position.set( 0, 1.5, 1 );
@@ -68,57 +77,67 @@
 
 				}
 
-				// scene
+				var sphere = new SpiralSphereGeometry( radius, turns, gap, gap, subGrid, subGrid, tiles.length );
+				var sphere2 = new SpiralSphereGeometry( radius + gap / 3, turns, - 3 * gap, - 3 * gap, subGrid, subGrid, tiles.length );
+				for ( var tile = 0; tile < sphere.attributes.id.count; tile ++ ) {
 
-				var geometry = new SpiralSphereGeometry( radius, turns, gap, gap, subgrid, subgrid, tiles.length );
-				for( var tile = 0; tile < geometry.attributes.id.count; tile ++ ) {
+					var id = sphere.attributes.id.array[ tile ];
+					var i = Math.floor( id / texSize );
+					var q = ( 1 - 2 * uvCut ) / texSize;
+					var u0 = ( id + uvCut ) / texSize - i;
+					var v0 = 1. - ( i + 1. - uvCut ) / texSize;
 
-					var id = geometry.attributes.id.array[ tile ];
-					var i = Math.floor( id / size );
-
-					var u0 = id / size - i + uvCut / size;
-					var v0 = 1. - ( i + 1. ) / size + uvCut / size;
-					var uh = ( 1 - 2 * uvCut ) / size;
-					var vh = ( 1 - 2 * uvCut ) / size;
-
-					geometry.attributes.uv.array[ 2 * tile ] *= uh;
-					geometry.attributes.uv.array[ 2 * tile ] += u0;
-					geometry.attributes.uv.array[ 2 * tile + 1 ] *= vh;
-					geometry.attributes.uv.array[ 2 * tile + 1 ] += v0;
+					sphere.attributes.uv.array[ 2 * tile ] *= q;
+					sphere.attributes.uv.array[ 2 * tile ] += u0;
+					sphere.attributes.uv.array[ 2 * tile + 1 ] *= q;
+					sphere.attributes.uv.array[ 2 * tile + 1 ] += v0;
 
 				}
+				sphere.computeVertexNormals();
+				sphere.attributes.position2 = sphere2.attributes.position;
 
-				var material = new THREE.MeshBasicMaterial( { color: 0xAAAAAA } );
-				var mesh = new THREE.Mesh( geometry, material );
-				new THREE.TextureLoader().load( './screenshots/all_in_one.jpg', function( tex ) {
+				material = new THREE.MeshBasicMaterial( { color: 0xAAAAAA } );
+				material.onBeforeCompile = function ( shader ) {
+
+					shader.uniforms.uId = uId;
+					shader.vertexShader = [
+						'attribute vec3 position2;',
+						'attribute float id;',
+						'uniform float uId;\n'
+					].join( '\n' ) + shader.vertexShader;
+					shader.vertexShader = shader.vertexShader.replace(
+						'#include <begin_vertex>',
+						'vec3 transformed = mix( position2, position, clamp( abs( id - uId ), 0., 1. ) );'
+					);
+
+				};
+				new THREE.TextureLoader().load( './screenshots/all_in_one.jpg', function( map ) {
+
 					material.color = null;
-					material.map = tex;
+					material.map = map;
 					material.needsUpdate = true;
-				});
 
-				scene = new THREE.Scene();
-				scene.add( mesh );
-				scene.background = new THREE.Color( 0xFFFFFF );
+				} );
+
+				scene.add( new THREE.Mesh( sphere, material ) );
 
 				// renderer
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
 
 				// controls
 
 				controls = new OrbitControls( camera, renderer.domElement );
-
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.04;
-
 				controls.screenSpacePanning = false;
 				controls.enablePan = false;
-
 				controls.minDistance = 1.05;
 				controls.maxDistance = 10;
+
+				// events
 
 				window.addEventListener( 'resize', onWindowResize, false );
 				window.addEventListener( 'mousedown', onMouseDown, false );
@@ -139,7 +158,7 @@
 				var b = 2 * ray.origin.dot( ray.direction );
 				var c = ray.origin.dot( ray.origin ) - radius * radius;
 				var D = b * b - 4 * a * c;
-				if ( D < 0 ) return null;
+				if ( D < 0 ) return ( - 1 );
 
 				var p = new THREE.Vector3();
 				var s = ( - b - Math.sqrt( D ) ) / ( 2 * a );
@@ -176,13 +195,14 @@
 				mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
 				mouseTileId = analyticRaycaster();
+				canvas.style.cursor = ( mouseTileId >= 0 ) ? 'auto' : 'pointer';
 
 			}
 
 			function onMouseUp( e ) {
 
 				onMouseMove( e );
-				if ( mouseTileId !== null && mouse.distanceTo( mouseDown ) < 0.03 ) {
+				if ( mouseTileId >= 0 && mouse.distanceTo( mouseDown ) < 0.03 ) {
 
 					window.location.href = './' + tiles[ mouseTileId ] + '.html';
 
@@ -211,7 +231,7 @@
 
 				}
 
-				if ( mouseTileId !== null && mouse.distanceTo( mouseDown ) < 0.15 ) {
+				if ( mouseTileId >= 0 && mouse.distanceTo( mouseDown ) < 0.15 ) {
 
 					window.location.href = './' + tiles[ mouseTileId ] + '.html';
 
@@ -219,10 +239,11 @@
 
 			}
 
-			function animate() {
+			function animate( now ) {
 
 				controls.update();
 				controls.rotateSpeed = 0.4 * ( camera.position.length() - 0.4 );
+				uId.value = mouseTileId;
 				renderer.render( scene, camera );
 				requestAnimationFrame( animate );
 

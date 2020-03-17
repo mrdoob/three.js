@@ -48,7 +48,7 @@ var SpiralSphereGeometry = function ( radius, turns, gapX, gapY, tileX, tileY, t
 				var v = j / tileY;
 				pushVert( t + gapX - ( 2 * gapX - Math.PI / turns ) * v, ( Math.PI + 2 * t ) * turns );
 				ids.push( id + 1 );
-				uvs.push( u, 1 - v );
+				uvs.push( 1 - u, 1 - v );
 
 			}
 
@@ -94,7 +94,7 @@ var SpiralSphereGeometry = function ( radius, turns, gapX, gapY, tileX, tileY, t
 				var v = j / tileY;
 				pushVert( sign * ( t1 * ( 1 - v ) + t2 * v ), turns * ( Math.PI + sign * 2 * t ) );
 				ids.push( pol * ( tiles - 1 ) );
-				uvs.push( u, 1 - pol - sign * v );
+				uvs.push( 1 - u, 1 - pol - sign * v );
 
 			}
 
