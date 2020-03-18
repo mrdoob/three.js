@@ -20,8 +20,8 @@
 		<code>
 		uniforms: {
 			time: { value: 1.0 },
-			resolution: new THREE.Uniform(new THREE.Vector2())
-		}
+			resolution: new Uniform( new Vector2() )
+		};
 		</code>
 
 		<h2>Uniform 种类</h2>
@@ -180,9 +180,65 @@
 		</table>
 
 		<p>
-
 		(*) 与最内层队列中 GSLS 的类型保持一致。包含队列中所有矢量的元素或矩阵中的元素。
 		</p>
+
+		<h2>Structured Uniforms</h2>
+
+		<p>
+			Sometimes you want to organize uniforms as *structs* in your shader code. The following style must be used so *three.js* is able
+			to process structured uniform data.
+		</p>
+		<code>
+		uniforms = {
+			data: {
+				value: {
+					position: new Vector3(),
+					direction: new Vector3( 0, 0, 1 )
+				 }
+			}
+		};
+		</code>
+		This definition can be mapped on the following GLSL code:
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data;
+		</code>
+
+		<h2>Structured Uniforms with Arrays</h2>
+
+		<p>
+			It's also possible to manage *structs* in arrays. The syntax for this use case looks like so:
+		</p>
+		<code>
+		var entry1 = {
+			position: new Vector3(),
+			direction: new Vector3( 0, 0, 1 )
+		};
+		var entry2 = {
+			position: new Vector3( 1, 1, 1 ),
+			direction: new Vector3( 0, 1, 0 )
+		};
+
+		uniforms = {
+			data: {
+				value: [ entry1, entry2 ]
+			}
+		};
+		</code>
+		This definition can be mapped on the following GLSL code:
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data[ 2 ];
+		</code>
 
 		<h2>构造函数</h2>
 
