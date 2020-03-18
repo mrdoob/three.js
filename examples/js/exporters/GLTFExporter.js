@@ -1176,17 +1176,14 @@ THREE.GLTFExporter.prototype = {
 
 			} else {
 
-				if ( ! geometry.isBufferGeometry ) {
-
-					console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use THREE.BufferGeometry instead.' );
-
-					var geometryTemp = new THREE.BufferGeometry();
-					geometryTemp.fromGeometry( geometry );
-					geometry = geometryTemp;
-
-				}
-
 				mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINES : WEBGL_CONSTANTS.TRIANGLES;
+
+			}
+
+			if ( ! geometry.isBufferGeometry ) {
+
+				console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use THREE.BufferGeometry instead.' );
+				geometry = new THREE.BufferGeometry().setFromObject( mesh );
 
 			}
 
