@@ -38,15 +38,15 @@ class DirectGeometry {
 
 	computeGroups( geometry ) {
 
-		let group;
-		let groups = [];
-		let materialIndex = undefined;
+		var group;
+		var groups = [];
+		var materialIndex = undefined;
 
-		let faces = geometry.faces;
+		var faces = geometry.faces;
 
-		for ( let i = 0; i < faces.length; i ++ ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
-			let face = faces[ i ];
+			var face = faces[ i ];
 
 			// materials
 
@@ -72,7 +72,7 @@ class DirectGeometry {
 
 		if ( group !== undefined ) {
 
-			group.count = ( faces.length * 3 ) - group.start;
+			group.count = ( i * 3 ) - group.start;
 			groups.push( group );
 
 		}
@@ -83,25 +83,25 @@ class DirectGeometry {
 
 	fromGeometry( geometry ) {
 
-		let faces = geometry.faces;
-		let vertices = geometry.vertices;
-		let faceVertexUvs = geometry.faceVertexUvs;
+		var faces = geometry.faces;
+		var vertices = geometry.vertices;
+		var faceVertexUvs = geometry.faceVertexUvs;
 
-		let hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
-		let hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
+		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
+		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 		// morphs
 
-		let morphTargets = geometry.morphTargets;
-		let morphTargetsLength = morphTargets.length;
+		var morphTargets = geometry.morphTargets;
+		var morphTargetsLength = morphTargets.length;
 
-		let morphTargetsPosition;
+		var morphTargetsPosition;
 
 		if ( morphTargetsLength > 0 ) {
 
 			morphTargetsPosition = [];
 
-			for ( let i = 0; i < morphTargetsLength; i ++ ) {
+			for ( var i = 0; i < morphTargetsLength; i ++ ) {
 
 				morphTargetsPosition[ i ] = {
 					name: morphTargets[ i ].name,
@@ -114,16 +114,16 @@ class DirectGeometry {
 
 		}
 
-		let morphNormals = geometry.morphNormals;
-		let morphNormalsLength = morphNormals.length;
+		var morphNormals = geometry.morphNormals;
+		var morphNormalsLength = morphNormals.length;
 
-		let morphTargetsNormal;
+		var morphTargetsNormal;
 
 		if ( morphNormalsLength > 0 ) {
 
 			morphTargetsNormal = [];
 
-			for ( let i = 0; i < morphNormalsLength; i ++ ) {
+			for ( var i = 0; i < morphNormalsLength; i ++ ) {
 
 				morphTargetsNormal[ i ] = {
 					name: morphNormals[ i ].name,
@@ -138,11 +138,11 @@ class DirectGeometry {
 
 		// skins
 
-		let skinIndices = geometry.skinIndices;
-		let skinWeights = geometry.skinWeights;
+		var skinIndices = geometry.skinIndices;
+		var skinWeights = geometry.skinWeights;
 
-		let hasSkinIndices = skinIndices.length === vertices.length;
-		let hasSkinWeights = skinWeights.length === vertices.length;
+		var hasSkinIndices = skinIndices.length === vertices.length;
+		var hasSkinWeights = skinWeights.length === vertices.length;
 
 		//
 
@@ -152,13 +152,13 @@ class DirectGeometry {
 
 		}
 
-		for ( let i = 0; i < faces.length; i ++ ) {
+		for ( var i = 0; i < faces.length; i ++ ) {
 
-			let face = faces[ i ];
+			var face = faces[ i ];
 
 			this.vertices.push( vertices[ face.a ], vertices[ face.b ], vertices[ face.c ] );
 
-			let vertexNormals = face.vertexNormals;
+			var vertexNormals = face.vertexNormals;
 
 			if ( vertexNormals.length === 3 ) {
 
@@ -166,13 +166,13 @@ class DirectGeometry {
 
 			} else {
 
-				let normal = face.normal;
+				var normal = face.normal;
 
 				this.normals.push( normal, normal, normal );
 
 			}
 
-			let vertexColors = face.vertexColors;
+			var vertexColors = face.vertexColors;
 
 			if ( vertexColors.length === 3 ) {
 
@@ -180,7 +180,7 @@ class DirectGeometry {
 
 			} else {
 
-				let color = face.color;
+				var color = face.color;
 
 				this.colors.push( color, color, color );
 
@@ -188,7 +188,7 @@ class DirectGeometry {
 
 			if ( hasFaceVertexUv === true ) {
 
-				let vertexUvs = faceVertexUvs[ 0 ][ i ];
+				var vertexUvs = faceVertexUvs[ 0 ][ i ];
 
 				if ( vertexUvs !== undefined ) {
 
@@ -206,7 +206,7 @@ class DirectGeometry {
 
 			if ( hasFaceVertexUv2 === true ) {
 
-				let vertexUvs = faceVertexUvs[ 1 ][ i ];
+				var vertexUvs = faceVertexUvs[ 1 ][ i ];
 
 				if ( vertexUvs !== undefined ) {
 
@@ -224,17 +224,17 @@ class DirectGeometry {
 
 			// morphs
 
-			for ( let j = 0; j < morphTargetsLength; j ++ ) {
+			for ( var j = 0; j < morphTargetsLength; j ++ ) {
 
-				let morphTarget = morphTargets[ j ].vertices;
+				var morphTarget = morphTargets[ j ].vertices;
 
 				morphTargetsPosition[ j ].data.push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
 
-			for ( let j = 0; j < morphNormalsLength; j ++ ) {
+			for ( var j = 0; j < morphNormalsLength; j ++ ) {
 
-				let morphNormal = morphNormals[ j ].vertexNormals[ i ];
+				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
 				morphTargetsNormal[ j ].data.push( morphNormal.a, morphNormal.b, morphNormal.c );
 
