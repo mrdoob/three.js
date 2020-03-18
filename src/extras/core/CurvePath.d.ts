@@ -13,6 +13,7 @@ export class CurvePath<T extends Vector> extends Curve<T> {
 	checkConnection(): boolean;
 	closePath(): void;
 	getPoint( t: number ): T;
+	getPointAt( t: number ): T;
 	getLength(): number;
 	updateArcLengths(): void;
 	getCurveLengths(): number[];
