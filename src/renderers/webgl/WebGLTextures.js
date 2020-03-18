@@ -1133,6 +1133,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.blitFramebuffer( 0, 0, width, height, 0, 0, width, height, mask, _gl.NEAREST );
 
+				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglMultisampledFramebuffer ); // see #18905
+
 			} else {
 
 				console.warn( 'THREE.WebGLRenderer: WebGLMultisampleRenderTarget can only be used with WebGL2.' );
