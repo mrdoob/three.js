@@ -889,7 +889,7 @@ var Strings = function ( config ) {
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
-			'sidebar/settings/exportPrecision': 'Export Precision',
+			'sidebar/settings/exportPrecision': '输出精度',
 
 			'sidebar/settings/shortcuts/translate': '移动',
 			'sidebar/settings/shortcuts/rotate': '旋转',
