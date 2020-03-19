@@ -856,10 +856,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 						glInternalFormat = _gl.DEPTH_COMPONENT24;
 
-					} else {
-
-						console.error( 'WebGLRenderer: THREE.UnsignedShortType not supported as a type for depth textures when using THREE.WebGLMultisampleRenderTarget.' );
-
 					}
 
 				}
