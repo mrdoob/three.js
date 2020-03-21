@@ -21911,15 +21911,29 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			glInternalFormat = 6402;
 
-			if ( texture.type === FloatType ) {
+			if ( isWebGL2 ) {
 
-				if ( isWebGL2 === false ) throw new Error( 'Float Depth Texture only supported in WebGL2.0' );
-				glInternalFormat = 36012;
+				if ( texture.type === FloatType ) {
 
-			} else if ( isWebGL2 ) {
+					glInternalFormat = 36012;
 
-				// WebGL 2.0 requires signed internalformat for glTexImage2D
-				glInternalFormat = 33189;
+				} else if ( texture.type === UnsignedIntType ) {
+
+					glInternalFormat = 33190;
+
+				} else {
+
+					glInternalFormat = 33189; // WebGL2 requires sized internalformat for glTexImage2D
+
+				}
+
+			} else {
+
+				if ( texture.type === FloatType ) {
+
+					console.error( 'WebGLRenderer: Floating point depth texture requires WebGL2.' );
+
+				}
 
 			}
 
@@ -22087,15 +22101,33 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.depthBuffer && ! renderTarget.stencilBuffer ) {
 
+			var glInternalFormat = 33189;
+
 			if ( isMultisample ) {
+
+				var depthTexture = renderTarget.depthTexture;
+
+				if ( depthTexture && depthTexture.isDepthTexture ) {
+
+					if ( depthTexture.type === FloatType ) {
+
+						glInternalFormat = 36012;
+
+					} else if ( depthTexture.type === UnsignedIntType ) {
+
+						glInternalFormat = 33190;
+
+					}
+
+				}
 
 				var samples = getRenderTargetSamples( renderTarget );
 
-				_gl.renderbufferStorageMultisample( 36161, samples, 33189, renderTarget.width, renderTarget.height );
+				_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
 
 			} else {
 
-				_gl.renderbufferStorage( 36161, 33189, renderTarget.width, renderTarget.height );
+				_gl.renderbufferStorage( 36161, glInternalFormat, renderTarget.width, renderTarget.height );
 
 			}
 
@@ -22210,7 +22242,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					_gl.bindFramebuffer( 36160, renderTargetProperties.__webglFramebuffer[ i ] );
 					renderTargetProperties.__webglDepthbuffer[ i ] = _gl.createRenderbuffer();
-					setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget );
+					setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer[ i ], renderTarget, false );
 
 				}
 
@@ -22218,7 +22250,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				_gl.bindFramebuffer( 36160, renderTargetProperties.__webglFramebuffer );
 				renderTargetProperties.__webglDepthbuffer = _gl.createRenderbuffer();
-				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget );
+				setupRenderBufferStorage( renderTargetProperties.__webglDepthbuffer, renderTarget, false );
 
 			}
 
@@ -33960,7 +33992,7 @@ Object.assign( Interpolant.prototype, {
 
 } );
 
-//!\ DECLARE ALIAS AFTER assign prototype !
+// DECLARE ALIAS AFTER assign prototype
 Object.assign( Interpolant.prototype, {
 
 	//( 0, t, t0 ), returns this.resultBuffer
@@ -43391,7 +43423,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 } );
 
-//!\ DECLARE ALIAS AFTER assign prototype !
+// DECLARE ALIAS AFTER assign prototype
 Object.assign( PropertyBinding.prototype, {
 
 	// initial state of these methods that calls 'bind'
