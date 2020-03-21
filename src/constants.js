@@ -129,6 +129,7 @@ export var RGBA_ASTC_10x8_Format = 37818;
 export var RGBA_ASTC_10x10_Format = 37819;
 export var RGBA_ASTC_12x10_Format = 37820;
 export var RGBA_ASTC_12x12_Format = 37821;
+export var RGBA_BPTC_Format = 36492;
 export var SRGB8_ALPHA8_ASTC_4x4_Format = 37840;
 export var SRGB8_ALPHA8_ASTC_5x4_Format = 37841;
 export var SRGB8_ALPHA8_ASTC_5x5_Format = 37842;

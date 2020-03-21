@@ -80,10 +80,15 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
 		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
 			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+		config.bptcSupported = !! renderer.extensions.get( 'EXT_texture_compression_bptc' );
 
 		if ( config.astcSupported ) {
 
 			config.format = BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4;
+
+		} else if ( config.bptcSupported ) {
+
+			config.format = BasisTextureLoader.BASIS_FORMAT.cTFBC7_M5;
 
 		} else if ( config.dxtSupported ) {
 
@@ -161,6 +166,9 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 					case BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4:
 						texture = new CompressedTexture( mipmaps, width, height, RGBA_ASTC_4x4_Format );
+						break;
+					case BasisTextureLoader.BASIS_FORMAT.cTFBC7_M5:
+						texture = new CompressedTexture( mipmaps, width, height, RGBA_BPTC_Format );
 						break;
 					case BasisTextureLoader.BASIS_FORMAT.cTFBC1:
 					case BasisTextureLoader.BASIS_FORMAT.cTFBC3:
