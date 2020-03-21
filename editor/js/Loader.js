@@ -219,7 +219,11 @@ var Loader = function ( editor ) {
 
 					} else {
 
+						var dracoLoader = new DRACOLoader();
+						dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+
 						loader = new GLTFLoader( manager );
+						loader.setDRACOLoader( dracoLoader );
 
 					}
 

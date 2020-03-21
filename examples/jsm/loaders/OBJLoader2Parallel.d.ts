@@ -12,7 +12,7 @@ export class OBJLoader2Parallel extends OBJLoader2 {
 	executeParallel: boolean;
 	workerExecutionSupport: WorkerExecutionSupport;
 
-	setPreferJsmWorker( preferJsmWorker: boolean ): this;
+	setJsmWorker( preferJsmWorker: boolean, jsmWorkerUrl: URL ): this;
 	setExecuteParallel( executeParallel: boolean ): this;
 	getWorkerExecutionSupport(): object;
 	buildWorkerCode(): object;

@@ -384,12 +384,11 @@
 		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>使用相机和指定材质渲染缓冲几何组。</p>
 
-		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:shaderprogram program], [param:Material shading] )</h3>
+		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
 		<p>object - 一个[page:Object3D]实例<br />
-		program - 一个shaderProgram实例<br />
-		shading - 一个Material实例<br /><br />
+		program - 一个[page:WebGLProgram]实例<br />
 
-		渲染即使缓冲，由enderImmediateObject对象调用
+		渲染即使缓冲，由renderObjectImmediate对象调用
 		</p>
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
