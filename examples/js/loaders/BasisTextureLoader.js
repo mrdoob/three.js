@@ -31,6 +31,7 @@ THREE.BasisTextureLoader = function ( manager ) {
 	this.workerConfig = {
 		format: null,
 		astcSupported: false,
+		bptcSupported: false,
 		etcSupported: false,
 		dxtSupported: false,
 		pvrtcSupported: false,
@@ -63,11 +64,11 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 		var config = this.workerConfig;
 
 		config.astcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_astc' );
+		config.bptcSupported = !! renderer.extensions.get( 'EXT_texture_compression_bptc' );
 		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
 		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
 		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
 			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
-		config.bptcSupported = !! renderer.extensions.get( 'EXT_texture_compression_bptc' );
 
 		if ( config.astcSupported ) {
 
