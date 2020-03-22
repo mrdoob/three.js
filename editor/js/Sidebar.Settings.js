@@ -2,13 +2,17 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Sidebar.Settings = function ( editor ) {
+import { UIPanel, UIRow, UISelect, UIText, UIInteger } from './libs/ui.js';
+
+import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
+import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
+
+var SidebarSettings = function ( editor ) {
 
 	var config = editor.config;
-	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setBorderTop( '0' );
 	container.setPaddingTop( '20px' );
 	container.setPaddingBottom( '20px' );
@@ -17,11 +21,12 @@ Sidebar.Settings = function ( editor ) {
 
 	var options = {
 		en: 'English',
+		fr: 'Français',
 		zh: '中文'
 	};
 
-	var languageRow = new UI.Row();
-	var language = new UI.Select().setWidth( '150px' );
+	var languageRow = new UIRow();
+	var language = new UISelect().setWidth( '150px' );
 	language.setOptions( options );
 
 	if ( config.getKey( 'language' ) !== undefined ) {
@@ -38,14 +43,36 @@ Sidebar.Settings = function ( editor ) {
 
 	} );
 
-	languageRow.add( new UI.Text( strings.getKey( 'sidebar/settings/language' ) ).setWidth( '90px' ) );
+	languageRow.add( new UIText( strings.getKey( 'sidebar/settings/language' ) ).setWidth( '90px' ) );
 	languageRow.add( language );
 
 	container.add( languageRow );
 
-	container.add( new Sidebar.Settings.Shortcuts( editor ) );
-	container.add( new Sidebar.Settings.Viewport( editor ) );
+	// export precision
+
+	var exportPrecisionRow = new UIRow();
+	var exportPrecision = new UIInteger( config.getKey( 'exportPrecision' ) ).setRange( 2, Infinity );
+
+	exportPrecision.onChange( function () {
+
+		var value = this.getValue();
+
+		editor.config.setKey( 'exportPrecision', value );
+
+	} );
+
+	exportPrecisionRow.add( new UIText( strings.getKey( 'sidebar/settings/exportPrecision' ) ).setWidth( '90px' ) );
+	exportPrecisionRow.add( exportPrecision );
+
+	container.add( exportPrecisionRow );
+
+	//
+
+	container.add( new SidebarSettingsShortcuts( editor ) );
+	container.add( new SidebarSettingsViewport( editor ) );
 
 	return container;
 
 };
+
+export { SidebarSettings };

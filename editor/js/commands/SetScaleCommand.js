@@ -3,6 +3,10 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
+import * as THREE from '../../../build/three.module.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
@@ -10,7 +14,6 @@
  * @param optionalOldScale THREE.Vector3
  * @constructor
  */
-
 var SetScaleCommand = function ( editor, object, newScale, optionalOldScale ) {
 
 	Command.call( this, editor );
@@ -83,3 +86,5 @@ SetScaleCommand.prototype = {
 	}
 
 };
+
+export { SetScaleCommand };

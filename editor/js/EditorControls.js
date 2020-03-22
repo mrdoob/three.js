@@ -5,7 +5,9 @@
  * @author WestLangley / http://github.com/WestLangley
  */
 
-THREE.EditorControls = function ( object, domElement ) {
+import * as THREE from '../../build/three.module.js';
+
+var EditorControls = function ( object, domElement ) {
 
 	// API
 
@@ -309,5 +311,7 @@ THREE.EditorControls = function ( object, domElement ) {
 
 };
 
-THREE.EditorControls.prototype = Object.create( THREE.EventDispatcher.prototype );
-THREE.EditorControls.prototype.constructor = THREE.EditorControls;
+EditorControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+EditorControls.prototype.constructor = EditorControls;
+
+export { EditorControls };

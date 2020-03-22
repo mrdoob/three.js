@@ -26,6 +26,7 @@ THREE.Water = function ( geometry, options ) {
 	var reflectivity = options.reflectivity || 0.02;
 	var scale = options.scale || 1;
 	var shader = options.shader || THREE.Water.WaterShader;
+	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	var textureLoader = new THREE.TextureLoader();
 
@@ -57,13 +58,15 @@ THREE.Water = function ( geometry, options ) {
 	var reflector = new THREE.Reflector( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	var refractor = new THREE.Refractor( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	reflector.matrixAutoUpdate = false;
@@ -236,6 +239,7 @@ THREE.Water.WaterShader = {
 
 	vertexShader: [
 
+		'#include <common>',
 		'#include <fog_pars_vertex>',
 		'#include <logdepthbuf_pars_vertex>',
 

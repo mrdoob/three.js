@@ -77,6 +77,24 @@ m.elements = [ 11, 21, 31, 41,
 		code, you'll have to take the [link:https://en.wikipedia.org/wiki/Transpose transpose] of any matrices outlined here to make sense of the calculations.
 		</p>
 
+		<h2>Extracting position, rotation and scale</h2>
+		<p>
+			There are several options available for extracting position, rotation and scale from a Matrix4.
+			<ul>
+				<li>
+					[page:Vector3.setFromMatrixPosition]: can be used to extract the translation component.
+				</li>
+				<li>
+					[page:Vector3.setFromMatrixScale]: can be used to extract the scale component.
+				</li>
+				<li>
+					[page:Quaternion.setFromRotationMatrix], [page:Euler.setFromRotationMatrix] or [page:.extractRotation extractRotation] can be used to extract the rotation component.
+				</li>
+				<li>
+					[page:.decompose decompose] can be used to extract position, rotation and scale all at once.
+				</li>
+			</ul>
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -96,25 +114,10 @@ m.elements = [ 11, 21, 31, 41,
 		 list of matrix values.
 		</p>
 
-		<h3>[property:Boolean isMatrix4]</h3>
-		<p>
-			Used to check whether this or derived classes are Matrix4s. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 
 
 
 		<h2>Methods</h2>
-
-		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
-		<p>
-		[page:BufferAttribute attribute] - An attribute of floats that represent 3D vectors.<br /><br />
-
-		Multiplies (applies) this matrix to every 3D vector in the [page:BufferAttribute attribute].
-		</p>
-
 
 		<h3>[method:Matrix4 clone]()</h3>
 		<p>Creates a new Matrix4 with identical [page:.elements elements] to this one.</p>
@@ -187,15 +190,14 @@ zAxis = (c, g, k)
 		[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major] format.
 		</p>
 
-		<h3>[method:this getInverse]( [param:Matrix4 m], [param:Boolean throwOnDegenerate] )</h3>
+		<h3>[method:this getInverse]( [param:Matrix4 m] )</h3>
 		<p>
-		[page:Matrix4 m] - the matrix to take the inverse of.<br />
-		[page:Boolean throwOnDegenerate] - (optional) If true, throw an error if the matrix is degenerate (not invertible).<br /><br />
+		[page:Matrix4 m] - the matrix to take the inverse of.<br /><br />
 
 		Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix4 m],
 		using the method outlined [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here].
 
-		If [page:Boolean throwOnDegenerate] is not set and the matrix is not invertible, set this to the 4x4 identity matrix.
+		You can not invert a matrix with a determinant of zero. If you attempt this, the method returns a zero matrix instead.
 		</p>
 
 

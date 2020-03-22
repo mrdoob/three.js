@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "noEmit": true,
+    "target": "ES6"
   },
   "include": [
-    "../../**/*.ts"
+    "../../src/**/*.ts"
   ]
 }

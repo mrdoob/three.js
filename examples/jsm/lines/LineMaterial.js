@@ -236,10 +236,10 @@ ShaderLib[ 'line' ] = {
 
 			gl_FragColor = vec4( diffuseColor.rgb, diffuseColor.a );
 
-			#include <premultiplied_alpha_fragment>
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>
 			#include <fog_fragment>
+			#include <premultiplied_alpha_fragment>
 
 		}
 		`
@@ -254,7 +254,9 @@ var LineMaterial = function ( parameters ) {
 		uniforms: UniformsUtils.clone( ShaderLib[ 'line' ].uniforms ),
 
 		vertexShader: ShaderLib[ 'line' ].vertexShader,
-		fragmentShader: ShaderLib[ 'line' ].fragmentShader
+		fragmentShader: ShaderLib[ 'line' ].fragmentShader,
+
+		clipping: true // required for clipping support
 
 	} );
 

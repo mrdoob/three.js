@@ -12,7 +12,6 @@ export class ConstNode extends TempNode {
 	getType( builder: NodeBuilder ): string;
 	parse( src: string, useDefine?: boolean ): void;
 	build( builder: NodeBuilder, output: string ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: ConstNode ): this;
 
 	static PI: string;

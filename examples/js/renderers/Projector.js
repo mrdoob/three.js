@@ -157,14 +157,12 @@ THREE.Projector = function () {
 		var uvs = [];
 
 		var object = null;
-		var material = null;
 
 		var normalMatrix = new THREE.Matrix3();
 
 		function setObject( value ) {
 
 			object = value;
-			material = object.material;
 
 			normalMatrix.getNormalMatrix( object.matrixWorld );
 
@@ -268,7 +266,7 @@ THREE.Projector = function () {
 
 				_line.material = object.material;
 
-				if ( object.material.vertexColors === THREE.VertexColors ) {
+				if ( object.material.vertexColors ) {
 
 					_line.vertexColors[ 0 ].fromArray( colors, a * 3 );
 					_line.vertexColors[ 1 ].fromArray( colors, b * 3 );
@@ -322,7 +320,7 @@ THREE.Projector = function () {
 
 				_face.material = material;
 
-				if ( material.vertexColors === THREE.FaceColors || material.vertexColors === THREE.VertexColors ) {
+				if ( material.vertexColors ) {
 
 					_face.color.fromArray( colors, a * 3 );
 
@@ -414,7 +412,7 @@ THREE.Projector = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_frustum.setFromMatrix( _viewProjectionMatrix );
+		_frustum.setFromProjectionMatrix( _viewProjectionMatrix );
 
 		//
 
@@ -832,7 +830,7 @@ THREE.Projector = function () {
 
 							_line.material = object.material;
 
-							if ( object.material.vertexColors === THREE.VertexColors ) {
+							if ( object.material.vertexColors ) {
 
 								_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
 								_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );

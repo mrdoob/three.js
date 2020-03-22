@@ -4,7 +4,6 @@ import { Raycaster } from './../core/Raycaster';
 import { Object3D } from './../core/Object3D';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Intersection } from '../core/Raycaster';
-import { TrianglesDrawModes } from '../constants';
 
 export class Mesh extends Object3D {
 
@@ -15,13 +14,11 @@ export class Mesh extends Object3D {
 
 	geometry: Geometry | BufferGeometry;
 	material: Material | Material[];
-	drawMode: TrianglesDrawModes;
 	morphTargetInfluences?: number[];
 	morphTargetDictionary?: { [key: string]: number };
-	isMesh: true;
+	readonly isMesh: true;
 	type: string;
 
-	setDrawMode( drawMode: TrianglesDrawModes ): void;
 	updateMorphTargets(): void;
 	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
 

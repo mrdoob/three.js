@@ -13,7 +13,7 @@ export class CodeBuilderInstructions {
 	isSupportsStandardWorker(): boolean;
 	isSupportsJsmWorker(): boolean;
 	isPreferJsmWorker(): boolean;
-	setJsmWorkerFile( jsmWorkerFile: string ): void;
+	setJsmWorkerUrl( jsmWorkerUrl: string ): void;
 	addStartCode( startCode: string ): void;
 	addCodeFragment( code: string ): void;
 	addLibraryImport( libraryPath: string ): void;

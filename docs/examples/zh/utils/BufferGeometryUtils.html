@@ -11,7 +11,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-		A class containing utility functions for [page:BufferGeometry BufferGeometry] instances.<br /><br />
+		A class containing utility functions for [page:BufferGeometry BufferGeometry] instances.
 		</p>
 
 
@@ -21,7 +21,7 @@
 		<p>
 		geometry -- A [page:BufferGeometry BufferGeometry] instance, which must have index, position, normal, and uv attributes.<br /><br />
 
-		Calculates and adds tangent attribute to a geometry.<br /><br />
+		Calculates and adds tangent attribute to a geometry.
 
 		</p>
 
@@ -31,7 +31,7 @@
 		useGroups -- Whether groups should be generated for the merged geometry or not.<br /><br />
 
 		Merges a set of geometries into a single instance. All geometries must have compatible attributes.
-		If merge does not succeed, the method returns null.<br /><br />
+		If merge does not succeed, the method returns null.
 
 		</p>
 
@@ -73,10 +73,20 @@
 
 		</p>
 
+		<h3>[method:BufferGeometry toTrianglesDrawMode]( [param:BufferGeometry geometry], [param:TrianglesDrawMode drawMode] )</h3>
+		<p>
+		geometry -- Instance of [page:BufferGeometry BufferGeometry].<br />
+		drawMode -- The draw mode of the given geometry.<br /><br />
+
+		Returns a new indexed [page:BufferGeometry BufferGeometry] based on the [page:DrawModes THREE.TrianglesDrawMode] draw mode. This mode
+		corresponds to the *gl.TRIANGLES* WebGL primitive.
+
+		</p>
+
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/utils/BufferGeometryUtils.js examples/js/utils/BufferGeometryUtils.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/BufferGeometryUtils.js examples/jsm/utils/BufferGeometryUtils.js]
 		</p>
 	</body>
 </html>

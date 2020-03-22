@@ -20,6 +20,8 @@ function InstancedMesh( geometry, material, count ) {
 
 	this.count = count;
 
+	this.frustumCulled = false;
+
 }
 
 InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
@@ -46,21 +48,19 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		for ( var instanceId = 0; instanceId < raycastTimes; instanceId ++ ) {
 
-			//Calculate the world matrix for each instance
+			// calculate the world matrix for each instance
 
 			this.getMatrixAt( instanceId, _instanceLocalMatrix );
 
 			_instanceWorldMatrix.multiplyMatrices( matrixWorld, _instanceLocalMatrix );
 
-
-			//The mesh represents this single instance
+			// the mesh represents this single instance
 
 			_mesh.matrixWorld = _instanceWorldMatrix;
 
 			_mesh.raycast( raycaster, _instanceIntersects );
 
-
-			//Process the result of raycast
+			// process the result of raycast
 
 			if ( _instanceIntersects.length > 0 ) {
 

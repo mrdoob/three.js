@@ -64,8 +64,7 @@
 
 		<h3>[property:Texture aoMap]</h3>
 		<p>The red channel of this texture is used as the ambient occlusion map. Default is null.
-		The aoMap requires a second set of UVs, and consequently will ignore the [page:Texture repeat]
-		and [page:Texture offset] Texture properties.</p>
+		The aoMap requires a second set of UVs.</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
 		<p>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</p>
@@ -82,20 +81,11 @@
 			blend between the two colors.
 		</p>
 
-		<h3>[property:Boolean isMeshBasicMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are mesh basic materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:TextureCube envMap]</h3>
 		<p>The environment map. Default is null.</p>
 
 		<h3>[property:Texture lightMap]</h3>
-		<p>The light map. Default is null. The lightMap requires a second set of UVs,
-		and consequently will ignore the [page:Texture repeat] and [page:Texture offset]
-		Texture properties.</p>
+		<p>The light map. Default is null. The lightMap requires a second set of UVs.</p>
 
 		<h3>[property:Float lightMapIntensity]</h3>
 		<p>Intensity of the baked light. Default is 1.</p>

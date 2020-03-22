@@ -8,7 +8,6 @@
 
 import { LineSegments } from '../objects/LineSegments.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { VertexColors } from '../constants.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Color } from '../math/Color.js';
 import { Vector3 } from '../math/Vector3.js';
@@ -70,7 +69,7 @@ function SkeletonHelper( object ) {
 	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-	var material = new LineBasicMaterial( { vertexColors: VertexColors, depthTest: false, depthWrite: false, transparent: true } );
+	var material = new LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false, transparent: true } );
 
 	LineSegments.call( this, geometry, material );
 
@@ -84,6 +83,8 @@ function SkeletonHelper( object ) {
 
 SkeletonHelper.prototype = Object.create( LineSegments.prototype );
 SkeletonHelper.prototype.constructor = SkeletonHelper;
+
+SkeletonHelper.prototype.isSkeletonHelper = true;
 
 SkeletonHelper.prototype.updateMatrixWorld = function ( force ) {
 

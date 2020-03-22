@@ -54,9 +54,6 @@
  * 	visible: true,
  * 	keepAlive: true
  * };
- *
- * TODO
- *  - support shader material without objectNormal in its vertexShader
  */
 
 THREE.OutlineEffect = function ( renderer, parameters ) {
@@ -90,58 +87,57 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	//this.cache = cache;  // for debug
 
-	// copied from WebGLPrograms and removed some materials
-	var shaderIDs = {
-		MeshBasicMaterial: 'basic',
-		MeshLambertMaterial: 'lambert',
-		MeshPhongMaterial: 'phong',
-		MeshToonMaterial: 'phong',
-		MeshStandardMaterial: 'physical',
-		MeshPhysicalMaterial: 'physical'
-	};
-
-	var uniformsChunk = {
+	var uniformsOutline = {
 		outlineThickness: { value: defaultThickness },
 		outlineColor: { value: defaultColor },
 		outlineAlpha: { value: defaultAlpha }
 	};
 
-	var vertexShaderChunk = [
+	var vertexShader = [
+		"#include <common>",
+		"#include <uv_pars_vertex>",
+		"#include <displacementmap_pars_vertex>",
+		"#include <fog_pars_vertex>",
+		"#include <morphtarget_pars_vertex>",
+		"#include <skinning_pars_vertex>",
+		"#include <logdepthbuf_pars_vertex>",
+		"#include <clipping_planes_pars_vertex>",
 
 		"uniform float outlineThickness;",
 
-		"vec4 calculateOutline( vec4 pos, vec3 objectNormal, vec4 skinned ) {",
-
+		"vec4 calculateOutline( vec4 pos, vec3 normal, vec4 skinned ) {",
 		"	float thickness = outlineThickness;",
 		"	const float ratio = 1.0;", // TODO: support outline thickness ratio for each vertex
-		"	vec4 pos2 = projectionMatrix * modelViewMatrix * vec4( skinned.xyz + objectNormal, 1.0 );",
+		"	vec4 pos2 = projectionMatrix * modelViewMatrix * vec4( skinned.xyz + normal, 1.0 );",
 		// NOTE: subtract pos2 from pos because BackSide objectNormal is negative
 		"	vec4 norm = normalize( pos - pos2 );",
 		"	return pos + norm * thickness * pos.w * ratio;",
+		"}",
 
-		"}"
+		"void main() {",
 
-	].join( "\n" );
+		"	#include <uv_vertex>",
 
-	var vertexShaderChunk2 = [
+		"	#include <beginnormal_vertex>",
+		"	#include <morphnormal_vertex>",
+		"	#include <skinbase_vertex>",
+		"	#include <skinnormal_vertex>",
 
-		"#if ! defined( LAMBERT ) && ! defined( PHONG ) && ! defined( TOON ) && ! defined( STANDARD )",
-		"	#ifndef USE_ENVMAP",
-		"		vec3 objectNormal = normalize( normal );",
-		"	#endif",
-		"#endif",
+		"	#include <begin_vertex>",
+		"	#include <morphtarget_vertex>",
+		"	#include <skinning_vertex>",
+		"	#include <displacementmap_vertex>",
+		"	#include <project_vertex>",
 
-		"#ifdef FLIP_SIDED",
-		"	objectNormal = -objectNormal;",
-		"#endif",
+		"	vec3 outlineNormal = - objectNormal;", // the outline material is always rendered with THREE.BackSide
 
-		"#ifdef DECLARE_TRANSFORMED",
-		"	vec3 transformed = vec3( position );",
-		"#endif",
+		"	gl_Position = calculateOutline( gl_Position, outlineNormal, vec4( transformed, 1.0 ) );",
 
-		"gl_Position = calculateOutline( gl_Position, objectNormal, vec4( transformed, 1.0 ) );",
+		"	#include <logdepthbuf_vertex>",
+		"	#include <clipping_planes_vertex>",
+		"	#include <fog_vertex>",
 
-		"#include <fog_vertex>"
+		"}",
 
 	].join( "\n" );
 
@@ -149,92 +145,40 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		"#include <common>",
 		"#include <fog_pars_fragment>",
+		"#include <logdepthbuf_pars_fragment>",
+		"#include <clipping_planes_pars_fragment>",
 
 		"uniform vec3 outlineColor;",
 		"uniform float outlineAlpha;",
 
 		"void main() {",
 
+		"	#include <clipping_planes_fragment>",
+		"	#include <logdepthbuf_fragment>",
+
 		"	gl_FragColor = vec4( outlineColor, outlineAlpha );",
 
+		"	#include <tonemapping_fragment>",
+		"	#include <encodings_fragment>",
 		"	#include <fog_fragment>",
+		"	#include <premultiplied_alpha_fragment>",
 
 		"}"
 
 	].join( "\n" );
 
-	function createInvisibleMaterial() {
-
-		return new THREE.ShaderMaterial( { name: 'invisible', visible: false } );
-
-	}
-
-	function createMaterial( originalMaterial ) {
-
-		var shaderID = shaderIDs[ originalMaterial.type ];
-		var originalUniforms, originalVertexShader;
-
-		if ( shaderID !== undefined ) {
-
-			var shader = THREE.ShaderLib[ shaderID ];
-			originalUniforms = shader.uniforms;
-			originalVertexShader = shader.vertexShader;
-
-		} else if ( originalMaterial.isRawShaderMaterial === true ) {
-
-			originalUniforms = originalMaterial.uniforms;
-			originalVertexShader = originalMaterial.vertexShader;
-
-			if ( ! /attribute\s+vec3\s+position\s*;/.test( originalVertexShader ) ||
-			     ! /attribute\s+vec3\s+normal\s*;/.test( originalVertexShader ) ) {
-
-				console.warn( 'THREE.OutlineEffect requires both vec3 position and normal attributes in vertex shader, ' +
-				              'does not draw outline for ' + originalMaterial.name + '(uuid:' + originalMaterial.uuid + ') material.' );
-
-				return createInvisibleMaterial();
-
-			}
-
-		} else if ( originalMaterial.isShaderMaterial === true ) {
-
-			originalUniforms = originalMaterial.uniforms;
-			originalVertexShader = originalMaterial.vertexShader;
-
-		} else {
-
-			return createInvisibleMaterial();
-
-		}
-
-		var uniforms = Object.assign( {}, originalUniforms, uniformsChunk );
-
-		var vertexShader = originalVertexShader
-			// put vertexShaderChunk right before "void main() {...}"
-			.replace( /void\s+main\s*\(\s*\)/, vertexShaderChunk + '\nvoid main()' )
-			// put vertexShaderChunk2 the end of "void main() {...}"
-			// Note: here assums originalVertexShader ends with "}" of "void main() {...}"
-			.replace( /\}\s*$/, vertexShaderChunk2 + '\n}' )
-			// remove any light related lines
-			// Note: here is very sensitive to originalVertexShader
-			// TODO: consider safer way
-			.replace( /#include\s+<[\w_]*light[\w_]*>/g, '' );
-
-		var defines = {};
-
-		if ( ! /vec3\s+transformed\s*=/.test( originalVertexShader ) &&
-		     ! /#include\s+<begin_vertex>/.test( originalVertexShader ) ) defines.DECLARE_TRANSFORMED = true;
+	function createMaterial() {
 
 		return new THREE.ShaderMaterial( {
-			defines: defines,
-			uniforms: uniforms,
+			type: 'OutlineEffect',
+			uniforms: THREE.UniformsUtils.merge( [
+				THREE.UniformsLib[ 'fog' ],
+				THREE.UniformsLib[ 'displacementmap' ],
+				uniformsOutline
+			] ),
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
-			side: THREE.BackSide,
-			//wireframe: true,
-			skinning: false,
-			morphTargets: false,
-			morphNormals: false,
-			fog: false
+			side: THREE.BackSide
 		} );
 
 	}
@@ -246,7 +190,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		if ( data === undefined ) {
 
 			data = {
-				material: createMaterial( originalMaterial ),
+				material: createMaterial(),
 				used: true,
 				keepAlive: defaultKeepAlive,
 				count: 0
@@ -274,9 +218,32 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	}
 
+	function isCompatible( object ) {
+
+		var geometry = object.geometry;
+		var hasNormals = false;
+
+		if ( object.geometry !== undefined ) {
+
+			if ( geometry.isBufferGeometry ) {
+
+				hasNormals = geometry.attributes.normal !== undefined;
+
+			} else {
+
+				hasNormals = true; // the renderer always produces a normal attribute for Geometry
+
+			}
+
+		}
+
+		return ( object.isMesh === true && object.material !== undefined && hasNormals === true );
+
+	}
+
 	function setOutlineMaterial( object ) {
 
-		if ( object.material === undefined ) return;
+		if ( isCompatible( object ) === false ) return;
 
 		if ( Array.isArray( object.material ) ) {
 
@@ -299,7 +266,7 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 	function restoreOriginalMaterial( object ) {
 
-		if ( object.material === undefined ) return;
+		if ( isCompatible( object ) === false ) return;
 
 		if ( Array.isArray( object.material ) ) {
 
@@ -344,6 +311,14 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 
 		}
 
+		if ( originalMaterial.displacementMap ) {
+
+			material.uniforms.displacementMap.value = originalMaterial.displacementMap;
+			material.uniforms.displacementScale.value = originalMaterial.displacementScale;
+			material.uniforms.displacementBias.value = originalMaterial.displacementBias;
+
+		}
+
 	}
 
 	function updateOutlineMaterial( material, originalMaterial ) {
@@ -356,6 +331,9 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		material.morphTargets = originalMaterial.morphTargets;
 		material.morphNormals = originalMaterial.morphNormals;
 		material.fog = originalMaterial.fog;
+		material.toneMapped = originalMaterial.toneMapped;
+		material.premultipliedAlpha = originalMaterial.premultipliedAlpha;
+		material.displacementMap = originalMaterial.displacementMap;
 
 		if ( outlineParameters !== undefined ) {
 
@@ -381,6 +359,18 @@ THREE.OutlineEffect = function ( renderer, parameters ) {
 		}
 
 		if ( originalMaterial.wireframe === true || originalMaterial.depthTest === false ) material.visible = false;
+
+		if ( originalMaterial.clippingPlanes ) {
+
+			material.clipping = true;
+
+			material.clippingPlanes = originalMaterial.clippingPlanes;
+			material.clipIntersection = originalMaterial.clipIntersection;
+			material.clipShadows = originalMaterial.clipShadows;
+
+		}
+
+		material.version = originalMaterial.version; // update outline material if necessary
 
 	}
 

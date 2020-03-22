@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - box projected cubemap environment mapping. <br> created by <a href="https://codercat.tk" target="_blank" rel="noopener">codercat</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - box projected cubemap environment mapping. <br> created by <a href="https://codercat.tk" target="_blank" rel="noopener">codercat</a>
 		</div>
 
 		<script type="module">
@@ -19,6 +19,7 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RectAreaLightHelper } from './jsm/helpers/RectAreaLightHelper.js';
 			import { RectAreaLightUniformsLib } from './jsm/lights/RectAreaLightUniformsLib.js';
 
 			// shader injection for box projected cube environment mapping
@@ -72,36 +73,39 @@
 					uniform float refractionRatio;
 				#endif
 
-				vec3 getLightProbeIndirectIrradiance( const in GeometricContext geometry, const in int maxMIPLevel ) {
+				vec3 getLightProbeIndirectIrradiance( /*const in SpecularLightProbe specularLightProbe,*/ const in GeometricContext geometry, const in int maxMIPLevel ) {
+
 					vec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );
+
 					#ifdef ENVMAP_TYPE_CUBE
 
-						vec3 worldNormalFinal = worldNormal;
+						#ifdef BOX_PROJECTED_ENV_MAP
 
-					#ifdef BOX_PROJECTED_ENV_MAP
+							worldNormal = parallaxCorrectNormal( worldNormal, cubeMapSize, cubeMapPos );
 
-						worldNormalFinal = parallaxCorrectNormal( worldNormal, cubeMapSize, cubeMapPos );
+						#endif
 
-					#endif
+						vec3 queryVec = vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
 
-					vec3 queryVec = vec3( flipEnvMap * worldNormalFinal.x, worldNormalFinal.yz );
+						// TODO: replace with properly filtered cubemaps and access the irradiance LOD level, be it the last LOD level
+						// of a specular cubemap, or just the default level of a specially created irradiance cubemap.
 
-					#ifdef TEXTURE_LOD_EXT
+						#ifdef TEXTURE_LOD_EXT
 
-						vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );
+							vec4 envMapColor = textureCubeLodEXT( envMap, queryVec, float( maxMIPLevel ) );
 
-					#else
+						#else
 
-						vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );
+							// force the bias high to get the last LOD level as it is the most blurred.
+							vec4 envMapColor = textureCube( envMap, queryVec, float( maxMIPLevel ) );
 
-					#endif
+						#endif
 
 						envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
 					#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-						vec3 queryVec = vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
-						vec4 envMapColor = textureCubeUV( envMap, queryVec, 1.0 );
+						vec4 envMapColor = textureCubeUV( envMap, worldNormal, 1.0 );
 
 					#else
 
@@ -110,19 +114,30 @@
 					#endif
 
 					return PI * envMapColor.rgb * envMapIntensity;
+
 				}
 
-				float getSpecularMIPLevel( const in float blinnShininessExponent, const in int maxMIPLevel ) {
+				// Trowbridge-Reitz distribution to Mip level, following the logic of http://casual-effects.blogspot.ca/2011/08/plausible-environment-lighting-in-two.html
+				float getSpecularMIPLevel( const in float roughness, const in int maxMIPLevel ) {
+
 					float maxMIPLevelScalar = float( maxMIPLevel );
-					float desiredMIPLevel = maxMIPLevelScalar + 0.79248 - 0.5 * log2( pow2( blinnShininessExponent ) + 1.0 );
+
+					float sigma = PI * roughness * roughness / ( 1.0 + roughness );
+					float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );
+
+					// clamp to allowable LOD ranges.
 					return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
+
 				}
 
-				vec3 getLightProbeIndirectRadiance( const in vec3 viewDir, const in vec3 normal, const in float blinnShininessExponent, const in int maxMIPLevel ) {
+				vec3 getLightProbeIndirectRadiance( /*const in SpecularLightProbe specularLightProbe,*/ const in vec3 viewDir, const in vec3 normal, const in float roughness, const in int maxMIPLevel ) {
 
 					#ifdef ENVMAP_MODE_REFLECTION
 
 						vec3 reflectVec = reflect( -viewDir, normal );
+
+						// Mixing the reflection with the normal is more accurate and keeps rough objects from gathering light from behind their tangent plane.
+						reflectVec = normalize( mix( reflectVec, normal, roughness * roughness) );
 
 					#else
 
@@ -131,36 +146,32 @@
 					#endif
 
 					reflectVec = inverseTransformDirection( reflectVec, viewMatrix );
-					float specularMIPLevel = getSpecularMIPLevel( blinnShininessExponent, maxMIPLevel );
+
+					float specularMIPLevel = getSpecularMIPLevel( roughness, maxMIPLevel );
 
 					#ifdef ENVMAP_TYPE_CUBE
 
-						vec3 reflectVecFinal = reflectVec;
+						#ifdef BOX_PROJECTED_ENV_MAP
+							reflectVec = parallaxCorrectNormal( reflectVec, cubeMapSize, cubeMapPos );
+						#endif
 
-					#ifdef BOX_PROJECTED_ENV_MAP
+						vec3 queryReflectVec = vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
 
-					 reflectVecFinal = parallaxCorrectNormal( reflectVec, cubeMapSize, cubeMapPos );
+						#ifdef TEXTURE_LOD_EXT
 
-					#endif
+							vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );
 
-					vec3 queryReflectVec = vec3( flipEnvMap * reflectVecFinal.x, reflectVecFinal.yz );
+						#else
 
-					#ifdef TEXTURE_LOD_EXT
+							vec4 envMapColor = textureCube( envMap, queryReflectVec, specularMIPLevel );
 
-						vec4 envMapColor = textureCubeLodEXT( envMap, queryReflectVec, specularMIPLevel );
+						#endif
 
-					#else
-
-						vec4 envMapColor = textureCube( envMap, queryReflectVec, specularMIPLevel );
-
-					#endif
-
-					envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
+						envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
 					#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-						vec3 queryReflectVec = vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
-						vec4 envMapColor = textureCubeUV( envMap, queryReflectVec, BlinnExponentToGGXRoughness(blinnShininessExponent ));
+						vec4 envMapColor = textureCubeUV( envMap, reflectVec, roughness );
 
 					#elif defined( ENVMAP_TYPE_EQUIREC )
 
@@ -179,6 +190,7 @@
 						#endif
 
 						envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
+
 					#elif defined( ENVMAP_TYPE_SPHERE )
 
 						vec3 reflectView = normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0,0.0,1.0 ) );
@@ -301,7 +313,6 @@
 					//these parameters are for the cubeCamera texture
 					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 200, 100 ) };
 					shader.uniforms.cubeMapPos = { value: new THREE.Vector3( 0, - 50, 0 ) };
-					shader.uniforms.flipEnvMap.value = true;
 
 					//replace shader chunks with box projection chunks
 					shader.vertexShader = 'varying vec3 vWorldPosition;\n' + shader.vertexShader;
@@ -387,7 +398,7 @@
 				blueRectLight.lookAt( 0, 5, 0 );
 				scene.add( blueRectLight );
 
-				var blueRectLightHelper = new THREE.RectAreaLightHelper( blueRectLight, 0xffffff );
+				var blueRectLightHelper = new RectAreaLightHelper( blueRectLight, 0xffffff );
 				blueRectLight.add( blueRectLightHelper );
 
 				var redRectLight = new THREE.RectAreaLight( 0x9aaeff, intensity, width, height );
@@ -395,7 +406,7 @@
 				redRectLight.lookAt( 0, 5, 0 );
 				scene.add( redRectLight );
 
-				var redRectLightHelper = new THREE.RectAreaLightHelper( redRectLight, 0xffffff );
+				var redRectLightHelper = new RectAreaLightHelper( redRectLight, 0xffffff );
 				redRectLight.add( redRectLightHelper );
 
 				render();

@@ -414,7 +414,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	function dollyIn( dollyScale ) {
+	function dollyOut( dollyScale ) {
 
 		if ( scope.object.isPerspectiveCamera ) {
 
@@ -435,7 +435,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	function dollyOut( dollyScale ) {
+	function dollyIn( dollyScale ) {
 
 		if ( scope.object.isPerspectiveCamera ) {
 
@@ -504,11 +504,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( dollyDelta.y > 0 ) {
 
-			dollyIn( getZoomScale() );
+			dollyOut( getZoomScale() );
 
 		} else if ( dollyDelta.y < 0 ) {
 
-			dollyOut( getZoomScale() );
+			dollyIn( getZoomScale() );
 
 		}
 
@@ -542,11 +542,11 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( event.deltaY < 0 ) {
 
-			dollyOut( getZoomScale() );
+			dollyIn( getZoomScale() );
 
 		} else if ( event.deltaY > 0 ) {
 
-			dollyIn( getZoomScale() );
+			dollyOut( getZoomScale() );
 
 		}
 
@@ -716,7 +716,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		dollyDelta.set( 0, Math.pow( dollyEnd.y / dollyStart.y, scope.zoomSpeed ) );
 
-		dollyIn( dollyDelta.y );
+		dollyOut( dollyDelta.y );
 
 		dollyStart.copy( dollyEnd );
 
@@ -753,7 +753,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 		if ( scope.enabled === false ) return;
 
 		// Prevent the browser from scrolling.
-
 		event.preventDefault();
 
 		// Manually set the focus since calling preventDefault above
@@ -761,119 +760,90 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		scope.domElement.focus ? scope.domElement.focus() : window.focus();
 
+		var mouseAction;
+
 		switch ( event.button ) {
 
 			case 0:
 
-				switch ( scope.mouseButtons.LEFT ) {
-
-					case THREE.MOUSE.ROTATE:
-
-						if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
-
-							if ( scope.enablePan === false ) return;
-
-							handleMouseDownPan( event );
-
-							state = STATE.PAN;
-
-						} else {
-
-							if ( scope.enableRotate === false ) return;
-
-							handleMouseDownRotate( event );
-
-							state = STATE.ROTATE;
-
-						}
-
-						break;
-
-					case THREE.MOUSE.PAN:
-
-						if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
-
-							if ( scope.enableRotate === false ) return;
-
-							handleMouseDownRotate( event );
-
-							state = STATE.ROTATE;
-
-						} else {
-
-							if ( scope.enablePan === false ) return;
-
-							handleMouseDownPan( event );
-
-							state = STATE.PAN;
-
-						}
-
-						break;
-
-					default:
-
-						state = STATE.NONE;
-
-				}
-
+				mouseAction = scope.mouseButtons.LEFT;
 				break;
-
 
 			case 1:
 
-				switch ( scope.mouseButtons.MIDDLE ) {
-
-					case THREE.MOUSE.DOLLY:
-
-						if ( scope.enableZoom === false ) return;
-
-						handleMouseDownDolly( event );
-
-						state = STATE.DOLLY;
-
-						break;
-
-
-					default:
-
-						state = STATE.NONE;
-
-				}
-
+				mouseAction = scope.mouseButtons.MIDDLE;
 				break;
 
 			case 2:
 
-				switch ( scope.mouseButtons.RIGHT ) {
+				mouseAction = scope.mouseButtons.RIGHT;
+				break;
 
-					case THREE.MOUSE.ROTATE:
+			default:
 
-						if ( scope.enableRotate === false ) return;
+				mouseAction = - 1;
 
-						handleMouseDownRotate( event );
+		}
 
-						state = STATE.ROTATE;
+		switch ( mouseAction ) {
 
-						break;
+			case THREE.MOUSE.DOLLY:
 
-					case THREE.MOUSE.PAN:
+				if ( scope.enableZoom === false ) return;
 
-						if ( scope.enablePan === false ) return;
+				handleMouseDownDolly( event );
 
-						handleMouseDownPan( event );
+				state = STATE.DOLLY;
 
-						state = STATE.PAN;
+				break;
 
-						break;
+			case THREE.MOUSE.ROTATE:
 
-					default:
+				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
 
-						state = STATE.NONE;
+					if ( scope.enablePan === false ) return;
+
+					handleMouseDownPan( event );
+
+					state = STATE.PAN;
+
+				} else {
+
+					if ( scope.enableRotate === false ) return;
+
+					handleMouseDownRotate( event );
+
+					state = STATE.ROTATE;
 
 				}
 
 				break;
+
+			case THREE.MOUSE.PAN:
+
+				if ( event.ctrlKey || event.metaKey || event.shiftKey ) {
+
+					if ( scope.enableRotate === false ) return;
+
+					handleMouseDownRotate( event );
+
+					state = STATE.ROTATE;
+
+				} else {
+
+					if ( scope.enablePan === false ) return;
+
+					handleMouseDownPan( event );
+
+					state = STATE.PAN;
+
+				}
+
+				break;
+
+			default:
+
+				state = STATE.NONE;
 
 		}
 
@@ -966,7 +936,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		event.preventDefault();
+		event.preventDefault(); // prevent scrolling
 
 		switch ( event.touches.length ) {
 
@@ -1052,7 +1022,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( scope.enabled === false ) return;
 
-		event.preventDefault();
+		event.preventDefault(); // prevent scrolling
 		event.stopPropagation();
 
 		switch ( state ) {

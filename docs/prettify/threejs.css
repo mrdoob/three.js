@@ -16,6 +16,9 @@ pre.prettyprint, code.prettyprint {
 
 @media (prefers-color-scheme: dark) {
 
+	pre .tag, code .tag { color: #2194ce; } /* HTML tag */
+	pre .atn, code .atn { color: #BB55FF; } /* HTML attribute name */
+	pre .atv, code .atv { color: #30b030; } /* HTML attribute value */
 	pre .str, code .str { color: #BB55FF; } /* string */
 	pre .com, code .com { color: #666666; } /* comment */
 	pre .lit, code .lit { color: #ff3399; } /* literal */
