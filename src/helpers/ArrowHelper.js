@@ -52,11 +52,11 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 	this.position.copy( origin );
 
-	this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color } ) );
+	this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
-	this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color } ) );
+	this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color, toneMapped: false } ) );
 	this.cone.matrixAutoUpdate = false;
 	this.add( this.cone );
 
