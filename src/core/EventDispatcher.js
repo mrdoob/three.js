@@ -68,6 +68,7 @@ Object.assign( EventDispatcher.prototype, {
 
 			event.target = this;
 
+			// Make a copy, in case listeners are removed while iterating.
 			var array = listenerArray.slice( 0 );
 
 			for ( var i = 0, l = array.length; i < l; i ++ ) {
