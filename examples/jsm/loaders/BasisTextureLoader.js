@@ -11,6 +11,7 @@ import {
 	LinearMipmapLinearFilter,
 	Loader,
 	RGBA_ASTC_4x4_Format,
+	RGBA_BPTC_Format,
 	RGBA_PVRTC_4BPPV1_Format,
 	RGB_ETC1_Format,
 	RGB_PVRTC_4BPPV1_Format,
