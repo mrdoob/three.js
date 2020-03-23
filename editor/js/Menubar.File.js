@@ -5,6 +5,7 @@
 import * as THREE from '../../build/three.module.js';
 
 import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
+import { DRACOExporter } from '../../examples/jsm/exporters/DRACOExporter.js';
 import { GLTFExporter } from '../../examples/jsm/exporters/GLTFExporter.js';
 import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
 import { PLYExporter } from '../../examples/jsm/exporters/PLYExporter.js';
@@ -210,6 +211,31 @@ var MenubarFile = function ( editor ) {
 			saveString( result.data, 'scene.dae' );
 
 		} );
+
+	} );
+	options.add( option );
+
+	// Export DRC
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/drc' ) );
+	option.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( object === null || object.isMesh === undefined ) {
+
+			alert( 'No mesh selected' );
+			return;
+
+		}
+
+		var exporter = new DRACOExporter();
+
+		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
+		var result = exporter.parse( object.geometry );
+		saveArrayBuffer( result, 'model.drc' );
 
 	} );
 	options.add( option );
