@@ -612,30 +612,30 @@ ${_getEncodings()}
 #include <cube_uv_reflection_fragment>
 
 vec3 getSample(float theta) {
-  vec3 axis = latitudinal ? poleAxis : cross(poleAxis, vOutputDirection);
-  if (all(equal(axis, vec3(0.0))))
-    axis = cross(vec3(0.0, 1.0, 0.0), vOutputDirection);
-  axis = normalize(axis);
-  float cosTheta = cos(theta);
-  // Rodrigues' axis-angle rotation
-  vec3 sampleDirection = vOutputDirection * cosTheta 
-    + cross(axis, vOutputDirection) * sin(theta) 
-    + axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);
-  return bilinearCubeUV(envMap, sampleDirection, mipInt);
+	vec3 axis = latitudinal ? poleAxis : cross(poleAxis, vOutputDirection);
+	if (all(equal(axis, vec3(0.0))))
+		xis = cross(vec3(0.0, 1.0, 0.0), vOutputDirection);
+	axis = normalize(axis);
+	float cosTheta = cos(theta);
+	// Rodrigues' axis-angle rotation
+	vec3 sampleDirection = vOutputDirection * cosTheta 
+		+ cross(axis, vOutputDirection) * sin(theta) 
+		+ axis * dot(axis, vOutputDirection) * (1.0 - cosTheta);
+	return bilinearCubeUV(envMap, sampleDirection, mipInt);
 }
 
 void main() {
-  gl_FragColor = vec4(0.0);
-  for (int i = 0; i < n; i++) {
-    if (i >= samples)
-      break;
-    float theta = dTheta * float(i);
-    gl_FragColor.rgb += weights[i] * getSample(-1.0 * theta);
-    if(i == 0)
-      continue;
-    gl_FragColor.rgb += weights[i] * getSample(theta);
-  }
-  gl_FragColor = linearToOutputTexel(gl_FragColor);
+	gl_FragColor = vec4(0.0);
+	for (int i = 0; i < n; i++) {
+		if (i >= samples)
+			break;
+		float theta = dTheta * float(i);
+		gl_FragColor.rgb += weights[i] * getSample(-1.0 * theta);
+		if(i == 0)
+			continue;
+		gl_FragColor.rgb += weights[i] * getSample(theta);
+	}
+	gl_FragColor = linearToOutputTexel(gl_FragColor);
 }
 		`,
 
