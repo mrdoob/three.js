@@ -429,6 +429,17 @@ THREE.ColladaExporter.prototype = {
 					) +
 
 					(
+						type !== 'constant' ?
+							'<bump>' +
+
+						(
+							m.normalMap ? '<texture texture="bump-sampler" texcoord="TEXCOORD" />' : ''
+						) +
+						'</bump>'
+							: ''
+					) +
+
+					(
 						type === 'phong' ?
 							`<specular><color sid="specular">${ specular.r } ${ specular.g } ${ specular.b } 1</color></specular>` +
 
@@ -480,6 +491,15 @@ THREE.ColladaExporter.prototype = {
 							`<init_from>${ processTexture( m.emissiveMap ) }</init_from>` +
 							'</surface></newparam>' +
 							'<newparam sid="emissive-sampler"><sampler2D><source>emissive-surface</source></sampler2D></newparam>' :
+							''
+					) +
+
+					(
+						m.normalMap ?
+							'<newparam sid="bump-surface"><surface type="2D">' +
+							`<init_from>${ processTexture( m.normalMap ) }</init_from>` +
+							'</surface></newparam>' +
+							'<newparam sid="bump-sampler"><sampler2D><source>bump-surface</source></sampler2D></newparam>' :
 							''
 					) +
 
