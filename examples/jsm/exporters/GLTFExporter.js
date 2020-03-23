@@ -918,16 +918,16 @@ GLTFExporter.prototype = {
 
 			}
 
-			if ( ! outputJSON.materials ) {
-
-				outputJSON.materials = [];
-
-			}
-
-			if ( material.isShaderMaterial && ! material.isGLTFSpecularGlossinessMaterial ) {
+			if ( material.isShaderMaterial ) {
 
 				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
 				return null;
+
+			}
+
+			if ( ! outputJSON.materials ) {
+
+				outputJSON.materials = [];
 
 			}
 
