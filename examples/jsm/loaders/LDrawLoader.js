@@ -1192,8 +1192,6 @@ var LDrawLoader = ( function () {
 
 									type = lp.getToken();
 
-									if ( ! parsingEmbeddedFiles ) {
-
 										currentParseScope.triangles = [];
 										currentParseScope.lineSegments = [];
 										currentParseScope.conditionalSegments = [];
@@ -1224,8 +1222,6 @@ var LDrawLoader = ( function () {
 										triangles = currentParseScope.triangles;
 										lineSegments = currentParseScope.lineSegments;
 										conditionalSegments = currentParseScope.conditionalSegments;
-
-									}
 
 									break;
 
