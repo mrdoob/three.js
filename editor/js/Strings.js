@@ -17,6 +17,7 @@ var Strings = function ( config ) {
 			'menubar/file/export/object': 'Export Object',
 			'menubar/file/export/scene': 'Export Scene',
 			'menubar/file/export/dae': 'Export DAE',
+			'menubar/file/export/drc': 'Export DRC',
 			'menubar/file/export/glb': 'Export GLB',
 			'menubar/file/export/gltf': 'Export GLTF',
 			'menubar/file/export/obj': 'Export OBJ',
@@ -327,6 +328,7 @@ var Strings = function ( config ) {
 			'menubar/file/export/object': 'Exporter Objet',
 			'menubar/file/export/scene': 'Exporter Scene',
 			'menubar/file/export/dae': 'Exporter DAE',
+			'menubar/file/export/drc': 'Exporter DRC',
 			'menubar/file/export/glb': 'Exporter GLB',
 			'menubar/file/export/gltf': 'Exporter GLTF',
 			'menubar/file/export/obj': 'Exporter OBJ',
@@ -602,11 +604,11 @@ var Strings = function ( config ) {
 			'sidebar/project/toneMappingWhitePoint': 'Point Blanc',
 			'sidebar/project/materials': 'Materiels',
 			'sidebar/project/Assign': 'Attribuer',
-			
+
 			'sidebar/settings': 'Paramètres',
 			'sidebar/settings/language': 'Langue',
 			'sidebar/settings/exportPrecision': 'Précision d\'exportation',
-			
+
 			'sidebar/settings/shortcuts/translate': 'Traduire',
 			'sidebar/settings/shortcuts/rotate': 'Rotation',
 			'sidebar/settings/shortcuts/scale': 'Échelle',
@@ -629,7 +631,7 @@ var Strings = function ( config ) {
 			'viewport/info/frametime': 'Temps de trame'
 		},
 		zh: {
-			
+
 			'menubar/file': '文件',
 			'menubar/file/new': '新建',
 			'menubar/file/import': '导入',
@@ -637,6 +639,7 @@ var Strings = function ( config ) {
 			'menubar/file/export/object': '导出物体',
 			'menubar/file/export/scene': '导出场景',
 			'menubar/file/export/dae': '导出DAE',
+			'menubar/file/export/drc': '导出DRC',
 			'menubar/file/export/glb': '导出GLB',
 			'menubar/file/export/gltf': '导出GLTF',
 			'menubar/file/export/obj': '导出OBJ',
