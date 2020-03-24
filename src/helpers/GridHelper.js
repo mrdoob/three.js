@@ -8,64 +8,68 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Color } from '../math/Color.js';
 
-function GridHelper( size, divisions, color1, color2 ) {
 
-	size = size || 10;
-	divisions = divisions || 10;
-	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
-	color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
+class GridHelper extends LineSegments {
 
-	var center = divisions / 2;
-	var step = size / divisions;
-	var halfSize = size / 2;
+	constructor( size, divisions, color1, color2 ) {
 
-	var vertices = [], colors = [];
+		size = size || 10;
+		divisions = divisions || 10;
+		color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
+		color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
 
-	for ( var i = 0, j = 0, k = - halfSize; i <= divisions; i ++, k += step ) {
+		var center = divisions / 2;
+		var step = size / divisions;
+		var halfSize = size / 2;
 
-		vertices.push( - halfSize, 0, k, halfSize, 0, k );
-		vertices.push( k, 0, - halfSize, k, 0, halfSize );
+		var vertices = [], colors = [];
 
-		var color = i === center ? color1 : color2;
+		for ( var i = 0, j = 0, k = - halfSize; i <= divisions; i ++, k += step ) {
 
-		color.toArray( colors, j ); j += 3;
-		color.toArray( colors, j ); j += 3;
-		color.toArray( colors, j ); j += 3;
-		color.toArray( colors, j ); j += 3;
+			vertices.push( - halfSize, 0, k, halfSize, 0, k );
+			vertices.push( k, 0, - halfSize, k, 0, halfSize );
+
+			var color = i === center ? color1 : color2;
+
+			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, j ); j += 3;
+			color.toArray( colors, j ); j += 3;
+
+		}
+
+		var geometry = new BufferGeometry();
+		geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+
+		var material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
+
+		super( geometry, material );
+		this.size = size;
+		this.divisions = divisions;
+		this.color1 = color1;
+		this.color2 = color2;
 
 	}
 
-	var geometry = new BufferGeometry();
-	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+	copy( source ) {
 
-	var material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
-
-	LineSegments.call( this, geometry, material );
-
-}
-
-GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
-
-	constructor: GridHelper,
-
-	copy: function ( source ) {
-
-		LineSegments.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.geometry.copy( source.geometry );
 		this.material.copy( source.material );
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
-		return new this.constructor().copy( this );
+		return new GridHelper( this.size, this.divisions, this.color1, this.color2 );
 
 	}
 
-} );
+}
+
 
 export { GridHelper };

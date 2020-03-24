@@ -12,79 +12,67 @@ import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
+
 var _vector = new Vector3();
 var _color1 = new Color();
 var _color2 = new Color();
 
-function HemisphereLightHelper( light, size, color ) {
+class HemisphereLightHelper extends Object3D {
 
-	Object3D.call( this );
+	constructor( light, size, color ) {
 
-	this.light = light;
-	this.light.updateMatrixWorld();
+		super();
+		this.light = light;
+		this.light.updateMatrixWorld();
+		this.matrix = light.matrixWorld;
+		this.matrixAutoUpdate = false;
+		this.color = color;
 
-	this.matrix = light.matrixWorld;
-	this.matrixAutoUpdate = false;
+		var geometry = new OctahedronBufferGeometry( size );
+		geometry.rotateY( Math.PI * 0.5 );
+		this.material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
+		if ( this.color === undefined ) this.material.vertexColors = true;
 
-	this.color = color;
+		var position = geometry.getAttribute( 'position' );
+		var colors = new Float32Array( position.count * 3 );
+		geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 
-	var geometry = new OctahedronBufferGeometry( size );
-	geometry.rotateY( Math.PI * 0.5 );
+		this.add( new Mesh( geometry, this.material ) );
+		this.update();
 
-	this.material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
-	if ( this.color === undefined ) this.material.vertexColors = true;
+	}
+	dispose() {
 
-	var position = geometry.getAttribute( 'position' );
-	var colors = new Float32Array( position.count * 3 );
+		this.children[ 0 ].geometry.dispose();
+		this.children[ 0 ].material.dispose();
 
-	geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
+	}
+	update() {
 
-	this.add( new Mesh( geometry, this.material ) );
+		var mesh = this.children[ 0 ];
+		if ( this.color !== undefined ) {
 
-	this.update();
+			this.material.color.set( this.color );
 
-}
+		} else {
 
-HemisphereLightHelper.prototype = Object.create( Object3D.prototype );
-HemisphereLightHelper.prototype.constructor = HemisphereLightHelper;
+			var colors = mesh.geometry.getAttribute( 'color' );
+			_color1.copy( this.light.color );
+			_color2.copy( this.light.groundColor );
+			for ( var i = 0, l = colors.count; i < l; i ++ ) {
 
-HemisphereLightHelper.prototype.dispose = function () {
+				var color = ( i < ( l / 2 ) ) ? _color1 : _color2;
+				colors.setXYZ( i, color.r, color.g, color.b );
 
-	this.children[ 0 ].geometry.dispose();
-	this.children[ 0 ].material.dispose();
-
-};
-
-HemisphereLightHelper.prototype.update = function () {
-
-	var mesh = this.children[ 0 ];
-
-	if ( this.color !== undefined ) {
-
-		this.material.color.set( this.color );
-
-	} else {
-
-		var colors = mesh.geometry.getAttribute( 'color' );
-
-		_color1.copy( this.light.color );
-		_color2.copy( this.light.groundColor );
-
-		for ( var i = 0, l = colors.count; i < l; i ++ ) {
-
-			var color = ( i < ( l / 2 ) ) ? _color1 : _color2;
-
-			colors.setXYZ( i, color.r, color.g, color.b );
+			}
+			colors.needsUpdate = true;
 
 		}
-
-		colors.needsUpdate = true;
+		mesh.lookAt( _vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
 
 	}
 
-	mesh.lookAt( _vector.setFromMatrixPosition( this.light.matrixWorld ).negate() );
-
-};
+}
 
 
 export { HemisphereLightHelper };
