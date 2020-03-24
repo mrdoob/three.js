@@ -28,7 +28,7 @@
 			[link:https://www.npmjs.com/package/three npm package] of three.js. For our basic demo in this guide we need the following files.
 		</p>
 
-		<code>
+		<code translate="no">
 		import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 		import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 		import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
@@ -38,7 +38,7 @@
 			After all files are successfully imported, we can create our composer by passing in an instance of [page:WebGLRenderer].
 		</p>
 
-		<code>
+		<code translate="no">
 		var composer = new EffectComposer( renderer );
 		</code>
 
@@ -47,7 +47,7 @@
 			[page:WebGLRenderer], we now use the respective counterpart of [page:EffectComposer].
 		</p>
 
-		<code>
+		<code translate="no">
 		function animate() {
 
 			requestAnimationFrame( animate );
@@ -64,7 +64,7 @@
 			of the passes looks like so:
 		</p>
 
-		<code>
+		<code translate="no">
 		var renderPass = new RenderPass( scene, camera );
 		composer.addPass( renderPass );
 
@@ -92,7 +92,7 @@
 			you can utilize *ShaderPass*. After importing the file and your custom shader, you can use the following code to setup the pass.
 		</p>
 
-		<code>
+		<code translate="no">
 		import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 		import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
 

@@ -24,7 +24,7 @@
 		要对其可用性进行检查，请将[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/WebGL.js WebGL.js]包含到你的项目中。
 	</p>
 
-	<code>
+	<code translate="no">
 import { WEBGL } from 'three/examples/jsm/WebGL.js';
 	</code>
 
@@ -32,7 +32,7 @@ import { WEBGL } from 'three/examples/jsm/WebGL.js';
 		接下来，使用和下列代码相似的代码来进行可用性检查。
 	</p>
 
-	<code>
+	<code translate="no">
 
 if ( WEBGL.isWebGL2Available() === false ) {
 
@@ -51,7 +51,7 @@ if ( WEBGL.isWebGL2Available() === false ) {
 		请注意：在上下文被创建后，将无法修改这些属性，因此将它们传递给WebGLRenderer将不会产生任何影响。
 	</p>
 
-	<code>
+	<code translate="no">
 var canvas = document.createElement( 'canvas' );
 var context = canvas.getContext( 'webgl2', { alpha: false } );
 var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
@@ -62,7 +62,7 @@ var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 		首先是GLSL ES 3.00代码。
 	</p>
 
-	<code>
+	<code translate="no">
 &lt;script id="vs" type="x-shader/x-vertex"&gt;
 #version 300 es
 
@@ -89,7 +89,7 @@ void main() {
 	<p>
 		然后是使用JavaScript来创建的对应的材质。
 	</p>
-	<code>
+	<code translate="no">
 var material = new THREE.ShaderMaterial( {
 	vertexShader: document.getElementById( 'vs' ).textContent.trim(),
 	fragmentShader: document.getElementById( 'fs' ).textContent.trim()

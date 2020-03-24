@@ -11,12 +11,12 @@
 		<h1>如何更新场景（[name]）</h1>
 		<div>
 			<p>默认情况下，所有对象都会自动更新它们的矩阵（如果它们已添加到场景中）</p>
-			<code>
+			<code translate="no">
 var object = new THREE.Object3D();
 scene.add( object );
 			</code>
 			或者它们是已添加到场景中的另一个对象的子节点:
-			<code>
+			<code translate="no">
 var object1 = new THREE.Object3D();
 var object2 = new THREE.Object3D();
 
@@ -27,7 +27,7 @@ scene.add( object1 ); //object1 和 object2 会自动更新它们的矩阵
 
 		<p>但是，如果你知道对象将是静态的，则可以禁用此选项并在需要时手动更新转换矩阵。</p>
 
-		<code>
+		<code translate="no">
 object.matrixAutoUpdate  = false;
 object.updateMatrix();
 		</code>
@@ -52,7 +52,7 @@ object.updateMatrix();
 				我们以在渲染时扩展的line来示例。我们将分配可容纳500个顶点的空间但起初仅绘制2个，使用
 				在500个顶点的缓冲区中，但首先只使用 [page:BufferGeometry.drawRange]。
 			</p>
-			<code>
+			<code translate="no">
 var MAX_POINTS = 500;
 
 // geometry
@@ -76,7 +76,7 @@ scene.add( line );
 		 	<p>
 				然后我们随机增加顶点到line中，以这样的一种方式：
 			</p>
-			<code>
+			<code translate="no">
 var positions = line.geometry.attributes.position.array;
 
 var x, y, z, index;
@@ -97,13 +97,13 @@ for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
 			<p>
 				如果要更改第一次渲染后渲染的<em>点数</em>，执行以下操作：
 			</p>
-			<code>
+			<code translate="no">
 line.geometry.setDrawRange( 0, newValue );
 			</code>
 			<p>
 				如果要在第一次渲染后更改position数值，则需要像这样设置needsUpdate标志：
 			</p>
-			<code>
+			<code translate="no">
 line.geometry.attributes.position.needsUpdate = true; // 需要加在第一次渲染之后
 			</code>
 
@@ -126,7 +126,7 @@ line.geometry.attributes.position.needsUpdate = true; // 需要加在第一次�
 				一旦buffers改变，这些标志位会自动重置为false。如果你想要持续更新buffers，你需要保持这些设置为true。
 				请注意这仅适用于[page:Geometry]而不是[page:BufferGeometry]。
 			</p>
-			<code>
+			<code translate="no">
 var geometry = new THREE.Geometry();
 geometry.verticesNeedUpdate = true;
 geometry.elementsNeedUpdate = true;
@@ -142,7 +142,7 @@ geometry.tangentsNeedUpdate = true;
 				需要额外设定 <em>dynamic</em> 标志为true （为了维持内部的 typed arrays）：
 			</p>
 
-			<code>
+			<code translate="no">
 	//removed after r66
 	geometry.dynamic = true;
 			</code>
@@ -171,7 +171,7 @@ geometry.tangentsNeedUpdate = true;
 			</ul>
 
 			<p>这些变化需要建立新的shader程序。你需要设置</p>
-			<code>material.needsUpdate = true</code>
+			<code translate="no">material.needsUpdate = true</code>
 
 			<p>请记住，这可能会非常缓慢并导致帧率的波动。（特别是在Windows上，因为shader编译在directx中比opengl慢）。</p>
 
@@ -195,7 +195,7 @@ geometry.tangentsNeedUpdate = true;
 		<h2>纹理（Textures）</h2>
 		<div>
 			<p>如果更改了图像，画布，视频和数据纹理，则需要设置以下标志：</p>
-			<code>
+			<code translate="no">
 				texture.needsUpdate = true;
 			</code>
 			<p>渲染对象就会自动更新。</p>
@@ -227,7 +227,7 @@ geometry.tangentsNeedUpdate = true;
 			<p>
 				那么你需要重新计算投影矩阵：
 			</p>
-			<code>
+			<code translate="no">
 camera.aspect = window.innerWidth / window.innerHeight;
 camera.updateProjectionMatrix();
 			</code>

@@ -28,7 +28,7 @@
 			在本指南的基础示例中，我们需要下列文件。
 		</p>
 
-		<code>
+		<code translate="no">
 		import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 		import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 		import { GlitchPass } from 'three/examples/jsm/postprocessing/GlitchPass.js';
@@ -38,7 +38,7 @@
 			当这些文件被成功导入后，我们便可以通过传入一个[page:WebGLRenderer]的实例，来创建我们的合成器了。
 		</p>
 
-		<code>
+		<code translate="no">
 		var composer = new EffectComposer( renderer );
 		</code>
 
@@ -47,7 +47,7 @@
 			现在我们不再调用[page:WebGLRenderer]的render方法，而是使用[page:EffectComposer]中对应的render方法。
 		</p>
 
-		<code>
+		<code translate="no">
 		function animate() {
 
 			requestAnimationFrame( animate );
@@ -64,7 +64,7 @@
 			这些过程的设置类似这样：
 		</p>
 
-		<code>
+		<code translate="no">
 		var renderPass = new RenderPass( scene, camera );
 		composer.addPass( renderPass );
 
@@ -92,7 +92,7 @@
 			对于这个需求，你可以使用*ShaderPass*。在引入该文件以及你的自定义着色期后，可以使用下列代码来设置该过程：
 		</p>
 
-		<code>
+		<code translate="no">
 		import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 		import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
 

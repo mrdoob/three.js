@@ -19,11 +19,11 @@
 
 		<p>
 			如果你习惯使用node和npm，
-			<code>
+			<code translate="no">
 				$ npm install three --save-dev
 			</code>
 			并将
-		<code>
+		<code translate="no">
 			var THREE = require('three');
 		</code>
 			添加到你的测试中。
@@ -39,7 +39,7 @@
 			<ol>
 				<li>
 					安装[link:https://www.npmjs.org/ npm]和nodejs。最简单的方式一般像这样
-					<code>
+					<code translate="no">
 $ sudo apt-get install -y npm nodejs-legacy
 # 修复默认registry URL中任何SSL的问题
 $ npm config set registry http://registry.npmjs.org/
@@ -48,14 +48,14 @@ $ npm config set registry http://registry.npmjs.org/
 
 				<li>
 					新建一个项目路径
-					<code>
+					<code translate="no">
 						 $ mkdir test-example; cd test-example
 					</code>
 				</li>
 
 				<li>
 					让npm为你创建一份新的项目文件：
-					<code>
+					<code translate="no">
 					 $ npm init
 					</code>
 					 在所有出现的提示中敲击回车键来接受默认值。
@@ -64,12 +64,12 @@ $ npm config set registry http://registry.npmjs.org/
 
 				<li>
 					尝试启动测试功能
-					<code>
+					<code translate="no">
 $ npm test
 					</code>
 					当然，这一定会失败。
 					如果你检查一下package.json，test script的定义是这样的
-					<code>
+					<code translate="no">
 						"test": "echo \"Error: no test specified\" && exit 1"
 					</code>
 				</li>
@@ -84,7 +84,7 @@ $ npm test
 			<ol>
 				<li>
 					安装mocha
-					<code>
+					<code translate="no">
 $ npm install mocha --save-dev
 					</code>
 					你会注意到 node_modules/ 被创建了，并且你的依赖都出现在了这里面。
@@ -95,14 +95,14 @@ $ npm install mocha --save-dev
 					编辑package.json来使用mocha进行测试。当调用测试的时候，我们只想运行mocha并且生成一份详细的报告。
 					默认情况下这会运行 test/ 中的任何东西。
 					（如果项目中没有 test/ 目录的话，会导致npm报错。你可以通过mkdir test来创建这个目录）
-					<code>
+					<code translate="no">
 						"test": "mocha --reporter list"
 					</code>
 				</li>
 
 				<li>
 					重新运行测试
-					<code>
+					<code translate="no">
 						$ npm test
 					</code>
 
@@ -117,17 +117,17 @@ $ npm install mocha --save-dev
 			<ol>
 				<li>
 					现在添加我们的three.js依赖
-					<code>
+					<code translate="no">
 $ npm install three --save-dev
 					</code>
 					<ul>
 						<li>
 							如果你需要three.js的其他版本，使用
-							<code>
+							<code translate="no">
 								$ npm show three versions
 							</code>
 						  	来确认哪些是可用的。要让npm使用正确的版本，执行
-							<code>
+							<code translate="no">
  $ npm install three@0.84.0 --save
 							</code>
 							（例子中用的是0.84.0）。 --save 指令将此加入项目的dependency而不是dev dependency。
@@ -138,7 +138,7 @@ $ npm install three --save-dev
 
 				<li>
 					Mocha会在 test/ 目录中寻找测试文件，所以我们先创建这个目录：
-					<code>
+					<code translate="no">
 					$ mkdir test
 					</code>
 				</li>
@@ -146,7 +146,7 @@ $ npm install three --save-dev
 				<li>
 					最后我们需要一份JS测试文件来运行。我们就添加一段简单的测试程序，这段程序会检验three.js对象是否能正常工作。
 					在 test/ 目录下创建verify-three.js包含以下代码：
-<code>
+<code translate="no">
 var THREE = require('three');
 var assert = require("assert");
 
@@ -165,7 +165,7 @@ describe('The THREE object', function() {
 
 				<li>
 				最后再次通过$ npm test来测试。这次应该能正确执行上面的代码，并且返回类似：
-				<code>
+				<code translate="no">
 The THREE object should have a defined BasicShadowMap constant: 0ms
 The THREE object should be able to construct a Vector3 with default of x=0: 0ms
 2 passing (8ms)
@@ -198,7 +198,7 @@ The THREE object should be able to construct a Vector3 with default of x=0: 0ms
 				第2、3条会根据你组织代码的方式而改变。在上面给出的Physics.js的例子中，导出的部分在代码的最末尾。
 				我们将module.exports赋值为一个对象:
 			</p>
-			<code>
+			<code translate="no">
 //=============================================================================
 // 为了在nodejs中可用
 //=============================================================================
@@ -233,7 +233,7 @@ if (typeof exports !== 'undefined')
 				</li>
 			</ol>
 			用Physics.js中的代码举例:
-			<code>
+			<code translate="no">
 //=============================================================================
 // 服务器端测试配置
 //=============================================================================

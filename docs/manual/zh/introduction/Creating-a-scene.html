@@ -16,7 +16,7 @@
 		<p>
 			在开始使用three.js之前，你需要一个地方来显示它。将下列HTML代码保存为你电脑上的一个HTML文件，同时将[link:https://threejs.org/build/three.js three.js]复制到该HTML文件所在的目录下的js/目录下，然后在你的浏览器中打开这个HTML文件。
 		</p>
-		<code>
+		<code translate="no">
 		&lt;!DOCTYPE html&gt;
 		&lt;html&gt;
 			&lt;head&gt;
@@ -42,7 +42,7 @@
 
 		<p>为了真正能够让你的场景借助three.js来进行显示，我们需要以下几个对象：场景、相机和渲染器，这样我们就能透过摄像机渲染出场景。</p>
 
-		<code>
+		<code translate="no">
 		var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -71,7 +71,7 @@
 
 		<p><em>“嗯，看起来很不错，那你说的那个立方体在哪儿？”</em>接下来，我们就来添加立方体。</p>
 
-		<code>
+		<code translate="no">
 		var geometry = new THREE.BoxGeometry();
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var cube = new THREE.Mesh( geometry, material );
@@ -92,7 +92,7 @@
 
 		<p>现在，如果将之前写好的代码复制到HTML文件中，你不会在页面中看到任何东西。这是因为我们还没有对它进行真正的渲染。为此，我们需要使用一个被叫做“<strong>渲染循环</strong>”（render loop）或者“<strong>动画循环</strong>”（animate loop）的东西。</p>
 
-		<code>
+		<code translate="no">
 		function animate() {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
@@ -109,7 +109,7 @@
 
 		<p>将下列代码添加到animate()函数中<strong>renderer.render</strong>调用的上方：</p>
 
-		<code>
+		<code translate="no">
 		cube.rotation.x += 0.01;
 		cube.rotation.y += 0.01;
 		</code>
@@ -121,7 +121,7 @@
 
 		<p>下面是完整的代码，可在[link:https://jsfiddle.net/mkba0ecu/ live example]运行、编辑；运行或者修改代码有助于你更好的理解它是如何工作的。</p>
 
-		<code>
+		<code translate="no">
 		&lt;html&gt;
 			&lt;head&gt;
 				&lt;title&gt;My first three.js app&lt;/title&gt;

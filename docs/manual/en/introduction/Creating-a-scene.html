@@ -16,7 +16,7 @@
 
 		<p>Before you can use three.js, you need somewhere to display it. Save the following HTML to a file on your computer, along with a copy of [link:https://threejs.org/build/three.js three.js] in the js/ directory, and open it in your browser.</p>
 
-		<code>
+		<code translate="no">
 		&lt;!DOCTYPE html&gt;
 		&lt;html&gt;
 			&lt;head&gt;
@@ -42,7 +42,7 @@
 
 		<p>To actually be able to display anything with three.js, we need three things: scene, camera and renderer, so that we can render the scene with camera.</p>
 
-		<code>
+		<code translate="no">
 		var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
@@ -71,7 +71,7 @@
 
 		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
 
-		<code>
+		<code translate="no">
 		var geometry = new THREE.BoxGeometry();
 		var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 		var cube = new THREE.Mesh( geometry, material );
@@ -92,7 +92,7 @@
 
 		<p>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a <strong>render or animate loop</strong>.</p>
 
-		<code>
+		<code translate="no">
 		function animate() {
 			requestAnimationFrame( animate );
 			renderer.render( scene, camera );
@@ -108,7 +108,7 @@
 
 		<p>Add the following right above the <strong>renderer.render</strong> call in your <strong>animate</strong> function:</p>
 
-		<code>
+		<code translate="no">
 		cube.rotation.x += 0.01;
 		cube.rotation.y += 0.01;
 		</code>
@@ -120,7 +120,7 @@
 
 		<p>The full code is available below and as an editable [link:https://jsfiddle.net/mkba0ecu/ live example]. Play around with it to get a better understanding of how it works.</p>
 
-		<code>
+		<code translate="no">
 		&lt;html&gt;
 			&lt;head&gt;
 				&lt;title&gt;My first three.js app&lt;/title&gt;

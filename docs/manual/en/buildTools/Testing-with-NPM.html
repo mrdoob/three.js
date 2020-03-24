@@ -20,11 +20,11 @@
 
 		<p>
 			If you're comfortable with node and npm,
-			<code>
+			<code translate="no">
 				$ npm install three --save-dev
 			</code>
 			and add
-		<code>
+		<code translate="no">
 			var THREE = require('three');
 		</code>
 			to your test.
@@ -41,7 +41,7 @@
 			<ol>
 				<li>
 					Install [link:https://www.npmjs.org/ npm] and nodejs. The shortest path typically looks something like
-					<code>
+					<code translate="no">
 $ sudo apt-get install -y npm nodejs-legacy
 # fix any problems with SSL in the default registry URL
 $ npm config set registry http://registry.npmjs.org/
@@ -50,14 +50,14 @@ $ npm config set registry http://registry.npmjs.org/
 
 				<li>
 					Make a new project directory
-					<code>
+					<code translate="no">
 						 $ mkdir test-example; cd test-example
 					</code>
 				</li>
 
 				<li>
 					Ask npm to create a new project file for you:
-					<code>
+					<code translate="no">
 					 $ npm init
 					</code>
 					 and accept all defaults by hitting Enter on all the prompts.
@@ -66,12 +66,12 @@ $ npm config set registry http://registry.npmjs.org/
 
 				<li>
 					Try and start the test feature with
-					<code>
+					<code translate="no">
 $ npm test
 					</code>
 					This will fail, which is expected.
 					If you look in the package.json, the definition of the test script is
-					<code>
+					<code translate="no">
 						"test": "echo \"Error: no test specified\" && exit 1"
 					</code>
 				</li>
@@ -86,7 +86,7 @@ $ npm test
 			<ol>
 				<li>
 					Install mocha with
-					<code>
+					<code translate="no">
 $ npm install mocha --save-dev
 					</code>
 					Notice that node_modules/ is created and your dependencies appear in there.
@@ -98,14 +98,14 @@ $ npm install mocha --save-dev
 					Edit package.json to use mocha for testing. When test is invoked, we just want to run
 					mocha and specify a verbose reporter. By default this will run anything in test/
 					(not having directory test/ can run into npm ERR!, create it by mkdir test)
-					<code>
+					<code translate="no">
 						"test": "mocha --reporter list"
 					</code>
 				</li>
 
 				<li>
 					Rerun the test with
-					<code>
+					<code translate="no">
 						$ npm test
 					</code>
 
@@ -121,18 +121,18 @@ $ npm install mocha --save-dev
 			<ol>
 				<li>
 					Let's pull in our three.js dependency with
-					<code>
+					<code translate="no">
 $ npm install three --save-dev
 					</code>
 					<ul>
 						<li>
 							If you need a different three version, use
-							<code>
+							<code translate="no">
 								$ npm show three versions
 							</code>
 						  to see
 							what's available. To tell npm the right one, use
-							<code>
+							<code translate="no">
  $ npm install three@0.84.0 --save
 							</code>
 							(0.84.0 in this example). --save makes this a dependency of this project, rather than
@@ -143,7 +143,7 @@ $ npm install three --save-dev
 
 				<li>
 					Mocha will look for tests in test/, so let's
-					<code>
+					<code translate="no">
 					$ mkdir test
 					</code>
 				</li>
@@ -151,7 +151,7 @@ $ npm install three --save-dev
 				<li>
 					Finally we actually need a JS test to run. Let's add a simple test that will verify that
 					the three.js object is available and working. Create test/verify-three.js containing:
-<code>
+<code translate="no">
 var THREE = require('three');
 var assert = require("assert");
 
@@ -171,7 +171,7 @@ describe('The THREE object', function() {
 				<li>
 				Finally let's test again with $ npm test. This should run the tests above and succeed,
 				showing something like:
-				<code>
+				<code translate="no">
 The THREE object should have a defined BasicShadowMap constant: 0ms
 The THREE object should be able to construct a Vector3 with default of x=0: 0ms
 2 passing (8ms)
@@ -204,7 +204,7 @@ The THREE object should be able to construct a Vector3 with default of x=0: 0ms
 				Items 2 and 3 will vary depending on how you manage your code. In the example of Physics.js
 		  	given above, the export part is right at the end. We assign an object to module.exports:
 			</p>
-			<code>
+			<code translate="no">
 //=============================================================================
 // make available in nodejs
 //=============================================================================
@@ -242,7 +242,7 @@ if (typeof exports !== 'undefined')
 				</li>
 			</ol>
 			Example code from Physics.js:
-			<code>
+			<code translate="no">
 //=============================================================================
 // setup for server-side testing
 //=============================================================================

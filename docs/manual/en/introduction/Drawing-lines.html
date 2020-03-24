@@ -16,7 +16,7 @@
 			</p>
 
 			<p>Here is the code that we will use:</p>
-			<code>
+			<code translate="no">
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
@@ -28,7 +28,7 @@ camera.lookAt( 0, 0, 0 );
 var scene = new THREE.Scene();
 			</code>
 			<p>Next thing we will do is define a material. For lines we have to use [page:LineBasicMaterial] or [page:LineDashedMaterial].</p>
-			<code>
+			<code translate="no">
 //create a blue LineBasicMaterial
 var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 			</code>
@@ -37,7 +37,7 @@ var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 				After material we will need a geometry with some vertices:
 			</p>
 
-			<code>
+			<code translate="no">
 var points = [];
 points.push( new THREE.Vector3( - 10, 0, 0 ) );
 points.push( new THREE.Vector3( 0, 10, 0 ) );
@@ -49,12 +49,12 @@ var geometry = new THREE.BufferGeometry().setFromPoints( points );
 			<p>Note that lines are drawn between each consecutive pair of vertices, but not between the first and last (the line is not closed.)</p>
 
 			<p>Now that we have points for two lines and a material, we can put them together to form a line.</p>
-			<code>
+			<code translate="no">
 var line = new THREE.Line( geometry, material );
 			</code>
 			<p>All that's left is to add it to the scene and call [page:WebGLRenderer.render render].</p>
 
-			<code>
+			<code translate="no">
 scene.add( line );
 renderer.render( scene, camera );
 			</code>

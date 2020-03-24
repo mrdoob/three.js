@@ -20,13 +20,13 @@
 				使用HTML通常是最简单、最快速的添加文本的方法，这是大多数的Three.js示例中用于添加描述性叠加文字的方法。
 			</p>
 			<p>你可以在这里添加内容</p>
-			<code>&lt;div id="info"&gt;Description&lt;/div&gt;</code>
+			<code translate="no">&lt;div id="info"&gt;Description&lt;/div&gt;</code>
 
 			<p>
 				然后使用CSS来将其绝对定位在其它具有z-index的元素之上，尤其是当你全屏运行three.js的时候。
 			</p>
 
-			<code>
+			<code translate="no">
 #info {
 	position: absolute;
 	top: 10px;
@@ -61,7 +61,7 @@
 				如果你更喜欢使用纯three.js来工作，或者创建能够由程序改变的、动态的3D文字，你可以创建一个其几何体为THREE.TextGeometry的实例的网格：
 			</p>
 			<p>
-				<code>new THREE.TextGeometry( text, parameters );</code>
+				<code translate="no">new THREE.TextGeometry( text, parameters );</code>
 			</p>
 			<p>
 				然而，为了使得它能够工作，你的TextGeometry需要在其“font”参数上设置一个THREE.Font的实例。

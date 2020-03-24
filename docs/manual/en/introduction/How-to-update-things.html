@@ -11,12 +11,12 @@
 		<h1>[name]</h1>
 		<div>
 			<p>All objects by default automatically update their matrices if they have been added to the scene with</p>
-			<code>
+			<code translate="no">
 var object = new THREE.Object3D();
 scene.add( object );
 			</code>
 			or if they are the child of another object that has been added to the scene:
-			<code>
+			<code translate="no">
 var object1 = new THREE.Object3D();
 var object2 = new THREE.Object3D();
 
@@ -27,7 +27,7 @@ scene.add( object1 ); //object1 and object2 will automatically update their matr
 
 		<p>However, if you know object will be static, you can disable this and update the transform matrix manually just when needed.</p>
 
-		<code>
+		<code translate="no">
 object.matrixAutoUpdate  = false;
 object.updateMatrix();
 		</code>
@@ -56,7 +56,7 @@ object.updateMatrix();
 				We'll use the example of a line that gets extended at render time. We'll allocate space
 				in the buffer for 500 vertices but draw only two at first, using [page:BufferGeometry.drawRange].
 			</p>
-			<code>
+			<code translate="no">
 var MAX_POINTS = 500;
 
 // geometry
@@ -80,7 +80,7 @@ scene.add( line );
 		 	<p>
 				Next we'll randomly add points to the line using a pattern like:
 			</p>
-			<code>
+			<code translate="no">
 var positions = line.geometry.attributes.position.array;
 
 var x, y, z, index;
@@ -101,14 +101,14 @@ for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
 			<p>
 				If you want to change the <em>number of points</em> rendered after the first render, do this:
 			</p>
-			<code>
+			<code translate="no">
 line.geometry.setDrawRange( 0, newValue );
 			</code>
 			<p>
 				If you want to change the position data values after the first render, you need to
 				set the needsUpdate flag like so:
 			</p>
-			<code>
+			<code translate="no">
 line.geometry.attributes.position.needsUpdate = true; // required after the first render
 			</code>
 
@@ -116,7 +116,7 @@ line.geometry.attributes.position.needsUpdate = true; // required after the firs
 				If you change the position data values after the initial render, you may need to
 				call `.computeBoundingSphere()` in order to recalculate the geometry's bounding sphere.
 			</p>
-			<code>
+			<code translate="no">
 line.geometry.computeBoundingSphere();
 			</code>
 
@@ -142,7 +142,7 @@ line.geometry.computeBoundingSphere();
 				true if you want to keep updating buffers. Note that this applies only to [page:Geometry]
 				and not to [page:BufferGeometry].
 			</p>
-			<code>
+			<code translate="no">
 var geometry = new THREE.Geometry();
 geometry.verticesNeedUpdate = true;
 geometry.elementsNeedUpdate = true;
@@ -158,7 +158,7 @@ geometry.tangentsNeedUpdate = true;
 				additionally need the <em>dynamic</em> flag enabled (to keep internal typed arrays):
 			</p>
 
-			<code>
+			<code translate="no">
 	//removed after r66
 	geometry.dynamic = true;
 			</code>
@@ -188,7 +188,7 @@ geometry.tangentsNeedUpdate = true;
 			</ul>
 
 			<p>Changes in these require building of new shader program. You'll need to set</p>
-			<code>material.needsUpdate = true</code>
+			<code translate="no">material.needsUpdate = true</code>
 
 			<p>Bear in mind this might be quite slow and induce jerkiness in framerate (especially on Windows, as shader compilation is slower in DirectX than OpenGL).</p>
 
@@ -212,7 +212,7 @@ geometry.tangentsNeedUpdate = true;
 		<h2>Textures</h2>
 		<div>
 			<p>Image, canvas, video and data textures need to have the following flag set if they are changed:</p>
-			<code>
+			<code translate="no">
 				texture.needsUpdate = true;
 			</code>
 			<p>Render targets update automatically.</p>
@@ -246,7 +246,7 @@ geometry.tangentsNeedUpdate = true;
 			<p>
 				then you'll need to recompute the projection matrix:
 			</p>
-			<code>
+			<code translate="no">
 camera.aspect = window.innerWidth / window.innerHeight;
 camera.updateProjectionMatrix();
 			</code>

@@ -26,10 +26,10 @@
 
 			<ol>
 				<li>
-					Change security for local files in a browser. This allows you to access your page as: <code>file:///yourFile.html</code>
+					Change security for local files in a browser. This allows you to access your page as: <code translate="no">file:///yourFile.html</code>
 				</li>
 				<li>
-					Run files from a local web server. This allows you to access your page as: <code>http://localhost/yourFile.html</code>
+					Run files from a local web server. This allows you to access your page as: <code translate="no">http://localhost/yourFile.html</code>
 				</li>
 			</ol>
 
@@ -59,10 +59,10 @@
 			<h3>Node.js http-server</h3>
 			<div>
 				<p>Node.js has a simple HTTP server package. To install:</p>
-				<code>npm install http-server -g</code>
+				<code translate="no">npm install http-server -g</code>
 
 				<p>To run (from your local directory):</p>
-				<code>http-server . -p 8000</code>
+				<code translate="no">http-server . -p 8000</code>
 			</div>
 
 			<h3>Python server</h3>
@@ -71,7 +71,7 @@
 					If you have [link:http://python.org/ Python] installed, it should be enough to run this
 					from a command line (from your working directory):
 				</p>
-				<code>
+				<code translate="no">
 //Python 2.x
 python -m SimpleHTTPServer
 
@@ -81,13 +81,13 @@ python -m http.server
 
 				<p>This will serve files from the current directory at localhost under port 8000, i.e in the address bar type:</p>
 
-				<code>http://localhost:8000/</code>
+				<code translate="no">http://localhost:8000/</code>
 			</div>
 
 			<h3>Ruby server</h3>
 			<div>
 				<p>If you have Ruby installed, you can get the same result running this instead:</p>
-				<code>
+				<code translate="no">
 ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => Dir.pwd); trap('INT') { s.shutdown }; s.start"
 				</code>
 			</div>
@@ -95,7 +95,7 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 			<h3>PHP server</h3>
 			<div>
 				<p>PHP also has a built-in web server, starting with php 5.4.0:</p>
-				<code>php -S localhost:8000</code>
+				<code translate="no">php -S localhost:8000</code>
 			</div>
 
 			<h3>Lighttpd</h3>
@@ -109,7 +109,7 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 				<ol>
 					<li>
 						Install it via homebrew
-						<code>brew install lighttpd</code>
+						<code translate="no">brew install lighttpd</code>
 					</li>
 					<li>
 						Create a configuration file called lighttpd.conf in the directory where you want to run
@@ -120,7 +120,7 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 					</li>
 					<li>
 						Start it with
-						<code>lighttpd -f lighttpd.conf</code>
+						<code translate="no">lighttpd -f lighttpd.conf</code>
 					</li>
 					<li>
 						Navigate to http://localhost:3000/ and it will serve static files from the directory you
@@ -131,7 +131,7 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 			<h3>IIS</h3>
 			<div>
 				<p>If you are using Microsoft IIS as web server. Please add a MIME type settings regarding .fbx extension before loading.</p>
-				<code>File name extension: fbx        MIME Type: text/plain</code>
+				<code translate="no">File name extension: fbx        MIME Type: text/plain</code>
 				<p>By default, IIS blocks .fbx, .obj files downloads. You have to configure IIS to enable these kind of files can be download.</p>
 			</div>
 			<p>
