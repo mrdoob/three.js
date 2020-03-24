@@ -47,13 +47,17 @@ class ArrowHelper extends Object3D {
 			_coneGeometry.translate( 0, - 0.5, 0 );
 
 		}
+
 		this.position.copy( origin );
+
 		this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color } ) );
 		this.line.matrixAutoUpdate = false;
 		this.add( this.line );
+
 		this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color } ) );
 		this.cone.matrixAutoUpdate = false;
 		this.add( this.cone );
+
 		this.setDirection( dir );
 		this.setLength( length, headLength, headWidth );
 
