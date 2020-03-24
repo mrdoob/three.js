@@ -623,7 +623,7 @@ vec3 getSample(float theta, vec3 axis) {
 void main() {
 	vec3 axis = latitudinal ? poleAxis : cross(poleAxis, vOutputDirection);
 	if (all(equal(axis, vec3(0.0))))
-		axis = vec3(vOutputDirection.z, 0.0, - vOutputDirection.x );
+		axis = vec3(vOutputDirection.z, 0.0, - vOutputDirection.x);
 	axis = normalize(axis);
 	gl_FragColor = vec4(0.0);
 	gl_FragColor.rgb += weights[0] * getSample(0.0, axis);
