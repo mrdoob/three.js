@@ -58,6 +58,7 @@ var GeometryCompressionUtils = {
 		let result;
 		if ( encodeMethod == "DEFAULT" ) {
 
+			// TODO: Add 1 byte to the result, making the encoded length to be 4 bytes.
 			result = new Uint8Array( count * 3 );
 
 			for ( let idx = 0; idx < array.length; idx += 3 ) {
@@ -76,6 +77,12 @@ var GeometryCompressionUtils = {
 			mesh.geometry.attributes.normal.bytes = result.length * 1;
 
 		} else if ( encodeMethod == "OCT1Byte" ) {
+
+			/**
+			* It is not recommended to use 1-byte octahedron normals encoding unless you want to extremely reduce the memory usage
+			* As it makes vertex data not aligned to a 4 byte boundary which may harm some WebGL implementations and sometimes the normal distortion is visible
+			* Please refer to @zeux 's comments in https://github.com/mrdoob/three.js/pull/18208
+			*/
 
 			result = new Int8Array( count * 2 );
 
@@ -387,7 +394,7 @@ var GeometryCompressionUtils = {
 
 		},
 
-		// for `OCT` encoding
+		// for `Octahedron` encoding
 		octEncodeBest: function ( x, y, z, bytes ) {
 
 			var oct, dec, best, currentCos, bestCos;
@@ -396,7 +403,7 @@ var GeometryCompressionUtils = {
 			// to minimize rounding errors
 			best = oct = octEncodeVec3( x, y, z, "floor", "floor" );
 			dec = octDecodeVec2( oct );
-			currentCos = bestCos = dot( x, y, z, dec );
+			bestCos = dot( x, y, z, dec );
 
 			oct = octEncodeVec3( x, y, z, "ceil", "floor" );
 			dec = octDecodeVec2( oct );
@@ -427,7 +434,6 @@ var GeometryCompressionUtils = {
 			if ( currentCos > bestCos ) {
 
 				best = oct;
-				bestCos = currentCos;
 
 			}
 
@@ -440,10 +446,9 @@ var GeometryCompressionUtils = {
 
 				if ( z < 0 ) {
 
-					var tempx = x;
-					var tempy = y;
-					tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
-					tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
+					var tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
+					var tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
+
 					x = tempx;
 					y = tempy;
 
@@ -833,6 +838,7 @@ function PackedPhongMaterial( parameters ) {
 		"}",
 	].join( "\n" );
 
+	// Use the original MeshPhongMaterial's fragmentShader.
 	this.fragmentShader = [
 		"#define PHONG",
 

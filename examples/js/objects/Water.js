@@ -90,8 +90,10 @@ THREE.Water = function ( geometry, options ) {
 			'varying vec4 mirrorCoord;',
 			'varying vec4 worldPosition;',
 
-			THREE.ShaderChunk[ 'fog_pars_vertex' ],
-			THREE.ShaderChunk[ 'shadowmap_pars_vertex' ],
+		 	'#include <common>',
+		 	'#include <fog_pars_vertex>',
+			'#include <shadowmap_pars_vertex>',
+			'#include <logdepthbuf_pars_vertex>',
 
 			'void main() {',
 			'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
@@ -100,9 +102,9 @@ THREE.Water = function ( geometry, options ) {
 			'	vec4 mvPosition =  modelViewMatrix * vec4( position, 1.0 );',
 			'	gl_Position = projectionMatrix * mvPosition;',
 
-			THREE.ShaderChunk[ 'fog_vertex' ],
-			THREE.ShaderChunk[ 'shadowmap_vertex' ],
-
+			'#include <logdepthbuf_vertex>',
+			'#include <fog_vertex>',
+			'#include <shadowmap_vertex>',
 			'}'
 		].join( '\n' ),
 
@@ -140,15 +142,18 @@ THREE.Water = function ( geometry, options ) {
 			'	diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;',
 			'}',
 
-			THREE.ShaderChunk[ 'common' ],
-			THREE.ShaderChunk[ 'packing' ],
-			THREE.ShaderChunk[ 'bsdfs' ],
-			THREE.ShaderChunk[ 'fog_pars_fragment' ],
-			THREE.ShaderChunk[ 'lights_pars_begin' ],
-			THREE.ShaderChunk[ 'shadowmap_pars_fragment' ],
-			THREE.ShaderChunk[ 'shadowmask_pars_fragment' ],
+			'#include <common>',
+			'#include <packing>',
+			'#include <bsdfs>',
+			'#include <fog_pars_fragment>',
+			'#include <logdepthbuf_pars_fragment>',
+			'#include <lights_pars_begin>',
+			'#include <shadowmap_pars_fragment>',
+			'#include <shadowmask_pars_fragment>',
 
 			'void main() {',
+
+			'#include <logdepthbuf_fragment>',
 			'	vec4 noise = getNoise( worldPosition.xz * size );',
 			'	vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',
 
@@ -172,9 +177,8 @@ THREE.Water = function ( geometry, options ) {
 			'	vec3 outgoingLight = albedo;',
 			'	gl_FragColor = vec4( outgoingLight, alpha );',
 
-			THREE.ShaderChunk[ 'tonemapping_fragment' ],
-			THREE.ShaderChunk[ 'fog_fragment' ],
-
+			'#include <tonemapping_fragment>',
+			'#include <fog_fragment>',
 			'}'
 		].join( '\n' )
 
@@ -291,7 +295,7 @@ THREE.Water = function ( geometry, options ) {
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, mirrorCamera );
 
 		scope.visible = true;

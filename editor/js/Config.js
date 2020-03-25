@@ -24,8 +24,6 @@ var Config = function () {
 		'project/renderer/toneMappingExposure': 1,
 		'project/renderer/toneMappingWhitePoint': 1,
 
-		'project/vr': false,
-
 		'settings/history': false,
 
 		'settings/shortcuts/translate': 'w',

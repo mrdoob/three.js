@@ -16,30 +16,32 @@
 			使用[link:https://en.wikipedia.org/wiki/Centripetal_Catmull-Rom_spline Catmull-Rom]算法，
 			从一系列的点创建一条平滑的三维样条曲线。</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
+
+		<code>
+		//Create a closed wavey loop
+		var curve = new THREE.CatmullRomCurve3( [
+			new THREE.Vector3( -10, 0, 10 ),
+			new THREE.Vector3( -5, 5, 5 ),
+			new THREE.Vector3( 0, 0, 0 ),
+			new THREE.Vector3( 5, -5, 5 ),
+			new THREE.Vector3( 10, 0, 10 )
+		] );
+
+		var points = curve.getPoints( 50 );
+		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+
+		// Create the final object to add to the scene
+		var curveObject = new THREE.Line( geometry, material );
+		</code>
+
+		<h2>例子</h2>
 
 		<p>
 			[example:webgl_geometry_extrude_splines WebGL / geometry / extrude / splines]
 		</p>
-
-<code>
-//Create a closed wavey loop
-var curve = new THREE.CatmullRomCurve3( [
-	new THREE.Vector3( -10, 0, 10 ),
-	new THREE.Vector3( -5, 5, 5 ),
-	new THREE.Vector3( 0, 0, 0 ),
-	new THREE.Vector3( 5, -5, 5 ),
-	new THREE.Vector3( 10, 0, 10 )
-] );
-
-var points = curve.getPoints( 50 );
-var geometry = new THREE.BufferGeometry().setFromPoints( points );
-
-var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
-
-// Create the final object to add to the scene
-var curveObject = new THREE.Line( geometry, material );
-</code>
 
 		<h2>构造函数</h2>
 

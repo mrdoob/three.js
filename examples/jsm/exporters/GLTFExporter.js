@@ -918,16 +918,16 @@ GLTFExporter.prototype = {
 
 			}
 
-			if ( ! outputJSON.materials ) {
-
-				outputJSON.materials = [];
-
-			}
-
-			if ( material.isShaderMaterial && ! material.isGLTFSpecularGlossinessMaterial ) {
+			if ( material.isShaderMaterial ) {
 
 				console.warn( 'GLTFExporter: THREE.ShaderMaterial not supported.' );
 				return null;
+
+			}
+
+			if ( ! outputJSON.materials ) {
+
+				outputJSON.materials = [];
 
 			}
 
@@ -1198,17 +1198,14 @@ GLTFExporter.prototype = {
 
 			} else {
 
-				if ( ! geometry.isBufferGeometry ) {
-
-					console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use BufferGeometry instead.' );
-
-					var geometryTemp = new BufferGeometry();
-					geometryTemp.fromGeometry( geometry );
-					geometry = geometryTemp;
-
-				}
-
 				mode = mesh.material.wireframe ? WEBGL_CONSTANTS.LINES : WEBGL_CONSTANTS.TRIANGLES;
+
+			}
+
+			if ( ! geometry.isBufferGeometry ) {
+
+				console.warn( 'GLTFExporter: Exporting THREE.Geometry will increase file size. Use BufferGeometry instead.' );
+				geometry = new BufferGeometry().setFromObject( mesh );
 
 			}
 
@@ -1931,11 +1928,7 @@ GLTFExporter.prototype = {
 
 			}
 
-			var gltfScene = {
-
-				nodes: []
-
-			};
+			var gltfScene = {};
 
 			if ( scene.name !== '' ) {
 
@@ -2047,70 +2040,70 @@ GLTFExporter.prototype = {
 			var extensionsUsedList = Object.keys( extensionsUsed );
 			if ( extensionsUsedList.length > 0 ) outputJSON.extensionsUsed = extensionsUsedList;
 
-			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
+			// Update bytelength of the single buffer.
+			if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) outputJSON.buffers[ 0 ].byteLength = blob.size;
 
-				// Update bytelength of the single buffer.
-				outputJSON.buffers[ 0 ].byteLength = blob.size;
+			if ( options.binary === true ) {
+
+				// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+
+				var GLB_HEADER_BYTES = 12;
+				var GLB_HEADER_MAGIC = 0x46546C67;
+				var GLB_VERSION = 2;
+
+				var GLB_CHUNK_PREFIX_BYTES = 8;
+				var GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
+				var GLB_CHUNK_TYPE_BIN = 0x004E4942;
 
 				var reader = new window.FileReader();
+				reader.readAsArrayBuffer( blob );
+				reader.onloadend = function () {
 
-				if ( options.binary === true ) {
+					// Binary chunk.
+					var binaryChunk = getPaddedArrayBuffer( reader.result );
+					var binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
+					binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
 
-					// https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification
+					// JSON chunk.
+					var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ) ), 0x20 );
+					var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
+					jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
+					jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
 
-					var GLB_HEADER_BYTES = 12;
-					var GLB_HEADER_MAGIC = 0x46546C67;
-					var GLB_VERSION = 2;
+					// GLB header.
+					var header = new ArrayBuffer( GLB_HEADER_BYTES );
+					var headerView = new DataView( header );
+					headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
+					headerView.setUint32( 4, GLB_VERSION, true );
+					var totalByteLength = GLB_HEADER_BYTES
+						+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
+						+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
+					headerView.setUint32( 8, totalByteLength, true );
 
-					var GLB_CHUNK_PREFIX_BYTES = 8;
-					var GLB_CHUNK_TYPE_JSON = 0x4E4F534A;
-					var GLB_CHUNK_TYPE_BIN = 0x004E4942;
+					var glbBlob = new Blob( [
+						header,
+						jsonChunkPrefix,
+						jsonChunk,
+						binaryChunkPrefix,
+						binaryChunk
+					], { type: 'application/octet-stream' } );
 
-					reader.readAsArrayBuffer( blob );
-					reader.onloadend = function () {
+					var glbReader = new window.FileReader();
+					glbReader.readAsArrayBuffer( glbBlob );
+					glbReader.onloadend = function () {
 
-						// Binary chunk.
-						var binaryChunk = getPaddedArrayBuffer( reader.result );
-						var binaryChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-						binaryChunkPrefix.setUint32( 0, binaryChunk.byteLength, true );
-						binaryChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_BIN, true );
-
-						// JSON chunk.
-						var jsonChunk = getPaddedArrayBuffer( stringToArrayBuffer( JSON.stringify( outputJSON ) ), 0x20 );
-						var jsonChunkPrefix = new DataView( new ArrayBuffer( GLB_CHUNK_PREFIX_BYTES ) );
-						jsonChunkPrefix.setUint32( 0, jsonChunk.byteLength, true );
-						jsonChunkPrefix.setUint32( 4, GLB_CHUNK_TYPE_JSON, true );
-
-						// GLB header.
-						var header = new ArrayBuffer( GLB_HEADER_BYTES );
-						var headerView = new DataView( header );
-						headerView.setUint32( 0, GLB_HEADER_MAGIC, true );
-						headerView.setUint32( 4, GLB_VERSION, true );
-						var totalByteLength = GLB_HEADER_BYTES
-							+ jsonChunkPrefix.byteLength + jsonChunk.byteLength
-							+ binaryChunkPrefix.byteLength + binaryChunk.byteLength;
-						headerView.setUint32( 8, totalByteLength, true );
-
-						var glbBlob = new Blob( [
-							header,
-							jsonChunkPrefix,
-							jsonChunk,
-							binaryChunkPrefix,
-							binaryChunk
-						], { type: 'application/octet-stream' } );
-
-						var glbReader = new window.FileReader();
-						glbReader.readAsArrayBuffer( glbBlob );
-						glbReader.onloadend = function () {
-
-							onDone( glbReader.result );
-
-						};
+						onDone( glbReader.result );
 
 					};
 
-				} else {
+				};
 
+			} else {
+
+				if ( outputJSON.buffers && outputJSON.buffers.length > 0 ) {
+
+					var reader = new window.FileReader();
 					reader.readAsDataURL( blob );
 					reader.onloadend = function () {
 
@@ -2120,11 +2113,11 @@ GLTFExporter.prototype = {
 
 					};
 
+				} else {
+
+					onDone( outputJSON );
+
 				}
-
-			} else {
-
-				onDone( outputJSON );
 
 			}
 

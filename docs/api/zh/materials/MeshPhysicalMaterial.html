@@ -16,6 +16,29 @@
 			请注意，为了获得最佳效果，您在使用此材质时应始终指定环境贴图。
 		</p>
 
+		<ul>
+			<li>
+				<b>Clearcoat:</b> Some materials — like car paints, carbon fiber, and wet surfaces — require a
+				clear, reflective layer on top of another layer that may be irregular or rough. Clearcoat
+				approximates this effect, without the need for a separate transparent surface.
+			</li>
+			<li>
+				<b>Physically-based transparency:</b> One limitation of [page:Material.opacity .opacity] is
+				that highly transparent materials are less reflective. Physically-based [page:.transparency]
+				provides a more realistic option for thin, transparent surfaces like glass.
+			</li>
+			<li>
+				<b>Advanced reflectivity:</b> More flexible reflectivity for non-metallic materials.
+			</li>
+		</ul>
+
+		<p>
+			As a result of these complex shading features, MeshPhysicalMaterial has a higher performance
+			cost, per pixel, than other three.js materials. Most effects are disabled by default, and add
+			cost as they are enabled. For best results, always specify an [page:.envMap environment map]
+			when using this material.
+		</p>
+
 		<iframe id="scene" src="scenes/material-browser.html#MeshPhysicalMaterial"></iframe>
 
 		<script>
@@ -34,7 +57,7 @@
 
 		</script>
 
-		<h2>例子(Examples)</h2>
+		<h2>例子</h2>
 
 		<p>
 			[example:webgl_materials_variations_physical materials / variations / physical]<br />
@@ -57,9 +80,14 @@
 
 		<h3>[property:Float clearcoat]</h3>
 		<p>
-		Represents the thickness of the clear coat layer, from *0.0* to *1.0*. You can use clear coat related properties to enable multilayer
-		materials that have a thin translucent layer over the base layer. Typical examples for this model are car paints or acrylic.
-		Default is *0.0*.
+		Represents the thickness of the clear coat layer, from *0.0* to *1.0*. Use clear coat related properties to enable multilayer
+		materials that have a thin translucent layer over the base layer. Default is *0.0*.
+		</p>
+
+		<h3>[property:Texture clearcoatMap]</h3>
+		<p>
+		The red channel of this texture is multiplied against [page:.clearcoat], for per-pixel control
+		over a coating's thickness. Default is *null*.
 		</p>
 
 		<h3>[property:Float clearcoatNormalMap]</h3>
@@ -70,6 +98,12 @@
 
 		<h3>[property:Float clearcoatRoughness]</h3>
 		<p>Roughness of the clear coat layer, from *0.0* to *1.0*. Default is *0.0*.</p>
+
+		<h3>[property:Texture clearcoatRoughnessMap]</h3>
+		<p>
+		The green channel of this texture is multiplied against [page:.clearcoatRoughness], for per-pixel control
+		over a coating's roughness. Default is *null*.
+		</p>
 
 		<h3>[property:Object defines]</h3>
 		<p> 如下形式的对象:
@@ -92,11 +126,11 @@
 		<h3>[property:Float transparency]</h3>
 		<p>
 		Degree of transparency, from *0.0* to *1.0*. Default is *0.0*.<br />
-		
+
 		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are mostly transparent.
-		
+
 		The transparency property can be used to model these materials.<br />
-		
+
 		When transparency is non-zero, [page:Material.opacity opacity] should be set to *1*.
 		</p>
 

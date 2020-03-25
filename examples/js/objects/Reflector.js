@@ -162,7 +162,7 @@ THREE.Reflector = function ( geometry, options ) {
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, virtualCamera );
 
 		renderer.xr.enabled = currentXrEnabled;

@@ -39,6 +39,8 @@
 
 			var binormal = new THREE.Vector3();
 			var normal = new THREE.Vector3();
+			var position = new THREE.Vector3();
+			var lookAt = new THREE.Vector3();
 
 			var pipeSpline = new THREE.CatmullRomCurve3( [
 				new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
@@ -290,8 +292,8 @@
 				var looptime = 20 * 1000;
 				var t = ( time % looptime ) / looptime;
 
-				var pos = tubeGeometry.parameters.path.getPointAt( t );
-				pos.multiplyScalar( params.scale );
+				tubeGeometry.parameters.path.getPointAt( t, position );
+				position.multiplyScalar( params.scale );
 
 				// interpolation
 
@@ -310,18 +312,19 @@
 
 				// we move on a offset on its binormal
 
-				pos.add( normal.clone().multiplyScalar( offset ) );
+				position.add( normal.clone().multiplyScalar( offset ) );
 
-				splineCamera.position.copy( pos );
-				cameraEye.position.copy( pos );
+				splineCamera.position.copy( position );
+				cameraEye.position.copy( position );
 
 				// using arclength for stablization in look ahead
 
-				var lookAt = tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
+				tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1, lookAt );
+				lookAt.multiplyScalar( params.scale );
 
 				// camera orientation 2 - up orientation via normal
 
-				if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
+				if ( ! params.lookAhead ) lookAt.copy( position ).add( dir );
 				splineCamera.matrix.lookAt( splineCamera.position, lookAt, normal );
 				splineCamera.quaternion.setFromRotationMatrix( splineCamera.matrix );
 

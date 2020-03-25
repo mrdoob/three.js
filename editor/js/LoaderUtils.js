@@ -54,7 +54,7 @@ var LoaderUtils = {
 
 					}
 
-					onEntryHandled( entry );
+					onEntryHandled();
 
 				} );
 

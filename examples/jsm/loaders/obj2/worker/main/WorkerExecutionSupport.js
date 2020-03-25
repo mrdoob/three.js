@@ -19,7 +19,7 @@ const CodeBuilderInstructions = function ( supportsStandardWorker, supportsJsmWo
 	this.codeFragments = [];
 	this.importStatements = [];
 
-	this.jsmWorkerFile = null;
+	this.jsmWorkerUrl = null;
 	this.defaultGeometryType = 0;
 
 };
@@ -49,13 +49,13 @@ CodeBuilderInstructions.prototype = {
 	/**
 	 * Set the full path to the module that contains the worker code.
 	 *
-	 * @param {String} jsmWorkerFile
+	 * @param {String} jsmWorkerUrl
 	 */
-	setJsmWorkerFile: function ( jsmWorkerFile ) {
+	setJsmWorkerUrl: function ( jsmWorkerUrl ) {
 
-		if ( jsmWorkerFile !== undefined && jsmWorkerFile !== null ) {
+		if ( jsmWorkerUrl !== undefined && jsmWorkerUrl !== null ) {
 
-			this.jsmWorkerFile = jsmWorkerFile;
+			this.jsmWorkerUrl = jsmWorkerUrl;
 
 		}
 
@@ -127,7 +127,7 @@ const WorkerExecutionSupport = function () {
 	this._reset();
 
 };
-WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.1.0';
+WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.2.0';
 console.info( 'Using WorkerSupport version: ' + WorkerExecutionSupport.WORKER_SUPPORT_VERSION );
 
 
@@ -289,10 +289,9 @@ WorkerExecutionSupport.prototype = {
 		let workerAvailable = this._buildWorkerCheckPreconditions( true, timeLabel );
 		if ( ! workerAvailable ) {
 
-			let workerFileUrl = new URL( codeBuilderInstructions.jsmWorkerFile, window.location.href ).href;
 			try {
 
-				let worker = new Worker( workerFileUrl, { type: "module" } );
+				let worker = new Worker( codeBuilderInstructions.jsmWorkerUrl.href, { type: "module" } );
 				this._configureWorkerCommunication( worker, true, codeBuilderInstructions.defaultGeometryType, timeLabel );
 
 			} catch ( e ) {
@@ -387,6 +386,7 @@ WorkerExecutionSupport.prototype = {
 
 		};
 		this.worker.native.onmessage = scopedReceiveWorkerMessage;
+		this.worker.native.onerror = scopedReceiveWorkerMessage;
 		if ( defaultGeometryType !== undefined && defaultGeometryType !== null ) {
 
 			this.worker.workerRunner.defaultGeometryType = defaultGeometryType;
@@ -418,9 +418,15 @@ WorkerExecutionSupport.prototype = {
 	 */
 	_receiveWorkerMessage: function ( event ) {
 
+		// fast-fail in case of error
+		if ( event.type === "error" ) {
+
+			console.error( event );
+			return;
+
+		}
 		let payload = event.data;
 		let workerRunnerName = this.worker.workerRunner.name;
-
 		switch ( payload.cmd ) {
 
 			case 'assetAvailable':

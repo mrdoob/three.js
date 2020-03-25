@@ -22,7 +22,8 @@ THREE.Sky = function () {
 		fragmentShader: shader.fragmentShader,
 		vertexShader: shader.vertexShader,
 		uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-		side: THREE.BackSide
+		side: THREE.BackSide,
+		depthWrite: false
 	} );
 
 	THREE.Mesh.call( this, new THREE.BoxBufferGeometry( 1, 1, 1 ), material );
@@ -173,9 +174,12 @@ THREE.Sky.SkyShader = {
 
 
 		'void main() {',
+
+		'	vec3 direction = normalize( vWorldPosition - cameraPos );',
+
 		// optical length
 		// cutoff angle at 90 to avoid singularity in next formula.
-		'	float zenithAngle = acos( max( 0.0, dot( up, normalize( vWorldPosition - cameraPos ) ) ) );',
+		'	float zenithAngle = acos( max( 0.0, dot( up, direction ) ) );',
 		'	float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( 93.885 - ( ( zenithAngle * 180.0 ) / pi ), -1.253 ) );',
 		'	float sR = rayleighZenithLength * inverse;',
 		'	float sM = mieZenithLength * inverse;',
@@ -184,7 +188,7 @@ THREE.Sky.SkyShader = {
 		'	vec3 Fex = exp( -( vBetaR * sR + vBetaM * sM ) );',
 
 		// in scattering
-		'	float cosTheta = dot( normalize( vWorldPosition - cameraPos ), vSunDirection );',
+		'	float cosTheta = dot( direction, vSunDirection );',
 
 		'	float rPhase = rayleighPhase( cosTheta * 0.5 + 0.5 );',
 		'	vec3 betaRTheta = vBetaR * rPhase;',
@@ -196,7 +200,6 @@ THREE.Sky.SkyShader = {
 		'	Lin *= mix( vec3( 1.0 ), pow( vSunE * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * Fex, vec3( 1.0 / 2.0 ) ), clamp( pow( 1.0 - dot( up, vSunDirection ), 5.0 ), 0.0, 1.0 ) );',
 
 		// nightsky
-		'	vec3 direction = normalize( vWorldPosition - cameraPos );',
 		'	float theta = acos( direction.y ); // elevation --> y-axis, [-pi/2, pi/2]',
 		'	float phi = atan( direction.z, direction.x ); // azimuth --> x-axis [-pi/2, pi/2]',
 		'	vec2 uv = vec2( phi, theta ) / vec2( 2.0 * pi, pi ) + vec2( 0.5, 0.0 );',
