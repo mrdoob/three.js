@@ -106,16 +106,16 @@ function main() {
   function getCanvasRelativePosition(event) {
     const rect = canvas.getBoundingClientRect();
     return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
+      x: (event.clientX - rect.left) * canvas.width  / rect.width,
+      y: (event.clientY - rect.top ) * canvas.height / rect.height,
     };
   }
 
   const temp = new THREE.Vector3();
   function setPosition(e) {
     const pos = getCanvasRelativePosition(e);
-    const x = pos.x / canvas.clientWidth  *  2 - 1;
-    const y = pos.y / canvas.clientHeight * -2 + 1;
+    const x = pos.x / canvas.width  *  2 - 1;
+    const y = pos.y / canvas.height * -2 + 1;
     temp.set(x, y, 0).unproject(camera);
     state.x = temp.x;
     state.y = temp.y;

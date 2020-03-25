@@ -85,16 +85,16 @@ function main() {  /* eslint consistent-return: 0 */
   function getCanvasRelativePosition(event) {
     const rect = canvas.getBoundingClientRect();
     return {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-    };
+      x: (event.clientX - rect.left) * canvas.width  / rect.width,
+      y: (event.clientY - rect.top ) * canvas.height / rect.height,
+   };
   }
 
   function setPickPosition(event) {
     const pos = getCanvasRelativePosition(event);
     sendMouse(
-        (pos.x / canvas.clientWidth ) *  2 - 1,
-        (pos.y / canvas.clientHeight) * -2 + 1);  // note we flip Y
+        (pos.x / canvas.width ) *  2 - 1,
+        (pos.y / canvas.height) * -2 + 1);  // note we flip Y
   }
 
   function clearPickPosition() {
