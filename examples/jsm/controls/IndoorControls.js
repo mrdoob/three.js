@@ -18,6 +18,12 @@ var IndoorControls = function ( camera, domElement ) {
     this.camera = camera;
     this.domElement = domElement;
 
+    // 控制器是否产生作用
+    this.enabled = true;
+    this.enabled_rotate = true;
+    this.enabled_move = true;
+    this.enabled_key = true;
+
     // 相机第一人称旋转的速度
     this.speedRotating = 0.001;
     // 是否启用第一人称旋转动画
@@ -38,7 +44,7 @@ var IndoorControls = function ( camera, domElement ) {
     this.speedKeyMoving = 2;
 
     // 捕捉水平移动目标点的三维物体
-    this.ground = null;
+    this.ground = [];
 
     var scope = this;
 
@@ -47,6 +53,8 @@ var IndoorControls = function ( camera, domElement ) {
     var PI_2 = Math.PI / 2;
 
     var vec = new Vector3();
+
+    var rect = scope.domElement.getBoundingClientRect();
 
     // 动画每一帧更新前的时间
     var prevTime = performance.now();
@@ -98,7 +106,7 @@ var IndoorControls = function ( camera, domElement ) {
     var moveDir = new Vector3();
 
     // 鼠标在地面时的移动事件
-    var moveEvent = { type: 'move' };
+    var moveEvent = { type: 'move', intersect: null };
     // 鼠标点击水平移动事件
     var moveClickEvent = { type: 'moveclick' };
     // 鼠标拖拽第一人称旋转事件
@@ -118,8 +126,13 @@ var IndoorControls = function ( camera, domElement ) {
 
         scope.domElement.focus();
 
-        canRotate = true;
-        canMove = true;
+        if ( scope.enabled ) {
+
+            if ( scope.enabled_rotate ) canRotate = true;
+
+            if ( scope.enabled_move ) canMove = true;
+
+        }
 
     }
 
@@ -128,6 +141,7 @@ var IndoorControls = function ( camera, domElement ) {
         // 获取鼠标每一帧的移动量
         if ( canRotate === true ) {
 
+            // 有时会出现Bug，即使鼠标没有移动也会触发，导致不能点击地面进行水平移动，重启浏览器可恢复
             canMove = false;
 
             movement.x += event.movementX || event.mozMovementX || event.webkitMovementX || 0;
@@ -138,22 +152,22 @@ var IndoorControls = function ( camera, domElement ) {
         }
 
         // 获取鼠标相对于地面的实时交点
-        if ( scope.ground ) {
+        if ( scope.ground.length > 0 ) {
 
             // 将鼠标位置归一化为设备坐标
-            mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-            mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+            mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+            mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
 
             // 通过相机和鼠标位置更新射线
             raycaster.setFromCamera( mouse, scope.camera );
 
             // 计算物体和射线的交点信息
-            intersects = raycaster.intersectObject( scope.ground, true );
+            intersects = raycaster.intersectObjects( scope.ground, true );
 
             // 触发鼠标在地面时的移动事件
             if ( intersects.length > 0 ) {
 
-                moveEvent[ 'intersect' ] = intersects[ 0 ];
+                moveEvent.intersect = intersects[ 0 ];
                 scope.dispatchEvent( moveEvent );
 
             }
@@ -196,6 +210,8 @@ var IndoorControls = function ( camera, domElement ) {
 
     function onKeyDown( event ) {
 
+        if ( !scope.enabled || !scope.enabled_key ) return;
+
         switch ( event.keyCode ) {
 
             case 87: // w
@@ -217,10 +233,12 @@ var IndoorControls = function ( camera, domElement ) {
                 break;
 
             case 38: // up
+            case 81: // q
                 moveUp = true;
                 break;
 
             case 40: // down
+            case 69: // e
                 moveDown = true;
                 break;
 
@@ -229,6 +247,8 @@ var IndoorControls = function ( camera, domElement ) {
     }
 
     function onKeyUp( event ) {
+
+        if ( !scope.enabled || !scope.enabled_key ) return;
 
         switch ( event.keyCode ) {
 
@@ -251,10 +271,12 @@ var IndoorControls = function ( camera, domElement ) {
                 break;
 
             case 38: // up
+            case 81: // q
                 moveUp = false;
                 break;
 
             case 40: // down
+            case 69: // e
                 moveDown = false;
                 break;
 
@@ -437,6 +459,14 @@ var IndoorControls = function ( camera, domElement ) {
         }
 
         prevTime = time;
+
+    };
+
+    // 怎么解决窗口缩放或摄像机参数变更问题？
+    this.reset = function ( cameraNew, domElementNew ) {
+
+        scope.camera = cameraNew;
+        scope.domElement = domElementNew;
 
     };
 
