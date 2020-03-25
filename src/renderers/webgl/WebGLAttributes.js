@@ -73,7 +73,7 @@ function WebGLAttributes( gl, capabilities ) {
 		gl.bindBuffer( bufferType, buffer );
 
 		attribute.onUploadCallback();
-		
+
 		if ( updateRange.count === - 1 ) {
 
 			// Not using update ranges
