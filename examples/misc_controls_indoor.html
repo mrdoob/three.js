@@ -37,17 +37,17 @@
     init();
     animate();
 
-    //场景初始化
+    // 场景初始化
     function init() {
 
-        //新建相机
+        // 新建相机
         camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
         camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
-        //新建场景
+        // 新建场景
         scene = new THREE.Scene();
 
-        //加载环境贴图
+        // 加载环境贴图
         loadEnvironment( './textures/equirectangular/venice_sunset_1k.hdr' ).then( function ( envMap ) {
 
             scene.background = envMap;
@@ -55,10 +55,10 @@
 
         } );
 
-        //导入GLTF模型
+        // 导入GLTF模型
         setModels( './models/gltf/Room.glb' );
 
-        //渲染场景
+        // 渲染场景
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setSize( window.innerWidth, window.innerHeight );
         renderer.setPixelRatio( window.devicePixelRatio );
@@ -72,71 +72,60 @@
         viewport = document.getElementById( 'viewport' );
         viewport.appendChild( renderer.domElement );
 
-        //新建控制器
+        // 新建控制器
         controls = new IndoorControls( camera, renderer.domElement );
 
-        //新建鼠标光标
+        // 新建鼠标光标
         let helperMaterial = new THREE.MeshBasicMaterial();
         helperMaterial.transparent = true;
-        helperMaterial.opacity = 0.6;
-        let mouseHelper = new THREE.Mesh( new THREE.CircleBufferGeometry( 0.2, 32 ), helperMaterial );
+        helperMaterial.opacity = 0.2;
+        let helperGeometry = new THREE.CircleBufferGeometry( 0.2, 64 );
+        let mouseHelper = new THREE.Mesh( helperGeometry, helperMaterial );
+
+        let ringMaterial = new THREE.MeshBasicMaterial();
+        ringMaterial.transparent = true;
+        ringMaterial.opacity = 0.8;
+        let ringGeometry = new THREE.RingBufferGeometry( 0.2, 0.22, 64 );
+        let ring = new THREE.Mesh( ringGeometry, ringMaterial );
+        mouseHelper.add( ring );
+
+        mouseHelper.visible = false;
+        mouseHelper.renderOrder = 1;
+
         scene.add( mouseHelper );
 
-        //添加光标移动事件
+        // 添加光标移动事件
         controls.addEventListener( 'move', function ( event ) {
 
             let intersect = event.intersect;
+            let normal = intersect.face.normal;
 
-            mouseHelper.position.set( 0, 0, 0 );
-            mouseHelper.lookAt( intersect.face.normal );
+            if ( normal.y !== 1 ) {
 
-            mouseHelper.position.copy( intersect.point );
-            mouseHelper.position.addScaledVector( intersect.face.normal, 0.001 );
+                mouseHelper.visible = false;
+                controls.enabled_move = false;
+
+            } else {
+
+                mouseHelper.position.set( 0, 0, 0 );
+                mouseHelper.lookAt( normal );
+
+                mouseHelper.position.copy( intersect.point );
+                mouseHelper.position.addScaledVector( normal, 0.001 );
+
+                mouseHelper.visible = true;
+                controls.enabled_move = true;
+
+            }
 
         } );
 
-        //监听窗口缩放
+        // 监听窗口缩放
         window.addEventListener( 'resize', onWindowResize, false );
-
-        /*//拖动到节点上方时持续触发事件
-        viewport.ondragover = function ( event ) {
-
-            event.preventDefault();
-
-        };
-
-        //拖放完成事件
-        viewport.ondrop = function( event ) {
-
-            event.preventDefault();
-            //clearModels();
-
-            //获取FormData实例
-            let files = event.dataTransfer.files;
-            let formData = new FormData();
-            if ( files.length !== 1 ) {
-                alert( "请上传单个文件夹!" );
-                return;
-            }
-            //使用append方法添加文件到file键
-            formData.append( 'file',  files[0] );
-
-            //创建XHR实例
-            let request = new XMLHttpRequest();
-            request.open( 'post', '/uploadGLTF' );
-            request.onload = function () {
-
-                setModels( './models/temp/' + this.response );
-
-            };
-            //发送请求
-            request.send( formData );
-
-        };*/
 
     }
 
-    //响应窗口缩放
+    // 响应窗口缩放
     function onWindowResize() {
 
         camera.aspect = window.innerWidth / window.innerHeight;
@@ -146,7 +135,7 @@
 
     }
 
-    //加载环境贴图
+    // 加载环境贴图
     function loadEnvironment( url ) {
 
         let rgbeLoader = new RGBELoader();
@@ -161,9 +150,6 @@
                 let envMap = pmremGenerator.fromEquirectangular( texture ).texture;
                 pmremGenerator.dispose();
 
-                //scene.background = envMap;
-                //scene.environment = envMap;
-
                 resolve( envMap );
 
             } );
@@ -172,7 +158,7 @@
 
     }
 
-    //导入GLTF模型
+    // 导入GLTF模型
     function setModels( url ) {
 
         let gltfLoader = new GLTFLoader();
@@ -182,13 +168,12 @@
 
             sceneImport.traverse( function ( node ) {
 
-                //设置模型所有节点接收和产生阴影
+                // 设置模型所有节点接收和产生阴影
                 node.receiveShadow = true;
                 if ( node.isMesh || node.isLight ) node.castShadow = true;
 
-                //设置控制器的捕捉对象
-                //if (node.name === 'Plane001_6') controls.ground = node;
-                if (node.name === 'ConfRoom') controls.ground = node;
+                // 设置控制器的捕捉对象
+                if (node.name === 'ConfRoom') controls.ground.push( node );
 
             } );
 
@@ -204,10 +189,10 @@
 
     }
 
-    //根据模型设置相机和控制器参数
+    // 根据模型设置相机和控制器参数
     function setModelConfig( sceneImport ) {
 
-        //根据导入模型获取范围盒
+        // 根据导入模型获取范围盒
         let boxSize = new THREE.Vector3();
         const roomBox = new THREE.Box3().setFromObject( sceneImport );
         const size = roomBox.getSize( boxSize ).length();
@@ -217,13 +202,13 @@
         camera.far = size * 100;
         camera.position.copy( center );
 
-        //物体外部
+        // 物体外部
         /*camera.position.x += boxSize.x * 0.8;
         camera.position.y += boxSize.y * 0.8;
         camera.position.z += boxSize.z * 0.8;
         camera.lookAt( center );*/
 
-        //物体内部
+        // 物体内部
         camera.position.y -= boxSize.y * 0.02;
         let cameraLook = camera.position.clone();
         cameraLook.x += boxSize.x * 0.02;
@@ -231,17 +216,17 @@
         cameraLook.z += boxSize.z * 0.02;
         camera.lookAt( cameraLook );
 
-        //controls.update();
+        // controls.update();
         camera.updateProjectionMatrix();
 
     }
 
-    //更新动画
+    // 更新动画
     function animate() {
 
         requestAnimationFrame( animate );
 
-        //更新控制器
+        // 更新控制器
         controls.update();
 
         renderer.render( scene, camera );
