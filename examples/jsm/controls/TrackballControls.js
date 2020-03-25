@@ -524,6 +524,8 @@ var TrackballControls = function ( object, domElement ) {
 
 		}
 
+		if (_this.staticMoving === true) _this.update();
+
 	}
 
 	function mouseup( event ) {
