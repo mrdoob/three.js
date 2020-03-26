@@ -150,6 +150,12 @@ export class Object3D extends EventDispatcher {
 	 */
 	readonly isObject3D: true;
 
+	readonly isMesh?: boolean;
+    
+	readonly isLine?: boolean;
+    
+	readonly isSprite?: boolean;
+	
 	/**
 	 * Calls before rendering object
 	 */
