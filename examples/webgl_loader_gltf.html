@@ -60,9 +60,10 @@
 						// use of RoughnessMipmapper is optional
 						var roughnessMipmapper = new RoughnessMipmapper( renderer );
 
-						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
-						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
-
+						//var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+						//loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+						var loader = new GLTFLoader().setPath( 'models/gltf/' );
+						loader.load( 'bubble1.gltf', function ( gltf ) {
 							gltf.scene.traverse( function ( child ) {
 
 								if ( child.isMesh ) {
