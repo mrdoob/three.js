@@ -99,7 +99,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
     DodecahedronBufferGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
-        detail: { type: 'range', min: 1, max: 5, precision: 0, },
+        detail: { type: 'range', min: 0, max: 5, precision: 0, },
       },
       create(radius = 7) {
         return new THREE.DodecahedronBufferGeometry(radius);
@@ -169,7 +169,7 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
     IcosahedronBufferGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
-        detail: { type: 'range', min: 1, max: 5, precision: 0, },
+        detail: { type: 'range', min: 0, max: 5, precision: 0, },
       },
       create(radius = 7) {
         return new THREE.IcosahedronBufferGeometry(radius);
@@ -203,7 +203,7 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
     OctahedronBufferGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
-        detail: { type: 'range', min: 1, max: 5, precision: 0, },
+        detail: { type: 'range', min: 0, max: 5, precision: 0, },
       },
       create(radius = 7) {
         return new THREE.OctahedronBufferGeometry(radius);
@@ -289,7 +289,7 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
     PolyhedronBufferGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
-        detail: { type: 'range', min: 1, max: 5, precision: 0, },
+        detail: { type: 'range', min: 0, max: 5, precision: 0, },
       },
       create(radius = 7, detail = 2) {
         const verticesOfCube = [
@@ -383,7 +383,7 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
     TetrahedronBufferGeometry: {
       ui: {
         radius: { type: 'range', min: 1, max: 10, precision: 1, },
-        detail: { type: 'range', min: 1, max: 5, precision: 0, },
+        detail: { type: 'range', min: 0, max: 5, precision: 0, },
       },
       create(radius = 7) {
         return new THREE.TetrahedronBufferGeometry(radius);
