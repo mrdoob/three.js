@@ -133,7 +133,7 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 	},
 
-	fromLineSegements: function ( lineSegments ) {
+	fromLineSegments: function ( lineSegments ) {
 
 		var geometry = lineSegments.geometry;
 
