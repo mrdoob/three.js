@@ -39,6 +39,12 @@ div[data-primitive] .input>div {
 div[data-primitive] .input input {
   position: absolute;
 }
+div[data-primitive] .input input[type=text] {
+  background: #444;
+  color: white;
+  border: none;
+  padding: 3px;
+}
 
 @media (max-width: 600px) {
   div[data-primitive] .input>div {
