@@ -21,10 +21,48 @@ div[data-primitive] .desc {
 div[data-primitive] .desc code {
   white-space: normal;
 }
+
+div[data-primitive] .input {
+  display: inline-block;
+  user-select: none;
+}
+div[data-primitive] .input::before {
+  content:" ";
+}
+div[data-primitive] .input input[type=range] {
+  width: 200px;
+}
+div[data-primitive] .input>div {
+  position: absolute;
+  display: inline-block;
+}
+div[data-primitive] .input input {
+  position: absolute;
+}
+
+@media (max-width: 600px) {
+  div[data-primitive] .input>div {
+    right: 0;
+  }
+  div[data-primitive] .input input {
+      opacity: 0.2;
+      right: 1em;
+  }
+}
+
 @media (max-width: 550px) {
   div[data-primitive] .shape {
       width: 120px;
       height: 120px;
+  }
+}
+@media (max-width: 450px) {
+  div[data-primitive] .pair {
+    flex-direction: column-reverse;
+  }
+  div[data-primitive] .shape {
+    margin: 0 auto;
+    width: 100%;
   }
 }
 div[data-primitive] .desc {

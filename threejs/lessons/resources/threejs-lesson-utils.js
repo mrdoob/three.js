@@ -217,4 +217,4 @@ export const threejsLessonUtils = {
   },
 };
 
-
+window.threejsLessonUtils = threejsLessonUtils;

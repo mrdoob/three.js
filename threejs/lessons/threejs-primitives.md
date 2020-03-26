@@ -42,7 +42,7 @@ for <code>TextBufferGeometry</code> and <code>TextGeometry</code> respectively.<
 <div data-primitive="TorusBufferGeometry">A torus (donut)</div>
 <div data-primitive="TorusKnotBufferGeometry">A torus knot</div>
 <div data-primitive="TubeBufferGeometry">A circle traced down a path</div>
-<div data-primitive="EdgesGeometry">A helper object that takes another geometry as input and generates edges only if the angle between faces is greater than some threshold. For example if you look at the box at the top it shows a line going through each face showing every triangle that makes the box. Using an <code>EdgesGeometry</code> instead the middle lines are removed.</div>
+<div data-primitive="EdgesGeometry">A helper object that takes another geometry as input and generates edges only if the angle between faces is greater than some threshold. For example if you look at the box at the top it shows a line going through each face showing every triangle that makes the box. Using an <code>EdgesGeometry</code> instead the middle lines are removed. Adjust the thresholdAngle below and you'll see the edges below that threshold disappear.</div>
 <div data-primitive="WireframeGeometry">Generates geometry that contains one line segment (2 points) per edge in the given geometry. Without this you'd often be missing edges or get extra edges since WebGL generally requires 2 points per line segment. For example if all you had was a single triangle there would only be 3 points. If you tried to draw it using a material with <code>wireframe: true</code> you would only get a single line. Passing that triangle geometry to a <code>WireframeGeometry</code> will generate a new geometry that has 3 lines segments using 6 points..</div>
 
 You might notice of most of them come in pairs of `Geometry`
@@ -75,7 +75,7 @@ can not have new vertices easily added. The number of vertices used is
 decided at creation time, storage is created, and then data for vertices
 are filled in. Whereas for `Geometry` you can add vertices as you go.
 
-We'll go over creating custom geometry in another article. For now
+We'll go over creating custom geometry in [another article](threejs-custom-geometry.html). For now
 let's make an example creating each type of primitive. We'll start
 with the [examples from the previous article](threejs-responsive.html).
 

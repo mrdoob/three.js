@@ -39,6 +39,7 @@ pre>code {
 pre.prettyprint {
     margin-top: 2em !important;
     margin-bottom: 2em !important;
+    position: relative;
 }
 pre.prettyprint li {
     white-space: pre;
@@ -565,5 +566,10 @@ pre.prettyprint.lighttheme .fun { color: #900; }  /* function name */
   .lesson-comment-notes {
     background: #222;
   }
+  input[type=text] {
+    background: #444;
+    color: white;
+    border: none;
+    padding: 3px;
+  }
 }
-

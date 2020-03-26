@@ -189,15 +189,15 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
         for (let i = 0; i < 10; ++i) {
           points.push(new THREE.Vector2(Math.sin(i * 0.2) * 3 + 3, (i - 5) * .8));
         }
-        const geometry = new THREE.LatheBufferGeometry(points);
-        return geometry;
+        return new THREE.LatheBufferGeometry(points);
       },
       create2(segments = 12, phiStart = Math.PI * 0.25, phiLength = Math.PI * 1.5) {
         const points = [];
         for (let i = 0; i < 10; ++i) {
           points.push(new THREE.Vector2(Math.sin(i * 0.2) * 3 + 3, (i - 5) * .8));
         }
-        return new THREE.LatheBufferGeometry(points, segments, phiStart, phiLength);
+        return new THREE.LatheBufferGeometry(
+            points, segments, phiStart, phiLength);
       },
     },
     OctahedronBufferGeometry: {
@@ -266,7 +266,8 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
           target.set(x, y, z).multiplyScalar(0.75);
         }
 
-        return new THREE.ParametricBufferGeometry(klein, slices, stacks);
+        return new THREE.ParametricBufferGeometry(
+            klein, slices, stacks);
       },
     },
     PlaneBufferGeometry: {
@@ -317,7 +318,8 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
         thetaLength: { type: 'range', min: 0, max: 2, mult: Math.PI },
       },
       create(innerRadius = 2, outerRadius = 7, thetaSegments = 18) {
-        return new THREE.RingBufferGeometry(innerRadius, outerRadius, thetaSegments);
+        return new THREE.RingBufferGeometry(
+            innerRadius, outerRadius, thetaSegments);
       },
       create2(innerRadius = 2, outerRadius = 7, thetaSegments = 18, phiSegments = 2, thetaStart = Math.PI * 0.25, thetaLength = Math.PI * 1.5) {
         return new THREE.RingBufferGeometry(
@@ -341,8 +343,7 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
         shape.bezierCurveTo(x + 6, y + 7.7, x + 8, y + 4.5, x + 8, y + 3.5);
         shape.bezierCurveTo(x + 8, y + 3.5, x + 8, y, x + 5, y);
         shape.bezierCurveTo(x + 3.5, y, x + 2.5, y + 2.5, x + 2.5, y + 2.5);
-        const geometry = new THREE.ShapeBufferGeometry(shape);
-        return geometry;
+        return new THREE.ShapeBufferGeometry(shape);
       },
       create2(curveSegments = 5) {
         const shape = new THREE.Shape();
@@ -405,24 +406,20 @@ const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
         bevelSegments: { type: 'range', min: 0, max: 8, },
       },
       addConstCode: false,
-      async create(text = 'three.js', size = 3, height = 0.2, curveSegments = 12, bevelEnabled = true, bevelThickness = 0.15, bevelSize = 0.3, bevelSegments = 5) {
-        const loader = new THREE.FontLoader();
-        // promisify font loading
-        function loadFont(url) {
-          return new Promise((resolve, reject) => {
-            loader.load(url, resolve, undefined, reject);
+      create(text = 'three.js', size = 3, height = 0.2, curveSegments = 12, bevelEnabled = true, bevelThickness = 0.15, bevelSize = 0.3, bevelSegments = 5) {
+        return new Promise((resolve) => {
+          fontPromise.then((font) => {
+            resolve(new THREE.TextBufferGeometry(text, {
+              font: font,
+              size,
+              height,
+              curveSegments,
+              bevelEnabled,
+              bevelThickness,
+              bevelSize,
+              bevelSegments,
+            }));
           });
-        }
-        const font = await loadFont('/threejs/resources/threejs/fonts/helvetiker_regular.typeface.json');
-        return new THREE.TextBufferGeometry(text, {
-          font: font,
-          size,
-          height,
-          curveSegments,
-          bevelEnabled,
-          bevelThickness,
-          bevelSize,
-          bevelSegments,
         });
       },
       src: `
@@ -499,25 +496,40 @@ loader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', (font
     },
     EdgesGeometry: {
       ui: {
-        widthSegments: { type: 'range', min: 1, max: 10, },
-        heightSegments: { type: 'range', min: 1, max: 10, },
-        depthSegments: { type: 'range', min: 1, max: 10, },
+        thresholdAngle: { type: 'range', min: 1, max: 180, },
       },
-      create(widthSegments = 2, heightSegments = 2, depthSegments = 2) {
-        const size = 8;
+      create() {
         return {
-          lineGeometry: new THREE.EdgesGeometry(new THREE.BoxBufferGeometry(
-            size, size, size,
-            widthSegments, heightSegments, depthSegments)),
+          lineGeometry: new THREE.EdgesGeometry(
+            new THREE.BoxBufferGeometry(8, 8, 8)),
+        };
+      },
+      create2(thresholdAngle = 1) {
+        return {
+          lineGeometry: new THREE.EdgesGeometry(
+            new THREE.SphereBufferGeometry(7, 6, 3), thresholdAngle),
         };
       },
       nonBuffer: false,
+      addConstCode: false,
       src: `
 const size = 8;
-const geometry = new THREE.EdgesGeometry(
-    new THREE.BoxBufferGeometry(
-      size, size, size,
-      widthSegments, heightSegments, depthSegments));
+const widthSegments = 2;
+const heightSegments = 2;
+const depthSegments = 2;
+const boxGeometry = new THREE.BoxBufferGeometry(
+    size, size, size,
+    widthSegments, heightSegments, depthSegments);
+const geometry = new THREE.EdgesGeometry(boxGeometry);
+`,
+      src2: `
+const radius = 7;
+const widthSegments = 6;
+const heightSegments = 3;
+const sphereGeometry = new THREE.SphereBufferGeometry(
+    radius, widthSegments, heightSegments);
+const thresholdAngle = 1;  // ui: thresholdAngle
+const geometry = new THREE.EdgesGeometry(sphereGeometry, thresholdAngle);
 `,
     },
     WireframeGeometry: {
@@ -535,8 +547,12 @@ const geometry = new THREE.EdgesGeometry(
         };
       },
       nonBuffer: false,
+      addConstCode: false,
       src: `
 const size = 8;
+const widthSegments = 2;  // ui: widthSegments
+const heightSegments = 2;  // ui: heightSegments
+const depthSegments = 2;  // ui: depthSegments
 const geometry = new THREE.WireframeGeometry(
     new THREE.BoxBufferGeometry(
       size, size, size,
@@ -557,6 +573,7 @@ const geometry = new THREE.WireframeGeometry(
         return {
           showLines: false,
           mesh: points,
+          geometry,
         };
       },
     },
@@ -575,6 +592,7 @@ const geometry = new THREE.WireframeGeometry(
         return {
           showLines: false,
           mesh: points,
+          geometry,
         };
       },
     },
@@ -650,10 +668,6 @@ const geometry = new THREE.WireframeGeometry(
     return addElem(parent, 'div', className);
   }
 
-  const primitives = {};
-  document.querySelectorAll('[data-diagram]').forEach(createDiagram);
-  document.querySelectorAll('[data-primitive]').forEach(createPrimitiveDOM);
-
   function createPrimitiveDOM(base) {
     const name = base.dataset.primitive;
     const info = diagrams[name];
@@ -726,72 +740,65 @@ const geometry = new THREE.WireframeGeometry(
     if (!info) {
       throw new Error(`no primitive ${name}`);
     }
-    return createLiveImage(base, info, name);
+    createLiveImage(base, info, name);
   }
 
-  const whiteLineMaterial = new THREE.LineBasicMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.5,
-  });
-  const blackLineMaterial = new THREE.LineBasicMaterial({
-    color: 0x000000,
-    transparent: true,
-    opacity: 0.5,
-  });
-
-  function addGeometry(root, info, args = []) {
+  async function addGeometry(root, info, args = []) {
     const geometry = info.create(...args);
     const promise = (geometry instanceof Promise) ? geometry : Promise.resolve(geometry);
 
-    return promise.then((geometryInfo) => {
-      if (geometryInfo instanceof THREE.BufferGeometry ||
-          geometryInfo instanceof THREE.Geometry) {
-        const geometry = geometryInfo;
-        geometryInfo = {
-          geometry,
-        };
-      }
+    let geometryInfo = await promise;
+    if (geometryInfo instanceof THREE.BufferGeometry ||
+        geometryInfo instanceof THREE.Geometry) {
+      const geometry = geometryInfo;
+      geometryInfo = {
+        geometry,
+      };
+    }
 
-      const boxGeometry = geometryInfo.geometry || geometryInfo.lineGeometry;
-      boxGeometry.computeBoundingBox();
-      const centerOffset = new THREE.Vector3();
-      boxGeometry.boundingBox.getCenter(centerOffset).multiplyScalar(-1);
+    const boxGeometry = geometryInfo.geometry || geometryInfo.lineGeometry;
+    boxGeometry.computeBoundingBox();
+    const centerOffset = new THREE.Vector3();
+    boxGeometry.boundingBox.getCenter(centerOffset).multiplyScalar(-1);
 
-      if (geometryInfo.geometry) {
-        if (!info.material) {
-          const material = new THREE.MeshPhongMaterial({
-            flatShading: info.flatShading === false ? false : true,
-            side: THREE.DoubleSide,
-          });
-          material.color.setHSL(Math.random(), .5, .5);
-          info.material = material;
-        }
-        const mesh = new THREE.Mesh(geometryInfo.geometry, info.material);
-        mesh.position.copy(centerOffset);
-        root.add(mesh);
+    if (geometryInfo.geometry) {
+      if (!info.material) {
+        const material = new THREE.MeshPhongMaterial({
+          flatShading: info.flatShading === false ? false : true,
+          side: THREE.DoubleSide,
+        });
+        material.color.setHSL(Math.random(), .5, .5);
+        info.material = material;
       }
-      if (info.showLines !== false) {
-        const lineMesh = new THREE.LineSegments(
-          geometryInfo.lineGeometry || geometryInfo.geometry,
-          geometryInfo.geometry ? whiteLineMaterial : blackLineMaterial);
-        lineMesh.position.copy(centerOffset);
-        root.add(lineMesh);
-      }
-    });
+      const mesh = new THREE.Mesh(geometryInfo.geometry, info.material);
+      mesh.position.copy(centerOffset);
+      root.add(mesh);
+    }
+    if (info.showLines !== false) {
+      const lineMesh = new THREE.LineSegments(
+        geometryInfo.lineGeometry || geometryInfo.geometry,
+        new THREE.LineBasicMaterial({
+          color: geometryInfo.geometry ? 0xffffff : colors.lines,
+          transparent: true,
+          opacity: 0.5,
+        }));
+      lineMesh.position.copy(centerOffset);
+      root.add(lineMesh);
+    }
   }
 
-  function updateGeometry(root, info, params) {
+  async function updateGeometry(root, info, params) {
     const oldChildren = root.children.slice();
-    addGeometry(root, info, Object.values(params)).then(() => {
-      oldChildren.forEach((child) => {
-        root.remove(child);
-        child.geometry.dispose();
-      });
+    await addGeometry(root, info, Object.values(params));
+    oldChildren.forEach((child) => {
+      root.remove(child);
+      child.geometry.dispose();
     });
   }
 
-  function createLiveImage(elem, info, name) {
+  const primitives = {};
+
+  async function createLiveImage(elem, info, name) {
     const root = new THREE.Object3D();
 
     primitives[name] = primitives[name] || [];
@@ -800,9 +807,8 @@ const geometry = new THREE.WireframeGeometry(
       info,
     });
 
-    addGeometry(root, info).then(() => {
-      threejsLessonUtils.addDiagram(elem, {create: () => root});
-    });
+    await addGeometry(root, info);
+    threejsLessonUtils.addDiagram(elem, {create: () => root});
   }
 
   function getValueElem(commentElem) {
@@ -838,6 +844,11 @@ const geometry = new THREE.WireframeGeometry(
             console.error(`no value element for ${primitiveName}:${ndx} param: ${name}`);  // eslint-disable-line
             return;
           }
+          const inputHolderHolder = document.createElement('div');
+          inputHolderHolder.className = 'input';
+          const inputHolder = document.createElement('div');
+          span.appendChild(inputHolderHolder);
+          inputHolderHolder.appendChild(inputHolder);
           switch (ui.type) {
             case 'range': {
               const valueRange = ui.max - ui.min;
@@ -849,7 +860,7 @@ const geometry = new THREE.WireframeGeometry(
               const value = parseFloat(valueElem.textContent);
               params[name] = value * (ui.mult || 1);
               input.value = (value - ui.min) / valueRange * inputMax;
-              span.appendChild(input);
+              inputHolder.appendChild(input);
               const precision = ui.precision === undefined ? (valueRange > 4 ? 0 : 2) : ui.precision;
               const padding = ui.max.toFixed(precision).length;
               input.addEventListener('input', () => {
@@ -868,7 +879,7 @@ const geometry = new THREE.WireframeGeometry(
               input.type = 'checkbox';
               params[name] = valueElem.textContent === 'true';
               input.checked = params[name];
-              span.appendChild(input);
+              inputHolder.appendChild(input);
               input.addEventListener('change', () => {
                 params[name] = input.checked;
                 valueElem.textContent = params[name] ? 'true' : 'false';
@@ -882,7 +893,7 @@ const geometry = new THREE.WireframeGeometry(
               params[name] = valueElem.textContent.slice(1, -1);
               input.value = params[name];
               input.maxlength = ui.maxLength || 50;
-              span.appendChild(input);
+              inputHolder.appendChild(input);
               input.addEventListener('input', () => {
                 params[name] = input.value;
                 valueElem.textContent = `'${input.value.replace(/'/g, '\'')}'`;
@@ -891,10 +902,13 @@ const geometry = new THREE.WireframeGeometry(
               break;
             }
             default:
-              throw new Error(`unknonw type for ${primitiveName}:${ndx} param: ${name}`);
+              throw new Error(`unknown type for ${primitiveName}:${ndx} param: ${name}`);
           }
         });
       });
     });
   });
+
+  document.querySelectorAll('[data-diagram]').forEach(createDiagram);
+  document.querySelectorAll('[data-primitive]').forEach(createPrimitiveDOM);
 }
