@@ -5,13 +5,13 @@ div[data-primitive] {
 }
 div[data-primitive] .pair {
   display: flex;
-  align-items: center;
+  flex-direction: column-reverse;
   margin-bottom: 1em;
 }
 div[data-primitive] .shape {
   flex: 0 0 auto;
-  width: 200px;
-  height: 200px;
+  width: 100%;
+  height: 250px;
 }
 div[data-primitive] .desc {
   word-wrap: break-word;
@@ -58,7 +58,6 @@ div[data-primitive] .input input[type=text] {
 
 @media (max-width: 550px) {
   div[data-primitive] .shape {
-      width: 120px;
       height: 120px;
   }
 }

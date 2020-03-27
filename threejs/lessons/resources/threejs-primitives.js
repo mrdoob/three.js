@@ -573,7 +573,6 @@ const geometry = new THREE.WireframeGeometry(
         return {
           showLines: false,
           mesh: points,
-          geometry,
         };
       },
     },
@@ -592,7 +591,6 @@ const geometry = new THREE.WireframeGeometry(
         return {
           showLines: false,
           mesh: points,
-          geometry,
         };
       },
     },
@@ -744,24 +742,25 @@ const geometry = new THREE.WireframeGeometry(
   }
 
   async function addGeometry(root, info, args = []) {
-    const geometry = info.create(...args);
-    const promise = (geometry instanceof Promise) ? geometry : Promise.resolve(geometry);
+    const result = info.create(...args);
+    const promise = (result instanceof Promise) ? result : Promise.resolve(result);
 
-    let geometryInfo = await promise;
-    if (geometryInfo instanceof THREE.BufferGeometry ||
-        geometryInfo instanceof THREE.Geometry) {
-      const geometry = geometryInfo;
-      geometryInfo = {
+    let diagramInfo = await promise;
+    if (diagramInfo instanceof THREE.BufferGeometry ||
+        diagramInfo instanceof THREE.Geometry) {
+      const geometry = diagramInfo;
+      diagramInfo = {
         geometry,
       };
     }
 
-    const boxGeometry = geometryInfo.geometry || geometryInfo.lineGeometry;
-    boxGeometry.computeBoundingBox();
+    const geometry = diagramInfo.geometry || diagramInfo.lineGeometry || diagramInfo.mesh.geometry;
+    geometry.computeBoundingBox();
     const centerOffset = new THREE.Vector3();
-    boxGeometry.boundingBox.getCenter(centerOffset).multiplyScalar(-1);
+    geometry.boundingBox.getCenter(centerOffset).multiplyScalar(-1);
 
-    if (geometryInfo.geometry) {
+    let mesh = diagramInfo.mesh;
+    if (diagramInfo.geometry) {
       if (!info.material) {
         const material = new THREE.MeshPhongMaterial({
           flatShading: info.flatShading === false ? false : true,
@@ -770,15 +769,17 @@ const geometry = new THREE.WireframeGeometry(
         material.color.setHSL(Math.random(), .5, .5);
         info.material = material;
       }
-      const mesh = new THREE.Mesh(geometryInfo.geometry, info.material);
+      mesh = new THREE.Mesh(diagramInfo.geometry, info.material);
+    }
+    if (mesh) {
       mesh.position.copy(centerOffset);
       root.add(mesh);
     }
     if (info.showLines !== false) {
       const lineMesh = new THREE.LineSegments(
-        geometryInfo.lineGeometry || geometryInfo.geometry,
+        diagramInfo.lineGeometry || diagramInfo.geometry,
         new THREE.LineBasicMaterial({
-          color: geometryInfo.geometry ? 0xffffff : colors.lines,
+          color: diagramInfo.geometry ? 0xffffff : colors.lines,
           transparent: true,
           opacity: 0.5,
         }));
