@@ -15,10 +15,14 @@ for a globe or a bunch of boxes to draw a 3D graph. It's
 especially common to use primitives to experiment
 and get started with 3D. For the majority of 3D apps
 it's more common to have an artist make 3D models
-in a 3D modeling program. Later in this series we'll
+in a 3D modeling program like [Blender](https://blender.org)
+or [Maya](https://www.autodesk.com/products/maya/) or [Cinema 4D](https://www.maxon.net/en-us/products/cinema-4d/). Later in this series we'll
 cover making and loading data from several 3D modeling
 programs. For now let's go over some of the available
 primitives.
+
+Many of the primitives below have defaults for some or all of their
+parameters so you can use more or less depending on your needs.
 
 <div data-primitive="BoxBufferGeometry">A Box</div>
 <div data-primitive="CircleBufferGeometry">A flat circle</div>
