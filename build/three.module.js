@@ -91,7 +91,7 @@ if ( Object.assign === undefined ) {
 
 }
 
-var REVISION = '115';
+var REVISION = '116dev';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 var CullFaceNone = 0;
@@ -24453,11 +24453,10 @@ function WebGLRenderer( parameters ) {
 		}
 
 		//
+		scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
 
 		currentRenderState = renderStates.get( scene, camera );
 		currentRenderState.init();
-
-		scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromProjectionMatrix( _projScreenMatrix );
@@ -36406,8 +36405,8 @@ TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
  * Extensible curve object
  *
  * Some common of curve methods:
- * .getPoint( t, optionalTarget ), .getTangent( t )
- * .getPointAt( u, optionalTarget ), .getTangentAt( u )
+ * .getPoint( t, optionalTarget ), .getTangent( t, optionalTarget )
+ * .getPointAt( u, optionalTarget ), .getTangentAt( u, optionalTarget )
  * .getPoints(), .getSpacedPoints()
  * .getLength()
  * .updateArcLengths()
@@ -36636,7 +36635,7 @@ Object.assign( Curve.prototype, {
 	// 2 points a small delta apart will be used to find its gradient
 	// which seems to give a reasonable approximation
 
-	getTangent: function ( t ) {
+	getTangent: function ( t, optionalTarget ) {
 
 		var delta = 0.0001;
 		var t1 = t - delta;
@@ -36650,15 +36649,18 @@ Object.assign( Curve.prototype, {
 		var pt1 = this.getPoint( t1 );
 		var pt2 = this.getPoint( t2 );
 
-		var vec = pt2.clone().sub( pt1 );
-		return vec.normalize();
+		var tangent = optionalTarget || ( ( pt1.isVector2 ) ? new Vector2() : new Vector3() );
+
+		tangent.copy( pt2 ).sub( pt1 ).normalize();
+
+		return tangent;
 
 	},
 
-	getTangentAt: function ( u ) {
+	getTangentAt: function ( u, optionalTarget ) {
 
 		var t = this.getUtoTmapping( u );
-		return this.getTangent( t );
+		return this.getTangent( t, optionalTarget );
 
 	},
 
@@ -36683,7 +36685,7 @@ Object.assign( Curve.prototype, {
 
 			u = i / segments;
 
-			tangents[ i ] = this.getTangentAt( u );
+			tangents[ i ] = this.getTangentAt( u, new Vector3() );
 			tangents[ i ].normalize();
 
 		}
@@ -37503,11 +37505,13 @@ LineCurve.prototype.getPointAt = function ( u, optionalTarget ) {
 
 };
 
-LineCurve.prototype.getTangent = function ( /* t */ ) {
+LineCurve.prototype.getTangent = function ( t, optionalTarget ) {
 
-	var tangent = this.v2.clone().sub( this.v1 );
+	var tangent = optionalTarget || new Vector2();
 
-	return tangent.normalize();
+	var tangent = tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+
+	return tangent;
 
 };
 
