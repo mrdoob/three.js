@@ -29,6 +29,8 @@ function Box3Helper( box, color ) {
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 
+	this.type = 'Box3Helper';
+
 	this.geometry.computeBoundingSphere();
 
 }

@@ -111,6 +111,8 @@ function CameraHelper( camera ) {
 
 	LineSegments.call( this, geometry, material );
 
+	this.type = 'CameraHelper';
+
 	this.camera = camera;
 	if ( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
 

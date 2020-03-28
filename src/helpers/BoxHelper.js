@@ -26,6 +26,8 @@ function BoxHelper( object, color ) {
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 
+	this.type = 'BoxHelper';
+
 	this.matrixAutoUpdate = false;
 
 	this.update();
