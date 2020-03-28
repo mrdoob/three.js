@@ -297,17 +297,9 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			var useMorphing = false;
 
-			if ( material.morphTargets === true ) {
+			if ( material.morphTargets === true && geometry.isBufferGeometry === true ) {
 
-				if ( geometry.isBufferGeometry === true ) {
-
-					useMorphing = geometry.morphAttributes && geometry.morphAttributes.position && geometry.morphAttributes.position.length > 0;
-
-				} else if ( geometry.isGeometry === true ) {
-
-					useMorphing = geometry.morphTargets && geometry.morphTargets.length > 0;
-
-				}
+				useMorphing = geometry.morphAttributes && geometry.morphAttributes.position && geometry.morphAttributes.position.length > 0;
 
 			}
 
