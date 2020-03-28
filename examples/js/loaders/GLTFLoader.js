@@ -180,8 +180,8 @@ THREE.GLTFLoader = ( function () {
 							extensions[ extensionName ] = new GLTFMaterialsPbrSpecularGlossinessExtension();
 							break;
 
-						case EXTENSIONS.EXT_MESH_INSTANCING:
-							extensions[ extensionName ] = new GLTFMeshInstancingExtension( json );
+						case EXTENSIONS.EXT_MESH_GPU_INSTANCING:
+							extensions[ extensionName ] = new GLTFMeshGPUInstancingExtension( json );
 							break;
 
 						case EXTENSIONS.KHR_DRACO_MESH_COMPRESSION:
@@ -275,7 +275,7 @@ THREE.GLTFLoader = ( function () {
 		KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
-		EXT_MESH_INSTANCING: 'EXT_mesh_instancing',
+		EXT_MESH_GPU_INSTANCING: 'EXT_mesh_gpu_instancing',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 		KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
 		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
@@ -983,13 +983,13 @@ THREE.GLTFLoader = ( function () {
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/pull/1691
 	 */
-	function GLTFMeshInstancingExtension() {
+	function GLTFMeshGPUInstancingExtension() {
 
-		this.name = EXTENSIONS.EXT_MESH_INSTANCING;
+		this.name = EXTENSIONS.EXT_MESH_GPU_INSTANCING;
 
 	}
 
-	GLTFMeshInstancingExtension.prototype.createInstancedMesh = function ( parser, nodeDef, node ) {
+	GLTFMeshGPUInstancingExtension.prototype.createInstancedMesh = function ( parser, nodeDef, node ) {
 
 		var extensionDef = nodeDef.extensions[ this.name ];
 		var pending = [];
@@ -1017,7 +1017,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( attributeName[ 0 ] === '_' ) {
 
-				customAttributeNames.push( attributeName );
+				customAttributeNames.push( attributeName.toLowerCase() );
 
 				pending.push( parser.getDependency( 'accessor', extensionDef.attributes[ attributeName ] ) );
 
@@ -1048,7 +1048,7 @@ THREE.GLTFLoader = ( function () {
 				for ( var i = 0; i < template.count; i ++ ) {
 
 					if ( translation ) t.fromBufferAttribute( translation, i );
-					if ( rotation ) quaternionFromBufferAttribute( r, rotation, i );
+					if ( rotation ) r.fromBufferAttribute( rotation, i );
 					if ( scale ) s.fromBufferAttribute( scale, i );
 
 					instancedMesh.setMatrixAt( i, matrix.compose( t, r, s ) );
@@ -1060,7 +1060,7 @@ THREE.GLTFLoader = ( function () {
 
 					var attributeSource = dependencies[ 4 + i ];
 
-					instancedMesh.setAttribute( customAttributeNames[ i ], new THREE.InstancedBufferAttribute(
+					instancedMesh.geometry.setAttribute( customAttributeNames[ i ], new THREE.InstancedBufferAttribute(
 
 						attributeSource.array,
 						attributeSource.itemSize,
@@ -1499,19 +1499,6 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		return attributesKey;
-
-	}
-
-	function quaternionFromBufferAttribute( quaternion, attribute, index ) {
-
-		return quaternion.set(
-
-			attribute.getX( index ),
-			attribute.getY( index ),
-			attribute.getZ( index ),
-			attribute.getW( index )
-
-		);
 
 	}
 
@@ -3252,7 +3239,7 @@ THREE.GLTFLoader = ( function () {
 			}
 
 			// Apply instancing last, as it requires asynchronous resources.
-			if ( nodeDef.extensions && nodeDef.extensions[ EXTENSIONS.EXT_MESH_INSTANCING ] !== undefined ) {
+			if ( nodeDef.extensions && nodeDef.extensions[ EXTENSIONS.EXT_MESH_GPU_INSTANCING ] !== undefined ) {
 
 				if ( ! node.isMesh && node.children.length > 0 ) {
 
@@ -3261,7 +3248,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				return extensions[ EXTENSIONS.EXT_MESH_INSTANCING ].createInstancedMesh( parser, nodeDef, node );
+				return extensions[ EXTENSIONS.EXT_MESH_GPU_INSTANCING ].createInstancedMesh( parser, nodeDef, node );
 
 			}
 
