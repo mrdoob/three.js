@@ -117,7 +117,7 @@
 
 						if ( baseActions[ name ] ) {
 
-							const action = mixer.clipAction( clip, undefined, false );
+							const action = mixer.clipAction( clip, undefined, THREE.OverrideBlendMode );
 							activateAction( action );
 							baseActions[ name ].action = action;
 							allActions.push( action );
@@ -134,7 +134,7 @@
 
 							}
 
-							const action = mixer.clipAction( clip, undefined, true );
+							const action = mixer.clipAction( clip, undefined, THREE.AdditiveBlendMode );
 							activateAction( action );
 							additiveActions[ name ].action = action;
 							allActions.push( action );

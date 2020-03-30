@@ -1,4 +1,4 @@
-import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat } from '../constants.js';
+import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat, OverrideBlendMode, AdditiveBlendMode } from '../constants.js';
 
 /**
  *
@@ -11,12 +11,12 @@ import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, L
  *
  */
 
-function AnimationAction( mixer, clip, localRoot, isAdditive = false ) {
+function AnimationAction( mixer, clip, localRoot, blendMode = OverrideBlendMode ) {
 
 	this._mixer = mixer;
 	this._clip = clip;
 	this._localRoot = localRoot || null;
-	this.isAdditive = isAdditive;
+	this.blendMode = blendMode;
 
 	var tracks = clip.tracks,
 		nTracks = tracks.length,
@@ -375,23 +375,28 @@ Object.assign( AnimationAction.prototype, {
 			var interpolants = this._interpolants;
 			var propertyMixers = this._propertyBindings;
 
-			if ( this.isAdditive ) {
+			switch ( this.blendMode ) {
 
-				for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+				case AdditiveBlendMode:
 
-					interpolants[ j ].evaluate( clipTime );
-					propertyMixers[ j ].accumulateAdditive( weight );
+					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
 
-				}
+						interpolants[ j ].evaluate( clipTime );
+						propertyMixers[ j ].accumulateAdditive( weight );
 
-			} else {
+					}
 
-				for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+					break;
 
-					interpolants[ j ].evaluate( clipTime );
-					propertyMixers[ j ].accumulate( accuIndex, weight );
+				case OverrideBlendMode:
+				default:
 
-				}
+					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+						interpolants[ j ].evaluate( clipTime );
+						propertyMixers[ j ].accumulate( accuIndex, weight );
+
+					}
 
 			}
 

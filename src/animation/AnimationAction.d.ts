@@ -1,14 +1,14 @@
 import { AnimationMixer } from './AnimationMixer';
 import { AnimationClip } from './AnimationClip';
-import { AnimationActionLoopStyles } from '../constants';
+import { AnimationActionLoopStyles, AnimationBlendMode } from '../constants';
 import { Object3D } from '../core/Object3D';
 // Animation ////////////////////////////////////////////////////////////////////////////////////////
 
 export class AnimationAction {
 
-	constructor( mixer: AnimationMixer, clip: AnimationClip, localRoot?: Object3D, isAdditive?: boolean );
+	constructor( mixer: AnimationMixer, clip: AnimationClip, localRoot?: Object3D, blendMode?: AnimationBlendMode );
 
-	isAdditive: boolean;
+	blendMode: AnimationBlendMode;
 	loop: AnimationActionLoopStyles;
 	time: number;
 	timeScale: number;
