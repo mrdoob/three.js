@@ -118,6 +118,16 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "makeEmpty", ( assert ) => {
+
+			var a = new Sphere( one3.clone(), 1 );
+
+			a.makeEmpty();
+			assert.ok( a.empty(), "Passed!" );
+			assert.ok( a.center.equals( zero3 ), "Passed!" );
+
+		} );
+
 		QUnit.test( "containsPoint", ( assert ) => {
 
 			var a = new Sphere( one3.clone(), 1 );
