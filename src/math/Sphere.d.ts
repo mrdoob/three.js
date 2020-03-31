@@ -15,6 +15,7 @@ export class Sphere {
 	clone(): this;
 	copy( sphere: Sphere ): this;
 	empty(): boolean;
+	makeEmpty(): this;
 	containsPoint( point: Vector3 ): boolean;
 	distanceToPoint( point: Vector3 ): number;
 	intersectsSphere( sphere: Sphere ): boolean;

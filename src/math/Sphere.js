@@ -75,6 +75,15 @@ Object.assign( Sphere.prototype, {
 
 	},
 
+	makeEmpty: function () {
+
+		this.center.set( 0, 0, 0 );
+		this.radius = 0;
+
+		return this;
+
+	},
+
 	containsPoint: function ( point ) {
 
 		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
