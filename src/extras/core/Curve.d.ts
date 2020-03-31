@@ -71,6 +71,11 @@ export class Curve<T extends Vector> {
 	 */
 	getTangentAt( u: number, optionalTarget?: T ): T;
 
+	clone(): Curve<T>;
+	copy( source: Curve<T> ): this;
+	toJSON(): object;
+	fromJSON( json: object ): this;
+
 	/**
 	 * @deprecated since r84.
 	 */
