@@ -50,15 +50,15 @@ function intersectObject( object, raycaster, intersects, recursive ) {
 
 		object.raycast( raycaster, intersects );
 
-	}
+		if ( recursive === true ) {
 
-	if ( recursive === true ) {
+			var children = object.children;
 
-		var children = object.children;
+			for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
+				intersectObject( children[ i ], raycaster, intersects, true );
 
-			intersectObject( children[ i ], raycaster, intersects, true );
+			}
 
 		}
 
