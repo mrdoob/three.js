@@ -216,47 +216,26 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 function replaceMappingUvs( string, parameters ) {
 
-	if ( parameters.worldUvs ) {
-
-		return string
-			.replace( /ALPHAMAP_UVS/g, getMappingUvs( parameters.alphaMapMapping, 'vUv' ) )
-			.replace( /AOMAP_UVS/g, getMappingUvs( parameters.aoMapMapping, 'vUv2' ) )
-			.replace( /BUMPMAP_UVS/g, getMappingUvs( parameters.bumpMapMapping, 'vUv' ) )
-			.replace( /CLEARCOAT_UVS/g, getMappingUvs( parameters.clearcoatMapMapping, 'vUv' ) )
-			.replace( /CLEARCOAT_NORMALMAP_UVS/g, getMappingUvs( parameters.clearcoatNormalMapMapping, 'vUv' ) )
-			.replace( /CLEARCOAT_ROUGHNESSMAP_UVS/g, getMappingUvs( parameters.clearcoatRoughnessMapMapping, 'vUv' ) )
-			.replace( /DISPLACEMENT_MAP_UVS/g, getMappingUvs( parameters.displacementMapMapping, 'vUv' ) )
-			.replace( /EMISSIVEMAP_UVS/g, getMappingUvs( parameters.emissiveMapMapping, 'vUv' ) )
-			.replace( /METALNESSMAP_UVS/g, getMappingUvs( parameters.metalnessMapMapping, 'vUv' ) )
-			.replace( /NORMALMAP_UVS/g, getMappingUvs( parameters.normalMapMapping, 'vUv' ) )
-			.replace( /ROUGHNESSMAP_UVS/g, getMappingUvs( parameters.roughnessMapMapping, 'vUv' ) )
-			.replace( /SPECULARMAP_UVS/g, getMappingUvs( parameters.specularMapMapping, 'vUv' ) )
-			.replace( /MAP_UVS/g, getMappingUvs( parameters.mapMapping, 'vUv' ) )
-
-	} else {
-
-		return string
-			.replace( /ALPHAMAP_UVS/g, 'vUv' )
-			.replace( /AOMAP_UVS/g, 'vUv2' )
-			.replace( /BUMPMAP_UVS/g, 'vUv' )
-			.replace( /CLEARCOAT_UVS/g, 'vUv' )
-			.replace( /CLEARCOAT_NORMALMAP_UVS/g, 'vUv' )
-			.replace( /CLEARCOAT_ROUGHNESSMAP_UVS/g, 'vUv' )
-			.replace( /DISPLACEMENT_MAP_UVS/g, 'vUv' )
-			.replace( /EMISSIVEMAP_UVS/g, 'vUv' )
-			.replace( /METALNESSMAP_UVS/g, 'vUv' )
-			.replace( /NORMALMAP_UVS/g, 'vUv' )
-			.replace( /ROUGHNESSMAP_UVS/g, 'vUv' )
-			.replace( /SPECULARMAP_UVS/g, 'vUv' )
-			.replace( /MAP_UVS/g, 'vUv' )
-
-	}
+	return string
+		.replace( /ALPHAMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /AOMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv2' ) )
+		.replace( /BUMPMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /CLEARCOAT_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /CLEARCOAT_NORMALMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /CLEARCOAT_ROUGHNESSMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /DISPLACEMENT_MAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /EMISSIVEMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /METALNESSMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /NORMALMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /ROUGHNESSMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /SPECULARMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /MAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
 
 }
 
 function replaceWorldUvsAxes( string, parameters ) {
 
-	if ( ! parameters.worldUvs ) return string;
+	if ( ! parameters.worldUvsAxes ) return string;
 
 	return string
 		.replace( /WORLD_MAPPING_U/g, parameters.worldUvsAxes[0] )
@@ -548,7 +527,7 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
-			parameters.worldUvs ? '#define USE_WORLD_UV' : '',
+			parameters.mapping === WorldMapping ? '#define USE_WORLD_UV' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -678,7 +657,7 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
-			parameters.worldUvs ? '#define USE_WORLD_UV' : '',
+			parameters.mapping === WorldMapping ? '#define USE_WORLD_UV' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
