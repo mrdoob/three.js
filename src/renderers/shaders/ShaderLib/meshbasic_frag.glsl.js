@@ -13,6 +13,7 @@ uniform float opacity;
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
 #include <uv2_pars_fragment>
+#include <uv3_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <aomap_pars_fragment>
@@ -42,7 +43,7 @@ void main() {
 
 	// accumulation (baked indirect lighting only)
 	#ifdef USE_LIGHTMAP
-	
+
 		vec4 lightMapTexel= texture2D( lightMap, vUv2 );
 		reflectedLight.indirectDiffuse += lightMapTexelToLinear( lightMapTexel ).rgb * lightMapIntensity;
 

@@ -162,6 +162,7 @@ var files = {
 		"webgl_materials_texture_canvas",
 		"webgl_materials_texture_filters",
 		"webgl_materials_texture_manualmipmap",
+		"webgl_materials_texture_mapping",
 		"webgl_materials_texture_partialupdate",
 		"webgl_materials_texture_rotation",
 		"webgl_materials_translucency",

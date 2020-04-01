@@ -2,6 +2,7 @@ export default /* glsl */`
 #include <common>
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
+#include <uv3_pars_fragment>
 #include <envmap_pars_vertex>
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
@@ -12,8 +13,10 @@ export default /* glsl */`
 
 void main() {
 
+	#include <worldposinitial_vertex>
 	#include <uv_vertex>
 	#include <uv2_vertex>
+	#include <uv3_vertex>
 	#include <color_vertex>
 	#include <skinbase_vertex>
 

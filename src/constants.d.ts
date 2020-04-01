@@ -121,7 +121,7 @@ export const EquirectangularRefractionMapping: Mapping;
 export const SphericalReflectionMapping: Mapping;
 export const CubeUVReflectionMapping: Mapping;
 export const CubeUVRefractionMapping: Mapping;
-export const SceneMapping: Mapping;
+export const WorldMapping: Mapping;
 
 // Wrapping modes
 export enum Wrapping {}
