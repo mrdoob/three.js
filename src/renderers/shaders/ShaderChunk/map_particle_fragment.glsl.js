@@ -7,14 +7,14 @@ export default /* glsl */`
 
 #ifdef USE_MAP
 
-	vec4 mapTexel = texture2D( map, vUv );
+	vec4 mapTexel = texture2D( map, uv );
 	diffuseColor *= mapTexelToLinear( mapTexel );
 
 #endif
 
 #ifdef USE_ALPHAMAP
 
-	diffuseColor.a *= texture2D( alphaMap, vUv ).g;
+	diffuseColor.a *= texture2D( alphaMap, uv ).g;
 
 #endif
 `;
