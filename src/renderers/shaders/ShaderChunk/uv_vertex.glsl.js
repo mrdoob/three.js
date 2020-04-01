@@ -3,5 +3,5 @@ export default /* glsl */`
 
 	vUv = ( uvTransform * vec3( uv, 1 ) ).xy;
 
-#endifw
+#endif
 `;

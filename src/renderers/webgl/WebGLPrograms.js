@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { BackSide, DoubleSide, CubeUVRefractionMapping, CubeUVReflectionMapping, WorldMapping, LinearEncoding, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping } from '../../constants.js';
+import { BackSide, DoubleSide, UVMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, WorldMapping, LinearEncoding, ObjectSpaceNormalMap, TangentSpaceNormalMap, NoToneMapping } from '../../constants.js';
 import { WebGLProgram } from './WebGLProgram.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
@@ -231,7 +231,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			aoMapMapping: getTextureMappingFromMap ( material.aoMap ),
 			emissiveMap: !! material.emissiveMap,
 			emissiveMapEncoding: getTextureEncodingFromMap( material.emissiveMap ),
-			emissiveMapEncoding: getTextureMappingFromMap( material.emissiveMap ),
+			emissiveMapMapping: getTextureMappingFromMap( material.emissiveMap ),
 			bumpMap: !! material.bumpMap,
 			bumpMapMapping: getTextureMappingFromMap( material.bumpMap ),
 			normalMap: !! material.normalMap,
@@ -255,7 +255,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			alphaMap: !! material.alphaMap,
 			alphaMapMapping: getTextureMappingFromMap( material.alphaMap ),
 
-			gradientMap: !! material.gradientMap,
+			gradientMap: !! material.gradieUVMappingntMap,
 
 			sheen: !! material.sheen,
 
@@ -264,10 +264,10 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			vertexTangents: ( material.normalMap && material.vertexTangents ),
 			vertexColors: material.vertexColors,
 			vertexUvs: ( material.map && material.map.mapping === UVMapping ) || ( material.bumpMap && material.bumpMap.mapping === UVMapping ) || ( material.normalMap && material.normalMap.mapping === UVMapping ) || ( material.alphaMap && material.alphaMap.mapping === UVMapping ) || ( material.emissiveMap && material.emissiveMap.mapping === UVMapping ) || ( material.roughnessMap && material.roughnessMap.mapping === UVMapping ) || ( material.metalnessMap && material.metalnessMap.mapping === UVMapping ) || ( material.clearcoatNormalMap && material.clearcoatNormalMap.mapping === UVMapping ) || ( material.clearcoatRoughnessMap && material.clearcoatRoughnessMap.mapping === UVMapping ) || ( material.displacementMap && material.displacementMap.mapping === UVMapping ),
-			uvsVertexOnly: uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap ) && !! material.displacementMap,
+			uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap ) && !! material.displacementMap,
 			worldUvs : object.worldUvsAxes && (material.map && material.map.mapping === WorldMapping) || (material.bumpMap && material.bumpMap.mapping === WorldMapping) || (material.normalMap && material.normalMap.mapping === WorldMapping) || (material.alphaMap && material.alphaMap.mapping === WorldMapping) || (material.emissiveMap && material.emissiveMap.mapping === WorldMapping) || (material.roughnessMap && material.roughnessMap.mapping === WorldMapping) || (material.metalnessMap && material.metalnessMap.mapping === WorldMapping) || (material.clearcoatNormalMap && material.clearcoatNormalMap.mapping === WorldMapping) || (material.clearcoatRoughnessMap && material.clearcoatRoughnessMap.mapping === WorldMapping),
 
-			worldUvsAxes: object.worldUvsAxes,
+			worldUvsAxes: object.worldMappingAxes,
 
 			fog: !! fog,
 			useFog: material.fog,
