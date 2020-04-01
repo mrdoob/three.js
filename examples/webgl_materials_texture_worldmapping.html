@@ -19,7 +19,9 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - texture mapping example
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - texture mapping example<br/>
+			Checkerboard mapped using XZ world coordinates,<br/>
+			applied to a plane and an instanced mesh
 		</div>
 
 		<script type="module">
@@ -82,28 +84,32 @@
 				var worldUvTexture = uvTexture.clone();
 				worldUvTexture.mapping = THREE.WorldMapping;
 
-				var planeGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var	planeMaterial = new THREE.MeshBasicMaterial( { map: worldUvTexture } );
+				var planeGeometry = new THREE.PlaneBufferGeometry( 200, 200 );
+				var	planeMaterial = new THREE.MeshBasicMaterial( { map: worldUvTexture, side: THREE.DoubleSide } );
 
 				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.rotation.x = - Math.PI / 2;
-				plane.scale.set( 10, 10, 10 );
 
 				scene.add(plane);
 
-				var hexGeometry = new THREE.CircleBufferGeometry( 5, 6, Math.PI / 2 );
+				var side = 5;
+				var apothem = Math.sqrt(3) * side / 2;
+
+				var hexGeometry = new THREE.CircleBufferGeometry( side, 6, Math.PI / 2 );
 				hexGeometry.rotateX(-Math.PI / 2);
 
-				var	hexMaterial = new THREE.MeshBasicMaterial( { map: worldUvTexture } );
+				var	hexMaterial = new THREE.MeshBasicMaterial( { map: worldUvTexture, side: THREE.DoubleSide } );
 
 				var hexes = new THREE.InstancedMesh( hexGeometry, hexMaterial, HEXES_TOTAL );
 				hexes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
 				var buffer = new THREE.Object3D();
 
-				for (let x = 0; x < HEXES; x++) {
-					for (let z = 0; z < HEXES; z++) {
-						buffer.position.set(x * 10 + z * 5, 0, z * 8);
+				for (var x = 0; x < HEXES; x++) {
+					for (var z = 0; z < HEXES; z++) {
+						var hx = (x * 2 + z % 2) * apothem;
+						var hz = z * side * 1.5
+						buffer.position.set(hx, Math.sin(hx / 5) + Math.sin(hz / 5), hz);
 						buffer.updateMatrix();
 						hexes.setMatrixAt(x + z * HEXES, buffer.matrix);
 						console.log(`setting ${x}, ${z} => ${x + z * HEXES}`)
