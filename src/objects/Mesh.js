@@ -49,11 +49,13 @@ function Mesh( geometry, material ) {
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new MeshBasicMaterial();
 
-	this.worldMappingAxes = 'xz';
+	this.worldMappingAxes = Mesh.DefaultWorldMappingAxes;
 
 	this.updateMorphTargets();
 
 }
+
+Mesh.DefaultWorldMappingAxes = 'xz';
 
 Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 

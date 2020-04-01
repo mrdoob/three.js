@@ -92,8 +92,8 @@
 				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.rotation.x = - Math.PI / 2;
 
-				// XZ axes
-				plane.worldMappingAxes = 'xz';
+				// XZ axes are the default, no need to set
+				//plane.worldMappingAxes = 'xz';
 
 				scene.add(plane);
 
@@ -108,8 +108,8 @@
 				var hexes = new THREE.InstancedMesh( hexGeometry, hexMaterial, HEXES_TOTAL );
 				hexes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
 
-				// XZ axes
-				hexes.worldMappingAxes = 'xz';
+				// XZ axes are the default, no need to set
+				//hexes.worldMappingAxes = 'xz';
 
 				var buffer = new THREE.Object3D();
 
