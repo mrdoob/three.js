@@ -92,9 +92,6 @@ import uv_vertex from './ShaderChunk/uv_vertex.glsl.js';
 import uv2_pars_fragment from './ShaderChunk/uv2_pars_fragment.glsl.js';
 import uv2_pars_vertex from './ShaderChunk/uv2_pars_vertex.glsl.js';
 import uv2_vertex from './ShaderChunk/uv2_vertex.glsl.js';
-import uv3_pars_fragment from './ShaderChunk/uv3_pars_fragment.glsl.js';
-import uv3_pars_vertex from './ShaderChunk/uv3_pars_vertex.glsl.js';
-import uv3_vertex from './ShaderChunk/uv3_vertex.glsl.js';
 import worldpos_vertex from './ShaderChunk/worldpos_vertex.glsl.js';
 import worldposinitial_vertex from './ShaderChunk/worldposinitial_vertex.glsl.js';
 
@@ -226,9 +223,6 @@ export var ShaderChunk = {
 	uv2_pars_fragment: uv2_pars_fragment,
 	uv2_pars_vertex: uv2_pars_vertex,
 	uv2_vertex: uv2_vertex,
-	uv3_pars_fragment: uv3_pars_fragment,
-	uv3_pars_vertex: uv3_pars_vertex,
-	uv3_vertex: uv3_vertex,
 	worldpos_vertex: worldpos_vertex,
 	worldposinitial_vertex: worldposinitial_vertex,
 

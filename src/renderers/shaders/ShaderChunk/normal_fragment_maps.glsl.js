@@ -20,7 +20,7 @@ export default /* glsl */`
 
 #elif defined( TANGENTSPACE_NORMALMAP )
 
-	vec3 mapN = texture2D( normalMap, NORMALMAP_UVS ).xyz * 2.0 - 1.0;
+	vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
 	mapN.xy *= normalScale;
 
 	#ifdef USE_TANGENT

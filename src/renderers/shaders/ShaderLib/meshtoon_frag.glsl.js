@@ -13,7 +13,6 @@ uniform float opacity;
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
 #include <uv2_pars_fragment>
-#include <uv3_pars_fragment>
 #include <map_pars_fragment>
 #include <alphamap_pars_fragment>
 #include <aomap_pars_fragment>

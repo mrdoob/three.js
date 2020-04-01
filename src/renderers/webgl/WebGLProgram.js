@@ -5,7 +5,7 @@
 import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
-import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, WorldMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding } from '../../constants.js';
+import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, SphericalReflectionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, Uncharted2ToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding } from '../../constants.js';
 
 var programIdCount = 0;
 
@@ -115,25 +115,6 @@ function getToneMappingFunction( functionName, toneMapping ) {
 
 }
 
-function getMappingUvs( mapping, defaultUvs ) {
-
-	var uvs;
-
-	switch ( mapping ) {
-
-		case WorldMapping:
-			uvs = 'vUv3';
-			break;
-
-		default:
-			uvs = 'vUv';
-
-	}
-
-	return uvs;
-
-}
-
 function generateExtensions( parameters ) {
 
 	var chunks = [
@@ -211,26 +192,6 @@ function replaceClippingPlaneNums( string, parameters ) {
 	return string
 		.replace( /NUM_CLIPPING_PLANES/g, parameters.numClippingPlanes )
 		.replace( /UNION_CLIPPING_PLANES/g, ( parameters.numClippingPlanes - parameters.numClipIntersection ) );
-
-}
-
-function replaceMappingUvs( string, parameters ) {
-
-	var mapping = getMappingUvs( parameters.mapping );
-
-	return string
-		.replace( /ALPHAMAP_UVS/g, mapping )
-		.replace( /BUMPMAP_UVS/g, mapping )
-		.replace( /CLEARCOAT_UVS/g, mapping )
-		.replace( /CLEARCOAT_NORMALMAP_UVS/g, mapping )
-		.replace( /CLEARCOAT_ROUGHNESSMAP_UVS/g, mapping )
-		.replace( /DISPLACEMENTMAP_UVS/g, mapping )
-		.replace( /EMISSIVEMAP_UVS/g, mapping )
-		.replace( /METALNESSMAP_UVS/g, mapping )
-		.replace( /NORMALMAP_UVS/g, mapping )
-		.replace( /ROUGHNESSMAP_UVS/g, mapping )
-		.replace( /SPECULARMAP_UVS/g, mapping )
-		.replace( /MAP_UVS/g, mapping )
 
 }
 
@@ -528,7 +489,7 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
-			parameters.mapping === WorldMapping ? '#define USE_WORLD_UV' : '',
+			parameters.worldUvs ? '#define USE_WORLD_UV' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -658,7 +619,7 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
-			parameters.mapping === WorldMapping ? '#define USE_WORLD_UV' : '',
+			parameters.worldUvs ? '#define USE_WORLD_UV' : '',
 
 			parameters.gradientMap ? '#define USE_GRADIENTMAP' : '',
 
@@ -710,12 +671,10 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 	vertexShader = replaceLightNums( vertexShader, parameters );
 	vertexShader = replaceClippingPlaneNums( vertexShader, parameters );
 	vertexShader = replaceWorldUvsAxes( vertexShader, parameters );
-	vertexShader = replaceMappingUvs( vertexShader, parameters );
 
 	fragmentShader = resolveIncludes( fragmentShader );
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 	fragmentShader = replaceClippingPlaneNums( fragmentShader, parameters );
-	fragmentShader = replaceMappingUvs( fragmentShader, parameters );
 
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );

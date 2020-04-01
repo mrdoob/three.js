@@ -12,7 +12,6 @@ varying vec3 vIndirectFront;
 #include <common>
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
-#include <uv3_pars_fragment>
 #include <envmap_pars_vertex>
 #include <bsdfs>
 #include <lights_pars_begin>
@@ -29,7 +28,6 @@ void main() {
 	#include <worldposinitial_vertex>
 	#include <uv_vertex>
 	#include <uv2_vertex>
-	#include <uv3_vertex>
 	#include <color_vertex>
 
 	#include <beginnormal_vertex>

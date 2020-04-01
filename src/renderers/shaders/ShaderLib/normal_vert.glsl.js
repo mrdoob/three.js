@@ -22,7 +22,6 @@ export default /* glsl */`
 
 #include <common>
 #include <uv_pars_vertex>
-#include <uv3_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <morphtarget_pars_vertex>
 #include <skinning_pars_vertex>
@@ -31,8 +30,8 @@ export default /* glsl */`
 
 void main() {
 
+	#include <worldposinitial_vertex>
 	#include <uv_vertex>
-	#include <uv3_vertex>
 
 	#include <beginnormal_vertex>
 	#include <morphnormal_vertex>

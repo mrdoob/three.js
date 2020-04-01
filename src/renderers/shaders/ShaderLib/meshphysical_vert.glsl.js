@@ -19,7 +19,6 @@ varying vec3 vViewPosition;
 #include <common>
 #include <uv_pars_vertex>
 #include <uv2_pars_vertex>
-#include <uv3_pars_vertex>
 #include <displacementmap_pars_vertex>
 #include <color_pars_vertex>
 #include <fog_pars_vertex>
@@ -33,7 +32,6 @@ void main() {
 
 	#include <uv_vertex>
 	#include <uv2_vertex>
-	#include <uv3_vertex>
 	#include <color_vertex>
 
 	#include <beginnormal_vertex>
