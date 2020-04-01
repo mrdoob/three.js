@@ -279,7 +279,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			specularMap: !! material.specularMap,
 			alphaMap: !! material.alphaMap,
 
-			gradientMap: !! material.gradieUVMappingntMap,
+			gradientMap: !! material.gradientMap,
 
 			sheen: !! material.sheen,
 
