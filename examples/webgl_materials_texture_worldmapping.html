@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - materials - texture mapping</title>
+		<title>three.js webgl - materials - texture world mapping</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -28,7 +28,7 @@
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
-			var HEXES = 5;
+			var HEXES = 25;
 			var HEXES_TOTAL = Math.pow(HEXES, 2);
 
 			var mouseX = 0, mouseY = 0;
@@ -50,7 +50,7 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 35, SCREEN_WIDTH / SCREEN_HEIGHT, 1, 5000 );
-				camera.position.z = 1500;
+				camera.position.z = 20;
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x000000 );
@@ -75,7 +75,7 @@
 				context.fillRect( 64, 64, 64, 64 );
 
 				var uvTexture = new THREE.CanvasTexture( imageCanvas );
-				uvTexture.repeat.set( 1000, 1000 );
+				uvTexture.repeat.set( 100, 100 );
 				uvTexture.wrapS = THREE.RepeatWrapping;
 				uvTexture.wrapT = THREE.RepeatWrapping;
 
@@ -83,36 +83,38 @@
 				worldUvTexture.mapping = THREE.WorldMapping;
 
 				var planeGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
-				var	planeMaterial = new THREE.MeshBasicMaterial( { map: uvTexture } );
+				var	planeMaterial = new THREE.MeshBasicMaterial( { map: worldUvTexture } );
 
 				var plane = new THREE.Mesh( planeGeometry, planeMaterial );
 				plane.rotation.x = - Math.PI / 2;
-				plane.scale.set( 1000, 1000, 1000 );
+				plane.scale.set( 10, 10, 10 );
 
 				scene.add(plane);
 
-				var hexGeometry = new THREE.CircleBufferGeometry( 1, 6, Math.PI / 2 );
+				var hexGeometry = new THREE.CircleBufferGeometry( 5, 6, Math.PI / 2 );
 				hexGeometry.rotateX(-Math.PI / 2);
 
 				var	hexMaterial = new THREE.MeshBasicMaterial( { map: worldUvTexture } );
 
-				var hexes = new THREE.InstancedMesh( hexGeometry, hexMaterial );
+				var hexes = new THREE.InstancedMesh( hexGeometry, hexMaterial, HEXES_TOTAL );
 				hexes.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-				hexes.count = HEXES_TOTAL;
 
 				var buffer = new THREE.Object3D();
 
-				for (let x = 0; x < HEXES_TOTAL; x++) {
-					for (let z = 0; z < HEXES_TOTAL; z++) {
-						buffer.position.set(x, 0, z);
+				for (let x = 0; x < HEXES; x++) {
+					for (let z = 0; z < HEXES; z++) {
+						buffer.position.set(x * 10 + z * 5, 0, z * 8);
 						buffer.updateMatrix();
 						hexes.setMatrixAt(x + z * HEXES, buffer.matrix);
+						console.log(`setting ${x}, ${z} => ${x + z * HEXES}`)
 					}
 				}
 
 				hexes.instanceMatrix.needsUpdate = true;
 
 				scene2.add(hexes);
+
+				hexes.position.set(-0.5 * HEXES * 10, 0, -0.5 * HEXES * 8);
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
