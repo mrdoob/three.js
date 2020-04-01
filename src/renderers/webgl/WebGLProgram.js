@@ -126,7 +126,7 @@ function getMappingUvs( mapping, defaultUvs ) {
 			break;
 
 		default:
-			uvs = defaultUvs;
+			uvs = 'vUv';
 
 	}
 
@@ -216,20 +216,21 @@ function replaceClippingPlaneNums( string, parameters ) {
 
 function replaceMappingUvs( string, parameters ) {
 
+	var mapping = getMappingUvs( parameters.mapping );
+
 	return string
-		.replace( /ALPHAMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /AOMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv2' ) )
-		.replace( /BUMPMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /CLEARCOAT_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /CLEARCOAT_NORMALMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /CLEARCOAT_ROUGHNESSMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /DISPLACEMENT_MAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /EMISSIVEMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /METALNESSMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /NORMALMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /ROUGHNESSMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /SPECULARMAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
-		.replace( /MAP_UVS/g, getMappingUvs( parameters.mapping, 'vUv' ) )
+		.replace( /ALPHAMAP_UVS/g, mapping )
+		.replace( /BUMPMAP_UVS/g, mapping )
+		.replace( /CLEARCOAT_UVS/g, mapping )
+		.replace( /CLEARCOAT_NORMALMAP_UVS/g, mapping )
+		.replace( /CLEARCOAT_ROUGHNESSMAP_UVS/g, mapping )
+		.replace( /DISPLACEMENTMAP_UVS/g, mapping )
+		.replace( /EMISSIVEMAP_UVS/g, mapping )
+		.replace( /METALNESSMAP_UVS/g, mapping )
+		.replace( /NORMALMAP_UVS/g, mapping )
+		.replace( /ROUGHNESSMAP_UVS/g, mapping )
+		.replace( /SPECULARMAP_UVS/g, mapping )
+		.replace( /MAP_UVS/g, mapping )
 
 }
 
@@ -709,6 +710,7 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 	vertexShader = replaceLightNums( vertexShader, parameters );
 	vertexShader = replaceClippingPlaneNums( vertexShader, parameters );
 	vertexShader = replaceWorldUvsAxes( vertexShader, parameters );
+	vertexShader = replaceMappingUvs( vertexShader, parameters );
 
 	fragmentShader = resolveIncludes( fragmentShader );
 	fragmentShader = replaceLightNums( fragmentShader, parameters );

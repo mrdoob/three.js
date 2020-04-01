@@ -24,6 +24,7 @@ uniform float opacity;
 
 #include <packing>
 #include <uv_pars_fragment>
+#include <uv3_pars_fragment>
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>
