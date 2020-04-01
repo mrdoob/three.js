@@ -264,6 +264,13 @@ ColladaExporter.prototype = {
 					triangleInputs += `<input semantic="TEXCOORD" source="#${ uvName }" offset="0" set="0" />`;
 
 				}
+				
+				// serialize lightmap uvs
+				if ( 'uv2' in bufferGeometry.attributes ) {
+					var uvName = `${ meshid }-texcoord2`;
+					gnode += getAttribute( bufferGeometry.attributes.uv2, uvName, [ 'S', 'T' ], 'float' );
+					triangleInputs += `<input semantic="TEXCOORD" source="#${ uvName }" offset="0" set="1" />`;
+				}
 
 				// serialize colors
 				if ( 'color' in bufferGeometry.attributes ) {
@@ -273,7 +280,7 @@ ColladaExporter.prototype = {
 					triangleInputs += `<input semantic="COLOR" source="#${ colName }" offset="0" />`;
 
 				}
-
+				
 				var indexArray = null;
 				if ( bufferGeometry.index ) {
 
