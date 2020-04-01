@@ -4,92 +4,91 @@
 
 import { WebGLLights } from './WebGLLights.js';
 
-function WebGLRenderState() {
+class WebGLRenderState {
 
-	var lights = new WebGLLights();
+	constructor() {
 
-	var lightsArray = [];
-	var shadowsArray = [];
+		this.lights = new WebGLLights();
 
-	function init() {
+		this.lightsArray = [];
+		this.shadowsArray = [];
 
-		lightsArray.length = 0;
-		shadowsArray.length = 0;
+		this.state = {
+			lightsArray: this.lightsArray,
+			shadowsArray: this.shadowsArray,
 
-	}
-
-	function pushLight( light ) {
-
-		lightsArray.push( light );
+			lights: this.lights
+		};
 
 	}
 
-	function pushShadow( shadowLight ) {
+	init() {
 
-		shadowsArray.push( shadowLight );
-
-	}
-
-	function setupLights( camera ) {
-
-		lights.setup( lightsArray, shadowsArray, camera );
+		this.lightsArray.length = 0;
+		this.shadowsArray.length = 0;
 
 	}
 
-	var state = {
-		lightsArray: lightsArray,
-		shadowsArray: shadowsArray,
+	pushLight( light ) {
 
-		lights: lights
-	};
+		this.lightsArray.push( light );
 
-	return {
-		init: init,
-		state: state,
-		setupLights: setupLights,
+	}
 
-		pushLight: pushLight,
-		pushShadow: pushShadow
-	};
+	pushShadow( shadowLight ) {
+
+		this.shadowsArray.push( shadowLight );
+
+	}
+
+	setupLights( camera ) {
+
+		this.lights.setup( this.lightsArray, this.shadowsArray, camera );
+
+	}
 
 }
 
-function WebGLRenderStates() {
+class WebGLRenderStates {
 
-	var renderStates = new WeakMap();
+	constructor() {
 
-	function onSceneDispose( event ) {
-
-		var scene = event.target;
-
-		scene.removeEventListener( 'dispose', onSceneDispose );
-
-		renderStates.delete( scene );
+		this.renderStates = new WeakMap();
 
 	}
 
-	function get( scene, camera ) {
+	onSceneDispose( event ) {
+
+		var scene = event.target;
+
+		scene.removeEventListener( 'dispose', this.onSceneDispose );
+
+		this.renderStates.delete( scene );
+
+	}
+
+	get( scene, camera ) {
 
 		var renderState;
 
-		if ( renderStates.has( scene ) === false ) {
+		if ( this.renderStates.has( scene ) === false ) {
 
 			renderState = new WebGLRenderState();
-			renderStates.set( scene, new WeakMap() );
-			renderStates.get( scene ).set( camera, renderState );
+			this.renderStates.set( scene, new WeakMap() );
+			this.renderStates.get( scene ).set( camera, renderState );
 
-			scene.addEventListener( 'dispose', onSceneDispose );
+			scene.addEventListener( 'dispose', this.onSceneDispose );
 
 		} else {
 
-			if ( renderStates.get( scene ).has( camera ) === false ) {
+			if ( this.renderStates.get( scene ).has( camera ) === false ) {
 
 				renderState = new WebGLRenderState();
-				renderStates.get( scene ).set( camera, renderState );
+				this.renderStates.get( scene ).set( camera, renderState );
 
 			} else {
 
-				renderState = renderStates.get( scene ).get( camera );
+				renderState = this.renderStates.get( scene ).get( camera );
 
 			}
 
@@ -99,16 +98,11 @@ function WebGLRenderStates() {
 
 	}
 
-	function dispose() {
+	dispose() {
 
-		renderStates = new WeakMap();
+		this.renderStates = new WeakMap();
 
 	}
-
-	return {
-		get: get,
-		dispose: dispose
-	};
 
 }
 

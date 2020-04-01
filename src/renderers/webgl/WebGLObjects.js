@@ -2,20 +2,29 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLObjects( gl, geometries, attributes, info ) {
+class WebGLObjects {
 
-	var updateMap = new WeakMap();
+	constructor( gl, geometries, attributes, info ) {
 
-	function update( object ) {
+		this.gl = gl;
+		this.geometries = geometries;
+		this.attributes = attributes;
+		this.info = info;
 
-		var frame = info.render.frame;
+		this.updateMap = new WeakMap();
+
+	}
+
+	update( object ) {
+
+		var frame = this.info.render.frame;
 
 		var geometry = object.geometry;
-		var buffergeometry = geometries.get( object, geometry );
+		var buffergeometry = this.geometries.get( object, geometry );
 
 		// Update once per frame
 
-		if ( updateMap.get( buffergeometry ) !== frame ) {
+		if ( this.updateMap.get( buffergeometry ) !== frame ) {
 
 			if ( geometry.isGeometry ) {
 
@@ -23,15 +32,15 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 			}
 
-			geometries.update( buffergeometry );
+			this.geometries.update( buffergeometry );
 
-			updateMap.set( buffergeometry, frame );
+			this.updateMap.set( buffergeometry, frame );
 
 		}
 
 		if ( object.isInstancedMesh ) {
 
-			attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
+			this.attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
 
 		}
 
@@ -39,18 +48,11 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 	}
 
-	function dispose() {
+	dispose() {
 
-		updateMap = new WeakMap();
+		this.updateMap = new WeakMap();
 
 	}
-
-	return {
-
-		update: update,
-		dispose: dispose
-
-	};
 
 }
 

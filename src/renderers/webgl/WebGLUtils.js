@@ -4,11 +4,17 @@
 
 import { RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_ASTC_6x5_Format, RGBA_ASTC_6x6_Format, RGBA_ASTC_8x5_Format, RGBA_ASTC_8x6_Format, RGBA_ASTC_8x8_Format, RGBA_ASTC_10x5_Format, RGBA_ASTC_10x6_Format, RGBA_ASTC_10x8_Format, RGBA_ASTC_10x10_Format, RGBA_ASTC_12x10_Format, RGBA_ASTC_12x12_Format, RGB_ETC1_Format, RGB_ETC2_Format, RGBA_ETC2_EAC_Format, RGBA_PVRTC_2BPPV1_Format, RGBA_PVRTC_4BPPV1_Format, RGB_PVRTC_2BPPV1_Format, RGB_PVRTC_4BPPV1_Format, RGBA_S3TC_DXT5_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT1_Format, RGB_S3TC_DXT1_Format, DepthFormat, DepthStencilFormat, LuminanceAlphaFormat, LuminanceFormat, RedFormat, RGBAFormat, RGBFormat, AlphaFormat, RedIntegerFormat, RGFormat, RGIntegerFormat, RGBIntegerFormat, RGBAIntegerFormat, HalfFloatType, FloatType, UnsignedIntType, IntType, UnsignedShortType, ShortType, ByteType, UnsignedInt248Type, UnsignedShort565Type, UnsignedShort5551Type, UnsignedShort4444Type, UnsignedByteType, SRGB8_ALPHA8_ASTC_4x4_Format, SRGB8_ALPHA8_ASTC_5x4_Format, SRGB8_ALPHA8_ASTC_5x5_Format, SRGB8_ALPHA8_ASTC_6x5_Format, SRGB8_ALPHA8_ASTC_6x6_Format, SRGB8_ALPHA8_ASTC_8x5_Format, SRGB8_ALPHA8_ASTC_8x6_Format, SRGB8_ALPHA8_ASTC_8x8_Format, SRGB8_ALPHA8_ASTC_10x5_Format, SRGB8_ALPHA8_ASTC_10x6_Format, SRGB8_ALPHA8_ASTC_10x8_Format, SRGB8_ALPHA8_ASTC_10x10_Format, SRGB8_ALPHA8_ASTC_12x10_Format, SRGB8_ALPHA8_ASTC_12x12_Format, RGBA_BPTC_Format } from '../../constants.js';
 
-function WebGLUtils( gl, extensions, capabilities ) {
+class WebGLUtils {
 
-	var isWebGL2 = capabilities.isWebGL2;
+	constructor( gl, extensions, capabilities ) {
 
-	function convert( p ) {
+		this.gl = gl;
+		this.extensions = extensions;
+		this.isWebGL2 = capabilities.isWebGL2;
+
+	}
+
+	convert( p ) {
 
 		var extension;
 
@@ -26,9 +32,9 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === HalfFloatType ) {
 
-			if ( isWebGL2 ) return gl.HALF_FLOAT;
+			if ( this.isWebGL2 ) return gl.HALF_FLOAT;
 
-			extension = extensions.get( 'OES_texture_half_float' );
+			extension = this.extensions.get( 'OES_texture_half_float' );
 
 			if ( extension !== null ) {
 
@@ -62,7 +68,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 		if ( p === RGB_S3TC_DXT1_Format || p === RGBA_S3TC_DXT1_Format ||
 			p === RGBA_S3TC_DXT3_Format || p === RGBA_S3TC_DXT5_Format ) {
 
-			extension = extensions.get( 'WEBGL_compressed_texture_s3tc' );
+			extension = this.extensions.get( 'WEBGL_compressed_texture_s3tc' );
 
 			if ( extension !== null ) {
 
@@ -82,7 +88,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 		if ( p === RGB_PVRTC_4BPPV1_Format || p === RGB_PVRTC_2BPPV1_Format ||
 			p === RGBA_PVRTC_4BPPV1_Format || p === RGBA_PVRTC_2BPPV1_Format ) {
 
-			extension = extensions.get( 'WEBGL_compressed_texture_pvrtc' );
+			extension = this.extensions.get( 'WEBGL_compressed_texture_pvrtc' );
 
 			if ( extension !== null ) {
 
@@ -101,7 +107,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === RGB_ETC1_Format ) {
 
-			extension = extensions.get( 'WEBGL_compressed_texture_etc1' );
+			extension = this.extensions.get( 'WEBGL_compressed_texture_etc1' );
 
 			if ( extension !== null ) {
 
@@ -117,7 +123,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === RGB_ETC2_Format || p === RGBA_ETC2_EAC_Format ) {
 
-			extension = extensions.get( 'WEBGL_compressed_texture_etc' );
+			extension = this.extensions.get( 'WEBGL_compressed_texture_etc' );
 
 			if ( extension !== null ) {
 
@@ -139,7 +145,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 			p === SRGB8_ALPHA8_ASTC_10x6_Format || p === SRGB8_ALPHA8_ASTC_10x8_Format || p === SRGB8_ALPHA8_ASTC_10x10_Format ||
 			p === SRGB8_ALPHA8_ASTC_12x10_Format || p === SRGB8_ALPHA8_ASTC_12x12_Format ) {
 
-			extension = extensions.get( 'WEBGL_compressed_texture_astc' );
+			extension = this.extensions.get( 'WEBGL_compressed_texture_astc' );
 
 			if ( extension !== null ) {
 
@@ -157,7 +163,7 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === RGBA_BPTC_Format ) {
 
-			extension = extensions.get( 'EXT_texture_compression_bptc' );
+			extension = this.extensions.get( 'EXT_texture_compression_bptc' );
 
 			if ( extension !== null ) {
 
@@ -175,9 +181,9 @@ function WebGLUtils( gl, extensions, capabilities ) {
 
 		if ( p === UnsignedInt248Type ) {
 
-			if ( isWebGL2 ) return gl.UNSIGNED_INT_24_8;
+			if ( this.isWebGL2 ) return gl.UNSIGNED_INT_24_8;
 
-			extension = extensions.get( 'WEBGL_depth_texture' );
+			extension = this.extensions.get( 'WEBGL_depth_texture' );
 
 			if ( extension !== null ) {
 
@@ -192,8 +198,6 @@ function WebGLUtils( gl, extensions, capabilities ) {
 		}
 
 	}
-
-	return { convert: convert };
 
 }
 

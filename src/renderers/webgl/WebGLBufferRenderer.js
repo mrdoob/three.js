@@ -2,42 +2,43 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
+class WebGLBufferRenderer {
 
-	var isWebGL2 = capabilities.isWebGL2;
+	constructor( gl, extensions, info, capabilities ) {
 
-	var mode;
-
-	function setMode( value ) {
-
-		mode = value;
-
-	}
-
-	function render( start, count ) {
-
-		gl.drawArrays( mode, start, count );
-
-		info.update( count, mode );
+		this.gl = gl;
+		this.extensions = extensions;
+		this.info = info;
+		this.isWebGL2 = capabilities.isWebGL2;
+		this.mode;
 
 	}
 
-	function renderInstances( geometry, start, count, primcount ) {
+	setMode( value ) {
 
-		if ( primcount === 0 ) return;
+		this.mode = value;
 
+	}
+	render( start, count ) {
+
+		this.gl.drawArrays( this.mode, start, count );
+		this.info.update( count, this.mode );
+
+	}
+	renderInstances( geometry, start, count, primcount ) {
+
+		if ( primcount === 0 )
+			return;
 		var extension, methodName;
+		if ( this.isWebGL2 ) {
 
-		if ( isWebGL2 ) {
-
-			extension = gl;
+			extension = this.gl;
 			methodName = 'drawArraysInstanced';
 
 		} else {
 
-			extension = extensions.get( 'ANGLE_instanced_arrays' );
+			extension = this.extensions.get( 'ANGLE_instanced_arrays' );
 			methodName = 'drawArraysInstancedANGLE';
-
 			if ( extension === null ) {
 
 				console.error( 'THREE.WebGLBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
@@ -46,18 +47,10 @@ function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 			}
 
 		}
-
-		extension[ methodName ]( mode, start, count, primcount );
-
-		info.update( count, mode, primcount );
+		extension[ methodName ]( this.mode, start, count, primcount );
+		this.info.update( count, this.mode, primcount );
 
 	}
-
-	//
-
-	this.setMode = setMode;
-	this.render = render;
-	this.renderInstances = renderInstances;
 
 }
 

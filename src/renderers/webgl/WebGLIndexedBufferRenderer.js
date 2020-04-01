@@ -2,51 +2,54 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
-	var isWebGL2 = capabilities.isWebGL2;
+class WebGLIndexedBufferRenderer {
 
-	var mode;
+	constructor( gl, extensions, info, capabilities ) {
 
-	function setMode( value ) {
+		this.gl = gl;
+		this.extensions = extensions;
+		this.info = info;
 
-		mode = value;
-
-	}
-
-	var type, bytesPerElement;
-
-	function setIndex( value ) {
-
-		type = value.type;
-		bytesPerElement = value.bytesPerElement;
+		this.isWebGL2 = capabilities.isWebGL2;
+		this.mode;
+		this.type;
+		this.bytesPerElement;
 
 	}
 
-	function render( start, count ) {
+	setMode( value ) {
 
-		gl.drawElements( mode, count, type, start * bytesPerElement );
-
-		info.update( count, mode );
+		this.mode = value;
 
 	}
 
-	function renderInstances( geometry, start, count, primcount ) {
+	setIndex( value ) {
 
-		if ( primcount === 0 ) return;
+		this.type = value.type;
+		this.bytesPerElement = value.bytesPerElement;
 
+	}
+	render( start, count ) {
+
+		this.gl.drawElements( this.mode, count, this.type, start * this.bytesPerElement );
+		this.info.update( count, this.mode );
+
+	}
+	renderInstances( geometry, start, count, primcount ) {
+
+		if ( primcount === 0 )
+			return;
 		var extension, methodName;
-
-		if ( isWebGL2 ) {
+		if ( this.isWebGL2 ) {
 
 			extension = gl;
 			methodName = 'drawElementsInstanced';
 
 		} else {
 
-			extension = extensions.get( 'ANGLE_instanced_arrays' );
+			extension = this.extensions.get( 'ANGLE_instanced_arrays' );
 			methodName = 'drawElementsInstancedANGLE';
-
 			if ( extension === null ) {
 
 				console.error( 'THREE.WebGLIndexedBufferRenderer: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
@@ -55,19 +58,10 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 			}
 
 		}
-
-		extension[ methodName ]( mode, count, type, start * bytesPerElement, primcount );
-
-		info.update( count, mode, primcount );
+		extension[ methodName ]( this.mode, count, this.type, start * this.bytesPerElement, primcount );
+		this.info.update( count, this.mode, primcount );
 
 	}
-
-	//
-
-	this.setMode = setMode;
-	this.setIndex = setIndex;
-	this.render = render;
-	this.renderInstances = renderInstances;
 
 }
 

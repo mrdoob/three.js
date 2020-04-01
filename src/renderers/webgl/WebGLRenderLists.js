@@ -55,28 +55,32 @@ function reversePainterSortStable( a, b ) {
 }
 
 
-function WebGLRenderList() {
+class WebGLRenderList {
 
-	var renderItems = [];
-	var renderItemsIndex = 0;
+	constructor() {
 
-	var opaque = [];
-	var transparent = [];
+		this.renderItems = [];
+		this.renderItemsIndex = 0;
 
-	var defaultProgram = { id: - 1 };
+		this.opaque = [];
+		this.transparent = [];
 
-	function init() {
-
-		renderItemsIndex = 0;
-
-		opaque.length = 0;
-		transparent.length = 0;
+		this.defaultProgram = { id: - 1 };
 
 	}
 
-	function getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
+	init() {
 
-		var renderItem = renderItems[ renderItemsIndex ];
+		this.renderItemsIndex = 0;
+
+		this.opaque.length = 0;
+		this.transparent.length = 0;
+
+	}
+
+	getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
+
+		var renderItem = this.renderItems[ this.renderItemsIndex ];
 
 		if ( renderItem === undefined ) {
 
@@ -85,14 +89,14 @@ function WebGLRenderList() {
 				object: object,
 				geometry: geometry,
 				material: material,
-				program: material.program || defaultProgram,
+				program: material.program || this.defaultProgram,
 				groupOrder: groupOrder,
 				renderOrder: object.renderOrder,
 				z: z,
 				group: group
 			};
 
-			renderItems[ renderItemsIndex ] = renderItem;
+			this.renderItems[ this.renderItemsIndex ] = renderItem;
 
 		} else {
 
@@ -100,7 +104,7 @@ function WebGLRenderList() {
 			renderItem.object = object;
 			renderItem.geometry = geometry;
 			renderItem.material = material;
-			renderItem.program = material.program || defaultProgram;
+			renderItem.program = material.program || this.defaultProgram;
 			renderItem.groupOrder = groupOrder;
 			renderItem.renderOrder = object.renderOrder;
 			renderItem.z = z;
@@ -108,42 +112,42 @@ function WebGLRenderList() {
 
 		}
 
-		renderItemsIndex ++;
+		this.renderItemsIndex ++;
 
 		return renderItem;
 
 	}
 
-	function push( object, geometry, material, groupOrder, z, group ) {
+	push( object, geometry, material, groupOrder, z, group ) {
 
-		var renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
+		var renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		( material.transparent === true ? transparent : opaque ).push( renderItem );
-
-	}
-
-	function unshift( object, geometry, material, groupOrder, z, group ) {
-
-		var renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
-
-		( material.transparent === true ? transparent : opaque ).unshift( renderItem );
+		( material.transparent === true ? this.transparent : this.opaque ).push( renderItem );
 
 	}
 
-	function sort( customOpaqueSort, customTransparentSort ) {
+	unshift( object, geometry, material, groupOrder, z, group ) {
 
-		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
-		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
+		var renderItem = this.getNextRenderItem( object, geometry, material, groupOrder, z, group );
+
+		( material.transparent === true ? this.transparent : this.opaque ).unshift( renderItem );
 
 	}
 
-	function finish() {
+	sort( customOpaqueSort, customTransparentSort ) {
+
+		if ( this.opaque.length > 1 ) this.opaque.sort( customOpaqueSort || painterSortStable );
+		if ( this.transparent.length > 1 ) this.transparent.sort( customTransparentSort || reversePainterSortStable );
+
+	}
+
+	finish() {
 
 		// Clear references from inactive renderItems in the list
 
-		for ( var i = renderItemsIndex, il = renderItems.length; i < il; i ++ ) {
+		for ( var i = this.renderItemsIndex, il = this.renderItems.length; i < il; i ++ ) {
 
-			var renderItem = renderItems[ i ];
+			var renderItem = this.renderItems[ i ];
 
 			if ( renderItem.id === null ) break;
 
@@ -158,45 +162,37 @@ function WebGLRenderList() {
 
 	}
 
-	return {
-		opaque: opaque,
-		transparent: transparent,
-
-		init: init,
-		push: push,
-		unshift: unshift,
-		finish: finish,
-
-		sort: sort
-	};
-
 }
 
-function WebGLRenderLists() {
+class WebGLRenderLists {
 
-	var lists = new WeakMap();
+	constructor() {
 
-	function onSceneDispose( event ) {
-
-		var scene = event.target;
-
-		scene.removeEventListener( 'dispose', onSceneDispose );
-
-		lists.delete( scene );
+		this.lists = new WeakMap();
 
 	}
 
-	function get( scene, camera ) {
+	onSceneDispose( event ) {
 
-		var cameras = lists.get( scene );
+		var scene = event.target;
+
+		scene.removeEventListener( 'dispose', this.onSceneDispose );
+
+		this.lists.delete( scene );
+
+	}
+
+	get( scene, camera ) {
+
+		var cameras = this.lists.get( scene );
 		var list;
 		if ( cameras === undefined ) {
 
 			list = new WebGLRenderList();
-			lists.set( scene, new WeakMap() );
-			lists.get( scene ).set( camera, list );
+			this.lists.set( scene, new WeakMap() );
+			this.lists.get( scene ).set( camera, list );
 
-			scene.addEventListener( 'dispose', onSceneDispose );
+			scene.addEventListener( 'dispose', this.onSceneDispose );
 
 		} else {
 
@@ -214,16 +210,11 @@ function WebGLRenderLists() {
 
 	}
 
-	function dispose() {
+	dispose() {
 
-		lists = new WeakMap();
+		this.lists = new WeakMap();
 
 	}
-
-	return {
-		get: get,
-		dispose: dispose
-	};
 
 }
 

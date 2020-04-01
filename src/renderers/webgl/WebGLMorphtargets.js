@@ -8,12 +8,18 @@ function absNumericalSort( a, b ) {
 
 }
 
-function WebGLMorphtargets( gl ) {
+class WebGLMorphtargets {
 
-	var influencesList = {};
-	var morphInfluences = new Float32Array( 8 );
+	constructor( gl ) {
 
-	function update( object, geometry, material, program ) {
+		this.gl = gl;
+
+		this.influencesList = {};
+		this.morphInfluences = new Float32Array( 8 );
+
+	}
+
+	update( object, geometry, material, program ) {
 
 		var objectInfluences = object.morphTargetInfluences;
 
@@ -22,7 +28,7 @@ function WebGLMorphtargets( gl ) {
 
 		var length = objectInfluences === undefined ? 0 : objectInfluences.length;
 
-		var influences = influencesList[ geometry.id ];
+		var influences = this.influencesList[ geometry.id ];
 
 		if ( influences === undefined ) {
 
@@ -36,7 +42,7 @@ function WebGLMorphtargets( gl ) {
 
 			}
 
-			influencesList[ geometry.id ] = influences;
+			this.influencesList[ geometry.id ] = influences;
 
 		}
 
@@ -89,7 +95,7 @@ function WebGLMorphtargets( gl ) {
 					if ( morphTargets ) geometry.setAttribute( 'morphTarget' + i, morphTargets[ index ] );
 					if ( morphNormals ) geometry.setAttribute( 'morphNormal' + i, morphNormals[ index ] );
 
-					morphInfluences[ i ] = value;
+					this.morphInfluences[ i ] = value;
 					morphInfluencesSum += value;
 					continue;
 
@@ -97,7 +103,7 @@ function WebGLMorphtargets( gl ) {
 
 			}
 
-			morphInfluences[ i ] = 0;
+			this.morphInfluences[ i ] = 0;
 
 		}
 
@@ -106,16 +112,10 @@ function WebGLMorphtargets( gl ) {
 		// When baseinfluence = 1 - sum(influence), the above is equivalent to sum((target - base) * influence)
 		var morphBaseInfluence = geometry.morphTargetsRelative ? 1 : 1 - morphInfluencesSum;
 
-		program.getUniforms().setValue( gl, 'morphTargetBaseInfluence', morphBaseInfluence );
-		program.getUniforms().setValue( gl, 'morphTargetInfluences', morphInfluences );
+		program.getUniforms().setValue( this.gl, 'morphTargetBaseInfluence', morphBaseInfluence );
+		program.getUniforms().setValue( this.gl, 'morphTargetInfluences', this.morphInfluences );
 
 	}
-
-	return {
-
-		update: update
-
-	};
 
 }
 
