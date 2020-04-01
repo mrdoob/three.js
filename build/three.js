@@ -17799,7 +17799,6 @@
 	function replaceMappingUvs( string, parameters ) {
 
 		return string
-			.replace( /MAP_UVS/g, getMappingUvs( parameters.mapMapping, 'vUv' ) )
 			.replace( /ALPHAMAP_UVS/g, getMappingUvs( parameters.alphaMapMapping, 'vUv' ) )
 			.replace( /AOMAP_UVS/g, getMappingUvs( parameters.aoMapMapping, 'vUv2' ) )
 			.replace( /BUMPMAP_UVS/g, getMappingUvs( parameters.bumpMapMapping, 'vUv' ) )
@@ -17812,6 +17811,7 @@
 			.replace( /NORMALMAP_UVS/g, getMappingUvs( parameters.normalMapMapping, 'vUv' ) )
 			.replace( /ROUGHNESSMAP_UVS/g, getMappingUvs( parameters.roughnessMapMapping, 'vUv' ) )
 			.replace( /SPECULARMAP_UVS/g, getMappingUvs( parameters.specularMapMapping, 'vUv' ) )
+			.replace( /MAP_UVS/g, getMappingUvs( parameters.mapMapping, 'vUv' ) )
 
 	}
 
