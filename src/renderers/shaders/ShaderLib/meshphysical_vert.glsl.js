@@ -33,6 +33,7 @@ void main() {
 
 	#include <uv_vertex>
 	#include <uv2_vertex>
+	#include <uv3_vertex>
 	#include <color_vertex>
 
 	#include <beginnormal_vertex>
