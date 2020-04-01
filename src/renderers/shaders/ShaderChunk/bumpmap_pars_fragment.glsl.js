@@ -11,12 +11,12 @@ export default /* glsl */`
 
 	vec2 dHdxy_fwd() {
 
-		vec2 dSTdx = dFdx( vUv );
-		vec2 dSTdy = dFdy( vUv );
+		vec2 dSTdx = dFdx( BUMPMAP_UVS );
+		vec2 dSTdy = dFdy( BUMPMAP_UVS );
 
-		float Hll = bumpScale * texture2D( bumpMap, vUv ).x;
-		float dBx = bumpScale * texture2D( bumpMap, vUv + dSTdx ).x - Hll;
-		float dBy = bumpScale * texture2D( bumpMap, vUv + dSTdy ).x - Hll;
+		float Hll = bumpScale * texture2D( bumpMap, BUMPMAP_UVS ).x;
+		float dBx = bumpScale * texture2D( bumpMap, BUMPMAP_UVS + dSTdx ).x - Hll;
+		float dBy = bumpScale * texture2D( bumpMap, BUMPMAP_UVS + dSTdy ).x - Hll;
 
 		return vec2( dBx, dBy );
 

@@ -64,6 +64,7 @@ export var EquirectangularRefractionMapping = 304;
 export var SphericalReflectionMapping = 305;
 export var CubeUVReflectionMapping = 306;
 export var CubeUVRefractionMapping = 307;
+export var WorldMapping = 308;
 export var RepeatWrapping = 1000;
 export var ClampToEdgeWrapping = 1001;
 export var MirroredRepeatWrapping = 1002;

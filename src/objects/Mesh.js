@@ -49,6 +49,8 @@ function Mesh( geometry, material ) {
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new MeshBasicMaterial();
 
+	this.worldUvsAxes = 'xz';
+
 	this.updateMorphTargets();
 
 }

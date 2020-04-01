@@ -115,6 +115,24 @@ function getToneMappingFunction( functionName, toneMapping ) {
 
 }
 
+function getMappingUvs( mapping, defaultUvs ) {
+
+	var uvs;
+
+	switch ( mapping ) {
+
+		case WorldMapping:
+			uvs = 'vUv3';
+
+		default:
+			uvs = defaultUvs;
+
+	}
+
+	return uvs;
+
+}
+
 function generateExtensions( parameters ) {
 
 	var chunks = [
@@ -192,6 +210,33 @@ function replaceClippingPlaneNums( string, parameters ) {
 	return string
 		.replace( /NUM_CLIPPING_PLANES/g, parameters.numClippingPlanes )
 		.replace( /UNION_CLIPPING_PLANES/g, ( parameters.numClippingPlanes - parameters.numClipIntersection ) );
+
+}
+
+function replaceMappingUvs( string, parameters ) {
+
+	return string
+		.replace( /MAP_UVS/g, getMappingUvs( parameters.mapMapping, 'vUv' ) )
+		.replace( /ALPHAMAP_UVS/g, getMappingUvs( parameters.alphaMapMapping, 'vUv' ) )
+		.replace( /AOMAP_UVS/g, getMappingUvs( parameters.aoMapMapping, 'vUv2' ) )
+		.replace( /BUMPMAP_UVS/g, getMappingUvs( parameters.bumpMapMapping, 'vUv' ) )
+		.replace( /CLEARCOAT_UVS/g, getMappingUvs( parameters.clearcoatMapMapping, 'vUv' ) )
+		.replace( /CLEARCOAT_NORMALMAP_UVS/g, getMappingUvs( parameters.clearcoatNormalMapMapping, 'vUv' ) )
+		.replace( /CLEARCOAT_ROUGHNESSMAP_UVS/g, getMappingUvs( parameters.clearcoatRoughnessMapMapping, 'vUv' ) )
+		.replace( /DISPLACEMENT_MAP_UVS/g, getMappingUvs( parameters.displacementMapMapping, 'vUv' ) )
+		.replace( /EMISSIVEMAP_UVS/g, getMappingUvs( parameters.emissiveMapMapping, 'vUv' ) )
+		.replace( /METALNESSMAP_UVS/g, getMappingUvs( parameters.metalnessMapMapping, 'vUv' ) )
+		.replace( /NORMALMAP_UVS/g, getMappingUvs( parameters.normalMapMapping, 'vUv' ) )
+		.replace( /ROUGHNESSMAP_UVS/g, getMappingUvs( parameters.roughnessMapMapping, 'vUv' ) )
+		.replace( /SPECULARMAP_UVS/g, getMappingUvs( parameters.specularMapMapping, 'vUv' ) )
+
+}
+
+function replaceWorldUvsAxes( string, parameters ) {
+
+	return string
+		.replace( /WORLD_MAPPING_U/g, parameters.worldUvsAxes[0] )
+		.replace( /WORLD_MAPPING_V/g, parameters.worldUvsAxes[1] )
 
 }
 
@@ -479,6 +524,7 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 			parameters.vertexColors ? '#define USE_COLOR' : '',
 			parameters.vertexUvs ? '#define USE_UV' : '',
 			parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
+			parameters.worldUvs ? '#define USE_WORLD_UV' : '',
 
 			parameters.flatShading ? '#define FLAT_SHADED' : '',
 
@@ -658,10 +704,12 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 	vertexShader = resolveIncludes( vertexShader );
 	vertexShader = replaceLightNums( vertexShader, parameters );
 	vertexShader = replaceClippingPlaneNums( vertexShader, parameters );
+	vertexShader = replaceWorldUvsAxes( vertexShader, parameters );
 
 	fragmentShader = resolveIncludes( fragmentShader );
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 	fragmentShader = replaceClippingPlaneNums( fragmentShader, parameters );
+	fragmentShader = replaceMappingUvs( fragmentShader, parameters );
 
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
