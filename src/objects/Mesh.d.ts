@@ -18,6 +18,7 @@ export class Mesh extends Object3D {
 	morphTargetDictionary?: { [key: string]: number };
 	readonly isMesh: true;
 	type: string;
+	worldMappingAxes: string;
 
 	updateMorphTargets(): void;
 	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;

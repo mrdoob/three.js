@@ -18647,7 +18647,7 @@
 
 		}
 
-		function getTextureMappingFromMaterial( material ) {
+		function getTextureMapping( object, material ) {
 
 			// mapping priorities same as WebGL renderer
 
@@ -18693,7 +18693,7 @@
 
 			var mapping;
 
-			if ( ! mappingMap ) {
+			if ( ! mappingMap || ! object.worldMappingAxes ) {
 
 				mapping = UVMapping;
 
@@ -18795,7 +18795,7 @@
 				vertexColors: material.vertexColors,
 				vertexUvs: !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatMap || !! material.clearcoatRoughnessMap || !! material.clearcoatNormalMap || !! material.displacementMap,
 				uvsVertexOnly: ! ( !! material.map || !! material.bumpMap || !! material.normalMap || !! material.specularMap || !! material.alphaMap || !! material.emissiveMap || !! material.roughnessMap || !! material.metalnessMap || !! material.clearcoatNormalMap ) && !! material.displacementMap,
-				mapping: getTextureMappingFromMaterial(material),
+				mapping: getTextureMapping(object, material),
 
 				worldUvsAxes: object.worldMappingAxes,
 
