@@ -13,15 +13,21 @@ import { CubeCamera } from '../cameras/CubeCamera.js';
  */
 
 class WebGLCubeRenderTarget extends WebGLRenderTarget {
-	constructor(size, options, dummy) {
-		if (Number.isInteger(options)) {
-			console.warn('THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )');
+
+	constructor( size, options, dummy ) {
+
+		if ( Number.isInteger( options ) ) {
+
+			console.warn( 'THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )' );
 			options = dummy;
+
 		}
-		super(size, size, options);
+		super( size, size, options );
+
 	}
-	
-	fromEquirectangularTexture(renderer, texture) {
+
+	fromEquirectangularTexture( renderer, texture ) {
+
 		this.texture.type = texture.type;
 		this.texture.format = texture.format;
 		this.texture.encoding = texture.encoding;
@@ -40,7 +46,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 				"	#include <begin_vertex>",
 				"	#include <project_vertex>",
 				"}"
-			].join('\n'),
+			].join( '\n' ),
 			fragmentShader: [
 				"uniform sampler2D tEquirect;",
 				"varying vec3 vWorldDirection;",
@@ -53,27 +59,29 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 				"	sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;",
 				"	gl_FragColor = texture2D( tEquirect, sampleUV );",
 				"}"
-			].join('\n'),
+			].join( '\n' ),
 		};
-		var material = new ShaderMaterial({
+		var material = new ShaderMaterial( {
 			type: 'CubemapFromEquirect',
-			uniforms: cloneUniforms(shader.uniforms),
+			uniforms: cloneUniforms( shader.uniforms ),
 			vertexShader: shader.vertexShader,
 			fragmentShader: shader.fragmentShader,
 			side: BackSide,
 			blending: NoBlending
-		});
+		} );
 		material.uniforms.tEquirect.value = texture;
-		var mesh = new Mesh(new BoxBufferGeometry(5, 5, 5), material);
-		scene.add(mesh);
-		var camera = new CubeCamera(1, 10, 1);
+		var mesh = new Mesh( new BoxBufferGeometry( 5, 5, 5 ), material );
+		scene.add( mesh );
+		var camera = new CubeCamera( 1, 10, 1 );
 		camera.renderTarget = this;
 		camera.renderTarget.texture.name = 'CubeCameraTexture';
-		camera.update(renderer, scene);
+		camera.update( renderer, scene );
 		mesh.geometry.dispose();
 		mesh.material.dispose();
 		return this;
+
 	}
+
 }
 
 WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;

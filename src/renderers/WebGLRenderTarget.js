@@ -16,20 +16,21 @@ import { Vector4 } from '../math/Vector4.js';
 
 class WebGLRenderTarget extends EventDispatcher {
 
-	constructor(width, height, options) {
-		super()
+	constructor( width, height, options ) {
+
+		super();
 
 		this.width = width;
 		this.height = height;
 
-		this.scissor = new Vector4(0, 0, width, height);
+		this.scissor = new Vector4( 0, 0, width, height );
 		this.scissorTest = false;
 
-		this.viewport = new Vector4(0, 0, width, height);
+		this.viewport = new Vector4( 0, 0, width, height );
 
 		options = options || {};
 
-		this.texture = new Texture(undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding);
+		this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 		this.texture.image = {};
 		this.texture.image.width = width;
 		this.texture.image.height = height;
@@ -91,6 +92,7 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.dispatchEvent( { type: 'dispose' } );
 
 	}
+
 }
 
 WebGLRenderTarget.prototype.isWebGLRenderTarget = true;

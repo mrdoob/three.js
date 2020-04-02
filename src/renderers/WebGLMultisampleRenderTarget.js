@@ -6,9 +6,12 @@ import { WebGLRenderTarget } from './WebGLRenderTarget.js';
  */
 
 class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
-	constructor(width, height, options) {
-		super(width, height, options);
+
+	constructor( width, height, options ) {
+
+		super( width, height, options );
 		this.samples = 4;
+
 	}
 
 	copy( source ) {
@@ -20,6 +23,7 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 		return this;
 
 	}
+
 }
 
 WebGLMultisampleRenderTarget.prototype.isWebGLMultisampleRenderTarget = true;
