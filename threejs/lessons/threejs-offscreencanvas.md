@@ -1125,8 +1125,8 @@ They also also add `mousemove` and `mouseup` events to the `document`
 to handle mouse capture (when the mouse goes outside the window) but
 like `window` there is no `document` in a worker.
 
-Further the compare `document` to the element we pass into `OrbitControls`
-and expect them to not be equal.
+Further the code compares `document` to the element we pass into `OrbitControls`
+and expects them to not be equal.
 
 We can solve all of these with a few quick hacks. In our worker
 code we'll re-use our proxy for all 3 problems.
@@ -1153,7 +1153,7 @@ I know that was kind of hard to follow. The short version is:
 `ElementProxy` runs on the main page and forwards DOM events 
 to `ElementProxyReceiver` in the worker which
 masquerades as an `HTMLElement` that we can use both with the
-`OrbitControls` and with our own.
+`OrbitControls` and with our own code.
 
 The final thing is our fallback when we are not using OffscreenCanvas.
 All we have to do is pass the canvas itself as our `inputElement`.
