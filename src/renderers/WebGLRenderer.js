@@ -748,6 +748,12 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		if ( object.isInstancedMesh === true ) {
+
+			updateBuffers = true;
+
+		}
+
 		//
 
 		var index = geometry.index;
