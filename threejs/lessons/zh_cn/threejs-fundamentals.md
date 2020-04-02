@@ -16,7 +16,7 @@ Three.js经常会和WebGL混淆，
 用到ES6的语法。[点击这里查看你需要提前掌握的东西](threejs-prerequisites.html)。 
 大部分支持Three.js的浏览器都会自动更新，所以部分用户应该都能运行本套教程的代码。
 如果你想在非常老的浏览器上运行此代码，
-你需要一个像[Babel](http://babel.io)一样的语法编译器 。
+你需要一个像[Babel](http://babeljs.io)一样的语法编译器 。
 当然使用非常老的浏览器的用户可能根本不能运行Three.js。
 
 人们在学习大多数编程语言的时候第一件事就是让电脑打印`"Hello World!"`。
@@ -35,7 +35,7 @@ Three.js将会使用这个canvas标签所以我们要先获取它然后传给thr
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r114/build/three.module.js';
+import * as THREE from './resources/threejs/r115/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');

@@ -19,7 +19,7 @@ most part they will use ES6 style. [See here for a
 terse list of things you're expected to already know](threejs-prerequisites.html).
 Most browsers that support three.js are auto-updated so most users should
 be able to run this code. If you'd like to make this code run
-on really old browsers look into a transpiler like [Babel](https://babel.io).
+on really old browsers look into a transpiler like [Babel](https://babeljs.io).
 Of course users running really old browsers probably have machines
 that can't run three.js.
 
@@ -96,7 +96,7 @@ First let's load three.js
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r114/build/three.module.js';
+import * as THREE from './resources/threejs/r115/build/three.module.js';
 </script>
 ```
 
@@ -119,7 +119,7 @@ We will ask three.js to draw into that canvas so we need to look it up.
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r114/build/three.module.js';
+import * as THREE from './resources/threejs/r115/build/three.module.js';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -416,7 +416,7 @@ both
 </p>
 <pre class=prettyprint>
 &lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r114/build/three.module.js';
+import * as THREE from './resources/threejs/r115/build/three.module.js';
 
 ...
 

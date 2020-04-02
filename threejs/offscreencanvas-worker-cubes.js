@@ -2,7 +2,7 @@
 
 /* global importScripts, init, state */
 
-importScripts('resources/threejs/r114/build/three.min.js');
+importScripts('resources/threejs/r115/build/three.min.js');
 importScripts('shared-cubes.js');
 
 function size(data) {

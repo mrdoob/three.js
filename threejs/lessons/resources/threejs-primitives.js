@@ -1,4 +1,4 @@
-import * as THREE from '../../resources/threejs/r114/build/three.module.js';
+import * as THREE from '../../resources/threejs/r115/build/three.module.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
@@ -15,7 +15,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
   const fontLoader = new THREE.FontLoader();
   const fontPromise = new Promise((resolve) => {
-    fontLoader.load('../resources/threejs/fonts/helvetiker_regular.typeface.json', resolve);
+    fontLoader.load('/threejs/resources/threejs/fonts/helvetiker_regular.typeface.json', resolve);
   });
 
   const diagrams = {
