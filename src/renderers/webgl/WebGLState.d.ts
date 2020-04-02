@@ -56,6 +56,7 @@ export class WebGLState {
 	enableAttribute( attribute: number ): void;
 	enableAttributeAndDivisor( attribute: number, meshPerAttribute: number ): void;
 	disableUnusedAttributes(): void;
+	vertexAttribPointer( index: number, size: number, type: number, normalized: boolean, stride: number, offset: number ): void;
 	enable( id: number ): void;
 	disable( id: number ): void;
 	useProgram( program: any ): boolean;
