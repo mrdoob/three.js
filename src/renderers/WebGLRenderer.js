@@ -993,8 +993,8 @@ class WebGLRenderer {
 		}
 		//
 		scene.onBeforeRender( this, scene, camera, renderTarget || this._currentRenderTarget );
-    
-    this.currentRenderState = this.renderStates.get( scene, camera );
+
+		this.currentRenderState = this.renderStates.get( scene, camera );
 		this.currentRenderState.init();
 
 		this._projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
