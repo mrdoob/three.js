@@ -67,7 +67,7 @@ class WebGLRenderer {
 		this.currentRenderList = null;
 		this.currentRenderState = null;
 
-		// public this.properties
+		// public properties
 		this.domElement = this._canvas;
 
 		// Debug configuration container
@@ -108,7 +108,7 @@ class WebGLRenderer {
 		this.maxMorphTargets = 8;
 		this.maxMorphNormals = 4;
 
-		// internal this.properties
+		// internal properties
 		this._isContextLost = false;
 
 		// internal this.state cache
@@ -202,19 +202,6 @@ class WebGLRenderer {
 			throw error;
 
 		}
-
-		// var extensions, capabilities, state, info;
-		// var properties, textures, attributes, geometries, objects;
-		// var programCache, renderLists, renderStates;
-		// var background, morphtargets, bufferRenderer, indexedBufferRenderer;
-		// var utils;
-
-		// this.capabilities = capabilities;
-		// this.extensions = extensions;
-		// this.properties = properties;
-		// this.renderLists = renderLists;
-		// this.state = state;
-		// this.info = info;
 
 		this.extensions = new WebGLExtensions( this._gl );
 		this.capabilities = new WebGLCapabilities( this._gl, this.extensions, parameters );
@@ -925,7 +912,7 @@ class WebGLRenderer {
 
 						if ( object.material[ i ].uuid in compiled === false ) {
 
-							this.initMaterial( object.material[ i ], scene, object );
+							WebGLRenderer.initMaterial( object.material[ i ], scene, object, this );
 							compiled[ object.material[ i ].uuid ] = true;
 
 						}
@@ -934,7 +921,7 @@ class WebGLRenderer {
 
 				} else if ( object.material.uuid in compiled === false ) {
 
-					this.initMaterial( object.material, scene, object );
+					WebGLRenderer.initMaterial( object.material, scene, object, this );
 					compiled[ object.material.uuid ] = true;
 
 				}
@@ -1266,26 +1253,25 @@ class WebGLRenderer {
 
 	}
 
-	initMaterial( material, scene, object ) {
+	static initMaterial( material, scene, object, instance ) {
 
-		// TODO (DefinitelyMaybe): This function is depreciated and may be overwritten
-		var materialProperties = this.properties.get( material );
-		var lights = this.currentRenderState.state.lights;
-		var shadowsArray = this.currentRenderState.state.shadowsArray;
+		var materialProperties = instance.properties.get( material );
+		var lights = instance.currentRenderState.state.lights;
+		var shadowsArray = instance.currentRenderState.state.shadowsArray;
 		var lightsStateVersion = lights.state.version;
-		var parameters = this.programCache.getParameters( material, lights.state, shadowsArray, scene, this._clipping.numPlanes, this._clipping.numIntersection, object );
-		var programCacheKey = this.programCache.getProgramCacheKey( parameters );
+		var parameters = instance.programCache.getParameters( material, lights.state, shadowsArray, scene, instance._clipping.numPlanes, instance._clipping.numIntersection, object );
+		var programCacheKey = instance.programCache.getProgramCacheKey( parameters );
 		var program = materialProperties.program;
 		var programChange = true;
 		if ( program === undefined ) {
 
 			// new material
-			material.addEventListener( 'dispose', this.onMaterialDispose );
+			material.addEventListener( 'dispose', instance.onMaterialDispose );
 
 		} else if ( program.cacheKey !== programCacheKey ) {
 
 			// changed glsl or parameters
-			this.releaseMaterialProgramReference( material );
+			instance.releaseMaterialProgramReference( material );
 
 		} else if ( materialProperties.lightsStateVersion !== lightsStateVersion ) {
 
@@ -1305,11 +1291,11 @@ class WebGLRenderer {
 		}
 		if ( programChange ) {
 
-			program = this.programCache.acquireProgram( parameters, programCacheKey );
+			program = instance.programCache.acquireProgram( parameters, programCacheKey );
 			materialProperties.program = program;
 			materialProperties.uniforms = parameters.uniforms;
 			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
-			materialProperties.outputEncoding = this.outputEncoding;
+			materialProperties.outputEncoding = instance.outputEncoding;
 			material.program = program;
 
 		}
@@ -1317,7 +1303,7 @@ class WebGLRenderer {
 		if ( material.morphTargets ) {
 
 			material.numSupportedMorphTargets = 0;
-			for ( var i = 0; i < this.maxMorphTargets; i ++ ) {
+			for ( var i = 0; i < instance.maxMorphTargets; i ++ ) {
 
 				if ( programAttributes[ 'morphTarget' + i ] >= 0 ) {
 
@@ -1331,7 +1317,7 @@ class WebGLRenderer {
 		if ( material.morphNormals ) {
 
 			material.numSupportedMorphNormals = 0;
-			for ( var i = 0; i < this.maxMorphNormals; i ++ ) {
+			for ( var i = 0; i < instance.maxMorphNormals; i ++ ) {
 
 				if ( programAttributes[ 'morphNormal' + i ] >= 0 ) {
 
@@ -1347,18 +1333,18 @@ class WebGLRenderer {
 			! material.isRawShaderMaterial ||
 			material.clipping === true ) {
 
-			materialProperties.numClippingPlanes = this._clipping.numPlanes;
-			materialProperties.numIntersection = this._clipping.numIntersection;
-			uniforms.clippingPlanes = this._clipping.uniform;
+			materialProperties.numClippingPlanes = instance._clipping.numPlanes;
+			materialProperties.numIntersection = instance._clipping.numIntersection;
+			uniforms.clippingPlanes = instance._clipping.uniform;
 
 		}
 		materialProperties.fog = scene.fog;
 		// store the light setup it was created for
-		materialProperties.needsLights = this.materialNeedsLights( material );
+		materialProperties.needsLights = instance.materialNeedsLights( material );
 		materialProperties.lightsStateVersion = lightsStateVersion;
 		if ( materialProperties.needsLights ) {
 
-			// wire up the material to this renderer's lighting this.state
+			// wire up the material to this renderer's lighting state
 			uniforms.ambientLightColor.value = lights.state.ambient;
 			uniforms.lightProbe.value = lights.state.probe;
 			uniforms.directionalLights.value = lights.state.directional;
@@ -1375,7 +1361,7 @@ class WebGLRenderer {
 			uniforms.spotShadowMatrix.value = lights.state.spotShadowMatrix;
 			uniforms.pointShadowMap.value = lights.state.pointShadowMap;
 			uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix;
-			// TODO (abelnation): add area lights shadow this.info to uniforms
+			// TODO (abelnation): add area lights shadow info to uniforms
 
 		}
 		var progUniforms = materialProperties.program.getUniforms(),
@@ -1385,8 +1371,6 @@ class WebGLRenderer {
 	}
 
 	setProgram( camera, scene, material, object ) {
-
-		// TODO (DefinitelyMaybe): initMaterial is depreciated. what should take its place here?
 
 		this.textures.resetTextureUnits();
 		var fog = scene.fog;
@@ -1413,35 +1397,35 @@ class WebGLRenderer {
 
 			if ( materialProperties.program === undefined ) {
 
-				this.initMaterial( material, scene, object );
+				WebGLRenderer.initMaterial( material, scene, object, this );
 
 			} else if ( material.fog && materialProperties.fog !== fog ) {
 
-				this.initMaterial( material, scene, object );
+				WebGLRenderer.initMaterial( material, scene, object, this );
 
 			} else if ( materialProperties.environment !== environment ) {
 
-				this.initMaterial( material, scene, object );
+				WebGLRenderer.initMaterial( material, scene, object, this );
 
 			} else if ( materialProperties.needsLights && ( materialProperties.lightsStateVersion !== lights.state.version ) ) {
 
-				this.initMaterial( material, scene, object );
+				WebGLRenderer.initMaterial( material, scene, object, this );
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
 				( materialProperties.numClippingPlanes !== this._clipping.numPlanes ||
 					materialProperties.numIntersection !== this._clipping.numIntersection ) ) {
 
-				this.initMaterial( material, scene, object );
+				WebGLRenderer.initMaterial( material, scene, object, this );
 
 			} else if ( materialProperties.outputEncoding !== this.outputEncoding ) {
 
-				this.initMaterial( material, scene, object );
+				WebGLRenderer.initMaterial( material, scene, object, this );
 
 			}
 
 		} else {
 
-			this.initMaterial( material, scene, object );
+			WebGLRenderer.initMaterial( material, scene, object, this );
 			materialProperties.__version = material.version;
 
 		}
@@ -1451,8 +1435,6 @@ class WebGLRenderer {
 
 		var program = materialProperties.program;
 
-		// TODO (DefinitelyMaybe): errors out on p_uniforms = program.getUniforms() => program is undefined
-		
 		var p_uniforms = program.getUniforms();
 		var m_uniforms = materialProperties.uniforms;
 		if ( this.state.useProgram( program.program ) ) {
