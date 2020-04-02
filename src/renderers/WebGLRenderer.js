@@ -992,13 +992,12 @@ class WebGLRenderer {
 
 		}
 		//
-		this.currentRenderState = this.renderStates.get( scene, camera );
+		scene.onBeforeRender( this, scene, camera, renderTarget || this._currentRenderTarget );
+    
+    this.currentRenderState = this.renderStates.get( scene, camera );
 		this.currentRenderState.init();
 
-		scene.onBeforeRender( this, scene, camera, renderTarget || this._currentRenderTarget );
-
 		this._projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-
 		this._frustum.setFromProjectionMatrix( this._projScreenMatrix );
 
 		this._localClippingEnabled = this.localClippingEnabled;
