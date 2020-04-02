@@ -42,15 +42,19 @@ import { WebGLRenderTarget } from "../renderers/WebGLRenderTarget.js";
 var LOD_MIN = 4;
 var LOD_MAX = 8;
 var SIZE_MAX = Math.pow( 2, LOD_MAX );
+
 // The standard deviations (radians) associated with the extra mips. These are
 // chosen to approximate a Trowbridge-Reitz distribution function times the
 // geometric shadowing function. These sigma values squared must match the
 // variance #defines in cube_uv_reflection_fragment.glsl.js.
 var EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
+
 var TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
+
 // The maximum length of the blur for loop. Smaller sigmas will use fewer
 // samples and exit early, but not recompile the shader.
 var MAX_SAMPLES = 20;
+
 var ENCODINGS = {
 	[ LinearEncoding ]: 0,
 	[ sRGBEncoding ]: 1,
@@ -68,6 +72,7 @@ var _oldTarget = null;
 // Golden Ratio
 var PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
 var INV_PHI = 1 / PHI;
+
 // Vertices of a dodecahedron (except the opposites, which represent the
 // same axis), used as axis directions evenly spread on a sphere.
 var _axisDirections = [
@@ -117,6 +122,7 @@ PMREMGenerator.prototype = {
 			this._blur( cubeUVRenderTarget, 0, 0, sigma );
 
 		}
+
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
 
@@ -230,6 +236,7 @@ PMREMGenerator.prototype = {
 			depthBuffer: false,
 			stencilBuffer: false
 		};
+
 		var cubeUVRenderTarget = _createRenderTarget( params );
 		cubeUVRenderTarget.depthBuffer = equirectangular ? false : true;
 		this._pingPongRenderTarget = _createRenderTarget( params );
@@ -298,6 +305,7 @@ PMREMGenerator.prototype = {
 				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
+
 			_setViewport( cubeUVRenderTarget,
 				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
 			renderer.setRenderTarget( cubeUVRenderTarget );
@@ -338,18 +346,22 @@ PMREMGenerator.prototype = {
 
 		var material = texture.isCubeTexture ? this._cubemapShader : this._equirectShader;
 		scene.add( new Mesh( _lodPlanes[ 0 ], material ) );
+
 		var uniforms = material.uniforms;
 
 		uniforms[ 'envMap' ].value = texture;
+
 		if ( ! texture.isCubeTexture ) {
 
 			uniforms[ 'texelSize' ].value.set( 1.0 / texture.image.width, 1.0 / texture.image.height );
 
 		}
+
 		uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
 		uniforms[ 'outputEncoding' ].value = ENCODINGS[ texture.encoding ];
 
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
+
 		renderer.setRenderTarget( cubeUVRenderTarget );
 		renderer.render( scene, _flatCamera );
 
@@ -363,11 +375,10 @@ PMREMGenerator.prototype = {
 
 		for ( var i = 1; i < TOTAL_LODS; i ++ ) {
 
-			var sigma = Math.sqrt(
-				_sigmas[ i ] * _sigmas[ i ] -
-			_sigmas[ i - 1 ] * _sigmas[ i - 1 ] );
-			var poleAxis =
-			_axisDirections[ ( i - 1 ) % _axisDirections.length ];
+			var sigma = Math.sqrt( _sigmas[ i ] * _sigmas[ i ] - _sigmas[ i - 1 ] * _sigmas[ i - 1 ] );
+
+			var poleAxis = _axisDirections[ ( i - 1 ) % _axisDirections.length ];
+
 			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
 
 		}
@@ -470,11 +481,13 @@ PMREMGenerator.prototype = {
 		blurUniforms[ 'samples' ].value = samples;
 		blurUniforms[ 'weights' ].value = weights;
 		blurUniforms[ 'latitudinal' ].value = direction === 'latitudinal';
+
 		if ( poleAxis ) {
 
 			blurUniforms[ 'poleAxis' ].value = poleAxis;
 
 		}
+
 		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
 		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
 		blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
@@ -482,9 +495,7 @@ PMREMGenerator.prototype = {
 
 		var outputSize = _sizeLods[ lodOut ];
 		var x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
-		var y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) +
-		2 * outputSize *
-			( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
+		var y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) + 2 * outputSize * ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
 
 		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
 		renderer.setRenderTarget( targetOut );
@@ -501,11 +512,13 @@ function _createPlanes() {
 	var _sigmas = [];
 
 	var lod = LOD_MAX;
+
 	for ( var i = 0; i < TOTAL_LODS; i ++ ) {
 
 		var sizeLod = Math.pow( 2, lod );
 		_sizeLods.push( sizeLod );
 		var sigma = 1.0 / sizeLod;
+
 		if ( i > LOD_MAX - LOD_MIN ) {
 
 			sigma = EXTRA_LOD_SIGMA[ i - LOD_MAX + LOD_MIN - 1 ];
@@ -515,6 +528,7 @@ function _createPlanes() {
 			sigma = 0;
 
 		}
+
 		_sigmas.push( sigma );
 
 		var texelSize = 1.0 / ( sizeLod - 1 );
@@ -550,6 +564,7 @@ function _createPlanes() {
 			faceIndex.set( fill, faceIndexSize * vertices * face );
 
 		}
+
 		var planes = new BufferGeometry();
 		planes.setAttribute( 'position', new BufferAttribute( position, positionSize ) );
 		planes.setAttribute( 'uv', new BufferAttribute( uv, uvSize ) );
