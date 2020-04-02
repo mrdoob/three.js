@@ -462,6 +462,20 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
+
+		if ( isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT ) ) {
+
+			gl.vertexAttribIPointer( index, size, type, normalized, stride, offset );
+
+		} else {
+
+			gl.vertexAttribPointer( index, size, type, normalized, stride, offset );
+
+		}
+
+	}
+
 	function enable( id ) {
 
 		if ( enabledCapabilities[ id ] !== true ) {
@@ -980,6 +994,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		enableAttribute: enableAttribute,
 		enableAttributeAndDivisor: enableAttributeAndDivisor,
 		disableUnusedAttributes: disableUnusedAttributes,
+		vertexAttribPointer: vertexAttribPointer,
 		enable: enable,
 		disable: disable,
 
