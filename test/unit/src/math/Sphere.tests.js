@@ -108,13 +108,21 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "empty", ( assert ) => {
+		QUnit.test( "isEmpty", ( assert ) => {
 
 			var a = new Sphere();
-			assert.ok( a.empty(), "Passed!" );
+			assert.ok( a.isEmpty(), "Passed!" );
 
 			a.set( one3, 1 );
-			assert.ok( ! a.empty(), "Passed!" );
+			assert.ok( ! a.isEmpty(), "Passed!" );
+
+			// Negative radius contains no points
+			a.set( one3, -1 );
+			assert.ok( a.isEmpty(), "Passed!" );
+
+			// Zero radius contains only the center point
+			a.set( one3, 0 );
+			assert.ok( ! a.isEmpty(), "Passed!" );
 
 		} );
 
@@ -122,8 +130,10 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Sphere( one3.clone(), 1 );
 
+			assert.ok( ! a.isEmpty(), "Passed!" );
+
 			a.makeEmpty();
-			assert.ok( a.empty(), "Passed!" );
+			assert.ok( a.isEmpty(), "Passed!" );
 			assert.ok( a.center.equals( zero3 ), "Passed!" );
 
 		} );
@@ -134,6 +144,12 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.ok( ! a.containsPoint( zero3 ), "Passed!" );
 			assert.ok( a.containsPoint( one3 ), "Passed!" );
+
+			a.set( zero3, 0 );
+			assert.ok( a.containsPoint( a.center ), "Passed!" );
+
+			a.makeEmpty();
+			assert.ok( !a.containsPoint( a.center ), "Passed" );
 
 		} );
 
@@ -155,16 +171,22 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.intersectsSphere( b ), "Passed!" );
 			assert.ok( ! a.intersectsSphere( c ), "Passed!" );
 
+			a.makeEmpty();
+			assert.ok( !a.intersectsSphere( a ), "Passed!" );
+
 		} );
 
 		QUnit.test( "intersectsBox", ( assert ) => {
 
-			var a = new Sphere();
-			var b = new Sphere( new Vector3( - 5, - 5, - 5 ) );
+			var a = new Sphere( zero3, 1 );
+			var b = new Sphere( new Vector3( - 5, - 5, - 5 ), 1 );
 			var box = new Box3( zero3, one3 );
 
-			assert.strictEqual( a.intersectsBox( box ), true, "Check default sphere" );
+			assert.strictEqual( a.intersectsBox( box ), true, "Check unit sphere" );
 			assert.strictEqual( b.intersectsBox( box ), false, "Check shifted sphere" );
+
+			a.makeEmpty();
+			assert.strictEqual( a.intersectsBox( box ), false , "Check empty sphere");
 
 		} );
 
@@ -178,6 +200,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.intersectsPlane( b ), "Passed!" );
 			assert.ok( ! a.intersectsPlane( c ), "Passed!" );
 			assert.ok( ! a.intersectsPlane( d ), "Passed!" );
+
+			a.makeEmpty();
+			assert.ok( ! a.intersectsPlane( b ), "Passed!" );
 
 		} );
 
@@ -204,6 +229,11 @@ export default QUnit.module( 'Maths', () => {
 			a.set( zero3, 0 );
 			a.getBoundingBox( aabb );
 			assert.ok( aabb.equals( new Box3( zero3, zero3 ) ), "Passed!" );
+
+			// Empty sphere produces empty bounding box
+			a.makeEmpty();
+			a.getBoundingBox( aabb );
+			assert.ok( aabb.isEmpty(), "Passed!" );
 
 		} );
 

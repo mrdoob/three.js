@@ -325,6 +325,12 @@ Object.assign( Box3.prototype, {
 
 	intersectsSphere: function ( sphere ) {
 
+		if( sphere.isEmpty() ) {
+
+			return false;
+
+		}
+
 		// Find the point on the AABB closest to the sphere center.
 		this.clampPoint( sphere.center, _vector );
 

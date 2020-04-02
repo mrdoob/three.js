@@ -542,6 +542,17 @@ Object.assign( Box3.prototype, {
 	}
 } );
 
+Object.assign( Sphere.prototype, {
+
+	empty: function() {
+
+		console.warn( 'THREE.Sphere: .empty() has been renamed to .isEmpty().' );
+		return this.isEmpty();
+
+	},
+
+} );
+
 Frustum.prototype.setFromMatrix = function ( m ) {
 
 	console.warn( 'THREE.Frustum: .setFromMatrix() has been renamed to .setFromProjectionMatrix().' );
