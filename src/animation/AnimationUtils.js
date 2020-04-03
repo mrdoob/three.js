@@ -244,22 +244,22 @@ var AnimationUtils = {
 
 		}
 
-		const numTracks = targetClip.tracks.length;
+		var numTracks = targetClip.tracks.length;
 
 		fps = fps > 0 ? fps : 30;
-		const referenceTime = referenceFrame / fps;
+		var referenceTime = referenceFrame / fps;
 
 		// Make each track's values relative to the values at the reference frame
-		for ( let i = 0; i < numTracks; ++ i ) {
+		for ( var i = 0; i < numTracks; ++ i ) {
 
-			const referenceTrack = referenceClip.tracks[ i ];
-			const referenceTrackType = referenceTrack.ValueTypeName;
+			var referenceTrack = referenceClip.tracks[ i ];
+			var referenceTrackType = referenceTrack.ValueTypeName;
 
 			// Skip this track if it's non-numeric
 			if ( referenceTrackType === 'bool' || referenceTrackType === 'string' ) continue;
 
 			// Find the track in the target clip whose name and type matches the reference track
-			const targetTrack = targetClip.tracks.find( track => {
+			var targetTrack = targetClip.tracks.find( track => {
 
 				return track.name === referenceTrack.name
 				&& track.ValueTypeName === referenceTrackType;
@@ -268,9 +268,9 @@ var AnimationUtils = {
 
 			if ( targetTrack === undefined ) continue;
 
-			const valueSize = referenceTrack.getValueSize();
-			const lastIndex = referenceTrack.times.length - 1;
-			let referenceValue;
+			var valueSize = referenceTrack.getValueSize();
+			var lastIndex = referenceTrack.times.length - 1;
+			var referenceValue;
 
 			// Find the value to subtract out of the track
 			if ( referenceTime <= referenceTrack.times[ 0 ] ) {
@@ -281,13 +281,13 @@ var AnimationUtils = {
 			} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
 
 				// Reference frame is after the last keyframe, so just use the last keyframe
-				const startIndex = lastIndex * valueSize;
+				var startIndex = lastIndex * valueSize;
 				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex );
 
 			} else {
 
 				// Interpolate to the reference value
-				const interpolant = referenceTrack.createInterpolant();
+				var interpolant = referenceTrack.createInterpolant();
 				interpolant.evaluate( referenceTime );
 				referenceValue = interpolant.resultBuffer;
 
@@ -296,7 +296,7 @@ var AnimationUtils = {
 			// Conjugate the quaternion
 			if ( referenceTrackType === 'quaternion' ) {
 
-				const referenceQuat = new Quaternion(
+				var referenceQuat = new Quaternion(
 					referenceValue[ 0 ],
 					referenceValue[ 1 ],
 					referenceValue[ 2 ],
@@ -308,10 +308,10 @@ var AnimationUtils = {
 
 			// Subtract the reference value from all of the track values
 
-			const numTimes = targetTrack.times.length;
-			for ( let j = 0; j < numTimes; ++ j ) {
+			var numTimes = targetTrack.times.length;
+			for ( var j = 0; j < numTimes; ++ j ) {
 
-				const valueStart = j * valueSize;
+				var valueStart = j * valueSize;
 
 				if ( referenceTrackType === 'quaternion' ) {
 
@@ -328,7 +328,7 @@ var AnimationUtils = {
 				} else {
 
 					// Subtract each value for all other numeric track types
-					for ( let k = 0; k < valueSize; ++ k ) {
+					for ( var k = 0; k < valueSize; ++ k ) {
 
 						targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
 

@@ -17,12 +17,12 @@ import { NormalAnimationBlendMode } from '../constants.js';
  * @author David Sarno / http://lighthaus.us/
  */
 
-function AnimationClip( name, duration, tracks, blendMode = NormalAnimationBlendMode ) {
+function AnimationClip( name, duration, tracks, blendMode ) {
 
 	this.name = name;
 	this.tracks = tracks;
 	this.duration = ( duration !== undefined ) ? duration : - 1;
-	this.blendMode = blendMode;
+	this.blendMode = blendMode || NormalAnimationBlendMode;
 
 	this.uuid = MathUtils.generateUUID();
 
