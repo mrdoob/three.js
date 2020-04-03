@@ -14800,7 +14800,7 @@ var lightmap_fragment = "#ifdef USE_LIGHTMAP\n\tvec4 lightMapTexel= texture2D( l
 
 var lightmap_pars_fragment = "#ifdef USE_LIGHTMAP\n\tuniform sampler2D lightMap;\n\tuniform float lightMapIntensity;\n#endif";
 
-var lights_lambert_vertex = "vec3 diffuse = vec3( 1.0 );\nGeometricContext geometry;\ngeometry.position = mvPosition.xyz;\ngeometry.normal = normalize( transformedNormal );\ngeometry.viewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( -mvPosition.xyz );\nGeometricContext backGeometry;\nbackGeometry.position = geometry.position;\nbackGeometry.normal = -geometry.normal;\nbackGeometry.viewDir = geometry.viewDir;\nvLightFront = vec3( 0.0 );\nvIndirectFront = vec3( 0.0 );\n#ifdef DOUBLE_SIDED\n\tvLightBack = vec3( 0.0 );\n\tvIndirectBack = vec3( 0.0 );\n#endif\nIncidentLight directLight;\nfloat dotNL;\nvec3 directLightColor_Diffuse;\n#if NUM_POINT_LIGHTS > 0\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n\t\tgetPointDirectLightIrradiance( pointLights[ i ], geometry, directLight );\n\t\tdotNL = dot( geometry.normal, directLight.direction );\n\t\tdirectLightColor_Diffuse = PI * directLight.color;\n\t\tvLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tvLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n\t\t#endif\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if NUM_SPOT_LIGHTS > 0\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n\t\tgetSpotDirectLightIrradiance( spotLights[ i ], geometry, directLight );\n\t\tdotNL = dot( geometry.normal, directLight.direction );\n\t\tdirectLightColor_Diffuse = PI * directLight.color;\n\t\tvLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tvLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n\t\t#endif\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if NUM_DIR_LIGHTS > 0\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n\t\tgetDirectionalDirectLightIrradiance( directionalLights[ i ], geometry, directLight );\n\t\tdotNL = dot( geometry.normal, directLight.direction );\n\t\tdirectLightColor_Diffuse = PI * directLight.color;\n\t\tvLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tvLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n\t\t#endif\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if NUM_HEMI_LIGHTS > 0\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n\t\tvIndirectFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tvIndirectBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );\n\t\t#endif\n\t}\n\t#pragma unroll_loop_end\n#endif";
+var lights_lambert_vertex = "vec3 diffuse = vec3( 1.0 );\nGeometricContext geometry;\ngeometry.position = mvPosition.xyz;\ngeometry.normal = normalize( transformedNormal );\ngeometry.viewDir = ( isOrthographic ) ? vec3( 0, 0, 1 ) : normalize( -mvPosition.xyz );\nGeometricContext backGeometry;\nbackGeometry.position = geometry.position;\nbackGeometry.normal = -geometry.normal;\nbackGeometry.viewDir = geometry.viewDir;\nvLightFront = vec3( 0.0 );\nvIndirectFront = vec3( 0.0 );\n#ifdef DOUBLE_SIDED\n\tvLightBack = vec3( 0.0 );\n\tvIndirectBack = vec3( 0.0 );\n#endif\nIncidentLight directLight;\nfloat dotNL;\nvec3 directLightColor_Diffuse;\nvIndirectFront += getAmbientLightIrradiance( ambientLightColor );\nvIndirectFront += getLightProbeIrradiance( lightProbe, geometry );\n#ifdef DOUBLE_SIDED\n\tvIndirectBack += getAmbientLightIrradiance( ambientLightColor );\n\tvIndirectBack += getLightProbeIrradiance( lightProbe, backGeometry );\n#endif\n#if NUM_POINT_LIGHTS > 0\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {\n\t\tgetPointDirectLightIrradiance( pointLights[ i ], geometry, directLight );\n\t\tdotNL = dot( geometry.normal, directLight.direction );\n\t\tdirectLightColor_Diffuse = PI * directLight.color;\n\t\tvLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tvLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n\t\t#endif\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if NUM_SPOT_LIGHTS > 0\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_SPOT_LIGHTS; i ++ ) {\n\t\tgetSpotDirectLightIrradiance( spotLights[ i ], geometry, directLight );\n\t\tdotNL = dot( geometry.normal, directLight.direction );\n\t\tdirectLightColor_Diffuse = PI * directLight.color;\n\t\tvLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tvLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n\t\t#endif\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if NUM_DIR_LIGHTS > 0\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {\n\t\tgetDirectionalDirectLightIrradiance( directionalLights[ i ], geometry, directLight );\n\t\tdotNL = dot( geometry.normal, directLight.direction );\n\t\tdirectLightColor_Diffuse = PI * directLight.color;\n\t\tvLightFront += saturate( dotNL ) * directLightColor_Diffuse;\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tvLightBack += saturate( -dotNL ) * directLightColor_Diffuse;\n\t\t#endif\n\t}\n\t#pragma unroll_loop_end\n#endif\n#if NUM_HEMI_LIGHTS > 0\n\t#pragma unroll_loop_start\n\tfor ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {\n\t\tvIndirectFront += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );\n\t\t#ifdef DOUBLE_SIDED\n\t\t\tvIndirectBack += getHemisphereLightIrradiance( hemisphereLights[ i ], backGeometry );\n\t\t#endif\n\t}\n\t#pragma unroll_loop_end\n#endif";
 
 var lights_pars_begin = "uniform bool receiveShadow;\nuniform vec3 ambientLightColor;\nuniform vec3 lightProbe[ 9 ];\nvec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {\n\tfloat x = normal.x, y = normal.y, z = normal.z;\n\tvec3 result = shCoefficients[ 0 ] * 0.886227;\n\tresult += shCoefficients[ 1 ] * 2.0 * 0.511664 * y;\n\tresult += shCoefficients[ 2 ] * 2.0 * 0.511664 * z;\n\tresult += shCoefficients[ 3 ] * 2.0 * 0.511664 * x;\n\tresult += shCoefficients[ 4 ] * 2.0 * 0.429043 * x * y;\n\tresult += shCoefficients[ 5 ] * 2.0 * 0.429043 * y * z;\n\tresult += shCoefficients[ 6 ] * ( 0.743125 * z * z - 0.247708 );\n\tresult += shCoefficients[ 7 ] * 2.0 * 0.429043 * x * z;\n\tresult += shCoefficients[ 8 ] * 0.429043 * ( x * x - y * y );\n\treturn result;\n}\nvec3 getLightProbeIrradiance( const in vec3 lightProbe[ 9 ], const in GeometricContext geometry ) {\n\tvec3 worldNormal = inverseTransformDirection( geometry.normal, viewMatrix );\n\tvec3 irradiance = shGetIrradianceAt( worldNormal, lightProbe );\n\treturn irradiance;\n}\nvec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {\n\tvec3 irradiance = ambientLightColor;\n\t#ifndef PHYSICALLY_CORRECT_LIGHTS\n\t\tirradiance *= PI;\n\t#endif\n\treturn irradiance;\n}\n#if NUM_DIR_LIGHTS > 0\n\tstruct DirectionalLight {\n\t\tvec3 direction;\n\t\tvec3 color;\n\t};\n\tuniform DirectionalLight directionalLights[ NUM_DIR_LIGHTS ];\n\t#if defined( USE_SHADOWMAP ) && NUM_DIR_LIGHT_SHADOWS > 0\n\t\tstruct DirectionalLightShadow {\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];\n\t#endif\n\tvoid getDirectionalDirectLightIrradiance( const in DirectionalLight directionalLight, const in GeometricContext geometry, out IncidentLight directLight ) {\n\t\tdirectLight.color = directionalLight.color;\n\t\tdirectLight.direction = directionalLight.direction;\n\t\tdirectLight.visible = true;\n\t}\n#endif\n#if NUM_POINT_LIGHTS > 0\n\tstruct PointLight {\n\t\tvec3 position;\n\t\tvec3 color;\n\t\tfloat distance;\n\t\tfloat decay;\n\t};\n\tuniform PointLight pointLights[ NUM_POINT_LIGHTS ];\n\t#if defined( USE_SHADOWMAP ) && NUM_POINT_LIGHT_SHADOWS > 0\n\t\tstruct PointLightShadow {\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t\tfloat shadowCameraNear;\n\t\t\tfloat shadowCameraFar;\n\t\t};\n\t\tuniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];\n\t#endif\n\tvoid getPointDirectLightIrradiance( const in PointLight pointLight, const in GeometricContext geometry, out IncidentLight directLight ) {\n\t\tvec3 lVector = pointLight.position - geometry.position;\n\t\tdirectLight.direction = normalize( lVector );\n\t\tfloat lightDistance = length( lVector );\n\t\tdirectLight.color = pointLight.color;\n\t\tdirectLight.color *= punctualLightIntensityToIrradianceFactor( lightDistance, pointLight.distance, pointLight.decay );\n\t\tdirectLight.visible = ( directLight.color != vec3( 0.0 ) );\n\t}\n#endif\n#if NUM_SPOT_LIGHTS > 0\n\tstruct SpotLight {\n\t\tvec3 position;\n\t\tvec3 direction;\n\t\tvec3 color;\n\t\tfloat distance;\n\t\tfloat decay;\n\t\tfloat coneCos;\n\t\tfloat penumbraCos;\n\t};\n\tuniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];\n\t#if defined( USE_SHADOWMAP ) && NUM_SPOT_LIGHT_SHADOWS > 0\n\t\tstruct SpotLightShadow {\n\t\t\tfloat shadowBias;\n\t\t\tfloat shadowRadius;\n\t\t\tvec2 shadowMapSize;\n\t\t};\n\t\tuniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];\n\t#endif\n\tvoid getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight  ) {\n\t\tvec3 lVector = spotLight.position - geometry.position;\n\t\tdirectLight.direction = normalize( lVector );\n\t\tfloat lightDistance = length( lVector );\n\t\tfloat angleCos = dot( directLight.direction, spotLight.direction );\n\t\tif ( angleCos > spotLight.coneCos ) {\n\t\t\tfloat spotEffect = smoothstep( spotLight.coneCos, spotLight.penumbraCos, angleCos );\n\t\t\tdirectLight.color = spotLight.color;\n\t\t\tdirectLight.color *= spotEffect * punctualLightIntensityToIrradianceFactor( lightDistance, spotLight.distance, spotLight.decay );\n\t\t\tdirectLight.visible = true;\n\t\t} else {\n\t\t\tdirectLight.color = vec3( 0.0 );\n\t\t\tdirectLight.visible = false;\n\t\t}\n\t}\n#endif\n#if NUM_RECT_AREA_LIGHTS > 0\n\tstruct RectAreaLight {\n\t\tvec3 color;\n\t\tvec3 position;\n\t\tvec3 halfWidth;\n\t\tvec3 halfHeight;\n\t};\n\tuniform sampler2D ltc_1;\tuniform sampler2D ltc_2;\n\tuniform RectAreaLight rectAreaLights[ NUM_RECT_AREA_LIGHTS ];\n#endif\n#if NUM_HEMI_LIGHTS > 0\n\tstruct HemisphereLight {\n\t\tvec3 direction;\n\t\tvec3 skyColor;\n\t\tvec3 groundColor;\n\t};\n\tuniform HemisphereLight hemisphereLights[ NUM_HEMI_LIGHTS ];\n\tvec3 getHemisphereLightIrradiance( const in HemisphereLight hemiLight, const in GeometricContext geometry ) {\n\t\tfloat dotNL = dot( geometry.normal, hemiLight.direction );\n\t\tfloat hemiDiffuseWeight = 0.5 * dotNL + 0.5;\n\t\tvec3 irradiance = mix( hemiLight.groundColor, hemiLight.skyColor, hemiDiffuseWeight );\n\t\t#ifndef PHYSICALLY_CORRECT_LIGHTS\n\t\t\tirradiance *= PI;\n\t\t#endif\n\t\treturn irradiance;\n\t}\n#endif";
 
@@ -14942,7 +14942,7 @@ var meshbasic_frag = "uniform vec3 diffuse;\nuniform float opacity;\n#ifndef FLA
 
 var meshbasic_vert = "#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <envmap_pars_vertex>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <uv2_vertex>\n\t#include <color_vertex>\n\t#include <skinbase_vertex>\n\t#ifdef USE_ENVMAP\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#endif\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <worldpos_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <envmap_vertex>\n\t#include <fog_vertex>\n}";
 
-var meshlambert_frag = "uniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float opacity;\nvarying vec3 vLightFront;\nvarying vec3 vIndirectFront;\n#ifdef DOUBLE_SIDED\n\tvarying vec3 vLightBack;\n\tvarying vec3 vIndirectBack;\n#endif\n#include <common>\n#include <packing>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_pars_fragment>\n#include <cube_uv_reflection_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <fog_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <specularmap_fragment>\n\t#include <emissivemap_fragment>\n\treflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );\n\t#ifdef DOUBLE_SIDED\n\t\treflectedLight.indirectDiffuse += ( gl_FrontFacing ) ? vIndirectFront : vIndirectBack;\n\t#else\n\t\treflectedLight.indirectDiffuse += vIndirectFront;\n\t#endif\n\t#include <lightmap_fragment>\n\treflectedLight.indirectDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb );\n\t#ifdef DOUBLE_SIDED\n\t\treflectedLight.directDiffuse = ( gl_FrontFacing ) ? vLightFront : vLightBack;\n\t#else\n\t\treflectedLight.directDiffuse = vLightFront;\n\t#endif\n\treflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
+var meshlambert_frag = "uniform vec3 diffuse;\nuniform vec3 emissive;\nuniform float opacity;\nvarying vec3 vLightFront;\nvarying vec3 vIndirectFront;\n#ifdef DOUBLE_SIDED\n\tvarying vec3 vLightBack;\n\tvarying vec3 vIndirectBack;\n#endif\n#include <common>\n#include <packing>\n#include <dithering_pars_fragment>\n#include <color_pars_fragment>\n#include <uv_pars_fragment>\n#include <uv2_pars_fragment>\n#include <map_pars_fragment>\n#include <alphamap_pars_fragment>\n#include <aomap_pars_fragment>\n#include <lightmap_pars_fragment>\n#include <emissivemap_pars_fragment>\n#include <envmap_common_pars_fragment>\n#include <envmap_pars_fragment>\n#include <cube_uv_reflection_fragment>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <fog_pars_fragment>\n#include <shadowmap_pars_fragment>\n#include <shadowmask_pars_fragment>\n#include <specularmap_pars_fragment>\n#include <logdepthbuf_pars_fragment>\n#include <clipping_planes_pars_fragment>\nvoid main() {\n\t#include <clipping_planes_fragment>\n\tvec4 diffuseColor = vec4( diffuse, opacity );\n\tReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );\n\tvec3 totalEmissiveRadiance = emissive;\n\t#include <logdepthbuf_fragment>\n\t#include <map_fragment>\n\t#include <color_fragment>\n\t#include <alphamap_fragment>\n\t#include <alphatest_fragment>\n\t#include <specularmap_fragment>\n\t#include <emissivemap_fragment>\n\t#ifdef DOUBLE_SIDED\n\t\treflectedLight.indirectDiffuse += ( gl_FrontFacing ) ? vIndirectFront : vIndirectBack;\n\t#else\n\t\treflectedLight.indirectDiffuse += vIndirectFront;\n\t#endif\n\t#include <lightmap_fragment>\n\treflectedLight.indirectDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb );\n\t#ifdef DOUBLE_SIDED\n\t\treflectedLight.directDiffuse = ( gl_FrontFacing ) ? vLightFront : vLightBack;\n\t#else\n\t\treflectedLight.directDiffuse = vLightFront;\n\t#endif\n\treflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();\n\t#include <aomap_fragment>\n\tvec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;\n\t#include <envmap_fragment>\n\tgl_FragColor = vec4( outgoingLight, diffuseColor.a );\n\t#include <tonemapping_fragment>\n\t#include <encodings_fragment>\n\t#include <fog_fragment>\n\t#include <premultiplied_alpha_fragment>\n\t#include <dithering_fragment>\n}";
 
 var meshlambert_vert = "#define LAMBERT\nvarying vec3 vLightFront;\nvarying vec3 vIndirectFront;\n#ifdef DOUBLE_SIDED\n\tvarying vec3 vLightBack;\n\tvarying vec3 vIndirectBack;\n#endif\n#include <common>\n#include <uv_pars_vertex>\n#include <uv2_pars_vertex>\n#include <envmap_pars_vertex>\n#include <bsdfs>\n#include <lights_pars_begin>\n#include <color_pars_vertex>\n#include <fog_pars_vertex>\n#include <morphtarget_pars_vertex>\n#include <skinning_pars_vertex>\n#include <shadowmap_pars_vertex>\n#include <logdepthbuf_pars_vertex>\n#include <clipping_planes_pars_vertex>\nvoid main() {\n\t#include <uv_vertex>\n\t#include <uv2_vertex>\n\t#include <color_vertex>\n\t#include <beginnormal_vertex>\n\t#include <morphnormal_vertex>\n\t#include <skinbase_vertex>\n\t#include <skinnormal_vertex>\n\t#include <defaultnormal_vertex>\n\t#include <begin_vertex>\n\t#include <morphtarget_vertex>\n\t#include <skinning_vertex>\n\t#include <project_vertex>\n\t#include <logdepthbuf_vertex>\n\t#include <clipping_planes_vertex>\n\t#include <worldpos_vertex>\n\t#include <envmap_vertex>\n\t#include <lights_lambert_vertex>\n\t#include <shadowmap_vertex>\n\t#include <fog_vertex>\n}";
 
@@ -20725,6 +20725,20 @@ function WebGLState( gl, extensions, capabilities ) {
 
 	}
 
+	function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
+
+		if ( isWebGL2 === true && ( type === 5124 || type === 5125 ) ) {
+
+			gl.vertexAttribIPointer( index, size, type, normalized, stride, offset );
+
+		} else {
+
+			gl.vertexAttribPointer( index, size, type, normalized, stride, offset );
+
+		}
+
+	}
+
 	function enable( id ) {
 
 		if ( enabledCapabilities[ id ] !== true ) {
@@ -21243,6 +21257,7 @@ function WebGLState( gl, extensions, capabilities ) {
 		enableAttribute: enableAttribute,
 		enableAttributeAndDivisor: enableAttributeAndDivisor,
 		disableUnusedAttributes: disableUnusedAttributes,
+		vertexAttribPointer: vertexAttribPointer,
 		enable: enable,
 		disable: disable,
 
@@ -24234,7 +24249,7 @@ function WebGLRenderer( parameters ) {
 						}
 
 						_gl.bindBuffer( 34962, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
+						state.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
 
 					} else {
 
@@ -24255,7 +24270,7 @@ function WebGLRenderer( parameters ) {
 						}
 
 						_gl.bindBuffer( 34962, buffer );
-						_gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+						state.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
 
 					}
 
@@ -26060,6 +26075,8 @@ function WebGLRenderer( parameters ) {
 
 	this.copyTextureToTexture = function ( position, srcTexture, dstTexture, level ) {
 
+		if ( level === undefined ) level = 0;
+
 		var width = srcTexture.image.width;
 		var height = srcTexture.image.height;
 		var glFormat = utils.convert( dstTexture.format );
@@ -26069,13 +26086,24 @@ function WebGLRenderer( parameters ) {
 
 		if ( srcTexture.isDataTexture ) {
 
-			_gl.texSubImage2D( 3553, level || 0, position.x, position.y, width, height, glFormat, glType, srcTexture.image.data );
+			_gl.texSubImage2D( 3553, level, position.x, position.y, width, height, glFormat, glType, srcTexture.image.data );
 
 		} else {
 
-			_gl.texSubImage2D( 3553, level || 0, position.x, position.y, glFormat, glType, srcTexture.image );
+			if ( srcTexture.isCompressedTexture ) {
+
+				_gl.compressedTexSubImage2D( 3553, level, position.x, position.y, srcTexture.mipmaps[ 0 ].width, srcTexture.mipmaps[ 0 ].height, glFormat, srcTexture.mipmaps[ 0 ].data );
+
+			} else {
+
+				_gl.texSubImage2D( 3553, level, position.x, position.y, glFormat, glType, srcTexture.image );
+
+			}
 
 		}
+
+		// Generate mipmaps only when copying level 0
+		if ( level === 0 && dstTexture.generateMipmaps ) _gl.generateMipmap( 3553 );
 
 		state.unbindTexture();
 
@@ -39164,6 +39192,311 @@ RectAreaLight.prototype = Object.assign( Object.create( Light.prototype ), {
 } );
 
 /**
+ * @author bhouston / http://clara.io
+ * @author WestLangley / http://github.com/WestLangley
+ *
+ * Primary reference:
+ *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
+ *
+ * Secondary reference:
+ *   https://www.ppsloan.org/publications/StupidSH36.pdf
+ */
+
+// 3-band SH defined by 9 coefficients
+
+function SphericalHarmonics3() {
+
+	this.coefficients = [];
+
+	for ( var i = 0; i < 9; i ++ ) {
+
+		this.coefficients.push( new Vector3() );
+
+	}
+
+}
+
+Object.assign( SphericalHarmonics3.prototype, {
+
+	isSphericalHarmonics3: true,
+
+	set: function ( coefficients ) {
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			this.coefficients[ i ].copy( coefficients[ i ] );
+
+		}
+
+		return this;
+
+	},
+
+	zero: function () {
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			this.coefficients[ i ].set( 0, 0, 0 );
+
+		}
+
+		return this;
+
+	},
+
+	// get the radiance in the direction of the normal
+	// target is a Vector3
+	getAt: function ( normal, target ) {
+
+		// normal is assumed to be unit length
+
+		var x = normal.x, y = normal.y, z = normal.z;
+
+		var coeff = this.coefficients;
+
+		// band 0
+		target.copy( coeff[ 0 ] ).multiplyScalar( 0.282095 );
+
+		// band 1
+		target.addScaledVector( coeff[ 1 ], 0.488603 * y );
+		target.addScaledVector( coeff[ 2 ], 0.488603 * z );
+		target.addScaledVector( coeff[ 3 ], 0.488603 * x );
+
+		// band 2
+		target.addScaledVector( coeff[ 4 ], 1.092548 * ( x * y ) );
+		target.addScaledVector( coeff[ 5 ], 1.092548 * ( y * z ) );
+		target.addScaledVector( coeff[ 6 ], 0.315392 * ( 3.0 * z * z - 1.0 ) );
+		target.addScaledVector( coeff[ 7 ], 1.092548 * ( x * z ) );
+		target.addScaledVector( coeff[ 8 ], 0.546274 * ( x * x - y * y ) );
+
+		return target;
+
+	},
+
+	// get the irradiance (radiance convolved with cosine lobe) in the direction of the normal
+	// target is a Vector3
+	// https://graphics.stanford.edu/papers/envmap/envmap.pdf
+	getIrradianceAt: function ( normal, target ) {
+
+		// normal is assumed to be unit length
+
+		var x = normal.x, y = normal.y, z = normal.z;
+
+		var coeff = this.coefficients;
+
+		// band 0
+		target.copy( coeff[ 0 ] ).multiplyScalar( 0.886227 ); // π * 0.282095
+
+		// band 1
+		target.addScaledVector( coeff[ 1 ], 2.0 * 0.511664 * y ); // ( 2 * π / 3 ) * 0.488603
+		target.addScaledVector( coeff[ 2 ], 2.0 * 0.511664 * z );
+		target.addScaledVector( coeff[ 3 ], 2.0 * 0.511664 * x );
+
+		// band 2
+		target.addScaledVector( coeff[ 4 ], 2.0 * 0.429043 * x * y ); // ( π / 4 ) * 1.092548
+		target.addScaledVector( coeff[ 5 ], 2.0 * 0.429043 * y * z );
+		target.addScaledVector( coeff[ 6 ], 0.743125 * z * z - 0.247708 ); // ( π / 4 ) * 0.315392 * 3
+		target.addScaledVector( coeff[ 7 ], 2.0 * 0.429043 * x * z );
+		target.addScaledVector( coeff[ 8 ], 0.429043 * ( x * x - y * y ) ); // ( π / 4 ) * 0.546274
+
+		return target;
+
+	},
+
+	add: function ( sh ) {
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			this.coefficients[ i ].add( sh.coefficients[ i ] );
+
+		}
+
+		return this;
+
+	},
+
+	addScaledSH: function ( sh, s ) {
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			this.coefficients[ i ].addScaledVector( sh.coefficients[ i ], s );
+
+		}
+
+		return this;
+
+	},
+
+	scale: function ( s ) {
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			this.coefficients[ i ].multiplyScalar( s );
+
+		}
+
+		return this;
+
+	},
+
+	lerp: function ( sh, alpha ) {
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			this.coefficients[ i ].lerp( sh.coefficients[ i ], alpha );
+
+		}
+
+		return this;
+
+	},
+
+	equals: function ( sh ) {
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			if ( ! this.coefficients[ i ].equals( sh.coefficients[ i ] ) ) {
+
+				return false;
+
+			}
+
+		}
+
+		return true;
+
+	},
+
+	copy: function ( sh ) {
+
+		return this.set( sh.coefficients );
+
+	},
+
+	clone: function () {
+
+		return new this.constructor().copy( this );
+
+	},
+
+	fromArray: function ( array, offset ) {
+
+		if ( offset === undefined ) offset = 0;
+
+		var coefficients = this.coefficients;
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			coefficients[ i ].fromArray( array, offset + ( i * 3 ) );
+
+		}
+
+		return this;
+
+	},
+
+	toArray: function ( array, offset ) {
+
+		if ( array === undefined ) array = [];
+		if ( offset === undefined ) offset = 0;
+
+		var coefficients = this.coefficients;
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			coefficients[ i ].toArray( array, offset + ( i * 3 ) );
+
+		}
+
+		return array;
+
+	}
+
+} );
+
+Object.assign( SphericalHarmonics3, {
+
+	// evaluate the basis functions
+	// shBasis is an Array[ 9 ]
+	getBasisAt: function ( normal, shBasis ) {
+
+		// normal is assumed to be unit length
+
+		var x = normal.x, y = normal.y, z = normal.z;
+
+		// band 0
+		shBasis[ 0 ] = 0.282095;
+
+		// band 1
+		shBasis[ 1 ] = 0.488603 * y;
+		shBasis[ 2 ] = 0.488603 * z;
+		shBasis[ 3 ] = 0.488603 * x;
+
+		// band 2
+		shBasis[ 4 ] = 1.092548 * x * y;
+		shBasis[ 5 ] = 1.092548 * y * z;
+		shBasis[ 6 ] = 0.315392 * ( 3 * z * z - 1 );
+		shBasis[ 7 ] = 1.092548 * x * z;
+		shBasis[ 8 ] = 0.546274 * ( x * x - y * y );
+
+	}
+
+} );
+
+/**
+ * @author WestLangley / http://github.com/WestLangley
+ *
+ * A LightProbe is a source of indirect-diffuse light
+ */
+
+function LightProbe( sh, intensity ) {
+
+	Light.call( this, undefined, intensity );
+
+	this.type = 'LightProbe';
+
+	this.sh = ( sh !== undefined ) ? sh : new SphericalHarmonics3();
+
+}
+
+LightProbe.prototype = Object.assign( Object.create( Light.prototype ), {
+
+	constructor: LightProbe,
+
+	isLightProbe: true,
+
+	copy: function ( source ) {
+
+		Light.prototype.copy.call( this, source );
+
+		this.sh.copy( source.sh );
+
+		return this;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		this.intensity = json.intensity; // TODO: Move this bit to Light.fromJSON();
+		this.sh.fromArray( json.sh );
+
+		return this;
+
+	},
+
+	toJSON: function ( meta ) {
+
+		var data = Light.prototype.toJSON.call( this, meta );
+
+		data.object.sh = this.sh.toArray();
+
+		return data;
+
+	}
+
+} );
+
+/**
  * @author mrdoob / http://mrdoob.com/
  */
 
@@ -40484,6 +40817,12 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				break;
 
+			case 'LightProbe':
+
+				object = new LightProbe().fromJSON( data );
+
+				break;
+
 			case 'SkinnedMesh':
 
 				console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
@@ -41315,301 +41654,6 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			} );
 
 		}, onProgress, onError );
-
-	}
-
-} );
-
-/**
- * @author bhouston / http://clara.io
- * @author WestLangley / http://github.com/WestLangley
- *
- * Primary reference:
- *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
- *
- * Secondary reference:
- *   https://www.ppsloan.org/publications/StupidSH36.pdf
- */
-
-// 3-band SH defined by 9 coefficients
-
-function SphericalHarmonics3() {
-
-	this.coefficients = [];
-
-	for ( var i = 0; i < 9; i ++ ) {
-
-		this.coefficients.push( new Vector3() );
-
-	}
-
-}
-
-Object.assign( SphericalHarmonics3.prototype, {
-
-	isSphericalHarmonics3: true,
-
-	set: function ( coefficients ) {
-
-		for ( var i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].copy( coefficients[ i ] );
-
-		}
-
-		return this;
-
-	},
-
-	zero: function () {
-
-		for ( var i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].set( 0, 0, 0 );
-
-		}
-
-		return this;
-
-	},
-
-	// get the radiance in the direction of the normal
-	// target is a Vector3
-	getAt: function ( normal, target ) {
-
-		// normal is assumed to be unit length
-
-		var x = normal.x, y = normal.y, z = normal.z;
-
-		var coeff = this.coefficients;
-
-		// band 0
-		target.copy( coeff[ 0 ] ).multiplyScalar( 0.282095 );
-
-		// band 1
-		target.addScaledVector( coeff[ 1 ], 0.488603 * y );
-		target.addScaledVector( coeff[ 2 ], 0.488603 * z );
-		target.addScaledVector( coeff[ 3 ], 0.488603 * x );
-
-		// band 2
-		target.addScaledVector( coeff[ 4 ], 1.092548 * ( x * y ) );
-		target.addScaledVector( coeff[ 5 ], 1.092548 * ( y * z ) );
-		target.addScaledVector( coeff[ 6 ], 0.315392 * ( 3.0 * z * z - 1.0 ) );
-		target.addScaledVector( coeff[ 7 ], 1.092548 * ( x * z ) );
-		target.addScaledVector( coeff[ 8 ], 0.546274 * ( x * x - y * y ) );
-
-		return target;
-
-	},
-
-	// get the irradiance (radiance convolved with cosine lobe) in the direction of the normal
-	// target is a Vector3
-	// https://graphics.stanford.edu/papers/envmap/envmap.pdf
-	getIrradianceAt: function ( normal, target ) {
-
-		// normal is assumed to be unit length
-
-		var x = normal.x, y = normal.y, z = normal.z;
-
-		var coeff = this.coefficients;
-
-		// band 0
-		target.copy( coeff[ 0 ] ).multiplyScalar( 0.886227 ); // π * 0.282095
-
-		// band 1
-		target.addScaledVector( coeff[ 1 ], 2.0 * 0.511664 * y ); // ( 2 * π / 3 ) * 0.488603
-		target.addScaledVector( coeff[ 2 ], 2.0 * 0.511664 * z );
-		target.addScaledVector( coeff[ 3 ], 2.0 * 0.511664 * x );
-
-		// band 2
-		target.addScaledVector( coeff[ 4 ], 2.0 * 0.429043 * x * y ); // ( π / 4 ) * 1.092548
-		target.addScaledVector( coeff[ 5 ], 2.0 * 0.429043 * y * z );
-		target.addScaledVector( coeff[ 6 ], 0.743125 * z * z - 0.247708 ); // ( π / 4 ) * 0.315392 * 3
-		target.addScaledVector( coeff[ 7 ], 2.0 * 0.429043 * x * z );
-		target.addScaledVector( coeff[ 8 ], 0.429043 * ( x * x - y * y ) ); // ( π / 4 ) * 0.546274
-
-		return target;
-
-	},
-
-	add: function ( sh ) {
-
-		for ( var i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].add( sh.coefficients[ i ] );
-
-		}
-
-		return this;
-
-	},
-
-	addScaledSH: function ( sh, s ) {
-
-		for ( var i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].addScaledVector( sh.coefficients[ i ], s );
-
-		}
-
-		return this;
-
-	},
-
-	scale: function ( s ) {
-
-		for ( var i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].multiplyScalar( s );
-
-		}
-
-		return this;
-
-	},
-
-	lerp: function ( sh, alpha ) {
-
-		for ( var i = 0; i < 9; i ++ ) {
-
-			this.coefficients[ i ].lerp( sh.coefficients[ i ], alpha );
-
-		}
-
-		return this;
-
-	},
-
-	equals: function ( sh ) {
-
-		for ( var i = 0; i < 9; i ++ ) {
-
-			if ( ! this.coefficients[ i ].equals( sh.coefficients[ i ] ) ) {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
-
-	},
-
-	copy: function ( sh ) {
-
-		return this.set( sh.coefficients );
-
-	},
-
-	clone: function () {
-
-		return new this.constructor().copy( this );
-
-	},
-
-	fromArray: function ( array, offset ) {
-
-		if ( offset === undefined ) offset = 0;
-
-		var coefficients = this.coefficients;
-
-		for ( var i = 0; i < 9; i ++ ) {
-
-			coefficients[ i ].fromArray( array, offset + ( i * 3 ) );
-
-		}
-
-		return this;
-
-	},
-
-	toArray: function ( array, offset ) {
-
-		if ( array === undefined ) array = [];
-		if ( offset === undefined ) offset = 0;
-
-		var coefficients = this.coefficients;
-
-		for ( var i = 0; i < 9; i ++ ) {
-
-			coefficients[ i ].toArray( array, offset + ( i * 3 ) );
-
-		}
-
-		return array;
-
-	}
-
-} );
-
-Object.assign( SphericalHarmonics3, {
-
-	// evaluate the basis functions
-	// shBasis is an Array[ 9 ]
-	getBasisAt: function ( normal, shBasis ) {
-
-		// normal is assumed to be unit length
-
-		var x = normal.x, y = normal.y, z = normal.z;
-
-		// band 0
-		shBasis[ 0 ] = 0.282095;
-
-		// band 1
-		shBasis[ 1 ] = 0.488603 * y;
-		shBasis[ 2 ] = 0.488603 * z;
-		shBasis[ 3 ] = 0.488603 * x;
-
-		// band 2
-		shBasis[ 4 ] = 1.092548 * x * y;
-		shBasis[ 5 ] = 1.092548 * y * z;
-		shBasis[ 6 ] = 0.315392 * ( 3 * z * z - 1 );
-		shBasis[ 7 ] = 1.092548 * x * z;
-		shBasis[ 8 ] = 0.546274 * ( x * x - y * y );
-
-	}
-
-} );
-
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- * A LightProbe is a source of indirect-diffuse light
- */
-
-function LightProbe( sh, intensity ) {
-
-	Light.call( this, undefined, intensity );
-
-	this.sh = ( sh !== undefined ) ? sh : new SphericalHarmonics3();
-
-}
-
-LightProbe.prototype = Object.assign( Object.create( Light.prototype ), {
-
-	constructor: LightProbe,
-
-	isLightProbe: true,
-
-	copy: function ( source ) {
-
-		Light.prototype.copy.call( this, source );
-
-		this.sh.copy( source.sh );
-		this.intensity = source.intensity;
-
-		return this;
-
-	},
-
-	toJSON: function ( meta ) {
-
-		var data = Light.prototype.toJSON.call( this, meta );
-
-		// data.sh = this.sh.toArray(); // todo
-
-		return data;
 
 	}
 
@@ -47212,15 +47256,19 @@ AxesHelper.prototype.constructor = AxesHelper;
 var LOD_MIN = 4;
 var LOD_MAX = 8;
 var SIZE_MAX = Math.pow( 2, LOD_MAX );
+
 // The standard deviations (radians) associated with the extra mips. These are
 // chosen to approximate a Trowbridge-Reitz distribution function times the
 // geometric shadowing function. These sigma values squared must match the
 // variance #defines in cube_uv_reflection_fragment.glsl.js.
 var EXTRA_LOD_SIGMA = [ 0.125, 0.215, 0.35, 0.446, 0.526, 0.582 ];
+
 var TOTAL_LODS = LOD_MAX - LOD_MIN + 1 + EXTRA_LOD_SIGMA.length;
+
 // The maximum length of the blur for loop. Smaller sigmas will use fewer
 // samples and exit early, but not recompile the shader.
 var MAX_SAMPLES = 20;
+
 var ENCODINGS = {
 	[ LinearEncoding ]: 0,
 	[ sRGBEncoding ]: 1,
@@ -47238,6 +47286,7 @@ var _oldTarget = null;
 // Golden Ratio
 var PHI = ( 1 + Math.sqrt( 5 ) ) / 2;
 var INV_PHI = 1 / PHI;
+
 // Vertices of a dodecahedron (except the opposites, which represent the
 // same axis), used as axis directions evenly spread on a sphere.
 var _axisDirections = [
@@ -47287,6 +47336,7 @@ PMREMGenerator.prototype = {
 			this._blur( cubeUVRenderTarget, 0, 0, sigma );
 
 		}
+
 		this._applyPMREM( cubeUVRenderTarget );
 		this._cleanup( cubeUVRenderTarget );
 
@@ -47400,6 +47450,7 @@ PMREMGenerator.prototype = {
 			depthBuffer: false,
 			stencilBuffer: false
 		};
+
 		var cubeUVRenderTarget = _createRenderTarget( params );
 		cubeUVRenderTarget.depthBuffer = equirectangular ? false : true;
 		this._pingPongRenderTarget = _createRenderTarget( params );
@@ -47468,6 +47519,7 @@ PMREMGenerator.prototype = {
 				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
+
 			_setViewport( cubeUVRenderTarget,
 				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
 			renderer.setRenderTarget( cubeUVRenderTarget );
@@ -47508,18 +47560,22 @@ PMREMGenerator.prototype = {
 
 		var material = texture.isCubeTexture ? this._cubemapShader : this._equirectShader;
 		scene.add( new Mesh( _lodPlanes[ 0 ], material ) );
+
 		var uniforms = material.uniforms;
 
 		uniforms[ 'envMap' ].value = texture;
+
 		if ( ! texture.isCubeTexture ) {
 
 			uniforms[ 'texelSize' ].value.set( 1.0 / texture.image.width, 1.0 / texture.image.height );
 
 		}
+
 		uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
 		uniforms[ 'outputEncoding' ].value = ENCODINGS[ texture.encoding ];
 
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
+
 		renderer.setRenderTarget( cubeUVRenderTarget );
 		renderer.render( scene, _flatCamera );
 
@@ -47533,11 +47589,10 @@ PMREMGenerator.prototype = {
 
 		for ( var i = 1; i < TOTAL_LODS; i ++ ) {
 
-			var sigma = Math.sqrt(
-				_sigmas[ i ] * _sigmas[ i ] -
-			_sigmas[ i - 1 ] * _sigmas[ i - 1 ] );
-			var poleAxis =
-			_axisDirections[ ( i - 1 ) % _axisDirections.length ];
+			var sigma = Math.sqrt( _sigmas[ i ] * _sigmas[ i ] - _sigmas[ i - 1 ] * _sigmas[ i - 1 ] );
+
+			var poleAxis = _axisDirections[ ( i - 1 ) % _axisDirections.length ];
+
 			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
 
 		}
@@ -47640,11 +47695,13 @@ PMREMGenerator.prototype = {
 		blurUniforms[ 'samples' ].value = samples;
 		blurUniforms[ 'weights' ].value = weights;
 		blurUniforms[ 'latitudinal' ].value = direction === 'latitudinal';
+
 		if ( poleAxis ) {
 
 			blurUniforms[ 'poleAxis' ].value = poleAxis;
 
 		}
+
 		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
 		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
 		blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
@@ -47652,9 +47709,7 @@ PMREMGenerator.prototype = {
 
 		var outputSize = _sizeLods[ lodOut ];
 		var x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
-		var y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) +
-		2 * outputSize *
-			( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
+		var y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) + 2 * outputSize * ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
 
 		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
 		renderer.setRenderTarget( targetOut );
@@ -47671,11 +47726,13 @@ function _createPlanes() {
 	var _sigmas = [];
 
 	var lod = LOD_MAX;
+
 	for ( var i = 0; i < TOTAL_LODS; i ++ ) {
 
 		var sizeLod = Math.pow( 2, lod );
 		_sizeLods.push( sizeLod );
 		var sigma = 1.0 / sizeLod;
+
 		if ( i > LOD_MAX - LOD_MIN ) {
 
 			sigma = EXTRA_LOD_SIGMA[ i - LOD_MAX + LOD_MIN - 1 ];
@@ -47685,6 +47742,7 @@ function _createPlanes() {
 			sigma = 0;
 
 		}
+
 		_sigmas.push( sigma );
 
 		var texelSize = 1.0 / ( sizeLod - 1 );
@@ -47720,6 +47778,7 @@ function _createPlanes() {
 			faceIndex.set( fill, faceIndexSize * vertices * face );
 
 		}
+
 		var planes = new BufferGeometry();
 		planes.setAttribute( 'position', new BufferAttribute( position, positionSize ) );
 		planes.setAttribute( 'uv', new BufferAttribute( uv, uvSize ) );
