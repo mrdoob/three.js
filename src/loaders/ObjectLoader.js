@@ -40,6 +40,7 @@ import { PointLight } from '../lights/PointLight.js';
 import { DirectionalLight } from '../lights/DirectionalLight.js';
 import { AmbientLight } from '../lights/AmbientLight.js';
 import { RectAreaLight } from '../lights/RectAreaLight.js';
+import { LightProbe } from '../lights/LightProbe.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
@@ -814,6 +815,12 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'HemisphereLight':
 
 				object = new HemisphereLight( data.color, data.groundColor, data.intensity );
+
+				break;
+
+			case 'LightProbe':
+
+				object = new LightProbe().fromJSON( data );
 
 				break;
 
