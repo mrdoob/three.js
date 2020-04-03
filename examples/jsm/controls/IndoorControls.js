@@ -4,473 +4,508 @@
  */
 
 import {
-    Euler,
-    EventDispatcher,
-    Raycaster,
-    Vector2,
-    Vector3
-} from "../../../build/three.module.js";
+	Euler,
+	EventDispatcher,
+	Raycaster,
+	Vector2,
+	Vector3
+} from '../../../build/three.module.js';
 
 var IndoorControls = function ( camera, domElement ) {
 
-    if ( domElement === undefined ) console.error( 'Please use "renderer.domElement".' );
-
-    this.camera = camera;
-    this.domElement = domElement;
-
-    // 控制器是否产生作用
-    this.enabled = true;
-    this.enabled_rotate = true;
-    this.enabled_move = true;
-    this.enabled_key = true;
-
-    // 相机第一人称旋转的速度
-    this.speedRotating = 0.001;
-    // 是否启用第一人称旋转动画
-    this.rotateAnimate = true;
-    // 相机第一人称旋转的阻尼惯性
-    this.rotateDamping = 0.1;
-    // 相机第一人称旋转的衰减精度
-    this.rotatePrecision = 0.1;
-
-    // 相机水平移动的速度（m/s）
-    this.speedMoving = 4;
-    // 是否启动水平移动动画
-    this.moveAnimate = true;
-    // 相机水平移动的总时间（s）
-    this.moveTime = 1.6;
-
-    // 相机按键移动的速度（m/s）
-    this.speedKeyMoving = 2;
-
-    // 捕捉水平移动目标点的三维物体
-    this.ground = [];
-
-    var scope = this;
-
-    var euler = new Euler( 0, 0, 0, 'YXZ' );
-
-    var PI_2 = Math.PI / 2;
-
-    var vec = new Vector3();
-
-    var rect = scope.domElement.getBoundingClientRect();
-
-    // 动画每一帧更新前的时间
-    var prevTime = performance.now();
-
-    // 相机是否允许被第一人称旋转
-    var canRotate = false;
-    // 相机是否正在进行第一人称旋转
-    var isRotating = false;
-    // 鼠标的实时移动距离
-    var movement = new Vector2();
-    // 鼠标静止时的实时移动距离
-    var movement0 = new Vector2();
-    // 鼠标上一帧的实时移动距离
-    var prevMovement = new Vector2();
-    // 鼠标的实时位置
-    var mouse = new Vector2();
-    // 鼠标与相机间的实时射线
-    var raycaster = new Raycaster();
-    // 鼠标与地面的实时交点信息
-    var intersects = [];
+	if ( domElement === undefined ) console.error( 'Please use "renderer.domElement".' );
+
+	this.camera = camera;
+	this.domElement = domElement;
+
+	// 控制器是否产生作用
+	this.enabled = true;
+	this.enabled_rotate = true;
+	this.enabled_move = true;
+	this.enabled_key = true;
+
+	// 相机第一人称旋转的速度
+	this.speedRotating = 0.001;
+	// 是否启用第一人称旋转动画
+	this.rotateAnimate = true;
+	// 相机第一人称旋转的阻尼惯性
+	this.rotateDamping = 0.1;
+	// 相机第一人称旋转的衰减精度
+	this.rotatePrecision = 0.1;
+
+	// 相机水平移动的速度（m/s）
+	this.speedMoving = 4;
+	// 是否启动水平移动动画
+	this.moveAnimate = true;
+	// 相机水平移动的总时间（s）
+	this.moveTime = 1.6;
+
+	// 相机按键移动的速度（m/s）
+	this.speedKeyMoving = 2;
+
+	// 捕捉水平移动目标点的三维物体
+	this.ground = [];
+
+	var scope = this;
+
+	var euler = new Euler( 0, 0, 0, 'YXZ' );
+
+	var PI_2 = Math.PI / 2;
+
+	var vec = new Vector3();
+
+	var rect = scope.domElement.getBoundingClientRect();
+
+	// 动画每一帧更新前的时间
+	var prevTime = performance.now();
+
+	// 相机是否允许被第一人称旋转
+	var canRotate = false;
+	// 相机是否正在进行第一人称旋转
+	var isRotating = false;
+	// 鼠标的实时移动距离
+	var movement = new Vector2();
+	// 鼠标静止时的实时移动距离
+	var movement0 = new Vector2();
+	// 鼠标上一帧的实时移动距离
+	var prevMovement = new Vector2();
+	// 鼠标上一次触发move事件的位置
+	var prevScreen = new Vector2();
+	// 鼠标的实时位置
+	var mouse = new Vector2();
+	// 鼠标与相机间的实时射线
+	var raycaster = new Raycaster();
+	// 鼠标与地面的实时交点信息
+	var intersects = [];
 
-    // 相机是否允许被水平移动
-    var canMove = false;
-    // 相机是否正在进行水平移动
-    var isMoving = false;
-    // 相机水平移动的目标点
-    var target = new Vector3();
-    // 相机水平移动的方向向量
-    var targetDir = new Vector3();
-    // 相机水平移动时到目标点距离的平方
-    var targetDis = 0;
-    // 匀变速运动时相机运动的总时间
-    var targetTime = 0;
-    // 匀变速运动时相机的加速度
-    var targetAcc = 0;
-    // 匀变速运动时相机的实时速度
-    var targetSpeed = 0;
-    // 相机水平移动时将要移动的下一个点
-    var cameraLater = new Vector3();
+	// 相机是否允许被水平移动
+	var canMove = false;
+	// 相机是否正在进行水平移动
+	var isMoving = false;
+	// 相机水平移动的目标点
+	var target = new Vector3();
+	// 相机水平移动的方向向量
+	var targetDir = new Vector3();
+	// 相机水平移动时到目标点距离的平方
+	var targetDis = 0;
+	// 匀变速运动时相机运动的总时间
+	var targetTime = 0;
+	// 匀变速运动时相机的加速度
+	var targetAcc = 0;
+	// 匀变速运动时相机的实时速度
+	var targetSpeed = 0;
+	// 相机水平移动时将要移动的下一个点
+	var cameraLater = new Vector3();
 
-    // 相机的按键移动状态
-    var moveForward = false;
-    var moveBackward = false;
-    var moveLeft = false;
-    var moveRight = false;
-    var moveUp = false;
-    var moveDown = false;
-    // 相机按键移动的移动方向向量
-    var moveDir = new Vector3();
+	// 相机的按键移动状态
+	var moveForward = false;
+	var moveBackward = false;
+	var moveLeft = false;
+	var moveRight = false;
+	var moveUp = false;
+	var moveDown = false;
+	// 相机按键移动的移动方向向量
+	var moveDir = new Vector3();
 
-    // 鼠标在地面时的移动事件
-    var moveEvent = { type: 'move', intersect: null };
-    // 鼠标点击水平移动事件
-    var moveClickEvent = { type: 'moveclick' };
-    // 鼠标拖拽第一人称旋转事件
-    var rotateDownEvent = { type: 'rotatedown' };
-    // 鼠标释放第一人称旋转事件
-    var rotateUpEvent = { type: 'rotateup' };
+	// 鼠标在地面时的移动事件
+	var moveEvent = { type: 'move', intersect: null };
+	// 鼠标点击水平移动事件
+	var moveClickEvent = { type: 'moveclick' };
+	// 鼠标拖拽第一人称旋转事件
+	var rotateDownEvent = { type: 'rotatedown' };
+	// 鼠标释放第一人称旋转事件
+	var rotateUpEvent = { type: 'rotateup' };
 
-    function onContextMenu( event ) {
+	function onContextMenu( event ) {
 
-        event.preventDefault();
+		event.preventDefault();
 
-    }
+	}
 
-    function onMouseDown( event ) {
+	function onMouseDown( event ) {
 
-        event.preventDefault();
+		event.preventDefault();
 
-        scope.domElement.focus();
+		scope.domElement.focus();
 
-        if ( scope.enabled ) {
+		if ( scope.enabled ) {
 
-            if ( scope.enabled_rotate ) canRotate = true;
+			if ( scope.enabled_rotate ) canRotate = true;
 
-            if ( scope.enabled_move ) canMove = true;
+			if ( scope.enabled_move ) canMove = true;
 
-        }
+		}
 
-    }
+		// 兼容touch事件
+		if ( event.changedTouches ) {
 
-    function onMouseMove( event ) {
+			event = event.changedTouches[ 0 ];
 
-        // 获取鼠标每一帧的移动量
-        if ( canRotate === true ) {
+			prevScreen.x = event.screenX;
+			prevScreen.y = event.screenY;
 
-            // 有时会出现Bug，即使鼠标没有移动也会触发，导致不能点击地面进行水平移动，重启浏览器可恢复
-            canMove = false;
+		}
 
-            movement.x += event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-            movement.y += event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+	}
 
-            isRotating = true;
+	function onMouseMove( event ) {
 
-        }
+		// 兼容touch事件
+		if ( event.changedTouches ) {
 
-        // 获取鼠标相对于地面的实时交点
-        if ( scope.ground.length > 0 ) {
+			event = event.changedTouches[ 0 ];
 
-            // 将鼠标位置归一化为设备坐标
-            mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
-            mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
+			event.movementX = event.screenX - prevScreen.x;
+			event.movementY = event.screenY - prevScreen.y;
 
-            // 通过相机和鼠标位置更新射线
-            raycaster.setFromCamera( mouse, scope.camera );
+			prevScreen.x = event.screenX;
+			prevScreen.y = event.screenY;
 
-            // 计算物体和射线的交点信息
-            intersects = raycaster.intersectObjects( scope.ground, true );
+		}
 
-            // 触发鼠标在地面时的移动事件
-            if ( intersects.length > 0 ) {
+		// 获取鼠标每一帧的移动量
+		if ( canRotate === true ) {
 
-                moveEvent.intersect = intersects[ 0 ];
-                scope.dispatchEvent( moveEvent );
+			if ( Math.abs( event.movementX ) >= 1 || Math.abs( event.movementY ) >= 1 ) canMove = false;
 
-            }
+			movement.x += event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+			movement.y += event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-        }
+			isRotating = true;
 
-    }
+		}
 
-    function onMouseUp( event ) {
+		// 获取鼠标相对于地面的实时交点
+		if ( scope.ground.length > 0 ) {
 
-        event.preventDefault();
+			// 将鼠标位置归一化为设备坐标
+			mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
+			mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
 
-        canRotate = false;
+			// 通过相机和鼠标位置更新射线
+			raycaster.setFromCamera( mouse, scope.camera );
 
-        // 获取水平移动的目标位置和方向
-        if ( canMove === true && isMoving === false ) {
+			// 计算物体和射线的交点信息
+			intersects = raycaster.intersectObjects( scope.ground, true );
 
-            if ( intersects.length === 0 ) return;
+			// 触发鼠标在地面时的移动事件
+			if ( intersects.length > 0 ) {
 
-            target.copy( intersects[ 0 ].point );
-            target.y = scope.camera.position.y;
+				moveEvent.intersect = intersects[ 0 ];
+				scope.dispatchEvent( moveEvent );
 
-            if ( target.equals( scope.camera.position ) ) return;
+			}
 
-            targetDir.subVectors( target, scope.camera.position ).normalize();
-            targetDis = target.distanceToSquared( scope.camera.position );
+		}
 
-            if ( scope.moveAnimate === true ) {
+	}
 
-                // 计算加速度
-                targetAcc = 4 * Math.sqrt( targetDis ) / Math.pow( scope.moveTime, 2 );
+	function onMouseUp( event ) {
 
-            }
+		event.preventDefault();
 
-            isMoving = true;
+		canRotate = false;
 
-        }
+		// 获取水平移动的目标位置和方向
+		if ( canMove === true && isMoving === false ) {
 
-    }
+			if ( intersects.length === 0 ) return;
 
-    function onKeyDown( event ) {
+			target.copy( intersects[ 0 ].point );
+			target.y = scope.camera.position.y;
 
-        if ( !scope.enabled || !scope.enabled_key ) return;
+			if ( target.equals( scope.camera.position ) ) return;
 
-        switch ( event.keyCode ) {
+			targetDir.subVectors( target, scope.camera.position ).normalize();
+			targetDis = target.distanceToSquared( scope.camera.position );
 
-            case 87: // w
-                moveForward = true;
-                break;
+			if ( scope.moveAnimate === true ) {
 
-            case 37: // left
-            case 65: // a
-                moveLeft = true;
-                break;
+				// 计算加速度
+				targetAcc = 4 * Math.sqrt( targetDis ) / Math.pow( scope.moveTime, 2 );
 
-            case 83: // s
-                moveBackward = true;
-                break;
+			}
 
-            case 39: // right
-            case 68: // d
-                moveRight = true;
-                break;
+			isMoving = true;
 
-            case 38: // up
-            case 81: // q
-                moveUp = true;
-                break;
+		}
 
-            case 40: // down
-            case 69: // e
-                moveDown = true;
-                break;
+	}
 
-        }
+	function onKeyDown( event ) {
 
-    }
+		if ( ! scope.enabled || ! scope.enabled_key ) return;
 
-    function onKeyUp( event ) {
+		switch ( event.keyCode ) {
 
-        if ( !scope.enabled || !scope.enabled_key ) return;
+			case 87: // w
+				moveForward = true;
+				break;
 
-        switch ( event.keyCode ) {
+			case 37: // left
+			case 65: // a
+				moveLeft = true;
+				break;
 
-            case 87: // w
-                moveForward = false;
-                break;
+			case 83: // s
+				moveBackward = true;
+				break;
 
-            case 37: // left
-            case 65: // a
-                moveLeft = false;
-                break;
+			case 39: // right
+			case 68: // d
+				moveRight = true;
+				break;
 
-            case 83: // s
-                moveBackward = false;
-                break;
+			case 38: // up
+			case 81: // q
+				moveUp = true;
+				break;
 
-            case 39: // right
-            case 68: // d
-                moveRight = false;
-                break;
+			case 40: // down
+			case 69: // e
+				moveDown = true;
+				break;
 
-            case 38: // up
-            case 81: // q
-                moveUp = false;
-                break;
+		}
 
-            case 40: // down
-            case 69: // e
-                moveDown = false;
-                break;
+	}
 
-        }
+	function onKeyUp( event ) {
 
-    }
+		if ( ! scope.enabled || ! scope.enabled_key ) return;
 
-    //
-    // public methods
-    //
+		switch ( event.keyCode ) {
 
-    this.connect = function () {
+			case 87: // w
+				moveForward = false;
+				break;
 
-        scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
+			case 37: // left
+			case 65: // a
+				moveLeft = false;
+				break;
 
-        scope.domElement.addEventListener( 'mousedown', onMouseDown, false );
-        scope.domElement.addEventListener( 'mousemove', onMouseMove, false );
-        scope.domElement.addEventListener( 'mouseup', onMouseUp, false );
+			case 83: // s
+				moveBackward = false;
+				break;
 
-        scope.domElement.addEventListener( 'keydown', onKeyDown, false );
-        scope.domElement.addEventListener( 'keyup', onKeyUp, false );
+			case 39: // right
+			case 68: // d
+				moveRight = false;
+				break;
 
-        // 确保dom元素接收按键
-        if ( scope.domElement.tabIndex === - 1 ) scope.domElement.tabIndex = 0;
+			case 38: // up
+			case 81: // q
+				moveUp = false;
+				break;
 
-    };
+			case 40: // down
+			case 69: // e
+				moveDown = false;
+				break;
 
-    this.disconnect = function () {
+		}
 
-        scope.domElement.removeEventListener( 'contextmenu', onContextMenu, false );
+	}
 
-        scope.domElement.removeEventListener( 'mousedown', onMouseDown, false );
-        scope.domElement.removeEventListener( 'mousemove', onMouseMove, false );
-        scope.domElement.removeEventListener( 'mouseup', onMouseUp, false );
+	//
+	// public methods
+	//
 
-        scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
-        scope.domElement.removeEventListener( 'keyup', onKeyUp, false );
+	this.connect = function () {
 
-    };
+		scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
 
-    this.dispose = function () {
+		scope.domElement.addEventListener( 'mousedown', onMouseDown, false );
+		scope.domElement.addEventListener( 'mousemove', onMouseMove, false );
+		document.addEventListener( 'mouseup', onMouseUp, false );
 
-        this.disconnect();
+		scope.domElement.addEventListener( 'keydown', onKeyDown, false );
+		scope.domElement.addEventListener( 'keyup', onKeyUp, false );
 
-    };
+		scope.domElement.addEventListener( 'touchstart', onMouseDown, false );
+		scope.domElement.addEventListener( 'touchmove', onMouseMove, false );
+		scope.domElement.addEventListener( 'touchend', onMouseUp, false );
 
-    this.moveForward = function ( distance ) {
+		// 确保dom元素接收按键
+		if ( scope.domElement.tabIndex === - 1 ) scope.domElement.tabIndex = 0;
 
-        // move forward parallel to the xz-plane
-        // assumes camera.up is y-up
+	};
 
-        vec.setFromMatrixColumn( scope.camera.matrix, 0 );
+	this.disconnect = function () {
 
-        vec.crossVectors( scope.camera.up, vec );
+		scope.domElement.removeEventListener( 'contextmenu', onContextMenu, false );
 
-        scope.camera.position.addScaledVector( vec, distance );
+		scope.domElement.removeEventListener( 'mousedown', onMouseDown, false );
+		scope.domElement.removeEventListener( 'mousemove', onMouseMove, false );
+		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-    };
+		scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
+		scope.domElement.removeEventListener( 'keyup', onKeyUp, false );
 
-    this.moveRight = function ( distance ) {
+		scope.domElement.removeEventListener( 'touchstart', onMouseDown, false );
+		scope.domElement.removeEventListener( 'touchmove', onMouseMove, false );
+		scope.domElement.removeEventListener( 'touchend', onMouseUp, false );
 
-        vec.setFromMatrixColumn( scope.camera.matrix, 0 );
+	};
 
-        scope.camera.position.addScaledVector( vec, distance );
+	this.dispose = function () {
 
-    };
+		this.disconnect();
 
-    this.moveUp = function ( distance ) {
+	};
 
-        vec.set( 0, 1, 0 );
+	this.moveForward = function ( distance ) {
 
-        scope.camera.position.addScaledVector( vec, distance );
+		// move forward parallel to the xz-plane
+		// assumes camera.up is y-up
 
-    };
+		vec.setFromMatrixColumn( scope.camera.matrix, 0 );
 
-    this.update = function () {
+		vec.crossVectors( scope.camera.up, vec );
 
-        var time = performance.now();
-        var interval = ( time - prevTime ) / 1000;
+		scope.camera.position.addScaledVector( vec, distance );
 
-        // 如果鼠标位置更新，则进行第一人称旋转
-        if ( isRotating === true ) {
+	};
 
-            if ( movement.equals( movement0 ) ) movement.copy( prevMovement );
+	this.moveRight = function ( distance ) {
 
-            euler.setFromQuaternion( scope.camera.quaternion );
+		vec.setFromMatrixColumn( scope.camera.matrix, 0 );
 
-            euler.y += movement.x * scope.speedRotating;
-            euler.x += movement.y * scope.speedRotating;
+		scope.camera.position.addScaledVector( vec, distance );
 
-            // 限定绕x轴的旋转角度在-180°至180°之间
-            euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
+	};
 
-            scope.camera.quaternion.setFromEuler( euler );
+	this.moveUp = function ( distance ) {
 
-            if ( scope.rotateAnimate === true ) {
+		vec.set( 0, 1, 0 );
 
-                // 使鼠标移动量趋近于(0, 0)
-                movement.x = movement.x * ( 1 - scope.rotateDamping );
-                movement.y = movement.y * ( 1 - scope.rotateDamping );
+		scope.camera.position.addScaledVector( vec, distance );
 
-            } else {
+	};
 
-                movement.copy( movement0 );
+	// 在动画更新函数中调用
+	this.update = function () {
 
-            }
+		var time = performance.now();
+		var interval = ( time - prevTime ) / 1000;
 
-            if ( Math.abs( movement.x ) <= scope.rotatePrecision && Math.abs( movement.y ) <= scope.rotatePrecision ) isRotating = false;
+		// 如果鼠标位置更新，则进行第一人称旋转
+		if ( isRotating === true ) {
 
-            prevMovement.copy( movement );
-            movement.copy( movement0 );
+			if ( movement.equals( movement0 ) ) movement.copy( prevMovement );
 
-        }
+			euler.setFromQuaternion( scope.camera.quaternion );
 
-        // 如果相机不位于目标点，则进行水平移动
-        if ( isMoving === true && target.equals( scope.camera.position ) === false ) {
+			euler.y += movement.x * scope.speedRotating;
+			euler.x += movement.y * scope.speedRotating;
 
-            cameraLater.copy( scope.camera.position );
+			// 限定绕x轴的旋转角度在-180°至180°之间
+			euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
 
-            // 计算相机水平移动后的位置
-            if ( scope.moveAnimate === true ) {
+			scope.camera.quaternion.setFromEuler( euler );
 
-                targetTime += interval;
+			if ( scope.rotateAnimate === true ) {
 
-                if ( targetTime < scope.moveTime / 2 ) {
+				// 使鼠标移动量趋近于(0, 0)
+				movement.x = movement.x * ( 1 - scope.rotateDamping );
+				movement.y = movement.y * ( 1 - scope.rotateDamping );
 
-                    targetSpeed += targetAcc * interval;
-                    cameraLater.addScaledVector( targetDir, targetSpeed * interval + 0.5 * targetAcc * interval * interval );
+			} else {
 
-                } else {
+				movement.copy( movement0 );
 
-                    targetSpeed -= targetAcc * interval;
-                    cameraLater.addScaledVector( targetDir, targetSpeed * interval - 0.5 * targetAcc * interval * interval );
+			}
 
-                }
+			if ( Math.abs( movement.x ) <= scope.rotatePrecision && Math.abs( movement.y ) <= scope.rotatePrecision ) isRotating = false;
 
-                // console.log( targetSpeed + ',' + target.distanceTo( scope.camera.position ) );
+			prevMovement.copy( movement );
+			movement.copy( movement0 );
 
-            } else {
+		}
 
-                cameraLater.addScaledVector( targetDir, scope.speedMoving * interval );
+		// 如果相机不位于目标点，则进行水平移动
+		if ( isMoving === true && target.equals( scope.camera.position ) === false ) {
 
-            }
+			cameraLater.copy( scope.camera.position );
 
-            // 判断相机是否距离目标点足够近
-            var targetDisLater = target.distanceToSquared( cameraLater );
+			// 计算相机水平移动后的位置
+			if ( scope.moveAnimate === true ) {
 
-            if ( targetDisLater >= targetDis ) {
+				targetTime += interval;
 
-                target.copy( scope.camera.position );
-                targetDis = 0;
-                targetTime = 0;
-                targetSpeed = 0;
+				if ( targetTime < scope.moveTime / 2 ) {
 
-                isMoving = false;
+					targetSpeed += targetAcc * interval;
+					cameraLater.addScaledVector( targetDir, targetSpeed * interval + 0.5 * targetAcc * interval * interval );
 
-            } else {
+				} else {
 
-                scope.camera.position.copy( cameraLater );
-                targetDis = targetDisLater;
+					targetSpeed -= targetAcc * interval;
+					cameraLater.addScaledVector( targetDir, targetSpeed * interval - 0.5 * targetAcc * interval * interval );
 
-            }
+				}
 
-        }
+				// console.log( targetSpeed + ',' + target.distanceTo( scope.camera.position ) );
 
-        // 如果相机没有进行水平移动，则启用按键移动
-        if ( isMoving === false ) {
+			} else {
 
-            // 计算按键移动方向
-            moveDir.z = Number( moveForward ) - Number( moveBackward );
-            moveDir.x = Number( moveRight ) - Number( moveLeft );
-            moveDir.y = Number( moveUp ) - Number( moveDown );
-            moveDir.normalize();
+				cameraLater.addScaledVector( targetDir, scope.speedMoving * interval );
 
-            // 进行相机的按键移动
-            scope.moveForward( moveDir.z * scope.speedKeyMoving * interval );
-            scope.moveRight( moveDir.x * scope.speedKeyMoving * interval );
-            scope.moveUp( moveDir.y * scope.speedKeyMoving * interval );
+			}
 
-        }
+			// 判断相机是否距离目标点足够近
+			var targetDisLater = target.distanceToSquared( cameraLater );
 
-        prevTime = time;
+			if ( targetDisLater >= targetDis ) {
 
-    };
+				target.copy( scope.camera.position );
+				targetDis = 0;
+				targetTime = 0;
+				targetSpeed = 0;
 
-    // 怎么解决窗口缩放或摄像机参数变更问题？
-    this.reset = function ( cameraNew, domElementNew ) {
+				isMoving = false;
 
-        scope.camera = cameraNew;
-        scope.domElement = domElementNew;
+			} else {
 
-    };
+				scope.camera.position.copy( cameraLater );
+				targetDis = targetDisLater;
 
-    this.connect();
+			}
+
+		}
+
+		// 如果相机没有进行水平移动，则启用按键移动
+		if ( isMoving === false ) {
+
+			// 计算按键移动方向
+			moveDir.z = Number( moveForward ) - Number( moveBackward );
+			moveDir.x = Number( moveRight ) - Number( moveLeft );
+			moveDir.y = Number( moveUp ) - Number( moveDown );
+			moveDir.normalize();
+
+			// 进行相机的按键移动
+			scope.moveForward( moveDir.z * scope.speedKeyMoving * interval );
+			scope.moveRight( moveDir.x * scope.speedKeyMoving * interval );
+			scope.moveUp( moveDir.y * scope.speedKeyMoving * interval );
+
+		}
+
+		prevTime = time;
+
+	};
+
+	// 窗口缩放或摄像机参数变更后需要调用
+	this.reset = function ( cameraNew, domElementNew ) {
+
+		scope.camera = cameraNew;
+		scope.domElement = domElementNew;
+
+		rect = scope.domElement.getBoundingClientRect();
+
+	};
+
+	this.connect();
 
 };
 
