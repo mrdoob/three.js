@@ -46236,6 +46236,8 @@
 
 		LineSegments.call( this, geometry, material );
 
+		this.type = 'SkeletonHelper';
+
 		this.root = object;
 		this.bones = bones;
 
@@ -46300,6 +46302,8 @@
 		var material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
 
 		Mesh.call( this, geometry, material );
+
+		this.type = 'PointLightHelper';
 
 		this.matrix = this.light.matrixWorld;
 		this.matrixAutoUpdate = false;
@@ -46489,6 +46493,8 @@
 
 		LineSegments.call( this, geometry, material );
 
+		this.type = 'GridHelper';
+
 	}
 
 	GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
@@ -46595,6 +46601,8 @@
 		var material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
 
 		LineSegments.call( this, geometry, material );
+
+		this.type = 'PolarGridHelper';
 
 	}
 
@@ -46791,6 +46799,8 @@
 
 		LineSegments.call( this, geometry, material );
 
+		this.type = 'CameraHelper';
+
 		this.camera = camera;
 		if ( this.camera.updateProjectionMatrix ) { this.camera.updateProjectionMatrix(); }
 
@@ -46900,6 +46910,8 @@
 		geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
 		LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+
+		this.type = 'BoxHelper';
 
 		this.matrixAutoUpdate = false;
 
@@ -47013,6 +47025,8 @@
 
 		LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 
+		this.type = 'Box3Helper';
+
 		this.geometry.computeBoundingSphere();
 
 	}
@@ -47042,8 +47056,6 @@
 
 	function PlaneHelper( plane, size, hex ) {
 
-		this.type = 'PlaneHelper';
-
 		this.plane = plane;
 
 		this.size = ( size === undefined ) ? 1 : size;
@@ -47057,6 +47069,8 @@
 		geometry.computeBoundingSphere();
 
 		Line.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+
+		this.type = 'PlaneHelper';
 
 		//
 
@@ -47113,6 +47127,8 @@
 		// dir is assumed to be normalized
 
 		Object3D.call( this );
+
+		this.type = 'ArrowHelper';
 
 		if ( dir === undefined ) { dir = new Vector3( 0, 0, 1 ); }
 		if ( origin === undefined ) { origin = new Vector3( 0, 0, 0 ); }
@@ -47239,6 +47255,8 @@
 		var material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
 
 		LineSegments.call( this, geometry, material );
+
+		this.type = 'AxesHelper';
 
 	}
 

@@ -46228,6 +46228,8 @@ function SkeletonHelper( object ) {
 
 	LineSegments.call( this, geometry, material );
 
+	this.type = 'SkeletonHelper';
+
 	this.root = object;
 	this.bones = bones;
 
@@ -46292,6 +46294,8 @@ function PointLightHelper( light, sphereSize, color ) {
 	var material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
 
 	Mesh.call( this, geometry, material );
+
+	this.type = 'PointLightHelper';
 
 	this.matrix = this.light.matrixWorld;
 	this.matrixAutoUpdate = false;
@@ -46481,6 +46485,8 @@ function GridHelper( size, divisions, color1, color2 ) {
 
 	LineSegments.call( this, geometry, material );
 
+	this.type = 'GridHelper';
+
 }
 
 GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
@@ -46587,6 +46593,8 @@ function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) 
 	var material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
 
 	LineSegments.call( this, geometry, material );
+
+	this.type = 'PolarGridHelper';
 
 }
 
@@ -46783,6 +46791,8 @@ function CameraHelper( camera ) {
 
 	LineSegments.call( this, geometry, material );
 
+	this.type = 'CameraHelper';
+
 	this.camera = camera;
 	if ( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
 
@@ -46892,6 +46902,8 @@ function BoxHelper( object, color ) {
 	geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+
+	this.type = 'BoxHelper';
 
 	this.matrixAutoUpdate = false;
 
@@ -47005,6 +47017,8 @@ function Box3Helper( box, color ) {
 
 	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 
+	this.type = 'Box3Helper';
+
 	this.geometry.computeBoundingSphere();
 
 }
@@ -47034,8 +47048,6 @@ Box3Helper.prototype.updateMatrixWorld = function ( force ) {
 
 function PlaneHelper( plane, size, hex ) {
 
-	this.type = 'PlaneHelper';
-
 	this.plane = plane;
 
 	this.size = ( size === undefined ) ? 1 : size;
@@ -47049,6 +47061,8 @@ function PlaneHelper( plane, size, hex ) {
 	geometry.computeBoundingSphere();
 
 	Line.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+
+	this.type = 'PlaneHelper';
 
 	//
 
@@ -47105,6 +47119,8 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 	// dir is assumed to be normalized
 
 	Object3D.call( this );
+
+	this.type = 'ArrowHelper';
 
 	if ( dir === undefined ) dir = new Vector3( 0, 0, 1 );
 	if ( origin === undefined ) origin = new Vector3( 0, 0, 0 );
@@ -47231,6 +47247,8 @@ function AxesHelper( size ) {
 	var material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
 
 	LineSegments.call( this, geometry, material );
+
+	this.type = 'AxesHelper';
 
 }
 
