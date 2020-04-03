@@ -62,6 +62,7 @@ import { PointsMaterial } from './materials/PointsMaterial.js';
 import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
 import { Box3 } from './math/Box3.js';
+import { Sphere } from './math/Sphere.js';
 import { Color } from './math/Color.js';
 import { Frustum } from './math/Frustum.js';
 import { Line3 } from './math/Line3.js';
@@ -544,7 +545,7 @@ Object.assign( Box3.prototype, {
 
 Object.assign( Sphere.prototype, {
 
-	empty: function() {
+	empty: function () {
 
 		console.warn( 'THREE.Sphere: .empty() has been renamed to .isEmpty().' );
 		return this.isEmpty();

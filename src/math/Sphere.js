@@ -11,7 +11,7 @@ var _box = new Box3();
 function Sphere( center, radius ) {
 
 	this.center = ( center !== undefined ) ? center : new Vector3();
-	this.radius = ( radius !== undefined ) ? radius : -1;
+	this.radius = ( radius !== undefined ) ? radius : - 1;
 
 }
 
@@ -78,19 +78,13 @@ Object.assign( Sphere.prototype, {
 	makeEmpty: function () {
 
 		this.center.set( 0, 0, 0 );
-		this.radius = -1;
+		this.radius = - 1;
 
 		return this;
 
 	},
 
 	containsPoint: function ( point ) {
-
-		if( this.isEmpty() ) {
-
-			return false;
-
-		}
 
 		return ( point.distanceToSquared( this.center ) <= ( this.radius * this.radius ) );
 
@@ -103,12 +97,6 @@ Object.assign( Sphere.prototype, {
 	},
 
 	intersectsSphere: function ( sphere ) {
-
-		if( this.isEmpty() ) {
-
-			return false;
-
-		}
 
 		var radiusSum = this.radius + sphere.radius;
 
@@ -161,8 +149,9 @@ Object.assign( Sphere.prototype, {
 
 		}
 
-		if( this.isEmpty() ) {
+		if ( this.isEmpty() ) {
 
+			// Empty sphere produces empty bounding box
 			target.makeEmpty();
 			return target;
 

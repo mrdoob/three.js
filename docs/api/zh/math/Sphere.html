@@ -71,10 +71,13 @@
 		</p>
 
 		<h3>[method:Boolean isEmpty]()</h3>
-		<p>检查球是否为空（the radius set to a negative number）.</p>
+		<p>
+		检查球是否为空（the radius set to a negative number）.
+		Spheres with a radius of 0 contain only their center point and are not considered to be empty.
+		</p>
 
 		<h3>[method:Sphere makeEmpty]()</h3>
-		<p>Makes the sphere empty by setting [page:.center center] to (0, 0, 0) and [page:.radius radius] to 0.</p>
+		<p>Makes the sphere empty by setting [page:.center center] to (0, 0, 0) and [page:.radius radius] to -1.</p>
 
 		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
 		<p>

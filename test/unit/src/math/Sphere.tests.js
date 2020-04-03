@@ -25,7 +25,7 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Sphere();
 			assert.ok( a.center.equals( zero3 ), "Passed!" );
-			assert.ok( a.radius == 0, "Passed!" );
+			assert.ok( a.radius == - 1, "Passed!" );
 
 			var a = new Sphere( one3.clone(), 1 );
 			assert.ok( a.center.equals( one3 ), "Passed!" );
@@ -44,7 +44,7 @@ export default QUnit.module( 'Maths', () => {
 
 			var a = new Sphere();
 			assert.ok( a.center.equals( zero3 ), "Passed!" );
-			assert.ok( a.radius == 0, "Passed!" );
+			assert.ok( a.radius == - 1, "Passed!" );
 
 			a.set( one3, 1 );
 			assert.ok( a.center.equals( one3 ), "Passed!" );
@@ -148,9 +148,6 @@ export default QUnit.module( 'Maths', () => {
 			a.set( zero3, 0 );
 			assert.ok( a.containsPoint( a.center ), "Passed!" );
 
-			a.makeEmpty();
-			assert.ok( !a.containsPoint( a.center ), "Passed" );
-
 		} );
 
 		QUnit.test( "distanceToPoint", ( assert ) => {
@@ -171,9 +168,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.intersectsSphere( b ), "Passed!" );
 			assert.ok( ! a.intersectsSphere( c ), "Passed!" );
 
-			a.makeEmpty();
-			assert.ok( !a.intersectsSphere( a ), "Passed!" );
-
 		} );
 
 		QUnit.test( "intersectsBox", ( assert ) => {
@@ -184,9 +178,6 @@ export default QUnit.module( 'Maths', () => {
 
 			assert.strictEqual( a.intersectsBox( box ), true, "Check unit sphere" );
 			assert.strictEqual( b.intersectsBox( box ), false, "Check shifted sphere" );
-
-			a.makeEmpty();
-			assert.strictEqual( a.intersectsBox( box ), false , "Check empty sphere");
 
 		} );
 
@@ -200,9 +191,6 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.intersectsPlane( b ), "Passed!" );
 			assert.ok( ! a.intersectsPlane( c ), "Passed!" );
 			assert.ok( ! a.intersectsPlane( d ), "Passed!" );
-
-			a.makeEmpty();
-			assert.ok( ! a.intersectsPlane( b ), "Passed!" );
 
 		} );
 
