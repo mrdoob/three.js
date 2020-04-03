@@ -23,7 +23,8 @@ const exceptionList = [
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
 	'webgl_materials_envmaps_parallax',
 	'webgl_test_memory2', // gives fatal error in puppeteer
-	'webgl_worker_offscreencanvas' // in a worker, not robust
+	'webgl_worker_offscreencanvas', // in a worker, not robust
+	'webgl2_multisampled_renderbuffers'
 
 ].concat( ( process.platform === "win32" ) ? [
 
