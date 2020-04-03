@@ -1519,11 +1519,12 @@ function WebGLRenderer( parameters ) {
 
 			materialProperties.program = program;
 			materialProperties.uniforms = parameters.uniforms;
-			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 			materialProperties.outputEncoding = _this.outputEncoding;
 			material.program = program;
 
 		}
+
+		materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 
 		var programAttributes = program.getAttributes();
 
