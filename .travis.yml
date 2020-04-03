@@ -1,7 +1,6 @@
 language: node_js
 node_js: 12
 services: xvfb
-cache: bundler
 
 jobs:
   include:
