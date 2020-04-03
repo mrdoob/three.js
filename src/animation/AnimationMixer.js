@@ -4,7 +4,7 @@ import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
 import { PropertyBinding } from './PropertyBinding.js';
 import { PropertyMixer } from './PropertyMixer.js';
 import { AnimationClip } from './AnimationClip.js';
-import { OverrideBlendMode } from '../constants.js';
+import { NormalAnimationBlendMode } from '../constants';
 
 /**
  *
@@ -517,7 +517,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// return an action for a clip optionally using a custom root target
 	// object (this method allocates a lot of dynamic memory in case a
 	// previously unknown clip/root combination is specified)
-	clipAction: function ( clip, optionalRoot, blendMode = OverrideBlendMode ) {
+	clipAction: function ( clip, optionalRoot, blendMode ) {
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
@@ -529,6 +529,20 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			actionsForClip = this._actionsByClip[ clipUuid ],
 			prototypeAction = null;
+
+		if ( blendMode === undefined ) {
+
+			if ( clipObject !== null ) {
+
+				blendMode = clipObject.blendMode;
+
+			} else {
+
+				blendMode = NormalAnimationBlendMode;
+
+			}
+
+		}
 
 		if ( actionsForClip !== undefined ) {
 

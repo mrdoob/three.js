@@ -5,6 +5,7 @@
  */
 
 import { Quaternion } from '../math/Quaternion.js';
+import { AdditiveAnimationBlendMode } from '../constants.js';
 
 var AnimationUtils = {
 
@@ -235,16 +236,15 @@ var AnimationUtils = {
 
 	},
 
-	makeClipAdditive: function ( sourceClip, referenceFrame = 0, cloneOriginal = false, clonedName, fps = 30 ) {
+	makeClipAdditive: function ( targetClip, referenceFrame = 0, referenceClip, fps = 30 ) {
 
-		let clip = sourceClip;
-		if ( cloneOriginal ) {
+		if ( referenceClip === undefined ) {
 
-			clip = sourceClip.clone();
-			clip.name = clonedName || clip.name;
+			referenceClip = targetClip;
 
 		}
-		const numTracks = clip.tracks.length;
+
+		const numTracks = targetClip.tracks.length;
 
 		fps = fps > 0 ? fps : 30;
 		const referenceTime = referenceFrame / fps;
@@ -252,40 +252,49 @@ var AnimationUtils = {
 		// Make each track's values relative to the values at the reference frame
 		for ( let i = 0; i < numTracks; ++ i ) {
 
-			const track = clip.tracks[ i ];
-			const trackType = track.ValueTypeName;
+			const referenceTrack = referenceClip.tracks[ i ];
+			const referenceTrackType = referenceTrack.ValueTypeName;
 
 			// Skip this track if it's non-numeric
-			if ( trackType === 'bool' || trackType === 'string' ) continue;
+			if ( referenceTrackType === 'bool' || referenceTrackType === 'string' ) continue;
 
-			const valueSize = track.getValueSize();
-			const lastIndex = track.times.length - 1;
-			const numTimes = track.times.length;
+			// Find the track in the target clip whose name and type matches the reference track
+			const targetTrack = targetClip.tracks.find( track => {
+
+				return track.name === referenceTrack.name
+				&& track.ValueTypeName === referenceTrackType;
+
+			} );
+
+			if ( targetTrack === undefined ) continue;
+
+			const valueSize = referenceTrack.getValueSize();
+			const lastIndex = referenceTrack.times.length - 1;
 			let referenceValue;
 
 			// Find the value to subtract out of the track
-			if ( referenceTime <= track.times[ 0 ] ) {
+			if ( referenceTime <= referenceTrack.times[ 0 ] ) {
 
 				// Reference frame is earlier than the first keyframe, so just use the first keyframe
-				referenceValue = AnimationUtils.arraySlice( track.values, 0, track.valueSize );
+				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, 0, referenceTrack.valueSize );
 
-			} else if ( referenceTime >= track.times[ lastIndex ] ) {
+			} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
 
 				// Reference frame is after the last keyframe, so just use the last keyframe
 				const startIndex = lastIndex * valueSize;
-				referenceValue = AnimationUtils.arraySlice( track.values, startIndex );
+				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex );
 
 			} else {
 
 				// Interpolate to the reference value
-				const interpolant = track.createInterpolant();
+				const interpolant = referenceTrack.createInterpolant();
 				interpolant.evaluate( referenceTime );
 				referenceValue = interpolant.resultBuffer;
 
 			}
 
 			// Conjugate the quaternion
-			if ( trackType === 'quaternion' ) {
+			if ( referenceTrackType === 'quaternion' ) {
 
 				const referenceQuat = new Quaternion(
 					referenceValue[ 0 ],
@@ -299,19 +308,20 @@ var AnimationUtils = {
 
 			// Subtract the reference value from all of the track values
 
+			const numTimes = targetTrack.times.length;
 			for ( let j = 0; j < numTimes; ++ j ) {
 
 				const valueStart = j * valueSize;
 
-				if ( trackType === 'quaternion' ) {
+				if ( referenceTrackType === 'quaternion' ) {
 
 					// Multiply the conjugate for quaternion track types
 					Quaternion.multiplyQuaternionsFlat(
-						track.values,
+						targetTrack.values,
 						valueStart,
 						referenceValue,
 						0,
-						track.values,
+						targetTrack.values,
 						valueStart
 					);
 
@@ -320,7 +330,7 @@ var AnimationUtils = {
 					// Subtract each value for all other numeric track types
 					for ( let k = 0; k < valueSize; ++ k ) {
 
-						track.values[ valueStart + k ] -= referenceValue[ k ];
+						targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
 
 					}
 
@@ -330,7 +340,9 @@ var AnimationUtils = {
 
 		}
 
-		return clip;
+		targetClip.blendMode = AdditiveAnimationBlendMode;
+
+		return targetClip;
 
 	}
 

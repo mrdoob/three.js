@@ -1,4 +1,4 @@
-import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat, OverrideBlendMode, AdditiveBlendMode } from '../constants.js';
+import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat, NormalAnimationBlendMode, AdditiveAnimationBlendMode } from '../constants.js';
 
 /**
  *
@@ -11,12 +11,12 @@ import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, L
  *
  */
 
-function AnimationAction( mixer, clip, localRoot, blendMode = OverrideBlendMode ) {
+function AnimationAction( mixer, clip, localRoot, blendMode ) {
 
 	this._mixer = mixer;
 	this._clip = clip;
 	this._localRoot = localRoot || null;
-	this.blendMode = blendMode;
+	this.blendMode = blendMode || clip.blendMode;
 
 	var tracks = clip.tracks,
 		nTracks = tracks.length,
@@ -377,7 +377,7 @@ Object.assign( AnimationAction.prototype, {
 
 			switch ( this.blendMode ) {
 
-				case AdditiveBlendMode:
+				case AdditiveAnimationBlendMode:
 
 					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
 
@@ -388,7 +388,7 @@ Object.assign( AnimationAction.prototype, {
 
 					break;
 
-				case OverrideBlendMode:
+				case NormalAnimationBlendMode:
 				default:
 
 					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {

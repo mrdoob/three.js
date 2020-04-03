@@ -117,7 +117,7 @@
 
 						if ( baseActions[ name ] ) {
 
-							const action = mixer.clipAction( clip, undefined, THREE.OverrideBlendMode );
+							const action = mixer.clipAction( clip );
 							activateAction( action );
 							baseActions[ name ].action = action;
 							allActions.push( action );
@@ -127,6 +127,7 @@
 							// Make the clip additive and remove the reference frame
 
 							THREE.AnimationUtils.makeClipAdditive( clip );
+							console.log( clip );
 
 							if ( clip.name.endsWith( '_pose' ) ) {
 
@@ -134,7 +135,7 @@
 
 							}
 
-							const action = mixer.clipAction( clip, undefined, THREE.AdditiveBlendMode );
+							const action = mixer.clipAction( clip );
 							activateAction( action );
 							additiveActions[ name ].action = action;
 							allActions.push( action );

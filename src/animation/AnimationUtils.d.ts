@@ -24,10 +24,9 @@ export namespace AnimationUtils {
 		fps?: number
 	): AnimationClip;
 	export function makeClipAdditive(
-		sourceClip: AnimationClip,
+		targetClip: AnimationClip,
 		referenceFrame?: number,
-		cloneOriginal?: boolean,
-		clonedName?: string,
+		referenceClip?: AnimationClip,
 		fps?: number
 	): AnimationClip;
 }
