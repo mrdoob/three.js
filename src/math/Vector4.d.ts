@@ -208,6 +208,11 @@ export class Vector4 implements Vector {
 		attribute: BufferAttribute,
 		index: number,
 		offset?: number
-	): this;
+    ): this;
+    
+    /**
+	 * Sets this vector's x, y, z and w from Math.random
+	 */
+	random(): this;
 
 }
