@@ -87,7 +87,7 @@
     "image-output": "2.4.1",
     "pixelmatch": "5.1.0",
     "pngjs": "3.4.0",
-    "puppeteer": "^2.1.1",
+    "puppeteer": "2.1.1",
     "qunit": "^2.9.3",
     "rollup": "^2.0.5",
     "rollup-plugin-buble": "^0.19.8",
