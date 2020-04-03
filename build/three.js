@@ -23896,8 +23896,6 @@
 
 			animation.stop();
 
-			this.forceContextLoss();
-
 		};
 
 		// Events

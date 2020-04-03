@@ -23888,8 +23888,6 @@ function WebGLRenderer( parameters ) {
 
 		animation.stop();
 
-		this.forceContextLoss();
-
 	};
 
 	// Events
