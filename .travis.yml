@@ -1,0 +1,27 @@
+language: node_js
+node_js: node
+services: xvfb
+cache: bundler
+
+jobs:
+  include:
+
+    - &lint-n-unit
+      stage: lint & unit
+      name: lint
+      script: npm run test-lint
+    - <<: *lint-n-unit
+      name: unit
+      script: npm run test-unit
+
+    - &e2e
+      stage: e2e
+      name: e2e
+      script: npm run test-e2e
+      env: FORCE_COLOR=0 CI=0
+    - <<: *e2e
+      env: FORCE_COLOR=0 CI=1
+    - <<: *e2e
+      env: FORCE_COLOR=0 CI=2
+    - <<: *e2e
+      env: FORCE_COLOR=0 CI=3
