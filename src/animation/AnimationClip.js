@@ -22,7 +22,7 @@ function AnimationClip( name, duration, tracks, blendMode ) {
 	this.name = name;
 	this.tracks = tracks;
 	this.duration = ( duration !== undefined ) ? duration : - 1;
-	this.blendMode = blendMode || NormalAnimationBlendMode;
+	this.blendMode = ( blendMode !== undefined ) ? blendMode : NormalAnimationBlendMode;
 
 	this.uuid = MathUtils.generateUUID();
 
