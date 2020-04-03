@@ -11,9 +11,6 @@ var APP = {
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.outputEncoding = THREE.sRGBEncoding;
 
-		// HACK(mrdoob) Avoid Editor losing context on Play/Stop :/
-		renderer.forceContextLoss = function () {};
-
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
 
