@@ -1012,7 +1012,12 @@ OBJLoader2Parser.prototype = {
 
 			if ( this.logging.enabled && this.logging.debug ) {
 
-				let materialIndexLine = ( selectedMaterialIndex === undefined || selectedMaterialIndex === null ) ? '' : '\n\t\tmaterialIndex: ' + selectedMaterialIndex;
+				let materialIndexLine = '';
+				if ( selectedMaterialIndex ) {
+
+					materialIndexLine = '\n\t\tmaterialIndex: ' + selectedMaterialIndex;
+
+				}
 				let createdReport = '\tOutput Object no.: ' + this.outputObjectCount +
 					'\n\t\tgroupName: ' + meshOutputGroup.groupName +
 					'\n\t\tIndex: ' + meshOutputGroup.index +
