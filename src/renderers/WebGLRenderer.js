@@ -1521,8 +1521,6 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
-
 		var programAttributes = program.getAttributes();
 
 		if ( material.morphTargets ) {
@@ -1569,6 +1567,7 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+		materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 		materialProperties.fog = scene.fog;
 
 		// store the light setup it was created for
