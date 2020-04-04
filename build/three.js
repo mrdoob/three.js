@@ -24831,7 +24831,6 @@
 
 				materialProperties.program = program;
 				materialProperties.uniforms = parameters.uniforms;
-				materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 				materialProperties.outputEncoding = _this.outputEncoding;
 				material.program = program;
 
@@ -24883,6 +24882,7 @@
 
 			}
 
+			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 			materialProperties.fog = scene.fog;
 
 			// store the light setup it was created for
