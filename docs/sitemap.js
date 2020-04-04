@@ -6,7 +6,6 @@ const { createWriteStream, readFileSync } = require('fs');
 const { resolve } = require('path');
 const { runInThisContext } = require('vm');
 const { SitemapStream, streamToPromise } = require('sitemap');
-const { createGzip } = require('zlib');
 
 // Hack to load the list.js file without it exporting the list variable
 const include = function() {
