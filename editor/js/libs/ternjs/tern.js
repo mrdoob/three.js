@@ -951,7 +951,7 @@
     var expr = findExprOrThrow(file, query, true);
     if (expr.node.type == "Identifier") {
       return findRefsToVariable(srv, query, file, expr);
-    } else if (expr && expr.node.type == "MemberExpression" && !expr.node.computed) {
+    } else if (expr.node.type == "MemberExpression" && !expr.node.computed) {
       var p = expr.node.property;
       expr.node = expr.node.object;
       return findRefsToProperty(srv, query, expr, p);
