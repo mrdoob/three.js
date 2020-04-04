@@ -126,7 +126,7 @@ h1 a {
 	left: 0px;
 	width: var(--panel-width);
 	height: 100%;
-	overflow: auto;
+	overflow: visible;
 	border-right: var(--border-style);
 	display: flex;
 	flex-direction: column;
@@ -277,7 +277,7 @@ h1 a {
 
 	#contentWrapper {
 		flex: 1;
-		overflow: hidden;
+		overflow: visible;
 		display: flex;
 		flex-direction: column;
 		transform: translate3d(0,0,0);
@@ -285,7 +285,7 @@ h1 a {
 	#panel #content {
 		flex: 1;
 		overflow-y: auto;
-		overflow-x: hidden;
+		overflow-x: visible;
 		-webkit-overflow-scrolling: touch;
 		padding: 0 var(--panel-padding) var(--panel-padding) var(--panel-padding);
 	}
@@ -487,7 +487,7 @@ iframe {
 		width: 100%;
 		right: 0;
 		z-index: 1000;
-		overflow-x: hidden;
+		overflow: visible;
 		transition: 0s 0s height;
 		border: none;
 		height: var(--header-height);
@@ -526,7 +526,7 @@ iframe {
 		max-width: 360px;
 		z-index: 10000;
 		transition: .25s transform;
-		overflow-x: hidden;
+		overflow: visible;
 		margin-right: -380px;
 		line-height: 2rem;
 	}
@@ -543,4 +543,23 @@ iframe {
 	#viewer {
 		padding-left: 0;
 	}
+}
+
+/* DocSearch */
+
+body .algolia-autocomplete .ds-dropdown-menu [class^=ds-dataset-],
+body .algolia-autocomplete .algolia-docsearch-suggestion,
+body .algolia-autocomplete .algolia-docsearch-suggestion--category-header,
+body .algolia-autocomplete .ds-dropdown-menu:before {
+	background-color: var(--background-color);
+	color: var(--text-color);
+}
+
+body .algolia-autocomplete .algolia-docsearch-suggestion--title {
+	color: var(--text-color);
+}
+
+body .algolia-autocomplete .algolia-docsearch-suggestion--highlight {
+	color: white;
+	color: var(--color-blue);
 }

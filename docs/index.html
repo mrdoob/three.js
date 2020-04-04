@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="shortcut icon" href="../files/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
 		<!-- console sandbox -->
 		<script src="../build/three.min.js" async defer></script>
 	</head>
@@ -84,7 +85,6 @@
 				language = value;
 
 				createNavigation();
-				updateFilter();
 				autoChangeUrlLanguage( language );
 
 			}
@@ -139,14 +139,12 @@
 			exitSearchButton.onclick = function( event ) {
 
 				filterInput.value = '';
-				updateFilter();
 				panel.classList.remove('searchFocused');
 
 			}
 
 			filterInput.oninput = function ( event ) {
 
-				updateFilter();
 
 			};
 
@@ -282,117 +280,6 @@
 
 			}
 
-
-			// Filtering
-
-			function updateFilter() {
-
-				// (uncomment the following line and the "Query strings" section, if you want query strings):
-				// updateQueryString();
-
-				var regExp = new RegExp( filterInput.value, 'gi' );
-
-				for ( var pageName in pageProperties ) {
-
-					var linkElement = pageProperties[ pageName ].linkElement;
-					var categoryClassList = linkElement.parentElement.classList;
-					var filterResults = pageName.match( regExp );
-
-					if ( filterResults && filterResults.length > 0 ) {
-
-						// Accentuate matching characters
-
-						for ( var i = 0; i < filterResults.length; i++ ) {
-
-							var result = filterResults[ i ];
-
-							if ( result !== '' ) {
-								pageName = pageName.replace( result, '<b>' + result + '</b>' );
-							}
-
-						}
-
-						categoryClassList.remove( 'hidden' );
-						linkElement.innerHTML = pageName;
-
-					} else {
-
-						// Hide all non-matching page names
-
-						categoryClassList.add( 'hidden' );
-
-					}
-
-				}
-
-				displayFilteredPanel();
-
-			}
-
-			function displayFilteredPanel() {
-
-				// Show/hide categories depending on their content
-				// First check if at least one page in this category is not hidden
-
-				categoryElements.forEach( function ( category ) {
-
-					var pages = category.children;
-					var pagesLength = pages.length;
-					var sectionClassList = category.parentElement.classList;
-
-					var hideCategory = true;
-
-					for ( var i = 0; i < pagesLength; i ++ ) {
-
-						var pageClassList = pages[ i ].classList;
-
-						if ( ! pageClassList.contains( 'hidden' ) ) {
-
-							hideCategory = false;
-
-						}
-
-					}
-
-					// If and only if all page names are hidden, hide the whole category
-
-					if ( hideCategory ) {
-
-						sectionClassList.add( 'hidden' );
-
-					} else {
-
-						sectionClassList.remove( 'hidden' );
-
-					}
-
-				} );
-
-			}
-
-
-			// Routing
-
-			function setUrlFragment( pageName ) {
-
-				// Handle navigation from the subpages (iframes):
-				// First separate the memeber (if existing) from the page name,
-				// then identify the subpage's URL and set it as URL fragment (re-adding the member)
-
-				var splitPageName = decomposePageName( pageName, '.', '.' );
-
-				var currentProperties = pageProperties[ splitPageName[ 0 ] ];
-
-				if ( currentProperties ) {
-
-					window.location.hash = currentProperties.pageURL + splitPageName[ 1 ];
-
-					createNewIframe();
-
-				}
-
-			}
-
 			function createNewIframe() {
 
 				// Change the content displayed in the iframe
@@ -474,6 +361,20 @@
 
 
 		</script>
+		<script>
+			function addSearch() {
+				var languageSelect = document.getElementById('language');
+	
+				docsearch({
+					apiKey: 'ec69071880b355699ad27cb720becc23',
+					indexName: 'threejs',
+					inputSelector: '#filter',
+					algoliaOptions: { 'facetFilters': ["lang:" + languageSelect.value] }
+				})
+			}
+		</script>
+		<script type="text/javascript" onload="addSearch()" async defer
+			src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
 
 	</body>
 
