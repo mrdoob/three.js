@@ -49,7 +49,11 @@
 			var surface = new THREE.Mesh( surfaceGeometry, surfaceMaterial );
 
 			// Source: https://gist.github.com/gre/1650294
-			var easeOutCubic = function ( t ) { return ( -- t ) * t * t + 1; };
+			var easeOutCubic = function ( t ) {
+
+				return ( -- t ) * t * t + 1;
+
+			};
 
 			// Scaling curve causes particles to grow quickly, ease gradually into full scale, then
 			// disappear quickly. More of the particle's lifetime is spent around full scale.
@@ -63,8 +67,8 @@
 
 			loader.load( './models/gltf/Flower/Flower.glb', function ( gltf ) {
 
-				var _stemMesh = gltf.scene.getObjectByName('Stem');
-				var _blossomMesh = gltf.scene.getObjectByName('Blossom');
+				var _stemMesh = gltf.scene.getObjectByName( 'Stem' );
+				var _blossomMesh = gltf.scene.getObjectByName( 'Blossom' );
 
 				stemGeometry = new THREE.InstancedBufferGeometry();
 				blossomGeometry = new THREE.InstancedBufferGeometry();
@@ -74,7 +78,7 @@
 
 				var defaultTransform = new THREE.Matrix4()
 					.makeRotationX( Math.PI )
-					.multiply( new THREE.Matrix4().makeScale( 7, 7, 7 ) )
+					.multiply( new THREE.Matrix4().makeScale( 7, 7, 7 ) );
 
 				stemGeometry.applyMatrix4( defaultTransform );
 				blossomGeometry.applyMatrix4( defaultTransform );
@@ -123,7 +127,7 @@
 				scene.background = new THREE.Color( api.backgroundColor );
 
 				var pointLight = new THREE.PointLight( 0xAA8899, 0.75 );
-				pointLight.position.set( 50, -25, 75 );
+				pointLight.position.set( 50, - 25, 75 );
 				scene.add( pointLight );
 
 				scene.add( new THREE.HemisphereLight() );
@@ -214,7 +218,7 @@
 
 			}
 
-			function resampleParticle ( i ) {
+			function resampleParticle( i ) {
 
 				sampler.sample( _position, _normal );
 				_normal.add( _position );
@@ -229,7 +233,7 @@
 
 			}
 
-			function updateParticle ( i ) {
+			function updateParticle( i ) {
 
 				// Update lifecycle.
 
