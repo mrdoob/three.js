@@ -6701,7 +6701,7 @@ var _box$1 = new Box3();
 function Sphere( center, radius ) {
 
 	this.center = ( center !== undefined ) ? center : new Vector3();
-	this.radius = ( radius !== undefined ) ? radius : 0;
+	this.radius = ( radius !== undefined ) ? radius : - 1;
 
 }
 
@@ -6759,9 +6759,18 @@ Object.assign( Sphere.prototype, {
 
 	},
 
-	empty: function () {
+	isEmpty: function () {
 
-		return ( this.radius <= 0 );
+		return ( this.radius < 0 );
+
+	},
+
+	makeEmpty: function () {
+
+		this.center.set( 0, 0, 0 );
+		this.radius = - 1;
+
+		return this;
 
 	},
 
@@ -6827,6 +6836,14 @@ Object.assign( Sphere.prototype, {
 
 			console.warn( 'THREE.Sphere: .getBoundingBox() target is now required' );
 			target = new Box3();
+
+		}
+
+		if ( this.isEmpty() ) {
+
+			// Empty sphere produces empty bounding box
+			target.makeEmpty();
+			return target;
 
 		}
 
@@ -48540,6 +48557,17 @@ Object.assign( Box3.prototype, {
 		return this.getSize( optionalTarget );
 
 	}
+} );
+
+Object.assign( Sphere.prototype, {
+
+	empty: function () {
+
+		console.warn( 'THREE.Sphere: .empty() has been renamed to .isEmpty().' );
+		return this.isEmpty();
+
+	},
+
 } );
 
 Frustum.prototype.setFromMatrix = function ( m ) {
