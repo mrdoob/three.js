@@ -713,7 +713,7 @@ Object.assign( Vector3.prototype, {
 		return this;
 
 	},
-	
+
 	random: function () {
 
 		this.x = Math.random();
@@ -721,7 +721,7 @@ Object.assign( Vector3.prototype, {
 		this.z = Math.random();
 
 		return this;
-		
+
 	}
 
 } );

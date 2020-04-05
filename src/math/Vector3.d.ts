@@ -286,7 +286,7 @@ export class Vector3 implements Vector {
 		index: number,
 		offset?: number
 	): this;
-	
+
 	/**
 	 * Sets this vector's x, y and z from Math.random
 	 */

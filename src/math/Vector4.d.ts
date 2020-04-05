@@ -209,7 +209,7 @@ export class Vector4 implements Vector {
 		index: number,
 		offset?: number
 	): this;
-	
+
 	/**
 	 * Sets this vector's x, y, z and w from Math.random
 	 */

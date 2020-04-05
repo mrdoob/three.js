@@ -647,7 +647,7 @@ Object.assign( Vector4.prototype, {
 		return this;
 
 	},
-	
+
 	random: function () {
 
 		this.x = Math.random();
@@ -656,7 +656,7 @@ Object.assign( Vector4.prototype, {
 		this.w = Math.random();
 
 		return this;
-		
+
 	}
 
 } );
