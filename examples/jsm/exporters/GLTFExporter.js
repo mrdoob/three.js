@@ -2276,9 +2276,9 @@ GLTFExporter.Utils = {
 
 				}
 
-				// We need to take into consideration that the target node for a
-				// blendshape animation might not be the root node of the animation:
-				mergedTrack.name = sourceTrack.name
+				// We need to take into consideration the intended target node
+				// of our original un-merged morphTarget animation.
+				mergedTrack.name = sourceTrackBinding.nodeName + '.morphTargetInfluences';
 				mergedTrack.values = values;
 
 				mergedTracks[ sourceTrackNode.uuid ] = mergedTrack;
