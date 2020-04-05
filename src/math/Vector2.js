@@ -482,16 +482,16 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
-    },
-    
-    random: function () {
+	},
+	
+	random: function () {
 
-        this.x = Math.random();
-        this.y = Math.random();
+		this.x = Math.random();
+		this.y = Math.random();
 
-        return this;
+		return this;
 
-    }
+	}
 
 } );
 

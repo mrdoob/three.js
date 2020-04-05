@@ -285,9 +285,9 @@ export class Vector3 implements Vector {
 		attribute: BufferAttribute,
 		index: number,
 		offset?: number
-    ): this;
-    
-    /**
+	): this;
+	
+	/**
 	 * Sets this vector's x, y and z from Math.random
 	 */
 	random(): this;

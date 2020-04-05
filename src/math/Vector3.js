@@ -713,16 +713,16 @@ Object.assign( Vector3.prototype, {
 		return this;
 
 	},
-    
-    random: function () {
+	
+	random: function () {
 
-        this.x = Math.random();
-        this.y = Math.random();
-        this.z = Math.random();
+		this.x = Math.random();
+		this.y = Math.random();
+		this.z = Math.random();
 
-        return this;
-        
-    }
+		return this;
+		
+	}
 
 } );
 

@@ -457,9 +457,9 @@ export class Vector2 implements Vector {
 	 *
 	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
 	 */
-    manhattanDistanceTo( v: Vector2 ): number;
-    
-    /**
+	manhattanDistanceTo( v: Vector2 ): number;
+
+	/**
 	 * Sets this vector's x and y from Math.random
 	 */
 	random(): this;
