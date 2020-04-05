@@ -3341,8 +3341,7 @@ var FBXLoader = ( function () {
 			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 
-			// note: do not remove this even if you get a linter warning as it moves the buffer forward
-			var propertyListLen = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			( version >= 7500 ) ? reader.getUint64() : reader.getUint32(); // the returned propertyListLen is not used
 
 			var nameLen = reader.getUint8();
 			var name = reader.getString( nameLen );
