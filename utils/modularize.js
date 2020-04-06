@@ -279,6 +279,18 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	} );
 
+	// classes
+
+	contents = contents.replace( /\nclass (\w+)/g, function ( match, p1 ) {
+
+		classNames.push( p1 );
+
+		console.log( p1 );
+
+		return match;
+
+	} );
+
 	// methods
 
 	contents = contents.replace( /new THREE\.([a-zA-Z0-9]+)\(/g, function ( match, p1 ) {
