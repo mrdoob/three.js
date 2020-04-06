@@ -281,13 +281,13 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	// classes
 
-	contents = contents.replace( /\nclass (\w+)/g, function ( match, p1 ) {
+	contents = contents.replace( /\nTHREE.(\w+) = class (\w+)/g, function ( match, p1, p2 ) {
 
 		classNames.push( p1 );
 
 		console.log( p1 );
 
-		return match;
+		return `\nclass ${p1}`;
 
 	} );
 
