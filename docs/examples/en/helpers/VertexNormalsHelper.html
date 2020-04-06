@@ -20,22 +20,23 @@
 			Unlike [page:FaceNormalsHelper], this works with [page:BufferGeometry].
 		</p>
 
-		<h2>Example</h2>
-		<p>
-			[example:webgl_helpers WebGL / helpers]
-		</p>
+		<h2>Code Example</h2>
 
 		<code>
-		var geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
+		var geometry = new THREE.BoxBufferGeometry( 10, 10, 10, 2, 2, 2 );
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var box = new THREE.Mesh( geometry, material );
 
-		var helper = new THREE.VertexNormalsHelper( box, 2, 0x00ff00, 1 );
+		var helper = new VertexNormalsHelper( box, 2, 0x00ff00, 1 );
 
 		scene.add( box );
 		scene.add( helper );
 		</code>
 
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_helpers WebGL / helpers]
+		</p>
 
 		<h2>Constructor</h2>
 

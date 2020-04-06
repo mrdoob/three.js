@@ -31,6 +31,7 @@ import { Face3 } from './core/Face3.js';
 import { Geometry } from './core/Geometry.js';
 import { Object3D } from './core/Object3D.js';
 import { Uniform } from './core/Uniform.js';
+import { Raycaster } from './core/Raycaster.js';
 import { Curve } from './extras/core/Curve.js';
 import { CurvePath } from './extras/core/CurvePath.js';
 import { Path } from './extras/core/Path.js';
@@ -61,6 +62,7 @@ import { PointsMaterial } from './materials/PointsMaterial.js';
 import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
 import { Box3 } from './math/Box3.js';
+import { Sphere } from './math/Sphere.js';
 import { Color } from './math/Color.js';
 import { Frustum } from './math/Frustum.js';
 import { Line3 } from './math/Line3.js';
@@ -100,8 +102,10 @@ export function Face4( a, b, c, d, normal, color, materialIndex ) {
 }
 
 export var LineStrip = 0;
-
 export var LinePieces = 1;
+export var NoColors = 0;
+export var FaceColors = 1;
+export var VertexColors = 2;
 
 export function MeshFaceMaterial( materials ) {
 
@@ -537,6 +541,17 @@ Object.assign( Box3.prototype, {
 		return this.getSize( optionalTarget );
 
 	}
+} );
+
+Object.assign( Sphere.prototype, {
+
+	empty: function () {
+
+		console.warn( 'THREE.Sphere: .empty() has been renamed to .isEmpty().' );
+		return this.isEmpty();
+
+	},
+
 } );
 
 Frustum.prototype.setFromMatrix = function ( m ) {
@@ -1354,6 +1369,25 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 } );
 
+Object.defineProperties( Raycaster.prototype, {
+
+	linePrecision: {
+		get: function () {
+
+			console.warn( 'THREE.Raycaster: .linePrecision has been deprecated. Use .params.Line.threshold instead.' );
+			return this.params.Line.threshold;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.Raycaster: .linePrecision has been deprecated. Use .params.Line.threshold instead.' );
+			this.params.Line.threshold = value;
+
+		}
+	}
+
+} );
+
 Object.defineProperties( InterleavedBuffer.prototype, {
 
 	dynamic: {
@@ -2117,19 +2151,19 @@ export var SceneUtils = {
 
 	createMultiMaterialObject: function ( /* geometry, materials */ ) {
 
-		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+		console.error( 'THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js' );
 
 	},
 
 	detach: function ( /* child, parent, scene */ ) {
 
-		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+		console.error( 'THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js' );
 
 	},
 
 	attach: function ( /* child, scene, parent */ ) {
 
-		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+		console.error( 'THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js' );
 
 	}
 
@@ -2139,6 +2173,6 @@ export var SceneUtils = {
 
 export function LensFlare() {
 
-	console.error( 'THREE.LensFlare has been moved to /examples/js/objects/Lensflare.js' );
+	console.error( 'THREE.LensFlare has been moved to /examples/jsm/objects/Lensflare.js' );
 
 }

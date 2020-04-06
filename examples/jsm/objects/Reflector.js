@@ -4,6 +4,7 @@
 
 import {
 	Color,
+	LinearEncoding,
 	LinearFilter,
 	MathUtils,
 	Matrix4,
@@ -34,6 +35,7 @@ var Reflector = function ( geometry, options ) {
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Reflector.ReflectorShader;
 	var recursion = options.recursion !== undefined ? options.recursion : 0;
+	var encoding = options.encoding !== undefined ? options.encoding : LinearEncoding;
 
 	//
 
@@ -56,7 +58,8 @@ var Reflector = function ( geometry, options ) {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBFormat,
-		stencilBuffer: false
+		stencilBuffer: false,
+		encoding: encoding
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -176,7 +179,10 @@ var Reflector = function ( geometry, options ) {
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+
+		renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
+
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, virtualCamera );
 
 		renderer.xr.enabled = currentXrEnabled;

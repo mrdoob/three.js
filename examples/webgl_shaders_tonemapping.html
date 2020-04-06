@@ -315,7 +315,6 @@
 							 r + "dark-s_pz.jpg", r + "dark-s_nz.jpg" ];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.format = THREE.RGBFormat;
 				textureCube.encoding = THREE.sRGBEncoding;
 
 				sceneCube.background = textureCube;

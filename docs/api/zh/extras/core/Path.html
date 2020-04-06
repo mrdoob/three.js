@@ -16,22 +16,22 @@
 		该类定义了二维路径，提供了一些类似2D Canvas API的方法来创建或者构造二维路径。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-			var path = new THREE.Path();
+		var path = new THREE.Path();
 
-			path.lineTo( 0, 0.8 );
-			path.quadraticCurveTo( 0, 1, 0.2, 1 );
-			path.lineTo( 1, 1 );
+		path.lineTo( 0, 0.8 );
+		path.quadraticCurveTo( 0, 1, 0.2, 1 );
+		path.lineTo( 1, 1 );
 
-			var points = path.getPoints();
+		var points = path.getPoints();
 
-			var geometry = new THREE.BufferGeometry().setFromPoints( points );
-			var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
+		var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		var material = new THREE.LineBasicMaterial( { color: 0xffffff } );
 
-			var line = new THREE.Line( geometry, material );
-			scene.add( line );
+		var line = new THREE.Line( geometry, material );
+		scene.add( line );
 		</code>
 
 

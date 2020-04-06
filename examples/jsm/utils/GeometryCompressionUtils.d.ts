@@ -1,9 +1,9 @@
-import * as THREE from "../../../build/three.module.js";
+import { Mesh } from '../../../src/Three';
 
 export namespace GeometryCompressionUtils {
 
-	export function compressNormals( mesh: THREE.Mesh, encodeMethod: String );
-	export function compressPositions( mesh: THREE.Mesh );
-	export function compressUvs( mesh: THREE.Mesh );
+	export function compressNormals( mesh: Mesh, encodeMethod: String ): void;
+	export function compressPositions( mesh: Mesh ): void;
+	export function compressUvs( mesh: Mesh ): void;
 
 }

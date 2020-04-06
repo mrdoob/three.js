@@ -620,6 +620,17 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	fromBufferAttribute: function ( attribute, index ) {
+
+		this._x = attribute.getX( index );
+		this._y = attribute.getY( index );
+		this._z = attribute.getZ( index );
+		this._w = attribute.getW( index );
+
+		return this;
+
+	},
+
 	_onChange: function ( callback ) {
 
 		this._onChangeCallback = callback;

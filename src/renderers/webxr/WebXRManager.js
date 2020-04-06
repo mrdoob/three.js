@@ -16,7 +16,7 @@ function WebXRManager( renderer, gl ) {
 
 	var session = null;
 
-	// var framebufferScaleFactor = 1.0;
+	var framebufferScaleFactor = 1.0;
 
 	var referenceSpace = null;
 	var referenceSpaceType = 'local-floor';
@@ -166,9 +166,16 @@ function WebXRManager( renderer, gl ) {
 
 	}
 
-	this.setFramebufferScaleFactor = function ( /* value */ ) {
+	this.setFramebufferScaleFactor = function ( value ) {
 
-		// framebufferScaleFactor = value;
+		framebufferScaleFactor = value;
+
+		// Warn if function is used while presenting
+		if ( scope.isPresenting == true ) {
+
+			console.warn( "WebXRManager: Cannot change framebuffer scale while presenting VR content" );
+
+		}
 
 	};
 
@@ -210,7 +217,8 @@ function WebXRManager( renderer, gl ) {
 				antialias: attributes.antialias,
 				alpha: attributes.alpha,
 				depth: attributes.depth,
-				stencil: attributes.stencil
+				stencil: attributes.stencil,
+				framebufferScaleFactor: framebufferScaleFactor
 			};
 
 			// eslint-disable-next-line no-undef

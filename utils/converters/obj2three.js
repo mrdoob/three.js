@@ -1,5 +1,7 @@
-var fs = require( 'fs' );
-var path = require( 'path' );
+import fs from 'fs';
+import path from 'path';
+
+import { OBJLoader } from '../../examples/jsm/loaders/OBJLoader.js';
 
 if ( process.argv.length <= 2 ) {
 
@@ -10,7 +12,7 @@ if ( process.argv.length <= 2 ) {
 
 //
 
-var PRECISION = 6;
+const PRECISION = 6;
 
 function parseNumber( key, value ) {
 
@@ -18,13 +20,10 @@ function parseNumber( key, value ) {
 
 }
 
-THREE = require( '../../build/three.js' );
-require( '../../examples/js/loaders/OBJLoader.js' );
+const file = process.argv[ 2 ];
+const loader = new OBJLoader();
 
-var file = process.argv[ 2 ];
-var loader = new THREE.OBJLoader();
+const text = fs.readFileSync( file, 'utf8' );
 
-var text = fs.readFileSync( file, 'utf8' );
-
-var content = JSON.stringify( loader.parse( text ).toJSON(), parseNumber );
+const content = JSON.stringify( loader.parse( text ).toJSON(), parseNumber );
 fs.writeFileSync( path.basename( file, '.obj' ) + '.json', content, 'utf8' );

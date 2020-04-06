@@ -19,21 +19,23 @@
 			半球光不能投射阴影。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
-		<div>
+		<code>
+		var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		scene.add( light );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
 			[example:webgl_lights_hemisphere lights / hemisphere ]<br />
-		  [example:misc_controls_pointerlock controls / pointerlock ]<br />
-		  [example:webgl_decals decals ]<br />
-		  [example:webgl_loader_collada_kinematics loader / collada / kinematics ]<br />
-		  [example:webgl_materials_lightmap materials / lightmap ]<br />
-		  [example:webgl_shaders_ocean shaders / ocean ]
-		</div>
-
-<code>
-var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
-scene.add( light );
-</code>
+			[example:misc_controls_pointerlock controls / pointerlock ]<br />
+			[example:webgl_decals decals ]<br />
+			[example:webgl_loader_collada_kinematics loader / collada / kinematics ]<br />
+			[example:webgl_materials_lightmap materials / lightmap ]<br />
+			[example:webgl_shaders_ocean shaders / ocean ]
+		</p>
 
 		<h2>构造器（Constructor）</h2>
 		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
@@ -77,7 +79,7 @@ scene.add( light );
 
 		<h2>方法（Methods）</h2>
 
-		公共方法请查看基类 [page:Light Light]。
+		<p>公共方法请查看基类 [page:Light Light]。</p>
 
 		<h3>[method:HemisphereLight copy]( [param:HemisphereLight source] )</h3>
 		<p>

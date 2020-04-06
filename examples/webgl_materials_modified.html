@@ -74,6 +74,8 @@
 				document.body.appendChild( renderer.domElement );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1000;
+				controls.maxDistance = 5000;
 
 				//
 

@@ -17,6 +17,8 @@
 		[page:ShapeGeometry], to get points, or to get triangulated faces.
 		</p>
 
+		<h2>Code Example</h2>
+
 		<code>
 		var heartShape = new THREE.Shape();
 
@@ -30,7 +32,7 @@
 
 		var extrudeSettings = { amount: 8, bevelEnabled: true, bevelSegments: 2, steps: 2, bevelSize: 1, bevelThickness: 1 };
 
-		var geometry = new THREE.ExtrudeGeometry( heartShape, extrudeSettings );
+		var geometry = new THREE.ExtrudeBufferGeometry( heartShape, extrudeSettings );
 
 		var mesh = new THREE.Mesh( geometry, new THREE.MeshPhongMaterial() );
 		</code>

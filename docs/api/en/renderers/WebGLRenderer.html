@@ -427,12 +427,11 @@
 		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>Render a buffer geometry group using the camera and with the specified material.</p>
 
-		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:shaderprogram program], [param:Material shading] )</h3>
+		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
 		<p>object - an instance of [page:Object3D]<br />
-		program - an instance of shaderProgram<br />
-		shading - an instance of Material<br /><br />
+		program - an instance of [page:WebGLProgram]<br />
 
-		Render an immediate buffer. Gets called by renderImmediateObject.
+		Renders an instance of [page:ImmediateRenderObject]. Gets called by renderObjectImmediate().
 		</p>
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
@@ -444,6 +443,9 @@
 
 		<h3>[method:null setClearColor]( [param:Color color], [param:Float alpha] )</h3>
 		<p>Sets the clear color and opacity.</p>
+
+		<h3>[method:null setFramebuffer]( [param:WebGLFramebuffer value] )</h3>
+		<p>Sets the given WebGLFramebuffer. This method can only be used if no render target is set via [page:WebGLRenderer.setRenderTarget .setRenderTarget]().</p>
 
 		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
 		<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</p>

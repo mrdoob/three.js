@@ -1,4 +1,4 @@
-// r113
+// r115.1
 
 const assets = [
 	'./',
@@ -15,6 +15,7 @@ const assets = [
 	'../examples/js/libs/jszip.min.js',
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
+	'../examples/js/libs/draco/draco_encoder.js',
 	'../examples/js/libs/draco/draco_wasm_wrapper.js',
 
 	'../examples/jsm/loaders/AMFLoader.js',
@@ -39,12 +40,16 @@ const assets = [
 	'../examples/jsm/curves/NURBSUtils.js',
 
 	'../examples/jsm/exporters/ColladaExporter.js',
+	'../examples/jsm/exporters/DRACOExporter.js',
 	'../examples/jsm/exporters/GLTFExporter.js',
 	'../examples/jsm/exporters/OBJExporter.js',
 	'../examples/jsm/exporters/PLYExporter.js',
 	'../examples/jsm/exporters/STLExporter.js',
 
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
+
+	'../examples/js/vr/HelioWebXRPolyfill.js',
+	'../examples/jsm/webxr/VRButton.js',
 
 	'./manifest.json',
 	'./images/icon.png',
@@ -98,6 +103,7 @@ const assets = [
 	'./js/Config.js',
 	'./js/History.js',
 	'./js/Loader.js',
+	'./js/LoaderUtils.js',
 	'./js/Menubar.js',
 	'./js/Menubar.File.js',
 	'./js/Menubar.Edit.js',

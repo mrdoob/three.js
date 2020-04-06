@@ -168,6 +168,10 @@ THREE.GLTFLoader = ( function () {
 							extensions[ extensionName ] = new GLTFLightsExtension( json );
 							break;
 
+						case EXTENSIONS.KHR_MATERIALS_CLEARCOAT:
+							extensions[ extensionName ] = new GLTFMaterialsClearcoatExtension();
+							break;
+
 						case EXTENSIONS.KHR_MATERIALS_UNLIT:
 							extensions[ extensionName ] = new GLTFMaterialsUnlitExtension();
 							break;
@@ -264,6 +268,7 @@ THREE.GLTFLoader = ( function () {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
 		KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
 		KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
+		KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
@@ -399,6 +404,71 @@ THREE.GLTFLoader = ( function () {
 			if ( metallicRoughness.baseColorTexture !== undefined ) {
 
 				pending.push( parser.assignTexture( materialParams, 'map', metallicRoughness.baseColorTexture ) );
+
+			}
+
+		}
+
+		return Promise.all( pending );
+
+	};
+
+	/**
+	 * Clearcoat Materials Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_clearcoat
+	 */
+	function GLTFMaterialsClearcoatExtension() {
+
+		this.name = EXTENSIONS.KHR_MATERIALS_CLEARCOAT;
+
+	}
+
+	GLTFMaterialsClearcoatExtension.prototype.getMaterialType = function () {
+
+		return THREE.MeshPhysicalMaterial;
+
+	};
+
+	GLTFMaterialsClearcoatExtension.prototype.extendParams = function ( materialParams, materialDef, parser ) {
+
+		var pending = [];
+
+		var extension = materialDef.extensions[ this.name ];
+
+		if ( extension.clearcoatFactor !== undefined ) {
+
+			materialParams.clearcoat = extension.clearcoatFactor;
+
+		}
+
+		if ( extension.clearcoatTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'clearcoatMap', extension.clearcoatTexture ) );
+
+		}
+
+		if ( extension.clearcoatRoughnessFactor !== undefined ) {
+
+			materialParams.clearcoatRoughness = extension.clearcoatRoughnessFactor;
+
+		}
+
+		if ( extension.clearcoatRoughnessTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'clearcoatRoughnessMap', extension.clearcoatRoughnessTexture ) );
+
+		}
+
+		if ( extension.clearcoatNormalTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'clearcoatNormalMap', extension.clearcoatNormalTexture ) );
+
+			if ( extension.clearcoatNormalTexture.scale !== undefined ) {
+
+				var scale = extension.clearcoatNormalTexture.scale;
+
+				materialParams.clearcoatNormalScale = new THREE.Vector2( scale, scale );
 
 			}
 
@@ -690,7 +760,7 @@ THREE.GLTFLoader = ( function () {
 		/*eslint-disable*/
 		Object.defineProperties(
 			this,
-			{	
+			{
 				specular: {
 					get: function () { return uniforms.specular.value; },
 					set: function ( v ) { uniforms.specular.value = v; }
@@ -1758,7 +1828,7 @@ THREE.GLTFLoader = ( function () {
 		var options = this.options;
 		var textureLoader = this.textureLoader;
 
-		var URL = window.URL || window.webkitURL;
+		var URL = self.URL || self.webkitURL;
 
 		var textureDef = json.textures[ textureIndex ];
 
@@ -1826,7 +1896,7 @@ THREE.GLTFLoader = ( function () {
 
 			texture.flipY = false;
 
-			if ( textureDef.name !== undefined ) texture.name = textureDef.name;
+			if ( textureDef.name ) texture.name = textureDef.name;
 
 			// Ignore unknown mime types, like DDS files.
 			if ( source.mimeType in MIME_TYPE_FORMATS ) {
@@ -1916,7 +1986,6 @@ THREE.GLTFLoader = ( function () {
 
 		var geometry = mesh.geometry;
 		var material = mesh.material;
-		var extensions = this.extensions;
 
 		var useVertexTangents = geometry.attributes.tangent !== undefined;
 		var useVertexColors = geometry.attributes.color !== undefined;
@@ -1986,7 +2055,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( useSkinning ) cachedMaterial.skinning = true;
 				if ( useVertexTangents ) cachedMaterial.vertexTangents = true;
-				if ( useVertexColors ) cachedMaterial.vertexColors = THREE.VertexColors;
+				if ( useVertexColors ) cachedMaterial.vertexColors = true;
 				if ( useFlatShading ) cachedMaterial.flatShading = true;
 				if ( useMorphTargets ) cachedMaterial.morphTargets = true;
 				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
@@ -2011,6 +2080,12 @@ THREE.GLTFLoader = ( function () {
 		if ( material.normalScale && ! useVertexTangents ) {
 
 			material.normalScale.y = - material.normalScale.y;
+
+		}
+
+		if ( material.clearcoatNormalScale && ! useVertexTangents ) {
+
+			material.clearcoatNormalScale.y = - material.clearcoatNormalScale.y;
 
 		}
 
@@ -2099,6 +2174,9 @@ THREE.GLTFLoader = ( function () {
 
 			materialParams.transparent = true;
 
+			// See: https://github.com/mrdoob/three.js/issues/17706
+			materialParams.depthWrite = false;
+
 		} else {
 
 			materialParams.transparent = false;
@@ -2149,6 +2227,14 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
+		if ( materialExtensions[ EXTENSIONS.KHR_MATERIALS_CLEARCOAT ] ) {
+
+			var clearcoatExtension = extensions[ EXTENSIONS.KHR_MATERIALS_CLEARCOAT ];
+			materialType = clearcoatExtension.getMaterialType();
+			pending.push( clearcoatExtension.extendParams( materialParams, { extensions: materialExtensions }, parser ) );
+
+		}
+
 		return Promise.all( pending ).then( function () {
 
 			var material;
@@ -2163,7 +2249,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			if ( materialDef.name !== undefined ) material.name = materialDef.name;
+			if ( materialDef.name ) material.name = materialDef.name;
 
 			// baseColorTexture, emissiveTexture, and specularGlossinessTexture use sRGB encoding.
 			if ( material.map ) material.map.encoding = THREE.sRGBEncoding;
@@ -2223,6 +2309,7 @@ THREE.GLTFLoader = ( function () {
 
 		if ( targets !== undefined ) {
 
+			var maxDisplacement = new THREE.Vector3();
 			var vector = new THREE.Vector3();
 
 			for ( var i = 0, il = targets.length; i < il; i ++ ) {
@@ -2244,7 +2331,11 @@ THREE.GLTFLoader = ( function () {
 						vector.setY( Math.max( Math.abs( min[ 1 ] ), Math.abs( max[ 1 ] ) ) );
 						vector.setZ( Math.max( Math.abs( min[ 2 ] ), Math.abs( max[ 2 ] ) ) );
 
-						box.expandByVector( vector );
+						// Note: this assumes that the sum of all weights is at most 1. This isn't quite correct - it's more conservative
+						// to assume that each target can have a max weight of 1. However, for some use cases - notably, when morph targets
+						// are used to implement key-frame animations and as such only two are active at a time - this results in very large
+						// boxes. So for now we make a box that's sometimes a touch too small but is hopefully mostly of reasonable size.
+						maxDisplacement.max( vector );
 
 					} else {
 
@@ -2255,6 +2346,9 @@ THREE.GLTFLoader = ( function () {
 				}
 
 			}
+
+			// As per comment above this box isn't conservative, but has a reasonable size for a very large number of morph targets.
+			box.expandByVector( maxDisplacement );
 
 		}
 
@@ -2654,7 +2748,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		if ( cameraDef.name !== undefined ) camera.name = cameraDef.name;
+		if ( cameraDef.name ) camera.name = cameraDef.name;
 
 		assignExtrasToUserData( camera, cameraDef );
 
@@ -2875,7 +2969,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			var name = animationDef.name !== undefined ? animationDef.name : 'animation_' + animationIndex;
+			var name = animationDef.name ? animationDef.name : 'animation_' + animationIndex;
 
 			return new THREE.AnimationClip( name, undefined, tracks );
 
@@ -2994,7 +3088,7 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			if ( nodeDef.name !== undefined ) {
+			if ( nodeDef.name ) {
 
 				node.userData.name = nodeDef.name;
 				node.name = THREE.PropertyBinding.sanitizeNodeName( nodeDef.name );
@@ -3042,7 +3136,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#scenes
 	 * @param {number} sceneIndex
-	 * @return {Promise<THREE.Scene>}
+	 * @return {Promise<THREE.Group>}
 	 */
 	GLTFParser.prototype.loadScene = function () {
 
@@ -3151,8 +3245,10 @@ THREE.GLTFLoader = ( function () {
 			var sceneDef = this.json.scenes[ sceneIndex ];
 			var parser = this;
 
-			var scene = new THREE.Scene();
-			if ( sceneDef.name !== undefined ) scene.name = sceneDef.name;
+			// Loader returns Group, not Scene.
+			// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
+			var scene = new THREE.Group();
+			if ( sceneDef.name ) scene.name = sceneDef.name;
 
 			assignExtrasToUserData( scene, sceneDef );
 

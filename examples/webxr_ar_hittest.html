@@ -23,7 +23,7 @@
 
 			var reticle;
 
-			var hitTestSource;
+			var hitTestSource = null;
 			var hitTestSourceRequested = false;
 
 			init();
@@ -123,6 +123,13 @@
 								hitTestSource = source;
 
 							} );
+
+						} );
+
+						session.addEventListener( 'end', function () {
+
+							hitTestSourceRequested = false;
+							hitTestSource = null;
 
 						} );
 

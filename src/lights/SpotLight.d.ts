@@ -13,7 +13,7 @@ export class SpotLight extends Light {
 		intensity?: number,
 		distance?: number,
 		angle?: number,
-		exponent?: number,
+		penumbra?: number,
 		decay?: number
 	);
 
@@ -40,12 +40,6 @@ export class SpotLight extends Light {
 	 * Default — Math.PI/2.
 	 */
 	angle: number;
-
-	/**
-	 * Rapidity of the falloff of light from its target direction.
-	 * Default — 10.0.
-	 */
-	exponent: number;
 
 	decay: number;
 	shadow: SpotLightShadow;

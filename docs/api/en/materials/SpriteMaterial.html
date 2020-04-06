@@ -14,6 +14,19 @@
 
 		<p class="desc">A material for a use with a [page:Sprite].</p>
 
+		<h2>Code Example</h2>
+
+		<code>
+		var spriteMap = new THREE.TextureLoader().load( 'textures/sprite.png' );
+
+		var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, color: 0xffffff } );
+
+		var sprite = new THREE.Sprite( spriteMaterial );
+		sprite.scale.set(200, 200, 1)
+
+		scene.add( sprite );
+		</code>
+
 		<h2>Examples</h2>
 		<p>
 			[example:webgl_sprites WebGL / sprites]<br />
@@ -22,18 +35,7 @@
 			[example:webgl_materials_cubemap_dynamic webgl / materials / cubemap / dynamic]
 		</p>
 
-		<code>
-var spriteMap = new THREE.TextureLoader().load( 'textures/sprite.png' );
-
-var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, color: 0xffffff } );
-
-var sprite = new THREE.Sprite( spriteMaterial );
-sprite.scale.set(200, 200, 1)
-
-scene.add( sprite );
-
-		</code>
-
+		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>

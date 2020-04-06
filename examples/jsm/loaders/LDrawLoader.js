@@ -1192,40 +1192,36 @@ var LDrawLoader = ( function () {
 
 									type = lp.getToken();
 
-									if ( ! parsingEmbeddedFiles ) {
+									currentParseScope.triangles = [];
+									currentParseScope.lineSegments = [];
+									currentParseScope.conditionalSegments = [];
+									currentParseScope.type = type;
 
-										currentParseScope.triangles = [];
-										currentParseScope.lineSegments = [];
-										currentParseScope.conditionalSegments = [];
-										currentParseScope.type = type;
+									var isRoot = ! parentParseScope.isFromParse;
+									if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
 
-										var isRoot = ! parentParseScope.isFromParse;
-										if ( isRoot || scope.separateObjects && ! isPrimitiveType( type ) ) {
+										currentParseScope.groupObject = new Group();
 
-											currentParseScope.groupObject = new Group();
-
-											currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
-
-										}
-
-										// If the scale of the object is negated then the triangle winding order
-										// needs to be flipped.
-										var matrix = currentParseScope.matrix;
-										if (
-											matrix.determinant() < 0 && (
-												scope.separateObjects && isPrimitiveType( type ) ||
-												! scope.separateObjects
-											) ) {
-
-											currentParseScope.inverted = ! currentParseScope.inverted;
-
-										}
-
-										triangles = currentParseScope.triangles;
-										lineSegments = currentParseScope.lineSegments;
-										conditionalSegments = currentParseScope.conditionalSegments;
+										currentParseScope.groupObject.userData.startingConstructionStep = currentParseScope.startingConstructionStep;
 
 									}
+
+									// If the scale of the object is negated then the triangle winding order
+									// needs to be flipped.
+									var matrix = currentParseScope.matrix;
+									if (
+										matrix.determinant() < 0 && (
+											scope.separateObjects && isPrimitiveType( type ) ||
+											! scope.separateObjects
+										) ) {
+
+										currentParseScope.inverted = ! currentParseScope.inverted;
+
+									}
+
+									triangles = currentParseScope.triangles;
+									lineSegments = currentParseScope.lineSegments;
+									conditionalSegments = currentParseScope.conditionalSegments;
 
 									break;
 

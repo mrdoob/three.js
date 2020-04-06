@@ -200,7 +200,7 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				} else {
 
 					PCDheader.offset[ PCDheader.fields[ i ] ] = sizeSum;
-					sizeSum += PCDheader.size[ i ];
+					sizeSum += PCDheader.size[ i ] * PCDheader.count[ i ];
 
 				}
 
@@ -369,7 +369,7 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		if ( color.length > 0 ) {
 
-			material.vertexColors = THREE.VertexColors;
+			material.vertexColors = true;
 
 		} else {
 

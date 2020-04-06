@@ -6,14 +6,18 @@ import { Color } from '../math/Color.js';
  * @author WestLangley / http://github.com/WestLangley
  *
  * parameters = {
- *  reflectivity: <float>
- *  clearcoat: <float>
- *  clearcoatRoughness: <float>
- *
- *  sheen: <Color>
- *
+ *  clearcoat: <float>,
+ *  clearcoatMap: new THREE.Texture( <Image> ),
+ *  clearcoatRoughness: <float>,
+ *  clearcoatRoughnessMap: new THREE.Texture( <Image> ),
  *  clearcoatNormalScale: <Vector2>,
  *  clearcoatNormalMap: new THREE.Texture( <Image> ),
+ *
+ *  reflectivity: <float>,
+ *
+ *  sheen: <Color>,
+ *
+ *  transparency: <float>
  * }
  */
 
@@ -30,15 +34,16 @@ function MeshPhysicalMaterial( parameters ) {
 
 	this.type = 'MeshPhysicalMaterial';
 
-	this.reflectivity = 0.5; // maps to F0 = 0.04
-
 	this.clearcoat = 0.0;
+	this.clearcoatMap = null;
 	this.clearcoatRoughness = 0.0;
-
-	this.sheen = null; // null will disable sheen bsdf
-
+	this.clearcoatRoughnessMap = null;
 	this.clearcoatNormalScale = new Vector2( 1, 1 );
 	this.clearcoatNormalMap = null;
+
+	this.reflectivity = 0.5; // maps to F0 = 0.04
+
+	this.sheen = null; // null will disable sheen bsdf
 
 	this.transparency = 0.0;
 
@@ -62,16 +67,24 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	};
 
-	this.reflectivity = source.reflectivity;
-
 	this.clearcoat = source.clearcoat;
+	this.clearcoatMap = source.clearcoatMap;
 	this.clearcoatRoughness = source.clearcoatRoughness;
-
-	if ( source.sheen ) this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
-	else this.sheen = null;
-
+	this.clearcoatRoughnessMap = source.clearcoatRoughnessMap;
 	this.clearcoatNormalMap = source.clearcoatNormalMap;
 	this.clearcoatNormalScale.copy( source.clearcoatNormalScale );
+
+	this.reflectivity = source.reflectivity;
+
+	if ( source.sheen ) {
+
+		this.sheen = ( this.sheen || new Color() ).copy( source.sheen );
+
+	} else {
+
+		this.sheen = null;
+
+	}
 
 	this.transparency = source.transparency;
 

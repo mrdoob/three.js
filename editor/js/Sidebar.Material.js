@@ -250,18 +250,22 @@ var SidebarMaterial = function ( editor ) {
 	// vertex colors
 
 	var materialVertexColorsRow = new UIRow();
-	var materialVertexColors = new UISelect().setOptions( {
-
-		0: strings.getKey( 'sidebar/material/vertexcolors/no' ),
-		1: strings.getKey( 'sidebar/material/vertexcolors/face' ),
-		2: strings.getKey( 'sidebar/material/vertexcolors/vertex' )
-
-	} ).onChange( update );
+	var materialVertexColors = new UICheckbox( false ).onChange( update );
 
 	materialVertexColorsRow.add( new UIText( strings.getKey( 'sidebar/material/vertexcolors' ) ).setWidth( '90px' ) );
 	materialVertexColorsRow.add( materialVertexColors );
 
 	container.add( materialVertexColorsRow );
+
+	// vertex tangents
+
+	var materialVertexTangentsRow = new UIRow();
+	var materialVertexTangents = new UICheckbox( false ).onChange( update );
+
+	materialVertexTangentsRow.add( new UIText( strings.getKey( 'sidebar/material/vertextangents' ) ).setWidth( '90px' ) );
+	materialVertexTangentsRow.add( materialVertexTangents );
+
+	container.add( materialVertexTangentsRow );
 
 	// depth packing
 
@@ -699,7 +703,7 @@ var SidebarMaterial = function ( editor ) {
 
 			if ( material.vertexColors !== undefined ) {
 
-				var vertexColors = parseInt( materialVertexColors.getValue() );
+				var vertexColors = materialVertexColors.getValue();
 
 				if ( material.vertexColors !== vertexColors ) {
 
@@ -1189,6 +1193,7 @@ var SidebarMaterial = function ( editor ) {
 			'clearcoatRoughness': materialClearcoatRoughnessRow,
 			'vertexShader': materialProgramRow,
 			'vertexColors': materialVertexColorsRow,
+			'vertexTangents': materialVertexTangentsRow,
 			'depthPacking': materialDepthPackingRow,
 			'skinning': materialSkinningRow,
 			'map': materialMapRow,

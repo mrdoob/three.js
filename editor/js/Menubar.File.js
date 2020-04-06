@@ -5,6 +5,7 @@
 import * as THREE from '../../build/three.module.js';
 
 import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
+import { DRACOExporter } from '../../examples/jsm/exporters/DRACOExporter.js';
 import { GLTFExporter } from '../../examples/jsm/exporters/GLTFExporter.js';
 import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
 import { PLYExporter } from '../../examples/jsm/exporters/PLYExporter.js';
@@ -14,11 +15,11 @@ import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 var MenubarFile = function ( editor ) {
 
-	var NUMBER_PRECISION = 6;
-
 	function parseNumber( key, value ) {
 
-		return typeof value === 'number' ? parseFloat( value.toFixed( NUMBER_PRECISION ) ) : value;
+		var precision = config.getKey( 'exportPrecision' );
+
+		return typeof value === 'number' ? parseFloat( value.toFixed( precision ) ) : value;
 
 	}
 
@@ -210,6 +211,31 @@ var MenubarFile = function ( editor ) {
 			saveString( result.data, 'scene.dae' );
 
 		} );
+
+	} );
+	options.add( option );
+
+	// Export DRC
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/drc' ) );
+	option.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( object === null || object.isMesh === undefined ) {
+
+			alert( 'No mesh selected' );
+			return;
+
+		}
+
+		var exporter = new DRACOExporter();
+
+		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
+		var result = exporter.parse( object.geometry );
+		saveArrayBuffer( result, 'model.drc' );
 
 	} );
 	options.add( option );
@@ -414,6 +440,16 @@ var MenubarFile = function ( editor ) {
 		loader.load( '../build/three.module.js', function ( content ) {
 
 			zip.file( 'js/three.module.js', content );
+
+		} );
+		loader.load( '../examples/jsm/webxr/VRButton.js', function ( content ) {
+
+			zip.file( 'js/VRButton.js', content );
+
+		} );
+		loader.load( '../examples/js/vr/HelioWebXRPolyfill.js', function ( content ) {
+
+			zip.file( 'js/HelioWebXRPolyfill.js', content );
 
 		} );
 

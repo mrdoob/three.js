@@ -127,7 +127,7 @@ THREE.TranslucentShader = {
 
 		"		PointLight pointLight;",
 
-		"		#pragma unroll_loop",
+		"		#pragma unroll_loop_start",
 		"		for ( int i = 0; i < NUM_POINT_LIGHTS; i ++ ) {",
 		"		 	pointLight = pointLights[ i ];",
 		"		 	getPointDirectLightIrradiance( pointLight, geometry, directLight );",
@@ -142,6 +142,7 @@ THREE.TranslucentShader = {
 		"			RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);",
 		"			#endif",
 		"		}",
+		"		#pragma unroll_loop_end",
 
 		"		#endif",
 
@@ -149,7 +150,7 @@ THREE.TranslucentShader = {
 
 		"		DirectionalLight directionalLight;",
 
-		"		#pragma unroll_loop",
+		"		#pragma unroll_loop_start",
 		"		for ( int i = 0; i < NUM_DIR_LIGHTS; i ++ ) {",
 		"			directionalLight = directionalLights[ i ];",
 		"			getDirectionalDirectLightIrradiance( directionalLight, geometry, directLight );",
@@ -164,6 +165,7 @@ THREE.TranslucentShader = {
 		"			RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);",
 		"			#endif",
 		"		}",
+		"		#pragma unroll_loop_end",
 
 		"	#endif",
 
@@ -173,12 +175,13 @@ THREE.TranslucentShader = {
 
 		"		#if ( NUM_HEMI_LIGHTS > 0 )",
 
-		"			#pragma unroll_loop",
+		"			#pragma unroll_loop_start",
 		"			for ( int i = 0; i < NUM_HEMI_LIGHTS; i ++ ) {",
 
 		"				irradiance += getHemisphereLightIrradiance( hemisphereLights[ i ], geometry );",
 
 		"			}",
+		"			#pragma unroll_loop_end",
 
 		"		#endif",
 

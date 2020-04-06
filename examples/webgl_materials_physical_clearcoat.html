@@ -20,6 +20,8 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
 
+			import { FlakesTexture } from './jsm/textures/FlakesTexture.js';
+
 			var container, stats;
 
 			var camera, scene, renderer;
@@ -70,11 +72,11 @@
 
 							var normalMap2 = textureLoader.load( "textures/water/Water_1_M_Normal.jpg" );
 
-							var normalMap3 = textureLoader.load( "textures/flakes.png" );
+							var normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
 							normalMap3.wrapS = THREE.RepeatWrapping;
 							normalMap3.wrapT = THREE.RepeatWrapping;
 							normalMap3.repeat.x = 10;
-							normalMap3.repeat.y = 10;
+							normalMap3.repeat.y = 6;
 							normalMap3.anisotropy = 16;
 
 							var normalMap4 = textureLoader.load( "textures/golfball.jpg" );
@@ -122,7 +124,7 @@
 								clearcoatNormalMap: clearcoatNormaMap,
 
 								// y scale is negated to compensate for normal map handedness.
-								clearcoatNormalScale: new THREE.Vector2( 2.0, -2.0 )
+								clearcoatNormalScale: new THREE.Vector2( 2.0, - 2.0 )
 							} );
 							var mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = - 100;
@@ -140,7 +142,7 @@
 								clearcoatNormalMap: clearcoatNormaMap,
 
 								// y scale is negated to compensate for normal map handedness.
-								clearcoatNormalScale: new THREE.Vector2( 2.0, -2.0 )
+								clearcoatNormalScale: new THREE.Vector2( 2.0, - 2.0 )
 							} );
 							var mesh = new THREE.Mesh( geometry, material );
 							mesh.position.x = 100;

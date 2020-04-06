@@ -210,4 +210,9 @@ export class Vector4 implements Vector {
 		offset?: number
 	): this;
 
+	/**
+	 * Sets this vector's x, y, z and w from Math.random
+	 */
+	random(): this;
+
 }
