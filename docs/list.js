@@ -105,10 +105,6 @@ var list = {
 				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"Deprecated": {
-				"DeprecatedList": "api/en/deprecated/DeprecatedList"
-			},
-
 			"Extras": {
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
@@ -555,10 +551,6 @@ var list = {
 
 			"核心 / BufferAttributes": {
 				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
-			},
-
-			"弃用列表": {
-				"DeprecatedList": "api/zh/deprecated/DeprecatedList"
 			},
 
 			"附件": {
