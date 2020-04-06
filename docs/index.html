@@ -369,7 +369,9 @@
 					apiKey: 'ec69071880b355699ad27cb720becc23',
 					indexName: 'threejs',
 					inputSelector: '#filter',
-					algoliaOptions: { 'facetFilters': ["lang:" + languageSelect.value] }
+					algoliaOptions: {
+						hitsPerPage: 20, 'facetFilters': ["lang:" + languageSelect.value]
+					}
 				})
 			}
 		</script>
