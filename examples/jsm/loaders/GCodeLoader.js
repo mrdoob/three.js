@@ -34,13 +34,13 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var self = this;
+		var scope = this;
 
-		var loader = new FileLoader( self.manager );
-		loader.setPath( self.path );
+		var loader = new FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( self.parse( text ) );
+			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
 
