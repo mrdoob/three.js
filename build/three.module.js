@@ -20130,9 +20130,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function getDepthMaterial( object, material, light, shadowCameraNear, shadowCameraFar, type ) {
-
-		var geometry = object.geometry;
+	function getDepthMaterial( object, geometry, material, light, shadowCameraNear, shadowCameraFar, type ) {
 
 		var result = null;
 
@@ -20152,15 +20150,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			if ( material.morphTargets === true ) {
 
-				if ( geometry.isBufferGeometry === true ) {
-
-					useMorphing = geometry.morphAttributes && geometry.morphAttributes.position && geometry.morphAttributes.position.length > 0;
-
-				} else if ( geometry.isGeometry === true ) {
-
-					useMorphing = geometry.morphTargets && geometry.morphTargets.length > 0;
-
-				}
+				useMorphing = geometry.morphAttributes && geometry.morphAttributes.position && geometry.morphAttributes.position.length > 0;
 
 			}
 
@@ -20279,7 +20269,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 						if ( groupMaterial && groupMaterial.visible ) {
 
-							var depthMaterial = getDepthMaterial( object, groupMaterial, light, shadowCamera.near, shadowCamera.far, type );
+							var depthMaterial = getDepthMaterial( object, geometry, groupMaterial, light, shadowCamera.near, shadowCamera.far, type );
 
 							_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, group );
 
@@ -20289,7 +20279,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				} else if ( material.visible ) {
 
-					var depthMaterial = getDepthMaterial( object, material, light, shadowCamera.near, shadowCamera.far, type );
+					var depthMaterial = getDepthMaterial( object, geometry, material, light, shadowCamera.near, shadowCamera.far, type );
 
 					_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
 
