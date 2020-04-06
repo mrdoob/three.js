@@ -140,7 +140,8 @@
 
 				filterInput.value = '';
 				panel.classList.remove('searchFocused');
-
+				const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+				window.history.pushState({ path: newUrl }, '', newUrl);
 			}
 
 			filterInput.oninput = function ( event ) {
@@ -363,13 +364,36 @@
 		</script>
 		<script>
 			function addSearch() {
-				var languageSelect = document.getElementById('language');
-	
-				docsearch({
+				const languageSelect = document.getElementById('language');
+				const docSearch = docsearch({
 					apiKey: 'ec69071880b355699ad27cb720becc23',
 					indexName: 'threejs',
 					inputSelector: '#filter',
-					algoliaOptions: { 'facetFilters': ["lang:" + languageSelect.value] }
+					queryHook: (q) => {
+						let hash = window.location.hash.replace(/(\?q=.*)/g, '')
+						hash = hash.replace(/(\.html)/g, '')
+						var newRelativePathQuery = window.location.pathname + hash + ".html" + '?q=' + q;
+						history.pushState(null, '', newRelativePathQuery);
+					},
+					algoliaOptions: {
+						hitsPerPage: 10, 'facetFilters': ["lang:" + languageSelect.value]
+					}
+				})
+				if ('URLSearchParams' in window) {
+					const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
+					const searchQuery = urlParams.get('q')
+					document.getElementById('filter').value = searchQuery
+					document.getElementById('filter').focus()
+					docSearch.autocomplete.autocomplete.setVal(searchQuery)
+					docSearch.autocomplete.autocomplete.open()
+				}
+				const input = document.querySelector('#filter')
+				input.addEventListener('input', evt => {
+					if (evt.target.value === "") {
+						const hash = window.location.hash.replace(/(\?q=.*)/g, '')
+						const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + hash;
+						window.history.pushState({ path: newUrl }, '', newUrl);
+					}
 				})
 			}
 		</script>
