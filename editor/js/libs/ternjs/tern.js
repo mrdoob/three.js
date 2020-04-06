@@ -955,7 +955,7 @@
       var p = expr.node.property;
       expr.node = expr.node.object;
       return findRefsToProperty(srv, query, expr, p);
-    } else if (expr && expr.node.type == "ObjectExpression") {
+    } else if (expr.node.type == "ObjectExpression") {
       var pos = resolvePos(file, query.end);
       for (var i = 0; i < expr.node.properties.length; ++i) {
         var k = expr.node.properties[i].key;

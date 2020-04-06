@@ -8161,7 +8161,7 @@
     }
   };
 
-  var noHandlers = []
+  var noHandlers = [];
   function getHandlers(emitter, type, copy) {
     var arr = emitter._handlers && emitter._handlers[type]
     if (copy) return arr && arr.length > 0 ? arr.slice() : noHandlers

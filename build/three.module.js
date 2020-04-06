@@ -1063,6 +1063,15 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
+	},
+
+	random: function () {
+
+		this.x = Math.random();
+		this.y = Math.random();
+
+		return this;
+
 	}
 
 } );
@@ -2440,6 +2449,17 @@ Object.assign( Vector4.prototype, {
 		this.y = attribute.getY( index );
 		this.z = attribute.getZ( index );
 		this.w = attribute.getW( index );
+
+		return this;
+
+	},
+
+	random: function () {
+
+		this.x = Math.random();
+		this.y = Math.random();
+		this.z = Math.random();
+		this.w = Math.random();
 
 		return this;
 
@@ -3923,6 +3943,16 @@ Object.assign( Vector3.prototype, {
 		this.x = attribute.getX( index );
 		this.y = attribute.getY( index );
 		this.z = attribute.getZ( index );
+
+		return this;
+
+	},
+
+	random: function () {
+
+		this.x = Math.random();
+		this.y = Math.random();
+		this.z = Math.random();
 
 		return this;
 

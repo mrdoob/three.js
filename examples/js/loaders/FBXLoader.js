@@ -37,19 +37,19 @@ THREE.FBXLoader = ( function () {
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
-			var self = this;
+			var scope = this;
 
-			var path = ( self.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : self.path;
+			var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
 			var loader = new THREE.FileLoader( this.manager );
-			loader.setPath( self.path );
+			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 
 			loader.load( url, function ( buffer ) {
 
 				try {
 
-					onLoad( self.parse( buffer, path ) );
+					onLoad( scope.parse( buffer, path ) );
 
 				} catch ( error ) {
 
@@ -57,7 +57,7 @@ THREE.FBXLoader = ( function () {
 
 						if ( onError ) onError( error );
 
-						self.manager.itemError( url );
+						scope.manager.itemError( url );
 
 					}, 0 );
 
@@ -557,7 +557,7 @@ THREE.FBXLoader = ( function () {
 
 			}
 
-			var self = this;
+			var scope = this;
 			connections.get( ID ).children.forEach( function ( child ) {
 
 				var type = child.relationship;
@@ -565,46 +565,46 @@ THREE.FBXLoader = ( function () {
 				switch ( type ) {
 
 					case 'Bump':
-						parameters.bumpMap = self.getTexture( textureMap, child.ID );
+						parameters.bumpMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'Maya|TEX_ao_map':
-						parameters.aoMap = self.getTexture( textureMap, child.ID );
+						parameters.aoMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
-						parameters.map = self.getTexture( textureMap, child.ID );
+						parameters.map = scope.getTexture( textureMap, child.ID );
 						parameters.map.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'DisplacementColor':
-						parameters.displacementMap = self.getTexture( textureMap, child.ID );
+						parameters.displacementMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'EmissiveColor':
-						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
+						parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
 						parameters.emissiveMap.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'NormalMap':
 					case 'Maya|TEX_normal_map':
-						parameters.normalMap = self.getTexture( textureMap, child.ID );
+						parameters.normalMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'ReflectionColor':
-						parameters.envMap = self.getTexture( textureMap, child.ID );
+						parameters.envMap = scope.getTexture( textureMap, child.ID );
 						parameters.envMap.mapping = THREE.EquirectangularReflectionMapping;
 						parameters.envMap.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'SpecularColor':
-						parameters.specularMap = self.getTexture( textureMap, child.ID );
+						parameters.specularMap = scope.getTexture( textureMap, child.ID );
 						parameters.specularMap.encoding = THREE.sRGBEncoding;
 						break;
 
 					case 'TransparentColor':
-						parameters.alphaMap = self.getTexture( textureMap, child.ID );
+						parameters.alphaMap = scope.getTexture( textureMap, child.ID );
 						parameters.transparent = true;
 						break;
 
@@ -784,11 +784,11 @@ THREE.FBXLoader = ( function () {
 
 			var modelNodes = fbxTree.Objects.Model;
 
-			var self = this;
+			var scope = this;
 			modelMap.forEach( function ( model ) {
 
 				var modelNode = modelNodes[ model.ID ];
-				self.setLookAtProperties( model, modelNode );
+				scope.setLookAtProperties( model, modelNode );
 
 				var parentConnections = connections.get( model.ID ).parents;
 
@@ -1409,7 +1409,7 @@ THREE.FBXLoader = ( function () {
 
 		setupMorphMaterials: function () {
 
-			var self = this;
+			var scope = this;
 			sceneGraph.traverse( function ( child ) {
 
 				if ( child.isMesh ) {
@@ -1420,13 +1420,13 @@ THREE.FBXLoader = ( function () {
 
 							child.material.forEach( function ( material, i ) {
 
-								self.setupMorphMaterial( child, material, i );
+								scope.setupMorphMaterial( child, material, i );
 
 							} );
 
 						} else {
 
-							self.setupMorphMaterial( child, child.material );
+							scope.setupMorphMaterial( child, child.material );
 
 						}
 
@@ -1780,7 +1780,7 @@ THREE.FBXLoader = ( function () {
 			var faceWeights = [];
 			var faceWeightIndices = [];
 
-			var self = this;
+			var scope = this;
 			geoInfo.vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
 
 				var endOfFace = false;
@@ -1919,7 +1919,7 @@ THREE.FBXLoader = ( function () {
 
 				if ( endOfFace ) {
 
-					self.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
+					scope.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
 
 					polygonIndex ++;
 					faceLength = 0;
@@ -2063,7 +2063,7 @@ THREE.FBXLoader = ( function () {
 			parentGeo.morphAttributes.position = [];
 			// parentGeo.morphAttributes.normal = []; // not implemented
 
-			var self = this;
+			var scope = this;
 			morphTargets.forEach( function ( morphTarget ) {
 
 				morphTarget.rawTargets.forEach( function ( rawTarget ) {
@@ -2072,7 +2072,7 @@ THREE.FBXLoader = ( function () {
 
 					if ( morphGeoNode !== undefined ) {
 
-						self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+						scope.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
 
 					}
 
@@ -2614,10 +2614,10 @@ THREE.FBXLoader = ( function () {
 
 			var tracks = [];
 
-			var self = this;
+			var scope = this;
 			rawClip.layer.forEach( function ( rawTracks ) {
 
-				tracks = tracks.concat( self.generateTracks( rawTracks ) );
+				tracks = tracks.concat( scope.generateTracks( rawTracks ) );
 
 			} );
 
@@ -2950,7 +2950,7 @@ THREE.FBXLoader = ( function () {
 			this.currentProp = [];
 			this.currentPropName = '';
 
-			var self = this;
+			var scope = this;
 
 			var split = text.split( /[\r\n]+/ );
 
@@ -2961,27 +2961,27 @@ THREE.FBXLoader = ( function () {
 
 				if ( matchComment || matchEmpty ) return;
 
-				var matchBeginning = line.match( '^\\t{' + self.currentIndent + '}(\\w+):(.*){', '' );
-				var matchProperty = line.match( '^\\t{' + ( self.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
-				var matchEnd = line.match( '^\\t{' + ( self.currentIndent - 1 ) + '}}' );
+				var matchBeginning = line.match( '^\\t{' + scope.currentIndent + '}(\\w+):(.*){', '' );
+				var matchProperty = line.match( '^\\t{' + ( scope.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
+				var matchEnd = line.match( '^\\t{' + ( scope.currentIndent - 1 ) + '}}' );
 
 				if ( matchBeginning ) {
 
-					self.parseNodeBegin( line, matchBeginning );
+					scope.parseNodeBegin( line, matchBeginning );
 
 				} else if ( matchProperty ) {
 
-					self.parseNodeProperty( line, matchProperty, split[ ++ i ] );
+					scope.parseNodeProperty( line, matchProperty, split[ ++ i ] );
 
 				} else if ( matchEnd ) {
 
-					self.popStack();
+					scope.popStack();
 
 				} else if ( line.match( /^[^\s\t}]/ ) ) {
 
 					// large arrays are split over multiple lines terminated with a ',' character
 					// if this is encountered the line needs to be joined to the previous line
-					self.parseNodePropertyContinued( line );
+					scope.parseNodePropertyContinued( line );
 
 				}
 
