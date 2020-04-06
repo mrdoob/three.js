@@ -75,6 +75,8 @@
 			container.appendChild( stats.dom );
 
 			var controls = new OrbitControls( camera, container );
+			controls.minDistance = 500;
+			controls.maxDistance = 3000;
 
 			window.addEventListener( 'resize', onWindowResize, false );
 

@@ -92,6 +92,8 @@
 				document.body.appendChild( renderer2.domElement );
 
 				var controls = new OrbitControls( camera, renderer2.domElement );
+				controls.minZoom = 0.5;
+				controls.maxZoom = 2;
 
 				function createPlane( width, height, cssColor, pos, rot ) {
 
