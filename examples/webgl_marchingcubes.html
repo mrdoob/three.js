@@ -105,6 +105,8 @@
 			// CONTROLS
 
 			var controls = new OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 500;
+			controls.maxDistance = 5000;
 
 			// STATS
 
