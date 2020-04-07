@@ -2,8 +2,8 @@
  * @author Richard M. / https://github.com/richardmonette
  * @author ScieCode / http://github.com/sciecode
  *
- * OpenEXR loader which, currently, supports uncompressed, ZIP(S), RLE and PIZ wavelet compression.
- * Supports reading 16 and 32 bit data format.
+ * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
  *
  * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
  * implementation, so I have preserved their copyright notices.
