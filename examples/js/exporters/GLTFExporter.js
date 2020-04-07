@@ -2254,7 +2254,9 @@ THREE.GLTFExporter.Utils = {
 
 				}
 
-				mergedTrack.name = '.morphTargetInfluences';
+				// We need to take into consideration the intended target node
+				// of our original un-merged morphTarget animation.
+				mergedTrack.name = sourceTrackBinding.nodeName + '.morphTargetInfluences';
 				mergedTrack.values = values;
 
 				mergedTracks[ sourceTrackNode.uuid ] = mergedTrack;
