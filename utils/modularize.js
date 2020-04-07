@@ -258,6 +258,18 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	} );
 
+	// classes
+
+	contents = contents.replace( /\nTHREE.(\w+) = class (\w+)/g, function ( match, p1, p2 ) {
+
+		classNames.push( p1 );
+
+		console.log( p1 );
+
+		return `\nclass ${p1}`;
+
+	} );
+
 	// class name
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {
@@ -276,18 +288,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 		if ( classNames.includes( p2 ) ) return `${p2}${p3}`;
 
 		return match;
-
-	} );
-
-	// classes
-
-	contents = contents.replace( /\nTHREE.(\w+) = class (\w+)/g, function ( match, p1, p2 ) {
-
-		classNames.push( p1 );
-
-		console.log( p1 );
-
-		return `\nclass ${p1}`;
 
 	} );
 
