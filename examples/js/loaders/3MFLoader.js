@@ -18,35 +18,31 @@
  * - Metallic Display Properties (PBR)
  */
 
-THREE.ThreeMFLoader = function ( manager ) {
 
-	THREE.Loader.call( this, manager );
+THREE.ThreeMFLoader = class ThreeMFLoader extends THREE.Loader {
 
-	this.availableExtensions = [];
+	constructor( manager ) {
 
-};
+		super( manager );
+		this.availableExtensions = [];
 
-THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.ThreeMFLoader,
+	load( url, onLoad, onProgress, onError ) {
 
-	load: function ( url, onLoad, onProgress, onError ) {
-
-		var scope = this;
-		var loader = new THREE.FileLoader( scope.manager );
-		loader.setPath( scope.path );
+		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer ) );
+			onLoad( this.parse( buffer ) );
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
-		var scope = this;
 		var textureLoader = new THREE.TextureLoader( this.manager );
 
 		function loadDocument( data ) {
@@ -1178,9 +1174,9 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				var ns = keys[ i ];
 
-				for ( var j = 0; j < scope.availableExtensions.length; j ++ ) {
+				for ( var j = 0; j < this.availableExtensions.length; j ++ ) {
 
-					var extension = scope.availableExtensions[ j ];
+					var extension = this.availableExtensions[ j ];
 
 					if ( extension.ns === ns ) {
 
@@ -1403,12 +1399,12 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		return build( objects, data3mf );
 
-	},
+	}
 
-	addExtension: function ( extension ) {
+	addExtension( extension ) {
 
 		this.availableExtensions.push( extension );
 
 	}
 
-} );
+};

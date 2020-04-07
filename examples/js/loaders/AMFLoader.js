@@ -18,22 +18,20 @@
  *
  */
 
-THREE.AMFLoader = function ( manager ) {
+THREE.AMFLoader = class AMFLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.AMFLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
-		var loader = new THREE.FileLoader( scope.manager );
-		loader.setPath( scope.path );
+		var loader = new THREE.FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
@@ -41,9 +39,9 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		function loadDocument( data ) {
 
@@ -485,4 +483,4 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};

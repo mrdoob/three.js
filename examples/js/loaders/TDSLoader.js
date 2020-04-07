@@ -9,23 +9,21 @@
  * @constructor
  */
 
-THREE.TDSLoader = function ( manager ) {
+THREE.TDSLoader = class TDSLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.debug = false;
+		super( manager );
 
-	this.group = null;
-	this.position = 0;
+		this.debug = false;
 
-	this.materials = [];
-	this.meshes = [];
+		this.group = null;
+		this.position = 0;
 
-};
+		this.materials = [];
+		this.meshes = [];
 
-THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-	constructor: THREE.TDSLoader,
+	}
 
 	/**
 	 * Load 3ds file from url.
@@ -36,7 +34,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {Function} onProgress onProgress callback.
 	 * @param {Function} onError onError callback.
 	 */
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -52,7 +50,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
 	/**
 	 * Parse arraybuffer data and load 3ds file.
@@ -62,7 +60,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {String} path Path for external resources.
 	 * @return {Group} Group loaded from 3ds file.
 	 */
-	parse: function ( arraybuffer, path ) {
+	parse( arraybuffer, path ) {
 
 		this.group = new THREE.Group();
 		this.position = 0;
@@ -79,7 +77,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		return this.group;
 
-	},
+	}
 
 	/**
 	 * Decode file content to read 3ds data.
@@ -88,7 +86,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {ArrayBuffer} arraybuffer Arraybuffer data to be loaded.
 	 * @param {String} path Path for external resources.
 	 */
-	readFile: function ( arraybuffer, path ) {
+	readFile( arraybuffer, path ) {
 
 		var data = new DataView( arraybuffer );
 		var chunk = this.readChunk( data );
@@ -123,7 +121,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		this.debugMessage( 'Parsed ' + this.meshes.length + ' meshes' );
 
-	},
+	}
 
 	/**
 	 * Read mesh data chunk.
@@ -132,7 +130,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {Dataview} data Dataview in use.
 	 * @param {String} path Path for external resources.
 	 */
-	readMeshData: function ( data, path ) {
+	readMeshData( data, path ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
@@ -172,7 +170,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}
 
-	},
+	}
 
 	/**
 	 * Read named object chunk.
@@ -180,7 +178,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @method readNamedObject
 	 * @param {Dataview} data Dataview in use.
 	 */
-	readNamedObject: function ( data ) {
+	readNamedObject( data ) {
 
 		var chunk = this.readChunk( data );
 		var name = this.readString( data, 64 );
@@ -208,7 +206,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		this.endChunk( chunk );
 
-	},
+	}
 
 	/**
 	 * Read material data chunk and add it to the material list.
@@ -217,7 +215,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {Dataview} data Dataview in use.
 	 * @param {String} path Path for external resources.
 	 */
-	readMaterialEntry: function ( data, path ) {
+	readMaterialEntry( data, path ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
@@ -317,7 +315,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		this.materials[ material.name ] = material;
 
-	},
+	}
 
 	/**
 	 * Read mesh data chunk.
@@ -326,7 +324,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {Dataview} data Dataview in use.
 	 * @return {Mesh} The parsed mesh.
 	 */
-	readMesh: function ( data ) {
+	readMesh( data ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
@@ -446,7 +444,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		return mesh;
 
-	},
+	}
 
 	/**
 	 * Read face array data chunk.
@@ -455,7 +453,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {Dataview} data Dataview in use.
 	 * @param {Mesh} mesh Mesh to be filled with the data read.
 	 */
-	readFaceArray: function ( data, mesh ) {
+	readFaceArray( data, mesh ) {
 
 		var chunk = this.readChunk( data );
 		var faces = this.readWord( data );
@@ -514,7 +512,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		this.endChunk( chunk );
 
-	},
+	}
 
 	/**
 	 * Read texture map data chunk.
@@ -524,7 +522,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {String} path Path for external resources.
 	 * @return {Texture} Texture read from this data chunk.
 	 */
-	readMap: function ( data, path ) {
+	readMap( data, path ) {
 
 		var chunk = this.readChunk( data );
 		var next = this.nextChunk( data, chunk );
@@ -576,7 +574,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		return texture;
 
-	},
+	}
 
 	/**
 	 * Read material group data chunk.
@@ -585,7 +583,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {Dataview} data Dataview in use.
 	 * @return {Object} Object with name and index of the object.
 	 */
-	readMaterialGroup: function ( data ) {
+	readMaterialGroup( data ) {
 
 		this.readChunk( data );
 		var name = this.readString( data, 64 );
@@ -603,7 +601,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		return { name: name, index: index };
 
-	},
+	}
 
 	/**
 	 * Read a color value.
@@ -612,7 +610,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {DataView} data Dataview.
 	 * @return {Color} Color value read..
 	 */
-	readColor: function ( data ) {
+	readColor( data ) {
 
 		var chunk = this.readChunk( data );
 		var color = new THREE.Color();
@@ -646,7 +644,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		this.endChunk( chunk );
 		return color;
 
-	},
+	}
 
 	/**
 	 * Read next chunk of data.
@@ -655,7 +653,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {DataView} data Dataview.
 	 * @return {Object} Chunk of data read.
 	 */
-	readChunk: function ( data ) {
+	readChunk( data ) {
 
 		var chunk = {};
 
@@ -667,7 +665,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		return chunk;
 
-	},
+	}
 
 	/**
 	 * Set position to the end of the current chunk of data.
@@ -675,11 +673,11 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @method endChunk
 	 * @param {Object} chunk Data chunk.
 	 */
-	endChunk: function ( chunk ) {
+	endChunk( chunk ) {
 
 		this.position = chunk.end;
 
-	},
+	}
 
 	/**
 	 * Move to the next data chunk.
@@ -688,7 +686,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {DataView} data Dataview.
 	 * @param {Object} chunk Data chunk.
 	 */
-	nextChunk: function ( data, chunk ) {
+	nextChunk( data, chunk ) {
 
 		if ( chunk.cur >= chunk.end ) {
 
@@ -711,18 +709,18 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}
 
-	},
+	}
 
 	/**
 	 * Reset dataview position.
 	 *
 	 * @method resetPosition
 	 */
-	resetPosition: function () {
+	resetPosition() {
 
 		this.position -= 6;
 
-	},
+	}
 
 	/**
 	 * Read byte value.
@@ -731,13 +729,13 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readByte: function ( data ) {
+	readByte( data ) {
 
 		var v = data.getUint8( this.position, true );
 		this.position += 1;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read 32 bit float value.
@@ -746,7 +744,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readFloat: function ( data ) {
+	readFloat( data ) {
 
 		try {
 
@@ -760,7 +758,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}
 
-	},
+	}
 
 	/**
 	 * Read 32 bit signed integer value.
@@ -769,13 +767,13 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readInt: function ( data ) {
+	readInt( data ) {
 
 		var v = data.getInt32( this.position, true );
 		this.position += 4;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read 16 bit signed integer value.
@@ -784,13 +782,13 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readShort: function ( data ) {
+	readShort( data ) {
 
 		var v = data.getInt16( this.position, true );
 		this.position += 2;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read 64 bit unsigned integer value.
@@ -799,13 +797,13 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readDWord: function ( data ) {
+	readDWord( data ) {
 
 		var v = data.getUint32( this.position, true );
 		this.position += 4;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read 32 bit unsigned integer value.
@@ -814,13 +812,13 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {DataView} data Dataview to read data from.
 	 * @return {Number} Data read from the dataview.
 	 */
-	readWord: function ( data ) {
+	readWord( data ) {
 
 		var v = data.getUint16( this.position, true );
 		this.position += 2;
 		return v;
 
-	},
+	}
 
 	/**
 	 * Read string value.
@@ -830,7 +828,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @param {Number} maxLength Max size of the string to be read.
 	 * @return {String} Data read from the dataview.
 	 */
-	readString: function ( data, maxLength ) {
+	readString( data, maxLength ) {
 
 		var s = '';
 
@@ -849,7 +847,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		return s;
 
-	},
+	}
 
 	/**
 	 * Print debug message to the console.
@@ -859,7 +857,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 	 * @method debugMessage
 	 * @param {Object} message Debug message to print to the console.
 	 */
-	debugMessage: function ( message ) {
+	debugMessage( message ) {
 
 		if ( this.debug ) {
 
@@ -869,7 +867,7 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};
 
 // var NULL_CHUNK = 0x0000;
 var M3DMAGIC = 0x4D4D;

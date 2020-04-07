@@ -5,20 +5,17 @@
  * Description: A THREE loader for PCD ascii and binary files.
  */
 
-THREE.PCDLoader = function ( manager ) {
+THREE.PCDLoader = class PCDLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.littleEndian = true;
+		super( manager );
 
-};
+		this.littleEndian = true;
 
+	}
 
-THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-	constructor: THREE.PCDLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -47,9 +44,9 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data, url ) {
+	parse( data, url ) {
 
 		// from https://gitlab.com/taketwo/three-pcd-loader/blob/master/decompress-lzf.js
 
@@ -389,4 +386,4 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};

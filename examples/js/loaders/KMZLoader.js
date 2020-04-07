@@ -2,17 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.KMZLoader = function ( manager ) {
+THREE.KMZLoader = class KMZLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-THREE.KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.KMZLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -25,9 +23,9 @@ THREE.KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		function findFile( url ) {
 
@@ -102,4 +100,4 @@ THREE.KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};

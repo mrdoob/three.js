@@ -3,17 +3,24 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.ColladaLoader = function ( manager ) {
+THREE.ColladaLoader = class ColladaLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
+		this.options = {
 
-THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+			set convertUpAxis( value ) {
 
-	constructor: THREE.ColladaLoader,
+				console.warn( 'THREE.ColladaLoader: options.convertUpAxis() has been removed. Up axis is converted automatically.' );
 
-	load: function ( url, onLoad, onProgress, onError ) {
+			}
+
+		};
+
+	}
+
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -27,19 +34,9 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	options: {
-
-		set convertUpAxis( value ) {
-
-			console.warn( 'THREE.ColladaLoader: options.convertUpAxis() has been removed. Up axis is converted automatically.' );
-
-		}
-
-	},
-
-	parse: function ( text, path ) {
+	parse( text, path ) {
 
 		function getElementsByTagName( xml, name ) {
 
@@ -3945,4 +3942,4 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 	}
 
-} );
+};

@@ -8,20 +8,17 @@
  *
  */
 
-THREE.BVHLoader = function ( manager ) {
+THREE.BVHLoader = class BVHLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.animateBonePositions = true;
-	this.animateBoneRotations = true;
+		super( manager );
+		this.animateBonePositions = true;
+		this.animateBoneRotations = true;
 
-};
+	}
 
-THREE.BVHLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-	constructor: THREE.BVHLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -33,9 +30,9 @@ THREE.BVHLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( text ) {
+	parse( text ) {
 
 		/*
 			reads a string array (lines) from a BVH file
@@ -404,4 +401,4 @@ THREE.BVHLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};

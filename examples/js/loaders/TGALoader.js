@@ -4,17 +4,15 @@
  * @author takahirox / https://github.com/takahirox/
  */
 
-THREE.TGALoader = function ( manager ) {
+THREE.TGALoader = class TGALoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.TGALoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -39,9 +37,9 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		return texture;
 
-	},
+	}
 
-	parse: function ( buffer ) {
+	parse( buffer ) {
 
 		// reference from vthibault, https://github.com/vthibault/roBrowser/blob/master/src/Loaders/Targa.js
 
@@ -540,4 +538,4 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};

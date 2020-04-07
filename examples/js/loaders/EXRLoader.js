@@ -74,19 +74,16 @@
 
 // // End of OpenEXR license -------------------------------------------------
 
-THREE.EXRLoader = function ( manager ) {
+THREE.EXRLoader = class EXRLoader extends THREE.DataTextureLoader {
 
-	THREE.DataTextureLoader.call( this, manager );
+	constructor( manager ) {
 
-	this.type = THREE.FloatType;
+		super( manager );
+		this.type = THREE.FloatType;
 
-};
+	}
 
-THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoader.prototype ), {
-
-	constructor: THREE.EXRLoader,
-
-	parse: function ( buffer ) {
+	parse( buffer ) {
 
 		const USHORT_RANGE = ( 1 << 16 );
 		const BITMAP_SIZE = ( USHORT_RANGE >> 3 );
@@ -2122,16 +2119,16 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			type: this.type
 		};
 
-	},
+	}
 
-	setDataType: function ( value ) {
+	setDataType( value ) {
 
 		this.type = value;
 		return this;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		function onLoadCallback( texture, texData ) {
 
@@ -2165,4 +2162,4 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 	}
 
-} );
+};

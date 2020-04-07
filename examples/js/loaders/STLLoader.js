@@ -56,17 +56,15 @@
  */
 
 
-THREE.STLLoader = function ( manager ) {
+THREE.STLLoader = class STLLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.STLLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -91,9 +89,9 @@ THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		function isBinary( data ) {
 
@@ -384,4 +382,4 @@ THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};

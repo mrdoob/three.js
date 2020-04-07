@@ -3,20 +3,18 @@
 * @author Ben Houston / http://clara.io / bhouston
 */
 
-THREE.HDRCubeTextureLoader = function ( manager ) {
+THREE.HDRCubeTextureLoader = class HDRCubeTextureLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.hdrLoader = new THREE.RGBELoader();
-	this.type = THREE.UnsignedByteType;
+		super( manager );
 
-};
+		this.hdrLoader = new THREE.RGBELoader();
+		this.type = THREE.UnsignedByteType;
 
-THREE.HDRCubeTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.HDRCubeTextureLoader,
-
-	load: function ( urls, onLoad, onProgress, onError ) {
+	load( urls, onLoad, onProgress, onError ) {
 
 		if ( ! Array.isArray( urls ) ) {
 
@@ -117,9 +115,9 @@ THREE.HDRCubeTextureLoader.prototype = Object.assign( Object.create( THREE.Loade
 
 		return texture;
 
-	},
+	}
 
-	setDataType: function ( value ) {
+	setDataType( value ) {
 
 		this.type = value;
 		this.hdrLoader.setDataType( value );
@@ -128,4 +126,4 @@ THREE.HDRCubeTextureLoader.prototype = Object.assign( Object.create( THREE.Loade
 
 	}
 
-} );
+};

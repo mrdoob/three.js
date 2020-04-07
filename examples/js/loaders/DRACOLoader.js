@@ -2,85 +2,83 @@
  * @author Don McCurdy / https://www.donmccurdy.com
  */
 
-THREE.DRACOLoader = function ( manager ) {
+THREE.DRACOLoader = class DRACOLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.decoderPath = '';
-	this.decoderConfig = {};
-	this.decoderBinary = null;
-	this.decoderPending = null;
+		super( manager );
 
-	this.workerLimit = 4;
-	this.workerPool = [];
-	this.workerNextTaskID = 1;
-	this.workerSourceURL = '';
+		this.decoderPath = '';
+		this.decoderConfig = {};
+		this.decoderBinary = null;
+		this.decoderPending = null;
 
-	this.defaultAttributeIDs = {
-		position: 'POSITION',
-		normal: 'NORMAL',
-		color: 'COLOR',
-		uv: 'TEX_COORD'
-	};
-	this.defaultAttributeTypes = {
-		position: 'Float32Array',
-		normal: 'Float32Array',
-		color: 'Float32Array',
-		uv: 'Float32Array'
-	};
+		this.workerLimit = 4;
+		this.workerPool = [];
+		this.workerNextTaskID = 1;
+		this.workerSourceURL = '';
 
-};
+		this.defaultAttributeIDs = {
+			position: 'POSITION',
+			normal: 'NORMAL',
+			color: 'COLOR',
+			uv: 'TEX_COORD'
+		};
+		this.defaultAttributeTypes = {
+			position: 'Float32Array',
+			normal: 'Float32Array',
+			color: 'Float32Array',
+			uv: 'Float32Array'
+		};
 
-THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.DRACOLoader,
-
-	setDecoderPath: function ( path ) {
+	setDecoderPath( path ) {
 
 		this.decoderPath = path;
 
 		return this;
 
-	},
+	}
 
-	setDecoderConfig: function ( config ) {
+	setDecoderConfig( config ) {
 
 		this.decoderConfig = config;
 
 		return this;
 
-	},
+	}
 
-	setWorkerLimit: function ( workerLimit ) {
+	setWorkerLimit( workerLimit ) {
 
 		this.workerLimit = workerLimit;
 
 		return this;
 
-	},
+	}
 
 	/** @deprecated */
-	setVerbosity: function () {
+	setVerbosity() {
 
 		console.warn( 'THREE.DRACOLoader: The .setVerbosity() method has been removed.' );
 
-	},
+	}
 
 	/** @deprecated */
-	setDrawMode: function () {
+	setDrawMode() {
 
 		console.warn( 'THREE.DRACOLoader: The .setDrawMode() method has been removed.' );
 
-	},
+	}
 
 	/** @deprecated */
-	setSkipDequantization: function () {
+	setSkipDequantization() {
 
 		console.warn( 'THREE.DRACOLoader: The .setSkipDequantization() method has been removed.' );
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var loader = new THREE.FileLoader( this.manager );
 
@@ -107,10 +105,10 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		}, onProgress, onError );
 
-	},
+	}
 
 	/** @deprecated Kept for backward-compatibility with previous DRACOLoader versions. */
-	decodeDracoFile: function ( buffer, callback, attributeIDs, attributeTypes ) {
+	decodeDracoFile( buffer, callback, attributeIDs, attributeTypes ) {
 
 		var taskConfig = {
 			attributeIDs: attributeIDs || this.defaultAttributeIDs,
@@ -120,9 +118,9 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		this.decodeGeometry( buffer, taskConfig ).then( callback );
 
-	},
+	}
 
-	decodeGeometry: function ( buffer, taskConfig ) {
+	decodeGeometry( buffer, taskConfig ) {
 
 		// TODO: For backward-compatibility, support 'attributeTypes' objects containing
 		// references (rather than names) to typed array constructors. These must be
@@ -220,9 +218,9 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		return geometryPending;
 
-	},
+	}
 
-	_createGeometry: function ( geometryData ) {
+	_createGeometry( geometryData ) {
 
 		var geometry = new THREE.BufferGeometry();
 
@@ -245,9 +243,9 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		return geometry;
 
-	},
+	}
 
-	_loadLibrary: function ( url, responseType ) {
+	_loadLibrary( url, responseType ) {
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( this.decoderPath );
@@ -259,17 +257,17 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		} );
 
-	},
+	}
 
-	preload: function () {
+	preload() {
 
 		this._initDecoder();
 
 		return this;
 
-	},
+	}
 
-	_initDecoder: function () {
+	_initDecoder() {
 
 		if ( this.decoderPending ) return this.decoderPending;
 
@@ -314,9 +312,9 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		return this.decoderPending;
 
-	},
+	}
 
-	_getWorker: function ( taskID, taskCost ) {
+	_getWorker( taskID, taskCost ) {
 
 		return this._initDecoder().then( () => {
 
@@ -370,23 +368,23 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		} );
 
-	},
+	}
 
-	_releaseTask: function ( worker, taskID ) {
+	_releaseTask( worker, taskID ) {
 
 		worker._taskLoad -= worker._taskCosts[ taskID ];
 		delete worker._callbacks[ taskID ];
 		delete worker._taskCosts[ taskID ];
 
-	},
+	}
 
-	debug: function () {
+	debug() {
 
 		console.log( 'Task load: ', this.workerPool.map( ( worker ) => worker._taskLoad ) );
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		for ( var i = 0; i < this.workerPool.length; ++ i ) {
 
@@ -400,7 +398,7 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 	}
 
-} );
+};
 
 /* WEB WORKER */
 

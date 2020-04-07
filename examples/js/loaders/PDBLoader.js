@@ -3,17 +3,15 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
-THREE.PDBLoader = function ( manager ) {
+THREE.PDBLoader = class PDBLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-THREE.PDBLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.PDBLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -25,11 +23,11 @@ THREE.PDBLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
 	// Based on CanvasMol PDB parser
 
-	parse: function ( text ) {
+	parse( text ) {
 
 		function trim( text ) {
 
@@ -207,4 +205,4 @@ THREE.PDBLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};

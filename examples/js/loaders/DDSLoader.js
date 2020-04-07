@@ -2,17 +2,15 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-THREE.DDSLoader = function ( manager ) {
+THREE.DDSLoader = class DDSLoader extends THREE.CompressedTextureLoader {
 
-	THREE.CompressedTextureLoader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-THREE.DDSLoader.prototype = Object.assign( Object.create( THREE.CompressedTextureLoader.prototype ), {
+	}
 
-	constructor: THREE.DDSLoader,
-
-	parse: function ( buffer, loadMipmaps ) {
+	parse( buffer, loadMipmaps ) {
 
 		var dds = { mipmaps: [], width: 0, height: 0, format: null, mipmapCount: 1 };
 
@@ -270,4 +268,4 @@ THREE.DDSLoader.prototype = Object.assign( Object.create( THREE.CompressedTextur
 
 	}
 
-} );
+};

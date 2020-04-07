@@ -9,19 +9,17 @@
  * @author joewalnes
  */
 
-THREE.GCodeLoader = function ( manager ) {
+THREE.GCodeLoader = class GCodeLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.splitLayer = false;
+		super( manager );
 
-};
+		this.splitLayer = false;
 
-THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.GCodeLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -33,9 +31,9 @@ THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		var state = { x: 0, y: 0, z: 0, e: 0, f: 0, extruding: false, relative: false };
 		var layers = [];
@@ -220,4 +218,4 @@ THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 	}
 
-} );
+};

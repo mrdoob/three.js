@@ -4,23 +4,21 @@
  * @author yomboprime / https://yombo.org
  */
 
-THREE.SVGLoader = function ( manager ) {
+THREE.SVGLoader = class SVGLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	// Default dots per inch
-	this.defaultDPI = 90;
+		super( manager );
 
-	// Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
-	this.defaultUnit = "px";
+		// Default dots per inch
+		this.defaultDPI = 90;
 
-};
+		// Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
+		this.defaultUnit = "px";
 
-THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.SVGLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -32,9 +30,9 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( text ) {
+	parse( text ) {
 
 		var scope = this;
 
@@ -1264,7 +1262,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};
 
 THREE.SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
 

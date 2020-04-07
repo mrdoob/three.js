@@ -8,20 +8,17 @@
  * to create THREE.Font objects.
  */
 
-THREE.TTFLoader = function ( manager ) {
+THREE.TTFLoader = class TTFLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.reversed = false;
+		super( manager );
 
-};
+		this.reversed = false;
 
+	}
 
-THREE.TTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
-
-	constructor: THREE.TTFLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -34,9 +31,9 @@ THREE.TTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( arraybuffer ) {
+	parse( arraybuffer ) {
 
 		function convert( font, reversed ) {
 
@@ -197,4 +194,4 @@ THREE.TTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};

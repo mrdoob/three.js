@@ -27,19 +27,17 @@
  */
 
 
-THREE.PLYLoader = function ( manager ) {
+THREE.PLYLoader = class PLYLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.propertyNameMapping = {};
+		super( manager );
 
-};
+		this.propertyNameMapping = {};
 
-THREE.PLYLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.PLYLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -52,15 +50,15 @@ THREE.PLYLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	setPropertyNameMapping: function ( mapping ) {
+	setPropertyNameMapping( mapping ) {
 
 		this.propertyNameMapping = mapping;
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		function parseHeader( data ) {
 
@@ -495,4 +493,4 @@ THREE.PLYLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};

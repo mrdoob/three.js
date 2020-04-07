@@ -4,22 +4,19 @@
 
 // https://github.com/mrdoob/three.js/issues/5552
 // http://en.wikipedia.org/wiki/RGBE_image_format
+// adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
 
-THREE.RGBELoader = function ( manager ) {
+THREE.RGBELoader = class RGBELoader extends THREE.DataTextureLoader {
 
-	THREE.DataTextureLoader.call( this, manager );
+	constructor( manager ) {
 
-	this.type = THREE.UnsignedByteType;
+		super( manager );
 
-};
+		this.type = THREE.UnsignedByteType;
 
-THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoader.prototype ), {
+	}
 
-	constructor: THREE.RGBELoader,
-
-	// adapted from http://www.graphics.cornell.edu/~bjw/rgbe.html
-
-	parse: function ( buffer ) {
+	parse( buffer ) {
 
 		var
 			/* return codes for rgbe routines */
@@ -471,16 +468,16 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 		return null;
 
-	},
+	}
 
-	setDataType: function ( value ) {
+	setDataType( value ) {
 
 		this.type = value;
 		return this;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		function onLoadCallback( texture, texData ) {
 
@@ -523,4 +520,4 @@ THREE.RGBELoader.prototype = Object.assign( Object.create( THREE.DataTextureLoad
 
 	}
 
-} );
+};

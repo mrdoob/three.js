@@ -2,17 +2,15 @@
  *  three.js NRRD file loader
  */
 
-THREE.NRRDLoader = function ( manager ) {
+THREE.NRRDLoader = class NRRDLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.NRRDLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -25,9 +23,9 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		// this parser is largely inspired from the XTK NRRD parser : https://github.com/xtk/X
 
@@ -400,9 +398,9 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 
 		return volume;
 
-	},
+	}
 
-	parseChars: function ( array, start, end ) {
+	parseChars( array, start, end ) {
 
 		// without borders, use the whole array
 		if ( start === undefined ) {
@@ -427,169 +425,169 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 
 		return output;
 
-	},
-
-	fieldFunctions: {
-
-		type: function ( data ) {
-
-			switch ( data ) {
-
-				case 'uchar':
-				case 'unsigned char':
-				case 'uint8':
-				case 'uint8_t':
-					this.__array = Uint8Array;
-					break;
-				case 'signed char':
-				case 'int8':
-				case 'int8_t':
-					this.__array = Int8Array;
-					break;
-				case 'short':
-				case 'short int':
-				case 'signed short':
-				case 'signed short int':
-				case 'int16':
-				case 'int16_t':
-					this.__array = Int16Array;
-					break;
-				case 'ushort':
-				case 'unsigned short':
-				case 'unsigned short int':
-				case 'uint16':
-				case 'uint16_t':
-					this.__array = Uint16Array;
-					break;
-				case 'int':
-				case 'signed int':
-				case 'int32':
-				case 'int32_t':
-					this.__array = Int32Array;
-					break;
-				case 'uint':
-				case 'unsigned int':
-				case 'uint32':
-				case 'uint32_t':
-					this.__array = Uint32Array;
-					break;
-				case 'float':
-					this.__array = Float32Array;
-					break;
-				case 'double':
-					this.__array = Float64Array;
-					break;
-				default:
-					throw new Error( 'Unsupported NRRD data type: ' + data );
-
-			}
-
-			return this.type = data;
-
-		},
-
-		endian: function ( data ) {
-
-			return this.endian = data;
-
-		},
-
-		encoding: function ( data ) {
-
-			return this.encoding = data;
-
-		},
-
-		dimension: function ( data ) {
-
-			return this.dim = parseInt( data, 10 );
-
-		},
-
-		sizes: function ( data ) {
-
-			var i;
-			return this.sizes = ( function () {
-
-				var _i, _len, _ref, _results;
-				_ref = data.split( /\s+/ );
-				_results = [];
-				for ( _i = 0, _len = _ref.length; _i < _len; _i ++ ) {
-
-					i = _ref[ _i ];
-					_results.push( parseInt( i, 10 ) );
-
-				}
-				return _results;
-
-			} )();
-
-		},
-
-		space: function ( data ) {
-
-			return this.space = data;
-
-		},
-
-		'space origin': function ( data ) {
-
-			return this.space_origin = data.split( "(" )[ 1 ].split( ")" )[ 0 ].split( "," );
-
-		},
-
-		'space directions': function ( data ) {
-
-			var f, parts, v;
-			parts = data.match( /\(.*?\)/g );
-			return this.vectors = ( function () {
-
-				var _i, _len, _results;
-				_results = [];
-				for ( _i = 0, _len = parts.length; _i < _len; _i ++ ) {
-
-					v = parts[ _i ];
-					_results.push( ( function () {
-
-						var _j, _len2, _ref, _results2;
-						_ref = v.slice( 1, - 1 ).split( /,/ );
-						_results2 = [];
-						for ( _j = 0, _len2 = _ref.length; _j < _len2; _j ++ ) {
-
-							f = _ref[ _j ];
-							_results2.push( parseFloat( f ) );
-
-						}
-						return _results2;
-
-					} )() );
-
-				}
-				return _results;
-
-			} )();
-
-		},
-
-		spacings: function ( data ) {
-
-			var f, parts;
-			parts = data.split( /\s+/ );
-			return this.spacings = ( function () {
-
-				var _i, _len, _results = [];
-
-				for ( _i = 0, _len = parts.length; _i < _len; _i ++ ) {
-
-					f = parts[ _i ];
-					_results.push( parseFloat( f ) );
-
-				}
-				return _results;
-
-			} )();
-
-		}
 	}
 
-} );
+};
+
+THREE.NRRDLoader.prototype.fieldFunctions = {
+
+	type: function ( data ) {
+
+		switch ( data ) {
+
+			case 'uchar':
+			case 'unsigned char':
+			case 'uint8':
+			case 'uint8_t':
+				this.__array = Uint8Array;
+				break;
+			case 'signed char':
+			case 'int8':
+			case 'int8_t':
+				this.__array = Int8Array;
+				break;
+			case 'short':
+			case 'short int':
+			case 'signed short':
+			case 'signed short int':
+			case 'int16':
+			case 'int16_t':
+				this.__array = Int16Array;
+				break;
+			case 'ushort':
+			case 'unsigned short':
+			case 'unsigned short int':
+			case 'uint16':
+			case 'uint16_t':
+				this.__array = Uint16Array;
+				break;
+			case 'int':
+			case 'signed int':
+			case 'int32':
+			case 'int32_t':
+				this.__array = Int32Array;
+				break;
+			case 'uint':
+			case 'unsigned int':
+			case 'uint32':
+			case 'uint32_t':
+				this.__array = Uint32Array;
+				break;
+			case 'float':
+				this.__array = Float32Array;
+				break;
+			case 'double':
+				this.__array = Float64Array;
+				break;
+			default:
+				throw new Error( 'Unsupported NRRD data type: ' + data );
+
+		}
+
+		return this.type = data;
+
+	},
+
+	endian: function ( data ) {
+
+		return this.endian = data;
+
+	},
+
+	encoding: function ( data ) {
+
+		return this.encoding = data;
+
+	},
+
+	dimension: function ( data ) {
+
+		return this.dim = parseInt( data, 10 );
+
+	},
+
+	sizes: function ( data ) {
+
+		var i;
+		return this.sizes = ( function () {
+
+			var _i, _len, _ref, _results;
+			_ref = data.split( /\s+/ );
+			_results = [];
+			for ( _i = 0, _len = _ref.length; _i < _len; _i ++ ) {
+
+				i = _ref[ _i ];
+				_results.push( parseInt( i, 10 ) );
+
+			}
+			return _results;
+
+		} )();
+
+	},
+
+	space: function ( data ) {
+
+		return this.space = data;
+
+	},
+
+	'space origin': function ( data ) {
+
+		return this.space_origin = data.split( "(" )[ 1 ].split( ")" )[ 0 ].split( "," );
+
+	},
+
+	'space directions': function ( data ) {
+
+		var f, parts, v;
+		parts = data.match( /\(.*?\)/g );
+		return this.vectors = ( function () {
+
+			var _i, _len, _results;
+			_results = [];
+			for ( _i = 0, _len = parts.length; _i < _len; _i ++ ) {
+
+				v = parts[ _i ];
+				_results.push( ( function () {
+
+					var _j, _len2, _ref, _results2;
+					_ref = v.slice( 1, - 1 ).split( /,/ );
+					_results2 = [];
+					for ( _j = 0, _len2 = _ref.length; _j < _len2; _j ++ ) {
+
+						f = _ref[ _j ];
+						_results2.push( parseFloat( f ) );
+
+					}
+					return _results2;
+
+				} )() );
+
+			}
+			return _results;
+
+		} )();
+
+	},
+
+	spacings: function ( data ) {
+
+		var f, parts;
+		parts = data.split( /\s+/ );
+		return this.spacings = ( function () {
+
+			var _i, _len, _results = [];
+
+			for ( _i = 0, _len = parts.length; _i < _len; _i ++ ) {
+
+				f = parts[ _i ];
+				_results.push( parseFloat( f ) );
+
+			}
+			return _results;
+
+		} )();
+
+	}
+};

@@ -2,17 +2,15 @@
  * @author Virtulous / https://virtulo.us/
  */
 
-THREE.AssimpLoader = function ( manager ) {
+THREE.AssimpLoader = class AssimpLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.AssimpLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -28,9 +26,9 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( buffer, path ) {
+	parse( buffer, path ) {
 
 		var textureLoader = new THREE.TextureLoader( this.manager );
 		textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
@@ -2251,4 +2249,4 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 	}
 
-} );
+};

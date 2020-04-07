@@ -16,50 +16,48 @@
  * of web workers, before transferring the transcoded compressed texture back
  * to the main thread.
  */
-THREE.BasisTextureLoader = function ( manager ) {
+THREE.BasisTextureLoader = class BasisTextureLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-	this.transcoderPath = '';
-	this.transcoderBinary = null;
-	this.transcoderPending = null;
+		super( manager );
 
-	this.workerLimit = 4;
-	this.workerPool = [];
-	this.workerNextTaskID = 1;
-	this.workerSourceURL = '';
-	this.workerConfig = {
-		format: null,
-		astcSupported: false,
-		bptcSupported: false,
-		etcSupported: false,
-		dxtSupported: false,
-		pvrtcSupported: false,
-	};
+		this.transcoderPath = '';
+		this.transcoderBinary = null;
+		this.transcoderPending = null;
 
-};
+		this.workerLimit = 4;
+		this.workerPool = [];
+		this.workerNextTaskID = 1;
+		this.workerSourceURL = '';
+		this.workerConfig = {
+			format: null,
+			astcSupported: false,
+			bptcSupported: false,
+			etcSupported: false,
+			dxtSupported: false,
+			pvrtcSupported: false,
+		};
 
-THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.BasisTextureLoader,
-
-	setTranscoderPath: function ( path ) {
+	setTranscoderPath( path ) {
 
 		this.transcoderPath = path;
 
 		return this;
 
-	},
+	}
 
-	setWorkerLimit: function ( workerLimit ) {
+	setWorkerLimit( workerLimit ) {
 
 		this.workerLimit = workerLimit;
 
 		return this;
 
-	},
+	}
 
-	detectSupport: function ( renderer ) {
+	detectSupport( renderer ) {
 
 		var config = this.workerConfig;
 
@@ -98,9 +96,9 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 		return this;
 
-	},
+	}
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var loader = new THREE.FileLoader( this.manager );
 
@@ -114,13 +112,13 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 		}, onProgress, onError );
 
-	},
+	}
 
 	/**
 	 * @param  {ArrayBuffer} buffer
 	 * @return {Promise<THREE.CompressedTexture>}
 	 */
-	_createTexture: function ( buffer ) {
+	_createTexture( buffer ) {
 
 		var worker;
 		var taskID;
@@ -199,9 +197,9 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 		return texturePending;
 
-	},
+	}
 
-	_initTranscoder: function () {
+	_initTranscoder() {
 
 		if ( ! this.transcoderPending ) {
 
@@ -245,9 +243,9 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 		return this.transcoderPending;
 
-	},
+	}
 
-	_allocateWorker: function ( taskCost ) {
+	_allocateWorker( taskCost ) {
 
 		return this._initTranscoder().then( () => {
 
@@ -305,9 +303,9 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 		} );
 
-	},
+	}
 
-	dispose: function () {
+	dispose() {
 
 		for ( var i = 0; i < this.workerPool.length; i ++ ) {
 
@@ -321,7 +319,7 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 	}
 
-} );
+};
 
 /* CONSTANTS */
 

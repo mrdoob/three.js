@@ -9,17 +9,15 @@
  * @author Sriram Somasundharam https://github.com/raamssundar
  */
 
-THREE.VTKLoader = function ( manager ) {
+THREE.VTKLoader = class VTKLoader extends THREE.Loader {
 
-	THREE.Loader.call( this, manager );
+	constructor( manager ) {
 
-};
+		super( manager );
 
-THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
+	}
 
-	constructor: THREE.VTKLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
@@ -32,9 +30,9 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( data ) {
+	parse( data ) {
 
 		function parseASCII( data ) {
 
@@ -1175,4 +1173,4 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 	}
 
-} );
+};
