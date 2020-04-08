@@ -2,6 +2,10 @@
 	color-scheme: light dark;
 }
 
+html {
+	touch-action: none;
+}
+
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
