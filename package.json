@@ -57,6 +57,7 @@
     "test-lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-unit": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
     "test-e2e": "node --expose-gc test/e2e/puppeteer.js",
+    "test-e2e-cov": "node test/e2e/check-coverage.js",
     "make-screenshot": "cross-env MAKE=true npm run test-e2e"
   },
   "keywords": [
@@ -87,7 +88,7 @@
     "image-output": "2.4.1",
     "pixelmatch": "5.1.0",
     "pngjs": "3.4.0",
-    "puppeteer": "^2.1.1",
+    "puppeteer": "2.1.1",
     "qunit": "^2.9.3",
     "rollup": "^2.3.2",
     "rollup-plugin-buble": "^0.19.8",
