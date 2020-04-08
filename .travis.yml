@@ -25,3 +25,12 @@ jobs:
       env: FORCE_COLOR=0 CI=2
     - <<: *e2e
       env: FORCE_COLOR=0 CI=3
+
+    - &e2e-cov
+      stage: e2e-cov
+      name: e2e-cov
+      script: npm run test-e2e-cov
+
+  allow_failures:
+
+    - stage: e2e-cov
