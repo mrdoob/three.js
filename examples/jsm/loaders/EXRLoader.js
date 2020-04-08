@@ -2175,7 +2175,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 				for ( let w = 0; w < width; ++ w ) {
 
 					i = h * width * 4 + w * 4;
-					j = ( height - h ) * width * 4 + w * 4;
+					j = ( height - 1 - h ) * width * 4 + w * 4;
 
 					const red = byteArray[ j ];
 					const green = byteArray[ j + 1 ];
