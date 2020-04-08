@@ -2,8 +2,8 @@
  * @author Richard M. / https://github.com/richardmonette
  * @author ScieCode / http://github.com/sciecode
  *
- * OpenEXR loader which, currently, supports uncompressed, ZIP(S), RLE and PIZ wavelet compression.
- * Supports reading 16 and 32 bit data format.
+ * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
  *
  * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
  * implementation, so I have preserved their copyright notices.
@@ -15,8 +15,12 @@ import {
 	HalfFloatType,
 	LinearEncoding,
 	LinearFilter,
+	NearestFilter,
 	RGBAFormat,
-	RGBFormat
+	RGBEEncoding,
+	RGBEFormat,
+	RGBFormat,
+	UnsignedByteType
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.module.min.js";
 
@@ -127,6 +131,39 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 		const RLE = 2;
 
 		const logBase = Math.pow( 2.7182818, 2.2 );
+
+		function frexp( value ) {
+
+			if ( value === 0 ) return [ value, 0 ];
+
+			var data = new DataView( new ArrayBuffer( 8 ) );
+			data.setFloat64( 0, value );
+
+			var bits = ( data.getUint32( 0 ) >>> 20 ) & 0x7FF;
+			if ( bits === 0 ) { // denormal
+
+				data.setFloat64( 0, value * Math.pow( 2, 64 ) ); // exp + 64
+				bits = ( ( data.getUint32( 0 ) >>> 20 ) & 0x7FF ) - 64;
+
+			}
+			var exponent = bits - 1022;
+			var mantissa = ldexp( value, - exponent );
+
+			return [ mantissa, exponent ];
+
+		}
+
+		function ldexp( mantissa, exponent ) {
+
+			var steps = Math.min( 3, Math.ceil( Math.abs( exponent ) / 1023 ) );
+			var result = mantissa;
+
+			for ( var i = 0; i < steps; i ++ )
+				result *= Math.pow( 2, Math.floor( ( exponent + i ) / steps ) );
+
+			return result;
+
+		}
 
 		function reverseLutFromBitmap( bitmap, lut ) {
 
@@ -1970,6 +2007,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			switch ( this.type ) {
 
+				case UnsignedByteType:
 				case FloatType:
 
 					getValue = parseFloat16;
@@ -1988,6 +2026,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			switch ( this.type ) {
 
+				case UnsignedByteType:
 				case FloatType:
 
 					getValue = parseFloat32;
@@ -2026,6 +2065,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 		// Fill initially with 1s for the alpha value if the texture is not RGBA, RGB values will be overwritten
 		switch ( this.type ) {
 
+			case UnsignedByteType:
 			case FloatType:
 
 				var byteArray = new Float32Array( size );
@@ -2124,12 +2164,51 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		if ( this.type === UnsignedByteType ) {
+
+			let v;
+			const size = byteArray.length;
+			const RGBEArray = new Uint8Array( size );
+
+			for ( let i = 0; i < size; i += 4 ) {
+
+				const red = byteArray[ size - ( i + 4 ) ];
+				const green = byteArray[ size - ( i + 3 ) ];
+				const blue = byteArray[ size - ( i + 2 ) ];
+
+				v = ( red > green ) ? red : green;
+				v = ( blue > v ) ? blue : v;
+
+				if ( v < 1e-32 ) {
+
+					RGBEArray[ i ] = RGBEArray[ i + 1 ] = RGBEArray[ i + 2 ] = RGBEArray[ i + 3 ] = 0;
+
+				} else {
+
+					const res = frexp( v );
+					v = res[ 0 ] * 256 / v;
+
+					RGBEArray[ i ] = red * v;
+					RGBEArray[ i + 1 ] = green * v;
+					RGBEArray[ i + 2 ] = blue * v;
+					RGBEArray[ i + 3 ] = res[ 1 ] + 128;
+
+				}
+
+			}
+
+			byteArray = RGBEArray;
+
+		}
+
+		let format = ( this.type === UnsignedByteType ) ? RGBEFormat : ( numChannels === 4 ) ? RGBAFormat : RGBFormat;
+
 		return {
 			header: EXRHeader,
 			width: width,
 			height: height,
 			data: byteArray,
-			format: numChannels === 4 ? RGBAFormat : RGBFormat,
+			format: format,
 			type: this.type
 		};
 
@@ -2148,15 +2227,16 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			switch ( texture.type ) {
 
-				case FloatType:
+				case UnsignedByteType:
 
-					texture.encoding = LinearEncoding;
-					texture.minFilter = LinearFilter;
-					texture.magFilter = LinearFilter;
+					texture.encoding = RGBEEncoding;
+					texture.minFilter = NearestFilter;
+					texture.magFilter = NearestFilter;
 					texture.generateMipmaps = false;
-					texture.flipY = false;
+					texture.flipY = true;
 					break;
 
+				case FloatType:
 				case HalfFloatType:
 
 					texture.encoding = LinearEncoding;

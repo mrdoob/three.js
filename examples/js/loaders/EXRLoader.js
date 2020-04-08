@@ -2,8 +2,8 @@
  * @author Richard M. / https://github.com/richardmonette
  * @author ScieCode / http://github.com/sciecode
  *
- * OpenEXR loader which, currently, supports uncompressed, ZIP(S), RLE and PIZ wavelet compression.
- * Supports reading 16 and 32 bit data format.
+ * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
  *
  * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
  * implementation, so I have preserved their copyright notices.
@@ -116,6 +116,39 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 		const RLE = 2;
 
 		const logBase = Math.pow( 2.7182818, 2.2 );
+
+		function frexp( value ) {
+
+			if ( value === 0 ) return [ value, 0 ];
+
+			var data = new DataView( new ArrayBuffer( 8 ) );
+			data.setFloat64( 0, value );
+
+			var bits = ( data.getUint32( 0 ) >>> 20 ) & 0x7FF;
+			if ( bits === 0 ) { // denormal
+
+				data.setFloat64( 0, value * Math.pow( 2, 64 ) ); // exp + 64
+				bits = ( ( data.getUint32( 0 ) >>> 20 ) & 0x7FF ) - 64;
+
+			}
+			var exponent = bits - 1022;
+			var mantissa = ldexp( value, - exponent );
+
+			return [ mantissa, exponent ];
+
+		}
+
+		function ldexp( mantissa, exponent ) {
+
+			var steps = Math.min( 3, Math.ceil( Math.abs( exponent ) / 1023 ) );
+			var result = mantissa;
+
+			for ( var i = 0; i < steps; i ++ )
+				result *= Math.pow( 2, Math.floor( ( exponent + i ) / steps ) );
+
+			return result;
+
+		}
 
 		function reverseLutFromBitmap( bitmap, lut ) {
 
@@ -1959,6 +1992,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			switch ( this.type ) {
 
+				case THREE.UnsignedByteType:
 				case THREE.FloatType:
 
 					getValue = parseFloat16;
@@ -1977,6 +2011,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			switch ( this.type ) {
 
+				case THREE.UnsignedByteType:
 				case THREE.FloatType:
 
 					getValue = parseFloat32;
@@ -2015,6 +2050,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 		// Fill initially with 1s for the alpha value if the texture is not RGBA, RGB values will be overwritten
 		switch ( this.type ) {
 
+			case THREE.UnsignedByteType:
 			case THREE.FloatType:
 
 				var byteArray = new Float32Array( size );
@@ -2113,12 +2149,51 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		}
 
+		if ( this.type === THREE.UnsignedByteType ) {
+
+			let v;
+			const size = byteArray.length;
+			const RGBEArray = new Uint8Array( size );
+
+			for ( let i = 0; i < size; i += 4 ) {
+
+				const red = byteArray[ size - ( i + 4 ) ];
+				const green = byteArray[ size - ( i + 3 ) ];
+				const blue = byteArray[ size - ( i + 2 ) ];
+
+				v = ( red > green ) ? red : green;
+				v = ( blue > v ) ? blue : v;
+
+				if ( v < 1e-32 ) {
+
+					RGBEArray[ i ] = RGBEArray[ i + 1 ] = RGBEArray[ i + 2 ] = RGBEArray[ i + 3 ] = 0;
+
+				} else {
+
+					const res = frexp( v );
+					v = res[ 0 ] * 256 / v;
+
+					RGBEArray[ i ] = red * v;
+					RGBEArray[ i + 1 ] = green * v;
+					RGBEArray[ i + 2 ] = blue * v;
+					RGBEArray[ i + 3 ] = res[ 1 ] + 128;
+
+				}
+
+			}
+
+			byteArray = RGBEArray;
+
+		}
+
+		let format = ( this.type === THREE.UnsignedByteType ) ? THREE.RGBEFormat : ( numChannels === 4 ) ? THREE.RGBAFormat : THREE.RGBFormat;
+
 		return {
 			header: EXRHeader,
 			width: width,
 			height: height,
 			data: byteArray,
-			format: numChannels === 4 ? THREE.RGBAFormat : THREE.RGBFormat,
+			format: format,
 			type: this.type
 		};
 
@@ -2137,15 +2212,16 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			switch ( texture.type ) {
 
-				case THREE.FloatType:
+				case THREE.UnsignedByteType:
 
-					texture.encoding = THREE.LinearEncoding;
-					texture.minFilter = THREE.LinearFilter;
-					texture.magFilter = THREE.LinearFilter;
+					texture.encoding = THREE.RGBEEncoding;
+					texture.minFilter = THREE.NearestFilter;
+					texture.magFilter = THREE.NearestFilter;
 					texture.generateMipmaps = false;
-					texture.flipY = false;
+					texture.flipY = true;
 					break;
 
+				case THREE.FloatType:
 				case THREE.HalfFloatType:
 
 					texture.encoding = THREE.LinearEncoding;
