@@ -18,6 +18,10 @@
  *		https://code.blender.org/2013/08/fbx-binary-file-format-specification/
  */
 
+
+import { Zlib } from "../libs/inflate.module.min.js";
+import { NURBSCurve } from "../curves/NURBSCurve.js";
+
 import {
 	AmbientLight,
 	AnimationClip,
@@ -4168,3 +4172,5 @@ var FBXLoader = ( function () {
 } )();
 
 export { FBXLoader };
+
+export {  };
