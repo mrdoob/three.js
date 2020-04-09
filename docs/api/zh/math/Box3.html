@@ -121,10 +121,13 @@
 
 		<h3>[method:Box3 expandByObject]( [param:Object3D object] )</h3>
 		<p>
-		[page:Object3D object] - 包裹在包围盒中的3d对象 [page:Object3D]。<br /><br />
+		[page:Object3D object] - [page:Object3D] to expand the box by.<br /><br />
 
-		扩展此包围盒的边界，使得对象及其子对象在包围盒内，包括对象和子对象的世界坐标的变换。
+		Expands the boundaries of this box to include [page:Object3D object] and its children,
+		accounting for the object's, and children's, world transforms.
 
+		Note: For computational efficiency, the computed bounding box is conservative. That is, it is not necessarily the minimal bounding box.
+		It's possible to get the precise box by using [page:.setFromBufferAttribute]() or [page:.expandByPoint]() if desired.
 		</p>
 
 		<h3>[method:Box3 expandByPoint]( [param:Vector3 point] )</h3>
@@ -258,10 +261,13 @@
 
 		<h3>[method:Box3 setFromObject]( [param:Object3D object] )</h3>
 		<p>
-		[page:Object3D object] - 用来计算包围盒的3D对象 [page:Object3D]。<br /><br />
+		[page:Object3D object] - [page:Object3D] to compute the bounding box of.<br /><br />
 
-		计算和世界轴对齐的一个对象 [page:Object3D] （含其子对象）的包围盒，计算对象和子对象的世界坐标变换。
+		Computes the world-axis-aligned bounding box of an [page:Object3D] (including its children),
+		accounting for the object's, and children's, world transforms.
 
+		Note: For computational efficiency, the computed bounding box is conservative. That is, it is not necessarily the minimal bounding box.
+		It's possible to get the precise box by using [page:.setFromBufferAttribute]() or [page:.expandByPoint]() if desired.
 		</p>
 
 		<h3>[method:Box3 setFromPoints]( [param:Array points] )</h3>

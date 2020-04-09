@@ -128,8 +128,9 @@
 
 		Expands the boundaries of this box to include [page:Object3D object] and its children,
 		accounting for the object's, and children's, world transforms.
-		The function may result in a larger box than strictly necessary.
 
+		Note: For computational efficiency, the computed bounding box is conservative. That is, it is not necessarily the minimal bounding box.
+		It's possible to get the precise box by using [page:.setFromBufferAttribute]() or [page:.expandByPoint]() if desired.
 		</p>
 
 		<h3>[method:Box3 expandByPoint]( [param:Vector3 point] )</h3>
@@ -271,8 +272,9 @@
 
 		Computes the world-axis-aligned bounding box of an [page:Object3D] (including its children),
 		accounting for the object's, and children's, world transforms.
-		The function may result in a larger box than strictly necessary.
 
+		Note: For computational efficiency, the computed bounding box is conservative. That is, it is not necessarily the minimal bounding box.
+		It's possible to get the precise box by using [page:.setFromBufferAttribute]() or [page:.expandByPoint]() if desired.
 		</p>
 
 		<h3>[method:Box3 setFromPoints]( [param:Array points] )</h3>
