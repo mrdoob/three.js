@@ -4019,6 +4019,8 @@ THREE.FBXLoader = ( function () {
 
 		}
 
+		var lRotationPivotM_inv = new Matrix4().getInverse( lRotationPivotM );
+		var lScalingPivotM_inv = new Matrix4().getInverse( lScalingPivotM );
 		// Calculate the local transform matrix
 		var lTransform = new Matrix4();
 		lTransform.multiply( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
