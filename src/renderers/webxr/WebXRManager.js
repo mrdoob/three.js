@@ -49,14 +49,14 @@ function WebXRManager( renderer, gl ) {
 
 	this.isPresenting = false;
 
-	this.getController = function ( id ) {
+	this.getController = function ( index ) {
 
-		var controller = controllers[ id ];
+		var controller = controllers[ index ];
 
 		if ( controller === undefined ) {
 
 			controller = {};
-			controllers[ id ] = controller;
+			controllers[ index ] = controller;
 
 		}
 
@@ -72,14 +72,14 @@ function WebXRManager( renderer, gl ) {
 
 	};
 
-	this.getControllerGrip = function ( id ) {
+	this.getControllerGrip = function ( index ) {
 
-		var controller = controllers[ id ];
+		var controller = controllers[ index ];
 
 		if ( controller === undefined ) {
 
 			controller = {};
-			controllers[ id ] = controller;
+			controllers[ index ] = controller;
 
 		}
 
