@@ -4005,7 +4005,6 @@ var FBXLoader = ( function () {
 			var array = transformData.rotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
-
 		}
 
 		if ( transformData.postRotation ) {
@@ -4028,49 +4027,58 @@ var FBXLoader = ( function () {
 		if ( transformData.parentMatrixWorld ) lParentGX = transformData.parentMatrixWorld;
 
 		// Global Rotation
-		var lLRM = lPreRotationM.multiply( lRotationM ).multiply( lPostRotationM );
+		var lLRM = new Matrix4().multiply(lPreRotationM).multiply(lRotationM).multiply(lPostRotationM);
 		var lParentGRM = new Matrix4();
 		lParentGX.extractRotation( lParentGRM );
 
 		// Global Shear*Scaling
 		var lParentTM = new Matrix4();
-		var lLSM;
-		var lParentGSM;
-		var lParentGRSM;
+		var lLSM = new Matrix4();
+		var lParentGSM = new Matrix4();
+		var lParentGRSM = new Matrix4();
+		
+		var lParentTM_inv = new Matrix4().getInverse(lParentTM);
 
 		lParentTM.copyPosition( lParentGX );
-		lParentGRSM = lParentTM.getInverse( lParentTM ).multiply( lParentGX );
-		lParentGSM = lParentGRM.getInverse( lParentGRM ).multiply( lParentGRSM );
+		lParentGRSM.multiply(lParentTM_inv).multiply(lParentGX);
+		
+		var lParentGRM_inv = new Matrix4().getInverse(lParentGRM);
+		lParentGSM.multiply(lParentGRM_inv).multiply(lParentGRSM);
 		lLSM = lScalingM;
-
-		var lGlobalRS;
+		
+	
+		var lGlobalRS = new Matrix4();
 		if ( inheritType === 0 ) {
 
-			lGlobalRS = lParentGRM.multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
+			lGlobalRS.multiply( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
 
 		} else if ( inheritType === 1 ) {
 
-			lGlobalRS = lParentGRM.multiply( lParentGSM ).multiply( lLRM ).multiply( lLSM );
+			lGlobalRS.multiply(lParentGRM).multiply( lParentGSM ).multiply( lLRM ).multiply( lLSM );
 
 		} else {
 
 			var lParentLSM = new Matrix4().copy( lScalingM );
 
-			var lParentGSM_noLocal = lParentGSM.multiply( lParentLSM.getInverse( lParentLSM ) );
+			var lParentGSM_noLocal = new Matrix4().multiply(lParentGSM).multiply( lParentLSM.getInverse( lParentLSM ) );
 
-			lGlobalRS = lParentGRM.multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
+			lGlobalRS.multiply(lParentGRM).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
 
 		}
 
+		var lRotationPivotM_inv = new Matrix4().getInverse(lRotationPivotM);
+		var lScalingPivotM_inv = new Matrix4().getInverse(lScalingPivotM);
+
 		// Calculate the local transform matrix
-		var lTransform = lTranslationM.multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM.getInverse( lRotationPivotM ) ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM.getInverse( lScalingPivotM ) );
+		var lTransform = new Matrix4;
+		lTransform.multiply(lTranslationM).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
 
 		var lLocalTWithAllPivotAndOffsetInfo = new Matrix4().copyPosition( lTransform );
 
-		var lGlobalTranslation = lParentGX.multiply( lLocalTWithAllPivotAndOffsetInfo );
+		var lGlobalTranslation = new Matrix4().multiply(lParentGX).multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
 
-		lTransform = lGlobalT.multiply( lGlobalRS );
+		lTransform = new Matrix4().multiply(lGlobalT).multiply( lGlobalRS );
 
 		return lTransform;
 
