@@ -2151,32 +2151,39 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		if ( this.type === THREE.UnsignedByteType ) {
 
-			let v;
+			let v, i, j;
 			const size = byteArray.length;
 			const RGBEArray = new Uint8Array( size );
 
-			for ( let i = 0; i < size; i += 4 ) {
+			for ( let h = 0; h < height; ++ h ) {
 
-				const red = byteArray[ size - ( i + 4 ) ];
-				const green = byteArray[ size - ( i + 3 ) ];
-				const blue = byteArray[ size - ( i + 2 ) ];
+				for ( let w = 0; w < width; ++ w ) {
 
-				v = ( red > green ) ? red : green;
-				v = ( blue > v ) ? blue : v;
+					i = h * width * 4 + w * 4;
+					j = ( height - 1 - h ) * width * 4 + w * 4;
 
-				if ( v < 1e-32 ) {
+					const red = byteArray[ j ];
+					const green = byteArray[ j + 1 ];
+					const blue = byteArray[ j + 2 ];
 
-					RGBEArray[ i ] = RGBEArray[ i + 1 ] = RGBEArray[ i + 2 ] = RGBEArray[ i + 3 ] = 0;
+					v = ( red > green ) ? red : green;
+					v = ( blue > v ) ? blue : v;
 
-				} else {
+					if ( v < 1e-32 ) {
 
-					const res = frexp( v );
-					v = res[ 0 ] * 256 / v;
+						RGBEArray[ i ] = RGBEArray[ i + 1 ] = RGBEArray[ i + 2 ] = RGBEArray[ i + 3 ] = 0;
 
-					RGBEArray[ i ] = red * v;
-					RGBEArray[ i + 1 ] = green * v;
-					RGBEArray[ i + 2 ] = blue * v;
-					RGBEArray[ i + 3 ] = res[ 1 ] + 128;
+					} else {
+
+						const res = frexp( v );
+						v = res[ 0 ] * 256 / v;
+
+						RGBEArray[ i ] = red * v;
+						RGBEArray[ i + 1 ] = green * v;
+						RGBEArray[ i + 2 ] = blue * v;
+						RGBEArray[ i + 3 ] = res[ 1 ] + 128;
+
+					}
 
 				}
 
