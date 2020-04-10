@@ -66,7 +66,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				} else if ( version === 3 ) {
 
-					console.warn( 'THREE.3MFLoader: jszip version 3 parse(data, onLoad) return will be null.' );
+					console.warn( 'THREE.3MFLoader: jszip version 3 found, parse() will return null.' );
 
 					JSZip.loadAsync( data ).then( next );
 
@@ -80,17 +80,19 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
-		function getUint8Array( zipFile, next ) {
+		// Get zip file data as uint8 array depending on the JSZip version used.
+
+		function getUint8Array( zipFile, next, data ) {
 
 			if ( version === 2 ) {
 
-				next( new Uint8Array( zipFile.asArrayBuffer() ) );
+				next( new Uint8Array( zipFile.asArrayBuffer() ), data );
 
 			} else if ( version === 3 ) {
 
 				zipFile.async( "arraybuffer" ).then( function ( arraybuffer ) {
 
-					next( new Uint8Array( arraybuffer ) );
+					next(  new Uint8Array( arraybuffer ), data );
 
 				} );
 
@@ -156,9 +158,9 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 					// Amount of async calls that we have to wait for 
 
-					var waiting = modelPartNames.length + 1;
+					var waiting = modelPartNames.length + texturesPartNames.length + 1;
 
-					//
+					// Scene structure
 
 					if ( modelRelsName ) {
 
@@ -179,9 +181,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 					for ( var i = 0; i < modelPartNames.length; i ++ ) {
 
-						var modelPart = modelPartNames[ i ];
-
-						getUint8Array( zip.file( modelPart ), function ( view ) {
+						getUint8Array( zip.file( modelPartNames[ i ] ), function ( view, modelPart ) {
 
 							var fileText = THREE.LoaderUtils.decodeText( view );
 							var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
@@ -209,7 +209,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 							var modelData = parseModelNode( modelNode );
 							modelData[ 'xml' ] = modelNode;
 
-							if ( 0 < Object.keys( extensions ).length ) {
+							if ( Object.keys( extensions ).length > 0 ) {
 
 								modelData[ 'extensions' ] = extensions;
 
@@ -219,7 +219,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 							finished();
 
-						} );
+						},  modelPartNames[ i ] );
 
 					}
 
@@ -227,13 +227,17 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 					for ( var i = 0; i < texturesPartNames.length; i ++ ) {
 
-						var texturesPartName = texturesPartNames[ i ];
-						texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asArrayBuffer();
+						getUint8Array( zip.file( texturesPartNames[ i ] ), function ( texturesPart, texturesPartName ) {
+							
+							texturesParts[ texturesPartName ] = texturesPart;
+
+							finished();
+
+						},  texturesPartNames[ i ] );
 
 					}
 
 					finished();
-
 
 					// Auxiliar method to check if everything was finished before moving up to next step
 
@@ -1469,23 +1473,22 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
-		var object = null;
+		var output = null;
+		var objects = null;
 
 		loadDocument( data, function ( data3mf ) {
-
-			var objects = buildObjects( data3mf );
-
-			object = build( objects, data3mf );
+			objects = buildObjects( data3mf );
+			output = build( objects, data3mf );
 
 			if ( onLoad !== undefined ) {
 
-				onLoad( object );
+				onLoad( output );
 
 			}
 
 		} );
 
-		return object;
+		return output;
 
 	},
 
