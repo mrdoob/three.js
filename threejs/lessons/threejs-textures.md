@@ -306,7 +306,7 @@ less memory than a PNG in WebGL. See above.
 
 Let's apply this 16x16 texture
 
-<div class="threejs_center"><img src="resources/images/mip-low-res-enlarged.png" class="border" align="center"></div>
+<div class="threejs_center"><img src="resources/images/mip-low-res-enlarged.png" class="nobg" align="center"></div>
 
 To a cube
 
@@ -334,7 +334,7 @@ mip where the pixels have been blended to make the next smaller mip. Mips are cr
 until we get all the way to a 1x1 pixel mip. For the image above all of the mips would
 end up being something like this
 
-<div class="threejs_center"><img src="resources/images/mipmap-low-res-enlarged.png" align="center"></div>
+<div class="threejs_center"><img src="resources/images/mipmap-low-res-enlarged.png" class="nobg" align="center"></div>
 
 Now, when the cube is drawn so small that it's only 1 or 2 pixels large the GPU can choose
 to use just the smallest or next to smallest mip level to decide what color to make the
