@@ -22859,6 +22859,143 @@
 	} );
 
 	/**
+	 * @author Mugen87 / https://github.com/Mugen87
+	 */
+
+	function WebXRController() {
+
+		this._targetRay = null;
+		this._grip = null;
+
+	}
+
+	Object.assign( WebXRController.prototype, {
+
+		constructor: WebXRController,
+
+		getTargetRaySpace: function () {
+
+			if ( this._targetRay === null ) {
+
+				this._targetRay = new Group();
+				this._targetRay.matrixAutoUpdate = false;
+				this._targetRay.visible = false;
+
+			}
+
+			return this._targetRay;
+
+		},
+
+		getGripSpace: function () {
+
+			if ( this._grip === null ) {
+
+				this._grip = new Group();
+				this._grip.matrixAutoUpdate = false;
+				this._grip.visible = false;
+
+			}
+
+			return this._grip;
+
+		},
+
+		dispatchEvent: function ( event ) {
+
+			if ( this._targetRay !== null ) {
+
+				this._targetRay.dispatchEvent( event );
+
+			}
+
+			if ( this._grip !== null ) {
+
+				this._grip.dispatchEvent( event );
+
+			}
+
+			return this;
+
+		},
+
+		disconnect: function ( inputSource ) {
+
+			this.dispatchEvent( { type: 'disconnected', data: inputSource } );
+
+			if ( this._targetRay !== null ) {
+
+				this._targetRay.visible = false;
+
+			}
+
+			if ( this._grip !== null ) {
+
+				this._grip.visible = false;
+
+			}
+
+			return this;
+
+		},
+
+		update: function ( inputSource, frame, referenceSpace ) {
+
+			var inputPose = null;
+			var gripPose = null;
+
+			var targetRay = this._targetRay;
+			var grip = this._grip;
+
+			if ( inputSource ) {
+
+				if ( targetRay !== null ) {
+
+					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+
+					if ( inputPose !== null ) {
+
+						targetRay.matrix.fromArray( inputPose.transform.matrix );
+						targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+
+					}
+
+				}
+
+				if ( grip !== null && inputSource.gripSpace ) {
+
+					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
+
+					if ( gripPose !== null ) {
+
+						grip.matrix.fromArray( gripPose.transform.matrix );
+						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+
+					}
+
+				}
+
+			}
+
+			if ( targetRay !== null ) {
+
+				targetRay.visible = ( inputPose !== null );
+
+			}
+
+			if ( grip !== null ) {
+
+				grip.visible = ( gripPose !== null );
+
+			}
+
+			return this;
+
+		}
+
+	} );
+
+	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
@@ -22901,49 +23038,33 @@
 
 		this.isPresenting = false;
 
-		this.getController = function ( id ) {
+		this.getController = function ( index ) {
 
-			var controller = controllers[ id ];
+			var controller = controllers[ index ];
 
 			if ( controller === undefined ) {
 
-				controller = {};
-				controllers[ id ] = controller;
+				controller = new WebXRController();
+				controllers[ index ] = controller;
 
 			}
 
-			if ( controller.targetRay === undefined ) {
-
-				controller.targetRay = new Group();
-				controller.targetRay.matrixAutoUpdate = false;
-				controller.targetRay.visible = false;
-
-			}
-
-			return controller.targetRay;
+			return controller.getTargetRaySpace();
 
 		};
 
-		this.getControllerGrip = function ( id ) {
+		this.getControllerGrip = function ( index ) {
 
-			var controller = controllers[ id ];
+			var controller = controllers[ index ];
 
 			if ( controller === undefined ) {
 
-				controller = {};
-				controllers[ id ] = controller;
+				controller = new WebXRController();
+				controllers[ index ] = controller;
 
 			}
 
-			if ( controller.grip === undefined ) {
-
-				controller.grip = new Group();
-				controller.grip.matrixAutoUpdate = false;
-				controller.grip.visible = false;
-
-			}
-
-			return controller.grip;
+			return controller.getGripSpace();
 
 		};
 
@@ -22955,17 +23076,7 @@
 
 			if ( controller ) {
 
-				if ( controller.targetRay ) {
-
-					controller.targetRay.dispatchEvent( { type: event.type } );
-
-				}
-
-				if ( controller.grip ) {
-
-					controller.grip.dispatchEvent( { type: event.type } );
-
-				}
+				controller.dispatchEvent( { type: event.type } );
 
 			}
 
@@ -22975,19 +23086,7 @@
 
 			inputSourcesMap.forEach( function ( controller, inputSource ) {
 
-				if ( controller.targetRay ) {
-
-					controller.targetRay.dispatchEvent( { type: 'disconnected', data: inputSource } );
-					controller.targetRay.visible = false;
-
-				}
-
-				if ( controller.grip ) {
-
-					controller.grip.dispatchEvent( { type: 'disconnected', data: inputSource } );
-					controller.grip.visible = false;
-
-				}
+				controller.disconnect( inputSource );
 
 			} );
 
@@ -23109,18 +23208,7 @@
 
 				if ( controller ) {
 
-					if ( controller.targetRay ) {
-
-						controller.targetRay.dispatchEvent( { type: 'disconnected', data: inputSource } );
-
-					}
-
-					if ( controller.grip ) {
-
-						controller.grip.dispatchEvent( { type: 'disconnected', data: inputSource } );
-
-					}
-
+					controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
 					inputSourcesMap.delete( inputSource );
 
 				}
@@ -23136,17 +23224,7 @@
 
 				if ( controller ) {
 
-					if ( controller.targetRay ) {
-
-						controller.targetRay.dispatchEvent( { type: 'connected', data: inputSource } );
-
-					}
-
-					if ( controller.grip ) {
-
-						controller.grip.dispatchEvent( { type: 'connected', data: inputSource } );
-
-					}
+					controller.dispatchEvent( { type: 'connected', data: inputSource } );
 
 				}
 
@@ -23322,53 +23400,9 @@
 			for ( var i = 0; i < controllers.length; i ++ ) {
 
 				var controller = controllers[ i ];
-
 				var inputSource = inputSources[ i ];
 
-				var inputPose = null;
-				var gripPose = null;
-
-				if ( inputSource ) {
-
-					if ( controller.targetRay ) {
-
-						inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-						if ( inputPose !== null ) {
-
-							controller.targetRay.matrix.fromArray( inputPose.transform.matrix );
-							controller.targetRay.matrix.decompose( controller.targetRay.position, controller.targetRay.rotation, controller.targetRay.scale );
-
-						}
-
-					}
-
-					if ( controller.grip && inputSource.gripSpace ) {
-
-						gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
-
-						if ( gripPose !== null ) {
-
-							controller.grip.matrix.fromArray( gripPose.transform.matrix );
-							controller.grip.matrix.decompose( controller.grip.position, controller.grip.rotation, controller.grip.scale );
-
-						}
-
-					}
-
-				}
-
-				if ( controller.targetRay ) {
-
-					controller.targetRay.visible = inputPose !== null;
-
-				}
-
-				if ( controller.grip ) {
-
-					controller.grip.visible = gripPose !== null;
-
-				}
+				controller.update( inputSource, frame, referenceSpace );
 
 			}
 
