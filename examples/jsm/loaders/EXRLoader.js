@@ -1623,6 +1623,24 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		function parseRational( dataView, offset ) {
+
+			var x = parseUint32( dataView, offset );
+			var y = parseUint32( dataView, offset );
+
+			return [ x, y ];
+
+		}
+
+		function parseTimecode( dataView, offset ) {
+
+			var x = parseUint32( dataView, offset );
+			var y = parseUint32( dataView, offset );
+
+			return [ x, y ];
+
+		}
+
 		function parseUint32( dataView, offset ) {
 
 			var Uint32 = dataView.getUint32( offset.value, true );
@@ -1897,6 +1915,14 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			} else if ( type === 'int' ) {
 
 				return parseUint32( dataView, offset );
+
+			} else if ( type === 'rational' ) {
+
+				return parseRational( dataView, offset );
+
+			} else if ( type === 'timecode' ) {
+
+				return parseTimecode( dataView, offset );
 
 			} else {
 
