@@ -210,6 +210,8 @@ THREE.CSS3DRenderer = function () {
 				cache.objects.set( object, objectData );
 
 			}
+			
+			element.style.display = object.visible ? '' : 'none';
 
 			if ( element.parentNode !== cameraElement ) {
 
