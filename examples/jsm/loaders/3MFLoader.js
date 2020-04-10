@@ -1298,7 +1298,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var object3D = build.clone();
 
-				// apply component transfrom
+				// apply component transform
 
 				var transform = component.transform;
 
