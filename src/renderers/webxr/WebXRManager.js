@@ -4,11 +4,11 @@
 
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
-import { Group } from '../../objects/Group.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
+import { WebXRController } from './WebXRController.js';
 
 function WebXRManager( renderer, gl ) {
 
@@ -55,20 +55,12 @@ function WebXRManager( renderer, gl ) {
 
 		if ( controller === undefined ) {
 
-			controller = {};
+			controller = new WebXRController();
 			controllers[ index ] = controller;
 
 		}
 
-		if ( controller.targetRay === undefined ) {
-
-			controller.targetRay = new Group();
-			controller.targetRay.matrixAutoUpdate = false;
-			controller.targetRay.visible = false;
-
-		}
-
-		return controller.targetRay;
+		return controller.getTargetRaySpace();
 
 	};
 
@@ -78,20 +70,12 @@ function WebXRManager( renderer, gl ) {
 
 		if ( controller === undefined ) {
 
-			controller = {};
+			controller = new WebXRController();
 			controllers[ index ] = controller;
 
 		}
 
-		if ( controller.grip === undefined ) {
-
-			controller.grip = new Group();
-			controller.grip.matrixAutoUpdate = false;
-			controller.grip.visible = false;
-
-		}
-
-		return controller.grip;
+		return controller.getGripSpace();
 
 	};
 
@@ -103,17 +87,7 @@ function WebXRManager( renderer, gl ) {
 
 		if ( controller ) {
 
-			if ( controller.targetRay ) {
-
-				controller.targetRay.dispatchEvent( { type: event.type } );
-
-			}
-
-			if ( controller.grip ) {
-
-				controller.grip.dispatchEvent( { type: event.type } );
-
-			}
+			controller.dispatchEvent( { type: event.type } );
 
 		}
 
@@ -123,19 +97,7 @@ function WebXRManager( renderer, gl ) {
 
 		inputSourcesMap.forEach( function ( controller, inputSource ) {
 
-			if ( controller.targetRay ) {
-
-				controller.targetRay.dispatchEvent( { type: 'disconnected', data: inputSource } );
-				controller.targetRay.visible = false;
-
-			}
-
-			if ( controller.grip ) {
-
-				controller.grip.dispatchEvent( { type: 'disconnected', data: inputSource } );
-				controller.grip.visible = false;
-
-			}
+			controller.disconnect( inputSource );
 
 		} );
 
@@ -257,18 +219,7 @@ function WebXRManager( renderer, gl ) {
 
 			if ( controller ) {
 
-				if ( controller.targetRay ) {
-
-					controller.targetRay.dispatchEvent( { type: 'disconnected', data: inputSource } );
-
-				}
-
-				if ( controller.grip ) {
-
-					controller.grip.dispatchEvent( { type: 'disconnected', data: inputSource } );
-
-				}
-
+				controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
 				inputSourcesMap.delete( inputSource );
 
 			}
@@ -284,17 +235,7 @@ function WebXRManager( renderer, gl ) {
 
 			if ( controller ) {
 
-				if ( controller.targetRay ) {
-
-					controller.targetRay.dispatchEvent( { type: 'connected', data: inputSource } );
-
-				}
-
-				if ( controller.grip ) {
-
-					controller.grip.dispatchEvent( { type: 'connected', data: inputSource } );
-
-				}
+				controller.dispatchEvent( { type: 'connected', data: inputSource } );
 
 			}
 
@@ -470,53 +411,9 @@ function WebXRManager( renderer, gl ) {
 		for ( var i = 0; i < controllers.length; i ++ ) {
 
 			var controller = controllers[ i ];
-
 			var inputSource = inputSources[ i ];
 
-			var inputPose = null;
-			var gripPose = null;
-
-			if ( inputSource ) {
-
-				if ( controller.targetRay ) {
-
-					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-					if ( inputPose !== null ) {
-
-						controller.targetRay.matrix.fromArray( inputPose.transform.matrix );
-						controller.targetRay.matrix.decompose( controller.targetRay.position, controller.targetRay.rotation, controller.targetRay.scale );
-
-					}
-
-				}
-
-				if ( controller.grip && inputSource.gripSpace ) {
-
-					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
-
-					if ( gripPose !== null ) {
-
-						controller.grip.matrix.fromArray( gripPose.transform.matrix );
-						controller.grip.matrix.decompose( controller.grip.position, controller.grip.rotation, controller.grip.scale );
-
-					}
-
-				}
-
-			}
-
-			if ( controller.targetRay ) {
-
-				controller.targetRay.visible = inputPose !== null;
-
-			}
-
-			if ( controller.grip ) {
-
-				controller.grip.visible = gripPose !== null;
-
-			}
+			controller.update( inputSource, frame, referenceSpace );
 
 		}
 
