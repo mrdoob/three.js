@@ -398,7 +398,6 @@ or [custom BufferGeometry](threejs-custom-buffergeometry.html).
 Next up let's go over [how three's scene graph works and how
 to use it](threejs-scenegraph.html).
 
-<canvas id="c"></canvas>
 <link rel="stylesheet" href="resources/threejs-primitives.css">
 <script type="module" src="resources/threejs-primitives.js"></script>
 

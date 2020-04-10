@@ -7,7 +7,10 @@ export const threejsLessonUtils = {
     if (this.renderer) {
       return;
     }
-    const canvas = document.querySelector('#c');
+
+    const canvas = document.createElement('canvas');
+    canvas.id = 'c';
+    document.body.appendChild(canvas);
     const renderer = new THREE.WebGLRenderer({
       canvas,
       alpha: true,
@@ -36,7 +39,7 @@ export const threejsLessonUtils = {
     const render = (time) => {
       time *= 0.001;
 
-      resizeRendererToDisplaySize(renderer);
+      const resized = resizeRendererToDisplaySize(renderer);
 
       renderer.setScissorTest(false);
 
@@ -62,7 +65,7 @@ export const threejsLessonUtils = {
       renderer.domElement.style.transform = transform;
 
       this.renderFuncs.forEach((fn) => {
-        fn(renderer, time);
+        fn(renderer, time, resized);
       });
 
       requestAnimationFrame(render);
@@ -177,8 +180,8 @@ export const threejsLessonUtils = {
         return;
       }
 
-      renderInfo.width = (rect.right - rect.left) * this.pixelRatio;
-      renderInfo.height = (rect.bottom - rect.top) * this.pixelRatio;
+      renderInfo.width = rect.width * this.pixelRatio;
+      renderInfo.height = rect.height * this.pixelRatio;
       renderInfo.left = rect.left * this.pixelRatio;
       renderInfo.bottom = (renderer.domElement.clientHeight - rect.bottom) * this.pixelRatio;
 
