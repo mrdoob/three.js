@@ -321,6 +321,10 @@ var list = {
 				"UniformsUtils": "api/en/renderers/shaders/UniformsUtils"
 			},
 
+			"Renderers / WebXR": {
+				"WebXRManager": "api/en/renderers/webxr/WebXRManager"
+			},
+
 			"Scenes": {
 				"Fog": "api/en/scenes/Fog",
 				"FogExp2": "api/en/scenes/FogExp2",
@@ -767,6 +771,10 @@ var list = {
 				"ShaderLib": "api/zh/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/zh/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/zh/renderers/shaders/UniformsUtils"
+			},
+
+			"渲染器 / WebXR": {
+				"WebXRManager": "api/zh/renderers/webxr/WebXRManager"
 			},
 
 			"场景": {
