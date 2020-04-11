@@ -1610,7 +1610,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		function parseRational( dataView, offset ) {
 
-			var x = parseUint32( dataView, offset );
+			var x = parseInt32( dataView, offset );
 			var y = parseUint32( dataView, offset );
 
 			return [ x, y ];
@@ -1623,6 +1623,16 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			var y = parseUint32( dataView, offset );
 
 			return [ x, y ];
+
+		}
+
+		function parseInt32( dataView, offset ) {
+
+			var Int32 = dataView.getInt32( offset.value, true );
+
+			offset.value = offset.value + INT32_SIZE;
+
+			return Int32;
 
 		}
 
@@ -1773,11 +1783,11 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			while ( offset.value < ( startOffset + size - 1 ) ) {
 
 				var name = parseNullTerminatedString( buffer, offset );
-				var pixelType = parseUint32( dataView, offset ); // TODO: Cast this to UINT, HALF or FLOAT
+				var pixelType = parseInt32( dataView, offset );
 				var pLinear = parseUint8( dataView, offset );
 				offset.value += 3; // reserved, three chars
-				var xSampling = parseUint32( dataView, offset );
-				var ySampling = parseUint32( dataView, offset );
+				var xSampling = parseInt32( dataView, offset );
+				var ySampling = parseInt32( dataView, offset );
 
 				channels.push( {
 					name: name,
@@ -1899,7 +1909,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			} else if ( type === 'int' ) {
 
-				return parseUint32( dataView, offset );
+				return parseInt32( dataView, offset );
 
 			} else if ( type === 'rational' ) {
 
