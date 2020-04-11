@@ -4036,12 +4036,12 @@ var FBXLoader = ( function () {
 		var lLSM = new Matrix4();
 		var lParentGSM = new Matrix4();
 		var lParentGRSM = new Matrix4();
-		
+
 		var lParentTM_inv = new Matrix4().getInverse( lParentTM );
 
 		lParentTM.copyPosition( lParentGX );
 		lParentGRSM.multiply( lParentTM_inv ).multiply( lParentGX );
-		
+
 		var lParentGRM_inv = new Matrix4().getInverse( lParentGRM );
 		lParentGSM.multiply( lParentGRM_inv ).multiply( lParentGRSM );
 		lLSM = lScalingM;
@@ -4074,10 +4074,10 @@ var FBXLoader = ( function () {
 
 		var lLocalTWithAllPivotAndOffsetInfo = new Matrix4().copyPosition( lTransform );
 
-		var lGlobalTranslation = new Matrix4().multiply(lParentGX).multiply( lLocalTWithAllPivotAndOffsetInfo );
+		var lGlobalTranslation = new Matrix4().multiply( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
 
-		lTransform = new Matrix4().multiply(lGlobalT).multiply( lGlobalRS );
+		lTransform = new Matrix4().multiply( lGlobalT ).multiply( lGlobalRS );
 
 		return lTransform;
 
