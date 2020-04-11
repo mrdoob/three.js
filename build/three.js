@@ -42157,7 +42157,7 @@
 		this.sourceType = 'empty';
 
 		this._startedAt = 0;
-		this._pausedAt = 0;
+		this._progress = 0;
 
 		this.filters = [];
 
@@ -42243,7 +42243,7 @@
 			source.loopStart = this.loopStart;
 			source.loopEnd = this.loopEnd;
 			source.onended = this.onEnded.bind( this );
-			source.start( this._startedAt, this._pausedAt + this.offset, this.duration );
+			source.start( this._startedAt, this._progress + this.offset, this.duration );
 
 			this.isPlaying = true;
 
@@ -42267,7 +42267,17 @@
 
 			if ( this.isPlaying === true ) {
 
-				this._pausedAt += Math.max( this.context.currentTime - this._startedAt, 0 ) * this.playbackRate;
+				// update current progress
+
+				this._progress += Math.max( this.context.currentTime - this._startedAt, 0 ) * this.playbackRate;
+
+				if ( this.loop === true ) {
+
+					// ensure _progress does not exceed duration with looped audios
+
+					this._progress = this._progress % ( this.duration || this.buffer.duration );
+
+				}
 
 				this.source.stop();
 				this.source.onended = null;
@@ -42289,7 +42299,7 @@
 
 			}
 
-			this._pausedAt = 0;
+			this._progress = 0;
 
 			this.source.stop();
 			this.source.onended = null;
