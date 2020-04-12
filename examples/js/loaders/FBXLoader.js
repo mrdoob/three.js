@@ -3986,36 +3986,27 @@ THREE.FBXLoader = ( function () {
 
 		// Global Shear*Scaling
 		var lParentTM = new THREE.Matrix4();
-		var lLSM = new THREE.Matrix4();
-		var lParentGSM = new THREE.Matrix4();
-		var lParentGRSM = new THREE.Matrix4();
-
-		var lParentTM_inv = new THREE.Matrix4().getInverse( lParentTM );
-
 		lParentTM.copyPosition( lParentGX );
-		lParentGRSM.multiply( lParentTM_inv ).multiply( lParentGX );
 
-		var lParentGRM_inv = new THREE.Matrix4().getInverse( lParentGRM );
-		lParentGSM.multiply( lParentGRM_inv ).multiply( lParentGRSM );
-		lLSM = lScalingM;
+		var lParentGSM = new THREE.Matrix4();
+		lParentGSM.getInverse( lParentGRM ).multiply( lParentGX );
 
 		var lGlobalRS = new THREE.Matrix4();
+
 		if ( inheritType === 0 ) {
 
-			lGlobalRS.multiply( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lScalingM );
 
 		} else if ( inheritType === 1 ) {
 
-			lGlobalRS.multiply( lParentGRM ).multiply( lParentGSM ).multiply( lLRM ).multiply( lLSM );
+			lGlobalRS.copy( lParentGRM ).multiply( lParentGSM ).multiply( lLRM ).multiply( lScalingM );
 
 		} else {
 
-			var lParentLSM = new THREE.Matrix4().copy( lScalingM );
-
-			var lParentLSM_inv = new THREE.Matrix4().getInverse( lParentLSM );
+			var lParentLSM_inv = new THREE.Matrix4().getInverse( lScalingM );
 			var lParentGSM_noLocal = new THREE.Matrix4().multiply( lParentGSM ).multiply( lParentLSM_inv );
 
-			lGlobalRS.multiply( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lScalingM );
 
 		}
 
@@ -4023,11 +4014,11 @@ THREE.FBXLoader = ( function () {
 		var lScalingPivotM_inv = new THREE.Matrix4().getInverse( lScalingPivotM );
 		// Calculate the local transform matrix
 		var lTransform = new THREE.Matrix4();
-		lTransform.multiply( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
+		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
 
 		var lLocalTWithAllPivotAndOffsetInfo = new THREE.Matrix4().copyPosition( lTransform );
 
-		var lGlobalTranslation = new THREE.Matrix4().multiply( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
+		var lGlobalTranslation = new THREE.Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
 
 		lTransform = new THREE.Matrix4().multiply( lGlobalT ).multiply( lGlobalRS );
