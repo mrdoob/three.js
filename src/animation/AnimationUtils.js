@@ -236,17 +236,13 @@ var AnimationUtils = {
 
 	},
 
-	makeClipAdditive: function ( targetClip, referenceFrame = 0, referenceClip, fps = 30 ) {
+	makeClipAdditive: function ( targetClip, referenceFrame, referenceClip, fps ) {
 
-		if ( referenceClip === undefined ) {
-
-			referenceClip = targetClip;
-
-		}
+		if ( referenceFrame === undefined ) referenceFrame = 0;
+		if ( referenceClip === undefined ) referenceClip = targetClip;
+		if ( fps === undefined || fps <= 0 ) fps = 30;
 
 		var numTracks = targetClip.tracks.length;
-
-		fps = fps > 0 ? fps : 30;
 		var referenceTime = referenceFrame / fps;
 
 		// Make each track's values relative to the values at the reference frame
@@ -259,7 +255,7 @@ var AnimationUtils = {
 			if ( referenceTrackType === 'bool' || referenceTrackType === 'string' ) continue;
 
 			// Find the track in the target clip whose name and type matches the reference track
-			var targetTrack = targetClip.tracks.find( track => {
+			var targetTrack = targetClip.tracks.find( function ( track ) {
 
 				return track.name === referenceTrack.name
 				&& track.ValueTypeName === referenceTrackType;
