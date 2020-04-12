@@ -80,7 +80,6 @@ THREE.GLTFExporter.prototype = {
 			embedImages: true,
 			maxTextureSize: Infinity,
 			animations: [],
-			forceIndices: false,
 			forcePowerOfTwoTextures: false,
 			includeCustomExtensions: false
 		};
@@ -1372,36 +1371,9 @@ THREE.GLTFExporter.prototype = {
 
 			}
 
-			var forceIndices = options.forceIndices;
 			var isMultiMaterial = Array.isArray( mesh.material );
 
 			if ( isMultiMaterial && geometry.groups.length === 0 ) return null;
-
-			if ( ! forceIndices && geometry.index === null && isMultiMaterial ) {
-
-				// temporal workaround.
-				console.warn( 'THREE.GLTFExporter: Creating index for non-indexed multi-material mesh.' );
-				forceIndices = true;
-
-			}
-
-			var didForceIndices = false;
-
-			if ( geometry.index === null && forceIndices ) {
-
-				var indices = [];
-
-				for ( var i = 0, il = geometry.attributes.position.count; i < il; i ++ ) {
-
-					indices[ i ] = i;
-
-				}
-
-				geometry.setIndex( indices );
-
-				didForceIndices = true;
-
-			}
 
 			var materials = isMultiMaterial ? mesh.material : [ mesh.material ];
 			var groups = isMultiMaterial ? geometry.groups : [ { materialIndex: 0, start: undefined, count: undefined } ];
@@ -1451,12 +1423,6 @@ THREE.GLTFExporter.prototype = {
 				}
 
 				primitives.push( primitive );
-
-			}
-
-			if ( didForceIndices ) {
-
-				geometry.setIndex( null );
 
 			}
 
