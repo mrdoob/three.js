@@ -130,6 +130,7 @@ function onDocumentLoad( event ) {
 
 			var e = elements[ i ];
 			e.className += ' prettyprint';
+			e.setAttribute( 'translate', 'no' );
 
 		}
 
