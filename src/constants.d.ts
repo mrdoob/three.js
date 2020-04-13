@@ -306,6 +306,11 @@ export const ZeroCurvatureEnding: InterpolationEndingModes;
 export const ZeroSlopeEnding: InterpolationEndingModes;
 export const WrapAroundEnding: InterpolationEndingModes;
 
+// Animation blending modes
+export enum AnimationBlendMode { }
+export const NormalAnimationBlendMode: AnimationBlendMode;
+export const AdditiveAnimationBlendMode: AnimationBlendMode;
+
 // Triangle Draw modes
 export enum TrianglesDrawModes {}
 export const TrianglesDrawMode: TrianglesDrawModes;

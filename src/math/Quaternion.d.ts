@@ -149,6 +149,15 @@ export class Quaternion {
 		t: number
 	): Quaternion;
 
+	static multiplyQuaternionsFlat(
+		dst: number[],
+		dstOffset: number,
+		src0: number[],
+		srcOffset: number,
+		src1: number[],
+		stcOffset1: number
+	): number[];
+
 	/**
 	 * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.
 	 */
