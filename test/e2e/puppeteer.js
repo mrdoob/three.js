@@ -57,7 +57,7 @@ server.on( 'SIGINT', () => process.exit( 1 ) );
 const pup = puppeteer.launch( {
 	headless: ! process.env.VISIBLE,
 	args: [
-		'--use-gl=egl',
+		'--use-gl=swiftshader',
 		'--no-sandbox',
 		'--enable-surface-synchronization'
 	]
