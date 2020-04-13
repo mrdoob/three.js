@@ -252,6 +252,8 @@
 	var ZeroCurvatureEnding = 2400;
 	var ZeroSlopeEnding = 2401;
 	var WrapAroundEnding = 2402;
+	var NormalAnimationBlendMode = 2500;
+	var AdditiveAnimationBlendMode = 2501;
 	var TrianglesDrawMode = 0;
 	var TriangleStripDrawMode = 1;
 	var TriangleFanDrawMode = 2;
@@ -2681,6 +2683,27 @@
 			dst[ dstOffset + 1 ] = y0;
 			dst[ dstOffset + 2 ] = z0;
 			dst[ dstOffset + 3 ] = w0;
+
+		},
+
+		multiplyQuaternionsFlat: function ( dst, dstOffset, src0, srcOffset0, src1, srcOffset1 ) {
+
+			var x0 = src0[ srcOffset0 ];
+			var y0 = src0[ srcOffset0 + 1 ];
+			var z0 = src0[ srcOffset0 + 2 ];
+			var w0 = src0[ srcOffset0 + 3 ];
+
+			var x1 = src1[ srcOffset1 ];
+			var y1 = src1[ srcOffset1 + 1 ];
+			var z1 = src1[ srcOffset1 + 2 ];
+			var w1 = src1[ srcOffset1 + 3 ];
+
+			dst[ dstOffset ] = x0 * w1 + w0 * x1 + y0 * z1 - z0 * y1;
+			dst[ dstOffset + 1 ] = y0 * w1 + w0 * y1 + z0 * x1 - x0 * z1;
+			dst[ dstOffset + 2 ] = z0 * w1 + w0 * z1 + x0 * y1 - y0 * x1;
+			dst[ dstOffset + 3 ] = w0 * w1 - x0 * x1 - y0 * y1 - z0 * z1;
+
+			return dst;
 
 		}
 
@@ -33918,6 +33941,112 @@
 
 			return clip;
 
+		},
+
+		makeClipAdditive: function ( targetClip, referenceFrame, referenceClip, fps ) {
+
+			if ( referenceFrame === undefined ) { referenceFrame = 0; }
+			if ( referenceClip === undefined ) { referenceClip = targetClip; }
+			if ( fps === undefined || fps <= 0 ) { fps = 30; }
+
+			var numTracks = targetClip.tracks.length;
+			var referenceTime = referenceFrame / fps;
+
+			// Make each track's values relative to the values at the reference frame
+			for ( var i = 0; i < numTracks; ++ i ) {
+
+				var referenceTrack = referenceClip.tracks[ i ];
+				var referenceTrackType = referenceTrack.ValueTypeName;
+
+				// Skip this track if it's non-numeric
+				if ( referenceTrackType === 'bool' || referenceTrackType === 'string' ) { continue; }
+
+				// Find the track in the target clip whose name and type matches the reference track
+				var targetTrack = targetClip.tracks.find( function ( track ) {
+
+					return track.name === referenceTrack.name
+					&& track.ValueTypeName === referenceTrackType;
+
+				} );
+
+				if ( targetTrack === undefined ) { continue; }
+
+				var valueSize = referenceTrack.getValueSize();
+				var lastIndex = referenceTrack.times.length - 1;
+				var referenceValue;
+
+				// Find the value to subtract out of the track
+				if ( referenceTime <= referenceTrack.times[ 0 ] ) {
+
+					// Reference frame is earlier than the first keyframe, so just use the first keyframe
+					referenceValue = AnimationUtils.arraySlice( referenceTrack.values, 0, referenceTrack.valueSize );
+
+				} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
+
+					// Reference frame is after the last keyframe, so just use the last keyframe
+					var startIndex = lastIndex * valueSize;
+					referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex );
+
+				} else {
+
+					// Interpolate to the reference value
+					var interpolant = referenceTrack.createInterpolant();
+					interpolant.evaluate( referenceTime );
+					referenceValue = interpolant.resultBuffer;
+
+				}
+
+				// Conjugate the quaternion
+				if ( referenceTrackType === 'quaternion' ) {
+
+					var referenceQuat = new Quaternion(
+						referenceValue[ 0 ],
+						referenceValue[ 1 ],
+						referenceValue[ 2 ],
+						referenceValue[ 3 ]
+					).normalize().conjugate();
+					referenceQuat.toArray( referenceValue );
+
+				}
+
+				// Subtract the reference value from all of the track values
+
+				var numTimes = targetTrack.times.length;
+				for ( var j = 0; j < numTimes; ++ j ) {
+
+					var valueStart = j * valueSize;
+
+					if ( referenceTrackType === 'quaternion' ) {
+
+						// Multiply the conjugate for quaternion track types
+						Quaternion.multiplyQuaternionsFlat(
+							targetTrack.values,
+							valueStart,
+							referenceValue,
+							0,
+							targetTrack.values,
+							valueStart
+						);
+
+					} else {
+
+						// Subtract each value for all other numeric track types
+						for ( var k = 0; k < valueSize; ++ k ) {
+
+							targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
+
+						}
+
+					}
+
+				}
+
+			}
+
+			targetClip.blendMode = AdditiveAnimationBlendMode;
+
+			return targetClip;
+
 		}
 
 	};
@@ -35096,11 +35225,12 @@
 	 * @author David Sarno / http://lighthaus.us/
 	 */
 
-	function AnimationClip( name, duration, tracks ) {
+	function AnimationClip( name, duration, tracks, blendMode ) {
 
 		this.name = name;
 		this.tracks = tracks;
 		this.duration = ( duration !== undefined ) ? duration : - 1;
+		this.blendMode = ( blendMode !== undefined ) ? blendMode : NormalAnimationBlendMode;
 
 		this.uuid = MathUtils.generateUUID();
 
@@ -35204,7 +35334,7 @@
 
 			}
 
-			return new AnimationClip( json.name, json.duration, tracks );
+			return new AnimationClip( json.name, json.duration, tracks, json.blendMode );
 
 		},
 
@@ -35218,7 +35348,8 @@
 				'name': clip.name,
 				'duration': clip.duration,
 				'tracks': tracks,
-				'uuid': clip.uuid
+				'uuid': clip.uuid,
+				'blendMode': clip.blendMode
 
 			};
 
@@ -35380,6 +35511,7 @@
 			// automatic length determination in AnimationClip.
 			var duration = animation.length || - 1;
 			var fps = animation.fps || 30;
+			var blendMode = animation.blendMode;
 
 			var hierarchyTracks = animation.hierarchy || [];
 
@@ -35461,7 +35593,7 @@
 
 			}
 
-			var clip = new AnimationClip( clipName, duration, tracks );
+			var clip = new AnimationClip( clipName, duration, tracks, blendMode );
 
 			return clip;
 
@@ -35537,7 +35669,7 @@
 
 			}
 
-			return new AnimationClip( this.name, this.duration, tracks );
+			return new AnimationClip( this.name, this.duration, tracks, this.blendMode );
 
 		}
 
@@ -42737,28 +42869,11 @@
 		this.binding = binding;
 		this.valueSize = valueSize;
 
-		var bufferType = Float64Array,
-			mixFunction;
+		var mixFunction,
+			mixFunctionAdditive,
+			setIdentity;
 
-		switch ( typeName ) {
-
-			case 'quaternion':
-				mixFunction = this._slerp;
-				break;
-
-			case 'string':
-			case 'bool':
-				bufferType = Array;
-				mixFunction = this._select;
-				break;
-
-			default:
-				mixFunction = this._lerp;
-
-		}
-
-		this.buffer = new bufferType( valueSize * 4 );
-		// layout: [ incoming | accu0 | accu1 | orig ]
+		// buffer layout: [ incoming | accu0 | accu1 | orig | addAccu | (optional work) ]
 		//
 		// interpolators can use .buffer as their .result
 		// the data then goes to 'incoming'
@@ -42768,10 +42883,53 @@
 		// changes
 		//
 		// 'orig' stores the original state of the property
+		//
+		// 'add' is used for additive cumulative results
+		//
+		// 'work' is optional and is only present for quaternion types. It is used
+		// to store intermediate quaternion multiplication results
+
+		switch ( typeName ) {
+
+			case 'quaternion':
+				mixFunction = this._slerp;
+				mixFunctionAdditive = this._slerpAdditive;
+				setIdentity = this._setAdditiveIdentityQuaternion;
+
+				this.buffer = new Float64Array( 24 );
+				this._workIndex = 5;
+				break;
+
+			case 'string':
+			case 'bool':
+				mixFunction = this._select;
+
+				// Use the regular mix function and for additive on these types,
+				// additive is not relevant for non-numeric types
+				mixFunctionAdditive = this._select;
+
+				setIdentity = this._setAdditiveIdentityOther;
+
+				this.buffer = new Array( valueSize * 5 );
+				break;
+
+			default:
+				mixFunction = this._lerp;
+				mixFunctionAdditive = this._lerpAdditive;
+				setIdentity = this._setAdditiveIdentityNumeric;
+
+				this.buffer = new Float64Array( valueSize * 5 );
+
+		}
 
 		this._mixBufferRegion = mixFunction;
+		this._mixBufferRegionAdditive = mixFunctionAdditive;
+		this._setIdentity = setIdentity;
+		this._origIndex = 3;
+		this._addIndex = 4;
 
 		this.cumulativeWeight = 0;
+		this.cumulativeWeightAdditive = 0;
 
 		this.useCount = 0;
 		this.referenceCount = 0;
@@ -42818,6 +42976,28 @@
 
 		},
 
+		// accumulate data in the 'incoming' region into 'add'
+		accumulateAdditive: function ( weight ) {
+
+			var buffer = this.buffer,
+				stride = this.valueSize,
+				offset = stride * this._addIndex;
+
+			if ( this.cumulativeWeightAdditive === 0 ) {
+
+				// add = identity
+
+				this._setIdentity();
+
+			}
+
+			// add := add + incoming * weight
+
+			this._mixBufferRegionAdditive( buffer, offset, 0, weight, stride );
+			this.cumulativeWeightAdditive += weight;
+
+		},
+
 		// apply the state of 'accu<i>' to the binding when accus differ
 		apply: function ( accuIndex ) {
 
@@ -42826,19 +43006,29 @@
 				offset = accuIndex * stride + stride,
 
 				weight = this.cumulativeWeight,
+				weightAdditive = this.cumulativeWeightAdditive,
 
 				binding = this.binding;
 
 			this.cumulativeWeight = 0;
+			this.cumulativeWeightAdditive = 0;
 
 			if ( weight < 1 ) {
 
 				// accuN := accuN + original * ( 1 - cumulativeWeight )
 
-				var originalValueOffset = stride * 3;
+				var originalValueOffset = stride * this._origIndex;
 
 				this._mixBufferRegion(
 					buffer, offset, originalValueOffset, 1 - weight, stride );
+
+			}
+
+			if ( weightAdditive > 0 ) {
+
+				// accuN := accuN + additive accuN
+
+				this._mixBufferRegionAdditive( buffer, offset, this._addIndex * stride, 1, stride );
 
 			}
 
@@ -42865,7 +43055,7 @@
 			var buffer = this.buffer,
 				stride = this.valueSize,
 
-				originalValueOffset = stride * 3;
+				originalValueOffset = stride * this._origIndex;
 
 			binding.getValue( buffer, originalValueOffset );
 
@@ -42876,7 +43066,11 @@
 
 			}
 
+			// Add to identity for additive
+			this._setIdentity();
+
 			this.cumulativeWeight = 0;
+			this.cumulativeWeightAdditive = 0;
 
 		},
 
@@ -42885,6 +43079,30 @@
 
 			var originalValueOffset = this.valueSize * 3;
 			this.binding.setValue( this.buffer, originalValueOffset );
+
+		},
+
+		_setAdditiveIdentityNumeric: function () {
+
+			var startIndex = this._addIndex * this.valueSize;
+
+			this.buffer.fill( 0, startIndex, startIndex + this.valueSize );
+
+		},
+
+		_setAdditiveIdentityQuaternion: function () {
+
+			this._setAdditiveIdentityNumeric();
+			this.buffer[ this._addIndex * 4 + 3 ] = 1;
+
+		},
+
+		_setAdditiveIdentityOther: function () {
+
+			var startIndex = this._origIndex * this.valueSize;
+			var targetIndex = this._addIndex * this.valueSize;
+
+			this.buffer.copyWithin( targetIndex, startIndex, this.valueSize );
 
 		},
 
@@ -42911,6 +43129,18 @@
 
 		},
 
+		_slerpAdditive: function ( buffer, dstOffset, srcOffset, t, stride ) {
+
+			var workOffset = this._workIndex * stride;
+
+			// Store result in intermediate buffer offset
+			Quaternion.multiplyQuaternionsFlat( buffer, workOffset, buffer, dstOffset, buffer, srcOffset );
+
+			// Slerp to the intermediate result
+			Quaternion.slerpFlat( buffer, dstOffset, buffer, dstOffset, buffer, workOffset, t );
+
+		},
+
 		_lerp: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
 			var s = 1 - t;
@@ -42920,6 +43150,18 @@
 				var j = dstOffset + i;
 
 				buffer[ j ] = buffer[ j ] * s + buffer[ srcOffset + i ] * t;
+
+			}
+
+		},
+
+		_lerpAdditive: function ( buffer, dstOffset, srcOffset, t, stride ) {
+
+			for ( var i = 0; i !== stride; ++ i ) {
+
+				var j = dstOffset + i;
+
+				buffer[ j ] = buffer[ j ] + buffer[ srcOffset + i ] * t;
 
 			}
 
@@ -44027,11 +44269,12 @@
 	 *
 	 */
 
-	function AnimationAction( mixer, clip, localRoot ) {
+	function AnimationAction( mixer, clip, localRoot, blendMode ) {
 
 		this._mixer = mixer;
 		this._clip = clip;
 		this._localRoot = localRoot || null;
+		this.blendMode = blendMode || clip.blendMode;
 
 		var tracks = clip.tracks,
 			nTracks = tracks.length,
@@ -44390,10 +44633,28 @@
 				var interpolants = this._interpolants;
 				var propertyMixers = this._propertyBindings;
 
-				for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+				switch ( this.blendMode ) {
 
-					interpolants[ j ].evaluate( clipTime );
-					propertyMixers[ j ].accumulate( accuIndex, weight );
+					case AdditiveAnimationBlendMode:
+
+						for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+							interpolants[ j ].evaluate( clipTime );
+							propertyMixers[ j ].accumulateAdditive( weight );
+
+						}
+
+						break;
+
+					case NormalAnimationBlendMode:
+					default:
+
+						for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+							interpolants[ j ].evaluate( clipTime );
+							propertyMixers[ j ].accumulate( accuIndex, weight );
+
+						}
 
 				}
 
@@ -45211,7 +45472,7 @@
 		// return an action for a clip optionally using a custom root target
 		// object (this method allocates a lot of dynamic memory in case a
 		// previously unknown clip/root combination is specified)
-		clipAction: function ( clip, optionalRoot ) {
+		clipAction: function ( clip, optionalRoot, blendMode ) {
 
 			var root = optionalRoot || this._root,
 				rootUuid = root.uuid,
@@ -45224,12 +45485,26 @@
 				actionsForClip = this._actionsByClip[ clipUuid ],
 				prototypeAction = null;
 
+			if ( blendMode === undefined ) {
+
+				if ( clipObject !== null ) {
+
+					blendMode = clipObject.blendMode;
+
+				} else {
+
+					blendMode = NormalAnimationBlendMode;
+
+				}
+
+			}
+
 			if ( actionsForClip !== undefined ) {
 
 				var existingAction =
 						actionsForClip.actionByRoot[ rootUuid ];
 
-				if ( existingAction !== undefined ) {
+				if ( existingAction !== undefined && existingAction.blendMode === blendMode ) {
 
 					return existingAction;
 
@@ -45249,7 +45524,7 @@
 			if ( clipObject === null ) { return null; }
 
 			// allocate all resources required to run it
-			var newAction = new AnimationAction( this, clipObject, optionalRoot );
+			var newAction = new AnimationAction( this, clipObject, optionalRoot, blendMode );
 
 			this._bindAction( newAction, prototypeAction );
 
@@ -50153,6 +50428,7 @@
 	exports.ACESFilmicToneMapping = ACESFilmicToneMapping;
 	exports.AddEquation = AddEquation;
 	exports.AddOperation = AddOperation;
+	exports.AdditiveAnimationBlendMode = AdditiveAnimationBlendMode;
 	exports.AdditiveBlending = AdditiveBlending;
 	exports.AlphaFormat = AlphaFormat;
 	exports.AlwaysDepth = AlwaysDepth;
@@ -50399,6 +50675,7 @@
 	exports.NoBlending = NoBlending;
 	exports.NoColors = NoColors;
 	exports.NoToneMapping = NoToneMapping;
+	exports.NormalAnimationBlendMode = NormalAnimationBlendMode;
 	exports.NormalBlending = NormalBlending;
 	exports.NotEqualDepth = NotEqualDepth;
 	exports.NotEqualStencilFunc = NotEqualStencilFunc;
