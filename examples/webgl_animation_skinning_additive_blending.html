@@ -157,11 +157,13 @@
 				container.appendChild( renderer.domElement );
 
 				// camera
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
-				var controls = new OrbitControls( camera, renderer.domElement );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 100 );
 				camera.position.set( - 1, 2, 3 );
-				camera.lookAt( 0, 1, 0 );
-				controls.target = new THREE.Vector3( 0, 1, 0 );
+
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.enablePan = false;
+				controls.enableZoom = false;
+				controls.target.set( 0, 1, 0 );
 				controls.update();
 
 				stats = new Stats();
