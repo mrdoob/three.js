@@ -1165,7 +1165,8 @@ THREE.TransformControlsGizmo = function () {
 			handle.rotation.set( 0, 0, 0 );
 			handle.position.copy( this.worldPosition );
 
-			var eyeDistance = this.worldPosition.distanceTo( this.cameraPosition );
+			var eyeDistance = this.camera.isOrthographicCamera ? 1000 / this.camera.zoom : 
+				this.worldPosition.distanceTo( this.cameraPosition );			
 			handle.scale.set( 1, 1, 1 ).multiplyScalar( eyeDistance * this.size / 7 );
 
 			// TODO: simplify helpers and consider decoupling from gizmo
