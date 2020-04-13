@@ -61,157 +61,231 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer ) );
+			scope.parse( buffer, onLoad );
 
 		}, onProgress, onError );
 
 	},
 
-	parse: function ( data ) {
+	parse: function ( data, onLoad ) {
 
 		var scope = this;
 		var textureLoader = new TextureLoader( this.manager );
+		var version = 2;
 
-		function loadDocument( data ) {
+		function readZip( data, next ) {
 
-			var zip = null;
-			var file = null;
+			if ( JSZip !== undefined ) {
 
-			var relsName;
-			var modelRelsName;
-			var modelPartNames = [];
-			var printTicketPartNames = [];
-			var texturesPartNames = [];
-			var otherPartNames = [];
+				if ( JSZip.version !== undefined ) {
 
-			var rels;
-			var modelRels;
-			var modelParts = {};
-			var printTicketParts = {};
-			var texturesParts = {};
-			var otherParts = {};
-
-			try {
-
-				zip = new JSZip( data ); // eslint-disable-line no-undef
-
-			} catch ( e ) {
-
-				if ( e instanceof ReferenceError ) {
-
-					console.error( 'THREE.3MFLoader: jszip missing and file is compressed.' );
-					return null;
+					version = Number.parseInt( JSZip.version.split( "." ).shift() );
 
 				}
 
-			}
+				if ( version === 2 ) {
 
-			for ( file in zip.files ) {
+					next( new JSZip( data ) ); // eslint-disable-line no-undef
 
-				if ( file.match( /\_rels\/.rels$/ ) ) {
+				} else if ( version === 3 ) {
 
-					relsName = file;
+					console.warn( 'THREE.3MFLoader: jszip version 3 found, parse() will return null.' );
 
-				} else if ( file.match( /3D\/_rels\/.*\.model\.rels$/ ) ) {
-
-					modelRelsName = file;
-
-				} else if ( file.match( /^3D\/.*\.model$/ ) ) {
-
-					modelPartNames.push( file );
-
-				} else if ( file.match( /^3D\/Metadata\/.*\.xml$/ ) ) {
-
-					printTicketPartNames.push( file );
-
-				} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
-
-					texturesPartNames.push( file );
-
-				} else if ( file.match( /^3D\/Other\/.*/ ) ) {
-
-					otherPartNames.push( file );
+					JSZip.loadAsync( data ).then( next );
 
 				}
 
-			}
+			} else {
 
-			//
-
-			var relsView = new Uint8Array( zip.file( relsName ).asArrayBuffer() );
-			var relsFileText = LoaderUtils.decodeText( relsView );
-			rels = parseRelsXml( relsFileText );
-
-			//
-
-			if ( modelRelsName ) {
-
-				var relsView = new Uint8Array( zip.file( modelRelsName ).asArrayBuffer() );
-				var relsFileText = LoaderUtils.decodeText( relsView );
-				modelRels = parseRelsXml( relsFileText );
+				console.error( 'THREE.3MFLoader: jszip missing and file is compressed.' );
 
 			}
 
-			//
+		}
 
-			for ( var i = 0; i < modelPartNames.length; i ++ ) {
+		// Get zip file data as uint8 array depending on the JSZip version used.
 
-				var modelPart = modelPartNames[ i ];
-				var view = new Uint8Array( zip.file( modelPart ).asArrayBuffer() );
+		function getUint8Array( zipFile, next, data ) {
 
-				var fileText = LoaderUtils.decodeText( view );
-				var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
+			if ( version === 2 ) {
 
-				if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
+				next( new Uint8Array( zipFile.asArrayBuffer() ), data );
 
-					console.error( 'THREE.3MFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
+			} else if ( version === 3 ) {
 
-				}
+				zipFile.async( "arraybuffer" ).then( function ( arraybuffer ) {
 
-				var modelNode = xmlData.querySelector( 'model' );
-				var extensions = {};
+					next(  new Uint8Array( arraybuffer ), data );
 
-				for ( var i = 0; i < modelNode.attributes.length; i ++ ) {
+				} );
 
-					var attr = modelNode.attributes[ i ];
-					if ( attr.name.match( /^xmlns:(.+)$/ ) ) {
+			}
 
-						extensions[ attr.value ] = RegExp.$1;
+		}
+
+
+		function loadDocument( data, next ) {
+
+			readZip( data, function ( zip ) {
+
+				var file = null;
+
+				var relsName;
+				var modelRelsName;
+				var modelPartNames = [];
+				var printTicketPartNames = [];
+				var texturesPartNames = [];
+				var otherPartNames = [];
+
+				var rels;
+				var modelRels;
+				var modelParts = {};
+				var printTicketParts = {};
+				var texturesParts = {};
+				var otherParts = {};
+
+				for ( file in zip.files ) {
+
+					if ( file.match( /\_rels\/.rels$/ ) ) {
+
+						relsName = file;
+
+					} else if ( file.match( /3D\/_rels\/.*\.model\.rels$/ ) ) {
+
+						modelRelsName = file;
+
+					} else if ( file.match( /^3D\/.*\.model$/ ) ) {
+
+						modelPartNames.push( file );
+
+					} else if ( file.match( /^3D\/Metadata\/.*\.xml$/ ) ) {
+
+						printTicketPartNames.push( file );
+
+					} else if ( file.match( /^3D\/Textures?\/.*/ ) ) {
+
+						texturesPartNames.push( file );
+
+					} else if ( file.match( /^3D\/Other\/.*/ ) ) {
+
+						otherPartNames.push( file );
 
 					}
 
 				}
 
-				var modelData = parseModelNode( modelNode );
-				modelData[ 'xml' ] = modelNode;
+				getUint8Array( zip.file( relsName ), function ( relsView ) {
 
-				if ( 0 < Object.keys( extensions ).length ) {
+					var relsFileText = LoaderUtils.decodeText( relsView );
+					rels = parseRelsXml( relsFileText );
 
-					modelData[ 'extensions' ] = extensions;
+					// Amount of async calls that we have to wait for 
 
-				}
+					var waiting = modelPartNames.length + texturesPartNames.length + 1;
 
-				modelParts[ modelPart ] = modelData;
+					// Scene structure
 
-			}
+					if ( modelRelsName ) {
 
-			//
+						waiting ++;
 
-			for ( var i = 0; i < texturesPartNames.length; i ++ ) {
+						getUint8Array( zip.file( modelRelsName ), function ( relsView ) {
 
-				var texturesPartName = texturesPartNames[ i ];
-				texturesParts[ texturesPartName ] = zip.file( texturesPartName ).asArrayBuffer();
+							var relsFileText = LoaderUtils.decodeText( relsView );
+							modelRels = parseRelsXml( relsFileText );
 
-			}
+							finished();
 
-			return {
-				rels: rels,
-				modelRels: modelRels,
-				model: modelParts,
-				printTicket: printTicketParts,
-				texture: texturesParts,
-				other: otherParts
-			};
+						} );
+
+					}
+
+					// Models
+
+					for ( var i = 0; i < modelPartNames.length; i ++ ) {
+
+						getUint8Array( zip.file( modelPartNames[ i ] ), function ( view, modelPart ) {
+
+							var fileText = LoaderUtils.decodeText( view );
+							var xmlData = new DOMParser().parseFromString( fileText, 'application/xml' );
+
+							if ( xmlData.documentElement.nodeName.toLowerCase() !== 'model' ) {
+
+								console.error( 'THREE.3MFLoader: Error loading 3MF - no 3MF document found: ', modelPart );
+
+							}
+
+							var modelNode = xmlData.querySelector( 'model' );
+							var extensions = {};
+
+							for ( var i = 0; i < modelNode.attributes.length; i ++ ) {
+
+								var attr = modelNode.attributes[ i ];
+								if ( attr.name.match( /^xmlns:(.+)$/ ) ) {
+
+									extensions[ attr.value ] = RegExp.$1;
+
+								}
+
+							}
+
+							var modelData = parseModelNode( modelNode );
+							modelData[ 'xml' ] = modelNode;
+
+							if ( Object.keys( extensions ).length > 0 ) {
+
+								modelData[ 'extensions' ] = extensions;
+
+							}
+
+							modelParts[ modelPart ] = modelData;
+
+							finished();
+
+						},  modelPartNames[ i ] );
+
+					}
+
+					// Textures
+
+					for ( var i = 0; i < texturesPartNames.length; i ++ ) {
+
+						getUint8Array( zip.file( texturesPartNames[ i ] ), function ( texturesPart, texturesPartName ) {
+							
+							texturesParts[ texturesPartName ] = texturesPart;
+
+							finished();
+
+						},  texturesPartNames[ i ] );
+
+					}
+
+					finished();
+
+					// Auxiliar method to check if everything was finished before moving up to next step
+
+					function finished() {
+
+						waiting --;
+
+						if ( waiting === 0 ) {
+
+							next( {
+								rels: rels,
+								modelRels: modelRels,
+								model: modelParts,
+								printTicket: printTicketParts,
+								texture: texturesParts,
+								other: otherParts
+							} );
+
+						}
+
+					}
+
+				} );
+
+			} );
 
 		}
 
@@ -1091,6 +1165,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							meshes.push( newMeshes[ j ] );
 
 						}
+
 						break;
 
 					case 'texture':
@@ -1421,10 +1496,22 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		var data3mf = loadDocument( data );
-		var objects = buildObjects( data3mf );
+		var output = null;
+		var objects = null;
 
-		return build( objects, data3mf );
+		loadDocument( data, function ( data3mf ) {
+			objects = buildObjects( data3mf );
+			output = build( objects, data3mf );
+
+			if ( onLoad !== undefined ) {
+
+				onLoad( output );
+
+			}
+
+		} );
+
+		return output;
 
 	},
 
