@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This class is an alternative implementation of [page:FlyControls].
+		</p>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_geometry_terrain webgl / geometry / terrain ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Camera object], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera object]: The camera to be controlled.
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+			</p>
+			<p>
+				Creates a new instance of [name].
+			</p>
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean activeLook]</h3>
+		<p>
+			Whether or not it's possible to look around. Default is *true*.
+		</p>
+
+		<h3>[property:Boolean autoForward]</h3>
+		<p>
+			Whether or not the camera is automatically moved forward. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean constrainVertical]</h3>
+		<p>
+			Whether or not looking around is vertically constrained by [[page:.verticalMin], [page:.verticalMax]]. Default is *false*.
+		</p>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
+			not set up new event listeners.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			Whether or not the controls are enabled. Default is *true*.
+		</p>
+
+		<h3>[property:Number heightCoef]</h3>
+		<p>
+			Determines how much faster the camera moves when it's y-component is near [page:.heightMax]. Default is *1*.
+		</p>
+
+		<h3>[property:Number heightMax]</h3>
+		<p>
+			Upper camera height limit used for movement speed adjusment. Default is *1*.
+		</p>
+
+		<h3>[property:Number heightMin]</h3>
+		<p>
+			Lower camera height limit used for movement speed adjusment. Default is *0*.
+		</p>
+
+		<h3>[property:Boolean heightSpeed]</h3>
+		<p>
+			Whether or not the camera's height influences the forward movement speed. Default is *false*.
+			Use the properties [page:.heightCoef], [page:.heightMin] and [page:.heightMax] for configuration.
+		</p>
+
+		<h3>[property:Boolean lookVertical]</h3>
+		<p>
+			Whether or not it's possible to vertically look around. Default is *true*.
+		</p>
+
+		<h3>[property:Number lookSpeed]</h3>
+		<p>
+			The look around speed. Default is *0.005*.
+		</p>
+
+		<h3>[property:Boolean mouseDragOn]</h3>
+		<p>
+			Whether or not the mouse is pressed down. Read-only property.
+		</p>
+
+		<h3>[property:Number movementSpeed]</h3>
+		<p>
+			The movement speed. Default is *1*.
+		</p>
+
+		<h3>[property:Camera object]</h3>
+		<p>
+			The camera to be controlled.
+		</p>
+
+		<h3>[property:Number verticalMax]</h3>
+		<p>
+			How far you can vertically look around, upper limit. Range is 0 to Math.PI radians. Default is *Math.PI*.
+		</p>
+
+		<h3>[property:Number verticalMin]</h3>
+		<p>
+			How far you can vertically look around, lower limit. Range is 0 to Math.PI radians. Default is *0*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null dispose] ()</h3>
+		<p>
+			Should be called if the controls is no longer required.
+		</p>
+
+		<h3>[method:null handleResize] ()</h3>
+		<p>
+			Should be called if the application window is resized.
+		</p>
+
+		<h3>[method:FirstPersonControls lookAt]( [param:Vector3 vector] )<br />
+		[method:FirstPersonControls lookAt]( [param:Float x], [param:Float y], [param:Float z] )</h3>
+		<p>
+			<p>
+				<p>
+					vector - A vector representing the target position.
+				</p>
+				<p>
+					Optionally, the x, y, z components of the world space position.
+				</p>
+			</p>
+			<p>
+				Ensures the controls orient the camera towards the defined target position.
+			</p>
+		</p>
+
+		<h3>[method:null update] ( [param:Number delta] )</h3>
+		<p>
+			<p>
+				[page:Number delta]: Time delta value.
+			</p>
+			<p>
+				Updates the controls. Usually called in the animation loop.
+			</p>
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/FirstPersonControls.js examples/jsm/controls/FirstPersonControls.js]
+		</p>
+	</body>
+</html>

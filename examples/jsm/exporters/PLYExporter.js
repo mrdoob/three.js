@@ -6,7 +6,7 @@
  *  var exporter = new PLYExporter();
  *
  *  // second argument is a list of options
- *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ] });
+ *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ], littleEndian: true });
  *
  * Format Definition:
  * http://paulbourke.net/dataformats/ply/
@@ -69,7 +69,8 @@ PLYExporter.prototype = {
 		// Default options
 		var defaultOptions = {
 			binary: false,
-			excludeAttributes: [] // normal, uv, color, index
+			excludeAttributes: [], // normal, uv, color, index
+			littleEndian: false
 		};
 
 		options = Object.assign( defaultOptions, options );
@@ -150,26 +151,11 @@ PLYExporter.prototype = {
 
 		}
 
-		// get how many bytes will be needed to save out the faces
-		// so we can use a minimal amount of memory / data
-		var indexByteCount = 1;
-
-		if ( vertexCount > 256 ) { // 2^8 bits
-
-			indexByteCount = 2;
-
-		}
-
-		if ( vertexCount > 65536 ) { // 2^16 bits
-
-			indexByteCount = 4;
-
-		}
-
+		var indexByteCount = 4;
 
 		var header =
 			'ply\n' +
-			`format ${ options.binary ? 'binary_big_endian' : 'ascii' } 1.0\n` +
+			`format ${ options.binary ? ( options.littleEndian ? 'binary_little_endian' : 'binary_big_endian' ) : 'ascii' } 1.0\n` +
 			`element vertex ${vertexCount}\n` +
 
 			// position
@@ -211,7 +197,7 @@ PLYExporter.prototype = {
 			// faces
 			header +=
 				`element face ${faceCount}\n` +
-				`property list uchar uint${ indexByteCount * 8 } vertex_index\n`;
+				`property list uchar int vertex_index\n`;
 
 		}
 
@@ -264,13 +250,13 @@ PLYExporter.prototype = {
 
 
 					// Position information
-					output.setFloat32( vOffset, vertex.x );
+					output.setFloat32( vOffset, vertex.x, options.littleEndian );
 					vOffset += 4;
 
-					output.setFloat32( vOffset, vertex.y );
+					output.setFloat32( vOffset, vertex.y, options.littleEndian );
 					vOffset += 4;
 
-					output.setFloat32( vOffset, vertex.z );
+					output.setFloat32( vOffset, vertex.z, options.littleEndian );
 					vOffset += 4;
 
 					// Normal information
@@ -282,26 +268,26 @@ PLYExporter.prototype = {
 							vertex.y = normals.getY( i );
 							vertex.z = normals.getZ( i );
 
-							vertex.applyMatrix3( normalMatrixWorld );
+							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
-							output.setFloat32( vOffset, vertex.x );
+							output.setFloat32( vOffset, vertex.x, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, vertex.y );
+							output.setFloat32( vOffset, vertex.y, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, vertex.z );
+							output.setFloat32( vOffset, vertex.z, options.littleEndian );
 							vOffset += 4;
 
 						} else {
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
 						}
@@ -313,18 +299,18 @@ PLYExporter.prototype = {
 
 						if ( uvs != null ) {
 
-							output.setFloat32( vOffset, uvs.getX( i ) );
+							output.setFloat32( vOffset, uvs.getX( i ), options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, uvs.getY( i ) );
+							output.setFloat32( vOffset, uvs.getY( i ), options.littleEndian );
 							vOffset += 4;
 
 						} else if ( includeUVs !== false ) {
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
 						}
@@ -365,7 +351,7 @@ PLYExporter.prototype = {
 				if ( includeIndices === true ) {
 
 					// Create the face list
-					var faceIndexFunc = `setUint${indexByteCount * 8}`;
+
 					if ( indices !== null ) {
 
 						for ( var i = 0, l = indices.count; i < l; i += 3 ) {
@@ -373,13 +359,13 @@ PLYExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output[ faceIndexFunc ]( fOffset, indices.getX( i + 0 ) + writtenVertices );
+							output.setUint32( fOffset, indices.getX( i + 0 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, indices.getX( i + 1 ) + writtenVertices );
+							output.setUint32( fOffset, indices.getX( i + 1 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, indices.getX( i + 2 ) + writtenVertices );
+							output.setUint32( fOffset, indices.getX( i + 2 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
 						}
@@ -391,13 +377,13 @@ PLYExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output[ faceIndexFunc ]( fOffset, writtenVertices + i );
+							output.setUint32( fOffset, writtenVertices + i, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 1 );
+							output.setUint32( fOffset, writtenVertices + i + 1, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output[ faceIndexFunc ]( fOffset, writtenVertices + i + 2 );
+							output.setUint32( fOffset, writtenVertices + i + 2, options.littleEndian );
 							fOffset += indexByteCount;
 
 						}
@@ -458,7 +444,7 @@ PLYExporter.prototype = {
 							vertex.y = normals.getY( i );
 							vertex.z = normals.getZ( i );
 
-							vertex.applyMatrix3( normalMatrixWorld );
+							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
 							line += ' ' +
 								vertex.x + ' ' +
@@ -543,7 +529,7 @@ PLYExporter.prototype = {
 
 			} );
 
-			result = `${ header }${vertexList}\n${ includeIndices ? `${faceList}\n` : '' }`;
+			result = `${ header }${vertexList}${ includeIndices ? `${faceList}\n` : '\n' }`;
 
 		}
 

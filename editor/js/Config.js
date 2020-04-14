@@ -8,18 +8,21 @@ var Config = function () {
 
 	var storage = {
 		'language': 'en',
+		'exportPrecision': 6,
 
 		'autosave': true,
-		'theme': 'css/light.css',
 
 		'project/title': '',
 		'project/editable': false,
+		'project/vr': false,
 
-		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
 		'project/renderer/shadows': true,
-
-		'project/vr': false,
+		'project/renderer/shadowType': 1, // PCF
+		'project/renderer/physicallyCorrectLights': false,
+		'project/renderer/toneMapping': 1, // linear
+		'project/renderer/toneMappingExposure': 1,
+		'project/renderer/toneMappingWhitePoint': 1,
 
 		'settings/history': false,
 
@@ -77,3 +80,5 @@ var Config = function () {
 	};
 
 };
+
+export { Config };

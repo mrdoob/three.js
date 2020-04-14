@@ -8,32 +8,32 @@ export interface MeshStandardMaterialParameters extends MaterialParameters {
 	color?: Color | string | number;
 	roughness?: number;
 	metalness?: number;
-	map?: Texture;
-	lightMap?: Texture;
+	map?: Texture | null;
+	lightMap?: Texture | null;
 	lightMapIntensity?: number;
-	aoMap?: Texture;
+	aoMap?: Texture | null;
 	aoMapIntensity?: number;
 	emissive?: Color | string | number;
 	emissiveIntensity?: number;
-	emissiveMap?: Texture;
-	bumpMap?: Texture;
+	emissiveMap?: Texture | null;
+	bumpMap?: Texture | null;
 	bumpScale?: number;
-	normalMap?: Texture;
+	normalMap?: Texture | null;
 	normalMapType?: NormalMapTypes;
 	normalScale?: Vector2;
-	displacementMap?: Texture;
+	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
-	roughnessMap?: Texture;
-	metalnessMap?: Texture;
-	alphaMap?: Texture;
-	envMap?: Texture;
+	roughnessMap?: Texture | null;
+	metalnessMap?: Texture | null;
+	alphaMap?: Texture | null;
+	envMap?: Texture | null;
 	envMapIntensity?: number;
-	energyPreservation: boolean;
 	refractionRatio?: number;
 	wireframe?: boolean;
 	wireframeLinewidth?: number;
 	skinning?: boolean;
+	vertexTangents?: boolean;
 	morphTargets?: boolean;
 	morphNormals?: boolean;
 }
@@ -42,7 +42,6 @@ export class MeshStandardMaterial extends Material {
 
 	constructor( parameters?: MeshStandardMaterialParameters );
 
-	defines: any;
 	color: Color;
 	roughness: number;
 	metalness: number;
@@ -67,11 +66,11 @@ export class MeshStandardMaterial extends Material {
 	alphaMap: Texture | null;
 	envMap: Texture | null;
 	envMapIntensity: number;
-	energyPreservation: boolean;
 	refractionRatio: number;
 	wireframe: boolean;
 	wireframeLinewidth: number;
 	skinning: boolean;
+	vertexTangents: boolean;
 	morphTargets: boolean;
 	morphNormals: boolean;
 

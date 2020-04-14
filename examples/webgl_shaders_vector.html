@@ -17,7 +17,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - Resolution-Independent Vector Fonts. <a href="https://github.com/mrdoob/three.js/issues/4746">info</a>.
 		</div>
 
 		<script type="x-shader/x-fragment" id="fs">
@@ -122,8 +122,8 @@
 
 					var wind;
 
-					pts.push( path[ 0 ].getPoint( 0 ) );
-					pts2.push( path[ 0 ].getPoint( 0 ) );
+					pts.push( path[ 0 ].getPoint( 0, new THREE.Vector2() ) );
+					pts2.push( path[ 0 ].getPoint( 0, new THREE.Vector2() ) );
 
 					for ( var i = 0; i < path.length; i ++ ) {
 
@@ -235,9 +235,9 @@
 
 				}
 
-				bezierGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
-				bezierGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-				bezierGeometry.addAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
+				bezierGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				bezierGeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				bezierGeometry.setAttribute( 'invert', new THREE.Float32BufferAttribute( invert, 1 ) );
 
 				geometry = new THREE.ShapeBufferGeometry( convexhullShapeGroup );
 

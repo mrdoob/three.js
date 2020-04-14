@@ -15,7 +15,7 @@ export class Ray {
 	clone(): this;
 	copy( ray: Ray ): this;
 	at( t: number, target: Vector3 ): Vector3;
-	lookAt( v: Vector3 ): Vector3;
+	lookAt( v: Vector3 ): Ray;
 	recast( t: number ): Ray;
 	closestPointToPoint( point: Vector3, target: Vector3 ): Vector3;
 	distanceToPoint( point: Vector3 ): number;
@@ -26,12 +26,12 @@ export class Ray {
 		optionalPointOnRay?: Vector3,
 		optionalPointOnSegment?: Vector3
 	): number;
-	intersectSphere( sphere: Sphere, target: Vector3 ): Vector3;
+	intersectSphere( sphere: Sphere, target: Vector3 ): Vector3 | null;
 	intersectsSphere( sphere: Sphere ): boolean;
 	distanceToPlane( plane: Plane ): number;
-	intersectPlane( plane: Plane, target: Vector3 ): Vector3;
+	intersectPlane( plane: Plane, target: Vector3 ): Vector3 | null;
 	intersectsPlane( plane: Plane ): boolean;
-	intersectBox( box: Box3, target: Vector3 ): Vector3;
+	intersectBox( box: Box3, target: Vector3 ): Vector3 | null;
 	intersectsBox( box: Box3 ): boolean;
 	intersectTriangle(
 		a: Vector3,
@@ -39,7 +39,7 @@ export class Ray {
 		c: Vector3,
 		backfaceCulling: boolean,
 		target: Vector3
-	): Vector3;
+	): Vector3 | null;
 	applyMatrix4( matrix4: Matrix4 ): Ray;
 	equals( ray: Ray ): boolean;
 

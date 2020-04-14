@@ -392,14 +392,14 @@ THREE.CCDIKSolver = ( function () {
 
 		_init: function () {
 
-			var self = this;
+			var scope = this;
 			var iks = this.iks;
 
 			function createLineGeometry( ik ) {
 
 				var geometry = new THREE.BufferGeometry();
 				var vertices = new Float32Array( ( 2 + ik.links.length ) * 3 );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 				return geometry;
 
@@ -407,25 +407,25 @@ THREE.CCDIKSolver = ( function () {
 
 			function createTargetMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.targetSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.targetSphereMaterial );
 
 			}
 
 			function createEffectorMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.effectorSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.effectorSphereMaterial );
 
 			}
 
 			function createLinkMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.linkSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.linkSphereMaterial );
 
 			}
 
 			function createLine( ik ) {
 
-				return new THREE.Line( createLineGeometry( ik ), self.lineMaterial );
+				return new THREE.Line( createLineGeometry( ik ), scope.lineMaterial );
 
 			}
 

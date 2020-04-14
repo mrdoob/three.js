@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified material.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified material.
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 		</div>
 
@@ -74,6 +74,8 @@
 				document.body.appendChild( renderer.domElement );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1000;
+				controls.maxDistance = 5000;
 
 				//
 

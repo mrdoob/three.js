@@ -1,23 +1,19 @@
 import {
-  Mesh,
-  LoadingManager
+	Mesh,
+	Loader,
+	LoadingManager
 } from '../../../src/Three';
 
 export interface XResult {
-  animations: object[];
-  models: Mesh[];
+	animations: object[];
+	models: Mesh[];
 }
 
-export class VRMLLoader {
-  constructor(manager?: LoadingManager);
-  crossOrigin: string;
-  manager: LoadingManager;
-  path: string;
-  resourcePath: string;
+export class XLoader extends Loader {
 
-  load(url: string, onLoad: (object: object) => void, onProgress?: (event: ProgressEvent) => void, onError?: (event: ErrorEvent) => void): void;
-  setCrossOrigin(path: string): this;
-  parse(data: ArrayBuffer | string, onLoad: (object: object) => void): object;
-  setPath(path: string): this;
-  setResourcePath(path: string): this;
+	constructor( manager?: LoadingManager );
+
+	load( url: string, onLoad: ( object: XResult ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
+	parse( data: ArrayBuffer | string, onLoad: ( object: object ) => void ): object;
+
 }

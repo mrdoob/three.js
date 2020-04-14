@@ -8,7 +8,7 @@ import { Matrix4 } from '../math/Matrix4.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from './Object3D.js';
-import { _Math } from '../math/Math.js';
+import { MathUtils } from '../math/MathUtils.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -20,13 +20,15 @@ import { _Math } from '../math/Math.js';
  */
 
 var _geometryId = 0; // Geometry uses even numbers as Id
-var _m1, _obj, _offset;
+var _m1 = new Matrix4();
+var _obj = new Object3D();
+var _offset = new Vector3();
 
 function Geometry() {
 
 	Object.defineProperty( this, 'id', { value: _geometryId += 2 } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.type = 'Geometry';
@@ -65,7 +67,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	isGeometry: true,
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		var normalMatrix = new Matrix3().getNormalMatrix( matrix );
 
@@ -112,11 +114,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// rotate geometry around world x-axis
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeRotationX( angle );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -126,11 +126,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// rotate geometry around world y-axis
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeRotationY( angle );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -140,11 +138,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// rotate geometry around world z-axis
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeRotationZ( angle );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -154,11 +150,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// translate geometry
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeTranslation( x, y, z );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -168,11 +162,9 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// scale geometry
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		_m1.makeScale( x, y, z );
 
-		this.applyMatrix( _m1 );
+		this.applyMatrix4( _m1 );
 
 		return this;
 
@@ -180,13 +172,11 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	lookAt: function ( vector ) {
 
-		if ( _obj === undefined ) _obj = new Object3D();
-
 		_obj.lookAt( vector );
 
 		_obj.updateMatrix();
 
-		this.applyMatrix( _obj.matrix );
+		this.applyMatrix4( _obj.matrix );
 
 		return this;
 
@@ -198,6 +188,13 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var indices = geometry.index !== null ? geometry.index.array : undefined;
 		var attributes = geometry.attributes;
+
+		if ( attributes.position === undefined ) {
+
+			console.error( 'THREE.Geometry.fromBufferGeometry(): Position attribute required for conversion.' );
+			return this;
+
+		}
 
 		var positions = attributes.position.array;
 		var normals = attributes.normal !== undefined ? attributes.normal.array : undefined;
@@ -327,8 +324,6 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	center: function () {
 
-		if ( _offset === undefined ) _offset = new Vector3();
-
 		this.computeBoundingBox();
 
 		this.boundingBox.getCenter( _offset ).negate();
@@ -356,7 +351,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			0, 0, 0, 1
 		);
 
-		this.applyMatrix( matrix );
+		this.applyMatrix4( matrix );
 
 		return this;
 

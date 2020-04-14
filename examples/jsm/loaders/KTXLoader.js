@@ -16,27 +16,28 @@ var KTXLoader = function ( manager ) {
 
 	CompressedTextureLoader.call( this, manager );
 
-	this._parser = KTXLoader.parse;
-
 };
 
-KTXLoader.prototype = Object.create( CompressedTextureLoader.prototype );
-KTXLoader.prototype.constructor = KTXLoader;
+KTXLoader.prototype = Object.assign( Object.create( CompressedTextureLoader.prototype ), {
 
-KTXLoader.parse = function ( buffer, loadMipmaps ) {
+	constructor: KTXLoader,
 
-	var ktx = new KhronosTextureContainer( buffer, 1 );
+	parse: function ( buffer, loadMipmaps ) {
 
-	return {
-		mipmaps: ktx.mipmaps( loadMipmaps ),
-		width: ktx.pixelWidth,
-		height: ktx.pixelHeight,
-		format: ktx.glInternalFormat,
-		isCubemap: ktx.numberOfFaces === 6,
-		mipmapCount: ktx.numberOfMipmapLevels
-	};
+		var ktx = new KhronosTextureContainer( buffer, 1 );
 
-};
+		return {
+			mipmaps: ktx.mipmaps( loadMipmaps ),
+			width: ktx.pixelWidth,
+			height: ktx.pixelHeight,
+			format: ktx.glInternalFormat,
+			isCubemap: ktx.numberOfFaces === 6,
+			mipmapCount: ktx.numberOfMipmapLevels
+		};
+
+	}
+
+} );
 
 var KhronosTextureContainer = ( function () {
 

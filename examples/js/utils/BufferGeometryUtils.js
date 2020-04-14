@@ -31,7 +31,7 @@ THREE.BufferGeometryUtils = {
 
 		if ( attributes.tangent === undefined ) {
 
-			geometry.addAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
+			geometry.setAttribute( 'tangent', new THREE.BufferAttribute( new Float32Array( 4 * nVertices ), 4 ) );
 
 		}
 
@@ -67,34 +67,20 @@ THREE.BufferGeometryUtils = {
 			uvB.fromArray( uvs, b * 2 );
 			uvC.fromArray( uvs, c * 2 );
 
-			var x1 = vB.x - vA.x;
-			var x2 = vC.x - vA.x;
+			vB.sub( vA );
+			vC.sub( vA );
 
-			var y1 = vB.y - vA.y;
-			var y2 = vC.y - vA.y;
+			uvB.sub( uvA );
+			uvC.sub( uvA );
 
-			var z1 = vB.z - vA.z;
-			var z2 = vC.z - vA.z;
+			var r = 1.0 / ( uvB.x * uvC.y - uvC.x * uvB.y );
 
-			var s1 = uvB.x - uvA.x;
-			var s2 = uvC.x - uvA.x;
+			// silently ignore degenerate uv triangles having coincident or colinear vertices
 
-			var t1 = uvB.y - uvA.y;
-			var t2 = uvC.y - uvA.y;
+			if ( ! isFinite( r ) ) return;
 
-			var r = 1.0 / ( s1 * t2 - s2 * t1 );
-
-			sdir.set(
-				( t2 * x1 - t1 * x2 ) * r,
-				( t2 * y1 - t1 * y2 ) * r,
-				( t2 * z1 - t1 * z2 ) * r
-			);
-
-			tdir.set(
-				( s1 * x2 - s2 * x1 ) * r,
-				( s1 * y2 - s2 * y1 ) * r,
-				( s1 * z2 - s2 * z1 ) * r
-			);
+			sdir.copy( vB ).multiplyScalar( uvC.y ).addScaledVector( vC, - uvB.y ).multiplyScalar( r );
+			tdir.copy( vC ).multiplyScalar( uvB.x ).addScaledVector( vB, - uvC.x ).multiplyScalar( r );
 
 			tan1[ a ].add( sdir );
 			tan1[ b ].add( sdir );
@@ -199,6 +185,8 @@ THREE.BufferGeometryUtils = {
 		var attributes = {};
 		var morphAttributes = {};
 
+		var morphTargetsRelative = geometries[ 0 ].morphTargetsRelative;
+
 		var mergedGeometry = new THREE.BufferGeometry();
 
 		var offset = 0;
@@ -224,6 +212,8 @@ THREE.BufferGeometryUtils = {
 			}
 
 			// gather morph attributes, exit early if they're different
+
+			if ( morphTargetsRelative !== geometry.morphTargetsRelative ) return null;
 
 			for ( var name in geometry.morphAttributes ) {
 
@@ -299,7 +289,7 @@ THREE.BufferGeometryUtils = {
 
 			if ( ! mergedAttribute ) return null;
 
-			mergedGeometry.addAttribute( name, mergedAttribute );
+			mergedGeometry.setAttribute( name, mergedAttribute );
 
 		}
 
@@ -589,29 +579,21 @@ THREE.BufferGeometryUtils = {
 
 			var name = attributeNames[ i ];
 			var oldAttribute = geometry.getAttribute( name );
-			var attribute;
 
 			var buffer = new oldAttribute.array.constructor( attrArrays[ name ] );
-			if ( oldAttribute.isInterleavedBufferAttribute ) {
+			var attribute = new THREE.BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.normalized );
 
-				attribute = new THREE.BufferAttribute( buffer, oldAttribute.itemSize, oldAttribute.itemSize );
-
-			} else {
-
-				attribute = geometry.getAttribute( name ).clone();
-				attribute.setArray( buffer );
-
-			}
-
-			result.addAttribute( name, attribute );
+			result.setAttribute( name, attribute );
 
 			// Update the attribute arrays
 			if ( name in morphAttrsArrays ) {
 
 				for ( var j = 0; j < morphAttrsArrays[ name ].length; j ++ ) {
 
-					var morphAttribute = geometry.morphAttributes[ name ][ j ].clone();
-					morphAttribute.setArray( new morphAttribute.array.constructor( morphAttrsArrays[ name ][ j ] ) );
+					var oldMorphAttribute = geometry.morphAttributes[ name ][ j ];
+
+					var buffer = new oldMorphAttribute.array.constructor( morphAttrsArrays[ name ][ j ] );
+					var morphAttribute = new THREE.BufferAttribute( buffer, oldMorphAttribute.itemSize, oldMorphAttribute.normalized );
 					result.morphAttributes[ name ][ j ] = morphAttribute;
 
 				}
@@ -620,27 +602,122 @@ THREE.BufferGeometryUtils = {
 
 		}
 
-		// Generate an index buffer typed array
-		var cons = Uint8Array;
-		if ( newIndices.length >= Math.pow( 2, 8 ) ) cons = Uint16Array;
-		if ( newIndices.length >= Math.pow( 2, 16 ) ) cons = Uint32Array;
-
-		var newIndexBuffer = new cons( newIndices );
-		var newIndices = null;
-		if ( indices === null ) {
-
-			newIndices = new THREE.BufferAttribute( newIndexBuffer, 1 );
-
-		} else {
-
-			newIndices = geometry.getIndex().clone();
-			newIndices.setArray( newIndexBuffer );
-
-		}
+		// indices
 
 		result.setIndex( newIndices );
 
 		return result;
+
+	},
+
+	/**
+	 * @param {THREE.BufferGeometry} geometry
+	 * @param {number} drawMode
+	 * @return {THREE.BufferGeometry>}
+	 */
+	toTrianglesDrawMode: function ( geometry, drawMode ) {
+
+		if ( drawMode === THREE.TrianglesDrawMode ) {
+
+			console.warn( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Geometry already defined as triangles.' );
+			return geometry;
+
+		}
+
+		if ( drawMode === THREE.TriangleFanDrawMode || drawMode === THREE.TriangleStripDrawMode ) {
+
+			var index = geometry.getIndex();
+
+			// generate index if not present
+
+			if ( index === null ) {
+
+				var indices = [];
+
+				var position = geometry.getAttribute( 'position' );
+
+				if ( position !== undefined ) {
+
+					for ( var i = 0; i < position.count; i ++ ) {
+
+						indices.push( i );
+
+					}
+
+					geometry.setIndex( indices );
+					index = geometry.getIndex();
+
+				} else {
+
+					console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Undefined position attribute. Processing not possible.' );
+					return geometry;
+
+				}
+
+			}
+
+			//
+
+			var numberOfTriangles = index.count - 2;
+			var newIndices = [];
+
+			if ( drawMode === THREE.TriangleFanDrawMode ) {
+
+				// gl.TRIANGLE_FAN
+
+				for ( var i = 1; i <= numberOfTriangles; i ++ ) {
+
+					newIndices.push( index.getX( 0 ) );
+					newIndices.push( index.getX( i ) );
+					newIndices.push( index.getX( i + 1 ) );
+
+				}
+
+			} else {
+
+				// gl.TRIANGLE_STRIP
+
+				for ( var i = 0; i < numberOfTriangles; i ++ ) {
+
+					if ( i % 2 === 0 ) {
+
+						newIndices.push( index.getX( i ) );
+						newIndices.push( index.getX( i + 1 ) );
+						newIndices.push( index.getX( i + 2 ) );
+
+
+					} else {
+
+						newIndices.push( index.getX( i + 2 ) );
+						newIndices.push( index.getX( i + 1 ) );
+						newIndices.push( index.getX( i ) );
+
+					}
+
+				}
+
+			}
+
+			if ( ( newIndices.length / 3 ) !== numberOfTriangles ) {
+
+				console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unable to generate correct amount of triangles.' );
+
+			}
+
+			// build final geometry
+
+			var newGeometry = geometry.clone();
+			newGeometry.setIndex( newIndices );
+			newGeometry.clearGroups();
+
+			return newGeometry;
+
+		} else {
+
+			console.error( 'THREE.BufferGeometryUtils.toTrianglesDrawMode(): Unknown draw mode:', drawMode );
+			return geometry;
+
+		}
 
 	}
 

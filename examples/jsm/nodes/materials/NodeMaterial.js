@@ -19,7 +19,7 @@ function NodeMaterial( vertex, fragment ) {
 
 	ShaderMaterial.call( this );
 
-	var self = this;
+	var scope = this;
 
 	this.vertex = vertex || new RawNode( new PositionNode( PositionNode.PROJECTION ) );
 	this.fragment = fragment || new RawNode( new ColorNode( 0xFF0000 ) );
@@ -30,7 +30,9 @@ function NodeMaterial( vertex, fragment ) {
 
 	this.onBeforeCompile = function ( shader, renderer ) {
 
-		if ( this.needsUpdate ) {
+		var materialProperties = renderer.properties.get( this );
+
+		if ( this.version !== materialProperties.__version ) {
 
 			this.build( { renderer: renderer } );
 
@@ -46,7 +48,7 @@ function NodeMaterial( vertex, fragment ) {
 
 	this.onBeforeCompile.toString = function () {
 
-		return self.needsCompile;
+		return scope.needsCompile;
 
 	};
 
@@ -74,6 +76,7 @@ Object.defineProperties( NodeMaterial.prototype, {
 
 		set: function ( value ) {
 
+			if ( value === true ) this.version ++;
 			this.needsCompile = value;
 
 		},
@@ -119,8 +122,6 @@ NodeMaterial.prototype.build = function ( params ) {
 	this.lights = builder.requires.lights;
 
 	this.transparent = builder.requires.transparent || this.blending > NormalBlending;
-
-	this.needsUpdate = false;
 
 	return this;
 

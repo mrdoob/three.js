@@ -12,7 +12,7 @@ import {
 	DstColorFactor,
 	FloatType,
 	LinearFilter,
-	Math as _Math,
+	MathUtils,
 	MeshNormalMaterial,
 	NearestFilter,
 	NoBlending,
@@ -183,16 +183,16 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.ssaoRenderTarget.dispose();
 		this.blurRenderTarget.dispose();
 
-		// dispose geometry
-
-		this.quad.geometry.dispose();
-
 		// dispose materials
 
 		this.normalMaterial.dispose();
 		this.blurMaterial.dispose();
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
+
+		// dipsose full screen quad
+
+		this.fsQuad.dispose();
 
 	},
 
@@ -374,7 +374,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			sample.normalize();
 
 			var scale = i / kernelSize;
-			scale = _Math.lerp( 0.1, 1, scale * scale );
+			scale = MathUtils.lerp( 0.1, 1, scale * scale );
 			sample.multiplyScalar( scale );
 
 			kernel.push( sample );
@@ -418,7 +418,6 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.noiseTexture = new DataTexture( data, width, height, RGBAFormat, FloatType );
 		this.noiseTexture.wrapS = RepeatWrapping;
 		this.noiseTexture.wrapT = RepeatWrapping;
-		this.noiseTexture.needsUpdate = true;
 
 	}
 

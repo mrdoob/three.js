@@ -1,18 +1,41 @@
 import { Vector3 } from './Vector3.js';
 
+var _points = [
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3()
+];
+
+var _vector = new Vector3();
+
+var _box = new Box3();
+
+// triangle centered vertices
+
+var _v0 = new Vector3();
+var _v1 = new Vector3();
+var _v2 = new Vector3();
+
+// triangle edge vectors
+
+var _f0 = new Vector3();
+var _f1 = new Vector3();
+var _f2 = new Vector3();
+
+var _center = new Vector3();
+var _extents = new Vector3();
+var _triangleNormal = new Vector3();
+var _testAxis = new Vector3();
+
 /**
  * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  */
-
-var _points;
-var _vector;
-
-var _v0, _v1, _v2;
-var _f0, _f1, _f2;
-var _center;
-var _extents;
-var _triangleNormal;
 
 function Box3( min, max ) {
 
@@ -20,6 +43,7 @@ function Box3( min, max ) {
 	this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
 
 }
+
 
 Object.assign( Box3.prototype, {
 
@@ -115,8 +139,6 @@ Object.assign( Box3.prototype, {
 	},
 
 	setFromCenterAndSize: function ( center, size ) {
-
-		if ( _vector === undefined ) _vector = new Vector3();
 
 		var halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
 
@@ -222,10 +244,6 @@ Object.assign( Box3.prototype, {
 
 	expandByObject: function ( object ) {
 
-		if ( _vector === undefined ) _vector = new Vector3();
-
-		var i, l;
-
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
 
@@ -235,44 +253,22 @@ Object.assign( Box3.prototype, {
 
 		if ( geometry !== undefined ) {
 
-			if ( geometry.isGeometry ) {
+			if ( geometry.boundingBox === null ) {
 
-				var vertices = geometry.vertices;
-
-				for ( i = 0, l = vertices.length; i < l; i ++ ) {
-
-					_vector.copy( vertices[ i ] );
-					_vector.applyMatrix4( object.matrixWorld );
-
-					this.expandByPoint( _vector );
-
-				}
-
-			} else if ( geometry.isBufferGeometry ) {
-
-				var attribute = geometry.attributes.position;
-
-				if ( attribute !== undefined ) {
-
-					for ( i = 0, l = attribute.count; i < l; i ++ ) {
-
-						_vector.fromBufferAttribute( attribute, i ).applyMatrix4( object.matrixWorld );
-
-						this.expandByPoint( _vector );
-
-					}
-
-				}
+				geometry.computeBoundingBox();
 
 			}
 
-		}
+			_box.copy( geometry.boundingBox );
+			_box.applyMatrix4( object.matrixWorld );
 
-		//
+			this.union( _box );
+
+		}
 
 		var children = object.children;
 
-		for ( i = 0, l = children.length; i < l; i ++ ) {
+		for ( var i = 0, l = children.length; i < l; i ++ ) {
 
 			this.expandByObject( children[ i ] );
 
@@ -328,8 +324,6 @@ Object.assign( Box3.prototype, {
 	},
 
 	intersectsSphere: function ( sphere ) {
-
-		if ( _vector === undefined ) _vector = new Vector3();
 
 		// Find the point on the AABB closest to the sphere center.
 		this.clampPoint( sphere.center, _vector );
@@ -387,26 +381,6 @@ Object.assign( Box3.prototype, {
 	},
 
 	intersectsTriangle: function ( triangle ) {
-
-		if ( _v0 === undefined ) {
-
-			// triangle centered vertices
-
-			_v0 = new Vector3();
-			_v1 = new Vector3();
-			_v2 = new Vector3();
-
-			// triangle edge vectors
-
-			_f0 = new Vector3();
-			_f1 = new Vector3();
-			_f2 = new Vector3();
-
-			_center = new Vector3();
-			_extents = new Vector3();
-			_triangleNormal = new Vector3();
-
-		}
 
 		if ( this.isEmpty() ) {
 
@@ -474,8 +448,6 @@ Object.assign( Box3.prototype, {
 
 	distanceToPoint: function ( point ) {
 
-		if ( _vector === undefined ) _vector = new Vector3();
-
 		var clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
 
 		return clampedPoint.sub( point ).length();
@@ -483,8 +455,6 @@ Object.assign( Box3.prototype, {
 	},
 
 	getBoundingSphere: function ( target ) {
-
-		if ( _vector === undefined ) _vector = new Vector3();
 
 		if ( target === undefined ) {
 
@@ -524,21 +494,6 @@ Object.assign( Box3.prototype, {
 
 	applyMatrix4: function ( matrix ) {
 
-		if ( _points === undefined ) {
-
-			_points = [
-				new Vector3(),
-				new Vector3(),
-				new Vector3(),
-				new Vector3(),
-				new Vector3(),
-				new Vector3(),
-				new Vector3(),
-				new Vector3()
-			];
-
-		}
-
 		// transform of empty box is an empty box.
 		if ( this.isEmpty() ) return this;
 
@@ -575,11 +530,7 @@ Object.assign( Box3.prototype, {
 
 } );
 
-var _testAxis;
-
 function satForAxes( axes, v0, v1, v2, extents ) {
-
-	if ( _testAxis === undefined ) _testAxis = new Vector3();
 
 	var i, j;
 

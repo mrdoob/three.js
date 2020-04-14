@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org">Three.js</a> parallax mapping <br />
+			<a href="https://threejs.org">Three.js</a> parallax mapping <br />
 			Oryginal shaders authors:
 			<a href="http://sunandblackcat.com/tipFullView.php?topicid=28">Igor Dyhta</a>,
 			<a href="http://mmikkelsen3d.blogspot.sk/2012/02/parallaxpoc-mapping-and-no-tangent.html">Morten S. Mikkelsen</a><br />
@@ -82,13 +82,13 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 5;
 
 				//
 

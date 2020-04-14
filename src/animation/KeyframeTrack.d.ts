@@ -13,8 +13,8 @@ export class KeyframeTrack {
 	);
 
 	name: string;
-	times: any[];
-	values: any[];
+	times: Float32Array;
+	values: Float32Array;
 
 	ValueTypeName: string;
 	TimeBufferType: Float32Array;
@@ -26,18 +26,18 @@ export class KeyframeTrack {
 	InterpolantFactoryMethodLinear( result: any ): LinearInterpolant;
 	InterpolantFactoryMethodSmooth( result: any ): CubicInterpolant;
 
-	setInterpolation( interpolation: InterpolationModes ): void;
+	setInterpolation( interpolation: InterpolationModes ): KeyframeTrack;
 	getInterpolation(): InterpolationModes;
 
-	getValuesize(): number;
+	getValueSize(): number;
 
 	shift( timeOffset: number ): KeyframeTrack;
 	scale( timeScale: number ): KeyframeTrack;
 	trim( startTime: number, endTime: number ): KeyframeTrack;
 	validate(): boolean;
 	optimize(): KeyframeTrack;
+	clone(): KeyframeTrack;
 
-	static parse( json: any ): KeyframeTrack;
 	static toJSON( track: KeyframeTrack ): any;
 
 }

@@ -2,11 +2,11 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { Math as _Math } from '../../../../build/three.module.js';
+import { MathUtils } from '../../../../build/three.module.js';
 
 function Node( type ) {
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = "";
 
@@ -91,6 +91,12 @@ Node.prototype = {
 		}
 
 		return this.generate( builder, output, uuid );
+
+	},
+
+	generate: function ( /* builder, output, uuid, type, ns */ ) {
+
+		// This method needs to be implemented in subclasses
 
 	},
 

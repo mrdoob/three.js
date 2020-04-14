@@ -1132,8 +1132,7 @@
     }
 
     function testRegExp(pattern, flags) {
-        var tmp = pattern,
-            value;
+        var tmp = pattern;
 
         if (flags.indexOf('u') >= 0) {
             // Replace each astral symbol and every Unicode code point
@@ -1156,7 +1155,7 @@
 
         // First, detect invalid regular expressions.
         try {
-            value = new RegExp(tmp);
+            new RegExp(tmp);
         } catch (e) {
             throwError(Messages.InvalidRegExp);
         }
@@ -3567,7 +3566,7 @@
         if (type === Token.Punctuator) {
             switch (lookahead.value) {
             case ';':
-                return parseEmptyStatement(node);
+                return parseEmptyStatement();
             case '(':
                 return parseExpressionStatement(node);
             default:
@@ -3586,7 +3585,7 @@
             case 'for':
                 return parseForStatement(node);
             case 'function':
-                return parseFunctionDeclaration(node);
+                return parseFunctionDeclaration();
             case 'if':
                 return parseIfStatement(node);
             case 'return':

@@ -5,8 +5,25 @@ import { EventDispatcher } from './EventDispatcher.js';
 import { Euler } from '../math/Euler.js';
 import { Layers } from './Layers.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { _Math } from '../math/Math.js';
-import { TrianglesDrawMode } from '../constants.js';
+import { MathUtils } from '../math/MathUtils.js';
+
+var _object3DId = 0;
+
+var _v1 = new Vector3();
+var _q1 = new Quaternion();
+var _m1 = new Matrix4();
+var _target = new Vector3();
+
+var _position = new Vector3();
+var _scale = new Vector3();
+var _quaternion = new Quaternion();
+
+var _xAxis = new Vector3( 1, 0, 0 );
+var _yAxis = new Vector3( 0, 1, 0 );
+var _zAxis = new Vector3( 0, 0, 1 );
+
+var _addedEvent = { type: 'added' };
+var _removedEvent = { type: 'removed' };
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -16,18 +33,11 @@ import { TrianglesDrawMode } from '../constants.js';
  * @author elephantatwork / www.elephantatwork.ch
  */
 
-var _object3DId = 0;
-var _m1, _q1, _v1;
-var _xAxis, _yAxis, _zAxis;
-var _target, _position, _scale, _quaternion;
-var _addedEvent = { type: 'added' };
-var _removedEvent = { type: 'removed' };
-
 function Object3D() {
 
 	Object.defineProperty( this, 'id', { value: _object3DId ++ } );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.name = '';
 	this.type = 'Object3D';
@@ -117,7 +127,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	onBeforeRender: function () {},
 	onAfterRender: function () {},
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		if ( this.matrixAutoUpdate ) this.updateMatrix();
 
@@ -170,8 +180,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		// rotate object on axis in object space
 		// axis is assumed to be normalized
 
-		if ( _q1 === undefined ) _q1 = new Quaternion();
-
 		_q1.setFromAxisAngle( axis, angle );
 
 		this.quaternion.multiply( _q1 );
@@ -186,8 +194,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		// axis is assumed to be normalized
 		// method assumes no rotated parent
 
-		if ( _q1 === undefined ) _q1 = new Quaternion();
-
 		_q1.setFromAxisAngle( axis, angle );
 
 		this.quaternion.premultiply( _q1 );
@@ -198,23 +204,17 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	rotateX: function ( angle ) {
 
-		if ( _xAxis === undefined ) _xAxis = new Vector3( 1, 0, 0 );
-
 		return this.rotateOnAxis( _xAxis, angle );
 
 	},
 
 	rotateY: function ( angle ) {
 
-		if ( _yAxis === undefined ) _yAxis = new Vector3( 0, 1, 0 );
-
 		return this.rotateOnAxis( _yAxis, angle );
 
 	},
 
 	rotateZ: function ( angle ) {
-
-		if ( _zAxis === undefined ) _zAxis = new Vector3( 0, 0, 1 );
 
 		return this.rotateOnAxis( _zAxis, angle );
 
@@ -224,8 +224,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// translate object by distance along axis in object space
 		// axis is assumed to be normalized
-
-		if ( _v1 === undefined ) _v1 = new Vector3();
 
 		_v1.copy( axis ).applyQuaternion( this.quaternion );
 
@@ -237,23 +235,17 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	translateX: function ( distance ) {
 
-		if ( _xAxis === undefined ) _xAxis = new Vector3( 1, 0, 0 );
-
 		return this.translateOnAxis( _xAxis, distance );
 
 	},
 
 	translateY: function ( distance ) {
 
-		if ( _yAxis === undefined ) _yAxis = new Vector3( 0, 1, 0 );
-
 		return this.translateOnAxis( _yAxis, distance );
 
 	},
 
 	translateZ: function ( distance ) {
-
-		if ( _zAxis === undefined ) _zAxis = new Vector3( 0, 0, 1 );
 
 		return this.translateOnAxis( _zAxis, distance );
 
@@ -267,8 +259,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	worldToLocal: function ( vector ) {
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		return vector.applyMatrix4( _m1.getInverse( this.matrixWorld ) );
 
 	},
@@ -276,15 +266,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	lookAt: function ( x, y, z ) {
 
 		// This method does not support objects having non-uniformly-scaled parent(s)
-
-		if ( _target === undefined ) {
-
-			_q1 = new Quaternion();
-			_m1 = new Matrix4();
-			_target = new Vector3();
-			_position = new Vector3();
-
-		}
 
 		if ( x.isVector3 ) {
 
@@ -401,8 +382,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// adds object as a child of this, while maintaining the object's world transform
 
-		if ( _m1 === undefined ) _m1 = new Matrix4();
-
 		this.updateWorldMatrix( true, false );
 
 		_m1.getInverse( this.matrixWorld );
@@ -415,7 +394,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		object.applyMatrix( _m1 );
+		object.applyMatrix4( _m1 );
 
 		object.updateWorldMatrix( false, false );
 
@@ -475,13 +454,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	getWorldQuaternion: function ( target ) {
 
-		if ( _scale === undefined ) {
-
-			_position = new Vector3();
-			_scale = new Vector3();
-
-		}
-
 		if ( target === undefined ) {
 
 			console.warn( 'THREE.Object3D: .getWorldQuaternion() target is now required' );
@@ -498,13 +470,6 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	},
 
 	getWorldScale: function ( target ) {
-
-		if ( _quaternion === undefined ) {
-
-			_position = new Vector3();
-			_quaternion = new Quaternion();
-
-		}
 
 		if ( target === undefined ) {
 
@@ -715,7 +680,13 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		// object specific properties
 
-		if ( this.isMesh && this.drawMode !== TrianglesDrawMode ) object.drawMode = this.drawMode;
+		if ( this.isInstancedMesh ) {
+
+			object.type = 'InstancedMesh';
+			object.count = this.count;
+			object.instanceMatrix = this.instanceMatrix.toJSON();
+
+		}
 
 		//
 

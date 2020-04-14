@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - typed arrays<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - typed arrays<br/>
 			nearest neighbour for 500,000 sprites
 		</div>
 
@@ -72,17 +72,10 @@
 
 				scene = new THREE.Scene();
 
-				controls = new FirstPersonControls( camera );
-				controls.movementSpeed = 100;
-				controls.lookSpeed = 0.1;
-
-				controls.lookAt( 500, 500, 500 );
-
-
 				// add a skybox background
 				var cubeTextureLoader = new THREE.CubeTextureLoader();
 
-				cubeTextureLoader.setPath( 'textures/cube/skybox/' );
+				cubeTextureLoader.setPath( 'textures/cube/skyboxsun25deg/' );
 
 				var cubeTexture = cubeTextureLoader.load( [
 					'px.jpg', 'nx.jpg',
@@ -98,6 +91,12 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				controls = new FirstPersonControls( camera, renderer.domElement );
+				controls.movementSpeed = 100;
+				controls.lookSpeed = 0.1;
+
+				controls.lookAt( 500, 500, 500 );
 
 				// create the custom shader
 
@@ -130,8 +129,8 @@
 				alphas = new Float32Array( amountOfParticles );
 
 				_particleGeom = new THREE.BufferGeometry();
-				_particleGeom.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				_particleGeom.addAttribute( 'alpha', new THREE.BufferAttribute( alphas, 1 ) );
+				_particleGeom.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
+				_particleGeom.setAttribute( 'alpha', new THREE.BufferAttribute( alphas, 1 ) );
 
 				particles = new THREE.Points( _particleGeom, pointShaderMaterial );
 
@@ -194,7 +193,7 @@
 				var _projScreenMatrix = new THREE.Matrix4();
 
 				_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-				_frustum.setFromMatrix( _projScreenMatrix );
+				_frustum.setFromProjectionMatrix( _projScreenMatrix );
 
 				for ( var i = 0, il = imagePositionsInRange.length; i < il; i ++ ) {
 

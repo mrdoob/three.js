@@ -1,5 +1,13 @@
 import { Vector3 } from './Vector3.js';
 
+var _v1 = new Vector3();
+var _m1 = new Matrix4();
+var _zero = new Vector3( 0, 0, 0 );
+var _one = new Vector3( 1, 1, 1 );
+var _x = new Vector3();
+var _y = new Vector3();
+var _z = new Vector3();
+
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -12,10 +20,6 @@ import { Vector3 } from './Vector3.js';
  * @author bhouston / http://clara.io
  * @author WestLangley / http://github.com/WestLangley
  */
-
-var _v1, _m1;
-var _zero, _one;
-var _x, _y, _z;
 
 function Matrix4() {
 
@@ -124,8 +128,6 @@ Object.assign( Matrix4.prototype, {
 	},
 
 	extractRotation: function ( m ) {
-
-		if ( _v1 === undefined ) _v1 = new Vector3();
 
 		// this method does not support reflection matrices
 
@@ -290,26 +292,11 @@ Object.assign( Matrix4.prototype, {
 
 	makeRotationFromQuaternion: function ( q ) {
 
-		if ( _zero === undefined ) {
-
-			_zero = new Vector3( 0, 0, 0 );
-			_one = new Vector3( 1, 1, 1 );
-
-		}
-
 		return this.compose( _zero, q, _one );
 
 	},
 
 	lookAt: function ( eye, target, up ) {
-
-		if ( _x === undefined ) {
-
-			_x = new Vector3();
-			_y = new Vector3();
-			_z = new Vector3();
-
-		}
 
 		var te = this.elements;
 
@@ -428,26 +415,6 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
-	applyToBufferAttribute: function ( attribute ) {
-
-		if ( _v1 === undefined ) _v1 = new Vector3();
-
-		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
-
-			_v1.x = attribute.getX( i );
-			_v1.y = attribute.getY( i );
-			_v1.z = attribute.getZ( i );
-
-			_v1.applyMatrix4( this );
-
-			attribute.setXYZ( i, _v1.x, _v1.y, _v1.z );
-
-		}
-
-		return attribute;
-
-	},
-
 	determinant: function () {
 
 		var te = this.elements;
@@ -539,6 +506,12 @@ Object.assign( Matrix4.prototype, {
 
 	getInverse: function ( m, throwOnDegenerate ) {
 
+		if ( throwOnDegenerate !== undefined ) {
+
+			console.warn( "THREE.Matrix4: .getInverse() can no longer be configured to throw on degenerate." );
+
+		}
+
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 		var te = this.elements,
 			me = m.elements,
@@ -555,23 +528,7 @@ Object.assign( Matrix4.prototype, {
 
 		var det = n11 * t11 + n21 * t12 + n31 * t13 + n41 * t14;
 
-		if ( det === 0 ) {
-
-			var msg = "THREE.Matrix4: .getInverse() can't invert matrix, determinant is 0";
-
-			if ( throwOnDegenerate === true ) {
-
-				throw new Error( msg );
-
-			} else {
-
-				console.warn( msg );
-
-			}
-
-			return this.identity();
-
-		}
+		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 		var detInv = 1 / det;
 
@@ -781,13 +738,6 @@ Object.assign( Matrix4.prototype, {
 	},
 
 	decompose: function ( position, quaternion, scale ) {
-
-		if ( _m1 === undefined ) {
-
-			_m1 = new Matrix4();
-			_v1 = new Vector3();
-
-		}
 
 		var te = this.elements;
 

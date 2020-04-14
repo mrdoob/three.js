@@ -8,7 +8,6 @@
 
 import { LineSegments } from '../objects/LineSegments.js';
 import { Matrix4 } from '../math/Matrix4.js';
-import { VertexColors } from '../constants.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Color } from '../math/Color.js';
 import { Vector3 } from '../math/Vector3.js';
@@ -16,7 +15,9 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Object3D } from '../core/Object3D.js';
 
-var _vector, _boneMatrix, _matrixWorldInv;
+var _vector = new Vector3();
+var _boneMatrix = new Matrix4();
+var _matrixWorldInv = new Matrix4();
 
 function getBoneList( object ) {
 
@@ -65,12 +66,14 @@ function SkeletonHelper( object ) {
 
 	}
 
-	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-	var material = new LineBasicMaterial( { vertexColors: VertexColors, depthTest: false, depthWrite: false, transparent: true } );
+	var material = new LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false, toneMapped: false, transparent: true } );
 
 	LineSegments.call( this, geometry, material );
+
+	this.type = 'SkeletonHelper';
 
 	this.root = object;
 	this.bones = bones;
@@ -83,15 +86,9 @@ function SkeletonHelper( object ) {
 SkeletonHelper.prototype = Object.create( LineSegments.prototype );
 SkeletonHelper.prototype.constructor = SkeletonHelper;
 
+SkeletonHelper.prototype.isSkeletonHelper = true;
+
 SkeletonHelper.prototype.updateMatrixWorld = function ( force ) {
-
-	if ( _matrixWorldInv === undefined ) {
-
-		_vector = new Vector3();
-		_boneMatrix = new Matrix4();
-		_matrixWorldInv = new Matrix4();
-
-	}
 
 	var bones = this.bones;
 

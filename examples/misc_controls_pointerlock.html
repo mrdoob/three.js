@@ -96,7 +96,7 @@
 				light.position.set( 0.5, 1, 0.75 );
 				scene.add( light );
 
-				controls = new PointerLockControls( camera );
+				controls = new PointerLockControls( camera, document.body );
 
 				var blocker = document.getElementById( 'blocker' );
 				var instructions = document.getElementById( 'instructions' );
@@ -222,9 +222,9 @@
 
 				}
 
-				floorGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
 				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				scene.add( floor );
@@ -244,11 +244,11 @@
 
 				}
 
-				boxGeometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				boxGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				for ( var i = 0; i < 500; i ++ ) {
 
-					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: true } );
 					boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 
 					var box = new THREE.Mesh( boxGeometry, boxMaterial );
@@ -305,7 +305,7 @@
 					velocity.y -= 9.8 * 100.0 * delta; // 100.0 = mass
 
 					direction.z = Number( moveForward ) - Number( moveBackward );
-					direction.x = Number( moveLeft ) - Number( moveRight );
+					direction.x = Number( moveRight ) - Number( moveLeft );
 					direction.normalize(); // this ensures consistent movements in all directions
 
 					if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
@@ -317,9 +317,11 @@
 						canJump = true;
 
 					}
-					controls.getObject().translateX( velocity.x * delta );
+
+					controls.moveRight( - velocity.x * delta );
+					controls.moveForward( - velocity.z * delta );
+
 					controls.getObject().position.y += ( velocity.y * delta ); // new behavior
-					controls.getObject().translateZ( velocity.z * delta );
 
 					if ( controls.getObject().position.y < 10 ) {
 

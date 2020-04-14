@@ -1,16 +1,16 @@
 export default /* glsl */`
 #ifdef USE_CLEARCOAT_NORMALMAP
 
+	vec3 clearcoatMapN = texture2D( clearcoatNormalMap, vUv ).xyz * 2.0 - 1.0;
+	clearcoatMapN.xy *= clearcoatNormalScale;
+
 	#ifdef USE_TANGENT
 
-		mat3 vTBN = mat3( tangent, bitangent, clearCoatNormal );
-		vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
-		mapN.xy = clearCoatNormalScale * mapN.xy;
-		clearCoatNormal = normalize( vTBN * mapN );
+		clearcoatNormal = normalize( vTBN * clearcoatMapN );
 
 	#else
 
-		clearCoatNormal = perturbNormal2Arb( - vViewPosition, clearCoatNormal, clearCoatNormalScale, clearCoatNormalMap );
+		clearcoatNormal = perturbNormal2Arb( - vViewPosition, clearcoatNormal, clearcoatMapN );
 
 	#endif
 

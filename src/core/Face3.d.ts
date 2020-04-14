@@ -1,12 +1,6 @@
 import { Vector3 } from './../math/Vector3';
 import { Color } from './../math/Color';
 
-export interface Event {
-	type: string;
-	target?: any;
-	[attachment: string]: any;
-}
-
 /**
  * Triangle face.
  *

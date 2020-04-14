@@ -11,13 +11,12 @@ import {
 	Color,
 	FrontSide,
 	LinearFilter,
-	Math as _Math,
+	MathUtils,
 	Matrix4,
 	Mesh,
 	PerspectiveCamera,
 	Plane,
 	RGBFormat,
-	ShaderChunk,
 	ShaderMaterial,
 	UniformsLib,
 	UniformsUtils,
@@ -76,7 +75,7 @@ var Water = function ( geometry, options ) {
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	if ( ! _Math.isPowerOfTwo( textureWidth ) || ! _Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! MathUtils.isPowerOfTwo( textureWidth ) || ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		renderTarget.texture.generateMipmaps = false;
 
@@ -109,8 +108,10 @@ var Water = function ( geometry, options ) {
 			'varying vec4 mirrorCoord;',
 			'varying vec4 worldPosition;',
 
-			ShaderChunk[ 'fog_pars_vertex' ],
-			ShaderChunk[ 'shadowmap_pars_vertex' ],
+		 	'#include <common>',
+		 	'#include <fog_pars_vertex>',
+			'#include <shadowmap_pars_vertex>',
+			'#include <logdepthbuf_pars_vertex>',
 
 			'void main() {',
 			'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
@@ -119,9 +120,9 @@ var Water = function ( geometry, options ) {
 			'	vec4 mvPosition =  modelViewMatrix * vec4( position, 1.0 );',
 			'	gl_Position = projectionMatrix * mvPosition;',
 
-			ShaderChunk[ 'fog_vertex' ],
-			ShaderChunk[ 'shadowmap_vertex' ],
-
+			'#include <logdepthbuf_vertex>',
+			'#include <fog_vertex>',
+			'#include <shadowmap_vertex>',
 			'}'
 		].join( '\n' ),
 
@@ -159,15 +160,18 @@ var Water = function ( geometry, options ) {
 			'	diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;',
 			'}',
 
-			ShaderChunk[ 'common' ],
-			ShaderChunk[ 'packing' ],
-			ShaderChunk[ 'bsdfs' ],
-			ShaderChunk[ 'fog_pars_fragment' ],
-			ShaderChunk[ 'lights_pars_begin' ],
-			ShaderChunk[ 'shadowmap_pars_fragment' ],
-			ShaderChunk[ 'shadowmask_pars_fragment' ],
+			'#include <common>',
+			'#include <packing>',
+			'#include <bsdfs>',
+			'#include <fog_pars_fragment>',
+			'#include <logdepthbuf_pars_fragment>',
+			'#include <lights_pars_begin>',
+			'#include <shadowmap_pars_fragment>',
+			'#include <shadowmask_pars_fragment>',
 
 			'void main() {',
+
+			'#include <logdepthbuf_fragment>',
 			'	vec4 noise = getNoise( worldPosition.xz * size );',
 			'	vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',
 
@@ -191,9 +195,8 @@ var Water = function ( geometry, options ) {
 			'	vec3 outgoingLight = albedo;',
 			'	gl_FragColor = vec4( outgoingLight, alpha );',
 
-			ShaderChunk[ 'tonemapping_fragment' ],
-			ShaderChunk[ 'fog_fragment' ],
-
+			'#include <tonemapping_fragment>',
+			'#include <fog_fragment>',
 			'}'
 		].join( '\n' )
 
@@ -203,7 +206,6 @@ var Water = function ( geometry, options ) {
 		fragmentShader: mirrorShader.fragmentShader,
 		vertexShader: mirrorShader.vertexShader,
 		uniforms: UniformsUtils.clone( mirrorShader.uniforms ),
-		transparent: true,
 		lights: true,
 		side: side,
 		fog: fog
@@ -302,24 +304,37 @@ var Water = function ( geometry, options ) {
 
 		var currentRenderTarget = renderer.getRenderTarget();
 
-		var currentVrEnabled = renderer.vr.enabled;
+		var currentXrEnabled = renderer.xr.enabled;
 		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
 		scope.visible = false;
 
-		renderer.vr.enabled = false; // Avoid camera modification and recursion
+		renderer.xr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+
+		renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
+
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, mirrorCamera );
 
 		scope.visible = true;
 
-		renderer.vr.enabled = currentVrEnabled;
+		renderer.xr.enabled = currentXrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
 		renderer.setRenderTarget( currentRenderTarget );
+
+		// Restore viewport
+
+		var viewport = camera.viewport;
+
+		if ( viewport !== undefined ) {
+
+			renderer.state.viewport( viewport );
+
+		}
 
 	};
 

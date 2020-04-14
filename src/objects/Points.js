@@ -10,7 +10,10 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
-var _inverseMatrix, _ray, _sphere, _position;
+var _inverseMatrix = new Matrix4();
+var _ray = new Ray();
+var _sphere = new Sphere();
+var _position = new Vector3();
 
 function Points( geometry, material ) {
 
@@ -19,7 +22,7 @@ function Points( geometry, material ) {
 	this.type = 'Points';
 
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new PointsMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new PointsMaterial();
 
 	this.updateMorphTargets();
 
@@ -32,15 +35,6 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	isPoints: true,
 
 	raycast: function ( raycaster, intersects ) {
-
-		if ( _sphere === undefined ) {
-
-			_inverseMatrix = new Matrix4();
-			_ray = new Ray();
-			_sphere = new Sphere();
-			_position = new Vector3();
-
-		}
 
 		var geometry = this.geometry;
 		var matrixWorld = this.matrixWorld;

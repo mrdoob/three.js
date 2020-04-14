@@ -24,7 +24,7 @@ import { Mesh } from '../objects/Mesh.js';
 import { Line } from '../objects/Line.js';
 import { Vector3 } from '../math/Vector3.js';
 
-var _axis;
+var _axis = new Vector3();
 var _lineGeometry, _coneGeometry;
 
 function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
@@ -32,6 +32,8 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 	// dir is assumed to be normalized
 
 	Object3D.call( this );
+
+	this.type = 'ArrowHelper';
 
 	if ( dir === undefined ) dir = new Vector3( 0, 0, 1 );
 	if ( origin === undefined ) origin = new Vector3( 0, 0, 0 );
@@ -43,7 +45,7 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 	if ( _lineGeometry === undefined ) {
 
 		_lineGeometry = new BufferGeometry();
-		_lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+		_lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
 		_coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
 		_coneGeometry.translate( 0, - 0.5, 0 );
@@ -52,11 +54,11 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 	this.position.copy( origin );
 
-	this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color } ) );
+	this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
-	this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color } ) );
+	this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color, toneMapped: false } ) );
 	this.cone.matrixAutoUpdate = false;
 	this.add( this.cone );
 
@@ -69,8 +71,6 @@ ArrowHelper.prototype = Object.create( Object3D.prototype );
 ArrowHelper.prototype.constructor = ArrowHelper;
 
 ArrowHelper.prototype.setDirection = function ( dir ) {
-
-	if ( _axis === undefined ) _axis = new Vector3();
 
 	// dir is assumed to be normalized
 
@@ -99,7 +99,7 @@ ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	this.line.scale.set( 1, Math.max( 0, length - headLength ), 1 );
+	this.line.scale.set( 1, Math.max( 0.0001, length - headLength ), 1 ); // see #17458
 	this.line.updateMatrix();
 
 	this.cone.scale.set( headWidth, headLength, headWidth );

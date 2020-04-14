@@ -43,7 +43,7 @@
 
 				// camera
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
 				camera.position.set( - 15, 7, 15 );
 				camera.lookAt( scene.position );
 
@@ -100,12 +100,12 @@
 				// skybox
 
 				var cubeTextureLoader = new THREE.CubeTextureLoader();
-				cubeTextureLoader.setPath( 'textures/cube/skybox/' );
+				cubeTextureLoader.setPath( 'textures/cube/Park2/' );
 
 				var cubeTexture = cubeTextureLoader.load( [
-					'px.jpg', 'nx.jpg',
-					'py.jpg', 'ny.jpg',
-					'pz.jpg', 'nz.jpg',
+					"posx.jpg", "negx.jpg",
+					"posy.jpg", "negy.jpg",
+					"posz.jpg", "negz.jpg"
 				] );
 
 				scene.background = cubeTexture;
@@ -158,6 +158,8 @@
 				//
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 50;
 
 				//
 

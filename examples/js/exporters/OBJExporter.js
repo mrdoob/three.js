@@ -66,7 +66,7 @@ THREE.OBJExporter.prototype = {
 						vertex.y = vertices.getY( i );
 						vertex.z = vertices.getZ( i );
 
-						// transfrom the vertex to world space
+						// transform the vertex to world space
 						vertex.applyMatrix4( mesh.matrixWorld );
 
 						// transform the vertex to export format
@@ -104,8 +104,8 @@ THREE.OBJExporter.prototype = {
 						normal.y = normals.getY( i );
 						normal.z = normals.getZ( i );
 
-						// transfrom the normal to world space
-						normal.applyMatrix3( normalMatrixWorld );
+						// transform the normal to world space
+						normal.applyMatrix3( normalMatrixWorld ).normalize();
 
 						// transform the normal to export format
 						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
@@ -194,7 +194,7 @@ THREE.OBJExporter.prototype = {
 						vertex.y = vertices.getY( i );
 						vertex.z = vertices.getZ( i );
 
-						// transfrom the vertex to world space
+						// transform the vertex to world space
 						vertex.applyMatrix4( line.matrixWorld );
 
 						// transform the vertex to export format

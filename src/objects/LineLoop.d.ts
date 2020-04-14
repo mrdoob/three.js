@@ -11,6 +11,6 @@ export class LineLoop extends Line {
 	);
 
 	type: 'LineLoop';
-	isLineLoop: true;
+	readonly isLineLoop: true;
 
 }

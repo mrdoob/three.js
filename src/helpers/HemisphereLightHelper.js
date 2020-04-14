@@ -8,12 +8,13 @@ import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Mesh } from '../objects/Mesh.js';
-import { VertexColors } from '../constants.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
-var _vector, _color1, _color2;
+var _vector = new Vector3();
+var _color1 = new Color();
+var _color2 = new Color();
 
 function HemisphereLightHelper( light, size, color ) {
 
@@ -30,13 +31,13 @@ function HemisphereLightHelper( light, size, color ) {
 	var geometry = new OctahedronBufferGeometry( size );
 	geometry.rotateY( Math.PI * 0.5 );
 
-	this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
-	if ( this.color === undefined ) this.material.vertexColors = VertexColors;
+	this.material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
+	if ( this.color === undefined ) this.material.vertexColors = true;
 
 	var position = geometry.getAttribute( 'position' );
 	var colors = new Float32Array( position.count * 3 );
 
-	geometry.addAttribute( 'color', new BufferAttribute( colors, 3 ) );
+	geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 
 	this.add( new Mesh( geometry, this.material ) );
 
@@ -55,14 +56,6 @@ HemisphereLightHelper.prototype.dispose = function () {
 };
 
 HemisphereLightHelper.prototype.update = function () {
-
-	if ( _color2 === undefined ) {
-
-		_vector = new Vector3();
-		_color1 = new Color();
-		_color2 = new Color();
-
-	}
 
 	var mesh = this.children[ 0 ];
 

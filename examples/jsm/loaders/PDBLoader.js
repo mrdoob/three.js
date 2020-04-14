@@ -5,18 +5,18 @@
 
 import {
 	BufferGeometry,
-	DefaultLoadingManager,
 	FileLoader,
-	Float32BufferAttribute
+	Float32BufferAttribute,
+	Loader
 } from "../../../build/three.module.js";
 
 var PDBLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 };
 
-PDBLoader.prototype = {
+PDBLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: PDBLoader,
 
@@ -31,13 +31,6 @@ PDBLoader.prototype = {
 			onLoad( scope.parse( text ) );
 
 		}, onProgress, onError );
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	},
 
@@ -150,10 +143,10 @@ PDBLoader.prototype = {
 
 			// build geometry
 
-			geometryAtoms.addAttribute( 'position', new Float32BufferAttribute( verticesAtoms, 3 ) );
-			geometryAtoms.addAttribute( 'color', new Float32BufferAttribute( colorsAtoms, 3 ) );
+			geometryAtoms.setAttribute( 'position', new Float32BufferAttribute( verticesAtoms, 3 ) );
+			geometryAtoms.setAttribute( 'color', new Float32BufferAttribute( colorsAtoms, 3 ) );
 
-			geometryBonds.addAttribute( 'position', new Float32BufferAttribute( verticesBonds, 3 ) );
+			geometryBonds.setAttribute( 'position', new Float32BufferAttribute( verticesBonds, 3 ) );
 
 			return build;
 
@@ -221,6 +214,6 @@ PDBLoader.prototype = {
 
 	}
 
-};
+} );
 
 export { PDBLoader };

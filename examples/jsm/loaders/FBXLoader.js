@@ -26,7 +26,6 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
-	DefaultLoadingManager,
 	DirectionalLight,
 	EquirectangularReflectionMapping,
 	Euler,
@@ -37,7 +36,7 @@ import {
 	LineBasicMaterial,
 	Loader,
 	LoaderUtils,
-	Math as _Math,
+	MathUtils,
 	Matrix3,
 	Matrix4,
 	Mesh,
@@ -61,7 +60,6 @@ import {
 	Vector3,
 	Vector4,
 	VectorKeyframeTrack,
-	VertexColors,
 	sRGBEncoding
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.module.min.js";
@@ -76,31 +74,29 @@ var FBXLoader = ( function () {
 
 	function FBXLoader( manager ) {
 
-		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+		Loader.call( this, manager );
 
 	}
 
-	FBXLoader.prototype = {
+	FBXLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		constructor: FBXLoader,
 
-		crossOrigin: 'anonymous',
-
 		load: function ( url, onLoad, onProgress, onError ) {
 
-			var self = this;
+			var scope = this;
 
-			var path = ( self.path === undefined ) ? LoaderUtils.extractUrlBase( url ) : self.path;
+			var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
 			var loader = new FileLoader( this.manager );
-			loader.setPath( self.path );
+			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 
 			loader.load( url, function ( buffer ) {
 
 				try {
 
-					onLoad( self.parse( buffer, path ) );
+					onLoad( scope.parse( buffer, path ) );
 
 				} catch ( error ) {
 
@@ -108,34 +104,13 @@ var FBXLoader = ( function () {
 
 						if ( onError ) onError( error );
 
-						self.manager.itemError( url );
+						scope.manager.itemError( url );
 
 					}, 0 );
 
 				}
 
 			}, onProgress, onError );
-
-		},
-
-		setPath: function ( value ) {
-
-			this.path = value;
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.resourcePath = value;
-			return this;
-
-		},
-
-		setCrossOrigin: function ( value ) {
-
-			this.crossOrigin = value;
-			return this;
 
 		},
 
@@ -169,16 +144,17 @@ var FBXLoader = ( function () {
 
 			var textureLoader = new TextureLoader( this.manager ).setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-			return new FBXTreeParser( textureLoader ).parse( fbxTree );
+			return new FBXTreeParser( textureLoader, this.manager ).parse( fbxTree );
 
 		}
 
-	};
+	} );
 
 	// Parse the FBXTree object returned by the BinaryParser or TextParser and return a Group
-	function FBXTreeParser( textureLoader ) {
+	function FBXTreeParser( textureLoader, manager ) {
 
 		this.textureLoader = textureLoader;
+		this.manager = manager;
 
 	}
 
@@ -337,7 +313,7 @@ var FBXLoader = ( function () {
 
 				case 'tga':
 
-					if ( Loader.Handlers.get( '.tga' ) === null ) {
+					if ( this.manager.getHandler( '.tga' ) === null ) {
 
 						console.warn( 'FBXLoader: TGA loader not found, skipping ', fileName );
 
@@ -450,7 +426,7 @@ var FBXLoader = ( function () {
 
 			if ( extension === 'tga' ) {
 
-				var loader = Loader.Handlers.get( '.tga' );
+				var loader = this.manager.getHandler( '.tga' );
 
 				if ( loader === null ) {
 
@@ -628,7 +604,7 @@ var FBXLoader = ( function () {
 
 			}
 
-			var self = this;
+			var scope = this;
 			connections.get( ID ).children.forEach( function ( child ) {
 
 				var type = child.relationship;
@@ -636,47 +612,47 @@ var FBXLoader = ( function () {
 				switch ( type ) {
 
 					case 'Bump':
-						parameters.bumpMap = self.getTexture( textureMap, child.ID );
+						parameters.bumpMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'Maya|TEX_ao_map':
-						parameters.aoMap = self.getTexture( textureMap, child.ID );
+						parameters.aoMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'DiffuseColor':
 					case 'Maya|TEX_color_map':
-						parameters.map = self.getTexture( textureMap, child.ID );
+						parameters.map = scope.getTexture( textureMap, child.ID );
 						parameters.map.encoding = sRGBEncoding;
 						break;
 
 					case 'DisplacementColor':
-						parameters.displacementMap = self.getTexture( textureMap, child.ID );
+						parameters.displacementMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'EmissiveColor':
-						parameters.emissiveMap = self.getTexture( textureMap, child.ID );
+						parameters.emissiveMap = scope.getTexture( textureMap, child.ID );
 						parameters.emissiveMap.encoding = sRGBEncoding;
 						break;
 
 					case 'NormalMap':
 					case 'Maya|TEX_normal_map':
-						parameters.normalMap = self.getTexture( textureMap, child.ID );
+						parameters.normalMap = scope.getTexture( textureMap, child.ID );
 						break;
 
 					case 'ReflectionColor':
-						parameters.envMap = self.getTexture( textureMap, child.ID );
+						parameters.envMap = scope.getTexture( textureMap, child.ID );
 						parameters.envMap.mapping = EquirectangularReflectionMapping;
 						parameters.envMap.encoding = sRGBEncoding;
 						break;
 
 					case 'SpecularColor':
-						parameters.specularMap = self.getTexture( textureMap, child.ID );
+						parameters.specularMap = scope.getTexture( textureMap, child.ID );
 						parameters.specularMap.encoding = sRGBEncoding;
 						break;
 
 					case 'TransparentColor':
 					case 'TransparencyFactor':
-						parameters.alphaMap = self.getTexture( textureMap, child.ID );
+						parameters.alphaMap = scope.getTexture( textureMap, child.ID );
 						parameters.transparent = true;
 						break;
 
@@ -856,11 +832,11 @@ var FBXLoader = ( function () {
 
 			var modelNodes = fbxTree.Objects.Model;
 
-			var self = this;
+			var scope = this;
 			modelMap.forEach( function ( model ) {
 
 				var modelNode = modelNodes[ model.ID ];
-				self.setLookAtProperties( model, modelNode );
+				scope.setLookAtProperties( model, modelNode );
 
 				var parentConnections = connections.get( model.ID ).parents;
 
@@ -894,7 +870,7 @@ var FBXLoader = ( function () {
 
 					var transform = generateTransform( node.userData.transformData );
 
-					node.applyMatrix( transform );
+					node.applyMatrix4( transform );
 
 				}
 
@@ -955,7 +931,8 @@ var FBXLoader = ( function () {
 
 					}
 
-					model.name = PropertyBinding.sanitizeNodeName( node.attrName );
+					model.name = node.attrName ? PropertyBinding.sanitizeNodeName( node.attrName ) : '';
+
 					model.ID = id;
 
 				}
@@ -989,7 +966,8 @@ var FBXLoader = ( function () {
 							bone.matrixWorld.copy( rawBone.transformLink );
 
 							// set name and id here - otherwise in cases where "subBone" is created it will not have a name / id
-							bone.name = PropertyBinding.sanitizeNodeName( name );
+
+							bone.name = name ? PropertyBinding.sanitizeNodeName( name ) : '';
 							bone.ID = id;
 
 							skeleton.bones[ i ] = bone;
@@ -1192,7 +1170,7 @@ var FBXLoader = ( function () {
 
 						if ( lightAttribute.InnerAngle !== undefined ) {
 
-							angle = _Math.degToRad( lightAttribute.InnerAngle.value );
+							angle = MathUtils.degToRad( lightAttribute.InnerAngle.value );
 
 						}
 
@@ -1202,7 +1180,7 @@ var FBXLoader = ( function () {
 							// TODO: this is not correct - FBX calculates outer and inner angle in degrees
 							// with OuterAngle > InnerAngle && OuterAngle <= Math.PI
 							// while three.js uses a penumbra between (0, 1) to attenuate the inner angle
-							penumbra = _Math.degToRad( lightAttribute.OuterAngle.value );
+							penumbra = MathUtils.degToRad( lightAttribute.OuterAngle.value );
 							penumbra = Math.max( penumbra, 1 );
 
 						}
@@ -1272,7 +1250,7 @@ var FBXLoader = ( function () {
 
 				materials.forEach( function ( material ) {
 
-					material.vertexColors = VertexColors;
+					material.vertexColors = true;
 
 				} );
 
@@ -1479,7 +1457,7 @@ var FBXLoader = ( function () {
 
 		setupMorphMaterials: function () {
 
-			var self = this;
+			var scope = this;
 			sceneGraph.traverse( function ( child ) {
 
 				if ( child.isMesh ) {
@@ -1490,13 +1468,13 @@ var FBXLoader = ( function () {
 
 							child.material.forEach( function ( material, i ) {
 
-								self.setupMorphMaterial( child, material, i );
+								scope.setupMorphMaterial( child, material, i );
 
 							} );
 
 						} else {
 
-							self.setupMorphMaterial( child, child.material );
+							scope.setupMorphMaterial( child, child.material );
 
 						}
 
@@ -1601,7 +1579,7 @@ var FBXLoader = ( function () {
 		parseMeshGeometry: function ( relationships, geoNode, deformers ) {
 
 			var skeletons = deformers.skeletons;
-			var morphTargets = deformers.morphTargets;
+			var morphTargets = [];
 
 			var modelNodes = relationships.parents.map( function ( parent ) {
 
@@ -1620,13 +1598,15 @@ var FBXLoader = ( function () {
 
 			}, null );
 
-			var morphTarget = relationships.children.reduce( function ( morphTarget, child ) {
+			relationships.children.forEach( function ( child ) {
 
-				if ( morphTargets[ child.ID ] !== undefined ) morphTarget = morphTargets[ child.ID ];
+				if ( deformers.morphTargets[ child.ID ] !== undefined ) {
 
-				return morphTarget;
+					morphTargets.push( deformers.morphTargets[ child.ID ] );
 
-			}, null );
+				}
+
+			} );
 
 			// Assume one model and get the preRotation from that
 			// if there is more than one model associated with the geometry this may cause problems
@@ -1643,12 +1623,12 @@ var FBXLoader = ( function () {
 
 			var transform = generateTransform( transformData );
 
-			return this.genGeometry( geoNode, skeleton, morphTarget, transform );
+			return this.genGeometry( geoNode, skeleton, morphTargets, transform );
 
 		},
 
 		// Generate a BufferGeometry from a node in FBXTree.Objects.Geometry
-		genGeometry: function ( geoNode, skeleton, morphTarget, preTransform ) {
+		genGeometry: function ( geoNode, skeleton, morphTargets, preTransform ) {
 
 			var geo = new BufferGeometry();
 			if ( geoNode.attrName ) geo.name = geoNode.attrName;
@@ -1658,21 +1638,21 @@ var FBXLoader = ( function () {
 
 			var positionAttribute = new Float32BufferAttribute( buffers.vertex, 3 );
 
-			preTransform.applyToBufferAttribute( positionAttribute );
+			positionAttribute.applyMatrix4( preTransform );
 
-			geo.addAttribute( 'position', positionAttribute );
+			geo.setAttribute( 'position', positionAttribute );
 
 			if ( buffers.colors.length > 0 ) {
 
-				geo.addAttribute( 'color', new Float32BufferAttribute( buffers.colors, 3 ) );
+				geo.setAttribute( 'color', new Float32BufferAttribute( buffers.colors, 3 ) );
 
 			}
 
 			if ( skeleton ) {
 
-				geo.addAttribute( 'skinIndex', new Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
+				geo.setAttribute( 'skinIndex', new Uint16BufferAttribute( buffers.weightsIndices, 4 ) );
 
-				geo.addAttribute( 'skinWeight', new Float32BufferAttribute( buffers.vertexWeights, 4 ) );
+				geo.setAttribute( 'skinWeight', new Float32BufferAttribute( buffers.vertexWeights, 4 ) );
 
 				// used later to bind the skeleton to the model
 				geo.FBX_Deformer = skeleton;
@@ -1681,12 +1661,12 @@ var FBXLoader = ( function () {
 
 			if ( buffers.normal.length > 0 ) {
 
-				var normalAttribute = new Float32BufferAttribute( buffers.normal, 3 );
-
 				var normalMatrix = new Matrix3().getNormalMatrix( preTransform );
-				normalMatrix.applyToBufferAttribute( normalAttribute );
 
-				geo.addAttribute( 'normal', normalAttribute );
+				var normalAttribute = new Float32BufferAttribute( buffers.normal, 3 );
+				normalAttribute.applyNormalMatrix( normalMatrix );
+
+				geo.setAttribute( 'normal', normalAttribute );
 
 			}
 
@@ -1702,7 +1682,7 @@ var FBXLoader = ( function () {
 
 				}
 
-				geo.addAttribute( name, new Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
+				geo.setAttribute( name, new Float32BufferAttribute( buffers.uvs[ i ], 2 ) );
 
 			} );
 
@@ -1749,7 +1729,7 @@ var FBXLoader = ( function () {
 
 			}
 
-			this.addMorphTargets( geo, geoNode, morphTarget, preTransform );
+			this.addMorphTargets( geo, geoNode, morphTargets, preTransform );
 
 			return geo;
 
@@ -1848,7 +1828,7 @@ var FBXLoader = ( function () {
 			var faceWeights = [];
 			var faceWeightIndices = [];
 
-			var self = this;
+			var scope = this;
 			geoInfo.vertexIndices.forEach( function ( vertexIndex, polygonVertexIndex ) {
 
 				var endOfFace = false;
@@ -1987,7 +1967,7 @@ var FBXLoader = ( function () {
 
 				if ( endOfFace ) {
 
-					self.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
+					scope.genFace( buffers, geoInfo, facePositionIndexes, materialIndex, faceNormals, faceColors, faceUVs, faceWeights, faceWeightIndices, faceLength );
 
 					polygonIndex ++;
 					faceLength = 0;
@@ -2122,23 +2102,29 @@ var FBXLoader = ( function () {
 
 		},
 
-		addMorphTargets: function ( parentGeo, parentGeoNode, morphTarget, preTransform ) {
+		addMorphTargets: function ( parentGeo, parentGeoNode, morphTargets, preTransform ) {
 
-			if ( morphTarget === null ) return;
+			if ( morphTargets.length === 0 ) return;
+
+			parentGeo.morphTargetsRelative = true;
 
 			parentGeo.morphAttributes.position = [];
 			// parentGeo.morphAttributes.normal = []; // not implemented
 
-			var self = this;
-			morphTarget.rawTargets.forEach( function ( rawTarget ) {
+			var scope = this;
+			morphTargets.forEach( function ( morphTarget ) {
 
-				var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
+				morphTarget.rawTargets.forEach( function ( rawTarget ) {
 
-				if ( morphGeoNode !== undefined ) {
+					var morphGeoNode = fbxTree.Objects.Geometry[ rawTarget.geoID ];
 
-					self.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+					if ( morphGeoNode !== undefined ) {
 
-				}
+						scope.genMorphGeometry( parentGeo, parentGeoNode, morphGeoNode, preTransform, rawTarget.name );
+
+					}
+
+				} );
 
 			} );
 
@@ -2150,33 +2136,29 @@ var FBXLoader = ( function () {
 		// Normal and position attributes only have data for the vertices that are affected by the morph
 		genMorphGeometry: function ( parentGeo, parentGeoNode, morphGeoNode, preTransform, name ) {
 
-			var morphGeo = new BufferGeometry();
-			if ( morphGeoNode.attrName ) morphGeo.name = morphGeoNode.attrName;
-
 			var vertexIndices = ( parentGeoNode.PolygonVertexIndex !== undefined ) ? parentGeoNode.PolygonVertexIndex.a : [];
 
-			// make a copy of the parent's vertex positions
-			var vertexPositions = ( parentGeoNode.Vertices !== undefined ) ? parentGeoNode.Vertices.a.slice() : [];
-
-			var morphPositions = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
+			var morphPositionsSparse = ( morphGeoNode.Vertices !== undefined ) ? morphGeoNode.Vertices.a : [];
 			var indices = ( morphGeoNode.Indexes !== undefined ) ? morphGeoNode.Indexes.a : [];
+
+			var length = parentGeo.attributes.position.count * 3;
+			var morphPositions = new Float32Array( length );
 
 			for ( var i = 0; i < indices.length; i ++ ) {
 
 				var morphIndex = indices[ i ] * 3;
 
-				// FBX format uses blend shapes rather than morph targets. This can be converted
-				// by additively combining the blend shape positions with the original geometry's positions
-				vertexPositions[ morphIndex ] += morphPositions[ i * 3 ];
-				vertexPositions[ morphIndex + 1 ] += morphPositions[ i * 3 + 1 ];
-				vertexPositions[ morphIndex + 2 ] += morphPositions[ i * 3 + 2 ];
+				morphPositions[ morphIndex ] = morphPositionsSparse[ i * 3 ];
+				morphPositions[ morphIndex + 1 ] = morphPositionsSparse[ i * 3 + 1 ];
+				morphPositions[ morphIndex + 2 ] = morphPositionsSparse[ i * 3 + 2 ];
 
 			}
 
 			// TODO: add morph normal support
 			var morphGeoInfo = {
 				vertexIndices: vertexIndices,
-				vertexPositions: vertexPositions,
+				vertexPositions: morphPositions,
+
 			};
 
 			var morphBuffers = this.genBuffers( morphGeoInfo );
@@ -2184,7 +2166,7 @@ var FBXLoader = ( function () {
 			var positionAttribute = new Float32BufferAttribute( morphBuffers.vertex, 3 );
 			positionAttribute.name = name || morphGeoNode.attrName;
 
-			preTransform.applyToBufferAttribute( positionAttribute );
+			positionAttribute.applyMatrix4( preTransform );
 
 			parentGeo.morphAttributes.position.push( positionAttribute );
 
@@ -2370,7 +2352,7 @@ var FBXLoader = ( function () {
 			} );
 
 			var geometry = new BufferGeometry();
-			geometry.addAttribute( 'position', new BufferAttribute( positions, 3 ) );
+			geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
 			return geometry;
 
@@ -2558,7 +2540,7 @@ var FBXLoader = ( function () {
 
 										var node = {
 
-											modelName: PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+											modelName: rawModel.attrName ? PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
 											ID: rawModel.id,
 											initialPosition: [ 0, 0, 0 ],
 											initialRotation: [ 0, 0, 0 ],
@@ -2613,7 +2595,7 @@ var FBXLoader = ( function () {
 
 									var node = {
 
-										modelName: PropertyBinding.sanitizeNodeName( rawModel.attrName ),
+										modelName: rawModel.attrName ? PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
 										morphName: fbxTree.Objects.Deformer[ deformerID ].attrName,
 
 									};
@@ -2680,10 +2662,10 @@ var FBXLoader = ( function () {
 
 			var tracks = [];
 
-			var self = this;
+			var scope = this;
 			rawClip.layer.forEach( function ( rawTracks ) {
 
-				tracks = tracks.concat( self.generateTracks( rawTracks ) );
+				tracks = tracks.concat( scope.generateTracks( rawTracks ) );
 
 			} );
 
@@ -2751,19 +2733,19 @@ var FBXLoader = ( function () {
 			if ( curves.x !== undefined ) {
 
 				this.interpolateRotations( curves.x );
-				curves.x.values = curves.x.values.map( _Math.degToRad );
+				curves.x.values = curves.x.values.map( MathUtils.degToRad );
 
 			}
 			if ( curves.y !== undefined ) {
 
 				this.interpolateRotations( curves.y );
-				curves.y.values = curves.y.values.map( _Math.degToRad );
+				curves.y.values = curves.y.values.map( MathUtils.degToRad );
 
 			}
 			if ( curves.z !== undefined ) {
 
 				this.interpolateRotations( curves.z );
-				curves.z.values = curves.z.values.map( _Math.degToRad );
+				curves.z.values = curves.z.values.map( MathUtils.degToRad );
 
 			}
 
@@ -2772,7 +2754,7 @@ var FBXLoader = ( function () {
 
 			if ( preRotation !== undefined ) {
 
-				preRotation = preRotation.map( _Math.degToRad );
+				preRotation = preRotation.map( MathUtils.degToRad );
 				preRotation.push( eulerOrder );
 
 				preRotation = new Euler().fromArray( preRotation );
@@ -2782,7 +2764,7 @@ var FBXLoader = ( function () {
 
 			if ( postRotation !== undefined ) {
 
-				postRotation = postRotation.map( _Math.degToRad );
+				postRotation = postRotation.map( MathUtils.degToRad );
 				postRotation.push( eulerOrder );
 
 				postRotation = new Euler().fromArray( postRotation );
@@ -3016,7 +2998,7 @@ var FBXLoader = ( function () {
 			this.currentProp = [];
 			this.currentPropName = '';
 
-			var self = this;
+			var scope = this;
 
 			var split = text.split( /[\r\n]+/ );
 
@@ -3027,27 +3009,27 @@ var FBXLoader = ( function () {
 
 				if ( matchComment || matchEmpty ) return;
 
-				var matchBeginning = line.match( '^\\t{' + self.currentIndent + '}(\\w+):(.*){', '' );
-				var matchProperty = line.match( '^\\t{' + ( self.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
-				var matchEnd = line.match( '^\\t{' + ( self.currentIndent - 1 ) + '}}' );
+				var matchBeginning = line.match( '^\\t{' + scope.currentIndent + '}(\\w+):(.*){', '' );
+				var matchProperty = line.match( '^\\t{' + ( scope.currentIndent ) + '}(\\w+):[\\s\\t\\r\\n](.*)' );
+				var matchEnd = line.match( '^\\t{' + ( scope.currentIndent - 1 ) + '}}' );
 
 				if ( matchBeginning ) {
 
-					self.parseNodeBegin( line, matchBeginning );
+					scope.parseNodeBegin( line, matchBeginning );
 
 				} else if ( matchProperty ) {
 
-					self.parseNodeProperty( line, matchProperty, split[ ++ i ] );
+					scope.parseNodeProperty( line, matchProperty, split[ ++ i ] );
 
 				} else if ( matchEnd ) {
 
-					self.popStack();
+					scope.popStack();
 
 				} else if ( line.match( /^[^\s\t}]/ ) ) {
 
 					// large arrays are split over multiple lines terminated with a ',' character
 					// if this is encountered the line needs to be joined to the previous line
-					self.parseNodePropertyContinued( line );
+					scope.parseNodePropertyContinued( line );
 
 				}
 
@@ -3360,8 +3342,7 @@ var FBXLoader = ( function () {
 			var endOffset = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 			var numProperties = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
 
-			// note: do not remove this even if you get a linter warning as it moves the buffer forward
-			var propertyListLen = ( version >= 7500 ) ? reader.getUint64() : reader.getUint32();
+			( version >= 7500 ) ? reader.getUint64() : reader.getUint32(); // the returned propertyListLen is not used
 
 			var nameLen = reader.getUint8();
 			var name = reader.getString( nameLen );
@@ -4013,7 +3994,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.preRotation ) {
 
-			var array = transformData.preRotation.map( _Math.degToRad );
+			var array = transformData.preRotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPreRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4021,7 +4002,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.rotation ) {
 
-			var array = transformData.rotation.map( _Math.degToRad );
+			var array = transformData.rotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4029,7 +4010,7 @@ var FBXLoader = ( function () {
 
 		if ( transformData.postRotation ) {
 
-			var array = transformData.postRotation.map( _Math.degToRad );
+			var array = transformData.postRotation.map( MathUtils.degToRad );
 			array.push( transformData.eulerOrder );
 			lPostRotationM.makeRotationFromEuler( tempEuler.fromArray( array ) );
 
@@ -4053,43 +4034,42 @@ var FBXLoader = ( function () {
 
 		// Global Shear*Scaling
 		var lParentTM = new Matrix4();
-		var lLSM;
-		var lParentGSM;
-		var lParentGRSM;
-
 		lParentTM.copyPosition( lParentGX );
-		lParentGRSM = lParentTM.getInverse( lParentTM ).multiply( lParentGX );
-		lParentGSM = lParentGRM.getInverse( lParentGRM ).multiply( lParentGRSM );
-		lLSM = lScalingM;
 
-		var lGlobalRS;
+		var lParentGSM = new Matrix4();
+		lParentGSM.getInverse( lParentGRM ).multiply( lParentGX );
+
+		var lGlobalRS = new Matrix4();
+
 		if ( inheritType === 0 ) {
 
-			lGlobalRS = lParentGRM.multiply( lLRM ).multiply( lParentGSM ).multiply( lLSM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM ).multiply( lScalingM );
 
 		} else if ( inheritType === 1 ) {
 
-			lGlobalRS = lParentGRM.multiply( lParentGSM ).multiply( lLRM ).multiply( lLSM );
+			lGlobalRS.copy( lParentGRM ).multiply( lParentGSM ).multiply( lLRM ).multiply( lScalingM );
 
 		} else {
 
-			var lParentLSM = new Matrix4().copy( lScalingM );
+			var lParentLSM_inv = new Matrix4().getInverse( lScalingM );
+			var lParentGSM_noLocal = new Matrix4().multiply( lParentGSM ).multiply( lParentLSM_inv );
 
-			var lParentGSM_noLocal = lParentGSM.multiply( lParentLSM.getInverse( lParentLSM ) );
-
-			lGlobalRS = lParentGRM.multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lLSM );
+			lGlobalRS.copy( lParentGRM ).multiply( lLRM ).multiply( lParentGSM_noLocal ).multiply( lScalingM );
 
 		}
 
+		var lRotationPivotM_inv = new Matrix4().getInverse( lRotationPivotM );
+		var lScalingPivotM_inv = new Matrix4().getInverse( lScalingPivotM );
 		// Calculate the local transform matrix
-		var lTransform = lTranslationM.multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM.getInverse( lRotationPivotM ) ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM.getInverse( lScalingPivotM ) );
+		var lTransform = new Matrix4();
+		lTransform.copy( lTranslationM ).multiply( lRotationOffsetM ).multiply( lRotationPivotM ).multiply( lPreRotationM ).multiply( lRotationM ).multiply( lPostRotationM ).multiply( lRotationPivotM_inv ).multiply( lScalingOffsetM ).multiply( lScalingPivotM ).multiply( lScalingM ).multiply( lScalingPivotM_inv );
 
 		var lLocalTWithAllPivotAndOffsetInfo = new Matrix4().copyPosition( lTransform );
 
-		var lGlobalTranslation = lParentGX.multiply( lLocalTWithAllPivotAndOffsetInfo );
+		var lGlobalTranslation = new Matrix4().copy( lParentGX ).multiply( lLocalTWithAllPivotAndOffsetInfo );
 		lGlobalT.copyPosition( lGlobalTranslation );
 
-		lTransform = lGlobalT.multiply( lGlobalRS );
+		lTransform = new Matrix4().multiply( lGlobalT ).multiply( lGlobalRS );
 
 		return lTransform;
 
@@ -4177,4 +4157,5 @@ var FBXLoader = ( function () {
 	return FBXLoader;
 
 } )();
+
 export { FBXLoader };

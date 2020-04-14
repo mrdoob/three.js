@@ -41,7 +41,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> buffergeometry - selective - draw
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> buffergeometry - selective - draw
 			<div id="title"></div>
 			<div id="ui"><a href="#" id="hideLines">CULL SOME LINES</a> - <a href="#" id="showAllLines">SHOW ALL LINES</a></div>
 		</div>
@@ -133,9 +133,9 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
-				geometry.addAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
-				geometry.addAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( linePositions, 3 ) );
+				geometry.setAttribute( 'vertColor', new THREE.BufferAttribute( lineColors, 3 ) );
+				geometry.setAttribute( 'visible', new THREE.BufferAttribute( visible, 1 ) );
 
 				geometry.computeBoundingSphere();
 

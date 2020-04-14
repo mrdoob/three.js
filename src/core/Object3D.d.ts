@@ -59,26 +59,26 @@ export class Object3D extends EventDispatcher {
 	/**
 	 * Object's local position.
 	 */
-	position: Vector3;
+	readonly position: Vector3;
 
 	/**
 	 * Object's local rotation (Euler angles), in radians.
 	 */
-	rotation: Euler;
+	readonly rotation: Euler;
 
 	/**
 	 * Global rotation.
 	 */
-	quaternion: Quaternion;
+	readonly quaternion: Quaternion;
 
 	/**
 	 * Object's local scale.
 	 */
-	scale: Vector3;
+	readonly scale: Vector3;
 
-	modelViewMatrix: Matrix4;
+	readonly modelViewMatrix: Matrix4;
 
-	normalMatrix: Matrix3;
+	readonly normalMatrix: Matrix3;
 
 	/**
 	 * Local transform.
@@ -148,7 +148,7 @@ export class Object3D extends EventDispatcher {
 	 * Used to check whether this or derived classes are Object3Ds. Default is true.
 	 * You should not change this, as it is used internally for optimisation.
 	 */
-	isObject3D: true;
+	readonly isObject3D: true;
 
 	/**
 	 * Calls before rendering object
@@ -180,7 +180,7 @@ export class Object3D extends EventDispatcher {
 	/**
 	 * This updates the position, rotation and scale with the matrix.
 	 */
-	applyMatrix( matrix: Matrix4 ): void;
+	applyMatrix4( matrix: Matrix4 ): void;
 
 	applyQuaternion( quaternion: Quaternion ): this;
 

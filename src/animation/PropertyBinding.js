@@ -10,9 +10,39 @@
 
 // Characters [].:/ are reserved for track binding syntax.
 var _RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
+var _reservedRe = new RegExp( '[' + _RESERVED_CHARS_RE + ']', 'g' );
 
-var _reservedRe;
-var _trackRe, _supportedObjectNames;
+// Attempts to allow node names from any language. ES5's `\w` regexp matches
+// only latin characters, and the unicode \p{L} is not yet supported. So
+// instead, we exclude reserved characters and match everything else.
+var _wordChar = '[^' + _RESERVED_CHARS_RE + ']';
+var _wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
+
+// Parent directories, delimited by '/' or ':'. Currently unused, but must
+// be matched to parse the rest of the track name.
+var _directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
+
+// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
+var _nodeRe = /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
+
+// Object on target node, and accessor. May not contain reserved
+// characters. Accessor may contain any character except closing bracket.
+var _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
+
+// Property and accessor. May not contain reserved characters. Accessor may
+// contain any non-bracket characters.
+var _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
+
+var _trackRe = new RegExp( ''
+	+ '^'
+	+ _directoryRe
+	+ _nodeRe
+	+ _objectRe
+	+ _propertyRe
+	+ '$'
+);
+
+var _supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
 function Composite( targetGroup, path, optionalParsedPath ) {
 
@@ -114,53 +144,11 @@ Object.assign( PropertyBinding, {
 	 */
 	sanitizeNodeName: function ( name ) {
 
-		if ( _reservedRe === undefined ) {
-
-			_reservedRe = new RegExp( '[' + _RESERVED_CHARS_RE + ']', 'g' );
-
-		}
-
 		return name.replace( /\s/g, '_' ).replace( _reservedRe, '' );
 
 	},
 
 	parseTrackName: function ( trackName ) {
-
-		if ( _supportedObjectNames === undefined ) {
-
-			// Attempts to allow node names from any language. ES5's `\w` regexp matches
-			// only latin characters, and the unicode \p{L} is not yet supported. So
-			// instead, we exclude reserved characters and match everything else.
-			var wordChar = '[^' + _RESERVED_CHARS_RE + ']';
-			var wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
-
-			// Parent directories, delimited by '/' or ':'. Currently unused, but must
-			// be matched to parse the rest of the track name.
-			var directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', wordChar );
-
-			// Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
-			var nodeRe = /(WCOD+)?/.source.replace( 'WCOD', wordCharOrDot );
-
-			// Object on target node, and accessor. May not contain reserved
-			// characters. Accessor may contain any character except closing bracket.
-			var objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', wordChar );
-
-			// Property and accessor. May not contain reserved characters. Accessor may
-			// contain any non-bracket characters.
-			var propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', wordChar );
-
-			_trackRe = new RegExp( ''
-				+ '^'
-				+ directoryRe
-				+ nodeRe
-				+ objectRe
-				+ propertyRe
-				+ '$'
-			);
-
-			_supportedObjectNames = [ 'material', 'materials', 'bones' ];
-
-		}
 
 		var matches = _trackRe.exec( trackName );
 
@@ -210,7 +198,7 @@ Object.assign( PropertyBinding, {
 
 	findNode: function ( root, nodeName ) {
 
-		if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
+		if ( ! nodeName || nodeName === "" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
 
 			return root;
 
@@ -714,7 +702,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 } );
 
-//!\ DECLARE ALIAS AFTER assign prototype !
+// DECLARE ALIAS AFTER assign prototype
 Object.assign( PropertyBinding.prototype, {
 
 	// initial state of these methods that calls 'bind'

@@ -32,19 +32,18 @@
 		</ul>
 
 		<p>
-		其他的一些事物也可以使用二维向量进行表示，但以上这些是它在three.js中的常用用途。
+		其他的一些事物也可以使用四维向量进行表示，但以上这些是它在three.js中的常用用途。
 		</p>
 
-
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-var a = new THREE.Vector4( 0, 1, 0, 0 );
+		var a = new THREE.Vector4( 0, 1, 0, 0 );
 
-//no arguments; will be initialised to (0, 0, 0, 1)
-var b = new THREE.Vector4( );
+		//no arguments; will be initialised to (0, 0, 0, 1)
+		var b = new THREE.Vector4( );
 
-var d = a.dot( b );
+		var d = a.dot( b );
 		</code>
 
 
@@ -62,13 +61,6 @@ var d = a.dot( b );
 
 
 		<h2>属性</h2>
-
-		<h3>[property:Boolean isVector4]</h3>
-		<p>
-			用于测试这个类或者派生类是否为Vector4，默认为*true*。<br /><br />
-
-			你不应当对这个属性进行改变,因为它在内部使用，以用于优化。
-		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -330,8 +322,15 @@ var d = a.dot( b );
 		返回一个数组[x, y, z, w]，或者将x、y、z和w复制到所传入的[page:Array array]中。
 		</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
+
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

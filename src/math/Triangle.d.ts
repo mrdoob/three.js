@@ -29,7 +29,7 @@ export class Triangle {
 	getArea(): number;
 	getMidpoint( target: Vector3 ): Vector3;
 	getNormal( target: Vector3 ): Vector3;
-	getPlane( target: Vector3 ): Plane;
+	getPlane( target: Plane ): Plane;
 	getBarycoord( point: Vector3, target: Vector3 ): Vector3;
 	getUV( point: Vector3, uv1: Vector2, uv2: Vector2, uv3: Vector2, target: Vector2 ): Vector2;
 	containsPoint( point: Vector3 ): boolean;

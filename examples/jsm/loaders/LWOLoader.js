@@ -24,7 +24,6 @@ import {
 	BufferGeometry,
 	ClampToEdgeWrapping,
 	Color,
-	DefaultLoadingManager,
 	DoubleSide,
 	EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping,
@@ -33,6 +32,7 @@ import {
 	FrontSide,
 	LineBasicMaterial,
 	LineSegments,
+	Loader,
 	LoaderUtils,
 	Mesh,
 	MeshPhongMaterial,
@@ -2050,61 +2050,38 @@ var lwoTree;
 
 var LWOLoader = function ( manager, parameters ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 	parameters = parameters || {};
 
-	this.resourcePath = ( parameters.resourcePath !== undefined ) ? parameters.resourcePath : undefined;
+	this.resourcePath = ( parameters.resourcePath !== undefined ) ? parameters.resourcePath : '';
 
 };
 
-LWOLoader.prototype = {
+LWOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: LWOLoader,
 
-	crossOrigin: 'anonymous',
-
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var self = this;
+		var scope = this;
 
-		var path = ( self.path === undefined ) ? extractParentUrl( url, 'Objects' ) : self.path;
+		var path = ( scope.path === '' ) ? extractParentUrl( url, 'Objects' ) : scope.path;
 
 		// give the mesh a default name based on the filename
 		var modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
 		var loader = new FileLoader( this.manager );
-		loader.setPath( self.path );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( buffer ) {
 
 			// console.time( 'Total parsing: ' );
-			onLoad( self.parse( buffer, path, modelName ) );
+			onLoad( scope.parse( buffer, path, modelName ) );
 			// console.timeEnd( 'Total parsing: ' );
 
 		}, onProgress, onError );
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
-
-	},
-
-	setResourcePath: function ( value ) {
-
-		this.resourcePath = value;
-		return this;
 
 	},
 
@@ -2120,7 +2097,7 @@ LWOLoader.prototype = {
 
 	}
 
-};
+} );
 
 // Parse the lwoTree object
 function LWOTreeParser( textureLoader ) {
@@ -2157,12 +2134,12 @@ LWOTreeParser.prototype = {
 
 		var geometryParser = new GeometryParser();
 
-		var self = this;
+		var scope = this;
 		lwoTree.layers.forEach( function ( layer ) {
 
 			var geometry = geometryParser.parse( layer.geometry, layer );
 
-			var mesh = self.parseMesh( geometry, layer );
+			var mesh = scope.parseMesh( geometry, layer );
 
 			meshes[ layer.number ] = mesh;
 
@@ -2232,11 +2209,11 @@ LWOTreeParser.prototype = {
 
 		var materials = [];
 
-		var self = this;
+		var scope = this;
 
 		namesArray.forEach( function ( name, i ) {
 
-			materials[ i ] = self.getMaterialByName( name );
+			materials[ i ] = scope.getMaterialByName( name );
 
 		} );
 
@@ -2305,7 +2282,7 @@ LWOTreeParser.prototype = {
 
 		if ( ! duplicateUVs ) return;
 
-		geometry.addAttribute( 'uv2', new BufferAttribute( geometry.attributes.uv.array, 2 ) );
+		geometry.setAttribute( 'uv2', new BufferAttribute( geometry.attributes.uv.array, 2 ) );
 
 	},
 
@@ -2421,12 +2398,12 @@ MaterialParser.prototype = {
 		var inputNodeName = connections.inputNodeName;
 		var nodeName = connections.nodeName;
 
-		var self = this;
+		var scope = this;
 		inputName.forEach( function ( name, index ) {
 
 			if ( name === 'Material' ) {
 
-				var matNode = self.getNodeByRefName( inputNodeName[ index ], nodes );
+				var matNode = scope.getNodeByRefName( inputNodeName[ index ], nodes );
 				materialConnections.attributes = matNode.attributes;
 				materialConnections.envMap = matNode.fileName;
 				materialConnections.name = inputNodeName[ index ];
@@ -2439,7 +2416,7 @@ MaterialParser.prototype = {
 
 			if ( name === materialConnections.name ) {
 
-				materialConnections.maps[ inputName[ index ] ] = self.getNodeByRefName( inputNodeName[ index ], nodes );
+				materialConnections.maps[ inputName[ index ] ] = scope.getNodeByRefName( inputNodeName[ index ], nodes );
 
 			}
 
@@ -2622,11 +2599,11 @@ MaterialParser.prototype = {
 
 		if ( attributes.Clearcoat && attributes.Clearcoat.value > 0 ) {
 
-			params.clearCoat = attributes.Clearcoat.value;
+			params.clearcoat = attributes.Clearcoat.value;
 
 			if ( attributes[ 'Clearcoat Gloss' ] ) {
 
-				params.clearCoatRoughness = 0.5 * ( 1 - attributes[ 'Clearcoat Gloss' ].value );
+				params.clearcoatRoughness = 0.5 * ( 1 - attributes[ 'Clearcoat Gloss' ].value );
 
 			}
 
@@ -2810,7 +2787,7 @@ GeometryParser.prototype = {
 
 		var geometry = new BufferGeometry();
 
-		geometry.addAttribute( 'position', new Float32BufferAttribute( geoData.points, 3 ) );
+		geometry.setAttribute( 'position', new Float32BufferAttribute( geoData.points, 3 ) );
 
 		var indices = this.splitIndices( geoData.vertexIndices, geoData.polygonDimensions );
 		geometry.setIndex( indices );
@@ -3023,7 +3000,7 @@ GeometryParser.prototype = {
 
 		}
 
-		geometry.addAttribute( 'uv', new Float32BufferAttribute( remappedUVs, 2 ) );
+		geometry.setAttribute( 'uv', new Float32BufferAttribute( remappedUVs, 2 ) );
 
 	},
 
@@ -3064,6 +3041,8 @@ GeometryParser.prototype = {
 			num ++;
 
 		}
+
+		geometry.morphTargetsRelative = false;
 
 	},
 

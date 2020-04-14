@@ -29,11 +29,17 @@ export default /* glsl */`
 
 		#endif
 
+		#if defined( TANGENTSPACE_NORMALMAP ) || defined( USE_CLEARCOAT_NORMALMAP )
+
+			mat3 vTBN = mat3( tangent, bitangent, normal );
+
+		#endif
+
 	#endif
 
 #endif
 
-// non perturbed normal for clearcoat
+// non perturbed normal for clearcoat among others
 
 vec3 geometryNormal = normal;
 

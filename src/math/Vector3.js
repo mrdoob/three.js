@@ -1,4 +1,4 @@
-import { _Math } from './Math.js';
+import { MathUtils } from './MathUtils.js';
 import { Quaternion } from './Quaternion.js';
 
 /**
@@ -10,7 +10,8 @@ import { Quaternion } from './Quaternion.js';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-var _vector, _quaternion;
+var _vector = new Vector3();
+var _quaternion = new Quaternion();
 
 function Vector3( x, y, z ) {
 
@@ -235,8 +236,6 @@ Object.assign( Vector3.prototype, {
 
 	applyEuler: function ( euler ) {
 
-		if ( _quaternion === undefined ) _quaternion = new Quaternion();
-
 		if ( ! ( euler && euler.isEuler ) ) {
 
 			console.error( 'THREE.Vector3: .applyEuler() now expects an Euler rotation rather than a Vector3 and order.' );
@@ -248,8 +247,6 @@ Object.assign( Vector3.prototype, {
 	},
 
 	applyAxisAngle: function ( axis, angle ) {
-
-		if ( _quaternion === undefined ) _quaternion = new Quaternion();
 
 		return this.applyQuaternion( _quaternion.setFromAxisAngle( axis, angle ) );
 
@@ -265,6 +262,12 @@ Object.assign( Vector3.prototype, {
 		this.z = e[ 2 ] * x + e[ 5 ] * y + e[ 8 ] * z;
 
 		return this;
+
+	},
+
+	applyNormalMatrix: function ( m ) {
+
+		return this.applyMatrix3( m ).normalize();
 
 	},
 
@@ -529,17 +532,19 @@ Object.assign( Vector3.prototype, {
 
 	},
 
-	projectOnVector: function ( vector ) {
+	projectOnVector: function ( v ) {
 
-		var scalar = vector.dot( this ) / vector.lengthSq();
+		var denominator = v.lengthSq();
 
-		return this.copy( vector ).multiplyScalar( scalar );
+		if ( denominator === 0 ) return this.set( 0, 0, 0 );
+
+		var scalar = v.dot( this ) / denominator;
+
+		return this.copy( v ).multiplyScalar( scalar );
 
 	},
 
 	projectOnPlane: function ( planeNormal ) {
-
-		if ( _vector === undefined ) _vector = new Vector3();
 
 		_vector.copy( this ).projectOnVector( planeNormal );
 
@@ -548,8 +553,6 @@ Object.assign( Vector3.prototype, {
 	},
 
 	reflect: function ( normal ) {
-
-		if ( _vector === undefined ) _vector = new Vector3();
 
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
@@ -560,11 +563,15 @@ Object.assign( Vector3.prototype, {
 
 	angleTo: function ( v ) {
 
-		var theta = this.dot( v ) / ( Math.sqrt( this.lengthSq() * v.lengthSq() ) );
+		var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
+
+		if ( denominator === 0 ) return Math.PI / 2;
+
+		var theta = this.dot( v ) / denominator;
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( _Math.clamp( theta, - 1, 1 ) );
+		return Math.acos( MathUtils.clamp( theta, - 1, 1 ) );
 
 	},
 
@@ -654,6 +661,12 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	setFromMatrix3Column: function ( m, index ) {
+
+		return this.fromArray( m.elements, index * 3 );
+
+	},
+
 	equals: function ( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
@@ -696,6 +709,16 @@ Object.assign( Vector3.prototype, {
 		this.x = attribute.getX( index );
 		this.y = attribute.getY( index );
 		this.z = attribute.getZ( index );
+
+		return this;
+
+	},
+
+	random: function () {
+
+		this.x = Math.random();
+		this.y = Math.random();
+		this.z = Math.random();
 
 		return this;
 

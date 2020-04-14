@@ -130,10 +130,31 @@ function WebGLRenderList() {
 
 	}
 
-	function sort() {
+	function sort( customOpaqueSort, customTransparentSort ) {
 
-		if ( opaque.length > 1 ) opaque.sort( painterSortStable );
-		if ( transparent.length > 1 ) transparent.sort( reversePainterSortStable );
+		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
+		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
+
+	}
+
+	function finish() {
+
+		// Clear references from inactive renderItems in the list
+
+		for ( var i = renderItemsIndex, il = renderItems.length; i < il; i ++ ) {
+
+			var renderItem = renderItems[ i ];
+
+			if ( renderItem.id === null ) break;
+
+			renderItem.id = null;
+			renderItem.object = null;
+			renderItem.geometry = null;
+			renderItem.material = null;
+			renderItem.program = null;
+			renderItem.group = null;
+
+		}
 
 	}
 
@@ -144,6 +165,7 @@ function WebGLRenderList() {
 		init: init,
 		push: push,
 		unshift: unshift,
+		finish: finish,
 
 		sort: sort
 	};
@@ -152,7 +174,7 @@ function WebGLRenderList() {
 
 function WebGLRenderLists() {
 
-	var lists = {};
+	var lists = new WeakMap();
 
 	function onSceneDispose( event ) {
 
@@ -160,29 +182,29 @@ function WebGLRenderLists() {
 
 		scene.removeEventListener( 'dispose', onSceneDispose );
 
-		delete lists[ scene.id ];
+		lists.delete( scene );
 
 	}
 
 	function get( scene, camera ) {
 
-		var cameras = lists[ scene.id ];
+		var cameras = lists.get( scene );
 		var list;
 		if ( cameras === undefined ) {
 
 			list = new WebGLRenderList();
-			lists[ scene.id ] = {};
-			lists[ scene.id ][ camera.id ] = list;
+			lists.set( scene, new WeakMap() );
+			lists.get( scene ).set( camera, list );
 
 			scene.addEventListener( 'dispose', onSceneDispose );
 
 		} else {
 
-			list = cameras[ camera.id ];
+			list = cameras.get( camera );
 			if ( list === undefined ) {
 
 				list = new WebGLRenderList();
-				cameras[ camera.id ] = list;
+				cameras.set( camera, list );
 
 			}
 
@@ -194,7 +216,7 @@ function WebGLRenderLists() {
 
 	function dispose() {
 
-		lists = {};
+		lists = new WeakMap();
 
 	}
 

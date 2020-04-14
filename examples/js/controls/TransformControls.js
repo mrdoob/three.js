@@ -4,11 +4,17 @@
 
 THREE.TransformControls = function ( camera, domElement ) {
 
+	if ( domElement === undefined ) {
+
+		console.warn( 'THREE.TransformControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document;
+
+	}
+
 	THREE.Object3D.call( this );
 
-	domElement = ( domElement !== undefined ) ? domElement : document;
-
 	this.visible = false;
+	this.domElement = domElement;
 
 	var _gizmo = new THREE.TransformControlsGizmo();
 	this.add( _gizmo );
@@ -29,6 +35,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 	defineProperty( "mode", "translate" );
 	defineProperty( "translationSnap", null );
 	defineProperty( "rotationSnap", null );
+	defineProperty( "scaleSnap", null );
 	defineProperty( "space", "world" );
 	defineProperty( "size", 1 );
 	defineProperty( "dragging", false );
@@ -199,7 +206,17 @@ THREE.TransformControls = function ( camera, domElement ) {
 		if ( this.object !== undefined ) {
 
 			this.object.updateMatrixWorld();
-			this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			if ( this.object.parent === null ) {
+
+				console.error( 'TransformControls: The attached 3D object must be a part of the scene graph.' );
+
+			} else {
+
+				this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			}
+
 			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
 
 			parentQuaternionInv.copy( parentQuaternion ).inverse();
@@ -210,15 +227,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		this.camera.updateMatrixWorld();
 		this.camera.matrixWorld.decompose( cameraPosition, cameraQuaternion, cameraScale );
 
-		if ( this.camera instanceof THREE.PerspectiveCamera ) {
-
-			eye.copy( cameraPosition ).sub( worldPosition ).normalize();
-
-		} else if ( this.camera instanceof THREE.OrthographicCamera ) {
-
-			eye.copy( cameraPosition ).normalize();
-
-		}
+		eye.copy( cameraPosition ).sub( worldPosition ).normalize();
 
 		THREE.Object3D.prototype.updateMatrixWorld.call( this );
 
@@ -462,6 +471,28 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 			object.scale.copy( scaleStart ).multiply( _tempVector2 );
 
+			if ( this.scaleSnap ) {
+
+				if ( axis.search( 'X' ) !== - 1 ) {
+
+					object.scale.x = Math.round( object.scale.x / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Y' ) !== - 1 ) {
+
+					object.scale.y = Math.round( object.scale.y / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Z' ) !== - 1 ) {
+
+					object.scale.z = Math.round( object.scale.z / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+			}
+
 		} else if ( mode === 'rotate' ) {
 
 			offset.copy( pointEnd ).sub( pointStart );
@@ -547,15 +578,27 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function getPointer( event ) {
 
-		var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+		if ( document.pointerLockElement ) {
 
-		var rect = domElement.getBoundingClientRect();
+			return {
+				x: 0,
+				y: 0,
+				button: event.button
+			};
 
-		return {
-			x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
-			y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
-			button: event.button
-		};
+		} else {
+
+			var pointer = event.changedTouches ? event.changedTouches[ 0 ] : event;
+
+			var rect = domElement.getBoundingClientRect();
+
+			return {
+				x: ( pointer.clientX - rect.left ) / rect.width * 2 - 1,
+				y: - ( pointer.clientY - rect.top ) / rect.height * 2 + 1,
+				button: event.button
+			};
+
+		}
 
 	}
 
@@ -621,6 +664,12 @@ THREE.TransformControls = function ( camera, domElement ) {
 	this.setRotationSnap = function ( rotationSnap ) {
 
 		scope.rotationSnap = rotationSnap;
+
+	};
+
+	this.setScaleSnap = function ( scaleSnap ) {
+
+		scope.scaleSnap = scaleSnap;
 
 	};
 
@@ -696,16 +745,16 @@ THREE.TransformControlsGizmo = function () {
 	var matBlue = gizmoMaterial.clone();
 	matBlue.color.set( 0x0000ff );
 
-	var matWhiteTransperent = gizmoMaterial.clone();
-	matWhiteTransperent.opacity = 0.25;
+	var matWhiteTransparent = gizmoMaterial.clone();
+	matWhiteTransparent.opacity = 0.25;
 
-	var matYellowTransparent = matWhiteTransperent.clone();
+	var matYellowTransparent = matWhiteTransparent.clone();
 	matYellowTransparent.color.set( 0xffff00 );
 
-	var matCyanTransparent = matWhiteTransperent.clone();
+	var matCyanTransparent = matWhiteTransparent.clone();
 	matCyanTransparent.color.set( 0x00ffff );
 
-	var matMagentaTransparent = matWhiteTransperent.clone();
+	var matMagentaTransparent = matWhiteTransparent.clone();
 	matMagentaTransparent.color.set( 0xff00ff );
 
 	var matYellow = gizmoMaterial.clone();
@@ -742,7 +791,7 @@ THREE.TransformControlsGizmo = function () {
 	var scaleHandleGeometry = new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 );
 
 	var lineGeometry = new THREE.BufferGeometry( );
-	lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
+	lineGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
 
 	var CircleGeometry = function ( radius, arc ) {
 
@@ -755,7 +804,7 @@ THREE.TransformControlsGizmo = function () {
 
 		}
 
-		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 		return geometry;
 
@@ -767,7 +816,7 @@ THREE.TransformControlsGizmo = function () {
 
 		var geometry = new THREE.BufferGeometry();
 
-		geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
+		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0, 1, 1, 1 ], 3 ) );
 
 		return geometry;
 
@@ -792,20 +841,20 @@ THREE.TransformControlsGizmo = function () {
 			[ new THREE.Line( lineGeometry, matLineBlue ), null, [ 0, - Math.PI / 2, 0 ]]
 		],
 		XYZ: [
-			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.1, 0 ), matWhiteTransperent ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
+			[ new THREE.Mesh( new THREE.OctahedronBufferGeometry( 0.1, 0 ), matWhiteTransparent.clone() ), [ 0, 0, 0 ], [ 0, 0, 0 ]]
 		],
 		XY: [
-			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.295, 0.295 ), matYellowTransparent ), [ 0.15, 0.15, 0 ]],
+			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.295, 0.295 ), matYellowTransparent.clone() ), [ 0.15, 0.15, 0 ]],
 			[ new THREE.Line( lineGeometry, matLineYellow ), [ 0.18, 0.3, 0 ], null, [ 0.125, 1, 1 ]],
 			[ new THREE.Line( lineGeometry, matLineYellow ), [ 0.3, 0.18, 0 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]]
 		],
 		YZ: [
-			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.295, 0.295 ), matCyanTransparent ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]],
+			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.295, 0.295 ), matCyanTransparent.clone() ), [ 0, 0.15, 0.15 ], [ 0, Math.PI / 2, 0 ]],
 			[ new THREE.Line( lineGeometry, matLineCyan ), [ 0, 0.18, 0.3 ], [ 0, 0, Math.PI / 2 ], [ 0.125, 1, 1 ]],
 			[ new THREE.Line( lineGeometry, matLineCyan ), [ 0, 0.3, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		],
 		XZ: [
-			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.295, 0.295 ), matMagentaTransparent ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]],
+			[ new THREE.Mesh( new THREE.PlaneBufferGeometry( 0.295, 0.295 ), matMagentaTransparent.clone() ), [ 0.15, 0, 0.15 ], [ - Math.PI / 2, 0, 0 ]],
 			[ new THREE.Line( lineGeometry, matLineMagenta ), [ 0.18, 0, 0.3 ], null, [ 0.125, 1, 1 ]],
 			[ new THREE.Line( lineGeometry, matLineMagenta ), [ 0.3, 0, 0.18 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		]
@@ -934,13 +983,13 @@ THREE.TransformControlsGizmo = function () {
 			[ new THREE.Line( lineGeometry, matLineMagenta ), [ 0.98, 0, 0.855 ], [ 0, - Math.PI / 2, 0 ], [ 0.125, 1, 1 ]]
 		],
 		XYZX: [
-			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 1.1, 0, 0 ]],
+			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 1.1, 0, 0 ]],
 		],
 		XYZY: [
-			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 1.1, 0 ]],
+			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 0, 1.1, 0 ]],
 		],
 		XYZZ: [
-			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransperent ), [ 0, 0, 1.1 ]],
+			[ new THREE.Mesh( new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 ), matWhiteTransparent.clone() ), [ 0, 0, 1.1 ]],
 		]
 	};
 
@@ -1025,7 +1074,7 @@ THREE.TransformControlsGizmo = function () {
 				object.updateMatrix();
 
 				var tempGeometry = object.geometry.clone();
-				tempGeometry.applyMatrix( object.matrix );
+				tempGeometry.applyMatrix4( object.matrix );
 				object.geometry = tempGeometry;
 				object.renderOrder = Infinity;
 
@@ -1116,7 +1165,8 @@ THREE.TransformControlsGizmo = function () {
 			handle.rotation.set( 0, 0, 0 );
 			handle.position.copy( this.worldPosition );
 
-			var eyeDistance = this.worldPosition.distanceTo( this.cameraPosition );
+			var eyeDistance = this.camera.isOrthographicCamera ? 1000 / this.camera.zoom : 
+				this.worldPosition.distanceTo( this.cameraPosition );			
 			handle.scale.set( 1, 1, 1 ).multiplyScalar( eyeDistance * this.size / 7 );
 
 			// TODO: simplify helpers and consider decoupling from gizmo

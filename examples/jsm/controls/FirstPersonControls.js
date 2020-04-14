@@ -5,16 +5,24 @@
  */
 
 import {
-	Math as _Math,
+	MathUtils,
 	Spherical,
 	Vector3
 } from "../../../build/three.module.js";
 
 var FirstPersonControls = function ( object, domElement ) {
 
-	this.object = object;
+	if ( domElement === undefined ) {
 
-	this.domElement = ( domElement !== undefined ) ? domElement : document;
+		console.warn( 'THREE.FirstPersonControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document;
+
+	}
+
+	this.object = object;
+	this.domElement = domElement;
+
+	// API
 
 	this.enabled = true;
 
@@ -35,6 +43,10 @@ var FirstPersonControls = function ( object, domElement ) {
 	this.verticalMin = 0;
 	this.verticalMax = Math.PI;
 
+	this.mouseDragOn = false;
+
+	// internals
+
 	this.autoSpeedFactor = 0.0;
 
 	this.mouseX = 0;
@@ -44,8 +56,6 @@ var FirstPersonControls = function ( object, domElement ) {
 	this.moveBackward = false;
 	this.moveLeft = false;
 	this.moveRight = false;
-
-	this.mouseDragOn = false;
 
 	this.viewHalfX = 0;
 	this.viewHalfY = 0;
@@ -225,7 +235,7 @@ var FirstPersonControls = function ( object, domElement ) {
 
 			if ( this.heightSpeed ) {
 
-				var y = _Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
+				var y = MathUtils.clamp( this.object.position.y, this.heightMin, this.heightMax );
 				var heightDelta = y - this.heightMin;
 
 				this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
@@ -268,12 +278,12 @@ var FirstPersonControls = function ( object, domElement ) {
 
 			lat = Math.max( - 85, Math.min( 85, lat ) );
 
-			var phi = _Math.degToRad( 90 - lat );
-			var theta = _Math.degToRad( lon );
+			var phi = MathUtils.degToRad( 90 - lat );
+			var theta = MathUtils.degToRad( lon );
 
 			if ( this.constrainVertical ) {
 
-				phi = _Math.mapLinear( phi, 0, Math.PI, this.verticalMin, this.verticalMax );
+				phi = MathUtils.mapLinear( phi, 0, Math.PI, this.verticalMin, this.verticalMax );
 
 			}
 
@@ -336,8 +346,8 @@ var FirstPersonControls = function ( object, domElement ) {
 		lookDirection.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 		spherical.setFromVector3( lookDirection );
 
-		lat = 90 - _Math.radToDeg( spherical.phi );
-		lon = _Math.radToDeg( spherical.theta );
+		lat = 90 - MathUtils.radToDeg( spherical.phi );
+		lon = MathUtils.radToDeg( spherical.theta );
 
 	}
 

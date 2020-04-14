@@ -11,8 +11,11 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var _start, _end;
-var _inverseMatrix, _ray, _sphere;
+var _start = new Vector3();
+var _end = new Vector3();
+var _inverseMatrix = new Matrix4();
+var _ray = new Ray();
+var _sphere = new Sphere();
 
 function Line( geometry, material, mode ) {
 
@@ -27,7 +30,7 @@ function Line( geometry, material, mode ) {
 	this.type = 'Line';
 
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new LineBasicMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new LineBasicMaterial();
 
 }
 
@@ -38,13 +41,6 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	isLine: true,
 
 	computeLineDistances: function () {
-
-		if ( _end === undefined ) {
-
-			_start = new Vector3();
-			_end = new Vector3();
-
-		}
 
 		var geometry = this.geometry;
 
@@ -67,7 +63,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				}
 
-				geometry.addAttribute( 'lineDistance', new Float32BufferAttribute( lineDistances, 1 ) );
+				geometry.setAttribute( 'lineDistance', new Float32BufferAttribute( lineDistances, 1 ) );
 
 			} else {
 
@@ -97,18 +93,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: function ( raycaster, intersects ) {
 
-		if ( _sphere === undefined ) {
-
-			_inverseMatrix = new Matrix4();
-			_ray = new Ray();
-			_sphere = new Sphere();
-
-		}
-
-		var precision = raycaster.linePrecision;
-
 		var geometry = this.geometry;
 		var matrixWorld = this.matrixWorld;
+		var threshold = raycaster.params.Line.threshold;
 
 		// Checking boundingSphere distance to ray
 
@@ -116,7 +103,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		_sphere.copy( geometry.boundingSphere );
 		_sphere.applyMatrix4( matrixWorld );
-		_sphere.radius += precision;
+		_sphere.radius += threshold;
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
@@ -125,8 +112,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		_inverseMatrix.getInverse( matrixWorld );
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-		var localPrecisionSq = localPrecision * localPrecision;
+		var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		var localThresholdSq = localThreshold * localThreshold;
 
 		var vStart = new Vector3();
 		var vEnd = new Vector3();
@@ -154,7 +141,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					var distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-					if ( distSq > localPrecisionSq ) continue;
+					if ( distSq > localThresholdSq ) continue;
 
 					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -186,7 +173,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					var distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-					if ( distSq > localPrecisionSq ) continue;
+					if ( distSq > localThresholdSq ) continue;
 
 					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -220,7 +207,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				var distSq = _ray.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
-				if ( distSq > localPrecisionSq ) continue;
+				if ( distSq > localThresholdSq ) continue;
 
 				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js WebGL 2 - buffergeometry - integer attributes</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container"></div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> WebGL 2 - buffergeometry - integer attributes</div>
+
+		<script id="vertexShader" type="x-shader/x-vertex">#version 300 es
+			in int textureIndex;
+
+			flat out int vIndex; // "flat" indicates that the value will not be interpolated (required for integer attributes)
+			out vec2 vUv;
+
+			void main()	{
+
+				vIndex = textureIndex;
+				vUv = uv;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+			}
+		</script>
+
+		<script id="fragmentShader" type="x-shader/x-fragment">#version 300 es
+			flat in int vIndex;
+			in vec2 vUv;
+
+			uniform sampler2D uTextures[ 3 ];
+
+			out vec4 outColor;
+
+			void main()	{
+
+				if ( vIndex == 0 ) outColor = texture( uTextures[ 0 ], vUv );
+				else if ( vIndex == 1 ) outColor = texture( uTextures[ 1 ], vUv );
+				else if ( vIndex == 2 ) outColor = texture( uTextures[ 2 ], vUv );
+
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			var camera, scene, renderer, mesh;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 3500 );
+				camera.position.z = 2500;
+
+				scene = new THREE.Scene();
+				scene.background = new THREE.Color( 0x050505 );
+				scene.fog = new THREE.Fog( 0x050505, 2000, 3500 );
+
+				// geometry
+
+				var triangles = 10000;
+
+				var geometry = new THREE.BufferGeometry();
+
+				var positions = [];
+				var uvs = [];
+				var textureIndices = [];
+
+				var n = 800, n2 = n / 2; // triangles spread in the cube
+				var d = 50, d2 = d / 2; // individual triangle size
+
+				for ( var i = 0; i < triangles; i ++ ) {
+
+					// positions
+
+					var x = Math.random() * n - n2;
+					var y = Math.random() * n - n2;
+					var z = Math.random() * n - n2;
+
+					var ax = x + Math.random() * d - d2;
+					var ay = y + Math.random() * d - d2;
+					var az = z + Math.random() * d - d2;
+
+					var bx = x + Math.random() * d - d2;
+					var by = y + Math.random() * d - d2;
+					var bz = z + Math.random() * d - d2;
+
+					var cx = x + Math.random() * d - d2;
+					var cy = y + Math.random() * d - d2;
+					var cz = z + Math.random() * d - d2;
+
+					positions.push( ax, ay, az );
+					positions.push( bx, by, bz );
+					positions.push( cx, cy, cz );
+
+					// uvs
+
+					uvs.push( 0, 0 );
+					uvs.push( 0.5, 1 );
+					uvs.push( 1, 0 );
+
+					// texture indices
+
+					var t = i % 3;
+					textureIndices.push( t, t, t );
+
+				}
+
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				geometry.setAttribute( 'textureIndex', new THREE.Int32BufferAttribute( textureIndices, 1 ) );
+
+				geometry.computeBoundingSphere();
+
+				// material
+
+				var loader = new THREE.TextureLoader();
+
+				var map1 = loader.load( 'textures/crate.gif' );
+				var map2 = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
+				var map3 = loader.load( 'textures/terrain/grasslight-big.jpg' );
+
+				var material = new THREE.ShaderMaterial( {
+					uniforms: {
+						uTextures: {
+							value: [ map1, map2, map3 ]
+						}
+					},
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+					side: THREE.DoubleSide
+				} );
+
+				// mesh
+
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
+
+				// renderer
+
+				var canvas = document.createElement( 'canvas' );
+				var context = canvas.getContext( 'webgl2', { alpha: false } );
+				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var time = Date.now() * 0.001;
+
+				mesh.rotation.x = time * 0.25;
+				mesh.rotation.y = time * 0.5;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

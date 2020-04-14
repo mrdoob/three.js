@@ -21,6 +21,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { VertexNormalsHelper } from './jsm/helpers/VertexNormalsHelper.js';
 
 			var container, stats, gui;
 			var camera, scene, renderer;
@@ -69,7 +70,7 @@
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
-				var vertexNormalsHelper = new THREE.VertexNormalsHelper( mesh, 10 );
+				var vertexNormalsHelper = new VertexNormalsHelper( mesh, 10 );
 				mesh.add( vertexNormalsHelper );
 
 			}
@@ -122,6 +123,7 @@
 				//
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
 
 				//
 
