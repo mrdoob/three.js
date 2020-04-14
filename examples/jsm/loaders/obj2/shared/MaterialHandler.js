@@ -7,8 +7,7 @@ import {
 	LineBasicMaterial,
 	MaterialLoader,
 	MeshStandardMaterial,
-	PointsMaterial,
-	VertexColors
+	PointsMaterial
 } from "../../../../../build/three.module.js";
 
 
@@ -65,7 +64,7 @@ MaterialHandler.prototype = {
 
 		let defaultVertexColorMaterial = new MeshStandardMaterial( { color: 0xDCF1FF } );
 		defaultVertexColorMaterial.name = 'defaultVertexColorMaterial';
-		defaultVertexColorMaterial.vertexColors = VertexColors;
+		defaultVertexColorMaterial.vertexColors = true;
 
 		let defaultLineMaterial = new LineBasicMaterial();
 		defaultLineMaterial.name = 'defaultLineMaterial';
