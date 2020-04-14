@@ -182,6 +182,18 @@
 		Begin loading from url and call the callback function with the parsed response content.
 		</p>
 
+		<h3>[method:Promise loadAsync]( [param:String url], [param:Function onProgress] )</h3>
+		<p>
+		[page:String url] — A string containing the path/URL of the <em>.gltf</em> or <em>.glb</em> file.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		</p>
+		<p>
+		This method is equivalent to [page:.load], but returns a [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promise].
+		</p>
+		<p>
+		[page:Function onLoad] is handled by [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve Promise.resolve] and [page:Function onError] is handled by [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject Promise.reject].
+		</p>
+
 		<h3>[method:null setDRACOLoader]( [param:DRACOLoader dracoLoader] )</h3>
 		<p>
 		[page:DRACOLoader dracoLoader] — Instance of THREE.DRACOLoader, to be used for decoding assets compressed with the KHR_draco_mesh_compression extension.
@@ -189,6 +201,7 @@
 		<p>
 		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
 		</p>
+
 
 		<h3>[method:null setDDSLoader]( [param:DDSLoader ddsLoader] )</h3>
 		<p>
