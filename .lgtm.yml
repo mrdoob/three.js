@@ -1,0 +1,11 @@
+# exclude paths from LGTM analysis
+
+path_classifiers:
+  generated:
+    - build
+  docs:
+    - docs
+  test:
+    - test
+  library:
+    - examples/js/libs
