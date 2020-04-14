@@ -121,6 +121,7 @@ var Strings = function ( config ) {
 			'sidebar/geometry/uuid': 'UUID',
 			'sidebar/geometry/name': 'Name',
 			'sidebar/geometry/bounds': 'Bounds',
+			'sidebar/geometry/show_vertex_normals': 'Show Vertex Normals',
 
 			'sidebar/geometry/box_geometry/width': 'Width',
 			'sidebar/geometry/box_geometry/height': 'Height',
@@ -432,6 +433,7 @@ var Strings = function ( config ) {
 			'sidebar/geometry/uuid': 'UUID',
 			'sidebar/geometry/name': 'Nom',
 			'sidebar/geometry/bounds': 'Limites',
+			'sidebar/geometry/show_vertex_normals': 'Show Vertex Normals',
 
 			'sidebar/geometry/box_geometry/width': 'Largeur',
 			'sidebar/geometry/box_geometry/height': 'Hauteur',
@@ -743,6 +745,7 @@ var Strings = function ( config ) {
 			'sidebar/geometry/uuid': '识别码',
 			'sidebar/geometry/name': '名称',
 			'sidebar/geometry/bounds': '界限',
+			'sidebar/geometry/show_vertex_normals': '显示顶点法线',
 
 			'sidebar/geometry/box_geometry/width': '宽度',
 			'sidebar/geometry/box_geometry/height': '高度',
@@ -838,7 +841,7 @@ var Strings = function ( config ) {
 			'sidebar/material/clearcoat': '透明图层',
 			'sidebar/material/clearcoatroughness': '透明图层粗糙度',
 			'sidebar/material/vertexcolors': '顶点颜色',
-			'sidebar/material/vertextangents': 'Vertex Tangents',
+			'sidebar/material/vertextangents': '顶点切线',
 			'sidebar/material/skinning': '皮肤',
 			'sidebar/material/map': '贴图',
 			'sidebar/material/alphamap': '透明贴图',
