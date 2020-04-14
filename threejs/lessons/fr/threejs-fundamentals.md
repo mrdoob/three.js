@@ -51,9 +51,9 @@ Voici ce qui est à remarquer dans le diagramme ci-dessus :
   la couleur d'arrière plan et le brouillard. L'ensemble de ces objets définissent une structure
   hiérarchique de type parent/enfant, arborescente, et indique où les objets apparaissent et
   comment ils sont orientés. Les enfants sont positionnés et orientés par rapport à leur parent.
-  Par exemple, les roues d'une voiture peuvent les enfants du châssis impliquant que le déplacement
-  et l'orientation de la voiture déplace automatiquement les roues. Plus de détails sont donnés
-  dans [l'article sur les graphes de scène](threejs-scenegraph.html).
+  Par exemple, les roues d'une voiture sont les enfants du châssis impliquant que si l'on déplace
+  ou oriente la voiture, les roues suiveront automatiquement son déplacement. Plus de
+  détails sont donnés dans [l'article sur les graphes de scène](threejs-scenegraph.html).
 
   Il est à noter sur que ce diagramme `Camera` est patiellement placée dans le graphe de scène.
   Cela permet d'attirer l'attention qu'en three.js, contrairement aux autres objets, une `Camera` ne doit
@@ -67,7 +67,7 @@ Voici ce qui est à remarquer dans le diagramme ci-dessus :
   simultanément. Par exemple, pour dessiner deux cubes bleus à des positions différentes, nous
   pouvons soit utiliser deux objets `Mesh` pour spécifier les positions et orientations de
   chaque cube; soit nous pouvons utiliser seulement une géométrie unique (`Geometry`) pour décrire les
-  données spatiales du cube et un matériau unique (`Material`) pour spécifier la couleur bleu.
+  données spatiales du cube et un matériau unique (`Material`) pour spécifier la couleur bleue.
   Les deux objets `Mesh` peuvent ainsi référencer les mêmes objets `Geometry` et `Material`.
 
 * Les objets `Geometry` représentent les données associées aux sommets d'une géométrie telle qu'une
@@ -78,7 +78,7 @@ Voici ce qui est à remarquer dans le diagramme ci-dessus :
 
 * Les objets `Material` représentent les
   [propriétés de surface utilisées pour dessiner la géométrie](threejs-materials.html)
-  telles que le couleur à utiliser ou leur pouvoir réfléchissant (brillance). Un matériau (`Material`)
+  telles que la couleur à utiliser ou le pouvoir réfléchissant (brillance). Un matériau (`Material`)
   peut aussi se référer à un ou plusieurs objets `Texture` dont l'utilité est, par exemple, de plaquer
   une image sur la surface d'un géométrie.
 
@@ -88,7 +88,7 @@ Voici ce qui est à remarquer dans le diagramme ci-dessus :
 
 * Les objets `Light` représentent [différentes sortent de lumière](threejs-lights.html).
 
-Maintenant que tout cela a été défini, nous allons présenter un exemple de type *"Hello Cube"* utilisant au
+Maintenant que tout cela a été défini, nous allons présenter un exemple de type *"Hello Cube"* utilisant un
 nombre minimum d'élements three.js :
 
 <div class="threejs_center"><img src="resources/images/threejs-1cube-no-light-scene.svg" style="width: 500px;"></div>
@@ -156,7 +156,7 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 ```
 
 `fov` est le raccourci pour `field of view` ou champ de vision.
-Dans ce cas, 75 d'ouverture verticale. Il est à noter que
+Dans ce cas, 75 degrés d'ouverture verticale. Il est à noter que
 la plupart des angles dans three.js sont exprimés en radians à l'exception
 de la caméra perspective.
 
@@ -174,7 +174,7 @@ cubes et prismes.
 
 <img src="resources/frustum-3d.svg" width="500" class="threejs_center"/>
 
-L'espacement entre les plans *near* et *far* est déterminée
+L'espacement entre les plans *near* et *far* est déterminé
 par le champ de vue. La largeur est fixée par le champ de vue et l'aspect.
 
 Tout ce qui est dans le *frustum* est dessiné. Ce qui est à l'extérieur ne l'est pas.
@@ -200,7 +200,7 @@ est plus grand que les 75 degrés spécifié pour le champ vertical.
 
 Ensuite, nous créons une `Scene`. Dans three.js, une `Scene` est la racine
 du graphe de scène. Tout ce que nous voulons que three.js dessine doit être ajouté
-à la scene. Cela est davantage détaillé dans [un futur article sur le fonctionnement des scènes](threejs-scenegraph.html).
+à la scène. Cela sera davantage détaillé dans [un futur article sur le fonctionnement des scènes](threejs-scenegraph.html).
 
 ```js
 const scene = new THREE.Scene();
@@ -285,7 +285,7 @@ qui dessinera notre scène.
 Il est mesuré en millisecondes. Il est parfois plus facile de travailler
 avec des secondes. C'est pourquoi, nous l'avons converti.
 
-A présent, nous appliquons sur le cube des rotations sur les axes X et Y en fonction du temps écoulé.
+A présent, nous appliquons sur le cube des rotations le long des axes X et Y en fonction du temps écoulé.
 Les angles de rotation sont exprimés en [radians](https://en.wikipedia.org/wiki/Radian).
 Sachant que 2 pi radians fait faire un tour complet, notre cube effectuera une rotation complète
 sur chaque axe en à peu près 6.28 secondes.
@@ -297,7 +297,7 @@ A l'extérieur de la boucle, nous appelons `requestAnimationFrame` une première
 
 {{{example url="../threejs-fundamentals-with-animation.html" }}}
 
-C'est un peu mieux mais il est toujours difficile de percevoir la 3d.
+C'est un peu mieux mais il est toujours difficile de percevoir la 3D.
 Ce qui aiderait serait d'ajouter de la lumière.
 Three.js propose plusieurs type de lumière que nous détaillerons dans
 [un futur article](threejs-lights.html). Pour le moment, créons une lumière directionnelle.
@@ -337,7 +337,7 @@ Cela devrait à présent apparaître très clairement en 3D.
 
 Pour le sport, ajoutons 2 cubes supplémentaires.
 
-Nous partageons la même géométrie pour chaque cube mais un matériau différente par cube
+Nous partageons la même géométrie pour chaque cube mais un matériau différent par cube
 de sorte que chacun d'eux soit affecté d'une couleur différente.
 
 Tout d'abord, nous définissons une fonction qui crée une nouveau matériau
@@ -395,7 +395,7 @@ sont partiellement en dehors du *frustum*. Ils sont également
 exagérément déformés puisque le champ de vue dépeint au travers du
 canevas est extrême.
 
-A présent, notre programme est représenté par la structure suivante :
+A présent, notre programme est schématisé par la figure suivante :
 
 <div class="threejs_center"><img src="resources/images/threejs-3cubes-scene.svg" style="width: 610px;"></div>
 
