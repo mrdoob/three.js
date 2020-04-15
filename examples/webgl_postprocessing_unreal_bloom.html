@@ -34,7 +34,10 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+
+			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 			import { UnrealBloomPass } from './jsm/postprocessing/UnrealBloomPass.js';
 
 			var scene, camera, controls, pointLight, stats;
@@ -82,9 +85,12 @@
 			bloomPass.strength = params.bloomStrength;
 			bloomPass.radius = params.bloomRadius;
 
+			var gammaCorrectionPass = new ShaderPass( GammaCorrectionShader );
+
 			composer = new EffectComposer( renderer );
 			composer.addPass( renderScene );
 			composer.addPass( bloomPass );
+			composer.addPass( gammaCorrectionPass );
 
 			new GLTFLoader().load( 'models/gltf/PrimaryIonDrive.glb', function ( gltf ) {
 
