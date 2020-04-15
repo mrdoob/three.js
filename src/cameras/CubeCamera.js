@@ -17,6 +17,13 @@ function CubeCamera( near, far, renderTarget ) {
 
 	this.type = 'CubeCamera';
 
+	if ( renderTarget.isWebGLCubeRenderTarget !== true ) {
+
+		console.error( 'THREE.CubeCamera: The constructor now expects an instance of WebGLCubeRenderTarget as third parameter.' );
+		return;
+
+	}
+
 	this.renderTarget = renderTarget;
 	this.renderTarget.texture.name = "CubeCameraTexture";
 
