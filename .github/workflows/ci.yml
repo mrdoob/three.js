@@ -27,10 +27,7 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-ci-${{ env.cache-name }}-
-            ${{ runner.os }}-ci-
-            ${{ runner.os }}-
+          restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
       - name: Install packages
         run: npm ci
 
@@ -54,10 +51,7 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-ci-${{ env.cache-name }}-
-            ${{ runner.os }}-ci-
-            ${{ runner.os }}-
+          restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
       - name: Install packages
         run: npm ci
 
@@ -87,10 +81,7 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-ci-${{ env.cache-name }}-
-            ${{ runner.os }}-ci-
-            ${{ runner.os }}-
+          restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
       - name: Install packages
         run: npm ci && sudo apt-get install xvfb && npm run build
 
@@ -114,10 +105,7 @@ jobs:
         with:
           path: ~/.npm
           key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-ci-${{ env.cache-name }}-
-            ${{ runner.os }}-ci-
-            ${{ runner.os }}-
+          restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
       - name: Install packages
         run: npm ci
 
