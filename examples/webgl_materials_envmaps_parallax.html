@@ -280,10 +280,13 @@
 				cameraControls.update();
 
 				// cube camera for environment map
-				cubeCamera = new THREE.CubeCamera( 1, 1000, 512 );
-				cubeCamera.renderTarget.texture.generateMipmaps = true;
-				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
-				cubeCamera.renderTarget.texture.mapping = THREE.CubeReflectionMapping;
+
+				var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 512, {
+					format: THREE.RGBFormat,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter
+				} );
+				cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
 
 				cubeCamera.position.set( 0, - 100, 0 );
 				scene.add( cubeCamera );
@@ -297,14 +300,14 @@
 
 				var defaultMat = new THREE.MeshPhysicalMaterial( {
 					roughness: 1,
-					envMap: cubeCamera.renderTarget.texture,
+					envMap: cubeRenderTarget.texture,
 					roughnessMap: rMap
 				} );
 
 				var boxProjectedMat = new THREE.MeshPhysicalMaterial( {
 					color: new THREE.Color( '#ffffff' ),
 					roughness: 1,
-					envMap: cubeCamera.renderTarget.texture,
+					envMap: cubeRenderTarget.texture,
 					roughnessMap: rMap
 				} );
 

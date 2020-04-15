@@ -17,12 +17,16 @@
 
 		<h2>代码示例</h2>
 
-		<code>// Create cube camera
-		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
+		<code>
+		// Create cube render target
+		var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+
+		// Create cube camera
+		var cubeCamera = new THREE.CubeCamera( 1, 100000, cubeRenderTarget );
 		scene.add( cubeCamera );
 
 		// Create car
-		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeCamera.renderTarget.texture } );
+		var chromeMaterial = new THREE.MeshLambertMaterial( { color: 0xffffff, envMap: cubeRenderTarget.texture } );
 		var car = new Mesh( carGeometry, chromeMaterial );
 		scene.add( car );
 
@@ -40,7 +44,6 @@
 
 		<p>
 			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]<br />
-			[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]<br />
 			[example:webgl_shading_physical shading / physical ]
 		</p>
 
@@ -48,12 +51,12 @@
 
 
 
-		<h3>[name]( [param:Number near], [param:Number far], [param:Number cubeResolution] )</h3>
+		<h3>[name]( [param:Number near], [param:Number far], [param:WebGLCubeRenderTarget renderTarget] )</h3>
 		<p>
 
 		near -- 近剪切面的距离<br />
 		far -- 远剪切面的距离<br />
-		cubeResolution -- 设置立方体边缘的长度
+		renderTarget -- The destination cube render target.
 		</p>
 		<p>
 			构造一个包含6个[page:PerspectiveCamera PerspectiveCameras]（透视摄像机）的立方摄像机，并将其拍摄的场景渲染到一个[page:WebGLCubeRenderTarget]上。
@@ -66,8 +69,7 @@
 
 		<h3>[property:WebGLCubeRenderTarget renderTarget]</h3>
 		<p>
-			生成的立方体纹理<br>
-			（译注：生成的立方体纹理保存在其中的.texture对象中，可作为贴图赋值给其他材质）
+			The destination cube render target.
 		</p>
 
 		<h2>方法</h2>

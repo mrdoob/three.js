@@ -17,7 +17,7 @@
 			var camera, scene, renderer;
 			var cube, sphere, torus, material;
 
-			var count = 0, cubeCamera1, cubeCamera2;
+			var count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
 
 			var onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
 
@@ -57,14 +57,12 @@
 
 				//
 
-				cubeCamera1 = new THREE.CubeCamera( 1, 1000, 256 );
-				cubeCamera1.renderTarget.texture.generateMipmaps = true;
-				cubeCamera1.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
+				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( 256, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
 				scene.add( cubeCamera1 );
 
-				cubeCamera2 = new THREE.CubeCamera( 1, 1000, 256 );
-				cubeCamera2.renderTarget.texture.generateMipmaps = true;
-				cubeCamera2.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
+				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
 				scene.add( cubeCamera2 );
 
 				document.body.appendChild( renderer.domElement );
@@ -72,7 +70,7 @@
 				//
 
 				material = new THREE.MeshBasicMaterial( {
-					envMap: cubeCamera2.renderTarget.texture
+					envMap: cubeRenderTarget2.texture
 				} );
 
 				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 3 ), material );
@@ -183,12 +181,12 @@
 				if ( count % 2 === 0 ) {
 
 					cubeCamera1.update( renderer, scene );
-					material.envMap = cubeCamera1.renderTarget.texture;
+					material.envMap = cubeRenderTarget1.texture;
 
 				} else {
 
 					cubeCamera2.update( renderer, scene );
-					material.envMap = cubeCamera2.renderTarget.texture;
+					material.envMap = cubeRenderTarget2.texture;
 
 				}
 

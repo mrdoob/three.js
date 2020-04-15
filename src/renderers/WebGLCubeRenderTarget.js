@@ -110,11 +110,7 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 	scene.add( mesh );
 
-	var camera = new CubeCamera( 1, 10, 1 );
-
-	camera.renderTarget = this;
-	camera.renderTarget.texture.name = 'CubeCameraTexture';
-
+	var camera = new CubeCamera( 1, 10, this );
 	camera.update( renderer, scene );
 
 	mesh.geometry.dispose();
