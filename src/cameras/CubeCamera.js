@@ -25,7 +25,6 @@ function CubeCamera( near, far, renderTarget ) {
 	}
 
 	this.renderTarget = renderTarget;
-	this.renderTarget.texture.name = "CubeCameraTexture";
 
 	var cameraPX = new PerspectiveCamera( fov, aspect, near, far );
 	cameraPX.up.set( 0, - 1, 0 );
