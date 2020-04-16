@@ -379,7 +379,7 @@
 						hitsPerPage: 10, 'facetFilters': ["lang:" + languageSelect.value]
 					}
 				})
-				if ('URLSearchParams' in window) {
+				if (window.location.hash.includes('q=')) {
 					const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
 					const searchQuery = urlParams.get('q')
 					document.getElementById('filter').value = searchQuery
