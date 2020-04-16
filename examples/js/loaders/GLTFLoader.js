@@ -121,6 +121,8 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
+			return this;
+
 		},
 
 		unregister: function ( plugin ) {
@@ -130,6 +132,8 @@ THREE.GLTFLoader = ( function () {
 				this.plugins.splice( this.plugins.indexOf( plugin ), 1 );
 
 			}
+
+			return this;
 
 		},
 

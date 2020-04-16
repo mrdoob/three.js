@@ -185,6 +185,8 @@ var GLTFLoader = ( function () {
 
 			}
 
+			return this;
+
 		},
 
 		unregister: function ( plugin ) {
@@ -194,6 +196,8 @@ var GLTFLoader = ( function () {
 				this.plugins.splice( this.plugins.indexOf( plugin ), 1 );
 
 			}
+
+			return this;
 
 		},
 
