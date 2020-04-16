@@ -14,6 +14,21 @@ import { Raycaster } from './Raycaster';
 import { EventDispatcher } from './EventDispatcher';
 import { BufferGeometry } from './BufferGeometry';
 import { Intersection } from './Raycaster';
+import { CubeCamera } from '../cameras/CubeCamera';
+import { Light } from '../lights/Light';
+import { Bone } from '../objects/Bone';
+import { LOD } from '../objects/LOD';
+import { Line } from '../objects/Line';
+import { Mesh } from '../objects/Mesh';
+import { Points } from '../objects/Points';
+import { Sprite } from '../objects/Sprite';
+import { Audio } from '../audio/Audio';
+import { ArrowHelper } from '../helpers/ArrowHelper';
+import { DirectionalLightHelper } from '../helpers/DirectionalLightHelper';
+import { HemisphereLightHelper } from '../helpers/HemisphereLightHelper';
+import { PointLightHelper } from '../helpers/PointLightHelper';
+import { SpotLightHelper } from '../helpers/SpotLightHelper';
+import { ImmediateRenderObject } from '../extras/objects/ImmediateRenderObject';
 
 export let Object3DIdCount: number;
 
@@ -297,7 +312,28 @@ export class Object3D extends EventDispatcher {
 	 * Searches through the object's children and returns the first with a matching id.
 	 * @param id	Unique number of the object instance
 	 */
-	getObjectById( id: number ): Object3D | undefined;
+	getObjectByName( name: string ):
+	Object3D |
+	Camera |
+	CubeCamera |
+	Light |
+	Bone |
+	Group |
+	LOD |
+	Line |
+	Mesh |
+	Points |
+	Sprite |
+	Scene |
+	Audio |
+	AudioListener |
+	ArrowHelper |
+	DirectionalLightHelper |
+	HemisphereLightHelper |
+	PointLightHelper |
+	SpotLightHelper |
+	ImmediateRenderObject |
+	undefined;
 
 	/**
 	 * Searches through the object's children and returns the first with a matching name.
