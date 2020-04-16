@@ -107,8 +107,6 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				}
 
-				path.opacity = style.opacity || 1.0;
-
 				transformPath( path, currentTransform );
 
 				paths.push( path );
