@@ -564,7 +564,12 @@ body .algolia-autocomplete .algolia-docsearch-suggestion--highlight {
 	color: var(--color-blue);
 }
 
-body .ds-dropdown-menu {
+body .algolia-autocomplete .ds-dropdown-menu {
 	max-height: 80vh;
-	overflow-y: scroll;
+	overflow: scroll;
+}
+
+body .algolia-autocomplete .ds-dropdown-menu,
+body .algolia-autocomplete .ds-dropdown-menu * {
+	max-width:80vw;
 }
