@@ -382,6 +382,7 @@
 				if (window.location.hash.includes('q=')) {
 					const urlParams = new URLSearchParams(window.location.hash.split('?')[1]);
 					const searchQuery = urlParams.get('q')
+					window.innerWidth < 640 && document.getElementById('expandButton').click();
 					document.getElementById('filter').value = searchQuery
 					document.getElementById('filter').focus()
 					docSearch.autocomplete.autocomplete.setVal(searchQuery)
