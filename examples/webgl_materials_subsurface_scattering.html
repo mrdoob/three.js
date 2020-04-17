@@ -21,7 +21,7 @@
 
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { TranslucentShader } from './jsm/shaders/TranslucentShader.js';
+		import { SubsurfaceScatteringShader } from './jsm/shaders/SubsurfaceScatteringShader.js';
 		import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 		var container, stats;
@@ -91,7 +91,7 @@
 			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
-			var shader = TranslucentShader;
+			var shader = SubsurfaceScatteringShader;
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			uniforms[ 'map' ].value = imgTexture;

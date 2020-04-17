@@ -214,7 +214,7 @@ var files = [
 	{ path: 'shaders/TechnicolorShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ToneMapShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ToonShader.js', dependencies: [], ignoreList: [] },
-	{ path: 'shaders/TranslucentShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/SubsurfaceScatteringShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/TriangleBlurShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/UnpackDepthRGBAShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/VerticalBlurShader.js', dependencies: [], ignoreList: [] },

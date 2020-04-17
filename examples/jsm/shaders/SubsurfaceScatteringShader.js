@@ -24,7 +24,7 @@ function replaceAll( string, find, replace ) {
 var meshphong_frag_head = ShaderChunk[ "meshphong_frag" ].slice( 0, ShaderChunk[ "meshphong_frag" ].indexOf( 'void main() {' ) );
 var meshphong_frag_body = ShaderChunk[ "meshphong_frag" ].slice( ShaderChunk[ "meshphong_frag" ].indexOf( 'void main() {' ) );
 
-var TranslucentShader = {
+var SubsurfaceScatteringShader = {
 
 	uniforms: UniformsUtils.merge( [
 		ShaderLib[ "phong" ].uniforms,
@@ -47,7 +47,7 @@ var TranslucentShader = {
 
 	fragmentShader: [
 		"#define USE_UV",
-		"#define TRANSLUCENT",
+		"#define SUBSURFACE",
 
 		meshphong_frag_head,
 
@@ -75,7 +75,7 @@ var TranslucentShader = {
 				[
 					"RE_Direct( directLight, geometry, material, reflectedLight );",
 
-					"#if defined( TRANSLUCENT ) && defined( USE_UV )",
+					"#if defined( SUBSURFACE ) && defined( USE_UV )",
 					" RE_Direct_Scattering(directLight, vUv, geometry, reflectedLight);",
 					"#endif",
 				].join( "\n" )
@@ -87,4 +87,4 @@ var TranslucentShader = {
 
 };
 
-export { TranslucentShader };
+export { SubsurfaceScatteringShader };
