@@ -724,6 +724,12 @@ GLTFExporter.prototype = {
 
 			};
 
+			if ( attribute.normalized === true ) {
+
+				gltfAccessor.normalized = true;
+				
+			}
+
 			if ( ! outputJSON.accessors ) {
 
 				outputJSON.accessors = [];
