@@ -138,7 +138,7 @@
 
 			var ThicknessControls = function () {
 
-				this.distoration = uniforms[ 'thicknessDistortion' ].value;
+				this.distortion = uniforms[ 'thicknessDistortion' ].value;
 				this.ambient = uniforms[ 'thicknessAmbient' ].value;
 				this.attenuation = uniforms[ 'thicknessAttenuation' ].value;
 				this.power = uniforms[ 'thicknessPower' ].value;
@@ -149,9 +149,9 @@
 			var thicknessControls = new ThicknessControls();
 			var thicknessFolder = gui.addFolder( 'Thickness Control' );
 
-			thicknessFolder.add( thicknessControls, 'distoration' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
+			thicknessFolder.add( thicknessControls, 'distortion' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
 
-				uniforms[ 'thicknessDistortion' ].value = thicknessControls.distoration;
+				uniforms[ 'thicknessDistortion' ].value = thicknessControls.distortion;
 
 			} );
 
