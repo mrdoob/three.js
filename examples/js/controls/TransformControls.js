@@ -1165,9 +1165,19 @@ THREE.TransformControlsGizmo = function () {
 			handle.rotation.set( 0, 0, 0 );
 			handle.position.copy( this.worldPosition );
 
-			var eyeDistance = this.camera.isOrthographicCamera ? 1000 / this.camera.zoom : 
-				this.worldPosition.distanceTo( this.cameraPosition );			
-			handle.scale.set( 1, 1, 1 ).multiplyScalar( eyeDistance * this.size / 7 );
+			var factor;
+
+			if ( this.camera.isOrthographicCamera ) {
+
+				factor = ( this.camera.top - this.camera.bottom ) / this.camera.zoom;
+
+			} else {
+
+				factor = this.worldPosition.distanceTo( this.cameraPosition ) * Math.min( 1.9 * Math.tan( Math.PI * this.camera.getEffectiveFOV() / 360 ), 7 );
+
+			}
+
+			handle.scale.set( 1, 1, 1 ).multiplyScalar( factor * this.size / 7 );
 
 			// TODO: simplify helpers and consider decoupling from gizmo
 
