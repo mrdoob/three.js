@@ -13,7 +13,6 @@ function ShapePath() {
 	this.type = 'ShapePath';
 
 	this.color = new Color();
-	this.opacity = 1.0;
 
 	this.subPaths = [];
 	this.currentPath = null;
