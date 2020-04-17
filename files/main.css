@@ -277,15 +277,14 @@ h1 a {
 
 	#contentWrapper {
 		flex: 1;
-		overflow: visible;
 		display: flex;
 		flex-direction: column;
 		transform: translate3d(0,0,0);
+		max-height: 100%;
 	}
 	#panel #content {
 		flex: 1;
-		overflow-y: auto;
-		overflow-x: visible;
+		overflow-y: scroll;
 		-webkit-overflow-scrolling: touch;
 		padding: 0 var(--panel-padding) var(--panel-padding) var(--panel-padding);
 	}
