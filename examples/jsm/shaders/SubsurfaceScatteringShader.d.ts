@@ -2,7 +2,7 @@ import {
 	Uniform
 } from '../../../src/Three';
 
-export const TranslucentShader: {
+export const SubsurfaceScatteringShader: {
 	uniforms: {
 		alphaMap: Uniform;
 		ambientLightColor: Uniform;
