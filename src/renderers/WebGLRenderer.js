@@ -1272,9 +1272,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		var visible = object.layers.test( camera.layers );
+		var layerTest = object.layers.test( camera.layers );
 
-		if ( visible ) {
+		if ( ! object.layers.recursive || layerTest && object.layers.recursive ) {
 
 			if ( object.isGroup ) {
 

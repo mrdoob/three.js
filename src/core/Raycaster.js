@@ -46,11 +46,17 @@ function ascSort( a, b ) {
 
 function intersectObject( object, raycaster, intersects, recursive ) {
 
-	if ( object.layers.test( raycaster.layers ) ) {
+	var layerTest = object.layers.test( raycaster.layers );
+
+	if ( layerTest ) {
 
 		object.raycast( raycaster, intersects );
 
-		if ( recursive === true ) {
+	}
+
+	if ( recursive === true ) {
+
+		if ( ! object.layers.recursive || object.layers.recursive && layerTest ) {
 
 			var children = object.children;
 
