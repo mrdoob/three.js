@@ -1274,7 +1274,7 @@ function WebGLRenderer( parameters ) {
 
 		var layerTest = object.layers.test( camera.layers );
 
-		if ( ! object.layers.recursive || layerTest && object.layers.recursive ) {
+		if ( layerTest ) {
 
 			if ( object.isGroup ) {
 
@@ -1381,11 +1381,15 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			var children = object.children;
+			if ( ! object.layers.recursive || object.layers.recursive && layerTest ) {
 
-			for ( var i = 0, l = children.length; i < l; i ++ ) {
+				var children = object.children;
 
-				projectObject( children[ i ], camera, groupOrder, sortObjects );
+				for ( var i = 0, l = children.length; i < l; i ++ ) {
+
+					projectObject( children[ i ], camera, groupOrder, sortObjects );
+
+				}
 
 			}
 
