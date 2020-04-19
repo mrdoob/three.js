@@ -6,12 +6,13 @@
 import { Raycaster } from '../../../../src/core/Raycaster';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Mesh } from '../../../../src/objects/Mesh';
-import { SphereGeometry } from '../../../../src/geometries/SphereGeometry';
+import { SphereGeometry, SphereBufferGeometry } from '../../../../src/geometries/SphereGeometry';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
 import { Line } from '../../../../src/objects/Line.js';
 import { Points } from '../../../../src/objects/Points.js';
 import { PerspectiveCamera } from '../../../../src/cameras/PerspectiveCamera';
 import { OrthographicCamera } from '../../../../src/cameras/OrthographicCamera';
+import { Group } from '../../../../src/objects/Group';
 
 function checkRayDirectionAgainstReferenceVector( rayDirection, refVector, assert ) {
 
@@ -227,6 +228,27 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "Recursive layers", ( assert ) => {
+
+			var raycaster = getRaycaster();
+			var geometry = new SphereBufferGeometry();
+			var child = new Mesh( geometry );
+			var parent = new Group();
+
+			parent.add( child );
+
+			raycaster.ray.origin.set( 0, 0, - 2 );
+			raycaster.ray.direction.set( 0, 0, 1 );
+
+			parent.layers.disableAll();
+			assert.ok( raycaster.intersectObject( parent, true ).length === 1,
+				"successful intersection with child that matches layer mask" );
+
+			parent.layers.recursive = true;
+			assert.ok( raycaster.intersectObject( parent, true ).length === 0,
+				"no intersection with recursive layer checking" );
+
+		} );
 
 	} );
 
