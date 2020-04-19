@@ -240,6 +240,11 @@ export default QUnit.module( 'Core', () => {
 			raycaster.ray.origin.set( 0, 0, - 2 );
 			raycaster.ray.direction.set( 0, 0, 1 );
 
+			parent.layers.recursive = true;
+			assert.ok( raycaster.intersectObject( parent, true ).length === 1,
+				"successful intersection with parent and child that matches recursive layer mask" );
+
+			parent.layers.recursive = false;
 			parent.layers.disableAll();
 			assert.ok( raycaster.intersectObject( parent, true ).length === 1,
 				"successful intersection with child that matches layer mask" );
