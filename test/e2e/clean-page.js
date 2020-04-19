@@ -5,7 +5,7 @@
 ( function () {
 
 
-  /* Start VR pages */
+  /* Remove start screen ( or press some button ) */
 
   let button = document.getElementById( 'startButton' );
   if ( button ) {
