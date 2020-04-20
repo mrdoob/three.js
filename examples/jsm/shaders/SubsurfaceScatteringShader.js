@@ -11,8 +11,8 @@
 import {
 	Color,
 	ShaderChunk,
-	UniformsUtils,
-	ShaderLib
+	ShaderLib,
+	UniformsUtils
 } from "../../../build/three.module.js";
 
 function replaceAll( string, find, replace ) {
