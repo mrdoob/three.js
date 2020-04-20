@@ -27380,16 +27380,16 @@
 
 				// process the result of raycast
 
-				if ( _instanceIntersects.length > 0 ) {
+				for ( var i = 0, l = _instanceIntersects.length; i < l; i ++ ) {
 
-					_instanceIntersects[ 0 ].instanceId = instanceId;
-					_instanceIntersects[ 0 ].object = this;
-
-					intersects.push( _instanceIntersects[ 0 ] );
-
-					_instanceIntersects.length = 0;
+					var intersect = _instanceIntersects[ i ];
+					intersect.instanceId = instanceId;
+					intersect.object = this;
+					intersects.push( intersect );
 
 				}
+
+				_instanceIntersects.length = 0;
 
 			}
 
@@ -35897,6 +35897,18 @@
 	Object.assign( Loader.prototype, {
 
 		load: function ( /* url, onLoad, onProgress, onError */ ) {},
+
+		loadAsync: function ( url, onProgress ) {
+
+			var scope = this;
+
+			return new Promise( function ( resolve, reject ) {
+
+				scope.load( url, resolve, onProgress, reject );
+
+			} );
+
+		},
 
 		parse: function ( /* data */ ) {},
 
