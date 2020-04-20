@@ -63,6 +63,10 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				case 'svg':
 					break;
 
+				case 'style':
+					parseCSSStylesheet( node );
+					break;
+
 				case 'g':
 					style = parseStyle( node, style );
 					break;
@@ -103,7 +107,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					break;
 
 				default:
-					console.log( node );
+					// console.log( node );
 
 			}
 
@@ -570,6 +574,34 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		function parseCSSStylesheet( node ) {
+
+			if ( !node.sheet || !node.sheet.cssRules || !node.sheet.cssRules.length ) return;
+
+			for ( var i = 0; i < node.sheet.cssRules.length; i ++ ) {
+
+				var stylesheet = node.sheet.cssRules[ i ];
+
+				if ( stylesheet.type !== 1 ) continue;
+
+				var selectorList = stylesheet.selectorText
+					.split( /,/gm )
+					.filter( Boolean )
+					.map( i => i.trim() );
+
+				for ( var j = 0; j < selectorList.length; j ++ ) {
+
+					stylesheets[ selectorList[ j ] ] = Object.assign(
+						stylesheets[ selectorList[ j ] ] || {},
+						stylesheet.style
+					);
+
+				}
+				
+			}
+
+		}
+
 		/**
 		 * https://www.w3.org/TR/SVG/implnote.html#ArcImplementationNotes
 		 * https://mortoray.com/2017/02/16/rendering-an-svg-elliptical-arc-as-bezier-curves/ Appendix: Endpoint to center arc conversion
@@ -806,6 +838,29 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			style = Object.assign( {}, style ); // clone style
 
+			var stylesheetStyles = {};
+
+			if ( node.hasAttribute( 'class' ) ) {
+
+				var classSelectors = node.getAttribute( 'class' )
+					.split( /\s/ )
+					.filter( Boolean )
+					.map( i => i.trim() );
+
+				for ( var i = 0; i < classSelectors.length; i ++ ) {
+
+					stylesheetStyles = Object.assign( stylesheetStyles, stylesheets[ '.' + classSelectors[ i ] ] );
+
+				}
+
+			}
+
+			if ( node.hasAttribute( 'id' ) ) {
+
+				stylesheetStyles = Object.assign( stylesheetStyles, stylesheets[ '#' + node.getAttribute( 'id' ) ] );
+
+			}
+
 			function addStyle( svgName, jsName, adjustFunction ) {
 
 				if ( adjustFunction === undefined ) adjustFunction = function copy( v ) {
@@ -815,6 +870,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				};
 
 				if ( node.hasAttribute( svgName ) ) style[ jsName ] = adjustFunction( node.getAttribute( svgName ) );
+				if ( stylesheetStyles[ svgName ] ) style[ jsName ] = adjustFunction( stylesheetStyles[ svgName ] );
 				if ( node.style && node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
 
 			}
@@ -833,12 +889,14 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			addStyle( 'fill', 'fill' );
 			addStyle( 'fill-opacity', 'fillOpacity', clamp );
+			addStyle( 'opacity', 'opacity', clamp );
 			addStyle( 'stroke', 'stroke' );
 			addStyle( 'stroke-opacity', 'strokeOpacity', clamp );
 			addStyle( 'stroke-width', 'strokeWidth', positive );
 			addStyle( 'stroke-linejoin', 'strokeLineJoin' );
 			addStyle( 'stroke-linecap', 'strokeLineCap' );
 			addStyle( 'stroke-miterlimit', 'strokeMiterLimit', positive );
+			addStyle( 'visibility', 'visibility' );
 
 			return style;
 
@@ -1245,6 +1303,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		//
 
 		var paths = [];
+		var stylesheets = {};
 
 		var transformStack = [];
 
