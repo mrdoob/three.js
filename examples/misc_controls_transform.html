@@ -22,7 +22,8 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 
-			var cameras, camera, scene, renderer, control, orbit;
+			var cameraPersp, cameraOrtho, currentCamera;
+			var scene, renderer, control, orbit;
 
 			init();
 			render();
@@ -35,14 +36,13 @@
 				document.body.appendChild( renderer.domElement );
 
 				const aspect = window.innerWidth / window.innerHeight;
-				camera = 'persp';
-				cameras = {
-					'persp': new THREE.PerspectiveCamera( 50, aspect, 0.01, 30000 ),
-					'ortho': new THREE.OrthographicCamera( -600 * aspect, 600 * aspect, 600, -600, 0.01, 30000 ),
-				};
 
-				cameras[camera].position.set( 1000, 500, 1000 );
-				cameras[camera].lookAt( 0, 200, 0 );
+				cameraPersp = new THREE.PerspectiveCamera( 50, aspect, 0.01, 30000 );
+				cameraOrtho = new THREE.OrthographicCamera( - 600 * aspect, 600 * aspect, 600, - 600, 0.01, 30000 );
+				currentCamera = cameraPersp;
+
+				currentCamera.position.set( 1000, 500, 1000 );
+				currentCamera.lookAt( 0, 200, 0 );
 
 				scene = new THREE.Scene();
 				scene.add( new THREE.GridHelper( 1000, 10 ) );
@@ -57,11 +57,11 @@
 				var geometry = new THREE.BoxBufferGeometry( 200, 200, 200 );
 				var material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
 
-				orbit = new OrbitControls( cameras[camera], renderer.domElement );
+				orbit = new OrbitControls( currentCamera, renderer.domElement );
 				orbit.update();
 				orbit.addEventListener( 'change', render );
 
-				control = new TransformControls( cameras[camera], renderer.domElement );
+				control = new TransformControls( currentCamera, renderer.domElement );
 				control.addEventListener( 'change', render );
 
 				control.addEventListener( 'dragging-changed', function ( event ) {
@@ -105,15 +105,15 @@
 							break;
 
 						case 67: // C
-							const position = cameras[camera].position.clone();
+							const position = currentCamera.position.clone();
 
-							camera = camera === 'persp' ? 'ortho' : 'persp';
-							cameras[camera].position.copy(position);
+							currentCamera = currentCamera.isPerspectiveCamera ? cameraOrtho : cameraPersp;
+							currentCamera.position.copy( position );
 
-							orbit.object = cameras[camera];
-							control.camera = cameras[camera];
+							orbit.object = currentCamera;
+							control.camera = currentCamera;
 
-							cameras[camera].lookAt( orbit.target.x, orbit.target.y, orbit.target.z );
+							currentCamera.lookAt( orbit.target.x, orbit.target.y, orbit.target.z );
 							onWindowResize();
 							break;
 
@@ -121,12 +121,12 @@
 							const randomFoV = Math.random() + 0.1;
 							const randomZoom = Math.random() + 0.1;
 
-							cameras['persp'].fov = randomFoV * 160;
-							cameras['ortho'].bottom = -randomFoV * 500;
-							cameras['ortho'].top = randomFoV * 500;
+							cameraPersp.fov = randomFoV * 160;
+							cameraOrtho.bottom = - randomFoV * 500;
+							cameraOrtho.top = randomFoV * 500;
 
-							cameras['persp'].zoom = randomZoom * 5;
-							cameras['ortho'].zoom = randomZoom * 5;
+							cameraPersp.zoom = randomZoom * 5;
+							cameraOrtho.zoom = randomZoom * 5;
 							onWindowResize();
 							break;
 
@@ -180,12 +180,12 @@
 
 				const aspect = window.innerWidth / window.innerHeight;
 
-				cameras['persp'].aspect = aspect;
-				cameras['persp'].updateProjectionMatrix();
+				cameraPersp.aspect = aspect;
+				cameraPersp.updateProjectionMatrix();
 
-				cameras['ortho'].left = cameras['ortho'].bottom * aspect;
-				cameras['ortho'].right = cameras['ortho'].top * aspect;
-				cameras['ortho'].updateProjectionMatrix();
+				cameraOrtho.left = cameraOrtho.bottom * aspect;
+				cameraOrtho.right = cameraOrtho.top * aspect;
+				cameraOrtho.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
@@ -195,7 +195,7 @@
 
 			function render() {
 
-				renderer.render( scene, cameras[camera] );
+				renderer.render( scene, currentCamera );
 
 			}
 
