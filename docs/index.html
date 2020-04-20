@@ -27,7 +27,7 @@
 
 			<div id="contentWrapper">
 				<div id="inputWrapper">
-					<input placeholder="" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
 					<div id="exitSearchButton"></div>
 					<select id="language">
 						<option value="en">en</option>
@@ -94,7 +94,7 @@
 			var expandButton = document.getElementById( 'expandButton' );
 			var exitSearchButton = document.getElementById( 'exitSearchButton' );
 			var panelScrim = document.getElementById( 'panelScrim' );
-			var filterInput = document.getElementById( 'filter' );
+			var filterInput = document.getElementById( 'filterInput' );
 			var iframe = document.querySelector( 'iframe' );
 
 			var pageProperties = {};
