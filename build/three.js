@@ -553,33 +553,34 @@
 			var c3_1 = cos( ( c - a ) / 2 );
 			var s3_1 = sin( ( c - a ) / 2 );
 
-			if ( order === 'XYX' ) {
+			switch ( order ) {
 
-				q.set( c2 * s13, s2 * c1_3, s2 * s1_3, c2 * c13 );
+				case 'XYX':
+					q.set( c2 * s13, s2 * c1_3, s2 * s1_3, c2 * c13 );
+					break;
 
-			} else if ( order === 'YZY' ) {
+				case 'YZY':
+					q.set( s2 * s1_3, c2 * s13, s2 * c1_3, c2 * c13 );
+					break;
 
-				q.set( s2 * s1_3, c2 * s13, s2 * c1_3, c2 * c13 );
+				case 'ZXZ':
+					q.set( s2 * c1_3, s2 * s1_3, c2 * s13, c2 * c13 );
+					break;
 
-			} else if ( order === 'ZXZ' ) {
+				case 'XZX':
+					q.set( c2 * s13, s2 * s3_1, s2 * c3_1, c2 * c13 );
+					break;
 
-				q.set( s2 * c1_3, s2 * s1_3, c2 * s13, c2 * c13 );
+				case 'YXY':
+					q.set( s2 * c3_1, c2 * s13, s2 * s3_1, c2 * c13 );
+					break;
 
-			} else if ( order === 'XZX' ) {
+				case 'ZYZ':
+					q.set( s2 * s3_1, s2 * c3_1, c2 * s13, c2 * c13 );
+					break;
 
-				q.set( c2 * s13, s2 * s3_1, s2 * c3_1, c2 * c13 );
-
-			} else if ( order === 'YXY' ) {
-
-				q.set( s2 * c3_1, c2 * s13, s2 * s3_1, c2 * c13 );
-
-			} else if ( order === 'ZYZ' ) {
-
-				q.set( s2 * s3_1, s2 * c3_1, c2 * s13, c2 * c13 );
-
-			} else {
-
-				console.warn( 'THREE.MathUtils: .setQuaternionFromProperEuler() encountered an unknown order.' );
+				default:
+					console.warn( 'THREE.MathUtils: .setQuaternionFromProperEuler() encountered an unknown order: ' + order );
 
 			}
 
@@ -2842,47 +2843,52 @@
 			var s2 = sin( y / 2 );
 			var s3 = sin( z / 2 );
 
-			if ( order === 'XYZ' ) {
+			switch ( order ) {
 
-				this._x = s1 * c2 * c3 + c1 * s2 * s3;
-				this._y = c1 * s2 * c3 - s1 * c2 * s3;
-				this._z = c1 * c2 * s3 + s1 * s2 * c3;
-				this._w = c1 * c2 * c3 - s1 * s2 * s3;
+				case 'XYZ':
+					this._x = s1 * c2 * c3 + c1 * s2 * s3;
+					this._y = c1 * s2 * c3 - s1 * c2 * s3;
+					this._z = c1 * c2 * s3 + s1 * s2 * c3;
+					this._w = c1 * c2 * c3 - s1 * s2 * s3;
+					break;
 
-			} else if ( order === 'YXZ' ) {
+				case 'YXZ':
+					this._x = s1 * c2 * c3 + c1 * s2 * s3;
+					this._y = c1 * s2 * c3 - s1 * c2 * s3;
+					this._z = c1 * c2 * s3 - s1 * s2 * c3;
+					this._w = c1 * c2 * c3 + s1 * s2 * s3;
+					break;
 
-				this._x = s1 * c2 * c3 + c1 * s2 * s3;
-				this._y = c1 * s2 * c3 - s1 * c2 * s3;
-				this._z = c1 * c2 * s3 - s1 * s2 * c3;
-				this._w = c1 * c2 * c3 + s1 * s2 * s3;
+				case 'ZXY':
+					this._x = s1 * c2 * c3 - c1 * s2 * s3;
+					this._y = c1 * s2 * c3 + s1 * c2 * s3;
+					this._z = c1 * c2 * s3 + s1 * s2 * c3;
+					this._w = c1 * c2 * c3 - s1 * s2 * s3;
+					break;
 
-			} else if ( order === 'ZXY' ) {
+				case 'ZYX':
+					this._x = s1 * c2 * c3 - c1 * s2 * s3;
+					this._y = c1 * s2 * c3 + s1 * c2 * s3;
+					this._z = c1 * c2 * s3 - s1 * s2 * c3;
+					this._w = c1 * c2 * c3 + s1 * s2 * s3;
+					break;
 
-				this._x = s1 * c2 * c3 - c1 * s2 * s3;
-				this._y = c1 * s2 * c3 + s1 * c2 * s3;
-				this._z = c1 * c2 * s3 + s1 * s2 * c3;
-				this._w = c1 * c2 * c3 - s1 * s2 * s3;
+				case 'YZX':
+					this._x = s1 * c2 * c3 + c1 * s2 * s3;
+					this._y = c1 * s2 * c3 + s1 * c2 * s3;
+					this._z = c1 * c2 * s3 - s1 * s2 * c3;
+					this._w = c1 * c2 * c3 - s1 * s2 * s3;
+					break;
 
-			} else if ( order === 'ZYX' ) {
+				case 'XZY':
+					this._x = s1 * c2 * c3 - c1 * s2 * s3;
+					this._y = c1 * s2 * c3 - s1 * c2 * s3;
+					this._z = c1 * c2 * s3 + s1 * s2 * c3;
+					this._w = c1 * c2 * c3 + s1 * s2 * s3;
+					break;
 
-				this._x = s1 * c2 * c3 - c1 * s2 * s3;
-				this._y = c1 * s2 * c3 + s1 * c2 * s3;
-				this._z = c1 * c2 * s3 - s1 * s2 * c3;
-				this._w = c1 * c2 * c3 + s1 * s2 * s3;
-
-			} else if ( order === 'YZX' ) {
-
-				this._x = s1 * c2 * c3 + c1 * s2 * s3;
-				this._y = c1 * s2 * c3 + s1 * c2 * s3;
-				this._z = c1 * c2 * s3 - s1 * s2 * c3;
-				this._w = c1 * c2 * c3 - s1 * s2 * s3;
-
-			} else if ( order === 'XZY' ) {
-
-				this._x = s1 * c2 * c3 - c1 * s2 * s3;
-				this._y = c1 * s2 * c3 - s1 * c2 * s3;
-				this._z = c1 * c2 * s3 + s1 * s2 * c3;
-				this._w = c1 * c2 * c3 + s1 * s2 * s3;
+				default:
+					console.warn( 'THREE.Quaternion: .setFromEuler() encountered an unknown order: ' + order );
 
 			}
 
@@ -5022,105 +5028,119 @@
 
 			order = order || this._order;
 
-			if ( order === 'XYZ' ) {
+			switch ( order ) {
 
-				this._y = Math.asin( clamp( m13, - 1, 1 ) );
+				case 'XYZ':
 
-				if ( Math.abs( m13 ) < 0.9999999 ) {
+					this._y = Math.asin( clamp( m13, - 1, 1 ) );
 
-					this._x = Math.atan2( - m23, m33 );
-					this._z = Math.atan2( - m12, m11 );
+					if ( Math.abs( m13 ) < 0.9999999 ) {
 
-				} else {
+						this._x = Math.atan2( - m23, m33 );
+						this._z = Math.atan2( - m12, m11 );
 
-					this._x = Math.atan2( m32, m22 );
-					this._z = 0;
+					} else {
 
-				}
+						this._x = Math.atan2( m32, m22 );
+						this._z = 0;
 
-			} else if ( order === 'YXZ' ) {
+					}
 
-				this._x = Math.asin( - clamp( m23, - 1, 1 ) );
+					break;
 
-				if ( Math.abs( m23 ) < 0.9999999 ) {
+				case 'YXZ':
 
-					this._y = Math.atan2( m13, m33 );
-					this._z = Math.atan2( m21, m22 );
+					this._x = Math.asin( - clamp( m23, - 1, 1 ) );
 
-				} else {
+					if ( Math.abs( m23 ) < 0.9999999 ) {
 
-					this._y = Math.atan2( - m31, m11 );
-					this._z = 0;
+						this._y = Math.atan2( m13, m33 );
+						this._z = Math.atan2( m21, m22 );
 
-				}
+					} else {
 
-			} else if ( order === 'ZXY' ) {
+						this._y = Math.atan2( - m31, m11 );
+						this._z = 0;
 
-				this._x = Math.asin( clamp( m32, - 1, 1 ) );
+					}
 
-				if ( Math.abs( m32 ) < 0.9999999 ) {
+					break;
 
-					this._y = Math.atan2( - m31, m33 );
-					this._z = Math.atan2( - m12, m22 );
+				case 'ZXY':
 
-				} else {
+					this._x = Math.asin( clamp( m32, - 1, 1 ) );
 
-					this._y = 0;
-					this._z = Math.atan2( m21, m11 );
+					if ( Math.abs( m32 ) < 0.9999999 ) {
 
-				}
+						this._y = Math.atan2( - m31, m33 );
+						this._z = Math.atan2( - m12, m22 );
 
-			} else if ( order === 'ZYX' ) {
+					} else {
 
-				this._y = Math.asin( - clamp( m31, - 1, 1 ) );
+						this._y = 0;
+						this._z = Math.atan2( m21, m11 );
 
-				if ( Math.abs( m31 ) < 0.9999999 ) {
+					}
 
-					this._x = Math.atan2( m32, m33 );
-					this._z = Math.atan2( m21, m11 );
+					break;
 
-				} else {
+				case 'ZYX':
 
-					this._x = 0;
-					this._z = Math.atan2( - m12, m22 );
+					this._y = Math.asin( - clamp( m31, - 1, 1 ) );
 
-				}
+					if ( Math.abs( m31 ) < 0.9999999 ) {
 
-			} else if ( order === 'YZX' ) {
+						this._x = Math.atan2( m32, m33 );
+						this._z = Math.atan2( m21, m11 );
 
-				this._z = Math.asin( clamp( m21, - 1, 1 ) );
+					} else {
 
-				if ( Math.abs( m21 ) < 0.9999999 ) {
+						this._x = 0;
+						this._z = Math.atan2( - m12, m22 );
 
-					this._x = Math.atan2( - m23, m22 );
-					this._y = Math.atan2( - m31, m11 );
+					}
 
-				} else {
+					break;
 
-					this._x = 0;
-					this._y = Math.atan2( m13, m33 );
+				case 'YZX':
 
-				}
+					this._z = Math.asin( clamp( m21, - 1, 1 ) );
 
-			} else if ( order === 'XZY' ) {
+					if ( Math.abs( m21 ) < 0.9999999 ) {
 
-				this._z = Math.asin( - clamp( m12, - 1, 1 ) );
+						this._x = Math.atan2( - m23, m22 );
+						this._y = Math.atan2( - m31, m11 );
 
-				if ( Math.abs( m12 ) < 0.9999999 ) {
+					} else {
 
-					this._x = Math.atan2( m32, m22 );
-					this._y = Math.atan2( m13, m11 );
+						this._x = 0;
+						this._y = Math.atan2( m13, m33 );
 
-				} else {
+					}
 
-					this._x = Math.atan2( - m23, m33 );
-					this._y = 0;
+					break;
 
-				}
+				case 'XZY':
 
-			} else {
+					this._z = Math.asin( - clamp( m12, - 1, 1 ) );
 
-				console.warn( 'THREE.Euler: .setFromRotationMatrix() given unsupported order: ' + order );
+					if ( Math.abs( m12 ) < 0.9999999 ) {
+
+						this._x = Math.atan2( m32, m22 );
+						this._y = Math.atan2( m13, m11 );
+
+					} else {
+
+						this._x = Math.atan2( - m23, m33 );
+						this._y = 0;
+
+					}
+
+					break;
+
+				default:
+
+					console.warn( 'THREE.Euler: .setFromRotationMatrix() encountered an unknown order: ' + order );
 
 			}
 
@@ -15281,8 +15301,8 @@
 				UniformsLib.lights,
 				{
 					emissive: { value: new Color( 0x000000 ) },
-					roughness: { value: 0.5 },
-					metalness: { value: 0.5 },
+					roughness: { value: 1.0 },
+					metalness: { value: 0.0 },
 					envMapIntensity: { value: 1 } // temporary
 				}
 			] ),
