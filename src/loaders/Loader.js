@@ -18,6 +18,16 @@ Object.assign( Loader.prototype, {
 
 	load: function ( /* url, onLoad, onProgress, onError */ ) {},
 
+	loadAsync: function ( url, onProgress ) {
+
+		return new Promise( ( resolve, reject ) => {
+
+			this.load( url, resolve, onProgress, reject );
+
+		} );
+
+	},
+
 	parse: function ( /* data */ ) {},
 
 	setCrossOrigin: function ( crossOrigin ) {
