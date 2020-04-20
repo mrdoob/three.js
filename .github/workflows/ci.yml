@@ -3,10 +3,14 @@ name: CI
 on:
   pull_request:
     paths-ignore:
+      - 'build/**'
       - 'docs/**'
+      - 'files/**'
   push:
     paths-ignore:
+      - 'build/**'
       - 'docs/**'
+      - 'files/**'
 
 jobs:
 
@@ -53,7 +57,7 @@ jobs:
           key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
       - name: Install packages
-        run: npm ci
+        run: npm ci && npm run build-test
 
       - name: === Unit testing ===
         run: npm run test-unit
