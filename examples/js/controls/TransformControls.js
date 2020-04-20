@@ -50,7 +50,29 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	// Reusable utility variables
 
-	var ray = new THREE.Raycaster();
+	var raycaster = new THREE.Raycaster();
+
+	var intersectObjectWithRay = function( object, raycaster, includeInvisible ) {
+
+		var allIntersections = raycaster.intersectObject( object, true );
+
+		var intersection = false;
+
+		for ( var i = allIntersections.length; i--; ) {
+
+			if (allIntersections[i].object.visible || includeInvisible) {
+
+				intersection = allIntersections[ i ];
+
+				continue;
+
+			}
+
+		}
+
+		return intersection;
+
+	}
 
 	var _tempVector = new THREE.Vector3();
 	var _tempVector2 = new THREE.Vector3();
@@ -237,9 +259,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( this.object === undefined || this.dragging === true || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
 
-		ray.setFromCamera( pointer, this.camera );
+		raycaster.setFromCamera( pointer, this.camera );
 
-		var intersect = ray.intersectObjects( _gizmo.picker[ this.mode ].children, true )[ 0 ] || false;
+		var intersect = intersectObjectWithRay( _gizmo.picker[ this.mode ], raycaster );
 
 		if ( intersect ) {
 
@@ -259,9 +281,9 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( ( pointer.button === 0 || pointer.button === undefined ) && this.axis !== null ) {
 
-			ray.setFromCamera( pointer, this.camera );
+			raycaster.setFromCamera( pointer, this.camera );
 
-			var planeIntersect = ray.intersectObjects( [ _plane ], true )[ 0 ] || false;
+			var planeIntersect = intersectObjectWithRay( [ _plane ], raycaster, true );
 
 			if ( planeIntersect ) {
 
@@ -327,11 +349,11 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( object === undefined || axis === null || this.dragging === false || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
 
-		ray.setFromCamera( pointer, this.camera );
+		raycaster.setFromCamera( pointer, this.camera );
 
-		var planeIntersect = ray.intersectObjects( [ _plane ], true )[ 0 ] || false;
+		var planeIntersect = intersectObjectWithRay( [ _plane ], raycaster, true );
 
-		if ( planeIntersect === false ) return;
+		if ( !planeIntersect ) return;
 
 		pointEnd.copy( planeIntersect.point ).sub( worldPositionStart );
 
