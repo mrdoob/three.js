@@ -75,15 +75,15 @@ var TransformControls = function ( camera, domElement ) {
 
 	var raycaster = new Raycaster();
 
-	var intersectObjectWithRay = function( object, raycaster, includeInvisible ) {
+	var intersectObjectWithRay = function ( object, raycaster, includeInvisible ) {
 
 		var allIntersections = raycaster.intersectObject( object, true );
 
 		var intersection = false;
 
-		for ( var i =  allIntersections.length; i--; ) {
+		for ( var i = allIntersections.length; i --; ) {
 
-			if (allIntersections[i].object.visible || includeInvisible) {
+			if ( allIntersections[ i ].object.visible || includeInvisible ) {
 
 				intersection = allIntersections[ i ];
 
@@ -95,7 +95,7 @@ var TransformControls = function ( camera, domElement ) {
 
 		return intersection;
 
-	}
+	};
 
 	var _tempVector = new Vector3();
 	var _tempVector2 = new Vector3();
@@ -376,7 +376,7 @@ var TransformControls = function ( camera, domElement ) {
 
 		var planeIntersect = intersectObjectWithRay( _plane, raycaster, true );
 
-		if ( !planeIntersect ) return;
+		if ( ! planeIntersect ) return;
 
 		pointEnd.copy( planeIntersect.point ).sub( worldPositionStart );
 
