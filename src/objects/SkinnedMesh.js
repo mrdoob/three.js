@@ -115,7 +115,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	boneTransform: ( function() {
+	boneTransform: ( function () {
 
 		var basePosition = new Vector3();
 
@@ -125,7 +125,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 		var vector = new Vector3();
 		var matrix = new Matrix4();
 
-		return function( index, target ) {
+		return function ( index, target ) {
 
 			var skeleton = this.skeleton;
 			var geometry = this.geometry;
