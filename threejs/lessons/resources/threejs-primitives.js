@@ -110,7 +110,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
     },
     ExtrudeBufferGeometry: {
       ui: {
-        steps: { type: 'range', min: 1, max: 10, },
+        steps: { type: 'range', min: 1, max: 100, },
         depth: { type: 'range', min: 1, max: 20, precision: 1, },
         bevelEnabled: { type: 'bool', },
         bevelThickness: { type: 'range', min: 0.1, max: 3, },
@@ -165,6 +165,68 @@ const extrudeSettings = {
 
 const geometry = THREE.ExtrudeBufferGeometry(shape, extrudeSettings);
 `,
+      create2(steps = 100) {
+    const outline = new THREE.Shape([
+      [ -2, -0.1], [  2, -0.1], [ 2,  0.6],
+      [1.6,  0.6], [1.6,  0.1], [-2,  0.1],
+    ].map(p => new THREE.Vector2(...p)));
+
+    const x = -2.5;
+    const y = -5;
+    const shape = new THREE.CurvePath();
+    const points = [
+      [x + 2.5, y + 2.5],
+      [x + 2.5, y + 2.5], [x + 2, y], [x, y],
+      [x - 3, y], [x - 3, y + 3.5], [x - 3, y + 3.5],
+      [x - 3, y + 5.5], [x - 1.5, y + 7.7], [x + 2.5, y + 9.5],
+      [x + 6, y + 7.7], [x + 8, y + 4.5], [x + 8, y + 3.5],
+      [x + 8, y + 3.5], [x + 8, y], [x + 5, y],
+      [x + 3.5, y], [x + 2.5, y + 2.5], [x + 2.5, y + 2.5],
+    ].map(p => new THREE.Vector3(...p, 0));
+    for (let i = 0; i < points.length; i += 3) {
+      shape.add(new THREE.CubicBezierCurve3(...points.slice(i, i + 4)));
+    }
+
+    const extrudeSettings = {
+      steps,
+      bevelEnabled: false,
+      extrudePath: shape,
+    };
+
+    const geometry =  new THREE.ExtrudeBufferGeometry(outline, extrudeSettings);
+    return geometry;
+      },
+      src2: `
+const outline = new THREE.Shape([
+  [ -2, -0.1], [  2, -0.1], [ 2,  0.6],
+  [1.6,  0.6], [1.6,  0.1], [-2,  0.1],
+].map(p => new THREE.Vector2(...p)));
+
+const x = -2.5;
+const y = -5;
+const shape = new THREE.CurvePath();
+const points = [
+  [x + 2.5, y + 2.5],
+  [x + 2.5, y + 2.5], [x + 2,   y      ], [x,       y      ],
+  [x - 3,   y      ], [x - 3,   y + 3.5], [x - 3,   y + 3.5],
+  [x - 3,   y + 5.5], [x - 1.5, y + 7.7], [x + 2.5, y + 9.5],
+  [x + 6,   y + 7.7], [x + 8,   y + 4.5], [x + 8,   y + 3.5],
+  [x + 8,   y + 3.5], [x + 8,   y      ], [x + 5,   y      ],
+  [x + 3.5, y      ], [x + 2.5, y + 2.5], [x + 2.5, y + 2.5],
+].map(p => new THREE.Vector3(...p, 0));
+for (let i = 0; i < points.length; i += 3) {
+  shape.add(new THREE.CubicBezierCurve3(...points.slice(i, i + 4)));
+}
+
+const extrudeSettings = {
+  steps: 100,  // ui: steps
+  bevelEnabled: false,
+  extrudePath: shape,
+};
+
+const geometry =  new THREE.ExtrudeBufferGeometry(outline, extrudeSettings);
+return geometry;
+      `,
     },
     IcosahedronBufferGeometry: {
       ui: {
