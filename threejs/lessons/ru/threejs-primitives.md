@@ -18,30 +18,30 @@ Three.js имеет большое количество примитивов. П
 создание и загрузку данных из нескольких программ 3D-моделирования. 
 А сейчас давайте рассмотрим некоторые из доступных примитивов.
 
-<div data-primitive="BoxBufferGeometry">Прямоугольный параллелепипед</div>
-<div data-primitive="CircleBufferGeometry">Круг</div>
-<div data-primitive="ConeBufferGeometry">Конус</div>
-<div data-primitive="CylinderBufferGeometry">Цилиндр</div>
-<div data-primitive="DodecahedronBufferGeometry">Додекаэдр (12 граней)</div>
-<div data-primitive="ExtrudeBufferGeometry">Выдавленная 2d фигура с скругленными краями.
+<div id="Diagram-BoxBufferGeometry" data-primitive="BoxBufferGeometry">Прямоугольный параллелепипед</div>
+<div id="Diagram-CircleBufferGeometry" data-primitive="CircleBufferGeometry">Круг</div>
+<div id="Diagram-ConeBufferGeometry" data-primitive="ConeBufferGeometry">Конус</div>
+<div id="Diagram-CylinderBufferGeometry" data-primitive="CylinderBufferGeometry">Цилиндр</div>
+<div id="Diagram-DodecahedronBufferGeometry" data-primitive="DodecahedronBufferGeometry">Додекаэдр (12 граней)</div>
+<div id="Diagram-ExtrudeBufferGeometry" data-primitive="ExtrudeBufferGeometry">Выдавленная 2d фигура с скругленными краями.
 Здесь мы выдавливаем форму сердца. Обратите внимание, это основа 
 для <code>TextBufferGeometry</code> и <code>TextGeometry</code> соответственно.</div>
-<div data-primitive="IcosahedronBufferGeometry">Икосаэдр (20 граней)</div>
-<div data-primitive="LatheBufferGeometry">Форма, созданная вращением линии. Например, лампы, кегли для боулинга, свечи, подсвечники, бокалы для вина, стаканы для питья и т. Д. Вы указываете 2-мерный силуэт в виде серии точек, а затем указываете three.js , сколько секций нужно сделать, когда он вращает силуэт вокруг оси.</div>
-<div data-primitive="OctahedronBufferGeometry">Октаэдр (8 граней)</div>
-<div data-primitive="ParametricBufferGeometry">Поверхность, созданная путем предоставления функции, которая берет 2d точку из сетки и возвращает соответствующую 3d точку.</div>
-<div data-primitive="PlaneBufferGeometry">2D плоскость</div>
-<div data-primitive="PolyhedronBufferGeometry">Берет набор треугольников с центром вокруг точки и проецирует их на сферу</div>
-<div data-primitive="RingBufferGeometry">2D диск с отверстием в центре</div>
-<div data-primitive="ShapeBufferGeometry">2D контур, который строится из треугольников</div>
-<div data-primitive="SphereBufferGeometry">Сфера</div>
-<div data-primitive="TetrahedronBufferGeometry">Тераэдр (4 грани)</div>
-<div data-primitive="TextBufferGeometry">3D-текст, сгенерированный из 3D-шрифта и строки</div>
-<div data-primitive="TorusBufferGeometry">Тор (пончик)</div>
-<div data-primitive="TorusKnotBufferGeometry">Торический узел</div>
-<div data-primitive="TubeBufferGeometry">Труба - круг проходящий путь</div>
-<div data-primitive="EdgesGeometry">Вспомогательный объект, который принимает другую геометрию в качестве входных данных и генерирует ребра, только если угол между гранями больше некоторого порога. Например, если вы посмотрите на прямоугольник сверху, он показывает линию, проходящую через каждую грань, показывая каждый треугольник, из которого состоит прямоугольник. Используя EdgesGeometry, вместо этого удаляются средние линии.</div>
-<div data-primitive="WireframeGeometry">Создает геометрию, которая содержит один отрезок (2 точки) на ребро в заданной геометрии. Без этого вы часто теряете ребра или получаете дополнительные ребра, поскольку WebGL обычно требует 2 точки на отрезок. Например, если бы у вас был только один треугольник, было бы только 3 очка. Если вы попытаетесь нарисовать его, используя материал с <code>wireframe: true</code> вы получите только одну линию. А передача этой triangle geometry в <code>WireframeGeometry</code> создаст новую геометрию, которая имеет 3 отрезка линий, используя 6 точек..</div>
+<div id="Diagram-IcosahedronBufferGeometry" data-primitive="IcosahedronBufferGeometry">Икосаэдр (20 граней)</div>
+<div id="Diagram-LatheBufferGeometry" data-primitive="LatheBufferGeometry">Форма, созданная вращением линии. Например, лампы, кегли для боулинга, свечи, подсвечники, бокалы для вина, стаканы для питья и т. Д. Вы указываете 2-мерный силуэт в виде серии точек, а затем указываете three.js , сколько секций нужно сделать, когда он вращает силуэт вокруг оси.</div>
+<div id="Diagram-OctahedronBufferGeometry" data-primitive="OctahedronBufferGeometry">Октаэдр (8 граней)</div>
+<div id="Diagram-ParametricBufferGeometry" data-primitive="ParametricBufferGeometry">Поверхность, созданная путем предоставления функции, которая берет 2d точку из сетки и возвращает соответствующую 3d точку.</div>
+<div id="Diagram-PlaneBufferGeometry" data-primitive="PlaneBufferGeometry">2D плоскость</div>
+<div id="Diagram-PolyhedronBufferGeometry" data-primitive="PolyhedronBufferGeometry">Берет набор треугольников с центром вокруг точки и проецирует их на сферу</div>
+<div id="Diagram-RingBufferGeometry" data-primitive="RingBufferGeometry">2D диск с отверстием в центре</div>
+<div id="Diagram-ShapeBufferGeometry" data-primitive="ShapeBufferGeometry">2D контур, который строится из треугольников</div>
+<div id="Diagram-SphereBufferGeometry" data-primitive="SphereBufferGeometry">Сфера</div>
+<div id="Diagram-TetrahedronBufferGeometry" data-primitive="TetrahedronBufferGeometry">Тераэдр (4 грани)</div>
+<div id="Diagram-TextBufferGeometry" data-primitive="TextBufferGeometry">3D-текст, сгенерированный из 3D-шрифта и строки</div>
+<div id="Diagram-TorusBufferGeometry" data-primitive="TorusBufferGeometry">Тор (пончик)</div>
+<div id="Diagram-TorusKnotBufferGeometry" data-primitive="TorusKnotBufferGeometry">Торический узел</div>
+<div id="Diagram-TubeBufferGeometry" data-primitive="TubeBufferGeometry">Труба - круг проходящий путь</div>
+<div id="Diagram-EdgesGeometry" data-primitive="EdgesGeometry">Вспомогательный объект, который принимает другую геометрию в качестве входных данных и генерирует ребра, только если угол между гранями больше некоторого порога. Например, если вы посмотрите на прямоугольник сверху, он показывает линию, проходящую через каждую грань, показывая каждый треугольник, из которого состоит прямоугольник. Используя EdgesGeometry, вместо этого удаляются средние линии.</div>
+<div id="Diagram-WireframeGeometry" data-primitive="WireframeGeometry">Создает геометрию, которая содержит один отрезок (2 точки) на ребро в заданной геометрии. Без этого вы часто теряете ребра или получаете дополнительные ребра, поскольку WebGL обычно требует 2 точки на отрезок. Например, если бы у вас был только один треугольник, было бы только 3 очка. Если вы попытаетесь нарисовать его, используя материал с <code>wireframe: true</code> вы получите только одну линию. А передача этой triangle geometry в <code>WireframeGeometry</code> создаст новую геометрию, которая имеет 3 отрезка линий, используя 6 точек..</div>
 
 Вы можете заметить, что большинство из них приходят парами `Geometry` 
 или `BufferGeometry`. Разница между этими двумя типами заключается 

@@ -642,12 +642,21 @@ const geometry = new THREE.WireframeGeometry(
     },
   };
 
-  function addLink(parent, name) {
+  function addLink(parent, name, href) {
     const a = document.createElement('a');
-    a.href = `https://threejs.org/docs/#api/geometries/${name}`;
+    a.href = href || `https://threejs.org/docs/#api/geometries/${name}`;
     const code = document.createElement('code');
     code.textContent = name;
     a.appendChild(code);
+    parent.appendChild(a);
+    return a;
+  }
+
+  function addDeepLink(parent, name, href) {
+    const a = document.createElement('a');
+    a.href = href || `https://threejs.org/docs/#api/geometries/${name}`;
+    a.textContent = name;
+    a.className = 'deep-link';
     parent.appendChild(a);
     return a;
   }
@@ -680,6 +689,7 @@ const geometry = new THREE.WireframeGeometry(
     const elem = addDiv(pair, 'shape');
 
     const right = addDiv(pair, 'desc');
+    addDeepLink(right, '#', `#${base.id}`);
     addLink(right, name);
     if (info.nonBuffer !== false) {
       addElem(right, 'span', '', ', ');

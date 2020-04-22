@@ -27,6 +27,10 @@ table {
 .footnotes {
   font-size: smaller;
 }
+.deep-link {
+  position: absolute;
+  transform: translateX(-1em);
+}
 
 pre {
   background: rgb(143, 140, 140);

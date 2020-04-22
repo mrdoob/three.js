@@ -1,5 +1,5 @@
 import * as THREE from '../../resources/threejs/r115/build/three.module.js';
-import {TrackballControls} from '../../resources/threejs/r115/examples/jsm/controls/TrackballControls.js';
+import {OrbitControls} from '../../resources/threejs/r115/examples/jsm/controls/OrbitControls.js';
 
 export const threejsLessonUtils = {
   _afterPrettifyFuncs: [],
@@ -147,10 +147,13 @@ export const threejsLessonUtils = {
       targetFOVDeg = camera.fov;
 
       if (settings.trackball !== false) {
-        const controls = new TrackballControls(camera, elem);
-        controls.noZoom = true;
-        controls.noPan = true;
-        resizeFunctions.push(controls.handleResize.bind(controls));
+        const controls = new OrbitControls(camera, elem);
+        controls.rotateSpeed = 1 / 6;
+        controls.enableZoom = false;
+        controls.enablePan = false;
+        controls.enableKeys = false;
+        elem.removeAttribute('tabIndex');
+        //resizeFunctions.push(controls.handleResize.bind(controls));
         updateFunctions.push(controls.update.bind(controls));
       }
 
