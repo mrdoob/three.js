@@ -102,6 +102,7 @@
 				labelRenderer.setSize( window.innerWidth, window.innerHeight );
 				labelRenderer.domElement.style.position = 'absolute';
 				labelRenderer.domElement.style.top = 0;
+				labelRenderer.domElement.style.left = 0;
 				document.body.appendChild( labelRenderer.domElement );
 
 				var controls = new OrbitControls( camera, labelRenderer.domElement );
