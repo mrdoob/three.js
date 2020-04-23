@@ -128,6 +128,8 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 	}
 
 	function onDocumentMouseDown( event ) {
+		
+		if (event.target!=_domElement) return;
 
 		event.preventDefault();
 
@@ -201,6 +203,8 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 	}
 
 	function onDocumentTouchStart( event ) {
+		
+		if (event.target!=_domElement) return;
 
 		event.preventDefault();
 		event = event.changedTouches[ 0 ];
