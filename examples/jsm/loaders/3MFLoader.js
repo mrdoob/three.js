@@ -40,6 +40,7 @@ import {
 	TextureLoader,
 	sRGBEncoding
 } from "../../../build/three.module.js";
+import { JSZip } from "../libs/jszip.module.min.js";
 
 var ThreeMFLoader = function ( manager ) {
 
@@ -93,7 +94,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			try {
 
-				zip = new JSZip( data ); // eslint-disable-line no-undef
+				zip = new JSZip( data );
 
 			} catch ( e ) {
 

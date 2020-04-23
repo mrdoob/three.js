@@ -26,6 +26,8 @@ import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
 
+import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
+
 var Loader = function ( editor ) {
 
 	var scope = this;
