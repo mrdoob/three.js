@@ -1,4 +1,4 @@
-if ( !window.frameElement && window.location.protocol !== 'file:' ) {
+if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
 	// If the page is not yet displayed as an iframe of the index page (navigation panel/working links),
 	// redirect to the index page (using the current URL without extension as the new fragment).
