@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - indoor controls</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				color: #444;
+			}
+			a {
+				color: #08f;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		indoor controls
+		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank" rel="noopener">VRML 2.0 Tutorial</a>,-->
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { IndoorControls } from './jsm/controls/IndoorControls.js';
+			import { VRMLLoader } from './jsm/loaders/VRMLLoader.js';
+
+			var camera, scene, renderer, stats, controls, gui;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+				camera.position.y = 1.3;
+				camera.position.z = 6;
+
+				scene = new THREE.Scene();
+				scene.add( camera );
+
+				// light
+
+				var dirLight = new THREE.DirectionalLight( 0xffffff );
+				dirLight.position.set( 200, 200, 1000 ).normalize();
+
+				camera.add( dirLight );
+				camera.add( dirLight.target );
+
+				var loader = new VRMLLoader();
+				loader.load( 'models/vrml/house.wrl', function ( object ) {
+
+					scene.add( object );
+
+					controls.ground.push( object );
+
+				} );
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				// controls
+
+				controls = new IndoorControls( camera, renderer.domElement );
+
+				// controls cursor
+
+				var helperMaterial = new THREE.MeshBasicMaterial();
+				helperMaterial.transparent = true;
+				helperMaterial.opacity = 0.2;
+				var helperGeometry = new THREE.CircleBufferGeometry( 0.2, 64 );
+				var mouseHelper = new THREE.Mesh( helperGeometry, helperMaterial );
+
+				var ringMaterial = new THREE.MeshBasicMaterial();
+				ringMaterial.transparent = true;
+				ringMaterial.opacity = 0.8;
+				var ringGeometry = new THREE.RingBufferGeometry( 0.2, 0.22, 64 );
+				var ring = new THREE.Mesh( ringGeometry, ringMaterial );
+				mouseHelper.add( ring );
+
+				mouseHelper.visible = false;
+
+				ring.renderOrder = 1;
+				mouseHelper.renderOrder = 1;
+
+				scene.add( mouseHelper );
+
+				// controls cursor move
+
+				controls.addEventListener( 'move', function ( event ) {
+
+					var intersect = event.intersect;
+					var normal = intersect.face.normal;
+
+					if ( normal.y !== 1 ) {
+
+						mouseHelper.visible = false;
+						controls.enabled_move = false;
+
+					} else {
+
+						mouseHelper.position.set( 0, 0, 0 );
+						mouseHelper.lookAt( normal );
+
+						mouseHelper.position.copy( intersect.point );
+						mouseHelper.position.addScaledVector( normal, 0.001 );
+
+						mouseHelper.visible = true;
+						controls.enabled_move = true;
+
+					}
+
+				} );
+
+				//
+
+				gui = new GUI();
+
+				var api = {};
+				var goTo = {
+					'house1': { 'position': new THREE.Vector3( 1.48, 1.3, - 1.64 ), 'lookAt': new THREE.Vector3( 2.78, 0.6, - 3.05 ) },
+					'house2': { 'position': new THREE.Vector3( 4.96, 1.3, 6.07 ), 'lookAt': new THREE.Vector3( 3.63, 0.6, 4.75 ) },
+					'staircase': { 'position': new THREE.Vector3( 3.52, 1.3, - 2.85 ), 'lookAt': new THREE.Vector3( 4.38, 0.6, - 2.41 ) },
+					'outside': { 'position': new THREE.Vector3( 0, 1.3, 6 ), 'lookAt': new THREE.Vector3() }
+				};
+
+				var goToFolder = gui.addFolder( 'GoTo' );
+
+				function goToCallback( name ) {
+
+					api[ name ] = function () {
+
+						controls.goTo( goTo[ name ].position, goTo[ name ].lookAt );
+
+					}
+
+					goToFolder.add( api, name );
+
+				}
+
+				for ( var i = 0; i < Object.keys( goTo ).length; i ++ ) {
+
+					goToCallback( Object.keys( goTo )[ i ] );
+
+				}
+
+				goToFolder.open();
+
+				//
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				controls.reset( camera, renderer.domElement );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			}
+
+		</script>
+
+	</body>
+</html>
