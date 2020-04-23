@@ -300,10 +300,29 @@ var SidebarObject = function ( editor ) {
 	var objectReceiveShadow = new UIBoolean( false, strings.getKey( 'sidebar/object/receive' ) ).onChange( update );
 	objectShadowRow.add( objectReceiveShadow );
 
-	var objectShadowRadius = new UINumber( 1 ).onChange( update );
-	objectShadowRow.add( objectShadowRadius );
-
 	container.add( objectShadowRow );
+
+	// shadow radius
+
+	var objectShadowRadiusRow = new UIRow();
+
+	objectShadowRadiusRow.add( new UIText( strings.getKey( 'sidebar/object/shadowRadius' ) ).setWidth( '90px' ) );
+
+	var objectShadowRadius = new UINumber( 1 ).onChange( update );
+	objectShadowRadiusRow.add( objectShadowRadius );
+
+	container.add( objectShadowRadiusRow );
+
+	// shadow bias
+
+	var objectShadowBiasRow = new UIRow();
+
+	objectShadowBiasRow.add( new UIText( strings.getKey( 'sidebar/object/shadowBias' ) ).setWidth( '90px' ) );
+
+	var objectShadowBias = new UINumber( 0 ).setPrecision( 6 ).setStep( 0.001 ).setNudge( 0.000001 ).onChange( update );
+	objectShadowBiasRow.add( objectShadowBias );
+
+	container.add( objectShadowBiasRow );
 
 	// visible
 
@@ -581,6 +600,12 @@ var SidebarObject = function ( editor ) {
 
 				}
 
+				if ( object.shadow.bias !== objectShadowBias.getValue() ) {
+
+					editor.execute( new SetValueCommand( editor, object.shadow, 'bias', objectShadowBias.getValue() ) );
+
+				}
+
 			}
 
 			try {
@@ -621,12 +646,26 @@ var SidebarObject = function ( editor ) {
 			'decay': objectDecayRow,
 			'castShadow': objectShadowRow,
 			'receiveShadow': objectReceiveShadow,
-			'shadow': objectShadowRadius
+			'shadow': [ objectShadowRadiusRow, objectShadowBiasRow ]
 		};
 
 		for ( var property in properties ) {
 
-			properties[ property ].setDisplay( object[ property ] !== undefined ? '' : 'none' );
+			var uiElement = properties[ property ];
+
+			if ( Array.isArray( uiElement ) === true ) {
+
+				for ( var i = 0; i < uiElement.length; i ++ ) {
+
+					uiElement[ i ].setDisplay( object[ property ] !== undefined ? '' : 'none' );
+
+				}
+
+			} else {
+
+				uiElement.setDisplay( object[ property ] !== undefined ? '' : 'none' );
+
+			}
 
 		}
 
@@ -802,6 +841,7 @@ var SidebarObject = function ( editor ) {
 		if ( object.shadow !== undefined ) {
 
 			objectShadowRadius.setValue( object.shadow.radius );
+			objectShadowBias.setValue( object.shadow.bias );
 
 		}
 
