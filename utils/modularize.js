@@ -171,6 +171,7 @@ var files = [
 	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 
+	{ path: 'shaders/ACESFilmicToneMappingShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/AfterimageShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/BasicShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/BleachBypassShader.js', dependencies: [], ignoreList: [] },
