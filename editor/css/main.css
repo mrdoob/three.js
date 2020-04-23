@@ -455,6 +455,7 @@ select {
 	font-size: 12px;
 	cursor: default;
 	overflow: auto;
+	resize: vertical;
 	outline: none !important;
 }
 
