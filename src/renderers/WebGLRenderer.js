@@ -750,7 +750,9 @@ function WebGLRenderer( parameters ) {
 			updateBuffers = true;
 
 		}
-
+		if (object.isInstancedMesh) {
+			updateBuffers = true;
+		}
 		//
 
 		var index = geometry.index;
