@@ -54,6 +54,7 @@
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "test": "npm run test-lint && npm run test-unit",
     "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
+    "test-lint-docs": "eslint docs --ext html",
     "test-lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-unit": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
     "test-e2e": "node --expose-gc test/e2e/puppeteer.js",
