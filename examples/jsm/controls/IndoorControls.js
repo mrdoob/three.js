@@ -525,7 +525,7 @@ var IndoorControls = function ( camera, domElement ) {
 
 	this.goTo = function ( go_position, go_lookAt ) {
 
-		if ( isMoving || isRotating ) return;
+		if ( isMoving || isRotating || isGoing ) return;
 
 		if ( !go_position || go_position.equals( scope.camera.position ) ) return;
 
