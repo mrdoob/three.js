@@ -194,6 +194,7 @@ THREE.BufferGeometryUtils = {
 		for ( var i = 0; i < geometries.length; ++ i ) {
 
 			var geometry = geometries[ i ];
+			var attributesCount = 0;
 
 			// ensure that all geometries are indexed, or none
 
@@ -218,6 +219,17 @@ THREE.BufferGeometryUtils = {
 				if ( attributes[ name ] === undefined ) attributes[ name ] = [];
 
 				attributes[ name ].push( geometry.attributes[ name ] );
+
+				attributesCount ++;
+
+			}
+
+			// ensure geometries have the same number of attributes
+
+			if ( attributesCount !== attributesUsed.size ) {
+
+					console.error( 'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' + i + '. Make sure all geometries have the same number of attributes.' );
+					return null;
 
 			}
 
