@@ -32,41 +32,48 @@ export const threejsLessonUtils = {
       return needResize;
     };
 
-    // Three r93 needs to render at least once for some reason.
-    const scene = new THREE.Scene();
-    const camera = new THREE.Camera();
+    const clearColor = new THREE.Color('#000');
+    let needsUpdate = true;
 
     const render = (time) => {
       time *= 0.001;
 
       const resized = resizeRendererToDisplaySize(renderer);
 
-      renderer.setScissorTest(false);
+      // only update if we drew last time
+      // so the browser will not recomposite the page
+      // of nothing is being drawn.
+      if (needsUpdate) {
+        needsUpdate = false;
 
-      // Three r93 needs to render at least once for some reason.
-      renderer.render(scene, camera);
-
-      renderer.setScissorTest(true);
-
-      // maybe there is another way. Originally I used `position: fixed`
-      // but the problem is if we can't render as fast as the browser
-      // scrolls then our shapes lag. 1 or 2 frames of lag isn't too
-      // horrible but iOS would often been 1/2 a second or worse.
-      // By doing it this way the canvas will scroll which means the
-      // worse that happens is part of the shapes scrolling on don't
-      // get drawn for a few frames but the shapes that are on the screen
-      // scroll perfectly.
-      //
-      // I'm using `transform` on the voodoo that it doesn't affect
-      // layout as much as `top` since AFAIK setting `top` is in
-      // the flow but `transform` is not though thinking about it
-      // the given we're `position: absolute` maybe there's no difference?
-      const transform = `translateY(${window.scrollY}px)`;
-      renderer.domElement.style.transform = transform;
+        renderer.setScissorTest(false);
+        renderer.setClearColor(clearColor, 0);
+        renderer.clear(true, true);
+        renderer.setScissorTest(true);
+      }
 
       this.renderFuncs.forEach((fn) => {
-        fn(renderer, time, resized);
+        const wasRendered = fn(renderer, time, resized);
+        needsUpdate = needsUpdate || wasRendered;
       });
+
+      if (needsUpdate) {
+        // maybe there is another way. Originally I used `position: fixed`
+        // but the problem is if we can't render as fast as the browser
+        // scrolls then our shapes lag. 1 or 2 frames of lag isn't too
+        // horrible but iOS would often been 1/2 a second or worse.
+        // By doing it this way the canvas will scroll which means the
+        // worse that happens is part of the shapes scrolling on don't
+        // get drawn for a few frames but the shapes that are on the screen
+        // scroll perfectly.
+        //
+        // I'm using `transform` on the voodoo that it doesn't affect
+        // layout as much as `top` since AFAIK setting `top` is in
+        // the flow but `transform` is not though thinking about it
+        // the given we're `position: absolute` maybe there's no difference?
+        const transform = `translateY(${window.scrollY}px)`;
+        renderer.domElement.style.transform = transform;
+      }
 
       requestAnimationFrame(render);
     };
@@ -180,7 +187,7 @@ export const threejsLessonUtils = {
       const rect = elem.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top  > renderer.domElement.clientHeight ||
           rect.right  < 0 || rect.left > renderer.domElement.clientWidth) {
-        return;
+        return false;
       }
 
       renderInfo.width = rect.width * this.pixelRatio;
@@ -209,6 +216,8 @@ export const threejsLessonUtils = {
       renderer.setScissor(renderInfo.left, renderInfo.bottom, renderInfo.width, renderInfo.height);
 
       settings.render(renderInfo);
+
+      return true;
     };
 
     this.renderFuncs.push(render);
