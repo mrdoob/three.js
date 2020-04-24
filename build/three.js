@@ -24175,6 +24175,12 @@
 
 			}
 
+			if ( object.isInstancedMesh === true ) {
+
+				updateBuffers = true;
+
+			}
+
 			//
 
 			var index = geometry.index;
@@ -24945,7 +24951,7 @@
 
 				materialProperties.program = program;
 				materialProperties.uniforms = parameters.uniforms;
-				materialProperties.outputEncoding = _this.outputEncoding;
+				materialProperties.outputEncoding = parameters.outputEncoding;
 				material.program = program;
 
 			}
@@ -25043,6 +25049,7 @@
 
 			var fog = scene.fog;
 			var environment = material.isMeshStandardMaterial ? scene.environment : null;
+			var encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
 
 			var materialProperties = properties.get( material );
 			var lights = currentRenderState.state.lights;
@@ -25090,7 +25097,7 @@
 
 					initMaterial( material, scene, object );
 
-				} else if ( materialProperties.outputEncoding !== _this.outputEncoding ) {
+				} else if ( materialProperties.outputEncoding !== encoding ) {
 
 					initMaterial( material, scene, object );
 
