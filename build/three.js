@@ -23536,7 +23536,7 @@
 
 		// tone mapping
 
-		this.toneMapping = LinearToneMapping;
+		this.toneMapping = NoToneMapping;
 		this.toneMappingExposure = 1.0;
 		this.toneMappingWhitePoint = 1.0;
 
