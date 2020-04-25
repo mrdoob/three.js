@@ -134,7 +134,7 @@ function WebXRManager( renderer, gl ) {
 
 		if ( scope.isPresenting === true ) {
 
-			console.warn( 'THREE.WebXRManager: Cannot change framebuffer scale while presenting XR content.' );
+			console.warn( 'THREE.WebXRManager: Cannot change framebuffer scale while presenting.' );
 
 		}
 
@@ -146,7 +146,7 @@ function WebXRManager( renderer, gl ) {
 
 		if ( scope.isPresenting === true ) {
 
-			console.warn( 'THREE.WebXRManager: Cannot change reference space type while presenting XR content.' );
+			console.warn( 'THREE.WebXRManager: Cannot change reference space type while presenting.' );
 
 		}
 
