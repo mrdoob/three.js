@@ -11,6 +11,8 @@ import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
 import { PLYExporter } from '../../examples/jsm/exporters/PLYExporter.js';
 import { STLExporter } from '../../examples/jsm/exporters/STLExporter.js';
 
+import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
+
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 var MenubarFile = function ( editor ) {

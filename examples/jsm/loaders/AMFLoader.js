@@ -29,6 +29,7 @@ import {
 	Mesh,
 	MeshPhongMaterial
 } from "../../../build/three.module.js";
+import { JSZip } from "../libs/jszip.module.min.js";
 
 var AMFLoader = function ( manager ) {
 
@@ -71,7 +72,7 @@ AMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				try {
 
-					zip = new JSZip( data ); // eslint-disable-line no-undef
+					zip = new JSZip( data );
 
 				} catch ( e ) {
 
