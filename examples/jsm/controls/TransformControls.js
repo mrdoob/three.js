@@ -75,27 +75,23 @@ var TransformControls = function ( camera, domElement ) {
 
 	var raycaster = new Raycaster();
 
-	var intersectObjectWithRay = function ( object, raycaster, includeInvisible ) {
+	function intersectObjectWithRay( object, raycaster, includeInvisible ) {
 
 		var allIntersections = raycaster.intersectObject( object, true );
-
-		var intersection = false;
 
 		for ( var i = allIntersections.length; i --; ) {
 
 			if ( allIntersections[ i ].object.visible || includeInvisible ) {
 
-				intersection = allIntersections[ i ];
-
-				continue;
+				return allIntersections[ i ];
 
 			}
 
 		}
 
-		return intersection;
+		return false;
 
-	};
+	}
 
 	var _tempVector = new Vector3();
 	var _tempVector2 = new Vector3();
