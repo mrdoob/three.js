@@ -23164,10 +23164,9 @@
 
 			framebufferScaleFactor = value;
 
-			// Warn if function is used while presenting
-			if ( scope.isPresenting == true ) {
+			if ( scope.isPresenting === true ) {
 
-				console.warn( "WebXRManager: Cannot change framebuffer scale while presenting VR content" );
+				console.warn( 'THREE.WebXRManager: Cannot change framebuffer scale while presenting.' );
 
 			}
 
@@ -23176,6 +23175,12 @@
 		this.setReferenceSpaceType = function ( value ) {
 
 			referenceSpaceType = value;
+
+			if ( scope.isPresenting === true ) {
+
+				console.warn( 'THREE.WebXRManager: Cannot change reference space type while presenting.' );
+
+			}
 
 		};
 
@@ -47897,9 +47902,9 @@
 				magFilter: NearestFilter,
 				minFilter: NearestFilter,
 				generateMipmaps: false,
-				type: equirectangular ? equirectangular.type : UnsignedByteType,
-				format: equirectangular ? equirectangular.format : RGBEFormat,
-				encoding: equirectangular ? equirectangular.encoding : RGBEEncoding,
+				type: UnsignedByteType,
+				format: RGBEFormat,
+				encoding: _isLDR( equirectangular ) ? equirectangular.encoding : RGBEEncoding,
 				depthBuffer: false,
 				stencilBuffer: false
 			};
@@ -48025,7 +48030,7 @@
 			}
 
 			uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
-			uniforms[ 'outputEncoding' ].value = ENCODINGS[ texture.encoding ];
+			uniforms[ 'outputEncoding' ].value = ENCODINGS[ cubeUVRenderTarget.texture.encoding ];
 
 			_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 
@@ -48169,6 +48174,14 @@
 		}
 
 	};
+
+	function _isLDR( texture ) {
+
+		if ( texture === undefined || texture.type !== UnsignedByteType ) { return false; }
+
+		return texture.encoding === LinearEncoding || texture.encoding === sRGBEncoding || texture.encoding === GammaEncoding;
+
+	}
 
 	function _createPlanes() {
 
