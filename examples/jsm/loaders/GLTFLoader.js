@@ -2808,7 +2808,7 @@ var GLTFLoader = ( function () {
 
 		} else if ( cameraDef.type === 'orthographic' ) {
 
-			camera = new OrthographicCamera( - 1 * params.xmag, params.xmag, params.ymag, - 1 * params.ymag, params.znear, params.zfar );
+			camera = new OrthographicCamera( - params.xmag, params.xmag, params.ymag, - params.ymag, params.znear, params.zfar );
 
 		}
 
