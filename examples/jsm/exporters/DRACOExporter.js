@@ -76,19 +76,13 @@ DRACOExporter.prototype = {
 
 		var faces = geometry.getIndex();
 
-		var numFaces = 0;
-
 		if ( faces !== null ) {
 
-			numFaces = faces.count / 3;
-
-			builder.AddFacesToMesh( mesh, numFaces, faces.array );
+			builder.AddFacesToMesh( mesh, faces.count / 3, faces.array );
 
 		} else {
 
 			var faces = new ( vertices.count > 65535 ? Uint32Array : Uint16Array )( vertices.count );
-
-			numFaces = vertices.count / 3;
 
 			for ( var i = 0; i < faces.length; i ++ ) {
 
@@ -96,7 +90,7 @@ DRACOExporter.prototype = {
 
 			}
 
-			builder.AddFacesToMesh( mesh, numFaces, faces );
+			builder.AddFacesToMesh( mesh, vertices.count / 3, faces );
 
 		}
 
