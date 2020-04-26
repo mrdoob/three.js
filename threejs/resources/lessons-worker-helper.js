@@ -79,10 +79,10 @@
     setupLesson = function() {};
 
     if (canvas) {
-      canvas.addEventListener('webglcontextlost', function(e) {
+      canvas.addEventListener('webglcontextlost', function() {
           // the default is to do nothing. Preventing the default
           // means allowing context to be restored
-          e.preventDefault();
+          // e.preventDefault();  // can't do this because firefox bug - https://bugzilla.mozilla.org/show_bug.cgi?id=1633280
           sendMessage({
             type: 'lostContext',
           });
