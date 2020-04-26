@@ -10,21 +10,21 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc"> A Physics handler for <a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a> resources. <br /><br />
+		<p class="desc"> A Physics handler for <a href="https://sites.google.com/view/evpvp/"><em>MMD</em></a> resources. <br /><br />
 		[name] calculates Physics for model loaded by [page:MMDLoader] with <a href="https://github.com/kripken/ammo.js/">ammo.js</a> (Bullet-based JavaScript Physics engine).
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		var physics;
 
 		// Load MMD resources and instantiate MMDPhysics
-		new THREE.MMDLoader().load(
+		new MMDLoader().load(
 			'models/mmd/miku.pmd',
 			function ( mesh ) {
 
-				physics = new THREE.MMDPhysics( mesh )
+				physics = new MMDPhysics( mesh )
 				scene.add( mesh );
 
 			}
@@ -40,11 +40,12 @@
 		}
 		</code>
 
-		[example:webgl_loader_mmd]<br />
-		[example:webgl_loader_mmd_audio]<br />
+		<h2>Examples</h2>
 
-		<br />
-		<hr>
+		<p>
+			[example:webgl_loader_mmd]<br />
+			[example:webgl_loader_mmd_audio]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -108,7 +109,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/animation/MMDPhysics.js examples/js/animation/MMDPhysics.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/MMDPhysics.js examples/jsm/animation/MMDPhysics.js]
 		</p>
 	</body>
 </html>

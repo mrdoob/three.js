@@ -1,8 +1,10 @@
+import { Audio } from './Audio';
+
 export class AudioAnalyser {
 
-	constructor( audio: any, fftSize: number );
+	constructor( audio: Audio<AudioNode>, fftSize: number );
 
-	analyser: any;
+	analyser: AnalyserNode;
 	data: Uint8Array;
 
 	getFrequencyData(): Uint8Array;

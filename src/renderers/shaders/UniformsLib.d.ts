@@ -8,6 +8,7 @@ export let UniformsLib: {
 		opacity: IUniform;
 		map: IUniform;
 		uvTransform: IUniform;
+		uv2Transform: IUniform;
 		alphaMap: IUniform;
 	};
 	specularmap: {
@@ -66,7 +67,11 @@ export let UniformsLib: {
 			properties: {
 				direction: {};
 				color: {};
-				shadow: {};
+			};
+		};
+		directionalLightShadows: {
+			value: any[];
+			properties: {
 				shadowBias: {};
 				shadowRadius: {};
 				shadowMapSize: {};
@@ -84,7 +89,11 @@ export let UniformsLib: {
 				coneCos: {};
 				penumbraCos: {};
 				decay: {};
-				shadow: {};
+			};
+		};
+		spotLightShadows: {
+			value: any[];
+			properties: {
 				shadowBias: {};
 				shadowRadius: {};
 				shadowMapSize: {};
@@ -99,7 +108,11 @@ export let UniformsLib: {
 				position: {};
 				decay: {};
 				distance: {};
-				shadow: {};
+			};
+		};
+		pointLightShadows: {
+			value: any[];
+			properties: {
 				shadowBias: {};
 				shadowRadius: {};
 				shadowMapSize: {};

@@ -16,20 +16,10 @@
 			A light that gets emitted from a single point in all directions. A common use case for this
 			is to replicate the light emitted from a bare lightbulb.<br /><br />
 
-			 This light can cast shadows - see [page:LightShadow] page for details.
+			 This light can cast shadows - see [page:PointLightShadow] page for details.
 		</p>
 
-
-		<h2>Example</h2>
-
-		<p>
-			[example:webgl_lights_pointlights lights / pointlights ]<br />
-			[example:webgl_lights_pointlights2 lights / pointlights2 ]<br />
-			[example:webgldeferred_animation animation ]<br />
-			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
-			[example:webgl_geometry_text geometry / text ]<br />
-			[example:webgl_lensflares lensflares ]
-		</p>
+		<h2>Code Example</h2>
 
 		<code>
 var light = new THREE.PointLight( 0xff0000, 1, 100 );
@@ -37,6 +27,15 @@ light.position.set( 50, 50, 50 );
 scene.add( light );
 		</code>
 
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_lights_pointlights lights / pointlights ]<br />
+			[example:webgl_lights_pointlights2 lights / pointlights2 ]<br />
+			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
+			[example:webgl_geometry_text geometry / text ]<br />
+			[example:webgl_lensflares lensflares ]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -80,13 +79,6 @@ scene.add( light );
 			Default is *0.0*.
 		</p>
 
-		<h3>[property:Boolean isPointLight]</h3>
-		<p>
-			Used to check whether this or derived classes are point lights. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:Float power]</h3>
 		<p>
 			The light's power.<br />
@@ -100,9 +92,9 @@ scene.add( light );
 			and changing this will also change the intensity.
 		</p>
 
-		<h3>[property:LightShadow shadow]</h3>
+		<h3>[property:PointLightShadow shadow]</h3>
 		<p>
-			A [page:LightShadow] used to calculate shadows for this light.<br /><br />
+			A [page:PointLightShadow] used to calculate shadows for this light.<br /><br />
 
 			 The lightShadow's [page:LightShadow.camera camera]
 			is set to a  [page:PerspectiveCamera] with [page:PerspectiveCamera.fov fov] of 90,

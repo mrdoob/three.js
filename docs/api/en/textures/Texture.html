@@ -12,12 +12,7 @@
 
 		<p class="desc">Create a texture to apply to a surface or as a reflection or refraction map.</p>
 
-
-		<h2>Constructor</h2>
-
-		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
-
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		// load a texture, set wrap mode to repeat
@@ -26,6 +21,10 @@
 		texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set( 4, 4 );
 		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding )</h3>
 
 		<h2>Properties</h2>
 
@@ -53,13 +52,6 @@
 		To use video as a texture you need to have a playing HTML5
 		video element as a source for your texture image and continuously update this texture
 		as long as video is playing - the [page:VideoTexture VideoTexture] class handles this automatically.
-		</p>
-
-		<h3>[property:Boolean isTexture]</h3>
-		<p>
-			Used to check whether this or derived classes are Textures. Default is *true*.<br /><br />
-
-			You should not change this, as it is used internally for optimisation.
 		</p>
 
 		<h3>[property:array mipmaps]</h3>
@@ -126,6 +118,17 @@
 		See the [page:Textures texture constants] page for details of other formats.
 		</p>
 
+		<h3>[property:String internalFormat]</h3>
+		<p>
+		The default value is obtained using a combination of [page:Texture.format .format] and
+		[page:Texture.type .type].<br />
+
+		The GPU format allows the developer to specify how the data is going to be
+		stored on the GPU.<br /><br />
+
+		See the [page:Textures texture constants] page for details regarding all supported internal formats.
+		</p>
+
 		<h3>[property:number type]</h3>
 		<p>
 		This must correspond to the [page:Texture.format .format]. The default is [page:Textures THREE.UnsignedByteType],
@@ -187,7 +190,7 @@
 
 		<h3>[property:boolean premultiplyAlpha]</h3>
 		<p>
-		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Defaut is *false*.<br /><br />
+		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is *false*.<br /><br />
 
 		Note that this property has no effect for [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap].
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].

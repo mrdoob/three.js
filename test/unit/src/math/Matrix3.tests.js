@@ -6,7 +6,6 @@
 
 import { Matrix3 } from '../../../../src/math/Matrix3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute';
 
 function matrixEquals3( a, b, tolerance ) {
 
@@ -163,18 +162,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyToBufferAttribute", ( assert ) => {
-
-			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
-			var attr = new Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
-			var expected = new Float32Array( [ 8, 20, 32, 12, 30, 48 ] );
-
-			var applied = a.applyToBufferAttribute( attr );
-
-			assert.deepEqual( applied.array, expected, "Check resulting buffer" );
-
-		} );
-
 		QUnit.test( "multiply/premultiply", ( assert ) => {
 
 			// both simply just wrap multiplyMatrices
@@ -272,25 +259,13 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "getInverse", ( assert ) => {
 
-			var identity = new Matrix3();
+			var zero = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var identity4 = new Matrix4();
-			var a = new Matrix3();
-			var b = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
-			var c = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+			var a = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+			var b = new Matrix3();
 
-			b.getInverse( a, false );
-			assert.ok( matrixEquals3( a, identity ), "Matrix a is identity matrix" );
-
-			try {
-
-				b.getInverse( c, true );
-				assert.ok( false, "Should never get here !" ); // should never get here.
-
-			} catch ( err ) {
-
-				assert.ok( true, "Passed: " + err );
-
-			}
+			b.getInverse( a );
+			assert.ok( matrixEquals3( b, zero ), "Matrix a is zero matrix" );
 
 			var testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),

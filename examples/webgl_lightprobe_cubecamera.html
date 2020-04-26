@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe from cubeCamera
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe from cubeCamera
 		</div>
 
 		<script type="module">
@@ -17,6 +17,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { LightProbeHelper } from './jsm/helpers/LightProbeHelper.js';
 			import { LightProbeGenerator } from './jsm/lights/LightProbeGenerator.js';
 
 			var renderer, scene, camera, cubeCamera;
@@ -32,10 +33,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
-
-				// gamma
-				renderer.gammaOutput = true;
-				renderer.gammaFactor = 2.2; // approximate sRGB
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				// scene
 				scene = new THREE.Scene();
@@ -81,9 +79,9 @@
 
 					cubeCamera.update( renderer, scene );
 
-					lightProbe.copy( LightProbeGenerator.fromRenderTargetCube( renderer, cubeCamera.renderTarget ) );
+					lightProbe.copy( LightProbeGenerator.fromCubeRenderTarget( renderer, cubeCamera.renderTarget ) );
 
-					scene.add( new THREE.LightProbeHelper( lightProbe, 5 ) );
+					scene.add( new LightProbeHelper( lightProbe, 5 ) );
 
 					render();
 

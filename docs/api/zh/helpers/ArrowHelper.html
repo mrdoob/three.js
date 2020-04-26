@@ -14,12 +14,7 @@
 
 		<p class="desc">用于模拟方向的3维箭头对象.</p>
 
-
-		<h2>例子</h2>
-
-		<div>[example:webgl_geometries WebGL / geometries]</div>
-		<div>[example:webgl_geometry_normals WebGL / geometry / normals]</div>
-		<div>[example:webgl_shadowmesh WebGL / shadowmesh]</div>
+		<h2>代码示例</h2>
 
 		<code>
 		var dir = new THREE.Vector3( 1, 2, 0 );
@@ -35,7 +30,13 @@
 		scene.add( arrowHelper );
 		</code>
 
+		<h2>例子</h2>
 
+		<p>
+			[example:webgl_geometries WebGL / geometries]<br/>
+			[example:webgl_geometry_normals WebGL / geometry / normals]<br/>
+			[example:webgl_shadowmesh WebGL / shadowmesh]
+		</p>
 
 		<h2>构造函数</h2>
 
@@ -47,7 +48,7 @@
 		[page:Number length] -- 箭头的长度. 默认为 *1*.<br />
 		[page:Number hex] -- 定义的16进制颜色值. 默认为 0xffff00.<br />
 		[page:Number headLength] -- 箭头头部(锥体)的长度. 默认为箭头长度的0.2倍(0.2 * length).<br />
-		[page:Number headWidth] -- 箭头的宽度. 默认为箭头头部(锥体)长度的0.2倍(0.2 * headLength).
+		[page:Number headWidth] -- The width of the head of the arrow. Default is 0.2 * headLength.
 		</p>
 
 		<h2>属性</h2>
@@ -60,12 +61,8 @@
 		<h3>[property:Mesh cone]</h3>
 		<p>包含箭头辅助对象的锥体部分.</p>
 
-
-
-
 		<h2>方法</h2>
 		<p>请到基类 [page:Object3D] 页面查看公共方法.</p>
-
 
 		<h3>[method:null setColor]([param:Color color])</h3>
 		<p>
@@ -78,7 +75,7 @@
 		<p>
 		length -- 要设置的长度.<br />
 		headLength -- 要设置的箭头头部(锥体)的长度.<br />
-		headWidth -- 要设置的箭头的宽度.<br /><br />
+		headWidth -- The width of the head of the arrow.<br /><br />
 
 		设置箭头辅助对象的长度.
 		</p>

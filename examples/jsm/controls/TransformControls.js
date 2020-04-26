@@ -37,6 +37,7 @@ var TransformControls = function ( camera, domElement ) {
 	Object3D.call( this );
 
 	this.visible = false;
+	this.domElement = domElement;
 
 	var _gizmo = new TransformControlsGizmo();
 	this.add( _gizmo );
@@ -57,6 +58,7 @@ var TransformControls = function ( camera, domElement ) {
 	defineProperty( "mode", "translate" );
 	defineProperty( "translationSnap", null );
 	defineProperty( "rotationSnap", null );
+	defineProperty( "scaleSnap", null );
 	defineProperty( "space", "world" );
 	defineProperty( "size", 1 );
 	defineProperty( "dragging", false );
@@ -227,7 +229,17 @@ var TransformControls = function ( camera, domElement ) {
 		if ( this.object !== undefined ) {
 
 			this.object.updateMatrixWorld();
-			this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			if ( this.object.parent === null ) {
+
+				console.error( 'TransformControls: The attached 3D object must be a part of the scene graph.' );
+
+			} else {
+
+				this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			}
+
 			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
 
 			parentQuaternionInv.copy( parentQuaternion ).inverse();
@@ -482,6 +494,28 @@ var TransformControls = function ( camera, domElement ) {
 
 			object.scale.copy( scaleStart ).multiply( _tempVector2 );
 
+			if ( this.scaleSnap ) {
+
+				if ( axis.search( 'X' ) !== - 1 ) {
+
+					object.scale.x = Math.round( object.scale.x / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Y' ) !== - 1 ) {
+
+					object.scale.y = Math.round( object.scale.y / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Z' ) !== - 1 ) {
+
+					object.scale.z = Math.round( object.scale.z / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+			}
+
 		} else if ( mode === 'rotate' ) {
 
 			offset.copy( pointEnd ).sub( pointStart );
@@ -653,6 +687,12 @@ var TransformControls = function ( camera, domElement ) {
 	this.setRotationSnap = function ( rotationSnap ) {
 
 		scope.rotationSnap = rotationSnap;
+
+	};
+
+	this.setScaleSnap = function ( scaleSnap ) {
+
+		scope.scaleSnap = scaleSnap;
 
 	};
 
@@ -1057,7 +1097,7 @@ var TransformControlsGizmo = function () {
 				object.updateMatrix();
 
 				var tempGeometry = object.geometry.clone();
-				tempGeometry.applyMatrix( object.matrix );
+				tempGeometry.applyMatrix4( object.matrix );
 				object.geometry = tempGeometry;
 				object.renderOrder = Infinity;
 

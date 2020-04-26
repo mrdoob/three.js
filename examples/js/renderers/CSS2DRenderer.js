@@ -32,6 +32,8 @@ THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
 
 THREE.CSS2DRenderer = function () {
 
+	var _this = this;
+
 	var _width, _height;
 	var _widthHalf, _heightHalf;
 
@@ -70,9 +72,11 @@ THREE.CSS2DRenderer = function () {
 
 	};
 
-	var renderObject = function ( object, camera ) {
+	var renderObject = function ( object, scene, camera ) {
 
 		if ( object instanceof THREE.CSS2DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			vector.setFromMatrixPosition( object.matrixWorld );
 			vector.applyMatrix4( viewProjectionMatrix );
@@ -99,11 +103,13 @@ THREE.CSS2DRenderer = function () {
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera );
+			renderObject( object.children[ i ], scene, camera );
 
 		}
 
@@ -162,14 +168,13 @@ THREE.CSS2DRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld();
-
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		viewMatrix.copy( camera.matrixWorldInverse );
 		viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, viewMatrix );
 
-		renderObject( scene, camera );
+		renderObject( scene, scene, camera );
 		zOrder( scene );
 
 	};

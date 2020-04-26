@@ -1525,7 +1525,7 @@
 
         // Try to detect the user choosing select-all
         if (te.selectionStart != null) {
-          if (!ie || (ie && ie_version < 9)) prepareSelectAllHack();
+          if (!ie || (ie_version < 9)) prepareSelectAllHack();
           var i = 0, poll = function() {
             if (display.selForContextMenu == cm.doc.sel && te.selectionStart == 0 &&
                 te.selectionEnd > 0 && input.prevInput == "\u200b")
@@ -2222,7 +2222,7 @@
   // Verify that the selection does not partially select any atomic
   // marked ranges.
   function reCheckSelection(doc) {
-    setSelectionInner(doc, skipAtomicInSelection(doc, doc.sel, null, false), sel_dontScroll);
+    setSelectionInner(doc, skipAtomicInSelection(doc, doc.sel, null, false));
   }
 
   // Return a selection that does not partially select any atomic
@@ -4040,7 +4040,7 @@
       // actually possible. Otherwise, it causes vertical scroll
       // jitter on OSX trackpads when deltaX is small and deltaY
       // is large (issue #3579)
-      if (!dy || (dy && canScrollY))
+      if (!dy || canScrollY)
         e_preventDefault(e);
       display.wheelStartX = null; // Abort measurement, if in progress
       return;
@@ -6752,7 +6752,7 @@
       var prop = lineClass[1] ? "bgClass" : "textClass";
       if (output[prop] == null)
         output[prop] = lineClass[2];
-      else if (!(new RegExp("(?:^|\s)" + lineClass[2] + "(?:$|\s)")).test(output[prop]))
+      else if (!(new RegExp("(?:^|\\s)" + lineClass[2] + "(?:$|\\s)")).test(output[prop]))
         output[prop] += " " + lineClass[2];
     }
     return type;
@@ -8771,8 +8771,8 @@
     return function(str) {
       if (!bidiRE.test(str)) return false;
       var len = str.length, types = [];
-      for (var i = 0, type; i < len; ++i)
-        types.push(type = charType(str.charCodeAt(i)));
+      for (var i = 0; i < len; ++i)
+        types.push(charType(str.charCodeAt(i)));
 
       // W1. Examine each non-spacing mark (NSM) in the level run, and
       // change the type of the NSM to the type of the previous

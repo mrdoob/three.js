@@ -228,10 +228,10 @@ THREE.ShaderLib[ 'line' ] = {
 
 			gl_FragColor = vec4( diffuseColor.rgb, diffuseColor.a );
 
-			#include <premultiplied_alpha_fragment>
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>
 			#include <fog_fragment>
+			#include <premultiplied_alpha_fragment>
 
 		}
 		`
@@ -246,7 +246,9 @@ THREE.LineMaterial = function ( parameters ) {
 		uniforms: THREE.UniformsUtils.clone( THREE.ShaderLib[ 'line' ].uniforms ),
 
 		vertexShader: THREE.ShaderLib[ 'line' ].vertexShader,
-		fragmentShader: THREE.ShaderLib[ 'line' ].fragmentShader
+		fragmentShader: THREE.ShaderLib[ 'line' ].fragmentShader,
+
+		clipping: true // required for clipping support
 
 	} );
 

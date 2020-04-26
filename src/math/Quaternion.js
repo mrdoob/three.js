@@ -5,7 +5,7 @@
  * @author bhouston / http://clara.io
  */
 
-import { _Math } from './Math.js';
+import { MathUtils } from './MathUtils.js';
 
 function Quaternion( x, y, z, w ) {
 
@@ -394,7 +394,7 @@ Object.assign( Quaternion.prototype, {
 
 	angleTo: function ( q ) {
 
-		return 2 * Math.acos( Math.abs( _Math.clamp( this.dot( q ), - 1, 1 ) ) );
+		return 2 * Math.acos( Math.abs( MathUtils.clamp( this.dot( q ), - 1, 1 ) ) );
 
 	},
 
@@ -617,6 +617,17 @@ Object.assign( Quaternion.prototype, {
 		array[ offset + 3 ] = this._w;
 
 		return array;
+
+	},
+
+	fromBufferAttribute: function ( attribute, index ) {
+
+		this._x = attribute.getX( index );
+		this._y = attribute.getY( index );
+		this._z = attribute.getZ( index );
+		this._w = attribute.getW( index );
+
+		return this;
 
 	},
 

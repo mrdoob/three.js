@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
 			<button id="export">Export COLLADA</button>
 		</div>
 
@@ -40,7 +40,7 @@
 			var bFitLid;
 			var bNonBlinn;
 			var shading;
-			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
+			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, normalMaterial, reflectiveMaterial;
 
 			var teapot, textureCube;
 
@@ -73,8 +73,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
@@ -85,9 +84,17 @@
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
+				var loader = new THREE.TextureLoader();
+
+				var textureMap = loader.load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
+				textureMap.encoding = THREE.sRGBEncoding;
+
+				// NORMAL MAP
+
+				var diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
+				var normalMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
 
 				// REFLECTION MAP
 				var path = "textures/cube/pisa/";
@@ -98,6 +105,7 @@
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.encoding = THREE.sRGBEncoding;
 
 				// MATERIALS
 				var materialColor = new THREE.Color();
@@ -112,6 +120,8 @@
 				phongMaterial = new THREE.MeshPhongMaterial( { color: materialColor, side: THREE.DoubleSide } );
 
 				texturedMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: textureMap, side: THREE.DoubleSide } );
+
+				normalMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: diffuseMap, normalMap: normalMap, side: THREE.DoubleSide } );
 
 				reflectiveMaterial = new THREE.MeshPhongMaterial( { color: materialColor, envMap: textureCube, side: THREE.DoubleSide } );
 
@@ -223,7 +233,7 @@
 
 				// shading
 
-				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" ).onChange( render );
+				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "normal", "reflective" ] ).name( "Shading" ).onChange( render );
 
 				var exportButton = document.getElementById( 'export' );
 				exportButton.addEventListener( 'click', exportCollada );
@@ -259,6 +269,7 @@
 				// only if they have. But, these calls are cheap enough and this is just a demo.
 				phongMaterial.shininess = effectController.shininess;
 				texturedMaterial.shininess = effectController.shininess;
+				normalMaterial.shininess = effectController.shininess;
 
 				diffuseColor.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 				if ( effectController.metallic ) {
@@ -278,10 +289,12 @@
 				gouraudMaterial.color.copy( diffuseColor );
 				phongMaterial.color.copy( diffuseColor );
 				texturedMaterial.color.copy( diffuseColor );
+				normalMaterial.color.copy( diffuseColor );
 
 				specularColor.multiplyScalar( effectController.ks );
 				phongMaterial.specular.copy( specularColor );
 				texturedMaterial.specular.copy( specularColor );
+				normalMaterial.specular.copy( specularColor );
 
 				// Ambient's actually controlled by the light for this demo
 				ambientLight.color.setHSL( effectController.hue, effectController.saturation, effectController.lightness * effectController.ka );
@@ -328,7 +341,8 @@
 						shading === "flat" ? flatMaterial : (
 							shading === "smooth" ? gouraudMaterial : (
 								shading === "glossy" ? phongMaterial : (
-									shading === "textured" ? texturedMaterial : reflectiveMaterial ) ) ) ) );	// if no match, pick Phong
+									shading === "textured" ? texturedMaterial : (
+										shading === "normal" ? normalMaterial : reflectiveMaterial ) ) ) ) ) );	// if no match, pick Phong
 
 				scene.add( teapot );
 

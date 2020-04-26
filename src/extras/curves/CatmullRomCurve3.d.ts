@@ -43,6 +43,4 @@ export class CatmullRomCurve3 extends Curve<Vector3> {
 
 	points: Vector3[];
 
-	getPoint( t: number ): Vector3;
-
 }

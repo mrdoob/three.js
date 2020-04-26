@@ -6,15 +6,16 @@ export class Node {
 
 	uuid: string;
 	name: string;
-	type: string | undefined;
+	type: string | undefined;
 	userData: object;
-	isNode: boolean;
-	frameId: number | undefined;
+	readonly isNode: true;
+	frameId: number | undefined;
 
 	analyze( builder: NodeBuilder, settings?: object ): void;
 	analyzeAndFlow( builder: NodeBuilder, output: string, settings?: object ): object;
 	flow( builder: NodeBuilder, output: string, settings?: object ): object;
 	build( builder: NodeBuilder, output: string, uuid?: string ): string;
+	generate( builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string ): string;
 	appendDepsNode( builder: NodeBuilder, data: object, output: string ): void;
 	setName( name: string ): this;
 	getName( builder: NodeBuilder ): string;

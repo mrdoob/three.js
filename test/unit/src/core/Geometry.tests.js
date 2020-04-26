@@ -64,7 +64,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix", ( assert ) => {
+		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var geometry = getGeometry();
 			geometry.faces.push( new Face3( 0, 1, 2 ) );
@@ -79,7 +79,7 @@ export default QUnit.module( 'Core', () => {
 			m.makeRotationX( Math.PI / 2 );
 			m.setPosition( new Vector3( x, y, z ) );
 
-			geometry.applyMatrix( m );
+			geometry.applyMatrix4( m );
 
 			v0 = geometry.vertices[ 0 ];
 			v1 = geometry.vertices[ 1 ];
@@ -112,7 +112,7 @@ export default QUnit.module( 'Core', () => {
 			var matrix = new Matrix4();
 			matrix.makeRotationX( Math.PI / 2 ); // 90 degree
 
-			geometry.applyMatrix( matrix );
+			geometry.applyMatrix4( matrix );
 
 			var v0 = geometry.vertices[ 0 ], v1 = geometry.vertices[ 1 ], v2 = geometry.vertices[ 2 ];
 			assert.ok( v0.x === - 0.5 && v0.y === 0 && v0.z === 0, "first vertex was rotated" );
@@ -128,7 +128,7 @@ export default QUnit.module( 'Core', () => {
 			var matrix = new Matrix4();
 			matrix.makeRotationY( Math.PI ); // 180 degrees
 
-			geometry.applyMatrix( matrix );
+			geometry.applyMatrix4( matrix );
 
 			var v0 = geometry.vertices[ 0 ], v1 = geometry.vertices[ 1 ], v2 = geometry.vertices[ 2 ];
 			assert.ok( v0.x === 0.5 && v0.y === 0 && v0.z < Number.EPSILON, "first vertex was rotated" );
@@ -144,7 +144,7 @@ export default QUnit.module( 'Core', () => {
 			var matrix = new Matrix4();
 			matrix.makeRotationZ( Math.PI / 2 * 3 ); // 270 degrees
 
-			geometry.applyMatrix( matrix );
+			geometry.applyMatrix4( matrix );
 
 			var v0 = geometry.vertices[ 0 ], v1 = geometry.vertices[ 1 ], v2 = geometry.vertices[ 2 ];
 			assert.ok( v0.x < Number.EPSILON && v0.y === 0.5 && v0.z === 0, "first vertex was rotated" );

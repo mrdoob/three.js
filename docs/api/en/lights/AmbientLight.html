@@ -18,15 +18,18 @@
 			This light cannot be used to cast shadows as it does not have a direction.
 		</p>
 
+		<h2>Code Example</h2>
 
-		<h2>Example</h2>
+		<code>
+		var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+		scene.add( light );
+		</code>
+
+		<h2>Examples</h2>
 		<p>
-		  [example:webgl_animation_cloth animation / cloth ]<br />
-		  [example:webgl_animation_skinning_blending animation / skinning / blending ]
+			[example:webgl_animation_cloth animation / cloth ]<br />
+			[example:webgl_animation_skinning_blending animation / skinning / blending ]
 		</p>
-
-<code>var light = new THREE.AmbientLight( 0x404040 ); // soft white light
-scene.add( light );</code>
 
 		<h2>Constructor</h2>
 
@@ -47,15 +50,6 @@ scene.add( light );</code>
 		<p>
 			This is set to *undefined* in the constructor as ambient lights cannot cast shadows.
 		</p>
-
-
-		<h3>[property:Boolean isAmbientLight]</h3>
-		<p>
-			Used to check whether this or derived classes are ambient lights. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 
 
 		<h2>Methods</h2>

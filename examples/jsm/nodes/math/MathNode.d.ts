@@ -4,17 +4,16 @@ import { Node } from '../core/Node';
 
 export class MathNode extends TempNode {
 
-	constructor( a: Node, bOrMethod: Node | string, cOrMethod?: Node | string, method?: string );
+	constructor( a: Node, bOrMethod: Node | string, cOrMethod?: Node | string, method?: string );
 
 	a: Node;
 	b: Node | string | undefined;
-	c: Node | string | undefined;
+	c: Node | string | undefined;
 	method: string;
 	nodeType: string;
 
 	getNumInputs( builder: NodeBuilder ): number;
 	getInputType( builder: NodeBuilder ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: MathNode ): this;
 
 	static RAD: string;

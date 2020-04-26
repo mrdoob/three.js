@@ -27,8 +27,8 @@ export class DirectGeometry {
 	morphTargets: MorphTarget[];
 	skinWeights: Vector4[];
 	skinIndices: Vector4[];
-	boundingBox: Box3;
-	boundingSphere: Sphere;
+	boundingBox: Box3 | null;
+	boundingSphere: Sphere | null;
 	verticesNeedUpdate: boolean;
 	normalsNeedUpdate: boolean;
 	colorsNeedUpdate: boolean;

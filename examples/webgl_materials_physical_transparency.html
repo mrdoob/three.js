@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)</div>
 
 		<script type="module">
 
@@ -19,9 +19,7 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var params = {
 				color: 0xffffff,
@@ -38,12 +36,10 @@
 			var spotLight1, spotLight2;
 			var mesh1, mesh2;
 
-			var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
-
-			var hdrCubeMap = new HDRCubeTextureLoader()
-				.setPath( './textures/cube/pisaHDR/' )
+			var hdrEquirect = new RGBELoader()
 				.setDataType( THREE.UnsignedByteType )
-				.load( hdrUrls, function () {
+				.setPath( 'textures/equirectangular/' )
+				.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
 					init();
 					animate();
@@ -64,29 +60,22 @@
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
-				scene.background = hdrCubeMap;
+				scene.background = hdrEquirect;
 
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.position.set( 0, 0, 120 );
 
 				//
 
-				var pmremGenerator = new PMREMGenerator( hdrCubeMap );
-				pmremGenerator.update( renderer );
-
-				var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-				pmremCubeUVPacker.update( renderer );
-
-				hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-				hdrCubeMap.magFilter = THREE.LinearFilter;
-				hdrCubeMap.needsUpdate = true;
-
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+				hdrEquirect.dispose();
 				pmremGenerator.dispose();
-				pmremCubeUVPacker.dispose();
+
+				scene.background = hdrCubeRenderTarget.texture;
 
 				//
 
@@ -106,8 +95,9 @@
 					alphaTest: 0.5,
 					envMap: hdrCubeRenderTarget.texture,
 					envMapIntensity: params.envMapIntensity,
-					depthTest: false,
-					transparency: params.transparency,
+					depthWrite: false,
+					transparency: params.transparency, // use material.transparency for glass materials
+					opacity: 1,                        // set material.opacity to 1 when material.transparency is non-zero
 					transparent: true
 				} );
 

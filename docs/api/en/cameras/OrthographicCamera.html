@@ -21,23 +21,26 @@
 			This can be useful for rendering 2D scenes and UI elements, amongst other things.
 		</p>
 
+		<h2>Code Example</h2>
 
-		<h2>Example</h2>
+		<code>
+		var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+		scene.add( camera );
+		</code>
 
-		<p>[example:webgl_camera camera ]</p>
-		<p>[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]</p>
-		<p>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</p>
-		<p>[example:webgl_postprocessing_advanced postprocessing / advanced ]</p>
-		<p>[example:webgl_postprocessing_dof2 postprocessing / dof2 ]</p>
-		<p>[example:webgl_postprocessing_godrays postprocessing / godrays ]</p>
-		<p>[example:webgl_rtt rtt ]</p>
-		<p>[example:webgl_shaders_tonemapping shaders / tonemapping ]</p>
-		<p>[example:webgl_shadowmap shadowmap ]</p>
-		<p>[example:webgl_terrain_dynamic terrain / dynamic ]</p>
+		<h2>Examples</h2>
 
-		<code>var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-scene.add( camera );</code>
-
+		<p>
+			[example:webgl_camera camera ]<br />
+			[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]<br />
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]<br />
+			[example:webgl_postprocessing_advanced postprocessing / advanced ]<br />
+			[example:webgl_postprocessing_dof2 postprocessing / dof2 ]<br />
+			[example:webgl_postprocessing_godrays postprocessing / godrays ]<br />
+			[example:webgl_rtt rtt ]<br />
+			[example:webgl_shaders_tonemapping shaders / tonemapping ]<br />
+			[example:webgl_shadowmap shadowmap ]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -70,13 +73,6 @@ scene.add( camera );</code>
 		Camera frustum far plane. Default is *2000*.<br /><br />
 
 		The valid range is between the current value of the [page:.near near] plane and infinity.
-		</p>
-
-		<h3>[property:Boolean isOrthographicCamera]</h3>
-		<p>
-			Used to test whether this or derived classes are OrthographicCameras. Default is *true*.<br /><br />
-
-			This should not be changed as it is used internally by the renderer for optimisation.
 		</p>
 
 		<h3>[property:Float left]</h3>

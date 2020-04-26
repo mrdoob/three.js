@@ -9,12 +9,11 @@ export class CubeTextureNode extends InputNode {
 	constructor( value: CubeTexture, uv?: Node, bias?: Node );
 
 	value: CubeTexture;
-	uv: Node | undefined;
-	bias: Node | undefined;
+	uv: Node | undefined;
+	bias: Node | undefined;
 	nodeType: string;
 
 	getTexture( builder: NodeBuilder, output: string ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: CubeTextureNode ): this;
 
 }

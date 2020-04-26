@@ -10,7 +10,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - LWOLoader
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - LWOLoader
 			<P>Lightwave Object loader by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a></P>
 			Models by <a href="https://onthez.com/" target="_blank" rel="noopener">on the z</a> - Environment images by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
@@ -87,7 +87,7 @@
 				renderer.shadowMap.enabled = true;
 				renderer.physicallyCorrectLights = true;
 				renderer.gammaFactor = 1.18;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );

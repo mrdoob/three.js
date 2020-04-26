@@ -3,32 +3,38 @@
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
-const ObjectManipulator = {
+const ObjectManipulator = function () {
+};
+
+ObjectManipulator.prototype = {
+
+	constructor: ObjectManipulator,
 
 	/**
 	 * Applies values from parameter object via set functions or via direct assignment.
 	 *
 	 * @param {Object} objToAlter The objToAlter instance
 	 * @param {Object} params The parameter object
+	 * @param {boolean} forceCreation Force the creation of a property
 	 */
-	applyProperties: function (objToAlter, params, forceCreation) {
+	applyProperties: function ( objToAlter, params, forceCreation ) {
 
 		// fast-fail
-		if (objToAlter === undefined || objToAlter === null || params === undefined || params === null) return;
+		if ( objToAlter === undefined || objToAlter === null || params === undefined || params === null ) return;
 
 		let property, funcName, values;
-		for (property in params) {
+		for ( property in params ) {
 
-			funcName = 'set' + property.substring(0, 1).toLocaleUpperCase() + property.substring(1);
-			values = params[property];
+			funcName = 'set' + property.substring( 0, 1 ).toLocaleUpperCase() + property.substring( 1 );
+			values = params[ property ];
 
-			if (typeof objToAlter[funcName] === 'function') {
+			if ( typeof objToAlter[ funcName ] === 'function' ) {
 
-				objToAlter[funcName](values);
+				objToAlter[ funcName ]( values );
 
-			} else if (objToAlter.hasOwnProperty(property) || forceCreation) {
+			} else if ( objToAlter.hasOwnProperty( property ) || forceCreation ) {
 
-				objToAlter[property] = values;
+				objToAlter[ property ] = values;
 
 			}
 
@@ -81,8 +87,9 @@ DefaultWorkerPayloadHandler.prototype = {
 				parser.setLogging( this.logging.enabled, this.logging.debug );
 
 			}
-			ObjectManipulator.applyProperties( parser, payload.params, false );
-			ObjectManipulator.applyProperties( parser, callbacks, false );
+			let objectManipulator = new ObjectManipulator();
+			objectManipulator.applyProperties( parser, payload.params, false );
+			objectManipulator.applyProperties( parser, callbacks, false );
 
 			let arraybuffer = payload.data.input;
 			let executeFunctionName = 'execute';

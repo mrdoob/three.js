@@ -14,7 +14,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - (<span id="description">normal + ao + displacement + environment</span>) map demo.<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - (<span id="description">normal + ao + displacement + environment</span>) map demo.<br />
 			ninja head from <a href="http://developer.amd.com/tools-and-sdks/archive/legacy-cpu-gpu-tools/amd-gpu-meshmapper/" target="_blank" rel="noopener">AMD GPU MeshMapper</a>
 
 			<div id="vt">displacement mapping requires vertex textures</div>
@@ -112,9 +112,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
@@ -157,6 +155,7 @@
 				];
 
 				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
+				reflectionCube.encoding = THREE.sRGBEncoding;
 
 				// textures
 
@@ -242,6 +241,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				controls.update();
 
 				stats.begin();
 				render();

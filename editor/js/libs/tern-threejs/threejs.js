@@ -1979,7 +1979,7 @@
           "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer."
         },
         "vertexColors": {
-          "!type": "number",
+          "!type": "bool",
           "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "fog": {
@@ -2015,7 +2015,7 @@
           "!doc": "The size of the gap. Default is 1."
         },
         "vertexColors": {
-          "!type": "boolean",
+          "!type": "bool",
           "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "fog": {
@@ -2158,8 +2158,8 @@
           "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer."
         },
         "vertexColors": {
-          "!type": "number",
-          "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer."
+          "!type": "boolean",
+          "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "skinning": {
           "!type": "bool",
@@ -2297,8 +2297,8 @@
           "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer."
         },
         "vertexColors": {
-          "!type": "number",
-          "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer."
+          "!type": "boolean",
+          "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "skinning": {
           "!type": "bool",
@@ -2441,8 +2441,8 @@
           "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:WebGLRenderer WebGL] renderer, but does work with the [page:CanvasRenderer Canvas] renderer."
         },
         "vertexColors": {
-          "!type": "number",
-          "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer."
+          "!type": "bool",
+          "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "skinning": {
           "!type": "bool",
@@ -2482,7 +2482,7 @@
         },
         "vertexColors": {
           "!type": "bool",
-          "!doc": "This setting might not have any effect when used with certain renderers. For example, it is ignored with the [page:CanvasRenderer Canvas] renderer, but does work with the [page:WebGLRenderer WebGL] renderer."
+          "!doc": "This setting might not have any effect when used with certain renderers."
         },
         "fog": {
           "!type": "bool",
@@ -2548,8 +2548,8 @@
           "!doc": "Defines whether this material uses lighting; true to pass uniform data related to lighting to this shader"
         },
         "vertexColors": {
-          "!type": "number",
-          "!doc": "Define how the vertices are colored, by defining how the *colors* attribute gets populated. Possible values are [page:Materials THREE.NoColors], [page:Materials THREE.FaceColors] and [page:Materials THREE.VertexColors]. Default is THREE.NoColors."
+          "!type": "bool",
+          "!doc": "Define how the vertices are colored, by defining how the *colors* attribute gets populated. Default is false."
         },
         "skinning": {
           "!type": "bool",
@@ -4660,14 +4660,6 @@
         "autoUpdateObjects": {
           "!type": "bool",
           "!doc": "Defines whether the renderer should auto update objects. Default is true."
-        },
-        "gammaInput": {
-          "!type": "bool",
-          "!doc": "Default is false. If set, then it expects that all textures and colors are premultiplied gamma."
-        },
-        "gammaOutput": {
-          "!type": "bool",
-          "!doc": "Default is false.  If set, then it expects that all textures and colors need to be outputted in premultiplied gamma."
         },
         "shadowMapEnabled": {
           "!type": "bool",

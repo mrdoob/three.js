@@ -5,6 +5,7 @@ import { WebGLInfo } from './webgl/WebGLInfo';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities';
 import { WebGLProperties } from './webgl/WebGLProperties';
+import { WebGLProgram } from './webgl/WebGLProgram';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists';
 import { WebGLState } from './webgl/WebGLState';
 import { Vector2 } from './../math/Vector2';
@@ -13,9 +14,8 @@ import { Color } from './../math/Color';
 import { WebGLRenderTarget } from './WebGLRenderTarget';
 import { Object3D } from './../core/Object3D';
 import { Material } from './../materials/Material';
-import { Fog } from './../scenes/Fog';
-import { ToneMapping, ShadowMapType, CullFace } from '../constants';
-import { WebVRManager } from '../renderers/webvr/WebVRManager';
+import { ToneMapping, ShadowMapType, CullFace, TextureEncoding } from '../constants';
+import { WebXRManager } from '../renderers/webxr/WebXRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
@@ -47,7 +47,7 @@ export interface WebGLRendererParameters {
 	precision?: string;
 
 	/**
-	 * default is true.
+	 * default is false.
 	 */
 	alpha?: boolean;
 
@@ -156,14 +156,9 @@ export class WebGLRenderer implements Renderer {
 	extensions: WebGLExtensions;
 
 	/**
-	 * Default is false.
+	 * Default is LinearEncoding.
 	 */
-	gammaInput: boolean;
-
-	/**
-	 * Default is false.
-	 */
-	gammaOutput: boolean;
+	outputEncoding: TextureEncoding;
 
 	physicallyCorrectLights: boolean;
 	toneMapping: ToneMapping;
@@ -196,7 +191,7 @@ export class WebGLRenderer implements Renderer {
 	renderLists: WebGLRenderLists;
 	state: WebGLState;
 
-	vr: WebVRManager;
+	xr: WebXRManager;
 
 	/**
 	 * Return the WebGL context.
@@ -262,6 +257,16 @@ export class WebGLRenderer implements Renderer {
 	setScissorTest( enable: boolean ): void;
 
 	/**
+	 * Sets the custom opaque sort function for the WebGLRenderLists. Pass null to use the default painterSortStable function.
+	 */
+	setOpaqueSort( method: Function ): void;
+
+	/**
+	 * Sets the custom transparent sort function for the WebGLRenderLists. Pass null to use the default reversePainterSortStable function.
+	 */
+	setTransparentSort( method: Function ): void;
+
+	/**
 	 * Returns a THREE.Color instance with the current clear color.
 	 */
 	getClearColor(): Color;
@@ -302,21 +307,14 @@ export class WebGLRenderer implements Renderer {
 	resetGLState(): void;
 	dispose(): void;
 
-	/**
-	 * Tells the shadow map plugin to update using the passed scene and camera parameters.
-	 *
-	 * @param scene an instance of Scene
-	 * @param camera — an instance of Camera
-	 */
 	renderBufferImmediate(
 		object: Object3D,
-		program: Object,
-		material: Material
+		program: WebGLProgram,
 	): void;
 
 	renderBufferDirect(
 		camera: Camera,
-		fog: Fog,
+		scene: Scene,
 		geometry: Geometry | BufferGeometry,
 		material: Material,
 		object: Object3D,
@@ -324,7 +322,7 @@ export class WebGLRenderer implements Renderer {
 	): void;
 
 	/**
-	 * A build in function that can be used instead of requestAnimationFrame. For WebVR projects this function must be used.
+	 * A build in function that can be used instead of requestAnimationFrame. For WebXR projects this function must be used.
 	 * @param callback The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.
 	 */
 	setAnimationLoop( callback: Function | null ): void;
@@ -369,6 +367,14 @@ export class WebGLRenderer implements Renderer {
 	getActiveMipmapLevel(): number;
 
 	/**
+	 * Sets the given WebGLFramebuffer. This method can only be used if no render target is set via
+	 * {@link WebGLRenderer#setRenderTarget .setRenderTarget}.
+	 *
+	 * @param value The WebGLFramebuffer.
+	 */
+	setFramebuffer( value: WebGLFramebuffer ): void;
+
+	/**
 	 * Returns the current render target. If no render target is set, null is returned.
 	 */
 	getRenderTarget(): RenderTarget | null;
@@ -382,7 +388,7 @@ export class WebGLRenderer implements Renderer {
 	 * Sets the active render target.
 	 *
 	 * @param renderTarget The {@link WebGLRenderTarget renderTarget} that needs to be activated. When `null` is given, the canvas is set as the active render target instead.
-	 * @param activeCubeFace Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of {@link WebGLRenderTargetCube}.
+	 * @param activeCubeFace Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of {@link WebGLCubeRenderTarget}.
 	 * @param activeMipmapLevel Specifies the active mipmap level.
 	 */
 	setRenderTarget( renderTarget: RenderTarget | null, activeCubeFace?: number, activeMipmapLevel?: number ): void;
@@ -428,6 +434,11 @@ export class WebGLRenderer implements Renderer {
 	 * @deprecated
 	 */
 	gammaFactor: number;
+
+	/**
+	 * @deprecated Use {@link WebGLRenderer#xr .xr} instead.
+	 */
+	vr: boolean;
 
 	/**
 	 * @deprecated Use {@link WebGLShadowMap#enabled .shadowMap.enabled} instead.

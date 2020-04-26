@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - the Utah Teapot<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - the Utah Teapot<br />
 			from <a href="https://www.udacity.com/course/interactive-3d-graphics--cs291" target="_blank" rel="noopener">Udacity Interactive 3D Graphics</a>
 		</div>
 
@@ -67,8 +67,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
@@ -82,6 +81,7 @@
 				var textureMap = new THREE.TextureLoader().load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
+				textureMap.encoding = THREE.sRGBEncoding;
 
 				// REFLECTION MAP
 				var path = "textures/cube/pisa/";
@@ -92,6 +92,7 @@
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.encoding = THREE.sRGBEncoding;
 
 				// MATERIALS
 				var materialColor = new THREE.Color();

@@ -55,7 +55,7 @@
 		</div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras - logarithmic depth buffer<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras - logarithmic depth buffer<br/>
 			mousewheel to dolly out
 		</div>
 
@@ -249,7 +249,7 @@
 				var damping = ( Math.abs( zoomspeed ) > minzoomspeed ? .95 : 1.0 );
 
 				// Zoom out faster the further out you go
-				var zoom = THREE.Math.clamp( Math.pow( Math.E, zoompos ), minzoom, maxzoom );
+				var zoom = THREE.MathUtils.clamp( Math.pow( Math.E, zoompos ), minzoom, maxzoom );
 				zoompos = Math.log( zoom );
 
 				// Slow down quickly at the zoom limits

@@ -19,21 +19,23 @@
 			This light cannot be used to cast shadows.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
-		<div>
+		<code>
+		var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		scene.add( light );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
 			[example:webgl_lights_hemisphere lights / hemisphere ]<br />
-		  [example:misc_controls_pointerlock controls / pointerlock ]<br />
-		  [example:webgl_decals decals ]<br />
-		  [example:webgl_loader_collada_kinematics loader / collada / kinematics ]<br />
-		  [example:webgl_materials_lightmap materials / lightmap ]<br />
-		  [example:webgl_shaders_ocean shaders / ocean ]
-		</div>
-
-<code>
-var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
-scene.add( light );
-</code>
+			[example:misc_controls_pointerlock controls / pointerlock ]<br />
+			[example:webgl_decals decals ]<br />
+			[example:webgl_loader_collada_kinematics loader / collada / kinematics ]<br />
+			[example:webgl_materials_lightmap materials / lightmap ]<br />
+			[example:webgl_shaders_ocean shaders / ocean ]
+		</p>
 
 		<h2>Constructor</h2>
 		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
@@ -68,13 +70,6 @@ scene.add( light );
 			Default is a new [page:Color] set to white (0xffffff).
 		</p>
 
-		<h3>[property:Boolean isHemisphereLight]</h3>
-		<p>
-			Used to check whether this or derived classes are hemisphere lights. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:Vector3 position]</h3>
 		<p>
 			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
@@ -84,7 +79,7 @@ scene.add( light );
 
 		<h2>Methods</h2>
 
-		See the base [page:Light Light] class for common methods.
+		<p>See the base [page:Light Light] class for common methods.</p>
 
 		<h3>[method:HemisphereLight copy]( [param:HemisphereLight source] )</h3>
 		<p>

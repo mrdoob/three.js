@@ -14,6 +14,30 @@
 
 		<p class="desc">The default material used by [page:Points].</p>
 
+		<h2>Code Example</h2>
+		<code>
+		var vertices = [];
+
+		for ( var i = 0; i < 10000; i ++ ) {
+
+			var x = THREE.MathUtils.randFloatSpread( 2000 );
+			var y = THREE.MathUtils.randFloatSpread( 2000 );
+			var z = THREE.MathUtils.randFloatSpread( 2000 );
+
+			vertices.push( x, y, z );
+
+		}
+
+		var geometry = new THREE.BufferGeometry();
+		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+
+		var material = new THREE.PointsMaterial( { color: 0x888888 } );
+
+		var points = new THREE.Points( geometry, material );
+
+		scene.add( points );
+		</code>
+
 		<h2>Examples</h2>
 		<p>
 			[example:misc_controls_fly misc / controls / fly]<br />
@@ -31,29 +55,7 @@
 			[example:webgl_trails WebGL / trails]
 		</p>
 
-		<code>
-//This will add a starfield to the background of a scene
-var starsGeometry = new THREE.Geometry();
-
-for ( var i = 0; i < 10000; i ++ ) {
-
-	var star = new THREE.Vector3();
-	star.x = THREE.Math.randFloatSpread( 2000 );
-	star.y = THREE.Math.randFloatSpread( 2000 );
-	star.z = THREE.Math.randFloatSpread( 2000 );
-
-	starsGeometry.vertices.push( star );
-
-}
-
-var starsMaterial = new THREE.PointsMaterial( { color: 0x888888 } );
-
-var starField = new THREE.Points( starsGeometry, starsMaterial );
-
-scene.add( starField );
-		</code>
-
-		<h3>[name]( [param:Object parameters] )</h3>
+		<h2>[name]( [param:Object parameters] )</h2>
 		<p>
 			[page:Object parameters] - (optional) an object with one or more properties defining the material's appearance.
 			Any property of the material (including any property inherited from [page:Material]) can be passed in here.<br /><br />
@@ -79,13 +81,6 @@ scene.add( starField );
 		<h3>[property:Color color]</h3>
 		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
 
-		<h3>[property:Boolean isPointsMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are points materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:Texture map]</h3>
 
 		<p>Sets the color of the points using data from a [page:Texture].</p>
@@ -94,7 +89,8 @@ scene.add( starField );
 		<p>Define whether the material uses morphTargets. Default is false.</p>
 
 		<h3>[property:Number size]</h3>
-		<p>Sets the size of the points. Default is 1.0.</p>
+		<p>Sets the size of the points. Default is 1.0.<br/>
+			Will be capped if it exceeds the hardware dependent parameter [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter gl.ALIASED_POINT_SIZE_RANGE].</p>
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
 		<p>Specify whether points' size is attenuated by the camera depth. (Perspective camera only.) Default is true.</p>
