@@ -152,7 +152,21 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		return this;
 
+	},
+
+	toJSON: function()
+	{
+
+		return {
+			bufferType: "InterleavedBufferAttribute",
+			data: this.data.toJSON(),
+			itemSize: this.itemSize,
+			offset: this.offset,
+			normalized: this.normalized
+		};
+
 	}
+
 
 } );
 

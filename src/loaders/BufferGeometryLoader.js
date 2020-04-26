@@ -6,6 +6,8 @@ import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
+import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
+import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -35,6 +37,53 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 	},
 
+	parseBufferAttribute: function( json ) {
+
+		// Legacy format
+
+		if (json.array !== undefined) {
+
+			var typedArray = new TYPED_ARRAYS[json.type](json.array);
+			var contructor = json.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
+			var bufferAttribute = new contructor(typedArray, json.itemSize, json.normalized);
+
+			if (json.name !== undefined) bufferAttribute.name = json.name;
+
+			return bufferAttribute;
+
+		}
+
+		var bufferAttribute;
+
+		if ( json.type === "BufferAttribute" ) {
+
+			var typedArray = new TYPED_ARRAYS[json.typedArray.type](json.typedArray.array);
+			bufferAttribute = new BufferAttribute(typedArray, json.itemSize, json.normalized);
+
+		} else if ( json.type === "InstancedBufferAttribute" ) {
+
+			var typedArray = new TYPED_ARRAYS[json.typedArray.type](json.typedArray.array);
+			bufferAttribute = new InstancedBufferAttribute(typedArray, json.itemSize, json.normalized, json.meshPerAttribute);
+
+		} else if ( json.type === "InterleavedBufferAttribute") {
+
+			// InterleavedBuffer
+
+			var typedArray = new TYPED_ARRAYS[json.data.typedArray.type](json.data.typedArray.array);
+			var interleavedBuffer = new InterleavedBuffer(typedArray, json.data.stride);
+			interleavedBuffer.setUsage(json.data.usage);
+			interleavedBuffer.count = json.data.count;
+			
+			bufferAttribute = new InterleavedBufferAttribute(interleavedBuffer, json.itemSize, json.offset, json.normalized);
+
+		}
+
+		if (json.name !== undefined) bufferAttribute.name = json.name;
+
+		return bufferAttribute;
+
+	};
+
 	parse: function ( json ) {
 
 		var geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
@@ -52,12 +101,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		for ( var key in attributes ) {
 
-			var attribute = attributes[ key ];
-			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
-			var bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
-			var bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
-			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
-			geometry.setAttribute( key, bufferAttribute );
+			geometry.setAttribute( key, this.parseBufferAttribute( attributes[ key ] ) );
 
 		}
 
@@ -73,12 +117,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 				for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
 
-					var attribute = attributeArray[ i ];
-					var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
-
-					var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
-					if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
-					array.push( bufferAttribute );
+					array.push( this.parseBufferAttribute( attributeArray[ i ] ) );
 
 				}
 
