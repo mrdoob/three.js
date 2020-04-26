@@ -89,7 +89,7 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
-	}
+	},
 
 	toJSON: function() {
 

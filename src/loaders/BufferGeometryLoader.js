@@ -82,7 +82,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		return bufferAttribute;
 
-	};
+	},
 
 	parse: function ( json ) {
 
