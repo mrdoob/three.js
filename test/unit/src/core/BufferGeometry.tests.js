@@ -831,8 +831,11 @@ export default QUnit.module( 'Core', () => {
 					"attributes": {
 						"attribute1": {
 							"itemSize": 1,
-							"type": "Uint16Array",
-							"array": [ 1, 3, 5, 7 ],
+							"type": "BufferAttribute",
+							"typedArray": {
+								"type": "Uint16Array",
+								"array": [ 1, 3, 5, 7 ],
+							},
 							"normalized": false,
 							"name": "attribute1"
 						}
@@ -864,8 +867,11 @@ export default QUnit.module( 'Core', () => {
 			gold.data.morphAttributes = {
 				"attribute1": [ {
 					"itemSize": 1,
-					"type": "Uint16Array",
-					"array": [ 1, 3, 5, 7 ],
+					"typedArray": {
+						"type": "Uint16Array",
+						"array": [ 1, 3, 5, 7 ]
+					},
+					"type": "BufferAttribute",
 					"normalized": false,
 					"name": "attribute1"
 				} ]
