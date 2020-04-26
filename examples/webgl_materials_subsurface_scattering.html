@@ -21,7 +21,7 @@
 
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { TranslucentShader } from './jsm/shaders/TranslucentShader.js';
+		import { SubsurfaceScatteringShader } from './jsm/shaders/SubsurfaceScatteringShader.js';
 		import { FBXLoader } from './jsm/loaders/FBXLoader.js';
 
 		var container, stats;
@@ -75,6 +75,8 @@
 			container.appendChild( stats.dom );
 
 			var controls = new OrbitControls( camera, container );
+			controls.minDistance = 500;
+			controls.maxDistance = 3000;
 
 			window.addEventListener( 'resize', onWindowResize, false );
 
@@ -89,7 +91,7 @@
 			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
 			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
 
-			var shader = TranslucentShader;
+			var shader = SubsurfaceScatteringShader;
 			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
 			uniforms[ 'map' ].value = imgTexture;
@@ -136,7 +138,7 @@
 
 			var ThicknessControls = function () {
 
-				this.distoration = uniforms[ 'thicknessDistortion' ].value;
+				this.distortion = uniforms[ 'thicknessDistortion' ].value;
 				this.ambient = uniforms[ 'thicknessAmbient' ].value;
 				this.attenuation = uniforms[ 'thicknessAttenuation' ].value;
 				this.power = uniforms[ 'thicknessPower' ].value;
@@ -147,9 +149,9 @@
 			var thicknessControls = new ThicknessControls();
 			var thicknessFolder = gui.addFolder( 'Thickness Control' );
 
-			thicknessFolder.add( thicknessControls, 'distoration' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
+			thicknessFolder.add( thicknessControls, 'distortion' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
 
-				uniforms[ 'thicknessDistortion' ].value = thicknessControls.distoration;
+				uniforms[ 'thicknessDistortion' ].value = thicknessControls.distortion;
 
 			} );
 

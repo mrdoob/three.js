@@ -13,7 +13,6 @@ backGeometry.viewDir = geometry.viewDir;
 
 vLightFront = vec3( 0.0 );
 vIndirectFront = vec3( 0.0 );
-
 #ifdef DOUBLE_SIDED
 	vLightBack = vec3( 0.0 );
 	vIndirectBack = vec3( 0.0 );
@@ -22,6 +21,18 @@ vIndirectFront = vec3( 0.0 );
 IncidentLight directLight;
 float dotNL;
 vec3 directLightColor_Diffuse;
+
+vIndirectFront += getAmbientLightIrradiance( ambientLightColor );
+
+vIndirectFront += getLightProbeIrradiance( lightProbe, geometry );
+
+#ifdef DOUBLE_SIDED
+
+	vIndirectBack += getAmbientLightIrradiance( ambientLightColor );
+
+	vIndirectBack += getLightProbeIrradiance( lightProbe, backGeometry );
+
+#endif
 
 #if NUM_POINT_LIGHTS > 0
 

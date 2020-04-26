@@ -13,8 +13,6 @@ import { FrontSide, BackSide } from '../constants.js';
 
 function PlaneHelper( plane, size, hex ) {
 
-	this.type = 'PlaneHelper';
-
 	this.plane = plane;
 
 	this.size = ( size === undefined ) ? 1 : size;
@@ -28,6 +26,8 @@ function PlaneHelper( plane, size, hex ) {
 	geometry.computeBoundingSphere();
 
 	Line.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+
+	this.type = 'PlaneHelper';
 
 	//
 

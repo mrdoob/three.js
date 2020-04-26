@@ -1,4 +1,4 @@
-export var REVISION = '115';
+export var REVISION = '116dev';
 export var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 export var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 export var CullFaceNone = 0;
@@ -153,6 +153,8 @@ export var InterpolateSmooth = 2302;
 export var ZeroCurvatureEnding = 2400;
 export var ZeroSlopeEnding = 2401;
 export var WrapAroundEnding = 2402;
+export var NormalAnimationBlendMode = 2500;
+export var AdditiveAnimationBlendMode = 2501;
 export var TrianglesDrawMode = 0;
 export var TriangleStripDrawMode = 1;
 export var TriangleFanDrawMode = 2;

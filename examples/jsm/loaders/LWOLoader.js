@@ -2064,21 +2064,21 @@ LWOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var self = this;
+		var scope = this;
 
-		var path = ( self.path === '' ) ? extractParentUrl( url, 'Objects' ) : self.path;
+		var path = ( scope.path === '' ) ? extractParentUrl( url, 'Objects' ) : scope.path;
 
 		// give the mesh a default name based on the filename
 		var modelName = url.split( path ).pop().split( '.' )[ 0 ];
 
 		var loader = new FileLoader( this.manager );
-		loader.setPath( self.path );
+		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 
 		loader.load( url, function ( buffer ) {
 
 			// console.time( 'Total parsing: ' );
-			onLoad( self.parse( buffer, path, modelName ) );
+			onLoad( scope.parse( buffer, path, modelName ) );
 			// console.timeEnd( 'Total parsing: ' );
 
 		}, onProgress, onError );
@@ -2134,12 +2134,12 @@ LWOTreeParser.prototype = {
 
 		var geometryParser = new GeometryParser();
 
-		var self = this;
+		var scope = this;
 		lwoTree.layers.forEach( function ( layer ) {
 
 			var geometry = geometryParser.parse( layer.geometry, layer );
 
-			var mesh = self.parseMesh( geometry, layer );
+			var mesh = scope.parseMesh( geometry, layer );
 
 			meshes[ layer.number ] = mesh;
 
@@ -2209,11 +2209,11 @@ LWOTreeParser.prototype = {
 
 		var materials = [];
 
-		var self = this;
+		var scope = this;
 
 		namesArray.forEach( function ( name, i ) {
 
-			materials[ i ] = self.getMaterialByName( name );
+			materials[ i ] = scope.getMaterialByName( name );
 
 		} );
 
@@ -2398,12 +2398,12 @@ MaterialParser.prototype = {
 		var inputNodeName = connections.inputNodeName;
 		var nodeName = connections.nodeName;
 
-		var self = this;
+		var scope = this;
 		inputName.forEach( function ( name, index ) {
 
 			if ( name === 'Material' ) {
 
-				var matNode = self.getNodeByRefName( inputNodeName[ index ], nodes );
+				var matNode = scope.getNodeByRefName( inputNodeName[ index ], nodes );
 				materialConnections.attributes = matNode.attributes;
 				materialConnections.envMap = matNode.fileName;
 				materialConnections.name = inputNodeName[ index ];
@@ -2416,7 +2416,7 @@ MaterialParser.prototype = {
 
 			if ( name === materialConnections.name ) {
 
-				materialConnections.maps[ inputName[ index ] ] = self.getNodeByRefName( inputNodeName[ index ], nodes );
+				materialConnections.maps[ inputName[ index ] ] = scope.getNodeByRefName( inputNodeName[ index ], nodes );
 
 			}
 

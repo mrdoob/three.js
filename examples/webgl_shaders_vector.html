@@ -122,8 +122,8 @@
 
 					var wind;
 
-					pts.push( path[ 0 ].getPoint( 0 ) );
-					pts2.push( path[ 0 ].getPoint( 0 ) );
+					pts.push( path[ 0 ].getPoint( 0, new THREE.Vector2() ) );
+					pts2.push( path[ 0 ].getPoint( 0, new THREE.Vector2() ) );
 
 					for ( var i = 0; i < path.length; i ++ ) {
 

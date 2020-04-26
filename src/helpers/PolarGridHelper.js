@@ -86,6 +86,8 @@ function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) 
 
 	LineSegments.call( this, geometry, material );
 
+	this.type = 'PolarGridHelper';
+
 }
 
 PolarGridHelper.prototype = Object.create( LineSegments.prototype );

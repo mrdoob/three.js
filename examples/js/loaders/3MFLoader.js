@@ -70,7 +70,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			try {
 
-				zip = new JSZip( data ); // eslint-disable-line no-undef
+				zip = new JSZip( data );
 
 			} catch ( e ) {
 
@@ -1275,7 +1275,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				var object3D = build.clone();
 
-				// apply component transfrom
+				// apply component transform
 
 				var transform = component.transform;
 

@@ -106,10 +106,6 @@ var list = {
 				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"Deprecated": {
-				"DeprecatedList": "api/en/deprecated/DeprecatedList"
-			},
-
 			"Extras": {
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
@@ -324,6 +320,10 @@ var list = {
 				"ShaderLib": "api/en/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/en/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/en/renderers/shaders/UniformsUtils"
+			},
+
+			"Renderers / WebXR": {
+				"WebXRManager": "api/en/renderers/webxr/WebXRManager"
 			},
 
 			"Scenes": {
@@ -558,10 +558,6 @@ var list = {
 				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"弃用列表": {
-				"DeprecatedList": "api/zh/deprecated/DeprecatedList"
-			},
-
 			"附件": {
 				"Earcut": "api/zh/extras/Earcut",
 				"ImageUtils": "api/zh/extras/ImageUtils",
@@ -776,6 +772,10 @@ var list = {
 				"ShaderLib": "api/zh/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/zh/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/zh/renderers/shaders/UniformsUtils"
+			},
+
+			"渲染器 / WebXR": {
+				"WebXRManager": "api/zh/renderers/webxr/WebXRManager"
 			},
 
 			"场景": {

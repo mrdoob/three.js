@@ -7,6 +7,7 @@ import { QuaternionKeyframeTrack } from './tracks/QuaternionKeyframeTrack.js';
 import { StringKeyframeTrack } from './tracks/StringKeyframeTrack.js';
 import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
 import { MathUtils } from '../math/MathUtils.js';
+import { NormalAnimationBlendMode } from '../constants.js';
 
 /**
  *
@@ -16,11 +17,12 @@ import { MathUtils } from '../math/MathUtils.js';
  * @author David Sarno / http://lighthaus.us/
  */
 
-function AnimationClip( name, duration, tracks ) {
+function AnimationClip( name, duration, tracks, blendMode ) {
 
 	this.name = name;
 	this.tracks = tracks;
 	this.duration = ( duration !== undefined ) ? duration : - 1;
+	this.blendMode = ( blendMode !== undefined ) ? blendMode : NormalAnimationBlendMode;
 
 	this.uuid = MathUtils.generateUUID();
 
@@ -124,7 +126,7 @@ Object.assign( AnimationClip, {
 
 		}
 
-		return new AnimationClip( json.name, json.duration, tracks );
+		return new AnimationClip( json.name, json.duration, tracks, json.blendMode );
 
 	},
 
@@ -138,7 +140,8 @@ Object.assign( AnimationClip, {
 			'name': clip.name,
 			'duration': clip.duration,
 			'tracks': tracks,
-			'uuid': clip.uuid
+			'uuid': clip.uuid,
+			'blendMode': clip.blendMode
 
 		};
 
@@ -300,6 +303,7 @@ Object.assign( AnimationClip, {
 		// automatic length determination in AnimationClip.
 		var duration = animation.length || - 1;
 		var fps = animation.fps || 30;
+		var blendMode = animation.blendMode;
 
 		var hierarchyTracks = animation.hierarchy || [];
 
@@ -381,7 +385,7 @@ Object.assign( AnimationClip, {
 
 		}
 
-		var clip = new AnimationClip( clipName, duration, tracks );
+		var clip = new AnimationClip( clipName, duration, tracks, blendMode );
 
 		return clip;
 
@@ -457,7 +461,7 @@ Object.assign( AnimationClip.prototype, {
 
 		}
 
-		return new AnimationClip( this.name, this.duration, tracks );
+		return new AnimationClip( this.name, this.duration, tracks, this.blendMode );
 
 	}
 

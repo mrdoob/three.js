@@ -544,7 +544,7 @@
 
     d.sizer.style.paddingRight = (d.barWidth = sizes.right) + "px";
     d.sizer.style.paddingBottom = (d.barHeight = sizes.bottom) + "px";
-    d.heightForcer.style.borderBottom = sizes.bottom + "px solid transparent"
+    d.heightForcer.style.borderBottom = sizes.bottom + "px solid transparent";
 
     if (sizes.right && sizes.bottom) {
       d.scrollbarFiller.style.display = "block";
@@ -1260,7 +1260,7 @@
       });
 
       function prepareCopyCut(e) {
-        if (signalDOMEvent(cm, e)) return
+        if (signalDOMEvent(cm, e)) return;
         if (cm.somethingSelected()) {
           lastCopied = cm.getSelections();
           if (input.inaccurateSelection) {
@@ -1485,8 +1485,8 @@
         operation(cm, setSelection)(cm.doc, simpleSelection(pos), sel_dontScroll);
 
       var oldCSS = te.style.cssText, oldWrapperCSS = input.wrapper.style.cssText;
-      input.wrapper.style.cssText = "position: absolute"
-      var wrapperBox = input.wrapper.getBoundingClientRect()
+      input.wrapper.style.cssText = "position: absolute";
+      var wrapperBox = input.wrapper.getBoundingClientRect();
       te.style.cssText = "position: absolute; width: 30px; height: 30px; top: " + (e.clientY - wrapperBox.top - 5) +
         "px; left: " + (e.clientX - wrapperBox.left - 5) + "px; z-index: 1000; background: " +
         (ie ? "rgba(255, 255, 255, .05)" : "transparent") +
@@ -1576,7 +1576,7 @@
 
       on(div, "paste", function(e) {
         if (!signalDOMEvent(cm, e)) handlePaste(e, cm);
-      })
+      });
 
       on(div, "compositionstart", function(e) {
         var data = e.data;
@@ -1619,7 +1619,7 @@
       });
 
       function onCopyCut(e) {
-        if (signalDOMEvent(cm, e)) return
+        if (signalDOMEvent(cm, e)) return;
         if (cm.somethingSelected()) {
           lastCopied = cm.getSelections();
           if (e.type == "cut") cm.replaceSelection("", null, "cut");
@@ -3906,7 +3906,7 @@
     if (signalDOMEvent(cm, e) || eventInWidget(cm.display, e)) return;
 
     e.dataTransfer.setData("Text", cm.getSelection());
-    e.dataTransfer.effectAllowed = "copyMove"
+    e.dataTransfer.effectAllowed = "copyMove";
 
     // Use dummy image instead of default browsers image.
     // Recent Safari (~6.0.2) have a tendency to segfault when this happens, so we don't do it there.
@@ -7099,7 +7099,7 @@
       if (nextChange == pos) { // Update current marker set
         spanStyle = spanEndStyle = spanStartStyle = title = css = "";
         collapsed = null; nextChange = Infinity;
-        var foundBookmarks = [], endStyles
+        var foundBookmarks = [], endStyles;
         for (var j = 0; j < spans.length; ++j) {
           var sp = spans[j], m = sp.marker;
           if (m.type == "bookmark" && sp.from == pos && m.widgetNode) {
@@ -7112,7 +7112,7 @@
             if (m.className) spanStyle += " " + m.className;
             if (m.css) css = (css ? css + ";" : "") + m.css;
             if (m.startStyle && sp.from == pos) spanStartStyle += " " + m.startStyle;
-            if (m.endStyle && sp.to == nextChange) (endStyles || (endStyles = [])).push(m.endStyle, sp.to)
+            if (m.endStyle && sp.to == nextChange) (endStyles || (endStyles = [])).push(m.endStyle, sp.to);
             if (m.title && !title) title = m.title;
             if (m.collapsed && (!collapsed || compareCollapsedMarkers(collapsed.marker, m) < 0))
               collapsed = sp;
@@ -7121,7 +7121,7 @@
           }
         }
         if (endStyles) for (var j = 0; j < endStyles.length; j += 2)
-          if (endStyles[j + 1] == nextChange) spanEndStyle += " " + endStyles[j]
+          if (endStyles[j + 1] == nextChange) spanEndStyle += " " + endStyles[j];
 
         if (!collapsed || collapsed.from == pos) for (var j = 0; j < foundBookmarks.length; ++j)
           buildCollapsedSpan(builder, 0, foundBookmarks[j]);
@@ -8161,7 +8161,7 @@
     }
   };
 
-  var noHandlers = []
+  var noHandlers = [];
   function getHandlers(emitter, type, copy) {
     var arr = emitter._handlers && emitter._handlers[type]
     if (copy) return arr && arr.length > 0 ? arr.slice() : noHandlers
@@ -8181,7 +8181,7 @@
   };
 
   var signal = CodeMirror.signal = function(emitter, type /*, values...*/) {
-    var handlers = getHandlers(emitter, type, true)
+    var handlers = getHandlers(emitter, type, true);
     if (!handlers.length) return;
     var args = Array.prototype.slice.call(arguments, 2);
     for (var i = 0; i < handlers.length; ++i) handlers[i].apply(null, args);
@@ -8297,7 +8297,7 @@
       pos = nextTab + 1;
       if (col >= goal) return pos;
     }
-  }
+  };
 
   var spaceStrs = [""];
   function spaceStr(n) {
