@@ -1,5 +1,3 @@
-import { _Math } from '../math/Math.js';
-
 /**
  * @author raub / https://github.com/raub
  */
@@ -27,8 +25,6 @@ function GLBufferAttribute( gl, buffer, type, itemSize, count, normalized ) {
 		throw new TypeError( 'THREE.GLBufferAttribute: unsupported GL data type.' );
 
 	}
-
-	this.uuid = _Math.generateUUID();
 
 	this.buffer = buffer;
 	this.type = type;

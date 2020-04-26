@@ -32,19 +32,12 @@
 		<div id="container"></div>
 		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - custom VBOs</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
-
+			import Stats from './jsm/libs/stats.module.js';
+			
 			var container, stats;
 
 			var camera, scene, renderer;
@@ -112,7 +105,7 @@
 
 				}
 
-				var gl = renderer.context;
+				var gl = renderer.getContext();
 
 				var pos = gl.createBuffer();
 				gl.bindBuffer( gl.ARRAY_BUFFER, pos );
@@ -127,7 +120,7 @@
 				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( colors ), gl.STATIC_DRAW );
 
 				var posAttr = new THREE.GLBufferAttribute( gl, pos, gl.FLOAT, 3, particles );
-				geometry.addAttribute( 'position', posAttr );
+				geometry.setAttribute( 'position', posAttr );
 
 				setInterval( function () {
 
@@ -144,7 +137,7 @@
 
 				}, 20 );
 
-				geometry.addAttribute( 'color', new THREE.GLBufferAttribute( gl, rgb, gl.FLOAT, 3, particles ) );
+				geometry.setAttribute( 'color', new THREE.GLBufferAttribute( gl, rgb, gl.FLOAT, 3, particles ) );
 
 				//
 
