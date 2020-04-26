@@ -91,12 +91,12 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	},
 
-	toJSON: function() {
+	toJSON: function () {
 
 		return {
 			typedArray: {
 				type: this.array.constructor.name,
-				array: Array.prototype.slice.call(this.array)
+				array: Array.prototype.slice.call( this.array )
 			},
 			stride: this.stride,
 			count: this.count,

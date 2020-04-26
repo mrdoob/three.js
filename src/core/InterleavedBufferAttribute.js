@@ -154,8 +154,7 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	},
 
-	toJSON: function()
-	{
+	toJSON: function () {
 
 		return {
 			bufferType: "InterleavedBufferAttribute",

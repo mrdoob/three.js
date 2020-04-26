@@ -387,7 +387,7 @@ Object.assign( BufferAttribute.prototype, {
 			type: "BufferAttribute",
 			typedArray: {
 				type: this.array.constructor.name,
-				array: Array.prototype.slice.call(this.array)
+				array: Array.prototype.slice.call( this.array )
 			},
 			itemSize: this.itemSize,
 			normalized: this.normalized

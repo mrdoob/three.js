@@ -37,17 +37,17 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 	},
 
-	parseBufferAttribute: function( json ) {
+	parseBufferAttribute: function ( json ) {
 
 		// Legacy format
 
-		if (json.array !== undefined) {
+		if ( json.array !== undefined ) {
 
-			var typedArray = new TYPED_ARRAYS[json.type](json.array);
+			var typedArray = new TYPED_ARRAYS[ json.type ]( json.array );
 			var contructor = json.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
-			var bufferAttribute = new contructor(typedArray, json.itemSize, json.normalized);
+			var bufferAttribute = new contructor( typedArray, json.itemSize, json.normalized );
 
-			if (json.name !== undefined) bufferAttribute.name = json.name;
+			if ( json.name !== undefined ) bufferAttribute.name = json.name;
 
 			return bufferAttribute;
 
@@ -57,28 +57,28 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		if ( json.type === "BufferAttribute" ) {
 
-			var typedArray = new TYPED_ARRAYS[json.typedArray.type](json.typedArray.array);
-			bufferAttribute = new BufferAttribute(typedArray, json.itemSize, json.normalized);
+			var typedArray = new TYPED_ARRAYS[ json.typedArray.type ]( json.typedArray.array );
+			bufferAttribute = new BufferAttribute( typedArray, json.itemSize, json.normalized );
 
 		} else if ( json.type === "InstancedBufferAttribute" ) {
 
-			var typedArray = new TYPED_ARRAYS[json.typedArray.type](json.typedArray.array);
-			bufferAttribute = new InstancedBufferAttribute(typedArray, json.itemSize, json.normalized, json.meshPerAttribute);
+			var typedArray = new TYPED_ARRAYS[ json.typedArray.type ]( json.typedArray.array );
+			bufferAttribute = new InstancedBufferAttribute( typedArray, json.itemSize, json.normalized, json.meshPerAttribute );
 
-		} else if ( json.type === "InterleavedBufferAttribute") {
+		} else if ( json.type === "InterleavedBufferAttribute" ) {
 
 			// InterleavedBuffer
 
-			var typedArray = new TYPED_ARRAYS[json.data.typedArray.type](json.data.typedArray.array);
-			var interleavedBuffer = new InterleavedBuffer(typedArray, json.data.stride);
-			interleavedBuffer.setUsage(json.data.usage);
+			var typedArray = new TYPED_ARRAYS[ json.data.typedArray.type ]( json.data.typedArray.array );
+			var interleavedBuffer = new InterleavedBuffer( typedArray, json.data.stride );
+			interleavedBuffer.setUsage( json.data.usage );
 			interleavedBuffer.count = json.data.count;
-			
-			bufferAttribute = new InterleavedBufferAttribute(interleavedBuffer, json.itemSize, json.offset, json.normalized);
+
+			bufferAttribute = new InterleavedBufferAttribute( interleavedBuffer, json.itemSize, json.offset, json.normalized );
 
 		}
 
-		if (json.name !== undefined) bufferAttribute.name = json.name;
+		if ( json.name !== undefined ) bufferAttribute.name = json.name;
 
 		return bufferAttribute;
 
