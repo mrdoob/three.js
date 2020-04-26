@@ -257,8 +257,8 @@ PMREMGenerator.prototype = {
 		var fov = 90;
 		var aspect = 1;
 		var cubeCamera = new PerspectiveCamera( fov, aspect, near, far );
-		var upSign = [ 1, 1, 1, 1, - 1, 1 ];
-		var forwardSign = [ 1, 1, 1, - 1, - 1, - 1 ];
+		var upSign = [ 1, 1, 1, - 1, 1, 1 ];
+		var forwardSign = [ 1, - 1, 1, - 1, 1, - 1 ];
 		var renderer = this._renderer;
 
 		var outputEncoding = renderer.outputEncoding;
@@ -287,7 +287,7 @@ PMREMGenerator.prototype = {
 
 		for ( var i = 0; i < 6; i ++ ) {
 
-			var col = i % 3;
+			var col = Math.floor( i / 2 );
 			if ( col == 0 ) {
 
 				cubeCamera.up.set( 0, upSign[ i ], 0 );
@@ -306,7 +306,7 @@ PMREMGenerator.prototype = {
 			}
 
 			_setViewport( cubeUVRenderTarget,
-				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
+				col * SIZE_MAX, ( i % 2 ) ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
 			renderer.setRenderTarget( cubeUVRenderTarget );
 			renderer.render( scene, cubeCamera );
 
@@ -554,8 +554,8 @@ function _createPlanes() {
 
 		for ( var face = 0; face < cubeFaces; face ++ ) {
 
-			var x = ( face % 3 ) * 2 / 3 - 1;
-			var y = face > 2 ? 0 : - 1;
+			var x = Math.floor( face / 2 ) * 2 / 3 - 1;
+			var y = face % 2 ? 0 : - 1;
 			var coordinates = [
 				x, y, 0,
 				x + 2 / 3, y, 0,
@@ -797,16 +797,16 @@ vec3 getDirection(vec2 uv, float face) {
 	vec3 direction = vec3(uv, 1.0);
 	if (face == 0.0) { // pos_x
 		direction = direction.zyx;
-	} else if (face == 1.0) { // pos_y
-		direction = direction.xzy;
-	} else if ( face == 2.0 ) { // pos_z
-		direction.x *= -1.0;
-	} else if (face == 3.0) { // neg_x
+	} else if (face == 1.0) { // neg_x
 		direction = direction.zyx;
 		direction.xz *= -1.0;
-	} else if (face == 4.0) { // neg_y
+	} else if ( face == 2.0 ) { // pos_y
+		direction = direction.xzy;
+	} else if (face == 3.0) { // neg_y
 		direction = direction.xzy;
 		direction.yz *= -1.0;
+	} else if (face == 4.0) { // pos_z
+		direction.x *= -1.0;
 	} else if (face == 5.0) { // neg_z
 		direction.z *= -1.0;
 	}
