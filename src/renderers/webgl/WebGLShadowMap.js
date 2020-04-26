@@ -119,8 +119,6 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			if ( _shadowMapSize.x > maxTextureSize || _shadowMapSize.y > maxTextureSize ) {
 
-				console.warn( 'THREE.WebGLShadowMap:', light, 'has shadow exceeding max texture size, reducing' );
-
 				if ( _shadowMapSize.x > maxTextureSize ) {
 
 					_viewportSize.x = Math.floor( maxTextureSize / shadowFrameExtents.x );
