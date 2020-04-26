@@ -258,7 +258,7 @@ PMREMGenerator.prototype = {
 		var aspect = 1;
 		var cubeCamera = new PerspectiveCamera( fov, aspect, near, far );
 		var upSign = [ 1, 1, 1, 1, - 1, 1 ];
-		var forwardSign = [ 1, 1, - 1, - 1, - 1, 1 ];
+		var forwardSign = [ 1, 1, 1, - 1, - 1, - 1 ];
 		var renderer = this._renderer;
 
 		var outputEncoding = renderer.outputEncoding;
@@ -270,7 +270,6 @@ PMREMGenerator.prototype = {
 		renderer.toneMapping = LinearToneMapping;
 		renderer.toneMappingExposure = 1.0;
 		renderer.outputEncoding = LinearEncoding;
-		scene.scale.z *= - 1;
 
 		var background = scene.background;
 		if ( background && background.isColor ) {
@@ -317,7 +316,6 @@ PMREMGenerator.prototype = {
 		renderer.toneMappingExposure = toneMappingExposure;
 		renderer.outputEncoding = outputEncoding;
 		renderer.setClearColor( clearColor, clearAlpha );
-		scene.scale.z *= - 1;
 
 	},
 
@@ -797,20 +795,20 @@ varying vec3 vOutputDirection;
 vec3 getDirection(vec2 uv, float face) {
 	uv = 2.0 * uv - 1.0;
 	vec3 direction = vec3(uv, 1.0);
-	if (face == 0.0) {
+	if (face == 0.0) { // pos_x
 		direction = direction.zyx;
-		direction.z *= -1.0;
-	} else if (face == 1.0) {
+	} else if (face == 1.0) { // pos_y
 		direction = direction.xzy;
-		direction.z *= -1.0;
-	} else if (face == 3.0) {
-		direction = direction.zyx;
+	} else if ( face == 2.0 ) { // pos_z
 		direction.x *= -1.0;
-	} else if (face == 4.0) {
-		direction = direction.xzy;
-		direction.y *= -1.0;
-	} else if (face == 5.0) {
+	} else if (face == 3.0) { // neg_x
+		direction = direction.zyx;
 		direction.xz *= -1.0;
+	} else if (face == 4.0) { // neg_y
+		direction = direction.xzy;
+		direction.yz *= -1.0;
+	} else if (face == 5.0) { // neg_z
+		direction.z *= -1.0;
 	}
 	return direction;
 }
