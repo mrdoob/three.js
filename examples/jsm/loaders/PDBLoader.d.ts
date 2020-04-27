@@ -8,8 +8,7 @@ export interface PDB {
 	geometryAtoms: BufferGeometry;
 	geometryBonds: BufferGeometry;
 	json: {
-		atoms: any[][],
-		bonds: number[][]
+		atoms: any[][]
 	}
 }
 
