@@ -543,6 +543,7 @@ var list = {
 				"EventDispatcher": "api/zh/core/EventDispatcher",
 				"Face3": "api/zh/core/Face3",
 				"Geometry": "api/zh/core/Geometry",
+				"GLBufferAttribute": "api/zh/core/GLBufferAttribute",
 				"InstancedBufferAttribute": "api/zh/core/InstancedBufferAttribute",
 				"InstancedBufferGeometry": "api/zh/core/InstancedBufferGeometry",
 				"InstancedInterleavedBuffer": "api/zh/core/InstancedInterleavedBuffer",
