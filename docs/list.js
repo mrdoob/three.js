@@ -90,7 +90,7 @@ var list = {
 				"EventDispatcher": "api/en/core/EventDispatcher",
 				"Face3": "api/en/core/Face3",
 				"Geometry": "api/en/core/Geometry",
-				"GLBufferAttribute": "api/{lan}/core/GLBufferAttribute",
+				"GLBufferAttribute": "api/en/core/GLBufferAttribute",
 				"InstancedBufferAttribute": "api/en/core/InstancedBufferAttribute",
 				"InstancedBufferGeometry": "api/en/core/InstancedBufferGeometry",
 				"InstancedInterleavedBuffer": "api/en/core/InstancedInterleavedBuffer",
