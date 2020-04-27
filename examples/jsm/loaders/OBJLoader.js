@@ -477,6 +477,7 @@ var OBJLoader = ( function () {
 								);
 
 							}
+
 							break;
 						case 'vn':
 							state.normals.push(
@@ -553,6 +554,7 @@ var OBJLoader = ( function () {
 						}
 
 					}
+
 					state.addLineGeometry( lineVertices, lineUVs );
 
 				} else if ( lineFirstChar === 'p' ) {
@@ -628,6 +630,7 @@ var OBJLoader = ( function () {
 						state.object.smooth = true;
 
 					}
+
 					var material = state.object.currentMaterial();
 					if ( material ) material.smooth = state.object.smooth;
 

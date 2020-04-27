@@ -272,6 +272,7 @@ THREE.AsciiEffect = function ( renderer, charSet, options ) {
 				}
 
 			}
+
 			strChars += "<br/>";
 
 		}

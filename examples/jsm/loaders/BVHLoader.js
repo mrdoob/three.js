@@ -394,6 +394,7 @@ BVHLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var line;
 			// skip empty lines
 			while ( ( line = lines.shift().trim() ).length === 0 ) { }
+
 			return line;
 
 		}
