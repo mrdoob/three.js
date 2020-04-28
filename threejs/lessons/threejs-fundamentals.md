@@ -406,7 +406,7 @@ a different color.
 I hope this short intro helps to get things started. [Next up we'll cover
 making our code responsive so it is adaptable to multiple situations](threejs-responsive.html).
 
-<div class="threejs_bottombar">
+<div id="es6" class="threejs_bottombar">
 <h3>es6 modules, three.js, and folder structure</h3>
 <p>As of version r106 the preferred way to use three.js is via <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import">es6 modules</a>.</p>
 <p>
