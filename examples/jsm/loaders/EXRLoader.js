@@ -147,6 +147,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 				bits = ( ( tmpDataView.getUint32( 0 ) >>> 20 ) & 0x7FF ) - 64;
 
 			}
+
 			var exponent = bits - 1022;
 			var mantissa = ldexp( value, - exponent );
 

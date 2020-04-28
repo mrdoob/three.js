@@ -2056,6 +2056,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 							data.stride = parseInt( accessor.getAttribute( 'stride' ) );
 
 						}
+
 						break;
 
 				}
@@ -2328,6 +2329,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 											}
 
 										}
+
 										break;
 
 									case 'NORMAL':
@@ -2356,6 +2358,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 								}
 
 							}
+
 							break;
 
 						case 'NORMAL':
@@ -3664,6 +3667,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 							object = new THREE.Mesh( geometry.data, material );
 
 						}
+
 						break;
 
 				}

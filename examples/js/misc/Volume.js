@@ -435,6 +435,7 @@ THREE.Volume.prototype = {
 		var datasize = this.data.length;
 
 		var i = 0;
+
 		for ( i = 0; i < datasize; i ++ ) {
 
 			if ( ! isNaN( this.data[ i ] ) ) {
@@ -446,6 +447,7 @@ THREE.Volume.prototype = {
 			}
 
 		}
+
 		this.min = min;
 		this.max = max;
 

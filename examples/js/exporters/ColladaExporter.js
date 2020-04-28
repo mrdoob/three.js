@@ -571,8 +571,8 @@ THREE.ColladaExporter.prototype = {
 					matidsArray = new Array( materials.length );
 
 				}
-				matids = matidsArray.fill()
-					.map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
+
+				matids = matidsArray.fill().map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
 
 				node +=
 					`<instance_geometry url="#${ meshid }">` +

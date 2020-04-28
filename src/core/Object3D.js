@@ -801,6 +801,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 				values.push( data );
 
 			}
+
 			return values;
 
 		}

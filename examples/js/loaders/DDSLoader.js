@@ -96,6 +96,7 @@ THREE.DDSLoader.prototype = Object.assign( Object.create( THREE.CompressedTextur
 				}
 
 			}
+
 			return byteArray;
 
 		}
