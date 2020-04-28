@@ -370,7 +370,19 @@ function WebXRManager( renderer, gl ) {
 
 		}
 
-		setProjectionFromUnion( cameraVR, cameraL, cameraR );
+		// update projection matrix for proper view frustum culling
+
+		if ( cameras.length === 2 ) {
+
+			setProjectionFromUnion( cameraVR, cameraL, cameraR );
+
+		} else {
+
+			// assume single camera setup (AR)
+
+			cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
+
+		}
 
 		return cameraVR;
 
