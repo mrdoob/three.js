@@ -1754,6 +1754,7 @@
 							uv.x = uv.x - Math.floor( uv.x );
 
 						}
+
 						break;
 
 				}
@@ -1785,6 +1786,7 @@
 							uv.y = uv.y - Math.floor( uv.y );
 
 						}
+
 						break;
 
 				}
@@ -6085,6 +6087,7 @@
 					values.push( data );
 
 				}
+
 				return values;
 
 			}
@@ -20036,8 +20039,6 @@
 
 				if ( _shadowMapSize.x > maxTextureSize || _shadowMapSize.y > maxTextureSize ) {
 
-					console.warn( 'THREE.WebGLShadowMap:', light, 'has shadow exceeding max texture size, reducing' );
-
 					if ( _shadowMapSize.x > maxTextureSize ) {
 
 						_viewportSize.x = Math.floor( maxTextureSize / shadowFrameExtents.x );
@@ -23410,7 +23411,19 @@
 
 			}
 
-			setProjectionFromUnion( cameraVR, cameraL, cameraR );
+			// update projection matrix for proper view frustum culling
+
+			if ( cameras.length === 2 ) {
+
+				setProjectionFromUnion( cameraVR, cameraL, cameraR );
+
+			} else {
+
+				// assume single camera setup (AR)
+
+				cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
+
+			}
 
 			return cameraVR;
 
@@ -36561,6 +36574,7 @@
 					texture.format = texData.format;
 
 				}
+
 				if ( texData.type !== undefined ) {
 
 					texture.type = texData.type;
@@ -41564,6 +41578,7 @@
 							edgeHighPt = inPolygon[ p ]; edgeDy = - edgeDy;
 
 						}
+
 						if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		{ continue; }
 
 						if ( inPt.y === edgeLowPt.y ) {
@@ -41703,6 +41718,7 @@
 							}
 
 						}
+
 						if ( hole_unassigned ) {
 
 							betterShapeHoles[ sIdx ].push( ho );
@@ -41713,6 +41729,7 @@
 
 				}
 				// console.log("ambiguous: ", ambiguous);
+
 				if ( toChange.length > 0 ) {
 
 					// console.log("to change: ", toChange);
@@ -48487,6 +48504,7 @@
 			return materials.slice();
 
 		};
+
 		return materials;
 
 	}
@@ -49673,6 +49691,7 @@
 				console.warn( 'THREE.BufferGeometry: .addDrawCall() no longer supports indexOffset.' );
 
 			}
+
 			console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
 			this.addGroup( start, count );
 
