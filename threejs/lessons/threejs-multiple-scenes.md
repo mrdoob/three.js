@@ -260,7 +260,7 @@ while the rest of the page scrolled over it. `position: absolute` will let the c
 
 Now that we've gotten multiple scenes working let's make this just slightly more generic.
 
-We could make it so the main render function, the one managing the canvas, just has a list of elements and their associated render function. For each element it would check if the element is on screen and if so call the corresponding render function. In this way we'd have a generic system where individual scenes aren't really aware they are aware they are being rendered in some smaller space.
+We could make it so the main render function, the one managing the canvas, just has a list of elements and their associated render function. For each element it would check if the element is on screen and if so call the corresponding render function. In this way we'd have a generic system where individual scenes aren't really aware they are being rendered in some smaller space.
 
 Here's the main render function
 
@@ -351,7 +351,7 @@ Now the setup code for each scene just adds itself to the list of scenes
 }
 ```
 
-With that we no longer needed `sceneInfo1` and `sceneInfo2` and the code that was rotating the meshes is now specific to each scene.
+With that we no longer need `sceneInfo1` and `sceneInfo2` and the code that was rotating the meshes is now specific to each scene.
 
 {{{example url="../threejs-multiple-scenes-generic.html" }}}
 
