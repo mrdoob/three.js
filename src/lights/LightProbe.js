@@ -11,6 +11,8 @@ function LightProbe( sh, intensity ) {
 
 	Light.call( this, undefined, intensity );
 
+	this.type = 'LightProbe';
+
 	this.sh = ( sh !== undefined ) ? sh : new SphericalHarmonics3();
 
 }
@@ -26,7 +28,15 @@ LightProbe.prototype = Object.assign( Object.create( Light.prototype ), {
 		Light.prototype.copy.call( this, source );
 
 		this.sh.copy( source.sh );
-		this.intensity = source.intensity;
+
+		return this;
+
+	},
+
+	fromJSON: function ( json ) {
+
+		this.intensity = json.intensity; // TODO: Move this bit to Light.fromJSON();
+		this.sh.fromArray( json.sh );
 
 		return this;
 
@@ -36,7 +46,7 @@ LightProbe.prototype = Object.assign( Object.create( Light.prototype ), {
 
 		var data = Light.prototype.toJSON.call( this, meta );
 
-		// data.sh = this.sh.toArray(); // todo
+		data.object.sh = this.sh.toArray();
 
 		return data;
 

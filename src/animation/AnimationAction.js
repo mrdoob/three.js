@@ -1,4 +1,4 @@
-import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat } from '../constants.js';
+import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat, NormalAnimationBlendMode, AdditiveAnimationBlendMode } from '../constants.js';
 
 /**
  *
@@ -11,11 +11,12 @@ import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, L
  *
  */
 
-function AnimationAction( mixer, clip, localRoot ) {
+function AnimationAction( mixer, clip, localRoot, blendMode ) {
 
 	this._mixer = mixer;
 	this._clip = clip;
 	this._localRoot = localRoot || null;
+	this.blendMode = blendMode || clip.blendMode;
 
 	var tracks = clip.tracks,
 		nTracks = tracks.length,
@@ -374,10 +375,28 @@ Object.assign( AnimationAction.prototype, {
 			var interpolants = this._interpolants;
 			var propertyMixers = this._propertyBindings;
 
-			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+			switch ( this.blendMode ) {
 
-				interpolants[ j ].evaluate( clipTime );
-				propertyMixers[ j ].accumulate( accuIndex, weight );
+				case AdditiveAnimationBlendMode:
+
+					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+						interpolants[ j ].evaluate( clipTime );
+						propertyMixers[ j ].accumulateAdditive( weight );
+
+					}
+
+					break;
+
+				case NormalAnimationBlendMode:
+				default:
+
+					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+						interpolants[ j ].evaluate( clipTime );
+						propertyMixers[ j ].accumulate( accuIndex, weight );
+
+					}
 
 			}
 

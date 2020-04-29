@@ -78,7 +78,7 @@ DRACOExporter.prototype = {
 
 		if ( faces !== null ) {
 
-			builder.AddFacesToMesh( mesh, faces.count, faces.array );
+			builder.AddFacesToMesh( mesh, faces.count / 3, faces.array );
 
 		} else {
 
@@ -90,7 +90,7 @@ DRACOExporter.prototype = {
 
 			}
 
-			builder.AddFacesToMesh( mesh, vertices.count, faces );
+			builder.AddFacesToMesh( mesh, vertices.count / 3, faces );
 
 		}
 

@@ -34,7 +34,6 @@ var Reflector = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Reflector.ReflectorShader;
-	var recursion = options.recursion !== undefined ? options.recursion : 0;
 	var encoding = options.encoding !== undefined ? options.encoding : LinearEncoding;
 
 	//
@@ -84,14 +83,6 @@ var Reflector = function ( geometry, options ) {
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
 
-		if ( 'recursion' in camera.userData ) {
-
-			if ( camera.userData.recursion === recursion ) return;
-
-			camera.userData.recursion ++;
-
-		}
-
 		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
 
@@ -129,8 +120,6 @@ var Reflector = function ( geometry, options ) {
 
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
-
-		virtualCamera.userData.recursion = 0;
 
 		// Update the texture matrix
 		textureMatrix.set(
@@ -175,11 +164,14 @@ var Reflector = function ( geometry, options ) {
 		var currentXrEnabled = renderer.xr.enabled;
 		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-		renderer.xr.enabled = false; // Avoid camera modification and recursion
+		renderer.xr.enabled = false; // Avoid camera modification
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+
+		renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
+
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, virtualCamera );
 
 		renderer.xr.enabled = currentXrEnabled;

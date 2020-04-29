@@ -17,15 +17,13 @@ var _v2 = new Vector3();
 var _normalMatrix = new Matrix3();
 var _keys = [ 'a', 'b', 'c' ];
 
-function VertexNormalsHelper( object, size, hex, linewidth ) {
+function VertexNormalsHelper( object, size, hex ) {
 
 	this.object = object;
 
-	this.size = ( size !== undefined ) ? size : 1;
+	this.size = ( size !== undefined ) ? size : 0.1;
 
 	var color = ( hex !== undefined ) ? hex : 0xff0000;
-
-	var width = ( linewidth !== undefined ) ? linewidth : 1;
 
 	//
 
@@ -51,7 +49,9 @@ function VertexNormalsHelper( object, size, hex, linewidth ) {
 
 	geometry.setAttribute( 'position', positions );
 
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+
+	this.type = 'VertexNormalsHelper';
 
 	//
 

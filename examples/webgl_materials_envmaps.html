@@ -50,37 +50,38 @@
 
 				// Textures
 
-				var r = "textures/cube/Bridge2/";
-				var urls = [ r + "posx.jpg", r + "negx.jpg",
-							 r + "posy.jpg", r + "negy.jpg",
-							 r + "posz.jpg", r + "negz.jpg" ];
+				var r = 'textures/cube/Bridge2/';
+				var urls = [ r + 'posx.jpg', r + 'negx.jpg',
+							 r + 'posy.jpg', r + 'negy.jpg',
+							 r + 'posz.jpg', r + 'negz.jpg' ];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
 				textureCube.encoding = THREE.sRGBEncoding;
 
 				var textureLoader = new THREE.TextureLoader();
 
-				textureEquirec = textureLoader.load( "textures/2294472375_24a3b8ef46_o.jpg" );
+				textureEquirec = textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg' );
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
 				textureEquirec.encoding = THREE.sRGBEncoding;
 
-				textureSphere = textureLoader.load( "textures/metal.jpg" );
+				textureSphere = textureLoader.load( 'textures/metal.jpg' );
 				textureSphere.mapping = THREE.SphericalReflectionMapping;
 				textureSphere.encoding = THREE.sRGBEncoding;
 
 				// Materials
 
-				var equirectShader = THREE.ShaderLib[ "equirect" ];
+				var equirectShader = THREE.ShaderLib[ 'equirect' ];
 
 				var equirectMaterial = new THREE.ShaderMaterial( {
+					uniforms: THREE.UniformsUtils.clone( equirectShader.uniforms ),
 					fragmentShader: equirectShader.fragmentShader,
 					vertexShader: equirectShader.vertexShader,
-					uniforms: equirectShader.uniforms,
 					depthWrite: false,
 					side: THREE.BackSide
 				} );
 
-				equirectMaterial.uniforms[ "tEquirect" ].value = textureEquirec;
+				equirectMaterial.uniforms[ 'tEquirect' ].value = textureEquirec;
+
 				// enable code injection for non-built-in material
 				Object.defineProperty( equirectMaterial, 'map', {
 
@@ -92,11 +93,12 @@
 
 				} );
 
-				var cubeShader = THREE.ShaderLib[ "cube" ];
+				var cubeShader = THREE.ShaderLib[ 'cube' ];
+
 				var cubeMaterial = new THREE.ShaderMaterial( {
+					uniforms: THREE.UniformsUtils.clone( cubeShader.uniforms ),
 					fragmentShader: cubeShader.fragmentShader,
 					vertexShader: cubeShader.vertexShader,
-					uniforms: cubeShader.uniforms,
 					depthWrite: false,
 					side: THREE.BackSide
 				} );

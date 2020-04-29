@@ -17,7 +17,8 @@ The aim of the project is to create an easy to use, lightweight, 3D library with
 [Migrating](https://github.com/mrdoob/three.js/wiki/Migration-Guide) &mdash;
 [Questions](http://stackoverflow.com/questions/tagged/three.js) &mdash;
 [Forum](https://discourse.threejs.org/) &mdash;
-[Slack](https://join.slack.com/t/threejs/shared_invite/enQtMzYxMzczODM2OTgxLTQ1YmY4YTQxOTFjNDAzYmQ4NjU2YzRhNzliY2RiNDEyYjU2MjhhODgyYWQ5Y2MyZTU3MWNkOGVmOGRhOTQzYTk)
+[Slack](https://join.slack.com/t/threejs/shared_invite/enQtMzYxMzczODM2OTgxLTQ1YmY4YTQxOTFjNDAzYmQ4NjU2YzRhNzliY2RiNDEyYjU2MjhhODgyYWQ5Y2MyZTU3MWNkOGVmOGRhOTQzYTk) &mdash;
+[Discord](https://discordapp.com/invite/HF4UdyF)
 
 ### Usage ###
 
@@ -63,7 +64,7 @@ function animate() {
 }
 ```
 
-If everything went well you should see [this](https://jsfiddle.net/f2Lommf5/).
+If everything went well you should see [this](https://jsfiddle.net/8kubjpL5/).
 
 ### Change log ###
 

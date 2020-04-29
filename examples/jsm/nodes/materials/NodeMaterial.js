@@ -19,7 +19,7 @@ function NodeMaterial( vertex, fragment ) {
 
 	ShaderMaterial.call( this );
 
-	var self = this;
+	var scope = this;
 
 	this.vertex = vertex || new RawNode( new PositionNode( PositionNode.PROJECTION ) );
 	this.fragment = fragment || new RawNode( new ColorNode( 0xFF0000 ) );
@@ -48,7 +48,7 @@ function NodeMaterial( vertex, fragment ) {
 
 	this.onBeforeCompile.toString = function () {
 
-		return self.needsCompile;
+		return scope.needsCompile;
 
 	};
 

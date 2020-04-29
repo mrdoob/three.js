@@ -1,6 +1,6 @@
 {
   "name": "three",
-  "version": "0.113.2",
+  "version": "0.115.0",
   "description": "JavaScript 3D library",
   "main": "build/three.js",
   "module": "build/three.module.js",
@@ -54,10 +54,12 @@
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
     "test": "npm run test-lint && npm run test-unit",
     "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
+    "test-lint-docs": "eslint docs --ext html",
     "test-lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-unit": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
-    "test-diff": "node --expose-gc test/diff/puppeteer.js",
-    "make-screenshot": "cross-env MAKE=true npm run test-diff"
+    "test-e2e": "node --expose-gc test/e2e/puppeteer.js",
+    "test-e2e-cov": "node test/e2e/check-coverage.js",
+    "make-screenshot": "cross-env MAKE=true npm run test-e2e"
   },
   "keywords": [
     "three",
@@ -74,26 +76,25 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@types/webgl2": "^0.0.5",
-    "@typescript-eslint/eslint-plugin": "^2.15.0",
-    "@typescript-eslint/parser": "^2.15.0",
-    "concurrently": "^5.0.2",
-    "cross-env": "^7.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "concurrently": "^5.1.0",
+    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
-    "eslint-config-mdcs": "^4.2.3",
-    "eslint-plugin-html": "^6.0.0",
+    "eslint-config-mdcs": "^5.0.0",
+    "eslint-plugin-html": "^6.0.2",
     "failonlyreporter": "^1.0.0",
-    "google-closure-compiler": "20200101.0.0",
+    "google-closure-compiler": "20200224.0.0",
     "http-server": "^0.12.1",
-    "image-output": "2.4.1",
-    "pixelmatch": "5.1.0",
-    "pngjs": "3.4.0",
-    "puppeteer": "^2.1.1",
+    "image-output": "^2.4.2",
+    "pixelmatch": "5.2.0",
+    "pngjs": "5.0.0",
+    "puppeteer": "2.1.1",
     "qunit": "^2.9.3",
-    "rollup": "^1.28.0",
+    "rollup": "^2.3.2",
     "rollup-plugin-buble": "^0.19.8",
     "serve-handler": "^6.1.2",
-    "typescript": "^3.7.4"
+    "typescript": "^3.8.3"
   },
   "jspm": {
     "files": [

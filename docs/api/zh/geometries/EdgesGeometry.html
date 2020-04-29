@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -14,16 +14,18 @@
 
 		<p class="desc">这可以作为一个辅助对象来查看[page:Geometry Geometry]的边缘。</p>
 
-		<h2>示例</h2>
-
-		[example:webgl_helpers helpers]
-
+		<h2>代码示例</h2>
 		<code>
-var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
-var edges = new THREE.EdgesGeometry( geometry );
-var line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
-scene.add( line );
+		var geometry = new THREE.BoxBufferGeometry( 100, 100, 100 );
+		var edges = new THREE.EdgesGeometry( geometry );
+		var line = new THREE.LineSegments( edges, new THREE.LineBasicMaterial( { color: 0xffffff } ) );
+		scene.add( line );
 		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_helpers helpers]
+		</p>
 
 		<h2>构造器</h2>
 

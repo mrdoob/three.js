@@ -62,6 +62,7 @@ import { PointsMaterial } from './materials/PointsMaterial.js';
 import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
 import { Box3 } from './math/Box3.js';
+import { Sphere } from './math/Sphere.js';
 import { Color } from './math/Color.js';
 import { Frustum } from './math/Frustum.js';
 import { Line3 } from './math/Line3.js';
@@ -125,6 +126,7 @@ export function MultiMaterial( materials ) {
 		return materials.slice();
 
 	};
+
 	return materials;
 
 }
@@ -540,6 +542,17 @@ Object.assign( Box3.prototype, {
 		return this.getSize( optionalTarget );
 
 	}
+} );
+
+Object.assign( Sphere.prototype, {
+
+	empty: function () {
+
+		console.warn( 'THREE.Sphere: .empty() has been renamed to .isEmpty().' );
+		return this.isEmpty();
+
+	},
+
 } );
 
 Frustum.prototype.setFromMatrix = function ( m ) {
@@ -1300,6 +1313,7 @@ Object.assign( BufferGeometry.prototype, {
 			console.warn( 'THREE.BufferGeometry: .addDrawCall() no longer supports indexOffset.' );
 
 		}
+
 		console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
 		this.addGroup( start, count );
 
@@ -2139,19 +2153,19 @@ export var SceneUtils = {
 
 	createMultiMaterialObject: function ( /* geometry, materials */ ) {
 
-		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+		console.error( 'THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js' );
 
 	},
 
 	detach: function ( /* child, parent, scene */ ) {
 
-		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+		console.error( 'THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js' );
 
 	},
 
 	attach: function ( /* child, scene, parent */ ) {
 
-		console.error( 'THREE.SceneUtils has been moved to /examples/js/utils/SceneUtils.js' );
+		console.error( 'THREE.SceneUtils has been moved to /examples/jsm/utils/SceneUtils.js' );
 
 	}
 
@@ -2161,6 +2175,6 @@ export var SceneUtils = {
 
 export function LensFlare() {
 
-	console.error( 'THREE.LensFlare has been moved to /examples/js/objects/Lensflare.js' );
+	console.error( 'THREE.LensFlare has been moved to /examples/jsm/objects/Lensflare.js' );
 
 }

@@ -262,8 +262,7 @@ Object.assign( Box3.prototype, {
 			_box.copy( geometry.boundingBox );
 			_box.applyMatrix4( object.matrixWorld );
 
-			this.expandByPoint( _box.min );
-			this.expandByPoint( _box.max );
+			this.union( _box );
 
 		}
 

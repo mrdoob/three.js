@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
 	<meta charset="utf-8" />
@@ -22,13 +22,13 @@
 
 		// iOS iframe auto-resize workaround
 
-		if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) {
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-			var scene = document.getElementById('scene');
+			var scene = document.getElementById( 'scene' );
 
-			scene.style.width = getComputedStyle(scene).width;
-			scene.style.height = getComputedStyle(scene).height;
-			scene.setAttribute('scrolling', 'no');
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
 
 		}
 

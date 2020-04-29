@@ -939,6 +939,7 @@ var VRMLLoader = ( function () {
 								material = getNode( fieldValues[ 0 ] );
 
 							}
+
 							break;
 
 						case 'geometry':
@@ -947,6 +948,7 @@ var VRMLLoader = ( function () {
 								geometry = getNode( fieldValues[ 0 ] );
 
 							}
+
 							break;
 
 						default:
@@ -1079,6 +1081,7 @@ var VRMLLoader = ( function () {
 								material = new MeshBasicMaterial( { color: 0x000000 } );
 
 							}
+
 							break;
 
 						case 'texture':
@@ -1096,6 +1099,7 @@ var VRMLLoader = ( function () {
 								}
 
 							}
+
 							break;
 
 						case 'textureTransform':
@@ -1104,6 +1108,7 @@ var VRMLLoader = ( function () {
 								transformData = getNode( fieldValues[ 0 ] );
 
 							}
+
 							break;
 
 						default:
@@ -1495,6 +1500,7 @@ var VRMLLoader = ( function () {
 								color = getNode( colorNode );
 
 							}
+
 							break;
 
 						case 'coord':
@@ -1505,6 +1511,7 @@ var VRMLLoader = ( function () {
 								coord = getNode( coordNode );
 
 							}
+
 							break;
 
 						case 'normal':
@@ -1515,6 +1522,7 @@ var VRMLLoader = ( function () {
 								normal = getNode( normalNode );
 
 							}
+
 							break;
 
 						case 'texCoord':
@@ -1525,6 +1533,7 @@ var VRMLLoader = ( function () {
 								texCoord = getNode( texCoordNode );
 
 							}
+
 							break;
 
 						case 'ccw':
@@ -1751,6 +1760,7 @@ var VRMLLoader = ( function () {
 								color = getNode( colorNode );
 
 							}
+
 							break;
 
 						case 'coord':
@@ -1761,6 +1771,7 @@ var VRMLLoader = ( function () {
 								coord = getNode( coordNode );
 
 							}
+
 							break;
 
 						case 'colorIndex':
@@ -1870,6 +1881,7 @@ var VRMLLoader = ( function () {
 								color = getNode( colorNode );
 
 							}
+
 							break;
 
 						case 'coord':
@@ -1880,6 +1892,7 @@ var VRMLLoader = ( function () {
 								coord = getNode( coordNode );
 
 							}
+
 							break;
 
 
