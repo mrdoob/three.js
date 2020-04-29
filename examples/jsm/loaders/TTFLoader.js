@@ -12,6 +12,7 @@ import {
 	FileLoader,
 	Loader
 } from "../../../build/three.module.js";
+import { opentype } from "../libs/opentype.module.min.js";
 
 var TTFLoader = function ( manager ) {
 
