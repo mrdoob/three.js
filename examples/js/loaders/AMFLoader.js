@@ -59,7 +59,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				try {
 
-					zip = new JSZip( data ); // eslint-disable-line no-undef
+					zip = new JSZip( data );
 
 				} catch ( e ) {
 
@@ -289,6 +289,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 					}
 
 				}
+
 				currVerticesNode = currVerticesNode.nextElementSibling;
 
 			}

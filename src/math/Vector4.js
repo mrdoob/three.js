@@ -646,6 +646,17 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
+	},
+
+	random: function () {
+
+		this.x = Math.random();
+		this.y = Math.random();
+		this.z = Math.random();
+		this.w = Math.random();
+
+		return this;
+
 	}
 
 } );

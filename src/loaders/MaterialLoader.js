@@ -207,12 +207,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( json.map !== undefined ) material.map = getTexture( json.map );
 		if ( json.matcap !== undefined ) material.matcap = getTexture( json.matcap );
 
-		if ( json.alphaMap !== undefined ) {
-
-			material.alphaMap = getTexture( json.alphaMap );
-			material.transparent = true;
-
-		}
+		if ( json.alphaMap !== undefined ) material.alphaMap = getTexture( json.alphaMap );
 
 		if ( json.bumpMap !== undefined ) material.bumpMap = getTexture( json.bumpMap );
 		if ( json.bumpScale !== undefined ) material.bumpScale = json.bumpScale;
@@ -261,6 +256,8 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( json.gradientMap !== undefined ) material.gradientMap = getTexture( json.gradientMap );
 
+		if ( json.clearcoatMap !== undefined ) material.clearcoatMap = getTexture( json.clearcoatMap );
+		if ( json.clearcoatRoughnessMap !== undefined ) material.clearcoatRoughnessMap = getTexture( json.clearcoatRoughnessMap );
 		if ( json.clearcoatNormalMap !== undefined ) material.clearcoatNormalMap = getTexture( json.clearcoatNormalMap );
 		if ( json.clearcoatNormalScale !== undefined ) material.clearcoatNormalScale = new Vector2().fromArray( json.clearcoatNormalScale );
 

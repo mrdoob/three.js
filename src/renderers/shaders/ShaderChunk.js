@@ -66,7 +66,7 @@ import normal_fragment_maps from './ShaderChunk/normal_fragment_maps.glsl.js';
 import normalmap_pars_fragment from './ShaderChunk/normalmap_pars_fragment.glsl.js';
 import clearcoat_normal_fragment_begin from './ShaderChunk/clearcoat_normal_fragment_begin.glsl.js';
 import clearcoat_normal_fragment_maps from './ShaderChunk/clearcoat_normal_fragment_maps.glsl.js';
-import clearcoat_normalmap_pars_fragment from './ShaderChunk/clearcoat_normalmap_pars_fragment.glsl.js';
+import clearcoat_pars_fragment from './ShaderChunk/clearcoat_pars_fragment.glsl.js';
 import packing from './ShaderChunk/packing.glsl.js';
 import premultiplied_alpha_fragment from './ShaderChunk/premultiplied_alpha_fragment.glsl.js';
 import project_vertex from './ShaderChunk/project_vertex.glsl.js';
@@ -84,7 +84,6 @@ import skinning_vertex from './ShaderChunk/skinning_vertex.glsl.js';
 import skinnormal_vertex from './ShaderChunk/skinnormal_vertex.glsl.js';
 import specularmap_fragment from './ShaderChunk/specularmap_fragment.glsl.js';
 import specularmap_pars_fragment from './ShaderChunk/specularmap_pars_fragment.glsl.js';
-import transparent_fragment from './ShaderChunk/transparent_fragment.glsl.js';
 import tonemapping_fragment from './ShaderChunk/tonemapping_fragment.glsl.js';
 import tonemapping_pars_fragment from './ShaderChunk/tonemapping_pars_fragment.glsl.js';
 import uv_pars_fragment from './ShaderChunk/uv_pars_fragment.glsl.js';
@@ -197,7 +196,7 @@ export var ShaderChunk = {
 	normalmap_pars_fragment: normalmap_pars_fragment,
 	clearcoat_normal_fragment_begin: clearcoat_normal_fragment_begin,
 	clearcoat_normal_fragment_maps: clearcoat_normal_fragment_maps,
-	clearcoat_normalmap_pars_fragment: clearcoat_normalmap_pars_fragment,
+	clearcoat_pars_fragment: clearcoat_pars_fragment,
 	packing: packing,
 	premultiplied_alpha_fragment: premultiplied_alpha_fragment,
 	project_vertex: project_vertex,
@@ -215,7 +214,6 @@ export var ShaderChunk = {
 	skinnormal_vertex: skinnormal_vertex,
 	specularmap_fragment: specularmap_fragment,
 	specularmap_pars_fragment: specularmap_pars_fragment,
-	transparent_fragment: transparent_fragment,
 	tonemapping_fragment: tonemapping_fragment,
 	tonemapping_pars_fragment: tonemapping_pars_fragment,
 	uv_pars_fragment: uv_pars_fragment,

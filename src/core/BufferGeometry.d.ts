@@ -42,8 +42,8 @@ export class BufferGeometry extends EventDispatcher {
 	};
 	morphTargetsRelative: boolean;
 	groups: { start: number; count: number; materialIndex?: number }[];
-	boundingBox: Box3;
-	boundingSphere: Sphere;
+	boundingBox: Box3 | null;
+	boundingSphere: Sphere | null;
 	drawRange: { start: number; count: number };
 	userData: {[key: string]: any};
 	readonly isBufferGeometry: true;
@@ -99,7 +99,7 @@ export class BufferGeometry extends EventDispatcher {
 	 */
 	computeVertexNormals(): void;
 
-	merge( geometry: BufferGeometry, offset: number ): BufferGeometry;
+	merge( geometry: BufferGeometry, offset?: number ): BufferGeometry;
 	normalizeNormals(): void;
 
 	toNonIndexed(): BufferGeometry;

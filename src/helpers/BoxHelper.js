@@ -24,7 +24,9 @@ function BoxHelper( object, color ) {
 	geometry.setIndex( new BufferAttribute( indices, 1 ) );
 	geometry.setAttribute( 'position', new BufferAttribute( positions, 3 ) );
 
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color } ) );
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+
+	this.type = 'BoxHelper';
 
 	this.matrixAutoUpdate = false;
 

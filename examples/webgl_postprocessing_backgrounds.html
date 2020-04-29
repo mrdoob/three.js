@@ -177,6 +177,7 @@
 				composer.addPass( copyPass );
 
 				var controls = new OrbitControls( cameraP, renderer.domElement );
+				controls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

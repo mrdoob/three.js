@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+		<title>three.js webgl - Fast subsurface scattering in Blinn-Phong shading demo</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+  </head>
+  <body>
+
+	<div id="container"></div>
+	<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
+		<br/>Fast subsurface scattering in Blinn-Phong shading demo<br/>
+		[Thanks for the art support from <a href="https://github.com/shaochun" target="_blank" rel="noopener">Shaochun Lin</a>]
+	</div>
+
+	<script type="module">
+		import * as THREE from '../build/three.module.js';
+
+		import Stats from './jsm/libs/stats.module.js';
+
+		import { GUI } from './jsm/libs/dat.gui.module.js';
+		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { SubsurfaceScatteringShader } from './jsm/shaders/SubsurfaceScatteringShader.js';
+		import { FBXLoader } from './jsm/loaders/FBXLoader.js';
+
+		var container, stats;
+		var camera, scene, renderer;
+		var model;
+
+		init();
+		animate();
+
+		function init() {
+
+			container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 5000 );
+			camera.position.set( 0.0, 300, 400 * 4 );
+
+			scene = new THREE.Scene();
+
+			// Lights
+
+			scene.add( new THREE.AmbientLight( 0x888888 ) );
+
+			var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.03 );
+			directionalLight.position.set( 0.0, 0.5, 0.5 ).normalize();
+			scene.add( directionalLight );
+
+			var pointLight1 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888888 } ) );
+			pointLight1.add( new THREE.PointLight( 0x888888, 7.0, 300 ) );
+			scene.add( pointLight1 );
+			pointLight1.position.x = 0;
+			pointLight1.position.y = - 50;
+			pointLight1.position.z = 350;
+
+			var pointLight2 = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0x888800 } ) );
+			pointLight2.add( new THREE.PointLight( 0x888800, 1.0, 500 ) );
+			scene.add( pointLight2 );
+			pointLight2.position.x = - 100;
+			pointLight2.position.y = 20;
+			pointLight2.position.z = - 260;
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			container.appendChild( renderer.domElement );
+			renderer.outputEncoding = THREE.sRGBEncoding;
+
+			//
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			var controls = new OrbitControls( camera, container );
+			controls.minDistance = 500;
+			controls.maxDistance = 3000;
+
+			window.addEventListener( 'resize', onWindowResize, false );
+
+			initMaterial();
+
+		}
+
+		function initMaterial() {
+
+			var loader = new THREE.TextureLoader();
+			var imgTexture = loader.load( 'models/fbx/white.jpg' );
+			var thicknessTexture = loader.load( 'models/fbx/bunny_thickness.jpg' );
+			imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
+
+			var shader = SubsurfaceScatteringShader;
+			var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
+
+			uniforms[ 'map' ].value = imgTexture;
+
+			uniforms[ 'diffuse' ].value = new THREE.Vector3( 1.0, 0.2, 0.2 );
+			uniforms[ 'shininess' ].value = 500;
+
+			uniforms[ 'thicknessMap' ].value = thicknessTexture;
+			uniforms[ 'thicknessColor' ].value = new THREE.Vector3( 0.5, 0.3, 0.0 );
+			uniforms[ 'thicknessDistortion' ].value = 0.1;
+			uniforms[ 'thicknessAmbient' ].value = 0.4;
+			uniforms[ 'thicknessAttenuation' ].value = 0.8;
+			uniforms[ 'thicknessPower' ].value = 2.0;
+			uniforms[ 'thicknessScale' ].value = 16.0;
+
+			var material = new THREE.ShaderMaterial( {
+				uniforms: uniforms,
+				vertexShader: shader.vertexShader,
+				fragmentShader: shader.fragmentShader,
+				lights: true
+			} );
+			material.extensions.derivatives = true;
+
+			// LOADER
+
+			var loader = new FBXLoader();
+			loader.load( 'models/fbx/stanford-bunny.fbx', function ( object ) {
+
+				model = object.children[ 0 ];
+				model.position.set( 0, 0, 10 );
+				model.scale.setScalar( 1 );
+				model.material = material;
+				scene.add( model );
+
+			} );
+
+			initGUI( uniforms );
+
+		}
+
+		function initGUI( uniforms ) {
+
+			var gui = new GUI();
+
+			var ThicknessControls = function () {
+
+				this.distortion = uniforms[ 'thicknessDistortion' ].value;
+				this.ambient = uniforms[ 'thicknessAmbient' ].value;
+				this.attenuation = uniforms[ 'thicknessAttenuation' ].value;
+				this.power = uniforms[ 'thicknessPower' ].value;
+				this.scale = uniforms[ 'thicknessScale' ].value;
+
+			};
+
+			var thicknessControls = new ThicknessControls();
+			var thicknessFolder = gui.addFolder( 'Thickness Control' );
+
+			thicknessFolder.add( thicknessControls, 'distortion' ).min( 0.01 ).max( 1 ).step( 0.01 ).onChange( function () {
+
+				uniforms[ 'thicknessDistortion' ].value = thicknessControls.distortion;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'ambient' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
+
+				uniforms[ 'thicknessAmbient' ].value = thicknessControls.ambient;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'attenuation' ).min( 0.01 ).max( 5.0 ).step( 0.05 ).onChange( function () {
+
+				uniforms[ 'thicknessAttenuation' ].value = thicknessControls.attenuation;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'power' ).min( 0.01 ).max( 16.0 ).step( 0.1 ).onChange( function () {
+
+				uniforms[ 'thicknessPower' ].value = thicknessControls.power;
+
+			} );
+
+			thicknessFolder.add( thicknessControls, 'scale' ).min( 0.01 ).max( 50.0 ).step( 0.1 ).onChange( function () {
+
+				uniforms[ 'thicknessScale' ].value = thicknessControls.scale;
+
+			} );
+
+			thicknessFolder.open();
+
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+
+			stats.update();
+
+		}
+
+		function render() {
+
+			if ( model ) model.rotation.y = performance.now() / 5000;
+
+			renderer.render( scene, camera );
+
+		}
+
+	</script>
+
+  </body>
+</html>

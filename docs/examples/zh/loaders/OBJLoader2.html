@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -18,11 +18,11 @@
 			vertices, and texture vertices.
 		</p>
 
-		<h2>Examples</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// instantiate the loader
-		let loader = new THREE.OBJLoader2();
+		let loader = new OBJLoader2();
 
 		// function called on successful load
 		function callbackOnLoad ( object3d ) {
@@ -33,9 +33,11 @@
 		loader.load( 'obj/female02/female02.obj', callbackOnLoad, null, null, null );
 		</code>
 
-		[example:webgl_loader_obj2] - Simple example <br>
-		[example:webgl_loader_obj2_options] - Example for multiple use-cases (parse and load, sync or in parallel to main (see [page:OBJLoader2Parallel]))<br>
-
+		<h2>例子</h2>
+		<p>
+			[example:webgl_loader_obj2] - Simple example<br />
+			[example:webgl_loader_obj2_options] - Example for multiple use-cases (parse and load, sync or in parallel to main (see [page:OBJLoader2Parallel]))
+		</p>
 
 		<h2>Constructor</h2>
 

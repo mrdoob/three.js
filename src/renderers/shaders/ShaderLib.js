@@ -94,8 +94,8 @@ var ShaderLib = {
 			UniformsLib.lights,
 			{
 				emissive: { value: new Color( 0x000000 ) },
-				roughness: { value: 0.5 },
-				metalness: { value: 0.5 },
+				roughness: { value: 1.0 },
+				metalness: { value: 0.0 },
 				envMapIntensity: { value: 1 } // temporary
 			}
 		] ),
@@ -299,12 +299,14 @@ ShaderLib.physical = {
 	uniforms: mergeUniforms( [
 		ShaderLib.standard.uniforms,
 		{
-			transparency: { value: 0 },
 			clearcoat: { value: 0 },
+			clearcoatMap: { value: null },
 			clearcoatRoughness: { value: 0 },
-			sheen: { value: new Color( 0x000000 ) },
+			clearcoatRoughnessMap: { value: null },
 			clearcoatNormalScale: { value: new Vector2( 1, 1 ) },
 			clearcoatNormalMap: { value: null },
+			sheen: { value: new Color( 0x000000 ) },
+			transparency: { value: 0 },
 		}
 	] ),
 

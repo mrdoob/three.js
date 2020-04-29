@@ -166,9 +166,9 @@ Object.assign( Matrix3.prototype, {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
-		if ( matrix && matrix.isMatrix4 ) {
+		if ( throwOnDegenerate !== undefined ) {
 
-			console.error( "THREE.Matrix3: .getInverse() no longer takes a Matrix4 argument." );
+			console.warn( "THREE.Matrix3: .getInverse() can no longer be configured to throw on degenerate." );
 
 		}
 
@@ -185,23 +185,7 @@ Object.assign( Matrix3.prototype, {
 
 			det = n11 * t11 + n21 * t12 + n31 * t13;
 
-		if ( det === 0 ) {
-
-			var msg = "THREE.Matrix3: .getInverse() can't invert matrix, determinant is 0";
-
-			if ( throwOnDegenerate === true ) {
-
-				throw new Error( msg );
-
-			} else {
-
-				console.warn( msg );
-
-			}
-
-			return this.identity();
-
-		}
+		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 		var detInv = 1 / det;
 

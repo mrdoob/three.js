@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -20,10 +20,11 @@
 
 		<h3>[name]( [param:VertexNode vertex], [param:Face face] )</h3>
 		<p>
-		[page:VertexNode vertex] - [page:VertexNode] A reference to its destination vertex.<br /><br />
-		[page:Face face] - [page:Face] A reference to its face.<br />
-		</p>
+		[page:VertexNode vertex] - [page:VertexNode] A reference to its destination vertex.<br />
+		[page:Face face] - [page:Face] A reference to its face.<br /><br />
 
+		Creates a new instance of [name].
+		</p>
 		<h2>Properties</h2>
 
 		<h3>[property:VertexNode vertex]</h3>
@@ -68,14 +69,16 @@
 		(straight-line length) of the edge.</p>
 
 		<h3>[method:HalfEdge setTwin]( [param:HalfEdge edge] )</h3>
-		[page:HalfEdge edge] - Any half-edge.<br /><br />
+		<p>
+			[page:HalfEdge edge] - Any half-edge.<br /><br />
 
-		<p>Sets the twin edge of this half-edge. It also ensures that the twin reference of the given half-edge is correctly set.</p>
+			Sets the twin edge of this half-edge. It also ensures that the twin reference of the given half-edge is correctly set.
+		</p>
 
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/math/ConvexHull.js examples/js/math/ConvexHull.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/ConvexHull.js examples/jsm/math/ConvexHull.js]
 		</p>
 	</body>
 </html>

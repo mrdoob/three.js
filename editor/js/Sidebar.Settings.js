@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { UIPanel, UIRow, UISelect, UIText } from './libs/ui.js';
+import { UIPanel, UIRow, UISelect, UIText, UIInteger } from './libs/ui.js';
 
 import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
 import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
@@ -21,6 +21,7 @@ var SidebarSettings = function ( editor ) {
 
 	var options = {
 		en: 'English',
+		fr: 'Français',
 		zh: '中文'
 	};
 
@@ -46,6 +47,26 @@ var SidebarSettings = function ( editor ) {
 	languageRow.add( language );
 
 	container.add( languageRow );
+
+	// export precision
+
+	var exportPrecisionRow = new UIRow();
+	var exportPrecision = new UIInteger( config.getKey( 'exportPrecision' ) ).setRange( 2, Infinity );
+
+	exportPrecision.onChange( function () {
+
+		var value = this.getValue();
+
+		editor.config.setKey( 'exportPrecision', value );
+
+	} );
+
+	exportPrecisionRow.add( new UIText( strings.getKey( 'sidebar/settings/exportPrecision' ) ).setWidth( '90px' ) );
+	exportPrecisionRow.add( exportPrecision );
+
+	container.add( exportPrecisionRow );
+
+	//
 
 	container.add( new SidebarSettingsShortcuts( editor ) );
 	container.add( new SidebarSettingsViewport( editor ) );

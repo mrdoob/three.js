@@ -388,6 +388,7 @@ THREE.ConvexObjectBreaker.prototype = {
 				radius1 = Math.max( radius1, p.x, p.y, p.z );
 
 			}
+
 			this.tempCM1.add( object.position );
 
 		}
@@ -407,6 +408,7 @@ THREE.ConvexObjectBreaker.prototype = {
 				radius2 = Math.max( radius2, p.x, p.y, p.z );
 
 			}
+
 			this.tempCM2.add( object.position );
 
 		}
