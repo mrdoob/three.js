@@ -42,7 +42,7 @@ function PropertyMixer( binding, typeName, valueSize ) {
 			mixFunctionAdditive = this._slerpAdditive;
 			setIdentity = this._setAdditiveIdentityQuaternion;
 
-			this.buffer = new Float64Array( 24 );
+			this.buffer = new Float64Array( valueSize * 6 );
 			this._workIndex = 5;
 			break;
 
