@@ -150,6 +150,9 @@ THREE.Reflector = function ( geometry, options ) {
 		renderer.xr.enabled = false; // Avoid camera modification
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
+		// If no specific encoding is specified, use the same as the renderer outputEncoding to avoid shader recompilation
+		if ( options.encoding === undefined ) renderTarget.texture.encoding = renderer.outputEncoding;
+
 		renderer.setRenderTarget( renderTarget );
 
 		renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
