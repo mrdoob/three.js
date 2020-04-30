@@ -80,6 +80,10 @@
 
 				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
 
+				var listener = new THREE.AudioListener();
+				camera.add( listener );
+				scene.add( camera );
+
 				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
 
@@ -136,15 +140,9 @@
 
 						new THREE.AudioLoader().load( audioFile, function ( buffer ) {
 
-							var listener = new THREE.AudioListener();
 							var audio = new THREE.Audio( listener ).setBuffer( buffer );
 
-							listener.position.z = 1;
-
 							helper.add( audio, audioParams );
-
-							scene.add( audio );
-							scene.add( listener );
 							scene.add( mesh );
 
 							ready = true;
