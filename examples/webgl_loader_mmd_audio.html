@@ -7,7 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #fff;
 				color: #444;
 			}
 			a {
@@ -17,6 +16,12 @@
 	</head>
 
 	<body>
+		<div id="overlay">
+			<div>
+				<button id="startButton">Click to Play</button>
+				<p>Audio playback requires user interaction.</p>
+			</div>
+		</div>
 		<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
 		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
@@ -46,16 +51,22 @@
 
 			var clock = new THREE.Clock();
 
-			Ammo().then( function ( AmmoLib ) {
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', function () {
 
-				Ammo = AmmoLib;
+				Ammo().then( function () {
 
-				init();
-				animate();
+					init();
+					animate();
+
+				} );
 
 			} );
 
 			function init() {
+
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
