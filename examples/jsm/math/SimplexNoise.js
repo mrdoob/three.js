@@ -28,13 +28,16 @@ var SimplexNoise = function ( r ) {
 	     [ - 1, 1, 1, 0 ], [ - 1, 1, - 1, 0 ], [ - 1, - 1, 1, 0 ], [ - 1, - 1, - 1, 0 ]];
 
 	this.p = [];
+
 	for ( var i = 0; i < 256; i ++ ) {
 
 		this.p[ i ] = Math.floor( r.random() * 256 );
 
 	}
+
 	// To remove the need for index wrapping, double the permutation table length
 	this.perm = [];
+
 	for ( var i = 0; i < 512; i ++ ) {
 
 		this.perm[ i ] = this.p[ i & 255 ];
@@ -101,6 +104,7 @@ SimplexNoise.prototype.noise = function ( xin, yin ) {
 		i1 = 0; j1 = 1;
 
 	} // upper triangle, YX order: (0,0)->(0,1)->(1,1)
+
 	// A step of (1,0) in (i,j) means a step of (1-c,-c) in (x,y), and
 	// a step of (0,1) in (i,j) means a step of (-c,1-c) in (x,y), where
 	// c = (3-sqrt(3))/6
@@ -123,6 +127,7 @@ SimplexNoise.prototype.noise = function ( xin, yin ) {
 		n0 = t0 * t0 * this.dot( this.grad3[ gi0 ], x0, y0 ); // (x,y) of grad3 used for 2D gradient
 
 	}
+
 	var t1 = 0.5 - x1 * x1 - y1 * y1;
 	if ( t1 < 0 ) n1 = 0.0;
 	else {
@@ -131,6 +136,7 @@ SimplexNoise.prototype.noise = function ( xin, yin ) {
 		n1 = t1 * t1 * this.dot( this.grad3[ gi1 ], x1, y1 );
 
 	}
+
 	var t2 = 0.5 - x2 * x2 - y2 * y2;
 	if ( t2 < 0 ) n2 = 0.0;
 	else {
@@ -139,6 +145,7 @@ SimplexNoise.prototype.noise = function ( xin, yin ) {
 		n2 = t2 * t2 * this.dot( this.grad3[ gi2 ], x2, y2 );
 
 	}
+
 	// Add contributions from each corner to get the final noise value.
 	// The result is scaled to return values in the interval [-1,1].
 	return 70.0 * ( n0 + n1 + n2 );
@@ -208,6 +215,7 @@ SimplexNoise.prototype.noise3d = function ( xin, yin, zin ) {
 		} // Y X Z order
 
 	}
+
 	// A step of (1,0,0) in (i,j,k) means a step of (1-c,-c,-c) in (x,y,z),
 	// a step of (0,1,0) in (i,j,k) means a step of (-c,1-c,-c) in (x,y,z), and
 	// a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z), where
@@ -238,6 +246,7 @@ SimplexNoise.prototype.noise3d = function ( xin, yin, zin ) {
 		n0 = t0 * t0 * this.dot3( this.grad3[ gi0 ], x0, y0, z0 );
 
 	}
+
 	var t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1;
 	if ( t1 < 0 ) n1 = 0.0;
 	else {
@@ -246,6 +255,7 @@ SimplexNoise.prototype.noise3d = function ( xin, yin, zin ) {
 		n1 = t1 * t1 * this.dot3( this.grad3[ gi1 ], x1, y1, z1 );
 
 	}
+
 	var t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2;
 	if ( t2 < 0 ) n2 = 0.0;
 	else {
@@ -254,6 +264,7 @@ SimplexNoise.prototype.noise3d = function ( xin, yin, zin ) {
 		n2 = t2 * t2 * this.dot3( this.grad3[ gi2 ], x2, y2, z2 );
 
 	}
+
 	var t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3;
 	if ( t3 < 0 ) n3 = 0.0;
 	else {
@@ -262,6 +273,7 @@ SimplexNoise.prototype.noise3d = function ( xin, yin, zin ) {
 		n3 = t3 * t3 * this.dot3( this.grad3[ gi3 ], x3, y3, z3 );
 
 	}
+
 	// Add contributions from each corner to get the final noise value.
 	// The result is scaled to stay just inside [-1,1]
 	return 32.0 * ( n0 + n1 + n2 + n3 );
@@ -368,6 +380,7 @@ SimplexNoise.prototype.noise4d = function ( x, y, z, w ) {
 		n0 = t0 * t0 * this.dot4( grad4[ gi0 ], x0, y0, z0, w0 );
 
 	}
+
 	var t1 = 0.6 - x1 * x1 - y1 * y1 - z1 * z1 - w1 * w1;
 	if ( t1 < 0 ) n1 = 0.0;
 	else {
@@ -376,6 +389,7 @@ SimplexNoise.prototype.noise4d = function ( x, y, z, w ) {
 		n1 = t1 * t1 * this.dot4( grad4[ gi1 ], x1, y1, z1, w1 );
 
 	}
+
 	var t2 = 0.6 - x2 * x2 - y2 * y2 - z2 * z2 - w2 * w2;
 	if ( t2 < 0 ) n2 = 0.0;
 	else {
@@ -383,7 +397,9 @@ SimplexNoise.prototype.noise4d = function ( x, y, z, w ) {
 		t2 *= t2;
 		n2 = t2 * t2 * this.dot4( grad4[ gi2 ], x2, y2, z2, w2 );
 
-	} var t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
+	}
+
+	var t3 = 0.6 - x3 * x3 - y3 * y3 - z3 * z3 - w3 * w3;
 	if ( t3 < 0 ) n3 = 0.0;
 	else {
 
@@ -391,6 +407,7 @@ SimplexNoise.prototype.noise4d = function ( x, y, z, w ) {
 		n3 = t3 * t3 * this.dot4( grad4[ gi3 ], x3, y3, z3, w3 );
 
 	}
+
 	var t4 = 0.6 - x4 * x4 - y4 * y4 - z4 * z4 - w4 * w4;
 	if ( t4 < 0 ) n4 = 0.0;
 	else {
@@ -399,6 +416,7 @@ SimplexNoise.prototype.noise4d = function ( x, y, z, w ) {
 		n4 = t4 * t4 * this.dot4( grad4[ gi4 ], x4, y4, z4, w4 );
 
 	}
+
 	// Sum up and scale the result to cover the range [-1,1]
 	return 27.0 * ( n0 + n1 + n2 + n3 + n4 );
 

@@ -227,6 +227,8 @@
 
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 20;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

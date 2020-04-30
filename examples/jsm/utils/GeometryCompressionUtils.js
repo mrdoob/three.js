@@ -158,16 +158,19 @@ var GeometryCompressionUtils = {
 			mesh.material.defines.USE_PACKED_NORMAL = 0;
 
 		}
+
 		if ( encodeMethod == "OCT1Byte" ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 1;
 
 		}
+
 		if ( encodeMethod == "OCT2Byte" ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 1;
 
 		}
+
 		if ( encodeMethod == "DEFAULT" ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 2;
@@ -471,6 +474,7 @@ var GeometryCompressionUtils = {
 					] );
 
 				}
+
 				if ( bytes == 2 ) {
 
 					return new Int16Array( [

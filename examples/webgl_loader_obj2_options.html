@@ -303,7 +303,7 @@
 
 						let mesh = new THREE.Mesh( event.detail.bufferGeometry, event.detail.material );
 						mesh.name = event.detail.meshName;
-						let helper = new VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
+						let helper = new VertexNormalsHelper( mesh, 2, 0x00ff00 );
 						helper.name = 'VertexNormalsHelper';
 
 						override.addMesh( mesh );

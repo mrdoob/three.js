@@ -903,6 +903,7 @@ THREE.VRMLLoader = ( function () {
 								material = getNode( fieldValues[ 0 ] );
 
 							}
+
 							break;
 
 						case 'geometry':
@@ -911,6 +912,7 @@ THREE.VRMLLoader = ( function () {
 								geometry = getNode( fieldValues[ 0 ] );
 
 							}
+
 							break;
 
 						default:
@@ -1043,6 +1045,7 @@ THREE.VRMLLoader = ( function () {
 								material = new THREE.MeshBasicMaterial( { color: 0x000000 } );
 
 							}
+
 							break;
 
 						case 'texture':
@@ -1060,6 +1063,7 @@ THREE.VRMLLoader = ( function () {
 								}
 
 							}
+
 							break;
 
 						case 'textureTransform':
@@ -1068,6 +1072,7 @@ THREE.VRMLLoader = ( function () {
 								transformData = getNode( fieldValues[ 0 ] );
 
 							}
+
 							break;
 
 						default:
@@ -1459,6 +1464,7 @@ THREE.VRMLLoader = ( function () {
 								color = getNode( colorNode );
 
 							}
+
 							break;
 
 						case 'coord':
@@ -1469,6 +1475,7 @@ THREE.VRMLLoader = ( function () {
 								coord = getNode( coordNode );
 
 							}
+
 							break;
 
 						case 'normal':
@@ -1479,6 +1486,7 @@ THREE.VRMLLoader = ( function () {
 								normal = getNode( normalNode );
 
 							}
+
 							break;
 
 						case 'texCoord':
@@ -1489,6 +1497,7 @@ THREE.VRMLLoader = ( function () {
 								texCoord = getNode( texCoordNode );
 
 							}
+
 							break;
 
 						case 'ccw':
@@ -1715,6 +1724,7 @@ THREE.VRMLLoader = ( function () {
 								color = getNode( colorNode );
 
 							}
+
 							break;
 
 						case 'coord':
@@ -1725,6 +1735,7 @@ THREE.VRMLLoader = ( function () {
 								coord = getNode( coordNode );
 
 							}
+
 							break;
 
 						case 'colorIndex':
@@ -1834,6 +1845,7 @@ THREE.VRMLLoader = ( function () {
 								color = getNode( colorNode );
 
 							}
+
 							break;
 
 						case 'coord':
@@ -1844,6 +1856,7 @@ THREE.VRMLLoader = ( function () {
 								coord = getNode( coordNode );
 
 							}
+
 							break;
 
 

@@ -3,6 +3,7 @@ var files = {
 		"webgl_animation_cloth",
 		"webgl_animation_keyframes",
 		"webgl_animation_skinning_blending",
+		"webgl_animation_skinning_additive_blending",
 		"webgl_animation_skinning_morph",
 		"webgl_animation_multiple",
 		"webgl_camera",
@@ -158,13 +159,13 @@ var files = {
 		"webgl_materials_physical_transparency",
 		"webgl_materials_shaders_fresnel",
 		"webgl_materials_standard",
+		"webgl_materials_subsurface_scattering",
 		"webgl_materials_texture_anisotropy",
 		"webgl_materials_texture_canvas",
 		"webgl_materials_texture_filters",
 		"webgl_materials_texture_manualmipmap",
 		"webgl_materials_texture_partialupdate",
 		"webgl_materials_texture_rotation",
-		"webgl_materials_translucency",
 		"webgl_materials_variations_basic",
 		"webgl_materials_variations_lambert",
 		"webgl_materials_variations_phong",
@@ -310,6 +311,7 @@ var files = {
 		"webgl_worker_offscreencanvas"
 	],
 	"webgl2": [
+		"webgl2_buffergeometry_attributes_integer",
 		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
 		"webgl2_multisampled_renderbuffers",
@@ -388,4 +390,15 @@ var files = {
 		"webgl_pmrem_test",
 		"misc_uv_tests"
 	]
+};
+
+var tags = {
+	"webgl_clipping_intersection": [ "csg", "solid" ],
+	"webgl_fire": [ "smoke" ],
+	"webgl_materials_translucency": [ "subsurface", "scattering" ],
+	"webgl_postprocessing_unreal_bloom": [ "glow" ],
+	"webgl_postprocessing_unreal_bloom_selective": [ "glow" ],
+	"webgl_shadowmap_csm": [ "cascade" ],
+	"webgl_shadowmap_pcss": [ "soft" ],
+	"webgl_simple_gi": [ "global", "illumination" ]
 };

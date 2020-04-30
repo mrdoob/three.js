@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -55,6 +55,18 @@
 		<h3>[method:void load]()</h3>
 		<p>
 			This method needs to be implement by all concrete loaders. It holds the logic for loading the asset from the backend.
+		</p>
+
+		<h3>[method:Promise loadAsync]( [param:String url], [param:Function onProgress] )</h3>
+		<p>
+		[page:String url] — A string containing the path/URL of the file to be loaded.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		</p>
+		<p>
+		This method is equivalent to [page:.load], but returns a [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promise].
+		</p>
+		<p>
+		[page:Function onLoad] is handled by [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve Promise.resolve] and [page:Function onError] is handled by [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject Promise.reject].
 		</p>
 
 		<h3>[method:void parse]()</h3>
