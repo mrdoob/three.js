@@ -47,6 +47,8 @@ const assets = [
 	'../examples/jsm/exporters/PLYExporter.js',
 	'../examples/jsm/exporters/STLExporter.js',
 
+	'../examples/jsm/helpers/VertexNormalsHelper.js',
+
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
 
 	'../examples/js/vr/HelioWebXRPolyfill.js',
