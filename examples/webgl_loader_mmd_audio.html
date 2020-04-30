@@ -52,11 +52,9 @@
 			var clock = new THREE.Clock();
 
 			var startButton = document.getElementById( 'startButton' );
-			startButton.addEventListener( 'click', function() {
+			startButton.addEventListener( 'click', function () {
 
-				Ammo().then( function ( AmmoLib ) {
-
-					Ammo = AmmoLib;
+				Ammo().then( function () {
 
 					init();
 					animate();
