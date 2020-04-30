@@ -91,7 +91,7 @@ if ( Object.assign === undefined ) {
 
 }
 
-var REVISION = '116dev';
+var REVISION = '116';
 var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 var CullFaceNone = 0;
@@ -32750,8 +32750,6 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 CircleBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 CircleBufferGeometry.prototype.constructor = CircleBufferGeometry;
 
-
-
 var Geometries = /*#__PURE__*/Object.freeze({
 	__proto__: null,
 	WireframeGeometry: WireframeGeometry,
@@ -33795,8 +33793,6 @@ LineDashedMaterial.prototype.copy = function ( source ) {
 	return this;
 
 };
-
-
 
 var Materials = /*#__PURE__*/Object.freeze({
 	__proto__: null,
@@ -38243,8 +38239,6 @@ SplineCurve.prototype.fromJSON = function ( json ) {
 	return this;
 
 };
-
-
 
 var Curves = /*#__PURE__*/Object.freeze({
 	__proto__: null,
