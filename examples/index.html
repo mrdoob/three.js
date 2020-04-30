@@ -249,9 +249,8 @@
 
 			var link = links[ file ];
 			var name = getName( file );
-			var matchCandidates = ( tags[ file ] || [] ).slice();
-			matchCandidates.push( file );
-			var res = matchCandidates.join( ' ' ).match( exp );
+			if ( file in tags ) file += tags[ file ].join( ' ' );
+			var res = file.match( exp );
 			var text;
 
 			if ( res && res.length > 0 ) {
