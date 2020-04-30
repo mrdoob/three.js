@@ -90,7 +90,7 @@ DRACOExporter.prototype = {
 
 			}
 
-			builder.AddFacesToMesh( mesh, vertices.count / 3, faces );
+			builder.AddFacesToMesh( mesh, vertices.count, faces );
 
 		}
 
