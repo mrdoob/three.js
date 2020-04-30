@@ -391,3 +391,14 @@ var files = {
 		"misc_uv_tests"
 	]
 };
+
+var tags = {
+    "webgl_clipping_intersection": [ "csg", "solid" ],
+    "webgl_fire": [ "smoke" ],
+    "webgl_materials_translucency": [ "subsurface", "scattering" ],
+    "webgl_postprocessing_unreal_bloom": [ "glow" ],
+    "webgl_postprocessing_unreal_bloom_selective": [ "glow" ],
+    "webgl_shadowmap_csm": [ "cascade" ],
+    "webgl_shadowmap_pcss": [ "soft" ],
+    "webgl_simple_gi": [ "global", "illumination" ]
+};
