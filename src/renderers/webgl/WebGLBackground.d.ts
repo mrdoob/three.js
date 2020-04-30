@@ -14,6 +14,6 @@ export class WebGLBackground {
 	setClearColor( color: Color, alpha: number ): void;
 	getClearAlpha(): number;
 	setClearAlpha( alpha: number ): void;
-	render( renderList: WebGLRenderList, scene: Scene, camera: any, forceClear: any ): void;
+	render( renderList: WebGLRenderList, scene: Scene, camera: any, forceClear: boolean ): void;
 
 }
