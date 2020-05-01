@@ -18476,10 +18476,11 @@
 
 		}
 
-		// clean up
+		// Clean up
 
-		gl.detachShader( program, glVertexShader );
-		gl.detachShader( program, glFragmentShader );
+		// Crashes in iOS9 and iOS10. #18402
+		// gl.detachShader( program, glVertexShader );
+		// gl.detachShader( program, glFragmentShader );
 
 		gl.deleteShader( glVertexShader );
 		gl.deleteShader( glFragmentShader );
