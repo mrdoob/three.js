@@ -797,8 +797,9 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 
 	// clean up
 
-	gl.detachShader( program, glVertexShader );
-	gl.detachShader( program, glFragmentShader );
+	// spec fails on iOS 10 or lower - #18402
+	//gl.detachShader( program, glVertexShader );
+	//gl.detachShader( program, glFragmentShader );
 
 	gl.deleteShader( glVertexShader );
 	gl.deleteShader( glFragmentShader );
