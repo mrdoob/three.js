@@ -64,10 +64,17 @@
   "keywords": [
     "three",
     "three.js",
+    "javascript",
     "3d",
+    "virtual-reality",
+    "augmented-reality",
+    "webgl",
+    "webgl2",
+    "webaudio",
+    "webxr",
     "canvas",
     "svg",
-    "webgl"
+    "html5"
   ],
   "author": "mrdoob",
   "license": "MIT",
