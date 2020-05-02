@@ -681,6 +681,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( textureCacheKey !== textureProperties.__cacheKey ) {
 
+			// if not, create a new instance of WebGLTexture
+
 			if ( webglTextures[ textureCacheKey ] === undefined ) {
 
 				// create new entry
@@ -697,27 +699,26 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				forceUpload = true;
 
-			} else {
+			}
 
-				// handle previous entry if necessary
+			webglTextures[ textureCacheKey ].usedTimes ++;
 
-				var webglTexture = webglTextures[ textureProperties.__cacheKey ];
+			// every time the texture cache key changes, it's necessary to check if an instance of
+			// WebGLTexture can be deleted in order to avoid a memory leak.
 
-				if ( webglTexture !== undefined ) {
+			var webglTexture = webglTextures[ textureProperties.__cacheKey ];
 
-					webglTextures[ textureCacheKey ].usedTimes --;
+			if ( webglTexture !== undefined ) {
 
-					if ( webglTexture.usedTimes === 0 ) {
+				webglTextures[ textureProperties.__cacheKey ].usedTimes --;
 
-						deleteTexture( texture );
+				if ( webglTexture.usedTimes === 0 ) {
 
-					}
+					deleteTexture( texture );
 
 				}
 
 			}
-
-			webglTextures[ textureCacheKey ].usedTimes ++;
 
 			// store references to cache key and WebGLTexture object
 
