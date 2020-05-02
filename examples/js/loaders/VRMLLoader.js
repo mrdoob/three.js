@@ -515,6 +515,8 @@ THREE.VRMLLoader = ( function () {
 
 					if ( object instanceof THREE.Object3D ) scene.add( object );
 
+					if ( node.name === 'WorldInfo' ) scene.userData.worldInfo = object;
+
 				}
 
 				return scene;
@@ -648,6 +650,10 @@ THREE.VRMLLoader = ( function () {
 						build = buildGeometricNode( node );
 						break;
 
+					case 'WorldInfo':
+						build = buildWorldInfoNode( node );
+						break;
+
 					case 'Anchor':
 					case 'Billboard':
 					case 'Collision':
@@ -662,7 +668,6 @@ THREE.VRMLLoader = ( function () {
 					case 'Script':
 					case 'Sound':
 					case 'SpotLight':
-					case 'WorldInfo':
 
 					case 'CylinderSensor':
 					case 'PlaneSensor':
@@ -1436,6 +1441,40 @@ THREE.VRMLLoader = ( function () {
 			function buildGeometricNode( node ) {
 
 				return node.fields[ 0 ].values;
+
+			}
+
+			function buildWorldInfoNode( node ) {
+
+				var worldInfo = {};
+
+				var fields = node.fields;
+
+				for ( var i = 0, l = fields.length; i < l; i ++ ) {
+
+					var field = fields[ i ];
+					var fieldName = field.name;
+					var fieldValues = field.values;
+
+					switch ( fieldName ) {
+
+						case 'title':
+							worldInfo.title = fieldValues[ 0 ];
+							break;
+
+						case 'info':
+							worldInfo.info = fieldValues;
+							break;
+
+						default:
+							console.warn( 'THREE.VRMLLoader: Unknown field:', fieldName );
+							break;
+
+					}
+
+				}
+
+				return worldInfo;
 
 			}
 
