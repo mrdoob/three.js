@@ -275,12 +275,10 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function deleteTexture( texture ) {
 
 		var textureProperties = properties.get( texture );
+		_gl.deleteTexture( textureProperties.__webglTexture );
 
 		var textureImage = texture.textureImage;
 		var webglTextures = _textureImages.get( textureImage );
-
-		_gl.deleteTexture( textureProperties.__webglTexture );
-
 		delete webglTextures[ textureProperties.__cacheKey ];
 
 		info.memory.textures --;
