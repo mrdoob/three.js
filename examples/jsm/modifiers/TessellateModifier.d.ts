@@ -2,7 +2,7 @@ import {
 	Geometry
 } from '../../../src/Three';
 
-export class SubdivisionModifier {
+export class TessellateModifier {
 
 	constructor( maxEdgeLength: number );
 	maxEdgeLength: number;

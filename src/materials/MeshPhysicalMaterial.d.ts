@@ -22,13 +22,17 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	constructor( parameters: MeshPhysicalMaterialParameters );
 
-	reflectivity: number;
 	clearcoat: number;
+	clearcoatMap: Texture | null;
 	clearcoatRoughness: number;
+	clearcoatRoughnessMap: Texture | null;
+	clearcoatNormalScale: Vector2;
+	clearcoatNormalMap: Texture | null;
+
+	reflectivity: number;
 
 	sheen: Color | null;
 
-	clearcoatNormalScale: Vector2;
-	clearcoatNormalMap: Texture | null;
+	transparency: number;
 
 }

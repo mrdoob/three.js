@@ -459,4 +459,9 @@ export class Vector2 implements Vector {
 	 */
 	manhattanDistanceTo( v: Vector2 ): number;
 
+	/**
+	 * Sets this vector's x and y from Math.random
+	 */
+	random(): this;
+
 }

@@ -20,11 +20,9 @@ var Config = function () {
 		'project/renderer/shadows': true,
 		'project/renderer/shadowType': 1, // PCF
 		'project/renderer/physicallyCorrectLights': false,
-		'project/renderer/toneMapping': 1, // linear
+		'project/renderer/toneMapping': 0, // NoToneMapping
 		'project/renderer/toneMappingExposure': 1,
 		'project/renderer/toneMappingWhitePoint': 1,
-
-		'project/vr': false,
 
 		'settings/history': false,
 

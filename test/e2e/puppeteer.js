@@ -22,9 +22,11 @@ const exceptionList = [
 	'webgl_kinect', // same here
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
-	'webgl_materials_envmaps_parallax',
+	'webgl_materials_envmaps_parallax', // empty for some reason
+	'webgl_raymarching_reflect', // exception for Github Actions
 	'webgl_test_memory2', // gives fatal error in puppeteer
-	'webgl_worker_offscreencanvas' // in a worker, not robust
+	'webgl_tiled_forward', // exception for Github Actions
+	'webgl_worker_offscreencanvas', // in a worker, not robust
 
 ].concat( ( process.platform === "win32" ) ? [
 
@@ -47,28 +49,8 @@ console.null = () => {};
 
 /* Launch server */
 
-const server = http.createServer( ( request, response ) => {
-
-	return handler( request, response );
-
-} );
-server.listen( port, async () => {
-
-	try {
-
-		await pup;
-
-	} catch ( e ) {
-
-		console.error( e );
-
-	} finally {
-
-		server.close();
-
-	}
-
-} );
+const server = http.createServer( ( req, resp ) => handler( req, resp ) );
+server.listen( port, async () => await pup );
 server.on( 'SIGINT', () => process.exit( 1 ) );
 
 
@@ -77,7 +59,7 @@ server.on( 'SIGINT', () => process.exit( 1 ) );
 const pup = puppeteer.launch( {
 	headless: ! process.env.VISIBLE,
 	args: [
-		'--use-gl=egl',
+		'--use-gl=swiftshader',
 		'--no-sandbox',
 		'--enable-surface-synchronization'
 	]
@@ -122,7 +104,7 @@ const pup = puppeteer.launch( {
 	/* Loop for each file, with CI parallelism */
 
 	let pageSize, file, attemptProgress;
-	let failedScreenshots = 0;
+	let failedScreenshots = [];
 	const isParallel = 'CI' in process.env;
 	const beginId = isParallel ? Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / 4 ) : 0;
 	const endId = isParallel ? Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / 4 ) : files.length;
@@ -212,7 +194,7 @@ const pup = puppeteer.launch( {
 				if ( ++ attemptId === maxAttemptId ) {
 
 					console.red( `WTF? 'Network timeout' is small for your machine. file: ${ file } \n${ e }` );
-					++ failedScreenshots;
+					failedScreenshots.push( file );
 					continue;
 
 				} else {
@@ -234,6 +216,7 @@ const pup = puppeteer.launch( {
 
 				attemptId = maxAttemptId;
 				await page.screenshot( { path: `./examples/screenshots/${ file }.png` } );
+				printImage( png.sync.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) ), console );
 				console.green( `file: ${ file } generated` );
 
 
@@ -260,7 +243,7 @@ const pup = puppeteer.launch( {
 
 					attemptId = maxAttemptId;
 					console.red( `ERROR! Image sizes does not match in file: ${ file }` );
-					++ failedScreenshots;
+					failedScreenshots.push( file );
 					continue;
 
 				}
@@ -280,7 +263,7 @@ const pup = puppeteer.launch( {
 
 						printImage( diff, console );
 						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
-						++ failedScreenshots;
+						failedScreenshots.push( file );
 						continue;
 
 					} else {
@@ -294,8 +277,7 @@ const pup = puppeteer.launch( {
 			} else {
 
 				attemptId = maxAttemptId;
-				console.red( `ERROR! Screenshot not exists: ${ file }` );
-				++ failedScreenshots;
+				console.null( `Warning! Screenshot not exists: ${ file }` );
 				continue;
 
 			}
@@ -307,10 +289,19 @@ const pup = puppeteer.launch( {
 
 	/* Finish */
 
-	if ( failedScreenshots ) {
+	if ( failedScreenshots.length ) {
 
-		console.red( `TEST FAILED! ${ failedScreenshots } from ${ endId - beginId } screenshots not pass.` );
-		process.exit( 1 );
+		if ( failedScreenshots.length > 1 ) {
+
+			console.red( 'List of failed screenshots: ' + failedScreenshots.join(' ') );
+
+		} else {
+
+			console.red( `If you sure that all is right, try to run \`npm run make-screenshot ${ failedScreenshots[ 0 ] }\`` );
+
+		}
+
+		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endId - beginId } screenshots not pass.` );
 
 	} else if ( ! process.env.MAKE ) {
 
@@ -318,6 +309,8 @@ const pup = puppeteer.launch( {
 
 	}
 
-	await browser.close();
+	browser.close();
+	server.close();
+	process.exit( failedScreenshots.length );
 
 } );

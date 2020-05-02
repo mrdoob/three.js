@@ -16,7 +16,7 @@ export class LineSegmentsGeometry extends InstancedBufferGeometry {
 	computeBoundingBox(): void;
 	computeBoundingSphere(): void;
 	fromEdgesGeometry( geometry: WireframeGeometry ): this;
-	fromLineSegements( lineSegments: LineSegments ): this;
+	fromLineSegments( lineSegments: LineSegments ): this;
 	fromMesh( mesh: Mesh ): this;
 	fromWireframeGeometry( geometry: EdgesGeometry ): this;
 	setColors( array: number[] | Float32Array ): this;

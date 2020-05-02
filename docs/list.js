@@ -105,10 +105,6 @@ var list = {
 				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"Deprecated": {
-				"DeprecatedList": "api/en/deprecated/DeprecatedList"
-			},
-
 			"Extras": {
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
@@ -325,6 +321,10 @@ var list = {
 				"UniformsUtils": "api/en/renderers/shaders/UniformsUtils"
 			},
 
+			"Renderers / WebXR": {
+				"WebXRManager": "api/en/renderers/webxr/WebXRManager"
+			},
+
 			"Scenes": {
 				"Fog": "api/en/scenes/Fog",
 				"FogExp2": "api/en/scenes/FogExp2",
@@ -462,7 +462,7 @@ var list = {
 				"浏览器支持": "manual/zh/introduction/Browser-support",
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
-				"Typescript setup": "manual/zh/introduction/Typescript-setup",
+				"Typescript设置": "manual/zh/introduction/Typescript-setup",
 				"如何使用WebGL 2": "manual/zh/introduction/How-to-use-WebGL2",
 				"画线": "manual/zh/introduction/Drawing-lines",
 				"创建文字": "manual/zh/introduction/Creating-text",
@@ -555,10 +555,6 @@ var list = {
 
 			"核心 / BufferAttributes": {
 				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
-			},
-
-			"弃用列表": {
-				"DeprecatedList": "api/zh/deprecated/DeprecatedList"
 			},
 
 			"附件": {
@@ -775,6 +771,10 @@ var list = {
 				"ShaderLib": "api/zh/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/zh/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/zh/renderers/shaders/UniformsUtils"
+			},
+
+			"渲染器 / WebXR": {
+				"WebXRManager": "api/zh/renderers/webxr/WebXRManager"
 			},
 
 			"场景": {

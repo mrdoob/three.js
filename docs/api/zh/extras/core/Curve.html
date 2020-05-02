@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -77,17 +77,25 @@
 			Given u in the range ( 0 .. 1 ), returns [page:Float t] also in the range ( 0 .. 1 ).
 			u and t can then be used to give you points which are equidistant from the ends of the curve,
 			using [page:.getPoint].
-		 </p>
+		</p>
 
-		<h3>[method:Vector getTangent]( [param:Float t] )</h3>
+		<h3>[method:Vector getTangent]( [param:Float t, [param:Vector optionalTarget] ] )</h3>
 		<p>
+			[page:Float t] - A position on the curve. Must be in the range [ 0, 1 ]. <br>
+			[page:Vector optionalTarget] — (optional) If specified, the result will be copied into this Vector,
+			otherwise a new Vector will be created. <br /><br />
+
 			Returns a unit vector tangent at t. If the derived curve does not implement its
 			tangent derivation, two points a small delta apart will be used to find its gradient
 			which seems to give a reasonable approximation.
 		</p>
 
-		<h3>[method:Vector getTangentAt]( [param:Float u] )</h3>
+		<h3>[method:Vector getTangentAt]( [param:Float u, [param:Vector optionalTarget] ] )</h3>
 		<p>
+			[page:Float u] - A position on the curve according to the arc length. Must be in the range [ 0, 1 ]. <br>
+			[page:Vector optionalTarget] — (optional) If specified, the result will be copied into this Vector,
+			otherwise a new Vector will be created. <br /><br />
+
 			Returns tangent at a point which is equidistant to the ends of the curve from the
 			point given in [page:.getTangent].
 		</p>

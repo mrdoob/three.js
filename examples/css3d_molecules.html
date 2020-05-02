@@ -140,7 +140,7 @@
 
 				baseSprite.onload = function () {
 
-					loadMolecule( "models/molecules/caffeine.pdb" );
+					loadMolecule( "models/pdb/caffeine.pdb" );
 					createMenu();
 
 				};
@@ -173,7 +173,7 @@
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					var url = "models/molecules/" + MOLECULES[ m ];
+					var url = "models/pdb/" + MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ), false );
 
