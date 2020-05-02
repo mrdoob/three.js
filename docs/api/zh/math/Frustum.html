@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -86,29 +86,17 @@
 			检查精灵[page:Sprite sprite]是否与截锥体相交。<br /><br />
 		</p>
 
-		<h3>[method:Frustum set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )</h3>
+		<h3>[method:this set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )</h3>
 		<p>
-			使用传入的平面设置当前视锥体。没有隐式的顺序。
+		Sets the frustum from the passed planes. No plane order is implied.<br>
+		Note that this method only copies the values from the given objects.
 		</p>
 
-		<h3>[method:Frustum setFromMatrix]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:this setFromProjectionMatrix]( [param:Matrix4 matrix] )</h3>
 		<p>
-			[page:Matrix4 matrix] - [page:Matrix4] 用于设置 [page:.planes planes]<br /><br />
-
-			[page:WebGLRenderer] 使用 [page:Camera Camera]的投影矩阵（[page:Camera.projectionMatrix projectionMatrix] ）
-			和相机世界变换矩阵的逆矩阵 [page:Camera.matrixWorldInverse matrixWorldInverse] 来设置视锥体。
-				</p>
-
-
-
-
-
-
-
-
-
-
-
+		[page:Matrix4 matrix] - Projection [page:Matrix4] used to set the [page:.planes planes]<br /><br />
+		Sets the frustum planes from the projection matrix.
+		</p>
 
 
 		<h2>Source</h2>

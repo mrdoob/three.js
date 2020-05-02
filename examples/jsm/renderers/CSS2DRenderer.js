@@ -38,6 +38,8 @@ CSS2DObject.prototype.constructor = CSS2DObject;
 
 var CSS2DRenderer = function () {
 
+	var _this = this;
+
 	var _width, _height;
 	var _widthHalf, _heightHalf;
 
@@ -76,9 +78,11 @@ var CSS2DRenderer = function () {
 
 	};
 
-	var renderObject = function ( object, camera ) {
+	var renderObject = function ( object, scene, camera ) {
 
 		if ( object instanceof CSS2DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			vector.setFromMatrixPosition( object.matrixWorld );
 			vector.applyMatrix4( viewProjectionMatrix );
@@ -105,11 +109,13 @@ var CSS2DRenderer = function () {
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera );
+			renderObject( object.children[ i ], scene, camera );
 
 		}
 
@@ -174,7 +180,7 @@ var CSS2DRenderer = function () {
 		viewMatrix.copy( camera.matrixWorldInverse );
 		viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, viewMatrix );
 
-		renderObject( scene, camera );
+		renderObject( scene, scene, camera );
 		zOrder( scene );
 
 	};

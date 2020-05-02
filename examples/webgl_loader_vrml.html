@@ -38,7 +38,7 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1e10 );
 				camera.position.z = 6;
 
 				scene = new THREE.Scene();
@@ -69,6 +69,8 @@
 				// controls
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 100;
 
 				//
 

@@ -34,8 +34,7 @@ import {
 	SphereBufferGeometry,
 	TextureLoader,
 	Vector2,
-	Vector3,
-	VertexColors
+	Vector3
 } from "../../../build/three.module.js";
 import { chevrotain } from "../libs/chevrotain.module.min.js";
 
@@ -878,7 +877,7 @@ var VRMLLoader = ( function () {
 					if ( skyColor.length > 3 ) {
 
 						paintFaces( skyGeometry, radius, skyAngle, toColorArray( skyColor ), true );
-						skyMaterial.vertexColors = VertexColors;
+						skyMaterial.vertexColors = true;
 
 					} else {
 
@@ -898,7 +897,7 @@ var VRMLLoader = ( function () {
 					if ( groundColor.length > 0 ) {
 
 						var groundGeometry = new SphereBufferGeometry( radius, 32, 16, 0, 2 * Math.PI, 0.5 * Math.PI, 1.5 * Math.PI );
-						var groundMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, vertexColors: VertexColors, depthWrite: false, depthTest: false } );
+						var groundMaterial = new MeshBasicMaterial( { fog: false, side: BackSide, vertexColors: true, depthWrite: false, depthTest: false } );
 
 						paintFaces( groundGeometry, radius, groundAngle, toColorArray( groundColor ), false );
 
@@ -940,6 +939,7 @@ var VRMLLoader = ( function () {
 								material = getNode( fieldValues[ 0 ] );
 
 							}
+
 							break;
 
 						case 'geometry':
@@ -948,6 +948,7 @@ var VRMLLoader = ( function () {
 								geometry = getNode( fieldValues[ 0 ] );
 
 							}
+
 							break;
 
 						default:
@@ -972,7 +973,7 @@ var VRMLLoader = ( function () {
 
 						if ( geometry.attributes.color !== undefined ) {
 
-							pointsMaterial.vertexColors = VertexColors;
+							pointsMaterial.vertexColors = true;
 
 						} else {
 
@@ -994,7 +995,7 @@ var VRMLLoader = ( function () {
 
 						if ( geometry.attributes.color !== undefined ) {
 
-							lineMaterial.vertexColors = VertexColors;
+							lineMaterial.vertexColors = true;
 
 						} else {
 
@@ -1024,7 +1025,7 @@ var VRMLLoader = ( function () {
 
 						if ( geometry.attributes.color !== undefined ) {
 
-							material.vertexColors = VertexColors;
+							material.vertexColors = true;
 
 						}
 
@@ -1080,6 +1081,7 @@ var VRMLLoader = ( function () {
 								material = new MeshBasicMaterial( { color: 0x000000 } );
 
 							}
+
 							break;
 
 						case 'texture':
@@ -1097,6 +1099,7 @@ var VRMLLoader = ( function () {
 								}
 
 							}
+
 							break;
 
 						case 'textureTransform':
@@ -1105,6 +1108,7 @@ var VRMLLoader = ( function () {
 								transformData = getNode( fieldValues[ 0 ] );
 
 							}
+
 							break;
 
 						default:
@@ -1496,6 +1500,7 @@ var VRMLLoader = ( function () {
 								color = getNode( colorNode );
 
 							}
+
 							break;
 
 						case 'coord':
@@ -1506,6 +1511,7 @@ var VRMLLoader = ( function () {
 								coord = getNode( coordNode );
 
 							}
+
 							break;
 
 						case 'normal':
@@ -1516,6 +1522,7 @@ var VRMLLoader = ( function () {
 								normal = getNode( normalNode );
 
 							}
+
 							break;
 
 						case 'texCoord':
@@ -1526,6 +1533,7 @@ var VRMLLoader = ( function () {
 								texCoord = getNode( texCoordNode );
 
 							}
+
 							break;
 
 						case 'ccw':
@@ -1752,6 +1760,7 @@ var VRMLLoader = ( function () {
 								color = getNode( colorNode );
 
 							}
+
 							break;
 
 						case 'coord':
@@ -1762,6 +1771,7 @@ var VRMLLoader = ( function () {
 								coord = getNode( coordNode );
 
 							}
+
 							break;
 
 						case 'colorIndex':
@@ -1871,6 +1881,7 @@ var VRMLLoader = ( function () {
 								color = getNode( colorNode );
 
 							}
+
 							break;
 
 						case 'coord':
@@ -1881,6 +1892,7 @@ var VRMLLoader = ( function () {
 								coord = getNode( coordNode );
 
 							}
+
 							break;
 
 

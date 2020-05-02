@@ -164,7 +164,7 @@ NodeBuilder.prototype = {
 		this.buildShader( 'vertex', vertex );
 		this.buildShader( 'fragment', fragment );
 
-		for ( var i = 0; i < this.requires.uv.length; i++ ) {
+		for ( var i = 0; i < this.requires.uv.length; i ++ ) {
 
 			if ( this.requires.uv[ i ] ) {
 
@@ -178,7 +178,7 @@ NodeBuilder.prototype = {
 
 				}
 
-				this.addVertexFinalCode( 'vUv' + uvIndex + ' = uv' + uvIndex +';' );
+				this.addVertexFinalCode( 'vUv' + uvIndex + ' = uv' + uvIndex + ';' );
 
 			}
 

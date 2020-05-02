@@ -91,6 +91,8 @@
 				camera.position.z = 1750;
 
 				var controls = new OrbitControls( camera, container );
+				controls.minDistance = 1000;
+				controls.maxDistance = 3000;
 
 				scene = new THREE.Scene();
 
@@ -155,7 +157,7 @@
 				geometry.setDrawRange( 0, 0 );
 
 				var material = new THREE.LineBasicMaterial( {
-					vertexColors: THREE.VertexColors,
+					vertexColors: true,
 					blending: THREE.AdditiveBlending,
 					transparent: true
 				} );

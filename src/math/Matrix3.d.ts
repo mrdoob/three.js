@@ -28,9 +28,9 @@ export interface Matrix {
 	determinant(): number;
 
 	/**
-	 * getInverse(matrix:T, throwOnInvertible?:boolean):T;
+	 * getInverse(matrix:T):T;
 	 */
-	getInverse( matrix: Matrix, throwOnInvertible?: boolean ): Matrix;
+	getInverse( matrix: Matrix ): Matrix;
 
 	/**
 	 * transpose():T;
@@ -72,6 +72,7 @@ export class Matrix3 implements Matrix {
 	identity(): Matrix3;
 	clone(): this;
 	copy( m: Matrix3 ): this;
+	extractBasis( xAxis: Vector3, yAxis: Vector3, zAxis: Vector3 ): Matrix3;
 	setFromMatrix4( m: Matrix4 ): Matrix3;
 	multiplyScalar( s: number ): Matrix3;
 	determinant(): number;

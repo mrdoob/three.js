@@ -162,7 +162,7 @@
 				bufferGeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
 				bufferGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.MeshPhongMaterial( { shininess: 80, vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshPhongMaterial( { shininess: 80, vertexColors: true } );
 
 				var mesh = new THREE.Mesh( bufferGeometry, material );
 				scene.add( mesh );

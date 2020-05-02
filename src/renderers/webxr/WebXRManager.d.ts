@@ -8,6 +8,7 @@ export class WebXRManager {
 	enabled: boolean;
 	isPresenting: boolean;
 	getController( id: number ): Group;
+	getControllerGrip( id: number ): Group;
 	setFramebufferScaleFactor( value: number ): void;
 	setReferenceSpaceType( value: string ): void;
 	getReferenceSpace(): any;

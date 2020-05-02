@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "noEmit": true,
+    "target": "ES6"
   },
   "include": [
     "../../examples/jsm/**/*.ts"

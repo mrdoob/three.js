@@ -23,22 +23,6 @@
 			So [name] is just focused on ordinary DOM elements. These elements are wrapped into special objects (*CSS3DObject* or *CSS3DSprite*) and then added to the scene graph.
 		</p>
 
-		<script>
-
-		// iOS iframe auto-resize workaround
-
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			var scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script>
-
 		<h2>Examples</h2>
 
 		<p>
@@ -73,7 +57,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/CSS3DRenderer.js examples/js/renderers/CSS3DRenderer.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/CSS3DRenderer.js examples/jsm/renderers/CSS3DRenderer.js]
 		</p>
 	</body>
 </html>

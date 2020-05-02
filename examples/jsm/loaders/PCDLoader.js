@@ -12,8 +12,7 @@ import {
 	Loader,
 	LoaderUtils,
 	Points,
-	PointsMaterial,
-	VertexColors
+	PointsMaterial
 } from "../../../build/three.module.js";
 
 var PCDLoader = function ( manager ) {
@@ -98,6 +97,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						if ( inPtr >= inLength ) throw new Error( 'Invalid compressed data' );
 
 					}
+
 					ref -= inData[ inPtr ++ ];
 					if ( outPtr + len + 2 > outLength ) throw new Error( 'Output buffer is not large enough' );
 					if ( ref < 0 ) throw new Error( 'Invalid compressed data' );
@@ -211,7 +211,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				} else {
 
 					PCDheader.offset[ PCDheader.fields[ i ] ] = sizeSum;
-					sizeSum += PCDheader.size[ i ];
+					sizeSum += PCDheader.size[ i ] * PCDheader.count[ i ];
 
 				}
 
@@ -380,7 +380,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( color.length > 0 ) {
 
-			material.vertexColors = VertexColors;
+			material.vertexColors = true;
 
 		} else {
 

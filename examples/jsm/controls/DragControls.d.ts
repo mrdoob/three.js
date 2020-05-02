@@ -13,9 +13,11 @@ export class DragControls extends EventDispatcher {
 	// API
 
 	enabled: boolean;
+	transformGroup: boolean;
 
 	activate(): void;
 	deactivate(): void;
 	dispose(): void;
+	getObjects(): Object3D[];
 
 }

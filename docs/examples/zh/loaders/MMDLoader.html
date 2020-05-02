@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -12,17 +12,17 @@
 
 		<h1>MMD加载器（[name]）</h1>
 
- 		<p class="desc">一个用于加载<a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a>资源的加载器。<br /><br />
+		<p class="desc">一个用于加载<a href="https://sites.google.com/view/evpvp/"><em>MMD</em></a>资源的加载器。<br /><br />
 		[name]从MMD资源（例如PMD、PMX、VMD和VPD文件）中创建Three.js物体（对象）。
 		请参阅[page:MMDAnimationHelper]来了解MMD动画的处理，例如IK、Grant和Physics。<br /><br />
 
- 		如果你想要MMD资源的原始内容，请使用.loadPMD/PMX/VMD/VPD方法。
+		如果你想要MMD资源的原始内容，请使用.loadPMD/PMX/VMD/VPD方法。
 
- 		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// Instantiate a loader
-		var loader = new THREE.MMDLoader();
+		var loader = new MMDLoader();
 
 		// Load a MMD model
 		loader.load(
@@ -49,12 +49,12 @@
 		);
 		</code>
 
+		<h2>例子</h2>
+		<p>
 		[example:webgl_loader_mmd]<br />
 		[example:webgl_loader_mmd_pose]<br />
-		[example:webgl_loader_mmd_audio]<br />
-
-		<br />
-		<hr>
+		[example:webgl_loader_mmd_audio]
+		</p>
 
  		<h2>构造函数</h2>
 
@@ -118,7 +118,7 @@
 		<h2>源代码</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/MMDLoader.js examples/js/loaders/MMDLoader.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/MMDLoader.js examples/jsm/loaders/MMDLoader.js]
 		</p>
 	</body>
 </html>

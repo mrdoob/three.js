@@ -117,7 +117,7 @@ export class Matrix4 implements Matrix {
 	 * Sets this matrix to the inverse of matrix m.
 	 * Based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm.
 	 */
-	getInverse( m: Matrix4, throwOnDegeneratee?: boolean ): Matrix4;
+	getInverse( m: Matrix4 ): Matrix4;
 
 	/**
 	 * Multiplies the columns of this matrix by vector v.
@@ -171,13 +171,12 @@ export class Matrix4 implements Matrix {
 	compose( translation: Vector3, rotation: Quaternion, scale: Vector3 ): Matrix4;
 
 	/**
-	 * Decomposes this matrix into the translation, rotation and scale components.
-	 * If parameters are not passed, new instances will be created.
+	 * Decomposes this matrix into it's position, quaternion and scale components.
 	 */
 	decompose(
-		translation?: Vector3,
-		rotation?: Quaternion,
-		scale?: Vector3
+		translation: Vector3,
+		rotation: Quaternion,
+		scale: Vector3
 	): Matrix4;
 
 	/**
