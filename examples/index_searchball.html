@@ -1,7 +1,7 @@
 <!--
 	@author munrocket / https://twitter.com/munrocket_twit
-
-	Inspired by Callum Prentice, Marco Abrate and Fabrizio Pollastri.
+	Uses modified formulas from paper by Marco Abrate and Fabrizio Pollastri
+	Inspired by Callum Prentice page thumbnails
 -->
 
 <!DOCTYPE html>
@@ -27,37 +27,30 @@
 			import { SpiralSphereGeometry } from './jsm/geometries/SpiralSphereGeometry.js';
 
 			var canvas, camera, material, scene, renderer, controls;
-			var radius, tiles, turns;
-			var mouse, mouseDown, mouseTileId, uId;
+			var radius, turns, examples;
+			var mouse, mouseDown, mouseExampleId, uId;
 
 			init();
 			animate();
 
 			function init() {
 
-				// variables
+				examples = [];
+				Object.keys( files ).forEach( key => {
+					files[ key ].forEach( name => examples.push( name ) );
+				});
 
+				var tileRatio = 800 / 600;
+				turns = Math.PI / Math.sqrt( 4 * Math.PI / examples.length / tileRatio );
 				radius = 1;
-				var gap = 0.05;
+				var gap = 0.03;
 				var subGrid = 10;
-				var uvCut = 0.02;
-
-				tiles = [];
-				for ( var key in files ) {
-
-					var section = files[ key ];
-					for ( var i = 0, len = section.length; i < len; i ++ ) {
-
-						tiles.push( section[ i ] );
-
-					}
-
-				}
-				turns = Math.PI / Math.sqrt( 4 * Math.PI / tiles.length / 800 * 600 );
-				var texSize = Math.ceil( Math.sqrt( tiles.length ) );
+				var uvZoom = 0.02;
+				var uvZoom2 = 0.1;
+				var texSize = Math.ceil( Math.sqrt( examples.length ) );
 
 				uId = { value : - 1 };
-				mouseTileId = - 1;
+				mouseExampleId = - 1;
 				mouse = new THREE.Vector2();
 				mouseDown = new THREE.Vector2();
 				canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
@@ -77,38 +70,27 @@
 
 				}
 
-				var sphere = new SpiralSphereGeometry( radius, turns, gap, gap, subGrid, subGrid, tiles.length );
-				var sphere2 = new SpiralSphereGeometry( radius + gap / 3, turns, - 3 * gap, - 3 * gap, subGrid, subGrid, tiles.length );
-				for ( var tile = 0; tile < sphere.attributes.id.count; tile ++ ) {
-
-					var id = sphere.attributes.id.array[ tile ];
-					var i = Math.floor( id / texSize );
-					var q = ( 1 - 2 * uvCut ) / texSize;
-					var u0 = ( id + uvCut ) / texSize - i;
-					var v0 = 1. - ( i + 1. - uvCut ) / texSize;
-
-					sphere.attributes.uv.array[ 2 * tile ] *= q;
-					sphere.attributes.uv.array[ 2 * tile ] += u0;
-					sphere.attributes.uv.array[ 2 * tile + 1 ] *= q;
-					sphere.attributes.uv.array[ 2 * tile + 1 ] += v0;
-
-				}
+				var sphere = new SpiralSphereGeometry( radius, turns, gap, gap, subGrid, subGrid, examples.length );
+				sphere.setAttribute( 'uv2', sphere.attributes.uv.clone() );
 				sphere.computeVertexNormals();
-				sphere.attributes.position2 = sphere2.attributes.position;
+				computeTileUVs( sphere, texSize, sphere.attributes.uv, uvZoom );
+				computeTileUVs( sphere, texSize, sphere.attributes.uv2, uvZoom2 );
 
 				material = new THREE.MeshBasicMaterial( { color: 0xAAAAAA } );
 				material.onBeforeCompile = function ( shader ) {
 
 					shader.uniforms.uId = uId;
 					shader.vertexShader = [
-						'attribute vec3 position2;',
 						'attribute float id;',
-						'uniform float uId;\n'
-					].join( '\n' ) + shader.vertexShader;
-					shader.vertexShader = shader.vertexShader.replace(
-						'#include <begin_vertex>',
-						'vec3 transformed = mix( position2, position, clamp( abs( id - uId ), 0., 1. ) );'
-					);
+						'attribute vec2 uv2;',
+						'uniform float uId;',
+						shader.vertexShader
+					].join( '\n' );
+					shader.vertexShader = shader.vertexShader.replace( '#include <uv_vertex>', [
+						'#ifdef USE_UV',
+						'  vUv = mix( uv2, uv, clamp( abs( id - uId ), 0., 1. ) );',
+						'#endif'
+					].join( '\n' ) );
 
 				};
 				new THREE.TextureLoader().load( './screenshots/all_in_one.jpg', function( map ) {
@@ -148,6 +130,25 @@
 
 			}
 
+			function computeTileUVs( sphere, texSize, aUv, uvZoom ) {
+
+				for ( var i = 0; i < sphere.attributes.id.count; i ++ ) {
+
+					var id = sphere.attributes.id.array[ i ];
+					var j = Math.floor( id / texSize );
+					var q = ( 1 - 2 * uvZoom ) / texSize;
+					var u0 = ( id + uvZoom ) / texSize - j;
+					var v0 = 1. - ( j + 1. - uvZoom ) / texSize;
+
+					aUv.array[ 2 * i ] *= q;
+					aUv.array[ 2 * i ] += u0;
+					aUv.array[ 2 * i + 1 ] *= q;
+					aUv.array[ 2 * i + 1 ] += v0;
+
+				}
+
+			}
+
 			function analyticRaycaster() {
 
 				var ray = new THREE.Ray();
@@ -170,7 +171,7 @@
 
 				var t = p.theta / 2 / turns + Math.PI / turns *
 						Math.floor( ( turns * ( Math.PI - 2 * p.phi ) - p.theta ) / ( 2 * Math.PI ) ) - Math.PI / 2;
-				return 1 + Math.floor( ( tiles.length - 2 ) * ( Math.cos( Math.PI / 2 / turns ) -
+				return 1 + Math.floor( ( examples.length - 2 ) * ( Math.cos( Math.PI / 2 / turns ) -
 						Math.cos( t + ( turns + 1 ) * Math.PI / 2 / turns ) ) / ( 2 * Math.cos( Math.PI / 2 / turns ) ) );
 
 			}
@@ -194,17 +195,17 @@
 
 				mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-				mouseTileId = analyticRaycaster();
-				canvas.style.cursor = ( mouseTileId >= 0 ) ? 'auto' : 'pointer';
+				mouseExampleId = analyticRaycaster();
+				canvas.style.cursor = ( mouseExampleId >= 0 ) ? 'auto' : 'pointer';
 
 			}
 
 			function onMouseUp( e ) {
 
 				onMouseMove( e );
-				if ( mouseTileId >= 0 && mouse.distanceTo( mouseDown ) < 0.03 ) {
+				if ( mouseExampleId >= 0 && mouse.distanceTo( mouseDown ) < 0.03 ) {
 
-					window.location.href = './' + tiles[ mouseTileId ] + '.html';
+					window.location.href = './' + examples[ mouseExampleId ] + '.html';
 
 				}
 
@@ -227,13 +228,13 @@
 
 					mouse.x = ( e.changedTouches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
 					mouse.y = - ( e.changedTouches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
-					mouseTileId = analyticRaycaster();
+					mouseExampleId = analyticRaycaster();
 
 				}
 
-				if ( mouseTileId >= 0 && mouse.distanceTo( mouseDown ) < 0.15 ) {
+				if ( mouseExampleId >= 0 && mouse.distanceTo( mouseDown ) < 0.15 ) {
 
-					window.location.href = './' + tiles[ mouseTileId ] + '.html';
+					window.location.href = './' + examples[ mouseExampleId ] + '.html';
 
 				}
 
@@ -243,7 +244,7 @@
 
 				controls.update();
 				controls.rotateSpeed = 0.4 * ( camera.position.length() - 0.4 );
-				uId.value = mouseTileId;
+				uId.value = mouseExampleId;
 				renderer.render( scene, camera );
 				requestAnimationFrame( animate );
 

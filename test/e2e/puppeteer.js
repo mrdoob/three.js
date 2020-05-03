@@ -7,7 +7,7 @@ const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const pixelmatch = require( 'pixelmatch' );
 const printImage = require( 'image-output' );
-const png = require( 'pngjs' ).PNG;
+const jimp = require( 'jimp' );
 const fs = require( 'fs' );
 
 const port = 1234;
@@ -215,8 +215,8 @@ const pup = puppeteer.launch( {
 				/* Make screenshots */
 
 				attemptId = maxAttemptId;
-				await page.screenshot( { path: `./examples/screenshots/${ file }.png` } );
-				printImage( png.sync.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) ), console );
+				let capture = await page.screenshot( { path: `./examples/screenshots/${ file }.png` } );
+				printImage( ( await jimp.read( capture ) ).bitmap, console );
 				console.green( `file: ${ file } generated` );
 
 
@@ -225,9 +225,9 @@ const pup = puppeteer.launch( {
 
 				/* Diff screenshots */
 
-				let actual = png.sync.read( await page.screenshot() );
-				let expected = png.sync.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) );
-				let diff = new png( { width: actual.width, height: actual.height } );
+				let actual = ( await jimp.read( await page.screenshot() ) ).bitmap;
+				let expected = ( await jimp.read( `./examples/screenshots/${ file }.png` ) ).bitmap;
+				let diff = actual;
 
 				let numFailedPixels;
 				try {
