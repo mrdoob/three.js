@@ -21,3 +21,10 @@ export class DragControls extends EventDispatcher {
 	getObjects(): Object3D[];
 
 }
+
+export interface DragEvent {
+	object: THREE.Object3D;
+	target: DragControls;
+	type: string;
+	event: MouseEvent;
+}

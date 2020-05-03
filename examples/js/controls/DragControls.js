@@ -77,7 +77,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			}
 
-			scope.dispatchEvent( { type: 'drag', object: _selected } );
+			scope.dispatchEvent( { type: 'drag', object: _selected, event: event } );
 
 			return;
 
@@ -140,7 +140,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			_domElement.style.cursor = 'move';
 
-			scope.dispatchEvent( { type: 'dragstart', object: _selected } );
+			scope.dispatchEvent( { type: 'dragstart', object: _selected, event: event } );
 
 		}
 
@@ -153,7 +153,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		if ( _selected ) {
 
-			scope.dispatchEvent( { type: 'dragend', object: _selected } );
+			scope.dispatchEvent( { type: 'dragend', object: _selected, event: event } );
 
 			_selected = null;
 
