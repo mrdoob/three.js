@@ -8,7 +8,7 @@ const fs = require( 'fs' );
 const E = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => f !== 'index' );
+		.filter( f => f !== 'index' && f !== 'index_searchball' );
 
 // screenshots
 const S = fs.readdirSync( './examples/screenshots' )

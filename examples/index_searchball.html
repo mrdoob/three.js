@@ -27,8 +27,8 @@
 			import { SpiralSphereGeometry } from './jsm/geometries/SpiralSphereGeometry.js';
 
 			var canvas, camera, material, scene, renderer, controls;
-			var radius, turns, examples;
-			var mouse, mouseDown, mouseExampleId, uId;
+			var sphere, radius, turns, examples;
+			var mouse, mouseDown, hoverId, zoomSpeed;
 
 			init();
 			animate();
@@ -43,14 +43,14 @@
 				var tileRatio = 800 / 600;
 				turns = Math.PI / Math.sqrt( 4 * Math.PI / examples.length / tileRatio );
 				radius = 1;
+				zoomSpeed = 0.25;
 				var gap = 0.03;
 				var subGrid = 10;
-				var uvZoom = 0.02;
-				var uvZoom2 = 0.1;
+				var uvZoom = 0.01;
+				var uvZoom2 = 0.065;
 				var texSize = Math.ceil( Math.sqrt( examples.length ) );
 
-				uId = { value : - 1 };
-				mouseExampleId = - 1;
+				hoverId = { value : - 1 };
 				mouse = new THREE.Vector2();
 				mouseDown = new THREE.Vector2();
 				canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
@@ -70,7 +70,8 @@
 
 				}
 
-				var sphere = new SpiralSphereGeometry( radius, turns, gap, gap, subGrid, subGrid, examples.length );
+				sphere = new SpiralSphereGeometry( radius, turns, gap, gap, subGrid, subGrid, examples.length );
+				sphere.setAttribute( 'zoom', new THREE.BufferAttribute( new Float32Array( sphere.attributes.id.count ), 1 ) );
 				sphere.setAttribute( 'uv2', sphere.attributes.uv.clone() );
 				sphere.computeVertexNormals();
 				computeTileUVs( sphere, texSize, sphere.attributes.uv, uvZoom );
@@ -79,16 +80,15 @@
 				material = new THREE.MeshBasicMaterial( { color: 0xAAAAAA } );
 				material.onBeforeCompile = function ( shader ) {
 
-					shader.uniforms.uId = uId;
 					shader.vertexShader = [
 						'attribute float id;',
+						'attribute float zoom;',
 						'attribute vec2 uv2;',
-						'uniform float uId;',
 						shader.vertexShader
 					].join( '\n' );
 					shader.vertexShader = shader.vertexShader.replace( '#include <uv_vertex>', [
 						'#ifdef USE_UV',
-						'  vUv = mix( uv2, uv, clamp( abs( id - uId ), 0., 1. ) );',
+						'  vUv = mix( uv, uv2, zoom );',
 						'#endif'
 					].join( '\n' ) );
 
@@ -195,17 +195,17 @@
 
 				mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-				mouseExampleId = analyticRaycaster();
-				canvas.style.cursor = ( mouseExampleId >= 0 ) ? 'auto' : 'pointer';
+				hoverId.value = analyticRaycaster();
+				canvas.style.cursor = ( hoverId.value >= 0 ) ? 'auto' : 'pointer';
 
 			}
 
 			function onMouseUp( e ) {
 
 				onMouseMove( e );
-				if ( mouseExampleId >= 0 && mouse.distanceTo( mouseDown ) < 0.03 ) {
+				if ( hoverId.value >= 0 && mouse.distanceTo( mouseDown ) < 0.03 ) {
 
-					window.location.href = './' + examples[ mouseExampleId ] + '.html';
+					window.location.href = './' + examples[ hoverId.value ] + '.html';
 
 				}
 
@@ -228,13 +228,13 @@
 
 					mouse.x = ( e.changedTouches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
 					mouse.y = - ( e.changedTouches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
-					mouseExampleId = analyticRaycaster();
+					hoverId.value = analyticRaycaster();
 
 				}
 
-				if ( mouseExampleId >= 0 && mouse.distanceTo( mouseDown ) < 0.15 ) {
+				if ( hoverId.value >= 0 && mouse.distanceTo( mouseDown ) < 0.15 ) {
 
-					window.location.href = './' + examples[ mouseExampleId ] + '.html';
+					window.location.href = './' + examples[ hoverId.value ] + '.html';
 
 				}
 
@@ -242,9 +242,16 @@
 
 			function animate( now ) {
 
+				for ( var i = 0, attr = sphere.attributes; i < attr.id.count; i ++ ) {
+
+					var dz = ( attr.id.array[ i ] === hoverId.value ) ? zoomSpeed : - zoomSpeed;
+					attr.zoom.array[ i ] = Math.max( 0, Math.min( 1, attr.zoom.array[ i ] + dz ) );
+					attr.zoom.needsUpdate = true;
+
+				}
 				controls.update();
 				controls.rotateSpeed = 0.4 * ( camera.position.length() - 0.4 );
-				uId.value = mouseExampleId;
+
 				renderer.render( scene, camera );
 				requestAnimationFrame( animate );
 
