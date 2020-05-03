@@ -641,6 +641,10 @@ THREE.VRMLLoader = ( function () {
 						build = buildSphereNode( node );
 						break;
 
+					case 'ElevationGrid':
+						build = buildElevationGridNode( node );
+						break;
+
 					case 'Color':
 					case 'Coordinate':
 					case 'Normal':
@@ -672,7 +676,6 @@ THREE.VRMLLoader = ( function () {
 					case 'TouchSensor':
 					case 'VisibilitySensor':
 
-					case 'ElevationGrid':
 					case 'Extrusion':
 					case 'Text':
 
@@ -2032,6 +2035,313 @@ THREE.VRMLLoader = ( function () {
 				}
 
 				var geometry = new THREE.SphereBufferGeometry( radius, 16, 16 );
+
+				return geometry;
+
+			}
+
+			function buildElevationGridNode( node ) {
+
+				var color;
+				var normal;
+				var texCoord;
+				var height;
+
+				var colorPerVertex = true;
+				var normalPerVertex = true;
+				var solid = true;
+				var ccw = true;
+				var creaseAngle = 0;
+				var xDimension = 2;
+				var zDimension = 2;
+				var xSpacing = 1;
+				var zSpacing = 1;
+
+				var fields = node.fields;
+
+				for ( var i = 0, l = fields.length; i < l; i ++ ) {
+
+					var field = fields[ i ];
+					var fieldName = field.name;
+					var fieldValues = field.values;
+
+					switch ( fieldName ) {
+
+						case 'color':
+							var colorNode = fieldValues[ 0 ];
+
+							if ( colorNode !== null ) {
+
+								color = getNode( colorNode );
+
+							}
+
+							break;
+
+						case 'normal':
+							var normalNode = fieldValues[ 0 ];
+
+							if ( normalNode !== null ) {
+
+								normal = getNode( normalNode );
+
+							}
+
+							break;
+
+						case 'texCoord':
+							var texCoordNode = fieldValues[ 0 ];
+
+							if ( texCoordNode !== null ) {
+
+								texCoord = getNode( texCoordNode );
+
+							}
+
+							break;
+
+						case 'height':
+							height = fieldValues;
+							break;
+
+						case 'ccw':
+							ccw = fieldValues[ 0 ];
+							break;
+
+						case 'colorPerVertex':
+							colorPerVertex = fieldValues[ 0 ];
+							break;
+
+						case 'creaseAngle':
+							creaseAngle = fieldValues[ 0 ];
+							break;
+
+						case 'normalPerVertex':
+							normalPerVertex = fieldValues[ 0 ];
+							break;
+
+						case 'solid':
+							solid = fieldValues[ 0 ];
+							break;
+
+						case 'xDimension':
+							xDimension = fieldValues[ 0 ];
+							break;
+
+						case 'xSpacing':
+							xSpacing = fieldValues[ 0 ];
+							break;
+
+						case 'zDimension':
+							zDimension = fieldValues[ 0 ];
+							break;
+
+						case 'zSpacing':
+							zSpacing = fieldValues[ 0 ];
+							break;
+
+						default:
+							console.warn( 'THREE.VRMLLoader: Unknown field:', fieldName );
+							break;
+
+					}
+
+				}
+
+				// vertex data
+
+				var vertices = [];
+				var normals = [];
+				var colors = [];
+				var uvs = [];
+
+				for ( var i = 0; i < zDimension; i ++ ) {
+
+					for ( var j = 0; j < xDimension; j ++ ) {
+
+						// compute a row major index
+
+						var index = ( i * xDimension ) + j;
+
+						// vertices
+
+						var x = xSpacing * i;
+						var y = height[ index ];
+						var z = zSpacing * j;
+
+						vertices.push( x, y, z );
+
+						// colors
+
+						if ( color && colorPerVertex === true ) {
+
+							var r = color[ index * 3 + 0 ];
+							var g = color[ index * 3 + 1 ];
+							var b = color[ index * 3 + 2 ];
+
+							colors.push( r, g, b );
+
+						}
+
+						// normals
+
+						if ( normal && normalPerVertex === true ) {
+
+							var xn = normal[ index * 3 + 0 ];
+							var yn = normal[ index * 3 + 1 ];
+							var zn = normal[ index * 3 + 2 ];
+
+							normals.push( xn, yn, zn );
+
+						}
+
+						// uvs
+
+						if ( texCoord ) {
+
+							var s = texCoord[ index * 2 + 0 ];
+							var t = texCoord[ index * 2 + 1 ];
+
+							uvs.push( s, t );
+
+
+						} else {
+
+							uvs.push( i / ( xDimension - 1 ), j / ( zDimension - 1 ) );
+
+						}
+
+					}
+
+				}
+
+				// indices
+
+				var indices = [];
+
+				for ( var i = 0; i < xDimension - 1; i ++ ) {
+
+					for ( var j = 0; j < zDimension - 1; j ++ ) {
+
+						// from https://tecfa.unige.ch/guides/vrml/vrml97/spec/part1/nodesRef.html#ElevationGrid
+
+						var a = i + j * xDimension;
+						var b = i + ( j + 1 ) * xDimension;
+						var c = ( i + 1 ) + ( j + 1 ) * xDimension;
+						var d = ( i + 1 ) + j * xDimension;
+
+						// faces
+
+						if ( ccw === true ) {
+
+							indices.push( a, c, b );
+							indices.push( c, a, d );
+
+						} else {
+
+							indices.push( a, b, c );
+							indices.push( c, d, a );
+
+						}
+
+					}
+
+				}
+
+				//
+
+				var positionAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( vertices, 3 ) );
+				var uvAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( uvs, 2 ) );
+				var colorAttribute;
+				var normalAttribute;
+
+				// color attribute
+
+				if ( color ) {
+
+					if ( colorPerVertex === false ) {
+
+						for ( var i = 0; i < xDimension - 1; i ++ ) {
+
+							for ( var j = 0; j < zDimension - 1; j ++ ) {
+
+								var index = i + j * ( xDimension - 1 );
+
+								var r = color[ index * 3 + 0 ];
+								var g = color[ index * 3 + 1 ];
+								var b = color[ index * 3 + 2 ];
+
+								// one color per quad
+
+								colors.push( r, g, b ); colors.push( r, g, b ); colors.push( r, g, b );
+								colors.push( r, g, b ); colors.push( r, g, b ); colors.push( r, g, b );
+
+							}
+
+						}
+
+						colorAttribute = new THREE.Float32BufferAttribute( colors, 3 );
+
+					} else {
+
+						colorAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( colors, 3 ) );
+
+					}
+
+				}
+
+				// normal attribute
+
+				if ( normal ) {
+
+					if ( normalPerVertex === false ) {
+
+						for ( var i = 0; i < xDimension - 1; i ++ ) {
+
+							for ( var j = 0; j < zDimension - 1; j ++ ) {
+
+								var index = i + j * ( xDimension - 1 );
+
+								var xn = normal[ index * 3 + 0 ];
+								var yn = normal[ index * 3 + 1 ];
+								var zn = normal[ index * 3 + 2 ];
+
+								// one normal per quad
+
+								normals.push( xn, yn, zn ); normals.push( xn, yn, zn ); normals.push( xn, yn, zn );
+								normals.push( xn, yn, zn ); normals.push( xn, yn, zn ); normals.push( xn, yn, zn );
+
+							}
+
+						}
+
+						normalAttribute = new THREE.Float32BufferAttribute( normals, 3 );
+
+					} else {
+
+						normalAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( normals, 3 ) );
+
+					}
+
+				} else {
+
+					normalAttribute = computeNormalAttribute( indices, vertices, creaseAngle );
+
+				}
+
+				// build geometry
+
+				var geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'normal', normalAttribute );
+				geometry.setAttribute( 'uv', uvAttribute );
+
+				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
+
+				// "solid" influences the material so let's store it for later use
+
+				geometry._solid = solid;
+				geometry._type = 'mesh';
 
 				return geometry;
 
