@@ -329,13 +329,13 @@ THREE.VRMLLoader = ( function () {
 
 					def: function ( ctx ) {
 
-						return ctx.Identifier[ 0 ].image;
+						return ( ctx.Identifier || ctx.NodeName )[ 0 ].image;
 
 					},
 
 					use: function ( ctx ) {
 
-						return { USE: ctx.Identifier[ 0 ].image };
+						return { USE: ( ctx.Identifier || ctx.NodeName )[ 0 ].image };
 
 					},
 
@@ -3020,14 +3020,36 @@ THREE.VRMLLoader = ( function () {
 		$.RULE( 'def', function () {
 
 			$.CONSUME( DEF );
-			$.CONSUME( Identifier );
+			$.OR( [
+				{ ALT: function () {
+
+					$.CONSUME( Identifier );
+
+				} },
+				{ ALT: function () {
+
+					$.CONSUME( NodeName );
+
+				} }
+			] );
 
 		} );
 
 		$.RULE( 'use', function () {
 
 			$.CONSUME( USE );
-			$.CONSUME( Identifier );
+			$.OR( [
+				{ ALT: function () {
+
+					$.CONSUME( Identifier );
+
+				} },
+				{ ALT: function () {
+
+					$.CONSUME( NodeName );
+
+				} }
+			] );
 
 		} );
 
