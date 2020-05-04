@@ -169,6 +169,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 			}
 
+			// loop an interval into [ - Math.PI, Math.PI ] to support inverse azimuthal range
+			scope.minAzimuthAngle = isFinite( scope.minAzimuthAngle) ?
+				( scope.minAzimuthAngle + Math.PI ) % ( 2 * Math.PI ) - Math.PI : scope.minAzimuthAngle;
+			scope.maxAzimuthAngle = isFinite( scope.maxAzimuthAngle) ?
+				( scope.maxAzimuthAngle + Math.PI ) % ( 2 * Math.PI ) - Math.PI : scope.maxAzimuthAngle;
+
 			// restrict theta to be between desired limits
 			if ( scope.minAzimuthAngle <= scope.maxAzimuthAngle ) {
 
