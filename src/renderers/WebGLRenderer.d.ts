@@ -20,19 +20,6 @@ import { RenderTarget } from './webgl/WebGLRenderLists';
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 import { Texture } from '../textures/Texture';
-import { WebGLMaterials } from './webgl/WebGLMaterials';
-import { WebGLPrograms } from './webgl/WebGLPrograms';
-import { WebGLObjects } from './webgl/WebGLObjects';
-import { WebGLGeometries } from './webgl/WebGLGeometries';
-import { WebGLAttributes } from './webgl/WebGLAttributes';
-import { WebGLTextures } from './webgl/WebGLTextures';
-import { WebGLRenderStates } from './webgl/WebGLRenderStates';
-import { WebGLBackground } from './webgl/WebGLBackground';
-import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer';
-import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
-import { WebGLUtils } from './webgl/WebGLUtils';
-import { WebGLAnimation } from './webgl/WebGLAnimation';
-import { WebGLMorphtargets } from './webgl/WebGLMorphtargets';
 
 export interface Renderer {
 	domElement: HTMLCanvasElement;
@@ -98,27 +85,6 @@ export interface WebGLRendererParameters {
 	 * default is false.
 	 */
 	logarithmicDepthBuffer?: boolean;
-
-	/**
-	 * Custom WebGLRenderer helpers, all null by default
-	 * Should be used for rendering pipeline customization
-	 */
-	textures?: WebGLTextures;
-	attributes?: WebGLAttributes;
-	geometries?: WebGLGeometries;
-	objects?: WebGLObjects;
-	programCache?: WebGLPrograms;
-	materials?: WebGLMaterials;
-	renderStates?: WebGLRenderStates;
-	background?: WebGLBackground;
-	bufferRenderer?: WebGLBufferRenderer;
-	indexedBufferRenderer?: WebGLIndexedBufferRenderer;
-	utils?: WebGLUtils;
-	renderLists?: WebGLRenderLists;
-	animation?: WebGLAnimation;
-	morphtargets?: WebGLMorphtargets;
-	shadowMap?: WebGLShadowMap;
-	xr?: WebXRManager;
 }
 
 export interface WebGLDebug {

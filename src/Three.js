@@ -154,18 +154,6 @@ export { ImageUtils } from './extras/ImageUtils.js';
 export { ShapeUtils } from './extras/ShapeUtils.js';
 export { PMREMGenerator } from './extras/PMREMGenerator.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
-export { WebGLMaterials } from './renderers/webgl/WebGLMaterials.js';
-export { WebGLPrograms } from './renderers/webgl/WebGLPrograms.js';
-export { WebGLObjects } from './renderers/webgl/WebGLObjects.js';
-export { WebGLGeometries } from './renderers/webgl/WebGLGeometries.js';
-export { WebGLAttributes } from './renderers/webgl/WebGLAttributes.js';
-export { WebGLTextures } from './renderers/webgl/WebGLTextures.js';
-export { WebGLRenderStates } from './renderers/webgl/WebGLRenderStates.js';
-export { WebGLBackground } from './renderers/webgl/WebGLBackground.js';
-export { WebGLBufferRenderer } from './renderers/webgl/WebGLBufferRenderer.js';
-export { WebGLIndexedBufferRenderer } from './renderers/webgl/WebGLIndexedBufferRenderer.js';
-export { WebGLAnimation } from './renderers/webgl/WebGLAnimation.js';
-export { WebGLMorphtargets } from './renderers/webgl/WebGLMorphtargets.js';
 export * from './constants.js';
 export * from './Three.Legacy.js';
 
