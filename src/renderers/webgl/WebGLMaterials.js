@@ -19,74 +19,74 @@ WebGLMaterials.prototype.refreshUniforms = function ( uniforms, material, enviro
 
 	if ( material.isMeshBasicMaterial ) {
 
-		this.refreshUniformsCommon( uniforms, material );
+		refreshUniformsCommon( uniforms, material );
 
 	} else if ( material.isMeshLambertMaterial ) {
 
-		this.refreshUniformsCommon( uniforms, material );
-		this.refreshUniformsLambert( uniforms, material );
+		refreshUniformsCommon( uniforms, material );
+		refreshUniformsLambert( uniforms, material );
 
 	} else if ( material.isMeshToonMaterial ) {
 
-		this.refreshUniformsCommon( uniforms, material );
-		this.refreshUniformsToon( uniforms, material );
+		refreshUniformsCommon( uniforms, material );
+		refreshUniformsToon( uniforms, material );
 
 	} else if ( material.isMeshPhongMaterial ) {
 
-		this.refreshUniformsCommon( uniforms, material );
-		this.refreshUniformsPhong( uniforms, material );
+		refreshUniformsCommon( uniforms, material );
+		refreshUniformsPhong( uniforms, material );
 
 	} else if ( material.isMeshStandardMaterial ) {
 
-		this.refreshUniformsCommon( uniforms, material, environment );
+		refreshUniformsCommon( uniforms, material, environment );
 
 		if ( material.isMeshPhysicalMaterial ) {
 
-			this.refreshUniformsPhysical( uniforms, material, environment );
+			refreshUniformsPhysical( uniforms, material, environment );
 
 		} else {
 
-			this.refreshUniformsStandard( uniforms, material, environment );
+			refreshUniformsStandard( uniforms, material, environment );
 
 		}
 
 	} else if ( material.isMeshMatcapMaterial ) {
 
-		this.refreshUniformsCommon( uniforms, material );
-		this.refreshUniformsMatcap( uniforms, material );
+		refreshUniformsCommon( uniforms, material );
+		refreshUniformsMatcap( uniforms, material );
 
 	} else if ( material.isMeshDepthMaterial ) {
 
-		this.refreshUniformsCommon( uniforms, material );
-		this.refreshUniformsDepth( uniforms, material );
+		refreshUniformsCommon( uniforms, material );
+		refreshUniformsDepth( uniforms, material );
 
 	} else if ( material.isMeshDistanceMaterial ) {
 
-		this.refreshUniformsCommon( uniforms, material );
-		this.refreshUniformsDistance( uniforms, material );
+		refreshUniformsCommon( uniforms, material );
+		refreshUniformsDistance( uniforms, material );
 
 	} else if ( material.isMeshNormalMaterial ) {
 
-		this.refreshUniformsCommon( uniforms, material );
-		this.refreshUniformsNormal( uniforms, material );
+		refreshUniformsCommon( uniforms, material );
+		refreshUniformsNormal( uniforms, material );
 
 	} else if ( material.isLineBasicMaterial ) {
 
-		this.refreshUniformsLine( uniforms, material );
+		refreshUniformsLine( uniforms, material );
 
 		if ( material.isLineDashedMaterial ) {
 
-			this.refreshUniformsDash( uniforms, material );
+			refreshUniformsDash( uniforms, material );
 
 		}
 
 	} else if ( material.isPointsMaterial ) {
 
-		this.refreshUniformsPoints( uniforms, material, pixelRatio, height );
+		refreshUniformsPoints( uniforms, material, pixelRatio, height );
 
 	} else if ( material.isSpriteMaterial ) {
 
-		this.refreshUniformsSprites( uniforms, material );
+		refreshUniformsSprites( uniforms, material );
 
 	} else if ( material.isShadowMaterial ) {
 
@@ -103,7 +103,7 @@ WebGLMaterials.prototype.refreshUniforms = function ( uniforms, material, enviro
 
 };
 
-WebGLMaterials.prototype.refreshUniformsCommon = function ( uniforms, material, environment ) {
+function refreshUniformsCommon( uniforms, material, environment ) {
 
 	uniforms.opacity.value = material.opacity;
 
@@ -268,24 +268,24 @@ WebGLMaterials.prototype.refreshUniformsCommon = function ( uniforms, material, 
 
 	}
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsLine = function ( uniforms, material ) {
+function refreshUniformsLine( uniforms, material ) {
 
 	uniforms.diffuse.value.copy( material.color );
 	uniforms.opacity.value = material.opacity;
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsDash = function ( uniforms, material ) {
+function refreshUniformsDash( uniforms, material ) {
 
 	uniforms.dashSize.value = material.dashSize;
 	uniforms.totalSize.value = material.dashSize + material.gapSize;
 	uniforms.scale.value = material.scale;
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsPoints = function ( uniforms, material, pixelRatio, height ) {
+function refreshUniformsPoints( uniforms, material, pixelRatio, height ) {
 
 	uniforms.diffuse.value.copy( material.color );
 	uniforms.opacity.value = material.opacity;
@@ -332,9 +332,9 @@ WebGLMaterials.prototype.refreshUniformsPoints = function ( uniforms, material, 
 
 	}
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsSprites = function ( uniforms, material ) {
+function refreshUniformsSprites( uniforms, material ) {
 
 	uniforms.diffuse.value.copy( material.color );
 	uniforms.opacity.value = material.opacity;
@@ -380,7 +380,7 @@ WebGLMaterials.prototype.refreshUniformsSprites = function ( uniforms, material 
 
 	}
 
-};
+}
 
 WebGLMaterials.prototype.refreshUniformsFog = function ( uniforms, fog ) {
 
@@ -399,7 +399,7 @@ WebGLMaterials.prototype.refreshUniformsFog = function ( uniforms, fog ) {
 
 };
 
-WebGLMaterials.prototype.refreshUniformsLambert = function ( uniforms, material ) {
+function refreshUniformsLambert( uniforms, material ) {
 
 	if ( material.emissiveMap ) {
 
@@ -407,9 +407,9 @@ WebGLMaterials.prototype.refreshUniformsLambert = function ( uniforms, material 
 
 	}
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsPhong = function ( uniforms, material ) {
+function refreshUniformsPhong( uniforms, material ) {
 
 	uniforms.specular.value.copy( material.specular );
 	uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
@@ -444,9 +444,9 @@ WebGLMaterials.prototype.refreshUniformsPhong = function ( uniforms, material ) 
 
 	}
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsToon = function ( uniforms, material ) {
+function refreshUniformsToon( uniforms, material ) {
 
 	uniforms.specular.value.copy( material.specular );
 	uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
@@ -487,9 +487,9 @@ WebGLMaterials.prototype.refreshUniformsToon = function ( uniforms, material ) {
 
 	}
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsStandard = function ( uniforms, material, environment ) {
+function refreshUniformsStandard( uniforms, material, environment ) {
 
 	uniforms.roughness.value = material.roughness;
 	uniforms.metalness.value = material.metalness;
@@ -543,11 +543,11 @@ WebGLMaterials.prototype.refreshUniformsStandard = function ( uniforms, material
 
 	}
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsPhysical = function ( uniforms, material, environment ) {
+function refreshUniformsPhysical( uniforms, material, environment ) {
 
-	this.refreshUniformsStandard( uniforms, material, environment );
+	refreshUniformsStandard( uniforms, material, environment );
 
 	uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
 
@@ -582,9 +582,9 @@ WebGLMaterials.prototype.refreshUniformsPhysical = function ( uniforms, material
 
 	uniforms.transparency.value = material.transparency;
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsMatcap = function ( uniforms, material ) {
+function refreshUniformsMatcap( uniforms, material ) {
 
 	if ( material.matcap ) {
 
@@ -616,9 +616,9 @@ WebGLMaterials.prototype.refreshUniformsMatcap = function ( uniforms, material )
 
 	}
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsDepth = function ( uniforms, material ) {
+function refreshUniformsDepth( uniforms, material ) {
 
 	if ( material.displacementMap ) {
 
@@ -628,9 +628,9 @@ WebGLMaterials.prototype.refreshUniformsDepth = function ( uniforms, material ) 
 
 	}
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsDistance = function ( uniforms, material ) {
+function refreshUniformsDistance( uniforms, material ) {
 
 	if ( material.displacementMap ) {
 
@@ -644,9 +644,9 @@ WebGLMaterials.prototype.refreshUniformsDistance = function ( uniforms, material
 	uniforms.nearDistance.value = material.nearDistance;
 	uniforms.farDistance.value = material.farDistance;
 
-};
+}
 
-WebGLMaterials.prototype.refreshUniformsNormal = function ( uniforms, material ) {
+function refreshUniformsNormal( uniforms, material ) {
 
 	if ( material.bumpMap ) {
 
@@ -672,6 +672,6 @@ WebGLMaterials.prototype.refreshUniformsNormal = function ( uniforms, material )
 
 	}
 
-};
+}
 
 export { WebGLMaterials };
