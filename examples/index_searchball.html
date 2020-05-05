@@ -11,12 +11,36 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="./main.css">
-		<style> body { background-color: #FFF; } </style>
+		<style>
+			body {
+				background-color: #FFF;
+			}
+			@font-face {
+				font-family: 'Roboto Mono';
+				src: local('Roboto Mono'), local('RobotoMono-Regular'), url('../files/RobotoMono-Regular.woff2') format('woff2');
+				font-style: normal;
+				font-weight: 400;
+			}
+			#tooltip {
+				position: fixed;
+				display: none;
+				padding: 0px 10px 2px 10px;
+				border-radius: 16px;
+				background-color: #049EF4;
+				color: #fff;
+				font-family: 'Roboto Mono', monospace;
+				font-size: 14px;
+				text-align: center;
+				pointer-events: none;
+				z-index: 5;
+			}
+		</style>
 	</head>
 
 	<body>
 
-		<canvas></canvas>
+		<div id="tooltip"></div>
+		<canvas id="canvas"></canvas>
 
 		<script src="files.js"></script>
 
@@ -27,8 +51,8 @@
 			import { SpiralSphereGeometry } from './jsm/geometries/SpiralSphereGeometry.js';
 
 			var canvas, camera, material, scene, renderer, controls;
-			var sphere, radius, turns, examples;
-			var mouse, mouseDown, hoverId, zoomSpeed;
+			var sphere, outline, examples, radius, turns, zoomSpeed;
+			var mouseMove, mouseMove0, mouseDown, idMove, idDown, isSwipe, tooltip, tooltipWaiting;
 
 			init();
 			animate();
@@ -43,17 +67,18 @@
 				var tileRatio = 800 / 600;
 				turns = Math.PI / Math.sqrt( 4 * Math.PI / examples.length / tileRatio );
 				radius = 1;
-				zoomSpeed = 0.25;
-				var gap = 0.03;
+				var gap = 0.05;
 				var subGrid = 10;
+
+				var texSize = Math.ceil( Math.sqrt( examples.length ) );
 				var uvZoom = 0.01;
 				var uvZoom2 = 0.065;
-				var texSize = Math.ceil( Math.sqrt( examples.length ) );
+				zoomSpeed = 0.25;
 
-				hoverId = { value : - 1 };
-				mouse = new THREE.Vector2();
+				mouseMove = new THREE.Vector2();
+				mouseMove0 = new THREE.Vector2();
 				mouseDown = new THREE.Vector2();
-				canvas = document.getElementsByTagName( 'canvas' )[ 0 ];
+				tooltip = document.getElementById( 'tooltip' );
 
 				// scene
 
@@ -77,11 +102,17 @@
 				computeTileUVs( sphere, texSize, sphere.attributes.uv, uvZoom );
 				computeTileUVs( sphere, texSize, sphere.attributes.uv2, uvZoom2 );
 
-				material = new THREE.MeshBasicMaterial( { color: 0xAAAAAA } );
+				material = new THREE.MeshBasicMaterial( { color: 0xA1A1A1 } );
+				new THREE.TextureLoader().load( './screenshots/all_in_one.jpg', function( map ) {
+
+					material.color = null;
+					material.map = map;
+					material.needsUpdate = true;
+
+				} );
 				material.onBeforeCompile = function ( shader ) {
 
 					shader.vertexShader = [
-						'attribute float id;',
 						'attribute float zoom;',
 						'attribute vec2 uv2;',
 						shader.vertexShader
@@ -93,18 +124,19 @@
 					].join( '\n' ) );
 
 				};
-				new THREE.TextureLoader().load( './screenshots/all_in_one.jpg', function( map ) {
-
-					material.color = null;
-					material.map = map;
-					material.needsUpdate = true;
-
-				} );
 
 				scene.add( new THREE.Mesh( sphere, material ) );
 
+				var thikness = 0.12 * gap * Math.sqrt( window.devicePixelRatio || 1 );
+				var geometry = new THREE.RingBufferGeometry( 1 + thikness, 1 + 2 * thikness, 100 );
+				var matLine = new THREE.MeshBasicMaterial( { color: 0x049EF4 } );
+				outline = new THREE.Mesh( geometry, matLine );
+
+				scene.add( outline );
+
 				// renderer
 
+				canvas = document.getElementById( 'canvas' );
 				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -122,11 +154,14 @@
 				// events
 
 				window.addEventListener( 'resize', onWindowResize, false );
-				window.addEventListener( 'mousedown', onMouseDown, false );
-				window.addEventListener( 'mousemove', onMouseMove, false );
-				window.addEventListener( 'mouseup', onMouseUp, false );
-				window.addEventListener( 'touchstart', onTouchStart, false );
-				window.addEventListener( 'touchend', onTouchEnd, false );
+
+				canvas.addEventListener( 'mousedown', onMouseDown, false );
+				canvas.addEventListener( 'mousemove', onMouseMove, false );
+				canvas.addEventListener( 'mouseup', onMouseUp, false );
+
+				canvas.addEventListener( 'touchstart', onMouseDown, false );
+				canvas.addEventListener( 'touchmove', onMouseMove, false );
+				canvas.addEventListener( 'touchend', onMouseUp, false );
 
 			}
 
@@ -149,11 +184,13 @@
 
 			}
 
-			function analyticRaycaster() {
+			function analyticRaycaster( mouse ) {
 
 				var ray = new THREE.Ray();
 				ray.origin.setFromMatrixPosition( camera.matrixWorld );
-				ray.direction.set( mouse.x, mouse.y, 0.5 ).unproject( camera ).sub( ray.origin ).normalize();
+				var x = 2 * mouse.x / window.innerWidth - 1;
+				var y = - 2 * mouse.y / window.innerHeight + 1;
+				ray.direction.set( x, y, 0.5 ).unproject( camera ).sub( ray.origin ).normalize();
 
 				var a = ray.direction.dot( ray.direction );
 				var b = 2 * ray.origin.dot( ray.direction );
@@ -176,81 +213,99 @@
 
 			}
 
-			function onWindowResize() {
+			function savePosition( mouse, e, touches ) {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				camera.updateProjectionMatrix();
+				mouse.x = ( touches ) ? touches[ 0 ].pageX : e.clientX;
+				mouse.y = ( touches ) ? touches[ 0 ].pageY : e.clientY;
 
 			}
 
-			function onMouseDown() {
+			function onMouseDown( e ) {
 
-				mouseDown.x = mouse.x;
-				mouseDown.y = mouse.y;
+				savePosition( mouseDown, e, e.changedTouches );
+				idMove = analyticRaycaster( mouseDown );
+				idDown = idMove;
+				isSwipe = false;
 
 			}
 
 			function onMouseMove( e ) {
 
-				mouse.x = ( e.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( e.clientY / window.innerHeight ) * 2 + 1;
-				hoverId.value = analyticRaycaster();
-				canvas.style.cursor = ( hoverId.value >= 0 ) ? 'auto' : 'pointer';
+				e.preventDefault();
+				savePosition( mouseMove, e, e.changedTouches );
+
+				idMove = analyticRaycaster( mouseMove );
+				canvas.style.cursor = ( idMove < 0 ) ? 'auto' : 'pointer';
+				var multitouch = e.touches && e.touches.length > 1;
+				isSwipe = ( mouseMove.distanceTo( mouseDown ) > 4 || multitouch );
+
+				if ( mouseMove0.distanceTo( mouseMove ) > 4 ) {
+
+					tooltip.style.display = 'none';
+					clearTimeout( tooltipWaiting );
+					tooltipWaiting = null;
+
+				}
+				if ( ! tooltipWaiting ) {
+
+					tooltipWaiting = setTimeout( function ( ) {
+
+						if ( idMove >= 0 ) {
+
+							tooltip.innerHTML = examples[ idMove ];
+							tooltip.style.display = 'block';
+							var dy = ( e.touches ) ? - 2 * tooltip.clientHeight : tooltip.clientHeight;
+							tooltip.style.left = ( mouseMove.x - ( tooltip.clientWidth - 10 ) / 2 ) + 'px';
+							tooltip.style.top = ( mouseMove.y + dy ) + 'px';
+
+						}
+						tooltipWaiting = null;
+
+					}, 500 );
+
+				}
+				mouseMove0.copy( mouseMove );
 
 			}
 
 			function onMouseUp( e ) {
 
-				onMouseMove( e );
-				if ( hoverId.value >= 0 && mouse.distanceTo( mouseDown ) < 0.03 ) {
+				savePosition( mouseMove, e, e.changedTouches );
+				if ( idMove >= 0 && ! isSwipe ) {
 
-					window.location.href = './' + examples[ hoverId.value ] + '.html';
+					window.location.href = './' + examples[ idMove ] + '.html';
 
 				}
+				tooltip.style.display = 'none';
+				clearTimeout( tooltipWaiting );
+				tooltipWaiting = null;
 
 			}
 
-			function onTouchStart( e ) {
+			function onWindowResize() {
 
-				if ( e.touches.length == 1 ) {
-
-					mouseDown.x = ( e.touches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
-					mouseDown.y = - ( e.touches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
-
-				}
-
-			}
-
-			function onTouchEnd( e ) {
-
-				if ( e.changedTouches.length == 1 ) {
-
-					mouse.x = ( e.changedTouches[ 0 ].pageX / window.innerWidth ) * 2 - 1;
-					mouse.y = - ( e.changedTouches[ 0 ].pageY / window.innerHeight ) * 2 + 1;
-					hoverId.value = analyticRaycaster();
-
-				}
-
-				if ( hoverId.value >= 0 && mouse.distanceTo( mouseDown ) < 0.15 ) {
-
-					window.location.href = './' + examples[ hoverId.value ] + '.html';
-
-				}
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
 
 			}
 
 			function animate( now ) {
 
+				controls.update();
+				controls.rotateSpeed = 0.4 * ( camera.position.length() - 0.4 );
+
+				var k = 1 / Math.sqrt( 1 - 1 / camera.position.lengthSq() );
+				outline.scale.copy( new THREE.Vector3( k, k, 1 ) );
+				outline.lookAt( camera.position );
+
 				for ( var i = 0, attr = sphere.attributes; i < attr.id.count; i ++ ) {
 
-					var dz = ( attr.id.array[ i ] === hoverId.value ) ? zoomSpeed : - zoomSpeed;
+					var dz = ( idMove === attr.id.array[ i ] ) ? zoomSpeed : - zoomSpeed;
 					attr.zoom.array[ i ] = Math.max( 0, Math.min( 1, attr.zoom.array[ i ] + dz ) );
 					attr.zoom.needsUpdate = true;
 
 				}
-				controls.update();
-				controls.rotateSpeed = 0.4 * ( camera.position.length() - 0.4 );
 
 				renderer.render( scene, camera );
 				requestAnimationFrame( animate );
