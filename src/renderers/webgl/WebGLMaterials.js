@@ -7,10 +7,15 @@ import { BackSide } from "../../constants";
  * i.e. uniforms refresh before material is being rendered
  */
 
-function WebGLMaterials() {
+var _properties;
+
+function WebGLMaterials( properties ) {
+
+	_properties = properties;
+
 }
 
-WebGLMaterials.prototype.refreshUniforms = function ( uniforms, material, environment ) {
+WebGLMaterials.prototype.refreshUniforms = function ( uniforms, material, environment, pixelRatio, height ) {
 
 	if ( material.isMeshBasicMaterial ) {
 
@@ -77,7 +82,7 @@ WebGLMaterials.prototype.refreshUniforms = function ( uniforms, material, enviro
 
 	} else if ( material.isPointsMaterial ) {
 
-		this.refreshUniformsPoints( uniforms, material );
+		this.refreshUniformsPoints( uniforms, material, pixelRatio, height );
 
 	} else if ( material.isSpriteMaterial ) {
 
@@ -143,7 +148,7 @@ WebGLMaterials.prototype.refreshUniformsCommon = function ( uniforms, material, 
 		uniforms.reflectivity.value = material.reflectivity;
 		uniforms.refractionRatio.value = material.refractionRatio;
 
-		uniforms.maxMipLevel.value = properties.get( envMap ).__maxMipLevel;
+		uniforms.maxMipLevel.value = _properties.get( envMap ).__maxMipLevel;
 
 	}
 
@@ -280,12 +285,12 @@ WebGLMaterials.prototype.refreshUniformsDash = function ( uniforms, material ) {
 
 };
 
-WebGLMaterials.prototype.refreshUniformsPoints = function ( uniforms, material ) {
+WebGLMaterials.prototype.refreshUniformsPoints = function ( uniforms, material, pixelRatio, height ) {
 
 	uniforms.diffuse.value.copy( material.color );
 	uniforms.opacity.value = material.opacity;
-	uniforms.size.value = material.size * _pixelRatio;
-	uniforms.scale.value = _height * 0.5;
+	uniforms.size.value = material.size * pixelRatio;
+	uniforms.scale.value = height * 0.5;
 
 	if ( material.map ) {
 

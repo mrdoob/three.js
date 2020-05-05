@@ -282,7 +282,7 @@ function WebGLRenderer( parameters ) {
 		objects = parameters.objects !== undefined ? parameters.objects : new WebGLObjects( _gl, geometries, attributes, info );
 		morphtargets = parameters.morphtargets !== undefined ? parameters.morphtargets : new WebGLMorphtargets( _gl );
 		programCache = parameters.programCache !== undefined ? parameters.programCache : new WebGLPrograms( _this, extensions, capabilities );
-		materials = parameters.materials !== undefined ? parameters.materials : new WebGLMaterials();
+		materials = parameters.materials !== undefined ? parameters.materials : new WebGLMaterials( properties );
 		renderLists = parameters.renderLists !== undefined ? parameters.renderLists : new WebGLRenderLists();
 		renderStates = parameters.renderStates !== undefined ? parameters.renderStates : new WebGLRenderStates();
 
@@ -1865,7 +1865,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			materials.refreshUniforms( m_uniforms, material, environment );
+			materials.refreshUniforms( m_uniforms, material, environment, _pixelRatio, _height );
 
 			// RectAreaLight Texture
 			// TODO (mrdoob): Find a nicer implementation
