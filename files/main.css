@@ -133,6 +133,22 @@ h1 a {
 	transition: 0s 0s height;
 }
 
+	#panel #searchBallButton {
+		width: 48px;
+		height: 48px;
+		visibility: hidden;
+		background-color: var(--text-color);
+		background-size: var(--icon-size);
+		-webkit-mask-image: url(../files/ic_searchball_black_24dp.svg);
+		-webkit-mask-position: 50% 50%;
+		-webkit-mask-repeat: no-repeat;
+		mask-image: url(../files/ic_searchball_black_24dp.svg);
+		mask-position: 50% 50%;
+		mask-repeat: no-repeat;
+		cursor: pointer;
+		margin-right: 0px;
+	}
+
 	#panel #exitSearchButton {
 		width: 48px;
 		height: 48px;
@@ -147,6 +163,10 @@ h1 a {
 		mask-repeat: no-repeat;
 		cursor: pointer;
 		margin-right: 0px;
+	}
+
+	#panel.searchFocused #searchBallButton {
+		display: none;
 	}
 
 	#panel.searchFocused #exitSearchButton {

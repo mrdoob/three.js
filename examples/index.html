@@ -33,6 +33,7 @@
 
 				<div id="inputWrapper">
 					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<div id="searchBallButton"></div>
 					<div id="exitSearchButton"></div>
 				</div>
 
@@ -41,7 +42,7 @@
 
 		</div>
 
-		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
+		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel="" src="./index_searchball.html"></iframe>
 
 		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
@@ -53,6 +54,7 @@
 		var content = document.getElementById( 'content' );
 		var viewer = document.getElementById( 'viewer' );
 		var filterInput = document.getElementById( 'filterInput' );
+		var searchBallButton = document.getElementById( 'searchBallButton' );
 		var exitSearchButton = document.getElementById( 'exitSearchButton' );
 		var expandButton = document.getElementById( 'expandButton' );
 		var viewSrcButton = document.getElementById( 'button' );
@@ -134,6 +136,12 @@
 
 			};
 
+			searchBallButton.onclick = function ( event ) {
+
+				location.href = './';
+
+			};
+
 			filterInput.addEventListener( 'input', function () {
 
 				updateFilter();
@@ -210,6 +218,7 @@
 			viewSrcButton.style.display = '';
 			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
 			viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
+			searchBallButton.style.visibility = 'visible';
 
 		}
 
