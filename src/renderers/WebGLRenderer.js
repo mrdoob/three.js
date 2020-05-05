@@ -268,28 +268,28 @@ function WebGLRenderer( parameters ) {
 
 		extensions.get( 'OES_texture_float_linear' );
 
-		utils = new WebGLUtils( _gl, extensions, capabilities );
+		utils = parameters.utils !== undefined ? parameters.utils : new WebGLUtils( _gl, extensions, capabilities );
 
-		state = new WebGLState( _gl, extensions, capabilities );
+		state = parameters.state !== undefined ? parameters.state : new WebGLState( _gl, extensions, capabilities );
 		state.scissor( _currentScissor.copy( _scissor ).multiplyScalar( _pixelRatio ).floor() );
 		state.viewport( _currentViewport.copy( _viewport ).multiplyScalar( _pixelRatio ).floor() );
 
-		info = new WebGLInfo( _gl );
-		properties = new WebGLProperties();
-		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
-		attributes = new WebGLAttributes( _gl, capabilities );
-		geometries = new WebGLGeometries( _gl, attributes, info );
-		objects = new WebGLObjects( _gl, geometries, attributes, info );
-		morphtargets = new WebGLMorphtargets( _gl );
-		programCache = new WebGLPrograms( _this, extensions, capabilities );
-		materials = new WebGLMaterials();
-		renderLists = new WebGLRenderLists();
-		renderStates = new WebGLRenderStates();
+		info = parameters.info !== undefined ? parameters.info : new WebGLInfo( _gl );
+		properties = parameters.properties !== undefined ? parameters.properties : new WebGLProperties();
+		textures = parameters.textures !== undefined ? parameters.textures : new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
+		attributes = parameters.attributes !== undefined ? parameters.attributes : new WebGLAttributes( _gl, capabilities );
+		geometries = parameters.geometries !== undefined ? parameters.geometries : new WebGLGeometries( _gl, attributes, info );
+		objects = parameters.objects !== undefined ? parameters.objects : new WebGLObjects( _gl, geometries, attributes, info );
+		morphtargets = parameters.morphtargets !== undefined ? parameters.morphtargets : new WebGLMorphtargets( _gl );
+		programCache = parameters.programCache !== undefined ? parameters.programCache : new WebGLPrograms( _this, extensions, capabilities );
+		materials = parameters.materials !== undefined ? parameters.materials : new WebGLMaterials();
+		renderLists = parameters.renderLists !== undefined ? parameters.renderLists : new WebGLRenderLists();
+		renderStates = parameters.renderStates !== undefined ? parameters.renderStates : new WebGLRenderStates();
 
-		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
+		background = parameters.background !== undefined ? parameters.background : new WebGLBackground( _this, state, objects, _premultipliedAlpha );
 
-		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
-		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
+		bufferRenderer = parameters.bufferRenderer !== undefined ? parameters.bufferRenderer : new WebGLBufferRenderer( _gl, extensions, info, capabilities );
+		indexedBufferRenderer = parameters.indexedBufferRenderer !== undefined ? parameters.indexedBufferRenderer : new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
 
 		info.programs = programCache.programs;
 
@@ -306,13 +306,13 @@ function WebGLRenderer( parameters ) {
 
 	// xr
 
-	var xr = new WebXRManager( _this, _gl );
+	var xr = parameters.xr !== undefined ? parameters.xr : new WebXRManager( _this, _gl );
 
 	this.xr = xr;
 
 	// shadow map
 
-	var shadowMap = new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
+	var shadowMap = parameters.shadowMap !== undefined ? parameters.shadowMap : new WebGLShadowMap( _this, objects, capabilities.maxTextureSize );
 
 	this.shadowMap = shadowMap;
 
@@ -1100,7 +1100,7 @@ function WebGLRenderer( parameters ) {
 
 	}
 
-	var animation = new WebGLAnimation();
+	var animation = parameters.animation !== undefined ? parameters.animation : new WebGLAnimation();
 	animation.setAnimationLoop( onAnimationFrame );
 
 	if ( typeof window !== 'undefined' ) animation.setContext( window );
