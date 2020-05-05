@@ -31,7 +31,6 @@ import { LineLoop } from '../objects/LineLoop.js';
 import { LineSegments } from '../objects/LineSegments.js';
 import { LOD } from '../objects/LOD.js';
 import { Mesh } from '../objects/Mesh.js';
-import { SkinnedMesh } from '../objects/SkinnedMesh.js';
 import { Shape } from '../extras/core/Shape.js';
 import { Fog } from '../scenes/Fog.js';
 import { FogExp2 } from '../scenes/FogExp2.js';
@@ -41,6 +40,7 @@ import { PointLight } from '../lights/PointLight.js';
 import { DirectionalLight } from '../lights/DirectionalLight.js';
 import { AmbientLight } from '../lights/AmbientLight.js';
 import { RectAreaLight } from '../lights/RectAreaLight.js';
+import { LightProbe } from '../lights/LightProbe.js';
 import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
 import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
@@ -419,17 +419,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					case 'Geometry':
 
-						if ( 'THREE' in window && 'LegacyJSONLoader' in THREE ) {
-
-							var geometryLoader = new THREE.LegacyJSONLoader();
-							geometry = geometryLoader.parse( data, this.resourcePath ).geometry;
-
-
-						} else {
-
-							console.error( 'THREE.ObjectLoader: You have to import LegacyJSONLoader in order load geometry data of type "Geometry".' );
-
-						}
+						console.error( 'THREE.ObjectLoader: Loading "Geometry" is not supported anymore.' );
 
 						break;
 
@@ -828,6 +818,12 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				break;
 
+			case 'LightProbe':
+
+				object = new LightProbe().fromJSON( data );
+
+				break;
+
 			case 'SkinnedMesh':
 
 				console.warn( 'THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.' );
@@ -837,15 +833,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var geometry = getGeometry( data.geometry );
 				var material = getMaterial( data.material );
 
-				if ( geometry.bones && geometry.bones.length > 0 ) {
-
-					object = new SkinnedMesh( geometry, material );
-
-				} else {
-
-					object = new Mesh( geometry, material );
-
-				}
+				object = new Mesh( geometry, material );
 
 				break;
 

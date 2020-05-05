@@ -20,6 +20,7 @@ var ViewportInfo = function ( editor ) {
 	var objectsText = new UIText( '0' ).setMarginLeft( '6px' );
 	var verticesText = new UIText( '0' ).setMarginLeft( '6px' );
 	var trianglesText = new UIText( '0' ).setMarginLeft( '6px' );
+	var frametimeText = new UIText( '0' ).setMarginLeft( '6px' );
 
 	container.add( new UIText( strings.getKey( 'viewport/info/objects' ) ).setTextTransform( 'lowercase' ) );
 	container.add( objectsText, new UIBreak() );
@@ -27,6 +28,8 @@ var ViewportInfo = function ( editor ) {
 	container.add( verticesText, new UIBreak() );
 	container.add( new UIText( strings.getKey( 'viewport/info/triangles' ) ).setTextTransform( 'lowercase' ) );
 	container.add( trianglesText, new UIBreak() );
+	container.add( new UIText( strings.getKey( 'viewport/info/frametime' ) ).setTextTransform( 'lowercase' ) );
+	container.add( frametimeText, new UIBreak() );
 
 	signals.objectAdded.add( update );
 	signals.objectRemoved.add( update );
@@ -82,6 +85,14 @@ var ViewportInfo = function ( editor ) {
 		objectsText.setValue( objects.format() );
 		verticesText.setValue( vertices.format() );
 		trianglesText.setValue( triangles.format() );
+
+	}
+
+	signals.sceneRendered.add( updateFrametime );
+
+	function updateFrametime( frametime ) {
+
+		frametimeText.setValue( Number( frametime ).toFixed( 2 ) + " ms" );
 
 	}
 

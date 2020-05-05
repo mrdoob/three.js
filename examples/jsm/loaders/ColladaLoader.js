@@ -2096,6 +2096,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							data.stride = parseInt( accessor.getAttribute( 'stride' ) );
 
 						}
+
 						break;
 
 				}
@@ -2368,6 +2369,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 											}
 
 										}
+
 										break;
 
 									case 'NORMAL':
@@ -2396,6 +2398,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 								}
 
 							}
+
 							break;
 
 						case 'NORMAL':
@@ -2947,7 +2950,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( targetElement ) {
 
-					// get the parent of the transfrom element
+					// get the parent of the transform element
 
 					var parentVisualElement = targetElement.parentElement;
 
@@ -3704,6 +3707,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							object = new Mesh( geometry.data, material );
 
 						}
+
 						break;
 
 				}

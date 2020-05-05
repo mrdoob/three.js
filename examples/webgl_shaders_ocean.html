@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean
 		</div>
 
 		<script type="module">
@@ -146,7 +146,7 @@
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				var material = new THREE.MeshStandardMaterial( {
-					vertexColors: THREE.VertexColors,
+					vertexColors: true,
 					roughness: 0.0,
 					flatShading: true,
 					envMap: cubeCamera.renderTarget.texture,

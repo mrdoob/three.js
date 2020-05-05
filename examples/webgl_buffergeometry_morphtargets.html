@@ -15,7 +15,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - buffergeometry - morph targets<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - buffergeometry - morph targets<br/>
 			by <a href="https://discoverthreejs.com/" target="_blank" rel="noopener">Discover three.js</a>
 		</div>
 
@@ -37,10 +37,8 @@
 
 				container = document.getElementById( 'container' );
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
-				camera.position.z = 8;
+				camera.position.z = 10;
 				scene.add( camera );
-
-				var controls = new OrbitControls( camera, container );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( pointLight );
@@ -61,15 +59,15 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				renderer.setAnimationLoop( function () {
 
 					renderer.render( scene, camera );
 
 				} );
-
 				container.appendChild( renderer.domElement );
 
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

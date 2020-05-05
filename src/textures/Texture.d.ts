@@ -33,7 +33,7 @@ export class Texture extends EventDispatcher {
 	name: string;
 	sourceFile: string;
 	image: any; // HTMLImageElement or ImageData or { width: number, height: number } in some children;
-	mipmaps: ImageData[];
+	mipmaps: any[]; // ImageData[] for 2D textures and CubeTexture[] for cube textures;
 	mapping: Mapping;
 	wrapS: Wrapping;
 	wrapT: Wrapping;

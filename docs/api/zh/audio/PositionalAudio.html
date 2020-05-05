@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -18,14 +18,7 @@
 			使用了[link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
 		</p>
 
-
-		<h2>示例</h2>
-
-		<p>
-			[example:webaudio_orientation webaudio / orientation ]<br />
-			[example:webaudio_sandbox webaudio / sandbox ]<br />
-			[example:webaudio_timing webaudio / timing ]
-		</p>
+		<h2>代码示例</h2>
 
 		<code>
 		// create an AudioListener and add it to the camera
@@ -44,7 +37,7 @@
 		});
 
 		// create an object for the sound to play from
-		var sphere = new THREE.SphereGeometry( 20, 32, 16 );
+		var sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
 		var material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
 		var mesh = new THREE.Mesh( sphere, material );
 		scene.add( mesh );
@@ -53,6 +46,13 @@
 		mesh.add( sound );
 		</code>
 
+		<h2>例子</h2>
+
+		<p>
+			[example:webaudio_orientation webaudio / orientation ]<br />
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
+			[example:webaudio_timing webaudio / timing ]
+		</p>
 
 		<h2>构造函数</h2>
 

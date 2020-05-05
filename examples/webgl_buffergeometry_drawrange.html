@@ -15,7 +15,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry drawrange<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry drawrange<br/>
 			by <a href="https://twitter.com/fernandojsg">fernandojsg</a>
 		</div>
 
@@ -91,6 +91,8 @@
 				camera.position.z = 1750;
 
 				var controls = new OrbitControls( camera, container );
+				controls.minDistance = 1000;
+				controls.maxDistance = 3000;
 
 				scene = new THREE.Scene();
 
@@ -155,7 +157,7 @@
 				geometry.setDrawRange( 0, 0 );
 
 				var material = new THREE.LineBasicMaterial( {
-					vertexColors: THREE.VertexColors,
+					vertexColors: true,
 					blending: THREE.AdditiveBlending,
 					transparent: true
 				} );

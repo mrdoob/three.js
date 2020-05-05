@@ -19,7 +19,7 @@
 
 	<div id="info">
 
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - instancing - performance
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - instancing - performance
 
 	</div>
 
@@ -182,7 +182,7 @@
 				randomizeMatrix( matrix );
 
 				var instanceGeometry = geometry.clone();
-				instanceGeometry.applyMatrix( matrix );
+				instanceGeometry.applyMatrix4( matrix );
 
 				geometries.push( instanceGeometry );
 
@@ -212,7 +212,7 @@
 				randomizeMatrix( matrix );
 
 				var mesh = new THREE.Mesh( geometry, material );
-				mesh.applyMatrix( matrix );
+				mesh.applyMatrix4( matrix );
 
 				scene.add( mesh );
 

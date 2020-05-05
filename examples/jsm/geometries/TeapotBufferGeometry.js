@@ -682,7 +682,7 @@ var TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid,
 					v4 = v1 + vertPerRow;
 
 					// Normals and UVs cannot be shared. Without clone(), you can see the consequences
-					// of sharing if you call geometry.applyMatrix( matrix ).
+					// of sharing if you call geometry.applyMatrix4( matrix ).
 					if ( notDegenerate( v1, v2, v3 ) ) {
 
 						indices[ indexCount ++ ] = v1;
@@ -690,6 +690,7 @@ var TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid,
 						indices[ indexCount ++ ] = v3;
 
 					}
+
 					if ( notDegenerate( v1, v3, v4 ) ) {
 
 						indices[ indexCount ++ ] = v1;

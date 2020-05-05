@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
 			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
 		</div>
 
@@ -93,7 +93,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.physicallyCorrectLights = true;
-				renderer.toneMapping = THREE.LinearToneMapping;
 
 				//
 
@@ -180,7 +179,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				//renderer.toneMapping = ReinhardToneMapping;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();

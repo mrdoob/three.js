@@ -70,7 +70,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			try {
 
-				zip = new JSZip( data ); // eslint-disable-line no-undef
+				zip = new JSZip( data );
 
 			} catch ( e ) {
 
@@ -1022,7 +1022,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			// material
 
-			var material = new THREE.MeshPhongMaterial( { vertexColors: THREE.VertexColors, flatShading: true } );
+			var material = new THREE.MeshPhongMaterial( { vertexColors: true, flatShading: true } );
 
 			// mesh
 
@@ -1068,6 +1068,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 							meshes.push( newMeshes[ j ] );
 
 						}
+
 						break;
 
 					case 'texture':
@@ -1275,13 +1276,13 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				var object3D = build.clone();
 
-				// apply component transfrom
+				// apply component transform
 
 				var transform = component.transform;
 
 				if ( transform ) {
 
-					object3D.applyMatrix( transform );
+					object3D.applyMatrix4( transform );
 
 				}
 
@@ -1386,7 +1387,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				if ( transform ) {
 
-					object3D.applyMatrix( transform );
+					object3D.applyMatrix4( transform );
 
 				}
 

@@ -3,6 +3,7 @@ var files = {
 		"webgl_animation_cloth",
 		"webgl_animation_keyframes",
 		"webgl_animation_skinning_blending",
+		"webgl_animation_skinning_additive_blending",
 		"webgl_animation_skinning_morph",
 		"webgl_animation_multiple",
 		"webgl_camera",
@@ -48,7 +49,6 @@ var files = {
 		"webgl_geometry_text_stroke",
 		"webgl_helpers",
 		"webgl_instancing_dynamic",
-		"webgl_instancing_modified",
 		"webgl_instancing_performance",
 		"webgl_instancing_raycast",
 		"webgl_instancing_scatter",
@@ -99,6 +99,7 @@ var files = {
 		"webgl_loader_lwo",
 		"webgl_loader_md2",
 		"webgl_loader_md2_control",
+		"webgl_loader_mdd",
 		"webgl_loader_mmd",
 		"webgl_loader_mmd_pose",
 		"webgl_loader_mmd_audio",
@@ -153,18 +154,18 @@ var files = {
 		"webgl_materials_normalmap_object_space",
 		"webgl_materials_parallaxmap",
 		"webgl_materials_physical_clearcoat",
+		"webgl_materials_physical_reflectivity",
 		"webgl_materials_physical_sheen",
 		"webgl_materials_physical_transparency",
-		"webgl_materials_reflectivity",
 		"webgl_materials_shaders_fresnel",
 		"webgl_materials_standard",
+		"webgl_materials_subsurface_scattering",
 		"webgl_materials_texture_anisotropy",
 		"webgl_materials_texture_canvas",
 		"webgl_materials_texture_filters",
 		"webgl_materials_texture_manualmipmap",
 		"webgl_materials_texture_partialupdate",
 		"webgl_materials_texture_rotation",
-		"webgl_materials_translucency",
 		"webgl_materials_variations_basic",
 		"webgl_materials_variations_lambert",
 		"webgl_materials_variations_phong",
@@ -174,6 +175,7 @@ var files = {
 		"webgl_materials_video",
 		"webgl_materials_video_webcam",
 		"webgl_materials_wireframe",
+		"webgl_math_obb",
 		"webgl_math_orientation_transform",
 		"webgl_mirror",
 		"webgl_modifier_simplifier",
@@ -216,6 +218,7 @@ var files = {
 		"webgl_shaders_tonemapping",
 		"webgl_shaders_vector",
 		"webgl_shading_physical",
+		"webgl_shadow_contact",
 		"webgl_shadowmap",
 		"webgl_shadowmap_performance",
 		"webgl_shadowmap_pointlight",
@@ -272,6 +275,7 @@ var files = {
 	],
 	"webgl / advanced": [
 		"webgl_buffergeometry",
+		"webgl_buffergeometry_compression",
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",
 		"webgl_buffergeometry_drawrange",
@@ -279,7 +283,6 @@ var files = {
 		"webgl_buffergeometry_instancing",
 		"webgl_buffergeometry_instancing_billboards",
 		"webgl_buffergeometry_instancing_interleaved",
-		"webgl_buffergeometry_instancing_lambert",
 		"webgl_buffergeometry_lines",
 		"webgl_buffergeometry_lines_indexed",
 		"webgl_buffergeometry_morphtargets",
@@ -297,16 +300,18 @@ var files = {
 		"webgl_gpgpu_birds",
 		"webgl_gpgpu_water",
 		"webgl_gpgpu_protoplanet",
+		"webgl_instancing_modified",
 		"webgl_lightningstrike",
-		"webgl_lightshafts",
 		"webgl_materials_modified",
 		"webgl_raymarching_reflect",
+		"webgl_shadowmap_csm",
 		"webgl_shadowmap_pcss",
 		"webgl_simple_gi",
 		"webgl_tiled_forward",
 		"webgl_worker_offscreencanvas"
 	],
 	"webgl2": [
+		"webgl2_buffergeometry_attributes_integer",
 		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
 		"webgl2_multisampled_renderbuffers",
@@ -326,7 +331,6 @@ var files = {
 		"webxr_vr_cubes",
 		"webxr_vr_dragging",
 		"webxr_vr_lorenzattractor",
-		"webxr_vr_multiview",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
 		"webxr_vr_paint",
@@ -336,11 +340,12 @@ var files = {
 		"webxr_vr_video"
 	],
 	"physics": [
-		"webgl_physics_cloth",
-		"webgl_physics_convex_break",
-		"webgl_physics_rope",
-		"webgl_physics_terrain",
-		"webgl_physics_volume"
+		"physics_ammo_break",
+		"physics_ammo_cloth",
+		"physics_ammo_rope",
+		"physics_ammo_terrain",
+		"physics_ammo_volume",
+		"physics_cannon_instancing"
 	],
 	"misc": [
 		"misc_animation_authoring",
@@ -385,4 +390,15 @@ var files = {
 		"webgl_pmrem_test",
 		"misc_uv_tests"
 	]
+};
+
+var tags = {
+	"webgl_clipping_intersection": [ "csg", "solid" ],
+	"webgl_fire": [ "smoke" ],
+	"webgl_materials_translucency": [ "subsurface", "scattering" ],
+	"webgl_postprocessing_unreal_bloom": [ "glow" ],
+	"webgl_postprocessing_unreal_bloom_selective": [ "glow" ],
+	"webgl_shadowmap_csm": [ "cascade" ],
+	"webgl_shadowmap_pcss": [ "soft" ],
+	"webgl_simple_gi": [ "global", "illumination" ]
 };

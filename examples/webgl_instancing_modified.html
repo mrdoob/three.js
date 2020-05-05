@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl instancing - modified
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl instancing - modified
 		</div>
 
 		<script type="module">
@@ -50,9 +50,9 @@
 
 					for ( var i = 0; i < count; i ++ ) {
 
-						instanceColors.push( 0.5 + 0.5 * Math.random() );
-						instanceColors.push( 0.5 + 0.5 * Math.random() );
-						instanceColors.push( 0.5 + 0.5 * Math.random() );
+						instanceColors.push( Math.random() );
+						instanceColors.push( Math.random() );
+						instanceColors.push( Math.random() );
 
 					}
 
@@ -168,7 +168,7 @@
 
 							for ( var z = 0; z < amount; z ++ ) {
 
-								dummy.position.set( offset - x, offset - y, offset - z ).multiplyScalar( 2 );
+								dummy.position.set( offset - x, offset - y, offset - z );
 								dummy.rotation.y = ( Math.sin( x / 4 + time ) + Math.sin( y / 4 + time ) + Math.sin( z / 4 + time ) );
 								dummy.rotation.z = dummy.rotation.y * 2;
 

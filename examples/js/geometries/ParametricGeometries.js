@@ -96,9 +96,9 @@ THREE.ParametricGeometries = {
  *
  *********************************************/
 
-class ParametricTubeGeometry extends THREE.ParametricGeometry {
+ class ParametricTubeGeometry extends THREE.ParametricGeometry {
 
-	constructor( path, segments, radius, segmentsRadius, closed ) {
+ 	constructor( path, segments, radius, segmentsRadius, closed ) {
 
 		var frames = path.computeFrenetFrames( segments, closed ),
 			tangents = frames.tangents,

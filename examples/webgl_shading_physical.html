@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based shading testbed
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl physically based shading testbed
 		</div>
 
 		<script type="module">
@@ -76,19 +76,16 @@
 				textureSquares.repeat.set( 50, 50 );
 				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
 				textureSquares.magFilter = THREE.NearestFilter;
-				textureSquares.format = THREE.RGBFormat;
 				textureSquares.encoding = THREE.sRGBEncoding;
 
 				var textureNoiseColor = textureLoader.load( "textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
 				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
-				textureNoiseColor.format = THREE.RGBFormat;
 				textureNoiseColor.encoding = THREE.sRGBEncoding;
 
 				var textureLava = textureLoader.load( "textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
-				textureLava.format = THREE.RGBFormat;
 				textureLava.encoding = THREE.sRGBEncoding;
 
 				// GROUND

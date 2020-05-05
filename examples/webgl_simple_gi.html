@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - simple global illumination (<a href="http://www.iquilezles.org/www/articles/simplegi/simplegi.htm">article</a>)
 		</div>
 
 		<script type="module">
@@ -159,7 +159,7 @@
 				// sphere
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.75, 0.3, 128, 32, 1 );
-				var material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var material = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
 				var mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -189,6 +189,8 @@
 				new SimpleGI( renderer, scene );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 10;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -14,7 +14,7 @@
 	<body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - shapes extrusion via geodata
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - shapes extrusion via geodata
 		</div>
 
 		<script type="module">
@@ -430,6 +430,8 @@
 				//
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 100;
+				controls.maxDistance = 1000;
 
 				//
 

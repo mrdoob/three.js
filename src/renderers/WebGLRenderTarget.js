@@ -26,7 +26,7 @@ function WebGLRenderTarget( width, height, options ) {
 
 	options = options || {};
 
-	this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+	this.texture = new Texture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
 	this.texture.image = {};
 	this.texture.image.width = width;

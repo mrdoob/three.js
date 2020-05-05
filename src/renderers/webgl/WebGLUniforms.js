@@ -465,6 +465,20 @@ function setValueV4i( gl, v ) {
 
 }
 
+// uint
+
+function setValueV1ui( gl, v ) {
+
+	var cache = this.cache;
+
+	if ( cache[ 0 ] === v ) return;
+
+	gl.uniform1ui( this.addr, v );
+
+	cache[ 0 ] = v;
+
+}
+
 // Helper to pick the right setter for the singular case
 
 function getSingularSetter( type ) {
@@ -484,6 +498,8 @@ function getSingularSetter( type ) {
 		case 0x8b53: case 0x8b57: return setValueV2i; // _VEC2
 		case 0x8b54: case 0x8b58: return setValueV3i; // _VEC3
 		case 0x8b55: case 0x8b59: return setValueV4i; // _VEC4
+
+		case 0x1405: return setValueV1ui; // UINT
 
 		case 0x8b5e: // SAMPLER_2D
 		case 0x8d66: // SAMPLER_EXTERNAL_OES

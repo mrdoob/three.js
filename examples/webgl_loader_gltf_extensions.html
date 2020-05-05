@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			<a href="https://github.com/KhronosGroup/glTF" target="_blank" rel="noopener">glTF</a> 2.0 loader<br />
 			<div id="description"></div>
 		</div>
@@ -65,6 +65,15 @@
 					cameraPos: new THREE.Vector3( 2, 1, 15 ),
 					objectRotation: new THREE.Euler( 0, 0, 0 ),
 					extensions: [ 'glTF', 'glTF-Embedded' ],
+					addEnvMap: true
+				},
+				'Clearcoat Test': {
+					name: 'Clearcoat Test',
+					url: './models/gltf/ClearcoatTest/ClearcoatTest.glb',
+					author: 'Ed Mackey (Analytical Graphics, Inc.)',
+					authorURL: 'https://www.agi.com/',
+					cameraPos: new THREE.Vector3( 0, 0, 20 ),
+					extensions: [ 'glTF' ],
 					addEnvMap: true
 				},
 				Duck: {
