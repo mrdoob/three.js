@@ -195,7 +195,7 @@ import './unit/src/math/Euler.tests';
 import './unit/src/math/Frustum.tests';
 import './unit/src/math/Interpolant.tests';
 import './unit/src/math/Line3.tests';
-import './unit/src/math/Math.tests';
+import './unit/src/math/MathUtils.tests';
 import './unit/src/math/Matrix3.tests';
 import './unit/src/math/Matrix4.tests';
 import './unit/src/math/Plane.tests';
@@ -232,7 +232,7 @@ import './unit/src/objects/Sprite.tests';
 //src/renderers
 import './unit/src/renderers/WebGLRenderer.tests';
 import './unit/src/renderers/WebGLRenderTarget.tests';
-import './unit/src/renderers/WebGLRenderTargetCube.tests';
+import './unit/src/renderers/WebGLCubeRenderTarget.tests';
 
 //src/renderers/shaders
 import './unit/src/renderers/shaders/ShaderChunk.tests';

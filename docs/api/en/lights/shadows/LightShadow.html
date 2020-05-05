@@ -22,7 +22,7 @@
 		<p>
 		[page:Camera camera] - the light's view of the world.<br /><br />
 
-		Create a new [name]. This is not intended to be called directly - it is used as a base class by 
+		Create a new [name]. This is not intended to be called directly - it is used as a base class by
 		other light shadows.
 		</p>
 
@@ -48,7 +48,7 @@
 
 		<h3>[property:WebGLRenderTarget mapPass]</h3>
 		<p>
-			The distribution map generated using the internal camera; an occlusion is calculated based 
+			The distribution map generated using the internal camera; an occlusion is calculated based
 			on the distribution of depths. Computed internally during rendering.
 		</p>
 
@@ -74,8 +74,8 @@
 
 			High values will cause unwanted banding effects in the shadows - a greater [page:.mapSize mapSize]
 			will allow for a higher value to be used here before these effects become visible.<br />
-			If [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer PCFSoftShadowMap], it is recommended to
-			leave radius at 1 and increase softness by decreasing [page:.mapSize mapSize] instead.<br /><br />
+			If [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer PCFSoftShadowMap], radius has
+			no effect and it is recommended to increase softness by decreasing [page:.mapSize mapSize] instead.<br /><br />
 
 			Note that this has no effect if the [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer BasicShadowMap].
 		</p>
@@ -123,6 +123,8 @@
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+		</p>
 	</body>
 </html>

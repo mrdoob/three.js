@@ -4,8 +4,8 @@ import { Texture } from './../textures/Texture';
 
 export interface MeshDistanceMaterialParameters extends MaterialParameters {
 	map?: Texture | null;
-	alphaMap?: Texture | null;
-	displacementMap?: Texture | null;
+	alphaMap?: Texture | null;
+	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
 	farDistance?: number;
@@ -18,7 +18,7 @@ export class MeshDistanceMaterial extends Material {
 	constructor( parameters?: MeshDistanceMaterialParameters );
 
 	map: Texture | null;
-	alphaMap: Texture | null;
+	alphaMap: Texture | null;
 	displacementMap: Texture | null;
 	displacementScale: number;
 	displacementBias: number;

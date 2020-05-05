@@ -19,7 +19,7 @@ export class Vector4 implements Vector {
 	w: number;
 	width: number;
 	height: number;
-	isVector4: true;
+	readonly isVector4: true;
 
 	/**
 	 * Sets value of this vector.
@@ -209,5 +209,10 @@ export class Vector4 implements Vector {
 		index: number,
 		offset?: number
 	): this;
+
+	/**
+	 * Sets this vector's x, y, z and w from Math.random
+	 */
+	random(): this;
 
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -13,19 +13,18 @@
 		<p class="desc">Uniforms 是 [link:https://www.opengl.org/documentation/glsl/ GLSL] 着色器中的全局变量。
 		</p>
 
-		<h3>示例</h3>
+		<h2>代码示例</h2>
 		<p>
-			在声明一个 [page:ShaderMaterial] 的 Uniform 变量时，该变量被值或对象声明。
-		When declaring a uniform of a [page:ShaderMaterial], it is declared by value or by object.
+			When declaring a uniform of a [page:ShaderMaterial], it is declared by value or by object.
 		</p>
 		<code>
 		uniforms: {
 			time: { value: 1.0 },
-			resolution: new THREE.Uniform(new THREE.Vector2())
-		}
+			resolution: new Uniform( new Vector2() )
+		};
 		</code>
 
-		<h3>Uniform 种类</h3>
+		<h2>Uniform 种类</h2>
 
 		<p>
 			每个 Uniform 必须包括一个 *value* 属性。value 的类型必须和下表中 GLSL 的基本类型相对应。同样，Uniform 的结构体和队列
@@ -46,6 +45,10 @@
 
 				<tr>
 					<td>int</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td>uint (WebGL 2)</td>
 					<td>[page:Number]</td>
 				</tr>
 				<tr>
@@ -177,9 +180,65 @@
 		</table>
 
 		<p>
-
 		(*) 与最内层队列中 GSLS 的类型保持一致。包含队列中所有矢量的元素或矩阵中的元素。
 		</p>
+
+		<h2>Structured Uniforms</h2>
+
+		<p>
+			Sometimes you want to organize uniforms as *structs* in your shader code. The following style must be used so *three.js* is able
+			to process structured uniform data.
+		</p>
+		<code>
+		uniforms = {
+			data: {
+				value: {
+					position: new Vector3(),
+					direction: new Vector3( 0, 0, 1 )
+				 }
+			}
+		};
+		</code>
+		This definition can be mapped on the following GLSL code:
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data;
+		</code>
+
+		<h2>Structured Uniforms with Arrays</h2>
+
+		<p>
+			It's also possible to manage *structs* in arrays. The syntax for this use case looks like so:
+		</p>
+		<code>
+		var entry1 = {
+			position: new Vector3(),
+			direction: new Vector3( 0, 0, 1 )
+		};
+		var entry2 = {
+			position: new Vector3( 1, 1, 1 ),
+			direction: new Vector3( 0, 1, 0 )
+		};
+
+		uniforms = {
+			data: {
+				value: [ entry1, entry2 ]
+			}
+		};
+		</code>
+		This definition can be mapped on the following GLSL code:
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data[ 2 ];
+		</code>
 
 		<h2>构造函数</h2>
 
@@ -201,9 +260,7 @@
 		<p>
 			返回该 Uniform 的克隆。<br />
 			如果 Uniform 的 value 属性是一个带 clone() 方法的 [page:Object]，则克隆该对象时，value 的 clone() 方法也会被调用，否则克隆时只会使用赋值语句。
-			队列中的值会在该 Uniform 和 被克隆对象间共享。<br /><br />
-
-			该方法的使用示例详见 [example:webgldeferred_animation WebGL deferred animation]。
+			队列中的值会在该 Uniform 和 被克隆对象间共享。
 		</p>
 
 		<h2>源代码</h2>

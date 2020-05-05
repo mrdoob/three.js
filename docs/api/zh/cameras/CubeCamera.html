@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -13,13 +13,9 @@
 		<h1>立方相机（[name]）</h1>
 
 
-		<p class="desc">创建6个摄像机，并将它们所拍摄的场景渲染到[page:WebGLRenderTargetCube]上。</p>
+		<p class="desc">创建6个摄像机，并将它们所拍摄的场景渲染到[page:WebGLCubeRenderTarget]上。</p>
 
-		<h2>示例</h2>
-
-		<p>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</p>
-		<p>[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]</p>
-		<p>[example:webgl_shading_physical shading / physical ]</p>
+		<h2>代码示例</h2>
 
 		<code>// Create cube camera
 		var cubeCamera = new THREE.CubeCamera( 1, 100000, 128 );
@@ -40,7 +36,13 @@
 		renderer.render( scene, camera );
 		</code>
 
+		<h2>例子</h2>
 
+		<p>
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]<br />
+			[example:webgl_materials_cubemap_dynamic2 materials / cubemap / dynamic2 ]<br />
+			[example:webgl_shading_physical shading / physical ]
+		</p>
 
 		<h2>构造器</h2>
 
@@ -54,7 +56,7 @@
 		cubeResolution -- 设置立方体边缘的长度
 		</p>
 		<p>
-			构造一个包含6个[page:PerspectiveCamera PerspectiveCameras]（透视摄像机）的立方摄像机，并将其拍摄的场景渲染到一个[page:WebGLRenderTargetCube]上。
+			构造一个包含6个[page:PerspectiveCamera PerspectiveCameras]（透视摄像机）的立方摄像机，并将其拍摄的场景渲染到一个[page:WebGLCubeRenderTarget]上。
 
 		</p>
 
@@ -62,7 +64,7 @@
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Object3D]。</p>
 
-		<h3>[property:WebGLRenderTargetCube renderTarget]</h3>
+		<h3>[property:WebGLCubeRenderTarget renderTarget]</h3>
 		<p>
 			生成的立方体纹理<br>
 			（译注：生成的立方体纹理保存在其中的.texture对象中，可作为贴图赋值给其他材质）

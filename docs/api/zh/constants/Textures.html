@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
 	<meta charset="utf-8" />
@@ -221,11 +221,50 @@
 	<h2>ETC 压缩纹理格式</h2>
 	<code>
 		THREE.RGB_ETC1_Format
+		THREE.RGB_ETC2_Format
+		THREE.RGBA_ETC2_EAC_Format
 		</code>
+		<p>
+		For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+		these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
+		(ETC1) or [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc/ WEBGL_compressed_texture_etc]
+		(ETC2) extensions. <br /><br />
+		</p>
+
+	<h2>ASTC Compressed Texture Format</h2>
+	<code>
+		THREE.RGBA_ASTC_4x4_Format
+		THREE.RGBA_ASTC_5x4_Format
+		THREE.RGBA_ASTC_5x5_Format
+		THREE.RGBA_ASTC_6x5_Format
+		THREE.RGBA_ASTC_6x6_Format
+		THREE.RGBA_ASTC_8x5_Format
+		THREE.RGBA_ASTC_8x6_Format
+		THREE.RGBA_ASTC_8x8_Format
+		THREE.RGBA_ASTC_10x5_Format
+		THREE.RGBA_ASTC_10x6_Format
+		THREE.RGBA_ASTC_10x8_Format
+		THREE.RGBA_ASTC_10x10_Format
+		THREE.RGBA_ASTC_12x10_Format
+		THREE.RGBA_ASTC_12x12_Format
+		THREE.SRGB8_ALPHA8_ASTC_4x4_Format
+		THREE.SRGB8_ALPHA8_ASTC_5x4_Format
+		THREE.SRGB8_ALPHA8_ASTC_5x5_Format
+		THREE.SRGB8_ALPHA8_ASTC_6x5_Format
+		THREE.SRGB8_ALPHA8_ASTC_6x6_Format
+		THREE.SRGB8_ALPHA8_ASTC_8x5_Format
+		THREE.SRGB8_ALPHA8_ASTC_8x6_Format
+		THREE.SRGB8_ALPHA8_ASTC_8x8_Format
+		THREE.SRGB8_ALPHA8_ASTC_10x5_Format
+		THREE.SRGB8_ALPHA8_ASTC_10x6_Format
+		THREE.SRGB8_ALPHA8_ASTC_10x8_Format
+		THREE.SRGB8_ALPHA8_ASTC_10x10_Format
+		THREE.SRGB8_ALPHA8_ASTC_12x10_Format
+		THREE.SRGB8_ALPHA8_ASTC_12x12_Format
+	</code>
 	<p>
-		要使用[page:CompressedTexture CompressedTexture]中的[page:Texture.format format]属性，需要获得
-		[link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_etc1/ WEBGL_compressed_texture_etc1]
-		扩展的支持。<br /><br />
+	For use with a [page:CompressedTexture CompressedTexture]'s [page:Texture.format format]	property,
+	these require support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_compressed_texture_astc/ WEBGL_compressed_texture_astc] extension. <br /><br />
 	</p>
 
 	<h2>编码</h2>

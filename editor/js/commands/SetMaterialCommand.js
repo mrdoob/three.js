@@ -78,4 +78,4 @@ SetMaterialCommand.prototype = {
 
 };
 
-export { SetMaterialCommand };
+export { SetMaterialCommand };

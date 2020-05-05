@@ -9,7 +9,6 @@ import {
 	BlendingSrcFactor,
 	DepthModes,
 	Side,
-	Colors,
 	StencilFunc,
 	StencilOp
 } from '../constants';
@@ -48,8 +47,7 @@ export interface MaterialParameters {
 	shadowSide?: Side;
 	toneMapped?: boolean;
 	transparent?: boolean;
-	vertexColors?: Colors;
-	vertexTangents?: boolean;
+	vertexColors?: boolean;
 	visible?: boolean;
 	stencilWrite?: boolean;
 	stencilFunc?: StencilFunc;
@@ -198,7 +196,7 @@ export class Material extends EventDispatcher {
 	 * Used to check whether this or derived classes are materials. Default is true.
 	 * You should not change this, as it used internally for optimisation.
 	 */
-	isMaterial: boolean;
+	readonly isMaterial: true;
 
 	/**
 	 * Material name. Default is an empty string.
@@ -258,6 +256,12 @@ export class Material extends EventDispatcher {
 	side: Side;
 
 	/**
+	 * Defines which of the face sides will cast shadows. Default is *null*.
+	 * If *null*, the value is opposite that of side, above.
+	 */
+	shadowSide: Side;
+
+	/**
 	 * Defines whether this material is tone mapped according to the renderer's toneMapping setting.
 	 * Default is true.
 	 */
@@ -281,14 +285,9 @@ export class Material extends EventDispatcher {
 	uuid: string;
 
 	/**
-	 * Defines whether vertex coloring is used. Default is THREE.NoColors. Other options are THREE.VertexColors and THREE.FaceColors.
+	 * Defines whether vertex coloring is used. Default is false.
 	 */
-	vertexColors: Colors;
-
-	/**
-	 * Defines whether precomputed vertex tangents are used. Default is false.
-	 */
-	vertexTangents: boolean;
+	vertexColors: boolean;
 
 	/**
 	 * Defines whether this material is visible. Default is true.

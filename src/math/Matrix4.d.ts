@@ -1,7 +1,6 @@
 import { Vector3 } from './Vector3';
 import { Euler } from './Euler';
 import { Quaternion } from './Quaternion';
-import { BufferAttribute } from './../core/BufferAttribute';
 import { Matrix } from './Matrix3';
 /**
  * A 4x4 Matrix.
@@ -99,17 +98,6 @@ export class Matrix4 implements Matrix {
 	multiplyScalar( s: number ): Matrix4;
 
 	/**
-	 * @deprecated Use {@link Matrix4#applyToBufferAttribute matrix4.applyToBufferAttribute( attribute )} instead.
-	 */
-	applyToBuffer(
-		buffer: BufferAttribute,
-		offset?: number,
-		length?: number
-	): BufferAttribute;
-
-	applyToBufferAttribute( attribute: BufferAttribute ): BufferAttribute;
-
-	/**
 	 * Computes determinant of this matrix.
 	 * Based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 	 */
@@ -129,7 +117,7 @@ export class Matrix4 implements Matrix {
 	 * Sets this matrix to the inverse of matrix m.
 	 * Based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm.
 	 */
-	getInverse( m: Matrix4, throwOnDegeneratee?: boolean ): Matrix4;
+	getInverse( m: Matrix4 ): Matrix4;
 
 	/**
 	 * Multiplies the columns of this matrix by vector v.
@@ -183,14 +171,13 @@ export class Matrix4 implements Matrix {
 	compose( translation: Vector3, rotation: Quaternion, scale: Vector3 ): Matrix4;
 
 	/**
-	 * Decomposes this matrix into the translation, rotation and scale components.
-	 * If parameters are not passed, new instances will be created.
+	 * Decomposes this matrix into it's position, quaternion and scale components.
 	 */
 	decompose(
-		translation?: Vector3,
-		rotation?: Quaternion,
-		scale?: Vector3
-	): Object[]; // [Vector3, Quaternion, Vector3]
+		translation: Vector3,
+		rotation: Quaternion,
+		scale: Vector3
+	): Matrix4;
 
 	/**
 	 * Creates a frustum matrix.

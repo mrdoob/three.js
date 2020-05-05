@@ -137,6 +137,27 @@ function WebGLRenderList() {
 
 	}
 
+	function finish() {
+
+		// Clear references from inactive renderItems in the list
+
+		for ( var i = renderItemsIndex, il = renderItems.length; i < il; i ++ ) {
+
+			var renderItem = renderItems[ i ];
+
+			if ( renderItem.id === null ) break;
+
+			renderItem.id = null;
+			renderItem.object = null;
+			renderItem.geometry = null;
+			renderItem.material = null;
+			renderItem.program = null;
+			renderItem.group = null;
+
+		}
+
+	}
+
 	return {
 		opaque: opaque,
 		transparent: transparent,
@@ -144,6 +165,7 @@ function WebGLRenderList() {
 		init: init,
 		push: push,
 		unshift: unshift,
+		finish: finish,
 
 		sort: sort
 	};

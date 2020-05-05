@@ -25,6 +25,7 @@ export class Quaternion {
 	y: number;
 	z: number;
 	w: number;
+	readonly isQuaternion: true;
 
 	/**
 	 * Sets values of this quaternion.
@@ -147,6 +148,15 @@ export class Quaternion {
 		stcOffset1: number,
 		t: number
 	): Quaternion;
+
+	static multiplyQuaternionsFlat(
+		dst: number[],
+		dstOffset: number,
+		src0: number[],
+		srcOffset: number,
+		src1: number[],
+		stcOffset1: number
+	): number[];
 
 	/**
 	 * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.

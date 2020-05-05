@@ -1,19 +1,25 @@
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
 var APP = {
 
-	Player: function ( THREE ) {
+	Player: function () {
 
-		window.THREE = THREE; // FIX for editor scripts (they require THREE in global namespace)
+		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setPixelRatio( window.devicePixelRatio );
+		renderer.outputEncoding = THREE.sRGBEncoding;
 
 		var loader = new THREE.ObjectLoader();
-		var camera, scene, renderer;
+		var camera, scene;
+
+		var vrButton = VRButton.createButton( renderer );
 
 		var events = {};
 
 		var dom = document.createElement( 'div' );
+		dom.appendChild( renderer.domElement );
 
 		this.dom = dom;
 
@@ -22,17 +28,10 @@ var APP = {
 
 		this.load = function ( json ) {
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.outputEncoding = THREE.sRGBEncoding;
-			renderer.setClearColor( 0x000000 );
-			renderer.setPixelRatio( window.devicePixelRatio );
-
 			var project = json.project;
 
-			if ( project.shadows ) renderer.shadowMap.enabled = true;
-			if ( project.vr ) renderer.xr.enabled = true;
-
-			dom.appendChild( renderer.domElement );
+			renderer.shadowMap.enabled = project.shadows === true;
+			renderer.xr.enabled = project.vr === true;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -174,6 +173,8 @@ var APP = {
 
 		this.play = function () {
 
+			if ( renderer.xr.enabled ) dom.append( vrButton );
+
 			prevTime = performance.now();
 
 			document.addEventListener( 'keydown', onDocumentKeyDown );
@@ -193,6 +194,8 @@ var APP = {
 
 		this.stop = function () {
 
+			if ( renderer.xr.enabled ) vrButton.remove();
+
 			document.removeEventListener( 'keydown', onDocumentKeyDown );
 			document.removeEventListener( 'keyup', onDocumentKeyUp );
 			document.removeEventListener( 'mousedown', onDocumentMouseDown );
@@ -210,17 +213,10 @@ var APP = {
 
 		this.dispose = function () {
 
-			while ( dom.children.length ) {
-
-				dom.removeChild( dom.firstChild );
-
-			}
-
 			renderer.dispose();
 
 			camera = undefined;
 			scene = undefined;
-			renderer = undefined;
 
 		};
 

@@ -157,7 +157,7 @@ h1 a {
 		display: none;
 	}
 
-	#panel.searchFocused #filter {
+	#panel.searchFocused #filterInput {
 		-webkit-mask-image: none;
 		mask-image: none;
 		background-color: inherit;
@@ -232,7 +232,7 @@ h1 a {
 	content: "";
 }
 
-	#panel #filter {
+	#panel #filterInput {
 		flex: 1;
 		width: 100%;
 		padding: 0 36px;

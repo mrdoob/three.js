@@ -47,20 +47,20 @@
 	</script>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - 2D Texture array<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - 2D Texture array<br />
 			Scanned head data by
 			<a href="https://www.codeproject.com/Articles/352270/Getting-started-with-Volume-Rendering" target="_blank" rel="noopener">Divine Augustine</a><br />
 			licensed under
 			<a href="https://www.codeproject.com/info/cpol10.aspx" target="_blank" rel="noopener">CPOL</a>
 		</div>
 
-		<script src="js/libs/jszip.min.js"></script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
+			import { JSZip } from './jsm/libs/jszip.module.min.js';
+
 			import { WEBGL } from './jsm/WebGL.js';
 
 			if ( WEBGL.isWebGL2Available() === false ) {

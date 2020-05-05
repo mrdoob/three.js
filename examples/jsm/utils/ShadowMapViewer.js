@@ -2,14 +2,14 @@
  * @author arya-s / https://github.com/arya-s
  *
  * This is a helper for visualising a given light's shadow map.
- * It works for shadow casting lights: THREE.DirectionalLight and THREE.SpotLight.
+ * It works for shadow casting lights: DirectionalLight and SpotLight.
  * It renders out the shadow map and displays it on a HUD.
  *
  * Example usage:
- *	1) Include <script src='examples/js/utils/ShadowMapViewer.js'><script> in your html file
+ *	1) Import ShadowMapViewer into your app.
  *
  *	2) Create a shadow casting light and name it optionally:
- *		var light = new THREE.DirectionalLight( 0xffffff, 1 );
+ *		var light = new DirectionalLight( 0xffffff, 1 );
  *		light.castShadow = true;
  *		light.name = 'Sun';
  *

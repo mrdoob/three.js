@@ -8,7 +8,7 @@
 	</head>
 
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - dashed lines example</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - dashed lines example</div>
 		<div id="container"></div>
 
 		<script type="module">
@@ -51,9 +51,9 @@
 				objects.push( line );
 				scene.add( line );
 
-				var geometryCube = cube( 50 );
+				var geometryBox = box( 50, 50, 50 );
 
-				var lineSegments = new THREE.LineSegments( geometryCube, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
+				var lineSegments = new THREE.LineSegments( geometryBox, new THREE.LineDashedMaterial( { color: 0xffaa00, dashSize: 3, gapSize: 1 } ) );
 				lineSegments.computeLineDistances();
 
 				objects.push( lineSegments );
@@ -75,49 +75,51 @@
 
 			}
 
-			function cube( size ) {
+			function box( width, height, depth ) {
 
-				var h = size * 0.5;
+				width = width * 0.5,
+				height = height * 0.5,
+				depth = depth * 0.5;
 
 				var geometry = new THREE.BufferGeometry();
 				var position = [];
 
 				position.push(
-					- h, - h, - h,
-					- h, h, - h,
+					- width, - height, - depth,
+					- width, height, - depth,
 
-					- h, h, - h,
-					h, h, - h,
+					- width, height, - depth,
+					width, height, - depth,
 
-					h, h, - h,
-					h, - h, - h,
+					width, height, - depth,
+					width, - height, - depth,
 
-					h, - h, - h,
-					- h, - h, - h,
+					width, - height, - depth,
+					- width, - height, - depth,
 
-					- h, - h, h,
-					- h, h, h,
+					- width, - height, depth,
+					- width, height, depth,
 
-					- h, h, h,
-					h, h, h,
+					- width, height, depth,
+					width, height, depth,
 
-					h, h, h,
-					h, - h, h,
+					width, height, depth,
+					width, - height, depth,
 
-					h, - h, h,
-					- h, - h, h,
+					width, - height, depth,
+					- width, - height, depth,
 
-					- h, - h, - h,
-					- h, - h, h,
+					- width, - height, - depth,
+					- width, - height, depth,
 
-					- h, h, - h,
-					- h, h, h,
+					- width, height, - depth,
+					- width, height, depth,
 
-					h, h, - h,
-					h, h, h,
+					width, height, - depth,
+					width, height, depth,
 
-					h, - h, - h,
-					h, - h, h
+					width, - height, - depth,
+					width, - height, depth
 				 );
 
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );

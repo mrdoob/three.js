@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - buffergeometry</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive - buffergeometry</div>
 
 		<script type="module">
 
@@ -165,7 +165,7 @@
 
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+					side: THREE.DoubleSide, vertexColors: true
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -259,7 +259,7 @@
 
 					mesh.updateMatrix();
 
-					line.geometry.applyMatrix( mesh.matrix );
+					line.geometry.applyMatrix4( mesh.matrix );
 
 					line.visible = true;
 

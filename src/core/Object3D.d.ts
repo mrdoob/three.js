@@ -148,7 +148,7 @@ export class Object3D extends EventDispatcher {
 	 * Used to check whether this or derived classes are Object3Ds. Default is true.
 	 * You should not change this, as it is used internally for optimisation.
 	 */
-	isObject3D: true;
+	readonly isObject3D: true;
 
 	/**
 	 * Calls before rendering object
@@ -180,7 +180,7 @@ export class Object3D extends EventDispatcher {
 	/**
 	 * This updates the position, rotation and scale with the matrix.
 	 */
-	applyMatrix( matrix: Matrix4 ): void;
+	applyMatrix4( matrix: Matrix4 ): void;
 
 	applyQuaternion( quaternion: Quaternion ): this;
 

@@ -316,6 +316,7 @@ PhongNode.prototype.build = function ( builder ) {
 
 		}
 	*/
+
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );
@@ -327,10 +328,10 @@ PhongNode.prototype.build = function ( builder ) {
 		}
 
 		output.push(
-			"#include <premultiplied_alpha_fragment>",
 			"#include <tonemapping_fragment>",
 			"#include <encodings_fragment>",
-			"#include <fog_fragment>"
+			"#include <fog_fragment>",
+			"#include <premultiplied_alpha_fragment>"
 		);
 
 		code = output.join( "\n" );

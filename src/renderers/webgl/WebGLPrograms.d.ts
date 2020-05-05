@@ -3,6 +3,7 @@ import { WebGLProgram } from './WebGLProgram';
 import { WebGLCapabilities } from './WebGLCapabilities';
 import { WebGLExtensions } from './WebGLExtensions';
 import { Material } from './../../materials/Material';
+import { Scene } from './../../scenes/Scene';
 
 export class WebGLPrograms {
 
@@ -13,13 +14,14 @@ export class WebGLPrograms {
 	getParameters(
 		material: Material,
 		lights: any,
-		fog: any,
+		shadows: object[],
+		scene: Scene,
 		nClipPlanes: number,
+		nClipIntersection: number,
 		object: any
 	): any;
-	getProgramCacheKey( material: Material, parameters: any ): string;
+	getProgramCacheKey( parameters: any ): string;
 	acquireProgram(
-		material: Material,
 		parameters: any,
 		cacheKey: string
 	): WebGLProgram;

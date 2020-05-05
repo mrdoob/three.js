@@ -10,6 +10,7 @@ var list = {
 				"Browser support": "manual/en/introduction/Browser-support",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
+				"Typescript setup": "manual/en/introduction/Typescript-setup",
 				"How to use WebGL 2": "manual/en/introduction/How-to-use-WebGL2",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
@@ -104,13 +105,11 @@ var list = {
 				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"Deprecated": {
-				"DeprecatedList": "api/en/deprecated/DeprecatedList"
-			},
-
 			"Extras": {
 				"Earcut": "api/en/extras/Earcut",
-				"ShapeUtils": "api/en/extras/ShapeUtils"
+				"ImageUtils": "api/en/extras/ImageUtils",
+				"PMREMGenerator": "api/en/extras/PMREMGenerator",
+				"ShapeUtils": "api/en/extras/ShapeUtils",
 			},
 
 			"Extras / Core": {
@@ -272,7 +271,7 @@ var list = {
 				"Frustum": "api/en/math/Frustum",
 				"Interpolant": "api/en/math/Interpolant",
 				"Line3": "api/en/math/Line3",
-				"Math": "api/en/math/Math",
+				"MathUtils": "api/en/math/MathUtils",
 				"Matrix3": "api/en/math/Matrix3",
 				"Matrix4": "api/en/math/Matrix4",
 				"Plane": "api/en/math/Plane",
@@ -312,7 +311,7 @@ var list = {
 				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
-				"WebGLRenderTargetCube": "api/en/renderers/WebGLRenderTargetCube"
+				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
 			},
 
 			"Renderers / Shaders": {
@@ -320,6 +319,10 @@ var list = {
 				"ShaderLib": "api/en/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/en/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/en/renderers/shaders/UniformsUtils"
+			},
+
+			"Renderers / WebXR": {
+				"WebXRManager": "api/en/renderers/webxr/WebXRManager"
 			},
 
 			"Scenes": {
@@ -459,6 +462,7 @@ var list = {
 				"浏览器支持": "manual/zh/introduction/Browser-support",
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
+				"Typescript设置": "manual/zh/introduction/Typescript-setup",
 				"如何使用WebGL 2": "manual/zh/introduction/How-to-use-WebGL2",
 				"画线": "manual/zh/introduction/Drawing-lines",
 				"创建文字": "manual/zh/introduction/Creating-text",
@@ -553,12 +557,10 @@ var list = {
 				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"弃用列表": {
-				"DeprecatedList": "api/zh/deprecated/DeprecatedList"
-			},
-
 			"附件": {
 				"Earcut": "api/zh/extras/Earcut",
+				"ImageUtils": "api/zh/extras/ImageUtils",
+				"PMREMGenerator": "api/zh/extras/PMREMGenerator",
 				"ShapeUtils": "api/zh/extras/ShapeUtils"
 			},
 
@@ -721,7 +723,7 @@ var list = {
 				"Frustum": "api/zh/math/Frustum",
 				"Interpolant": "api/zh/math/Interpolant",
 				"Line3": "api/zh/math/Line3",
-				"Math": "api/zh/math/Math",
+				"MathUtils": "api/zh/math/MathUtils",
 				"Matrix3": "api/zh/math/Matrix3",
 				"Matrix4": "api/zh/math/Matrix4",
 				"Plane": "api/zh/math/Plane",
@@ -761,7 +763,7 @@ var list = {
 				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
-				"WebGLRenderTargetCube": "api/zh/renderers/WebGLRenderTargetCube"
+				"WebGLCubeRenderTarget": "api/zh/renderers/WebGLCubeRenderTarget"
 			},
 
 			"渲染器 / 着色器": {
@@ -769,6 +771,10 @@ var list = {
 				"ShaderLib": "api/zh/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/zh/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/zh/renderers/shaders/UniformsUtils"
+			},
+
+			"渲染器 / WebXR": {
+				"WebXRManager": "api/zh/renderers/webxr/WebXRManager"
 			},
 
 			"场景": {

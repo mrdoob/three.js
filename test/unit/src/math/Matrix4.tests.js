@@ -8,8 +8,7 @@ import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Euler } from '../../../../src/math/Euler';
 import { Quaternion } from '../../../../src/math/Quaternion';
-import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { _Math } from '../../../../src/math/Math';
+import { MathUtils } from '../../../../src/math/MathUtils';
 import { eps } from './Constants.tests';
 
 
@@ -418,29 +417,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyToBufferAttribute", ( assert ) => {
-
-			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
-			var attr = new Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
-			var expected = new Float32BufferAttribute( [
-				0.1666666716337204, 0.4444444477558136, 0.7222222089767456,
-				0.1599999964237213, 0.4399999976158142, 0.7200000286102295
-			], 3 );
-
-			var applied = a.applyToBufferAttribute( attr );
-
-			assert.strictEqual( expected.count, applied.count, "Applied buffer and expected buffer have the same number of entries" );
-
-			for ( var i = 0, l = expected.count; i < l; i ++ ) {
-
-				assert.ok( Math.abs( applied.getX( i ) - expected.getX( i ) ) <= eps, "Check x" );
-				assert.ok( Math.abs( applied.getY( i ) - expected.getY( i ) ) <= eps, "Check y" );
-				assert.ok( Math.abs( applied.getZ( i ) - expected.getZ( i ) ) <= eps, "Check z" );
-
-			}
-
-		} );
-
 		QUnit.test( "determinant", ( assert ) => {
 
 			var a = new Matrix4();
@@ -485,26 +461,15 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "getInverse", ( assert ) => {
 
+			var zero = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var identity = new Matrix4();
 
 			var a = new Matrix4();
 			var b = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
-			var c = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
-			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
-			b.getInverse( a, false );
-			assert.ok( matrixEquals4( b, new Matrix4() ), "Passed!" );
+			a.getInverse( b );
+			assert.ok( matrixEquals4( a, zero ), "Passed!" );
 
-			try {
-
-				b.getInverse( c, true );
-				assert.ok( false, "Passed!" ); // should never get here.
-
-			} catch ( err ) {
-
-				assert.ok( true, "Passed!" );
-
-			}
 
 			var testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),
@@ -570,7 +535,7 @@ export default QUnit.module( 'Maths', () => {
 			var b = new Vector3( 2, 3, 4 );
 			var c = new Matrix4().set( 1, 0, 0, 2, 0, 1, 0, 3, 0, 0, 1, 4, 0, 0, 0, 1 );
 
-			a.makeTranslation( b );
+			a.makeTranslation( b.x, b.y, b.z );
 			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );
@@ -613,7 +578,7 @@ export default QUnit.module( 'Maths', () => {
 		QUnit.test( "makeRotationAxis", ( assert ) => {
 
 			var axis = new Vector3( 1.5, 0.0, 1.0 ).normalize();
-			var radians = _Math.degToRad( 45 );
+			var radians = MathUtils.degToRad( 45 );
 			var a = new Matrix4().makeRotationAxis( axis, radians );
 
 			var expected = new Matrix4().set(

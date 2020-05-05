@@ -4,7 +4,7 @@ import { LineSegments } from './../objects/LineSegments';
 
 export class BoxHelper extends LineSegments {
 
-	constructor( object: Object3D, color?: Color );
+	constructor( object: Object3D, color?: Color | string | number );
 
 	update( object?: Object3D ): void;
 

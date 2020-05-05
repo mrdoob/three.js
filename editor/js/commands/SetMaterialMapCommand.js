@@ -134,4 +134,4 @@ SetMaterialMapCommand.prototype = {
 
 };
 
-export { SetMaterialMapCommand };
+export { SetMaterialMapCommand };

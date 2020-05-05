@@ -1,13 +1,9 @@
-import { Vector3 } from './Vector3.js';
-
 /**
  * @author alteredq / http://alteredqualia.com/
  * @author WestLangley / http://github.com/WestLangley
  * @author bhouston / http://clara.io
  * @author tschw
  */
-
-var _vector = new Vector3();
 
 function Matrix3() {
 
@@ -76,6 +72,16 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	extractBasis: function ( xAxis, yAxis, zAxis ) {
+
+		xAxis.setFromMatrix3Column( this, 0 );
+		yAxis.setFromMatrix3Column( this, 1 );
+		zAxis.setFromMatrix3Column( this, 2 );
+
+		return this;
+
+	},
+
 	setFromMatrix4: function ( m ) {
 
 		var me = m.elements;
@@ -89,24 +95,6 @@ Object.assign( Matrix3.prototype, {
 		);
 
 		return this;
-
-	},
-
-	applyToBufferAttribute: function ( attribute ) {
-
-		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
-
-			_vector.x = attribute.getX( i );
-			_vector.y = attribute.getY( i );
-			_vector.z = attribute.getZ( i );
-
-			_vector.applyMatrix3( this );
-
-			attribute.setXYZ( i, _vector.x, _vector.y, _vector.z );
-
-		}
-
-		return attribute;
 
 	},
 
@@ -178,9 +166,9 @@ Object.assign( Matrix3.prototype, {
 
 	getInverse: function ( matrix, throwOnDegenerate ) {
 
-		if ( matrix && matrix.isMatrix4 ) {
+		if ( throwOnDegenerate !== undefined ) {
 
-			console.error( "THREE.Matrix3: .getInverse() no longer takes a Matrix4 argument." );
+			console.warn( "THREE.Matrix3: .getInverse() can no longer be configured to throw on degenerate." );
 
 		}
 
@@ -197,23 +185,7 @@ Object.assign( Matrix3.prototype, {
 
 			det = n11 * t11 + n21 * t12 + n31 * t13;
 
-		if ( det === 0 ) {
-
-			var msg = "THREE.Matrix3: .getInverse() can't invert matrix, determinant is 0";
-
-			if ( throwOnDegenerate === true ) {
-
-				throw new Error( msg );
-
-			} else {
-
-				console.warn( msg );
-
-			}
-
-			return this.identity();
-
-		}
+		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
 		var detInv = 1 / det;
 

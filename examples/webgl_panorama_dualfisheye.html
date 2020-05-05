@@ -19,7 +19,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - dualfisheye panorama
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js webgl</a> - dualfisheye panorama
 		</div>
 
 		<script type="module">
@@ -88,7 +88,6 @@
 
 				var texture = new THREE.TextureLoader().load( 'textures/ricoh_theta_s.jpg' );
 				texture.minFilter = THREE.LinearFilter;
-				texture.format = THREE.RGBFormat;
 
 				var material = new THREE.MeshBasicMaterial( { map: texture } );
 
@@ -155,7 +154,7 @@
 
 				distance += event.deltaY * 0.05;
 
-				distance = THREE.Math.clamp( distance, 400, 1000 );
+				distance = THREE.MathUtils.clamp( distance, 400, 1000 );
 
 			}
 
@@ -175,8 +174,8 @@
 				}
 
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = THREE.Math.degToRad( 90 - lat );
-				theta = THREE.Math.degToRad( lon - 180 );
+				phi = THREE.MathUtils.degToRad( 90 - lat );
+				theta = THREE.MathUtils.degToRad( lon - 180 );
 
 				camera.position.x = distance * Math.sin( phi ) * Math.cos( theta );
 				camera.position.y = distance * Math.cos( phi );

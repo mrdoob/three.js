@@ -77,7 +77,7 @@
 
 						case 17: // Ctrl
 							control.setTranslationSnap( 100 );
-							control.setRotationSnap( THREE.Math.degToRad( 15 ) );
+							control.setRotationSnap( THREE.MathUtils.degToRad( 15 ) );
 							break;
 
 						case 87: // W
@@ -159,6 +159,12 @@
 
 			}
 
+		</script>
+
+		<script>
+			if (navigator.webdriver) { // off for testing
+				setTimeout(() => { document.getElementsByTagName('div')[1].style.display = 'none' }, 750)
+			}
 		</script>
 
 	</body>

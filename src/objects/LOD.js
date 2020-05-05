@@ -14,6 +14,8 @@ function LOD() {
 
 	Object3D.call( this );
 
+	this._currentLevel = 0;
+
 	this.type = 'LOD';
 
 	Object.defineProperties( this, {
@@ -79,6 +81,12 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
+	getCurrentLevel: function () {
+
+		return this._currentLevel;
+
+	},
+
 	getObjectForDistance: function ( distance ) {
 
 		var levels = this.levels;
@@ -128,7 +136,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			_v1.setFromMatrixPosition( camera.matrixWorld );
 			_v2.setFromMatrixPosition( this.matrixWorld );
 
-			var distance = _v1.distanceTo( _v2 );
+			var distance = _v1.distanceTo( _v2 ) / camera.zoom;
 
 			levels[ 0 ].object.visible = true;
 
@@ -146,6 +154,8 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 				}
 
 			}
+
+			this._currentLevel = i - 1;
 
 			for ( ; i < l; i ++ ) {
 

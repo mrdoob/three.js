@@ -84,7 +84,7 @@ var SidebarObject = function ( editor ) {
 	var objectUUID = new UIInput().setWidth( '102px' ).setFontSize( '12px' ).setDisabled( true );
 	var objectUUIDRenew = new UIButton( strings.getKey( 'sidebar/object/new' ) ).setMarginLeft( '7px' ).onClick( function () {
 
-		objectUUID.setValue( THREE.Math.generateUUID() );
+		objectUUID.setValue( THREE.MathUtils.generateUUID() );
 
 		editor.execute( new SetUuidCommand( editor, editor.selected, objectUUID.getValue() ) );
 
@@ -125,9 +125,9 @@ var SidebarObject = function ( editor ) {
 	// rotation
 
 	var objectRotationRow = new UIRow();
-	var objectRotationX = new UINumber().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
-	var objectRotationY = new UINumber().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
-	var objectRotationZ = new UINumber().setStep( 10 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationX = new UINumber().setStep( 10 ).setNudge( 0.1 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationY = new UINumber().setStep( 10 ).setNudge( 0.1 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
+	var objectRotationZ = new UINumber().setStep( 10 ).setNudge( 0.1 ).setUnit( '°' ).setWidth( '50px' ).onChange( update );
 
 	objectRotationRow.add( new UIText( strings.getKey( 'sidebar/object/rotation' ) ).setWidth( '90px' ) );
 	objectRotationRow.add( objectRotationX, objectRotationY, objectRotationZ );
@@ -300,10 +300,29 @@ var SidebarObject = function ( editor ) {
 	var objectReceiveShadow = new UIBoolean( false, strings.getKey( 'sidebar/object/receive' ) ).onChange( update );
 	objectShadowRow.add( objectReceiveShadow );
 
-	var objectShadowRadius = new UINumber( 1 ).onChange( update );
-	objectShadowRow.add( objectShadowRadius );
-
 	container.add( objectShadowRow );
+
+	// shadow radius
+
+	var objectShadowRadiusRow = new UIRow();
+
+	objectShadowRadiusRow.add( new UIText( strings.getKey( 'sidebar/object/shadowRadius' ) ).setWidth( '90px' ) );
+
+	var objectShadowRadius = new UINumber( 1 ).onChange( update );
+	objectShadowRadiusRow.add( objectShadowRadius );
+
+	container.add( objectShadowRadiusRow );
+
+	// shadow bias
+
+	var objectShadowBiasRow = new UIRow();
+
+	objectShadowBiasRow.add( new UIText( strings.getKey( 'sidebar/object/shadowBias' ) ).setWidth( '90px' ) );
+
+	var objectShadowBias = new UINumber( 0 ).setPrecision( 6 ).setStep( 0.001 ).setNudge( 0.000001 ).onChange( update );
+	objectShadowBiasRow.add( objectShadowBias );
+
+	container.add( objectShadowBiasRow );
 
 	// visible
 
@@ -429,7 +448,7 @@ var SidebarObject = function ( editor ) {
 
 			}
 
-			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.Math.DEG2RAD, objectRotationY.getValue() * THREE.Math.DEG2RAD, objectRotationZ.getValue() * THREE.Math.DEG2RAD );
+			var newRotation = new THREE.Euler( objectRotationX.getValue() * THREE.MathUtils.DEG2RAD, objectRotationY.getValue() * THREE.MathUtils.DEG2RAD, objectRotationZ.getValue() * THREE.MathUtils.DEG2RAD );
 			if ( object.rotation.toVector3().distanceTo( newRotation.toVector3() ) >= 0.01 ) {
 
 				editor.execute( new SetRotationCommand( editor, object, newRotation ) );
@@ -568,7 +587,7 @@ var SidebarObject = function ( editor ) {
 
 			if ( object.receiveShadow !== undefined && object.receiveShadow !== objectReceiveShadow.getValue() ) {
 
-				object.material.needsUpdate = true;
+				if ( object.material !== undefined ) object.material.needsUpdate = true;
 				editor.execute( new SetValueCommand( editor, object, 'receiveShadow', objectReceiveShadow.getValue() ) );
 
 			}
@@ -578,6 +597,12 @@ var SidebarObject = function ( editor ) {
 				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
 
 					editor.execute( new SetValueCommand( editor, object.shadow, 'radius', objectShadowRadius.getValue() ) );
+
+				}
+
+				if ( object.shadow.bias !== objectShadowBias.getValue() ) {
+
+					editor.execute( new SetValueCommand( editor, object.shadow, 'bias', objectShadowBias.getValue() ) );
 
 				}
 
@@ -621,12 +646,26 @@ var SidebarObject = function ( editor ) {
 			'decay': objectDecayRow,
 			'castShadow': objectShadowRow,
 			'receiveShadow': objectReceiveShadow,
-			'shadow': objectShadowRadius
+			'shadow': [ objectShadowRadiusRow, objectShadowBiasRow ]
 		};
 
 		for ( var property in properties ) {
 
-			properties[ property ].setDisplay( object[ property ] !== undefined ? '' : 'none' );
+			var uiElement = properties[ property ];
+
+			if ( Array.isArray( uiElement ) === true ) {
+
+				for ( var i = 0; i < uiElement.length; i ++ ) {
+
+					uiElement[ i ].setDisplay( object[ property ] !== undefined ? '' : 'none' );
+
+				}
+
+			} else {
+
+				uiElement.setDisplay( object[ property ] !== undefined ? '' : 'none' );
+
+			}
 
 		}
 
@@ -695,9 +734,9 @@ var SidebarObject = function ( editor ) {
 		objectPositionY.setValue( object.position.y );
 		objectPositionZ.setValue( object.position.z );
 
-		objectRotationX.setValue( object.rotation.x * THREE.Math.RAD2DEG );
-		objectRotationY.setValue( object.rotation.y * THREE.Math.RAD2DEG );
-		objectRotationZ.setValue( object.rotation.z * THREE.Math.RAD2DEG );
+		objectRotationX.setValue( object.rotation.x * THREE.MathUtils.RAD2DEG );
+		objectRotationY.setValue( object.rotation.y * THREE.MathUtils.RAD2DEG );
+		objectRotationZ.setValue( object.rotation.z * THREE.MathUtils.RAD2DEG );
 
 		objectScaleX.setValue( object.scale.x );
 		objectScaleY.setValue( object.scale.y );
@@ -802,6 +841,7 @@ var SidebarObject = function ( editor ) {
 		if ( object.shadow !== undefined ) {
 
 			objectShadowRadius.setValue( object.shadow.radius );
+			objectShadowBias.setValue( object.shadow.bias );
 
 		}
 

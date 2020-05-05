@@ -215,7 +215,7 @@
 
   function similarType(a, b, depth) {
     if (!a || depth >= 5) return b;
-    if (!a || a == b) return a;
+    if (a == b) return a;
     if (!b) return a;
     if (a.constructor != b.constructor) return false;
     if (a.constructor == Arr) {

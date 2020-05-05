@@ -138,7 +138,7 @@ export class Vector2 implements Vector {
 	y: number;
 	width: number;
 	height: number;
-	isVector2: true;
+	readonly isVector2: true;
 
 	/**
 	 * Sets value of this vector.
@@ -458,5 +458,10 @@ export class Vector2 implements Vector {
 	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
 	 */
 	manhattanDistanceTo( v: Vector2 ): number;
+
+	/**
+	 * Sets this vector's x and y from Math.random
+	 */
+	random(): this;
 
 }

@@ -18,7 +18,8 @@ THREE.UniformsLib.line = {
 	resolution: { value: new THREE.Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
-	gapSize: { value: 1 } // todo FIX - maybe change to totalSize
+	gapSize: { value: 1 }, // todo FIX - maybe change to totalSize
+	opacity: { value: 1 }
 
 };
 
@@ -228,10 +229,10 @@ THREE.ShaderLib[ 'line' ] = {
 
 			gl_FragColor = vec4( diffuseColor.rgb, diffuseColor.a );
 
-			#include <premultiplied_alpha_fragment>
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>
 			#include <fog_fragment>
+			#include <premultiplied_alpha_fragment>
 
 		}
 		`
@@ -341,6 +342,24 @@ THREE.LineMaterial = function ( parameters ) {
 			set: function ( value ) {
 
 				this.uniforms.gapSize.value = value;
+
+			}
+
+		},
+
+		opacity: {
+
+			enumerable: true,
+
+			get: function () {
+
+				return this.uniforms.opacity.value;
+
+			},
+
+			set: function ( value ) {
+
+				this.uniforms.opacity.value = value;
 
 			}
 

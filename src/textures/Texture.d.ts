@@ -1,4 +1,4 @@
-import { Vector2, Vector } from './../math/Vector2';
+import { Vector2 } from './../math/Vector2';
 import { EventDispatcher } from './../core/EventDispatcher';
 import {
 	Mapping,
@@ -33,7 +33,7 @@ export class Texture extends EventDispatcher {
 	name: string;
 	sourceFile: string;
 	image: any; // HTMLImageElement or ImageData or { width: number, height: number } in some children;
-	mipmaps: ImageData[];
+	mipmaps: any[]; // ImageData[] for 2D textures and CubeTexture[] for cube textures;
 	mapping: Mapping;
 	wrapS: Wrapping;
 	wrapT: Wrapping;
@@ -54,6 +54,8 @@ export class Texture extends EventDispatcher {
 	encoding: TextureEncoding;
 	version: number;
 	needsUpdate: boolean;
+	readonly isTexture: true;
+
 	onUpdate: () => void;
 	static DEFAULT_IMAGE: any;
 	static DEFAULT_MAPPING: any;
@@ -62,6 +64,6 @@ export class Texture extends EventDispatcher {
 	copy( source: Texture ): this;
 	toJSON( meta: any ): any;
 	dispose(): void;
-	transformUv( uv: Vector ): void;
+	transformUv( uv: Vector2 ): Vector2;
 
 }
