@@ -668,3 +668,5 @@ WebGLMaterials.prototype.refreshUniformsNormal = function ( uniforms, material )
 	}
 
 };
+
+export { WebGLMaterials };
