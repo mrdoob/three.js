@@ -54,6 +54,8 @@
 				camera.add( dirLight );
 				camera.add( dirLight.target );
 
+				// load house
+
 				var loader = new VRMLLoader();
 				loader.load( 'models/vrml/house.wrl', function ( object ) {
 
@@ -62,6 +64,22 @@
 					controls.ground.push( object );
 
 				} );
+
+				// ground
+
+				var groundMaterial = new THREE.MeshBasicMaterial();
+				groundMaterial.transparent = true;
+				groundMaterial.opacity = 0;
+				var groundGeometry = new THREE.PlaneGeometry( 20, 20 );
+				var ground = new THREE.Mesh( groundGeometry, groundMaterial );
+
+				ground.renderOrder = 1;
+				ground.rotateX( - Math.PI / 2 );
+
+				ground.geometry.faces[ 0 ].normal.set( 0, 1, 0 );
+				ground.geometry.faces[ 1 ].normal.set( 0, 1, 0 );
+
+				scene.add( ground );
 
 				// renderer
 
@@ -73,6 +91,7 @@
 				// controls
 
 				controls = new IndoorControls( camera, renderer.domElement );
+				controls.ground.push( ground );
 
 				// controls cursor
 
@@ -91,14 +110,14 @@
 
 				mouseHelper.visible = false;
 
-				ring.renderOrder = 1;
-				mouseHelper.renderOrder = 1;
+				ring.renderOrder = 2;
+				mouseHelper.renderOrder = 2;
 
 				scene.add( mouseHelper );
 
 				// controls cursor move
 
-				controls.addEventListener( 'move', function ( event ) {
+				controls.addEventListener( 'mousemove', function ( event ) {
 
 					var intersect = event.intersect;
 					var normal = intersect.face.normal;
