@@ -355,6 +355,7 @@ var files = {
 		"misc_controls_deviceorientation",
 		"misc_controls_drag",
 		"misc_controls_fly",
+		"misc_controls_indoor",
 		"misc_controls_map",
 		"misc_controls_orbit",
 		"misc_controls_pointerlock",
