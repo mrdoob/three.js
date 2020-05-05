@@ -111,6 +111,8 @@ class ParametricTubeGeometry extends ParametricGeometry {
 			normals = frames.normals,
 			binormals = frames.binormals;
 
+		var position = new Vector3();
+
 		var ParametricTube = function ( u, v, target ) {
 
 			v *= 2 * Math.PI;
@@ -118,7 +120,7 @@ class ParametricTubeGeometry extends ParametricGeometry {
 			var i = u * segments;
 			i = Math.floor( i );
 
-			var pos = path.getPointAt( u );
+			path.getPointAt( u, position );
 
 			var normal = normals[ i ];
 			var binormal = binormals[ i ];
@@ -126,11 +128,11 @@ class ParametricTubeGeometry extends ParametricGeometry {
 			var cx = radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 			var cy = radius * Math.sin( v );
 
-			pos.x += cx * normal.x + cy * binormal.x;
-			pos.y += cx * normal.y + cy * binormal.y;
-			pos.z += cx * normal.z + cy * binormal.z;
+			position.x += cx * normal.x + cy * binormal.x;
+			position.y += cx * normal.y + cy * binormal.y;
+			position.z += cx * normal.z + cy * binormal.z;
 
-			target.copy( pos );
+			target.copy( position );
 
 		};
 
