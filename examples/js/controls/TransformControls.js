@@ -56,7 +56,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		var allIntersections = raycaster.intersectObject( object, true );
 
-		for ( var i = allIntersections.length; i --; ) {
+		for ( var i = 0; i < allIntersections.length; i ++ ) {
 
 			if ( allIntersections[ i ].object.visible || includeInvisible ) {
 
