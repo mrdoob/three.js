@@ -205,6 +205,7 @@ var GLTFLoader = ( function () {
 
 			var content;
 			var extensions = {};
+			var plugins = {};
 
 			if ( typeof data === 'string' ) {
 
@@ -243,6 +244,27 @@ var GLTFLoader = ( function () {
 
 				if ( onError ) onError( new Error( 'THREE.GLTFLoader: Unsupported asset. glTF versions >=2.0 are supported.' ) );
 				return;
+
+			}
+
+			var parser = new GLTFParser( json, {
+
+				path: path || this.resourcePath || '',
+				crossOrigin: this.crossOrigin,
+				manager: this.manager
+
+			} );
+
+			for ( var i = 0; i < this.pluginCallbacks.length; i ++ ) {
+
+				var plugin = this.pluginCallbacks[ i ]( parser );
+				plugins[ plugin.name ] = plugin;
+
+				// Workaround to avoid determining as unknown extension
+				// in addUnknownExtensionsToUserData().
+				// Remove this workaround if we move all the existing
+				// extension handlers to plugin system
+				extensions[ plugin.name ] = true;
 
 			}
 
@@ -285,7 +307,7 @@ var GLTFLoader = ( function () {
 
 						default:
 
-							if ( extensionsRequired.indexOf( extensionName ) >= 0 ) {
+							if ( extensionsRequired.indexOf( extensionName ) >= 0 && plugins[ extensionName ] === undefined ) {
 
 								console.warn( 'THREE.GLTFLoader: Unknown extension "' + extensionName + '".' );
 
@@ -297,14 +319,8 @@ var GLTFLoader = ( function () {
 
 			}
 
-			var parser = new GLTFParser( json, extensions, {
-
-				path: path || this.resourcePath || '',
-				crossOrigin: this.crossOrigin,
-				manager: this.manager
-
-			} );
-			parser.setPluginCallbacks( this.pluginCallbacks );
+			parser.setExtensions( extensions );
+			parser.setPlugins( plugins );
 			parser.parse( onLoad, onError );
 
 		}
@@ -1492,10 +1508,10 @@ var GLTFLoader = ( function () {
 
 	/* GLTF PARSER */
 
-	function GLTFParser( json, extensions, options ) {
+	function GLTFParser( json, options ) {
 
 		this.json = json || {};
-		this.extensions = extensions || {};
+		this.extensions = {};
 		this.plugins = {};
 		this.options = options || {};
 
@@ -1519,20 +1535,15 @@ var GLTFLoader = ( function () {
 
 	}
 
-	GLTFParser.prototype.setPluginCallbacks = function ( pluginCallbacks ) {
+	GLTFParser.prototype.setExtensions = function ( extensions ) {
 
-		for ( var i = 0; i < pluginCallbacks.length; i ++ ) {
+		this.extensions = extensions;
 
-			var plugin = pluginCallbacks[ i ]( this );
-			this.plugins[ plugin.name ] = plugin;
+	};
 
-			// Workaround to avoid determining as unknown extension
-			// in addUnknownExtensionsToUserData().
-			// Remove this workaround if we move all the existing
-			// extension handlers to plugin system
-			this.extensions[ plugin.name ] = true;
+	GLTFParser.prototype.setPlugins = function ( plugins ) {
 
-		}
+		this.plugins = plugins;
 
 	};
 
