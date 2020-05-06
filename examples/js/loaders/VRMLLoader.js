@@ -647,6 +647,10 @@ THREE.VRMLLoader = ( function () {
 						build = buildElevationGridNode( node );
 						break;
 
+					case 'Extrusion':
+						build = buildExtrusionNode( node );
+						break;
+
 					case 'Color':
 					case 'Coordinate':
 					case 'Normal':
@@ -681,7 +685,6 @@ THREE.VRMLLoader = ( function () {
 					case 'TouchSensor':
 					case 'VisibilitySensor':
 
-					case 'Extrusion':
 					case 'Text':
 
 					case 'FontStyle':
@@ -2376,6 +2379,250 @@ THREE.VRMLLoader = ( function () {
 				geometry.setAttribute( 'uv', uvAttribute );
 
 				if ( colorAttribute ) geometry.setAttribute( 'color', colorAttribute );
+
+				// "solid" influences the material so let's store it for later use
+
+				geometry._solid = solid;
+				geometry._type = 'mesh';
+
+				return geometry;
+
+			}
+
+			function buildExtrusionNode( node ) {
+
+				var crossSection = [ 1, 1, 1, - 1, - 1, - 1, - 1, 1, 1, 1 ];
+				var spine = [ 0, 0, 0, 0, 1, 0 ];
+				var scale;
+				var orientation;
+
+				var beginCap = true;
+				var ccw = true;
+				var creaseAngle = 0;
+				var endCap = true;
+				var solid = true;
+
+				var fields = node.fields;
+
+				for ( var i = 0, l = fields.length; i < l; i ++ ) {
+
+					var field = fields[ i ];
+					var fieldName = field.name;
+					var fieldValues = field.values;
+
+					switch ( fieldName ) {
+
+						case 'beginCap':
+							beginCap = fieldValues[ 0 ];
+							break;
+
+						case 'ccw':
+							ccw = fieldValues[ 0 ];
+							break;
+
+						case 'convex':
+							// field not supported
+							break;
+
+						case 'creaseAngle':
+							creaseAngle = fieldValues[ 0 ];
+							break;
+
+						case 'crossSection':
+							crossSection = fieldValues;
+							break;
+
+						case 'endCap':
+							endCap = fieldValues[ 0 ];
+							break;
+
+						case 'orientation':
+							orientation = fieldValues;
+							break;
+
+						case 'scale':
+							scale = fieldValues;
+							break;
+
+						case 'solid':
+							solid = fieldValues[ 0 ];
+							break;
+
+						case 'spine':
+							spine = fieldValues; // only extrusion along the Y-axis are supported so far
+							break;
+
+						default:
+							console.warn( 'THREE.VRMLLoader: Unknown field:', fieldName );
+							break;
+
+					}
+
+				}
+
+				var crossSectionClosed = ( crossSection[ 0 ] === crossSection[ crossSection.length - 2 ] && crossSection[ 1 ] === crossSection[ crossSection.length - 1 ] );
+
+				// vertices
+
+				var vertices = [];
+				var spineVector = new THREE.Vector3();
+				var scaling = new THREE.Vector3();
+
+				var axis = new THREE.Vector3();
+				var vertex = new THREE.Vector3();
+				var quaternion = new THREE.Quaternion();
+
+				for ( var i = 0, j = 0, o = 0, il = spine.length; i < il; i += 3, j += 2, o += 4 ) {
+
+					spineVector.fromArray( spine, i );
+
+					scaling.x = scale ? scale[ j + 0 ] : 1;
+					scaling.y = 1;
+					scaling.z = scale ? scale[ j + 1 ] : 1;
+
+					axis.x = orientation ? orientation[ o + 0 ] : 0;
+					axis.y = orientation ? orientation[ o + 1 ] : 0;
+					axis.z = orientation ? orientation[ o + 2 ] : 1;
+					var angle = orientation ? orientation[ o + 3 ] : 0;
+
+					for ( var k = 0, kl = crossSection.length; k < kl; k += 2 ) {
+
+						vertex.x = crossSection[ k + 0 ];
+						vertex.y = 0;
+						vertex.z = crossSection[ k + 1 ];
+
+						// scale
+
+						vertex.multiply( scaling );
+
+						// rotate
+
+						quaternion.setFromAxisAngle( axis, angle );
+						vertex.applyQuaternion( quaternion );
+
+						// translate
+
+						vertex.add( spineVector );
+
+						vertices.push( vertex.x, vertex.y, vertex.z );
+
+					}
+
+				}
+
+				// indices
+
+				var indices = [];
+
+				var spineCount = spine.length / 3;
+				var crossSectionCount = crossSection.length / 2;
+
+				for ( var i = 0; i < spineCount - 1; i ++ ) {
+
+					for ( var j = 0; j < crossSectionCount - 1; j ++ ) {
+
+						var a = j + i * crossSectionCount;
+						var b = ( j + 1 ) + i * crossSectionCount;
+						var c = j + ( i + 1 ) * crossSectionCount;
+						var d = ( j + 1 ) + ( i + 1 ) * crossSectionCount;
+
+						if ( ( j === crossSectionCount - 2 ) && ( crossSectionClosed === true ) ) {
+
+							b = i * crossSectionCount;
+							d = ( i + 1 ) * crossSectionCount;
+
+						}
+
+						if ( ccw === true ) {
+
+							indices.push( a, b, c );
+							indices.push( c, b, d );
+
+						} else {
+
+							indices.push( a, c, b );
+							indices.push( c, d, b );
+
+						}
+
+					}
+
+				}
+
+				// triangulate cap
+
+				if ( beginCap === true || endCap === true ) {
+
+					var contour = [];
+
+					for ( var i = 0, l = crossSection.length; i < l; i += 2 ) {
+
+						contour.push( new THREE.Vector2( crossSection[ i ], crossSection[ i + 1 ] ) );
+
+					}
+
+					var faces = THREE.ShapeUtils.triangulateShape( contour, [] );
+					var capIndices = [];
+
+					for ( var i = 0, l = faces.length; i < l; i ++ ) {
+
+						var face = faces[ i ];
+
+						capIndices.push( face[ 0 ], face[ 1 ], face[ 2 ] );
+
+					}
+
+					// begin cap
+
+					if ( beginCap === true ) {
+
+						for ( var i = 0, l = capIndices.length; i < l; i += 3 ) {
+
+							if ( ccw === true ) {
+
+								indices.push( capIndices[ i + 0 ], capIndices[ i + 1 ], capIndices[ i + 2 ] );
+
+							} else {
+
+								indices.push( capIndices[ i + 0 ], capIndices[ i + 2 ], capIndices[ i + 1 ] );
+
+							}
+
+						}
+
+					}
+
+					// end cap
+
+					if ( endCap === true ) {
+
+						var indexOffset = crossSectionCount * ( spineCount - 1 ); // references to the first vertex of the last cross section
+
+						for ( var i = 0, l = capIndices.length; i < l; i += 3 ) {
+
+							if ( ccw === true ) {
+
+								indices.push( indexOffset + capIndices[ i + 0 ], indexOffset + capIndices[ i + 2 ], indexOffset + capIndices[ i + 1 ] );
+
+							} else {
+
+								indices.push( indexOffset + capIndices[ i + 0 ], indexOffset + capIndices[ i + 1 ], indexOffset + capIndices[ i + 2 ] );
+
+							}
+
+						}
+
+					}
+
+				}
+
+				var positionAttribute = toNonIndexedAttribute( indices, new THREE.Float32BufferAttribute( vertices, 3 ) );
+				var normalAttribute = computeNormalAttribute( indices, vertices, creaseAngle );
+
+				var geometry = new THREE.BufferGeometry();
+				geometry.setAttribute( 'position', positionAttribute );
+				geometry.setAttribute( 'normal', normalAttribute );
+				// no uvs yet
 
 				// "solid" influences the material so let's store it for later use
 
