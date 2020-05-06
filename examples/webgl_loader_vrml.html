@@ -31,7 +31,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRMLLoader } from './jsm/loaders/VRMLLoader.js';
 
-			var camera, scene, renderer, stats;
+			var camera, scene, renderer, stats, controls;
 
 			init();
 			animate();
@@ -39,7 +39,7 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1e10 );
-				camera.position.z = 6;
+				camera.position.set( - 10, 5, 10 );
 
 				scene = new THREE.Scene();
 				scene.add( camera );
@@ -47,7 +47,7 @@
 				// light
 
 				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 200, 200, 1000 ).normalize();
+				dirLight.position.set( 200, 200, 1000 );
 
 				camera.add( dirLight );
 				camera.add( dirLight.target );
@@ -68,9 +68,10 @@
 
 				// controls
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 100;
+				controls.enableDamping = true;
 
 				//
 
@@ -95,6 +96,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				controls.update(); // to support damping
 
 				renderer.render( scene, camera );
 
