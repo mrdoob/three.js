@@ -1,7 +1,7 @@
-import { BackSide } from "../../constants";
+import { BackSide } from "../../constants.js";
 
 /**
- * @author taphos / https://github.com/taphos
+ * @author mrdoob / http://mrdoob.com/
  *
  * This is a helper which deals with webgl specific logic of builtin materials
  * i.e. uniforms refresh before material is being rendered
