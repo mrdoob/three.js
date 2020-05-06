@@ -2533,7 +2533,7 @@ var VRMLLoader = ( function () {
 
 						vertex.multiply( scaling );
 
-						// rotation
+						// rotate
 
 						quaternion.setFromAxisAngle( axis, angle );
 						vertex.applyQuaternion( quaternion );
@@ -2660,6 +2660,7 @@ var VRMLLoader = ( function () {
 				var geometry = new BufferGeometry();
 				geometry.setAttribute( 'position', positionAttribute );
 				geometry.setAttribute( 'normal', normalAttribute );
+				// no uvs yet
 
 				// "solid" influences the material so let's store it for later use
 
