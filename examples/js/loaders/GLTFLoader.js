@@ -15,8 +15,8 @@ THREE.GLTFLoader = ( function () {
 		this.dracoLoader = null;
 		this.ddsLoader = null;
 
-		this.plugins = [];
-		this.register( GLTFMaterialsClearcoatExtension );
+		this.pluginCallbacks = [];
+		this.register( function ( parser ) { return new GLTFMaterialsClearcoatExtension( parser ); } );
 
 	}
 
@@ -113,11 +113,11 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
-		register: function ( plugin ) {
+		register: function ( callback ) {
 
-			if ( ! this.plugins.includes( plugin ) ) {
+			if ( ! this.pluginCallbacks.includes( callback ) ) {
 
-				this.plugins.push( plugin );
+				this.pluginCallbacks.push( callback );
 
 			}
 
@@ -125,11 +125,11 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
-		unregister: function ( plugin ) {
+		unregister: function ( callback ) {
 
-			if ( this.plugins.includes( plugin ) ) {
+			if ( this.pluginCallbacks.includes( callback ) ) {
 
-				this.plugins.splice( this.plugins.indexOf( plugin ), 1 );
+				this.pluginCallbacks.splice( this.pluginCallbacks.indexOf( callback ), 1 );
 
 			}
 
@@ -240,7 +240,7 @@ THREE.GLTFLoader = ( function () {
 				manager: this.manager
 
 			} );
-			parser.setPlugins( this.plugins );
+			parser.setPluginCallbacks( this.pluginCallbacks );
 			parser.parse( onLoad, onError );
 
 		}
@@ -1455,11 +1455,11 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	GLTFParser.prototype.setPlugins = function ( pluginList ) {
+	GLTFParser.prototype.setPluginCallbacks = function ( pluginCallbacks ) {
 
-		for ( var i = 0; i < pluginList.length; i ++ ) {
+		for ( var i = 0; i < pluginCallbacks.length; i ++ ) {
 
-			var plugin = new pluginList[ i ]( this );
+			var plugin = pluginCallbacks[ i ]( this );
 			this.plugins[ plugin.name ] = plugin;
 
 			// Workaround to avoid determining as unknown extension
