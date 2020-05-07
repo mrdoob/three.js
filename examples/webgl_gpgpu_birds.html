@@ -214,9 +214,9 @@
 			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
 
 			/* TEXTURE WIDTH FOR SIMULATION */
-			var WIDTH = 32
+			var WIDTH = 64
 			var BIRDS = WIDTH * WIDTH;
-
+			
 			/* BAKE ANIMATION INTO TEXTURE and CREATE GEOMETRY FROM BASE MODEL */
 			var BirdGeometry = new THREE.BufferGeometry();
 			var textureAnimation, durationAnimation, originalMaterial,birdMesh, materialShader, vertexPerBird;
@@ -230,8 +230,8 @@
 			};
 
 			var geos = [ 'Parrot', 'Flamingo', 'Horse' ]
-			var colors = [ 0xE0FFFF, 0xffdeff, 0xffdede ]
-			var selectModel = 1
+			var colors = [ 0xccFFFF, 0xffdeff, 0xffdede ]
+			var selectModel = Math.floor( Math.random() * geos.length )
 			new GLTFLoader().load( 'models/gltf/' + geos[ selectModel ] + '.glb', function ( gltf ) {
 
 				var animations = gltf.animations;
@@ -382,7 +382,7 @@
 					cohesion: 20.0,
 					freedom: 0.75,
 					size: 0.1,
-					count: Math.floor( BIRDS * 0.5 )
+					count: BIRDS
 
 				};
 
