@@ -178,6 +178,8 @@
 
 					scene.add( mesh );
 
+					console.log( mesh.material)
+
 					var mixer = new THREE.AnimationMixer( mesh );
 					mixer.clipAction( gltf.animations[ 0 ] ).setDuration( 1 ).play();
 					mixers.push( mixer );
