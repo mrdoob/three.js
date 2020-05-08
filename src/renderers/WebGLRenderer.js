@@ -12,7 +12,7 @@ import {
 	FloatType,
 	UnsignedByteType,
 	LinearEncoding,
-	NoToneMapping,
+	NoToneMapping
 } from '../constants.js';
 import { MathUtils } from '../math/MathUtils.js';
 import { DataTexture } from '../textures/DataTexture.js';
@@ -1861,11 +1861,11 @@ function WebGLRenderer( parameters ) {
 
 			if ( fog && material.fog ) {
 
-				materials.refreshUniformsFog( m_uniforms, fog );
+				materials.refreshFogUniforms( m_uniforms, fog );
 
 			}
 
-			materials.refreshUniforms( m_uniforms, material, environment, _pixelRatio, _height );
+			materials.refreshMaterialUniforms( m_uniforms, material, environment, _pixelRatio, _height );
 
 			// RectAreaLight Texture
 			// TODO (mrdoob): Find a nicer implementation
@@ -1874,6 +1874,12 @@ function WebGLRenderer( parameters ) {
 			if ( m_uniforms.ltc_2 !== undefined ) m_uniforms.ltc_2.value = UniformsLib.LTC_2;
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+
+			if ( material.isShaderMaterial ) {
+
+				material.uniformsNeedUpdate = false; // #15581
+
+			}
 
 		}
 

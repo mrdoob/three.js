@@ -1,15 +1,29 @@
-import { BackSide } from "../../constants.js";
-
 /**
  * @author mrdoob / http://mrdoob.com/
- *
- * This is a helper which deals with webgl specific logic of builtin materials
- * i.e. uniforms refresh before material is being rendered
  */
+
+import { BackSide } from "../../constants.js";
 
 function WebGLMaterials( properties ) {
 
-	function refreshUniforms( uniforms, material, environment, pixelRatio, height ) {
+	function refreshFogUniforms( uniforms, fog ) {
+
+		uniforms.fogColor.value.copy( fog.color );
+
+		if ( fog.isFog ) {
+
+			uniforms.fogNear.value = fog.near;
+			uniforms.fogFar.value = fog.far;
+
+		} else if ( fog.isFogExp2 ) {
+
+			uniforms.fogDensity.value = fog.density;
+
+		}
+
+	}
+
+	function refreshMaterialUniforms( uniforms, material, environment, pixelRatio, height ) {
 
 		if ( material.isMeshBasicMaterial ) {
 
@@ -86,12 +100,6 @@ function WebGLMaterials( properties ) {
 
 			uniforms.color.value.copy( material.color );
 			uniforms.opacity.value = material.opacity;
-
-		}
-
-		if ( material.isShaderMaterial ) {
-
-			material.uniformsNeedUpdate = false; // #15581
 
 		}
 
@@ -376,23 +384,6 @@ function WebGLMaterials( properties ) {
 
 	}
 
-	function refreshUniformsFog( uniforms, fog ) {
-
-		uniforms.fogColor.value.copy( fog.color );
-
-		if ( fog.isFog ) {
-
-			uniforms.fogNear.value = fog.near;
-			uniforms.fogFar.value = fog.far;
-
-		} else if ( fog.isFogExp2 ) {
-
-			uniforms.fogDensity.value = fog.density;
-
-		}
-
-	}
-
 	function refreshUniformsLambert( uniforms, material ) {
 
 		if ( material.emissiveMap ) {
@@ -669,8 +660,8 @@ function WebGLMaterials( properties ) {
 	}
 
 	return {
-		refreshUniforms: refreshUniforms,
-		refreshUniformsFog: refreshUniformsFog
+		refreshFogUniforms: refreshFogUniforms,
+		refreshMaterialUniforms: refreshMaterialUniforms
 	};
 
 }
