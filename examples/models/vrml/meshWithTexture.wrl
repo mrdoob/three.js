@@ -1,7 +1,7 @@
 #VRML V2.0 utf8
 
 DEF Plane001 Transform {
-  translation -6.849 25.21 0
+  scale 0.1 0.1 0.1
   rotation -1 0 0 -1.571
   children [
     Shape {

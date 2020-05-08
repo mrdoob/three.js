@@ -26,7 +26,7 @@
 # Note that avatarSize must be adjusted to match collision distance between camera and geometry, height of eye above ground, and highest distance that camera is able to walk over..
 NavigationInfo {
   avatarSize [ 0.1 0.1 4 ]
-  type [ "WALK" "ANY"  ] 
+  type [ "WALK" "ANY"  ]
 }
 # A height of 10m above the ElevationGrid ensures that the camera will fall and land on top of the ground while in WALK mode.
 # Be careful not to provide viewpoints that are beneath terrain or initially locked in a collision location, or else the camera will not be able to move.
