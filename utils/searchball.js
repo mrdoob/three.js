@@ -6,12 +6,13 @@ const printImage = require( 'image-output' );
 const jimp = require( 'jimp' );
 const fs = require( 'fs' );
 
-const oututRes = 4096;
+const outputRes = 1024;
+const outputResFull = 4096;
 
 ( async () => {
 
 	const pinkPixel = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8rvTjPwAHOwMSKpP6zwAAAABJRU5ErkJggg==';
-	let output = ( await jimp.read( Buffer.from( pinkPixel, 'base64' ) ) ).resize( oututRes, oututRes );
+	let output = ( await jimp.read( Buffer.from( pinkPixel, 'base64' ) ) ).resize( outputResFull, outputResFull );
 
 	let examples = [];
 	eval( fs.readFileSync( './examples/files.js' ).toString() );
@@ -20,7 +21,7 @@ const oututRes = 4096;
 	});
 
 	const sideSize = Math.ceil( Math.sqrt( examples.length ) );
-	const tileRes = oututRes / sideSize;
+	const tileRes = outputResFull / sideSize;
 
 	for ( let id = 0; id < examples.length; id ++ ) {
 
@@ -38,9 +39,14 @@ const oututRes = 4096;
 
 	}
 
+	const pathFull = `./examples/screenshots/all_in_one_full.jpg`;
+	output.quality( 90 ).write( pathFull );
+
 	const path = `./examples/screenshots/all_in_one.jpg`;
-	output.quality( 95 ).write( path );
+	output.resize( outputRes, outputRes ).quality( 90 ).write( path );
+
 	printImage( output.bitmap, console );
+	console.log( 'out: ' + pathFull );
 	console.log( 'out: ' + path );
 
 } ) ();

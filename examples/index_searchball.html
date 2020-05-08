@@ -10,6 +10,7 @@
 		<title>three.js examples</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="preload" href="./screenshots/all_in_one.jpg">
 		<link type="text/css" rel="stylesheet" href="./main.css">
 		<style>
 			body {
@@ -55,7 +56,6 @@
 			var mouseMove, mouseMove0, mouseDown, idMove, idDown, isSwipe, tooltip, tooltipWaiting;
 
 			init();
-			animate();
 
 			function init() {
 
@@ -79,6 +79,7 @@
 				mouseMove0 = new THREE.Vector2();
 				mouseDown = new THREE.Vector2();
 				tooltip = document.getElementById( 'tooltip' );
+				canvas = document.getElementById( 'canvas' );
 
 				// scene
 
@@ -103,11 +104,22 @@
 				computeTileUVs( sphere, texSize, sphere.attributes.uv2, uvZoom2 );
 
 				material = new THREE.MeshBasicMaterial( { color: 0xA1A1A1 } );
-				new THREE.TextureLoader().load( './screenshots/all_in_one.jpg', function( map ) {
+				var loader = new THREE.TextureLoader();
+				loader.load( './screenshots/all_in_one.jpg', function( map ) {
 
 					material.color = null;
 					material.map = map;
 					material.needsUpdate = true;
+
+					loader.load( './screenshots/all_in_one_full.jpg', function( map ) {
+
+						map.generateMipmaps = false;
+						map.minFilter = THREE.LinearFilter;
+						map.magFilter = THREE.LinearFilter;
+						material.map = map;
+						material.needsUpdate = true;
+
+					} );
 
 				} );
 				material.onBeforeCompile = function ( shader ) {
@@ -134,16 +146,9 @@
 
 				scene.add( outline );
 
-				// renderer
-
-				canvas = document.getElementById( 'canvas' );
-				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				// controls
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, canvas );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.04;
 				controls.screenSpacePanning = false;
@@ -151,17 +156,22 @@
 				controls.minDistance = 1.05;
 				controls.maxDistance = 10;
 
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				animate();
+
 				// events
-
-				window.addEventListener( 'resize', onWindowResize, false );
-
-				canvas.addEventListener( 'mousedown', onMouseDown, false );
-				canvas.addEventListener( 'mousemove', onMouseMove, false );
-				canvas.addEventListener( 'mouseup', onMouseUp, false );
 
 				canvas.addEventListener( 'touchstart', onMouseDown, false );
 				canvas.addEventListener( 'touchmove', onMouseMove, false );
 				canvas.addEventListener( 'touchend', onMouseUp, false );
+				window.addEventListener( 'resize', onWindowResize, false );
+				canvas.addEventListener( 'mousedown', onMouseDown, false );
+				canvas.addEventListener( 'mousemove', onMouseMove, false );
+				canvas.addEventListener( 'mouseup', onMouseUp, false );
 
 			}
 
@@ -222,8 +232,7 @@
 
 			function onMouseDown( e ) {
 
-				savePosition( mouseDown, e, e.changedTouches );
-				idMove = analyticRaycaster( mouseDown );
+				onMouseMove( e );
 				idDown = idMove;
 				isSwipe = false;
 
