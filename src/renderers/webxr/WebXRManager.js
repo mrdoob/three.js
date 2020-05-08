@@ -47,7 +47,7 @@ function WebXRManager( renderer, gl ) {
 
 	//
 
-	this.enabled = false;
+	this.enabled = renderer.xrCompatible;
 
 	this.isPresenting = false;
 
