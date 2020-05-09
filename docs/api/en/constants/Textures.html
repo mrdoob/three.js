@@ -104,20 +104,25 @@
 
 		[page:constant NearestMipmapNearestFilter] chooses the mipmap that most closely
 		matches the size of the pixel being textured
-		and uses the [page:constant NearestFilter] criterion (the texel nearest to the
-		center of the pixel) to produce a texture value.<br /><br />
+		and uses the [page:constant NearestFilter] criterion
+		(the texel nearest to the center of the pixel)
+		to produce a texture value.<br /><br />
 
-		[page:constant NearestMipmapLinearFilter] chooses the two mipmaps that most closely
-		match the size of the pixel being textured and uses the [page:constant NearestFilter] criterion to produce
-		a texture value from each mipmap. The final texture value is a weighted average of those two values.<br /><br />
-
-		[page:constant LinearMipmapNearestFilter] chooses the mipmap that most closely matches
-		the size of the pixel being textured and uses the [page:constant LinearFilter] criterion
+		[page:constant NearestMipmapLinearFilter] chooses the mipmap that most closely
+		matches the size of the pixel being textured
+		and uses the [page:constant LinearFilter] criterion
 		(a weighted average of the four texels that are closest to the center of the pixel)
 		to produce a texture value.<br /><br />
 
-		[page:constant LinearMipmapLinearFilter] is the default and chooses the two mipmaps
-		that most closely match the size of the pixel being textured and uses the [page:constant LinearFilter] criterion
+		[page:constant LinearMipmapNearestFilter] chooses the two mipmaps that most closely
+		match the size of the pixel being textured 
+		and uses the [page:constant NearestFilter] criterion
+		(a weighted average of the four texels that are closest to the center of the pixel)
+		to produce a texture value from each mipmap. The final texture value is a weighted average of those two values.<br /><br />
+
+		[page:constant LinearMipmapLinearFilter] is the default and chooses the two mipmaps that most closely
+		match the size of the pixel being textured
+		and uses the [page:constant LinearFilter] criterion
 		to produce a texture value from each mipmap. The final texture value is a weighted average of those two values.<br /><br />
 
 		See the [example:webgl_materials_texture_filters materials / texture / filters] example.
