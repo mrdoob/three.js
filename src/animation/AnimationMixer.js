@@ -622,6 +622,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		for ( var i = 0; i !== nBindings; ++ i ) {
 
+			bindings[ i ].restoreOriginalState();
 			bindings[ i ].useCount = 0;
 
 		}
