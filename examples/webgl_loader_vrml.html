@@ -46,11 +46,12 @@
 
 				// light
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 200, 200, 1000 );
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
+				scene.add( hemiLight );
 
-				camera.add( dirLight );
-				camera.add( dirLight.target );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				dirLight.position.set( 200, 200, 200 );
+				scene.add( dirLight );
 
 				var loader = new VRMLLoader();
 				loader.load( 'models/vrml/house.wrl', function ( object ) {
