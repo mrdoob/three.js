@@ -18,15 +18,10 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl gpgpu birds<br/>
-			Move mouse to disturb birds.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl gpgpu birds + GLTF mesh<br/>
+			Flamingo by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br/>
+			Move mouse to disturb birds. 
 		</div>
-
-		<!--
-		TODO: If you're reading this, you may wish to improve this example by
-			- Create a better shading for the birds?
-
-		-->
 
 		<!-- shader for bird's position -->
 		<script id="fragmentShaderPosition" type="x-shader/x-fragment">
@@ -196,8 +191,6 @@
 
 				}
 
-
-
 				// this make tends to fly around than down or up
 				// if (velocity.y > 0.) velocity.y *= (1. - 0.2 * delta);
 
@@ -212,191 +205,114 @@
 
 		</script>
 
-		<script type="x-shader/x-vertex" id="birdVS">
-
-			attribute vec2 reference;
-			attribute float birdVertex;
-
-			attribute vec3 birdColor;
-
-			uniform sampler2D texturePosition;
-			uniform sampler2D textureVelocity;
-
-			varying vec4 vColor;
-			varying float z;
-
-			uniform float time;
-
-			void main() {
-
-				vec4 tmpPos = texture2D( texturePosition, reference );
-				vec3 pos = tmpPos.xyz;
-				vec3 velocity = normalize(texture2D( textureVelocity, reference ).xyz);
-
-				vec3 newPosition = position;
-
-				if ( birdVertex == 4.0 || birdVertex == 7.0 ) {
-					// flap wings
-					newPosition.y = sin( tmpPos.w ) * 5.;
-				}
-
-				newPosition = mat3( modelMatrix ) * newPosition;
-
-
-				velocity.z *= -1.;
-				float xz = length( velocity.xz );
-				float xyz = 1.;
-				float x = sqrt( 1. - velocity.y * velocity.y );
-
-				float cosry = velocity.x / xz;
-				float sinry = velocity.z / xz;
-
-				float cosrz = x / xyz;
-				float sinrz = velocity.y / xyz;
-
-				mat3 maty =  mat3(
-					cosry, 0, -sinry,
-					0    , 1, 0     ,
-					sinry, 0, cosry
-
-				);
-
-				mat3 matz =  mat3(
-					cosrz , sinrz, 0,
-					-sinrz, cosrz, 0,
-					0     , 0    , 1
-				);
-
-				newPosition =  maty * matz * newPosition;
-				newPosition += pos;
-
-				z = newPosition.z;
-
-				vColor = vec4( birdColor, 1.0 );
-				gl_Position = projectionMatrix *  viewMatrix  * vec4( newPosition, 1.0 );
-			}
-
-		</script>
-
-		<!-- bird geometry shader -->
-		<script type="x-shader/x-fragment" id="birdFS">
-
-			varying vec4 vColor;
-			varying float z;
-
-			uniform vec3 color;
-
-			void main() {
-				// Fake colors for now
-				float z2 = 0.2 + ( 1000. - z ) / 1000. * vColor.x;
-				gl_FragColor = vec4( z2, z2, z2, 1. );
-
-			}
-
-		</script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
-
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
 
 			/* TEXTURE WIDTH FOR SIMULATION */
-			var WIDTH = 32;
-
+			var WIDTH = 64
 			var BIRDS = WIDTH * WIDTH;
+			
+			/* BAKE ANIMATION INTO TEXTURE and CREATE GEOMETRY FROM BASE MODEL */
+			var BirdGeometry = new THREE.BufferGeometry();
+			var textureAnimation, durationAnimation, originalMaterial,birdMesh, materialShader, vertexPerBird;
+			function nextPowerOf2( n ) { return Math.pow( 2, Math.ceil( Math.log( n ) / Math.log( 2 ) ) ) };
 
-			// Custom Geometry - using 3 triangles each. No UVs, no normals currently.
-			var BirdGeometry = function () {
+			Math.lerp = function (value1, value2, amount) {
 
-				var triangles = BIRDS * 3;
-				var points = triangles * 3;
+				amount = Math.max( Math.min( amount, 1 ), 0 );
+				return value1 + (value2 - value1) * amount;
+				
+			};
 
-				THREE.BufferGeometry.call( this );
+			var gltfs = [ 'models/gltf/Parrot.glb', 'models/gltf/Flamingo.glb' ]
+            var colors = [ 0xccFFFF, 0xffdeff ]
+            var sizes = [ 0.2, 0.1 ]
+			var selectModel = Math.floor( Math.random() * gltfs.length )
+			new GLTFLoader().load( gltfs[ selectModel ], function ( gltf ) {
 
-				var vertices = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
-				var birdColors = new THREE.BufferAttribute( new Float32Array( points * 3 ), 3 );
-				var references = new THREE.BufferAttribute( new Float32Array( points * 2 ), 2 );
-				var birdVertex = new THREE.BufferAttribute( new Float32Array( points ), 1 );
+				var animations = gltf.animations;
+				durationAnimation = Math.round( animations[ 0 ].duration * 60 );
+				var birdGeo = gltf.scene.children[ 0 ].geometry;
+				originalMaterial = gltf.scene.children[ 0 ].material;
+				var morphAttributes = birdGeo.morphAttributes.position;
+				var tHeight = nextPowerOf2( durationAnimation );
+				var tWidth = nextPowerOf2( birdGeo.getAttribute( 'position' ).count );
+				vertexPerBird = birdGeo.getAttribute( 'position' ).count;
+				var tData = new Float32Array( 3 * tWidth * tHeight );
 
-				this.setAttribute( 'position', vertices );
-				this.setAttribute( 'birdColor', birdColors );
-				this.setAttribute( 'reference', references );
-				this.setAttribute( 'birdVertex', birdVertex );
+				for( var i = 0 ; i < tWidth ; i++ ){
 
-				// this.setAttribute( 'normal', new Float32Array( points * 3 ), 3 );
+					for( var j = 0 ; j < tHeight ; j++ ){
 
+						var offset = j * tWidth * 3;
 
-				var v = 0;
+						var curFrame = j;
+						var curMorph = Math.floor( j / durationAnimation * morphAttributes.length );
+						var nextMorph = ( Math.floor( j / durationAnimation * morphAttributes.length ) + 1 ) % morphAttributes.length;
+						var lerpAmount = j / durationAnimation * morphAttributes.length % 1;
 
-				function verts_push() {
+						if( j < durationAnimation ){
 
-					for ( var i = 0; i < arguments.length; i ++ ) {
-
-						vertices.array[ v ++ ] = arguments[ i ];
-
+							tData[ offset + i * 3 ] = Math.lerp( morphAttributes[ curMorph ].array[ i * 3 ], morphAttributes[ nextMorph ].array[ i * 3 ], lerpAmount );
+							tData[ offset + i * 3 + 1 ] = Math.lerp( morphAttributes[ curMorph ].array[ i * 3 + 1 ], morphAttributes[ nextMorph ].array[ i * 3 + 1 ], lerpAmount );
+							tData[ offset + i * 3 + 2 ] = Math.lerp( morphAttributes[ curMorph ].array[ i * 3 + 2 ], morphAttributes[ nextMorph ].array[ i * 3 + 2 ], lerpAmount );
+						
+						}
 					}
 
 				}
+				
+				textureAnimation = new THREE.DataTexture( tData, tWidth, tHeight, THREE.RGBFormat, THREE.FloatType );
+				textureAnimation.needsUpdate = true;
 
-				var wingsSpan = 20;
+				var vertices = [], color = [], reference = [], seeds = [], indices = [];
+				var totalVertices = birdGeo.getAttribute( 'position' ).count * 3 * BIRDS;
+				for( var i = 0 ; i < totalVertices ; i++ ){
 
-				for ( var f = 0; f < BIRDS; f ++ ) {
-
-					// Body
-					verts_push(
-						0, - 0, - 20,
-						0, 4, - 20,
-						0, 0, 30
-					);
-
-					// Left Wing
-					verts_push(
-						0, 0, - 15,
-						- wingsSpan, 0, 0,
-						0, 0, 15
-					);
-
-					// Right Wing
-					verts_push(
-						0, 0, 15,
-						wingsSpan, 0, 0,
-						0, 0, - 15
-					);
+					var bIndex = i % ( birdGeo.getAttribute( 'position' ).count * 3 );
+					vertices.push( birdGeo.getAttribute( 'position' ).array[ bIndex ] );
+					color.push( birdGeo.getAttribute( 'color' ).array[ bIndex ] );
 
 				}
 
-				for ( var v = 0; v < triangles * 3; v ++ ) {
-
-					var i = ~ ~ ( v / 3 );
-					var x = ( i % WIDTH ) / WIDTH;
-					var y = ~ ~ ( i / WIDTH ) / WIDTH;
-
-					var c = new THREE.Color(
-						0x444444 +
-						~ ~ ( v / 9 ) / BIRDS * 0x666666
-					);
-
-					birdColors.array[ v * 3 + 0 ] = c.r;
-					birdColors.array[ v * 3 + 1 ] = c.g;
-					birdColors.array[ v * 3 + 2 ] = c.b;
-
-					references.array[ v * 2 ] = x;
-					references.array[ v * 2 + 1 ] = y;
-
-					birdVertex.array[ v ] = v % 9;
+				var r = Math.random();
+				for( var i = 0 ; i < birdGeo.getAttribute( 'position' ).count * BIRDS ; i++ ){
+					
+					var bIndex = i % ( birdGeo.getAttribute( 'position' ).count );
+					var bird = Math.floor( i / birdGeo.getAttribute( 'position' ).count );
+					if( bIndex == 0 ) r = Math.random();
+					var j = ~ ~ bird;
+					var x = ( j % WIDTH ) / WIDTH;
+					var y = ~ ~ ( j / WIDTH ) / WIDTH;
+					reference.push( x, y, bIndex / tWidth, durationAnimation / tHeight );
+					seeds.push( bird, r, Math.random(), Math.random() );
 
 				}
 
-				this.scale( 0.2, 0.2, 0.2 );
+				for( var i = 0 ; i < birdGeo.index.array.length * BIRDS ; i++ ){
 
-			};
+					var offset = Math.floor( i / birdGeo.index.array.length ) * ( birdGeo.getAttribute( 'position' ).count );				
+					indices.push( birdGeo.index.array[ i % birdGeo.index.array.length ] + offset );
 
-			BirdGeometry.prototype = Object.create( THREE.BufferGeometry.prototype );
+				}
 
+				BirdGeometry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array( vertices ), 3 ) );
+				BirdGeometry.setAttribute( 'birdColor', new THREE.BufferAttribute( new Float32Array( color ), 3 ) );
+				BirdGeometry.setAttribute( 'color', new THREE.BufferAttribute( new Float32Array( color ), 3 ) );
+				BirdGeometry.setAttribute( 'reference', new THREE.BufferAttribute( new Float32Array( reference ), 4 ) );
+				BirdGeometry.setAttribute( 'seeds', new THREE.BufferAttribute( new Float32Array( seeds ), 4 ) );
+
+				BirdGeometry.setIndex( indices );
+
+				init();
+				animate();
+
+			} );
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -416,9 +332,6 @@
 			var velocityUniforms;
 			var birdUniforms;
 
-			init();
-			animate();
-
 			function init() {
 
 				container = document.createElement( 'div' );
@@ -428,10 +341,24 @@
 				camera.position.z = 350;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0xffffff );
-				scene.fog = new THREE.Fog( 0xffffff, 100, 1000 );
+				scene.background = new THREE.Color( colors[ selectModel ] );
+				scene.fog = new THREE.Fog( colors[ selectModel ], 100, 1000 );
 
-				renderer = new THREE.WebGLRenderer();
+				// LIGHTS
+
+				var hemiLight = new THREE.HemisphereLight( colors[ selectModel ], 0xffffff, 1.6 );
+				hemiLight.color.setHSL( 0.6, 1, 0.6 );
+				hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+				hemiLight.position.set( 0, 50, 0 );
+				scene.add( hemiLight );
+
+				var dirLight = new THREE.DirectionalLight( 0x00CED1, 0.6 );
+				dirLight.color.setHSL( 0.1, 1, 0.95 );
+				dirLight.position.set( - 1, 1.75, 1 );
+				dirLight.position.multiplyScalar( 30 );
+				scene.add( dirLight );
+
+				renderer = new THREE.WebGLRenderer( { antialias : true, alpha : true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -445,18 +372,19 @@
 				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
 				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 
-				//
-
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				var gui = new GUI();
 
-
 				var effectController = {
+
 					separation: 20.0,
 					alignment: 20.0,
 					cohesion: 20.0,
-					freedom: 0.75
+					freedom: 0.75,
+					size: sizes[ selectModel ],
+					count: BIRDS
+
 				};
 
 				var valuesChanger = function () {
@@ -465,14 +393,18 @@
 					velocityUniforms[ "alignmentDistance" ].value = effectController.alignment;
 					velocityUniforms[ "cohesionDistance" ].value = effectController.cohesion;
 					velocityUniforms[ "freedomFactor" ].value = effectController.freedom;
+					if( materialShader ) materialShader.uniforms[ "size" ].value = effectController.size;
+					BirdGeometry.setDrawRange ( 0, vertexPerBird * effectController.count )
 
 				};
 
 				valuesChanger();
 
-				gui.add( effectController, "separation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
+                gui.add( effectController, "separation", 0.0, 100.0, 1.0 ).onChange( valuesChanger );
 				gui.add( effectController, "alignment", 0.0, 100, 0.001 ).onChange( valuesChanger );
 				gui.add( effectController, "cohesion", 0.0, 100, 0.025 ).onChange( valuesChanger );
+				gui.add( effectController, "size", 0, 1, 0.01 ).onChange( valuesChanger );
+				gui.add( effectController, "count", 0, BIRDS, 1 ).onChange( valuesChanger );
 				gui.close();
 
 				initBirds();
@@ -513,42 +445,92 @@
 				velocityVariable.wrapT = THREE.RepeatWrapping;
 				positionVariable.wrapS = THREE.RepeatWrapping;
 				positionVariable.wrapT = THREE.RepeatWrapping;
-
+				
 				var error = gpuCompute.init();
 				if ( error !== null ) {
-
 				    console.error( error );
-
 				}
-
 			}
 
 			function initBirds() {
 
-				var geometry = new BirdGeometry();
+				var geometry = BirdGeometry;
 
-				// For Vertex and Fragment
-				birdUniforms = {
-					"color": { value: new THREE.Color( 0xff2200 ) },
-					"texturePosition": { value: null },
-					"textureVelocity": { value: null },
-					"time": { value: 1.0 },
-					"delta": { value: 0.0 }
-				};
+				var m = new THREE.MeshStandardMaterial({
+					vertexColors : true,
+					flatShading : true,
+					roughness : 1,
+					metalness : 0
+				})
 
-				// THREE.ShaderMaterial
-				var material = new THREE.ShaderMaterial( {
-					uniforms: birdUniforms,
-					vertexShader: document.getElementById( 'birdVS' ).textContent,
-					fragmentShader: document.getElementById( 'birdFS' ).textContent,
-					side: THREE.DoubleSide
+				m.onBeforeCompile = ( shader ) => {
 
-				} );
+					shader.uniforms.texturePosition = { value : null };
+					shader.uniforms.textureVelocity = { value : null };
+					shader.uniforms.textureAnimation = { value : textureAnimation };
+					shader.uniforms.time = { value : 1.0 };
+					shader.uniforms.size = { value : 0.1 };
+					shader.uniforms.delta = { value : 0.0 };
 
-				var birdMesh = new THREE.Mesh( geometry, material );
+                    var token = '#define STANDARD';
+                    
+                    var insert = /* glsl */`
+                        attribute vec4 reference;
+                        attribute vec4 seeds;
+                        attribute vec3 birdColor;
+                        uniform sampler2D texturePosition;
+                        uniform sampler2D textureVelocity;
+                        uniform sampler2D textureAnimation;
+                        uniform float size;
+                        uniform float time;
+                    `;
+
+					shader.vertexShader = shader.vertexShader.replace( token, token + insert );
+
+                    var token = '#include <begin_vertex>';
+                        
+                    var insert = /* glsl */`
+                        vec4 tmpPos = texture2D( texturePosition, reference.xy );
+                    
+                        vec3 pos = tmpPos.xyz;
+                        vec3 velocity = normalize(texture2D( textureVelocity, reference.xy ).xyz);
+                        vec3 aniPos = texture2D( textureAnimation, vec2( reference.z, mod( ( time + seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
+                        vec3 newPosition = position;
+                        
+                        newPosition = mat3( modelMatrix ) * ( newPosition + aniPos );
+                        newPosition *= size + seeds.y * size * 0.2;
+                        
+                        velocity.z *= -1.;
+                        float xz = length( velocity.xz );
+                        float xyz = 1.;
+                        float x = sqrt( 1. - velocity.y * velocity.y );
+
+                        float cosry = velocity.x / xz;
+                        float sinry = velocity.z / xz;
+
+                        float cosrz = x / xyz;
+                        float sinrz = velocity.y / xyz;
+
+                        mat3 maty =  mat3( cosry, 0, -sinry, 0    , 1, 0     , sinry, 0, cosry );
+                        mat3 matz =  mat3( cosrz , sinrz, 0, -sinrz, cosrz, 0, 0     , 0    , 1 );
+
+                        newPosition =  maty * matz * newPosition;
+                        newPosition += pos;
+                        
+                        vec3 transformed = vec3( newPosition );
+                    `;
+					
+        			shader.vertexShader = shader.vertexShader.replace( token, insert );
+
+					materialShader = shader;
+
+				}    
+
+				birdMesh = new THREE.Mesh( geometry, m );
 				birdMesh.rotation.y = Math.PI / 2;
-				birdMesh.matrixAutoUpdate = false;
-				birdMesh.updateMatrix();
+				
+				birdMesh.castShadow = true;
+				birdMesh.receiveShadow = true;
 
 				scene.add( birdMesh );
 
@@ -653,7 +635,7 @@
 
 				var now = performance.now();
 				var delta = ( now - last ) / 1000;
-
+				
 				if ( delta > 1 ) delta = 1; // safety cap on large deltas
 				last = now;
 
@@ -661,8 +643,8 @@
 				positionUniforms[ "delta" ].value = delta;
 				velocityUniforms[ "time" ].value = now;
 				velocityUniforms[ "delta" ].value = delta;
-				birdUniforms[ "time" ].value = now;
-				birdUniforms[ "delta" ].value = delta;
+				if( materialShader ) materialShader.uniforms[ "time" ].value = now;
+				if( materialShader ) materialShader.uniforms[ "delta" ].value = delta;
 
 				velocityUniforms[ "predator" ].value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
 
@@ -670,12 +652,11 @@
 				mouseY = 10000;
 
 				gpuCompute.compute();
-
-				birdUniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				birdUniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
-
+				
+				if( materialShader ) materialShader.uniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				if( materialShader ) materialShader.uniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+				
 				renderer.render( scene, camera );
-
 			}
 
 		</script>
