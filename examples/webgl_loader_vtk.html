@@ -41,11 +41,12 @@
 
 				// light
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 2, 2, 10 );
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
+				scene.add( hemiLight );
 
-				camera.add( dirLight );
-				camera.add( dirLight.target );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				dirLight.position.set( 2, 2, 2 );
+				scene.add( dirLight );
 
 				var loader = new VTKLoader();
 				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
