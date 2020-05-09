@@ -1,5 +1,21 @@
 import buble from 'rollup-plugin-buble';
 
+function importConditionalPlugins( plugins ) {
+
+	try {
+
+		var visualizer = require( 'rollup-plugin-visualizer' );
+		var options = { filename: 'node_modules/analyzer.html', title: 'Three.js' };
+		plugins.push( visualizer( options ) );
+
+	} catch { } finally {
+
+		return plugins;
+
+	}
+
+}
+
 function glconstants() {
 
 	var constants = {
@@ -225,10 +241,10 @@ export default [
 	},
 	{
 		input: 'src/Three.js',
-		plugins: [
+		plugins: importConditionalPlugins( [
 			glconstants(),
 			glsl()
-		],
+		] ),
 		output: [
 			{
 				format: 'esm',

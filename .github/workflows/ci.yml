@@ -111,7 +111,12 @@ jobs:
           key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
       - name: Install packages
-        run: npm ci
+        run: npm i -D rollup-plugin-visualizer && npm ci && npm run build
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: bundle-analyzer.html
+          path: node_modules/analyzer.html
 
       - name: === Ready for release ===
         run: npm run test-e2e-cov
