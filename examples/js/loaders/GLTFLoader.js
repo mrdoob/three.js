@@ -464,7 +464,7 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	GLTFMaterialsClearcoatExtension.prototype.getMaterialType = function () {
+	GLTFMaterialsClearcoatExtension.prototype.getMaterialType = function ( materialIndex ) {
 
 		return THREE.MeshPhysicalMaterial;
 
@@ -2199,7 +2199,7 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-	GLTFParser.prototype.getMaterialType = function () {
+	GLTFParser.prototype.getMaterialType = function ( materialIndex ) {
 
 		return THREE.MeshStandardMaterial;
 
@@ -2272,7 +2272,7 @@ THREE.GLTFLoader = ( function () {
 
 			materialType = this._invokeOne( function ( ext ) {
 
-				return ext.getMaterialType && ext.getMaterialType();
+				return ext.getMaterialType && ext.getMaterialType( materialIndex );
 
 			} );
 
