@@ -23607,6 +23607,10 @@ function WebGLMaterials( properties ) {
 			uniforms.color.value.copy( material.color );
 			uniforms.opacity.value = material.opacity;
 
+		} else if ( material.isShaderMaterial ) {
+
+			material.uniformsNeedUpdate = false; // #15581
+
 		}
 
 	}
@@ -26007,12 +26011,6 @@ function WebGLRenderer( parameters ) {
 			if ( m_uniforms.ltc_2 !== undefined ) m_uniforms.ltc_2.value = UniformsLib.LTC_2;
 
 			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
-
-			if ( material.isShaderMaterial ) {
-
-				material.uniformsNeedUpdate = false; // #15581
-
-			}
 
 		}
 
