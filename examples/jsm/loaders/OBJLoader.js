@@ -360,7 +360,7 @@ var OBJLoader = ( function () {
 
 					this.object.geometry.hasNormalIndices = true;
 
-				}	else {
+				} else {
 
 					this.addFaceNormal( ia, ib, ic );
 
