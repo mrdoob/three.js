@@ -13,6 +13,13 @@ THREE.OBJLoader = ( function () {
 	// usemap map_name
 	var map_use_pattern = /^usemap /;
 
+	var vA = new THREE.Vector3();
+	var vB = new THREE.Vector3();
+	var vC = new THREE.Vector3();
+
+	var ab = new THREE.Vector3();
+	var cb = new THREE.Vector3();
+
 	function ParserState() {
 
 		var state = {
@@ -248,6 +255,27 @@ THREE.OBJLoader = ( function () {
 
 			},
 
+			addFaceNormal: function ( a, b, c ) {
+
+				var src = this.vertices;
+				var dst = this.object.geometry.normals;
+
+				vA.fromArray( src, a );
+				vB.fromArray( src, b );
+				vC.fromArray( src, c );
+
+				cb.subVectors( vC, vB );
+				ab.subVectors( vA, vB );
+				cb.cross( ab );
+
+				cb.normalize();
+
+				dst.push( cb.x, cb.y, cb.z );
+				dst.push( cb.x, cb.y, cb.z );
+				dst.push( cb.x, cb.y, cb.z );
+
+			},
+
 			addColor: function ( a, b, c ) {
 
 				var src = this.colors;
@@ -267,6 +295,16 @@ THREE.OBJLoader = ( function () {
 				dst.push( src[ a + 0 ], src[ a + 1 ] );
 				dst.push( src[ b + 0 ], src[ b + 1 ] );
 				dst.push( src[ c + 0 ], src[ c + 1 ] );
+
+			},
+
+			addDefaultUV: function () {
+
+				var dst = this.object.geometry.uvs;
+
+				dst.push( 0, 0 );
+				dst.push( 0, 0 );
+				dst.push( 0, 0 );
 
 			},
 
@@ -290,26 +328,41 @@ THREE.OBJLoader = ( function () {
 				this.addVertex( ia, ib, ic );
 				this.addColor( ia, ib, ic );
 
-				if ( ua !== undefined && ua !== '' ) {
-
-					var uvLen = this.uvs.length;
-					ia = this.parseUVIndex( ua, uvLen );
-					ib = this.parseUVIndex( ub, uvLen );
-					ic = this.parseUVIndex( uc, uvLen );
-					this.addUV( ia, ib, ic );
-
-				}
+				// normals
 
 				if ( na !== undefined && na !== '' ) {
 
-					// Normals are many times the same. If so, skip function call and parseInt.
 					var nLen = this.normals.length;
-					ia = this.parseNormalIndex( na, nLen );
 
-					ib = na === nb ? ia : this.parseNormalIndex( nb, nLen );
-					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
+					ia = this.parseNormalIndex( na, nLen );
+					ib = this.parseNormalIndex( nb, nLen );
+					ic = this.parseNormalIndex( nc, nLen );
 
 					this.addNormal( ia, ib, ic );
+
+				}	else {
+
+					this.addFaceNormal( ia, ib, ic );
+
+				}
+
+				// uvs
+
+				if ( ua !== undefined && ua !== '' ) {
+
+					var uvLen = this.uvs.length;
+
+					ia = this.parseUVIndex( ua, uvLen );
+					ib = this.parseUVIndex( ub, uvLen );
+					ic = this.parseUVIndex( uc, uvLen );
+
+					this.addUV( ia, ib, ic );
+
+				} else {
+
+					// add placeholder values (for inconsistent face definitions)
+
+					this.addDefaultUV();
 
 				}
 
