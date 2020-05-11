@@ -62,7 +62,9 @@ THREE.OBJLoader = ( function () {
 						vertices: [],
 						normals: [],
 						colors: [],
-						uvs: []
+						uvs: [],
+						hasNormalIndices: false,
+						hasUVIndices: false
 					},
 					materials: [],
 					smooth: true,
@@ -340,6 +342,8 @@ THREE.OBJLoader = ( function () {
 
 					this.addNormal( ia, ib, ic );
 
+					this.object.geometry.hasNormalIndices = true;
+
 				}	else {
 
 					this.addFaceNormal( ia, ib, ic );
@@ -357,6 +361,8 @@ THREE.OBJLoader = ( function () {
 					ic = this.parseUVIndex( uc, uvLen );
 
 					this.addUV( ia, ib, ic );
+
+					this.object.geometry.hasUVIndices = true;
 
 				} else {
 
@@ -705,13 +711,9 @@ THREE.OBJLoader = ( function () {
 
 				buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( geometry.vertices, 3 ) );
 
-				if ( geometry.normals.length > 0 ) {
+				if ( geometry.hasNormalIndices === true ) {
 
 					buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
-
-				} else {
-
-					buffergeometry.computeVertexNormals();
 
 				}
 
@@ -722,7 +724,7 @@ THREE.OBJLoader = ( function () {
 
 				}
 
-				if ( geometry.uvs.length > 0 ) {
+				if ( geometry.hasUVIndices === true ) {
 
 					buffergeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( geometry.uvs, 2 ) );
 

@@ -78,7 +78,9 @@ var OBJLoader = ( function () {
 						vertices: [],
 						normals: [],
 						colors: [],
-						uvs: []
+						uvs: [],
+						hasNormalIndices: false,
+						hasUVIndices: false
 					},
 					materials: [],
 					smooth: true,
@@ -356,6 +358,8 @@ var OBJLoader = ( function () {
 
 					this.addNormal( ia, ib, ic );
 
+					this.object.geometry.hasNormalIndices = true;
+
 				}	else {
 
 					this.addFaceNormal( ia, ib, ic );
@@ -373,6 +377,8 @@ var OBJLoader = ( function () {
 					ic = this.parseUVIndex( uc, uvLen );
 
 					this.addUV( ia, ib, ic );
+
+					this.object.geometry.hasUVIndices = true;
 
 				} else {
 
@@ -721,13 +727,9 @@ var OBJLoader = ( function () {
 
 				buffergeometry.setAttribute( 'position', new Float32BufferAttribute( geometry.vertices, 3 ) );
 
-				if ( geometry.normals.length > 0 ) {
+				if ( geometry.hasNormalIndices === true ) {
 
 					buffergeometry.setAttribute( 'normal', new Float32BufferAttribute( geometry.normals, 3 ) );
-
-				} else {
-
-					buffergeometry.computeVertexNormals();
 
 				}
 
@@ -738,7 +740,7 @@ var OBJLoader = ( function () {
 
 				}
 
-				if ( geometry.uvs.length > 0 ) {
+				if ( geometry.hasUVIndices === true ) {
 
 					buffergeometry.setAttribute( 'uv', new Float32BufferAttribute( geometry.uvs, 2 ) );
 
