@@ -179,7 +179,7 @@ var GLTFLoader = ( function () {
 
 		register: function ( callback ) {
 
-			if ( ! this.pluginCallbacks.includes( callback ) ) {
+			if ( this.pluginCallbacks.indexOf( callback ) === -1 ) {
 
 				this.pluginCallbacks.push( callback );
 
@@ -191,7 +191,7 @@ var GLTFLoader = ( function () {
 
 		unregister: function ( callback ) {
 
-			if ( this.pluginCallbacks.includes( callback ) ) {
+			if ( this.pluginCallbacks.indexOf( callback ) !== -1 ) {
 
 				this.pluginCallbacks.splice( this.pluginCallbacks.indexOf( callback ), 1 );
 
