@@ -23,10 +23,9 @@
 			} from './jsm/misc/RollerCoaster.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 
-			var renderer = new THREE.WebGLRenderer( { antialias: true } );
+			var renderer = new THREE.WebGLRenderer( { antialias: true, xrCompatible: true } );
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-			renderer.xr.enabled = true;
 			renderer.xr.setReferenceSpaceType( 'local' );
 			document.body.appendChild( renderer.domElement );
 
