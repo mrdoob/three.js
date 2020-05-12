@@ -297,9 +297,69 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.todo( 'finish', ( assert ) => {
+			QUnit.test( 'finish', ( assert ) => {
 
-				assert.ok( false, "everything's gonna be alright" );
+				var list = new WebGLRenderList();
+				var obj = { id: 'A', renderOrder: 0 };
+				var mat = { transparent: false, program: { id: 0 } };
+				var geom = {};
+
+				assert.ok( list.renderItems.length === 0, 'Render items length defaults to 0.' );
+
+				list.push( obj, geom, mat, 0, 0, {} );
+				list.push( obj, geom, mat, 0, 0, {} );
+				list.push( obj, geom, mat, 0, 0, {} );
+				assert.ok( list.renderItems.length === 3, 'Render items length expands as items are added.' );
+
+				list.finish();
+				assert.deepEqual(
+					list.renderItems.map( item => item.object ),
+					[ obj, obj, obj ],
+					'Render items are not cleaned if they are being used.'
+				);
+				assert.deepEqual(
+					list.renderItems[ 1 ],
+					{
+						id: 'A',
+						object: obj,
+						geometry: geom,
+						material: mat,
+						program: mat.program,
+						groupOrder: 0,
+						renderOrder: 0,
+						z: 0,
+						group: {}
+					},
+					'Unused render item is structured correctly before clearing.'
+				);
+
+				list.init();
+				list.push( obj, geom, mat, 0, 0, {} );
+				assert.ok( list.renderItems.length === 3, 'Render items length does not shrink.' );
+
+				list.finish();
+				assert.deepEqual(
+					list.renderItems.map( item => item.object ),
+					[ obj, null, null ],
+					'Render items are cleaned if they are not being used.'
+				);
+
+				assert.deepEqual(
+					list.renderItems[ 1 ],
+					{
+						id: null,
+						object: null,
+						geometry: null,
+						material: null,
+						program: null,
+						groupOrder: 0,
+						renderOrder: 0,
+						z: 0,
+						group: null
+					},
+					'Unused render item is structured correctly before clearing.'
+				);
+
 
 			} );
 

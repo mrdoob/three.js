@@ -159,6 +159,7 @@ function WebGLRenderList() {
 	}
 
 	return {
+		renderItems: renderItems,
 		opaque: opaque,
 		transparent: transparent,
 
