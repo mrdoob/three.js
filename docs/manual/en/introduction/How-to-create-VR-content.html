@@ -20,7 +20,15 @@
 	<h2>Workflow</h2>
 
 	<p>
-		First, you have to include [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/VRButton.js VRButton.js]
+		First, you have to create your instance of *WebGLRenderer* to enable XR rendering by setting the *xrCompatible* parameter.
+	</p>
+
+	<code>
+renderer = new THREE.WebGLRenderer( { xrCompatible: true } );
+	</code>
+
+	<p>
+		Next, you have to include [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/webxr/VRButton.js VRButton.js]
 		into your project.
 	</p>
 
@@ -36,14 +44,6 @@ import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 	<code>
 document.body.appendChild( VRButton.createButton( renderer ) );
-	</code>
-
-	<p>
-		Next, you have to tell your instance of *WebGLRenderer* to enable XR rendering.
-	</p>
-
-	<code>
-renderer.xr.enabled = true;
 	</code>
 
 	<p>
