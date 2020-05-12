@@ -124,6 +124,7 @@
 		[page:Object3D object] - 包裹在包围盒中的3d对象 [page:Object3D]。<br /><br />
 
 		扩展此包围盒的边界，使得对象及其子对象在包围盒内，包括对象和子对象的世界坐标的变换。
+		The function may result in a larger box than strictly necessary.
 
 		</p>
 
@@ -231,7 +232,8 @@
 		[page:Vector3 min] - [page:Vector3] 表示下边界每个纬度（x,y,z）的值。<br />
 		[page:Vector3 max] - [page:Vector3] 表示上边界每个纬度（x,y,z）的值。<br /><br />
 
-		设置包围盒上下边界每个纬度（x,y,z)的值。
+		设置包围盒上下边界每个纬度（x,y,z)的值。<br>
+		Please note that this method only copies the values from the given objects.
 		</p>
 
 		<h3>[method:Box3 setFromArray]( [param:Array array] ) [param:Box3 this]</h3>
@@ -261,6 +263,7 @@
 		[page:Object3D object] - 用来计算包围盒的3D对象 [page:Object3D]。<br /><br />
 
 		计算和世界轴对齐的一个对象 [page:Object3D] （含其子对象）的包围盒，计算对象和子对象的世界坐标变换。
+		The function may result in a larger box than strictly necessary.
 
 		</p>
 

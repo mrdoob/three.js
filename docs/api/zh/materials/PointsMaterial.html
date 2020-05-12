@@ -87,7 +87,8 @@
 		<p>材质是否使用morphTargets。默认值为false。</p>
 
 		<h3>[property:Number size]</h3>
-		<p>设置点的大小。默认值为1.0。</p>
+		<p>设置点的大小。默认值为1.0。<br/>
+			Will be capped if it exceeds the hardware dependent parameter [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter gl.ALIASED_POINT_SIZE_RANGE].</p>
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
 		<p>指定点的大小是否因相机深度而衰减。（仅限透视摄像头。）默认为true。 </p>
