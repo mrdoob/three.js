@@ -26,6 +26,7 @@ import {
 	BufferAttribute
 } from './core/BufferAttribute.js';
 import { BufferGeometry } from './core/BufferGeometry.js';
+import { InstancedBufferGeometry } from './core/InstancedBufferGeometry.js';
 import { InterleavedBuffer } from './core/InterleavedBuffer.js';
 import { Face3 } from './core/Face3.js';
 import { Geometry } from './core/Geometry.js';
@@ -126,6 +127,7 @@ export function MultiMaterial( materials ) {
 		return materials.slice();
 
 	};
+
 	return materials;
 
 }
@@ -1312,6 +1314,7 @@ Object.assign( BufferGeometry.prototype, {
 			console.warn( 'THREE.BufferGeometry: .addDrawCall() no longer supports indexOffset.' );
 
 		}
+
 		console.warn( 'THREE.BufferGeometry: .addDrawCall() is now .addGroup().' );
 		this.addGroup( start, count );
 
@@ -1363,6 +1366,25 @@ Object.defineProperties( BufferGeometry.prototype, {
 
 			console.warn( 'THREE.BufferGeometry: .offsets has been renamed to .groups.' );
 			return this.groups;
+
+		}
+	}
+
+} );
+
+Object.defineProperties( InstancedBufferGeometry.prototype, {
+
+	maxInstancedCount: {
+		get: function () {
+
+			console.warn( 'THREE.InstancedBufferGeometry: .maxInstancedCount has been renamed to .instanceCount.' );
+			return this.instanceCount;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.InstancedBufferGeometry: .maxInstancedCount has been renamed to .instanceCount.' );
+			this.instanceCount = value;
 
 		}
 	}

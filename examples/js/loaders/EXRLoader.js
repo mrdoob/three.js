@@ -98,6 +98,10 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 		const HUF_DECSIZE = 1 << HUF_DECBITS; // decoding table size
 		const HUF_DECMASK = HUF_DECSIZE - 1;
 
+		const NBITS = 16;
+		const A_OFFSET = 1 << ( NBITS - 1 );
+		const MOD_MASK = ( 1 << NBITS ) - 1;
+
 		const SHORT_ZEROCODE_RUN = 59;
 		const LONG_ZEROCODE_RUN = 63;
 		const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
@@ -132,6 +136,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 				bits = ( ( tmpDataView.getUint32( 0 ) >>> 20 ) & 0x7FF ) - 64;
 
 			}
+
 			var exponent = bits - 1022;
 			var mantissa = ldexp( value, - exponent );
 
@@ -471,8 +476,22 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		}
 
-		function wav2Decode( buffer, j, nx, ox, ny, oy ) {
+		function wdec16( l, h ) {
 
+			var m = UInt16( l );
+			var d = UInt16( h );
+
+			var bb = ( m - ( d >> 1 ) ) & MOD_MASK;
+			var aa = ( d + bb - A_OFFSET ) & MOD_MASK;
+
+			wdec14Return.a = aa;
+			wdec14Return.b = bb;
+
+		}
+
+		function wav2Decode( buffer, j, nx, ox, ny, oy, mx ) {
+
+			var w14 = mx < ( 1 << 14 );
 			var n = ( nx > ny ) ? ny : nx;
 			var p = 1;
 			var p2;
@@ -504,25 +523,52 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 						var p10 = px + oy1;
 						var p11 = p10 + ox1;
 
-						wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+						if ( w14 ) {
 
-						i00 = wdec14Return.a;
-						i10 = wdec14Return.b;
+							wdec14( buffer[ px + j ], buffer[ p10 + j ] );
 
-						wdec14( buffer[ p01 + j ], buffer[ p11 + j ] );
+							i00 = wdec14Return.a;
+							i10 = wdec14Return.b;
 
-						i01 = wdec14Return.a;
-						i11 = wdec14Return.b;
+							wdec14( buffer[ p01 + j ], buffer[ p11 + j ] );
 
-						wdec14( i00, i01 );
+							i01 = wdec14Return.a;
+							i11 = wdec14Return.b;
 
-						buffer[ px + j ] = wdec14Return.a;
-						buffer[ p01 + j ] = wdec14Return.b;
+							wdec14( i00, i01 );
 
-						wdec14( i10, i11 );
+							buffer[ px + j ] = wdec14Return.a;
+							buffer[ p01 + j ] = wdec14Return.b;
 
-						buffer[ p10 + j ] = wdec14Return.a;
-						buffer[ p11 + j ] = wdec14Return.b;
+							wdec14( i10, i11 );
+
+							buffer[ p10 + j ] = wdec14Return.a;
+							buffer[ p11 + j ] = wdec14Return.b;
+
+						} else {
+
+							wdec16( buffer[ px + j ], buffer[ p10 + j ] );
+
+							i00 = wdec14Return.a;
+							i10 = wdec14Return.b;
+
+							wdec16( buffer[ p01 + j ], buffer[ p11 + j ] );
+
+							i01 = wdec14Return.a;
+							i11 = wdec14Return.b;
+
+							wdec16( i00, i01 );
+
+							buffer[ px + j ] = wdec14Return.a;
+							buffer[ p01 + j ] = wdec14Return.b;
+
+							wdec16( i10, i11 );
+
+							buffer[ p10 + j ] = wdec14Return.a;
+							buffer[ p11 + j ] = wdec14Return.b;
+
+
+						}
 
 					}
 
@@ -530,7 +576,10 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 						var p10 = px + oy1;
 
-						wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+						if ( w14 )
+							wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+						else
+							wdec16( buffer[ px + j ], buffer[ p10 + j ] );
 
 						i00 = wdec14Return.a;
 						buffer[ p10 + j ] = wdec14Return.b;
@@ -550,7 +599,10 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 						var p01 = px + ox1;
 
-						wdec14( buffer[ px + j ], buffer[ p01 + j ] );
+						if ( w14 )
+							wdec14( buffer[ px + j ], buffer[ p01 + j ] );
+						else
+							wdec16( buffer[ px + j ], buffer[ p01 + j ] );
 
 						i00 = wdec14Return.a;
 						buffer[ p01 + j ] = wdec14Return.b;
@@ -1293,7 +1345,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			// Reverse LUT
 			var lut = new Uint16Array( USHORT_RANGE );
-			reverseLutFromBitmap( bitmap, lut );
+			var maxValue = reverseLutFromBitmap( bitmap, lut );
 
 			var length = parseUint32( inDataView, inOffset );
 
@@ -1313,7 +1365,8 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 						cd.nx,
 						cd.size,
 						cd.ny,
-						cd.nx * cd.size
+						cd.nx * cd.size,
+						maxValue
 					);
 
 				}

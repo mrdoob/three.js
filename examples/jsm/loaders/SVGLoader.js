@@ -208,6 +208,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'H':
@@ -223,6 +224,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'V':
@@ -238,6 +240,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'L':
@@ -254,6 +257,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'C':
@@ -277,6 +281,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'S':
@@ -300,6 +305,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'Q':
@@ -321,6 +327,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'T':
@@ -344,6 +351,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'A':
@@ -363,6 +371,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'm':
@@ -388,6 +397,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'h':
@@ -403,6 +413,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'v':
@@ -418,6 +429,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'l':
@@ -434,6 +446,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'c':
@@ -457,6 +470,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 's':
@@ -480,6 +494,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'q':
@@ -501,6 +516,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 't':
@@ -524,6 +540,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'a':
@@ -543,6 +560,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'Z':
@@ -557,6 +575,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							isFirstPoint = true;
 
 						}
+
 						break;
 
 					default:
@@ -576,7 +595,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseCSSStylesheet( node ) {
 
-			if ( !node.sheet || !node.sheet.cssRules || !node.sheet.cssRules.length ) return;
+			if ( ! node.sheet || ! node.sheet.cssRules || ! node.sheet.cssRules.length ) return;
 
 			for ( var i = 0; i < node.sheet.cssRules.length; i ++ ) {
 
@@ -597,7 +616,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					);
 
 				}
-				
+
 			}
 
 		}
@@ -1506,6 +1525,7 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 					joinIsOnLeftSide = false;
 
 				}
+
 				if ( iPoint === 1 ) initialJoinIsOnLeftSide = joinIsOnLeftSide;
 
 				tempV2_3.subVectors( nextPoint, currentPoint );
@@ -1533,6 +1553,7 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 						innerSideModified = true;
 
 					}
+
 					outerPoint.copy( tempV2_5 ).add( currentPoint );
 					innerPoint.add( currentPoint );
 

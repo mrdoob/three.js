@@ -302,6 +302,7 @@ AMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					}
 
 				}
+
 				currVerticesNode = currVerticesNode.nextElementSibling;
 
 			}

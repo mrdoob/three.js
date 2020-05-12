@@ -228,8 +228,8 @@ THREE.BufferGeometryUtils = {
 
 			if ( attributesCount !== attributesUsed.size ) {
 
-					console.error( 'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' + i + '. Make sure all geometries have the same number of attributes.' );
-					return null;
+				console.error( 'THREE.BufferGeometryUtils: .mergeBufferGeometries() failed with geometry at index ' + i + '. Make sure all geometries have the same number of attributes.' );
+				return null;
 
 			}
 

@@ -31,12 +31,14 @@ const MtlObjBridge = {
 	addMaterialsFromMtlLoader: function ( materialCreator ) {
 
 		let newMaterials = {};
+
 		if ( materialCreator instanceof MTLLoader.MaterialCreator ) {
 
 			materialCreator.preload();
 			newMaterials = materialCreator.materials;
 
 		}
+
 		return newMaterials;
 
 	}

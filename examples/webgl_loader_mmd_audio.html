@@ -7,7 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background-color: #fff;
 				color: #444;
 			}
 			a {
@@ -17,6 +16,12 @@
 	</head>
 
 	<body>
+		<div id="overlay">
+			<div>
+				<button id="startButton">Click to Play</button>
+				<p>Audio playback requires user interaction.</p>
+			</div>
+		</div>
 		<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MMDLoader test<br />
 		<a href="https://github.com/mrdoob/three.js/tree/master/examples/models/mmd#readme" target="_blank" rel="noopener">MMD Assets license</a><br />
@@ -46,16 +51,22 @@
 
 			var clock = new THREE.Clock();
 
-			Ammo().then( function ( AmmoLib ) {
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', function () {
 
-				Ammo = AmmoLib;
+				Ammo().then( function () {
 
-				init();
-				animate();
+					init();
+					animate();
+
+				} );
 
 			} );
 
 			function init() {
+
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
@@ -68,6 +79,10 @@
 				scene.background = new THREE.Color( 0xffffff );
 
 				scene.add( new THREE.PolarGridHelper( 30, 10 ) );
+
+				var listener = new THREE.AudioListener();
+				camera.add( listener );
+				scene.add( camera );
 
 				var ambient = new THREE.AmbientLight( 0x666666 );
 				scene.add( ambient );
@@ -125,15 +140,9 @@
 
 						new THREE.AudioLoader().load( audioFile, function ( buffer ) {
 
-							var listener = new THREE.AudioListener();
 							var audio = new THREE.Audio( listener ).setBuffer( buffer );
 
-							listener.position.z = 1;
-
 							helper.add( audio, audioParams );
-
-							scene.add( audio );
-							scene.add( listener );
 							scene.add( mesh );
 
 							ready = true;

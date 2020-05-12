@@ -1092,6 +1092,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							meshes.push( newMeshes[ j ] );
 
 						}
+
 						break;
 
 					case 'texture':

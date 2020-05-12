@@ -217,6 +217,8 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 				channels: {}
 			};
 
+			var hasChildren = false;
+
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 				var child = xml.childNodes[ i ];
@@ -242,6 +244,12 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 						data.channels[ id ] = parseAnimationChannel( child );
 						break;
 
+					case 'animation':
+						// hierarchy of related animations
+						parseAnimation( child );
+						hasChildren = true;
+						break;
+
 					default:
 						console.log( child );
 
@@ -249,7 +257,13 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			}
 
-			library.animations[ xml.getAttribute( 'id' ) ] = data;
+			if ( hasChildren === false ) {
+
+				// since 'id' attributes can be optional, it's necessary to generate a UUID for unqiue assignment
+
+				library.animations[ xml.getAttribute( 'id' ) || THREE.MathUtils.generateUUID() ] = data;
+
+			}
 
 		}
 
@@ -2056,6 +2070,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 							data.stride = parseInt( accessor.getAttribute( 'stride' ) );
 
 						}
+
 						break;
 
 				}
@@ -2328,6 +2343,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 											}
 
 										}
+
 										break;
 
 									case 'NORMAL':
@@ -2356,6 +2372,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 								}
 
 							}
+
 							break;
 
 						case 'NORMAL':
@@ -3555,12 +3572,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			}
 
-			if ( object.name === '' ) {
-
-				object.name = ( type === 'JOINT' ) ? data.sid : data.name;
-
-			}
-
+			object.name = ( type === 'JOINT' ) ? data.sid : data.name;
 			object.matrix.copy( matrix );
 			object.matrix.decompose( object.position, object.quaternion, object.scale );
 
@@ -3664,6 +3676,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 							object = new THREE.Mesh( geometry.data, material );
 
 						}
+
 						break;
 
 				}

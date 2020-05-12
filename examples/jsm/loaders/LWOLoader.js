@@ -1044,6 +1044,7 @@ IFFParser.prototype = {
 					this.parseClip( length );
 
 				}
+
 				break;
 
 			case 'STIL':

@@ -249,6 +249,7 @@
 
 			var link = links[ file ];
 			var name = getName( file );
+			if ( file in tags ) file += tags[ file ].join( ' ' );
 			var res = file.match( exp );
 			var text;
 

@@ -42,7 +42,7 @@ function PropertyMixer( binding, typeName, valueSize ) {
 			mixFunctionAdditive = this._slerpAdditive;
 			setIdentity = this._setAdditiveIdentityQuaternion;
 
-			this.buffer = new Float64Array( 24 );
+			this.buffer = new Float64Array( valueSize * 6 );
 			this._workIndex = 5;
 			break;
 
@@ -231,8 +231,13 @@ Object.assign( PropertyMixer.prototype, {
 	_setAdditiveIdentityNumeric: function () {
 
 		var startIndex = this._addIndex * this.valueSize;
+		var endIndex = startIndex + this.valueSize;
 
-		this.buffer.fill( 0, startIndex, startIndex + this.valueSize );
+		for ( var i = startIndex; i < endIndex; i ++ ) {
+
+			this.buffer[ i ] = 0;
+
+		}
 
 	},
 
@@ -248,7 +253,11 @@ Object.assign( PropertyMixer.prototype, {
 		var startIndex = this._origIndex * this.valueSize;
 		var targetIndex = this._addIndex * this.valueSize;
 
-		this.buffer.copyWithin( targetIndex, startIndex, this.valueSize );
+		for ( var i = 0; i < this.valueSize; i ++ ) {
+
+			this.buffer[ targetIndex + i ] = this.buffer[ startIndex + i ];
+
+		}
 
 	},
 

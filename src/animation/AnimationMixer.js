@@ -4,7 +4,7 @@ import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
 import { PropertyBinding } from './PropertyBinding.js';
 import { PropertyMixer } from './PropertyMixer.js';
 import { AnimationClip } from './AnimationClip.js';
-import { NormalAnimationBlendMode } from '../constants';
+import { NormalAnimationBlendMode } from '../constants.js';
 
 /**
  *

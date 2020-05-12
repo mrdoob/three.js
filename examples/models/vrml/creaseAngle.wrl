@@ -3,7 +3,8 @@
 #Created by Cinema 4D
 
 DEF Plane Transform {
-  children [ 
+	scale 0.1 0.1 0.1
+  children [
     Shape {
       appearance DEF MAT_Mat Appearance {
         material Material {
@@ -40,11 +41,11 @@ DEF Plane Transform {
   ]
 }
 DEF Null Transform {
-  translation 0 -200 0
-  children [ 
+  translation 0 5 0
+  children [
     DEF Platonic Transform {
-      translation 0 400 0
-      children [ 
+			scale 0.02 0.02 0.02
+      children [
         Shape {
           appearance USE MAT_Mat
           geometry DEF FACESET_Platonic IndexedFaceSet {

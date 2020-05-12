@@ -56,7 +56,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		var allIntersections = raycaster.intersectObject( object, true );
 
-		for ( var i = allIntersections.length; i --; ) {
+		for ( var i = 0; i < allIntersections.length; i ++ ) {
 
 			if ( allIntersections[ i ].object.visible || includeInvisible ) {
 
@@ -472,11 +472,13 @@ THREE.TransformControls = function ( camera, domElement ) {
 					_tempVector2.x = 1;
 
 				}
+
 				if ( axis.search( 'Y' ) === - 1 ) {
 
 					_tempVector2.y = 1;
 
 				}
+
 				if ( axis.search( 'Z' ) === - 1 ) {
 
 					_tempVector2.z = 1;
@@ -1078,11 +1080,13 @@ THREE.TransformControlsGizmo = function () {
 					object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
 
 				}
+
 				if ( rotation ) {
 
 					object.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
 
 				}
+
 				if ( scale ) {
 
 					object.scale.set( scale[ 0 ], scale[ 1 ], scale[ 2 ] );
@@ -1333,6 +1337,7 @@ THREE.TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'Y' || handle.name === 'XYZY' ) {
 
 					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
@@ -1343,6 +1348,7 @@ THREE.TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'Z' || handle.name === 'XYZZ' ) {
 
 					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
@@ -1353,6 +1359,7 @@ THREE.TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'XY' ) {
 
 					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
@@ -1363,6 +1370,7 @@ THREE.TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'YZ' ) {
 
 					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
@@ -1373,6 +1381,7 @@ THREE.TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'XZ' ) {
 
 					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
@@ -1623,6 +1632,7 @@ THREE.TransformControlsPlane = function () {
 						break;
 
 				}
+
 				break;
 			case 'rotate':
 			default:

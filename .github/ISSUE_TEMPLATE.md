@@ -17,7 +17,7 @@ Please also include a live example if possible. You can start from these templat
 ##### Three.js version
 
 - [ ] Dev
-- [ ] r115
+- [ ] r116
 - [ ] ...
 
 ##### Browser

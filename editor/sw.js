@@ -1,4 +1,4 @@
-// r115.1
+// r116
 
 const assets = [
 	'./',
@@ -46,6 +46,8 @@ const assets = [
 	'../examples/jsm/exporters/OBJExporter.js',
 	'../examples/jsm/exporters/PLYExporter.js',
 	'../examples/jsm/exporters/STLExporter.js',
+
+	'../examples/jsm/helpers/VertexNormalsHelper.js',
 
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
 
