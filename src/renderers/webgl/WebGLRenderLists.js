@@ -228,4 +228,4 @@ function WebGLRenderLists() {
 }
 
 
-export { WebGLRenderLists };
+export { WebGLRenderLists, WebGLRenderList };
