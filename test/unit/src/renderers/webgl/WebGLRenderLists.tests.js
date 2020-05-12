@@ -75,22 +75,22 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.todo( 'push', ( assert ) => {
+			QUnit.test( 'push', ( assert ) => {
 
 				var list = new WebGLRenderList();
-				var objA = { id: 'A' };
+				var objA = { id: 'A', renderOrder: 0 };
 				var matA = { transparent: true, program: { id: 1 } };
 				var geoA = {};
 
-				var objB = { id: 'B' };
+				var objB = { id: 'B', renderOrder: 0 };
 				var matB = { transparent: true, program: { id: 2 } };
 				var geoB = {};
 
-				var objC = { id: 'C' };
+				var objC = { id: 'C', renderOrder: 0 };
 				var matC = { transparent: false, program: { id: 3 } };
 				var geoC = {};
 
-				var objD = { id: 'D' };
+				var objD = { id: 'D', renderOrder: 0 };
 				var matD = { transparent: false, program: { id: 4 } };
 				var geoD = {};
 
@@ -106,6 +106,7 @@ export default QUnit.module( 'Renderers', () => {
 						material: matA,
 						program: matA.program,
 						groupOrder: 0,
+						renderOrder: 0,
 						z: 0.5,
 						group: {}
 					},
@@ -124,6 +125,7 @@ export default QUnit.module( 'Renderers', () => {
 						material: matB,
 						program: matB.program,
 						groupOrder: 1,
+						renderOrder: 0,
 						z: 1.5,
 						group: {}
 					},
@@ -133,7 +135,7 @@ export default QUnit.module( 'Renderers', () => {
 				list.push( objC, geoC, matC, 2, 2.5, {} );
 				assert.ok( list.transparent.length === 2, 'Transparent list is length 2 after adding first opaque item.' );
 				assert.ok( list.opaque.length === 1, 'Opaque list list is length 1 after adding first opaque item.' );
-				assert.opaque(
+				assert.deepEqual(
 					list.opaque[ 0 ],
 					{
 						id: 'C',
@@ -142,6 +144,7 @@ export default QUnit.module( 'Renderers', () => {
 						material: matC,
 						program: matC.program,
 						groupOrder: 2,
+						renderOrder: 0,
 						z: 2.5,
 						group: {}
 					},
@@ -151,7 +154,7 @@ export default QUnit.module( 'Renderers', () => {
 				list.push( objD, geoD, matD, 3, 3.5, {} );
 				assert.ok( list.transparent.length === 2, 'Transparent list is length 2 after adding second opaque item.' );
 				assert.ok( list.opaque.length === 2, 'Opaque list list is length 2 after adding second opaque item.' );
-				assert.opaque(
+				assert.deepEqual(
 					list.opaque[ 1 ],
 					{
 						id: 'D',
@@ -160,29 +163,31 @@ export default QUnit.module( 'Renderers', () => {
 						material: matD,
 						program: matD.program,
 						groupOrder: 3,
+						renderOrder: 0,
 						z: 3.5,
 						group: {}
 					},
+					'The second opaque render list item is structured correctly.'
 				);
 
 			} );
 
-			QUnit.todo( 'unshift', ( assert ) => {
+			QUnit.test( 'unshift', ( assert ) => {
 
 				var list = new WebGLRenderList();
-				var objA = { id: 'A' };
+				var objA = { id: 'A', renderOrder: 0 };
 				var matA = { transparent: true, program: { id: 1 } };
 				var geoA = {};
 
-				var objB = { id: 'B' };
+				var objB = { id: 'B', renderOrder: 0 };
 				var matB = { transparent: true, program: { id: 2 } };
 				var geoB = {};
 
-				var objC = { id: 'C' };
+				var objC = { id: 'C', renderOrder: 0 };
 				var matC = { transparent: false, program: { id: 3 } };
 				var geoC = {};
 
-				var objD = { id: 'D' };
+				var objD = { id: 'D', renderOrder: 0 };
 				var matD = { transparent: false, program: { id: 4 } };
 				var geoD = {};
 
@@ -198,6 +203,7 @@ export default QUnit.module( 'Renderers', () => {
 						material: matA,
 						program: matA.program,
 						groupOrder: 0,
+						renderOrder: 0,
 						z: 0.5,
 						group: {}
 					},
@@ -216,6 +222,7 @@ export default QUnit.module( 'Renderers', () => {
 						material: matB,
 						program: matB.program,
 						groupOrder: 1,
+						renderOrder: 0,
 						z: 1.5,
 						group: {}
 					},
@@ -225,7 +232,7 @@ export default QUnit.module( 'Renderers', () => {
 				list.unshift( objC, geoC, matC, 2, 2.5, {} );
 				assert.ok( list.transparent.length === 2, 'Transparent list is length 2 after adding first opaque item.' );
 				assert.ok( list.opaque.length === 1, 'Opaque list list is length 1 after adding first opaque item.' );
-				assert.opaque(
+				assert.deepEqual(
 					list.opaque[ 0 ],
 					{
 						id: 'C',
@@ -234,6 +241,7 @@ export default QUnit.module( 'Renderers', () => {
 						material: matC,
 						program: matC.program,
 						groupOrder: 2,
+						renderOrder: 0,
 						z: 2.5,
 						group: {}
 					},
@@ -243,7 +251,7 @@ export default QUnit.module( 'Renderers', () => {
 				list.unshift( objD, geoD, matD, 3, 3.5, {} );
 				assert.ok( list.transparent.length === 2, 'Transparent list is length 2 after adding second opaque item.' );
 				assert.ok( list.opaque.length === 2, 'Opaque list list is length 2 after adding second opaque item.' );
-				assert.opaque(
+				assert.deepEqual(
 					list.opaque[ 0 ],
 					{
 						id: 'D',
@@ -252,14 +260,46 @@ export default QUnit.module( 'Renderers', () => {
 						material: matD,
 						program: matD.program,
 						groupOrder: 3,
+						renderOrder: 0,
 						z: 3.5,
 						group: {}
 					},
+					'The second opaque render list item is structured correctly.'
+				);
+
+			} );
+
+			QUnit.test( 'sort', ( assert ) => {
+
+				var list = new WebGLRenderList();
+				var items = [ { id: 4 }, { id: 5 }, { id: 2 }, { id: 3 } ];
+
+				items.forEach( item => {
+
+					list.push( item, {}, { transparent: true }, 0, 0, {} );
+					list.push( item, {}, { transparent: false }, 0, 0, {} );
+
+				} );
+
+				list.sort( ( a, b ) => a.id - b.id, ( a, b ) => b.id - a.id );
+
+				assert.deepEqual(
+					list.opaque.map( item => item.id ),
+					[ 2, 3, 4, 5 ],
+					'The opaque sort is applied to the opaque items list.'
+				);
+
+				assert.deepEqual(
+					list.transparent.map( item => item.id ),
+					[ 5, 4, 3, 2 ],
+					'The transparent sort is applied to the transparent items list.'
 				);
 
 			} );
 
 			QUnit.todo( 'finish', ( assert ) => {
+
+				assert.ok( false, "everything's gonna be alright" );
 
 			} );
 
