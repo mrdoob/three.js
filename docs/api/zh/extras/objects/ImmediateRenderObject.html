@@ -13,16 +13,21 @@
 		<h1>即时渲染对象([name])</h1>
 
 		<p class="desc">
-			This experimental class provides a fast code path for rendering meshes. When the renderer
-			encounters an instance of [name], it only takes care about the most primitive rendering
-			operations (e.g. binding vertex attributes, determining correct shader program or perfoming the
-			actual draw call). Features like view frustum culling, wireframe rendering or using multiple
-			materials are not supported. Besides [name] can only be used to render triangles.
+			This experimental class provides a fast code path for rendering meshes with frequently updated
+			geometry data. When the renderer encounters an instance of [name], it only takes care about
+			the most primitive rendering operations (e.g. binding vertex attributes, determining correct shader
+			program or perfoming the actual draw call). Features like view frustum culling, wireframe rendering
+			or using multiple materials are not supported. Besides [name] can only be used to render triangles.
 		</p>
 
 		<p class="desc">
 			[name] does not work with instances of [page:BufferGeometry] or [page:Geometry]. The
 			raw geometry data have to be maintained as properties of the [name].
+		</p>
+
+		<p class="desc">
+			Using [name] makes only sense if you are updating your geometry data per frame. You can then
+			benefit of a faster code path compared to the default mesh redering logic.
 		</p>
 
 		<h2>例子</h2>
