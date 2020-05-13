@@ -20,7 +20,7 @@
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl gpgpu birds + GLTF mesh<br/>
 			Flamingo by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a><br/>
-			Move mouse to disturb birds. 
+			Move mouse to disturb birds.
 		</div>
 
 		<!-- shader for bird's position -->
@@ -214,65 +214,69 @@
 			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
 
 			/* TEXTURE WIDTH FOR SIMULATION */
-			var WIDTH = 64
+			var WIDTH = 64;
 			var BIRDS = WIDTH * WIDTH;
-			
+
 			/* BAKE ANIMATION INTO TEXTURE and CREATE GEOMETRY FROM BASE MODEL */
 			var BirdGeometry = new THREE.BufferGeometry();
-			var textureAnimation, durationAnimation, originalMaterial,birdMesh, materialShader, vertexPerBird;
-			function nextPowerOf2( n ) { return Math.pow( 2, Math.ceil( Math.log( n ) / Math.log( 2 ) ) ) };
+			var textureAnimation, durationAnimation, birdMesh, materialShader, vertexPerBird;
 
-			Math.lerp = function (value1, value2, amount) {
+			function nextPowerOf2( n ) {
+
+				return Math.pow( 2, Math.ceil( Math.log( n ) / Math.log( 2 ) ) );
+
+			}
+
+			Math.lerp = function ( value1, value2, amount ) {
 
 				amount = Math.max( Math.min( amount, 1 ), 0 );
-				return value1 + (value2 - value1) * amount;
-				
+				return value1 + ( value2 - value1 ) * amount;
+
 			};
 
-			var gltfs = [ 'models/gltf/Parrot.glb', 'models/gltf/Flamingo.glb' ]
-			var colors = [ 0xccFFFF, 0xffdeff ]
-			var sizes = [ 0.2, 0.1 ]
-			var selectModel = Math.floor( Math.random() * gltfs.length )
+			var gltfs = [ 'models/gltf/Parrot.glb', 'models/gltf/Flamingo.glb' ];
+			var colors = [ 0xccFFFF, 0xffdeff ];
+			var sizes = [ 0.2, 0.1 ];
+			var selectModel = Math.floor( Math.random() * gltfs.length );
 			new GLTFLoader().load( gltfs[ selectModel ], function ( gltf ) {
 
 				var animations = gltf.animations;
 				durationAnimation = Math.round( animations[ 0 ].duration * 60 );
 				var birdGeo = gltf.scene.children[ 0 ].geometry;
-				originalMaterial = gltf.scene.children[ 0 ].material;
 				var morphAttributes = birdGeo.morphAttributes.position;
 				var tHeight = nextPowerOf2( durationAnimation );
 				var tWidth = nextPowerOf2( birdGeo.getAttribute( 'position' ).count );
 				vertexPerBird = birdGeo.getAttribute( 'position' ).count;
 				var tData = new Float32Array( 3 * tWidth * tHeight );
 
-				for( var i = 0 ; i < tWidth ; i++ ){
+				for ( var i = 0; i < tWidth; i ++ ) {
 
-					for( var j = 0 ; j < tHeight ; j++ ){
+					for ( var j = 0; j < tHeight; j ++ ) {
 
 						var offset = j * tWidth * 3;
 
-						var curFrame = j;
 						var curMorph = Math.floor( j / durationAnimation * morphAttributes.length );
 						var nextMorph = ( Math.floor( j / durationAnimation * morphAttributes.length ) + 1 ) % morphAttributes.length;
 						var lerpAmount = j / durationAnimation * morphAttributes.length % 1;
 
-						if( j < durationAnimation ){
+						if ( j < durationAnimation ) {
 
 							tData[ offset + i * 3 ] = Math.lerp( morphAttributes[ curMorph ].array[ i * 3 ], morphAttributes[ nextMorph ].array[ i * 3 ], lerpAmount );
 							tData[ offset + i * 3 + 1 ] = Math.lerp( morphAttributes[ curMorph ].array[ i * 3 + 1 ], morphAttributes[ nextMorph ].array[ i * 3 + 1 ], lerpAmount );
 							tData[ offset + i * 3 + 2 ] = Math.lerp( morphAttributes[ curMorph ].array[ i * 3 + 2 ], morphAttributes[ nextMorph ].array[ i * 3 + 2 ], lerpAmount );
-						
+
 						}
-					}
+
+		}
 
 				}
-				
+
 				textureAnimation = new THREE.DataTexture( tData, tWidth, tHeight, THREE.RGBFormat, THREE.FloatType );
 				textureAnimation.needsUpdate = true;
 
 				var vertices = [], color = [], reference = [], seeds = [], indices = [];
 				var totalVertices = birdGeo.getAttribute( 'position' ).count * 3 * BIRDS;
-				for( var i = 0 ; i < totalVertices ; i++ ){
+				for ( var i = 0; i < totalVertices; i ++ ) {
 
 					var bIndex = i % ( birdGeo.getAttribute( 'position' ).count * 3 );
 					vertices.push( birdGeo.getAttribute( 'position' ).array[ bIndex ] );
@@ -281,11 +285,11 @@
 				}
 
 				var r = Math.random();
-				for( var i = 0 ; i < birdGeo.getAttribute( 'position' ).count * BIRDS ; i++ ){
-					
+				for ( var i = 0; i < birdGeo.getAttribute( 'position' ).count * BIRDS; i ++ ) {
+
 					var bIndex = i % ( birdGeo.getAttribute( 'position' ).count );
 					var bird = Math.floor( i / birdGeo.getAttribute( 'position' ).count );
-					if( bIndex == 0 ) r = Math.random();
+					if ( bIndex == 0 ) r = Math.random();
 					var j = ~ ~ bird;
 					var x = ( j % WIDTH ) / WIDTH;
 					var y = ~ ~ ( j / WIDTH ) / WIDTH;
@@ -294,9 +298,9 @@
 
 				}
 
-				for( var i = 0 ; i < birdGeo.index.array.length * BIRDS ; i++ ){
+				for ( var i = 0; i < birdGeo.index.array.length * BIRDS; i ++ ) {
 
-					var offset = Math.floor( i / birdGeo.index.array.length ) * ( birdGeo.getAttribute( 'position' ).count );				
+					var offset = Math.floor( i / birdGeo.index.array.length ) * ( birdGeo.getAttribute( 'position' ).count );
 					indices.push( birdGeo.index.array[ i % birdGeo.index.array.length ] + offset );
 
 				}
@@ -330,7 +334,6 @@
 			var positionVariable;
 			var positionUniforms;
 			var velocityUniforms;
-			var birdUniforms;
 
 			function init() {
 
@@ -358,7 +361,7 @@
 				dirLight.position.multiplyScalar( 30 );
 				scene.add( dirLight );
 
-				renderer = new THREE.WebGLRenderer( { antialias : true, alpha : true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -393,8 +396,8 @@
 					velocityUniforms[ "alignmentDistance" ].value = effectController.alignment;
 					velocityUniforms[ "cohesionDistance" ].value = effectController.cohesion;
 					velocityUniforms[ "freedomFactor" ].value = effectController.freedom;
-					if( materialShader ) materialShader.uniforms[ "size" ].value = effectController.size;
-					BirdGeometry.setDrawRange ( 0, vertexPerBird * effectController.count )
+					if ( materialShader ) materialShader.uniforms[ "size" ].value = effectController.size;
+					BirdGeometry.setDrawRange( 0, vertexPerBird * effectController.count );
 
 				};
 
@@ -445,35 +448,39 @@
 				velocityVariable.wrapT = THREE.RepeatWrapping;
 				positionVariable.wrapS = THREE.RepeatWrapping;
 				positionVariable.wrapT = THREE.RepeatWrapping;
-				
+
 				var error = gpuCompute.init();
+
 				if ( error !== null ) {
+
 					console.error( error );
+
 				}
+
 			}
 
 			function initBirds() {
 
 				var geometry = BirdGeometry;
 
-				var m = new THREE.MeshStandardMaterial({
-					vertexColors : true,
-					flatShading : true,
-					roughness : 1,
-					metalness : 0
-				})
+				var m = new THREE.MeshStandardMaterial( {
+					vertexColors: true,
+					flatShading: true,
+					roughness: 1,
+					metalness: 0
+				} );
 
 				m.onBeforeCompile = ( shader ) => {
 
-					shader.uniforms.texturePosition = { value : null };
-					shader.uniforms.textureVelocity = { value : null };
-					shader.uniforms.textureAnimation = { value : textureAnimation };
-					shader.uniforms.time = { value : 1.0 };
-					shader.uniforms.size = { value : 0.1 };
-					shader.uniforms.delta = { value : 0.0 };
+					shader.uniforms.texturePosition = { value: null };
+					shader.uniforms.textureVelocity = { value: null };
+					shader.uniforms.textureAnimation = { value: textureAnimation };
+					shader.uniforms.time = { value: 1.0 };
+					shader.uniforms.size = { value: 0.1 };
+					shader.uniforms.delta = { value: 0.0 };
 
 					var token = '#define STANDARD';
-					
+
 					var insert = /* glsl */`
 						attribute vec4 reference;
 						attribute vec4 seeds;
@@ -488,18 +495,18 @@
 					shader.vertexShader = shader.vertexShader.replace( token, token + insert );
 
 					var token = '#include <begin_vertex>';
-						
+
 					var insert = /* glsl */`
 						vec4 tmpPos = texture2D( texturePosition, reference.xy );
-					
+
 						vec3 pos = tmpPos.xyz;
 						vec3 velocity = normalize(texture2D( textureVelocity, reference.xy ).xyz);
 						vec3 aniPos = texture2D( textureAnimation, vec2( reference.z, mod( ( time + seeds.x ) * ( ( 0.0004 + seeds.y / 10000.0) + normalize( velocity ) / 20000.0 ), reference.w ) ) ).xyz;
 						vec3 newPosition = position;
-						
+
 						newPosition = mat3( modelMatrix ) * ( newPosition + aniPos );
 						newPosition *= size + seeds.y * size * 0.2;
-						
+
 						velocity.z *= -1.;
 						float xz = length( velocity.xz );
 						float xyz = 1.;
@@ -516,19 +523,19 @@
 
 						newPosition =  maty * matz * newPosition;
 						newPosition += pos;
-						
+
 						vec3 transformed = vec3( newPosition );
 					`;
-					
+
 					shader.vertexShader = shader.vertexShader.replace( token, insert );
 
 					materialShader = shader;
 
-				}    
+				};
 
 				birdMesh = new THREE.Mesh( geometry, m );
 				birdMesh.rotation.y = Math.PI / 2;
-				
+
 				birdMesh.castShadow = true;
 				birdMesh.receiveShadow = true;
 
@@ -635,7 +642,7 @@
 
 				var now = performance.now();
 				var delta = ( now - last ) / 1000;
-				
+
 				if ( delta > 1 ) delta = 1; // safety cap on large deltas
 				last = now;
 
@@ -643,8 +650,8 @@
 				positionUniforms[ "delta" ].value = delta;
 				velocityUniforms[ "time" ].value = now;
 				velocityUniforms[ "delta" ].value = delta;
-				if( materialShader ) materialShader.uniforms[ "time" ].value = now;
-				if( materialShader ) materialShader.uniforms[ "delta" ].value = delta;
+				if ( materialShader ) materialShader.uniforms[ "time" ].value = now;
+				if ( materialShader ) materialShader.uniforms[ "delta" ].value = delta;
 
 				velocityUniforms[ "predator" ].value.set( 0.5 * mouseX / windowHalfX, - 0.5 * mouseY / windowHalfY, 0 );
 
@@ -652,11 +659,12 @@
 				mouseY = 10000;
 
 				gpuCompute.compute();
-				
-				if( materialShader ) materialShader.uniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
-				if( materialShader ) materialShader.uniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
-				
+
+				if ( materialShader ) materialShader.uniforms[ "texturePosition" ].value = gpuCompute.getCurrentRenderTarget( positionVariable ).texture;
+				if ( materialShader ) materialShader.uniforms[ "textureVelocity" ].value = gpuCompute.getCurrentRenderTarget( velocityVariable ).texture;
+
 				renderer.render( scene, camera );
+
 			}
 
 		</script>
