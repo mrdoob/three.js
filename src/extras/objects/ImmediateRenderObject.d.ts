@@ -8,6 +8,19 @@ export class ImmediateRenderObject extends Object3D {
 	constructor( material: Material );
 
 	material: Material;
+
+	hasPositions: boolean;
+	hasNormals: boolean;
+	hasColors: boolean;
+	hasUvs: boolean;
+
+	positionArray: null | Float32Array;
+	normalArray: null | Float32Array;
+	colorArray: null | Float32Array;
+	uvArray: null | Float32Array;
+
+	count: number;
+
 	render( renderCallback: Function ): void;
 
 }
