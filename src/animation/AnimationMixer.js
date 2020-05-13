@@ -607,7 +607,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	stopAllAction: function () {
 
 		var actions = this._actions,
-			nActions = this._nActiveActions,
+			nActions = this._nActiveActions;
 
 		for ( var i = nActions - 1; i >= 0; -- i ) {
 
