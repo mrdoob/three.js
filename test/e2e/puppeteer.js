@@ -123,8 +123,6 @@ const pup = puppeteer.launch( {
 			file = files[ id ];
 			attemptProgress = progressFunc( attemptId );
 			pageSize = 0;
-			global.gc();
-			global.gc();
 
 			try {
 

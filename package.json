@@ -52,14 +52,13 @@
     "build-examples": "rollup -c utils/build/rollup-examples.config.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
-    "test": "npm run test-lint && npm run test-unit",
+    "lint-docs": "eslint docs --ext html",
+    "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
-    "test-lint-docs": "eslint docs --ext html",
-    "test-lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-unit": "npm run build-test && qunit -r failonlyreporter test/unit/three.source.unit.js",
-    "test-e2e": "node --expose-gc test/e2e/puppeteer.js",
+    "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
-    "make-screenshot": "cross-env MAKE=true npm run test-e2e"
+    "make-screenshot": "cross-env MAKE=true node test/e2e/puppeteer.js"
   },
   "keywords": [
     "three",
