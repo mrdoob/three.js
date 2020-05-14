@@ -1344,6 +1344,24 @@ THREE.GLTFLoader = ( function () {
 
 					mesh.morphTargetDictionary[ targetNames[ i ] ] = i;
 
+					// Set the mesh's geometry's bufferAttribute instance names
+					// to match those used for the mesh's morphTargetDictionary
+					if ( mesh.geometry && mesh.geometry.morphAttributes ) {
+
+						if ( mesh.geometry.morphAttributes.normal && mesh.geometry.morphAttributes.normal.length === targetNames.length ) {
+
+							mesh.geometry.morphAttributes.normal[ i ].name = targetNames[ i ];
+
+						}
+
+						if ( mesh.geometry.morphAttributes.position && mesh.geometry.morphAttributes.position.length === targetNames.length ) {
+
+							mesh.geometry.morphAttributes.position[ i ].name = targetNames[ i ];
+
+						}
+
+					}
+
 				}
 
 			} else {
