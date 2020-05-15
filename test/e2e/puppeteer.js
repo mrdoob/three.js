@@ -2,6 +2,17 @@
  * @author munrocket / https://github.com/munrocket
  */
 
+try {
+
+	require( 'puppeteer' );
+
+} catch {
+
+	console.log( '\x1b[31mError! You not installed dependencies. Please run `npm i --prefix test`\x1b[37m' );
+	process.exit( 1 );
+
+}
+
 const puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );
@@ -13,6 +24,14 @@ const fs = require( 'fs' );
 const port = 1234;
 const pixelThreshold = 0.2; // threshold error in one pixel
 const maxFailedPixels = 0.05; // total failed pixels
+
+const networkTimeout = 600;
+const networkTax = 2000; // additional timeout for resources size
+const pageSizeMinTax = 1.0; // in mb, when networkTax = 0
+const pageSizeMaxTax = 5.0; // in mb, when networkTax = networkTax
+const renderTimeout = 1200;
+const maxAttemptId = 3; // progresseve attempts
+const progressFunc = n => 1 + n;
 
 const exceptionList = [
 
@@ -32,14 +51,6 @@ const exceptionList = [
 	'webgl_effects_ascii' // windows fonts not supported
 
 ] : [] );
-
-const networkTimeout = 600;
-const networkTax = 2000; // additional timeout for resources size
-const pageSizeMinTax = 1.0; // in mb, when networkTax = 0
-const pageSizeMaxTax = 5.0; // in mb, when networkTax = networkTax
-const renderTimeout = 1200;
-const maxAttemptId = 3; // progresseve attempts
-const progressFunc = n => 1 + n;
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
