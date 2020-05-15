@@ -123,10 +123,10 @@ export class CSM {
 
 			}
 
-			shadowCam.left = - squaredBBWidth / 2;
-			shadowCam.right = squaredBBWidth / 2;
-			shadowCam.top = squaredBBWidth / 2;
-			shadowCam.bottom = - squaredBBWidth / 2;
+			shadowCam.left = - squaredBBWidth;
+			shadowCam.right = squaredBBWidth;
+			shadowCam.top = squaredBBWidth;
+			shadowCam.bottom = - squaredBBWidth;
 			shadowCam.updateProjectionMatrix();
 
 		}
