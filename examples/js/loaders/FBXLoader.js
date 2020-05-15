@@ -2491,9 +2491,8 @@ THREE.FBXLoader = ( function () {
 									if ( modelID !== undefined ) {
 
 										var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
-										
-										if (!rawModel) {
-											console.log("invalid rawModel", modelID, child);
+
+										if ( rawModel === undefined ) {
 											return;
 										}
 
