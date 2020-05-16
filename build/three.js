@@ -13469,7 +13469,7 @@
 		this.morphTargets = source.morphTargets;
 		this.morphNormals = source.morphNormals;
 
-		this.extensions = source.extensions;
+		this.extensions = Object.assign( {}, source.extensions );
 
 		return this;
 
@@ -43950,37 +43950,17 @@
 
 						}
 
-						for ( var i = 0; i < this.node.geometry.morphAttributes.position.length; i ++ ) {
+						if ( targetObject.morphTargetDictionary[ propertyIndex ] !== undefined ) {
 
-							if ( targetObject.geometry.morphAttributes.position[ i ].name === propertyIndex ) {
-
-								propertyIndex = i;
-								break;
-
-							}
+							propertyIndex = targetObject.morphTargetDictionary[ propertyIndex ];
 
 						}
 
 
 					} else {
 
-						if ( ! targetObject.geometry.morphTargets ) {
-
-							console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences because node does not have a geometry.morphTargets.', this );
-							return;
-
-						}
-
-						for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
-
-							if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
-
-								propertyIndex = i;
-								break;
-
-							}
-
-						}
+						console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences on THREE.Geometry. Use THREE.BufferGeometry instead.', this );
+						return;
 
 					}
 
