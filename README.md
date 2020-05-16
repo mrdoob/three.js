@@ -66,6 +66,14 @@ function animate() {
 
 If everything went well, you should see [this](https://jsfiddle.net/8kubjpL5/).
 
+### Cloning this repository ###
+
+Use the `depth` parameter to prevent cloning the entire commit history. This will significantly reduce the download size.
+
+```sh
+git clone --depth=30 https://github.com/mrdoob/three.js.git
+```
+
 ### Change log ###
 
 [Releases](https://github.com/mrdoob/three.js/releases)
