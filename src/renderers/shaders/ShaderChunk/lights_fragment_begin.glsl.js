@@ -74,11 +74,11 @@ IncidentLight directLight;
 		#if defined( SHADOWMAP_TYPE_PCF )
         directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowPCF( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowBias, spotLightShadow.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
 		#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
-        directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowPCFSoft( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowBias, spotLightShadow.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+        directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowPCFSoft( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowBias, vSpotShadowCoord[ i ] ) : 1.0;
 		#elif defined(SHADOWMAP_TYPE_VSM )
-		directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowVSM( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowBias, spotLightShadow.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+		directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowVSM( spotShadowMap[ i ], spotLightShadow.shadowBias, vSpotShadowCoord[ i ] ) : 1.0;
 		#else
-		directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowBias, spotLightShadow.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+		directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( spotShadowMap[ i ], spotLightShadow.shadowBias, vSpotShadowCoord[ i ] ) : 1.0;
 		#endif
 
 		#endif
@@ -110,11 +110,11 @@ IncidentLight directLight;
 		#if defined( SHADOWMAP_TYPE_PCF )
         directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowPCF( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
 		#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
-        directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowPCFSoft( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+        directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowPCFSoft( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, vDirectionalShadowCoord[ i ] ) : 1.0;
 		#elif defined(SHADOWMAP_TYPE_VSM )
-		directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowVSM( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+		directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadowVSM( directionalShadowMap[ i ], directionalLightShadow.shadowBias, vDirectionalShadowCoord[ i ] ) : 1.0;
 		#else
-		directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowMapSize, directionalLightShadow.shadowBias, directionalLightShadow.shadowRadius, vDirectionalShadowCoord[ i ] ) : 1.0;
+		directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( directionalShadowMap[ i ], directionalLightShadow.shadowBias, vDirectionalShadowCoord[ i ] ) : 1.0;
 		#endif
 
 		#endif

@@ -119,7 +119,7 @@ export default /* glsl */`
 
 	}
 
-	float getShadowPCFSoft( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+	float getShadowPCFSoft( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, vec4 shadowCoord ) {
 
 		float shadow = 1.0;
 
@@ -178,7 +178,7 @@ export default /* glsl */`
 
 	}
 
-	float getShadowVSM( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+	float getShadowVSM( sampler2D shadowMap, float shadowBias, vec4 shadowCoord ) {
 
 		float shadow = 1.0;
 
@@ -205,7 +205,7 @@ export default /* glsl */`
 
 	}
 
-	float getShadow( sampler2D shadowMap, vec2 shadowMapSize, float shadowBias, float shadowRadius, vec4 shadowCoord ) {
+	float getShadow( sampler2D shadowMap, float shadowBias, vec4 shadowCoord ) {
 
 		float shadow = 1.0;
 
