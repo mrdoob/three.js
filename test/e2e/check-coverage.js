@@ -43,7 +43,7 @@ if ( subES.length + subSE.length + subEF.length + subFE.length === 0 ) {
 
 } else {
 
-	if ( subES.length > 0 ) console.red( 'Add screenshots for example(s): ' + subES.join(' ') );
+	if ( subES.length > 0 ) console.red( 'Make screenshot for example(s): ' + subES.join(' ') );
 	if ( subSE.length > 0 ) console.red( 'Remove unnecessary screenshot(s): ' + subSE.join(' ') );
 	if ( subEF.length > 0 ) console.red( 'Add description in file.js for example(s): ' + subEF.join(' ') );
 	if ( subFE.length > 0 ) console.red( 'Remove description in file.js for example(s): ' + subFE.join(' ') );
