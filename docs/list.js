@@ -379,6 +379,10 @@ var list = {
 				"VertexTangentsHelper": "examples/en/helpers/VertexTangentsHelper"
 			},
 
+			"Lights": {
+				"LightProbeGenerator": "examples/en/lights/LightProbeGenerator"
+			},
+
 			"Loaders": {
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
@@ -821,6 +825,10 @@ var list = {
 				"ConvexBufferGeometry": "examples/zh/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
+			},
+
+			"灯光": {
+				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
 			},
 
 			"辅助对象": {
