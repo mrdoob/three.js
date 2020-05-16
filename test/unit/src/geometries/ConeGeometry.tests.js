@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
 import {
 	ConeBufferGeometry
 } from '../../../../src/geometries/ConeGeometry';

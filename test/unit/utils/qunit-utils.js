@@ -4,7 +4,7 @@
 /* global QUnit */
 
 import { SmartComparer } from './SmartComparer';
-import { ObjectLoader } from '../../src/loaders/ObjectLoader';
+import { ObjectLoader } from '../../../src/loaders/ObjectLoader';
 
 QUnit.assert.success = function ( message ) {
 
