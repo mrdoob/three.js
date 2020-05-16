@@ -5,7 +5,7 @@
 // TODO (Itee) Editor is not es6 module so care to include order !!!
 // TODO: all views could not be testable, waiting modular code before implement units tests on them
 
-import './qunit-utils.js';
+import './utils/qunit-utils.js';
 
 //editor
 import './editor/Command.tests';

@@ -2,7 +2,7 @@
  * @author TristanVALCKE / https://github.com/Itee
  */
 
-import './qunit-utils.js';
+import './utils/qunit-utils.js';
 
 import './example/utils/BufferGeometryUtils.tests';
 import './example/exporters/GLTFExporter.tests';
