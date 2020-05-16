@@ -68,10 +68,10 @@ If everything went well, you should see [this](https://jsfiddle.net/8kubjpL5/).
 
 ### Cloning this repository ###
 
-Use the `depth` parameter to prevent cloning the entire commit history. This will significantly reduce the download size.
+Cloning the repo with all its history results in a ~2GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
 
 ```sh
-git clone --depth=30 https://github.com/mrdoob/three.js.git
+git clone --depth=1 https://github.com/mrdoob/three.js.git
 ```
 
 ### Change log ###
