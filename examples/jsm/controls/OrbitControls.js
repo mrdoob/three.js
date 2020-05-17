@@ -244,8 +244,8 @@ var OrbitControls = function ( object, domElement ) {
 
 	}();
 
-	// if damping is used, this method can be called to see if there is
-	// movement and re-render is needed (when not using infinite render loop)
+	// this method can be called to see if there is movement
+	// and re-render is needed (when not using infinite render loop)
 	// TODO: zoom change
 	this.needsUpdate = function () {
 		const treshold = 0.0001
