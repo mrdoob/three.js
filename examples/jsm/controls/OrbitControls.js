@@ -244,6 +244,18 @@ var OrbitControls = function ( object, domElement ) {
 
 	}();
 
+	// if damping is used, this method can be called to see if there is
+	// movement and re-render is needed (when not using infinite render loop)
+	// TODO: zoom change
+	this.needsUpdate = function () {
+		const treshold = 0.0001
+		return [
+			Math.abs(sphericalDelta.phi),
+			Math.abs(sphericalDelta.theta),
+			panOffset.length()
+		].some((value) => value > treshold)
+	};
+
 	this.dispose = function () {
 
 		scope.domElement.removeEventListener( 'contextmenu', onContextMenu, false );
