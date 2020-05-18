@@ -51,6 +51,7 @@
     "build-examples": "rollup -c utils/build/rollup-examples.config.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"rollup -c test/rollup.unit.config.js -w -m inline\" \"http-server -p 8080\"",
+    "typecheck": "tsc -p utils/build/tsconfig.lint.json",
     "lint-docs": "eslint docs --ext html",
     "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
