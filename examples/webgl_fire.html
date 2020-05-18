@@ -430,6 +430,8 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				if ( typeof TESTING !== 'undefined'  ) { for( var i = 0; i < 60; i ++ ) { renderer.render( scene, camera ); } };
+
 			}
 
 			function onWindowResize() {

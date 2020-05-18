@@ -12,7 +12,7 @@ const E = fs.readdirSync( './examples' )
 
 // screenshots
 const S = fs.readdirSync( './examples/screenshots' )
-		.filter( s => s.slice( - 4 ) === '.png' )
+		.filter( s => s.slice( - 4 ) === '.jpg' )
 		.map( s => s.slice( 0, s.length - 4 ) )
 
 // files.js
