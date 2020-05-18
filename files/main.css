@@ -478,7 +478,7 @@ iframe {
 }
 
 .card .cover {
-	padding-bottom: 62.5%; /* 8:5 aspect ratio */
+	padding-bottom: 56.25%; /* 16:9 aspect ratio */
 	position: relative;
 	overflow: hidden;
 }
