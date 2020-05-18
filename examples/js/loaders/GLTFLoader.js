@@ -1404,6 +1404,9 @@ THREE.GLTFLoader = ( function () {
 		// loader object cache
 		this.cache = new GLTFRegistry();
 
+		// associations between Three.js objects and glTF elements
+		this.associations = new Map();
+
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
@@ -1913,6 +1916,11 @@ THREE.GLTFLoader = ( function () {
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || THREE.RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || THREE.RepeatWrapping;
 
+			parser.associations.set( texture, {
+				type: 'textures',
+				index: textureIndex
+			} );
+
 			return texture;
 
 		} );
@@ -1962,7 +1970,9 @@ THREE.GLTFLoader = ( function () {
 
 				if ( transform ) {
 
+					var gltfReference = this.associations.get( texture );
 					texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, transform );
+					this.associations.set( texture, gltfReference );
 
 				}
 
@@ -2061,6 +2071,8 @@ THREE.GLTFLoader = ( function () {
 				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
 
 				this.cache.add( cacheKey, cachedMaterial );
+
+				this.associations.set( cachedMaterial, this.associations.get( material ) );
 
 			}
 
@@ -2256,6 +2268,8 @@ THREE.GLTFLoader = ( function () {
 			if ( material.emissiveMap ) material.emissiveMap.encoding = THREE.sRGBEncoding;
 
 			assignExtrasToUserData( material, materialDef );
+
+			parser.associations.set( material, { type: 'materials', index: materialIndex } );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -3126,6 +3140,8 @@ THREE.GLTFLoader = ( function () {
 				}
 
 			}
+
+			parser.associations.set( node, { type: 'nodes', index: nodeIndex } );
 
 			return node;
 

@@ -2135,7 +2135,9 @@ var GLTFLoader = ( function () {
 				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
 
 				this.cache.add( cacheKey, cachedMaterial );
+
 				this.associations.set( cachedMaterial, this.associations.get( material ) );
+
 			}
 
 			material = cachedMaterial;
