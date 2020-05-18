@@ -3,7 +3,10 @@ import {
 	Camera,
 	Group,
 	Loader,
-	LoadingManager
+	LoadingManager,
+	Object3D,
+	Material,
+	Texture
 } from '../../../src/Three';
 
 import { DRACOLoader } from './DRACOLoader';
@@ -39,9 +42,16 @@ export class GLTFLoader extends Loader {
 
 }
 
+export interface GLTFReference {
+	type: 'materials'|'nodes'|'textures';
+	index: number;
+}
+
 export class GLTFParser {
 
 	json: any;
+
+	associations: Map<Object3D|Material|Texture, GLTFReference>;
 
 	getDependency: ( type: string, index: number ) => Promise<any>;
 	getDependencies: ( type: string ) => Promise<any[]>;
