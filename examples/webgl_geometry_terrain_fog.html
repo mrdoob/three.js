@@ -56,7 +56,8 @@
 
 				var data = generateHeight( worldWidth, worldDepth );
 
-				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] * 10 + 500;
+				camera.position.set( 100,  800, -800);
+				camera.lookAt( -100, 810, -800 );
 
 				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );
@@ -108,8 +109,11 @@
 
 			function generateHeight( width, height ) {
 
-				var size = width * height, data = new Uint8Array( size ),
-					perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
+				var seed = Math.PI / 4;
+				window.Math.random = function () { const x = Math.sin( seed ++ ) * 10000; return x - Math.floor( x ); };
+
+				var size = width * height, data = new Uint8Array( size );
+				var perlin = new ImprovedNoise(), quality = 1, z = Math.random() * 100;
 
 				for ( var j = 0; j < 4; j ++ ) {
 

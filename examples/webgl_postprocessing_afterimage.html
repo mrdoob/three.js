@@ -61,6 +61,8 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				if ( typeof TESTING !== 'undefined' ) { for ( var i = 0; i < 45; i ++ ) { render(); }; };
+
 			}
 
 			function createGUI() {
@@ -81,9 +83,7 @@
 
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
+			function render() {
 
 				mesh.rotation.x += 0.005;
 				mesh.rotation.y += 0.01;
@@ -97,6 +97,13 @@
 					renderer.render( scene, camera );
 
 				}
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+				render();
 
 			}
 
