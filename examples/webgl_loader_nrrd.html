@@ -65,11 +65,12 @@
 
 				// light
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 200, 200, 1000 ).normalize();
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000 , 1 );
+				scene.add( hemiLight );
 
-				camera.add( dirLight );
-				camera.add( dirLight.target );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				dirLight.position.set( 200, 200, 200 );
+				scene.add( dirLight );
 
 				var loader = new NRRDLoader();
 				loader.load( "models/nrrd/I.nrrd", function ( volume ) {
@@ -172,10 +173,11 @@
 				container.appendChild( renderer.domElement );
 
 				controls = new TrackballControls( camera, renderer.domElement );
+				controls.minDistance = 100;
+				controls.maxDistance = 500;
 				controls.rotateSpeed = 5.0;
 				controls.zoomSpeed = 5;
 				controls.panSpeed = 2;
-				controls.staticMoving = true;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

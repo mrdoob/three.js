@@ -44,10 +44,13 @@
 				ACESFilmic: THREE.ACESFilmicToneMapping
 			};
 
-			init();
-			render();
+			init().catch( function ( err ) {
 
-			function init() {
+				console.error( err );
+
+			} );
+
+			async function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -75,42 +78,41 @@
 				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				new RGBELoader()
+				var rgbeLoader = new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
-					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', function ( texture ) {
+					.setPath( 'textures/equirectangular/' );
 
-						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+				var gltfLoader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 
-						scene.background = envMap;
-						scene.environment = envMap;
+				var [ texture, gltf ] = await Promise.all( [
+					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					gltfLoader.loadAsync( 'DamagedHelmet.gltf' ),
+				] );
 
-						texture.dispose();
-						pmremGenerator.dispose();
+				// environment
 
-						render();
+				var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
-						// model
+				scene.background = envMap;
+				scene.environment = envMap;
 
-						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
-						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+				texture.dispose();
+				pmremGenerator.dispose();
 
-							gltf.scene.traverse( function ( child ) {
+				// model
 
-								if ( child.isMesh ) {
+				gltf.scene.traverse( function ( child ) {
 
-									mesh = child;
-									scene.add( mesh );
+					if ( child.isMesh ) {
 
-								}
+						mesh = child;
+						scene.add( mesh );
 
-							} );
+					}
 
-							render();
+				} );
 
-						} );
-
-					} );
+				render();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

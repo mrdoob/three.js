@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -117,8 +117,6 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:this compose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
 		设置将该对象由位置[page:Vector3 position]，四元数[page:Quaternion quaternion] 和 缩放[page:Vector3 scale]
-		组合变换的矩阵。内部先调用[page:.makeRotationFromQuaternion makeRotationFromQuaternion]( [page:Quaternion quaternion] )
-		再调用缩放[page:.scale scale]( [page:Vector3 scale] )最后是平移[page:.setPosition setPosition]( [page:Vector3 position] )。
 		</p>
 
 		<h3>[method:this copy]( [param:Matrix4 m] )</h3>
@@ -175,16 +173,15 @@ zAxis = (c, g, k)
 			使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
 			</p>
 
-		<h3>[method:this getInverse]( [param:Matrix4 m], [param:Boolean throwOnDegenerate] )</h3>
+		<h3>[method:this getInverse]( [param:Matrix4 m] )</h3>
 		<p>
-			[page:Matrix3 m] - 取逆的矩阵。<br />
-			[page:Boolean throwOnDegenerate] - (optional) 如果设置为true，如果矩阵是退化的（如果不可逆的话），则会抛出一个错误。<br /><br />
+			[page:Matrix3 m] - 取逆的矩阵。<br /><br />
 
-			使用逆矩阵计算方法[link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method]，
-			将当前矩阵设置为给定矩阵的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse]，如果[page:Boolean throwOnDegenerate]
-			参数没有设置且给定矩阵不可逆，那么将当前矩阵设置为3X3单位矩阵。
-				</p>
+			Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix4 m],
+			using the method outlined [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here].
 
+			You can not invert a matrix with a determinant of zero. If you attempt this, the method returns a zero matrix instead.
+		</p>
 
 		<h3>[method:Float getMaxScaleOnAxis]()</h3>
 		<p>获取3个轴方向的最大缩放值。</p>

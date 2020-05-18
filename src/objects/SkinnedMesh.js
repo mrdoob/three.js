@@ -6,6 +6,7 @@
 
 import { Mesh } from './Mesh.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 
 function SkinnedMesh( geometry, material ) {
@@ -112,7 +113,51 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		return new this.constructor( this.geometry, this.material ).copy( this );
 
-	}
+	},
+
+	boneTransform: ( function () {
+
+		var basePosition = new Vector3();
+
+		var skinIndex = new Vector4();
+		var skinWeight = new Vector4();
+
+		var vector = new Vector3();
+		var matrix = new Matrix4();
+
+		return function ( index, target ) {
+
+			var skeleton = this.skeleton;
+			var geometry = this.geometry;
+
+			skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
+			skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
+
+			basePosition.fromBufferAttribute( geometry.attributes.position, index ).applyMatrix4( this.bindMatrix );
+
+			target.set( 0, 0, 0 );
+
+			for ( var i = 0; i < 4; i ++ ) {
+
+				var weight = skinWeight.getComponent( i );
+
+				if ( weight !== 0 ) {
+
+					var boneIndex = skinIndex.getComponent( i );
+
+					matrix.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
+
+					target.addScaledVector( vector.copy( basePosition ).applyMatrix4( matrix ), weight );
+
+				}
+
+			}
+
+			return target.applyMatrix4( this.bindMatrixInverse );
+
+		};
+
+	}() )
 
 } );
 

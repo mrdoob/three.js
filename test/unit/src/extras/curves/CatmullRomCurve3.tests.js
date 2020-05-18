@@ -232,10 +232,10 @@ export default QUnit.module( 'Extras', () => {
 				];
 
 				var points = [
-					curve.getPointAt( 0 ),
-					curve.getPointAt( 0.3 ),
-					curve.getPointAt( 0.5 ),
-					curve.getPointAt( 1 )
+					curve.getPointAt( 0, new Vector3() ),
+					curve.getPointAt( 0.3, new Vector3() ),
+					curve.getPointAt( 0.5, new Vector3() ),
+					curve.getPointAt( 1, new Vector3() )
 				];
 
 				assert.deepEqual( points, expectedPoints, "Correct points" );
@@ -256,11 +256,11 @@ export default QUnit.module( 'Extras', () => {
 				];
 
 				var tangents = [
-					curve.getTangent( 0 ),
-					curve.getTangent( 0.25 ),
-					curve.getTangent( 0.5 ),
-					curve.getTangent( 0.75 ),
-					curve.getTangent( 1 )
+					curve.getTangent( 0, new Vector3() ),
+					curve.getTangent( 0.25, new Vector3() ),
+					curve.getTangent( 0.5, new Vector3() ),
+					curve.getTangent( 0.75, new Vector3() ),
+					curve.getTangent( 1, new Vector3() )
 				];
 
 				expectedTangents.forEach( function ( exp, i ) {
@@ -274,7 +274,7 @@ export default QUnit.module( 'Extras', () => {
 
 				//
 
-				var expectedTangents = [
+				expectedTangents = [
 					new Vector3( 0, 1, 0 ),
 					new Vector3( - 0.10709018822205997, 0.9884651653817284, 0.10709018822205997 ),
 					new Vector3( 0.6396363672964268, - 0.4262987629159402, - 0.6396363672964268 ),
@@ -282,12 +282,12 @@ export default QUnit.module( 'Extras', () => {
 					new Vector3( - 0.00019991333100812723, - 0.9999999600346592, 0.00019991333100812723 )
 				];
 
-				var tangents = [
-					curve.getTangentAt( 0 ),
-					curve.getTangentAt( 0.25 ),
-					curve.getTangentAt( 0.5 ),
-					curve.getTangentAt( 0.75 ),
-					curve.getTangentAt( 1 )
+				tangents = [
+					curve.getTangentAt( 0, new Vector3() ),
+					curve.getTangentAt( 0.25, new Vector3() ),
+					curve.getTangentAt( 0.5, new Vector3() ),
+					curve.getTangentAt( 0.75, new Vector3() ),
+					curve.getTangentAt( 1, new Vector3() )
 				];
 
 				expectedTangents.forEach( function ( exp, i ) {

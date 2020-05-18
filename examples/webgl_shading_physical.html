@@ -67,7 +67,13 @@
 
 				// CUBE CAMERA
 
-				cubeCamera = new THREE.CubeCamera( 1, 10000, 128, { encoding: THREE.sRGBEncoding } );
+				var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, {
+					format: THREE.RGBFormat,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter,
+					encoding: THREE.sRGBEncoding
+				} );
+				cubeCamera = new THREE.CubeCamera( 1, 10000, cubeRenderTarget );
 
 				// TEXTURES
 				var textureLoader = new THREE.TextureLoader();
@@ -110,7 +116,7 @@
 
 				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
 				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget.texture } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeRenderTarget.texture } );
 
 				// OBJECTS
 

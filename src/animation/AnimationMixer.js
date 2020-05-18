@@ -4,6 +4,7 @@ import { LinearInterpolant } from '../math/interpolants/LinearInterpolant.js';
 import { PropertyBinding } from './PropertyBinding.js';
 import { PropertyMixer } from './PropertyMixer.js';
 import { AnimationClip } from './AnimationClip.js';
+import { NormalAnimationBlendMode } from '../constants.js';
 
 /**
  *
@@ -516,7 +517,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// return an action for a clip optionally using a custom root target
 	// object (this method allocates a lot of dynamic memory in case a
 	// previously unknown clip/root combination is specified)
-	clipAction: function ( clip, optionalRoot ) {
+	clipAction: function ( clip, optionalRoot, blendMode ) {
 
 		var root = optionalRoot || this._root,
 			rootUuid = root.uuid,
@@ -529,12 +530,26 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			actionsForClip = this._actionsByClip[ clipUuid ],
 			prototypeAction = null;
 
+		if ( blendMode === undefined ) {
+
+			if ( clipObject !== null ) {
+
+				blendMode = clipObject.blendMode;
+
+			} else {
+
+				blendMode = NormalAnimationBlendMode;
+
+			}
+
+		}
+
 		if ( actionsForClip !== undefined ) {
 
 			var existingAction =
 					actionsForClip.actionByRoot[ rootUuid ];
 
-			if ( existingAction !== undefined ) {
+			if ( existingAction !== undefined && existingAction.blendMode === blendMode ) {
 
 				return existingAction;
 
@@ -554,7 +569,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		if ( clipObject === null ) return null;
 
 		// allocate all resources required to run it
-		var newAction = new AnimationAction( this, clipObject, optionalRoot );
+		var newAction = new AnimationAction( this, clipObject, optionalRoot, blendMode );
 
 		this._bindAction( newAction, prototypeAction );
 
@@ -592,22 +607,11 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	stopAllAction: function () {
 
 		var actions = this._actions,
-			nActions = this._nActiveActions,
-			bindings = this._bindings,
-			nBindings = this._nActiveBindings;
+			nActions = this._nActiveActions;
 
-		this._nActiveActions = 0;
-		this._nActiveBindings = 0;
+		for ( var i = nActions - 1; i >= 0; -- i ) {
 
-		for ( var i = 0; i !== nActions; ++ i ) {
-
-			actions[ i ].reset();
-
-		}
-
-		for ( var i = 0; i !== nBindings; ++ i ) {
-
-			bindings[ i ].useCount = 0;
+			actions[ i ].stop();
 
 		}
 

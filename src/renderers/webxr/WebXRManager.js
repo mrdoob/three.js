@@ -4,11 +4,11 @@
 
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
-import { Group } from '../../objects/Group.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
+import { WebXRController } from './WebXRController.js';
 
 function WebXRManager( renderer, gl ) {
 
@@ -36,7 +36,9 @@ function WebXRManager( renderer, gl ) {
 	cameraR.layers.enable( 2 );
 	cameraR.viewport = new Vector4();
 
-	var cameraVR = new ArrayCamera( [ cameraL, cameraR ] );
+	var cameras = [ cameraL, cameraR ];
+
+	var cameraVR = new ArrayCamera();
 	cameraVR.layers.enable( 1 );
 	cameraVR.layers.enable( 2 );
 
@@ -49,49 +51,33 @@ function WebXRManager( renderer, gl ) {
 
 	this.isPresenting = false;
 
-	this.getController = function ( id ) {
+	this.getController = function ( index ) {
 
-		var controller = controllers[ id ];
+		var controller = controllers[ index ];
 
 		if ( controller === undefined ) {
 
-			controller = {};
-			controllers[ id ] = controller;
+			controller = new WebXRController();
+			controllers[ index ] = controller;
 
 		}
 
-		if ( controller.targetRay === undefined ) {
-
-			controller.targetRay = new Group();
-			controller.targetRay.matrixAutoUpdate = false;
-			controller.targetRay.visible = false;
-
-		}
-
-		return controller.targetRay;
+		return controller.getTargetRaySpace();
 
 	};
 
-	this.getControllerGrip = function ( id ) {
+	this.getControllerGrip = function ( index ) {
 
-		var controller = controllers[ id ];
+		var controller = controllers[ index ];
 
 		if ( controller === undefined ) {
 
-			controller = {};
-			controllers[ id ] = controller;
+			controller = new WebXRController();
+			controllers[ index ] = controller;
 
 		}
 
-		if ( controller.grip === undefined ) {
-
-			controller.grip = new Group();
-			controller.grip.matrixAutoUpdate = false;
-			controller.grip.visible = false;
-
-		}
-
-		return controller.grip;
+		return controller.getGripSpace();
 
 	};
 
@@ -103,17 +89,7 @@ function WebXRManager( renderer, gl ) {
 
 		if ( controller ) {
 
-			if ( controller.targetRay ) {
-
-				controller.targetRay.dispatchEvent( { type: event.type } );
-
-			}
-
-			if ( controller.grip ) {
-
-				controller.grip.dispatchEvent( { type: event.type } );
-
-			}
+			controller.dispatchEvent( { type: event.type } );
 
 		}
 
@@ -123,19 +99,7 @@ function WebXRManager( renderer, gl ) {
 
 		inputSourcesMap.forEach( function ( controller, inputSource ) {
 
-			if ( controller.targetRay ) {
-
-				controller.targetRay.dispatchEvent( { type: 'disconnected', data: inputSource } );
-				controller.targetRay.visible = false;
-
-			}
-
-			if ( controller.grip ) {
-
-				controller.grip.dispatchEvent( { type: 'disconnected', data: inputSource } );
-				controller.grip.visible = false;
-
-			}
+			controller.disconnect( inputSource );
 
 		} );
 
@@ -170,10 +134,9 @@ function WebXRManager( renderer, gl ) {
 
 		framebufferScaleFactor = value;
 
-		// Warn if function is used while presenting
-		if ( scope.isPresenting == true ) {
+		if ( scope.isPresenting === true ) {
 
-			console.warn( "WebXRManager: Cannot change framebuffer scale while presenting VR content" );
+			console.warn( 'THREE.WebXRManager: Cannot change framebuffer scale while presenting.' );
 
 		}
 
@@ -182,6 +145,12 @@ function WebXRManager( renderer, gl ) {
 	this.setReferenceSpaceType = function ( value ) {
 
 		referenceSpaceType = value;
+
+		if ( scope.isPresenting === true ) {
+
+			console.warn( 'THREE.WebXRManager: Cannot change reference space type while presenting.' );
+
+		}
 
 	};
 
@@ -257,18 +226,7 @@ function WebXRManager( renderer, gl ) {
 
 			if ( controller ) {
 
-				if ( controller.targetRay ) {
-
-					controller.targetRay.dispatchEvent( { type: 'disconnected', data: inputSource } );
-
-				}
-
-				if ( controller.grip ) {
-
-					controller.grip.dispatchEvent( { type: 'disconnected', data: inputSource } );
-
-				}
-
+				controller.dispatchEvent( { type: 'disconnected', data: inputSource } );
 				inputSourcesMap.delete( inputSource );
 
 			}
@@ -284,17 +242,7 @@ function WebXRManager( renderer, gl ) {
 
 			if ( controller ) {
 
-				if ( controller.targetRay ) {
-
-					controller.targetRay.dispatchEvent( { type: 'connected', data: inputSource } );
-
-				}
-
-				if ( controller.grip ) {
-
-					controller.grip.dispatchEvent( { type: 'connected', data: inputSource } );
-
-				}
+				controller.dispatchEvent( { type: 'connected', data: inputSource } );
 
 			}
 
@@ -422,7 +370,19 @@ function WebXRManager( renderer, gl ) {
 
 		}
 
-		setProjectionFromUnion( cameraVR, cameraL, cameraR );
+		// update projection matrix for proper view frustum culling
+
+		if ( cameras.length === 2 ) {
+
+			setProjectionFromUnion( cameraVR, cameraL, cameraR );
+
+		} else {
+
+			// assume single camera setup (AR)
+
+			cameraVR.projectionMatrix.copy( cameraL.projectionMatrix );
+
+		}
 
 		return cameraVR;
 
@@ -443,12 +403,23 @@ function WebXRManager( renderer, gl ) {
 
 			renderer.setFramebuffer( baseLayer.framebuffer );
 
+			var cameraVRNeedsUpdate = false;
+
+			// check if it's necessary to rebuild cameraVR's camera list
+
+			if ( views.length !== cameraVR.cameras.length ) {
+
+				cameraVR.cameras.length = 0;
+				cameraVRNeedsUpdate = true;
+
+			}
+
 			for ( var i = 0; i < views.length; i ++ ) {
 
 				var view = views[ i ];
 				var viewport = baseLayer.getViewport( view );
 
-				var camera = cameraVR.cameras[ i ];
+				var camera = cameras[ i ];
 				camera.matrix.fromArray( view.transform.matrix );
 				camera.projectionMatrix.fromArray( view.projectionMatrix );
 				camera.viewport.set( viewport.x, viewport.y, viewport.width, viewport.height );
@@ -456,6 +427,12 @@ function WebXRManager( renderer, gl ) {
 				if ( i === 0 ) {
 
 					cameraVR.matrix.copy( camera.matrix );
+
+				}
+
+				if ( cameraVRNeedsUpdate === true ) {
+
+					cameraVR.cameras.push( camera );
 
 				}
 
@@ -470,53 +447,9 @@ function WebXRManager( renderer, gl ) {
 		for ( var i = 0; i < controllers.length; i ++ ) {
 
 			var controller = controllers[ i ];
-
 			var inputSource = inputSources[ i ];
 
-			var inputPose = null;
-			var gripPose = null;
-
-			if ( inputSource ) {
-
-				if ( controller.targetRay ) {
-
-					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
-
-					if ( inputPose !== null ) {
-
-						controller.targetRay.matrix.fromArray( inputPose.transform.matrix );
-						controller.targetRay.matrix.decompose( controller.targetRay.position, controller.targetRay.rotation, controller.targetRay.scale );
-
-					}
-
-				}
-
-				if ( controller.grip && inputSource.gripSpace ) {
-
-					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
-
-					if ( gripPose !== null ) {
-
-						controller.grip.matrix.fromArray( gripPose.transform.matrix );
-						controller.grip.matrix.decompose( controller.grip.position, controller.grip.rotation, controller.grip.scale );
-
-					}
-
-				}
-
-			}
-
-			if ( controller.targetRay ) {
-
-				controller.targetRay.visible = inputPose !== null;
-
-			}
-
-			if ( controller.grip ) {
-
-				controller.grip.visible = gripPose !== null;
-
-			}
+			controller.update( inputSource, frame, referenceSpace );
 
 		}
 

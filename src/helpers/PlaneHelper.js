@@ -13,8 +13,6 @@ import { FrontSide, BackSide } from '../constants.js';
 
 function PlaneHelper( plane, size, hex ) {
 
-	this.type = 'PlaneHelper';
-
 	this.plane = plane;
 
 	this.size = ( size === undefined ) ? 1 : size;
@@ -27,7 +25,9 @@ function PlaneHelper( plane, size, hex ) {
 	geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 	geometry.computeBoundingSphere();
 
-	Line.call( this, geometry, new LineBasicMaterial( { color: color } ) );
+	Line.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+
+	this.type = 'PlaneHelper';
 
 	//
 
@@ -37,7 +37,7 @@ function PlaneHelper( plane, size, hex ) {
 	geometry2.setAttribute( 'position', new Float32BufferAttribute( positions2, 3 ) );
 	geometry2.computeBoundingSphere();
 
-	this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false } ) ) );
+	this.add( new Mesh( geometry2, new MeshBasicMaterial( { color: color, opacity: 0.2, transparent: true, depthWrite: false, toneMapped: false } ) ) );
 
 }
 

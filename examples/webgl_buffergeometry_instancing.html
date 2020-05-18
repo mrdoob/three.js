@@ -145,7 +145,7 @@
 			}
 
 			var geometry = new THREE.InstancedBufferGeometry();
-			geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
+			geometry.instanceCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
 
 			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
@@ -191,7 +191,7 @@
 			//
 
 			var gui = new GUI( { width: 350 } );
-			gui.add( geometry, 'maxInstancedCount', 0, instances );
+			gui.add( geometry, 'instanceCount', 0, instances );
 
 			//
 

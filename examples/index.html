@@ -32,7 +32,7 @@
 			<div id="contentWrapper">
 
 				<div id="inputWrapper">
-					<input placeholder="" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
 					<div id="exitSearchButton"></div>
 				</div>
 
@@ -49,61 +49,123 @@
 
 		<script>
 
-		function extractQuery() {
-
-			var p = window.location.search.indexOf( '?q=' );
-
-			if ( p !== - 1 ) {
-
-				return window.location.search.substr( 3 );
-
-			}
-
-			return '';
-
-		}
-
 		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
 		var viewer = document.getElementById( 'viewer' );
-
-		var filterInput = document.getElementById( 'filter' );
+		var filterInput = document.getElementById( 'filterInput' );
 		var exitSearchButton = document.getElementById( 'exitSearchButton' );
-
 		var expandButton = document.getElementById( 'expandButton' );
-		expandButton.addEventListener( 'click', function ( event ) {
-
-			event.preventDefault();
-			panel.classList.toggle( 'open' );
-
-		} );
-
-		var panelScrim = document.getElementById( 'panelScrim' );
-		panelScrim.onclick = function ( event ) {
-
-			event.preventDefault();
-			panel.classList.toggle( 'open' );
-
-		};
-
-		// iOS iframe auto-resize workaround
-
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			viewer.style.width = getComputedStyle( viewer ).width;
-			viewer.style.height = getComputedStyle( viewer ).height;
-			viewer.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		var container = document.createElement( 'div' );
-		content.appendChild( container );
-
 		var viewSrcButton = document.getElementById( 'button' );
-		viewSrcButton.style.display = 'none';
+		var panelScrim = document.getElementById( 'panelScrim' );
 
 		var links = {};
 		var selected = null;
+		var container = document.createElement( 'div' );
+
+		init();
+
+		function init() {
+
+			content.appendChild( container );
+
+			viewSrcButton.style.display = 'none';
+
+			for ( var key in files ) {
+
+				var section = files[ key ];
+
+				var header = document.createElement( 'h2' );
+				header.textContent = key;
+				header.setAttribute( 'data-category', key );
+				container.appendChild( header );
+
+				for ( var i = 0; i < section.length; i ++ ) {
+
+					var file = section[ i ];
+
+					var link = createLink( file );
+					container.appendChild( link );
+
+					links[ file ] = link;
+
+				}
+
+			}
+
+			if ( window.location.hash !== '' && links[ window.location.hash.substring( 1 ) ] ) {
+
+				loadFile( window.location.hash.substring( 1 ) );
+
+			}
+
+			filterInput.value = extractQuery();
+
+			if ( filterInput.value !== '' ) {
+
+				panel.classList.add( 'searchFocused' );
+
+			}
+
+			updateFilter();
+
+			// Events
+
+			filterInput.onfocus = function ( event ) {
+
+				panel.classList.add( 'searchFocused' );
+
+			};
+
+			filterInput.onblur = function ( event ) {
+
+				if ( filterInput.value === '' ) {
+
+					panel.classList.remove( 'searchFocused' );
+
+				}
+
+			};
+
+			exitSearchButton.onclick = function ( event ) {
+
+				filterInput.value = '';
+				updateFilter();
+				panel.classList.remove( 'searchFocused' );
+
+			};
+
+			filterInput.addEventListener( 'input', function () {
+
+				updateFilter();
+
+			} );
+
+
+			expandButton.addEventListener( 'click', function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			} );
+
+			panelScrim.onclick = function ( event ) {
+
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			};
+
+			// iOS iframe auto-resize workaround
+
+			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+				viewer.style.width = getComputedStyle( viewer ).width;
+				viewer.style.height = getComputedStyle( viewer ).height;
+				viewer.setAttribute( 'scrolling', 'no' );
+
+			}
+
+		}
 
 		function createLink( file ) {
 
@@ -121,28 +183,6 @@
 			} );
 
 			return link;
-
-		}
-
-		for ( var key in files ) {
-
-			var section = files[ key ];
-
-			var header = document.createElement( 'h2' );
-			header.textContent = key;
-			header.setAttribute( 'data-category', key );
-			container.appendChild( header );
-
-			for ( var i = 0; i < section.length; i ++ ) {
-
-				var file = section[ i ];
-
-				var link = createLink( file );
-				container.appendChild( link );
-
-				links[ file ] = link;
-
-			}
 
 		}
 
@@ -172,43 +212,6 @@
 			viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
 
 		}
-
-		if ( window.location.hash !== '' && links[ window.location.hash.substring( 1 ) ] ) {
-
-			loadFile( window.location.hash.substring( 1 ) );
-
-		}
-
-		// filter
-		filterInput.onfocus = function ( event ) {
-
-			panel.classList.add( 'searchFocused' );
-
-		};
-
-		filterInput.onblur = function ( event ) {
-
-			if ( filterInput.value === '' ) {
-
-				panel.classList.remove( 'searchFocused' );
-
-			}
-
-		};
-
-		exitSearchButton.onclick = function ( event ) {
-
-			filterInput.value = '';
-			updateFilter();
-			panel.classList.remove( 'searchFocused' );
-
-		};
-
-		filterInput.addEventListener( 'input', function () {
-
-			updateFilter();
-
-		} );
 
 		function updateFilter() {
 
@@ -246,6 +249,7 @@
 
 			var link = links[ file ];
 			var name = getName( file );
+			if ( file in tags ) file += tags[ file ].join( ' ' );
 			var res = file.match( exp );
 			var text;
 
@@ -315,15 +319,19 @@
 
 		}
 
-		filterInput.value = extractQuery();
+		function extractQuery() {
 
-		if ( filterInput.value !== '' ) {
+			var p = window.location.search.indexOf( '?q=' );
 
-			panel.classList.add( 'searchFocused' );
+			if ( p !== - 1 ) {
+
+				return window.location.search.substr( 3 );
+
+			}
+
+			return '';
 
 		}
-
-		updateFilter();
 
 		</script>
 

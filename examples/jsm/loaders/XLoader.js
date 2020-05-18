@@ -105,11 +105,13 @@ var XLoader = ( function () {
 				this.putFlags.putPos = true;
 
 			}
+
 			if ( this.putFlags.putRot === undefined ) {
 
 				this.putFlags.putRot = true;
 
 			}
+
 			if ( this.putFlags.putScl === undefined ) {
 
 				this.putFlags.putScl = true;
@@ -127,6 +129,7 @@ var XLoader = ( function () {
 					this.hierarchy.push( this.makeBonekeys( XAnimationInfoArray[ i ] ) );
 
 				}
+
 				this.length = this.hierarchy[ 0 ].keys[ this.hierarchy[ 0 ].keys.length - 1 ].time;
 
 			}
@@ -150,6 +153,7 @@ var XLoader = ( function () {
 					return Object.assign( {}, this );
 
 				};
+
 				return refObj;
 
 			}
@@ -167,16 +171,19 @@ var XLoader = ( function () {
 						keyframe.pos = XAnimationInfo.keyFrames[ i ].pos;
 
 					}
+
 					if ( XAnimationInfo.keyFrames[ i ].rot && this.putFlags.putRot ) {
 
 						keyframe.rot = XAnimationInfo.keyFrames[ i ].rot;
 
 					}
+
 					if ( XAnimationInfo.keyFrames[ i ].scl && this.putFlags.putScl ) {
 
 						keyframe.scl = XAnimationInfo.keyFrames[ i ].scl;
 
 					}
+
 					if ( XAnimationInfo.keyFrames[ i ].matrix ) {
 
 						keyframe.matrix = XAnimationInfo.keyFrames[ i ].matrix;
@@ -185,11 +192,13 @@ var XLoader = ( function () {
 							keyframe.pos = new Vector3().setFromMatrixPosition( keyframe.matrix );
 
 						}
+
 						if ( this.putFlags.putRot ) {
 
 							keyframe.rot = new Quaternion().setFromRotationMatrix( keyframe.matrix );
 
 						}
+
 						if ( this.putFlags.putScl ) {
 
 							keyframe.scl = new Vector3().setFromMatrixScale( keyframe.matrix );
@@ -197,9 +206,11 @@ var XLoader = ( function () {
 						}
 
 					}
+
 					keys.push( keyframe );
 
 				}
+
 				return keys;
 
 			}
@@ -261,6 +272,7 @@ var XLoader = ( function () {
 					return;
 
 				}
+
 				for ( var i = _start; i < _arg.length; i ++ ) {
 
 					switch ( i ) {
@@ -275,6 +287,7 @@ var XLoader = ( function () {
 					}
 
 				}
+
 				if ( this.options === undefined ) {
 
 					this.options = {};
@@ -313,6 +326,7 @@ var XLoader = ( function () {
 						find = line.indexOf( '#', readed );
 
 					}
+
 					if ( find > - 1 && find < 2 ) {
 
 						var foundNewLine = - 1;
@@ -343,6 +357,7 @@ var XLoader = ( function () {
 					}
 
 				}
+
 				return line.substr( readed );
 
 			}
@@ -360,6 +375,7 @@ var XLoader = ( function () {
 						find = line.indexOf( '#', readed );
 
 					}
+
 					if ( find > - 1 && find < 2 ) {
 
 						var foundNewLine = - 1;
@@ -390,6 +406,7 @@ var XLoader = ( function () {
 					}
 
 				}
+
 				return line.substr( readed );
 
 			}
@@ -406,6 +423,7 @@ var XLoader = ( function () {
 					return true;
 
 				}
+
 				var fileLength = reader.byteLength;
 				for ( var index = 0; index < fileLength; index ++ ) {
 
@@ -416,6 +434,7 @@ var XLoader = ( function () {
 					}
 
 				}
+
 				return false;
 
 			}
@@ -431,6 +450,7 @@ var XLoader = ( function () {
 						array_buffer[ i ] = buf.charCodeAt( i ) & 0xff;
 
 					}
+
 					return array_buffer.buffer || array_buffer;
 
 				} else {
@@ -537,6 +557,7 @@ var XLoader = ( function () {
 							_currentObject.type = "";
 
 						}
+
 						if ( _currentObject.type === "Animation" ) {
 
 							_currentObject.data = this._data.substr( findNext, findEnd - findNext ).trim();
@@ -562,6 +583,7 @@ var XLoader = ( function () {
 							}
 
 						}
+
 						_currentObject.parent = _parent;
 						if ( _currentObject.type != "template" ) {
 
@@ -577,6 +599,7 @@ var XLoader = ( function () {
 					}
 
 				}
+
 				return {
 					parent: _parent,
 					end: endRead
@@ -686,6 +709,7 @@ var XLoader = ( function () {
 									this._currentAnime.AnimeFrames.push( this._currentAnimeFrames );
 
 								}
+
 								this._currentAnimeFrames = new XAnimationInfo();
 								this._currentAnimeFrames.boneName = this._currentObject.data.trim();
 								break;
@@ -695,9 +719,11 @@ var XLoader = ( function () {
 								break;
 
 						}
+
 						this._currentObject.worked = true;
 
 					}
+
 					if ( this._currentObject.children.length > 0 ) {
 
 						this._currentObject = this._currentObject.children.shift();
@@ -706,6 +732,7 @@ var XLoader = ( function () {
 							console.log( 'processing ' + this._currentObject.name );
 
 						}
+
 						if ( breakFlag ) break;
 
 					} else {
@@ -719,6 +746,7 @@ var XLoader = ( function () {
 							}
 
 						}
+
 						if ( this._currentObject.parent ) {
 
 							this._currentObject = this._currentObject.parent;
@@ -728,11 +756,13 @@ var XLoader = ( function () {
 							breakFlag = true;
 
 						}
+
 						if ( breakFlag ) break;
 
 					}
 
 				}
+
 				return;
 
 			}
@@ -745,6 +775,7 @@ var XLoader = ( function () {
 					this._makeOutputGeometry();
 
 				}
+
 				this._currentGeo = {};
 				if ( this._currentAnime != null && this._currentAnime.name ) {
 
@@ -754,9 +785,11 @@ var XLoader = ( function () {
 						this._currentAnimeFrames = null;
 
 					}
+
 					this._makeOutputAnimation();
 
 				}
+
 				this._currentAnime = {};
 
 			}
@@ -796,6 +829,7 @@ var XLoader = ( function () {
 					this._currentFrame.parentName = this._currentObject.parent.name;
 
 				}
+
 				this.frameHierarchie.push( this._nowFrameName );
 				this.HieStack[ this._nowFrameName ] = this._currentFrame;
 
@@ -819,6 +853,7 @@ var XLoader = ( function () {
 					return;
 
 				}
+
 				var b = new Bone();
 				b.name = this._currentFrame.name;
 				b.applyMatrix4( this._currentFrame.FrameTransformMatrix );
@@ -876,6 +911,7 @@ var XLoader = ( function () {
 								break;
 
 						}
+
 						if ( find === 0 || find > maxLength ) {
 
 							find = maxLength;
@@ -883,6 +919,7 @@ var XLoader = ( function () {
 							changeMode = true;
 
 						}
+
 						switch ( this._currentObject.type ) {
 
 							case "Mesh":
@@ -896,6 +933,7 @@ var XLoader = ( function () {
 										break;
 
 								}
+
 								break;
 							case "MeshNormals":
 								switch ( mode ) {
@@ -905,9 +943,11 @@ var XLoader = ( function () {
 										break;
 
 								}
+
 								break;
 
 						}
+
 						endRead = find + 1;
 						if ( changeMode ) {
 
@@ -916,6 +956,7 @@ var XLoader = ( function () {
 						}
 
 					}
+
 					if ( endRead >= this._currentObject.data.length ) {
 
 						break;
@@ -1075,6 +1116,7 @@ var XLoader = ( function () {
 									mode_local = 0;
 
 								}
+
 								var line = this._currentObject.data.substr( endRead, find - endRead );
 								var data = this._readLine( line.trim() ).split( ";" );
 								if ( this.IsUvYReverse ) {
@@ -1086,12 +1128,15 @@ var XLoader = ( function () {
 									this._currentGeo.GeometryData.uvs.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ) );
 
 								}
+
 								endRead = find + 1;
 
 							}
+
 							break;
 
 					}
+
 					if ( endRead >= this._currentObject.data.length ) {
 
 						break;
@@ -1126,6 +1171,7 @@ var XLoader = ( function () {
 							mode_local = 0;
 
 						}
+
 						var line = this._currentObject.data.substr( endRead, find - endRead );
 						var data = this._readLine( line.trim() ).split( "," );
 						for ( var i = 0; i < data.length; i ++ ) {
@@ -1133,9 +1179,11 @@ var XLoader = ( function () {
 							this._currentGeo.GeometryData.materialIndices[ i ] = parseInt( data[ i ] );
 
 						}
+
 						endRead = this._currentObject.data.length;
 
 					}
+
 					if ( endRead >= this._currentObject.data.length || mode >= 3 ) {
 
 						break;
@@ -1179,6 +1227,7 @@ var XLoader = ( function () {
 					find = this._currentObject.data.length;
 
 				}
+
 				line = this._currentObject.data.substr( endRead, find - endRead );
 				var data3 = this._readLine( line.trim() ).split( ";" );
 				_nowMat.emissive.r = parseFloat( data3[ 0 ] );
@@ -1195,6 +1244,7 @@ var XLoader = ( function () {
 							console.log( 'processing ' + localObject.name );
 
 						}
+
 						var fileName = localObject.data.substr( 1, localObject.data.length - 2 );
 						switch ( localObject.type ) {
 
@@ -1225,6 +1275,7 @@ var XLoader = ( function () {
 					}
 
 				}
+
 				this._currentGeo.Materials.push( _nowMat );
 
 			}
@@ -1249,6 +1300,7 @@ var XLoader = ( function () {
 					boneInf.Indeces.push( parseInt( data[ i ] ) );
 
 				}
+
 				endRead = find + 1;
 				find = this._currentObject.data.indexOf( ';', endRead );
 				line = this._currentObject.data.substr( endRead, find - endRead );
@@ -1258,6 +1310,7 @@ var XLoader = ( function () {
 					boneInf.Weights.push( parseFloat( data2[ _i ] ) );
 
 				}
+
 				endRead = find + 1;
 				find = this._currentObject.data.indexOf( ';', endRead );
 				if ( find <= 0 ) {
@@ -1265,6 +1318,7 @@ var XLoader = ( function () {
 					find = this._currentObject.data.length;
 
 				}
+
 				line = this._currentObject.data.substr( endRead, find - endRead );
 				var data3 = this._readLine( line.trim() ).split( "," );
 				boneInf.OffsetMatrix = new Matrix4();
@@ -1305,6 +1359,7 @@ var XLoader = ( function () {
 							}
 
 						}
+
 						_bones.push( b );
 
 					}
@@ -1336,6 +1391,7 @@ var XLoader = ( function () {
 							}
 
 						}
+
 						for ( var vi = 0; vi < this._currentGeo.BoneInfs[ bi ].Indeces.length; vi ++ ) {
 
 							var nowVertexID = this._currentGeo.BoneInfs[ bi ].Indeces[ vi ];
@@ -1363,6 +1419,7 @@ var XLoader = ( function () {
 									break;
 
 							}
+
 							this._currentGeo.VertexSetedBoneCount[ nowVertexID ] ++;
 							if ( this._currentGeo.VertexSetedBoneCount[ nowVertexID ] > 4 ) {
 
@@ -1373,11 +1430,13 @@ var XLoader = ( function () {
 						}
 
 					}
+
 					for ( var sk = 0; sk < this._currentGeo.Materials.length; sk ++ ) {
 
 						this._currentGeo.Materials[ sk ].skinning = true;
 
 					}
+
 					var offsetList = [];
 					for ( var _bi = 0; _bi < putBones.length; _bi ++ ) {
 
@@ -1404,6 +1463,7 @@ var XLoader = ( function () {
 					mesh = new Mesh( _bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
 
 				}
+
 				mesh.name = this._currentGeo.name;
 				var worldBaseMx = new Matrix4();
 				var currentMxFrame = this._currentGeo.baseFrame.putBone;
@@ -1423,9 +1483,11 @@ var XLoader = ( function () {
 						}
 
 					}
+
 					mesh.applyMatrix4( worldBaseMx );
 
 				}
+
 				this.Meshes.push( mesh );
 
 			}
@@ -1508,6 +1570,7 @@ var XLoader = ( function () {
 							}
 
 						}
+
 						var frameValue = data2[ 2 ].split( "," );
 						switch ( nowKeyType ) {
 
@@ -1522,6 +1585,7 @@ var XLoader = ( function () {
 								break;
 
 						}
+
 						if ( ! frameFound ) {
 
 							this._currentAnimeFrames.keyFrames.push( keyInfo );
@@ -1561,16 +1625,19 @@ var XLoader = ( function () {
 					model = this.Meshes[ 0 ];
 
 				}
+
 				if ( ! animation ) {
 
 					animation = this.animations[ 0 ];
 
 				}
+
 				if ( ! model || ! animation ) {
 
 					return null;
 
 				}
+
 				var put = {};
 				put.fps = animation.fps;
 				put.name = animation.name;
@@ -1600,12 +1667,14 @@ var XLoader = ( function () {
 								}
 
 							}
+
 							put.hierarchy.push( c_key );
 							break;
 
 						}
 
 					}
+
 					if ( ! findAnimation ) {
 
 						var _c_key = animation.hierarchy[ 0 ].copy();
@@ -1618,11 +1687,13 @@ var XLoader = ( function () {
 								_c_key.keys[ k ].pos.set( 0, 0, 0 );
 
 							}
+
 							if ( _c_key.keys[ k ].scl ) {
 
 								_c_key.keys[ k ].scl.set( 1, 1, 1 );
 
 							}
+
 							if ( _c_key.keys[ k ].rot ) {
 
 								_c_key.keys[ k ].rot.set( 0, 0, 0, 1 );
@@ -1630,11 +1701,13 @@ var XLoader = ( function () {
 							}
 
 						}
+
 						put.hierarchy.push( _c_key );
 
 					}
 
 				}
+
 				if ( ! model.geometry.animations ) {
 
 					model.geometry.animations = [];

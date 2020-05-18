@@ -110,6 +110,7 @@ Object.assign( ShapePath.prototype, {
 						edgeHighPt = inPolygon[ p ]; edgeDy = - edgeDy;
 
 					}
+
 					if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		continue;
 
 					if ( inPt.y === edgeLowPt.y ) {
@@ -249,6 +250,7 @@ Object.assign( ShapePath.prototype, {
 						}
 
 					}
+
 					if ( hole_unassigned ) {
 
 						betterShapeHoles[ sIdx ].push( ho );
@@ -259,6 +261,7 @@ Object.assign( ShapePath.prototype, {
 
 			}
 			// console.log("ambiguous: ", ambiguous);
+
 			if ( toChange.length > 0 ) {
 
 				// console.log("to change: ", toChange);

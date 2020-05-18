@@ -16,7 +16,7 @@
 		<h3>[name]( [param:Vector3 center], [param:Float radius] )</h3>
 		<p>
 		[page:Vector3 center] - center of the sphere. Default is a [page:Vector3] at (0, 0, 0). <br />
-		[page:Float radius] - radius of the sphere. Default is 0.<br /><br />
+		[page:Float radius] - radius of the sphere. Default is -1.<br /><br />
 
 		Creates a new [name].
 
@@ -73,8 +73,14 @@
 		the distance will be negative.
 		</p>
 
-		<h3>[method:Boolean empty]()</h3>
-		<p>Checks to see if the sphere is empty (the radius set to 0).</p>
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+		Checks to see if the sphere is empty (the radius set to a negative number).</br>
+		Spheres with a radius of 0 contain only their center point and are not considered to be empty.
+		</p>
+
+		<h3>[method:Sphere makeEmpty]()</h3>
+		<p>Makes the sphere empty by setting [page:.center center] to (0, 0, 0) and [page:.radius radius] to -1.</p>
 
 		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
 		<p>

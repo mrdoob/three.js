@@ -1,20 +1,24 @@
 # Three.js end-to-end testing
 
-You probably shouldn't run this tests on PC because it's not optimized for local usage and
-you can get different results on different GPUs. Goal is to make quick automated testing
-inside CI and keep screenshot pack updated for it.
+### Motivation
+Simplify code reviews with quick automated testing inside CI.
 
 ### Local usage
+If you get an error in e2e test after PR and you sure that all is correct,
+just make a new screenshot to example. As a last resort add it to exception list or increase timeouts.
+
 ```shell
-# generate new screenshots
+# generate new screenshots for exact examples
 npm run make-screenshot <example1_name> ... <exampleN_name>
 
-# check examples
+# check exact examples
 npm run test-e2e <example1_name> ... <exampleN_name>
 
-# check all examples in browser
-npx cross-env VISIBLE=ture npm run test-e2e
+# check all examples
+npm run test-e2e
 ```
+
+Merge only those commits that pass the tests, otherwise all next commits will also fail.
 
 ### How it works
 - ci configs with parallelism
@@ -34,14 +38,8 @@ npx cross-env VISIBLE=ture npm run test-e2e
 | 4=0+0+2+2 failed, time=3:26             | with progressive attempts            |
 
 ### Status
-97% examples are covered with tests. Random robusness in CI >93%. Robustness on different machines ~97%.
-For example on integrated GPU you can have additional artifacts: webgl_materials_texture_anisotropy,
-webgl_postprocessing_procedural, webgl_shaders_tonemapping.
+97% examples are covered with tests. Robusness in CI >97%.
 
 ### Wrong screenshots but ok for CI
-webgl_loader_bvh, webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc, webgl_physics_volume
-
-### Contribution
-Proper determinism for video/audio is welcome. You can cover more examples: `dof2` can be rendered with 2 rAF,
-`offsceencanvas`/`webgl_test_memory2` with additional puppeteer flags, `webgl_simple_gi` with
-[beginFrame](https://chromedevtools.github.io/devtools-protocol/tot/HeadlessExperimental) CDP API.
+webgl_loader_bvh, webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc, webgl_physics_volume.
+Some of them can be fixed with another [pipeline](https://github.com/munrocket/puppeteer-webgl-ci).

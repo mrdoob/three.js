@@ -66,10 +66,10 @@ export default QUnit.module( 'Extras', () => {
 				];
 
 				var points = [
-					curve.getPointAt( 0 ),
-					curve.getPointAt( 0.3 ),
-					curve.getPointAt( 0.5 ),
-					curve.getPointAt( 1 )
+					curve.getPointAt( 0, new Vector3() ),
+					curve.getPointAt( 0.3, new Vector3() ),
+					curve.getPointAt( 0.5, new Vector3() ),
+					curve.getPointAt( 1, new Vector3() )
 				];
 
 				assert.deepEqual( points, expectedPoints, "Correct getPointAt points" );
@@ -145,8 +145,9 @@ export default QUnit.module( 'Extras', () => {
 			QUnit.test( "getTangent/getTangentAt", ( assert ) => {
 
 				var curve = _curve;
+				var tangent = new Vector3();
 
-				var tangent = curve.getTangent( 0.5 );
+				curve.getTangent( 0.5, tangent );
 				var expectedTangent = Math.sqrt( 1 / 3 );
 
 				assert.numEqual( tangent.x, expectedTangent, "tangent.x correct" );
