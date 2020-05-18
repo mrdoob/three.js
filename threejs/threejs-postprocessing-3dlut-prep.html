@@ -92,6 +92,13 @@ function main() {
       const root = gltf.scene;
       scene.add(root);
 
+      // fix materials from r114
+      root.traverse(({material}) => {
+        if (material) {
+          material.depthWrite = true;
+        }
+      });
+
       // compute the box that contains all the stuff
       // from root and below
       const box = new THREE.Box3().setFromObject(root);
