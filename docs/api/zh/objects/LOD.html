@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -18,28 +18,30 @@
 			通常情况下，你会创建多个几何体，比如说三个，一个距离很远（低细节），一个距离适中（中等细节），还有一个距离非常近（高质量）。
 		</p>
 
-		<h2>示例</h2>
-		
+		<h2>代码示例</h2>
+
+		<code>
+		var lod = new THREE.LOD();
+
+		//Create spheres with 3 levels of detail and create new LOD levels for them
+		for( var i = 0; i < 3; i++ ) {
+
+			var geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
+
+			var mesh = new THREE.Mesh( geometry, material );
+
+			lod.addLevel( mesh, i * 75 );
+
+		}
+
+		scene.add( lod );
+		</code>
+
+		<h2>例子</h2>
+
 		<p>
 			[example:webgl_lod webgl / lod ]
 		</p>
-
-		<code>
-var lod = new THREE.LOD();
-
-//Create spheres with 3 levels of detail and create new LOD levels for them
-for( var i = 0; i < 3; i++ ) {
-
-	var geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
-
-	var mesh = new THREE.Mesh( geometry, material );
-
-	lod.addLevel( mesh, i * 75 );
-
-}
-
-scene.add( lod );
-		</code>
 
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>

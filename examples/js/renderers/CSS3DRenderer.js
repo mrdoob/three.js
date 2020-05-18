@@ -211,6 +211,8 @@ THREE.CSS3DRenderer = function () {
 
 			}
 
+			element.style.display = object.visible ? '' : 'none';
+
 			if ( element.parentNode !== cameraElement ) {
 
 				cameraElement.appendChild( element );

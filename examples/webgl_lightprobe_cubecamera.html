@@ -42,10 +42,12 @@
 				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 0, 0, 30 );
 
-				cubeCamera = new THREE.CubeCamera( 1, 1000, 256, { format: THREE.RGBAFormat, magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter } );
+				var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, {
+					encoding: THREE.sRGBEncoding, // since gamma is applied during rendering, the cubeCamera renderTarget texture encoding must be sRGBEncoding
+					format: THREE.RGBAFormat
+				} );
 
-				//Since gamma is applied during rendering, the cubeCamera renderTarget texture encoding must be sRGBEncoding
-				cubeCamera.renderTarget.texture.encoding = THREE.sRGBEncoding;
+				cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
 
 				// controls
 				var controls = new OrbitControls( camera, renderer.domElement );
@@ -79,7 +81,7 @@
 
 					cubeCamera.update( renderer, scene );
 
-					lightProbe.copy( LightProbeGenerator.fromCubeRenderTarget( renderer, cubeCamera.renderTarget ) );
+					lightProbe.copy( LightProbeGenerator.fromCubeRenderTarget( renderer, cubeRenderTarget ) );
 
 					scene.add( new LightProbeHelper( lightProbe, 5 ) );
 

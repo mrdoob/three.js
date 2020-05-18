@@ -14,6 +14,17 @@
 
 		<p class="desc">A material for drawing wireframe-style geometries.</p>
 
+		<h2>Code Example</h2>
+
+		<code>
+		var material = new THREE.LineBasicMaterial( {
+			color: 0xffffff,
+			linewidth: 1,
+			linecap: 'round', //ignored by WebGLRenderer
+			linejoin:  'round' //ignored by WebGLRenderer
+		} );
+		</code>
+
 		<h2>Examples</h2>
 
 		<p>
@@ -30,17 +41,8 @@
 			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
 			[example:webgl_lines_sphere WebGL / lines / sphere]<br />
 			[example:webgl_materials WebGL / materials]<br />
-			[example:webgl_physics_rope WebGL / phyics / rope]
+			[example:physics_ammo_rope physics / ammo / rope]
 		</p>
-
-		<code>
-var material = new THREE.LineBasicMaterial( {
-	color: 0xffffff,
-	linewidth: 1,
-	linecap: 'round', //ignored by WebGLRenderer
-	linejoin:  'round' //ignored by WebGLRenderer
-} );
-		</code>
 
 		<h2>Constructor</h2>
 

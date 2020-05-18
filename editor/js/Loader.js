@@ -4,6 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
+import { ThreeMFLoader } from '../../examples/jsm/loaders/3MFLoader.js';
 import { AMFLoader } from '../../examples/jsm/loaders/AMFLoader.js';
 import { ColladaLoader } from '../../examples/jsm/loaders/ColladaLoader.js';
 import { DRACOLoader } from '../../examples/jsm/loaders/DRACOLoader.js';
@@ -24,6 +25,8 @@ import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
 import { LoaderUtils } from './LoaderUtils.js';
+
+import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
 
 var Loader = function ( editor ) {
 
@@ -96,6 +99,20 @@ var Loader = function ( editor ) {
 				reader.addEventListener( 'load', function ( event ) {
 
 					var loader = new TDSLoader();
+					var object = loader.parse( event.target.result );
+
+					editor.execute( new AddObjectCommand( editor, object ) );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
+
+			case '3mf':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var loader = new ThreeMFLoader();
 					var object = loader.parse( event.target.result );
 
 					editor.execute( new AddObjectCommand( editor, object ) );
@@ -219,7 +236,11 @@ var Loader = function ( editor ) {
 
 					} else {
 
+						var dracoLoader = new DRACOLoader();
+						dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+
 						loader = new GLTFLoader( manager );
+						loader.setDRACOLoader( dracoLoader );
 
 					}
 

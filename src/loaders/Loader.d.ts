@@ -18,6 +18,8 @@ export class Loader {
 	parse(): void;
 	*/
 
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<any>;
+
 	setCrossOrigin( crossOrigin: string ): this;
 	setPath( path: string ): this;
 	setResourcePath( resourcePath: string ): this;

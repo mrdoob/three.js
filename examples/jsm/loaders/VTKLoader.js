@@ -400,6 +400,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						pointIndex = pointIndex + 12;
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -448,6 +449,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -485,6 +487,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 

@@ -58,7 +58,7 @@ var GeometryCompressionUtils = {
 		let result;
 		if ( encodeMethod == "DEFAULT" ) {
 
-			// TODO: Add 1 byte to the result, making the encoded length to be 4 bytes. 
+			// TODO: Add 1 byte to the result, making the encoded length to be 4 bytes.
 			result = new Uint8Array( count * 3 );
 
 			for ( let idx = 0; idx < array.length; idx += 3 ) {
@@ -158,16 +158,19 @@ var GeometryCompressionUtils = {
 			mesh.material.defines.USE_PACKED_NORMAL = 0;
 
 		}
+
 		if ( encodeMethod == "OCT1Byte" ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 1;
 
 		}
+
 		if ( encodeMethod == "OCT2Byte" ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 1;
 
 		}
+
 		if ( encodeMethod == "DEFAULT" ) {
 
 			mesh.material.defines.USE_PACKED_NORMAL = 2;
@@ -268,7 +271,7 @@ var GeometryCompressionUtils = {
 
 		let array = uvs.array;
 
-		for ( let i = 0; i < array.length; i++ ) {
+		for ( let i = 0; i < array.length; i ++ ) {
 
 			range.min = Math.min( range.min, array[ i ] );
 			range.max = Math.max( range.max, array[ i ] );
@@ -446,8 +449,8 @@ var GeometryCompressionUtils = {
 
 				if ( z < 0 ) {
 
-					var tempx = tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
-					var tempy = tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
+					var tempx = ( 1 - Math.abs( y ) ) * ( x >= 0 ? 1 : - 1 );
+					var tempy = ( 1 - Math.abs( x ) ) * ( y >= 0 ? 1 : - 1 );
 
 					x = tempx;
 					y = tempy;
@@ -471,6 +474,7 @@ var GeometryCompressionUtils = {
 					] );
 
 				}
+
 				if ( bytes == 2 ) {
 
 					return new Int16Array( [
@@ -838,7 +842,7 @@ function PackedPhongMaterial( parameters ) {
 		"}",
 	].join( "\n" );
 
-	// Use the original MeshPhongMaterial's fragmentShader. 
+	// Use the original MeshPhongMaterial's fragmentShader.
 	this.fragmentShader = [
 		"#define PHONG",
 

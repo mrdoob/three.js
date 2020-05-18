@@ -1,0 +1,23 @@
+#VRML V2.0 utf8
+
+Shape {
+   appearance Appearance {
+      material Material { diffuseColor 1 0 0 }
+   }
+   geometry ElevationGrid {
+      xDimension 5
+      zDimension 6
+      xSpacing .5
+      zSpacing .25
+      height [ .0 .2 .4 .2 .0
+         .0 .2 .4 .2 .1
+         .1 .4 .5 .2 .2
+         .2 .3 .5 .3 .1
+         .1 .2 .3 .1 .0
+         .0 .1 .2 .1 .0 ]
+   }
+}
+
+NavigationInfo { type "EXAMINE" }
+Viewpoint { description "start" position 1 0 5 }
+Background { skyColor 1 1 1 }

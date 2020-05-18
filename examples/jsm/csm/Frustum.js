@@ -88,6 +88,7 @@ export default class Frustum {
 			target.push( new Frustum() );
 
 		}
+
 		target.length = breaks.length;
 
 		for ( let i = 0; i < breaks.length; i ++ ) {

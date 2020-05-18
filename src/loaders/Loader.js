@@ -19,6 +19,18 @@ Object.assign( Loader.prototype, {
 
 	load: function ( /* url, onLoad, onProgress, onError */ ) {},
 
+	loadAsync: function ( url, onProgress ) {
+
+		var scope = this;
+
+		return new Promise( function ( resolve, reject ) {
+
+			scope.load( url, resolve, onProgress, reject );
+
+		} );
+
+	},
+
 	parse: function ( /* data */ ) {},
 
 	setCrossOrigin: function ( crossOrigin ) {

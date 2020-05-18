@@ -5,10 +5,13 @@
 import * as THREE from '../../build/three.module.js';
 
 import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
+import { DRACOExporter } from '../../examples/jsm/exporters/DRACOExporter.js';
 import { GLTFExporter } from '../../examples/jsm/exporters/GLTFExporter.js';
 import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
 import { PLYExporter } from '../../examples/jsm/exporters/PLYExporter.js';
 import { STLExporter } from '../../examples/jsm/exporters/STLExporter.js';
+
+import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
 
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
@@ -214,6 +217,31 @@ var MenubarFile = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Export DRC
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/drc' ) );
+	option.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( object === null || object.isMesh === undefined ) {
+
+			alert( 'No mesh selected' );
+			return;
+
+		}
+
+		var exporter = new DRACOExporter();
+
+		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
+		var result = exporter.parse( object.geometry );
+		saveArrayBuffer( result, 'model.drc' );
+
+	} );
+	options.add( option );
+
 	// Export GLB
 
 	var option = new UIRow();
@@ -227,10 +255,7 @@ var MenubarFile = function ( editor ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-			// forceIndices: true, forcePowerOfTwoTextures: true
-			// to allow compatibility with facebook
-
-		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+		}, { binary: true } );
 
 	} );
 	options.add( option );

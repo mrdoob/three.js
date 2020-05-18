@@ -83,7 +83,7 @@ class CSMHelper extends Group {
 		this.scale.copy( camera.scale );
 		this.updateMatrixWorld( true );
 
-		while( cascadeLines.length > cascades ) {
+		while ( cascadeLines.length > cascades ) {
 
 			this.remove( cascadeLines.pop() );
 			this.remove( cascadePlanes.pop() );
@@ -91,7 +91,7 @@ class CSMHelper extends Group {
 
 		}
 
-		while( cascadeLines.length < cascades ) {
+		while ( cascadeLines.length < cascades ) {
 
 			const cascadeLine = new Box3Helper( new Box3(), 0xffffff );
 			const planeMat = new MeshBasicMaterial( { transparent: true, opacity: 0.1, depthWrite: false, side: DoubleSide } );
