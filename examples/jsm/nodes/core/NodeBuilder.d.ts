@@ -114,7 +114,7 @@ export class NodeBuilder {
 	isDefined( name: string ): boolean;
 	getVar( uuid: string, type: string, ns: string, shader?: string, prefix?: string, label?: string ): object;
 	getVar( uuid: string, type: string, ns: string, label: string ): object;
-	getAttribute( name: string, type: string );
+	getAttribute( name: string, type: string ): any;
 	getCode( shader: string ): string;
 	getVarListCode( vars: object[], prefix?: string ): string;
 	getVars( shader: string ): object[];
