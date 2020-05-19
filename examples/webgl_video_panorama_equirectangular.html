@@ -7,11 +7,17 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<div id="overlay">
+			<div>
+				<button id="startButton">Click to Play</button>
+				<p>Video playback requires user interaction.</p>
+			</div>
+		</div>
+		<div id="container"></div>
+
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - video panorama
 		</div>
-
-		<div id="container"></div>
 
 		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
 			<source src="textures/pano.webm">
@@ -33,10 +39,18 @@
 				onPointerDownLon = 0,
 				onPointerDownLat = 0;
 
-			init();
-			animate();
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', function () {
+
+				init();
+				animate();
+
+			}, false );
 
 			function init() {
+
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
 				var container, mesh;
 
@@ -105,7 +119,7 @@
 				if ( isUserInteracting === true ) {
 
 					lon = ( onPointerDownPointerX - event.clientX ) * 0.1 + onPointerDownLon;
-					lat = ( event.clientY - onPointerDownPointerY ) * 0.1 + onPointerDownLat;
+					lat = ( onPointerDownPointerY - event.clientY ) * 0.1 + onPointerDownLat;
 
 				}
 
