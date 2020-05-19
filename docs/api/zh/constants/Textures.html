@@ -73,10 +73,10 @@
 		这些常量用于纹理的[page:Texture.magFilter magFilter]属性，它们定义了当被纹理化的像素映射到小于或者等于1纹理元素（texel）的区域时，将要使用的纹理放大函数。<br /><br />
 
 		[page:constant NearestFilter]返回与指定纹理坐标（在曼哈顿距离之内）最接近的纹理元素的值。<br /><br />
+
 		[page:constant LinearFilter]是默认值，返回距离指定的纹理坐标最近的四个纹理元素的加权平均值，
 		并且可以包含纹理的其他部分中，被包裹或者被重复的项目，具体取决于 [page:Texture.wrapS wrapS] 和 [page:Texture.wrapT wrapT] 的值，and on the exact mapping。
-
-	</p>
+		</p>
 
 	<h2>缩小滤镜（Minification Filters）</h2>
 	<code>
