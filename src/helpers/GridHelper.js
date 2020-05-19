@@ -8,12 +8,13 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Color } from '../math/Color.js';
 
-function GridHelper( size, divisions, color1, color2 ) {
+function GridHelper( size, divisions, color1, color2, opacity ) {
 
 	size = size || 10;
 	divisions = divisions || 10;
 	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
 	color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
+	opacity = opacity !== undefined ? opacity : 1;
 
 	var center = divisions / 2;
 	var step = size / divisions;
@@ -39,7 +40,7 @@ function GridHelper( size, divisions, color1, color2 ) {
 	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-	var material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
+	var material = new LineBasicMaterial( { vertexColors: true, toneMapped: false, transparent: opacity != 1, opacity: opacity } );
 
 	LineSegments.call( this, geometry, material );
 
