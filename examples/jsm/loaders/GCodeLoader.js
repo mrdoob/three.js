@@ -215,8 +215,8 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var layer = layers[ i ];
 
-				vertex = vertex.concat( layer.vertex );
-				pathVertex = pathVertex.concat( layer.pathVertex );
+ 	 	 	 	vertex.push(...layer.vertex)
+ 		 		pathVertex.push(...layer.pathVertex)
 
 			}
 
