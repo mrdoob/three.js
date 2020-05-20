@@ -204,8 +204,13 @@ THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 				var layer = layers[ i ];
 
- 	 	 	 	vertex.push( ...layer.vertex )
- 		 		pathVertex.push( ...layer.pathVertex )
+ 				for ( var j = 0; j < layer.vertex.length; j ++ ) {
+					vertex.push(layer.vertex[ j ])
+				}
+
+				for ( var j = 0; j < layer.pathVertex.length; j ++ ) {
+					pathVertex.push(layer.pathVertex[ j ])
+				}
 
 			}
 
