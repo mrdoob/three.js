@@ -25,7 +25,6 @@ export const GodRaysCombineShader: {
 		tColors: Uniform;
 		tGodRays: Uniform;
 		fGodRayIntensity: Uniform;
-		vSunPositionScreenSpace: Uniform;
 	};
 	vertexShader: string;
 	fragmentShader: string;
