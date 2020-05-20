@@ -214,13 +214,19 @@ GCodeLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			for ( var i = 0; i < layers.length; i ++ ) {
 
 				var layer = layers[ i ];
+				var layerVertex = layer.vertex;
+				var layerPathVertex = layer.pathVertex;
 
- 				for ( var j = 0; j < layer.vertex.length; j ++ ) {
-					vertex.push(layer.vertex[ j ])
+				for ( var j = 0; j < layerVertex.length; j ++ ) {
+
+					vertex.push( layerVertex[ j ] );
+
 				}
 
-				for ( var j = 0; j < layer.pathVertex.length; j ++ ) {
-					pathVertex.push(layer.pathVertex[ j ])
+				for ( var j = 0; j < layerPathVertex.length; j ++ ) {
+
+					pathVertex.push( layerPathVertex[ j ] );
+
 				}
 
 			}
