@@ -38,9 +38,7 @@ export class Color {
 	 */
 	b: number;
 
-	set( color: Color ): Color;
-	set( color: number ): Color;
-	set( color: string ): Color;
+	set( color: Color | string | number ): Color;
 	setScalar( scalar: number ): Color;
 	setHex( hex: number ): Color;
 
