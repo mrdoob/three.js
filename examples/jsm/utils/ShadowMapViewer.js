@@ -83,13 +83,13 @@ var ShadowMapViewer = function ( light ) {
 		labelCanvas = document.createElement( 'canvas' );
 
 		var context = labelCanvas.getContext( '2d' );
-		context.font = 'Bold 18px Arial';
+		context.font = 'Bold 20px Arial';
 
 		var labelWidth = context.measureText( light.name ).width;
 		labelCanvas.width = labelWidth;
 		labelCanvas.height = 25;	//25 to account for g, p, etc.
 
-		context.font = 'Bold 18px Arial';
+		context.font = 'Bold 20px Arial';
 		context.fillStyle = 'rgba( 255, 0, 0, 1 )';
 		context.fillText( light.name, 0, 20 );
 
