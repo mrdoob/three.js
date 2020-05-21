@@ -13,6 +13,17 @@ for ( var i = 0; i < 256; i ++ ) {
 
 }
 
+// Park-Miller algorithm
+
+var _seed = 1234567;
+function _prng ( seed ) {
+
+	if ( seed !== undefined ) _seed = seed % 2147483647;
+	_seed = _seed * 16807 % 2147483647;
+	return ( _seed - 1 ) / 2147483646;
+
+};
+
 var MathUtils = {
 
 	DEG2RAD: Math.PI / 180,
@@ -22,10 +33,10 @@ var MathUtils = {
 
 		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
 
-		var d0 = Math.random() * 0xffffffff | 0;
-		var d1 = Math.random() * 0xffffffff | 0;
-		var d2 = Math.random() * 0xffffffff | 0;
-		var d3 = Math.random() * 0xffffffff | 0;
+		var d0 = _prng() * 0xffffffff | 0;
+		var d1 = _prng() * 0xffffffff | 0;
+		var d2 = _prng() * 0xffffffff | 0;
+		var d3 = _prng() * 0xffffffff | 0;
 		var uuid = _lut[ d0 & 0xff ] + _lut[ d0 >> 8 & 0xff ] + _lut[ d0 >> 16 & 0xff ] + _lut[ d0 >> 24 & 0xff ] + '-' +
 			_lut[ d1 & 0xff ] + _lut[ d1 >> 8 & 0xff ] + '-' + _lut[ d1 >> 16 & 0x0f | 0x40 ] + _lut[ d1 >> 24 & 0xff ] + '-' +
 			_lut[ d2 & 0x3f | 0x80 ] + _lut[ d2 >> 8 & 0xff ] + '-' + _lut[ d2 >> 16 & 0xff ] + _lut[ d2 >> 24 & 0xff ] +
@@ -117,23 +128,7 @@ var MathUtils = {
 
 	// Deterministic pseudo-random float in the interval [ 0, 1 ]
 
-	prng: function () {
-
-		var seed = 1234567;
-
-		return function prng( s ) {
-
-			if ( s !== undefined ) seed = s % 2147483647;
-
-			// Park-Miller algorithm
-
-			seed = seed * 16807 % 2147483647;
-
-			return ( seed - 1 ) / 2147483646;
-
-		};
-
-	}(),
+	prng: _prng(),
 
 	degToRad: function ( degrees ) {
 
