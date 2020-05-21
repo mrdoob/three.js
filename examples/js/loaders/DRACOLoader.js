@@ -198,7 +198,18 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		// Remove task from the task list.
 		geometryPending
-			.finally( () => {
+			.then( () => {
+
+				if ( worker && taskID ) {
+
+					this._releaseTask( worker, taskID );
+
+					// this.debug();
+
+				}
+
+			} )
+			.catch( () => {
 
 				if ( worker && taskID ) {
 

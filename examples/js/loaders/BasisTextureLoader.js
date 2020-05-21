@@ -186,7 +186,17 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 			} );
 
 		texturePending
-			.finally( () => {
+			.then( () => {
+
+				if ( worker && taskID ) {
+
+					worker._taskLoad -= taskCost;
+					delete worker._callbacks[ taskID ];
+
+				}
+
+			} )
+			.catch( () => {
 
 				if ( worker && taskID ) {
 
