@@ -257,6 +257,8 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				channels: {}
 			};
 
+			var hasChildren = false;
+
 			for ( var i = 0, l = xml.childNodes.length; i < l; i ++ ) {
 
 				var child = xml.childNodes[ i ];
@@ -282,6 +284,12 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						data.channels[ id ] = parseAnimationChannel( child );
 						break;
 
+					case 'animation':
+						// hierarchy of related animations
+						parseAnimation( child );
+						hasChildren = true;
+						break;
+
 					default:
 						console.log( child );
 
@@ -289,7 +297,13 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			library.animations[ xml.getAttribute( 'id' ) ] = data;
+			if ( hasChildren === false ) {
+
+				// since 'id' attributes can be optional, it's necessary to generate a UUID for unqiue assignment
+
+				library.animations[ xml.getAttribute( 'id' ) || MathUtils.generateUUID() ] = data;
+
+			}
 
 		}
 
@@ -3598,12 +3612,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			if ( object.name === '' ) {
-
-				object.name = ( type === 'JOINT' ) ? data.sid : data.name;
-
-			}
-
+			object.name = ( type === 'JOINT' ) ? data.sid : data.name;
 			object.matrix.copy( matrix );
 			object.matrix.decompose( object.position, object.quaternion, object.scale );
 

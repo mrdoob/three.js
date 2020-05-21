@@ -136,8 +136,8 @@
 				var effectController = {
 
 					focus: 500.0,
-					aperture:	5,
-					maxblur:	1.0
+					aperture: 5,
+					maxblur: 0.01
 
 				};
 
@@ -152,7 +152,7 @@
 				var gui = new GUI();
 				gui.add( effectController, "focus", 10.0, 3000.0, 10 ).onChange( matChanger );
 				gui.add( effectController, "aperture", 0, 10, 0.1 ).onChange( matChanger );
-				gui.add( effectController, "maxblur", 0.0, 3.0, 0.025 ).onChange( matChanger );
+				gui.add( effectController, "maxblur", 0.0, 0.01, 0.001 ).onChange( matChanger );
 				gui.close();
 
 				matChanger();
@@ -214,8 +214,8 @@
 
 				var bokehPass = new BokehPass( scene, camera, {
 					focus: 1.0,
-					aperture:	0.025,
-					maxblur:	1.0,
+					aperture: 0.025,
+					maxblur: 0.01,
 
 					width: width,
 					height: height

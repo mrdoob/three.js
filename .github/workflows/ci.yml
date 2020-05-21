@@ -23,15 +23,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
-      - name: Restore cache
-        uses: actions/cache@v1
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
+          node-version: 10
       - name: Install packages
         run: npm ci
 
@@ -47,17 +39,11 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
-      - name: Restore cache
-        uses: actions/cache@v1
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
+          node-version: 10
       - name: Install packages
-        run: npm ci && npm run build-test
+        run: npm ci && npm ci --prefix test
+      - name: Build
+        run: npm run build
 
       - name: === Unit testing ===
         run: npm run test-unit
@@ -77,17 +63,11 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
-      - name: Restore cache
-        uses: actions/cache@v1
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
+          node-version: 10
       - name: Install packages
-        run: npm ci && sudo apt-get install xvfb && npm run build
+        run: npm ci && npm ci --prefix test && sudo apt-get install xvfb
+      - name: Build
+        run: npm run build
 
       - name: === E2E testing ===
         run: xvfb-run --auto-servernum npm run test-e2e
@@ -101,15 +81,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
-      - name: Restore cache
-        uses: actions/cache@v1
-        env:
-          cache-name: cache-node-modules
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-ci-${{ env.cache-name }}-
+          node-version: 10
       - name: Install packages
         run: npm ci
 

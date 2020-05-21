@@ -464,6 +464,39 @@ iframe {
 }
 
 
+.card {
+	border-radius: 3px;
+	overflow: hidden;
+	background-color: #f7f7f7;
+	padding-bottom: 6px;
+	margin-bottom: 16px;
+}
+
+.card.selected {
+	box-shadow: 0 0 0 3px var(--color-blue);
+	text-decoration: none !important;
+}
+
+.card .cover {
+	padding-bottom: 56.25%; /* 16:9 aspect ratio */
+	position: relative;
+	overflow: hidden;
+}
+
+.card .cover img {
+	position: absolute;
+	width: 100%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.card .title {
+	padding: 8px 12px 8px;
+	font-size: 18px;
+	font-weight: 500;
+}
+
 /* mobile */
 
 @media all and ( max-width: 640px ) {

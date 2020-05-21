@@ -205,6 +205,7 @@ var list = {
 				"DirectionalLight": "api/en/lights/DirectionalLight",
 				"HemisphereLight": "api/en/lights/HemisphereLight",
 				"Light": "api/en/lights/Light",
+				"LightProbe": "api/en/lights/LightProbe",
 				"PointLight": "api/en/lights/PointLight",
 				"RectAreaLight": "api/en/lights/RectAreaLight",
 				"SpotLight": "api/en/lights/SpotLight"
@@ -279,6 +280,7 @@ var list = {
 				"Ray": "api/en/math/Ray",
 				"Sphere": "api/en/math/Sphere",
 				"Spherical": "api/en/math/Spherical",
+				"SphericalHarmonics3": "api/en/math/SphericalHarmonics3",
 				"Triangle": "api/en/math/Triangle",
 				"Vector2": "api/en/math/Vector2",
 				"Vector3": "api/en/math/Vector3",
@@ -376,6 +378,10 @@ var list = {
 				"RectAreaLightHelper": "examples/en/helpers/RectAreaLightHelper",
 				"VertexNormalsHelper": "examples/en/helpers/VertexNormalsHelper",
 				"VertexTangentsHelper": "examples/en/helpers/VertexTangentsHelper"
+			},
+
+			"Lights": {
+				"LightProbeGenerator": "examples/en/lights/LightProbeGenerator"
 			},
 
 			"Loaders": {
@@ -657,6 +663,7 @@ var list = {
 				"DirectionalLight": "api/zh/lights/DirectionalLight",
 				"HemisphereLight": "api/zh/lights/HemisphereLight",
 				"Light": "api/zh/lights/Light",
+				"LightProbe": "api/zh/lights/LightProbe",
 				"PointLight": "api/zh/lights/PointLight",
 				"RectAreaLight": "api/zh/lights/RectAreaLight",
 				"SpotLight": "api/zh/lights/SpotLight"
@@ -731,6 +738,7 @@ var list = {
 				"Ray": "api/zh/math/Ray",
 				"Sphere": "api/zh/math/Sphere",
 				"Spherical": "api/zh/math/Spherical",
+				"SphericalHarmonics3": "api/zh/math/SphericalHarmonics3",
 				"Triangle": "api/zh/math/Triangle",
 				"Vector2": "api/zh/math/Vector2",
 				"Vector3": "api/zh/math/Vector3",
@@ -819,6 +827,10 @@ var list = {
 				"ConvexBufferGeometry": "examples/zh/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
+			},
+
+			"灯光": {
+				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
 			},
 
 			"辅助对象": {

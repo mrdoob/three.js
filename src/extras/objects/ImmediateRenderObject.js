@@ -11,6 +11,18 @@ function ImmediateRenderObject( material ) {
 	this.material = material;
 	this.render = function ( /* renderCallback */ ) {};
 
+	this.hasPositions = false;
+	this.hasNormals = false;
+	this.hasColors = false;
+	this.hasUvs = false;
+
+	this.positionArray = null;
+	this.normalArray = null;
+	this.colorArray = null;
+	this.uvArray = null;
+
+	this.count = 0;
+
 }
 
 ImmediateRenderObject.prototype = Object.create( Object3D.prototype );

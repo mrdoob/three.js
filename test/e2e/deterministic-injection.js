@@ -1,5 +1,5 @@
 /**
- * @author munrocket / https://github.com/munrocket
+ * @author munrocket / https://twitter.com/munrocket_twit
  */
 
 ( function () {
@@ -27,7 +27,7 @@
 
 	/* Deterministic RAF */
 
-	window.chromeMaxFrameId = 1;
+	window.chromeMaxFrameId = 2;
 	window.chromeRenderStarted = false;
 	window.chromeRenderFinished = false;
 	const RAF = window.requestAnimationFrame;
@@ -80,5 +80,7 @@
 		RAF( renew );
 
 	};
+
+	TESTING = true;
 
 }() );

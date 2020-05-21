@@ -23,7 +23,7 @@ export namespace ParametricGeometries {
 
 	export class SphereGeometry {
 
-  	constructor( size: number, u: number, v );
+  	constructor( size: number, u: number, v: number );
 
 	}
 

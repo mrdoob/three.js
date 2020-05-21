@@ -12,7 +12,7 @@ import { MaterialParameters, Material } from './Material';
  */
 
 export interface ShaderMaterialParameters extends MaterialParameters {
-	uniforms?: any;
+	uniforms?: { [uniform: string]: IUniform };
 	vertexShader?: string;
 	fragmentShader?: string;
 	linewidth?: number;
