@@ -70,7 +70,7 @@ var SelectionBox = ( function () {
 			endPoint.x = Math.max( startPoint.x, endPoint.x );
 			endPoint.y = Math.min( startPoint.y, endPoint.y );
 
-			vecNear.copy( this.camera.position );
+			vecNear.copy( this.camera.getWorldPosition() );
 			vecTopLeft.copy( tmpPoint );
 			vecTopRight.set( endPoint.x, tmpPoint.y, 0 );
 			vecDownRight.copy( endPoint );
