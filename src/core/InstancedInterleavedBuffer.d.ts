@@ -1,7 +1,7 @@
 import { InterleavedBuffer } from './InterleavedBuffer';
 
 /**
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/InstancedInterleavedBuffer.js">src/core/InstancedInterleavedBuffer.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/InstancedInterleavedBuffer.js|src/core/InstancedInterleavedBuffer.js}
  */
 export class InstancedInterleavedBuffer extends InterleavedBuffer {
 

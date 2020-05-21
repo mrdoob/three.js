@@ -8,7 +8,7 @@ import { Intersection } from '../core/Raycaster';
 /**
  * A class for displaying particles in the form of variable size points. For example, if using the WebGLRenderer, the particles are displayed using GL_POINTS.
  *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/objects/ParticleSystem.js">src/objects/ParticleSystem.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/objects/ParticleSystem.js|src/objects/ParticleSystem.js}
  */
 export class Points extends Object3D {
 
