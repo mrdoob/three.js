@@ -3129,17 +3129,17 @@ THREE.VRMLLoader = ( function () {
 			var textureLoader = new THREE.TextureLoader( this.manager );
 			textureLoader.setPath( this.resourcePath || path ).setCrossOrigin( this.crossOrigin );
 
-			// create JSON representing the tree structure of the VRML asset
-
-			var tree = generateVRMLTree( data );
-
 			// check version (only 2.0 is supported)
 
-			if ( tree.version.indexOf( 'V2.0' ) === - 1 ) {
+			if ( data.indexOf( '#VRML V2.0' ) === - 1 ) {
 
 				throw Error( 'THREE.VRMLLexer: Version of VRML asset not supported.' );
 
 			}
+
+			// create JSON representing the tree structure of the VRML asset
+
+			var tree = generateVRMLTree( data );
 
 			// parse the tree structure to a three.js scene
 
