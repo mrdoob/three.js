@@ -54,6 +54,20 @@ THREE.SelectionBox = ( function () {
 		startPoint = startPoint || this.startPoint;
 		endPoint = endPoint || this.endPoint;
 
+		// Avoid invalid frustum
+
+		if ( startPoint.x === endPoint.x ) {
+
+			endPoint.x += Number.EPSILON;
+
+		}
+
+		if ( startPoint.y === endPoint.y ) {
+
+			endPoint.y += Number.EPSILON;
+
+		}
+
 		this.camera.updateProjectionMatrix();
 		this.camera.updateMatrixWorld();
 
@@ -101,8 +115,6 @@ THREE.SelectionBox = ( function () {
 			planes[ 5 ].normal.multiplyScalar( - 1 );
 
 		} else if ( this.camera.isOrthographicCamera ) {
-
-			if ( startPoint.equals( endPoint ) ) endPoint.addScalar( Number.EPSILON ); // avoid invalid frustum
 
 			var left = Math.min( startPoint.x, endPoint.x );
 			var top = Math.max( startPoint.y, endPoint.y );
