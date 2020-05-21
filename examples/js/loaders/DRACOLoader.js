@@ -197,19 +197,10 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			.then( ( message ) => this._createGeometry( message.geometry ) );
 
 		// Remove task from the task list.
+		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 		geometryPending
+			.catch( () => true )
 			.then( () => {
-
-				if ( worker && taskID ) {
-
-					this._releaseTask( worker, taskID );
-
-					// this.debug();
-
-				}
-
-			} )
-			.catch( () => {
 
 				if ( worker && taskID ) {
 

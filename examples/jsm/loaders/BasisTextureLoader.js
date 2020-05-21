@@ -199,18 +199,10 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 			} );
 
+		// Note: replaced 'finally()' with .catch().then() block - iOS 11 support (#19416)
 		texturePending
+			.catch( () => true )
 			.then( () => {
-
-				if ( worker && taskID ) {
-
-					worker._taskLoad -= taskCost;
-					delete worker._callbacks[ taskID ];
-
-				}
-
-			} )
-			.catch( () => {
 
 				if ( worker && taskID ) {
 
