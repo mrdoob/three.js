@@ -67,6 +67,7 @@ THREE.GLTFLoader = ( function () {
 
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( this.requestHeader );
 
 			if ( scope.crossOrigin === 'use-credentials' ) {
 
@@ -218,6 +219,7 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
+			parser.fileLoader.setRequestHeader( this.requestHeader );
 			parser.parse( onLoad, onError );
 
 		}

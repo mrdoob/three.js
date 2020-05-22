@@ -301,13 +301,6 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		this.mimeType = value;
 		return this;
 
-	},
-
-	setRequestHeader: function ( value ) {
-
-		this.requestHeader = value;
-		return this;
-
 	}
 
 } );

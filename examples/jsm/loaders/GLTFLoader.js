@@ -78,7 +78,6 @@ var GLTFLoader = ( function () {
 
 		this.dracoLoader = null;
 		this.ddsLoader = null;
-
 	}
 
 	GLTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
@@ -131,6 +130,7 @@ var GLTFLoader = ( function () {
 
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( this.requestHeader );
 
 			if ( scope.crossOrigin === 'use-credentials' ) {
 
@@ -282,6 +282,7 @@ var GLTFLoader = ( function () {
 
 			} );
 
+			parser.fileLoader.setRequestHeader( this.requestHeader );
 			parser.parse( onLoad, onError );
 
 		}

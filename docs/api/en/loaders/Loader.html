@@ -50,6 +50,11 @@
 			Default is the empty string.
 		</p>
 
+		<h3>[property:Object requestHeader]</h3>
+		<p>
+			The [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request. See [page:.setRequestHeader]. Default is empty object.
+		</p>
+
 		<h2>Methods</h2>
 
 		<h3>[method:void load]()</h3>
@@ -87,6 +92,13 @@
 		<h3>[method:Loader setResourcePath]( [param:String resourcePath] )</h3>
 		<p>
 			[page:String resourcePath] — Set the base path for dependent resources like textures.
+		</p>
+
+		<h3>[method:Loader setRequestHeader]( [param:Object requestHeader] )</h3>
+		<p>
+			[page:object requestHeader] - key: The name of the header whose value is to be set. value: The value to set as the body of the header.<br /><br />
+
+			Set the [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request.
 		</p>
 
 		<h2>Source</h2>
