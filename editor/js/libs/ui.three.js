@@ -522,8 +522,23 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 		} else if ( area > 0.75 ) {
 
-			var nextObject = scene.getObjectById( this.nextSibling.value );
-			moveObject( object, nextObject.parent, nextObject );
+			var nextObject, parent;
+
+			if ( this.nextSibling !== null ) {
+
+				nextObject = scene.getObjectById( this.nextSibling.value );
+				parent = nextObject.parent;
+
+			} else {
+
+				// end of list (no next object)
+
+				nextObject = null;
+				parent = scene.getObjectById( this.value ).parent;
+
+			}
+
+			moveObject( object, parent, nextObject );
 
 		} else {
 

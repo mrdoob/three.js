@@ -198,7 +198,7 @@ Object.assign( PropertyBinding, {
 
 	findNode: function ( root, nodeName ) {
 
-		if ( ! nodeName || nodeName === "" || nodeName === "root" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
+		if ( ! nodeName || nodeName === "" || nodeName === "." || nodeName === - 1 || nodeName === root.name || nodeName === root.uuid ) {
 
 			return root;
 
@@ -622,37 +622,17 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 					}
 
-					for ( var i = 0; i < this.node.geometry.morphAttributes.position.length; i ++ ) {
+					if ( targetObject.morphTargetDictionary[ propertyIndex ] !== undefined ) {
 
-						if ( targetObject.geometry.morphAttributes.position[ i ].name === propertyIndex ) {
-
-							propertyIndex = i;
-							break;
-
-						}
+						propertyIndex = targetObject.morphTargetDictionary[ propertyIndex ];
 
 					}
 
 
 				} else {
 
-					if ( ! targetObject.geometry.morphTargets ) {
-
-						console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences because node does not have a geometry.morphTargets.', this );
-						return;
-
-					}
-
-					for ( var i = 0; i < this.node.geometry.morphTargets.length; i ++ ) {
-
-						if ( targetObject.geometry.morphTargets[ i ].name === propertyIndex ) {
-
-							propertyIndex = i;
-							break;
-
-						}
-
-					}
+					console.error( 'THREE.PropertyBinding: Can not bind to morphTargetInfluences on THREE.Geometry. Use THREE.BufferGeometry instead.', this );
+					return;
 
 				}
 
@@ -702,7 +682,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 } );
 
-//!\ DECLARE ALIAS AFTER assign prototype !
+// DECLARE ALIAS AFTER assign prototype
 Object.assign( PropertyBinding.prototype, {
 
 	// initial state of these methods that calls 'bind'

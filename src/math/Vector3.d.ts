@@ -16,7 +16,7 @@ import { Vector } from './Vector2';
  * var c = new THREE.Vector3();
  * c.crossVectors( a, b );
  *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js">src/math/Vector3.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js|src/math/Vector3.js}
  *
  * ( class Vector3 implements Vector<Vector3> )
  */
@@ -286,5 +286,10 @@ export class Vector3 implements Vector {
 		index: number,
 		offset?: number
 	): this;
+
+	/**
+	 * Sets this vector's x, y and z from Math.random
+	 */
+	random(): this;
 
 }

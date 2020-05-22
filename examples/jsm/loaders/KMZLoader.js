@@ -9,6 +9,7 @@ import {
 	LoadingManager
 } from "../../../build/three.module.js";
 import { ColladaLoader } from "../loaders/ColladaLoader.js";
+import { JSZip } from "../libs/jszip.module.min.js";
 
 var KMZLoader = function ( manager ) {
 
@@ -71,7 +72,7 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		//
 
-		var zip = new JSZip( data ); // eslint-disable-line no-undef
+		var zip = new JSZip( data );
 
 		if ( zip.files[ 'doc.kml' ] ) {
 

@@ -45,11 +45,13 @@ LineCurve.prototype.getPointAt = function ( u, optionalTarget ) {
 
 };
 
-LineCurve.prototype.getTangent = function ( /* t */ ) {
+LineCurve.prototype.getTangent = function ( t, optionalTarget ) {
 
-	var tangent = this.v2.clone().sub( this.v1 );
+	var tangent = optionalTarget || new Vector2();
 
-	return tangent.normalize();
+	var tangent = tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+
+	return tangent;
 
 };
 

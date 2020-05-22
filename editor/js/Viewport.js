@@ -79,9 +79,11 @@ var Viewport = function ( editor ) {
 
 			selectionBox.setFromObject( object );
 
-			if ( editor.helpers[ object.id ] !== undefined ) {
+			var helper = editor.helpers[ object.id ];
 
-				editor.helpers[ object.id ].update();
+			if ( helper !== undefined && helper.isSkeletonHelper !== true ) {
+
+				helper.update();
 
 			}
 
@@ -455,13 +457,25 @@ var Viewport = function ( editor ) {
 
 	signals.helperAdded.add( function ( object ) {
 
-		objects.push( object.getObjectByName( 'picker' ) );
+		var picker = object.getObjectByName( 'picker' );
+
+		if ( picker !== undefined ) {
+
+			objects.push( picker );
+
+		}
 
 	} );
 
 	signals.helperRemoved.add( function ( object ) {
 
-		objects.splice( objects.indexOf( object.getObjectByName( 'picker' ) ), 1 );
+		var picker = object.getObjectByName( 'picker' );
+
+		if ( picker !== undefined ) {
+
+			objects.splice( objects.indexOf( picker ), 1 );
+
+		}
 
 	} );
 

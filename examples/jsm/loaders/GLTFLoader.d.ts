@@ -1,9 +1,12 @@
 import {
 	AnimationClip,
 	Camera,
+	Group,
 	Loader,
 	LoadingManager,
-	Scene
+	Object3D,
+	Material,
+	Texture
 } from '../../../src/Three';
 
 import { DRACOLoader } from './DRACOLoader';
@@ -11,8 +14,8 @@ import { DDSLoader } from './DDSLoader';
 
 export interface GLTF {
 	animations: AnimationClip[];
-	scene: Scene;
-	scenes: Scene[];
+	scene: Group;
+	scenes: Group[];
 	cameras: Camera[];
 	asset: {
 		copyright?: string;
@@ -39,9 +42,16 @@ export class GLTFLoader extends Loader {
 
 }
 
+export interface GLTFReference {
+	type: 'materials'|'nodes'|'textures';
+	index: number;
+}
+
 export class GLTFParser {
 
 	json: any;
+
+	associations: Map<Object3D|Material|Texture, GLTFReference>;
 
 	getDependency: ( type: string, index: number ) => Promise<any>;
 	getDependencies: ( type: string ) => Promise<any[]>;

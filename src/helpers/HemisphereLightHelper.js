@@ -8,7 +8,6 @@ import { Vector3 } from '../math/Vector3.js';
 import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Mesh } from '../objects/Mesh.js';
-import { VertexColors } from '../constants.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
@@ -32,8 +31,8 @@ function HemisphereLightHelper( light, size, color ) {
 	var geometry = new OctahedronBufferGeometry( size );
 	geometry.rotateY( Math.PI * 0.5 );
 
-	this.material = new MeshBasicMaterial( { wireframe: true, fog: false } );
-	if ( this.color === undefined ) this.material.vertexColors = VertexColors;
+	this.material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
+	if ( this.color === undefined ) this.material.vertexColors = true;
 
 	var position = geometry.getAttribute( 'position' );
 	var colors = new Float32Array( position.count * 3 );

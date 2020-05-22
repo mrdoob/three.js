@@ -1,5 +1,4 @@
 import { Matrix4 } from './Matrix4';
-import { Quaternion } from './Quaternion';
 import { Vector3 } from './Vector3';
 
 /**
@@ -29,9 +28,9 @@ export interface Matrix {
 	determinant(): number;
 
 	/**
-	 * getInverse(matrix:T, throwOnInvertible?:boolean):T;
+	 * getInverse(matrix:T):T;
 	 */
-	getInverse( matrix: Matrix, throwOnInvertible?: boolean ): Matrix;
+	getInverse( matrix: Matrix ): Matrix;
 
 	/**
 	 * transpose():T;

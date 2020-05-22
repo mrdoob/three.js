@@ -244,7 +244,7 @@ Object.assign( Interpolant.prototype, {
 
 } );
 
-//!\ DECLARE ALIAS AFTER assign prototype !
+// DECLARE ALIAS AFTER assign prototype
 Object.assign( Interpolant.prototype, {
 
 	//( 0, t, t0 ), returns this.resultBuffer

@@ -67,16 +67,16 @@ Object.assign( SphericalHarmonics3.prototype, {
 		target.copy( coeff[ 0 ] ).multiplyScalar( 0.282095 );
 
 		// band 1
-		target.addScale( coeff[ 1 ], 0.488603 * y );
-		target.addScale( coeff[ 2 ], 0.488603 * z );
-		target.addScale( coeff[ 3 ], 0.488603 * x );
+		target.addScaledVector( coeff[ 1 ], 0.488603 * y );
+		target.addScaledVector( coeff[ 2 ], 0.488603 * z );
+		target.addScaledVector( coeff[ 3 ], 0.488603 * x );
 
 		// band 2
-		target.addScale( coeff[ 4 ], 1.092548 * ( x * y ) );
-		target.addScale( coeff[ 5 ], 1.092548 * ( y * z ) );
-		target.addScale( coeff[ 6 ], 0.315392 * ( 3.0 * z * z - 1.0 ) );
-		target.addScale( coeff[ 7 ], 1.092548 * ( x * z ) );
-		target.addScale( coeff[ 8 ], 0.546274 * ( x * x - y * y ) );
+		target.addScaledVector( coeff[ 4 ], 1.092548 * ( x * y ) );
+		target.addScaledVector( coeff[ 5 ], 1.092548 * ( y * z ) );
+		target.addScaledVector( coeff[ 6 ], 0.315392 * ( 3.0 * z * z - 1.0 ) );
+		target.addScaledVector( coeff[ 7 ], 1.092548 * ( x * z ) );
+		target.addScaledVector( coeff[ 8 ], 0.546274 * ( x * x - y * y ) );
 
 		return target;
 
@@ -97,16 +97,16 @@ Object.assign( SphericalHarmonics3.prototype, {
 		target.copy( coeff[ 0 ] ).multiplyScalar( 0.886227 ); // π * 0.282095
 
 		// band 1
-		target.addScale( coeff[ 1 ], 2.0 * 0.511664 * y ); // ( 2 * π / 3 ) * 0.488603
-		target.addScale( coeff[ 2 ], 2.0 * 0.511664 * z );
-		target.addScale( coeff[ 3 ], 2.0 * 0.511664 * x );
+		target.addScaledVector( coeff[ 1 ], 2.0 * 0.511664 * y ); // ( 2 * π / 3 ) * 0.488603
+		target.addScaledVector( coeff[ 2 ], 2.0 * 0.511664 * z );
+		target.addScaledVector( coeff[ 3 ], 2.0 * 0.511664 * x );
 
 		// band 2
-		target.addScale( coeff[ 4 ], 2.0 * 0.429043 * x * y ); // ( π / 4 ) * 1.092548
-		target.addScale( coeff[ 5 ], 2.0 * 0.429043 * y * z );
-		target.addScale( coeff[ 6 ], 0.743125 * z * z - 0.247708 ); // ( π / 4 ) * 0.315392 * 3
-		target.addScale( coeff[ 7 ], 2.0 * 0.429043 * x * z );
-		target.addScale( coeff[ 8 ], 0.429043 * ( x * x - y * y ) ); // ( π / 4 ) * 0.546274
+		target.addScaledVector( coeff[ 4 ], 2.0 * 0.429043 * x * y ); // ( π / 4 ) * 1.092548
+		target.addScaledVector( coeff[ 5 ], 2.0 * 0.429043 * y * z );
+		target.addScaledVector( coeff[ 6 ], 0.743125 * z * z - 0.247708 ); // ( π / 4 ) * 0.315392 * 3
+		target.addScaledVector( coeff[ 7 ], 2.0 * 0.429043 * x * z );
+		target.addScaledVector( coeff[ 8 ], 0.429043 * ( x * x - y * y ) ); // ( π / 4 ) * 0.546274
 
 		return target;
 
@@ -124,6 +124,17 @@ Object.assign( SphericalHarmonics3.prototype, {
 
 	},
 
+	addScaledSH: function ( sh, s ) {
+
+		for ( var i = 0; i < 9; i ++ ) {
+
+			this.coefficients[ i ].addScaledVector( sh.coefficients[ i ], s );
+
+		}
+
+		return this;
+
+	},
 
 	scale: function ( s ) {
 

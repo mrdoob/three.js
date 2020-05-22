@@ -37,7 +37,7 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 
-			var scene, camera, pointLight, stats;
+			var scene, camera, dirLight, stats;
 			var renderer, mixer, controls;
 
 			var clock = new THREE.Clock();
@@ -60,13 +60,15 @@
 
 			controls = new OrbitControls( camera, renderer.domElement );
 			controls.target.set( 0, 0.5, 0 );
+			controls.update();
 			controls.enablePan = false;
+			controls.enableDamping = true;
 
-			scene.add( new THREE.AmbientLight( 0x404040 ) );
+			scene.add( new THREE.HemisphereLight( 0xffffff, 0x000000, 0.4 ) );
 
-			pointLight = new THREE.PointLight( 0xffffff, 1 );
-			pointLight.position.copy( camera.position );
-			scene.add( pointLight );
+			dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+			dirLight.position.set( 5, 2, 8 );
+			scene.add( dirLight );
 
 			// envmap
 			var path = 'textures/cube/Park2/';
@@ -122,8 +124,10 @@
 				requestAnimationFrame( animate );
 
 				var delta = clock.getDelta();
+
 				mixer.update( delta );
-				controls.update( delta );
+
+				controls.update();
 
 				stats.update();
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -18,37 +18,38 @@
 
 		</p>
 
-
-		<h2>示例</h2>
-
-		<p>[example:misc_controls_orbit misc / controls / orbit ]</p>
+		<h2>代码示例</h2>
 
 		<code>
-var renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+		var renderer = new THREE.WebGLRenderer();
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
 
-var scene = new THREE.Scene();
+		var scene = new THREE.Scene();
 
-var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+		var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
-var controls = new THREE.OrbitControls( camera, renderer.domElement );
+		var controls = new OrbitControls( camera, renderer.domElement );
 
-//controls.update() must be called after any manual changes to the camera's transform
-camera.position.set( 0, 20, 100 );
-controls.update();
+		//controls.update() must be called after any manual changes to the camera's transform
+		camera.position.set( 0, 20, 100 );
+		controls.update();
 
-function animate() {
+		function animate() {
 
-	requestAnimationFrame( animate );
+			requestAnimationFrame( animate );
 
-	// required if controls.enableDamping or controls.autoRotate are set to true
-	controls.update();
+			// required if controls.enableDamping or controls.autoRotate are set to true
+			controls.update();
 
-	renderer.render( scene, camera );
+			renderer.render( scene, camera );
 
-}
+		}
 		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_orbit misc / controls / orbit ]</p>
 
 		<h2>Constructor</h2>
 
@@ -291,7 +292,7 @@ controls.touches = {
 		<h2>源代码</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/OrbitControls.js examples/js/controls/OrbitControls.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/OrbitControls.js examples/jsm/controls/OrbitControls.js]
 		</p>
 	</body>
 </html>

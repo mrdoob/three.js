@@ -21,12 +21,28 @@ material.specularRoughness = min( material.specularRoughness, 1.0 );
 
 #ifdef CLEARCOAT
 
-	material.clearcoat = saturate( clearcoat ); // Burley clearcoat model
-	material.clearcoatRoughness = max( clearcoatRoughness, 0.0525 );
+	material.clearcoat = clearcoat;
+	material.clearcoatRoughness = clearcoatRoughness;
+
+	#ifdef USE_CLEARCOATMAP
+
+		material.clearcoat *= texture2D( clearcoatMap, vUv ).x;
+
+	#endif
+
+	#ifdef USE_CLEARCOAT_ROUGHNESSMAP
+
+		material.clearcoatRoughness *= texture2D( clearcoatRoughnessMap, vUv ).y;
+
+	#endif
+
+	material.clearcoat = saturate( material.clearcoat ); // Burley clearcoat model
+	material.clearcoatRoughness = max( material.clearcoatRoughness, 0.0525 );
 	material.clearcoatRoughness += geometryRoughness;
 	material.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );
 
 #endif
+
 #ifdef USE_SHEEN
 
 	material.sheenColor = sheen;

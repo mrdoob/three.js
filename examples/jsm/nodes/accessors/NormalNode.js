@@ -41,7 +41,7 @@ NormalNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 	return TempNode.prototype.build.call( this, builder, output, uuid );
 
-}
+};
 
 NormalNode.prototype.generate = function ( builder, output ) {
 

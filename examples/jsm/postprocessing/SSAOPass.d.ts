@@ -21,8 +21,8 @@ export class SSAOPass extends Pass {
 	width: number;
 	height: boolean;
 	clear: boolean;
-	kernelRadius: boolean;
-	kernelSize: boolean;
+	kernelRadius: number;
+	kernelSize: number;
 	kernel: Vector3[];
 	noiseTexture: DataTexture;
 	output: number;
@@ -52,9 +52,7 @@ export class SSAOPass extends Pass {
 	dipose(): void;
 	generateSampleKernel(): Vector3[];
 	generateRandomKernelRotations(): void;
-	renderPass( renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color, clearAlpha?: number ): void;
-	renderPass( renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: number, clearAlpha?: number ): void;
-	renderOverride( renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color, clearAlpha?: number ): void;
-	renderOverride( renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: number, clearAlpha?: number ): void;
+	renderPass( renderer: WebGLRenderer, passMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color | string | number, clearAlpha?: number ): void;
+	renderOverride( renderer: WebGLRenderer, overrideMaterial: Material, renderTarget: WebGLRenderTarget, clearColor?: Color | string | number, clearAlpha?: number ): void;
 
 }

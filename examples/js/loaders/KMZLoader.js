@@ -63,7 +63,7 @@ THREE.KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		//
 
-		var zip = new JSZip( data ); // eslint-disable-line no-undef
+		var zip = new JSZip( data );
 
 		if ( zip.files[ 'doc.kml' ] ) {
 

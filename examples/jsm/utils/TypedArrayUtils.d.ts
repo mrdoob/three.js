@@ -1,6 +1,7 @@
 export namespace TypedArrayUtils {
 	export function quicksortIP( arr: any[], eleSize: number, orderElement: number ): any[];
 
+	type Points = Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Float32Array | Float64Array | Uint8ClampedArray;
 
 	export class Kdtree {
 
@@ -8,9 +9,9 @@ export namespace TypedArrayUtils {
 		root: Node;
 		private maxDepth: number;
 
-		constructor( points: Int8Array | Int16Array | Int32Array | Uint8Array | Uint16Array | Uint32Array | Float32Array | Float64Array | Uint8ClampedArray, metric: ( a: any, b: any ) => number, eleSize: number );
+		constructor( points: Points, metric: ( a: any, b: any ) => number, eleSize: number );
 
-		getPointSet( points: any, pos: number );
+		getPointSet( points: Points, pos: number ): Points;
 
 		buildTree(): Node;
 

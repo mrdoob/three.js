@@ -15,7 +15,7 @@ import { CodeSerializer } from "./obj2/utils/CodeSerializer.js";
 import { OBJLoader2 } from "./OBJLoader2.js";
 
 // Imports only related to worker (when standard workers (modules aren't supported) are used)
-import { OBJLoader2Parser } from "./obj2/worker/parallel/OBJLoader2Parser.js";
+import { OBJLoader2Parser } from "./obj2/OBJLoader2Parser.js";
 import {
 	WorkerRunner,
 	DefaultWorkerPayloadHandler,
@@ -34,15 +34,16 @@ const OBJLoader2Parallel = function ( manager ) {
 
 	OBJLoader2.call( this, manager );
 	this.preferJsmWorker = false;
+	this.jsmWorkerUrl = null;
 
 	this.executeParallel = true;
 	this.workerExecutionSupport = new WorkerExecutionSupport();
 
 };
 
-OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.1.2';
+OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION = '3.2.0';
 console.info( 'Using OBJLoader2Parallel version: ' + OBJLoader2Parallel.OBJLOADER2_PARALLEL_VERSION );
-
+OBJLoader2Parallel.DEFAULT_JSM_WORKER_PATH = './jsm/loaders/obj2/worker/parallel/OBJLoader2JsmWorker.js';
 
 OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototype ), {
 
@@ -51,7 +52,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	/**
 	 * Execution of parse in parallel via Worker is default, but normal {OBJLoader2} parsing can be enforced via false here.
 	 *
-	 * @param executeParallel True or False
+	 * @param {boolean} executeParallel True or False
 	 * @return {OBJLoader2Parallel}
 	 */
 	setExecuteParallel: function ( executeParallel ) {
@@ -63,12 +64,22 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 
 	/**
 	 * Set whether jsm modules in workers should be used. This requires browser support which is currently only experimental.
-	 * @param preferJsmWorker True or False
+	 * @param {boolean} preferJsmWorker True or False
+	 * @param {URL} jsmWorkerUrl Provide complete jsm worker URL otherwise relative path to this module may not be correct
 	 * @return {OBJLoader2Parallel}
 	 */
-	setPreferJsmWorker: function ( preferJsmWorker ) {
+	setJsmWorker: function ( preferJsmWorker, jsmWorkerUrl ) {
 
 		this.preferJsmWorker = preferJsmWorker === true;
+
+		if ( jsmWorkerUrl === undefined || jsmWorkerUrl === null ) {
+
+			throw "The url to the jsm worker is not valid. Aborting...";
+
+		}
+
+		this.jsmWorkerUrl = jsmWorkerUrl;
+
 		return this;
 
 	},
@@ -90,11 +101,13 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 	buildWorkerCode: function () {
 
 		let codeBuilderInstructions = new CodeBuilderInstructions( true, true, this.preferJsmWorker );
+
 		if ( codeBuilderInstructions.isSupportsJsmWorker() ) {
 
-			codeBuilderInstructions.setJsmWorkerFile( '../examples/loaders/jsm/obj2/worker/parallel/jsm/OBJLoader2Worker.js' );
+			codeBuilderInstructions.setJsmWorkerUrl( this.jsmWorkerUrl );
 
 		}
+
 		if ( codeBuilderInstructions.isSupportsStandardWorker() ) {
 
 			let objectManipulator = new ObjectManipulator();
@@ -109,6 +122,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 			codeBuilderInstructions.addStartCode( startCode );
 
 		}
+
 		return codeBuilderInstructions;
 
 	},
@@ -155,6 +169,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 				throw "No callback other than the default callback was provided! Aborting!";
 
 			}
+
 			// check if worker has been initialize before. If yes, skip init
 			if ( ! this.workerExecutionSupport.isWorkerLoaded( this.preferJsmWorker ) ) {
 
@@ -166,6 +181,7 @@ OBJLoader2Parallel.prototype = Object.assign( Object.create( OBJLoader2.prototyp
 					scope._onAssetAvailable( payload );
 
 				};
+
 				function scopedOnLoad( message ) {
 
 					scope.parser.callbacks.onLoad( scope.baseObject3d, message );

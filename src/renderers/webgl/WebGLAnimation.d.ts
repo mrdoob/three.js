@@ -6,6 +6,6 @@ export class WebGLAnimation {
 
 	setAnimationLoop( callback: Function ): void;
 
-	setContext( value: WebGLRenderingContext | WebGL2RenderingContext ): void;
+	setContext( value: Window ): void;
 
 }

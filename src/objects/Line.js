@@ -32,6 +32,8 @@ function Line( geometry, material, mode ) {
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new LineBasicMaterial();
 
+	this.updateMorphTargets();
+
 }
 
 Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
@@ -93,10 +95,9 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	raycast: function ( raycaster, intersects ) {
 
-		var precision = raycaster.linePrecision;
-
 		var geometry = this.geometry;
 		var matrixWorld = this.matrixWorld;
+		var threshold = raycaster.params.Line.threshold;
 
 		// Checking boundingSphere distance to ray
 
@@ -104,7 +105,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		_sphere.copy( geometry.boundingSphere );
 		_sphere.applyMatrix4( matrixWorld );
-		_sphere.radius += precision;
+		_sphere.radius += threshold;
 
 		if ( raycaster.ray.intersectsSphere( _sphere ) === false ) return;
 
@@ -113,8 +114,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		_inverseMatrix.getInverse( matrixWorld );
 		_ray.copy( raycaster.ray ).applyMatrix4( _inverseMatrix );
 
-		var localPrecision = precision / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
-		var localPrecisionSq = localPrecision * localPrecision;
+		var localThreshold = threshold / ( ( this.scale.x + this.scale.y + this.scale.z ) / 3 );
+		var localThresholdSq = localThreshold * localThreshold;
 
 		var vStart = new Vector3();
 		var vEnd = new Vector3();
@@ -142,7 +143,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					var distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-					if ( distSq > localPrecisionSq ) continue;
+					if ( distSq > localThresholdSq ) continue;
 
 					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -174,7 +175,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					var distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-					if ( distSq > localPrecisionSq ) continue;
+					if ( distSq > localThresholdSq ) continue;
 
 					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -208,7 +209,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				var distSq = _ray.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
 
-				if ( distSq > localPrecisionSq ) continue;
+				if ( distSq > localThresholdSq ) continue;
 
 				interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
@@ -228,6 +229,52 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					object: this
 
 				} );
+
+			}
+
+		}
+
+	},
+
+	updateMorphTargets: function () {
+
+		var geometry = this.geometry;
+		var m, ml, name;
+
+		if ( geometry.isBufferGeometry ) {
+
+			var morphAttributes = geometry.morphAttributes;
+			var keys = Object.keys( morphAttributes );
+
+			if ( keys.length > 0 ) {
+
+				var morphAttribute = morphAttributes[ keys[ 0 ] ];
+
+				if ( morphAttribute !== undefined ) {
+
+					this.morphTargetInfluences = [];
+					this.morphTargetDictionary = {};
+
+					for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+
+						name = morphAttribute[ m ].name || String( m );
+
+						this.morphTargetInfluences.push( 0 );
+						this.morphTargetDictionary[ name ] = m;
+
+					}
+
+				}
+
+			}
+
+		} else {
+
+			var morphTargets = geometry.morphTargets;
+
+			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
+
+				console.error( 'THREE.Line.updateMorphTargets() does not support THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 			}
 

@@ -37,8 +37,11 @@
 
 			var camera, scene, renderer, splineCamera, cameraHelper, cameraEye;
 
+			var direction = new THREE.Vector3();
 			var binormal = new THREE.Vector3();
 			var normal = new THREE.Vector3();
+			var position = new THREE.Vector3();
+			var lookAt = new THREE.Vector3();
 
 			var pipeSpline = new THREE.CatmullRomCurve3( [
 				new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
@@ -257,6 +260,8 @@
 				folderCamera.open();
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 100;
+				controls.maxDistance = 2000;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -290,8 +295,8 @@
 				var looptime = 20 * 1000;
 				var t = ( time % looptime ) / looptime;
 
-				var pos = tubeGeometry.parameters.path.getPointAt( t );
-				pos.multiplyScalar( params.scale );
+				tubeGeometry.parameters.path.getPointAt( t, position );
+				position.multiplyScalar( params.scale );
 
 				// interpolation
 
@@ -303,25 +308,26 @@
 				binormal.subVectors( tubeGeometry.binormals[ pickNext ], tubeGeometry.binormals[ pick ] );
 				binormal.multiplyScalar( pickt - pick ).add( tubeGeometry.binormals[ pick ] );
 
-				var dir = tubeGeometry.parameters.path.getTangentAt( t );
+				tubeGeometry.parameters.path.getTangentAt( t, direction );
 				var offset = 15;
 
-				normal.copy( binormal ).cross( dir );
+				normal.copy( binormal ).cross( direction );
 
 				// we move on a offset on its binormal
 
-				pos.add( normal.clone().multiplyScalar( offset ) );
+				position.add( normal.clone().multiplyScalar( offset ) );
 
-				splineCamera.position.copy( pos );
-				cameraEye.position.copy( pos );
+				splineCamera.position.copy( position );
+				cameraEye.position.copy( position );
 
 				// using arclength for stablization in look ahead
 
-				var lookAt = tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1 ).multiplyScalar( params.scale );
+				tubeGeometry.parameters.path.getPointAt( ( t + 30 / tubeGeometry.parameters.path.getLength() ) % 1, lookAt );
+				lookAt.multiplyScalar( params.scale );
 
 				// camera orientation 2 - up orientation via normal
 
-				if ( ! params.lookAhead ) lookAt.copy( pos ).add( dir );
+				if ( ! params.lookAhead ) lookAt.copy( position ).add( direction );
 				splineCamera.matrix.lookAt( splineCamera.position, lookAt, normal );
 				splineCamera.quaternion.setFromRotationMatrix( splineCamera.matrix );
 

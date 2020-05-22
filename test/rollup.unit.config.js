@@ -1,3 +1,15 @@
+try {
+
+	require( 'qunit' );
+
+} catch {
+
+	console.log( '\x1b[31mError! You not installed dependencies. Please run `npm i --prefix test`\x1b[37m' );
+	process.exit( 1 );
+
+}
+
+
 function glsl() {
 
 	return {
@@ -26,7 +38,7 @@ function glsl() {
 export default [
 	// editor unit conf
 	{
-		input: 'test/three.editor.unit.js',
+		input: 'unit/three.editor.unit.js',
 		plugins: [
 			glsl()
 		],
@@ -35,7 +47,7 @@ export default [
 			{
 				format: 'umd',
 				name: 'THREE',
-				file: 'test/unit/three.editor.unit.js',
+				file: 'unit/build/three.editor.unit.js',
 				intro: 'QUnit.module( "Editor", () => {',
 				outro: '} );',
 				indent: '\t',
@@ -44,7 +56,7 @@ export default [
 	},
 	// example unit conf
 	{
-		input: 'test/three.example.unit.js',
+		input: 'unit/three.example.unit.js',
 		plugins: [
 			glsl()
 		],
@@ -53,7 +65,7 @@ export default [
 			{
 				format: 'umd',
 				name: 'THREE',
-				file: 'test/unit/three.example.unit.js',
+				file: 'unit/build/three.example.unit.js',
 				intro: 'QUnit.module( "Example", () => {',
 				outro: '} );',
 				indent: '\t',
@@ -62,7 +74,7 @@ export default [
 	},
 	// source unit conf
 	{
-		input: 'test/three.source.unit.js',
+		input: 'unit/three.source.unit.js',
 		plugins: [
 			glsl()
 		],
@@ -71,7 +83,7 @@ export default [
 			{
 				format: 'umd',
 				name: 'THREE',
-				file: 'test/unit/three.source.unit.js',
+				file: 'unit/build/three.source.unit.js',
 				intro: 'QUnit.module( "Source", () => {',
 				outro: '} );',
 				indent: '\t',

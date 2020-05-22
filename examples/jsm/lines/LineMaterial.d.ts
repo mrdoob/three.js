@@ -23,6 +23,7 @@ export class LineMaterial extends ShaderMaterial {
 	dashScale: number;
 	dashSize: number;
 	gapSize: number;
+	opacity: number;
 	readonly isLineMaterial: true;
 	linewidth: number;
 	resolution: Vector2;

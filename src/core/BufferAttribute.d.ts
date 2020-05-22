@@ -3,7 +3,7 @@ import { Matrix3 } from './../math/Matrix3';
 import { Matrix4 } from './../math/Matrix4';
 
 /**
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js">src/core/BufferAttribute.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/BufferAttribute.js|src/core/BufferAttribute.js}
  */
 export class BufferAttribute {
 

@@ -168,33 +168,34 @@ var MathUtils = {
 		var c3_1 = cos( ( c - a ) / 2 );
 		var s3_1 = sin( ( c - a ) / 2 );
 
-		if ( order === 'XYX' ) {
+		switch ( order ) {
 
-			q.set( c2 * s13, s2 * c1_3, s2 * s1_3, c2 * c13 );
+			case 'XYX':
+				q.set( c2 * s13, s2 * c1_3, s2 * s1_3, c2 * c13 );
+				break;
 
-		} else if ( order === 'YZY' ) {
+			case 'YZY':
+				q.set( s2 * s1_3, c2 * s13, s2 * c1_3, c2 * c13 );
+				break;
 
-			q.set( s2 * s1_3, c2 * s13, s2 * c1_3, c2 * c13 );
+			case 'ZXZ':
+				q.set( s2 * c1_3, s2 * s1_3, c2 * s13, c2 * c13 );
+				break;
 
-		} else if ( order === 'ZXZ' ) {
+			case 'XZX':
+				q.set( c2 * s13, s2 * s3_1, s2 * c3_1, c2 * c13 );
+				break;
 
-			q.set( s2 * c1_3, s2 * s1_3, c2 * s13, c2 * c13 );
+			case 'YXY':
+				q.set( s2 * c3_1, c2 * s13, s2 * s3_1, c2 * c13 );
+				break;
 
-		} else if ( order === 'XZX' ) {
+			case 'ZYZ':
+				q.set( s2 * s3_1, s2 * c3_1, c2 * s13, c2 * c13 );
+				break;
 
-			q.set( c2 * s13, s2 * s3_1, s2 * c3_1, c2 * c13 );
-
-		} else if ( order === 'YXY' ) {
-
-			q.set( s2 * c3_1, c2 * s13, s2 * s3_1, c2 * c13 );
-
-		} else if ( order === 'ZYZ' ) {
-
-			q.set( s2 * s3_1, s2 * c3_1, c2 * s13, c2 * c13 );
-
-		} else {
-
-			console.warn( 'THREE.MathUtils: .setQuaternionFromProperEuler() encountered an unknown order.' );
+			default:
+				console.warn( 'THREE.MathUtils: .setQuaternionFromProperEuler() encountered an unknown order: ' + order );
 
 		}
 

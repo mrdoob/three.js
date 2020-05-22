@@ -1,4 +1,5 @@
 import { Vector2 } from './../math/Vector2';
+import { Matrix3 } from './../math/Matrix3';
 import { EventDispatcher } from './../core/EventDispatcher';
 import {
 	Mapping,
@@ -33,7 +34,7 @@ export class Texture extends EventDispatcher {
 	name: string;
 	sourceFile: string;
 	image: any; // HTMLImageElement or ImageData or { width: number, height: number } in some children;
-	mipmaps: ImageData[];
+	mipmaps: any[]; // ImageData[] for 2D textures and CubeTexture[] for cube textures;
 	mapping: Mapping;
 	wrapS: Wrapping;
 	wrapT: Wrapping;
@@ -43,6 +44,8 @@ export class Texture extends EventDispatcher {
 	format: PixelFormat;
 	internalFormat: PixelFormatGPU | null;
 	type: TextureDataType;
+	matrix: Matrix3;
+	matrixAutoUpdate: boolean;
 	offset: Vector2;
 	repeat: Vector2;
 	center: Vector2;

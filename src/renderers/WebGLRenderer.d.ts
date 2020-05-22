@@ -100,7 +100,7 @@ export interface WebGLDebug {
  * The WebGL renderer displays your beautifully crafted scenes using WebGL, if your device supports it.
  * This renderer has way better performance than CanvasRenderer.
  *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js">src/renderers/WebGLRenderer.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js|src/renderers/WebGLRenderer.js}
  */
 export class WebGLRenderer implements Renderer {
 
@@ -274,9 +274,7 @@ export class WebGLRenderer implements Renderer {
 	/**
 	 * Sets the clear color, using color for the color and alpha for the opacity.
 	 */
-	setClearColor( color: Color, alpha?: number ): void;
-	setClearColor( color: string, alpha?: number ): void;
-	setClearColor( color: number, alpha?: number ): void;
+	setClearColor( color: Color | string | number, alpha?: number ): void;
 
 	/**
 	 * Returns a float with the current clear alpha. Ranges from 0 to 1.
@@ -365,6 +363,14 @@ export class WebGLRenderer implements Renderer {
 	 * Returns the current active mipmap level.
 	 */
 	getActiveMipmapLevel(): number;
+
+	/**
+	 * Sets the given WebGLFramebuffer. This method can only be used if no render target is set via
+	 * {@link WebGLRenderer#setRenderTarget .setRenderTarget}.
+	 *
+	 * @param value The WebGLFramebuffer.
+	 */
+	setFramebuffer( value: WebGLFramebuffer ): void;
 
 	/**
 	 * Returns the current render target. If no render target is set, null is returned.

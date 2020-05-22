@@ -9,17 +9,17 @@
 	</head>
 	<body>
 		[page:Texture] &rarr;
-		
+
 		<h1>[name]</h1>
 
 		<p class="desc">Creates a cube texture made up of six images.</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		var loader = new THREE.CubeTextureLoader();
 		loader.setPath( 'textures/cube/pisa/' );
-		
+
 		var textureCube = loader.load( [
 			'px.png', 'nx.png',
 			'py.png', 'ny.png',
@@ -33,7 +33,7 @@
 
 
 		<h3>[name]( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy )</h3>
-		
+
 		<p>
 		CubeTexture is almost equivalent in functionality and usage to [page:Texture]. The only differences are that the
 		images are an array of 6 images as opposed to a single image, and the mapping options are
@@ -43,13 +43,16 @@
 
 		<h2>Properties</h2>
 
-		<h3>See [page:Texture]</h3>
+		<p>
+		See the base [page:Texture Texture] class for common properties.
+		</p>
 
 		<h2>Methods</h2>
-		
 
-		<h3>See [page:Texture]</h3>
-		
+		<p>
+		See the base [page:Texture Texture] class for common methods.
+		</p>
+
 		<h2>Source</h2>
 
 		<p>

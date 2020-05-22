@@ -17,7 +17,7 @@
 
 	<body>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> car materials demo<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> car materials<br/>
 			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
 			<br><br>
 			<span>Body: <select id="body-mat"></select></span>
@@ -192,21 +192,21 @@
 						} ),
 						new THREE.MeshStandardMaterial( {
 							color: 0xffffff, metalness: 1.0, roughness: 0.2, name: 'metallic'
-						} ),
+						} )
 
 					],
 
 					glass: [
 
 						new THREE.MeshPhysicalMaterial( {
-							color: 0xffffff, metalness: 1, roughness: 0, transparency: 1.0, transparent: true, name: 'clear'
+							color: 0xffffff, metalness: 0, roughness: 0, transparency: 1.0, transparent: true, name: 'clear'
 						} ),
 						new THREE.MeshPhysicalMaterial( {
-							color: 0x000000, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'smoked'
+							color: 0x000000, metalness: 0, roughness: 0, transparency: 0.7, transparent: true, name: 'smoked'
 						} ),
 						new THREE.MeshPhysicalMaterial( {
-							color: 0x001133, metalness: 1, roughness: 0, transparency: 0.7, transparent: true, name: 'blue'
-						} ),
+							color: 0x001133, metalness: 0, roughness: 0, transparency: 0.7, transparent: true, name: 'blue'
+						} )
 
 					],
 
