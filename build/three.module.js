@@ -5287,23 +5287,23 @@ Object.assign( Layers.prototype, {
 
 } );
 
-var _object3DId = 0;
+let _object3DId = 0;
 
-var _v1$1 = new Vector3();
-var _q1 = new Quaternion();
-var _m1$1 = new Matrix4();
-var _target = new Vector3();
+const _v1$1 = new Vector3();
+const _q1 = new Quaternion();
+const _m1$1 = new Matrix4();
+const _target = new Vector3();
 
-var _position = new Vector3();
-var _scale = new Vector3();
-var _quaternion$2 = new Quaternion();
+const _position = new Vector3();
+const _scale = new Vector3();
+const _quaternion$2 = new Quaternion();
 
-var _xAxis = new Vector3( 1, 0, 0 );
-var _yAxis = new Vector3( 0, 1, 0 );
-var _zAxis = new Vector3( 0, 0, 1 );
+const _xAxis = new Vector3( 1, 0, 0 );
+const _yAxis = new Vector3( 0, 1, 0 );
+const _zAxis = new Vector3( 0, 0, 1 );
 
-var _addedEvent = { type: 'added' };
-var _removedEvent = { type: 'removed' };
+const _addedEvent = { type: 'added' };
+const _removedEvent = { type: 'removed' };
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -13894,31 +13894,37 @@ function CubeCamera( near, far, renderTarget ) {
 	this.renderTarget = renderTarget;
 
 	var cameraPX = new PerspectiveCamera( fov, aspect, near, far );
+	cameraPX.layers = this.layers;
 	cameraPX.up.set( 0, - 1, 0 );
 	cameraPX.lookAt( new Vector3( 1, 0, 0 ) );
 	this.add( cameraPX );
 
 	var cameraNX = new PerspectiveCamera( fov, aspect, near, far );
+	cameraNX.layers = this.layers;
 	cameraNX.up.set( 0, - 1, 0 );
 	cameraNX.lookAt( new Vector3( - 1, 0, 0 ) );
 	this.add( cameraNX );
 
 	var cameraPY = new PerspectiveCamera( fov, aspect, near, far );
+	cameraPY.layers = this.layers;
 	cameraPY.up.set( 0, 0, 1 );
 	cameraPY.lookAt( new Vector3( 0, 1, 0 ) );
 	this.add( cameraPY );
 
 	var cameraNY = new PerspectiveCamera( fov, aspect, near, far );
+	cameraNY.layers = this.layers;
 	cameraNY.up.set( 0, 0, - 1 );
 	cameraNY.lookAt( new Vector3( 0, - 1, 0 ) );
 	this.add( cameraNY );
 
 	var cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
+	cameraPZ.layers = this.layers;
 	cameraPZ.up.set( 0, - 1, 0 );
 	cameraPZ.lookAt( new Vector3( 0, 0, 1 ) );
 	this.add( cameraPZ );
 
 	var cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
+	cameraNZ.layers = this.layers;
 	cameraNZ.up.set( 0, - 1, 0 );
 	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
