@@ -85,7 +85,7 @@
     "@typescript-eslint/parser": "^2.26.0",
     "concurrently": "^5.2.0",
     "cross-env": "^7.0.2",
-    "eslint": "^6.8.0",
+    "eslint": "^7.0.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.0.2",
     "google-closure-compiler": "20200224.0.0",
