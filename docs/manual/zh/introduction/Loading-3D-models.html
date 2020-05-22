@@ -70,19 +70,11 @@
 	<h2>加载</h2>
 
 	<p>
-		three.js中默认仅包含了几个加载器（例如：[page:ObjectLoader]）——其它加载器需要你分别地添加到页面中。
-		取决于你对构建工具的偏好，选择以下任意一种方式：
+		Only a few loaders (e.g. [page:ObjectLoader]) are included by default with
+		three.js — others should be added to your app individually.
 	</p>
 
 	<code>
-		// global script
-		&lt;script src="GLTFLoader.js"&gt;&lt;/script&gt;
-
-		// commonjs
-		var THREE = window.THREE = require('three');
-		require('three/examples/js/loaders/GLTFLoader');
-
-		// ES modules
 		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 	</code>
 

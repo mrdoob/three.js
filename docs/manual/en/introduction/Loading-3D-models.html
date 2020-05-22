@@ -81,19 +81,10 @@
 
 	<p>
 		Only a few loaders (e.g. [page:ObjectLoader]) are included by default with
-		three.js — others should be added to your page individually. Depending on your
-		preference and comfort with build tools, choose one of the following:
+		three.js — others should be added to your app individually.
 	</p>
 
 	<code>
-		// global script
-		&lt;script src="GLTFLoader.js"&gt;&lt;/script&gt;
-
-		// commonjs
-		var THREE = window.THREE = require('three');
-		require('three/examples/js/loaders/GLTFLoader');
-
-		// ES modules
 		import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 	</code>
 
