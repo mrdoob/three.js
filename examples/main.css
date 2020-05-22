@@ -85,3 +85,11 @@ a, button, input, select {
 	color: #777777;
 	font-size: 12px;
 }
+
+#notSupported {
+	width: 50%;
+	margin: auto;
+	background-color: #f00;
+	margin-top: 20px;
+	padding: 10px;
+}
