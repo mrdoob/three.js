@@ -36053,6 +36053,7 @@ function Loader( manager ) {
 	this.crossOrigin = 'anonymous';
 	this.path = '';
 	this.resourcePath = '';
+	this.requestHeader = {};
 
 }
 
@@ -36091,6 +36092,13 @@ Object.assign( Loader.prototype, {
 	setResourcePath: function ( resourcePath ) {
 
 		this.resourcePath = resourcePath;
+		return this;
+
+	},
+
+	setRequestHeader: function ( requestHeader ) {
+
+		this.requestHeader = requestHeader;
 		return this;
 
 	}
@@ -36395,13 +36403,6 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	setMimeType: function ( value ) {
 
 		this.mimeType = value;
-		return this;
-
-	},
-
-	setRequestHeader: function ( value ) {
-
-		this.requestHeader = value;
 		return this;
 
 	}
