@@ -1,4 +1,5 @@
 import { Vector3 } from '../math/Vector3.js';
+import { BufferAttribute } from './BufferAttribute.js';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -156,9 +157,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	},
 
-	toJSON: function () {
+	clone: function () {
 
-		// deinterleave data and save it as an ordinary buffer attribute for now
+		console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.' );
 
 		var array = [];
 
@@ -173,6 +174,30 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 			}
 
 		}
+
+		return new BufferAttribute( new this.array.constructor( array ), this.itemSize, this.normalized );
+
+	},
+
+	toJSON: function () {
+
+		console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interlaved buffer attribute will deinterleave buffer data.' );
+
+		var array = [];
+
+		for ( var i = 0; i < this.count; i ++ ) {
+
+			var index = i * this.data.stride + this.offset;
+
+			for ( var j = 0; j < this.itemSize; j ++ ) {
+
+				array.push( this.data.array[ index + j ] );
+
+			}
+
+		}
+
+		// deinterleave data and save it as an ordinary buffer attribute for now
 
 		return {
 			itemSize: this.itemSize,
