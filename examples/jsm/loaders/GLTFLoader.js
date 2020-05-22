@@ -78,6 +78,7 @@ var GLTFLoader = ( function () {
 
 		this.dracoLoader = null;
 		this.ddsLoader = null;
+
 	}
 
 	GLTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {

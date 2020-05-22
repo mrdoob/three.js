@@ -162,7 +162,7 @@ var GodRaysGenerateShader = {
 
 		// Unrolling loop manually makes it work in ANGLE
 
-		"	float f = min( 1.0, max( vSunPositionScreenSpace.z / 1000.0, 0.0 ) );", // used to fade outgodrays
+		"	float f = min( 1.0, max( vSunPositionScreenSpace.z / 1000.0, 0.0 ) );", // used to fade out godrays
 
 		"	if ( 0.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;",
 		"	uv += stepv;",
