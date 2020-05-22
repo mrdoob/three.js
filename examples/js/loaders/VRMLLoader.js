@@ -584,6 +584,7 @@ THREE.VRMLLoader = ( function () {
 
 					case 'Group':
 					case 'Transform':
+					case 'Collision':
 						build = buildGroupingNode( node );
 						break;
 
@@ -664,7 +665,6 @@ THREE.VRMLLoader = ( function () {
 
 					case 'Anchor':
 					case 'Billboard':
-					case 'Collision':
 
 					case 'Inline':
 					case 'LOD':
@@ -729,12 +729,24 @@ THREE.VRMLLoader = ( function () {
 
 					switch ( fieldName ) {
 
+						case 'bboxCenter':
+							// field not supported
+							break;
+
+						case 'bboxSize':
+							// field not supported
+							break;
+
 						case 'center':
 							// field not supported
 							break;
 
 						case 'children':
 							parseFieldChildren( fieldValues, object );
+							break;
+
+						case 'collide':
+							// field not supported
 							break;
 
 						case 'rotation':
@@ -755,11 +767,7 @@ THREE.VRMLLoader = ( function () {
 							object.position.set( fieldValues[ 0 ], fieldValues[ 1 ], fieldValues[ 2 ] );
 							break;
 
-						case 'bboxCenter':
-							// field not supported
-							break;
-
-						case 'bboxSize':
+						case 'proxy':
 							// field not supported
 							break;
 
