@@ -185,6 +185,7 @@ function WebXRManager( renderer, gl ) {
 			if ( ! attributes.xrCompatible ) {
 
 				gl.makeXRCompatible();
+				this.enabled = true;
 
 			}
 
