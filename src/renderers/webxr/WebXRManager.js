@@ -181,8 +181,11 @@ function WebXRManager( renderer, gl ) {
 			session.addEventListener( 'end', onSessionEnd );
 
 			var attributes = gl.getContextAttributes();
+
 			if ( ! attributes.xrCompatible ) {
+
 				gl.makeXRCompatible();
+
 			}
 
 			var layerInit = {
