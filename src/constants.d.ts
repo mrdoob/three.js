@@ -360,6 +360,9 @@ export const NotEqualStencilFunc: StencilFunc;
 export const GreaterEqualStencilFunc: StencilFunc;
 export const AlwaysStencilFunc: StencilFunc;
 
+/**
+ *  @see {@link https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants#Buffers|WebGL API Constant}
+ */
 // usage types
 export enum Usage {}
 export const StaticDrawUsage: Usage;
