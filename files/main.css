@@ -373,7 +373,6 @@ h1 a {
 	bottom: 0;
 	left: 100%;
 	width: 16px;
-	transform: translateX(-50%);
 	cursor: ew-resize;
 }
 
