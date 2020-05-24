@@ -75,15 +75,15 @@
 				// manager.addHandler( /\.tga$/i, new TGALoader() );
 
 				new MTLLoader( manager )
-					.setPath( 'models/obj/male02/' )
-					.load( 'male02_dds.mtl', function ( materials ) {
+					.setPath( 'models/obj/bunny/' )
+					.load( 'bunny.mtl', function ( materials ) {
 
 						materials.preload();
 
 						new OBJLoader( manager )
 							.setMaterials( materials )
-							.setPath( 'models/obj/male02/' )
-							.load( 'male02.obj', function ( object ) {
+							.setPath( 'models/obj/bunny/' )
+							.load( 'bunny.obj', function ( object ) {
 
 								object.position.y = - 95;
 								scene.add( object );
