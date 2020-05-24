@@ -1,1 +1,0 @@
-# make available through CORS
