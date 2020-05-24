@@ -195,9 +195,38 @@ var MenubarFile = function ( editor ) {
 	} );
 	options.add( option );
 
-	//
+        // Export Project
+        
+        var option = new UIRow();
+        option.setClass( 'option' );
+        option.setTextContent( strings.getKey( 'menubar/file/export/project' ) );
+        option.onClick( function () {
 
-	options.add( new UIHorizontalRule() );
+                var output = editor.toJSON();
+
+                try {
+                        
+                        var output = editor.toJSON();
+                        output.metadata.type = 'App';
+                        delete output.history;
+                        output = JSON.stringify( output, parseNumber, '\t' );
+                        output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
+
+
+                } catch ( e ) {
+
+                        output = JSON.stringify( output );
+
+                }
+
+                saveString( output, 'project.json' );
+
+        } );
+        options.add( option );
+
+        //
+
+        options.add( new UIHorizontalRule() );
 
 	// Export DAE
 
