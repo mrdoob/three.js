@@ -81,12 +81,16 @@
 				header.setAttribute( 'data-category', key );
 				container.appendChild( header );
 
+				const grid = document.createElement( 'div' );
+				grid.classList.add( 'grid' );
+				container.appendChild( grid );
+
 				for ( let i = 0; i < section.length; i ++ ) {
 
 					const file = section[ i ];
 
 					const link = createLink( file );
-					container.appendChild( link );
+					grid.appendChild( link );
 
 					links[ file ] = link;
 					validRedirects.set( file, file + '.html' );
@@ -94,6 +98,14 @@
 				}
 
 			}
+
+			if ( window.innerWidth > 768 ) {
+
+				initResizer();
+
+			}
+
+
 
 			if ( window.location.hash !== '' ) {
 
@@ -192,7 +204,7 @@
 				<div class="card">
 					<a href="${file}.html" target="viewer">
 						<div class="cover">
-							<img src="screenshots/${ file }.jpg" loading="lazy" width="400" />
+							<img src="screenshots/${file}.jpg" loading="lazy" width="400" />
 						</div>
 						<div class="title">${getName( file )}</div>
 					</a>
@@ -210,6 +222,74 @@
 			} );
 
 			return link;
+
+		}
+
+		function initResizer() {
+
+			const resizer = document.createElement( 'div' );
+			resizer.id = 'resizer';
+			panel.appendChild( resizer );
+
+			let startX;
+			let initialPanelWidth;
+			const minPanelWidth = getPropertyPixelValue( '--panel-width' );
+
+			function startDragging( e ) {
+
+				startX = e.pageX;
+
+				initialPanelWidth = getPropertyPixelValue( '--panel-width' );
+
+				// disable some interactions
+				viewer.style.pointerEvents = 'none';
+				content.style.pointerEvents = 'none';
+				panel.style.userSelect = 'none';
+				panel.style.webkitUserSelect = 'none';
+
+				document.body.style.cursor = 'ew-resize';
+
+			}
+
+			function onDrag( e ) {
+
+				if ( ! startX ) return;
+
+				const distanceX = e.pageX - startX;
+
+				setPropertyPixelValue( '--panel-width', clamp( initialPanelWidth + distanceX, minPanelWidth, window.innerWidth / 2 ) );
+
+			}
+
+			function stopDragging( ) {
+
+				if ( ! startX ) return;
+
+				startX = undefined;
+
+				// re-enable the interactions
+				viewer.style.pointerEvents = null;
+				content.style.pointerEvents = null;
+				panel.style.userSelect = null;
+				panel.style.webkitUserSelect = null;
+
+				document.body.style.cursor = null;
+
+			}
+
+			resizer.addEventListener( 'pointerdown', startDragging );
+			document.body.addEventListener( 'pointermove', onDrag );
+			document.body.addEventListener( 'pointerup', stopDragging );
+			document.body.addEventListener( 'pointerleave', stopDragging );
+
+		}
+
+
+
+		function loadFile( file ) {
+
+			selectFile( file );
+			viewer.src = file + '.html';
 
 		}
 
@@ -360,6 +440,28 @@
 			const div = document.createElement( 'div' );
 			div.innerHTML = htmlString.trim();
 			return div.firstChild;
+
+		}
+
+		function getPropertyPixelValue( propertyName ) {
+
+			const rootStyles = window.getComputedStyle( document.documentElement );
+			const stringValue = rootStyles.getPropertyValue( propertyName );
+			return Number( stringValue.trim().slice( 0, - 2 ) );
+
+		}
+
+		function setPropertyPixelValue( propertyName, value ) {
+
+			const stringValue = String( value ) + 'px';
+			document.documentElement.style.setProperty( propertyName, stringValue );
+
+		}
+
+
+		function clamp( value, min, max ) {
+
+			return Math.min( Math.max( value, min ), max );
 
 		}
 
