@@ -140,6 +140,10 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				//
+
+				if ( typeof TESTING !== 'undefined'  ) { for ( var i = 0; i < 200; i ++ ) { render(); } };
+
 			}
 
 			function onWindowResize() {

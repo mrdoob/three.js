@@ -9,7 +9,7 @@ function InstancedBufferGeometry() {
 	BufferGeometry.call( this );
 
 	this.type = 'InstancedBufferGeometry';
-	this.maxInstancedCount = undefined;
+	this.instanceCount = Infinity;
 
 }
 
@@ -23,7 +23,7 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 		BufferGeometry.prototype.copy.call( this, source );
 
-		this.maxInstancedCount = source.maxInstancedCount;
+		this.instanceCount = source.instanceCount;
 
 		return this;
 
@@ -39,7 +39,7 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 		var data = BufferGeometry.prototype.toJSON.call( this );
 
-		data.maxInstancedCount = this.maxInstancedCount;
+		data.instanceCount = this.instanceCount;
 
 		data.isInstancedBufferGeometry = true;
 

@@ -121,16 +121,8 @@
 			function initShadowMapViewers() {
 
 				dirLightShadowMapViewer = new ShadowMapViewer( dirLight );
-				dirLightShadowMapViewer.position.x = 10;
-				dirLightShadowMapViewer.position.y = 10;
-				dirLightShadowMapViewer.size.width = 256;
-				dirLightShadowMapViewer.size.height = 256;
-				dirLightShadowMapViewer.update(); //Required when setting position or size directly
-
 				spotLightShadowMapViewer = new ShadowMapViewer( spotLight );
-				spotLightShadowMapViewer.size.set( 256, 256 );
-				spotLightShadowMapViewer.position.set( 276, 10 );
-				// spotLightShadowMapViewer.update();	//NOT required because .set updates automatically
+				resizeShadowMapViewers();
 
 			}
 
@@ -154,6 +146,22 @@
 
 			}
 
+			function resizeShadowMapViewers() {
+
+				var size = window.innerWidth * 0.15;
+
+				dirLightShadowMapViewer.position.x = 10;
+				dirLightShadowMapViewer.position.y = 10;
+				dirLightShadowMapViewer.size.width = size;
+				dirLightShadowMapViewer.size.height = size;
+				dirLightShadowMapViewer.update(); //Required when setting position or size directly
+
+				spotLightShadowMapViewer.size.set( size, size );
+				spotLightShadowMapViewer.position.set( size + 20, 10 );
+				// spotLightShadowMapViewer.update();	//NOT required because .set updates automatically
+
+			}
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -161,6 +169,7 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				resizeShadowMapViewers();
 				dirLightShadowMapViewer.updateForWindowResize();
 				spotLightShadowMapViewer.updateForWindowResize();
 

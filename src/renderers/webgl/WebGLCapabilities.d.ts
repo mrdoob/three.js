@@ -11,7 +11,7 @@ export class WebGLCapabilities {
 		parameters: WebGLCapabilitiesParameters
 	);
 
-	readonly isWebGL2: true;
+	readonly isWebGL2: boolean;
 	precision: string;
 	logarithmicDepthBuffer: boolean;
 	maxTextures: number;

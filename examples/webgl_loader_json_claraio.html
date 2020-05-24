@@ -54,6 +54,7 @@
 				var objectLoader = new THREE.ObjectLoader();
 				objectLoader.load( "models/json/teapot-claraio.json", function ( obj ) {
 
+					obj.position.y = -0.8;
 				 	scene.add( obj );
 
 				} );

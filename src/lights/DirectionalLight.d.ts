@@ -10,7 +10,7 @@ import { Light } from './Light';
  * directionalLight.position.set( 0, 1, 0 );
  * scene.add( directionalLight );
  *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/lights/DirectionalLight.js">src/lights/DirectionalLight.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/lights/DirectionalLight.js|src/lights/DirectionalLight.js}
  */
 export class DirectionalLight extends Light {
 

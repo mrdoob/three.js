@@ -41,13 +41,12 @@
 
 				// light
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 200, 200, 1000 ).normalize();
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
+				scene.add( hemiLight );
 
-				camera.add( dirLight );
-				camera.add( dirLight.target );
-
-				var material = new THREE.MeshLambertMaterial( { color: 0xffffff, side: THREE.DoubleSide } );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				dirLight.position.set( 2, 2, 2 );
+				scene.add( dirLight );
 
 				var loader = new VTKLoader();
 				loader.load( "models/vtk/bunny.vtk", function ( geometry ) {
@@ -55,6 +54,7 @@
 					geometry.center();
 					geometry.computeVertexNormals();
 
+					var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
 					var mesh = new THREE.Mesh( geometry, material );
 					mesh.position.set( - 0.075, 0.005, 0 );
 					mesh.scale.multiplyScalar( 0.2 );
@@ -68,7 +68,7 @@
 					geometry.computeVertexNormals();
 					geometry.center();
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x00ff00, side: THREE.DoubleSide } );
+					var material = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( - 0.025, 0, 0 );
@@ -85,7 +85,7 @@
 					geometry.computeVertexNormals();
 					geometry.center();
 
-					var material = new THREE.MeshLambertMaterial( { color: 0x0000ff, side: THREE.DoubleSide } );
+					var material = new THREE.MeshLambertMaterial( { color: 0x0000ff } );
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0.025, 0, 0 );
@@ -102,7 +102,7 @@
 					geometry.computeVertexNormals();
 					geometry.center();
 
-					var material = new THREE.MeshLambertMaterial( { color: 0xff0000, side: THREE.DoubleSide } );
+					var material = new THREE.MeshLambertMaterial( { color: 0xff0000 } );
 					var mesh = new THREE.Mesh( geometry, material );
 
 					mesh.position.set( 0.075, 0, 0 );
@@ -126,12 +126,9 @@
 				// controls
 
 				controls = new TrackballControls( camera, renderer.domElement );
-
+				controls.minDistance = .1;
+				controls.maxDistance = 0.5;
 				controls.rotateSpeed = 5.0;
-				controls.zoomSpeed = 5;
-				controls.panSpeed = 2;
-
-				controls.staticMoving = true;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -158,6 +155,7 @@
 				requestAnimationFrame( animate );
 
 				controls.update();
+
 				renderer.render( scene, camera );
 
 				stats.update();

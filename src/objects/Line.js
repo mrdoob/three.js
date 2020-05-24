@@ -32,6 +32,8 @@ function Line( geometry, material, mode ) {
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
 	this.material = material !== undefined ? material : new LineBasicMaterial();
 
+	this.updateMorphTargets();
+
 }
 
 Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
@@ -227,6 +229,52 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					object: this
 
 				} );
+
+			}
+
+		}
+
+	},
+
+	updateMorphTargets: function () {
+
+		var geometry = this.geometry;
+		var m, ml, name;
+
+		if ( geometry.isBufferGeometry ) {
+
+			var morphAttributes = geometry.morphAttributes;
+			var keys = Object.keys( morphAttributes );
+
+			if ( keys.length > 0 ) {
+
+				var morphAttribute = morphAttributes[ keys[ 0 ] ];
+
+				if ( morphAttribute !== undefined ) {
+
+					this.morphTargetInfluences = [];
+					this.morphTargetDictionary = {};
+
+					for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+
+						name = morphAttribute[ m ].name || String( m );
+
+						this.morphTargetInfluences.push( 0 );
+						this.morphTargetDictionary[ name ] = m;
+
+					}
+
+				}
+
+			}
+
+		} else {
+
+			var morphTargets = geometry.morphTargets;
+
+			if ( morphTargets !== undefined && morphTargets.length > 0 ) {
+
+				console.error( 'THREE.Line.updateMorphTargets() does not support THREE.Geometry. Use THREE.BufferGeometry instead.' );
 
 			}
 

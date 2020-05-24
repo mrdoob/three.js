@@ -1,4 +1,5 @@
 import { Vector3 } from '../math/Vector3.js';
+import { BufferAttribute } from './BufferAttribute.js';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -7,6 +8,8 @@ import { Vector3 } from '../math/Vector3.js';
 var _vector = new Vector3();
 
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
+
+	this.name = '';
 
 	this.data = interleavedBuffer;
 	this.itemSize = itemSize;
@@ -151,6 +154,57 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 		this.data.array[ index + 3 ] = w;
 
 		return this;
+
+	},
+
+	clone: function () {
+
+		console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.' );
+
+		var array = [];
+
+		for ( var i = 0; i < this.count; i ++ ) {
+
+			var index = i * this.data.stride + this.offset;
+
+			for ( var j = 0; j < this.itemSize; j ++ ) {
+
+				array.push( this.data.array[ index + j ] );
+
+			}
+
+		}
+
+		return new BufferAttribute( new this.array.constructor( array ), this.itemSize, this.normalized );
+
+	},
+
+	toJSON: function () {
+
+		console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interlaved buffer attribute will deinterleave buffer data.' );
+
+		var array = [];
+
+		for ( var i = 0; i < this.count; i ++ ) {
+
+			var index = i * this.data.stride + this.offset;
+
+			for ( var j = 0; j < this.itemSize; j ++ ) {
+
+				array.push( this.data.array[ index + j ] );
+
+			}
+
+		}
+
+		// deinterleave data and save it as an ordinary buffer attribute for now
+
+		return {
+			itemSize: this.itemSize,
+			type: this.array.constructor.name,
+			array: array,
+			normalized: this.normalized
+		};
 
 	}
 

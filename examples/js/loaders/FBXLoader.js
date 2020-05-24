@@ -2492,6 +2492,13 @@ THREE.FBXLoader = ( function () {
 
 										var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
 
+										if ( rawModel === undefined ) {
+
+											console.warn( 'THREE.FBXLoader: Encountered a unused curve.', child );
+											return;
+
+										}
+
 										var node = {
 
 											modelName: rawModel.attrName ? THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',

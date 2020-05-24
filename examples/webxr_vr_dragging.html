@@ -183,13 +183,9 @@
 
 					var intersection = intersections[ 0 ];
 
-					tempMatrix.getInverse( controller.matrixWorld );
-
 					var object = intersection.object;
-					object.matrix.premultiply( tempMatrix );
-					object.matrix.decompose( object.position, object.quaternion, object.scale );
 					object.material.emissive.b = 1;
-					controller.add( object );
+					controller.attach( object );
 
 					controller.userData.selected = object;
 
@@ -204,10 +200,8 @@
 				if ( controller.userData.selected !== undefined ) {
 
 					var object = controller.userData.selected;
-					object.matrix.premultiply( controller.matrixWorld );
-					object.matrix.decompose( object.position, object.quaternion, object.scale );
 					object.material.emissive.b = 0;
-					group.add( object );
+					group.attach( object );
 
 					controller.userData.selected = undefined;
 

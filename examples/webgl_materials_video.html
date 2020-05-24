@@ -90,6 +90,9 @@
 
 				video = document.getElementById( 'video' );
 				video.play();
+				video.addEventListener('play', function() {
+					this.currentTime = 3;
+				}, false);
 
 				texture = new THREE.VideoTexture( video );
 
@@ -242,9 +245,9 @@
 						mesh.rotation.x += 10 * mesh.dx;
 						mesh.rotation.y += 10 * mesh.dy;
 
-						mesh.position.x += 200 * mesh.dx;
-						mesh.position.y += 200 * mesh.dy;
-						mesh.position.z += 400 * mesh.dx;
+						mesh.position.x -= 150 * mesh.dx;
+						mesh.position.y += 150 * mesh.dy;
+						mesh.position.z += 300 * mesh.dx;
 
 					}
 

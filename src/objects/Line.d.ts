@@ -19,7 +19,11 @@ export class Line extends Object3D {
 	type: 'Line' | 'LineLoop' | 'LineSegments';
 	readonly isLine: true;
 
+	morphTargetInfluences?: number[];
+	morphTargetDictionary?: { [key: string]: number };
+
 	computeLineDistances(): this;
 	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+	updateMorphTargets(): void;
 
 }

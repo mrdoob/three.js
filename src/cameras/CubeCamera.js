@@ -1,6 +1,4 @@
 import { Object3D } from '../core/Object3D.js';
-import { WebGLCubeRenderTarget } from '../renderers/WebGLCubeRenderTarget.js';
-import { LinearFilter, RGBFormat } from '../constants.js';
 import { Vector3 } from '../math/Vector3.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
@@ -13,46 +11,56 @@ import { PerspectiveCamera } from './PerspectiveCamera.js';
 
 var fov = 90, aspect = 1;
 
-function CubeCamera( near, far, cubeResolution, options ) {
+function CubeCamera( near, far, renderTarget ) {
 
 	Object3D.call( this );
 
 	this.type = 'CubeCamera';
 
+	if ( renderTarget.isWebGLCubeRenderTarget !== true ) {
+
+		console.error( 'THREE.CubeCamera: The constructor now expects an instance of WebGLCubeRenderTarget as third parameter.' );
+		return;
+
+	}
+
+	this.renderTarget = renderTarget;
+
 	var cameraPX = new PerspectiveCamera( fov, aspect, near, far );
+	cameraPX.layers = this.layers;
 	cameraPX.up.set( 0, - 1, 0 );
 	cameraPX.lookAt( new Vector3( 1, 0, 0 ) );
 	this.add( cameraPX );
 
 	var cameraNX = new PerspectiveCamera( fov, aspect, near, far );
+	cameraNX.layers = this.layers;
 	cameraNX.up.set( 0, - 1, 0 );
 	cameraNX.lookAt( new Vector3( - 1, 0, 0 ) );
 	this.add( cameraNX );
 
 	var cameraPY = new PerspectiveCamera( fov, aspect, near, far );
+	cameraPY.layers = this.layers;
 	cameraPY.up.set( 0, 0, 1 );
 	cameraPY.lookAt( new Vector3( 0, 1, 0 ) );
 	this.add( cameraPY );
 
 	var cameraNY = new PerspectiveCamera( fov, aspect, near, far );
+	cameraNY.layers = this.layers;
 	cameraNY.up.set( 0, 0, - 1 );
 	cameraNY.lookAt( new Vector3( 0, - 1, 0 ) );
 	this.add( cameraNY );
 
 	var cameraPZ = new PerspectiveCamera( fov, aspect, near, far );
+	cameraPZ.layers = this.layers;
 	cameraPZ.up.set( 0, - 1, 0 );
 	cameraPZ.lookAt( new Vector3( 0, 0, 1 ) );
 	this.add( cameraPZ );
 
 	var cameraNZ = new PerspectiveCamera( fov, aspect, near, far );
+	cameraNZ.layers = this.layers;
 	cameraNZ.up.set( 0, - 1, 0 );
 	cameraNZ.lookAt( new Vector3( 0, 0, - 1 ) );
 	this.add( cameraNZ );
-
-	options = options || { format: RGBFormat, magFilter: LinearFilter, minFilter: LinearFilter };
-
-	this.renderTarget = new WebGLCubeRenderTarget( cubeResolution, options );
-	this.renderTarget.texture.name = "CubeCamera";
 
 	this.update = function ( renderer, scene ) {
 
@@ -60,7 +68,6 @@ function CubeCamera( near, far, cubeResolution, options ) {
 
 		var currentRenderTarget = renderer.getRenderTarget();
 
-		var renderTarget = this.renderTarget;
 		var generateMipmaps = renderTarget.texture.generateMipmaps;
 
 		renderTarget.texture.generateMipmaps = false;
@@ -92,8 +99,6 @@ function CubeCamera( near, far, cubeResolution, options ) {
 	this.clear = function ( renderer, color, depth, stencil ) {
 
 		var currentRenderTarget = renderer.getRenderTarget();
-
-		var renderTarget = this.renderTarget;
 
 		for ( var i = 0; i < 6; i ++ ) {
 

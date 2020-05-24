@@ -161,11 +161,6 @@
 
 		</script>
 
-		<script>
-			if (navigator.webdriver) { // off for testing
-				setTimeout(() => { document.getElementsByTagName('div')[1].style.display = 'none' }, 750)
-			}
-		</script>
-
+		<script>if ( typeof TESTING !== 'undefined' ) { setTimeout(() => { var a = document.querySelectorAll( 'body > div' ); a[1].style.display = 'none'; }, 750); }</script>
 	</body>
 </html>
