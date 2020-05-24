@@ -24858,7 +24858,7 @@ function WebGLRenderer( parameters ) {
 
 	this.renderBufferDirect = function ( camera, scene, geometry, material, object, group ) {
 
-		if ( scene === null ) { scene = tempScene; } // renderBufferDirect second parameter used to be fog (could be null)
+		if ( scene === null ) scene = tempScene;		// renderBufferDirect second parameter used to be fog (could be null)
 
 		var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
@@ -24906,8 +24906,9 @@ function WebGLRenderer( parameters ) {
 		if ( index === null ) {
 
 			// <<<< if ( position === undefined || position.count === 0 ) { return; }
-			if ( positionCount === 0 ) { return; }  // <<<<
-			if ( position === undefined &&  geometry.drawRange.count === Infinity) { return; } // <<<< early out, not needed but may be wanted
+			if ( positionCount === 0 ) return;		// <<<<
+
+			if ( position === undefined && geometry.drawRange.count === Infinity ) return;		// <<<< early out, not needed but may be wanted
 
 		} else if ( index.count === 0 ) {
 
@@ -24952,7 +24953,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		var dataCount = ( index !== null ) ? index.count : positionCount;  //  <<<<
+		var dataCount = ( index !== null ) ? index.count : positionCount;		//  <<<<
 
 		var rangeStart = geometry.drawRange.start * rangeFactor;
 		var rangeCount = geometry.drawRange.count * rangeFactor;
@@ -24965,7 +24966,7 @@ function WebGLRenderer( parameters ) {
 
 		var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
 
-		if ( drawCount === 0) { return; }
+		if ( drawCount === 0 ) return;
 
 		//
 
@@ -24986,7 +24987,7 @@ function WebGLRenderer( parameters ) {
 
 			var lineWidth = material.linewidth;
 
-			if ( lineWidth === undefined ) { lineWidth = 1; } // Not using Line*Material
+			if ( lineWidth === undefined ) lineWidth = 1;		// Not using Line*Material
 
 			state.setLineWidth( lineWidth * getTargetPixelRatio() );
 
@@ -25021,9 +25022,9 @@ function WebGLRenderer( parameters ) {
 		} else if ( geometry.isInstancedBufferGeometry ) {
 
 			// <<<<<<<<< below to allow for no instance attribute
-			var umaxdc = (geometry._maxInstanceCount === undefined) ? Infinity : geometry._maxInstanceCount;  // <<<<
-			var instanceCount = Math.min( geometry.instanceCount, umaxdc );  // <<<<
-			if (instanceCount === Infinity) return;  // <<<<
+			var umaxdc = ( geometry._maxInstanceCount === undefined ) ? Infinity : geometry._maxInstanceCount;	// <<<<
+			var instanceCount = Math.min( geometry.instanceCount, umaxdc );		// <<<<
+			if ( instanceCount === Infinity ) return;		// <<<<
 
 			renderer.renderInstances( geometry, drawStart, drawCount, instanceCount );
 
