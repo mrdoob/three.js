@@ -66,7 +66,10 @@ function CubeCamera( near, far, renderTarget ) {
 
 		if ( this.parent === null ) this.updateMatrixWorld();
 
+		var currentXrEnabled = renderer.xr.enabled;
 		var currentRenderTarget = renderer.getRenderTarget();
+
+		renderer.xr.enabled = false;
 
 		var generateMipmaps = renderTarget.texture.generateMipmaps;
 
@@ -94,6 +97,7 @@ function CubeCamera( near, far, renderTarget ) {
 
 		renderer.setRenderTarget( currentRenderTarget );
 
+		renderer.xr.enabled = currentXrEnabled;
 	};
 
 	this.clear = function ( renderer, color, depth, stencil ) {
