@@ -210,12 +210,13 @@ var SidebarProject = function ( editor ) {
 			shadowTypeSelect.getValue(),
 			toneMappingSelect.getValue(),
 			toneMappingExposure.getValue(),
+			toneMappingWhitePoint.getValue(),
 			physicallyCorrectLightsBoolean.getValue()
 		);
 
 	}
 
-	function createRenderer( antialias, shadows, shadowType, toneMapping, toneMappingExposure, physicallyCorrectLights ) {
+	function createRenderer( antialias, shadows, shadowType, toneMapping, toneMappingExposure, toneMappingWhitePoint, physicallyCorrectLights ) {
 
 		var parameters = { antialias: antialias };
 
@@ -240,6 +241,7 @@ var SidebarProject = function ( editor ) {
 
 		currentRenderer.toneMapping = parseFloat( toneMapping );
 		currentRenderer.toneMappingExposure = toneMappingExposure;
+		currentRenderer.toneMappingWhitePoint = toneMappingWhitePoint;
 		currentRenderer.physicallyCorrectLights = physicallyCorrectLights;
 
 		signals.rendererChanged.dispatch( currentRenderer, currentPmremGenerator );
