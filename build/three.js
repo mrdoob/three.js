@@ -24864,176 +24864,184 @@
 
 		var tempScene = new Scene();
 
-		this.renderBufferDirect = function ( camera, scene, geometry, material, object, group ) {
+			this.renderBufferDirect = function ( camera, scene, geometry, material, object, group ) {
 
-			if ( scene === null ) { scene = tempScene; } // renderBufferDirect second parameter used to be fog (could be null)
+				if ( scene === null ) { scene = tempScene; } // renderBufferDirect second parameter used to be fog (could be null)
 
-			var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
+				var frontFaceCW = ( object.isMesh && object.matrixWorld.determinant() < 0 );
 
-			var program = setProgram( camera, scene, material, object );
+				var program = setProgram( camera, scene, material, object );
 
-			state.setMaterial( material, frontFaceCW );
+				state.setMaterial( material, frontFaceCW );
 
-			var updateBuffers = false;
+				var updateBuffers = false;
 
-			if ( _currentGeometryProgram.geometry !== geometry.id ||
-				_currentGeometryProgram.program !== program.id ||
-				_currentGeometryProgram.wireframe !== ( material.wireframe === true ) ) {
+				if ( _currentGeometryProgram.geometry !== geometry.id ||
+					_currentGeometryProgram.program !== program.id ||
+					_currentGeometryProgram.wireframe !== ( material.wireframe === true ) ) {
 
-				_currentGeometryProgram.geometry = geometry.id;
-				_currentGeometryProgram.program = program.id;
-				_currentGeometryProgram.wireframe = material.wireframe === true;
-				updateBuffers = true;
-
-			}
-
-			if ( material.morphTargets || material.morphNormals ) {
-
-				morphtargets.update( object, geometry, material, program );
-
-				updateBuffers = true;
-
-			}
-
-			if ( object.isInstancedMesh === true ) {
-
-				updateBuffers = true;
-
-			}
-
-			//
-
-			var index = geometry.index;
-			var position = geometry.attributes.position;
-
-			//
-
-			if ( index === null ) {
-
-				if ( position === undefined || position.count === 0 ) { return; }
-
-			} else if ( index.count === 0 ) {
-
-				return;
-
-			}
-
-			//
-
-			var rangeFactor = 1;
-
-			if ( material.wireframe === true ) {
-
-				index = geometries.getWireframeAttribute( geometry );
-				rangeFactor = 2;
-
-			}
-
-			var attribute;
-			var renderer = bufferRenderer;
-
-			if ( index !== null ) {
-
-				attribute = attributes.get( index );
-
-				renderer = indexedBufferRenderer;
-				renderer.setIndex( attribute );
-
-			}
-
-			if ( updateBuffers ) {
-
-				setupVertexAttributes( object, geometry, material, program );
-
-				if ( index !== null ) {
-
-					_gl.bindBuffer( 34963, attribute.buffer );
+					_currentGeometryProgram.geometry = geometry.id;
+					_currentGeometryProgram.program = program.id;
+					_currentGeometryProgram.wireframe = material.wireframe === true;
+					updateBuffers = true;
 
 				}
 
-			}
+				if ( material.morphTargets || material.morphNormals ) {
 
-			//
+					morphtargets.update( object, geometry, material, program );
 
-			var dataCount = ( index !== null ) ? index.count : position.count;
+					updateBuffers = true;
 
-			var rangeStart = geometry.drawRange.start * rangeFactor;
-			var rangeCount = geometry.drawRange.count * rangeFactor;
+				}
 
-			var groupStart = group !== null ? group.start * rangeFactor : 0;
-			var groupCount = group !== null ? group.count * rangeFactor : Infinity;
+				if ( object.isInstancedMesh === true ) {
 
-			var drawStart = Math.max( rangeStart, groupStart );
-			var drawEnd = Math.min( dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
+					updateBuffers = true;
 
-			var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
+				}
 
-			if ( drawCount === 0 ) { return; }
+				//
 
-			//
+				var index = geometry.index;
+	            var position = geometry.attributes.position;
 
-			if ( object.isMesh ) {
+	            // <<<< changes in next few lines to allow for no (position) vertex attribute
+	            var positionCount = position ? position.count : Infinity;
+
+				//
+
+				if ( index === null ) {
+
+					// <<<< if ( position === undefined || position.count === 0 ) { return; }
+	                if ( positionCount === 0 ) { return; }  // <<<<
+	                if ( position === undefined &&  geometry.drawRange.count === Infinity) { return; } // <<<< early out, not needed but may be wanted
+
+				} else if ( index.count === 0 ) {
+
+					return;
+
+				}
+
+				//
+
+				var rangeFactor = 1;
 
 				if ( material.wireframe === true ) {
 
-					state.setLineWidth( material.wireframeLinewidth * getTargetPixelRatio() );
-					renderer.setMode( 1 );
+					index = geometries.getWireframeAttribute( geometry );
+					rangeFactor = 2;
 
-				} else {
+				}
+
+				var attribute;
+				var renderer = bufferRenderer;
+
+				if ( index !== null ) {
+
+					attribute = attributes.get( index );
+
+					renderer = indexedBufferRenderer;
+					renderer.setIndex( attribute );
+
+				}
+
+				if ( updateBuffers ) {
+
+					setupVertexAttributes( object, geometry, material, program );
+
+					if ( index !== null ) {
+
+						_gl.bindBuffer( 34963, attribute.buffer );
+
+					}
+
+				}
+
+				//
+
+				var dataCount = ( index !== null ) ? index.count : positionCount;  //  <<<<
+
+				var rangeStart = geometry.drawRange.start * rangeFactor;
+				var rangeCount = geometry.drawRange.count * rangeFactor;
+
+				var groupStart = group !== null ? group.start * rangeFactor : 0;
+				var groupCount = group !== null ? group.count * rangeFactor : Infinity;
+
+				var drawStart = Math.max( rangeStart, groupStart );
+				var drawEnd = Math.min( dataCount, rangeStart + rangeCount, groupStart + groupCount ) - 1;
+
+				var drawCount = Math.max( 0, drawEnd - drawStart + 1 );
+
+				if ( drawCount === 0) { return; }
+
+				//
+
+				if ( object.isMesh ) {
+
+					if ( material.wireframe === true ) {
+
+						state.setLineWidth( material.wireframeLinewidth * getTargetPixelRatio() );
+						renderer.setMode( 1 );
+
+					} else {
+
+						renderer.setMode( 4 );
+
+					}
+
+				} else if ( object.isLine ) {
+
+					var lineWidth = material.linewidth;
+
+					if ( lineWidth === undefined ) { lineWidth = 1; } // Not using Line*Material
+
+					state.setLineWidth( lineWidth * getTargetPixelRatio() );
+
+					if ( object.isLineSegments ) {
+
+						renderer.setMode( 1 );
+
+					} else if ( object.isLineLoop ) {
+
+						renderer.setMode( 2 );
+
+					} else {
+
+						renderer.setMode( 3 );
+
+					}
+
+				} else if ( object.isPoints ) {
+
+					renderer.setMode( 0 );
+
+				} else if ( object.isSprite ) {
 
 					renderer.setMode( 4 );
 
 				}
 
-			} else if ( object.isLine ) {
+				if ( object.isInstancedMesh ) {
 
-				var lineWidth = material.linewidth;
+					renderer.renderInstances( geometry, drawStart, drawCount, object.count );
 
-				if ( lineWidth === undefined ) { lineWidth = 1; } // Not using Line*Material
+				} else if ( geometry.isInstancedBufferGeometry ) {
 
-				state.setLineWidth( lineWidth * getTargetPixelRatio() );
+	                // <<<<<<<<< below to allow for no instance attribute
+	                var umaxdc = (geometry._maxInstanceCount === undefined) ? Infinity : geometry._maxInstanceCount;  // <<<<
+	                var instanceCount = Math.min( geometry.instanceCount, umaxdc );  // <<<<
+	                if (instanceCount === Infinity) { return; }  // <<<<
 
-				if ( object.isLineSegments ) {
-
-					renderer.setMode( 1 );
-
-				} else if ( object.isLineLoop ) {
-
-					renderer.setMode( 2 );
+					renderer.renderInstances( geometry, drawStart, drawCount, instanceCount );
 
 				} else {
 
-					renderer.setMode( 3 );
+					renderer.render( drawStart, drawCount );
 
 				}
 
-			} else if ( object.isPoints ) {
-
-				renderer.setMode( 0 );
-
-			} else if ( object.isSprite ) {
-
-				renderer.setMode( 4 );
-
-			}
-
-			if ( object.isInstancedMesh ) {
-
-				renderer.renderInstances( geometry, drawStart, drawCount, object.count );
-
-			} else if ( geometry.isInstancedBufferGeometry ) {
-
-				var instanceCount = Math.min( geometry.instanceCount, geometry._maxInstanceCount );
-
-				renderer.renderInstances( geometry, drawStart, drawCount, instanceCount );
-
-			} else {
-
-				renderer.render( drawStart, drawCount );
-
-			}
-
-		};
+			};
 
 		function setupVertexAttributes( object, geometry, material, program ) {
 
