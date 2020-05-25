@@ -758,11 +758,16 @@ function WebGLRenderer( parameters ) {
 		var index = geometry.index;
 		var position = geometry.attributes.position;
 
+		// <<<< changes in next few lines to allow for no (position) vertex attribute
+		var positionCount = position ? position.count : Infinity;
+
 		//
 
 		if ( index === null ) {
 
-			if ( position === undefined || position.count === 0 ) return;
+			if ( positionCount === 0 ) return;
+
+			if ( position === undefined && geometry.drawRange.count === Infinity ) return;		// <<<< early out, not needed but may be wanted
 
 		} else if ( index.count === 0 ) {
 
@@ -807,7 +812,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		var dataCount = ( index !== null ) ? index.count : position.count;
+		var dataCount = ( index !== null ) ? index.count : positionCount;
 
 		var rangeStart = geometry.drawRange.start * rangeFactor;
 		var rangeCount = geometry.drawRange.count * rangeFactor;
@@ -875,7 +880,10 @@ function WebGLRenderer( parameters ) {
 
 		} else if ( geometry.isInstancedBufferGeometry ) {
 
-			var instanceCount = Math.min( geometry.instanceCount, geometry._maxInstanceCount );
+			// <<<<<<<<< below to allow for no instance attribute
+			var umaxdc = ( geometry._maxInstanceCount === undefined ) ? Infinity : geometry._maxInstanceCount;
+			var instanceCount = Math.min( geometry.instanceCount, umaxdc );
+			if ( instanceCount === Infinity ) return;
 
 			renderer.renderInstances( geometry, drawStart, drawCount, instanceCount );
 
