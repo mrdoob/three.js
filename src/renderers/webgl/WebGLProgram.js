@@ -714,11 +714,18 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 	var vertexGlsl = prefixVertex + vertexShader;
 	var fragmentGlsl = prefixFragment + fragmentShader;
 
+	var compiled = {
+	  vertexGlsl,
+	  fragmentGlsl,
+	}
+
+	parameters.onAfterCompile( compiled )
+
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
 
-	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
-	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
+	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, compiled.vertexGlsl );
+	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, compiled.fragmentGlsl );
 
 	gl.attachShader( program, glVertexShader );
 	gl.attachShader( program, glFragmentShader );

@@ -334,6 +334,16 @@
 		Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
 		</p>
 
+		<h3>[method:null onAfterCompile]( [param:object compiled] )</h3>
+		<p>
+		compiled -- object containing vertexGlsl and fragmentGlsl.<br />
+		An optional callback that is executed after the shader program is compiled.
+		This function is called with the compiled glsl code as a parameter. Useful for the log and modification of the final materials.
+		</p>
+		<p>
+		Unlike properties, the callback is not supported by [page:Material.clone .clone](), [page:Material.copy .copy]() and [page:Material.toJSON .toJSON]().
+		</p>
+
 		<h3>[method:null setValues]( [param:object values] )</h3>
 		<p>
 		values -- a container with parameters.<br />

@@ -85,6 +85,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	onBeforeCompile: function () {},
 
+	onAfterCompile: function () {},
+
 	setValues: function ( values ) {
 
 		if ( values === undefined ) return;
