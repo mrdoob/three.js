@@ -15,7 +15,7 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: ImageLoader,
 
-	load: function ( url, onLoad, onProgress, onError ) {
+	load: function ( url, onLoad, onProgress, onError, priorityHint ) {
 
 		if ( this.path !== undefined ) url = this.path + url;
 
@@ -76,6 +76,8 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			if ( this.crossOrigin !== undefined ) image.crossOrigin = this.crossOrigin;
 
 		}
+
+		if ( priorityHint ) image.importance = priorityHint;
 
 		scope.manager.itemStart( url );
 
