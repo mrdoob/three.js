@@ -494,8 +494,8 @@ iframe {
 }
 
 .card .title {
-	padding: 8px 12px 8px;
-	font-size: 18px;
+	padding: 8px 12px 4px;
+	font-size: calc(var(--font-size) - 1px);
 	font-weight: 500;
 }
 
