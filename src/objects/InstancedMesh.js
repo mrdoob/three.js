@@ -85,6 +85,18 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	updateMorphTargets: function () {
 
+	},
+	
+	copy: function ( source ) {
+
+		Mesh.prototype.copy.call( this, source );
+
+		this.instanceMatrix.copy( source.instanceMatrix );
+		
+		this.count = source.count;
+
+		return this;
+
 	}
 
 } );
