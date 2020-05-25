@@ -539,9 +539,9 @@ GLTFExporter.prototype = {
 					} else {
 
 						if ( a === 0 ) value = attribute.getX( i );
-						if ( a === 1 ) value = attribute.getY( i );
-						if ( a === 2 ) value = attribute.getZ( i );
-						if ( a === 3 ) value = attribute.getW( i );
+						else if ( a === 1 ) value = attribute.getY( i );
+						else if ( a === 2 ) value = attribute.getZ( i );
+						else if ( a === 3 ) value = attribute.getW( i );
 
 					}
 
