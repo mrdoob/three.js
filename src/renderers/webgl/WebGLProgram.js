@@ -717,9 +717,9 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 	var compiled = {
 	  vertexGlsl,
 	  fragmentGlsl,
-	}
+	};
 
-	parameters.onAfterCompile( compiled )
+	parameters.onAfterCompile( compiled );
 
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
