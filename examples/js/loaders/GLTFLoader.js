@@ -494,7 +494,7 @@ THREE.GLTFLoader = ( function () {
 		var headerView = new DataView( data, 0, BINARY_EXTENSION_HEADER_LENGTH );
 
 		this.header = {
-			magic: THREE.LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
+			magic: THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) ),
 			version: headerView.getUint32( 4, true ),
 			length: headerView.getUint32( 8, true )
 		};
@@ -528,7 +528,7 @@ THREE.GLTFLoader = ( function () {
 			} else if ( chunkType === BINARY_EXTENSION_CHUNK_TYPES.BIN ) {
 
 				var byteOffset = BINARY_EXTENSION_HEADER_LENGTH + chunkIndex;
-				this.body = data.slice( byteOffset, byteOffset + chunkLength );
+				this.body = new DataView( data, byteOffset, chunkLength );
 
 			}
 
@@ -604,7 +604,11 @@ THREE.GLTFLoader = ( function () {
 
 			return new Promise( function ( resolve ) {
 
-				dracoLoader.decodeDracoFile( bufferView, function ( geometry ) {
+				// Copy compressed data out of the ArrayBuffer here, because DRACOLoader needs to
+				// transfer the ArrayBuffer it's decoding to a Web Worker.
+				var compressedBuffer = bufferView.buffer.slice( bufferView.byteOffset, bufferView.byteOffset + bufferView.byteLength );
+
+				dracoLoader.decodeDracoFile( compressedBuffer, function ( geometry ) {
 
 					for ( var attributeName in geometry.attributes ) {
 
@@ -1636,7 +1640,7 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#buffers-and-buffer-views
 	 * @param {number} bufferIndex
-	 * @return {Promise<ArrayBuffer>}
+	 * @return {Promise<DataView>}
 	 */
 	GLTFParser.prototype.loadBuffer = function ( bufferIndex ) {
 
@@ -1660,7 +1664,11 @@ THREE.GLTFLoader = ( function () {
 
 		return new Promise( function ( resolve, reject ) {
 
-			loader.load( resolveURL( bufferDef.uri, options.path ), resolve, undefined, function () {
+			loader.load( resolveURL( bufferDef.uri, options.path ), function ( arrayBuffer ) {
+
+				resolve( new DataView( arrayBuffer ) );
+
+			}, undefined, function () {
 
 				reject( new Error( 'THREE.GLTFLoader: Failed to load buffer "' + bufferDef.uri + '".' ) );
 
@@ -1673,17 +1681,17 @@ THREE.GLTFLoader = ( function () {
 	/**
 	 * Specification: https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#buffers-and-buffer-views
 	 * @param {number} bufferViewIndex
-	 * @return {Promise<ArrayBuffer>}
+	 * @return {Promise<DataView>}
 	 */
 	GLTFParser.prototype.loadBufferView = function ( bufferViewIndex ) {
 
 		var bufferViewDef = this.json.bufferViews[ bufferViewIndex ];
 
-		return this.getDependency( 'buffer', bufferViewDef.buffer ).then( function ( buffer ) {
+		return this.getDependency( 'buffer', bufferViewDef.buffer ).then( function ( dataView ) {
 
 			var byteLength = bufferViewDef.byteLength || 0;
-			var byteOffset = bufferViewDef.byteOffset || 0;
-			return buffer.slice( byteOffset, byteOffset + byteLength );
+			var byteOffset = dataView.byteOffset + ( bufferViewDef.byteOffset || 0 );
+			return new DataView( dataView.buffer, byteOffset, byteLength )
 
 		} );
 
@@ -1755,7 +1763,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( ! ib ) {
 
-					array = new TypedArray( bufferView, ibSlice * byteStride, accessorDef.count * byteStride / elementBytes );
+					array = new TypedArray( bufferView.buffer, bufferView.byteOffset + ibSlice * byteStride, accessorDef.count * byteStride / elementBytes );
 
 					// Integer parameters to IB/IBA are in array elements, not bytes.
 					ib = new THREE.InterleavedBuffer( array, byteStride / elementBytes );
@@ -1774,7 +1782,7 @@ THREE.GLTFLoader = ( function () {
 
 				} else {
 
-					array = new TypedArray( bufferView, byteOffset, accessorDef.count * itemSize );
+					array = new TypedArray( bufferView.buffer, bufferView.byteOffset + byteOffset, accessorDef.count * itemSize );
 
 				}
 
@@ -1791,8 +1799,8 @@ THREE.GLTFLoader = ( function () {
 				var byteOffsetIndices = accessorDef.sparse.indices.byteOffset || 0;
 				var byteOffsetValues = accessorDef.sparse.values.byteOffset || 0;
 
-				var sparseIndices = new TypedArrayIndices( bufferViews[ 1 ], byteOffsetIndices, accessorDef.sparse.count * itemSizeIndices );
-				var sparseValues = new TypedArray( bufferViews[ 2 ], byteOffsetValues, accessorDef.sparse.count * itemSize );
+				var sparseIndices = new TypedArrayIndices( bufferViews[ 1 ].buffer, bufferViews[ 1 ].byteOffset + byteOffsetIndices, accessorDef.sparse.count * itemSizeIndices );
+				var sparseValues = new TypedArray( bufferViews[ 2 ].buffer, bufferViews[ 2 ].byteOffset + byteOffsetValues, accessorDef.sparse.count * itemSize );
 
 				if ( bufferView !== null ) {
 
