@@ -48,7 +48,11 @@
 		<p>
 			The base path from which additional resources like textures will be loaded.
 			Default is the empty string.
-		</p>
+
+		<h3>[property:object requestHeader]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] 在HTTP 请求中使用。 请参考 [page:.setRequestHeader]。 默认为 *undefined*。
+		</p>	
 
 		<h2>方法</h2>
 
@@ -87,6 +91,13 @@
 		<h3>[method:Loader setResourcePath]( [param:String resourcePath] )</h3>
 		<p>
 			[page:String resourcePath] — Set the base path for dependent resources like textures.
+		</p>
+
+		<h3>[method:Loader setRequestHeader]( [param:Object requestHeader] )</h3>
+		<p>
+			[page:object requestHeader] - key: The name of the header whose value is to be set. value: The value to set as the body of the header.<br /><br />
+
+			Set the [link:https://developer.mozilla.org/en-US/docs/Glossary/Request_header request header] used in HTTP request.
 		</p>
 
 		<h2>Source</h2>
