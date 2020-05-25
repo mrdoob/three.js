@@ -1012,7 +1012,10 @@
 
 		lerpVectors: function ( v1, v2, alpha ) {
 
-			return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+			this.x = v1.x + ( v2.x - v1.x ) * alpha;
+			this.y = v1.y + ( v2.y - v1.y ) * alpha;
+
+			return this;
 
 		},
 
@@ -2411,7 +2414,12 @@
 
 		lerpVectors: function ( v1, v2, alpha ) {
 
-			return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+			this.x = v1.x + ( v2.x - v1.x ) * alpha;
+			this.y = v1.y + ( v2.y - v1.y ) * alpha;
+			this.z = v1.z + ( v2.z - v1.z ) * alpha;
+			this.w = v1.w + ( v2.w - v1.w ) * alpha;
+
+			return this;
 
 		},
 
@@ -3773,7 +3781,11 @@
 
 		lerpVectors: function ( v1, v2, alpha ) {
 
-			return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+			this.x = v1.x + ( v2.x - v1.x ) * alpha;
+			this.y = v1.y + ( v2.y - v1.y ) * alpha;
+			this.z = v1.z + ( v2.z - v1.z ) * alpha;
+
+			return this;
 
 		},
 
@@ -13947,7 +13959,10 @@
 
 			if ( this.parent === null ) { this.updateMatrixWorld(); }
 
+			var currentXrEnabled = renderer.xr.enabled;
 			var currentRenderTarget = renderer.getRenderTarget();
+
+			renderer.xr.enabled = false;
 
 			var generateMipmaps = renderTarget.texture.generateMipmaps;
 
@@ -13974,6 +13989,8 @@
 			renderer.render( scene, cameraNZ );
 
 			renderer.setRenderTarget( currentRenderTarget );
+
+			renderer.xr.enabled = currentXrEnabled;
 
 		};
 
