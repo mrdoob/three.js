@@ -422,7 +422,10 @@ Object.assign( Vector2.prototype, {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-		return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+		this.x = v1.x + ( v2.x - v1.x ) * alpha;
+		this.y = v1.y + ( v2.y - v1.y ) * alpha;
+
+		return this;
 
 	},
 
