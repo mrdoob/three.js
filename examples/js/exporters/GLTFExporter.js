@@ -508,9 +508,9 @@ THREE.GLTFExporter.prototype = {
 
 					var value;
 
-					if ( attribute.itemSize > 3 ) {
+					if ( attribute.itemSize > 4 ) {
 
-						 // no support for interleaved data for itemSize > 3
+						 // no support for interleaved data for itemSize > 4
 
 						value = attribute.array[ i * attribute.itemSize + a ];
 
