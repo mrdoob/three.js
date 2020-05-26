@@ -39,9 +39,11 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				} else {
 
-					throw e;
+					console.error( e );
 
 				}
+
+				scope.manager.itemError( url );
 
 			}
 

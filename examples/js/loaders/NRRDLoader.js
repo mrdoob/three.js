@@ -21,7 +21,25 @@ THREE.NRRDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototyp
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data ) );
+			try {
+
+				onLoad( scope.parse( data ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 

@@ -76,7 +76,27 @@ LWOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.load( url, function ( buffer ) {
 
 			// console.time( 'Total parsing: ' );
-			onLoad( scope.parse( buffer, path, modelName ) );
+
+			try {
+
+				onLoad( scope.parse( buffer, path, modelName ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
+
 			// console.timeEnd( 'Total parsing: ' );
 
 		}, onProgress, onError );
