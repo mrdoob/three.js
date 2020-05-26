@@ -116,11 +116,11 @@ class BoxBufferGeometry extends BufferGeometry {
 
 			for ( iy = 0; iy < gridY1; iy ++ ) {
 
-				let y = iy * segmentHeight - heightHalf;
+				const y = iy * segmentHeight - heightHalf;
 
 				for ( ix = 0; ix < gridX1; ix ++ ) {
 
-					let x = ix * segmentWidth - widthHalf;
+					const x = ix * segmentWidth - widthHalf;
 
 					// set values to correct vector component
 
@@ -165,10 +165,10 @@ class BoxBufferGeometry extends BufferGeometry {
 
 				for ( ix = 0; ix < gridX; ix ++ ) {
 
-					let a = numberOfVertices + ix + gridX1 * iy;
-					let b = numberOfVertices + ix + gridX1 * ( iy + 1 );
-					let c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
-					let d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
+					const a = numberOfVertices + ix + gridX1 * iy;
+					const b = numberOfVertices + ix + gridX1 * ( iy + 1 );
+					const c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
+					const d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
 
 					// faces
 
