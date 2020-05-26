@@ -72,18 +72,13 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 			"varying vec3 vWorldDirection;",
 
-			"#define RECIPROCAL_PI 0.31830988618",
-			"#define RECIPROCAL_PI2 0.15915494",
+			"#include <common>",
 
 			"void main() {",
 
 			"	vec3 direction = normalize( vWorldDirection );",
 
-			"	vec2 sampleUV;",
-
-			"	sampleUV.y = asin( clamp( direction.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;",
-
-			"	sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;",
+			"	vec2 sampleUV = equirectUv( direction );",
 
 			"	gl_FragColor = texture2D( tEquirect, sampleUV );",
 
