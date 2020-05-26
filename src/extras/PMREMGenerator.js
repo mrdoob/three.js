@@ -707,15 +707,12 @@ uniform vec2 texelSize;
 
 ${_getEncodings()}
 
-#define RECIPROCAL_PI 0.31830988618
-#define RECIPROCAL_PI2 0.15915494
+#include <common>
 
 void main() {
 	gl_FragColor = vec4(0.0);
 	vec3 outputDirection = normalize(vOutputDirection);
-	vec2 uv;
-	uv.y = asin(clamp(outputDirection.y, -1.0, 1.0)) * RECIPROCAL_PI + 0.5;
-	uv.x = atan(outputDirection.z, outputDirection.x) * RECIPROCAL_PI2 + 0.5;
+	vec2 uv = equirectUv( outputDirection );
 	vec2 f = fract(uv / texelSize - 0.5);
 	uv -= f * texelSize;
 	vec3 tl = envMapTexelToLinear(texture2D(envMap, uv)).rgb;

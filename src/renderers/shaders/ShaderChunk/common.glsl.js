@@ -118,4 +118,16 @@ bool isPerspectiveMatrix( mat4 m ) {
   return m[ 2 ][ 3 ] == - 1.0;
 
 }
+
+vec2 equirectUv( in vec3 dir ) {
+
+	// dir is assumed to be unit length
+
+	float u = atan( dir.z, dir.x ) * RECIPROCAL_PI2 + 0.5;
+
+	float v = asin( clamp( dir.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;
+
+	return vec2( u, v );
+
+}
 `;
