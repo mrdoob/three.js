@@ -13210,17 +13210,15 @@
 				var vertexCounter = 0;
 				var groupCount = 0;
 
-				var ix, iy;
-
 				var vector = new Vector3();
 
 				// generate vertices, normals and uvs
 
-				for ( iy = 0; iy < gridY1; iy ++ ) {
+				for ( var iy = 0; iy < gridY1; iy ++ ) {
 
 					var y = iy * segmentHeight - heightHalf;
 
-					for ( ix = 0; ix < gridX1; ix ++ ) {
+					for ( var ix = 0; ix < gridX1; ix ++ ) {
 
 						var x = ix * segmentWidth - widthHalf;
 
@@ -13263,14 +13261,14 @@
 				// 2. a single segment consists of two faces
 				// 3. so we need to generate six (2*3) indices per segment
 
-				for ( iy = 0; iy < gridY; iy ++ ) {
+				for ( var iy$1 = 0; iy$1 < gridY; iy$1 ++ ) {
 
-					for ( ix = 0; ix < gridX; ix ++ ) {
+					for ( var ix$1 = 0; ix$1 < gridX; ix$1 ++ ) {
 
-						var a = numberOfVertices + ix + gridX1 * iy;
-						var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
-						var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
-						var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
+						var a = numberOfVertices + ix$1 + gridX1 * iy$1;
+						var b = numberOfVertices + ix$1 + gridX1 * ( iy$1 + 1 );
+						var c = numberOfVertices + ( ix$1 + 1 ) + gridX1 * ( iy$1 + 1 );
+						var d = numberOfVertices + ( ix$1 + 1 ) + gridX1 * iy$1;
 
 						// faces
 
