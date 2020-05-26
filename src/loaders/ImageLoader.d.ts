@@ -13,8 +13,11 @@ export class ImageLoader extends Loader {
 		url: string,
 		onLoad?: ( image: HTMLImageElement ) => void,
 		onProgress?: ( event: ProgressEvent ) => void,
-		onError?: ( event: ErrorEvent ) => void,
-		priorityHint?: string
+		onError?: ( event: ErrorEvent ) => void
 	): HTMLImageElement;
+	
+	setPriorityHint(
+		priorityHint: string
+	);
 
 }
