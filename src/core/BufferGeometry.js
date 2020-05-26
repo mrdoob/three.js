@@ -891,7 +891,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			var array = attribute.array;
 			var itemSize = attribute.itemSize;
-			var normalized = attribute.normalized === true;
+			var normalized = attribute.normalized;
 
 			var array2 = new array.constructor( indices.length * itemSize );
 
