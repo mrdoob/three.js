@@ -251,7 +251,25 @@ var PRWMLoader = ( function () {
 
 			loader.load( url, function ( arrayBuffer ) {
 
-				onLoad( scope.parse( arrayBuffer ) );
+				try {
+
+					onLoad( scope.parse( arrayBuffer ) );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
 
 			}, onProgress, onError );
 

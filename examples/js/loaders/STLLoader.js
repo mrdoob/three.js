@@ -79,13 +79,19 @@ THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				onLoad( scope.parse( text ) );
 
-			} catch ( exception ) {
+			} catch ( e ) {
 
 				if ( onError ) {
 
-					onError( exception );
+					onError( e );
+
+				} else {
+
+					console.error( e );
 
 				}
+
+				scope.manager.itemError( url );
 
 			}
 
