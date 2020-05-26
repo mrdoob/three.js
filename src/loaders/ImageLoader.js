@@ -77,7 +77,7 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		if ( this.priorityHint ) image.importance = priorityHint;
+		if ( this.priorityHint ) image.importance = this.priorityHint;
 
 		scope.manager.itemStart( url );
 
@@ -87,9 +87,9 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
-	setPriorityHint: function( priorityHint ) {
+	setPriorityHint: function ( priorityHint ) {
 
-		this.priorityHint = priorityHint
+		this.priorityHint = priorityHint;
 
 	}
 

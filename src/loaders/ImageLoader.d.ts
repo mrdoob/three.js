@@ -15,7 +15,7 @@ export class ImageLoader extends Loader {
 		onProgress?: ( event: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
 	): HTMLImageElement;
-	
+
 	setPriorityHint(
 		priorityHint: string
 	);
