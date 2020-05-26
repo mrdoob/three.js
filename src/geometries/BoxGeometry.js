@@ -108,17 +108,15 @@ class BoxBufferGeometry extends BufferGeometry {
 			let vertexCounter = 0;
 			let groupCount = 0;
 
-			let ix, iy;
-
 			const vector = new Vector3();
 
 			// generate vertices, normals and uvs
 
-			for ( iy = 0; iy < gridY1; iy ++ ) {
+			for ( let iy = 0; iy < gridY1; iy ++ ) {
 
 				const y = iy * segmentHeight - heightHalf;
 
-				for ( ix = 0; ix < gridX1; ix ++ ) {
+				for ( let ix = 0; ix < gridX1; ix ++ ) {
 
 					const x = ix * segmentWidth - widthHalf;
 
@@ -161,9 +159,9 @@ class BoxBufferGeometry extends BufferGeometry {
 			// 2. a single segment consists of two faces
 			// 3. so we need to generate six (2*3) indices per segment
 
-			for ( iy = 0; iy < gridY; iy ++ ) {
+			for ( let iy = 0; iy < gridY; iy ++ ) {
 
-				for ( ix = 0; ix < gridX; ix ++ ) {
+				for ( let ix = 0; ix < gridX; ix ++ ) {
 
 					const a = numberOfVertices + ix + gridX1 * iy;
 					const b = numberOfVertices + ix + gridX1 * ( iy + 1 );
