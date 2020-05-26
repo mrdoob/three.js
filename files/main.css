@@ -497,6 +497,7 @@ iframe {
 	padding: 8px 12px 4px;
 	font-size: calc(var(--font-size) - 1px);
 	font-weight: 500;
+	line-height: calc(var(--line-height) - 6px);
 }
 
 /* mobile */
