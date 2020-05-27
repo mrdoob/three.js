@@ -48195,9 +48195,8 @@ PMREMGenerator.prototype = {
 
 	_compileMaterial: function ( material ) {
 
-		var tmpScene = new Scene();
-		tmpScene.add( new Mesh( _lodPlanes[ 0 ], material ) );
-		this._renderer.compile( tmpScene, _flatCamera );
+		var tmpMesh = new Mesh( _lodPlanes[ 0 ], material );
+		this._renderer.compile( tmpMesh, _flatCamera );
 
 	},
 
@@ -48270,7 +48269,6 @@ PMREMGenerator.prototype = {
 
 	_textureToCubeUV: function ( texture, cubeUVRenderTarget ) {
 
-		var scene = new Scene();
 		var renderer = this._renderer;
 
 		if ( texture.isCubeTexture ) {
@@ -48292,7 +48290,7 @@ PMREMGenerator.prototype = {
 		}
 
 		var material = texture.isCubeTexture ? this._cubemapShader : this._equirectShader;
-		scene.add( new Mesh( _lodPlanes[ 0 ], material ) );
+		var mesh = new Mesh( _lodPlanes[ 0 ], material );
 
 		var uniforms = material.uniforms;
 
@@ -48310,7 +48308,7 @@ PMREMGenerator.prototype = {
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 
 		renderer.setRenderTarget( cubeUVRenderTarget );
-		renderer.render( scene, _flatCamera );
+		renderer.render( mesh, _flatCamera );
 
 	},
 
@@ -48380,8 +48378,7 @@ PMREMGenerator.prototype = {
 		// Number of standard deviations at which to cut off the discrete approximation.
 		var STANDARD_DEVIATIONS = 3;
 
-		var blurScene = new Scene();
-		blurScene.add( new Mesh( _lodPlanes[ lodOut ], blurMaterial ) );
+		var blurMesh = new Mesh( _lodPlanes[ lodOut ], blurMaterial );
 		var blurUniforms = blurMaterial.uniforms;
 
 		var pixels = _sizeLods[ lodIn ] - 1;
@@ -48446,7 +48443,7 @@ PMREMGenerator.prototype = {
 
 		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
 		renderer.setRenderTarget( targetOut );
-		renderer.render( blurScene, _flatCamera );
+		renderer.render( blurMesh, _flatCamera );
 
 	}
 
