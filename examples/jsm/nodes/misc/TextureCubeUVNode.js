@@ -66,17 +66,17 @@ TextureCubeUVNode.Nodes = ( function () {
 		`vec2 getUV(vec3 direction, float face) {
 				vec2 uv;
 				if (face == 0.0) {
-					uv = vec2(-direction.z, direction.y) / abs(direction.x);
+					uv = vec2(direction.z, direction.y) / abs(direction.x); // pos x
 				} else if (face == 1.0) {
-					uv = vec2(direction.x, -direction.z) / abs(direction.y);
+					uv = vec2(-direction.x, -direction.z) / abs(direction.y); // pos y
 				} else if (face == 2.0) {
-					uv = direction.xy / abs(direction.z);
+					uv = vec2(-direction.x, direction.y) / abs(direction.z); // pos z
 				} else if (face == 3.0) {
-					uv = vec2(direction.z, direction.y) / abs(direction.x);
+					uv = vec2(-direction.z, direction.y) / abs(direction.x); // neg x
 				} else if (face == 4.0) {
-					uv = direction.xz / abs(direction.y);
+					uv = vec2(-direction.x, direction.z) / abs(direction.y); // neg y
 				} else {
-					uv = vec2(-direction.x, direction.y) / abs(direction.z);
+					uv = vec2(direction.x, direction.y) / abs(direction.z); // neg z
 				}
 				return 0.5 * (uv + 1.0);
 		}` );
@@ -106,7 +106,7 @@ TextureCubeUVNode.Nodes = ( function () {
 			uv.y += filterInt * 2.0 * cubeUV_minTileSize;
 			uv.x += 3.0 * max(0.0, cubeUV_maxTileSize - 2.0 * faceSize);
 			uv *= texelSize;
- 
+
 			vec4 tl = texture2D(envMap, uv);
 			uv.x += texelSize;
 			vec4 tr = texture2D(envMap, uv);

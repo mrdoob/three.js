@@ -58,6 +58,6 @@ export class WorkerExecutionSupport {
 	updateCallbacks( onAssetAvailable: Function, onLoad: Function ): void;
 	buildWorker( codeBuilderInstructions: CodeBuilderInstructions ): void;
 	isWorkerLoaded( requireJsmWorker: boolean ): boolean;
-	executeParallel( payload:object, transferables?: object[] );
+	executeParallel( payload:object, transferables?: object[] ): void;
 
 }

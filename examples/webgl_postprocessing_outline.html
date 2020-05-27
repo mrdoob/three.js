@@ -305,7 +305,7 @@
 
 					raycaster.setFromCamera( mouse, camera );
 
-					var intersects = raycaster.intersectObjects( [ scene ], true );
+					var intersects = raycaster.intersectObject( scene, true );
 
 					if ( intersects.length > 0 ) {
 

@@ -1,3 +1,4 @@
+console.warn( "THREE.AssimpLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Virtulous / https://virtulo.us/
  */
@@ -24,7 +25,25 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer, path ) );
+			try {
+
+				onLoad( scope.parse( buffer, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 

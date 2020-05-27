@@ -131,6 +131,7 @@ var GLTFLoader = ( function () {
 
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( this.requestHeader );
 
 			if ( scope.crossOrigin === 'use-credentials' ) {
 
@@ -282,6 +283,7 @@ var GLTFLoader = ( function () {
 
 			} );
 
+			parser.fileLoader.setRequestHeader( this.requestHeader );
 			parser.parse( onLoad, onError );
 
 		}
@@ -1468,6 +1470,9 @@ var GLTFLoader = ( function () {
 		// loader object cache
 		this.cache = new GLTFRegistry();
 
+		// associations between Three.js objects and glTF elements
+		this.associations = new Map();
+
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
@@ -1977,6 +1982,11 @@ var GLTFLoader = ( function () {
 			texture.wrapS = WEBGL_WRAPPINGS[ sampler.wrapS ] || RepeatWrapping;
 			texture.wrapT = WEBGL_WRAPPINGS[ sampler.wrapT ] || RepeatWrapping;
 
+			parser.associations.set( texture, {
+				type: 'textures',
+				index: textureIndex
+			} );
+
 			return texture;
 
 		} );
@@ -2026,7 +2036,9 @@ var GLTFLoader = ( function () {
 
 				if ( transform ) {
 
+					var gltfReference = this.associations.get( texture );
 					texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, transform );
+					this.associations.set( texture, gltfReference );
 
 				}
 
@@ -2125,6 +2137,8 @@ var GLTFLoader = ( function () {
 				if ( useMorphNormals ) cachedMaterial.morphNormals = true;
 
 				this.cache.add( cacheKey, cachedMaterial );
+
+				this.associations.set( cachedMaterial, this.associations.get( material ) );
 
 			}
 
@@ -2320,6 +2334,8 @@ var GLTFLoader = ( function () {
 			if ( material.emissiveMap ) material.emissiveMap.encoding = sRGBEncoding;
 
 			assignExtrasToUserData( material, materialDef );
+
+			parser.associations.set( material, { type: 'materials', index: materialIndex } );
 
 			if ( materialDef.extensions ) addUnknownExtensionsToUserData( extensions, material, materialDef );
 
@@ -3190,6 +3206,8 @@ var GLTFLoader = ( function () {
 				}
 
 			}
+
+			parser.associations.set( node, { type: 'nodes', index: nodeIndex } );
 
 			return node;
 

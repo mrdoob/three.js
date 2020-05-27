@@ -1,3 +1,4 @@
+console.warn( "THREE.TDSLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * Autodesk 3DS three.js file loader, based on lib3ds.
  *
@@ -48,7 +49,25 @@ THREE.TDSLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data, path ) );
+			try {
+
+				onLoad( scope.parse( data, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 

@@ -76,8 +76,6 @@
 
 			var tmpForce = new THREE.Vector3();
 
-			var lastTime;
-
 
 			function plane( width, height ) {
 
@@ -263,14 +261,13 @@
 
 			}
 
-			function simulate( time ) {
+			function simulate( now ) {
 
-				if ( ! lastTime ) {
+				var windStrength = Math.cos( now / 7000 ) * 20 + 40;
 
-					lastTime = time;
-					return;
-
-				}
+				windForce.set( Math.sin( now / 2000 ), Math.cos( now / 3000 ), Math.sin( now / 1000 ) );
+				windForce.normalize();
+				windForce.multiplyScalar( windStrength );
 
 				var i, j, il, particles, particle, constraints, constraint;
 
@@ -323,8 +320,8 @@
 
 				// Ball Constraints
 
-				ballPosition.z = - Math.sin( Date.now() / 600 ) * 90; //+ 40;
-				ballPosition.x = Math.cos( Date.now() / 400 ) * 70;
+				ballPosition.z = - Math.sin( now / 600 ) * 90; //+ 40;
+				ballPosition.x = Math.cos( now / 400 ) * 70;
 
 				if ( params.showBall ) {
 
@@ -415,7 +412,7 @@
 			var object;
 
 			init();
-			animate();
+			animate( 0 );
 
 			function init() {
 
@@ -588,6 +585,10 @@
 				gui.add( params, 'showBall' );
 				gui.add( params, 'tooglePins' );
 
+				//
+
+				if ( typeof TESTING !== 'undefined' ) { for ( var i = 0; i < 50; i ++ ) { simulate( 500 - 10 * i ); }; };
+
 			}
 
 			//
@@ -603,19 +604,10 @@
 
 			//
 
-			function animate() {
+			function animate( now ) {
 
 				requestAnimationFrame( animate );
-
-				var time = Date.now();
-
-				var windStrength = Math.cos( time / 7000 ) * 20 + 40;
-
-				windForce.set( Math.sin( time / 2000 ), Math.cos( time / 3000 ), Math.sin( time / 1000 ) );
-				windForce.normalize();
-				windForce.multiplyScalar( windStrength );
-
-				simulate( time );
+				simulate( now );
 				render();
 				stats.update();
 

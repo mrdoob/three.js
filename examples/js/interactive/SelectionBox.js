@@ -1,3 +1,4 @@
+console.warn( "THREE.SelectionBox: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author HypnosNova / https://www.threejs.org.cn/gallery
  * This is a class to check whether objects are in a selection area in 3D space
@@ -54,6 +55,20 @@ THREE.SelectionBox = ( function () {
 		startPoint = startPoint || this.startPoint;
 		endPoint = endPoint || this.endPoint;
 
+		// Avoid invalid frustum
+
+		if ( startPoint.x === endPoint.x ) {
+
+			endPoint.x += Number.EPSILON;
+
+		}
+
+		if ( startPoint.y === endPoint.y ) {
+
+			endPoint.y += Number.EPSILON;
+
+		}
+
 		this.camera.updateProjectionMatrix();
 		this.camera.updateMatrixWorld();
 
@@ -65,7 +80,7 @@ THREE.SelectionBox = ( function () {
 			endPoint.x = Math.max( startPoint.x, endPoint.x );
 			endPoint.y = Math.min( startPoint.y, endPoint.y );
 
-			vecNear.copy( this.camera.position );
+			vecNear.setFromMatrixPosition( this.camera.matrixWorld );
 			vecTopLeft.copy( tmpPoint );
 			vecTopRight.set( endPoint.x, tmpPoint.y, 0 );
 			vecDownRight.copy( endPoint );
@@ -101,8 +116,6 @@ THREE.SelectionBox = ( function () {
 			planes[ 5 ].normal.multiplyScalar( - 1 );
 
 		} else if ( this.camera.isOrthographicCamera ) {
-
-			if ( startPoint.equals( endPoint ) ) endPoint.addScalar( Number.EPSILON ); // avoid invalid frustum
 
 			var left = Math.min( startPoint.x, endPoint.x );
 			var top = Math.max( startPoint.y, endPoint.y );

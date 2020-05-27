@@ -1,3 +1,4 @@
+console.warn( "THREE.OBJLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -12,6 +13,13 @@ THREE.OBJLoader = ( function () {
 	var material_use_pattern = /^usemtl /;
 	// usemap map_name
 	var map_use_pattern = /^usemap /;
+
+	var vA = new THREE.Vector3();
+	var vB = new THREE.Vector3();
+	var vC = new THREE.Vector3();
+
+	var ab = new THREE.Vector3();
+	var cb = new THREE.Vector3();
 
 	function ParserState() {
 
@@ -55,7 +63,9 @@ THREE.OBJLoader = ( function () {
 						vertices: [],
 						normals: [],
 						colors: [],
-						uvs: []
+						uvs: [],
+						hasNormalIndices: false,
+						hasUVIndices: false
 					},
 					materials: [],
 					smooth: true,
@@ -248,6 +258,27 @@ THREE.OBJLoader = ( function () {
 
 			},
 
+			addFaceNormal: function ( a, b, c ) {
+
+				var src = this.vertices;
+				var dst = this.object.geometry.normals;
+
+				vA.fromArray( src, a );
+				vB.fromArray( src, b );
+				vC.fromArray( src, c );
+
+				cb.subVectors( vC, vB );
+				ab.subVectors( vA, vB );
+				cb.cross( ab );
+
+				cb.normalize();
+
+				dst.push( cb.x, cb.y, cb.z );
+				dst.push( cb.x, cb.y, cb.z );
+				dst.push( cb.x, cb.y, cb.z );
+
+			},
+
 			addColor: function ( a, b, c ) {
 
 				var src = this.colors;
@@ -267,6 +298,16 @@ THREE.OBJLoader = ( function () {
 				dst.push( src[ a + 0 ], src[ a + 1 ] );
 				dst.push( src[ b + 0 ], src[ b + 1 ] );
 				dst.push( src[ c + 0 ], src[ c + 1 ] );
+
+			},
+
+			addDefaultUV: function () {
+
+				var dst = this.object.geometry.uvs;
+
+				dst.push( 0, 0 );
+				dst.push( 0, 0 );
+				dst.push( 0, 0 );
 
 			},
 
@@ -290,26 +331,45 @@ THREE.OBJLoader = ( function () {
 				this.addVertex( ia, ib, ic );
 				this.addColor( ia, ib, ic );
 
-				if ( ua !== undefined && ua !== '' ) {
-
-					var uvLen = this.uvs.length;
-					ia = this.parseUVIndex( ua, uvLen );
-					ib = this.parseUVIndex( ub, uvLen );
-					ic = this.parseUVIndex( uc, uvLen );
-					this.addUV( ia, ib, ic );
-
-				}
+				// normals
 
 				if ( na !== undefined && na !== '' ) {
 
-					// Normals are many times the same. If so, skip function call and parseInt.
 					var nLen = this.normals.length;
-					ia = this.parseNormalIndex( na, nLen );
 
-					ib = na === nb ? ia : this.parseNormalIndex( nb, nLen );
-					ic = na === nc ? ia : this.parseNormalIndex( nc, nLen );
+					ia = this.parseNormalIndex( na, nLen );
+					ib = this.parseNormalIndex( nb, nLen );
+					ic = this.parseNormalIndex( nc, nLen );
 
 					this.addNormal( ia, ib, ic );
+
+					this.object.geometry.hasNormalIndices = true;
+
+				} else {
+
+					this.addFaceNormal( ia, ib, ic );
+
+				}
+
+				// uvs
+
+				if ( ua !== undefined && ua !== '' ) {
+
+					var uvLen = this.uvs.length;
+
+					ia = this.parseUVIndex( ua, uvLen );
+					ib = this.parseUVIndex( ub, uvLen );
+					ic = this.parseUVIndex( uc, uvLen );
+
+					this.addUV( ia, ib, ic );
+
+					this.object.geometry.hasUVIndices = true;
+
+				} else {
+
+					// add placeholder values (for inconsistent face definitions)
+
+					this.addDefaultUV();
 
 				}
 
@@ -380,7 +440,25 @@ THREE.OBJLoader = ( function () {
 			loader.setPath( this.path );
 			loader.load( url, function ( text ) {
 
-				onLoad( scope.parse( text ) );
+				try {
+
+					onLoad( scope.parse( text ) );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
 
 			}, onProgress, onError );
 
@@ -652,13 +730,9 @@ THREE.OBJLoader = ( function () {
 
 				buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( geometry.vertices, 3 ) );
 
-				if ( geometry.normals.length > 0 ) {
+				if ( geometry.hasNormalIndices === true ) {
 
 					buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
-
-				} else {
-
-					buffergeometry.computeVertexNormals();
 
 				}
 
@@ -669,7 +743,7 @@ THREE.OBJLoader = ( function () {
 
 				}
 
-				if ( geometry.uvs.length > 0 ) {
+				if ( geometry.hasUVIndices === true ) {
 
 					buffergeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( geometry.uvs, 2 ) );
 

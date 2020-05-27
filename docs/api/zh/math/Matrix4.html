@@ -117,8 +117,6 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:this compose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
 		设置将该对象由位置[page:Vector3 position]，四元数[page:Quaternion quaternion] 和 缩放[page:Vector3 scale]
-		组合变换的矩阵。内部先调用[page:.makeRotationFromQuaternion makeRotationFromQuaternion]( [page:Quaternion quaternion] )
-		再调用缩放[page:.scale scale]( [page:Vector3 scale] )最后是平移[page:.setPosition setPosition]( [page:Vector3 position] )。
 		</p>
 
 		<h3>[method:this copy]( [param:Matrix4 m] )</h3>
