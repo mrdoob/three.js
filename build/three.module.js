@@ -25210,29 +25210,33 @@ function WebGLRenderer( parameters ) {
 
 		currentRenderState.setupLights( camera );
 
-		var compiled = {};
+		const compiled = {};
 
 		scene.traverse( function ( object ) {
 
-			if ( object.material ) {
+			let material = object.material;
 
-				if ( Array.isArray( object.material ) ) {
+			if ( material ) {
 
-					for ( var i = 0; i < object.material.length; i ++ ) {
+				if ( Array.isArray( material ) ) {
 
-						if ( object.material[ i ].uuid in compiled === false ) {
+					for ( let i = 0; i < material.length; i ++ ) {
 
-							initMaterial( object.material[ i ], scene, object );
-							compiled[ object.material[ i ].uuid ] = true;
+						let material2 = material[ i ];
+
+						if ( material2.uuid in compiled === false ) {
+
+							initMaterial( material2, scene, object );
+							compiled[ material2.uuid ] = true;
 
 						}
 
 					}
 
-				} else if ( object.material.uuid in compiled === false ) {
+				} else if ( material.uuid in compiled === false ) {
 
-					initMaterial( object.material, scene, object );
-					compiled[ object.material.uuid ] = true;
+					initMaterial( material, scene, object );
+					compiled[ material.uuid ] = true;
 
 				}
 
