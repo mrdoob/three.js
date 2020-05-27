@@ -91,12 +91,27 @@
 				var listener = new THREE.AudioListener();
 
 				var audio = new THREE.Audio( listener );
+				var file = './sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3';
 
-				var mediaElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
+				if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+					var loader = new THREE.AudioLoader();
+					loader.load( file, function ( buffer ) {
+
+						audio.setBuffer( buffer );
+						audio.play();
+
+					} );
+
+				} else {
+
+					var mediaElement = new Audio( file );
 				mediaElement.loop = true;
 				mediaElement.play();
 
 				audio.setMediaElementSource( mediaElement );
+
+				}
 
 				analyser = new THREE.AudioAnalyser( audio, fftSize );
 
