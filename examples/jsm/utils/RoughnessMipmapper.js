@@ -16,7 +16,6 @@ import {
 	OrthographicCamera,
 	PlaneBufferGeometry,
 	RawShaderMaterial,
-	Scene,
 	Vector2,
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
@@ -24,8 +23,7 @@ import {
 var RoughnessMipmapper = ( function () {
 
 	var _mipmapMaterial = _getMipmapMaterial();
-	var _scene = new Scene();
-	_scene.add( new Mesh( new PlaneBufferGeometry( 2, 2 ), _mipmapMaterial ) );
+	var _mesh = new Mesh( new PlaneBufferGeometry( 2, 2 ), _mipmapMaterial );
 
 	var _flatCamera = new OrthographicCamera( 0, 1, 0, 1, 0, 1 );
 	var _tempTarget = null;
@@ -35,7 +33,7 @@ var RoughnessMipmapper = ( function () {
 	var RoughnessMipmapper = function ( renderer ) {
 
 		_renderer = renderer;
-		_renderer.compile( _scene, _flatCamera );
+		_renderer.compile( _mesh, _flatCamera );
 
 	};
 
@@ -101,7 +99,7 @@ var RoughnessMipmapper = ( function () {
 				_tempTarget.viewport.set( position.x, position.y, width, height );
 				_tempTarget.scissor.set( position.x, position.y, width, height );
 				_renderer.setRenderTarget( _tempTarget );
-				_renderer.render( _scene, _flatCamera );
+				_renderer.render( _mesh, _flatCamera );
 				_renderer.copyFramebufferToTexture( position, material.roughnessMap, mip );
 				_mipmapMaterial.uniforms.roughnessMap.value = material.roughnessMap;
 
@@ -117,7 +115,7 @@ var RoughnessMipmapper = ( function () {
 		dispose: function ( ) {
 
 			_mipmapMaterial.dispose();
-			_scene.children[ 0 ].geometry.dispose();
+			_mesh.geometry.dispose();
 			if ( _tempTarget != null ) _tempTarget.dispose();
 
 		}
