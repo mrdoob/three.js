@@ -25,7 +25,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> car materials<br/>
 			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
 			<br><br>
-			<span class="colorPicker"><input id="body-color" type="color" value="#660000"></input><br/>Body</span>
+			<span class="colorPicker"><input id="body-color" type="color" value="#000333"></input><br/>Body</span>
 			<span class="colorPicker"><input id="details-color" type="color" value="#ffffff"></input><br/>Details</span>
 			<span class="colorPicker"><input id="glass-color" type="color" value="#ffffff"></input><br/>Glass</span>
 		</div>
@@ -69,11 +69,11 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 3, 1.75, - 4 );
+				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 6, 2, - 5 );
 
 				controls = new OrbitControls( camera, container );
-				controls.target.set( 0, 0.4, 0 );
+				controls.target.set( 0, 0.5, 0 );
 				controls.update();
 
 				scene = new THREE.Scene();
@@ -90,11 +90,11 @@
 				// materials
 
 				var bodyMaterial = new THREE.MeshPhysicalMaterial( {
-					color: 0x660000, metalness: 1.0, roughness: 0.5, clearcoat: 0.02, clearcoatRoughness: 0.01
+					color: 0x000333, metalness: 1.0, roughness: 0.5, clearcoat: 0.02, clearcoatRoughness: 0.01
 				} );
 
 				var detailsMaterial = new THREE.MeshStandardMaterial( {
-					color: 0xffffff, metalness: 1.0, roughness: 0
+					color: 0xffffff, metalness: 1.0, roughness: 0.5
 				} );
 
 				var glassMaterial = new THREE.MeshPhysicalMaterial( {
