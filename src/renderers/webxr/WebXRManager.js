@@ -182,6 +182,12 @@ function WebXRManager( renderer, gl ) {
 
 			var attributes = gl.getContextAttributes();
 
+			if ( attributes.xrCompatible !== true ) {
+
+				gl.makeXRCompatible();
+
+			}
+
 			var layerInit = {
 				antialias: attributes.antialias,
 				alpha: attributes.alpha,
