@@ -250,6 +250,10 @@ function convert( path, exampleDependencies, ignoreList ) {
 	var classNames = [];
 	var coreDependencies = {};
 
+	// remove examples/js deprecation warning
+
+	contents = contents.replace( /^console\.warn.*\n/, '' );
+
 	// imports
 
 	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match ) {
