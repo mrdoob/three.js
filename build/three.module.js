@@ -23230,6 +23230,12 @@ function WebXRManager( renderer, gl ) {
 
 			var attributes = gl.getContextAttributes();
 
+			if ( attributes.xrCompatible !== true ) {
+
+				gl.makeXRCompatible();
+
+			}
+
 			var layerInit = {
 				antialias: attributes.antialias,
 				alpha: attributes.alpha,
@@ -24347,8 +24353,7 @@ function WebGLRenderer( parameters ) {
 			premultipliedAlpha: _premultipliedAlpha,
 			preserveDrawingBuffer: _preserveDrawingBuffer,
 			powerPreference: _powerPreference,
-			failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat,
-			xrCompatible: true
+			failIfMajorPerformanceCaveat: _failIfMajorPerformanceCaveat
 		};
 
 		// event listeners must be registered before WebGL context is created, see #12753
