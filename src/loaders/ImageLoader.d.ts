@@ -18,6 +18,6 @@ export class ImageLoader extends Loader {
 
 	setPriorityHint(
 		priorityHint: string
-	);
+	): void;
 
 }
