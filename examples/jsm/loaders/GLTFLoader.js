@@ -2036,9 +2036,9 @@ var GLTFLoader = ( function () {
 
 				if ( transform ) {
 
-					var gltfReference = this.associations.get( texture );
+					var gltfReference = parser.associations.get( texture );
 					texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, transform );
-					this.associations.set( texture, gltfReference );
+					parser.associations.set( texture, gltfReference );
 
 				}
 
