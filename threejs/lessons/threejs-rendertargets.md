@@ -30,6 +30,9 @@ rtScene.background = new THREE.Color('red');
 ```
 
 Notice we set the aspect to the aspect for the render target, not the canvas.
+The correct aspect to use depends on what we are rendering for. In this case
+we'll use the render target's texture on the side of a cube. Since faces of
+the cube are square we want an aspect of 1.0.
 
 We fill the scene with stuff. In this case we're using the light and the 3 cubes [from the previous article](threejs-responsive.html).
 
@@ -115,33 +118,39 @@ And voilà
 
 {{{example url="../threejs-render-target.html" }}}
 
-The cube is red because we set the `background` of the `rtScene` to red so the render target's texture is being cleared to red.
+The cube is red because we set the `background` of the `rtScene` to red so the
+render target's texture is being cleared to red.
 
-Render target are used for all kinds of things. Shadows use a render target. [Picking can use a render target](threejs-picking.html). Various kinds of [post processing effects](threejs-post-processing.html) require a render target. Rendering a rear view mirror in a car or a live view on a monitor inside a 3D scene might use a render target.
+Render targets are used for all kinds of things. [Shadows](threejs-shadows.html) use render targets.
+[Picking can use a render target](threejs-picking.html). Various kinds of
+[post processing effects](threejs-post-processing.html) require render targets.
+Rendering a rear view mirror in a car or a live view on a monitor inside a 3D
+scene might use a render target.
 
 A few notes about using `WebGLRenderTarget`.
 
 * By default `WebGLRenderTarget` creates 2 textures. A color texture and a depth/stencil texture. If you don't need the depth or stencil textures you can request to not create them by passing in options. Example:
 
-        const rt = new THREE.WebGLRenderTarget(width, height, {
-          depthBuffer: false,
-          stencilBuffer: false,
-        });
+    ```js
+    const rt = new THREE.WebGLRenderTarget(width, height, {
+      depthBuffer: false,
+      stencilBuffer: false,
+    });
+    ```
 
 * You might need to change the size of a render target
 
   In the example above we make a render target of a fixed size, 512x512. For things like post processing you generally need to make a render target the same size as your canvas. In our code that would mean when we change the canvas size we would also update both the render target size and the camera we're using when rendering to the render target. Example:
 
-        function render(time) {
-          time *= 0.001;
+      function render(time) {
+        time *= 0.001;
 
-          if (resizeRendererToDisplaySize(renderer)) {
-            const canvas = renderer.domElement;
-            camera.aspect = canvas.clientWidth / canvas.clientHeight;
-            camera.updateProjectionMatrix();
+        if (resizeRendererToDisplaySize(renderer)) {
+          const canvas = renderer.domElement;
+          camera.aspect = canvas.clientWidth / canvas.clientHeight;
+          camera.updateProjectionMatrix();
 
-        +    renderTarget.setSize(canvas.width, canvas.height);
-        +    rtCamera.aspect = camera.aspect;
-        +    rtCamera.updateProjectionMatrix();
-          }
-
+      +    renderTarget.setSize(canvas.width, canvas.height);
+      +    rtCamera.aspect = camera.aspect;
+      +    rtCamera.updateProjectionMatrix();
+      }
