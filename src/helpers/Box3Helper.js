@@ -17,11 +17,11 @@ function Box3Helper( box, color ) {
 
 	color = color || 0xffff00;
 
-	var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
+	const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 
-	var positions = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 1, - 1, 1, - 1, - 1 ];
+	const positions = [ 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 1, - 1, 1, - 1, - 1 ];
 
-	var geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 
 	geometry.setIndex( new BufferAttribute( indices, 1 ) );
 
@@ -40,7 +40,7 @@ Box3Helper.prototype.constructor = Box3Helper;
 
 Box3Helper.prototype.updateMatrixWorld = function ( force ) {
 
-	var box = this.box;
+	const box = this.box;
 
 	if ( box.isEmpty() ) return;
 
