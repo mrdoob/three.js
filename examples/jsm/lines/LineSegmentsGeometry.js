@@ -47,7 +47,7 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 			end.applyMatrix4( matrix );
 
-			start.data.needsUpdate = true;
+			start.needsUpdate = true;
 
 		}
 
