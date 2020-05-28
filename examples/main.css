@@ -8,6 +8,20 @@ body {
 	overscroll-behavior: none;
 }
 
+body.dark {
+	background-color: #000;
+	color: #fff;
+}
+
+body.light {
+	background-color: #fff;
+	color: #000;
+}
+
+	body.light a {
+		color: #08f;
+	}
+
 a {
 	color: #ff0;
 	text-decoration: none;
