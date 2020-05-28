@@ -28,11 +28,18 @@ DirectionalLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	isDirectionalLight: true,
 
-	copy: function ( source ) {
+	copy: function ( source, recursive, cache ) {
 
-		Light.prototype.copy.call( this, source );
+		if ( cache === undefined ) cache = {};
 
-		this.target = source.target.clone();
+		Light.prototype.copy.call( this, source, recursive, cache );
+
+		if ( ( source.target.uuid in cache ) === false ) {
+
+			source.target.clone( recursive, cache );
+
+		}
+		this.target = cache[ source.target.uuid ];
 
 		this.shadow = source.shadow.clone();
 
