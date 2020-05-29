@@ -9,7 +9,7 @@ import { BufferAttribute } from './../core/BufferAttribute';
  * Those definitions will be changed when TypeScript innovates Generics to be type safe.
  *
  * @example
- * var v:THREE.Vector = new THREE.Vector3();
+ * const v:THREE.Vector = new THREE.Vector3();
  * v.addVectors(new THREE.Vector2(0, 1), new THREE.Vector2(2, 3));		// invalid but compiled successfully
  */
 export interface Vector {

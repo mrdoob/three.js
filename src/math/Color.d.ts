@@ -12,7 +12,7 @@ export interface HSL {
  * Represents a color. See also {@link ColorUtils}.
  *
  * @example
- * var color = new THREE.Color( 0xff0000 );
+ * const color = new THREE.Color( 0xff0000 );
  *
  * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Color.js|src/math/Color.js}
  */
