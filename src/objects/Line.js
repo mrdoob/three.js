@@ -42,6 +42,17 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	isLine: true,
 
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
+
+		this.material = source.material;
+		this.geometry = source.geometry;
+
+		return this;
+
+	},
+
 	computeLineDistances: function () {
 
 		const geometry = this.geometry;
@@ -278,12 +289,6 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			}
 
 		}
-
-	},
-
-	clone: function () {
-
-		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
 

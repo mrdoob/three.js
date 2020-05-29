@@ -75,6 +75,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
+		this.material = source.material;
+		this.geometry = source.geometry;
+
 		return this;
 
 	},
@@ -331,12 +334,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			}
 
 		}
-
-	},
-
-	clone: function () {
-
-		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
 

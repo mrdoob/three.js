@@ -30,6 +30,17 @@ InstancedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	isInstancedMesh: true,
 
+	copy: function ( source ) {
+
+		Mesh.prototype.copy.call( this, source );
+
+		this.instanceMatrix.copy( source.instanceMatrix );
+		this.count = source.count;
+
+		return this;
+
+	},
+
 	getMatrixAt: function ( index, matrix ) {
 
 		matrix.fromArray( this.instanceMatrix.array, index * 16 );
