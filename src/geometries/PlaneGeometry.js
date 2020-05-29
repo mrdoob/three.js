@@ -48,36 +48,34 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 	width = width || 1;
 	height = height || 1;
 
-	var width_half = width / 2;
-	var height_half = height / 2;
+	const width_half = width / 2;
+	const height_half = height / 2;
 
-	var gridX = Math.floor( widthSegments ) || 1;
-	var gridY = Math.floor( heightSegments ) || 1;
+	const gridX = Math.floor( widthSegments ) || 1;
+	const gridY = Math.floor( heightSegments ) || 1;
 
-	var gridX1 = gridX + 1;
-	var gridY1 = gridY + 1;
+	const gridX1 = gridX + 1;
+	const gridY1 = gridY + 1;
 
-	var segment_width = width / gridX;
-	var segment_height = height / gridY;
-
-	var ix, iy;
+	const segment_width = width / gridX;
+	const segment_height = height / gridY;
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// generate vertices, normals and uvs
 
-	for ( iy = 0; iy < gridY1; iy ++ ) {
+	for ( let iy = 0; iy < gridY1; iy ++ ) {
 
-		var y = iy * segment_height - height_half;
+		const y = iy * segment_height - height_half;
 
-		for ( ix = 0; ix < gridX1; ix ++ ) {
+		for ( let ix = 0; ix < gridX1; ix ++ ) {
 
-			var x = ix * segment_width - width_half;
+			const x = ix * segment_width - width_half;
 
 			vertices.push( x, - y, 0 );
 
@@ -92,14 +90,14 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 
 	// indices
 
-	for ( iy = 0; iy < gridY; iy ++ ) {
+	for ( let iy = 0; iy < gridY; iy ++ ) {
 
-		for ( ix = 0; ix < gridX; ix ++ ) {
+		for ( let ix = 0; ix < gridX; ix ++ ) {
 
-			var a = ix + gridX1 * iy;
-			var b = ix + gridX1 * ( iy + 1 );
-			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-			var d = ( ix + 1 ) + gridX1 * iy;
+			const a = ix + gridX1 * iy;
+			const b = ix + gridX1 * ( iy + 1 );
+			const c = ( ix + 1 ) + gridX1 * ( iy + 1 );
+			const d = ( ix + 1 ) + gridX1 * iy;
 
 			// faces
 
