@@ -4,13 +4,13 @@
  * @author szimek / https://github.com/szimek/
  */
 
-var _canvas;
+let _canvas;
 
-var ImageUtils = {
+const ImageUtils = {
 
 	getDataURL: function ( image ) {
 
-		var canvas;
+		let canvas;
 
 		if ( typeof HTMLCanvasElement == 'undefined' ) {
 
@@ -27,7 +27,7 @@ var ImageUtils = {
 			_canvas.width = image.width;
 			_canvas.height = image.height;
 
-			var context = _canvas.getContext( '2d' );
+			const context = _canvas.getContext( '2d' );
 
 			if ( image instanceof ImageData ) {
 

@@ -63,7 +63,7 @@ Object.assign( Curve.prototype, {
 
 	getPointAt: function ( u, optionalTarget ) {
 
-		var t = this.getUtoTmapping( u );
+		const t = this.getUtoTmapping( u );
 		return this.getPoint( t, optionalTarget );
 
 	},
@@ -74,9 +74,9 @@ Object.assign( Curve.prototype, {
 
 		if ( divisions === undefined ) divisions = 5;
 
-		var points = [];
+		const points = [];
 
-		for ( var d = 0; d <= divisions; d ++ ) {
+		for ( let d = 0; d <= divisions; d ++ ) {
 
 			points.push( this.getPoint( d / divisions ) );
 
@@ -92,9 +92,9 @@ Object.assign( Curve.prototype, {
 
 		if ( divisions === undefined ) divisions = 5;
 
-		var points = [];
+		const points = [];
 
-		for ( var d = 0; d <= divisions; d ++ ) {
+		for ( let d = 0; d <= divisions; d ++ ) {
 
 			points.push( this.getPointAt( d / divisions ) );
 
@@ -108,7 +108,7 @@ Object.assign( Curve.prototype, {
 
 	getLength: function () {
 
-		var lengths = this.getLengths();
+		const lengths = this.getLengths();
 		return lengths[ lengths.length - 1 ];
 
 	},
@@ -129,13 +129,13 @@ Object.assign( Curve.prototype, {
 
 		this.needsUpdate = false;
 
-		var cache = [];
-		var current, last = this.getPoint( 0 );
-		var p, sum = 0;
+		const cache = [];
+		let current, last = this.getPoint( 0 );
+		let sum = 0;
 
 		cache.push( 0 );
 
-		for ( p = 1; p <= divisions; p ++ ) {
+		for ( let p = 1; p <= divisions; p ++ ) {
 
 			current = this.getPoint( p / divisions );
 			sum += current.distanceTo( last );
@@ -161,11 +161,11 @@ Object.assign( Curve.prototype, {
 
 	getUtoTmapping: function ( u, distance ) {
 
-		var arcLengths = this.getLengths();
+		const arcLengths = this.getLengths();
 
-		var i = 0, il = arcLengths.length;
+		let i = 0, il = arcLengths.length;
 
-		var targetArcLength; // The targeted u distance value to get
+		let targetArcLength; // The targeted u distance value to get
 
 		if ( distance ) {
 
@@ -179,7 +179,7 @@ Object.assign( Curve.prototype, {
 
 		// binary search for the index with largest value smaller than target u distance
 
-		var low = 0, high = il - 1, comparison;
+		let low = 0, high = il - 1, comparison;
 
 		while ( low <= high ) {
 
@@ -216,18 +216,18 @@ Object.assign( Curve.prototype, {
 
 		// we could get finer grain at lengths, or use simple interpolation between two points
 
-		var lengthBefore = arcLengths[ i ];
-		var lengthAfter = arcLengths[ i + 1 ];
+		const lengthBefore = arcLengths[ i ];
+		const lengthAfter = arcLengths[ i + 1 ];
 
-		var segmentLength = lengthAfter - lengthBefore;
+		const segmentLength = lengthAfter - lengthBefore;
 
 		// determine where we are between the 'before' and 'after' points
 
-		var segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
+		const segmentFraction = ( targetArcLength - lengthBefore ) / segmentLength;
 
 		// add that fractional amount to t
 
-		var t = ( i + segmentFraction ) / ( il - 1 );
+		const t = ( i + segmentFraction ) / ( il - 1 );
 
 		return t;
 
@@ -240,19 +240,19 @@ Object.assign( Curve.prototype, {
 
 	getTangent: function ( t, optionalTarget ) {
 
-		var delta = 0.0001;
-		var t1 = t - delta;
-		var t2 = t + delta;
+		const delta = 0.0001;
+		let t1 = t - delta;
+		let t2 = t + delta;
 
 		// Capping in case of danger
 
 		if ( t1 < 0 ) t1 = 0;
 		if ( t2 > 1 ) t2 = 1;
 
-		var pt1 = this.getPoint( t1 );
-		var pt2 = this.getPoint( t2 );
+		const pt1 = this.getPoint( t1 );
+		const pt2 = this.getPoint( t2 );
 
-		var tangent = optionalTarget || ( ( pt1.isVector2 ) ? new Vector2() : new Vector3() );
+		const tangent = optionalTarget || ( ( pt1.isVector2 ) ? new Vector2() : new Vector3() );
 
 		tangent.copy( pt2 ).sub( pt1 ).normalize();
 
@@ -262,7 +262,7 @@ Object.assign( Curve.prototype, {
 
 	getTangentAt: function ( u, optionalTarget ) {
 
-		var t = this.getUtoTmapping( u );
+		const t = this.getUtoTmapping( u );
 		return this.getTangent( t, optionalTarget );
 
 	},
@@ -271,22 +271,20 @@ Object.assign( Curve.prototype, {
 
 		// see http://www.cs.indiana.edu/pub/techreports/TR425.pdf
 
-		var normal = new Vector3();
+		const normal = new Vector3();
 
-		var tangents = [];
-		var normals = [];
-		var binormals = [];
+		const tangents = [];
+		const normals = [];
+		const binormals = [];
 
-		var vec = new Vector3();
-		var mat = new Matrix4();
-
-		var i, u, theta;
+		const vec = new Vector3();
+		const mat = new Matrix4();
 
 		// compute the tangent vectors for each segment on the curve
 
-		for ( i = 0; i <= segments; i ++ ) {
+		for ( let i = 0; i <= segments; i ++ ) {
 
-			u = i / segments;
+			const u = i / segments;
 
 			tangents[ i ] = this.getTangentAt( u, new Vector3() );
 			tangents[ i ].normalize();
@@ -298,10 +296,10 @@ Object.assign( Curve.prototype, {
 
 		normals[ 0 ] = new Vector3();
 		binormals[ 0 ] = new Vector3();
-		var min = Number.MAX_VALUE;
-		var tx = Math.abs( tangents[ 0 ].x );
-		var ty = Math.abs( tangents[ 0 ].y );
-		var tz = Math.abs( tangents[ 0 ].z );
+		let min = Number.MAX_VALUE;
+		const tx = Math.abs( tangents[ 0 ].x );
+		const ty = Math.abs( tangents[ 0 ].y );
+		const tz = Math.abs( tangents[ 0 ].z );
 
 		if ( tx <= min ) {
 
@@ -331,7 +329,7 @@ Object.assign( Curve.prototype, {
 
 		// compute the slowly-varying normal and binormal vectors for each segment on the curve
 
-		for ( i = 1; i <= segments; i ++ ) {
+		for ( let i = 1; i <= segments; i ++ ) {
 
 			normals[ i ] = normals[ i - 1 ].clone();
 
@@ -343,7 +341,7 @@ Object.assign( Curve.prototype, {
 
 				vec.normalize();
 
-				theta = Math.acos( MathUtils.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+				const theta = Math.acos( MathUtils.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
 
 				normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
@@ -357,7 +355,7 @@ Object.assign( Curve.prototype, {
 
 		if ( closed === true ) {
 
-			theta = Math.acos( MathUtils.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
+			let theta = Math.acos( MathUtils.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
 			theta /= segments;
 
 			if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ segments ] ) ) > 0 ) {
@@ -366,7 +364,7 @@ Object.assign( Curve.prototype, {
 
 			}
 
-			for ( i = 1; i <= segments; i ++ ) {
+			for ( let i = 1; i <= segments; i ++ ) {
 
 				// twist a little...
 				normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
@@ -400,7 +398,7 @@ Object.assign( Curve.prototype, {
 
 	toJSON: function () {
 
-		var data = {
+		const data = {
 			metadata: {
 				version: 4.5,
 				type: 'Curve',
