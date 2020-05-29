@@ -1282,9 +1282,9 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.visible === false ) return;
 
-		var visible = object.layers.test( camera.layers );
+		var layerTest = object.layers.test( camera.layers );
 
-		if ( visible ) {
+		if ( layerTest ) {
 
 			if ( object.isGroup ) {
 
@@ -1391,13 +1391,17 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-		}
+			if ( ! object.layers.recursive || object.layers.recursive && layerTest ) {
 
-		var children = object.children;
+				var children = object.children;
 
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
+				for ( var i = 0, l = children.length; i < l; i ++ ) {
 
-			projectObject( children[ i ], camera, groupOrder, sortObjects );
+					projectObject( children[ i ], camera, groupOrder, sortObjects );
+
+				}
+
+			}
 
 		}
 
