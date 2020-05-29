@@ -1171,7 +1171,7 @@ function WebGLRenderer( parameters ) {
 		}
 
 		//
-		scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
+		if ( scene.isScene ) scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
 
 		currentRenderState = renderStates.get( scene, camera );
 		currentRenderState.init();
@@ -1247,7 +1247,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		scene.onAfterRender( _this, scene, camera );
+		if ( scene.isScene ) scene.onAfterRender( _this, scene, camera );
 
 		//
 

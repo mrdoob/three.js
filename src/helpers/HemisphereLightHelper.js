@@ -12,9 +12,9 @@ import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
-var _vector = new Vector3();
-var _color1 = new Color();
-var _color2 = new Color();
+const _vector = new Vector3();
+const _color1 = new Color();
+const _color2 = new Color();
 
 function HemisphereLightHelper( light, size, color ) {
 
@@ -28,14 +28,14 @@ function HemisphereLightHelper( light, size, color ) {
 
 	this.color = color;
 
-	var geometry = new OctahedronBufferGeometry( size );
+	const geometry = new OctahedronBufferGeometry( size );
 	geometry.rotateY( Math.PI * 0.5 );
 
 	this.material = new MeshBasicMaterial( { wireframe: true, fog: false, toneMapped: false } );
 	if ( this.color === undefined ) this.material.vertexColors = true;
 
-	var position = geometry.getAttribute( 'position' );
-	var colors = new Float32Array( position.count * 3 );
+	const position = geometry.getAttribute( 'position' );
+	const colors = new Float32Array( position.count * 3 );
 
 	geometry.setAttribute( 'color', new BufferAttribute( colors, 3 ) );
 
@@ -57,7 +57,7 @@ HemisphereLightHelper.prototype.dispose = function () {
 
 HemisphereLightHelper.prototype.update = function () {
 
-	var mesh = this.children[ 0 ];
+	const mesh = this.children[ 0 ];
 
 	if ( this.color !== undefined ) {
 
@@ -65,14 +65,14 @@ HemisphereLightHelper.prototype.update = function () {
 
 	} else {
 
-		var colors = mesh.geometry.getAttribute( 'color' );
+		const colors = mesh.geometry.getAttribute( 'color' );
 
 		_color1.copy( this.light.color );
 		_color2.copy( this.light.groundColor );
 
-		for ( var i = 0, l = colors.count; i < l; i ++ ) {
+		for ( let i = 0, l = colors.count; i < l; i ++ ) {
 
-			var color = ( i < ( l / 2 ) ) ? _color1 : _color2;
+			const color = ( i < ( l / 2 ) ) ? _color1 : _color2;
 
 			colors.setXYZ( i, color.r, color.g, color.b );
 
