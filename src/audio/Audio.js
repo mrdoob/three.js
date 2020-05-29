@@ -112,7 +112,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		this._startedAt = this.context.currentTime + delay;
 
-		var source = this.context.createBufferSource();
+		const source = this.context.createBufferSource();
 		source.buffer = this.buffer;
 		source.loop = this.loop;
 		source.loopStart = this.loopStart;
@@ -190,7 +190,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			this.source.connect( this.filters[ 0 ] );
 
-			for ( var i = 1, l = this.filters.length; i < l; i ++ ) {
+			for ( let i = 1, l = this.filters.length; i < l; i ++ ) {
 
 				this.filters[ i - 1 ].connect( this.filters[ i ] );
 
@@ -214,7 +214,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			this.source.disconnect( this.filters[ 0 ] );
 
-			for ( var i = 1, l = this.filters.length; i < l; i ++ ) {
+			for ( let i = 1, l = this.filters.length; i < l; i ++ ) {
 
 				this.filters[ i - 1 ].disconnect( this.filters[ i ] );
 

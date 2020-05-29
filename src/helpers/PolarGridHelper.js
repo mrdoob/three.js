@@ -19,25 +19,22 @@ function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) 
 	color1 = new Color( color1 !== undefined ? color1 : 0x444444 );
 	color2 = new Color( color2 !== undefined ? color2 : 0x888888 );
 
-	var vertices = [];
-	var colors = [];
-
-	var x, z;
-	var v, i, j, r, color;
+	const vertices = [];
+	const colors = [];
 
 	// create the radials
 
-	for ( i = 0; i <= radials; i ++ ) {
+	for ( let i = 0; i <= radials; i ++ ) {
 
-		v = ( i / radials ) * ( Math.PI * 2 );
+		const v = ( i / radials ) * ( Math.PI * 2 );
 
-		x = Math.sin( v ) * radius;
-		z = Math.cos( v ) * radius;
+		const x = Math.sin( v ) * radius;
+		const z = Math.cos( v ) * radius;
 
 		vertices.push( 0, 0, 0 );
 		vertices.push( x, 0, z );
 
-		color = ( i & 1 ) ? color1 : color2;
+		const color = ( i & 1 ) ? color1 : color2;
 
 		colors.push( color.r, color.g, color.b );
 		colors.push( color.r, color.g, color.b );
@@ -46,20 +43,20 @@ function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) 
 
 	// create the circles
 
-	for ( i = 0; i <= circles; i ++ ) {
+	for ( let i = 0; i <= circles; i ++ ) {
 
-		color = ( i & 1 ) ? color1 : color2;
+		const color = ( i & 1 ) ? color1 : color2;
 
-		r = radius - ( radius / circles * i );
+		const r = radius - ( radius / circles * i );
 
-		for ( j = 0; j < divisions; j ++ ) {
+		for ( let j = 0; j < divisions; j ++ ) {
 
 			// first vertex
 
-			v = ( j / divisions ) * ( Math.PI * 2 );
+			let v = ( j / divisions ) * ( Math.PI * 2 );
 
-			x = Math.sin( v ) * r;
-			z = Math.cos( v ) * r;
+			let x = Math.sin( v ) * r;
+			let z = Math.cos( v ) * r;
 
 			vertices.push( x, 0, z );
 			colors.push( color.r, color.g, color.b );
@@ -78,11 +75,11 @@ function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) 
 
 	}
 
-	var geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-	var material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
+	const material = new LineBasicMaterial( { vertexColors: true, toneMapped: false } );
 
 	LineSegments.call( this, geometry, material );
 

@@ -4,7 +4,7 @@ import { PointLightShadow } from './PointLightShadow';
 
 /**
  * @example
- * var light = new THREE.PointLight( 0xff0000, 1, 100 );
+ * const light = new THREE.PointLight( 0xff0000, 1, 100 );
  * light.position.set( 50, 50, 50 );
  * scene.add( light );
  */
