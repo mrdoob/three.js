@@ -1297,7 +1297,8 @@
 
 		transpose: function () {
 
-			var tmp, m = this.elements;
+			var tmp;
+			var m = this.elements;
 
 			tmp = m[ 1 ]; m[ 1 ] = m[ 3 ]; m[ 3 ] = tmp;
 			tmp = m[ 2 ]; m[ 2 ] = m[ 6 ]; m[ 6 ] = tmp;
@@ -2132,8 +2133,8 @@
 
 			// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
-			var angle, x, y, z,		// variables for result
-				epsilon = 0.01,		// margin to allow for rounding errors
+			var angle, x, y, z; // variables for result
+			var epsilon = 0.01,		// margin to allow for rounding errors
 				epsilon2 = 0.1,		// margin to distinguish between 0 and 180 degrees
 
 				te = m.elements,
@@ -2239,8 +2240,8 @@
 			// as we have reached here there are no singularities so we can handle normally
 
 			var s = Math.sqrt( ( m32 - m23 ) * ( m32 - m23 ) +
-			                   ( m13 - m31 ) * ( m13 - m31 ) +
-			                   ( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
+				( m13 - m31 ) * ( m13 - m31 ) +
+				( m21 - m12 ) * ( m21 - m12 ) ); // used to normalize
 
 			if ( Math.abs( s ) < 0.001 ) { s = 1; }
 
@@ -2642,9 +2643,9 @@
 			var x0 = src0[ srcOffset0 + 0 ],
 				y0 = src0[ srcOffset0 + 1 ],
 				z0 = src0[ srcOffset0 + 2 ],
-				w0 = src0[ srcOffset0 + 3 ],
+				w0 = src0[ srcOffset0 + 3 ];
 
-				x1 = src1[ srcOffset1 + 0 ],
+			var x1 = src1[ srcOffset1 + 0 ],
 				y1 = src1[ srcOffset1 + 1 ],
 				z1 = src1[ srcOffset1 + 2 ],
 				w1 = src1[ srcOffset1 + 3 ];
@@ -2939,12 +2940,11 @@
 				m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ],
 				m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ],
 
-				trace = m11 + m22 + m33,
-				s;
+				trace = m11 + m22 + m33;
 
 			if ( trace > 0 ) {
 
-				s = 0.5 / Math.sqrt( trace + 1.0 );
+				var s = 0.5 / Math.sqrt( trace + 1.0 );
 
 				this._w = 0.25 / s;
 				this._x = ( m32 - m23 ) * s;
@@ -2953,30 +2953,30 @@
 
 			} else if ( m11 > m22 && m11 > m33 ) {
 
-				s = 2.0 * Math.sqrt( 1.0 + m11 - m22 - m33 );
+				var s$1 = 2.0 * Math.sqrt( 1.0 + m11 - m22 - m33 );
 
-				this._w = ( m32 - m23 ) / s;
-				this._x = 0.25 * s;
-				this._y = ( m12 + m21 ) / s;
-				this._z = ( m13 + m31 ) / s;
+				this._w = ( m32 - m23 ) / s$1;
+				this._x = 0.25 * s$1;
+				this._y = ( m12 + m21 ) / s$1;
+				this._z = ( m13 + m31 ) / s$1;
 
 			} else if ( m22 > m33 ) {
 
-				s = 2.0 * Math.sqrt( 1.0 + m22 - m11 - m33 );
+				var s$2 = 2.0 * Math.sqrt( 1.0 + m22 - m11 - m33 );
 
-				this._w = ( m13 - m31 ) / s;
-				this._x = ( m12 + m21 ) / s;
-				this._y = 0.25 * s;
-				this._z = ( m23 + m32 ) / s;
+				this._w = ( m13 - m31 ) / s$2;
+				this._x = ( m12 + m21 ) / s$2;
+				this._y = 0.25 * s$2;
+				this._z = ( m23 + m32 ) / s$2;
 
 			} else {
 
-				s = 2.0 * Math.sqrt( 1.0 + m33 - m11 - m22 );
+				var s$3 = 2.0 * Math.sqrt( 1.0 + m33 - m11 - m22 );
 
-				this._w = ( m21 - m12 ) / s;
-				this._x = ( m13 + m31 ) / s;
-				this._y = ( m23 + m32 ) / s;
-				this._z = 0.25 * s;
+				this._w = ( m21 - m12 ) / s$3;
+				this._x = ( m13 + m31 ) / s$3;
+				this._y = ( m23 + m32 ) / s$3;
+				this._z = 0.25 * s$3;
 
 			}
 
@@ -4220,15 +4220,15 @@
 
 			} else if ( euler.order === 'ZXY' ) {
 
-				var ce = c * e, cf = c * f, de = d * e, df = d * f;
+				var ce$1 = c * e, cf$1 = c * f, de$1 = d * e, df$1 = d * f;
 
-				te[ 0 ] = ce - df * b;
+				te[ 0 ] = ce$1 - df$1 * b;
 				te[ 4 ] = - a * f;
-				te[ 8 ] = de + cf * b;
+				te[ 8 ] = de$1 + cf$1 * b;
 
-				te[ 1 ] = cf + de * b;
+				te[ 1 ] = cf$1 + de$1 * b;
 				te[ 5 ] = a * e;
-				te[ 9 ] = df - ce * b;
+				te[ 9 ] = df$1 - ce$1 * b;
 
 				te[ 2 ] = - a * d;
 				te[ 6 ] = b;
@@ -4236,15 +4236,15 @@
 
 			} else if ( euler.order === 'ZYX' ) {
 
-				var ae = a * e, af = a * f, be = b * e, bf = b * f;
+				var ae$1 = a * e, af$1 = a * f, be$1 = b * e, bf$1 = b * f;
 
 				te[ 0 ] = c * e;
-				te[ 4 ] = be * d - af;
-				te[ 8 ] = ae * d + bf;
+				te[ 4 ] = be$1 * d - af$1;
+				te[ 8 ] = ae$1 * d + bf$1;
 
 				te[ 1 ] = c * f;
-				te[ 5 ] = bf * d + ae;
-				te[ 9 ] = af * d - be;
+				te[ 5 ] = bf$1 * d + ae$1;
+				te[ 9 ] = af$1 * d - be$1;
 
 				te[ 2 ] = - d;
 				te[ 6 ] = b * c;
@@ -4268,19 +4268,19 @@
 
 			} else if ( euler.order === 'XZY' ) {
 
-				var ac = a * c, ad = a * d, bc = b * c, bd = b * d;
+				var ac$1 = a * c, ad$1 = a * d, bc$1 = b * c, bd$1 = b * d;
 
 				te[ 0 ] = c * e;
 				te[ 4 ] = - f;
 				te[ 8 ] = d * e;
 
-				te[ 1 ] = ac * f + bd;
+				te[ 1 ] = ac$1 * f + bd$1;
 				te[ 5 ] = a * e;
-				te[ 9 ] = ad * f - bc;
+				te[ 9 ] = ad$1 * f - bc$1;
 
-				te[ 2 ] = bc * f - ad;
+				te[ 2 ] = bc$1 * f - ad$1;
 				te[ 6 ] = b * e;
-				te[ 10 ] = bd * f + ac;
+				te[ 10 ] = bd$1 * f + ac$1;
 
 			}
 
@@ -6036,9 +6036,9 @@
 
 					var uuids = [];
 
-					for ( var i = 0, l = this.material.length; i < l; i ++ ) {
+					for ( var i$1 = 0, l$1 = this.material.length; i$1 < l$1; i$1 ++ ) {
 
-						uuids.push( serialize( meta.materials, this.material[ i ] ) );
+						uuids.push( serialize( meta.materials, this.material[ i$1 ] ) );
 
 					}
 
@@ -6058,9 +6058,9 @@
 
 				object.children = [];
 
-				for ( var i = 0; i < this.children.length; i ++ ) {
+				for ( var i$2 = 0; i$2 < this.children.length; i$2 ++ ) {
 
-					object.children.push( this.children[ i ].toJSON( meta ).object );
+					object.children.push( this.children[ i$2 ].toJSON( meta ).object );
 
 				}
 
@@ -6072,13 +6072,13 @@
 				var materials = extractFromCache( meta.materials );
 				var textures = extractFromCache( meta.textures );
 				var images = extractFromCache( meta.images );
-				var shapes = extractFromCache( meta.shapes );
+				var shapes$1 = extractFromCache( meta.shapes );
 
 				if ( geometries.length > 0 ) { output.geometries = geometries; }
 				if ( materials.length > 0 ) { output.materials = materials; }
 				if ( textures.length > 0 ) { output.textures = textures; }
 				if ( images.length > 0 ) { output.images = images; }
-				if ( shapes.length > 0 ) { output.shapes = shapes; }
+				if ( shapes$1.length > 0 ) { output.shapes = shapes$1; }
 
 			}
 
@@ -6759,9 +6759,7 @@
 
 	function satForAxes( axes, v0, v1, v2, extents ) {
 
-		var i, j;
-
-		for ( i = 0, j = axes.length - 3; i <= j; i += 3 ) {
+		for ( var i = 0, j = axes.length - 3; i <= j; i += 3 ) {
 
 			_testAxis.fromArray( axes, i );
 			// project the aabb onto the seperating axis
@@ -8676,9 +8674,9 @@
 
 			}
 
-			for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
+			for ( var i$1 = 0, il$1 = source.vertexColors.length; i$1 < il$1; i$1 ++ ) {
 
-				this.vertexColors[ i ] = source.vertexColors[ i ].clone();
+				this.vertexColors[ i$1 ] = source.vertexColors[ i$1 ].clone();
 
 			}
 
@@ -9068,16 +9066,19 @@
 			this.stencilZPass = source.stencilZPass;
 			this.stencilWrite = source.stencilWrite;
 
-			var srcPlanes = source.clippingPlanes,
-				dstPlanes = null;
+			var srcPlanes = source.clippingPlanes;
+			var dstPlanes = null;
 
 			if ( srcPlanes !== null ) {
 
 				var n = srcPlanes.length;
 				dstPlanes = new Array( n );
 
-				for ( var i = 0; i !== n; ++ i )
-					{ dstPlanes[ i ] = srcPlanes[ i ].clone(); }
+				for ( var i = 0; i !== n; ++ i ) {
+
+					dstPlanes[ i ] = srcPlanes[ i ].clone();
+
+				}
 
 			}
 
@@ -9331,7 +9332,8 @@
 
 		copyColorsArray: function ( colors ) {
 
-			var array = this.array, offset = 0;
+			var array = this.array;
+			var offset = 0;
 
 			for ( var i = 0, l = colors.length; i < l; i ++ ) {
 
@@ -9356,7 +9358,8 @@
 
 		copyVector2sArray: function ( vectors ) {
 
-			var array = this.array, offset = 0;
+			var array = this.array;
+			var offset = 0;
 
 			for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
@@ -9380,7 +9383,8 @@
 
 		copyVector3sArray: function ( vectors ) {
 
-			var array = this.array, offset = 0;
+			var array = this.array;
+			var offset = 0;
 
 			for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
@@ -9405,7 +9409,8 @@
 
 		copyVector4sArray: function ( vectors ) {
 
-			var array = this.array, offset = 0;
+			var array = this.array;
+			var offset = 0;
 
 			for ( var i = 0, l = vectors.length; i < l; i ++ ) {
 
@@ -9759,13 +9764,14 @@
 
 		computeGroups: function ( geometry ) {
 
-			var group;
 			var groups = [];
+
+			var group, i;
 			var materialIndex = undefined;
 
 			var faces = geometry.faces;
 
-			for ( var i = 0; i < faces.length; i ++ ) {
+			for ( i = 0; i < faces.length; i ++ ) {
 
 				var face = faces[ i ];
 
@@ -9844,10 +9850,10 @@
 
 				morphTargetsNormal = [];
 
-				for ( var i = 0; i < morphNormalsLength; i ++ ) {
+				for ( var i$1 = 0; i$1 < morphNormalsLength; i$1 ++ ) {
 
-					morphTargetsNormal[ i ] = {
-						name: morphNormals[ i ].name,
+					morphTargetsNormal[ i$1 ] = {
+						name: morphNormals[ i$1 ].name,
 					 	data: []
 					};
 
@@ -9873,9 +9879,9 @@
 
 			}
 
-			for ( var i = 0; i < faces.length; i ++ ) {
+			for ( var i$2 = 0; i$2 < faces.length; i$2 ++ ) {
 
-				var face = faces[ i ];
+				var face = faces[ i$2 ];
 
 				this.vertices.push( vertices[ face.a ], vertices[ face.b ], vertices[ face.c ] );
 
@@ -9909,7 +9915,7 @@
 
 				if ( hasFaceVertexUv === true ) {
 
-					var vertexUvs = faceVertexUvs[ 0 ][ i ];
+					var vertexUvs = faceVertexUvs[ 0 ][ i$2 ];
 
 					if ( vertexUvs !== undefined ) {
 
@@ -9917,7 +9923,7 @@
 
 					} else {
 
-						console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv ', i );
+						console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv ', i$2 );
 
 						this.uvs.push( new Vector2(), new Vector2(), new Vector2() );
 
@@ -9927,15 +9933,15 @@
 
 				if ( hasFaceVertexUv2 === true ) {
 
-					var vertexUvs = faceVertexUvs[ 1 ][ i ];
+					var vertexUvs$1 = faceVertexUvs[ 1 ][ i$2 ];
 
-					if ( vertexUvs !== undefined ) {
+					if ( vertexUvs$1 !== undefined ) {
 
-						this.uvs2.push( vertexUvs[ 0 ], vertexUvs[ 1 ], vertexUvs[ 2 ] );
+						this.uvs2.push( vertexUvs$1[ 0 ], vertexUvs$1[ 1 ], vertexUvs$1[ 2 ] );
 
 					} else {
 
-						console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv2 ', i );
+						console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv2 ', i$2 );
 
 						this.uvs2.push( new Vector2(), new Vector2(), new Vector2() );
 
@@ -9953,11 +9959,11 @@
 
 				}
 
-				for ( var j = 0; j < morphNormalsLength; j ++ ) {
+				for ( var j$1 = 0; j$1 < morphNormalsLength; j$1 ++ ) {
 
-					var morphNormal = morphNormals[ j ].vertexNormals[ i ];
+					var morphNormal = morphNormals[ j$1 ].vertexNormals[ i$2 ];
 
-					morphTargetsNormal[ j ].data.push( morphNormal.a, morphNormal.b, morphNormal.c );
+					morphTargetsNormal[ j$1 ].data.push( morphNormal.a, morphNormal.b, morphNormal.c );
 
 				}
 
@@ -10372,11 +10378,9 @@
 
 			}
 
-			var attribute;
-
 			if ( geometry.verticesNeedUpdate === true ) {
 
-				attribute = this.attributes.position;
+				var attribute = this.attributes.position;
 
 				if ( attribute !== undefined ) {
 
@@ -10391,12 +10395,12 @@
 
 			if ( geometry.normalsNeedUpdate === true ) {
 
-				attribute = this.attributes.normal;
+				var attribute$1 = this.attributes.normal;
 
-				if ( attribute !== undefined ) {
+				if ( attribute$1 !== undefined ) {
 
-					attribute.copyVector3sArray( geometry.normals );
-					attribute.needsUpdate = true;
+					attribute$1.copyVector3sArray( geometry.normals );
+					attribute$1.needsUpdate = true;
 
 				}
 
@@ -10406,12 +10410,12 @@
 
 			if ( geometry.colorsNeedUpdate === true ) {
 
-				attribute = this.attributes.color;
+				var attribute$2 = this.attributes.color;
 
-				if ( attribute !== undefined ) {
+				if ( attribute$2 !== undefined ) {
 
-					attribute.copyColorsArray( geometry.colors );
-					attribute.needsUpdate = true;
+					attribute$2.copyColorsArray( geometry.colors );
+					attribute$2.needsUpdate = true;
 
 				}
 
@@ -10421,12 +10425,12 @@
 
 			if ( geometry.uvsNeedUpdate ) {
 
-				attribute = this.attributes.uv;
+				var attribute$3 = this.attributes.uv;
 
-				if ( attribute !== undefined ) {
+				if ( attribute$3 !== undefined ) {
 
-					attribute.copyVector2sArray( geometry.uvs );
-					attribute.needsUpdate = true;
+					attribute$3.copyVector2sArray( geometry.uvs );
+					attribute$3.needsUpdate = true;
 
 				}
 
@@ -10436,12 +10440,12 @@
 
 			if ( geometry.lineDistancesNeedUpdate ) {
 
-				attribute = this.attributes.lineDistance;
+				var attribute$4 = this.attributes.lineDistance;
 
-				if ( attribute !== undefined ) {
+				if ( attribute$4 !== undefined ) {
 
-					attribute.copyArray( geometry.lineDistances );
-					attribute.needsUpdate = true;
+					attribute$4.copyArray( geometry.lineDistances );
+					attribute$4.needsUpdate = true;
 
 				}
 
@@ -10674,9 +10678,9 @@
 
 				var maxRadiusSq = 0;
 
-				for ( var i = 0, il = position.count; i < il; i ++ ) {
+				for ( var i$1 = 0, il$1 = position.count; i$1 < il$1; i$1 ++ ) {
 
-					_vector$4.fromBufferAttribute( position, i );
+					_vector$4.fromBufferAttribute( position, i$1 );
 
 					maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( _vector$4 ) );
 
@@ -10686,14 +10690,14 @@
 
 				if ( morphAttributesPosition ) {
 
-					for ( var i = 0, il = morphAttributesPosition.length; i < il; i ++ ) {
+					for ( var i$2 = 0, il$2 = morphAttributesPosition.length; i$2 < il$2; i$2 ++ ) {
 
-						var morphAttribute = morphAttributesPosition[ i ];
+						var morphAttribute$1 = morphAttributesPosition[ i$2 ];
 						var morphTargetsRelative = this.morphTargetsRelative;
 
-						for ( var j = 0, jl = morphAttribute.count; j < jl; j ++ ) {
+						for ( var j = 0, jl = morphAttribute$1.count; j < jl; j ++ ) {
 
-							_vector$4.fromBufferAttribute( morphAttribute, j );
+							_vector$4.fromBufferAttribute( morphAttribute$1, j );
 
 							if ( morphTargetsRelative ) {
 
@@ -10757,7 +10761,6 @@
 
 				var normals = attributes.normal.array;
 
-				var vA, vB, vC;
 				var pA = new Vector3(), pB = new Vector3(), pC = new Vector3();
 				var cb = new Vector3(), ab = new Vector3();
 
@@ -10767,11 +10770,11 @@
 
 					var indices = index.array;
 
-					for ( var i = 0, il = index.count; i < il; i += 3 ) {
+					for ( var i$1 = 0, il$1 = index.count; i$1 < il$1; i$1 += 3 ) {
 
-						vA = indices[ i + 0 ] * 3;
-						vB = indices[ i + 1 ] * 3;
-						vC = indices[ i + 2 ] * 3;
+						var vA = indices[ i$1 + 0 ] * 3;
+						var vB = indices[ i$1 + 1 ] * 3;
+						var vC = indices[ i$1 + 2 ] * 3;
 
 						pA.fromArray( positions, vA );
 						pB.fromArray( positions, vB );
@@ -10799,27 +10802,27 @@
 
 					// non-indexed elements (unconnected triangle soup)
 
-					for ( var i = 0, il = positions.length; i < il; i += 9 ) {
+					for ( var i$2 = 0, il$2 = positions.length; i$2 < il$2; i$2 += 9 ) {
 
-						pA.fromArray( positions, i );
-						pB.fromArray( positions, i + 3 );
-						pC.fromArray( positions, i + 6 );
+						pA.fromArray( positions, i$2 );
+						pB.fromArray( positions, i$2 + 3 );
+						pC.fromArray( positions, i$2 + 6 );
 
 						cb.subVectors( pC, pB );
 						ab.subVectors( pA, pB );
 						cb.cross( ab );
 
-						normals[ i ] = cb.x;
-						normals[ i + 1 ] = cb.y;
-						normals[ i + 2 ] = cb.z;
+						normals[ i$2 ] = cb.x;
+						normals[ i$2 + 1 ] = cb.y;
+						normals[ i$2 + 2 ] = cb.z;
 
-						normals[ i + 3 ] = cb.x;
-						normals[ i + 4 ] = cb.y;
-						normals[ i + 5 ] = cb.z;
+						normals[ i$2 + 3 ] = cb.x;
+						normals[ i$2 + 4 ] = cb.y;
+						normals[ i$2 + 5 ] = cb.z;
 
-						normals[ i + 6 ] = cb.x;
-						normals[ i + 7 ] = cb.y;
-						normals[ i + 8 ] = cb.z;
+						normals[ i$2 + 6 ] = cb.x;
+						normals[ i$2 + 7 ] = cb.y;
+						normals[ i$2 + 8 ] = cb.z;
 
 					}
 
@@ -10956,22 +10959,22 @@
 
 			var morphAttributes = this.morphAttributes;
 
-			for ( name in morphAttributes ) {
+			for ( var name$1 in morphAttributes ) {
 
 				var morphArray = [];
-				var morphAttribute = morphAttributes[ name ]; // morphAttribute: array of Float32BufferAttributes
+				var morphAttribute = morphAttributes[ name$1 ]; // morphAttribute: array of Float32BufferAttributes
 
 				for ( var i = 0, il = morphAttribute.length; i < il; i ++ ) {
 
-					var attribute = morphAttribute[ i ];
+					var attribute$1 = morphAttribute[ i ];
 
-					var newAttribute = convertBufferAttribute( attribute, indices );
+					var newAttribute$1 = convertBufferAttribute( attribute$1, indices );
 
-					morphArray.push( newAttribute );
+					morphArray.push( newAttribute$1 );
 
 				}
 
-				geometry2.morphAttributes[ name ] = morphArray;
+				geometry2.morphAttributes[ name$1 ] = morphArray;
 
 			}
 
@@ -10981,9 +10984,9 @@
 
 			var groups = this.groups;
 
-			for ( var i = 0, l = groups.length; i < l; i ++ ) {
+			for ( var i$1 = 0, l = groups.length; i$1 < l; i$1 ++ ) {
 
-				var group = groups[ i ];
+				var group = groups[ i$1 ];
 				geometry2.addGroup( group.start, group.count, group.materialIndex );
 
 			}
@@ -11038,42 +11041,42 @@
 
 			var attributes = this.attributes;
 
-			for ( var key in attributes ) {
+			for ( var key$1 in attributes ) {
 
-				var attribute = attributes[ key ];
+				var attribute = attributes[ key$1 ];
 
 				var attributeData = attribute.toJSON();
 
 				if ( attribute.name !== '' ) { attributeData.name = attribute.name; }
 
-				data.data.attributes[ key ] = attributeData;
+				data.data.attributes[ key$1 ] = attributeData;
 
 			}
 
 			var morphAttributes = {};
 			var hasMorphAttributes = false;
 
-			for ( var key in this.morphAttributes ) {
+			for ( var key$2 in this.morphAttributes ) {
 
-				var attributeArray = this.morphAttributes[ key ];
+				var attributeArray = this.morphAttributes[ key$2 ];
 
 				var array = [];
 
 				for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
 
-					var attribute = attributeArray[ i ];
+					var attribute$1 = attributeArray[ i ];
 
-					var attributeData = attribute.toJSON();
+					var attributeData$1 = attribute$1.toJSON();
 
-					if ( attribute.name !== '' ) { attributeData.name = attribute.name; }
+					if ( attribute$1.name !== '' ) { attributeData$1.name = attribute$1.name; }
 
-					array.push( attributeData );
+					array.push( attributeData$1 );
 
 				}
 
 				if ( array.length > 0 ) {
 
-					morphAttributes[ key ] = array;
+					morphAttributes[ key$2 ] = array;
 
 					hasMorphAttributes = true;
 
@@ -11116,19 +11119,19 @@
 			/*
 			 // Handle primitives
 
-			 var parameters = this.parameters;
+			 const parameters = this.parameters;
 
 			 if ( parameters !== undefined ) {
 
-			 var values = [];
+			 const values = [];
 
-			 for ( var key in parameters ) {
+			 for ( const key in parameters ) {
 
 			 values.push( parameters[ key ] );
 
 			 }
 
-			 var geometry = Object.create( this.constructor.prototype );
+			 const geometry = Object.create( this.constructor.prototype );
 			 this.constructor.apply( geometry, values );
 			 return geometry;
 
@@ -11142,8 +11145,6 @@
 		},
 
 		copy: function ( source ) {
-
-			var name, i, l;
 
 			// reset
 
@@ -11172,7 +11173,7 @@
 
 			var attributes = source.attributes;
 
-			for ( name in attributes ) {
+			for ( var name in attributes ) {
 
 				var attribute = attributes[ name ];
 				this.setAttribute( name, attribute.clone() );
@@ -11183,18 +11184,18 @@
 
 			var morphAttributes = source.morphAttributes;
 
-			for ( name in morphAttributes ) {
+			for ( var name$1 in morphAttributes ) {
 
 				var array = [];
-				var morphAttribute = morphAttributes[ name ]; // morphAttribute: array of Float32BufferAttributes
+				var morphAttribute = morphAttributes[ name$1 ]; // morphAttribute: array of Float32BufferAttributes
 
-				for ( i = 0, l = morphAttribute.length; i < l; i ++ ) {
+				for ( var i = 0, l = morphAttribute.length; i < l; i ++ ) {
 
 					array.push( morphAttribute[ i ].clone() );
 
 				}
 
-				this.morphAttributes[ name ] = array;
+				this.morphAttributes[ name$1 ] = array;
 
 			}
 
@@ -11204,9 +11205,9 @@
 
 			var groups = source.groups;
 
-			for ( i = 0, l = groups.length; i < l; i ++ ) {
+			for ( var i$1 = 0, l$1 = groups.length; i$1 < l$1; i$1 ++ ) {
 
-				var group = groups[ i ];
+				var group = groups[ i$1 ];
 				this.addGroup( group.start, group.count, group.materialIndex );
 
 			}
@@ -11317,6 +11318,9 @@
 
 			}
 
+			this.material = source.material;
+			this.geometry = source.geometry;
+
 			return this;
 
 		},
@@ -11324,7 +11328,6 @@
 		updateMorphTargets: function () {
 
 			var geometry = this.geometry;
-			var m, ml, name;
 
 			if ( geometry.isBufferGeometry ) {
 
@@ -11340,9 +11343,9 @@
 						this.morphTargetInfluences = [];
 						this.morphTargetDictionary = {};
 
-						for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+						for ( var m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
 
-							name = morphAttribute[ m ].name || String( m );
+							var name = morphAttribute[ m ].name || String( m );
 
 							this.morphTargetInfluences.push( 0 );
 							this.morphTargetDictionary[ name ] = m;
@@ -11401,7 +11404,6 @@
 
 			if ( geometry.isBufferGeometry ) {
 
-				var a, b, c;
 				var index = geometry.index;
 				var position = geometry.attributes.position;
 				var morphPosition = geometry.morphAttributes.position;
@@ -11410,9 +11412,6 @@
 				var uv2 = geometry.attributes.uv2;
 				var groups = geometry.groups;
 				var drawRange = geometry.drawRange;
-				var i, j, il, jl;
-				var group, groupMaterial;
-				var start, end;
 
 				if ( index !== null ) {
 
@@ -11420,19 +11419,19 @@
 
 					if ( Array.isArray( material ) ) {
 
-						for ( i = 0, il = groups.length; i < il; i ++ ) {
+						for ( var i = 0, il = groups.length; i < il; i ++ ) {
 
-							group = groups[ i ];
-							groupMaterial = material[ group.materialIndex ];
+							var group = groups[ i ];
+							var groupMaterial = material[ group.materialIndex ];
 
-							start = Math.max( group.start, drawRange.start );
-							end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+							var start = Math.max( group.start, drawRange.start );
+							var end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
 
-							for ( j = start, jl = end; j < jl; j += 3 ) {
+							for ( var j = start, jl = end; j < jl; j += 3 ) {
 
-								a = index.getX( j );
-								b = index.getX( j + 1 );
-								c = index.getX( j + 2 );
+								var a = index.getX( j );
+								var b = index.getX( j + 1 );
+								var c = index.getX( j + 2 );
 
 								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
 
@@ -11450,20 +11449,20 @@
 
 					} else {
 
-						start = Math.max( 0, drawRange.start );
-						end = Math.min( index.count, ( drawRange.start + drawRange.count ) );
+						var start$1 = Math.max( 0, drawRange.start );
+						var end$1 = Math.min( index.count, ( drawRange.start + drawRange.count ) );
 
-						for ( i = start, il = end; i < il; i += 3 ) {
+						for ( var i$1 = start$1, il$1 = end$1; i$1 < il$1; i$1 += 3 ) {
 
-							a = index.getX( i );
-							b = index.getX( i + 1 );
-							c = index.getX( i + 2 );
+							var a$1 = index.getX( i$1 );
+							var b$1 = index.getX( i$1 + 1 );
+							var c$1 = index.getX( i$1 + 2 );
 
-							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a$1, b$1, c$1 );
 
 							if ( intersection ) {
 
-								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in indexed buffer semantics
+								intersection.faceIndex = Math.floor( i$1 / 3 ); // triangle number in indexed buffer semantics
 								intersects.push( intersection );
 
 							}
@@ -11478,26 +11477,26 @@
 
 					if ( Array.isArray( material ) ) {
 
-						for ( i = 0, il = groups.length; i < il; i ++ ) {
+						for ( var i$2 = 0, il$2 = groups.length; i$2 < il$2; i$2 ++ ) {
 
-							group = groups[ i ];
-							groupMaterial = material[ group.materialIndex ];
+							var group$1 = groups[ i$2 ];
+							var groupMaterial$1 = material[ group$1.materialIndex ];
 
-							start = Math.max( group.start, drawRange.start );
-							end = Math.min( ( group.start + group.count ), ( drawRange.start + drawRange.count ) );
+							var start$2 = Math.max( group$1.start, drawRange.start );
+							var end$2 = Math.min( ( group$1.start + group$1.count ), ( drawRange.start + drawRange.count ) );
 
-							for ( j = start, jl = end; j < jl; j += 3 ) {
+							for ( var j$1 = start$2, jl$1 = end$2; j$1 < jl$1; j$1 += 3 ) {
 
-								a = j;
-								b = j + 1;
-								c = j + 2;
+								var a$2 = j$1;
+								var b$2 = j$1 + 1;
+								var c$2 = j$1 + 2;
 
-								intersection = checkBufferGeometryIntersection( this, groupMaterial, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+								intersection = checkBufferGeometryIntersection( this, groupMaterial$1, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a$2, b$2, c$2 );
 
 								if ( intersection ) {
 
-									intersection.faceIndex = Math.floor( j / 3 ); // triangle number in non-indexed buffer semantics
-									intersection.face.materialIndex = group.materialIndex;
+									intersection.faceIndex = Math.floor( j$1 / 3 ); // triangle number in non-indexed buffer semantics
+									intersection.face.materialIndex = group$1.materialIndex;
 									intersects.push( intersection );
 
 								}
@@ -11508,20 +11507,20 @@
 
 					} else {
 
-						start = Math.max( 0, drawRange.start );
-						end = Math.min( position.count, ( drawRange.start + drawRange.count ) );
+						var start$3 = Math.max( 0, drawRange.start );
+						var end$3 = Math.min( position.count, ( drawRange.start + drawRange.count ) );
 
-						for ( i = start, il = end; i < il; i += 3 ) {
+						for ( var i$3 = start$3, il$3 = end$3; i$3 < il$3; i$3 += 3 ) {
 
-							a = i;
-							b = i + 1;
-							c = i + 2;
+							var a$3 = i$3;
+							var b$3 = i$3 + 1;
+							var c$3 = i$3 + 2;
 
-							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a, b, c );
+							intersection = checkBufferGeometryIntersection( this, material, raycaster, _ray, position, morphPosition, morphTargetsRelative, uv, uv2, a$3, b$3, c$3 );
 
 							if ( intersection ) {
 
-								intersection.faceIndex = Math.floor( i / 3 ); // triangle number in non-indexed buffer semantics
+								intersection.faceIndex = Math.floor( i$3 / 3 ); // triangle number in non-indexed buffer semantics
 								intersects.push( intersection );
 
 							}
@@ -11534,7 +11533,6 @@
 
 			} else if ( geometry.isGeometry ) {
 
-				var fvA, fvB, fvC;
 				var isMultiMaterial = Array.isArray( material );
 
 				var vertices = geometry.vertices;
@@ -11551,9 +11549,9 @@
 
 					if ( faceMaterial === undefined ) { continue; }
 
-					fvA = vertices[ face.a ];
-					fvB = vertices[ face.b ];
-					fvC = vertices[ face.c ];
+					var fvA = vertices[ face.a ];
+					var fvB = vertices[ face.b ];
+					var fvC = vertices[ face.c ];
 
 					intersection = checkIntersection( this, faceMaterial, raycaster, _ray, fvA, fvB, fvC, _intersectionPoint );
 
@@ -11579,12 +11577,6 @@
 				}
 
 			}
-
-		},
-
-		clone: function () {
-
-			return new this.constructor( this.geometry, this.material ).copy( this );
 
 		}
 
@@ -11779,9 +11771,9 @@
 
 			}
 
-			for ( var i = 0, il = this.faces.length; i < il; i ++ ) {
+			for ( var i$1 = 0, il$1 = this.faces.length; i$1 < il$1; i$1 ++ ) {
 
-				var face = this.faces[ i ];
+				var face = this.faces[ i$1 ];
 				face.normal.applyMatrix3( normalMatrix ).normalize();
 
 				for ( var j = 0, jl = face.vertexNormals.length; j < jl; j ++ ) {
@@ -11960,9 +11952,9 @@
 
 			if ( groups.length > 0 ) {
 
-				for ( var i = 0; i < groups.length; i ++ ) {
+				for ( var i$1 = 0; i$1 < groups.length; i$1 ++ ) {
 
-					var group = groups[ i ];
+					var group = groups[ i$1 ];
 
 					var start = group.start;
 					var count = group.count;
@@ -11987,17 +11979,17 @@
 
 				if ( indices !== undefined ) {
 
-					for ( var i = 0; i < indices.length; i += 3 ) {
+					for ( var i$2 = 0; i$2 < indices.length; i$2 += 3 ) {
 
-						addFace( indices[ i ], indices[ i + 1 ], indices[ i + 2 ] );
+						addFace( indices[ i$2 ], indices[ i$2 + 1 ], indices[ i$2 + 2 ] );
 
 					}
 
 				} else {
 
-					for ( var i = 0; i < positions.length / 3; i += 3 ) {
+					for ( var i$3 = 0; i$3 < positions.length / 3; i$3 += 3 ) {
 
-						addFace( i, i + 1, i + 2 );
+						addFace( i$3, i$3 + 1, i$3 + 2 );
 
 					}
 
@@ -12086,11 +12078,9 @@
 
 			if ( areaWeighted === undefined ) { areaWeighted = true; }
 
-			var v, vl, f, fl, face, vertices;
+			var vertices = new Array( this.vertices.length );
 
-			vertices = new Array( this.vertices.length );
-
-			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+			for ( var v = 0, vl = this.vertices.length; v < vl; v ++ ) {
 
 				vertices[ v ] = new Vector3();
 
@@ -12101,16 +12091,15 @@
 				// vertex normals weighted by triangle areas
 				// http://www.iquilezles.org/www/articles/normals/normals.htm
 
-				var vA, vB, vC;
 				var cb = new Vector3(), ab = new Vector3();
 
-				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+				for ( var f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
-					face = this.faces[ f ];
+					var face = this.faces[ f ];
 
-					vA = this.vertices[ face.a ];
-					vB = this.vertices[ face.b ];
-					vC = this.vertices[ face.c ];
+					var vA = this.vertices[ face.a ];
+					var vB = this.vertices[ face.b ];
+					var vC = this.vertices[ face.c ];
 
 					cb.subVectors( vC, vB );
 					ab.subVectors( vA, vB );
@@ -12126,41 +12115,41 @@
 
 				this.computeFaceNormals();
 
-				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+				for ( var f$1 = 0, fl$1 = this.faces.length; f$1 < fl$1; f$1 ++ ) {
 
-					face = this.faces[ f ];
+					var face$1 = this.faces[ f$1 ];
 
-					vertices[ face.a ].add( face.normal );
-					vertices[ face.b ].add( face.normal );
-					vertices[ face.c ].add( face.normal );
+					vertices[ face$1.a ].add( face$1.normal );
+					vertices[ face$1.b ].add( face$1.normal );
+					vertices[ face$1.c ].add( face$1.normal );
 
 				}
 
 			}
 
-			for ( v = 0, vl = this.vertices.length; v < vl; v ++ ) {
+			for ( var v$1 = 0, vl$1 = this.vertices.length; v$1 < vl$1; v$1 ++ ) {
 
-				vertices[ v ].normalize();
+				vertices[ v$1 ].normalize();
 
 			}
 
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+			for ( var f$2 = 0, fl$2 = this.faces.length; f$2 < fl$2; f$2 ++ ) {
 
-				face = this.faces[ f ];
+				var face$2 = this.faces[ f$2 ];
 
-				var vertexNormals = face.vertexNormals;
+				var vertexNormals = face$2.vertexNormals;
 
 				if ( vertexNormals.length === 3 ) {
 
-					vertexNormals[ 0 ].copy( vertices[ face.a ] );
-					vertexNormals[ 1 ].copy( vertices[ face.b ] );
-					vertexNormals[ 2 ].copy( vertices[ face.c ] );
+					vertexNormals[ 0 ].copy( vertices[ face$2.a ] );
+					vertexNormals[ 1 ].copy( vertices[ face$2.b ] );
+					vertexNormals[ 2 ].copy( vertices[ face$2.c ] );
 
 				} else {
 
-					vertexNormals[ 0 ] = vertices[ face.a ].clone();
-					vertexNormals[ 1 ] = vertices[ face.b ].clone();
-					vertexNormals[ 2 ] = vertices[ face.c ].clone();
+					vertexNormals[ 0 ] = vertices[ face$2.a ].clone();
+					vertexNormals[ 1 ] = vertices[ face$2.b ].clone();
+					vertexNormals[ 2 ] = vertices[ face$2.c ].clone();
 
 				}
 
@@ -12176,13 +12165,11 @@
 
 		computeFlatVertexNormals: function () {
 
-			var f, fl, face;
-
 			this.computeFaceNormals();
 
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+			for ( var f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
-				face = this.faces[ f ];
+				var face = this.faces[ f ];
 
 				var vertexNormals = face.vertexNormals;
 
@@ -12212,15 +12199,13 @@
 
 		computeMorphNormals: function () {
 
-			var i, il, f, fl, face;
-
 			// save original normals
 			// - create temp variables on first access
 			//   otherwise just copy (for faster repeated calls)
 
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+			for ( var f = 0, fl = this.faces.length; f < fl; f ++ ) {
 
-				face = this.faces[ f ];
+				var face = this.faces[ f ];
 
 				if ( ! face.__originalFaceNormal ) {
 
@@ -12234,7 +12219,7 @@
 
 				if ( ! face.__originalVertexNormals ) { face.__originalVertexNormals = []; }
 
-				for ( i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
+				for ( var i = 0, il = face.vertexNormals.length; i < il; i ++ ) {
 
 					if ( ! face.__originalVertexNormals[ i ] ) {
 
@@ -12255,25 +12240,23 @@
 			var tmpGeo = new Geometry();
 			tmpGeo.faces = this.faces;
 
-			for ( i = 0, il = this.morphTargets.length; i < il; i ++ ) {
+			for ( var i$1 = 0, il$1 = this.morphTargets.length; i$1 < il$1; i$1 ++ ) {
 
 				// create on first access
 
-				if ( ! this.morphNormals[ i ] ) {
+				if ( ! this.morphNormals[ i$1 ] ) {
 
-					this.morphNormals[ i ] = {};
-					this.morphNormals[ i ].faceNormals = [];
-					this.morphNormals[ i ].vertexNormals = [];
+					this.morphNormals[ i$1 ] = {};
+					this.morphNormals[ i$1 ].faceNormals = [];
+					this.morphNormals[ i$1 ].vertexNormals = [];
 
-					var dstNormalsFace = this.morphNormals[ i ].faceNormals;
-					var dstNormalsVertex = this.morphNormals[ i ].vertexNormals;
+					var dstNormalsFace = this.morphNormals[ i$1 ].faceNormals;
+					var dstNormalsVertex = this.morphNormals[ i$1 ].vertexNormals;
 
-					var faceNormal, vertexNormals;
+					for ( var f$1 = 0, fl$1 = this.faces.length; f$1 < fl$1; f$1 ++ ) {
 
-					for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
-
-						faceNormal = new Vector3();
-						vertexNormals = { a: new Vector3(), b: new Vector3(), c: new Vector3() };
+						var faceNormal = new Vector3();
+						var vertexNormals = { a: new Vector3(), b: new Vector3(), c: new Vector3() };
 
 						dstNormalsFace.push( faceNormal );
 						dstNormalsVertex.push( vertexNormals );
@@ -12282,11 +12265,11 @@
 
 				}
 
-				var morphNormals = this.morphNormals[ i ];
+				var morphNormals = this.morphNormals[ i$1 ];
 
 				// set vertices to morph target
 
-				tmpGeo.vertices = this.morphTargets[ i ].vertices;
+				tmpGeo.vertices = this.morphTargets[ i$1 ].vertices;
 
 				// compute morph normals
 
@@ -12295,20 +12278,18 @@
 
 				// store morph normals
 
-				var faceNormal, vertexNormals;
+				for ( var f$2 = 0, fl$2 = this.faces.length; f$2 < fl$2; f$2 ++ ) {
 
-				for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+					var face$1 = this.faces[ f$2 ];
 
-					face = this.faces[ f ];
+					var faceNormal$1 = morphNormals.faceNormals[ f$2 ];
+					var vertexNormals$1 = morphNormals.vertexNormals[ f$2 ];
 
-					faceNormal = morphNormals.faceNormals[ f ];
-					vertexNormals = morphNormals.vertexNormals[ f ];
+					faceNormal$1.copy( face$1.normal );
 
-					faceNormal.copy( face.normal );
-
-					vertexNormals.a.copy( face.vertexNormals[ 0 ] );
-					vertexNormals.b.copy( face.vertexNormals[ 1 ] );
-					vertexNormals.c.copy( face.vertexNormals[ 2 ] );
+					vertexNormals$1.a.copy( face$1.vertexNormals[ 0 ] );
+					vertexNormals$1.b.copy( face$1.vertexNormals[ 1 ] );
+					vertexNormals$1.c.copy( face$1.vertexNormals[ 2 ] );
 
 				}
 
@@ -12316,12 +12297,12 @@
 
 			// restore original normals
 
-			for ( f = 0, fl = this.faces.length; f < fl; f ++ ) {
+			for ( var f$3 = 0, fl$3 = this.faces.length; f$3 < fl$3; f$3 ++ ) {
 
-				face = this.faces[ f ];
+				var face$2 = this.faces[ f$3 ];
 
-				face.normal = face.__originalFaceNormal;
-				face.vertexNormals = face.__originalVertexNormals;
+				face$2.normal = face$2.__originalFaceNormal;
+				face$2.vertexNormals = face$2.__originalVertexNormals;
 
 			}
 
@@ -12393,17 +12374,17 @@
 
 			// colors
 
-			for ( var i = 0, il = colors2.length; i < il; i ++ ) {
+			for ( var i$1 = 0, il$1 = colors2.length; i$1 < il$1; i$1 ++ ) {
 
-				colors1.push( colors2[ i ].clone() );
+				colors1.push( colors2[ i$1 ].clone() );
 
 			}
 
 			// faces
 
-			for ( i = 0, il = faces2.length; i < il; i ++ ) {
+			for ( var i$2 = 0, il$2 = faces2.length; i$2 < il$2; i$2 ++ ) {
 
-				var face = faces2[ i ], faceCopy, normal, color,
+				var face = faces2[ i$2 ], faceCopy = (void 0), normal = (void 0), color = (void 0),
 					faceVertexNormals = face.vertexNormals,
 					faceVertexColors = face.vertexColors;
 
@@ -12432,9 +12413,9 @@
 
 				faceCopy.color.copy( face.color );
 
-				for ( var j = 0, jl = faceVertexColors.length; j < jl; j ++ ) {
+				for ( var j$1 = 0, jl$1 = faceVertexColors.length; j$1 < jl$1; j$1 ++ ) {
 
-					color = faceVertexColors[ j ];
+					color = faceVertexColors[ j$1 ];
 					faceCopy.vertexColors.push( color.clone() );
 
 				}
@@ -12447,15 +12428,15 @@
 
 			// uvs
 
-			for ( var i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
+			for ( var i$3 = 0, il$3 = geometry.faceVertexUvs.length; i$3 < il$3; i$3 ++ ) {
 
-				var faceVertexUvs2 = geometry.faceVertexUvs[ i ];
+				var faceVertexUvs2 = geometry.faceVertexUvs[ i$3 ];
 
-				if ( this.faceVertexUvs[ i ] === undefined ) { this.faceVertexUvs[ i ] = []; }
+				if ( this.faceVertexUvs[ i$3 ] === undefined ) { this.faceVertexUvs[ i$3 ] = []; }
 
-				for ( var j = 0, jl = faceVertexUvs2.length; j < jl; j ++ ) {
+				for ( var j$2 = 0, jl$2 = faceVertexUvs2.length; j$2 < jl$2; j$2 ++ ) {
 
-					var uvs2 = faceVertexUvs2[ j ], uvsCopy = [];
+					var uvs2 = faceVertexUvs2[ j$2 ], uvsCopy = [];
 
 					for ( var k = 0, kl = uvs2.length; k < kl; k ++ ) {
 
@@ -12463,7 +12444,7 @@
 
 					}
 
-					this.faceVertexUvs[ i ].push( uvsCopy );
+					this.faceVertexUvs[ i$3 ].push( uvsCopy );
 
 				}
 
@@ -12497,16 +12478,13 @@
 			var verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
 			var unique = [], changes = [];
 
-			var v, key;
 			var precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
 			var precision = Math.pow( 10, precisionPoints );
-			var i, il, face;
-			var indices, j, jl;
 
-			for ( i = 0, il = this.vertices.length; i < il; i ++ ) {
+			for ( var i = 0, il = this.vertices.length; i < il; i ++ ) {
 
-				v = this.vertices[ i ];
-				key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision );
+				var v = this.vertices[ i ];
+				var key = Math.round( v.x * precision ) + '_' + Math.round( v.y * precision ) + '_' + Math.round( v.z * precision );
 
 				if ( verticesMap[ key ] === undefined ) {
 
@@ -12528,15 +12506,15 @@
 			// have to remove them from the geometry.
 			var faceIndicesToRemove = [];
 
-			for ( i = 0, il = this.faces.length; i < il; i ++ ) {
+			for ( var i$1 = 0, il$1 = this.faces.length; i$1 < il$1; i$1 ++ ) {
 
-				face = this.faces[ i ];
+				var face = this.faces[ i$1 ];
 
 				face.a = changes[ face.a ];
 				face.b = changes[ face.b ];
 				face.c = changes[ face.c ];
 
-				indices = [ face.a, face.b, face.c ];
+				var indices = [ face.a, face.b, face.c ];
 
 				// if any duplicate vertices are found in a Face3
 				// we have to remove the face as nothing can be saved
@@ -12544,7 +12522,7 @@
 
 					if ( indices[ n ] === indices[ ( n + 1 ) % 3 ] ) {
 
-						faceIndicesToRemove.push( i );
+						faceIndicesToRemove.push( i$1 );
 						break;
 
 					}
@@ -12553,13 +12531,13 @@
 
 			}
 
-			for ( i = faceIndicesToRemove.length - 1; i >= 0; i -- ) {
+			for ( var i$2 = faceIndicesToRemove.length - 1; i$2 >= 0; i$2 -- ) {
 
-				var idx = faceIndicesToRemove[ i ];
+				var idx = faceIndicesToRemove[ i$2 ];
 
 				this.faces.splice( idx, 1 );
 
-				for ( j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = this.faceVertexUvs.length; j < jl; j ++ ) {
 
 					this.faceVertexUvs[ j ].splice( idx, 1 );
 
@@ -12623,9 +12601,9 @@
 			if ( uvs1 && uvs1.length === length ) { newUvs1 = []; }
 			if ( uvs2 && uvs2.length === length ) { newUvs2 = []; }
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( var i$1 = 0; i$1 < length; i$1 ++ ) {
 
-				var id = faces[ i ]._id;
+				var id = faces[ i$1 ]._id;
 
 				if ( newUvs1 ) { newUvs1.push( uvs1[ id ] ); }
 				if ( newUvs2 ) { newUvs2.push( uvs2[ id ] ); }
@@ -12684,13 +12662,13 @@
 			var uvs = [];
 			var uvsHash = {};
 
-			for ( var i = 0; i < this.faces.length; i ++ ) {
+			for ( var i$1 = 0; i$1 < this.faces.length; i$1 ++ ) {
 
-				var face = this.faces[ i ];
+				var face = this.faces[ i$1 ];
 
 				var hasMaterial = true;
 				var hasFaceUv = false; // deprecated
-				var hasFaceVertexUv = this.faceVertexUvs[ 0 ][ i ] !== undefined;
+				var hasFaceVertexUv = this.faceVertexUvs[ 0 ][ i$1 ] !== undefined;
 				var hasFaceNormal = face.normal.length() > 0;
 				var hasFaceVertexNormal = face.vertexNormals.length > 0;
 				var hasFaceColor = face.color.r !== 1 || face.color.g !== 1 || face.color.b !== 1;
@@ -12713,7 +12691,7 @@
 
 				if ( hasFaceVertexUv ) {
 
-					var faceVertexUvs = this.faceVertexUvs[ 0 ][ i ];
+					var faceVertexUvs = this.faceVertexUvs[ 0 ][ i$1 ];
 
 					faces.push(
 						getUvIndex( faceVertexUvs[ 0 ] ),
@@ -12835,19 +12813,19 @@
 			/*
 			 // Handle primitives
 
-			 var parameters = this.parameters;
+			 const parameters = this.parameters;
 
 			 if ( parameters !== undefined ) {
 
-			 var values = [];
+			 const values = [];
 
-			 for ( var key in parameters ) {
+			 for ( const key in parameters ) {
 
 			 values.push( parameters[ key ] );
 
 			 }
 
-			 var geometry = Object.create( this.constructor.prototype );
+			 const geometry = Object.create( this.constructor.prototype );
 			 this.constructor.apply( geometry, values );
 			 return geometry;
 
@@ -12861,8 +12839,6 @@
 		},
 
 		copy: function ( source ) {
-
-			var i, il, j, jl, k, kl;
 
 			// reset
 
@@ -12886,7 +12862,7 @@
 
 			var vertices = source.vertices;
 
-			for ( i = 0, il = vertices.length; i < il; i ++ ) {
+			for ( var i = 0, il = vertices.length; i < il; i ++ ) {
 
 				this.vertices.push( vertices[ i ].clone() );
 
@@ -12896,9 +12872,9 @@
 
 			var colors = source.colors;
 
-			for ( i = 0, il = colors.length; i < il; i ++ ) {
+			for ( var i$1 = 0, il$1 = colors.length; i$1 < il$1; i$1 ++ ) {
 
-				this.colors.push( colors[ i ].clone() );
+				this.colors.push( colors[ i$1 ].clone() );
 
 			}
 
@@ -12906,29 +12882,29 @@
 
 			var faces = source.faces;
 
-			for ( i = 0, il = faces.length; i < il; i ++ ) {
+			for ( var i$2 = 0, il$2 = faces.length; i$2 < il$2; i$2 ++ ) {
 
-				this.faces.push( faces[ i ].clone() );
+				this.faces.push( faces[ i$2 ].clone() );
 
 			}
 
 			// face vertex uvs
 
-			for ( i = 0, il = source.faceVertexUvs.length; i < il; i ++ ) {
+			for ( var i$3 = 0, il$3 = source.faceVertexUvs.length; i$3 < il$3; i$3 ++ ) {
 
-				var faceVertexUvs = source.faceVertexUvs[ i ];
+				var faceVertexUvs = source.faceVertexUvs[ i$3 ];
 
-				if ( this.faceVertexUvs[ i ] === undefined ) {
+				if ( this.faceVertexUvs[ i$3 ] === undefined ) {
 
-					this.faceVertexUvs[ i ] = [];
+					this.faceVertexUvs[ i$3 ] = [];
 
 				}
 
-				for ( j = 0, jl = faceVertexUvs.length; j < jl; j ++ ) {
+				for ( var j = 0, jl = faceVertexUvs.length; j < jl; j ++ ) {
 
 					var uvs = faceVertexUvs[ j ], uvsCopy = [];
 
-					for ( k = 0, kl = uvs.length; k < kl; k ++ ) {
+					for ( var k = 0, kl = uvs.length; k < kl; k ++ ) {
 
 						var uv = uvs[ k ];
 
@@ -12936,7 +12912,7 @@
 
 					}
 
-					this.faceVertexUvs[ i ].push( uvsCopy );
+					this.faceVertexUvs[ i$3 ].push( uvsCopy );
 
 				}
 
@@ -12946,20 +12922,20 @@
 
 			var morphTargets = source.morphTargets;
 
-			for ( i = 0, il = morphTargets.length; i < il; i ++ ) {
+			for ( var i$4 = 0, il$4 = morphTargets.length; i$4 < il$4; i$4 ++ ) {
 
 				var morphTarget = {};
-				morphTarget.name = morphTargets[ i ].name;
+				morphTarget.name = morphTargets[ i$4 ].name;
 
 				// vertices
 
-				if ( morphTargets[ i ].vertices !== undefined ) {
+				if ( morphTargets[ i$4 ].vertices !== undefined ) {
 
 					morphTarget.vertices = [];
 
-					for ( j = 0, jl = morphTargets[ i ].vertices.length; j < jl; j ++ ) {
+					for ( var j$1 = 0, jl$1 = morphTargets[ i$4 ].vertices.length; j$1 < jl$1; j$1 ++ ) {
 
-						morphTarget.vertices.push( morphTargets[ i ].vertices[ j ].clone() );
+						morphTarget.vertices.push( morphTargets[ i$4 ].vertices[ j$1 ].clone() );
 
 					}
 
@@ -12967,13 +12943,13 @@
 
 				// normals
 
-				if ( morphTargets[ i ].normals !== undefined ) {
+				if ( morphTargets[ i$4 ].normals !== undefined ) {
 
 					morphTarget.normals = [];
 
-					for ( j = 0, jl = morphTargets[ i ].normals.length; j < jl; j ++ ) {
+					for ( var j$2 = 0, jl$2 = morphTargets[ i$4 ].normals.length; j$2 < jl$2; j$2 ++ ) {
 
-						morphTarget.normals.push( morphTargets[ i ].normals[ j ].clone() );
+						morphTarget.normals.push( morphTargets[ i$4 ].normals[ j$2 ].clone() );
 
 					}
 
@@ -12987,19 +12963,19 @@
 
 			var morphNormals = source.morphNormals;
 
-			for ( i = 0, il = morphNormals.length; i < il; i ++ ) {
+			for ( var i$5 = 0, il$5 = morphNormals.length; i$5 < il$5; i$5 ++ ) {
 
 				var morphNormal = {};
 
 				// vertex normals
 
-				if ( morphNormals[ i ].vertexNormals !== undefined ) {
+				if ( morphNormals[ i$5 ].vertexNormals !== undefined ) {
 
 					morphNormal.vertexNormals = [];
 
-					for ( j = 0, jl = morphNormals[ i ].vertexNormals.length; j < jl; j ++ ) {
+					for ( var j$3 = 0, jl$3 = morphNormals[ i$5 ].vertexNormals.length; j$3 < jl$3; j$3 ++ ) {
 
-						var srcVertexNormal = morphNormals[ i ].vertexNormals[ j ];
+						var srcVertexNormal = morphNormals[ i$5 ].vertexNormals[ j$3 ];
 						var destVertexNormal = {};
 
 						destVertexNormal.a = srcVertexNormal.a.clone();
@@ -13014,13 +12990,13 @@
 
 				// face normals
 
-				if ( morphNormals[ i ].faceNormals !== undefined ) {
+				if ( morphNormals[ i$5 ].faceNormals !== undefined ) {
 
 					morphNormal.faceNormals = [];
 
-					for ( j = 0, jl = morphNormals[ i ].faceNormals.length; j < jl; j ++ ) {
+					for ( var j$4 = 0, jl$4 = morphNormals[ i$5 ].faceNormals.length; j$4 < jl$4; j$4 ++ ) {
 
-						morphNormal.faceNormals.push( morphNormals[ i ].faceNormals[ j ].clone() );
+						morphNormal.faceNormals.push( morphNormals[ i$5 ].faceNormals[ j$4 ].clone() );
 
 					}
 
@@ -13034,9 +13010,9 @@
 
 			var skinWeights = source.skinWeights;
 
-			for ( i = 0, il = skinWeights.length; i < il; i ++ ) {
+			for ( var i$6 = 0, il$6 = skinWeights.length; i$6 < il$6; i$6 ++ ) {
 
-				this.skinWeights.push( skinWeights[ i ].clone() );
+				this.skinWeights.push( skinWeights[ i$6 ].clone() );
 
 			}
 
@@ -13044,9 +13020,9 @@
 
 			var skinIndices = source.skinIndices;
 
-			for ( i = 0, il = skinIndices.length; i < il; i ++ ) {
+			for ( var i$7 = 0, il$7 = skinIndices.length; i$7 < il$7; i$7 ++ ) {
 
-				this.skinIndices.push( skinIndices[ i ].clone() );
+				this.skinIndices.push( skinIndices[ i$7 ].clone() );
 
 			}
 
@@ -13054,9 +13030,9 @@
 
 			var lineDistances = source.lineDistances;
 
-			for ( i = 0, il = lineDistances.length; i < il; i ++ ) {
+			for ( var i$8 = 0, il$8 = lineDistances.length; i$8 < il$8; i$8 ++ ) {
 
-				this.lineDistances.push( lineDistances[ i ] );
+				this.lineDistances.push( lineDistances[ i$8 ] );
 
 			}
 
@@ -13778,10 +13754,10 @@
 		 *
 		 * then for each monitor you would call it like this
 		 *
-		 *   var w = 1920;
-		 *   var h = 1080;
-		 *   var fullWidth = w * 3;
-		 *   var fullHeight = h * 2;
+		 *   const w = 1920;
+		 *   const h = 1080;
+		 *   const fullWidth = w * 3;
+		 *   const fullHeight = h * 2;
 		 *
 		 *   --A--
 		 *   camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );
@@ -16770,7 +16746,7 @@
 		// We're going to add .setXXX() methods for setting properties later.
 		// Users can still set in DataTexture3D directly.
 		//
-		//	var texture = new THREE.DataTexture3D( data, width, height, depth );
+		//	const texture = new THREE.DataTexture3D( data, width, height, depth );
 		// 	texture.anisotropy = 16;
 		//
 		// See #14839
@@ -25336,7 +25312,7 @@
 			}
 
 			//
-			scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
+			if ( scene.isScene ) { scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget ); }
 
 			currentRenderState = renderStates.get( scene, camera );
 			currentRenderState.init();
@@ -25412,7 +25388,7 @@
 
 			//
 
-			scene.onAfterRender( _this, scene, camera );
+			if ( scene.isScene ) { scene.onAfterRender( _this, scene, camera ); }
 
 			//
 
@@ -26856,6 +26832,7 @@
 
 			var rotation = this.material.rotation;
 			var sin, cos;
+
 			if ( rotation !== 0 ) {
 
 				cos = Math.cos( rotation );
@@ -26907,22 +26884,17 @@
 
 		},
 
-		clone: function () {
-
-			return new this.constructor( this.material ).copy( this );
-
-		},
-
 		copy: function ( source ) {
 
 			Object3D.prototype.copy.call( this, source );
 
 			if ( source.center !== undefined ) { this.center.copy( source.center ); }
 
+			this.material = source.material;
+
 			return this;
 
 		}
-
 
 	} );
 
@@ -27015,7 +26987,9 @@
 
 			var levels = this.levels;
 
-			for ( var l = 0; l < levels.length; l ++ ) {
+			var l;
+
+			for ( l = 0; l < levels.length; l ++ ) {
 
 				if ( distance < levels[ l ].distance ) {
 
@@ -27045,7 +27019,9 @@
 
 			if ( levels.length > 0 ) {
 
-				for ( var i = 1, l = levels.length; i < l; i ++ ) {
+				var i, l;
+
+				for ( i = 1, l = levels.length; i < l; i ++ ) {
 
 					if ( distance < levels[ i ].distance ) {
 
@@ -27092,7 +27068,9 @@
 
 				levels[ 0 ].object.visible = true;
 
-				for ( var i = 1, l = levels.length; i < l; i ++ ) {
+				var i, l;
+
+				for ( i = 1, l = levels.length; i < l; i ++ ) {
 
 					if ( distance >= levels[ i ].distance ) {
 
@@ -27176,6 +27154,20 @@
 
 		isSkinnedMesh: true,
 
+		copy: function ( source ) {
+
+			Mesh.prototype.copy.call( this, source );
+
+			this.bindMode = source.bindMode;
+			this.bindMatrix.copy( source.bindMatrix );
+			this.bindMatrixInverse.copy( source.bindMatrixInverse );
+
+			this.skeleton = source.skeleton;
+
+			return this;
+
+		},
+
 		bind: function ( skeleton, bindMatrix ) {
 
 			this.skeleton = skeleton;
@@ -27249,12 +27241,6 @@
 				console.warn( 'THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode );
 
 			}
-
-		},
-
-		clone: function () {
-
-			return new this.constructor( this.geometry, this.material ).copy( this );
 
 		},
 
@@ -27379,13 +27365,11 @@
 
 		pose: function () {
 
-			var bone, i, il;
-
 			// recover the bind-time world matrices
 
-			for ( i = 0, il = this.bones.length; i < il; i ++ ) {
+			for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
 
-				bone = this.bones[ i ];
+				var bone = this.bones[ i ];
 
 				if ( bone ) {
 
@@ -27397,24 +27381,24 @@
 
 			// compute the local matrices, positions, rotations and scales
 
-			for ( i = 0, il = this.bones.length; i < il; i ++ ) {
+			for ( var i$1 = 0, il$1 = this.bones.length; i$1 < il$1; i$1 ++ ) {
 
-				bone = this.bones[ i ];
+				var bone$1 = this.bones[ i$1 ];
 
-				if ( bone ) {
+				if ( bone$1 ) {
 
-					if ( bone.parent && bone.parent.isBone ) {
+					if ( bone$1.parent && bone$1.parent.isBone ) {
 
-						bone.matrix.getInverse( bone.parent.matrixWorld );
-						bone.matrix.multiply( bone.matrixWorld );
+						bone$1.matrix.getInverse( bone$1.parent.matrixWorld );
+						bone$1.matrix.multiply( bone$1.matrixWorld );
 
 					} else {
 
-						bone.matrix.copy( bone.matrixWorld );
+						bone$1.matrix.copy( bone$1.matrixWorld );
 
 					}
 
-					bone.matrix.decompose( bone.position, bone.quaternion, bone.scale );
+					bone$1.matrix.decompose( bone$1.position, bone$1.quaternion, bone$1.scale );
 
 				}
 
@@ -27538,6 +27522,17 @@
 		constructor: InstancedMesh,
 
 		isInstancedMesh: true,
+
+		copy: function ( source ) {
+
+			Mesh.prototype.copy.call( this, source );
+
+			this.instanceMatrix.copy( source.instanceMatrix );
+			this.count = source.count;
+
+			return this;
+
+		},
 
 		getMatrixAt: function ( index, matrix ) {
 
@@ -27686,6 +27681,17 @@
 
 		isLine: true,
 
+		copy: function ( source ) {
+
+			Object3D.prototype.copy.call( this, source );
+
+			this.material = source.material;
+			this.geometry = source.geometry;
+
+			return this;
+
+		},
+
 		computeLineDistances: function () {
 
 			var geometry = this.geometry;
@@ -27720,14 +27726,14 @@
 			} else if ( geometry.isGeometry ) {
 
 				var vertices = geometry.vertices;
-				var lineDistances = geometry.lineDistances;
+				var lineDistances$1 = geometry.lineDistances;
 
-				lineDistances[ 0 ] = 0;
+				lineDistances$1[ 0 ] = 0;
 
-				for ( var i = 1, l = vertices.length; i < l; i ++ ) {
+				for ( var i$1 = 1, l$1 = vertices.length; i$1 < l$1; i$1 ++ ) {
 
-					lineDistances[ i ] = lineDistances[ i - 1 ];
-					lineDistances[ i ] += vertices[ i - 1 ].distanceTo( vertices[ i ] );
+					lineDistances$1[ i$1 ] = lineDistances$1[ i$1 - 1 ];
+					lineDistances$1[ i$1 ] += vertices[ i$1 - 1 ].distanceTo( vertices[ i$1 ] );
 
 				}
 
@@ -27812,28 +27818,28 @@
 
 				} else {
 
-					for ( var i = 0, l = positions.length / 3 - 1; i < l; i += step ) {
+					for ( var i$1 = 0, l$1 = positions.length / 3 - 1; i$1 < l$1; i$1 += step ) {
 
-						vStart.fromArray( positions, 3 * i );
-						vEnd.fromArray( positions, 3 * i + 3 );
+						vStart.fromArray( positions, 3 * i$1 );
+						vEnd.fromArray( positions, 3 * i$1 + 3 );
 
-						var distSq = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
+						var distSq$1 = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
-						if ( distSq > localThresholdSq ) { continue; }
+						if ( distSq$1 > localThresholdSq ) { continue; }
 
 						interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
-						var distance = raycaster.ray.origin.distanceTo( interRay );
+						var distance$1 = raycaster.ray.origin.distanceTo( interRay );
 
-						if ( distance < raycaster.near || distance > raycaster.far ) { continue; }
+						if ( distance$1 < raycaster.near || distance$1 > raycaster.far ) { continue; }
 
 						intersects.push( {
 
-							distance: distance,
+							distance: distance$1,
 							// What do we want? intersection point on the ray or on the segment??
 							// point: raycaster.ray.at( distance ),
 							point: interSegment.clone().applyMatrix4( this.matrixWorld ),
-							index: i,
+							index: i$1,
 							face: null,
 							faceIndex: null,
 							object: this
@@ -27849,25 +27855,25 @@
 				var vertices = geometry.vertices;
 				var nbVertices = vertices.length;
 
-				for ( var i = 0; i < nbVertices - 1; i += step ) {
+				for ( var i$2 = 0; i$2 < nbVertices - 1; i$2 += step ) {
 
-					var distSq = _ray$1.distanceSqToSegment( vertices[ i ], vertices[ i + 1 ], interRay, interSegment );
+					var distSq$2 = _ray$1.distanceSqToSegment( vertices[ i$2 ], vertices[ i$2 + 1 ], interRay, interSegment );
 
-					if ( distSq > localThresholdSq ) { continue; }
+					if ( distSq$2 > localThresholdSq ) { continue; }
 
 					interRay.applyMatrix4( this.matrixWorld ); //Move back to world space for distance calculation
 
-					var distance = raycaster.ray.origin.distanceTo( interRay );
+					var distance$2 = raycaster.ray.origin.distanceTo( interRay );
 
-					if ( distance < raycaster.near || distance > raycaster.far ) { continue; }
+					if ( distance$2 < raycaster.near || distance$2 > raycaster.far ) { continue; }
 
 					intersects.push( {
 
-						distance: distance,
+						distance: distance$2,
 						// What do we want? intersection point on the ray or on the segment??
 						// point: raycaster.ray.at( distance ),
 						point: interSegment.clone().applyMatrix4( this.matrixWorld ),
-						index: i,
+						index: i$2,
 						face: null,
 						faceIndex: null,
 						object: this
@@ -27883,7 +27889,6 @@
 		updateMorphTargets: function () {
 
 			var geometry = this.geometry;
-			var m, ml, name;
 
 			if ( geometry.isBufferGeometry ) {
 
@@ -27899,9 +27904,9 @@
 						this.morphTargetInfluences = [];
 						this.morphTargetDictionary = {};
 
-						for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+						for ( var m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
 
-							name = morphAttribute[ m ].name || String( m );
+							var name = morphAttribute[ m ].name || String( m );
 
 							this.morphTargetInfluences.push( 0 );
 							this.morphTargetDictionary[ name ] = m;
@@ -27923,12 +27928,6 @@
 				}
 
 			}
-
-		},
-
-		clone: function () {
-
-			return new this.constructor( this.geometry, this.material ).copy( this );
 
 		}
 
@@ -27989,15 +27988,15 @@
 			} else if ( geometry.isGeometry ) {
 
 				var vertices = geometry.vertices;
-				var lineDistances = geometry.lineDistances;
+				var lineDistances$1 = geometry.lineDistances;
 
-				for ( var i = 0, l = vertices.length; i < l; i += 2 ) {
+				for ( var i$1 = 0, l$1 = vertices.length; i$1 < l$1; i$1 += 2 ) {
 
-					_start$1.copy( vertices[ i ] );
-					_end$1.copy( vertices[ i + 1 ] );
+					_start$1.copy( vertices[ i$1 ] );
+					_end$1.copy( vertices[ i$1 + 1 ] );
 
-					lineDistances[ i ] = ( i === 0 ) ? 0 : lineDistances[ i - 1 ];
-					lineDistances[ i + 1 ] = lineDistances[ i ] + _start$1.distanceTo( _end$1 );
+					lineDistances$1[ i$1 ] = ( i$1 === 0 ) ? 0 : lineDistances$1[ i$1 - 1 ];
+					lineDistances$1[ i$1 + 1 ] = lineDistances$1[ i$1 ] + _start$1.distanceTo( _end$1 );
 
 				}
 
@@ -28119,6 +28118,17 @@
 
 		isPoints: true,
 
+		copy: function ( source ) {
+
+			Object3D.prototype.copy.call( this, source );
+
+			this.material = source.material;
+			this.geometry = source.geometry;
+
+			return this;
+
+		},
+
 		raycast: function ( raycaster, intersects ) {
 
 			var geometry = this.geometry;
@@ -28165,11 +28175,11 @@
 
 				} else {
 
-					for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
+					for ( var i$1 = 0, l = positions.length / 3; i$1 < l; i$1 ++ ) {
 
-						_position$1.fromArray( positions, i * 3 );
+						_position$1.fromArray( positions, i$1 * 3 );
 
-						testPoint( _position$1, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
+						testPoint( _position$1, i$1, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
 					}
 
@@ -28179,9 +28189,9 @@
 
 				var vertices = geometry.vertices;
 
-				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+				for ( var i$2 = 0, l$1 = vertices.length; i$2 < l$1; i$2 ++ ) {
 
-					testPoint( vertices[ i ], i, localThresholdSq, matrixWorld, raycaster, intersects, this );
+					testPoint( vertices[ i$2 ], i$2, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
 				}
 
@@ -28192,7 +28202,6 @@
 		updateMorphTargets: function () {
 
 			var geometry = this.geometry;
-			var m, ml, name;
 
 			if ( geometry.isBufferGeometry ) {
 
@@ -28208,9 +28217,9 @@
 						this.morphTargetInfluences = [];
 						this.morphTargetDictionary = {};
 
-						for ( m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
+						for ( var m = 0, ml = morphAttribute.length; m < ml; m ++ ) {
 
-							name = morphAttribute[ m ].name || String( m );
+							var name = morphAttribute[ m ].name || String( m );
 
 							this.morphTargetInfluences.push( 0 );
 							this.morphTargetDictionary[ name ] = m;
@@ -28232,12 +28241,6 @@
 				}
 
 			}
-
-		},
-
-		clone: function () {
-
-			return new this.constructor( this.geometry, this.material ).copy( this );
 
 		}
 
@@ -30697,9 +30700,9 @@
 
 			//
 
-			for ( var i = 0; i < triangles.length; i += 3 ) {
+			for ( var i$1 = 0; i$1 < triangles.length; i$1 += 3 ) {
 
-				faces.push( triangles.slice( i, i + 3 ) );
+				faces.push( triangles.slice( i$1, i$1 + 3 ) );
 
 			}
 
@@ -34423,7 +34426,7 @@
 
 							// linear reverse scan
 
-							for ( var giveUpAt = i1 - 2; ; ) {
+							for ( var giveUpAt$1 = i1 - 2; ; ) {
 
 								if ( t0 === undefined ) {
 
@@ -34434,7 +34437,7 @@
 
 								}
 
-								if ( i1 === giveUpAt ) { break; } // this loop
+								if ( i1 === giveUpAt$1 ) { break; } // this loop
 
 								t1 = t0;
 								t0 = pp[ -- i1 - 1 ];
@@ -35370,9 +35373,9 @@
 				values = this.sampleValues,
 				stride = this.valueSize,
 
-				offset = i1 * stride,
-
 				alpha = ( t - t0 ) / ( t1 - t0 );
+
+			var offset = i1 * stride;
 
 			for ( var end = offset + stride; offset !== end; offset += 4 ) {
 
@@ -36249,14 +36252,15 @@
 			// Check for data: URI
 			var dataUriRegex = /^data:(.*?)(;base64)?,(.*)$/;
 			var dataUriRegexResult = url.match( dataUriRegex );
+			var request;
 
 			// Safari can not handle Data URIs through XMLHttpRequest so process manually
 			if ( dataUriRegexResult ) {
 
 				var mimeType = dataUriRegexResult[ 1 ];
 				var isBase64 = !! dataUriRegexResult[ 2 ];
-				var data = dataUriRegexResult[ 3 ];
 
+				var data = dataUriRegexResult[ 3 ];
 				data = decodeURIComponent( data );
 
 				if ( isBase64 ) { data = atob( data ); }
@@ -36349,7 +36353,7 @@
 
 				} );
 
-				var request = new XMLHttpRequest();
+				request = new XMLHttpRequest();
 
 				request.open( 'GET', url, true );
 
@@ -36383,10 +36387,10 @@
 
 					} else {
 
-						for ( var i = 0, il = callbacks.length; i < il; i ++ ) {
+						for ( var i$1 = 0, il$1 = callbacks.length; i$1 < il$1; i$1 ++ ) {
 
-							var callback = callbacks[ i ];
-							if ( callback.onError ) { callback.onError( event ); }
+							var callback$1 = callbacks[ i$1 ];
+							if ( callback$1.onError ) { callback$1.onError( event ); }
 
 						}
 
@@ -36585,6 +36589,8 @@
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 
+			var loaded = 0;
+
 			function loadTexture( i ) {
 
 				loader.load( url[ i ], function ( buffer ) {
@@ -36617,8 +36623,6 @@
 			}
 
 			if ( Array.isArray( url ) ) {
-
-				var loaded = 0;
 
 				for ( var i = 0, il = url.length; i < il; ++ i ) {
 
@@ -37090,11 +37094,11 @@
 
 			var cache = [];
 			var current, last = this.getPoint( 0 );
-			var p, sum = 0;
+			var sum = 0;
 
 			cache.push( 0 );
 
-			for ( p = 1; p <= divisions; p ++ ) {
+			for ( var p = 1; p <= divisions; p ++ ) {
 
 				current = this.getPoint( p / divisions );
 				sum += current.distanceTo( last );
@@ -37239,13 +37243,11 @@
 			var vec = new Vector3();
 			var mat = new Matrix4();
 
-			var i, u, theta;
-
 			// compute the tangent vectors for each segment on the curve
 
-			for ( i = 0; i <= segments; i ++ ) {
+			for ( var i = 0; i <= segments; i ++ ) {
 
-				u = i / segments;
+				var u = i / segments;
 
 				tangents[ i ] = this.getTangentAt( u, new Vector3() );
 				tangents[ i ].normalize();
@@ -37290,25 +37292,25 @@
 
 			// compute the slowly-varying normal and binormal vectors for each segment on the curve
 
-			for ( i = 1; i <= segments; i ++ ) {
+			for ( var i$1 = 1; i$1 <= segments; i$1 ++ ) {
 
-				normals[ i ] = normals[ i - 1 ].clone();
+				normals[ i$1 ] = normals[ i$1 - 1 ].clone();
 
-				binormals[ i ] = binormals[ i - 1 ].clone();
+				binormals[ i$1 ] = binormals[ i$1 - 1 ].clone();
 
-				vec.crossVectors( tangents[ i - 1 ], tangents[ i ] );
+				vec.crossVectors( tangents[ i$1 - 1 ], tangents[ i$1 ] );
 
 				if ( vec.length() > Number.EPSILON ) {
 
 					vec.normalize();
 
-					theta = Math.acos( MathUtils.clamp( tangents[ i - 1 ].dot( tangents[ i ] ), - 1, 1 ) ); // clamp for floating pt errors
+					var theta = Math.acos( MathUtils.clamp( tangents[ i$1 - 1 ].dot( tangents[ i$1 ] ), - 1, 1 ) ); // clamp for floating pt errors
 
-					normals[ i ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
+					normals[ i$1 ].applyMatrix4( mat.makeRotationAxis( vec, theta ) );
 
 				}
 
-				binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
+				binormals[ i$1 ].crossVectors( tangents[ i$1 ], normals[ i$1 ] );
 
 			}
 
@@ -37316,20 +37318,20 @@
 
 			if ( closed === true ) {
 
-				theta = Math.acos( MathUtils.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
-				theta /= segments;
+				var theta$1 = Math.acos( MathUtils.clamp( normals[ 0 ].dot( normals[ segments ] ), - 1, 1 ) );
+				theta$1 /= segments;
 
 				if ( tangents[ 0 ].dot( vec.crossVectors( normals[ 0 ], normals[ segments ] ) ) > 0 ) {
 
-					theta = - theta;
+					theta$1 = - theta$1;
 
 				}
 
-				for ( i = 1; i <= segments; i ++ ) {
+				for ( var i$2 = 1; i$2 <= segments; i$2 ++ ) {
 
 					// twist a little...
-					normals[ i ].applyMatrix4( mat.makeRotationAxis( tangents[ i ], theta * i ) );
-					binormals[ i ].crossVectors( tangents[ i ], normals[ i ] );
+					normals[ i$2 ].applyMatrix4( mat.makeRotationAxis( tangents[ i$2 ], theta$1 * i$2 ) );
+					binormals[ i$2 ].crossVectors( tangents[ i$2 ], normals[ i$2 ] );
 
 				}
 
@@ -38071,7 +38073,7 @@
 
 		var tangent = optionalTarget || new Vector2();
 
-		var tangent = tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+		tangent.copy( this.v2 ).sub( this.v1 ).normalize();
 
 		return tangent;
 
@@ -38550,7 +38552,8 @@
 			// Get length of sub-curve
 			// Push sums into cached array
 
-			var lengths = [], sums = 0;
+			var lengths = [];
+			var sums = 0;
 
 			for ( var i = 0, l = this.curves.length; i < l; i ++ ) {
 
@@ -38591,7 +38594,8 @@
 
 			divisions = divisions || 12;
 
-			var points = [], last;
+			var points = [];
+			var last;
 
 			for ( var i = 0, curves = this.curves; i < curves.length; i ++ ) {
 
@@ -40529,9 +40533,9 @@
 			for ( var key in attributes ) {
 
 				var attribute = attributes[ key ];
-				var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+				var typedArray$1 = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
 				var bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
-				var bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+				var bufferAttribute = new bufferAttributeConstr( typedArray$1, attribute.itemSize, attribute.normalized );
 				if ( attribute.name !== undefined ) { bufferAttribute.name = attribute.name; }
 				geometry.setAttribute( key, bufferAttribute );
 
@@ -40541,24 +40545,24 @@
 
 			if ( morphAttributes ) {
 
-				for ( var key in morphAttributes ) {
+				for ( var key$1 in morphAttributes ) {
 
-					var attributeArray = morphAttributes[ key ];
+					var attributeArray = morphAttributes[ key$1 ];
 
 					var array = [];
 
 					for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
 
-						var attribute = attributeArray[ i ];
-						var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+						var attribute$1 = attributeArray[ i ];
+						var typedArray$2 = new TYPED_ARRAYS[ attribute$1.type ]( attribute$1.array );
 
-						var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
-						if ( attribute.name !== undefined ) { bufferAttribute.name = attribute.name; }
-						array.push( bufferAttribute );
+						var bufferAttribute$1 = new BufferAttribute( typedArray$2, attribute$1.itemSize, attribute$1.normalized );
+						if ( attribute$1.name !== undefined ) { bufferAttribute$1.name = attribute$1.name; }
+						array.push( bufferAttribute$1 );
 
 					}
 
-					geometry.morphAttributes[ key ] = array;
+					geometry.morphAttributes[ key$1 ] = array;
 
 				}
 
@@ -40576,9 +40580,9 @@
 
 			if ( groups !== undefined ) {
 
-				for ( var i = 0, n = groups.length; i !== n; ++ i ) {
+				for ( var i$1 = 0, n = groups.length; i$1 !== n; ++ i$1 ) {
 
-					var group = groups[ i ];
+					var group = groups[ i$1 ];
 
 					geometry.addGroup( group.start, group.count, group.materialIndex );
 
@@ -40735,6 +40739,7 @@
 		parseGeometries: function ( json, shapes ) {
 
 			var geometries = {};
+			var geometryShapes;
 
 			if ( json !== undefined ) {
 
@@ -40742,7 +40747,7 @@
 
 				for ( var i = 0, l = json.length; i < l; i ++ ) {
 
-					var geometry;
+					var geometry = (void 0);
 					var data = json[ i ];
 
 					switch ( data.type ) {
@@ -40931,7 +40936,7 @@
 						case 'ShapeGeometry':
 						case 'ShapeBufferGeometry':
 
-							var geometryShapes = [];
+							geometryShapes = [];
 
 							for ( var j = 0, jl = data.shapes.length; j < jl; j ++ ) {
 
@@ -40952,13 +40957,13 @@
 						case 'ExtrudeGeometry':
 						case 'ExtrudeBufferGeometry':
 
-							var geometryShapes = [];
+							geometryShapes = [];
 
-							for ( var j = 0, jl = data.shapes.length; j < jl; j ++ ) {
+							for ( var j$1 = 0, jl$1 = data.shapes.length; j$1 < jl$1; j$1 ++ ) {
 
-								var shape = shapes[ data.shapes[ j ] ];
+								var shape$1 = shapes[ data.shapes[ j$1 ] ];
 
-								geometryShapes.push( shape );
+								geometryShapes.push( shape$1 );
 
 							}
 
@@ -41094,6 +41099,8 @@
 			var scope = this;
 			var images = {};
 
+			var loader;
+
 			function loadImage( url ) {
 
 				scope.manager.itemStart( url );
@@ -41115,7 +41122,7 @@
 
 				var manager = new LoadingManager( onLoad );
 
-				var loader = new ImageLoader( manager );
+				loader = new ImageLoader( manager );
 				loader.setCrossOrigin( this.crossOrigin );
 
 				for ( var i = 0, il = json.length; i < il; i ++ ) {
@@ -41143,9 +41150,9 @@
 
 						// load single image
 
-						var path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.resourcePath + image.url;
+						var path$1 = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.resourcePath + image.url;
 
-						images[ image.uuid ] = loadImage( path );
+						images[ image.uuid ] = loadImage( path$1 );
 
 					}
 
@@ -41189,7 +41196,7 @@
 
 					}
 
-					var texture;
+					var texture = (void 0);
 
 					if ( Array.isArray( images[ data.image ] ) ) {
 
@@ -41296,6 +41303,8 @@
 
 			}
 
+			var geometry, material;
+
 			switch ( data.type ) {
 
 				case 'Scene':
@@ -41397,8 +41406,8 @@
 
 				case 'Mesh':
 
-					var geometry = getGeometry( data.geometry );
-					var material = getMaterial( data.material );
+					geometry = getGeometry( data.geometry );
+					material = getMaterial( data.material );
 
 					object = new Mesh( geometry, material );
 
@@ -41406,8 +41415,8 @@
 
 				case 'InstancedMesh':
 
-					var geometry = getGeometry( data.geometry );
-					var material = getMaterial( data.material );
+					geometry = getGeometry( data.geometry );
+					material = getMaterial( data.material );
 					var count = data.count;
 					var instanceMatrix = data.instanceMatrix;
 
@@ -41892,9 +41901,9 @@
 
 				}
 
-				for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
+				for ( var sIdx$1 = 0, sLen$1 = newShapes.length; sIdx$1 < sLen$1; sIdx$1 ++ ) {
 
-					var sho = newShapeHoles[ sIdx ];
+					var sho = newShapeHoles[ sIdx$1 ];
 
 					for ( var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 
@@ -41905,7 +41914,7 @@
 
 							if ( isPointInsidePolygon( ho.p, newShapes[ s2Idx ].p ) ) {
 
-								if ( sIdx !== s2Idx )	{ toChange.push( { froms: sIdx, tos: s2Idx, hole: hIdx } ); }
+								if ( sIdx$1 !== s2Idx )	{ toChange.push( { froms: sIdx$1, tos: s2Idx, hole: hIdx } ); }
 								if ( hole_unassigned ) {
 
 									hole_unassigned = false;
@@ -41923,7 +41932,7 @@
 
 						if ( hole_unassigned ) {
 
-							betterShapeHoles[ sIdx ].push( ho );
+							betterShapeHoles[ sIdx$1 ].push( ho );
 
 						}
 
@@ -41943,11 +41952,11 @@
 
 			var tmpHoles;
 
-			for ( var i = 0, il = newShapes.length; i < il; i ++ ) {
+			for ( var i$1 = 0, il = newShapes.length; i$1 < il; i$1 ++ ) {
 
-				tmpShape = newShapes[ i ].s;
+				tmpShape = newShapes[ i$1 ].s;
 				shapes.push( tmpShape );
-				tmpHoles = newShapeHoles[ i ];
+				tmpHoles = newShapeHoles[ i$1 ];
 
 				for ( var j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
 
@@ -43194,7 +43203,8 @@
 
 		getAverageFrequency: function () {
 
-			var value = 0, data = this.getFrequencyData();
+			var value = 0;
+			var data = this.getFrequencyData();
 
 			for ( var i = 0; i < data.length; i ++ ) {
 
@@ -47040,13 +47050,13 @@
 
 
 		/*
-		var distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
-		var distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
+		const distanceGeometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
+		const distanceMaterial = new THREE.MeshBasicMaterial( { color: hexColor, fog: false, wireframe: true, opacity: 0.1, transparent: true } );
 
 		this.lightSphere = new THREE.Mesh( bulbGeometry, bulbMaterial );
 		this.lightDistance = new THREE.Mesh( distanceGeometry, distanceMaterial );
 
-		var d = light.distance;
+		const d = light.distance;
 
 		if ( d === 0.0 ) {
 
@@ -47086,7 +47096,7 @@
 		}
 
 		/*
-		var d = this.light.distance;
+		const d = this.light.distance;
 
 		if ( d === 0.0 ) {
 
@@ -47266,22 +47276,19 @@
 		var vertices = [];
 		var colors = [];
 
-		var x, z;
-		var v, i, j, r, color;
-
 		// create the radials
 
-		for ( i = 0; i <= radials; i ++ ) {
+		for ( var i = 0; i <= radials; i ++ ) {
 
-			v = ( i / radials ) * ( Math.PI * 2 );
+			var v = ( i / radials ) * ( Math.PI * 2 );
 
-			x = Math.sin( v ) * radius;
-			z = Math.cos( v ) * radius;
+			var x = Math.sin( v ) * radius;
+			var z = Math.cos( v ) * radius;
 
 			vertices.push( 0, 0, 0 );
 			vertices.push( x, 0, z );
 
-			color = ( i & 1 ) ? color1 : color2;
+			var color = ( i & 1 ) ? color1 : color2;
 
 			colors.push( color.r, color.g, color.b );
 			colors.push( color.r, color.g, color.b );
@@ -47290,33 +47297,33 @@
 
 		// create the circles
 
-		for ( i = 0; i <= circles; i ++ ) {
+		for ( var i$1 = 0; i$1 <= circles; i$1 ++ ) {
 
-			color = ( i & 1 ) ? color1 : color2;
+			var color$1 = ( i$1 & 1 ) ? color1 : color2;
 
-			r = radius - ( radius / circles * i );
+			var r = radius - ( radius / circles * i$1 );
 
-			for ( j = 0; j < divisions; j ++ ) {
+			for ( var j = 0; j < divisions; j ++ ) {
 
 				// first vertex
 
-				v = ( j / divisions ) * ( Math.PI * 2 );
+				var v$1 = ( j / divisions ) * ( Math.PI * 2 );
 
-				x = Math.sin( v ) * r;
-				z = Math.cos( v ) * r;
+				var x$1 = Math.sin( v$1 ) * r;
+				var z$1 = Math.cos( v$1 ) * r;
 
-				vertices.push( x, 0, z );
-				colors.push( color.r, color.g, color.b );
+				vertices.push( x$1, 0, z$1 );
+				colors.push( color$1.r, color$1.g, color$1.b );
 
 				// second vertex
 
-				v = ( ( j + 1 ) / divisions ) * ( Math.PI * 2 );
+				v$1 = ( ( j + 1 ) / divisions ) * ( Math.PI * 2 );
 
-				x = Math.sin( v ) * r;
-				z = Math.cos( v ) * r;
+				x$1 = Math.sin( v$1 ) * r;
+				z$1 = Math.cos( v$1 ) * r;
 
-				vertices.push( x, 0, z );
-				colors.push( color.r, color.g, color.b );
+				vertices.push( x$1, 0, z$1 );
+				colors.push( color$1.r, color$1.g, color$1.b );
 
 			}
 
@@ -48420,8 +48427,8 @@
 
 			for ( var i = 0; i < MAX_SAMPLES; ++ i ) {
 
-				var x = i / sigmaPixels;
-				var weight = Math.exp( - x * x / 2 );
+				var x$1 = i / sigmaPixels;
+				var weight = Math.exp( - x$1 * x$1 / 2 );
 				weights.push( weight );
 
 				if ( i == 0 ) {
@@ -48436,9 +48443,9 @@
 
 			}
 
-			for ( var i = 0; i < weights.length; i ++ ) {
+			for ( var i$1 = 0; i$1 < weights.length; i$1 ++ ) {
 
-				weights[ i ] = weights[ i ] / sum;
+				weights[ i$1 ] = weights[ i$1 ] / sum;
 
 			}
 
