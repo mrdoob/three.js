@@ -5,7 +5,7 @@ import { BufferAttribute } from './BufferAttribute.js';
  * @author benaadams / https://twitter.com/ben_a_adams
  */
 
-var _vector = new Vector3();
+const _vector = new Vector3();
 
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {
 
@@ -49,7 +49,7 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	applyMatrix4: function ( m ) {
 
-		for ( var i = 0, l = this.data.count; i < l; i ++ ) {
+		for ( let i = 0, l = this.data.count; i < l; i ++ ) {
 
 			_vector.x = this.getX( i );
 			_vector.y = this.getY( i );
@@ -161,13 +161,13 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.' );
 
-		var array = [];
+		const array = [];
 
-		for ( var i = 0; i < this.count; i ++ ) {
+		for ( let i = 0; i < this.count; i ++ ) {
 
-			var index = i * this.data.stride + this.offset;
+			const index = i * this.data.stride + this.offset;
 
-			for ( var j = 0; j < this.itemSize; j ++ ) {
+			for ( let j = 0; j < this.itemSize; j ++ ) {
 
 				array.push( this.data.array[ index + j ] );
 
@@ -183,13 +183,13 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 		console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interlaved buffer attribute will deinterleave buffer data.' );
 
-		var array = [];
+		const array = [];
 
-		for ( var i = 0; i < this.count; i ++ ) {
+		for ( let i = 0; i < this.count; i ++ ) {
 
-			var index = i * this.data.stride + this.offset;
+			const index = i * this.data.stride + this.offset;
 
-			for ( var j = 0; j < this.itemSize; j ++ ) {
+			for ( let j = 0; j < this.itemSize; j ++ ) {
 
 				array.push( this.data.array[ index + j ] );
 

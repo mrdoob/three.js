@@ -57,7 +57,7 @@ Object.assign( InterleavedBuffer.prototype, {
 		index1 *= this.stride;
 		index2 *= attribute.stride;
 
-		for ( var i = 0, l = this.stride; i < l; i ++ ) {
+		for ( let i = 0, l = this.stride; i < l; i ++ ) {
 
 			this.array[ index1 + i ] = attribute.array[ index2 + i ];
 

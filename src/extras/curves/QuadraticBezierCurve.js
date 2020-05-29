@@ -22,9 +22,9 @@ QuadraticBezierCurve.prototype.isQuadraticBezierCurve = true;
 
 QuadraticBezierCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
-	var point = optionalTarget || new Vector2();
+	const point = optionalTarget || new Vector2();
 
-	var v0 = this.v0, v1 = this.v1, v2 = this.v2;
+	const v0 = this.v0, v1 = this.v1, v2 = this.v2;
 
 	point.set(
 		QuadraticBezier( t, v0.x, v1.x, v2.x ),
@@ -49,7 +49,7 @@ QuadraticBezierCurve.prototype.copy = function ( source ) {
 
 QuadraticBezierCurve.prototype.toJSON = function () {
 
-	var data = Curve.prototype.toJSON.call( this );
+	const data = Curve.prototype.toJSON.call( this );
 
 	data.v0 = this.v0.toArray();
 	data.v1 = this.v1.toArray();

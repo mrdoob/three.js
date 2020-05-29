@@ -26,9 +26,9 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
@@ -58,7 +58,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	parse: function ( json ) {
 
-		var textures = this.textures;
+		const textures = this.textures;
 
 		function getTexture( name ) {
 
@@ -72,7 +72,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		var material = new Materials[ json.type ]();
+		const material = new Materials[ json.type ]();
 
 		if ( json.uuid !== undefined ) material.uuid = json.uuid;
 		if ( json.name !== undefined ) material.name = json.name;
@@ -153,9 +153,9 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( json.uniforms !== undefined ) {
 
-			for ( var name in json.uniforms ) {
+			for ( const name in json.uniforms ) {
 
-				var uniform = json.uniforms[ name ];
+				const uniform = json.uniforms[ name ];
 
 				material.uniforms[ name ] = {};
 
@@ -203,7 +203,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( json.extensions !== undefined ) {
 
-			for ( var key in json.extensions ) {
+			for ( const key in json.extensions ) {
 
 				material.extensions[ key ] = json.extensions[ key ];
 
@@ -234,7 +234,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( json.normalMapType !== undefined ) material.normalMapType = json.normalMapType;
 		if ( json.normalScale !== undefined ) {
 
-			var normalScale = json.normalScale;
+			let normalScale = json.normalScale;
 
 			if ( Array.isArray( normalScale ) === false ) {
 

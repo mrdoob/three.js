@@ -51,7 +51,7 @@ Object.assign( Spherical.prototype, {
 	// restrict phi to be betwee EPS and PI-EPS
 	makeSafe: function () {
 
-		var EPS = 0.000001;
+		const EPS = 0.000001;
 		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
 
 		return this;

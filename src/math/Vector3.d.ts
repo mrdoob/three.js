@@ -11,9 +11,9 @@ import { Vector } from './Vector2';
  * 3D vector.
  *
  * @example
- * var a = new THREE.Vector3( 1, 0, 0 );
- * var b = new THREE.Vector3( 0, 1, 0 );
- * var c = new THREE.Vector3();
+ * const a = new THREE.Vector3( 1, 0, 0 );
+ * const b = new THREE.Vector3( 0, 1, 0 );
+ * const c = new THREE.Vector3();
  * c.crossVectors( a, b );
  *
  * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js|src/math/Vector3.js}
