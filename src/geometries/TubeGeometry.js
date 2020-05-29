@@ -32,7 +32,7 @@ function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, ta
 
 	if ( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
 
-	var bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
+	const bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
 
 	// expose internals
 
@@ -71,7 +71,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 	radialSegments = radialSegments || 8;
 	closed = closed || false;
 
-	var frames = path.computeFrenetFrames( tubularSegments, closed );
+	const frames = path.computeFrenetFrames( tubularSegments, closed );
 
 	// expose internals
 
@@ -81,19 +81,17 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	// helper variables
 
-	var vertex = new Vector3();
-	var normal = new Vector3();
-	var uv = new Vector2();
-	var P = new Vector3();
-
-	var i, j;
+	const vertex = new Vector3();
+	const normal = new Vector3();
+	const uv = new Vector2();
+	let P = new Vector3();
 
 	// buffer
 
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
-	var indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
+	const indices = [];
 
 	// create buffer data
 
@@ -110,7 +108,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	function generateBufferData() {
 
-		for ( i = 0; i < tubularSegments; i ++ ) {
+		for ( let i = 0; i < tubularSegments; i ++ ) {
 
 			generateSegment( i );
 
@@ -142,17 +140,17 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 		// retrieve corresponding normal and binormal
 
-		var N = frames.normals[ i ];
-		var B = frames.binormals[ i ];
+		const N = frames.normals[ i ];
+		const B = frames.binormals[ i ];
 
 		// generate normals and vertices for the current segment
 
-		for ( j = 0; j <= radialSegments; j ++ ) {
+		for ( let j = 0; j <= radialSegments; j ++ ) {
 
-			var v = j / radialSegments * Math.PI * 2;
+			const v = j / radialSegments * Math.PI * 2;
 
-			var sin = Math.sin( v );
-			var cos = - Math.cos( v );
+			const sin = Math.sin( v );
+			const cos = - Math.cos( v );
 
 			// normal
 
@@ -177,14 +175,14 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	function generateIndices() {
 
-		for ( j = 1; j <= tubularSegments; j ++ ) {
+		for ( let j = 1; j <= tubularSegments; j ++ ) {
 
-			for ( i = 1; i <= radialSegments; i ++ ) {
+			for ( let i = 1; i <= radialSegments; i ++ ) {
 
-				var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
-				var b = ( radialSegments + 1 ) * j + ( i - 1 );
-				var c = ( radialSegments + 1 ) * j + i;
-				var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
+				const a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+				const b = ( radialSegments + 1 ) * j + ( i - 1 );
+				const c = ( radialSegments + 1 ) * j + i;
+				const d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
 				// faces
 
@@ -199,9 +197,9 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	function generateUVs() {
 
-		for ( i = 0; i <= tubularSegments; i ++ ) {
+		for ( let i = 0; i <= tubularSegments; i ++ ) {
 
-			for ( j = 0; j <= radialSegments; j ++ ) {
+			for ( let j = 0; j <= radialSegments; j ++ ) {
 
 				uv.x = i / tubularSegments;
 				uv.y = j / radialSegments;
@@ -221,7 +219,7 @@ TubeBufferGeometry.prototype.constructor = TubeBufferGeometry;
 
 TubeBufferGeometry.prototype.toJSON = function () {
 
-	var data = BufferGeometry.prototype.toJSON.call( this );
+	const data = BufferGeometry.prototype.toJSON.call( this );
 
 	data.path = this.parameters.path.toJSON();
 

@@ -18,18 +18,18 @@ function AnimationAction( mixer, clip, localRoot, blendMode ) {
 	this._localRoot = localRoot || null;
 	this.blendMode = blendMode || clip.blendMode;
 
-	var tracks = clip.tracks,
+	const tracks = clip.tracks,
 		nTracks = tracks.length,
 		interpolants = new Array( nTracks );
 
-	var interpolantSettings = {
+	const interpolantSettings = {
 		endingStart: ZeroCurvatureEnding,
 		endingEnd: ZeroCurvatureEnding
 	};
 
-	for ( var i = 0; i !== nTracks; ++ i ) {
+	for ( let i = 0; i !== nTracks; ++ i ) {
 
-		var interpolant = tracks[ i ].createInterpolant( null );
+		const interpolant = tracks[ i ].createInterpolant( null );
 		interpolants[ i ] = interpolant;
 		interpolant.settings = interpolantSettings;
 
@@ -183,7 +183,7 @@ Object.assign( AnimationAction.prototype, {
 
 		if ( warp ) {
 
-			var fadeInDuration = this._clip.duration,
+			const fadeInDuration = this._clip.duration,
 				fadeOutDuration = fadeOutAction._clip.duration,
 
 				startEndRatio = fadeOutDuration / fadeInDuration,
@@ -206,7 +206,7 @@ Object.assign( AnimationAction.prototype, {
 
 	stopFading: function () {
 
-		var weightInterpolant = this._weightInterpolant;
+		let weightInterpolant = this._weightInterpolant;
 
 		if ( weightInterpolant !== null ) {
 
@@ -265,10 +265,11 @@ Object.assign( AnimationAction.prototype, {
 
 	warp: function ( startTimeScale, endTimeScale, duration ) {
 
-		var mixer = this._mixer, now = mixer.time,
-			interpolant = this._timeScaleInterpolant,
-
+		const mixer = this._mixer,
+			now = mixer.time,
 			timeScale = this.timeScale;
+
+		let interpolant = this._timeScaleInterpolant;
 
 		if ( interpolant === null ) {
 
@@ -277,7 +278,7 @@ Object.assign( AnimationAction.prototype, {
 
 		}
 
-		var times = interpolant.parameterPositions,
+		const times = interpolant.parameterPositions,
 			values = interpolant.sampleValues;
 
 		times[ 0 ] = now;
@@ -292,7 +293,7 @@ Object.assign( AnimationAction.prototype, {
 
 	stopWarping: function () {
 
-		var timeScaleInterpolant = this._timeScaleInterpolant;
+		let timeScaleInterpolant = this._timeScaleInterpolant;
 
 		if ( timeScaleInterpolant !== null ) {
 
@@ -340,13 +341,13 @@ Object.assign( AnimationAction.prototype, {
 
 		}
 
-		var startTime = this._startTime;
+		const startTime = this._startTime;
 
 		if ( startTime !== null ) {
 
 			// check for scheduled start of action
 
-			var timeRunning = ( time - startTime ) * timeDirection;
+			const timeRunning = ( time - startTime ) * timeDirection;
 			if ( timeRunning < 0 || timeDirection === 0 ) {
 
 				return; // yet to come / don't decide when delta = 0
@@ -363,23 +364,23 @@ Object.assign( AnimationAction.prototype, {
 		// apply time scale and advance time
 
 		deltaTime *= this._updateTimeScale( time );
-		var clipTime = this._updateTime( deltaTime );
+		const clipTime = this._updateTime( deltaTime );
 
 		// note: _updateTime may disable the action resulting in
 		// an effective weight of 0
 
-		var weight = this._updateWeight( time );
+		const weight = this._updateWeight( time );
 
 		if ( weight > 0 ) {
 
-			var interpolants = this._interpolants;
-			var propertyMixers = this._propertyBindings;
+			const interpolants = this._interpolants;
+			const propertyMixers = this._propertyBindings;
 
 			switch ( this.blendMode ) {
 
 				case AdditiveAnimationBlendMode:
 
-					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+					for ( let j = 0, m = interpolants.length; j !== m; ++ j ) {
 
 						interpolants[ j ].evaluate( clipTime );
 						propertyMixers[ j ].accumulateAdditive( weight );
@@ -391,7 +392,7 @@ Object.assign( AnimationAction.prototype, {
 				case NormalAnimationBlendMode:
 				default:
 
-					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+					for ( let j = 0, m = interpolants.length; j !== m; ++ j ) {
 
 						interpolants[ j ].evaluate( clipTime );
 						propertyMixers[ j ].accumulate( accuIndex, weight );
@@ -406,16 +407,16 @@ Object.assign( AnimationAction.prototype, {
 
 	_updateWeight: function ( time ) {
 
-		var weight = 0;
+		let weight = 0;
 
 		if ( this.enabled ) {
 
 			weight = this.weight;
-			var interpolant = this._weightInterpolant;
+			const interpolant = this._weightInterpolant;
 
 			if ( interpolant !== null ) {
 
-				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+				const interpolantValue = interpolant.evaluate( time )[ 0 ];
 
 				weight *= interpolantValue;
 
@@ -443,17 +444,17 @@ Object.assign( AnimationAction.prototype, {
 
 	_updateTimeScale: function ( time ) {
 
-		var timeScale = 0;
+		let timeScale = 0;
 
 		if ( ! this.paused ) {
 
 			timeScale = this.timeScale;
 
-			var interpolant = this._timeScaleInterpolant;
+			const interpolant = this._timeScaleInterpolant;
 
 			if ( interpolant !== null ) {
 
-				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+				const interpolantValue = interpolant.evaluate( time )[ 0 ];
 
 				timeScale *= interpolantValue;
 
@@ -486,12 +487,13 @@ Object.assign( AnimationAction.prototype, {
 
 	_updateTime: function ( deltaTime ) {
 
-		var time = this.time + deltaTime;
-		var duration = this._clip.duration;
-		var loop = this.loop;
-		var loopCount = this._loopCount;
+		const duration = this._clip.duration;
+		const loop = this.loop;
 
-		var pingPong = ( loop === LoopPingPong );
+		let time = this.time + deltaTime;
+		let loopCount = this._loopCount;
+
+		const pingPong = ( loop === LoopPingPong );
 
 		if ( deltaTime === 0 ) {
 
@@ -570,12 +572,12 @@ Object.assign( AnimationAction.prototype, {
 
 				// wrap around
 
-				var loopDelta = Math.floor( time / duration ); // signed
+				const loopDelta = Math.floor( time / duration ); // signed
 				time -= duration * loopDelta;
 
 				loopCount += Math.abs( loopDelta );
 
-				var pending = this.repetitions - loopCount;
+				const pending = this.repetitions - loopCount;
 
 				if ( pending <= 0 ) {
 
@@ -601,7 +603,7 @@ Object.assign( AnimationAction.prototype, {
 
 						// entering the last round
 
-						var atStart = deltaTime < 0;
+						const atStart = deltaTime < 0;
 						this._setEndings( atStart, ! atStart, pingPong );
 
 					} else {
@@ -642,7 +644,7 @@ Object.assign( AnimationAction.prototype, {
 
 	_setEndings: function ( atStart, atEnd, pingPong ) {
 
-		var settings = this._interpolantSettings;
+		const settings = this._interpolantSettings;
 
 		if ( pingPong ) {
 
@@ -679,8 +681,8 @@ Object.assign( AnimationAction.prototype, {
 
 	_scheduleFading: function ( duration, weightNow, weightThen ) {
 
-		var mixer = this._mixer, now = mixer.time,
-			interpolant = this._weightInterpolant;
+		const mixer = this._mixer, now = mixer.time;
+		let interpolant = this._weightInterpolant;
 
 		if ( interpolant === null ) {
 
@@ -689,7 +691,7 @@ Object.assign( AnimationAction.prototype, {
 
 		}
 
-		var times = interpolant.parameterPositions,
+		const times = interpolant.parameterPositions,
 			values = interpolant.sampleValues;
 
 		times[ 0 ] = now;

@@ -9,31 +9,31 @@
  */
 
 // Characters [].:/ are reserved for track binding syntax.
-var _RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
-var _reservedRe = new RegExp( '[' + _RESERVED_CHARS_RE + ']', 'g' );
+const _RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
+const _reservedRe = new RegExp( '[' + _RESERVED_CHARS_RE + ']', 'g' );
 
 // Attempts to allow node names from any language. ES5's `\w` regexp matches
 // only latin characters, and the unicode \p{L} is not yet supported. So
 // instead, we exclude reserved characters and match everything else.
-var _wordChar = '[^' + _RESERVED_CHARS_RE + ']';
-var _wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
+const _wordChar = '[^' + _RESERVED_CHARS_RE + ']';
+const _wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
 
 // Parent directories, delimited by '/' or ':'. Currently unused, but must
 // be matched to parse the rest of the track name.
-var _directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
+const _directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
 
 // Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
-var _nodeRe = /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
+const _nodeRe = /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
 
 // Object on target node, and accessor. May not contain reserved
 // characters. Accessor may contain any character except closing bracket.
-var _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
+const _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
 
 // Property and accessor. May not contain reserved characters. Accessor may
 // contain any non-bracket characters.
-var _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
+const _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
 
-var _trackRe = new RegExp( ''
+const _trackRe = new RegExp( ''
 	+ '^'
 	+ _directoryRe
 	+ _nodeRe
@@ -42,11 +42,11 @@ var _trackRe = new RegExp( ''
 	+ '$'
 );
 
-var _supportedObjectNames = [ 'material', 'materials', 'bones' ];
+const _supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
 function Composite( targetGroup, path, optionalParsedPath ) {
 
-	var parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
+	const parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
 	this._targetGroup = targetGroup;
 	this._bindings = targetGroup.subscribe_( path, parsedPath );
@@ -59,7 +59,7 @@ Object.assign( Composite.prototype, {
 
 		this.bind(); // bind all binding
 
-		var firstValidIndex = this._targetGroup.nCachedObjects_,
+		const firstValidIndex = this._targetGroup.nCachedObjects_,
 			binding = this._bindings[ firstValidIndex ];
 
 		// and only call .getValue on the first
@@ -69,9 +69,9 @@ Object.assign( Composite.prototype, {
 
 	setValue: function ( array, offset ) {
 
-		var bindings = this._bindings;
+		const bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+		for ( let i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].setValue( array, offset );
 
@@ -81,9 +81,9 @@ Object.assign( Composite.prototype, {
 
 	bind: function () {
 
-		var bindings = this._bindings;
+		const bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+		for ( let i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].bind();
 
@@ -93,9 +93,9 @@ Object.assign( Composite.prototype, {
 
 	unbind: function () {
 
-		var bindings = this._bindings;
+		const bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+		for ( let i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].unbind();
 
@@ -150,7 +150,7 @@ Object.assign( PropertyBinding, {
 
 	parseTrackName: function ( trackName ) {
 
-		var matches = _trackRe.exec( trackName );
+		const matches = _trackRe.exec( trackName );
 
 		if ( ! matches ) {
 
@@ -158,7 +158,7 @@ Object.assign( PropertyBinding, {
 
 		}
 
-		var results = {
+		const results = {
 			// directoryName: matches[ 1 ], // (tschw) currently unused
 			nodeName: matches[ 2 ],
 			objectName: matches[ 3 ],
@@ -167,11 +167,11 @@ Object.assign( PropertyBinding, {
 			propertyIndex: matches[ 6 ]
 		};
 
-		var lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
+		const lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
 
 		if ( lastDot !== undefined && lastDot !== - 1 ) {
 
-			var objectName = results.nodeName.substring( lastDot + 1 );
+			const objectName = results.nodeName.substring( lastDot + 1 );
 
 			// Object names must be checked against a whitelist. Otherwise, there
 			// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
@@ -207,7 +207,7 @@ Object.assign( PropertyBinding, {
 		// search into skeleton bones.
 		if ( root.skeleton ) {
 
-			var bone = root.skeleton.getBoneByName( nodeName );
+			const bone = root.skeleton.getBoneByName( nodeName );
 
 			if ( bone !== undefined ) {
 
@@ -220,11 +220,11 @@ Object.assign( PropertyBinding, {
 		// search into node subtree.
 		if ( root.children ) {
 
-			var searchNodeSubtree = function ( children ) {
+			const searchNodeSubtree = function ( children ) {
 
-				for ( var i = 0; i < children.length; i ++ ) {
+				for ( let i = 0; i < children.length; i ++ ) {
 
-					var childNode = children[ i ];
+					const childNode = children[ i ];
 
 					if ( childNode.name === nodeName || childNode.uuid === nodeName ) {
 
@@ -232,7 +232,7 @@ Object.assign( PropertyBinding, {
 
 					}
 
-					var result = searchNodeSubtree( childNode.children );
+					const result = searchNodeSubtree( childNode.children );
 
 					if ( result ) return result;
 
@@ -242,7 +242,7 @@ Object.assign( PropertyBinding, {
 
 			};
 
-			var subTreeNode = searchNodeSubtree( root.children );
+			const subTreeNode = searchNodeSubtree( root.children );
 
 			if ( subTreeNode ) {
 
@@ -287,9 +287,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		function getValue_array( buffer, offset ) {
 
-			var source = this.resolvedProperty;
+			const source = this.resolvedProperty;
 
-			for ( var i = 0, n = source.length; i !== n; ++ i ) {
+			for ( let i = 0, n = source.length; i !== n; ++ i ) {
 
 				buffer[ offset ++ ] = source[ i ];
 
@@ -342,9 +342,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			function setValue_array( buffer, offset ) {
 
-				var dest = this.resolvedProperty;
+				const dest = this.resolvedProperty;
 
-				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+				for ( let i = 0, n = dest.length; i !== n; ++ i ) {
 
 					dest[ i ] = buffer[ offset ++ ];
 
@@ -354,9 +354,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			function setValue_array_setNeedsUpdate( buffer, offset ) {
 
-				var dest = this.resolvedProperty;
+				const dest = this.resolvedProperty;
 
-				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+				for ( let i = 0, n = dest.length; i !== n; ++ i ) {
 
 					dest[ i ] = buffer[ offset ++ ];
 
@@ -368,9 +368,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			function setValue_array_setMatrixWorldNeedsUpdate( buffer, offset ) {
 
-				var dest = this.resolvedProperty;
+				const dest = this.resolvedProperty;
 
-				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+				for ( let i = 0, n = dest.length; i !== n; ++ i ) {
 
 					dest[ i ] = buffer[ offset ++ ];
 
@@ -455,7 +455,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 	// create getter / setter pair for a property in the scene graph
 	bind: function () {
 
-		var targetObject = this.node,
+		let targetObject = this.node,
 			parsedPath = this.parsedPath,
 
 			objectName = parsedPath.objectName,
@@ -484,7 +484,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		if ( objectName ) {
 
-			var objectIndex = parsedPath.objectIndex;
+			let objectIndex = parsedPath.objectIndex;
 
 			// special cases were we need to reach deeper into the hierarchy to get the face materials....
 			switch ( objectName ) {
@@ -524,7 +524,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 					targetObject = targetObject.skeleton.bones;
 
 					// support resolving morphTarget names into indices.
-					for ( var i = 0; i < targetObject.length; i ++ ) {
+					for ( let i = 0; i < targetObject.length; i ++ ) {
 
 						if ( targetObject[ i ].name === objectIndex ) {
 
@@ -567,11 +567,11 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		}
 
 		// resolve property
-		var nodeProperty = targetObject[ propertyName ];
+		const nodeProperty = targetObject[ propertyName ];
 
 		if ( nodeProperty === undefined ) {
 
-			var nodeName = parsedPath.nodeName;
+			const nodeName = parsedPath.nodeName;
 
 			console.error( 'THREE.PropertyBinding: Trying to update property for track: ' + nodeName +
 				'.' + propertyName + ' but it wasn\'t found.', targetObject );
@@ -580,7 +580,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		}
 
 		// determine versioning scheme
-		var versioning = this.Versioning.None;
+		let versioning = this.Versioning.None;
 
 		this.targetObject = targetObject;
 
@@ -595,7 +595,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		}
 
 		// determine how the property gets bound
-		var bindingType = this.BindingType.Direct;
+		let bindingType = this.BindingType.Direct;
 
 		if ( propertyIndex !== undefined ) {
 
