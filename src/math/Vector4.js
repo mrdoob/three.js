@@ -252,7 +252,8 @@ Object.assign( Vector4.prototype, {
 		this.x *= v.x;
 		this.y *= v.y;
 		this.z *= v.z;
-		this.w *= v.w || 1;
+		if ( v.w !== undefined )
+			this.w *= v.w;
 
 		return this;
 
