@@ -23,9 +23,9 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
@@ -55,46 +55,46 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 	parse: function ( json ) {
 
-		var geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
+		const geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
 
-		var index = json.data.index;
+		const index = json.data.index;
 
 		if ( index !== undefined ) {
 
-			var typedArray = new TYPED_ARRAYS[ index.type ]( index.array );
+			const typedArray = new TYPED_ARRAYS[ index.type ]( index.array );
 			geometry.setIndex( new BufferAttribute( typedArray, 1 ) );
 
 		}
 
-		var attributes = json.data.attributes;
+		const attributes = json.data.attributes;
 
-		for ( var key in attributes ) {
+		for ( const key in attributes ) {
 
-			var attribute = attributes[ key ];
-			var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
-			var bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
-			var bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+			const attribute = attributes[ key ];
+			const typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+			const bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
+			const bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 			geometry.setAttribute( key, bufferAttribute );
 
 		}
 
-		var morphAttributes = json.data.morphAttributes;
+		const morphAttributes = json.data.morphAttributes;
 
 		if ( morphAttributes ) {
 
-			for ( var key in morphAttributes ) {
+			for ( const key in morphAttributes ) {
 
-				var attributeArray = morphAttributes[ key ];
+				const attributeArray = morphAttributes[ key ];
 
-				var array = [];
+				const array = [];
 
-				for ( var i = 0, il = attributeArray.length; i < il; i ++ ) {
+				for ( let i = 0, il = attributeArray.length; i < il; i ++ ) {
 
-					var attribute = attributeArray[ i ];
-					var typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+					const attribute = attributeArray[ i ];
+					const typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
 
-					var bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+					const bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
 					if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 					array.push( bufferAttribute );
 
@@ -106,7 +106,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		}
 
-		var morphTargetsRelative = json.data.morphTargetsRelative;
+		const morphTargetsRelative = json.data.morphTargetsRelative;
 
 		if ( morphTargetsRelative ) {
 
@@ -114,13 +114,13 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		}
 
-		var groups = json.data.groups || json.data.drawcalls || json.data.offsets;
+		const groups = json.data.groups || json.data.drawcalls || json.data.offsets;
 
 		if ( groups !== undefined ) {
 
-			for ( var i = 0, n = groups.length; i !== n; ++ i ) {
+			for ( let i = 0, n = groups.length; i !== n; ++ i ) {
 
-				var group = groups[ i ];
+				const group = groups[ i ];
 
 				geometry.addGroup( group.start, group.count, group.materialIndex );
 
@@ -128,11 +128,11 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		}
 
-		var boundingSphere = json.data.boundingSphere;
+		const boundingSphere = json.data.boundingSphere;
 
 		if ( boundingSphere !== undefined ) {
 
-			var center = new Vector3();
+			const center = new Vector3();
 
 			if ( boundingSphere.center !== undefined ) {
 
@@ -153,7 +153,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 } );
 
-var TYPED_ARRAYS = {
+const TYPED_ARRAYS = {
 	Int8Array: Int8Array,
 	Uint8Array: Uint8Array,
 	// Workaround for IE11 pre KB2929437. See #11440

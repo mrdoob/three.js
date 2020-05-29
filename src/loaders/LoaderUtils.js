@@ -2,7 +2,7 @@
  * @author Don McCurdy / https://www.donmccurdy.com
  */
 
-var LoaderUtils = {
+const LoaderUtils = {
 
 	decodeText: function ( array ) {
 
@@ -15,9 +15,9 @@ var LoaderUtils = {
 		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
 		// throws a "maximum call stack size exceeded" error for large arrays.
 
-		var s = '';
+		let s = '';
 
-		for ( var i = 0, il = array.length; i < il; i ++ ) {
+		for ( let i = 0, il = array.length; i < il; i ++ ) {
 
 			// Implicitly assumes little-endian.
 			s += String.fromCharCode( array[ i ] );
@@ -40,7 +40,7 @@ var LoaderUtils = {
 
 	extractUrlBase: function ( url ) {
 
-		var index = url.lastIndexOf( '/' );
+		const index = url.lastIndexOf( '/' );
 
 		if ( index === - 1 ) return './';
 

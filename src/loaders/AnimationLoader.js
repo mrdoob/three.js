@@ -18,9 +18,9 @@ AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
@@ -50,11 +50,11 @@ AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	parse: function ( json ) {
 
-		var animations = [];
+		const animations = [];
 
-		for ( var i = 0; i < json.length; i ++ ) {
+		for ( let i = 0; i < json.length; i ++ ) {
 
-			var clip = AnimationClip.parse( json[ i ] );
+			const clip = AnimationClip.parse( json[ i ] );
 
 			animations.push( clip );
 
