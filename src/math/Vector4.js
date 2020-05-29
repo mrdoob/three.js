@@ -247,6 +247,17 @@ Object.assign( Vector4.prototype, {
 
 	},
 
+	multiply: function ( v ) {
+
+		this.x *= v.x;
+		this.y *= v.y;
+		this.z *= v.z;
+		this.w *= v.w || 1;
+
+		return this;
+
+	},
+
 	multiplyScalar: function ( scalar ) {
 
 		this.x *= scalar;
