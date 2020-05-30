@@ -37,9 +37,9 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	this.texture.format = texture.format;
 	this.texture.encoding = texture.encoding;
 
-	var scene = new Scene();
+	const scene = new Scene();
 
-	var shader = {
+	const shader = {
 
 		uniforms: {
 			tEquirect: { value: null },
@@ -87,7 +87,7 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 		].join( '\n' ),
 	};
 
-	var material = new ShaderMaterial( {
+	const material = new ShaderMaterial( {
 
 		type: 'CubemapFromEquirect',
 
@@ -101,11 +101,11 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 	material.uniforms.tEquirect.value = texture;
 
-	var mesh = new Mesh( new BoxBufferGeometry( 5, 5, 5 ), material );
+	const mesh = new Mesh( new BoxBufferGeometry( 5, 5, 5 ), material );
 
 	scene.add( mesh );
 
-	var camera = new CubeCamera( 1, 10, this );
+	const camera = new CubeCamera( 1, 10, this );
 	camera.update( renderer, scene );
 
 	mesh.geometry.dispose();

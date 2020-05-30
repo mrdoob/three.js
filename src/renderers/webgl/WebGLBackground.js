@@ -13,25 +13,25 @@ import { cloneUniforms } from '../shaders/UniformsUtils.js';
 
 function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
-	var clearColor = new Color( 0x000000 );
-	var clearAlpha = 0;
+	const clearColor = new Color( 0x000000 );
+	let clearAlpha = 0;
 
-	var planeMesh;
-	var boxMesh;
+	let planeMesh;
+	let boxMesh;
 
-	var currentBackground = null;
-	var currentBackgroundVersion = 0;
-	var currentTonemapping = null;
+	let currentBackground = null;
+	let currentBackgroundVersion = 0;
+	let currentTonemapping = null;
 
 	function render( renderList, scene, camera, forceClear ) {
 
-		var background = scene.background;
+		let background = scene.background;
 
 		// Ignore background in AR
 		// TODO: Reconsider this.
 
-		var xr = renderer.xr;
-		var session = xr.getSession && xr.getSession();
+		const xr = renderer.xr;
+		const session = xr.getSession && xr.getSession();
 
 		if ( session && session.environmentBlendMode === 'additive' ) {
 
@@ -98,7 +98,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			}
 
-			var texture = background.isWebGLCubeRenderTarget ? background.texture : background;
+			const texture = background.isWebGLCubeRenderTarget ? background.texture : background;
 
 			boxMesh.material.uniforms.envMap.value = texture;
 			boxMesh.material.uniforms.flipEnvMap.value = texture.isCubeTexture ? - 1 : 1;

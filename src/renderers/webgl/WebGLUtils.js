@@ -6,11 +6,11 @@ import { RGBA_ASTC_4x4_Format, RGBA_ASTC_5x4_Format, RGBA_ASTC_5x5_Format, RGBA_
 
 function WebGLUtils( gl, extensions, capabilities ) {
 
-	var isWebGL2 = capabilities.isWebGL2;
+	const isWebGL2 = capabilities.isWebGL2;
 
 	function convert( p ) {
 
-		var extension;
+		let extension;
 
 		if ( p === UnsignedByteType ) return gl.UNSIGNED_BYTE;
 		if ( p === UnsignedShort4444Type ) return gl.UNSIGNED_SHORT_4_4_4_4;
