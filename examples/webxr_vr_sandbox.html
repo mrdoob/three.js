@@ -119,7 +119,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.shadowMap.enabled = true;
-				renderer.xr.enabled = true;
+				renderer.xr = new THREE.WebXRManager( renderer );
 				document.body.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer ) );

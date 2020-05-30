@@ -10,9 +10,11 @@ import { Vector4 } from '../../math/Vector4.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
 import { WebXRController } from './WebXRController.js';
 
-function WebXRManager( renderer, gl ) {
+function WebXRManager( renderer ) {
 
 	var scope = this;
+
+	var gl = renderer.getContext();
 
 	var session = null;
 
@@ -47,7 +49,7 @@ function WebXRManager( renderer, gl ) {
 
 	//
 
-	this.enabled = false;
+	this.enabled = true;
 
 	this.isPresenting = false;
 

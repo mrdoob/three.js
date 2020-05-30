@@ -44,7 +44,6 @@ import { WebGLState } from './webgl/WebGLState.js';
 import { WebGLTextures } from './webgl/WebGLTextures.js';
 import { WebGLUniforms } from './webgl/WebGLUniforms.js';
 import { WebGLUtils } from './webgl/WebGLUtils.js';
-import { WebXRManager } from './webxr/WebXRManager.js';
 import { WebGLMaterials } from "./webgl/WebGLMaterials.js";
 
 function WebGLRenderer( parameters ) {
@@ -305,8 +304,7 @@ function WebGLRenderer( parameters ) {
 
 	// xr
 
-	var xr = new WebXRManager( _this, _gl );
-
+	var xr = { enabled: false };
 	this.xr = xr;
 
 	// shadow map
@@ -577,7 +575,11 @@ function WebGLRenderer( parameters ) {
 		properties.dispose();
 		objects.dispose();
 
-		xr.dispose();
+		if ( xr.enabled ) {
+
+			xr.dispose();
+
+		}
 
 		animation.stop();
 
@@ -1113,7 +1115,11 @@ function WebGLRenderer( parameters ) {
 	this.setAnimationLoop = function ( callback ) {
 
 		onAnimationFrameCallback = callback;
-		xr.setAnimationLoop( callback );
+		if ( xr.enabled ) {
+
+			xr.setAnimationLoop( callback );
+
+		};
 
 		animation.start();
 
