@@ -1185,7 +1185,7 @@ function WebGLRenderer( parameters ) {
 		currentRenderList = renderLists.get( scene, camera );
 		currentRenderList.init();
 
-		projectObject( scene, camera, 0, _this.sortObjects );
+		projectObject( scene, camera, null, _this.sortObjects );
 
 		currentRenderList.finish();
 
@@ -1282,13 +1282,20 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.visible === false ) return;
 
+		if ( groupOrder === null ) groupOrder = '';
+
 		var visible = object.layers.test( camera.layers );
 
 		if ( visible ) {
 
 			if ( object.isGroup ) {
 
-				groupOrder = object.renderOrder;
+				if ( object.renderOrder !== null ) {
+
+					// encode the hierarchy draw order as a string for quick comparisons
+					groupOrder += String.fromCharCode( object.renderOrder );
+
+				}
 
 			} else if ( object.isLOD ) {
 

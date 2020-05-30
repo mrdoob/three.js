@@ -9,6 +9,7 @@ function Group() {
 	Object3D.call( this );
 
 	this.type = 'Group';
+	this.renderOrder = null;
 
 }
 
