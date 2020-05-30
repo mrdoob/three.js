@@ -1,3 +1,4 @@
+console.warn( "THREE.GLTFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Rich Tibbett / https://github.com/richtr
  * @author mrdoob / http://mrdoob.com/
@@ -67,6 +68,7 @@ THREE.GLTFLoader = ( function () {
 
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( this.requestHeader );
 
 			if ( scope.crossOrigin === 'use-credentials' ) {
 
@@ -218,6 +220,7 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
+			parser.fileLoader.setRequestHeader( this.requestHeader );
 			parser.parse( onLoad, onError );
 
 		}
@@ -1970,9 +1973,9 @@ THREE.GLTFLoader = ( function () {
 
 				if ( transform ) {
 
-					var gltfReference = this.associations.get( texture );
+					var gltfReference = parser.associations.get( texture );
 					texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, transform );
-					this.associations.set( texture, gltfReference );
+					parser.associations.set( texture, gltfReference );
 
 				}
 

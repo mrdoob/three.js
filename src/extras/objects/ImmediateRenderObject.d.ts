@@ -7,6 +7,8 @@ export class ImmediateRenderObject extends Object3D {
 
 	constructor( material: Material );
 
+	readonly isImmediateRenderObject: true;
+
 	material: Material;
 
 	hasPositions: boolean;

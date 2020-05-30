@@ -44,7 +44,25 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer, path ) );
+			try {
+
+				onLoad( scope.parse( buffer, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 

@@ -143,7 +143,7 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		var envMap = material.envMap || environment;
+		const envMap = material.envMap || environment;
 
 		if ( envMap ) {
 
@@ -180,7 +180,7 @@ function WebGLMaterials( properties ) {
 		// 5. alpha map
 		// 6. emissive map
 
-		var uvScaleMap;
+		let uvScaleMap;
 
 		if ( material.map ) {
 
@@ -243,7 +243,7 @@ function WebGLMaterials( properties ) {
 		// 1. ao map
 		// 2. light map
 
-		var uv2ScaleMap;
+		let uv2ScaleMap;
 
 		if ( material.aoMap ) {
 
@@ -314,7 +314,7 @@ function WebGLMaterials( properties ) {
 		// 1. color map
 		// 2. alpha map
 
-		var uvScaleMap;
+		let uvScaleMap;
 
 		if ( material.map ) {
 
@@ -362,7 +362,7 @@ function WebGLMaterials( properties ) {
 		// 1. color map
 		// 2. alpha map
 
-		var uvScaleMap;
+		let uvScaleMap;
 
 		if ( material.map ) {
 

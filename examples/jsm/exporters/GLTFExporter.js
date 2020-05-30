@@ -528,9 +528,22 @@ GLTFExporter.prototype = {
 
 				for ( var a = 0; a < attribute.itemSize; a ++ ) {
 
-					// @TODO Fails on InterleavedBufferAttribute, and could probably be
-					// optimized for normal BufferAttribute.
-					var value = attribute.array[ i * attribute.itemSize + a ];
+					var value;
+
+					if ( attribute.itemSize > 4 ) {
+
+						 // no support for interleaved data for itemSize > 4
+
+						value = attribute.array[ i * attribute.itemSize + a ];
+
+					} else {
+
+						if ( a === 0 ) value = attribute.getX( i );
+						else if ( a === 1 ) value = attribute.getY( i );
+						else if ( a === 2 ) value = attribute.getZ( i );
+						else if ( a === 3 ) value = attribute.getW( i );
+
+					}
 
 					if ( componentType === WEBGL_CONSTANTS.FLOAT ) {
 

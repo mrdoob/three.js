@@ -131,6 +131,7 @@ var GLTFLoader = ( function () {
 
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( this.requestHeader );
 
 			if ( scope.crossOrigin === 'use-credentials' ) {
 
@@ -282,6 +283,7 @@ var GLTFLoader = ( function () {
 
 			} );
 
+			parser.fileLoader.setRequestHeader( this.requestHeader );
 			parser.parse( onLoad, onError );
 
 		}
@@ -2034,9 +2036,9 @@ var GLTFLoader = ( function () {
 
 				if ( transform ) {
 
-					var gltfReference = this.associations.get( texture );
+					var gltfReference = parser.associations.get( texture );
 					texture = parser.extensions[ EXTENSIONS.KHR_TEXTURE_TRANSFORM ].extendTexture( texture, transform );
-					this.associations.set( texture, gltfReference );
+					parser.associations.set( texture, gltfReference );
 
 				}
 

@@ -37,7 +37,7 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 	toJSON: function () {
 
-		var data = BufferGeometry.prototype.toJSON.call( this );
+		const data = BufferGeometry.prototype.toJSON.call( this );
 
 		data.instanceCount = this.instanceCount;
 

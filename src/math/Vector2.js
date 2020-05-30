@@ -239,8 +239,8 @@ Object.assign( Vector2.prototype, {
 
 	applyMatrix3: function ( m ) {
 
-		var x = this.x, y = this.y;
-		var e = m.elements;
+		const x = this.x, y = this.y;
+		const e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ];
 		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ];
@@ -289,7 +289,7 @@ Object.assign( Vector2.prototype, {
 
 	clampLength: function ( min, max ) {
 
-		var length = this.length();
+		const length = this.length();
 
 		return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
 
@@ -380,7 +380,7 @@ Object.assign( Vector2.prototype, {
 
 		// computes the angle in radians with respect to the positive x-axis
 
-		var angle = Math.atan2( - this.y, - this.x ) + Math.PI;
+		const angle = Math.atan2( - this.y, - this.x ) + Math.PI;
 
 		return angle;
 
@@ -394,7 +394,7 @@ Object.assign( Vector2.prototype, {
 
 	distanceToSquared: function ( v ) {
 
-		var dx = this.x - v.x, dy = this.y - v.y;
+		const dx = this.x - v.x, dy = this.y - v.y;
 		return dx * dx + dy * dy;
 
 	},
@@ -422,7 +422,10 @@ Object.assign( Vector2.prototype, {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-		return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+		this.x = v1.x + ( v2.x - v1.x ) * alpha;
+		this.y = v1.y + ( v2.y - v1.y ) * alpha;
+
+		return this;
 
 	},
 
@@ -472,10 +475,10 @@ Object.assign( Vector2.prototype, {
 
 	rotateAround: function ( center, angle ) {
 
-		var c = Math.cos( angle ), s = Math.sin( angle );
+		const c = Math.cos( angle ), s = Math.sin( angle );
 
-		var x = this.x - center.x;
-		var y = this.y - center.y;
+		const x = this.x - center.x;
+		const y = this.y - center.y;
 
 		this.x = x * c - y * s + center.x;
 		this.y = x * s + y * c + center.y;

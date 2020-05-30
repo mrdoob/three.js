@@ -4,7 +4,7 @@ import { Vector } from './../../math/Vector2';
 
 /**
  * An extensible curve object which contains methods for interpolation
- * class Curve&lt;T extends Vector&gt;
+ * class Curve<T extends Vector>
  */
 export class Curve<T extends Vector> {
 

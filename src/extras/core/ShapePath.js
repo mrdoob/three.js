@@ -67,13 +67,13 @@ Object.assign( ShapePath.prototype, {
 
 		function toShapesNoHoles( inSubpaths ) {
 
-			var shapes = [];
+			const shapes = [];
 
-			for ( var i = 0, l = inSubpaths.length; i < l; i ++ ) {
+			for ( let i = 0, l = inSubpaths.length; i < l; i ++ ) {
 
-				var tmpPath = inSubpaths[ i ];
+				const tmpPath = inSubpaths[ i ];
 
-				var tmpShape = new Shape();
+				const tmpShape = new Shape();
 				tmpShape.curves = tmpPath.curves;
 
 				shapes.push( tmpShape );
@@ -86,20 +86,20 @@ Object.assign( ShapePath.prototype, {
 
 		function isPointInsidePolygon( inPt, inPolygon ) {
 
-			var polyLen = inPolygon.length;
+			const polyLen = inPolygon.length;
 
 			// inPt on polygon contour => immediate success    or
 			// toggling of inside/outside at every single! intersection point of an edge
 			//  with the horizontal line through inPt, left of inPt
 			//  not counting lowerY endpoints of edges and whole edges on that line
-			var inside = false;
-			for ( var p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
+			let inside = false;
+			for ( let p = polyLen - 1, q = 0; q < polyLen; p = q ++ ) {
 
-				var edgeLowPt = inPolygon[ p ];
-				var edgeHighPt = inPolygon[ q ];
+				let edgeLowPt = inPolygon[ p ];
+				let edgeHighPt = inPolygon[ q ];
 
-				var edgeDx = edgeHighPt.x - edgeLowPt.x;
-				var edgeDy = edgeHighPt.y - edgeLowPt.y;
+				let edgeDx = edgeHighPt.x - edgeLowPt.x;
+				let edgeDy = edgeHighPt.y - edgeLowPt.y;
 
 				if ( Math.abs( edgeDy ) > Number.EPSILON ) {
 
@@ -120,7 +120,7 @@ Object.assign( ShapePath.prototype, {
 
 					} else {
 
-						var perpEdge = edgeDy * ( inPt.x - edgeLowPt.x ) - edgeDx * ( inPt.y - edgeLowPt.y );
+						const perpEdge = edgeDy * ( inPt.x - edgeLowPt.x ) - edgeDx * ( inPt.y - edgeLowPt.y );
 						if ( perpEdge === 0 )				return	true;		// inPt is on contour ?
 						if ( perpEdge < 0 ) 				continue;
 						inside = ! inside;		// true intersection left of inPt
@@ -144,15 +144,15 @@ Object.assign( ShapePath.prototype, {
 
 		}
 
-		var isClockWise = ShapeUtils.isClockWise;
+		const isClockWise = ShapeUtils.isClockWise;
 
-		var subPaths = this.subPaths;
+		const subPaths = this.subPaths;
 		if ( subPaths.length === 0 ) return [];
 
 		if ( noHoles === true )	return	toShapesNoHoles( subPaths );
 
 
-		var solid, tmpPath, tmpShape, shapes = [];
+		let solid, tmpPath, tmpShape, shapes = [];
 
 		if ( subPaths.length === 1 ) {
 
@@ -164,21 +164,21 @@ Object.assign( ShapePath.prototype, {
 
 		}
 
-		var holesFirst = ! isClockWise( subPaths[ 0 ].getPoints() );
+		let holesFirst = ! isClockWise( subPaths[ 0 ].getPoints() );
 		holesFirst = isCCW ? ! holesFirst : holesFirst;
 
 		// console.log("Holes first", holesFirst);
 
-		var betterShapeHoles = [];
-		var newShapes = [];
-		var newShapeHoles = [];
-		var mainIdx = 0;
-		var tmpPoints;
+		const betterShapeHoles = [];
+		const newShapes = [];
+		let newShapeHoles = [];
+		let mainIdx = 0;
+		let tmpPoints;
 
 		newShapes[ mainIdx ] = undefined;
 		newShapeHoles[ mainIdx ] = [];
 
-		for ( var i = 0, l = subPaths.length; i < l; i ++ ) {
+		for ( let i = 0, l = subPaths.length; i < l; i ++ ) {
 
 			tmpPath = subPaths[ i ];
 			tmpPoints = tmpPath.getPoints();
@@ -213,25 +213,25 @@ Object.assign( ShapePath.prototype, {
 
 		if ( newShapes.length > 1 ) {
 
-			var ambiguous = false;
-			var toChange = [];
+			let ambiguous = false;
+			const toChange = [];
 
-			for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
+			for ( let sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
 
 				betterShapeHoles[ sIdx ] = [];
 
 			}
 
-			for ( var sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
+			for ( let sIdx = 0, sLen = newShapes.length; sIdx < sLen; sIdx ++ ) {
 
-				var sho = newShapeHoles[ sIdx ];
+				const sho = newShapeHoles[ sIdx ];
 
-				for ( var hIdx = 0; hIdx < sho.length; hIdx ++ ) {
+				for ( let hIdx = 0; hIdx < sho.length; hIdx ++ ) {
 
-					var ho = sho[ hIdx ];
-					var hole_unassigned = true;
+					const ho = sho[ hIdx ];
+					let hole_unassigned = true;
 
-					for ( var s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
+					for ( let s2Idx = 0; s2Idx < newShapes.length; s2Idx ++ ) {
 
 						if ( isPointInsidePolygon( ho.p, newShapes[ s2Idx ].p ) ) {
 
@@ -271,15 +271,15 @@ Object.assign( ShapePath.prototype, {
 
 		}
 
-		var tmpHoles;
+		let tmpHoles;
 
-		for ( var i = 0, il = newShapes.length; i < il; i ++ ) {
+		for ( let i = 0, il = newShapes.length; i < il; i ++ ) {
 
 			tmpShape = newShapes[ i ].s;
 			shapes.push( tmpShape );
 			tmpHoles = newShapeHoles[ i ];
 
-			for ( var j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
+			for ( let j = 0, jl = tmpHoles.length; j < jl; j ++ ) {
 
 				tmpShape.holes.push( tmpHoles[ j ].h );
 

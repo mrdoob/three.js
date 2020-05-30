@@ -1,6 +1,6 @@
 import { Vector3 } from './Vector3.js';
 
-var _points = [
+const _points = [
 	new Vector3(),
 	new Vector3(),
 	new Vector3(),
@@ -11,26 +11,26 @@ var _points = [
 	new Vector3()
 ];
 
-var _vector = new Vector3();
+const _vector = new Vector3();
 
-var _box = new Box3();
+const _box = new Box3();
 
 // triangle centered vertices
 
-var _v0 = new Vector3();
-var _v1 = new Vector3();
-var _v2 = new Vector3();
+const _v0 = new Vector3();
+const _v1 = new Vector3();
+const _v2 = new Vector3();
 
 // triangle edge vectors
 
-var _f0 = new Vector3();
-var _f1 = new Vector3();
-var _f2 = new Vector3();
+const _f0 = new Vector3();
+const _f1 = new Vector3();
+const _f2 = new Vector3();
 
-var _center = new Vector3();
-var _extents = new Vector3();
-var _triangleNormal = new Vector3();
-var _testAxis = new Vector3();
+const _center = new Vector3();
+const _extents = new Vector3();
+const _triangleNormal = new Vector3();
+const _testAxis = new Vector3();
 
 /**
  * @author bhouston / http://clara.io
@@ -60,19 +60,19 @@ Object.assign( Box3.prototype, {
 
 	setFromArray: function ( array ) {
 
-		var minX = + Infinity;
-		var minY = + Infinity;
-		var minZ = + Infinity;
+		let minX = + Infinity;
+		let minY = + Infinity;
+		let minZ = + Infinity;
 
-		var maxX = - Infinity;
-		var maxY = - Infinity;
-		var maxZ = - Infinity;
+		let maxX = - Infinity;
+		let maxY = - Infinity;
+		let maxZ = - Infinity;
 
-		for ( var i = 0, l = array.length; i < l; i += 3 ) {
+		for ( let i = 0, l = array.length; i < l; i += 3 ) {
 
-			var x = array[ i ];
-			var y = array[ i + 1 ];
-			var z = array[ i + 2 ];
+			const x = array[ i ];
+			const y = array[ i + 1 ];
+			const z = array[ i + 2 ];
 
 			if ( x < minX ) minX = x;
 			if ( y < minY ) minY = y;
@@ -93,19 +93,19 @@ Object.assign( Box3.prototype, {
 
 	setFromBufferAttribute: function ( attribute ) {
 
-		var minX = + Infinity;
-		var minY = + Infinity;
-		var minZ = + Infinity;
+		let minX = + Infinity;
+		let minY = + Infinity;
+		let minZ = + Infinity;
 
-		var maxX = - Infinity;
-		var maxY = - Infinity;
-		var maxZ = - Infinity;
+		let maxX = - Infinity;
+		let maxY = - Infinity;
+		let maxZ = - Infinity;
 
-		for ( var i = 0, l = attribute.count; i < l; i ++ ) {
+		for ( let i = 0, l = attribute.count; i < l; i ++ ) {
 
-			var x = attribute.getX( i );
-			var y = attribute.getY( i );
-			var z = attribute.getZ( i );
+			const x = attribute.getX( i );
+			const y = attribute.getY( i );
+			const z = attribute.getZ( i );
 
 			if ( x < minX ) minX = x;
 			if ( y < minY ) minY = y;
@@ -128,7 +128,7 @@ Object.assign( Box3.prototype, {
 
 		this.makeEmpty();
 
-		for ( var i = 0, il = points.length; i < il; i ++ ) {
+		for ( let i = 0, il = points.length; i < il; i ++ ) {
 
 			this.expandByPoint( points[ i ] );
 
@@ -140,7 +140,7 @@ Object.assign( Box3.prototype, {
 
 	setFromCenterAndSize: function ( center, size ) {
 
-		var halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
+		const halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
 
 		this.min.copy( center ).sub( halfSize );
 		this.max.copy( center ).add( halfSize );
@@ -249,7 +249,7 @@ Object.assign( Box3.prototype, {
 
 		object.updateWorldMatrix( false, false );
 
-		var geometry = object.geometry;
+		const geometry = object.geometry;
 
 		if ( geometry !== undefined ) {
 
@@ -266,9 +266,9 @@ Object.assign( Box3.prototype, {
 
 		}
 
-		var children = object.children;
+		const children = object.children;
 
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
 			this.expandByObject( children[ i ] );
 
@@ -338,7 +338,7 @@ Object.assign( Box3.prototype, {
 		// We compute the minimum and maximum dot product values. If those values
 		// are on the same side (back or front) of the plane, then there is no intersection.
 
-		var min, max;
+		let min, max;
 
 		if ( plane.normal.x > 0 ) {
 
@@ -405,7 +405,7 @@ Object.assign( Box3.prototype, {
 		// test against axes that are given by cross product combinations of the edges of the triangle and the edges of the aabb
 		// make an axis testing of each of the 3 sides of the aabb against each of the 3 sides of the triangle = 9 axis of separation
 		// axis_ij = u_i x f_j (u0, u1, u2 = face normals of aabb = x,y,z axes vectors since aabb is axis aligned)
-		var axes = [
+		let axes = [
 			0, - _f0.z, _f0.y, 0, - _f1.z, _f1.y, 0, - _f2.z, _f2.y,
 			_f0.z, 0, - _f0.x, _f1.z, 0, - _f1.x, _f2.z, 0, - _f2.x,
 			- _f0.y, _f0.x, 0, - _f1.y, _f1.x, 0, - _f2.y, _f2.x, 0
@@ -448,7 +448,7 @@ Object.assign( Box3.prototype, {
 
 	distanceToPoint: function ( point ) {
 
-		var clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
+		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
 
 		return clampedPoint.sub( point ).length();
 
@@ -532,17 +532,15 @@ Object.assign( Box3.prototype, {
 
 function satForAxes( axes, v0, v1, v2, extents ) {
 
-	var i, j;
-
-	for ( i = 0, j = axes.length - 3; i <= j; i += 3 ) {
+	for ( let i = 0, j = axes.length - 3; i <= j; i += 3 ) {
 
 		_testAxis.fromArray( axes, i );
 		// project the aabb onto the seperating axis
-		var r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
+		const r = extents.x * Math.abs( _testAxis.x ) + extents.y * Math.abs( _testAxis.y ) + extents.z * Math.abs( _testAxis.z );
 		// project all 3 vertices of the triangle onto the seperating axis
-		var p0 = v0.dot( _testAxis );
-		var p1 = v1.dot( _testAxis );
-		var p2 = v2.dot( _testAxis );
+		const p0 = v0.dot( _testAxis );
+		const p1 = v1.dot( _testAxis );
+		const p2 = v2.dot( _testAxis );
 		// actual test, basically see if either of the most extreme of the triangle points intersects r
 		if ( Math.max( - Math.max( p0, p1, p2 ), Math.min( p0, p1, p2 ) ) > r ) {
 

@@ -7,7 +7,7 @@ import { MathUtils } from '../math/MathUtils.js';
  * @author alteredq / http://alteredqualia.com/
  */
 
-var materialId = 0;
+let materialId = 0;
 
 function Material() {
 
@@ -89,9 +89,9 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( values === undefined ) return;
 
-		for ( var key in values ) {
+		for ( const key in values ) {
 
-			var newValue = values[ key ];
+			const newValue = values[ key ];
 
 			if ( newValue === undefined ) {
 
@@ -109,7 +109,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			}
 
-			var currentValue = this[ key ];
+			const currentValue = this[ key ];
 
 			if ( currentValue === undefined ) {
 
@@ -138,7 +138,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	toJSON: function ( meta ) {
 
-		var isRoot = ( meta === undefined || typeof meta === 'string' );
+		const isRoot = ( meta === undefined || typeof meta === 'string' );
 
 		if ( isRoot ) {
 
@@ -149,7 +149,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		var data = {
+		const data = {
 			metadata: {
 				version: 4.5,
 				type: 'Material',
@@ -314,11 +314,11 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		function extractFromCache( cache ) {
 
-			var values = [];
+			const values = [];
 
-			for ( var key in cache ) {
+			for ( const key in cache ) {
 
-				var data = cache[ key ];
+				const data = cache[ key ];
 				delete data.metadata;
 				values.push( data );
 
@@ -330,8 +330,8 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		if ( isRoot ) {
 
-			var textures = extractFromCache( meta.textures );
-			var images = extractFromCache( meta.images );
+			const textures = extractFromCache( meta.textures );
+			const images = extractFromCache( meta.images );
 
 			if ( textures.length > 0 ) data.textures = textures;
 			if ( images.length > 0 ) data.images = images;
@@ -382,16 +382,19 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		this.stencilZPass = source.stencilZPass;
 		this.stencilWrite = source.stencilWrite;
 
-		var srcPlanes = source.clippingPlanes,
-			dstPlanes = null;
+		const srcPlanes = source.clippingPlanes;
+		let dstPlanes = null;
 
 		if ( srcPlanes !== null ) {
 
-			var n = srcPlanes.length;
+			const n = srcPlanes.length;
 			dstPlanes = new Array( n );
 
-			for ( var i = 0; i !== n; ++ i )
+			for ( let i = 0; i !== n; ++ i ) {
+
 				dstPlanes[ i ] = srcPlanes[ i ].clone();
+
+			}
 
 		}
 

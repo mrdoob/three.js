@@ -1,3 +1,4 @@
+console.warn( "THREE.BasisTextureLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Don McCurdy / https://www.donmccurdy.com
  * @author Austin Eng / https://github.com/austinEng
@@ -185,8 +186,10 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 			} );
 
+		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 		texturePending
-			.finally( () => {
+			.catch( () => true )
+			.then( () => {
 
 				if ( worker && taskID ) {
 

@@ -2,6 +2,7 @@
 	color-scheme: light dark;
 
 	--background-color: #fff;
+	--secondary-background-color: #f7f7f7;
 
 	--color-blue: #049EF4;
 	--text-color: #444;
@@ -21,6 +22,7 @@
 
 	:root {
 		--background-color: #222;
+		--secondary-background-color: #2e2e2e;
 
 		--text-color: #bbb;
 		--secondary-text-color: #666;
@@ -467,7 +469,7 @@ iframe {
 .card {
 	border-radius: 3px;
 	overflow: hidden;
-	background-color: #f7f7f7;
+	background-color: var(--secondary-background-color);
 	padding-bottom: 6px;
 	margin-bottom: 16px;
 }
@@ -492,9 +494,10 @@ iframe {
 }
 
 .card .title {
-	padding: 8px 12px 8px;
-	font-size: 18px;
+	padding: 8px 12px 4px;
+	font-size: calc(var(--font-size) - 1px);
 	font-weight: 500;
+	line-height: calc(var(--line-height) - 6px);
 }
 
 /* mobile */

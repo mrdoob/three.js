@@ -117,14 +117,14 @@ ShaderMaterial.prototype.copy = function ( source ) {
 
 ShaderMaterial.prototype.toJSON = function ( meta ) {
 
-	var data = Material.prototype.toJSON.call( this, meta );
+	const data = Material.prototype.toJSON.call( this, meta );
 
 	data.uniforms = {};
 
-	for ( var name in this.uniforms ) {
+	for ( const name in this.uniforms ) {
 
-		var uniform = this.uniforms[ name ];
-		var value = uniform.value;
+		const uniform = this.uniforms[ name ];
+		const value = uniform.value;
 
 		if ( value && value.isTexture ) {
 
@@ -192,9 +192,9 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 	data.vertexShader = this.vertexShader;
 	data.fragmentShader = this.fragmentShader;
 
-	var extensions = {};
+	const extensions = {};
 
-	for ( var key in this.extensions ) {
+	for ( const key in this.extensions ) {
 
 		if ( this.extensions[ key ] === true ) extensions[ key ] = true;
 

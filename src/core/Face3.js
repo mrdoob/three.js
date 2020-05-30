@@ -41,13 +41,13 @@ Object.assign( Face3.prototype, {
 
 		this.materialIndex = source.materialIndex;
 
-		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
+		for ( let i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
 
 			this.vertexNormals[ i ] = source.vertexNormals[ i ].clone();
 
 		}
 
-		for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
+		for ( let i = 0, il = source.vertexColors.length; i < il; i ++ ) {
 
 			this.vertexColors[ i ] = source.vertexColors[ i ].clone();
 
