@@ -262,6 +262,8 @@ var SidebarProject = function ( editor ) {
 		config.getKey( 'project/renderer/shadows' ),
 		config.getKey( 'project/renderer/shadowType' ),
 		config.getKey( 'project/renderer/toneMapping' ),
+		config.getKey( 'project/renderer/toneMappingExposure' ),
+		config.getKey( 'project/renderer/toneMappingWhitePoint' ),
 		config.getKey( 'project/renderer/physicallyCorrectLights' )
 	 );
 
