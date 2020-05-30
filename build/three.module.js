@@ -14741,36 +14741,34 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 	width = width || 1;
 	height = height || 1;
 
-	var width_half = width / 2;
-	var height_half = height / 2;
+	const width_half = width / 2;
+	const height_half = height / 2;
 
-	var gridX = Math.floor( widthSegments ) || 1;
-	var gridY = Math.floor( heightSegments ) || 1;
+	const gridX = Math.floor( widthSegments ) || 1;
+	const gridY = Math.floor( heightSegments ) || 1;
 
-	var gridX1 = gridX + 1;
-	var gridY1 = gridY + 1;
+	const gridX1 = gridX + 1;
+	const gridY1 = gridY + 1;
 
-	var segment_width = width / gridX;
-	var segment_height = height / gridY;
-
-	var ix, iy;
+	const segment_width = width / gridX;
+	const segment_height = height / gridY;
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// generate vertices, normals and uvs
 
-	for ( iy = 0; iy < gridY1; iy ++ ) {
+	for ( let iy = 0; iy < gridY1; iy ++ ) {
 
-		var y = iy * segment_height - height_half;
+		const y = iy * segment_height - height_half;
 
-		for ( ix = 0; ix < gridX1; ix ++ ) {
+		for ( let ix = 0; ix < gridX1; ix ++ ) {
 
-			var x = ix * segment_width - width_half;
+			const x = ix * segment_width - width_half;
 
 			vertices.push( x, - y, 0 );
 
@@ -14785,14 +14783,14 @@ function PlaneBufferGeometry( width, height, widthSegments, heightSegments ) {
 
 	// indices
 
-	for ( iy = 0; iy < gridY; iy ++ ) {
+	for ( let iy = 0; iy < gridY; iy ++ ) {
 
-		for ( ix = 0; ix < gridX; ix ++ ) {
+		for ( let ix = 0; ix < gridX; ix ++ ) {
 
-			var a = ix + gridX1 * iy;
-			var b = ix + gridX1 * ( iy + 1 );
-			var c = ( ix + 1 ) + gridX1 * ( iy + 1 );
-			var d = ( ix + 1 ) + gridX1 * iy;
+			const a = ix + gridX1 * iy;
+			const b = ix + gridX1 * ( iy + 1 );
+			const c = ( ix + 1 ) + gridX1 * ( iy + 1 );
+			const d = ( ix + 1 ) + gridX1 * iy;
 
 			// faces
 
@@ -28396,14 +28394,12 @@ function WireframeGeometry( geometry ) {
 
 	// buffer
 
-	var vertices = [];
+	const vertices = [];
 
 	// helper variables
 
-	var i, j, l, o, ol;
-	var edge = [ 0, 0 ], edges = {}, e, edge1, edge2;
-	var key, keys = [ 'a', 'b', 'c' ];
-	var vertex;
+	const edge = [ 0, 0 ], edges = {};
+	const keys = [ 'a', 'b', 'c' ];
 
 	// different logic for Geometry and BufferGeometry
 
@@ -28411,20 +28407,20 @@ function WireframeGeometry( geometry ) {
 
 		// create a data structure that contains all edges without duplicates
 
-		var faces = geometry.faces;
+		const faces = geometry.faces;
 
-		for ( i = 0, l = faces.length; i < l; i ++ ) {
+		for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-			var face = faces[ i ];
+			const face = faces[ i ];
 
-			for ( j = 0; j < 3; j ++ ) {
+			for ( let j = 0; j < 3; j ++ ) {
 
-				edge1 = face[ keys[ j ] ];
-				edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
+				const edge1 = face[ keys[ j ] ];
+				const edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
 				edge[ 0 ] = Math.min( edge1, edge2 ); // sorting prevents duplicates
 				edge[ 1 ] = Math.max( edge1, edge2 );
 
-				key = edge[ 0 ] + ',' + edge[ 1 ];
+				const key = edge[ 0 ] + ',' + edge[ 1 ];
 
 				if ( edges[ key ] === undefined ) {
 
@@ -28438,11 +28434,11 @@ function WireframeGeometry( geometry ) {
 
 		// generate vertices
 
-		for ( key in edges ) {
+		for ( const key in edges ) {
 
-			e = edges[ key ];
+			const e = edges[ key ];
 
-			vertex = geometry.vertices[ e.index1 ];
+			let vertex = geometry.vertices[ e.index1 ];
 			vertices.push( vertex.x, vertex.y, vertex.z );
 
 			vertex = geometry.vertices[ e.index2 ];
@@ -28452,19 +28448,15 @@ function WireframeGeometry( geometry ) {
 
 	} else if ( geometry && geometry.isBufferGeometry ) {
 
-		var position, indices, groups;
-		var group, start, count;
-		var index1, index2;
-
-		vertex = new Vector3();
+		let vertex = new Vector3();
 
 		if ( geometry.index !== null ) {
 
 			// indexed BufferGeometry
 
-			position = geometry.attributes.position;
-			indices = geometry.index;
-			groups = geometry.groups;
+			const position = geometry.attributes.position;
+			const indices = geometry.index;
+			let groups = geometry.groups;
 
 			if ( groups.length === 0 ) {
 
@@ -28474,23 +28466,23 @@ function WireframeGeometry( geometry ) {
 
 			// create a data structure that contains all eges without duplicates
 
-			for ( o = 0, ol = groups.length; o < ol; ++ o ) {
+			for ( let o = 0, ol = groups.length; o < ol; ++ o ) {
 
-				group = groups[ o ];
+				const group = groups[ o ];
 
-				start = group.start;
-				count = group.count;
+				const start = group.start;
+				const count = group.count;
 
-				for ( i = start, l = ( start + count ); i < l; i += 3 ) {
+				for ( let i = start, l = ( start + count ); i < l; i += 3 ) {
 
-					for ( j = 0; j < 3; j ++ ) {
+					for ( let j = 0; j < 3; j ++ ) {
 
-						edge1 = indices.getX( i + j );
-						edge2 = indices.getX( i + ( j + 1 ) % 3 );
+						const edge1 = indices.getX( i + j );
+						const edge2 = indices.getX( i + ( j + 1 ) % 3 );
 						edge[ 0 ] = Math.min( edge1, edge2 ); // sorting prevents duplicates
 						edge[ 1 ] = Math.max( edge1, edge2 );
 
-						key = edge[ 0 ] + ',' + edge[ 1 ];
+						const key = edge[ 0 ] + ',' + edge[ 1 ];
 
 						if ( edges[ key ] === undefined ) {
 
@@ -28506,9 +28498,9 @@ function WireframeGeometry( geometry ) {
 
 			// generate vertices
 
-			for ( key in edges ) {
+			for ( const key in edges ) {
 
-				e = edges[ key ];
+				const e = edges[ key ];
 
 				vertex.fromBufferAttribute( position, e.index1 );
 				vertices.push( vertex.x, vertex.y, vertex.z );
@@ -28522,20 +28514,20 @@ function WireframeGeometry( geometry ) {
 
 			// non-indexed BufferGeometry
 
-			position = geometry.attributes.position;
+			const position = geometry.attributes.position;
 
-			for ( i = 0, l = ( position.count / 3 ); i < l; i ++ ) {
+			for ( let i = 0, l = ( position.count / 3 ); i < l; i ++ ) {
 
-				for ( j = 0; j < 3; j ++ ) {
+				for ( let j = 0; j < 3; j ++ ) {
 
 					// three edges per triangle, an edge is represented as (index1, index2)
 					// e.g. the first triangle has the following edges: (0,1),(1,2),(2,0)
 
-					index1 = 3 * i + j;
+					const index1 = 3 * i + j;
 					vertex.fromBufferAttribute( position, index1 );
 					vertices.push( vertex.x, vertex.y, vertex.z );
 
-					index2 = 3 * i + ( ( j + 1 ) % 3 );
+					const index2 = 3 * i + ( ( j + 1 ) % 3 );
 					vertex.fromBufferAttribute( position, index2 );
 					vertices.push( vertex.x, vertex.y, vertex.z );
 
@@ -28602,19 +28594,17 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
-	var EPS = 0.00001;
+	const EPS = 0.00001;
 
-	var normal = new Vector3();
+	const normal = new Vector3();
 
-	var p0 = new Vector3(), p1 = new Vector3();
-	var pu = new Vector3(), pv = new Vector3();
-
-	var i, j;
+	const p0 = new Vector3(), p1 = new Vector3();
+	const pu = new Vector3(), pv = new Vector3();
 
 	if ( func.length < 3 ) {
 
@@ -28624,15 +28614,15 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// generate vertices, normals and uvs
 
-	var sliceCount = slices + 1;
+	const sliceCount = slices + 1;
 
-	for ( i = 0; i <= stacks; i ++ ) {
+	for ( let i = 0; i <= stacks; i ++ ) {
 
-		var v = i / stacks;
+		const v = i / stacks;
 
-		for ( j = 0; j <= slices; j ++ ) {
+		for ( let j = 0; j <= slices; j ++ ) {
 
-			var u = j / slices;
+			const u = j / slices;
 
 			// vertex
 
@@ -28682,14 +28672,14 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// generate indices
 
-	for ( i = 0; i < stacks; i ++ ) {
+	for ( let i = 0; i < stacks; i ++ ) {
 
-		for ( j = 0; j < slices; j ++ ) {
+		for ( let j = 0; j < slices; j ++ ) {
 
-			var a = i * sliceCount + j;
-			var b = i * sliceCount + j + 1;
-			var c = ( i + 1 ) * sliceCount + j + 1;
-			var d = ( i + 1 ) * sliceCount + j;
+			const a = i * sliceCount + j;
+			const b = i * sliceCount + j + 1;
+			const c = ( i + 1 ) * sliceCount + j + 1;
+			const d = ( i + 1 ) * sliceCount + j;
 
 			// faces one and two
 
@@ -28762,8 +28752,8 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	// default buffer data
 
-	var vertexBuffer = [];
-	var uvBuffer = [];
+	const vertexBuffer = [];
+	const uvBuffer = [];
 
 	// the subdivision creates the vertex buffer data
 
@@ -28797,13 +28787,13 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function subdivide( detail ) {
 
-		var a = new Vector3();
-		var b = new Vector3();
-		var c = new Vector3();
+		const a = new Vector3();
+		const b = new Vector3();
+		const c = new Vector3();
 
 		// iterate over all faces and apply a subdivison with the given detail value
 
-		for ( var i = 0; i < indices.length; i += 3 ) {
+		for ( let i = 0; i < indices.length; i += 3 ) {
 
 			// get the vertices of the face
 
@@ -28821,26 +28811,24 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function subdivideFace( a, b, c, detail ) {
 
-		var cols = Math.pow( 2, detail );
+		const cols = Math.pow( 2, detail );
 
 		// we use this multidimensional array as a data structure for creating the subdivision
 
-		var v = [];
-
-		var i, j;
+		const v = [];
 
 		// construct all of the vertices for this subdivision
 
-		for ( i = 0; i <= cols; i ++ ) {
+		for ( let i = 0; i <= cols; i ++ ) {
 
 			v[ i ] = [];
 
-			var aj = a.clone().lerp( c, i / cols );
-			var bj = b.clone().lerp( c, i / cols );
+			const aj = a.clone().lerp( c, i / cols );
+			const bj = b.clone().lerp( c, i / cols );
 
-			var rows = cols - i;
+			const rows = cols - i;
 
-			for ( j = 0; j <= rows; j ++ ) {
+			for ( let j = 0; j <= rows; j ++ ) {
 
 				if ( j === 0 && i === cols ) {
 
@@ -28858,11 +28846,11 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 		// construct all of the faces
 
-		for ( i = 0; i < cols; i ++ ) {
+		for ( let i = 0; i < cols; i ++ ) {
 
-			for ( j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
+			for ( let j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
 
-				var k = Math.floor( j / 2 );
+				const k = Math.floor( j / 2 );
 
 				if ( j % 2 === 0 ) {
 
@@ -28886,11 +28874,11 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function applyRadius( radius ) {
 
-		var vertex = new Vector3();
+		const vertex = new Vector3();
 
 		// iterate over the entire buffer and apply the radius to each vertex
 
-		for ( var i = 0; i < vertexBuffer.length; i += 3 ) {
+		for ( let i = 0; i < vertexBuffer.length; i += 3 ) {
 
 			vertex.x = vertexBuffer[ i + 0 ];
 			vertex.y = vertexBuffer[ i + 1 ];
@@ -28908,16 +28896,16 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function generateUVs() {
 
-		var vertex = new Vector3();
+		const vertex = new Vector3();
 
-		for ( var i = 0; i < vertexBuffer.length; i += 3 ) {
+		for ( let i = 0; i < vertexBuffer.length; i += 3 ) {
 
 			vertex.x = vertexBuffer[ i + 0 ];
 			vertex.y = vertexBuffer[ i + 1 ];
 			vertex.z = vertexBuffer[ i + 2 ];
 
-			var u = azimuth( vertex ) / 2 / Math.PI + 0.5;
-			var v = inclination( vertex ) / Math.PI + 0.5;
+			const u = azimuth( vertex ) / 2 / Math.PI + 0.5;
+			const v = inclination( vertex ) / Math.PI + 0.5;
 			uvBuffer.push( u, 1 - v );
 
 		}
@@ -28932,16 +28920,16 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 		// handle case when face straddles the seam, see #3269
 
-		for ( var i = 0; i < uvBuffer.length; i += 6 ) {
+		for ( let i = 0; i < uvBuffer.length; i += 6 ) {
 
 			// uv data of a single face
 
-			var x0 = uvBuffer[ i + 0 ];
-			var x1 = uvBuffer[ i + 2 ];
-			var x2 = uvBuffer[ i + 4 ];
+			const x0 = uvBuffer[ i + 0 ];
+			const x1 = uvBuffer[ i + 2 ];
+			const x2 = uvBuffer[ i + 4 ];
 
-			var max = Math.max( x0, x1, x2 );
-			var min = Math.min( x0, x1, x2 );
+			const max = Math.max( x0, x1, x2 );
+			const min = Math.min( x0, x1, x2 );
 
 			// 0.9 is somewhat arbitrary
 
@@ -28965,7 +28953,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function getVertexByIndex( index, vertex ) {
 
-		var stride = index * 3;
+		const stride = index * 3;
 
 		vertex.x = vertices[ stride + 0 ];
 		vertex.y = vertices[ stride + 1 ];
@@ -28975,17 +28963,17 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function correctUVs() {
 
-		var a = new Vector3();
-		var b = new Vector3();
-		var c = new Vector3();
+		const a = new Vector3();
+		const b = new Vector3();
+		const c = new Vector3();
 
-		var centroid = new Vector3();
+		const centroid = new Vector3();
 
-		var uvA = new Vector2();
-		var uvB = new Vector2();
-		var uvC = new Vector2();
+		const uvA = new Vector2();
+		const uvB = new Vector2();
+		const uvC = new Vector2();
 
-		for ( var i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6 ) {
+		for ( let i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6 ) {
 
 			a.set( vertexBuffer[ i + 0 ], vertexBuffer[ i + 1 ], vertexBuffer[ i + 2 ] );
 			b.set( vertexBuffer[ i + 3 ], vertexBuffer[ i + 4 ], vertexBuffer[ i + 5 ] );
@@ -28997,7 +28985,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 			centroid.copy( a ).add( b ).add( c ).divideScalar( 3 );
 
-			var azi = azimuth( centroid );
+			const azi = azimuth( centroid );
 
 			correctUV( uvA, j + 0, a, azi );
 			correctUV( uvB, j + 2, b, azi );
@@ -29075,11 +29063,11 @@ TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
 
 function TetrahedronBufferGeometry( radius, detail ) {
 
-	var vertices = [
+	const vertices = [
 		1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
 	];
 
-	var indices = [
+	const indices = [
 		2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
 	];
 
@@ -29127,12 +29115,12 @@ OctahedronGeometry.prototype.constructor = OctahedronGeometry;
 
 function OctahedronBufferGeometry( radius, detail ) {
 
-	var vertices = [
+	const vertices = [
 		1, 0, 0, 	- 1, 0, 0,	0, 1, 0,
 		0, - 1, 0, 	0, 0, 1,	0, 0, - 1
 	];
 
-	var indices = [
+	const indices = [
 		0, 2, 4,	0, 4, 3,	0, 3, 5,
 		0, 5, 2,	1, 2, 5,	1, 5, 3,
 		1, 3, 4,	1, 4, 2
@@ -29182,15 +29170,15 @@ IcosahedronGeometry.prototype.constructor = IcosahedronGeometry;
 
 function IcosahedronBufferGeometry( radius, detail ) {
 
-	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
+	const t = ( 1 + Math.sqrt( 5 ) ) / 2;
 
-	var vertices = [
+	const vertices = [
 		- 1, t, 0, 	1, t, 0, 	- 1, - t, 0, 	1, - t, 0,
 		 0, - 1, t, 	0, 1, t,	0, - 1, - t, 	0, 1, - t,
 		 t, 0, - 1, 	t, 0, 1, 	- t, 0, - 1, 	- t, 0, 1
 	];
 
-	var indices = [
+	const indices = [
 		 0, 11, 5, 	0, 5, 1, 	0, 1, 7, 	0, 7, 10, 	0, 10, 11,
 		 1, 5, 9, 	5, 11, 4,	11, 10, 2,	10, 7, 6,	7, 1, 8,
 		 3, 9, 4, 	3, 4, 2,	3, 2, 6,	3, 6, 8,	3, 8, 9,
@@ -29241,10 +29229,10 @@ DodecahedronGeometry.prototype.constructor = DodecahedronGeometry;
 
 function DodecahedronBufferGeometry( radius, detail ) {
 
-	var t = ( 1 + Math.sqrt( 5 ) ) / 2;
-	var r = 1 / t;
+	const t = ( 1 + Math.sqrt( 5 ) ) / 2;
+	const r = 1 / t;
 
-	var vertices = [
+	const vertices = [
 
 		// (±1, ±1, ±1)
 		- 1, - 1, - 1,	- 1, - 1, 1,
@@ -29265,7 +29253,7 @@ function DodecahedronBufferGeometry( radius, detail ) {
 		- t, 0, r, t, 0, r
 	];
 
-	var indices = [
+	const indices = [
 		3, 11, 7, 	3, 7, 15, 	3, 15, 13,
 		7, 19, 17, 	7, 17, 6, 	7, 6, 15,
 		17, 4, 8, 	17, 8, 10, 	17, 10, 6,
@@ -29322,7 +29310,7 @@ function TubeGeometry( path, tubularSegments, radius, radialSegments, closed, ta
 
 	if ( taper !== undefined ) console.warn( 'THREE.TubeGeometry: taper has been removed.' );
 
-	var bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
+	const bufferGeometry = new TubeBufferGeometry( path, tubularSegments, radius, radialSegments, closed );
 
 	// expose internals
 
@@ -29361,7 +29349,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 	radialSegments = radialSegments || 8;
 	closed = closed || false;
 
-	var frames = path.computeFrenetFrames( tubularSegments, closed );
+	const frames = path.computeFrenetFrames( tubularSegments, closed );
 
 	// expose internals
 
@@ -29371,19 +29359,17 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	// helper variables
 
-	var vertex = new Vector3();
-	var normal = new Vector3();
-	var uv = new Vector2();
-	var P = new Vector3();
-
-	var i, j;
+	const vertex = new Vector3();
+	const normal = new Vector3();
+	const uv = new Vector2();
+	let P = new Vector3();
 
 	// buffer
 
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
-	var indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
+	const indices = [];
 
 	// create buffer data
 
@@ -29400,7 +29386,7 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	function generateBufferData() {
 
-		for ( i = 0; i < tubularSegments; i ++ ) {
+		for ( let i = 0; i < tubularSegments; i ++ ) {
 
 			generateSegment( i );
 
@@ -29432,17 +29418,17 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 		// retrieve corresponding normal and binormal
 
-		var N = frames.normals[ i ];
-		var B = frames.binormals[ i ];
+		const N = frames.normals[ i ];
+		const B = frames.binormals[ i ];
 
 		// generate normals and vertices for the current segment
 
-		for ( j = 0; j <= radialSegments; j ++ ) {
+		for ( let j = 0; j <= radialSegments; j ++ ) {
 
-			var v = j / radialSegments * Math.PI * 2;
+			const v = j / radialSegments * Math.PI * 2;
 
-			var sin = Math.sin( v );
-			var cos = - Math.cos( v );
+			const sin = Math.sin( v );
+			const cos = - Math.cos( v );
 
 			// normal
 
@@ -29467,14 +29453,14 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	function generateIndices() {
 
-		for ( j = 1; j <= tubularSegments; j ++ ) {
+		for ( let j = 1; j <= tubularSegments; j ++ ) {
 
-			for ( i = 1; i <= radialSegments; i ++ ) {
+			for ( let i = 1; i <= radialSegments; i ++ ) {
 
-				var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
-				var b = ( radialSegments + 1 ) * j + ( i - 1 );
-				var c = ( radialSegments + 1 ) * j + i;
-				var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
+				const a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+				const b = ( radialSegments + 1 ) * j + ( i - 1 );
+				const c = ( radialSegments + 1 ) * j + i;
+				const d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
 				// faces
 
@@ -29489,9 +29475,9 @@ function TubeBufferGeometry( path, tubularSegments, radius, radialSegments, clos
 
 	function generateUVs() {
 
-		for ( i = 0; i <= tubularSegments; i ++ ) {
+		for ( let i = 0; i <= tubularSegments; i ++ ) {
 
-			for ( j = 0; j <= radialSegments; j ++ ) {
+			for ( let j = 0; j <= radialSegments; j ++ ) {
 
 				uv.x = i / tubularSegments;
 				uv.y = j / radialSegments;
@@ -29511,7 +29497,7 @@ TubeBufferGeometry.prototype.constructor = TubeBufferGeometry;
 
 TubeBufferGeometry.prototype.toJSON = function () {
 
-	var data = BufferGeometry.prototype.toJSON.call( this );
+	const data = BufferGeometry.prototype.toJSON.call( this );
 
 	data.path = this.parameters.path.toJSON();
 
@@ -29579,32 +29565,30 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// helper variables
 
-	var i, j;
+	const vertex = new Vector3();
+	const normal = new Vector3();
 
-	var vertex = new Vector3();
-	var normal = new Vector3();
+	const P1 = new Vector3();
+	const P2 = new Vector3();
 
-	var P1 = new Vector3();
-	var P2 = new Vector3();
-
-	var B = new Vector3();
-	var T = new Vector3();
-	var N = new Vector3();
+	const B = new Vector3();
+	const T = new Vector3();
+	const N = new Vector3();
 
 	// generate vertices, normals and uvs
 
-	for ( i = 0; i <= tubularSegments; ++ i ) {
+	for ( let i = 0; i <= tubularSegments; ++ i ) {
 
 		// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
 
-		var u = i / tubularSegments * p * Math.PI * 2;
+		const u = i / tubularSegments * p * Math.PI * 2;
 
 		// now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
 		// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
@@ -29624,14 +29608,14 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 		B.normalize();
 		N.normalize();
 
-		for ( j = 0; j <= radialSegments; ++ j ) {
+		for ( let j = 0; j <= radialSegments; ++ j ) {
 
 			// now calculate the vertices. they are nothing more than an extrusion of the torus curve.
 			// because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
 
-			var v = j / radialSegments * Math.PI * 2;
-			var cx = - tube * Math.cos( v );
-			var cy = tube * Math.sin( v );
+			const v = j / radialSegments * Math.PI * 2;
+			const cx = - tube * Math.cos( v );
+			const cy = tube * Math.sin( v );
 
 			// now calculate the final vertex position.
 			// first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
@@ -29659,16 +29643,16 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	// generate indices
 
-	for ( j = 1; j <= tubularSegments; j ++ ) {
+	for ( let j = 1; j <= tubularSegments; j ++ ) {
 
-		for ( i = 1; i <= radialSegments; i ++ ) {
+		for ( let i = 1; i <= radialSegments; i ++ ) {
 
 			// indices
 
-			var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
-			var b = ( radialSegments + 1 ) * j + ( i - 1 );
-			var c = ( radialSegments + 1 ) * j + i;
-			var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
+			const a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+			const b = ( radialSegments + 1 ) * j + ( i - 1 );
+			const c = ( radialSegments + 1 ) * j + i;
+			const d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
 			// faces
 
@@ -29690,10 +29674,10 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	function calculatePositionOnCurve( u, p, q, radius, position ) {
 
-		var cu = Math.cos( u );
-		var su = Math.sin( u );
-		var quOverP = q / p * u;
-		var cs = Math.cos( quOverP );
+		const cu = Math.cos( u );
+		const su = Math.sin( u );
+		const quOverP = q / p * u;
+		const cs = Math.cos( quOverP );
 
 		position.x = radius * ( 2 + cs ) * 0.5 * cu;
 		position.y = radius * ( 2 + cs ) * su * 0.5;
@@ -29760,27 +29744,25 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// helper variables
 
-	var center = new Vector3();
-	var vertex = new Vector3();
-	var normal = new Vector3();
-
-	var j, i;
+	const center = new Vector3();
+	const vertex = new Vector3();
+	const normal = new Vector3();
 
 	// generate vertices, normals and uvs
 
-	for ( j = 0; j <= radialSegments; j ++ ) {
+	for ( let j = 0; j <= radialSegments; j ++ ) {
 
-		for ( i = 0; i <= tubularSegments; i ++ ) {
+		for ( let i = 0; i <= tubularSegments; i ++ ) {
 
-			var u = i / tubularSegments * arc;
-			var v = j / radialSegments * Math.PI * 2;
+			const u = i / tubularSegments * arc;
+			const v = j / radialSegments * Math.PI * 2;
 
 			// vertex
 
@@ -29809,16 +29791,16 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 
 	// generate indices
 
-	for ( j = 1; j <= radialSegments; j ++ ) {
+	for ( let j = 1; j <= radialSegments; j ++ ) {
 
-		for ( i = 1; i <= tubularSegments; i ++ ) {
+		for ( let i = 1; i <= tubularSegments; i ++ ) {
 
 			// indices
 
-			var a = ( tubularSegments + 1 ) * j + i - 1;
-			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
-			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
-			var d = ( tubularSegments + 1 ) * j + i;
+			const a = ( tubularSegments + 1 ) * j + i - 1;
+			const b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+			const c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+			const d = ( tubularSegments + 1 ) * j + i;
 
 			// faces
 
@@ -30774,10 +30756,10 @@ ExtrudeGeometry.prototype.constructor = ExtrudeGeometry;
 
 ExtrudeGeometry.prototype.toJSON = function () {
 
-	var data = Geometry.prototype.toJSON.call( this );
+	const data = Geometry.prototype.toJSON.call( this );
 
-	var shapes = this.parameters.shapes;
-	var options = this.parameters.options;
+	const shapes = this.parameters.shapes;
+	const options = this.parameters.options;
 
 	return toJSON( shapes, options, data );
 
@@ -30798,14 +30780,14 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 	shapes = Array.isArray( shapes ) ? shapes : [ shapes ];
 
-	var scope = this;
+	const scope = this;
 
-	var verticesArray = [];
-	var uvArray = [];
+	const verticesArray = [];
+	const uvArray = [];
 
-	for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+	for ( let i = 0, l = shapes.length; i < l; i ++ ) {
 
-		var shape = shapes[ i ];
+		const shape = shapes[ i ];
 		addShape( shape );
 
 	}
@@ -30821,23 +30803,23 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 	function addShape( shape ) {
 
-		var placeholder = [];
+		const placeholder = [];
 
 		// options
 
-		var curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
-		var steps = options.steps !== undefined ? options.steps : 1;
-		var depth = options.depth !== undefined ? options.depth : 100;
+		const curveSegments = options.curveSegments !== undefined ? options.curveSegments : 12;
+		const steps = options.steps !== undefined ? options.steps : 1;
+		let depth = options.depth !== undefined ? options.depth : 100;
 
-		var bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
-		var bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
-		var bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
-		var bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
-		var bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
+		let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true;
+		let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6;
+		let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2;
+		let bevelOffset = options.bevelOffset !== undefined ? options.bevelOffset : 0;
+		let bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
 
-		var extrudePath = options.extrudePath;
+		const extrudePath = options.extrudePath;
 
-		var uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
+		const uvgen = options.UVGenerator !== undefined ? options.UVGenerator : WorldUVGenerator;
 
 		// deprecated options
 
@@ -30850,8 +30832,8 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		//
 
-		var extrudePts, extrudeByPath = false;
-		var splineTube, binormal, normal, position2;
+		let extrudePts, extrudeByPath = false;
+		let splineTube, binormal, normal, position2;
 
 		if ( extrudePath ) {
 
@@ -30887,14 +30869,12 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		// Variables initialization
 
-		var ahole, h, hl; // looping of holes
+		const shapePoints = shape.extractPoints( curveSegments );
 
-		var shapePoints = shape.extractPoints( curveSegments );
+		let vertices = shapePoints.shape;
+		const holes = shapePoints.holes;
 
-		var vertices = shapePoints.shape;
-		var holes = shapePoints.holes;
-
-		var reverse = ! ShapeUtils.isClockWise( vertices );
+		const reverse = ! ShapeUtils.isClockWise( vertices );
 
 		if ( reverse ) {
 
@@ -30902,9 +30882,9 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 			// Maybe we should also check if holes are in the opposite direction, just to be safe ...
 
-			for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+			for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
 
-				ahole = holes[ h ];
+				const ahole = holes[ h ];
 
 				if ( ShapeUtils.isClockWise( ahole ) ) {
 
@@ -30917,15 +30897,15 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		}
 
 
-		var faces = ShapeUtils.triangulateShape( vertices, holes );
+		const faces = ShapeUtils.triangulateShape( vertices, holes );
 
 		/* Vertices */
 
-		var contour = vertices; // vertices has all points but contour has only points of circumference
+		const contour = vertices; // vertices has all points but contour has only points of circumference
 
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+		for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
 
-			ahole = holes[ h ];
+			const ahole = holes[ h ];
 
 			vertices = vertices.concat( ahole );
 
@@ -30940,9 +30920,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		}
 
-		var b, bs, t, z,
-			vert, vlen = vertices.length,
-			face, flen = faces.length;
+		const vlen = vertices.length, flen = faces.length;
 
 
 		// Find directions for point movement
@@ -30957,20 +30935,20 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			// inPt' is the intersection of the two lines parallel to the two
 			//  adjacent edges of inPt at a distance of 1 unit on the left side.
 
-			var v_trans_x, v_trans_y, shrink_by; // resulting translation vector for inPt
+			let v_trans_x, v_trans_y, shrink_by; // resulting translation vector for inPt
 
 			// good reading for geometry algorithms (here: line-line intersection)
 			// http://geomalgorithms.com/a05-_intersect-1.html
 
-			var v_prev_x = inPt.x - inPrev.x,
+			const v_prev_x = inPt.x - inPrev.x,
 				v_prev_y = inPt.y - inPrev.y;
-			var v_next_x = inNext.x - inPt.x,
+			const v_next_x = inNext.x - inPt.x,
 				v_next_y = inNext.y - inPt.y;
 
-			var v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
+			const v_prev_lensq = ( v_prev_x * v_prev_x + v_prev_y * v_prev_y );
 
 			// check for collinear edges
-			var collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
+			const collinear0 = ( v_prev_x * v_next_y - v_prev_y * v_next_x );
 
 			if ( Math.abs( collinear0 ) > Number.EPSILON ) {
 
@@ -30978,20 +30956,20 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				// length of vectors for normalizing
 
-				var v_prev_len = Math.sqrt( v_prev_lensq );
-				var v_next_len = Math.sqrt( v_next_x * v_next_x + v_next_y * v_next_y );
+				const v_prev_len = Math.sqrt( v_prev_lensq );
+				const v_next_len = Math.sqrt( v_next_x * v_next_x + v_next_y * v_next_y );
 
 				// shift adjacent points by unit vectors to the left
 
-				var ptPrevShift_x = ( inPrev.x - v_prev_y / v_prev_len );
-				var ptPrevShift_y = ( inPrev.y + v_prev_x / v_prev_len );
+				const ptPrevShift_x = ( inPrev.x - v_prev_y / v_prev_len );
+				const ptPrevShift_y = ( inPrev.y + v_prev_x / v_prev_len );
 
-				var ptNextShift_x = ( inNext.x - v_next_y / v_next_len );
-				var ptNextShift_y = ( inNext.y + v_next_x / v_next_len );
+				const ptNextShift_x = ( inNext.x - v_next_y / v_next_len );
+				const ptNextShift_y = ( inNext.y + v_next_x / v_next_len );
 
 				// scaling factor for v_prev to intersection point
 
-				var sf = ( ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
+				const sf = ( ( ptNextShift_x - ptPrevShift_x ) * v_next_y -
 						( ptNextShift_y - ptPrevShift_y ) * v_next_x ) /
 					( v_prev_x * v_next_y - v_prev_y * v_next_x );
 
@@ -31002,7 +30980,7 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				// Don't normalize!, otherwise sharp corners become ugly
 				//  but prevent crazy spikes
-				var v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
+				const v_trans_lensq = ( v_trans_x * v_trans_x + v_trans_y * v_trans_y );
 				if ( v_trans_lensq <= 2 ) {
 
 					return new Vector2( v_trans_x, v_trans_y );
@@ -31017,7 +30995,8 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				// handle special case of collinear edges
 
-				var direction_eq = false; // assumes: opposite
+				let direction_eq = false; // assumes: opposite
+
 				if ( v_prev_x > Number.EPSILON ) {
 
 					if ( v_next_x > Number.EPSILON ) {
@@ -31071,9 +31050,9 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		}
 
 
-		var contourMovements = [];
+		const contourMovements = [];
 
-		for ( var i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
+		for ( let i = 0, il = contour.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
 
 			if ( j === il ) j = 0;
 			if ( k === il ) k = 0;
@@ -31085,16 +31064,16 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		}
 
-		var holesMovements = [],
-			oneHoleMovements, verticesMovements = contourMovements.concat();
+		const holesMovements = [];
+		let oneHoleMovements, verticesMovements = contourMovements.concat();
 
-		for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+		for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
 
-			ahole = holes[ h ];
+			const ahole = holes[ h ];
 
 			oneHoleMovements = [];
 
-			for ( i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
+			for ( let i = 0, il = ahole.length, j = il - 1, k = i + 1; i < il; i ++, j ++, k ++ ) {
 
 				if ( j === il ) j = 0;
 				if ( k === il ) k = 0;
@@ -31112,19 +31091,19 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		// Loop bevelSegments, 1 for the front, 1 for the back
 
-		for ( b = 0; b < bevelSegments; b ++ ) {
+		for ( let b = 0; b < bevelSegments; b ++ ) {
 
 			//for ( b = bevelSegments; b > 0; b -- ) {
 
-			t = b / bevelSegments;
-			z = bevelThickness * Math.cos( t * Math.PI / 2 );
-			bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelOffset;
+			const t = b / bevelSegments;
+			const z = bevelThickness * Math.cos( t * Math.PI / 2 );
+			const bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelOffset;
 
 			// contract shape
 
-			for ( i = 0, il = contour.length; i < il; i ++ ) {
+			for ( let i = 0, il = contour.length; i < il; i ++ ) {
 
-				vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
+				const vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 
 				v( vert.x, vert.y, - z );
 
@@ -31132,14 +31111,14 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 			// expand holes
 
-			for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+			for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
 
-				ahole = holes[ h ];
+				const ahole = holes[ h ];
 				oneHoleMovements = holesMovements[ h ];
 
-				for ( i = 0, il = ahole.length; i < il; i ++ ) {
+				for ( let i = 0, il = ahole.length; i < il; i ++ ) {
 
-					vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+					const vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
 					v( vert.x, vert.y, - z );
 
@@ -31149,13 +31128,13 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		}
 
-		bs = bevelSize + bevelOffset;
+		const bs = bevelSize + bevelOffset;
 
 		// Back facing vertices
 
-		for ( i = 0; i < vlen; i ++ ) {
+		for ( let i = 0; i < vlen; i ++ ) {
 
-			vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
+			const vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
 			if ( ! extrudeByPath ) {
 
@@ -31179,13 +31158,11 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		// Add stepped vertices...
 		// Including front facing vertices
 
-		var s;
+		for ( let s = 1; s <= steps; s ++ ) {
 
-		for ( s = 1; s <= steps; s ++ ) {
+			for ( let i = 0; i < vlen; i ++ ) {
 
-			for ( i = 0; i < vlen; i ++ ) {
-
-				vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
+				const vert = bevelEnabled ? scalePt2( vertices[ i ], verticesMovements[ i ], bs ) : vertices[ i ];
 
 				if ( ! extrudeByPath ) {
 
@@ -31212,31 +31189,31 @@ function ExtrudeBufferGeometry( shapes, options ) {
 		// Add bevel segments planes
 
 		//for ( b = 1; b <= bevelSegments; b ++ ) {
-		for ( b = bevelSegments - 1; b >= 0; b -- ) {
+		for ( let b = bevelSegments - 1; b >= 0; b -- ) {
 
-			t = b / bevelSegments;
-			z = bevelThickness * Math.cos( t * Math.PI / 2 );
-			bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelOffset;
+			const t = b / bevelSegments;
+			const z = bevelThickness * Math.cos( t * Math.PI / 2 );
+			const bs = bevelSize * Math.sin( t * Math.PI / 2 ) + bevelOffset;
 
 			// contract shape
 
-			for ( i = 0, il = contour.length; i < il; i ++ ) {
+			for ( let i = 0, il = contour.length; i < il; i ++ ) {
 
-				vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
+				const vert = scalePt2( contour[ i ], contourMovements[ i ], bs );
 				v( vert.x, vert.y, depth + z );
 
 			}
 
 			// expand holes
 
-			for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+			for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
 
-				ahole = holes[ h ];
+				const ahole = holes[ h ];
 				oneHoleMovements = holesMovements[ h ];
 
-				for ( i = 0, il = ahole.length; i < il; i ++ ) {
+				for ( let i = 0, il = ahole.length; i < il; i ++ ) {
 
-					vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
+					const vert = scalePt2( ahole[ i ], oneHoleMovements[ i ], bs );
 
 					if ( ! extrudeByPath ) {
 
@@ -31269,18 +31246,18 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		function buildLidFaces() {
 
-			var start = verticesArray.length / 3;
+			const start = verticesArray.length / 3;
 
 			if ( bevelEnabled ) {
 
-				var layer = 0; // steps + 1
-				var offset = vlen * layer;
+				let layer = 0; // steps + 1
+				let offset = vlen * layer;
 
 				// Bottom faces
 
-				for ( i = 0; i < flen; i ++ ) {
+				for ( let i = 0; i < flen; i ++ ) {
 
-					face = faces[ i ];
+					const face = faces[ i ];
 					f3( face[ 2 ] + offset, face[ 1 ] + offset, face[ 0 ] + offset );
 
 				}
@@ -31290,9 +31267,9 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				// Top faces
 
-				for ( i = 0; i < flen; i ++ ) {
+				for ( let i = 0; i < flen; i ++ ) {
 
-					face = faces[ i ];
+					const face = faces[ i ];
 					f3( face[ 0 ] + offset, face[ 1 ] + offset, face[ 2 ] + offset );
 
 				}
@@ -31301,18 +31278,18 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 				// Bottom faces
 
-				for ( i = 0; i < flen; i ++ ) {
+				for ( let i = 0; i < flen; i ++ ) {
 
-					face = faces[ i ];
+					const face = faces[ i ];
 					f3( face[ 2 ], face[ 1 ], face[ 0 ] );
 
 				}
 
 				// Top faces
 
-				for ( i = 0; i < flen; i ++ ) {
+				for ( let i = 0; i < flen; i ++ ) {
 
-					face = faces[ i ];
+					const face = faces[ i ];
 					f3( face[ 0 ] + vlen * steps, face[ 1 ] + vlen * steps, face[ 2 ] + vlen * steps );
 
 				}
@@ -31327,14 +31304,14 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		function buildSideFaces() {
 
-			var start = verticesArray.length / 3;
-			var layeroffset = 0;
+			const start = verticesArray.length / 3;
+			let layeroffset = 0;
 			sidewalls( contour, layeroffset );
 			layeroffset += contour.length;
 
-			for ( h = 0, hl = holes.length; h < hl; h ++ ) {
+			for ( let h = 0, hl = holes.length; h < hl; h ++ ) {
 
-				ahole = holes[ h ];
+				const ahole = holes[ h ];
 				sidewalls( ahole, layeroffset );
 
 				//, true
@@ -31350,26 +31327,22 @@ function ExtrudeBufferGeometry( shapes, options ) {
 
 		function sidewalls( contour, layeroffset ) {
 
-			var j, k;
-			i = contour.length;
+			let i = contour.length;
 
 			while ( -- i >= 0 ) {
 
-				j = i;
-				k = i - 1;
+				const j = i;
+				let k = i - 1;
 				if ( k < 0 ) k = contour.length - 1;
 
 				//console.log('b', i,j, i-1, k,vertices.length);
 
-				var s = 0,
-					sl = steps + bevelSegments * 2;
+				for ( let s = 0, sl = ( steps + bevelSegments * 2 ); s < sl; s ++ ) {
 
-				for ( s = 0; s < sl; s ++ ) {
+					const slen1 = vlen * s;
+					const slen2 = vlen * ( s + 1 );
 
-					var slen1 = vlen * s;
-					var slen2 = vlen * ( s + 1 );
-
-					var a = layeroffset + j + slen1,
+					const a = layeroffset + j + slen1,
 						b = layeroffset + k + slen1,
 						c = layeroffset + k + slen2,
 						d = layeroffset + j + slen2;
@@ -31397,8 +31370,8 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			addVertex( b );
 			addVertex( c );
 
-			var nextIndex = verticesArray.length / 3;
-			var uvs = uvgen.generateTopUV( scope, verticesArray, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
+			const nextIndex = verticesArray.length / 3;
+			const uvs = uvgen.generateTopUV( scope, verticesArray, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 
 			addUV( uvs[ 0 ] );
 			addUV( uvs[ 1 ] );
@@ -31417,8 +31390,8 @@ function ExtrudeBufferGeometry( shapes, options ) {
 			addVertex( d );
 
 
-			var nextIndex = verticesArray.length / 3;
-			var uvs = uvgen.generateSideWallUV( scope, verticesArray, nextIndex - 6, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
+			const nextIndex = verticesArray.length / 3;
+			const uvs = uvgen.generateSideWallUV( scope, verticesArray, nextIndex - 6, nextIndex - 3, nextIndex - 2, nextIndex - 1 );
 
 			addUV( uvs[ 0 ] );
 			addUV( uvs[ 1 ] );
@@ -31455,10 +31428,10 @@ ExtrudeBufferGeometry.prototype.constructor = ExtrudeBufferGeometry;
 
 ExtrudeBufferGeometry.prototype.toJSON = function () {
 
-	var data = BufferGeometry.prototype.toJSON.call( this );
+	const data = BufferGeometry.prototype.toJSON.call( this );
 
-	var shapes = this.parameters.shapes;
-	var options = this.parameters.options;
+	const shapes = this.parameters.shapes;
+	const options = this.parameters.options;
 
 	return toJSON( shapes, options, data );
 
@@ -31466,16 +31439,16 @@ ExtrudeBufferGeometry.prototype.toJSON = function () {
 
 //
 
-var WorldUVGenerator = {
+const WorldUVGenerator = {
 
 	generateTopUV: function ( geometry, vertices, indexA, indexB, indexC ) {
 
-		var a_x = vertices[ indexA * 3 ];
-		var a_y = vertices[ indexA * 3 + 1 ];
-		var b_x = vertices[ indexB * 3 ];
-		var b_y = vertices[ indexB * 3 + 1 ];
-		var c_x = vertices[ indexC * 3 ];
-		var c_y = vertices[ indexC * 3 + 1 ];
+		const a_x = vertices[ indexA * 3 ];
+		const a_y = vertices[ indexA * 3 + 1 ];
+		const b_x = vertices[ indexB * 3 ];
+		const b_y = vertices[ indexB * 3 + 1 ];
+		const c_x = vertices[ indexC * 3 ];
+		const c_y = vertices[ indexC * 3 + 1 ];
 
 		return [
 			new Vector2( a_x, a_y ),
@@ -31487,18 +31460,18 @@ var WorldUVGenerator = {
 
 	generateSideWallUV: function ( geometry, vertices, indexA, indexB, indexC, indexD ) {
 
-		var a_x = vertices[ indexA * 3 ];
-		var a_y = vertices[ indexA * 3 + 1 ];
-		var a_z = vertices[ indexA * 3 + 2 ];
-		var b_x = vertices[ indexB * 3 ];
-		var b_y = vertices[ indexB * 3 + 1 ];
-		var b_z = vertices[ indexB * 3 + 2 ];
-		var c_x = vertices[ indexC * 3 ];
-		var c_y = vertices[ indexC * 3 + 1 ];
-		var c_z = vertices[ indexC * 3 + 2 ];
-		var d_x = vertices[ indexD * 3 ];
-		var d_y = vertices[ indexD * 3 + 1 ];
-		var d_z = vertices[ indexD * 3 + 2 ];
+		const a_x = vertices[ indexA * 3 ];
+		const a_y = vertices[ indexA * 3 + 1 ];
+		const a_z = vertices[ indexA * 3 + 2 ];
+		const b_x = vertices[ indexB * 3 ];
+		const b_y = vertices[ indexB * 3 + 1 ];
+		const b_z = vertices[ indexB * 3 + 2 ];
+		const c_x = vertices[ indexC * 3 ];
+		const c_y = vertices[ indexC * 3 + 1 ];
+		const c_z = vertices[ indexC * 3 + 2 ];
+		const d_x = vertices[ indexD * 3 ];
+		const d_y = vertices[ indexD * 3 + 1 ];
+		const d_z = vertices[ indexD * 3 + 2 ];
 
 		if ( Math.abs( a_y - b_y ) < 0.01 ) {
 
@@ -31531,9 +31504,9 @@ function toJSON( shapes, options, data ) {
 
 	if ( Array.isArray( shapes ) ) {
 
-		for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+		for ( let i = 0, l = shapes.length; i < l; i ++ ) {
 
-			var shape = shapes[ i ];
+			const shape = shapes[ i ];
 
 			data.shapes.push( shape.uuid );
 
@@ -31600,7 +31573,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	parameters = parameters || {};
 
-	var font = parameters.font;
+	const font = parameters.font;
 
 	if ( ! ( font && font.isFont ) ) {
 
@@ -31609,7 +31582,7 @@ function TextBufferGeometry( text, parameters ) {
 
 	}
 
-	var shapes = font.generateShapes( text, parameters.size );
+	const shapes = font.generateShapes( text, parameters.size );
 
 	// translate parameters to ExtrudeGeometry API
 
@@ -31691,34 +31664,32 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 	thetaStart = thetaStart !== undefined ? thetaStart : 0;
 	thetaLength = thetaLength !== undefined ? thetaLength : Math.PI;
 
-	var thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
+	const thetaEnd = Math.min( thetaStart + thetaLength, Math.PI );
 
-	var ix, iy;
+	let index = 0;
+	const grid = [];
 
-	var index = 0;
-	var grid = [];
-
-	var vertex = new Vector3();
-	var normal = new Vector3();
+	const vertex = new Vector3();
+	const normal = new Vector3();
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// generate vertices, normals and uvs
 
-	for ( iy = 0; iy <= heightSegments; iy ++ ) {
+	for ( let iy = 0; iy <= heightSegments; iy ++ ) {
 
-		var verticesRow = [];
+		const verticesRow = [];
 
-		var v = iy / heightSegments;
+		const v = iy / heightSegments;
 
 		// special case for the poles
 
-		var uOffset = 0;
+		let uOffset = 0;
 
 		if ( iy == 0 && thetaStart == 0 ) {
 
@@ -31730,9 +31701,9 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 		}
 
-		for ( ix = 0; ix <= widthSegments; ix ++ ) {
+		for ( let ix = 0; ix <= widthSegments; ix ++ ) {
 
-			var u = ix / widthSegments;
+			const u = ix / widthSegments;
 
 			// vertex
 
@@ -31761,14 +31732,14 @@ function SphereBufferGeometry( radius, widthSegments, heightSegments, phiStart, 
 
 	// indices
 
-	for ( iy = 0; iy < heightSegments; iy ++ ) {
+	for ( let iy = 0; iy < heightSegments; iy ++ ) {
 
-		for ( ix = 0; ix < widthSegments; ix ++ ) {
+		for ( let ix = 0; ix < widthSegments; ix ++ ) {
 
-			var a = grid[ iy ][ ix + 1 ];
-			var b = grid[ iy ][ ix ];
-			var c = grid[ iy + 1 ][ ix ];
-			var d = grid[ iy + 1 ][ ix + 1 ];
+			const a = grid[ iy ][ ix + 1 ];
+			const b = grid[ iy ][ ix ];
+			const c = grid[ iy + 1 ][ ix ];
+			const d = grid[ iy + 1 ][ ix + 1 ];
 
 			if ( iy !== 0 || thetaStart > 0 ) indices.push( a, b, d );
 			if ( iy !== heightSegments - 1 || thetaEnd < Math.PI ) indices.push( b, c, d );
@@ -31847,29 +31818,27 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// some helper variables
 
-	var segment;
-	var radius = innerRadius;
-	var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
-	var vertex = new Vector3();
-	var uv = new Vector2();
-	var j, i;
+	let radius = innerRadius;
+	const radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
+	const vertex = new Vector3();
+	const uv = new Vector2();
 
 	// generate vertices, normals and uvs
 
-	for ( j = 0; j <= phiSegments; j ++ ) {
+	for ( let j = 0; j <= phiSegments; j ++ ) {
 
-		for ( i = 0; i <= thetaSegments; i ++ ) {
+		for ( let i = 0; i <= thetaSegments; i ++ ) {
 
 			// values are generate from the inside of the ring to the outside
 
-			segment = thetaStart + i / thetaSegments * thetaLength;
+			const segment = thetaStart + i / thetaSegments * thetaLength;
 
 			// vertex
 
@@ -31899,18 +31868,18 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 
 	// indices
 
-	for ( j = 0; j < phiSegments; j ++ ) {
+	for ( let j = 0; j < phiSegments; j ++ ) {
 
-		var thetaSegmentLevel = j * ( thetaSegments + 1 );
+		const thetaSegmentLevel = j * ( thetaSegments + 1 );
 
-		for ( i = 0; i < thetaSegments; i ++ ) {
+		for ( let i = 0; i < thetaSegments; i ++ ) {
 
-			segment = i + thetaSegmentLevel;
+			const segment = i + thetaSegmentLevel;
 
-			var a = segment;
-			var b = segment + thetaSegments + 1;
-			var c = segment + thetaSegments + 2;
-			var d = segment + 1;
+			const a = segment;
+			const b = segment + thetaSegments + 1;
+			const c = segment + thetaSegments + 2;
+			const d = segment + 1;
 
 			// faces
 
@@ -31988,28 +31957,26 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const uvs = [];
 
 	// helper variables
 
-	var base;
-	var inverseSegments = 1.0 / segments;
-	var vertex = new Vector3();
-	var uv = new Vector2();
-	var i, j;
+	const inverseSegments = 1.0 / segments;
+	const vertex = new Vector3();
+	const uv = new Vector2();
 
 	// generate vertices and uvs
 
-	for ( i = 0; i <= segments; i ++ ) {
+	for ( let i = 0; i <= segments; i ++ ) {
 
-		var phi = phiStart + i * inverseSegments * phiLength;
+		const phi = phiStart + i * inverseSegments * phiLength;
 
-		var sin = Math.sin( phi );
-		var cos = Math.cos( phi );
+		const sin = Math.sin( phi );
+		const cos = Math.cos( phi );
 
-		for ( j = 0; j <= ( points.length - 1 ); j ++ ) {
+		for ( let j = 0; j <= ( points.length - 1 ); j ++ ) {
 
 			// vertex
 
@@ -32033,16 +32000,16 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	// indices
 
-	for ( i = 0; i < segments; i ++ ) {
+	for ( let i = 0; i < segments; i ++ ) {
 
-		for ( j = 0; j < ( points.length - 1 ); j ++ ) {
+		for ( let j = 0; j < ( points.length - 1 ); j ++ ) {
 
-			base = j + i * points.length;
+			const base = j + i * points.length;
 
-			var a = base;
-			var b = base + points.length;
-			var c = base + points.length + 1;
-			var d = base + 1;
+			const a = base;
+			const b = base + points.length;
+			const c = base + points.length + 1;
+			const d = base + 1;
 
 			// faces
 
@@ -32068,16 +32035,16 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	if ( phiLength === Math.PI * 2 ) {
 
-		var normals = this.attributes.normal.array;
-		var n1 = new Vector3();
-		var n2 = new Vector3();
-		var n = new Vector3();
+		const normals = this.attributes.normal.array;
+		const n1 = new Vector3();
+		const n2 = new Vector3();
+		const n = new Vector3();
 
 		// this is the buffer offset for the last line of vertices
 
-		base = segments * points.length * 3;
+		const base = segments * points.length * 3;
 
-		for ( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
+		for ( let i = 0, j = 0; i < points.length; i ++, j += 3 ) {
 
 			// select the normal of the vertex in the first line
 
@@ -32146,9 +32113,9 @@ ShapeGeometry.prototype.constructor = ShapeGeometry;
 
 ShapeGeometry.prototype.toJSON = function () {
 
-	var data = Geometry.prototype.toJSON.call( this );
+	const data = Geometry.prototype.toJSON.call( this );
 
-	var shapes = this.parameters.shapes;
+	const shapes = this.parameters.shapes;
 
 	return toJSON$1( shapes, data );
 
@@ -32171,15 +32138,15 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// helper variables
 
-	var groupStart = 0;
-	var groupCount = 0;
+	let groupStart = 0;
+	let groupCount = 0;
 
 	// allow single and array values for "shapes" parameter
 
@@ -32189,7 +32156,7 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 	} else {
 
-		for ( var i = 0; i < shapes.length; i ++ ) {
+		for ( let i = 0; i < shapes.length; i ++ ) {
 
 			addShape( shapes[ i ] );
 
@@ -32214,13 +32181,11 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 	function addShape( shape ) {
 
-		var i, l, shapeHole;
+		const indexOffset = vertices.length / 3;
+		const points = shape.extractPoints( curveSegments );
 
-		var indexOffset = vertices.length / 3;
-		var points = shape.extractPoints( curveSegments );
-
-		var shapeVertices = points.shape;
-		var shapeHoles = points.holes;
+		let shapeVertices = points.shape;
+		const shapeHoles = points.holes;
 
 		// check direction of vertices
 
@@ -32230,9 +32195,9 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 		}
 
-		for ( i = 0, l = shapeHoles.length; i < l; i ++ ) {
+		for ( let i = 0, l = shapeHoles.length; i < l; i ++ ) {
 
-			shapeHole = shapeHoles[ i ];
+			const shapeHole = shapeHoles[ i ];
 
 			if ( ShapeUtils.isClockWise( shapeHole ) === true ) {
 
@@ -32242,22 +32207,22 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 		}
 
-		var faces = ShapeUtils.triangulateShape( shapeVertices, shapeHoles );
+		const faces = ShapeUtils.triangulateShape( shapeVertices, shapeHoles );
 
 		// join vertices of inner and outer paths to a single array
 
-		for ( i = 0, l = shapeHoles.length; i < l; i ++ ) {
+		for ( let i = 0, l = shapeHoles.length; i < l; i ++ ) {
 
-			shapeHole = shapeHoles[ i ];
+			const shapeHole = shapeHoles[ i ];
 			shapeVertices = shapeVertices.concat( shapeHole );
 
 		}
 
 		// vertices, normals, uvs
 
-		for ( i = 0, l = shapeVertices.length; i < l; i ++ ) {
+		for ( let i = 0, l = shapeVertices.length; i < l; i ++ ) {
 
-			var vertex = shapeVertices[ i ];
+			const vertex = shapeVertices[ i ];
 
 			vertices.push( vertex.x, vertex.y, 0 );
 			normals.push( 0, 0, 1 );
@@ -32267,13 +32232,13 @@ function ShapeBufferGeometry( shapes, curveSegments ) {
 
 		// incides
 
-		for ( i = 0, l = faces.length; i < l; i ++ ) {
+		for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-			var face = faces[ i ];
+			const face = faces[ i ];
 
-			var a = face[ 0 ] + indexOffset;
-			var b = face[ 1 ] + indexOffset;
-			var c = face[ 2 ] + indexOffset;
+			const a = face[ 0 ] + indexOffset;
+			const b = face[ 1 ] + indexOffset;
+			const c = face[ 2 ] + indexOffset;
 
 			indices.push( a, b, c );
 			groupCount += 3;
@@ -32289,9 +32254,9 @@ ShapeBufferGeometry.prototype.constructor = ShapeBufferGeometry;
 
 ShapeBufferGeometry.prototype.toJSON = function () {
 
-	var data = BufferGeometry.prototype.toJSON.call( this );
+	const data = BufferGeometry.prototype.toJSON.call( this );
 
-	var shapes = this.parameters.shapes;
+	const shapes = this.parameters.shapes;
 
 	return toJSON$1( shapes, data );
 
@@ -32305,9 +32270,9 @@ function toJSON$1( shapes, data ) {
 
 	if ( Array.isArray( shapes ) ) {
 
-		for ( var i = 0, l = shapes.length; i < l; i ++ ) {
+		for ( let i = 0, l = shapes.length; i < l; i ++ ) {
 
-			var shape = shapes[ i ];
+			const shape = shapes[ i ];
 
 			data.shapes.push( shape.uuid );
 
@@ -32342,17 +32307,18 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	// buffer
 
-	var vertices = [];
+	const vertices = [];
 
 	// helper variables
 
-	var thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
-	var edge = [ 0, 0 ], edges = {}, edge1, edge2;
-	var key, keys = [ 'a', 'b', 'c' ];
+	const thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
+	const edge = [ 0, 0 ], edges = {};
+	let edge1, edge2, key;
+	const keys = [ 'a', 'b', 'c' ];
 
 	// prepare source geometry
 
-	var geometry2;
+	let geometry2;
 
 	if ( geometry.isBufferGeometry ) {
 
@@ -32368,16 +32334,16 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 	geometry2.mergeVertices();
 	geometry2.computeFaceNormals();
 
-	var sourceVertices = geometry2.vertices;
-	var faces = geometry2.faces;
+	const sourceVertices = geometry2.vertices;
+	const faces = geometry2.faces;
 
 	// now create a data structure where each entry represents an edge with its adjoining faces
 
-	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+	for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-		var face = faces[ i ];
+		const face = faces[ i ];
 
-		for ( var j = 0; j < 3; j ++ ) {
+		for ( let j = 0; j < 3; j ++ ) {
 
 			edge1 = face[ keys[ j ] ];
 			edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
@@ -32404,13 +32370,13 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	for ( key in edges ) {
 
-		var e = edges[ key ];
+		const e = edges[ key ];
 
 		// an edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
 
 		if ( e.face2 === undefined || faces[ e.face1 ].normal.dot( faces[ e.face2 ].normal ) <= thresholdDot ) {
 
-			var vertex = sourceVertices[ e.index1 ];
+			let vertex = sourceVertices[ e.index1 ];
 			vertices.push( vertex.x, vertex.y, vertex.z );
 
 			vertex = sourceVertices[ e.index2 ];
@@ -32480,7 +32446,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 		thetaLength: thetaLength
 	};
 
-	var scope = this;
+	const scope = this;
 
 	radiusTop = radiusTop !== undefined ? radiusTop : 1;
 	radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
@@ -32495,17 +32461,17 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// helper variables
 
-	var index = 0;
-	var indexArray = [];
-	var halfHeight = height / 2;
-	var groupStart = 0;
+	let index = 0;
+	const indexArray = [];
+	const halfHeight = height / 2;
+	let groupStart = 0;
 
 	// generate geometry
 
@@ -32527,35 +32493,34 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	function generateTorso() {
 
-		var x, y;
-		var normal = new Vector3();
-		var vertex = new Vector3();
+		const normal = new Vector3();
+		const vertex = new Vector3();
 
-		var groupCount = 0;
+		let groupCount = 0;
 
 		// this will be used to calculate the normal
-		var slope = ( radiusBottom - radiusTop ) / height;
+		const slope = ( radiusBottom - radiusTop ) / height;
 
 		// generate vertices, normals and uvs
 
-		for ( y = 0; y <= heightSegments; y ++ ) {
+		for ( let y = 0; y <= heightSegments; y ++ ) {
 
-			var indexRow = [];
+			const indexRow = [];
 
-			var v = y / heightSegments;
+			const v = y / heightSegments;
 
 			// calculate the radius of the current row
 
-			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
+			const radius = v * ( radiusBottom - radiusTop ) + radiusTop;
 
-			for ( x = 0; x <= radialSegments; x ++ ) {
+			for ( let x = 0; x <= radialSegments; x ++ ) {
 
-				var u = x / radialSegments;
+				const u = x / radialSegments;
 
-				var theta = u * thetaLength + thetaStart;
+				const theta = u * thetaLength + thetaStart;
 
-				var sinTheta = Math.sin( theta );
-				var cosTheta = Math.cos( theta );
+				const sinTheta = Math.sin( theta );
+				const cosTheta = Math.cos( theta );
 
 				// vertex
 
@@ -32587,16 +32552,16 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 		// generate indices
 
-		for ( x = 0; x < radialSegments; x ++ ) {
+		for ( let x = 0; x < radialSegments; x ++ ) {
 
-			for ( y = 0; y < heightSegments; y ++ ) {
+			for ( let y = 0; y < heightSegments; y ++ ) {
 
 				// we use the index array to access the correct indices
 
-				var a = indexArray[ y ][ x ];
-				var b = indexArray[ y + 1 ][ x ];
-				var c = indexArray[ y + 1 ][ x + 1 ];
-				var d = indexArray[ y ][ x + 1 ];
+				const a = indexArray[ y ][ x ];
+				const b = indexArray[ y + 1 ][ x ];
+				const c = indexArray[ y + 1 ][ x + 1 ];
+				const d = indexArray[ y ][ x + 1 ];
 
 				// faces
 
@@ -32623,15 +32588,15 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	function generateCap( top ) {
 
-		var x, centerIndexStart, centerIndexEnd;
+		let centerIndexStart, centerIndexEnd;
 
-		var uv = new Vector2();
-		var vertex = new Vector3();
+		const uv = new Vector2();
+		const vertex = new Vector3();
 
-		var groupCount = 0;
+		let groupCount = 0;
 
-		var radius = ( top === true ) ? radiusTop : radiusBottom;
-		var sign = ( top === true ) ? 1 : - 1;
+		const radius = ( top === true ) ? radiusTop : radiusBottom;
+		const sign = ( top === true ) ? 1 : - 1;
 
 		// save the index of the first center vertex
 		centerIndexStart = index;
@@ -32640,7 +32605,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 		// because the geometry needs one set of uvs per face,
 		// we must generate a center vertex per face/segment
 
-		for ( x = 1; x <= radialSegments; x ++ ) {
+		for ( let x = 1; x <= radialSegments; x ++ ) {
 
 			// vertex
 
@@ -32666,13 +32631,13 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 		// now we generate the surrounding vertices, normals and uvs
 
-		for ( x = 0; x <= radialSegments; x ++ ) {
+		for ( let x = 0; x <= radialSegments; x ++ ) {
 
-			var u = x / radialSegments;
-			var theta = u * thetaLength + thetaStart;
+			const u = x / radialSegments;
+			const theta = u * thetaLength + thetaStart;
 
-			var cosTheta = Math.cos( theta );
-			var sinTheta = Math.sin( theta );
+			const cosTheta = Math.cos( theta );
+			const sinTheta = Math.sin( theta );
 
 			// vertex
 
@@ -32699,10 +32664,10 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 		// generate indices
 
-		for ( x = 0; x < radialSegments; x ++ ) {
+		for ( let x = 0; x < radialSegments; x ++ ) {
 
-			var c = centerIndexStart + x;
-			var i = centerIndexEnd + x;
+			const c = centerIndexStart + x;
+			const i = centerIndexEnd + x;
 
 			if ( top === true ) {
 
@@ -32839,16 +32804,15 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// helper variables
 
-	var i, s;
-	var vertex = new Vector3();
-	var uv = new Vector2();
+	const vertex = new Vector3();
+	const uv = new Vector2();
 
 	// center point
 
@@ -32856,9 +32820,9 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 	normals.push( 0, 0, 1 );
 	uvs.push( 0.5, 0.5 );
 
-	for ( s = 0, i = 3; s <= segments; s ++, i += 3 ) {
+	for ( let s = 0, i = 3; s <= segments; s ++, i += 3 ) {
 
-		var segment = thetaStart + s / segments * thetaLength;
+		const segment = thetaStart + s / segments * thetaLength;
 
 		// vertex
 
@@ -32882,7 +32846,7 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	// indices
 
-	for ( i = 1; i <= segments; i ++ ) {
+	for ( let i = 1; i <= segments; i ++ ) {
 
 		indices.push( i, i + 1, 0 );
 
@@ -33972,7 +33936,7 @@ var Materials = /*#__PURE__*/Object.freeze({
  * @author David Sarno / http://lighthaus.us/
  */
 
-var AnimationUtils = {
+const AnimationUtils = {
 
 	// same as Array.prototype.slice, but also works on typed arrays
 	arraySlice: function ( array, from, to ) {
@@ -34021,9 +33985,9 @@ var AnimationUtils = {
 
 		}
 
-		var n = times.length;
-		var result = new Array( n );
-		for ( var i = 0; i !== n; ++ i ) result[ i ] = i;
+		const n = times.length;
+		const result = new Array( n );
+		for ( let i = 0; i !== n; ++ i ) result[ i ] = i;
 
 		result.sort( compareTime );
 
@@ -34034,14 +33998,14 @@ var AnimationUtils = {
 	// uses the array previously returned by 'getKeyframeOrder' to sort data
 	sortedArray: function ( values, stride, order ) {
 
-		var nValues = values.length;
-		var result = new values.constructor( nValues );
+		const nValues = values.length;
+		const result = new values.constructor( nValues );
 
-		for ( var i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
+		for ( let i = 0, dstOffset = 0; dstOffset !== nValues; ++ i ) {
 
-			var srcOffset = order[ i ] * stride;
+			const srcOffset = order[ i ] * stride;
 
-			for ( var j = 0; j !== stride; ++ j ) {
+			for ( let j = 0; j !== stride; ++ j ) {
 
 				result[ dstOffset ++ ] = values[ srcOffset + j ];
 
@@ -34056,7 +34020,7 @@ var AnimationUtils = {
 	// function for parsing AOS keyframe formats
 	flattenJSON: function ( jsonKeys, times, values, valuePropertyName ) {
 
-		var i = 1, key = jsonKeys[ 0 ];
+		let i = 1, key = jsonKeys[ 0 ];
 
 		while ( key !== undefined && key[ valuePropertyName ] === undefined ) {
 
@@ -34066,7 +34030,7 @@ var AnimationUtils = {
 
 		if ( key === undefined ) return; // no data
 
-		var value = key[ valuePropertyName ];
+		let value = key[ valuePropertyName ];
 		if ( value === undefined ) return; // no data
 
 		if ( Array.isArray( value ) ) {
@@ -34132,29 +34096,29 @@ var AnimationUtils = {
 
 		fps = fps || 30;
 
-		var clip = sourceClip.clone();
+		const clip = sourceClip.clone();
 
 		clip.name = name;
 
-		var tracks = [];
+		const tracks = [];
 
-		for ( var i = 0; i < clip.tracks.length; ++ i ) {
+		for ( let i = 0; i < clip.tracks.length; ++ i ) {
 
-			var track = clip.tracks[ i ];
-			var valueSize = track.getValueSize();
+			const track = clip.tracks[ i ];
+			const valueSize = track.getValueSize();
 
-			var times = [];
-			var values = [];
+			const times = [];
+			const values = [];
 
-			for ( var j = 0; j < track.times.length; ++ j ) {
+			for ( let j = 0; j < track.times.length; ++ j ) {
 
-				var frame = track.times[ j ] * fps;
+				const frame = track.times[ j ] * fps;
 
 				if ( frame < startFrame || frame >= endFrame ) continue;
 
 				times.push( track.times[ j ] );
 
-				for ( var k = 0; k < valueSize; ++ k ) {
+				for ( let k = 0; k < valueSize; ++ k ) {
 
 					values.push( track.values[ j * valueSize + k ] );
 
@@ -34175,9 +34139,9 @@ var AnimationUtils = {
 
 		// find minimum .times value across all tracks in the trimmed clip
 
-		var minStartTime = Infinity;
+		let minStartTime = Infinity;
 
-		for ( var i = 0; i < clip.tracks.length; ++ i ) {
+		for ( let i = 0; i < clip.tracks.length; ++ i ) {
 
 			if ( minStartTime > clip.tracks[ i ].times[ 0 ] ) {
 
@@ -34189,7 +34153,7 @@ var AnimationUtils = {
 
 		// shift all tracks such that clip begins at t=0
 
-		for ( var i = 0; i < clip.tracks.length; ++ i ) {
+		for ( let i = 0; i < clip.tracks.length; ++ i ) {
 
 			clip.tracks[ i ].shift( - 1 * minStartTime );
 
@@ -34207,20 +34171,20 @@ var AnimationUtils = {
 		if ( referenceClip === undefined ) referenceClip = targetClip;
 		if ( fps === undefined || fps <= 0 ) fps = 30;
 
-		var numTracks = targetClip.tracks.length;
-		var referenceTime = referenceFrame / fps;
+		const numTracks = targetClip.tracks.length;
+		const referenceTime = referenceFrame / fps;
 
 		// Make each track's values relative to the values at the reference frame
-		for ( var i = 0; i < numTracks; ++ i ) {
+		for ( let i = 0; i < numTracks; ++ i ) {
 
-			var referenceTrack = referenceClip.tracks[ i ];
-			var referenceTrackType = referenceTrack.ValueTypeName;
+			const referenceTrack = referenceClip.tracks[ i ];
+			const referenceTrackType = referenceTrack.ValueTypeName;
 
 			// Skip this track if it's non-numeric
 			if ( referenceTrackType === 'bool' || referenceTrackType === 'string' ) continue;
 
 			// Find the track in the target clip whose name and type matches the reference track
-			var targetTrack = targetClip.tracks.find( function ( track ) {
+			const targetTrack = targetClip.tracks.find( function ( track ) {
 
 				return track.name === referenceTrack.name
 				&& track.ValueTypeName === referenceTrackType;
@@ -34229,9 +34193,9 @@ var AnimationUtils = {
 
 			if ( targetTrack === undefined ) continue;
 
-			var valueSize = referenceTrack.getValueSize();
-			var lastIndex = referenceTrack.times.length - 1;
-			var referenceValue;
+			const valueSize = referenceTrack.getValueSize();
+			const lastIndex = referenceTrack.times.length - 1;
+			let referenceValue;
 
 			// Find the value to subtract out of the track
 			if ( referenceTime <= referenceTrack.times[ 0 ] ) {
@@ -34242,13 +34206,13 @@ var AnimationUtils = {
 			} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
 
 				// Reference frame is after the last keyframe, so just use the last keyframe
-				var startIndex = lastIndex * valueSize;
+				const startIndex = lastIndex * valueSize;
 				referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex );
 
 			} else {
 
 				// Interpolate to the reference value
-				var interpolant = referenceTrack.createInterpolant();
+				const interpolant = referenceTrack.createInterpolant();
 				interpolant.evaluate( referenceTime );
 				referenceValue = interpolant.resultBuffer;
 
@@ -34257,7 +34221,7 @@ var AnimationUtils = {
 			// Conjugate the quaternion
 			if ( referenceTrackType === 'quaternion' ) {
 
-				var referenceQuat = new Quaternion(
+				const referenceQuat = new Quaternion(
 					referenceValue[ 0 ],
 					referenceValue[ 1 ],
 					referenceValue[ 2 ],
@@ -34269,10 +34233,10 @@ var AnimationUtils = {
 
 			// Subtract the reference value from all of the track values
 
-			var numTimes = targetTrack.times.length;
-			for ( var j = 0; j < numTimes; ++ j ) {
+			const numTimes = targetTrack.times.length;
+			for ( let j = 0; j < numTimes; ++ j ) {
 
-				var valueStart = j * valueSize;
+				const valueStart = j * valueSize;
 
 				if ( referenceTrackType === 'quaternion' ) {
 
@@ -34289,7 +34253,7 @@ var AnimationUtils = {
 				} else {
 
 					// Subtract each value for all other numeric track types
-					for ( var k = 0; k < valueSize; ++ k ) {
+					for ( let k = 0; k < valueSize; ++ k ) {
 
 						targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
 
@@ -34815,9 +34779,9 @@ Object.assign( KeyframeTrack, {
 
 	toJSON: function ( track ) {
 
-		var trackType = track.constructor;
+		const trackType = track.constructor;
 
-		var json;
+		let json;
 
 		// derived classes can define a static toJSON method
 		if ( trackType.toJSON !== undefined ) {
@@ -34835,7 +34799,7 @@ Object.assign( KeyframeTrack, {
 
 			};
 
-			var interpolation = track.getInterpolation();
+			const interpolation = track.getInterpolation();
 
 			if ( interpolation !== track.DefaultInterpolation ) {
 
@@ -34883,7 +34847,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 	setInterpolation: function ( interpolation ) {
 
-		var factoryMethod;
+		let factoryMethod;
 
 		switch ( interpolation ) {
 
@@ -34909,7 +34873,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 		if ( factoryMethod === undefined ) {
 
-			var message = "unsupported interpolation for " +
+			const message = "unsupported interpolation for " +
 				this.ValueTypeName + " keyframe track named " + this.name;
 
 			if ( this.createInterpolant === undefined ) {
@@ -34969,9 +34933,9 @@ Object.assign( KeyframeTrack.prototype, {
 
 		if ( timeOffset !== 0.0 ) {
 
-			var times = this.times;
+			const times = this.times;
 
-			for ( var i = 0, n = times.length; i !== n; ++ i ) {
+			for ( let i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] += timeOffset;
 
@@ -34988,9 +34952,9 @@ Object.assign( KeyframeTrack.prototype, {
 
 		if ( timeScale !== 1.0 ) {
 
-			var times = this.times;
+			const times = this.times;
 
-			for ( var i = 0, n = times.length; i !== n; ++ i ) {
+			for ( let i = 0, n = times.length; i !== n; ++ i ) {
 
 				times[ i ] *= timeScale;
 
@@ -35006,9 +34970,10 @@ Object.assign( KeyframeTrack.prototype, {
 	// IMPORTANT: We do not shift around keys to the start of the track time, because for interpolated keys this will change their values
 	trim: function ( startTime, endTime ) {
 
-		var times = this.times,
-			nKeys = times.length,
-			from = 0,
+		const times = this.times,
+			nKeys = times.length;
+
+		let from = 0,
 			to = nKeys - 1;
 
 		while ( from !== nKeys && times[ from ] < startTime ) {
@@ -35035,7 +35000,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 			}
 
-			var stride = this.getValueSize();
+			const stride = this.getValueSize();
 			this.times = AnimationUtils.arraySlice( times, from, to );
 			this.values = AnimationUtils.arraySlice( this.values, from * stride, to * stride );
 
@@ -35048,9 +35013,9 @@ Object.assign( KeyframeTrack.prototype, {
 	// ensure we do not get a GarbageInGarbageOut situation, make sure tracks are at least minimally viable
 	validate: function () {
 
-		var valid = true;
+		let valid = true;
 
-		var valueSize = this.getValueSize();
+		const valueSize = this.getValueSize();
 		if ( valueSize - Math.floor( valueSize ) !== 0 ) {
 
 			console.error( 'THREE.KeyframeTrack: Invalid value size in track.', this );
@@ -35058,7 +35023,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 		}
 
-		var times = this.times,
+		const times = this.times,
 			values = this.values,
 
 			nKeys = times.length;
@@ -35070,11 +35035,11 @@ Object.assign( KeyframeTrack.prototype, {
 
 		}
 
-		var prevTime = null;
+		let prevTime = null;
 
-		for ( var i = 0; i !== nKeys; i ++ ) {
+		for ( let i = 0; i !== nKeys; i ++ ) {
 
-			var currTime = times[ i ];
+			const currTime = times[ i ];
 
 			if ( typeof currTime === 'number' && isNaN( currTime ) ) {
 
@@ -35100,9 +35065,9 @@ Object.assign( KeyframeTrack.prototype, {
 
 			if ( AnimationUtils.isTypedArray( values ) ) {
 
-				for ( var i = 0, n = values.length; i !== n; ++ i ) {
+				for ( let i = 0, n = values.length; i !== n; ++ i ) {
 
-					var value = values[ i ];
+					const value = values[ i ];
 
 					if ( isNaN( value ) ) {
 
@@ -35127,21 +35092,22 @@ Object.assign( KeyframeTrack.prototype, {
 	optimize: function () {
 
 		// times or values may be shared with other tracks, so overwriting is unsafe
-		var times = AnimationUtils.arraySlice( this.times ),
+		const times = AnimationUtils.arraySlice( this.times ),
 			values = AnimationUtils.arraySlice( this.values ),
 			stride = this.getValueSize(),
 
 			smoothInterpolation = this.getInterpolation() === InterpolateSmooth,
 
-			writeIndex = 1,
 			lastIndex = times.length - 1;
 
-		for ( var i = 1; i < lastIndex; ++ i ) {
+		let writeIndex = 1;
 
-			var keep = false;
+		for ( let i = 1; i < lastIndex; ++ i ) {
 
-			var time = times[ i ];
-			var timeNext = times[ i + 1 ];
+			let keep = false;
+
+			const time = times[ i ];
+			const timeNext = times[ i + 1 ];
 
 			// remove adjacent keyframes scheduled at the same time
 
@@ -35151,13 +35117,13 @@ Object.assign( KeyframeTrack.prototype, {
 
 					// remove unnecessary keyframes same as their neighbors
 
-					var offset = i * stride,
+					const offset = i * stride,
 						offsetP = offset - stride,
 						offsetN = offset + stride;
 
-					for ( var j = 0; j !== stride; ++ j ) {
+					for ( let j = 0; j !== stride; ++ j ) {
 
-						var value = values[ offset + j ];
+						const value = values[ offset + j ];
 
 						if ( value !== values[ offsetP + j ] ||
 							value !== values[ offsetN + j ] ) {
@@ -35185,10 +35151,10 @@ Object.assign( KeyframeTrack.prototype, {
 
 					times[ writeIndex ] = times[ i ];
 
-					var readOffset = i * stride,
+					const readOffset = i * stride,
 						writeOffset = writeIndex * stride;
 
-					for ( var j = 0; j !== stride; ++ j ) {
+					for ( let j = 0; j !== stride; ++ j ) {
 
 						values[ writeOffset + j ] = values[ readOffset + j ];
 
@@ -35208,7 +35174,7 @@ Object.assign( KeyframeTrack.prototype, {
 
 			times[ writeIndex ] = times[ lastIndex ];
 
-			for ( var readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j ) {
+			for ( let readOffset = lastIndex * stride, writeOffset = writeIndex * stride, j = 0; j !== stride; ++ j ) {
 
 				values[ writeOffset + j ] = values[ readOffset + j ];
 
@@ -35236,11 +35202,11 @@ Object.assign( KeyframeTrack.prototype, {
 
 	clone: function () {
 
-		var times = AnimationUtils.arraySlice( this.times, 0 );
-		var values = AnimationUtils.arraySlice( this.values, 0 );
+		const times = AnimationUtils.arraySlice( this.times, 0 );
+		const values = AnimationUtils.arraySlice( this.values, 0 );
 
-		var TypedKeyframeTrack = this.constructor;
-		var track = new TypedKeyframeTrack( this.name, times, values );
+		const TypedKeyframeTrack = this.constructor;
+		const track = new TypedKeyframeTrack( this.name, times, values );
 
 		// Interpolant argument to constructor is not saved, so copy the factory method directly.
 		track.createInterpolant = this.createInterpolant;
@@ -35551,11 +35517,11 @@ function parseKeyframeTrack( json ) {
 
 	}
 
-	var trackType = getTrackTypeForValueTypeName( json.type );
+	const trackType = getTrackTypeForValueTypeName( json.type );
 
 	if ( json.times === undefined ) {
 
-		var times = [], values = [];
+		const times = [], values = [];
 
 		AnimationUtils.flattenJSON( json.keys, times, values, 'value' );
 
@@ -35582,11 +35548,11 @@ Object.assign( AnimationClip, {
 
 	parse: function ( json ) {
 
-		var tracks = [],
+		const tracks = [],
 			jsonTracks = json.tracks,
 			frameTime = 1.0 / ( json.fps || 1.0 );
 
-		for ( var i = 0, n = jsonTracks.length; i !== n; ++ i ) {
+		for ( let i = 0, n = jsonTracks.length; i !== n; ++ i ) {
 
 			tracks.push( parseKeyframeTrack( jsonTracks[ i ] ).scale( frameTime ) );
 
@@ -35598,10 +35564,10 @@ Object.assign( AnimationClip, {
 
 	toJSON: function ( clip ) {
 
-		var tracks = [],
+		const tracks = [],
 			clipTracks = clip.tracks;
 
-		var json = {
+		const json = {
 
 			'name': clip.name,
 			'duration': clip.duration,
@@ -35611,7 +35577,7 @@ Object.assign( AnimationClip, {
 
 		};
 
-		for ( var i = 0, n = clipTracks.length; i !== n; ++ i ) {
+		for ( let i = 0, n = clipTracks.length; i !== n; ++ i ) {
 
 			tracks.push( KeyframeTrack.toJSON( clipTracks[ i ] ) );
 
@@ -35623,13 +35589,13 @@ Object.assign( AnimationClip, {
 
 	CreateFromMorphTargetSequence: function ( name, morphTargetSequence, fps, noLoop ) {
 
-		var numMorphTargets = morphTargetSequence.length;
-		var tracks = [];
+		const numMorphTargets = morphTargetSequence.length;
+		const tracks = [];
 
-		for ( var i = 0; i < numMorphTargets; i ++ ) {
+		for ( let i = 0; i < numMorphTargets; i ++ ) {
 
-			var times = [];
-			var values = [];
+			let times = [];
+			let values = [];
 
 			times.push(
 				( i + numMorphTargets - 1 ) % numMorphTargets,
@@ -35638,7 +35604,7 @@ Object.assign( AnimationClip, {
 
 			values.push( 0, 1, 0 );
 
-			var order = AnimationUtils.getKeyframeOrder( times );
+			const order = AnimationUtils.getKeyframeOrder( times );
 			times = AnimationUtils.sortedArray( times, 1, order );
 			values = AnimationUtils.sortedArray( values, 1, order );
 
@@ -35665,16 +35631,16 @@ Object.assign( AnimationClip, {
 
 	findByName: function ( objectOrClipArray, name ) {
 
-		var clipArray = objectOrClipArray;
+		let clipArray = objectOrClipArray;
 
 		if ( ! Array.isArray( objectOrClipArray ) ) {
 
-			var o = objectOrClipArray;
+			const o = objectOrClipArray;
 			clipArray = o.geometry && o.geometry.animations || o.animations;
 
 		}
 
-		for ( var i = 0; i < clipArray.length; i ++ ) {
+		for ( let i = 0; i < clipArray.length; i ++ ) {
 
 			if ( clipArray[ i ].name === name ) {
 
@@ -35690,24 +35656,25 @@ Object.assign( AnimationClip, {
 
 	CreateClipsFromMorphTargetSequences: function ( morphTargets, fps, noLoop ) {
 
-		var animationToMorphTargets = {};
+		const animationToMorphTargets = {};
 
 		// tested with https://regex101.com/ on trick sequences
 		// such flamingo_flyA_003, flamingo_run1_003, crdeath0059
-		var pattern = /^([\w-]*?)([\d]+)$/;
+		const pattern = /^([\w-]*?)([\d]+)$/;
 
 		// sort morph target names into animation groups based
 		// patterns like Walk_001, Walk_002, Run_001, Run_002
-		for ( var i = 0, il = morphTargets.length; i < il; i ++ ) {
+		for ( let i = 0, il = morphTargets.length; i < il; i ++ ) {
 
-			var morphTarget = morphTargets[ i ];
-			var parts = morphTarget.name.match( pattern );
+			const morphTarget = morphTargets[ i ];
+			const parts = morphTarget.name.match( pattern );
 
 			if ( parts && parts.length > 1 ) {
 
-				var name = parts[ 1 ];
+				const name = parts[ 1 ];
 
-				var animationMorphTargets = animationToMorphTargets[ name ];
+				let animationMorphTargets = animationToMorphTargets[ name ];
+
 				if ( ! animationMorphTargets ) {
 
 					animationToMorphTargets[ name ] = animationMorphTargets = [];
@@ -35720,9 +35687,9 @@ Object.assign( AnimationClip, {
 
 		}
 
-		var clips = [];
+		const clips = [];
 
-		for ( var name in animationToMorphTargets ) {
+		for ( const name in animationToMorphTargets ) {
 
 			clips.push( AnimationClip.CreateFromMorphTargetSequence( name, animationToMorphTargets[ name ], fps, noLoop ) );
 
@@ -35742,13 +35709,13 @@ Object.assign( AnimationClip, {
 
 		}
 
-		var addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
+		const addNonemptyTrack = function ( trackType, trackName, animationKeys, propertyName, destTracks ) {
 
 			// only return track if there are actually keys.
 			if ( animationKeys.length !== 0 ) {
 
-				var times = [];
-				var values = [];
+				const times = [];
+				const values = [];
 
 				AnimationUtils.flattenJSON( animationKeys, times, values, propertyName );
 
@@ -35763,19 +35730,20 @@ Object.assign( AnimationClip, {
 
 		};
 
-		var tracks = [];
+		const tracks = [];
 
-		var clipName = animation.name || 'default';
+		const clipName = animation.name || 'default';
+		const fps = animation.fps || 30;
+		const blendMode = animation.blendMode;
+
 		// automatic length determination in AnimationClip.
-		var duration = animation.length || - 1;
-		var fps = animation.fps || 30;
-		var blendMode = animation.blendMode;
+		let duration = animation.length || - 1;
 
-		var hierarchyTracks = animation.hierarchy || [];
+		const hierarchyTracks = animation.hierarchy || [];
 
-		for ( var h = 0; h < hierarchyTracks.length; h ++ ) {
+		for ( let h = 0; h < hierarchyTracks.length; h ++ ) {
 
-			var animationKeys = hierarchyTracks[ h ].keys;
+			const animationKeys = hierarchyTracks[ h ].keys;
 
 			// skip empty tracks
 			if ( ! animationKeys || animationKeys.length === 0 ) continue;
@@ -35784,13 +35752,15 @@ Object.assign( AnimationClip, {
 			if ( animationKeys[ 0 ].morphTargets ) {
 
 				// figure out all morph targets used in this track
-				var morphTargetNames = {};
+				const morphTargetNames = {};
 
-				for ( var k = 0; k < animationKeys.length; k ++ ) {
+				let k;
+
+				for ( k = 0; k < animationKeys.length; k ++ ) {
 
 					if ( animationKeys[ k ].morphTargets ) {
 
-						for ( var m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
+						for ( let m = 0; m < animationKeys[ k ].morphTargets.length; m ++ ) {
 
 							morphTargetNames[ animationKeys[ k ].morphTargets[ m ] ] = - 1;
 
@@ -35803,14 +35773,14 @@ Object.assign( AnimationClip, {
 				// create a track for each morph target with all zero
 				// morphTargetInfluences except for the keys in which
 				// the morphTarget is named.
-				for ( var morphTargetName in morphTargetNames ) {
+				for ( const morphTargetName in morphTargetNames ) {
 
-					var times = [];
-					var values = [];
+					const times = [];
+					const values = [];
 
-					for ( var m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
+					for ( let m = 0; m !== animationKeys[ k ].morphTargets.length; ++ m ) {
 
-						var animationKey = animationKeys[ k ];
+						const animationKey = animationKeys[ k ];
 
 						times.push( animationKey.time );
 						values.push( ( animationKey.morphTarget === morphTargetName ) ? 1 : 0 );
@@ -35827,7 +35797,7 @@ Object.assign( AnimationClip, {
 
 				// ...assume skeletal animation
 
-				var boneName = '.bones[' + bones[ h ].name + ']';
+				const boneName = '.bones[' + bones[ h ].name + ']';
 
 				addNonemptyTrack(
 					VectorKeyframeTrack, boneName + '.position',
@@ -35851,7 +35821,7 @@ Object.assign( AnimationClip, {
 
 		}
 
-		var clip = new AnimationClip( clipName, duration, tracks, blendMode );
+		const clip = new AnimationClip( clipName, duration, tracks, blendMode );
 
 		return clip;
 
@@ -35863,11 +35833,12 @@ Object.assign( AnimationClip.prototype, {
 
 	resetDuration: function () {
 
-		var tracks = this.tracks, duration = 0;
+		const tracks = this.tracks;
+		let duration = 0;
 
-		for ( var i = 0, n = tracks.length; i !== n; ++ i ) {
+		for ( let i = 0, n = tracks.length; i !== n; ++ i ) {
 
-			var track = this.tracks[ i ];
+			const track = this.tracks[ i ];
 
 			duration = Math.max( duration, track.times[ track.times.length - 1 ] );
 
@@ -35881,7 +35852,7 @@ Object.assign( AnimationClip.prototype, {
 
 	trim: function () {
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
+		for ( let i = 0; i < this.tracks.length; i ++ ) {
 
 			this.tracks[ i ].trim( 0, this.duration );
 
@@ -35893,9 +35864,9 @@ Object.assign( AnimationClip.prototype, {
 
 	validate: function () {
 
-		var valid = true;
+		let valid = true;
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
+		for ( let i = 0; i < this.tracks.length; i ++ ) {
 
 			valid = valid && this.tracks[ i ].validate();
 
@@ -35907,7 +35878,7 @@ Object.assign( AnimationClip.prototype, {
 
 	optimize: function () {
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
+		for ( let i = 0; i < this.tracks.length; i ++ ) {
 
 			this.tracks[ i ].optimize();
 
@@ -35919,9 +35890,9 @@ Object.assign( AnimationClip.prototype, {
 
 	clone: function () {
 
-		var tracks = [];
+		const tracks = [];
 
-		for ( var i = 0; i < this.tracks.length; i ++ ) {
+		for ( let i = 0; i < this.tracks.length; i ++ ) {
 
 			tracks.push( this.tracks[ i ].clone() );
 
@@ -42171,7 +42142,7 @@ FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 let _context;
 
-var AudioContext = {
+const AudioContext = {
 
 	getContext: function () {
 
@@ -43225,7 +43196,7 @@ function PropertyMixer( binding, typeName, valueSize ) {
 	this.binding = binding;
 	this.valueSize = valueSize;
 
-	var mixFunction,
+	let mixFunction,
 		mixFunctionAdditive,
 		setIdentity;
 
@@ -43300,17 +43271,17 @@ Object.assign( PropertyMixer.prototype, {
 		// note: happily accumulating nothing when weight = 0, the caller knows
 		// the weight and shouldn't have made the call in the first place
 
-		var buffer = this.buffer,
+		const buffer = this.buffer,
 			stride = this.valueSize,
-			offset = accuIndex * stride + stride,
+			offset = accuIndex * stride + stride;
 
-			currentWeight = this.cumulativeWeight;
+		let currentWeight = this.cumulativeWeight;
 
 		if ( currentWeight === 0 ) {
 
 			// accuN := incoming * weight
 
-			for ( var i = 0; i !== stride; ++ i ) {
+			for ( let i = 0; i !== stride; ++ i ) {
 
 				buffer[ offset + i ] = buffer[ i ];
 
@@ -43323,7 +43294,7 @@ Object.assign( PropertyMixer.prototype, {
 			// accuN := accuN + incoming * weight
 
 			currentWeight += weight;
-			var mix = weight / currentWeight;
+			const mix = weight / currentWeight;
 			this._mixBufferRegion( buffer, offset, 0, mix, stride );
 
 		}
@@ -43335,7 +43306,7 @@ Object.assign( PropertyMixer.prototype, {
 	// accumulate data in the 'incoming' region into 'add'
 	accumulateAdditive: function ( weight ) {
 
-		var buffer = this.buffer,
+		const buffer = this.buffer,
 			stride = this.valueSize,
 			offset = stride * this._addIndex;
 
@@ -43357,7 +43328,7 @@ Object.assign( PropertyMixer.prototype, {
 	// apply the state of 'accu<i>' to the binding when accus differ
 	apply: function ( accuIndex ) {
 
-		var stride = this.valueSize,
+		const stride = this.valueSize,
 			buffer = this.buffer,
 			offset = accuIndex * stride + stride,
 
@@ -43373,7 +43344,7 @@ Object.assign( PropertyMixer.prototype, {
 
 			// accuN := accuN + original * ( 1 - cumulativeWeight )
 
-			var originalValueOffset = stride * this._origIndex;
+			const originalValueOffset = stride * this._origIndex;
 
 			this._mixBufferRegion(
 				buffer, offset, originalValueOffset, 1 - weight, stride );
@@ -43388,7 +43359,7 @@ Object.assign( PropertyMixer.prototype, {
 
 		}
 
-		for ( var i = stride, e = stride + stride; i !== e; ++ i ) {
+		for ( let i = stride, e = stride + stride; i !== e; ++ i ) {
 
 			if ( buffer[ i ] !== buffer[ i + stride ] ) {
 
@@ -43406,9 +43377,9 @@ Object.assign( PropertyMixer.prototype, {
 	// remember the state of the bound property and copy it to both accus
 	saveOriginalState: function () {
 
-		var binding = this.binding;
+		const binding = this.binding;
 
-		var buffer = this.buffer,
+		const buffer = this.buffer,
 			stride = this.valueSize,
 
 			originalValueOffset = stride * this._origIndex;
@@ -43416,7 +43387,7 @@ Object.assign( PropertyMixer.prototype, {
 		binding.getValue( buffer, originalValueOffset );
 
 		// accu[0..1] := orig -- initially detect changes against the original
-		for ( var i = stride, e = originalValueOffset; i !== e; ++ i ) {
+		for ( let i = stride, e = originalValueOffset; i !== e; ++ i ) {
 
 			buffer[ i ] = buffer[ originalValueOffset + ( i % stride ) ];
 
@@ -43433,17 +43404,17 @@ Object.assign( PropertyMixer.prototype, {
 	// apply the state previously taken via 'saveOriginalState' to the binding
 	restoreOriginalState: function () {
 
-		var originalValueOffset = this.valueSize * 3;
+		const originalValueOffset = this.valueSize * 3;
 		this.binding.setValue( this.buffer, originalValueOffset );
 
 	},
 
 	_setAdditiveIdentityNumeric: function () {
 
-		var startIndex = this._addIndex * this.valueSize;
-		var endIndex = startIndex + this.valueSize;
+		const startIndex = this._addIndex * this.valueSize;
+		const endIndex = startIndex + this.valueSize;
 
-		for ( var i = startIndex; i < endIndex; i ++ ) {
+		for ( let i = startIndex; i < endIndex; i ++ ) {
 
 			this.buffer[ i ] = 0;
 
@@ -43460,10 +43431,10 @@ Object.assign( PropertyMixer.prototype, {
 
 	_setAdditiveIdentityOther: function () {
 
-		var startIndex = this._origIndex * this.valueSize;
-		var targetIndex = this._addIndex * this.valueSize;
+		const startIndex = this._origIndex * this.valueSize;
+		const targetIndex = this._addIndex * this.valueSize;
 
-		for ( var i = 0; i < this.valueSize; i ++ ) {
+		for ( let i = 0; i < this.valueSize; i ++ ) {
 
 			this.buffer[ targetIndex + i ] = this.buffer[ startIndex + i ];
 
@@ -43478,7 +43449,7 @@ Object.assign( PropertyMixer.prototype, {
 
 		if ( t >= 0.5 ) {
 
-			for ( var i = 0; i !== stride; ++ i ) {
+			for ( let i = 0; i !== stride; ++ i ) {
 
 				buffer[ dstOffset + i ] = buffer[ srcOffset + i ];
 
@@ -43496,7 +43467,7 @@ Object.assign( PropertyMixer.prototype, {
 
 	_slerpAdditive: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
-		var workOffset = this._workIndex * stride;
+		const workOffset = this._workIndex * stride;
 
 		// Store result in intermediate buffer offset
 		Quaternion.multiplyQuaternionsFlat( buffer, workOffset, buffer, dstOffset, buffer, srcOffset );
@@ -43508,11 +43479,11 @@ Object.assign( PropertyMixer.prototype, {
 
 	_lerp: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
-		var s = 1 - t;
+		const s = 1 - t;
 
-		for ( var i = 0; i !== stride; ++ i ) {
+		for ( let i = 0; i !== stride; ++ i ) {
 
-			var j = dstOffset + i;
+			const j = dstOffset + i;
 
 			buffer[ j ] = buffer[ j ] * s + buffer[ srcOffset + i ] * t;
 
@@ -43522,9 +43493,9 @@ Object.assign( PropertyMixer.prototype, {
 
 	_lerpAdditive: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
-		for ( var i = 0; i !== stride; ++ i ) {
+		for ( let i = 0; i !== stride; ++ i ) {
 
-			var j = dstOffset + i;
+			const j = dstOffset + i;
 
 			buffer[ j ] = buffer[ j ] + buffer[ srcOffset + i ] * t;
 
@@ -43545,31 +43516,31 @@ Object.assign( PropertyMixer.prototype, {
  */
 
 // Characters [].:/ are reserved for track binding syntax.
-var _RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
-var _reservedRe = new RegExp( '[' + _RESERVED_CHARS_RE + ']', 'g' );
+const _RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
+const _reservedRe = new RegExp( '[' + _RESERVED_CHARS_RE + ']', 'g' );
 
 // Attempts to allow node names from any language. ES5's `\w` regexp matches
 // only latin characters, and the unicode \p{L} is not yet supported. So
 // instead, we exclude reserved characters and match everything else.
-var _wordChar = '[^' + _RESERVED_CHARS_RE + ']';
-var _wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
+const _wordChar = '[^' + _RESERVED_CHARS_RE + ']';
+const _wordCharOrDot = '[^' + _RESERVED_CHARS_RE.replace( '\\.', '' ) + ']';
 
 // Parent directories, delimited by '/' or ':'. Currently unused, but must
 // be matched to parse the rest of the track name.
-var _directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
+const _directoryRe = /((?:WC+[\/:])*)/.source.replace( 'WC', _wordChar );
 
 // Target node. May contain word characters (a-zA-Z0-9_) and '.' or '-'.
-var _nodeRe = /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
+const _nodeRe = /(WCOD+)?/.source.replace( 'WCOD', _wordCharOrDot );
 
 // Object on target node, and accessor. May not contain reserved
 // characters. Accessor may contain any character except closing bracket.
-var _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
+const _objectRe = /(?:\.(WC+)(?:\[(.+)\])?)?/.source.replace( 'WC', _wordChar );
 
 // Property and accessor. May not contain reserved characters. Accessor may
 // contain any non-bracket characters.
-var _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
+const _propertyRe = /\.(WC+)(?:\[(.+)\])?/.source.replace( 'WC', _wordChar );
 
-var _trackRe = new RegExp( ''
+const _trackRe = new RegExp( ''
 	+ '^'
 	+ _directoryRe
 	+ _nodeRe
@@ -43578,11 +43549,11 @@ var _trackRe = new RegExp( ''
 	+ '$'
 );
 
-var _supportedObjectNames = [ 'material', 'materials', 'bones' ];
+const _supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
 function Composite( targetGroup, path, optionalParsedPath ) {
 
-	var parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
+	const parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
 	this._targetGroup = targetGroup;
 	this._bindings = targetGroup.subscribe_( path, parsedPath );
@@ -43595,7 +43566,7 @@ Object.assign( Composite.prototype, {
 
 		this.bind(); // bind all binding
 
-		var firstValidIndex = this._targetGroup.nCachedObjects_,
+		const firstValidIndex = this._targetGroup.nCachedObjects_,
 			binding = this._bindings[ firstValidIndex ];
 
 		// and only call .getValue on the first
@@ -43605,9 +43576,9 @@ Object.assign( Composite.prototype, {
 
 	setValue: function ( array, offset ) {
 
-		var bindings = this._bindings;
+		const bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+		for ( let i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].setValue( array, offset );
 
@@ -43617,9 +43588,9 @@ Object.assign( Composite.prototype, {
 
 	bind: function () {
 
-		var bindings = this._bindings;
+		const bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+		for ( let i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].bind();
 
@@ -43629,9 +43600,9 @@ Object.assign( Composite.prototype, {
 
 	unbind: function () {
 
-		var bindings = this._bindings;
+		const bindings = this._bindings;
 
-		for ( var i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
+		for ( let i = this._targetGroup.nCachedObjects_, n = bindings.length; i !== n; ++ i ) {
 
 			bindings[ i ].unbind();
 
@@ -43686,7 +43657,7 @@ Object.assign( PropertyBinding, {
 
 	parseTrackName: function ( trackName ) {
 
-		var matches = _trackRe.exec( trackName );
+		const matches = _trackRe.exec( trackName );
 
 		if ( ! matches ) {
 
@@ -43694,7 +43665,7 @@ Object.assign( PropertyBinding, {
 
 		}
 
-		var results = {
+		const results = {
 			// directoryName: matches[ 1 ], // (tschw) currently unused
 			nodeName: matches[ 2 ],
 			objectName: matches[ 3 ],
@@ -43703,11 +43674,11 @@ Object.assign( PropertyBinding, {
 			propertyIndex: matches[ 6 ]
 		};
 
-		var lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
+		const lastDot = results.nodeName && results.nodeName.lastIndexOf( '.' );
 
 		if ( lastDot !== undefined && lastDot !== - 1 ) {
 
-			var objectName = results.nodeName.substring( lastDot + 1 );
+			const objectName = results.nodeName.substring( lastDot + 1 );
 
 			// Object names must be checked against a whitelist. Otherwise, there
 			// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
@@ -43743,7 +43714,7 @@ Object.assign( PropertyBinding, {
 		// search into skeleton bones.
 		if ( root.skeleton ) {
 
-			var bone = root.skeleton.getBoneByName( nodeName );
+			const bone = root.skeleton.getBoneByName( nodeName );
 
 			if ( bone !== undefined ) {
 
@@ -43756,11 +43727,11 @@ Object.assign( PropertyBinding, {
 		// search into node subtree.
 		if ( root.children ) {
 
-			var searchNodeSubtree = function ( children ) {
+			const searchNodeSubtree = function ( children ) {
 
-				for ( var i = 0; i < children.length; i ++ ) {
+				for ( let i = 0; i < children.length; i ++ ) {
 
-					var childNode = children[ i ];
+					const childNode = children[ i ];
 
 					if ( childNode.name === nodeName || childNode.uuid === nodeName ) {
 
@@ -43768,7 +43739,7 @@ Object.assign( PropertyBinding, {
 
 					}
 
-					var result = searchNodeSubtree( childNode.children );
+					const result = searchNodeSubtree( childNode.children );
 
 					if ( result ) return result;
 
@@ -43778,7 +43749,7 @@ Object.assign( PropertyBinding, {
 
 			};
 
-			var subTreeNode = searchNodeSubtree( root.children );
+			const subTreeNode = searchNodeSubtree( root.children );
 
 			if ( subTreeNode ) {
 
@@ -43823,9 +43794,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		function getValue_array( buffer, offset ) {
 
-			var source = this.resolvedProperty;
+			const source = this.resolvedProperty;
 
-			for ( var i = 0, n = source.length; i !== n; ++ i ) {
+			for ( let i = 0, n = source.length; i !== n; ++ i ) {
 
 				buffer[ offset ++ ] = source[ i ];
 
@@ -43878,9 +43849,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			function setValue_array( buffer, offset ) {
 
-				var dest = this.resolvedProperty;
+				const dest = this.resolvedProperty;
 
-				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+				for ( let i = 0, n = dest.length; i !== n; ++ i ) {
 
 					dest[ i ] = buffer[ offset ++ ];
 
@@ -43890,9 +43861,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			function setValue_array_setNeedsUpdate( buffer, offset ) {
 
-				var dest = this.resolvedProperty;
+				const dest = this.resolvedProperty;
 
-				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+				for ( let i = 0, n = dest.length; i !== n; ++ i ) {
 
 					dest[ i ] = buffer[ offset ++ ];
 
@@ -43904,9 +43875,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 			function setValue_array_setMatrixWorldNeedsUpdate( buffer, offset ) {
 
-				var dest = this.resolvedProperty;
+				const dest = this.resolvedProperty;
 
-				for ( var i = 0, n = dest.length; i !== n; ++ i ) {
+				for ( let i = 0, n = dest.length; i !== n; ++ i ) {
 
 					dest[ i ] = buffer[ offset ++ ];
 
@@ -43991,7 +43962,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 	// create getter / setter pair for a property in the scene graph
 	bind: function () {
 
-		var targetObject = this.node,
+		let targetObject = this.node,
 			parsedPath = this.parsedPath,
 
 			objectName = parsedPath.objectName,
@@ -44020,7 +43991,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		if ( objectName ) {
 
-			var objectIndex = parsedPath.objectIndex;
+			let objectIndex = parsedPath.objectIndex;
 
 			// special cases were we need to reach deeper into the hierarchy to get the face materials....
 			switch ( objectName ) {
@@ -44060,7 +44031,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 					targetObject = targetObject.skeleton.bones;
 
 					// support resolving morphTarget names into indices.
-					for ( var i = 0; i < targetObject.length; i ++ ) {
+					for ( let i = 0; i < targetObject.length; i ++ ) {
 
 						if ( targetObject[ i ].name === objectIndex ) {
 
@@ -44103,11 +44074,11 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		}
 
 		// resolve property
-		var nodeProperty = targetObject[ propertyName ];
+		const nodeProperty = targetObject[ propertyName ];
 
 		if ( nodeProperty === undefined ) {
 
-			var nodeName = parsedPath.nodeName;
+			const nodeName = parsedPath.nodeName;
 
 			console.error( 'THREE.PropertyBinding: Trying to update property for track: ' + nodeName +
 				'.' + propertyName + ' but it wasn\'t found.', targetObject );
@@ -44116,7 +44087,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		}
 
 		// determine versioning scheme
-		var versioning = this.Versioning.None;
+		let versioning = this.Versioning.None;
 
 		this.targetObject = targetObject;
 
@@ -44131,7 +44102,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		}
 
 		// determine how the property gets bound
-		var bindingType = this.BindingType.Direct;
+		let bindingType = this.BindingType.Direct;
 
 		if ( propertyIndex !== undefined ) {
 
@@ -44268,10 +44239,10 @@ function AnimationObjectGroup() {
 	this.nCachedObjects_ = 0; // threshold
 	// note: read by PropertyBinding.Composite
 
-	var indices = {};
+	const indices = {};
 	this._indicesByUUID = indices; // for bookkeeping
 
-	for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+	for ( let i = 0, n = arguments.length; i !== n; ++ i ) {
 
 		indices[ arguments[ i ].uuid ] = i;
 
@@ -44282,7 +44253,7 @@ function AnimationObjectGroup() {
 	this._bindings = []; // inside: Array< PropertyBinding >
 	this._bindingsIndicesByPath = {}; // inside: indices in these arrays
 
-	var scope = this;
+	const scope = this;
 
 	this.stats = {
 
@@ -44314,21 +44285,22 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	add: function () {
 
-		var objects = this._objects,
-			nObjects = objects.length,
-			nCachedObjects = this.nCachedObjects_,
+		const objects = this._objects,
 			indicesByUUID = this._indicesByUUID,
 			paths = this._paths,
 			parsedPaths = this._parsedPaths,
 			bindings = this._bindings,
-			nBindings = bindings.length,
-			knownObject = undefined;
+			nBindings = bindings.length;
 
-		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+		let knownObject = undefined,
+			nObjects = objects.length,
+			nCachedObjects = this.nCachedObjects_;
 
-			var object = arguments[ i ],
-				uuid = object.uuid,
-				index = indicesByUUID[ uuid ];
+		for ( let i = 0, n = arguments.length; i !== n; ++ i ) {
+
+			const object = arguments[ i ],
+				uuid = object.uuid;
+			let index = indicesByUUID[ uuid ];
 
 			if ( index === undefined ) {
 
@@ -44340,7 +44312,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 				// accounting is done, now do the same for all bindings
 
-				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+				for ( let j = 0, m = nBindings; j !== m; ++ j ) {
 
 					bindings[ j ].push( new PropertyBinding( object, paths[ j ], parsedPaths[ j ] ) );
 
@@ -44352,7 +44324,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 				// move existing object to the ACTIVE region
 
-				var firstActiveIndex = -- nCachedObjects,
+				const firstActiveIndex = -- nCachedObjects,
 					lastCachedObject = objects[ firstActiveIndex ];
 
 				indicesByUUID[ lastCachedObject.uuid ] = index;
@@ -44363,11 +44335,12 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 				// accounting is done, now do the same for all bindings
 
-				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+				for ( let j = 0, m = nBindings; j !== m; ++ j ) {
 
-					var bindingsForPath = bindings[ j ],
-						lastCached = bindingsForPath[ firstActiveIndex ],
-						binding = bindingsForPath[ index ];
+					const bindingsForPath = bindings[ j ],
+						lastCached = bindingsForPath[ firstActiveIndex ];
+
+					let binding = bindingsForPath[ index ];
 
 					bindingsForPath[ index ] = lastCached;
 
@@ -44400,15 +44373,16 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 	remove: function () {
 
-		var objects = this._objects,
-			nCachedObjects = this.nCachedObjects_,
+		const objects = this._objects,
 			indicesByUUID = this._indicesByUUID,
 			bindings = this._bindings,
 			nBindings = bindings.length;
 
-		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+		let nCachedObjects = this.nCachedObjects_;
 
-			var object = arguments[ i ],
+		for ( let i = 0, n = arguments.length; i !== n; ++ i ) {
+
+			const object = arguments[ i ],
 				uuid = object.uuid,
 				index = indicesByUUID[ uuid ];
 
@@ -44416,7 +44390,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 				// move existing object into the CACHED region
 
-				var lastCachedIndex = nCachedObjects ++,
+				const lastCachedIndex = nCachedObjects ++,
 					firstActiveObject = objects[ lastCachedIndex ];
 
 				indicesByUUID[ firstActiveObject.uuid ] = index;
@@ -44427,9 +44401,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 				// accounting is done, now do the same for all bindings
 
-				for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+				for ( let j = 0, m = nBindings; j !== m; ++ j ) {
 
-					var bindingsForPath = bindings[ j ],
+					const bindingsForPath = bindings[ j ],
 						firstActive = bindingsForPath[ lastCachedIndex ],
 						binding = bindingsForPath[ index ];
 
@@ -44449,16 +44423,17 @@ Object.assign( AnimationObjectGroup.prototype, {
 	// remove & forget
 	uncache: function () {
 
-		var objects = this._objects,
-			nObjects = objects.length,
-			nCachedObjects = this.nCachedObjects_,
+		const objects = this._objects,
 			indicesByUUID = this._indicesByUUID,
 			bindings = this._bindings,
 			nBindings = bindings.length;
 
-		for ( var i = 0, n = arguments.length; i !== n; ++ i ) {
+		let nCachedObjects = this.nCachedObjects_,
+			nObjects = objects.length;
 
-			var object = arguments[ i ],
+		for ( let i = 0, n = arguments.length; i !== n; ++ i ) {
+
+			const object = arguments[ i ],
 				uuid = object.uuid,
 				index = indicesByUUID[ uuid ];
 
@@ -44470,7 +44445,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 					// object is cached, shrink the CACHED region
 
-					var firstActiveIndex = -- nCachedObjects,
+					const firstActiveIndex = -- nCachedObjects,
 						lastCachedObject = objects[ firstActiveIndex ],
 						lastIndex = -- nObjects,
 						lastObject = objects[ lastIndex ];
@@ -44486,9 +44461,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 					// accounting is done, now do the same for all bindings
 
-					for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+					for ( let j = 0, m = nBindings; j !== m; ++ j ) {
 
-						var bindingsForPath = bindings[ j ],
+						const bindingsForPath = bindings[ j ],
 							lastCached = bindingsForPath[ firstActiveIndex ],
 							last = bindingsForPath[ lastIndex ];
 
@@ -44502,7 +44477,7 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 					// object is active, just swap with the last and pop
 
-					var lastIndex = -- nObjects,
+					const lastIndex = -- nObjects,
 						lastObject = objects[ lastIndex ];
 
 					indicesByUUID[ lastObject.uuid ] = index;
@@ -44511,9 +44486,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 
 					// accounting is done, now do the same for all bindings
 
-					for ( var j = 0, m = nBindings; j !== m; ++ j ) {
+					for ( let j = 0, m = nBindings; j !== m; ++ j ) {
 
-						var bindingsForPath = bindings[ j ];
+						const bindingsForPath = bindings[ j ];
 
 						bindingsForPath[ index ] = bindingsForPath[ lastIndex ];
 						bindingsForPath.pop();
@@ -44537,13 +44512,13 @@ Object.assign( AnimationObjectGroup.prototype, {
 		// returns an array of bindings for the given path that is changed
 		// according to the contained objects in the group
 
-		var indicesByPath = this._bindingsIndicesByPath,
+		let indicesByPath = this._bindingsIndicesByPath,
 			index = indicesByPath[ path ],
 			bindings = this._bindings;
 
 		if ( index !== undefined ) return bindings[ index ];
 
-		var paths = this._paths,
+		const paths = this._paths,
 			parsedPaths = this._parsedPaths,
 			objects = this._objects,
 			nObjects = objects.length,
@@ -44558,9 +44533,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 		parsedPaths.push( parsedPath );
 		bindings.push( bindingsForPath );
 
-		for ( var i = nCachedObjects, n = objects.length; i !== n; ++ i ) {
+		for ( let i = nCachedObjects, n = objects.length; i !== n; ++ i ) {
 
-			var object = objects[ i ];
+			const object = objects[ i ];
 			bindingsForPath[ i ] = new PropertyBinding( object, path, parsedPath );
 
 		}
@@ -44574,12 +44549,12 @@ Object.assign( AnimationObjectGroup.prototype, {
 		// tells the group to forget about a property path and no longer
 		// update the array previously obtained with 'subscribe_'
 
-		var indicesByPath = this._bindingsIndicesByPath,
+		const indicesByPath = this._bindingsIndicesByPath,
 			index = indicesByPath[ path ];
 
 		if ( index !== undefined ) {
 
-			var paths = this._paths,
+			const paths = this._paths,
 				parsedPaths = this._parsedPaths,
 				bindings = this._bindings,
 				lastBindingsIndex = bindings.length - 1,
@@ -44621,18 +44596,18 @@ function AnimationAction( mixer, clip, localRoot, blendMode ) {
 	this._localRoot = localRoot || null;
 	this.blendMode = blendMode || clip.blendMode;
 
-	var tracks = clip.tracks,
+	const tracks = clip.tracks,
 		nTracks = tracks.length,
 		interpolants = new Array( nTracks );
 
-	var interpolantSettings = {
+	const interpolantSettings = {
 		endingStart: ZeroCurvatureEnding,
 		endingEnd: ZeroCurvatureEnding
 	};
 
-	for ( var i = 0; i !== nTracks; ++ i ) {
+	for ( let i = 0; i !== nTracks; ++ i ) {
 
-		var interpolant = tracks[ i ].createInterpolant( null );
+		const interpolant = tracks[ i ].createInterpolant( null );
 		interpolants[ i ] = interpolant;
 		interpolant.settings = interpolantSettings;
 
@@ -44786,7 +44761,7 @@ Object.assign( AnimationAction.prototype, {
 
 		if ( warp ) {
 
-			var fadeInDuration = this._clip.duration,
+			const fadeInDuration = this._clip.duration,
 				fadeOutDuration = fadeOutAction._clip.duration,
 
 				startEndRatio = fadeOutDuration / fadeInDuration,
@@ -44809,7 +44784,7 @@ Object.assign( AnimationAction.prototype, {
 
 	stopFading: function () {
 
-		var weightInterpolant = this._weightInterpolant;
+		let weightInterpolant = this._weightInterpolant;
 
 		if ( weightInterpolant !== null ) {
 
@@ -44868,10 +44843,11 @@ Object.assign( AnimationAction.prototype, {
 
 	warp: function ( startTimeScale, endTimeScale, duration ) {
 
-		var mixer = this._mixer, now = mixer.time,
-			interpolant = this._timeScaleInterpolant,
-
+		const mixer = this._mixer,
+			now = mixer.time,
 			timeScale = this.timeScale;
+
+		let interpolant = this._timeScaleInterpolant;
 
 		if ( interpolant === null ) {
 
@@ -44880,7 +44856,7 @@ Object.assign( AnimationAction.prototype, {
 
 		}
 
-		var times = interpolant.parameterPositions,
+		const times = interpolant.parameterPositions,
 			values = interpolant.sampleValues;
 
 		times[ 0 ] = now;
@@ -44895,7 +44871,7 @@ Object.assign( AnimationAction.prototype, {
 
 	stopWarping: function () {
 
-		var timeScaleInterpolant = this._timeScaleInterpolant;
+		let timeScaleInterpolant = this._timeScaleInterpolant;
 
 		if ( timeScaleInterpolant !== null ) {
 
@@ -44943,13 +44919,13 @@ Object.assign( AnimationAction.prototype, {
 
 		}
 
-		var startTime = this._startTime;
+		const startTime = this._startTime;
 
 		if ( startTime !== null ) {
 
 			// check for scheduled start of action
 
-			var timeRunning = ( time - startTime ) * timeDirection;
+			const timeRunning = ( time - startTime ) * timeDirection;
 			if ( timeRunning < 0 || timeDirection === 0 ) {
 
 				return; // yet to come / don't decide when delta = 0
@@ -44966,23 +44942,23 @@ Object.assign( AnimationAction.prototype, {
 		// apply time scale and advance time
 
 		deltaTime *= this._updateTimeScale( time );
-		var clipTime = this._updateTime( deltaTime );
+		const clipTime = this._updateTime( deltaTime );
 
 		// note: _updateTime may disable the action resulting in
 		// an effective weight of 0
 
-		var weight = this._updateWeight( time );
+		const weight = this._updateWeight( time );
 
 		if ( weight > 0 ) {
 
-			var interpolants = this._interpolants;
-			var propertyMixers = this._propertyBindings;
+			const interpolants = this._interpolants;
+			const propertyMixers = this._propertyBindings;
 
 			switch ( this.blendMode ) {
 
 				case AdditiveAnimationBlendMode:
 
-					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+					for ( let j = 0, m = interpolants.length; j !== m; ++ j ) {
 
 						interpolants[ j ].evaluate( clipTime );
 						propertyMixers[ j ].accumulateAdditive( weight );
@@ -44994,7 +44970,7 @@ Object.assign( AnimationAction.prototype, {
 				case NormalAnimationBlendMode:
 				default:
 
-					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+					for ( let j = 0, m = interpolants.length; j !== m; ++ j ) {
 
 						interpolants[ j ].evaluate( clipTime );
 						propertyMixers[ j ].accumulate( accuIndex, weight );
@@ -45009,16 +44985,16 @@ Object.assign( AnimationAction.prototype, {
 
 	_updateWeight: function ( time ) {
 
-		var weight = 0;
+		let weight = 0;
 
 		if ( this.enabled ) {
 
 			weight = this.weight;
-			var interpolant = this._weightInterpolant;
+			const interpolant = this._weightInterpolant;
 
 			if ( interpolant !== null ) {
 
-				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+				const interpolantValue = interpolant.evaluate( time )[ 0 ];
 
 				weight *= interpolantValue;
 
@@ -45046,17 +45022,17 @@ Object.assign( AnimationAction.prototype, {
 
 	_updateTimeScale: function ( time ) {
 
-		var timeScale = 0;
+		let timeScale = 0;
 
 		if ( ! this.paused ) {
 
 			timeScale = this.timeScale;
 
-			var interpolant = this._timeScaleInterpolant;
+			const interpolant = this._timeScaleInterpolant;
 
 			if ( interpolant !== null ) {
 
-				var interpolantValue = interpolant.evaluate( time )[ 0 ];
+				const interpolantValue = interpolant.evaluate( time )[ 0 ];
 
 				timeScale *= interpolantValue;
 
@@ -45089,12 +45065,13 @@ Object.assign( AnimationAction.prototype, {
 
 	_updateTime: function ( deltaTime ) {
 
-		var time = this.time + deltaTime;
-		var duration = this._clip.duration;
-		var loop = this.loop;
-		var loopCount = this._loopCount;
+		const duration = this._clip.duration;
+		const loop = this.loop;
 
-		var pingPong = ( loop === LoopPingPong );
+		let time = this.time + deltaTime;
+		let loopCount = this._loopCount;
+
+		const pingPong = ( loop === LoopPingPong );
 
 		if ( deltaTime === 0 ) {
 
@@ -45173,12 +45150,12 @@ Object.assign( AnimationAction.prototype, {
 
 				// wrap around
 
-				var loopDelta = Math.floor( time / duration ); // signed
+				const loopDelta = Math.floor( time / duration ); // signed
 				time -= duration * loopDelta;
 
 				loopCount += Math.abs( loopDelta );
 
-				var pending = this.repetitions - loopCount;
+				const pending = this.repetitions - loopCount;
 
 				if ( pending <= 0 ) {
 
@@ -45204,7 +45181,7 @@ Object.assign( AnimationAction.prototype, {
 
 						// entering the last round
 
-						var atStart = deltaTime < 0;
+						const atStart = deltaTime < 0;
 						this._setEndings( atStart, ! atStart, pingPong );
 
 					} else {
@@ -45245,7 +45222,7 @@ Object.assign( AnimationAction.prototype, {
 
 	_setEndings: function ( atStart, atEnd, pingPong ) {
 
-		var settings = this._interpolantSettings;
+		const settings = this._interpolantSettings;
 
 		if ( pingPong ) {
 
@@ -45282,8 +45259,8 @@ Object.assign( AnimationAction.prototype, {
 
 	_scheduleFading: function ( duration, weightNow, weightThen ) {
 
-		var mixer = this._mixer, now = mixer.time,
-			interpolant = this._weightInterpolant;
+		const mixer = this._mixer, now = mixer.time;
+		let interpolant = this._weightInterpolant;
 
 		if ( interpolant === null ) {
 
@@ -45292,7 +45269,7 @@ Object.assign( AnimationAction.prototype, {
 
 		}
 
-		var times = interpolant.parameterPositions,
+		const times = interpolant.parameterPositions,
 			values = interpolant.sampleValues;
 
 		times[ 0 ] = now;
@@ -45334,14 +45311,15 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_bindAction: function ( action, prototypeAction ) {
 
-		var root = action._localRoot || this._root,
+		const root = action._localRoot || this._root,
 			tracks = action._clip.tracks,
 			nTracks = tracks.length,
 			bindings = action._propertyBindings,
 			interpolants = action._interpolants,
 			rootUuid = root.uuid,
-			bindingsByRoot = this._bindingsByRootAndName,
-			bindingsByName = bindingsByRoot[ rootUuid ];
+			bindingsByRoot = this._bindingsByRootAndName;
+
+		let bindingsByName = bindingsByRoot[ rootUuid ];
 
 		if ( bindingsByName === undefined ) {
 
@@ -45350,11 +45328,12 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		for ( var i = 0; i !== nTracks; ++ i ) {
+		for ( let i = 0; i !== nTracks; ++ i ) {
 
-			var track = tracks[ i ],
-				trackName = track.name,
-				binding = bindingsByName[ trackName ];
+			const track = tracks[ i ],
+				trackName = track.name;
+
+			let binding = bindingsByName[ trackName ];
 
 			if ( binding !== undefined ) {
 
@@ -45379,7 +45358,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				}
 
-				var path = prototypeAction && prototypeAction.
+				const path = prototypeAction && prototypeAction.
 					_propertyBindings[ i ].binding.parsedPath;
 
 				binding = new PropertyMixer(
@@ -45408,7 +45387,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 				// this action has been forgotten by the cache, but the user
 				// appears to be still using it -> rebind
 
-				var rootUuid = ( action._localRoot || this._root ).uuid,
+				const rootUuid = ( action._localRoot || this._root ).uuid,
 					clipUuid = action._clip.uuid,
 					actionsForClip = this._actionsByClip[ clipUuid ];
 
@@ -45419,12 +45398,12 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			}
 
-			var bindings = action._propertyBindings;
+			const bindings = action._propertyBindings;
 
 			// increment reference counts / sort out state
-			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+			for ( let i = 0, n = bindings.length; i !== n; ++ i ) {
 
-				var binding = bindings[ i ];
+				const binding = bindings[ i ];
 
 				if ( binding.useCount ++ === 0 ) {
 
@@ -45445,12 +45424,12 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( this._isActiveAction( action ) ) {
 
-			var bindings = action._propertyBindings;
+			const bindings = action._propertyBindings;
 
 			// decrement reference counts / sort out state
-			for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+			for ( let i = 0, n = bindings.length; i !== n; ++ i ) {
 
-				var binding = bindings[ i ];
+				const binding = bindings[ i ];
 
 				if ( -- binding.useCount === 0 ) {
 
@@ -45491,7 +45470,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		this._controlInterpolants = []; // same game as above
 		this._nActiveControlInterpolants = 0;
 
-		var scope = this;
+		const scope = this;
 
 		this.stats = {
 
@@ -45540,16 +45519,17 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_isActiveAction: function ( action ) {
 
-		var index = action._cacheIndex;
+		const index = action._cacheIndex;
 		return index !== null && index < this._nActiveActions;
 
 	},
 
 	_addInactiveAction: function ( action, clipUuid, rootUuid ) {
 
-		var actions = this._actions,
-			actionsByClip = this._actionsByClip,
-			actionsForClip = actionsByClip[ clipUuid ];
+		const actions = this._actions,
+			actionsByClip = this._actionsByClip;
+
+		let actionsForClip = actionsByClip[ clipUuid ];
 
 		if ( actionsForClip === undefined ) {
 
@@ -45566,7 +45546,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		} else {
 
-			var knownActions = actionsForClip.knownActions;
+			const knownActions = actionsForClip.knownActions;
 
 			action._byClipCacheIndex = knownActions.length;
 			knownActions.push( action );
@@ -45582,7 +45562,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_removeInactiveAction: function ( action ) {
 
-		var actions = this._actions,
+		const actions = this._actions,
 			lastInactiveAction = actions[ actions.length - 1 ],
 			cacheIndex = action._cacheIndex;
 
@@ -45593,7 +45573,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		action._cacheIndex = null;
 
 
-		var clipUuid = action._clip.uuid,
+		const clipUuid = action._clip.uuid,
 			actionsByClip = this._actionsByClip,
 			actionsForClip = actionsByClip[ clipUuid ],
 			knownActionsForClip = actionsForClip.knownActions,
@@ -45610,7 +45590,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		action._byClipCacheIndex = null;
 
 
-		var actionByRoot = actionsForClip.actionByRoot,
+		const actionByRoot = actionsForClip.actionByRoot,
 			rootUuid = ( action._localRoot || this._root ).uuid;
 
 		delete actionByRoot[ rootUuid ];
@@ -45627,10 +45607,11 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_removeInactiveBindingsForAction: function ( action ) {
 
-		var bindings = action._propertyBindings;
-		for ( var i = 0, n = bindings.length; i !== n; ++ i ) {
+		const bindings = action._propertyBindings;
 
-			var binding = bindings[ i ];
+		for ( let i = 0, n = bindings.length; i !== n; ++ i ) {
+
+			const binding = bindings[ i ];
 
 			if ( -- binding.referenceCount === 0 ) {
 
@@ -45650,7 +45631,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		//                  <-swap->
 		//                 a        s
 
-		var actions = this._actions,
+		const actions = this._actions,
 			prevIndex = action._cacheIndex,
 
 			lastActiveIndex = this._nActiveActions ++,
@@ -45673,7 +45654,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		//         <-swap->
 		//        s        a
 
-		var actions = this._actions,
+		const actions = this._actions,
 			prevIndex = action._cacheIndex,
 
 			firstInactiveIndex = -- this._nActiveActions,
@@ -45692,10 +45673,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_addInactiveBinding: function ( binding, rootUuid, trackName ) {
 
-		var bindingsByRoot = this._bindingsByRootAndName,
-			bindingByName = bindingsByRoot[ rootUuid ],
-
+		const bindingsByRoot = this._bindingsByRootAndName,
 			bindings = this._bindings;
+
+		let bindingByName = bindingsByRoot[ rootUuid ];
 
 		if ( bindingByName === undefined ) {
 
@@ -45713,7 +45694,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_removeInactiveBinding: function ( binding ) {
 
-		var bindings = this._bindings,
+		const bindings = this._bindings,
 			propBinding = binding.binding,
 			rootUuid = propBinding.rootNode.uuid,
 			trackName = propBinding.path,
@@ -45739,7 +45720,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_lendBinding: function ( binding ) {
 
-		var bindings = this._bindings,
+		const bindings = this._bindings,
 			prevIndex = binding._cacheIndex,
 
 			lastActiveIndex = this._nActiveBindings ++,
@@ -45756,7 +45737,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_takeBackBinding: function ( binding ) {
 
-		var bindings = this._bindings,
+		const bindings = this._bindings,
 			prevIndex = binding._cacheIndex,
 
 			firstInactiveIndex = -- this._nActiveBindings,
@@ -45776,9 +45757,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_lendControlInterpolant: function () {
 
-		var interpolants = this._controlInterpolants,
-			lastActiveIndex = this._nActiveControlInterpolants ++,
-			interpolant = interpolants[ lastActiveIndex ];
+		const interpolants = this._controlInterpolants,
+			lastActiveIndex = this._nActiveControlInterpolants ++;
+
+		let interpolant = interpolants[ lastActiveIndex ];
 
 		if ( interpolant === undefined ) {
 
@@ -45797,7 +45779,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 	_takeBackControlInterpolant: function ( interpolant ) {
 
-		var interpolants = this._controlInterpolants,
+		const interpolants = this._controlInterpolants,
 			prevIndex = interpolant.__cacheIndex,
 
 			firstInactiveIndex = -- this._nActiveControlInterpolants,
@@ -45819,15 +45801,14 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// previously unknown clip/root combination is specified)
 	clipAction: function ( clip, optionalRoot, blendMode ) {
 
-		var root = optionalRoot || this._root,
-			rootUuid = root.uuid,
+		const root = optionalRoot || this._root,
+			rootUuid = root.uuid;
 
-			clipObject = typeof clip === 'string' ?
-				AnimationClip.findByName( root, clip ) : clip,
+		let clipObject = typeof clip === 'string' ? AnimationClip.findByName( root, clip ) : clip;
 
-			clipUuid = clipObject !== null ? clipObject.uuid : clip,
+		const clipUuid = clipObject !== null ? clipObject.uuid : clip;
 
-			actionsForClip = this._actionsByClip[ clipUuid ],
+		let actionsForClip = this._actionsByClip[ clipUuid ],
 			prototypeAction = null;
 
 		if ( blendMode === undefined ) {
@@ -45846,8 +45827,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( actionsForClip !== undefined ) {
 
-			var existingAction =
-					actionsForClip.actionByRoot[ rootUuid ];
+			const existingAction = actionsForClip.actionByRoot[ rootUuid ];
 
 			if ( existingAction !== undefined && existingAction.blendMode === blendMode ) {
 
@@ -45869,7 +45849,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		if ( clipObject === null ) return null;
 
 		// allocate all resources required to run it
-		var newAction = new AnimationAction( this, clipObject, optionalRoot, blendMode );
+		const newAction = new AnimationAction( this, clipObject, optionalRoot, blendMode );
 
 		this._bindAction( newAction, prototypeAction );
 
@@ -45883,7 +45863,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// get an existing action
 	existingAction: function ( clip, optionalRoot ) {
 
-		var root = optionalRoot || this._root,
+		const root = optionalRoot || this._root,
 			rootUuid = root.uuid,
 
 			clipObject = typeof clip === 'string' ?
@@ -45906,10 +45886,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// deactivates all previously scheduled actions
 	stopAllAction: function () {
 
-		var actions = this._actions,
+		const actions = this._actions,
 			nActions = this._nActiveActions;
 
-		for ( var i = nActions - 1; i >= 0; -- i ) {
+		for ( let i = nActions - 1; i >= 0; -- i ) {
 
 			actions[ i ].stop();
 
@@ -45924,7 +45904,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		deltaTime *= this.timeScale;
 
-		var actions = this._actions,
+		const actions = this._actions,
 			nActions = this._nActiveActions,
 
 			time = this.time += deltaTime,
@@ -45934,9 +45914,9 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// run active actions
 
-		for ( var i = 0; i !== nActions; ++ i ) {
+		for ( let i = 0; i !== nActions; ++ i ) {
 
-			var action = actions[ i ];
+			const action = actions[ i ];
 
 			action._update( time, deltaTime, timeDirection, accuIndex );
 
@@ -45944,10 +45924,10 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		// update scene graph
 
-		var bindings = this._bindings,
+		const bindings = this._bindings,
 			nBindings = this._nActiveBindings;
 
-		for ( var i = 0; i !== nBindings; ++ i ) {
+		for ( let i = 0; i !== nBindings; ++ i ) {
 
 			bindings[ i ].apply( accuIndex );
 
@@ -45961,7 +45941,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	setTime: function ( timeInSeconds ) {
 
 		this.time = 0; // Zero out time attribute for AnimationMixer object;
-		for ( var i = 0; i < this._actions.length; i ++ ) {
+		for ( let i = 0; i < this._actions.length; i ++ ) {
 
 			this._actions[ i ].time = 0; // Zero out time attribute for all associated AnimationAction objects.
 
@@ -45981,7 +45961,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// free all resources specific to a particular clip
 	uncacheClip: function ( clip ) {
 
-		var actions = this._actions,
+		const actions = this._actions,
 			clipUuid = clip.uuid,
 			actionsByClip = this._actionsByClip,
 			actionsForClip = actionsByClip[ clipUuid ];
@@ -45992,15 +45972,15 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 			// iteration state and also require updating the state we can
 			// just throw away
 
-			var actionsToRemove = actionsForClip.knownActions;
+			const actionsToRemove = actionsForClip.knownActions;
 
-			for ( var i = 0, n = actionsToRemove.length; i !== n; ++ i ) {
+			for ( let i = 0, n = actionsToRemove.length; i !== n; ++ i ) {
 
-				var action = actionsToRemove[ i ];
+				const action = actionsToRemove[ i ];
 
 				this._deactivateAction( action );
 
-				var cacheIndex = action._cacheIndex,
+				const cacheIndex = action._cacheIndex,
 					lastInactiveAction = actions[ actions.length - 1 ];
 
 				action._cacheIndex = null;
@@ -46023,12 +46003,12 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// free all resources specific to a particular root target object
 	uncacheRoot: function ( root ) {
 
-		var rootUuid = root.uuid,
+		const rootUuid = root.uuid,
 			actionsByClip = this._actionsByClip;
 
-		for ( var clipUuid in actionsByClip ) {
+		for ( const clipUuid in actionsByClip ) {
 
-			var actionByRoot = actionsByClip[ clipUuid ].actionByRoot,
+			const actionByRoot = actionsByClip[ clipUuid ].actionByRoot,
 				action = actionByRoot[ rootUuid ];
 
 			if ( action !== undefined ) {
@@ -46040,14 +46020,14 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		}
 
-		var bindingsByRoot = this._bindingsByRootAndName,
+		const bindingsByRoot = this._bindingsByRootAndName,
 			bindingByName = bindingsByRoot[ rootUuid ];
 
 		if ( bindingByName !== undefined ) {
 
-			for ( var trackName in bindingByName ) {
+			for ( const trackName in bindingByName ) {
 
-				var binding = bindingByName[ trackName ];
+				const binding = bindingByName[ trackName ];
 				binding.restoreOriginalState();
 				this._removeInactiveBinding( binding );
 
@@ -46060,7 +46040,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 	// remove a targeted clip from the cache
 	uncacheAction: function ( clip, optionalRoot ) {
 
-		var action = this.existingAction( clip, optionalRoot );
+		const action = this.existingAction( clip, optionalRoot );
 
 		if ( action !== null ) {
 
@@ -48845,11 +48825,11 @@ function Face4( a, b, c, d, normal, color, materialIndex ) {
 
 }
 
-var LineStrip = 0;
-var LinePieces = 1;
-var NoColors = 0;
-var FaceColors = 1;
-var VertexColors = 2;
+const LineStrip = 0;
+const LinePieces = 1;
+const NoColors = 0;
+const FaceColors = 1;
+const VertexColors = 2;
 
 function MeshFaceMaterial( materials ) {
 
@@ -49020,7 +49000,7 @@ Object.assign( CurvePath.prototype, {
 
 		// generate geometry from path points (for Line or Points objects)
 
-		var pts = this.getPoints( divisions );
+		const pts = this.getPoints( divisions );
 		return this.createGeometry( pts );
 
 	},
@@ -49031,7 +49011,7 @@ Object.assign( CurvePath.prototype, {
 
 		// generate geometry from equidistant sampling along the path
 
-		var pts = this.getSpacedPoints( divisions );
+		const pts = this.getSpacedPoints( divisions );
 		return this.createGeometry( pts );
 
 	},
@@ -49040,11 +49020,11 @@ Object.assign( CurvePath.prototype, {
 
 		console.warn( 'THREE.CurvePath: .createGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
 
-		var geometry = new Geometry();
+		const geometry = new Geometry();
 
-		for ( var i = 0, l = points.length; i < l; i ++ ) {
+		for ( let i = 0, l = points.length; i < l; i ++ ) {
 
-			var point = points[ i ];
+			const point = points[ i ];
 			geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
 
 		}
@@ -50782,8 +50762,8 @@ Object.defineProperties( Audio.prototype, {
 		value: function ( file ) {
 
 			console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
-			var scope = this;
-			var audioLoader = new AudioLoader();
+			const scope = this;
+			const audioLoader = new AudioLoader();
 			audioLoader.load( file, function ( buffer ) {
 
 				scope.setBuffer( buffer );
@@ -50821,12 +50801,12 @@ CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
 
 //
 
-var GeometryUtils = {
+const GeometryUtils = {
 
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
 		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
-		var matrix;
+		let matrix;
 
 		if ( geometry2.isMesh ) {
 
@@ -50856,10 +50836,10 @@ ImageUtils.loadTexture = function ( url, mapping, onLoad, onError ) {
 
 	console.warn( 'THREE.ImageUtils.loadTexture has been deprecated. Use THREE.TextureLoader() instead.' );
 
-	var loader = new TextureLoader();
+	const loader = new TextureLoader();
 	loader.setCrossOrigin( this.crossOrigin );
 
-	var texture = loader.load( url, onLoad, undefined, onError );
+	const texture = loader.load( url, onLoad, undefined, onError );
 
 	if ( mapping ) texture.mapping = mapping;
 
@@ -50871,10 +50851,10 @@ ImageUtils.loadTextureCube = function ( urls, mapping, onLoad, onError ) {
 
 	console.warn( 'THREE.ImageUtils.loadTextureCube has been deprecated. Use THREE.CubeTextureLoader() instead.' );
 
-	var loader = new CubeTextureLoader();
+	const loader = new CubeTextureLoader();
 	loader.setCrossOrigin( this.crossOrigin );
 
-	var texture = loader.load( urls, onLoad, undefined, onError );
+	const texture = loader.load( urls, onLoad, undefined, onError );
 
 	if ( mapping ) texture.mapping = mapping;
 
@@ -50912,7 +50892,7 @@ function JSONLoader() {
 
 //
 
-var SceneUtils = {
+const SceneUtils = {
 
 	createMultiMaterialObject: function ( /* geometry, materials */ ) {
 
