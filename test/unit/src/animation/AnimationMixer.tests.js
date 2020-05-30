@@ -96,9 +96,11 @@ export default QUnit.module( 'Animation', () => {
 
 		} );
 
-		QUnit.todo( "getRoot", ( assert ) => {
+		QUnit.test( "getRoot", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			const obj = new Object3D();
+			const animMixer = new AnimationMixer( obj );
+			assert.strictEqual( obj, animMixer.getRoot(), "Get original root object" );
 
 		} );
 
