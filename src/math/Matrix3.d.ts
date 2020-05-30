@@ -2,7 +2,7 @@ import { Matrix4 } from './Matrix4';
 import { Vector3 } from './Vector3';
 
 /**
- * ( interface Matrix&lt;T&gt; )
+ * ( interface Matrix<T> )
  */
 export interface Matrix {
 	/**
@@ -44,7 +44,7 @@ export interface Matrix {
 }
 
 /**
- * ( class Matrix3 implements Matrix&lt;Matrix3&gt; )
+ * ( class Matrix3 implements Matrix<Matrix3> )
  */
 export class Matrix3 implements Matrix {
 
