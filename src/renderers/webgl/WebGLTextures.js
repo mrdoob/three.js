@@ -456,7 +456,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				}
 
-				var image = cubeImage[ 0 ],
+				const image = cubeImage[ 0 ],
 					supportsMips = isPowerOfTwo( image ) || isWebGL2,
 					glFormat = utils.convert( texture.format ),
 					glType = utils.convert( texture.type ),
@@ -504,7 +504,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					mipmaps = texture.mipmaps;
 
-					for ( var i = 0; i < 6; i ++ ) {
+					for ( let i = 0; i < 6; i ++ ) {
 
 						if ( isDataTexture ) {
 
@@ -773,8 +773,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			const image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
 
 			const supportsMips = isPowerOfTwo( image ) || isWebGL2,
-				glFormat = utils.convert( texture.format ),
-				glType = utils.convert( texture.type ),
+				glFormat = utils.convert( texture.format );
+
+			let glType = utils.convert( texture.type ),
 				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
 			setTextureParameters( textureType, texture, supportsMips );
@@ -932,7 +933,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( mipmaps.length > 0 && supportsMips ) {
 
-					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
+					for ( let i = 0, il = mipmaps.length; i < il; i ++ ) {
 
 						mipmap = mipmaps[ i ];
 						state.texImage2D( _gl.TEXTURE_2D, i, glInternalFormat, glFormat, glType, mipmap );

@@ -18,7 +18,7 @@ Object.assign( TextureImage.prototype, {
 
 	toJSON: function ( meta ) {
 
-		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
 		if ( ! isRootObject && meta.images[ this.uuid ] !== undefined ) {
 
@@ -26,16 +26,16 @@ Object.assign( TextureImage.prototype, {
 
 		}
 
-		var output = {
+		const output = {
 			uuid: this.uuid,
 			url: ''
 		};
 
-		var image = this.image;
+		const image = this.image;
 
 		if ( image !== undefined ) {
 
-			var url;
+			let url;
 
 			if ( Array.isArray( image ) ) {
 
@@ -43,7 +43,7 @@ Object.assign( TextureImage.prototype, {
 
 				url = [];
 
-				for ( var i = 0, l = image.length; i < l; i ++ ) {
+				for ( let i = 0, l = image.length; i < l; i ++ ) {
 
 					url.push( ImageUtils.getDataURL( image[ i ] ) );
 
