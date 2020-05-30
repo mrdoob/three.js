@@ -4,12 +4,12 @@
 
 function WebGLInfo( gl ) {
 
-	var memory = {
+	const memory = {
 		geometries: 0,
 		textures: 0
 	};
 
-	var render = {
+	const render = {
 		frame: 0,
 		calls: 0,
 		triangles: 0,

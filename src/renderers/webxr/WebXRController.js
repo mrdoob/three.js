@@ -83,11 +83,11 @@ Object.assign( WebXRController.prototype, {
 
 	update: function ( inputSource, frame, referenceSpace ) {
 
-		var inputPose = null;
-		var gripPose = null;
+		let inputPose = null;
+		let gripPose = null;
 
-		var targetRay = this._targetRay;
-		var grip = this._grip;
+		const targetRay = this._targetRay;
+		const grip = this._grip;
 
 		if ( inputSource ) {
 
