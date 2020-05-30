@@ -15923,14 +15923,14 @@
 
 	function WebGLClipping() {
 
-		var scope = this,
+		var scope = this;
 
-			globalState = null,
+		var globalState = null,
 			numGlobalPlanes = 0,
 			localClippingEnabled = false,
-			renderingShadows = false,
+			renderingShadows = false;
 
-			plane = new Plane(),
+		var plane = new Plane(),
 			viewNormalMatrix = new Matrix3(),
 
 			uniform = { value: null, needsUpdate: false };
@@ -15993,9 +15993,9 @@
 			} else {
 
 				var nGlobal = renderingShadows ? 0 : numGlobalPlanes,
-					lGlobal = nGlobal * 4,
+					lGlobal = nGlobal * 4;
 
-					dstArray = cache.clippingState || null;
+				var dstArray = cache.clippingState || null;
 
 				uniform.value = dstArray; // ensure unique state
 
@@ -16234,9 +16234,9 @@
 
 			var morphAttributes = geometry.morphAttributes;
 
-			for ( var name in morphAttributes ) {
+			for ( var name$1 in morphAttributes ) {
 
-				var array = morphAttributes[ name ];
+				var array = morphAttributes[ name$1 ];
 
 				for ( var i = 0, l = array.length; i < l; i ++ ) {
 
@@ -16273,16 +16273,16 @@
 
 			} else {
 
-				var array = geometryPosition.array;
+				var array$1 = geometryPosition.array;
 				version = geometryPosition.version;
 
-				for ( var i = 0, l = ( array.length / 3 ) - 1; i < l; i += 3 ) {
+				for ( var i$1 = 0, l$1 = ( array$1.length / 3 ) - 1; i$1 < l$1; i$1 += 3 ) {
 
-					var a = i + 0;
-					var b = i + 1;
-					var c = i + 2;
+					var a$1 = i$1 + 0;
+					var b$1 = i$1 + 1;
+					var c$1 = i$1 + 2;
 
-					indices.push( a, b, b, c, c, a );
+					indices.push( a$1, b$1, b$1, c$1, c$1, a$1 );
 
 				}
 
@@ -16542,14 +16542,14 @@
 
 			// Remove current morphAttributes
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( var i$1 = 0; i$1 < length; i$1 ++ ) {
 
-				var influence = influences[ i ];
+				var influence = influences[ i$1 ];
 
 				if ( influence[ 1 ] !== 0 ) {
 
-					if ( morphTargets ) { geometry.deleteAttribute( 'morphTarget' + i ); }
-					if ( morphNormals ) { geometry.deleteAttribute( 'morphNormal' + i ); }
+					if ( morphTargets ) { geometry.deleteAttribute( 'morphTarget' + i$1 ); }
+					if ( morphNormals ) { geometry.deleteAttribute( 'morphNormal' + i$1 ); }
 
 				}
 
@@ -16557,12 +16557,12 @@
 
 			// Collect influences
 
-			for ( var i = 0; i < length; i ++ ) {
+			for ( var i$2 = 0; i$2 < length; i$2 ++ ) {
 
-				var influence = influences[ i ];
+				var influence$1 = influences[ i$2 ];
 
-				influence[ 0 ] = i;
-				influence[ 1 ] = objectInfluences[ i ];
+				influence$1[ 0 ] = i$2;
+				influence$1[ 1 ] = objectInfluences[ i$2 ];
 
 			}
 
@@ -16572,21 +16572,21 @@
 
 			var morphInfluencesSum = 0;
 
-			for ( var i = 0; i < 8; i ++ ) {
+			for ( var i$3 = 0; i$3 < 8; i$3 ++ ) {
 
-				var influence = influences[ i ];
+				var influence$2 = influences[ i$3 ];
 
-				if ( influence ) {
+				if ( influence$2 ) {
 
-					var index = influence[ 0 ];
-					var value = influence[ 1 ];
+					var index = influence$2[ 0 ];
+					var value = influence$2[ 1 ];
 
 					if ( value ) {
 
-						if ( morphTargets ) { geometry.setAttribute( 'morphTarget' + i, morphTargets[ index ] ); }
-						if ( morphNormals ) { geometry.setAttribute( 'morphNormal' + i, morphNormals[ index ] ); }
+						if ( morphTargets ) { geometry.setAttribute( 'morphTarget' + i$3, morphTargets[ index ] ); }
+						if ( morphNormals ) { geometry.setAttribute( 'morphNormal' + i$3, morphNormals[ index ] ); }
 
-						morphInfluences[ i ] = value;
+						morphInfluences[ i$3 ] = value;
 						morphInfluencesSum += value;
 						continue;
 
@@ -16594,7 +16594,7 @@
 
 				}
 
-				morphInfluences[ i ] = 0;
+				morphInfluences[ i$3 ] = 0;
 
 			}
 
@@ -16909,8 +16909,11 @@
 
 		}
 
-		for ( var i = 0; i !== n; ++ i )
-			{ r[ i ] = textures.allocateTextureUnit(); }
+		for ( var i = 0; i !== n; ++ i ) {
+
+			r[ i ] = textures.allocateTextureUnit();
+
+		}
 
 		return r;
 
@@ -17546,9 +17549,9 @@
 		while ( true ) {
 
 			var match = RePathPart.exec( path ),
-				matchEnd = RePathPart.lastIndex,
+				matchEnd = RePathPart.lastIndex;
 
-				id = match[ 1 ],
+			var id = match[ 1 ],
 				idIsIndex = match[ 2 ] === ']',
 				subscript = match[ 3 ];
 
@@ -17568,7 +17571,8 @@
 
 				// step into inner node / create it in case it doesn't exist
 
-				var map = container.map, next = map[ id ];
+				var map = container.map;
+				var next = map[ id ];
 
 				if ( next === undefined ) {
 
@@ -18062,6 +18066,7 @@
 
 		var vertexShader = parameters.vertexShader;
 		var fragmentShader = parameters.fragmentShader;
+
 		var shadowMapTypeDefine = generateShadowMapTypeDefine( parameters );
 		var envMapTypeDefine = generateEnvMapTypeDefine( parameters );
 		var envMapModeDefine = generateEnvMapModeDefine( parameters );
@@ -18539,9 +18544,10 @@
 		var isWebGL2 = capabilities.isWebGL2;
 		var logarithmicDepthBuffer = capabilities.logarithmicDepthBuffer;
 		var floatVertexTextures = capabilities.floatVertexTextures;
-		var precision = capabilities.precision;
 		var maxVertexUniforms = capabilities.maxVertexUniforms;
 		var vertexTextures = capabilities.vertexTextures;
+
+		var precision = capabilities.precision;
 
 		var shaderIDs = {
 			MeshDepthMaterial: 'depth',
@@ -19160,6 +19166,7 @@
 
 			var cameras = lists.get( scene );
 			var list;
+
 			if ( cameras === undefined ) {
 
 				list = new WebGLRenderList();
@@ -19411,9 +19418,9 @@
 
 			lights.sort( shadowCastingLightsFirst );
 
-			for ( var i = 0, l = lights.length; i < l; i ++ ) {
+			for ( var i$1 = 0, l = lights.length; i$1 < l; i$1 ++ ) {
 
-				var light = lights[ i ];
+				var light = lights[ i$1 ];
 
 				var color = light.color;
 				var intensity = light.intensity;
@@ -19469,34 +19476,34 @@
 
 				} else if ( light.isSpotLight ) {
 
-					var uniforms = cache.get( light );
+					var uniforms$1 = cache.get( light );
 
-					uniforms.position.setFromMatrixPosition( light.matrixWorld );
-					uniforms.position.applyMatrix4( viewMatrix );
+					uniforms$1.position.setFromMatrixPosition( light.matrixWorld );
+					uniforms$1.position.applyMatrix4( viewMatrix );
 
-					uniforms.color.copy( color ).multiplyScalar( intensity );
-					uniforms.distance = distance;
+					uniforms$1.color.copy( color ).multiplyScalar( intensity );
+					uniforms$1.distance = distance;
 
-					uniforms.direction.setFromMatrixPosition( light.matrixWorld );
+					uniforms$1.direction.setFromMatrixPosition( light.matrixWorld );
 					vector3.setFromMatrixPosition( light.target.matrixWorld );
-					uniforms.direction.sub( vector3 );
-					uniforms.direction.transformDirection( viewMatrix );
+					uniforms$1.direction.sub( vector3 );
+					uniforms$1.direction.transformDirection( viewMatrix );
 
-					uniforms.coneCos = Math.cos( light.angle );
-					uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
-					uniforms.decay = light.decay;
+					uniforms$1.coneCos = Math.cos( light.angle );
+					uniforms$1.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
+					uniforms$1.decay = light.decay;
 
 					if ( light.castShadow ) {
 
-						var shadow = light.shadow;
+						var shadow$1 = light.shadow;
 
-						var shadowUniforms = shadowCache.get( light );
+						var shadowUniforms$1 = shadowCache.get( light );
 
-						shadowUniforms.shadowBias = shadow.bias;
-						shadowUniforms.shadowRadius = shadow.radius;
-						shadowUniforms.shadowMapSize = shadow.mapSize;
+						shadowUniforms$1.shadowBias = shadow$1.bias;
+						shadowUniforms$1.shadowRadius = shadow$1.radius;
+						shadowUniforms$1.shadowMapSize = shadow$1.mapSize;
 
-						state.spotShadow[ spotLength ] = shadowUniforms;
+						state.spotShadow[ spotLength ] = shadowUniforms$1;
 						state.spotShadowMap[ spotLength ] = shadowMap;
 						state.spotShadowMatrix[ spotLength ] = light.shadow.matrix;
 
@@ -19504,22 +19511,22 @@
 
 					}
 
-					state.spot[ spotLength ] = uniforms;
+					state.spot[ spotLength ] = uniforms$1;
 
 					spotLength ++;
 
 				} else if ( light.isRectAreaLight ) {
 
-					var uniforms = cache.get( light );
+					var uniforms$2 = cache.get( light );
 
 					// (a) intensity is the total visible light emitted
 					//uniforms.color.copy( color ).multiplyScalar( intensity / ( light.width * light.height * Math.PI ) );
 
 					// (b) intensity is the brightness of the light
-					uniforms.color.copy( color ).multiplyScalar( intensity );
+					uniforms$2.color.copy( color ).multiplyScalar( intensity );
 
-					uniforms.position.setFromMatrixPosition( light.matrixWorld );
-					uniforms.position.applyMatrix4( viewMatrix );
+					uniforms$2.position.setFromMatrixPosition( light.matrixWorld );
+					uniforms$2.position.applyMatrix4( viewMatrix );
 
 					// extract local rotation of light to derive width/height half vectors
 					matrix42.identity();
@@ -19527,43 +19534,43 @@
 					matrix4.premultiply( viewMatrix );
 					matrix42.extractRotation( matrix4 );
 
-					uniforms.halfWidth.set( light.width * 0.5, 0.0, 0.0 );
-					uniforms.halfHeight.set( 0.0, light.height * 0.5, 0.0 );
+					uniforms$2.halfWidth.set( light.width * 0.5, 0.0, 0.0 );
+					uniforms$2.halfHeight.set( 0.0, light.height * 0.5, 0.0 );
 
-					uniforms.halfWidth.applyMatrix4( matrix42 );
-					uniforms.halfHeight.applyMatrix4( matrix42 );
+					uniforms$2.halfWidth.applyMatrix4( matrix42 );
+					uniforms$2.halfHeight.applyMatrix4( matrix42 );
 
 					// TODO (abelnation): RectAreaLight distance?
 					// uniforms.distance = distance;
 
-					state.rectArea[ rectAreaLength ] = uniforms;
+					state.rectArea[ rectAreaLength ] = uniforms$2;
 
 					rectAreaLength ++;
 
 				} else if ( light.isPointLight ) {
 
-					var uniforms = cache.get( light );
+					var uniforms$3 = cache.get( light );
 
-					uniforms.position.setFromMatrixPosition( light.matrixWorld );
-					uniforms.position.applyMatrix4( viewMatrix );
+					uniforms$3.position.setFromMatrixPosition( light.matrixWorld );
+					uniforms$3.position.applyMatrix4( viewMatrix );
 
-					uniforms.color.copy( light.color ).multiplyScalar( light.intensity );
-					uniforms.distance = light.distance;
-					uniforms.decay = light.decay;
+					uniforms$3.color.copy( light.color ).multiplyScalar( light.intensity );
+					uniforms$3.distance = light.distance;
+					uniforms$3.decay = light.decay;
 
 					if ( light.castShadow ) {
 
-						var shadow = light.shadow;
+						var shadow$2 = light.shadow;
 
-						var shadowUniforms = shadowCache.get( light );
+						var shadowUniforms$2 = shadowCache.get( light );
 
-						shadowUniforms.shadowBias = shadow.bias;
-						shadowUniforms.shadowRadius = shadow.radius;
-						shadowUniforms.shadowMapSize = shadow.mapSize;
-						shadowUniforms.shadowCameraNear = shadow.camera.near;
-						shadowUniforms.shadowCameraFar = shadow.camera.far;
+						shadowUniforms$2.shadowBias = shadow$2.bias;
+						shadowUniforms$2.shadowRadius = shadow$2.radius;
+						shadowUniforms$2.shadowMapSize = shadow$2.mapSize;
+						shadowUniforms$2.shadowCameraNear = shadow$2.camera.near;
+						shadowUniforms$2.shadowCameraFar = shadow$2.camera.far;
 
-						state.pointShadow[ pointLength ] = shadowUniforms;
+						state.pointShadow[ pointLength ] = shadowUniforms$2;
 						state.pointShadowMap[ pointLength ] = shadowMap;
 						state.pointShadowMatrix[ pointLength ] = light.shadow.matrix;
 
@@ -19571,22 +19578,22 @@
 
 					}
 
-					state.point[ pointLength ] = uniforms;
+					state.point[ pointLength ] = uniforms$3;
 
 					pointLength ++;
 
 				} else if ( light.isHemisphereLight ) {
 
-					var uniforms = cache.get( light );
+					var uniforms$4 = cache.get( light );
 
-					uniforms.direction.setFromMatrixPosition( light.matrixWorld );
-					uniforms.direction.transformDirection( viewMatrix );
-					uniforms.direction.normalize();
+					uniforms$4.direction.setFromMatrixPosition( light.matrixWorld );
+					uniforms$4.direction.transformDirection( viewMatrix );
+					uniforms$4.direction.normalize();
 
-					uniforms.skyColor.copy( light.color ).multiplyScalar( intensity );
-					uniforms.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
+					uniforms$4.skyColor.copy( light.color ).multiplyScalar( intensity );
+					uniforms$4.groundColor.copy( light.groundColor ).multiplyScalar( intensity );
 
-					state.hemi[ hemiLength ] = uniforms;
+					state.hemi[ hemiLength ] = uniforms$4;
 
 					hemiLength ++;
 
@@ -19929,9 +19936,9 @@
 
 	function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
-		var _frustum = new Frustum(),
+		var _frustum = new Frustum();
 
-			_shadowMapSize = new Vector2(),
+		var _shadowMapSize = new Vector2(),
 			_viewportSize = new Vector2(),
 
 			_viewport = new Vector4(),
@@ -20061,9 +20068,9 @@
 
 				if ( shadow.map === null ) {
 
-					var pars = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
+					var pars$1 = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
-					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
+					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars$1 );
 					shadow.map.texture.name = light.name + ".shadowMap";
 
 					shadow.camera.updateProjectionMatrix();
@@ -20333,9 +20340,9 @@
 
 					} else if ( material.visible ) {
 
-						var depthMaterial = getDepthMaterial( object, geometry, material, light, shadowCamera.near, shadowCamera.far, type );
+						var depthMaterial$1 = getDepthMaterial( object, geometry, material, light, shadowCamera.near, shadowCamera.far, type );
 
-						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial, object, null );
+						_renderer.renderBufferDirect( shadowCamera, null, geometry, depthMaterial$1, object, null );
 
 					}
 
@@ -21805,9 +21812,9 @@
 
 				if ( isCompressed ) {
 
-					for ( var i = 0; i < 6; i ++ ) {
+					for ( var i$1 = 0; i$1 < 6; i$1 ++ ) {
 
-						mipmaps = cubeImage[ i ].mipmaps;
+						mipmaps = cubeImage[ i$1 ].mipmaps;
 
 						for ( var j = 0; j < mipmaps.length; j ++ ) {
 
@@ -21817,7 +21824,7 @@
 
 								if ( glFormat !== null ) {
 
-									state.compressedTexImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+									state.compressedTexImage2D( 34069 + i$1, j, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
 								} else {
 
@@ -21827,7 +21834,7 @@
 
 							} else {
 
-								state.texImage2D( 34069 + i, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+								state.texImage2D( 34069 + i$1, j, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
 
 							}
 
@@ -21841,30 +21848,30 @@
 
 					mipmaps = texture.mipmaps;
 
-					for ( var i = 0; i < 6; i ++ ) {
+					for ( var i$2 = 0; i$2 < 6; i$2 ++ ) {
 
 						if ( isDataTexture ) {
 
-							state.texImage2D( 34069 + i, 0, glInternalFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
+							state.texImage2D( 34069 + i$2, 0, glInternalFormat, cubeImage[ i$2 ].width, cubeImage[ i$2 ].height, 0, glFormat, glType, cubeImage[ i$2 ].data );
 
-							for ( var j = 0; j < mipmaps.length; j ++ ) {
+							for ( var j$1 = 0; j$1 < mipmaps.length; j$1 ++ ) {
 
-								var mipmap = mipmaps[ j ];
-								var mipmapImage = mipmap.image[ i ].image;
+								var mipmap$1 = mipmaps[ j$1 ];
+								var mipmapImage = mipmap$1.image[ i$2 ].image;
 
-								state.texImage2D( 34069 + i, j + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data );
+								state.texImage2D( 34069 + i$2, j$1 + 1, glInternalFormat, mipmapImage.width, mipmapImage.height, 0, glFormat, glType, mipmapImage.data );
 
 							}
 
 						} else {
 
-							state.texImage2D( 34069 + i, 0, glInternalFormat, glFormat, glType, cubeImage[ i ] );
+							state.texImage2D( 34069 + i$2, 0, glInternalFormat, glFormat, glType, cubeImage[ i$2 ] );
 
-							for ( var j = 0; j < mipmaps.length; j ++ ) {
+							for ( var j$2 = 0; j$2 < mipmaps.length; j$2 ++ ) {
 
-								var mipmap = mipmaps[ j ];
+								var mipmap$2 = mipmaps[ j$2 ];
 
-								state.texImage2D( 34069 + i, j + 1, glInternalFormat, glFormat, glType, mipmap.image[ i ] );
+								state.texImage2D( 34069 + i$2, j$2 + 1, glInternalFormat, glFormat, glType, mipmap$2.image[ i$2 ] );
 
 							}
 
@@ -22014,13 +22021,15 @@
 			var image = resizeImage( texture.image, needsPowerOfTwo, false, maxTextureSize );
 
 			var supportsMips = isPowerOfTwo( image ) || isWebGL2,
-				glFormat = utils.convert( texture.format ),
-				glType = utils.convert( texture.type ),
+				glFormat = utils.convert( texture.format );
+
+			var glType = utils.convert( texture.type ),
 				glInternalFormat = getInternalFormat( texture.internalFormat, glFormat, glType );
 
 			setTextureParameters( textureType, texture, supportsMips );
 
-			var mipmap, mipmaps = texture.mipmaps;
+			var mipmap;
+			var mipmaps = texture.mipmaps;
 
 			if ( texture.isDepthTexture ) {
 
@@ -22127,15 +22136,15 @@
 
 			} else if ( texture.isCompressedTexture ) {
 
-				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
+				for ( var i$1 = 0, il$1 = mipmaps.length; i$1 < il$1; i$1 ++ ) {
 
-					mipmap = mipmaps[ i ];
+					mipmap = mipmaps[ i$1 ];
 
 					if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
 
 						if ( glFormat !== null ) {
 
-							state.compressedTexImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
+							state.compressedTexImage2D( 3553, i$1, glInternalFormat, mipmap.width, mipmap.height, 0, mipmap.data );
 
 						} else {
 
@@ -22145,7 +22154,7 @@
 
 					} else {
 
-						state.texImage2D( 3553, i, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
+						state.texImage2D( 3553, i$1, glInternalFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
 
 					}
 
@@ -22173,10 +22182,10 @@
 
 				if ( mipmaps.length > 0 && supportsMips ) {
 
-					for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
+					for ( var i$2 = 0, il$2 = mipmaps.length; i$2 < il$2; i$2 ++ ) {
 
-						mipmap = mipmaps[ i ];
-						state.texImage2D( 3553, i, glInternalFormat, glFormat, glType, mipmap );
+						mipmap = mipmaps[ i$2 ];
+						state.texImage2D( 3553, i$2, glInternalFormat, glFormat, glType, mipmap );
 
 					}
 
@@ -22262,9 +22271,9 @@
 
 				if ( isMultisample ) {
 
-					var samples = getRenderTargetSamples( renderTarget );
+					var samples$1 = getRenderTargetSamples( renderTarget );
 
-					_gl.renderbufferStorageMultisample( 36161, samples, 35056, renderTarget.width, renderTarget.height );
+					_gl.renderbufferStorageMultisample( 36161, samples$1, 35056, renderTarget.width, renderTarget.height );
 
 				} else {
 
@@ -22279,17 +22288,17 @@
 
 				var glFormat = utils.convert( renderTarget.texture.format );
 				var glType = utils.convert( renderTarget.texture.type );
-				var glInternalFormat = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
+				var glInternalFormat$1 = getInternalFormat( renderTarget.texture.internalFormat, glFormat, glType );
 
 				if ( isMultisample ) {
 
-					var samples = getRenderTargetSamples( renderTarget );
+					var samples$2 = getRenderTargetSamples( renderTarget );
 
-					_gl.renderbufferStorageMultisample( 36161, samples, glInternalFormat, renderTarget.width, renderTarget.height );
+					_gl.renderbufferStorageMultisample( 36161, samples$2, glInternalFormat$1, renderTarget.width, renderTarget.height );
 
 				} else {
 
-					_gl.renderbufferStorage( 36161, glInternalFormat, renderTarget.width, renderTarget.height );
+					_gl.renderbufferStorage( 36161, glInternalFormat$1, renderTarget.width, renderTarget.height );
 
 				}
 
@@ -22473,9 +22482,9 @@
 				state.bindTexture( 34067, textureProperties.__webglTexture );
 				setTextureParameters( 34067, renderTarget.texture, supportsMips );
 
-				for ( var i = 0; i < 6; i ++ ) {
+				for ( var i$1 = 0; i$1 < 6; i$1 ++ ) {
 
-					setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i ], renderTarget, 36064, 34069 + i );
+					setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer[ i$1 ], renderTarget, 36064, 34069 + i$1 );
 
 				}
 
@@ -23255,9 +23264,9 @@
 
 			// Notify disconnected
 
-			for ( var i = 0; i < event.removed.length; i ++ ) {
+			for ( var i$1 = 0; i$1 < event.removed.length; i$1 ++ ) {
 
-				var inputSource = event.removed[ i ];
+				var inputSource = event.removed[ i$1 ];
 				var controller = inputSourcesMap.get( inputSource );
 
 				if ( controller ) {
@@ -23271,14 +23280,14 @@
 
 			// Notify connected
 
-			for ( var i = 0; i < event.added.length; i ++ ) {
+			for ( var i$2 = 0; i$2 < event.added.length; i$2 ++ ) {
 
-				var inputSource = event.added[ i ];
-				var controller = inputSourcesMap.get( inputSource );
+				var inputSource$1 = event.added[ i$2 ];
+				var controller$1 = inputSourcesMap.get( inputSource$1 );
 
-				if ( controller ) {
+				if ( controller$1 ) {
 
-					controller.dispatchEvent( { type: 'connected', data: inputSource } );
+					controller$1.dispatchEvent( { type: 'connected', data: inputSource$1 } );
 
 				}
 
@@ -23400,9 +23409,9 @@
 
 			var children = camera.children;
 
-			for ( var i = 0, l = children.length; i < l; i ++ ) {
+			for ( var i$1 = 0, l = children.length; i$1 < l; i$1 ++ ) {
 
-				children[ i ].updateMatrixWorld( true );
+				children[ i$1 ].updateMatrixWorld( true );
 
 			}
 
@@ -23480,10 +23489,10 @@
 
 			var inputSources = session.inputSources;
 
-			for ( var i = 0; i < controllers.length; i ++ ) {
+			for ( var i$1 = 0; i$1 < controllers.length; i$1 ++ ) {
 
-				var controller = controllers[ i ];
-				var inputSource = inputSources[ i ];
+				var controller = controllers[ i$1 ];
+				var inputSource = inputSources[ i$1 ];
 
 				controller.update( inputSource, frame, referenceSpace );
 
@@ -25114,26 +25123,26 @@
 
 					} else if ( name === 'instanceMatrix' ) {
 
-						var attribute = attributes.get( object.instanceMatrix );
+						var attribute$1 = attributes.get( object.instanceMatrix );
 
 						// TODO Attribute may not be available on context restore
 
-						if ( attribute === undefined ) { continue; }
+						if ( attribute$1 === undefined ) { continue; }
 
-						var buffer = attribute.buffer;
-						var type = attribute.type;
+						var buffer$1 = attribute$1.buffer;
+						var type$1 = attribute$1.type;
 
 						state.enableAttributeAndDivisor( programAttribute + 0, 1 );
 						state.enableAttributeAndDivisor( programAttribute + 1, 1 );
 						state.enableAttributeAndDivisor( programAttribute + 2, 1 );
 						state.enableAttributeAndDivisor( programAttribute + 3, 1 );
 
-						_gl.bindBuffer( 34962, buffer );
+						_gl.bindBuffer( 34962, buffer$1 );
 
-						_gl.vertexAttribPointer( programAttribute + 0, 4, type, false, 64, 0 );
-						_gl.vertexAttribPointer( programAttribute + 1, 4, type, false, 64, 16 );
-						_gl.vertexAttribPointer( programAttribute + 2, 4, type, false, 64, 32 );
-						_gl.vertexAttribPointer( programAttribute + 3, 4, type, false, 64, 48 );
+						_gl.vertexAttribPointer( programAttribute + 0, 4, type$1, false, 64, 0 );
+						_gl.vertexAttribPointer( programAttribute + 1, 4, type$1, false, 64, 16 );
+						_gl.vertexAttribPointer( programAttribute + 2, 4, type$1, false, 64, 32 );
+						_gl.vertexAttribPointer( programAttribute + 3, 4, type$1, false, 64, 48 );
 
 					} else if ( materialDefaultAttributeValues !== undefined ) {
 
@@ -25500,29 +25509,29 @@
 
 						}
 
-						var geometry = objects.update( object );
-						var material = object.material;
+						var geometry$1 = objects.update( object );
+						var material$1 = object.material;
 
-						if ( Array.isArray( material ) ) {
+						if ( Array.isArray( material$1 ) ) {
 
-							var groups = geometry.groups;
+							var groups = geometry$1.groups;
 
 							for ( var i = 0, l = groups.length; i < l; i ++ ) {
 
 								var group = groups[ i ];
-								var groupMaterial = material[ group.materialIndex ];
+								var groupMaterial = material$1[ group.materialIndex ];
 
 								if ( groupMaterial && groupMaterial.visible ) {
 
-									currentRenderList.push( object, geometry, groupMaterial, groupOrder, _vector3.z, group );
+									currentRenderList.push( object, geometry$1, groupMaterial, groupOrder, _vector3.z, group );
 
 								}
 
 							}
 
-						} else if ( material.visible ) {
+						} else if ( material$1.visible ) {
 
-							currentRenderList.push( object, geometry, material, groupOrder, _vector3.z, null );
+							currentRenderList.push( object, geometry$1, material$1, groupOrder, _vector3.z, null );
 
 						}
 
@@ -25534,9 +25543,9 @@
 
 			var children = object.children;
 
-			for ( var i = 0, l = children.length; i < l; i ++ ) {
+			for ( var i$1 = 0, l$1 = children.length; i$1 < l$1; i$1 ++ ) {
 
-				projectObject( children[ i ], camera, groupOrder, sortObjects );
+				projectObject( children[ i$1 ], camera, groupOrder, sortObjects );
 
 			}
 
@@ -25694,9 +25703,9 @@
 
 				material.numSupportedMorphNormals = 0;
 
-				for ( var i = 0; i < _this.maxMorphNormals; i ++ ) {
+				for ( var i$1 = 0; i$1 < _this.maxMorphNormals; i$1 ++ ) {
 
-					if ( programAttributes[ 'morphNormal' + i ] >= 0 ) {
+					if ( programAttributes[ 'morphNormal' + i$1 ] >= 0 ) {
 
 						material.numSupportedMorphNormals ++;
 
@@ -26114,11 +26123,11 @@
 
 			if ( renderTarget ) {
 
-				var __webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
+				var _webglFramebuffer = properties.get( renderTarget ).__webglFramebuffer;
 
 				if ( renderTarget.isWebGLCubeRenderTarget ) {
 
-					framebuffer = __webglFramebuffer[ activeCubeFace || 0 ];
+					framebuffer = _webglFramebuffer[ activeCubeFace || 0 ];
 					isCube = true;
 
 				} else if ( renderTarget.isWebGLMultisampleRenderTarget ) {
@@ -26127,7 +26136,7 @@
 
 				} else {
 
-					framebuffer = __webglFramebuffer;
+					framebuffer = _webglFramebuffer;
 
 				}
 
