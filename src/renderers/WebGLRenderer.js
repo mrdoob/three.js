@@ -1119,7 +1119,7 @@ function WebGLRenderer( parameters ) {
 
 			xr.setAnimationLoop( callback );
 
-		};
+		}
 
 		animation.start();
 
