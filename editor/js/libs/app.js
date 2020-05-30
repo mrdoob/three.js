@@ -30,8 +30,13 @@ var APP = {
 
 			var project = json.project;
 
-			renderer.shadowMap.enabled = project.shadows === true;
-			renderer.xr.enabled = project.vr === true;
+			if ( project.vr !== undefined ) renderer.xr.enabled = project.vr;
+			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
+			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
+			if ( project.toneMapping !== undefined ) renderer.toneMapping = project.toneMapping;
+			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
+			if ( project.toneMappingWhitePoint !== undefined ) renderer.toneMappingWhitePoint = project.toneMappingWhitePoint;
+			if ( project.physicallyCorrectLights !== undefined ) renderer.physicallyCorrectLights = project.physicallyCorrectLights;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
