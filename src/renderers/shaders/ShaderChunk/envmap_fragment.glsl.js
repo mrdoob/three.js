@@ -50,14 +50,6 @@ export default /* glsl */`
 
 		vec4 envColor = texture2D( envMap, sampleUV );
 
-	#elif defined( ENVMAP_TYPE_SPHERE )
-
-		reflectVec = normalize( reflectVec );
-
-		vec3 reflectView = normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0, 0.0, 1.0 ) );
-
-		vec4 envColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5 );
-
 	#else
 
 		vec4 envColor = vec4( 0.0 );

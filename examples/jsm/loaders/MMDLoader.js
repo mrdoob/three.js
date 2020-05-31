@@ -55,7 +55,6 @@ import {
 	RepeatWrapping,
 	Skeleton,
 	SkinnedMesh,
-	SphericalReflectionMapping,
 	SrcAlphaFactor,
 	TextureLoader,
 	Uint16BufferAttribute,
