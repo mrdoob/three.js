@@ -4,6 +4,22 @@
 		<title>three.js - uv mapping tests</title>
 		<meta charset=utf-8 />
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background: #ffffff;
+				color: #000000;
+				text-align: center;
+				font-family: sans-serif;
+			}
+			h3 {
+				margin-top: 60px;
+				margin-bottom: 30px;
+				font-weight: normal;
+			}
+			canvas {
+				width: 100%;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -23,7 +39,7 @@
 
 				var d = document.createElement( 'div' );
 
-				d.innerHTML = '<br><br>' + name + '<br>';
+				d.innerHTML = '<h3>' + name + '</h3>';
 
 				d.appendChild( UVsDebug( geometry ) );
 
