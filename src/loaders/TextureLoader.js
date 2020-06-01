@@ -7,7 +7,7 @@ import { ImageLoader } from './ImageLoader.js';
 import { Texture } from '../textures/Texture.js';
 import { Loader } from './Loader.js';
 
-function TextureLoader( manager, imageLoader ) {
+function TextureLoader( manager ) {
 
 	Loader.call( this, manager );
 
@@ -23,7 +23,7 @@ TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		const texture = new Texture();
 
-		if ( !this.imageLoader ) {
+		if ( ! this.imageLoader ) {
 
 			this.imageLoader = new ImageLoader( this.manager );
 

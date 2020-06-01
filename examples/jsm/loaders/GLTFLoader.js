@@ -1482,7 +1482,7 @@ var GLTFLoader = ( function () {
 
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
-		if (typeof createImageBitmap !== 'undefined') {
+		if ( typeof createImageBitmap !== 'undefined' ) {
 			this.textureLoader.setImageLoader( new ImageBitmapLoader( this.options.manager ) );
 		}
 
