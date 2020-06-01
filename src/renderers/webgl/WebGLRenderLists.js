@@ -57,6 +57,8 @@ function reversePainterSortStable( a, b ) {
 
 function WebGLRenderList() {
 
+	// lists containing groups of render items that are intended to be
+	// rendered together in a specific order.
 	const renderGroupStack = [];
 	const renderGroupItems = [];
 	const usedRenderGroups = [];
