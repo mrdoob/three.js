@@ -20,6 +20,16 @@ export interface RenderItem {
 	group: Group | null;
 }
 
+export interface RenderGroupItem {
+
+	isRenderGroupItem: boolean;
+	id: number;
+	renderOrder: number;
+	opaque: Array<RenderItem | RenderGroupItem>,
+	transparent: Array<RenderItem | RenderGroupItem>
+
+}
+
 export class WebGLRenderList {
 
 	opaque: Array<RenderItem>;
