@@ -71,7 +71,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Adds v to this vector.
 	 */
-	add( v: Vector3, w?: Vector3 ): this;
+	add( v: Vector3 ): this;
 
 	addScalar( s: number ): this;
 
@@ -211,7 +211,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Sets this vector to cross product of itself and v.
 	 */
-	cross( a: Vector3, w?: Vector3 ): this;
+	cross( a: Vector3 ): this;
 
 	/**
 	 * Sets this vector to cross product of a and b.
@@ -283,8 +283,7 @@ export class Vector3 implements Vector {
 
 	fromBufferAttribute(
 		attribute: BufferAttribute,
-		index: number,
-		offset?: number
+		index: number
 	): this;
 
 	/**
