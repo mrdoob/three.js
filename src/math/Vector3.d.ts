@@ -94,7 +94,7 @@ export class Vector3 implements Vector {
 	 */
 	subVectors( a: Vector3, b: Vector3 ): this;
 
-	multiply( v: Vector3, w: Vector3 ): this;
+	multiply( v: Vector3 ): this;
 
 	/**
 	 * Multiplies this vector by scalar s.
