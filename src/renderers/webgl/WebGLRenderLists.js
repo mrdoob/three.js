@@ -79,7 +79,7 @@ function WebGLRenderList() {
 		renderItemsIndex = 0;
 
 		usedRenderGroups.length = 0;
-		renderGroupStack = 0;
+		renderGroupStack.length = 0;
 		opaque.length = 0;
 		transparent.length = 0;
 
@@ -118,6 +118,37 @@ function WebGLRenderList() {
 		renderGroupItemIndex ++;
 
 		return renderGroupItem;
+
+	}
+
+	function pushRenderGroup( object ) {
+
+		var renderGroupItem = getNextRenderGroupItem( object );
+
+		currOpaque.push( renderGroupItem );
+		currOpaque = renderGroupItem.opaque;
+
+		transparentRenderGroupStack.push( object );
+		currTransparent = renderGroupItem.transparent;
+
+		usedRenderGroups.push( renderGroupItem );
+		renderGroupStack.push( renderGroupItem );
+
+	}
+
+	function popRenderGroup() {
+
+		renderGroupStack.pop();
+		currOpaque =
+			renderGroupStack.length ?
+				renderGroupStack[ renderGroupStack.length - 1 ].opaque :
+				opaque;
+
+		transparentRenderGroupStack.pop();
+		currTransparent =
+			transparentRenderGroupStack ?
+				transparentRenderGroupStack[ transparentRenderGroupStack.length - 1 ].transparent :
+				transparent;
 
 	}
 
