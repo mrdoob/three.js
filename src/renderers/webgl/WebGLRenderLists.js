@@ -57,6 +57,11 @@ function reversePainterSortStable( a, b ) {
 
 function WebGLRenderList() {
 
+	const renderGroupStack = [];
+	const renderGroupItems = [];
+	const usedRenderGroups = [];
+	let renderGroupItemIndex = 0;
+
 	const renderItems = [];
 	let renderItemsIndex = 0;
 
@@ -65,12 +70,54 @@ function WebGLRenderList() {
 
 	const defaultProgram = { id: - 1 };
 
+	let currOpaque = opaque;
+	let currTransparent = transparent;
+
 	function init() {
 
+		renderGroupItemIndex = 0;
 		renderItemsIndex = 0;
 
+		usedRenderGroups.length = 0;
+		renderGroupStack = 0;
 		opaque.length = 0;
 		transparent.length = 0;
+
+		currOpaque = opaque;
+		currTransparent = transparent;
+
+	}
+
+	function getNextRenderGroupItem( object ) {
+
+		const renderGroupItem = renderGroupItems[ renderGroupItemIndex ];
+
+		if ( renderGroupItem === undefined ) {
+
+			renderGroupItem = {
+
+				isRenderGroupItem: true,
+				id: object.id,
+				renderOrder: object.renderOrder,
+				opaque: [],
+				transparent: []
+
+			};
+
+			renderGroupItems[ renderGroupItemIndex ] = renderGroupItem;
+
+		} else {
+
+			renderGroupItem.id = object.id;
+			renderGroupItem.renderOrder = object.renderOrder;
+			renderGroupItem.opaque.length = 0;
+			renderGroupItem.transparent.length = 0;
+
+		}
+
+		renderGroupItemIndex ++;
+
+		return renderGroupItem;
 
 	}
 
@@ -118,7 +165,7 @@ function WebGLRenderList() {
 
 		const renderItem = getNextRenderItem( object, geometry, material, groupOrder, z, group );
 
-		( material.transparent === true ? transparent : opaque ).push( renderItem );
+		( material.transparent === true ? currTransparent : currOpaque ).push( renderItem );
 
 	}
 
