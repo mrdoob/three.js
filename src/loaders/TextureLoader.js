@@ -7,9 +7,11 @@ import { ImageLoader } from './ImageLoader.js';
 import { Texture } from '../textures/Texture.js';
 import { Loader } from './Loader.js';
 
-function TextureLoader( manager ) {
+function TextureLoader( manager, imageLoader ) {
 
 	Loader.call( this, manager );
+
+	this.imageLoader = imageLoader || new ImageLoader( manager );
 
 }
 
@@ -21,7 +23,7 @@ TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		const texture = new Texture();
 
-		const loader = new ImageLoader( this.manager );
+		const loader = this.imageLoader;
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 

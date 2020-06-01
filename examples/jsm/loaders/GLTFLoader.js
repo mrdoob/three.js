@@ -19,6 +19,7 @@ import {
 	FileLoader,
 	FrontSide,
 	Group,
+	ImageBitmapLoader,
 	InterleavedBuffer,
 	InterleavedBufferAttribute,
 	Interpolant,
@@ -1476,7 +1477,14 @@ var GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
-		this.textureLoader = new TextureLoader( this.options.manager );
+		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
+		// expensive work of uploading a texture to the GPU off the main thread.
+		var imageLoader = null;
+		if (typeof createImageBitmap !== 'undefined') {
+			imageLoader = new ImageBitmapLoader( this.options.manager );
+		}
+
+		this.textureLoader = new TextureLoader( this.options.manager, imageLoader );
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
 		this.fileLoader = new FileLoader( this.options.manager );
