@@ -71,7 +71,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Adds v to this vector.
 	 */
-	add( v: Vector3, w?: Vector3 ): this;
+	add( v: Vector3, w: Vector3 ): this;
 
 	addScalar( s: number ): this;
 
@@ -94,7 +94,7 @@ export class Vector3 implements Vector {
 	 */
 	subVectors( a: Vector3, b: Vector3 ): this;
 
-	multiply( v: Vector3 ): this;
+	multiply( v: Vector3, w: Vector3 ): this;
 
 	/**
 	 * Multiplies this vector by scalar s.
@@ -283,8 +283,7 @@ export class Vector3 implements Vector {
 
 	fromBufferAttribute(
 		attribute: BufferAttribute,
-		index: number,
-		offset?: number
+		index: number
 	): this;
 
 	/**
