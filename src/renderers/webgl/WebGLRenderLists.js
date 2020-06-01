@@ -92,7 +92,7 @@ function WebGLRenderList() {
 
 	function getNextRenderGroupItem( object ) {
 
-		const renderGroupItem = renderGroupItems[ renderGroupItemIndex ];
+		let renderGroupItem = renderGroupItems[ renderGroupItemIndex ];
 
 		if ( renderGroupItem === undefined ) {
 
@@ -125,7 +125,7 @@ function WebGLRenderList() {
 
 	function pushRenderGroup( object ) {
 
-		var renderGroupItem = getNextRenderGroupItem( object );
+		const renderGroupItem = getNextRenderGroupItem( object );
 
 		currOpaque.push( renderGroupItem );
 		currOpaque = renderGroupItem.opaque;
