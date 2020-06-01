@@ -35,7 +35,7 @@ export interface Vector {
 	 *
 	 * add(v:T):T;
 	 */
-	add( v: Vector, w?: Vector ): this;
+	add( v: Vector ): this;
 
 	/**
 	 * addVectors(a:T, b:T):T;
