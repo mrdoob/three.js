@@ -211,7 +211,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Sets this vector to cross product of itself and v.
 	 */
-	cross( a: Vector3, w?: Vector3 ): this;
+	cross( a: Vector3, w: Vector3 ): this;
 
 	/**
 	 * Sets this vector to cross product of a and b.
