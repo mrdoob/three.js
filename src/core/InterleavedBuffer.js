@@ -112,7 +112,7 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
 
-			data.arrayBuffers[ this.array.buffer._uuid ] = arrayBufferToBase64( this.array.buffer );
+			data.arrayBuffers[ this.array.buffer._uuid ] = Array.prototype.slice.call( new Uint32Array( this.array.buffer ) );
 
 		}
 
@@ -128,21 +128,5 @@ Object.assign( InterleavedBuffer.prototype, {
 	}
 
 } );
-
-function arrayBufferToBase64( buffer ) {
-
-	let binary = '';
-	const bytes = new Uint8Array( buffer );
-
-	for ( let i = 0, l = bytes.byteLength; i < l; i ++ ) {
-
-		binary += String.fromCharCode( bytes[ i ] );
-
-	}
-
-	return window.btoa( binary );
-
-}
-
 
 export { InterleavedBuffer };

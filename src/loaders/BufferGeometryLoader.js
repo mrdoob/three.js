@@ -86,7 +86,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 			const arrayBuffers = json.arrayBuffers;
 			const arrayBuffer = arrayBuffers[ uuid ];
 
-			const ab = base64ToArrayBuffer( arrayBuffer );
+			const ab = new Uint32Array( arrayBuffer ).buffer;
 
 			arrayBufferMap[ uuid ] = ab;
 
@@ -214,22 +214,6 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 	}
 
 } );
-
-function base64ToArrayBuffer( base64 ) {
-
-	const binaryString = window.atob( base64 );
-	const length = binaryString.length;
-	const bytes = new Uint8Array( length );
-
-	for ( let i = 0; i < length; i ++ ) {
-
-		bytes[ i ] = binaryString.charCodeAt( i );
-
-	}
-
-	return bytes.buffer;
-
-}
 
 const TYPED_ARRAYS = {
 	Int8Array: Int8Array,
