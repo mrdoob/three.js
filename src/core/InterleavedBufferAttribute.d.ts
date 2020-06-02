@@ -48,10 +48,11 @@ export class InterleavedBufferAttribute {
 		z: number,
 		w: number
 	): InterleavedBufferAttribute;
-	toJSON(): {
+	toJSON( data: object, deinterleave: boolean ): {
+		isInterleavedBufferAttribute: true,
 		itemSize: number,
-		type: string,
-		array: number[],
+		data: string,
+		offset: number,
 		normalized: boolean
 	};
 

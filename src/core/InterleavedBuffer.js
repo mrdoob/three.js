@@ -1,3 +1,4 @@
+import { MathUtils } from '../math/MathUtils.js';
 import { StaticDrawUsage } from '../constants.js';
 
 /**
@@ -14,6 +15,8 @@ function InterleavedBuffer( array, stride ) {
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
+
+	this.uuid = MathUtils.generateUUID();
 
 }
 
@@ -89,9 +92,41 @@ Object.assign( InterleavedBuffer.prototype, {
 
 		return this;
 
+	},
+
+	toJSON: function ( data ) {
+
+		if ( data.arrayBuffers === undefined ) {
+
+			data.arrayBuffers = {};
+
+		}
+
+		// generate UUID for array buffer if necessary
+
+		if ( this.array.buffer._uuid === undefined ) {
+
+			this.array.buffer._uuid = MathUtils.generateUUID();
+
+		}
+
+		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
+
+			data.arrayBuffers[ this.array.buffer._uuid ] = Array.prototype.slice.call( new Uint32Array( this.array.buffer ) );
+
+		}
+
+		//
+
+		return {
+			uuid: this.uuid,
+			buffer: this.array.buffer._uuid,
+			type: this.array.constructor.name,
+			stride: this.stride
+		};
+
 	}
 
 } );
-
 
 export { InterleavedBuffer };

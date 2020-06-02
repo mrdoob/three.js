@@ -1026,7 +1026,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			const attribute = attributes[ key ];
 
-			const attributeData = attribute.toJSON();
+			const attributeData = attribute.toJSON( data.data, false );
 
 			if ( attribute.name !== '' ) attributeData.name = attribute.name;
 
@@ -1047,7 +1047,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 				const attribute = attributeArray[ i ];
 
-				const attributeData = attribute.toJSON();
+				const attributeData = attribute.toJSON( data.data, false );
 
 				if ( attribute.name !== '' ) attributeData.name = attribute.name;
 
