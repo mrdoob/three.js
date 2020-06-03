@@ -4,7 +4,12 @@
 	},
 	"project": {
 		"shadows": true,
-		"vr": false
+		"shadowType": 1,
+		"vr": false,
+		"physicallyCorrectLights": false,
+		"toneMapping": 0,
+		"toneMappingExposure": 1,
+		"toneMappingWhitePoint": 1
 	},
 	"camera": {
 		"metadata": {
@@ -13,17 +18,17 @@
 			"generator": "Object3D.toJSON"
 		},
 		"object": {
-			"uuid": "0C0DD0AD-3A7F-4ECD-A9FE-CECD97D5CBD9",
+			"uuid": "209E4EC6-6670-4F88-BDEB-B9B1E7FB9DCA",
 			"type": "PerspectiveCamera",
 			"name": "Camera",
 			"layers": 1,
-			"matrix": [0.939236,0,-0.343272,0,-0.147782,0.902586,-0.404351,0,0.309832,0.430511,0.847741,0,11.713146,19.228675,40.388679,1],
+			"matrix": [1,0,0,0,0,0.707107,-0.707107,0,0,0.707107,0.707107,0,0,32.901925,37.901925,1],
 			"fov": 50,
 			"zoom": 1,
 			"near": 0.1,
 			"far": 100000,
 			"focus": 10,
-			"aspect": 1.428977,
+			"aspect": 1.678879,
 			"filmGauge": 35,
 			"filmOffset": 0
 		}
@@ -104,7 +109,15 @@
 				"shininess": 30,
 				"depthFunc": 3,
 				"depthTest": true,
-				"depthWrite": true
+				"depthWrite": true,
+				"stencilWrite": false,
+				"stencilWriteMask": 255,
+				"stencilFunc": 519,
+				"stencilRef": 0,
+				"stencilFuncMask": 255,
+				"stencilFail": 7680,
+				"stencilZFail": 7680,
+				"stencilZPass": 7680
 			},
 			{
 				"uuid": "D98FC4D1-169E-420A-92EA-20E55009A46D",
@@ -113,6 +126,14 @@
 				"depthFunc": 3,
 				"depthTest": true,
 				"depthWrite": true,
+				"stencilWrite": false,
+				"stencilWriteMask": 255,
+				"stencilFunc": 519,
+				"stencilRef": 0,
+				"stencilFuncMask": 255,
+				"stencilFail": 7680,
+				"stencilZFail": 7680,
+				"stencilZPass": 7680,
 				"wireframe": true
 			},
 			{
@@ -124,7 +145,15 @@
 				"shininess": 30,
 				"depthFunc": 3,
 				"depthTest": true,
-				"depthWrite": true
+				"depthWrite": true,
+				"stencilWrite": false,
+				"stencilWriteMask": 255,
+				"stencilFunc": 519,
+				"stencilRef": 0,
+				"stencilFuncMask": 255,
+				"stencilFail": 7680,
+				"stencilZFail": 7680,
+				"stencilZPass": 7680
 			},
 			{
 				"uuid": "043B208C-1F83-42C6-802C-E0E35621C27C",
@@ -135,7 +164,15 @@
 				"shininess": 30,
 				"depthFunc": 3,
 				"depthTest": true,
-				"depthWrite": true
+				"depthWrite": true,
+				"stencilWrite": false,
+				"stencilWriteMask": 255,
+				"stencilFunc": 519,
+				"stencilRef": 0,
+				"stencilFuncMask": 255,
+				"stencilFail": 7680,
+				"stencilZFail": 7680,
+				"stencilZPass": 7680
 			},
 			{
 				"uuid": "40EC9BDA-91C0-4671-937A-2BCB6DA7EEBB",
@@ -144,6 +181,14 @@
 				"depthFunc": 3,
 				"depthTest": true,
 				"depthWrite": true,
+				"stencilWrite": false,
+				"stencilWriteMask": 255,
+				"stencilFunc": 519,
+				"stencilRef": 0,
+				"stencilFuncMask": 255,
+				"stencilFail": 7680,
+				"stencilZFail": 7680,
+				"stencilZPass": 7680,
 				"wireframe": true
 			}],
 		"object": {
@@ -199,7 +244,7 @@
 							"type": "Mesh",
 							"name": "Cylinder",
 							"layers": 1,
-							"matrix": [0.000795,0.000795,1,0,-1.000001,-0.000001,0.000795,0,0.000001,-1.000001,0.000795,0,0,0,0,1],
+							"matrix": [0.000794,0.000795,1,0,-1.000001,-0.000001,0.000795,0,0.000001,-1.000001,0.000794,0,0,0,0,1],
 							"geometry": "327EFFCF-649C-4EF3-86D4-B422C5A86E89",
 							"material": "3B9DE64D-E1C8-4C24-9F73-3A9E10E3E655"
 						}]
@@ -227,7 +272,7 @@
 							"type": "Mesh",
 							"name": "Cylinder",
 							"layers": 1,
-							"matrix": [0.000795,0.000795,1,0,-1.000001,-0.000001,0.000795,0,0.000001,-1.000001,0.000795,0,0,0,0,1],
+							"matrix": [0.000794,0.000795,1,0,-1.000001,-0.000001,0.000795,0,0.000001,-1.000001,0.000794,0,0,0,0,1],
 							"geometry": "3BDEB9FB-BDD4-44AD-8A47-008BED1C8982",
 							"material": "3B9DE64D-E1C8-4C24-9F73-3A9E10E3E655"
 						}]
@@ -257,6 +302,21 @@
 							"filmOffset": 0
 						}
 					}
+				},
+				{
+					"uuid": "F3FFE988-C8F3-4F3D-959E-239FFF2D7AA2",
+					"type": "PerspectiveCamera",
+					"name": "PlayerCamera",
+					"layers": 1,
+					"matrix": [1,0,0,0,0,0.707107,-0.707107,0,0,0.707107,0.707107,0,0,30,35,1],
+					"fov": 50,
+					"zoom": 1,
+					"near": 0.1,
+					"far": 2000,
+					"focus": 10,
+					"aspect": 1,
+					"filmGauge": 35,
+					"filmOffset": 0
 				}],
 			"background": 11184810
 		}
@@ -270,7 +330,7 @@
 		"31517222-A9A7-4EAF-B5F6-60751C0BABA3": [
 			{
 				"name": "Game Logic",
-				"source": "var ball = this.getObjectByName( 'Ball' );\n\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = - 0.5;\ndirection.normalize();\n\nvar speed = new THREE.Vector3();\n\n//\n\nvar group = new THREE.Group();\nthis.add( group );\n\nvar paddle = this.getObjectByName( 'Paddle' );\npaddle.material.visible = false;\ngroup.add( paddle );\n\nvar brick = this.getObjectByName( 'Brick' );\n\nfor ( var j = 0; j < 8; j ++ ) {\n\n\tvar material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );\n\n\tfor ( var i = 0; i < 12; i ++ ) {\n\t\t\n\t\tvar object = brick.clone();\n\t\tobject.position.x = i * 2.2 - 12;\n\t\tobject.position.z = j * 1.4 - 12;\n\t\tgroup.add( object );\n\n\t\tvar cylinder = object.getObjectByName( 'Cylinder' );\n\t\tcylinder.material = material;\n\n\t}\n\t\n}\n\nbrick.visible = false;\nbrick.material.visible = false;\n\n//\n\nvar raycaster = new THREE.Raycaster();\n\nfunction update( event ) {\n\t\n\tif ( ball.position.x < - 15 || ball.position.x > 15 ) direction.x = - direction.x;\n\tif ( ball.position.z < - 20 || ball.position.z > 20 ) direction.z = - direction.z;\n\n\tball.position.x = Math.max( - 15, Math.min( 15, ball.position.x ) );\n\tball.position.z = Math.max( - 20, Math.min( 20, ball.position.z ) );\n\t\t\n\traycaster.set( ball.position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( group.children );\n\t\n\tif ( intersections.length > 0 ) {\n\t\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 0.5 ) {\n\t\t\t\n\t\t\tif ( intersection.object !== paddle ) {\n\n\t\t\t\tgroup.remove( intersection.object );\n\t\t\t\t\n\t\t\t}\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n\tball.position.add( speed.copy( direction ).multiplyScalar( event.delta / 40 ) );\n\t\n}"
+				"source": "var ball = this.getObjectByName( 'Ball' );\n\nplayer.setCamera(this.getObjectByName( 'PlayerCamera' ))\nvar direction = new THREE.Vector3();\ndirection.x = Math.random() - 0.5;\ndirection.z = - 0.5;\ndirection.normalize();\n\nvar speed = new THREE.Vector3();\n\n//\n\nvar group = new THREE.Group();\nthis.add( group );\n\nvar paddle = this.getObjectByName( 'Paddle' );\npaddle.material.visible = false;\ngroup.add( paddle );\n\nvar brick = this.getObjectByName( 'Brick' );\n\nfor ( var j = 0; j < 8; j ++ ) {\n\n\tvar material = new THREE.MeshPhongMaterial( { color: Math.random() * 0xffffff } );\n\n\tfor ( var i = 0; i < 12; i ++ ) {\n\t\t\n\t\tvar object = brick.clone();\n\t\tobject.position.x = i * 2.2 - 12;\n\t\tobject.position.z = j * 1.4 - 12;\n\t\tgroup.add( object );\n\n\t\tvar cylinder = object.getObjectByName( 'Cylinder' );\n\t\tcylinder.material = material;\n\n\t}\n\t\n}\n\nbrick.visible = false;\nbrick.material.visible = false;\n\n//\n\nvar raycaster = new THREE.Raycaster();\n\nfunction update( event ) {\n\t\n\tif ( ball.position.x < - 15 || ball.position.x > 15 ) direction.x = - direction.x;\n\tif ( ball.position.z < - 20 || ball.position.z > 20 ) direction.z = - direction.z;\n\n\tball.position.x = Math.max( - 15, Math.min( 15, ball.position.x ) );\n\tball.position.z = Math.max( - 20, Math.min( 20, ball.position.z ) );\n\t\t\n\traycaster.set( ball.position, direction );\n\t\n\tvar intersections = raycaster.intersectObjects( group.children );\n\t\n\tif ( intersections.length > 0 ) {\n\t\n\t\tvar intersection = intersections[ 0 ];\n\t\t\n\t\tif ( intersection.distance < 0.5 ) {\n\t\t\t\n\t\t\tif ( intersection.object !== paddle ) {\n\n\t\t\t\tgroup.remove( intersection.object );\n\t\t\t\t\n\t\t\t}\n\t\t\t\n\t\t\tdirection.reflect( intersection.face.normal );\n\t\t\t\n\t\t}\n\t\t\n\t}\n\n\tball.position.add( speed.copy( direction ).multiplyScalar( event.delta / 40 ) );\n\t\n}"
 			}]
 	}
 }
