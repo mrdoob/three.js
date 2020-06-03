@@ -23,7 +23,7 @@
 			import { RectAreaLightUniformsLib } from './jsm/lights/RectAreaLightUniformsLib.js';
 
 			// shader injection for box projected cube environment mapping
-			var worldposReplace = `
+			var worldposReplace = /* glsl */`
 			#define BOX_PROJECTED_ENV_MAP
 
 			#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP )
@@ -39,7 +39,7 @@
 			#endif
 			`;
 
-			var envmapPhysicalParsReplace = `
+			var envmapPhysicalParsReplace = /* glsl */`
 			#if defined( USE_ENVMAP )
 
 				#define BOX_PROJECTED_ENV_MAP
