@@ -5,8 +5,10 @@
  * @author thezwap
  */
 
-const _lut = [];
+let _id = 0;
+let _seed = 1000000 * ( 1 + Math.random() );
 
+const _lut = [];
 for ( let i = 0; i < 256; i ++ ) {
 
 	_lut[ i ] = ( i < 16 ? '0' : '' ) + ( i ).toString( 16 );
@@ -20,16 +22,21 @@ const MathUtils = {
 
 	generateUUID: function () {
 
-		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
+		// Park–Miller random number generator
+		_seed = _seed * 16807 % 2147483647;
+		const prng = ( _seed - 1 ) / 2147483646;
 
-		const d0 = Math.random() * 0xffffffff | 0;
-		const d1 = Math.random() * 0xffffffff | 0;
-		const d2 = Math.random() * 0xffffffff | 0;
-		const d3 = Math.random() * 0xffffffff | 0;
-		const uuid = _lut[ d0 & 0xff ] + _lut[ d0 >> 8 & 0xff ] + _lut[ d0 >> 16 & 0xff ] + _lut[ d0 >> 24 & 0xff ] + '-' +
-			_lut[ d1 & 0xff ] + _lut[ d1 >> 8 & 0xff ] + '-' + _lut[ d1 >> 16 & 0x0f | 0x40 ] + _lut[ d1 >> 24 & 0xff ] + '-' +
-			_lut[ d2 & 0x3f | 0x80 ] + _lut[ d2 >> 8 & 0xff ] + '-' + _lut[ d2 >> 16 & 0xff ] + _lut[ d2 >> 24 & 0xff ] +
-			_lut[ d3 & 0xff ] + _lut[ d3 >> 8 & 0xff ] + _lut[ d3 >> 16 & 0xff ] + _lut[ d3 >> 24 & 0xff ];
+		// circular id + time x2 + prng
+		const a = ( ++ _id ) % 0xffffffff;
+		const b = Date.now();
+		const c = b / 0xffffffff;
+		const d = prng * 0xffffffff | 0;
+
+		// http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript/21963136#21963136
+		const uuid = _lut[ a >> 24 & 0xff ] + _lut[ a >> 16 & 0xff ] + _lut[ a >> 8 & 0xff ] + _lut[ a & 0xff ] + '-'
+			+ _lut[ b >> 24 & 0xff ] + _lut[ b >> 16 & 0xff ] + '-' + _lut[ c >> 24 & 0x0f | 0x40 ] + _lut[ b & 0xff ] + '-'
+			+ _lut[ c >> 16 & 0x3f | 0x80 ] + _lut[ c >> 8 & 0xff ] + '-' + _lut[ b >> 8 & 0xff ] + _lut[ c & 0xff ] +
+			+ _lut[ d >> 24 & 0xff ] + _lut[ d >> 16 & 0xff ] + _lut[ d >> 8 & 0xff ] + _lut[ d & 0xff ];
 
 		// .toUpperCase() here flattens concatenated strings to save heap memory space.
 		return uuid.toUpperCase();
