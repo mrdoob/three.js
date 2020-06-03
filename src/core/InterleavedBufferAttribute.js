@@ -157,25 +157,45 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	},
 
-	clone: function () {
+	clone: function ( data ) {
 
-		console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.' );
+		if ( data === undefined ) {
 
-		const array = [];
+			console.log( 'THREE.InterleavedBufferAttribute.clone(): Cloning an interlaved buffer attribute will deinterleave buffer data.' );
 
-		for ( let i = 0; i < this.count; i ++ ) {
+			const array = [];
 
-			const index = i * this.data.stride + this.offset;
+			for ( let i = 0; i < this.count; i ++ ) {
 
-			for ( let j = 0; j < this.itemSize; j ++ ) {
+				const index = i * this.data.stride + this.offset;
 
-				array.push( this.data.array[ index + j ] );
+				for ( let j = 0; j < this.itemSize; j ++ ) {
+
+					array.push( this.data.array[ index + j ] );
+
+				}
 
 			}
 
-		}
+			return new BufferAttribute( new this.array.constructor( array ), this.itemSize, this.normalized );
 
-		return new BufferAttribute( new this.array.constructor( array ), this.itemSize, this.normalized );
+		} else {
+
+			if ( data.interleavedBuffers === undefined ) {
+
+				data.interleavedBuffers = {};
+
+			}
+
+			if ( data.interleavedBuffers[ this.data.uuid ] === undefined ) {
+
+				data.interleavedBuffers[ this.data.uuid ] = this.data.clone( data );
+
+			}
+
+			return new InterleavedBufferAttribute( data.interleavedBuffers[ this.data.uuid ], this.itemSize, this.offset, this.normalized );
+
+		}
 
 	},
 

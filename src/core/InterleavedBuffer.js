@@ -80,9 +80,32 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	},
 
-	clone: function () {
+	clone: function ( data ) {
 
-		return new this.constructor().copy( this );
+		if ( data.arrayBuffers === undefined ) {
+
+			data.arrayBuffers = {};
+
+		}
+
+		if ( this.array.buffer._uuid === undefined ) {
+
+			this.array.buffer._uuid = MathUtils.generateUUID();
+
+		}
+
+		if ( data.arrayBuffers[ this.array.buffer._uuid ] === undefined ) {
+
+			data.arrayBuffers[ this.array.buffer._uuid ] = this.array.slice( 0 ).buffer;
+
+		}
+
+		const array = new this.array.constructor( data.arrayBuffers[ this.array.buffer._uuid ] );
+
+		const ib = new InterleavedBuffer( array, this.stride );
+		ib.setUsage( this.usage );
+
+		return ib;
 
 	},
 

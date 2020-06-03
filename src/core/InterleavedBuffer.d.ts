@@ -19,7 +19,7 @@ export class InterleavedBuffer {
 	uuid: string;
 
 	setUsage( usage: Usage ): InterleavedBuffer;
-	clone(): this;
+	clone( data: object ): this;
 	copy( source: InterleavedBuffer ): this;
 	copyAt(
 		index1: number,
