@@ -25,7 +25,7 @@ export class InterleavedBufferAttribute {
 	readonly isInterleavedBufferAttribute: true;
 
 	applyMatrix4( m: Matrix4 ): this;
-	clone(): BufferAttribute;
+	clone( data?: object ): BufferAttribute;
 	getX( index: number ): number;
 	setX( index: number, x: number ): InterleavedBufferAttribute;
 	getY( index: number ): number;

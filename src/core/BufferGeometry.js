@@ -1136,6 +1136,10 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		this.boundingBox = null;
 		this.boundingSphere = null;
 
+		// used for storing cloned, shared data
+
+		const data = {};
+
 		// name
 
 		this.name = source.name;
@@ -1146,7 +1150,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		if ( index !== null ) {
 
-			this.setIndex( index.clone() );
+			this.setIndex( index.clone( data ) );
 
 		}
 
@@ -1157,7 +1161,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		for ( const name in attributes ) {
 
 			const attribute = attributes[ name ];
-			this.setAttribute( name, attribute.clone() );
+			this.setAttribute( name, attribute.clone( data ) );
 
 		}
 
@@ -1172,7 +1176,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 			for ( let i = 0, l = morphAttribute.length; i < l; i ++ ) {
 
-				array.push( morphAttribute[ i ].clone() );
+				array.push( morphAttribute[ i ].clone( data ) );
 
 			}
 
