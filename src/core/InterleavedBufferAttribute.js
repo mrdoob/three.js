@@ -179,9 +179,9 @@ Object.assign( InterleavedBufferAttribute.prototype, {
 
 	},
 
-	toJSON: function ( data = null, deinterleave = true ) {
+	toJSON: function ( data ) {
 
-		if ( deinterleave === true ) {
+		if ( data === undefined ) {
 
 			console.log( 'THREE.InterleavedBufferAttribute.toJSON(): Serializing an interlaved buffer attribute will deinterleave buffer data.' );
 
