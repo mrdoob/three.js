@@ -3,6 +3,9 @@ import { Material } from './../materials/Material';
 import { Object3D } from './../core/Object3D';
 import { Color } from '../math/Color';
 import { Texture } from '../textures/Texture';
+import { WebGLRenderer } from "../renderers/WebGLRenderer";
+import { Camera } from "../cameras/Camera";
+import { RenderTarget } from "../renderers/webgl/WebGLRenderLists";
 // Scenes /////////////////////////////////////////////////////////////////////
 
 /**
@@ -28,6 +31,25 @@ export class Scene extends Object3D {
 	environment: null | Texture;
 
 	readonly isScene: true;
+
+	/**
+	 * Calls before rendering scene
+	 */
+	onBeforeRender: (
+		renderer: WebGLRenderer,
+		scene: Scene,
+		camera: Camera,
+		renderTarget: RenderTarget
+	) => void;
+
+	/**
+	 * Calls after rendering scene
+	 */
+	onAfterRender: (
+		renderer: WebGLRenderer,
+		scene: Scene,
+		camera: Camera
+	) => void;
 
 	toJSON( meta?: any ): any;
 	dispose(): void;

@@ -55,6 +55,8 @@
 				container.appendChild( renderer.domElement );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 750;
+				controls.maxDistance = 2500;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

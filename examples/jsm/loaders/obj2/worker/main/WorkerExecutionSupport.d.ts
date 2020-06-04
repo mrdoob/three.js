@@ -13,7 +13,7 @@ export class CodeBuilderInstructions {
 	isSupportsStandardWorker(): boolean;
 	isSupportsJsmWorker(): boolean;
 	isPreferJsmWorker(): boolean;
-	setJsmWorkerFile( jsmWorkerFile: string ): void;
+	setJsmWorkerUrl( jsmWorkerUrl: string ): void;
 	addStartCode( startCode: string ): void;
 	addCodeFragment( code: string ): void;
 	addLibraryImport( libraryPath: string ): void;
@@ -58,6 +58,6 @@ export class WorkerExecutionSupport {
 	updateCallbacks( onAssetAvailable: Function, onLoad: Function ): void;
 	buildWorker( codeBuilderInstructions: CodeBuilderInstructions ): void;
 	isWorkerLoaded( requireJsmWorker: boolean ): boolean;
-	executeParallel( payload:object, transferables?: object[] );
+	executeParallel( payload:object, transferables?: object[] ): void;
 
 }

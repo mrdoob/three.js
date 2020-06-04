@@ -1,11 +1,11 @@
 /**
- * @author munrocket / https://github.com/munrocket
+ * @author munrocket / https://twitter.com/munrocket_twit
  */
 
 ( function () {
 
 
-  /* Start VR pages */
+  /* Remove start screen ( or press some button ) */
 
   let button = document.getElementById( 'startButton' );
   if ( button ) {

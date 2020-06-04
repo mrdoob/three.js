@@ -3,12 +3,6 @@ import { Vector3 } from './Vector3';
 import { Plane } from './Plane';
 import { Box3 } from './Box3';
 
-export interface SplineControlPoint {
-	x: number;
-	y: number;
-	z: number;
-}
-
 export class Triangle {
 
 	constructor( a?: Vector3, b?: Vector3, c?: Vector3 );

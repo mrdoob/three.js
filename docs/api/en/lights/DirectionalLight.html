@@ -37,8 +37,15 @@
 			See the [page:.target target] property below for details on updating the target.
 		</p>
 
+		<h2>Code Example</h2>
 
-		<h2>Example</h2>
+		<code>
+		// White directional light at half intensity shining from the top.
+		var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		scene.add( directionalLight );
+		</code>
+
+		<h2>Examples</h2>
 		<p>
 			[example:misc_controls_fly controls / fly ]<br />
 			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
@@ -47,13 +54,6 @@
 			[example:webgl_materials_bumpmap materials / bumpmap ]<br />
 			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection ]
 		</p>
-
-		<code>
-		// White directional light at half intensity shining from the top.
-		var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-		scene.add( directionalLight );
-		</code>
-
 
 		<h2>Constructor</h2>
 

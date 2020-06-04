@@ -4,9 +4,9 @@
 
 function WebGLAnimation() {
 
-	var context = null;
-	var isAnimating = false;
-	var animationLoop = null;
+	let context = null;
+	let isAnimating = false;
+	let animationLoop = null;
 
 	function onAnimationFrame( time, frame ) {
 

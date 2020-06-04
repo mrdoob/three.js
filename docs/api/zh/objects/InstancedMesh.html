@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -17,8 +17,11 @@
 		objects with the same geometry and material but with different world transformations. The usage of [name] will help you
 		to reduce the number of draw calls and thus improve the overall rendering performance in your application.
 		</p>
+		<p>
+		The current implementation requires that materials are not shared between [name] and other 3D objects.
+		</p>
 
-		<h3>Examples</h3>
+		<h2>Examples</h2>
 
 		<p>
 			[example:webgl_instancing_dynamic WebGL / instancing / dynamic]<br />
@@ -51,8 +54,10 @@
 
 		<h3>[property:BufferAttribute instanceMatrix]</h3>
 		<p>
-			Represents the local transformation of all instances. For internal use only.
+			Represents the local transformation of all instances.
+			You have to set its [page:BufferAttribute.needsUpdate needsUpdate] flag to true if you modify instanced data via [page:.setMatrixAt]().
 		</p>
+
 
 		<h2>Methods</h2>
 		<p>See the base [page:Mesh] class for common methods.</p>

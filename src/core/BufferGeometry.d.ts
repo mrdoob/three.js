@@ -15,7 +15,7 @@ import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
  * It reduces memory costs and cpu cycles. But it is not as easy to work with because of all the necessary buffer calculations.
  * It is mainly interesting when working with static objects.
  *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js">src/core/BufferGeometry.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/BufferGeometry.js|src/core/BufferGeometry.js}
  */
 export class BufferGeometry extends EventDispatcher {
 
@@ -42,8 +42,8 @@ export class BufferGeometry extends EventDispatcher {
 	};
 	morphTargetsRelative: boolean;
 	groups: { start: number; count: number; materialIndex?: number }[];
-	boundingBox: Box3;
-	boundingSphere: Sphere;
+	boundingBox: Box3 | null;
+	boundingSphere: Sphere | null;
 	drawRange: { start: number; count: number };
 	userData: {[key: string]: any};
 	readonly isBufferGeometry: true;
@@ -99,7 +99,7 @@ export class BufferGeometry extends EventDispatcher {
 	 */
 	computeVertexNormals(): void;
 
-	merge( geometry: BufferGeometry, offset: number ): BufferGeometry;
+	merge( geometry: BufferGeometry, offset?: number ): BufferGeometry;
 	normalizeNormals(): void;
 
 	toNonIndexed(): BufferGeometry;

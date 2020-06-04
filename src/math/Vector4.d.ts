@@ -68,7 +68,7 @@ export class Vector4 implements Vector {
 	/**
 	 * Adds v to this vector.
 	 */
-	add( v: Vector4, w?: Vector4 ): this;
+	add( v: Vector4 ): this;
 
 	addScalar( scalar: number ): this;
 
@@ -206,8 +206,12 @@ export class Vector4 implements Vector {
 
 	fromBufferAttribute(
 		attribute: BufferAttribute,
-		index: number,
-		offset?: number
+		index: number
 	): this;
+
+	/**
+	 * Sets this vector's x, y, z and w from Math.random
+	 */
+	random(): this;
 
 }

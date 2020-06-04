@@ -106,6 +106,8 @@ function LightProbeHelper( lightProbe, size ) {
 
 	Mesh.call( this, geometry, material );
 
+	this.type = 'LightProbeHelper';
+
 	this.onBeforeRender();
 
 }

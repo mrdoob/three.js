@@ -24,14 +24,16 @@ import { Mesh } from '../objects/Mesh.js';
 import { Line } from '../objects/Line.js';
 import { Vector3 } from '../math/Vector3.js';
 
-var _axis = new Vector3();
-var _lineGeometry, _coneGeometry;
+const _axis = new Vector3();
+let _lineGeometry, _coneGeometry;
 
 function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 	// dir is assumed to be normalized
 
 	Object3D.call( this );
+
+	this.type = 'ArrowHelper';
 
 	if ( dir === undefined ) dir = new Vector3( 0, 0, 1 );
 	if ( origin === undefined ) origin = new Vector3( 0, 0, 0 );
@@ -52,11 +54,11 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 	this.position.copy( origin );
 
-	this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color } ) );
+	this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
-	this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color } ) );
+	this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color, toneMapped: false } ) );
 	this.cone.matrixAutoUpdate = false;
 	this.add( this.cone );
 
@@ -84,7 +86,7 @@ ArrowHelper.prototype.setDirection = function ( dir ) {
 
 		_axis.set( dir.z, 0, - dir.x ).normalize();
 
-		var radians = Math.acos( dir.y );
+		const radians = Math.acos( dir.y );
 
 		this.quaternion.setFromAxisAngle( _axis, radians );
 

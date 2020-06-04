@@ -37,13 +37,13 @@ var UVsDebug = function ( geometry, size ) {
 	canvas.height = height;
 
 	var ctx = canvas.getContext( '2d' );
-	ctx.lineWidth = 2;
-	ctx.strokeStyle = 'rgba( 0, 0, 0, 1.0 )';
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = 'rgb( 63, 63, 63 )';
 	ctx.textAlign = 'center';
 
 	// paint background white
 
-	ctx.fillStyle = 'rgba( 255, 255, 255, 1.0 )';
+	ctx.fillStyle = 'rgb( 255, 255, 255 )';
 	ctx.fillRect( 0, 0, width, height );
 
 	if ( geometry.isGeometry ) {
@@ -132,11 +132,11 @@ var UVsDebug = function ( geometry, size ) {
 
 			if ( j === 0 ) {
 
-				ctx.moveTo( uv.x * width, ( 1 - uv.y ) * height );
+				ctx.moveTo( uv.x * ( width - 2 ) + 0.5, ( 1 - uv.y ) * ( height - 2 ) + 0.5 );
 
 			} else {
 
-				ctx.lineTo( uv.x * width, ( 1 - uv.y ) * height );
+				ctx.lineTo( uv.x * ( width - 2 ) + 0.5, ( 1 - uv.y ) * ( height - 2 ) + 0.5 );
 
 			}
 
@@ -151,8 +151,8 @@ var UVsDebug = function ( geometry, size ) {
 
 		// label the face number
 
-		ctx.font = '12pt Arial bold';
-		ctx.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
+		ctx.font = '18px Arial';
+		ctx.fillStyle = 'rgb( 63, 63, 63 )';
 		ctx.fillText( index, a.x * width, ( 1 - a.y ) * height );
 
 		if ( a.x > 0.95 ) {
@@ -165,8 +165,8 @@ var UVsDebug = function ( geometry, size ) {
 
 		//
 
-		ctx.font = '8pt Arial bold';
-		ctx.fillStyle = 'rgba( 0, 0, 0, 1.0 )';
+		ctx.font = '12px Arial';
+		ctx.fillStyle = 'rgb( 191, 191, 191 )';
 
 		// label uv edge orders
 

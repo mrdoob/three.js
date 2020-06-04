@@ -3,6 +3,7 @@ import { Object3D } from '../../../src/Three';
 export interface PLYExporterOptions {
 	binary?: boolean;
 	excludeAttributes?: string[];
+	littleEndian?: boolean;
 }
 
 export class PLYExporter {

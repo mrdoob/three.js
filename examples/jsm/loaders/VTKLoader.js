@@ -38,7 +38,25 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -400,6 +418,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						pointIndex = pointIndex + 12;
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -448,6 +467,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -485,6 +505,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 

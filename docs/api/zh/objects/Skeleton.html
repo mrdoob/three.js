@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -15,29 +15,30 @@
 			使用一个[page:Bone bones]数组来创建一个可以由[page:SkinnedMesh]使用的骨架。
 		</p>
 
-		<h2>实例</h2>
-<code>
-// Create a simple "arm"
+		<h2>代码示例</h2>
+		<code>
+		// Create a simple "arm"
 
-var bones = [];
+		var bones = [];
 
-var shoulder = new THREE.Bone();
-var elbow = new THREE.Bone();
-var hand = new THREE.Bone();
+		var shoulder = new THREE.Bone();
+		var elbow = new THREE.Bone();
+		var hand = new THREE.Bone();
 
-shoulder.add( elbow );
-elbow.add( hand );
+		shoulder.add( elbow );
+		elbow.add( hand );
 
-bones.push( shoulder );
-bones.push( elbow );
-bones.push( hand );
+		bones.push( shoulder );
+		bones.push( elbow );
+		bones.push( hand );
 
-shoulder.position.y = -5;
-elbow.position.y = 0;
-hand.position.y = 5;
+		shoulder.position.y = -5;
+		elbow.position.y = 0;
+		hand.position.y = 5;
 
-var armSkeleton = new THREE.Skeleton( bones );
-</code>
+		var armSkeleton = new THREE.Skeleton( bones );
+		</code>
+
 		<p>
 			请查看[page:SkinnedMesh]页面，来查看其在标准的[page:BufferGeometry]中使用的示例。
  		</p>
@@ -102,9 +103,14 @@ var armSkeleton = new THREE.Skeleton( bones );
 
 		<h3>[method:Bone getBoneByName]( [param:String name] )</h3>
 		<p>
-			
+
 		name —— 匹配Bone对象中.name属性的字符串。<br /><br />
 		在骨架中的骨骼数组中遍览，并返回第一个能够和name匹配上的骨骼对象。<br />
+		</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+		Can be used if an instance of [name] becomes obsolete in an application. The method will free internal resources.
 		</p>
 
 		<h2>源代码</h2>

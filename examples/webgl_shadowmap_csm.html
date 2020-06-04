@@ -20,9 +20,10 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
-			import * as CSM from './jsm/csm/CSM.js';
+			import { CSM } from './jsm/csm/CSM.js';
+			import { CSMHelper } from './jsm/csm/CSMHelper.js';
 
-			var renderer, scene, camera, orthoCamera, controls, csm;
+			var renderer, scene, camera, orthoCamera, controls, csm, csmHelper;
 
 			var params = {
 				orthographic: false,
@@ -35,10 +36,10 @@
 				margin: 100,
 				lightFar: 5000,
 				lightNear: 1,
-				helper: function () {
+				autoUpdateHelper: true,
+				updateHelper: function () {
 
-					var helper = csm.helper( camera.matrix );
-					scene.add( helper );
+					csmHelper.update();
 
 				}
 			};
@@ -83,7 +84,7 @@
 				var ambientLight = new THREE.AmbientLight( 0xffffff, 0.5 );
 				scene.add( ambientLight );
 
-				csm = new CSM.default({
+				csm = new CSM({
 					maxFar: params.far,
 					cascades: 4,
 					mode: params.mode,
@@ -92,6 +93,10 @@
 					lightDirection: new THREE.Vector3( params.lightX, params.lightY, params.lightZ ).normalize(),
 					camera: camera
 				} );
+
+				csmHelper = new CSMHelper( csm );
+				csmHelper.visible = false;
+				scene.add( csmHelper );
 
 				var floorMaterial = new THREE.MeshPhongMaterial( { color: '#252a34' } );
 				csm.setupMaterial( floorMaterial );
@@ -204,7 +209,33 @@
 
 				} );
 
-				gui.add( params, 'helper' ).name( 'add frustum helper' );
+				const helperFolder = gui.addFolder( 'helper' );
+				
+				helperFolder.add( csmHelper, 'visible' );
+
+				helperFolder.add( csmHelper, 'displayFrustum' ).onChange( function () { 
+
+					csmHelper.updateVisibility();
+
+				} );
+
+				helperFolder.add( csmHelper, 'displayPlanes' ).onChange( function () { 
+
+					csmHelper.updateVisibility();
+
+				} );
+
+				helperFolder.add( csmHelper, 'displayShadowBounds' ).onChange( function () { 
+
+					csmHelper.updateVisibility();
+
+				} );
+
+				helperFolder.add( params, 'autoUpdateHelper' ).name( 'auto update' );
+
+				helperFolder.add( params, 'updateHelper' ).name( 'update' );
+				
+				helperFolder.open();
 
 				window.addEventListener( 'resize', function () {
 
@@ -224,17 +255,27 @@
 				requestAnimationFrame( animate );
 
 				camera.updateMatrixWorld();
-				csm.update( camera.matrixWorld );
+				csm.update();
 				controls.update();
 
 				if ( params.orthographic ) {
 
 					updateOrthoCamera();
 					csm.updateFrustums();
+					if ( params.autoUpdateHelper ) {
+						
+						csmHelper.update();
+					
+					}
 					renderer.render( scene, orthoCamera );
 
 				} else {
 	
+					if ( params.autoUpdateHelper ) {
+						
+						csmHelper.update();
+					
+					}
 					renderer.render( scene, camera );
 
 				}

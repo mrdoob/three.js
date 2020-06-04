@@ -6,9 +6,9 @@ import { Matrix4 } from './Matrix4';
  * Implementation of a quaternion. This is used for rotating things without incurring in the dreaded gimbal lock issue, amongst other advantages.
  *
  * @example
- * var quaternion = new THREE.Quaternion();
+ * const quaternion = new THREE.Quaternion();
  * quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
- * var vector = new THREE.Vector3( 1, 0, 0 );
+ * const vector = new THREE.Vector3( 1, 0, 0 );
  * vector.applyQuaternion( quaternion );
  */
 export class Quaternion {
@@ -148,6 +148,15 @@ export class Quaternion {
 		stcOffset1: number,
 		t: number
 	): Quaternion;
+
+	static multiplyQuaternionsFlat(
+		dst: number[],
+		dstOffset: number,
+		src0: number[],
+		srcOffset: number,
+		src1: number[],
+		stcOffset1: number
+	): number[];
 
 	/**
 	 * @deprecated Use {@link Vector#applyQuaternion vector.applyQuaternion( quaternion )} instead.

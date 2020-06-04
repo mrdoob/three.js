@@ -21,6 +21,7 @@ var SidebarSettings = function ( editor ) {
 
 	var options = {
 		en: 'English',
+		fr: 'Français',
 		zh: '中文'
 	};
 

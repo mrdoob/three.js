@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -18,9 +18,7 @@
 		它和其基类[page:Texture Texture]几乎是相同的，除了它总是将[page:Texture.needsUpdate needsUpdate]设置为*true*，以便使得贴图能够在视频播放时进行更新。自动创建[page:Texture.mipmaps mipmaps]也会被禁用。
 		</p>
 
-	<h2>示例</h2>
-
-		<p>[example:webgl_materials_video materials / video ]</p>
+		<h2>代码示例</h2>
 
 		<code>
 //assuming you have created a HTML video element with id="video"
@@ -32,6 +30,9 @@ texture.magFilter = THREE.LinearFilter;
 texture.format = THREE.RGBFormat;
 		</code>
 
+		<h2>例子</h2>
+
+		<p>[example:webgl_materials_video materials / video ]</p>
 
 		<h2>构造函数</h2>
 		<h3>[name]( [param:Video video], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>

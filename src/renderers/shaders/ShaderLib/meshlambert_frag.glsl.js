@@ -48,12 +48,10 @@ void main() {
 	#include <color_fragment>
 	#include <alphamap_fragment>
 	#include <alphatest_fragment>
-	#include <transparent_fragment>
 	#include <specularmap_fragment>
 	#include <emissivemap_fragment>
 
 	// accumulation
-	reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );
 
 	#ifdef DOUBLE_SIDED
 
@@ -82,6 +80,7 @@ void main() {
 	reflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();
 
 	// modulation
+
 	#include <aomap_fragment>
 
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;

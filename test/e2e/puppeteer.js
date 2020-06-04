@@ -1,35 +1,29 @@
 /**
- * @author munrocket / https://github.com/munrocket
+ * @author munrocket / https://twitter.com/munrocket_twit
  */
+
+try {
+
+	require( 'puppeteer' );
+
+} catch {
+
+	console.log( 'Error: Can\'t find Puppeteer. Run `npm install --prefix test`.' );
+	process.exit( 0 );
+
+}
 
 const puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const pixelmatch = require( 'pixelmatch' );
 const printImage = require( 'image-output' );
-const png = require( 'pngjs' ).PNG;
+const jimp = require( 'jimp' );
 const fs = require( 'fs' );
 
 const port = 1234;
-const pixelThreshold = 0.2; // threshold error in one pixel
+const pixelThreshold = 0.1; // threshold error in one pixel
 const maxFailedPixels = 0.05; // total failed pixels
-
-const exceptionList = [
-
-	'index',
-	'css3d_youtube', // video tag not deterministic enough
-	'webgl_kinect', // same here
-	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
-	'webgl_loader_texture_pvrtc', // not supported in CI, useless
-	'webgl_materials_envmaps_parallax',
-	'webgl_test_memory2', // gives fatal error in puppeteer
-	'webgl_worker_offscreencanvas' // in a worker, not robust
-
-].concat( ( process.platform === "win32" ) ? [
-
-	'webgl_effects_ascii' // windows fonts not supported
-
-] : [] );
 
 const networkTimeout = 600;
 const networkTax = 2000; // additional timeout for resources size
@@ -39,6 +33,30 @@ const renderTimeout = 1200;
 const maxAttemptId = 3; // progresseve attempts
 const progressFunc = n => 1 + n;
 
+const width = 400;
+const height = 250;
+const viewScale = 2;
+const jpgQuality = 95;
+
+const exceptionList = [
+
+	'index',
+	'css3d_youtube', // video tag not deterministic enough
+	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
+	'webgl_kinect', // video tag not deterministic enough
+	'webgl_loader_texture_pvrtc', // not supported in CI, useless
+	'webgl_materials_envmaps_parallax', // empty for some reason
+	'webgl_raymarching_reflect', // exception for Github Actions
+	'webgl_test_memory2', // gives fatal error in puppeteer
+	'webgl_tiled_forward', // exception for Github Actions
+	'webgl_worker_offscreencanvas', // in a worker, not robust
+
+].concat( ( process.platform === "win32" ) ? [
+
+	'webgl_effects_ascii' // windows fonts not supported
+
+] : [] );
+
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
 console.null = () => {};
@@ -46,37 +64,17 @@ console.null = () => {};
 
 /* Launch server */
 
-const server = http.createServer( ( request, response ) => {
-
-	return handler( request, response );
-
-} );
-server.listen( port, async () => {
-
-	try {
-
-		await pup;
-
-	} catch ( e ) {
-
-		console.error( e );
-
-	} finally {
-
-		server.close();
-
-	}
-
-} );
+const server = http.createServer( ( req, resp ) => handler( req, resp ) );
+server.listen( port, async () => await pup );
 server.on( 'SIGINT', () => process.exit( 1 ) );
 
 
-/* Launch puppeteer with WebGL support in Linux */
+/* Launch browser */
 
 const pup = puppeteer.launch( {
 	headless: ! process.env.VISIBLE,
 	args: [
-		'--use-gl=egl',
+		'--use-gl=swiftshader',
 		'--no-sandbox',
 		'--enable-surface-synchronization'
 	]
@@ -86,7 +84,7 @@ const pup = puppeteer.launch( {
 	/* Prepare page */
 
 	const page = ( await browser.pages() )[ 0 ];
-	await page.setViewport( { width: 800, height: 600 } );
+	await page.setViewport( { width: width * viewScale, height: height * viewScale } );
 
 	const cleanPage = fs.readFileSync( 'test/e2e/clean-page.js', 'utf8' );
 	const injection = fs.readFileSync( 'test/e2e/deterministic-injection.js', 'utf8' );
@@ -121,7 +119,7 @@ const pup = puppeteer.launch( {
 	/* Loop for each file, with CI parallelism */
 
 	let pageSize, file, attemptProgress;
-	let failedScreenshots = 0;
+	let failedScreenshots = [];
 	const isParallel = 'CI' in process.env;
 	const beginId = isParallel ? Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / 4 ) : 0;
 	const endId = isParallel ? Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / 4 ) : files.length;
@@ -131,7 +129,7 @@ const pup = puppeteer.launch( {
 
 		/* At least 3 attempts before fail */
 
-		let attemptId = process.env.MAKE ? 1 : 0;
+		let attemptId = process.env.MAKE ? 1.5 : 0;
 
 		while ( attemptId < maxAttemptId ) {
 
@@ -141,8 +139,6 @@ const pup = puppeteer.launch( {
 			file = files[ id ];
 			attemptProgress = progressFunc( attemptId );
 			pageSize = 0;
-			global.gc();
-			global.gc();
 
 			try {
 
@@ -179,12 +175,9 @@ const pup = puppeteer.launch( {
 					window.chromeRenderStarted = true;
 					await new Promise( function ( resolve ) {
 
-						if ( typeof performance.wow === 'undefined' ) {
-
-							performance.wow = performance.now;
-
-						}
+						performance.wow = performance.wow || performance.now;
 						let renderStart = performance.wow();
+
 						let waitingLoop = setInterval( function () {
 
 							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * attemptProgress );
@@ -195,6 +188,7 @@ const pup = puppeteer.launch( {
 									console.log( 'Warning. Render timeout exceeded...' );
 
 								}
+
 								clearInterval( waitingLoop );
 								resolve();
 
@@ -211,7 +205,7 @@ const pup = puppeteer.launch( {
 				if ( ++ attemptId === maxAttemptId ) {
 
 					console.red( `WTF? 'Network timeout' is small for your machine. file: ${ file } \n${ e }` );
-					++ failedScreenshots;
+					failedScreenshots.push( file );
 					continue;
 
 				} else {
@@ -224,26 +218,28 @@ const pup = puppeteer.launch( {
 			}
 
 
-			/* Make or diff? */
-
 			if ( process.env.MAKE ) {
 
 
 				/* Make screenshots */
 
 				attemptId = maxAttemptId;
-				await page.screenshot( { path: `./examples/screenshots/${ file }.png` } );
+				let bitmap = ( await jimp.read( await page.screenshot() ) )
+					.scale( 1 / viewScale ).quality( jpgQuality )
+					.write( `./examples/screenshots/${ file }.jpg` ).bitmap;
+
+				printImage( bitmap, console );
 				console.green( `file: ${ file } generated` );
 
 
-			} else if ( fs.existsSync( `./examples/screenshots/${ file }.png` ) ) {
+			} else if ( fs.existsSync( `./examples/screenshots/${ file }.jpg` ) ) {
 
 
 				/* Diff screenshots */
 
-				let actual = png.sync.read( await page.screenshot() );
-				let expected = png.sync.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) );
-				let diff = new png( { width: actual.width, height: actual.height } );
+				let actual = ( await jimp.read( await page.screenshot() ) ).scale( 1 / viewScale ).quality( jpgQuality ).bitmap;
+				let expected = ( await jimp.read( fs.readFileSync( `./examples/screenshots/${ file }.jpg` ) ) ).bitmap;
+				let diff = actual;
 
 				let numFailedPixels;
 				try {
@@ -259,12 +255,12 @@ const pup = puppeteer.launch( {
 
 					attemptId = maxAttemptId;
 					console.red( `ERROR! Image sizes does not match in file: ${ file }` );
-					++ failedScreenshots;
+					failedScreenshots.push( file );
 					continue;
 
 				}
-				numFailedPixels /= actual.width * actual.height;
 
+				numFailedPixels /= actual.width * actual.height;
 
 				/* Print results */
 
@@ -279,7 +275,7 @@ const pup = puppeteer.launch( {
 
 						printImage( diff, console );
 						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
-						++ failedScreenshots;
+						failedScreenshots.push( file );
 						continue;
 
 					} else {
@@ -293,8 +289,7 @@ const pup = puppeteer.launch( {
 			} else {
 
 				attemptId = maxAttemptId;
-				console.red( `ERROR! Screenshot not exists: ${ file }` );
-				++ failedScreenshots;
+				console.log( `Warning! Screenshot not exists: ${ file }` );
 				continue;
 
 			}
@@ -306,10 +301,19 @@ const pup = puppeteer.launch( {
 
 	/* Finish */
 
-	if ( failedScreenshots ) {
+	if ( failedScreenshots.length ) {
 
-		console.red( `TEST FAILED! ${ failedScreenshots } from ${ endId - beginId } screenshots not pass.` );
-		process.exit( 1 );
+		if ( failedScreenshots.length > 1 ) {
+
+			console.red( 'List of failed screenshots: ' + failedScreenshots.join( ' ' ) );
+
+		} else {
+
+			console.red( `If you sure that all is right, try to run \`npm run make-screenshot ${ failedScreenshots[ 0 ] }\`` );
+
+		}
+
+		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endId - beginId } screenshots not pass.` );
 
 	} else if ( ! process.env.MAKE ) {
 
@@ -317,6 +321,12 @@ const pup = puppeteer.launch( {
 
 	}
 
-	await browser.close();
+	setTimeout( () => {
+
+		server.close();
+		browser.close();
+		process.exit( failedScreenshots.length );
+
+	}, 300 );
 
 } );

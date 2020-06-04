@@ -118,7 +118,6 @@ export const CubeReflectionMapping: Mapping;
 export const CubeRefractionMapping: Mapping;
 export const EquirectangularReflectionMapping: Mapping;
 export const EquirectangularRefractionMapping: Mapping;
-export const SphericalReflectionMapping: Mapping;
 export const CubeUVReflectionMapping: Mapping;
 export const CubeUVRefractionMapping: Mapping;
 
@@ -285,6 +284,9 @@ export const SRGB8_ALPHA8_ASTC_10x10_Format: CompressedPixelFormat;
 export const SRGB8_ALPHA8_ASTC_12x10_Format: CompressedPixelFormat;
 export const SRGB8_ALPHA8_ASTC_12x12_Format: CompressedPixelFormat;
 
+// BPTC compressed texture formats
+export const RGBA_BPTC_Format: CompressedPixelFormat;
+
 // Loop styles for AnimationAction
 export enum AnimationActionLoopStyles {}
 export const LoopOnce: AnimationActionLoopStyles;
@@ -302,6 +304,11 @@ export enum InterpolationEndingModes {}
 export const ZeroCurvatureEnding: InterpolationEndingModes;
 export const ZeroSlopeEnding: InterpolationEndingModes;
 export const WrapAroundEnding: InterpolationEndingModes;
+
+// Animation blending modes
+export enum AnimationBlendMode { }
+export const NormalAnimationBlendMode: AnimationBlendMode;
+export const AdditiveAnimationBlendMode: AnimationBlendMode;
 
 // Triangle Draw modes
 export enum TrianglesDrawModes {}

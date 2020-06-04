@@ -62,29 +62,27 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// some helper variables
 
-	var segment;
-	var radius = innerRadius;
-	var radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
-	var vertex = new Vector3();
-	var uv = new Vector2();
-	var j, i;
+	let radius = innerRadius;
+	const radiusStep = ( ( outerRadius - innerRadius ) / phiSegments );
+	const vertex = new Vector3();
+	const uv = new Vector2();
 
 	// generate vertices, normals and uvs
 
-	for ( j = 0; j <= phiSegments; j ++ ) {
+	for ( let j = 0; j <= phiSegments; j ++ ) {
 
-		for ( i = 0; i <= thetaSegments; i ++ ) {
+		for ( let i = 0; i <= thetaSegments; i ++ ) {
 
 			// values are generate from the inside of the ring to the outside
 
-			segment = thetaStart + i / thetaSegments * thetaLength;
+			const segment = thetaStart + i / thetaSegments * thetaLength;
 
 			// vertex
 
@@ -114,18 +112,18 @@ function RingBufferGeometry( innerRadius, outerRadius, thetaSegments, phiSegment
 
 	// indices
 
-	for ( j = 0; j < phiSegments; j ++ ) {
+	for ( let j = 0; j < phiSegments; j ++ ) {
 
-		var thetaSegmentLevel = j * ( thetaSegments + 1 );
+		const thetaSegmentLevel = j * ( thetaSegments + 1 );
 
-		for ( i = 0; i < thetaSegments; i ++ ) {
+		for ( let i = 0; i < thetaSegments; i ++ ) {
 
-			segment = i + thetaSegmentLevel;
+			const segment = i + thetaSegmentLevel;
 
-			var a = segment;
-			var b = segment + thetaSegments + 1;
-			var c = segment + thetaSegments + 2;
-			var d = segment + 1;
+			const a = segment;
+			const b = segment + thetaSegments + 1;
+			const c = segment + thetaSegments + 2;
+			const d = segment + 1;
 
 			// faces
 

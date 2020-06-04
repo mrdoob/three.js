@@ -2,6 +2,10 @@
 	color-scheme: light dark;
 }
 
+html {
+	touch-action: none;
+}
+
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -420,7 +424,6 @@ select {
 #toolbar {
 	position: absolute;
 	left: calc(50% - 290px); /* ( ( 100% - 300px ) / 2.0 ) - 140px */
-	width: 280px;
 	bottom: 16px;
 	height: 32px;
 	background: #eee;
@@ -451,6 +454,7 @@ select {
 	font-size: 12px;
 	cursor: default;
 	overflow: auto;
+	resize: vertical;
 	outline: none !important;
 }
 
@@ -535,7 +539,6 @@ select {
 
 	#toolbar {
 		left: calc(50% - 140px);
-		width: 280px;
 		top: 68px;
 	}
 

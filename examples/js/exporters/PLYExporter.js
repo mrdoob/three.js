@@ -1,3 +1,4 @@
+console.warn( "THREE.PLYExporter: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Garrett Johnson / http://gkjohnson.github.io/
  * https://github.com/gkjohnson/ply-exporter-js
@@ -6,7 +7,7 @@
  *  var exporter = new THREE.PLYExporter();
  *
  *  // second argument is a list of options
- *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ] });
+ *  exporter.parse(mesh, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ], littleEndian: true });
  *
  * Format Definition:
  * http://paulbourke.net/dataformats/ply/
@@ -63,7 +64,8 @@ THREE.PLYExporter.prototype = {
 		// Default options
 		var defaultOptions = {
 			binary: false,
-			excludeAttributes: [] // normal, uv, color, index
+			excludeAttributes: [], // normal, uv, color, index
+			littleEndian: false
 		};
 
 		options = Object.assign( defaultOptions, options );
@@ -148,7 +150,7 @@ THREE.PLYExporter.prototype = {
 
 		var header =
 			'ply\n' +
-			`format ${ options.binary ? 'binary_big_endian' : 'ascii' } 1.0\n` +
+			`format ${ options.binary ? ( options.littleEndian ? 'binary_little_endian' : 'binary_big_endian' ) : 'ascii' } 1.0\n` +
 			`element vertex ${vertexCount}\n` +
 
 			// position
@@ -243,13 +245,13 @@ THREE.PLYExporter.prototype = {
 
 
 					// Position information
-					output.setFloat32( vOffset, vertex.x );
+					output.setFloat32( vOffset, vertex.x, options.littleEndian );
 					vOffset += 4;
 
-					output.setFloat32( vOffset, vertex.y );
+					output.setFloat32( vOffset, vertex.y, options.littleEndian );
 					vOffset += 4;
 
-					output.setFloat32( vOffset, vertex.z );
+					output.setFloat32( vOffset, vertex.z, options.littleEndian );
 					vOffset += 4;
 
 					// Normal information
@@ -263,24 +265,24 @@ THREE.PLYExporter.prototype = {
 
 							vertex.applyMatrix3( normalMatrixWorld ).normalize();
 
-							output.setFloat32( vOffset, vertex.x );
+							output.setFloat32( vOffset, vertex.x, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, vertex.y );
+							output.setFloat32( vOffset, vertex.y, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, vertex.z );
+							output.setFloat32( vOffset, vertex.z, options.littleEndian );
 							vOffset += 4;
 
 						} else {
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
 						}
@@ -292,18 +294,18 @@ THREE.PLYExporter.prototype = {
 
 						if ( uvs != null ) {
 
-							output.setFloat32( vOffset, uvs.getX( i ) );
+							output.setFloat32( vOffset, uvs.getX( i ), options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, uvs.getY( i ) );
+							output.setFloat32( vOffset, uvs.getY( i ), options.littleEndian );
 							vOffset += 4;
 
 						} else if ( includeUVs !== false ) {
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
-							output.setFloat32( vOffset, 0 );
+							output.setFloat32( vOffset, 0, options.littleEndian );
 							vOffset += 4;
 
 						}
@@ -352,13 +354,13 @@ THREE.PLYExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output.setUint32( fOffset, indices.getX( i + 0 ) + writtenVertices );
+							output.setUint32( fOffset, indices.getX( i + 0 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, indices.getX( i + 1 ) + writtenVertices );
+							output.setUint32( fOffset, indices.getX( i + 1 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, indices.getX( i + 2 ) + writtenVertices );
+							output.setUint32( fOffset, indices.getX( i + 2 ) + writtenVertices, options.littleEndian );
 							fOffset += indexByteCount;
 
 						}
@@ -370,13 +372,13 @@ THREE.PLYExporter.prototype = {
 							output.setUint8( fOffset, 3 );
 							fOffset += 1;
 
-							output.setUint32( fOffset, writtenVertices + i );
+							output.setUint32( fOffset, writtenVertices + i, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, writtenVertices + i + 1 );
+							output.setUint32( fOffset, writtenVertices + i + 1, options.littleEndian );
 							fOffset += indexByteCount;
 
-							output.setUint32( fOffset, writtenVertices + i + 2 );
+							output.setUint32( fOffset, writtenVertices + i + 2, options.littleEndian );
 							fOffset += indexByteCount;
 
 						}

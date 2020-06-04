@@ -5,11 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			a {
-				color: #f00;
-			}
-		</style>
 	</head>
 
 	<body>
@@ -37,10 +32,8 @@
 
 				container = document.getElementById( 'container' );
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 20 );
-				camera.position.z = 8;
+				camera.position.z = 10;
 				scene.add( camera );
-
-				var controls = new OrbitControls( camera, container );
 
 				var pointLight = new THREE.PointLight( 0xffffff, 1 );
 				camera.add( pointLight );
@@ -61,15 +54,15 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
 				renderer.setAnimationLoop( function () {
 
 					renderer.render( scene, camera );
 
 				} );
-
 				container.appendChild( renderer.domElement );
 
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

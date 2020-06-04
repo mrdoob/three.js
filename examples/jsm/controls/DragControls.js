@@ -53,6 +53,8 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 		_domElement.removeEventListener( 'touchstart', onDocumentTouchStart, false );
 		_domElement.removeEventListener( 'touchend', onDocumentTouchEnd, false );
 
+		_domElement.style.cursor = '';
+
 	}
 
 	function dispose() {

@@ -10,9 +10,10 @@ export class WebGLClipping {
 	endShadows(): void;
 	setState(
 		planes: any[],
+		clipIntersection: boolean,
 		clipShadows: boolean,
 		camera: Camera,
-		cache: boolean,
+		cache: any,
 		fromCache: boolean
 	): void;
 

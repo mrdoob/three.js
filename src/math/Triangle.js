@@ -6,17 +6,17 @@ import { Plane } from './Plane.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var _v0 = new Vector3();
-var _v1 = new Vector3();
-var _v2 = new Vector3();
-var _v3 = new Vector3();
+const _v0 = new Vector3();
+const _v1 = new Vector3();
+const _v2 = new Vector3();
+const _v3 = new Vector3();
 
-var _vab = new Vector3();
-var _vac = new Vector3();
-var _vbc = new Vector3();
-var _vap = new Vector3();
-var _vbp = new Vector3();
-var _vcp = new Vector3();
+const _vab = new Vector3();
+const _vac = new Vector3();
+const _vbc = new Vector3();
+const _vap = new Vector3();
+const _vbp = new Vector3();
+const _vcp = new Vector3();
 
 function Triangle( a, b, c ) {
 
@@ -41,7 +41,7 @@ Object.assign( Triangle, {
 		_v0.subVectors( a, b );
 		target.cross( _v0 );
 
-		var targetLengthSq = target.lengthSq();
+		const targetLengthSq = target.lengthSq();
 		if ( targetLengthSq > 0 ) {
 
 			return target.multiplyScalar( 1 / Math.sqrt( targetLengthSq ) );
@@ -60,13 +60,13 @@ Object.assign( Triangle, {
 		_v1.subVectors( b, a );
 		_v2.subVectors( point, a );
 
-		var dot00 = _v0.dot( _v0 );
-		var dot01 = _v0.dot( _v1 );
-		var dot02 = _v0.dot( _v2 );
-		var dot11 = _v1.dot( _v1 );
-		var dot12 = _v1.dot( _v2 );
+		const dot00 = _v0.dot( _v0 );
+		const dot01 = _v0.dot( _v1 );
+		const dot02 = _v0.dot( _v2 );
+		const dot11 = _v1.dot( _v1 );
+		const dot12 = _v1.dot( _v2 );
 
-		var denom = ( dot00 * dot11 - dot01 * dot01 );
+		const denom = ( dot00 * dot11 - dot01 * dot01 );
 
 		if ( target === undefined ) {
 
@@ -84,9 +84,9 @@ Object.assign( Triangle, {
 
 		}
 
-		var invDenom = 1 / denom;
-		var u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
-		var v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
+		const invDenom = 1 / denom;
+		const u = ( dot11 * dot02 - dot01 * dot12 ) * invDenom;
+		const v = ( dot00 * dot12 - dot01 * dot02 ) * invDenom;
 
 		// barycentric coordinates must always sum to 1
 		return target.set( 1 - u - v, v, u );
@@ -244,8 +244,8 @@ Object.assign( Triangle.prototype, {
 
 		}
 
-		var a = this.a, b = this.b, c = this.c;
-		var v, w;
+		const a = this.a, b = this.b, c = this.c;
+		let v, w;
 
 		// algorithm thanks to Real-Time Collision Detection by Christer Ericson,
 		// published by Morgan Kaufmann Publishers, (c) 2005 Elsevier Inc.,
@@ -256,8 +256,8 @@ Object.assign( Triangle.prototype, {
 		_vab.subVectors( b, a );
 		_vac.subVectors( c, a );
 		_vap.subVectors( p, a );
-		var d1 = _vab.dot( _vap );
-		var d2 = _vac.dot( _vap );
+		const d1 = _vab.dot( _vap );
+		const d2 = _vac.dot( _vap );
 		if ( d1 <= 0 && d2 <= 0 ) {
 
 			// vertex region of A; barycentric coords (1, 0, 0)
@@ -266,8 +266,8 @@ Object.assign( Triangle.prototype, {
 		}
 
 		_vbp.subVectors( p, b );
-		var d3 = _vab.dot( _vbp );
-		var d4 = _vac.dot( _vbp );
+		const d3 = _vab.dot( _vbp );
+		const d4 = _vac.dot( _vbp );
 		if ( d3 >= 0 && d4 <= d3 ) {
 
 			// vertex region of B; barycentric coords (0, 1, 0)
@@ -275,7 +275,7 @@ Object.assign( Triangle.prototype, {
 
 		}
 
-		var vc = d1 * d4 - d3 * d2;
+		const vc = d1 * d4 - d3 * d2;
 		if ( vc <= 0 && d1 >= 0 && d3 <= 0 ) {
 
 			v = d1 / ( d1 - d3 );
@@ -285,8 +285,8 @@ Object.assign( Triangle.prototype, {
 		}
 
 		_vcp.subVectors( p, c );
-		var d5 = _vab.dot( _vcp );
-		var d6 = _vac.dot( _vcp );
+		const d5 = _vab.dot( _vcp );
+		const d6 = _vac.dot( _vcp );
 		if ( d6 >= 0 && d5 <= d6 ) {
 
 			// vertex region of C; barycentric coords (0, 0, 1)
@@ -294,7 +294,7 @@ Object.assign( Triangle.prototype, {
 
 		}
 
-		var vb = d5 * d2 - d1 * d6;
+		const vb = d5 * d2 - d1 * d6;
 		if ( vb <= 0 && d2 >= 0 && d6 <= 0 ) {
 
 			w = d2 / ( d2 - d6 );
@@ -303,7 +303,7 @@ Object.assign( Triangle.prototype, {
 
 		}
 
-		var va = d3 * d6 - d5 * d4;
+		const va = d3 * d6 - d5 * d4;
 		if ( va <= 0 && ( d4 - d3 ) >= 0 && ( d5 - d6 ) >= 0 ) {
 
 			_vbc.subVectors( c, b );
@@ -314,7 +314,7 @@ Object.assign( Triangle.prototype, {
 		}
 
 		// face region
-		var denom = 1 / ( va + vb + vc );
+		const denom = 1 / ( va + vb + vc );
 		// u = va * denom
 		v = vb * denom;
 		w = vc * denom;

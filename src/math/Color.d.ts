@@ -14,9 +14,9 @@ export interface HSL {
  * Represents a color. See also {@link ColorUtils}.
  *
  * @example
- * var color = new THREE.Color( 0xff0000 );
+ * const color = new THREE.Color( 0xff0000 );
  *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/math/Color.js">src/math/Color.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Color.js|src/math/Color.js}
  */
 export class Color {
 
@@ -40,9 +40,7 @@ export class Color {
 	 */
 	b: number;
 
-	set( color: Color ): Color;
-	set( color: number ): Color;
-	set( color: string ): Color;
+	set( color: Color | string | number ): Color;
 	setScalar( scalar: number ): Color;
 	setHex( hex: number ): Color;
 

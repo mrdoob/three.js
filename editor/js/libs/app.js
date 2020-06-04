@@ -13,11 +13,8 @@ var APP = {
 
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
-		// If VR support is turned on, this button will display
-		// when the player is running.
-		var vrButton;
-		// Returns true if VR support is enabled.
-		var vrEnabled;
+
+		var vrButton = VRButton.createButton( renderer );
 
 		var events = {};
 
@@ -33,13 +30,13 @@ var APP = {
 
 			var project = json.project;
 
-			vrEnabled = () => project.vr;
-
-			if ( project.shadows ) renderer.shadowMap.enabled = true;
-			if ( project.vr ) { 
-				renderer.xr.enabled = true;
-				vrButton = VRButton.createButton( renderer );
-			};
+			if ( project.vr !== undefined ) renderer.xr.enabled = project.vr;
+			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
+			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
+			if ( project.toneMapping !== undefined ) renderer.toneMapping = project.toneMapping;
+			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
+			if ( project.toneMappingWhitePoint !== undefined ) renderer.toneMappingWhitePoint = project.toneMappingWhitePoint;
+			if ( project.physicallyCorrectLights !== undefined ) renderer.physicallyCorrectLights = project.physicallyCorrectLights;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -181,9 +178,7 @@ var APP = {
 
 		this.play = function () {
 
-			if ( vrEnabled() ) {
-				dom.append( vrButton );
-			}
+			if ( renderer.xr.enabled ) dom.append( vrButton );
 
 			prevTime = performance.now();
 
@@ -204,9 +199,7 @@ var APP = {
 
 		this.stop = function () {
 
-			if ( vrEnabled() ) {
-				vrButton.remove();
-			}
+			if ( renderer.xr.enabled ) vrButton.remove();
 
 			document.removeEventListener( 'keydown', onDocumentKeyDown );
 			document.removeEventListener( 'keyup', onDocumentKeyUp );

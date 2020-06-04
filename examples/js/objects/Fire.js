@@ -1,3 +1,4 @@
+console.warn( "THREE.Fire: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Mike Piecuch / https://github.com/mikepiecuch
  *
@@ -89,6 +90,7 @@ THREE.Fire = function ( geometry, options ) {
 						this.sourceData[ stride ] = Math.min( Math.max( density, 0.0 ), 1.0 ) * 255;
 
 					}
+
 					if ( windX != null ) {
 
 						var wind = Math.min( Math.max( windX, - 1.0 ), 1.0 );
@@ -96,6 +98,7 @@ THREE.Fire = function ( geometry, options ) {
 						this.sourceData[ stride + 1 ] = wind;
 
 					}
+
 					if ( windY != null ) {
 
 						var wind = Math.min( Math.max( windY, - 1.0 ), 1.0 );
@@ -273,6 +276,7 @@ THREE.Fire = function ( geometry, options ) {
 		shader = THREE.Fire.ColorShader;
 
 	}
+
 	this.material = new THREE.ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
@@ -434,11 +438,13 @@ THREE.Fire = function ( geometry, options ) {
 	this.onBeforeRender = function ( renderer ) {
 
 		var delta = this.clock.getDelta();
+
 		if ( delta > 0.1 ) {
 
 			delta = 0.1;
 
 		}
+
 		var dt = delta * ( this.speed * 0.1 );
 
 		this.configShaders( dt );
@@ -460,11 +466,13 @@ THREE.Fire = function ( geometry, options ) {
 		this.renderSource( renderer );
 
 		this.clearDiffuse();
+
 		for ( var i = 0; i < 21; i ++ ) {
 
 			this.renderDiffuse( renderer );
 
 		}
+
 		this.configShaders( dt );
 		this.renderDiffuse( renderer );
 
