@@ -7,6 +7,12 @@ npm-debug.log
 .jshintrc
 .vs/
 
+# npm install --prefix test adds files in the test folder.
+# There are 2 kindsof files, those without extension and those with cmd extension.
+# To ignore files without a extension, following precedure is nessecary:
+# - ignore all files in the test folder
+# - unignore all files in subdirectories of the test folder
+# - unignore all files with an extension in the test folder
 test/*
 !test/*/
 !test/*.*
