@@ -212,10 +212,14 @@ get into at another time.
 The `MeshNormalMaterial` will show you the *normals* of geometry.
 *Normals* are the direction a particular triangle or pixel faces.
 `MeshNormalMaterial` draws the view space normals (the normals relative to the camera).
-<span class="color:red;">x is red</span>,
-<span class="color:green;">y is green</span>, and
-<span class="color:blue;">z is blue</span> so things facing
-to the right will be red, up will be green, and toward the screen will be blue.
+<span style="background: red;" class="color">x is red</span>,
+<span style="background: green;" class="dark-color">y is green</span>, and
+<span style="background: blue;" class="dark-color">z is blue</span> so things facing
+to the right will be <span style="background: #FF7F7F;" class="color">pink</span>,
+to the left will be <span style="background: #007F7F;" class="dark-color">aqua</span>,
+up will be <span style="background: #7FFF7F;" class="color">light green</span>,
+down will be <span style="background: #7F007F;" class="dark-color">purple</span>,
+and toward the screen will be <span style="background: #7F7FFF;" class="color">lavender</span>.
 
 <div class="spread">
   <div>

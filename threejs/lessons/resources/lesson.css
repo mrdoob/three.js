@@ -182,6 +182,16 @@ div[data-diagram] {
 .home-lang select {
     font-size: large;
 }
+.color {
+  padding: 0.25em;
+  border-radius: 0.5em;
+  color: black;
+}
+.dark-color {
+  padding: 0.25em;
+  border-radius: 0.5em;
+  color: white;
+}
 .checkerboard {
   background-color: #404040;
   background-image:
@@ -380,7 +390,7 @@ pre.prettyprint .atv { color: #70c0b1 } /* attribute value */
 pre.prettyprint .dec { color: #e78c45 } /* decimal         */
 pre.prettyprint .var { color: #d54e53 } /* variable name   */
 pre.prettyprint .fun { color: #7aa6da } /* function name   */
-
+foo{ color: #FF8080}
 pre.prettyprint ul.modifiedlines {
     list-style-type: none;
     padding-left: 0;
