@@ -6,7 +6,7 @@ import { Texture } from '../textures/Texture';
 import { WebGLRenderer } from "../renderers/WebGLRenderer";
 import { Camera } from "../cameras/Camera";
 import { RenderTarget } from "../renderers/webgl/WebGLRenderLists";
-import { WebGLRenderTarget } from "../renderers/WebGLRenderTarget";
+import { WebGLCubeRenderTarget } from "../renderers/WebGLCubeRenderTarget";
 // Scenes /////////////////////////////////////////////////////////////////////
 
 /**
@@ -28,7 +28,7 @@ export class Scene extends Object3D {
 	 */
 	overrideMaterial: Material | null;
 	autoUpdate: boolean;
-	background: null | Color | Texture | WebGLRenderTarget;
+	background: null | Color | Texture | WebGLCubeRenderTarget;
 	environment: null | Texture;
 
 	readonly isScene: true;
