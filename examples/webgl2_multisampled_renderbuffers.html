@@ -17,7 +17,7 @@
 
 			#container {
 				position: absolute;
-				top: 80px;
+				top: 70px;
 				width: 100%;
 				bottom: 0px;
 			}
@@ -27,8 +27,8 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Multisampled Renderbuffers<br />
-			Left: WebGLMultisampleRenderTarget, Right: WebGLRenderTarget.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Multisampled Renderbuffers<br />
+			Left: WebGLRenderTarget, Right: WebGLMultisampleRenderTarget.
 		</div>
 		<div id="container">
 		</div>
@@ -60,7 +60,7 @@
 
 				container = document.getElementById( 'container' );
 
-				camera = new THREE.PerspectiveCamera( 45, ( container.offsetWidth * 0.5 ) / container.offsetHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 1, 2000 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
@@ -71,29 +71,34 @@
 
 				//
 
-				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x444444 );
-				hemiLight.position.set( 0, 1000, 0 );
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x222222, 1.5 );
+				hemiLight.position.set( 1, 1, 1 );
 				scene.add( hemiLight );
-
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.8 );
-				dirLight.position.set( - 3000, 1000, - 1000 );
-				scene.add( dirLight );
 
 				//
 
 				group = new THREE.Group();
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 10, 2 );
-				var material = new THREE.MeshStandardMaterial( { color: 0xee0808, flatShading: true } );
+				var geometry = new THREE.SphereBufferGeometry( 10, 64, 40 );
+				var material = new THREE.MeshLambertMaterial( { color: 0xee0808 } );
+				var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
 
-				for ( var i = 0; i < 100; i ++ ) {
+				for ( var i = 0; i < 10; i ++ ) {
 
 					var mesh = new THREE.Mesh( geometry, material );
-					mesh.position.x = Math.random() * 500 - 250;
-					mesh.position.y = Math.random() * 500 - 250;
-					mesh.position.z = Math.random() * 500 - 250;
-					mesh.scale.setScalar( Math.random() * 2 + 1 );
+					mesh.position.x = Math.random() * 600 - 300;
+					mesh.position.y = Math.random() * 600 - 300;
+					mesh.position.z = Math.random() * 600 - 300;
+					mesh.rotation.x = Math.random();
+					mesh.rotation.z = Math.random();
+					mesh.scale.setScalar( Math.random() * 5 + 5 );
 					group.add( mesh );
+
+					var mesh2 = new THREE.Mesh( geometry, material2 );
+					mesh2.position.copy( mesh.position );
+					mesh2.rotation.copy( mesh.rotation );
+					mesh2.scale.copy( mesh.scale );
+					group.add( mesh2 );
 
 				}
 
@@ -102,12 +107,11 @@
 				//
 
 				var canvas = document.createElement( 'canvas' );
-				canvas.style.imageRendering = 'pixelated'; // disable browser interpolation
-
 				var context = canvas.getContext( 'webgl2', { alpha: false, antialias: false } );
 
 				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 				renderer.autoClear = false;
+				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
 				container.appendChild( renderer.domElement );
 
@@ -126,13 +130,13 @@
 
 				//
 
-				composer1 = new EffectComposer( renderer, renderTarget );
+				composer1 = new EffectComposer( renderer );
 				composer1.addPass( renderPass );
 				composer1.addPass( copyPass );
 
 				//
 
-				composer2 = new EffectComposer( renderer );
+				composer2 = new EffectComposer( renderer, renderTarget );
 				composer2.addPass( renderPass );
 				composer2.addPass( copyPass );
 
@@ -144,7 +148,7 @@
 
 			function onWindowResize() {
 
-				camera.aspect = ( container.offsetWidth * 0.5 ) / container.offsetHeight;
+				camera.aspect = container.offsetWidth / container.offsetHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( container.offsetWidth, container.offsetHeight );
@@ -161,13 +165,15 @@
 
 				group.rotation.y += clock.getDelta() * 0.1;
 
-				renderer.setViewport( 0, 0, halfWidth, container.offsetHeight );
+				renderer.setScissorTest( true );
 
+				renderer.setScissor( 0, 0, halfWidth - 1, container.offsetHeight );
 				composer1.render();
 
-				renderer.setViewport( halfWidth, 0, halfWidth, container.offsetHeight );
-
+				renderer.setScissor( halfWidth, 0, halfWidth, container.offsetHeight );
 				composer2.render();
+
+				renderer.setScissorTest( false );
 
 			}
 

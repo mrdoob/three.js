@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -18,24 +18,24 @@
 			由起点、终点和两个控制点所定义。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
-<code>
-var curve = new THREE.CubicBezierCurve(
-	new THREE.Vector2( -10, 0 ),
-	new THREE.Vector2( -5, 15 ),
-	new THREE.Vector2( 20, 15 ),
-	new THREE.Vector2( 10, 0 )
-);
+		<code>
+		var curve = new THREE.CubicBezierCurve(
+			new THREE.Vector2( -10, 0 ),
+			new THREE.Vector2( -5, 15 ),
+			new THREE.Vector2( 20, 15 ),
+			new THREE.Vector2( 10, 0 )
+		);
 
-var points = curve.getPoints( 50 );
-var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		var points = curve.getPoints( 50 );
+		var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-// Create the final object to add to the scene
-var curveObject = new THREE.Line( geometry, material );
-</code>
+		// Create the final object to add to the scene
+		var curveObject = new THREE.Line( geometry, material );
+		</code>
 
 		<h2>构造函数</h2>
 
@@ -50,14 +50,6 @@ var curveObject = new THREE.Line( geometry, material );
 
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Curve]。</p>
-
-		<h3>[property:Boolean isCubicBezierCurve]</h3>
-		<p>
-			
-			用于检查该类或者其派生类是否为CubicBezierCurves。默认值为*true*。<br /><br />
-
-			你不应当对这一属性进行改变，它在内部使用，以用于优化。
-		</p>
 
 		<h3>[property:Vector2 v0]</h3>
 		<p>起点</p>

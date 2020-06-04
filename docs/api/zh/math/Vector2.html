@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -34,8 +34,7 @@
 			其他的一些事物也可以使用二维向量进行表示，比如说动量矢量、复数等等；但以上这些是它在three.js中的常用用途。
 		</p>
 
-		<h2>示例</h2>
-
+		<h2>代码示例</h2>
 
 		<code>
 		var a = new THREE.Vector2( 0, 1 );
@@ -59,13 +58,6 @@
 
 
 		<h2>属性</h2>
-
-		<h3>[property:Boolean isVector2]</h3>
-		<p>
-			用于测试这个类或者派生类是否为Vector2，默认为*true*。<br /><br />
-
-			你不应当对这个属性进行改变,因为它在内部使用，以用于优化。
-		</p>
 
 		<h3>[property:Float height]</h3>
 		<p>[page:.y y]的别名。</p>
@@ -178,7 +170,7 @@
 
 		<h3>[method:Float cross]( [param:Vector2 v] )</h3>
 		<p>
-			计算该vector和所传入[page:Vector2 v]的叉积（[link:https://en.wikipedia.org/wiki/Cross_product cross product]）。 
+			计算该vector和所传入[page:Vector2 v]的叉积（[link:https://en.wikipedia.org/wiki/Cross_product cross product]）。
 			请注意，“叉积”在2D中并没有被明确定义。该函数计算的是2D图形中经常使用的几何叉积。
 		</p>
 
@@ -203,7 +195,7 @@
 		[page:BufferAttribute attribute] - 来源的attribute。<br />
 		[page:Integer index] - 在attribute中的索引。<br /><br />
 
-		从[page:BufferAttribute attribute]中设置向量的[page:.x x]值和[page:.y y]值。 
+		从[page:BufferAttribute attribute]中设置向量的[page:.x x]值和[page:.y y]值。
 、		</p>
 
 		<h3>[method:Float getComponent]( [param:Integer index] )</h3>
@@ -287,7 +279,7 @@
 		</p>
 
 		<h3>[method:this round]()</h3>
-		<p>			
+		<p>
 			向量中的[page:.x x]分量和[page:.y y]分量四舍五入取整为最接近的整数值。
 		</p>
 
@@ -339,6 +331,11 @@
 		[page:Integer offset] - （可选） 数组中元素的偏移量。<br /><br />
 
 		返回一个数组[x, y]，或者将x和y复制到所传入的[page:Array array]中。
+		</p>
+
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
 		</p>
 
 		<h2>源代码</h2>

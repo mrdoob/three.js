@@ -36,15 +36,15 @@
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
-var a = new THREE.Vector4( 0, 1, 0, 0 );
+		var a = new THREE.Vector4( 0, 1, 0, 0 );
 
-//no arguments; will be initialised to (0, 0, 0, 1)
-var b = new THREE.Vector4( );
+		//no arguments; will be initialised to (0, 0, 0, 1)
+		var b = new THREE.Vector4( );
 
-var d = a.dot( b );
+		var d = a.dot( b );
 		</code>
 
 
@@ -52,23 +52,16 @@ var d = a.dot( b );
 
 		<h3>[name]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
 		<p>
-		[page:Float x] - the x value of the vector. Default is *0*.<br />
-		[page:Float y] -  the y value of the vector. Default is *0*.<br />
-		[page:Float z] - the z value of the vector. Default is *0*.<br />
-		[page:Float w] - the w value of the vector. Default is *1*.<br /><br />
+		[page:Float x] - the x value of this vector. Default is *0*.<br />
+		[page:Float y] -  the y value of this vector. Default is *0*.<br />
+		[page:Float z] - the z value of this vector. Default is *0*.<br />
+		[page:Float w] - the w value of this vector. Default is *1*.<br /><br />
 
 		Creates a new [name].
 		</p>
 
 
 		<h2>Properties</h2>
-
-		<h3>[property:Boolean isVector4]</h3>
-		<p>
-			Used to check whether this or derived classes are Vector4s. Default is *true*.<br /><br />
-
-			You should not change this, as it is used internally for optimisation.
-		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -106,7 +99,7 @@ var d = a.dot( b );
 
 		<h3>[method:this ceil]()</h3>
 		<p>
-		The [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components of the vector are rounded up to the nearest integer value.
+		The [page:.x x], [page:.y y], [page:.z z] and [page:.w w] components of this vector are rounded up to the nearest integer value.
 		</p>
 
 		<h3>[method:this clamp]( [param:Vector4 min], [param:Vector4 max] )</h3>
@@ -163,7 +156,7 @@ var d = a.dot( b );
 		<p>Checks for strict equality of this vector and [page:Vector4 v].</p>
 
 		<h3>[method:this floor]()</h3>
-		<p>The components of the vector are rounded down to the nearest integer value.</p>
+		<p>The components of this vector are rounded down to the nearest integer value.</p>
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
@@ -233,7 +226,7 @@ var d = a.dot( b );
 
 		<h3>[method:this normalize]()</h3>
 		<p>
-		Converts this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
+		Converts this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to a vector with the same direction
 		as this one, but [page:.length length] 1.
 		</p>
 
@@ -253,11 +246,11 @@ var d = a.dot( b );
 		<p>Multiplies this vector by scalar [page:Float s].</p>
 
 		<h3>[method:this round]()</h3>
-		<p>The components of the vector are rounded to the nearest integer value.</p>
+		<p>The components of this vector are rounded to the nearest integer value.</p>
 
 		<h3>[method:this roundToZero]()</h3>
 		<p>
-		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
+		The components of this vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</p>
 
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z], [param:Float w] )</h3>
@@ -292,7 +285,7 @@ var d = a.dot( b );
 
 		<h3>[method:this setLength]( [param:Float l] )</h3>
 		<p>
-		Sets this vector to the vector with the same direction as this one, but [page:.length length]
+		Sets this vector to a vector with the same direction as this one, but [page:.length length]
 		[page:Float l].
 		</p>
 
@@ -324,10 +317,15 @@ var d = a.dot( b );
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - (optional) array to store the vector to. If this is not provided, a new array will be created.<br />
+		[page:Array array] - (optional) array to store this vector to. If this is not provided, a new array will be created.<br />
 		[page:Integer offset] - (optional) optional offset into the array.<br /><br />
 
 		Returns an array [x, y, z, w], or copies x, y, z and w into the provided [page:Array array].
+		</p>
+
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
 		</p>
 
 		<h2>Source</h2>

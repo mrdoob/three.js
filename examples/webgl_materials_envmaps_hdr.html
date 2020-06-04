@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - High dynamic range (RGBE) Image-based Lighting (IBL)<br />using run-time generated pre-filtered roughness mipmaps (PMREM)<br/>
 			Created by Prashant Sharma and <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.
 		</div>
 
@@ -23,8 +23,6 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
 
 			var params = {
 				envMap: 'HDR',
@@ -37,11 +35,49 @@
 			var container, stats;
 			var camera, scene, renderer, controls;
 			var torusMesh, planeMesh;
-			var ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
+			var generatedCubeRenderTarget, ldrCubeRenderTarget, hdrCubeRenderTarget, rgbmCubeRenderTarget;
 			var ldrCubeMap, hdrCubeMap, rgbmCubeMap;
 
 			init();
 			animate();
+
+			function getEnvScene() {
+
+				var envScene = new THREE.Scene();
+
+				var geometry = new THREE.BoxBufferGeometry();
+				geometry.deleteAttribute( 'uv' );
+				var roomMaterial = new THREE.MeshStandardMaterial( { metalness: 0, side: THREE.BackSide } );
+				var room = new THREE.Mesh( geometry, roomMaterial );
+				room.scale.setScalar( 10 );
+				envScene.add( room );
+
+				var mainLight = new THREE.PointLight( 0xffffff, 50, 0, 2 );
+				envScene.add( mainLight );
+
+				var lightMaterial = new THREE.MeshLambertMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 10 } );
+
+				var light1 = new THREE.Mesh( geometry, lightMaterial );
+				light1.material.color.setHex( 0xff0000 );
+				light1.position.set( - 5, 2, 0 );
+				light1.scale.set( 0.1, 1, 1 );
+				envScene.add( light1 );
+
+				var light2 = new THREE.Mesh( geometry, lightMaterial.clone() );
+				light2.material.color.setHex( 0x00ff00 );
+				light2.position.set( 0, 5, 0 );
+				light2.scale.set( 1, 0.1, 1 );
+				envScene.add( light2 );
+
+				var light3 = new THREE.Mesh( geometry, lightMaterial.clone() );
+				light3.material.color.setHex( 0x0000ff );
+				light3.position.set( 2, 1, 5 );
+				light3.scale.set( 1.5, 2, 0.1 );
+				envScene.add( light3 );
+
+				return envScene;
+
+			}
 
 			function init() {
 
@@ -55,11 +91,13 @@
 				scene.background = new THREE.Color( 0x000000 );
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.physicallyCorrectLights = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 				//
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				//var geometry = new THREE.SphereBufferGeometry( 26, 64, 32 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 					metalness: params.metalness,
@@ -78,26 +116,22 @@
 				planeMesh.rotation.x = - Math.PI * 0.5;
 				scene.add( planeMesh );
 
-				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
+				THREE.DefaultLoadingManager.onLoad = function ( ) {
 
+					pmremGenerator.dispose();
+
+				};
+
+				var hdrUrls = [ 'px.hdr', 'nx.hdr', 'py.hdr', 'ny.hdr', 'pz.hdr', 'nz.hdr' ];
 				hdrCubeMap = new HDRCubeTextureLoader()
 					.setPath( './textures/cube/pisaHDR/' )
 					.setDataType( THREE.UnsignedByteType )
 					.load( hdrUrls, function () {
 
-						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						hdrCubeRenderTarget = pmremGenerator.fromCubemap( hdrCubeMap );
 
 						hdrCubeMap.magFilter = THREE.LinearFilter;
 						hdrCubeMap.needsUpdate = true;
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
 
 					} );
 
@@ -108,16 +142,7 @@
 
 						ldrCubeMap.encoding = THREE.sRGBEncoding;
 
-						var pmremGenerator = new PMREMGenerator( ldrCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						ldrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+						ldrCubeRenderTarget = pmremGenerator.fromCubemap( ldrCubeMap );
 
 					} );
 
@@ -130,28 +155,25 @@
 						rgbmCubeMap.encoding = THREE.RGBM16Encoding;
 						rgbmCubeMap.format = THREE.RGBAFormat;
 
-						var pmremGenerator = new PMREMGenerator( rgbmCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						rgbmCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						rgbmCubeRenderTarget = pmremGenerator.fromCubemap( rgbmCubeMap );
 
 						rgbmCubeMap.magFilter = THREE.LinearFilter;
 						rgbmCubeMap.needsUpdate = true;
 
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
-
 					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileCubemapShader();
+
+				var envScene = getEnvScene();
+				generatedCubeRenderTarget = pmremGenerator.fromScene( envScene, 0.04 );
 
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
 				//renderer.toneMapping = ReinhardToneMapping;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -164,7 +186,7 @@
 
 				var gui = new GUI();
 
-				gui.add( params, 'envMap', [ 'LDR', 'HDR', 'RGBM16' ] );
+				gui.add( params, 'envMap', [ 'Generated', 'LDR', 'HDR', 'RGBM16' ] );
 				gui.add( params, 'roughness', 0, 1, 0.01 );
 				gui.add( params, 'metalness', 0, 1, 0.01 );
 				gui.add( params, 'exposure', 0, 2, 0.01 );
@@ -204,6 +226,10 @@
 
 				switch ( params.envMap ) {
 
+					case 'Generated':
+						renderTarget = generatedCubeRenderTarget;
+						cubeMap = generatedCubeRenderTarget.texture;
+						break;
 					case 'LDR':
 						renderTarget = ldrCubeRenderTarget;
 						cubeMap = ldrCubeMap;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -143,13 +143,10 @@
 		<h3>[property:Float gammaFactor]</h3>
 		<p>默认是 *2*. </p>
 
-
-		<h3>[property:Boolean gammaInput]</h3>
-		<p>如果设置，那么所有的纹理和颜色都会预乘gamma。 默认值是*false*.</p>
-
-
-		<h3>[property:Boolean gammaOutput]</h3>
-		<p>如果设置, 那么它期望所有纹理和颜色需要乘以gamma输出。 默认值*false*.</p>
+		<h3>[property:number outputEncoding]</h3>
+		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<p>If a render target has been set using [page:WebGLRenderer.setRenderTarget .setRenderTarget] then renderTarget.texture.encoding will be used instead.</p>
+		<p>See the [page:Textures texture constants] page for details of other formats.</p>
 
 		<h3>[property:Object info]</h3>
 		<p>一个对象，包含有关图形板内存和渲染过程的一系列统计信息。这些信息可用于调试或仅仅满足下好奇心。改对象包含以下字段:</p>
@@ -218,7 +215,7 @@
 		</p>
 
 		<h3>[property:Boolean shadowMap.enabled]</h3>
-		<p>如果设置, 请在场景中使用阴影贴图。 默认是 *false*</p>
+		<p>如果设置开启，允许在场景中使用阴影贴图。默认是 *false*。</p>
 
 		<h3>[property:Boolean shadowMap.autoUpdate]</h3>
 		<p>启用场景中的阴影自动更新。默认是*true*</p>
@@ -247,7 +244,7 @@
 
 		<h3>[property:Constant toneMapping]</h3>
 		<p>
-		默认是[page:Renderer LinearToneMapping]。查看[page:Renderer Renderer constants]以获取其它备选项
+		默认是[page:Renderer NoToneMapping]。查看[page:Renderer Renderer constants]以获取其它备选项
 		</p>
 
 		<h3>[property:Number toneMappingExposure]</h3>
@@ -258,6 +255,11 @@
 		<h3>[property:Number toneMappingWhitePoint]</h3>
 		<p>
 		色调映射的白点。默认是*1*
+		</p>
+
+		<h3>[property:WebXRManager xr]</h3>
+		<p>
+		Provides access to the WebXR related [page:WebXRManager interface] of the renderer.
 		</p>
 
 		<h2>方法</h2>
@@ -362,7 +364,7 @@
 		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
 		<p>将enderTarget中的像素数据读取到传入的缓冲区中。这是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]()的包装器<br />
 		示例：[example:webgl_interactive_cubes_gpu interactive / cubes / gpu]</p>
-		<p>For reading out a [page:WebGLRenderTargetCube WebGLRenderTargetCube] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
+		<p>For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
 		<h3>[method:null render]( [param:Scene scene], [param:Camera camera], [param:WebGLRenderTarget renderTarget], [param:Boolean forceClear] )</h3>
 		<p>
@@ -378,17 +380,16 @@
 		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>使用相机和指定材质渲染缓冲几何组。</p>
 
-		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:shaderprogram program], [param:Material shading] )</h3>
+		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
 		<p>object - 一个[page:Object3D]实例<br />
-		program - 一个shaderProgram实例<br />
-		shading - 一个Material实例<br /><br />
+		program - 一个[page:WebGLProgram]实例<br />
 
-		渲染即使缓冲，由enderImmediateObject对象调用
+		渲染即使缓冲，由renderObjectImmediate对象调用
 		</p>
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — 每个可用帧都会调用的函数。 如果传入‘null’,所有正在进行的动画都会停止。</p>
-		<p>可用来代替[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]的内置函数. 对于WebVR项目，必须使用此函数。</p>
+		<p>可用来代替[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]的内置函数. 对于WebXR项目，必须使用此函数。</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>设置alpha。合法参数是一个*0.0*到 *1.0*之间的浮点数</p>
@@ -396,13 +397,16 @@
 		<h3>[method:null setClearColor]( [param:Color color], [param:Float alpha] )</h3>
 		<p>设置颜色及其透明度</p>
 
+		<h3>[method:null setFramebuffer]( [param:WebGLFramebuffer value] )</h3>
+		<p>Sets the given WebGLFramebuffer. This method can only be used if no render target is set via [page:WebGLRenderer.setRenderTarget .setRenderTarget]().</p>
+
 		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
 		<p>设置设备像素比。通常用于避免HiDPI设备上绘图模糊</p>
 
 		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
 		<p>
 		renderTarget -- 需要被激活的[page:WebGLRenderTarget renderTarget](可选)。若此参数为空，则将canvas设置成活跃render target。<br />
-		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLRenderTargetCube] (optional).<br />
+		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLCubeRenderTarget] (optional).<br />
 		activeMipmapLevel -- Specifies the active mipmap level (optional).<br /><br />
 		该方法设置活跃rendertarget。
 		</p>

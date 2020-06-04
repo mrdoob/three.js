@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - uint</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - uint</div>
 
 		<script type="module">
 
@@ -146,7 +146,7 @@
 
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xaaaaaa, specular: 0xffffff, shininess: 250,
-					side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+					side: THREE.DoubleSide, vertexColors: true
 				} );
 
 				mesh = new THREE.Mesh( geometry, material );
@@ -157,9 +157,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 

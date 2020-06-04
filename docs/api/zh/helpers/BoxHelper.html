@@ -20,21 +20,22 @@
 			所以当目标对象是精灵 [page:Sprite Sprites] 时将不能正常运行.
 		</p>
 
+		<h2>代码示例</h2>
+
+		<code>
+		var sphere = new THREE.SphereBufferGeometry();
+		var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
+		var box = new THREE.BoxHelper( object, 0xffff00 );
+		scene.add( box );
+		</code>
 
 		<h2>例子</h2>
 
-		<div>[example:webgl_helpers WebGL / helpers]</div>
-		<div>[example:webgl_loader_nrrd WebGL / loader / nrrd]</div>
-		<div>[example:webgl_buffergeometry_drawcalls advanced / buffergeometry / drawcalls]</div>
-
-
-		<code>
-			var sphere = new THREE.SphereGeometry();
-			var object = new THREE.Mesh( sphere, new THREE.MeshBasicMaterial( 0xff0000 ) );
-			var box = new THREE.BoxHelper( object, 0xffff00 );
-			scene.add( box );
-		</code>
-
+		<p>
+			[example:webgl_helpers WebGL / helpers]<br/>
+			[example:webgl_loader_nrrd WebGL / loader / nrrd]<br/>
+			[example:webgl_buffergeometry_drawrange WebGL / buffergeometry / drawrange]
+		</p>
 
 		<h2>构造函数</h2>
 

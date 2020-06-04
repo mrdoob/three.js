@@ -163,8 +163,8 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.init = function () {
 
-		if ( ! renderer.extensions.get( "OES_texture_float" ) &&
-			 ! renderer.capabilities.isWebGL2 ) {
+		if ( ! renderer.capabilities.isWebGL2 &&
+			 ! renderer.extensions.get( "OES_texture_float" ) ) {
 
 			return "No OES_texture_float support for float textures.";
 
@@ -189,6 +189,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 			// Adds dependencies uniforms to the ShaderMaterial
 			var material = variable.material;
 			var uniforms = material.uniforms;
+
 			if ( variable.dependencies !== null ) {
 
 				for ( var d = 0; d < variable.dependencies.length; d ++ ) {
@@ -283,6 +284,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
 
 	}
+
 	this.addResolutionDefine = addResolutionDefine;
 
 
@@ -334,11 +336,8 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.createTexture = function () {
 
-		var a = new Float32Array( sizeX * sizeY * 4 );
-		var texture = new DataTexture( a, sizeX, sizeY, RGBAFormat, FloatType );
-		texture.needsUpdate = true;
-
-		return texture;
+		var data = new Float32Array( sizeX * sizeY * 4 );
+		return new DataTexture( data, sizeX, sizeY, RGBAFormat, FloatType );
 
 	};
 

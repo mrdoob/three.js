@@ -32,21 +32,10 @@ export default /* glsl */`
 		vec3 T = normalize( ( - q0 * st1.s + q1 * st0.s ) * scale );
 		vec3 N = normalize( surf_norm );
 
-		#ifdef DOUBLE_SIDED
-
-			// Workaround for Adreno GPUs gl_FrontFacing bug. See #15850 and #10331
-
-			bool frontFacing = dot( cross( S, T ), N ) > 0.0;
-
-			mapN.xy *= ( float( frontFacing ) * 2.0 - 1.0 );
-
-		#else
-
-			mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
-
-		#endif
-
 		mat3 tsn = mat3( S, T, N );
+
+		mapN.xy *= ( float( gl_FrontFacing ) * 2.0 - 1.0 );
+
 		return normalize( tsn * mapN );
 
 	}

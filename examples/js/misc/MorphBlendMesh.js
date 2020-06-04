@@ -1,3 +1,4 @@
+console.warn( "THREE.MorphBlendMesh: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -282,7 +283,7 @@ THREE.MorphBlendMesh.prototype = Object.assign( Object.create( THREE.Mesh.protot
 
 			}
 
-			var keyframe = animation.start + THREE.Math.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
+			var keyframe = animation.start + THREE.MathUtils.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
 			var weight = animation.weight;
 
 			if ( keyframe !== animation.currentFrame ) {

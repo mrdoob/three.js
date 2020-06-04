@@ -17,8 +17,7 @@
 		  Also serves as a base for other classes such as [page:SkinnedMesh].
 		</p>
 
-
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		var geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
@@ -26,7 +25,6 @@
 		var mesh = new THREE.Mesh( geometry, material );
 		scene.add( mesh );
 		</code>
-
 
 		<h2>Constructor</h2>
 
@@ -41,25 +39,6 @@
 		<h2>Properties</h2>
 		<p>See the base [page:Object3D] class for common properties.</p>
 
-		<h3>[property:Integer drawMode]</h3>
-		<p>
-			Determines how the mesh triangles are constructed from the vertices.
-			See the draw mode [page:DrawModes constants] for all possible values.
-			Default is [page:DrawModes TrianglesDrawMode].
-		</p>
-		<p>
-			A sensible usage of this property is only possible when [page:Mesh.geometry] is of type [page:BufferGeometry BufferGeometry]
-			since the engine always assumes *THREE.TrianglesDrawMode* for [page:Geometry Geometry].
-		</p>
-
-
-		<h3>[property:Boolean isMesh]</h3>
-		<p>
-			Used to check whether this or derived classes are meshes. Default is *true*.<br /><br />
-
-			You should not change this, as it is used internally for optimisation.
-		</p>
-
 		<h3>[property:Geometry geometry]</h3>
 		<p>
 			An instance of [page:Geometry] or [page:BufferGeometry] (or derived classes),
@@ -71,7 +50,7 @@
 		<h3>[property:Material material]</h3>
 		<p>
 			An instance of material derived from the [page:Material] base class or an array of materials, defining the
-			object's appearance. Default is a [page:MeshBasicMaterial] with a random color.
+			object's appearance. Default is a [page:MeshBasicMaterial].
 		</p>
 
 		<h3>[property:Array morphTargetInfluences]</h3>
@@ -89,9 +68,6 @@
 
 		<h2>Methods</h2>
 		<p>See the base [page:Object3D] class for common methods.</p>
-
-		<h3>[method:null setDrawMode]( [param:Integer value] )</h3>
-		<p>Set the value of [page:.drawMode drawMode].</p>
 
 		<h3>[method:Mesh clone]()</h3>
 		<p>Returns a clone of this [name] object and its descendants.</p>

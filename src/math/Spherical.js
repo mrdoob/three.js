@@ -1,4 +1,4 @@
-import { _Math } from './Math.js';
+import { MathUtils } from './MathUtils.js';
 
 /**
  * @author bhouston / http://clara.io
@@ -51,7 +51,7 @@ Object.assign( Spherical.prototype, {
 	// restrict phi to be betwee EPS and PI-EPS
 	makeSafe: function () {
 
-		var EPS = 0.000001;
+		const EPS = 0.000001;
 		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
 
 		return this;
@@ -76,7 +76,7 @@ Object.assign( Spherical.prototype, {
 		} else {
 
 			this.theta = Math.atan2( x, z );
-			this.phi = Math.acos( _Math.clamp( y / this.radius, - 1, 1 ) );
+			this.phi = Math.acos( MathUtils.clamp( y / this.radius, - 1, 1 ) );
 
 		}
 

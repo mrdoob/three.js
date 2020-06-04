@@ -37,6 +37,7 @@ var TransformControls = function ( camera, domElement ) {
 	Object3D.call( this );
 
 	this.visible = false;
+	this.domElement = domElement;
 
 	var _gizmo = new TransformControlsGizmo();
 	this.add( _gizmo );
@@ -57,6 +58,7 @@ var TransformControls = function ( camera, domElement ) {
 	defineProperty( "mode", "translate" );
 	defineProperty( "translationSnap", null );
 	defineProperty( "rotationSnap", null );
+	defineProperty( "scaleSnap", null );
 	defineProperty( "space", "world" );
 	defineProperty( "size", 1 );
 	defineProperty( "dragging", false );
@@ -71,7 +73,25 @@ var TransformControls = function ( camera, domElement ) {
 
 	// Reusable utility variables
 
-	var ray = new Raycaster();
+	var raycaster = new Raycaster();
+
+	function intersectObjectWithRay( object, raycaster, includeInvisible ) {
+
+		var allIntersections = raycaster.intersectObject( object, true );
+
+		for ( var i = 0; i < allIntersections.length; i ++ ) {
+
+			if ( allIntersections[ i ].object.visible || includeInvisible ) {
+
+				return allIntersections[ i ];
+
+			}
+
+		}
+
+		return false;
+
+	}
 
 	var _tempVector = new Vector3();
 	var _tempVector2 = new Vector3();
@@ -227,7 +247,17 @@ var TransformControls = function ( camera, domElement ) {
 		if ( this.object !== undefined ) {
 
 			this.object.updateMatrixWorld();
-			this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			if ( this.object.parent === null ) {
+
+				console.error( 'TransformControls: The attached 3D object must be a part of the scene graph.' );
+
+			} else {
+
+				this.object.parent.matrixWorld.decompose( parentPosition, parentQuaternion, parentScale );
+
+			}
+
 			this.object.matrixWorld.decompose( worldPosition, worldQuaternion, worldScale );
 
 			parentQuaternionInv.copy( parentQuaternion ).inverse();
@@ -248,9 +278,9 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( this.object === undefined || this.dragging === true || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
 
-		ray.setFromCamera( pointer, this.camera );
+		raycaster.setFromCamera( pointer, this.camera );
 
-		var intersect = ray.intersectObjects( _gizmo.picker[ this.mode ].children, true )[ 0 ] || false;
+		var intersect = intersectObjectWithRay( _gizmo.picker[ this.mode ], raycaster );
 
 		if ( intersect ) {
 
@@ -270,9 +300,9 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( ( pointer.button === 0 || pointer.button === undefined ) && this.axis !== null ) {
 
-			ray.setFromCamera( pointer, this.camera );
+			raycaster.setFromCamera( pointer, this.camera );
 
-			var planeIntersect = ray.intersectObjects( [ _plane ], true )[ 0 ] || false;
+			var planeIntersect = intersectObjectWithRay( _plane, raycaster, true );
 
 			if ( planeIntersect ) {
 
@@ -338,11 +368,11 @@ var TransformControls = function ( camera, domElement ) {
 
 		if ( object === undefined || axis === null || this.dragging === false || ( pointer.button !== undefined && pointer.button !== 0 ) ) return;
 
-		ray.setFromCamera( pointer, this.camera );
+		raycaster.setFromCamera( pointer, this.camera );
 
-		var planeIntersect = ray.intersectObjects( [ _plane ], true )[ 0 ] || false;
+		var planeIntersect = intersectObjectWithRay( _plane, raycaster, true );
 
-		if ( planeIntersect === false ) return;
+		if ( ! planeIntersect ) return;
 
 		pointEnd.copy( planeIntersect.point ).sub( worldPositionStart );
 
@@ -465,11 +495,13 @@ var TransformControls = function ( camera, domElement ) {
 					_tempVector2.x = 1;
 
 				}
+
 				if ( axis.search( 'Y' ) === - 1 ) {
 
 					_tempVector2.y = 1;
 
 				}
+
 				if ( axis.search( 'Z' ) === - 1 ) {
 
 					_tempVector2.z = 1;
@@ -481,6 +513,28 @@ var TransformControls = function ( camera, domElement ) {
 			// Apply scale
 
 			object.scale.copy( scaleStart ).multiply( _tempVector2 );
+
+			if ( this.scaleSnap ) {
+
+				if ( axis.search( 'X' ) !== - 1 ) {
+
+					object.scale.x = Math.round( object.scale.x / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Y' ) !== - 1 ) {
+
+					object.scale.y = Math.round( object.scale.y / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+				if ( axis.search( 'Z' ) !== - 1 ) {
+
+					object.scale.z = Math.round( object.scale.z / this.scaleSnap ) * this.scaleSnap || this.scaleSnap;
+
+				}
+
+			}
 
 		} else if ( mode === 'rotate' ) {
 
@@ -653,6 +707,12 @@ var TransformControls = function ( camera, domElement ) {
 	this.setRotationSnap = function ( rotationSnap ) {
 
 		scope.rotationSnap = rotationSnap;
+
+	};
+
+	this.setScaleSnap = function ( scaleSnap ) {
+
+		scope.scaleSnap = scaleSnap;
 
 	};
 
@@ -1043,11 +1103,13 @@ var TransformControlsGizmo = function () {
 					object.position.set( position[ 0 ], position[ 1 ], position[ 2 ] );
 
 				}
+
 				if ( rotation ) {
 
 					object.rotation.set( rotation[ 0 ], rotation[ 1 ], rotation[ 2 ] );
 
 				}
+
 				if ( scale ) {
 
 					object.scale.set( scale[ 0 ], scale[ 1 ], scale[ 2 ] );
@@ -1057,7 +1119,7 @@ var TransformControlsGizmo = function () {
 				object.updateMatrix();
 
 				var tempGeometry = object.geometry.clone();
-				tempGeometry.applyMatrix( object.matrix );
+				tempGeometry.applyMatrix4( object.matrix );
 				object.geometry = tempGeometry;
 				object.renderOrder = Infinity;
 
@@ -1148,8 +1210,19 @@ var TransformControlsGizmo = function () {
 			handle.rotation.set( 0, 0, 0 );
 			handle.position.copy( this.worldPosition );
 
-			var eyeDistance = this.worldPosition.distanceTo( this.cameraPosition );
-			handle.scale.set( 1, 1, 1 ).multiplyScalar( eyeDistance * this.size / 7 );
+			var factor;
+
+			if ( this.camera.isOrthographicCamera ) {
+
+				factor = ( this.camera.top - this.camera.bottom ) / this.camera.zoom;
+
+			} else {
+
+				factor = this.worldPosition.distanceTo( this.cameraPosition ) * Math.min( 1.9 * Math.tan( Math.PI * this.camera.fov / 360 ) / this.camera.zoom, 7 );
+
+			}
+
+			handle.scale.set( 1, 1, 1 ).multiplyScalar( factor * this.size / 7 );
 
 			// TODO: simplify helpers and consider decoupling from gizmo
 
@@ -1287,6 +1360,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'Y' || handle.name === 'XYZY' ) {
 
 					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
@@ -1297,6 +1371,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'Z' || handle.name === 'XYZZ' ) {
 
 					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) > AXIS_HIDE_TRESHOLD ) {
@@ -1307,6 +1382,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'XY' ) {
 
 					if ( Math.abs( alignVector.copy( unitZ ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
@@ -1317,6 +1393,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'YZ' ) {
 
 					if ( Math.abs( alignVector.copy( unitX ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
@@ -1327,6 +1404,7 @@ var TransformControlsGizmo = function () {
 					}
 
 				}
+
 				if ( handle.name === 'XZ' ) {
 
 					if ( Math.abs( alignVector.copy( unitY ).applyQuaternion( quaternion ).dot( this.eye ) ) < PLANE_HIDE_TRESHOLD ) {
@@ -1577,6 +1655,7 @@ var TransformControlsPlane = function () {
 						break;
 
 				}
+
 				break;
 			case 'rotate':
 			default:

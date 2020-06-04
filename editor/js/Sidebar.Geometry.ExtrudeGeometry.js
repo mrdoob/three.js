@@ -2,11 +2,17 @@
  * @author Temdog007 / http://github.com/Temdog007
  */
 
-Sidebar.Geometry.ExtrudeGeometry = function ( editor, object ) {
+import * as THREE from '../../build/three.module.js';
+
+import { UIRow, UIText, UIInteger, UICheckbox, UIButton, UINumber } from './libs/ui.js';
+
+import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
+
+var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new UI.Row();
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
@@ -22,40 +28,40 @@ Sidebar.Geometry.ExtrudeGeometry = function ( editor, object ) {
 
 	// curveSegments
 
-	var curveSegmentsRow = new UI.Row();
-	var curveSegments = new UI.Integer( options.curveSegments ).onChange( update ).setRange( 1, Infinity );
+	var curveSegmentsRow = new UIRow();
+	var curveSegments = new UIInteger( options.curveSegments ).onChange( update ).setRange( 1, Infinity );
 
-	curveSegmentsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/extrude_geometry/curveSegments' ) ).setWidth( '90px' ) );
+	curveSegmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/curveSegments' ) ).setWidth( '90px' ) );
 	curveSegmentsRow.add( curveSegments );
 
 	container.add( curveSegmentsRow );
 
 	// steps
 
-	var stepsRow = new UI.Row();
-	var steps = new UI.Integer( options.steps ).onChange( update ).setRange( 1, Infinity );
+	var stepsRow = new UIRow();
+	var steps = new UIInteger( options.steps ).onChange( update ).setRange( 1, Infinity );
 
-	stepsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/extrude_geometry/steps' ) ).setWidth( '90px' ) );
+	stepsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/steps' ) ).setWidth( '90px' ) );
 	stepsRow.add( steps );
 
 	container.add( stepsRow );
 
 	// depth
 
-	var depthRow = new UI.Row();
-	var depth = new UI.Number( options.depth ).onChange( update ).setRange( 1, Infinity );
+	var depthRow = new UIRow();
+	var depth = new UINumber( options.depth ).onChange( update ).setRange( 1, Infinity );
 
-	depthRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/extrude_geometry/depth' ) ).setWidth( '90px' ) );
+	depthRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/depth' ) ).setWidth( '90px' ) );
 	depthRow.add( depth );
 
 	container.add( depthRow );
 
 	// enabled
 
-	var enabledRow = new UI.Row();
-	var enabled = new UI.Checkbox( options.bevelEnabled ).onChange( update );
+	var enabledRow = new UIRow();
+	var enabled = new UICheckbox( options.bevelEnabled ).onChange( update );
 
-	enabledRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelEnabled' ) ).setWidth( '90px' ) );
+	enabledRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelEnabled' ) ).setWidth( '90px' ) );
 	enabledRow.add( enabled );
 
 	container.add( enabledRow );
@@ -64,54 +70,54 @@ Sidebar.Geometry.ExtrudeGeometry = function ( editor, object ) {
 
 		// thickness
 
-		var thicknessRow = new UI.Row();
-		var thickness = new UI.Number( options.bevelThickness ).onChange( update );
+		var thicknessRow = new UIRow();
+		var thickness = new UINumber( options.bevelThickness ).onChange( update );
 
-		thicknessRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelThickness' ) ).setWidth( '90px' ) );
+		thicknessRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelThickness' ) ).setWidth( '90px' ) );
 		thicknessRow.add( thickness );
 
 		container.add( thicknessRow );
 
 		// size
 
-		var sizeRow = new UI.Row();
-		var size = new UI.Number( options.bevelSize ).onChange( update );
+		var sizeRow = new UIRow();
+		var size = new UINumber( options.bevelSize ).onChange( update );
 
-		sizeRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSize' ) ).setWidth( '90px' ) );
+		sizeRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSize' ) ).setWidth( '90px' ) );
 		sizeRow.add( size );
 
 		container.add( sizeRow );
 
 		// offset
 
-		var offsetRow = new UI.Row();
-		var offset = new UI.Number( options.bevelOffset ).onChange( update );
+		var offsetRow = new UIRow();
+		var offset = new UINumber( options.bevelOffset ).onChange( update );
 
-		offsetRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelOffset' ) ).setWidth( '90px' ) );
+		offsetRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelOffset' ) ).setWidth( '90px' ) );
 		offsetRow.add( offset );
 
 		container.add( offsetRow );
 
 		// segments
 
-		var segmentsRow = new UI.Row();
-		var segments = new UI.Integer( options.bevelSegments ).onChange( update ).setRange( 0, Infinity );
+		var segmentsRow = new UIRow();
+		var segments = new UIInteger( options.bevelSegments ).onChange( update ).setRange( 0, Infinity );
 
-		segmentsRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSegments' ) ).setWidth( '90px' ) );
+		segmentsRow.add( new UIText( strings.getKey( 'sidebar/geometry/extrude_geometry/bevelSegments' ) ).setWidth( '90px' ) );
 		segmentsRow.add( segments );
 
 		container.add( segmentsRow );
 
 	}
 
-	var button = new UI.Button( strings.getKey( 'sidebar/geometry/extrude_geometry/shape' ) ).onClick( toShape ).setWidth( '90px' ).setMarginLeft( '90px' );
+	var button = new UIButton( strings.getKey( 'sidebar/geometry/extrude_geometry/shape' ) ).onClick( toShape ).setWidth( '90px' ).setMarginLeft( '90px' );
 	container.add( button );
 
 	//
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ](
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.ExtrudeBufferGeometry(
 			parameters.shapes,
 			{
 				curveSegments: curveSegments.getValue(),
@@ -140,4 +146,4 @@ Sidebar.Geometry.ExtrudeGeometry = function ( editor, object ) {
 
 };
 
-Sidebar.Geometry.ExtrudeBufferGeometry = Sidebar.Geometry.ExtrudeGeometry;
+export { SidebarGeometryExtrudeGeometry };

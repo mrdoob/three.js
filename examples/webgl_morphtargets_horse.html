@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - morph targets - horse<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - morph targets - horse<br/>
 			model by <a href="http://mirada.com/">mirada</a> from <a href="http://ro.me">rome</a>
 		</div>
 
@@ -80,8 +80,7 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				renderer.gammaOutput = true;
-				renderer.gammaFactor = 2.2;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 
@@ -125,8 +124,8 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 
 				camera.lookAt( camera.target );
 

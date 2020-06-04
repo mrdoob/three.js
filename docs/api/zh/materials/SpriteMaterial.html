@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -14,26 +14,28 @@
 
 		<p class="desc">一种使用[page:Sprite]的材质。</p>
 
-		<h2>例子(Examples)</h2>
-		<div>
+		<h2>代码示例</h2>
+
+		<code>
+		var spriteMap = new THREE.TextureLoader().load( 'textures/sprite.png' );
+
+		var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, color: 0xffffff } );
+
+		var sprite = new THREE.Sprite( spriteMaterial );
+		sprite.scale.set(200, 200, 1)
+
+		scene.add( sprite );
+		</code>
+
+		<h2>例子</h2>
+		<p>
 			[example:webgl_sprites WebGL / sprites]<br />
 			[example:software_sandbox software / sandbox]<br />
 			[example:svg_sandbox svg / sandbox]<br />
 			[example:webgl_materials_cubemap_dynamic webgl / materials / cubemap / dynamic]
-		</div>
+		</p>
 
-		<code>
-var spriteMap = new THREE.TextureLoader().load( 'textures/sprite.png' );
-
-var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, color: 0xffffff } );
-
-var sprite = new THREE.Sprite( spriteMaterial );
-sprite.scale.set(200, 200, 1)
-
-scene.add( sprite );
-
-		</code>
-
+		<h2>构造函数(Constructor)</h2>
 
 		<h3>[name]( [param:Object parameters] )</h3>
 		<p>

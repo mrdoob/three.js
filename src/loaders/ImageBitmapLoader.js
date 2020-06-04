@@ -46,9 +46,9 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		url = this.manager.resolveURL( url );
 
-		var scope = this;
+		const scope = this;
 
-		var cached = Cache.get( url );
+		const cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 

@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl postprocessing example<br/>
 			<a href="http://g3d.cs.williams.edu/g3d/data10/index.html#mesh19" target="_blank" rel="noopener">Lee Perry-Smith</a> head
 		</div>
 
@@ -36,6 +36,7 @@
 			import { VerticalBlurShader } from './jsm/shaders/VerticalBlurShader.js';
 			import { SepiaShader } from './jsm/shaders/SepiaShader.js';
 			import { VignetteShader } from './jsm/shaders/VignetteShader.js';
+			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
@@ -90,8 +91,11 @@
 
 				//
 
+				var diffuseMap = new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" );
+				diffuseMap.encoding = THREE.sRGBEncoding;
+
 				var materialColor = new THREE.MeshBasicMaterial( {
-					map: new THREE.TextureLoader().load( "textures/cube/SwedishRoyalCastle/pz.jpg" ),
+					map: diffuseMap,
 					depthTest: false
 				} );
 
@@ -118,11 +122,6 @@
 
 				//
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-
-				//
-
 				container.appendChild( renderer.domElement );
 
 				//
@@ -140,6 +139,7 @@
 				var effectBleach = new ShaderPass( shaderBleach );
 				var effectSepia = new ShaderPass( shaderSepia );
 				var effectVignette = new ShaderPass( shaderVignette );
+				var gammaCorrection = new ShaderPass( GammaCorrectionShader );
 				// var effectCopy = new ShaderPass( shaderCopy );
 
 				effectBleach.uniforms[ "opacity" ].value = 0.95;
@@ -207,9 +207,11 @@
 				composer1 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer1.addPass( renderScene );
+				composer1.addPass( gammaCorrection );
 				//composer1.addPass( renderMask );
 				composer1.addPass( effectFilmBW );
 				//composer1.addPass( clearMask );
+
 				composer1.addPass( effectVignette );
 
 				//
@@ -217,6 +219,7 @@
 				composer2 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer2.addPass( renderScene );
+				composer2.addPass( gammaCorrection );
 				composer2.addPass( effectDotScreen );
 				composer2.addPass( renderMask );
 				composer2.addPass( effectColorify1 );
@@ -231,6 +234,7 @@
 				composer3 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer3.addPass( renderScene );
+				composer3.addPass( gammaCorrection );
 				//composer3.addPass( renderMask );
 				composer3.addPass( effectSepia );
 				composer3.addPass( effectFilm );
@@ -242,6 +246,7 @@
 				composer4 = new EffectComposer( renderer, new THREE.WebGLRenderTarget( rtWidth, rtHeight, rtParameters ) );
 
 				composer4.addPass( renderScene );
+				composer4.addPass( gammaCorrection );
 				//composer4.addPass( renderMask );
 				composer4.addPass( effectBloom );
 				composer4.addPass( effectFilm );
@@ -288,12 +293,15 @@
 
 			function createMesh( geometry, scene, scale ) {
 
+				var diffuseMap = new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" );
+				diffuseMap.encoding = THREE.sRGBEncoding;
+
 				var mat2 = new THREE.MeshPhongMaterial( {
 
 					color: 0x999999,
 					specular: 0x080808,
 					shininess: 20,
-					map: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Map-COL.jpg" ),
+					map: diffuseMap,
 					normalMap: new THREE.TextureLoader().load( "models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg" ),
 					normalScale: new THREE.Vector2( 0.75, 0.75 )
 

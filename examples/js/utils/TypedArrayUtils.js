@@ -1,3 +1,4 @@
+console.warn( "THREE.TypedArrayUtils: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 
 THREE.TypedArrayUtils = {};
 
@@ -184,7 +185,7 @@ THREE.TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 THREE.TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
-	var self = this;
+	var scope = this;
 
 	var maxDepth = 0;
 
@@ -206,7 +207,7 @@ THREE.TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 		if ( plength === 0 ) return null;
 		if ( plength === 1 ) {
 
-			return new self.Node( getPointSet( points, 0 ), depth, parent, pos );
+			return new scope.Node( getPointSet( points, 0 ), depth, parent, pos );
 
 		}
 
@@ -214,7 +215,7 @@ THREE.TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
 		median = Math.floor( plength / 2 );
 
-		node = new self.Node( getPointSet( points, median ), depth, parent, median + pos );
+		node = new scope.Node( getPointSet( points, median ), depth, parent, median + pos );
 		node.left = buildTree( points.subarray( 0, median * eleSize ), depth + 1, node, pos );
 		node.right = buildTree( points.subarray( ( median + 1 ) * eleSize, points.length ), depth + 1, node, pos + median + 1 );
 
@@ -370,7 +371,7 @@ THREE.TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
 		}
 
-		nearestSearch( self.root );
+		nearestSearch( scope.root );
 
 		result = [];
 

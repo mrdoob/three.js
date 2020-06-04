@@ -1,3 +1,0 @@
-<Files *.pdb>
-SetOutputFilter DEFLATE
-</Files>

@@ -3,6 +3,8 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
@@ -10,7 +12,6 @@
  * @param newValue number, string, boolean or object
  * @constructor
  */
-
 var SetMaterialValueCommand = function ( editor, object, attributeName, newValue, materialSlot ) {
 
 	Command.call( this, editor );
@@ -82,3 +83,5 @@ SetMaterialValueCommand.prototype = {
 	}
 
 };
+
+export { SetMaterialValueCommand };

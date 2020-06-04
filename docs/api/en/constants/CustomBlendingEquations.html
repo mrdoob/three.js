@@ -10,14 +10,11 @@
 	<body>
 		<h1>Custom Blending Equation Constants</h1>
 
-
-		<h2>Example</h2>
-		<p>[example:webgl_materials_blending_custom materials / blending / custom ]</p>
-
-		<h2>Usage</h2>
 		<p>
 			These work with all material types. First set the material's blending mode to THREE.CustomBlending, then set the desired Blending Equation, Source Factor and Destination Factor.
 		</p>
+
+		<h2>Code Example</h2>
 
 		<code>
 		var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
@@ -26,6 +23,9 @@
 		material.blendSrc = THREE.SrcAlphaFactor; //default
 		material.blendDst = THREE.OneMinusSrcAlphaFactor; //default
 		</code>
+
+		<h2>Examples</h2>
+		<p>[example:webgl_materials_blending_custom materials / blending / custom ]</p>
 
 		<h2>Blending Equations</h2>
 		<code>

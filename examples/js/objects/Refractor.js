@@ -1,3 +1,4 @@
+console.warn( "THREE.Refractor: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Mugen87 / https://github.com/Mugen87
  *
@@ -18,6 +19,7 @@ THREE.Refractor = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || THREE.Refractor.RefractorShader;
+	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	//
 
@@ -36,12 +38,13 @@ THREE.Refractor = function ( geometry, options ) {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBFormat,
-		stencilBuffer: false
+		stencilBuffer: false,
+		encoding: encoding
 	};
 
 	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	if ( ! THREE.Math.isPowerOfTwo( textureWidth ) || ! THREE.Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		renderTarget.texture.generateMipmaps = false;
 
@@ -189,17 +192,17 @@ THREE.Refractor = function ( geometry, options ) {
 		scope.visible = false;
 
 		var currentRenderTarget = renderer.getRenderTarget();
-		var currentVrEnabled = renderer.vr.enabled;
+		var currentXrEnabled = renderer.xr.enabled;
 		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-		renderer.vr.enabled = false; // avoid camera modification
+		renderer.xr.enabled = false; // avoid camera modification
 		renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, virtualCamera );
 
-		renderer.vr.enabled = currentVrEnabled;
+		renderer.xr.enabled = currentXrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 		renderer.setRenderTarget( currentRenderTarget );
 

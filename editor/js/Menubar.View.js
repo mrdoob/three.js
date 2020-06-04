@@ -2,23 +2,25 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Menubar.View = function ( editor ) {
+import { UIPanel, UIRow } from './libs/ui.js';
 
-	var container = new UI.Panel();
+var MenubarView = function ( editor ) {
+
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new UI.Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( 'View' );
 	container.add( title );
 
-	var options = new UI.Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// VR mode
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( 'VR mode' );
 	option.onClick( function () {
@@ -31,3 +33,5 @@ Menubar.View = function ( editor ) {
 	return container;
 
 };
+
+export { MenubarView };

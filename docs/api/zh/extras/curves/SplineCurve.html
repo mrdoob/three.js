@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -16,26 +16,26 @@
 			从一系列的点中，创建一个平滑的二维样条曲线。内部使用[page:Interpolations.CatmullRom]来创建曲线。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
-<code>
-// Create a sine-like wave
-var curve = new THREE.SplineCurve( [
-	new THREE.Vector2( -10, 0 ),
-	new THREE.Vector2( -5, 5 ),
-	new THREE.Vector2( 0, 0 ),
-	new THREE.Vector2( 5, -5 ),
-	new THREE.Vector2( 10, 0 )
-] );
+		<code>
+		// Create a sine-like wave
+		var curve = new THREE.SplineCurve( [
+			new THREE.Vector2( -10, 0 ),
+			new THREE.Vector2( -5, 5 ),
+			new THREE.Vector2( 0, 0 ),
+			new THREE.Vector2( 5, -5 ),
+			new THREE.Vector2( 10, 0 )
+		] );
 
-var points = curve.getPoints( 50 );
-var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		var points = curve.getPoints( 50 );
+		var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-// Create the final object to add to the scene
-var splineObject = new THREE.Line( geometry, material );
-</code>
+		// Create the final object to add to the scene
+		var splineObject = new THREE.Line( geometry, material );
+		</code>
 
 		<h2>构造函数</h2>
 
@@ -46,13 +46,6 @@ var splineObject = new THREE.Line( geometry, material );
 
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Curve]。</p>
-
-		<h3>[property:Boolean isSplineCurve]</h3>
-		<p>
-			用于检查该类或者其派生类是否为样条曲线。默认值为*true*。<br /><br />
-
-			你不应当对这一属性进行改变，它在内部使用，以用于优化。
-		</p>
 
 		<h3>[property:Array points]</h3>
 		<p>定义这一曲线的[page:Vector2]点的数组。</p>

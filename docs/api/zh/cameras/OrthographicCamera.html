@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -22,24 +22,26 @@
 			这对于渲染2D场景或者UI元素是非常有用的。
 		</p>
 
+		<h2>代码示例</h2>
 
-		<h2>示例</h2>
+		<code>
+		var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
+		scene.add( camera );
+		</code>
 
-		<p>[example:webgl_camera camera ]</p>
-		<p>[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]</p>
-		<p>[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]</p>
-		<p>[example:webgl_postprocessing_advanced postprocessing / advanced ]</p>
-		<p>[example:webgl_postprocessing_dof2 postprocessing / dof2 ]</p>
-		<p>[example:webgl_postprocessing_godrays postprocessing / godrays ]</p>
-		<p>[example:webgl_rtt rtt ]</p>
-		<p>[example:webgl_shaders_tonemapping shaders / tonemapping ]</p>
-		<p>[example:webgl_shadowmap shadowmap ]</p>
-		<p>[example:webgl_terrain_dynamic terrain / dynamic ]</p>
+		<h2>例子</h2>
 
-		<code>var camera = new THREE.OrthographicCamera( width / - 2, width / 2, height / 2, height / - 2, 1, 1000 );
-scene.add( camera );</code>
-
-
+		<p>
+			[example:webgl_camera camera ]<br />
+			[example:webgl_interactive_cubes_ortho interactive / cubes / ortho ]<br />
+			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]<br />
+			[example:webgl_postprocessing_advanced postprocessing / advanced ]<br />
+			[example:webgl_postprocessing_dof2 postprocessing / dof2 ]<br />
+			[example:webgl_postprocessing_godrays postprocessing / godrays ]<br />
+			[example:webgl_rtt rtt ]<br />
+			[example:webgl_shaders_tonemapping shaders / tonemapping ]<br />
+			[example:webgl_shadowmap shadowmap ]
+		</p>
 
 		<h2>构造器</h2>
 
@@ -75,12 +77,6 @@ scene.add( camera );</code>
 			摄像机视锥体远端面，其默认值为*2000*。<br /><br />
 			其值的有效范围介于[page:.near near]（摄像机视锥体近端面）和无穷大之间。
 
-		</p>
-
-		<h3>[property:Boolean isOrthographicCamera]</h3>
-		<p>
-			用于测试这个类或者派生类是否为OrthographicCameras，默认为*true*。<br /><br />
-			你不应当对这个属性进行改变,因为它在内部由渲染器使用，以用于优化。
 		</p>
 
 		<h3>[property:Float left]</h3>

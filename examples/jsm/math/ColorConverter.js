@@ -4,7 +4,7 @@
  */
 
 import {
-	Math as _Math
+	MathUtils
 } from "../../../build/three.module.js";
 
 var ColorConverter = {
@@ -13,9 +13,9 @@ var ColorConverter = {
 
 		// https://gist.github.com/xpansive/1337890#file-index-js
 
-		h = _Math.euclideanModulo( h, 1 );
-		s = _Math.clamp( s, 0, 1 );
-		v = _Math.clamp( v, 0, 1 );
+		h = MathUtils.euclideanModulo( h, 1 );
+		s = MathUtils.clamp( s, 0, 1 );
+		v = MathUtils.clamp( v, 0, 1 );
 
 		return color.setHSL( h, ( s * v ) / ( ( h = ( 2 - s ) * v ) < 1 ? h : ( 2 - h ) ), h * 0.5 );
 

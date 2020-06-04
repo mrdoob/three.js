@@ -3,7 +3,7 @@
  */
 
 import {
-	Math as _Math,
+	MathUtils,
 	Mesh
 } from "../../../build/three.module.js";
 
@@ -287,7 +287,7 @@ MorphBlendMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			}
 
-			var keyframe = animation.start + _Math.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
+			var keyframe = animation.start + MathUtils.clamp( Math.floor( animation.time / frameTime ), 0, animation.length - 1 );
 			var weight = animation.weight;
 
 			if ( keyframe !== animation.currentFrame ) {

@@ -238,9 +238,7 @@
 
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 
 				// controls

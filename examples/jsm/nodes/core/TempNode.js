@@ -3,7 +3,7 @@
  * @author sunag / http://www.sunag.com.br/
  */
 
-import { Math as _Math } from '../../../../build/three.module.js';
+import { MathUtils } from '../../../../build/three.module.js';
 import { Node } from './Node.js';
 
 function TempNode( type, params ) {
@@ -30,7 +30,7 @@ TempNode.prototype.build = function ( builder, output, uuid, ns ) {
 
 		if ( isUnique && this.constructor.uuid === undefined ) {
 
-			this.constructor.uuid = _Math.generateUUID();
+			this.constructor.uuid = MathUtils.generateUUID();
 
 		}
 

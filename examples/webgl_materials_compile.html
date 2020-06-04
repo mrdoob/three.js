@@ -25,7 +25,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Node-Based Material
 			<br /><span class="button" id="preload">change preload</span>
 		</div>
 
@@ -58,7 +58,6 @@
 			var frame = new NodeFrame();
 			var teapot;
 			var controls;
-			var rtTexture, rtMaterial;
 			var meshes = [];
 
 			document.getElementById( "preload" ).addEventListener( 'click', function () {
@@ -151,20 +150,6 @@
 
 				if ( mesh.material ) mesh.material.dispose();
 
-				if ( rtTexture ) {
-
-					rtTexture.dispose();
-					rtTexture = null;
-
-				}
-
-				if ( rtMaterial ) {
-
-					rtMaterial.dispose();
-					rtMaterial = null;
-
-				}
-
 				var mtl = new PhongNodeMaterial();
 
 				var time = new TimerNode();
@@ -217,8 +202,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-				if ( rtTexture ) rtTexture.setSize( width, height );
 
 			}
 

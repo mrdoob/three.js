@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - procedural 3D text by <a href="http://www.lab4games.net/zz85/blog" target="_blank" rel="noopener">zz85</a> &amp; alteredq<br/>
 			type to enter new text, drag to spin the text<br/>
 			<button id="color">change color</button>
 			<button id="font">change font</button>
@@ -23,8 +23,6 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-
-			import { GeometryUtils } from './jsm/utils/GeometryUtils.js';
 
 			THREE.Cache.enabled = true;
 
@@ -357,6 +355,8 @@
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
 
+				var triangle = new THREE.Triangle();
+
 				// "fix" side normals by removing z-component of normals for side faces
 				// (this doesn't work well for beveled geometry as then we lose nice curvature around z-axis)
 
@@ -381,7 +381,7 @@
 							var vb = textGeo.vertices[ face.b ];
 							var vc = textGeo.vertices[ face.c ];
 
-							var s = GeometryUtils.triangleArea( va, vb, vc );
+							var s = triangle.set( va, vb, vc ).getArea();
 
 							if ( s > triangleAreaHeuristics ) {
 

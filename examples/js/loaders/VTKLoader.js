@@ -1,3 +1,4 @@
+console.warn( "THREE.VTKLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Alex Pletzer
@@ -28,7 +29,25 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -51,6 +70,9 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			var normals = [];
 
 			var result;
+
+			// pattern for detecting the end of a number sequence
+			var patWord = /^[^\d.\s-]+/;
 
 			// pattern for reading vertices, 3 floats or integers
 			var pat3Floats = /(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)\s+(\-?\d+\.?[\d\-\+e]*)/g;
@@ -92,7 +114,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			for ( var i in lines ) {
 
-				var line = lines[ i ];
+				var line = lines[ i ].trim();
 
 				if ( line.indexOf( 'DATASET' ) === 0 ) {
 
@@ -104,6 +126,8 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 					// get the vertices
 					while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+						if ( patWord.exec( line ) !== null ) break;
 
 						var x = parseFloat( result[ 1 ] );
 						var y = parseFloat( result[ 2 ] );
@@ -183,6 +207,8 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
 
+							if ( patWord.exec( line ) !== null ) break;
+
 							var r = parseFloat( result[ 1 ] );
 							var g = parseFloat( result[ 2 ] );
 							var b = parseFloat( result[ 3 ] );
@@ -195,6 +221,8 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						// Get the normal vectors
 
 						while ( ( result = pat3Floats.exec( line ) ) !== null ) {
+
+							if ( patWord.exec( line ) !== null ) break;
 
 							var nx = parseFloat( result[ 1 ] );
 							var ny = parseFloat( result[ 2 ] );
@@ -381,6 +409,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						pointIndex = pointIndex + 12;
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -429,6 +458,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -466,6 +496,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -19,18 +19,22 @@
 
 		</p>
 
+		<h2>代码示例</h2>
 
-		<h2>示例</h2>
+		<code>
+		var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+		scene.add( camera );
+		</code>
 
-		<p>[example:webgl_animation_skinning_blending animation / skinning / blending ]</p>
-		<p>[example:webgl_animation_skinning_morph animation / skinning / blending ]</p>
-		<p>[example:webgl_effects_stereo effects / stereo ]</p>
-		<p>[example:webgl_interactive_cubes interactive / cubes ]</p>
-		<p>[example:webgl_loader_collada_skinning loader / collada / skinning ]</p>
+		<h2>例子</h2>
 
-		<code>var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
-scene.add( camera );</code>
-
+		<p>
+			[example:webgl_animation_skinning_blending animation / skinning / blending ]<br />
+			[example:webgl_animation_skinning_morph animation / skinning / blending ]<br />
+			[example:webgl_effects_stereo effects / stereo ]<br />
+			[example:webgl_interactive_cubes interactive / cubes ]<br />
+			[example:webgl_loader_collada_skinning loader / collada / skinning ]
+		</p>
 
 		<h2>构造器</h2>
 
@@ -76,15 +80,6 @@ scene.add( camera );</code>
 
 		<h3>[property:Float fov]</h3>
 		<p>摄像机视锥体垂直视野角度，从视图的底部到顶部，以角度来表示。默认值是*50*。</p>
-
-		<h3>[property:Boolean isPerspectiveCamera]</h3>
-		<p>
-
-			用于测试这个类或者派生类是否为PerspectiveCameras，默认为true。
-			<br /><br />
-
-			你不应当对这个属性进行改变,因为它在内部由渲染器使用，以用于优化。
-		</p>
 
 
 		<h3>[property:Float near]</h3>

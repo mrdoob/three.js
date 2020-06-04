@@ -7,7 +7,7 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - panorama demo. cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>.</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js css3d</a> - panorama demo. cubemap by <a href="http://www.humus.name/index.php?page=Textures" target="_blank" rel="noopener">Humus</a>.</div>
 
 		<script type="module">
 
@@ -135,7 +135,7 @@
 
 				var fov = camera.fov + event.deltaY * 0.05;
 
-				camera.fov = THREE.Math.clamp( fov, 10, 75 );
+				camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
 
 				camera.updateProjectionMatrix();
 
@@ -172,8 +172,8 @@
 
 				lon += 0.1;
 				lat = Math.max( - 85, Math.min( 85, lat ) );
-				phi = THREE.Math.degToRad( 90 - lat );
-				theta = THREE.Math.degToRad( lon );
+				phi = THREE.MathUtils.degToRad( 90 - lat );
+				theta = THREE.MathUtils.degToRad( lon );
 
 				target.x = Math.sin( phi ) * Math.cos( theta );
 				target.y = Math.cos( phi );

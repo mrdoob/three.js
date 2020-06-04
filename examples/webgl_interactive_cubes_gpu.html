@@ -18,7 +18,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - gpu picking
 		</div>
 
 		<div id="container"></div>
@@ -62,8 +62,8 @@
 				light.position.set( 0, 500, 2000 );
 				scene.add( light );
 
-				var pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
-				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0	} );
+				var pickingMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
+				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: true, shininess: 0	} );
 
 				function applyVertexColors( geometry, color ) {
 
@@ -109,7 +109,7 @@
 					quaternion.setFromEuler( rotation );
 					matrix.compose( position, quaternion, scale );
 
-					geometry.applyMatrix( matrix );
+					geometry.applyMatrix4( matrix );
 
 					// give the geometry's vertices a random color, to be displayed
 

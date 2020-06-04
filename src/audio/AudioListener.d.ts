@@ -9,12 +9,13 @@ export class AudioListener extends Object3D {
 	context: AudioContext;
 	gain: GainNode;
 	filter: null | any;
+	timeDelta: number;
 
 	getInput(): GainNode;
-	removeFilter(): void;
-	setFilter( value: any ): void;
+	removeFilter(): this;
+	setFilter( value: any ): this;
 	getFilter(): any;
-	setMasterVolume( value: number ): void;
+	setMasterVolume( value: number ): this;
 	getMasterVolume(): number;
 	updateMatrixWorld( force?: boolean ): void;
 

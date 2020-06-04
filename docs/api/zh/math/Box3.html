@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -14,23 +14,24 @@
 			在3D空间中表示一个盒子或立方体。其主要用于表示物体在世界坐标中的边界框。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-		// Creating the object whose bounding box we want to compute
-		var sphereObject = new THREE.Mesh( 
-			new THREE.SphereGeometry(), 
-			new THREE.MeshBasicMaterial( 0xff0000 ) 
+		var box = new THREE.Box3();
+
+		var mesh = new THREE.Mesh(
+			new THREE.SphereBufferGeometry(),
+			new THREE.MeshBasicMaterial()
 		);
-		// Creating the actual bounding box with Box3
-		sphereObject.geometry.computeBoundingBox();
-		var box = sphereObject.geometry.boundingBox.clone();
+
+		// ensure the bounding box is computed for its geometry
+		// this should be done only once (assuming static geometries)
+		mesh.geometry.computeBoundingBox();
 
 		// ...
-		
-		// In the animation loop, to keep the bounding box updated after move/rotate/scale operations
-		sphereObject.updateMatrixWorld( true );
-		box.copy( sphereObject.geometry.boundingBox ).applyMatrix4( sphereObject.matrixWorld );
+
+		// in the animation loop, compute the current bounding box with the world matrix
+		box.copy( mesh.geometry.boundingBox ).applyMatrix4( mesh.matrixWorld );
 		</code>
 
 		<h2>构造器（Constructor）</h2>
@@ -48,13 +49,6 @@
 		</p>
 
 		<h2>属性（Properties）</h2>
-
-		<h3>[property:Boolean isBox3]</h3>
-		<p>
-			用于检测当前对象或者派生类对象是否是Box3。默认为 *true*。<br /><br />
-
-			不应该修改这个值，因为内部使用该属性做了优化的任务。
-		</p>
 
 		<h3>[property:Vector3 min]</h3>
 		<p>

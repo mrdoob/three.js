@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Backgrounds: ClearPass, TexturePass and CubeTexturePass<br/>
 			by <a href="https://clara.io" target="_blank" rel="noopener">Ben Houston</a>
 		</div>
 
@@ -159,13 +159,13 @@
 
 				} );
 
-				cubeTexturePassP = new CubeTexturePass( cameraP );
-				composer.addPass( cubeTexturePassP );
+				cubeTexturePassP = null;
 
 				var ldrUrls = genCubeUrls( "textures/cube/pisa/", ".png" );
 				new THREE.CubeTextureLoader().load( ldrUrls, function ( ldrCubeMap ) {
 
-					cubeTexturePassP.envMap = ldrCubeMap;
+					cubeTexturePassP = new CubeTexturePass( cameraP, ldrCubeMap );
+					composer.insertPass( cubeTexturePassP, 2 );
 
 				} );
 
@@ -177,6 +177,7 @@
 				composer.addPass( copyPass );
 
 				var controls = new OrbitControls( cameraP, renderer.domElement );
+				controls.enableZoom = false;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -222,8 +223,10 @@
 				texturePass.enabled = params.texturePass;
 				texturePass.opacity = params.texturePassOpacity;
 
-				cubeTexturePassP.enabled = params.cubeTexturePass;
-				cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
+				if ( cubeTexturePassP != null ) {
+					cubeTexturePassP.enabled = params.cubeTexturePass;
+					cubeTexturePassP.opacity = params.cubeTexturePassOpacity;
+				}
 
 				renderPass.enabled = params.renderPass;
 

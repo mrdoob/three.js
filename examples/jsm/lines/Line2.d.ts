@@ -5,6 +5,6 @@ import { LineMaterial } from './LineMaterial';
 export class Line2 extends LineSegments2 {
 
 	constructor( geometry?: LineGeometry, material?: LineMaterial );
-	isLine2: boolean;
+	readonly isLine2: true;
 
 }

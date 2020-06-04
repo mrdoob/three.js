@@ -4,10 +4,12 @@ import { LineSegments } from './../objects/LineSegments';
 
 export class SkeletonHelper extends LineSegments {
 
-	constructor( bone: Object3D );
+	constructor( object: Object3D );
 
 	bones: Bone[];
 	root: Object3D;
+
+	readonly isSkeletonHelper: true;
 
 	getBoneList( object: Object3D ): Bone[];
 	update(): void;

@@ -18,6 +18,7 @@ export class EffectComposer {
 	passes: Pass[];
 	copyPass: ShaderPass;
 	clock: Clock;
+	renderToScreen: boolean;
 
 	swapBuffers(): void;
 	addPass( pass: Pass ): void;

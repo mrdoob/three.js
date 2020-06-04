@@ -1,5 +1,5 @@
 import { Path } from './Path.js';
-import { _Math } from '../../math/Math.js';
+import { MathUtils } from '../../math/MathUtils.js';
 
 /**
  * @author zz85 / http://www.lab4games.net/zz85/blog
@@ -16,7 +16,7 @@ function Shape( points ) {
 
 	Path.call( this, points );
 
-	this.uuid = _Math.generateUUID();
+	this.uuid = MathUtils.generateUUID();
 
 	this.type = 'Shape';
 
@@ -30,9 +30,9 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 	getPointsHoles: function ( divisions ) {
 
-		var holesPts = [];
+		const holesPts = [];
 
-		for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+		for ( let i = 0, l = this.holes.length; i < l; i ++ ) {
 
 			holesPts[ i ] = this.holes[ i ].getPoints( divisions );
 
@@ -61,9 +61,9 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 		this.holes = [];
 
-		for ( var i = 0, l = source.holes.length; i < l; i ++ ) {
+		for ( let i = 0, l = source.holes.length; i < l; i ++ ) {
 
-			var hole = source.holes[ i ];
+			const hole = source.holes[ i ];
 
 			this.holes.push( hole.clone() );
 
@@ -75,14 +75,14 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 
 	toJSON: function () {
 
-		var data = Path.prototype.toJSON.call( this );
+		const data = Path.prototype.toJSON.call( this );
 
 		data.uuid = this.uuid;
 		data.holes = [];
 
-		for ( var i = 0, l = this.holes.length; i < l; i ++ ) {
+		for ( let i = 0, l = this.holes.length; i < l; i ++ ) {
 
-			var hole = this.holes[ i ];
+			const hole = this.holes[ i ];
 			data.holes.push( hole.toJSON() );
 
 		}
@@ -98,9 +98,9 @@ Shape.prototype = Object.assign( Object.create( Path.prototype ), {
 		this.uuid = json.uuid;
 		this.holes = [];
 
-		for ( var i = 0, l = json.holes.length; i < l; i ++ ) {
+		for ( let i = 0, l = json.holes.length; i < l; i ++ ) {
 
-			var hole = json.holes[ i ];
+			const hole = json.holes[ i ];
 			this.holes.push( new Path().fromJSON( hole ) );
 
 		}

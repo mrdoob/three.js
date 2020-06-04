@@ -27,14 +27,17 @@
 			using Draco with glTF, an instance of DRACOLoader will be used internally by [page:GLTFLoader].
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		// Instantiate a loader
-		var loader = new THREE.DRACOLoader();
+		var loader = new DRACOLoader();
 
 		// Specify path to a folder containing WASM/JS decoding libraries.
-		loader.setDecoderPath( '/examples/js/libs/draco' );
+		loader.setDecoderPath( '/examples/js/libs/draco/' );
+
+		// Optional: Pre-fetch Draco WASM/JS module.
+		loader.preload();
 
 		// Load a Draco geometry
 		loader.load(
@@ -63,7 +66,11 @@
 		);
 		</code>
 
-		[example:webgl_loader_draco]
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_loader_draco]
+		</p>
 
 		<h2>Browser compatibility</h2>
 
@@ -128,6 +135,11 @@
 		in the application.
 		</p>
 
+		<h3>[method:this preload]()</h3>
+		<p>
+		Requests the decoder libraries, if not already loaded.
+		</p>
+
 		<h3>[method:this dispose]()</h3>
 		<p>
 		Disposes of the decoder resources and deallocates memory. The decoder
@@ -137,7 +149,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/DRACOLoader.js examples/js/loaders/DRACOLoader.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/DRACOLoader.js examples/jsm/loaders/DRACOLoader.js]
 		</p>
 	</body>
 </html>

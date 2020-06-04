@@ -14,12 +14,7 @@
 
 		<p class="desc">An 3D arrow object for visualizing directions.</p>
 
-
-		<h2>Example</h2>
-
-		<div>[example:webgl_geometries WebGL / geometries]</div>
-		<div>[example:webgl_geometry_normals WebGL / geometry / normals]</div>
-		<div>[example:webgl_shadowmesh WebGL / shadowmesh]</div>
+		<h2>Code Example</h2>
 
 		<code>
 		var dir = new THREE.Vector3( 1, 2, 0 );
@@ -35,10 +30,15 @@
 		scene.add( arrowHelper );
 		</code>
 
+		<h2>Examples</h2>
 
+		<p>
+			[example:webgl_geometries WebGL / geometries]<br/>
+			[example:webgl_geometry_normals WebGL / geometry / normals]<br/>
+			[example:webgl_shadowmesh WebGL / shadowmesh]
+		</p>
 
 		<h2>Constructor</h2>
-
 
 		<h3>[name]([param:Vector3 dir], [param:Vector3 origin], [param:Number length], [param:Number hex], [param:Number headLength], [param:Number headWidth] )</h3>
 		<p>
@@ -47,12 +47,11 @@
 		[page:Number length] -- length of the arrow. Default is *1*.<br />
 		[page:Number hex] -- hexadecimal value to define color. Default is 0xffff00.<br />
 		[page:Number headLength] -- The length of the head of the arrow. Default is 0.2 * length.<br />
-		[page:Number headWidth] -- The length of the width of the arrow. Default is 0.2 * headLength.
+		[page:Number headWidth] -- The width of the head of the arrow. Default is 0.2 * headLength.<br />
 		</p>
 
 		<h2>Properties</h2>
 		<p>See the base [page:Object3D] class for common properties.</p>
-
 
 		<h3>[property:Line line]</h3>
 		<p>Contains the line part of the arrowHelper.</p>
@@ -60,13 +59,8 @@
 		<h3>[property:Mesh cone]</h3>
 		<p>Contains the cone part of the arrowHelper.</p>
 
-
-
-
 		<h2>Methods</h2>
 		<p>See the base [page:Object3D] class for common methods.</p>
-
-
 
 		<h3>[method:null setColor]([param:Color color])</h3>
 		<p>
@@ -79,7 +73,7 @@
 		<p>
 		length -- The desired length.<br />
 		headLength -- The length of the head of the arrow.<br />
-		headWidth -- The length of the width of the arrow.<br /><br />
+		headWidth -- The width of the head of the arrow.<br /><br />
 
 		Sets the length of the arrowhelper.
 		</p>

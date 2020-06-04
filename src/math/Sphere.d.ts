@@ -14,7 +14,8 @@ export class Sphere {
 	setFromPoints( points: Vector3[], optionalCenter?: Vector3 ): Sphere;
 	clone(): this;
 	copy( sphere: Sphere ): this;
-	empty(): boolean;
+	isEmpty(): boolean;
+	makeEmpty(): this;
 	containsPoint( point: Vector3 ): boolean;
 	distanceToPoint( point: Vector3 ): number;
 	intersectsSphere( sphere: Sphere ): boolean;
@@ -25,5 +26,10 @@ export class Sphere {
 	applyMatrix4( matrix: Matrix4 ): Sphere;
 	translate( offset: Vector3 ): Sphere;
 	equals( sphere: Sphere ): boolean;
+
+	/**
+	 * @deprecated Use {@link Sphere#isEmpty .isEmpty()} instead.
+	 */
+	empty(): any;
 
 }

@@ -11,7 +11,7 @@
 
 	<div id="container"></div>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 		marching cubes<br/>
 		based on greggman's <a href="https://webglsamples.org/blob/blob.html">blob</a>, original code by Henrik Rydgård
 	</div>
@@ -92,19 +92,16 @@
 			// RENDERER
 
 			renderer = new THREE.WebGLRenderer();
-			renderer.gammaOutput = true;
+			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
-			renderer.domElement.style.position = "absolute";
-			renderer.domElement.style.top = "0px";
-			renderer.domElement.style.left = "0px";
-
 			container.appendChild( renderer.domElement );
 
 			// CONTROLS
 
 			var controls = new OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 500;
+			controls.maxDistance = 5000;
 
 			// STATS
 
@@ -194,12 +191,12 @@
 				},
 
 				"colors": {
-					m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: THREE.VertexColors } ),
+					m: new THREE.MeshPhongMaterial( { color: 0xffffff, specular: 0xffffff, shininess: 2, vertexColors: true } ),
 					h: 0, s: 0, l: 1
 				},
 
 				"multiColors": {
-					m: new THREE.MeshPhongMaterial( { shininess: 2, vertexColors: THREE.VertexColors } ),
+					m: new THREE.MeshPhongMaterial( { shininess: 2, vertexColors: true } ),
 					h: 0, s: 0, l: 1
 				},
 

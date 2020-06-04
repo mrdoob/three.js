@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -14,7 +14,7 @@
 
 		一个三维向量表示的是一个有顺序的、三个为一组的数字组合（标记为x、y和z），
 		可被用来表示很多事物，例如：
-		
+
 		</p>
 
 		<ul>
@@ -36,16 +36,15 @@
 		但以上这些是它在three.js中的常用用途。
 		</p>
 
-
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-var a = new THREE.Vector3( 0, 1, 0 );
+		var a = new THREE.Vector3( 0, 1, 0 );
 
-//no arguments; will be initialised to (0, 0, 0)
-var b = new THREE.Vector3( );
+		//no arguments; will be initialised to (0, 0, 0)
+		var b = new THREE.Vector3( );
 
-var d = a.distanceTo( b );
+		var d = a.distanceTo( b );
 		</code>
 
 
@@ -62,13 +61,6 @@ var d = a.distanceTo( b );
 
 
 		<h2>属性</h2>
-
-		<h3>[property:Boolean isVector3]</h3>
-		<p>
-			用于测试这个类或者派生类是否为Vector3，默认为*true*。<br /><br />
-
-			你不应当对这个属性进行改变,因为它在内部使用，以用于优化。
-		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -121,7 +113,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Float angleTo]( [param:Vector3 v] )</h3>
 		<p>
-		以弧度返回该向量与向量[page:Vector3 v]之间的角度。 Neither this vector nor [page:Vector3 v] can be the zero vector.
+		以弧度返回该向量与向量[page:Vector3 v]之间的角度。
 		</p>
 
 		<h3>[method:this ceil]()</h3>
@@ -308,7 +300,7 @@ var d = a.distanceTo( b );
 		<p>
 		[page:Camera camera] — 在投影中使用的摄像机。<br /><br />
 
-		使用所传入的摄像机来投影（[link:https://en.wikipedia.org/wiki/Vector_projection projects]）该向量。
+		Projects this vector from world space into the camera's normalized device coordinate (NDC) space.
 		</p>
 
 		<h3>[method:this projectOnPlane]( [param:Vector3 planeNormal] )</h3>
@@ -320,13 +312,13 @@ var d = a.distanceTo( b );
 		</p>
 
 		<h3>[method:this projectOnVector]( [param:Vector3] )</h3>
-		<p>投影（[link:https://en.wikipedia.org/wiki/Vector_projection Projects]）该向量到向量[page:Vector3 v]上。[page:Vector3 v]不能是零向量。</p>
+		<p>投影（[link:https://en.wikipedia.org/wiki/Vector_projection Projects]）该向量到向量[page:Vector3 v]上。</p>
 
 		<h3>[method:this reflect]( [param:Vector3 normal] )</h3>
 		<p>
 		[page:Vector3 normal] - the normal to the reflecting plane<br /><br />
 
-		Reflect the vector off of plane orthogonal to [page:Vector3 normal]. Normal is assumed to
+		Reflect this vector off of plane orthogonal to [page:Vector3 normal]. Normal is assumed to
 		have unit length.
 		</p>
 
@@ -431,10 +423,13 @@ var d = a.distanceTo( b );
 		<p>
 		[page:Camera camera] — 在投影中使用的摄像机。<br /><br />
 
-		[link:https://en.wikipedia.org/wiki/Vector_projection Unprojects] the vector with the
-		camera's projection matrix.
+		Projects this vector from the camera's normalized device coordinate (NDC) space into world space.
 		</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
 
 		<h2>源代码</h2>
 

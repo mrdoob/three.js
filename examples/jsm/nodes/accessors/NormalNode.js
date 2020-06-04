@@ -29,6 +29,20 @@ NormalNode.prototype.getShared = function () {
 
 };
 
+NormalNode.prototype.build = function ( builder, output, uuid, ns ) {
+
+	var contextNormal = builder.context[ this.scope + 'Normal' ];
+
+	if ( contextNormal ) {
+
+		return contextNormal.build( builder, output, uuid, ns );
+
+	}
+
+	return TempNode.prototype.build.call( this, builder, output, uuid );
+
+};
+
 NormalNode.prototype.generate = function ( builder, output ) {
 
 	var result;

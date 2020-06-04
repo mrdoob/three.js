@@ -18,15 +18,18 @@
 			环境光不能用来投射阴影，因为它没有方向。
 		</p>
 
+		<h2>代码示例</h2>
 
-		<h2>示例</h2>
+		<code>
+		var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+		scene.add( light );
+		</code>
+
+		<h2>例子</h2>
 		<p>
-		  [example:webgl_animation_cloth animation / cloth ]<br />
-		  [example:webgl_animation_skinning_blending animation / skinning / blending ]
+			[example:webgl_animation_cloth animation / cloth ]<br />
+			[example:webgl_animation_skinning_blending animation / skinning / blending ]
 		</p>
-
-<code>var light = new THREE.AmbientLight( 0x404040 ); // soft white light
-scene.add( light );</code>
 
 		<h2>构造函数</h2>
 
@@ -46,14 +49,6 @@ scene.add( light );</code>
 		<h3>[property:Boolean castShadow]</h3>
 		<p>
 			这个参数在对象构造的时候就被设置成了 *undefined* 。因为环境光不能投射阴影。
-		</p>
-
-
-		<h3>[property:Boolean isAmbientLight]</h3>
-		<p>
-			用来校验这个类或者派生类是不是环境光.默认是 *true*。<br /><br />
-
-			不应该去改变这个变量,因为内部使用这个变量做了些优化的工作。
 		</p>
 
 

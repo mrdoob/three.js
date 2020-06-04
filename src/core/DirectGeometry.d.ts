@@ -6,8 +6,9 @@ import { Box3 } from './../math/Box3';
 import { Sphere } from './../math/Sphere';
 import { Geometry } from './Geometry';
 import { MorphTarget } from './Geometry';
+
 /**
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/DirectGeometry.js">src/core/DirectGeometry.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/DirectGeometry.js|src/core/DirectGeometry.js}
  */
 export class DirectGeometry {
 
@@ -27,8 +28,8 @@ export class DirectGeometry {
 	morphTargets: MorphTarget[];
 	skinWeights: Vector4[];
 	skinIndices: Vector4[];
-	boundingBox: Box3;
-	boundingSphere: Sphere;
+	boundingBox: Box3 | null;
+	boundingSphere: Sphere | null;
 	verticesNeedUpdate: boolean;
 	normalsNeedUpdate: boolean;
 	colorsNeedUpdate: boolean;

@@ -1,3 +1,4 @@
+console.warn( "THREE.ParametricGeometries: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author zz85
  *
@@ -96,14 +97,13 @@ THREE.ParametricGeometries = {
  *
  *********************************************/
 
-THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, segmentsRadius, closed, debug ) {
+THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, segmentsRadius, closed ) {
 
 	this.path = path;
 	this.segments = segments || 64;
 	this.radius = radius || 1;
 	this.segmentsRadius = segmentsRadius || 8;
 	this.closed = closed || false;
-	if ( debug ) this.debug = new THREE.Object3D();
 
 	var scope = this, numpoints = this.segments + 1;
 
@@ -118,6 +118,8 @@ THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, seg
 	this.normals = normals;
 	this.binormals = binormals;
 
+	var position = new THREE.Vector3();
+
 	var ParametricTube = function ( u, v, target ) {
 
 		v *= 2 * Math.PI;
@@ -125,28 +127,19 @@ THREE.ParametricGeometries.TubeGeometry = function ( path, segments, radius, seg
 		var i = u * ( numpoints - 1 );
 		i = Math.floor( i );
 
-		var pos = path.getPointAt( u );
+		path.getPointAt( u, position );
 
-		var tangent = tangents[ i ];
 		var normal = normals[ i ];
 		var binormal = binormals[ i ];
-
-		if ( scope.debug ) {
-
-			scope.debug.add( new THREE.ArrowHelper( tangent, pos, radius, 0x0000ff ) );
-			scope.debug.add( new THREE.ArrowHelper( normal, pos, radius, 0xff0000 ) );
-			scope.debug.add( new THREE.ArrowHelper( binormal, pos, radius, 0x00ff00 ) );
-
-		}
 
 		var cx = - scope.radius * Math.cos( v ); // TODO: Hack: Negating it so it faces outside.
 		var cy = scope.radius * Math.sin( v );
 
-		pos.x += cx * normal.x + cy * binormal.x;
-		pos.y += cx * normal.y + cy * binormal.y;
-		pos.z += cx * normal.z + cy * binormal.z;
+		position.x += cx * normal.x + cy * binormal.x;
+		position.y += cx * normal.y + cy * binormal.y;
+		position.z += cx * normal.z + cy * binormal.z;
 
-		target.copy( pos );
+		target.copy( position );
 
 	};
 

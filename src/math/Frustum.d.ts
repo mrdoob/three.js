@@ -26,16 +26,16 @@ export class Frustum {
 	planes: Plane[];
 
 	set(
-		p0?: number,
-		p1?: number,
-		p2?: number,
-		p3?: number,
-		p4?: number,
-		p5?: number
+		p0: Plane,
+		p1: Plane,
+		p2: Plane,
+		p3: Plane,
+		p4: Plane,
+		p5: Plane
 	): Frustum;
 	clone(): this;
 	copy( frustum: Frustum ): this;
-	setFromMatrix( m: Matrix4 ): Frustum;
+	setFromProjectionMatrix( m: Matrix4 ): this;
 	intersectsObject( object: Object3D ): boolean;
 	intersectsSprite( sprite: Sprite ): boolean;
 	intersectsSphere( sphere: Sphere ): boolean;

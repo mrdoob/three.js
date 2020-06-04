@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Physically accurate incandescent bulb by <a href="http://clara.io" target="_blank" rel="noopener">Ben Houston</a><br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Physically accurate incandescent bulb by <a href="http://clara.io" target="_blank" rel="noopener">Ben Houston</a><br />
 			Real world scale: Brick cube is 50 cm in size. Globe is 50 cm in diameter.<br/>
 			Reinhard inline tonemapping with real-world light falloff (decay = 2).
 		</div>
@@ -110,6 +110,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 10, 24 );
+					map.encoding = THREE.sRGBEncoding;
 					floorMat.map = map;
 					floorMat.needsUpdate = true;
 
@@ -147,6 +148,7 @@
 					map.wrapT = THREE.RepeatWrapping;
 					map.anisotropy = 4;
 					map.repeat.set( 1, 1 );
+					map.encoding = THREE.sRGBEncoding;
 					cubeMat.map = map;
 					cubeMat.needsUpdate = true;
 
@@ -170,6 +172,7 @@
 				textureLoader.load( "textures/planets/earth_atmos_2048.jpg", function ( map ) {
 
 					map.anisotropy = 4;
+					map.encoding = THREE.sRGBEncoding;
 					ballMat.map = map;
 					ballMat.needsUpdate = true;
 
@@ -177,6 +180,7 @@
 				textureLoader.load( "textures/planets/earth_specular_2048.jpg", function ( map ) {
 
 					map.anisotropy = 4;
+					map.encoding = THREE.sRGBEncoding;
 					ballMat.metalnessMap = map;
 					ballMat.needsUpdate = true;
 
@@ -214,8 +218,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.physicallyCorrectLights = true;
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -224,6 +227,8 @@
 
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 20;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -21,7 +21,7 @@
 			几何体的更多使用示例，详见 [page:Geometry]。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 		<code>
 		var geometry = new THREE.BufferGeometry();
 		// 创建一个简单的矩形. 在这里我们左上和右下顶点被复制了两次。
@@ -41,6 +41,8 @@
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
+
+		<h2>例子</h2>
 		<p>
 			[example:webgl_buffergeometry Mesh with non-indexed faces]<br />
 			[example:webgl_buffergeometry_indexed Mesh with indexed faces]<br />
@@ -125,13 +127,6 @@
 			默认值是 *null*。
 		</p>
 
-		<h3>[property:Boolean isBufferGeometry]</h3>
-		<p>
-			用于检查当前类或派生类的类型是 BufferGeometries。默认值是 *true*。<br /><br />
-
-			该值用于内部优化，你不应该手动修改该值。
-		</p>
-
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
 			存储 [page:BufferAttribute] 的 Hashmap，存储了几何体 [page:Geometry.morphTargets morphTargets] 的细节信息。
@@ -169,7 +164,7 @@
 		</p>
 
 
-		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p> 用给定矩阵转换几何体的顶点坐标。</p>
 
 		<h3>[method:BufferGeometry center] ()</h3>

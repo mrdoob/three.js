@@ -21,4 +21,6 @@ export class VideoTexture extends Texture {
 		anisotropy?: number
 	);
 
+	readonly isVideoTexture: true;
+
 }

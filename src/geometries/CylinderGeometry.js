@@ -55,7 +55,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 		thetaLength: thetaLength
 	};
 
-	var scope = this;
+	const scope = this;
 
 	radiusTop = radiusTop !== undefined ? radiusTop : 1;
 	radiusBottom = radiusBottom !== undefined ? radiusBottom : 1;
@@ -70,17 +70,17 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// helper variables
 
-	var index = 0;
-	var indexArray = [];
-	var halfHeight = height / 2;
-	var groupStart = 0;
+	let index = 0;
+	const indexArray = [];
+	const halfHeight = height / 2;
+	let groupStart = 0;
 
 	// generate geometry
 
@@ -102,35 +102,34 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	function generateTorso() {
 
-		var x, y;
-		var normal = new Vector3();
-		var vertex = new Vector3();
+		const normal = new Vector3();
+		const vertex = new Vector3();
 
-		var groupCount = 0;
+		let groupCount = 0;
 
 		// this will be used to calculate the normal
-		var slope = ( radiusBottom - radiusTop ) / height;
+		const slope = ( radiusBottom - radiusTop ) / height;
 
 		// generate vertices, normals and uvs
 
-		for ( y = 0; y <= heightSegments; y ++ ) {
+		for ( let y = 0; y <= heightSegments; y ++ ) {
 
-			var indexRow = [];
+			const indexRow = [];
 
-			var v = y / heightSegments;
+			const v = y / heightSegments;
 
 			// calculate the radius of the current row
 
-			var radius = v * ( radiusBottom - radiusTop ) + radiusTop;
+			const radius = v * ( radiusBottom - radiusTop ) + radiusTop;
 
-			for ( x = 0; x <= radialSegments; x ++ ) {
+			for ( let x = 0; x <= radialSegments; x ++ ) {
 
-				var u = x / radialSegments;
+				const u = x / radialSegments;
 
-				var theta = u * thetaLength + thetaStart;
+				const theta = u * thetaLength + thetaStart;
 
-				var sinTheta = Math.sin( theta );
-				var cosTheta = Math.cos( theta );
+				const sinTheta = Math.sin( theta );
+				const cosTheta = Math.cos( theta );
 
 				// vertex
 
@@ -162,16 +161,16 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 		// generate indices
 
-		for ( x = 0; x < radialSegments; x ++ ) {
+		for ( let x = 0; x < radialSegments; x ++ ) {
 
-			for ( y = 0; y < heightSegments; y ++ ) {
+			for ( let y = 0; y < heightSegments; y ++ ) {
 
 				// we use the index array to access the correct indices
 
-				var a = indexArray[ y ][ x ];
-				var b = indexArray[ y + 1 ][ x ];
-				var c = indexArray[ y + 1 ][ x + 1 ];
-				var d = indexArray[ y ][ x + 1 ];
+				const a = indexArray[ y ][ x ];
+				const b = indexArray[ y + 1 ][ x ];
+				const c = indexArray[ y + 1 ][ x + 1 ];
+				const d = indexArray[ y ][ x + 1 ];
 
 				// faces
 
@@ -198,15 +197,15 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	function generateCap( top ) {
 
-		var x, centerIndexStart, centerIndexEnd;
+		let centerIndexStart, centerIndexEnd;
 
-		var uv = new Vector2();
-		var vertex = new Vector3();
+		const uv = new Vector2();
+		const vertex = new Vector3();
 
-		var groupCount = 0;
+		let groupCount = 0;
 
-		var radius = ( top === true ) ? radiusTop : radiusBottom;
-		var sign = ( top === true ) ? 1 : - 1;
+		const radius = ( top === true ) ? radiusTop : radiusBottom;
+		const sign = ( top === true ) ? 1 : - 1;
 
 		// save the index of the first center vertex
 		centerIndexStart = index;
@@ -215,7 +214,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 		// because the geometry needs one set of uvs per face,
 		// we must generate a center vertex per face/segment
 
-		for ( x = 1; x <= radialSegments; x ++ ) {
+		for ( let x = 1; x <= radialSegments; x ++ ) {
 
 			// vertex
 
@@ -241,13 +240,13 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 		// now we generate the surrounding vertices, normals and uvs
 
-		for ( x = 0; x <= radialSegments; x ++ ) {
+		for ( let x = 0; x <= radialSegments; x ++ ) {
 
-			var u = x / radialSegments;
-			var theta = u * thetaLength + thetaStart;
+			const u = x / radialSegments;
+			const theta = u * thetaLength + thetaStart;
 
-			var cosTheta = Math.cos( theta );
-			var sinTheta = Math.sin( theta );
+			const cosTheta = Math.cos( theta );
+			const sinTheta = Math.sin( theta );
 
 			// vertex
 
@@ -274,10 +273,10 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 		// generate indices
 
-		for ( x = 0; x < radialSegments; x ++ ) {
+		for ( let x = 0; x < radialSegments; x ++ ) {
 
-			var c = centerIndexStart + x;
-			var i = centerIndexEnd + x;
+			const c = centerIndexStart + x;
+			const i = centerIndexEnd + x;
 
 			if ( top === true ) {
 

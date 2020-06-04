@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -140,17 +140,12 @@
 			请确保将minFilter设置为其中一个MipMap选项，并且未强制禁用mip贴图。</p>
 		<p>
 			注意：MeshStandardMaterial 仅支持[link:https://threejs.org/docs/#api/textures/CubeTexture cube environment maps]。
-			如果要使用equirectangular贴图，则需要使用 [page:WebGLRenderTargetCube.fromEquirectangularTexture WebGLRenderTargetCube.fromEquirectangularTexture]().。
+			如果要使用equirectangular贴图，则需要使用 [page:WebGLCubeRenderTarget.fromEquirectangularTexture WebGLCubeRenderTarget.fromEquirectangularTexture]().。
 			详细信息请参阅此示例[link:https://threejs.org/examples/webgl_materials_envmaps_exr.html example]。
 		</p>
 
 		<h3>[property:Float envMapIntensity]</h3>
 		<p> 通过乘以环境贴图的颜色来缩放环境贴图的效果。</p>
-
-		<h3>[property:Boolean isMeshStandardMaterial]</h3>
-		<p> 用于检查此类或派生类是否为标准网格材质。默认值为 *true*。<br /><br />
-			因为其通常用在内部优化，所以不应该更改该属性值。
-		</p>
 
 
 		<h3>[property:Texture lightMap]</h3>
@@ -164,7 +159,7 @@
 
 		<h3>[property:Float metalness]</h3>
 		<p> 材质与金属的相似度。非金属材质，如木材或石材，使用0.0，金属使用1.0，通常没有中间值。
-			默认值为0.5。0.0到1.0之间的值可用于生锈金属的外观。如果还提供了metalnessMap，则两个值相乘。
+			默认值为0.0。0.0到1.0之间的值可用于生锈金属的外观。如果还提供了metalnessMap，则两个值相乘。
 		</p>
 
 		<h3>[property:Texture metalnessMap]</h3>
@@ -197,7 +192,7 @@
 		</p>
 
 		<h3>[property:Float roughness]</h3>
-		<p> 材质的粗糙程度。0.0表示平滑的镜面反射，1.0表示完全漫反射。默认值为0.5。如果还提供roughnessMap，则两个值相乘。
+		<p> 材质的粗糙程度。0.0表示平滑的镜面反射，1.0表示完全漫反射。默认值为1.0。如果还提供roughnessMap，则两个值相乘。
 		</p>
 
 		<h3>[property:Texture roughnessMap]</h3>
@@ -205,6 +200,12 @@
 
 		<h3>[property:Boolean skinning]</h3>
 		<p>材质是否使用蒙皮。默认值为false。</p>
+
+		<h3>[property:Boolean vertexTangents]</h3>
+		<p>	Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
+			are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
+			more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+		</p>
 
 		<h3>[property:Boolean wireframe]</h3>
 		<p>将几何体渲染为线框。默认值为*false*（即渲染为平面多边形）。</p>

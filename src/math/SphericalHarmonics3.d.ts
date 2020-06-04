@@ -1,15 +1,16 @@
-import { Vector3 } from './Vector3.js';
+import { Vector3 } from './Vector3';
 
 export class SphericalHarmonics3 {
 
 	constructor();
 
 	coefficients: Vector3[];
-	isSphericalHarmonics3: boolean;
+	readonly isSphericalHarmonics3: true;
 
 	set ( coefficients: Vector3[] ): SphericalHarmonics3;
 	zero(): SphericalHarmonics3;
 	add( sh: SphericalHarmonics3 ): SphericalHarmonics3;
+	addScaledSH( sh: SphericalHarmonics3, s: number ): SphericalHarmonics3;
 	scale( s: number ): SphericalHarmonics3;
 	lerp( sh: SphericalHarmonics3, alpha: number ): SphericalHarmonics3;
 	equals( sh: SphericalHarmonics3 ): boolean;

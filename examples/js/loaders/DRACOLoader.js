@@ -1,3 +1,4 @@
+console.warn( "THREE.DRACOLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Don McCurdy / https://www.donmccurdy.com
  */
@@ -124,10 +125,6 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 	decodeGeometry: function ( buffer, taskConfig ) {
 
-		var worker;
-		var taskID = this.workerNextTaskID ++;
-		var taskCost = buffer.byteLength;
-
 		// TODO: For backward-compatibility, support 'attributeTypes' objects containing
 		// references (rather than names) to typed array constructors. These must be
 		// serialized before sending them to the worker.
@@ -142,6 +139,43 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			}
 
 		}
+
+		//
+
+		var taskKey = JSON.stringify( taskConfig );
+
+		// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+		// again from this thread.
+		if ( THREE.DRACOLoader.taskCache.has( buffer ) ) {
+
+			var cachedTask = THREE.DRACOLoader.taskCache.get( buffer );
+
+			if ( cachedTask.key === taskKey ) {
+
+				return cachedTask.promise;
+
+			} else if ( buffer.byteLength === 0 ) {
+
+				// Technically, it would be possible to wait for the previous task to complete,
+				// transfer the buffer back, and decode again with the second configuration. That
+				// is complex, and I don't know of any reason to decode a Draco buffer twice in
+				// different ways, so this is left unimplemented.
+				throw new Error(
+
+					'THREE.DRACOLoader: Unable to re-decode a buffer with different ' +
+					'settings. Buffer has already been transferred.'
+
+				);
+
+			}
+
+		}
+
+		//
+
+		var worker;
+		var taskID = this.workerNextTaskID ++;
+		var taskCost = buffer.byteLength;
 
 		// Obtain a worker and assign a task, and construct a geometry instance
 		// when the task completes.
@@ -164,8 +198,10 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			.then( ( message ) => this._createGeometry( message.geometry ) );
 
 		// Remove task from the task list.
+		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 		geometryPending
-			.finally( () => {
+			.catch( () => true )
+			.then( () => {
 
 				if ( worker && taskID ) {
 
@@ -176,6 +212,14 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 				}
 
 			} );
+
+		// Cache the task result.
+		THREE.DRACOLoader.taskCache.set( buffer, {
+
+			key: taskKey,
+			promise: geometryPending
+
+		} );
 
 		return geometryPending;
 
@@ -217,6 +261,14 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			loader.load( url, resolve, undefined, reject );
 
 		} );
+
+	},
+
+	preload: function () {
+
+		this._initDecoder();
+
+		return this;
 
 	},
 
@@ -595,6 +647,8 @@ THREE.DRACOLoader.DRACOWorker = function () {
 	}
 
 };
+
+THREE.DRACOLoader.taskCache = new WeakMap();
 
 /** Deprecated static methods */
 

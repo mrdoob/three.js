@@ -6,7 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			#overlay {
+			#selection {
 				position: fixed;
 				display: flex;
 				flex-direction: column;
@@ -18,7 +18,7 @@
 				z-index: 999;
 			}
 
-			#overlay > div {
+			#selection > div {
 				height: 128px;
 				width: 128px;
 				border: 1px solid white;
@@ -31,7 +31,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture
 		</div>
 
-		<div id="overlay">
+		<div id="selection">
 			<div></div>
 		</div>
 
@@ -114,8 +114,8 @@
 
 				//
 
-				var overlay = document.getElementById( 'overlay' );
-				var controls = new OrbitControls( camera, overlay );
+				var selection = document.getElementById( 'selection' );
+				var controls = new OrbitControls( camera, selection );
 				controls.enablePan = false;
 
 				//

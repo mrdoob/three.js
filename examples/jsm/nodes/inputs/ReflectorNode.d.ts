@@ -1,4 +1,3 @@
-import { NodeBuilder } from '../core/NodeBuilder';
 import { TempNode } from '../core/TempNode';
 import { Matrix4Node } from './Matrix4Node';
 import { OperatorNode } from '../math/OperatorNode';
@@ -19,7 +18,6 @@ export class ReflectorNode extends TempNode {
 
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: ReflectorNode ): this;
 
 }

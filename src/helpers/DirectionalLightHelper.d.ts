@@ -14,7 +14,7 @@ export class DirectionalLightHelper extends Object3D {
 
 	light: DirectionalLight;
 	lightPlane: Line;
-	targetPlane: Line;
+	targetLine: Line;
 	color: Color | string | number | undefined;
 	matrix: Matrix4;
 	matrixAutoUpdate: boolean;

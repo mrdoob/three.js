@@ -21,20 +21,10 @@
 		</p>
 		</div>
 
+		<h2>Code Example</h2>
 
-		<h2>Example</h2>
-
-		<div>[example:webgl_geometry_minecraft WebGL / geometry / minecraft ]</div>
-		<div>[example:webgl_geometry_minecraft_ao WebGL / geometry / minecraft / ao ]</div>
-		<div>[example:webgl_geometry_nurbs WebGL / geometry / nurbs ]</div>
-		<div>[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor ]</div>
-		<div>[example:webgl_interactive_cubes_gpu WebGL / interactive / cubes / gpu ]</div>
-		<div>[example:webgl_interactive_lines WebGL / interactive / lines ]</div>
-		<div>[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points ]</div>
-		<div>[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter ]</div>
-
-
-		<code>var geometry = new THREE.Geometry();
+		<code>
+		var geometry = new THREE.Geometry();
 
 		geometry.vertices.push(
 			new THREE.Vector3( -10,  10, 0 ),
@@ -46,6 +36,20 @@
 
 		geometry.computeBoundingSphere();
 		</code>
+
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_geometry_minecraft WebGL / geometry / minecraft ]<br />
+			[example:webgl_geometry_minecraft_ao WebGL / geometry / minecraft / ao ]<br />
+			[example:webgl_geometry_nurbs WebGL / geometry / nurbs ]<br />
+			[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor ]<br />
+			[example:webgl_interactive_cubes_gpu WebGL / interactive / cubes / gpu ]<br />
+			[example:webgl_interactive_lines WebGL / interactive / lines ]<br />
+			[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points ]<br />
+			[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter ]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -97,13 +101,6 @@
 
 		<h3>[property:Integer id]</h3>
 		<p>Unique number for this geometry instance.</p>
-
-		<h3>[property:Boolean isGeometry]</h3>
-		<p>
-			Used to check whether this or derived classes are Geometries. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
 
 		<h3>[property:array lineDistances]</h3>
 		<p>
@@ -210,7 +207,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] methods are available on this class.</h3>
 
-		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>Bakes matrix transform directly into vertex coordinates.</p>
 
 		<h3>[method:Geometry center] ()</h3>

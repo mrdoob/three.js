@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl ocean
 		</div>
 
 		<script type="module">
@@ -101,11 +101,10 @@
 					azimuth: 0.205
 				};
 
-				var cubeCamera = new THREE.CubeCamera( 0.1, 1, 512 );
-				cubeCamera.renderTarget.texture.generateMipmaps = true;
-				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
+				var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 512, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+				var cubeCamera = new THREE.CubeCamera( 0.1, 1, cubeRenderTarget );
 
-				scene.background = cubeCamera.renderTarget;
+				scene.background = cubeRenderTarget;
 
 				function updateSun() {
 
@@ -146,10 +145,10 @@
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
 				var material = new THREE.MeshStandardMaterial( {
-					vertexColors: THREE.VertexColors,
+					vertexColors: true,
 					roughness: 0.0,
 					flatShading: true,
-					envMap: cubeCamera.renderTarget.texture,
+					envMap: cubeRenderTarget.texture,
 					side: THREE.DoubleSide
 				} );
 

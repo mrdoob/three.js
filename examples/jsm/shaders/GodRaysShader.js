@@ -20,7 +20,7 @@
 
 import {
 	Color,
-	Vector2
+	Vector3
 } from "../../../build/three.module.js";
 
 var GodRaysDepthMaskShader = {
@@ -90,7 +90,7 @@ var GodRaysGenerateShader = {
 			value: 1.0
 		},
 		vSunPositionScreenSpace: {
-			value: new Vector2( 0.5, 0.5 )
+			value: new Vector3()
 		}
 
 	},
@@ -116,14 +116,14 @@ var GodRaysGenerateShader = {
 
 		"uniform sampler2D tInput;",
 
-		"uniform vec2 vSunPositionScreenSpace;",
+		"uniform vec3 vSunPositionScreenSpace;",
 		"uniform float fStepSize;", // filter step size
 
 		"void main() {",
 
 		// delta from current pixel to "sun" position
 
-		"	vec2 delta = vSunPositionScreenSpace - vUv;",
+		"	vec2 delta = vSunPositionScreenSpace.xy - vUv;",
 		"	float dist = length( delta );",
 
 		// Step vector (uv space)
@@ -162,22 +162,24 @@ var GodRaysGenerateShader = {
 
 		// Unrolling loop manually makes it work in ANGLE
 
-		"	if ( 0.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r;",
+		"	float f = min( 1.0, max( vSunPositionScreenSpace.z / 1000.0, 0.0 ) );", // used to fade out godrays
+
+		"	if ( 0.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;",
 		"	uv += stepv;",
 
-		"	if ( 1.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r;",
+		"	if ( 1.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;",
 		"	uv += stepv;",
 
-		"	if ( 2.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r;",
+		"	if ( 2.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;",
 		"	uv += stepv;",
 
-		"	if ( 3.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r;",
+		"	if ( 3.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;",
 		"	uv += stepv;",
 
-		"	if ( 4.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r;",
+		"	if ( 4.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;",
 		"	uv += stepv;",
 
-		"	if ( 5.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r;",
+		"	if ( 5.0 <= iters && uv.y < 1.0 ) col += texture2D( tInput, uv ).r * f;",
 		"	uv += stepv;",
 
 		// Should technically be dividing by 'iters', but 'TAPS_PER_PASS' smooths out
@@ -215,10 +217,6 @@ var GodRaysCombineShader = {
 
 		fGodRayIntensity: {
 			value: 0.69
-		},
-
-		vSunPositionScreenSpace: {
-			value: new Vector2( 0.5, 0.5 )
 		}
 
 	},
@@ -243,7 +241,6 @@ var GodRaysCombineShader = {
 		"uniform sampler2D tColors;",
 		"uniform sampler2D tGodRays;",
 
-		"uniform vec2 vSunPositionScreenSpace;",
 		"uniform float fGodRayIntensity;",
 
 		"void main() {",
@@ -272,7 +269,7 @@ var GodRaysFakeSunShader = {
 	uniforms: {
 
 		vSunPositionScreenSpace: {
-			value: new Vector2( 0.5, 0.5 )
+			value: new Vector3()
 		},
 
 		fAspect: {
@@ -306,7 +303,7 @@ var GodRaysFakeSunShader = {
 
 		"varying vec2 vUv;",
 
-		"uniform vec2 vSunPositionScreenSpace;",
+		"uniform vec3 vSunPositionScreenSpace;",
 		"uniform float fAspect;",
 
 		"uniform vec3 sunColor;",
@@ -314,7 +311,7 @@ var GodRaysFakeSunShader = {
 
 		"void main() {",
 
-		"	vec2 diff = vUv - vSunPositionScreenSpace;",
+		"	vec2 diff = vUv - vSunPositionScreenSpace.xy;",
 
 		// Correct for aspect ratio
 
@@ -323,7 +320,7 @@ var GodRaysFakeSunShader = {
 		"	float prop = clamp( length( diff ) / 0.5, 0.0, 1.0 );",
 		"	prop = 0.35 * pow( 1.0 - prop, 3.0 );",
 
-		"	gl_FragColor.xyz = mix( sunColor, bgColor, 1.0 - prop );",
+		"	gl_FragColor.xyz = ( vSunPositionScreenSpace.z > 0.0 ) ? mix( sunColor, bgColor, 1.0 - prop ) : bgColor;",
 		"	gl_FragColor.w = 1.0;",
 
 		"}"

@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lightning strike</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - lightning strike</div>
 
 		<script type="module">
 
@@ -54,9 +54,7 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 
@@ -417,8 +415,8 @@
 							 r + "posz.jpg", r + "negz.jpg" ];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.format = THREE.RGBFormat;
 				textureCube.mapping = THREE.CubeReflectionMapping;
+				textureCube.encoding = THREE.sRGBEncoding;
 
 				var sphereMaterial = new THREE.MeshPhysicalMaterial( {
 					transparent: true,

@@ -36,16 +36,16 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 	isLineSegmentsGeometry: true,
 
-	applyMatrix: function ( matrix ) {
+	applyMatrix4: function ( matrix ) {
 
 		var start = this.attributes.instanceStart;
 		var end = this.attributes.instanceEnd;
 
 		if ( start !== undefined ) {
 
-			matrix.applyToBufferAttribute( start );
+			start.applyMatrix4( matrix );
 
-			matrix.applyToBufferAttribute( end );
+			end.applyMatrix4( matrix );
 
 			start.data.needsUpdate = true;
 
@@ -144,7 +144,7 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 	},
 
-	fromLineSegements: function ( lineSegments ) {
+	fromLineSegments: function ( lineSegments ) {
 
 		var geometry = lineSegments.geometry;
 
@@ -154,7 +154,7 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 
 		} else if ( geometry.isBufferGeometry ) {
 
-			this.setPositions( geometry.position.array ); // assumes non-indexed
+			this.setPositions( geometry.attributes.position.array ); // assumes non-indexed
 
 		}
 
@@ -249,6 +249,14 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( InstancedBufferGe
 	toJSON: function () {
 
 		// todo
+
+	},
+
+	applyMatrix: function ( matrix ) {
+
+		console.warn( 'THREE.LineSegmentsGeometry: applyMatrix() has been renamed to applyMatrix4().' );
+
+		return this.applyMatrix4( matrix );
 
 	}
 

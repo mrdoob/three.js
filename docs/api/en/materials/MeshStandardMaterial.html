@@ -99,8 +99,7 @@
 
 		<h3>[property:Texture aoMap]</h3>
 		<p>The red channel of this texture is used as the ambient occlusion map. Default is null.
-		The aoMap requires a second set of UVs, and consequently will ignore the [page:Texture repeat]
-		and [page:Texture offset] Texture properties.</p>
+		The aoMap requires a second set of UVs.</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
 		<p>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</p>
@@ -175,25 +174,16 @@
 		<p>
 		Note: only [link:https://threejs.org/docs/#api/textures/CubeTexture cube environment maps] are supported
 		for MeshStandardMaterial. If you want to use an equirectangular map you will need to use
-		[page:WebGLRenderTargetCube.fromEquirectangularTexture WebGLRenderTargetCube.fromEquirectangularTexture]().
+		[page:WebGLCubeRenderTarget.fromEquirectangularTexture WebGLCubeRenderTarget.fromEquirectangularTexture]().
 		See this [link:https://threejs.org/examples/webgl_materials_envmaps_exr.html example] for details.
 		</p>
 
 		<h3>[property:Float envMapIntensity]</h3>
 		<p>Scales the effect of the environment map by multiplying its color.</p>
 
-		<h3>[property:Boolean isMeshStandardMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are mesh standard materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 
 		<h3>[property:Texture lightMap]</h3>
-		<p>The light map. Default is null. The lightMap requires a second set of UVs,
-		and consequently will ignore the [page:Texture repeat] and [page:Texture offset]
-		Texture properties.</p>
+		<p>The light map. Default is null. The lightMap requires a second set of UVs.</p>
 
 		<h3>[property:Float lightMapIntensity]</h3>
 		<p>Intensity of the baked light. Default is 1.</p>
@@ -204,7 +194,7 @@
 		<h3>[property:Float metalness]</h3>
 		<p>
 			How much the material is like a metal. Non-metallic materials such as wood or stone use 0.0, metallic use 1.0, with nothing
-			(usually) in between. Default is 0.5. A value between 0.0 and 1.0 could be used for a rusty metal look. If metalnessMap is
+			(usually) in between. Default is 0.0. A value between 0.0 and 1.0 could be used for a rusty metal look. If metalnessMap is
 			also provided, both values are multiplied.
 		</p>
 
@@ -224,6 +214,8 @@
 		<p>
 			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
 			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
+			In case the material has a normal map authored using the left handed convention, the y component of normalScale
+			should be negated to compensate for the different handedness.
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>
@@ -248,7 +240,7 @@
 
 		<h3>[property:Float roughness]</h3>
 		<p>
-			How rough the material appears. 0.0 means a smooth mirror reflection, 1.0 means fully diffuse. Default is 0.5.
+			How rough the material appears. 0.0 means a smooth mirror reflection, 1.0 means fully diffuse. Default is 1.0.
 			If roughnessMap is also provided, both values are multiplied.
 		</p>
 
@@ -257,6 +249,13 @@
 
 		<h3>[property:Boolean skinning]</h3>
 		<p>Define whether the material uses skinning. Default is false.</p>
+
+		<h3>[property:Boolean vertexTangents]</h3>
+		<p>
+		Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
+		are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
+		more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+		</p>
 
 		<h3>[property:Boolean wireframe]</h3>
 		<p>Render geometry as wireframe. Default is *false* (i.e. render as flat polygons).</p>

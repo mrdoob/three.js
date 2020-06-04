@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader - kinematics<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> collada loader - kinematics<br/>
 			robot from <a href="https://github.com/rdiankov/collada_robots" target="_blank" rel="noopener">collada robots</a>
 		</div>
 
@@ -106,7 +106,7 @@
 
 			function setupTween() {
 
-				var duration = THREE.Math.randInt( 1000, 5000 );
+				var duration = THREE.MathUtils.randInt( 1000, 5000 );
 
 				var target = {};
 
@@ -124,7 +124,7 @@
 
 							tweenParameters[ prop ] = position;
 
-							target[ prop ] = THREE.Math.randInt( joint.limits.min, joint.limits.max );
+							target[ prop ] = THREE.MathUtils.randInt( joint.limits.min, joint.limits.max );
 
 						}
 

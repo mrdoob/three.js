@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl EXR texture loader example<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl EXR texture loader example<br/>
 			Image courtesy of <a href="http://www.pauldebevec.com/Research/HDR/" target="_blank" rel="noopener">Paul Debevec</a>.
 		</div>
 
@@ -39,7 +39,7 @@
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 

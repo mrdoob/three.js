@@ -8,10 +8,7 @@
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sky + sun shader
-
-			<br/><a href="https://plus.google.com/117614030945250277079/posts/MYkgKdvLhNj">More info</a> by <a href="http://twitter.com/blurspline">@blurspline</a>
-
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sky + sun shader
 		</div>
 
 		<script type="module">
@@ -68,7 +65,7 @@
 					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
 					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
 					uniforms[ "luminance" ].value = effectController.luminance;
-					
+
 					var theta = Math.PI * ( effectController.inclination - 0.5 );
 					var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
 

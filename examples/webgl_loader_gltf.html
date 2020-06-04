@@ -9,29 +9,26 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - GLTFLoader<br />
 			Battle Damaged Sci-fi Helmet by
 			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
-			<a href="https://hdrihaven.com/hdri/?h=pedestrian_overpass" target="_blank" rel="noopener">Pedestrian Overpass</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
 		</div>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 
-			import Stats from './jsm/libs/stats.module.js';
-
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+			import { RoughnessMipmapper } from './jsm/utils/RoughnessMipmapper.js';
 
-			var container, stats, controls;
+			var container, controls;
 			var camera, scene, renderer;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -39,31 +36,29 @@
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
-				camera.position.set( - 1.8, 0.9, 2.7 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
 
 				scene = new THREE.Scene();
 
 				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
 					.setPath( 'textures/equirectangular/' )
-					.load( 'pedestrian_overpass_2k.hdr', function ( texture ) {
+					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						var options = {
-							minFilter: texture.minFilter,
-							magFilter: texture.magFilter
-						};
+						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
-						scene.background = new THREE.WebGLRenderTargetCube( 1024, 1024, options ).fromEquirectangularTexture( renderer, texture );
+						scene.background = envMap;
+						scene.environment = envMap;
 
-						var pmremGenerator = new PMREMGenerator( scene.background.texture );
-						pmremGenerator.update( renderer );
+						texture.dispose();
+						pmremGenerator.dispose();
 
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						var envMap = pmremCubeUVPacker.CubeUVRenderTarget.texture;
+						render();
 
 						// model
+
+						// use of RoughnessMipmapper is optional
+						var roughnessMipmapper = new RoughnessMipmapper( renderer );
 
 						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
@@ -72,7 +67,7 @@
 
 								if ( child.isMesh ) {
 
-									child.material.envMap = envMap;
+									roughnessMipmapper.generateMipmaps( child.material );
 
 								}
 
@@ -80,28 +75,33 @@
 
 							scene.add( gltf.scene );
 
-						} );
+							roughnessMipmapper.dispose();
 
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+							render();
+
+						} );
 
 					} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.8;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
+
 				controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.set( 0, - 0.2, - 0.2 );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+				controls.target.set( 0, 0, - 0.2 );
 				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-				// stats
-				stats = new Stats();
-				container.appendChild( stats.dom );
 
 			}
 
@@ -112,17 +112,15 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
+				render();
+
 			}
 
 			//
 
-			function animate() {
-
-				requestAnimationFrame( animate );
+			function render() {
 
 				renderer.render( scene, camera );
-
-				stats.update();
 
 			}
 

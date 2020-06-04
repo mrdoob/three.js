@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -15,28 +15,28 @@
 		</p>
 
 
-		<h2>示例(Examples)</h2>
+		<h2>代码示例</h2>
 		颜色可以用以下任意一种方式初始化。
 		<code>
-//empty constructor - will default white
-var color = new THREE.Color();
+		//empty constructor - will default white
+		var color = new THREE.Color();
 
-//Hexadecimal color (recommended)
-var color = new THREE.Color( 0xff0000 );
+		//Hexadecimal color (recommended)
+		var color = new THREE.Color( 0xff0000 );
 
-//RGB string
-var color = new THREE.Color("rgb(255, 0, 0)");
-var color = new THREE.Color("rgb(100%, 0%, 0%)");
+		//RGB string
+		var color = new THREE.Color("rgb(255, 0, 0)");
+		var color = new THREE.Color("rgb(100%, 0%, 0%)");
 
-//X11 color name - all 140 color names are supported.
-//Note the lack of CamelCase in the name
-var color = new THREE.Color( 'skyblue' );
+		//X11 color name - all 140 color names are supported.
+		//Note the lack of CamelCase in the name
+		var color = new THREE.Color( 'skyblue' );
 
-//HSL string
-var color = new THREE.Color("hsl(0, 100%, 50%)");
+		//HSL string
+		var color = new THREE.Color("hsl(0, 100%, 50%)");
 
-//Separate RGB values between 0 and 1
-var color = new THREE.Color( 1, 0, 0 );
+		//Separate RGB values between 0 and 1
+		var color = new THREE.Color( 1, 0, 0 );
 		</code>
 
 
@@ -74,13 +74,6 @@ var color = new THREE.Color( 1, 0, 0 );
 		</p>
 
 		<h2>属性（Properties）</h2>
-
-		<h3>[property:Boolean isColor]</h3>
-		<p>
-			用来检测此类或者派生类是否为颜色。默认值是 *true*。<br /><br />
-
-			不应该去改变这个值，因为它在内部用于优化。
-		</p>
 
 		<h3>[property:Float r]</h3>
 		<p>
@@ -126,7 +119,7 @@ var color = new THREE.Color( 1, 0, 0 );
 		[page:Float gammaFactor] - (可选参数). 默认值 *2.0*.<br /><br />
 		通过取颜色 [page:.r r], [page:.g g] and [page:.b b] 的 [page:Float gammaFactor] 次方将颜色从伽马空间转换成线性空间。
 		</p>
-		
+
 		<h3>[method:Color convertLinearToGamma]( [param:Float gammaFactor] ) </h3>
 		<p>
 		[page:Float gammaFactor] - (可选参数). 默认值 *2.0*.<br /><br />

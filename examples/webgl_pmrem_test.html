@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js PMREM directional light test</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+
+		<div id="container">
+			<div id="info">
+				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+				PMREM directional light test <a href="https://github.com/elalish" target="_blank" rel="noopener">Emmett Lalish</a>
+				<br>Top row is white metal
+				<br>Middle row is white dielectric
+				<br>Bottom row is black dielectric.
+				<br>Mouse-out is a standard Directional Light.
+				<br>Mouse-over is a PMREM of the skybox: a single bright pixel representing the same directional light source.
+				<br>The difference between these renders indicates the error in the PMREM approximations.
+			</div>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+
+			var scene, camera, controls, renderer;
+			
+			function init() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+				var aspect = width / height;
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( width, height );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.physicallyCorrectLights = true;
+
+				// tonemapping
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+
+				document.body.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onResize, false );
+
+				// scene
+
+				scene = new THREE.Scene();
+
+				// camera
+
+				camera = new THREE.PerspectiveCamera( 40, aspect, 1, 30 );
+				updateCamera();
+				camera.position.set( 0, 0, 16 );
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 4;
+				controls.maxDistance = 20;
+
+				// light
+
+				var directionalLight = new THREE.DirectionalLight( 0xffffff, 0 ); // set intensity to 0 to start
+				var x = 597;
+				var y = 213;
+				var theta = ( x + 0.5 ) * Math.PI / 512;
+				var phi = ( y + 0.5 ) * Math.PI / 512;
+
+				directionalLight.position.setFromSphericalCoords( 100, - phi, Math.PI / 2 - theta );
+
+				scene.add( directionalLight );
+				// scene.add( new THREE.DirectionalLightHelper( directionalLight ) );
+
+				// The spot1Lux HDR environment map is expressed in nits (lux / sr). The directional light has units of lux,
+				// so to match a 1 lux light, we set a single pixel with a value equal to 1 divided by the solid
+				// angle of the pixel in steradians. This image is 1024 x 512,
+				// so the value is 1 / ( sin( phi ) * ( pi / 512 ) ^ 2 ) = 27,490 nits.
+
+				document.body.addEventListener( 'mouseover', function () {
+
+					scene.traverse( function ( child ) {
+
+						if ( child.isMesh ) {
+
+							child.material.envMapIntensity = 1;
+							directionalLight.intensity = 0;
+
+						}
+
+					} );
+
+					render();
+
+				} );
+
+				document.body.addEventListener( 'mouseout', function () {
+
+					scene.traverse( function ( child ) {
+
+						if ( child.isMesh ) {
+
+							child.material.envMapIntensity = 0;
+							directionalLight.intensity = 1;
+
+						}
+
+					} );
+
+					render();
+
+				} );
+
+			}
+
+			function createObjects() {
+
+				var radianceMap = null;
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					// .setDataType( THREE.FloatType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'spot1Lux.hdr', function ( texture ) {
+
+						radianceMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						pmremGenerator.dispose();
+
+						scene.background = radianceMap;
+
+						var geometry = new THREE.SphereBufferGeometry( 0.4, 32, 32 );
+
+						for ( var x = 0; x <= 10; x ++ ) {
+
+							for ( var y = 0; y <= 2; y ++ ) {
+
+								var material = new THREE.MeshPhysicalMaterial( {
+									roughness: x / 10,
+									metalness: y < 1 ? 1 : 0,
+									color: y < 2 ? 0xffffff : 0x000000,
+									envMap: radianceMap,
+									envMapIntensity: 1
+								} );
+
+								var mesh = new THREE.Mesh( geometry, material );
+								mesh.position.x = x - 5;
+								mesh.position.y = 1 - y;
+								scene.add( mesh );
+
+							}
+
+						}
+
+						render();
+
+					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
+
+			}
+
+			function onResize() {
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
+				updateCamera();
+
+				renderer.setSize( width, height );
+
+				render();
+
+			}
+			
+			function updateCamera() {
+
+				var horizontalFoV = 40;
+				var verticalFoV = 2 * Math.atan( Math.tan( horizontalFoV / 2 * Math.PI / 180 ) / camera.aspect ) * 180 / Math.PI;
+				camera.fov = verticalFoV;
+				camera.updateProjectionMatrix();
+
+			}
+
+			function render() {
+
+				renderer.render( scene, camera );
+
+			}
+			
+			Promise.resolve()
+				.then( init )
+				.then( createObjects )
+				.then( render );
+
+		</script>
+	</body>
+</html>

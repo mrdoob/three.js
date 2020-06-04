@@ -347,6 +347,9 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.min.equals( new Vector3( - 0.25, - 0.25, - 0.25 ) ), "Smaller box: correct new minimum" );
 			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Smaller box: correct new maximum" );
 
+			//
+			assert.ok( new Box3().expandByObject( new Mesh() ).isEmpty() === true, "The AABB of a mesh with inital geometry is empty." );
+
 		} );
 
 		QUnit.test( "containsPoint", ( assert ) => {

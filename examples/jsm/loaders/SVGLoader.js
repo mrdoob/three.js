@@ -6,7 +6,6 @@
 
 import {
 	BufferGeometry,
-	Color,
 	FileLoader,
 	Float32BufferAttribute,
 	Loader,
@@ -20,6 +19,12 @@ import {
 var SVGLoader = function ( manager ) {
 
 	Loader.call( this, manager );
+
+	// Default dots per inch
+	this.defaultDPI = 90;
+
+	// Accepted units: 'mm', 'cm', 'in', 'pt', 'pc', 'px'
+	this.defaultUnit = "px";
 
 };
 
@@ -35,13 +40,33 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
 	},
 
 	parse: function ( text ) {
+
+		var scope = this;
 
 		function parseNode( node, style ) {
 
@@ -54,6 +79,10 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			switch ( node.nodeName ) {
 
 				case 'svg':
+					break;
+
+				case 'style':
+					parseCSSStylesheet( node );
 					break;
 
 				case 'g':
@@ -96,7 +125,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					break;
 
 				default:
-					console.log( node );
+					// console.log( node );
 
 			}
 
@@ -197,6 +226,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'H':
@@ -212,6 +242,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'V':
@@ -227,6 +258,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'L':
@@ -243,6 +275,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'C':
@@ -266,6 +299,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'S':
@@ -289,6 +323,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'Q':
@@ -310,6 +345,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'T':
@@ -333,6 +369,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'A':
@@ -352,6 +389,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'm':
@@ -377,6 +415,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'h':
@@ -392,6 +431,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'v':
@@ -407,6 +447,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'l':
@@ -423,6 +464,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'c':
@@ -446,6 +488,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 's':
@@ -469,6 +512,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'q':
@@ -490,6 +534,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 't':
@@ -513,6 +558,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'a':
@@ -532,6 +578,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							if ( j === 0 && doSetFirstPoint === true ) firstPoint.copy( point );
 
 						}
+
 						break;
 
 					case 'Z':
@@ -546,6 +593,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 							isFirstPoint = true;
 
 						}
+
 						break;
 
 					default:
@@ -560,6 +608,34 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 			return path;
+
+		}
+
+		function parseCSSStylesheet( node ) {
+
+			if ( ! node.sheet || ! node.sheet.cssRules || ! node.sheet.cssRules.length ) return;
+
+			for ( var i = 0; i < node.sheet.cssRules.length; i ++ ) {
+
+				var stylesheet = node.sheet.cssRules[ i ];
+
+				if ( stylesheet.type !== 1 ) continue;
+
+				var selectorList = stylesheet.selectorText
+					.split( /,/gm )
+					.filter( Boolean )
+					.map( i => i.trim() );
+
+				for ( var j = 0; j < selectorList.length; j ++ ) {
+
+					stylesheets[ selectorList[ j ] ] = Object.assign(
+						stylesheets[ selectorList[ j ] ] || {},
+						stylesheet.style
+					);
+
+				}
+
+			}
 
 		}
 
@@ -641,12 +717,12 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		*/
 		function parseRectNode( node ) {
 
-			var x = parseFloat( node.getAttribute( 'x' ) || 0 );
-			var y = parseFloat( node.getAttribute( 'y' ) || 0 );
-			var rx = parseFloat( node.getAttribute( 'rx' ) || 0 );
-			var ry = parseFloat( node.getAttribute( 'ry' ) || 0 );
-			var w = parseFloat( node.getAttribute( 'width' ) );
-			var h = parseFloat( node.getAttribute( 'height' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'x' ) || 0 );
+			var y = parseFloatWithUnits( node.getAttribute( 'y' ) || 0 );
+			var rx = parseFloatWithUnits( node.getAttribute( 'rx' ) || 0 );
+			var ry = parseFloatWithUnits( node.getAttribute( 'ry' ) || 0 );
+			var w = parseFloatWithUnits( node.getAttribute( 'width' ) );
+			var h = parseFloatWithUnits( node.getAttribute( 'height' ) );
 
 			var path = new ShapePath();
 			path.moveTo( x + 2 * rx, y );
@@ -678,8 +754,8 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			function iterator( match, a, b ) {
 
-				var x = parseFloat( a );
-				var y = parseFloat( b );
+				var x = parseFloatWithUnits( a );
+				var y = parseFloatWithUnits( b );
 
 				if ( index === 0 ) {
 
@@ -713,8 +789,8 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			function iterator( match, a, b ) {
 
-				var x = parseFloat( a );
-				var y = parseFloat( b );
+				var x = parseFloatWithUnits( a );
+				var y = parseFloatWithUnits( b );
 
 				if ( index === 0 ) {
 
@@ -746,9 +822,9 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseCircleNode( node ) {
 
-			var x = parseFloat( node.getAttribute( 'cx' ) );
-			var y = parseFloat( node.getAttribute( 'cy' ) );
-			var r = parseFloat( node.getAttribute( 'r' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) );
+			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) );
+			var r = parseFloatWithUnits( node.getAttribute( 'r' ) );
 
 			var subpath = new Path();
 			subpath.absarc( x, y, r, 0, Math.PI * 2 );
@@ -762,10 +838,10 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseEllipseNode( node ) {
 
-			var x = parseFloat( node.getAttribute( 'cx' ) );
-			var y = parseFloat( node.getAttribute( 'cy' ) );
-			var rx = parseFloat( node.getAttribute( 'rx' ) );
-			var ry = parseFloat( node.getAttribute( 'ry' ) );
+			var x = parseFloatWithUnits( node.getAttribute( 'cx' ) );
+			var y = parseFloatWithUnits( node.getAttribute( 'cy' ) );
+			var rx = parseFloatWithUnits( node.getAttribute( 'rx' ) );
+			var ry = parseFloatWithUnits( node.getAttribute( 'ry' ) );
 
 			var subpath = new Path();
 			subpath.absellipse( x, y, rx, ry, 0, Math.PI * 2 );
@@ -779,10 +855,10 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function parseLineNode( node ) {
 
-			var x1 = parseFloat( node.getAttribute( 'x1' ) );
-			var y1 = parseFloat( node.getAttribute( 'y1' ) );
-			var x2 = parseFloat( node.getAttribute( 'x2' ) );
-			var y2 = parseFloat( node.getAttribute( 'y2' ) );
+			var x1 = parseFloatWithUnits( node.getAttribute( 'x1' ) );
+			var y1 = parseFloatWithUnits( node.getAttribute( 'y1' ) );
+			var x2 = parseFloatWithUnits( node.getAttribute( 'x2' ) );
+			var y2 = parseFloatWithUnits( node.getAttribute( 'y2' ) );
 
 			var path = new ShapePath();
 			path.moveTo( x1, y1 );
@@ -799,6 +875,29 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			style = Object.assign( {}, style ); // clone style
 
+			var stylesheetStyles = {};
+
+			if ( node.hasAttribute( 'class' ) ) {
+
+				var classSelectors = node.getAttribute( 'class' )
+					.split( /\s/ )
+					.filter( Boolean )
+					.map( i => i.trim() );
+
+				for ( var i = 0; i < classSelectors.length; i ++ ) {
+
+					stylesheetStyles = Object.assign( stylesheetStyles, stylesheets[ '.' + classSelectors[ i ] ] );
+
+				}
+
+			}
+
+			if ( node.hasAttribute( 'id' ) ) {
+
+				stylesheetStyles = Object.assign( stylesheetStyles, stylesheets[ '#' + node.getAttribute( 'id' ) ] );
+
+			}
+
 			function addStyle( svgName, jsName, adjustFunction ) {
 
 				if ( adjustFunction === undefined ) adjustFunction = function copy( v ) {
@@ -808,30 +907,33 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				};
 
 				if ( node.hasAttribute( svgName ) ) style[ jsName ] = adjustFunction( node.getAttribute( svgName ) );
-				if ( node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
+				if ( stylesheetStyles[ svgName ] ) style[ jsName ] = adjustFunction( stylesheetStyles[ svgName ] );
+				if ( node.style && node.style[ svgName ] !== '' ) style[ jsName ] = adjustFunction( node.style[ svgName ] );
 
 			}
 
 			function clamp( v ) {
 
-				return Math.max( 0, Math.min( 1, parseFloat( v ) ) );
+				return Math.max( 0, Math.min( 1, parseFloatWithUnits( v ) ) );
 
 			}
 
 			function positive( v ) {
 
-				return Math.max( 0, parseFloat( v ) );
+				return Math.max( 0, parseFloatWithUnits( v ) );
 
 			}
 
 			addStyle( 'fill', 'fill' );
 			addStyle( 'fill-opacity', 'fillOpacity', clamp );
+			addStyle( 'opacity', 'opacity', clamp );
 			addStyle( 'stroke', 'stroke' );
 			addStyle( 'stroke-opacity', 'strokeOpacity', clamp );
 			addStyle( 'stroke-width', 'strokeWidth', positive );
 			addStyle( 'stroke-linejoin', 'strokeLineJoin' );
 			addStyle( 'stroke-linecap', 'strokeLineCap' );
 			addStyle( 'stroke-miterlimit', 'strokeMiterLimit', positive );
+			addStyle( 'visibility', 'visibility' );
 
 			return style;
 
@@ -868,7 +970,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				}
 
-				array[ i ] = parseFloat( number );
+				array[ i ] = parseFloatWithUnits( number );
 
 			}
 
@@ -876,6 +978,109 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 
 		}
+
+		// Units
+
+		var units = [ 'mm', 'cm', 'in', 'pt', 'pc', 'px' ];
+
+		// Conversion: [ fromUnit ][ toUnit ] (-1 means dpi dependent)
+		var unitConversion = {
+
+			"mm": {
+				"mm": 1,
+				"cm": 0.1,
+				"in": 1 / 25.4,
+				"pt": 72 / 25.4,
+				"pc": 6 / 25.4,
+				"px": - 1
+			},
+			"cm": {
+				"mm": 10,
+				"cm": 1,
+				"in": 1 / 2.54,
+				"pt": 72 / 2.54,
+				"pc": 6 / 2.54,
+				"px": - 1
+			},
+			"in": {
+				"mm": 25.4,
+				"cm": 2.54,
+				"in": 1,
+				"pt": 72,
+				"pc": 6,
+				"px": - 1
+			},
+			"pt": {
+				"mm": 25.4 / 72,
+				"cm": 2.54 / 72,
+				"in": 1 / 72,
+				"pt": 1,
+				"pc": 6 / 72,
+				"px": - 1
+			},
+			"pc": {
+				"mm": 25.4 / 6,
+				"cm": 2.54 / 6,
+				"in": 1 / 6,
+				"pt": 72 / 6,
+				"pc": 1,
+				"px": - 1
+			},
+			"px": {
+				"px": 1
+			}
+
+		};
+
+		function parseFloatWithUnits( string ) {
+
+			var theUnit = "px";
+
+			if ( typeof string === 'string' || string instanceof String ) {
+
+				for ( var i = 0, n = units.length; i < n; i ++ ) {
+
+					var u = units[ i ];
+
+					if ( string.endsWith( u ) ) {
+
+						theUnit = u;
+						string = string.substring( 0, string.length - u.length );
+						break;
+
+					}
+
+				}
+
+			}
+
+			var scale = undefined;
+
+			if ( theUnit === "px" && scope.defaultUnit !== "px" ) {
+
+				// Conversion scale from  pixels to inches, then to default units
+
+				scale = unitConversion[ "in" ][ scope.defaultUnit ] / scope.defaultDPI;
+
+			} else {
+
+				scale = unitConversion[ theUnit ][ scope.defaultUnit ];
+
+				if ( scale < 0 ) {
+
+					// Conversion scale to pixels
+
+					scale = unitConversion[ theUnit ][ "in" ] * scope.defaultDPI;
+
+				}
+
+			}
+
+			return scale * parseFloat( string );
+
+		}
+
+		// Transforms
 
 		function getNodeTransform( node ) {
 
@@ -1134,9 +1339,8 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		//
 
-		console.log( 'THREE.SVGLoader' );
-
 		var paths = [];
+		var stylesheets = {};
 
 		var transformStack = [];
 
@@ -1149,13 +1353,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var currentTransform = new Matrix3();
 
-		console.time( 'THREE.SVGLoader: DOMParser' );
-
 		var xml = new DOMParser().parseFromString( text, 'image/svg+xml' ); // application/xml
-
-		console.timeEnd( 'THREE.SVGLoader: DOMParser' );
-
-		console.time( 'THREE.SVGLoader: Parse' );
 
 		parseNode( xml.documentElement, {
 			fill: '#000',
@@ -1170,10 +1368,6 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var data = { paths: paths, xml: xml.documentElement };
 
 		// console.log( paths );
-
-
-		console.timeEnd( 'THREE.SVGLoader: Parse' );
-
 		return data;
 
 	}
@@ -1183,7 +1377,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 SVGLoader.getStrokeStyle = function ( width, color, lineJoin, lineCap, miterLimit ) {
 
 	// Param width: Stroke width
-	// Param color: As returned by Color.getStyle()
+	// Param color: As returned by THREE.Color.getStyle()
 	// Param lineJoin: One of "round", "bevel", "miter" or "miter-limit"
 	// Param lineCap: One of "round", "square" or "butt"
 	// Param miterLimit: Maximum join length, in multiples of the "width" parameter (join is truncated if it exceeds that distance)
@@ -1349,6 +1543,7 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 					joinIsOnLeftSide = false;
 
 				}
+
 				if ( iPoint === 1 ) initialJoinIsOnLeftSide = joinIsOnLeftSide;
 
 				tempV2_3.subVectors( nextPoint, currentPoint );
@@ -1376,6 +1571,7 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 						innerSideModified = true;
 
 					}
+
 					outerPoint.copy( tempV2_5 ).add( currentPoint );
 					innerPoint.add( currentPoint );
 
@@ -1625,23 +1821,31 @@ SVGLoader.pointsToStrokeWithBuffers = function () {
 
 			if ( joinIsOnLeftSide ) {
 
-				lastInner.toArray( vertices, 0 * 3 );
-				lastInner.toArray( vertices, 3 * 3 );
+				if ( isMiter || initialJoinIsOnLeftSide ) {
 
-				if ( isMiter ) {
+					lastInner.toArray( vertices, 0 * 3 );
+					lastInner.toArray( vertices, 3 * 3 );
 
-					lastOuter.toArray( vertices, 1 * 3 );
+					if ( isMiter ) {
+
+						lastOuter.toArray( vertices, 1 * 3 );
+
+					}
 
 				}
 
 			} else {
 
-				lastInner.toArray( vertices, 1 * 3 );
-				lastInner.toArray( vertices, 3 * 3 );
+				if ( isMiter || ! initialJoinIsOnLeftSide ) {
 
-				if ( isMiter ) {
+					lastInner.toArray( vertices, 1 * 3 );
+					lastInner.toArray( vertices, 3 * 3 );
 
-					lastOuter.toArray( vertices, 0 * 3 );
+					if ( isMiter ) {
+
+						lastOuter.toArray( vertices, 0 * 3 );
+
+					}
 
 				}
 

@@ -32,6 +32,8 @@ export class Fog implements IFog {
 	 */
 	far: number;
 
+	readonly isFog: true;
+
 	clone(): this;
 	toJSON(): any;
 

@@ -32,6 +32,7 @@
 			<li>KHR_draco_mesh_compression</li>
 			<li>KHR_materials_pbrSpecularGlossiness</li>
 			<li>KHR_materials_unlit</li>
+			<li>KHR_mesh_quantization</li>
 			<li>KHR_lights_punctual<sup>1</sup></li>
 			<li>KHR_texture_transform<sup>2</sup></li>
 			<li>MSFT_texture_dds</li>
@@ -50,15 +51,15 @@
 			#[link:https://github.com/mrdoob/three.js/issues/12788 12788].
 		</i></p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		// Instantiate a loader
-		var loader = new THREE.GLTFLoader();
+		var loader = new GLTFLoader();
 
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
-		var dracoLoader = new THREE.DRACOLoader();
-		dracoLoader.setDecoderPath( '/examples/js/libs/draco' );
+		var dracoLoader = new DRACOLoader();
+		dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
 		loader.setDRACOLoader( dracoLoader );
 
 		// Load a glTF resource
@@ -71,8 +72,8 @@
 				scene.add( gltf.scene );
 
 				gltf.animations; // Array&lt;THREE.AnimationClip&gt;
-				gltf.scene; // THREE.Scene
-				gltf.scenes; // Array&lt;THREE.Scene&gt;
+				gltf.scene; // THREE.Group
+				gltf.scenes; // Array&lt;THREE.Group&gt;
 				gltf.cameras; // Array&lt;THREE.Camera&gt;
 				gltf.asset; // Object
 
@@ -92,7 +93,11 @@
 		);
 		</code>
 
-		[example:webgl_loader_gltf]
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_loader_gltf]
+		</p>
 
 		<h2>Browser compatibility</h2>
 
@@ -110,8 +115,7 @@
 		in linear colorspace, always configure [page:WebGLRenderer] as follows when using glTF:</p>
 
 		<code>
-		renderer.gammaOutput = true;
-		renderer.gammaFactor = 2.2;
+		renderer.outputEncoding = THREE.sRGBEncoding;
 		</code>
 
 		<p>GLTFLoader will automatically configure textures referenced from a .gltf or .glb file correctly, with the
@@ -186,6 +190,7 @@
 		Refer to this [link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/draco#readme readme] for the details of Draco and its decoder.
 		</p>
 
+
 		<h3>[method:null setDDSLoader]( [param:DDSLoader ddsLoader] )</h3>
 		<p>
 		[page:DDSLoader ddsLoader] — Instance of THREE.DDSLoader, to be used for loading compressed textures with the MSFT_TEXTURE_DDS extension.
@@ -199,13 +204,13 @@
 		[page:Function onError] — (optional) A function to be called if an error occurs during parsing. The function receives error as an argument.<br />
 		</p>
 		<p>
-		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Scene scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
+		Parse a glTF-based ArrayBuffer or <em>JSON</em> String and fire [page:Function onLoad] callback when complete. The argument to [page:Function onLoad] will be an [page:object] that contains loaded parts: .[page:Group scene], .[page:Array scenes], .[page:Array cameras], .[page:Array animations], and .[page:Object asset].
 		</p>
 
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/loaders/GLTFLoader.js examples/js/loaders/GLTFLoader.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/GLTFLoader.js examples/jsm/loaders/GLTFLoader.js]
 		</p>
 	</body>
 </html>

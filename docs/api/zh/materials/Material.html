@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
 	<meta charset="utf-8"/>
 	<base href="../../../"/>
@@ -153,18 +153,11 @@ Which stencil operation to perform when the comparison function returns true and
 <h3>[property:Integer id]</h3>
 <p>此材质实例的唯一编号。</p>
 
-<h3>[property:Boolean isMaterial]</h3>
-<p>用于检查此类或派生类是否为材质。默认值为 *true*。<br/><br/>
-
-	因为其通常用在内部优化，所以不应该更改该属性值。
-</p>
-
 <h3>[property:String name]</h3>
 <p>对象的可选名称（不必是唯一的）。默认值为空字符串。</p>
 
 <h3>[property:Boolean needsUpdate]</h3>
-<p>指定需要重新编译材质。<br/>
-	实例化新材质时，此属性自动设置为true。
+<p>指定需要重新编译材质。
 </p>
 
 <h3>[property:Float opacity]</h3>
@@ -255,15 +248,14 @@ Defines whether this material is tone mapped according to the renderer's [page:W
 <p> 此材质实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]，会自动分配，不应该被更改。
 </p>
 
-<h3>[property:Integer vertexColors]</h3>
-<p> 是否使用顶点着色。默认值为[page:Materials THREE.NoColors]。
-	其他选项有[page:Materials THREE.VertexColors] 和 [page:Materials THREE.FaceColors]。
+<h3>[property:Integer version]</h3>
+<p>
+This starts at *0* and counts how many times [property:Boolean needsUpdate] is set to *true*.
 </p>
 
-<h3>[property:Boolean vertexTangents]</h3>
-<p>	Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
-	are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
-	more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+<h3>[property:Boolean vertexColors]</h3>
+<p>
+Defines whether vertex coloring is used. Default is *false*.
 </p>
 
 <h3>[property:Boolean visible]</h3>

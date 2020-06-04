@@ -18,7 +18,7 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - orthographic</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - orthographic</div>
 
 		<script type="module">
 
@@ -54,7 +54,7 @@
 					100, 100,
 					'chocolate',
 					new THREE.Vector3( - 50, 0, 0 ),
-					new THREE.Euler( 0, - 90 * THREE.Math.DEG2RAD, 0 )
+					new THREE.Euler( 0, - 90 * THREE.MathUtils.DEG2RAD, 0 )
 				);
 				// right
 				createPlane(
@@ -68,14 +68,14 @@
 					100, 100,
 					'yellowgreen',
 					new THREE.Vector3( 0, 50, 0 ),
-					new THREE.Euler( - 90 * THREE.Math.DEG2RAD, 0, 0 )
+					new THREE.Euler( - 90 * THREE.MathUtils.DEG2RAD, 0, 0 )
 				);
 				// bottom
 				createPlane(
 					300, 300,
 					'seagreen',
 					new THREE.Vector3( 0, - 50, 0 ),
-					new THREE.Euler( - 90 * THREE.Math.DEG2RAD, 0, 0 )
+					new THREE.Euler( - 90 * THREE.MathUtils.DEG2RAD, 0, 0 )
 				);
 
 				//
@@ -92,6 +92,8 @@
 				document.body.appendChild( renderer2.domElement );
 
 				var controls = new OrbitControls( camera, renderer2.domElement );
+				controls.minZoom = 0.5;
+				controls.maxZoom = 2;
 
 				function createPlane( width, height, cssColor, pos, rot ) {
 

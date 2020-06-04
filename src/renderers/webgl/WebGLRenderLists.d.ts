@@ -41,7 +41,8 @@ export class WebGLRenderList {
 		z: number,
 		group: Group | null
 	): void;
-	sort(): void;
+	sort( opaqueSort: Function, transparentSort: Function ): void;
+	finish(): void;
 
 }
 

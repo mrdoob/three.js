@@ -164,13 +164,10 @@
 		<h3>[property:Float gammaFactor]</h3>
 		<p>Default is *2*. </p>
 
-
-		<h3>[property:Boolean gammaInput]</h3>
-		<p>If set, then it expects that all textures and colors are premultiplied gamma. Default is *false*.</p>
-
-
-		<h3>[property:Boolean gammaOutput]</h3>
-		<p>If set, then it expects that all textures and colors need to be outputted in premultiplied gamma. Default is *false*.</p>
+		<h3>[property:number outputEncoding]</h3>
+		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<p>If a render target has been set using [page:WebGLRenderer.setRenderTarget .setRenderTarget] then renderTarget.texture.encoding will be used instead.</p>
+		<p>See the [page:Textures texture constants] page for details of other formats.</p>
 
 		<h3>[property:Object info]</h3>
 		<p>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</p>
@@ -270,7 +267,7 @@
 
 		<h3>[property:Constant toneMapping]</h3>
 		<p>
-		Default is [page:Renderer LinearToneMapping]. See the [page:Renderer Renderer constants] for other choices.
+		Default is [page:Renderer NoToneMapping]. See the [page:Renderer Renderer constants] for other choices.
 		</p>
 
 		<h3>[property:Number toneMappingExposure]</h3>
@@ -281,6 +278,11 @@
 		<h3>[property:Number toneMappingWhitePoint]</h3>
 		<p>
 		Tone mapping white point. Default is *1*.
+		</p>
+
+		<h3>[property:WebXRManager xr]</h3>
+		<p>
+		Provides access to the WebXR related [page:WebXRManager interface] of the renderer.
 		</p>
 
 		<h2>Methods</h2>
@@ -404,7 +406,7 @@
 		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
 		<p>Reads the pixel data from the renderTarget into the buffer you pass in. This is a wrapper around [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().</p>
 		<p>See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.</p>
-		<p>For reading out a [page:WebGLRenderTargetCube WebGLRenderTargetCube] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
+		<p>For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
 
 		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
@@ -421,17 +423,16 @@
 		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
 		<p>Render a buffer geometry group using the camera and with the specified material.</p>
 
-		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:shaderprogram program], [param:Material shading] )</h3>
+		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
 		<p>object - an instance of [page:Object3D]<br />
-		program - an instance of shaderProgram<br />
-		shading - an instance of Material<br /><br />
+		program - an instance of [page:WebGLProgram]<br />
 
-		Render an immediate buffer. Gets called by renderImmediateObject.
+		Renders an instance of [page:ImmediateRenderObject]. Gets called by renderObjectImmediate().
 		</p>
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
 		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
-		<p>A built in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebVR projects this function must be used.</p>
+		<p>A built in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebXR projects this function must be used.</p>
 
 		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
 		<p>Sets the clear alpha. Valid input is a float between *0.0* and *1.0*.</p>
@@ -439,13 +440,16 @@
 		<h3>[method:null setClearColor]( [param:Color color], [param:Float alpha] )</h3>
 		<p>Sets the clear color and opacity.</p>
 
+		<h3>[method:null setFramebuffer]( [param:WebGLFramebuffer value] )</h3>
+		<p>Sets the given WebGLFramebuffer. This method can only be used if no render target is set via [page:WebGLRenderer.setRenderTarget .setRenderTarget]().</p>
+
 		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
 		<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</p>
 
 		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
 		<p>
 		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated. When *null* is given, the canvas is set as the active render target instead.<br />
-		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLRenderTargetCube] (optional).<br />
+		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLCubeRenderTarget] (optional).<br />
 		activeMipmapLevel -- Specifies the active mipmap level (optional).<br /><br />
 		This method sets the active rendertarget.
 		</p>
@@ -465,6 +469,16 @@
 		<p>
 		Enable or disable the scissor test. When this is enabled, only the pixels within the defined
 			scissor area will be affected by further renderer actions.
+		</p>
+
+		<h3>[method:null setOpaqueSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom opaque sort function for the WebGLRenderLists. Pass null to use the default painterSortStable function.
+		</p>
+
+		<h3>[method:null setTransparentSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom transparent sort function for the WebGLRenderLists. Pass null to use the default reversePainterSortStable function.
 		</p>
 
 		<h3>[method:null setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>

@@ -10,7 +10,7 @@
 <body>
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a>
 			<a href="https://github.com/Virtulous" target="_blank" rel="noopener">Assimp File format</a>
 			<div>Assimp loader by <a href="https://virtulo.us" target="_blank" rel="noopener">Virtulous</a></div>
 			<div>Octaminator model from <a href="http://opengameart.org/content/octaminator-engine-ready" target="_blank" rel="noopener">Teh_Bucket and raymoohawk</a></div>
@@ -55,6 +55,8 @@
 				container.appendChild( renderer.domElement );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 750;
+				controls.maxDistance = 2500;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

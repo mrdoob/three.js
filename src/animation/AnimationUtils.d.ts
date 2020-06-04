@@ -4,7 +4,7 @@ export namespace AnimationUtils {
 	export function arraySlice( array: any, from: number, to: number ): any;
 	export function convertArray( array: any, type: any, forceClone: boolean ): any;
 	export function isTypedArray( object: any ): boolean;
-	export function getKeyFrameOrder( times: number ): number[];
+	export function getKeyFrameOrder( times: number[] ): number[];
 	export function sortedArray(
 		values: any[],
 		stride: number,
@@ -21,6 +21,12 @@ export namespace AnimationUtils {
 		name: string,
 		startFrame: number,
 		endFrame: number,
+		fps?: number
+	): AnimationClip;
+	export function makeClipAdditive(
+		targetClip: AnimationClip,
+		referenceFrame?: number,
+		referenceClip?: AnimationClip,
 		fps?: number
 	): AnimationClip;
 }

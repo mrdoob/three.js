@@ -18,25 +18,25 @@
 			defined by a start point, endpoint and two control points.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
-<code>
-var curve = new THREE.CubicBezierCurve3(
-	new THREE.Vector3( -10, 0, 0 ),
-	new THREE.Vector3( -5, 15, 0 ),
-	new THREE.Vector3( 20, 15, 0 ),
-	new THREE.Vector3( 10, 0, 0 )
-);
+		<code>
+		var curve = new THREE.CubicBezierCurve3(
+			new THREE.Vector3( -10, 0, 0 ),
+			new THREE.Vector3( -5, 15, 0 ),
+			new THREE.Vector3( 20, 15, 0 ),
+			new THREE.Vector3( 10, 0, 0 )
+		);
 
-var points = curve.getPoints( 50 );
-var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		var points = curve.getPoints( 50 );
+		var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-// Create the final object to add to the scene
-var curveObject = new THREE.Line( geometry, material );
+		// Create the final object to add to the scene
+		var curveObject = new THREE.Line( geometry, material );
 
-</code>
+		</code>
 
 		<h2>Constructor</h2>
 
@@ -51,13 +51,6 @@ var curveObject = new THREE.Line( geometry, material );
 
 		<h2>Properties</h2>
 		<p>See the base [page:Curve] class for common properties.</p>
-
-		<h3>[property:Boolean isCubicBezierCurve3]</h3>
-		<p>
-			Used to check whether this or derived classes are CubicBezierCurve3s. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
 
 		<h3>[property:Vector2 v0]</h3>
 		<p>The starting point.</p>

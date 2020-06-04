@@ -3,6 +3,8 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
@@ -10,7 +12,6 @@
  * @param newValue integer representing a hex color value
  * @constructor
  */
-
 var SetColorCommand = function ( editor, object, attributeName, newValue ) {
 
 	Command.call( this, editor );
@@ -73,3 +74,5 @@ SetColorCommand.prototype = {
 	}
 
 };
+
+export { SetColorCommand };
