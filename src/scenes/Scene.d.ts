@@ -5,8 +5,9 @@ import { Color } from '../math/Color';
 import { Texture } from '../textures/Texture';
 import { WebGLRenderer } from "../renderers/WebGLRenderer";
 import { Camera } from "../cameras/Camera";
-import { RenderTarget } from "../renderers/webgl/WebGLRenderLists";
+import { WebGLRenderTarget } from "../renderers/WebGLRenderTarget";
 import { WebGLCubeRenderTarget } from "../renderers/WebGLCubeRenderTarget";
+
 // Scenes /////////////////////////////////////////////////////////////////////
 
 /**
@@ -40,7 +41,7 @@ export class Scene extends Object3D {
 		renderer: WebGLRenderer,
 		scene: Scene,
 		camera: Camera,
-		renderTarget: RenderTarget
+		renderTarget: WebGLRenderTarget | any // any required for Object3D.onBeforeRender compatibility
 	) => void;
 
 	/**
