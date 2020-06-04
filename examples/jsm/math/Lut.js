@@ -6,11 +6,17 @@ import {
 	Color
 } from "../../../build/three.module.js";
 
-var Lut = function ( colormap, numberofcolors ) {
+var Lut = function ( colormapName, numberofcolors ) {
 
 	this.lut = [];
-	this.setColorMap( colormap, numberofcolors );
+	this.setColorMap( colormapName, numberofcolors );
 	return this;
+
+};
+
+Lut.AddColorMap = function ( colormapName, arrayOfColorStops ) {
+
+	ColorMapKeywords[ colormapName ] = arrayOfColorStops;
 
 };
 
@@ -18,7 +24,7 @@ Lut.prototype = {
 
 	constructor: Lut,
 
-	lut: [], map: [], n: 256, minV: 0, maxV: 1,
+	lut: [], map: [], n: 32, minV: 0, maxV: 1,
 
 	set: function ( value ) {
 
@@ -48,10 +54,15 @@ Lut.prototype = {
 
 	},
 
-	setColorMap: function ( colormap, numberofcolors ) {
+	setColorMap: function ( colormapName, numberOfColors ) {
 
-		this.map = ColorMapKeywords[ colormap ] || ColorMapKeywords.rainbow;
-		this.n = numberofcolors || 32;
+		this.map = ColorMapKeywords[ colormapName ] || ColorMapKeywords.rainbow;
+
+		if ( numberOfColors > 0 ) {
+
+			this.n = Math.ceil( numberOfColors );
+			
+		}
 
 		var step = 1.0 / this.n;
 
@@ -115,12 +126,6 @@ Lut.prototype = {
 
 	},
 
-	addColorMap: function ( colormapName, arrayOfColors ) {
-
-		ColorMapKeywords[ colormapName ] = arrayOfColors;
-
-	},
-
 	createCanvas: function () {
 
 		var canvas = document.createElement( 'canvas' );
@@ -176,7 +181,16 @@ Lut.prototype = {
 
 		return canvas;
 
+	},
+
+	addColorMap: function ( colormapName, arrayOfColorStops ) {
+
+		console.warn( 'Deprecated; Use static `Lut.AddColorMap()` instead.' );
+		
+		ColorMapKeywords[ colormapName ] = arrayOfColorStops;
+	
 	}
+
 };
 
 var ColorMapKeywords = {

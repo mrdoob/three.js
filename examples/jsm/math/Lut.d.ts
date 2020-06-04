@@ -4,23 +4,26 @@ import {
 
 export class Lut {
 
-	constructor( colormap?: string, numberofcolors?: number );
+	constructor( colormapName?: string, numberOfColors?: number );
 	lut: Color[];
 	map: object[];
 	n: number;
 	minV: number;
 	maxV: number;
 
-	set( value: Lut ): this;
+	set( object: any ): this;
 	setMin( min: number ): this;
 	setMax( max: number ): this;
-	setColorMap( colormap?: string, numberofcolors?: number ): this;
+	setColorMap( colormapName?: string, numberOfColors?: number ): this;
 	copy( lut: Lut ): this;
 	getColor( alpha: number ): Color;
-	addColorMap( colormapName: string, arrayOfColors: number[][] ): void;
 	createCanvas(): HTMLCanvasElement;
 	updateCanvas( canvas: HTMLCanvasElement ): HTMLCanvasElement;
 
+	/** @deprecated Use static `Lut.AddColorMap()` instead. */
+	addColorMap( colormapName: string, arrayOfColorStops: number[][] ): void;
+	static AddColorMap( colormapName: string, arrayOfColorStops: number[][] ): void;
+	
 }
 
 export interface ColorMapKeywords {

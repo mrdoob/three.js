@@ -3,11 +3,17 @@ console.warn( "THREE.Lut: As part of the transition to ES6 Modules, the files in
  * @author daron1337 / http://daron1337.github.io/
  */
 
-THREE.Lut = function ( colormap, numberofcolors ) {
+THREE.Lut = function ( colormapName, numberOfColors ) {
 
 	this.lut = [];
-	this.setColorMap( colormap, numberofcolors );
+	this.setColorMap( colormapName, numberOfColors );
 	return this;
+
+};
+
+THREE.Lut.AddColorMap = function ( colormapName, arrayOfColorStops ) {
+
+	THREE.ColorMapKeywords[ colormapName ] = arrayOfColorStops;
 
 };
 
@@ -15,7 +21,7 @@ THREE.Lut.prototype = {
 
 	constructor: THREE.Lut,
 
-	lut: [], map: [], n: 256, minV: 0, maxV: 1,
+	lut: [], map: [], n: 32, minV: 0, maxV: 1,
 
 	set: function ( value ) {
 
@@ -45,10 +51,15 @@ THREE.Lut.prototype = {
 
 	},
 
-	setColorMap: function ( colormap, numberofcolors ) {
+	setColorMap: function ( colormapName, numberOfColors ) {
 
-		this.map = THREE.ColorMapKeywords[ colormap ] || THREE.ColorMapKeywords.rainbow;
-		this.n = numberofcolors || 32;
+		this.map = THREE.ColorMapKeywords[ colormapName ] || THREE.ColorMapKeywords.rainbow;
+		
+		if ( numberOfColors > 0 ) {
+			
+			this.n = Math.ceil( numberOfColors );
+		
+		}
 
 		var step = 1.0 / this.n;
 
@@ -112,9 +123,11 @@ THREE.Lut.prototype = {
 
 	},
 
-	addColorMap: function ( colormapName, arrayOfColors ) {
+	addColorMap: function ( colormapName, arrayOfColorStops ) {
 
-		THREE.ColorMapKeywords[ colormapName ] = arrayOfColors;
+		console.warn( 'Deprecated; Use static `Lut.AddColorMap()` instead.' );
+
+		THREE.ColorMapKeywords[ colormapName ] = arrayOfColorStops;
 
 	},
 
