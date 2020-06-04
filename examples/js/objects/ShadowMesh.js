@@ -1,3 +1,4 @@
+console.warn( "THREE.ShadowMesh: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author erichlof /  http://github.com/erichlof
  *
@@ -42,23 +43,23 @@ THREE.ShadowMesh.prototype.update = function () {
 
 		var sme = shadowMatrix.elements;
 
-		sme[ 0 ]  = dot - lightPosition4D.x * plane.normal.x;
-		sme[ 4 ]  = - lightPosition4D.x * plane.normal.y;
-		sme[ 8 ]  = - lightPosition4D.x * plane.normal.z;
+		sme[ 0 ] = dot - lightPosition4D.x * plane.normal.x;
+		sme[ 4 ] = - lightPosition4D.x * plane.normal.y;
+		sme[ 8 ] = - lightPosition4D.x * plane.normal.z;
 		sme[ 12 ] = - lightPosition4D.x * - plane.constant;
 
-		sme[ 1 ]  = - lightPosition4D.y * plane.normal.x;
-		sme[ 5 ]  = dot - lightPosition4D.y * plane.normal.y;
-		sme[ 9 ]  = - lightPosition4D.y * plane.normal.z;
+		sme[ 1 ] = - lightPosition4D.y * plane.normal.x;
+		sme[ 5 ] = dot - lightPosition4D.y * plane.normal.y;
+		sme[ 9 ] = - lightPosition4D.y * plane.normal.z;
 		sme[ 13 ] = - lightPosition4D.y * - plane.constant;
 
-		sme[ 2 ]  = - lightPosition4D.z * plane.normal.x;
-		sme[ 6 ]  = - lightPosition4D.z * plane.normal.y;
+		sme[ 2 ] = - lightPosition4D.z * plane.normal.x;
+		sme[ 6 ] = - lightPosition4D.z * plane.normal.y;
 		sme[ 10 ] = dot - lightPosition4D.z * plane.normal.z;
 		sme[ 14 ] = - lightPosition4D.z * - plane.constant;
 
-		sme[ 3 ]  = - lightPosition4D.w * plane.normal.x;
-		sme[ 7 ]  = - lightPosition4D.w * plane.normal.y;
+		sme[ 3 ] = - lightPosition4D.w * plane.normal.x;
+		sme[ 7 ] = - lightPosition4D.w * plane.normal.y;
 		sme[ 11 ] = - lightPosition4D.w * plane.normal.z;
 		sme[ 15 ] = dot - lightPosition4D.w * - plane.constant;
 

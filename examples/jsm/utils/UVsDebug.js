@@ -1,4 +1,4 @@
-/*
+/**
  * @author zz85 / http://github.com/zz85
  * @author WestLangley / http://github.com/WestLangley
  * @author Mugen87 / https://github.com/Mugen87

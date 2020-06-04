@@ -1,3 +1,4 @@
+console.warn( "THREE.PVRLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /*
  *	 PVRLoader
  *   Author: pierre lepers
@@ -12,44 +13,44 @@ THREE.PVRLoader = function ( manager ) {
 
 	THREE.CompressedTextureLoader.call( this, manager );
 
-	this._parser = THREE.PVRLoader.parse;
-
 };
 
-THREE.PVRLoader.prototype = Object.create( THREE.CompressedTextureLoader.prototype );
-THREE.PVRLoader.prototype.constructor = THREE.PVRLoader;
+THREE.PVRLoader.prototype = Object.assign( Object.create( THREE.CompressedTextureLoader.prototype ), {
 
+	constructor: THREE.PVRLoader,
 
-THREE.PVRLoader.parse = function ( buffer, loadMipmaps ) {
+	parse: function ( buffer, loadMipmaps ) {
 
-	var headerLengthInt = 13;
-	var header = new Uint32Array( buffer, 0, headerLengthInt );
+		var headerLengthInt = 13;
+		var header = new Uint32Array( buffer, 0, headerLengthInt );
 
-	var pvrDatas = {
-		buffer: buffer,
-		header: header,
-		loadMipmaps: loadMipmaps
-	};
+		var pvrDatas = {
+			buffer: buffer,
+			header: header,
+			loadMipmaps: loadMipmaps
+		};
 
-	if ( header[ 0 ] === 0x03525650 ) {
+		if ( header[ 0 ] === 0x03525650 ) {
 
-		// PVR v3
+			// PVR v3
 
-		return THREE.PVRLoader._parseV3( pvrDatas );
+			return THREE.PVRLoader._parseV3( pvrDatas );
 
-	} else if ( header[ 11 ] === 0x21525650 ) {
+		} else if ( header[ 11 ] === 0x21525650 ) {
 
-		// PVR v2
+			// PVR v2
 
-		return THREE.PVRLoader._parseV2( pvrDatas );
+			return THREE.PVRLoader._parseV2( pvrDatas );
 
-	} else {
+		} else {
 
-		console.error( 'THREE.PVRLoader: Unknown PVR format.' );
+			console.error( 'THREE.PVRLoader: Unknown PVR format.' );
+
+		}
 
 	}
 
-};
+} );
 
 THREE.PVRLoader._parseV3 = function ( pvrDatas ) {
 

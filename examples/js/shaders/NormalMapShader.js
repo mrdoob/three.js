@@ -1,3 +1,4 @@
+console.warn( "THREE.NormalMapShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -9,10 +10,10 @@ THREE.NormalMapShader = {
 
 	uniforms: {
 
-		"heightMap":  { value: null },
+		"heightMap": { value: null },
 		"resolution": { value: new THREE.Vector2( 512, 512 ) },
-		"scale":      { value: new THREE.Vector2( 1, 1 ) },
-		"height":     { value: 0.05 }
+		"scale": { value: new THREE.Vector2( 1, 1 ) },
+		"height": { value: 0.05 }
 
 	},
 
@@ -22,8 +23,8 @@ THREE.NormalMapShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -39,12 +40,12 @@ THREE.NormalMapShader = {
 
 		"void main() {",
 
-			"float val = texture2D( heightMap, vUv ).x;",
+		"	float val = texture2D( heightMap, vUv ).x;",
 
-			"float valU = texture2D( heightMap, vUv + vec2( 1.0 / resolution.x, 0.0 ) ).x;",
-			"float valV = texture2D( heightMap, vUv + vec2( 0.0, 1.0 / resolution.y ) ).x;",
+		"	float valU = texture2D( heightMap, vUv + vec2( 1.0 / resolution.x, 0.0 ) ).x;",
+		"	float valV = texture2D( heightMap, vUv + vec2( 0.0, 1.0 / resolution.y ) ).x;",
 
-			"gl_FragColor = vec4( ( 0.5 * normalize( vec3( val - valU, val - valV, height  ) ) + 0.5 ), 1.0 );",
+		"	gl_FragColor = vec4( ( 0.5 * normalize( vec3( val - valU, val - valV, height  ) ) + 0.5 ), 1.0 );",
 
 		"}"
 

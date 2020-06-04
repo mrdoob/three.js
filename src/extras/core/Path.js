@@ -41,11 +41,15 @@ Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 		}
 
+		return this;
+
 	},
 
 	moveTo: function ( x, y ) {
 
 		this.currentPoint.set( x, y ); // TODO consider referencing vectors instead of copying?
+
+		return this;
 
 	},
 
@@ -55,6 +59,8 @@ Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
 		this.curves.push( curve );
 
 		this.currentPoint.set( x, y );
+
+		return this;
 
 	},
 
@@ -69,6 +75,8 @@ Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
 		this.curves.push( curve );
 
 		this.currentPoint.set( aX, aY );
+
+		return this;
 
 	},
 
@@ -85,6 +93,8 @@ Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 		this.currentPoint.set( aX, aY );
 
+		return this;
+
 	},
 
 	splineThru: function ( pts /*Array of Vector*/ ) {
@@ -96,6 +106,8 @@ Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 		this.currentPoint.copy( pts[ pts.length - 1 ] );
 
+		return this;
+
 	},
 
 	arc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
@@ -106,11 +118,15 @@ Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
 		this.absarc( aX + x0, aY + y0, aRadius,
 			aStartAngle, aEndAngle, aClockwise );
 
+		return this;
+
 	},
 
 	absarc: function ( aX, aY, aRadius, aStartAngle, aEndAngle, aClockwise ) {
 
 		this.absellipse( aX, aY, aRadius, aRadius, aStartAngle, aEndAngle, aClockwise );
+
+		return this;
 
 	},
 
@@ -120,6 +136,8 @@ Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
 		var y0 = this.currentPoint.y;
 
 		this.absellipse( aX + x0, aY + y0, xRadius, yRadius, aStartAngle, aEndAngle, aClockwise, aRotation );
+
+		return this;
 
 	},
 
@@ -144,6 +162,8 @@ Path.prototype = Object.assign( Object.create( CurvePath.prototype ), {
 
 		var lastPoint = curve.getPoint( 1 );
 		this.currentPoint.copy( lastPoint );
+
+		return this;
 
 	},
 

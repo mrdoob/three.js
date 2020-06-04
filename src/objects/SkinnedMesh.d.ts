@@ -5,20 +5,26 @@ import { Skeleton } from './Skeleton';
 import { Mesh } from './Mesh';
 import { BufferGeometry } from '../core/BufferGeometry';
 
-export class SkinnedMesh extends Mesh {
-  constructor(
-    geometry?: Geometry | BufferGeometry,
-    material?: Material | Material[],
-    useVertexTexture?: boolean
-  );
+export class SkinnedMesh <
+	TGeometry extends Geometry | BufferGeometry = Geometry | BufferGeometry,
+	TMaterial extends Material | Material[] = Material | Material[]
+> extends Mesh {
 
-  bindMode: string;
-  bindMatrix: Matrix4;
-  bindMatrixInverse: Matrix4;
-  skeleton: Skeleton;
+	constructor(
+		geometry?: TGeometry,
+		material?: TMaterial,
+		useVertexTexture?: boolean
+	);
 
-  bind(skeleton: Skeleton, bindMatrix?: Matrix4): void;
-  pose(): void;
-  normalizeSkinWeights(): void;
-  updateMatrixWorld(force?: boolean): void;
+	bindMode: string;
+	bindMatrix: Matrix4;
+	bindMatrixInverse: Matrix4;
+	skeleton: Skeleton;
+	readonly isSkinnedMesh: true;
+
+	bind( skeleton: Skeleton, bindMatrix?: Matrix4 ): void;
+	pose(): void;
+	normalizeSkinWeights(): void;
+	updateMatrixWorld( force?: boolean ): void;
+
 }

@@ -1,3 +1,4 @@
+console.warn( "THREE.RGBShiftShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author felixturner / http://airtight.cc/
  *
@@ -15,8 +16,8 @@ THREE.RGBShiftShader = {
 	uniforms: {
 
 		"tDiffuse": { value: null },
-		"amount":   { value: 0.005 },
-		"angle":    { value: 0.0 }
+		"amount": { value: 0.005 },
+		"angle": { value: 0.0 }
 
 	},
 
@@ -26,8 +27,8 @@ THREE.RGBShiftShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -43,11 +44,11 @@ THREE.RGBShiftShader = {
 
 		"void main() {",
 
-			"vec2 offset = amount * vec2( cos(angle), sin(angle));",
-			"vec4 cr = texture2D(tDiffuse, vUv + offset);",
-			"vec4 cga = texture2D(tDiffuse, vUv);",
-			"vec4 cb = texture2D(tDiffuse, vUv - offset);",
-			"gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
+		"	vec2 offset = amount * vec2( cos(angle), sin(angle));",
+		"	vec4 cr = texture2D(tDiffuse, vUv + offset);",
+		"	vec4 cga = texture2D(tDiffuse, vUv);",
+		"	vec4 cb = texture2D(tDiffuse, vUv - offset);",
+		"	gl_FragColor = vec4(cr.r, cga.g, cb.b, cga.a);",
 
 		"}"
 

@@ -1,3 +1,4 @@
+console.warn( "THREE.PointerLockControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
@@ -5,14 +6,31 @@
 
 THREE.PointerLockControls = function ( camera, domElement ) {
 
+	if ( domElement === undefined ) {
+
+		console.warn( 'THREE.PointerLockControls: The second parameter "domElement" is now mandatory.' );
+		domElement = document.body;
+
+	}
+
+	this.domElement = domElement;
+	this.isLocked = false;
+
+	//
+	// internals
+	//
+
 	var scope = this;
 
-	this.domElement = domElement || document.body;
-	this.isLocked = false;
+	var changeEvent = { type: 'change' };
+	var lockEvent = { type: 'lock' };
+	var unlockEvent = { type: 'unlock' };
 
 	var euler = new THREE.Euler( 0, 0, 0, 'YXZ' );
 
 	var PI_2 = Math.PI / 2;
+
+	var vec = new THREE.Vector3();
 
 	function onMouseMove( event ) {
 
@@ -30,19 +48,21 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 		camera.quaternion.setFromEuler( euler );
 
+		scope.dispatchEvent( changeEvent );
+
 	}
 
 	function onPointerlockChange() {
 
 		if ( document.pointerLockElement === scope.domElement ) {
 
-			scope.dispatchEvent( { type: 'lock' } );
+			scope.dispatchEvent( lockEvent );
 
 			scope.isLocked = true;
 
 		} else {
 
-			scope.dispatchEvent( { type: 'unlock' } );
+			scope.dispatchEvent( unlockEvent );
 
 			scope.isLocked = false;
 
@@ -95,6 +115,27 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 		};
 
 	}();
+
+	this.moveForward = function ( distance ) {
+
+		// move forward parallel to the xz-plane
+		// assumes camera.up is y-up
+
+		vec.setFromMatrixColumn( camera.matrix, 0 );
+
+		vec.crossVectors( camera.up, vec );
+
+		camera.position.addScaledVector( vec, distance );
+
+	};
+
+	this.moveRight = function ( distance ) {
+
+		vec.setFromMatrixColumn( camera.matrix, 0 );
+
+		camera.position.addScaledVector( vec, distance );
+
+	};
 
 	this.lock = function () {
 

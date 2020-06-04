@@ -9,7 +9,8 @@ export default QUnit.module( 'Constants', () => {
 
 	QUnit.test( "default values", ( assert ) => {
 
-		assert.propEqual( Constants.MOUSE, { LEFT: 0, MIDDLE: 1, RIGHT: 2 }, 'MOUSE equal { LEFT: 0, MIDDLE: 1, RIGHT: 2 }' );
+		assert.propEqual( Constants.MOUSE, { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 }, 'MOUSE equal { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 }' );
+		assert.propEqual( Constants.TOUCH, { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 }, 'TOUCH equal { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 }' );
 		assert.equal( Constants.CullFaceNone, 0, 'CullFaceNone equal 0' );
 		assert.equal( Constants.CullFaceBack, 1, 'CullFaceBack equal 1' );
 		assert.equal( Constants.CullFaceFront, 2, 'CullFaceFront is equal to 2' );
@@ -24,9 +25,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.DoubleSide, 2, 'DoubleSide is equal to 2' );
 		assert.equal( Constants.FlatShading, 1, 'FlatShading is equal to 1' );
 		assert.equal( Constants.SmoothShading, 2, 'SmoothShading is equal to 2' );
-		assert.equal( Constants.NoColors, 0, 'NoColors is equal to 0' );
-		assert.equal( Constants.FaceColors, 1, 'FaceColors is equal to 1' );
-		assert.equal( Constants.VertexColors, 2, 'VertexColors is equal to 2' );
 		assert.equal( Constants.NoBlending, 0, 'NoBlending is equal to 0' );
 		assert.equal( Constants.NormalBlending, 1, 'NormalBlending is equal to 1' );
 		assert.equal( Constants.AdditiveBlending, 2, 'AdditiveBlending is equal to 2' );

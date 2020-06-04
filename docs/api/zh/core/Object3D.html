@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
 	<meta charset="utf-8" />
@@ -38,9 +38,9 @@
 
 	<h3>[property:Material customDepthMaterial]</h3>
 	<p>渲染到深度贴图时此材质要使用的自定义深度材质。
-	    当使用[page:DirectionalLight]或[page:SpotLight]进行阴影投射时，如果您正在（a）修改顶点着色器中的顶点位置，
-	    （b）使用位移贴图，（c）alphaTest中使用alpha贴图，或（d）alphaTest中使用透明纹理，
-	    您必须指定customDepthMaterial以得到合适的阴影。默认值*undefined*。
+		当使用[page:DirectionalLight]或[page:SpotLight]进行阴影投射时，如果您正在（a）修改顶点着色器中的顶点位置，
+		（b）使用位移贴图，（c）alphaTest中使用alpha贴图，或（d）alphaTest中使用透明纹理，
+		您必须指定customDepthMaterial以得到合适的阴影。默认值*undefined*。
 	</p>
 
 	<h3>[property:Material customDistanceMaterial]</h3>
@@ -56,17 +56,11 @@
 	<h3>[property:Integer id]</h3>
 	<p>只读 —— 表示该对象实例ID的唯一数字。</p>
 
-	<h3>[property:Boolean isObject3D]</h3>
-	<p>
-
-		用于测试这个类或者派生类是否为Object3D，默认为*true*。<br /><br />
-		你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
-	</p>
-
 	<h3>[property:Layers layers]</h3>
 	<p>
 		物体的层级关系。
-		物体只有和一个正在使用的[page:Camera]至少在同一个层时才可见。
+		物体只有和一个正在使用的[page:Camera]至少在同一个层时才可见。This property can also be used to filter out
+		unwanted objects in ray-intersection tests when using [page:Raycaster].
 	</p>
 
 	<h3>[property:Matrix4 matrix]</h3>
@@ -111,8 +105,8 @@
 
 	<h3>[property:function onBeforeRender]</h3>
 	<p>
-			一个可选的回调函数，在Object3D渲染之前直接执行。
-			使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
+		一个可选的回调函数，在Object3D渲染之前直接执行。
+		使用以下参数来调用此函数：renderer，scene，camera，geometry，material，group。
 	</p>
 
 	<h3>[property:Object3D parent]</h3>
@@ -182,7 +176,7 @@
 		默认设为( 0, 1, 0 )。
 	</p>
 
-	<h3>[property:Vector3 DefaultMatrixAutoUpdate]</h3>
+	<h3>[property:Boolean DefaultMatrixAutoUpdate]</h3>
 	<p>
 			[page:.matrixAutoUpdate matrixAutoUpdate]的默认设置，用于新创建的Object3D。<br />
 
@@ -200,11 +194,15 @@
 		请参阅[page:Group]来查看手动编组对象的相关信息。
 	</p>
 
-	<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+	<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 	<p>对当前物体应用这个变换矩阵，并更新物体的位置、旋转和缩放。</p>
 
 	<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
 	<p>对当前物体应用由四元数所表示的变换。</p>
+
+
+	<h3>[method:this attach]( [param:Object3D object] )</h3>
+	<p>将*object*作为子级来添加到该对象中，同时保持该object的世界变换。</p>
 
 	<h3>[method:Object3D clone]( [param:Boolean recursive] )</h3>
 	<p>
@@ -216,7 +214,10 @@
 	<h3>[method:this copy]( [param:Object3D object], [param:Boolean recursive] )</h3>
 	<p>
 		recursive —— 如果值为true，则该物体的后代也会被复制。默认值为true。<br /><br />
+
 		复制给定的对象到这个对象中。
+
+		请注意，事件监听器和用户定义的回调函数（[page:.onAfterRender] 和 [page:.onBeforeRender]）不会被复制。
 	</p>
 
 	<h3>[method:Object3D getObjectById]( [param:Integer id] )</h3>
@@ -356,12 +357,13 @@
 	<p>
 		q -- 标准化的四元数。<br /><br />
 
-将所给的四元数复制到[page:.quaternion]中。
+		将所给的四元数复制到[page:.quaternion]中。
 	</p>
 
-	<h3>[method:null toJSON]( [param:Quaternion q] )</h3>
+	<h3>[method:Object toJSON]( [param:object meta] )</h3>
 	<p>
-		将这个对象转换为JSON格式。
+		meta -- 包含有元数据的对象，例如该对象的材质、纹理或图片。
+		将对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
 	</p>
 
 	<h3>[method:this translateOnAxis]( [param:Vector3 axis], [param:Float distance] )</h3>
@@ -408,8 +410,15 @@
 	<p>更新局部变换。</p>
 
 	<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
-	<p>更新物体及其子级的全局变换。</p>
+	<p>更新物体及其后代的全局变换。</p>
 
+	<h3>[method:null updateWorldMatrix]( [param:Boolean updateParents], [param:Boolean updateChildren] )</h3>
+	<p>
+		updateParents - recursively updates global transform of ancestors.<br />
+		updateChildren - recursively updates global transform of descendants.<br /><br />
+
+		Updates the global transform of the object.
+	</p>
 
 	<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
 	<p>
@@ -419,7 +428,9 @@
 
 	<h2>源代码</h2>
 
-	[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+	<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 </body>
 
 </html>

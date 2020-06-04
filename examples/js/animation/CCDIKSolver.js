@@ -1,3 +1,4 @@
+console.warn( "THREE.CCDIKSolver: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author takahiro / https://github.com/takahirox
  *
@@ -65,7 +66,7 @@ THREE.CCDIKSolver = ( function () {
 				// for reference overhead reduction in loop
 				var math = Math;
 
-				for ( var i = 0, il = iks.length; i < il; i++ ) {
+				for ( var i = 0, il = iks.length; i < il; i ++ ) {
 
 					var ik = iks[ i ];
 					var effector = bones[ ik.effector ];
@@ -78,11 +79,11 @@ THREE.CCDIKSolver = ( function () {
 					var links = ik.links;
 					var iteration = ik.iteration !== undefined ? ik.iteration : 1;
 
-					for ( var j = 0; j < iteration; j++ ) {
+					for ( var j = 0; j < iteration; j ++ ) {
 
 						var rotated = false;
 
-						for ( var k = 0, kl = links.length; k < kl; k++ ) {
+						for ( var k = 0, kl = links.length; k < kl; k ++ ) {
 
 							var link = bones[ links[ k ].index ];
 
@@ -115,9 +116,9 @@ THREE.CCDIKSolver = ( function () {
 
 								angle = 1.0;
 
-							} else if ( angle < -1.0 ) {
+							} else if ( angle < - 1.0 ) {
 
-								angle = -1.0;
+								angle = - 1.0;
 
 							}
 
@@ -392,14 +393,14 @@ THREE.CCDIKSolver = ( function () {
 
 		_init: function () {
 
-			var self = this;
+			var scope = this;
 			var iks = this.iks;
 
 			function createLineGeometry( ik ) {
 
 				var geometry = new THREE.BufferGeometry();
 				var vertices = new Float32Array( ( 2 + ik.links.length ) * 3 );
-				geometry.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
 
 				return geometry;
 
@@ -407,25 +408,25 @@ THREE.CCDIKSolver = ( function () {
 
 			function createTargetMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.targetSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.targetSphereMaterial );
 
 			}
 
 			function createEffectorMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.effectorSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.effectorSphereMaterial );
 
 			}
 
 			function createLinkMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.linkSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.linkSphereMaterial );
 
 			}
 
 			function createLine( ik ) {
 
-				return new THREE.Line( createLineGeometry( ik ), self.lineMaterial );
+				return new THREE.Line( createLineGeometry( ik ), scope.lineMaterial );
 
 			}
 

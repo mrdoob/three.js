@@ -5,19 +5,28 @@ import { Object3D } from './../core/Object3D';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Intersection } from '../core/Raycaster';
 
-export class Line extends Object3D {
-  constructor(
-    geometry?: Geometry | BufferGeometry,
-    material?: Material | Material[],
-    mode?: number
-  );
+export class Line <
+	TGeometry extends Geometry | BufferGeometry = Geometry | BufferGeometry,
+	TMaterial extends Material | Material[] = Material | Material[]
+> extends Object3D {
 
-  geometry: Geometry | BufferGeometry;
-  material: Material | Material[];
+	constructor(
+		geometry?: TGeometry,
+		material?: TMaterial,
+		mode?: number
+	);
 
-  type: 'Line' | 'LineLoop' | 'LineSegments';
-  isLine: true;
+	geometry: TGeometry;
+	material: TMaterial;
 
-  computeLineDistances(): this;
-  raycast(raycaster: Raycaster, intersects: Intersection[]): void;
+	type: 'Line' | 'LineLoop' | 'LineSegments';
+	readonly isLine: true;
+
+	morphTargetInfluences?: number[];
+	morphTargetDictionary?: { [key: string]: number };
+
+	computeLineDistances(): this;
+	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+	updateMorphTargets(): void;
+
 }

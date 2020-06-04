@@ -1,3 +1,4 @@
+console.warn( "THREE.TessellateModifier: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * Break faces with edges longer than maxEdgeLength
  * - not recursive
@@ -186,7 +187,7 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 							var uvsTriA = [ uvA.clone(), uvM.clone(), uvC.clone() ];
 							var uvsTriB = [ uvM.clone(), uvB.clone(), uvC.clone() ];
 
-						// BC
+							// BC
 
 						} else if ( edge === 1 ) {
 
@@ -196,7 +197,7 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 							var uvsTriA = [ uvA.clone(), uvB.clone(), uvM.clone() ];
 							var uvsTriB = [ uvM.clone(), uvC.clone(), uvA.clone() ];
 
-						// AC
+							// AC
 
 						} else {
 

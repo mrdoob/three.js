@@ -12,13 +12,18 @@ export const LineStrip: number;
  */
 export const LinePieces: number;
 
-export class LineSegments extends Line {
-  constructor(
-    geometry?: Geometry | BufferGeometry,
-    material?: Material | Material[],
-    mode?: number
-  );
+export class LineSegments <
+	TGeometry extends Geometry | BufferGeometry = Geometry | BufferGeometry,
+	TMaterial extends Material | Material[] = Material | Material[]
+> extends Line {
 
-  type: 'LineSegments';
-  isLineSegments: true;
+	constructor(
+		geometry?: TGeometry,
+		material?: TMaterial,
+		mode?: number
+	);
+
+	type: 'LineSegments';
+	readonly isLineSegments: true;
+
 }

@@ -6,7 +6,7 @@ export default /* glsl */`
 
 	#ifdef BONE_TEXTURE
 
-		uniform sampler2D boneTexture;
+		uniform highp sampler2D boneTexture;
 		uniform int boneTextureSize;
 
 		mat4 getBoneMatrix( const in float i ) {

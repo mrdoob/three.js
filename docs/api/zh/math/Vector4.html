@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -32,19 +32,18 @@
 		</ul>
 
 		<p>
-		其他的一些事物也可以使用二维向量进行表示，但以上这些是它在three.js中的常用用途。
+		其他的一些事物也可以使用四维向量进行表示，但以上这些是它在three.js中的常用用途。
 		</p>
 
-
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
-var a = new THREE.Vector4( 0, 1, 0, 0 );
+		var a = new THREE.Vector4( 0, 1, 0, 0 );
 
-//no arguments; will be initialised to (0, 0, 0, 1)
-var b = new THREE.Vector4( );
+		//no arguments; will be initialised to (0, 0, 0, 1)
+		var b = new THREE.Vector4( );
 
-var d = a.dot( b );
+		var d = a.dot( b );
 		</code>
 
 
@@ -63,13 +62,6 @@ var d = a.dot( b );
 
 		<h2>属性</h2>
 
-		<h3>[property:Boolean isVector4]</h3>
-		<p>
-			用于测试这个类或者派生类是否为Vector4，默认为*true*。<br /><br />
-
-			你不应当对这个属性进行改变,因为它在内部使用，以用于优化。
-		</p>
-
 		<h3>[property:Float x]</h3>
 
 		<h3>[property:Float y]</h3>
@@ -77,6 +69,12 @@ var d = a.dot( b );
 		<h3>[property:Float z]</h3>
 
 		<h3>[property:Float w]</h3>
+
+		<h3>[property:Float width]</h3>
+		<p>[page:.z z]的别名。</p>
+
+		<h3>[property:Float height]</h3>
+		<p>[page:.w w]的别名。</p>
 
 
 		<h2>方法</h2>
@@ -205,9 +203,9 @@ var d = a.dot( b );
 		<h3>[method:this lerp]( [param:Vector4 v], [param:Float alpha] )</h3>
 		<p>
 		[page:Vector4 v] - 朝着进行插值的[page:Vector4]。<br />
-		alpha - 插值因数，其范围在[0, 1]闭区间。<br /><br />
+		[page:Float alpha] - 插值因数，其范围通常在[0, 1]闭区间。<br /><br />
 
-		在该向量与传入的向量[page:Vector4 v]之间的线性插值，alpha是沿着线的距离长度。
+		在该向量与传入的向量[page:Vector4 v]之间的线性插值，alpha是沿着线的长度的百分比
 		—— alpha = 0 时表示的是当前向量，alpha = 1 时表示的是所传入的向量[page:Vector4 v]。
 		</p>
 
@@ -218,7 +216,7 @@ var d = a.dot( b );
 		[page:Float alpha] - 插值因数，其范围在[0, 1]闭区间。<br /><br />
 
 		将此向量设置为在[page:Vector4 v1]和[page:Vector4 v2]之间进行线性插值的向量，
-		其中alpha为两个向量之间连线的距离长度。
+		其中alpha为两个向量之间连线的长度的百分比
 		—— alpha = 0 时表示的是[page:Vector4 v1]，alpha = 1 时表示的是[page:Vector4 v2]。
 		</p>
 
@@ -324,8 +322,15 @@ var d = a.dot( b );
 		返回一个数组[x, y, z, w]，或者将x、y、z和w复制到所传入的[page:Array array]中。
 		</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
+
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

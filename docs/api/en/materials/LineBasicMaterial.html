@@ -14,6 +14,17 @@
 
 		<p class="desc">A material for drawing wireframe-style geometries.</p>
 
+		<h2>Code Example</h2>
+
+		<code>
+		var material = new THREE.LineBasicMaterial( {
+			color: 0xffffff,
+			linewidth: 1,
+			linecap: 'round', //ignored by WebGLRenderer
+			linejoin:  'round' //ignored by WebGLRenderer
+		} );
+		</code>
+
 		<h2>Examples</h2>
 
 		<p>
@@ -30,17 +41,8 @@
 			[example:webgl_lines_dashed WebGL / lines / dashed]<br />
 			[example:webgl_lines_sphere WebGL / lines / sphere]<br />
 			[example:webgl_materials WebGL / materials]<br />
-			[example:webgl_physics_rope WebGL / phyics / rope]
+			[example:physics_ammo_rope physics / ammo / rope]
 		</p>
-
-		<code>
-var material = new THREE.LineBasicMaterial( {
-	color: 0xffffff,
-	linewidth: 1,
-	linecap: 'round', //ignored by WebGLRenderer
-	linejoin:  'round' //ignored by WebGLRenderer
-} );
-		</code>
 
 		<h2>Constructor</h2>
 
@@ -59,16 +61,6 @@ var material = new THREE.LineBasicMaterial( {
 
 		<h3>[property:Color color]</h3>
 		<p>[page:Color] of the material, by default set to white (0xffffff).</p>
-
-		<h3>[property:Boolean isLineBasicMaterial]</h3>
-		<p>
-			Used to check whether this or derived classes are line basic materials. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
-		<h3>[property:Boolean lights]</h3>
-		<p>Whether the material is affected by lights. Default is *false*.</p>
 
 		<h3>[property:Float linewidth]</h3>
 		<p>
@@ -96,12 +88,16 @@ var material = new THREE.LineBasicMaterial( {
 			property and it is ignored by the [page:WebGLRenderer WebGL] renderer.
 		</p>
 
+		<h3>[property:Boolean morphTargets]</h3>
+		<p>Define whether the material uses morphTargets. Default is false.</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Material] class for common methods.</p>
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

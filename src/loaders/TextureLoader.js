@@ -5,18 +5,17 @@
 import { RGBAFormat, RGBFormat } from '../constants.js';
 import { ImageLoader } from './ImageLoader.js';
 import { Texture } from '../textures/Texture.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
-
+import { Loader } from './Loader.js';
 
 function TextureLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( TextureLoader.prototype, {
+TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
-	crossOrigin: 'anonymous',
+	constructor: TextureLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
@@ -45,20 +44,6 @@ Object.assign( TextureLoader.prototype, {
 		}, onProgress, onError );
 
 		return texture;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	}
 

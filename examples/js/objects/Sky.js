@@ -1,3 +1,4 @@
+console.warn( "THREE.Sky: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author zz85 / https://github.com/zz85
  *
@@ -22,7 +23,8 @@ THREE.Sky = function () {
 		fragmentShader: shader.fragmentShader,
 		vertexShader: shader.vertexShader,
 		uniforms: THREE.UniformsUtils.clone( shader.uniforms ),
-		side: THREE.BackSide
+		side: THREE.BackSide,
+		depthWrite: false
 	} );
 
 	THREE.Mesh.call( this, new THREE.BoxBufferGeometry( 1, 1, 1 ), material );
@@ -39,7 +41,8 @@ THREE.Sky.SkyShader = {
 		"rayleigh": { value: 1 },
 		"mieCoefficient": { value: 0.005 },
 		"mieDirectionalG": { value: 0.8 },
-		"sunPosition": { value: new THREE.Vector3() }
+		"sunPosition": { value: new THREE.Vector3() },
+		"up": { value: new THREE.Vector3( 0, 1, 0 ) }
 	},
 
 	vertexShader: [
@@ -47,6 +50,7 @@ THREE.Sky.SkyShader = {
 		'uniform float rayleigh;',
 		'uniform float turbidity;',
 		'uniform float mieCoefficient;',
+		'uniform vec3 up;',
 
 		'varying vec3 vWorldPosition;',
 		'varying vec3 vSunDirection;',
@@ -54,8 +58,6 @@ THREE.Sky.SkyShader = {
 		'varying vec3 vBetaR;',
 		'varying vec3 vBetaM;',
 		'varying float vSunE;',
-
-		'const vec3 up = vec3( 0.0, 1.0, 0.0 );',
 
 		// constants for atmospheric scattering
 		'const float e = 2.71828182845904523536028747135266249775724709369995957;',
@@ -126,6 +128,7 @@ THREE.Sky.SkyShader = {
 
 		'uniform float luminance;',
 		'uniform float mieDirectionalG;',
+		'uniform vec3 up;',
 
 		'const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );',
 
@@ -138,7 +141,6 @@ THREE.Sky.SkyShader = {
 		// optical length at zenith for molecules
 		'const float rayleighZenithLength = 8.4E3;',
 		'const float mieZenithLength = 1.25E3;',
-		'const vec3 up = vec3( 0.0, 1.0, 0.0 );',
 		// 66 arc seconds -> degrees, and the cosine of that
 		'const float sunAngularDiameterCos = 0.999956676946448443553574619906976478926848692873900859324;',
 
@@ -173,9 +175,12 @@ THREE.Sky.SkyShader = {
 
 
 		'void main() {',
+
+		'	vec3 direction = normalize( vWorldPosition - cameraPos );',
+
 		// optical length
 		// cutoff angle at 90 to avoid singularity in next formula.
-		'	float zenithAngle = acos( max( 0.0, dot( up, normalize( vWorldPosition - cameraPos ) ) ) );',
+		'	float zenithAngle = acos( max( 0.0, dot( up, direction ) ) );',
 		'	float inverse = 1.0 / ( cos( zenithAngle ) + 0.15 * pow( 93.885 - ( ( zenithAngle * 180.0 ) / pi ), -1.253 ) );',
 		'	float sR = rayleighZenithLength * inverse;',
 		'	float sM = mieZenithLength * inverse;',
@@ -184,7 +189,7 @@ THREE.Sky.SkyShader = {
 		'	vec3 Fex = exp( -( vBetaR * sR + vBetaM * sM ) );',
 
 		// in scattering
-		'	float cosTheta = dot( normalize( vWorldPosition - cameraPos ), vSunDirection );',
+		'	float cosTheta = dot( direction, vSunDirection );',
 
 		'	float rPhase = rayleighPhase( cosTheta * 0.5 + 0.5 );',
 		'	vec3 betaRTheta = vBetaR * rPhase;',
@@ -196,7 +201,6 @@ THREE.Sky.SkyShader = {
 		'	Lin *= mix( vec3( 1.0 ), pow( vSunE * ( ( betaRTheta + betaMTheta ) / ( vBetaR + vBetaM ) ) * Fex, vec3( 1.0 / 2.0 ) ), clamp( pow( 1.0 - dot( up, vSunDirection ), 5.0 ), 0.0, 1.0 ) );',
 
 		// nightsky
-		'	vec3 direction = normalize( vWorldPosition - cameraPos );',
 		'	float theta = acos( direction.y ); // elevation --> y-axis, [-pi/2, pi/2]',
 		'	float phi = atan( direction.z, direction.x ); // azimuth --> x-axis [-pi/2, pi/2]',
 		'	vec2 uv = vec2( phi, theta ) / vec2( 2.0 * pi, pi ) + vec2( 0.5, 0.0 );',

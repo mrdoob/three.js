@@ -1,3 +1,4 @@
+import { StaticDrawUsage } from '../constants.js';
 
 /**
  * @author benaadams / https://twitter.com/ben_a_adams
@@ -9,7 +10,7 @@ function InterleavedBuffer( array, stride ) {
 	this.stride = stride;
 	this.count = array !== undefined ? array.length / stride : 0;
 
-	this.dynamic = false;
+	this.usage = StaticDrawUsage;
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
@@ -32,24 +33,9 @@ Object.assign( InterleavedBuffer.prototype, {
 
 	onUploadCallback: function () {},
 
-	setArray: function ( array ) {
+	setUsage: function ( value ) {
 
-		if ( Array.isArray( array ) ) {
-
-			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-		}
-
-		this.count = array !== undefined ? array.length / this.stride : 0;
-		this.array = array;
-
-		return this;
-
-	},
-
-	setDynamic: function ( value ) {
-
-		this.dynamic = value;
+		this.usage = value;
 
 		return this;
 
@@ -60,7 +46,7 @@ Object.assign( InterleavedBuffer.prototype, {
 		this.array = new source.array.constructor( source.array );
 		this.count = source.count;
 		this.stride = source.stride;
-		this.dynamic = source.dynamic;
+		this.usage = source.usage;
 
 		return this;
 

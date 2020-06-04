@@ -1,3 +1,4 @@
+console.warn( "THREE.BrightnessContrastShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author tapio / http://tapio.github.com/
  *
@@ -11,9 +12,9 @@ THREE.BrightnessContrastShader = {
 
 	uniforms: {
 
-		"tDiffuse":   { value: null },
+		"tDiffuse": { value: null },
 		"brightness": { value: 0 },
-		"contrast":   { value: 0 }
+		"contrast": { value: 0 }
 
 	},
 
@@ -23,9 +24,9 @@ THREE.BrightnessContrastShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
+		"	vUv = uv;",
 
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -41,15 +42,15 @@ THREE.BrightnessContrastShader = {
 
 		"void main() {",
 
-			"gl_FragColor = texture2D( tDiffuse, vUv );",
+		"	gl_FragColor = texture2D( tDiffuse, vUv );",
 
-			"gl_FragColor.rgb += brightness;",
+		"	gl_FragColor.rgb += brightness;",
 
-			"if (contrast > 0.0) {",
-				"gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) / (1.0 - contrast) + 0.5;",
-			"} else {",
-				"gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * (1.0 + contrast) + 0.5;",
-			"}",
+		"	if (contrast > 0.0) {",
+		"		gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) / (1.0 - contrast) + 0.5;",
+		"	} else {",
+		"		gl_FragColor.rgb = (gl_FragColor.rgb - 0.5) * (1.0 + contrast) + 0.5;",
+		"	}",
 
 		"}"
 

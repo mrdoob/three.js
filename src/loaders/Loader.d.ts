@@ -1,58 +1,28 @@
-import { Material } from './../materials/Material';
-import { LoaderHandler } from './FileLoader';
-
-// Loaders //////////////////////////////////////////////////////////////////////////////////
+import { LoadingManager } from './LoadingManager';
 
 /**
  * Base class for implementing loaders.
- *
- * Events:
- *     load
- *         Dispatched when the image has completed loading
- *         content — loaded image
- *
- *     error
- *
- *          Dispatched when the image can't be loaded
- *          message — error message
  */
 export class Loader {
-  constructor();
 
-  /**
-   * Will be called when load starts.
-   * The default is a function with empty body.
-   */
-  onLoadStart: () => void;
+	constructor( manager?: LoadingManager );
 
-  /**
-   * Will be called while load progresses.
-   * The default is a function with empty body.
-   */
-  onLoadProgress: () => void;
+	crossOrigin: string;
+	path: string;
+	resourcePath: string;
+	manager: LoadingManager;
+	requestHeader: { [header: string]: string };
 
-  /**
-   * Will be called when load completes.
-   * The default is a function with empty body.
-   */
-  onLoadComplete: () => void;
+	/*
+	load(): void;
+	parse(): void;
+	*/
 
-  /**
-   * default — null.
-   * If set, assigns the crossOrigin attribute of the image to the value of crossOrigin, prior to starting the load.
-   */
-  crossOrigin: string;
+	loadAsync( url: string, onProgress?: ( event: ProgressEvent ) => void ): Promise<any>;
 
-  /**
-   * @deprecated Use THREE.LoaderUtils.extractUrlBase() instead.
-   */
-  extractUrlBase(url: string): string;
-  initMaterials(materials: Material[], texturePath: string): Material[];
-  createMaterial(
-    m: Material,
-    texturePath: string,
-    crossOrigin?: string
-  ): boolean;
+	setCrossOrigin( crossOrigin: string ): this;
+	setPath( path: string ): this;
+	setResourcePath( resourcePath: string ): this;
+	setRequestHeader( requestHeader: { [header: string]: string } ): this;
 
-  static Handlers: LoaderHandler;
 }

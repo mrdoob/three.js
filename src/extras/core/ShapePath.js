@@ -27,11 +27,15 @@ Object.assign( ShapePath.prototype, {
 		this.subPaths.push( this.currentPath );
 		this.currentPath.moveTo( x, y );
 
+		return this;
+
 	},
 
 	lineTo: function ( x, y ) {
 
 		this.currentPath.lineTo( x, y );
+
+		return this;
 
 	},
 
@@ -39,17 +43,23 @@ Object.assign( ShapePath.prototype, {
 
 		this.currentPath.quadraticCurveTo( aCPx, aCPy, aX, aY );
 
+		return this;
+
 	},
 
 	bezierCurveTo: function ( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY ) {
 
 		this.currentPath.bezierCurveTo( aCP1x, aCP1y, aCP2x, aCP2y, aX, aY );
 
+		return this;
+
 	},
 
 	splineThru: function ( pts ) {
 
 		this.currentPath.splineThru( pts );
+
+		return this;
 
 	},
 
@@ -100,6 +110,7 @@ Object.assign( ShapePath.prototype, {
 						edgeHighPt = inPolygon[ p ]; edgeDy = - edgeDy;
 
 					}
+
 					if ( ( inPt.y < edgeLowPt.y ) || ( inPt.y > edgeHighPt.y ) ) 		continue;
 
 					if ( inPt.y === edgeLowPt.y ) {
@@ -239,6 +250,7 @@ Object.assign( ShapePath.prototype, {
 						}
 
 					}
+
 					if ( hole_unassigned ) {
 
 						betterShapeHoles[ sIdx ].push( ho );
@@ -249,6 +261,7 @@ Object.assign( ShapePath.prototype, {
 
 			}
 			// console.log("ambiguous: ", ambiguous);
+
 			if ( toChange.length > 0 ) {
 
 				// console.log("to change: ", toChange);

@@ -4,44 +4,21 @@
 		<title>three.js webgl - postprocessing - digital glitch</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-
-			div {
-				position: absolute;
-				z-index: 10;
-				color: #fff;
-				font-family: monospace;
-				text-align: center;
-				margin: 10px;
-				width: 100%;
-			}
-
-			input { cursor: pointer; }
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-
-		<script src="js/shaders/CopyShader.js"></script>
-		<script src="js/shaders/DigitalGlitch.js"></script>
-
-		<script src="js/postprocessing/EffectComposer.js"></script>
-		<script src="js/postprocessing/RenderPass.js"></script>
-		<script src="js/postprocessing/MaskPass.js"></script>
-		<script src="js/postprocessing/ShaderPass.js"></script>
-		<script src="js/postprocessing/GlitchPass.js"></script>
-
-		<div>
-			<label for="dotScreen">Glitch me wild:</label><input id="wildGlitch" type="checkbox" onchange="updateOptions()"/><br />
+		<div id="info">
+			<label for="dotScreen">Glitch me wild:</label><input id="wildGlitch" type="checkbox"/><br />
 		</div>
 
-		<script>
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { GlitchPass } from './jsm/postprocessing/GlitchPass.js';
 
 			var camera, scene, renderer, composer;
 			var object, light;
@@ -99,16 +76,19 @@
 
 				// postprocessing
 
-				composer = new THREE.EffectComposer( renderer );
-				composer.addPass( new THREE.RenderPass( scene, camera ) );
+				composer = new EffectComposer( renderer );
+				composer.addPass( new RenderPass( scene, camera ) );
 
-				glitchPass = new THREE.GlitchPass();
+				glitchPass = new GlitchPass();
 				composer.addPass( glitchPass );
 
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				var wildGlitchOption = document.getElementById( 'wildGlitch' );
+				wildGlitchOption.addEventListener( 'change', updateOptions );
 
 				updateOptions();
 
@@ -133,7 +113,6 @@
 				object.rotation.y += 0.01;
 
 				composer.render();
-				//renderer.render(scene, camera);
 
 			}
 

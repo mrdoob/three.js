@@ -1,3 +1,4 @@
+console.warn( "THREE.VRMLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Takahiro / https://github.com/takahirox
  */
@@ -17,16 +18,15 @@ THREE.VRMLoader = ( function () {
 
 		}
 
-		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		THREE.Loader.call( this, manager );
+
 		this.gltfLoader = new THREE.GLTFLoader( this.manager );
 
 	}
 
-	VRMLoader.prototype = {
+	VRMLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 		constructor: VRMLoader,
-
-		crossOrigin: 'anonymous',
 
 		load: function ( url, onLoad, onProgress, onError ) {
 
@@ -34,45 +34,42 @@ THREE.VRMLoader = ( function () {
 
 			this.gltfLoader.load( url, function ( gltf ) {
 
-				scope.parse( gltf, onLoad );
+				try {
+
+					scope.parse( gltf, onLoad );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
 
 			}, onProgress, onError );
 
 		},
 
-		setCrossOrigin: function ( value ) {
-
-			this.glTFLoader.setCrossOrigin( value );
-			return this;
-
-		},
-
-		setPath: function ( value ) {
-
-			this.glTFLoader.setPath( value );
-			return this;
-
-		},
-
-		setResourcePath: function ( value ) {
-
-			this.glTFLoader.setResourcePath( value );
-			return this;
-
-		},
-
 		setDRACOLoader: function ( dracoLoader ) {
 
-			this.glTFLoader.setDRACOLoader( dracoLoader );
+			this.gltfLoader.setDRACOLoader( dracoLoader );
 			return this;
 
 		},
 
 		parse: function ( gltf, onLoad ) {
 
-			var gltfParser = gltf.parser;
-			var gltfExtensions = gltf.userData.gltfExtensions || {};
-			var vrmExtension = gltfExtensions.VRM || {};
+			// var gltfParser = gltf.parser;
+			// var gltfExtensions = gltf.userData.gltfExtensions || {};
+			// var vrmExtension = gltfExtensions.VRM || {};
 
 			// handle VRM Extension here
 
@@ -80,7 +77,7 @@ THREE.VRMLoader = ( function () {
 
 		}
 
-	};
+	} );
 
 	return VRMLoader;
 

@@ -1,13 +1,8 @@
-/**
- * @deprecated
- */
+import {
+	Vector3
+} from '../../../src/Three';
+
 export namespace GeometryUtils {
-    /**
-     * @deprecated Use {@link Geometry#merge geometry.merge( geometry2, matrix, materialIndexOffset )} instead.
-     */
-    export function merge(geometry1: any, geometry2: any, materialIndexOffset?: any): any;
-    /**
-     * @deprecated Use {@link Geometry#center geometry.center()} instead.
-     */
-    export function center(geometry: any): any;
+	export function hilbert2D( center?: Vector3, size?: number, iterations?: number, v0?: number, v1?: number, v2?: number, v3?: number ): Vector3[];
+	export function hilbert3D( center?: Vector3, size?: number, iterations?: number, v0?: number, v1?: number, v2?: number, v3?: number, v4?: number, v5?: number, v6?: number, v7?: number ): Vector3[];
 }

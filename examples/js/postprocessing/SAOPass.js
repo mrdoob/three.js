@@ -1,3 +1,4 @@
+console.warn( "THREE.SAOPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author ludobaka / ludobaka.github.io
  * SAO implementation inspired from bhouston previous SAO work
@@ -147,7 +148,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.materialCopy.blendDstAlpha = THREE.ZeroFactor;
 	this.materialCopy.blendEquationAlpha = THREE.AddEquation;
 
-	if ( THREE.CopyShader === undefined ) {
+	if ( THREE.UnpackDepthRGBAShader === undefined ) {
 
 		console.error( 'THREE.SAOPass relies on THREE.UnpackDepthRGBAShader' );
 
@@ -175,7 +176,7 @@ THREE.SAOPass.OUTPUT = {
 THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), {
 	constructor: THREE.SAOPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, deltaTime, maskActive ) {
+	render: function ( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
 		// Rendering readBuffer first when rendering to screen
 		if ( this.renderToScreen ) {

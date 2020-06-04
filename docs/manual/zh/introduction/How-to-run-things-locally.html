@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
@@ -115,6 +115,12 @@ ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => 
 						使用浏览器打开http://localhost:3000/，然后服务器将可以从你所选择的目录中向你提供静态文件。
 					</li>
 				</ol>
+			</div>
+			<h3>IIS</h3>
+			<div>
+				<p>如果你正在使用Microsoft IIS来作为网站服务器，在服务器载入之前，请为.fbx扩展名增加MIME类型。</p>
+				<code>File name externsion: fbx        MIME Type: text/plain</code>
+				<p>在默认情况下，IIS阻止 .fbx、 .obj 文件的下载，因此你必须对IIS进行配置，使得这些类型的文件可以被下载。</p>
 			</div>
 
 			<p>

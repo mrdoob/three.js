@@ -4,50 +4,23 @@
 		<title>three.js webgl - postprocessing - godrays</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-				text-align:center;
-			}
-
-			a { color:#0078ff; }
-
-			#info {
-				color:#fff;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
-		<script src="../build/three.js"></script>
-		<script src="js/loaders/OBJLoader.js"></script>
-		<script src="js/ShaderGodRays.js"></script>
-
-		<script src="js/WebGL.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl god-rays example - tree by <a href="http://www.turbosquid.com/3d-models/free-tree-3d-model/592617" target="_blank" rel="noopener">stanloshka</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl god-rays example - tree by <a href="http://www.turbosquid.com/3d-models/free-tree-3d-model/592617" target="_blank" rel="noopener">stanloshka</a>
 		</div>
 
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			if ( WEBGL.isWebGLAvailable() === false ) {
+			import Stats from './jsm/libs/stats.module.js';
 
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GodRaysFakeSunShader, GodRaysDepthMaskShader, GodRaysCombineShader, GodRaysGenerateShader } from './jsm/shaders/GodRaysShader.js';
 
 			var container, stats;
 			var camera, scene, renderer, materialDepth;
@@ -55,9 +28,8 @@
 			var sphereMesh;
 
 			var sunPosition = new THREE.Vector3( 0, 1000, - 1000 );
+			var clipPosition = new THREE.Vector4();
 			var screenSpacePosition = new THREE.Vector3();
-
-			var mouseX = 0, mouseY = 0;
 
 			var postprocessing = { enabled: true };
 
@@ -92,7 +64,7 @@
 
 				// tree
 
-				var loader = new THREE.OBJLoader();
+				var loader = new OBJLoader();
 				loader.load( 'models/obj/tree.obj', function ( object ) {
 
 					object.material = materialScene;
@@ -119,6 +91,10 @@
 
 				renderer.autoClear = false;
 
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 500;
+
 				//
 
 				stats = new Stats();
@@ -126,49 +102,11 @@
 
 				//
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				//
 
 				initPostprocessing( window.innerWidth, window.innerHeight );
-
-			}
-
-			//
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = event.clientX - window.innerWidth / 2;
-				mouseY = event.clientY - window.innerHeight / 2;
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - window.innerWidth / 2;
-					mouseY = event.touches[ 0 ].pageY - window.innerHeight / 2;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - window.innerWidth / 2;
-					mouseY = event.touches[ 0 ].pageY - window.innerHeight / 2;
-
-				}
 
 			}
 
@@ -208,7 +146,7 @@
 
 				// Switching the depth formats to luminance from rgb doesn't seem to work. I didn't
 				// investigate further for now.
-				// pars.format = THREE.LuminanceFormat;
+				// pars.format = LuminanceFormat;
 
 				// I would have this quarter size and use it as one of the ping-pong render
 				// targets but the aliasing causes some temporal flickering
@@ -225,7 +163,7 @@
 
 				// god-ray shaders
 
-				var godraysMaskShader = THREE.ShaderGodRays[ "godrays_depthMask" ];
+				var godraysMaskShader = GodRaysDepthMaskShader;
 				postprocessing.godrayMaskUniforms = THREE.UniformsUtils.clone( godraysMaskShader.uniforms );
 				postprocessing.materialGodraysDepthMask = new THREE.ShaderMaterial( {
 
@@ -235,7 +173,7 @@
 
 				} );
 
-				var godraysGenShader = THREE.ShaderGodRays[ "godrays_generate" ];
+				var godraysGenShader = GodRaysGenerateShader;
 				postprocessing.godrayGenUniforms = THREE.UniformsUtils.clone( godraysGenShader.uniforms );
 				postprocessing.materialGodraysGenerate = new THREE.ShaderMaterial( {
 
@@ -245,7 +183,7 @@
 
 				} );
 
-				var godraysCombineShader = THREE.ShaderGodRays[ "godrays_combine" ];
+				var godraysCombineShader = GodRaysCombineShader;
 				postprocessing.godrayCombineUniforms = THREE.UniformsUtils.clone( godraysCombineShader.uniforms );
 				postprocessing.materialGodraysCombine = new THREE.ShaderMaterial( {
 
@@ -255,7 +193,7 @@
 
 				} );
 
-				var godraysFakeSunShader = THREE.ShaderGodRays[ "godrays_fake_sun" ];
+				var godraysFakeSunShader = GodRaysFakeSunShader;
 				postprocessing.godraysFakeSunUniforms = THREE.UniformsUtils.clone( godraysFakeSunShader.uniforms );
 				postprocessing.materialGodraysFakeSun = new THREE.ShaderMaterial( {
 
@@ -315,28 +253,28 @@
 				sphereMesh.position.x = orbitRadius * Math.cos( time );
 				sphereMesh.position.z = orbitRadius * Math.sin( time ) - 100;
 
-
-				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
-				camera.position.y += ( - ( mouseY ) - camera.position.y ) * 0.036;
-
-				camera.lookAt( scene.position );
-
 				if ( postprocessing.enabled ) {
 
-					// Find the screenspace position of the sun
+					clipPosition.x = sunPosition.x;
+					clipPosition.y = sunPosition.y;
+					clipPosition.z = sunPosition.z;
+					clipPosition.w = 1;
 
-					screenSpacePosition.copy( sunPosition ).project( camera );
+					clipPosition.applyMatrix4( camera.matrixWorldInverse ).applyMatrix4( camera.projectionMatrix );
 
-					screenSpacePosition.x = ( screenSpacePosition.x + 1 ) / 2;
-					screenSpacePosition.y = ( screenSpacePosition.y + 1 ) / 2;
+					// perspective divide (produce NDC space)
+
+					clipPosition.x /= clipPosition.w;
+					clipPosition.y /= clipPosition.w;
+
+					screenSpacePosition.x = ( clipPosition.x + 1 ) / 2; // transform from [-1,1] to [0,1]
+					screenSpacePosition.y = ( clipPosition.y + 1 ) / 2; // transform from [-1,1] to [0,1]
+					screenSpacePosition.z = clipPosition.z; // needs to stay in clip space for visibilty checks
 
 					// Give it to the god-ray and sun shaders
 
-					postprocessing.godrayGenUniforms[ "vSunPositionScreenSpace" ].value.x = screenSpacePosition.x;
-					postprocessing.godrayGenUniforms[ "vSunPositionScreenSpace" ].value.y = screenSpacePosition.y;
-
-					postprocessing.godraysFakeSunUniforms[ "vSunPositionScreenSpace" ].value.x = screenSpacePosition.x;
-					postprocessing.godraysFakeSunUniforms[ "vSunPositionScreenSpace" ].value.y = screenSpacePosition.y;
+					postprocessing.godrayGenUniforms[ "vSunPositionScreenSpace" ].value.copy( screenSpacePosition );
+					postprocessing.godraysFakeSunUniforms[ "vSunPositionScreenSpace" ].value.copy( screenSpacePosition );
 
 					// -- Draw sky and sun --
 

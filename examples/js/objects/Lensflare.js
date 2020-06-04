@@ -1,3 +1,4 @@
+console.warn( "THREE.Lensflare: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Mugen87 / https://github.com/Mugen87
  * @author mrdoob / http://mrdoob.com/
@@ -23,14 +24,12 @@ THREE.Lensflare = function () {
 	tempMap.magFilter = THREE.NearestFilter;
 	tempMap.wrapS = THREE.ClampToEdgeWrapping;
 	tempMap.wrapT = THREE.ClampToEdgeWrapping;
-	tempMap.needsUpdate = true;
 
 	var occlusionMap = new THREE.DataTexture( new Uint8Array( 16 * 16 * 3 ), 16, 16, THREE.RGBFormat );
 	occlusionMap.minFilter = THREE.NearestFilter;
 	occlusionMap.magFilter = THREE.NearestFilter;
 	occlusionMap.wrapS = THREE.ClampToEdgeWrapping;
 	occlusionMap.wrapT = THREE.ClampToEdgeWrapping;
-	occlusionMap.needsUpdate = true;
 
 	// material
 
@@ -371,8 +370,8 @@ THREE.Lensflare.Geometry = ( function () {
 	var interleavedBuffer = new THREE.InterleavedBuffer( float32Array, 5 );
 
 	geometry.setIndex( [ 0, 1, 2,	0, 2, 3 ] );
-	geometry.addAttribute( 'position', new THREE.InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
-	geometry.addAttribute( 'uv', new THREE.InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
+	geometry.setAttribute( 'position', new THREE.InterleavedBufferAttribute( interleavedBuffer, 3, 0, false ) );
+	geometry.setAttribute( 'uv', new THREE.InterleavedBufferAttribute( interleavedBuffer, 2, 3, false ) );
 
 	return geometry;
 

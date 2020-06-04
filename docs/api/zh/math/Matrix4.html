@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -51,7 +51,7 @@
 
 				这意味着
 		<code>
-var m = new Matrix4();
+var m = new THREE.Matrix4();
 
 m.set( 11, 12, 13, 14,
        21, 22, 23, 24,
@@ -71,6 +71,24 @@ m.elements = [ 11, 21, 31, 41,
 		请记住，如果您正在阅读源代码，您必须对这里列出的任何矩阵进行转置[link:https://en.wikipedia.org/wiki/Transpose transpose]，以理解计算。
 		</p>
 
+		<h2>Extracting position, rotation and scale</h2>
+		<p>
+			There are several options available for extracting position, rotation and scale from a Matrix4.
+			<ul>
+				<li>
+					[page:Vector3.setFromMatrixPosition]: can be used to extract the translation component.
+				</li>
+				<li>
+					[page:Vector3.setFromMatrixScale]: can be used to extract the scale component.
+				</li>
+				<li>
+					[page:Quaternion.setFromRotationMatrix], [page:Euler.setFromRotationMatrix] or [page:.extractRotation extractRotation] can be used to extract the rotation component.
+				</li>
+				<li>
+					[page:.decompose decompose] can be used to extract position, rotation and scale all at once.
+				</li>
+			</ul>
+		</p>
 
 		<h2>构造器（Constructor）</h2>
 
@@ -88,25 +106,10 @@ m.elements = [ 11, 21, 31, 41,
 		矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
 		</p>
 
-		<h3>[property:Boolean isMatrix4]</h3>
-		<p>
-			用于判定此对象或者此类的派生对象是否是三维矩阵。默认值为 *true*。<br /><br />
-
-			不应该改变该值，因为它在内部用于优化。
-		</p>
-
 
 
 
 		<h2>方法（Methods）</h2>
-
-		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
-		<p>
-		[page:BufferAttribute attribute] - 表示三维向量缓存属性。<br /><br />
-
-		用这个矩阵乘以缓存属性[page:BufferAttribute attribute]里的所有3d向量。
-		</p>
-
 
 		<h3>[method:Matrix4 clone]()</h3>
 		<p>创建一个新的矩阵，元素[page:.elements elements]与该矩阵相同。</p>
@@ -114,8 +117,6 @@ m.elements = [ 11, 21, 31, 41,
 		<h3>[method:this compose]( [param:Vector3 position], [param:Quaternion quaternion], [param:Vector3 scale] )</h3>
 		<p>
 		设置将该对象由位置[page:Vector3 position]，四元数[page:Quaternion quaternion] 和 缩放[page:Vector3 scale]
-		组合变换的矩阵。内部先调用[page:.makeRotationFromQuaternion makeRotationFromQuaternion]( [page:Quaternion quaternion] )
-		再调用缩放[page:.scale scale]( [page:Vector3 scale] )最后是平移[page:.setPosition setPosition]( [page:Vector3 position] )。
 		</p>
 
 		<h3>[method:this copy]( [param:Matrix4 m] )</h3>
@@ -172,16 +173,15 @@ zAxis = (c, g, k)
 			使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
 			</p>
 
-		<h3>[method:this getInverse]( [param:Matrix4 m], [param:Boolean throwOnDegenerate] )</h3>
+		<h3>[method:this getInverse]( [param:Matrix4 m] )</h3>
 		<p>
-			[page:Matrix3 m] - 取逆的矩阵。<br />
-			[page:Boolean throwOnDegenerate] - (optional) 如果设置为true，如果矩阵是退化的（如果不可逆的话），则会抛出一个错误。<br /><br />
+			[page:Matrix3 m] - 取逆的矩阵。<br /><br />
 
-			使用逆矩阵计算方法[link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method]，
-			将当前矩阵设置为给定矩阵的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse]，如果[page:Boolean throwOnDegenerate]
-			参数没有设置且给定矩阵不可逆，那么将当前矩阵设置为3X3单位矩阵。
-				</p>
+			Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix4 m],
+			using the method outlined [link:http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm here].
 
+			You can not invert a matrix with a determinant of zero. If you attempt this, the method returns a zero matrix instead.
+		</p>
 
 		<h3>[method:Float getMaxScaleOnAxis]()</h3>
 		<p>获取3个轴方向的最大缩放值。</p>
@@ -203,7 +203,7 @@ zAxis = (c, g, k)
 
 		设置当前矩阵为围绕轴 [page:Vector3 axis] 旋转量为 [page:Float theta]弧度。<br />
 
-		这是一种有点争议但在数学上可以替代通过四元数[page:Quaternions]旋转的办法。 请参阅此处[link:http://www.gamedev.net/reference/articles/article1199.asp here]的讨论。
+		这是一种有点争议但在数学上可以替代通过四元数[page:Quaternions]旋转的办法。 请参阅此处[link:https://www.gamedev.net/articles/programming/math-and-physics/do-we-really-need-quaternions-r1199 here]的讨论。
 		</p>
 
 		<h3>[method:this makeBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
@@ -356,6 +356,7 @@ x, y, 1, 0,
 		</p>
 
 		<h3>[method:this setPosition]( [param:Vector3 v] )</h3>
+		<h3>[method:this setPosition]( [param:Float x], [param:Float y], [param:Float z] ) // optional API</h3>
 		<p>
 			取传入参数[param:Vector3 v]中值设置该矩阵的位置分量，不影响该矩阵的其余部分——即，如果该矩阵当前为:
 <code>
@@ -386,6 +387,8 @@ m, n, o, p
 
 		<h2>源码（Source）</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -50,13 +50,16 @@
 		</p>
 
 		<h2>属性(Properties)</h2>
-		<p>常用属性请参见基类[page:Material]。</p>
+		<p>共有属性请参见其基类[page:Material]。</p>
 
 		<h3>[property:Texture alphaMap]</h3>
-		<p>alpha贴图是一种灰度纹理，用于控制整个表面的不透明度（黑色：完全透明;白色：完全不透明）。默认值为null。<br /><br />
+		<p>alpha贴图是一张灰度纹理，用于控制整个表面的不透明度。（黑色：完全透明；白色：完全不透明）。
+			默认值为null。<br /><br />
 
-			仅使用纹理的颜色，忽略alpha通道（如果存在）。对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
-			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。Luminance-only以及luminance/alpha纹理也仍然有效。
+			仅使用纹理的颜色，忽略alpha通道（如果存在）。
+			对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
+			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。
+			Luminance-only以及luminance/alpha纹理也仍然有效。
 		</p>
 
 		<h3>[property:Texture aoMap]</h3>
@@ -89,12 +92,6 @@
 
 		<h3>[property:TextureCube envMap]</h3>
 		<p> 环境贴图。默认值为null。</p>
-
-		<h3>[property:Boolean isMeshLambertMaterial]</h3>
-		<p> 用于检查此类或派生类是否为Lambert网格材质。默认值为 *true*。<br /><br />
-
-			因为其通常用在内部优化，所以不应该更改该属性值。
-		</p>
 
 		<h3>[property:Texture lightMap]</h3>
 		<p>光照贴图。默认值为null。lightMap需要第二组UVs，因此将忽略[page:Texture repeat]和[page:Texture offset]纹理属性。</p>
@@ -150,10 +147,12 @@
 		</p>
 
 		<h2>方法(Methods)</h2>
-		<p>常用方法请参见基类[page:Material]。</p>
+		<p>共有方法请参见其基类[page:Material]。</p>
 
 		<h2>源码(Source)</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

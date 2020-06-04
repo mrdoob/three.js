@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>SVG渲染器（[name]）</h1>
+
+		<div class="desc">
+			<p>
+				[name]被用于使用SVG来渲染几何数据，所产生的矢量图形在以下几个方面十分有用：
+			</p>
+			<ul>
+				<li>动画标志（logo）或者图标（icon）</li>
+				<li>可交互的2D或3D图表或图形</li>
+				<li>交互式地图</li>
+				<li>复杂的或包含动画的用户界面</li>
+			</ul>
+			<p>
+				[name]具有很多优势。它产生清晰并且锐利的图像输出，它和实际视口分辨率无关。<br />
+				SVG元素可以通过CSS来控制样式；并且由于它可以添加诸如标题或者描述文字之类的元数据（对于搜索引擎或者屏幕阅读器十分有用），因此它具有十分良好的可访问性。
+			</p>
+			<p>
+				然而，SVG也有一些十分重要的限制：
+			</p>
+			<ul>
+				<li>没有高级的着色器</li>
+				<li>不支持纹理</li>
+				<li>不支持阴影</li>
+			</ul>
+		</div>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:svg_lines lines]<br />
+			[example:svg_sandbox sandbox]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]()</h3>
+
+		<h2>方法</h2>
+
+		<h3>[method:null clear]()</h3>
+		<p>
+			告诉渲染器来清除其绘图表面。
+		</p>
+
+		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
+		<p>
+			使用[page:Camera camera]来渲染一个[page:Scene scene]。
+		</p>
+
+		<h3>[method:null setClearColor]( [param:Color color], [param:number alpha] )</h3>
+		<p>
+			设置clearColor（空白颜色）以及clearAlpha（空白Alpha）。
+		</p>
+
+		<h3>[method:null setPrecision]( [param:Number precision] )</h3>
+		<p>
+			设置用于创建路径的数据的精度。
+		</p>
+
+		<h3>[method:null setQuality]()</h3>
+		<p>
+			设置渲染质量。可能的值有*low*和*high*（默认值）。
+		</p>
+
+		<h3>[method:null setSize]( [param:Number width], [param:Number height] )</h3>
+		<p>
+			改变渲染器尺寸为(width, height)。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/renderers/SVGRenderer.js examples/jsm/renderers/SVGRenderer.js]
+		</p>
+	</body>
+</html>

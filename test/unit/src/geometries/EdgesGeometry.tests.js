@@ -90,7 +90,7 @@ function createIndexedBufferGeometry( vertList, idxList ) {
 	vertices = vertices.subarray( 0, 3 * numVerts );
 
 	geom.setIndex( new BufferAttribute( indices, 1 ) );
-	geom.addAttribute( 'position', new BufferAttribute( vertices, 3 ) );
+	geom.setAttribute( 'position', new BufferAttribute( vertices, 3 ) );
 
 	geom.computeFaceNormals();
 

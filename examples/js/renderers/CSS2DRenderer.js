@@ -1,3 +1,4 @@
+console.warn( "THREE.CSS2DRenderer: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -11,11 +12,15 @@ THREE.CSS2DObject = function ( element ) {
 
 	this.addEventListener( 'removed', function () {
 
-		if ( this.element.parentNode !== null ) {
+		this.traverse( function ( object ) {
 
-			this.element.parentNode.removeChild( this.element );
+			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
-		}
+				object.element.parentNode.removeChild( object.element );
+
+			}
+
+		} );
 
 	} );
 
@@ -28,7 +33,7 @@ THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
 
 THREE.CSS2DRenderer = function () {
 
-	console.log( 'THREE.CSS2DRenderer', THREE.REVISION );
+	var _this = this;
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
@@ -68,9 +73,11 @@ THREE.CSS2DRenderer = function () {
 
 	};
 
-	var renderObject = function ( object, camera ) {
+	var renderObject = function ( object, scene, camera ) {
 
 		if ( object instanceof THREE.CSS2DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			vector.setFromMatrixPosition( object.matrixWorld );
 			vector.applyMatrix4( viewProjectionMatrix );
@@ -82,7 +89,8 @@ THREE.CSS2DRenderer = function () {
 			element.style.MozTransform = style;
 			element.style.oTransform = style;
 			element.style.transform = style;
-			element.style.display = ( vector.z < - 1 || vector.z > 1 ) ? 'none' : '';
+
+			element.style.display = ( object.visible && vector.z >= - 1 && vector.z <= 1 ) ? '' : 'none';
 
 			var objectData = {
 				distanceToCameraSquared: getDistanceToSquared( camera, object )
@@ -96,11 +104,13 @@ THREE.CSS2DRenderer = function () {
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera );
+			renderObject( object.children[ i ], scene, camera );
 
 		}
 
@@ -159,14 +169,13 @@ THREE.CSS2DRenderer = function () {
 
 	this.render = function ( scene, camera ) {
 
-		scene.updateMatrixWorld();
-
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		viewMatrix.copy( camera.matrixWorldInverse );
 		viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, viewMatrix );
 
-		renderObject( scene, camera );
+		renderObject( scene, scene, camera );
 		zOrder( scene );
 
 	};

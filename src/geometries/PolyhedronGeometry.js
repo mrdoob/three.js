@@ -63,7 +63,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	// all vertices should lie on a conceptual sphere with a given radius
 
-	appplyRadius( radius );
+	applyRadius( radius );
 
 	// finally, create the uv data
 
@@ -71,9 +71,9 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	// build non-indexed geometry
 
-	this.addAttribute( 'position', new Float32BufferAttribute( vertexBuffer, 3 ) );
-	this.addAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
-	this.addAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
+	this.setAttribute( 'position', new Float32BufferAttribute( vertexBuffer, 3 ) );
+	this.setAttribute( 'normal', new Float32BufferAttribute( vertexBuffer.slice(), 3 ) );
+	this.setAttribute( 'uv', new Float32BufferAttribute( uvBuffer, 2 ) );
 
 	if ( detail === 0 ) {
 
@@ -176,7 +176,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	}
 
-	function appplyRadius( radius ) {
+	function applyRadius( radius ) {
 
 		var vertex = new Vector3();
 

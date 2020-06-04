@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		An exporter for *Collada*.
+		<br /><br />
+		<a href="https://www.khronos.org/collada/">Collada</a> is a
+		file format for robust representation of scenes, materials, animations, and other 3D content in an xml format.
+		This exporter only supports exporting geometry, materials, textures, and scene hierarchy.
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// Instantiate an exporter
+		var exporter = new ColladaExporter();
+
+		// Parse the input and generate the ply output
+		var data = exporter.parse( scene, null, options );
+		downloadFile(data);
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]()</h3>
+		<p>
+		</p>
+		<p>
+		Creates a new [name].
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null parse]( [param:Object3D input], [param:Function onCompleted], [param:Object options] )</h3>
+		<p>
+		[page:Object input] — Object3D to be exported<br />
+		[page:Function onCompleted] — Will be called when the export completes. Optional. The same data is immediately returned from the function.<br />
+		[page:Options options] — Export options<br />
+		<ul>
+			<li>version - string. Which version of Collada to export. The options are "1.4.1" or "1.5.0". Defaults to "1.4.1".</li>
+			<li>author - string. The name to include in the author field. Author field is excluded by default.</li>
+			<li>textureDirectory - string. The directory relative to the Collada file to save the textures to.</li>
+		</ul>
+		</p>
+		<p>
+		Generates an object with Collada file and texture data. This object is returned from the function and passed into the "onCompleted" callback.
+		<code>
+		{
+			// Collada file content
+			data: "",
+
+			// List of referenced texures
+			textures: [{
+
+				// File directory, name, and extension of the texture data
+				directory: "",
+				name: "",
+				ext: "",
+
+				// The texture data and original texture object
+				data: [],
+				original: &ltTHREE.Texture&gt
+			}, ...]
+		}
+		</code>
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/exporters/ColladaExporter.js examples/jsm/exporters/ColladaExporter.js]
+		</p>
+	</body>
+</html>

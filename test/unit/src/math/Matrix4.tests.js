@@ -8,8 +8,7 @@ import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Euler } from '../../../../src/math/Euler';
 import { Quaternion } from '../../../../src/math/Quaternion';
-import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute';
-import { _Math } from '../../../../src/math/Math';
+import { MathUtils } from '../../../../src/math/MathUtils';
 import { eps } from './Constants.tests';
 
 
@@ -79,9 +78,13 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isMatrix4", ( assert ) => {
+		QUnit.test( "isMatrix4", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			assert.ok( a.isMatrix4 === true, "Passed!" );
+
+			var b = new Vector3();
+			assert.ok( ! b.isMatrix4, "Passed!" );
 
 		} );
 
@@ -215,12 +218,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "extractRotation", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
 		QUnit.test( "makeRotationFromEuler/extractRotation", ( assert ) => {
 
 			var testValues = [
@@ -284,15 +281,56 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "multiply", ( assert ) => {
+		QUnit.test( "multiply", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lhs = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+			var rhs = new Matrix4().set( 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 );
+
+			lhs.multiply( rhs );
+
+			assert.ok( lhs.elements[ 0 ] == 1585 );
+			assert.ok( lhs.elements[ 1 ] == 5318 );
+			assert.ok( lhs.elements[ 2 ] == 10514 );
+			assert.ok( lhs.elements[ 3 ] == 15894 );
+			assert.ok( lhs.elements[ 4 ] == 1655 );
+			assert.ok( lhs.elements[ 5 ] == 5562 );
+			assert.ok( lhs.elements[ 6 ] == 11006 );
+			assert.ok( lhs.elements[ 7 ] == 16634 );
+			assert.ok( lhs.elements[ 8 ] == 1787 );
+			assert.ok( lhs.elements[ 9 ] == 5980 );
+			assert.ok( lhs.elements[ 10 ] == 11840 );
+			assert.ok( lhs.elements[ 11 ] == 17888 );
+			assert.ok( lhs.elements[ 12 ] == 1861 );
+			assert.ok( lhs.elements[ 13 ] == 6246 );
+			assert.ok( lhs.elements[ 14 ] == 12378 );
+			assert.ok( lhs.elements[ 15 ] == 18710 );
 
 		} );
 
-		QUnit.todo( "premultiply", ( assert ) => {
+		QUnit.test( "premultiply", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var lhs = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+			var rhs = new Matrix4().set( 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 );
+
+			rhs.premultiply( lhs );
+
+			assert.ok( rhs.elements[ 0 ] == 1585 );
+			assert.ok( rhs.elements[ 1 ] == 5318 );
+			assert.ok( rhs.elements[ 2 ] == 10514 );
+			assert.ok( rhs.elements[ 3 ] == 15894 );
+			assert.ok( rhs.elements[ 4 ] == 1655 );
+			assert.ok( rhs.elements[ 5 ] == 5562 );
+			assert.ok( rhs.elements[ 6 ] == 11006 );
+			assert.ok( rhs.elements[ 7 ] == 16634 );
+			assert.ok( rhs.elements[ 8 ] == 1787 );
+			assert.ok( rhs.elements[ 9 ] == 5980 );
+			assert.ok( rhs.elements[ 10 ] == 11840 );
+			assert.ok( rhs.elements[ 11 ] == 17888 );
+			assert.ok( rhs.elements[ 12 ] == 1861 );
+			assert.ok( rhs.elements[ 13 ] == 6246 );
+			assert.ok( rhs.elements[ 14 ] == 12378 );
+			assert.ok( rhs.elements[ 15 ] == 18710 );
+
 
 		} );
 
@@ -379,29 +417,6 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "applyToBufferAttribute", ( assert ) => {
-
-			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
-			var attr = new Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
-			var expected = new Float32BufferAttribute( [
-				0.1666666716337204, 0.4444444477558136, 0.7222222089767456,
-				0.1599999964237213, 0.4399999976158142, 0.7200000286102295
-			], 3 );
-
-			var applied = a.applyToBufferAttribute( attr );
-
-			assert.strictEqual( expected.count, applied.count, "Applied buffer and expected buffer have the same number of entries" );
-
-			for ( var i = 0, l = expected.count; i < l; i ++ ) {
-
-				assert.ok( Math.abs( applied.getX( i ) - expected.getX( i ) ) <= eps, "Check x" );
-				assert.ok( Math.abs( applied.getY( i ) - expected.getY( i ) ) <= eps, "Check y" );
-				assert.ok( Math.abs( applied.getZ( i ) - expected.getZ( i ) ) <= eps, "Check z" );
-
-			}
-
-		} );
-
 		QUnit.test( "determinant", ( assert ) => {
 
 			var a = new Matrix4();
@@ -433,34 +448,28 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "setPosition", ( assert ) => {
+		QUnit.test( "setPosition", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+			var b = new Vector3( - 1, - 2, - 3 );
+			var c = new Matrix4().set( 0, 1, 2, - 1, 4, 5, 6, - 2, 8, 9, 10, - 3, 12, 13, 14, 15 );
+
+			a.setPosition( b );
+			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );
 
 		QUnit.test( "getInverse", ( assert ) => {
 
+			var zero = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var identity = new Matrix4();
 
 			var a = new Matrix4();
 			var b = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
-			var c = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
-			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
-			b.getInverse( a, false );
-			assert.ok( matrixEquals4( b, new Matrix4() ), "Passed!" );
+			a.getInverse( b );
+			assert.ok( matrixEquals4( a, zero ), "Passed!" );
 
-			try {
-
-				b.getInverse( c, true );
-				assert.ok( false, "Passed!" ); // should never get here.
-
-			} catch ( err ) {
-
-				assert.ok( true, "Passed!" );
-
-			}
 
 			var testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),
@@ -500,9 +509,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "scale", ( assert ) => {
+		QUnit.test( "scale", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4().set( 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 );
+			var b = new Vector3( 2, 3, 4 );
+			var c = new Matrix4().set( 2, 6, 12, 4, 10, 18, 28, 8, 18, 30, 44, 12, 26, 42, 60, 16 );
+
+			a.scale( b );
+			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );
 
@@ -515,34 +529,56 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "makeTranslation", ( assert ) => {
+		QUnit.test( "makeTranslation", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			var b = new Vector3( 2, 3, 4 );
+			var c = new Matrix4().set( 1, 0, 0, 2, 0, 1, 0, 3, 0, 0, 1, 4, 0, 0, 0, 1 );
 
-		} );
-
-		QUnit.todo( "makeRotationX", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
-
-		} );
-
-		QUnit.todo( "makeRotationY", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			a.makeTranslation( b.x, b.y, b.z );
+			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );
 
-		QUnit.todo( "makeRotationZ", ( assert ) => {
+		QUnit.test( "makeRotationX", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			var b = Math.sqrt( 3 ) / 2;
+			var c = new Matrix4().set( 1, 0, 0, 0, 0, b, - 0.5, 0, 0, 0.5, b, 0, 0, 0, 0, 1 );
+
+			a.makeRotationX( Math.PI / 6 );
+			assert.ok( matrixEquals4( a, c ), "Passed!" );
+
+		} );
+
+		QUnit.test( "makeRotationY", ( assert ) => {
+
+
+			var a = new Matrix4();
+			var b = Math.sqrt( 3 ) / 2;
+			var c = new Matrix4().set( b, 0, 0.5, 0, 0, 1, 0, 0, - 0.5, 0, b, 0, 0, 0, 0, 1 );
+
+			a.makeRotationY( Math.PI / 6 );
+			assert.ok( matrixEquals4( a, c ), "Passed!" );
+
+		} );
+
+		QUnit.test( "makeRotationZ", ( assert ) => {
+
+
+			var a = new Matrix4();
+			var b = Math.sqrt( 3 ) / 2;
+			var c = new Matrix4().set( b, - 0.5, 0, 0, 0.5, b, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 );
+
+			a.makeRotationZ( Math.PI / 6 );
+			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );
 
 		QUnit.test( "makeRotationAxis", ( assert ) => {
 
 			var axis = new Vector3( 1.5, 0.0, 1.0 ).normalize();
-			var radians = _Math.degToRad( 45 );
+			var radians = MathUtils.degToRad( 45 );
 			var a = new Matrix4().makeRotationAxis( axis, radians );
 
 			var expected = new Matrix4().set(
@@ -556,15 +592,23 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "makeScale", ( assert ) => {
+		QUnit.test( "makeScale", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			var c = new Matrix4().set( 2, 0, 0, 0, 0, 3, 0, 0, 0, 0, 4, 0, 0, 0, 0, 1 );
+
+			a.makeScale( 2, 3, 4 );
+			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );
 
-		QUnit.todo( "makeShear", ( assert ) => {
+		QUnit.test( "makeShear", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			var c = new Matrix4().set( 1, 3, 4, 0, 2, 1, 4, 0, 2, 3, 1, 0, 0, 0, 0, 1 );
+
+			a.makeShear( 2, 3, 4 );
+			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );
 
@@ -642,9 +686,16 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "makePerspective", ( assert ) => {
+		QUnit.test( "makePerspective", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4().makePerspective( - 1, 1, - 1, 1, 1, 100 );
+			var expected = new Matrix4().set(
+				1, 0, 0, 0,
+				0, - 1, 0, 0,
+				0, 0, - 101 / 99, - 200 / 99,
+				0, 0, - 1, 0
+			);
+			assert.ok( matrixEquals4( a, expected ), "Check result" );
 
 		} );
 
@@ -676,9 +727,13 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "fromArray", ( assert ) => {
+		QUnit.test( "fromArray", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix4();
+			var b = new Matrix4().set( 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15, 4, 8, 12, 16 );
+
+			a.fromArray( [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ] );
+			assert.ok( a.equals( b ), "Passed" );
 
 		} );
 

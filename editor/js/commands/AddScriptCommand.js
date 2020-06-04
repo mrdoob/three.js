@@ -3,15 +3,17 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param script javascript object
  * @constructor
  */
+var AddScriptCommand = function ( editor, object, script ) {
 
-var AddScriptCommand = function ( object, script ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'AddScriptCommand';
 	this.name = 'Add Script';
@@ -74,3 +76,5 @@ AddScriptCommand.prototype = {
 	}
 
 };
+
+export { AddScriptCommand };

@@ -1,4 +1,4 @@
-import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat } from '../constants.js';
+import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, LoopOnce, LoopRepeat, NormalAnimationBlendMode, AdditiveAnimationBlendMode } from '../constants.js';
 
 /**
  *
@@ -11,11 +11,12 @@ import { WrapAroundEnding, ZeroCurvatureEnding, ZeroSlopeEnding, LoopPingPong, L
  *
  */
 
-function AnimationAction( mixer, clip, localRoot ) {
+function AnimationAction( mixer, clip, localRoot, blendMode ) {
 
 	this._mixer = mixer;
 	this._clip = clip;
 	this._localRoot = localRoot || null;
+	this.blendMode = blendMode || clip.blendMode;
 
 	var tracks = clip.tracks,
 		nTracks = tracks.length,
@@ -374,10 +375,28 @@ Object.assign( AnimationAction.prototype, {
 			var interpolants = this._interpolants;
 			var propertyMixers = this._propertyBindings;
 
-			for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+			switch ( this.blendMode ) {
 
-				interpolants[ j ].evaluate( clipTime );
-				propertyMixers[ j ].accumulate( accuIndex, weight );
+				case AdditiveAnimationBlendMode:
+
+					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+						interpolants[ j ].evaluate( clipTime );
+						propertyMixers[ j ].accumulateAdditive( weight );
+
+					}
+
+					break;
+
+				case NormalAnimationBlendMode:
+				default:
+
+					for ( var j = 0, m = interpolants.length; j !== m; ++ j ) {
+
+						interpolants[ j ].evaluate( clipTime );
+						propertyMixers[ j ].accumulate( accuIndex, weight );
+
+					}
 
 			}
 
@@ -503,10 +522,18 @@ Object.assign( AnimationAction.prototype, {
 
 					time = 0;
 
-				} else break handle_stop;
+				} else {
+
+					this.time = time;
+
+					break handle_stop;
+
+				}
 
 				if ( this.clampWhenFinished ) this.paused = true;
 				else this.enabled = false;
+
+				this.time = time;
 
 				this._mixer.dispatchEvent( {
 					type: 'finished', action: this,
@@ -559,6 +586,8 @@ Object.assign( AnimationAction.prototype, {
 
 					time = deltaTime > 0 ? duration : 0;
 
+					this.time = time;
+
 					this._mixer.dispatchEvent( {
 						type: 'finished', action: this,
 						direction: deltaTime > 0 ? 1 : - 1
@@ -583,11 +612,17 @@ Object.assign( AnimationAction.prototype, {
 
 					this._loopCount = loopCount;
 
+					this.time = time;
+
 					this._mixer.dispatchEvent( {
 						type: 'loop', action: this, loopDelta: loopDelta
 					} );
 
 				}
+
+			} else {
+
+				this.time = time;
 
 			}
 
@@ -595,14 +630,12 @@ Object.assign( AnimationAction.prototype, {
 
 				// invert time for the "pong round"
 
-				this.time = time;
 				return duration - time;
 
 			}
 
 		}
 
-		this.time = time;
 		return time;
 
 	},

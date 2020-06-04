@@ -3,16 +3,18 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param attributeName string
  * @param newValue number, string, boolean or object
  * @constructor
  */
+var SetGeometryValueCommand = function ( editor, object, attributeName, newValue ) {
 
-var SetGeometryValueCommand = function ( object, attributeName, newValue ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetGeometryValueCommand';
 	this.name = 'Set Geometry.' + attributeName;
@@ -69,3 +71,5 @@ SetGeometryValueCommand.prototype = {
 	}
 
 };
+
+export { SetGeometryValueCommand };

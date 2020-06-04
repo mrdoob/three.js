@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		A special version of [page:Mesh] with instanced rendering support. Use [name] if you have to render a large number of
+		objects with the same geometry and material but with different world transformations. The usage of [name] will help you
+		to reduce the number of draw calls and thus improve the overall rendering performance in your application.
+		</p>
+		<p>
+		The current implementation requires that materials are not shared between [name] and other 3D objects.
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_instancing_dynamic WebGL / instancing / dynamic]<br />
+			[example:webgl_instancing_modified WebGL / instancing / modified]<br />
+			[example:webgl_instancing_performance WebGL / instancing / performance]<br />
+			[example:webgl_instancing_scatter WebGL / instancing / scatter]<br />
+			[example:webgl_instancing_raycast WebGL / instancing / raycast]
+		</p>
+
+		<h2>Constructor</h2>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material], [param:Integer count] )</h3>
+		<p>
+		[page:Geometry geometry] - an instance of [page:BufferGeometry].<br />
+		[page:Material material] - an instance of [page:Material]. Default is a new [page:MeshBasicMaterial].<br />
+		[page:Integer count] - the number of instances.<br />
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+			The number of instances. The *count* value passed into the constructor represents the maximum number of
+			instances of this mesh. You can change the number of instances at runtime to an integer value
+			in the range [0, count].
+		</p>
+		<p>
+			If you need more instances than the original count value, you have to create a new [name].
+		</p>
+
+		<h3>[property:BufferAttribute instanceMatrix]</h3>
+		<p>
+			Represents the local transformation of all instances.
+			You have to set its [page:BufferAttribute.needsUpdate needsUpdate] flag to true if you modify instanced data via [page:.setMatrixAt]().
+		</p>
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:null getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: This 4x4 matrix will be set to the local transformation matrix of the defined instance.
+		</p>
+		<p>
+			Get the local transformation matrix of the defined instance.
+		</p>
+
+		<h3>[method:null setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: A 4x4 matrix representing the local transformation of a single instance.
+		</p>
+		<p>
+			Sets the given local transformation matrix to the defined instance.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

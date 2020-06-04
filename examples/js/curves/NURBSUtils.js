@@ -1,3 +1,4 @@
+console.warn( "THREE.NURBSUtils: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author renej
  * NURBS utils
@@ -22,7 +23,7 @@ THREE.NURBSUtils = {
 
 	returns the span
 	*/
-	findSpan: function( p,  u,  U ) {
+	findSpan: function ( p, u, U ) {
 
 		var n = U.length - p - 1;
 
@@ -73,7 +74,7 @@ THREE.NURBSUtils = {
 
 	returns array[p+1] with basis functions values.
 	*/
-	calcBasisFunctions: function( span, u, p, U ) {
+	calcBasisFunctions: function ( span, u, p, U ) {
 
 		var N = [];
 		var left = [];
@@ -116,7 +117,7 @@ THREE.NURBSUtils = {
 
 	returns point for given u
 	*/
-	calcBSplinePoint: function( p, U, P, u ) {
+	calcBSplinePoint: function ( p, U, P, u ) {
 
 		var span = this.findSpan( p, u, U );
 		var N = this.calcBasisFunctions( span, u, p, U );
@@ -150,7 +151,7 @@ THREE.NURBSUtils = {
 
 	returns array[n+1][p+1] with basis functions derivatives
 	*/
-	calcBasisFunctionDerivatives: function( span,  u,  p,  n,  U ) {
+	calcBasisFunctionDerivatives: function ( span, u, p, n, U ) {
 
 		var zeroArr = [];
 		for ( var i = 0; i <= p; ++ i )
@@ -209,6 +210,7 @@ THREE.NURBSUtils = {
 				a[ i ] = zeroArr.slice( 0 );
 
 			}
+
 			a[ 0 ][ 0 ] = 1.0;
 
 			for ( var k = 1; k <= n; ++ k ) {
@@ -225,7 +227,7 @@ THREE.NURBSUtils = {
 				}
 
 				var j1 = ( rk >= - 1 ) ? 1 : - rk;
-				var j2 = ( r - 1 <= pk ) ? k - 1 :  p - r;
+				var j2 = ( r - 1 <= pk ) ? k - 1 : p - r;
 
 				for ( var j = j1; j <= j2; ++ j ) {
 
@@ -260,6 +262,7 @@ THREE.NURBSUtils = {
 				ders[ k ][ j ] *= r;
 
 			}
+
 			r *= p - k;
 
 		}
@@ -280,7 +283,7 @@ THREE.NURBSUtils = {
 
 		returns array[d+1] with derivatives
 		*/
-	calcBSplineDerivatives: function( p,  U,  P,  u,  nd ) {
+	calcBSplineDerivatives: function ( p, U, P, u, nd ) {
 
 		var du = nd < p ? nd : p;
 		var CK = [];
@@ -300,6 +303,7 @@ THREE.NURBSUtils = {
 			Pw[ i ] = point;
 
 		}
+
 		for ( var k = 0; k <= du; ++ k ) {
 
 			var point = Pw[ span - p ].clone().multiplyScalar( nders[ k ][ 0 ] );
@@ -330,7 +334,7 @@ THREE.NURBSUtils = {
 
 	returns k!/(i!(k-i)!)
 	*/
-	calcKoverI: function( k, i ) {
+	calcKoverI: function ( k, i ) {
 
 		var nom = 1;
 
@@ -412,7 +416,7 @@ THREE.NURBSUtils = {
 
 	returns array with derivatives.
 	*/
-	calcNURBSDerivatives: function( p,  U,  P,  u,  nd ) {
+	calcNURBSDerivatives: function ( p, U, P, u, nd ) {
 
 		var Pders = this.calcBSplineDerivatives( p, U, P, u, nd );
 		return this.calcRationalCurveDerivatives( Pders );

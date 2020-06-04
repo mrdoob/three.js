@@ -4,24 +4,25 @@ import { Raycaster } from './../core/Raycaster';
 import { Object3D } from './../core/Object3D';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { Intersection } from '../core/Raycaster';
-import { TrianglesDrawModes } from '../constants';
 
-export class Mesh extends Object3D {
-  constructor(
-    geometry?: Geometry | BufferGeometry,
-    material?: Material | Material[]
-  );
+export class Mesh <
+	TGeometry extends Geometry | BufferGeometry = Geometry | BufferGeometry,
+	TMaterial extends Material | Material[] = Material | Material[]
+> extends Object3D {
 
-  geometry: Geometry | BufferGeometry;
-  material: Material | Material[];
-  drawMode: TrianglesDrawModes;
-  morphTargetInfluences?: number[];
-  morphTargetDictionary?: { [key: string]: number };
-  isMesh: true;
-  type: string;
+	constructor(
+		geometry?: TGeometry,
+		material?: TMaterial
+	);
 
-  setDrawMode(drawMode: TrianglesDrawModes): void;
-  updateMorphTargets(): void;
-  raycast(raycaster: Raycaster, intersects: Intersection[]): void;
-  copy(source: this, recursive?: boolean): this;
+	geometry: TGeometry;
+	material: TMaterial;
+	morphTargetInfluences?: number[];
+	morphTargetDictionary?: { [key: string]: number };
+	readonly isMesh: true;
+	type: string;
+
+	updateMorphTargets(): void;
+	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
+
 }

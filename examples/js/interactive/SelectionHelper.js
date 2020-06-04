@@ -1,3 +1,4 @@
+console.warn( "THREE.SelectionHelper: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author HypnosNova / https://www.threejs.org.cn/gallery
  */
@@ -12,9 +13,9 @@ THREE.SelectionHelper = ( function () {
 
 		this.renderer = renderer;
 
-		this.startPoint = { x: 0, y: 0 };
-		this.pointTopLeft = { x: 0, y: 0 };
-		this.pointBottomRight = { x: 0, y: 0 };
+		this.startPoint = new THREE.Vector2();
+		this.pointTopLeft = new THREE.Vector2();
+		this.pointBottomRight = new THREE.Vector2();
 
 		this.isDown = false;
 

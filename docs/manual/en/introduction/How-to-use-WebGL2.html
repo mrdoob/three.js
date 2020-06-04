@@ -11,7 +11,6 @@
 
 <body>
 	<h1>[name]</h1>
-	<br />
 
 	<p>
 		Starting with three.js R95, the engine supports rendering with a WebGL 2 context. By default three.js always uses a
@@ -23,11 +22,11 @@
 
 	<p>
 		Since WebGL 2 is not supported by all devices that support WebGL 1, it's important to check the respective availability.
-		To do so, please include [link:https://github.com/mrdoob/three.js/blob/master/examples/js/WebGL.js WebGL.js] into your project.
+		To do so, please include [link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/WebGL.js WebGL.js] into your project.
 	</p>
 
 	<code>
-&lt;script src="/path/to/WebGL.js"&gt;&lt;/script&gt;
+import { WEBGL } from 'three/examples/jsm/WebGL.js';
 	</code>
 
 	<p>
@@ -49,9 +48,14 @@ if ( WEBGL.isWebGL2Available() === false ) {
 		automatically convert the built-in material's shader code to GLSL ES 3.00.
 	</p>
 
+	<p>
+		Since you are manually creating the WebGL 2 rendering context, you also have to pass in all necessary context attributes.
+		Note: It's not possible to modify these attributes after the context has been created, so passing them to the WebGLRenderer won't have any effect.
+	</p>
+
 	<code>
 var canvas = document.createElement( 'canvas' );
-var context = canvas.getContext( 'webgl2' );
+var context = canvas.getContext( 'webgl2', { alpha: false } );
 var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
 	</code>
 
@@ -100,7 +104,7 @@ var material = new THREE.ShaderMaterial( {
 		Have a look at one of the official examples in order to see WebGL 2 features in action.<br /><br />
 
 		[example:webgl2_materials_texture3d WebGL2 / materials / texture3d]<br />
-		[example:webgl2_materials_texture3d_volume WebGL2 / materials / texture3d / volume]<br />
+		[example:webgl2_materials_texture2darray WebGL2 / materials / texture2darray]<br />
 		[example:webgl2_multisampled_renderbuffers WebGL2 / multisampled renderbuffers]
 	</p>
 
@@ -111,7 +115,9 @@ var material = new THREE.ShaderMaterial( {
 		overview about what's already available in the latest version of three.js.
 		<ul>
 			<li>3D Textures</li>
+			<li>2D Texture Arrays</li>
 			<li>Multisampled Renderbuffers</li>
+			<li>Non-power of two (POT) textures work just the same as POT textures now. No resizing is required for best quality.</li>
 		</ul>
 
 	</p>

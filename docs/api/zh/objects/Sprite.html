@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -17,11 +17,11 @@
 			精灵不会投射任何阴影，即使设置了<code>castShadow = true</code>也将不会有任何效果。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
 var spriteMap = new THREE.TextureLoader().load( "sprite.png" );
-var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, color: 0xffffff } );
+var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap } );
 var sprite = new THREE.Sprite( spriteMaterial );
 scene.add( sprite );
 		</code>
@@ -31,20 +31,14 @@ scene.add( sprite );
 
 		<h3>[name]( [param:Material material] )</h3>
 		<p>
-    	[page:Material material] - （可选值）是[page:SpriteMaterial]的一个实例。 默认值是一个白色的[page:SpriteMaterial]。<br /><br />
+		[page:Material material] - （可选值）是[page:SpriteMaterial]的一个实例。 默认值是一个白色的[page:SpriteMaterial]。<br /><br />
 
 		创建一个新的[name]。
 		</p>
 
 
 		<h2>属性</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有属性。</p>
-
-		<h3>[property:Boolean isSprite]</h3>
-		<p>
-			用于检查这个类或者其派生类是否为精灵，默认值为*true*。<br /><br />
-			你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
-		</p>
+		<p>共有属性请参见其基类[page:Object3D]。</p>
 
 
 		<h3>[property:SpriteMaterial material]</h3>
@@ -60,7 +54,7 @@ scene.add( sprite );
 		</p>
 
 		<h2>方法</h2>
-		<p>请参阅其基类[page:Object3D]来查看共有方法。</p>
+		<p>共有方法请参见其基类[page:Object3D]。</p>
 
 		<h3>[method:Sprite clone]()</h3>
 		<p>
@@ -74,13 +68,14 @@ scene.add( sprite );
 
 		<h3>[method:null raycast]( [param:Raycaster raycaster], [param:Array intersects] )</h3>
 		<p>
-			在投射的光线和精灵之前产生交互。
-			[page:Raycaster.intersectObject]将会调用这个方法。
-		</p>
+		在投射的光线和精灵之前产生交互。[page:Raycaster.intersectObject]将会调用这个方法。
+		在对sprite进行射线投射之前，射线投射必须通过调用[page:Raycaster.setFromCamera]()来初始化。		</p>
 
 
 		<h2>源代码</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

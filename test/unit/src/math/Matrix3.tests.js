@@ -6,7 +6,6 @@
 
 import { Matrix3 } from '../../../../src/math/Matrix3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
-import { Float32BufferAttribute } from '../../../../src/core/BufferAttribute';
 
 function matrixEquals3( a, b, tolerance ) {
 
@@ -77,9 +76,13 @@ export default QUnit.module( 'Maths', () => {
 		} );
 
 		// PUBLIC STUFF
-		QUnit.todo( "isMatrix3", ( assert ) => {
+		QUnit.test( "isMatrix3", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix3();
+			assert.ok( a.isMatrix3 === true, "Passed!" );
+
+			var b = new Matrix4();
+			assert.ok( ! b.isMatrix3, "Passed!" );
 
 		} );
 
@@ -148,21 +151,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "setFromMatrix4", ( assert ) => {
+		QUnit.test( "setFromMatrix4", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
 
-		} );
-
-		QUnit.test( "applyToBufferAttribute", ( assert ) => {
-
-			var a = new Matrix3().set( 1, 2, 3, 4, 5, 6, 7, 8, 9 );
-			var attr = new Float32BufferAttribute( [ 1, 2, 1, 3, 0, 3 ], 3 );
-			var expected = new Float32Array( [ 8, 20, 32, 12, 30, 48 ] );
-
-			var applied = a.applyToBufferAttribute( attr );
-
-			assert.deepEqual( applied.array, expected, "Check resulting buffer" );
+			var a = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );
+			var b = new Matrix3();
+			var c = new Matrix3().set( 0, 1, 2, 4, 5, 6, 8, 9, 10 );
+			b.setFromMatrix4( a );
+			assert.ok( b.equals( c ) );
 
 		} );
 
@@ -263,25 +259,13 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "getInverse", ( assert ) => {
 
-			var identity = new Matrix3();
+			var zero = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var identity4 = new Matrix4();
-			var a = new Matrix3();
-			var b = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
-			var c = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+			var a = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
+			var b = new Matrix3();
 
-			b.getInverse( a, false );
-			assert.ok( matrixEquals3( a, identity ), "Matrix a is identity matrix" );
-
-			try {
-
-				b.getInverse( c, true );
-				assert.ok( false, "Should never get here !" ); // should never get here.
-
-			} catch ( err ) {
-
-				assert.ok( true, "Passed: " + err );
-
-			}
+			b.getInverse( a );
+			assert.ok( matrixEquals3( b, zero ), "Matrix a is zero matrix" );
 
 			var testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),
@@ -349,9 +333,22 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "transposeIntoArray", ( assert ) => {
+		QUnit.test( "transposeIntoArray", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
+			var b = [];
+			a.transposeIntoArray( b );
+
+			assert.ok( b[ 0 ] == 0 );
+			assert.ok( b[ 1 ] == 1 );
+			assert.ok( b[ 2 ] == 2 );
+			assert.ok( b[ 3 ] == 3 );
+			assert.ok( b[ 4 ] == 4 );
+			assert.ok( b[ 5 ] == 5 );
+			assert.ok( b[ 5 ] == 5 );
+			assert.ok( b[ 6 ] == 6 );
+			assert.ok( b[ 7 ] == 7 );
+			assert.ok( b[ 8 ] == 8 );
 
 		} );
 
@@ -449,9 +446,33 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "fromArray", ( assert ) => {
+		QUnit.test( "fromArray", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var b = new Matrix3();
+			b.fromArray( [ 0, 1, 2, 3, 4, 5, 6, 7, 8 ] );
+
+			assert.ok( b.elements[ 0 ] == 0 );
+			assert.ok( b.elements[ 1 ] == 1 );
+			assert.ok( b.elements[ 2 ] == 2 );
+			assert.ok( b.elements[ 3 ] == 3 );
+			assert.ok( b.elements[ 4 ] == 4 );
+			assert.ok( b.elements[ 5 ] == 5 );
+			assert.ok( b.elements[ 6 ] == 6 );
+			assert.ok( b.elements[ 7 ] == 7 );
+			assert.ok( b.elements[ 8 ] == 8 );
+
+			b = new Matrix3();
+			b.fromArray( [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18 ], 10 );
+
+			assert.ok( b.elements[ 0 ] == 10 );
+			assert.ok( b.elements[ 1 ] == 11 );
+			assert.ok( b.elements[ 2 ] == 12 );
+			assert.ok( b.elements[ 3 ] == 13 );
+			assert.ok( b.elements[ 4 ] == 14 );
+			assert.ok( b.elements[ 5 ] == 15 );
+			assert.ok( b.elements[ 6 ] == 16 );
+			assert.ok( b.elements[ 7 ] == 17 );
+			assert.ok( b.elements[ 8 ] == 18 );
 
 		} );
 

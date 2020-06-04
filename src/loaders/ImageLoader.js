@@ -3,22 +3,19 @@
  */
 
 import { Cache } from './Cache.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
-
+import { Loader } from './Loader.js';
 
 function ImageLoader( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
+	Loader.call( this, manager );
 
 }
 
-Object.assign( ImageLoader.prototype, {
+ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
-	crossOrigin: 'anonymous',
+	constructor: ImageLoader,
 
 	load: function ( url, onLoad, onProgress, onError ) {
-
-		if ( url === undefined ) url = '';
 
 		if ( this.path !== undefined ) url = this.path + url;
 
@@ -85,20 +82,6 @@ Object.assign( ImageLoader.prototype, {
 		image.src = url;
 
 		return image;
-
-	},
-
-	setCrossOrigin: function ( value ) {
-
-		this.crossOrigin = value;
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
 
 	}
 

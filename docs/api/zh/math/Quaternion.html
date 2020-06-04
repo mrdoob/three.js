@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -11,15 +11,11 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Implementation of a [link:http://en.wikipedia.org/wiki/Quaternion quaternion].
-			This is used for [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotating things]
-			without encountering the dreaded
-			[link:http://en.wikipedia.org/wiki/Gimbal_lock gimbal lock] issue, amongst other
-			advantages.
+			Implementation of a [link:http://en.wikipedia.org/wiki/Quaternion quaternion].<br/>
+			Quaternions are used in three.js to represent [link:https://en.wikipedia.org/wiki/Quaternions_and_spatial_rotation rotations].
 		</p>
 
-
-		<h2>Example</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		var quaternion = new THREE.Quaternion();
@@ -44,24 +40,13 @@
 
 		<h2>Properties</h2>
 
-		<h3>[property:Boolean isQuaternion]</h3>
-		<p>
-			Used to check whether this or derived classes are Quaternions. Default is *true*.<br /><br />
-
-			You should not change this, as it is used internally for optimisation.
-		</p>
-
 		<h3>[property:Float x]</h3>
-		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 		<h3>[property:Float y]</h3>
-		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 		<h3>[property:Float z]</h3>
-		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 		<h3>[property:Float w]</h3>
-		<p>Changing this property will result in [page:.onChangeCallback onChangeCallback] being called.</p>
 
 
 		<h2>Methods</h2>
@@ -115,8 +100,7 @@
 
 		<h3>[method:Quaternion inverse]()</h3>
 		<p>
-			Inverts this quaternion - calculate the [page:.conjugate conjugate] and then
-			[page:.normalize normalizes] the result.
+			Inverts this quaternion - calculates the [page:.conjugate conjugate]. The quaternion is assumed to have unit length.
 		</p>
 
 		<h3>[method:Float length]()</h3>
@@ -125,7 +109,7 @@
 
 		<h3>[method:Float lengthSq]()</h3>
 		<p>
-			Computes the [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
+			Computes the squared [link:https://en.wikipedia.org/wiki/Euclidean_distance Euclidean length]
 			(straight-line length) of this quaternion, considered as a 4 dimensional
 			vector. This can be useful if you are comparing the lengths of two quaternions,
 			as this is a slightly more efficient calculation than [page:.length length]().
@@ -146,32 +130,6 @@
 		Sets this quaternion to [page:Quaternion a] x [page:Quaternion b].<br />
 		Adapted from the method outlined [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here].
 		</p>
-
-		<h3>[method:Quaternion onChange]( [param:Function onChangeCallback] )</h3>
-		<p>Sets the [page:.onChangeCallback onChangeCallback]() method.</p>
-
-		<h3>[method:Quaternion onChangeCallback]( )</h3>
-		<p>
-			This function is called whenever any of the following occurs:
-			<ul>
-				<li>
-					The [page:.x x], [page:.y y], [page:.z z] or
-				  [page:.w w] properties are changed.
-				</li>
-				<li>
-					The [page:.set set](), [page:.copy copy](), [page:.clone clone](),
-					[page:.setFromAxisAngle setFromAxisAngle](),  [page:.setFromRotationMatrix setFromRotationMatrix](),
-					[page:.conjugate conjugate](), [page:.normalize normalize](),
-					[page:.multiplyQuaternions multiplyQuaternions](), [page:.slerp slerp]() or [page:.fromArray fromArray]()
-					functions are called.
-				</li>
-				<li>
-					[page:.setFromEuler setFromEuler]() function is called with its *update* argument set to true.
-				</li>
-			</ul>
-			By default it is the empty function, however you can change it if needed using [page:.onChange onChange]( [page:Function onChangeCallback] ).
-		</p>
-
 
 		<h3>[method:Quaternion premultiply]( [param:Quaternion q] )</h3>
 		<p>Pre-multiplies this quaternion by [page:Quaternion q].</p>
@@ -237,6 +195,14 @@
 		Returns the numerical elements of this quaternion in an array of format [x, y, z, w].
 		</p>
 
+		<h3>[method:this fromBufferAttribute]( [param:BufferAttribute attribute], [param:Integer index] )</h3>
+		<p>
+		[page:BufferAttribute attribute] - the source attribute.<br />
+		[page:Integer index] - index in the attribute.<br /><br />
+
+		Sets [page:.x x], [page:.y y], [page:.z z], [page:.w w] properties of this quaternion from the [page:BufferAttribute attribute].
+		</p>
+
 		<h2>Static Methods</h2>
 
 		<p>
@@ -295,6 +261,8 @@ q.slerp( qb, t )
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
 	</body>
 </html>

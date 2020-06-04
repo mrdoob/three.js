@@ -3,16 +3,18 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param attributeName string
  * @param newValue integer representing a hex color value
  * @constructor
  */
+var SetMaterialColorCommand = function ( editor, object, attributeName, newValue, materialSlot ) {
 
-var SetMaterialColorCommand = function ( object, attributeName, newValue, materialSlot ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'SetMaterialColorCommand';
 	this.name = 'Set Material.' + attributeName;
@@ -77,3 +79,5 @@ SetMaterialColorCommand.prototype = {
 	}
 
 };
+
+export { SetMaterialColorCommand };

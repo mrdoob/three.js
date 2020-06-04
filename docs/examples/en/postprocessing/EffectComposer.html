@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Used to implement post-processing effects in three.js. The class manages a chain of post-processing passes
+			to produce the final visual result. Post-processing passes are executed in order of their addition/insertion.
+			The last pass is automatically rendered to screen.
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_postprocessing postprocessing]<br />
+			[example:webgl_postprocessing_advanced postprocessing advanced]<br />
+			[example:webgl_postprocessing_backgrounds postprocessing backgrounds]<br />
+			[example:webgl_postprocessing_crossfade postprocessing crossfade]<br />
+			[example:webgl_postprocessing_dof postprocessing depth-of-field]<br />
+			[example:webgl_postprocessing_dof2 postprocessing depth-of-field 2]<br />
+			[example:webgl_postprocessing_fxaa postprocessing fxaa]<br />
+			[example:webgl_postprocessing_glitch postprocessing glitch]<br />
+			[example:webgl_postprocessing_godrays postprocessing godrays]<br />
+			[example:webgl_postprocessing_masking postprocessing masking]<br />
+			[example:webgl_postprocessing_nodes postprocessing node material]<br />
+			[example:webgl_postprocessing_outline postprocessing outline]<br />
+			[example:webgl_postprocessing_pixel postprocessing pixelate]<br />
+			[example:webgl_postprocessing_procedural postprocessing procedural]<br />
+			[example:webgl_postprocessing_rgb_halftone postprocessing rgb halftone]<br />
+			[example:webgl_postprocessing_sao postprocessing sao]<br />
+			[example:webgl_postprocessing_smaa postprocessing smaa]<br />
+			[example:webgl_postprocessing_sobel postprocessing sobel]<br />
+			[example:webgl_postprocessing_ssaa postprocessing ssaa]<br />
+			[example:webgl_postprocessing_ssao postprocessing ssao]<br />
+			[example:webgl_postprocessing_taa postprocessing taa]<br />
+			[example:webgl_postprocessing_unreal_bloom postprocessing unreal bloom]<br />
+			[example:webgl_postprocessing_unreal_bloom_selective postprocessing unreal bloom selective]<br />
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:WebGLRenderer renderer], [param:WebGLRenderTarget renderTarget] )</h3>
+		<p>
+		[page:WebGLRenderer renderer] -- The renderer used to render the scene. <br />
+		[page:WebGLRenderTarget renderTarget] -- (optional) A preconfigured render target internally used by [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array passes]</h3>
+		<p>
+			An array representing the (ordered) chain of post-processing passes.
+		</p>
+
+		<h3>[property:WebGLRendererTarget readBuffer]</h3>
+		<p>
+			A reference to the internal read buffer. Passes usually read the previous render result from this buffer.
+		</p>
+
+		<h3>[property:WebGLRenderer renderer]</h3>
+		<p>
+			A reference to the internal renderer.
+		</p>
+
+		<h3>[property:Boolean renderToScreen]</h3>
+		<p>
+			Whether the final pass is rendered to the screen (default framebuffer) or not.
+		</p>
+
+		<h3>[property:WebGLRendererTarget writeBuffer]</h3>
+		<p>
+			A reference to the internal write buffer. Passes usually write their result into this buffer.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:void addPass]( [param:Pass pass] )</h3>
+
+		<p>
+			pass -- The pass to add to the pass chain.<br /><br />
+
+			Adds the given pass to the pass chain.
+		</p>
+
+		<h3>[method:void insertPass]( [param:Pass pass], [param:Integer index] )</h3>
+
+		<p>
+			pass -- The pass to insert into the pass chain.<br />
+			index -- Defines the position in the pass chain where the pass should be inserted.<br /><br />
+
+			Inserts the given pass into the pass chain at the given index.
+		</p>
+
+		<h3>[method:boolean isLastEnabledPass]( [param:Integer passIndex] )</h3>
+
+		<p>
+			passIndex -- The pass to check.<br /><br />
+
+			Returns true if the pass for the given index is the last enabled pass in the pass chain.
+			Used by [name] to determine when a pass should be rendered to screen.
+		</p>
+
+		<h3>[method:void render]( [param:Float deltaTime] )</h3>
+
+		<p>
+			deltaTime -- The delta time value.<br /><br />
+
+			Executes all enabled post-processing passes in order to produce the final frame.
+		</p>
+
+		<h3>[method:void reset]( [param:WebGLRenderTarget renderTarget] )</h3>
+
+		<p>
+			[page:WebGLRenderTarget renderTarget] -- (optional) A preconfigured render target internally used by [name]..<br /><br />
+
+			Resets the internal state of the [name].
+		</p>
+
+		<h3>[method:void setPixelRatio]( [param:Float pixelRatio] )</h3>
+
+		<p>
+			pixelRatio -- The device pixel ratio.<br /><br />
+
+			Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output.
+				Thus, the semantic of the method is similar to [page:WebGLRenderer.setPixelRatio]().
+		</p>
+
+		<h3>[method:void setSize]( [param:Integer width], [param:Integer height] )</h3>
+
+		<p>
+			width -- The width of the [name].<br />
+			height -- The height of the [name].<br /><br />
+
+				Resizes the internal render buffers and passes to (width, height) with device pixel ratio taken into account.
+				Thus, the semantic of the method is similar to [page:WebGLRenderer.setSize]().
+		</p>
+
+		<h3>[method:void swapBuffers]()</h3>
+
+		<p>Swaps the internal read/write buffers.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/postprocessing/EffectComposer.js examples/jsm/postprocessing/EffectComposer.js]
+		</p>
+	</body>
+</html>

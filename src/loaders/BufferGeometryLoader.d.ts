@@ -1,16 +1,18 @@
+import { Loader } from './Loader';
 import { LoadingManager } from './LoadingManager';
 import { BufferGeometry } from './../core/BufferGeometry';
+import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry';
 
-export class BufferGeometryLoader {
-  constructor(manager?: LoadingManager);
+export class BufferGeometryLoader extends Loader {
 
-  manager: LoadingManager;
+	constructor( manager?: LoadingManager );
 
-  load(
-    url: string,
-    onLoad: (bufferGeometry: BufferGeometry) => void,
-    onProgress?: (event: any) => void,
-    onError?: (event: any) => void
-  ): void;
-  parse(json: any): BufferGeometry;
+	load(
+		url: string,
+		onLoad: ( bufferGeometry: InstancedBufferGeometry | BufferGeometry ) => void,
+		onProgress?: ( request: ProgressEvent ) => void,
+		onError?: ( event: ErrorEvent ) => void
+	): void;
+	parse( json: any ): InstancedBufferGeometry | BufferGeometry;
+
 }

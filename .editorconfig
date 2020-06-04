@@ -9,7 +9,6 @@ insert_final_newline = true
 [*.{js,ts,html}]
 charset = utf-8
 indent_style = tab
-indent_size = 2
 
 [*.{js,ts}]
 trim_trailing_whitespace = true

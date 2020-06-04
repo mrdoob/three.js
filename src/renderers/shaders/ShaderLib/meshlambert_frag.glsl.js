@@ -23,7 +23,9 @@ varying vec3 vIndirectFront;
 #include <aomap_pars_fragment>
 #include <lightmap_pars_fragment>
 #include <emissivemap_pars_fragment>
+#include <envmap_common_pars_fragment>
 #include <envmap_pars_fragment>
+#include <cube_uv_reflection_fragment>
 #include <bsdfs>
 #include <lights_pars_begin>
 #include <fog_pars_fragment>
@@ -50,7 +52,6 @@ void main() {
 	#include <emissivemap_fragment>
 
 	// accumulation
-	reflectedLight.indirectDiffuse = getAmbientLightIrradiance( ambientLightColor );
 
 	#ifdef DOUBLE_SIDED
 
@@ -79,6 +80,7 @@ void main() {
 	reflectedLight.directDiffuse *= BRDF_Diffuse_Lambert( diffuseColor.rgb ) * getShadowMask();
 
 	// modulation
+
 	#include <aomap_fragment>
 
 	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;

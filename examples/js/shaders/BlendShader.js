@@ -1,3 +1,4 @@
+console.warn( "THREE.BlendShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author alteredq / http://alteredqualia.com/
  *
@@ -10,8 +11,8 @@ THREE.BlendShader = {
 
 		"tDiffuse1": { value: null },
 		"tDiffuse2": { value: null },
-		"mixRatio":  { value: 0.5 },
-		"opacity":   { value: 1.0 }
+		"mixRatio": { value: 0.5 },
+		"opacity": { value: 1.0 }
 
 	},
 
@@ -21,8 +22,8 @@ THREE.BlendShader = {
 
 		"void main() {",
 
-			"vUv = uv;",
-			"gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
+		"	vUv = uv;",
+		"	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
 		"}"
 
@@ -40,9 +41,9 @@ THREE.BlendShader = {
 
 		"void main() {",
 
-			"vec4 texel1 = texture2D( tDiffuse1, vUv );",
-			"vec4 texel2 = texture2D( tDiffuse2, vUv );",
-			"gl_FragColor = opacity * mix( texel1, texel2, mixRatio );",
+		"	vec4 texel1 = texture2D( tDiffuse1, vUv );",
+		"	vec4 texel2 = texture2D( tDiffuse2, vUv );",
+		"	gl_FragColor = opacity * mix( texel1, texel2, mixRatio );",
 
 		"}"
 

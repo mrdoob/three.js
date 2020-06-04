@@ -153,6 +153,7 @@ function WebGLClipping() {
 		}
 
 		scope.numPlanes = nPlanes;
+		scope.numIntersection = 0;
 
 		return dstArray;
 

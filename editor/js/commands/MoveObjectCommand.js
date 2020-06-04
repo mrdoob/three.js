@@ -3,16 +3,18 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
 /**
+ * @param editor Editor
  * @param object THREE.Object3D
  * @param newParent THREE.Object3D
  * @param newBefore THREE.Object3D
  * @constructor
  */
+var MoveObjectCommand = function ( editor, object, newParent, newBefore ) {
 
-var MoveObjectCommand = function ( object, newParent, newBefore ) {
-
-	Command.call( this );
+	Command.call( this, editor );
 
 	this.type = 'MoveObjectCommand';
 	this.name = 'Move Object';
@@ -105,3 +107,5 @@ MoveObjectCommand.prototype = {
 	}
 
 };
+
+export { MoveObjectCommand };

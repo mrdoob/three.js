@@ -2,10 +2,13 @@ import { Vector4 } from '../math/Vector4.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
+import { StaticDrawUsage } from '../constants.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
  */
+
+var _vector = new Vector3();
 
 function BufferAttribute( array, itemSize, normalized ) {
 
@@ -22,7 +25,7 @@ function BufferAttribute( array, itemSize, normalized ) {
 	this.count = array !== undefined ? array.length / itemSize : 0;
 	this.normalized = normalized === true;
 
-	this.dynamic = false;
+	this.usage = StaticDrawUsage;
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
@@ -45,24 +48,9 @@ Object.assign( BufferAttribute.prototype, {
 
 	onUploadCallback: function () {},
 
-	setArray: function ( array ) {
+	setUsage: function ( value ) {
 
-		if ( Array.isArray( array ) ) {
-
-			throw new TypeError( 'THREE.BufferAttribute: array should be a Typed Array.' );
-
-		}
-
-		this.count = array !== undefined ? array.length / this.itemSize : 0;
-		this.array = array;
-
-		return this;
-
-	},
-
-	setDynamic: function ( value ) {
-
-		this.dynamic = value;
+		this.usage = value;
 
 		return this;
 
@@ -76,7 +64,7 @@ Object.assign( BufferAttribute.prototype, {
 		this.count = source.count;
 		this.normalized = source.normalized;
 
-		this.dynamic = source.dynamic;
+		this.usage = source.usage;
 
 		return this;
 
@@ -205,6 +193,78 @@ Object.assign( BufferAttribute.prototype, {
 
 	},
 
+	applyMatrix3: function ( m ) {
+
+		for ( var i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.applyMatrix3( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+		}
+
+		return this;
+
+	},
+
+	applyMatrix4: function ( m ) {
+
+		for ( var i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.applyMatrix4( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+		}
+
+		return this;
+
+	},
+
+	applyNormalMatrix: function ( m ) {
+
+		for ( var i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.applyNormalMatrix( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+		}
+
+		return this;
+
+	},
+
+	transformDirection: function ( m ) {
+
+		for ( var i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.transformDirection( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+		}
+
+		return this;
+
+	},
+
 	set: function ( value, offset ) {
 
 		if ( offset === undefined ) offset = 0;
@@ -318,6 +378,17 @@ Object.assign( BufferAttribute.prototype, {
 	clone: function () {
 
 		return new this.constructor( this.array, this.itemSize ).copy( this );
+
+	},
+
+	toJSON: function () {
+
+		return {
+			itemSize: this.itemSize,
+			type: this.array.constructor.name,
+			array: Array.prototype.slice.call( this.array ),
+			normalized: this.normalized
+		};
 
 	}
 

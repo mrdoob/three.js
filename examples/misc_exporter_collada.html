@@ -4,61 +4,28 @@
 		<title>three.js webgl - exporter - collada</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-				font-weight: bold;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				padding: 10px;
-				width: 100%;
-				text-align: center;
-				color: #fff;
-			}
-
-			a { color: blue; }
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
-			<button onclick="exportCollada()">Export COLLADA</button>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - collada<br /><br />
+			<button id="export">Export COLLADA</button>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/WebGL.js"></script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script src='js/libs/dat.gui.min.js'></script>
-
-		<script src='js/geometries/TeapotBufferGeometry.js'></script>
-
-		<script src="js/exporters/ColladaExporter.js"></script>
-
-		<script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { ColladaExporter } from './jsm/exporters/ColladaExporter.js';
+			import { TeapotBufferGeometry } from './jsm/geometries/TeapotBufferGeometry.js';
 
 			////////////////////////////////////////////////////////////////////////////////
 			// Utah/Newell Teapot demo
 			////////////////////////////////////////////////////////////////////////////////
-			/*global THREE, WEBGL, dat, window */
-
-			if ( WEBGL.isWebGLAvailable() === false ) {
-
-				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
-
-			}
+			/*global window */
 
 			var camera, scene, renderer;
 			var cameraControls;
@@ -73,7 +40,7 @@
 			var bFitLid;
 			var bNonBlinn;
 			var shading;
-			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, reflectiveMaterial;
+			var wireMaterial, flatMaterial, gouraudMaterial, phongMaterial, texturedMaterial, normalMaterial, reflectiveMaterial;
 
 			var teapot, textureCube;
 
@@ -106,31 +73,39 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( canvasWidth, canvasHeight );
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
 
 				// EVENTS
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// CONTROLS
-				cameraControls = new THREE.OrbitControls( camera, renderer.domElement );
+				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.addEventListener( 'change', render );
 
 				// TEXTURE MAP
-				var textureMap = new THREE.TextureLoader().load( 'textures/UV_Grid_Sm.jpg' );
+				var loader = new THREE.TextureLoader();
+
+				var textureMap = loader.load( 'textures/uv_grid_opengl.jpg' );
 				textureMap.wrapS = textureMap.wrapT = THREE.RepeatWrapping;
 				textureMap.anisotropy = 16;
+				textureMap.encoding = THREE.sRGBEncoding;
+
+				// NORMAL MAP
+
+				var diffuseMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Diffuse.jpg' );
+				var normalMap = loader.load( 'textures/floors/FloorsCheckerboard_S_Normal.jpg' );
 
 				// REFLECTION MAP
-				var path = "textures/cube/skybox/";
+				var path = "textures/cube/pisa/";
 				var urls = [
-					path + "px.jpg", path + "nx.jpg",
-					path + "py.jpg", path + "ny.jpg",
-					path + "pz.jpg", path + "nz.jpg"
+					path + "px.png", path + "nx.png",
+					path + "py.png", path + "ny.png",
+					path + "pz.png", path + "nz.png"
 				];
 
 				textureCube = new THREE.CubeTextureLoader().load( urls );
+				textureCube.encoding = THREE.sRGBEncoding;
 
 				// MATERIALS
 				var materialColor = new THREE.Color();
@@ -145,6 +120,8 @@
 				phongMaterial = new THREE.MeshPhongMaterial( { color: materialColor, side: THREE.DoubleSide } );
 
 				texturedMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: textureMap, side: THREE.DoubleSide } );
+
+				normalMaterial = new THREE.MeshPhongMaterial( { color: materialColor, map: diffuseMap, normalMap: normalMap, side: THREE.DoubleSide } );
 
 				reflectiveMaterial = new THREE.MeshPhongMaterial( { color: materialColor, envMap: textureCube, side: THREE.DoubleSide } );
 
@@ -210,7 +187,7 @@
 
 				var h;
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
 				// material (attributes)
 
@@ -256,7 +233,10 @@
 
 				// shading
 
-				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "reflective" ] ).name( "Shading" ).onChange( render );
+				gui.add( effectController, "newShading", [ "wireframe", "flat", "smooth", "glossy", "textured", "normal", "reflective" ] ).name( "Shading" ).onChange( render );
+
+				var exportButton = document.getElementById( 'export' );
+				exportButton.addEventListener( 'click', exportCollada );
 
 			}
 
@@ -289,6 +269,7 @@
 				// only if they have. But, these calls are cheap enough and this is just a demo.
 				phongMaterial.shininess = effectController.shininess;
 				texturedMaterial.shininess = effectController.shininess;
+				normalMaterial.shininess = effectController.shininess;
 
 				diffuseColor.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
 				if ( effectController.metallic ) {
@@ -308,10 +289,12 @@
 				gouraudMaterial.color.copy( diffuseColor );
 				phongMaterial.color.copy( diffuseColor );
 				texturedMaterial.color.copy( diffuseColor );
+				normalMaterial.color.copy( diffuseColor );
 
 				specularColor.multiplyScalar( effectController.ks );
 				phongMaterial.specular.copy( specularColor );
 				texturedMaterial.specular.copy( specularColor );
+				normalMaterial.specular.copy( specularColor );
 
 				// Ambient's actually controlled by the light for this demo
 				ambientLight.color.setHSL( effectController.hue, effectController.saturation, effectController.lightness * effectController.ka );
@@ -344,7 +327,7 @@
 
 				}
 
-				var teapotGeometry = new THREE.TeapotBufferGeometry( teapotSize,
+				var teapotGeometry = new TeapotBufferGeometry( teapotSize,
 					tess,
 					effectController.bottom,
 					effectController.lid,
@@ -358,29 +341,37 @@
 						shading === "flat" ? flatMaterial : (
 							shading === "smooth" ? gouraudMaterial : (
 								shading === "glossy" ? phongMaterial : (
-									shading === "textured" ? texturedMaterial : reflectiveMaterial ) ) ) ) );	// if no match, pick Phong
+									shading === "textured" ? texturedMaterial : (
+										shading === "normal" ? normalMaterial : reflectiveMaterial ) ) ) ) ) );	// if no match, pick Phong
 
 				scene.add( teapot );
 
 			}
 
-			var exporter = new THREE.ColladaExporter();
+			var exporter = new ColladaExporter();
 
 			function exportCollada() {
 
 				var result = exporter.parse( teapot );
 				var material_type = "Phong";
 				if ( shading === "wireframe" ) {
-					material_type = "Constant"
+
+					material_type = "Constant";
+
 				}
 				if ( shading === "smooth" ) {
-					material_type = "Lambert"
+
+					material_type = "Lambert";
+
 				}
 
 				saveString( result.data, 'teapot_' + shading + "_" + material_type + '.dae' );
+
 				result.textures.forEach( tex => {
+
 					saveArrayBuffer( tex.data, `${ tex.name }.${ tex.ext }` );
-				});
+
+				} );
 
 			}
 

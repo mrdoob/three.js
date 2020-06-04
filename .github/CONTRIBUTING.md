@@ -1,5 +1,5 @@
 
-# Help 
+# Help
 #### The issues section is for bug reports and feature requests only. If you need help, please use the [forum](http://discourse.threejs.org/) or [stackoverflow](http://stackoverflow.com/questions/tagged/three.js).
 ---
 # Bugs
@@ -25,4 +25,5 @@
 2. Fork the repository on GitHub.
 3. Check the [Contribution Guidelines](https://github.com/mrdoob/three.js/wiki/How-to-contribute-to-three.js).
 4. Make changes to your clone of the repository.
-5. Submit a pull request. Don't include build files in the PR.
+5. If your changes leads to a change in examples, make a new screenshot with `npm run make-screenshot <example_name>`.
+6. Submit a pull request. Don't include build files in the PR.

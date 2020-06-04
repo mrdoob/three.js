@@ -1,20 +1,21 @@
+console.warn( "THREE.ShadowMapViewer: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author arya-s / https://github.com/arya-s
  *
  * This is a helper for visualising a given light's shadow map.
- * It works for shadow casting lights: THREE.DirectionalLight and THREE.SpotLight.
+ * It works for shadow casting lights: DirectionalLight and SpotLight.
  * It renders out the shadow map and displays it on a HUD.
  *
  * Example usage:
- *	1) Include <script src='examples/js/utils/ShadowMapViewer.js'><script> in your html file
+ *	1) Import ShadowMapViewer into your app.
  *
  *	2) Create a shadow casting light and name it optionally:
- *		var light = new THREE.DirectionalLight( 0xffffff, 1 );
+ *		var light = new DirectionalLight( 0xffffff, 1 );
  *		light.castShadow = true;
  *		light.name = 'Sun';
  *
  *	3) Create a shadow map viewer for that light and set its size and position optionally:
- *		var shadowMapViewer = new THREE.ShadowMapViewer( light );
+ *		var shadowMapViewer = new ShadowMapViewer( light );
  *		shadowMapViewer.size.set( 128, 128 );	//width, height  default: 256, 256
  *		shadowMapViewer.position.set( 10, 10 );	//x, y in pixel	 default: 0, 0 (top left corner)
  *
@@ -49,7 +50,7 @@ THREE.ShadowMapViewer = function ( light ) {
 	//HUD for shadow map
 	var shader = THREE.UnpackDepthRGBAShader;
 
-	var uniforms = new THREE.UniformsUtils.clone( shader.uniforms );
+	var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 	var material = new THREE.ShaderMaterial( {
 		uniforms: uniforms,
 		vertexShader: shader.vertexShader,
@@ -95,7 +96,7 @@ THREE.ShadowMapViewer = function ( light ) {
 	}
 
 
-	function resetPosition () {
+	function resetPosition() {
 
 		scope.position.set( scope.position.x, scope.position.y );
 
@@ -173,6 +174,7 @@ THREE.ShadowMapViewer = function ( light ) {
 			 camera.updateProjectionMatrix();
 
 			 this.update();
+
 		}
 
 	};

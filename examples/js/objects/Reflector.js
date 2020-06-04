@@ -1,3 +1,4 @@
+console.warn( "THREE.Reflector: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Slayvin / http://slayvin.net
  */
@@ -17,7 +18,7 @@ THREE.Reflector = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || THREE.Reflector.ReflectorShader;
-	var recursion = options.recursion !== undefined ? options.recursion : 0;
+	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	//
 
@@ -28,12 +29,10 @@ THREE.Reflector = function ( geometry, options ) {
 	var rotationMatrix = new THREE.Matrix4();
 	var lookAtPosition = new THREE.Vector3( 0, 0, - 1 );
 	var clipPlane = new THREE.Vector4();
-	var viewport = new THREE.Vector4();
 
 	var view = new THREE.Vector3();
 	var target = new THREE.Vector3();
 	var q = new THREE.Vector4();
-	var size = new THREE.Vector2();
 
 	var textureMatrix = new THREE.Matrix4();
 	var virtualCamera = new THREE.PerspectiveCamera();
@@ -42,12 +41,13 @@ THREE.Reflector = function ( geometry, options ) {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBFormat,
-		stencilBuffer: false
+		stencilBuffer: false,
+		encoding: encoding
 	};
 
 	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
 
-	if ( ! THREE.Math.isPowerOfTwo( textureWidth ) || ! THREE.Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! THREE.MathUtils.isPowerOfTwo( textureWidth ) || ! THREE.MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		renderTarget.texture.generateMipmaps = false;
 
@@ -66,14 +66,6 @@ THREE.Reflector = function ( geometry, options ) {
 	this.material = material;
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
-
-		if ( 'recursion' in camera.userData ) {
-
-			if ( camera.userData.recursion === recursion ) return;
-
-			camera.userData.recursion ++;
-
-		}
 
 		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -112,8 +104,6 @@ THREE.Reflector = function ( geometry, options ) {
 
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
-
-		virtualCamera.userData.recursion = 0;
 
 		// Update the texture matrix
 		textureMatrix.set(
@@ -155,34 +145,29 @@ THREE.Reflector = function ( geometry, options ) {
 
 		var currentRenderTarget = renderer.getRenderTarget();
 
-		var currentVrEnabled = renderer.vr.enabled;
+		var currentXrEnabled = renderer.xr.enabled;
 		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-		renderer.vr.enabled = false; // Avoid camera modification and recursion
+		renderer.xr.enabled = false; // Avoid camera modification
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+
+		renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
+
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, virtualCamera );
 
-		renderer.vr.enabled = currentVrEnabled;
+		renderer.xr.enabled = currentXrEnabled;
 		renderer.shadowMap.autoUpdate = currentShadowAutoUpdate;
 
 		renderer.setRenderTarget( currentRenderTarget );
 
 		// Restore viewport
 
-		var bounds = camera.bounds;
+		var viewport = camera.viewport;
 
-		if ( bounds !== undefined ) {
-
-			renderer.getSize( size );
-			var pixelRatio = renderer.getPixelRatio();
-
-			viewport.x = bounds.x * size.width * pixelRatio;
-			viewport.y = bounds.y * size.height * pixelRatio;
-			viewport.z = bounds.z * size.width * pixelRatio;
-			viewport.w = bounds.w * size.height * pixelRatio;
+		if ( viewport !== undefined ) {
 
 			renderer.state.viewport( viewport );
 
@@ -208,17 +193,14 @@ THREE.Reflector.ReflectorShader = {
 	uniforms: {
 
 		'color': {
-			type: 'c',
 			value: null
 		},
 
 		'tDiffuse': {
-			type: 't',
 			value: null
 		},
 
 		'textureMatrix': {
-			type: 'm4',
 			value: null
 		}
 
