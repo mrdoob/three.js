@@ -75,6 +75,7 @@ const pup = puppeteer.launch( {
 	headless: ! process.env.VISIBLE,
 	args: [
 		'--use-gl=swiftshader',
+		'--disable-web-security',
 		'--no-sandbox',
 		'--enable-surface-synchronization'
 	]
@@ -142,7 +143,12 @@ const pup = puppeteer.launch( {
 
 			try {
 
-				await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
+				let html = fs.readFileSync( `examples/${ file }.html`, 'utf8' );
+				html = html.replace( /Math\.random/g, '_random' );
+				html = html.replace( '<head>', `<head><base href="http://localhost:${ port }/examples/">` );
+
+				await page.reload();
+				await page.setContent( html, {
 					waitUntil: 'networkidle2',
 					timeout: networkTimeout * attemptProgress
 				} );

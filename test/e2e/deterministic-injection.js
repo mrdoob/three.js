@@ -7,7 +7,14 @@
 	/* Deterministic random */
 
 	let seed = Math.PI / 4;
-	window.Math.random = function () {
+	window._random = function() {
+
+		/*
+		try { throw new Error; }
+		catch(e) {
+			console.log(e.stack);
+		}
+		*/
 
 		const x = Math.sin( seed ++ ) * 10000;
 		return x - Math.floor( x );
