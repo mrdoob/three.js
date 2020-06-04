@@ -90,7 +90,28 @@ const pup = puppeteer.launch( {
 	const injection = fs.readFileSync( 'test/e2e/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
+	const threeJsBuild = fs.readFileSync( 'build/three.module.js', 'utf8' )
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'crypto.getRandomValues(new Uint32Array(1))[0]' );
+	await page.setRequestInterception( true );
+
 	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
+	page.on( 'request', async ( request ) => {
+
+		if ( request.url() === 'http://localhost:1234/build/three.module.js' ) {
+
+			await request.respond( {
+				status: 200,
+				contentType: 'application/javascript; charset=utf-8',
+				body: threeJsBuild
+			} );
+
+		} else {
+
+			await request.continue();
+
+		}
+
+	} );
 	page.on( 'response', async ( response ) => {
 
 		try {
