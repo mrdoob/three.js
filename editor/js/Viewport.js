@@ -289,6 +289,7 @@ var Viewport = function ( editor ) {
 	controls.addEventListener( 'change', function () {
 
 		signals.cameraChanged.dispatch( camera );
+		signals.refreshSidebarObject3D.dispatch( camera );
 
 	} );
 
