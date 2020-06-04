@@ -108,12 +108,16 @@ const pup = puppeteer.launch( {
 
 	/* Find files */
 
-	const exactList = process.argv.slice( 2 ).map( f => f.replace( '.html', '' ) );
+	const isMakeScreenshot = process.argv[ 2 ] == '--make';
+	const isExactList = process.argv.length > ( 2 + isMakeScreenshot );
+
+	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
+		.map( f => f.replace( '.html', '' ) );
 
 	const files = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => ( process.argv.length > 2 ) ? exactList.includes( f ) : ! exceptionList.includes( f ) );
+		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 
 	/* Loop for each file, with CI parallelism */
@@ -129,7 +133,7 @@ const pup = puppeteer.launch( {
 
 		/* At least 3 attempts before fail */
 
-		let attemptId = process.env.MAKE ? 1.5 : 0;
+		let attemptId = isMakeScreenshot ? 1.5 : 0;
 
 		while ( attemptId < maxAttemptId ) {
 
@@ -218,7 +222,7 @@ const pup = puppeteer.launch( {
 			}
 
 
-			if ( process.env.MAKE ) {
+			if ( isMakeScreenshot ) {
 
 
 				/* Make screenshots */
@@ -315,7 +319,7 @@ const pup = puppeteer.launch( {
 
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endId - beginId } screenshots not pass.` );
 
-	} else if ( ! process.env.MAKE ) {
+	} else if ( ! isMakeScreenshot ) {
 
 		console.green( `TEST PASSED! ${ endId - beginId } screenshots correctly rendered.` );
 

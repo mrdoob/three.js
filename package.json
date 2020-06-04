@@ -56,7 +56,7 @@
     "test-unit": "npm run unit --prefix test",
     "test-e2e": "node test/e2e/puppeteer.js",
     "test-e2e-cov": "node test/e2e/check-coverage.js",
-    "make-screenshot": "cross-env MAKE=true node test/e2e/puppeteer.js"
+    "make-screenshot": "node test/e2e/puppeteer.js --make"
   },
   "keywords": [
     "three",
@@ -83,7 +83,6 @@
     "@typescript-eslint/eslint-plugin": "^2.26.0",
     "@typescript-eslint/parser": "^2.26.0",
     "concurrently": "^5.2.0",
-    "cross-env": "^7.0.2",
     "eslint": "^7.0.0",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.0.2",
