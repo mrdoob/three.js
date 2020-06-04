@@ -91,7 +91,7 @@ const pup = puppeteer.launch( {
 	await page.evaluateOnNewDocument( injection );
 
 	const threeJsBuild = fs.readFileSync( 'build/three.module.js', 'utf8' )
-		.replace( /Math\.random\(\) \* 0xffffffff/g, 'crypto.getRandomValues(new Uint32Array(1))[0]' );
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
 	await page.setRequestInterception( true );
 
 	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
