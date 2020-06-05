@@ -580,6 +580,26 @@ Object.assign( Color.prototype, {
 
 	},
 
+	fromBufferAttribute: function ( attribute, index ) {
+
+		this.r = attribute.getX( index );
+		this.g = attribute.getY( index );
+		this.b = attribute.getZ( index );
+
+		if ( attribute.normalized === true ) {
+
+			// assuming Uint8Array
+
+			this.r /= 255;
+			this.g /= 255;
+			this.b /= 255;
+
+		}
+
+		return this;
+
+	},
+
 	toJSON: function () {
 
 		return this.getHex();
