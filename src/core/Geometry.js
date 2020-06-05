@@ -221,7 +221,8 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 			const vertexColors = ( color === undefined ) ? [] : [
 				scope.colors[ a ].clone(),
 				scope.colors[ b ].clone(),
-				scope.colors[ c ].clone() ];
+				scope.colors[ c ].clone()
+			];
 
 			const vertexNormals = ( normal === undefined ) ? [] : [
 				new Vector3().fromBufferAttribute( normal, a ),
