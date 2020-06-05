@@ -13,6 +13,7 @@
     "pixelmatch": "^5.2.0",
     "puppeteer": "3.1.0",
     "qunit": "^2.10.0",
+    "rimraf": "^3.0.2",
     "serve-handler": "^6.1.2"
   },
   "license": "MIT"
