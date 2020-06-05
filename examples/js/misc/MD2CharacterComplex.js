@@ -1,3 +1,4 @@
+console.warn( "THREE.MD2CharacterComplex: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -451,8 +452,8 @@ THREE.MD2CharacterComplex = function () {
 
 		this.maxReverseSpeed = - this.maxSpeed;
 
-		if ( controls.moveForward ) this.speed = THREE.Math.clamp( this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
-		if ( controls.moveBackward ) this.speed = THREE.Math.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed );
+		if ( controls.moveForward ) this.speed = THREE.MathUtils.clamp( this.speed + delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
+		if ( controls.moveBackward ) this.speed = THREE.MathUtils.clamp( this.speed - delta * this.backAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
 		// orientation based on controls
 		// (don't just stand while turning)
@@ -462,14 +463,14 @@ THREE.MD2CharacterComplex = function () {
 		if ( controls.moveLeft ) {
 
 			this.bodyOrientation += delta * this.angularSpeed;
-			this.speed = THREE.Math.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
+			this.speed = THREE.MathUtils.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
 		}
 
 		if ( controls.moveRight ) {
 
 			this.bodyOrientation -= delta * this.angularSpeed;
-			this.speed = THREE.Math.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
+			this.speed = THREE.MathUtils.clamp( this.speed + dir * delta * this.frontAcceleration, this.maxReverseSpeed, this.maxSpeed );
 
 		}
 
@@ -480,12 +481,12 @@ THREE.MD2CharacterComplex = function () {
 			if ( this.speed > 0 ) {
 
 				var k = exponentialEaseOut( this.speed / this.maxSpeed );
-				this.speed = THREE.Math.clamp( this.speed - k * delta * this.frontDecceleration, 0, this.maxSpeed );
+				this.speed = THREE.MathUtils.clamp( this.speed - k * delta * this.frontDecceleration, 0, this.maxSpeed );
 
 			} else {
 
 				var k = exponentialEaseOut( this.speed / this.maxReverseSpeed );
-				this.speed = THREE.Math.clamp( this.speed + k * delta * this.backAcceleration, this.maxReverseSpeed, 0 );
+				this.speed = THREE.MathUtils.clamp( this.speed + k * delta * this.backAcceleration, this.maxReverseSpeed, 0 );
 
 			}
 
@@ -516,6 +517,7 @@ THREE.MD2CharacterComplex = function () {
 			textures[ i ] = textureLoader.load( baseUrl + textureUrls[ i ], checkLoadingComplete );
 			textures[ i ].mapping = THREE.UVMapping;
 			textures[ i ].name = textureUrls[ i ];
+			textures[ i ].encoding = THREE.sRGBEncoding;
 
 		}
 

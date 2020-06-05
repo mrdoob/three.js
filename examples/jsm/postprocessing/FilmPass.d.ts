@@ -1,5 +1,4 @@
 import {
-	Vector2,
 	ShaderMaterial
 } from '../../../src/Three';
 

@@ -1,5 +1,4 @@
 import {
-	BufferGeometry,
 	Loader,
 	LoadingManager
 } from '../../../src/Three';

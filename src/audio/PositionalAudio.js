@@ -7,10 +7,10 @@ import { Quaternion } from '../math/Quaternion.js';
 import { Audio } from './Audio.js';
 import { Object3D } from '../core/Object3D.js';
 
-var _position = new Vector3();
-var _quaternion = new Quaternion();
-var _scale = new Vector3();
-var _orientation = new Vector3();
+const _position = new Vector3();
+const _quaternion = new Quaternion();
+const _scale = new Vector3();
+const _orientation = new Vector3();
 
 function PositionalAudio( listener ) {
 
@@ -108,13 +108,13 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		_orientation.set( 0, 0, 1 ).applyQuaternion( _quaternion );
 
-		var panner = this.panner;
+		const panner = this.panner;
 
 		if ( panner.positionX ) {
 
 			// code path for Chrome and Firefox (see #14393)
 
-			var endTime = this.context.currentTime + this.listener.timeDelta;
+			const endTime = this.context.currentTime + this.listener.timeDelta;
 
 			panner.positionX.linearRampToValueAtTime( _position.x, endTime );
 			panner.positionY.linearRampToValueAtTime( _position.y, endTime );

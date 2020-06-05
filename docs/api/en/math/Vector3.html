@@ -37,15 +37,15 @@
 		</p>
 
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
-var a = new THREE.Vector3( 0, 1, 0 );
+		var a = new THREE.Vector3( 0, 1, 0 );
 
-//no arguments; will be initialised to (0, 0, 0)
-var b = new THREE.Vector3( );
+		//no arguments; will be initialised to (0, 0, 0)
+		var b = new THREE.Vector3( );
 
-var d = a.distanceTo( b );
+		var d = a.distanceTo( b );
 		</code>
 
 
@@ -53,22 +53,15 @@ var d = a.distanceTo( b );
 
 		<h3>[name]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-		[page:Float x] - the x value of the vector. Default is *0*.<br />
-		[page:Float y] -  the y value of the vector. Default is *0*.<br />
-		[page:Float z] - the z value of the vector. Default is *0*.<br /><br />
+		[page:Float x] - the x value of this vector. Default is *0*.<br />
+		[page:Float y] -  the y value of this vector. Default is *0*.<br />
+		[page:Float z] - the z value of this vector. Default is *0*.<br /><br />
 
 		Creates a new [name].
 		</p>
 
 
 		<h2>Properties</h2>
-
-		<h3>[property:Boolean isVector3]</h3>
-		<p>
-			Used to check whether this or derived classes are Vector3s. Default is *true*.<br /><br />
-
-			You should not change this, as it is used internally for optimisation.
-		</p>
 
 		<h3>[property:Float x]</h3>
 
@@ -113,6 +106,9 @@ var d = a.distanceTo( b );
 		Multiplies this vector (with an implicit 1 in the 4th dimension) and m, and divides by perspective.
 		</p>
 
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Multiplies this vector by normal matrix [page:Matrix3 m] and normalizes the result.</p>
+
 		<h3>[method:this applyQuaternion]( [param:Quaternion quaternion] )</h3>
 		<p>
 		Applies a [page:Quaternion] transform to this vector.
@@ -121,12 +117,12 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Float angleTo]( [param:Vector3 v] )</h3>
 		<p>
-		Returns the angle between this vector and vector [page:Vector3 v] in radians. Neither this vector nor [page:Vector3 v] can be the zero vector.
+		Returns the angle between this vector and vector [page:Vector3 v] in radians.
 		</p>
 
 		<h3>[method:this ceil]()</h3>
 		<p>
-		The [page:.x x], [page:.y y] and [page:.z z] components of the vector are rounded up to the nearest integer value.
+		The [page:.x x], [page:.y y] and [page:.z z] components of this vector are rounded up to the nearest integer value.
 		</p>
 
 		<h3>[method:this clamp]( [param:Vector3 min], [param:Vector3 max] )</h3>
@@ -211,7 +207,7 @@ var d = a.distanceTo( b );
 		<p>Checks for strict equality of this vector and [page:Vector3 v].</p>
 
 		<h3>[method:this floor]()</h3>
-		<p>The components of the vector are rounded down to the nearest integer value.</p>
+		<p>The components of this vector are rounded down to the nearest integer value.</p>
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
@@ -301,7 +297,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:this normalize]()</h3>
 		<p>
-		Convert this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
+		Convert this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to a vector with the same direction
 		as this one, but [page:.length length] 1.
 		</p>
 
@@ -309,7 +305,7 @@ var d = a.distanceTo( b );
 		<p>
 		[page:Camera camera] — camera to use in the projection.<br /><br />
 
-		[link:https://en.wikipedia.org/wiki/Vector_projection Projects] the vector with the camera.
+		Projects this vector from world space into the camera's normalized device coordinate (NDC) space.
 		</p>
 
 		<h3>[method:this projectOnPlane]( [param:Vector3 planeNormal] )</h3>
@@ -321,22 +317,22 @@ var d = a.distanceTo( b );
 		</p>
 
 		<h3>[method:this projectOnVector]( [param:Vector3 v] )</h3>
-		<p>[link:https://en.wikipedia.org/wiki/Vector_projection Projects] this vector onto [page:Vector3 v]. [page:Vector3 v] cannot be the zero vector.</p>
+		<p>[link:https://en.wikipedia.org/wiki/Vector_projection Projects] this vector onto [page:Vector3 v].</p>
 
 		<h3>[method:this reflect]( [param:Vector3 normal] )</h3>
 		<p>
 		[page:Vector3 normal] - the normal to the reflecting plane<br /><br />
 
-		Reflect the vector off of plane orthogonal to [page:Vector3 normal]. Normal is assumed to
+		Reflect this vector off of plane orthogonal to [page:Vector3 normal]. Normal is assumed to
 		have unit length.
 		</p>
 
 		<h3>[method:this round]()</h3>
-		<p>The components of the vector are rounded to the nearest integer value.</p>
+		<p>The components of this vector are rounded to the nearest integer value.</p>
 
 		<h3>[method:this roundToZero]()</h3>
 		<p>
-		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
+		The components of this vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</p>
 
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
@@ -362,8 +358,12 @@ var d = a.distanceTo( b );
 
 		<h3>[method:this setFromMatrixColumn]( [param:Matrix4 matrix], [param:Integer index] )</h3>
 		<p>
-		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] equal to the column of
-		the [page:Matrix4 matrix] specified by the [page:Integer index].
+		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] components from [page:Integer index] column of [page:Matrix4 matrix].
+		</p>
+
+		<h3>[method:this setFromMatrix3Column]( [param:Matrix3 matrix], [param:Integer index] )</h3>
+		<p>
+		Sets this vector's [page:.x x], [page:.y y] and [page:.z z] components from [page:Integer index] column of [page:Matrix3 matrix].
 		</p>
 
 		<h3>[method:this setFromMatrixPosition]( [param:Matrix4 m] )</h3>
@@ -388,7 +388,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:this setLength]( [param:Float l] )</h3>
 		<p>
-		Set this vector to the vector with the same direction as this one, but [page:.length length]
+		Set this vector to a vector with the same direction as this one, but [page:.length length]
 		[page:Float l].
 		</p>
 
@@ -417,7 +417,7 @@ var d = a.distanceTo( b );
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - (optional) array to store the vector to. If this is not provided
+		[page:Array array] - (optional) array to store this vector to. If this is not provided
 		a new array will be created.<br />
 		[page:Integer offset] - (optional) optional offset into the array.<br /><br />
 
@@ -434,10 +434,13 @@ var d = a.distanceTo( b );
 		<p>
 		[page:Camera camera] — camera to use in the projection.<br /><br />
 
-		[link:https://en.wikipedia.org/wiki/Vector_projection Unprojects] the vector with the
-		camera's projection matrix.
+		Projects this vector from the camera's normalized device coordinate (NDC) space into world space.
 		</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
 
 		<h2>Source</h2>
 

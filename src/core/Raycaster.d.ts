@@ -4,6 +4,7 @@ import { Object3D } from './Object3D';
 import { Vector2 } from './../math/Vector2';
 import { Ray } from './../math/Ray';
 import { Camera } from './../cameras/Camera';
+import { Layers } from './Layers';
 
 export interface Intersection {
 	distance: number;
@@ -14,11 +15,12 @@ export interface Intersection {
 	faceIndex?: number;
 	object: Object3D;
 	uv?: Vector2;
+	instanceId?: number;
 }
 
 export interface RaycasterParameters {
 	Mesh?: any;
-	Line?: any;
+	Line?: { threshold: number };
 	LOD?: any;
 	Points?: { threshold: number };
 	Sprite?: any;
@@ -61,12 +63,12 @@ export class Raycaster {
 	 */
 	camera: Camera;
 
-	params: RaycasterParameters;
-
 	/**
-	 * The precision factor of the raycaster when intersecting Line objects.
+	 * Used by Raycaster to selectively ignore 3D objects when performing intersection tests.
 	 */
-	linePrecision: number;
+	layers: Layers;
+
+	params: RaycasterParameters;
 
 	/**
 	 * Updates the ray with a new origin and direction.

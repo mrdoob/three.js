@@ -5,8 +5,6 @@ import {
 
 import { NodeBuilder } from '../core/NodeBuilder';
 import { NodeFrame } from '../core/NodeFrame';
-import { StandardNode } from './nodes/StandardNode';
-import { PropertyNode } from '../inputs/PropertyNode';
 import { MeshStandardNode } from './nodes/MeshStandardNode';
 import { RawNode } from './nodes/RawNode';
 
@@ -24,7 +22,7 @@ export class NodeMaterial extends ShaderMaterial {
 
 	updaters: object[];
 
-	isNodeMaterial: boolean;
+	readonly isNodeMaterial: true;
 	properties: object;
 
 	updateFrame( frame: NodeFrame ): void;

@@ -19,16 +19,7 @@
 
 		</p>
 
-
-		<h2>Example</h2>
-
-		<p>
-			[example:webgl_loader_fbx WebGL / loader / fbx]<br />
-			[example:webgl_loader_obj WebGL / loader / obj]<br />
-			[example:webgl_materials_reflectivity WebGL / materials / reflectivity]<br />
-			[example:webgl_postprocessing_outline WebGL / postprocesing / outline]<br />
-			[example:webgl_terrain_dynamic WebGL / terrain / dynamic]
-		</p>
+		<h2>Code Example</h2>
 
 		<p>
 			This example shows how to use LoadingManager to track the progress of
@@ -105,6 +96,15 @@
 
 		});
 		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_loader_fbx WebGL / loader / fbx]<br />
+			[example:webgl_loader_obj WebGL / loader / obj]<br />
+			[example:webgl_materials_physical_reflectivity WebGL / materials / physical / reflectivity]<br />
+			[example:webgl_postprocessing_outline WebGL / postprocesing / outline]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -204,7 +204,8 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 		behavior can be used to load assets from .ZIP files, drag-and-drop APIs, and Data URIs.
 		</p>
 
-		<br /><br />
+		<br />
+
 		<p>
 			<em>Note: The following methods are designed to be called internally by loaders. You shouldn't call
 			them directly.</em>
@@ -233,6 +234,8 @@ manager.addHandler( /\.tga$/i, new TGALoader() );
 
 		<h2>Source</h2>
 
-		[link:https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js src/loaders/LoadingManager.js]
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js src/loaders/LoadingManager.js]
+		</p>
 	</body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -17,11 +17,11 @@
 			精灵不会投射任何阴影，即使设置了<code>castShadow = true</code>也将不会有任何效果。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
 var spriteMap = new THREE.TextureLoader().load( "sprite.png" );
-var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, color: 0xffffff } );
+var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap } );
 var sprite = new THREE.Sprite( spriteMaterial );
 scene.add( sprite );
 		</code>
@@ -39,12 +39,6 @@ scene.add( sprite );
 
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Object3D]。</p>
-
-		<h3>[property:Boolean isSprite]</h3>
-		<p>
-			用于检查这个类或者其派生类是否为精灵，默认值为*true*。<br /><br />
-			你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
-		</p>
 
 
 		<h3>[property:SpriteMaterial material]</h3>

@@ -2,21 +2,26 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { UIElement, UIPanel, UIText } from './libs/ui.js';
+
+import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
+import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
+
 var Script = function ( editor ) {
 
 	var signals = editor.signals;
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setId( 'script' );
 	container.setPosition( 'absolute' );
 	container.setBackgroundColor( '#272822' );
 	container.setDisplay( 'none' );
 
-	var header = new UI.Panel();
+	var header = new UIPanel();
 	header.setPadding( '10px' );
 	container.add( header );
 
-	var title = new UI.Text().setColor( '#fff' );
+	var title = new UIText().setColor( '#fff' );
 	header.add( title );
 
 	var buttonSVG = ( function () {
@@ -32,7 +37,7 @@ var Script = function ( editor ) {
 
 	} )();
 
-	var close = new UI.Element( buttonSVG );
+	var close = new UIElement( buttonSVG );
 	close.setPosition( 'absolute' );
 	close.setTop( '3px' );
 	close.setRight( '1px' );
@@ -320,13 +325,41 @@ var Script = function ( editor ) {
 	} );
 
 	codemirror.setOption( 'extraKeys', {
-		'Ctrl-Space': function ( cm ) { server.complete( cm ); },
-		'Ctrl-I': function ( cm ) { server.showType( cm ); },
-		'Ctrl-O': function ( cm ) { server.showDocs( cm ); },
-		'Alt-.': function ( cm ) { server.jumpToDef( cm ); },
-		'Alt-,': function ( cm ) { server.jumpBack( cm ); },
-		'Ctrl-Q': function ( cm ) { server.rename( cm ); },
-		'Ctrl-.': function ( cm ) { server.selectName( cm ); }
+		'Ctrl-Space': function ( cm ) {
+
+			server.complete( cm );
+
+		},
+		'Ctrl-I': function ( cm ) {
+
+			server.showType( cm );
+
+		},
+		'Ctrl-O': function ( cm ) {
+
+			server.showDocs( cm );
+
+		},
+		'Alt-.': function ( cm ) {
+
+			server.jumpToDef( cm );
+
+		},
+		'Alt-,': function ( cm ) {
+
+			server.jumpBack( cm );
+
+		},
+		'Ctrl-Q': function ( cm ) {
+
+			server.rename( cm );
+
+		},
+		'Ctrl-.': function ( cm ) {
+
+			server.selectName( cm );
+
+		}
 	} );
 
 	codemirror.on( 'cursorActivity', function ( cm ) {
@@ -429,3 +462,5 @@ var Script = function ( editor ) {
 	return container;
 
 };
+
+export { Script };

@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			STL loader test by <a href="https://github.com/aleeper" target="_blank" rel="noopener">aleeper</a>.<br/>
 			PR2 head from <a href="http://www.ros.org/wiki/pr2_description">www.ros.org</a>
 		</div>
@@ -116,7 +116,7 @@
 					var meshMaterial = material;
 					if ( geometry.hasColors ) {
 
-						meshMaterial = new THREE.MeshPhongMaterial( { opacity: geometry.alpha, vertexColors: THREE.VertexColors } );
+						meshMaterial = new THREE.MeshPhongMaterial( { opacity: geometry.alpha, vertexColors: true } );
 
 					}
 
@@ -145,9 +145,7 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				renderer.shadowMap.enabled = true;
 

@@ -3,6 +3,10 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
+import * as THREE from '../../../build/three.module.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
@@ -75,7 +79,7 @@ SetGeometryCommand.prototype = {
 		this.oldGeometry = parseGeometry( json.oldGeometry );
 		this.newGeometry = parseGeometry( json.newGeometry );
 
-		function parseGeometry ( data ) {
+		function parseGeometry( data ) {
 
 			var loader = new THREE.ObjectLoader();
 			return loader.parseGeometries( [ data ] )[ data.uuid ];
@@ -85,3 +89,5 @@ SetGeometryCommand.prototype = {
 	}
 
 };
+
+export { SetGeometryCommand };

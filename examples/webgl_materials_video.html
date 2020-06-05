@@ -5,55 +5,16 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-
-			#overlay {
-				position: absolute;
-				z-index: 1;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height:100%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				opacity: 1;
-				background-color: #000000;
-				color: #ffffff;
-			}
-
-			#overlay > div {
-				text-align: center;
-			}
-
-			#overlay > div > button {
-				height: 20px;
-				background: transparent;
-				color: #ffffff;
-				outline: 1px solid #ffffff;
-				border: 0px;
-				cursor: pointer;
-			}
-
-			#overlay > div > p {
-				color: #777777;
-				font-size: 12px;
-			}
-
-		</style>
 	</head>
 	<body>
 
 		<div id="overlay">
-			<div>
-				<button id="startButton">Click to Play</button>
-				<p>Video playback with audio requires user interaction.</p>
-			</div>
+			<button id="startButton">Play</button>
 		</div>
 		<div id="container"></div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl video demo<br/>
 			playing <a href="http://durian.blender.org/" target="_blank" rel="noopener">sintel</a> trailer
 		</div>
 
@@ -126,6 +87,9 @@
 
 				video = document.getElementById( 'video' );
 				video.play();
+				video.addEventListener('play', function() {
+					this.currentTime = 3;
+				}, false);
 
 				texture = new THREE.VideoTexture( video );
 
@@ -278,9 +242,9 @@
 						mesh.rotation.x += 10 * mesh.dx;
 						mesh.rotation.y += 10 * mesh.dy;
 
-						mesh.position.x += 200 * mesh.dx;
-						mesh.position.y += 200 * mesh.dy;
-						mesh.position.z += 400 * mesh.dx;
+						mesh.position.x -= 150 * mesh.dx;
+						mesh.position.y += 150 * mesh.dy;
+						mesh.position.z += 300 * mesh.dx;
 
 					}
 

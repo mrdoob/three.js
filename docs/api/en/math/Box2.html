@@ -11,7 +11,7 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			Represents a box in 2D space.
+			Represents an axis-aligned bounding box (AABB) in 2D space.
 		</p>
 
 
@@ -174,7 +174,8 @@
 			[page:Vector2 min] - (required ) [page:Vector2] representing the lower (x, y) boundary of the box. <br>
 			[page:Vector2 max]  - (required) [page:Vector2] representing the upper (x, y) boundary of the box. <br /><br />
 
-			Sets the lower and upper (x, y) boundaries of this box.
+			Sets the lower and upper (x, y) boundaries of this box.<br>
+			Please note that this method only copies the values from the given objects.
 		</p>
 
 		<h3>[method:Box2 setFromCenterAndSize]( [param:Vector2 center], [param:Vector2 size] )</h3>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Renders a sphere to visualize a light probe in the scene.
+		<p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		var helper = new LightProbeHelper( lightProbe, 1 );
+		scene.add( helper );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_lightprobe_cubecamera WebGL / lightprobe / cubecamera]</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:LightProbe lightProbe], [param:Number size] )</h3>
+		<p>
+		[page:LightProbe lightProbe] -- the light probe.<br />
+		[page:Number size] -- size of the helper sphere
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
+
+		<h3>[property:LightProbe lightProbe]</h3>
+		<p>The light probe.</p>
+
+		<h3>[property:Number size]</h3>
+		<p>The size of the helper sphere.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>Frees internal resources.</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/LightProbeHelper.js examples/jsm/helpers/LightProbeHelper.js]
+		</p>
+	</body>
+</html>

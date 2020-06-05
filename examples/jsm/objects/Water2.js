@@ -10,6 +10,7 @@
 import {
 	Clock,
 	Color,
+	LinearEncoding,
 	Matrix4,
 	Mesh,
 	RepeatWrapping,
@@ -42,6 +43,7 @@ var Water = function ( geometry, options ) {
 	var reflectivity = options.reflectivity || 0.02;
 	var scale = options.scale || 1;
 	var shader = options.shader || Water.WaterShader;
+	var encoding = options.encoding !== undefined ? options.encoding : LinearEncoding;
 
 	var textureLoader = new TextureLoader();
 
@@ -73,13 +75,15 @@ var Water = function ( geometry, options ) {
 	var reflector = new Reflector( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	var refractor = new Refractor( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	reflector.matrixAutoUpdate = false;
@@ -252,6 +256,7 @@ Water.WaterShader = {
 
 	vertexShader: [
 
+		'#include <common>',
 		'#include <fog_pars_vertex>',
 		'#include <logdepthbuf_pars_vertex>',
 

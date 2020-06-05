@@ -2,21 +2,24 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+import { UIPanel, UIButton } from './libs/ui.js';
+import { UIBoolean } from './libs/ui.three.js';
+
 var Toolbar = function ( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setId( 'toolbar' );
 	container.setDisplay( 'none' );
 
-	var buttons = new UI.Panel();
+	var buttons = new UIPanel();
 	container.add( buttons );
 
 	// translate / rotate / scale
 
-	var translate = new UI.Button( strings.getKey( 'toolbar/translate' ) );
+	var translate = new UIButton( strings.getKey( 'toolbar/translate' ) );
 	translate.dom.className = 'Button selected';
 	translate.onClick( function () {
 
@@ -25,7 +28,7 @@ var Toolbar = function ( editor ) {
 	} );
 	buttons.add( translate );
 
-	var rotate = new UI.Button( strings.getKey( 'toolbar/rotate' ) );
+	var rotate = new UIButton( strings.getKey( 'toolbar/rotate' ) );
 	rotate.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'rotate' );
@@ -33,7 +36,7 @@ var Toolbar = function ( editor ) {
 	} );
 	buttons.add( rotate );
 
-	var scale = new UI.Button( strings.getKey( 'toolbar/scale' ) );
+	var scale = new UIButton( strings.getKey( 'toolbar/scale' ) );
 	scale.onClick( function () {
 
 		signals.transformModeChanged.dispatch( 'scale' );
@@ -41,7 +44,7 @@ var Toolbar = function ( editor ) {
 	} );
 	buttons.add( scale );
 
-	var local = new UI.THREE.Boolean( false, strings.getKey( 'toolbar/local' ) );
+	var local = new UIBoolean( false, strings.getKey( 'toolbar/local' ) );
 	local.onChange( function () {
 
 		signals.spaceChanged.dispatch( this.getValue() === true ? 'local' : 'world' );
@@ -76,3 +79,5 @@ var Toolbar = function ( editor ) {
 	return container;
 
 };
+
+export { Toolbar };

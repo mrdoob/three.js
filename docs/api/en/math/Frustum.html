@@ -89,29 +89,17 @@
 			Checks whether the [page:Sprite sprite] is intersecting the Frustum.<br /><br />
 		</p>
 
-		<h3>[method:Frustum set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )</h3>
+		<h3>[method:this set]( [param:Plane p0], [param:Plane p1], [param:Plane p2], [param:Plane p3], [param:Plane p4], [param:Plane p5] )</h3>
 		<p>
-		Sets the current frustum from the passed planes. No plane order is implicitely implied.
+		Sets the frustum from the passed planes. No plane order is implied.<br>
+		Note that this method only copies the values from the given objects.
 		</p>
 
-		<h3>[method:Frustum setFromMatrix]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:this setFromProjectionMatrix]( [param:Matrix4 matrix] )</h3>
 		<p>
-			[page:Matrix4 matrix] - [page:Matrix4] used to set the [page:.planes planes]<br /><br />
-
-			This is used by the [page:WebGLRenderer] to set up the Frustum from a [page:Camera Camera]'s
-			[page:Camera.projectionMatrix projectionMatrix] and [page:Camera.matrixWorldInverse matrixWorldInverse].
+		[page:Matrix4 matrix] - Projection [page:Matrix4] used to set the [page:.planes planes]<br /><br />
+		Sets the frustum planes from the projection matrix.
 		</p>
-
-
-
-
-
-
-
-
-
-
-
 
 
 		<h2>Source</h2>

@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf<br/><br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf<br/><br/>
 			<button id="export_scene">Export Scene1</button>
 			<button id="export_scenes">Export Scene1 and THREE.Scene 2</button>
 			<button id="export_object">Export Sphere</button><br/>
@@ -20,7 +20,6 @@
 			<label><input id="option_visible" name="visible" type="checkbox" checked="checked"/>Only Visible</label>
 			<label><input id="option_drawrange" name="visible" type="checkbox" checked="checked"/>Truncate drawRange</label><br/>
 			<label><input id="option_binary" name="visible" type="checkbox">Binary (<code>.glb</code>)</label>
-			<label><input id="option_forceindices" name="visible" type="checkbox">Force indices</label>
 			<label><input id="option_forcepot" name="visible" type="checkbox">Force POT textures</label>
 			<label><input id="option_maxsize" name="maxSize" type="number" value="4096" min="2" max="8192" step="1"> Max texture size</label>
 		</div>
@@ -41,7 +40,6 @@
 					onlyVisible: document.getElementById( 'option_visible' ).checked,
 					truncateDrawRange: document.getElementById( 'option_drawrange' ).checked,
 					binary: document.getElementById( 'option_binary' ).checked,
-					forceIndices: document.getElementById( 'option_forceindices' ).checked,
 					forcePowerOfTwoTextures: document.getElementById( 'option_forcepot' ).checked,
 					maxTextureSize: Number( document.getElementById( 'option_maxsize' ).value ) || Infinity // To prevent NaN value
 				};
@@ -294,39 +292,6 @@
 				group2.add( object2 );
 
 				// ---------------------------------------------------------------------
-				// Triangle Strip
-				// ---------------------------------------------------------------------
-				var geometry = new THREE.BufferGeometry();
-				var positions = new Float32Array( [
-					0, 0, 0,
-					0, 80, 0,
-					80, 0, 0,
-					80, 80, 0,
-					80, 0, 80,
-					80, 80, 80,
-				] );
-
-				var colors = new Float32Array( [
-					1, 0, 0,
-					1, 0, 0,
-					1, 1, 0,
-					1, 1, 0,
-					0, 0, 1,
-					0, 0, 1,
-				] );
-
-				geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
-				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
-				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
-				object.position.set( 140, - 40, - 250 );
-				object.setDrawMode( THREE.TriangleStripDrawMode );
-				object.name = 'Custom buffered';
-				object.userData = { data: 'customdata', list: [ 1, 2, 3, 4 ] };
-
-				scene1.add( object );
-
-
-				// ---------------------------------------------------------------------
 				// THREE.Line Strip
 				// ---------------------------------------------------------------------
 				var geometry = new THREE.BufferGeometry();
@@ -402,9 +367,9 @@
 				geometry.setAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
 				geometry.setDrawRange( 0, numElements );
 
-				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: THREE.VertexColors } ) );
+				object = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { side: THREE.DoubleSide, vertexColors: true } ) );
 				object.name = 'Custom buffered truncated';
-				object.position.set( 340, - 40, - 200 );
+				object.position.set( 140, - 40, - 200 );
 
 				scene1.add( object );
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -9,17 +9,17 @@
 	</head>
 	<body>
 		[page:Texture] &rarr;
-		
+
 		<h1>立方纹理（[name]）</h1>
 
 		<p class="desc">创建一个由6张图片所组成的纹理对象。</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		var loader = new THREE.CubeTextureLoader();
 		loader.setPath( 'textures/cube/pisa/' );
-		
+
 		var textureCube = loader.load( [
 			'px.png', 'nx.png',
 			'py.png', 'ny.png',
@@ -33,7 +33,7 @@
 
 
 		<h3>[name]( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy )</h3>
-		
+
 		<p>
 		CubeTexture（立方贴图）的功能以及用法几乎和[page:Texture]是相同的。区别在于，CubeTexture中的图像是6个单独的图像所组成的数组，
 		纹理映射选项为[page:Textures THREE.CubeReflectionMapping]（默认值）或[page:Textures THREE.CubeRefractionMapping]。
@@ -45,10 +45,10 @@
 		<h3>请参阅[page:Texture]页面。</h3>
 
 		<h2>方法</h2>
-		
+
 
 		<h3>请参阅[page:Texture]页面。</h3>
-		
+
 		<h2>源代码</h2>
 
 		<p>

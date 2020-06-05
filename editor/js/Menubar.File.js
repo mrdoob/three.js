@@ -2,13 +2,26 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Menubar.File = function ( editor ) {
+import * as THREE from '../../build/three.module.js';
 
-	var NUMBER_PRECISION = 6;
+import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
+import { DRACOExporter } from '../../examples/jsm/exporters/DRACOExporter.js';
+import { GLTFExporter } from '../../examples/jsm/exporters/GLTFExporter.js';
+import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
+import { PLYExporter } from '../../examples/jsm/exporters/PLYExporter.js';
+import { STLExporter } from '../../examples/jsm/exporters/STLExporter.js';
+
+import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
+
+import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
+
+var MenubarFile = function ( editor ) {
 
 	function parseNumber( key, value ) {
 
-		return typeof value === 'number' ? parseFloat( value.toFixed( NUMBER_PRECISION ) ) : value;
+		var precision = config.getKey( 'exportPrecision' );
+
+		return typeof value === 'number' ? parseFloat( value.toFixed( precision ) ) : value;
 
 	}
 
@@ -17,21 +30,21 @@ Menubar.File = function ( editor ) {
 	var config = editor.config;
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new UI.Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/file' ) );
 	container.add( title );
 
-	var options = new UI.Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// New
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/new' ) );
 	option.onClick( function () {
@@ -47,7 +60,7 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	options.add( new UI.HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Import
 
@@ -58,7 +71,7 @@ Menubar.File = function ( editor ) {
 	var fileInput = document.createElement( 'input' );
 	fileInput.multiple = true;
 	fileInput.type = 'file';
-	fileInput.addEventListener( 'change', function ( event ) {
+	fileInput.addEventListener( 'change', function () {
 
 		editor.loader.loadFiles( fileInput.files );
 		form.reset();
@@ -66,7 +79,7 @@ Menubar.File = function ( editor ) {
 	} );
 	form.appendChild( fileInput );
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/import' ) );
 	option.onClick( function () {
@@ -78,11 +91,11 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	options.add( new UI.HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Export Geometry
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/geometry' ) );
 	option.onClick( function () {
@@ -125,7 +138,7 @@ Menubar.File = function ( editor ) {
 
 	// Export Object
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/object' ) );
 	option.onClick( function () {
@@ -159,7 +172,7 @@ Menubar.File = function ( editor ) {
 
 	// Export Scene
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/scene' ) );
 	option.onClick( function () {
@@ -184,16 +197,16 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	options.add( new UI.HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Export DAE
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/dae' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.ColladaExporter();
+		var exporter = new ColladaExporter();
 
 		exporter.parse( editor.scene, function ( result ) {
 
@@ -204,34 +217,57 @@ Menubar.File = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Export DRC
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/drc' ) );
+	option.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( object === null || object.isMesh === undefined ) {
+
+			alert( 'No mesh selected' );
+			return;
+
+		}
+
+		var exporter = new DRACOExporter();
+
+		// TODO: Change to DRACOExporter's parse( geometry, onParse )?
+		var result = exporter.parse( object.geometry );
+		saveArrayBuffer( result, 'model.drc' );
+
+	} );
+	options.add( option );
+
 	// Export GLB
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/glb' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.GLTFExporter();
+		var exporter = new GLTFExporter();
 
 		exporter.parse( editor.scene, function ( result ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-			// forceIndices: true, forcePowerOfTwoTextures: true
-			// to allow compatibility with facebook
-		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+		}, { binary: true } );
 
 	} );
 	options.add( option );
 
 	// Export GLTF
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/gltf' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.GLTFExporter();
+		var exporter = new GLTFExporter();
 
 		exporter.parse( editor.scene, function ( result ) {
 
@@ -245,7 +281,7 @@ Menubar.File = function ( editor ) {
 
 	// Export OBJ
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/obj' ) );
 	option.onClick( function () {
@@ -259,21 +295,57 @@ Menubar.File = function ( editor ) {
 
 		}
 
-		var exporter = new THREE.OBJExporter();
+		var exporter = new OBJExporter();
 
 		saveString( exporter.parse( object ), 'model.obj' );
 
 	} );
 	options.add( option );
 
+	// Export PLY (ASCII)
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/ply' ) );
+	option.onClick( function () {
+
+		var exporter = new PLYExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveArrayBuffer( result, 'model.ply' );
+
+		} );
+
+	} );
+	options.add( option );
+
+	// Export PLY (Binary)
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/file/export/ply_binary' ) );
+	option.onClick( function () {
+
+		var exporter = new PLYExporter();
+
+		exporter.parse( editor.scene, function ( result ) {
+
+			saveArrayBuffer( result, 'model-binary.ply' );
+
+		}, { binary: true } );
+
+	} );
+	options.add( option );
+
 	// Export STL (ASCII)
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.STLExporter();
+		var exporter = new STLExporter();
 
 		saveString( exporter.parse( editor.scene ), 'model.stl' );
 
@@ -282,12 +354,12 @@ Menubar.File = function ( editor ) {
 
 	// Export STL (Binary)
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/export/stl_binary' ) );
 	option.onClick( function () {
 
-		var exporter = new THREE.STLExporter();
+		var exporter = new STLExporter();
 
 		saveArrayBuffer( exporter.parse( editor.scene, { binary: true } ), 'model-binary.stl' );
 
@@ -296,11 +368,11 @@ Menubar.File = function ( editor ) {
 
 	//
 
-	options.add( new UI.HorizontalRule() );
+	options.add( new UIHorizontalRule() );
 
 	// Publish
 
-	var option = new UI.Row();
+	var option = new UIRow();
 	option.setClass( 'option' );
 	option.setTextContent( strings.getKey( 'menubar/file/publish' ) );
 	option.onClick( function () {
@@ -312,8 +384,6 @@ Menubar.File = function ( editor ) {
 		var output = editor.toJSON();
 		output.metadata.type = 'App';
 		delete output.history;
-
-		var vr = output.project.vr;
 
 		output = JSON.stringify( output, parseNumber, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
@@ -337,12 +407,6 @@ Menubar.File = function ( editor ) {
 
 			var includes = [];
 
-			if ( vr ) {
-
-				includes.push( '<script src="js/WebVR.js"></script>' );
-
-			}
-
 			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
 
 			var editButton = '';
@@ -353,12 +417,13 @@ Menubar.File = function ( editor ) {
 					'',
 					'			var button = document.createElement( \'a\' );',
 					'			button.href = \'https://threejs.org/editor/#file=\' + location.href.split( \'/\' ).slice( 0, - 1 ).join( \'/\' ) + \'/app.json\';',
-					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 12px 14px; color: #fff; border: 1px solid #fff; border-radius: 4px; text-decoration: none;\';',
+					'			button.style.cssText = \'position: absolute; bottom: 20px; right: 20px; padding: 10px 16px; color: #fff; border: 1px solid #fff; border-radius: 20px; text-decoration: none;\';',
 					'			button.target = \'_blank\';',
 					'			button.textContent = \'EDIT\';',
 					'			document.body.appendChild( button );',
 					''
 				].join( '\n' );
+
 			}
 
 			content = content.replace( '\n\t\t\t/* edit button */\n', editButton );
@@ -371,21 +436,21 @@ Menubar.File = function ( editor ) {
 			zip.file( 'js/app.js', content );
 
 		} );
-		loader.load( '../build/three.min.js', function ( content ) {
+		loader.load( '../build/three.module.js', function ( content ) {
 
-			zip.file( 'js/three.min.js', content );
+			zip.file( 'js/three.module.js', content );
 
 		} );
+		loader.load( '../examples/jsm/webxr/VRButton.js', function ( content ) {
 
-		if ( vr ) {
+			zip.file( 'js/VRButton.js', content );
 
-			loader.load( '../examples/js/vr/WebVR.js', function ( content ) {
+		} );
+		loader.load( '../examples/js/vr/HelioWebXRPolyfill.js', function ( content ) {
 
-				zip.file( 'js/WebVR.js', content );
+			zip.file( 'js/HelioWebXRPolyfill.js', content );
 
-			} );
-
-		}
+		} );
 
 	} );
 	options.add( option );
@@ -418,3 +483,5 @@ Menubar.File = function ( editor ) {
 	return container;
 
 };
+
+export { MenubarFile };

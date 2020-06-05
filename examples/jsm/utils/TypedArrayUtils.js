@@ -184,7 +184,7 @@ TypedArrayUtils.quicksortIP = function ( arr, eleSize, orderElement ) {
 
 TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
-	var self = this;
+	var scope = this;
 
 	var maxDepth = 0;
 
@@ -206,7 +206,7 @@ TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 		if ( plength === 0 ) return null;
 		if ( plength === 1 ) {
 
-			return new self.Node( getPointSet( points, 0 ), depth, parent, pos );
+			return new scope.Node( getPointSet( points, 0 ), depth, parent, pos );
 
 		}
 
@@ -214,7 +214,7 @@ TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
 		median = Math.floor( plength / 2 );
 
-		node = new self.Node( getPointSet( points, median ), depth, parent, median + pos );
+		node = new scope.Node( getPointSet( points, median ), depth, parent, median + pos );
 		node.left = buildTree( points.subarray( 0, median * eleSize ), depth + 1, node, pos );
 		node.right = buildTree( points.subarray( ( median + 1 ) * eleSize, points.length ), depth + 1, node, pos + median + 1 );
 
@@ -370,7 +370,7 @@ TypedArrayUtils.Kdtree = function ( points, metric, eleSize ) {
 
 		}
 
-		nearestSearch( self.root );
+		nearestSearch( scope.root );
 
 		result = [];
 

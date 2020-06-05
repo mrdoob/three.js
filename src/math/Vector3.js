@@ -1,4 +1,4 @@
-import { _Math } from './Math.js';
+import { MathUtils } from './MathUtils.js';
 import { Quaternion } from './Quaternion.js';
 
 /**
@@ -10,8 +10,8 @@ import { Quaternion } from './Quaternion.js';
  * @author WestLangley / http://github.com/WestLangley
  */
 
-var _vector = new Vector3();
-var _quaternion = new Quaternion();
+const _vector = new Vector3();
+const _quaternion = new Quaternion();
 
 function Vector3( x, y, z ) {
 
@@ -254,8 +254,8 @@ Object.assign( Vector3.prototype, {
 
 	applyMatrix3: function ( m ) {
 
-		var x = this.x, y = this.y, z = this.z;
-		var e = m.elements;
+		const x = this.x, y = this.y, z = this.z;
+		const e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 3 ] * y + e[ 6 ] * z;
 		this.y = e[ 1 ] * x + e[ 4 ] * y + e[ 7 ] * z;
@@ -265,12 +265,18 @@ Object.assign( Vector3.prototype, {
 
 	},
 
+	applyNormalMatrix: function ( m ) {
+
+		return this.applyMatrix3( m ).normalize();
+
+	},
+
 	applyMatrix4: function ( m ) {
 
-		var x = this.x, y = this.y, z = this.z;
-		var e = m.elements;
+		const x = this.x, y = this.y, z = this.z;
+		const e = m.elements;
 
-		var w = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] );
+		const w = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] );
 
 		this.x = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] ) * w;
 		this.y = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] ) * w;
@@ -282,15 +288,15 @@ Object.assign( Vector3.prototype, {
 
 	applyQuaternion: function ( q ) {
 
-		var x = this.x, y = this.y, z = this.z;
-		var qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+		const x = this.x, y = this.y, z = this.z;
+		const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
 
 		// calculate quat * vector
 
-		var ix = qw * x + qy * z - qz * y;
-		var iy = qw * y + qz * x - qx * z;
-		var iz = qw * z + qx * y - qy * x;
-		var iw = - qx * x - qy * y - qz * z;
+		const ix = qw * x + qy * z - qz * y;
+		const iy = qw * y + qz * x - qx * z;
+		const iz = qw * z + qx * y - qy * x;
+		const iw = - qx * x - qy * y - qz * z;
 
 		// calculate result * inverse quat
 
@@ -319,8 +325,8 @@ Object.assign( Vector3.prototype, {
 		// input: THREE.Matrix4 affine matrix
 		// vector interpreted as a direction
 
-		var x = this.x, y = this.y, z = this.z;
-		var e = m.elements;
+		const x = this.x, y = this.y, z = this.z;
+		const e = m.elements;
 
 		this.x = e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z;
 		this.y = e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z;
@@ -390,7 +396,7 @@ Object.assign( Vector3.prototype, {
 
 	clampLength: function ( min, max ) {
 
-		var length = this.length();
+		const length = this.length();
 
 		return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
 
@@ -496,7 +502,11 @@ Object.assign( Vector3.prototype, {
 
 	lerpVectors: function ( v1, v2, alpha ) {
 
-		return this.subVectors( v2, v1 ).multiplyScalar( alpha ).add( v1 );
+		this.x = v1.x + ( v2.x - v1.x ) * alpha;
+		this.y = v1.y + ( v2.y - v1.y ) * alpha;
+		this.z = v1.z + ( v2.z - v1.z ) * alpha;
+
+		return this;
 
 	},
 
@@ -515,8 +525,8 @@ Object.assign( Vector3.prototype, {
 
 	crossVectors: function ( a, b ) {
 
-		var ax = a.x, ay = a.y, az = a.z;
-		var bx = b.x, by = b.y, bz = b.z;
+		const ax = a.x, ay = a.y, az = a.z;
+		const bx = b.x, by = b.y, bz = b.z;
 
 		this.x = ay * bz - az * by;
 		this.y = az * bx - ax * bz;
@@ -528,9 +538,11 @@ Object.assign( Vector3.prototype, {
 
 	projectOnVector: function ( v ) {
 
-		// v cannot be the zero v
+		const denominator = v.lengthSq();
 
-		var scalar = v.dot( this ) / v.lengthSq();
+		if ( denominator === 0 ) return this.set( 0, 0, 0 );
+
+		const scalar = v.dot( this ) / denominator;
 
 		return this.copy( v ).multiplyScalar( scalar );
 
@@ -555,15 +567,15 @@ Object.assign( Vector3.prototype, {
 
 	angleTo: function ( v ) {
 
-		var denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
+		const denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
 
-		if ( denominator === 0 ) console.error( 'THREE.Vector3: angleTo() can\'t handle zero length vectors.' );
+		if ( denominator === 0 ) return Math.PI / 2;
 
-		var theta = this.dot( v ) / denominator;
+		const theta = this.dot( v ) / denominator;
 
 		// clamp, to handle numerical problems
 
-		return Math.acos( _Math.clamp( theta, - 1, 1 ) );
+		return Math.acos( MathUtils.clamp( theta, - 1, 1 ) );
 
 	},
 
@@ -575,7 +587,7 @@ Object.assign( Vector3.prototype, {
 
 	distanceToSquared: function ( v ) {
 
-		var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
+		const dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
 
 		return dx * dx + dy * dy + dz * dz;
 
@@ -595,7 +607,7 @@ Object.assign( Vector3.prototype, {
 
 	setFromSphericalCoords: function ( radius, phi, theta ) {
 
-		var sinPhiRadius = Math.sin( phi ) * radius;
+		const sinPhiRadius = Math.sin( phi ) * radius;
 
 		this.x = sinPhiRadius * Math.sin( theta );
 		this.y = Math.cos( phi ) * radius;
@@ -623,7 +635,7 @@ Object.assign( Vector3.prototype, {
 
 	setFromMatrixPosition: function ( m ) {
 
-		var e = m.elements;
+		const e = m.elements;
 
 		this.x = e[ 12 ];
 		this.y = e[ 13 ];
@@ -635,9 +647,9 @@ Object.assign( Vector3.prototype, {
 
 	setFromMatrixScale: function ( m ) {
 
-		var sx = this.setFromMatrixColumn( m, 0 ).length();
-		var sy = this.setFromMatrixColumn( m, 1 ).length();
-		var sz = this.setFromMatrixColumn( m, 2 ).length();
+		const sx = this.setFromMatrixColumn( m, 0 ).length();
+		const sy = this.setFromMatrixColumn( m, 1 ).length();
+		const sz = this.setFromMatrixColumn( m, 2 ).length();
 
 		this.x = sx;
 		this.y = sy;
@@ -650,6 +662,12 @@ Object.assign( Vector3.prototype, {
 	setFromMatrixColumn: function ( m, index ) {
 
 		return this.fromArray( m.elements, index * 4 );
+
+	},
+
+	setFromMatrix3Column: function ( m, index ) {
+
+		return this.fromArray( m.elements, index * 3 );
 
 	},
 
@@ -695,6 +713,16 @@ Object.assign( Vector3.prototype, {
 		this.x = attribute.getX( index );
 		this.y = attribute.getY( index );
 		this.z = attribute.getZ( index );
+
+		return this;
+
+	},
+
+	random: function () {
+
+		this.x = Math.random();
+		this.y = Math.random();
+		this.z = Math.random();
 
 		return this;
 

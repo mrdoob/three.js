@@ -32,7 +32,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple scenes comparison<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - multiple scenes comparison<br />
 		</div>
 
 		<div class="container">
@@ -163,7 +163,7 @@
 
 					sliderMoved = true;
 
-					sliderPos = e.pageX || e.touches[ 0 ].pageX;
+					sliderPos = ( e.pageX === undefined ) ? e.touches[ 0 ].pageX : e.pageX;
 
 					//prevent the slider from being positioned outside the window bounds
 					if ( sliderPos < 0 ) sliderPos = 0;

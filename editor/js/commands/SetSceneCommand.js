@@ -3,12 +3,16 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+import { SetUuidCommand } from './SetUuidCommand.js';
+import { SetValueCommand } from './SetValueCommand.js';
+import { AddObjectCommand } from './AddObjectCommand.js';
+
 /**
  * @param editor Editor
  * @param scene containing children to import
  * @constructor
  */
-
 var SetSceneCommand = function ( editor, scene ) {
 
 	Command.call( this, editor );
@@ -99,3 +103,5 @@ SetSceneCommand.prototype = {
 	}
 
 };
+
+export { SetSceneCommand };

@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl RGBM texture loader example
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl RGBM texture loader example
 		</div>
 
 		<script type="module">
@@ -36,7 +36,7 @@
 				renderer.toneMapping = THREE.ReinhardToneMapping;
 				renderer.toneMappingExposure = params.exposure;
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 

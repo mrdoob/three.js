@@ -41,7 +41,25 @@ BVHLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -394,6 +412,7 @@ BVHLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var line;
 			// skip empty lines
 			while ( ( line = lines.shift().trim() ).length === 0 ) { }
+
 			return line;
 
 		}

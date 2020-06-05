@@ -23,6 +23,7 @@ export namespace Pass {
 		constructor( material?: Material );
 
 		render( renderer: WebGLRenderer ): void;
+		dispose(): void;
 
 		material: Material;
 

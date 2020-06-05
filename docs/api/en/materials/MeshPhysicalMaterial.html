@@ -13,9 +13,30 @@
 		<h1>[name]</h1>
 
 		<p class="desc">
-			An extension of the [page:MeshStandardMaterial] that allows for greater control over reflectivity.<br /><br />
+			An extension of the [page:MeshStandardMaterial], providing more advanced physically-based rendering properties:
+		</p>
 
-			Note that for best results you should always specify an [page:.envMap environment map] when using this material.
+		<ul>
+			<li>
+				<b>Clearcoat:</b> Some materials — like car paints, carbon fiber, and wet surfaces — require a
+				clear, reflective layer on top of another layer that may be irregular or rough. Clearcoat
+				approximates this effect, without the need for a separate transparent surface.
+			</li>
+			<li>
+				<b>Physically-based transparency:</b> One limitation of [page:Material.opacity .opacity] is
+				that highly transparent materials are less reflective. Physically-based [page:.transparency]
+				provides a more realistic option for thin, transparent surfaces like glass.
+			</li>
+			<li>
+				<b>Advanced reflectivity:</b> More flexible reflectivity for non-metallic materials.
+			</li>
+		</ul>
+
+		<p>
+			As a result of these complex shading features, MeshPhysicalMaterial has a higher performance
+			cost, per pixel, than other three.js materials. Most effects are disabled by default, and add
+			cost as they are enabled. For best results, always specify an [page:.envMap environment map]
+			when using this material.
 		</p>
 
 		<iframe id="scene" src="scenes/material-browser.html#MeshPhysicalMaterial"></iframe>
@@ -37,8 +58,12 @@
 		</script>
 
 		<h2>Examples</h2>
-		[example:webgl_materials_variations_physical materials / variations / physical]<br />
-		[example:webgl_materials_reflectivity materials / reflectivity]
+		<p>
+			[example:webgl_materials_variations_physical materials / variations / physical]<br />
+			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
+			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
+			[example:webgl_materials_physical_transparency materials / physical / transparency]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -57,17 +82,29 @@
 
 		<h3>[property:Float clearcoat]</h3>
 		<p>
-		Clearcoat level, from *0.0* to *1.0*. Default is *0.0*.
+		Represents the thickness of the clear coat layer, from *0.0* to *1.0*. Use clear coat related properties to enable multilayer
+		materials that have a thin translucent layer over the base layer. Default is *0.0*.
 		</p>
 
-		<h3>[property:Float clearcoatRoughness]</h3>
-		<p>How rough the clearcoat appears, from *0.0* to *1.0*. Default is *0.0*.</p>
-
-		<h3>[property:Boolean isMeshPhysicalMaterial]</h3>
+		<h3>[property:Texture clearcoatMap]</h3>
 		<p>
-			Used to check whether this or derived classes are mesh physical materials. Default is *true*.<br /><br />
+		The red channel of this texture is multiplied against [page:.clearcoat], for per-pixel control
+		over a coating's thickness. Default is *null*.
+		</p>
 
-			You should not change this, as it used internally for optimisation.
+		<h3>[property:Texture clearcoatNormalMap]</h3>
+		<p>Can be used to enable independent normals for the clear coat layer. Default is *null*.</p>
+
+		<h3>[property:Vector2 clearcoatNormalScale]</h3>
+		<p>How much [page:.clearcoatNormalMap] affects the clear coat layer, from *(0,0)* to *(1,1)*. Default is *(1,1)*.</p>
+
+		<h3>[property:Float clearcoatRoughness]</h3>
+		<p>Roughness of the clear coat layer, from *0.0* to *1.0*. Default is *0.0*.</p>
+
+		<h3>[property:Texture clearcoatRoughnessMap]</h3>
+		<p>
+		The green channel of this texture is multiplied against [page:.clearcoatRoughness], for per-pixel control
+		over a coating's roughness. Default is *null*.
 		</p>
 
 		<h3>[property:Object defines]</h3>
@@ -77,7 +114,7 @@
 
 					'STANDARD': ''
 					'PHYSICAL': '',
-			
+
 				};
 			</code>
 
@@ -89,6 +126,17 @@
 		Degree of reflectivity, from *0.0* to *1.0*. Default is *0.5*.<br />
 
 		This models the reflectivity of non-metallic materials. It has no effect when [page:MeshStandardMaterial.metalness metalness] is *1.0*
+		</p>
+
+		<h3>[property:Float transparency]</h3>
+		<p>
+		Degree of transparency, from *0.0* to *1.0*. Default is *0.0*.<br />
+
+		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are mostly transparent.
+
+		The transparency property can be used to model these materials.<br />
+
+		When transparency is non-zero, [page:Material.opacity opacity] should be set to *1*.
 		</p>
 
 		<h2>Methods</h2>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			渲染箭头辅助对象 [page:ArrowHelper arrows] 来模拟面 [page:Face3 face] 的法线.
+			需要所有面 [page:Face3 faces] 都指定了法线 或
+			通过 [page:Geometry.computeFaceNormals computeFaceNormals] 方法计算面的法线. <br /><br />
+
+			注意：仅几何体为 [page:Geometry] 类型的对象能正常运行.
+			对于 [page:BufferGeometry] 类型几何体的对象请使用 [page:VertexNormalsHelper] 代替.
+		<p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		geometry = new THREE.BoxGeometry( 10, 10, 10, 2, 2, 2 );
+		material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		box = new THREE.Mesh( geometry, material );
+
+		helper = new FaceNormalsHelper( box, 2, 0x00ff00, 1 );
+
+		scene.add( box );
+		scene.add( helper );
+		</code>
+
+		<h2>例子</h2>
+
+		<div>[example:webgl_helpers WebGL / helpers]</div>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:Object3D object], [param:Number size], [param:Color color], [param:Number linewidth] )</h3>
+		<p>
+		[page:Object3D object] -- 要渲染面法线辅助的对象.<br />
+		[page:Number size] -- (可选的) 箭头的长度. 默认为 *1*.<br />
+		[page:Hex color] -- (可选的) 箭头的颜色. 默认为 *0xffff00*.<br />
+		[page:Number linewidth] -- (可选的) 箭头线段的宽度.  默认为 *1*.
+		</p>
+
+
+		<h2>属性</h2>
+		<p>请到基类 [page:LineSegments] 页面查看公共属性.</p>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
+		<p>
+			请查看 [page:Object3D.matrixAutoUpdate]. 这里设置为 *false* 表示辅助对象
+			使用对象的世界矩阵 [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+		<h3>[property:Object3D object]</h3>
+		<p>被渲染面法线辅助的对象.</p>
+
+		<h3>[property:Number size]</h3>
+		<p>箭头的长度. 默认为 *1*.</p>
+
+
+
+		<h2>方法</h2>
+		<p>请到基类 [page:LineSegments] 页面查看公共方法.</p>
+
+
+		<h3>[method:null update]()</h3>
+		<p>基于对象的运动更新面法线辅助对象.</p>
+
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/FaceNormalsHelper.js examples/jsm/helpers/FaceNormalsHelper.js]
+		</p>
+	</body>
+</html>

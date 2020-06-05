@@ -16,7 +16,7 @@
 		other things.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 		<code>
 		var raycaster = new THREE.Raycaster();
 		var mouse = new THREE.Vector2();
@@ -54,21 +54,20 @@
 		window.requestAnimationFrame(render);
 
 		</code>
-		<div>
-			Examples: [example:webgl_interactive_cubes Raycasting to a Mesh]<br />
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_interactive_cubes Raycasting to a Mesh]<br />
 			[example:webgl_interactive_cubes_ortho Raycasting to a Mesh in using an OrthographicCamera]<br />
 			[example:webgl_interactive_buffergeometry Raycasting to a Mesh with BufferGeometry]<br />
+			[example:webgl_instancing_raycast Raycasting to a InstancedMesh]<br />
 			[example:webgl_interactive_lines Raycasting to a Line]<br />
 			[example:webgl_interactive_raycasting_points Raycasting to Points]<br />
 			[example:webgl_geometry_terrain_raycast Terrain raycasting]<br />
 			[example:webgl_interactive_voxelpainter Raycasting to paint voxels]<br />
 			[example:webgl_raycast_texture Raycast to a Texture]
-		</div>
-
-
-		<p>
 		</p>
-
 
 		<h2>Constructor</h2>
 
@@ -92,11 +91,6 @@
 		This value shouldn't be negative and should be larger than the near property.
 		</p>
 
-		<h3>[property:float linePrecision]</h3>
-		<p>
-		The precision factor of the raycaster when intersecting [page:Line] objects.
-		</p>
-
 		<h3>[property:float near]</h3>
 		<p>
 		The near factor of the raycaster. This value indicates which objects can be discarded based on the distance.
@@ -111,6 +105,18 @@
 		Defaults to null.
 		</p>
 
+		<h3>[property:Layers layers]</h3>
+		<p>
+		Used by [name] to selectively ignore 3D objects when performing intersection tests. The following code example ensures that
+		only 3D objects on layer *1* will be honored by the instance of [name].
+
+		<code>
+		raycaster.layers.set( 1 );
+		object.layers.enable( 1 );
+		</code>
+
+		</p>
+
 		<h3>[property:Object params]</h3>
 		<p>
 		An object with the following properties:
@@ -118,13 +124,14 @@
 			<code>
 {
 	Mesh: {},
-	Line: {},
+	Line: { threshold: 1 },
 	LOD: {},
 	Points: { threshold: 1 },
 	Sprite: {}
 }
 			</code>
 
+		Where threshold is the precision of the raycaster when intersecting objects, in world units.
 		</p>
 
 		<h3>[property:Ray ray]</h3>
@@ -170,7 +177,8 @@
 			[page:Integer faceIndex] – index of the intersected face<br />
 			[page:Object3D object] – the intersected object<br />
 			[page:Vector2 uv] - U,V coordinates at point of intersection<br />
-			[page:Vector2 uv2] - Second set of U,V coordinates at point of intersection
+			[page:Vector2 uv2] - Second set of U,V coordinates at point of intersection<br />
+			[page:Integer instanceId] – The index number of the instance where the ray intersects the InstancedMesh
 		</p>
 		<p>
 		*Raycaster* delegates to the [page:Object3D.raycast raycast] method of the passed object, when evaluating whether the ray intersects the object or not. This allows [page:Mesh meshes] to respond differently to ray casting than [page:Line lines] and [page:Points pointclouds].

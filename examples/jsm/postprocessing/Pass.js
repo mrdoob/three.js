@@ -63,6 +63,12 @@ Pass.FullScreenQuad = ( function () {
 
 	Object.assign( FullScreenQuad.prototype, {
 
+		dispose: function () {
+
+			this._mesh.geometry.dispose();
+
+		},
+
 		render: function ( renderer ) {
 
 			renderer.render( this._mesh, camera );

@@ -52,6 +52,12 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		}
 
+		if ( object.isInstancedMesh === true ) {
+
+			updateBuffers = true;
+
+		}
+
 		if ( index !== null ) {
 
 			attributes.update( index, gl.ELEMENT_ARRAY_BUFFER );
@@ -338,9 +344,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 							enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
 
-							if ( geometry.maxInstancedCount === undefined ) {
+							if ( geometry.instanceCount === undefined ) {
 
-								geometry.maxInstancedCount = data.meshPerAttribute * data.count;
+								geometry.instanceCount = data.meshPerAttribute * data.count;
 
 							}
 
@@ -359,9 +365,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 							enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
 
-							if ( geometry.maxInstancedCount === undefined ) {
+							if ( geometry.instanceCount === undefined ) {
 
-								geometry.maxInstancedCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
+								geometry.instanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
 							}
 

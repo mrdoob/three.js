@@ -15,7 +15,7 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css2d - label</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css2d - label</div>
 
 		<script type="module">
 
@@ -39,7 +39,7 @@
 				var EARTH_RADIUS = 1;
 				var MOON_RADIUS = 0.27;
 
-				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 200 );
 				camera.position.set( 10, 5, 20 );
 
 				scene = new THREE.Scene();
@@ -101,10 +101,12 @@
 				labelRenderer = new CSS2DRenderer();
 				labelRenderer.setSize( window.innerWidth, window.innerHeight );
 				labelRenderer.domElement.style.position = 'absolute';
-				labelRenderer.domElement.style.top = 0;
+				labelRenderer.domElement.style.top = '0px';
 				document.body.appendChild( labelRenderer.domElement );
 
 				var controls = new OrbitControls( camera, labelRenderer.domElement );
+				controls.minDistance = 5;
+				controls.maxDistance = 100;
 
 			}
 

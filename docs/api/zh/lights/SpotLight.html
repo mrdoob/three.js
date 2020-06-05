@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -13,35 +13,9 @@
 		<h1>聚光灯（[name]）</h1>
 
 		<p class="desc">
-			聚光灯是从一个方向上的一个点发出，沿着一个圆锥体，它离光越远，它的尺寸就越大。 <br /><br />
+			光线从一个点沿一个方向射出，随着光线照射的变远，光线圆锥体的尺寸也逐渐增大。<br /><br />
 
 			该光源可以投射阴影 - 跳转至 [page:SpotLightShadow] 查看更多细节。
-		</p>
-
-
-
-
-		<h2>示例</h2>
-
-		<iframe src='../examples/webgl_lights_spotlight.html'></iframe>
-		<p>
-			[example:webgl_lights_spotlight View in Examples ]
-		</p>
-
-		<h2>其他例子</h2>
-
-		<p>
-			[example:webgl_interactive_cubes_gpu interactive / cubes / gpu ]<br />
-			[example:webgl_interactive_draggablecubes interactive / draggablecubes ]<br />
-			[example:webgl_materials_bumpmap_skin materials / bumpmap / skin ]<br />
-			[example:webgl_materials_cubemap_dynamic materials / cubemap / dynamic ]<br />
-			[example:webgl_loader_md2 loader / md2 ]<br />
-			[example:webgl_shading_physical shading / physical ]<br />
-			[example:webgl_materials_bumpmap materials / bumpmap]<br/>
-			[example:webgl_shading_physical shading / physical]<br/>
-			[example:webgl_shadowmap shadowmap]<br/>
-			[example:webgl_shadowmap_performance shadowmap / performance]<br/>
-			[example:webgl_shadowmap_viewer shadowmap / viewer]
 		</p>
 
 		<h2>代码示例</h2>
@@ -63,6 +37,13 @@
 		scene.add( spotLight );
 		</code>
 
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_lights_spotlight lights / spotlight ]<br />
+			[example:webgl_lights_spotlights lights / spotlights ]
+		</p>
+
 		<h2>构造器（Constructor）</h2>
 
 
@@ -80,7 +61,7 @@
 
 		<h2>属性（Properties）</h2>
 
-		公共属性请查看基类[page:Light Light]。
+		<p>公共属性请查看基类[page:Light Light]。</p>
 
 		<h3>[property:Float angle]</h3>
 		<p>
@@ -108,13 +89,6 @@
 			缺省值为 *0.0*。
 		</p>
 
-		<h3>[property:Boolean isSpotLight]</h3>
-		<p>
-				用来校验这个类或者它的派生类是不是聚光灯光源。缺省值是 *true*。<br /><br />
-
-				不应该去改变这个变量,因为内部使用这个变量做了些优化的工作。
-		</p>
-
 		<h3>[property:Float penumbra]</h3>
 		<p>
 				聚光锥的半影衰减百分比。在0和1之间的值。
@@ -131,7 +105,7 @@
 			光功率<br />
 			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式中，
 			表示以"流明（光通量单位）"为单位的光功率。 缺省值 - *4Math.PI*。 <br /><br />
-			
+
 			该值与 [page:.intensity intensity] 直接关联
 				<code>
 				power = intensity * 4&pi;
@@ -169,7 +143,7 @@ light.target = targetObject;
 
 		<h2>方法（Methods）</h2>
 
-		公共方法请查看基类 [page:Light Light]。
+		<p>公共方法请查看基类 [page:Light Light]。</p>
 
 		<h3>[method:SpotLight copy]( [param:SpotLight source] )</h3>
 		<p>

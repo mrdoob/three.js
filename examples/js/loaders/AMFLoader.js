@@ -1,3 +1,4 @@
+console.warn( "THREE.AMFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author tamarintech / https://tamarintech.com
  *
@@ -37,7 +38,25 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -59,7 +78,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				try {
 
-					zip = new JSZip( data ); // eslint-disable-line no-undef
+					zip = new JSZip( data );
 
 				} catch ( e ) {
 
@@ -289,6 +308,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 					}
 
 				}
+
 				currVerticesNode = currVerticesNode.nextElementSibling;
 
 			}

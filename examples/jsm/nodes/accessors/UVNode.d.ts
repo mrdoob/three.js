@@ -1,4 +1,3 @@
-import { NodeBuilder } from '../core/NodeBuilder';
 import { TempNode } from '../core/TempNode';
 
 export class UVNode extends TempNode {
@@ -8,7 +7,6 @@ export class UVNode extends TempNode {
 	index: number;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: UVNode ): this;
 
 }

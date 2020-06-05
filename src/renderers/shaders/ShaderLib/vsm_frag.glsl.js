@@ -9,7 +9,7 @@ void main() {
 
   float mean = 0.0;
   float squared_mean = 0.0;
-  
+
 	// This seems totally useless but it's a crazy work around for a Adreno compiler bug
 	float depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy  ) / resolution ) );
 
@@ -17,7 +17,7 @@ void main() {
 
     #ifdef HORIZONAL_PASS
 
-      vec2 distribution = decodeHalfRGBA ( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( i, 0.0 ) * radius ) / resolution ) );
+      vec2 distribution = unpackRGBATo2Half( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( i, 0.0 ) * radius ) / resolution ) );
       mean += distribution.x;
       squared_mean += distribution.y * distribution.y + distribution.x * distribution.x;
 
@@ -34,9 +34,9 @@ void main() {
   mean = mean * HALF_SAMPLE_RATE;
   squared_mean = squared_mean * HALF_SAMPLE_RATE;
 
-  float std_dev = pow( squared_mean - mean * mean, 0.5 );
+  float std_dev = sqrt( squared_mean - mean * mean );
 
-  gl_FragColor = encodeHalfRGBA( vec2( mean, std_dev ) );
+  gl_FragColor = pack2HalfToRGBA( vec2( mean, std_dev ) );
 
 }
 `;

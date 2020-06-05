@@ -1,3 +1,4 @@
+console.warn( "THREE.Water2: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Mugen87 / https://github.com/Mugen87
  *
@@ -26,6 +27,7 @@ THREE.Water = function ( geometry, options ) {
 	var reflectivity = options.reflectivity || 0.02;
 	var scale = options.scale || 1;
 	var shader = options.shader || THREE.Water.WaterShader;
+	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	var textureLoader = new THREE.TextureLoader();
 
@@ -57,13 +59,15 @@ THREE.Water = function ( geometry, options ) {
 	var reflector = new THREE.Reflector( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	var refractor = new THREE.Refractor( geometry, {
 		textureWidth: textureWidth,
 		textureHeight: textureHeight,
-		clipBias: clipBias
+		clipBias: clipBias,
+		encoding: encoding
 	} );
 
 	reflector.matrixAutoUpdate = false;
@@ -236,6 +240,7 @@ THREE.Water.WaterShader = {
 
 	vertexShader: [
 
+		'#include <common>',
 		'#include <fog_pars_vertex>',
 		'#include <logdepthbuf_pars_vertex>',
 

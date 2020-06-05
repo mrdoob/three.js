@@ -1,5 +1,4 @@
 import { TempNode } from '../core/TempNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 import { FloatNode } from '../inputs/FloatNode';
 import { StructNode } from '../core/StructNode';
 import { FunctionNode } from '../core/FunctionNode';
@@ -12,8 +11,6 @@ export class TextureCubeUVNode extends TempNode {
 	uv: Node;
 	textureSize: FloatNode;
 	nodeType: string;
-
-	generate( builder: NodeBuilder, output: string ): string;
 
 	static Nodes: {
 		TextureCubeUVData: StructNode;

@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - SpotLights<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - SpotLights<br/>
 			by <a href="http://master-domain.com" target="_blank" rel="noopener">Master James</a>
 		</div>
 
@@ -52,9 +52,7 @@
 
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				camera.position.set( 46, 22, - 21 );
 

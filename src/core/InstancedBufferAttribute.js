@@ -42,7 +42,7 @@ InstancedBufferAttribute.prototype = Object.assign( Object.create( BufferAttribu
 
 	toJSON: function ()	{
 
-		var data = BufferAttribute.prototype.toJSON.call( this );
+		const data = BufferAttribute.prototype.toJSON.call( this );
 
 		data.meshPerAttribute = this.meshPerAttribute;
 

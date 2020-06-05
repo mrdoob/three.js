@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 
 <head>
 	<meta charset="utf-8" />
@@ -56,17 +56,11 @@
 	<h3>[property:Integer id]</h3>
 	<p>只读 —— 表示该对象实例ID的唯一数字。</p>
 
-	<h3>[property:Boolean isObject3D]</h3>
-	<p>
-
-		用于测试这个类或者派生类是否为Object3D，默认为*true*。<br /><br />
-		你不应当对这个属性进行改变，因为它在内部使用，以用于优化。
-	</p>
-
 	<h3>[property:Layers layers]</h3>
 	<p>
 		物体的层级关系。
-		物体只有和一个正在使用的[page:Camera]至少在同一个层时才可见。
+		物体只有和一个正在使用的[page:Camera]至少在同一个层时才可见。This property can also be used to filter out
+		unwanted objects in ray-intersection tests when using [page:Raycaster].
 	</p>
 
 	<h3>[property:Matrix4 matrix]</h3>
@@ -200,13 +194,13 @@
 		请参阅[page:Group]来查看手动编组对象的相关信息。
 	</p>
 
-	<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+	<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 	<p>对当前物体应用这个变换矩阵，并更新物体的位置、旋转和缩放。</p>
 
 	<h3>[method:Object3D applyQuaternion]( [param:Quaternion quaternion] )</h3>
 	<p>对当前物体应用由四元数所表示的变换。</p>
 
-	
+
 	<h3>[method:this attach]( [param:Object3D object] )</h3>
 	<p>将*object*作为子级来添加到该对象中，同时保持该object的世界变换。</p>
 

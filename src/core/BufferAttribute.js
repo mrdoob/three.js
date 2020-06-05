@@ -8,6 +8,8 @@ import { StaticDrawUsage } from '../constants.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
+const _vector = new Vector3();
+
 function BufferAttribute( array, itemSize, normalized ) {
 
 	if ( Array.isArray( array ) ) {
@@ -129,7 +131,7 @@ Object.assign( BufferAttribute.prototype, {
 		index1 *= this.itemSize;
 		index2 *= attribute.itemSize;
 
-		for ( var i = 0, l = this.itemSize; i < l; i ++ ) {
+		for ( let i = 0, l = this.itemSize; i < l; i ++ ) {
 
 			this.array[ index1 + i ] = attribute.array[ index2 + i ];
 
@@ -149,11 +151,12 @@ Object.assign( BufferAttribute.prototype, {
 
 	copyColorsArray: function ( colors ) {
 
-		var array = this.array, offset = 0;
+		const array = this.array;
+		let offset = 0;
 
-		for ( var i = 0, l = colors.length; i < l; i ++ ) {
+		for ( let i = 0, l = colors.length; i < l; i ++ ) {
 
-			var color = colors[ i ];
+			let color = colors[ i ];
 
 			if ( color === undefined ) {
 
@@ -174,11 +177,12 @@ Object.assign( BufferAttribute.prototype, {
 
 	copyVector2sArray: function ( vectors ) {
 
-		var array = this.array, offset = 0;
+		const array = this.array;
+		let offset = 0;
 
-		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
+		for ( let i = 0, l = vectors.length; i < l; i ++ ) {
 
-			var vector = vectors[ i ];
+			let vector = vectors[ i ];
 
 			if ( vector === undefined ) {
 
@@ -198,11 +202,12 @@ Object.assign( BufferAttribute.prototype, {
 
 	copyVector3sArray: function ( vectors ) {
 
-		var array = this.array, offset = 0;
+		const array = this.array;
+		let offset = 0;
 
-		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
+		for ( let i = 0, l = vectors.length; i < l; i ++ ) {
 
-			var vector = vectors[ i ];
+			let vector = vectors[ i ];
 
 			if ( vector === undefined ) {
 
@@ -223,11 +228,12 @@ Object.assign( BufferAttribute.prototype, {
 
 	copyVector4sArray: function ( vectors ) {
 
-		var array = this.array, offset = 0;
+		const array = this.array;
+		let offset = 0;
 
-		for ( var i = 0, l = vectors.length; i < l; i ++ ) {
+		for ( let i = 0, l = vectors.length; i < l; i ++ ) {
 
-			var vector = vectors[ i ];
+			let vector = vectors[ i ];
 
 			if ( vector === undefined ) {
 
@@ -240,6 +246,78 @@ Object.assign( BufferAttribute.prototype, {
 			array[ offset ++ ] = vector.y;
 			array[ offset ++ ] = vector.z;
 			array[ offset ++ ] = vector.w;
+
+		}
+
+		return this;
+
+	},
+
+	applyMatrix3: function ( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.applyMatrix3( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+		}
+
+		return this;
+
+	},
+
+	applyMatrix4: function ( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.applyMatrix4( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+		}
+
+		return this;
+
+	},
+
+	applyNormalMatrix: function ( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.applyNormalMatrix( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+		}
+
+		return this;
+
+	},
+
+	transformDirection: function ( m ) {
+
+		for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+			_vector.x = this.getX( i );
+			_vector.y = this.getY( i );
+			_vector.z = this.getZ( i );
+
+			_vector.transformDirection( m );
+
+			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
 
 		}
 

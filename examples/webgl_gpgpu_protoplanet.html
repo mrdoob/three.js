@@ -14,7 +14,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="protoplanets"></span> webgl gpgpu debris
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="protoplanets"></span> webgl gpgpu debris
 		</div>
 
 		<!-- Fragment shader for protoplanet's position -->
@@ -279,6 +279,8 @@
 				container.appendChild( renderer.domElement );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 100;
+				controls.maxDistance = 1000;
 
 				effectController = {
 					// Can be changed dynamically
@@ -523,7 +525,7 @@
 
 			function getCameraConstant( camera ) {
 
-				return window.innerHeight / ( Math.tan( THREE.Math.DEG2RAD * 0.5 * camera.fov ) / camera.zoom );
+				return window.innerHeight / ( Math.tan( THREE.MathUtils.DEG2RAD * 0.5 * camera.fov ) / camera.zoom );
 
 			}
 

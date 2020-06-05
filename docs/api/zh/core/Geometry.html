@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -12,7 +12,7 @@
 
 		<div class="desc">
 		<p>
-			Geometry 是对 [page:BufferGeometry] 的用户有好替代。Geometry 利用 [page:Vector3]
+			Geometry 是一个便于用户使用的 [page:BufferGeometry] 的替代品。Geometry 利用 [page:Vector3]
 			或 [page:Color] 存储了几何体的相关 attributes（如顶点位置，面信息，颜色等）比起 BufferGeometry
 			更容易读写，但是运行效率不如有类型的队列。
 		</p>
@@ -21,20 +21,10 @@
 		</p>
 		</div>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
-		<div>[example:webgl_geometry_minecraft WebGL / geometry / minecraft ]</div>
-		<div>[example:webgl_geometry_minecraft_ao WebGL / geometry / minecraft / ao ]</div>
-		<div>[example:webgl_geometry_nurbs WebGL / geometry / nurbs ]</div>
-		<div>[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor ]</div>
-		<div>[example:webgl_interactive_cubes_gpu WebGL / interactive / cubes / gpu ]</div>
-		<div>[example:webgl_interactive_lines WebGL / interactive / lines ]</div>
-		<div>[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points ]</div>
-		<div>[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter ]</div>
-		<div>[example:webgl_morphnormals WebGL / morphNormals ]</div>
-
-
-		<code>var geometry = new THREE.Geometry();
+		<code>
+		var geometry = new THREE.Geometry();
 
 		geometry.vertices.push(
 			new THREE.Vector3( -10,  10, 0 ),
@@ -46,6 +36,19 @@
 
 		geometry.computeBoundingSphere();
 		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_geometry_minecraft WebGL / geometry / minecraft ]<br />
+			[example:webgl_geometry_minecraft_ao WebGL / geometry / minecraft / ao ]<br />
+			[example:webgl_geometry_nurbs WebGL / geometry / nurbs ]<br />
+			[example:webgl_geometry_spline_editor WebGL / geometry / spline / editor ]<br />
+			[example:webgl_interactive_cubes_gpu WebGL / interactive / cubes / gpu ]<br />
+			[example:webgl_interactive_lines WebGL / interactive / lines ]<br />
+			[example:webgl_interactive_raycasting_points WebGL / interactive / raycasting / points ]<br />
+			[example:webgl_interactive_voxelpainter WebGL / interactive / voxelpainter ]
+		</p>
 
 		<h2>构造函数</h2>
 
@@ -95,13 +98,6 @@
 
 		<h3>[property:Integer id]</h3>
 		<p>当前 geometry 实例的唯一标识符的数。</p>
-
-		<h3>[property:Boolean isGeometry]</h3>
-		<p>
-			用于判断当前类或派生类属于 Geometries。默认值是 *true*。<br /><br />
-
-			你不应该改变该值，该值用于内部优化。
-		</p>
 
 		<h3>[property:array lineDistances]</h3>
 		<p>
@@ -205,7 +201,7 @@
 
 		<h3>[page:EventDispatcher EventDispatcher] 该类中可用的函数。</h3>
 
-		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p> 将矩阵信息直接应用于几何体顶点坐标。</p>
 
 		<h3>[method:Geometry center] ()</h3>

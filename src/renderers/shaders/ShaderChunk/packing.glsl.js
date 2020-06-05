@@ -25,20 +25,11 @@ float unpackRGBAToDepth( const in vec4 v ) {
 	return dot( v, UnpackFactors );
 }
 
-vec4 encodeHalfRGBA ( vec2 v ) {
-	vec4 encoded = vec4( 0.0 );
-	const vec2 offset = vec2( 1.0 / 255.0, 0.0 );
-
-	encoded.xy = vec2( v.x, fract( v.x * 255.0 ) );
-	encoded.xy = encoded.xy - ( encoded.yy * offset );
-
-	encoded.zw = vec2( v.y, fract( v.y * 255.0 ) );
-	encoded.zw = encoded.zw - ( encoded.ww * offset );
-
-	return encoded;
+vec4 pack2HalfToRGBA( vec2 v ) {
+	vec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ));
+	return vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w);
 }
-
-vec2 decodeHalfRGBA( vec4 v ) {
+vec2 unpackRGBATo2Half( vec4 v ) {
 	return vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );
 }
 

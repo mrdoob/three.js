@@ -3,7 +3,9 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
-History = function ( editor ) {
+import * as Commands from './commands/Commands.js';
+
+var History = function ( editor ) {
 
 	this.editor = editor;
 	this.undos = [];
@@ -202,7 +204,7 @@ History.prototype = {
 		for ( var i = 0; i < json.undos.length; i ++ ) {
 
 			var cmdJSON = json.undos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -214,7 +216,7 @@ History.prototype = {
 		for ( var i = 0; i < json.redos.length; i ++ ) {
 
 			var cmdJSON = json.redos[ i ];
-			var cmd = new window[ cmdJSON.type ]();	// creates a new object of type "json.type"
+			var cmd = new Commands[ cmdJSON.type ]( this.editor ); // creates a new object of type "json.type"
 			cmd.json = cmdJSON;
 			cmd.id = cmdJSON.id;
 			cmd.name = cmdJSON.name;
@@ -317,3 +319,5 @@ History.prototype = {
 	}
 
 };
+
+export { History };

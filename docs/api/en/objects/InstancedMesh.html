@@ -17,11 +17,18 @@
 		objects with the same geometry and material but with different world transformations. The usage of [name] will help you
 		to reduce the number of draw calls and thus improve the overall rendering performance in your application.
 		</p>
+		<p>
+		The current implementation requires that materials are not shared between [name] and other 3D objects.
+		</p>
 
-		<h3>Example</h3>
+		<h2>Examples</h2>
 
 		<p>
-			[example:webgl_instancing_suzanne WebGL / instancing / suzanne]<br />
+			[example:webgl_instancing_dynamic WebGL / instancing / dynamic]<br />
+			[example:webgl_instancing_modified WebGL / instancing / modified]<br />
+			[example:webgl_instancing_performance WebGL / instancing / performance]<br />
+			[example:webgl_instancing_scatter WebGL / instancing / scatter]<br />
+			[example:webgl_instancing_raycast WebGL / instancing / raycast]
 		</p>
 
 		<h2>Constructor</h2>
@@ -47,11 +54,23 @@
 
 		<h3>[property:BufferAttribute instanceMatrix]</h3>
 		<p>
-			Represents the local transformation of all instances. For internal use only.
+			Represents the local transformation of all instances.
+			You have to set its [page:BufferAttribute.needsUpdate needsUpdate] flag to true if you modify instanced data via [page:.setMatrixAt]().
 		</p>
 
 		<h2>Methods</h2>
 		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:null getMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
+		<p>
+			[page:Integer index]: The index of an instance. Values have to be in the range [0, count].
+		</p>
+		<p>
+			[page:Matrix4 matrix]: This 4x4 matrix will be set to the local transformation matrix of the defined instance.
+		</p>
+		<p>
+			Get the local transformation matrix of the defined instance.
+		</p>
 
 		<h3>[method:null setMatrixAt]( [param:Integer index], [param:Matrix4 matrix] )</h3>
 		<p>

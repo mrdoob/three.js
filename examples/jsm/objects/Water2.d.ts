@@ -4,6 +4,7 @@ import {
 	Geometry,
 	Mesh,
 	Texture,
+	TextureEncoding,
 	Vector2
 } from '../../../src/Three';
 
@@ -20,6 +21,7 @@ export interface WaterOptions {
 	flowMap?: Texture;
 	normalMap0?: Texture;
 	normalMap1?: Texture;
+	encoding?: TextureEncoding;
 }
 
 export class Water extends Mesh {

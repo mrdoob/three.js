@@ -1,3 +1,4 @@
+console.warn( "THREE.SSAOPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Mugen87 / https://github.com/Mugen87
  */
@@ -153,16 +154,16 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 		this.ssaoRenderTarget.dispose();
 		this.blurRenderTarget.dispose();
 
-		// dispose geometry
-
-		this.quad.geometry.dispose();
-
 		// dispose materials
 
 		this.normalMaterial.dispose();
 		this.blurMaterial.dispose();
 		this.copyMaterial.dispose();
 		this.depthRenderMaterial.dispose();
+
+		// dipsose full screen quad
+
+		this.fsQuad.dispose();
 
 	},
 
@@ -344,7 +345,7 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 			sample.normalize();
 
 			var scale = i / kernelSize;
-			scale = THREE.Math.lerp( 0.1, 1, scale * scale );
+			scale = THREE.MathUtils.lerp( 0.1, 1, scale * scale );
 			sample.multiplyScalar( scale );
 
 			kernel.push( sample );

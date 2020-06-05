@@ -22,7 +22,7 @@ var BokehShader = {
 		"focus": { value: 1.0 },
 		"aspect": { value: 1.0 },
 		"aperture": { value: 0.025 },
-		"maxblur": { value: 1.0 },
+		"maxblur": { value: 0.01 },
 		"nearClip": { value: 1.0 },
 		"farClip": { value: 1000.0 },
 

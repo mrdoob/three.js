@@ -1,4 +1,3 @@
-import { NodeBuilder } from '../core/NodeBuilder';
 import { TempNode } from '../core/TempNode';
 
 export class LightNode extends TempNode {
@@ -8,7 +7,6 @@ export class LightNode extends TempNode {
 	scope: string;
 	nodeType: string;
 
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: LightNode ): this;
 
 	static TOTAL: string;

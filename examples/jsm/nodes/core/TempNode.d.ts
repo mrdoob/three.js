@@ -21,6 +21,5 @@ export class TempNode extends Node {
 	getLabel( builder: NodeBuilder ): string;
 	getUuid( unique: boolean ): string;
 	getTemp( builder: NodeBuilder, uuid: string ): string | undefined;
-	generate( builder: NodeBuilder, output: string, uuid?: string, type?: string, ns?: string ): string;
 
 }

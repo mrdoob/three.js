@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl scene transitions<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl scene transitions<br/>
 			by <a href="https://twitter.com/fernandojsg">fernandojsg</a> - <a href="https://github.com/kile/three.js-demos">github</a>
 		</div>
 
@@ -171,7 +171,7 @@
 					applyVertexColors( geometry, color );
 
 					matrix.compose( position, quaternion, scale );
-					geometry.applyMatrix( matrix );
+					geometry.applyMatrix4( matrix );
 
 					geometries.push( geometry );
 
@@ -198,7 +198,7 @@
 
 				this.rotationSpeed = rotationSpeed;
 
-				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: true } );
 				this.mesh = new THREE.Mesh( generateGeometry( type, numObjects ), defaultMaterial );
 				this.scene.add( this.mesh );
 
@@ -354,7 +354,7 @@
 					if ( transitionParams.animateTransition ) {
 
 						var t = ( 1 + Math.sin( transitionParams.transitionSpeed * clock.getElapsedTime() / Math.PI ) ) / 2;
-						transitionParams.transition = THREE.Math.smoothstep( t, 0.3, 0.7 );
+						transitionParams.transition = THREE.MathUtils.smoothstep( t, 0.3, 0.7 );
 
 						// Change the current alpha texture after each transition
 						if ( transitionParams.loopTexture && ( transitionParams.transition == 0 || transitionParams.transition == 1 ) ) {

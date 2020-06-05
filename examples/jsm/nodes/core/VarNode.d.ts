@@ -9,7 +9,6 @@ export class VarNode extends Node {
 	nodeType: string;
 
 	getType( builder: NodeBuilder ): string;
-	generate( builder: NodeBuilder, output: string ): string;
 	copy( source: VarNode ): this;
 
 }

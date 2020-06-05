@@ -8,10 +8,10 @@ export class AnimationLoader extends Loader {
 
 	load(
 		url: string,
-		onLoad?: ( response: string | ArrayBuffer ) => void,
+		onLoad: ( response: AnimationClip[] ) => void,
 		onProgress?: ( request: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
-	): any;
+	): void;
 	parse( json: any ): AnimationClip[];
 
 }

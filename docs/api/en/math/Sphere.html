@@ -16,7 +16,7 @@
 		<h3>[name]( [param:Vector3 center], [param:Float radius] )</h3>
 		<p>
 		[page:Vector3 center] - center of the sphere. Default is a [page:Vector3] at (0, 0, 0). <br />
-		[page:Float radius] - radius of the sphere. Default is 0.<br /><br />
+		[page:Float radius] - radius of the sphere. Default is -1.<br /><br />
 
 		Creates a new [name].
 
@@ -46,8 +46,8 @@
 		[page:Vector3 point] - [page:Vector3] The point to clamp.<br />
 		[page:Vector3 target] — the result will be copied into this Vector3.<br /><br />
 
-		Clamps a point within the sphere. If the point is is outside the sphere, it will clamp it to the
-		closets point on the edge of the sphere. Points already inside the sphere will not be affected.
+		Clamps a point within the sphere. If the point is outside the sphere, it will clamp it to the
+		closest point on the edge of the sphere. Points already inside the sphere will not be affected.
 		</p>
 
 		<h3>[method:Sphere clone]()</h3>
@@ -73,8 +73,14 @@
 		the distance will be negative.
 		</p>
 
-		<h3>[method:Boolean empty]()</h3>
-		<p>Checks to see if the sphere is empty (the radius set to 0).</p>
+		<h3>[method:Boolean isEmpty]()</h3>
+		<p>
+		Checks to see if the sphere is empty (the radius set to a negative number).</br>
+		Spheres with a radius of 0 contain only their center point and are not considered to be empty.
+		</p>
+
+		<h3>[method:Sphere makeEmpty]()</h3>
+		<p>Makes the sphere empty by setting [page:.center center] to (0, 0, 0) and [page:.radius radius] to -1.</p>
 
 		<h3>[method:Boolean equals]( [param:Sphere sphere] )</h3>
 		<p>
@@ -114,7 +120,8 @@
 			[page:Vector3 center] - center of the sphere.<br />
 			[page:Float radius] - radius of the sphere.<br /><br />
 
-		Sets the [page:.center center] and [page:.radius radius] properties of this sphere.
+		Sets the [page:.center center] and [page:.radius radius] properties of this sphere.<br>
+		Please note that this method only copies the values from the given center.
 		</p>
 
 		<h3>[method:Sphere setFromPoints]( [param:Array points], [param:Vector3 optionalCenter] )</h3>

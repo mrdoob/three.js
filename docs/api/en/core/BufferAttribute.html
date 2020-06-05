@@ -58,13 +58,6 @@
 		then this will count the number of such vectors stored.
 		</p>
 
-		<h3>[property:Boolean isBufferAttribute]</h3>
-		<p>
-			Used to check whether this or derived classes are BufferAttributes. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:Integer itemSize]</h3>
 		<p>The length of vectors that are being stored in the [page:BufferAttribute.array array].</p>
 
@@ -112,6 +105,18 @@
 		<p>A version number, incremented every time the [page:BufferAttribute.needsUpdate needsUpdate] property is set to true.</p>
 
 		<h2>Methods</h2>
+
+		<h3>[method:this applyMatrix3]( [param:Matrix3 m] )</h3>
+		<p>Applies matrix [page:Matrix3 m] to every Vector3 element of this BufferAttribute.</p>
+
+		<h3>[method:this applyMatrix4]( [param:Matrix4 m] )</h3>
+		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this BufferAttribute.</p>
+
+		<h3>[method:this applyNormalMatrix]( [param:Matrix3 m] )</h3>
+		<p>Applies normal matrix [page:Matrix3 m] to every Vector3 element of this BufferAttribute.</p>
+
+		<h3>[method:this transformDirection]( [param:Matrix4 m] )</h3>
+		<p>Applies matrix [page:Matrix4 m] to every Vector3 element of this BufferAttribute, interpreting the elements as a direction vectors.</p>
 
 		<h3>[method:BufferAttribute clone]() </h3>
 		<p>Return a copy of this bufferAttribute.</p>

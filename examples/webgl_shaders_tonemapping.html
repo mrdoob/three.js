@@ -18,7 +18,7 @@
 	<body>
 		<div id="d">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl demo :
+				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl demo :
 				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a> :
 
 			</div>
@@ -193,12 +193,14 @@
 				textureLoader.load( 'textures/planets/earth_atmos_4096.jpg', function ( tex ) {
 
 					earthMat.map = tex;
+					earthMat.map.encoding = THREE.sRGBEncoding;
 					earthMat.needsUpdate = true;
 
 	} );
 				textureLoader.load( 'textures/planets/earth_specular_2048.jpg', function ( tex ) {
 
 					earthMat.specularMap = tex;
+					earthMat.specularMap.encoding = THREE.sRGBEncoding;
 					earthMat.needsUpdate = true;
 
 	} );
@@ -209,6 +211,7 @@
 				// } );
 
 				var earthLights = textureLoader.load( 'textures/planets/earth_lights_2048.png' );
+				earthLights.encoding = THREE.sRGBEncoding;
 
 				var earthLightsMat = new THREE.MeshBasicMaterial( {
 					color: 0xffffff,
@@ -220,6 +223,7 @@
 				} );
 
 				var clouds = textureLoader.load( 'textures/planets/earth_clouds_2048.png' );
+				clouds.encoding = THREE.sRGBEncoding;
 
 				var earthCloudsMat = new THREE.MeshLambertMaterial( {
 					color: 0xffffff,
@@ -311,7 +315,7 @@
 							 r + "dark-s_pz.jpg", r + "dark-s_nz.jpg" ];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.format = THREE.RGBFormat;
+				textureCube.encoding = THREE.sRGBEncoding;
 
 				sceneCube.background = textureCube;
 
@@ -319,9 +323,6 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = false;
 
 				container.appendChild( renderer.domElement );
 

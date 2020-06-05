@@ -25,9 +25,10 @@ Object.assign( AudioAnalyser.prototype, {
 
 	getAverageFrequency: function () {
 
-		var value = 0, data = this.getFrequencyData();
+		let value = 0;
+		const data = this.getFrequencyData();
 
-		for ( var i = 0; i < data.length; i ++ ) {
+		for ( let i = 0; i < data.length; i ++ ) {
 
 			value += data[ i ];
 

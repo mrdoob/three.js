@@ -18,7 +18,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - MD2 Loader -
 			Ogro by <a href="http://planetquake.gamespy.com/View.php?view=Quake2.Detail&id=556">Magarnigal</a><br />
 			use arrows to control characters, mouse for camera
 		</div>
@@ -111,6 +111,7 @@
 				ground.material.map.repeat.set( 64, 64 );
 				ground.material.map.wrapS = THREE.RepeatWrapping;
 				ground.material.map.wrapT = THREE.RepeatWrapping;
+				ground.material.map.encoding = THREE.sRGBEncoding;
 				// note that because the ground does not cast a shadow, .castShadow is left false
 				ground.receiveShadow = true;
 
@@ -125,9 +126,7 @@
 
 				//
 
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
-
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
 				renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 

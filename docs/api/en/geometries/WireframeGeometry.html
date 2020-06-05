@@ -14,40 +14,26 @@
 
 		<p class="desc">This can be used as a helper object to view a [page:Geometry Geometry] object as a wireframe.</p>
 
-		<!-- <iframe id="scene" src="scenes/geometry-browser.html#EdgeGeometry"></iframe>
-
-		<script>
-
-		// iOS iframe auto-resize workaround
-
-		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
-
-			var scene = document.getElementById( 'scene' );
-
-			scene.style.width = getComputedStyle( scene ).width;
-			scene.style.height = getComputedStyle( scene ).height;
-			scene.setAttribute( 'scrolling', 'no' );
-
-		}
-
-		</script> -->
-
-		<h2>Example</h2>
-
-		[example:webgl_helpers helpers]
+		<h2>Code Example</h2>
 
 		<code>
-var geometry = new THREE.SphereBufferGeometry( 100, 100, 100 );
+		var geometry = new THREE.SphereBufferGeometry( 100, 100, 100 );
 
-var wireframe = new THREE.WireframeGeometry( geometry );
+		var wireframe = new THREE.WireframeGeometry( geometry );
 
-var line = new THREE.LineSegments( wireframe );
-line.material.depthTest = false;
-line.material.opacity = 0.25;
-line.material.transparent = true;
+		var line = new THREE.LineSegments( wireframe );
+		line.material.depthTest = false;
+		line.material.opacity = 0.25;
+		line.material.transparent = true;
 
-scene.add( line );
+		scene.add( line );
 		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_helpers helpers]
+		</p>
 
 		<h2>Constructor</h2>
 

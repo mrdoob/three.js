@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -14,7 +14,7 @@
 			一个表示3X3矩阵[link:https://en.wikipedia.org/wiki/Matrix_(mathematics) matrix].的类。
 		</p>
 
-		<h2>示例（Example）</h2>
+		<h2>代码示例</h2>
 		<code>
 var m = new Matrix3();
 		</code>
@@ -58,24 +58,9 @@ m.elements = [ 11, 21, 31,
 			矩阵列优先[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order column-major]列表。
 		</p>
 
-		<h3>[property:Boolean isMatrix3]</h3>
-		<p>
-				用于判定此对象或者此类的派生对象是否是三维矩阵。默认值为 *true*。<br /><br />
-
-				不应该改变该值，因为它在内部用于优化。
-		</p>
-
 
 
 		<h2>方法（Methods）</h2>
-
-		<h3>[method:Array applyToBufferAttribute]( [param:BufferAttribute attribute] )</h3>
-		<p>
-		[page:BufferAttribute attribute] - 表示三维向量缓存属性。<br /><br />
-
-		用这个矩阵乘以缓存属性[page:BufferAttribute attribute]里的所有3d向量。
-		</p>
-
 
 		<h3>[method:Matrix3 clone]()</h3>
 		<p>创建一个新的矩阵，元素 [page:.elements elements] 与该矩阵相同。</p>
@@ -91,6 +76,23 @@ m.elements = [ 11, 21, 31,
 		<h3>[method:Boolean equals]( [param:Matrix3 m] )</h3>
 		<p>如果矩阵[page:Matrix3 m] 与当前矩阵所有对应元素相同则返回true。</p>
 
+		<h3>[method:this extractBasis]( [param:Vector3 xAxis], [param:Vector3 yAxis], [param:Vector3 zAxis] )</h3>
+		<p>
+		Extracts the [link:https://en.wikipedia.org/wiki/Basis_(linear_algebra) basis] of this
+		matrix into the three axis vectors provided. If this matrix is:
+		<code>
+a, b, c,
+d, e, f,
+g, h, i
+		</code>
+		then the [page:Vector3 xAxis], [page:Vector3 yAxis], [page:Vector3 zAxis] will be set to:
+		<code>
+xAxis = (a, d, g)
+yAxis = (b, e, h)
+zAxis = (c, f, i)
+		</code>
+		</p>
+
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
 		[page:Array array] - 用来存储设置元素数据的数组<br />
@@ -99,14 +101,14 @@ m.elements = [ 11, 21, 31,
 		使用基于列优先格式[link:https://en.wikipedia.org/wiki/Row-_and_column-major_order#Column-major_order column-major]的数组来设置该矩阵。
 		</p>
 
-		<h3>[method:this getInverse]( [param:Matrix3 m], [param:Boolean throwOnDegenerate] )</h3>
+		<h3>[method:this getInverse]( [param:Matrix3 m] )</h3>
 		<p>
-		[page:Matrix3 m] - 取逆的矩阵。<br />
-		[page:Boolean throwOnDegenerate] - (optional) 如果设置为true，如果矩阵是退化的（如果不可逆的话），则会抛出一个错误。<br /><br />
+		[page:Matrix3 m] - 取逆的矩阵。<br /><br />
 
-		使用逆矩阵计算方法[link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method]，
-		将当前矩阵设置为给定矩阵的逆矩阵[link:https://en.wikipedia.org/wiki/Invertible_matrix inverse]，如果[page:Boolean throwOnDegenerate]
-		参数没有设置且给定矩阵不可逆，那么将当前矩阵设置为3X3单位矩阵。
+		Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix3 m],
+		using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
+
+		You can not invert a matrix with a determinant of zero. If you attempt this, the method returns a zero matrix instead.
 		</p>
 
 		<h3>[method:this getNormalMatrix]( [param:Matrix4 m] )</h3>

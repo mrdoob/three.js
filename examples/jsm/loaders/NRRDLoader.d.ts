@@ -1,7 +1,5 @@
 import {
-	Material,
-	LoadingManager,
-	Group
+	LoadingManager
 } from '../../../src/Three';
 
 import {

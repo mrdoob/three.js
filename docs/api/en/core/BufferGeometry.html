@@ -22,7 +22,7 @@
 		For a less efficient but easier-to-use representation of geometry, see [page:Geometry].
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 		<code>
 		var geometry = new THREE.BufferGeometry();
 		// create a simple square shape. We duplicate the top left and bottom right
@@ -42,6 +42,8 @@
 		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
 		var mesh = new THREE.Mesh( geometry, material );
 		</code>
+
+		<h2>Examples</h2>
 		<p>
 			[example:webgl_buffergeometry Mesh with non-indexed faces]<br />
 			[example:webgl_buffergeometry_indexed Mesh with indexed faces]<br />
@@ -132,13 +134,6 @@
 			Default is *null*.
 		</p>
 
-		<h3>[property:Boolean isBufferGeometry]</h3>
-		<p>
-			Used to check whether this or derived classes are BufferGeometries. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
-
 		<h3>[property:Object morphAttributes]</h3>
 		<p>
 			Hashmap of [page:BufferAttribute]s holding details of the geometry's [page:Geometry.morphTargets morphTargets].
@@ -186,7 +181,7 @@
 		</p>
 
 
-		<h3>[method:null applyMatrix]( [param:Matrix4 matrix] )</h3>
+		<h3>[method:null applyMatrix4]( [param:Matrix4 matrix] )</h3>
 		<p>Bakes matrix transform directly into vertex coordinates.</p>
 
 		<h3>[method:BufferGeometry center] ()</h3>

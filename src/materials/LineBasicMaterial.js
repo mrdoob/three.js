@@ -27,6 +27,8 @@ function LineBasicMaterial( parameters ) {
 	this.linecap = 'round';
 	this.linejoin = 'round';
 
+	this.morphTargets = false;
+
 	this.setValues( parameters );
 
 }
@@ -45,6 +47,8 @@ LineBasicMaterial.prototype.copy = function ( source ) {
 	this.linewidth = source.linewidth;
 	this.linecap = source.linecap;
 	this.linejoin = source.linejoin;
+
+	this.morphTargets = source.morphTargets;
 
 	return this;
 

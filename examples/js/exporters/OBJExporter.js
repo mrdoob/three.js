@@ -1,3 +1,4 @@
+console.warn( "THREE.OBJExporter: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -66,7 +67,7 @@ THREE.OBJExporter.prototype = {
 						vertex.y = vertices.getY( i );
 						vertex.z = vertices.getZ( i );
 
-						// transfrom the vertex to world space
+						// transform the vertex to world space
 						vertex.applyMatrix4( mesh.matrixWorld );
 
 						// transform the vertex to export format
@@ -104,8 +105,8 @@ THREE.OBJExporter.prototype = {
 						normal.y = normals.getY( i );
 						normal.z = normals.getZ( i );
 
-						// transfrom the normal to world space
-						normal.applyMatrix3( normalMatrixWorld );
+						// transform the normal to world space
+						normal.applyMatrix3( normalMatrixWorld ).normalize();
 
 						// transform the normal to export format
 						output += 'vn ' + normal.x + ' ' + normal.y + ' ' + normal.z + '\n';
@@ -194,7 +195,7 @@ THREE.OBJExporter.prototype = {
 						vertex.y = vertices.getY( i );
 						vertex.z = vertices.getZ( i );
 
-						// transfrom the vertex to world space
+						// transform the vertex to world space
 						vertex.applyMatrix4( line.matrixWorld );
 
 						// transform the vertex to export format

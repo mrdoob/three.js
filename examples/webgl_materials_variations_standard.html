@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Standard Material Variations by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.<br/><br/>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Standard Material Variations by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.<br/><br/>
 		Note: Every second sphere has an IBL environment map on it.</div>
 
 		<script type="module">
@@ -19,9 +19,7 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { HDRCubeTextureLoader } from './jsm/loaders/HDRCubeTextureLoader.js';
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
-			import { PMREMCubeUVPacker } from './jsm/pmrem/PMREMCubeUVPacker.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var container, stats;
 
@@ -41,23 +39,11 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2500 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
-
-				//
-				var genCubeUrls = function ( prefix, postfix ) {
-
-					return [
-						prefix + 'px' + postfix, prefix + 'nx' + postfix,
-						prefix + 'py' + postfix, prefix + 'ny' + postfix,
-						prefix + 'pz' + postfix, prefix + 'nz' + postfix
-					];
-
-				};
 
 				scene = new THREE.Scene();
 
-				var hdrUrls = genCubeUrls( './textures/cube/pisaHDR/', '.hdr' );
 				var hdrCubeRenderTarget = null;
 
 				// Materials
@@ -67,17 +53,14 @@
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
 
-				new HDRCubeTextureLoader()
+				new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
-					.load( hdrUrls, function ( hdrCubeMap ) {
+					.setPath( 'textures/equirectangular/' )
+					.load( 'pedestrian_overpass_1k.hdr', function ( hdrEquirect ) {
 
-						var pmremGenerator = new PMREMGenerator( hdrCubeMap );
-						pmremGenerator.update( renderer );
-
-						var pmremCubeUVPacker = new PMREMCubeUVPacker( pmremGenerator.cubeLods );
-						pmremCubeUVPacker.update( renderer );
-
-						hdrCubeRenderTarget = pmremCubeUVPacker.CubeUVRenderTarget;
+						hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+						hdrEquirect.dispose();
+						pmremGenerator.dispose();
 
 						var bumpScale = 1;
 						var cubeWidth = 400;
@@ -126,12 +109,7 @@
 
 						}
 
-						hdrCubeMap.magFilter = THREE.LinearFilter;
-						hdrCubeMap.needsUpdate = true;
-						scene.background = hdrCubeMap;
-
-						pmremGenerator.dispose();
-						pmremCubeUVPacker.dispose();
+						scene.background = hdrCubeRenderTarget.texture;
 
 					} );
 
@@ -184,9 +162,14 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.Uncharted2ToneMapping;
 				renderer.toneMappingExposure = 0.75;
+
+				//
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 				//
 
@@ -194,6 +177,8 @@
 				container.appendChild( stats.dom );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 200;
+				controls.maxDistance = 2000;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

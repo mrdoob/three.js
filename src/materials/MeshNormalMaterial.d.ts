@@ -5,12 +5,12 @@ import { NormalMapTypes } from '../constants';
 
 export interface MeshNormalMaterialParameters extends MaterialParameters {
 
-	bumpMap?: Texture | null;
+	bumpMap?: Texture | null;
 	bumpScale?: number;
-	normalMap?: Texture | null;
+	normalMap?: Texture | null;
 	normalMapType?: NormalMapTypes;
 	normalScale?: Vector2;
-	displacementMap?: Texture | null;
+	displacementMap?: Texture | null;
 	displacementScale?: number;
 	displacementBias?: number;
 	wireframe?: boolean;

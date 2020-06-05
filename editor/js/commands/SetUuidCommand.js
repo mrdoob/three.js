@@ -3,13 +3,14 @@
  * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
  */
 
+import { Command } from '../Command.js';
+
 /**
  * @param editor Editor
  * @param object THREE.Object3D
  * @param newUuid string
  * @constructor
  */
-
 var SetUuidCommand = function ( editor, object, newUuid ) {
 
 	Command.call( this, editor );
@@ -70,3 +71,5 @@ SetUuidCommand.prototype = {
 	}
 
 };
+
+export { SetUuidCommand };

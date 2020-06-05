@@ -11,7 +11,7 @@ import {
 	Color,
 	DataTexture,
 	LinearFilter,
-	Math as _Math,
+	MathUtils,
 	Mesh,
 	NearestFilter,
 	NoToneMapping,
@@ -107,6 +107,7 @@ var Fire = function ( geometry, options ) {
 						this.sourceData[ stride ] = Math.min( Math.max( density, 0.0 ), 1.0 ) * 255;
 
 					}
+
 					if ( windX != null ) {
 
 						var wind = Math.min( Math.max( windX, - 1.0 ), 1.0 );
@@ -114,6 +115,7 @@ var Fire = function ( geometry, options ) {
 						this.sourceData[ stride + 1 ] = wind;
 
 					}
+
 					if ( windY != null ) {
 
 						var wind = Math.min( Math.max( windY, - 1.0 ), 1.0 );
@@ -163,8 +165,8 @@ var Fire = function ( geometry, options ) {
 
 	this.field0.background = new Color( 0x000000 );
 
-	if ( ! _Math.isPowerOfTwo( textureWidth ) ||
-		 ! _Math.isPowerOfTwo( textureHeight ) ) {
+	if ( ! MathUtils.isPowerOfTwo( textureWidth ) ||
+		 ! MathUtils.isPowerOfTwo( textureHeight ) ) {
 
 		this.field0.texture.generateMipmaps = false;
 		this.field1.texture.generateMipmaps = false;
@@ -291,6 +293,7 @@ var Fire = function ( geometry, options ) {
 		shader = Fire.ColorShader;
 
 	}
+
 	this.material = new ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
@@ -337,7 +340,7 @@ var Fire = function ( geometry, options ) {
 	this.saveRenderState = function ( renderer ) {
 
 		this.savedRenderTarget = renderer.getRenderTarget();
-		this.savedVrEnabled = renderer.vr.enabled;
+		this.savedXrEnabled = renderer.xr.enabled;
 		this.savedShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 		this.savedAntialias = renderer.antialias;
 		this.savedToneMapping = renderer.toneMapping;
@@ -346,7 +349,7 @@ var Fire = function ( geometry, options ) {
 
 	this.restoreRenderState = function ( renderer ) {
 
-		renderer.vr.enabled = this.savedVrEnabled;
+		renderer.xr.enabled = this.savedXrEnabled;
 		renderer.shadowMap.autoUpdate = this.savedShadowAutoUpdate;
 		renderer.setRenderTarget( this.savedRenderTarget );
 		renderer.antialias = this.savedAntialias;
@@ -452,18 +455,20 @@ var Fire = function ( geometry, options ) {
 	this.onBeforeRender = function ( renderer ) {
 
 		var delta = this.clock.getDelta();
+
 		if ( delta > 0.1 ) {
 
 			delta = 0.1;
 
 		}
+
 		var dt = delta * ( this.speed * 0.1 );
 
 		this.configShaders( dt );
 
 		this.saveRenderState( renderer );
 
-		renderer.vr.enabled = false; // Avoid camera modification and recursion
+		renderer.xr.enabled = false; // Avoid camera modification and recursion
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 		renderer.antialias = false;
 		renderer.toneMapping = NoToneMapping;
@@ -478,11 +483,13 @@ var Fire = function ( geometry, options ) {
 		this.renderSource( renderer );
 
 		this.clearDiffuse();
+
 		for ( var i = 0; i < 21; i ++ ) {
 
 			this.renderDiffuse( renderer );
 
 		}
+
 		this.configShaders( dt );
 		this.renderDiffuse( renderer );
 

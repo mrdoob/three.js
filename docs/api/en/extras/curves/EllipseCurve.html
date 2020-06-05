@@ -17,25 +17,25 @@
 			[page:Number xRadius] equal to the [page:Number yRadius] will result in a circle.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
-<code>
-var curve = new THREE.EllipseCurve(
-	0,  0,            // ax, aY
-	10, 10,           // xRadius, yRadius
-	0,  2 * Math.PI,  // aStartAngle, aEndAngle
-	false,            // aClockwise
-	0                 // aRotation
-);
+		<code>
+		var curve = new THREE.EllipseCurve(
+			0,  0,            // ax, aY
+			10, 10,           // xRadius, yRadius
+			0,  2 * Math.PI,  // aStartAngle, aEndAngle
+			false,            // aClockwise
+			0                 // aRotation
+		);
 
-var points = curve.getPoints( 50 );
-var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		var points = curve.getPoints( 50 );
+		var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-// Create the final object to add to the scene
-var ellipse = new THREE.Line( geometry, material );
-</code>
+		// Create the final object to add to the scene
+		var ellipse = new THREE.Line( geometry, material );
+		</code>
 
 		<h2>Constructor</h2>
 
@@ -54,13 +54,6 @@ var ellipse = new THREE.Line( geometry, material );
 
 		<h2>Properties</h2>
 		<p>See the base [page:Curve] class for common properties.</p>
-
-		<h3>[property:Boolean isEllipseCurve]</h3>
-		<p>
-			Used to check whether this or derived classes are EllipseCurves. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
-		</p>
 
 		<h3>[property:Float aX]</h3>
 		<p>The X center of the ellipse.</p>

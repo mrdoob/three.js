@@ -38,7 +38,7 @@ export default /* glsl */`
 
 	vec2 texture2DDistribution( sampler2D shadow, vec2 uv ) {
 
-		return decodeHalfRGBA( texture2D( shadow, uv ) );
+		return unpackRGBATo2Half( texture2D( shadow, uv ) );
 
 	}
 
@@ -60,28 +60,6 @@ export default /* glsl */`
 
 		}
 		return occlusion;
-
-	}
-
-	float texture2DShadowLerp( sampler2D depths, vec2 size, vec2 uv, float compare ) {
-
-		const vec2 offset = vec2( 0.0, 1.0 );
-
-		vec2 texelSize = vec2( 1.0 ) / size;
-		vec2 centroidUV = ( floor( uv * size - 0.5 ) + 0.5 ) * texelSize;
-
-		float lb = texture2DCompare( depths, centroidUV + texelSize * offset.xx, compare );
-		float lt = texture2DCompare( depths, centroidUV + texelSize * offset.xy, compare );
-		float rb = texture2DCompare( depths, centroidUV + texelSize * offset.yx, compare );
-		float rt = texture2DCompare( depths, centroidUV + texelSize * offset.yy, compare );
-
-		vec2 f = fract( uv * size + 0.5 );
-
-		float a = mix( lb, lt, f.y );
-		float b = mix( rb, rt, f.y );
-		float c = mix( a, b, f.x );
-
-		return c;
 
 	}
 
@@ -140,22 +118,37 @@ export default /* glsl */`
 		#elif defined( SHADOWMAP_TYPE_PCF_SOFT )
 
 			vec2 texelSize = vec2( 1.0 ) / shadowMapSize;
+			float dx = texelSize.x;
+			float dy = texelSize.y;
 
-			float dx0 = - texelSize.x * shadowRadius;
-			float dy0 = - texelSize.y * shadowRadius;
-			float dx1 = + texelSize.x * shadowRadius;
-			float dy1 = + texelSize.y * shadowRadius;
+			vec2 uv = shadowCoord.xy;
+			vec2 f = fract( uv * shadowMapSize + 0.5 );
+			uv -= f * texelSize;
 
 			shadow = (
-				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy0 ), shadowCoord.z ) +
-				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy0 ), shadowCoord.z ) +
-				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy0 ), shadowCoord.z ) +
-				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, 0.0 ), shadowCoord.z ) +
-				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy, shadowCoord.z ) +
-				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, 0.0 ), shadowCoord.z ) +
-				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx0, dy1 ), shadowCoord.z ) +
-				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( 0.0, dy1 ), shadowCoord.z ) +
-				texture2DShadowLerp( shadowMap, shadowMapSize, shadowCoord.xy + vec2( dx1, dy1 ), shadowCoord.z )
+				texture2DCompare( shadowMap, uv, shadowCoord.z ) +
+				texture2DCompare( shadowMap, uv + vec2( dx, 0.0 ), shadowCoord.z ) +
+				texture2DCompare( shadowMap, uv + vec2( 0.0, dy ), shadowCoord.z ) +
+				texture2DCompare( shadowMap, uv + texelSize, shadowCoord.z ) +
+				mix( texture2DCompare( shadowMap, uv + vec2( -dx, 0.0 ), shadowCoord.z ), 
+					 texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, 0.0 ), shadowCoord.z ),
+					 f.x ) +
+				mix( texture2DCompare( shadowMap, uv + vec2( -dx, dy ), shadowCoord.z ), 
+					 texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, dy ), shadowCoord.z ),
+					 f.x ) +
+				mix( texture2DCompare( shadowMap, uv + vec2( 0.0, -dy ), shadowCoord.z ), 
+					 texture2DCompare( shadowMap, uv + vec2( 0.0, 2.0 * dy ), shadowCoord.z ),
+					 f.y ) +
+				mix( texture2DCompare( shadowMap, uv + vec2( dx, -dy ), shadowCoord.z ), 
+					 texture2DCompare( shadowMap, uv + vec2( dx, 2.0 * dy ), shadowCoord.z ),
+					 f.y ) +
+				mix( mix( texture2DCompare( shadowMap, uv + vec2( -dx, -dy ), shadowCoord.z ), 
+						  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, -dy ), shadowCoord.z ),
+						  f.x ),
+					 mix( texture2DCompare( shadowMap, uv + vec2( -dx, 2.0 * dy ), shadowCoord.z ), 
+						  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, 2.0 * dy ), shadowCoord.z ),
+						  f.x ),
+					 f.y )
 			) * ( 1.0 / 9.0 );
 
 		#elif defined( SHADOWMAP_TYPE_VSM )
