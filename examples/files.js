@@ -194,6 +194,7 @@ var files = {
 		"webgl_nearestneighbour",
 		"webgl_panorama_cube",
 		"webgl_panorama_equirectangular",
+		"webgl_panorama_shaderMaterial",
 		"webgl_performance",
 		"webgl_performance_doublesided",
 		"webgl_performance_static",
