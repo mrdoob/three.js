@@ -1,3 +1,4 @@
+console.warn( "THREE.FBXLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Kyle-Larson https://github.com/Kyle-Larson
  * @author Takahiro https://github.com/takahirox
@@ -51,15 +52,19 @@ THREE.FBXLoader = ( function () {
 
 					onLoad( scope.parse( buffer, path ) );
 
-				} catch ( error ) {
+				} catch ( e ) {
 
-					setTimeout( function () {
+					if ( onError ) {
 
-						if ( onError ) onError( error );
+						onError( e );
 
-						scope.manager.itemError( url );
+					} else {
 
-					}, 0 );
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
 
 				}
 
@@ -488,6 +493,7 @@ THREE.FBXLoader = ( function () {
 				parameters.bumpScale = materialNode.BumpFactor.value;
 
 			}
+
 			if ( materialNode.Diffuse ) {
 
 				parameters.color = new THREE.Color().fromArray( materialNode.Diffuse.value );
@@ -604,6 +610,7 @@ THREE.FBXLoader = ( function () {
 						break;
 
 					case 'TransparentColor':
+					case 'TransparencyFactor':
 						parameters.alphaMap = scope.getTexture( textureMap, child.ID );
 						parameters.transparent = true;
 						break;
@@ -2490,6 +2497,13 @@ THREE.FBXLoader = ( function () {
 
 										var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
 
+										if ( rawModel === undefined ) {
+
+											console.warn( 'THREE.FBXLoader: Encountered a unused curve.', child );
+											return;
+
+										}
+
 										var node = {
 
 											modelName: rawModel.attrName ? THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
@@ -2688,12 +2702,14 @@ THREE.FBXLoader = ( function () {
 				curves.x.values = curves.x.values.map( THREE.MathUtils.degToRad );
 
 			}
+
 			if ( curves.y !== undefined ) {
 
 				this.interpolateRotations( curves.y );
 				curves.y.values = curves.y.values.map( THREE.MathUtils.degToRad );
 
 			}
+
 			if ( curves.z !== undefined ) {
 
 				this.interpolateRotations( curves.z );
@@ -3866,12 +3882,14 @@ THREE.FBXLoader = ( function () {
 
 		var versionRegExp = /FBXVersion: (\d+)/;
 		var match = text.match( versionRegExp );
+
 		if ( match ) {
 
 			var version = parseInt( match[ 1 ] );
 			return version;
 
 		}
+
 		throw new Error( 'THREE.FBXLoader: Cannot find the version number for the file given.' );
 
 	}

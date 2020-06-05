@@ -1,4 +1,4 @@
-// r115.1
+// r117
 
 const assets = [
 	'./',
@@ -11,8 +11,8 @@ const assets = [
 
 	'../examples/jsm/libs/chevrotain.module.min.js',
 	'../examples/jsm/libs/inflate.module.min.js',
+	'../examples/jsm/libs/jszip.module.min.js',
 
-	'../examples/js/libs/jszip.min.js',
 	'../examples/js/libs/draco/draco_decoder.js',
 	'../examples/js/libs/draco/draco_decoder.wasm',
 	'../examples/js/libs/draco/draco_encoder.js',
@@ -46,6 +46,8 @@ const assets = [
 	'../examples/jsm/exporters/OBJExporter.js',
 	'../examples/jsm/exporters/PLYExporter.js',
 	'../examples/jsm/exporters/STLExporter.js',
+
+	'../examples/jsm/helpers/VertexNormalsHelper.js',
 
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
 

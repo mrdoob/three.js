@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Sidebar.Object';
+import { } from '../../../editor/js/Sidebar.Object';
 
 export default QUnit.module( 'Editor', () => {
 

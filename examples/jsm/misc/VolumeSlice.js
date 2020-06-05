@@ -179,6 +179,7 @@ VolumeSlice.prototype = {
 			}
 
 		}
+
 		ctx.putImageData( imgData, 0, 0 );
 		this.ctx.drawImage( canvas, 0, 0, iLength, jLength, 0, 0, this.canvas.width, this.canvas.height );
 

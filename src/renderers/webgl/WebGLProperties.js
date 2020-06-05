@@ -4,11 +4,11 @@
 
 function WebGLProperties() {
 
-	var properties = new WeakMap();
+	let properties = new WeakMap();
 
 	function get( object ) {
 
-		var map = properties.get( object );
+		let map = properties.get( object );
 
 		if ( map === undefined ) {
 

@@ -15,13 +15,13 @@ import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Object3D } from '../core/Object3D.js';
 
-var _vector = new Vector3();
-var _boneMatrix = new Matrix4();
-var _matrixWorldInv = new Matrix4();
+const _vector = new Vector3();
+const _boneMatrix = new Matrix4();
+const _matrixWorldInv = new Matrix4();
 
 function getBoneList( object ) {
 
-	var boneList = [];
+	const boneList = [];
 
 	if ( object && object.isBone ) {
 
@@ -29,7 +29,7 @@ function getBoneList( object ) {
 
 	}
 
-	for ( var i = 0; i < object.children.length; i ++ ) {
+	for ( let i = 0; i < object.children.length; i ++ ) {
 
 		boneList.push.apply( boneList, getBoneList( object.children[ i ] ) );
 
@@ -41,19 +41,19 @@ function getBoneList( object ) {
 
 function SkeletonHelper( object ) {
 
-	var bones = getBoneList( object );
+	const bones = getBoneList( object );
 
-	var geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 
-	var vertices = [];
-	var colors = [];
+	const vertices = [];
+	const colors = [];
 
-	var color1 = new Color( 0, 0, 1 );
-	var color2 = new Color( 0, 1, 0 );
+	const color1 = new Color( 0, 0, 1 );
+	const color2 = new Color( 0, 1, 0 );
 
-	for ( var i = 0; i < bones.length; i ++ ) {
+	for ( let i = 0; i < bones.length; i ++ ) {
 
-		var bone = bones[ i ];
+		const bone = bones[ i ];
 
 		if ( bone.parent && bone.parent.isBone ) {
 
@@ -69,7 +69,7 @@ function SkeletonHelper( object ) {
 	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
-	var material = new LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false, toneMapped: false, transparent: true } );
+	const material = new LineBasicMaterial( { vertexColors: true, depthTest: false, depthWrite: false, toneMapped: false, transparent: true } );
 
 	LineSegments.call( this, geometry, material );
 
@@ -90,16 +90,16 @@ SkeletonHelper.prototype.isSkeletonHelper = true;
 
 SkeletonHelper.prototype.updateMatrixWorld = function ( force ) {
 
-	var bones = this.bones;
+	const bones = this.bones;
 
-	var geometry = this.geometry;
-	var position = geometry.getAttribute( 'position' );
+	const geometry = this.geometry;
+	const position = geometry.getAttribute( 'position' );
 
 	_matrixWorldInv.getInverse( this.root.matrixWorld );
 
-	for ( var i = 0, j = 0; i < bones.length; i ++ ) {
+	for ( let i = 0, j = 0; i < bones.length; i ++ ) {
 
-		var bone = bones[ i ];
+		const bone = bones[ i ];
 
 		if ( bone.parent && bone.parent.isBone ) {
 

@@ -10,7 +10,7 @@ Object.assign( EventDispatcher.prototype, {
 
 		if ( this._listeners === undefined ) this._listeners = {};
 
-		var listeners = this._listeners;
+		const listeners = this._listeners;
 
 		if ( listeners[ type ] === undefined ) {
 
@@ -30,7 +30,7 @@ Object.assign( EventDispatcher.prototype, {
 
 		if ( this._listeners === undefined ) return false;
 
-		var listeners = this._listeners;
+		const listeners = this._listeners;
 
 		return listeners[ type ] !== undefined && listeners[ type ].indexOf( listener ) !== - 1;
 
@@ -40,12 +40,12 @@ Object.assign( EventDispatcher.prototype, {
 
 		if ( this._listeners === undefined ) return;
 
-		var listeners = this._listeners;
-		var listenerArray = listeners[ type ];
+		const listeners = this._listeners;
+		const listenerArray = listeners[ type ];
 
 		if ( listenerArray !== undefined ) {
 
-			var index = listenerArray.indexOf( listener );
+			const index = listenerArray.indexOf( listener );
 
 			if ( index !== - 1 ) {
 
@@ -61,17 +61,17 @@ Object.assign( EventDispatcher.prototype, {
 
 		if ( this._listeners === undefined ) return;
 
-		var listeners = this._listeners;
-		var listenerArray = listeners[ event.type ];
+		const listeners = this._listeners;
+		const listenerArray = listeners[ event.type ];
 
 		if ( listenerArray !== undefined ) {
 
 			event.target = this;
 
 			// Make a copy, in case listeners are removed while iterating.
-			var array = listenerArray.slice( 0 );
+			const array = listenerArray.slice( 0 );
 
-			for ( var i = 0, l = array.length; i < l; i ++ ) {
+			for ( let i = 0, l = array.length; i < l; i ++ ) {
 
 				array[ i ].call( this, event );
 

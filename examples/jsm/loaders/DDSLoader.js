@@ -105,6 +105,7 @@ DDSLoader.prototype = Object.assign( Object.create( CompressedTextureLoader.prot
 				}
 
 			}
+
 			return byteArray;
 
 		}

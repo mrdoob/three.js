@@ -63,32 +63,30 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// helper variables
 
-	var i, j;
+	const vertex = new Vector3();
+	const normal = new Vector3();
 
-	var vertex = new Vector3();
-	var normal = new Vector3();
+	const P1 = new Vector3();
+	const P2 = new Vector3();
 
-	var P1 = new Vector3();
-	var P2 = new Vector3();
-
-	var B = new Vector3();
-	var T = new Vector3();
-	var N = new Vector3();
+	const B = new Vector3();
+	const T = new Vector3();
+	const N = new Vector3();
 
 	// generate vertices, normals and uvs
 
-	for ( i = 0; i <= tubularSegments; ++ i ) {
+	for ( let i = 0; i <= tubularSegments; ++ i ) {
 
 		// the radian "u" is used to calculate the position on the torus curve of the current tubular segement
 
-		var u = i / tubularSegments * p * Math.PI * 2;
+		const u = i / tubularSegments * p * Math.PI * 2;
 
 		// now we calculate two points. P1 is our current position on the curve, P2 is a little farther ahead.
 		// these points are used to create a special "coordinate space", which is necessary to calculate the correct vertex positions
@@ -108,14 +106,14 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 		B.normalize();
 		N.normalize();
 
-		for ( j = 0; j <= radialSegments; ++ j ) {
+		for ( let j = 0; j <= radialSegments; ++ j ) {
 
 			// now calculate the vertices. they are nothing more than an extrusion of the torus curve.
 			// because we extrude a shape in the xy-plane, there is no need to calculate a z-value.
 
-			var v = j / radialSegments * Math.PI * 2;
-			var cx = - tube * Math.cos( v );
-			var cy = tube * Math.sin( v );
+			const v = j / radialSegments * Math.PI * 2;
+			const cx = - tube * Math.cos( v );
+			const cy = tube * Math.sin( v );
 
 			// now calculate the final vertex position.
 			// first we orient the extrusion with our basis vectos, then we add it to the current position on the curve
@@ -143,16 +141,16 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	// generate indices
 
-	for ( j = 1; j <= tubularSegments; j ++ ) {
+	for ( let j = 1; j <= tubularSegments; j ++ ) {
 
-		for ( i = 1; i <= radialSegments; i ++ ) {
+		for ( let i = 1; i <= radialSegments; i ++ ) {
 
 			// indices
 
-			var a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
-			var b = ( radialSegments + 1 ) * j + ( i - 1 );
-			var c = ( radialSegments + 1 ) * j + i;
-			var d = ( radialSegments + 1 ) * ( j - 1 ) + i;
+			const a = ( radialSegments + 1 ) * ( j - 1 ) + ( i - 1 );
+			const b = ( radialSegments + 1 ) * j + ( i - 1 );
+			const c = ( radialSegments + 1 ) * j + i;
+			const d = ( radialSegments + 1 ) * ( j - 1 ) + i;
 
 			// faces
 
@@ -174,10 +172,10 @@ function TorusKnotBufferGeometry( radius, tube, tubularSegments, radialSegments,
 
 	function calculatePositionOnCurve( u, p, q, radius, position ) {
 
-		var cu = Math.cos( u );
-		var su = Math.sin( u );
-		var quOverP = q / p * u;
-		var cs = Math.cos( quOverP );
+		const cu = Math.cos( u );
+		const su = Math.sin( u );
+		const quOverP = q / p * u;
+		const cs = Math.cos( quOverP );
 
 		position.x = radius * ( 2 + cs ) * 0.5 * cu;
 		position.y = radius * ( 2 + cs ) * su * 0.5;

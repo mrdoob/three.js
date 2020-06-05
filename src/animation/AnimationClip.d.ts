@@ -35,8 +35,7 @@ export class AnimationClip {
 	static parse( json: any ): AnimationClip;
 	static parseAnimation(
 		animation: any,
-		bones: Bone[],
-		nodeName: string
+		bones: Bone[]
 	): AnimationClip;
 	static toJSON(): any;
 

@@ -690,6 +690,7 @@ var TeapotBufferGeometry = function ( size, segments, bottom, lid, body, fitLid,
 						indices[ indexCount ++ ] = v3;
 
 					}
+
 					if ( notDegenerate( v1, v3, v4 ) ) {
 
 						indices[ indexCount ++ ] = v1;

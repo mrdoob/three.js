@@ -1,11 +1,11 @@
 # Three.js end-to-end testing
 
 ### Motivation
-Simplify code reviews with quick automated testing inside CI.
+Simplify code reviews with quick pixel testing inside CI. The same screenshots are used for thumbnails.
 
 ### Local usage
-If you get an error in e2e test after PR in repo and you sure that all is right, just make a new screenshot.
-Sometime you can get wrong results on different GPUs, especially on macbook's. Keep screenshots pack updated for tests.
+If you get an error in e2e test after PR and you sure that all is correct,
+just make a new screenshot to example. As a last resort increase timeouts or add it to exception list.
 
 ```shell
 # generate new screenshots for exact examples
@@ -16,10 +16,9 @@ npm run test-e2e <example1_name> ... <exampleN_name>
 
 # check all examples
 npm run test-e2e
-
-# check all examples in browser
-npx cross-env VISIBLE=ture npm run test-e2e
 ```
+
+Merge only those commits that pass the tests, otherwise all next commits will also fail.
 
 ### How it works
 - ci configs with parallelism
@@ -39,12 +38,4 @@ npx cross-env VISIBLE=ture npm run test-e2e
 | 4=0+0+2+2 failed, time=3:26             | with progressive attempts            |
 
 ### Status
-95% examples are covered with tests. Random robusness in CI >85%. Robustness on different machines ~97%.
-For example on integrated GPU you can have additional artifacts: webgl_materials_texture_anisotropy,
-webgl_postprocessing_procedural, webgl_shaders_tonemapping.
-
-### Wrong screenshots but ok for CI
-webgl_loader_bvh, webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc, webgl_physics_volume
-
-### Contribution
-You can help with MacOS support.
+97% examples are covered with tests. Check exception list for more information.

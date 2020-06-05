@@ -64,6 +64,7 @@ TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						console.error( 'THREE.TGALoader: Invalid type colormap data for indexed type.' );
 
 					}
+
 					break;
 
 					// check colormap type
@@ -77,6 +78,7 @@ TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						console.error( 'THREE.TGALoader: Invalid type colormap data for colormap type.' );
 
 					}
+
 					break;
 
 					// What the need of a file without data ?
@@ -172,11 +174,13 @@ TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						// raw pixels
 
 						count *= pixel_size;
+
 						for ( i = 0; i < count; ++ i ) {
 
 							pixel_data[ shift + i ] = data[ offset ++ ];
 
 						}
+
 						shift += count;
 
 					}

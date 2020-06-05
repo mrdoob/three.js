@@ -49,7 +49,6 @@
 				scene = new THREE.Scene();
 
 				renderer = new THREE.WebGLRenderer();
-				renderer.toneMapping = THREE.LinearToneMapping;
 
 				//
 
@@ -108,6 +107,7 @@
 
 				container.appendChild( renderer.domElement );
 
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();

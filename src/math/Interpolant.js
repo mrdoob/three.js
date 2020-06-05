@@ -36,7 +36,7 @@ Object.assign( Interpolant.prototype, {
 
 	evaluate: function ( t ) {
 
-		var pp = this.parameterPositions,
+		let pp = this.parameterPositions,
 			i1 = this._cachedIndex,
 
 			t1 = pp[ i1 ],
@@ -46,7 +46,7 @@ Object.assign( Interpolant.prototype, {
 
 			seek: {
 
-				var right;
+				let right;
 
 				linear_scan: {
 
@@ -56,7 +56,7 @@ Object.assign( Interpolant.prototype, {
 					//- 				if ( t >= t1 || t1 === undefined ) {
 					forward_scan: if ( ! ( t < t1 ) ) {
 
-						for ( var giveUpAt = i1 + 2; ; ) {
+						for ( let giveUpAt = i1 + 2; ; ) {
 
 							if ( t1 === undefined ) {
 
@@ -96,7 +96,7 @@ Object.assign( Interpolant.prototype, {
 
 						// looping?
 
-						var t1global = pp[ 1 ];
+						const t1global = pp[ 1 ];
 
 						if ( t < t1global ) {
 
@@ -107,7 +107,7 @@ Object.assign( Interpolant.prototype, {
 
 						// linear reverse scan
 
-						for ( var giveUpAt = i1 - 2; ; ) {
+						for ( let giveUpAt = i1 - 2; ; ) {
 
 							if ( t0 === undefined ) {
 
@@ -149,7 +149,7 @@ Object.assign( Interpolant.prototype, {
 
 				while ( i1 < right ) {
 
-					var mid = ( i1 + right ) >>> 1;
+					const mid = ( i1 + right ) >>> 1;
 
 					if ( t < pp[ mid ] ) {
 
@@ -212,12 +212,12 @@ Object.assign( Interpolant.prototype, {
 
 		// copies a sample value to the result buffer
 
-		var result = this.resultBuffer,
+		const result = this.resultBuffer,
 			values = this.sampleValues,
 			stride = this.valueSize,
 			offset = index * stride;
 
-		for ( var i = 0; i !== stride; ++ i ) {
+		for ( let i = 0; i !== stride; ++ i ) {
 
 			result[ i ] = values[ offset + i ];
 

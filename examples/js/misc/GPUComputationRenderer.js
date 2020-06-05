@@ -1,3 +1,4 @@
+console.warn( "THREE.GPUComputationRenderer: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author yomboprime https://github.com/yomboprime
  *
@@ -174,6 +175,7 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 			// Adds dependencies uniforms to the ShaderMaterial
 			var material = variable.material;
 			var uniforms = material.uniforms;
+
 			if ( variable.dependencies !== null ) {
 
 				for ( var d = 0; d < variable.dependencies.length; d ++ ) {
@@ -194,6 +196,7 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 							}
 
 						}
+
 						if ( ! found ) {
 
 							return "Variable dependency not found. Variable=" + variable.name + ", dependency=" + depVar.name;
@@ -267,6 +270,7 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 		materialShader.defines.resolution = 'vec2( ' + sizeX.toFixed( 1 ) + ', ' + sizeY.toFixed( 1 ) + " )";
 
 	}
+
 	this.addResolutionDefine = addResolutionDefine;
 
 

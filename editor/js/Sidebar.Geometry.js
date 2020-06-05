@@ -205,7 +205,7 @@ var SidebarGeometry = function ( editor ) {
 	var helpersRow = new UIRow().setMarginTop( '16px' ).setPaddingLeft( '90px' );
 	container.add( helpersRow );
 
-	var vertexNormalsButton = new UIButton( 'Show Vertex Normals' );
+	var vertexNormalsButton = new UIButton( strings.getKey( 'sidebar/geometry/show_vertex_normals' ) );
 	vertexNormalsButton.onClick( function () {
 
 		var object = editor.selected;

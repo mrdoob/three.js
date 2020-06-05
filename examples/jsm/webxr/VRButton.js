@@ -7,9 +7,9 @@ var VRButton = {
 
 	createButton: function ( renderer, options ) {
 
-		if ( options && options.referenceSpaceType ) {
+		if ( options ) {
 
-			renderer.xr.setReferenceSpaceType( options.referenceSpaceType );
+			console.error( 'THREE.VRButton: The "options" parameter has been removed. Please set the reference space type via renderer.xr.setReferenceSpaceType() instead.' );
 
 		}
 

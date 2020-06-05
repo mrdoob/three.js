@@ -31,11 +31,11 @@ TetrahedronGeometry.prototype.constructor = TetrahedronGeometry;
 
 function TetrahedronBufferGeometry( radius, detail ) {
 
-	var vertices = [
+	const vertices = [
 		1, 1, 1, 	- 1, - 1, 1, 	- 1, 1, - 1, 	1, - 1, - 1
 	];
 
-	var indices = [
+	const indices = [
 		2, 1, 0, 	0, 3, 2,	1, 3, 0,	2, 3, 1
 	];
 

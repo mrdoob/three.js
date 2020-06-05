@@ -113,7 +113,7 @@
 				labelRenderer = new CSS2DRenderer();
 				labelRenderer.setSize( window.innerWidth, window.innerHeight );
 				labelRenderer.domElement.style.position = 'absolute';
-				labelRenderer.domElement.style.top = '0';
+				labelRenderer.domElement.style.top = '0px';
 				labelRenderer.domElement.style.pointerEvents = 'none';
 				document.getElementById( 'container' ).appendChild( labelRenderer.domElement );
 
@@ -125,7 +125,7 @@
 
 				//
 
-				loadMolecule( 'models/molecules/caffeine.pdb' );
+				loadMolecule( 'models/pdb/caffeine.pdb' );
 				createMenu();
 
 				//
@@ -154,7 +154,7 @@
 					button.innerHTML = m;
 					menu.appendChild( button );
 
-					var url = 'models/molecules/' + MOLECULES[ m ];
+					var url = 'models/pdb/' + MOLECULES[ m ];
 
 					button.addEventListener( 'click', generateButtonCallback( url ), false );
 

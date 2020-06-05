@@ -43,10 +43,7 @@
 	</head>
 	<body>
 		<div id="overlay">
-			<div>
-				<button id="startButton">Click to Play</button>
-				<p>Audio playback requires user interaction.</p>
-			</div>
+			<button id="startButton">Play</button>
 		</div>
 		<div id="container"></div>
 		<div id="info">
@@ -91,12 +88,26 @@
 				var listener = new THREE.AudioListener();
 
 				var audio = new THREE.Audio( listener );
+				var file = './sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3';
 
-				var mediaElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
-				mediaElement.loop = true;
-				mediaElement.play();
+				if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-				audio.setMediaElementSource( mediaElement );
+					var loader = new THREE.AudioLoader();
+					loader.load( file, function ( buffer ) {
+
+						audio.setBuffer( buffer );
+						audio.play();
+
+					} );
+
+				} else {
+
+					var mediaElement = new Audio( file );
+					mediaElement.play();
+
+					audio.setMediaElementSource( mediaElement );
+
+				}
 
 				analyser = new THREE.AudioAnalyser( audio, fftSize );
 

@@ -46,6 +46,7 @@ var PeppersGhostEffect = function ( renderer ) {
 			_height = height / 3;
 
 		}
+
 		renderer.setSize( width, height );
 
 	};

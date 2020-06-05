@@ -8,10 +8,10 @@ import { Clock } from '../core/Clock.js';
 import { Object3D } from '../core/Object3D.js';
 import { AudioContext } from './AudioContext.js';
 
-var _position = new Vector3();
-var _quaternion = new Quaternion();
-var _scale = new Vector3();
-var _orientation = new Vector3();
+const _position = new Vector3();
+const _quaternion = new Quaternion();
+const _scale = new Vector3();
+const _orientation = new Vector3();
 
 function AudioListener() {
 
@@ -104,8 +104,8 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		Object3D.prototype.updateMatrixWorld.call( this, force );
 
-		var listener = this.context.listener;
-		var up = this.up;
+		const listener = this.context.listener;
+		const up = this.up;
 
 		this.timeDelta = this._clock.getDelta();
 
@@ -117,7 +117,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			// code path for Chrome (see #14393)
 
-			var endTime = this.context.currentTime + this.timeDelta;
+			const endTime = this.context.currentTime + this.timeDelta;
 
 			listener.positionX.linearRampToValueAtTime( _position.x, endTime );
 			listener.positionY.linearRampToValueAtTime( _position.y, endTime );

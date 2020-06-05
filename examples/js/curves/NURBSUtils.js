@@ -1,3 +1,4 @@
+console.warn( "THREE.NURBSUtils: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author renej
  * NURBS utils
@@ -209,6 +210,7 @@ THREE.NURBSUtils = {
 				a[ i ] = zeroArr.slice( 0 );
 
 			}
+
 			a[ 0 ][ 0 ] = 1.0;
 
 			for ( var k = 1; k <= n; ++ k ) {
@@ -260,6 +262,7 @@ THREE.NURBSUtils = {
 				ders[ k ][ j ] *= r;
 
 			}
+
 			r *= p - k;
 
 		}
@@ -300,6 +303,7 @@ THREE.NURBSUtils = {
 			Pw[ i ] = point;
 
 		}
+
 		for ( var k = 0; k <= du; ++ k ) {
 
 			var point = Pw[ span - p ].clone().multiplyScalar( nders[ k ][ 0 ] );

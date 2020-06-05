@@ -43,11 +43,13 @@ const CodeSerializer = {
 			} else if ( typeof objectPart === 'function' ) {
 
 				funcTemp = overrideFunctions[ name ];
+
 				if ( funcTemp instanceof CodeSerializationInstruction && funcTemp.getName() === funcInstructions.getName() ) {
 
 					funcInstructions = funcTemp;
 
 				}
+
 				if ( ! funcInstructions.isRemoveCode() ) {
 
 					if ( isExtended ) {
@@ -65,10 +67,12 @@ const CodeSerializer = {
 			}
 
 		}
+
 		for ( let name in targetPrototype ) {
 
 			objectPart = targetPrototype[ name ];
 			funcInstructions = new CodeSerializationInstruction( name, fullObjectName + '.' + name );
+
 			if ( typeof objectPart === 'function' ) {
 
 				funcTemp = overrideFunctions[ name ];
@@ -81,6 +85,7 @@ const CodeSerializer = {
 					funcInstructions.setCode( objectPart.toString() );
 
 				}
+
 				if ( ! funcInstructions.isRemoveCode() ) {
 
 					objectFunctions.push( funcInstructions.getFullName() + ' = ' + funcInstructions.getCode() + ';\n\n' );
@@ -103,6 +108,7 @@ const CodeSerializer = {
 					funcInstructions.setCode( objectPart );
 
 				}
+
 				if ( ! funcInstructions.isRemoveCode() ) {
 
 					objectProperties.push( funcInstructions.getFullName() + ' = ' + funcInstructions.getCode() + ';\n' );
@@ -112,12 +118,15 @@ const CodeSerializer = {
 			}
 
 		}
+
 		let objectString = constructorString + '\n\n';
+
 		if ( isExtended ) {
 
 			objectString += fullObjectName + '.prototype = Object.create( ' + basePrototypeName + '.prototype );\n';
 
 		}
+
 		objectString += fullObjectName + '.prototype.constructor = ' + fullObjectName + ';\n';
 		objectString += '\n\n';
 
@@ -126,6 +135,7 @@ const CodeSerializer = {
 			objectString += objectProperties[ i ];
 
 		}
+
 		objectString += '\n\n';
 
 		for ( i = 0; i < objectFunctions.length; i ++ ) {
@@ -133,6 +143,7 @@ const CodeSerializer = {
 			objectString += objectFunctions[ i ];
 
 		}
+
 		objectString += '\n\n';
 
 		if ( isExtended ) {
@@ -151,9 +162,11 @@ const CodeSerializer = {
 				objectString += prototypeFunctions[ i ];
 
 			}
+
 			objectString += '\n};';
 
 		}
+
 		objectString += '\n\n';
 
 		return objectString;

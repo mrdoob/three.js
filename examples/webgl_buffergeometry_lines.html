@@ -5,11 +5,6 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
-		<style>
-			a {
-				color: #08f;
-			}
-		</style>
 	</head>
 	<body>
 
@@ -21,11 +16,21 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-			var container, stats;
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			var container, stats, clock;
 
 			var camera, scene, renderer;
 
 			var line;
+
+			var segments = 10000;
+			var r = 800;
+			var t = 0;
+
+			var params = {
+				morphTargets: false
+			};
 
 			init();
 			animate();
@@ -41,15 +46,13 @@
 
 				scene = new THREE.Scene();
 
-				var segments = 10000;
+				clock = new THREE.Clock();
 
 				var geometry = new THREE.BufferGeometry();
-				var material = new THREE.LineBasicMaterial( { vertexColors: true } );
+				var material = new THREE.LineBasicMaterial( { vertexColors: true, morphTargets: true } );
 
 				var positions = [];
 				var colors = [];
-
-				var r = 800;
 
 				for ( var i = 0; i < segments; i ++ ) {
 
@@ -71,6 +74,7 @@
 
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				generateMorphTargets( geometry );
 
 				geometry.computeBoundingSphere();
 
@@ -90,6 +94,13 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
+
+				//
+
+				var gui = new GUI();
+				gui.add( params, 'morphTargets' );
+				gui.open();
+
 
 				//
 
@@ -119,12 +130,41 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var delta = clock.getDelta();
+				var time = clock.getElapsedTime();
 
 				line.rotation.x = time * 0.25;
 				line.rotation.y = time * 0.5;
 
+				if ( params.morphTargets ) {
+
+					t += delta * 0.5;
+					line.morphTargetInfluences[ 0 ] = Math.abs( Math.sin( t ) );
+
+				}
+
 				renderer.render( scene, camera );
+
+			}
+
+			function generateMorphTargets( geometry ) {
+
+				var data = [];
+
+				for ( var i = 0; i < segments; i ++ ) {
+
+					var x = Math.random() * r - r / 2;
+					var y = Math.random() * r - r / 2;
+					var z = Math.random() * r - r / 2;
+
+					data.push( x, y, z );
+
+				}
+
+				var morphTarget = new THREE.Float32BufferAttribute( data, 3 );
+				morphTarget.name = 'target1';
+
+				geometry.morphAttributes.position = [ morphTarget ];
 
 			}
 

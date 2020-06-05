@@ -1,3 +1,4 @@
+console.warn( "THREE.VRMLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Takahiro / https://github.com/takahirox
  */
@@ -33,7 +34,25 @@ THREE.VRMLoader = ( function () {
 
 			this.gltfLoader.load( url, function ( gltf ) {
 
-				scope.parse( gltf, onLoad );
+				try {
+
+					scope.parse( gltf, onLoad );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
 
 			}, onProgress, onError );
 
@@ -41,7 +60,7 @@ THREE.VRMLoader = ( function () {
 
 		setDRACOLoader: function ( dracoLoader ) {
 
-			this.glTFLoader.setDRACOLoader( dracoLoader );
+			this.gltfLoader.setDRACOLoader( dracoLoader );
 			return this;
 
 		},

@@ -69,8 +69,8 @@ var files = [
 	{ path: 'lines/Wireframe.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' }, { name: 'LineMaterial', path: 'lines/LineMaterial.js' } ], ignoreList: [] },
 	{ path: 'lines/WireframeGeometry2.js', dependencies: [ { name: 'LineSegmentsGeometry', path: 'lines/LineSegmentsGeometry.js' } ], ignoreList: [] },
 
-	{ path: 'loaders/3MFLoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/AMFLoader.js', dependencies: [], ignoreList: [] },
+	{ path: 'loaders/3MFLoader.js', dependencies: [ { name: 'JSZip', path: 'libs/jszip.module.min.js' } ], ignoreList: [] },
+	{ path: 'loaders/AMFLoader.js', dependencies: [ { name: 'JSZip', path: 'libs/jszip.module.min.js' } ], ignoreList: [] },
 	{ path: 'loaders/AssimpLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BasisTextureLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/BVHLoader.js', dependencies: [], ignoreList: [ 'Bones' ] },
@@ -82,9 +82,8 @@ var files = [
 	{ path: 'loaders/GCodeLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/GLTFLoader.js', dependencies: [], ignoreList: [ 'NoSide', 'Matrix2', 'Camera', 'Texture' ] },
 	{ path: 'loaders/HDRCubeTextureLoader.js', dependencies: [ { name: 'RGBELoader', path: 'loaders/RGBELoader.js' } ], ignoreList: [] },
-	{ path: 'loaders/KMZLoader.js', dependencies: [ { name: 'ColladaLoader', path: 'loaders/ColladaLoader.js' } ], ignoreList: [] },
+	{ path: 'loaders/KMZLoader.js', dependencies: [ { name: 'ColladaLoader', path: 'loaders/ColladaLoader.js' }, { name: 'JSZip', path: 'libs/jszip.module.min.js' } ], ignoreList: [] },
 	{ path: 'loaders/LDrawLoader.js', dependencies: [], ignoreList: [ 'Cache', 'Material', 'Object3D' ] },
-	{ path: 'loaders/LWOLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/KTXLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/MD2Loader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/MMDLoader.js', dependencies: [ { name: 'TGALoader', path: 'loaders/TGALoader.js' }, { name: 'MMDParser', path: 'libs/mmdparser.module.js' } ], ignoreList: [ 'Camera', 'LoadingManager' ] },
@@ -101,7 +100,7 @@ var files = [
 	{ path: 'loaders/SVGLoader.js', dependencies: [], ignoreList: [ 'Color' ] },
 	{ path: 'loaders/TDSLoader.js', dependencies: [], ignoreList: [] },
 	{ path: 'loaders/TGALoader.js', dependencies: [], ignoreList: [] },
-	{ path: 'loaders/TTFLoader.js', dependencies: [], ignoreList: [ 'Font' ] },
+	{ path: 'loaders/TTFLoader.js', dependencies: [ { name: 'opentype', path: 'libs/opentype.module.min.js' } ], ignoreList: [ 'Font' ] },
 	{ path: 'loaders/VRMLLoader.js', dependencies: [ { name: 'chevrotain', path: 'libs/chevrotain.module.min.js' } ], ignoreList: [] },
 	{ path: 'loaders/VRMLoader.js', dependencies: [ { name: 'GLTFLoader', path: 'loaders/GLTFLoader.js' } ], ignoreList: [] },
 	{ path: 'loaders/VTKLoader.js', dependencies: [ { name: 'Zlib', path: 'libs/inflate.module.min.js' } ], ignoreList: [] },
@@ -171,6 +170,7 @@ var files = [
 	{ path: 'renderers/Projector.js', dependencies: [], ignoreList: [] },
 	{ path: 'renderers/SVGRenderer.js', dependencies: [ { name: 'Projector', path: 'renderers/Projector.js' }, { name: 'RenderableFace', path: 'renderers/Projector.js' }, { name: 'RenderableLine', path: 'renderers/Projector.js' }, { name: 'RenderableSprite', path: 'renderers/Projector.js' } ], ignoreList: [] },
 
+	{ path: 'shaders/ACESFilmicToneMappingShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/AfterimageShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/BasicShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/BleachBypassShader.js', dependencies: [], ignoreList: [] },
@@ -214,7 +214,7 @@ var files = [
 	{ path: 'shaders/TechnicolorShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ToneMapShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/ToonShader.js', dependencies: [], ignoreList: [] },
-	{ path: 'shaders/TranslucentShader.js', dependencies: [], ignoreList: [] },
+	{ path: 'shaders/SubsurfaceScatteringShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/TriangleBlurShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/UnpackDepthRGBAShader.js', dependencies: [], ignoreList: [] },
 	{ path: 'shaders/VerticalBlurShader.js', dependencies: [], ignoreList: [] },
@@ -249,6 +249,10 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	var classNames = [];
 	var coreDependencies = {};
+
+	// remove examples/js deprecation warning
+
+	contents = contents.replace( /^console\.warn.*\n/, '' );
 
 	// imports
 

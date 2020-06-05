@@ -19,13 +19,13 @@ CubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 	load: function ( urls, onLoad, onProgress, onError ) {
 
-		var texture = new CubeTexture();
+		const texture = new CubeTexture();
 
-		var loader = new ImageLoader( this.manager );
+		const loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 
-		var loaded = 0;
+		let loaded = 0;
 
 		function loadTexture( i ) {
 
@@ -47,7 +47,7 @@ CubeTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		}
 
-		for ( var i = 0; i < urls.length; ++ i ) {
+		for ( let i = 0; i < urls.length; ++ i ) {
 
 			loadTexture( i );
 

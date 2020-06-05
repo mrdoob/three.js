@@ -43,7 +43,7 @@ Object.assign( Clock.prototype, {
 
 	getDelta: function () {
 
-		var diff = 0;
+		let diff = 0;
 
 		if ( this.autoStart && ! this.running ) {
 
@@ -54,7 +54,7 @@ Object.assign( Clock.prototype, {
 
 		if ( this.running ) {
 
-			var newTime = ( typeof performance === 'undefined' ? Date : performance ).now();
+			const newTime = ( typeof performance === 'undefined' ? Date : performance ).now();
 
 			diff = ( newTime - this.oldTime ) / 1000;
 			this.oldTime = newTime;

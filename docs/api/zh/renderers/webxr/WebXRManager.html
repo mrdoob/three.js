@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -53,6 +53,32 @@
 		Note: If you want to show something in the user's hand AND offer a pointing ray at the same time, you'll want to attached the handheld object to the
 		group returned by [page:.getControllerGrip]()  and the ray to the group returned by [page:.getController](). The idea is to have two different groups
 		in two different coordinate spaces for the same WebXR controller.
+		</p>
+
+		<h3>[method:void setFramebufferScaleFactor]( [param:Float framebufferScaleFactor] )</h3>
+		<p>
+		[page:Float framebufferScaleFactor] — The framebuffer scale factor to set.<br /><br />
+
+		Specifies the scaling factor to use when determining the size of the framebuffer when rendering to a XR device.
+		The value is relative to the default XR device display resolution. Default is *1*. A value of *0.5* would specify
+		a framebuffer with 50% of the display's native resolution.
+		</p>
+
+		<p>
+		Note: It is not possible to change the framebuffer scale factor while presenting XR content.
+		</p>
+
+		<h3>[method:void setReferenceSpaceType]( [param:String referenceSpaceType] )</h3>
+		<p>
+		[page:String referenceSpaceType] — The reference space type to set.<br /><br />
+
+		Can be used to configure a spatial relationship with the user's physical environment. Depending on how the user moves in 3D space, setting an
+		appropriate reference space can improve tracking. Default is *local-floor*.
+		Please check out the [link:https://developer.mozilla.org/en-US/docs/Web/API/XRReferenceSpaceType MDN] for possible values and their use cases.
+		</p>
+
+		<p>
+		Note: It is not possible to change the reference space type while presenting XR content.
 		</p>
 
 		<h2>Source</h2>
