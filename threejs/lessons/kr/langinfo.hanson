@@ -1,17 +1,15 @@
 {
   language: '한국어',
   langCode: 'ko',
-  defaultExampleCaption: "새 창에서 보기",
+  defaultExampleCaption: "새 탭에서 보기",
   title: 'Three.js 튜토리얼',
   description: 'Three.js 입문자를 위한 튜토리얼',
   link: 'http://threejsfundamentals.org/',
   commentSectionHeader: `
     <div>
-      <a href="http://stackoverflow.com/questions/tagged/three.js">스택오버플로우 바로가기</a>
-    </div>
-
-    <div>
-      <a href="http://github.com/greggman/threefundamentals/issues">깃허브에 이슈 남기기</a>
+      <a href="http://stackoverflow.com/questions/tagged/three.js">Stackoverflow</a>
+      /
+      <a href="http://github.com/greggman/threefundamentals/issues">Github</a>
     </div>
   `,
   missing: `
