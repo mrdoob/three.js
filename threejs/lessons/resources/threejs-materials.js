@@ -76,7 +76,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const material = new MatCtor({
           color,
           roughness: r / (numRough - 1),
-          metalness: m / (numMetal - 1),
+          metalness: 1 - m / (numMetal - 1),
         });
         const mesh = new THREE.Mesh(highPolySphereGeometry, material);
         row.push(mesh);

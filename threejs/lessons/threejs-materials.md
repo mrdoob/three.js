@@ -169,9 +169,8 @@ have hard reflections whereas something that's not rough, like a billiard ball,
 is very shiny. Roughness goes from 0 to 1.
 
 The other setting, [`metalness`](MeshStandardMaterial.metalness), says
-how metal the material is. Metals behave differently than non-metals. For
-some reason this setting is un-intuitive and goes from 1, not metal at all,
-to 0, most metal like.
+how metal the material is. Metals behave differently than non-metals. 0
+for non-metal and 1 for metal.
 
 Here's a quick sample of `MeshStandardMaterial` with `roughness` from 0 to 1
 across and `metalness` from 0 to 1 down.
