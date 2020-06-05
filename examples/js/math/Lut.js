@@ -3,197 +3,179 @@ console.warn( "THREE.Lut: As part of the transition to ES6 Modules, the files in
  * @author daron1337 / http://daron1337.github.io/
  */
 
-THREE.Lut = function ( colormapName, numberOfColors ) {
+( function () {
 
-	this.lut = [];
-	this.setColorMap( colormapName, numberOfColors );
-	return this;
+	var PREDEFINED_MAPS = {
 
-};
+		"rainbow": [[ 0.0, 0x0000FF ], [ 0.2, 0x00FFFF ], [ 0.5, 0x00FF00 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFF0000 ]],
+		"cooltowarm": [[ 0.0, 0x3C4EC2 ], [ 0.2, 0x9BBCFF ], [ 0.5, 0xDCDCDC ], [ 0.8, 0xF6A385 ], [ 1.0, 0xB40426 ]],
+		"blackbody": [[ 0.0, 0x000000 ], [ 0.2, 0x780000 ], [ 0.5, 0xE63200 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFFFFFF ]],
+		"grayscale": [[ 0.0, 0x000000 ], [ 0.2, 0x404040 ], [ 0.5, 0x7F7F80 ], [ 0.8, 0xBFBFBF ], [ 1.0, 0xFFFFFF ]]
 
-THREE.Lut.AddColorMap = function ( colormapName, arrayOfColorStops ) {
+	};
 
-	THREE.ColorMapKeywords[ colormapName ] = arrayOfColorStops;
+	THREE.Lut = function ( map, numberOfColors ) {
 
-};
-
-THREE.Lut.prototype = {
-
-	constructor: THREE.Lut,
-
-	lut: [], map: [], n: 32, minV: 0, maxV: 1,
-
-	set: function ( value ) {
-
-		if ( value instanceof THREE.Lut ) {
-
-			this.copy( value );
-
-		}
-
+		this.colors = [];
+		this.setColorMap( map, numberOfColors );
 		return this;
 
-	},
+	};
 
-	setMin: function ( min ) {
+	THREE.Lut.prototype = {
 
-		this.minV = min;
+		constructor: THREE.Lut,
 
-		return this;
+		colors: [], map: [], minV: 0, maxV: 1,
 
-	},
+		setMin: function ( min ) {
 
-	setMax: function ( max ) {
+			this.minV = min;
 
-		this.maxV = max;
+			return this;
 
-		return this;
+		},
 
-	},
+		setMax: function ( max ) {
 
-	setColorMap: function ( colormapName, numberOfColors ) {
+			this.maxV = max;
 
-		this.map = THREE.ColorMapKeywords[ colormapName ] || THREE.ColorMapKeywords.rainbow;
-		
-		if ( numberOfColors > 0 ) {
-			
-			this.n = Math.ceil( numberOfColors );
-		
-		}
+			return this;
 
-		var step = 1.0 / this.n;
+		},
 
-		this.lut.length = 0;
-		for ( var i = 0; i <= 1; i += step ) {
+		setColorMap: function ( map, numberOfColors ) {
 
-			for ( var j = 0; j < this.map.length - 1; j ++ ) {
+			if ( typeof map == 'string' ) {
 
-				if ( i >= this.map[ j ][ 0 ] && i < this.map[ j + 1 ][ 0 ] ) {
+				this.map = PREDEFINED_MAPS[ map ];
 
-					var min = this.map[ j ][ 0 ];
-					var max = this.map[ j + 1 ][ 0 ];
+			} else if ( Array.isArray( map ) ) {
 
-					var minColor = new THREE.Color( this.map[ j ][ 1 ] );
-					var maxColor = new THREE.Color( this.map[ j + 1 ][ 1 ] );
+				this.map = map;
 
-					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
+			} else {
 
-					this.lut.push( color );
+				this.map = PREDEFINED_MAPS.rainbow;
+
+			}
+
+			var step;
+
+			if ( numberOfColors >= 1 ) {
+
+				step = 1.0 / numberOfColors;
+
+			} else {
+
+				step = 1.0 / 32;
+
+			}
+
+			this.colors.length = 0;
+			for ( var i = 0; i <= 1; i += step ) {
+
+				for ( var j = 0; j < this.map.length - 1; j ++ ) {
+
+					if ( i >= this.map[ j ][ 0 ] && i < this.map[ j + 1 ][ 0 ] ) {
+
+						var min = this.map[ j ][ 0 ];
+						var max = this.map[ j + 1 ][ 0 ];
+
+						var minColor = new THREE.Color( this.map[ j ][ 1 ] );
+						var maxColor = new THREE.Color( this.map[ j + 1 ][ 1 ] );
+
+						var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
+
+						this.colors.push( color );
+
+					}
 
 				}
 
 			}
 
-		}
+			return this;
 
-		return this;
+		},
 
-	},
+		copy: function ( lut ) {
 
-	copy: function ( lut ) {
+			this.colors = lut.colors;
+			this.map = lut.map;
+			this.minV = lut.minV;
+			this.maxV = lut.maxV;
 
-		this.lut = lut.lut;
-		this.map = lut.map;
-		this.n = lut.n;
-		this.minV = lut.minV;
-		this.maxV = lut.maxV;
+			return this;
 
-		return this;
+		},
 
-	},
+		getColor: function ( alpha ) {
 
-	getColor: function ( alpha ) {
+			alpha = Math.min( this.maxV, Math.max( this.minV, alpha ) );
+			alpha = ( alpha - this.minV ) / ( this.maxV - this.minV );
 
-		if ( alpha <= this.minV ) {
+			var colorPosition = Math.round( alpha * ( this.colors.length - 1 ) );
+			return this.colors[ colorPosition ];
 
-			alpha = this.minV;
+		},
 
-		} else if ( alpha >= this.maxV ) {
+		createCanvas: function () {
 
-			alpha = this.maxV;
+			var canvas = document.createElement( 'canvas' );
+			canvas.width = 1;
+			canvas.height = this.colors.length;
 
-		}
+			this.updateCanvas( canvas );
 
-		alpha = ( alpha - this.minV ) / ( this.maxV - this.minV );
+			return canvas;
 
-		var colorPosition = Math.round( alpha * this.n );
-		colorPosition == this.n ? colorPosition -= 1 : colorPosition;
+		},
 
-		return this.lut[ colorPosition ];
+		updateCanvas: function ( canvas ) {
 
-	},
+			var ctx = canvas.getContext( '2d', { alpha: false } );
 
-	addColorMap: function ( colormapName, arrayOfColorStops ) {
+			var imageData = ctx.getImageData( 0, 0, 1, this.colors.length );
 
-		console.warn( 'Deprecated; Use static `Lut.AddColorMap()` instead.' );
+			var data = imageData.data;
 
-		THREE.ColorMapKeywords[ colormapName ] = arrayOfColorStops;
+			var k = 0;
 
-	},
+			var step = 1.0 / this.colors.length;
 
-	createCanvas: function () {
+			for ( var i = 1; i >= 0; i -= step ) {
 
-		var canvas = document.createElement( 'canvas' );
-		canvas.width = 1;
-		canvas.height = this.n;
+				for ( var j = this.map.length - 1; j >= 0; j -- ) {
 
-		this.updateCanvas( canvas );
+					if ( i < this.map[ j ][ 0 ] && i >= this.map[ j - 1 ][ 0 ] ) {
 
-		return canvas;
+						var min = this.map[ j - 1 ][ 0 ];
+						var max = this.map[ j ][ 0 ];
 
-	},
+						var minColor = new THREE.Color( this.map[ j - 1 ][ 1 ] );
+						var maxColor = new THREE.Color( this.map[ j ][ 1 ] );
 
-	updateCanvas: function ( canvas ) {
+						var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
-		var ctx = canvas.getContext( '2d', { alpha: false } );
+						data[ k ] = Math.round( color.r * 255 );
+						data[ k + 1 ] = Math.round( color.g * 255 );
+						data[ k + 2 ] = Math.round( color.b * 255 );
+						data[ k + 3 ] = 255;
 
-		var imageData = ctx.getImageData( 0, 0, 1, this.n );
+						k += 4;
 
-		var data = imageData.data;
-
-		var k = 0;
-
-		var step = 1.0 / this.n;
-
-		for ( var i = 1; i >= 0; i -= step ) {
-
-			for ( var j = this.map.length - 1; j >= 0; j -- ) {
-
-				if ( i < this.map[ j ][ 0 ] && i >= this.map[ j - 1 ][ 0 ] ) {
-
-					var min = this.map[ j - 1 ][ 0 ];
-					var max = this.map[ j ][ 0 ];
-
-					var minColor = new THREE.Color( this.map[ j - 1 ][ 1 ] );
-					var maxColor = new THREE.Color( this.map[ j ][ 1 ] );
-
-					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
-
-					data[ k * 4 ] = Math.round( color.r * 255 );
-					data[ k * 4 + 1 ] = Math.round( color.g * 255 );
-					data[ k * 4 + 2 ] = Math.round( color.b * 255 );
-					data[ k * 4 + 3 ] = 255;
-
-					k += 1;
+					}
 
 				}
 
 			}
 
+			ctx.putImageData( imageData, 0, 0 );
+
+			return canvas;
+
 		}
+	};
 
-		ctx.putImageData( imageData, 0, 0 );
-
-		return canvas;
-
-	}
-};
-
-THREE.ColorMapKeywords = {
-
-	"rainbow": [[ 0.0, 0x0000FF ], [ 0.2, 0x00FFFF ], [ 0.5, 0x00FF00 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFF0000 ]],
-	"cooltowarm": [[ 0.0, 0x3C4EC2 ], [ 0.2, 0x9BBCFF ], [ 0.5, 0xDCDCDC ], [ 0.8, 0xF6A385 ], [ 1.0, 0xB40426 ]],
-	"blackbody": [[ 0.0, 0x000000 ], [ 0.2, 0x780000 ], [ 0.5, 0xE63200 ], [ 0.8, 0xFFFF00 ], [ 1.0, 0xFFFFFF ]],
-	"grayscale": [[ 0.0, 0x000000 ], [ 0.2, 0x404040 ], [ 0.5, 0x7F7F80 ], [ 0.8, 0xBFBFBF ], [ 1.0, 0xFFFFFF ]]
-
-};
+}() );

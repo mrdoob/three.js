@@ -17,45 +17,49 @@
 		<h2>代码示例</h2>
 
 		<code>
-		// Lookup predefined colormap 'rainbow'
+		// predefined colormap 'rainbow' lookup
 		var lut = new Lut( 'rainbow', 512 );
 		var color = lut.getColor( 0.5 );
 
-		// Add colormap 'winter'
-		Lut.AddColorMap( 'winter', [
+		// custom colormap lookup
+		var lut = new Lut( [
 			[ 0.0, 0x1019f7 ],
 			[ 0.2, 0x0011e1 ],
 			[ 0.4, 0x115cca ],
 			[ 0.6, 0x33a5c5 ],
 			[ 0.8, 0x25cea5 ],
 			[ 1.0, 0x16f782 ]
-		] );
-
-		// Lookup colormap 'winter'
-		var lut = new Lut( 'winter', 512 );
+		], 512 );
 		var color = lut.getColor( 0.5 );
 		</code>
 
 		<h2>Constructor</h2>
 
-		<h3>[name]( [param:String colormapName], [param:Integer numberOfColors] )</h3>
+		<h3>[name]( [param:String map], [param:Integer numberOfColors] )</h3>
+		<h3>[name]( [param:Array map], [param:Integer numberOfColors] )</h3>
 		<p>
-			colormapName - The name of colormap. Optional, default is "rainbow".
+			map - The name of predefined colormap or Array of color stops. Optional; Default is "rainbow".
 			Other predefined colormaps: "cooltowarm", "blackbody" and "grayscale".<br/>
-			numberOfColors - Number of colors used to represent the data array. Optional, default is 32.
+			numberOfColors - Number of colors used to represent the data array. Optional; Default is 32.
 		</p>
 
 		<h2>Properties</h2>
 
-		<h3>[property:Array lut]</h3>
+		<h3>[property:Array colors]</h3>
 		<p>
-			Array of [page:Color]s.
+			The palette. Array of [page:Color]s
 		</p>
 
 		<h3>[property:Array map]</h3>
 		<p>
-			Array of color stops.
+			The colormap. Array of color stops. Used to construct the palette.
 		</p>
+		<code>
+		// Color stop examples 
+		[ 0.0, 0xff0000 ]
+		[ 0.0, 'red' ]
+		[ 0.0, new Color('red') ]
+		</code>
 
 		<h3>[property:Float minV]</h3>
 		<p>
@@ -67,16 +71,11 @@
 			The maximum value to be represented with the lookup table. Default is 1.
 		</p>
 
-		<h3>[property:Integer n]</h3>
-		<p>
-			Number of colors. Default is 32.
-		</p>
-
 		<h2>Methods</h2>
 
 		<h3>[method:HTMLCanvasElement createCanvas]()</h3>
 		<p>
-			Create a 1x[page:.n n] canvas; Draw colors onto it, from top to bottom.
+			Create a 1px wide canvas filled with [page:.colors].
 		</p>
 
 		<h3>[method:this copy]( [param:Lut lut] )</h3>
@@ -84,7 +83,7 @@
 			lut — Lut to copy.
 		</p>
 		<p>
-			Copies given lut.
+			Copy given lut into this. It is shallow copy, [page:.colors][] and [page:.map][] are shared.
 		</p>
 
 		<h3>[method:Color getColor]( [param:Float alpha] )</h3>
@@ -92,24 +91,20 @@
 			alpha — The data value to be displayed as a color. Clamped between [page:.minV] and [page:.maxV].
 		</p>
 		<p>
-			Pick a [page:Color] from [page:.lut lut][] based on data value, alpha.
+			Pick a [page:Color] from the palette based on data value, alpha.
 		</p>
 
-		<h3>[method:this set]( [param:Object object] )</h3>
+		<h3>[method:this setColorMap]( [param:String map], [param:Integer numberOfColors] )</h3>
+		<h3>[method:this setColorMap]( [param:Array map], [param:Integer numberOfColors] )</h3>
 		<p>
-			If object is a Lut, copy into this.
+			map - The name of predefined colormap or Array of color stops. Default is "rainbow".<br />
+			numberOfColors - Number of colors. Default is 32.
+		</p>
+		<p>
+			Construct a new palette.
 		</p>
 
-		<h3>[method:this setColorMap]( [param:String colormapName], [param:Integer numberOfColors] )</h3>
-		<p>
-			colormapName - The name of colormap.<br />
-			numberOfColors - Number of colors.
-		</p>
-		<p>
-			Set colormap for this lut.
-		</p>
-
-		<h3>[method:Lut setMin]( [param:Float minV] )</h3>
+		<h3>[method:this setMin]( [param:Float minV] )</h3>
 		<p>
 			minV — The minimum value to be represented with the lookup table.
 		</p>
@@ -117,7 +112,7 @@
 			Sets this Lut with the minimum value to be represented.
 		</p>
 
-		<h3>[method:Lut setMax]( [param:Float maxV] )</h3>
+		<h3>[method:this setMax]( [param:Float maxV] )</h3>
 		<p>
 			maxV — The maximum value to be represented with the lookup table.
 		</p>
@@ -130,18 +125,7 @@
 			canvas — Canvas to be updated 
 		</p>
 		<p>
-			Draw colors onto given canvas.
-		</p>
-
-		<h2>Statics</h2>
-
-		<h3>[method:null AddColorMap]( [param:String colormapName], [param:Array arrayOfColorStops] )</h3>
-		<p>
-			colormapName — The name of colormap.<br />
-			arrayOfColorStops — Array of [stop, color] pairs.
-		</p>
-		<p>
-			Insert a new colormap into the set of available colormaps.
+			Draw [page:.colors] onto given canvas.
 		</p>
 
 		<h2>Examples</h2>

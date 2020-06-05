@@ -6,17 +6,11 @@ import {
 	Color
 } from "../../../build/three.module.js";
 
-var Lut = function ( colormapName, numberofcolors ) {
+var Lut = function ( colormap, numberofcolors ) {
 
-	this.lut = [];
-	this.setColorMap( colormapName, numberofcolors );
+	this.colors = [];
+	this.setColorMap( colormap, numberofcolors );
 	return this;
-
-};
-
-Lut.AddColorMap = function ( colormapName, arrayOfColorStops ) {
-
-	ColorMapKeywords[ colormapName ] = arrayOfColorStops;
 
 };
 
@@ -24,19 +18,7 @@ Lut.prototype = {
 
 	constructor: Lut,
 
-	lut: [], map: [], n: 32, minV: 0, maxV: 1,
-
-	set: function ( value ) {
-
-		if ( value instanceof Lut ) {
-
-			this.copy( value );
-
-		}
-
-		return this;
-
-	},
+	colors: [], map: [], minV: 0, maxV: 1,
 
 	setMin: function ( min ) {
 
@@ -54,19 +36,35 @@ Lut.prototype = {
 
 	},
 
-	setColorMap: function ( colormapName, numberOfColors ) {
+	setColorMap: function ( map, numberOfColors ) {
 
-		this.map = ColorMapKeywords[ colormapName ] || ColorMapKeywords.rainbow;
+		if ( typeof map == 'string' ) {
 
-		if ( numberOfColors > 0 ) {
+			this.map = ColorMapKeywords[ map ];
 
-			this.n = Math.ceil( numberOfColors );
-			
+		} else if ( Array.isArray( map ) ) {
+
+			this.map = map;
+
+		} else {
+
+			this.map = ColorMapKeywords.rainbow;
+
 		}
 
-		var step = 1.0 / this.n;
+		var step;
 
-		this.lut.length = 0;
+		if ( numberOfColors >= 1 ) {
+
+			step = 1.0 / numberOfColors;
+
+		} else {
+
+			step = 1.0 / 32;
+
+		}
+
+		this.colors.length = 0;
 		for ( var i = 0; i <= 1; i += step ) {
 
 			for ( var j = 0; j < this.map.length - 1; j ++ ) {
@@ -81,7 +79,7 @@ Lut.prototype = {
 
 					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
-					this.lut.push( color );
+					this.colors.push( color );
 
 				}
 
@@ -95,9 +93,8 @@ Lut.prototype = {
 
 	copy: function ( lut ) {
 
-		this.lut = lut.lut;
+		this.colors = lut.colors;
 		this.map = lut.map;
-		this.n = lut.n;
 		this.minV = lut.minV;
 		this.maxV = lut.maxV;
 
@@ -107,22 +104,11 @@ Lut.prototype = {
 
 	getColor: function ( alpha ) {
 
-		if ( alpha <= this.minV ) {
-
-			alpha = this.minV;
-
-		} else if ( alpha >= this.maxV ) {
-
-			alpha = this.maxV;
-
-		}
-
+		alpha = Math.min( this.maxV, Math.max( this.minV, alpha ) );
 		alpha = ( alpha - this.minV ) / ( this.maxV - this.minV );
 
-		var colorPosition = Math.round( alpha * this.n );
-		colorPosition == this.n ? colorPosition -= 1 : colorPosition;
-
-		return this.lut[ colorPosition ];
+		var colorPosition = Math.round( alpha * ( this.colors.length - 1 ) );
+		return this.colors[ colorPosition ];
 
 	},
 
@@ -130,7 +116,7 @@ Lut.prototype = {
 
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = 1;
-		canvas.height = this.n;
+		canvas.height = this.colors.length;
 
 		this.updateCanvas( canvas );
 
@@ -142,13 +128,13 @@ Lut.prototype = {
 
 		var ctx = canvas.getContext( '2d', { alpha: false } );
 
-		var imageData = ctx.getImageData( 0, 0, 1, this.n );
+		var imageData = ctx.getImageData( 0, 0, 1, this.colors.length );
 
 		var data = imageData.data;
 
 		var k = 0;
 
-		var step = 1.0 / this.n;
+		var step = 1.0 / this.colors.length;
 
 		for ( var i = 1; i >= 0; i -= step ) {
 
@@ -164,12 +150,12 @@ Lut.prototype = {
 
 					var color = minColor.lerp( maxColor, ( i - min ) / ( max - min ) );
 
-					data[ k * 4 ] = Math.round( color.r * 255 );
-					data[ k * 4 + 1 ] = Math.round( color.g * 255 );
-					data[ k * 4 + 2 ] = Math.round( color.b * 255 );
-					data[ k * 4 + 3 ] = 255;
+					data[ k ] = Math.round( color.r * 255 );
+					data[ k + 1 ] = Math.round( color.g * 255 );
+					data[ k + 2 ] = Math.round( color.b * 255 );
+					data[ k + 3 ] = 255;
 
-					k += 1;
+					k += 4;
 
 				}
 
@@ -183,14 +169,6 @@ Lut.prototype = {
 
 	},
 
-	addColorMap: function ( colormapName, arrayOfColorStops ) {
-
-		console.warn( 'Deprecated; Use static `Lut.AddColorMap()` instead.' );
-		
-		ColorMapKeywords[ colormapName ] = arrayOfColorStops;
-	
-	}
-
 };
 
 var ColorMapKeywords = {
@@ -202,4 +180,4 @@ var ColorMapKeywords = {
 
 };
 
-export { Lut, ColorMapKeywords };
+export { Lut };
