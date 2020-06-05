@@ -344,9 +344,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 							enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
 
-							if ( geometry.instanceCount === undefined ) {
+							if ( geometry._maxInstanceCount === undefined ) {
 
-								geometry.instanceCount = data.meshPerAttribute * data.count;
+								geometry._maxInstanceCount = data.meshPerAttribute * data.count;
 
 							}
 
@@ -365,9 +365,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 							enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
 
-							if ( geometry.instanceCount === undefined ) {
+							if ( geometry._maxInstanceCount === undefined ) {
 
-								geometry.instanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
+								geometry._maxInstanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
 
 							}
 
