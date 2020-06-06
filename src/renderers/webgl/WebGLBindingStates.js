@@ -290,16 +290,25 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 	}
 
+	function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
+
+		if ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT ) ) {
+
+			gl.vertexAttribIPointer( index, size, type, normalized, stride, offset );
+
+		} else {
+
+			gl.vertexAttribPointer( index, size, type, normalized, stride, offset );
+
+		}
+
+	}
+
 	function setupVertexAttributes( object, material, program, geometry ) {
 
-		if ( geometry && geometry.isInstancedBufferGeometry & ! capabilities.isWebGL2 ) {
+		if ( capabilities.isWebGL2 === false && ( object.isInstancedMesh || geometry.isInstancedBufferGeometry ) ) {
 
-			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
-
-				console.error( 'THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.' );
-				return;
-
-			}
+			if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) return;
 
 		}
 
@@ -357,7 +366,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 						}
 
 						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						gl.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
+						vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
 
 					} else {
 
@@ -378,7 +387,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 						}
 
 						gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-						gl.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+						vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
 
 					}
 
