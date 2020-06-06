@@ -3,13 +3,13 @@
 The issues section is for bug reports and feature requests only. If you need help, please use the [forum](http://discourse.threejs.org/) or [stackoverflow](http://stackoverflow.com/questions/tagged/three.js).
 
 # Bugs
-#### Before reporting a bug
+## Before reporting a bug
 
 1. Search issue tracker for similar issues.
 2. Try the latest dev branch version of three.js.
 3. Refer to the [Migration Guide](https://github.com/mrdoob/three.js/wiki/Migration) when upgrading to the dev version.
 
-#### How to report a bug
+## How to report a bug
 
 1. Specify the revision number of the three.js library where the bug occurred.
 2. Specify your browser version, operating system, and graphics card. (for example, Chrome 23.0.1271.95, Windows 7, Nvidia Quadro 2000M)
