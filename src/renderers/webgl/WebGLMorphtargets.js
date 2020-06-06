@@ -19,9 +19,9 @@ function WebGLMorphtargets( gl ) {
 	const influencesList = {};
 	const morphInfluences = new Float32Array( 8 );
 
-	var workInfluences = [];
+	const workInfluences = [];
 
-	for ( var i = 0; i < 8; i ++ ) {
+	for ( let i = 0; i < 8; i ++ ) {
 
 		workInfluences[ i ] = [ i, 0 ];
 
@@ -85,8 +85,8 @@ function WebGLMorphtargets( gl ) {
 
 		workInfluences.sort( numericalSort );
 
-		var morphTargets = material.morphTargets && geometry.morphAttributes.position;
-		var morphNormals = material.morphNormals && geometry.morphAttributes.normal;
+		const morphTargets = material.morphTargets && geometry.morphAttributes.position;
+		const morphNormals = material.morphNormals && geometry.morphAttributes.normal;
 
 		let morphInfluencesSum = 0;
 
