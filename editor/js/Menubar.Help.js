@@ -32,6 +32,18 @@ var MenubarHelp = function ( editor ) {
 	} );
 	options.add( option );
 
+	// Icon
+
+	var option = new UIRow();
+	option.setClass( 'option' );
+	option.setTextContent( strings.getKey( 'menubar/help/icons' ) );
+	option.onClick( function () {
+
+		window.open( 'https://www.flaticon.com/packs/interface-44', '_blank' );
+
+	} );
+	options.add( option );
+
 	// About
 
 	var option = new UIRow();

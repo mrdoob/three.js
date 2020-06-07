@@ -423,27 +423,21 @@ select {
 
 #toolbar {
 	position: absolute;
-	left: calc(50% - 290px); /* ( ( 100% - 300px ) / 2.0 ) - 140px */
-	bottom: 16px;
-	height: 32px;
+	left: 10px;
+	top: 42px;
+	width: 32px;
 	background: #eee;
-	color: #333;
+	text-align: center;
 }
 
-	#toolbar * {
-		vertical-align: middle;
+	#toolbar button, #toolbar input {
+		height: 32px;
 	}
 
-	#toolbar .Panel {
-		padding: 4px;
-		color: #888;
-	}
-
-	#toolbar button {
-		margin-right: 6px;
-		line-height: 14px;
-		height: 24px;
-	}
+		#toolbar button img {
+			width: 16px;
+			opacity: 0.5;
+		}
 
 .Outliner {
 	color: #444;
@@ -537,11 +531,6 @@ select {
 		bottom: 0;
 	}
 
-	#toolbar {
-		left: calc(50% - 140px);
-		top: 68px;
-	}
-
 }
 
 /* DARK MODE */
@@ -630,6 +619,10 @@ select {
 	#toolbar {
 		background-color: #111;
 	}
+
+		#toolbar img {
+			filter: invert(1);
+		}
 
 	.Outliner {
 		color: #888;
