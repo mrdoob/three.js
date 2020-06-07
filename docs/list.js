@@ -102,7 +102,16 @@ var list = {
 			},
 
 			"Core / BufferAttributes": {
-				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
+				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Uint8BufferAttribute": "api/en/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Int8BufferAttribute": "api/en/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Uint8ClampedBufferAttribute": "api/en/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Uint16BufferAttribute": "api/en/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Int16BufferAttribute": "api/en/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Uint32BufferAttribute": "api/en/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Int32BufferAttribute": "api/en/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Float32BufferAttribute": "api/en/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Float64BufferAttribute": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
 			"Extras": {
@@ -560,7 +569,16 @@ var list = {
 			},
 
 			"核心 / BufferAttributes": {
-				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
+				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Uint8BufferAttribute": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Int8BufferAttribute": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Uint8ClampedBufferAttribute": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Uint16BufferAttribute": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Int16BufferAttribute": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Uint32BufferAttribute": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Int32BufferAttribute": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Float32BufferAttribute": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes",
+				"Float64BufferAttribute": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
 			"附件": {
