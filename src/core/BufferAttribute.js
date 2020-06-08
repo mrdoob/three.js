@@ -204,23 +204,18 @@ Object.assign( BufferAttribute.prototype, {
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector2.x = this.getX( i );
-				_vector2.y = this.getY( i );
-
+				_vector2.fromBufferAttribute( this, i );
 				_vector2.applyMatrix3( m );
 
 				this.setXY( i, _vector2.x, _vector2.y, );
 
 			}
 
-		} else {
+		} else if ( this.itemSize === 3 ) {
 
 			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector.x = this.getX( i );
-				_vector.y = this.getY( i );
-				_vector.z = this.getZ( i );
-
+				_vector.fromBufferAttribute( this, i );
 				_vector.applyMatrix3( m );
 
 				this.setXYZ( i, _vector.x, _vector.y, _vector.z );
