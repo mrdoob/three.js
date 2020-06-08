@@ -7,7 +7,8 @@ THREE.CSS2DObject = function ( element ) {
 
 	THREE.Object3D.call( this );
 
-	this.element = element;
+	this.element = element || document.createElement( 'div' );
+
 	this.element.style.position = 'absolute';
 
 	this.addEventListener( 'removed', function () {
@@ -26,8 +27,21 @@ THREE.CSS2DObject = function ( element ) {
 
 };
 
-THREE.CSS2DObject.prototype = Object.create( THREE.Object3D.prototype );
-THREE.CSS2DObject.prototype.constructor = THREE.CSS2DObject;
+THREE.CSS2DObject.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+
+	constructor: THREE.CSS2DObject,
+
+	copy: function ( source, recursive ) {
+
+		THREE.Object3D.prototype.copy.call( this, source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+} );
 
 //
 
