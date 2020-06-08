@@ -521,7 +521,7 @@ var Loader = function ( editor ) {
 
 			default:
 
-				// alert( 'Unsupported file format (' + extension +  ').' );
+				console.error( 'Unsupported file format (' + extension + ').' );
 
 				break;
 
