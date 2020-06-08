@@ -232,7 +232,7 @@ var Loader = function ( editor ) {
 
 					if ( isGLTF1( contents ) ) {
 
-						alert( 'Import of glTF asset not possible. Only versions >= 2.0 are supported. Please try to upgrade the file to glTF 2.0 using glTF-Pipeline.' );
+						console.error( 'Import of glTF asset not possible. Only versions >= 2.0 are supported. Please try to upgrade the file to glTF 2.0 using glTF-Pipeline.' );
 
 					} else {
 
@@ -303,7 +303,7 @@ var Loader = function ( editor ) {
 
 					} catch ( error ) {
 
-						alert( error );
+						console.error( error );
 						return;
 
 					}
@@ -521,7 +521,7 @@ var Loader = function ( editor ) {
 
 			default:
 
-				// alert( 'Unsupported file format (' + extension +  ').' );
+				console.error( 'Unsupported file format (' + extension + ').' );
 
 				break;
 
