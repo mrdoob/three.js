@@ -1,4 +1,4 @@
-// r117
+// r117.1
 
 const assets = [
 	'./',
@@ -56,6 +56,9 @@ const assets = [
 
 	'./manifest.json',
 	'./images/icon.png',
+	'./images/rotate.svg',
+	'./images/scale.svg',
+	'./images/translate.svg',
 
 	'./js/libs/codemirror/codemirror.css',
 	'./js/libs/codemirror/theme/monokai.css',
