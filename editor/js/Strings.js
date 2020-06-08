@@ -706,7 +706,7 @@ var Strings = function ( config ) {
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
-			'menubar/help/icons': 'Icon Pack',
+			'menubar/help/icons': '图标组件包',
 			'menubar/help/about': '关于',
 
 			'sidebar/scene': '场景',
