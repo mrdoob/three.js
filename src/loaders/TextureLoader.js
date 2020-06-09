@@ -11,8 +11,6 @@ function TextureLoader( manager ) {
 
 	Loader.call( this, manager );
 
-	this.imageLoader = null;
-
 }
 
 TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
@@ -23,13 +21,7 @@ TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		const texture = new Texture();
 
-		if ( ! this.imageLoader ) {
-
-			this.imageLoader = new ImageLoader( this.manager );
-
-		}
-
-		const loader = this.imageLoader;
+		const loader = new ImageLoader( this.manager );
 		loader.setCrossOrigin( this.crossOrigin );
 		loader.setPath( this.path );
 
@@ -52,13 +44,6 @@ TextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		}, onProgress, onError );
 
 		return texture;
-
-	},
-
-	setImageLoader: function ( imageLoader ) {
-
-		this.imageLoader = imageLoader;
-		return this;
 
 	}
 

@@ -1413,14 +1413,16 @@ THREE.GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
-		this.textureLoader = new THREE.TextureLoader( this.options.manager );
-		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
+		this.useImageBitmap = typeof createImageBitmap !== 'undefined';
 
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
-		if ( typeof createImageBitmap !== 'undefined' ) {
-			this.textureLoader.setImageLoader( new THREE.ImageBitmapLoader( this.options.manager ) );
+		if ( this.useImageBitmap ) {
+			this.textureLoader = new THREE.ImageBitmapLoader( this.options.manager );
+		} else {
+			this.textureLoader = new THREE.TextureLoader( this.options.manager );
 		}
+		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
 		this.fileLoader = new THREE.FileLoader( this.options.manager );
 		this.fileLoader.setResponseType( 'arraybuffer' );
@@ -1838,6 +1840,7 @@ THREE.GLTFLoader = ( function () {
 		var parser = this;
 		var json = this.json;
 		var options = this.options;
+		var useImageBitmap = this.useImageBitmap;
 		var textureLoader = this.textureLoader;
 
 		var URL = self.URL || self.webkitURL;
@@ -1892,7 +1895,19 @@ THREE.GLTFLoader = ( function () {
 
 			return new Promise( function ( resolve, reject ) {
 
-				loader.load( resolveURL( sourceURI, options.path ), resolve, undefined, reject );
+				var onLoad = resolve;
+
+				if ( useImageBitmap ) {
+
+					onLoad = function ( imageBitmap ) {
+
+						resolve( new THREE.CanvasTexture( imageBitmap ) );
+
+					};
+
+				}
+
+				loader.load( resolveURL( sourceURI, options.path ), onLoad, undefined, reject );
 
 			} );
 
