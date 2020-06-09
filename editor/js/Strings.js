@@ -294,7 +294,6 @@ var Strings = function ( config ) {
 			'sidebar/project/physicallyCorrectLights': 'Physically correct lights',
 			'sidebar/project/toneMapping': 'Tone mapping',
 			'sidebar/project/toneMappingExposure': 'Exposure',
-			'sidebar/project/toneMappingWhitePoint': 'White Point',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
@@ -609,7 +608,6 @@ var Strings = function ( config ) {
 			'sidebar/project/physicallyCorrectLights': 'Rendu physique lumineux',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
 			'sidebar/project/toneMappingExposure': 'Réglage d\'exposition',
-			'sidebar/project/toneMappingWhitePoint': 'Réglage du point blanc',
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
@@ -898,7 +896,6 @@ var Strings = function ( config ) {
 			'sidebar/project/physicallyCorrectLights': '物理光照',
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/toneMappingExposure': '曝光',
-			'sidebar/project/toneMappingWhitePoint': '白点',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 

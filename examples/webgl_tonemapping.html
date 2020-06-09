@@ -25,13 +25,10 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var mesh, renderer, scene, camera, controls;
-			var gui,
-				guiWhitePoint = null,
-				guiExposure = null;
+			var gui, guiExposure = null;
 
 			var params = {
 				exposure: 0.8,
-				whitePoint: 1.0, // applies to Uncharted2 only
 				toneMapping: 'ACESFilmic'
 			};
 
@@ -58,7 +55,6 @@
 				document.body.appendChild( renderer.domElement );
 
 				renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
-				renderer.toneMappingWhitePoint = params.whitePoint;
 				renderer.toneMappingExposure = params.exposure;
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
@@ -138,13 +134,6 @@
 
 			function updateGUI() {
 
-				if ( guiWhitePoint !== null ) {
-
-					gui.remove( guiWhitePoint );
-					guiWhitePoint = null;
-
-				}
-
 				if ( guiExposure !== null ) {
 
 					gui.remove( guiExposure );
@@ -159,19 +148,6 @@
 						.onChange( function () {
 
 							renderer.toneMappingExposure = params.exposure;
-							render();
-
-						} );
-
-				}
-
-				if ( params.toneMapping === 'Uncharted2' ) {
-
-					guiWhitePoint = gui.add( params, 'whitePoint', 0, 2 )
-
-						.onChange( function () {
-
-							renderer.toneMappingWhitePoint = params.whitePoint;
 							render();
 
 						} );
