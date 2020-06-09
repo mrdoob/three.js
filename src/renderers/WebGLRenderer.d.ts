@@ -163,7 +163,6 @@ export class WebGLRenderer implements Renderer {
 	physicallyCorrectLights: boolean;
 	toneMapping: ToneMapping;
 	toneMappingExposure: number;
-	toneMappingWhitePoint: number;
 
 	/**
 	 * Default is false.

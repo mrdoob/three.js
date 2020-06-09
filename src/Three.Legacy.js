@@ -1829,7 +1829,20 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			this.outputEncoding = ( value === true ) ? sRGBEncoding : LinearEncoding;
 
 		}
-	}
+	},
+	toneMappingWhitePoint: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .toneMappingWhitePoint has been removed.' );
+			return 1.0;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .toneMappingWhitePoint has been removed.' );
+
+		}
+	},
 
 } );
 
