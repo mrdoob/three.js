@@ -474,6 +474,110 @@
 
 		</script>
 
+
+	
+		<script>
+
+			// handle light and dark mode theme switching -- start --
+			var theme;
+
+			var svghtml = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 32 32">
+								<title>themeswitch</title>
+								<path style="fill:var(--text-color)" d="M16 0c-8.837 0-16 7.163-16 16s7.163 16 16 16 16-7.163 16-16-7.163-16-16-16zM4 16c0-6.627 5.373-12 12-12v24c-6.627 0-12-5.373-12-12z"></path>
+							</svg>`;
+
+			function htmlToElement( html ) {
+				let template = document.createElement( 'template' );
+				html = html.trim( ); // Never return a text node of whitespace as the result
+				template.innerHTML = html;
+				return template.content.firstChild;
+			}
+
+			function theme_apply( ) {
+				'use strict';
+				if ( theme === 'light' ) {
+					document.documentElement.setAttribute( 'data-theme', 'light' );
+					localStorage.setItem( 'theme', 'light' );
+				} else {
+					document.documentElement.setAttribute( 'data-theme', 'dark' );
+					localStorage.setItem( 'theme', 'dark' );
+				}
+			}
+			theme_apply( );
+
+			function theme_switch( ) {
+				'use strict';
+				if ( theme === 'light' ) {
+					theme = 'dark';
+				} else {
+					theme = 'light';
+				}
+				var win = window.frames.viewer;
+
+				win.postMessage("message", "*");
+				
+				theme_apply( );
+			}
+
+			var theme_OS = window.matchMedia( '(prefers-color-scheme: light)' );
+
+			theme_OS.addEventListener( 'change', function ( e ) {
+				'use strict';
+				if ( e.matches ) {
+					theme = 'light';
+				} else {
+					theme = 'dark';
+				}
+				theme_apply( );
+			});
+
+			function add_theme_styles( ) {
+				var head = document.head || document.getElementsByTagName('head')[0];
+				var style = document.createElement( 'style' );
+				var csscontent = `[data-theme="dark"] {
+										--background-color: #222;
+										--secondary-background-color: #2e2e2e;
+
+										--text-color: #bbb;
+										--secondary-text-color: #666;
+
+										--border-style: 1px solid #444;
+									}
+
+									#themeswitch{
+										margin: 0 10px;
+										cursor: pointer;
+									}`;
+
+				head.appendChild(style);
+
+				if ( style.styleSheet ){
+					// This is required for IE8 and below.
+					style.styleSheet.cssText = csscontent;
+				} else {
+					style.appendChild( document.createTextNode( csscontent ) );
+				}
+			}
+			add_theme_styles( );
+
+			function add_theme_switch( ) {
+				var themeswitch_svg = htmlToElement( svghtml );
+				var themeswitch = htmlToElement( '<a id="themeswitch"></a>' );
+
+				themeswitch.appendChild( themeswitch_svg );
+				themeswitch.onclick = ( ) => {
+					theme_switch( );
+				}
+
+				var inputWrapper = document.getElementById( "inputWrapper" );
+				inputWrapper.appendChild( themeswitch );
+			}
+			add_theme_switch( );
+			
+			// handle light and dark mode theme switching -- end --
+
+		</script>
+
 	</body>
 
 </html>
