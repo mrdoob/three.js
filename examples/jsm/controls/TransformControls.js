@@ -760,7 +760,8 @@ var TransformControlsGizmo = function () {
 		depthWrite: false,
 		transparent: true,
 		side: DoubleSide,
-		fog: false
+		fog: false,
+		toneMapped: false
 	} );
 
 	var gizmoLineMaterial = new LineBasicMaterial( {
@@ -768,7 +769,8 @@ var TransformControlsGizmo = function () {
 		depthWrite: false,
 		transparent: true,
 		linewidth: 1,
-		fog: false
+		fog: false,
+		toneMapped: false
 	} );
 
 	// Make unique material for each axis/color
@@ -833,7 +835,7 @@ var TransformControlsGizmo = function () {
 
 	var scaleHandleGeometry = new BoxBufferGeometry( 0.125, 0.125, 0.125 );
 
-	var lineGeometry = new BufferGeometry( );
+	var lineGeometry = new BufferGeometry();
 	lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
 
 	var CircleGeometry = function ( radius, arc ) {
@@ -1590,7 +1592,7 @@ var TransformControlsPlane = function () {
 
 	Mesh.call( this,
 		new PlaneBufferGeometry( 100000, 100000, 2, 2 ),
-		new MeshBasicMaterial( { visible: false, wireframe: true, side: DoubleSide, transparent: true, opacity: 0.1 } )
+		new MeshBasicMaterial( { visible: false, wireframe: true, side: DoubleSide, transparent: true, opacity: 0.1, toneMapped: false } )
 	);
 
 	this.type = 'TransformControlsPlane';

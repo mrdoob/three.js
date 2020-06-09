@@ -83,7 +83,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	isMaterial: true,
 
-	onBeforeCompile: function () {},
+	onBeforeCompile: function ( /* shaderobject, renderer */ ) {},
 
 	setValues: function ( values ) {
 

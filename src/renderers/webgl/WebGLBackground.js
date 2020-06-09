@@ -25,7 +25,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 	function render( renderList, scene, camera, forceClear ) {
 
-		let background = scene.background;
+		let background = scene.isScene === true ? scene.background : null;
 
 		// Ignore background in AR
 		// TODO: Reconsider this.
