@@ -195,7 +195,6 @@ var files = {
 		"webgl_panorama_cube",
 		"webgl_panorama_equirectangular",
 		"webgl_performance",
-		"webgl_performance_doublesided",
 		"webgl_performance_static",
 		"webgl_points_billboards",
 		"webgl_points_dynamic",
