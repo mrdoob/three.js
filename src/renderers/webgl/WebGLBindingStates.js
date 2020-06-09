@@ -185,12 +185,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 			if ( cachedAttribute.attribute !== geometryAttribute ) return true;
 
-			if ( cachedAttribute.version !== geometryAttribute.versionVAO ) return true;
-
-			if ( cachedAttribute.data.buffer !== geometryAttribute.data ) return true;
-
-			if ( geometryAttribute.data &&
-				cachedAttribute.data.version !== geometryAttribute.data.versionVAO ) return true;
+			if ( cachedAttribute.data !== geometryAttribute.data ) return true;
 
 		}
 
@@ -209,14 +204,10 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 			const data = {};
 			data.attribute = attribute;
-			data.version = attribute.versionVAO;
-
-			data.data = {};
 
 			if ( attribute.data ) {
 
-				data.data.buffer = attribute.data;
-				data.data.version = attribute.data.versionVAO;
+				data.data = attribute.data;
 
 			}
 

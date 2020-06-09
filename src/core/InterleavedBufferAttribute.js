@@ -11,13 +11,11 @@ function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normal
 
 	this.name = '';
 
-	this._data = interleavedBuffer;
-	this._itemSize = itemSize;
-	this._offset = offset;
+	this.data = interleavedBuffer;
+	this.itemSize = itemSize;
+	this.offset = offset;
 
-	this._normalized = normalized === true;
-
-	this.versionVAO = 0;
+	this.normalized = normalized === true;
 
 }
 
@@ -38,74 +36,6 @@ Object.defineProperties( InterleavedBufferAttribute.prototype, {
 		get: function () {
 
 			return this.data.array;
-
-		}
-
-	},
-
-	data: {
-
-		get: function () {
-
-			return this._data;
-
-		},
-
-		set: function ( value ) {
-
-			this._data = value;
-			this.versionVAO ++;
-
-		}
-
-	},
-
-	itemSize: {
-
-		get: function () {
-
-			return this._itemSize;
-
-		},
-
-		set: function ( value ) {
-
-			this._itemSize = value;
-			this.versionVAO ++;
-
-		}
-
-	},
-
-	offset: {
-
-		get: function () {
-
-			return this._offset;
-
-		},
-
-		set: function ( value ) {
-
-			this._offset = value;
-			this.versionVAO ++;
-
-		}
-
-	},
-
-	normalized: {
-
-		get: function () {
-
-			return this._normalized;
-
-		},
-
-		set: function ( value ) {
-
-			this._normalized = value;
-			this.versionVAO ++;
 
 		}
 

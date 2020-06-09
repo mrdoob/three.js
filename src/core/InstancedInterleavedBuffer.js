@@ -8,9 +8,7 @@ function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
 	InterleavedBuffer.call( this, array, stride );
 
-	this._meshPerAttribute = meshPerAttribute || 1;
-
-	this.versionVAO = 0;
+	this.meshPerAttribute = meshPerAttribute || 1;
 
 }
 
@@ -48,27 +46,6 @@ InstancedInterleavedBuffer.prototype = Object.assign( Object.create( Interleaved
 		json.meshPerAttribute = this.meshPerAttribute;
 
 		return json;
-
-	}
-
-} );
-
-Object.defineProperties( InstancedInterleavedBuffer.prototype, {
-
-	meshPerAttribute: {
-
-		get: function () {
-
-			return this._meshPerAttribute;
-
-		},
-
-		set: function ( value ) {
-
-			this._meshPerAttribute = value;
-			this.versionVAO ++;
-
-		}
 
 	}
 

@@ -7,63 +7,24 @@ import { StaticDrawUsage } from '../constants.js';
 
 function InterleavedBuffer( array, stride ) {
 
-	this._array = array;
-	this._stride = stride;
+	this.array = array;
+	this.stride = stride;
 	this.count = array !== undefined ? array.length / stride : 0;
 
 	this.usage = StaticDrawUsage;
 	this.updateRange = { offset: 0, count: - 1 };
 
 	this.version = 0;
-	this.versionVAO = 0;
 
 	this.uuid = MathUtils.generateUUID();
 
 }
 
-Object.defineProperties( InterleavedBuffer.prototype, {
+Object.defineProperty( InterleavedBuffer.prototype, 'needsUpdate', {
 
-	needsUpdate: {
+	set: function ( value ) {
 
-		set: function ( value ) {
-
-			if ( value === true ) this.version ++;
-
-		}
-
-	},
-
-	array: {
-
-		get: function () {
-
-			return this._array;
-
-		},
-
-		set: function ( value ) {
-
-			this._array = value;
-			this.versionVAO ++;
-
-		}
-
-	},
-
-	stride: {
-
-		get: function () {
-
-			return this._stride;
-
-		},
-
-		set: function ( value ) {
-
-			this._stride = value;
-			this.versionVAO ++;
-
-		}
+		if ( value === true ) this.version ++;
 
 	}
 
