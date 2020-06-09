@@ -29,7 +29,7 @@ var SidebarProject = function ( editor ) {
 	// Title
 
 	var titleRow = new UIRow();
-	var title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).onChange( function () {
+	var title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).setWidth( '150px' ).onChange( function () {
 
 		config.setKey( 'project/title', this.getValue() );
 
