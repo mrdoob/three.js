@@ -297,6 +297,17 @@
 
 			}
 
+			function updateCombine( material ) {
+
+				return function (combine) {
+
+					material.combine = parseInt( combine );
+					material.needsUpdate = true;
+
+				};
+
+			}
+
 			function updateTexture( material, materialKey, textures ) {
 
 				return function ( key ) {
@@ -395,7 +406,7 @@
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
-				folder.add( material, 'combine', constants.combine );
+				folder.add( material, 'combine', constants.combine ).onChange( updateCombine( material ) );
 				folder.add( material, 'reflectivity', 0, 1 );
 				folder.add( material, 'refractionRatio', 0, 1 );
 
@@ -466,7 +477,7 @@
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
-				folder.add( material, 'combine', constants.combine );
+				folder.add( material, 'combine', constants.combine ).onChange( updateCombine( material ) );
 				folder.add( material, 'reflectivity', 0, 1 );
 				folder.add( material, 'refractionRatio', 0, 1 );
 
@@ -514,6 +525,9 @@
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
+				folder.add( material, 'combine', constants.combine ).onChange( updateCombine( material ) );
+				folder.add( material, 'reflectivity', 0, 1 );
+				folder.add( material, 'refractionRatio', 0, 1 );
 
 			}
 
