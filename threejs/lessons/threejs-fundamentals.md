@@ -49,7 +49,7 @@ Things to notice about the diagram above.
   the background color and fog. These objects define a hierarchical parent/child
   tree like structure and represent where objects appear and how they are
   oriented. Children are positioned and oriented relative to their parent. For
-  example the wheels on a car might children of the car so that moving and
+  example the wheels on a car might be children of the car so that moving and
   orienting the car's object automatically moves the wheels. You can read more
   about this in [the article on scenegraphs](threejs-scenegraph.html).
 
