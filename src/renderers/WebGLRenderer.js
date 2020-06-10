@@ -2004,13 +2004,13 @@ function WebGLRenderer( parameters ) {
 
 			if ( capabilities.multiRenderTarget ) {
 
-				var needsUpdate = false;
+				let needsUpdate = false;
 
 				if ( renderTarget && renderTarget.isWebGLMultiRenderTarget ) {
 
 					if ( _currentDrawBuffers.length !== renderTarget.textures.length || _currentDrawBuffers[ 0 ] !== _gl.COLOR_ATTACHMENT0 ) {
 
-						for ( var i = 0, il = renderTarget.textures.length; i < il; i ++ ) {
+						for ( let i = 0, il = renderTarget.textures.length; i < il; i ++ ) {
 
 							_currentDrawBuffers[ i ] = _gl.COLOR_ATTACHMENT0 + i;
 

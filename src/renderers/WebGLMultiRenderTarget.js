@@ -11,7 +11,7 @@ function WebGLMultiRenderTarget( width, height, numAttachments, options ) {
 
 	this.textures = [];
 
-	for ( var i = 0; i < numAttachments; i ++ ) {
+	for ( let i = 0; i < numAttachments; i ++ ) {
 
 		this.textures[ i ] = this.texture.clone();
 
@@ -31,7 +31,7 @@ WebGLMultiRenderTarget.prototype = Object.assign( Object.create( WebGLRenderTarg
 
 		this.textures.length = 0;
 
-		for ( var i = 0, il = source.textures.length; i < il; i ++ ) {
+		for ( let i = 0, il = source.textures.length; i < il; i ++ ) {
 
 			this.textures[ i ] = source.textures[ i ].clone();
 
@@ -49,7 +49,7 @@ WebGLMultiRenderTarget.prototype = Object.assign( Object.create( WebGLRenderTarg
 
 			if ( num > this.textures.length ) {
 
-				for ( var i = this.textures.length; i < num; i ++ ) {
+				for ( let i = this.textures.length; i < num; i ++ ) {
 
 					this.textures[ i ] = this.texture.clone();
 

@@ -287,11 +287,11 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		if ( renderTarget.isWebGLMultiRenderTarget ) {
 
-			var textures = renderTarget.textures;
+			const textures = renderTarget.textures;
 
-			for ( var i = 0, il = textures.length; i < il; i ++ ) {
+			for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
-				var attachmentProperties = properties.get( textures[ i ] );
+				const attachmentProperties = properties.get( textures[ i ] );
 
 				if ( attachmentProperties.__webglTexture ) {
 
@@ -1082,9 +1082,9 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 				if ( capabilities.multiRenderTarget ) {
 
-					for ( var i = 0, il = renderTarget.textures.length; i < il; i ++ ) {
+					for ( let i = 0, il = renderTarget.textures.length; i < il; i ++ ) {
 
-						var attachmentProperties = properties.get( renderTarget.textures[ i ] );
+						const attachmentProperties = properties.get( renderTarget.textures[ i ] );
 
 						if ( attachmentProperties.__webglTexture === undefined ) {
 
@@ -1164,12 +1164,12 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		} else if ( isMultiRenderTarget ) {
 
-			var textures = renderTarget.textures;
+			const textures = renderTarget.textures;
 
-			for ( var i = 0, il = textures.length; i < il; i ++ ) {
+			for ( let i = 0, il = textures.length; i < il; i ++ ) {
 
-				var attachment = textures[ i ];
-				var attachmentProperties = properties.get( attachment );
+				const attachment = textures[ i ];
+				const attachmentProperties = properties.get( attachment );
 
 				state.bindTexture( _gl.TEXTURE_2D, attachmentProperties.__webglTexture );
 				setTextureParameters( _gl.TEXTURE_2D, attachment, supportsMips );
