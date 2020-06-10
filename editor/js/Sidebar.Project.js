@@ -150,9 +150,8 @@ var SidebarProject = function ( editor ) {
 		0: 'None',
 		1: 'Linear',
 		2: 'Reinhard',
-		3: 'Uncharted2',
-		4: 'Cineon',
-		5: 'ACESFilmic',
+		3: 'Cineon',
+		4: 'ACESFilmic'
 	} ).setWidth( '150px' ).onChange( function () {
 
 		var toneMapping = parseFloat( this.getValue() );

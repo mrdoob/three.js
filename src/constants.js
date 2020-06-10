@@ -52,9 +52,8 @@ export const AddOperation = 2;
 export const NoToneMapping = 0;
 export const LinearToneMapping = 1;
 export const ReinhardToneMapping = 2;
-export const Uncharted2ToneMapping = 3;
-export const CineonToneMapping = 4;
-export const ACESFilmicToneMapping = 5;
+export const CineonToneMapping = 3;
+export const ACESFilmicToneMapping = 4;
 
 export const UVMapping = 300;
 export const CubeReflectionMapping = 301;
