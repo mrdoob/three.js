@@ -732,4 +732,18 @@ Editor.prototype = {
 
 };
 
+var getDataURL = THREE.ImageUtils.getDataURL;
+var Cache = {};
+THREE.ImageUtils.getDataURL = function ( image ) {
+
+	if ( ! Cache[ image.src ] ) {
+
+		Cache[ image.src ] = getDataURL( image );
+
+	}
+
+	return Cache[ image.src ];
+
+};
+
 export { Editor };
