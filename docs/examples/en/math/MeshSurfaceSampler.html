@@ -14,11 +14,11 @@
 
 		<p>Weighted sampling is useful for effects like heavier foliage growth in certain areas of terrain, or concentrated particle emissions from specific parts of a mesh. Vertex weights may be written programmatically, or painted by hand as vertex colors in 3D tools like Blender.</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		// Create a sampler for a Mesh surface.
-		var sampler = new THREE.MeshSurfaceSampler( surfaceMesh )
+		var sampler = new MeshSurfaceSampler( surfaceMesh )
 			.setWeightAttribute( 'color' )
 			.build();
 
@@ -45,10 +45,10 @@
 		scene.add( mesh );
 		</code>
 
-		[example:webgl_instancing_scatter]
-
-		<br>
-		<hr>
+		<h2>Examples</h2>
+		<p>
+			[example:webgl_instancing_scatter]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -80,7 +80,7 @@
 		<h2>Source</h2>
 
 		<p>
-		[link:https://github.com/mrdoob/three.js/blob/master/examples/js/math/MeshSurfaceSampler.js examples/js/math/MeshSurfaceSampler.js]
+		[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/math/MeshSurfaceSampler.js examples/jsm/math/MeshSurfaceSampler.js]
 		</p>
 	</body>
 </html>

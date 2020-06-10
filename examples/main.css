@@ -59,29 +59,26 @@ a, button, input, select {
 	top: 0;
 	left: 0;
 	width: 100%;
-	height:100%;
+	height: 100%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	opacity: 1;
-	background-color: #000000;
-	color: #ffffff;
+	background: rgba(0,0,0,0.7);
 }
 
-#overlay > div {
-	text-align: center;
-}
+	#overlay button {
+		background: #ffffff;
+		border: 0;
+		color: #000000;
+		padding: 16px 20px;
+		text-transform: uppercase;
+		cursor: pointer;
+	}
 
-#overlay > div > button {
-	height: 20px;
-	background: transparent;
-	color: #ffffff;
-	outline: 1px solid #ffffff;
-	border: 0px;
-	cursor: pointer;
-}
-
-#overlay > div > p {
-	color: #777777;
-	font-size: 12px;
+#notSupported {
+	width: 50%;
+	margin: auto;
+	background-color: #f00;
+	margin-top: 20px;
+	padding: 10px;
 }

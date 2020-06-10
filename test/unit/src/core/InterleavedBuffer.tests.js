@@ -92,16 +92,6 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "clone", ( assert ) => {
-
-			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
-			var instance = new InterleavedBuffer( array, 3 );
-			instance.setUsage( DynamicDrawUsage );
-
-			checkInstanceAgainstCopy( instance, instance.clone(), assert );
-
-		} );
-
 		QUnit.test( "onUpload", ( assert ) => {
 
 			var a = new InterleavedBuffer();

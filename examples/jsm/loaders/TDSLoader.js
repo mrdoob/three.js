@@ -64,7 +64,25 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data, path ) );
+			try {
+
+				onLoad( scope.parse( data, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -441,8 +459,8 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				matrix.transpose();
 
 				var inverse = new Matrix4();
-				inverse.getInverse( matrix, true );
-				geometry.applyMatrix( inverse );
+				inverse.getInverse( matrix );
+				geometry.applyMatrix4( inverse );
 
 				matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
 

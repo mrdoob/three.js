@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/SetPositionCommand';
+import { } from '../../../../editor/js/commands/SetPositionCommand';
 
 export default QUnit.module( 'Editor', () => {
 

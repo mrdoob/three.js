@@ -4,7 +4,7 @@
  */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
 import {
 	TetrahedronBufferGeometry
 } from '../../../../src/geometries/TetrahedronGeometry';

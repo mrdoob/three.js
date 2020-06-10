@@ -17,21 +17,21 @@ var obj_verify = {
 	materials: []
 };
 
-obj_verify.vertices.push( [ -1,  1,  1 ] );
-obj_verify.vertices.push( [ -1, -1,  1 ] );
-obj_verify.vertices.push( [  1, -1,  1 ] );
-obj_verify.vertices.push( [  1,  1,  1 ] );
-obj_verify.vertices.push( [ -1,  1, -1 ] );
-obj_verify.vertices.push( [ -1, -1, -1 ] );
-obj_verify.vertices.push( [  1, -1, -1 ] );
-obj_verify.vertices.push( [  1,  1, -1 ] );
+obj_verify.vertices.push( [ - 1, 1, 1 ] );
+obj_verify.vertices.push( [ - 1, - 1, 1 ] );
+obj_verify.vertices.push( [ 1, - 1, 1 ] );
+obj_verify.vertices.push( [ 1, 1, 1 ] );
+obj_verify.vertices.push( [ - 1, 1, - 1 ] );
+obj_verify.vertices.push( [ - 1, - 1, - 1 ] );
+obj_verify.vertices.push( [ 1, - 1, - 1 ] );
+obj_verify.vertices.push( [ 1, 1, - 1 ] );
 
-obj_verify.normals.push( [  0,  0,  1 ] );
-obj_verify.normals.push( [  0,  0, -1 ] );
-obj_verify.normals.push( [  0,  1,  0 ] );
-obj_verify.normals.push( [  0, -1,  0 ] );
-obj_verify.normals.push( [  1,  0,  0 ] );
-obj_verify.normals.push( [ -1,  0,  0 ] );
+obj_verify.normals.push( [ 0, 0, 1 ] );
+obj_verify.normals.push( [ 0, 0, - 1 ] );
+obj_verify.normals.push( [ 0, 1, 0 ] );
+obj_verify.normals.push( [ 0, - 1, 0 ] );
+obj_verify.normals.push( [ 1, 0, 0 ] );
+obj_verify.normals.push( [ - 1, 0, 0 ] );
 
 obj_verify.uvs.push( [ 0, 1 ] );
 obj_verify.uvs.push( [ 1, 1 ] );
@@ -68,42 +68,56 @@ obj_verify.materials.push( 'usemtl purple' );
 
 
 function vobjCreateVertices( factor, offsets ) {
+
 	var output = '\n';
-	for ( var x, y, z, i = 0, v = obj_verify.vertices, length = v.length; i < length; i++ ) {
+	for ( var x, y, z, i = 0, v = obj_verify.vertices, length = v.length; i < length; i ++ ) {
+
 		x = v[ i ][ 0 ] * factor + offsets[ 0 ];
 		y = v[ i ][ 1 ] * factor + offsets[ 1 ];
 		z = v[ i ][ 2 ] * factor + offsets[ 2 ];
 		output += 'v ' + x + ' ' + y + ' ' + z + '\n';
+
 	}
 	return output;
-};
+
+}
 
 function vobjCreateUvs() {
+
 	var output = '\n';
-	for ( var x, y, z, i = 0, vn = obj_verify.uvs, length = vn.length; i < length; i++ ) {
+	for ( var x, y, i = 0, vn = obj_verify.uvs, length = vn.length; i < length; i ++ ) {
+
 		x = vn[ i ][ 0 ];
 		y = vn[ i ][ 1 ];
 		output += 'vt ' + x + ' ' + y + '\n';
+
 	}
 	return output;
-};
+
+}
 
 function vobjCreateNormals() {
+
 	var output = '\n';
-	for ( var x, y, z, i = 0, vn = obj_verify.normals, length = vn.length; i < length; i++ ) {
+	for ( var x, y, z, i = 0, vn = obj_verify.normals, length = vn.length; i < length; i ++ ) {
+
 		x = vn[ i ][ 0 ];
 		y = vn[ i ][ 1 ];
 		z = vn[ i ][ 2 ];
 		output += 'vn ' + x + ' ' + y + ' ' + z + '\n';
+
 	}
 	return output;
-};
+
+}
 
 function vobjCreateCubeV( offsets, groups, usemtls ) {
+
 	var output = '\n';
 	if ( groups === null || groups.length === 0 ) groups = [ null, null, null, null, null, null ];
 	if ( usemtls === null || usemtls.length === 0 ) usemtls = [ null, null, null, null, null, null ];
-	for ( var group, usemtl, f0, f1, f2, f3, i = 0, facesV = obj_verify.facesV, length = facesV.length; i < length; i++ ) {
+	for ( var group, usemtl, f0, f1, f2, f3, i = 0, facesV = obj_verify.facesV, length = facesV.length; i < length; i ++ ) {
+
 		f0 = facesV[ i ][ 0 ] + offsets[ 0 ];
 		f1 = facesV[ i ][ 1 ] + offsets[ 0 ];
 		f2 = facesV[ i ][ 2 ] + offsets[ 0 ];
@@ -114,15 +128,18 @@ function vobjCreateCubeV( offsets, groups, usemtls ) {
 		if ( group ) output += 'g ' + group + '\n';
 		if ( usemtl ) output += 'usemtl ' + usemtl + '\n';
 		output += 'f ' + f0 + ' ' + f1 + ' ' + f2 + ' ' + f3 + '\n';
+
 	}
 	return output;
-};
+
+}
 
 function vobjCreateCubeVVn( offsets, groups, usemtls ) {
+
 	var output = '\n';
 	if ( groups === null || groups.length === 0 ) groups = [ null, null, null, null, null, null ];
 	if ( usemtls === null || usemtls.length === 0 ) usemtls = [ null, null, null, null, null, null ];
-	for ( var group, usemtl, f0, f1, f2, f3, i = 0, facesV = obj_verify.facesV, facesVn = obj_verify.facesVn; i < 6; i++ ) {
+	for ( var group, usemtl, f0, f1, f2, f3, i = 0, facesV = obj_verify.facesV, facesVn = obj_verify.facesVn; i < 6; i ++ ) {
 
 		f0 = facesV[ i ][ 0 ] + offsets[ 0 ] + '//' + ( facesVn[ i ][ 0 ] + offsets[ 1 ] );
 		f1 = facesV[ i ][ 1 ] + offsets[ 0 ] + '//' + ( facesVn[ i ][ 1 ] + offsets[ 1 ] );
@@ -137,13 +154,15 @@ function vobjCreateCubeVVn( offsets, groups, usemtls ) {
 
 	}
 	return output;
-};
+
+}
 
 function vobjCreateCubeVVt( offsets, groups, usemtls ) {
+
 	var output = '\n';
 	if ( groups === null || groups.length === 0 ) groups = [ null, null, null, null, null, null ];
 	if ( usemtls === null || usemtls.length === 0 ) usemtls = [ null, null, null, null, null, null ];
-	for ( var group, usemtl, f0, f1, f2, f3, i = 0, facesV = obj_verify.facesV, facesVt = obj_verify.facesVt; i < 6; i++ ) {
+	for ( var group, usemtl, f0, f1, f2, f3, i = 0, facesV = obj_verify.facesV, facesVt = obj_verify.facesVt; i < 6; i ++ ) {
 
 		f0 = facesV[ i ][ 0 ] + offsets[ 0 ] + '/' + ( facesVt[ i ][ 0 ] + offsets[ 1 ] );
 		f1 = facesV[ i ][ 1 ] + offsets[ 0 ] + '/' + ( facesVt[ i ][ 1 ] + offsets[ 1 ] );
@@ -158,13 +177,15 @@ function vobjCreateCubeVVt( offsets, groups, usemtls ) {
 
 	}
 	return output;
-};
+
+}
 
 function vobjCreateCubeVVnVt( offsets, groups, usemtls ) {
+
 	var output = '\n';
 	if ( groups === null || groups.length === 0 ) groups = [ null, null, null, null, null, null ];
 	if ( usemtls === null || usemtls.length === 0 ) usemtls = [ null, null, null, null, null, null ];
-	for ( var group, usemtl, f0, f1, f2, f3, i = 0, facesV = obj_verify.facesV, facesVt = obj_verify.facesVt, facesVn = obj_verify.facesVn; i < 6; i++ ) {
+	for ( var group, usemtl, f0, f1, f2, f3, i = 0, facesV = obj_verify.facesV, facesVt = obj_verify.facesVt, facesVn = obj_verify.facesVn; i < 6; i ++ ) {
 
 		f0 = facesV[ i ][ 0 ] + offsets[ 0 ] + '/' + ( facesVt[ i ][ 0 ] + offsets[ 1 ] ) + '/' + ( facesVn[ i ][ 0 ] + offsets[ 2 ] );
 		f1 = facesV[ i ][ 1 ] + offsets[ 0 ] + '/' + ( facesVt[ i ][ 1 ] + offsets[ 1 ] ) + '/' + ( facesVn[ i ][ 1 ] + offsets[ 2 ] );
@@ -179,12 +200,14 @@ function vobjCreateCubeVVnVt( offsets, groups, usemtls ) {
 
 	}
 	return output;
-};
 
-gulp.task( 'default', function( cb ){
+}
+
+gulp.task( 'default', function () {
+
 	gutil.log( 'Building: verify.obj' );
 	var offsets = [ 0, 0, 0 ];
-	var pos = [ -150, 50, 0 ];
+	var pos = [ - 150, 50, 0 ];
 	fs.writeFileSync( './verify.obj', '# Verification OBJ created with gulp\n\n' );
 	fs.appendFileSync( './verify.obj', 'mtllib verify.mtl\n\n# Cube no materials. Translated x:' + pos[ 0 ] );
 	fs.appendFileSync( './verify.obj', vobjCreateVertices( 10, pos ) );
@@ -223,7 +246,7 @@ gulp.task( 'default', function( cb ){
 	fs.appendFileSync( './verify.obj', '\n\n# cube with uvs and normals and two materials and group for every quad. Translated x:' + pos[ 0 ] );
 	fs.appendFileSync( './verify.obj', vobjCreateVertices( 10, pos ) );
 	fs.appendFileSync( './verify.obj', vobjCreateNormals() );
-	fs.appendFileSync( './verify.obj', vobjCreateCubeVVnVt( [ -9, offsets[ 1 ], offsets[ 2 ] ],
+	fs.appendFileSync( './verify.obj', vobjCreateCubeVVnVt( [ - 9, offsets[ 1 ], offsets[ 2 ] ],
 		[ 'cube6a', 'cube6b', 'cube6c', 'cube6d', 'cube6e', 'cube6f' ],
 		[ 'green', null, null, 'orange', null, null ] ) );
 
@@ -255,4 +278,4 @@ gulp.task( 'default', function( cb ){
 
 
 
-});
+} );

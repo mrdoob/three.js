@@ -21,6 +21,11 @@ var PointerLockControls = function ( camera, domElement ) {
 	this.domElement = domElement;
 	this.isLocked = false;
 
+	// Set to constrain the pitch of the camera
+	// Range is 0 to Math.PI radians
+	this.minPolarAngle = 0; // radians
+	this.maxPolarAngle = Math.PI; // radians
+
 	//
 	// internals
 	//
@@ -49,7 +54,7 @@ var PointerLockControls = function ( camera, domElement ) {
 		euler.y -= movementX * 0.002;
 		euler.x -= movementY * 0.002;
 
-		euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
+		euler.x = Math.max( PI_2 - scope.maxPolarAngle, Math.min( PI_2 - scope.minPolarAngle, euler.x ) );
 
 		camera.quaternion.setFromEuler( euler );
 

@@ -171,7 +171,7 @@
 					applyVertexColors( geometry, color );
 
 					matrix.compose( position, quaternion, scale );
-					geometry.applyMatrix( matrix );
+					geometry.applyMatrix4( matrix );
 
 					geometries.push( geometry );
 
@@ -198,7 +198,7 @@
 
 				this.rotationSpeed = rotationSpeed;
 
-				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+				var defaultMaterial = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true, vertexColors: true } );
 				this.mesh = new THREE.Mesh( generateGeometry( type, numObjects ), defaultMaterial );
 				this.scene.add( this.mesh );
 

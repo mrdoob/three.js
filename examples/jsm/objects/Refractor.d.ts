@@ -2,6 +2,7 @@ import {
 	Mesh,
 	BufferGeometry,
 	Color,
+	TextureEncoding,
 	WebGLRenderTarget
 } from '../../../src/Three';
 
@@ -11,6 +12,7 @@ export interface RefractorOptions {
 	textureHeight?: number;
 	clipBias?: number;
 	shader?: object;
+	encoding?: TextureEncoding;
 }
 
 export class Refractor extends Mesh {

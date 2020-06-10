@@ -66,7 +66,7 @@ varying vec3 vViewPosition;
 #include <shadowmap_pars_fragment>
 #include <bumpmap_pars_fragment>
 #include <normalmap_pars_fragment>
-#include <clearcoat_normalmap_pars_fragment>
+#include <clearcoat_pars_fragment>
 #include <roughnessmap_pars_fragment>
 #include <metalnessmap_pars_fragment>
 #include <logdepthbuf_pars_fragment>

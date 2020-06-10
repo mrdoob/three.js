@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -10,19 +10,19 @@
 	<body>
 		<h1>[name]</h1>
 
-		<p class="desc"> A animation helper for <a href="http://www.geocities.jp/higuchuu4/index_e.htm"><em>MMD</em></a> resources. <br /><br />
+		<p class="desc"> A animation helper for <a href="https://sites.google.com/view/evpvp/"><em>MMD</em></a> resources. <br /><br />
 		[name] handles animation of MMD assets loaded by [page:MMDLoader] with MMD special features as IK, Grant, and Physics.
 		It uses [page:CCDIKSolver] and [page:MMDPhysics] inside.
 		</p>
 
-		<h2>Example</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		// Instantiate a helper
-		var helper = new THREE.MMDAnimationHelper();
+		var helper = new MMDAnimationHelper();
 
 		// Load MMD resources and add to helper
-		new THREE.MMDLoader().loadWithAnimation(
+		new MMDLoader().loadWithAnimation(
 			'models/mmd/miku.pmd',
 			'models/mmd/dance.vmd',
 			function ( mmd ) {
@@ -62,12 +62,13 @@
 		}
 		</code>
 
-		[example:webgl_loader_mmd]<br />
-		[example:webgl_loader_mmd_pose]<br />
-		[example:webgl_loader_mmd_audio]<br />
+		<h2>例子</h2>
 
-		<br />
-		<hr>
+		<p>
+			[example:webgl_loader_mmd]<br />
+			[example:webgl_loader_mmd_pose]<br />
+			[example:webgl_loader_mmd_audio]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -165,7 +166,7 @@
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/animation/MMDAnimationHelper.js examples/js/animation/MMDAnimationHelper.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/animation/MMDAnimationHelper.js examples/jsm/animation/MMDAnimationHelper.js]
 		</p>
 	</body>
 </html>

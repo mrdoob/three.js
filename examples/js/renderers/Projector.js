@@ -1,3 +1,4 @@
+console.warn( "THREE.Projector: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -266,7 +267,7 @@ THREE.Projector = function () {
 
 				_line.material = object.material;
 
-				if ( object.material.vertexColors === THREE.VertexColors ) {
+				if ( object.material.vertexColors ) {
 
 					_line.vertexColors[ 0 ].fromArray( colors, a * 3 );
 					_line.vertexColors[ 1 ].fromArray( colors, b * 3 );
@@ -320,7 +321,7 @@ THREE.Projector = function () {
 
 				_face.material = material;
 
-				if ( material.vertexColors === THREE.FaceColors || material.vertexColors === THREE.VertexColors ) {
+				if ( material.vertexColors ) {
 
 					_face.color.fromArray( colors, a * 3 );
 
@@ -412,7 +413,7 @@ THREE.Projector = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_frustum.setFromMatrix( _viewProjectionMatrix );
+		_frustum.setFromProjectionMatrix( _viewProjectionMatrix );
 
 		//
 
@@ -830,7 +831,7 @@ THREE.Projector = function () {
 
 							_line.material = object.material;
 
-							if ( object.material.vertexColors === THREE.VertexColors ) {
+							if ( object.material.vertexColors ) {
 
 								_line.vertexColors[ 0 ].copy( object.geometry.colors[ v ] );
 								_line.vertexColors[ 1 ].copy( object.geometry.colors[ v - 1 ] );

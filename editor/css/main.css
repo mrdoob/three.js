@@ -2,6 +2,10 @@
 	color-scheme: light dark;
 }
 
+html {
+	touch-action: none;
+}
+
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -419,28 +423,21 @@ select {
 
 #toolbar {
 	position: absolute;
-	left: calc(50% - 290px); /* ( ( 100% - 300px ) / 2.0 ) - 140px */
-	width: 280px;
-	bottom: 16px;
-	height: 32px;
+	left: 10px;
+	top: 42px;
+	width: 32px;
 	background: #eee;
-	color: #333;
+	text-align: center;
 }
 
-	#toolbar * {
-		vertical-align: middle;
+	#toolbar button, #toolbar input {
+		height: 32px;
 	}
 
-	#toolbar .Panel {
-		padding: 4px;
-		color: #888;
-	}
-
-	#toolbar button {
-		margin-right: 6px;
-		line-height: 14px;
-		height: 24px;
-	}
+		#toolbar button img {
+			width: 16px;
+			opacity: 0.5;
+		}
 
 .Outliner {
 	color: #444;
@@ -451,6 +448,7 @@ select {
 	font-size: 12px;
 	cursor: default;
 	overflow: auto;
+	resize: vertical;
 	outline: none !important;
 }
 
@@ -531,12 +529,6 @@ select {
 		width: 100%;
 		top: calc(100% - 320px);
 		bottom: 0;
-	}
-
-	#toolbar {
-		left: calc(50% - 140px);
-		width: 280px;
-		top: 68px;
 	}
 
 }
@@ -627,6 +619,10 @@ select {
 	#toolbar {
 		background-color: #111;
 	}
+
+		#toolbar img {
+			filter: invert(1);
+		}
 
 	.Outliner {
 		color: #888;

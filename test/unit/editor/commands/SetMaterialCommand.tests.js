@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/SetMaterialCommand';
+import { } from '../../../../editor/js/commands/SetMaterialCommand';
 
 export default QUnit.module( 'Editor', () => {
 

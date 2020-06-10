@@ -18,8 +18,6 @@ import {
 
 function RectAreaLightHelper( light, color ) {
 
-	this.type = 'RectAreaLightHelper';
-
 	this.light = light;
 
 	this.color = color; // optional hardwired color for the helper
@@ -33,6 +31,8 @@ function RectAreaLightHelper( light, color ) {
 	var material = new LineBasicMaterial( { fog: false } );
 
 	Line.call( this, geometry, material );
+
+	this.type = 'RectAreaLightHelper';
 
 	//
 

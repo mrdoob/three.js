@@ -27,6 +27,8 @@ function PositionalAudioHelper( audio, range, divisionsInnerAngle, divisionsOute
 
 	Line.call( this, geometry, [ materialOuterAngle, materialInnerAngle ] );
 
+	this.type = 'PositionalAudioHelper';
+
 	this.update();
 
 }

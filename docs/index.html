@@ -10,7 +10,7 @@
 		<script src="../build/three.min.js" async defer></script>
 	</head>
 	<body>
-		<div id="panel" class="">
+		<div id="panel">
 
 			<div id="header">
 				<h1><a href="http://threejs.org">three.js</a></h1>
@@ -27,7 +27,7 @@
 
 			<div id="contentWrapper">
 				<div id="inputWrapper">
-					<input placeholder="" type="text" id="filter" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
 					<div id="exitSearchButton"></div>
 					<select id="language">
 						<option value="en">en</option>
@@ -94,7 +94,7 @@
 			var expandButton = document.getElementById( 'expandButton' );
 			var exitSearchButton = document.getElementById( 'exitSearchButton' );
 			var panelScrim = document.getElementById( 'panelScrim' );
-			var filterInput = document.getElementById( 'filter' );
+			var filterInput = document.getElementById( 'filterInput' );
 			var iframe = document.querySelector( 'iframe' );
 
 			var pageProperties = {};
@@ -102,7 +102,6 @@
 			var categoryElements = [];
 
 			var navigation;
-
 
 			// Functionality for hamburger button (on small devices)
 
@@ -124,25 +123,27 @@
 			// Functionality for search/filter input field
 			filterInput.onfocus = function ( event ) {
 
-				panel.classList.add('searchFocused');
+				panel.classList.add( 'searchFocused' );
 
-			}
+			};
 
 			filterInput.onblur = function ( event ) {
 
-				if(filterInput.value === '') {
-					panel.classList.remove('searchFocused');
+				if ( filterInput.value === '' ) {
+
+					panel.classList.remove( 'searchFocused' );
+
 				}
 
-			}
+			};
 
-			exitSearchButton.onclick = function( event ) {
+			exitSearchButton.onclick = function ( event ) {
 
 				filterInput.value = '';
 				updateFilter();
-				panel.classList.remove('searchFocused');
+				panel.classList.remove( 'searchFocused' );
 
-			}
+			};
 
 			filterInput.oninput = function ( event ) {
 
@@ -181,7 +182,7 @@
 
 					} );
 
-					link.classList.add('selected');
+					link.classList.add( 'selected' );
 
 				} );
 
@@ -241,7 +242,7 @@
 							var listElement = document.createElement( 'li' );
 							categoryContent.appendChild( listElement );
 
-							var linkElement = createLink( pageName, pageURL )
+							var linkElement = createLink( pageName, pageURL );
 							listElement.appendChild( linkElement );
 
 							// Gather the main properties for the current subpage
@@ -253,9 +254,9 @@
 								linkElement: linkElement
 							};
 
-						// Gather the document titles (used for easy access on browser navigation)
+							// Gather the document titles (used for easy access on browser navigation)
 
-						titles[ pageURL ] = pageName;
+							titles[ pageURL ] = pageName;
 
 						}
 
@@ -282,7 +283,6 @@
 
 			}
 
-
 			// Filtering
 
 			function updateFilter() {
@@ -302,12 +302,14 @@
 
 						// Accentuate matching characters
 
-						for ( var i = 0; i < filterResults.length; i++ ) {
+						for ( var i = 0; i < filterResults.length; i ++ ) {
 
 							var result = filterResults[ i ];
 
 							if ( result !== '' ) {
+
 								pageName = pageName.replace( result, '<b>' + result + '</b>' );
+			
 							}
 
 						}
@@ -370,7 +372,6 @@
 
 			}
 
-
 			// Routing
 
 			function setUrlFragment( pageName ) {
@@ -414,7 +415,7 @@
 				oldIframe = iframe;
 				iframe = oldIframe.cloneNode();
 
-				if(hash) {
+				if ( hash ) {
 
 					iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
 					subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
@@ -429,7 +430,6 @@
 				document.body.replaceChild( iframe, oldIframe );
 				document.title = subtitle + 'three.js docs';
 
-
 			}
 
 			function decomposePageName( pageName, oldDelimiter, newDelimiter ) {
@@ -443,7 +443,7 @@
 
 				var dotIndex = pageName.indexOf( oldDelimiter );
 
-				if ( dotIndex !== -1 ) {
+				if ( dotIndex !== - 1 ) {
 
 					parts = pageName.split( oldDelimiter );
 					parts[ 1 ] = newDelimiter + parts[ 1 ];
@@ -461,7 +461,7 @@
 
 			//
 
-			console.log([
+			console.log( [
 				'    __     __',
 				' __/ __\\  / __\\__   ____   _____   _____',
 				'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
@@ -470,8 +470,7 @@
 				'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
 				'                                         / __/  /  \\__  \\',
 				'                                         \\/____/\\/_____/'
-			].join('\n'));
-
+			].join( '\n' ) );
 
 		</script>
 

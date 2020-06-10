@@ -20,7 +20,7 @@ LineCurve.prototype.isLineCurve = true;
 
 LineCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
-	var point = optionalTarget || new Vector2();
+	const point = optionalTarget || new Vector2();
 
 	if ( t === 1 ) {
 
@@ -45,11 +45,13 @@ LineCurve.prototype.getPointAt = function ( u, optionalTarget ) {
 
 };
 
-LineCurve.prototype.getTangent = function ( /* t */ ) {
+LineCurve.prototype.getTangent = function ( t, optionalTarget ) {
 
-	var tangent = this.v2.clone().sub( this.v1 );
+	const tangent = optionalTarget || new Vector2();
 
-	return tangent.normalize();
+	tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+
+	return tangent;
 
 };
 
@@ -66,7 +68,7 @@ LineCurve.prototype.copy = function ( source ) {
 
 LineCurve.prototype.toJSON = function () {
 
-	var data = Curve.prototype.toJSON.call( this );
+	const data = Curve.prototype.toJSON.call( this );
 
 	data.v1 = this.v1.toArray();
 	data.v2 = this.v2.toArray();

@@ -316,6 +316,7 @@ PhongNode.prototype.build = function ( builder ) {
 
 		}
 	*/
+
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );

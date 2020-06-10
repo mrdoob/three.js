@@ -1,3 +1,4 @@
+console.warn( "THREE.ConvexObjectBreaker: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author yomboprime https://github.com/yomboprime
  *
@@ -388,6 +389,7 @@ THREE.ConvexObjectBreaker.prototype = {
 				radius1 = Math.max( radius1, p.x, p.y, p.z );
 
 			}
+
 			this.tempCM1.add( object.position );
 
 		}
@@ -407,6 +409,7 @@ THREE.ConvexObjectBreaker.prototype = {
 				radius2 = Math.max( radius2, p.x, p.y, p.z );
 
 			}
+
 			this.tempCM2.add( object.position );
 
 		}

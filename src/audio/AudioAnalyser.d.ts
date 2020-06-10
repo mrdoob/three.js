@@ -2,7 +2,7 @@ import { Audio } from './Audio';
 
 export class AudioAnalyser {
 
-	constructor( audio: Audio, fftSize: number );
+	constructor( audio: Audio<AudioNode>, fftSize: number );
 
 	analyser: AnalyserNode;
 	data: Uint8Array;

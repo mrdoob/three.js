@@ -9,6 +9,32 @@ import {
 
 var SceneUtils = {
 
+	createMeshesFromInstancedMesh: function ( instancedMesh ) {
+
+		var group = new Group();
+
+		var count = instancedMesh.count;
+		var geometry = instancedMesh.geometry;
+		var material = instancedMesh.material;
+
+		for ( var i = 0; i < count; i ++ ) {
+
+			var mesh = new Mesh( geometry, material );
+
+			instancedMesh.getMatrixAt( i, mesh.matrix );
+			mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
+
+			group.add( mesh );
+
+		}
+
+		group.copy( instancedMesh );
+		group.updateMatrixWorld(); // ensure correct world matrices of meshes
+
+		return group;
+
+	},
+
 	createMultiMaterialObject: function ( geometry, materials ) {
 
 		var group = new Group();

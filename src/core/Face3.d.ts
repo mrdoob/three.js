@@ -1,12 +1,6 @@
 import { Vector3 } from './../math/Vector3';
 import { Color } from './../math/Color';
 
-export interface Event {
-	type: string;
-	target?: any;
-	[attachment: string]: any;
-}
-
 /**
  * Triangle face.
  *
@@ -76,7 +70,7 @@ export class Face3 {
 	normal: Vector3;
 
 	/**
-	 * Array of 4 vertex normals.
+	 * Array of 3 vertex normals.
 	 */
 	vertexNormals: Vector3[];
 
@@ -86,7 +80,7 @@ export class Face3 {
 	color: Color;
 
 	/**
-	 * Array of 4 vertex normals.
+	 * Array of 3 vertex colors.
 	 */
 	vertexColors: Color[];
 

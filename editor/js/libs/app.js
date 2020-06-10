@@ -1,12 +1,11 @@
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */
 
 var APP = {
 
-	Player: function ( THREE ) {
-
-		window.THREE = THREE; // FIX for editor scripts (they require THREE in global namespace)
+	Player: function () {
 
 		var renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setPixelRatio( window.devicePixelRatio );
@@ -14,6 +13,8 @@ var APP = {
 
 		var loader = new THREE.ObjectLoader();
 		var camera, scene;
+
+		var vrButton = VRButton.createButton( renderer );
 
 		var events = {};
 
@@ -29,8 +30,12 @@ var APP = {
 
 			var project = json.project;
 
-			if ( project.shadows ) renderer.shadowMap.enabled = true;
-			if ( project.vr ) renderer.xr.enabled = true;
+			if ( project.vr !== undefined ) renderer.xr.enabled = project.vr;
+			if ( project.shadows !== undefined ) renderer.shadowMap.enabled = project.shadows;
+			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
+			if ( project.toneMapping !== undefined ) renderer.toneMapping = project.toneMapping;
+			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
+			if ( project.physicallyCorrectLights !== undefined ) renderer.physicallyCorrectLights = project.physicallyCorrectLights;
 
 			this.setScene( loader.parse( json.scene ) );
 			this.setCamera( loader.parse( json.camera ) );
@@ -172,6 +177,8 @@ var APP = {
 
 		this.play = function () {
 
+			if ( renderer.xr.enabled ) dom.append( vrButton );
+
 			prevTime = performance.now();
 
 			document.addEventListener( 'keydown', onDocumentKeyDown );
@@ -190,6 +197,8 @@ var APP = {
 		};
 
 		this.stop = function () {
+
+			if ( renderer.xr.enabled ) vrButton.remove();
 
 			document.removeEventListener( 'keydown', onDocumentKeyDown );
 			document.removeEventListener( 'keyup', onDocumentKeyUp );

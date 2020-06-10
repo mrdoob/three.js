@@ -4,18 +4,18 @@
 
 function WebGLObjects( gl, geometries, attributes, info ) {
 
-	var updateList = {};
+	let updateMap = new WeakMap();
 
 	function update( object ) {
 
-		var frame = info.render.frame;
+		const frame = info.render.frame;
 
-		var geometry = object.geometry;
-		var buffergeometry = geometries.get( object, geometry );
+		const geometry = object.geometry;
+		const buffergeometry = geometries.get( object, geometry );
 
 		// Update once per frame
 
-		if ( updateList[ buffergeometry.id ] !== frame ) {
+		if ( updateMap.get( buffergeometry ) !== frame ) {
 
 			if ( geometry.isGeometry ) {
 
@@ -25,7 +25,7 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 			geometries.update( buffergeometry );
 
-			updateList[ buffergeometry.id ] = frame;
+			updateMap.set( buffergeometry, frame );
 
 		}
 
@@ -41,7 +41,7 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 	function dispose() {
 
-		updateList = {};
+		updateMap = new WeakMap();
 
 	}
 

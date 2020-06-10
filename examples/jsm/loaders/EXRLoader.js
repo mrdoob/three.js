@@ -2,8 +2,8 @@
  * @author Richard M. / https://github.com/richardmonette
  * @author ScieCode / http://github.com/sciecode
  *
- * OpenEXR loader which, currently, supports uncompressed, ZIP(S), RLE and PIZ wavelet compression.
- * Supports reading 16 and 32 bit data format.
+ * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
  *
  * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
  * implementation, so I have preserved their copyright notices.
@@ -15,8 +15,12 @@ import {
 	HalfFloatType,
 	LinearEncoding,
 	LinearFilter,
+	NearestFilter,
 	RGBAFormat,
-	RGBFormat
+	RGBEEncoding,
+	RGBEFormat,
+	RGBFormat,
+	UnsignedByteType
 } from "../../../build/three.module.js";
 import { Zlib } from "../libs/inflate.module.min.js";
 
@@ -109,6 +113,10 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 		const HUF_DECSIZE = 1 << HUF_DECBITS; // decoding table size
 		const HUF_DECMASK = HUF_DECSIZE - 1;
 
+		const NBITS = 16;
+		const A_OFFSET = 1 << ( NBITS - 1 );
+		const MOD_MASK = ( 1 << NBITS ) - 1;
+
 		const SHORT_ZEROCODE_RUN = 59;
 		const LONG_ZEROCODE_RUN = 63;
 		const SHORTEST_LONG_RUN = 2 + LONG_ZEROCODE_RUN - SHORT_ZEROCODE_RUN;
@@ -127,6 +135,41 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 		const RLE = 2;
 
 		const logBase = Math.pow( 2.7182818, 2.2 );
+
+		var tmpDataView = new DataView( new ArrayBuffer( 8 ) );
+
+		function frexp( value ) {
+
+			if ( value === 0 ) return [ value, 0 ];
+
+			tmpDataView.setFloat64( 0, value );
+
+			var bits = ( tmpDataView.getUint32( 0 ) >>> 20 ) & 0x7FF;
+			if ( bits === 0 ) { // denormal
+
+				tmpDataView.setFloat64( 0, value * Math.pow( 2, 64 ) ); // exp + 64
+				bits = ( ( tmpDataView.getUint32( 0 ) >>> 20 ) & 0x7FF ) - 64;
+
+			}
+
+			var exponent = bits - 1022;
+			var mantissa = ldexp( value, - exponent );
+
+			return [ mantissa, exponent ];
+
+		}
+
+		function ldexp( mantissa, exponent ) {
+
+			var steps = Math.min( 3, Math.ceil( Math.abs( exponent ) / 1023 ) );
+			var result = mantissa;
+
+			for ( var i = 0; i < steps; i ++ )
+				result *= Math.pow( 2, Math.floor( ( exponent + i ) / steps ) );
+
+			return result;
+
+		}
 
 		function reverseLutFromBitmap( bitmap, lut ) {
 
@@ -448,8 +491,22 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
-		function wav2Decode( buffer, j, nx, ox, ny, oy ) {
+		function wdec16( l, h ) {
 
+			var m = UInt16( l );
+			var d = UInt16( h );
+
+			var bb = ( m - ( d >> 1 ) ) & MOD_MASK;
+			var aa = ( d + bb - A_OFFSET ) & MOD_MASK;
+
+			wdec14Return.a = aa;
+			wdec14Return.b = bb;
+
+		}
+
+		function wav2Decode( buffer, j, nx, ox, ny, oy, mx ) {
+
+			var w14 = mx < ( 1 << 14 );
 			var n = ( nx > ny ) ? ny : nx;
 			var p = 1;
 			var p2;
@@ -481,25 +538,52 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 						var p10 = px + oy1;
 						var p11 = p10 + ox1;
 
-						wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+						if ( w14 ) {
 
-						i00 = wdec14Return.a;
-						i10 = wdec14Return.b;
+							wdec14( buffer[ px + j ], buffer[ p10 + j ] );
 
-						wdec14( buffer[ p01 + j ], buffer[ p11 + j ] );
+							i00 = wdec14Return.a;
+							i10 = wdec14Return.b;
 
-						i01 = wdec14Return.a;
-						i11 = wdec14Return.b;
+							wdec14( buffer[ p01 + j ], buffer[ p11 + j ] );
 
-						wdec14( i00, i01 );
+							i01 = wdec14Return.a;
+							i11 = wdec14Return.b;
 
-						buffer[ px + j ] = wdec14Return.a;
-						buffer[ p01 + j ] = wdec14Return.b;
+							wdec14( i00, i01 );
 
-						wdec14( i10, i11 );
+							buffer[ px + j ] = wdec14Return.a;
+							buffer[ p01 + j ] = wdec14Return.b;
 
-						buffer[ p10 + j ] = wdec14Return.a;
-						buffer[ p11 + j ] = wdec14Return.b;
+							wdec14( i10, i11 );
+
+							buffer[ p10 + j ] = wdec14Return.a;
+							buffer[ p11 + j ] = wdec14Return.b;
+
+						} else {
+
+							wdec16( buffer[ px + j ], buffer[ p10 + j ] );
+
+							i00 = wdec14Return.a;
+							i10 = wdec14Return.b;
+
+							wdec16( buffer[ p01 + j ], buffer[ p11 + j ] );
+
+							i01 = wdec14Return.a;
+							i11 = wdec14Return.b;
+
+							wdec16( i00, i01 );
+
+							buffer[ px + j ] = wdec14Return.a;
+							buffer[ p01 + j ] = wdec14Return.b;
+
+							wdec16( i10, i11 );
+
+							buffer[ p10 + j ] = wdec14Return.a;
+							buffer[ p11 + j ] = wdec14Return.b;
+
+
+						}
 
 					}
 
@@ -507,7 +591,10 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 						var p10 = px + oy1;
 
-						wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+						if ( w14 )
+							wdec14( buffer[ px + j ], buffer[ p10 + j ] );
+						else
+							wdec16( buffer[ px + j ], buffer[ p10 + j ] );
 
 						i00 = wdec14Return.a;
 						buffer[ p10 + j ] = wdec14Return.b;
@@ -527,7 +614,10 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 						var p01 = px + ox1;
 
-						wdec14( buffer[ px + j ], buffer[ p01 + j ] );
+						if ( w14 )
+							wdec14( buffer[ px + j ], buffer[ p01 + j ] );
+						else
+							wdec16( buffer[ px + j ], buffer[ p01 + j ] );
 
 						i00 = wdec14Return.a;
 						buffer[ p01 + j ] = wdec14Return.b;
@@ -1270,7 +1360,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			// Reverse LUT
 			var lut = new Uint16Array( USHORT_RANGE );
-			reverseLutFromBitmap( bitmap, lut );
+			var maxValue = reverseLutFromBitmap( bitmap, lut );
 
 			var length = parseUint32( inDataView, inOffset );
 
@@ -1290,7 +1380,8 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 						cd.nx,
 						cd.size,
 						cd.ny,
-						cd.nx * cd.size
+						cd.nx * cd.size,
+						maxValue
 					);
 
 				}
@@ -1586,6 +1677,34 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		function parseRational( dataView, offset ) {
+
+			var x = parseInt32( dataView, offset );
+			var y = parseUint32( dataView, offset );
+
+			return [ x, y ];
+
+		}
+
+		function parseTimecode( dataView, offset ) {
+
+			var x = parseUint32( dataView, offset );
+			var y = parseUint32( dataView, offset );
+
+			return [ x, y ];
+
+		}
+
+		function parseInt32( dataView, offset ) {
+
+			var Int32 = dataView.getInt32( offset.value, true );
+
+			offset.value = offset.value + INT32_SIZE;
+
+			return Int32;
+
+		}
+
 		function parseUint32( dataView, offset ) {
 
 			var Uint32 = dataView.getUint32( offset.value, true );
@@ -1636,6 +1755,12 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		function decodeFloat32( dataView, offset ) {
+
+			return encodeFloat16( parseFloat32( dataView, offset ) );
+
+		}
+
 		// https://stackoverflow.com/questions/5678432/decompressing-half-precision-floats-in-javascript
 		function decodeFloat16( binary ) {
 
@@ -1654,60 +1779,54 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
-		var encodeFloat16 = ( function () {
-
-			// Source: http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
-
-			var floatView = new Float32Array( 1 );
-			var int32View = new Int32Array( floatView.buffer );
+		// http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
+		function encodeFloat16( val ) {
 
 			/* This method is faster than the OpenEXR implementation (very often
 			 * used, eg. in Ogre), with the additional benefit of rounding, inspired
-			 * by James Tursa?s half-precision code. */
-			return function toHalf( val ) {
+			 * by James Tursa?s half-precision code.
+			*/
 
-				floatView[ 0 ] = val;
-				var x = int32View[ 0 ];
+			tmpDataView.setFloat32( 0, val );
+			var x = tmpDataView.getInt32( 0 );
 
-				var bits = ( x >> 16 ) & 0x8000; /* Get the sign */
-				var m = ( x >> 12 ) & 0x07ff; /* Keep one extra bit for rounding */
-				var e = ( x >> 23 ) & 0xff; /* Using int is faster here */
+			var bits = ( x >> 16 ) & 0x8000; /* Get the sign */
+			var m = ( x >> 12 ) & 0x07ff; /* Keep one extra bit for rounding */
+			var e = ( x >> 23 ) & 0xff; /* Using int is faster here */
 
-				/* If zero, or denormal, or exponent underflows too much for a denormal
-				 * half, return signed zero. */
-				if ( e < 103 ) return bits;
+			/* If zero, or denormal, or exponent underflows too much for a denormal
+				* half, return signed zero. */
+			if ( e < 103 ) return bits;
 
-				/* If NaN, return NaN. If Inf or exponent overflow, return Inf. */
-				if ( e > 142 ) {
+			/* If NaN, return NaN. If Inf or exponent overflow, return Inf. */
+			if ( e > 142 ) {
 
-					bits |= 0x7c00;
-					/* If exponent was 0xff and one mantissa bit was set, it means NaN,
-							 * not Inf, so make sure we set one mantissa bit too. */
-					bits |= ( ( e == 255 ) ? 0 : 1 ) && ( x & 0x007fffff );
-					return bits;
-
-				}
-
-				/* If exponent underflows but not too much, return a denormal */
-				if ( e < 113 ) {
-
-					m |= 0x0800;
-					/* Extra rounding may overflow and set mantissa to 0 and exponent
-					 * to 1, which is OK. */
-					bits |= ( m >> ( 114 - e ) ) + ( ( m >> ( 113 - e ) ) & 1 );
-					return bits;
-
-				}
-
-				bits |= ( ( e - 112 ) << 10 ) | ( m >> 1 );
-				/* Extra rounding. An overflow will set mantissa to 0 and increment
-				 * the exponent, which is OK. */
-				bits += m & 1;
+				bits |= 0x7c00;
+				/* If exponent was 0xff and one mantissa bit was set, it means NaN,
+							* not Inf, so make sure we set one mantissa bit too. */
+				bits |= ( ( e == 255 ) ? 0 : 1 ) && ( x & 0x007fffff );
 				return bits;
 
-			};
+			}
 
-		} )();
+			/* If exponent underflows but not too much, return a denormal */
+			if ( e < 113 ) {
+
+				m |= 0x0800;
+				/* Extra rounding may overflow and set mantissa to 0 and exponent
+					* to 1, which is OK. */
+				bits |= ( m >> ( 114 - e ) ) + ( ( m >> ( 113 - e ) ) & 1 );
+				return bits;
+
+			}
+
+			bits |= ( ( e - 112 ) << 10 ) | ( m >> 1 );
+			/* Extra rounding. An overflow will set mantissa to 0 and increment
+				* the exponent, which is OK. */
+			bits += m & 1;
+			return bits;
+
+		}
 
 		function parseUint16( dataView, offset ) {
 
@@ -1733,11 +1852,11 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			while ( offset.value < ( startOffset + size - 1 ) ) {
 
 				var name = parseNullTerminatedString( buffer, offset );
-				var pixelType = parseUint32( dataView, offset ); // TODO: Cast this to UINT, HALF or FLOAT
+				var pixelType = parseInt32( dataView, offset );
 				var pLinear = parseUint8( dataView, offset );
 				offset.value += 3; // reserved, three chars
-				var xSampling = parseUint32( dataView, offset );
-				var ySampling = parseUint32( dataView, offset );
+				var xSampling = parseInt32( dataView, offset );
+				var ySampling = parseInt32( dataView, offset );
 
 				channels.push( {
 					name: name,
@@ -1823,6 +1942,16 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		function parseV3f( dataView, offset ) {
+
+			var x = parseFloat32( dataView, offset );
+			var y = parseFloat32( dataView, offset );
+			var z = parseFloat32( dataView, offset );
+
+			return [ x, y, z ];
+
+		}
+
 		function parseValue( dataView, buffer, offset, type, size ) {
 
 			if ( type === 'string' || type === 'stringvector' || type === 'iccProfile' ) {
@@ -1857,9 +1986,21 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				return parseV2f( dataView, offset );
 
+			} else if ( type === 'v3f' ) {
+
+				return parseV3f( dataView, offset );
+
 			} else if ( type === 'int' ) {
 
-				return parseUint32( dataView, offset );
+				return parseInt32( dataView, offset );
+
+			} else if ( type === 'rational' ) {
+
+				return parseRational( dataView, offset );
+
+			} else if ( type === 'timecode' ) {
+
+				return parseTimecode( dataView, offset );
 
 			} else {
 
@@ -1970,6 +2111,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			switch ( this.type ) {
 
+				case UnsignedByteType:
 				case FloatType:
 
 					getValue = parseFloat16;
@@ -1988,6 +2130,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			switch ( this.type ) {
 
+				case UnsignedByteType:
 				case FloatType:
 
 					getValue = parseFloat32;
@@ -1996,7 +2139,8 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				case HalfFloatType:
 
-					throw 'EXRLoader.parse: unsupported HalfFloatType texture for FloatType image file.';
+					getValue = decodeFloat32;
+					size_t = FLOAT32_SIZE;
 
 			}
 
@@ -2026,6 +2170,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 		// Fill initially with 1s for the alpha value if the texture is not RGBA, RGB values will be overwritten
 		switch ( this.type ) {
 
+			case UnsignedByteType:
 			case FloatType:
 
 				var byteArray = new Float32Array( size );
@@ -2124,12 +2269,58 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		if ( this.type === UnsignedByteType ) {
+
+			let v, i, j;
+			const size = byteArray.length;
+			const RGBEArray = new Uint8Array( size );
+
+			for ( let h = 0; h < height; ++ h ) {
+
+				for ( let w = 0; w < width; ++ w ) {
+
+					i = h * width * 4 + w * 4;
+					j = ( height - 1 - h ) * width * 4 + w * 4;
+
+					const red = byteArray[ j ];
+					const green = byteArray[ j + 1 ];
+					const blue = byteArray[ j + 2 ];
+
+					v = ( red > green ) ? red : green;
+					v = ( blue > v ) ? blue : v;
+
+					if ( v < 1e-32 ) {
+
+						RGBEArray[ i ] = RGBEArray[ i + 1 ] = RGBEArray[ i + 2 ] = RGBEArray[ i + 3 ] = 0;
+
+					} else {
+
+						const res = frexp( v );
+						v = res[ 0 ] * 256 / v;
+
+						RGBEArray[ i ] = red * v;
+						RGBEArray[ i + 1 ] = green * v;
+						RGBEArray[ i + 2 ] = blue * v;
+						RGBEArray[ i + 3 ] = res[ 1 ] + 128;
+
+					}
+
+				}
+
+			}
+
+			byteArray = RGBEArray;
+
+		}
+
+		let format = ( this.type === UnsignedByteType ) ? RGBEFormat : ( numChannels === 4 ) ? RGBAFormat : RGBFormat;
+
 		return {
 			header: EXRHeader,
 			width: width,
 			height: height,
 			data: byteArray,
-			format: numChannels === 4 ? RGBAFormat : RGBFormat,
+			format: format,
 			type: this.type
 		};
 
@@ -2148,15 +2339,16 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			switch ( texture.type ) {
 
-				case FloatType:
+				case UnsignedByteType:
 
-					texture.encoding = LinearEncoding;
-					texture.minFilter = LinearFilter;
-					texture.magFilter = LinearFilter;
+					texture.encoding = RGBEEncoding;
+					texture.minFilter = NearestFilter;
+					texture.magFilter = NearestFilter;
 					texture.generateMipmaps = false;
-					texture.flipY = false;
+					texture.flipY = true;
 					break;
 
+				case FloatType:
 				case HalfFloatType:
 
 					texture.encoding = LinearEncoding;

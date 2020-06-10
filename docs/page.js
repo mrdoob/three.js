@@ -1,4 +1,4 @@
-if ( !window.frameElement && window.location.protocol !== 'file:' ) {
+if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
 	// If the page is not yet displayed as an iframe of the index page (navigation panel/working links),
 	// redirect to the index page (using the current URL without extension as the new fragment).
@@ -68,7 +68,7 @@ function onDocumentLoad( event ) {
 	text = text.replace( /\[param:([\w\.]+) ([\w\.\s]+)\]/gi, "$2 : <a class=\"param\" onclick=\"window.parent.setUrlFragment('$1')\">$1</a>" ); // [param:name title]
 
 	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_]+)\]/gi, "[link:$1 $1]" ); // [link:url] to [link:url title]
-	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\#|\=]+) ([\w|\:|\/|\.|\-|\_|\s]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
+	text = text.replace( /\[link:([\w|\:|\/|\.|\-|\_|\(|\)|\?|\#|\=]+) ([\w|\:|\/|\.|\-|\_|\s]+)\]/gi, "<a href=\"$1\"  target=\"_blank\">$2</a>" ); // [link:url title]
 	text = text.replace( /\*([\w|\d|\"|\-|\(][\w|\d|\ |\-|\/|\+|\-|\(|\)|\=|\,|\.\"]*[\w|\d|\"|\)]|\w)\*/gi, "<strong>$1</strong>" ); // *
 
 	text = text.replace( /\[example:([\w\_]+)\]/gi, "[example:$1 $1]" ); // [example:name] to [example:name title]
@@ -130,6 +130,7 @@ function onDocumentLoad( event ) {
 
 			var e = elements[ i ];
 			e.className += ' prettyprint';
+			e.setAttribute( 'translate', 'no' );
 
 		}
 

@@ -33,40 +33,15 @@ RemoveObjectCommand.prototype = {
 
 	execute: function () {
 
-		var scope = this.editor;
-		this.object.traverse( function ( child ) {
-
-			scope.removeHelper( child );
-
-		} );
-
-		this.parent.remove( this.object );
-		this.editor.select( this.parent );
-
-		this.editor.signals.objectRemoved.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
+		this.editor.removeObject( this.object );
+		this.editor.deselect();
 
 	},
 
 	undo: function () {
 
-		var scope = this.editor;
-
-		this.object.traverse( function ( child ) {
-
-			if ( child.geometry !== undefined ) scope.addGeometry( child.geometry );
-			if ( child.material !== undefined ) scope.addMaterial( child.material );
-
-			scope.addHelper( child );
-
-		} );
-
-		this.parent.children.splice( this.index, 0, this.object );
-		this.object.parent = this.parent;
+		this.editor.addObject( this.object, this.parent, this.index );
 		this.editor.select( this.object );
-
-		this.editor.signals.objectAdded.dispatch( this.object );
-		this.editor.signals.sceneGraphChanged.dispatch();
 
 	},
 

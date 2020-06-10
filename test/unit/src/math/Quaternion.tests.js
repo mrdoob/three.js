@@ -5,6 +5,7 @@
  */
 /* global QUnit */
 
+import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { Quaternion } from '../../../../src/math/Quaternion';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Vector4 } from '../../../../src/math/Vector4';
@@ -711,6 +712,38 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "fromBufferAttribute", ( assert ) => {
+
+			var a = new Quaternion();
+
+			var attribute = new BufferAttribute( new Float32Array( [
+
+				0, 0, 0, 1,
+				.7, 0, 0, .7,
+				0, .7, 0, .7,
+
+			] ), 4 );
+
+			a.fromBufferAttribute( attribute, 0 );
+			assert.numEqual( a.x, 0, 'index 0, component x' );
+			assert.numEqual( a.y, 0, 'index 0, component y' );
+			assert.numEqual( a.z, 0, 'index 0, component z' );
+			assert.numEqual( a.w, 1, 'index 0, component w' );
+
+			a.fromBufferAttribute( attribute, 1 );
+			assert.numEqual( a.x, .7, 'index 1, component x' );
+			assert.numEqual( a.y, 0, 'index 1, component y' );
+			assert.numEqual( a.z, 0, 'index 1, component z' );
+			assert.numEqual( a.w, .7, 'index 1, component w' );
+
+			a.fromBufferAttribute( attribute, 2 );
+			assert.numEqual( a.x, 0, 'index 2, component x' );
+			assert.numEqual( a.y, .7, 'index 2, component y' );
+			assert.numEqual( a.z, 0, 'index 2, component z' );
+			assert.numEqual( a.w, .7, 'index 2, component w' );
+
+		} );
+
 		QUnit.test( "_onChange", ( assert ) => {
 
 			var b = false;
@@ -778,5 +811,3 @@ export default QUnit.module( 'Maths', () => {
 	} );
 
 } );
-
-QUnit.module( "Quaternion" );

@@ -56,7 +56,7 @@ Object.assign( LightShadow.prototype, {
 
 	updateMatrices: function ( light ) {
 
-		var shadowCamera = this.camera,
+		const shadowCamera = this.camera,
 			shadowMatrix = this.matrix,
 			projScreenMatrix = this._projScreenMatrix,
 			lookTarget = this._lookTarget,
@@ -70,7 +70,7 @@ Object.assign( LightShadow.prototype, {
 		shadowCamera.updateMatrixWorld();
 
 		projScreenMatrix.multiplyMatrices( shadowCamera.projectionMatrix, shadowCamera.matrixWorldInverse );
-		this._frustum.setFromMatrix( projScreenMatrix );
+		this._frustum.setFromProjectionMatrix( projScreenMatrix );
 
 		shadowMatrix.set(
 			0.5, 0.0, 0.0, 0.5,
@@ -117,7 +117,7 @@ Object.assign( LightShadow.prototype, {
 
 	toJSON: function () {
 
-		var object = {};
+		const object = {};
 
 		if ( this.bias !== 0 ) object.bias = this.bias;
 		if ( this.radius !== 1 ) object.radius = this.radius;

@@ -23,22 +23,24 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var images = [];
+		const images = [];
 
-		var texture = new CompressedTexture();
+		const texture = new CompressedTexture();
 		texture.image = images;
 
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+
+		let loaded = 0;
 
 		function loadTexture( i ) {
 
 			loader.load( url[ i ], function ( buffer ) {
 
-				var texDatas = scope.parse( buffer, true );
+				const texDatas = scope.parse( buffer, true );
 
 				images[ i ] = {
 					width: texDatas.width,
@@ -67,9 +69,7 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 
 		if ( Array.isArray( url ) ) {
 
-			var loaded = 0;
-
-			for ( var i = 0, il = url.length; i < il; ++ i ) {
+			for ( let i = 0, il = url.length; i < il; ++ i ) {
 
 				loadTexture( i );
 
@@ -81,17 +81,17 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 
 			loader.load( url, function ( buffer ) {
 
-				var texDatas = scope.parse( buffer, true );
+				const texDatas = scope.parse( buffer, true );
 
 				if ( texDatas.isCubemap ) {
 
-					var faces = texDatas.mipmaps.length / texDatas.mipmapCount;
+					const faces = texDatas.mipmaps.length / texDatas.mipmapCount;
 
-					for ( var f = 0; f < faces; f ++ ) {
+					for ( let f = 0; f < faces; f ++ ) {
 
 						images[ f ] = { mipmaps: [] };
 
-						for ( var i = 0; i < texDatas.mipmapCount; i ++ ) {
+						for ( let i = 0; i < texDatas.mipmapCount; i ++ ) {
 
 							images[ f ].mipmaps.push( texDatas.mipmaps[ f * texDatas.mipmapCount + i ] );
 							images[ f ].format = texDatas.format;

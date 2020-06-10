@@ -10,6 +10,4 @@ export class CubicBezierCurve3 extends Curve<Vector3> {
 	v2: Vector3;
 	v3: Vector3;
 
-	getPoint( t: number ): Vector3;
-
 }

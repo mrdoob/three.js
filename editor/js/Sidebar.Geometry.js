@@ -30,6 +30,8 @@ import { SidebarGeometryTorusGeometry } from './Sidebar.Geometry.TorusGeometry.j
 import { SidebarGeometryTorusKnotGeometry } from './Sidebar.Geometry.TorusKnotGeometry.js';
 import { SidebarGeometryTubeGeometry } from './Sidebar.Geometry.TubeGeometry.js';
 
+import { VertexNormalsHelper } from '../../examples/jsm/helpers/VertexNormalsHelper.js';
+
 var geometryUIClasses = {
 	'BoxBufferGeometry': SidebarGeometryBoxGeometry,
 	'CircleBufferGeometry': SidebarGeometryCircleGeometry,
@@ -60,6 +62,8 @@ var SidebarGeometry = function ( editor ) {
 	container.setBorderTop( '0' );
 	container.setDisplay( 'none' );
 	container.setPaddingTop( '20px' );
+
+	var currentGeometryType = null;
 
 	// Actions
 
@@ -196,7 +200,31 @@ var SidebarGeometry = function ( editor ) {
 	container.add( new UIText( strings.getKey( 'sidebar/geometry/bounds' ) ).setWidth( '90px' ) );
 	container.add( geometryBoundingSphere );
 
-	//
+	// Helpers
+
+	var helpersRow = new UIRow().setMarginTop( '16px' ).setPaddingLeft( '90px' );
+	container.add( helpersRow );
+
+	var vertexNormalsButton = new UIButton( strings.getKey( 'sidebar/geometry/show_vertex_normals' ) );
+	vertexNormalsButton.onClick( function () {
+
+		var object = editor.selected;
+
+		if ( editor.helpers[ object.id ] === undefined ) {
+
+			var helper = new VertexNormalsHelper( object );
+			editor.addHelper( object, helper );
+
+		} else {
+
+			editor.removeHelper( object );
+
+		}
+
+		signals.sceneGraphChanged.dispatch();
+
+	} );
+	helpersRow.add( vertexNormalsButton );
 
 	function build() {
 
@@ -215,15 +243,21 @@ var SidebarGeometry = function ( editor ) {
 
 			//
 
-			parameters.clear();
+			if ( currentGeometryType !== geometry.type ) {
 
-			if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
+				parameters.clear();
 
-				parameters.add( new SidebarGeometryModifiers( editor, object ) );
+				if ( geometry.type === 'BufferGeometry' || geometry.type === 'Geometry' ) {
 
-			} else if ( geometryUIClasses[ geometry.type ] !== undefined ) {
+					parameters.add( new SidebarGeometryModifiers( editor, object ) );
 
-				parameters.add( new geometryUIClasses[ geometry.type ]( editor, object ) );
+				} else if ( geometryUIClasses[ geometry.type ] !== undefined ) {
+
+					parameters.add( new geometryUIClasses[ geometry.type ]( editor, object ) );
+
+				}
+
+				currentGeometryType = geometry.type;
 
 			}
 
@@ -239,7 +273,14 @@ var SidebarGeometry = function ( editor ) {
 
 	}
 
-	signals.objectSelected.add( build );
+	signals.objectSelected.add( function () {
+
+		currentGeometryType = null;
+
+		build();
+
+	} );
+
 	signals.geometryChanged.add( build );
 
 	return container;

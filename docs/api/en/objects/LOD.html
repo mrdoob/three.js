@@ -20,28 +20,30 @@
 			and one for close up (high detail).
 		</p>
 
-		<h2>Example</h2>
-		
+		<h2>Code Example</h2>
+
+		<code>
+		var lod = new THREE.LOD();
+
+		//Create spheres with 3 levels of detail and create new LOD levels for them
+		for( var i = 0; i < 3; i++ ) {
+
+			var geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
+
+			var mesh = new THREE.Mesh( geometry, material );
+
+			lod.addLevel( mesh, i * 75 );
+
+		}
+
+		scene.add( lod );
+		</code>
+
+		<h2>Examples</h2>
+
 		<p>
 			[example:webgl_lod webgl / lod ]
 		</p>
-
-		<code>
-var lod = new THREE.LOD();
-
-//Create spheres with 3 levels of detail and create new LOD levels for them
-for( var i = 0; i < 3; i++ ) {
-
-	var geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
-
-	var mesh = new THREE.Mesh( geometry, material );
-
-	lod.addLevel( mesh, i * 75 );
-
-}
-
-scene.add( lod );
-		</code>
 
 		<h2>Constructor</h2>
 		<h3>[name]( )</h3>
@@ -87,6 +89,13 @@ scene.add( lod );
 		</p>
 
 
+		<h3>[method:integer getCurrentLevel]()</h3>
+		<p>
+		Get the currently active LOD level. As index of the levels array.
+		</p>
+
+
+
 		<h3>[method:Object3D getObjectForDistance]( [param:Float distance] )</h3>
 		<p>
 		Get a reference to the first [page:Object3D] (mesh) that is greater than [page:Float distance].
@@ -108,7 +117,7 @@ scene.add( lod );
 		<h3>[method:null update]( [param:Camera camera] )</h3>
 		<p>
 			Set the visibility of each [page:levels level]'s [page:Object3D object] based on
-			distance from the [page:Camera camera]. 
+			distance from the [page:Camera camera].
 		</p>
 
 		<h2>Source</h2>

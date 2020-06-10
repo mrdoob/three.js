@@ -1,4 +1,11 @@
-import { Event } from './Face3';
+/**
+ * Event object.
+ */
+export interface Event {
+	type: string;
+	target?: any;
+	[attachment: string]: any;
+}
 
 /**
  * JavaScript events for custom objects

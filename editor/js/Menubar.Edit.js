@@ -118,10 +118,11 @@ var MenubarEdit = function ( editor ) {
 
 		var object = editor.selected;
 
-		var parent = object.parent;
-		if ( parent === undefined ) return; // avoid deleting the camera or scene
+		if ( object !== null && object.parent !== null ) {
 
-		editor.execute( new RemoveObjectCommand( editor, object ) );
+			editor.execute( new RemoveObjectCommand( editor, object ) );
+
+		}
 
 	} );
 	options.add( option );
@@ -158,7 +159,7 @@ var MenubarEdit = function ( editor ) {
 
 			var material = object.material;
 
-			if ( material.isShaderMaterial ) {
+			if ( material !== undefined && material.isShaderMaterial ) {
 
 				try {
 

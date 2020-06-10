@@ -1,0 +1,20 @@
+{
+  "name": "test-deps-intaller",
+  "version": "1.0.0",
+  "description": "This package hiding test dependincies from main repo because puppeteer is pretty big.",
+  "scripts": {
+    "dev": "rollup -c rollup.unit.config.js -w -m inline",
+    "unit": "rollup -c rollup.unit.config.js && rimraf node_modules/three && qunit -r failonlyreporter unit/build/three.source.unit.js"
+  },
+  "devDependencies": {
+    "failonlyreporter": "^1.0.0",
+    "image-output": "^2.4.2",
+    "jimp": "^0.12.0",
+    "pixelmatch": "^5.2.0",
+    "puppeteer": "3.1.0",
+    "qunit": "^2.10.0",
+    "rimraf": "^3.0.2",
+    "serve-handler": "^6.1.2"
+  },
+  "license": "MIT"
+}

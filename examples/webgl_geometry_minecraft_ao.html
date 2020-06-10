@@ -242,7 +242,7 @@
 
 				var mesh = new THREE.Mesh(
 					geometry,
-					new THREE.MeshLambertMaterial( { map: texture, vertexColors: THREE.VertexColors, side: THREE.DoubleSide } )
+					new THREE.MeshLambertMaterial( { map: texture, vertexColors: true, side: THREE.DoubleSide } )
 				);
 				scene.add( mesh );
 

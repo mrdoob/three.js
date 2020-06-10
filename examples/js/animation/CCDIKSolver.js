@@ -1,3 +1,4 @@
+console.warn( "THREE.CCDIKSolver: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author takahiro / https://github.com/takahirox
  *
@@ -392,7 +393,7 @@ THREE.CCDIKSolver = ( function () {
 
 		_init: function () {
 
-			var self = this;
+			var scope = this;
 			var iks = this.iks;
 
 			function createLineGeometry( ik ) {
@@ -407,25 +408,25 @@ THREE.CCDIKSolver = ( function () {
 
 			function createTargetMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.targetSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.targetSphereMaterial );
 
 			}
 
 			function createEffectorMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.effectorSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.effectorSphereMaterial );
 
 			}
 
 			function createLinkMesh() {
 
-				return new THREE.Mesh( self.sphereGeometry, self.linkSphereMaterial );
+				return new THREE.Mesh( scope.sphereGeometry, scope.linkSphereMaterial );
 
 			}
 
 			function createLine( ik ) {
 
-				return new THREE.Line( createLineGeometry( ik ), self.lineMaterial );
+				return new THREE.Line( createLineGeometry( ik ), scope.lineMaterial );
 
 			}
 

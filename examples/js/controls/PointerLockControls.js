@@ -1,3 +1,4 @@
+console.warn( "THREE.PointerLockControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author Mugen87 / https://github.com/Mugen87
@@ -14,6 +15,11 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	this.domElement = domElement;
 	this.isLocked = false;
+
+	// Set to constrain the pitch of the camera
+	// Range is 0 to Math.PI radians
+	this.minPolarAngle = 0; // radians
+	this.maxPolarAngle = Math.PI; // radians
 
 	//
 	// internals
@@ -43,7 +49,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 		euler.y -= movementX * 0.002;
 		euler.x -= movementY * 0.002;
 
-		euler.x = Math.max( - PI_2, Math.min( PI_2, euler.x ) );
+		euler.x = Math.max( PI_2 - scope.maxPolarAngle, Math.min( PI_2 - scope.minPolarAngle, euler.x ) );
 
 		camera.quaternion.setFromEuler( euler );
 

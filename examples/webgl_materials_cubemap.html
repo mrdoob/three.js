@@ -50,11 +50,8 @@
 				];
 
 				var reflectionCube = new THREE.CubeTextureLoader().load( urls );
-				reflectionCube.format = THREE.RGBFormat;
-
 				var refractionCube = new THREE.CubeTextureLoader().load( urls );
 				refractionCube.mapping = THREE.CubeRefractionMapping;
-				refractionCube.format = THREE.RGBFormat;
 
 				scene = new THREE.Scene();
 				scene.background = reflectionCube;

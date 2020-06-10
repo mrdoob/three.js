@@ -33,6 +33,7 @@ export interface MeshStandardMaterialParameters extends MaterialParameters {
 	wireframe?: boolean;
 	wireframeLinewidth?: number;
 	skinning?: boolean;
+	vertexTangents?: boolean;
 	morphTargets?: boolean;
 	morphNormals?: boolean;
 }
@@ -69,6 +70,7 @@ export class MeshStandardMaterial extends Material {
 	wireframe: boolean;
 	wireframeLinewidth: number;
 	skinning: boolean;
+	vertexTangents: boolean;
 	morphTargets: boolean;
 	morphNormals: boolean;
 

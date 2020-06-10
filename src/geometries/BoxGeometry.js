@@ -53,7 +53,7 @@ class BoxBufferGeometry extends BufferGeometry {
 			depthSegments: depthSegments
 		};
 
-		var scope = this;
+		const scope = this;
 
 		width = width || 1;
 		height = height || 1;
@@ -67,15 +67,15 @@ class BoxBufferGeometry extends BufferGeometry {
 
 		// buffers
 
-		var indices = [];
-		var vertices = [];
-		var normals = [];
-		var uvs = [];
+		const indices = [];
+		const vertices = [];
+		const normals = [];
+		const uvs = [];
 
 		// helper variables
 
-		var numberOfVertices = 0;
-		var groupStart = 0;
+		let numberOfVertices = 0;
+		let groupStart = 0;
 
 		// build each side of the box geometry
 
@@ -95,32 +95,30 @@ class BoxBufferGeometry extends BufferGeometry {
 
 		function buildPlane( u, v, w, udir, vdir, width, height, depth, gridX, gridY, materialIndex ) {
 
-			var segmentWidth = width / gridX;
-			var segmentHeight = height / gridY;
+			const segmentWidth = width / gridX;
+			const segmentHeight = height / gridY;
 
-			var widthHalf = width / 2;
-			var heightHalf = height / 2;
-			var depthHalf = depth / 2;
+			const widthHalf = width / 2;
+			const heightHalf = height / 2;
+			const depthHalf = depth / 2;
 
-			var gridX1 = gridX + 1;
-			var gridY1 = gridY + 1;
+			const gridX1 = gridX + 1;
+			const gridY1 = gridY + 1;
 
-			var vertexCounter = 0;
-			var groupCount = 0;
+			let vertexCounter = 0;
+			let groupCount = 0;
 
-			var ix, iy;
-
-			var vector = new Vector3();
+			const vector = new Vector3();
 
 			// generate vertices, normals and uvs
 
-			for ( iy = 0; iy < gridY1; iy ++ ) {
+			for ( let iy = 0; iy < gridY1; iy ++ ) {
 
-				var y = iy * segmentHeight - heightHalf;
+				const y = iy * segmentHeight - heightHalf;
 
-				for ( ix = 0; ix < gridX1; ix ++ ) {
+				for ( let ix = 0; ix < gridX1; ix ++ ) {
 
-					var x = ix * segmentWidth - widthHalf;
+					const x = ix * segmentWidth - widthHalf;
 
 					// set values to correct vector component
 
@@ -161,14 +159,14 @@ class BoxBufferGeometry extends BufferGeometry {
 			// 2. a single segment consists of two faces
 			// 3. so we need to generate six (2*3) indices per segment
 
-			for ( iy = 0; iy < gridY; iy ++ ) {
+			for ( let iy = 0; iy < gridY; iy ++ ) {
 
-				for ( ix = 0; ix < gridX; ix ++ ) {
+				for ( let ix = 0; ix < gridX; ix ++ ) {
 
-					var a = numberOfVertices + ix + gridX1 * iy;
-					var b = numberOfVertices + ix + gridX1 * ( iy + 1 );
-					var c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
-					var d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
+					const a = numberOfVertices + ix + gridX1 * iy;
+					const b = numberOfVertices + ix + gridX1 * ( iy + 1 );
+					const c = numberOfVertices + ( ix + 1 ) + gridX1 * ( iy + 1 );
+					const d = numberOfVertices + ( ix + 1 ) + gridX1 * iy;
 
 					// faces
 

@@ -1,21 +1,6 @@
 import { Vector2 } from './../../math/Vector2';
 import { CurvePath } from './CurvePath';
 
-export enum PathActions {
-	MOVE_TO,
-	LINE_TO,
-	QUADRATIC_CURVE_TO, // Bezier quadratic curve
-	BEZIER_CURVE_TO, // Bezier cubic curve
-	CSPLINE_THRU, // Catmull-rom spline
-	ARC, // Circle
-	ELLIPSE,
-}
-
-export interface PathAction {
-	action: PathActions;
-	args: any;
-}
-
 /**
  * a 2d path representation, comprising of points, lines, and cubes, similar to the html5 2d canvas api. It extends CurvePath.
  */

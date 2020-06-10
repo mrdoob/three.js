@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -13,7 +13,7 @@
 		<h1>曲线路径（[name]）</h1>
 
 		<p class="desc">
-		
+
 		一个扩展了[page:Curve]的抽象基类。CurvePath仅仅是一个已连接的曲线的数组，但保留了曲线的API。
 		</p>
 
@@ -52,6 +52,26 @@
 		<h3>[method:Float getCurveLengths]()</h3>
 		<p>将[page:.curves]数组中曲线的长度相加。</p>
 
+		<h3>[method:Vector getPoint]( [param:Float t] )</h3>
+		<p>
+			[page:Float t] - A position on the curve. Must be in the range [ 0, 1 ]. <br><br />
+
+			Returns a vector for a given position on the curve path.
+		</p>
+
+		<h3>[method:Array getPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- 曲线分段数量。默认值为*12*。<br /><br />
+
+			返回一组使用getPoint( t )获得的divisions + 1个点。
+		</p>
+
+		<h3>[method:Array getSpacedPoints]( [param:Integer divisions] )</h3>
+		<p>
+			divisions -- 曲线分段数量。默认值为*40*。<br /><br />
+
+			返回一组使用getPointAt( u )获得的divisions + 1个均分点。
+		</p>
 
 		<h2>源代码</h2>
 

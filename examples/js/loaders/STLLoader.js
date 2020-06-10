@@ -1,3 +1,4 @@
+console.warn( "THREE.STLLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author aleeper / http://adamleeper.com/
  * @author mrdoob / http://mrdoob.com/
@@ -25,7 +26,7 @@
  * For binary STLs geometry might contain colors for vertices. To use it:
  *  // use the same code to load STL as above
  *  if (geometry.hasColors) {
- *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: THREE.VertexColors });
+ *    material = new THREE.MeshPhongMaterial({ opacity: geometry.alpha, vertexColors: true });
  *  } else { .... }
  *  var mesh = new THREE.Mesh( geometry, material );
  *
@@ -79,13 +80,19 @@ THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				onLoad( scope.parse( text ) );
 
-			} catch ( exception ) {
+			} catch ( e ) {
 
 				if ( onError ) {
 
-					onError( exception );
+					onError( e );
+
+				} else {
+
+					console.error( e );
 
 				}
+
+				scope.manager.itemError( url );
 
 			}
 

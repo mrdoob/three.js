@@ -125,7 +125,7 @@
 				scene.add( parentTransform );
 
 				raycaster = new THREE.Raycaster();
-				raycaster.linePrecision = 3;
+				raycaster.params.Line.threshold = 3;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );

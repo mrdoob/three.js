@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - clipping planes</title>
+		<title>three.js webgl - clipping planes - advanced</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -139,7 +139,7 @@
 				Planes = planesFromMesh( Vertices, Indices ),
 				PlaneMatrices = Planes.map( planeToMatrix ),
 
-				GlobalClippingPlanes = cylindricalPlanes( 5, 3.5 ),
+				GlobalClippingPlanes = cylindricalPlanes( 5, 2.5 ),
 
 				Empty = Object.freeze( [] );
 
@@ -161,9 +161,9 @@
 
 				// Lights
 
-				scene.add( new THREE.AmbientLight( 0x505050 ) );
+				scene.add( new THREE.AmbientLight( 0xffffff, 0.3 ) );
 
-				var spotLight = new THREE.SpotLight( 0xffffff );
+				var spotLight = new THREE.SpotLight( 0xffffff, 0.5 );
 				spotLight.angle = Math.PI / 5;
 				spotLight.penumbra = 0.2;
 				spotLight.position.set( 2, 3, 3 );
@@ -174,7 +174,7 @@
 				spotLight.shadow.mapSize.height = 1024;
 				scene.add( spotLight );
 
-				var dirLight = new THREE.DirectionalLight( 0x55505a, 1 );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
 				dirLight.position.set( 0, 2, 0 );
 				dirLight.castShadow = true;
 				dirLight.shadow.camera.near = 1;
@@ -249,8 +249,10 @@
 
 					} );
 
-					volumeVisualization.add(
-						new THREE.Mesh( planeGeometry, material ) );
+					var mesh = new THREE.Mesh( planeGeometry, material );
+					mesh.matrixAutoUpdate = false;
+
+					volumeVisualization.add( mesh );
 
 				}
 
@@ -259,7 +261,7 @@
 
 				var ground = new THREE.Mesh( planeGeometry,
 					new THREE.MeshPhongMaterial( {
-						color: 0xa0adaf, shininess: 150 } ) );
+						color: 0xa0adaf, shininess: 10 } ) );
 				ground.rotation.x = - Math.PI / 2;
 				ground.scale.multiplyScalar( 3 );
 				ground.receiveShadow = true;
@@ -288,6 +290,8 @@
 				// Controls
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 8;
 				controls.target.set( 0, 1, 0 );
 				controls.update();
 
@@ -374,7 +378,7 @@
 				var parent = object.parent;
 				scene.updateMatrixWorld();
 				object.matrix.getInverse( parent.matrixWorld );
-				object.applyMatrix( matrix );
+				object.applyMatrix4( matrix );
 
 			}
 

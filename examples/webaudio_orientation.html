@@ -14,10 +14,7 @@
 	</audio>
 
 	<div id="overlay">
-		<div>
-			<button id="startButton">Click to Play</button>
-			<p>Audio playback requires user interaction.</p>
-		</div>
+		<button id="startButton">Play</button>
 	</div>
 	<div id="container"></div>
 	<div id="info">
@@ -52,7 +49,6 @@
 			var reflectionCube = new THREE.CubeTextureLoader()
 				.setPath( 'textures/cube/SwedishRoyalCastle/' )
 				.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-			reflectionCube.format = THREE.RGBFormat;
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xa0a0a0 );

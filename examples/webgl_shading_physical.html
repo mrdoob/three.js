@@ -67,7 +67,13 @@
 
 				// CUBE CAMERA
 
-				cubeCamera = new THREE.CubeCamera( 1, 10000, 128, { encoding: THREE.sRGBEncoding } );
+				var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 128, {
+					format: THREE.RGBFormat,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter,
+					encoding: THREE.sRGBEncoding
+				} );
+				cubeCamera = new THREE.CubeCamera( 1, 10000, cubeRenderTarget );
 
 				// TEXTURES
 				var textureLoader = new THREE.TextureLoader();
@@ -76,19 +82,16 @@
 				textureSquares.repeat.set( 50, 50 );
 				textureSquares.wrapS = textureSquares.wrapT = THREE.RepeatWrapping;
 				textureSquares.magFilter = THREE.NearestFilter;
-				textureSquares.format = THREE.RGBFormat;
 				textureSquares.encoding = THREE.sRGBEncoding;
 
 				var textureNoiseColor = textureLoader.load( "textures/disturb.jpg" );
 				textureNoiseColor.repeat.set( 1, 1 );
 				textureNoiseColor.wrapS = textureNoiseColor.wrapT = THREE.RepeatWrapping;
-				textureNoiseColor.format = THREE.RGBFormat;
 				textureNoiseColor.encoding = THREE.sRGBEncoding;
 
 				var textureLava = textureLoader.load( "textures/lava/lavatile.jpg" );
 				textureLava.repeat.set( 6, 2 );
 				textureLava.wrapS = textureLava.wrapT = THREE.RepeatWrapping;
-				textureLava.format = THREE.RGBFormat;
 				textureLava.encoding = THREE.sRGBEncoding;
 
 				// GROUND
@@ -113,7 +116,7 @@
 
 				var materialLambert = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, map: textureNoiseColor } );
 				var materialPhong = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, map: textureLava } );
-				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeCamera.renderTarget.texture } );
+				var materialPhongCube = new THREE.MeshPhongMaterial( { shininess: 50, color: 0xffffff, specular: 0x999999, envMap: cubeRenderTarget.texture } );
 
 				// OBJECTS
 
