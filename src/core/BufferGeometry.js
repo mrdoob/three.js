@@ -858,9 +858,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		for ( let i = 0, il = normals.count; i < il; i ++ ) {
 
-			_vector.x = normals.getX( i );
-			_vector.y = normals.getY( i );
-			_vector.z = normals.getZ( i );
+			_vector.fromBufferAttribute( normals, i );
 
 			_vector.normalize();
 
