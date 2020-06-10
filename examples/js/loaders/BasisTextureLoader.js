@@ -118,11 +118,7 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 				var cachedTask = THREE.BasisTextureLoader.taskCache.get( buffer );
 
-				if ( cachedTask.url === url ) {
-
-					return cachedTask.promise.then( onLoad ).catch( onError );
-
-				}
+				return cachedTask.promise.then( onLoad ).catch( onError );
 
 			}
 

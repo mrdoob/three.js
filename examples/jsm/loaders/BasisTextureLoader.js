@@ -131,11 +131,7 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 				var cachedTask = BasisTextureLoader.taskCache.get( buffer );
 
-				if ( cachedTask.url === url ) {
-
-					return cachedTask.promise.then( onLoad ).catch( onError );
-
-				}
+				return cachedTask.promise.then( onLoad ).catch( onError );
 
 			}
 
