@@ -34,7 +34,6 @@ var Reflector = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Reflector.ReflectorShader;
-	var encoding = options.encoding !== undefined ? options.encoding : LinearEncoding;
 
 	//
 
@@ -57,8 +56,7 @@ var Reflector = function ( geometry, options ) {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBFormat,
-		stencilBuffer: false,
-		encoding: encoding
+		stencilBuffer: false
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -156,6 +154,15 @@ var Reflector = function ( geometry, options ) {
 		projectionMatrix.elements[ 14 ] = clipPlane.w;
 
 		// Render
+
+		if ( renderer.outputEncoding !== LinearEncoding ) {
+
+			console.warn( 'THREE.Reflector: WebGLRenderer must use LinearEncoding as outputEncoding.' );
+			scope.onBeforeRender = function () {};
+
+			return;
+
+		}
 
 		scope.visible = false;
 
