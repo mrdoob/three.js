@@ -136,11 +136,7 @@ PMREMGenerator.prototype = {
 	 */
 	fromEquirectangular: function ( equirectangular ) {
 
-		equirectangular.magFilter = NearestFilter;
-		equirectangular.minFilter = NearestFilter;
-		equirectangular.generateMipmaps = false;
-
-		return this.fromCubemap( equirectangular );
+		return this._fromTexture( equirectangular );
 
 	},
 
@@ -151,13 +147,7 @@ PMREMGenerator.prototype = {
 	 */
 	fromCubemap: function ( cubemap ) {
 
-		_oldTarget = this._renderer.getRenderTarget();
-		const cubeUVRenderTarget = this._allocateTargets( cubemap );
-		this._textureToCubeUV( cubemap, cubeUVRenderTarget );
-		this._applyPMREM( cubeUVRenderTarget );
-		this._cleanup( cubeUVRenderTarget );
-
-		return cubeUVRenderTarget;
+		return this._fromTexture( cubemap );
 
 	},
 
@@ -223,7 +213,19 @@ PMREMGenerator.prototype = {
 
 	},
 
-	_allocateTargets: function ( equirectangular ) {
+	_fromTexture: function ( texture ) {
+
+		_oldTarget = this._renderer.getRenderTarget();
+		const cubeUVRenderTarget = this._allocateTargets( texture );
+		this._textureToCubeUV( texture, cubeUVRenderTarget );
+		this._applyPMREM( cubeUVRenderTarget );
+		this._cleanup( cubeUVRenderTarget );
+
+		return cubeUVRenderTarget;
+
+	},
+
+	_allocateTargets: function ( texture ) { // warning: null texture is valid
 
 		const params = {
 			magFilter: NearestFilter,
@@ -231,14 +233,14 @@ PMREMGenerator.prototype = {
 			generateMipmaps: false,
 			type: UnsignedByteType,
 			format: RGBEFormat,
-			encoding: _isLDR( equirectangular ) ? equirectangular.encoding : RGBEEncoding,
+			encoding: _isLDR( texture ) ? texture.encoding : RGBEEncoding,
 			depthBuffer: false,
 			stencilBuffer: false
 		};
 
 		const cubeUVRenderTarget = _createRenderTarget( params );
-		cubeUVRenderTarget.depthBuffer = equirectangular ? false : true;
-		this._pingPongRenderTarget = _createRenderTarget( params );
+		cubeUVRenderTarget.depthBuffer = texture ? false : true;
+		this._pingPongRenderTarget = _createRenderTarget( params ); // what should be the pingPong depthBuffer setting?
 		return cubeUVRenderTarget;
 
 	},
