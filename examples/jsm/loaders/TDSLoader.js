@@ -64,7 +64,25 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		loader.load( url, function ( data ) {
 
-			onLoad( scope.parse( data, path ) );
+			try {
+
+				onLoad( scope.parse( data, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 

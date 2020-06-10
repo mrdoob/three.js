@@ -49,9 +49,11 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				} else {
 
-					throw e;
+					console.error( e );
 
 				}
+
+				scope.manager.itemError( url );
 
 			}
 

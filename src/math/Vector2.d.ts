@@ -2,15 +2,19 @@ import { Matrix3 } from './Matrix3';
 import { BufferAttribute } from './../core/BufferAttribute';
 
 /**
- * ( interface Vector&lt;T&gt; )
+ * ( interface Vector<T> )
  *
- * Abstract interface of Vector2, Vector3 and Vector4.
+ * Abstract interface of {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector2.js|Vector2},
+ * {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector3.js|Vector3}
+ * and {@link https://github.com/mrdoob/three.js/blob/master/src/math/Vector4.js|Vector4}.
+ *
  * Currently the members of Vector is NOT type safe because it accepts different typed vectors.
+ *
  * Those definitions will be changed when TypeScript innovates Generics to be type safe.
  *
  * @example
- * var v:THREE.Vector = new THREE.Vector3();
- * v.addVectors(new THREE.Vector2(0, 1), new THREE.Vector2(2, 3));		// invalid but compiled successfully
+ * const v:THREE.Vector = new THREE.Vector3();
+ * v.addVectors(new THREE.Vector2(0, 1), new THREE.Vector2(2, 3)); // invalid but compiled successfully
  */
 export interface Vector {
 	setComponent( index: number, value: number ): this;
@@ -31,7 +35,7 @@ export interface Vector {
 	 *
 	 * add(v:T):T;
 	 */
-	add( v: Vector, w?: Vector ): this;
+	add( v: Vector ): this;
 
 	/**
 	 * addVectors(a:T, b:T):T;

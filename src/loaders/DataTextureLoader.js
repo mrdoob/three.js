@@ -23,16 +23,16 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		const scope = this;
 
-		var texture = new DataTexture();
+		const texture = new DataTexture();
 
-		var loader = new FileLoader( this.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
-			var texData = scope.parse( buffer );
+			const texData = scope.parse( buffer );
 
 			if ( ! texData ) return;
 

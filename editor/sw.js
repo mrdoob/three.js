@@ -1,4 +1,4 @@
-// r115.1
+// r117.1
 
 const assets = [
 	'./',
@@ -47,6 +47,8 @@ const assets = [
 	'../examples/jsm/exporters/PLYExporter.js',
 	'../examples/jsm/exporters/STLExporter.js',
 
+	'../examples/jsm/helpers/VertexNormalsHelper.js',
+
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
 
 	'../examples/js/vr/HelioWebXRPolyfill.js',
@@ -54,6 +56,9 @@ const assets = [
 
 	'./manifest.json',
 	'./images/icon.png',
+	'./images/rotate.svg',
+	'./images/scale.svg',
+	'./images/translate.svg',
 
 	'./js/libs/codemirror/codemirror.css',
 	'./js/libs/codemirror/theme/monokai.css',

@@ -1,3 +1,4 @@
+console.warn( "THREE.TransformControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author arodic / https://github.com/arodic
  */
@@ -56,7 +57,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		var allIntersections = raycaster.intersectObject( object, true );
 
-		for ( var i = allIntersections.length; i --; ) {
+		for ( var i = 0; i < allIntersections.length; i ++ ) {
 
 			if ( allIntersections[ i ].object.visible || includeInvisible ) {
 
@@ -737,7 +738,8 @@ THREE.TransformControlsGizmo = function () {
 		depthWrite: false,
 		transparent: true,
 		side: THREE.DoubleSide,
-		fog: false
+		fog: false,
+		toneMapped: false
 	} );
 
 	var gizmoLineMaterial = new THREE.LineBasicMaterial( {
@@ -745,7 +747,8 @@ THREE.TransformControlsGizmo = function () {
 		depthWrite: false,
 		transparent: true,
 		linewidth: 1,
-		fog: false
+		fog: false,
+		toneMapped: false
 	} );
 
 	// Make unique material for each axis/color
@@ -810,7 +813,7 @@ THREE.TransformControlsGizmo = function () {
 
 	var scaleHandleGeometry = new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 );
 
-	var lineGeometry = new THREE.BufferGeometry( );
+	var lineGeometry = new THREE.BufferGeometry();
 	lineGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
 
 	var CircleGeometry = function ( radius, arc ) {
@@ -1567,7 +1570,7 @@ THREE.TransformControlsPlane = function () {
 
 	THREE.Mesh.call( this,
 		new THREE.PlaneBufferGeometry( 100000, 100000, 2, 2 ),
-		new THREE.MeshBasicMaterial( { visible: false, wireframe: true, side: THREE.DoubleSide, transparent: true, opacity: 0.1 } )
+		new THREE.MeshBasicMaterial( { visible: false, wireframe: true, side: THREE.DoubleSide, transparent: true, opacity: 0.1, toneMapped: false } )
 	);
 
 	this.type = 'TransformControlsPlane';

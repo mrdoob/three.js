@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Menubar.View';
+import { } from '../../../editor/js/Menubar.View';
 
 export default QUnit.module( 'Editor', () => {
 

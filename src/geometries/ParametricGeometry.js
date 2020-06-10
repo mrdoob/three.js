@@ -49,19 +49,17 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
-	var EPS = 0.00001;
+	const EPS = 0.00001;
 
-	var normal = new Vector3();
+	const normal = new Vector3();
 
-	var p0 = new Vector3(), p1 = new Vector3();
-	var pu = new Vector3(), pv = new Vector3();
-
-	var i, j;
+	const p0 = new Vector3(), p1 = new Vector3();
+	const pu = new Vector3(), pv = new Vector3();
 
 	if ( func.length < 3 ) {
 
@@ -71,15 +69,15 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// generate vertices, normals and uvs
 
-	var sliceCount = slices + 1;
+	const sliceCount = slices + 1;
 
-	for ( i = 0; i <= stacks; i ++ ) {
+	for ( let i = 0; i <= stacks; i ++ ) {
 
-		var v = i / stacks;
+		const v = i / stacks;
 
-		for ( j = 0; j <= slices; j ++ ) {
+		for ( let j = 0; j <= slices; j ++ ) {
 
-			var u = j / slices;
+			const u = j / slices;
 
 			// vertex
 
@@ -129,14 +127,14 @@ function ParametricBufferGeometry( func, slices, stacks ) {
 
 	// generate indices
 
-	for ( i = 0; i < stacks; i ++ ) {
+	for ( let i = 0; i < stacks; i ++ ) {
 
-		for ( j = 0; j < slices; j ++ ) {
+		for ( let j = 0; j < slices; j ++ ) {
 
-			var a = i * sliceCount + j;
-			var b = i * sliceCount + j + 1;
-			var c = ( i + 1 ) * sliceCount + j + 1;
-			var d = ( i + 1 ) * sliceCount + j;
+			const a = i * sliceCount + j;
+			const b = i * sliceCount + j + 1;
+			const c = ( i + 1 ) * sliceCount + j + 1;
+			const d = ( i + 1 ) * sliceCount + j;
 
 			// faces one and two
 

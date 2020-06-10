@@ -1,5 +1,5 @@
 /**
- * @author munrocket / https://github.com/munrocket
+ * @author munrocket / https://twitter.com/munrocket_twit
  */
 
 ( function () {

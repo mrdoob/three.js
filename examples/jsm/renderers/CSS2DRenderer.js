@@ -12,7 +12,8 @@ var CSS2DObject = function ( element ) {
 
 	Object3D.call( this );
 
-	this.element = element;
+	this.element = element || document.createElement( 'div' );
+
 	this.element.style.position = 'absolute';
 
 	this.addEventListener( 'removed', function () {
@@ -31,8 +32,21 @@ var CSS2DObject = function ( element ) {
 
 };
 
-CSS2DObject.prototype = Object.create( Object3D.prototype );
-CSS2DObject.prototype.constructor = CSS2DObject;
+CSS2DObject.prototype = Object.assign( Object.create( Object3D.prototype ), {
+
+	constructor: CSS2DObject,
+
+	copy: function ( source, recursive ) {
+
+		Object3D.prototype.copy.call( this, source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+} );
 
 //
 

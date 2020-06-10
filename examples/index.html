@@ -6,11 +6,6 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link rel="shortcut icon" href="../files/favicon.ico" />
 		<link rel="stylesheet" type="text/css" href="../files/main.css">
-		<style>
-			#panel #content .link {
-				display: block;
-			}
-		</style>
 	</head>
 	<body>
 
@@ -110,13 +105,13 @@
 
 			// Events
 
-			filterInput.onfocus = function ( event ) {
+			filterInput.onfocus = function ( ) {
 
 				panel.classList.add( 'searchFocused' );
 
 			};
 
-			filterInput.onblur = function ( event ) {
+			filterInput.onblur = function ( ) {
 
 				if ( filterInput.value === '' ) {
 
@@ -126,7 +121,7 @@
 
 			};
 
-			exitSearchButton.onclick = function ( event ) {
+			exitSearchButton.onclick = function ( ) {
 
 				filterInput.value = '';
 				updateFilter();
@@ -169,12 +164,21 @@
 
 		function createLink( file ) {
 
-			var link = document.createElement( 'a' );
-			link.className = 'link';
-			link.href = file + '.html';
-			link.textContent = getName( file );
-			link.setAttribute( 'target', 'viewer' );
-			link.addEventListener( 'click', function ( event ) {
+
+			var template = [
+				'<div class="card">',
+				'	<a href="' + file + '.html" target="viewer">',
+				'		<div class="cover">',
+				'			<img src="screenshots/' + file + '.jpg" loading="lazy" width="400" />',
+				'		</div>',
+				'		<div class="title">' + getName( file ) + '</div>',
+				'	</a>',
+				'</div>'
+			].join( "\n" );
+
+			var link = createElementFromHTML( template );
+
+			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
 
 				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
 
@@ -249,6 +253,7 @@
 
 			var link = links[ file ];
 			var name = getName( file );
+			if ( file in tags ) file += tags[ file ].join( ' ' );
 			var res = file.match( exp );
 			var text;
 
@@ -262,12 +267,12 @@
 
 				}
 
-				link.innerHTML = text;
+				link.querySelector( '.title' ).innerHTML = text;
 
 			} else {
 
 				link.classList.add( 'hidden' );
-				link.innerHTML = name;
+				link.querySelector( '.title' ).innerHTML = name;
 
 			}
 
@@ -329,6 +334,15 @@
 			}
 
 			return '';
+
+		}
+
+
+		function createElementFromHTML( htmlString ) {
+
+			var div = document.createElement( 'div' );
+			div.innerHTML = htmlString.trim();
+			return div.firstChild;
 
 		}
 

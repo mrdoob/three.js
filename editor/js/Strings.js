@@ -76,6 +76,7 @@ var Strings = function ( config ) {
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
+			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'About',
 
 			'sidebar/scene': 'Scene',
@@ -293,7 +294,6 @@ var Strings = function ( config ) {
 			'sidebar/project/physicallyCorrectLights': 'Physically correct lights',
 			'sidebar/project/toneMapping': 'Tone mapping',
 			'sidebar/project/toneMappingExposure': 'Exposure',
-			'sidebar/project/toneMappingWhitePoint': 'White Point',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
@@ -390,6 +390,7 @@ var Strings = function ( config ) {
 
 			'menubar/help': 'Aide',
 			'menubar/help/source_code': 'Code Source',
+			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'A propos',
 
 			'sidebar/scene': 'Scène',
@@ -607,7 +608,6 @@ var Strings = function ( config ) {
 			'sidebar/project/physicallyCorrectLights': 'Rendu physique lumineux',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
 			'sidebar/project/toneMappingExposure': 'Réglage d\'exposition',
-			'sidebar/project/toneMappingWhitePoint': 'Réglage du point blanc',
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
@@ -704,6 +704,7 @@ var Strings = function ( config ) {
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
+			'menubar/help/icons': '图标组件包',
 			'menubar/help/about': '关于',
 
 			'sidebar/scene': '场景',
@@ -895,7 +896,6 @@ var Strings = function ( config ) {
 			'sidebar/project/physicallyCorrectLights': '物理光照',
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/toneMappingExposure': '曝光',
-			'sidebar/project/toneMappingWhitePoint': '白点',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 

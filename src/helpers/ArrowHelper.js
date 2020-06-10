@@ -24,8 +24,8 @@ import { Mesh } from '../objects/Mesh.js';
 import { Line } from '../objects/Line.js';
 import { Vector3 } from '../math/Vector3.js';
 
-var _axis = new Vector3();
-var _lineGeometry, _coneGeometry;
+const _axis = new Vector3();
+let _lineGeometry, _coneGeometry;
 
 function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
@@ -86,7 +86,7 @@ ArrowHelper.prototype.setDirection = function ( dir ) {
 
 		_axis.set( dir.z, 0, - dir.x ).normalize();
 
-		var radians = Math.acos( dir.y );
+		const radians = Math.acos( dir.y );
 
 		this.quaternion.setFromAxisAngle( _axis, radians );
 

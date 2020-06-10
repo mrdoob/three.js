@@ -691,7 +691,11 @@ Editor.prototype = {
 			metadata: {},
 			project: {
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
-				vr: this.config.getKey( 'project/vr' )
+				shadowType: this.config.getKey( 'project/renderer/shadowType' ),
+				vr: this.config.getKey( 'project/vr' ),
+				physicallyCorrectLights: this.config.getKey( 'project/renderer/physicallyCorrectLights' ),
+				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
+				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),

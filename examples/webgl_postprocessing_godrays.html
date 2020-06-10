@@ -19,6 +19,7 @@
 			import Stats from './jsm/libs/stats.module.js';
 
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GodRaysFakeSunShader, GodRaysDepthMaskShader, GodRaysCombineShader, GodRaysGenerateShader } from './jsm/shaders/GodRaysShader.js';
 
 			var container, stats;
@@ -27,9 +28,8 @@
 			var sphereMesh;
 
 			var sunPosition = new THREE.Vector3( 0, 1000, - 1000 );
+			var clipPosition = new THREE.Vector4();
 			var screenSpacePosition = new THREE.Vector3();
-
-			var mouseX = 0, mouseY = 0;
 
 			var postprocessing = { enabled: true };
 
@@ -91,6 +91,10 @@
 
 				renderer.autoClear = false;
 
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 50;
+				controls.maxDistance = 500;
+
 				//
 
 				stats = new Stats();
@@ -98,49 +102,11 @@
 
 				//
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				//
 
 				initPostprocessing( window.innerWidth, window.innerHeight );
-
-			}
-
-			//
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = event.clientX - window.innerWidth / 2;
-				mouseY = event.clientY - window.innerHeight / 2;
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - window.innerWidth / 2;
-					mouseY = event.touches[ 0 ].pageY - window.innerHeight / 2;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - window.innerWidth / 2;
-					mouseY = event.touches[ 0 ].pageY - window.innerHeight / 2;
-
-				}
 
 			}
 
@@ -287,28 +253,28 @@
 				sphereMesh.position.x = orbitRadius * Math.cos( time );
 				sphereMesh.position.z = orbitRadius * Math.sin( time ) - 100;
 
-
-				camera.position.x += ( mouseX - camera.position.x ) * 0.036;
-				camera.position.y += ( - ( mouseY ) - camera.position.y ) * 0.036;
-
-				camera.lookAt( scene.position );
-
 				if ( postprocessing.enabled ) {
 
-					// Find the screenspace position of the sun
+					clipPosition.x = sunPosition.x;
+					clipPosition.y = sunPosition.y;
+					clipPosition.z = sunPosition.z;
+					clipPosition.w = 1;
 
-					screenSpacePosition.copy( sunPosition ).project( camera );
+					clipPosition.applyMatrix4( camera.matrixWorldInverse ).applyMatrix4( camera.projectionMatrix );
 
-					screenSpacePosition.x = ( screenSpacePosition.x + 1 ) / 2;
-					screenSpacePosition.y = ( screenSpacePosition.y + 1 ) / 2;
+					// perspective divide (produce NDC space)
+
+					clipPosition.x /= clipPosition.w;
+					clipPosition.y /= clipPosition.w;
+
+					screenSpacePosition.x = ( clipPosition.x + 1 ) / 2; // transform from [-1,1] to [0,1]
+					screenSpacePosition.y = ( clipPosition.y + 1 ) / 2; // transform from [-1,1] to [0,1]
+					screenSpacePosition.z = clipPosition.z; // needs to stay in clip space for visibilty checks
 
 					// Give it to the god-ray and sun shaders
 
-					postprocessing.godrayGenUniforms[ "vSunPositionScreenSpace" ].value.x = screenSpacePosition.x;
-					postprocessing.godrayGenUniforms[ "vSunPositionScreenSpace" ].value.y = screenSpacePosition.y;
-
-					postprocessing.godraysFakeSunUniforms[ "vSunPositionScreenSpace" ].value.x = screenSpacePosition.x;
-					postprocessing.godraysFakeSunUniforms[ "vSunPositionScreenSpace" ].value.y = screenSpacePosition.y;
+					postprocessing.godrayGenUniforms[ "vSunPositionScreenSpace" ].value.copy( screenSpacePosition );
+					postprocessing.godraysFakeSunUniforms[ "vSunPositionScreenSpace" ].value.copy( screenSpacePosition );
 
 					// -- Draw sky and sun --
 

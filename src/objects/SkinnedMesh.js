@@ -33,6 +33,20 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	isSkinnedMesh: true,
 
+	copy: function ( source ) {
+
+		Mesh.prototype.copy.call( this, source );
+
+		this.bindMode = source.bindMode;
+		this.bindMatrix.copy( source.bindMatrix );
+		this.bindMatrixInverse.copy( source.bindMatrixInverse );
+
+		this.skeleton = source.skeleton;
+
+		return this;
+
+	},
+
 	bind: function ( skeleton, bindMatrix ) {
 
 		this.skeleton = skeleton;
@@ -60,18 +74,18 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	normalizeSkinWeights: function () {
 
-		var vector = new Vector4();
+		const vector = new Vector4();
 
-		var skinWeight = this.geometry.attributes.skinWeight;
+		const skinWeight = this.geometry.attributes.skinWeight;
 
-		for ( var i = 0, l = skinWeight.count; i < l; i ++ ) {
+		for ( let i = 0, l = skinWeight.count; i < l; i ++ ) {
 
 			vector.x = skinWeight.getX( i );
 			vector.y = skinWeight.getY( i );
 			vector.z = skinWeight.getZ( i );
 			vector.w = skinWeight.getW( i );
 
-			var scale = 1.0 / vector.manhattanLength();
+			const scale = 1.0 / vector.manhattanLength();
 
 			if ( scale !== Infinity ) {
 
@@ -109,26 +123,20 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 	},
 
-	clone: function () {
-
-		return new this.constructor( this.geometry, this.material ).copy( this );
-
-	},
-
 	boneTransform: ( function () {
 
-		var basePosition = new Vector3();
+		const basePosition = new Vector3();
 
-		var skinIndex = new Vector4();
-		var skinWeight = new Vector4();
+		const skinIndex = new Vector4();
+		const skinWeight = new Vector4();
 
-		var vector = new Vector3();
-		var matrix = new Matrix4();
+		const vector = new Vector3();
+		const matrix = new Matrix4();
 
 		return function ( index, target ) {
 
-			var skeleton = this.skeleton;
-			var geometry = this.geometry;
+			const skeleton = this.skeleton;
+			const geometry = this.geometry;
 
 			skinIndex.fromBufferAttribute( geometry.attributes.skinIndex, index );
 			skinWeight.fromBufferAttribute( geometry.attributes.skinWeight, index );
@@ -137,13 +145,13 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			target.set( 0, 0, 0 );
 
-			for ( var i = 0; i < 4; i ++ ) {
+			for ( let i = 0; i < 4; i ++ ) {
 
-				var weight = skinWeight.getComponent( i );
+				const weight = skinWeight.getComponent( i );
 
 				if ( weight !== 0 ) {
 
-					var boneIndex = skinIndex.getComponent( i );
+					const boneIndex = skinIndex.getComponent( i );
 
 					matrix.multiplyMatrices( skeleton.bones[ boneIndex ].matrixWorld, skeleton.boneInverses[ boneIndex ] );
 

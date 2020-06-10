@@ -20,18 +20,18 @@ SplineCurve.prototype.isSplineCurve = true;
 
 SplineCurve.prototype.getPoint = function ( t, optionalTarget ) {
 
-	var point = optionalTarget || new Vector2();
+	const point = optionalTarget || new Vector2();
 
-	var points = this.points;
-	var p = ( points.length - 1 ) * t;
+	const points = this.points;
+	const p = ( points.length - 1 ) * t;
 
-	var intPoint = Math.floor( p );
-	var weight = p - intPoint;
+	const intPoint = Math.floor( p );
+	const weight = p - intPoint;
 
-	var p0 = points[ intPoint === 0 ? intPoint : intPoint - 1 ];
-	var p1 = points[ intPoint ];
-	var p2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
-	var p3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
+	const p0 = points[ intPoint === 0 ? intPoint : intPoint - 1 ];
+	const p1 = points[ intPoint ];
+	const p2 = points[ intPoint > points.length - 2 ? points.length - 1 : intPoint + 1 ];
+	const p3 = points[ intPoint > points.length - 3 ? points.length - 1 : intPoint + 2 ];
 
 	point.set(
 		CatmullRom( weight, p0.x, p1.x, p2.x, p3.x ),
@@ -48,9 +48,9 @@ SplineCurve.prototype.copy = function ( source ) {
 
 	this.points = [];
 
-	for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+	for ( let i = 0, l = source.points.length; i < l; i ++ ) {
 
-		var point = source.points[ i ];
+		const point = source.points[ i ];
 
 		this.points.push( point.clone() );
 
@@ -62,13 +62,13 @@ SplineCurve.prototype.copy = function ( source ) {
 
 SplineCurve.prototype.toJSON = function () {
 
-	var data = Curve.prototype.toJSON.call( this );
+	const data = Curve.prototype.toJSON.call( this );
 
 	data.points = [];
 
-	for ( var i = 0, l = this.points.length; i < l; i ++ ) {
+	for ( let i = 0, l = this.points.length; i < l; i ++ ) {
 
-		var point = this.points[ i ];
+		const point = this.points[ i ];
 		data.points.push( point.toArray() );
 
 	}
@@ -83,9 +83,9 @@ SplineCurve.prototype.fromJSON = function ( json ) {
 
 	this.points = [];
 
-	for ( var i = 0, l = json.points.length; i < l; i ++ ) {
+	for ( let i = 0, l = json.points.length; i < l; i ++ ) {
 
-		var point = json.points[ i ];
+		const point = json.points[ i ];
 		this.points.push( new Vector2().fromArray( point ) );
 
 	}

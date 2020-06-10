@@ -21,7 +21,7 @@ import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
 import { ImageUtils } from '../extras/ImageUtils.js';
 
-var textureId = 0;
+let textureId = 0;
 
 function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
@@ -134,7 +134,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	toJSON: function ( meta ) {
 
-		var isRootObject = ( meta === undefined || typeof meta === 'string' );
+		const isRootObject = ( meta === undefined || typeof meta === 'string' );
 
 		if ( ! isRootObject && meta.textures[ this.uuid ] !== undefined ) {
 
@@ -142,7 +142,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		}
 
-		var output = {
+		const output = {
 
 			metadata: {
 				version: 4.5,
@@ -181,7 +181,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			// TODO: Move to THREE.Image
 
-			var image = this.image;
+			const image = this.image;
 
 			if ( image.uuid === undefined ) {
 
@@ -191,7 +191,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
 
-				var url;
+				let url;
 
 				if ( Array.isArray( image ) ) {
 
@@ -199,7 +199,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 					url = [];
 
-					for ( var i = 0, l = image.length; i < l; i ++ ) {
+					for ( let i = 0, l = image.length; i < l; i ++ ) {
 
 						url.push( ImageUtils.getDataURL( image[ i ] ) );
 

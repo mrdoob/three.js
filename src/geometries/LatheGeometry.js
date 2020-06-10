@@ -60,28 +60,26 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const uvs = [];
 
 	// helper variables
 
-	var base;
-	var inverseSegments = 1.0 / segments;
-	var vertex = new Vector3();
-	var uv = new Vector2();
-	var i, j;
+	const inverseSegments = 1.0 / segments;
+	const vertex = new Vector3();
+	const uv = new Vector2();
 
 	// generate vertices and uvs
 
-	for ( i = 0; i <= segments; i ++ ) {
+	for ( let i = 0; i <= segments; i ++ ) {
 
-		var phi = phiStart + i * inverseSegments * phiLength;
+		const phi = phiStart + i * inverseSegments * phiLength;
 
-		var sin = Math.sin( phi );
-		var cos = Math.cos( phi );
+		const sin = Math.sin( phi );
+		const cos = Math.cos( phi );
 
-		for ( j = 0; j <= ( points.length - 1 ); j ++ ) {
+		for ( let j = 0; j <= ( points.length - 1 ); j ++ ) {
 
 			// vertex
 
@@ -105,16 +103,16 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	// indices
 
-	for ( i = 0; i < segments; i ++ ) {
+	for ( let i = 0; i < segments; i ++ ) {
 
-		for ( j = 0; j < ( points.length - 1 ); j ++ ) {
+		for ( let j = 0; j < ( points.length - 1 ); j ++ ) {
 
-			base = j + i * points.length;
+			const base = j + i * points.length;
 
-			var a = base;
-			var b = base + points.length;
-			var c = base + points.length + 1;
-			var d = base + 1;
+			const a = base;
+			const b = base + points.length;
+			const c = base + points.length + 1;
+			const d = base + 1;
 
 			// faces
 
@@ -140,16 +138,16 @@ function LatheBufferGeometry( points, segments, phiStart, phiLength ) {
 
 	if ( phiLength === Math.PI * 2 ) {
 
-		var normals = this.attributes.normal.array;
-		var n1 = new Vector3();
-		var n2 = new Vector3();
-		var n = new Vector3();
+		const normals = this.attributes.normal.array;
+		const n1 = new Vector3();
+		const n2 = new Vector3();
+		const n = new Vector3();
 
 		// this is the buffer offset for the last line of vertices
 
-		base = segments * points.length * 3;
+		const base = segments * points.length * 3;
 
-		for ( i = 0, j = 0; i < points.length; i ++, j += 3 ) {
+		for ( let i = 0, j = 0; i < points.length; i ++, j += 3 ) {
 
 			// select the normal of the vertex in the first line
 

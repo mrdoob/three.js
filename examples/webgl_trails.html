@@ -66,6 +66,10 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+				//
+
+				if ( typeof TESTING !== 'undefined'  ) { for ( var i = 0; i < 1000; i ++ ) { render( 1000 - i ); } };
+
 			}
 
 			function onWindowResize() {
@@ -79,18 +83,18 @@
 
 			//
 
-			function animate() {
+			function animate( now ) {
 
 				requestAnimationFrame( animate );
 
-				render();
+				render( now );
 				stats.update();
 
 			}
 
-			function render() {
+			function render( now ) {
 
-				scene.rotation.y = Date.now() / 2000;
+				scene.rotation.y = now / 2000;
 
 				renderer.render( scene, camera );
 
