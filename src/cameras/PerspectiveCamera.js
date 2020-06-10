@@ -23,6 +23,8 @@ function PerspectiveCamera( fov, aspect, near, far ) {
 	this.focus = 10;
 
 	this.aspect = aspect !== undefined ? aspect : 1;
+	this.fit = 'auto';
+
 	this.view = null;
 
 	this.filmGauge = 35;	// width of the film (default in millimeters)
@@ -50,12 +52,25 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		this.focus = source.focus;
 
 		this.aspect = source.aspect;
+		this.fit = source.fit;
+
 		this.view = source.view === null ? null : Object.assign( {}, source.view );
 
 		this.filmGauge = source.filmGauge;
 		this.filmOffset = source.filmOffset;
 
 		return this;
+
+	},
+
+	/**
+	 * Option to control which dimension (vertical or horizontal) along which field of view angle fits.
+	 * Possible options are 'auto', 'horizontal' and 'vertical'.
+	 */
+	setFit: function ( value ) {
+
+		this.fit = value;
+		this.updateProjectionMatrix();
 
 	},
 
@@ -188,10 +203,21 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	updateProjectionMatrix: function () {
 
+		const aspect = this.aspect;
+		const fit = this.fit;
+
+		let fov = this.fov;
+
+		if ( fit === 'horizontal' || ( fit === 'auto' && aspect < 1 ) ) {
+
+			fov = Math.atan( Math.tan( fov * Math.PI / 360 ) / aspect ) * 360 / Math.PI;
+
+		}
+
 		let near = this.near,
-			top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+			top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * fov ) / this.zoom,
 			height = 2 * top,
-			width = this.aspect * height,
+			width = aspect * height,
 			left = - 0.5 * width,
 			view = this.view;
 
@@ -228,6 +254,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		data.object.focus = this.focus;
 
 		data.object.aspect = this.aspect;
+		data.object.fit = this.fit;
 
 		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
 
