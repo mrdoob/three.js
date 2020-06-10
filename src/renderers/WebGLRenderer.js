@@ -184,7 +184,7 @@ function WebGLRenderer( parameters ) {
 
 	// initialize
 
-	let _gl;
+	let _gl = _context;
 
 	try {
 
@@ -204,17 +204,25 @@ function WebGLRenderer( parameters ) {
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
-		_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
+		if ( _gl === null ) {
+
+			const contextType = typeof WebGL2RenderingContext !== 'undefined' ? 'webgl2' : 'webgl';
+
+			console.log( contextType );
+
+			_gl = _canvas.getContext( contextType, contextAttributes );
 
 		if ( _gl === null ) {
 
-			if ( _canvas.getContext( 'webgl' ) !== null ) {
+				if ( _canvas.getContext( contextType ) !== null ) {
 
-				throw new Error( 'Error creating WebGL context with your selected attributes.' );
+					throw new Error( 'Error creating ' + contextType + ' context with your selected attributes.' );
 
 			} else {
 
-				throw new Error( 'Error creating WebGL context.' );
+					throw new Error( 'Error creating ' + contextType + ' context.' );
+
+				}
 
 			}
 
