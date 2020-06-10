@@ -145,7 +145,7 @@
 				stats = new Stats();
 
 				// since the script is async you do not know when it is executed, right ?
-				if( !container ) window.addEventListener( 'DOMContentLoaded', function() {
+				if( container ) onContainerReady(); else window.addEventListener( 'DOMContentLoaded', function() {
 					container = document.getElementById( 'container' );
 					onContainerReady();
 				} );
