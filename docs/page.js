@@ -23,6 +23,87 @@ if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
 }
 
+var theme;
+
+function htmlToElement( html ) {
+	let template = document.createElement( 'template' );
+	html = html.trim( );
+	template.innerHTML = html;
+	return template.content.firstChild;
+}
+
+function add_theme_styles( ) {
+	var head = document.head || document.getElementsByTagName('head')[0];
+	var style = document.createElement( 'style' );
+	var csscontent = `[data-theme="dark"] {
+							--background-color: #222;
+							--secondary-background-color: #2e2e2e;
+
+							--text-color: #bbb;
+							--secondary-text-color: #666;
+
+							--border-style: 1px solid #444;
+						}`;
+
+	head.appendChild(style);
+
+	if ( style.styleSheet ){
+		// This is required for IE8 and below.
+		style.styleSheet.cssText = csscontent;
+	} else {
+		style.appendChild( document.createTextNode( csscontent ) );
+	}
+}
+
+function theme_apply( ) {
+	'use strict';
+	if ( theme === 'light' ) {
+		document.documentElement.setAttribute( 'data-theme', 'light' );
+		localStorage.setItem( 'theme', 'light' );
+	} else {
+		document.documentElement.setAttribute( 'data-theme', 'dark' );
+		localStorage.setItem( 'theme', 'dark' );
+	}
+}
+
+function theme_switch( ) {
+	'use strict';
+	if ( theme === 'light' ) {
+		theme = 'dark';
+	} else {
+		theme = 'light';
+	}
+	
+	theme_apply( );
+}
+
+function theme_handler( ){
+	var theme_OS = window.matchMedia( '(prefers-color-scheme: light)' );
+
+	theme_OS.addEventListener( 'change', function ( e ) {
+		'use strict';
+		if ( e.matches ) {
+			theme = 'light';
+		} else {
+			theme = 'dark';
+		}
+		theme_apply( );
+	});
+	
+	window.addEventListener("message", function(event) {
+		if (event.origin != 'http://threejs.org') {
+			return;
+		}
+	  
+		theme_switch( );
+	});
+
+	add_theme_styles( );
+
+	theme_apply( );
+
+}
+
 
 function onDocumentLoad( event ) {
 
@@ -140,6 +221,7 @@ function onDocumentLoad( event ) {
 
 	document.head.appendChild( prettify );
 
+	theme_handler( );
 };
 
 document.addEventListener( 'DOMContentLoaded', onDocumentLoad, false );
