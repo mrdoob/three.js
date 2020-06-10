@@ -19,7 +19,6 @@ THREE.Refractor = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || THREE.Refractor.RefractorShader;
-	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	//
 
@@ -38,8 +37,7 @@ THREE.Refractor = function ( geometry, options ) {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBFormat,
-		stencilBuffer: false,
-		encoding: encoding
+		stencilBuffer: false
 	};
 
 	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -223,6 +221,17 @@ THREE.Refractor = function ( geometry, options ) {
 	//
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
+
+		// Render
+
+		if ( renderer.outputEncoding !== THREE.LinearEncoding ) {
+
+			console.warn( 'THREE.Refractor: WebGLRenderer must use LinearEncoding as outputEncoding.' );
+			scope.onBeforeRender = function () {};
+
+			return;
+
+		}
 
 		// ensure refractors are rendered only once per frame
 
