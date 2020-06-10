@@ -33,7 +33,7 @@
 			Note: crossfades are possible with blend weights being set to (1,0,0), (0,1,0) or (0,0,1)
 		</div>
 
-		<script type="module">
+		<script type="module" async>
 
 			import * as THREE from '../build/three.module.js';
 
@@ -44,6 +44,7 @@
 
 			var scene, renderer, camera, stats;
 			var model, skeleton, mixer, clock;
+			var container;
 
 			var crossFadeControls = [];
 
@@ -58,7 +59,7 @@
 
 			function init() {
 
-				var container = document.getElementById( 'container' );
+				container = document.getElementById( 'container' );
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 1, 2, - 3 );
@@ -140,13 +141,22 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.shadowMap.enabled = true;
-				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+
+				// since the script is async you do not know when it is executed, right ?
+				if( !container ) window.addEventListener( 'DOMContentLoaded', function() {
+					container = document.getElementById( 'container' );
+					onContainerReady();
+				} );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
+			}
+			
+			function onContainerReady() {
+				container.appendChild( renderer.domElement );
+				container.appendChild( stats.dom );
 			}
 
 			function createPanel() {
