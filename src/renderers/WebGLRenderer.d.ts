@@ -85,6 +85,11 @@ export interface WebGLRendererParameters {
 	 * default is false.
 	 */
 	logarithmicDepthBuffer?: boolean;
+
+	/**
+	 * default is false.
+	 */
+	webgl2?: boolean;
 }
 
 export interface WebGLDebug {

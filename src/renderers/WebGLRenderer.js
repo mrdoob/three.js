@@ -60,7 +60,8 @@ function WebGLRenderer( parameters ) {
 		_premultipliedAlpha = parameters.premultipliedAlpha !== undefined ? parameters.premultipliedAlpha : true,
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
-		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
+		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false,
+		_webgl2 = parameters.webgl2 !== undefined ? parameters.webgl2 : false;
 
 	let currentRenderList = null;
 	let currentRenderState = null;
@@ -184,7 +185,7 @@ function WebGLRenderer( parameters ) {
 
 	// initialize
 
-	let _gl;
+	let _gl = _context;
 
 	try {
 
@@ -204,13 +205,31 @@ function WebGLRenderer( parameters ) {
 		_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 		_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
-		_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
+		if ( _gl === null ) {
+
+			if ( _webgl2 === true ) {
+
+				_gl = _canvas.getContext( 'webgl2', contextAttributes );
+
+			} else {
+
+				_gl = _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
+
+			}
+
+		}
+
+		//
 
 		if ( _gl === null ) {
 
-			if ( _canvas.getContext( 'webgl' ) !== null ) {
+			if ( _webgl2 === false && _canvas.getContext( 'webgl' ) !== null ) {
 
 				throw new Error( 'Error creating WebGL context with your selected attributes.' );
+
+			} else if ( _webgl2 === true && _canvas.getContext( 'webgl2' ) !== null ) {
+
+				throw new Error( 'Error creating WebGL 2 context with your selected attributes.' );
 
 			} else {
 

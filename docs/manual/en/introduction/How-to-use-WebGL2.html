@@ -43,20 +43,12 @@ if ( WEBGL.isWebGL2Available() === false ) {
 	</code>
 
 	<p>
-		Now it's time to create the renderer by applying the HTML5 canvas element and the respective WebGL 2 context
-		to the constructor of *WebGLRenderer*. As a result, three.js will internally use the given context for rendering and
-		automatically convert the built-in material's shader code to GLSL ES 3.00.
-	</p>
-
-	<p>
-		Since you are manually creating the WebGL 2 rendering context, you also have to pass in all necessary context attributes.
-		Note: It's not possible to modify these attributes after the context has been created, so passing them to the WebGLRenderer won't have any effect.
+		Now it's time to create the renderer by setting the *webgl2* parameter to *true*.
+		As a result, three.js will internally use a WebGL 2 rendering context and automatically convert the built-in material's shader code to GLSL ES 3.00.
 	</p>
 
 	<code>
-var canvas = document.createElement( 'canvas' );
-var context = canvas.getContext( 'webgl2', { alpha: false } );
-var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+var renderer = new THREE.WebGLRenderer( { webgl2: true } );
 	</code>
 
 	<p>
