@@ -20,6 +20,7 @@ THREE.Sky = function () {
 	var shader = THREE.Sky.SkyShader;
 
 	var material = new THREE.ShaderMaterial( {
+		name: 'SkyShader',
 		fragmentShader: shader.fragmentShader,
 		vertexShader: shader.vertexShader,
 		uniforms: THREE.UniformsUtils.clone( shader.uniforms ),

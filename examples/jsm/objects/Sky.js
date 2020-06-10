@@ -28,6 +28,7 @@ var Sky = function () {
 	var shader = Sky.SkyShader;
 
 	var material = new ShaderMaterial( {
+		name: 'SkyShader',
 		fragmentShader: shader.fragmentShader,
 		vertexShader: shader.vertexShader,
 		uniforms: UniformsUtils.clone( shader.uniforms ),

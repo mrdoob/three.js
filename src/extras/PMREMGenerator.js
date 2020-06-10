@@ -608,6 +608,8 @@ function _getBlurShader( maxSamples ) {
 	const poleAxis = new Vector3( 0, 1, 0 );
 	const shaderMaterial = new RawShaderMaterial( {
 
+		name: 'SphericalGaussianBlur',
+
 		defines: { 'n': maxSamples },
 
 		uniforms: {
@@ -674,8 +676,6 @@ void main() {
 
 	} );
 
-	shaderMaterial.type = 'SphericalGaussianBlur';
-
 	return shaderMaterial;
 
 }
@@ -684,6 +684,8 @@ function _getEquirectShader() {
 
 	const texelSize = new Vector2( 1, 1 );
 	const shaderMaterial = new RawShaderMaterial( {
+
+		name: 'EquirectangularToCubeUV',
 
 		uniforms: {
 			'envMap': { value: null },
@@ -731,8 +733,6 @@ void main() {
 
 	} );
 
-	shaderMaterial.type = 'EquirectangularToCubeUV';
-
 	return shaderMaterial;
 
 }
@@ -740,6 +740,8 @@ void main() {
 function _getCubemapShader() {
 
 	const shaderMaterial = new RawShaderMaterial( {
+
+		name: 'CubemapToCubeUV',
 
 		uniforms: {
 			'envMap': { value: null },
@@ -769,8 +771,6 @@ void main() {
 		depthWrite: false
 
 	} );
-
-	shaderMaterial.type = 'CubemapToCubeUV';
 
 	return shaderMaterial;
 
