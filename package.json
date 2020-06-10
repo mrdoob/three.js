@@ -80,8 +80,8 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.34.0",
-    "@typescript-eslint/parser": "^2.34.0",
+    "@typescript-eslint/eslint-plugin": "^3.2.0",
+    "@typescript-eslint/parser": "^3.2.0",
     "concurrently": "^5.2.0",
     "eslint": "^7.2.0",
     "eslint-config-mdcs": "^5.0.0",
