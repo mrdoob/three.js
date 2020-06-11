@@ -12,7 +12,7 @@ const ImageUtils = {
 
 		let canvas;
 
-		if ( image.src.startsWith( "data:" ) ) {
+		if ( image.src.indexOf( "data:" ) === 0 ) {
 
 			return image.src;
 
