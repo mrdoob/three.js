@@ -12,7 +12,11 @@ const ImageUtils = {
 
 		let canvas;
 
-		if ( typeof HTMLCanvasElement == 'undefined' ) {
+		if ( image.src.startsWith( "data:" ) ) {
+
+			return image.src;
+
+		} else if ( typeof HTMLCanvasElement == 'undefined' ) {
 
 			return image.src;
 
