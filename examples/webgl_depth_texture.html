@@ -74,7 +74,6 @@
 			var camera, scene, renderer, controls, stats;
 			var target;
 			var postScene, postCamera, postMaterial;
-			var supportsExtension = true;
 
 			var params = {
 				format: THREE.DepthFormat,
@@ -90,15 +89,6 @@
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
-
-				if ( ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
-
-					supportsExtension = false;
-					document.querySelector( '#error' ).style.display = 'block';
-					return;
-
-				}
-
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -218,8 +208,6 @@
 			}
 
 			function animate() {
-
-				if ( ! supportsExtension ) return;
 
 				requestAnimationFrame( animate );
 
