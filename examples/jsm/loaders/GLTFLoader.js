@@ -258,7 +258,7 @@ var GLTFLoader = ( function () {
 
 			parser.fileLoader.setRequestHeader( this.requestHeader );
 
-      for ( var i = 0; i < this.pluginCallbacks.length; i ++ ) {
+			for ( var i = 0; i < this.pluginCallbacks.length; i ++ ) {
 
 				var plugin = this.pluginCallbacks[ i ]( parser );
 				plugins[ plugin.name ] = plugin;
