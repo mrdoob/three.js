@@ -208,8 +208,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( _gl === null ) {
 
-			if ( _canvas.getContext( 'webgl2' ) || _canvas.getContext( 'webgl' ) ||
-				_canvas.getContext( 'experimental-webgl' ) ) {
+			if ( _canvas.getContext( 'webgl2' ) || _canvas.getContext( 'webgl' ) || _canvas.getContext( 'experimental-webgl' ) ) {
 
 				throw new Error( 'Error creating WebGL context with your selected attributes.' );
 
