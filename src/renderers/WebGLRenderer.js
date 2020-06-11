@@ -208,8 +208,6 @@ function WebGLRenderer( parameters ) {
 
 			const contextType = typeof WebGL2RenderingContext !== 'undefined' ? 'webgl2' : 'webgl';
 
-			console.log( contextType );
-
 			_gl = _canvas.getContext( contextType, contextAttributes );
 
 		if ( _gl === null ) {
