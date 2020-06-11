@@ -5,6 +5,16 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			#error {
+				margin: auto;
+				margin-top: 40px;
+				display: block;
+				max-width: 400px;
+				padding: 20px;
+				background: #CE0808;
+			}
+		</style>
 
 		<script id="post-vert" type="x-shader/x-vertex">
 			varying vec2 vUv;
@@ -45,6 +55,11 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> webgl - depth texture<br/>
 			Stores render target depth in a texture attachment.<br/>
 			Created by <a href="http://twitter.com/mattdesl" target="_blank" rel="noopener">@mattdesl</a>.
+
+			<div id="error" style="display: none;">
+			Your browser does not support <strong>WEBGL_depth_texture</strong>.<br/><br/>
+			This demo will not work.
+			</div>
 		</div>
 
 		<script type="module">
@@ -59,6 +74,7 @@
 			var camera, scene, renderer, controls, stats;
 			var target;
 			var postScene, postCamera, postMaterial;
+			var supportsExtension = true;
 
 			var params = {
 				format: THREE.DepthFormat,
@@ -74,6 +90,15 @@
 			function init() {
 
 				renderer = new THREE.WebGLRenderer();
+
+				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
+
+					supportsExtension = false;
+					document.querySelector( '#error' ).style.display = 'block';
+					return;
+
+				}
+
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
@@ -193,6 +218,8 @@
 			}
 
 			function animate() {
+
+				if ( ! supportsExtension ) return;
 
 				requestAnimationFrame( animate );
 
