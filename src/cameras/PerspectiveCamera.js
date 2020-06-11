@@ -16,6 +16,8 @@ function PerspectiveCamera( fov, aspect, near, far ) {
 	this.type = 'PerspectiveCamera';
 
 	this.fov = fov !== undefined ? fov : 50;
+	this.fovMode = 'auto';
+
 	this.zoom = 1;
 
 	this.near = near !== undefined ? near : 0.1;
@@ -23,7 +25,6 @@ function PerspectiveCamera( fov, aspect, near, far ) {
 	this.focus = 10;
 
 	this.aspect = aspect !== undefined ? aspect : 1;
-	this.fit = 'auto';
 
 	this.view = null;
 
@@ -45,6 +46,8 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		Camera.prototype.copy.call( this, source, recursive );
 
 		this.fov = source.fov;
+		this.fovMode = source.fovMode;
+
 		this.zoom = source.zoom;
 
 		this.near = source.near;
@@ -52,7 +55,6 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		this.focus = source.focus;
 
 		this.aspect = source.aspect;
-		this.fit = source.fit;
 
 		this.view = source.view === null ? null : Object.assign( {}, source.view );
 
@@ -60,17 +62,6 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		this.filmOffset = source.filmOffset;
 
 		return this;
-
-	},
-
-	/**
-	 * Option to control which dimension (vertical or horizontal) along which field of view angle fits.
-	 * Possible options are 'auto', 'horizontal' and 'vertical'.
-	 */
-	setFit: function ( value ) {
-
-		this.fit = value;
-		this.updateProjectionMatrix();
 
 	},
 
@@ -204,11 +195,11 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 	updateProjectionMatrix: function () {
 
 		const aspect = this.aspect;
-		const fit = this.fit;
+		const fovMode = this.fovMode;
 
 		let fov = this.fov;
 
-		if ( fit === 'horizontal' || ( fit === 'auto' && aspect < 1 ) ) {
+		if ( fovMode === 'horizontal' || ( fovMode === 'auto' && aspect < 1 ) ) {
 
 			fov = Math.atan( Math.tan( fov * Math.PI / 360 ) / aspect ) * 360 / Math.PI;
 
@@ -247,6 +238,8 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		const data = Object3D.prototype.toJSON.call( this, meta );
 
 		data.object.fov = this.fov;
+		data.object.fovMode = this.fovMode;
+
 		data.object.zoom = this.zoom;
 
 		data.object.near = this.near;
@@ -254,7 +247,6 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		data.object.focus = this.focus;
 
 		data.object.aspect = this.aspect;
-		data.object.fit = this.fit;
 
 		if ( this.view !== null ) data.object.view = Object.assign( {}, this.view );
 
