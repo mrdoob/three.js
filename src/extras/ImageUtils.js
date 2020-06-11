@@ -12,7 +12,8 @@ const ImageUtils = {
 
 		let canvas;
 
-		if ( image.src.indexOf( "data:" ) === 0 ) {
+		var src = image.src;
+		if ( src[ 0 ] === "d" && src[ 1 ] === "a" && src[ 2 ] === "t" && src[ 3 ] === "a" && src[ 4 ] === ":" ) {
 
 			return image.src;
 
