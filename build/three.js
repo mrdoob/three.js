@@ -17726,7 +17726,8 @@
 			case LogLuvEncoding:
 				return [ 'LogLuv', '( value )' ];
 			default:
-				throw new Error( 'unsupported encoding: ' + encoding );
+				console.warn( 'THREE.WebGLProgram: Unsupported encoding:', encoding );
+				return [ 'Linear', '( value )' ];
 
 		}
 
@@ -17785,7 +17786,8 @@
 				break;
 
 			default:
-				throw new Error( 'unsupported toneMapping: ' + toneMapping );
+				console.warn( 'THREE.WebGLProgram: Unsupported toneMapping:', toneMapping );
+				toneMappingName = 'Linear';
 
 		}
 
