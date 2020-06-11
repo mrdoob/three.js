@@ -13,7 +13,7 @@ const ImageUtils = {
 		let canvas;
 
 		var src = image.src;
-		if ( src[ 0 ] === "d" && src[ 1 ] === "a" && src[ 2 ] === "t" && src[ 3 ] === "a" && src[ 4 ] === ":" ) {
+		if ( /^data:/i.test( src ) ) {
 
 			return image.src;
 
