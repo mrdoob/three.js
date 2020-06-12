@@ -29,7 +29,7 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var scene, camera, controls, renderer;
-			
+
 			function init() {
 
 				var width = window.innerWidth;
@@ -46,7 +46,7 @@
 
 				// tonemapping
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1;
+				renderer.toneMappingExposure = 1.75;
 
 				document.body.appendChild( renderer.domElement );
 
@@ -182,7 +182,7 @@
 				render();
 
 			}
-			
+
 			function updateCamera() {
 
 				var horizontalFoV = 40;
@@ -197,7 +197,7 @@
 				renderer.render( scene, camera );
 
 			}
-			
+
 			Promise.resolve()
 				.then( init )
 				.then( createObjects )

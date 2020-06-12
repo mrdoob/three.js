@@ -9,6 +9,7 @@ import { StaticDrawUsage } from '../constants.js';
  */
 
 const _vector = new Vector3();
+const _vector2 = new Vector2();
 
 function BufferAttribute( array, itemSize, normalized ) {
 
@@ -199,15 +200,27 @@ Object.assign( BufferAttribute.prototype, {
 
 	applyMatrix3: function ( m ) {
 
-		for ( let i = 0, l = this.count; i < l; i ++ ) {
+		if ( this.itemSize === 2 ) {
 
-			_vector.x = this.getX( i );
-			_vector.y = this.getY( i );
-			_vector.z = this.getZ( i );
+			for ( let i = 0, l = this.count; i < l; i ++ ) {
 
-			_vector.applyMatrix3( m );
+				_vector2.fromBufferAttribute( this, i );
+				_vector2.applyMatrix3( m );
 
-			this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+				this.setXY( i, _vector2.x, _vector2.y, );
+
+			}
+
+		} else if ( this.itemSize === 3 ) {
+
+			for ( let i = 0, l = this.count; i < l; i ++ ) {
+
+				_vector.fromBufferAttribute( this, i );
+				_vector.applyMatrix3( m );
+
+				this.setXYZ( i, _vector.x, _vector.y, _vector.z );
+
+			}
 
 		}
 

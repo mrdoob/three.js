@@ -144,9 +144,7 @@
 
 				// renderer
 
-				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( 'webgl2', { alpha: false } );
-				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 

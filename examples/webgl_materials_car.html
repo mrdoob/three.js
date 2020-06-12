@@ -25,7 +25,7 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> car materials<br/>
 			Ferrari 458 Italia model by <a href="https://sketchfab.com/models/57bf6cc56931426e87494f554df1dab6" target="_blank" rel="noopener">vicent091036</a>
 			<br><br>
-			<span class="colorPicker"><input id="body-color" type="color" value="#000333"></input><br/>Body</span>
+			<span class="colorPicker"><input id="body-color" type="color" value="#ff0000"></input><br/>Body</span>
 			<span class="colorPicker"><input id="details-color" type="color" value="#ffffff"></input><br/>Details</span>
 			<span class="colorPicker"><input id="glass-color" type="color" value="#ffffff"></input><br/>Glass</span>
 		</div>
@@ -60,6 +60,7 @@
 				renderer.setAnimationLoop( render );
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.25;
 				container.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -69,8 +70,8 @@
 
 				//
 
-				camera = new THREE.PerspectiveCamera( 30, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( 6, 2, - 5 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.set( 3.5, 2, - 4.5 );
 
 				controls = new OrbitControls( camera, container );
 				controls.target.set( 0, 0.5, 0 );
@@ -90,7 +91,7 @@
 				// materials
 
 				var bodyMaterial = new THREE.MeshPhysicalMaterial( {
-					color: 0x000333, metalness: 1.0, roughness: 0.5, clearcoat: 0.02, clearcoatRoughness: 0.01
+					color: 0xff0000, metalness: 0.6, roughness: 0.4, clearcoat: 0.05, clearcoatRoughness: 0.05
 				} );
 
 				var detailsMaterial = new THREE.MeshStandardMaterial( {
@@ -98,7 +99,7 @@
 				} );
 
 				var glassMaterial = new THREE.MeshPhysicalMaterial( {
-					color: 0xffffff, metalness: 0, roughness: 0, transparency: 0.8, transparent: true
+					color: 0xffffff, metalness: 0, roughness: 0.1, transparency: 0.9, transparent: true
 				} );
 
 				var bodyColorInput = document.getElementById( 'body-color' );

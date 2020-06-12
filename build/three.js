@@ -151,9 +151,8 @@
 	var NoToneMapping = 0;
 	var LinearToneMapping = 1;
 	var ReinhardToneMapping = 2;
-	var Uncharted2ToneMapping = 3;
-	var CineonToneMapping = 4;
-	var ACESFilmicToneMapping = 5;
+	var CineonToneMapping = 3;
+	var ACESFilmicToneMapping = 4;
 
 	var UVMapping = 300;
 	var CubeReflectionMapping = 301;
@@ -1454,13 +1453,21 @@
 
 		getDataURL: function ( image ) {
 
-			var canvas;
+			if ( /^data:/i.test( image.src ) ) {
+
+				return image.src;
+
+			}
 
 			if ( typeof HTMLCanvasElement == 'undefined' ) {
 
 				return image.src;
 
-			} else if ( image instanceof HTMLCanvasElement ) {
+			}
+
+			var canvas;
+
+			if ( image instanceof HTMLCanvasElement ) {
 
 				canvas = image;
 
@@ -9265,6 +9272,7 @@
 	 */
 
 	var _vector$3 = new Vector3();
+	var _vector2$1 = new Vector2();
 
 	function BufferAttribute( array, itemSize, normalized ) {
 
@@ -9455,15 +9463,27 @@
 
 		applyMatrix3: function ( m ) {
 
-			for ( var i = 0, l = this.count; i < l; i ++ ) {
+			if ( this.itemSize === 2 ) {
 
-				_vector$3.x = this.getX( i );
-				_vector$3.y = this.getY( i );
-				_vector$3.z = this.getZ( i );
+				for ( var i = 0, l = this.count; i < l; i ++ ) {
 
-				_vector$3.applyMatrix3( m );
+					_vector2$1.fromBufferAttribute( this, i );
+					_vector2$1.applyMatrix3( m );
 
-				this.setXYZ( i, _vector$3.x, _vector$3.y, _vector$3.z );
+					this.setXY( i, _vector2$1.x, _vector2$1.y );
+
+				}
+
+			} else if ( this.itemSize === 3 ) {
+
+				for ( var i$1 = 0, l$1 = this.count; i$1 < l$1; i$1 ++ ) {
+
+					_vector$3.fromBufferAttribute( this, i$1 );
+					_vector$3.applyMatrix3( m );
+
+					this.setXYZ( i$1, _vector$3.x, _vector$3.y, _vector$3.z );
+
+				}
 
 			}
 
@@ -10896,9 +10916,7 @@
 
 			for ( var i = 0, il = normals.count; i < il; i ++ ) {
 
-				_vector$4.x = normals.getX( i );
-				_vector$4.y = normals.getY( i );
-				_vector$4.z = normals.getZ( i );
+				_vector$4.fromBufferAttribute( normals, i );
 
 				_vector$4.normalize();
 
@@ -14084,7 +14102,7 @@
 
 		var material = new ShaderMaterial( {
 
-			type: 'CubemapFromEquirect',
+			name: 'CubemapFromEquirect',
 
 			uniforms: cloneUniforms( shader.uniforms ),
 			vertexShader: shader.vertexShader,
@@ -15013,7 +15031,7 @@
 
 	var tonemapping_fragment = "#if defined( TONE_MAPPING )\n\tgl_FragColor.rgb = toneMapping( gl_FragColor.rgb );\n#endif";
 
-	var tonemapping_pars_fragment = "#ifndef saturate\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#endif\nuniform float toneMappingExposure;\nvec3 LinearToneMapping( vec3 color ) {\n\treturn toneMappingExposure * color;\n}\nvec3 ReinhardToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( color / ( vec3( 1.0 ) + color ) );\n}\n#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )\nvec3 Uncharted2ToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( 1.0 ) ) );\n}\nvec3 OptimizedCineonToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\tcolor = max( vec3( 0.0 ), color - 0.004 );\n\treturn pow( ( color * ( 6.2 * color + 0.5 ) ) / ( color * ( 6.2 * color + 1.7 ) + 0.06 ), vec3( 2.2 ) );\n}\nvec3 ACESFilmicToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( ( color * ( 2.51 * color + 0.03 ) ) / ( color * ( 2.43 * color + 0.59 ) + 0.14 ) );\n}";
+	var tonemapping_pars_fragment = "#ifndef saturate\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#endif\nuniform float toneMappingExposure;\nvec3 LinearToneMapping( vec3 color ) {\n\treturn toneMappingExposure * color;\n}\nvec3 ReinhardToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\treturn saturate( color / ( vec3( 1.0 ) + color ) );\n}\nvec3 OptimizedCineonToneMapping( vec3 color ) {\n\tcolor *= toneMappingExposure;\n\tcolor = max( vec3( 0.0 ), color - 0.004 );\n\treturn pow( ( color * ( 6.2 * color + 0.5 ) ) / ( color * ( 6.2 * color + 1.7 ) + 0.06 ), vec3( 2.2 ) );\n}\nvec3 RRTAndODTFit( vec3 v ) {\n    vec3 a = v * ( v + 0.0245786 ) - 0.000090537;\n    vec3 b = v * ( 0.983729 * v + 0.4329510 ) + 0.238081;\n    return a / b;\n}\nvec3 ACESFilmicToneMapping( vec3 color ) {\n    const mat3 ACESInputMat = mat3(\n        vec3( 0.59719, 0.07600, 0.02840 ),        vec3( 0.35458, 0.90834, 0.13383 ),\n        vec3( 0.04823, 0.01566, 0.83777 )\n    );\n    const mat3 ACESOutputMat = mat3(\n        vec3(  1.60475, -0.10208, -0.00327 ),        vec3( -0.53108,  1.10813, -0.07276 ),\n        vec3( -0.07367, -0.00605,  1.07602 )\n    );\n    color *= toneMappingExposure;\n    color = ACESInputMat * color;\n    color = RRTAndODTFit( color );\n    color = ACESOutputMat * color;\n    return saturate( color );\n}";
 
 	var uv_pars_fragment = "#if ( defined( USE_UV ) && ! defined( UVS_VERTEX_ONLY ) )\n\tvarying vec2 vUv;\n#endif";
 
@@ -15588,7 +15606,7 @@
 					boxMesh = new Mesh(
 						new BoxBufferGeometry( 1, 1, 1 ),
 						new ShaderMaterial( {
-							type: 'BackgroundCubeMaterial',
+							name: 'BackgroundCubeMaterial',
 							uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
 							vertexShader: ShaderLib.cube.vertexShader,
 							fragmentShader: ShaderLib.cube.fragmentShader,
@@ -15650,7 +15668,7 @@
 					planeMesh = new Mesh(
 						new PlaneBufferGeometry( 2, 2 ),
 						new ShaderMaterial( {
-							type: 'BackgroundMaterial',
+							name: 'BackgroundMaterial',
 							uniforms: cloneUniforms( ShaderLib.background.uniforms ),
 							vertexShader: ShaderLib.background.vertexShader,
 							fragmentShader: ShaderLib.background.fragmentShader,
@@ -17729,7 +17747,8 @@
 			case LogLuvEncoding:
 				return [ 'LogLuv', '( value )' ];
 			default:
-				throw new Error( 'unsupported encoding: ' + encoding );
+				console.warn( 'THREE.WebGLProgram: Unsupported encoding:', encoding );
+				return [ 'Linear', '( value )' ];
 
 		}
 
@@ -17779,10 +17798,6 @@
 				toneMappingName = 'Reinhard';
 				break;
 
-			case Uncharted2ToneMapping:
-				toneMappingName = 'Uncharted2';
-				break;
-
 			case CineonToneMapping:
 				toneMappingName = 'OptimizedCineon';
 				break;
@@ -17792,7 +17807,8 @@
 				break;
 
 			default:
-				throw new Error( 'unsupported toneMapping: ' + toneMapping );
+				console.warn( 'THREE.WebGLProgram: Unsupported toneMapping:', toneMapping );
+				toneMappingName = 'Linear';
 
 		}
 
@@ -18600,7 +18616,7 @@
 				var shader = ShaderLib[ shaderID ];
 
 				shaderobject = {
-					name: material.type,
+					name: material.name || material.type,
 					uniforms: UniformsUtils.clone( shader.uniforms ),
 					vertexShader: shader.vertexShader,
 					fragmentShader: shader.fragmentShader
@@ -18609,7 +18625,7 @@
 			} else {
 
 				shaderobject = {
-					name: material.type,
+					name: material.name || material.type,
 					uniforms: material.uniforms,
 					vertexShader: material.vertexShader,
 					fragmentShader: material.fragmentShader
@@ -24367,11 +24383,11 @@
 			_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 			_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
-			_gl = _context || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
+			_gl = _context || _canvas.getContext( 'webgl2', contextAttributes ) || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
 
 			if ( _gl === null ) {
 
-				if ( _canvas.getContext( 'webgl' ) !== null ) {
+				if ( _canvas.getContext( 'webgl2' ) || _canvas.getContext( 'webgl' ) || _canvas.getContext( 'experimental-webgl' ) ) {
 
 					throw new Error( 'Error creating WebGL context with your selected attributes.' );
 
@@ -48765,6 +48781,8 @@
 		var poleAxis = new Vector3( 0, 1, 0 );
 		var shaderMaterial = new RawShaderMaterial( {
 
+			name: 'SphericalGaussianBlur',
+
 			defines: { 'n': maxSamples },
 
 			uniforms: {
@@ -48789,8 +48807,6 @@
 
 		} );
 
-		shaderMaterial.type = 'SphericalGaussianBlur';
-
 		return shaderMaterial;
 
 	}
@@ -48799,6 +48815,8 @@
 
 		var texelSize = new Vector2( 1, 1 );
 		var shaderMaterial = new RawShaderMaterial( {
+
+			name: 'EquirectangularToCubeUV',
 
 			uniforms: {
 				'envMap': { value: null },
@@ -48817,8 +48835,6 @@
 
 		} );
 
-		shaderMaterial.type = 'EquirectangularToCubeUV';
-
 		return shaderMaterial;
 
 	}
@@ -48826,6 +48842,8 @@
 	function _getCubemapShader() {
 
 		var shaderMaterial = new RawShaderMaterial( {
+
+			name: 'CubemapToCubeUV',
 
 			uniforms: {
 				'envMap': { value: null },
@@ -48842,8 +48860,6 @@
 			depthWrite: false
 
 		} );
-
-		shaderMaterial.type = 'CubemapToCubeUV';
 
 		return shaderMaterial;
 
@@ -51424,7 +51440,6 @@
 	exports.Uint8BufferAttribute = Uint8BufferAttribute;
 	exports.Uint8ClampedAttribute = Uint8ClampedAttribute;
 	exports.Uint8ClampedBufferAttribute = Uint8ClampedBufferAttribute;
-	exports.Uncharted2ToneMapping = Uncharted2ToneMapping;
 	exports.Uniform = Uniform;
 	exports.UniformsLib = UniformsLib;
 	exports.UniformsUtils = UniformsUtils;
