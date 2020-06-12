@@ -22,10 +22,15 @@ button {
 	position: relative;
 }
 
+input {
+	vertical-align: middle;
+}
+
 textarea {
 	tab-size: 4;
 	white-space: pre;
 	word-wrap: normal;
+	vertical-align: middle;
 }
 
 	textarea.success {
@@ -385,10 +390,6 @@ select {
 	background: #eee;
 	overflow: auto;
 }
-
-	#sidebar * {
-		vertical-align: middle;
-	}
 
 	#sidebar .Panel {
 		color: #888;
