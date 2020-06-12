@@ -10,18 +10,21 @@ const ImageUtils = {
 
 	getDataURL: function ( image ) {
 
+		if ( /^data:/i.test( image.src ) ) {
+
+			return image.src;
+
+		}
+
+		if ( typeof HTMLCanvasElement == 'undefined' ) {
+
+			return image.src;
+
+		}
+
 		let canvas;
 
-		var src = image.src;
-		if ( /^data:/i.test( src ) ) {
-
-			return image.src;
-
-		} else if ( typeof HTMLCanvasElement == 'undefined' ) {
-
-			return image.src;
-
-		} else if ( image instanceof HTMLCanvasElement ) {
+		if ( image instanceof HTMLCanvasElement ) {
 
 			canvas = image;
 
