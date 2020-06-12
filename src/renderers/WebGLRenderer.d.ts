@@ -334,7 +334,7 @@ export class WebGLRenderer implements Renderer {
 	 * Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
 	 */
 	compile(
-		scene: Scene,
+		scene: Object3D,
 		camera: Camera
 	): void;
 
