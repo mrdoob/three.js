@@ -4,7 +4,6 @@
 
 import {
 	Color,
-	LinearEncoding,
 	LinearFilter,
 	MathUtils,
 	Matrix4,
@@ -154,15 +153,6 @@ var Reflector = function ( geometry, options ) {
 		projectionMatrix.elements[ 14 ] = clipPlane.w;
 
 		// Render
-
-		if ( renderer.outputEncoding !== LinearEncoding ) {
-
-			console.warn( 'THREE.Reflector: WebGLRenderer must use LinearEncoding as outputEncoding.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
 
 		scope.visible = false;
 

@@ -53,7 +53,7 @@ vec4 LinearToRGBD( in vec4 value, in float maxRange ) {
 	float maxRGB = max( value.r, max( value.g, value.b ) );
 	float D = max( maxRange / maxRGB, 1.0 );
 	// NOTE: The implementation with min causes the shader to not compile on
-	// a common Alcatel A502DL in Chrome 78/Android 8.1. Some research suggests 
+	// a common Alcatel A502DL in Chrome 78/Android 8.1. Some research suggests
 	// that the chipset is Mediatek MT6739 w/ IMG PowerVR GE8100 GPU.
 	// D = min( floor( D ) / 255.0, 1.0 );
 	D = clamp( floor( D ) / 255.0, 0.0, 1.0 );
@@ -85,5 +85,21 @@ vec4 LogLuvToLinear( in vec4 value ) {
 	Xp_Y_XYZp.x = value.x * Xp_Y_XYZp.z;
 	vec3 vRGB = cLogLuvInverseM * Xp_Y_XYZp.rgb;
 	return vec4( max( vRGB, 0.0 ), 1.0 );
+}
+
+uniform int outputEncoding;
+
+vec4 linearToOutputTexel( vec4 value ) {
+
+	if ( outputEncoding == 3000 ) return LinearToLinear( value );
+	else if ( outputEncoding == 3001 ) return LinearTosRGB( value );
+	else if ( outputEncoding == 3002 ) return LinearToRGBE( value );
+	else if ( outputEncoding == 3003 ) return LinearToLogLuv( value );
+	else if ( outputEncoding == 3004 ) return LinearToRGBM( value, 7.0 );
+	else if ( outputEncoding == 3005 ) return LinearToRGBM( value, 16.0 );
+	else if ( outputEncoding == 3006 ) return LinearToRGBD( value, 256.0 );
+	else if ( outputEncoding == 3007 ) return LinearToGamma( value, float( GAMMA_FACTOR ) );
+	else return LinearToLinear( value );
+
 }
 `;

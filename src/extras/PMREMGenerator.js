@@ -354,8 +354,8 @@ PMREMGenerator.prototype = {
 
 		}
 
-		uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
-		uniforms[ 'outputEncoding' ].value = ENCODINGS[ cubeUVRenderTarget.texture.encoding ];
+		uniforms[ 'inputEncodingPMREM' ].value = ENCODINGS[ texture.encoding ];
+		uniforms[ 'outputEncodingPMREM' ].value = ENCODINGS[ cubeUVRenderTarget.texture.encoding ];
 
 		_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
 
@@ -486,8 +486,8 @@ PMREMGenerator.prototype = {
 
 		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
 		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
-		blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
-		blurUniforms[ 'outputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
+		blurUniforms[ 'inputEncodingPMREM' ].value = ENCODINGS[ targetIn.texture.encoding ];
+		blurUniforms[ 'outputEncodingPMREM' ].value = ENCODINGS[ targetIn.texture.encoding ];
 
 		const outputSize = _sizeLods[ lodOut ];
 		const x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
@@ -622,8 +622,8 @@ function _getBlurShader( maxSamples ) {
 			'dTheta': { value: 0 },
 			'mipInt': { value: 0 },
 			'poleAxis': { value: poleAxis },
-			'inputEncoding': { value: ENCODINGS[ LinearEncoding ] },
-			'outputEncoding': { value: ENCODINGS[ LinearEncoding ] }
+			'inputEncodingPMREM': { value: ENCODINGS[ LinearEncoding ] },
+			'outputEncodingPMREM': { value: ENCODINGS[ LinearEncoding ] }
 		},
 
 		vertexShader: _getCommonVertexShader(),
@@ -668,7 +668,7 @@ void main() {
 		gl_FragColor.rgb += weights[i] * getSample(-1.0 * theta, axis);
 		gl_FragColor.rgb += weights[i] * getSample(theta, axis);
 	}
-	gl_FragColor = linearToOutputTexel(gl_FragColor);
+	gl_FragColor = linearToOutputTexelPMREM(gl_FragColor);
 }
 		`,
 
@@ -692,8 +692,8 @@ function _getEquirectShader() {
 		uniforms: {
 			'envMap': { value: null },
 			'texelSize': { value: texelSize },
-			'inputEncoding': { value: ENCODINGS[ LinearEncoding ] },
-			'outputEncoding': { value: ENCODINGS[ LinearEncoding ] }
+			'inputEncodingPMREM': { value: ENCODINGS[ LinearEncoding ] },
+			'outputEncodingPMREM': { value: ENCODINGS[ LinearEncoding ] }
 		},
 
 		vertexShader: _getCommonVertexShader(),
@@ -725,7 +725,7 @@ void main() {
 	vec3 tm = mix(tl, tr, f.x);
 	vec3 bm = mix(bl, br, f.x);
 	gl_FragColor.rgb = mix(tm, bm, f.y);
-	gl_FragColor = linearToOutputTexel(gl_FragColor);
+	gl_FragColor = linearToOutputTexelPMREM(gl_FragColor);
 }
 		`,
 
@@ -747,8 +747,8 @@ function _getCubemapShader() {
 
 		uniforms: {
 			'envMap': { value: null },
-			'inputEncoding': { value: ENCODINGS[ LinearEncoding ] },
-			'outputEncoding': { value: ENCODINGS[ LinearEncoding ] }
+			'inputEncodingPMREM': { value: ENCODINGS[ LinearEncoding ] },
+			'outputEncodingPMREM': { value: ENCODINGS[ LinearEncoding ] }
 		},
 
 		vertexShader: _getCommonVertexShader(),
@@ -764,7 +764,7 @@ ${_getEncodings()}
 void main() {
 	gl_FragColor = vec4(0.0);
 	gl_FragColor.rgb = envMapTexelToLinear(textureCube(envMap, vec3( - vOutputDirection.x, vOutputDirection.yz ))).rgb;
-	gl_FragColor = linearToOutputTexel(gl_FragColor);
+	gl_FragColor = linearToOutputTexelPMREM(gl_FragColor);
 }
 		`,
 
@@ -822,49 +822,51 @@ void main() {
 function _getEncodings() {
 
 	return `
-uniform int inputEncoding;
-uniform int outputEncoding;
+uniform int inputEncodingPMREM;
+uniform int outputEncodingPMREM;
+
+#define GAMMA_FACTOR 2.2
 
 #include <encodings_pars_fragment>
 
-vec4 inputTexelToLinear(vec4 value){
-	if(inputEncoding == 0){
+vec4 inputTexelToLinearPMREM(vec4 value){
+	if(inputEncodingPMREM == 0){
 		return value;
-	}else if(inputEncoding == 1){
+	}else if(inputEncodingPMREM == 1){
 		return sRGBToLinear(value);
-	}else if(inputEncoding == 2){
+	}else if(inputEncodingPMREM == 2){
 		return RGBEToLinear(value);
-	}else if(inputEncoding == 3){
+	}else if(inputEncodingPMREM == 3){
 		return RGBMToLinear(value, 7.0);
-	}else if(inputEncoding == 4){
+	}else if(inputEncodingPMREM == 4){
 		return RGBMToLinear(value, 16.0);
-	}else if(inputEncoding == 5){
+	}else if(inputEncodingPMREM == 5){
 		return RGBDToLinear(value, 256.0);
 	}else{
-		return GammaToLinear(value, 2.2);
+		return GammaToLinear(value, GAMMA_FACTOR);
 	}
 }
 
-vec4 linearToOutputTexel(vec4 value){
-	if(outputEncoding == 0){
+vec4 linearToOutputTexelPMREM(vec4 value){
+	if(outputEncodingPMREM == 0){
 		return value;
-	}else if(outputEncoding == 1){
+	}else if(outputEncodingPMREM == 1){
 		return LinearTosRGB(value);
-	}else if(outputEncoding == 2){
+	}else if(outputEncodingPMREM == 2){
 		return LinearToRGBE(value);
-	}else if(outputEncoding == 3){
+	}else if(outputEncodingPMREM == 3){
 		return LinearToRGBM(value, 7.0);
-	}else if(outputEncoding == 4){
+	}else if(outputEncodingPMREM == 4){
 		return LinearToRGBM(value, 16.0);
-	}else if(outputEncoding == 5){
+	}else if(outputEncodingPMREM == 5){
 		return LinearToRGBD(value, 256.0);
 	}else{
-		return LinearToGamma(value, 2.2);
+		return LinearToGamma(value, GAMMA_FACTOR);
 	}
 }
 
 vec4 envMapTexelToLinear(vec4 color) {
-	return inputTexelToLinear(color);
+	return inputTexelToLinearPMREM(color);
 }
 	`;
 

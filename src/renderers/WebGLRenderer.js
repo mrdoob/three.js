@@ -1888,6 +1888,10 @@ function WebGLRenderer( parameters ) {
 		p_uniforms.setValue( _gl, 'normalMatrix', object.normalMatrix );
 		p_uniforms.setValue( _gl, 'modelMatrix', object.matrixWorld );
 
+		// output encoding
+
+		p_uniforms.setValue( _gl, 'outputEncoding', ( _currentRenderTarget !== null ) ? _currentRenderTarget.texture.encoding : _this.outputEncoding );
+
 		return program;
 
 	}
