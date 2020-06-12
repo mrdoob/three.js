@@ -1447,13 +1447,21 @@ const ImageUtils = {
 
 	getDataURL: function ( image ) {
 
-		let canvas;
+		if ( /^data:/i.test( image.src ) ) {
+
+			return image.src;
+
+		}
 
 		if ( typeof HTMLCanvasElement == 'undefined' ) {
 
 			return image.src;
 
-		} else if ( image instanceof HTMLCanvasElement ) {
+		}
+
+		let canvas;
+
+		if ( image instanceof HTMLCanvasElement ) {
 
 			canvas = image;
 

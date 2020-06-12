@@ -1453,13 +1453,21 @@
 
 		getDataURL: function ( image ) {
 
-			var canvas;
+			if ( /^data:/i.test( image.src ) ) {
+
+				return image.src;
+
+			}
 
 			if ( typeof HTMLCanvasElement == 'undefined' ) {
 
 				return image.src;
 
-			} else if ( image instanceof HTMLCanvasElement ) {
+			}
+
+			var canvas;
+
+			if ( image instanceof HTMLCanvasElement ) {
 
 				canvas = image;
 
