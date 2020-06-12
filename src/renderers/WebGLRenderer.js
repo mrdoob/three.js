@@ -1056,7 +1056,7 @@ function WebGLRenderer( parameters ) {
 
 		currentRenderState.setupLights( camera );
 
-		const compiled = {};
+		const compiled = new WeakMap();
 
 		scene.traverse( function ( object ) {
 
@@ -1070,19 +1070,19 @@ function WebGLRenderer( parameters ) {
 
 						let material2 = material[ i ];
 
-						if ( material2.uuid in compiled === false ) {
+						if ( compiled.has( material2 ) === false ) {
 
 							initMaterial( material2, scene, object );
-							compiled[ material2.uuid ] = true;
+							compiled.set( material2 );
 
 						}
 
 					}
 
-				} else if ( material.uuid in compiled === false ) {
+				} else if ( compiled.has( material ) === false ) {
 
 					initMaterial( material, scene, object );
-					compiled[ material.uuid ] = true;
+					compiled.set( material );
 
 				}
 
