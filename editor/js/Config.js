@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Config = function () {
+function Config() {
 
 	var name = 'threejs-editor';
 
@@ -78,6 +78,6 @@ var Config = function () {
 
 	};
 
-};
+}
 
 export { Config };

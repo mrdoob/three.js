@@ -4,7 +4,7 @@
 
 import { UIPanel, UIRow } from './libs/ui.js';
 
-var MenubarView = function ( editor ) {
+function MenubarView( editor ) {
 
 	var container = new UIPanel();
 	container.setClass( 'menu' );
@@ -32,6 +32,6 @@ var MenubarView = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarView };

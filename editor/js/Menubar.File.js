@@ -15,7 +15,7 @@ import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
 
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
-var MenubarFile = function ( editor ) {
+function MenubarFile( editor ) {
 
 	function parseNumber( key, value ) {
 
@@ -482,6 +482,6 @@ var MenubarFile = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarFile };

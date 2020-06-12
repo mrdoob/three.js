@@ -31,7 +31,7 @@ var materialClasses = {
 	'SpriteMaterial': THREE.SpriteMaterial
 };
 
-var SidebarMaterial = function ( editor ) {
+function SidebarMaterial( editor ) {
 
 	var strings = editor.strings;
 
@@ -1651,6 +1651,6 @@ var SidebarMaterial = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarMaterial };

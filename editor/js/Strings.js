@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Strings = function ( config ) {
+function Strings( config ) {
 
 	var language = config.getKey( 'language' );
 
@@ -938,6 +938,6 @@ var Strings = function ( config ) {
 
 	};
 
-};
+}
 
 export { Strings };

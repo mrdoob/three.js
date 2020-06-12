@@ -5,7 +5,7 @@
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UIOutliner, UITexture, UICubeTexture } from './libs/ui.three.js';
 
-var SidebarScene = function ( editor ) {
+function SidebarScene( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
@@ -427,6 +427,6 @@ var SidebarScene = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarScene };

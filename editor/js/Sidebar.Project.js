@@ -9,7 +9,7 @@ import { UIBoolean } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
 
-var SidebarProject = function ( editor ) {
+function SidebarProject( editor ) {
 
 	var config = editor.config;
 	var signals = editor.signals;
@@ -326,6 +326,6 @@ var SidebarProject = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarProject };

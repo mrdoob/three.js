@@ -12,7 +12,7 @@ import { Command } from '../Command.js';
  * @param newBefore THREE.Object3D
  * @constructor
  */
-var MoveObjectCommand = function ( editor, object, newParent, newBefore ) {
+function MoveObjectCommand( editor, object, newParent, newBefore ) {
 
 	Command.call( this, editor );
 
@@ -42,7 +42,7 @@ var MoveObjectCommand = function ( editor, object, newParent, newBefore ) {
 
 	this.newBefore = newBefore;
 
-};
+}
 
 MoveObjectCommand.prototype = {
 

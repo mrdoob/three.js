@@ -7,7 +7,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-var EditorControls = function ( object, domElement ) {
+function EditorControls( object, domElement ) {
 
 	// API
 
@@ -309,7 +309,7 @@ var EditorControls = function ( object, domElement ) {
 	domElement.addEventListener( 'touchstart', touchStart, false );
 	domElement.addEventListener( 'touchmove', touchMove, false );
 
-};
+}
 
 EditorControls.prototype = Object.create( THREE.EventDispatcher.prototype );
 EditorControls.prototype.constructor = EditorControls;

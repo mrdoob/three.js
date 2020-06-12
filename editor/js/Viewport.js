@@ -17,7 +17,7 @@ import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
-var Viewport = function ( editor ) {
+function Viewport( editor ) {
 
 	var signals = editor.signals;
 
@@ -696,6 +696,6 @@ var Viewport = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { Viewport };
