@@ -240,7 +240,7 @@ PMREMGenerator.prototype = {
 
 		const cubeUVRenderTarget = _createRenderTarget( params );
 		cubeUVRenderTarget.depthBuffer = texture ? false : true;
-		this._pingPongRenderTarget = _createRenderTarget( params ); // what should be the pingPong depthBuffer setting?
+		this._pingPongRenderTarget = _createRenderTarget( params );
 		return cubeUVRenderTarget;
 
 	},
