@@ -219,7 +219,8 @@
 
 		function updateFilter() {
 
-			var v = filterInput.value;
+			var v = filterInput.value.trim();
+			v = v.replace( '  ', ' ' ).replace( ' ', '|' );
 
 			if ( v !== '' ) {
 
@@ -253,7 +254,7 @@
 
 			var link = links[ file ];
 			var name = getName( file );
-			if ( file in tags ) file += tags[ file ].join( ' ' );
+			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
 			var res = file.match( exp );
 			var text;
 
