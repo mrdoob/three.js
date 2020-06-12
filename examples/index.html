@@ -220,7 +220,7 @@
 		function updateFilter() {
 
 			var v = filterInput.value.trim();
-			v = v.replace( '  ', ' ' ).replace( ' ', '|' );
+			v = v.replace( /\s+/gi, ' ' ).replace( ' ', '|' );
 
 			if ( v !== '' ) {
 
