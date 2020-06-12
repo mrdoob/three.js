@@ -237,7 +237,6 @@ h1 a {
 	#panel #filterInput {
 		flex: 1;
 		width: 100%;
-		padding: 0 36px;
 		font-size: 1rem;
 		font-weight: 500;
 		color: var(--text-color);
@@ -270,6 +269,7 @@ h1 a {
 		-moz-appearance: none;
 		appearance: none;
 		margin-right: 10px;
+		text-align-last: right;
 	}
 
 		#panel #language:focus {
