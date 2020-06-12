@@ -257,7 +257,6 @@ h1 a {
 	#panel #language {
 		font-family: 'Roboto Mono', monospace;
 		font-size: 1rem;
-		line-height: 1rem;
 		font-weight: 500;
 		color: var(--text-color);
 		border: 0px;
