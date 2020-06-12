@@ -285,7 +285,7 @@
 		该方法清楚了一个rendertarget。为此它会激活此endertarget
 		</p>
 
-		<h3>[method:null compile]( [param:Scene scene], [param:Camera camera] )</h3>
+		<h3>[method:null compile]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>使用相机编译场景中的所有材质。这对于在首次渲染之前预编译着色器很有用。</p>
 
 		<h3>[method:null copyFramebufferToTexture]( [param:Vector2 position], [param:Texture texture], [param:Number level] )</h3>
@@ -361,7 +361,7 @@
 		示例：[example:webgl_interactive_cubes_gpu interactive / cubes / gpu]</p>
 		<p>For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
-		<h3>[method:null render]( [param:Scene scene], [param:Camera camera], [param:WebGLRenderTarget renderTarget], [param:Boolean forceClear] )</h3>
+		<h3>[method:null render]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>
 			用相机([page:Camera camera])渲染一个场景([page:Scene scene])<br />
 
