@@ -135,9 +135,27 @@ textarea, input { outline: none; } /* osx */
 
 /* outliner */
 
+#outliner .opener {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	margin: 0px 4px;
+	vertical-align: top;
+	text-align: center;
+}
+
+	#outliner .opener.open:after {
+		content: '−';
+	}
+
+	#outliner .opener.closed:after {
+		content: '+';
+	}
+
 #outliner .option {
 
 	border: 1px solid transparent;
+
 }
 
 #outliner .option.drag {
@@ -159,14 +177,15 @@ textarea, input { outline: none; } /* osx */
 }
 
 #outliner .type {
-	position:relative;
-	top:-2px;
-	padding: 0 2px;
+	display: inline-block;
+	width: 14px;
+	height: 14px;
 	color: #ddd;
+	text-align: center;
 }
 
 #outliner .type:after {
-	content: '■';
+	content: '●';
 }
 
 #outliner .Scene {
