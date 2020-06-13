@@ -24362,7 +24362,21 @@
 
 		// initialize
 
-		var _gl;
+		var _gl = _context;
+
+		function getContext( contextNames, contextAttributes ) {
+
+			for ( var i = 0; i < contextNames.length; i ++ ) {
+
+				var contextName = contextNames[ i ];
+				var context = _canvas.getContext( contextName, contextAttributes );
+				if ( context !== null ) { return context; }
+
+			}
+
+			return null;
+
+		}
 
 		try {
 
@@ -24382,17 +24396,29 @@
 			_canvas.addEventListener( 'webglcontextlost', onContextLost, false );
 			_canvas.addEventListener( 'webglcontextrestored', onContextRestore, false );
 
-			_gl = _context || _canvas.getContext( 'webgl2', contextAttributes ) || _canvas.getContext( 'webgl', contextAttributes ) || _canvas.getContext( 'experimental-webgl', contextAttributes );
-
 			if ( _gl === null ) {
 
-				if ( _canvas.getContext( 'webgl2' ) || _canvas.getContext( 'webgl' ) || _canvas.getContext( 'experimental-webgl' ) ) {
+				var contextNames = [ 'webgl2', 'webgl', 'experimental-webgl' ];
 
-					throw new Error( 'Error creating WebGL context with your selected attributes.' );
+				if ( _this.isWebGL1Renderer === true ) {
 
-				} else {
+					contextNames.shift();
 
-					throw new Error( 'Error creating WebGL context.' );
+				}
+
+				_gl = getContext( contextNames, contextAttributes );
+
+				if ( _gl === null ) {
+
+					if ( getContext( contextNames ) ) {
+
+						throw new Error( 'Error creating WebGL context with your selected attributes.' );
+
+					} else {
+
+						throw new Error( 'Error creating WebGL context.' );
+
+					}
 
 				}
 
@@ -26338,6 +26364,24 @@
 		}
 
 	}
+
+	/**
+	 * @author Mugen87 / https://github.com/Mugen87
+	 */
+
+	function WebGL1Renderer( parameters ) {
+
+		WebGLRenderer.call( this, parameters );
+
+	}
+
+	WebGL1Renderer.prototype = Object.assign( Object.create( WebGLRenderer.prototype ), {
+
+		constructor: WebGL1Renderer,
+
+		isWebGL1Renderer: true
+
+	} );
 
 	/**
 	 * @author mrdoob / http://mrdoob.com/
@@ -51459,6 +51503,7 @@
 	exports.Vertex = Vertex;
 	exports.VertexColors = VertexColors;
 	exports.VideoTexture = VideoTexture;
+	exports.WebGL1Renderer = WebGL1Renderer;
 	exports.WebGLCubeRenderTarget = WebGLCubeRenderTarget;
 	exports.WebGLMultisampleRenderTarget = WebGLMultisampleRenderTarget;
 	exports.WebGLRenderTarget = WebGLRenderTarget;
