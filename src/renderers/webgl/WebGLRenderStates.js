@@ -56,7 +56,7 @@ function WebGLRenderState() {
 
 function WebGLRenderStates() {
 
-	let renderStates = new WeakMap();
+	let renderStates = new Map();
 
 	function onSceneDispose( event ) {
 
@@ -101,7 +101,13 @@ function WebGLRenderStates() {
 
 	function dispose() {
 
-		renderStates = new WeakMap();
+		renderStates.forEach( function ( _, scene ) {
+
+			scene.removeEventListener( 'dispose', onSceneDispose );
+
+		} );
+
+		renderStates.clear();
 
 	}
 
