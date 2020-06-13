@@ -31,7 +31,7 @@ var materialClasses = {
 	'SpriteMaterial': THREE.SpriteMaterial
 };
 
-var SidebarMaterial = function ( editor ) {
+function SidebarMaterial( editor ) {
 
 	var strings = editor.strings;
 
@@ -427,7 +427,7 @@ var SidebarMaterial = function ( editor ) {
 
 	var materialEnvMapRow = new UIRow();
 	var materialEnvMapEnabled = new UICheckbox( false ).onChange( update );
-	var materialEnvMap = new UITexture( THREE.SphericalReflectionMapping ).onChange( updateMaterial );
+	var materialEnvMap = new UITexture( THREE.EquirectangularReflectionMapping ).onChange( updateMaterial );
 	var materialReflectivity = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
 
 	materialEnvMapRow.add( new UIText( strings.getKey( 'sidebar/material/envmap' ) ).setWidth( '90px' ) );
@@ -1651,6 +1651,6 @@ var SidebarMaterial = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarMaterial };

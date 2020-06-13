@@ -1942,6 +1942,16 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		function parseV3f( dataView, offset ) {
+
+			var x = parseFloat32( dataView, offset );
+			var y = parseFloat32( dataView, offset );
+			var z = parseFloat32( dataView, offset );
+
+			return [ x, y, z ];
+
+		}
+
 		function parseValue( dataView, buffer, offset, type, size ) {
 
 			if ( type === 'string' || type === 'stringvector' || type === 'iccProfile' ) {
@@ -1975,6 +1985,10 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			} else if ( type === 'v2f' ) {
 
 				return parseV2f( dataView, offset );
+
+			} else if ( type === 'v3f' ) {
+
+				return parseV3f( dataView, offset );
 
 			} else if ( type === 'int' ) {
 

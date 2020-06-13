@@ -54,8 +54,8 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	// default buffer data
 
-	var vertexBuffer = [];
-	var uvBuffer = [];
+	const vertexBuffer = [];
+	const uvBuffer = [];
 
 	// the subdivision creates the vertex buffer data
 
@@ -89,13 +89,13 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function subdivide( detail ) {
 
-		var a = new Vector3();
-		var b = new Vector3();
-		var c = new Vector3();
+		const a = new Vector3();
+		const b = new Vector3();
+		const c = new Vector3();
 
 		// iterate over all faces and apply a subdivison with the given detail value
 
-		for ( var i = 0; i < indices.length; i += 3 ) {
+		for ( let i = 0; i < indices.length; i += 3 ) {
 
 			// get the vertices of the face
 
@@ -113,26 +113,24 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function subdivideFace( a, b, c, detail ) {
 
-		var cols = Math.pow( 2, detail );
+		const cols = Math.pow( 2, detail );
 
 		// we use this multidimensional array as a data structure for creating the subdivision
 
-		var v = [];
-
-		var i, j;
+		const v = [];
 
 		// construct all of the vertices for this subdivision
 
-		for ( i = 0; i <= cols; i ++ ) {
+		for ( let i = 0; i <= cols; i ++ ) {
 
 			v[ i ] = [];
 
-			var aj = a.clone().lerp( c, i / cols );
-			var bj = b.clone().lerp( c, i / cols );
+			const aj = a.clone().lerp( c, i / cols );
+			const bj = b.clone().lerp( c, i / cols );
 
-			var rows = cols - i;
+			const rows = cols - i;
 
-			for ( j = 0; j <= rows; j ++ ) {
+			for ( let j = 0; j <= rows; j ++ ) {
 
 				if ( j === 0 && i === cols ) {
 
@@ -150,11 +148,11 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 		// construct all of the faces
 
-		for ( i = 0; i < cols; i ++ ) {
+		for ( let i = 0; i < cols; i ++ ) {
 
-			for ( j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
+			for ( let j = 0; j < 2 * ( cols - i ) - 1; j ++ ) {
 
-				var k = Math.floor( j / 2 );
+				const k = Math.floor( j / 2 );
 
 				if ( j % 2 === 0 ) {
 
@@ -178,11 +176,11 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function applyRadius( radius ) {
 
-		var vertex = new Vector3();
+		const vertex = new Vector3();
 
 		// iterate over the entire buffer and apply the radius to each vertex
 
-		for ( var i = 0; i < vertexBuffer.length; i += 3 ) {
+		for ( let i = 0; i < vertexBuffer.length; i += 3 ) {
 
 			vertex.x = vertexBuffer[ i + 0 ];
 			vertex.y = vertexBuffer[ i + 1 ];
@@ -200,16 +198,16 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function generateUVs() {
 
-		var vertex = new Vector3();
+		const vertex = new Vector3();
 
-		for ( var i = 0; i < vertexBuffer.length; i += 3 ) {
+		for ( let i = 0; i < vertexBuffer.length; i += 3 ) {
 
 			vertex.x = vertexBuffer[ i + 0 ];
 			vertex.y = vertexBuffer[ i + 1 ];
 			vertex.z = vertexBuffer[ i + 2 ];
 
-			var u = azimuth( vertex ) / 2 / Math.PI + 0.5;
-			var v = inclination( vertex ) / Math.PI + 0.5;
+			const u = azimuth( vertex ) / 2 / Math.PI + 0.5;
+			const v = inclination( vertex ) / Math.PI + 0.5;
 			uvBuffer.push( u, 1 - v );
 
 		}
@@ -224,16 +222,16 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 		// handle case when face straddles the seam, see #3269
 
-		for ( var i = 0; i < uvBuffer.length; i += 6 ) {
+		for ( let i = 0; i < uvBuffer.length; i += 6 ) {
 
 			// uv data of a single face
 
-			var x0 = uvBuffer[ i + 0 ];
-			var x1 = uvBuffer[ i + 2 ];
-			var x2 = uvBuffer[ i + 4 ];
+			const x0 = uvBuffer[ i + 0 ];
+			const x1 = uvBuffer[ i + 2 ];
+			const x2 = uvBuffer[ i + 4 ];
 
-			var max = Math.max( x0, x1, x2 );
-			var min = Math.min( x0, x1, x2 );
+			const max = Math.max( x0, x1, x2 );
+			const min = Math.min( x0, x1, x2 );
 
 			// 0.9 is somewhat arbitrary
 
@@ -257,7 +255,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function getVertexByIndex( index, vertex ) {
 
-		var stride = index * 3;
+		const stride = index * 3;
 
 		vertex.x = vertices[ stride + 0 ];
 		vertex.y = vertices[ stride + 1 ];
@@ -267,17 +265,17 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 	function correctUVs() {
 
-		var a = new Vector3();
-		var b = new Vector3();
-		var c = new Vector3();
+		const a = new Vector3();
+		const b = new Vector3();
+		const c = new Vector3();
 
-		var centroid = new Vector3();
+		const centroid = new Vector3();
 
-		var uvA = new Vector2();
-		var uvB = new Vector2();
-		var uvC = new Vector2();
+		const uvA = new Vector2();
+		const uvB = new Vector2();
+		const uvC = new Vector2();
 
-		for ( var i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6 ) {
+		for ( let i = 0, j = 0; i < vertexBuffer.length; i += 9, j += 6 ) {
 
 			a.set( vertexBuffer[ i + 0 ], vertexBuffer[ i + 1 ], vertexBuffer[ i + 2 ] );
 			b.set( vertexBuffer[ i + 3 ], vertexBuffer[ i + 4 ], vertexBuffer[ i + 5 ] );
@@ -289,7 +287,7 @@ function PolyhedronBufferGeometry( vertices, indices, radius, detail ) {
 
 			centroid.copy( a ).add( b ).add( c ).divideScalar( 3 );
 
-			var azi = azimuth( centroid );
+			const azi = azimuth( centroid );
 
 			correctUV( uvA, j + 0, a, azi );
 			correctUV( uvB, j + 2, b, azi );

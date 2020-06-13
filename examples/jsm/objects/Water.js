@@ -10,10 +10,12 @@
 import {
 	Color,
 	FrontSide,
+	LinearEncoding,
 	LinearFilter,
 	MathUtils,
 	Matrix4,
 	Mesh,
+	NoToneMapping,
 	PerspectiveCamera,
 	Plane,
 	RGBFormat,
@@ -300,7 +302,25 @@ var Water = function ( geometry, options ) {
 
 		eye.setFromMatrixPosition( camera.matrixWorld );
 
-		//
+		// Render
+
+		if ( renderer.outputEncoding !== LinearEncoding ) {
+
+			console.warn( 'THREE.Water: WebGLRenderer must use LinearEncoding as outputEncoding.' );
+			scope.onBeforeRender = function () {};
+
+			return;
+
+		}
+
+		if ( renderer.toneMapping !== NoToneMapping ) {
+
+			console.warn( 'THREE.Water: WebGLRenderer must use NoToneMapping as toneMapping.' );
+			scope.onBeforeRender = function () {};
+
+			return;
+
+		}
 
 		var currentRenderTarget = renderer.getRenderTarget();
 

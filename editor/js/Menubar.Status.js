@@ -7,7 +7,7 @@ import * as THREE from '../../build/three.module.js';
 import { UIPanel, UIText } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
 
-var MenubarStatus = function ( editor ) {
+function MenubarStatus( editor ) {
 
 	var strings = editor.strings;
 
@@ -50,6 +50,6 @@ var MenubarStatus = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarStatus };

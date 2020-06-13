@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/SetUuidCommand';
+import { } from '../../../../editor/js/commands/SetUuidCommand';
 
 export default QUnit.module( 'Editor', () => {
 

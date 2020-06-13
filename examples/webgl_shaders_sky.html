@@ -21,7 +21,7 @@
 
 			var camera, controls, scene, renderer;
 
-			var sky, sunSphere;
+			var sky, sun;
 
 			init();
 			render();
@@ -33,14 +33,7 @@
 				sky.scale.setScalar( 450000 );
 				scene.add( sky );
 
-				// Add Sun Helper
-				sunSphere = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 20000, 16, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff } )
-				);
-				sunSphere.position.y = - 700000;
-				sunSphere.visible = false;
-				scene.add( sunSphere );
+				sun = new THREE.Vector3();
 
 				/// GUI
 
@@ -49,13 +42,10 @@
 					rayleigh: 2,
 					mieCoefficient: 0.005,
 					mieDirectionalG: 0.8,
-					luminance: 1,
 					inclination: 0.49, // elevation / inclination
 					azimuth: 0.25, // Facing front,
-					sun: ! true
+					exposure: renderer.toneMappingExposure
 				};
-
-				var distance = 400000;
 
 				function guiChanged() {
 
@@ -64,19 +54,17 @@
 					uniforms[ "rayleigh" ].value = effectController.rayleigh;
 					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
 					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
-					uniforms[ "luminance" ].value = effectController.luminance;
 
 					var theta = Math.PI * ( effectController.inclination - 0.5 );
 					var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
 
-					sunSphere.position.x = distance * Math.cos( phi );
-					sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
-					sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+					sun.x = Math.cos( phi );
+					sun.y = Math.sin( phi ) * Math.sin( theta );
+					sun.z = Math.sin( phi ) * Math.cos( theta );
 
-					sunSphere.visible = effectController.sun;
+					uniforms[ "sunPosition" ].value.copy( sun );
 
-					uniforms[ "sunPosition" ].value.copy( sunSphere.position );
-
+					renderer.toneMappingExposure = effectController.exposure;
 					renderer.render( scene, camera );
 
 				}
@@ -87,10 +75,9 @@
 				gui.add( effectController, "rayleigh", 0.0, 4, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, "mieCoefficient", 0.0, 0.1, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, "mieDirectionalG", 0.0, 1, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, "luminance", 0.0, 2 ).onChange( guiChanged );
 				gui.add( effectController, "inclination", 0, 1, 0.0001 ).onChange( guiChanged );
 				gui.add( effectController, "azimuth", 0, 1, 0.0001 ).onChange( guiChanged );
-				gui.add( effectController, "sun" ).onChange( guiChanged );
+				gui.add( effectController, "exposure", 0, 1, 0.0001 ).onChange( guiChanged );
 
 				guiChanged();
 
@@ -109,6 +96,9 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.5;
 				document.body.appendChild( renderer.domElement );
 
 				controls = new OrbitControls( camera, renderer.domElement );

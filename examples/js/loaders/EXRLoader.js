@@ -1,3 +1,4 @@
+console.warn( "THREE.EXRLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Richard M. / https://github.com/richardmonette
  * @author ScieCode / http://github.com/sciecode
@@ -1927,6 +1928,16 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		}
 
+		function parseV3f( dataView, offset ) {
+
+			var x = parseFloat32( dataView, offset );
+			var y = parseFloat32( dataView, offset );
+			var z = parseFloat32( dataView, offset );
+
+			return [ x, y, z ];
+
+		}
+
 		function parseValue( dataView, buffer, offset, type, size ) {
 
 			if ( type === 'string' || type === 'stringvector' || type === 'iccProfile' ) {
@@ -1960,6 +1971,10 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			} else if ( type === 'v2f' ) {
 
 				return parseV2f( dataView, offset );
+
+			} else if ( type === 'v3f' ) {
+
+				return parseV3f( dataView, offset );
 
 			} else if ( type === 'int' ) {
 

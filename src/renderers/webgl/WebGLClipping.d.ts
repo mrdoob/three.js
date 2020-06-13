@@ -4,6 +4,7 @@ export class WebGLClipping {
 
 	uniform: { value: any; needsUpdate: boolean };
 	numPlanes: number;
+	numIntersection: number;
 
 	init( planes: any[], enableLocalClipping: boolean, camera: Camera ): boolean;
 	beginShadows(): void;

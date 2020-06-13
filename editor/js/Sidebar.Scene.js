@@ -5,7 +5,7 @@
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
 import { UIOutliner, UITexture, UICubeTexture } from './libs/ui.three.js';
 
-var SidebarScene = function ( editor ) {
+function SidebarScene( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
@@ -16,12 +16,40 @@ var SidebarScene = function ( editor ) {
 
 	// outliner
 
+	var nodeStates = new WeakMap();
+
 	function buildOption( object, draggable ) {
 
 		var option = document.createElement( 'div' );
 		option.draggable = draggable;
 		option.innerHTML = buildHTML( object );
 		option.value = object.id;
+
+		// opener
+
+		if ( nodeStates.has( object ) ) {
+
+			var state = nodeStates.get( object );
+
+			var opener = document.createElement( 'span' );
+			opener.classList.add( 'opener' );
+
+			if ( object.children.length > 0 ) {
+
+				opener.classList.add( state ? 'open' : 'closed' );
+
+			}
+
+			opener.addEventListener( 'click', function () {
+
+				nodeStates.set( object, nodeStates.get( object ) === false ); // toggle
+				refreshUI();
+
+			}, false );
+
+			option.insertBefore( opener, option.firstChild );
+
+		}
 
 		return option;
 
@@ -60,15 +88,15 @@ var SidebarScene = function ( editor ) {
 
 	function buildHTML( object ) {
 
-		var html = '<span class="type ' + object.type + '"></span> ' + escapeHTML( object.name );
+		var html = `<span class="type ${ object.type }"></span> ${ escapeHTML( object.name ) }`;
 
 		if ( object.isMesh ) {
 
 			var geometry = object.geometry;
 			var material = object.material;
 
-			html += ' <span class="type ' + geometry.type + '"></span> ' + escapeHTML( geometry.name );
-			html += ' <span class="type ' + material.type + '"></span> ' + escapeHTML( getMaterialName( material ) );
+			html += ` <span class="type ${ geometry.type }"></span> ${ escapeHTML( geometry.name ) }`;
+			html += ` <span class="type ${ material.type }"></span> ${ escapeHTML( getMaterialName( material ) ) }`;
 
 		}
 
@@ -300,15 +328,25 @@ var SidebarScene = function ( editor ) {
 
 				var object = objects[ i ];
 
+				if ( nodeStates.has( object ) === false ) {
+
+					nodeStates.set( object, false );
+
+				}
+
 				var option = buildOption( object, true );
-				option.style.paddingLeft = ( pad * 10 ) + 'px';
+				option.style.paddingLeft = ( pad * 18 ) + 'px';
 				options.push( option );
 
-				addObjects( object.children, pad + 1 );
+				if ( nodeStates.get( object ) === true ) {
+
+					addObjects( object.children, pad + 1 );
+
+				}
 
 			}
 
-		} )( scene.children, 1 );
+		} )( scene.children, 0 );
 
 		outliner.setOptions( options );
 
@@ -421,12 +459,38 @@ var SidebarScene = function ( editor ) {
 
 		if ( ignoreObjectSelectedSignal === true ) return;
 
-		outliner.setValue( object !== null ? object.id : null );
+		if ( object !== null ) {
+
+			let needsRefresh = false;
+			let parent = object.parent;
+
+			while ( parent !== editor.scene ) {
+
+				if ( nodeStates.get( parent ) !== true ) {
+
+					nodeStates.set( parent, true );
+					needsRefresh = true;
+
+				}
+
+				parent = parent.parent;
+
+			}
+
+			if ( needsRefresh ) refreshUI();
+
+			outliner.setValue( object.id );
+
+		} else {
+
+			outliner.setValue( null );
+
+		}
 
 	} );
 
 	return container;
 
-};
+}
 
 export { SidebarScene };

@@ -1,4 +1,5 @@
 import { Vector2 } from './../math/Vector2';
+import { Matrix3 } from './../math/Matrix3';
 import { EventDispatcher } from './../core/EventDispatcher';
 import {
 	Mapping,
@@ -43,6 +44,8 @@ export class Texture extends EventDispatcher {
 	format: PixelFormat;
 	internalFormat: PixelFormatGPU | null;
 	type: TextureDataType;
+	matrix: Matrix3;
+	matrixAutoUpdate: boolean;
 	offset: Vector2;
 	repeat: Vector2;
 	center: Vector2;
@@ -65,5 +68,6 @@ export class Texture extends EventDispatcher {
 	toJSON( meta: any ): any;
 	dispose(): void;
 	transformUv( uv: Vector2 ): Vector2;
+	updateMatrix(): void;
 
 }

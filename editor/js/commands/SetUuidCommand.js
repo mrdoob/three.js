@@ -11,7 +11,7 @@ import { Command } from '../Command.js';
  * @param newUuid string
  * @constructor
  */
-var SetUuidCommand = function ( editor, object, newUuid ) {
+function SetUuidCommand( editor, object, newUuid ) {
 
 	Command.call( this, editor );
 
@@ -23,7 +23,7 @@ var SetUuidCommand = function ( editor, object, newUuid ) {
 	this.oldUuid = ( object !== undefined ) ? object.uuid : undefined;
 	this.newUuid = newUuid;
 
-};
+}
 
 SetUuidCommand.prototype = {
 

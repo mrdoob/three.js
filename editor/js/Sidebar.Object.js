@@ -14,7 +14,7 @@ import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 import { SetColorCommand } from './commands/SetColorCommand.js';
 
-var SidebarObject = function ( editor ) {
+function SidebarObject( editor ) {
 
 	var strings = editor.strings;
 
@@ -868,6 +868,6 @@ var SidebarObject = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarObject };

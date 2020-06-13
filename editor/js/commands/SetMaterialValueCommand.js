@@ -12,7 +12,7 @@ import { Command } from '../Command.js';
  * @param newValue number, string, boolean or object
  * @constructor
  */
-var SetMaterialValueCommand = function ( editor, object, attributeName, newValue, materialSlot ) {
+function SetMaterialValueCommand( editor, object, attributeName, newValue, materialSlot ) {
 
 	Command.call( this, editor );
 
@@ -28,7 +28,7 @@ var SetMaterialValueCommand = function ( editor, object, attributeName, newValue
 
 	this.attributeName = attributeName;
 
-};
+}
 
 SetMaterialValueCommand.prototype = {
 

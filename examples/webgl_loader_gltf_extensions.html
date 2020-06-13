@@ -14,8 +14,6 @@
 			<div id="description"></div>
 		</div>
 
-		<div id="container"></div>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -28,7 +26,7 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var orbitControls;
-			var container, camera, scene, renderer, loader;
+			var camera, scene, renderer, loader;
 			var gltf, background, envMap, mixer, gui, extensionControls;
 
 			var clock = new THREE.Clock();
@@ -147,14 +145,14 @@
 
 			function onload() {
 
-				container = document.getElementById( 'container' );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1.25;
 				renderer.physicallyCorrectLights = true;
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -196,7 +194,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.001, 1000 );
 				scene.add( camera );
 
 				var spot1;
@@ -388,7 +386,7 @@
 
 			function onWindowResize() {
 
-				camera.aspect = container.offsetWidth / container.offsetHeight;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );

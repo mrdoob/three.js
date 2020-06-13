@@ -14,7 +14,7 @@ import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var UITexture = function ( mapping ) {
+function UITexture( mapping ) {
 
 	UIElement.call( this );
 
@@ -141,7 +141,7 @@ var UITexture = function ( mapping ) {
 
 	return this;
 
-};
+}
 
 UITexture.prototype = Object.create( UIElement.prototype );
 UITexture.prototype.constructor = UITexture;
@@ -225,7 +225,7 @@ UITexture.prototype.onChange = function ( callback ) {
 
 // UICubeTexture
 
-var UICubeTexture = function () {
+function UICubeTexture() {
 
 	UIElement.call( this );
 
@@ -295,7 +295,7 @@ var UICubeTexture = function () {
 
 	}
 
-};
+}
 
 UICubeTexture.prototype = Object.create( UIElement.prototype );
 UICubeTexture.prototype.constructor = UICubeTexture;
@@ -366,7 +366,7 @@ UICubeTexture.prototype.onChange = function ( callback ) {
 
 // UIOutliner
 
-var UIOutliner = function ( editor ) {
+function UIOutliner( editor ) {
 
 	UIElement.call( this );
 
@@ -419,7 +419,7 @@ var UIOutliner = function ( editor ) {
 
 	return this;
 
-};
+}
 
 UIOutliner.prototype = Object.create( UIElement.prototype );
 UIOutliner.prototype.constructor = UIOutliner;
@@ -584,16 +584,16 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 		scope.options.push( div );
 
-		div.addEventListener( 'click', onClick, false );
+		div.addEventListener( 'click', onClick );
 
 		if ( div.draggable === true ) {
 
-			div.addEventListener( 'drag', onDrag, false );
-			div.addEventListener( 'dragstart', onDragStart, false ); // Firefox needs this
+			div.addEventListener( 'drag', onDrag );
+			div.addEventListener( 'dragstart', onDragStart ); // Firefox needs this
 
-			div.addEventListener( 'dragover', onDragOver, false );
-			div.addEventListener( 'dragleave', onDragLeave, false );
-			div.addEventListener( 'drop', onDrop, false );
+			div.addEventListener( 'dragover', onDragOver );
+			div.addEventListener( 'dragleave', onDragLeave );
+			div.addEventListener( 'drop', onDrop );
 
 		}
 
@@ -652,7 +652,7 @@ UIOutliner.prototype.setValue = function ( value ) {
 
 };
 
-var UIPoints = function ( onAddClicked ) {
+function UIPoints( onAddClicked ) {
 
 	UIElement.call( this );
 
@@ -683,7 +683,7 @@ var UIPoints = function ( onAddClicked ) {
 	this.onChangeCallback = null;
 	return this;
 
-};
+}
 
 UIPoints.prototype = Object.create( UIElement.prototype );
 UIPoints.prototype.constructor = UIPoints;
@@ -727,13 +727,13 @@ UIPoints.prototype.deletePointRow = function ( idx, dontUpdate ) {
 
 };
 
-var UIPoints2 = function () {
+function UIPoints2() {
 
 	UIPoints.call( this, UIPoints2.addRow.bind( this ) );
 
 	return this;
 
-};
+}
 
 UIPoints2.prototype = Object.create( UIPoints.prototype );
 UIPoints2.prototype.constructor = UIPoints2;
@@ -817,13 +817,13 @@ UIPoints2.prototype.createPointRow = function ( x, y ) {
 
 };
 
-var UIPoints3 = function () {
+function UIPoints3() {
 
 	UIPoints.call( this, UIPoints3.addRow.bind( this ) );
 
 	return this;
 
-};
+}
 
 UIPoints3.prototype = Object.create( UIPoints.prototype );
 UIPoints3.prototype.constructor = UIPoints3;
@@ -908,7 +908,7 @@ UIPoints3.prototype.createPointRow = function ( x, y, z ) {
 
 };
 
-var UIBoolean = function ( boolean, text ) {
+function UIBoolean( boolean, text ) {
 
 	UISpan.call( this );
 
@@ -920,7 +920,7 @@ var UIBoolean = function ( boolean, text ) {
 	this.add( this.checkbox );
 	this.add( this.text );
 
-};
+}
 
 UIBoolean.prototype = Object.create( UISpan.prototype );
 UIBoolean.prototype.constructor = UIBoolean;

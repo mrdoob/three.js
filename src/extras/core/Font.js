@@ -22,10 +22,10 @@ Object.assign( Font.prototype, {
 
 		if ( size === undefined ) size = 100;
 
-		var shapes = [];
-		var paths = createPaths( text, size, this.data );
+		const shapes = [];
+		const paths = createPaths( text, size, this.data );
 
-		for ( var p = 0, pl = paths.length; p < pl; p ++ ) {
+		for ( let p = 0, pl = paths.length; p < pl; p ++ ) {
 
 			Array.prototype.push.apply( shapes, paths[ p ].toShapes() );
 
@@ -39,17 +39,17 @@ Object.assign( Font.prototype, {
 
 function createPaths( text, size, data ) {
 
-	var chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // workaround for IE11, see #13988
-	var scale = size / data.resolution;
-	var line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
+	const chars = Array.from ? Array.from( text ) : String( text ).split( '' ); // workaround for IE11, see #13988
+	const scale = size / data.resolution;
+	const line_height = ( data.boundingBox.yMax - data.boundingBox.yMin + data.underlineThickness ) * scale;
 
-	var paths = [];
+	const paths = [];
 
-	var offsetX = 0, offsetY = 0;
+	let offsetX = 0, offsetY = 0;
 
-	for ( var i = 0; i < chars.length; i ++ ) {
+	for ( let i = 0; i < chars.length; i ++ ) {
 
-		var char = chars[ i ];
+		const char = chars[ i ];
 
 		if ( char === '\n' ) {
 
@@ -58,7 +58,7 @@ function createPaths( text, size, data ) {
 
 		} else {
 
-			var ret = createPath( char, scale, offsetX, offsetY, data );
+			const ret = createPath( char, scale, offsetX, offsetY, data );
 			offsetX += ret.offsetX;
 			paths.push( ret.path );
 
@@ -72,7 +72,7 @@ function createPaths( text, size, data ) {
 
 function createPath( char, scale, offsetX, offsetY, data ) {
 
-	var glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
+	const glyph = data.glyphs[ char ] || data.glyphs[ '?' ];
 
 	if ( ! glyph ) {
 
@@ -82,17 +82,17 @@ function createPath( char, scale, offsetX, offsetY, data ) {
 
 	}
 
-	var path = new ShapePath();
+	const path = new ShapePath();
 
-	var x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
+	let x, y, cpx, cpy, cpx1, cpy1, cpx2, cpy2;
 
 	if ( glyph.o ) {
 
-		var outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
+		const outline = glyph._cachedOutline || ( glyph._cachedOutline = glyph.o.split( ' ' ) );
 
-		for ( var i = 0, l = outline.length; i < l; ) {
+		for ( let i = 0, l = outline.length; i < l; ) {
 
-			var action = outline[ i ++ ];
+			const action = outline[ i ++ ];
 
 			switch ( action ) {
 

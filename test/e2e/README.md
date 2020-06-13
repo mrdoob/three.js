@@ -1,11 +1,11 @@
 # Three.js end-to-end testing
 
 ### Motivation
-Simplify code reviews with quick automated testing inside CI.
+Simplify code reviews with quick pixel testing inside CI. The same screenshots are used for thumbnails.
 
 ### Local usage
 If you get an error in e2e test after PR and you sure that all is correct,
-just make a new screenshot to example. As a last resort add it to exception list or increase timeouts.
+just make a new screenshot to example. As a last resort increase timeouts or add it to exception list.
 
 ```shell
 # generate new screenshots for exact examples
@@ -38,8 +38,4 @@ Merge only those commits that pass the tests, otherwise all next commits will al
 | 4=0+0+2+2 failed, time=3:26             | with progressive attempts            |
 
 ### Status
-97% examples are covered with tests. Robusness in CI >97%.
-
-### Wrong screenshots but ok for CI
-webgl_loader_bvh, webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc, webgl_physics_volume.
-Some of them can be fixed with another [pipeline](https://github.com/munrocket/puppeteer-webgl-ci).
+97% examples are covered with tests. Check exception list for more information.

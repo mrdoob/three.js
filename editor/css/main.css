@@ -22,10 +22,15 @@ button {
 	position: relative;
 }
 
+input {
+	vertical-align: middle;
+}
+
 textarea {
 	tab-size: 4;
 	white-space: pre;
 	word-wrap: normal;
+	vertical-align: middle;
 }
 
 	textarea.success {
@@ -130,9 +135,27 @@ textarea, input { outline: none; } /* osx */
 
 /* outliner */
 
+#outliner .opener {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	margin: 0px 4px;
+	vertical-align: top;
+	text-align: center;
+}
+
+	#outliner .opener.open:after {
+		content: '−';
+	}
+
+	#outliner .opener.closed:after {
+		content: '+';
+	}
+
 #outliner .option {
 
 	border: 1px solid transparent;
+
 }
 
 #outliner .option.drag {
@@ -154,14 +177,15 @@ textarea, input { outline: none; } /* osx */
 }
 
 #outliner .type {
-	position:relative;
-	top:-2px;
-	padding: 0 2px;
+	display: inline-block;
+	width: 14px;
+	height: 14px;
 	color: #ddd;
+	text-align: center;
 }
 
 #outliner .type:after {
-	content: '■';
+	content: '●';
 }
 
 #outliner .Scene {
@@ -386,10 +410,6 @@ select {
 	overflow: auto;
 }
 
-	#sidebar * {
-		vertical-align: middle;
-	}
-
 	#sidebar .Panel {
 		color: #888;
 		padding: 10px;
@@ -423,28 +443,21 @@ select {
 
 #toolbar {
 	position: absolute;
-	left: calc(50% - 290px); /* ( ( 100% - 300px ) / 2.0 ) - 140px */
-	width: 280px;
-	bottom: 16px;
-	height: 32px;
+	left: 10px;
+	top: 42px;
+	width: 32px;
 	background: #eee;
-	color: #333;
+	text-align: center;
 }
 
-	#toolbar * {
-		vertical-align: middle;
+	#toolbar button, #toolbar input {
+		height: 32px;
 	}
 
-	#toolbar .Panel {
-		padding: 4px;
-		color: #888;
-	}
-
-	#toolbar button {
-		margin-right: 6px;
-		line-height: 14px;
-		height: 24px;
-	}
+		#toolbar button img {
+			width: 16px;
+			opacity: 0.5;
+		}
 
 .Outliner {
 	color: #444;
@@ -538,12 +551,6 @@ select {
 		bottom: 0;
 	}
 
-	#toolbar {
-		left: calc(50% - 140px);
-		width: 280px;
-		top: 68px;
-	}
-
 }
 
 /* DARK MODE */
@@ -632,6 +639,10 @@ select {
 	#toolbar {
 		background-color: #111;
 	}
+
+		#toolbar img {
+			filter: invert(1);
+		}
 
 	.Outliner {
 		color: #888;

@@ -11,7 +11,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-var _vector = new Vector3();
+const _vector = new Vector3();
 
 function SpotLightHelper( light, color ) {
 
@@ -25,9 +25,9 @@ function SpotLightHelper( light, color ) {
 
 	this.color = color;
 
-	var geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 
-	var positions = [
+	const positions = [
 		0, 0, 0, 	0, 0, 1,
 		0, 0, 0, 	1, 0, 1,
 		0, 0, 0,	- 1, 0, 1,
@@ -35,10 +35,10 @@ function SpotLightHelper( light, color ) {
 		0, 0, 0, 	0, - 1, 1
 	];
 
-	for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
+	for ( let i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
 
-		var p1 = ( i / l ) * Math.PI * 2;
-		var p2 = ( j / l ) * Math.PI * 2;
+		const p1 = ( i / l ) * Math.PI * 2;
+		const p2 = ( j / l ) * Math.PI * 2;
 
 		positions.push(
 			Math.cos( p1 ), Math.sin( p1 ), 1,
@@ -49,7 +49,7 @@ function SpotLightHelper( light, color ) {
 
 	geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
-	var material = new LineBasicMaterial( { fog: false, toneMapped: false } );
+	const material = new LineBasicMaterial( { fog: false, toneMapped: false } );
 
 	this.cone = new LineSegments( geometry, material );
 	this.add( this.cone );
@@ -72,8 +72,8 @@ SpotLightHelper.prototype.update = function () {
 
 	this.light.updateMatrixWorld();
 
-	var coneLength = this.light.distance ? this.light.distance : 1000;
-	var coneWidth = coneLength * Math.tan( this.light.angle );
+	const coneLength = this.light.distance ? this.light.distance : 1000;
+	const coneWidth = coneLength * Math.tan( this.light.angle );
 
 	this.cone.scale.set( coneWidth, coneWidth, coneLength );
 

@@ -66,6 +66,14 @@ function animate() {
 
 If everything went well, you should see [this](https://jsfiddle.net/8kubjpL5/).
 
+### Cloning this repository ###
+
+Cloning the repo with all its history results in a ~2GB download. If you don't need the whole history you can use the `depth` parameter to significantly reduce download size.
+
+```sh
+git clone --depth=1 https://github.com/mrdoob/three.js.git
+```
+
 ### Change log ###
 
 [Releases](https://github.com/mrdoob/three.js/releases)

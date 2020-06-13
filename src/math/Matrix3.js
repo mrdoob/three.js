@@ -29,7 +29,7 @@ Object.assign( Matrix3.prototype, {
 
 	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
-		var te = this.elements;
+		const te = this.elements;
 
 		te[ 0 ] = n11; te[ 1 ] = n21; te[ 2 ] = n31;
 		te[ 3 ] = n12; te[ 4 ] = n22; te[ 5 ] = n32;
@@ -61,8 +61,8 @@ Object.assign( Matrix3.prototype, {
 
 	copy: function ( m ) {
 
-		var te = this.elements;
-		var me = m.elements;
+		const te = this.elements;
+		const me = m.elements;
 
 		te[ 0 ] = me[ 0 ]; te[ 1 ] = me[ 1 ]; te[ 2 ] = me[ 2 ];
 		te[ 3 ] = me[ 3 ]; te[ 4 ] = me[ 4 ]; te[ 5 ] = me[ 5 ];
@@ -84,7 +84,7 @@ Object.assign( Matrix3.prototype, {
 
 	setFromMatrix4: function ( m ) {
 
-		var me = m.elements;
+		const me = m.elements;
 
 		this.set(
 
@@ -112,17 +112,17 @@ Object.assign( Matrix3.prototype, {
 
 	multiplyMatrices: function ( a, b ) {
 
-		var ae = a.elements;
-		var be = b.elements;
-		var te = this.elements;
+		const ae = a.elements;
+		const be = b.elements;
+		const te = this.elements;
 
-		var a11 = ae[ 0 ], a12 = ae[ 3 ], a13 = ae[ 6 ];
-		var a21 = ae[ 1 ], a22 = ae[ 4 ], a23 = ae[ 7 ];
-		var a31 = ae[ 2 ], a32 = ae[ 5 ], a33 = ae[ 8 ];
+		const a11 = ae[ 0 ], a12 = ae[ 3 ], a13 = ae[ 6 ];
+		const a21 = ae[ 1 ], a22 = ae[ 4 ], a23 = ae[ 7 ];
+		const a31 = ae[ 2 ], a32 = ae[ 5 ], a33 = ae[ 8 ];
 
-		var b11 = be[ 0 ], b12 = be[ 3 ], b13 = be[ 6 ];
-		var b21 = be[ 1 ], b22 = be[ 4 ], b23 = be[ 7 ];
-		var b31 = be[ 2 ], b32 = be[ 5 ], b33 = be[ 8 ];
+		const b11 = be[ 0 ], b12 = be[ 3 ], b13 = be[ 6 ];
+		const b21 = be[ 1 ], b22 = be[ 4 ], b23 = be[ 7 ];
+		const b31 = be[ 2 ], b32 = be[ 5 ], b33 = be[ 8 ];
 
 		te[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31;
 		te[ 3 ] = a11 * b12 + a12 * b22 + a13 * b32;
@@ -142,7 +142,7 @@ Object.assign( Matrix3.prototype, {
 
 	multiplyScalar: function ( s ) {
 
-		var te = this.elements;
+		const te = this.elements;
 
 		te[ 0 ] *= s; te[ 3 ] *= s; te[ 6 ] *= s;
 		te[ 1 ] *= s; te[ 4 ] *= s; te[ 7 ] *= s;
@@ -154,9 +154,9 @@ Object.assign( Matrix3.prototype, {
 
 	determinant: function () {
 
-		var te = this.elements;
+		const te = this.elements;
 
-		var a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
+		const a = te[ 0 ], b = te[ 1 ], c = te[ 2 ],
 			d = te[ 3 ], e = te[ 4 ], f = te[ 5 ],
 			g = te[ 6 ], h = te[ 7 ], i = te[ 8 ];
 
@@ -172,7 +172,7 @@ Object.assign( Matrix3.prototype, {
 
 		}
 
-		var me = matrix.elements,
+		const me = matrix.elements,
 			te = this.elements,
 
 			n11 = me[ 0 ], n21 = me[ 1 ], n31 = me[ 2 ],
@@ -187,7 +187,7 @@ Object.assign( Matrix3.prototype, {
 
 		if ( det === 0 ) return this.set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
-		var detInv = 1 / det;
+		const detInv = 1 / det;
 
 		te[ 0 ] = t11 * detInv;
 		te[ 1 ] = ( n31 * n23 - n33 * n21 ) * detInv;
@@ -207,7 +207,8 @@ Object.assign( Matrix3.prototype, {
 
 	transpose: function () {
 
-		var tmp, m = this.elements;
+		let tmp;
+		const m = this.elements;
 
 		tmp = m[ 1 ]; m[ 1 ] = m[ 3 ]; m[ 3 ] = tmp;
 		tmp = m[ 2 ]; m[ 2 ] = m[ 6 ]; m[ 6 ] = tmp;
@@ -225,7 +226,7 @@ Object.assign( Matrix3.prototype, {
 
 	transposeIntoArray: function ( r ) {
 
-		var m = this.elements;
+		const m = this.elements;
 
 		r[ 0 ] = m[ 0 ];
 		r[ 1 ] = m[ 3 ];
@@ -243,8 +244,8 @@ Object.assign( Matrix3.prototype, {
 
 	setUvTransform: function ( tx, ty, sx, sy, rotation, cx, cy ) {
 
-		var c = Math.cos( rotation );
-		var s = Math.sin( rotation );
+		const c = Math.cos( rotation );
+		const s = Math.sin( rotation );
 
 		this.set(
 			sx * c, sx * s, - sx * ( c * cx + s * cy ) + cx + tx,
@@ -256,7 +257,7 @@ Object.assign( Matrix3.prototype, {
 
 	scale: function ( sx, sy ) {
 
-		var te = this.elements;
+		const te = this.elements;
 
 		te[ 0 ] *= sx; te[ 3 ] *= sx; te[ 6 ] *= sx;
 		te[ 1 ] *= sy; te[ 4 ] *= sy; te[ 7 ] *= sy;
@@ -267,13 +268,13 @@ Object.assign( Matrix3.prototype, {
 
 	rotate: function ( theta ) {
 
-		var c = Math.cos( theta );
-		var s = Math.sin( theta );
+		const c = Math.cos( theta );
+		const s = Math.sin( theta );
 
-		var te = this.elements;
+		const te = this.elements;
 
-		var a11 = te[ 0 ], a12 = te[ 3 ], a13 = te[ 6 ];
-		var a21 = te[ 1 ], a22 = te[ 4 ], a23 = te[ 7 ];
+		const a11 = te[ 0 ], a12 = te[ 3 ], a13 = te[ 6 ];
+		const a21 = te[ 1 ], a22 = te[ 4 ], a23 = te[ 7 ];
 
 		te[ 0 ] = c * a11 + s * a21;
 		te[ 3 ] = c * a12 + s * a22;
@@ -289,7 +290,7 @@ Object.assign( Matrix3.prototype, {
 
 	translate: function ( tx, ty ) {
 
-		var te = this.elements;
+		const te = this.elements;
 
 		te[ 0 ] += tx * te[ 2 ]; te[ 3 ] += tx * te[ 5 ]; te[ 6 ] += tx * te[ 8 ];
 		te[ 1 ] += ty * te[ 2 ]; te[ 4 ] += ty * te[ 5 ]; te[ 7 ] += ty * te[ 8 ];
@@ -300,10 +301,10 @@ Object.assign( Matrix3.prototype, {
 
 	equals: function ( matrix ) {
 
-		var te = this.elements;
-		var me = matrix.elements;
+		const te = this.elements;
+		const me = matrix.elements;
 
-		for ( var i = 0; i < 9; i ++ ) {
+		for ( let i = 0; i < 9; i ++ ) {
 
 			if ( te[ i ] !== me[ i ] ) return false;
 
@@ -317,7 +318,7 @@ Object.assign( Matrix3.prototype, {
 
 		if ( offset === undefined ) offset = 0;
 
-		for ( var i = 0; i < 9; i ++ ) {
+		for ( let i = 0; i < 9; i ++ ) {
 
 			this.elements[ i ] = array[ i + offset ];
 
@@ -332,7 +333,7 @@ Object.assign( Matrix3.prototype, {
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
 
-		var te = this.elements;
+		const te = this.elements;
 
 		array[ offset ] = te[ 0 ];
 		array[ offset + 1 ] = te[ 1 ];

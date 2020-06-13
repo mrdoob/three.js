@@ -367,7 +367,7 @@ OBJLoader2Parser.prototype = {
 
 				// LF
 				case 10:
-					this._processLine( buffer, bufferPointer, slashesCount, word, currentByte);
+					this._processLine( buffer, bufferPointer, slashesCount, word, currentByte );
 					word = '';
 					bufferPointer = 0;
 					slashesCount = 0;
@@ -385,7 +385,7 @@ OBJLoader2Parser.prototype = {
 
 		}
 
-		this._processLine( buffer, bufferPointer, slashesCount, word, currentByte);
+		this._processLine( buffer, bufferPointer, slashesCount, word, currentByte );
 		this._finalizeParsing();
 		if ( this.logging.enabled ) console.timeEnd( 'OBJLoader2Parser.execute' );
 

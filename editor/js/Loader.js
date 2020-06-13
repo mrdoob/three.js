@@ -28,7 +28,7 @@ import { LoaderUtils } from './LoaderUtils.js';
 
 import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
 
-var Loader = function ( editor ) {
+function Loader( editor ) {
 
 	var scope = this;
 
@@ -521,7 +521,7 @@ var Loader = function ( editor ) {
 
 			default:
 
-				// alert( 'Unsupported file format (' + extension +  ').' );
+				console.error( 'Unsupported file format (' + extension + ').' );
 
 				break;
 
@@ -717,6 +717,6 @@ var Loader = function ( editor ) {
 
 	}
 
-};
+}
 
 export { Loader };

@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/RemoveScriptCommand';
+import { } from '../../../../editor/js/commands/RemoveScriptCommand';
 
 export default QUnit.module( 'Editor', () => {
 
