@@ -335,7 +335,7 @@ function SidebarScene( editor ) {
 				}
 
 				var option = buildOption( object, true );
-				option.style.paddingLeft = ( pad * 15 ) + 'px';
+				option.style.paddingLeft = ( pad * 18 ) + 'px';
 				options.push( option );
 
 				if ( nodeStates.get( object ) === true ) {
