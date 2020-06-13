@@ -584,16 +584,16 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 		scope.options.push( div );
 
-		div.addEventListener( 'click', onClick, false );
+		div.addEventListener( 'click', onClick );
 
 		if ( div.draggable === true ) {
 
-			div.addEventListener( 'drag', onDrag, false );
-			div.addEventListener( 'dragstart', onDragStart, false ); // Firefox needs this
+			div.addEventListener( 'drag', onDrag );
+			div.addEventListener( 'dragstart', onDragStart ); // Firefox needs this
 
-			div.addEventListener( 'dragover', onDragOver, false );
-			div.addEventListener( 'dragleave', onDragLeave, false );
-			div.addEventListener( 'drop', onDrop, false );
+			div.addEventListener( 'dragover', onDragOver );
+			div.addEventListener( 'dragleave', onDragLeave );
+			div.addEventListener( 'drop', onDrop );
 
 		}
 
