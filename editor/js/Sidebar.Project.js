@@ -105,17 +105,12 @@ function SidebarProject( editor ) {
 	shadowsRow.add( new UIText( strings.getKey( 'sidebar/project/shadows' ) ).setWidth( '90px' ) );
 	shadowsRow.add( shadowsBoolean );
 
-	rendererPanel.add( shadowsRow );
-
-	// Renderer / Shadow Type
-
-	var shadowTypeRow = new UIRow();
 	var shadowTypeSelect = new UISelect().setOptions( {
 		0: 'Basic',
 		1: 'PCF',
 		2: 'PCF (Soft)',
-	//	3: 'VSM'
-	} ).setWidth( '150px' ).onChange( function () {
+		//	3: 'VSM'
+	} ).setWidth( '125px' ).onChange( function () {
 
 		config.setKey( 'project/renderer/shadowType', parseFloat( this.getValue() ) );
 		updateRenderer();
@@ -123,10 +118,9 @@ function SidebarProject( editor ) {
 	} );
 	shadowTypeSelect.setValue( config.getKey( 'project/renderer/shadowType' ) );
 
-	shadowTypeRow.add( new UIText( strings.getKey( 'sidebar/project/shadowType' ) ).setWidth( '90px' ) );
-	shadowTypeRow.add( shadowTypeSelect );
+	shadowsRow.add( shadowTypeSelect );
 
-	rendererPanel.add( shadowTypeRow );
+	rendererPanel.add( shadowsRow );
 
 	// Renderer / Physically Correct lights
 
@@ -152,7 +146,7 @@ function SidebarProject( editor ) {
 		2: 'Reinhard',
 		3: 'Cineon',
 		4: 'ACESFilmic'
-	} ).setWidth( '150px' ).onChange( function () {
+	} ).setWidth( '120px' ).onChange( function () {
 
 		var toneMapping = parseFloat( this.getValue() );
 		config.setKey( 'project/renderer/toneMapping', toneMapping );
@@ -164,21 +158,18 @@ function SidebarProject( editor ) {
 	toneMappingRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ) ).setWidth( '90px' ) );
 	toneMappingRow.add( toneMappingSelect );
 
-	rendererPanel.add( toneMappingRow );
-
-	// Tonemapping / Exposure
-
-	var toneMappingExposureRow = new UIRow();
-	var toneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) ).setRange( 0, 10 ).onChange( function () {
+	var toneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) );
+	toneMappingExposure.setWidth( '30px' ).setMarginLeft( '10px' );
+	toneMappingExposure.setRange( 0, 10 );
+	toneMappingExposure.onChange( function () {
 
 		config.setKey( 'project/renderer/toneMappingExposure', this.getValue() );
 		updateTonemapping();
 
 	} );
+	toneMappingRow.add( toneMappingExposure );
 
-	toneMappingExposureRow.add( new UIText( strings.getKey( 'sidebar/project/toneMappingExposure' ) ).setWidth( '90px' ) );
-	toneMappingExposureRow.add( toneMappingExposure );
-	rendererPanel.add( toneMappingExposureRow );
+	rendererPanel.add( toneMappingRow );
 
 	//
 
