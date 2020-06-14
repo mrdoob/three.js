@@ -4,7 +4,7 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel, UIRow, UIInput, UICheckbox, UIText, UIListbox, UISpan, UIButton, UISelect, UINumber } from './libs/ui.js';
+import { UIPanel, UIRow, UIInput, UICheckbox, UIText, UITextArea, UIListbox, UISpan, UIButton, UISelect, UINumber } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
@@ -324,6 +324,96 @@ function SidebarProject( editor ) {
 
 	}
 
+	
+	
+	// remote scripts
+
+	var remotescripts = new UIPanel();
+
+	// title row
+	var remoteScriptRow1 = new UIRow();
+
+	// info text rows
+	var remoteScriptRow2 = new UIRow();
+	var remoteScriptRow3 = new UIRow();
+
+	// add title text to row 1
+	remoteScriptRow1.add( new UIText( strings.getKey( 'sidebar/project/remotescript' ) ).setWidth( '100%' ) );
+
+	// add info text to rows 2 and 3
+	remoteScriptRow2.add( new UIText( `- ${strings.getKey( 'sidebar/project/remotescripthelp1' )}` ).setWidth( '100%' ).setFontSize('10px').setPadding('10px 5px 0 5px') );
+	remoteScriptRow3.add( new UIText( `- ${strings.getKey( 'sidebar/project/remotescripthelp2' )}` ).setWidth( '100%' ).setFontSize('10px').setPadding('10px 5px 0 5px') );
+
+
+	// create the textarea for list of remote sources
+	var remotescriptdata = new UITextArea().setWidth( '100%' ).setHeight( '140px' ).setFontSize( '12px' ).setValue( config.getKey( 'project/remoteScripts' ) );
+	remotescriptdata.onChange( remoteScriptsUpdate );
+
+	// had to specify border box so that text area would fit within the panel... css am i right?
+	remotescriptdata.dom.style.boxSizing = "border-box";
+	
+
+	// load the title, then the text area, then the info rows
+	remotescripts.add( remoteScriptRow1 );
+
+	remotescripts.add( remotescriptdata );
+
+	remotescripts.add( remoteScriptRow2 );
+	remotescripts.add( remoteScriptRow3 );
+	
+	// add the entire panel to the project tab
+	container.add( remotescripts );
+	
+	// handler for textarea onchange - updates saved list of URLs and loads the scripts to the header
+	function remoteScriptsUpdate( ){
+
+		config.setKey( 'project/remoteScripts', this.getValue() );
+				
+		loadRemoteScripts();
+
+	}
+
+	// Gets the list of saved URLs and loops through them injecting the scripts
+	function loadRemoteScripts( ){
+		var val = config.getKey( 'project/remoteScripts' );
+		var remoteScripts = val.split(/\r?\n/);
+		
+		for (var i=0; i<remoteScripts.length; i++){
+			injectScript(`${remoteScripts[i]}`).then((r) => {
+				console.log(`Script ${r.src} loaded!`);
+			}).catch(error => {
+				console.error(error);
+			});
+		}
+	}
+	loadRemoteScripts(); // load saved scripts once on page load
+
+
+	// function to load scripts as defined in the project tab - one script per line
+	function injectScript( url ){
+		return new Promise((resolve, reject) => {
+			var src = url.trim();
+
+			// check for empty string or single character
+			if (src.length > 1 && !(document.querySelectorAll(`script[src="${src}"]`).length > 0)) {
+
+				const script = document.createElement('script');
+
+				script.className = "dynamicRemoteScript";
+			
+				script.src = src;
+				script.addEventListener('load', resolve(script));
+				script.addEventListener('error', e => reject(e.error));
+				document.head.appendChild(script);	
+			} else if (src.length < 2 || src == "undefined") {
+				console.log(`Script src "${src}" not valid!`);
+			} else {
+				console.log(`Script already loaded: ${src}`);
+			}
+		});
+	}
+	
+	
 	return container;
 
 }
