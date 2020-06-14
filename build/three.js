@@ -48481,12 +48481,10 @@
 
 			var outputEncoding = renderer.outputEncoding;
 			var toneMapping = renderer.toneMapping;
-			var toneMappingExposure = renderer.toneMappingExposure;
 			var clearColor = renderer.getClearColor();
 			var clearAlpha = renderer.getClearAlpha();
 
-			renderer.toneMapping = LinearToneMapping;
-			renderer.toneMappingExposure = 1.0;
+			renderer.toneMapping = NoToneMapping;
 			renderer.outputEncoding = LinearEncoding;
 
 			var background = scene.background;
@@ -48531,7 +48529,6 @@
 			}
 
 			renderer.toneMapping = toneMapping;
-			renderer.toneMappingExposure = toneMappingExposure;
 			renderer.outputEncoding = outputEncoding;
 			renderer.setClearColor( clearColor, clearAlpha );
 

@@ -48465,12 +48465,10 @@ PMREMGenerator.prototype = {
 
 		const outputEncoding = renderer.outputEncoding;
 		const toneMapping = renderer.toneMapping;
-		const toneMappingExposure = renderer.toneMappingExposure;
 		const clearColor = renderer.getClearColor();
 		const clearAlpha = renderer.getClearAlpha();
 
-		renderer.toneMapping = LinearToneMapping;
-		renderer.toneMappingExposure = 1.0;
+		renderer.toneMapping = NoToneMapping;
 		renderer.outputEncoding = LinearEncoding;
 
 		let background = scene.background;
@@ -48515,7 +48513,6 @@ PMREMGenerator.prototype = {
 		}
 
 		renderer.toneMapping = toneMapping;
-		renderer.toneMappingExposure = toneMappingExposure;
 		renderer.outputEncoding = outputEncoding;
 		renderer.setClearColor( clearColor, clearAlpha );
 
