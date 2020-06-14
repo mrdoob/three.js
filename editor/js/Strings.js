@@ -296,6 +296,9 @@ function Strings( config ) {
 			'sidebar/project/toneMappingExposure': 'Exposure',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
+			'sidebar/project/remotescript': 'Remote Scripts',
+			'sidebar/project/remotescripthelp1': 'Enter one URL per line',
+			'sidebar/project/remotescripthelp2': 'Refresh to unload deleted scripts',
 
 			'sidebar/settings': 'Settings',
 			'sidebar/settings/language': 'Language',
@@ -610,6 +613,9 @@ function Strings( config ) {
 			'sidebar/project/toneMappingExposure': 'Réglage d\'exposition',
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
+			'sidebar/project/remotescript': 'Scripts distants',
+			'sidebar/project/remotescripthelp1': 'Entrez une URL par ligne',
+			'sidebar/project/remotescripthelp2': 'Actualisez pour décharger le script supprimé',
 
 			'sidebar/settings': 'Paramètres',
 			'sidebar/settings/language': 'Langue',
@@ -898,6 +904,9 @@ function Strings( config ) {
 			'sidebar/project/toneMappingExposure': '曝光',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
+			'sidebar/project/remotescript': '遠程腳本',
+			'sidebar/project/remotescripthelp1': '每行輸入一個網址',
+			'sidebar/project/remotescripthelp2': '刷新以卸載已刪除的腳本',
 
 			'sidebar/settings': '设置',
 			'sidebar/settings/language': '语言',
