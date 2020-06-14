@@ -12,7 +12,7 @@
 
 		<h1>[name]</h1>
 
-		<p class="desc">Creates an array of textures directly from raw data, width and height and depth.</p>
+		<p class="desc">Creates an array of textures directly from raw data, width and height and depth. This type of texture can only be used with a WebGL 2 rendering context.</p>
 
 
 		<h2>Constructor</h2>
@@ -67,6 +67,10 @@
 		texture.format = THREE.RGBFormat;
 		texture.type = THREE.UnsignedByteType;
 		</code>
+
+		<p>
+			[example:webgl2_materials_texture3d WebGL2 / materials / texture3d]
+		</p>
 
 		<h2>Properties</h2>
 
