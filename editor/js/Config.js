@@ -23,6 +23,8 @@ function Config() {
 		'project/renderer/toneMapping': 0, // NoToneMapping
 		'project/renderer/toneMappingExposure': 1,
 
+		'project/remoteScripts': 'https://code.jquery.com/jquery-3.5.1.min.js',
+
 		'settings/history': false,
 
 		'settings/shortcuts/translate': 'w',
