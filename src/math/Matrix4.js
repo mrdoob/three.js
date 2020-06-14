@@ -402,6 +402,52 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	add: function ( m ) {
+
+		return this.addMatrices( this, m );
+
+	},
+
+	addMatrices: function ( a, b ) {
+
+		const ae = a.elements;
+		const be = b.elements;
+		const te = this.elements;
+
+		const a11 = ae[ 0 ], a12 = ae[ 4 ], a13 = ae[ 8 ], a14 = ae[ 12 ];
+		const a21 = ae[ 1 ], a22 = ae[ 5 ], a23 = ae[ 9 ], a24 = ae[ 13 ];
+		const a31 = ae[ 2 ], a32 = ae[ 6 ], a33 = ae[ 10 ], a34 = ae[ 14 ];
+		const a41 = ae[ 3 ], a42 = ae[ 7 ], a43 = ae[ 11 ], a44 = ae[ 15 ];
+
+		const b11 = be[ 0 ], b12 = be[ 4 ], b13 = be[ 8 ], b14 = be[ 12 ];
+		const b21 = be[ 1 ], b22 = be[ 5 ], b23 = be[ 9 ], b24 = be[ 13 ];
+		const b31 = be[ 2 ], b32 = be[ 6 ], b33 = be[ 10 ], b34 = be[ 14 ];
+		const b41 = be[ 3 ], b42 = be[ 7 ], b43 = be[ 11 ], b44 = be[ 15 ];
+
+		te[ 0 ] = a11 + b11;
+		te[ 4 ] = a12 + b12;
+		te[ 8 ] = a13 + b13;
+		te[ 12 ] = a14 + b14;
+
+		te[ 1 ] = a21 + b21;
+		te[ 5 ] = a22 + b22;
+		te[ 9 ] = a23 + b23;
+		te[ 13 ] = a24 + b24;
+
+		te[ 2 ] = a31 + b31;
+		te[ 6 ] = a32 + b32;
+		te[ 10 ] = a33 + b33;
+		te[ 14 ] = a34 + b34;
+
+		te[ 3 ] = a41 + b41;
+		te[ 7 ] = a42 + b42;
+		te[ 11 ] = a43 + b43;
+		te[ 15 ] = a44 + b44;
+
+		return this;
+
+	},
+
 	multiplyScalar: function ( s ) {
 
 		const te = this.elements;

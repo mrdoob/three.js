@@ -140,6 +140,42 @@ Object.assign( Matrix3.prototype, {
 
 	},
 
+	add: function ( m ) {
+
+		return this.addMatrices( this, m );
+
+	},
+
+	addMatrices: function ( a, b ) {
+
+		const ae = a.elements;
+		const be = b.elements;
+		const te = this.elements;
+
+		const a11 = ae[ 0 ], a12 = ae[ 3 ], a13 = ae[ 6 ];
+		const a21 = ae[ 1 ], a22 = ae[ 4 ], a23 = ae[ 7 ];
+		const a31 = ae[ 2 ], a32 = ae[ 5 ], a33 = ae[ 8 ];
+
+		const b11 = be[ 0 ], b12 = be[ 3 ], b13 = be[ 6 ];
+		const b21 = be[ 1 ], b22 = be[ 4 ], b23 = be[ 7 ];
+		const b31 = be[ 2 ], b32 = be[ 5 ], b33 = be[ 8 ];
+
+		te[ 0 ] = a11 + b11;
+		te[ 3 ] = a12 + b12;
+		te[ 6 ] = a13 + b13;
+
+		te[ 1 ] = a21 + b21;
+		te[ 4 ] = a22 + b22;
+		te[ 7 ] = a23 + b23;
+
+		te[ 2 ] = a31 + b31;
+		te[ 5 ] = a32 + b32;
+		te[ 8 ] = a33 + b33;
+
+		return this;
+
+	},
+
 	multiplyScalar: function ( s ) {
 
 		const te = this.elements;

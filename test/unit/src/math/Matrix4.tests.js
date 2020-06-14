@@ -377,6 +377,61 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "add", ( assert ) => {
+
+			// just wrap addMatrices
+			var a = new Matrix4().set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+			var b = new Matrix4().set( 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 );
+			var expectedAdd = [ 61, 84, 120, 150, 64, 92, 130, 156, 72, 100, 134, 174, 78, 108, 144, 184 ];
+
+			a.add( b );
+			assert.deepEqual( a.elements, expectedAdd, "add: check result" );
+
+		} );
+
+		QUnit.test( "addMatrices", ( assert ) => {
+
+			// Reference:
+			//
+			// #!/usr/bin/env python
+			// import numpy as np
+			//
+			// a = np.reshape([2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53] , (4, 4))
+			// b = np.reshape([59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131] , (4, 4))
+			// print(a + b)
+			//
+			// [[ 61,  64,  72,  78],
+			// [ 84,  92, 100, 108],
+			// [120, 130, 134, 144],
+			// [150, 156, 174, 184]]
+			//
+			var lhs = new Matrix4()
+				.set( 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53 );
+			var rhs = new Matrix4()
+				.set( 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131 );
+			var ans = new Matrix4();
+
+			ans.addMatrices( lhs, rhs );
+
+			assert.ok( ans.elements[ 0 ] == 61 );
+			assert.ok( ans.elements[ 1 ] == 84 );
+			assert.ok( ans.elements[ 2 ] == 120 );
+			assert.ok( ans.elements[ 3 ] == 150 );
+			assert.ok( ans.elements[ 4 ] == 64 );
+			assert.ok( ans.elements[ 5 ] == 92 );
+			assert.ok( ans.elements[ 6 ] == 130 );
+			assert.ok( ans.elements[ 7 ] == 156 );
+			assert.ok( ans.elements[ 8 ] == 72 );
+			assert.ok( ans.elements[ 9 ] == 100 );
+			assert.ok( ans.elements[ 10 ] == 134 );
+			assert.ok( ans.elements[ 11 ] == 174 );
+			assert.ok( ans.elements[ 12 ] == 78 );
+			assert.ok( ans.elements[ 13 ] == 108 );
+			assert.ok( ans.elements[ 14 ] == 144 );
+			assert.ok( ans.elements[ 15 ] == 184 );
+
+		} );
+
 		QUnit.test( "multiplyScalar", ( assert ) => {
 
 			var b = new Matrix4().set( 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 );

@@ -214,6 +214,52 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
+		QUnit.test( "add", ( assert ) => {
+
+			// just wrap addMatrices
+			var a = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
+			var b = new Matrix3().set( 29, 31, 37, 41, 43, 47, 53, 59, 61 );
+			var expectedAdd = [ 31, 48, 70, 34, 54, 78, 42, 60, 84 ];
+
+			a.add( b );
+			assert.deepEqual( a.elements, expectedAdd, "add: check result" );
+
+		} );
+
+		QUnit.test( "addMatrices", ( assert ) => {
+
+			// Reference:
+			//
+			// #!/usr/bin/env python
+			// import numpy as np
+			//
+			// a = np.reshape([2, 3, 5, 7, 11, 13, 17, 19, 23], (3, 3))
+			// b = np.reshape([29, 31, 37, 41, 43, 47, 53, 59, 61], (3, 3))
+			//
+			// print(a + b)
+			//
+			// [[31, 34, 42],
+			//  [48, 54, 60],
+			//  [70, 78, 84]]
+			//
+			var lhs = new Matrix3().set( 2, 3, 5, 7, 11, 13, 17, 19, 23 );
+			var rhs = new Matrix3().set( 29, 31, 37, 41, 43, 47, 53, 59, 61 );
+			var ans = new Matrix3();
+
+			ans.addMatrices( lhs, rhs );
+
+			assert.ok( ans.elements[ 0 ] == 31 );
+			assert.ok( ans.elements[ 1 ] == 48 );
+			assert.ok( ans.elements[ 2 ] == 70 );
+			assert.ok( ans.elements[ 3 ] == 34 );
+			assert.ok( ans.elements[ 4 ] == 54 );
+			assert.ok( ans.elements[ 5 ] == 78 );
+			assert.ok( ans.elements[ 6 ] == 42 );
+			assert.ok( ans.elements[ 7 ] == 60 );
+			assert.ok( ans.elements[ 8 ] == 84 );
+
+		} );
+
 		QUnit.test( "multiplyScalar", ( assert ) => {
 
 			var b = new Matrix3().set( 0, 1, 2, 3, 4, 5, 6, 7, 8 );
