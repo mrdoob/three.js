@@ -87,12 +87,12 @@ export class Matrix4 implements Matrix {
 	/**
 	 * Add matrix m to this matrix
 	 */
-	add(m: Matrix4): Matrix4;
+	add( m: Matrix4 ): Matrix4;
 
 	/**
 	 * Set this matrix to a + b
 	 */
-	addMatrices(a: Matrix4, b: Matrix4): Matrix4;
+	addMatrices( a: Matrix4, b: Matrix4 ): Matrix4;
 
 	/**
 	 * Sets this matrix to a x b and stores the result into the flat array r.

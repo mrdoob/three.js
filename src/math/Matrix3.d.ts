@@ -144,12 +144,12 @@ export class Matrix3 implements Matrix {
 	/**
 	 * Add matrix m to this matrix
 	 */
-	add(m: Matrix3): Matrix3;
+	add( m: Matrix3 ): Matrix3;
 
 	/**
 	 * Set this matrix to a + b
 	 */
-	addMatrices(a: Matrix3, b: Matrix3): Matrix3;
+	addMatrices( a: Matrix3, b: Matrix3 ): Matrix3;
 
 	/**
 	 * @deprecated Use {@link Vector3.applyMatrix3 vector.applyMatrix3( matrix )} instead.
