@@ -689,8 +689,7 @@ function Viewport( editor ) {
 		}
 
 		endTime = performance.now();
-		var frametime = endTime - startTime;
-		editor.signals.sceneRendered.dispatch( frametime );
+		editor.signals.sceneRendered.dispatch( endTime - startTime );
 
 	}
 
