@@ -425,6 +425,10 @@ select {
 		margin-bottom: 10px;
 	}
 
+	#sidebar canvas {
+		vertical-align: middle;
+	}
+
 #tabs {
 	background-color: #ddd;
 	border-top: 1px solid #ccc;
