@@ -95,11 +95,47 @@
 
 			}
 
-			if ( window.location.hash !== '' && linkInfos[ window.location.hash.substring( 1 ) ] ) {
+			function setViewerToHash() {
 
-				loadFile( window.location.hash.substring( 1 ) );
+				if ( window.location.hash !== '' && linkInfos[ window.location.hash.substring( 1 ) ] ) {
+
+					var file = window.location.hash.substring( 1 )
+
+					if ( selected !== null ) linkInfos[ selected ].link.classList.remove( 'selected' );
+
+					linkInfos[ file ].link.classList.add( 'selected' );
+
+					viewer.focus();
+					viewer.classList.remove( 'hidden' );
+					thumbnails.classList.add( 'hidden' );
+					showThumbnailsElem.classList.remove( 'hidden' );
+
+					panel.classList.remove( 'open' );
+
+					selected = file;
+
+					// Reveal "View source" button and set attributes to this example
+					viewSrcButton.style.display = '';
+					viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
+					viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
+					// change the viewer without adding history to this page
+					viewer.contentWindow.location.replace( file + '.html' );
+
+				} else {
+
+					showThumbnailsElem.classList.add( 'hidden' );
+					thumbnails.classList.remove( 'hidden' );
+					viewer.classList.add( 'hidden' );
+					// change the viewer without adding history to this page
+					viewer.contentWindow.location.replace( 'about:blank' );
+
+				}
 
 			}
+
+			setViewerToHash();
+			window.addEventListener( 'hashchange', setViewerToHash );
+			window.addEventListener( 'popstate', setViewerToHash );
 
 			filterInput.value = extractQuery();
 
@@ -174,14 +210,12 @@
 
 		}
 
-			function showThumbnails() {
+		function showThumbnails() {
 
-				showThumbnailsElem.classList.add('hidden');
-				thumbnails.classList.remove('hidden');
-				viewer.classList.add('hidden');
-				viewer.src = "about:blank";
+			// the hashchange listener does the real work
+			window.location.hash = '';
 
-			}
+		}
 
 		function createLink( file ) {
 
@@ -234,33 +268,10 @@
 
 		}
 
-		function loadFile( file ) {
-
-			selectFile( file );
-			viewer.src = file + '.html';
-
-		}
-
 		function selectFile( file ) {
 
-			if ( selected !== null ) linkInfos[ selected ].link.classList.remove( 'selected' );
-
-			linkInfos[ file ].link.classList.add( 'selected' );
-
+			// the hashchange listener does the real work
 			window.location.hash = file;
-			viewer.focus();
-			viewer.classList.remove( 'hidden' );
-			thumbnails.classList.add( 'hidden' );
-			showThumbnailsElem.classList.remove( 'hidden' );
-
-			panel.classList.remove( 'open' );
-
-			selected = file;
-
-			// Reveal "View source" button and set attributes to this example
-			viewSrcButton.style.display = '';
-			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
-			viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
 
 		}
 
