@@ -276,6 +276,8 @@ function Strings( config ) {
 			'sidebar/material/opacity': 'Opacity',
 			'sidebar/material/transparent': 'Transparent',
 			'sidebar/material/alphatest': 'Alpha Test',
+			'sidebar/material/depthtest': 'Depth Test',
+			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
 
 			'sidebar/script': 'Script',
@@ -588,6 +590,8 @@ function Strings( config ) {
 			'sidebar/material/opacity': 'Opacité',
 			'sidebar/material/transparent': 'Transparence',
 			'sidebar/material/alphatest': 'Test de transparence',
+			'sidebar/material/depthtest': 'Depth Test',
+			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Fil de fer',
 
 			'sidebar/script': 'Script',
@@ -874,6 +878,8 @@ function Strings( config ) {
 			'sidebar/material/opacity': '透明度',
 			'sidebar/material/transparent': '透明性',
 			'sidebar/material/alphatest': 'α测试',
+			'sidebar/material/depthtest': 'Depth Test',
+			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': '线框',
 
 			'sidebar/script': '脚本',
