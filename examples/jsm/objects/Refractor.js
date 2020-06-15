@@ -5,7 +5,6 @@
 
 import {
 	Color,
-	LinearEncoding,
 	LinearFilter,
 	MathUtils,
 	Matrix4,
@@ -77,6 +76,12 @@ var Refractor = function ( geometry, options ) {
 	this.material.uniforms[ "color" ].value = color;
 	this.material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
 	this.material.uniforms[ "textureMatrix" ].value = textureMatrix;
+
+	this.material.onBeforeCompile = function ( shader, renderer ) {
+
+		this.uniforms[ "tDiffuse" ].value.encoding = renderer.outputEncoding;
+
+	}
 
 	// functions
 
@@ -238,17 +243,6 @@ var Refractor = function ( geometry, options ) {
 	//
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
-
-		// Render
-
-		if ( renderer.outputEncoding !== LinearEncoding ) {
-
-			console.warn( 'THREE.Refractor: WebGLRenderer must use LinearEncoding as outputEncoding.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
 
 		// ensure refractors are rendered only once per frame
 

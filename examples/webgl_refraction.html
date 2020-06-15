@@ -92,6 +92,11 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				document.body.appendChild( renderer.domElement );
 
+				renderer.outputEncoding = THREE.sRGBEncoding;
+
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.5;
+
 				//
 
 				var controls = new OrbitControls( camera, renderer.domElement );

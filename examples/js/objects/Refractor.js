@@ -61,6 +61,12 @@ THREE.Refractor = function ( geometry, options ) {
 	this.material.uniforms[ "tDiffuse" ].value = renderTarget.texture;
 	this.material.uniforms[ "textureMatrix" ].value = textureMatrix;
 
+	this.material.onBeforeCompile = function ( shader, renderer ) {
+
+		this.uniforms[ "tDiffuse" ].value.encoding = renderer.outputEncoding;
+
+	}
+
 	// functions
 
 	var visible = ( function () {
@@ -221,17 +227,6 @@ THREE.Refractor = function ( geometry, options ) {
 	//
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
-
-		// Render
-
-		if ( renderer.outputEncoding !== THREE.LinearEncoding ) {
-
-			console.warn( 'THREE.Refractor: WebGLRenderer must use LinearEncoding as outputEncoding.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
 
 		// ensure refractors are rendered only once per frame
 

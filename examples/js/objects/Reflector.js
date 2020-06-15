@@ -61,6 +61,12 @@ THREE.Reflector = function ( geometry, options ) {
 	material.uniforms[ "color" ].value = color;
 	material.uniforms[ "textureMatrix" ].value = textureMatrix;
 
+	material.onBeforeCompile = function ( shader, renderer ) {
+
+		this.uniforms[ "tDiffuse" ].value.encoding = renderer.outputEncoding;
+
+	}
+
 	this.material = material;
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
@@ -136,17 +142,6 @@ THREE.Reflector = function ( geometry, options ) {
 		projectionMatrix.elements[ 6 ] = clipPlane.y;
 		projectionMatrix.elements[ 10 ] = clipPlane.z + 1.0 - clipBias;
 		projectionMatrix.elements[ 14 ] = clipPlane.w;
-
-		// Render
-
-		if ( renderer.outputEncoding !== THREE.LinearEncoding ) {
-
-			console.warn( 'THREE.Reflector: WebGLRenderer must use LinearEncoding as outputEncoding.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
 
 		scope.visible = false;
 
