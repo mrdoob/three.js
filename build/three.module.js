@@ -587,10 +587,10 @@ const MathUtils = {
  * @author zz85 / http://www.lab4games.net/zz85/blog
  */
 
-function Vector2( x, y ) {
+function Vector2( x = 0, y = 0 ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
+	this.x = x;
+	this.y = y;
 
 }
 
@@ -1827,12 +1827,12 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
  * @author WestLangley / http://github.com/WestLangley
  */
 
-function Vector4( x, y, z, w ) {
+function Vector4( x = 0, y = 0, z = 0, w = 1 ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
-	this.w = ( w !== undefined ) ? w : 1;
+	this.x = x;
+	this.y = y;
+	this.z = z;
+	this.w = w;
 
 }
 
@@ -2619,12 +2619,12 @@ WebGLMultisampleRenderTarget.prototype = Object.assign( Object.create( WebGLRend
  * @author bhouston / http://clara.io
  */
 
-function Quaternion( x, y, z, w ) {
+function Quaternion( x = 0, y = 0, z = 0, w = 1 ) {
 
-	this._x = x || 0;
-	this._y = y || 0;
-	this._z = z || 0;
-	this._w = ( w !== undefined ) ? w : 1;
+	this._x = x;
+	this._y = y;
+	this._z = z;
+	this._w = w;
 
 }
 
@@ -3292,11 +3292,11 @@ Object.assign( Quaternion.prototype, {
 const _vector = new Vector3();
 const _quaternion = new Quaternion();
 
-function Vector3( x, y, z ) {
+function Vector3( x = 0, y = 0, z = 0 ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
+	this.x = x;
+	this.y = y;
+	this.z = z;
 
 }
 
@@ -4908,12 +4908,12 @@ Object.assign( Matrix4.prototype, {
 const _matrix = new Matrix4();
 const _quaternion$1 = new Quaternion();
 
-function Euler( x, y, z, order ) {
+function Euler( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
-	this._x = x || 0;
-	this._y = y || 0;
-	this._z = z || 0;
-	this._order = order || Euler.DefaultOrder;
+	this._x = x;
+	this._y = y;
+	this._z = z;
+	this._order = order;
 
 }
 
