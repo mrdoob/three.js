@@ -8789,6 +8789,12 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	onBeforeCompile: function ( /* shaderobject, renderer */ ) {},
 
+	customProgramCacheKey: function () {
+
+		return this.onBeforeCompile.toString();
+
+	},
+
 	setValues: function ( values ) {
 
 		if ( values === undefined ) return;
@@ -18829,7 +18835,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
 			rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
 
-			onBeforeCompile: material.onBeforeCompile
+			customProgramCacheKey: material.customProgramCacheKey()
 
 		};
 
@@ -18876,7 +18882,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
-		array.push( parameters.onBeforeCompile.toString() );
+		array.push( parameters.customProgramCacheKey );
 
 		return array.join();
 
