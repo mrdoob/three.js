@@ -63,7 +63,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			shaderobject = {
 				name: material.name || material.type,
-				uniforms: UniformsUtils.clone( shader.uniforms ),
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
 			};
@@ -72,7 +71,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 			shaderobject = {
 				name: material.name || material.type,
-				uniforms: material.uniforms,
 				vertexShader: material.vertexShader,
 				fragmentShader: material.fragmentShader
 			};
@@ -180,7 +178,6 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			shaderID: shaderID,
 			shaderName: shaderobject.name,
 
-			uniforms: shaderobject.uniforms,
 			vertexShader: shaderobject.vertexShader,
 			fragmentShader: shaderobject.fragmentShader,
 			defines: material.defines,
@@ -342,6 +339,26 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	}
 
+	function getUniforms( material ) {
+
+		const shaderID = shaderIDs[ material.type ];
+		let uniforms;
+
+		if ( shaderID ) {
+
+			const shader = ShaderLib[ shaderID ];
+			uniforms = UniformsUtils.clone( shader.uniforms );
+
+		} else {
+
+			uniforms = material.uniforms;
+
+		}
+
+		return uniforms;
+
+	}
+
 	function acquireProgram( parameters, cacheKey ) {
 
 		let program;
@@ -392,6 +409,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 	return {
 		getParameters: getParameters,
 		getProgramCacheKey: getProgramCacheKey,
+		getUniforms: getUniforms,
 		acquireProgram: acquireProgram,
 		releaseProgram: releaseProgram,
 		// Exposed for resource monitoring & error feedback via renderer.info:

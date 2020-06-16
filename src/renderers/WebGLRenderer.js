@@ -1539,7 +1539,7 @@ function WebGLRenderer( parameters ) {
 			program = programCache.acquireProgram( parameters, programCacheKey );
 
 			materialProperties.program = program;
-			materialProperties.uniforms = parameters.uniforms;
+			materialProperties.uniforms = programCache.getUniforms( material );
 			materialProperties.outputEncoding = parameters.outputEncoding;
 			material.program = program;
 
