@@ -323,7 +323,9 @@ function Strings( config ) {
 			'viewport/info/frametime': 'Frametime'
 
 		},
+
 		fr: {
+
 			'menubar/file': 'Fichier',
 			'menubar/file/new': 'Nouveau',
 			'menubar/file/import': 'Importer',
@@ -635,7 +637,9 @@ function Strings( config ) {
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
 			'viewport/info/frametime': 'Temps de trame'
+
 		},
+
 		zh: {
 
 			'menubar/file': '文件',
@@ -878,8 +882,8 @@ function Strings( config ) {
 			'sidebar/material/opacity': '透明度',
 			'sidebar/material/transparent': '透明性',
 			'sidebar/material/alphatest': 'α测试',
-			'sidebar/material/depthtest': 'Depth Test',
-			'sidebar/material/depthwrite': 'Depth Write',
+			'sidebar/material/depthtest': '深度测试',
+			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
 
 			'sidebar/script': '脚本',
@@ -894,7 +898,7 @@ function Strings( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/physicallyCorrectLights': 'Physical lights',
+			'sidebar/project/physicallyCorrectLights': '物理灯',
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
