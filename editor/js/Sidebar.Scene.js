@@ -436,6 +436,7 @@ function SidebarScene( editor ) {
 
 	signals.sceneGraphChanged.add( refreshUI );
 
+	/*
 	signals.objectChanged.add( function ( object ) {
 
 		var options = outliner.options;
@@ -454,6 +455,7 @@ function SidebarScene( editor ) {
 		}
 
 	} );
+	*/
 
 	signals.objectSelected.add( function ( object ) {
 
