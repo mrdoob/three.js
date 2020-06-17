@@ -42,10 +42,11 @@
 			// http://cg.alexandra.dk/tag/spring-mass-system/
 			// Real-time Cloth Animation http://www.darwin3d.com/gamedev/articles/col0599.pdf
 
-			var params = {};
-			params[ "Enable wind" ] = true;
-			params[ "Show ball" ] = false;
-			params[ "Toggle pins" ] = togglePins;
+			var params = {
+				enableWind: true,
+				showBall: false,
+				togglePins: togglePins
+			};
 
 			var DAMPING = 0.03;
 			var DRAG = 1 - DAMPING;
@@ -272,7 +273,7 @@
 
 				// Aerodynamics forces
 
-				if ( params[ "Enable wind" ] ) {
+				if ( params.enableWind ) {
 
 					var indx;
 					var normal = new THREE.Vector3();
@@ -322,7 +323,7 @@
 				ballPosition.z = - Math.sin( now / 600 ) * 90; //+ 40;
 				ballPosition.x = Math.cos( now / 400 ) * 70;
 
-				if ( params[ "Show ball" ] ) {
+				if ( params.showBall ) {
 
 					sphere.visible = true;
 
@@ -580,25 +581,22 @@
 				//
 
 				var gui = new GUI();
-				gui.add( params, 'Enable wind' );
-				gui.add( params, 'Show ball' );
-				gui.add( params, 'Toggle pins' );
-
+				gui.add( params, 'enableWind' ).name( 'Enable wind' );
+				gui.add( params, 'showBall' ).name( 'Show ball' );
+				gui.add( params, 'togglePins' ).name( 'Toggle pins' );
 				//
 
 				if ( typeof TESTING !== 'undefined' ) {
 
-		for ( var i = 0; i < 50; i ++ ) {
+					for ( var i = 0; i < 50; i ++ ) {
 
-			simulate( 500 - 10 * i );
+						simulate( 500 - 10 * i );
 
-		}
+					}
 
+				}
 
-
-	}
-
-}
+			}
 
 			//
 
