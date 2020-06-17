@@ -39388,6 +39388,7 @@
 			var object = {};
 
 			if ( this.bias !== 0 ) { object.bias = this.bias; }
+			if ( this.normalOffset !== 0 ) { object.normalOffset = this.normalOffset; }
 			if ( this.radius !== 1 ) { object.radius = this.radius; }
 			if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) { object.mapSize = this.mapSize.toArray(); }
 
@@ -41747,6 +41748,7 @@
 			if ( data.shadow ) {
 
 				if ( data.shadow.bias !== undefined ) { object.shadow.bias = data.shadow.bias; }
+				if ( data.shadow.normalOffset !== undefined ) { object.shadow.normalOffset = data.shadow.normalOffset; }
 				if ( data.shadow.radius !== undefined ) { object.shadow.radius = data.shadow.radius; }
 				if ( data.shadow.mapSize !== undefined ) { object.shadow.mapSize.fromArray( data.shadow.mapSize ); }
 				if ( data.shadow.camera !== undefined ) { object.shadow.camera = this.parseObject( data.shadow.camera ); }
