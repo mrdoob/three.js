@@ -64,7 +64,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// Set to false to disable panning
 	this.enablePan = true;
 	this.panSpeed = 1.0;
-	this.screenSpacePanning = false; // if true, pan in screen-space
+	this.screenSpacePanning = true; // if false, pan orthogonal to world-space direction camera.up
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
@@ -1138,6 +1138,8 @@ THREE.OrbitControls.prototype.constructor = THREE.OrbitControls;
 THREE.MapControls = function ( object, domElement ) {
 
 	THREE.OrbitControls.call( this, object, domElement );
+
+	this.screenSpacePanning = false; // pan orthogonal to world-space direction camera.up
 
 	this.mouseButtons.LEFT = THREE.MOUSE.PAN;
 	this.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
