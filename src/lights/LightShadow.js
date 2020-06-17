@@ -121,6 +121,7 @@ Object.assign( LightShadow.prototype, {
 		const object = {};
 
 		if ( this.bias !== 0 ) object.bias = this.bias;
+		if ( this.normalOffset !== 0 ) object.normalOffset = this.normalOffset;
 		if ( this.radius !== 1 ) object.radius = this.radius;
 		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
 
