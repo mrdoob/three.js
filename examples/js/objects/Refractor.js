@@ -224,14 +224,7 @@ THREE.Refractor = function ( geometry, options ) {
 
 		// Render
 
-		if ( renderer.outputEncoding !== THREE.LinearEncoding ) {
-
-			console.warn( 'THREE.Refractor: WebGLRenderer must use LinearEncoding as outputEncoding.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
+		renderTarget.texture.encoding = renderer.outputEncoding;
 
 		// ensure refractors are rendered only once per frame
 

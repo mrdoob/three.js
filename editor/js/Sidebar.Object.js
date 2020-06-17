@@ -302,17 +302,6 @@ function SidebarObject( editor ) {
 
 	container.add( objectShadowRow );
 
-	// shadow radius
-
-	var objectShadowRadiusRow = new UIRow();
-
-	objectShadowRadiusRow.add( new UIText( strings.getKey( 'sidebar/object/shadowRadius' ) ).setWidth( '90px' ) );
-
-	var objectShadowRadius = new UINumber( 1 ).onChange( update );
-	objectShadowRadiusRow.add( objectShadowRadius );
-
-	container.add( objectShadowRadiusRow );
-
 	// shadow bias
 
 	var objectShadowBiasRow = new UIRow();
@@ -323,6 +312,28 @@ function SidebarObject( editor ) {
 	objectShadowBiasRow.add( objectShadowBias );
 
 	container.add( objectShadowBiasRow );
+
+	// shadow normal offset
+
+	var objectShadowNormalOffsetRow = new UIRow();
+
+	objectShadowNormalOffsetRow.add( new UIText( strings.getKey( 'sidebar/object/shadowNormalOffset' ) ).setWidth( '90px' ) );
+
+	var objectShadowNormalOffset = new UINumber( 0 ).onChange( update );
+	objectShadowNormalOffsetRow.add( objectShadowNormalOffset );
+
+	container.add( objectShadowNormalOffsetRow );
+
+	// shadow radius
+
+	var objectShadowRadiusRow = new UIRow();
+
+	objectShadowRadiusRow.add( new UIText( strings.getKey( 'sidebar/object/shadowRadius' ) ).setWidth( '90px' ) );
+
+	var objectShadowRadius = new UINumber( 1 ).onChange( update );
+	objectShadowRadiusRow.add( objectShadowRadius );
+
+	container.add( objectShadowRadiusRow );
 
 	// visible
 
@@ -594,15 +605,21 @@ function SidebarObject( editor ) {
 
 			if ( object.shadow !== undefined ) {
 
-				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
-
-					editor.execute( new SetValueCommand( editor, object.shadow, 'radius', objectShadowRadius.getValue() ) );
-
-				}
-
 				if ( object.shadow.bias !== objectShadowBias.getValue() ) {
 
 					editor.execute( new SetValueCommand( editor, object.shadow, 'bias', objectShadowBias.getValue() ) );
+
+				}
+
+				if ( object.shadow.normalOffset !== objectShadowNormalOffset.getValue() ) {
+
+					editor.execute( new SetValueCommand( editor, object.shadow, 'normalOffset', objectShadowNormalOffset.getValue() ) );
+
+				}
+
+				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
+
+					editor.execute( new SetValueCommand( editor, object.shadow, 'radius', objectShadowRadius.getValue() ) );
 
 				}
 
@@ -646,7 +663,7 @@ function SidebarObject( editor ) {
 			'decay': objectDecayRow,
 			'castShadow': objectShadowRow,
 			'receiveShadow': objectReceiveShadow,
-			'shadow': [ objectShadowRadiusRow, objectShadowBiasRow ]
+			'shadow': [ objectShadowBiasRow, objectShadowNormalOffsetRow, objectShadowRadiusRow ]
 		};
 
 		for ( var property in properties ) {
@@ -840,8 +857,9 @@ function SidebarObject( editor ) {
 
 		if ( object.shadow !== undefined ) {
 
-			objectShadowRadius.setValue( object.shadow.radius );
 			objectShadowBias.setValue( object.shadow.bias );
+			objectShadowNormalOffset.setValue( object.shadow.normalOffset );
+			objectShadowRadius.setValue( object.shadow.radius );
 
 		}
 

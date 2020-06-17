@@ -139,14 +139,7 @@ THREE.Reflector = function ( geometry, options ) {
 
 		// Render
 
-		if ( renderer.outputEncoding !== THREE.LinearEncoding ) {
-
-			console.warn( 'THREE.Reflector: WebGLRenderer must use LinearEncoding as outputEncoding.' );
-			scope.onBeforeRender = function () {};
-
-			return;
-
-		}
+		renderTarget.texture.encoding = renderer.outputEncoding;
 
 		scope.visible = false;
 

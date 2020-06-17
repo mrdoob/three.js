@@ -103,6 +103,8 @@ THREE.Water = function ( geometry, options ) {
 			'	vec4 mvPosition =  modelViewMatrix * vec4( position, 1.0 );',
 			'	gl_Position = projectionMatrix * mvPosition;',
 
+			'#include <beginnormal_vertex>',
+			'#include <defaultnormal_vertex>',
 			'#include <logdepthbuf_vertex>',
 			'#include <fog_vertex>',
 			'#include <shadowmap_vertex>',

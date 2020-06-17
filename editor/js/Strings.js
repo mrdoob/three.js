@@ -110,8 +110,9 @@ function Strings( config ) {
 			'sidebar/object/penumbra': 'Penumbra',
 			'sidebar/object/decay': 'Decay',
 			'sidebar/object/shadow': 'Shadow',
-			'sidebar/object/shadowRadius': 'Shadow Radius',
 			'sidebar/object/shadowBias': 'Shadow Bias',
+			'sidebar/object/shadowNormalOffset': 'Shadow Normal Offset',
+			'sidebar/object/shadowRadius': 'Shadow Radius',
 			'sidebar/object/cast': 'cast',
 			'sidebar/object/receive': 'receive',
 			'sidebar/object/visible': 'Visible',
@@ -323,7 +324,9 @@ function Strings( config ) {
 			'viewport/info/frametime': 'Frametime'
 
 		},
+
 		fr: {
+
 			'menubar/file': 'Fichier',
 			'menubar/file/new': 'Nouveau',
 			'menubar/file/import': 'Importer',
@@ -424,8 +427,9 @@ function Strings( config ) {
 			'sidebar/object/penumbra': 'Pénombre',
 			'sidebar/object/decay': 'Affaiblissement',
 			'sidebar/object/shadow': 'Ombre',
-			'sidebar/object/shadowRadius': 'Rayon de l\'ombre',
 			'sidebar/object/shadowBias': 'Biais directionnel des ombres',
+			'sidebar/object/shadowNormalOffset': 'Shadow Normal Offset',
+			'sidebar/object/shadowRadius': 'Rayon de l\'ombre',
 			'sidebar/object/cast': 'Projète',
 			'sidebar/object/receive': 'Reçoit',
 			'sidebar/object/visible': 'Visible',
@@ -635,7 +639,9 @@ function Strings( config ) {
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
 			'viewport/info/frametime': 'Temps de trame'
+
 		},
+
 		zh: {
 
 			'menubar/file': '文件',
@@ -738,8 +744,9 @@ function Strings( config ) {
 			'sidebar/object/penumbra': '边缘',
 			'sidebar/object/decay': '衰减',
 			'sidebar/object/shadow': '阴影',
-			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/shadowBias': '阴影偏移',
+			'sidebar/object/shadowNormalOffset': '阴影法线偏移',
+			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/cast': '产生',
 			'sidebar/object/receive': '接受',
 			'sidebar/object/visible': '可见性',
@@ -878,8 +885,8 @@ function Strings( config ) {
 			'sidebar/material/opacity': '透明度',
 			'sidebar/material/transparent': '透明性',
 			'sidebar/material/alphatest': 'α测试',
-			'sidebar/material/depthtest': 'Depth Test',
-			'sidebar/material/depthwrite': 'Depth Write',
+			'sidebar/material/depthtest': '深度测试',
+			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
 
 			'sidebar/script': '脚本',
@@ -894,7 +901,7 @@ function Strings( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/physicallyCorrectLights': 'Physical lights',
+			'sidebar/project/physicallyCorrectLights': '物理灯',
 			'sidebar/project/toneMapping': '色调映射',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
