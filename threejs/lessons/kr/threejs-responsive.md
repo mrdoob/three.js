@@ -4,14 +4,14 @@ TOC: 반응형 디자인
 
 Three.js 두 번째 튜토리얼에 오신 것을 환영합니다!
 첫 번째 튜토리얼은 [Three.js의 기초](threejs-fundamentals.html)에 관한 내용이었죠.
-아직 이전 장을 보지 않았다면 이전 글을 먼저 읽어보길 추천합니다.
+아직 이전 장을 보지 않았다면 (예제가 이어지므로. 역주) 이전 글을 먼저 읽어보기 바랍니다.
 
 이 장에서는 Three.js 앱을 어떤 환경에서든 구동할 수 있도록
 반응형으로 만드는 법에 대해 알아볼 것입니다. 웹에서 반응형이란
 웹 페이지를 PC, 타블렛, 스마트폰 등 다양한 환경에서 이용하기
 용이하도록 사이즈에 맞춰 콘텐츠를 최적화하는 것을 의미하죠.
 
-Three.js의 경우 일반 웹보다 고려해야할 요소가 많습니다.
+Three.js의 경우 일반 웹보다 고려해야 할 요소가 많습니다.
 예를 들어 상하좌우에 컨트롤 패널이 있는 3D 에디터라든가,
 문서 사이에 들어가는 동적 그래프를 상상해볼 수 있죠.
 
@@ -42,7 +42,7 @@ html, body {
 ```
 
 body 요소는 기본적으로 5픽셀의 margin이 지정되어 있으니 `margin: 0`으로
-설정해 여백을 모두 없애줍니다. html과 body 요소의 높이를 지정하지 않으면
+설정해 여백을 모두 없앱니다. html과 body 요소의 높이를 지정하지 않으면
 컨텐츠의 높이만큼만 커지니, 높이를 100%로 맞춰 창 전체를 채우도록 합니다.
 
 그리고 `id=c`인 요소의 크기를 100%로 지정해 컨테이너, 이 예제에서는 body
@@ -208,7 +208,7 @@ Three.js로 HD-DPI를 다루는 방법은 아주 다양합니다.
 저대로 내버려 둔다면 우리의 코드가 1픽셀을 계산할 때마다 브라우저는
 해당 픽셀보다 3배 큰 픽셀을 렌더링해야 합니다(3배 곱하기 3배 = 9배 많은 픽셀).
 
-이는 낮은 FPS, 즉 화면이 버벅거리게 만들 것이므로 무거운 Three.js
+이는 낮은 FPS, 즉 화면이 버벅거리게 만들 것이므로 특히 무거운 Three.js
 앱을 만들 때는 지양해야 하는 요소이죠.
 
 물론 지양해야 한다는 건 기기의 해상도에 따라 화면을 렌더링할
@@ -243,29 +243,22 @@ Three.js에게 넘겨주는 것이죠.
 
 객관적으로 따져봐도 이 방법이 훨씬 낫습니다. 이 방법으로는 개발자가
 원하는 결과가 나오니까요. Three.js로 앱을 만들 때 언제 canvas의
-드로잉버퍼 사이즈를 알아야 할지 특정하기란 어렵습니다. 예를 들어 전처리
-필터를 만든다거나, `gl_FragCoord`에 접근하는 쉐이더를 만든다거나,
-스크린샷을 찍는다거나, GPU가 관여하는 픽셀 수를 가져 온다거나, 
+드로잉버퍼 사이즈를 가져와야 할지 특정하기란 어렵습니다. 예를 들어
+전처리 필터를 만든다거나, `gl_FragCoord`에 접근하는 쉐이더를 만든다거나,
+스크린샷을 찍는다거나, GPU가 제어하는 픽셀 수를 가져 온다거나, 2D
+canvas에 뭔가를 그린다던가 하는 경우가 있죠. 실제 크기 대신 `setPixelRatio`를
+사용하면 대부분의 경우 반환값이 개발자가 예상한 것과 다를 뿐더러,
+이 반환값을 언제 사용할지, Three.js가 쓰는 크기는 무엇인지 일일이
+계산해야 합니다. 직접 배율을 계산하면 어떤 값을 Three.js가 쓰는지
+확실히 알 수 있고, 예외도 줄어듭니다.
 
-
-This second way is objectively better. Why? Because it means I get what I ask for.
-There are many cases when using three.js where we need to know the actual
-size of the canvas's drawingBuffer. For example when making a post processing filter,
-or if we are making a shader that accesses `gl_FragCoord`, if we are making
-a screenshot, or reading pixels for GPU picking, for drawing into a 2D canvas,
-etc... There many many cases where if we use `setPixelRatio` then our actual size will be different
-than the size we requested and we'll have to guess when to use the size
-we asked for and when to use the size three.js is actually using.
-By doing it ourselves we always know the size being used is the size we requested.
-There is no special case where magic is happening behind the scenes.
-
-Here's an example using the code above.
+아래는 맨 마지막 방법을 적용한 예시입니다.
 
 {{{example url="../threejs-responsive-hd-dpi.html" }}}
 
-It might be hard to see the difference but if you have an HD-DPI
-display and you compare this sample to those above you should
-notice the edges are more crisp.
+결과물로는 차이를 구별하기 어렵지만, HD-DPI 기기에서 예시를 비교해
+보면 이전 예시의 모서리가 좀 더 깨진 것이 보일 겁니다.
 
-This article covered a very basic but fundamental topic. Next up lets quickly
-[go over the basic primitives that three.js provides](threejs-primitives.html).
+이 장에서는 아주 기초적인 예시만을 다루었습니다. 다음 장에서는
+[Three.js의 원시 모델](threejs-primitives.html)에 대해서 빠르게
+훑어보겠습니다.

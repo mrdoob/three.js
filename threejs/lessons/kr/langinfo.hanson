@@ -15,7 +15,7 @@
   missing: `
     아직 번역을 완료하지 못한 문서입니다 ㅠㅠ. [한국어 번역에 동참](https://github.com/gfxfundamentals/threejsfundamentals)해주세요! 😄
     
-    [영문으로 보기]({{{origLink}}}).
+    [괜찮습니다. 영문으로 볼래요.]({{{origLink}}}).
   `,
   toc: '목차',
   categoryMapping: {
