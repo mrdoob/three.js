@@ -745,7 +745,7 @@ function Strings( config ) {
 			'sidebar/object/decay': '衰减',
 			'sidebar/object/shadow': '阴影',
 			'sidebar/object/shadowBias': '阴影偏移',
-			'sidebar/object/shadowRadius': 'Rayon de l\'ombre',
+			'sidebar/object/shadowNormalOffset': '阴影法线偏移',
 			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/cast': '产生',
 			'sidebar/object/receive': '接受',
