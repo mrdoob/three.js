@@ -188,9 +188,21 @@ textarea, input { outline: none; } /* osx */
 	content: '●';
 }
 
+/* */
+
 #outliner .Scene {
-	color: #ccccff;
+	color: #8888dd;
 }
+
+#outliner .Camera {
+	color: #dd8888;
+}
+
+#outliner .Light {
+	color: #dddd88;
+}
+
+/* */
 
 #outliner .Object3D {
 	color: #aaaaee;
@@ -214,32 +226,12 @@ textarea, input { outline: none; } /* osx */
 
 /* */
 
-#outliner .PointLight {
-	color: #dddd00;
-}
-
-/* */
-
 #outliner .Geometry {
-	color: #88ff88;
-}
-
-#outliner .BoxGeometry {
-	color: #bbeebb;
-}
-
-#outliner .TorusGeometry {
 	color: #aaeeaa;
 }
 
-/* */
-
 #outliner .Material {
-	color: #ff8888;
-}
-
-#outliner .MeshPhongMaterial {
-	color: #ffaa88;
+	color: #eeaaee;
 }
 
 /* */

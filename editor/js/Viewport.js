@@ -617,6 +617,9 @@ function Viewport( editor ) {
 
 		}
 
+		// Disable EditorControls when setting a user camera
+		controls.enabled = viewportCamera === editor.camera;
+
 		camera = viewportCamera;
 
 		render();

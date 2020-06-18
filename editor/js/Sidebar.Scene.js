@@ -86,17 +86,30 @@ function SidebarScene( editor ) {
 
 	}
 
+	function getObjectType( object ) {
+
+		if ( object.isScene ) return 'Scene';
+		if ( object.isCamera ) return 'Camera';
+		if ( object.isLight ) return 'Light';
+		if ( object.isMesh ) return 'Mesh';
+		if ( object.isLine ) return 'Line';
+		if ( object.isPoints ) return 'Points';
+
+		return 'Object3D';
+
+	}
+
 	function buildHTML( object ) {
 
-		var html = `<span class="type ${ object.type }"></span> ${ escapeHTML( object.name ) }`;
+		var html = `<span class="type ${ getObjectType( object ) }"></span> ${ escapeHTML( object.name ) }`;
 
 		if ( object.isMesh ) {
 
 			var geometry = object.geometry;
 			var material = object.material;
 
-			html += ` <span class="type ${ geometry.type }"></span> ${ escapeHTML( geometry.name ) }`;
-			html += ` <span class="type ${ material.type }"></span> ${ escapeHTML( getMaterialName( material ) ) }`;
+			html += ` <span class="type Geometry"></span> ${ escapeHTML( geometry.name ) }`;
+			html += ` <span class="type Material"></span> ${ escapeHTML( getMaterialName( material ) ) }`;
 
 		}
 
