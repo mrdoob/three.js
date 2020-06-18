@@ -188,6 +188,8 @@ function EditorControls( object, domElement ) {
 
 	function onMouseWheel( event ) {
 
+		if ( scope.enabled === false ) return;
+
 		event.preventDefault();
 
 		// Normalize deltaY due to https://bugzilla.mozilla.org/show_bug.cgi?id=1392460
