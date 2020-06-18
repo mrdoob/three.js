@@ -308,7 +308,7 @@ function SidebarObject( editor ) {
 
 	objectShadowBiasRow.add( new UIText( strings.getKey( 'sidebar/object/shadowBias' ) ).setWidth( '90px' ) );
 
-	var objectShadowBias = new UINumber( 0 ).setPrecision( 6 ).setStep( 0.001 ).setNudge( 0.000001 ).onChange( update );
+	var objectShadowBias = new UINumber( 0 ).setPrecision( 5 ).setStep( 0.0001 ).setNudge( 0.00001 ).onChange( update );
 	objectShadowBiasRow.add( objectShadowBias );
 
 	container.add( objectShadowBiasRow );
