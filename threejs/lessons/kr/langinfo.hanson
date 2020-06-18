@@ -12,15 +12,11 @@
       <a href="http://github.com/greggman/threefundamentals/issues">Github</a>
     </div>
   `,
-  missing: `
-    아직 번역을 완료하지 못한 문서입니다 ㅠㅠ. [한국어 번역에 동참](https://github.com/gfxfundamentals/threejsfundamentals)해주세요! 😄
-    
-    [괜찮습니다. 영문으로 볼래요.]({{{origLink}}}).
-  `,
+  missing: "아직 번역을 완료하지 못한 문서입니다. [한국어 번역에 동참](https://github.com/gfxfundamentals/threejsfundamentals)해주세요! 😄\n\n[영문으로 볼래요]({{{origLink}}}).",
   toc: '목차',
   categoryMapping: {
     'basics': 'Three.js란?',
-    'solutions': '이슈',
+    'solutions': '활용하기',
     'webvr': '웹VR',
     'optimization': '최적화하기',
     'tips': '팁',

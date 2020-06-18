@@ -36,7 +36,7 @@ Three.js는 3차원 세계를 다루므로, 우리는 정육면체(cube)를 3차
 
 * 먼저 `Renderer`가 있습니다. Three.js의 핵심 객체이죠. `Renderer`는
   `Scene`과 `Camera` 객체를 넘겨 받아 카메라의 [*절두체(frustum)*](https://ko.wikipedia.org/wiki/%EC%A0%88%EB%91%90%EC%B2%B4)
-  안 3D 장면의 일부를 평면(2차원) 이미지로 렌더링합니다.
+  안 3D 씬의 일부를 평면(2차원) 이미지로 렌더링합니다.
 
 * [씬 그래프(Scene graph)](threejs-scenegraph.html)는 `Scene` 또는
   다수의 `Mesh`, `Light`, `Group`, `Object3D`, `Camera`로 이루어진

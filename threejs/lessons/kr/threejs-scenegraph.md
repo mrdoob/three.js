@@ -15,41 +15,41 @@ Three.js에서 가장 중요한 것은 무엇보다 씬 그래프(scene graph)�
 
 예시가 다소 추상적이니 좀 더 이해하기 쉬운 걸 예로 들어보겠습니다.
 
-태양계, 그 중에서도 해, 지구, 달이 적당하겠네요.
+태양계, 그 중에서도 태양, 지구, 달이 적당하겠네요.
 
 <img src="resources/images/scenegraph-solarsystem.svg" align="center">
 
 지구는 태양을 중심으로 공전합니다. 달은 지구를 중심으로 공전하죠.
 달의 공전 궤도는 원과 유사합니다. 달의 관점에서 달은 지구의 "지역
 공간" 안에서 공전하는 셈이죠. 태양이 봤을 때 달은 취한 사람처럼
-회전그래프(spirograph)를 그리며 돌지만, 달은 그저 지구의 "지역
-공간"을 도는 것에만 집중할 뿐입니다.
+스피로그래프(spirograph, 용수철 모양의 그래프)를 그리며 돌지만,
+달은 그저 지구의 "지역 공간"을 도는 것에만 집중할 뿐입니다.
 
 {{{diagram url="resources/moon-orbit.html" }}}
 
-To think of it another way, you living on the Earth do not have to think
-about the Earth's rotation on its axis nor its rotation around the
-Sun. You just walk or drive or swim or run as though the Earth is
-not moving or rotating at all. You walk, drive, swim, run, and live
-in the Earth's "local space" even though relative to the sun you are
-spinning around the earth at around 1000 miles per hour and around
-the sun at around 67,000 miles per hour. Your position in the solar
-system is similar to that of the moon above but you don't have to concern
-yourself. You just worry about your position relative to the earth in its
-"local space".
+좀 더 가까운 예를 들어보죠. 우리는 지구에서 살지만 지구의 자전이나
+자전축, 태양을 공전하는 일은 크게 신경쓰지 않습니다. 이건 지구의
+일이니까요. 우리가 걷거나, 뭔가를 타고 이동하거나 수영하거나 달리거나
+하는 일들은 지구의 일과는 무관해 보입니다. 그래서 옛날 사람들은 지구가
+공전, 자전한다는 사실을 쉽게 받아들이지 못했죠. 우리가 걷든, 헤엄을
+치든, 우리의 삶은 지구의 "지역 공간" 안에서 이루어집니다. 태양에서
+봤을 때 여러분은 지구를 시속 약 1,600km로 돌고 태양의 주위를 시속 약
+107,800km로 도는 셈이지만, 우리는 이렇게 빨리 움직이기 위해 따로
+노력할 필요가 없습니다. 달과 마찬가지로 우리가 신경써야 하는 건 지구의
+"지역 공간" 뿐이죠.
 
-Let's take it one step at a time. Imagine we want to make
-a diagram of the sun, earth, and moon. We'll start with the sun by
-just making a sphere and putting it at the origin. Note: We're using
-sun, earth, moon as a demonstration of how to use a scene graph. Of course
-the real sun, earth, and moon use physics but for our purposes we'll
-fake it with a scene graph.
+이제 위 예제를 Three.js로 하나씩 구현해볼 겁니다. 먼저 중점에
+태양의 역할을 할 구체를 하나 놓는 것으로 시작하죠.
+
+※ 앞으로 설명할 예제는 씬 그래프를 설명하기 위해 태양, 지구, 달을
+활용합니다. 실제 태양, 지구, 달의 운행을 구현하려면 물리를 사용해야
+하지만, 목적이 씬 그래프이니 씬 그래프로 실제 운행을 모방할 것입니다.
 
 ```js
-// an array of objects whose rotation to update
+// 회전값을 업데이트할 객체들
 const objects = [];
 
-// use just one sphere for everything
+// 하나의 geometry로 모든 태양, 지구, 달을 생성
 const radius = 1;
 const widthSegments = 6;
 const heightSegments = 6;
@@ -58,24 +58,23 @@ const sphereGeometry = new THREE.SphereBufferGeometry(
 
 const sunMaterial = new THREE.MeshPhongMaterial({emissive: 0xFFFF00});
 const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial);
-sunMesh.scale.set(5, 5, 5);  // make the sun large
+sunMesh.scale.set(5, 5, 5);  // 태양의 크기를 키움
 scene.add(sunMesh);
 objects.push(sunMesh);
 ```
 
-We're using a really low-polygon sphere. Only 6 subdivisions around its equator.
-This is so it's easy to see the rotation.
+예제에서는 로우-폴리(low poly) 구체를 사용할 겁니다. 적도를 중심으로
+딱 6분할만 한 구체이죠. 이렇게 하면 자전 운동을 쉽게 확인할 수 있습니다.
 
-We're going to reuse the same sphere for everything so we'll set a scale
-for the sun mesh of 5x.
+같은 구체를 재활용할 것이므로 태양의 `mesh`를 5배로 설정해줍니다.
 
-We also set the phong material's `emissive` property to yellow. A phong material's
-emissive property is basically the color that will be drawn with no light hitting
-the surface. Light is added to that color.
+다음으로 `MeshPhongMaterial`의 `emissive(방사성)` 속성(property)을
+노랑으로 지정합니다. 퐁-메터리얼의 `emissive` 속성은 빛을 반사하지 않는
+표면 색상으로, 대신 광원에 해당 색상이 더해집니다.
 
-Let's also put a single point light in the center of the scene. We'll go into more
-details about point lights later but for now the simple version is a point light
-represents light that emanates from a single point.
+씬 가운데에 단방향 조명(single point light)도 하나 넣습니다. 조명에
+대해서는 나중에 자세히 다루기로 하고, 지금은 한 점에서 발산하는 광원
+정도로 알아둡시다.
 
 ```js
 {
@@ -86,13 +85,12 @@ represents light that emanates from a single point.
 }
 ```
 
-To make it easy to see we're going to put the camera directly above the origin
-looking down. The easiest way to do that is to use the `lookAt` function. The `lookAt`
-function will orient the camera from its position to "look at" the position
-we pass to `lookAt`. Before we do that though we need to tell the camera
-which way the top of the camera is facing or rather which way is "up" for the
-camera. For most situations positive Y being up is good enough but since
-we are looking straight down we need to tell the camera that positive Z is up.
+예제를 쉽게 확인하기 위해 카메라를 중점 바로 위에서 아래로 내려다보게
+설치합니다. 카메라의 시점을 바꾸는 가장 간단한 방법은 `lookAt` 메서드를
+활용하는 것으로, 이 메서드는 카메라가 넘겨받은 좌표를 바라보게끔 회전시켜줍니다.
+하지만 이전에 먼저 카메라에게 어떤 방향이 위인지 알려줘야 합니다. 대부분의
+경우 양의 y(positive y) 방향을 위로 설정하면 되지만, 예제의 경우 위에서
+아래를 내려다 볼 것이므로 양의 z 방향이 위가 됩니다.
 
 ```js
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
@@ -101,8 +99,7 @@ camera.up.set(0, 0, 1);
 camera.lookAt(0, 0, 0);
 ```
 
-In the render loop, adapted from previous examples, we're rotating all
-objects in our `objects` array with this code.
+이전 예제처럼 렌더링 루프에서 `objects` 배열의 모든 객체를 회전시키겠습니다.
 
 ```js
 objects.forEach((obj) => {
@@ -110,11 +107,12 @@ objects.forEach((obj) => {
 });
 ```
 
-Since we added the `sunMesh` to the `objects` array it will rotate.
+`sunMesh`를 `objects` 배열 안에 넣어놨으므로 태양 모델이 회전하는 것을
+확인할 수 있습니다.
 
 {{{example url="../threejs-scenegraph-sun.html" }}}
 
-Now let's add in the earth.
+다음으로 지구를 추가하겠습니다.
 
 ```js
 const earthMaterial = new THREE.MeshPhongMaterial({color: 0x2233FF, emissive: 0x112244});
@@ -124,44 +122,44 @@ scene.add(earthMesh);
 objects.push(earthMesh);
 ```
 
-We make a material that is blue but we gave it a small amount of *emissive* blue
-so that it will show up against our black background.
+지구는 푸른색을 사용했으나, 약간의 *방사성(emissive)* 파랑을 섞어
+검은 배경에서 잘 보이도록 만들었습니다.
 
-We use the same `sphereGeometry` with our new blue `earthMaterial` to make
-an `earthMesh`. We position that 10 units to the left of the sun
-and add it to the scene.  Since we added it to our `objects` array it will
-rotate too.
+그리고 이전에 썼던 `sphereGeometry`와 방금 만든 `earthMaterial`을
+이용해 `earthMesh`를 만들고, 태양의 10칸 옆에 위치하도록 설정한 뒤
+씬에 추가했습니다. 마지막으로 `objects` 배열에 추가했으므로, 지구도
+태양과 마찬가지로 자전하게 됩니다.
 
 {{{example url="../threejs-scenegraph-sun-earth.html" }}}
 
-You can see both the sun and the earth are rotating but the earth is not
-going around the sun. Let's make the earth a child of the sun
+하지만 지구가 태양의 주위를 돌진 않습니다. 지구를 바로 씬에 추가하는
+대신, 태양의 자식으로 추가하면...
 
 ```js
 -scene.add(earthMesh);
 +sunMesh.add(earthMesh);
 ```
 
-and...
+...
 
 {{{example url="../threejs-scenegraph-sun-earth-orbit.html" }}}
 
-What happened? Why is the earth the same size as the sun and why is it so far away?
-I actually had to move the camera from 50 units above to 150 units above to see the earth.
+뭔가 이상합니다. 왜 지구의 크기와 태양의 크기가 같고 또 왜 저렇게
+멀리 떨어졌을까요? 기존 카메라로는 지구가 보이지 않아 카메라의 위치도
+150칸 위로 옮겼습니다.
 
-We made the `earthMesh` a child of the `sunMesh`. The `sunMesh` has
-its scale set to 5x with `sunMesh.scale.set(5, 5, 5)`. That means the
-`sunMesh`s local space is 5 times as big. Anything put in that space
- will be multiplied by 5. That means the earth is now 5x larger and
- it's distance from the sun (`earthMesh.position.x = 10`) is also
- 5x as well.
+방금 우리는 `earthMesh`를 `sunMesh`의 자식으로 추가했습니다. 이전에
+`sunMesh`를 만들 때 `sunMesh.scale.set(5, 5, 5)`라는 코드로 크기를
+5배로 설정했죠. 이는 `sunMesh`의 "지역 공간" 자체를 5배 키우겠다는
+의미입니다. 그래서 지구의 크기도 5배가 되었고, 거리(`earthMesh.position.x = 10`)도
+5배로 적용된 것이죠.
 
- Our scene graph currently looks like this
+현재 예제의 씬 그래프는 다음과 같습니다.
 
 <img src="resources/images/scenegraph-sun-earth.svg" align="center">
 
-To fix it let's add an empty scene graph node. We'll parent both the sun and the earth
-to that node.
+이를 해결하기 위해 빈 씬 그래프 요소를 하나 추가합니다. 그리고 태양과
+지구 둘 다 이 요소의 자식으로 추가할 겁니다.
 
 ```js
 +const solarSystem = new THREE.Object3D();
@@ -183,23 +181,23 @@ earthMesh.position.x = 10;
 objects.push(earthMesh);
 ```
 
-Here we made an `Object3D`. Like a `Mesh` it is also a node in the scene graph
-but unlike a `Mesh` it has no material or geometry. It just represents a local space.
+여기서는 `Object3D`를 생성했습니다. `Object3D`는 `Mesh`와 마찬가지로
+씬 그래프의 한 요소지만, `material`이나 `geometry`가 없다는 점이 다릅니다.
+그저 하나의 빈 "지역 공간"인 셈이죠.
 
-Our new scene graph looks like this
+이제 씬 그래프는 다음과 같습니다.
 
 <img src="resources/images/scenegraph-sun-earth-fixed.svg" align="center">
 
-Both the `sunMesh` and the `earthMesh` are children of the `solarSystem`. All 3
-are being rotated and now because the `earthMesh` is not a child of the `sunMesh`
-it is no longer scaled by 5x.
+`sunMesh`와 `earthMesh`는 `solarSystem`의 자식입니다. 이 3 객체는 각각
+회전하죠. 이제 `earthMesh`는 `sunMesh`의 자식이 아니므로 5배 커지지도
+않았습니다.
 
 {{{example url="../threejs-scenegraph-sun-earth-orbit-fixed.html" }}}
 
-Much better. The earth is smaller than the sun and it's rotating around the sun
-and rotating itself.
+훨씬 낫네요. 지구는 태양보다 작고 태양을 공전하는 동시에 자전까지 합니다.
 
-Continuing that same pattern let's add a moon.
+같은 패턴으로 달도 추가해봅시다.
 
 ```js
 +const earthOrbit = new THREE.Object3D();
@@ -224,31 +222,31 @@ objects.push(earthMesh);
 +objects.push(moonMesh);
 ```
 
-Again we added another invisible scene graph node, an `Object3D` called `earthOrbit`
-and added both the `earthMesh` and the `moonMesh` to it. The new scene graph looks like
-this.
+이전처럼 `Object3D`를 이용해 `eathOrbit` "지역 공간"을 만들고 거기에
+`earthMesh`와 `moonMesh`를 추가했습니다. 씬 그래프는 다음과 같죠.
 
 <img src="resources/images/scenegraph-sun-earth-moon.svg" align="center">
 
-and here's that
+그리고 결과물입니다.
 
 {{{example url="../threejs-scenegraph-sun-earth-moon.html" }}}
 
-You can see the moon follows the spirograph pattern shown at the top
-of this article but we didn't have to manually compute it. We just
-setup our scene graph to do it for us.
+처음에 봤던 예제처럼 달이 스피로그래프를 그리며 돌지만, 복잡한 수학적
+연산이 하나도 들어가지 않았습니다. 우리가 한 건 씬 그래프에게 그 연산을
+대신 맡긴 것 뿐이죠.
 
-It is often useful to draw something to visualize the nodes in the scene graph.
-Three.js has some helpful ummmm, helpers to ummm, ... help with this.
+때론 씬 그래프의 요소를 시각화하는 것이 도움이 될 때도 있습니다.
+Three.js는 유용한.. 음... 그러니까 이 <del>거시기</del>를 도와줄
+헬퍼 클래스가 있습니다.
 
-One is called an `AxesHelper`. It draws 3 lines representing the local
+그 중 하나는 `AxesHelper`로, 이 클래스는 지역
 <span style="color:red">X</span>,
-<span style="color:green">Y</span>, and
-<span style="color:blue">Z</span> axes. Let's add one to every node we
-created.
+<span style="color:green">Y</span>,
+<span style="color:blue">Z</span> 축을 표시해줍니다.
+한 번 여태까지 만든 요소에 모두 추가해보죠.
 
 ```js
-// add an AxesHelper to each node
+// AxesHelper 클래스를 각 요소에 지정
 objects.forEach((node) => {
   const axes = new THREE.AxesHelper();
   axes.material.depthTest = false;
@@ -257,35 +255,32 @@ objects.forEach((node) => {
 });
 ```
 
-On our case we want the axes to appear even though they are inside the spheres.
-To do this we set their material's `depthTest` to false which means they will
-not check to see if they are drawing behind something else. We also
-set their `renderOrder` to 1 (the default is 0) so that they get drawn after
-all the spheres. Otherwise a sphere might draw over them and cover them up.
+우리는 축이 구체 내부에 있더라도 전부 보이길 원하므로, 각 축의 `depthTest`를
+`false`로 설정합니다. 이러면 Three.js는 어떤 물체 뒤에 있는 요소를 그릴지
+말지 검사하는 과정을 생략하므로, 어떤 방향에서라도 축을 볼 수 있습니다. 그리고
+`renderOrder`를 1로 설정(기본값은 0)해 구체를 전부 렌더링한 후 축을 렌더링하도록
+합니다. 그렇지 않으면 축을 그린 후 구체가 그려져 보이지 않을 수도 있으니까요.
 
 {{{example url="../threejs-scenegraph-sun-earth-moon-axes.html" }}}
 
-We can see the
-<span style="color:red">x (red)</span> and
-<span style="color:blue">z (blue)</span> axes. Since we are looking
-straight down and each of our objects is only rotating around its
-y axis we don't see much of the <span style="color:green">y (green)</span> axes.
+<span style="color:red">x축(빨강)</span> 그리고
+<span style="color:blue">z축(파랑)</span> 축이 보이나요? 카메라가 바로 위에서
+아래를 내려다 보고, 각 물체도 y축을 따라 회전하므로 <span style="color:green">y축(초록)</span>은
+보여도 거의 점처럼 보일 겁니다.
 
-It might be hard to see some of them as there are 2 pairs of overlapping axes. Both the `sunMesh`
-and the `solarSystem` are at the same position. Similarly the `earthMesh` and
-`earthOrbit` are at the same position. Let's add some simple controls to allow us
-to turn them on/off for each node.
-While we're at it let's also add another helper called the `GridHelper`. It
-makes a 2D grid on the X,Z plane. By default the grid is 10x10 units.
+몇몇 축은 2개의 축이 겹쳐져 구별이 어려울 수 있습니다. `sunMesh`와 `solarSystem`,
+`earthMesh`와 `earthOrbit`이 같은 위치에 있기 때문이죠. 각 노드의 축을 켜고
+끌 수 있는 간단한 컨트롤 패널을 한 번 만들어보죠. 동시에 다른 헬퍼 클래스인
+`GridHelper`도 추가해보겠습니다. `GridHelper`는 X, Z축으로 2D 격자(grid)를
+만다는 클래스로, 기본값은 10x10 칸입니다.
 
-We're also going to use [dat.GUI](https://github.com/dataarts/dat.gui) which is
-a UI library that is very popular with three.js projects. dat.GUI takes an
-object and a property name on that object and based on the type of the property
-automatically makes a UI to manipulate that property.
+또 Three.js와 함께 사용하기로 유명한 [dat.GUI](https://github.com/dataarts/dat.gui)도
+사용할 겁니다. dat.GUI는 UI 라이브러리로, 객체와 속성 이름을 넘겨받고, 해당 속성의
+타입을 기반으로 속성값을 UI로 조정할 수 있게 해줍니다.
 
-We want to make both a `GridHelper` and an `AxesHelper` for each node. We need
-a label for each node so we'll get rid of the old loop and switch to calling
-some function to add the helpers for each node
+각 요소에 `GirdHelper`와 `AxesHelper`를 추가하겠습니다. 각 노드에 헬퍼를
+추가하기 위해 각 노드의 이름이 필요하니, 기존 렌더링 루프를 제거하고 특정
+함수를 호출하게 변경하겠습니다.
 
 ```js
 -// add an AxesHelper to each node
@@ -308,28 +303,27 @@ some function to add the helpers for each node
 +makeAxisGrid(moonMesh, 'moonMesh');
 ```
 
-`makeAxisGrid` makes an `AxisGridHelper` which is a class we'll create
-to make dat.GUI happy. Like it says above dat.GUI
-will automagically make a UI that manipulates the named property
-of some object. It will create a different UI depending on the type
-of property. We want it to create a checkbox so we need to specify
-a `bool` property. But, we want both the axes and the grid
-to appear/disappear based on a single property so we'll make a class
-that has a getter and setter for a property. That way we can let dat.GUI
-think it's manipulating a single property but internally we can set
-the visible property of both the `AxesHelper` and `GridHelper` for a node.
+`makeAxisGrid` 함수는 나중에 만들 `AxisGridHelper`를 생성하여
+dat.GUI에 붙이는 역할을 합니다. 예제에서는 체크박스를 만들 것이므로,
+`boolean` 타입으로 속성을 지정해주겠습니다. 또 하나의 속성가 바뀔 때
+축과 격자가 동시에 나타나고 사라지게 할 것이니 getter와 setter가
+있는 간단한 클래스를 하나 만들겠습니다. 이러면 dat.GUI가 하나의
+속성을 바꿀 때 요소의 `AxesHelper`와 `GridHelper`의 속성을
+동시에 조작할 수 있죠.
 
 ```js
-// Turns both axes and grid visible on/off
-// dat.GUI requires a property that returns a bool
-// to decide to make a checkbox so we make a setter
-// and getter for `visible` which we can tell dat.GUI
-// to look at.
+/* 
+ * 축과 격자를 동시에 켜고 끕니다
+ * dat.GUI가 체크박스를 만들게 하려면 boolean 타입의
+ * 속성을 지정해줘야 하므로, `visible` 속성에
+ * getter와 setter를 지정해 dat.GUI가 이 속성을
+ * 바라보도록 합니다
+ */
 class AxisGridHelper {
   constructor(node, units = 10) {
     const axes = new THREE.AxesHelper();
     axes.material.depthTest = false;
-    axes.renderOrder = 2;  // after the grid
+    axes.renderOrder = 2;  // 격자 다음에 렌더링
     node.add(axes);
 
     const grid = new THREE.GridHelper(units, units);
@@ -352,57 +346,56 @@ class AxisGridHelper {
 }
 ```
 
-One thing to notice is we set the `renderOrder` of the `AxesHelper`
-to 2 and for the `GridHelper` to 1 so that the axes get drawn after the grid.
-Otherwise the grid might overwrite the axes.
+격자가 축을 가릴 수 있으니, `AxesHelper`의 `renderOrder`를
+2로 설정하고 `GridHelper`를 2로 설정해 축을 격자 다음에
+렌더링하도록 합니다.
 
 {{{example url="../threejs-scenegraph-sun-earth-moon-axes-grids.html" }}}
 
-Turn on the `solarSystem` and you'll see how the earth is exactly 10
-units out from the center just like we set above. You can see how the
-earth is in the *local space* of the `solarSystem`. Similarly if you
-turn on the `earthOrbit` you'll see how the moon is exactly 2 units
-from the center of the *local space* of the `earthOrbit`.
+`solarSystem`을 체크하면 위에서 설정했듯 지구가 정확히 중앙으로부터
+10칸 떨어진 것을 확인할 수 있습니다. 지구가 `solarSystem` "지역 공간"
+안에 있는 것도 확인할 수 있죠. `earthOrbit`을 켜면 달도 마찬가지로
+`earthOrbit`의 "지역 공간"의 중심으로부터 정확히 2칸 떨어진 것을
+확인할 수 있을 겁니다.
 
-A few more examples of scene graphs. An automobile in a simple game world might have a scene graph like this
+씬 그래프의 다른 예시로 자동차를 들 수 있습니다.
 
 <img src="resources/images/scenegraph-car.svg" align="center">
 
-If you move the car's body all the wheels will move with it. If you wanted the body
-to bounce separate from the wheels you might parent the body and the wheels to a "frame" node
-that represents the car's frame.
+차체(Car body)를 움직이면 바퀴(wheel)도 같이 움직입니다. 차체가
+바퀴와는 별도로 튀게 하려면(서스펜션. 역주) 차체와 바퀴를 하나의
+차체의 "프레임" 요소의 자식으로 설정할 수 있죠.
 
-Another example is a human in a game world.
+다른 예로 게임 속 인간형 캐릭터를 한 번 봅시다.
 
 <img src="resources/images/scenegraph-human.svg" align="center">
 
-You can see the scene graph gets pretty complex for a human. In fact
-that scene graph above is simplified. For example you might extend it
-to cover every finger (at least another 28 nodes) and every toe
-(yet another 28 nodes) plus ones for the face and jaw, the eyes and maybe more.
+인간형 캐릭터의 씬 그래프는 꽤 복잡하네요. 위 씬 그래프는 상당히 축소된
+버젼인데도 말이죠. 좀 더 세세하게 만든다면 손가락 하나하나(최소한 28마디)와
+발가락 하나하나(또 다른 28마디), 얼굴과 턱, 눈 등등으로 나눠야 합니다.
 
-Let's make one semi-complex scene graph. We'll make a tank. The tank will have
-6 wheels and a turret. The tank will follow a path. There will be a sphere that
-moves around and the tank will target the sphere.
+약간 복잡한 씬 그래프를 만들어 봅시다. 탱크가 좋겠네요. 바퀴와 6개와
+포탑으로 이루어진 간단한 탱크입니다. 또 탱크의 주위를 돌아다니는 구체를
+하나 만들어 탱크가 그 구체를 조준하도록 해보겠습니다.
 
-Here's the scene graph. The meshes are colored in green, the `Object3D`s in blue,
-the lights in gold, and the cameras in purple. One camera has not been added
-to the scene graph.
+아래는 예제를 구현하기 위한 씬 그래프입니다. `mesh`는 녹색으로 칠했고,
+`Object3D`는 청색, 광원은 갈색, 카메라는 보라색으로 칠했습니다. 하나의
+카메라는 씬 그래프에 포함하지 않았습니다.
 
 <div class="threejs_center"><img src="resources/images/scenegraph-tank.svg" style="width: 800px;"></div>
 
-Look in the code to see the setup of all of these nodes.
+모든 요소를 어떻게 설정했는지 코드를 하나씩 살펴보죠.
 
-For the target, the thing the tank is aiming at, there is a `targetOrbit`
-(`Object3D`) which just rotates similar to the `earthOrbit` above. A
-`targetElevation` (`Object3D`) which is a child of the `targetOrbit` provides an
-offset from the `targetOrbit` and a base elevation. Childed to that is another
-`Object3D` called `targetBob` which just bobs up and down relative to the
-`targetElevation`. Finally there's the `targetMesh` which is just a cube we
-rotate and change it's colors
+탱크가 조준할 목표를 만들기 위해 먼저 위 예제의 `earthOrbit`과 유사한
+`targetOrbit`(`Object3D`)을 만듭니다. 그리고 `targetOrbit`의 상대 좌표를 넘겨줄
+`targetElevation`(`Object3D`)을 만들어 `targetOrbit`의 자식으로 추가한 뒤,
+또 다른 `Object3D`, `targetBob`을 만들어 `targetElevation`의 자식으로 추가합니다.
+이 `targetBob`은 위아래로 보빙(bob은 낙시찌, 권투에서 bobbing은 몸을 숙이는 동작을 말함. 역주)하는
+역할을 할 겁니다. 마지막으로 색이 색이 바뀌는 동시에 회전할 `targetMesh` 육면체를
+만듭니다.
 
 ```js
-// move target
+// 움직이는 목표
 targetOrbit.rotation.y = time * .27;
 targetBob.position.y = Math.sin(time * 2) * 4;
 targetMesh.rotation.x = time * 7;
@@ -411,12 +404,12 @@ targetMaterial.emissive.setHSL(time * 10 % 1, 1, .25);
 targetMaterial.color.setHSL(time * 10 % 1, 1, .25);
 ```
 
-For the tank there's an `Object3D` called `tank` which is used to move everything
-below it around. The code uses a `SplineCurve` which it can ask for positions
-along that curve. 0.0 is the start of the curve. 1.0 is the end of the curve. It
-asks for the current position where it puts the tank. It then asks for a
-position slightly further down the curve and uses that to point the tank in that
-direction using `Object3D.lookAt`.
+탱크는 먼저 `tank`라는 이름으로 다른 요소를 감쌀 `Object3D`를 하나 생성합니다.
+예제에서는 커브에 따라 위치값을 반환받을 수 있는 `SplineCurve`를 이용하겠습니다.
+0.0은 커브의 시작점이고, 1.0은 커브의 끝점으로, 먼저 탱크의 위치를 넘겨주어 탱크의
+다음 위치를 정한 뒤(아래 `tankPosition`. 역주), 커브의 다음 값을 받아 탱크가 어디를
+바라봐야할지 구합니다(아래 `tankTarget`. 역주). 그리고 구한 값을 `Object3D.lookAt`
+메서드에 넘겨주어 탱크가 그 방향을 바라보도록 합니다.
 
 ```js
 const tankPosition = new THREE.Vector2();
@@ -432,42 +425,40 @@ tank.position.set(tankPosition.x, 0, tankPosition.y);
 tank.lookAt(tankTarget.x, 0, tankTarget.y);
 ```
 
-The turret on top of the tank is moved automatically by being a child
-of the tank. To point it at the target we just ask for the target's world position
-and then again use `Object3D.lookAt`
+그 다음 탱크의 포탑을 탱크의 자식으로 지정해서 탱크를 따라 움직이게 합니다.
+그리고 목표물의 전역 위치값(global position)을 구한 뒤 `Object3D.lookAt`
+메서드를 이용, 포탑이 목표물을 조준하게 합니다.
 
 ```js
 const targetPosition = new THREE.Vector3();
 
 ...
 
-// face turret at target
+// 목표를 조준하도록
 targetMesh.getWorldPosition(targetPosition);
 turretPivot.lookAt(targetPosition);
 ```
 
-There's a `turretCamera` which is a child of the `turretMesh` so
-it will move up and down and rotate with the turret. We make that
-aim at the target.
+`turretCamera`를 `turretMesh`의 자식으로 지정해 포탑과 함께 카메라가
+움직이도록 설정합니다. 또 카메라도 목표물을 바라보게 변경합니다.
 
 ```js
-// make the turretCamera look at target
+// 포탑 카메라가 목표물을 바라보도록
 turretCamera.lookAt(targetPosition);
 ```
 
-There is also a `targetCameraPivot` which is a child of `targetBob` so it floats
-around with the target. We aim that back at the tank. It's purpose is to allow the
-`targetCamera` to be offset from the target itself. If we instead made the camera
-a child of `targetBob` and just aimed the camera itself it would be inside the
-target.
+`targetCameraPivot`은 `targetBob`의 자식으로 지정해 목표물과 함께
+돌아다니도록 하고, 탱크의 뒤쪽을 바라보도록 합니다. 이는 `targetCamera`가
+목표물의 위치에서 살짝 벗어나게 하기 위함으로, 만약 카메라를 `targetBob`의
+자식으로 바로 추가한다면 목표물 안에서 탱크를 보게 될 겁니다.
 
 ```js
-// make the targetCameraPivot look at the tank
+// targetCameraPivot이 탱크를 바라보도록
 tank.getWorldPosition(targetPosition);
 targetCameraPivot.lookAt(targetPosition);
 ```
 
-Finally we rotate all the wheels
+다음으로 바퀴를 회전시킵니다.
 
 ```js
 wheelMeshes.forEach((obj) => {
@@ -475,7 +466,7 @@ wheelMeshes.forEach((obj) => {
 });
 ```
 
-For the cameras we setup an array of all 4 cameras at init time with descriptions.
+그리고 카메라를 간단한 설명과 함께 배열로 묶은 뒤,
 
 ```js
 const cameras = [
@@ -488,7 +479,7 @@ const cameras = [
 const infoElem = document.querySelector('#info');
 ```
 
-and cycle through our cameras at render time.
+시간에 따라 카메라를 변경하도록 합니다.
 
 ```js
 const camera = cameras[time * .25 % cameras.length | 0];
@@ -497,11 +488,12 @@ infoElem.textContent = camera.desc;
 
 {{{example url="../threejs-scenegraph-tank.html"}}}
 
-I hope this gives some idea of how scene graphs work and how you might use them.
-Making `Object3D` nodes and parenting things to them is an important step to using
-a 3D engine like three.js well. Often it might seem like some complex math is necessary
-to make something move and rotate the way you want. For example without a scene graph
-computing the motion of the moon or where to put the wheels of the car relative to its
-body would be very complicated but using a scene graph it becomes much easier.
+자, 이번 장은 여기까지입니다. 이 글이 씬 그래프가 어떻게 작동하는지,
+어떻게 사용해야할지 감을 잡는 데 도움이 되었으면 좋겠네요. `Object3D`
+요소를 만들어 부모로 만드는 것은 Three.js 뿐만 아니라 다른 3D 엔진을
+쓸 때도 중요한 요소입니다. 뭔가를 만들다보면 종종 복잡한 수학이 필요한
+것처럼 느껴질 수 있는데, 이때 씬 그래프를 사용하지 않는다면 달의 궤도를
+계산하거나 자동차 바퀴의 위치를 계산하는 건 굉장히 복잡할 겁니다. 씬
+그래프를 적절히 활용하면 이런 복잡한 동작을 더 쉽게 구현할 수 있죠.
 
-[Next up we'll go over materials](threejs-materials.html).
+[다음 장에서는 `재질(material)`에 대해 알아보겠습니다](threejs-materials.html).
