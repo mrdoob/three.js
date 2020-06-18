@@ -379,7 +379,7 @@ function generateEnvMapBlendingDefine( parameters ) {
 
 }
 
-function WebGLProgram( renderer, cacheKey, parameters ) {
+function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	const gl = renderer.getContext();
 
@@ -833,6 +833,8 @@ function WebGLProgram( renderer, cacheKey, parameters ) {
 	// free resource
 
 	this.destroy = function () {
+
+		bindingStates.releaseStatesOfProgram( this );
 
 		gl.deleteProgram( program );
 		this.program = undefined;

@@ -2,6 +2,12 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
+function numericalSort( a, b ) {
+
+	return a[ 0 ] - b[ 0 ];
+
+}
+
 function absNumericalSort( a, b ) {
 
 	return Math.abs( b[ 1 ] ) - Math.abs( a[ 1 ] );
@@ -12,6 +18,14 @@ function WebGLMorphtargets( gl ) {
 
 	const influencesList = {};
 	const morphInfluences = new Float32Array( 8 );
+
+	const workInfluences = [];
+
+	for ( let i = 0; i < 8; i ++ ) {
+
+		workInfluences[ i ] = [ i, 0 ];
+
+	}
 
 	function update( object, geometry, material, program ) {
 
@@ -40,24 +54,6 @@ function WebGLMorphtargets( gl ) {
 
 		}
 
-		const morphTargets = material.morphTargets && geometry.morphAttributes.position;
-		const morphNormals = material.morphNormals && geometry.morphAttributes.normal;
-
-		// Remove current morphAttributes
-
-		for ( let i = 0; i < length; i ++ ) {
-
-			const influence = influences[ i ];
-
-			if ( influence[ 1 ] !== 0 ) {
-
-				if ( morphTargets ) geometry.deleteAttribute( 'morphTarget' + i );
-				if ( morphNormals ) geometry.deleteAttribute( 'morphNormal' + i );
-
-			}
-
-		}
-
 		// Collect influences
 
 		for ( let i = 0; i < length; i ++ ) {
@@ -71,33 +67,69 @@ function WebGLMorphtargets( gl ) {
 
 		influences.sort( absNumericalSort );
 
-		// Add morphAttributes
+		for ( let i = 0; i < 8; i ++ ) {
+
+			if ( i < length && influences[ i ][ 1 ] ) {
+
+				workInfluences[ i ][ 0 ] = influences[ i ][ 0 ];
+				workInfluences[ i ][ 1 ] = influences[ i ][ 1 ];
+
+			} else {
+
+				workInfluences[ i ][ 0 ] = Number.MAX_SAFE_INTEGER;
+				workInfluences[ i ][ 1 ] = 0;
+
+			}
+
+		}
+
+		workInfluences.sort( numericalSort );
+
+		const morphTargets = material.morphTargets && geometry.morphAttributes.position;
+		const morphNormals = material.morphNormals && geometry.morphAttributes.normal;
 
 		let morphInfluencesSum = 0;
 
 		for ( let i = 0; i < 8; i ++ ) {
 
-			const influence = influences[ i ];
+			const influence = workInfluences[ i ];
+			const index = influence[ 0 ];
+			const value = influence[ 1 ];
 
-			if ( influence ) {
+			if ( index !== Number.MAX_SAFE_INTEGER && value ) {
 
-				const index = influence[ 0 ];
-				const value = influence[ 1 ];
+				if ( morphTargets && geometry.getAttribute( 'morphTarget' + i ) !== morphTargets[ index ] ) {
 
-				if ( value ) {
-
-					if ( morphTargets ) geometry.setAttribute( 'morphTarget' + i, morphTargets[ index ] );
-					if ( morphNormals ) geometry.setAttribute( 'morphNormal' + i, morphNormals[ index ] );
-
-					morphInfluences[ i ] = value;
-					morphInfluencesSum += value;
-					continue;
+					geometry.setAttribute( 'morphTarget' + i, morphTargets[ index ] );
 
 				}
 
-			}
+				if ( morphNormals && geometry.getAttribute( 'morphNormal' + i ) !== morphNormals[ index ] ) {
 
-			morphInfluences[ i ] = 0;
+					geometry.setAttribute( 'morphNormal' + i, morphNormals[ index ] );
+
+				}
+
+				morphInfluences[ i ] = value;
+				morphInfluencesSum += value;
+
+			} else {
+
+				if ( morphTargets && geometry.getAttribute( 'morphTarget' + i ) !== undefined ) {
+
+					geometry.deleteAttribute( 'morphTarget' + i );
+
+				}
+
+				if ( morphNormals && geometry.getAttribute( 'morphNormal' + i ) !== undefined ) {
+
+					geometry.deleteAttribute( 'morphNormal' + i );
+
+				}
+
+				morphInfluences[ i ] = 0;
+
+			}
 
 		}
 
