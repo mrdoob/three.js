@@ -446,11 +446,6 @@ function MenubarFile( editor ) {
 			zip.file( 'js/VRButton.js', content );
 
 		} );
-		loader.load( '../examples/js/vr/HelioWebXRPolyfill.js', function ( content ) {
-
-			zip.file( 'js/HelioWebXRPolyfill.js', content );
-
-		} );
 
 	} );
 	options.add( option );

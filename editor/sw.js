@@ -51,7 +51,6 @@ const assets = [
 
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
 
-	'../examples/js/vr/HelioWebXRPolyfill.js',
 	'../examples/jsm/webxr/VRButton.js',
 
 	'./manifest.json',
