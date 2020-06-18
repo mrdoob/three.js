@@ -15795,6 +15795,568 @@
 	}
 
 	/**
+	 * @author Mugen87 / https://github.com/Mugen87
+	 * @author Takahiro / https://github.com/takahirox
+	 */
+
+	function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
+
+		var maxVertexAttributes = gl.getParameter( 34921 );
+
+		var extension = capabilities.isWebGL2 ? null : extensions.get( 'OES_vertex_array_object' );
+		var vaoAvailable = capabilities.isWebGL2 || extension !== null;
+
+		var bindingStates = {};
+
+		var defaultState = createBindingState( null );
+		var currentState = defaultState;
+
+		function setup( object, material, program, geometry, index ) {
+
+			var updateBuffers = false;
+
+			if ( vaoAvailable ) {
+
+				var state = getBindingState( geometry, program, material );
+
+				if ( currentState !== state ) {
+
+					currentState = state;
+					bindVertexArrayObject( currentState.object );
+
+				}
+
+				updateBuffers = needsUpdate( geometry );
+
+				if ( updateBuffers ) { saveCache( geometry ); }
+
+			} else {
+
+				var wireframe = ( material.wireframe === true );
+
+				if ( currentState.geometry !== geometry.id ||
+					currentState.program !== program.id ||
+					currentState.wireframe !== wireframe ) {
+
+					currentState.geometry = geometry.id;
+					currentState.program = program.id;
+					currentState.wireframe = wireframe;
+
+					updateBuffers = true;
+
+				}
+
+			}
+
+			if ( object.isInstancedMesh === true ) {
+
+				updateBuffers = true;
+
+			}
+
+			if ( index !== null ) {
+
+				attributes.update( index, 34963 );
+
+			}
+
+			if ( updateBuffers ) {
+
+				setupVertexAttributes( object, material, program, geometry );
+
+				if ( index !== null ) {
+
+					gl.bindBuffer( 34963, attributes.get( index ).buffer );
+
+				}
+
+			}
+
+		}
+
+		function createVertexArrayObject() {
+
+			if ( capabilities.isWebGL2 ) { return gl.createVertexArray(); }
+
+			return extension.createVertexArrayOES();
+
+		}
+
+		function bindVertexArrayObject( vao ) {
+
+			if ( capabilities.isWebGL2 ) { return gl.bindVertexArray( vao ); }
+
+			return extension.bindVertexArrayOES( vao );
+
+		}
+
+		function deleteVertexArrayObject( vao ) {
+
+			if ( capabilities.isWebGL2 ) { return gl.deleteVertexArray( vao ); }
+
+			return extension.deleteVertexArrayOES( vao );
+
+		}
+
+		function getBindingState( geometry, program, material ) {
+
+			var wireframe = ( material.wireframe === true );
+
+			var programMap = bindingStates[ geometry.id ];
+
+			if ( programMap === undefined ) {
+
+				programMap = {};
+				bindingStates[ geometry.id ] = programMap;
+
+			}
+
+			var stateMap = programMap[ program.id ];
+
+			if ( stateMap === undefined ) {
+
+				stateMap = {};
+				programMap[ program.id ] = stateMap;
+
+			}
+
+			var state = stateMap[ wireframe ];
+
+			if ( state === undefined ) {
+
+				state = createBindingState( createVertexArrayObject() );
+				stateMap[ wireframe ] = state;
+
+			}
+
+			return state;
+
+		}
+
+		function createBindingState( vao ) {
+
+			var newAttributes = [];
+			var enabledAttributes = [];
+			var attributeDivisors = [];
+
+			for ( var i = 0; i < maxVertexAttributes; i ++ ) {
+
+				newAttributes[ i ] = 0;
+				enabledAttributes[ i ] = 0;
+				attributeDivisors[ i ] = 0;
+
+			}
+
+			return {
+
+				// for backward compatibility on non-VAO support browser
+				geometry: null,
+				program: null,
+				wireframe: false,
+
+				newAttributes: newAttributes,
+				enabledAttributes: enabledAttributes,
+				attributeDivisors: attributeDivisors,
+				object: vao,
+				attributes: {}
+
+			};
+
+		}
+
+		// If we sacrifice some BufferGeometry/Attribute API flexibility
+		// needsUpdate() and saveCache() can be much simpler. See #16287
+
+		function needsUpdate( geometry ) {
+
+			var cachedAttributes = currentState.attributes;
+			var geometryAttributes = geometry.attributes;
+
+			if ( Object.keys( cachedAttributes ).length !== Object.keys( geometryAttributes ).length ) { return true; }
+
+			for ( var key in geometryAttributes ) {
+
+				var cachedAttribute = cachedAttributes[ key ];
+				var geometryAttribute = geometryAttributes[ key ];
+
+				if ( cachedAttribute.attribute !== geometryAttribute ) { return true; }
+
+				if ( cachedAttribute.data !== geometryAttribute.data ) { return true; }
+
+			}
+
+			return false;
+
+		}
+
+		function saveCache( geometry ) {
+
+			var cache = {};
+			var attributes = geometry.attributes;
+
+			for ( var key in attributes ) {
+
+				var attribute = attributes[ key ];
+
+				var data = {};
+				data.attribute = attribute;
+
+				if ( attribute.data ) {
+
+					data.data = attribute.data;
+
+				}
+
+				cache[ key ] = data;
+
+			}
+
+			currentState.attributes = cache;
+
+		}
+
+		function initAttributes() {
+
+			var newAttributes = currentState.newAttributes;
+
+			for ( var i = 0, il = newAttributes.length; i < il; i ++ ) {
+
+				newAttributes[ i ] = 0;
+
+			}
+
+		}
+
+		function enableAttribute( attribute ) {
+
+			enableAttributeAndDivisor( attribute, 0 );
+
+		}
+
+		function enableAttributeAndDivisor( attribute, meshPerAttribute ) {
+
+			var newAttributes = currentState.newAttributes;
+			var enabledAttributes = currentState.enabledAttributes;
+			var attributeDivisors = currentState.attributeDivisors;
+
+			newAttributes[ attribute ] = 1;
+
+			if ( enabledAttributes[ attribute ] === 0 ) {
+
+				gl.enableVertexAttribArray( attribute );
+				enabledAttributes[ attribute ] = 1;
+
+			}
+
+			if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
+
+				var extension = capabilities.isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
+
+				extension[ capabilities.isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
+				attributeDivisors[ attribute ] = meshPerAttribute;
+
+			}
+
+		}
+
+		function disableUnusedAttributes() {
+
+			var newAttributes = currentState.newAttributes;
+			var enabledAttributes = currentState.enabledAttributes;
+
+			for ( var i = 0, il = enabledAttributes.length; i < il; i ++ ) {
+
+				if ( enabledAttributes[ i ] !== newAttributes[ i ] ) {
+
+					gl.disableVertexAttribArray( i );
+					enabledAttributes[ i ] = 0;
+
+				}
+
+			}
+
+		}
+
+		function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
+
+			if ( capabilities.isWebGL2 === true && ( type === 5124 || type === 5125 ) ) {
+
+				gl.vertexAttribIPointer( index, size, type, normalized, stride, offset );
+
+			} else {
+
+				gl.vertexAttribPointer( index, size, type, normalized, stride, offset );
+
+			}
+
+		}
+
+		function setupVertexAttributes( object, material, program, geometry ) {
+
+			if ( capabilities.isWebGL2 === false && ( object.isInstancedMesh || geometry.isInstancedBufferGeometry ) ) {
+
+				if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) { return; }
+
+			}
+
+			initAttributes();
+
+			var geometryAttributes = geometry.attributes;
+
+			var programAttributes = program.getAttributes();
+
+			var materialDefaultAttributeValues = material.defaultAttributeValues;
+
+			for ( var name in programAttributes ) {
+
+				var programAttribute = programAttributes[ name ];
+
+				if ( programAttribute >= 0 ) {
+
+					var geometryAttribute = geometryAttributes[ name ];
+
+					if ( geometryAttribute !== undefined ) {
+
+						var normalized = geometryAttribute.normalized;
+						var size = geometryAttribute.itemSize;
+
+						var attribute = attributes.get( geometryAttribute );
+
+						// TODO Attribute may not be available on context restore
+
+						if ( attribute === undefined ) { continue; }
+
+						var buffer = attribute.buffer;
+						var type = attribute.type;
+						var bytesPerElement = attribute.bytesPerElement;
+
+						if ( geometryAttribute.isInterleavedBufferAttribute ) {
+
+							var data = geometryAttribute.data;
+							var stride = data.stride;
+							var offset = geometryAttribute.offset;
+
+							if ( data && data.isInstancedInterleavedBuffer ) {
+
+								enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
+
+								if ( geometry._maxInstanceCount === undefined ) {
+
+									geometry._maxInstanceCount = data.meshPerAttribute * data.count;
+
+								}
+
+							} else {
+
+								enableAttribute( programAttribute );
+
+							}
+
+							gl.bindBuffer( 34962, buffer );
+							vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
+
+						} else {
+
+							if ( geometryAttribute.isInstancedBufferAttribute ) {
+
+								enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
+
+								if ( geometry._maxInstanceCount === undefined ) {
+
+									geometry._maxInstanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
+
+								}
+
+							} else {
+
+								enableAttribute( programAttribute );
+
+							}
+
+							gl.bindBuffer( 34962, buffer );
+							vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
+
+						}
+
+					} else if ( name === 'instanceMatrix' ) {
+
+						var attribute$1 = attributes.get( object.instanceMatrix );
+
+						// TODO Attribute may not be available on context restore
+
+						if ( attribute$1 === undefined ) { continue; }
+
+						var buffer$1 = attribute$1.buffer;
+						var type$1 = attribute$1.type;
+
+						enableAttributeAndDivisor( programAttribute + 0, 1 );
+						enableAttributeAndDivisor( programAttribute + 1, 1 );
+						enableAttributeAndDivisor( programAttribute + 2, 1 );
+						enableAttributeAndDivisor( programAttribute + 3, 1 );
+
+						gl.bindBuffer( 34962, buffer$1 );
+
+						gl.vertexAttribPointer( programAttribute + 0, 4, type$1, false, 64, 0 );
+						gl.vertexAttribPointer( programAttribute + 1, 4, type$1, false, 64, 16 );
+						gl.vertexAttribPointer( programAttribute + 2, 4, type$1, false, 64, 32 );
+						gl.vertexAttribPointer( programAttribute + 3, 4, type$1, false, 64, 48 );
+
+					} else if ( materialDefaultAttributeValues !== undefined ) {
+
+						var value = materialDefaultAttributeValues[ name ];
+
+						if ( value !== undefined ) {
+
+							switch ( value.length ) {
+
+								case 2:
+									gl.vertexAttrib2fv( programAttribute, value );
+									break;
+
+								case 3:
+									gl.vertexAttrib3fv( programAttribute, value );
+									break;
+
+								case 4:
+									gl.vertexAttrib4fv( programAttribute, value );
+									break;
+
+								default:
+									gl.vertexAttrib1fv( programAttribute, value );
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+			disableUnusedAttributes();
+
+		}
+
+		function dispose() {
+
+			reset();
+
+			for ( var geometryId in bindingStates ) {
+
+				var programMap = bindingStates[ geometryId ];
+
+				for ( var programId in programMap ) {
+
+					var stateMap = programMap[ programId ];
+
+					for ( var wireframe in stateMap ) {
+
+						deleteVertexArrayObject( stateMap[ wireframe ].object );
+
+						delete stateMap[ wireframe ];
+
+					}
+
+					delete programMap[ programId ];
+
+				}
+
+				delete bindingStates[ geometryId ];
+
+			}
+
+		}
+
+		function releaseStatesOfGeometry( geometry ) {
+
+			if ( bindingStates[ geometry.id ] === undefined ) { return; }
+
+			var programMap = bindingStates[ geometry.id ];
+
+			for ( var programId in programMap ) {
+
+				var stateMap = programMap[ programId ];
+
+				for ( var wireframe in stateMap ) {
+
+					deleteVertexArrayObject( stateMap[ wireframe ].object );
+
+					delete stateMap[ wireframe ];
+
+				}
+
+				delete programMap[ programId ];
+
+			}
+
+			delete bindingStates[ geometry.id ];
+
+		}
+
+		function releaseStatesOfProgram( program ) {
+
+			for ( var geometryId in bindingStates ) {
+
+				var programMap = bindingStates[ geometryId ];
+
+				if ( programMap[ program.id ] === undefined ) { continue; }
+
+				var stateMap = programMap[ program.id ];
+
+				for ( var wireframe in stateMap ) {
+
+					deleteVertexArrayObject( stateMap[ wireframe ].object );
+
+					delete stateMap[ wireframe ];
+
+				}
+
+				delete programMap[ program.id ];
+
+			}
+
+		}
+
+		function reset() {
+
+			resetDefaultState();
+
+			if ( currentState === defaultState ) { return; }
+
+			currentState = defaultState;
+			bindVertexArrayObject( currentState.object );
+
+		}
+
+		// for backward-compatilibity
+
+		function resetDefaultState() {
+
+			defaultState.geometry = null;
+			defaultState.program = null;
+			defaultState.wireframe = false;
+
+		}
+
+		return {
+
+			setup: setup,
+			reset: reset,
+			resetDefaultState: resetDefaultState,
+			dispose: dispose,
+			releaseStatesOfGeometry: releaseStatesOfGeometry,
+			releaseStatesOfProgram: releaseStatesOfProgram,
+
+			initAttributes: initAttributes,
+			enableAttribute: enableAttribute,
+			disableUnusedAttributes: disableUnusedAttributes
+
+		};
+
+	}
+
+	/**
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
@@ -16201,7 +16763,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLGeometries( gl, attributes, info ) {
+	function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 		var geometries = new WeakMap();
 		var wireframeAttributes = new WeakMap();
@@ -16235,6 +16797,8 @@
 				wireframeAttributes.delete( buffergeometry );
 
 			}
+
+			bindingStates.releaseStatesOfGeometry( geometry );
 
 			//
 
@@ -16276,14 +16840,9 @@
 
 		function update( geometry ) {
 
-			var index = geometry.index;
 			var geometryAttributes = geometry.attributes;
 
-			if ( index !== null ) {
-
-				attributes.update( index, 34963 );
-
-			}
+			// Updating index buffer in VAO now. See WebGLBindingStates.
 
 			for ( var name in geometryAttributes ) {
 
@@ -16352,7 +16911,7 @@
 			var attribute = new ( arrayMax( indices ) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute )( indices, 1 );
 			attribute.version = version;
 
-			attributes.update( attribute, 34963 );
+			// Updating index buffer in VAO now. See WebGLBindingStates
 
 			//
 
@@ -16560,6 +17119,12 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
+	function numericalSort( a, b ) {
+
+		return a[ 0 ] - b[ 0 ];
+
+	}
+
 	function absNumericalSort( a, b ) {
 
 		return Math.abs( b[ 1 ] ) - Math.abs( a[ 1 ] );
@@ -16570,6 +17135,14 @@
 
 		var influencesList = {};
 		var morphInfluences = new Float32Array( 8 );
+
+		var workInfluences = [];
+
+		for ( var i = 0; i < 8; i ++ ) {
+
+			workInfluences[ i ] = [ i, 0 ];
+
+		}
 
 		function update( object, geometry, material, program ) {
 
@@ -16598,64 +17171,82 @@
 
 			}
 
-			var morphTargets = material.morphTargets && geometry.morphAttributes.position;
-			var morphNormals = material.morphNormals && geometry.morphAttributes.normal;
-
-			// Remove current morphAttributes
+			// Collect influences
 
 			for ( var i$1 = 0; i$1 < length; i$1 ++ ) {
 
 				var influence = influences[ i$1 ];
 
-				if ( influence[ 1 ] !== 0 ) {
-
-					if ( morphTargets ) { geometry.deleteAttribute( 'morphTarget' + i$1 ); }
-					if ( morphNormals ) { geometry.deleteAttribute( 'morphNormal' + i$1 ); }
-
-				}
-
-			}
-
-			// Collect influences
-
-			for ( var i$2 = 0; i$2 < length; i$2 ++ ) {
-
-				var influence$1 = influences[ i$2 ];
-
-				influence$1[ 0 ] = i$2;
-				influence$1[ 1 ] = objectInfluences[ i$2 ];
+				influence[ 0 ] = i$1;
+				influence[ 1 ] = objectInfluences[ i$1 ];
 
 			}
 
 			influences.sort( absNumericalSort );
 
-			// Add morphAttributes
+			for ( var i$2 = 0; i$2 < 8; i$2 ++ ) {
+
+				if ( i$2 < length && influences[ i$2 ][ 1 ] ) {
+
+					workInfluences[ i$2 ][ 0 ] = influences[ i$2 ][ 0 ];
+					workInfluences[ i$2 ][ 1 ] = influences[ i$2 ][ 1 ];
+
+				} else {
+
+					workInfluences[ i$2 ][ 0 ] = Number.MAX_SAFE_INTEGER;
+					workInfluences[ i$2 ][ 1 ] = 0;
+
+				}
+
+			}
+
+			workInfluences.sort( numericalSort );
+
+			var morphTargets = material.morphTargets && geometry.morphAttributes.position;
+			var morphNormals = material.morphNormals && geometry.morphAttributes.normal;
 
 			var morphInfluencesSum = 0;
 
 			for ( var i$3 = 0; i$3 < 8; i$3 ++ ) {
 
-				var influence$2 = influences[ i$3 ];
+				var influence$1 = workInfluences[ i$3 ];
+				var index = influence$1[ 0 ];
+				var value = influence$1[ 1 ];
 
-				if ( influence$2 ) {
+				if ( index !== Number.MAX_SAFE_INTEGER && value ) {
 
-					var index = influence$2[ 0 ];
-					var value = influence$2[ 1 ];
+					if ( morphTargets && geometry.getAttribute( 'morphTarget' + i$3 ) !== morphTargets[ index ] ) {
 
-					if ( value ) {
-
-						if ( morphTargets ) { geometry.setAttribute( 'morphTarget' + i$3, morphTargets[ index ] ); }
-						if ( morphNormals ) { geometry.setAttribute( 'morphNormal' + i$3, morphNormals[ index ] ); }
-
-						morphInfluences[ i$3 ] = value;
-						morphInfluencesSum += value;
-						continue;
+						geometry.setAttribute( 'morphTarget' + i$3, morphTargets[ index ] );
 
 					}
 
-				}
+					if ( morphNormals && geometry.getAttribute( 'morphNormal' + i$3 ) !== morphNormals[ index ] ) {
 
-				morphInfluences[ i$3 ] = 0;
+						geometry.setAttribute( 'morphNormal' + i$3, morphNormals[ index ] );
+
+					}
+
+					morphInfluences[ i$3 ] = value;
+					morphInfluencesSum += value;
+
+				} else {
+
+					if ( morphTargets && geometry.getAttribute( 'morphTarget' + i$3 ) !== undefined ) {
+
+						geometry.deleteAttribute( 'morphTarget' + i$3 );
+
+					}
+
+					if ( morphNormals && geometry.getAttribute( 'morphNormal' + i$3 ) !== undefined ) {
+
+						geometry.deleteAttribute( 'morphNormal' + i$3 );
+
+					}
+
+					morphInfluences[ i$3 ] = 0;
+
+				}
 
 			}
 
@@ -18113,7 +18704,7 @@
 
 	}
 
-	function WebGLProgram( renderer, cacheKey, parameters ) {
+	function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		var gl = renderer.getContext();
 
@@ -18568,6 +19159,8 @@
 
 		this.destroy = function () {
 
+			bindingStates.releaseStatesOfProgram( this );
+
 			gl.deleteProgram( program );
 			this.program = undefined;
 
@@ -18591,7 +19184,7 @@
 	 * @author mrdoob / http://mrdoob.com/
 	 */
 
-	function WebGLPrograms( renderer, extensions, capabilities ) {
+	function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 
 		var programs = [];
 
@@ -18948,7 +19541,7 @@
 
 			if ( program === undefined ) {
 
-				program = new WebGLProgram( renderer, cacheKey, parameters );
+				program = new WebGLProgram( renderer, cacheKey, parameters, bindingStates );
 				programs.push( program );
 
 			}
@@ -20745,11 +21338,6 @@
 		var depthBuffer = new DepthBuffer();
 		var stencilBuffer = new StencilBuffer();
 
-		var maxVertexAttributes = gl.getParameter( 34921 );
-		var newAttributes = new Uint8Array( maxVertexAttributes );
-		var enabledAttributes = new Uint8Array( maxVertexAttributes );
-		var attributeDivisors = new Uint8Array( maxVertexAttributes );
-
 		var enabledCapabilities = {};
 
 		var currentProgram = null;
@@ -20835,73 +21423,6 @@
 		setBlending( NoBlending );
 
 		//
-
-		function initAttributes() {
-
-			for ( var i = 0, l = newAttributes.length; i < l; i ++ ) {
-
-				newAttributes[ i ] = 0;
-
-			}
-
-		}
-
-		function enableAttribute( attribute ) {
-
-			enableAttributeAndDivisor( attribute, 0 );
-
-		}
-
-		function enableAttributeAndDivisor( attribute, meshPerAttribute ) {
-
-			newAttributes[ attribute ] = 1;
-
-			if ( enabledAttributes[ attribute ] === 0 ) {
-
-				gl.enableVertexAttribArray( attribute );
-				enabledAttributes[ attribute ] = 1;
-
-			}
-
-			if ( attributeDivisors[ attribute ] !== meshPerAttribute ) {
-
-				var extension = isWebGL2 ? gl : extensions.get( 'ANGLE_instanced_arrays' );
-
-				extension[ isWebGL2 ? 'vertexAttribDivisor' : 'vertexAttribDivisorANGLE' ]( attribute, meshPerAttribute );
-				attributeDivisors[ attribute ] = meshPerAttribute;
-
-			}
-
-		}
-
-		function disableUnusedAttributes() {
-
-			for ( var i = 0, l = enabledAttributes.length; i !== l; ++ i ) {
-
-				if ( enabledAttributes[ i ] !== newAttributes[ i ] ) {
-
-					gl.disableVertexAttribArray( i );
-					enabledAttributes[ i ] = 0;
-
-				}
-
-			}
-
-		}
-
-		function vertexAttribPointer( index, size, type, normalized, stride, offset ) {
-
-			if ( isWebGL2 === true && ( type === 5124 || type === 5125 ) ) {
-
-				gl.vertexAttribIPointer( index, size, type, normalized, stride, offset );
-
-			} else {
-
-				gl.vertexAttribPointer( index, size, type, normalized, stride, offset );
-
-			}
-
-		}
 
 		function enable( id ) {
 
@@ -21378,17 +21899,6 @@
 
 		function reset() {
 
-			for ( var i = 0; i < enabledAttributes.length; i ++ ) {
-
-				if ( enabledAttributes[ i ] === 1 ) {
-
-					gl.disableVertexAttribArray( i );
-					enabledAttributes[ i ] = 0;
-
-				}
-
-			}
-
 			enabledCapabilities = {};
 
 			currentTextureSlot = null;
@@ -21415,11 +21925,6 @@
 				stencil: stencilBuffer
 			},
 
-			initAttributes: initAttributes,
-			enableAttribute: enableAttribute,
-			enableAttributeAndDivisor: enableAttributeAndDivisor,
-			disableUnusedAttributes: disableUnusedAttributes,
-			vertexAttribPointer: vertexAttribPointer,
 			enable: enable,
 			disable: disable,
 
@@ -24345,14 +24850,6 @@
 		var _currentFramebuffer = null;
 		var _currentMaterialId = - 1;
 
-		// geometry and program caching
-
-		var _currentGeometryProgram = {
-			geometry: null,
-			program: null,
-			wireframe: false
-		};
-
 		var _currentCamera = null;
 		var _currentArrayCamera = null;
 
@@ -24486,7 +24983,7 @@
 
 		var background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
-		var utils;
+		var utils, bindingStates;
 
 		function initGLContext() {
 
@@ -24502,6 +24999,7 @@
 				extensions.get( 'OES_texture_half_float_linear' );
 				extensions.get( 'OES_standard_derivatives' );
 				extensions.get( 'OES_element_index_uint' );
+				extensions.get( 'OES_vertex_array_object' );
 				extensions.get( 'ANGLE_instanced_arrays' );
 
 			}
@@ -24518,10 +25016,11 @@
 			properties = new WebGLProperties();
 			textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
 			attributes = new WebGLAttributes( _gl, capabilities );
-			geometries = new WebGLGeometries( _gl, attributes, info );
+			bindingStates = new WebGLBindingStates( _gl, extensions, attributes, capabilities );
+			geometries = new WebGLGeometries( _gl, attributes, info, bindingStates );
 			objects = new WebGLObjects( _gl, geometries, attributes, info );
 			morphtargets = new WebGLMorphtargets( _gl );
-			programCache = new WebGLPrograms( _this, extensions, capabilities );
+			programCache = new WebGLPrograms( _this, extensions, capabilities, bindingStates );
 			materials = new WebGLMaterials( properties );
 			renderLists = new WebGLRenderLists();
 			renderStates = new WebGLRenderStates();
@@ -24817,6 +25316,7 @@
 			renderStates.dispose();
 			properties.dispose();
 			objects.dispose();
+			bindingStates.dispose();
 
 			xr.dispose();
 
@@ -24895,7 +25395,7 @@
 
 		this.renderBufferImmediate = function ( object, program ) {
 
-			state.initAttributes();
+			bindingStates.initAttributes();
 
 			var buffers = properties.get( object );
 
@@ -24911,7 +25411,7 @@
 				_gl.bindBuffer( 34962, buffers.position );
 				_gl.bufferData( 34962, object.positionArray, 35048 );
 
-				state.enableAttribute( programAttributes.position );
+				bindingStates.enableAttribute( programAttributes.position );
 				_gl.vertexAttribPointer( programAttributes.position, 3, 5126, false, 0, 0 );
 
 			}
@@ -24921,7 +25421,7 @@
 				_gl.bindBuffer( 34962, buffers.normal );
 				_gl.bufferData( 34962, object.normalArray, 35048 );
 
-				state.enableAttribute( programAttributes.normal );
+				bindingStates.enableAttribute( programAttributes.normal );
 				_gl.vertexAttribPointer( programAttributes.normal, 3, 5126, false, 0, 0 );
 
 			}
@@ -24931,7 +25431,7 @@
 				_gl.bindBuffer( 34962, buffers.uv );
 				_gl.bufferData( 34962, object.uvArray, 35048 );
 
-				state.enableAttribute( programAttributes.uv );
+				bindingStates.enableAttribute( programAttributes.uv );
 				_gl.vertexAttribPointer( programAttributes.uv, 2, 5126, false, 0, 0 );
 
 			}
@@ -24941,12 +25441,12 @@
 				_gl.bindBuffer( 34962, buffers.color );
 				_gl.bufferData( 34962, object.colorArray, 35048 );
 
-				state.enableAttribute( programAttributes.color );
+				bindingStates.enableAttribute( programAttributes.color );
 				_gl.vertexAttribPointer( programAttributes.color, 3, 5126, false, 0, 0 );
 
 			}
 
-			state.disableUnusedAttributes();
+			bindingStates.disableUnusedAttributes();
 
 			_gl.drawArrays( 4, 0, object.count );
 
@@ -24963,33 +25463,6 @@
 			var program = setProgram( camera, scene, material, object );
 
 			state.setMaterial( material, frontFaceCW );
-
-			var updateBuffers = false;
-
-			if ( _currentGeometryProgram.geometry !== geometry.id ||
-				_currentGeometryProgram.program !== program.id ||
-				_currentGeometryProgram.wireframe !== ( material.wireframe === true ) ) {
-
-				_currentGeometryProgram.geometry = geometry.id;
-				_currentGeometryProgram.program = program.id;
-				_currentGeometryProgram.wireframe = material.wireframe === true;
-				updateBuffers = true;
-
-			}
-
-			if ( material.morphTargets || material.morphNormals ) {
-
-				morphtargets.update( object, geometry, material, program );
-
-				updateBuffers = true;
-
-			}
-
-			if ( object.isInstancedMesh === true ) {
-
-				updateBuffers = true;
-
-			}
 
 			//
 
@@ -25019,6 +25492,14 @@
 
 			}
 
+			if ( material.morphTargets || material.morphNormals ) {
+
+				morphtargets.update( object, geometry, material, program );
+
+			}
+
+			bindingStates.setup( object, material, program, geometry, index );
+
 			var attribute;
 			var renderer = bufferRenderer;
 
@@ -25028,18 +25509,6 @@
 
 				renderer = indexedBufferRenderer;
 				renderer.setIndex( attribute );
-
-			}
-
-			if ( updateBuffers ) {
-
-				setupVertexAttributes( object, geometry, material, program );
-
-				if ( index !== null ) {
-
-					_gl.bindBuffer( 34963, attribute.buffer );
-
-				}
 
 			}
 
@@ -25124,153 +25593,6 @@
 			}
 
 		};
-
-		function setupVertexAttributes( object, geometry, material, program ) {
-
-			if ( capabilities.isWebGL2 === false && ( object.isInstancedMesh || geometry.isInstancedBufferGeometry ) ) {
-
-				if ( extensions.get( 'ANGLE_instanced_arrays' ) === null ) { return; }
-
-			}
-
-			state.initAttributes();
-
-			var geometryAttributes = geometry.attributes;
-
-			var programAttributes = program.getAttributes();
-
-			var materialDefaultAttributeValues = material.defaultAttributeValues;
-
-			for ( var name in programAttributes ) {
-
-				var programAttribute = programAttributes[ name ];
-
-				if ( programAttribute >= 0 ) {
-
-					var geometryAttribute = geometryAttributes[ name ];
-
-					if ( geometryAttribute !== undefined ) {
-
-						var normalized = geometryAttribute.normalized;
-						var size = geometryAttribute.itemSize;
-
-						var attribute = attributes.get( geometryAttribute );
-
-						// TODO Attribute may not be available on context restore
-
-						if ( attribute === undefined ) { continue; }
-
-						var buffer = attribute.buffer;
-						var type = attribute.type;
-						var bytesPerElement = attribute.bytesPerElement;
-
-						if ( geometryAttribute.isInterleavedBufferAttribute ) {
-
-							var data = geometryAttribute.data;
-							var stride = data.stride;
-							var offset = geometryAttribute.offset;
-
-							if ( data && data.isInstancedInterleavedBuffer ) {
-
-								state.enableAttributeAndDivisor( programAttribute, data.meshPerAttribute );
-
-								if ( geometry._maxInstanceCount === undefined ) {
-
-									geometry._maxInstanceCount = data.meshPerAttribute * data.count;
-
-								}
-
-							} else {
-
-								state.enableAttribute( programAttribute );
-
-							}
-
-							_gl.bindBuffer( 34962, buffer );
-							state.vertexAttribPointer( programAttribute, size, type, normalized, stride * bytesPerElement, offset * bytesPerElement );
-
-						} else {
-
-							if ( geometryAttribute.isInstancedBufferAttribute ) {
-
-								state.enableAttributeAndDivisor( programAttribute, geometryAttribute.meshPerAttribute );
-
-								if ( geometry._maxInstanceCount === undefined ) {
-
-									geometry._maxInstanceCount = geometryAttribute.meshPerAttribute * geometryAttribute.count;
-
-								}
-
-							} else {
-
-								state.enableAttribute( programAttribute );
-
-							}
-
-							_gl.bindBuffer( 34962, buffer );
-							state.vertexAttribPointer( programAttribute, size, type, normalized, 0, 0 );
-
-						}
-
-					} else if ( name === 'instanceMatrix' ) {
-
-						var attribute$1 = attributes.get( object.instanceMatrix );
-
-						// TODO Attribute may not be available on context restore
-
-						if ( attribute$1 === undefined ) { continue; }
-
-						var buffer$1 = attribute$1.buffer;
-						var type$1 = attribute$1.type;
-
-						state.enableAttributeAndDivisor( programAttribute + 0, 1 );
-						state.enableAttributeAndDivisor( programAttribute + 1, 1 );
-						state.enableAttributeAndDivisor( programAttribute + 2, 1 );
-						state.enableAttributeAndDivisor( programAttribute + 3, 1 );
-
-						_gl.bindBuffer( 34962, buffer$1 );
-
-						_gl.vertexAttribPointer( programAttribute + 0, 4, type$1, false, 64, 0 );
-						_gl.vertexAttribPointer( programAttribute + 1, 4, type$1, false, 64, 16 );
-						_gl.vertexAttribPointer( programAttribute + 2, 4, type$1, false, 64, 32 );
-						_gl.vertexAttribPointer( programAttribute + 3, 4, type$1, false, 64, 48 );
-
-					} else if ( materialDefaultAttributeValues !== undefined ) {
-
-						var value = materialDefaultAttributeValues[ name ];
-
-						if ( value !== undefined ) {
-
-							switch ( value.length ) {
-
-								case 2:
-									_gl.vertexAttrib2fv( programAttribute, value );
-									break;
-
-								case 3:
-									_gl.vertexAttrib3fv( programAttribute, value );
-									break;
-
-								case 4:
-									_gl.vertexAttrib4fv( programAttribute, value );
-									break;
-
-								default:
-									_gl.vertexAttrib1fv( programAttribute, value );
-
-							}
-
-						}
-
-					}
-
-				}
-
-			}
-
-			state.disableUnusedAttributes();
-
-		}
 
 		// Compile
 
@@ -25389,9 +25711,7 @@
 
 			// reset caching for this frame
 
-			_currentGeometryProgram.geometry = null;
-			_currentGeometryProgram.program = null;
-			_currentGeometryProgram.wireframe = false;
+			bindingStates.resetDefaultState();
 			_currentMaterialId = - 1;
 			_currentCamera = null;
 
@@ -25687,9 +26007,7 @@
 
 				state.setMaterial( material );
 
-				_currentGeometryProgram.geometry = null;
-				_currentGeometryProgram.program = null;
-				_currentGeometryProgram.wireframe = false;
+				bindingStates.reset();
 
 				renderObjectImmediate( object, program );
 
