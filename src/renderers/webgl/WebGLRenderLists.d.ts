@@ -22,7 +22,6 @@ export interface RenderItem {
 
 export class WebGLRenderList {
 
-	renderItems: Array<RenderItem>;
 	opaque: Array<RenderItem>;
 	transparent: Array<RenderItem>;
 	init(): void;
