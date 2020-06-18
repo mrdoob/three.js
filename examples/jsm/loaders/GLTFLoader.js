@@ -82,7 +82,11 @@ var GLTFLoader = ( function () {
 		this.ddsLoader = null;
 
 		this.pluginCallbacks = [];
-		this.register( function ( parser ) { return new GLTFMaterialsClearcoatExtension( parser ); } );
+		this.register( function ( parser ) {
+
+			return new GLTFMaterialsClearcoatExtension( parser );
+
+		} );
 
 	}
 
@@ -182,7 +186,7 @@ var GLTFLoader = ( function () {
 
 		register: function ( callback ) {
 
-			if ( this.pluginCallbacks.indexOf( callback ) === -1 ) {
+			if ( this.pluginCallbacks.indexOf( callback ) === - 1 ) {
 
 				this.pluginCallbacks.push( callback );
 
@@ -194,7 +198,7 @@ var GLTFLoader = ( function () {
 
 		unregister: function ( callback ) {
 
-			if ( this.pluginCallbacks.indexOf( callback ) !== -1 ) {
+			if ( this.pluginCallbacks.indexOf( callback ) !== - 1 ) {
 
 				this.pluginCallbacks.splice( this.pluginCallbacks.indexOf( callback ), 1 );
 
@@ -533,7 +537,7 @@ var GLTFLoader = ( function () {
 
 	}
 
-	GLTFMaterialsClearcoatExtension.prototype.getMaterialType = function ( materialIndex ) {
+	GLTFMaterialsClearcoatExtension.prototype.getMaterialType = function ( /* materialIndex */ ) {
 
 		return MeshPhysicalMaterial;
 
@@ -1534,10 +1538,15 @@ var GLTFLoader = ( function () {
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
 		if ( this.useImageBitmap ) {
+
 			this.textureLoader = new ImageBitmapLoader( this.options.manager );
+
 		} else {
+
 			this.textureLoader = new TextureLoader( this.options.manager );
+
 		}
+
 		this.textureLoader.setCrossOrigin( this.options.crossOrigin );
 
 		this.fileLoader = new FileLoader( this.options.manager );
@@ -2301,7 +2310,7 @@ var GLTFLoader = ( function () {
 
 	};
 
-	GLTFParser.prototype.getMaterialType = function ( materialIndex ) {
+	GLTFParser.prototype.getMaterialType = function ( /* materialIndex */ ) {
 
 		return MeshStandardMaterial;
 
