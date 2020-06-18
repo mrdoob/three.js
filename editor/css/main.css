@@ -246,6 +246,7 @@ button {
 	color: #555;
 	background-color: #ddd;
 	border: 0px;
+	margin: 0px; /* GNOME Web */
 	padding: 5px 8px;
 	text-transform: uppercase;
 	cursor: pointer;
