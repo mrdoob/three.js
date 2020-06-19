@@ -150,9 +150,9 @@ function SidebarProject( editor ) {
 		var value = this.getValue();
 
 		config.setKey( 'project/renderer/toneMapping', parseFloat( value ) );
-		updateRenderer();
-
 		toneMappingExposure.setDisplay( value === '0' ? 'none' : '' );
+
+		updateRenderer();
 
 	} );
 	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
