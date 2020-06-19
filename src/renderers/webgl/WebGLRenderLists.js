@@ -160,9 +160,6 @@ function WebGLRenderList() {
 
 	return {
 
-		// Note: renderItems temporarily exposed to enable testing of the `finish` function.
-
-		renderItems: renderItems,
 		opaque: opaque,
 		transparent: transparent,
 
