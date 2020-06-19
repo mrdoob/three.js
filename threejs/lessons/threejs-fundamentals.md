@@ -159,7 +159,7 @@ dimension. Note that most angles in three.js are in radians but for some
 reason the perspective camera takes degrees.
 
 `aspect` is the display aspect of the canvas. We'll go over the details
-[in another article](threejs-responsive.html) but by default a canvas i
+[in another article](threejs-responsive.html) but by default a canvas is
  300x150 pixels which makes the aspect 300/150 or 2.
 
 `near` and `far` represent the space in front of the camera
