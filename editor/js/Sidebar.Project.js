@@ -16,7 +16,6 @@ function SidebarProject( editor ) {
 	var strings = editor.strings;
 
 	var currentRenderer = null;
-	var currentPmremGenerator = null;
 
 	var container = new UISpan();
 
@@ -83,7 +82,7 @@ function SidebarProject( editor ) {
 	var antialiasBoolean = new UIBoolean( config.getKey( 'project/renderer/antialias' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/antialias', this.getValue() );
-		updateRenderer();
+		createRenderer();
 
 	} );
 
@@ -146,11 +145,14 @@ function SidebarProject( editor ) {
 		2: 'Reinhard',
 		3: 'Cineon',
 		4: 'ACESFilmic'
-	} ).setWidth( '120px' ).onChange( function () {
+	} ).setWidth( '120px' ).onChange( function ( value ) {
 
-		var toneMapping = parseFloat( this.getValue() );
-		config.setKey( 'project/renderer/toneMapping', toneMapping );
+		var value = this.getValue();
+
+		config.setKey( 'project/renderer/toneMapping', parseFloat( value ) );
 		updateRenderer();
+
+		toneMappingExposure.setDisplay( value === '0' ? 'none' : '' );
 
 	} );
 	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
@@ -159,12 +161,13 @@ function SidebarProject( editor ) {
 	toneMappingRow.add( toneMappingSelect );
 
 	var toneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) );
+	toneMappingExposure.setDisplay( toneMappingSelect.getValue() === '0' ? 'none' : '' );
 	toneMappingExposure.setWidth( '30px' ).setMarginLeft( '10px' );
 	toneMappingExposure.setRange( 0, 10 );
 	toneMappingExposure.onChange( function () {
 
 		config.setKey( 'project/renderer/toneMappingExposure', this.getValue() );
-		updateTonemapping();
+		updateRenderer();
 
 	} );
 	toneMappingRow.add( toneMappingExposure );
@@ -175,64 +178,31 @@ function SidebarProject( editor ) {
 
 	function updateRenderer() {
 
-		createRenderer(
-			antialiasBoolean.getValue(),
-			shadowsBoolean.getValue(),
-			shadowTypeSelect.getValue(),
-			toneMappingSelect.getValue(),
-			toneMappingExposure.getValue(),
-			physicallyCorrectLightsBoolean.getValue()
-		);
-
-	}
-
-	function createRenderer( antialias, shadows, shadowType, toneMapping, toneMappingExposure, physicallyCorrectLights ) {
-
-		var parameters = { antialias: antialias };
-
-		if ( currentRenderer !== null ) {
-
-			currentRenderer.dispose();
-			currentPmremGenerator.dispose();
-
-		}
-
-		currentRenderer = new THREE.WebGLRenderer( parameters );
-		currentPmremGenerator = new THREE.PMREMGenerator( currentRenderer );
-		currentPmremGenerator.compileCubemapShader();
-		currentPmremGenerator.compileEquirectangularShader();
-
-		if ( shadows ) {
-
-			currentRenderer.shadowMap.enabled = true;
-			currentRenderer.shadowMap.type = parseFloat( shadowType );
-
-		}
-
-		currentRenderer.toneMapping = parseFloat( toneMapping );
-		currentRenderer.toneMappingExposure = toneMappingExposure;
-		currentRenderer.physicallyCorrectLights = physicallyCorrectLights;
-
-		signals.rendererChanged.dispatch( currentRenderer, currentPmremGenerator );
-
-	}
-
-	function updateTonemapping() {
-
+		currentRenderer.physicallyCorrectLights = physicallyCorrectLightsBoolean.getValue();
+		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
+		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
+		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
 		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
 
 		signals.rendererUpdated.dispatch();
 
 	}
 
-	createRenderer(
-		config.getKey( 'project/renderer/antialias' ),
-		config.getKey( 'project/renderer/shadows' ),
-		config.getKey( 'project/renderer/shadowType' ),
-		config.getKey( 'project/renderer/toneMapping' ),
-		config.getKey( 'project/renderer/toneMappingExposure' ),
-		config.getKey( 'project/renderer/physicallyCorrectLights' )
-	 );
+	function createRenderer() {
+
+		currentRenderer = new THREE.WebGLRenderer( { antialias: antialiasBoolean.getValue() } );
+		currentRenderer.outputEncoding = THREE.sRGBEncoding;
+		currentRenderer.physicallyCorrectLights = physicallyCorrectLightsBoolean.getValue();
+		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
+		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
+		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
+		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
+
+		signals.rendererChanged.dispatch( currentRenderer );
+
+	}
+
+	createRenderer();
 
 	// Materials
 

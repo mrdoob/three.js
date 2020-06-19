@@ -324,26 +324,41 @@ function Viewport( editor ) {
 
 	signals.rendererUpdated.add( function () {
 
+		scene.traverse( function ( child ) {
+
+			if ( child.material !== undefined ) {
+
+				child.material.needsUpdate = true;
+
+			}
+
+		} );
+
 		render();
 
 	} );
 
-	signals.rendererChanged.add( function ( newRenderer, newPmremGenerator ) {
+	signals.rendererChanged.add( function ( newRenderer ) {
 
 		if ( renderer !== null ) {
+
+			renderer.dispose();
+			pmremGenerator.dispose();
 
 			container.dom.removeChild( renderer.domElement );
 
 		}
 
 		renderer = newRenderer;
-		pmremGenerator = newPmremGenerator;
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
-		renderer.outputEncoding = THREE.sRGBEncoding;
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+
+		pmremGenerator = new THREE.PMREMGenerator( renderer );
+		pmremGenerator.compileCubemapShader();
+		pmremGenerator.compileEquirectangularShader();
 
 		container.dom.appendChild( renderer.domElement );
 
