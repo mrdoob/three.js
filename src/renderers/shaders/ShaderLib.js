@@ -303,7 +303,8 @@ ShaderLib.physical = {
 			clearcoatNormalScale: { value: new Vector2( 1, 1 ) },
 			clearcoatNormalMap: { value: null },
 			sheen: { value: new Color( 0x000000 ) },
-			transparency: { value: 0 },
+			transmission: { value: 0 },
+			transmissionMap: { value: null },
 		}
 	] ),
 

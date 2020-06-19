@@ -19,6 +19,7 @@ THREE.GLTFLoader = ( function () {
 		this.ktx2Loader = null;
 
 		this.pluginCallbacks = [];
+
 		this.register( function ( parser ) {
 
 			return new GLTFMaterialsClearcoatExtension( parser );
@@ -27,6 +28,12 @@ THREE.GLTFLoader = ( function () {
 		this.register( function ( parser ) {
 
 			return new GLTFTextureBasisUExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
+			return new GLTFMaterialsTransmissionExtension( parser );
 
 		} );
 
@@ -332,6 +339,7 @@ THREE.GLTFLoader = ( function () {
 		KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
 		KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
+		KHR_MATERIALS_TRANSMISSION: 'KHR_materials_transmission',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
 		KHR_TEXTURE_BASISU: 'KHR_texture_basisu',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
@@ -544,6 +552,55 @@ THREE.GLTFLoader = ( function () {
 				materialParams.clearcoatNormalScale = new THREE.Vector2( scale, scale );
 
 			}
+
+		}
+
+		return Promise.all( pending );
+
+	};
+
+	/**
+	 * Transmission Materials Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_materials_transmission
+	 */
+	function GLTFMaterialsTransmissionExtension( parser ) {
+
+		this.parser = parser;
+		this.name = EXTENSIONS.KHR_MATERIALS_TRANSMISSION;
+
+	}
+
+	GLTFMaterialsTransmissionExtension.prototype.getMaterialType = function ( /* materialIndex */ ) {
+
+		return THREE.MeshPhysicalMaterial;
+
+	};
+
+	GLTFMaterialsTransmissionExtension.prototype.extendMaterialParams = function ( materialIndex, materialParams ) {
+
+		var parser = this.parser;
+		var materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) {
+
+			return Promise.resolve();
+
+		}
+
+		var pending = [];
+
+		var extension = materialDef.extensions[ this.name ];
+
+		if ( extension.transmissionFactor !== undefined ) {
+
+			materialParams.transmission = extension.transmissionFactor;
+
+		}
+
+		if ( extension.transmissionTexture !== undefined ) {
+
+			pending.push( parser.assignTexture( materialParams, 'transmissionMap', extension.transmissionTexture ) );
 
 		}
 

@@ -566,7 +566,13 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		uniforms.transparency.value = material.transparency;
+		uniforms.transmission.value = material.transmission;
+
+		if ( material.transmissionMap ) {
+
+			uniforms.transmissionMap.value = material.transmissionMap;
+
+		}
 
 	}
 
