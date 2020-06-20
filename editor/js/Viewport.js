@@ -553,7 +553,7 @@ function Viewport( editor ) {
 
 					var renderTarget = new THREE.WebGLCubeRenderTarget( 512 );
 					renderTarget.fromEquirectangularTexture( renderer, backgroundEquirectangularTexture );
-					renderTarget.toJSON = function () { return null };
+					renderTarget.toJSON = function () { return null }; // TODO Remove hack
 
 					scene.background = renderTarget;
 
