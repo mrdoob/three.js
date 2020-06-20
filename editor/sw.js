@@ -18,6 +18,10 @@ const assets = [
 	'../examples/js/libs/draco/draco_encoder.js',
 	'../examples/js/libs/draco/draco_wasm_wrapper.js',
 
+	'../examples/js/libs/draco/gltf/draco_decoder.js',
+	'../examples/js/libs/draco/gltf/draco_decoder.wasm',
+	'../examples/js/libs/draco/gltf/draco_wasm_wrapper.js',
+
 	'../examples/jsm/loaders/3MFLoader.js',
 	'../examples/jsm/loaders/AMFLoader.js',
 	'../examples/jsm/loaders/ColladaLoader.js',
