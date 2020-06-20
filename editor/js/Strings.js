@@ -81,6 +81,7 @@ function Strings( config ) {
 
 			'sidebar/scene': 'Scene',
 			'sidebar/scene/background': 'Background',
+			'sidebar/scene/environment': 'Environment',
 			'sidebar/scene/fog': 'Fog',
 
 			'sidebar/properties/object': 'Object',
@@ -398,6 +399,7 @@ function Strings( config ) {
 
 			'sidebar/scene': 'Scène',
 			'sidebar/scene/background': 'Arrière Plan',
+			'sidebar/scene/environment': 'Environment',
 			'sidebar/scene/fog': 'Brouillard',
 
 			'sidebar/properties/object': 'Objet',
@@ -715,6 +717,7 @@ function Strings( config ) {
 
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
+			'sidebar/scene/environment': 'Environment',
 			'sidebar/scene/fog': '雾',
 
 			'sidebar/properties/object': '属性',

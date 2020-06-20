@@ -44,6 +44,7 @@ function Editor() {
 		rendererUpdated: new Signal(),
 
 		sceneBackgroundChanged: new Signal(),
+		sceneEnvironmentChanged: new Signal(),
 		sceneFogChanged: new Signal(),
 		sceneGraphChanged: new Signal(),
 		sceneRendered: new Signal(),
@@ -94,7 +95,6 @@ function Editor() {
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
-	this.scene.background = new THREE.Color( 0xaaaaaa );
 
 	this.sceneHelpers = new THREE.Scene();
 
@@ -612,9 +612,11 @@ Editor.prototype = {
 		this.storage.clear();
 
 		this.camera.copy( this.DEFAULT_CAMERA );
+
 		this.scene.name = "Scene";
 		this.scene.userData = {};
-		this.scene.background = new THREE.Color( 0xaaaaaa );
+		this.scene.background = null;
+		this.scene.environment = null;
 		this.scene.fog = null;
 
 		var objects = this.scene.children;
