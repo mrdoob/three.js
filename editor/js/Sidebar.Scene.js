@@ -350,19 +350,9 @@ function SidebarScene( editor ) {
 				backgroundTexture.setValue( null );
 				backgroundEquirectangularTexture.setValue( null );
 
-			} else if ( scene.background.isEquirectangularTexture ) {
-
-				backgroundType.setValue( "Equirectangular" );
-				backgroundTexture.setValue( null );
-				backgroundEquirectangularTexture.setValue( scene.background );
-
-			} else if ( scene.background.isTexture ) {
-
-				backgroundType.setValue( "Texture" );
-				backgroundTexture.setValue( scene.background );
-				backgroundEquirectangularTexture.setValue( null );
-
 			}
+
+			// TODO: Add Texture/EquirectangularTexture support
 
 		} else {
 
