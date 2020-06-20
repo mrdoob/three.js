@@ -1533,7 +1533,30 @@ var GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
-		this.useImageBitmap = typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false;
+		// Firefox doesn't support ImageBitmapOptions: https://bugzilla.mozilla.org/show_bug.cgi?id=1367251
+		function premultiplyAlphaSupported() {
+
+			let premultiplyAlphaSupported = false;
+			try {
+
+				let options = {};
+				Object.defineProperty( options, 'premultiplyAlpha', {
+					get: function () {
+
+						premultiplyAlphaSupported = true;
+						return 'none';
+
+					}
+				} );
+				createImageBitmap( new Image(), options ).catch( function () {} );
+
+			} catch ( ex ) {}
+
+			return premultiplyAlphaSupported;
+
+		}
+
+		this.useImageBitmap = typeof createImageBitmap !== 'undefined' && premultiplyAlphaSupported();
 
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
