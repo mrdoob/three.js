@@ -11,8 +11,6 @@ function WebGLAnimation() {
 
 	function onAnimationFrame( time, frame ) {
 
-		if ( isAnimating === false ) return;
-
 		animationLoop( time, frame );
 
 		requestId = context.requestAnimationFrame( onAnimationFrame );
