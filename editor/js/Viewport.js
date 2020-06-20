@@ -351,11 +351,25 @@ function Viewport( editor ) {
 
 		renderer = newRenderer;
 
+		renderer.setClearColor( 0xaaaaaa );
+
+		if ( window.matchMedia ) {
+
+			var mediaQuery = window.matchMedia( '(prefers-color-scheme: dark)' );
+			mediaQuery.addListener( function ( event ) {
+
+				renderer.setClearColor( event.matches ? 0x333333 : 0xaaaaaa );
+
+				if ( scene.background === null ) render();
+
+			} );
+
+			renderer.setClearColor( mediaQuery.matches ? 0x333333 : 0xaaaaaa );
+
+		}
+
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
-
-		var isDarkMode = window.matchMedia && window.matchMedia( '(prefers-color-scheme: dark)' ).matches;
-		renderer.setClearColor( isDarkMode ? 0x333333 : 0xaaaaaa );
 
 		pmremGenerator = new THREE.PMREMGenerator( renderer );
 		pmremGenerator.compileEquirectangularShader();
