@@ -3,7 +3,7 @@
  */
 
 import { UIPanel, UIBreak, UIRow, UIColor, UISelect, UIText, UINumber } from './libs/ui.js';
-import { UIOutliner, UITexture, UICubeTexture } from './libs/ui.three.js';
+import { UIOutliner, UITexture } from './libs/ui.three.js';
 
 function SidebarScene( editor ) {
 
@@ -160,26 +160,9 @@ function SidebarScene( editor ) {
 			backgroundType.getValue(),
 			backgroundColor.getHexValue(),
 			backgroundTexture.getValue(),
-			backgroundCubeTexture.getValue(),
-			backgroundEquirectTexture.getValue()
+			backgroundEquirectangularTexture.getValue(),
+			environmentType.getValue()
 		);
-
-	}
-
-	function onTextureChanged( texture ) {
-
-		texture.encoding = texture.isHDRTexture ? THREE.RGBEEncoding : THREE.sRGBEncoding;
-
-		if ( texture.isCubeTexture && texture.isHDRTexture ) {
-
-			texture.format = THREE.RGBAFormat;
-			texture.minFilter = THREE.NearestFilter;
-			texture.magFilter = THREE.NearestFilter;
-			texture.generateMipmaps = false;
-
-		}
-
-		onBackgroundChanged();
 
 	}
 
@@ -190,8 +173,7 @@ function SidebarScene( editor ) {
 		'None': 'None',
 		'Color': 'Color',
 		'Texture': 'Texture',
-		'CubeTexture': 'CubeTexture',
-		'Equirect': 'Equirect (HDR)'
+		'Equirectangular': 'Equirectangular'
 
 	} ).setWidth( '150px' );
 	backgroundType.onChange( function () {
@@ -212,7 +194,7 @@ function SidebarScene( editor ) {
 	var colorRow = new UIRow();
 	colorRow.setMarginLeft( '90px' );
 
-	var backgroundColor = new UIColor().setValue( '#aaaaaa' ).onChange( onBackgroundChanged );
+	var backgroundColor = new UIColor().setValue( '#000000' ).onChange( onBackgroundChanged );
 	colorRow.add( backgroundColor );
 
 	container.add( colorRow );
@@ -223,32 +205,21 @@ function SidebarScene( editor ) {
 	textureRow.setDisplay( 'none' );
 	textureRow.setMarginLeft( '90px' );
 
-	var backgroundTexture = new UITexture().onChange( onTextureChanged );
+	var backgroundTexture = new UITexture().onChange( onBackgroundChanged );
 	textureRow.add( backgroundTexture );
 
 	container.add( textureRow );
 
 	//
 
-	var cubeTextureRow = new UIRow();
-	cubeTextureRow.setDisplay( 'none' );
-	cubeTextureRow.setMarginLeft( '90px' );
+	var equirectangularRow = new UIRow();
+	equirectangularRow.setDisplay( 'none' );
+	equirectangularRow.setMarginLeft( '90px' );
 
-	var backgroundCubeTexture = new UICubeTexture().onChange( onTextureChanged );
-	cubeTextureRow.add( backgroundCubeTexture );
+	var backgroundEquirectangularTexture = new UITexture().onChange( onBackgroundChanged );
+	equirectangularRow.add( backgroundEquirectangularTexture );
 
-	container.add( cubeTextureRow );
-
-	//
-
-	var equirectRow = new UIRow();
-	equirectRow.setDisplay( 'none' );
-	equirectRow.setMarginLeft( '90px' );
-
-	var backgroundEquirectTexture = new UITexture().onChange( onTextureChanged );
-	equirectRow.add( backgroundEquirectTexture );
-
-	container.add( equirectRow );
+	container.add( equirectangularRow );
 
 	//
 
@@ -258,10 +229,31 @@ function SidebarScene( editor ) {
 
 		colorRow.setDisplay( type === 'Color' ? '' : 'none' );
 		textureRow.setDisplay( type === 'Texture' ? '' : 'none' );
-		cubeTextureRow.setDisplay( type === 'CubeTexture' ? '' : 'none' );
-		equirectRow.setDisplay( type === 'Equirect' ? '' : 'none' );
+		equirectangularRow.setDisplay( type === 'Equirectangular' ? '' : 'none' );
 
 	}
+
+	// environment
+
+	var environmentRow = new UIRow();
+
+	var environmentType = new UISelect().setOptions( {
+
+		'None': 'None',
+		'Background': 'Background'
+
+	} ).setWidth( '150px' );
+	environmentType.setValue( 'None' );
+	environmentType.onChange( function () {
+
+		signals.sceneEnvironmentChanged.dispatch( environmentType.getValue() );
+
+	} );
+
+	environmentRow.add( new UIText( strings.getKey( 'sidebar/scene/environment' ) ).setWidth( '90px' ) );
+	environmentRow.add( environmentType );
+
+	container.add( environmentRow );
 
 	// fog
 
@@ -376,22 +368,19 @@ function SidebarScene( editor ) {
 				backgroundType.setValue( "Color" );
 				backgroundColor.setHexValue( scene.background.getHex() );
 				backgroundTexture.setValue( null );
-				backgroundCubeTexture.setValue( null );
-				backgroundEquirectTexture.setValue( null );
+				backgroundEquirectangularTexture.setValue( null );
 
-			} else if ( scene.background.isTexture && ! scene.background.isPmremTexture ) {
+			} else if ( scene.background.isEquirectangularTexture ) {
+
+				backgroundType.setValue( "Equirectangular" );
+				backgroundTexture.setValue( null );
+				backgroundEquirectangularTexture.setValue( scene.background );
+
+			} else if ( scene.background.isTexture ) {
 
 				backgroundType.setValue( "Texture" );
 				backgroundTexture.setValue( scene.background );
-				backgroundCubeTexture.setValue( null );
-				backgroundEquirectTexture.setValue( null );
-
-			} else if ( scene.background.isCubeTexture ) {
-
-				backgroundType.setValue( "CubeTexture" );
-				backgroundCubeTexture.setValue( scene.background );
-				backgroundTexture.setValue( null );
-				backgroundEquirectTexture.setValue( null );
+				backgroundEquirectangularTexture.setValue( null );
 
 			}
 
@@ -399,6 +388,17 @@ function SidebarScene( editor ) {
 
 			backgroundType.setValue( "None" );
 			backgroundTexture.setValue( null );
+			backgroundEquirectangularTexture.setValue( null );
+
+		}
+
+		if ( scene.environment ) {
+
+			// TODO
+
+		} else {
+
+			environmentType.setValue( "None" );
 
 		}
 

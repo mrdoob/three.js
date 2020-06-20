@@ -32,6 +32,7 @@ function Viewport( editor ) {
 
 	var renderer = null;
 	var pmremGenerator = null;
+	var pmremTexture = null;
 
 	var camera = editor.camera;
 	var scene = editor.scene;
@@ -298,8 +299,6 @@ function Viewport( editor ) {
 	signals.editorCleared.add( function () {
 
 		controls.center.set( 0, 0, 0 );
-		currentBackgroundType = null;
-		currentFogType = null;
 		render();
 
 	} );
@@ -344,6 +343,7 @@ function Viewport( editor ) {
 
 			renderer.dispose();
 			pmremGenerator.dispose();
+			pmremTexture = null;
 
 			container.dom.removeChild( renderer.domElement );
 
@@ -351,13 +351,13 @@ function Viewport( editor ) {
 
 		renderer = newRenderer;
 
-		renderer.autoClear = false;
-		renderer.autoUpdateScene = false;
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
+		var isDarkMode = window.matchMedia && window.matchMedia( '(prefers-color-scheme: dark)' ).matches;
+		renderer.setClearColor( isDarkMode ? 0x333333 : 0xaaaaaa );
+
 		pmremGenerator = new THREE.PMREMGenerator( renderer );
-		pmremGenerator.compileCubemapShader();
 		pmremGenerator.compileEquirectangularShader();
 
 		container.dom.appendChild( renderer.domElement );
@@ -503,68 +503,74 @@ function Viewport( editor ) {
 
 	// background
 
-	var currentBackgroundType = null;
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, environmentType ) {
 
-	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundCubeTexture, backgroundEquirectTexture ) {
+		pmremTexture = null;
 
-		if ( currentBackgroundType !== backgroundType ) {
+		switch ( backgroundType ) {
 
-			switch ( backgroundType ) {
+			case 'None':
 
-				case 'None':
-					scene.background = null;
-					break;
-				case 'Color':
-					scene.background = new THREE.Color();
-					break;
+				scene.background = null;
 
-			}
+				break;
+
+			case 'Color':
+
+				scene.background = new THREE.Color( backgroundColor );
+
+				break;
+
+			case 'Texture':
+
+				if ( backgroundTexture ) {
+
+					scene.background = backgroundTexture;
+
+				}
+
+				break;
+
+			case 'Equirectangular':
+
+				if ( backgroundEquirectangularTexture ) {
+
+					pmremTexture = pmremGenerator.fromEquirectangular( backgroundEquirectangularTexture ).texture;
+
+					var renderTarget = new THREE.WebGLCubeRenderTarget( 512 );
+					renderTarget.fromEquirectangularTexture( renderer, backgroundEquirectangularTexture );
+					renderTarget.toJSON = function () { return null };
+
+					scene.background = renderTarget;
+
+				}
+
+				break;
 
 		}
 
-		if ( backgroundType === 'Color' ) {
+		if ( environmentType === 'Background' ) {
 
-			scene.background.set( backgroundColor );
-			scene.environment = null;
+			scene.environment = pmremTexture;
 
-		} else if ( backgroundType === 'Texture' ) {
+		}
 
-			scene.background = backgroundTexture;
-			scene.environment = null;
+		render();
 
-		} else if ( backgroundType === 'CubeTexture' ) {
+	} );
 
-			if ( backgroundCubeTexture && backgroundCubeTexture.isHDRTexture ) {
+	// environment
 
-				var texture = pmremGenerator.fromCubemap( backgroundCubeTexture ).texture;
-				texture.isPmremTexture = true;
+	signals.sceneEnvironmentChanged.add( function ( environmentType ) {
 
-				scene.background = texture;
-				scene.environment = texture;
+		switch ( environmentType ) {
 
-			} else {
-
-				scene.background = backgroundCubeTexture;
+			case 'None':
 				scene.environment = null;
-
-			}
-
-		} else if ( backgroundType === 'Equirect' ) {
-
-			if ( backgroundEquirectTexture && backgroundEquirectTexture.isHDRTexture ) {
-
-				var texture = pmremGenerator.fromEquirectangular( backgroundEquirectTexture ).texture;
-				texture.isPmremTexture = true;
-
-				scene.background = texture;
-				scene.environment = texture;
-
-			} else {
-
-				scene.background = null;
-				scene.environment = null;
-
-			}
+				break;
+			case 'Background':
+				scene.environment = pmremTexture;
+				break;
 
 		}
 
@@ -574,44 +580,19 @@ function Viewport( editor ) {
 
 	// fog
 
-	var currentFogType = null;
-
 	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
 
-		if ( currentFogType !== fogType ) {
+		switch ( fogType ) {
 
-			switch ( fogType ) {
-
-				case 'None':
-					scene.fog = null;
-					break;
-				case 'Fog':
-					scene.fog = new THREE.Fog();
-					break;
-				case 'FogExp2':
-					scene.fog = new THREE.FogExp2();
-					break;
-
-			}
-
-			currentFogType = fogType;
-
-		}
-
-		if ( scene.fog ) {
-
-			if ( scene.fog.isFog ) {
-
-				scene.fog.color.setHex( fogColor );
-				scene.fog.near = fogNear;
-				scene.fog.far = fogFar;
-
-			} else if ( scene.fog.isFogExp2 ) {
-
-				scene.fog.color.setHex( fogColor );
-				scene.fog.density = fogDensity;
-
-			}
+			case 'None':
+				scene.fog = null;
+				break;
+			case 'Fog':
+				scene.fog = new THREE.Fog( fogColor, fogNear, fogFar );
+				break;
+			case 'FogExp2':
+				scene.fog = new THREE.FogExp2( fogColor, fogDensity );
+				break;
 
 		}
 
@@ -696,13 +677,13 @@ function Viewport( editor ) {
 
 		startTime = performance.now();
 
-		scene.updateMatrixWorld();
 		renderer.render( scene, camera );
 
 		if ( camera === editor.camera ) {
 
-			sceneHelpers.updateMatrixWorld();
+			renderer.autoClear = false;
 			renderer.render( sceneHelpers, camera );
+			renderer.autoClear = true;
 
 		}
 
