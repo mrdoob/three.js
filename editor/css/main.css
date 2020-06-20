@@ -26,6 +26,13 @@ input {
 	vertical-align: middle;
 }
 
+	input[type="color"]::-webkit-color-swatch-wrapper {
+		padding: 0;
+	}
+	input[type="color"]::-webkit-color-swatch {
+		border: none;
+	}
+
 textarea {
 	tab-size: 4;
 	white-space: pre;

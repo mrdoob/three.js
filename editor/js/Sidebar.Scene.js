@@ -173,7 +173,7 @@ function SidebarScene( editor ) {
 		'None': 'None',
 		'Color': 'Color',
 		'Texture': 'Texture',
-		'Equirectangular': 'Equirectangular'
+		'Equirectangular': 'Equirect'
 
 	} ).setWidth( '150px' );
 	backgroundType.onChange( function () {
@@ -187,39 +187,18 @@ function SidebarScene( editor ) {
 	backgroundRow.add( new UIText( strings.getKey( 'sidebar/scene/background' ) ).setWidth( '90px' ) );
 	backgroundRow.add( backgroundType );
 
+	var backgroundColor = new UIColor().setValue( '#000000' ).setMarginLeft( '8px' ).onChange( onBackgroundChanged );
+	backgroundRow.add( backgroundColor );
+
+	var backgroundTexture = new UITexture().setMarginLeft( '8px' ).onChange( onBackgroundChanged );
+	backgroundTexture.setDisplay( 'none' );
+	backgroundRow.add( backgroundTexture );
+
+	var backgroundEquirectangularTexture = new UITexture().setMarginLeft( '8px' ).onChange( onBackgroundChanged );
+	backgroundEquirectangularTexture.setDisplay( 'none' );
+	backgroundRow.add( backgroundEquirectangularTexture );
+
 	container.add( backgroundRow );
-
-	//
-
-	var colorRow = new UIRow();
-	colorRow.setMarginLeft( '90px' );
-
-	var backgroundColor = new UIColor().setValue( '#000000' ).onChange( onBackgroundChanged );
-	colorRow.add( backgroundColor );
-
-	container.add( colorRow );
-
-	//
-
-	var textureRow = new UIRow();
-	textureRow.setDisplay( 'none' );
-	textureRow.setMarginLeft( '90px' );
-
-	var backgroundTexture = new UITexture().onChange( onBackgroundChanged );
-	textureRow.add( backgroundTexture );
-
-	container.add( textureRow );
-
-	//
-
-	var equirectangularRow = new UIRow();
-	equirectangularRow.setDisplay( 'none' );
-	equirectangularRow.setMarginLeft( '90px' );
-
-	var backgroundEquirectangularTexture = new UITexture().onChange( onBackgroundChanged );
-	equirectangularRow.add( backgroundEquirectangularTexture );
-
-	container.add( equirectangularRow );
 
 	//
 
@@ -227,9 +206,10 @@ function SidebarScene( editor ) {
 
 		var type = backgroundType.getValue();
 
-		colorRow.setDisplay( type === 'Color' ? '' : 'none' );
-		textureRow.setDisplay( type === 'Texture' ? '' : 'none' );
-		equirectangularRow.setDisplay( type === 'Equirectangular' ? '' : 'none' );
+		backgroundType.setWidth( type === 'None' ? '150px' : '110px' );
+		backgroundColor.setDisplay( type === 'Color' ? '' : 'none' );
+		backgroundTexture.setDisplay( type === 'Texture' ? '' : 'none' );
+		backgroundEquirectangularTexture.setDisplay( type === 'Equirectangular' ? '' : 'none' );
 
 	}
 
