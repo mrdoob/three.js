@@ -614,6 +614,26 @@ function Viewport( editor ) {
 
 	} );
 
+	signals.sceneFogSettingsChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
+
+		switch ( fogType ) {
+
+			case 'Fog':
+				scene.fog.color.setHex( fogColor );
+				scene.fog.near = fogNear;
+				scene.fog.far = fogFar;
+				break;
+			case 'FogExp2':
+				scene.fog.color.setHex( fogColor );
+				scene.fog.density = fogDensity;
+				break;
+
+		}
+
+		render();
+
+	} );
+
 	signals.viewportCameraChanged.add( function ( viewportCamera ) {
 
 		if ( viewportCamera.isPerspectiveCamera ) {

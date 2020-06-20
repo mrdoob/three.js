@@ -249,6 +249,18 @@ function SidebarScene( editor ) {
 
 	}
 
+	function onFogSettingsChanged() {
+
+		signals.sceneFogSettingsChanged.dispatch(
+			fogType.getValue(),
+			fogColor.getHexValue(),
+			fogNear.getValue(),
+			fogFar.getValue(),
+			fogDensity.getValue()
+		);
+
+	}
+
 	var fogTypeRow = new UIRow();
 	var fogType = new UISelect().setOptions( {
 
@@ -277,22 +289,22 @@ function SidebarScene( editor ) {
 	container.add( fogPropertiesRow );
 
 	var fogColor = new UIColor().setValue( '#aaaaaa' );
-	fogColor.onChange( onFogChanged );
+	fogColor.onChange( onFogSettingsChanged );
 	fogPropertiesRow.add( fogColor );
 
 	// fog near
 
-	var fogNear = new UINumber( 0.1 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogChanged );
+	var fogNear = new UINumber( 0.1 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogSettingsChanged );
 	fogPropertiesRow.add( fogNear );
 
 	// fog far
 
-	var fogFar = new UINumber( 50 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogChanged );
+	var fogFar = new UINumber( 50 ).setWidth( '40px' ).setRange( 0, Infinity ).onChange( onFogSettingsChanged );
 	fogPropertiesRow.add( fogFar );
 
 	// fog density
 
-	var fogDensity = new UINumber( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setStep( 0.001 ).setPrecision( 3 ).onChange( onFogChanged );
+	var fogDensity = new UINumber( 0.05 ).setWidth( '40px' ).setRange( 0, 0.1 ).setStep( 0.001 ).setPrecision( 3 ).onChange( onFogSettingsChanged );
 	fogPropertiesRow.add( fogDensity );
 
 	//
