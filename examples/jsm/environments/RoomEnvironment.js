@@ -6,7 +6,7 @@
 
 import * as THREE from '../../../build/three.module.js';
 
-function RoomEnvironment( renderer ) {
+function RoomEnvironment() {
 
 	const scene = new THREE.Scene();
 
@@ -106,10 +106,7 @@ function RoomEnvironment( renderer ) {
 
 	}
 
-	let pmremGenerator = new THREE.PMREMGenerator( renderer );
-	let renderTarget = pmremGenerator.fromScene( scene );
-
-	return renderTarget.texture;
+	return scene;
 
 }
 
