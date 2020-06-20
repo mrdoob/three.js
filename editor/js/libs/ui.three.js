@@ -943,16 +943,14 @@ function renderToCanvas( texture ) {
 
 	if ( renderer === undefined ) {
 
-		renderer = new THREE.WebGLRenderer( { canvas: new OffscreenCanvas( 1, 1 ) } );
+		renderer = new THREE.WebGLRenderer();
+		renderer.outputEncoding = THREE.sRGBEncoding;
 
 	}
 
 	var image = texture.image;
 
 	renderer.setSize( image.width, image.height, false );
-	renderer.toneMapping = THREE.ReinhardToneMapping;
-	renderer.toneMappingExposure = 2;
-	renderer.outputEncoding = THREE.sRGBEncoding;
 
 	var scene = new THREE.Scene();
 	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
