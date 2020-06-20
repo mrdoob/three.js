@@ -42165,7 +42165,7 @@
 
 		Loader.call( this, manager );
 
-		this.options = undefined;
+		this.options = { premultiplyAlpha: 'none' };
 
 	}
 
@@ -42215,16 +42215,7 @@
 
 			} ).then( function ( blob ) {
 
-				if ( scope.options === undefined ) {
-
-					// Workaround for FireFox. It causes an error if you pass options.
-					return createImageBitmap( blob );
-
-				} else {
-
-					return createImageBitmap( blob, scope.options );
-
-				}
+				return createImageBitmap( blob, scope.options );
 
 			} ).then( function ( imageBitmap ) {
 
