@@ -6,6 +6,10 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
+			#info {
+				background: rgba(0, 0, 0, 0.3);
+			}
+
 			.container {
 				position: absolute;
 				width: 100%;
@@ -56,7 +60,7 @@
 				container = document.querySelector( '.container' );
 
 				sceneL = new THREE.Scene();
-				sceneL.background = new THREE.Color( 0xff00ff );
+				sceneL.background = new THREE.Color( 0xffffff );
 
 				sceneR = new THREE.Scene();
 				sceneR.background = new THREE.Color( 0x8FBCD4 );
@@ -89,12 +93,12 @@
 			function initMeshes() {
 
 				var geoB = new THREE.BoxBufferGeometry( 2, 2, 2 );
-				var matB = new THREE.MeshStandardMaterial( { color: 0x0000ff } );
+				var matB = new THREE.MeshStandardMaterial( { color: 0x8FBCD4 } );
 				var meshB = new THREE.Mesh( geoB, matB );
 				sceneL.add( meshB );
 
 				var geoA = new THREE.IcosahedronBufferGeometry( 1, 0 );
-				var matA = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				var matA = new THREE.MeshStandardMaterial( { color: 0xffffff } );
 				var meshA = new THREE.Mesh( geoA, matA );
 				sceneR.add( meshA );
 
