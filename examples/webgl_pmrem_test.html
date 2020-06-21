@@ -10,7 +10,7 @@
 
 		<div id="container">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 				PMREM directional light test <a href="https://github.com/elalish" target="_blank" rel="noopener">Emmett Lalish</a>
 				<br>Top row is white metal
 				<br>Middle row is white dielectric
@@ -29,7 +29,7 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var scene, camera, controls, renderer;
-			
+
 			function init() {
 
 				var width = window.innerWidth;
@@ -46,7 +46,7 @@
 
 				// tonemapping
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
-				renderer.toneMappingExposure = 1;
+				renderer.toneMappingExposure = 1.75;
 
 				document.body.appendChild( renderer.domElement );
 
@@ -182,7 +182,7 @@
 				render();
 
 			}
-			
+
 			function updateCamera() {
 
 				var horizontalFoV = 40;
@@ -197,7 +197,7 @@
 				renderer.render( scene, camera );
 
 			}
-			
+
 			Promise.resolve()
 				.then( init )
 				.then( createObjects )

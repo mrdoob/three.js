@@ -6,7 +6,7 @@ import { Matrix3 } from '../../math/Matrix3.js';
  * Uniforms library for shared webgl shaders
  */
 
-var UniformsLib = {
+const UniformsLib = {
 
 	common: {
 
@@ -114,10 +114,12 @@ var UniformsLib = {
 
 		directionalLights: { value: [], properties: {
 			direction: {},
-			color: {},
+			color: {}
+		} },
 
-			shadow: {},
+		directionalLightShadows: { value: [], properties: {
 			shadowBias: {},
+			shadowNormalOffset: {},
 			shadowRadius: {},
 			shadowMapSize: {}
 		} },
@@ -132,10 +134,12 @@ var UniformsLib = {
 			distance: {},
 			coneCos: {},
 			penumbraCos: {},
-			decay: {},
+			decay: {}
+		} },
 
-			shadow: {},
+		spotLightShadows: { value: [], properties: {
 			shadowBias: {},
+			shadowNormalOffset: {},
 			shadowRadius: {},
 			shadowMapSize: {}
 		} },
@@ -147,10 +151,12 @@ var UniformsLib = {
 			color: {},
 			position: {},
 			decay: {},
-			distance: {},
+			distance: {}
+		} },
 
-			shadow: {},
+		pointLightShadows: { value: [], properties: {
 			shadowBias: {},
+			shadowNormalOffset: {},
 			shadowRadius: {},
 			shadowMapSize: {},
 			shadowCameraNear: {},

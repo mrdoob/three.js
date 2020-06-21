@@ -13,7 +13,7 @@ import {
 export interface Variable {
 	name: string;
 	initialValueTexture: Texture;
-	material: Material;
+	material: ShaderMaterial;
 	dependencies: Variable[];
 	renderTargets: RenderTarget[];
 	wrapS: number;

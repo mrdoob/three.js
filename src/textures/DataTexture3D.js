@@ -10,7 +10,7 @@ function DataTexture3D( data, width, height, depth ) {
 	// We're going to add .setXXX() methods for setting properties later.
 	// Users can still set in DataTexture3D directly.
 	//
-	//	var texture = new THREE.DataTexture3D( data, width, height, depth );
+	//	const texture = new THREE.DataTexture3D( data, width, height, depth );
 	// 	texture.anisotropy = 16;
 	//
 	// See #14839

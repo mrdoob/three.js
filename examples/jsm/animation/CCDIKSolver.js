@@ -407,7 +407,7 @@ var CCDIKSolver = ( function () {
 
 		_init: function () {
 
-			var self = this;
+			var scope = this;
 			var iks = this.iks;
 
 			function createLineGeometry( ik ) {
@@ -422,25 +422,25 @@ var CCDIKSolver = ( function () {
 
 			function createTargetMesh() {
 
-				return new Mesh( self.sphereGeometry, self.targetSphereMaterial );
+				return new Mesh( scope.sphereGeometry, scope.targetSphereMaterial );
 
 			}
 
 			function createEffectorMesh() {
 
-				return new Mesh( self.sphereGeometry, self.effectorSphereMaterial );
+				return new Mesh( scope.sphereGeometry, scope.effectorSphereMaterial );
 
 			}
 
 			function createLinkMesh() {
 
-				return new Mesh( self.sphereGeometry, self.linkSphereMaterial );
+				return new Mesh( scope.sphereGeometry, scope.linkSphereMaterial );
 
 			}
 
 			function createLine( ik ) {
 
-				return new Line( createLineGeometry( ik ), self.lineMaterial );
+				return new Line( createLineGeometry( ik ), scope.lineMaterial );
 
 			}
 

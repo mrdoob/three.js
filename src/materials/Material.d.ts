@@ -9,7 +9,6 @@ import {
 	BlendingSrcFactor,
 	DepthModes,
 	Side,
-	Colors,
 	StencilFunc,
 	StencilOp
 } from '../constants';
@@ -48,8 +47,7 @@ export interface MaterialParameters {
 	shadowSide?: Side;
 	toneMapped?: boolean;
 	transparent?: boolean;
-	vertexColors?: Colors;
-	vertexTangents?: boolean;
+	vertexColors?: boolean;
 	visible?: boolean;
 	stencilWrite?: boolean;
 	stencilFunc?: StencilFunc;
@@ -258,6 +256,12 @@ export class Material extends EventDispatcher {
 	side: Side;
 
 	/**
+	 * Defines which of the face sides will cast shadows. Default is *null*.
+	 * If *null*, the value is opposite that of side, above.
+	 */
+	shadowSide: Side;
+
+	/**
 	 * Defines whether this material is tone mapped according to the renderer's toneMapping setting.
 	 * Default is true.
 	 */
@@ -281,14 +285,9 @@ export class Material extends EventDispatcher {
 	uuid: string;
 
 	/**
-	 * Defines whether vertex coloring is used. Default is THREE.NoColors. Other options are THREE.VertexColors and THREE.FaceColors.
+	 * Defines whether vertex coloring is used. Default is false.
 	 */
-	vertexColors: Colors;
-
-	/**
-	 * Defines whether precomputed vertex tangents are used. Default is false.
-	 */
-	vertexTangents: boolean;
+	vertexColors: boolean;
 
 	/**
 	 * Defines whether this material is visible. Default is true.
@@ -327,6 +326,11 @@ export class Material extends EventDispatcher {
 	 * @param renderer WebGLRenderer Context that is initializing the material
 	 */
 	onBeforeCompile ( shader : Shader, renderer : WebGLRenderer ) : void;
+
+	/**
+	 * In case onBeforeCompile is used, this callback can be used to identify values of settings used in onBeforeCompile, so three.js can reuse a cached shader or recompile the shader as needed.
+	 */
+	customProgramCacheKey(): string;
 
 	/**
 	 * Sets the properties based on the values.

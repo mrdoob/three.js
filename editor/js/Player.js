@@ -2,12 +2,10 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import * as THREE from '../../build/three.module.js';
-
 import { UIPanel } from './libs/ui.js';
 import { APP } from './libs/app.js';
 
-var Player = function ( editor ) {
+function Player( editor ) {
 
 	var signals = editor.signals;
 
@@ -18,7 +16,7 @@ var Player = function ( editor ) {
 
 	//
 
-	var player = new APP.Player( THREE );
+	var player = new APP.Player();
 	container.dom.appendChild( player.dom );
 
 	window.addEventListener( 'resize', function () {
@@ -48,6 +46,6 @@ var Player = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { Player };

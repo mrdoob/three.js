@@ -33,8 +33,15 @@
 			有关更新目标的详细信息，请参阅 [page:.target target] 下面的目标属性。
 		</p>
 
+		<h2>代码示例</h2>
 
-		<h2>示例</h2>
+		<code>
+		// White directional light at half intensity shining from the top.
+		var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		scene.add( directionalLight );
+		</code>
+
+		<h2>例子</h2>
 		<p>
 			[example:misc_controls_fly controls / fly ]<br />
 			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
@@ -43,13 +50,6 @@
 			[example:webgl_materials_bumpmap materials / bumpmap ]<br />
 			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection ]
 		</p>
-
-		<code>
-		// White directional light at half intensity shining from the top.
-		var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-		scene.add( directionalLight );
-		</code>
-
 
 		<h2>构造器</h2>
 
@@ -63,7 +63,7 @@
 
 		<h2>属性</h2>
 
-		公共属性请查看基类 [page:Light Light]。
+		<p>公共属性请查看基类 [page:Light Light]。</p>
 
 		<h3>[property:Boolean castShadow]</h3>
 		<p>
@@ -110,7 +110,7 @@
 
 		<h2>方法</h2>
 
-		公共方法请查看基类 [page:Light Light]。
+		<p>公共方法请查看基类 [page:Light Light]。</p>
 
 		<h3>[method:DirectionalLight copy]( [param:DirectionalLight source] )</h3>
 		<p>

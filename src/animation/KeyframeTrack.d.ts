@@ -29,7 +29,7 @@ export class KeyframeTrack {
 	setInterpolation( interpolation: InterpolationModes ): KeyframeTrack;
 	getInterpolation(): InterpolationModes;
 
-	getValuesize(): number;
+	getValueSize(): number;
 
 	shift( timeOffset: number ): KeyframeTrack;
 	scale( timeScale: number ): KeyframeTrack;

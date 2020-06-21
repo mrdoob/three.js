@@ -15,7 +15,7 @@ export class Ray {
 	clone(): this;
 	copy( ray: Ray ): this;
 	at( t: number, target: Vector3 ): Vector3;
-	lookAt( v: Vector3 ): Vector3;
+	lookAt( v: Vector3 ): Ray;
 	recast( t: number ): Ray;
 	closestPointToPoint( point: Vector3, target: Vector3 ): Vector3;
 	distanceToPoint( point: Vector3 ): number;

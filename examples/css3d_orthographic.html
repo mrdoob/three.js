@@ -18,7 +18,7 @@
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - orthographic</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> css3d - orthographic</div>
 
 		<script type="module">
 
@@ -92,6 +92,8 @@
 				document.body.appendChild( renderer2.domElement );
 
 				var controls = new OrbitControls( camera, renderer2.domElement );
+				controls.minZoom = 0.5;
+				controls.maxZoom = 2;
 
 				function createPlane( width, height, cssColor, pos, rot ) {
 

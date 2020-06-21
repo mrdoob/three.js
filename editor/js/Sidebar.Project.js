@@ -4,16 +4,18 @@
 
 import * as THREE from '../../build/three.module.js';
 
-import { UIPanel, UIRow, UIInput, UICheckbox, UIText, UIListbox, UISpan, UIButton } from './libs/ui.js';
+import { UIPanel, UIRow, UIInput, UICheckbox, UIText, UIListbox, UISpan, UIButton, UISelect, UINumber } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
 
-var SidebarProject = function ( editor ) {
+function SidebarProject( editor ) {
 
 	var config = editor.config;
 	var signals = editor.signals;
 	var strings = editor.strings;
+
+	var currentRenderer = null;
 
 	var container = new UISpan();
 
@@ -26,7 +28,7 @@ var SidebarProject = function ( editor ) {
 	// Title
 
 	var titleRow = new UIRow();
-	var title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).onChange( function () {
+	var title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).setWidth( '150px' ).onChange( function () {
 
 		config.setKey( 'project/title', this.getValue() );
 
@@ -51,56 +53,156 @@ var SidebarProject = function ( editor ) {
 
 	projectsettings.add( editableRow );
 
-	// Renderer
+	// WebVR
 
-	var rendererPropertiesRow = new UIRow();
-	rendererPropertiesRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ) ).setWidth( '90px' ) );
+	var vrRow = new UIRow();
+	var vr = new UICheckbox( config.getKey( 'project/vr' ) ).setLeft( '100px' ).onChange( function () {
 
-	var rendererAntialias = new UIBoolean( config.getKey( 'project/renderer/antialias' ), strings.getKey( 'sidebar/project/antialias' ) ).onChange( function () {
-
-		config.setKey( 'project/renderer/antialias', this.getValue() );
-		updateRenderer();
+		config.setKey( 'project/vr', this.getValue() );
 
 	} );
-	rendererPropertiesRow.add( rendererAntialias );
+
+	vrRow.add( new UIText( strings.getKey( 'sidebar/project/vr' ) ).setWidth( '90px' ) );
+	vrRow.add( vr );
+
+	projectsettings.add( vrRow );
+
+	// Renderer
+
+	var rendererPanel = new UIPanel();
+	container.add( rendererPanel );
+
+	var headerRow = new UIRow();
+	headerRow.add( new UIText( strings.getKey( 'sidebar/project/renderer' ).toUpperCase() ) );
+	rendererPanel.add( headerRow );
+
+	// Renderer / Antialias
+
+	var antialiasRow = new UIRow();
+	var antialiasBoolean = new UIBoolean( config.getKey( 'project/renderer/antialias' ) ).onChange( function () {
+
+		config.setKey( 'project/renderer/antialias', this.getValue() );
+		createRenderer();
+
+	} );
+
+	antialiasRow.add( new UIText( strings.getKey( 'sidebar/project/antialias' ) ).setWidth( '90px' ) );
+	antialiasRow.add( antialiasBoolean );
+
+	rendererPanel.add( antialiasRow );
 
 	// Renderer / Shadows
 
-	var rendererShadows = new UIBoolean( config.getKey( 'project/renderer/shadows' ), strings.getKey( 'sidebar/project/shadows' ) ).onChange( function () {
+	var shadowsRow = new UIRow();
+	var shadowsBoolean = new UIBoolean( config.getKey( 'project/renderer/shadows' ) ).onChange( function () {
 
 		config.setKey( 'project/renderer/shadows', this.getValue() );
 		updateRenderer();
 
 	} );
-	rendererPropertiesRow.add( rendererShadows );
 
-	projectsettings.add( rendererPropertiesRow );
+	shadowsRow.add( new UIText( strings.getKey( 'sidebar/project/shadows' ) ).setWidth( '90px' ) );
+	shadowsRow.add( shadowsBoolean );
+
+	var shadowTypeSelect = new UISelect().setOptions( {
+		0: 'Basic',
+		1: 'PCF',
+		2: 'PCF (Soft)',
+		//	3: 'VSM'
+	} ).setWidth( '125px' ).onChange( function () {
+
+		config.setKey( 'project/renderer/shadowType', parseFloat( this.getValue() ) );
+		updateRenderer();
+
+	} );
+	shadowTypeSelect.setValue( config.getKey( 'project/renderer/shadowType' ) );
+
+	shadowsRow.add( shadowTypeSelect );
+
+	rendererPanel.add( shadowsRow );
+
+	// Renderer / Physically Correct lights
+
+	var physicallyCorrectLightsRow = new UIRow();
+	var physicallyCorrectLightsBoolean = new UIBoolean( config.getKey( 'project/renderer/physicallyCorrectLights' ) ).onChange( function () {
+
+		config.setKey( 'project/renderer/physicallyCorrectLights', this.getValue() );
+		updateRenderer();
+
+	} );
+
+	physicallyCorrectLightsRow.add( new UIText( strings.getKey( 'sidebar/project/physicallyCorrectLights' ) ).setWidth( '90px' ) );
+	physicallyCorrectLightsRow.add( physicallyCorrectLightsBoolean );
+
+	rendererPanel.add( physicallyCorrectLightsRow );
+
+	// Renderer / Tonemapping
+
+	var toneMappingRow = new UIRow();
+	var toneMappingSelect = new UISelect().setOptions( {
+		0: 'None',
+		1: 'Linear',
+		2: 'Reinhard',
+		3: 'Cineon',
+		4: 'ACESFilmic'
+	} ).setWidth( '120px' ).onChange( function ( value ) {
+
+		var value = this.getValue();
+
+		config.setKey( 'project/renderer/toneMapping', parseFloat( value ) );
+		toneMappingExposure.setDisplay( value === '0' ? 'none' : '' );
+
+		updateRenderer();
+
+	} );
+	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
+
+	toneMappingRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ) ).setWidth( '90px' ) );
+	toneMappingRow.add( toneMappingSelect );
+
+	var toneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) );
+	toneMappingExposure.setDisplay( toneMappingSelect.getValue() === '0' ? 'none' : '' );
+	toneMappingExposure.setWidth( '30px' ).setMarginLeft( '10px' );
+	toneMappingExposure.setRange( 0, 10 );
+	toneMappingExposure.onChange( function () {
+
+		config.setKey( 'project/renderer/toneMappingExposure', this.getValue() );
+		updateRenderer();
+
+	} );
+	toneMappingRow.add( toneMappingExposure );
+
+	rendererPanel.add( toneMappingRow );
 
 	//
 
 	function updateRenderer() {
 
-		createRenderer( rendererAntialias.getValue() );
+		currentRenderer.physicallyCorrectLights = physicallyCorrectLightsBoolean.getValue();
+		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
+		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
+		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
+		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
+
+		signals.rendererUpdated.dispatch();
 
 	}
 
-	function createRenderer( antialias, shadows ) {
+	function createRenderer() {
 
-		var parameters = { antialias: antialias };
-		var renderer = new THREE.WebGLRenderer( parameters );
+		currentRenderer = new THREE.WebGLRenderer( { antialias: antialiasBoolean.getValue() } );
+		currentRenderer.outputEncoding = THREE.sRGBEncoding;
+		currentRenderer.physicallyCorrectLights = physicallyCorrectLightsBoolean.getValue();
+		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
+		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
+		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
+		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
 
-		if ( shadows ) {
-
-			renderer.shadowMap.enabled = true;
-			// renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-		}
-
-		signals.rendererChanged.dispatch( renderer );
+		signals.rendererChanged.dispatch( currentRenderer );
 
 	}
 
-	createRenderer( config.getKey( 'project/renderer/antialias' ), config.getKey( 'project/renderer/shadows' ) );
+	createRenderer();
 
 	// Materials
 
@@ -112,11 +214,6 @@ var SidebarProject = function ( editor ) {
 	materials.add( headerRow );
 
 	var listbox = new UIListbox();
-	signals.materialAdded.add( function () {
-
-		listbox.setItems( Object.values( editor.materials ) );
-
-	} );
 	materials.add( listbox );
 
 	var buttonsRow = new UIRow();
@@ -136,13 +233,25 @@ var SidebarProject = function ( editor ) {
 	var assignMaterial = new UIButton().setLabel( strings.getKey( 'sidebar/project/Assign' ) ).setMargin( '0px 5px' );
 	assignMaterial.onClick( function () {
 
-		if ( editor.selected !== null ) {
+		var selectedObject = editor.selected;
 
-			var material = editor.getMaterialById( parseInt( listbox.getValue() ) );
+		if ( selectedObject !== null ) {
 
-			if ( material !== undefined ) {
+			var oldMaterial = selectedObject.material;
 
-				editor.execute( new SetMaterialCommand( editor, editor.selected, material ) );
+			// only assing materials to objects with a material property (e.g. avoid assigning material to THREE.Group)
+
+			if ( oldMaterial !== undefined ) {
+
+				var material = editor.getMaterialById( parseInt( listbox.getValue() ) );
+
+				if ( material !== undefined ) {
+
+					editor.removeMaterial( oldMaterial );
+					editor.execute( new SetMaterialCommand( editor, selectedObject, material ) );
+					editor.addMaterial( material );
+
+				}
 
 			}
 
@@ -166,8 +275,18 @@ var SidebarProject = function ( editor ) {
 
 	} );
 
+	signals.materialAdded.add( refreshMaterialBrowserUI );
+	signals.materialChanged.add( refreshMaterialBrowserUI );
+	signals.materialRemoved.add( refreshMaterialBrowserUI );
+
+	function refreshMaterialBrowserUI() {
+
+		listbox.setItems( Object.values( editor.materials ) );
+
+	}
+
 	return container;
 
-};
+}
 
 export { SidebarProject };

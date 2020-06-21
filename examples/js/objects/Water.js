@@ -1,3 +1,4 @@
+console.warn( "THREE.Water: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author jbouny / https://github.com/jbouny
  *
@@ -90,8 +91,10 @@ THREE.Water = function ( geometry, options ) {
 			'varying vec4 mirrorCoord;',
 			'varying vec4 worldPosition;',
 
-			THREE.ShaderChunk[ 'fog_pars_vertex' ],
-			THREE.ShaderChunk[ 'shadowmap_pars_vertex' ],
+		 	'#include <common>',
+		 	'#include <fog_pars_vertex>',
+			'#include <shadowmap_pars_vertex>',
+			'#include <logdepthbuf_pars_vertex>',
 
 			'void main() {',
 			'	mirrorCoord = modelMatrix * vec4( position, 1.0 );',
@@ -100,9 +103,11 @@ THREE.Water = function ( geometry, options ) {
 			'	vec4 mvPosition =  modelViewMatrix * vec4( position, 1.0 );',
 			'	gl_Position = projectionMatrix * mvPosition;',
 
-			THREE.ShaderChunk[ 'fog_vertex' ],
-			THREE.ShaderChunk[ 'shadowmap_vertex' ],
-
+			'#include <beginnormal_vertex>',
+			'#include <defaultnormal_vertex>',
+			'#include <logdepthbuf_vertex>',
+			'#include <fog_vertex>',
+			'#include <shadowmap_vertex>',
 			'}'
 		].join( '\n' ),
 
@@ -140,15 +145,18 @@ THREE.Water = function ( geometry, options ) {
 			'	diffuseColor += max( dot( sunDirection, surfaceNormal ), 0.0 ) * sunColor * diffuse;',
 			'}',
 
-			THREE.ShaderChunk[ 'common' ],
-			THREE.ShaderChunk[ 'packing' ],
-			THREE.ShaderChunk[ 'bsdfs' ],
-			THREE.ShaderChunk[ 'fog_pars_fragment' ],
-			THREE.ShaderChunk[ 'lights_pars_begin' ],
-			THREE.ShaderChunk[ 'shadowmap_pars_fragment' ],
-			THREE.ShaderChunk[ 'shadowmask_pars_fragment' ],
+			'#include <common>',
+			'#include <packing>',
+			'#include <bsdfs>',
+			'#include <fog_pars_fragment>',
+			'#include <logdepthbuf_pars_fragment>',
+			'#include <lights_pars_begin>',
+			'#include <shadowmap_pars_fragment>',
+			'#include <shadowmask_pars_fragment>',
 
 			'void main() {',
+
+			'#include <logdepthbuf_fragment>',
 			'	vec4 noise = getNoise( worldPosition.xz * size );',
 			'	vec3 surfaceNormal = normalize( noise.xzy * vec3( 1.5, 1.0, 1.5 ) );',
 
@@ -172,9 +180,8 @@ THREE.Water = function ( geometry, options ) {
 			'	vec3 outgoingLight = albedo;',
 			'	gl_FragColor = vec4( outgoingLight, alpha );',
 
-			THREE.ShaderChunk[ 'tonemapping_fragment' ],
-			THREE.ShaderChunk[ 'fog_fragment' ],
-
+			'#include <tonemapping_fragment>',
+			'#include <fog_fragment>',
 			'}'
 		].join( '\n' )
 
@@ -184,7 +191,6 @@ THREE.Water = function ( geometry, options ) {
 		fragmentShader: mirrorShader.fragmentShader,
 		vertexShader: mirrorShader.vertexShader,
 		uniforms: THREE.UniformsUtils.clone( mirrorShader.uniforms ),
-		transparent: true,
 		lights: true,
 		side: side,
 		fog: fog
@@ -279,7 +285,25 @@ THREE.Water = function ( geometry, options ) {
 
 		eye.setFromMatrixPosition( camera.matrixWorld );
 
-		//
+		// Render
+
+		if ( renderer.outputEncoding !== THREE.LinearEncoding ) {
+
+			console.warn( 'THREE.Water: WebGLRenderer must use LinearEncoding as outputEncoding.' );
+			scope.onBeforeRender = function () {};
+
+			return;
+
+		}
+
+		if ( renderer.toneMapping !== THREE.NoToneMapping ) {
+
+			console.warn( 'THREE.Water: WebGLRenderer must use NoToneMapping as toneMapping.' );
+			scope.onBeforeRender = function () {};
+
+			return;
+
+		}
 
 		var currentRenderTarget = renderer.getRenderTarget();
 
@@ -292,7 +316,10 @@ THREE.Water = function ( geometry, options ) {
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+
+		renderer.state.buffers.depth.setMask( true ); // make sure the depth buffer is writable so it can be properly cleared, see #18897
+
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, mirrorCamera );
 
 		scope.visible = true;

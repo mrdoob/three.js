@@ -13,18 +13,18 @@
 		<p class="desc">Uniforms are global [link:https://www.opengl.org/documentation/glsl/ GLSL] variables. They are passed to shader programs.
 		</p>
 
-		<h3>Example</h3>
+		<h2>Code Example</h2>
 		<p>
 		When declaring a uniform of a [page:ShaderMaterial], it is declared by value or by object.
 		</p>
 		<code>
 		uniforms: {
 			time: { value: 1.0 },
-			resolution: new THREE.Uniform(new THREE.Vector2())
-		}
+			resolution: new Uniform( new Vector2() )
+		};
 		</code>
 
-		<h3>Uniform types</h3>
+		<h2>Uniform types</h2>
 
 		<p>
 		Each uniform must have a *value* property. The type of the value must correspond to the
@@ -48,6 +48,10 @@
 
 				<tr>
 					<td>int</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td>uint (WebGL 2)</td>
 					<td>[page:Number]</td>
 				</tr>
 				<tr>
@@ -182,6 +186,63 @@
 		(*) Same for an (innermost) array (dimension) of the same GLSL type, containing the components of all vectors or matrices in the array.
 		</p>
 
+		<h2>Structured Uniforms</h2>
+
+		<p>
+			Sometimes you want to organize uniforms as *structs* in your shader code. The following style must be used so *three.js* is able
+			to process structured uniform data.
+		</p>
+		<code>
+		uniforms = {
+			data: {
+				value: {
+					position: new Vector3(),
+					direction: new Vector3( 0, 0, 1 )
+				 }
+			}
+		};
+		</code>
+		This definition can be mapped on the following GLSL code:
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data;
+		</code>
+
+		<h2>Structured Uniforms with Arrays</h2>
+
+		<p>
+			It's also possible to manage *structs* in arrays. The syntax for this use case looks like so:
+		</p>
+		<code>
+		var entry1 = {
+			position: new Vector3(),
+			direction: new Vector3( 0, 0, 1 )
+		};
+		var entry2 = {
+			position: new Vector3( 1, 1, 1 ),
+			direction: new Vector3( 0, 1, 0 )
+		};
+
+		uniforms = {
+			data: {
+				value: [ entry1, entry2 ]
+			}
+		};
+		</code>
+		This definition can be mapped on the following GLSL code:
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data[ 2 ];
+		</code>
+
 		<h2>Constructor</h2>
 
 		<h3>[name]( [param:Object value] )</h3>
@@ -202,8 +263,7 @@
 		<p>
 		Returns a clone of this uniform.<br />
 		If the uniform's value property is an [page:Object] with a clone() method, this is used, otherwise the value is copied by assignment.
-		Array values are shared between cloned [page:Uniform]s.<br /><br />
-		See [example:webgldeferred_animation WebGL deferred animation] for an example of this method in use.
+		Array values are shared between cloned [page:Uniform]s.
 		</p>
 
 		<h2>Source</h2>

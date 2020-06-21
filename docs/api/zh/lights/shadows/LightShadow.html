@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -38,6 +38,10 @@
 			默认值为0.此处非常小的调整（大约0.0001）可能有助于减少阴影中的伪影
 		</p>
 
+		<h3>[property:Float normalOffset]</h3>
+		<p>Defines how much the position used to query the shadow map is offset along the object normal.</p>
+		<p>The default is 0. Increasing this value can be used to reduce shadow acne especially in large scenes where light shines onto geometry at a shallow angle. The cost is that shadows may appear distorted.</p>
+
 		<h3>[property:WebGLRenderTarget map]</h3>
 		<p>
 			使用内置摄像头生成的深度图;超出像素深度的位置在阴影中。在渲染期间内部计算。
@@ -69,8 +73,8 @@
 			将此值设置为大于1的值将模糊阴影的边缘。<br />
 
 			较高的值会在阴影中产生不必要的条带效果 - 更大的[page:.mapSize mapSize]将允许在这些效果变得可见之前使用更高的值。<br />
-			If [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer PCFSoftShadowMap], it is recommended to
-			leave radius at 1 and increase softness by decreasing [page:.mapSize mapSize] instead.<br /><br />
+			If [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer PCFSoftShadowMap], radius has 
+			no effect and it is recommended to increase softness by decreasing [page:.mapSize mapSize] instead.<br /><br />
 			
 			请注意，如果[page：WebGLRenderer.shadowMap.type]设置为[page:Renderer BasicShadowMap]，将会无效。
 		</p>

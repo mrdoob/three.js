@@ -2,7 +2,7 @@ import { Font } from './../extras/core/Font';
 import { ExtrudeGeometry, ExtrudeBufferGeometry } from './ExtrudeGeometry';
 
 export interface TextGeometryParameters {
-	font?: Font;
+	font: Font;
 	size?: number;
 	height?: number;
 	curveSegments?: number;
@@ -15,7 +15,7 @@ export interface TextGeometryParameters {
 
 export class TextBufferGeometry extends ExtrudeBufferGeometry {
 
-	constructor( text: string, parameters?: TextGeometryParameters );
+	constructor( text: string, parameters: TextGeometryParameters );
 
 	parameters: {
 		font: Font;
@@ -33,7 +33,7 @@ export class TextBufferGeometry extends ExtrudeBufferGeometry {
 
 export class TextGeometry extends ExtrudeGeometry {
 
-	constructor( text: string, parameters?: TextGeometryParameters );
+	constructor( text: string, parameters: TextGeometryParameters );
 
 	parameters: {
 		font: Font;

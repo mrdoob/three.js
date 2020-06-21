@@ -17,7 +17,6 @@ export class WebGLProgram {
 	program: any;
 	vertexShader: WebGLShader;
 	fragmentShader: WebGLShader;
-	numMultiviewViews: number;
 	/**
 	 * @deprecated Use {@link WebGLProgram#getUniforms getUniforms()} instead.
 	 */

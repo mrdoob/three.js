@@ -14,7 +14,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param optionalOldPosition THREE.Vector3
  * @constructor
  */
-var SetPositionCommand = function ( editor, object, newPosition, optionalOldPosition ) {
+function SetPositionCommand( editor, object, newPosition, optionalOldPosition ) {
 
 	Command.call( this, editor );
 
@@ -37,7 +37,8 @@ var SetPositionCommand = function ( editor, object, newPosition, optionalOldPosi
 
 	}
 
-};
+}
+
 SetPositionCommand.prototype = {
 
 	execute: function () {

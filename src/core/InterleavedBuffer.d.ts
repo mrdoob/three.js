@@ -2,7 +2,7 @@ import { InterleavedBufferAttribute } from './InterleavedBufferAttribute';
 import { Usage } from '../constants';
 
 /**
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBuffer.js">src/core/InterleavedBuffer.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/InterleavedBuffer.js|src/core/InterleavedBuffer.js}
  */
 export class InterleavedBuffer {
 
@@ -16,9 +16,10 @@ export class InterleavedBuffer {
 	length: number;
 	count: number;
 	needsUpdate: boolean;
+	uuid: string;
 
 	setUsage( usage: Usage ): InterleavedBuffer;
-	clone(): this;
+	clone( data: object ): this;
 	copy( source: InterleavedBuffer ): this;
 	copyAt(
 		index1: number,
@@ -26,5 +27,11 @@ export class InterleavedBuffer {
 		index2: number
 	): InterleavedBuffer;
 	set( value: ArrayLike<number>, index: number ): InterleavedBuffer;
+	toJSON( data: object ): {
+		uuid: string,
+		buffer: string,
+		type: string,
+		stride: number
+	};
 
 }

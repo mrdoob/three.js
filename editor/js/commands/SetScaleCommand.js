@@ -14,7 +14,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param optionalOldScale THREE.Vector3
  * @constructor
  */
-var SetScaleCommand = function ( editor, object, newScale, optionalOldScale ) {
+function SetScaleCommand( editor, object, newScale, optionalOldScale ) {
 
 	Command.call( this, editor );
 
@@ -37,7 +37,7 @@ var SetScaleCommand = function ( editor, object, newScale, optionalOldScale ) {
 
 	}
 
-};
+}
 
 SetScaleCommand.prototype = {
 

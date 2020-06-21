@@ -224,7 +224,7 @@
 
 				floorGeometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var floorMaterial = new THREE.MeshBasicMaterial( { vertexColors: true } );
 
 				var floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				scene.add( floor );
@@ -248,7 +248,7 @@
 
 				for ( var i = 0; i < 500; i ++ ) {
 
-					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors } );
+					var boxMaterial = new THREE.MeshPhongMaterial( { specular: 0xffffff, flatShading: true, vertexColors: true } );
 					boxMaterial.color.setHSL( Math.random() * 0.2 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
 
 					var box = new THREE.Mesh( boxGeometry, boxMaterial );

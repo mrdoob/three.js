@@ -461,26 +461,15 @@ export default QUnit.module( 'Maths', () => {
 
 		QUnit.test( "getInverse", ( assert ) => {
 
+			var zero = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var identity = new Matrix4();
 
 			var a = new Matrix4();
 			var b = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
-			var c = new Matrix4().set( 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 
-			assert.ok( ! matrixEquals4( a, b ), "Passed!" );
-			b.getInverse( a, false );
-			assert.ok( matrixEquals4( b, new Matrix4() ), "Passed!" );
+			a.getInverse( b );
+			assert.ok( matrixEquals4( a, zero ), "Passed!" );
 
-			try {
-
-				b.getInverse( c, true );
-				assert.ok( false, "Passed!" ); // should never get here.
-
-			} catch ( err ) {
-
-				assert.ok( true, "Passed!" );
-
-			}
 
 			var testMatrices = [
 				new Matrix4().makeRotationX( 0.3 ),
@@ -546,7 +535,7 @@ export default QUnit.module( 'Maths', () => {
 			var b = new Vector3( 2, 3, 4 );
 			var c = new Matrix4().set( 1, 0, 0, 2, 0, 1, 0, 3, 0, 0, 1, 4, 0, 0, 0, 1 );
 
-			a.makeTranslation( b );
+			a.makeTranslation( b.x, b.y, b.z );
 			assert.ok( matrixEquals4( a, c ), "Passed!" );
 
 		} );

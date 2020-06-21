@@ -17,7 +17,7 @@ import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 
-var Viewport = function ( editor ) {
+function Viewport( editor ) {
 
 	var signals = editor.signals;
 
@@ -31,6 +31,8 @@ var Viewport = function ( editor ) {
 	//
 
 	var renderer = null;
+	var pmremGenerator = null;
+	var pmremTexture = null;
 
 	var camera = editor.camera;
 	var scene = editor.scene;
@@ -78,9 +80,11 @@ var Viewport = function ( editor ) {
 
 			selectionBox.setFromObject( object );
 
-			if ( editor.helpers[ object.id ] !== undefined ) {
+			var helper = editor.helpers[ object.id ];
 
-				editor.helpers[ object.id ].update();
+			if ( helper !== undefined && helper.isSkeletonHelper !== true ) {
+
+				helper.update();
 
 			}
 
@@ -286,6 +290,7 @@ var Viewport = function ( editor ) {
 	controls.addEventListener( 'change', function () {
 
 		signals.cameraChanged.dispatch( camera );
+		signals.refreshSidebarObject3D.dispatch( camera );
 
 	} );
 
@@ -316,9 +321,29 @@ var Viewport = function ( editor ) {
 
 	} );
 
+	signals.rendererUpdated.add( function () {
+
+		scene.traverse( function ( child ) {
+
+			if ( child.material !== undefined ) {
+
+				child.material.needsUpdate = true;
+
+			}
+
+		} );
+
+		render();
+
+	} );
+
 	signals.rendererChanged.add( function ( newRenderer ) {
 
 		if ( renderer !== null ) {
+
+			renderer.dispose();
+			pmremGenerator.dispose();
+			pmremTexture = null;
 
 			container.dom.removeChild( renderer.domElement );
 
@@ -326,11 +351,28 @@ var Viewport = function ( editor ) {
 
 		renderer = newRenderer;
 
-		renderer.autoClear = false;
-		renderer.autoUpdateScene = false;
-		renderer.outputEncoding = THREE.sRGBEncoding;
+		renderer.setClearColor( 0xaaaaaa );
+
+		if ( window.matchMedia ) {
+
+			var mediaQuery = window.matchMedia( '(prefers-color-scheme: dark)' );
+			mediaQuery.addListener( function ( event ) {
+
+				renderer.setClearColor( event.matches ? 0x333333 : 0xaaaaaa );
+
+				if ( scene.background === null ) render();
+
+			} );
+
+			renderer.setClearColor( mediaQuery.matches ? 0x333333 : 0xaaaaaa );
+
+		}
+
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
+
+		pmremGenerator = new THREE.PMREMGenerator( renderer );
+		pmremGenerator.compileEquirectangularShader();
 
 		container.dom.appendChild( renderer.domElement );
 
@@ -445,13 +487,25 @@ var Viewport = function ( editor ) {
 
 	signals.helperAdded.add( function ( object ) {
 
-		objects.push( object.getObjectByName( 'picker' ) );
+		var picker = object.getObjectByName( 'picker' );
+
+		if ( picker !== undefined ) {
+
+			objects.push( picker );
+
+		}
 
 	} );
 
 	signals.helperRemoved.add( function ( object ) {
 
-		objects.splice( objects.indexOf( object.getObjectByName( 'picker' ) ), 1 );
+		var picker = object.getObjectByName( 'picker' );
+
+		if ( picker !== undefined ) {
+
+			objects.splice( objects.indexOf( picker ), 1 );
+
+		}
 
 	} );
 
@@ -461,54 +515,118 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	// fog
+	// background
 
-	signals.sceneBackgroundChanged.add( function ( backgroundColor ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundType, backgroundColor, backgroundTexture, backgroundEquirectangularTexture, environmentType ) {
 
-		scene.background.setHex( backgroundColor );
+		pmremTexture = null;
+
+		switch ( backgroundType ) {
+
+			case 'None':
+
+				scene.background = null;
+
+				break;
+
+			case 'Color':
+
+				scene.background = new THREE.Color( backgroundColor );
+
+				break;
+
+			case 'Texture':
+
+				if ( backgroundTexture ) {
+
+					scene.background = backgroundTexture;
+
+				}
+
+				break;
+
+			case 'Equirectangular':
+
+				if ( backgroundEquirectangularTexture ) {
+
+					pmremTexture = pmremGenerator.fromEquirectangular( backgroundEquirectangularTexture ).texture;
+
+					var renderTarget = new THREE.WebGLCubeRenderTarget( 512 );
+					renderTarget.fromEquirectangularTexture( renderer, backgroundEquirectangularTexture );
+					renderTarget.toJSON = function () { return null }; // TODO Remove hack
+
+					scene.background = renderTarget;
+
+				}
+
+				break;
+
+		}
+
+		if ( environmentType === 'Background' ) {
+
+			scene.environment = pmremTexture;
+
+		}
 
 		render();
 
 	} );
 
-	var currentFogType = null;
+	// environment
 
-	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
+	signals.sceneEnvironmentChanged.add( function ( environmentType ) {
 
-		if ( currentFogType !== fogType ) {
+		switch ( environmentType ) {
 
-			switch ( fogType ) {
-
-				case 'None':
-					scene.fog = null;
-					break;
-				case 'Fog':
-					scene.fog = new THREE.Fog();
-					break;
-				case 'FogExp2':
-					scene.fog = new THREE.FogExp2();
-					break;
-
-			}
-
-			currentFogType = fogType;
+			case 'None':
+				scene.environment = null;
+				break;
+			case 'Background':
+				scene.environment = pmremTexture;
+				break;
 
 		}
 
-		if ( scene.fog ) {
+		render();
 
-			if ( scene.fog.isFog ) {
+	} );
 
+	// fog
+
+	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
+
+		switch ( fogType ) {
+
+			case 'None':
+				scene.fog = null;
+				break;
+			case 'Fog':
+				scene.fog = new THREE.Fog( fogColor, fogNear, fogFar );
+				break;
+			case 'FogExp2':
+				scene.fog = new THREE.FogExp2( fogColor, fogDensity );
+				break;
+
+		}
+
+		render();
+
+	} );
+
+	signals.sceneFogSettingsChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
+
+		switch ( fogType ) {
+
+			case 'Fog':
 				scene.fog.color.setHex( fogColor );
 				scene.fog.near = fogNear;
 				scene.fog.far = fogFar;
-
-			} else if ( scene.fog.isFogExp2 ) {
-
+				break;
+			case 'FogExp2':
 				scene.fog.color.setHex( fogColor );
 				scene.fog.density = fogDensity;
-
-			}
+				break;
 
 		}
 
@@ -528,6 +646,9 @@ var Viewport = function ( editor ) {
 			throw "Invalid camera set as viewport";
 
 		}
+
+		// Disable EditorControls when setting a user camera
+		controls.enabled = viewportCamera === editor.camera;
 
 		camera = viewportCamera;
 
@@ -562,9 +683,9 @@ var Viewport = function ( editor ) {
 
 	// animations
 
-	var prevTime = performance.now();
+	var clock = new THREE.Clock(); // only used for animations
 
-	function animate( time ) {
+	function animate() {
 
 		requestAnimationFrame( animate );
 
@@ -572,12 +693,10 @@ var Viewport = function ( editor ) {
 
 		if ( mixer.stats.actions.inUse > 0 ) {
 
-			mixer.update( ( time - prevTime ) / 1000 );
+			mixer.update( clock.getDelta() );
 			render();
 
 		}
-
-		prevTime = time;
 
 	}
 
@@ -585,22 +704,30 @@ var Viewport = function ( editor ) {
 
 	//
 
+	var startTime = 0;
+	var endTime = 0;
+
 	function render() {
 
-		scene.updateMatrixWorld();
+		startTime = performance.now();
+
 		renderer.render( scene, camera );
 
 		if ( camera === editor.camera ) {
 
-			sceneHelpers.updateMatrixWorld();
+			renderer.autoClear = false;
 			renderer.render( sceneHelpers, camera );
+			renderer.autoClear = true;
 
 		}
+
+		endTime = performance.now();
+		editor.signals.sceneRendered.dispatch( endTime - startTime );
 
 	}
 
 	return container;
 
-};
+}
 
 export { Viewport };

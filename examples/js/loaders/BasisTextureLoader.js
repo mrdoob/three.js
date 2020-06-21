@@ -1,3 +1,4 @@
+console.warn( "THREE.BasisTextureLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Don McCurdy / https://www.donmccurdy.com
  * @author Austin Eng / https://github.com/austinEng
@@ -31,6 +32,7 @@ THREE.BasisTextureLoader = function ( manager ) {
 	this.workerConfig = {
 		format: null,
 		astcSupported: false,
+		bptcSupported: false,
 		etcSupported: false,
 		dxtSupported: false,
 		pvrtcSupported: false,
@@ -63,6 +65,7 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 		var config = this.workerConfig;
 
 		config.astcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_astc' );
+		config.bptcSupported = !! renderer.extensions.get( 'EXT_texture_compression_bptc' );
 		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
 		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
 		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
@@ -71,6 +74,10 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 		if ( config.astcSupported ) {
 
 			config.format = THREE.BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4;
+
+		} else if ( config.bptcSupported ) {
+
+			config.format = THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC7_M5;
 
 		} else if ( config.dxtSupported ) {
 
@@ -149,6 +156,9 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 					case THREE.BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4:
 						texture = new THREE.CompressedTexture( mipmaps, width, height, THREE.RGBA_ASTC_4x4_Format );
 						break;
+					case THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC7_M5:
+						texture = new THREE.CompressedTexture( mipmaps, width, height, THREE.RGBA_BPTC_Format );
+						break;
 					case THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC1:
 					case THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC3:
 						texture = new THREE.CompressedTexture( mipmaps, width, height, THREE.BasisTextureLoader.DXT_FORMAT_MAP[ config.format ], THREE.UnsignedByteType );
@@ -176,8 +186,10 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 			} );
 
+		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 		texturePending
-			.finally( () => {
+			.catch( () => true )
+			.then( () => {
 
 				if ( worker && taskID ) {
 

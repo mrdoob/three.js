@@ -35,7 +35,7 @@ export class Frustum {
 	): Frustum;
 	clone(): this;
 	copy( frustum: Frustum ): this;
-	setFromMatrix( m: Matrix4 ): Frustum;
+	setFromProjectionMatrix( m: Matrix4 ): this;
 	intersectsObject( object: Object3D ): boolean;
 	intersectsSprite( sprite: Sprite ): boolean;
 	intersectsSphere( sphere: Sphere ): boolean;

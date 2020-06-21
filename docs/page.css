@@ -61,6 +61,7 @@ body {
 	padding-bottom: var(--page-padding);
 	padding-right: var(--page-padding);
 	padding-left: calc(var(--page-padding) + var(--panel-width));
+	word-break: break-word;
 }
 
 a {

@@ -2,9 +2,9 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var _context;
+let _context;
 
-var AudioContext = {
+const AudioContext = {
 
 	getContext: function () {
 

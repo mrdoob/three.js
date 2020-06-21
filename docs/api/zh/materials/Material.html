@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
 	<meta charset="utf-8"/>
 	<base href="../../../"/>
@@ -105,8 +105,7 @@
 
 <h3>[property:Boolean stencilWrite]</h3>
 <p>
-Whether rendering this material has any effect on the stencil buffer. Default is *false*.
-</p>
+Whether stencil operations are performed against the stencil buffer. In order to perform writes or comparisons against the stencil buffer this value must be *true*. Default is *false*.</p>
 
 <h3>[property:Integer stencilWriteMask]</h3>
 <p>
@@ -182,7 +181,7 @@ Which stencil operation to perform when the comparison function returns true and
 </p>
 
 <h3>[property:Boolean premultipliedAlpha]</h3>
-<p> 是否预乘alpha（透明度）值。有关差异的示例，请参阅[Example:webgl_materials_transparency WebGL / Materials / Transparency]。
+<p> 是否预乘alpha（透明度）值。有关差异的示例，请参阅[Example:webgl_materials_physical_transparency WebGL / Materials / Physical / Transparency]。
 	默认值为*false*。
 </p>
 
@@ -253,15 +252,9 @@ Defines whether this material is tone mapped according to the renderer's [page:W
 This starts at *0* and counts how many times [property:Boolean needsUpdate] is set to *true*.
 </p>
 
-<h3>[property:Integer vertexColors]</h3>
-<p> 是否使用顶点着色。默认值为[page:Materials THREE.NoColors]。
-	其他选项有[page:Materials THREE.VertexColors] 和 [page:Materials THREE.FaceColors]。
-</p>
-
-<h3>[property:Boolean vertexTangents]</h3>
-<p>	Defines whether precomputed vertex tangents, which must be provided in a vec4 "tangent" attribute,
-	are used. When disabled, tangents are derived automatically. Using precomputed tangents will give
-	more accurate normal map details in some cases, such as with mirrored UVs. Default is false.
+<h3>[property:Boolean vertexColors]</h3>
+<p>
+Defines whether vertex coloring is used. Default is *false*.
 </p>
 
 <h3>[property:Boolean visible]</h3>

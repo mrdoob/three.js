@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Sidebar.Geometry.TeapotBufferGeometry';
+import { } from '../../../editor/js/Sidebar.Geometry.TeapotBufferGeometry';
 
 export default QUnit.module( 'Editor', () => {
 

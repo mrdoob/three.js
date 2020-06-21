@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
@@ -37,14 +37,15 @@ var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 
 			<p>
 				定义好材质之后，我们需要一个带有一些顶点的[page:Geometry] 或者 [page:BufferGeometry]。
-				（推荐使用BufferGeometry，因为它在性能上表现得会更好一些；但在这里，为了简单起见，我们使用Geometry）：
 			</p>
 
 			<code>
-var geometry = new THREE.Geometry();
-geometry.vertices.push(new THREE.Vector3( -10, 0, 0) );
-geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
-geometry.vertices.push(new THREE.Vector3( 10, 0, 0) );
+var points = [];
+points.push( new THREE.Vector3( - 10, 0, 0 ) );
+points.push( new THREE.Vector3( 0, 10, 0 ) );
+points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+var geometry = new THREE.BufferGeometry().setFromPoints( points );
 			</code>
 
 			<p>注意，线是画在每一对连续的顶点之间的，而不是在第一个顶点和最后一个顶点之间绘制线条（线条并未闭合）。</p>

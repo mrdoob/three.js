@@ -8,4 +8,6 @@ export class LightProbe extends Light {
 	readonly isLightProbe: true;
 	sh: SphericalHarmonics3;
 
+	fromJSON( json: object ): LightProbe;
+
 }

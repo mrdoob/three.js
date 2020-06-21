@@ -22,7 +22,7 @@ function ImageBitmapLoader( manager ) {
 
 	Loader.call( this, manager );
 
-	this.options = undefined;
+	this.options = { premultiplyAlpha: 'none' };
 
 }
 
@@ -46,9 +46,9 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		url = this.manager.resolveURL( url );
 
-		var scope = this;
+		const scope = this;
 
-		var cached = Cache.get( url );
+		const cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -72,16 +72,7 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		} ).then( function ( blob ) {
 
-			if ( scope.options === undefined ) {
-
-				// Workaround for FireFox. It causes an error if you pass options.
-				return createImageBitmap( blob );
-
-			} else {
-
-				return createImageBitmap( blob, scope.options );
-
-			}
+			return createImageBitmap( blob, scope.options );
 
 		} ).then( function ( imageBitmap ) {
 

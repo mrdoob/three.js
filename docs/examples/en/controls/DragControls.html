@@ -16,28 +16,29 @@
 		This class can be used to provide a drag'n'drop interaction.
 		</p>
 
-		<h2>Example</h2>
-
-		<p>[example:misc_controls_drag misc / controls / drag ]</p>
+		<h2>Code Example</h2>
 
 		<code>
-var controls = new THREE.DragControls( objects, camera, renderer.domElement );
+		var controls = new DragControls( objects, camera, renderer.domElement );
 
-// add event listener to highlight dragged objects
+		// add event listener to highlight dragged objects
 
-controls.addEventListener( 'dragstart', function ( event ) {
+		controls.addEventListener( 'dragstart', function ( event ) {
 
-	event.object.material.emissive.set( 0xaaaaaa );
+			event.object.material.emissive.set( 0xaaaaaa );
 
-} );
+		} );
 
-controls.addEventListener( 'dragend', function ( event ) {
+		controls.addEventListener( 'dragend', function ( event ) {
 
-	event.object.material.emissive.set( 0x000000 );
+			event.object.material.emissive.set( 0x000000 );
 
-} );
-
+		} );
 		</code>
+
+		<h2>Examples</h2>
+
+		<p>[example:misc_controls_drag misc / controls / drag ]</p>
 
 		<h2>Constructor</h2>
 
@@ -91,6 +92,12 @@ controls.addEventListener( 'dragend', function ( event ) {
 			Whether or not the controls are enabled.
 		</p>
 
+		<h3>[property:Boolean transformGroup]</h3>
+		<p>
+			This option only works if the [page:DragControls.objects] array contains a single draggable group object.
+			If set to *true*, [name] does not transform individual objects but the entire group. Default is *false*.
+		</p>
+
 		<h2>Methods</h2>
 
 		<p>See the base [page:EventDispatcher] class for common methods.</p>
@@ -110,10 +117,15 @@ controls.addEventListener( 'dragend', function ( event ) {
 			Should be called if the controls is no longer required.
 		</p>
 
+		<h3>[method:Array getObjects] ()</h3>
+		<p>
+			Returns the array of draggable objects.
+		</p>
+
 		<h2>Source</h2>
 
 		<p>
-			[link:https://github.com/mrdoob/three.js/blob/master/examples/js/controls/DragControls.js examples/js/controls/DragControls.js]
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/DragControls.js examples/jsm/controls/DragControls.js]
 		</p>
 	</body>
 </html>

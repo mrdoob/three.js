@@ -9,20 +9,20 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> vr - dragging
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - dragging
 		</div>
-
-		<script src="js/vr/HelioWebXRPolyfill.js"></script>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
+			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
 			var container;
 			var camera, scene, renderer;
 			var controller1, controller2;
+			var controllerGrip1, controllerGrip2;
 
 			var raycaster, intersected = [];
 			var tempMatrix = new THREE.Matrix4();
@@ -133,6 +133,16 @@
 				controller2.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller2 );
 
+				var controllerModelFactory = new XRControllerModelFactory();
+
+				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
+				controllerGrip1.add( controllerModelFactory.createControllerModel( controllerGrip1 ) );
+				scene.add( controllerGrip1 );
+
+				controllerGrip2 = renderer.xr.getControllerGrip( 1 );
+				controllerGrip2.add( controllerModelFactory.createControllerModel( controllerGrip2 ) );
+				scene.add( controllerGrip2 );
+
 				//
 
 				var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
@@ -171,13 +181,9 @@
 
 					var intersection = intersections[ 0 ];
 
-					tempMatrix.getInverse( controller.matrixWorld );
-
 					var object = intersection.object;
-					object.matrix.premultiply( tempMatrix );
-					object.matrix.decompose( object.position, object.quaternion, object.scale );
 					object.material.emissive.b = 1;
-					controller.add( object );
+					controller.attach( object );
 
 					controller.userData.selected = object;
 
@@ -192,10 +198,8 @@
 				if ( controller.userData.selected !== undefined ) {
 
 					var object = controller.userData.selected;
-					object.matrix.premultiply( controller.matrixWorld );
-					object.matrix.decompose( object.position, object.quaternion, object.scale );
 					object.material.emissive.b = 0;
-					group.add( object );
+					group.attach( object );
 
 					controller.userData.selected = undefined;
 

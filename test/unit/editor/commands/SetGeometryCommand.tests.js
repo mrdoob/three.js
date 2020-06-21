@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/SetGeometryCommand';
+import { } from '../../../../editor/js/commands/SetGeometryCommand';
 
 export default QUnit.module( 'Editor', () => {
 

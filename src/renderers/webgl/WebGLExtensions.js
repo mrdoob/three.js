@@ -4,7 +4,7 @@
 
 function WebGLExtensions( gl ) {
 
-	var extensions = {};
+	const extensions = {};
 
 	return {
 
@@ -16,7 +16,7 @@ function WebGLExtensions( gl ) {
 
 			}
 
-			var extension;
+			let extension;
 
 			switch ( name ) {
 

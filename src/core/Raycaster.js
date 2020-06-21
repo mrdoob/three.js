@@ -1,4 +1,5 @@
 import { Ray } from '../math/Ray.js';
+import { Layers } from './Layers.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -14,10 +15,11 @@ function Raycaster( origin, direction, near, far ) {
 	this.near = near || 0;
 	this.far = far || Infinity;
 	this.camera = null;
+	this.layers = new Layers();
 
 	this.params = {
 		Mesh: {},
-		Line: {},
+		Line: { threshold: 1 },
 		LOD: {},
 		Points: { threshold: 1 },
 		Sprite: {}
@@ -44,15 +46,17 @@ function ascSort( a, b ) {
 
 function intersectObject( object, raycaster, intersects, recursive ) {
 
-	if ( object.visible === false ) return;
+	if ( object.layers.test( raycaster.layers ) ) {
 
-	object.raycast( raycaster, intersects );
+		object.raycast( raycaster, intersects );
+
+	}
 
 	if ( recursive === true ) {
 
-		var children = object.children;
+		const children = object.children;
 
-		for ( var i = 0, l = children.length; i < l; i ++ ) {
+		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
 			intersectObject( children[ i ], raycaster, intersects, true );
 
@@ -63,8 +67,6 @@ function intersectObject( object, raycaster, intersects, recursive ) {
 }
 
 Object.assign( Raycaster.prototype, {
-
-	linePrecision: 1,
 
 	set: function ( origin, direction ) {
 
@@ -98,7 +100,7 @@ Object.assign( Raycaster.prototype, {
 
 	intersectObject: function ( object, recursive, optionalTarget ) {
 
-		var intersects = optionalTarget || [];
+		const intersects = optionalTarget || [];
 
 		intersectObject( object, this, intersects, recursive );
 
@@ -110,7 +112,7 @@ Object.assign( Raycaster.prototype, {
 
 	intersectObjects: function ( objects, recursive, optionalTarget ) {
 
-		var intersects = optionalTarget || [];
+		const intersects = optionalTarget || [];
 
 		if ( Array.isArray( objects ) === false ) {
 
@@ -119,7 +121,7 @@ Object.assign( Raycaster.prototype, {
 
 		}
 
-		for ( var i = 0, l = objects.length; i < l; i ++ ) {
+		for ( let i = 0, l = objects.length; i < l; i ++ ) {
 
 			intersectObject( objects[ i ], this, intersects, recursive );
 

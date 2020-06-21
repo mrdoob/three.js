@@ -1,3 +1,4 @@
+console.warn( "THREE.GCodeLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * THREE.GCodeLoader is used to load gcode files usually used for 3D printing or CNC applications.
  *
@@ -23,13 +24,31 @@ THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var self = this;
+		var scope = this;
 
-		var loader = new THREE.FileLoader( self.manager );
-		loader.setPath( self.path );
+		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( self.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -203,9 +222,20 @@ THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 			for ( var i = 0; i < layers.length; i ++ ) {
 
 				var layer = layers[ i ];
+				var layerVertex = layer.vertex;
+				var layerPathVertex = layer.pathVertex;
 
-				vertex = vertex.concat( layer.vertex );
-				pathVertex = pathVertex.concat( layer.pathVertex );
+				for ( var j = 0; j < layerVertex.length; j ++ ) {
+
+					vertex.push( layerVertex[ j ] );
+
+				}
+
+				for ( var j = 0; j < layerPathVertex.length; j ++ ) {
+
+					pathVertex.push( layerPathVertex[ j ] );
+
+				}
 
 			}
 

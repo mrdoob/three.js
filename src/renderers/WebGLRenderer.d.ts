@@ -5,6 +5,7 @@ import { WebGLInfo } from './webgl/WebGLInfo';
 import { WebGLShadowMap } from './webgl/WebGLShadowMap';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities';
 import { WebGLProperties } from './webgl/WebGLProperties';
+import { WebGLProgram } from './webgl/WebGLProgram';
 import { WebGLRenderLists } from './webgl/WebGLRenderLists';
 import { WebGLState } from './webgl/WebGLState';
 import { Vector2 } from './../math/Vector2';
@@ -13,7 +14,6 @@ import { Color } from './../math/Color';
 import { WebGLRenderTarget } from './WebGLRenderTarget';
 import { Object3D } from './../core/Object3D';
 import { Material } from './../materials/Material';
-import { Fog } from './../scenes/Fog';
 import { ToneMapping, ShadowMapType, CullFace, TextureEncoding } from '../constants';
 import { WebXRManager } from '../renderers/webxr/WebXRManager';
 import { RenderTarget } from './webgl/WebGLRenderLists';
@@ -24,7 +24,7 @@ import { Texture } from '../textures/Texture';
 export interface Renderer {
 	domElement: HTMLCanvasElement;
 
-	render( scene: Scene, camera: Camera ): void;
+	render( scene: Object3D, camera: Camera ): void;
 	setSize( width: number, height: number, updateStyle?: boolean ): void;
 }
 
@@ -47,7 +47,7 @@ export interface WebGLRendererParameters {
 	precision?: string;
 
 	/**
-	 * default is true.
+	 * default is false.
 	 */
 	alpha?: boolean;
 
@@ -100,7 +100,7 @@ export interface WebGLDebug {
  * The WebGL renderer displays your beautifully crafted scenes using WebGL, if your device supports it.
  * This renderer has way better performance than CanvasRenderer.
  *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js">src/renderers/WebGLRenderer.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js|src/renderers/WebGLRenderer.js}
  */
 export class WebGLRenderer implements Renderer {
 
@@ -163,7 +163,6 @@ export class WebGLRenderer implements Renderer {
 	physicallyCorrectLights: boolean;
 	toneMapping: ToneMapping;
 	toneMappingExposure: number;
-	toneMappingWhitePoint: number;
 
 	/**
 	 * Default is false.
@@ -274,9 +273,7 @@ export class WebGLRenderer implements Renderer {
 	/**
 	 * Sets the clear color, using color for the color and alpha for the opacity.
 	 */
-	setClearColor( color: Color, alpha?: number ): void;
-	setClearColor( color: string, alpha?: number ): void;
-	setClearColor( color: number, alpha?: number ): void;
+	setClearColor( color: Color | string | number, alpha?: number ): void;
 
 	/**
 	 * Returns a float with the current clear alpha. Ranges from 0 to 1.
@@ -307,21 +304,14 @@ export class WebGLRenderer implements Renderer {
 	resetGLState(): void;
 	dispose(): void;
 
-	/**
-	 * Tells the shadow map plugin to update using the passed scene and camera parameters.
-	 *
-	 * @param scene an instance of Scene
-	 * @param camera — an instance of Camera
-	 */
 	renderBufferImmediate(
 		object: Object3D,
-		program: Object,
-		material: Material
+		program: WebGLProgram,
 	): void;
 
 	renderBufferDirect(
 		camera: Camera,
-		fog: Fog,
+		scene: Scene,
 		geometry: Geometry | BufferGeometry,
 		material: Material,
 		object: Object3D,
@@ -343,12 +333,12 @@ export class WebGLRenderer implements Renderer {
 	 * Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
 	 */
 	compile(
-		scene: Scene,
+		scene: Object3D,
 		camera: Camera
 	): void;
 
 	/**
-	 * Render a scene using a camera.
+	 * Render a scene or an object using a camera.
 	 * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling
 	 * {@link WebGLRenderer#setRenderTarget .setRenderTarget} or to the canvas as usual.
 	 *
@@ -359,7 +349,7 @@ export class WebGLRenderer implements Renderer {
 	 * properties to false. To forcibly clear one ore more buffers call {@link WebGLRenderer#clear .clear}.
 	 */
 	render(
-		scene: Scene,
+		scene: Object3D,
 		camera: Camera
 	): void;
 
@@ -372,6 +362,14 @@ export class WebGLRenderer implements Renderer {
 	 * Returns the current active mipmap level.
 	 */
 	getActiveMipmapLevel(): number;
+
+	/**
+	 * Sets the given WebGLFramebuffer. This method can only be used if no render target is set via
+	 * {@link WebGLRenderer#setRenderTarget .setRenderTarget}.
+	 *
+	 * @param value The WebGLFramebuffer.
+	 */
+	setFramebuffer( value: WebGLFramebuffer ): void;
 
 	/**
 	 * Returns the current render target. If no render target is set, null is returned.

@@ -213,7 +213,7 @@ var Refractor = function ( geometry, options ) {
 		renderer.shadowMap.autoUpdate = false; // avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );
-		renderer.clear();
+		if ( renderer.autoClear === false ) renderer.clear();
 		renderer.render( scene, virtualCamera );
 
 		renderer.xr.enabled = currentXrEnabled;
@@ -237,6 +237,10 @@ var Refractor = function ( geometry, options ) {
 	//
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
+
+		// Render
+
+		renderTarget.texture.encoding = renderer.outputEncoding;
 
 		// ensure refractors are rendered only once per frame
 

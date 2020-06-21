@@ -4,6 +4,7 @@
 
 import * as THREE from '../../../build/three.module.js';
 
+import { RGBELoader } from '../../../examples/jsm/loaders/RGBELoader.js';
 import { TGALoader } from '../../../examples/jsm/loaders/TGALoader.js';
 
 import { UIElement, UISpan, UIDiv, UIRow, UIButton, UICheckbox, UIText, UINumber } from './ui.js';
@@ -13,7 +14,7 @@ import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var UITexture = function ( mapping ) {
+function UITexture( mapping ) {
 
 	UIElement.call( this );
 
@@ -101,6 +102,33 @@ var UITexture = function ( mapping ) {
 
 			}
 
+		} else {
+
+			var reader = new FileReader();
+			reader.addEventListener( 'load', function ( event ) {
+
+				if ( file.name.split( '.' ).pop() === 'hdr' ) {
+
+					// assuming RGBE/Radiance HDR iamge format
+
+					var loader = new RGBELoader().setDataType( THREE.UnsignedByteType );
+					loader.load( event.target.result, function ( hdrTexture ) {
+
+						hdrTexture.sourceFile = file.name;
+						hdrTexture.isHDRTexture = true;
+
+						scope.setValue( hdrTexture );
+
+						if ( scope.onChangeCallback ) scope.onChangeCallback( hdrTexture );
+
+					} );
+
+				}
+
+			} );
+
+			reader.readAsDataURL( file );
+
 		}
 
 		form.reset();
@@ -113,7 +141,7 @@ var UITexture = function ( mapping ) {
 
 	return this;
 
-};
+}
 
 UITexture.prototype = Object.create( UIElement.prototype );
 UITexture.prototype.constructor = UITexture;
@@ -136,9 +164,18 @@ UITexture.prototype.setValue = function ( texture ) {
 		if ( image !== undefined && image.width > 0 ) {
 
 			canvas.title = texture.sourceFile;
-
 			var scale = canvas.width / image.width;
-			context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+			if ( image.data === undefined ) {
+
+				context.drawImage( image, 0, 0, image.width * scale, image.height * scale );
+
+			} else {
+
+				var canvas2 = renderToCanvas( texture );
+				context.drawImage( canvas2, 0, 0, image.width * scale, image.height * scale );
+
+			}
 
 		} else {
 
@@ -186,9 +223,150 @@ UITexture.prototype.onChange = function ( callback ) {
 
 };
 
+// UICubeTexture
+
+function UICubeTexture() {
+
+	UIElement.call( this );
+
+	var container = new UIDiv();
+
+	this.cubeTexture = null;
+	this.onChangeCallback = null;
+	this.dom = container.dom;
+
+	this.textures = [];
+
+	var scope = this;
+
+	var pRow = new UIRow();
+	var nRow = new UIRow();
+
+	pRow.add( new UIText( 'P:' ).setWidth( '35px' ) );
+	nRow.add( new UIText( 'N:' ).setWidth( '35px' ) );
+
+	var posXTexture = new UITexture().onChange( onTextureChanged );
+	var negXTexture = new UITexture().onChange( onTextureChanged );
+	var posYTexture = new UITexture().onChange( onTextureChanged );
+	var negYTexture = new UITexture().onChange( onTextureChanged );
+	var posZTexture = new UITexture().onChange( onTextureChanged );
+	var negZTexture = new UITexture().onChange( onTextureChanged );
+
+	this.textures.push( posXTexture, negXTexture, posYTexture, negYTexture, posZTexture, negZTexture );
+
+	pRow.add( posXTexture );
+	pRow.add( posYTexture );
+	pRow.add( posZTexture );
+
+	nRow.add( negXTexture );
+	nRow.add( negYTexture );
+	nRow.add( negZTexture );
+
+	container.add( pRow, nRow );
+
+	function onTextureChanged() {
+
+		var images = [];
+
+		for ( var i = 0; i < scope.textures.length; i ++ ) {
+
+			var texture = scope.textures[ i ].getValue();
+
+			if ( texture !== null ) {
+
+				images.push( texture.isHDRTexture ? texture : texture.image );
+
+			}
+
+		}
+
+		if ( images.length === 6 ) {
+
+			var cubeTexture = new THREE.CubeTexture( images );
+			cubeTexture.needsUpdate = true;
+
+			if ( images[ 0 ].isHDRTexture ) cubeTexture.isHDRTexture = true;
+
+			scope.cubeTexture = cubeTexture;
+
+			if ( scope.onChangeCallback ) scope.onChangeCallback( cubeTexture );
+
+		}
+
+	}
+
+}
+
+UICubeTexture.prototype = Object.create( UIElement.prototype );
+UICubeTexture.prototype.constructor = UICubeTexture;
+
+UICubeTexture.prototype.setEncoding = function ( encoding ) {
+
+	var cubeTexture = this.getValue();
+	if ( cubeTexture !== null ) {
+
+		cubeTexture.encoding = encoding;
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.getValue = function () {
+
+	return this.cubeTexture;
+
+};
+
+UICubeTexture.prototype.setValue = function ( cubeTexture ) {
+
+	this.cubeTexture = cubeTexture;
+
+	if ( cubeTexture !== null ) {
+
+		var images = cubeTexture.image;
+
+		if ( Array.isArray( images ) === true && images.length === 6 ) {
+
+			for ( var i = 0; i < images.length; i ++ ) {
+
+				var image = images[ i ];
+
+				var texture = new THREE.Texture( image );
+				this.textures[ i ].setValue( texture );
+
+			}
+
+		}
+
+	} else {
+
+		var textures = this.textures;
+
+		for ( var i = 0; i < textures.length; i ++ ) {
+
+			textures[ i ].setValue( null );
+
+		}
+
+	}
+
+	return this;
+
+};
+
+UICubeTexture.prototype.onChange = function ( callback ) {
+
+	this.onChangeCallback = callback;
+
+	return this;
+
+};
+
 // UIOutliner
 
-var UIOutliner = function ( editor ) {
+function UIOutliner( editor ) {
 
 	UIElement.call( this );
 
@@ -241,7 +419,7 @@ var UIOutliner = function ( editor ) {
 
 	return this;
 
-};
+}
 
 UIOutliner.prototype = Object.create( UIElement.prototype );
 UIOutliner.prototype.constructor = UIOutliner;
@@ -344,8 +522,23 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 		} else if ( area > 0.75 ) {
 
-			var nextObject = scene.getObjectById( this.nextSibling.value );
-			moveObject( object, nextObject.parent, nextObject );
+			var nextObject, parent;
+
+			if ( this.nextSibling !== null ) {
+
+				nextObject = scene.getObjectById( this.nextSibling.value );
+				parent = nextObject.parent;
+
+			} else {
+
+				// end of list (no next object)
+
+				nextObject = null;
+				parent = scene.getObjectById( this.value ).parent;
+
+			}
+
+			moveObject( object, parent, nextObject );
 
 		} else {
 
@@ -391,16 +584,16 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 		scope.options.push( div );
 
-		div.addEventListener( 'click', onClick, false );
+		div.addEventListener( 'click', onClick );
 
 		if ( div.draggable === true ) {
 
-			div.addEventListener( 'drag', onDrag, false );
-			div.addEventListener( 'dragstart', onDragStart, false ); // Firefox needs this
+			div.addEventListener( 'drag', onDrag );
+			div.addEventListener( 'dragstart', onDragStart ); // Firefox needs this
 
-			div.addEventListener( 'dragover', onDragOver, false );
-			div.addEventListener( 'dragleave', onDragLeave, false );
-			div.addEventListener( 'drop', onDrop, false );
+			div.addEventListener( 'dragover', onDragOver );
+			div.addEventListener( 'dragleave', onDragLeave );
+			div.addEventListener( 'drop', onDrop );
 
 		}
 
@@ -459,7 +652,7 @@ UIOutliner.prototype.setValue = function ( value ) {
 
 };
 
-var UIPoints = function ( onAddClicked ) {
+function UIPoints( onAddClicked ) {
 
 	UIElement.call( this );
 
@@ -490,7 +683,7 @@ var UIPoints = function ( onAddClicked ) {
 	this.onChangeCallback = null;
 	return this;
 
-};
+}
 
 UIPoints.prototype = Object.create( UIElement.prototype );
 UIPoints.prototype.constructor = UIPoints;
@@ -534,13 +727,13 @@ UIPoints.prototype.deletePointRow = function ( idx, dontUpdate ) {
 
 };
 
-var UIPoints2 = function () {
+function UIPoints2() {
 
 	UIPoints.call( this, UIPoints2.addRow.bind( this ) );
 
 	return this;
 
-};
+}
 
 UIPoints2.prototype = Object.create( UIPoints.prototype );
 UIPoints2.prototype.constructor = UIPoints2;
@@ -624,13 +817,13 @@ UIPoints2.prototype.createPointRow = function ( x, y ) {
 
 };
 
-var UIPoints3 = function () {
+function UIPoints3() {
 
 	UIPoints.call( this, UIPoints3.addRow.bind( this ) );
 
 	return this;
 
-};
+}
 
 UIPoints3.prototype = Object.create( UIPoints.prototype );
 UIPoints3.prototype.constructor = UIPoints3;
@@ -715,7 +908,7 @@ UIPoints3.prototype.createPointRow = function ( x, y, z ) {
 
 };
 
-var UIBoolean = function ( boolean, text ) {
+function UIBoolean( boolean, text ) {
 
 	UISpan.call( this );
 
@@ -727,7 +920,7 @@ var UIBoolean = function ( boolean, text ) {
 	this.add( this.checkbox );
 	this.add( this.text );
 
-};
+}
 
 UIBoolean.prototype = Object.create( UISpan.prototype );
 UIBoolean.prototype.constructor = UIBoolean;
@@ -744,4 +937,33 @@ UIBoolean.prototype.setValue = function ( value ) {
 
 };
 
-export { UITexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };
+var renderer;
+
+function renderToCanvas( texture ) {
+
+	if ( renderer === undefined ) {
+
+		renderer = new THREE.WebGLRenderer();
+		renderer.outputEncoding = THREE.sRGBEncoding;
+
+	}
+
+	var image = texture.image;
+
+	renderer.setSize( image.width, image.height, false );
+
+	var scene = new THREE.Scene();
+	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+	var material = new THREE.MeshBasicMaterial( { map: texture } );
+	var quad = new THREE.PlaneBufferGeometry( 2, 2 );
+	var mesh = new THREE.Mesh( quad, material );
+	scene.add( mesh );
+
+	renderer.render( scene, camera );
+
+	return renderer.domElement;
+
+}
+
+export { UITexture, UICubeTexture, UIOutliner, UIPoints, UIPoints2, UIPoints3, UIBoolean };

@@ -18,7 +18,7 @@
 	<body>
 		<div id="d">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl demo :
+				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl demo :
 				Earth diffuse and city lights by <a href="http://seanward.org" target="_blank" rel="noopener">Sean Ward</a> :
 
 			</div>
@@ -315,7 +315,6 @@
 							 r + "dark-s_pz.jpg", r + "dark-s_nz.jpg" ];
 
 				var textureCube = new THREE.CubeTextureLoader().load( urls );
-				textureCube.format = THREE.RGBFormat;
 				textureCube.encoding = THREE.sRGBEncoding;
 
 				sceneCube.background = textureCube;
@@ -334,11 +333,14 @@
 				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				ldrEffectComposer = new EffectComposer( renderer, regularRenderTarget );
 
-				if ( renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+				parameters.type = THREE.FloatType;
 
-					parameters.type = THREE.FloatType;
+				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
 
-	}
+					parameters.type = undefined; // avoid usage of floating point textures
+
+				}
+
 				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				dynamicHdrEffectComposer = new EffectComposer( renderer, hdrRenderTarget );
 				dynamicHdrEffectComposer.setSize( window.innerWidth, window.innerHeight );

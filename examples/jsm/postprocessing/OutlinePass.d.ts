@@ -8,7 +8,8 @@ import {
 	MeshBasicMaterial,
 	MeshDepthMaterial,
 	ShaderMaterial,
-	WebGLRenderTarget
+	WebGLRenderTarget,
+	Texture
 } from '../../../src/Three';
 
 import { Pass } from './Pass';
@@ -28,6 +29,7 @@ export class OutlinePass extends Pass {
 	downSampleRatio: number;
 	pulsePeriod: number;
 	resolution: Vector2;
+	patternTexture: Texture;
 
 	maskBufferMaterial: MeshBasicMaterial;
 	renderTargetMaskBuffer: WebGLRenderTarget;

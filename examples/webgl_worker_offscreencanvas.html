@@ -41,7 +41,7 @@
 				width: 100%;
 				text-align: center;
 			}
-			
+
 			#button {
 				border: 0;
 				padding: 4px 6px;
@@ -64,25 +64,29 @@
 			<span id="result"></span>
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/offscreen/scene.js"></script>
-		<script src="js/offscreen/jank.js"></script>
-		<script>
+		<script type="module">
+
+			import initJank from './jsm/offscreen/jank.js';
+			import init from './jsm/offscreen/scene.js';
 
 			// onscreen
+
+			var canvas1 = document.getElementById( 'canvas1' );
+			var canvas2 = document.getElementById( 'canvas2' );
 
 			var width = canvas1.clientWidth;
 			var height = canvas1.clientHeight;
 			var pixelRatio = window.devicePixelRatio;
 
 			init( canvas1, width, height, pixelRatio, './' );
+			initJank();
 
 			// offscreen
 
 			if ( 'transferControlToOffscreen' in canvas2 ) {
 
 				var offscreen = canvas2.transferControlToOffscreen();
-				var worker = new Worker( 'js/offscreen/offscreen.js' );
+				var worker = new Worker( 'jsm/offscreen/offscreen.js', { type: 'module' } );
 				worker.postMessage( {
 					drawingSurface: offscreen,
 					width: canvas2.clientWidth,

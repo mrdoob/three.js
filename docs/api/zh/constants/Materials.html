@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -25,20 +25,6 @@
 		<p>
 			定义了哪一边的面将会被渲染 —— 正面，或是反面，还是两个面都渲染。
 			默认值是[page:Constant FrontSide]（只渲染正面）。
-		</p>
-
-
-		<h2>颜色</h2>
-		<code>
-		THREE.NoColors
-		THREE.FaceColors
-		THREE.VertexColors
-		</code>
-		<p>
-		[page:Constant NoColors] 是默认值，且会将材质的颜色应用到所有面。<br />
-		[page:Constant FaceColors] 根据每个[page:Face3 Face3]的[page:Color Color]值来对面进行着色。<br />
-		[page:Constant VertexColors] 根据每个 [page:Face3 Face3]的vertexColors（顶点颜色）值来对面进行着色。 这是一个包含有三个[page:Color Color]的数组，数组中每一项都对应着面中的每一个顶点。<br />
-		请查看示例：[example:webgl_geometry_colors geometry / colors]。
 		</p>
 
 		<h2>混合模式</h2>

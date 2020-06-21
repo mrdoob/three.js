@@ -17,11 +17,9 @@ function StandardNode() {
 
 	Node.call( this );
 
-	this.color = new ColorNode( 0xEEEEEE );
-	this.roughness = new FloatNode( 0.5 );
-	this.metalness = new FloatNode( 0.5 );
-
-	this.energyPreservation = true;
+	this.color = new ColorNode( 0xFFFFFF );
+	this.roughness = new FloatNode( 1 );
+	this.metalness = new FloatNode( 0 );
 
 }
 
@@ -45,6 +43,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 	builder.requires.lights = true;
 
+	builder.extensions.derivatives = true;
 	builder.extensions.shaderTextureLOD = true;
 
 	if ( builder.isShader( 'vertex' ) ) {
@@ -136,6 +135,7 @@ StandardNode.prototype.build = function ( builder ) {
 			roughness: specularRoughness,
 			bias: new SpecularMIPLevelNode( specularRoughness ),
 			viewNormal: new ExpressionNode( 'normal', 'v3' ),
+			worldNormal: new ExpressionNode( 'inverseTransformDirection( geometry.normal, viewMatrix )', 'v3' ),
 			gamma: true
 		};
 
@@ -147,6 +147,7 @@ StandardNode.prototype.build = function ( builder ) {
 			roughness: clearcoatRoughness,
 			bias: new SpecularMIPLevelNode( clearcoatRoughness ),
 			viewNormal: new ExpressionNode( 'clearcoatNormal', 'v3' ),
+			worldNormal: new ExpressionNode( 'inverseTransformDirection( geometry.clearcoatNormal, viewMatrix )', 'v3' ),
 			gamma: true
 		};
 
@@ -323,10 +324,22 @@ StandardNode.prototype.build = function ( builder ) {
 
 		}
 
+		// anti-aliasing code by @elalish
+
+		output.push(
+			'vec3 dxy = max( abs( dFdx( geometryNormal ) ), abs( dFdy( geometryNormal ) ) );',
+			'float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );',
+		);
+
 		// optimization for now
 
 		output.push(
-			'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor * (1.0 - metalnessFactor)' ) + ';',
+			'material.diffuseColor = ' + ( light ? 'vec3( 1.0 )' : 'diffuseColor * ( 1.0 - metalnessFactor )' ) + ';',
+
+			'material.specularRoughness = max( roughnessFactor, 0.0525 );',
+			'material.specularRoughness += geometryRoughness;',
+			'material.specularRoughness = min( material.specularRoughness, 1.0 );',
+
 			'material.specularRoughness = clamp( roughnessFactor, 0.04, 1.0 );'
 		);
 
@@ -334,7 +347,7 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push(
 				clearcoat.code,
-				'material.clearcoat = saturate( ' + clearcoat.result + ' );'
+				'material.clearcoat = saturate( ' + clearcoat.result + ' );' // Burley clearcoat model
 			);
 
 		} else if ( useClearcoat ) {
@@ -347,7 +360,9 @@ StandardNode.prototype.build = function ( builder ) {
 
 			output.push(
 				clearcoatRoughness.code,
-				'material.clearcoatRoughness = clamp( ' + clearcoatRoughness.result + ', 0.04, 1.0 );'
+				'material.clearcoatRoughness = max( ' + clearcoatRoughness.result + ', 0.0525 );',
+				'material.clearcoatRoughness += geometryRoughness;',
+				'material.clearcoatRoughness = min( material.clearcoatRoughness, 1.0 );'
 			);
 
 		} else if ( useClearcoat ) {

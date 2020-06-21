@@ -10,7 +10,7 @@ var list = {
 				"Browser support": "manual/en/introduction/Browser-support",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
-				"How to use WebGL 2": "manual/en/introduction/How-to-use-WebGL2",
+				"Typescript setup": "manual/en/introduction/Typescript-setup",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
 				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
@@ -104,13 +104,11 @@ var list = {
 				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"Deprecated": {
-				"DeprecatedList": "api/en/deprecated/DeprecatedList"
-			},
-
 			"Extras": {
 				"Earcut": "api/en/extras/Earcut",
-				"ShapeUtils": "api/en/extras/ShapeUtils"
+				"ImageUtils": "api/en/extras/ImageUtils",
+				"PMREMGenerator": "api/en/extras/PMREMGenerator",
+				"ShapeUtils": "api/en/extras/ShapeUtils",
 			},
 
 			"Extras / Core": {
@@ -203,9 +201,12 @@ var list = {
 
 			"Lights": {
 				"AmbientLight": "api/en/lights/AmbientLight",
+				"AmbientLightProbe": "api/en/lights/AmbientLightProbe",
 				"DirectionalLight": "api/en/lights/DirectionalLight",
 				"HemisphereLight": "api/en/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/en/lights/HemisphereLightProbe",
 				"Light": "api/en/lights/Light",
+				"LightProbe": "api/en/lights/LightProbe",
 				"PointLight": "api/en/lights/PointLight",
 				"RectAreaLight": "api/en/lights/RectAreaLight",
 				"SpotLight": "api/en/lights/SpotLight"
@@ -280,6 +281,7 @@ var list = {
 				"Ray": "api/en/math/Ray",
 				"Sphere": "api/en/math/Sphere",
 				"Spherical": "api/en/math/Spherical",
+				"SphericalHarmonics3": "api/en/math/SphericalHarmonics3",
 				"Triangle": "api/en/math/Triangle",
 				"Vector2": "api/en/math/Vector2",
 				"Vector3": "api/en/math/Vector3",
@@ -311,6 +313,7 @@ var list = {
 			"Renderers": {
 				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
+				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
 				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
 			},
@@ -320,6 +323,10 @@ var list = {
 				"ShaderLib": "api/en/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/en/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/en/renderers/shaders/UniformsUtils"
+			},
+
+			"Renderers / WebXR": {
+				"WebXRManager": "api/en/renderers/webxr/WebXRManager"
 			},
 
 			"Scenes": {
@@ -333,6 +340,7 @@ var list = {
 				"CompressedTexture": "api/en/textures/CompressedTexture",
 				"CubeTexture": "api/en/textures/CubeTexture",
 				"DataTexture": "api/en/textures/DataTexture",
+				"DataTexture2DArray": "api/en/textures/DataTexture2DArray",
 				"DataTexture3D": "api/en/textures/DataTexture3D",
 				"DepthTexture": "api/en/textures/DepthTexture",
 				"Texture": "api/en/textures/Texture",
@@ -373,6 +381,10 @@ var list = {
 				"RectAreaLightHelper": "examples/en/helpers/RectAreaLightHelper",
 				"VertexNormalsHelper": "examples/en/helpers/VertexNormalsHelper",
 				"VertexTangentsHelper": "examples/en/helpers/VertexTangentsHelper"
+			},
+
+			"Lights": {
+				"LightProbeGenerator": "examples/en/lights/LightProbeGenerator"
 			},
 
 			"Loaders": {
@@ -459,7 +471,7 @@ var list = {
 				"浏览器支持": "manual/zh/introduction/Browser-support",
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
-				"如何使用WebGL 2": "manual/zh/introduction/How-to-use-WebGL2",
+				"Typescript设置": "manual/zh/introduction/Typescript-setup",
 				"画线": "manual/zh/introduction/Drawing-lines",
 				"创建文字": "manual/zh/introduction/Creating-text",
 				"载入3D模型": "manual/zh/introduction/Loading-3D-models",
@@ -553,12 +565,10 @@ var list = {
 				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"弃用列表": {
-				"DeprecatedList": "api/zh/deprecated/DeprecatedList"
-			},
-
 			"附件": {
 				"Earcut": "api/zh/extras/Earcut",
+				"ImageUtils": "api/zh/extras/ImageUtils",
+				"PMREMGenerator": "api/zh/extras/PMREMGenerator",
 				"ShapeUtils": "api/zh/extras/ShapeUtils"
 			},
 
@@ -652,9 +662,12 @@ var list = {
 
 			"灯光": {
 				"AmbientLight": "api/zh/lights/AmbientLight",
+				"AmbientLightProbe": "api/zh/lights/AmbientLightProbe",
 				"DirectionalLight": "api/zh/lights/DirectionalLight",
 				"HemisphereLight": "api/zh/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/zh/lights/HemisphereLightProbe",
 				"Light": "api/zh/lights/Light",
+				"LightProbe": "api/zh/lights/LightProbe",
 				"PointLight": "api/zh/lights/PointLight",
 				"RectAreaLight": "api/zh/lights/RectAreaLight",
 				"SpotLight": "api/zh/lights/SpotLight"
@@ -729,6 +742,7 @@ var list = {
 				"Ray": "api/zh/math/Ray",
 				"Sphere": "api/zh/math/Sphere",
 				"Spherical": "api/zh/math/Spherical",
+				"SphericalHarmonics3": "api/zh/math/SphericalHarmonics3",
 				"Triangle": "api/zh/math/Triangle",
 				"Vector2": "api/zh/math/Vector2",
 				"Vector3": "api/zh/math/Vector3",
@@ -760,6 +774,7 @@ var list = {
 			"渲染器": {
 				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
+				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
 				"WebGLCubeRenderTarget": "api/zh/renderers/WebGLCubeRenderTarget"
 			},
@@ -769,6 +784,10 @@ var list = {
 				"ShaderLib": "api/zh/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/zh/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/zh/renderers/shaders/UniformsUtils"
+			},
+
+			"渲染器 / WebXR": {
+				"WebXRManager": "api/zh/renderers/webxr/WebXRManager"
 			},
 
 			"场景": {
@@ -782,6 +801,7 @@ var list = {
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
 				"DataTexture": "api/zh/textures/DataTexture",
+				"DataTexture2DArray": "api/zh/textures/DataTexture2DArray",
 				"DataTexture3D": "api/zh/textures/DataTexture3D",
 				"DepthTexture": "api/zh/textures/DepthTexture",
 				"Texture": "api/zh/textures/Texture",
@@ -813,6 +833,10 @@ var list = {
 				"ConvexBufferGeometry": "examples/zh/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/zh/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
+			},
+
+			"灯光": {
+				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
 			},
 
 			"辅助对象": {
