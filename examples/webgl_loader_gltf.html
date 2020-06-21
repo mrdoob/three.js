@@ -67,7 +67,8 @@
 
 								if ( child.isMesh ) {
 
-									roughnessMipmapper.generateMipmaps( child.material );
+									// TOFIX RoughnessMipmapper seems to be broken with WebGL 2.0
+									// roughnessMipmapper.generateMipmaps( child.material );
 
 								}
 
