@@ -173,7 +173,7 @@ Object.assign( PropertyBinding, {
 
 			const objectName = results.nodeName.substring( lastDot + 1 );
 
-			// Object names must be checked against a whitelist. Otherwise, there
+			// Object names must be checked against an allowlist. Otherwise, there
 			// is no way to parse 'foo.bar.baz': 'baz' must be a property, but
 			// 'bar' could be the objectName, or part of a nodeName (which can
 			// include '.' characters).
