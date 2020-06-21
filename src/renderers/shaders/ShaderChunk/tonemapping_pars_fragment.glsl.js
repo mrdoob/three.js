@@ -40,6 +40,9 @@ vec3 RRTAndODTFit( vec3 v ) {
 
 }
 
+// this implementation of ACES is modified to accommodate a brighter viewing environment.
+// the scale factor of 1/0.6 is subjective. see discussion in #19621.
+
 vec3 ACESFilmicToneMapping( vec3 color ) {
 
     // sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
@@ -56,7 +59,7 @@ vec3 ACESFilmicToneMapping( vec3 color ) {
         vec3( -0.07367, -0.00605,  1.07602 )
     );
 
-    color *= toneMappingExposure;
+    color *= toneMappingExposure / 0.6;
 
     color = ACESInputMat * color;
 
