@@ -1,4 +1,4 @@
-import CANNON from "../libs/cannon.module.min.js";
+import { World, SAPBroadphase, Vec3, Box, Plane, Sphere, Quaternion, Body } from "../libs/cannon-es.module.js";
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -39,9 +39,9 @@ function CannonPhysics() {
 	var frameRate = 60;
 	var frameTime = 1 / frameRate;
 
-	var world = new CANNON.World();
+	var world = new World();
 	world.gravity.set( 0, - 9.8, 0 );
-	world.broadphase = new CANNON.SAPBroadphase( world );
+	world.broadphase = new SAPBroadphase( world );
 	// world.solver.iterations = 20;
 	// world.solver.tolerance = 0.001;
 	// world.allowSleep = true;
@@ -57,18 +57,18 @@ function CannonPhysics() {
 		switch ( geometry.type ) {
 
 			case 'BoxBufferGeometry':
-				var halfExtents = new CANNON.Vec3();
+				var halfExtents = new Vec3();
 				halfExtents.x = parameters.width !== undefined ? parameters.width / 2 : 0.5;
 				halfExtents.y = parameters.height !== undefined ? parameters.height / 2 : 0.5;
 				halfExtents.z = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
-				return new CANNON.Box( halfExtents );
+				return new Box( halfExtents );
 
 			case 'PlaneBufferGeometry':
-				return new CANNON.Plane();
+				return new Plane();
 
 			case 'SphereBufferGeometry':
 				var radius = parameters.radius;
-				return new CANNON.Sphere( radius );
+				return new Sphere( radius );
 
 		}
 
@@ -101,13 +101,13 @@ function CannonPhysics() {
 
 	function handleMesh( mesh, mass, shape ) {
 
-		var position = new CANNON.Vec3();
+		var position = new Vec3();
 		position.copy( mesh.position );
 
-		var quaternion = new CANNON.Quaternion();
+		var quaternion = new Quaternion();
 		quaternion.copy( mesh.quaternion );
 
-		var body = new CANNON.Body( {
+		var body = new Body( {
 			position: position,
 			quaternion: quaternion,
 			mass: mass,
@@ -134,10 +134,10 @@ function CannonPhysics() {
 
 			var index = i * 16;
 
-			var position = new CANNON.Vec3();
+			var position = new Vec3();
 			position.set( array[ index + 12 ], array[ index + 13 ], array[ index + 14 ] );
 
-			var body = new CANNON.Body( {
+			var body = new Body( {
 				position: position,
 				mass: mass,
 				shape: shape
