@@ -717,7 +717,7 @@ function Strings( config ) {
 
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
-			'sidebar/scene/environment': 'Environment',
+			'sidebar/scene/environment': '环境',
 			'sidebar/scene/fog': '雾',
 
 			'sidebar/properties/object': '属性',
