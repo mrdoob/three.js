@@ -43,7 +43,6 @@ function Viewport( editor ) {
 	// helpers
 
 	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
-	sceneHelpers.add( grid );
 
 	var array = grid.geometry.attributes.color.array;
 
@@ -711,7 +710,12 @@ function Viewport( editor ) {
 
 		startTime = performance.now();
 
+		// Adding/removing grid to scene so materials with depthWrite false
+		// don't render under the grid.
+
+		scene.add( grid );
 		renderer.render( scene, camera );
+		scene.remove( grid );
 
 		if ( camera === editor.camera ) {
 
