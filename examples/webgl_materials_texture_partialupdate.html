@@ -119,10 +119,11 @@
 				for ( var i = 0; i < size; i ++ ) {
 
 					var stride = i * 3;
+					var gradient = i / size;
 
-					data[ stride ] = r;
-					data[ stride + 1 ] = g;
-					data[ stride + 2 ] = b;
+					data[ stride ] = r * gradient;
+					data[ stride + 1 ] = g * gradient;
+					data[ stride + 2 ] = b * gradient;
 
 				}
 
