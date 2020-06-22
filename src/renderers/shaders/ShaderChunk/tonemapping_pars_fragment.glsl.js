@@ -72,4 +72,6 @@ vec3 ACESFilmicToneMapping( vec3 color ) {
 	return saturate( color );
 
 }
+
+vec3 CustomToneMapping( vec3 color ) { return color; }
 `;
