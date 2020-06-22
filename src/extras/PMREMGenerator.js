@@ -208,8 +208,7 @@ PMREMGenerator.prototype = {
 		this._pingPongRenderTarget.dispose();
 		this._renderer.setRenderTarget( _oldTarget );
 		outputTarget.scissorTest = false;
-		// reset viewport and scissor
-		outputTarget.setSize( outputTarget.width, outputTarget.height );
+		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
 
 	},
 
