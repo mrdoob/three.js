@@ -13,7 +13,7 @@ function LightShadow( camera ) {
 	this.camera = camera;
 
 	this.bias = 0;
-	this.normalOffset = 0;
+	this.normalBias = 0;
 	this.radius = 1;
 
 	this.mapSize = new Vector2( 512, 512 );
@@ -121,7 +121,7 @@ Object.assign( LightShadow.prototype, {
 		const object = {};
 
 		if ( this.bias !== 0 ) object.bias = this.bias;
-		if ( this.normalOffset !== 0 ) object.normalOffset = this.normalOffset;
+		if ( this.normalBias !== 0 ) object.normalBias = this.normalBias;
 		if ( this.radius !== 1 ) object.radius = this.radius;
 		if ( this.mapSize.x !== 512 || this.mapSize.y !== 512 ) object.mapSize = this.mapSize.toArray();
 

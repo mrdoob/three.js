@@ -14,7 +14,7 @@ export default /* glsl */`
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_DIR_LIGHT_SHADOWS; i ++ ) {
 
-		shadowWorldPosition = worldPosition + vec4( shadowWorldNormal * directionalLightShadows[ i ].shadowNormalOffset, 0 );
+		shadowWorldPosition = worldPosition + vec4( shadowWorldNormal * directionalLightShadows[ i ].shadowNormalBias, 0 );
 		vDirectionalShadowCoord[ i ] = directionalShadowMatrix[ i ] * shadowWorldPosition;
 
 	}
@@ -27,7 +27,7 @@ export default /* glsl */`
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_SPOT_LIGHT_SHADOWS; i ++ ) {
 
-		shadowWorldPosition = worldPosition + vec4( shadowWorldNormal * spotLightShadows[ i ].shadowNormalOffset, 0 );
+		shadowWorldPosition = worldPosition + vec4( shadowWorldNormal * spotLightShadows[ i ].shadowNormalBias, 0 );
 		vSpotShadowCoord[ i ] = spotShadowMatrix[ i ] * shadowWorldPosition;
 
 	}
@@ -40,7 +40,7 @@ export default /* glsl */`
 	#pragma unroll_loop_start
 	for ( int i = 0; i < NUM_POINT_LIGHT_SHADOWS; i ++ ) {
 
-		shadowWorldPosition = worldPosition + vec4( shadowWorldNormal * pointLightShadows[ i ].shadowNormalOffset, 0 );
+		shadowWorldPosition = worldPosition + vec4( shadowWorldNormal * pointLightShadows[ i ].shadowNormalBias, 0 );
 		vPointShadowCoord[ i ] = pointShadowMatrix[ i ] * shadowWorldPosition;
 
 	}

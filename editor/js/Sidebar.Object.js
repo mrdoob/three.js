@@ -315,14 +315,14 @@ function SidebarObject( editor ) {
 
 	// shadow normal offset
 
-	var objectShadowNormalOffsetRow = new UIRow();
+	var objectShadowNormalBiasRow = new UIRow();
 
-	objectShadowNormalOffsetRow.add( new UIText( strings.getKey( 'sidebar/object/shadowNormalOffset' ) ).setWidth( '90px' ) );
+	objectShadowNormalBiasRow.add( new UIText( strings.getKey( 'sidebar/object/shadowNormalBias' ) ).setWidth( '90px' ) );
 
-	var objectShadowNormalOffset = new UINumber( 0 ).onChange( update );
-	objectShadowNormalOffsetRow.add( objectShadowNormalOffset );
+	var objectShadowNormalBias = new UINumber( 0 ).onChange( update );
+	objectShadowNormalBiasRow.add( objectShadowNormalBias );
 
-	container.add( objectShadowNormalOffsetRow );
+	container.add( objectShadowNormalBiasRow );
 
 	// shadow radius
 
@@ -611,9 +611,9 @@ function SidebarObject( editor ) {
 
 				}
 
-				if ( object.shadow.normalOffset !== objectShadowNormalOffset.getValue() ) {
+				if ( object.shadow.normalBias !== objectShadowNormalBias.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'normalOffset', objectShadowNormalOffset.getValue() ) );
+					editor.execute( new SetValueCommand( editor, object.shadow, 'normalBias', objectShadowNormalBias.getValue() ) );
 
 				}
 
@@ -663,7 +663,7 @@ function SidebarObject( editor ) {
 			'decay': objectDecayRow,
 			'castShadow': objectShadowRow,
 			'receiveShadow': objectReceiveShadow,
-			'shadow': [ objectShadowBiasRow, objectShadowNormalOffsetRow, objectShadowRadiusRow ]
+			'shadow': [ objectShadowBiasRow, objectShadowNormalBiasRow, objectShadowRadiusRow ]
 		};
 
 		for ( var property in properties ) {
@@ -858,7 +858,7 @@ function SidebarObject( editor ) {
 		if ( object.shadow !== undefined ) {
 
 			objectShadowBias.setValue( object.shadow.bias );
-			objectShadowNormalOffset.setValue( object.shadow.normalOffset );
+			objectShadowNormalBias.setValue( object.shadow.normalBias );
 			objectShadowRadius.setValue( object.shadow.radius );
 
 		}
