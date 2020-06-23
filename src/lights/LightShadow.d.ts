@@ -17,6 +17,8 @@ export class LightShadow {
 	map: RenderTarget;
 	mapPass: RenderTarget;
 	matrix: Matrix4;
+	autoUpdate: boolean;
+	needsUpdate: boolean;
 
 	copy( source: LightShadow ): this;
 	clone( recursive?: boolean ): this;
