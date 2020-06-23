@@ -43,6 +43,12 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
 		bindingStates.releaseStatesOfGeometry( geometry );
 
+		if ( geometry.isInstancedBufferGeometry === true ) {
+
+			delete geometry._maxInstanceCount;
+
+		}
+
 		//
 
 		info.memory.geometries --;
