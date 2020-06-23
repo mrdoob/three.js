@@ -55,7 +55,7 @@ const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // 빨강
 
 이제 Three.js의 기본 재질을 살펴보겠습니다.
 
-`MeshBasicMaterial`은 광원의 영향을 받지 않습니다. `MeshLamberMaterial`은
+`MeshBasicMaterial`은 광원의 영향을 받지 않습니다. `MeshLambertMaterial`은
 정점에서만 광원을 계산하고, `MeshPhongMaterial`은 픽셀 하나하나 전부 광원을
 계산합니다. 뿐만 아니라 `MeshPhongMaterial`은 반사점(specular highlights, 물체가 조명을 받을 때 물체에 나타나는 밝은 점. 역주)도
 지원합니다.
@@ -105,7 +105,7 @@ const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // 빨강
   </div>
 </div>
 
-만약 `MeshLamberMaterial`이나 `MeshPhongMaterial`의 `emissive` 속성에
+만약 `MeshLambertMaterial`이나 `MeshPhongMaterial`의 `emissive` 속성에
 색상값을 지정하고, (`MeshPhongMaterial`은 `shininess`도 0으로 지정해야함)
 `color` 속성을 검정으로 지정하면 `MeshBasicMaterial`과 마찬가지로 입체감이
 사라집니다.
@@ -137,7 +137,7 @@ const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // 빨강
   </div>
 </div>
 
-왜 `MeshPhongMaterial`로 `MeshBasicMaterial`과 `MeshLamberMaterial`을
+왜 `MeshPhongMaterial`로 `MeshBasicMaterial`과 `MeshLambertMaterial`을
 구현할 수 있는데 3가지로 분리해 놓았을까요? 이미 감을 잡으셨겠지만, 재질이
 정교할수록 GPU의 부담이 커지기 때문입니다. GPU 성능이 낮은 저사양 기기에서는
 덜 정교한 재질을 씀으로써 GPU의 부담을 줄일 수 있죠. 또한 복잡한 표현이 필요
@@ -232,18 +232,17 @@ const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // 빨강
   </div>
 </div>
 
-`ShaderMaterial` is for making custom materials using the three.js shader
-system. `RawShaderMaterial` is for making entirely custom shaders with
-no help from three.js. Both of these topics are large and will be
-covered later.
+`ShaderMaterial`과 `RawShaderMaterial`은 재질을 커스텀할 때 사용합니다.
+둘의 차이점은 `ShaderMaterial`은 Three.js의 쉐이더 시스템을 이용하고,
+`RawShaderMaterial`은 아예 Three.js의 도움을 받지 않는다는 점이죠. 둘
+다 짧게 다루기는 어려운 주제로, 나중에 상세하게 다루겠습니다.
 
-Most materials share a bunch of settings all defined by `Material`.
-[See the docs](Material)
-for all of them but let's go over two of the most commonly used
-properties.
+재질 속성(properties)의 대부분은 `Material` 클래스에 의해 정의됩니다.
+자세한 건 [공식 문서](Material)를 참고하되, 여기서는 자주 사용하는
+두 가지 속성만 살펴보도록 하죠.
 
 [`flatShading`](Material.flatShading):
-whether or not the object looks faceted or smooth. default = `false`.
+물체를 각지게(faceted) 표현할지의 여부입니다. 기본값은 `false`.
 
 <div class="spread">
   <div>
@@ -256,14 +255,16 @@ whether or not the object looks faceted or smooth. default = `false`.
   </div>
 </div>
 
-[`side`](Material.side): which sides of triangles to show. The default is `THREE.FrontSide`.
-Other options are `THREE.BackSide` and `THREE.DoubleSide` (both sides).
-Most 3D objects drawn in three are probably opaque solids so the back sides
-(the sides facing inside the solid) do not need to be drawn. The most common
-reason to set `side` is for planes or other non-solid objects where it is
-common to see the back sides of triangles.
+[`side`](Material.side):
+어떤 면을 렌더링할지의 여부입니다. 기본값은 `THREE.FrontSide(앞면)`.
+다른 값으로는 `THREE.BackSide(뒷면)`와 `THREE.DoubleSide(양면)`를
+지정할 수 있습니다. 3D로 렌더링한 물체는 대부분 불투명한 고체이기에,
+뒷면(고체의 안쪽면)은 굳이 렌더링할 필요가 없습니다. `side` 속성을
+별도로 지정하는 경우는 면이나 비-고체 등 뒷면을 렌더링해야 할 경우
+뿐이죠.
 
-Here are 6 planes drawn with `THREE.FrontSide` and `THREE.DoubleSide`.
+아래는 각각 `THREE.FrontSide`와 `THREE.DoubleSide`를 이용해 6개의
+면을 렌더링한 것입니다.
 
 <div class="spread">
   <div>
@@ -276,40 +277,44 @@ Here are 6 planes drawn with `THREE.FrontSide` and `THREE.DoubleSide`.
   </div>
 </div>
 
-There's really a lot to consider with materials and we actually still
-have a bunch more to go. In particular we've mostly ignored textures
-which open up a whole slew of options. Before we cover textures though
-we need to take a break and cover
-[setting up your development environment](threejs-setup.html)
+실제 프로젝트에서 재질을 다룰 때는 고려해야 할 것이 훨씬 많습니다.
+이 장에서는 아주 기본적인 것만 살펴보았을 뿐이고, 제대로 사용하기
+위해서는 알아야 할 것들이 훨씬 더 많죠. 예를 들어 나중에 살펴볼
+텍스처(textures, 질감)만 추가해도 경우의 수가 엄청나게 늘어납니다.
+말 나온 김에 바로 텍스처를 살펴보는 것도 좋지만, 다음 장에서는 잠시
+쉬어가는 의미로 [Three.js 개발 환경 구성하기](threejs-setup.html)에
+대해 알아보겠습니다.
 
 <div class="threejs_bottombar">
 <h3>material.needsUpdate</h3>
 <p>
-This topic rarely affects most three.js apps but just as an FYI...
-Three.js applies material settings when a material is used where "used"
-means "something is rendered that uses the material". Some material settings are
-only applied once as changing them requires lots of work by three.js.
-In those cases you need to set <code>material.needsUpdate = true</code> to tell
-three.js to apply your material changes. The most common settings
-that require you to set <code>needsUpdate</code> if you change the settings after
-using the material are:
+이 속성은 사용할 일이 그다지 많진 않으니 참고로 알아두시기 바랍니다.
+Three.js는 재질을 사용할 때-해당 재질을 사용하는 물체를 렌더링할 때-
+재질의 설정을 적용합니다. 재질을 바꿀 때는 많은 자원이 들어가기에,
+Three.js는 기본적으로 처음 한 번만 재질의 설정을 적용합니다. 만약
+재질의 속성(properties)을 런타임에 바꿔야 할 경우, <code>material.needsUpdate = true</code>를
+설정해 Three.js가 변경사항을 반영하도록 해야 하죠. 대표적으로
+<code>needsUpdate</code>를 사용해야 하는 경우는 다음과 같습니다.
+
 </p>
 <ul>
-  <li><code>flatShading</code></li>
-  <li>adding or removing a texture
+  <li><code>flatShading</code> 속성을 변경할 때</li>
+  <li>텍스처를 추가/제거할 때
     <p>
-    Changing a texture is ok, but if want to switch from using no texture
-    to using a texture or from using a texture to using no texture
-    then you need to set <code>needsUpdate = true</code>.
+    단순히 텍스처를 변경할 때는 상관없으나, 아예 텍스처를 사용하지 않다가
+    텍스처를 추가하는 경우, 또는 텍스처를 사용하다가 텍스처를 제거하는 경우
+    <code>needsUpdate = true</code>를 설정해주어야 합니다.
     </p>
-    <p>In the case of going from texture to no-texture it is often
-    just better to use a 1x1 pixel white texture.</p>
+    <p>
+    하지만 텍스처를 제거하는 경우, 대게 1x1 하얀색 픽셀 텍스처로 변경하는 게
+    낫습니다.
   </li>
 </ul>
-<p>As mentioned above most apps never run into these issues. Most apps
-do not switch between flat shaded and non flat shaded. Most apps also
-either use textures or a solid color for a given material, they rarely
-switch from using one to using the other.
+<p>
+위에서 언급했듯, 대부분의 앱은 이런 경우를 고려할 일이 거의 없습니다.
+<code>flatShade</code> 속성을 변경하는 경우는 흔치 않고, 텍스처를 변경하는
+경우는 있어도 물체의 속성이나 색상을 지정하지 않았다가 추가하는 경우는 흔치 않기
+때문입니다.
 </p>
 </div>
 
