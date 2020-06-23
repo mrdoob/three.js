@@ -22,6 +22,9 @@ function LightShadow( camera ) {
 	this.mapPass = null;
 	this.matrix = new Matrix4();
 
+	this.autoUpdate = true;
+	this.needsUpdate = false;
+
 	this._frustum = new Frustum();
 	this._frameExtents = new Vector2( 1, 1 );
 
