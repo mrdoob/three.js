@@ -20683,6 +20683,8 @@
 				var light = lights[ i ];
 				var shadow = light.shadow;
 
+				if ( shadow.autoUpdate === false && shadow.needsUpdate === false ) { continue; }
+
 				if ( shadow === undefined ) {
 
 					console.warn( 'THREE.WebGLShadowMap:', light, 'has no shadow.' );
@@ -20775,6 +20777,8 @@
 					VSMPass( shadow, camera );
 
 				}
+
+				shadow.needsUpdate = false;
 
 			}
 
@@ -26685,6 +26689,12 @@
 			var glType = utils.convert( dstTexture.type );
 
 			textures.setTexture2D( dstTexture, 0 );
+
+			// As another texture upload may have changed pixelStorei
+			// parameters, make sure they are correct for the dstTexture
+			_gl.pixelStorei( 37440, dstTexture.flipY );
+			_gl.pixelStorei( 37441, dstTexture.premultiplyAlpha );
+			_gl.pixelStorei( 3317, dstTexture.unpackAlignment );
 
 			if ( srcTexture.isDataTexture ) {
 
@@ -39614,6 +39624,9 @@
 		this.mapPass = null;
 		this.matrix = new Matrix4();
 
+		this.autoUpdate = true;
+		this.needsUpdate = false;
+
 		this._frustum = new Frustum();
 		this._frameExtents = new Vector2( 1, 1 );
 
@@ -48782,8 +48795,7 @@
 			this._pingPongRenderTarget.dispose();
 			this._renderer.setRenderTarget( _oldTarget );
 			outputTarget.scissorTest = false;
-			// reset viewport and scissor
-			outputTarget.setSize( outputTarget.width, outputTarget.height );
+			_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
 
 		},
 
