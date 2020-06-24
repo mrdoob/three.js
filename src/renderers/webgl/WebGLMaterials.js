@@ -437,9 +437,6 @@ function WebGLMaterials( properties ) {
 
 	function refreshUniformsToon( uniforms, material ) {
 
-		uniforms.specular.value.copy( material.specular );
-		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
-
 		if ( material.gradientMap ) {
 
 			uniforms.gradientMap.value = material.gradientMap;
