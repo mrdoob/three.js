@@ -14,8 +14,11 @@ import {
 	Spherical,
 	TOUCH,
 	Vector2,
-	Vector3
+	Vector3,
+	Matrix4
 } from "../../../build/three.module.js";
+
+const _m1 = new Matrix4();
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -211,8 +214,12 @@ var OrbitControls = function ( object, domElement ) {
 			offset.applyQuaternion( quatInverse );
 
 			position.copy( scope.target ).add( offset );
-
-			scope.object.lookAt( scope.target );
+			if ( scope.object.isCamera || scope.object.isLight ) {
+				_m1.lookAt( position, scope.target, scope.object.up );
+			} else {
+				_m1.lookAt( scope.object.up, position, scope.object.up );
+			}
+			scope.object.quaternion.setFromRotationMatrix( _m1 );
 
 			if ( scope.enableDamping === true ) {
 
