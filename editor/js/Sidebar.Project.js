@@ -81,7 +81,6 @@ function SidebarProject( editor ) {
 	var antialiasRow = new UIRow();
 	var antialiasBoolean = new UIBoolean( config.getKey( 'project/renderer/antialias' ) ).onChange( function () {
 
-		config.setKey( 'project/renderer/antialias', this.getValue() );
 		createRenderer();
 
 	} );
@@ -96,8 +95,8 @@ function SidebarProject( editor ) {
 	var shadowsRow = new UIRow();
 	var shadowsBoolean = new UIBoolean( config.getKey( 'project/renderer/shadows' ) ).onChange( function () {
 
-		config.setKey( 'project/renderer/shadows', this.getValue() );
-		updateRenderer();
+		currentRenderer.shadowMap.enabled = this.getValue();
+		signals.rendererUpdated.dispatch();
 
 	} );
 
@@ -111,8 +110,8 @@ function SidebarProject( editor ) {
 		//	3: 'VSM'
 	} ).setWidth( '125px' ).onChange( function () {
 
-		config.setKey( 'project/renderer/shadowType', parseFloat( this.getValue() ) );
-		updateRenderer();
+		currentRenderer.shadowMap.type = parseFloat( this.getValue() );
+		signals.rendererUpdated.dispatch();
 
 	} );
 	shadowTypeSelect.setValue( config.getKey( 'project/renderer/shadowType' ) );
@@ -126,8 +125,8 @@ function SidebarProject( editor ) {
 	var physicallyCorrectLightsRow = new UIRow();
 	var physicallyCorrectLightsBoolean = new UIBoolean( config.getKey( 'project/renderer/physicallyCorrectLights' ) ).onChange( function () {
 
-		config.setKey( 'project/renderer/physicallyCorrectLights', this.getValue() );
-		updateRenderer();
+		currentRenderer.physicallyCorrectLights = this.getValue();
+		signals.rendererUpdated.dispatch();
 
 	} );
 
@@ -145,14 +144,11 @@ function SidebarProject( editor ) {
 		2: 'Reinhard',
 		3: 'Cineon',
 		4: 'ACESFilmic'
-	} ).setWidth( '120px' ).onChange( function ( value ) {
+	} ).setWidth( '120px' ).onChange( function () {
 
-		var value = this.getValue();
-
-		config.setKey( 'project/renderer/toneMapping', parseFloat( value ) );
-		toneMappingExposure.setDisplay( value === '0' ? 'none' : '' );
-
-		updateRenderer();
+		currentRenderer.toneMapping = parseFloat( this.getValue() );
+		toneMappingExposure.setDisplay( currentRenderer.toneMapping === 0 ? 'none' : '' );
+		signals.rendererUpdated.dispatch();
 
 	} );
 	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
@@ -166,8 +162,8 @@ function SidebarProject( editor ) {
 	toneMappingExposure.setRange( 0, 10 );
 	toneMappingExposure.onChange( function () {
 
-		config.setKey( 'project/renderer/toneMappingExposure', this.getValue() );
-		updateRenderer();
+		currentRenderer.toneMappingExposure = this.getValue();
+		signals.rendererUpdated.dispatch();
 
 	} );
 	toneMappingRow.add( toneMappingExposure );
@@ -175,18 +171,6 @@ function SidebarProject( editor ) {
 	rendererPanel.add( toneMappingRow );
 
 	//
-
-	function updateRenderer() {
-
-		currentRenderer.physicallyCorrectLights = physicallyCorrectLightsBoolean.getValue();
-		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
-		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
-		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
-		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
-
-		signals.rendererUpdated.dispatch();
-
-	}
 
 	function createRenderer() {
 
@@ -262,7 +246,45 @@ function SidebarProject( editor ) {
 
 	container.add( materials );
 
-	// events
+	// signals
+
+	signals.editorCleared.add( function () {
+
+		currentRenderer.physicallyCorrectLights = false;
+		currentRenderer.shadowMap.enabled = true;
+		currentRenderer.shadowMap.type = 1;
+		currentRenderer.toneMapping = 0;
+		currentRenderer.toneMappingExposure = 1;
+
+		refreshRendererUI();
+
+		signals.rendererUpdated.dispatch();
+
+	} );
+
+	function refreshRendererUI() {
+
+		physicallyCorrectLightsBoolean.setValue( currentRenderer.physicallyCorrectLights );
+		shadowsBoolean.setValue( currentRenderer.shadowMap.enabled );
+		shadowTypeSelect.setValue( currentRenderer.shadowMap.type );
+		toneMappingSelect.setValue( currentRenderer.toneMapping );
+		toneMappingExposure.setValue( currentRenderer.toneMappingExposure );
+		toneMappingExposure.setDisplay( currentRenderer.toneMapping === 0 ? 'none' : '' );
+
+	}
+
+	signals.rendererUpdated.add( function () {
+
+		config.setKey(
+			'project/renderer/antialias', antialiasBoolean.getValue(),
+			'project/renderer/physicallyCorrectLights', physicallyCorrectLightsBoolean.getValue(),
+			'project/renderer/shadows', shadowsBoolean.getValue(),
+			'project/renderer/shadowType', parseFloat( shadowTypeSelect.getValue() ),
+			'project/renderer/toneMapping', parseFloat( toneMappingSelect.getValue() ),
+			'project/renderer/toneMappingExposure', toneMappingExposure.getValue()
+		);
+
+	} );
 
 	signals.objectSelected.add( function ( object ) {
 
