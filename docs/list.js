@@ -6,7 +6,7 @@ var list = {
 
 			"Getting Started": {
 				"Creating a scene": "manual/en/introduction/Creating-a-scene",
-				"Import via modules": "manual/en/introduction/Import-via-modules",
+				"Installation": "manual/en/introduction/Installation",
 				"Browser support": "manual/en/introduction/Browser-support",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
