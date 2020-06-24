@@ -158,8 +158,7 @@ controls.keys = {
 
 		<h3>[property:Float maxAzimuthAngle]</h3>
 		<p>
-			你能够水平旋转的角度的上限，范围是-Math.PI到Math.PI（或Infinity无限制），
-			其默认值为Infinity。
+			How far you can orbit horizontally, upper limit. If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI ). Default is Infinity.
 		</p>
 
 		<h3>[property:Float maxDistance]</h3>
@@ -179,8 +178,7 @@ controls.keys = {
 
 		<h3>[property:Float minAzimuthAngle]</h3>
 		<p>
-			你能够水平旋转的角度的下限，范围是-Math.PI到Math.PI（或-Infinity无限制），
-			其默认值为-Infinity。
+			How far you can orbit horizontally, lower limit. If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI ). Default is Infinity.
 		</p>
 
 		<h3>[property:Float minDistance]</h3>
