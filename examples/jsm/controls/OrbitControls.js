@@ -217,7 +217,7 @@ var OrbitControls = function ( object, domElement ) {
 			if ( scope.object.isCamera || scope.object.isLight ) {
 				_m1.lookAt( position, scope.target, scope.object.up );
 			} else {
-				_m1.lookAt( scope.object.up, position, scope.object.up );
+				_m1.lookAt( scope.target, position, scope.object.up );
 			}
 			scope.object.quaternion.setFromRotationMatrix( _m1 );
 
