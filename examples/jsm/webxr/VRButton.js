@@ -127,6 +127,7 @@ var VRButton = {
 		if ( 'xr' in navigator ) {
 
 			var button = document.createElement( 'button' );
+			button.id = 'VRButton';
 			button.style.display = 'none';
 
 			stylizeElement( button );

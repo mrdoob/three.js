@@ -23,7 +23,7 @@
 			import { RectAreaLightUniformsLib } from './jsm/lights/RectAreaLightUniformsLib.js';
 
 			// shader injection for box projected cube environment mapping
-			var worldposReplace = `
+			var worldposReplace = /* glsl */`
 			#define BOX_PROJECTED_ENV_MAP
 
 			#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP )
@@ -39,7 +39,7 @@
 			#endif
 			`;
 
-			var envmapPhysicalParsReplace = `
+			var envmapPhysicalParsReplace = /* glsl */`
 			#if defined( USE_ENVMAP )
 
 				#define BOX_PROJECTED_ENV_MAP
@@ -184,22 +184,6 @@
 						#else
 
 							vec4 envMapColor = texture2D( envMap, sampleUV, specularMIPLevel );
-
-						#endif
-
-						envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
-
-					#elif defined( ENVMAP_TYPE_SPHERE )
-
-						vec3 reflectView = normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0,0.0,1.0 ) );
-
-						#ifdef TEXTURE_LOD_EXT
-
-							vec4 envMapColor = texture2DLodEXT( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );
-
-						#else
-
-							vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );
 
 						#endif
 

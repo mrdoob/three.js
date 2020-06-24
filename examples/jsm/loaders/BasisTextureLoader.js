@@ -2,6 +2,7 @@
  * @author Don McCurdy / https://www.donmccurdy.com
  * @author Austin Eng / https://github.com/austinEng
  * @author Shrek Shao / https://github.com/shrekshao
+ * @author Senya Pugach / https://upisfr.ee
  */
 
 import {
@@ -52,6 +53,8 @@ var BasisTextureLoader = function ( manager ) {
 	};
 
 };
+
+BasisTextureLoader.taskCache = new WeakMap();
 
 BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
@@ -122,7 +125,17 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 		loader.load( url, ( buffer ) => {
 
-			this._createTexture( buffer )
+			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+			// again from this thread.
+			if ( BasisTextureLoader.taskCache.has( buffer ) ) {
+
+				var cachedTask = BasisTextureLoader.taskCache.get( buffer );
+
+				return cachedTask.promise.then( onLoad ).catch( onError );
+
+			}
+
+			this._createTexture( buffer, url )
 				.then( onLoad )
 				.catch( onError );
 
@@ -131,10 +144,11 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 	},
 
 	/**
-	 * @param  {ArrayBuffer} buffer
+	 * @param	{ArrayBuffer} buffer
+	 * @param	{string} url
 	 * @return {Promise<CompressedTexture>}
 	 */
-	_createTexture: function ( buffer ) {
+	_createTexture: function ( buffer, url ) {
 
 		var worker;
 		var taskID;
@@ -212,6 +226,14 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 				}
 
 			} );
+
+		// Cache the task result.
+		BasisTextureLoader.taskCache.set( buffer, {
+
+			url: url,
+			promise: texturePending
+
+		} );
 
 		return texturePending;
 
@@ -479,7 +501,7 @@ BasisTextureLoader.BasisWorker = function () {
 		if ( ! width || ! height || ! levels ) {
 
 			cleanup();
-			throw new Error( 'THREE.BasisTextureLoader:  Invalid .basis file' );
+			throw new Error( 'THREE.BasisTextureLoader:	Invalid .basis file' );
 
 		}
 

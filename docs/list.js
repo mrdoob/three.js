@@ -6,12 +6,11 @@ var list = {
 
 			"Getting Started": {
 				"Creating a scene": "manual/en/introduction/Creating-a-scene",
-				"Import via modules": "manual/en/introduction/Import-via-modules",
+				"Installation": "manual/en/introduction/Installation",
 				"Browser support": "manual/en/introduction/Browser-support",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
 				"Typescript setup": "manual/en/introduction/Typescript-setup",
-				"How to use WebGL 2": "manual/en/introduction/How-to-use-WebGL2",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
 				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
@@ -202,8 +201,10 @@ var list = {
 
 			"Lights": {
 				"AmbientLight": "api/en/lights/AmbientLight",
+				"AmbientLightProbe": "api/en/lights/AmbientLightProbe",
 				"DirectionalLight": "api/en/lights/DirectionalLight",
 				"HemisphereLight": "api/en/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/en/lights/HemisphereLightProbe",
 				"Light": "api/en/lights/Light",
 				"LightProbe": "api/en/lights/LightProbe",
 				"PointLight": "api/en/lights/PointLight",
@@ -312,6 +313,7 @@ var list = {
 			"Renderers": {
 				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
+				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
 				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
 			},
@@ -338,6 +340,7 @@ var list = {
 				"CompressedTexture": "api/en/textures/CompressedTexture",
 				"CubeTexture": "api/en/textures/CubeTexture",
 				"DataTexture": "api/en/textures/DataTexture",
+				"DataTexture2DArray": "api/en/textures/DataTexture2DArray",
 				"DataTexture3D": "api/en/textures/DataTexture3D",
 				"DepthTexture": "api/en/textures/DepthTexture",
 				"Texture": "api/en/textures/Texture",
@@ -469,7 +472,6 @@ var list = {
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
 				"Typescript设置": "manual/zh/introduction/Typescript-setup",
-				"如何使用WebGL 2": "manual/zh/introduction/How-to-use-WebGL2",
 				"画线": "manual/zh/introduction/Drawing-lines",
 				"创建文字": "manual/zh/introduction/Creating-text",
 				"载入3D模型": "manual/zh/introduction/Loading-3D-models",
@@ -660,8 +662,10 @@ var list = {
 
 			"灯光": {
 				"AmbientLight": "api/zh/lights/AmbientLight",
+				"AmbientLightProbe": "api/zh/lights/AmbientLightProbe",
 				"DirectionalLight": "api/zh/lights/DirectionalLight",
 				"HemisphereLight": "api/zh/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/zh/lights/HemisphereLightProbe",
 				"Light": "api/zh/lights/Light",
 				"LightProbe": "api/zh/lights/LightProbe",
 				"PointLight": "api/zh/lights/PointLight",
@@ -770,6 +774,7 @@ var list = {
 			"渲染器": {
 				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
+				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
 				"WebGLCubeRenderTarget": "api/zh/renderers/WebGLCubeRenderTarget"
 			},
@@ -796,6 +801,7 @@ var list = {
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
 				"DataTexture": "api/zh/textures/DataTexture",
+				"DataTexture2DArray": "api/zh/textures/DataTexture2DArray",
 				"DataTexture3D": "api/zh/textures/DataTexture3D",
 				"DepthTexture": "api/zh/textures/DepthTexture",
 				"Texture": "api/zh/textures/Texture",

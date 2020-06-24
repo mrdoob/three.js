@@ -5,7 +5,7 @@
 
 import { Command } from '../Command.js';
 
-var SetMaterialVectorCommand = function ( editor, object, attributeName, newValue, materialSlot ) {
+function SetMaterialVectorCommand( editor, object, attributeName, newValue, materialSlot ) {
 
 	Command.call( this, editor );
 
@@ -21,7 +21,7 @@ var SetMaterialVectorCommand = function ( editor, object, attributeName, newValu
 
 	this.attributeName = attributeName;
 
-};
+}
 
 SetMaterialVectorCommand.prototype = {
 

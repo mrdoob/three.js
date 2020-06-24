@@ -14,7 +14,7 @@ import * as THREE from '../../../build/three.module.js';
  * @constructor
  */
 
-var SetGeometryCommand = function ( editor, object, newGeometry ) {
+function SetGeometryCommand( editor, object, newGeometry ) {
 
 	Command.call( this, editor );
 
@@ -26,7 +26,7 @@ var SetGeometryCommand = function ( editor, object, newGeometry ) {
 	this.oldGeometry = ( object !== undefined ) ? object.geometry : undefined;
 	this.newGeometry = newGeometry;
 
-};
+}
 
 SetGeometryCommand.prototype = {
 

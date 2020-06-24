@@ -9,7 +9,7 @@ THREE.CSS3DObject = function ( element ) {
 
 	THREE.Object3D.call( this );
 
-	this.element = element;
+	this.element = element || document.createElement( 'div' );
 	this.element.style.position = 'absolute';
 	this.element.style.pointerEvents = 'auto';
 
@@ -29,8 +29,21 @@ THREE.CSS3DObject = function ( element ) {
 
 };
 
-THREE.CSS3DObject.prototype = Object.create( THREE.Object3D.prototype );
-THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject;
+THREE.CSS3DObject.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+
+	constructor: THREE.CSS3DObject,
+
+	copy: function ( source, recursive ) {
+
+		THREE.Object3D.prototype.copy.call( this, source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+} );
 
 THREE.CSS3DSprite = function ( element ) {
 

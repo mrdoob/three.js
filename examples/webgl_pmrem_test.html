@@ -29,7 +29,7 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var scene, camera, controls, renderer;
-			
+
 			function init() {
 
 				var width = window.innerWidth;
@@ -182,7 +182,7 @@
 				render();
 
 			}
-			
+
 			function updateCamera() {
 
 				var horizontalFoV = 40;
@@ -197,7 +197,7 @@
 				renderer.render( scene, camera );
 
 			}
-			
+
 			Promise.resolve()
 				.then( init )
 				.then( createObjects )

@@ -1,3 +1,5 @@
+import CANNON from "../libs/cannon.module.min.js";
+
 /**
  * @author mrdoob / http://mrdoob.com/
  */

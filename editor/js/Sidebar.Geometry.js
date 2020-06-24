@@ -52,7 +52,7 @@ var geometryUIClasses = {
 	'TubeBufferGeometry': SidebarGeometryTubeGeometry
 };
 
-var SidebarGeometry = function ( editor ) {
+function SidebarGeometry( editor ) {
 
 	var strings = editor.strings;
 
@@ -285,6 +285,6 @@ var SidebarGeometry = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometry };

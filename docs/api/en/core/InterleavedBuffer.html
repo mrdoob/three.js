@@ -59,6 +59,11 @@
 		Default is *-1*.
 		</p>
 
+		<h3>[property:String uuid]</h3>
+		<p>
+		[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID] of this instance. This gets automatically assigned, so this shouldn't be edited.
+		</p>
+
 		<h3>[property:Integer version]</h3>
 		<p>
 		A version number, incremented every time the needsUpdate property is set to true.
@@ -93,13 +98,22 @@
 			Stores multiple values in the buffer, reading input values from a specified array.
 		</p>
 
-		<h3>[method:InterleavedBuffer clone]() </h3>
+		<h3>[method:InterleavedBuffer clone]( [param:Object data] ) </h3>
 		<p>
+			data - This object holds shared array buffers required for properly cloning geometries with interleaved attributes.<br/><br />
+
 			Creates a clone of this [name].
 		</p>
 
-		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
-		<p>Set [page:BufferAttribute.usage usage] to value.</p>
+		<h3>[method:InterleavedBuffer setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:InterleavedBuffer.usage usage] to value.</p>
+
+		<h3>[method:InterleavedBuffer toJSON]( [param:Object data] ) </h3>
+		<p>
+			data - This object holds shared array buffers required for properly serializing geometries with interleaved attributes.<br/><br />
+
+			Serializes this [name].
+		</p>
 
 		<h2>Source</h2>
 

@@ -18,7 +18,7 @@ declare namespace Stats {
 		update( value: number, maxValue: number ): void;
 	}
 
-	function Panel(): Panel;
+	function Panel( name?: string, fg?: string, bg?: string ): Panel;
 }
 
 export default Stats;

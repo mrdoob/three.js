@@ -4,7 +4,7 @@
 
 import { UIPanel, UIRow } from './libs/ui.js';
 
-var MenubarHelp = function ( editor ) {
+function MenubarHelp( editor ) {
 
 	var strings = editor.strings;
 
@@ -58,6 +58,6 @@ var MenubarHelp = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarHelp };

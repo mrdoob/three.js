@@ -48,13 +48,6 @@
 
 				// Materials
 
-				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
-				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
-				imgTexture.encoding = THREE.sRGBEncoding;
-				imgTexture.anisotropy = 16;
-				imgTexture = null;
-
-				var bumpScale = 1;
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
 				var sphereRadius = ( cubeWidth / numberOfSphersPerSide ) * 0.8 * 0.5;
@@ -64,11 +57,20 @@
 
 				for ( var alpha = 0, alphaIndex = 0; alpha <= 1.0; alpha += stepSize, alphaIndex ++ ) {
 
-					var specularShininess = Math.pow( 2, alpha * 10 );
+					var colors = new Uint8Array( alphaIndex + 2 );
+
+					for ( var c = 0; c <= colors.length; c ++ ) {
+
+						colors[ c ] = ( c / colors.length ) * 256;
+
+					}
+
+					var gradientMap = new THREE.DataTexture( colors, colors.length, 1, THREE.LuminanceFormat );
+					gradientMap.minFilter = THREE.NearestFilter;
+					gradientMap.magFilter = THREE.NearestFilter;
+					gradientMap.generateMipmaps = false;
 
 					for ( var beta = 0; beta <= 1.0; beta += stepSize ) {
-
-						var specularColor = new THREE.Color( beta * 0.2, beta * 0.2, beta * 0.2 );
 
 						for ( var gamma = 0; gamma <= 1.0; gamma += stepSize ) {
 
@@ -76,12 +78,8 @@
 							var diffuseColor = new THREE.Color().setHSL( alpha, 0.5, gamma * 0.5 + 0.1 ).multiplyScalar( 1 - beta * 0.2 );
 
 							var material = new THREE.MeshToonMaterial( {
-								map: imgTexture,
-								bumpMap: imgTexture,
-								bumpScale: bumpScale,
 								color: diffuseColor,
-								specular: specularColor,
-								shininess: specularShininess,
+								gradientMap: gradientMap
 							} );
 
 							var mesh = new THREE.Mesh( geometry, material );
@@ -110,18 +108,15 @@
 
 					} );
 
-					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
+					var textMaterial = new THREE.MeshBasicMaterial();
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
 					textMesh.position.copy( location );
 					scene.add( textMesh );
 
 				}
 
-				addLabel( "-shininess", new THREE.Vector3( - 350, 0, 0 ) );
-				addLabel( "+shininess", new THREE.Vector3( 350, 0, 0 ) );
-
-				addLabel( "-specular", new THREE.Vector3( 0, - 300, 0 ) );
-				addLabel( "+specular", new THREE.Vector3( 0, 300, 0 ) );
+				addLabel( "-gradientMap", new THREE.Vector3( - 350, 0, 0 ) );
+				addLabel( "+gradientMap", new THREE.Vector3( 350, 0, 0 ) );
 
 				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
@@ -140,7 +135,7 @@
 				directionalLight.position.set( 1, 1, 1 ).normalize();
 				scene.add( directionalLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1, 800 );
+				var pointLight = new THREE.PointLight( 0xffffff, 1.75, 800 );
 				particleLight.add( pointLight );
 
 				//

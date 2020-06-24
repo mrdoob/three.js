@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Config = function () {
+function Config() {
 
 	var name = 'threejs-editor';
 
@@ -22,7 +22,6 @@ var Config = function () {
 		'project/renderer/physicallyCorrectLights': false,
 		'project/renderer/toneMapping': 0, // NoToneMapping
 		'project/renderer/toneMappingExposure': 1,
-		'project/renderer/toneMappingWhitePoint': 1,
 
 		'settings/history': false,
 
@@ -79,6 +78,6 @@ var Config = function () {
 
 	};
 
-};
+}
 
 export { Config };
