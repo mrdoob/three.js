@@ -143,8 +143,11 @@ var VRMLLoader = ( function () {
 
 				// from http://gun.teipir.gr/VRML-amgem/spec/part1/concepts.html#SyntaxBasics
 
-				var RouteIdentifier = createToken( { name: 'RouteIdentifier', pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*[\.][^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/ } );
-				var Identifier = createToken( { name: 'Identifier', pattern: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*/, longer_alt: RouteIdentifier } );
+				// Converted to not use complement sets for performance reasons. See https://sap.github.io/chevrotain/docs/guide/resolving_lexer_errors.html#COMPLEMENT
+				// Original regex: /[^\x30-\x39\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d][^\0-\x20\x22\x27\x23\x2b\x2c\x2d\x2e\x5b\x5d\x5c\x7b\x7d]*
+
+				var RouteIdentifier = createToken( { name: 'RouteIdentifier', pattern: /[\u0021\u0024-\u0026\u0028-\u002a\u002f\u003a-\u005a\u005e-\u007a\u007c\u007e-\uffff][\u0021\u0024-\u0026\u0028-\u002a\u002f-\u005a\u005e-\u007a\u007c\u007e-\uffff]*[\.][\u0021\u0024-\u0026\u0028-\u002a\u002f\u003a-\u005a\u005e-\u007a\u007c\u007e-\uffff][\u0021\u0024-\u0026\u0028-\u002a\u002f-\u005a\u005e-\u007a\u007c\u007e-\uffff]*/ } );
+				var Identifier = createToken( { name: 'Identifier', pattern: /[\u0021\u0024-\u0026\u0028-\u002a\u002f\u003a-\u005a\u005e-\u007a\u007c\u007e-\uffff][\u0021\u0024-\u0026\u0028-\u002a\u002f-\u005a\u005e-\u007a\u007c\u007e-\uffff]*/, longer_alt: RouteIdentifier } );
 
 				// from http://gun.teipir.gr/VRML-amgem/spec/part1/nodesRef.html
 
@@ -3217,7 +3220,9 @@ var VRMLLoader = ( function () {
 
 	function VRMLLexer( tokens ) {
 
-		this.lexer = new chevrotain.Lexer( tokens );
+		// ensureOptimizations will give console errors if lexer rules don't allow optimizations
+
+		this.lexer = new chevrotain.Lexer( tokens, { ensureOptimizations: true } );
 
 	}
 
@@ -3366,7 +3371,7 @@ var VRMLLoader = ( function () {
 
 		$.RULE( 'singleFieldValue', function () {
 
-			$.AT_LEAST_ONE( function () {
+			$.AT_LEAST_ONE( $.altSingleFieldValue || ($.altSingleFieldValue = function () {
 
 				$.OR( [
 					{ ALT: function () {
@@ -3412,7 +3417,7 @@ var VRMLLoader = ( function () {
 				] );
 
 
-			} );
+			}) );
 
 		} );
 
@@ -3421,7 +3426,7 @@ var VRMLLoader = ( function () {
 			$.CONSUME( LSquare );
 			$.MANY( function () {
 
-				$.OR( [
+				$.OR( $.altMultiFieldValue || ($.altMultiFieldValue = [
 					{ ALT: function () {
 
 						$.SUBRULE( $.node );
@@ -3452,7 +3457,7 @@ var VRMLLoader = ( function () {
 						$.CONSUME( NullLiteral );
 
 					} }
-				] );
+				]) );
 
 			} );
 			$.CONSUME( RSquare );
