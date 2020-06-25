@@ -340,7 +340,7 @@ is sharing vertices within a quad but it's not sharing vertices between
 quads because we want to be able to move each quad separately.
 
 Because I'm lazy I used a small hierarchy of 3 `Object3D` objects to compute
-sphere points. How this works is explained in [the article on optimizing lots of objects](http://localhost:8080/threejs/lessons/threejs-optimize-lots-of-objects.html).
+sphere points. How this works is explained in [the article on optimizing lots of objects](threejs-optimize-lots-of-objects.html).
 
 ```js
 function makeSpherePositions(segmentsAround, segmentsDown) {
