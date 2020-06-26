@@ -87,6 +87,27 @@ THREE.SVGRenderer = function () {
 
 	this.setPixelRatio = function () {};
 
+	this.getSize = function () {
+
+		var width = _svgWidth;
+		var height = _svgHeight;
+		if ( width === undefined || height === undefined ) {
+
+			// If setSize has not been called, we use the bounding client rect,
+			// rather than the SVG contents rect (getBBox), to respect CSS based sizing.
+			let box = _svg.getBoundingClientRect();
+			width = width === undefined ? box.width : width;
+			height = height === undefined ? box.height : height;
+
+		}
+
+	 	return { 
+	 		width: width, 
+	 		height: height 
+	 	};
+
+	};
+
 	this.setSize = function ( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;
