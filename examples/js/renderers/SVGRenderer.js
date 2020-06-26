@@ -87,6 +87,20 @@ THREE.SVGRenderer = function () {
 
 	this.setPixelRatio = function () {};
 
+	this.getSize = function ( target ) {
+
+		if ( target === undefined ) {
+
+			console.warn( 'WebGLRenderer: .getsize() now requires a Vector2 as an argument' );
+
+			target = new Vector2();
+
+		}
+
+		return target.set( _svgWidth, _svgHeight );
+
+	};
+	
 	this.setSize = function ( width, height ) {
 
 		_svgWidth = width; _svgHeight = height;
