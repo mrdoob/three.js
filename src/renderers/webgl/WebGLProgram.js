@@ -748,77 +748,84 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	gl.linkProgram( program );
 
-	// check for link errors
-	if ( renderer.debug.checkShaderErrors ) {
+	function onFirstUse() {
 
-		const programLog = gl.getProgramInfoLog( program ).trim();
-		const vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
-		const fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
+		// check for link errors
+		if ( renderer.debug.checkShaderErrors ) {
 
-		let runnable = true;
-		let haveDiagnostics = true;
+			const programLog = gl.getProgramInfoLog( program ).trim();
+			const vertexLog = gl.getShaderInfoLog( glVertexShader ).trim();
+			const fragmentLog = gl.getShaderInfoLog( glFragmentShader ).trim();
 
-		if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
+			let runnable = true;
+			let haveDiagnostics = true;
 
-			runnable = false;
+			if ( gl.getProgramParameter( program, gl.LINK_STATUS ) === false ) {
 
-			const vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
-			const fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
+				runnable = false;
 
-			console.error(
-				'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
-				'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
-				'Program Info Log: ' + programLog + '\n' +
-				vertexErrors + '\n' +
-				fragmentErrors
-			);
+				const vertexErrors = getShaderErrors( gl, glVertexShader, 'vertex' );
+				const fragmentErrors = getShaderErrors( gl, glFragmentShader, 'fragment' );
 
-		} else if ( programLog !== '' ) {
+				console.error(
+					'THREE.WebGLProgram: Shader Error ' + gl.getError() + ' - ' +
+					'VALIDATE_STATUS ' + gl.getProgramParameter( program, gl.VALIDATE_STATUS ) + '\n\n' +
+					'Program Info Log: ' + programLog + '\n' +
+					vertexErrors + '\n' +
+					fragmentErrors
+				);
 
-			console.warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
+			} else if ( programLog !== '' ) {
 
-		} else if ( vertexLog === '' || fragmentLog === '' ) {
+				console.warn( 'THREE.WebGLProgram: Program Info Log:', programLog );
 
-			haveDiagnostics = false;
+			} else if ( vertexLog === '' || fragmentLog === '' ) {
+
+				haveDiagnostics = false;
+
+			}
+
+			if ( haveDiagnostics ) {
+
+				this.diagnostics = {
+
+					runnable: runnable,
+
+					programLog: programLog,
+
+					vertexShader: {
+
+						log: vertexLog,
+						prefix: prefixVertex
+
+					},
+
+					fragmentShader: {
+
+						log: fragmentLog,
+						prefix: prefixFragment
+
+					}
+
+				};
+
+			}
 
 		}
 
-		if ( haveDiagnostics ) {
+		// Clean up
 
-			this.diagnostics = {
+		// Crashes in iOS9 and iOS10. #18402
+		// gl.detachShader( program, glVertexShader );
+		// gl.detachShader( program, glFragmentShader );
 
-				runnable: runnable,
+		gl.deleteShader( glVertexShader );
+		gl.deleteShader( glFragmentShader );
 
-				programLog: programLog,
-
-				vertexShader: {
-
-					log: vertexLog,
-					prefix: prefixVertex
-
-				},
-
-				fragmentShader: {
-
-					log: fragmentLog,
-					prefix: prefixFragment
-
-				}
-
-			};
-
-		}
+		cachedUniforms = new WebGLUniforms( gl, program );
+		cachedAttributes = fetchAttributeLocations( gl, program );
 
 	}
-
-	// Clean up
-
-	// Crashes in iOS9 and iOS10. #18402
-	// gl.detachShader( program, glVertexShader );
-	// gl.detachShader( program, glFragmentShader );
-
-	gl.deleteShader( glVertexShader );
-	gl.deleteShader( glFragmentShader );
 
 	// set up caching for uniform locations
 
@@ -828,7 +835,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		if ( cachedUniforms === undefined ) {
 
-			cachedUniforms = new WebGLUniforms( gl, program );
+			// Populates cachedUniforms and cachedAttributes
+			onFirstUse();
 
 		}
 
@@ -844,7 +852,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		if ( cachedAttributes === undefined ) {
 
-			cachedAttributes = fetchAttributeLocations( gl, program );
+			// Populates cachedAttributes and cachedUniforms
+			onFirstUse();
 
 		}
 
