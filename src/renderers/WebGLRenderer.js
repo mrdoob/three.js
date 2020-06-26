@@ -1596,13 +1596,23 @@ class WebGLRenderer {
 
 			}
 
-			const progUniforms = program.getUniforms();
-			const uniformsList = WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
-
 			materialProperties.currentProgram = program;
-			materialProperties.uniformsList = uniformsList;
+			materialProperties.uniformsList = null;
 
 			return program;
+
+		}
+
+		function getUniformList( materialProperties ) {
+
+			if ( materialProperties.uniformsList === null ) {
+
+				const progUniforms = materialProperties.currentProgram.getUniforms();
+				materialProperties.uniformsList = WebGLUniforms.seqWithValue( progUniforms.seq, materialProperties.uniforms );
+
+			}
+
+			return materialProperties.uniformsList;
 
 		}
 
@@ -1933,13 +1943,13 @@ class WebGLRenderer {
 
 				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height, _transmissionRenderTarget );
 
-				WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 
 			}
 
 			if ( material.isShaderMaterial && material.uniformsNeedUpdate === true ) {
 
-				WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+				WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 				material.uniformsNeedUpdate = false;
 
 			}
