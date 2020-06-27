@@ -1533,11 +1533,9 @@ var GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
-		this.useImageBitmap = typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false;
-
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
-		if ( this.useImageBitmap ) {
+		if ( typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false ) {
 
 			this.textureLoader = new ImageBitmapLoader( this.options.manager );
 
@@ -2021,7 +2019,6 @@ var GLTFLoader = ( function () {
 		var parser = this;
 		var json = this.json;
 		var options = this.options;
-		var useImageBitmap = this.useImageBitmap;
 		var textureLoader = this.textureLoader;
 
 		var URL = self.URL || self.webkitURL;
