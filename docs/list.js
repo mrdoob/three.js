@@ -467,7 +467,7 @@ var list = {
 
 			"起步": {
 				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
-				"通过模块来引入": "manual/zh/introduction/Import-via-modules",
+				"Installation": "manual/zh/introduction/Installation",
 				"浏览器支持": "manual/zh/introduction/Browser-support",
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
