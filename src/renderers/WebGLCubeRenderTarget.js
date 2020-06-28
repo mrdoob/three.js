@@ -45,46 +45,33 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 			tEquirect: { value: null },
 		},
 
-		vertexShader: [
+		vertexShader: /* glsl */`
+varying vec3 vWorldDirection;
 
-			"varying vec3 vWorldDirection;",
+vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
+	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
+}
 
-			"vec3 transformDirection( in vec3 dir, in mat4 matrix ) {",
+void main() {
+	vWorldDirection = transformDirection( position, modelMatrix );
 
-			"	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );",
+	#include <begin_vertex>
+	#include <project_vertex>
+}
+		`,
 
-			"}",
+		fragmentShader: /* glsl */`
+uniform sampler2D tEquirect;
+varying vec3 vWorldDirection;
 
-			"void main() {",
+#include <common>
 
-			"	vWorldDirection = transformDirection( position, modelMatrix );",
-
-			"	#include <begin_vertex>",
-			"	#include <project_vertex>",
-
-			"}"
-
-		].join( '\n' ),
-
-		fragmentShader: [
-
-			"uniform sampler2D tEquirect;",
-
-			"varying vec3 vWorldDirection;",
-
-			"#include <common>",
-
-			"void main() {",
-
-			"	vec3 direction = normalize( vWorldDirection );",
-
-			"	vec2 sampleUV = equirectUv( direction );",
-
-			"	gl_FragColor = texture2D( tEquirect, sampleUV );",
-
-			"}"
-
-		].join( '\n' ),
+void main() {
+	vec3 direction = normalize( vWorldDirection );
+	vec2 sampleUV = equirectUv( direction );
+	gl_FragColor = texture2D( tEquirect, sampleUV );
+}
+		`
 	};
 
 	const material = new ShaderMaterial( {

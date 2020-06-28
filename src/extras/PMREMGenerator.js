@@ -624,7 +624,7 @@ function _getBlurShader( maxSamples ) {
 
 		vertexShader: _getCommonVertexShader(),
 
-		fragmentShader: `
+		fragmentShader: /* glsl */`
 precision mediump float;
 precision mediump int;
 varying vec3 vOutputDirection;
@@ -694,7 +694,7 @@ function _getEquirectShader() {
 
 		vertexShader: _getCommonVertexShader(),
 
-		fragmentShader: `
+		fragmentShader: /* glsl */`
 precision mediump float;
 precision mediump int;
 varying vec3 vOutputDirection;
@@ -749,7 +749,7 @@ function _getCubemapShader() {
 
 		vertexShader: _getCommonVertexShader(),
 
-		fragmentShader: `
+		fragmentShader: /* glsl */`
 precision mediump float;
 precision mediump int;
 varying vec3 vOutputDirection;
@@ -776,7 +776,7 @@ void main() {
 
 function _getCommonVertexShader() {
 
-	return `
+	return /* glsl */`
 precision mediump float;
 precision mediump int;
 attribute vec3 position;
@@ -817,7 +817,7 @@ void main() {
 
 function _getEncodings() {
 
-	return `
+	return /* glsl */`
 uniform int inputEncoding;
 uniform int outputEncoding;
 
