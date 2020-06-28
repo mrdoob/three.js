@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "12"
+  - "12.16.2"
 script:
   - npm run build
 env:
