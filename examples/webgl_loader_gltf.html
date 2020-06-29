@@ -68,11 +68,15 @@
 
 							} );
 
-							scene.add( gltf.scene );
+							renderer.compileTarget( scene, gltf.scene, function() {
 
-							roughnessMipmapper.dispose();
+								scene.add( gltf.scene );
 
-							render();
+								roughnessMipmapper.dispose();
+
+								render();
+
+							} );
 
 						} );
 
