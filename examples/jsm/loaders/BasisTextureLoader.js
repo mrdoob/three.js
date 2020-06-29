@@ -80,12 +80,12 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 		var config = this.workerConfig;
 
-		config.astcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_astc' );
-		config.bptcSupported = !! renderer.extensions.get( 'EXT_texture_compression_bptc' );
-		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
-		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
-		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
-			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+		config.astcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_astc' );
+		config.bptcSupported = renderer.extensions.has( 'EXT_texture_compression_bptc' );
+		config.etcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_etc1' );
+		config.dxtSupported = renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' );
+		config.pvrtcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
+			|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		if ( config.astcSupported ) {
 
