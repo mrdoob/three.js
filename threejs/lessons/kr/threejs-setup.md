@@ -22,43 +22,42 @@ Three.js의 다른 요소를 더 살펴보기 전에, 개발 환경을 구축하
 
 {{{image url="resources/servez.gif" className="border" }}}
 
-압축을 푼 경로를 지정하고, "Start" 버튼을 클릭합니다. 
+압축을 푼 경로를 지정하고, "Start" 버튼을 클릭하세요. 그런 다음
+[`http://localhost:8080/`](http://localhost:8080/)로 이동하기만
+하면 됩니다. 만약 예제를 보고 싶다면 [`http://localhost:8080/threejs`](http://localhost:8080/threejs)로
+이동하세요.
 
-Just point it at the folder where you unzipped the files, click "Start", then go to
-in your browser [`http://localhost:8080/`](http://localhost:8080/) or if you'd
-like to browse the samples go to [`http://localhost:8080/threejs`](http://localhost:8080/threejs).
+서버를 중지하려면 Servez를 멈추거나 종료하면 됩니다.
 
-To stop serving pick stop or quit Servez.
+만약 CLI(Command Line Interface, 명령 줄 인터페이스)를 선호한다면(전 선호합니다)
+[node.js](https://nodejs.org)를 써도 좋습니다. 다운 받아 설치한 다음 프롬프트 /
+콘솔 / 터미널 창을 엽니다. 윈도우를 사용한다면 설치 마법사가 "Node Command Prompt"를
+추가할 테니 그걸 사용해도 좋습니다.
 
-If you prefer the command line (I do), another way is to use [node.js](https://nodejs.org).
-Download it, install it, then open a command prompt / console / terminal window. If you're on Windows the installer will add a special "Node Command Prompt" so use that.
-
-Then install the [`servez`](https://github.com/greggman/servez-cli) by typing
+창을 띄웠으면 [`servez`](https://github.com/greggman/servez-cli)를 설치합니다.
 
     npm -g install servez
 
-If you're on OSX use
+OS X를 사용한다면 다음과 같이 설치할 수 있습니다.
 
     sudo npm -g install servez
 
-Once you've done that type
+설치가 완료되면 다음과 같이 Servez를 실행합니다.
 
     servez path/to/folder/where/you/unzipped/files
 
-Or if you're like me
+사족이지만, 다음처럼 쓸 수도 있죠.
 
     cd path/to/folder/where/you/unzipped/files
     servez
 
-It should print something like
+정상적으로 작동했다면 다음과 같은 메시지가 뜰 겁니다.
 
 {{{image url="resources/servez-response.png" }}}
 
-Then in your browser go to [`http://localhost:8080/`](http://localhost:8080/).
+다음으로 브라우저에서 [`http://localhost:8080/`](http://localhost:8080/)로
+접속하세요. 경로를 지정하지 않으면 현재 경로를 서버의 ROOT 경로로 사용합니다.
 
-If you don't specify a path then servez will serve the current folder.
+만약 Servez가 마음에 들지 않는다면, [다른 간단한 웹 서버](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver)를 사용해도 좋습니다.
 
-If either of those options are not to your liking
-[there are many other simple servers to choose from](https://stackoverflow.com/questions/12905426/what-is-a-faster-alternative-to-pythons-servez-or-simplehttpserver).
-
-Now that you have a server setup we can move on to [textures](threejs-textures.html).
+이제 개발 환경을 갖추었으니, [텍스처](threejs-textures.html)에 대해 알아봅시다.
