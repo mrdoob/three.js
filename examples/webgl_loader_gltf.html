@@ -61,7 +61,13 @@
 						// model
 
 						const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
-						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+						loader.load( 'DamagedHelmet.gltf', async function ( gltf ) {
+
+							// Calling compileAsync returns a promise that resolves when gltf.scene can be added
+							// to scene without unnecessary stalling on shader compiation. This helps the page
+							// stay responsive during startup.
+
+							await renderer.compileAsync( gltf.scene, scene );
 
 							scene.add( gltf.scene );
 
