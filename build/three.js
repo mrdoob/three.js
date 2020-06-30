@@ -13176,6 +13176,13 @@
 
 	var BoxBufferGeometry = /*@__PURE__*/(function (BufferGeometry) {
 		function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+			if ( width === void 0 ) width = 1;
+			if ( height === void 0 ) height = 1;
+			if ( depth === void 0 ) depth = 1;
+			if ( widthSegments === void 0 ) widthSegments = 1;
+			if ( heightSegments === void 0 ) heightSegments = 1;
+			if ( depthSegments === void 0 ) depthSegments = 1;
+
 
 			BufferGeometry.call(this);
 
@@ -13192,15 +13199,11 @@
 
 			var scope = this;
 
-			width = width || 1;
-			height = height || 1;
-			depth = depth || 1;
-
 			// segments
 
-			widthSegments = Math.floor( widthSegments ) || 1;
-			heightSegments = Math.floor( heightSegments ) || 1;
-			depthSegments = Math.floor( depthSegments ) || 1;
+			widthSegments = Math.floor( widthSegments );
+			heightSegments = Math.floor( heightSegments );
+			depthSegments = Math.floor( depthSegments );
 
 			// buffers
 
@@ -19763,6 +19766,7 @@
 		}
 
 		return {
+
 			opaque: opaque,
 			transparent: transparent,
 
@@ -48309,7 +48313,7 @@
 
 		this.box = box;
 
-		color = color || 0xffff00;
+		if ( color === undefined ) { color = 0xffff00; }
 
 		var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 

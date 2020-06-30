@@ -9471,7 +9471,7 @@ Object.assign( BufferAttribute.prototype, {
 				_vector2$1.fromBufferAttribute( this, i );
 				_vector2$1.applyMatrix3( m );
 
-				this.setXY( i, _vector2$1.x, _vector2$1.y, );
+				this.setXY( i, _vector2$1.x, _vector2$1.y );
 
 			}
 
@@ -13144,7 +13144,7 @@ class BoxGeometry extends Geometry {
 
 class BoxBufferGeometry extends BufferGeometry {
 
-	constructor( width, height, depth, widthSegments, heightSegments, depthSegments ) {
+	constructor( width = 1, height = 1, depth = 1, widthSegments = 1, heightSegments = 1, depthSegments = 1 ) {
 
 		super();
 
@@ -13161,15 +13161,11 @@ class BoxBufferGeometry extends BufferGeometry {
 
 		const scope = this;
 
-		width = width || 1;
-		height = height || 1;
-		depth = depth || 1;
-
 		// segments
 
-		widthSegments = Math.floor( widthSegments ) || 1;
-		heightSegments = Math.floor( heightSegments ) || 1;
-		depthSegments = Math.floor( depthSegments ) || 1;
+		widthSegments = Math.floor( widthSegments );
+		heightSegments = Math.floor( heightSegments );
+		depthSegments = Math.floor( depthSegments );
 
 		// buffers
 
@@ -19763,6 +19759,7 @@ function WebGLRenderList() {
 	}
 
 	return {
+
 		opaque: opaque,
 		transparent: transparent,
 
@@ -48312,7 +48309,7 @@ function Box3Helper( box, color ) {
 
 	this.box = box;
 
-	color = color || 0xffff00;
+	if ( color === undefined ) color = 0xffff00;
 
 	const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 
