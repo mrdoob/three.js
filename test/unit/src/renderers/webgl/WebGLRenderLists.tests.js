@@ -379,6 +379,36 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
+			QUnit.test( 'sort renderGroups', ( assert ) => {
+
+				var list = new WebGLRenderList();
+				var rg = { id: 1 };
+				var items = [ { id: 4 }, { id: 5 }, { id: 2 }, { id: 3 } ];
+
+				list.pushRenderGroup( rg );
+				items.forEach( item => {
+
+					list.push( item, {}, { transparent: true }, 0, 0, {} );
+					list.push( item, {}, { transparent: false }, 0, 0, {} );
+
+				} );
+
+				list.sort( ( a, b ) => a.id - b.id, ( a, b ) => b.id - a.id );
+
+				assert.deepEqual(
+					list.opaque[ 0 ].opaque.map( item => item.id ),
+					[ 2, 3, 4, 5 ],
+					'The opaque sort is applied to the opaque items list.'
+				);
+
+				assert.deepEqual(
+					list.opaque[ 0 ].transparent.map( item => item.id ),
+					[ 5, 4, 3, 2 ],
+					'The transparent sort is applied to the transparent items list.'
+				);
+
+			} );
+
 			// QUnit.test( 'finish', ( assert ) => {
 
 			// 	var list = new WebGLRenderList();

@@ -1106,6 +1106,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( object.visible === false ) return;
 
+		const children = object.children;
 		const visible = object.layers.test( camera.layers );
 
 		if ( visible ) {
@@ -1117,8 +1118,6 @@ function WebGLRenderer( parameters ) {
 				if ( object.renderChildrenTogether ) {
 
 					currentRenderList.pushRenderGroup( object );
-
-					var children = object.children;
 
 					for ( var i = 0, l = children.length; i < l; i ++ ) {
 
@@ -1233,8 +1232,6 @@ function WebGLRenderer( parameters ) {
 			}
 
 		}
-
-		const children = object.children;
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 

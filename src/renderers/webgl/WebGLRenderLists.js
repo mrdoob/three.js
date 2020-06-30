@@ -212,9 +212,9 @@ function WebGLRenderList() {
 		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
 
 		// sort render group item lists
-		for ( var i = 0, l = renderItemsIndex; i < l; i ++ ) {
+		for ( var i = 0, l = renderGroupItemIndex; i < l; i ++ ) {
 
-			var renderGroupItem = usedRenderGroups[ i ];
+			var renderGroupItem = renderGroupItems[ i ];
 			var renderGroupOpaque = renderGroupItem.opaque;
 			var renderGroupTransparent = renderGroupItem.transparent;
 
