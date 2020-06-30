@@ -12,11 +12,11 @@ function painterSortStable( a, b ) {
 
 		return a.renderOrder - b.renderOrder;
 
-	} else if ( a.program !== b.program ) {
+	} else if ( a.program && b.program && a.program !== b.program ) {
 
 		return a.program.id - b.program.id;
 
-	} else if ( a.material.id !== b.material.id ) {
+	} else if ( a.material && b.material && a.material.id !== b.material.id ) {
 
 		return a.material.id - b.material.id;
 
