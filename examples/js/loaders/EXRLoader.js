@@ -1280,13 +1280,13 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			var compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof Zlib === 'undefined' ) {
+			if ( typeof Inflate === 'undefined' ) {
 
 				console.error( 'THREE.EXRLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 			}
 
-			var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
+			var inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
 
 			var rawBuffer = new Uint8Array( inflate.decompress().buffer );
 			var tmpBuffer = new Uint8Array( rawBuffer.length );
@@ -1514,7 +1514,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 					case DEFLATE:
 
 						var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
-						var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } );
+						var inflate = new Inflate( compressed, { resize: true, verify: true } );
 						var acBuffer = new Uint16Array( inflate.decompress().buffer );
 						inOffset.value += dwaHeader.totalAcUncompressedCount;
 						break;
@@ -1541,7 +1541,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			if ( dwaHeader.rleRawSize > 0 ) {
 
 				var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
-				var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } );
+				var inflate = new Inflate( compressed, { resize: true, verify: true } );
 				var rleBuffer = decodeRunLength( inflate.decompress().buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;

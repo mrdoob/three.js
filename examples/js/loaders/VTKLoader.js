@@ -795,7 +795,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 					for ( var i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						var inflate = new Zlib.Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
+						var inflate = new Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
 						content = inflate.decompress();
 						content = content.buffer;
 

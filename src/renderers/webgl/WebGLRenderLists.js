@@ -239,6 +239,7 @@ function WebGLRenderList() {
 	}
 
 	return {
+
 		opaque: opaque,
 		transparent: transparent,
 
@@ -309,4 +310,4 @@ function WebGLRenderLists() {
 }
 
 
-export { WebGLRenderLists };
+export { WebGLRenderLists, WebGLRenderList };

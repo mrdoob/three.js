@@ -7,6 +7,8 @@ export class ImageBitmapLoader extends Loader {
 
 	options: undefined | object;
 
+	readonly isImageBitmapLoader: true;
+
 	setOptions( options: object ): ImageBitmapLoader;
 	load(
 		url: string,
