@@ -138,8 +138,8 @@ function WebGLRenderList() {
 		renderGroupStack.pop();
 		if ( renderGroupStack.length !== 0 ) {
 
-			opaque = renderGroupStack[ renderGroupStack.length - 1 ].opaque;
-			transparent = renderGroupStack[ renderGroupStack.length - 1 ].transparent;
+			currOpaque = renderGroupStack[ renderGroupStack.length - 1 ].opaque;
+			currTransparent = renderGroupStack[ renderGroupStack.length - 1 ].transparent;
 
 		} else {
 
