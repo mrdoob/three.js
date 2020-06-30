@@ -61,7 +61,6 @@ function WebGLRenderList() {
 	// rendered together in a specific order.
 	const renderGroupStack = [];
 	const renderGroupItems = [];
-	const usedRenderGroups = [];
 	let renderGroupItemIndex = 0;
 
 	const renderItems = [];
@@ -80,7 +79,6 @@ function WebGLRenderList() {
 		renderGroupItemIndex = 0;
 		renderItemsIndex = 0;
 
-		usedRenderGroups.length = 0;
 		renderGroupStack.length = 0;
 		opaque.length = 0;
 		transparent.length = 0;
@@ -129,11 +127,8 @@ function WebGLRenderList() {
 
 		currOpaque.push( renderGroupItem );
 		currOpaque = renderGroupItem.opaque;
-
-		transparentRenderGroupStack.push( object );
 		currTransparent = renderGroupItem.transparent;
 
-		usedRenderGroups.push( renderGroupItem );
 		renderGroupStack.push( renderGroupItem );
 
 	}
@@ -141,16 +136,17 @@ function WebGLRenderList() {
 	function popRenderGroup() {
 
 		renderGroupStack.pop();
-		currOpaque =
-			renderGroupStack.length ?
-				renderGroupStack[ renderGroupStack.length - 1 ].opaque :
-				opaque;
+		if ( renderGroupStack.length !== 0 ) {
 
-		transparentRenderGroupStack.pop();
-		currTransparent =
-			transparentRenderGroupStack ?
-				transparentRenderGroupStack[ transparentRenderGroupStack.length - 1 ].transparent :
-				transparent;
+			opaque = renderGroupStack[ renderGroupStack.length - 1 ].opaque;
+			transparent = renderGroupStack[ renderGroupStack.length - 1 ].transparent;
+
+		} else {
+
+			currOpaque = opaque;
+			currTransparent = transparent;
+
+		}
 
 	}
 
@@ -240,6 +236,9 @@ function WebGLRenderList() {
 
 	return {
 
+		// uncomment for "finish" tests
+		// renderItems: renderItems,
+
 		opaque: opaque,
 		transparent: transparent,
 
@@ -247,6 +246,9 @@ function WebGLRenderList() {
 		push: push,
 		unshift: unshift,
 		finish: finish,
+
+		pushRenderGroup: pushRenderGroup,
+		popRenderGroup: popRenderGroup,
 
 		sort: sort
 	};

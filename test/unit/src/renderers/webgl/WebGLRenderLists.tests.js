@@ -297,6 +297,88 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
+			QUnit.test( 'opaque renderGroups', ( assert ) => {
+
+				var list = new WebGLRenderList();
+				var rg1 = { id: 1, renderOrder: 1 };
+				var rg2 = { id: 2, renderOrder: 2 };
+				var item1 = { id: 3, renderOrder: 3 };
+				var item2 = { id: 4, renderOrder: 4 };
+
+				list.pushRenderGroup( rg1 );
+
+				assert.deepEqual(
+					list.opaque,
+					[ { isRenderGroupItem: true, id: 1, renderOrder: 1, transparent: [], opaque: [] } ],
+					'The render group is added to the opaque list.'
+				);
+
+				assert.deepEqual(
+					list.transparent,
+					[],
+					'The transparent list is not modified.'
+				);
+
+				list.push( item1, {}, { transparent: false }, 0, 0, {} );
+
+				assert.equal(
+					list.opaque.length,
+					1,
+					'The item was not added to the root render list.'
+				);
+
+				assert.equal(
+					list.opaque[ 0 ].opaque.length,
+					1,
+					'The item was added to the render group item.'
+				);
+
+				list.popRenderGroup();
+				list.pushRenderGroup( rg2 );
+
+				assert.equal(
+					list.opaque.length,
+					2,
+					'The render group was added to the root list.'
+				);
+
+				list.push( item2, {}, { transparent: false }, 0, 0, {} );
+
+				assert.equal(
+					list.opaque[ 1 ].opaque.length,
+					1,
+					'The item was added to the render group item.'
+				);
+
+				list.popRenderGroup();
+
+			} );
+
+			QUnit.test( 'transparent renderGroups', ( assert ) => {
+
+				var list = new WebGLRenderList();
+				var rg = { id: 1, renderOrder: 1 };
+				var item = { id: 3, renderOrder: 3 };
+
+				list.pushRenderGroup( rg );
+				list.push( item, {}, { transparent: true }, 0, 0, {} );
+
+				assert.equal(
+					list.opaque[ 0 ].opaque.length,
+					0,
+					'The item was not added to the opaque list of the render group item.'
+				);
+
+				assert.equal(
+					list.opaque[ 0 ].transparent.length,
+					1,
+					'The item was added to the transparent list of the render group item.'
+				);
+
+				list.popRenderGroup();
+
+			} );
+
 			// QUnit.test( 'finish', ( assert ) => {
 
 			// 	var list = new WebGLRenderList();
