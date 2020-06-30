@@ -16,7 +16,9 @@ Group.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: Group,
 
-	isGroup: true
+	isGroup: true,
+
+	renderChildrenTogether: false,
 
 } );
 
