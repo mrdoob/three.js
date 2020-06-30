@@ -32,7 +32,7 @@ export interface RenderGroupItem {
 
 export class WebGLRenderList {
 
-	opaque: Array<RenderItem>;
+	opaque: Array<RenderItem | RenderGroupItem>;
 	transparent: Array<RenderItem>;
 	init(): void;
 	push(
