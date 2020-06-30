@@ -211,6 +211,27 @@ function WebGLRenderList() {
 		if ( opaque.length > 1 ) opaque.sort( customOpaqueSort || painterSortStable );
 		if ( transparent.length > 1 ) transparent.sort( customTransparentSort || reversePainterSortStable );
 
+		// sort render group item lists
+		for ( var i = 0, l = renderItemsIndex; i < l; i ++ ) {
+
+			var renderGroupItem = usedRenderGroups[ i ];
+			var renderGroupOpaque = renderGroupItem.opaque;
+			var renderGroupTransparent = renderGroupItem.transparent;
+
+			if ( renderGroupOpaque.length > 1 ) {
+
+				renderGroupOpaque.sort( customOpaqueSort || painterSortStable );
+
+			}
+
+			if ( renderGroupTransparent.length > 1 ) {
+
+				renderGroupTransparent.sort( customTransparentSort || reversePainterSortStable );
+
+			}
+
+		}
+
 	}
 
 	function finish() {
