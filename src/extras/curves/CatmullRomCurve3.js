@@ -92,7 +92,7 @@ function CatmullRomCurve3( points, closed, curveType, tension ) {
 	this.points = points || [];
 	this.closed = closed || false;
 	this.curveType = curveType || 'centripetal';
-	this.tension = tension || 0.5;
+	this.tension = ( tension !== undefined ) ? tension : 0.5;
 
 }
 
