@@ -6,14 +6,14 @@ TOC: 텍스처(Textures)
 먼저 [Three.js의 기본 구조에 관한 글](threejs-fundamentals.html)과
 [개발 환경 설정하는 법](threejs-setup.html)을 읽고 오길 권장합니다.
 
-※ 텍스처, Texture는 질감으로 번역할 수 있으나, 그대로 표기하는 쪽이
-직관적이라고 판단하여 **텍스처**로 번역하였습니다.
+※ 텍스처, Texture는 "질감"으로 번역할 수 있으나, 그대로 표기하는 쪽이
+직관적이라 판단하여 **텍스처**로 번역하였습니다.
 
 
 Three.js에서 텍스처를 이야기하기란 쉽지 않습니다. 텍스처는 워낙 방대한
 주제이고, 각 주제끼리도 서로 연결되어 있어 한 번에 설명하는 것이 거의
-불가능하기 때문이죠. 어떻게 설명해야 잘 설명했다고 할 수 있을지 확신은
-없지만, 일단 해보기로 합시다. 다음은 이 글의 간략한 목차입니다.
+불가능에 가깝기 때문이죠. 어떻게 설명해야 잘 설명했다고 할 수 있을지
+확신은 없지만, 일단 해보기로 합시다. 다음은 이 글의 간략한 목차입니다.
 
 <ul>
 <li><a href="#hello">하이, 텍스처</a></li>
@@ -28,7 +28,7 @@ Three.js에서 텍스처를 이야기하기란 쉽지 않습니다. 텍스처는
 <li><a href="#memory">메모리 관리</a></li>
 <li><a href="#format">JPG vs PNG</a></li>
 <li><a href="#filtering-and-mips">필터링과 Mips</a></li>
-<li><a href="#uvmanipulation">반복하기, 파생하기, 회전하기, 감싸기</a></li>
+<li><a href="#uvmanipulation">텍스처의 반복(repeating), 위치 조절(offseting), 회전(rotating), 래핑(wrapping)</a></li>
 </ul>
 
 ## <a name="hello"></a> 하이, 텍스처
@@ -274,14 +274,14 @@ loadManager.onLoad = () => {
 
 이 이미지는 매우 고 배율로 압축되어 157kb 밖에 되지 않습니다. 상대적으로
 다운 속도는 빠를 것이나, 이 [이미지의 실제 크기는 3024 x 3761 픽셀입니다](resources/images/compressed-but-large-wood-texture.jpg).
-위 공식에 따르면 이 이미지를 적용해보면,
+위 공식에 따라 이 이미지를 적용해보면,
 
     3024 * 3761 * 4 * 1.33 = 60505764.5
 
 무려 **약 60 메가바이트의 메모리**를 사용합니다. 이런 텍스처가 몇 개만 더
 있어도 메모리 부족으로 앱을 사용하지 못할 수 있죠(OUT_OF_MEMORY).
 
-극단적인 예제이기는 하나 이 예제는 텍스처를 사용하는데 숨겨진 비용을 고려해야
+극단적인 예제이기는 하나, 이 예제는 텍스처를 사용하는데 숨겨진 비용을 고려해야
 한다는 것을 잘 알려줍니다. Three.js가 텍스처를 사용하려면 GPU에 텍스처를
 넘겨주어야 하는데, GPU는 *일반적으로* 압축하지 않은 데이터를 사용하죠.
 
@@ -323,13 +323,13 @@ GPU는 작은 정육면체를 표현할 때 어떻게 각 픽셀의 색상을 �
 
 이게 바로 필터링(filtering)이 있는 이유입니다.
 
-포토샵의 경우는 근처 픽셀의 평균을 내 해당 1, 2 픽셀의 형태를 결정할 겁니다.
+포토샵이라면 근처 픽셀의 평균을 내 해당 1, 2 픽셀의 형태를 결정할 겁니다.
 이는 매우 무거운 작업이죠. GPU는 이 문제를 해결하기 위해 [밉맵(mipmaps)](https://ko.wikipedia.org/wiki/%EB%B0%89%EB%A7%B5)을
 사용합니다.
 
 밉(mips)은 텍스처의 복사본으로, 각 밉은 축소된 이전 밉보다 반만큼 작습니다.
-밉은 1x1 픽셀 밉을 생성할 때까지 계속 생성되죠. 위 이미지의 경우 밉은 다음과
-같이 생성됩니다.
+밉은 1x1 픽셀 밉을 생성할 때까지 계속 생성되죠. 위 이미지의 경우 밉은 다음처럼
+생성될 겁니다.
 
 <div class="threejs_center"><img src="resources/images/mipmap-low-res-enlarged.png" class="nobg" align="center"></div>
 
@@ -359,34 +359,34 @@ Three.js에서는 텍스처의 크기가 원본보다 클 때와 작을 때 각�
   </div>
 </div>
 
-For setting the filter when the texture is drawn smaller than its original size
-you set the [`texture.minFilter`](Texture.minFilter) property to one of 6 values.
+텍스처가 원본 크기보다 작을 때의 필터는 [`texture.minFilter`](Texture.minFilter)
+속성을 다음 6가지 값 중 하나로 지정해 사용합니다.
 
 * `THREE.NearestFilter`
 
-   same as above, choose the closest pixel in the texture
+   원본보다 클 때와 마찬가지로 가장 가까운 픽셀을 선택합니다
 
 * `THREE.LinearFilter`
 
-   same as above, choose 4 pixels from the texture and blend them
+   원본보다 클 때와 마찬가지로 주변의 가까운 픽셀 4개를 골라 섞습니다
 
 * `THREE.NearestMipmapNearestFilter`
 
-   choose the appropriate mip then choose one pixel
+   적절한 밉을 고른 뒤 밉에서 픽셀 하나를 선택합니다
 
 * `THREE.NearestMipmapLinearFilter`
 
-   choose 2 mips, choose one pixel from each, blend the 2 pixels
+   두 개의 밉을 골라 픽셀을 하나씩 선택한 후, 두 픽셀을 섞습니다
 
 * `THREE.LinearMipmapNearestFilter`
 
-   chose the appropriate mip then choose 4 pixels and blend them
+   적절한 밉을 고른 뒤 픽셀 4개를 골라 섞습니다
 
 *  `THREE.LinearMipmapLinearFilter`
 
-   choose 2 mips, choose 4 pixels from each and blend all 8 into 1 pixel
+   두 개의 밉을 골라 각각 픽셀을 4개씩 선택하고, 선택한 8개의 픽셀을 하나의 픽셀로 혼합합니다
 
-Here's an example showing all 6 settings
+아래는 6개의 필터를 각각 적용한 예제입니다.
 
 <div class="spread">
   <div data-diagram="filterModes" style="
@@ -409,7 +409,7 @@ Here's an example showing all 6 settings
         border-radius: .5em;
         line-height: 1.2;
         user-select: none;"
-      >click to<br/>change<br/>texture</div>
+      >클릭해<br/>텍스처를<br/>변경</div>
     </div>
     <div class="filter-caption" style="left: 0.5em; top: 0.5em;">nearest</div>
     <div class="filter-caption" style="width: 100%; text-align: center; top: 0.5em;">linear</div>
@@ -420,65 +420,63 @@ Here's an example showing all 6 settings
   </div>
 </div>
 
-One thing to notice is the top left and top middle using `NearestFilter` and `LinearFilter`
-don't use the mips. Because of that they flicker in the distance because the GPU is
-picking pixels from the original texture. On the left just one pixel is chosen and
-in the middle 4 are chosen and blended but it's not enough come up with a good
-representative color. The other 4 strips do better with the bottom right,
-`LinearMipmapLinearFilter` being best.
+여기서 주의깊게 봐야할 건 상단 왼쪽 `NearestFilter`와 상단 중앙의 `LinearFilter`는
+밉을 사용하지 않는다는 점입니다. 두 텍스처를 보면 멀리 떨어질수록 픽셀이 깜빡이는 증상이
+보이죠. 이는 GPU가 픽셀을 원본 텍스처에서 선택하기 때문입니다. `NearestFilter`는 하나의
+픽셀을 선택하고, `LinearFilter`는 4개의 픽셀을 선택하기는 하나, 픽셀을 제대로 표현하진
+못합니다. 다른 4개 예제는 그나마 낫고, 그 중 `LinearMipmapLinearFilter`가 제일 깔끔해
+보이네요.
 
-If you click the picture above it will toggle between the texture we've been using above
-and a texture where every mip level is a different color.
+위 캔버스를 클릭해보면 텍스처를 바꿀 수 있습니다. 하나는 여태까지 사용하던 텍스처이고,
+또 하나는 밉의 각 단계가 다른 색으로 나타나는 텍스처이죠.
 
 <div class="threejs_center">
   <div data-texture-diagram="differentColoredMips"></div>
 </div>
 
-This makes it more clear
-what is happening. You can see in the top left and top middle the first mip is used all the way
-into the distance. The top right and bottom middle you can clearly see where a different mip
-is used.
+이 텍스처는 필터의 동작 원리를 이해하기 쉽도록 해줍니다. 위 예제에서 `NearestFilter`와
+`LinearFilter`는 아주 멀리까지도 첫 번째 밉을 사용합니다. 반면 상단 오른쪽과 하단 중앙을
+보면 밉의 경계가 뚜렷이 보이죠.
 
-Switching back to the original texture you can see the bottom right is the smoothest,
-highest quality. You might ask why not always use that mode. The most obvious reason
-is sometimes you want things to be pixelated for a retro look or some other reason.
-The next most common reason is that reading 8 pixels and blending them is slower
-than reading 1 pixel and blending. While it's unlikely that a single texture is going
-to be the difference between fast and slow as we progress further into these articles
-we'll eventually have materials that use 4 or 5 textures all at once. 4 textures * 8
-pixels per texture is looking up 32 pixels for ever pixel rendered.
-This can be especially important to consider on mobile devices.
+다시 원래 텍스처로 바꿔보면 하단 오른쪽이 가장 매끄러운 것이 보일 겁니다. 왜 항상 이
+필터를 쓰지 않는 걸까요? 뭐, 레트로 감성을 표현한다든가 하는 이유로 물체들이 픽셀화된
+것을 원할 수도 있죠. 하지만 보다 흔한 이유는 성능입니다. 8개의 픽셀 데이터를 처리하는
+것보다는 당연히 1개의 픽셀 데이터를 처리하는 게 훨씬 빠르겠죠. 하나의 텍스처로 이런
+성능 차이를 체감하기는 어렵지만, Three.js를 사용하다보면 하나의 물체에 4, 5개의 텍스처가
+들어가는 경우도 빈번합니다. 4개의 텍스처에서 각각 8개의 픽셀을 처리해야 하니, 이는 한
+프레임당 32개의 픽셀을 처리해야 함을 의미하죠. 이는 저사양 기기를 고려할 때 특히 중요히
+여겨야 하는 요소입니다.
 
-## <a name="uvmanipulation"></a> Repeating, offseting, rotating, wrapping a texture
+## <a name="uvmanipulation"></a> 텍스처의 반복(repeating), 위치 조절(offseting), 회전(rotating), 래핑(wrapping)
 
-Textures have settings for repeating, offseting, and rotating a texture.
+텍스처에는 반복, 위치, 회전 설정이 있습니다.
 
-By default textures in three.js do not repeat. To set whether or not a
-texture repeats there are 2 properties, [`wrapS`](Texture.wrapS) for horizontal wrapping
-and [`wrapT`](Texture.wrapT) for vertical wrapping.
+Three.js는 기본적으로 텍스처를 반복하지 않습니다. 반복 여부를 설정하는
+2가지 속성이 있는데, 하나는 수평 래핑을 설정하는 [`wrapS`](Texture.wrapS)이고,
+또 하나는 수직 래핑을 설정하는 [`wrapT`](Texture.wrapT)입니다.
 
-They can be set to one of:
+두 속성은 다음 중 하나로 지정할 수 있습니다.
 
 * `THREE.ClampToEdgeWrapping`
 
-   the last pixel on each edge is repeated forever
+   텍스처의 가장자리 픽셀을 계속해서 반복합니다
 
 * `THREE.RepeatWrapping`
 
-   the texture is repeated
+   텍스처 자체를 반복합니다
 
 * `THREE.MirroredRepeatWrapping`
 
-   the texture is mirrored and repeated
+   텍스처 자체를 반복하되, 매번 뒤집습니다.
 
-For example to turn on wrapping in both directions:
+양 방향의 래핑을 키려면 다음과 같이 설정할 수 있습니다.
 
 ```js
 someTexture.wrapS = THREE.RepeatWrapping;
 someTexture.wrapT = THREE.RepeatWrapping;
 ```
 
-Repeating is set with the [repeat] repeat property.
+반복은 `repeat` 속성으로 설정할 수 있죠.
 
 ```js
 const timesToRepeatHorizontally = 4;
@@ -486,30 +484,29 @@ const timesToRepeatVertically = 2;
 someTexture.repeat.set(timesToRepeatHorizontally, timesToRepeatVertically);
 ```
 
-Offseting the texture can be done by setting the `offset` property. Textures
-are offset with units where 1 unit = 1 texture size. On other words 0 = no offset
-and 1 = offset one full texture amount.
+텍스처의 위치는 `offset` 속성을 설정해 조절할 수 있습니다. 텍스처 위치의 단위는
+텍스처의 크기와 1:1, 즉 0은 위치가 그대로인 것이고 1은 각 축에서 텍스처 크기만큼
+이동한 것을 의미하죠.
 
 ```js
-const xOffset = .5;   // offset by half the texture
-const yOffset = .25;  // offset by 1/4 the texture
+const xOffset = .5;   // 텍스처 너비의 반만큼 이동
+const yOffset = .25;  // 텍스처 높이의 1/4만큼 이동
 someTexture.offset.set(xOffset, yOffset);
 ```
 
-Rotating the texture can be set by setting the `rotation` property in radians
-as well as the `center` property for choosing the center of rotation.
-It defaults to 0,0 which rotates from the bottom left corner. Like offset
-these units are in texture size so setting them to `.5, .5` would rotate
-around the center of the texture.
+텍스처의 회전은 `rotation` 속성을 라디안(radians) 단위로 지정해 조절할 수 있습니다.
+`center` 속성은 회전의 중심을 정하는 데 사용하죠. `center` 속성의 기본값은 `0, 0`으로
+왼쪽 상단을 기준으로 회전하고, `offset`과 마찬가지로 텍스처의 크기를 기준으로
+단위가 정해지기에 `.5, .5`로 설정하면 텍스처의 중앙을 기준으로 회전합니다.
 
 ```js
 someTexture.center.set(.5, .5);
 someTexture.rotation = THREE.MathUtils.degToRad(45);
 ```
 
-Let's modify the top sample above to play with these values
+아까 작성한 예제를 수정해 위 설정을 테스트할 예제를 만들겠습니다.
 
-First we'll keep a reference to the texture so we can manipulate it
+먼저 텍스처를 별도 변수에 담아 나중에 수정할 수 있도록 합니다.
 
 ```js
 +const texture = loader.load('resources/images/wall.jpg');
@@ -519,15 +516,15 @@ const material = new THREE.MeshBasicMaterial({
 });
 ```
 
-Then we'll use [dat.GUI](https://github.com/dataarts/dat.gui) again to provide a simple interface.
+간단한 인터페이스를 만들어보죠.
+다시 한 번 [dat.GUI](https://github.com/dataarts/dat.gui)가 등장할 때입니다.
 
 ```js
-import {GUI} from '../3rdparty/dat.gui.module.js';
+import { GUI } from '../3rdparty/dat.gui.module.js';
 ```
 
-As we did in previous dat.GUI examples we'll use a simple class to
-give dat.GUI an object that it can manipulate in degrees
-but that will set a property in radians.
+이전 예제처럼 간단한 헬퍼 클래스를 만들어 각도(degrees)로 값을 조절하면
+알아서 호도(radians)로 변환해 지정하게끔 해줍니다.
 
 ```js
 class DegRadHelper {
@@ -544,9 +541,9 @@ class DegRadHelper {
 }
 ```
 
-We also need a class that will convert from a string like `"123"` into
-a number like `123` since three.js requires numbers for enum settings
-like `wrapS` and `wrapT` but dat.GUI only uses strings for enums.
+또 문자열을 숫자형으로 변환시켜줄 클래스도 만듭니다. dat.GUI는 값을 문자열로
+넘겨주는데, Three.js는 `wrapS`나 `wrapT` 등 enum 값을 지정할 때 숫자형만
+받기 때문이죠.
 
 ```js
 class StringToNumberHelper {
@@ -563,7 +560,7 @@ class StringToNumberHelper {
 }
 ```
 
-Using those classes we can setup a simple GUI for the settings above
+위에서 만든 클래스를 이용해 설정값을 조절할 GUI를 만듭니다.
 
 ```js
 const wrapModes = {
@@ -593,17 +590,16 @@ gui.add(new DegRadHelper(texture, 'rotation'), 'value', -360, 360)
   .name('texture.rotation');
 ```
 
-The last thing to note about the example is that if you change `wrapS` or
-`wrapT` on the texture you must also set [`texture.needsUpdate`](Texture.needsUpdate)
-so three.js knows to apply those settings. The other settings are automatically applied.
+텍스처의 `wrapS`나 `wrapT` 속성을 변경할 경우 [`texture.needsUpdate`](Texture.needsUpdate)를
+`true`로 설정해줘야 합니다. 나머지 설정만 변경한다면 굳이 이 값을 설정할 필요는 없죠.
 
 {{{example url="../threejs-textured-cube-adjust.html" }}}
 
-This is only one step into the topic of textures. At some point we'll go over
-texture coordinates as well as 9 other types of textures that can be applied
-to materials.
+뭔가 많은 것을 배운 것 같지만, 이는 맛보기에 불과합니다. 글을 진행하다보면
+텍스처의 정렬과 재질에 적용할 수 있는 다른 9가지의 텍스처에 대해 다룰 기회가
+있을 거예요.
 
-For now let's move on to [lights](threejs-lights.html).
+일단 다음 장에서는 [조명(lights)](threejs-lights.html)에 대해 알아보기로 하죠.
 
 <!--
 alpha
