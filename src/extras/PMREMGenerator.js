@@ -668,7 +668,7 @@ function _getBlurShader( maxSamples ) {
 
 				axis = normalize( axis );
 
-				gl_FragColor = vec4( 0.0 );
+				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 				gl_FragColor.rgb += weights[ 0 ] * getSample( 0.0, axis );
 
 				for ( int i = 1; i < n; i++ ) {
@@ -732,7 +732,7 @@ function _getEquirectShader() {
 
 			void main() {
 
-				gl_FragColor = vec4( 0.0 );
+				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 
 				vec3 outputDirection = normalize( vOutputDirection );
 				vec2 uv = equirectUv( outputDirection );
@@ -793,7 +793,7 @@ function _getCubemapShader() {
 
 			void main() {
 
-				gl_FragColor = vec4( 0.0 );
+				gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 				gl_FragColor.rgb = envMapTexelToLinear( textureCube( envMap, vec3( - vOutputDirection.x, vOutputDirection.yz ) ) ).rgb;
 				gl_FragColor = linearToOutputTexel( gl_FragColor );
 
