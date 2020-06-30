@@ -7,7 +7,7 @@ export class WebGLMaterials {
 
 	constructor( properties: WebGLProperties );
 
-	refreshUniforms( uniforms: object, material: Material, environment: Texture, pixelRatio: number, height: number ): void;
-	refreshUniformsFog( uniforms: object, fog: IFog ): void;
+	refreshMaterialUniforms( uniforms: object, material: Material, environment: Texture, pixelRatio: number, height: number ): void;
+	refreshFogUniforms( uniforms: object, fog: IFog ): void;
 
 }

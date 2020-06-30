@@ -45,7 +45,7 @@
 			var params = {
 				enableWind: true,
 				showBall: false,
-				tooglePins: togglePins
+				togglePins: togglePins
 			};
 
 			var DAMPING = 0.03;
@@ -581,13 +581,20 @@
 				//
 
 				var gui = new GUI();
-				gui.add( params, 'enableWind' );
-				gui.add( params, 'showBall' );
-				gui.add( params, 'tooglePins' );
-
+				gui.add( params, 'enableWind' ).name( 'Enable wind' );
+				gui.add( params, 'showBall' ).name( 'Show ball' );
+				gui.add( params, 'togglePins' ).name( 'Toggle pins' );
 				//
 
-				if ( typeof TESTING !== 'undefined' ) { for ( var i = 0; i < 50; i ++ ) { simulate( 500 - 10 * i ); }; };
+				if ( typeof TESTING !== 'undefined' ) {
+
+					for ( var i = 0; i < 50; i ++ ) {
+
+						simulate( 500 - 10 * i );
+
+					}
+
+				}
 
 			}
 

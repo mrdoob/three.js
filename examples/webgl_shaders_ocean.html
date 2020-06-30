@@ -25,8 +25,8 @@
 			import { Sky } from './jsm/objects/Sky.js';
 
 			var container, stats;
-			var camera, scene, renderer, light;
-			var controls, water, sphere;
+			var camera, scene, renderer;
+			var controls, water, sun, mesh;
 
 			init();
 			animate();
@@ -46,15 +46,12 @@
 
 				scene = new THREE.Scene();
 
-				//
-
 				camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 1, 20000 );
 				camera.position.set( 30, 30, 100 );
 
 				//
 
-				light = new THREE.DirectionalLight( 0xffffff, 0.8 );
-				scene.add( light );
+				sun = new THREE.Vector3();
 
 				// Water
 
@@ -71,7 +68,7 @@
 
 						} ),
 						alpha: 1.0,
-						sunDirection: light.position.clone().normalize(),
+						sunDirection: new THREE.Vector3(),
 						sunColor: 0xffffff,
 						waterColor: 0x001e0f,
 						distortionScale: 3.7,
@@ -86,39 +83,36 @@
 				// Skybox
 
 				var sky = new Sky();
+				sky.scale.setScalar( 10000 );
+				scene.add( sky );
 
 				var uniforms = sky.material.uniforms;
 
 				uniforms[ 'turbidity' ].value = 10;
 				uniforms[ 'rayleigh' ].value = 2;
-				uniforms[ 'luminance' ].value = 1;
 				uniforms[ 'mieCoefficient' ].value = 0.005;
 				uniforms[ 'mieDirectionalG' ].value = 0.8;
 
 				var parameters = {
-					distance: 400,
 					inclination: 0.49,
 					azimuth: 0.205
 				};
 
-				var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 512, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
-				var cubeCamera = new THREE.CubeCamera( 0.1, 1, cubeRenderTarget );
-
-				scene.background = cubeRenderTarget;
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 
 				function updateSun() {
 
 					var theta = Math.PI * ( parameters.inclination - 0.5 );
 					var phi = 2 * Math.PI * ( parameters.azimuth - 0.5 );
 
-					light.position.x = parameters.distance * Math.cos( phi );
-					light.position.y = parameters.distance * Math.sin( phi ) * Math.sin( theta );
-					light.position.z = parameters.distance * Math.sin( phi ) * Math.cos( theta );
+					sun.x = Math.cos( phi );
+					sun.y = Math.sin( phi ) * Math.sin( theta );
+					sun.z = Math.sin( phi ) * Math.cos( theta );
 
-					sky.material.uniforms[ 'sunPosition' ].value = light.position.copy( light.position );
-					water.material.uniforms[ 'sunDirection' ].value.copy( light.position ).normalize();
+					sky.material.uniforms[ 'sunPosition' ].value.copy( sun );
+					water.material.uniforms[ 'sunDirection' ].value.copy( sun ).normalize();
 
-					cubeCamera.update( renderer, sky );
+					scene.environment = pmremGenerator.fromScene( sky ).texture;
 
 				}
 
@@ -126,34 +120,11 @@
 
 				//
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 20, 1 );
-				var count = geometry.attributes.position.count;
+				var geometry = new THREE.BoxBufferGeometry( 30, 30, 30 );
+				var material = new THREE.MeshStandardMaterial( { roughness: 0 } );
 
-				var colors = [];
-				var color = new THREE.Color();
-
-				for ( var i = 0; i < count; i += 3 ) {
-
-					color.setHex( Math.random() * 0xffffff );
-
-					colors.push( color.r, color.g, color.b );
-					colors.push( color.r, color.g, color.b );
-					colors.push( color.r, color.g, color.b );
-
-				}
-
-				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
-
-				var material = new THREE.MeshStandardMaterial( {
-					vertexColors: true,
-					roughness: 0.0,
-					flatShading: true,
-					envMap: cubeRenderTarget.texture,
-					side: THREE.DoubleSide
-				} );
-
-				sphere = new THREE.Mesh( geometry, material );
-				scene.add( sphere );
+				mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
 
 				//
 
@@ -213,9 +184,9 @@
 
 				var time = performance.now() * 0.001;
 
-				sphere.position.y = Math.sin( time ) * 20 + 5;
-				sphere.rotation.x = time * 0.5;
-				sphere.rotation.z = time * 0.51;
+				mesh.position.y = Math.sin( time ) * 20 + 5;
+				mesh.rotation.x = time * 0.5;
+				mesh.rotation.z = time * 0.51;
 
 				water.material.uniforms[ 'time' ].value += 1.0 / 60.0;
 

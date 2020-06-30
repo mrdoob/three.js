@@ -23,7 +23,7 @@ export class Box2 {
 	expandByScalar( scalar: number ): Box2;
 	containsPoint( point: Vector2 ): boolean;
 	containsBox( box: Box2 ): boolean;
-	getParameter( point: Vector2 ): Vector2;
+	getParameter( point: Vector2, target: Vector2 ): Vector2;
 	intersectsBox( box: Box2 ): boolean;
 	clampPoint( point: Vector2, target: Vector2 ): Vector2;
 	distanceToPoint( point: Vector2 ): number;

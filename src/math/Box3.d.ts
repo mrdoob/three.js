@@ -32,7 +32,7 @@ export class Box3 {
 	expandByObject( object: Object3D ): this;
 	containsPoint( point: Vector3 ): boolean;
 	containsBox( box: Box3 ): boolean;
-	getParameter( point: Vector3 ): Vector3;
+	getParameter( point: Vector3, target: Vector3 ): Vector3;
 	intersectsBox( box: Box3 ): boolean;
 	intersectsSphere( sphere: Sphere ): boolean;
 	intersectsPlane( plane: Plane ): boolean;

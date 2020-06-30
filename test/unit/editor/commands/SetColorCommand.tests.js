@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/SetColorCommand';
+import { } from '../../../../editor/js/commands/SetColorCommand';
 
 export default QUnit.module( 'Editor', () => {
 

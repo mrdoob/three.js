@@ -4,7 +4,7 @@
 
 import { UISelect } from './libs/ui.js';
 
-var ViewportCamera = function ( editor ) {
+function ViewportCamera( editor ) {
 
 	var signals = editor.signals;
 
@@ -47,6 +47,6 @@ var ViewportCamera = function ( editor ) {
 
 	return cameraSelect;
 
-};
+}
 
 export { ViewportCamera };

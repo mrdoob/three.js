@@ -6,6 +6,8 @@ import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 import { InstancedBufferGeometry } from '../core/InstancedBufferGeometry.js';
 import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
+import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
+import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -55,6 +57,43 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 	parse: function ( json ) {
 
+		const interleavedBufferMap = {};
+		const arrayBufferMap = {};
+
+		function getInterleavedBuffer( json, uuid ) {
+
+			if ( interleavedBufferMap[ uuid ] !== undefined ) return interleavedBufferMap[ uuid ];
+
+			const interleavedBuffers = json.interleavedBuffers;
+			const interleavedBuffer = interleavedBuffers[ uuid ];
+
+			const buffer = getArrayBuffer( json, interleavedBuffer.buffer );
+
+			const array = new TYPED_ARRAYS[ interleavedBuffer.type ]( buffer );
+			const ib = new InterleavedBuffer( array, interleavedBuffer.stride );
+			ib.uuid = interleavedBuffer.uuid;
+
+			interleavedBufferMap[ uuid ] = ib;
+
+			return ib;
+
+		}
+
+		function getArrayBuffer( json, uuid ) {
+
+			if ( arrayBufferMap[ uuid ] !== undefined ) return arrayBufferMap[ uuid ];
+
+			const arrayBuffers = json.arrayBuffers;
+			const arrayBuffer = arrayBuffers[ uuid ];
+
+			const ab = new Uint32Array( arrayBuffer ).buffer;
+
+			arrayBufferMap[ uuid ] = ab;
+
+			return ab;
+
+		}
+
 		const geometry = json.isInstancedBufferGeometry ? new InstancedBufferGeometry() : new BufferGeometry();
 
 		const index = json.data.index;
@@ -71,9 +110,21 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 		for ( const key in attributes ) {
 
 			const attribute = attributes[ key ];
-			const typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
-			const bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
-			const bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+			let bufferAttribute;
+
+			if ( attribute.isInterleavedBufferAttribute ) {
+
+				const interleavedBuffer = getInterleavedBuffer( json.data, attribute.data );
+				bufferAttribute = new InterleavedBufferAttribute( interleavedBuffer, attribute.itemSize, attribute.offset, attribute.normalized );
+
+			} else {
+
+				const typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+				const bufferAttributeConstr = attribute.isInstancedBufferAttribute ? InstancedBufferAttribute : BufferAttribute;
+				bufferAttribute = new bufferAttributeConstr( typedArray, attribute.itemSize, attribute.normalized );
+
+			}
+
 			if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 			geometry.setAttribute( key, bufferAttribute );
 
@@ -92,9 +143,20 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 				for ( let i = 0, il = attributeArray.length; i < il; i ++ ) {
 
 					const attribute = attributeArray[ i ];
-					const typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+					let bufferAttribute;
 
-					const bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+					if ( attribute.isInterleavedBufferAttribute ) {
+
+						const interleavedBuffer = getInterleavedBuffer( json.data, attribute.data );
+						bufferAttribute = new InterleavedBufferAttribute( interleavedBuffer, attribute.itemSize, attribute.offset, attribute.normalized );
+
+					} else {
+
+						const typedArray = new TYPED_ARRAYS[ attribute.type ]( attribute.array );
+						bufferAttribute = new BufferAttribute( typedArray, attribute.itemSize, attribute.normalized );
+
+					}
+
 					if ( attribute.name !== undefined ) bufferAttribute.name = attribute.name;
 					array.push( bufferAttribute );
 

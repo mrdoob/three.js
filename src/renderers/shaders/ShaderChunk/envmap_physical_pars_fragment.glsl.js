@@ -111,22 +111,6 @@ export default /* glsl */`
 
 			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
 
-		#elif defined( ENVMAP_TYPE_SPHERE )
-
-			vec3 reflectView = normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0,0.0,1.0 ) );
-
-			#ifdef TEXTURE_LOD_EXT
-
-				vec4 envMapColor = texture2DLodEXT( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );
-
-			#else
-
-				vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );
-
-			#endif
-
-			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
-
 		#endif
 
 		return envMapColor.rgb * envMapIntensity;

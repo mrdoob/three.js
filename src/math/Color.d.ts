@@ -1,3 +1,5 @@
+import { BufferAttribute } from './../core/BufferAttribute';
+
 /**
  * @author Joe Pea / http://github.com/trusktr
  */
@@ -187,6 +189,8 @@ export class Color {
 	 * @return The provided array-like.
 	 */
 	toArray( xyz: ArrayLike<number>, offset?: number ): ArrayLike<number>;
+
+	fromBufferAttribute( attribute: BufferAttribute, index: number ): this;
 
 	/**
 	 * List of X11 color names.

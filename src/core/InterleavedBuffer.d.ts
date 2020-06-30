@@ -16,9 +16,10 @@ export class InterleavedBuffer {
 	length: number;
 	count: number;
 	needsUpdate: boolean;
+	uuid: string;
 
 	setUsage( usage: Usage ): InterleavedBuffer;
-	clone(): this;
+	clone( data: object ): this;
 	copy( source: InterleavedBuffer ): this;
 	copyAt(
 		index1: number,
@@ -26,5 +27,11 @@ export class InterleavedBuffer {
 		index2: number
 	): InterleavedBuffer;
 	set( value: ArrayLike<number>, index: number ): InterleavedBuffer;
+	toJSON( data: object ): {
+		uuid: string,
+		buffer: string,
+		type: string,
+		stride: number
+	};
 
 }

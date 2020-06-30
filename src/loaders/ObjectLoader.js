@@ -4,7 +4,6 @@ import {
 	CubeRefractionMapping,
 	EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping,
-	SphericalReflectionMapping,
 	CubeUVReflectionMapping,
 	CubeUVRefractionMapping,
 
@@ -929,6 +928,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		if ( data.shadow ) {
 
 			if ( data.shadow.bias !== undefined ) object.shadow.bias = data.shadow.bias;
+			if ( data.shadow.normalBias !== undefined ) object.shadow.normalBias = data.shadow.normalBias;
 			if ( data.shadow.radius !== undefined ) object.shadow.radius = data.shadow.radius;
 			if ( data.shadow.mapSize !== undefined ) object.shadow.mapSize.fromArray( data.shadow.mapSize );
 			if ( data.shadow.camera !== undefined ) object.shadow.camera = this.parseObject( data.shadow.camera );
@@ -986,7 +986,6 @@ const TEXTURE_MAPPING = {
 	CubeRefractionMapping: CubeRefractionMapping,
 	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
 	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
-	SphericalReflectionMapping: SphericalReflectionMapping,
 	CubeUVReflectionMapping: CubeUVReflectionMapping,
 	CubeUVRefractionMapping: CubeUVRefractionMapping
 };

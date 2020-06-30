@@ -11,7 +11,7 @@ import { Command } from '../Command.js';
  * @param script javascript object
  * @constructor
  */
-var RemoveScriptCommand = function ( editor, object, script ) {
+function RemoveScriptCommand( editor, object, script ) {
 
 	Command.call( this, editor );
 
@@ -26,7 +26,7 @@ var RemoveScriptCommand = function ( editor, object, script ) {
 
 	}
 
-};
+}
 
 RemoveScriptCommand.prototype = {
 

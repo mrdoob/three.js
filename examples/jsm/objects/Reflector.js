@@ -4,7 +4,6 @@
 
 import {
 	Color,
-	LinearEncoding,
 	LinearFilter,
 	MathUtils,
 	Matrix4,
@@ -34,7 +33,6 @@ var Reflector = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Reflector.ReflectorShader;
-	var encoding = options.encoding !== undefined ? options.encoding : LinearEncoding;
 
 	//
 
@@ -57,8 +55,7 @@ var Reflector = function ( geometry, options ) {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBFormat,
-		stencilBuffer: false,
-		encoding: encoding
+		stencilBuffer: false
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -156,6 +153,8 @@ var Reflector = function ( geometry, options ) {
 		projectionMatrix.elements[ 14 ] = clipPlane.w;
 
 		// Render
+
+		renderTarget.texture.encoding = renderer.outputEncoding;
 
 		scope.visible = false;
 

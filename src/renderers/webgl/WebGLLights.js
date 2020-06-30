@@ -103,6 +103,7 @@ function ShadowUniformsCache() {
 				case 'DirectionalLight':
 					uniforms = {
 						shadowBias: 0,
+						shadowNormalBias: 0,
 						shadowRadius: 1,
 						shadowMapSize: new Vector2()
 					};
@@ -111,6 +112,7 @@ function ShadowUniformsCache() {
 				case 'SpotLight':
 					uniforms = {
 						shadowBias: 0,
+						shadowNormalBias: 0,
 						shadowRadius: 1,
 						shadowMapSize: new Vector2()
 					};
@@ -119,6 +121,7 @@ function ShadowUniformsCache() {
 				case 'PointLight':
 					uniforms = {
 						shadowBias: 0,
+						shadowNormalBias: 0,
 						shadowRadius: 1,
 						shadowMapSize: new Vector2(),
 						shadowCameraNear: 1,
@@ -258,6 +261,7 @@ function WebGLLights() {
 					const shadowUniforms = shadowCache.get( light );
 
 					shadowUniforms.shadowBias = shadow.bias;
+					shadowUniforms.shadowNormalBias = shadow.normalBias;
 					shadowUniforms.shadowRadius = shadow.radius;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
 
@@ -299,6 +303,7 @@ function WebGLLights() {
 					const shadowUniforms = shadowCache.get( light );
 
 					shadowUniforms.shadowBias = shadow.bias;
+					shadowUniforms.shadowNormalBias = shadow.normalBias;
 					shadowUniforms.shadowRadius = shadow.radius;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
 
@@ -364,6 +369,7 @@ function WebGLLights() {
 					const shadowUniforms = shadowCache.get( light );
 
 					shadowUniforms.shadowBias = shadow.bias;
+					shadowUniforms.shadowNormalBias = shadow.normalBias;
 					shadowUniforms.shadowRadius = shadow.radius;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
 					shadowUniforms.shadowCameraNear = shadow.camera.near;

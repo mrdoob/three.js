@@ -7,7 +7,7 @@ import { WebGLProgram } from './WebGLProgram.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
 
-function WebGLPrograms( renderer, extensions, capabilities ) {
+function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 
 	const programs = [];
 
@@ -62,7 +62,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			const shader = ShaderLib[ shaderID ];
 
 			shaderobject = {
-				name: material.type,
+				name: material.name || material.type,
 				uniforms: UniformsUtils.clone( shader.uniforms ),
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
@@ -71,7 +71,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 		} else {
 
 			shaderobject = {
-				name: material.type,
+				name: material.name || material.type,
 				uniforms: material.uniforms,
 				vertexShader: material.vertexShader,
 				fragmentShader: material.fragmentShader
@@ -142,7 +142,7 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 	}
 
-	this.getParameters = function ( material, lights, shadows, scene, nClipPlanes, nClipIntersection, object ) {
+	function getParameters( material, lights, shadows, scene, nClipPlanes, nClipIntersection, object ) {
 
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
@@ -289,15 +289,15 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 			rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
 			rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
 
-			onBeforeCompile: material.onBeforeCompile
+			customProgramCacheKey: material.customProgramCacheKey()
 
 		};
 
 		return parameters;
 
-	};
+	}
 
-	this.getProgramCacheKey = function ( parameters ) {
+	function getProgramCacheKey( parameters ) {
 
 		const array = [];
 
@@ -336,13 +336,13 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
-		array.push( parameters.onBeforeCompile.toString() );
+		array.push( parameters.customProgramCacheKey );
 
 		return array.join();
 
-	};
+	}
 
-	this.acquireProgram = function ( parameters, cacheKey ) {
+	function acquireProgram( parameters, cacheKey ) {
 
 		let program;
 
@@ -364,16 +364,16 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, cacheKey, parameters );
+			program = new WebGLProgram( renderer, cacheKey, parameters, bindingStates );
 			programs.push( program );
 
 		}
 
 		return program;
 
-	};
+	}
 
-	this.releaseProgram = function ( program ) {
+	function releaseProgram( program ) {
 
 		if ( -- program.usedTimes === 0 ) {
 
@@ -387,10 +387,16 @@ function WebGLPrograms( renderer, extensions, capabilities ) {
 
 		}
 
-	};
+	}
 
-	// Exposed for resource monitoring & error feedback via renderer.info:
-	this.programs = programs;
+	return {
+		getParameters: getParameters,
+		getProgramCacheKey: getProgramCacheKey,
+		acquireProgram: acquireProgram,
+		releaseProgram: releaseProgram,
+		// Exposed for resource monitoring & error feedback via renderer.info:
+		programs: programs
+	};
 
 }
 

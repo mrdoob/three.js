@@ -120,6 +120,7 @@ var ARButton = {
 		if ( 'xr' in navigator ) {
 
 			var button = document.createElement( 'button' );
+			button.id = 'ARButton';
 			button.style.display = 'none';
 
 			stylizeElement( button );

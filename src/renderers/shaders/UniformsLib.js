@@ -119,6 +119,7 @@ const UniformsLib = {
 
 		directionalLightShadows: { value: [], properties: {
 			shadowBias: {},
+			shadowNormalBias: {},
 			shadowRadius: {},
 			shadowMapSize: {}
 		} },
@@ -138,6 +139,7 @@ const UniformsLib = {
 
 		spotLightShadows: { value: [], properties: {
 			shadowBias: {},
+			shadowNormalBias: {},
 			shadowRadius: {},
 			shadowMapSize: {}
 		} },
@@ -154,6 +156,7 @@ const UniformsLib = {
 
 		pointLightShadows: { value: [], properties: {
 			shadowBias: {},
+			shadowNormalBias: {},
 			shadowRadius: {},
 			shadowMapSize: {},
 			shadowCameraNear: {},

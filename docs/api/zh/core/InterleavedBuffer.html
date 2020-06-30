@@ -59,6 +59,11 @@
 			默认值为 *-1*。
 		</p>
 
+		<h3>[property:String uuid]</h3>
+		<p>
+		该类所创建的实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。它是自动被指定的，因此它不应当被编辑、更改。
+		</p>
+
 		<h3>[property:Integer version]</h3>
 		<p>
 			版本号，每次 needsUpdate 属性设置为 true 时，版本号增加。
@@ -98,13 +103,22 @@
 			将源队列数据拷贝到目标队列缓存中。
 		</p>
 
-		<h3>[method:InterleavedBuffer clone]() </h3>
+		<h3>[method:InterleavedBuffer clone]( [param:Object data] ) </h3>
 		<p>
-			克隆当前 [name]。
+			data - This object holds shared array buffers required for properly cloning geometries with interleaved attributes.<br/><br />
+
+			Creates a clone of this [name].
 		</p>
 
-		<h3>[method:BufferAttribute setUsage] ( [param:Usage value] ) </h3>
-		<p>Set [page:BufferAttribute.usage usage] to value.</p>
+		<h3>[method:InterleavedBuffer setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:InterleavedBuffer.usage usage] to value.</p>
+
+		<h3>[method:InterleavedBuffer toJSON]( [param:Object data] ) </h3>
+		<p>
+			data - This object holds shared array buffers required for properly serializing geometries with interleaved attributes.<br/><br />
+
+			Serializes this [name].
+		</p>
 
 		<h2>源代码</h2>
 

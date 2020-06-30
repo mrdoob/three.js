@@ -5,7 +5,7 @@
 
 import * as Commands from './commands/Commands.js';
 
-var History = function ( editor ) {
+function History( editor ) {
 
 	this.editor = editor;
 	this.undos = [];
@@ -32,7 +32,7 @@ var History = function ( editor ) {
 
 	} );
 
-};
+}
 
 History.prototype = {
 

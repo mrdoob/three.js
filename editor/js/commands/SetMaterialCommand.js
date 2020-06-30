@@ -13,7 +13,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param newMaterial THREE.Material
  * @constructor
  */
-var SetMaterialCommand = function ( editor, object, newMaterial, materialSlot ) {
+function SetMaterialCommand( editor, object, newMaterial, materialSlot ) {
 
 	Command.call( this, editor );
 
@@ -26,7 +26,7 @@ var SetMaterialCommand = function ( editor, object, newMaterial, materialSlot ) 
 	this.oldMaterial = this.editor.getObjectMaterial( object, materialSlot );
 	this.newMaterial = newMaterial;
 
-};
+}
 
 SetMaterialCommand.prototype = {
 

@@ -23,7 +23,7 @@
 
 			var controls, camera, scene, renderer;
 			var cameraCube, sceneCube;
-			var textureEquirec, textureCube, textureSphere;
+			var textureEquirec, textureCube;
 			var cubeMesh, sphereMesh;
 			var sphereMaterial;
 
@@ -63,10 +63,6 @@
 				textureEquirec = textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg' );
 				textureEquirec.mapping = THREE.EquirectangularReflectionMapping;
 				textureEquirec.encoding = THREE.sRGBEncoding;
-
-				textureSphere = textureLoader.load( 'textures/metal.jpg' );
-				textureSphere.mapping = THREE.SphericalReflectionMapping;
-				textureSphere.encoding = THREE.sRGBEncoding;
 
 				// Materials
 
@@ -153,20 +149,12 @@
 						sphereMaterial.needsUpdate = true;
 
 					},
-					Spherical: function () {
-
-						cubeMesh.visible = false;
-						sphereMaterial.envMap = textureSphere;
-						sphereMaterial.needsUpdate = true;
-
-					},
 					Refraction: false
 				};
 
 				var gui = new GUI();
 				gui.add( params, 'Cube' );
 				gui.add( params, 'Equirectangular' );
-				gui.add( params, 'Spherical' );
 				gui.add( params, 'Refraction' ).onChange( function ( value ) {
 
 					if ( value ) {
