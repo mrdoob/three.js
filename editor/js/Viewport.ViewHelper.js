@@ -14,12 +14,12 @@ function ViewHelper() {
 	var axesHelper = new THREE.AxesHelper();
 	this.add( axesHelper );
 
-	var posXAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#ff0000', 'X' ) } ) );
-	var posYAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#00ff00', 'Y' ) } ) );
-	var posZAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#0000ff', 'Z' ) } ) );
-	var negXAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#ff0000' ) } ) );
-	var negYAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#00ff00' ) } ) );
-	var negZAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#0000ff' ) } ) );
+	var posXAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#ff0000', 'X' ), toneMapped: false } ) );
+	var posYAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#00ff00', 'Y' ), toneMapped: false } ) );
+	var posZAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#0000ff', 'Z' ), toneMapped: false } ) );
+	var negXAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#ff0000' ), toneMapped: false } ) );
+	var negYAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#00ff00' ), toneMapped: false } ) );
+	var negZAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#0000ff' ), toneMapped: false } ) );
 
 	posXAxisHelper.position.x = 1;
 	posYAxisHelper.position.y = 1;
