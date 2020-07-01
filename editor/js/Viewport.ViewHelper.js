@@ -14,14 +14,12 @@ function ViewHelper() {
 	var axesHelper = new THREE.AxesHelper();
 	this.add( axesHelper );
 
-	var geometry = new THREE.SphereBufferGeometry( 0.2 );
-
-	var posXAxisHelper = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true } ) );
-	var posYAxisHelper = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x00ff00, transparent: true } ) );
-	var posZAxisHelper = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x0000ff, transparent: true } ) );
-	var negXAxisHelper = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0xff0000, transparent: true } ) );
-	var negYAxisHelper = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x00ff00, transparent: true } ) );
-	var negZAxisHelper = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x0000ff, transparent: true } ) );
+	var posXAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#ff0000', 'X' ) } ) );
+	var posYAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#00ff00', 'Y' ) } ) );
+	var posZAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#0000ff', 'Z' ) } ) );
+	var negXAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#ff0000' ) } ) );
+	var negYAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#00ff00' ) } ) );
+	var negZAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#0000ff' ) } ) );
 
 	posXAxisHelper.position.x = 1;
 	posYAxisHelper.position.y = 1;
@@ -100,6 +98,32 @@ function ViewHelper() {
 		renderer.setScissorTest( false );
 
 	};
+
+	function generateTexture( color, text = null ) {
+
+		var canvas = document.createElement( 'canvas' );
+		canvas.width = 128;
+		canvas.height = 128;
+
+		var context = canvas.getContext( '2d' );
+		context.beginPath();
+		context.arc( 64, 64, 32, 0, 2 * Math.PI );
+		context.closePath();
+		context.fillStyle = color;
+		context.fill();
+
+		if ( text !== null ) {
+
+			context.font = '48px Arial';
+			context.textAlign = 'center';
+			context.fillStyle = '#000000';
+			context.fillText( text, 64, 84 );
+
+		}
+
+		return new THREE.CanvasTexture( canvas );
+
+	}
 
 }
 
