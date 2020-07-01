@@ -102,22 +102,22 @@ function ViewHelper() {
 	function generateTexture( color, text = null ) {
 
 		var canvas = document.createElement( 'canvas' );
-		canvas.width = 128;
-		canvas.height = 128;
+		canvas.width = 64;
+		canvas.height = 64;
 
 		var context = canvas.getContext( '2d' );
 		context.beginPath();
-		context.arc( 64, 64, 32, 0, 2 * Math.PI );
+		context.arc( 32, 32, 16, 0, 2 * Math.PI );
 		context.closePath();
 		context.fillStyle = color;
 		context.fill();
 
 		if ( text !== null ) {
 
-			context.font = '48px Arial';
+			context.font = '24px Arial';
 			context.textAlign = 'center';
 			context.fillStyle = '#000000';
-			context.fillText( text, 64, 84 );
+			context.fillText( text, 32, 41 );
 
 		}
 
