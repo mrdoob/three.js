@@ -12,6 +12,7 @@ import { EditorControls } from './EditorControls.js';
 
 import { ViewportCamera } from './Viewport.Camera.js';
 import { ViewportInfo } from './Viewport.Info.js';
+import { ViewHelper } from './Viewport.ViewHelper.js';
 
 import { SetPositionCommand } from './commands/SetPositionCommand.js';
 import { SetRotationCommand } from './commands/SetRotationCommand.js';
@@ -55,6 +56,10 @@ function Viewport( editor ) {
 		}
 
 	}
+
+	//
+
+	var viewHelper = new ViewHelper();
 
 	//
 
@@ -714,6 +719,7 @@ function Viewport( editor ) {
 		// don't render under the grid.
 
 		scene.add( grid );
+		renderer.setViewport( 0, 0, container.dom.offsetWidth, container.dom.offsetHeight );
 		renderer.render( scene, camera );
 		scene.remove( grid );
 
@@ -721,6 +727,7 @@ function Viewport( editor ) {
 
 			renderer.autoClear = false;
 			renderer.render( sceneHelpers, camera );
+			viewHelper.render( renderer, camera, container );
 			renderer.autoClear = true;
 
 		}

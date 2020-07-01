@@ -159,6 +159,7 @@ const assets = [
 	'./js/Viewport.js',
 	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
+	'./js/Viewport.ViewHelper.js',
 
 	'./js/Command.js',
 	'./js/commands/AddObjectCommand.js',
