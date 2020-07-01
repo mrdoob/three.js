@@ -428,7 +428,6 @@ class KTX2Container {
 		var hasAlpha = this.getAlpha();
 		var isVideo = false;
 
-		// For both ETC1S and UASTC4x4 formats.
 		if ( texFormat === TextureFormat.ETC1S ) {
 
 			var numEndpoints = this.sgd.endpointCount;
