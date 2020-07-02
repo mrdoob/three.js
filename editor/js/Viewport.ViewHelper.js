@@ -4,13 +4,20 @@
 
 import * as THREE from '../../build/three.module.js';
 
-function ViewHelper() {
+function ViewHelper( editorCamera, container ) {
 
 	THREE.Object3D.call( this );
+
+	this.animating = false;
 
 	var color1 = new THREE.Color( '#ff3653' );
 	var color2 = new THREE.Color( '#8adb00' );
 	var color3 = new THREE.Color( '#2c8fff' );
+
+	var interactiveObjects = [];
+	var raycaster = new THREE.Raycaster();
+	var mouse = new THREE.Vector2();
+	var dummy = new THREE.Object3D();
 
 	var camera = new THREE.OrthographicCamera( - 2, 2, 2, - 2, 0, 4 );
 	camera.position.set( 0, 0, 2 );
@@ -29,11 +36,17 @@ function ViewHelper() {
 	this.add( yAxis );
 
 	var posXAxisHelper = new THREE.Sprite( getSpriteMaterial( color1, 'X' ) );
+	posXAxisHelper.userData.type = 'posX';
 	var posYAxisHelper = new THREE.Sprite( getSpriteMaterial( color2, 'Y' ) );
+	posYAxisHelper.userData.type = 'posY';
 	var posZAxisHelper = new THREE.Sprite( getSpriteMaterial( color3, 'Z' ) );
+	posZAxisHelper.userData.type = 'posZ';
 	var negXAxisHelper = new THREE.Sprite( getSpriteMaterial( color1 ) );
+	negXAxisHelper.userData.type = 'negX';
 	var negYAxisHelper = new THREE.Sprite( getSpriteMaterial( color2 ) );
+	negYAxisHelper.userData.type = 'negY';
 	var negZAxisHelper = new THREE.Sprite( getSpriteMaterial( color3 ) );
+	negZAxisHelper.userData.type = 'negZ';
 
 	posXAxisHelper.position.x = 1;
 	posYAxisHelper.position.y = 1;
@@ -52,10 +65,18 @@ function ViewHelper() {
 	this.add( negYAxisHelper );
 	this.add( negZAxisHelper );
 
+	interactiveObjects.push( posXAxisHelper );
+	interactiveObjects.push( posYAxisHelper );
+	interactiveObjects.push( posZAxisHelper );
+	interactiveObjects.push( negXAxisHelper );
+	interactiveObjects.push( negYAxisHelper );
+	interactiveObjects.push( negZAxisHelper );
+
 	var point = new THREE.Vector3();
 	var dim = 128;
+	var turnRate = 2 * Math.PI; // turn rate in angles per second
 
-	this.render = function ( renderer, editorCamera, container ) {
+	this.render = function ( renderer ) {
 
 		this.quaternion.copy( editorCamera.quaternion ).inverse();
 		this.updateMatrixWorld();
@@ -108,6 +129,121 @@ function ViewHelper() {
 		renderer.render( this, camera );
 
 	};
+
+	var targetPosition = new THREE.Vector3();
+	var targetQuaternion = new THREE.Quaternion();
+
+	var q1 = new THREE.Quaternion();
+	var q2 = new THREE.Quaternion();
+	var radius = 0;
+
+	this.handleClick = function ( event, center ) {
+
+		if ( this.animating === true ) return false;
+
+		var rect = container.dom.getBoundingClientRect();
+		var offsetX = rect.left + ( container.dom.offsetWidth - dim );
+		var offsetY = rect.top + ( container.dom.offsetHeight - dim );
+		mouse.x = ( ( event.clientX - offsetX ) / ( rect.width - offsetX ) ) * 2 - 1;
+		mouse.y = - ( ( event.clientY - offsetY ) / ( rect.bottom - offsetY ) ) * 2 + 1;
+
+		raycaster.setFromCamera( mouse, camera );
+
+		var intersects = raycaster.intersectObjects( interactiveObjects );
+
+		if ( intersects.length > 0 ) {
+
+			var intersection = intersects[ 0 ];
+			var object = intersection.object;
+
+			prepareAnimationData( object, center );
+
+			this.animating = true;
+
+			return true;
+
+		} else {
+
+			return false;
+
+		}
+
+	};
+
+	this.update = function ( delta ) {
+
+		var step = delta * turnRate;
+
+		// animate position by doing a slerp and then scaling the position on the unit sphere
+
+		q1.rotateTowards( q2, step );
+		editorCamera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius );
+
+		// animate orientation
+
+		editorCamera.quaternion.rotateTowards( targetQuaternion, step );
+
+		if ( q1.angleTo( q2 ) === 0 ) {
+
+			this.animating = false;
+
+		}
+
+	};
+
+	function prepareAnimationData( object, focusPoint ) {
+
+		switch ( object.userData.type ) {
+
+			case 'posX':
+				targetPosition.set( 1, 0, 0 );
+				targetQuaternion.setFromEuler( new THREE.Euler( 0, Math.PI * 0.5, 0 ) );
+				break;
+
+			case 'posY':
+				targetPosition.set( 0, 1, 0 );
+				targetQuaternion.setFromEuler( new THREE.Euler( - Math.PI * 0.5, 0, 0 ) );
+				break;
+
+			case 'posZ':
+				targetPosition.set( 0, 0, 1 );
+				targetQuaternion.setFromEuler( new THREE.Euler() );
+				break;
+
+			case 'negX':
+				targetPosition.set( - 1, 0, 0 );
+				targetQuaternion.setFromEuler( new THREE.Euler( 0, - Math.PI * 0.5, 0 ) );
+				break;
+
+			case 'negY':
+				targetPosition.set( 0, - 1, 0 );
+				targetQuaternion.setFromEuler( new THREE.Euler( Math.PI * 0.5, 0, 0 ) );
+				break;
+
+			case 'negZ':
+				targetPosition.set( 0, 0, - 1 );
+				targetQuaternion.setFromEuler( new THREE.Euler( 0, Math.PI, 0 ) );
+				break;
+
+			default:
+				console.error( 'ViewHelper: Invalid axis.' );
+
+		}
+
+		//
+
+		radius = editorCamera.position.distanceTo( focusPoint );
+		targetPosition.multiplyScalar( radius );
+
+		dummy.position.copy( focusPoint );
+
+		dummy.lookAt( editorCamera.position );
+		q1.copy( dummy.quaternion );
+
+		dummy.lookAt( targetPosition );
+		q2.copy( dummy.quaternion );
+
+	}
 
 	function getAxisMaterial( color ) {
 

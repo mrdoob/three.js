@@ -59,7 +59,7 @@ function Viewport( editor ) {
 
 	//
 
-	var viewHelper = new ViewHelper();
+	var viewHelper = new ViewHelper( camera, container );
 
 	//
 
@@ -186,37 +186,51 @@ function Viewport( editor ) {
 
 	}
 
-	function handleClick() {
+	function handleClick( event ) {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
-			var intersects = getIntersects( onUpPosition, objects );
+			// only test 3D objects if there is no UI interaction
 
-			if ( intersects.length > 0 ) {
+			if ( isUIInteraction( event ) === false ) {
 
-				var object = intersects[ 0 ].object;
+				var intersects = getIntersects( onUpPosition, objects );
 
-				if ( object.userData.object !== undefined ) {
+				if ( intersects.length > 0 ) {
 
-					// helper
+					var object = intersects[ 0 ].object;
 
-					editor.select( object.userData.object );
+					if ( object.userData.object !== undefined ) {
+
+						// helper
+
+						editor.select( object.userData.object );
+
+					} else {
+
+						editor.select( object );
+
+					}
 
 				} else {
 
-					editor.select( object );
+					editor.select( null );
 
 				}
-
-			} else {
-
-				editor.select( null );
 
 			}
 
 			render();
 
 		}
+
+	}
+
+	function isUIInteraction( event ) {
+
+		if ( viewHelper.handleClick( event, controls.center ) === true ) return true;
+
+		return false;
 
 	}
 
@@ -236,7 +250,7 @@ function Viewport( editor ) {
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onUpPosition.fromArray( array );
 
-		handleClick();
+		handleClick( event );
 
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
@@ -694,13 +708,25 @@ function Viewport( editor ) {
 		requestAnimationFrame( animate );
 
 		var mixer = editor.mixer;
+		var delta = clock.getDelta();
+
+		var needsUpdate = false;
 
 		if ( mixer.stats.actions.inUse > 0 ) {
 
-			mixer.update( clock.getDelta() );
-			render();
+			mixer.update( delta );
+			needsUpdate = true;
 
 		}
+
+		if ( viewHelper.animating === true ) {
+
+			viewHelper.update( delta );
+			needsUpdate = true;
+
+		}
+
+		if ( needsUpdate === true ) render();
 
 	}
 
@@ -727,7 +753,7 @@ function Viewport( editor ) {
 
 			renderer.autoClear = false;
 			renderer.render( sceneHelpers, camera );
-			viewHelper.render( renderer, camera, container );
+			viewHelper.render( renderer );
 			renderer.autoClear = true;
 
 		}
