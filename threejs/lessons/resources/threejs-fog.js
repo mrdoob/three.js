@@ -3,14 +3,25 @@ import {GLTFLoader} from '../../resources/threejs/r115/examples/jsm/loaders/GLTF
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
-  function fogExample(scene, fog) {
+  const darkColors = {
+    background: '#333',
+  };
+  const lightColors = {
+    background: '#FFF',
+  };
+  const darkMatcher = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function fogExample(scene, fog, update) {
     scene.fog = fog;
     const width = 4;
     const height = 3;
     const depth = 10;
     const geometry = new THREE.BoxBufferGeometry(width, height, depth);
     const material = new THREE.MeshPhongMaterial({color: 'hsl(130,50%,50%)'});
-    return new THREE.Mesh(geometry, material);
+    return {
+      obj3D: new THREE.Mesh(geometry, material),
+      update,
+    };
   }
 
   function houseScene(props, fogInHouse) {
@@ -86,7 +97,14 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         camera.lookAt(target[0] + Math.sin(time * .25) * .5, target[1], target[2]);
       },
     };
+  }
 
+  function createLightDarkFogUpdater(fog) {
+    return function() {
+      const isDarkMode = darkMatcher.matches;
+      const colors = isDarkMode ? darkColors : lightColors;
+      fog.color.set(colors.background);
+    };
   }
 
   threejsLessonUtils.addDiagrams({
@@ -96,7 +114,8 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const color = 0xFFFFFF;
         const near = 12;
         const far = 18;
-        return fogExample(scene, new THREE.Fog(color, near, far));
+        const fog = new THREE.Fog(color, near, far);
+        return fogExample(scene, fog, createLightDarkFogUpdater(fog));
       },
     },
     fogExp2: {
@@ -104,7 +123,8 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
         const {scene} = props;
         const color = 0xFFFFFF;
         const density = 0.1;
-        return fogExample(scene, new THREE.FogExp2(color, density));
+        const fog = new THREE.FogExp2(color, density);
+        return fogExample(scene, fog, createLightDarkFogUpdater(fog));
       },
     },
     fogBlueBackgroundRed: {
