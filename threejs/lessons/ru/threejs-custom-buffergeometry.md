@@ -1,6 +1,6 @@
-Title: Three.js Custom BufferGeometry
+Title: Three.js Пользовательская BufferGeometry
 Description: Создание собственной геометрии BufferGeometry.
-TOC: Custom BufferGeometry
+TOC: Пользовательская BufferGeometry
 
 В [предыдущей статье](threejs-custom-geometry.html) рассказывалось, как использовать `Geometry`. Эта статья о `BufferGeometry`. `BufferGeometry` обычно быстрее запускается и использует меньше памяти, но может быть сложнее в настройке. 
 
