@@ -1,6 +1,6 @@
-Title: Three.js Fog
-Description: Fog in Three.js
-TOC: Fog
+Title: Three.js Туман
+Description: Туман в Three.js
+TOC: Туман
 
 Эта статья является частью серии статей о three.js. Первая статья - [основы Three.js](threejs-fundamentals.html).
 Если вы еще не читали их, и вы новичок в three.js, возможно, вы захотите начать с них. 
