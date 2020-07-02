@@ -639,7 +639,7 @@ function _getBlurShader( maxSamples ) {
 			uniform float mipInt;
 			uniform vec3 poleAxis;
 
-			${_getEncodings()}
+			${ _getEncodings() }
 
 			#define ENVMAP_TYPE_CUBE_UV
 			#include <cube_uv_reflection_fragment>
@@ -726,7 +726,7 @@ function _getEquirectShader() {
 			uniform sampler2D envMap;
 			uniform vec2 texelSize;
 
-			${_getEncodings()}
+			${ _getEncodings() }
 
 			#include <common>
 
@@ -789,7 +789,7 @@ function _getCubemapShader() {
 
 			uniform samplerCube envMap;
 
-			${_getEncodings()}
+			${ _getEncodings() }
 
 			void main() {
 
@@ -884,7 +884,7 @@ function _getEncodings() {
 
 		vec4 inputTexelToLinear( vec4 value ) {
 
-			if( inputEncoding == 0 ) {
+			if ( inputEncoding == 0 ) {
 
 				return value;
 
@@ -916,9 +916,9 @@ function _getEncodings() {
 
 		}
 
-		vec4 linearToOutputTexel( vec4 value ){
+		vec4 linearToOutputTexel( vec4 value ) {
 
-			if( outputEncoding == 0 ) {
+			if ( outputEncoding == 0 ) {
 
 				return value;
 
