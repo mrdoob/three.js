@@ -186,51 +186,39 @@ function Viewport( editor ) {
 
 	}
 
-	function handleClick( event ) {
+	function handleClick() {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
 			// only test 3D objects if there is no UI interaction
 
-			if ( isUIInteraction( event ) === false ) {
+			var intersects = getIntersects( onUpPosition, objects );
 
-				var intersects = getIntersects( onUpPosition, objects );
+			if ( intersects.length > 0 ) {
 
-				if ( intersects.length > 0 ) {
+				var object = intersects[ 0 ].object;
 
-					var object = intersects[ 0 ].object;
+				if ( object.userData.object !== undefined ) {
 
-					if ( object.userData.object !== undefined ) {
+					// helper
 
-						// helper
-
-						editor.select( object.userData.object );
-
-					} else {
-
-						editor.select( object );
-
-					}
+					editor.select( object.userData.object );
 
 				} else {
 
-					editor.select( null );
+					editor.select( object );
 
 				}
+
+			} else {
+
+				editor.select( null );
 
 			}
 
 			render();
 
 		}
-
-	}
-
-	function isUIInteraction( event ) {
-
-		if ( viewHelper.handleClick( event, controls.center ) === true ) return true;
-
-		return false;
 
 	}
 
@@ -250,7 +238,7 @@ function Viewport( editor ) {
 		var array = getMousePosition( container.dom, event.clientX, event.clientY );
 		onUpPosition.fromArray( array );
 
-		handleClick( event );
+		handleClick();
 
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
@@ -311,6 +299,7 @@ function Viewport( editor ) {
 		signals.refreshSidebarObject3D.dispatch( camera );
 
 	} );
+	viewHelper.controls = controls;
 
 	// signals
 

@@ -2,6 +2,8 @@
  * @author Mugen87 / https://github.com/Mugen87
  */
 
+import { UIPanel } from './libs/ui.js';
+
 import * as THREE from '../../build/three.module.js';
 
 function ViewHelper( editorCamera, container ) {
@@ -9,6 +11,34 @@ function ViewHelper( editorCamera, container ) {
 	THREE.Object3D.call( this );
 
 	this.animating = false;
+	this.controls = null;
+
+	var panel = new UIPanel();
+	panel.setId( 'viewHelper' );
+	panel.setPosition( 'absolute' );
+	panel.setRight( '0px' );
+	panel.setBottom( '0px' );
+	panel.setHeight( '128px' );
+	panel.setWidth( '128px' );
+	panel.setBottom( '0px' );
+
+	var scope = this;
+
+	panel.dom.addEventListener( 'mouseup', function ( event ) {
+
+		event.stopPropagation();
+
+		scope.handleClick( event );
+
+	} );
+
+	panel.dom.addEventListener( 'mousedown', function ( event ) {
+
+		event.stopPropagation();
+
+	} );
+
+	container.add( panel );
 
 	var color1 = new THREE.Color( '#ff3653' );
 	var color2 = new THREE.Color( '#8adb00' );
@@ -137,7 +167,7 @@ function ViewHelper( editorCamera, container ) {
 	var q2 = new THREE.Quaternion();
 	var radius = 0;
 
-	this.handleClick = function ( event, center ) {
+	this.handleClick = function ( event ) {
 
 		if ( this.animating === true ) return false;
 
@@ -156,7 +186,7 @@ function ViewHelper( editorCamera, container ) {
 			var intersection = intersects[ 0 ];
 			var object = intersection.object;
 
-			prepareAnimationData( object, center );
+			prepareAnimationData( object, this.controls.center );
 
 			this.animating = true;
 
