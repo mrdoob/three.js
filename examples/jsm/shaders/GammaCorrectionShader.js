@@ -36,7 +36,7 @@ var GammaCorrectionShader = {
 
 		"void main() {",
 
-		"	vec4 tex = texture2D( tDiffuse, vec2( vUv.x, vUv.y ) );",
+		"	vec4 tex = texture2D( tDiffuse, vUv );",
 
 		"	gl_FragColor = LinearTosRGB( tex );", // optional: LinearToGamma( tex, float( GAMMA_FACTOR ) );
 

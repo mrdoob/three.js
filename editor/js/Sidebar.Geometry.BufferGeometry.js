@@ -4,7 +4,7 @@
 
 import { UIRow, UIText, UISpan, UIBreak } from './libs/ui.js';
 
-var SidebarGeometryBufferGeometry = function ( editor ) {
+function SidebarGeometryBufferGeometry( editor ) {
 
 	var strings = editor.strings;
 
@@ -65,6 +65,6 @@ var SidebarGeometryBufferGeometry = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryBufferGeometry };

@@ -12,7 +12,7 @@ import { SidebarProject } from './Sidebar.Project.js';
 import { SidebarHistory } from './Sidebar.History.js';
 import { SidebarSettings } from './Sidebar.Settings.js';
 
-var Sidebar = function ( editor ) {
+function Sidebar( editor ) {
 
 	var strings = editor.strings;
 
@@ -40,6 +40,6 @@ var Sidebar = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { Sidebar };

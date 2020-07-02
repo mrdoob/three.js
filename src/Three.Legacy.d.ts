@@ -13,6 +13,21 @@ export namespace SceneUtils {
 }
 
 /**
+ * @deprecated Use an Array instead.
+ */
+export class MultiMaterial extends Material {
+
+	constructor( materials?: Material[] );
+
+	readonly isMultiMaterial: true;
+
+	materials: Material[];
+
+	toJSON( meta: any ): any;
+
+}
+
+/**
  * @deprecated Material.vertexColors is now a boolean.
  */
 export enum Colors {}

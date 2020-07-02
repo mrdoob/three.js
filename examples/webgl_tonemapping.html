@@ -25,13 +25,10 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var mesh, renderer, scene, camera, controls;
-			var gui,
-				guiWhitePoint = null,
-				guiExposure = null;
+			var gui, guiExposure = null;
 
 			var params = {
-				exposure: 0.8,
-				whitePoint: 1.0, // applies to Uncharted2 only
+				exposure: 1.0,
 				toneMapping: 'ACESFilmic'
 			};
 
@@ -39,15 +36,18 @@
 				None: THREE.NoToneMapping,
 				Linear: THREE.LinearToneMapping,
 				Reinhard: THREE.ReinhardToneMapping,
-				Uncharted2: THREE.Uncharted2ToneMapping,
 				Cineon: THREE.CineonToneMapping,
-				ACESFilmic: THREE.ACESFilmicToneMapping
+				ACESFilmic: THREE.ACESFilmicToneMapping,
+				Custom: THREE.CustomToneMapping
 			};
 
-			init();
-			render();
+			init().catch( function ( err ) {
 
-			function init() {
+				console.error( err );
+
+			} );
+
+			async function init() {
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -55,10 +55,22 @@
 				document.body.appendChild( renderer.domElement );
 
 				renderer.toneMapping = toneMappingOptions[ params.toneMapping ];
-				renderer.toneMappingWhitePoint = params.whitePoint;
 				renderer.toneMappingExposure = params.exposure;
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
+
+				// Set CustomToneMapping to Uncharted2
+				// source: http://filmicworlds.com/blog/filmic-tonemapping-operators/
+
+				THREE.ShaderChunk.tonemapping_pars_fragment = THREE.ShaderChunk.tonemapping_pars_fragment.replace(
+					'vec3 CustomToneMapping( vec3 color ) { return color; }',
+					`#define Uncharted2Helper( x ) max( ( ( x * ( 0.15 * x + 0.10 * 0.50 ) + 0.20 * 0.02 ) / ( x * ( 0.15 * x + 0.50 ) + 0.20 * 0.30 ) ) - 0.02 / 0.30, vec3( 0.0 ) )
+					float toneMappingWhitePoint = 1.0;
+					vec3 CustomToneMapping( vec3 color ) {
+						color *= toneMappingExposure;
+						return saturate( Uncharted2Helper( color ) / Uncharted2Helper( vec3( toneMappingWhitePoint ) ) );
+					}`
+				);
 
 				scene = new THREE.Scene();
 
@@ -75,42 +87,41 @@
 				var pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
-				new RGBELoader()
+				var rgbeLoader = new RGBELoader()
 					.setDataType( THREE.UnsignedByteType )
-					.setPath( 'textures/equirectangular/' )
-					.load( 'venice_sunset_1k.hdr', function ( texture ) {
+					.setPath( 'textures/equirectangular/' );
 
-						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+				var gltfLoader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 
-						scene.background = envMap;
-						scene.environment = envMap;
+				var [ texture, gltf ] = await Promise.all( [
+					rgbeLoader.loadAsync( 'venice_sunset_1k.hdr' ),
+					gltfLoader.loadAsync( 'DamagedHelmet.gltf' ),
+				] );
 
-						texture.dispose();
-						pmremGenerator.dispose();
+				// environment
 
-						render();
+				var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
 
-						// model
+				scene.background = envMap;
+				scene.environment = envMap;
 
-						var loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
-						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+				texture.dispose();
+				pmremGenerator.dispose();
 
-							gltf.scene.traverse( function ( child ) {
+				// model
 
-								if ( child.isMesh ) {
+				gltf.scene.traverse( function ( child ) {
 
-									mesh = child;
-									scene.add( mesh );
+					if ( child.isMesh ) {
 
-								}
+						mesh = child;
+						scene.add( mesh );
 
-							} );
+					}
 
-							render();
+				} );
 
-						} );
-
-					} );
+				render();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -136,13 +147,6 @@
 
 			function updateGUI() {
 
-				if ( guiWhitePoint !== null ) {
-
-					gui.remove( guiWhitePoint );
-					guiWhitePoint = null;
-
-				}
-
 				if ( guiExposure !== null ) {
 
 					gui.remove( guiExposure );
@@ -157,19 +161,6 @@
 						.onChange( function () {
 
 							renderer.toneMappingExposure = params.exposure;
-							render();
-
-						} );
-
-				}
-
-				if ( params.toneMapping === 'Uncharted2' ) {
-
-					guiWhitePoint = gui.add( params, 'whitePoint', 0, 2 )
-
-						.onChange( function () {
-
-							renderer.toneMappingWhitePoint = params.whitePoint;
 							render();
 
 						} );

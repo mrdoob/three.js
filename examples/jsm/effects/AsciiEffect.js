@@ -274,6 +274,7 @@ var AsciiEffect = function ( renderer, charSet, options ) {
 				}
 
 			}
+
 			strChars += "<br/>";
 
 		}

@@ -328,6 +328,11 @@ export class Material extends EventDispatcher {
 	onBeforeCompile ( shader : Shader, renderer : WebGLRenderer ) : void;
 
 	/**
+	 * In case onBeforeCompile is used, this callback can be used to identify values of settings used in onBeforeCompile, so three.js can reuse a cached shader or recompile the shader as needed.
+	 */
+	customProgramCacheKey(): string;
+
+	/**
 	 * Sets the properties based on the values.
 	 * @param values A container with parameters.
 	 */

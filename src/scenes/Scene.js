@@ -51,7 +51,7 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	toJSON: function ( meta ) {
 
-		var data = Object3D.prototype.toJSON.call( this, meta );
+		const data = Object3D.prototype.toJSON.call( this, meta );
 
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 

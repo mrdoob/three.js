@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">Represents a third-order spherical harmonics (SH). Light probes use this class to encode lighting information.</p>
+
+		<h2>Constructor</h2>
+		<h3>[name]()</h3>
+		<p>
+		Creates a new instance of [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array coefficients]</h3>
+		<p>An array holding the (9) SH coefficients. A single coefficient is represented as an instance of [page:Vector3].</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:SphericalHarmonics3 add]( [param:SphericalHarmonics3 sh] )</h3>
+		<p>
+			[page:SphericalHarmonics3 sh] - The SH to add.<br /><br />
+
+			Adds the given SH to this instance.
+		</p>
+
+		<h3>[method:SphericalHarmonics3 addScaledSH]( [param:SphericalHarmonics3 sh], [param:Number scale] )</h3>
+		<p>
+			[page:SphericalHarmonics3 sh] - The SH to add.<br />
+			[page:Number scale] - The scale factor.<br /><br />
+
+			A convenience method for performing [page:.add]() and [page:.scale]() at once.
+		</p>
+
+		<h3>[method:SphericalHarmonics3 clone]()</h3>
+		<p>
+			Returns a new instance of [name] with equal coefficients.
+		</p>
+
+		<h3>[method:SphericalHarmonics3 copy]( [param:SphericalHarmonics3 sh] )</h3>
+		<p>
+			[page:SphericalHarmonics3 sh] - The SH to copy.<br /><br />
+
+			Copies the given SH to this instance.
+		</p>
+
+		<h3>[method:Boolean equals]( [param:SphericalHarmonics3 sh] )</h3>
+		<p>
+			[page:SphericalHarmonics3 sh] - The SH to compare with.<br /><br />
+
+			Returns true if the given SH and this instance have equal coefficients.
+		</p>
+
+		<h3>[method:SphericalHarmonics3 fromArray]( [param:Array array], [param:Number offset] )</h3>
+		<p>
+			[page:Array array] - The array holding the numbers of the SH coefficients.<br />
+			[page:Number offset] - (optional) The array offset.<br /><br />
+
+			Sets the coefficients of this instance from the given array.
+		</p>
+
+		<h3>[method:Vector3 getAt]( [param:Vector3 normal], [param:Vector3 target] )</h3>
+		<p>
+			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
+			[page:Vector3 target] - The result vector.<br /><br />
+
+			Returns the radiance in the direction of the given normal.
+		</p>
+
+		<h3>[method:Vector3 getIrradianceAt]( [param:Vector3 normal], [param:Vector3 target] )</h3>
+		<p>
+			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
+			[page:Vector3 target] - The result vector.<br /><br />
+
+			Returns the irradiance (radiance convolved with cosine lobe) in the direction of the given normal.
+		</p>
+
+		<h3>[method:SphericalHarmonics3 lerp]( [param:SphericalHarmonics3 sh], [param:Number alpha] )</h3>
+		<p>
+			[page:SphericalHarmonics3 sh] - The SH to interpolate with.<br />
+			[page:Number alpha] - The alpha factor.<br /><br />
+
+			Linear interpolates between the given SH and this instance by the given alpha factor.
+		</p>
+
+		<h3>[method:SphericalHarmonics3 scale]( [param:Number scale] )</h3>
+		<p>
+			[page:Number sh] - The scale factor.<br /><br />
+
+			Scales this SH by the given scale factor.
+		</p>
+
+		<h3>[method:SphericalHarmonics3 set]( [param:Array coefficients] )</h3>
+		<p>
+			[page:Array coefficients] - An array of SH coefficients.<br /><br />
+
+			Sets the given SH coefficients to this instance.
+		</p>
+
+		<h3>[method:Array toArray]( [param:Array array], [param:Number offset] )</h3>
+		<p>
+			[page:Array array] - (optional) The target array.<br />
+			[page:Number offset] - (optional) The array offset.<br /><br />
+
+			Returns an array with the coefficients, or copies them into the provided array. The coefficients
+			are represented as numbers.
+		</p>
+
+		<h3>[method:SphericalHarmonics3 zero]()</h3>
+		<p>
+			Sets all SH coefficients to 0.
+		</p>
+
+		<h2>Static Methods</h2>
+
+		<h3>[method:void getBasisAt]( [param:Vector3 normal], [param:Array shBasis] )</h3>
+		<p>
+			[page:Vector3 normal] - The normal vector (assumed to be unit length).<br />
+			[page:Array shBasis] - The resulting SH basis.<br /><br />
+
+			Computes the SH basis for the given normal vector.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

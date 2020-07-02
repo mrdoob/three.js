@@ -107,13 +107,16 @@ export default QUnit.module( 'Extras', () => {
 
 				var testValues = [ 0, 0.3, 0.5, 0.7, 1 ];
 
-				testValues.forEach( function ( val, i ) {
+				var p = new Vector2();
+				var a = new Vector2();
+
+				testValues.forEach( function ( val ) {
 
 					var expectedX = Math.cos( val * Math.PI * 2 ) * 10;
 					var expectedY = Math.sin( val * Math.PI * 2 ) * 10;
 
-					var p = curve.getPoint( val );
-					var a = curve.getPointAt( val );
+					curve.getPoint( val, p );
+					curve.getPointAt( val, a );
 
 					assert.numEqual( p.x, expectedX, "getPoint(" + val + ").x correct" );
 					assert.numEqual( p.y, expectedY, "getPoint(" + val + ").y correct" );
@@ -136,11 +139,11 @@ export default QUnit.module( 'Extras', () => {
 				];
 
 				var tangents = [
-					curve.getTangent( 0 ),
-					curve.getTangent( 0.25 ),
-					curve.getTangent( 0.5 ),
-					curve.getTangent( 0.75 ),
-					curve.getTangent( 1 )
+					curve.getTangent( 0, new Vector2() ),
+					curve.getTangent( 0.25, new Vector2() ),
+					curve.getTangent( 0.5, new Vector2() ),
+					curve.getTangent( 0.75, new Vector2() ),
+					curve.getTangent( 1, new Vector2() )
 				];
 
 				expectedTangents.forEach( function ( exp, i ) {

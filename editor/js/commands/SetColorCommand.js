@@ -12,7 +12,7 @@ import { Command } from '../Command.js';
  * @param newValue integer representing a hex color value
  * @constructor
  */
-var SetColorCommand = function ( editor, object, attributeName, newValue ) {
+function SetColorCommand( editor, object, attributeName, newValue ) {
 
 	Command.call( this, editor );
 
@@ -25,7 +25,7 @@ var SetColorCommand = function ( editor, object, attributeName, newValue ) {
 	this.oldValue = ( object !== undefined ) ? this.object[ this.attributeName ].getHex() : undefined;
 	this.newValue = newValue;
 
-};
+}
 
 SetColorCommand.prototype = {
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
@@ -8,22 +8,19 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>TypeScript设置（[name]）</h1>
 
 		<p>
-			three.js is a JavaScript-based library. However, it's possible to use it in a TypeScript project, as the library
-			exposes [link:https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html Declaration Files] (*d.ts* files).
+			three.js是一个基于JavaScript的库。但是，可以在TypeScript项目中使用它，因为该库公开了声明文件 [link:https://www.typescriptlang.org/docs/handbook/declaration-files/introduction.html Declaration Files]（*d.ts* 文件）。
 		</p>
 
 		<p>
-			A minimal configuration is required for the TypeScript compiler to
-			discover three.js types.<br>
-			You will need to set the [link:https://www.typescriptlang.org/docs/handbook/module-resolution.html moduleResolution]
-			option to *node*, and the [link:https://www.typescriptlang.org/docs/handbook/compiler-options.html target] option to *es6* or newer.
+			TypeScript编译器需要最少的配置即可发现three.js类型。<br>
+			你将需要设置 [link:https://www.typescriptlang.org/docs/handbook/module-resolution.html moduleResolution] （模块解析）为 *node* 和 [link:https://www.typescriptlang.org/docs/handbook/compiler-options.html target] （目标） 为 *es6* 或更高版本。
 		</p>
 
 		<code>
-		// Example of minimal `tsconfig.json` file
+		// tsconfig.json文件最少配置例子
 		{
 			"compilerOptions": {
 				"target": "es6",
@@ -34,13 +31,11 @@
 		</code>
 
 		<p>
-			Note: As of today, it's not yet possible to use three.js typings without using those two options.
+			注意：到目前为止，如果不使用这两个选项，则无法使用three.js类型。
 		</p>
 
 		<p>
-			Note: It happens that some declarations are incorrect and/or missing.
-			Contributing to Declaration Files is really helpful for the community, making three.js
-			typings better and more accurate.
+			注意：某些声明可能不正确或缺失。为声明文件做贡献对社区真的很有帮助，使Three.js开发会更好更准确。
 		</p>
 	</body>
 </html>

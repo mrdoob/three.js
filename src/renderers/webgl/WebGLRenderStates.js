@@ -6,10 +6,10 @@ import { WebGLLights } from './WebGLLights.js';
 
 function WebGLRenderState() {
 
-	var lights = new WebGLLights();
+	const lights = new WebGLLights();
 
-	var lightsArray = [];
-	var shadowsArray = [];
+	const lightsArray = [];
+	const shadowsArray = [];
 
 	function init() {
 
@@ -36,7 +36,7 @@ function WebGLRenderState() {
 
 	}
 
-	var state = {
+	const state = {
 		lightsArray: lightsArray,
 		shadowsArray: shadowsArray,
 
@@ -56,11 +56,11 @@ function WebGLRenderState() {
 
 function WebGLRenderStates() {
 
-	var renderStates = new WeakMap();
+	let renderStates = new WeakMap();
 
 	function onSceneDispose( event ) {
 
-		var scene = event.target;
+		const scene = event.target;
 
 		scene.removeEventListener( 'dispose', onSceneDispose );
 
@@ -70,7 +70,7 @@ function WebGLRenderStates() {
 
 	function get( scene, camera ) {
 
-		var renderState;
+		let renderState;
 
 		if ( renderStates.has( scene ) === false ) {
 

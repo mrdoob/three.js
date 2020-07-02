@@ -1,3 +1,4 @@
+console.warn( "THREE.TGALoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * @author Daosheng Mu / https://github.com/DaoshengMu/
  * @author mrdoob / http://mrdoob.com/
@@ -58,6 +59,7 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						console.error( 'THREE.TGALoader: Invalid type colormap data for indexed type.' );
 
 					}
+
 					break;
 
 					// check colormap type
@@ -71,6 +73,7 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						console.error( 'THREE.TGALoader: Invalid type colormap data for colormap type.' );
 
 					}
+
 					break;
 
 					// What the need of a file without data ?
@@ -166,11 +169,13 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						// raw pixels
 
 						count *= pixel_size;
+
 						for ( i = 0; i < count; ++ i ) {
 
 							pixel_data[ shift + i ] = data[ offset ++ ];
 
 						}
+
 						shift += count;
 
 					}
@@ -532,7 +537,7 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var imageData = context.createImageData( header.width, header.height );
 
 		var result = tgaParse( use_rle, use_pal, header, offset, content );
-		var rgbaData = getTgaRGBA( imageData.data, header.width, header.height, result.pixel_data, result.palettes );
+		getTgaRGBA( imageData.data, header.width, header.height, result.pixel_data, result.palettes );
 
 		context.putImageData( imageData, 0, 0 );
 

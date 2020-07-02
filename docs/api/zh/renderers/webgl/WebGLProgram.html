@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -105,28 +105,31 @@
 
 		<h2>构造器</h2>
 
-		<h3>[name]( [param:WebGLRenderer renderer], [param:Object code], [param:Material material], [param:Object parameters] )</h3>
-		<p>参数详见[page:WebGLRenderer WebGLRenderer]</p>
+		<h3>[name]( [param:WebGLRenderer renderer], [param:String cacheKey], [param:Object parameters] )</h3>
+		<p>参数详见[page:WebGLRenderer WebGLRenderer].</p>
 
 		<h2>属性</h2>
 
-		<h3>[property:String id]</h3>
-		<p></p>
+		<h3>[property:String name]</h3>
+		<p>The name of the respective shader program.</p>
 
-		<h3>[property:String code]</h3>
-		<p></p>
+		<h3>[property:String id]</h3>
+		<p>The identifier of this instance.</p>
+
+		<h3>[property:String cacheKey]</h3>
+		<p>This key enables the reusability of a single [name] for different materials.</p>
 
 		<h3>[property:Integer usedTimes]</h3>
-		<p></p>
+		<p>How many times this instance is used for rendering render items.</p>
 
 		<h3>[property:Object program]</h3>
-		<p></p>
+		<p>The actual shader program.</p>
 
 		<h3>[property:WebGLShader vertexShader]</h3>
-		<p></p>
+		<p>An instance of [page:WebGLShader] representing the vertex shader.</p>
 
 		<h3>[property:WebGLShader fragmentShader]</h3>
-		<p></p>
+		<p>An instance of [page:WebGLShader] representing the frament shader.</p>
 
 		<h2>方法</h2>
 
@@ -138,6 +141,11 @@
 		<h3>[method:Object getAttributes]()</h3>
 		<p>
 		返回所有活动态的顶点属性位置的name-value映射
+		</p>
+
+		<h3>[method:null destroy]()</h3>
+		<p>
+		Destroys an instance of [name].
 		</p>
 
 		<h2>源码</h2>

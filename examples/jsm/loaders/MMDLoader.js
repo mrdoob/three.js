@@ -13,7 +13,7 @@
  * VPD is a posing data format used in MMD(Miku Miku Dance).
  *
  * MMD official site
- *  - http://www.geocities.jp/higuchuu4/index_e.htm
+ *  - https://sites.google.com/view/evpvp/
  *
  * PMD, VMD format (in Japanese)
  *  - http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
@@ -55,7 +55,6 @@ import {
 	RepeatWrapping,
 	Skeleton,
 	SkinnedMesh,
-	SphericalReflectionMapping,
 	SrcAlphaFactor,
 	TextureLoader,
 	Uint16BufferAttribute,
@@ -1111,8 +1110,7 @@ var MMDLoader = ( function () {
 
 							params.envMap = this._loadTexture(
 								fileNames[ 1 ],
-								textures,
-								{ sphericalReflectionMapping: true }
+								textures
 							);
 
 							params.combine = extension === '.sph'
@@ -1163,7 +1161,7 @@ var MMDLoader = ( function () {
 
 						params.envMap = this._loadTexture(
 							data.textures[ material.envTextureIndex ],
-							textures, { sphericalReflectionMapping: true }
+							textures
 						);
 
 						params.combine = material.envFlag === 1
@@ -1378,12 +1376,6 @@ var MMDLoader = ( function () {
 				delete texture.readyCallbacks;
 
 			}, onProgress, onError );
-
-			if ( params.sphericalReflectionMapping === true ) {
-
-				texture.mapping = SphericalReflectionMapping;
-
-			}
 
 			texture.readyCallbacks = [];
 

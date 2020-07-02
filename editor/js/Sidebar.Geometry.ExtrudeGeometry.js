@@ -8,7 +8,7 @@ import { UIRow, UIText, UIInteger, UICheckbox, UIButton, UINumber } from './libs
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
+function SidebarGeometryExtrudeGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -144,6 +144,6 @@ var SidebarGeometryExtrudeGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryExtrudeGeometry };

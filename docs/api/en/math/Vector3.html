@@ -53,9 +53,9 @@
 
 		<h3>[name]( [param:Float x], [param:Float y], [param:Float z] )</h3>
 		<p>
-		[page:Float x] - the x value of the vector. Default is *0*.<br />
-		[page:Float y] -  the y value of the vector. Default is *0*.<br />
-		[page:Float z] - the z value of the vector. Default is *0*.<br /><br />
+		[page:Float x] - the x value of this vector. Default is *0*.<br />
+		[page:Float y] -  the y value of this vector. Default is *0*.<br />
+		[page:Float z] - the z value of this vector. Default is *0*.<br /><br />
 
 		Creates a new [name].
 		</p>
@@ -122,7 +122,7 @@
 
 		<h3>[method:this ceil]()</h3>
 		<p>
-		The [page:.x x], [page:.y y] and [page:.z z] components of the vector are rounded up to the nearest integer value.
+		The [page:.x x], [page:.y y] and [page:.z z] components of this vector are rounded up to the nearest integer value.
 		</p>
 
 		<h3>[method:this clamp]( [param:Vector3 min], [param:Vector3 max] )</h3>
@@ -207,7 +207,7 @@
 		<p>Checks for strict equality of this vector and [page:Vector3 v].</p>
 
 		<h3>[method:this floor]()</h3>
-		<p>The components of the vector are rounded down to the nearest integer value.</p>
+		<p>The components of this vector are rounded down to the nearest integer value.</p>
 
 		<h3>[method:this fromArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
@@ -297,7 +297,7 @@
 
 		<h3>[method:this normalize]()</h3>
 		<p>
-		Convert this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to the vector with the same direction
+		Convert this vector to a [link:https://en.wikipedia.org/wiki/Unit_vector unit vector] - that is, sets it equal to a vector with the same direction
 		as this one, but [page:.length length] 1.
 		</p>
 
@@ -323,16 +323,16 @@
 		<p>
 		[page:Vector3 normal] - the normal to the reflecting plane<br /><br />
 
-		Reflect the vector off of plane orthogonal to [page:Vector3 normal]. Normal is assumed to
+		Reflect this vector off of plane orthogonal to [page:Vector3 normal]. Normal is assumed to
 		have unit length.
 		</p>
 
 		<h3>[method:this round]()</h3>
-		<p>The components of the vector are rounded to the nearest integer value.</p>
+		<p>The components of this vector are rounded to the nearest integer value.</p>
 
 		<h3>[method:this roundToZero]()</h3>
 		<p>
-		The components of the vector are rounded towards zero (up if negative, down if positive) to an integer value.
+		The components of this vector are rounded towards zero (up if negative, down if positive) to an integer value.
 		</p>
 
 		<h3>[method:this set]( [param:Float x], [param:Float y], [param:Float z] )</h3>
@@ -388,7 +388,7 @@
 
 		<h3>[method:this setLength]( [param:Float l] )</h3>
 		<p>
-		Set this vector to the vector with the same direction as this one, but [page:.length length]
+		Set this vector to a vector with the same direction as this one, but [page:.length length]
 		[page:Float l].
 		</p>
 
@@ -417,7 +417,7 @@
 
 		<h3>[method:Array toArray]( [param:Array array], [param:Integer offset] )</h3>
 		<p>
-		[page:Array array] - (optional) array to store the vector to. If this is not provided
+		[page:Array array] - (optional) array to store this vector to. If this is not provided
 		a new array will be created.<br />
 		[page:Integer offset] - (optional) optional offset into the array.<br /><br />
 
@@ -437,6 +437,10 @@
 		Projects this vector from the camera's normalized device coordinate (NDC) space into world space.
 		</p>
 
+		<h3>[method:this random]()</h3>
+		<p>
+			Sets each component of this vector to a pseudo-random value between 0 and 1, excluding 1.
+		</p>
 
 		<h2>Source</h2>
 

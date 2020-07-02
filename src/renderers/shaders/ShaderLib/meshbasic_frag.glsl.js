@@ -9,6 +9,7 @@ uniform float opacity;
 #endif
 
 #include <common>
+#include <dithering_pars_fragment>
 #include <color_pars_fragment>
 #include <uv_pars_fragment>
 #include <uv2_pars_fragment>
@@ -66,6 +67,7 @@ void main() {
 	#include <encodings_fragment>
 	#include <fog_fragment>
 	#include <premultiplied_alpha_fragment>
+	#include <dithering_fragment>
 
 }
 `;

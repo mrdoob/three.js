@@ -95,16 +95,13 @@
 			renderer.outputEncoding = THREE.sRGBEncoding;
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
-
-			renderer.domElement.style.position = "absolute";
-			renderer.domElement.style.top = "0px";
-			renderer.domElement.style.left = "0px";
-
 			container.appendChild( renderer.domElement );
 
 			// CONTROLS
 
 			var controls = new OrbitControls( camera, renderer.domElement );
+			controls.minDistance = 500;
+			controls.maxDistance = 5000;
 
 			// STATS
 

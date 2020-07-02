@@ -2,7 +2,7 @@ import { BufferGeometry } from './BufferGeometry';
 import { BufferAttribute } from './BufferAttribute';
 
 /**
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/BufferGeometryUtils.js">examples/jsm/utils/BufferGeometryUtils.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/examples/jsm/utils/BufferGeometryUtils.js|examples/jsm/utils/BufferGeometryUtils.js}
  */
 export namespace BufferGeometryUtils {
 	export function mergeBufferGeometries(
@@ -33,7 +33,7 @@ export namespace GeometryUtils {
 }
 
 /**
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/core/InstancedBufferAttribute.js">src/core/InstancedBufferAttribute.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/InstancedBufferAttribute.js|src/core/InstancedBufferAttribute.js}
  */
 export class InstancedBufferAttribute extends BufferAttribute {
 

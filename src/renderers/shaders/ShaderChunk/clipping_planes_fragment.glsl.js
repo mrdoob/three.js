@@ -7,7 +7,7 @@ export default /* glsl */`
 	for ( int i = 0; i < UNION_CLIPPING_PLANES; i ++ ) {
 
 		plane = clippingPlanes[ i ];
-		if ( dot( vViewPosition, plane.xyz ) > plane.w ) discard;
+		if ( dot( vClipPosition, plane.xyz ) > plane.w ) discard;
 
 	}
 	#pragma unroll_loop_end
@@ -20,7 +20,7 @@ export default /* glsl */`
 		for ( int i = UNION_CLIPPING_PLANES; i < NUM_CLIPPING_PLANES; i ++ ) {
 
 			plane = clippingPlanes[ i ];
-			clipped = ( dot( vViewPosition, plane.xyz ) > plane.w ) && clipped;
+			clipped = ( dot( vClipPosition, plane.xyz ) > plane.w ) && clipped;
 
 		}
 		#pragma unroll_loop_end

@@ -7,9 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
-
-		<script src="js/vr/HelioWebXRPolyfill.js"></script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -27,9 +24,10 @@
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			renderer.xr.enabled = true;
+			renderer.xr.setReferenceSpaceType( 'local' );
 			document.body.appendChild( renderer.domElement );
 
-			document.body.appendChild( VRButton.createButton( renderer, { referenceSpaceType: 'local' } ) );
+			document.body.appendChild( VRButton.createButton( renderer ) );
 
 			//
 

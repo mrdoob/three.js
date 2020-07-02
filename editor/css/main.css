@@ -2,6 +2,10 @@
 	color-scheme: light dark;
 }
 
+html {
+	touch-action: none;
+}
+
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -18,10 +22,22 @@ button {
 	position: relative;
 }
 
+input {
+	vertical-align: middle;
+}
+
+	input[type="color"]::-webkit-color-swatch-wrapper {
+		padding: 0;
+	}
+	input[type="color"]::-webkit-color-swatch {
+		border: none;
+	}
+
 textarea {
 	tab-size: 4;
 	white-space: pre;
 	word-wrap: normal;
+	vertical-align: middle;
 }
 
 	textarea.success {
@@ -126,9 +142,27 @@ textarea, input { outline: none; } /* osx */
 
 /* outliner */
 
+#outliner .opener {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	margin: 0px 4px;
+	vertical-align: top;
+	text-align: center;
+}
+
+	#outliner .opener.open:after {
+		content: '−';
+	}
+
+	#outliner .opener.closed:after {
+		content: '+';
+	}
+
 #outliner .option {
 
 	border: 1px solid transparent;
+
 }
 
 #outliner .option.drag {
@@ -150,19 +184,32 @@ textarea, input { outline: none; } /* osx */
 }
 
 #outliner .type {
-	position:relative;
-	top:-2px;
-	padding: 0 2px;
+	display: inline-block;
+	width: 14px;
+	height: 14px;
 	color: #ddd;
+	text-align: center;
 }
 
 #outliner .type:after {
-	content: '■';
+	content: '●';
 }
 
+/* */
+
 #outliner .Scene {
-	color: #ccccff;
+	color: #8888dd;
 }
+
+#outliner .Camera {
+	color: #dd8888;
+}
+
+#outliner .Light {
+	color: #dddd88;
+}
+
+/* */
 
 #outliner .Object3D {
 	color: #aaaaee;
@@ -186,32 +233,12 @@ textarea, input { outline: none; } /* osx */
 
 /* */
 
-#outliner .PointLight {
-	color: #dddd00;
-}
-
-/* */
-
 #outliner .Geometry {
-	color: #88ff88;
-}
-
-#outliner .BoxGeometry {
-	color: #bbeebb;
-}
-
-#outliner .TorusGeometry {
 	color: #aaeeaa;
 }
 
-/* */
-
 #outliner .Material {
-	color: #ff8888;
-}
-
-#outliner .MeshPhongMaterial {
-	color: #ffaa88;
+	color: #eeaaee;
 }
 
 /* */
@@ -226,6 +253,7 @@ button {
 	color: #555;
 	background-color: #ddd;
 	border: 0px;
+	margin: 0px; /* GNOME Web */
 	padding: 5px 8px;
 	text-transform: uppercase;
 	cursor: pointer;
@@ -382,10 +410,6 @@ select {
 	overflow: auto;
 }
 
-	#sidebar * {
-		vertical-align: middle;
-	}
-
 	#sidebar .Panel {
 		color: #888;
 		padding: 10px;
@@ -399,6 +423,10 @@ select {
 	#sidebar .Row {
 		min-height: 20px;
 		margin-bottom: 10px;
+	}
+
+	#sidebar canvas {
+		vertical-align: middle;
 	}
 
 #tabs {
@@ -419,28 +447,21 @@ select {
 
 #toolbar {
 	position: absolute;
-	left: calc(50% - 290px); /* ( ( 100% - 300px ) / 2.0 ) - 140px */
-	width: 280px;
-	bottom: 16px;
-	height: 32px;
+	left: 10px;
+	top: 42px;
+	width: 32px;
 	background: #eee;
-	color: #333;
+	text-align: center;
 }
 
-	#toolbar * {
-		vertical-align: middle;
+	#toolbar button, #toolbar input {
+		height: 32px;
 	}
 
-	#toolbar .Panel {
-		padding: 4px;
-		color: #888;
-	}
-
-	#toolbar button {
-		margin-right: 6px;
-		line-height: 14px;
-		height: 24px;
-	}
+		#toolbar button img {
+			width: 16px;
+			opacity: 0.5;
+		}
 
 .Outliner {
 	color: #444;
@@ -451,6 +472,7 @@ select {
 	font-size: 12px;
 	cursor: default;
 	overflow: auto;
+	resize: vertical;
 	outline: none !important;
 }
 
@@ -531,12 +553,6 @@ select {
 		width: 100%;
 		top: calc(100% - 320px);
 		bottom: 0;
-	}
-
-	#toolbar {
-		left: calc(50% - 140px);
-		width: 280px;
-		top: 68px;
 	}
 
 }
@@ -627,6 +643,10 @@ select {
 	#toolbar {
 		background-color: #111;
 	}
+
+		#toolbar img {
+			filter: invert(1);
+		}
 
 	.Outliner {
 		color: #888;

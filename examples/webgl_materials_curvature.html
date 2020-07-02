@@ -131,6 +131,8 @@
 				document.body.appendChild( renderer.domElement );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 20;
+				controls.maxDistance = 100;
 
 				var loader = new OBJLoader();
 				//load the obj

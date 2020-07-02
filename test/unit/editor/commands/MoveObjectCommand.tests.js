@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/MoveObjectCommand';
+import { } from '../../../../editor/js/commands/MoveObjectCommand';
 
 export default QUnit.module( 'Editor', () => {
 

@@ -6,6 +6,15 @@ export default /* glsl */`
 		uniform sampler2D directionalShadowMap[ NUM_DIR_LIGHT_SHADOWS ];
 		varying vec4 vDirectionalShadowCoord[ NUM_DIR_LIGHT_SHADOWS ];
 
+		struct DirectionalLightShadow {
+			float shadowBias;
+			float shadowNormalBias;
+			float shadowRadius;
+			vec2 shadowMapSize;
+		};
+
+		uniform DirectionalLightShadow directionalLightShadows[ NUM_DIR_LIGHT_SHADOWS ];
+
 	#endif
 
 	#if NUM_SPOT_LIGHT_SHADOWS > 0
@@ -13,12 +22,32 @@ export default /* glsl */`
 		uniform sampler2D spotShadowMap[ NUM_SPOT_LIGHT_SHADOWS ];
 		varying vec4 vSpotShadowCoord[ NUM_SPOT_LIGHT_SHADOWS ];
 
+		struct SpotLightShadow {
+			float shadowBias;
+			float shadowNormalBias;
+			float shadowRadius;
+			vec2 shadowMapSize;
+		};
+
+		uniform SpotLightShadow spotLightShadows[ NUM_SPOT_LIGHT_SHADOWS ];
+
 	#endif
 
 	#if NUM_POINT_LIGHT_SHADOWS > 0
 
 		uniform sampler2D pointShadowMap[ NUM_POINT_LIGHT_SHADOWS ];
 		varying vec4 vPointShadowCoord[ NUM_POINT_LIGHT_SHADOWS ];
+
+		struct PointLightShadow {
+			float shadowBias;
+			float shadowNormalBias;
+			float shadowRadius;
+			vec2 shadowMapSize;
+			float shadowCameraNear;
+			float shadowCameraFar;
+		};
+
+		uniform PointLightShadow pointLightShadows[ NUM_POINT_LIGHT_SHADOWS ];
 
 	#endif
 
@@ -146,7 +175,7 @@ export default /* glsl */`
 						  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, -dy ), shadowCoord.z ),
 						  f.x ),
 					 mix( texture2DCompare( shadowMap, uv + vec2( -dx, 2.0 * dy ), shadowCoord.z ), 
-						  texture2DCompare( shadowMap, uv + + vec2( 2.0 * dx, 2.0 * dy ), shadowCoord.z ),
+						  texture2DCompare( shadowMap, uv + vec2( 2.0 * dx, 2.0 * dy ), shadowCoord.z ),
 						  f.x ),
 					 f.y )
 			) * ( 1.0 / 9.0 );

@@ -12,7 +12,7 @@ import { Matrix3 } from '../../math/Matrix3.js';
  * @author mikael emtinger / http://gomo.se/
  */
 
-var ShaderLib = {
+const ShaderLib = {
 
 	basic: {
 
@@ -94,8 +94,8 @@ var ShaderLib = {
 			UniformsLib.lights,
 			{
 				emissive: { value: new Color( 0x000000 ) },
-				roughness: { value: 0.5 },
-				metalness: { value: 0.5 },
+				roughness: { value: 1.0 },
+				metalness: { value: 0.0 },
 				envMapIntensity: { value: 1 } // temporary
 			}
 		] ),
@@ -109,7 +109,6 @@ var ShaderLib = {
 
 		uniforms: mergeUniforms( [
 			UniformsLib.common,
-			UniformsLib.specularmap,
 			UniformsLib.aomap,
 			UniformsLib.lightmap,
 			UniformsLib.emissivemap,
@@ -120,9 +119,7 @@ var ShaderLib = {
 			UniformsLib.fog,
 			UniformsLib.lights,
 			{
-				emissive: { value: new Color( 0x000000 ) },
-				specular: { value: new Color( 0x111111 ) },
-				shininess: { value: 30 }
+				emissive: { value: new Color( 0x000000 ) }
 			}
 		] ),
 

@@ -1,7 +1,11 @@
 // Renderers / WebGL /////////////////////////////////////////////////////////////////////
+import { WebGLExtensions } from "./WebGLExtensions";
+import { WebGLInfo } from "./WebGLInfo";
+import { WebGLCapabilities } from "./WebGLCapabilities";
+
 export class WebGLBufferRenderer {
 
-	constructor( _gl: WebGLRenderingContext, extensions: any, _infoRender: any );
+	constructor( gl: WebGLRenderingContext, extensions: WebGLExtensions, info: WebGLInfo, capabilities: WebGLCapabilities );
 
 	setMode( value: any ): void;
 	render( start: any, count: number ): void;

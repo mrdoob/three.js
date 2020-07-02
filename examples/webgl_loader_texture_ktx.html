@@ -47,10 +47,10 @@
 		document.body.appendChild( renderer.domElement );
 
 		var formats = {
-			astc: renderer.extensions.get( 'WEBGL_compressed_texture_astc' ),
-			etc1: renderer.extensions.get( 'WEBGL_compressed_texture_etc1' ),
-			s3tc: renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' ),
-			pvrtc: renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
+			astc: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
+			etc1: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
+			s3tc: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
+			pvrtc: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
 		};
 
 		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );

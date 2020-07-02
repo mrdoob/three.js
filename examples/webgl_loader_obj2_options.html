@@ -40,11 +40,9 @@
 		<div id="glFullscreen">
 			<canvas id="example"></canvas>
 		</div>
-		<div id="dat">
-
-		</div>
+		<div id="dat" class="dg ac"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 usage options
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 usage options<br>Use module workers with Chromium based browser (80+)
 			<div id="feedback"></div>
 		</div>
 
@@ -85,6 +83,8 @@
 
 				this.flatShading = false;
 				this.doubleSide = false;
+				this.useJsmWorker = false;
+				this.loadCount = 6;
 
 				this.cube = null;
 				this.pivot = null;
@@ -155,7 +155,8 @@
 								scope.pivot.add( local );
 								local.add( objLoader2.parse( content ) );
 
-								scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
+								scope._reportProgress( { detail: { text: 'Loading of ' + modelName + ' completed: OBJLoader2#pase: Parsing completed' } } );
+								scope.finalize();
 							}
 						);
 					}
@@ -176,7 +177,8 @@
 					let scope = this;
 					function callbackOnLoad( object3d, message ) {
 						local.add( object3d );
-						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
+						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + ' completed: ' + message } } );
+						scope.finalize();
 					}
 
 					let materials = {
@@ -185,6 +187,7 @@
 
 					let objLoader2Parallel = new OBJLoader2Parallel()
 						.setModelName( modelName )
+						.setJsmWorker( this.useJsmWorker, new URL( OBJLoader2Parallel.DEFAULT_JSM_WORKER_PATH, window.location.href ) )
 						.setCallbackOnLoad( callbackOnLoad )
 						.addMaterials( materials, true );
 
@@ -214,7 +217,8 @@
 						scope.pivot.add( local );
 						local.add( object3d );
 
-						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
+						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + ' completed: ' + message } } );
+						scope.finalize();
 					}
 
 					function onLoadMtl ( mtlParseResult ) {
@@ -238,12 +242,14 @@
 					this.pivot.add( local );
 
 					let objLoader2Parallel = new OBJLoader2Parallel()
-						.setModelName( modelName );
+						.setModelName( modelName )
+						.setJsmWorker( this.useJsmWorker, new URL( OBJLoader2Parallel.DEFAULT_JSM_WORKER_PATH, window.location.href ) );
 
 					let scope = this;
 					function callbackOnLoad ( object3d, message ) {
 						local.add( object3d );
-						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + 'completed: ' + message } } );
+						scope._reportProgress( { detail: { text: 'Loading of ' + modelName + ' completed: ' + message } } );
+						scope.finalize();
 					}
 					function onLoadMtl ( mtlParseResult ) {
 						objLoader2Parallel.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
@@ -269,7 +275,8 @@
 					let scope = this;
 					function callbackOnLoad ( object3d, message ) {
 						local.add( object3d );
-						scope._reportProgress( { detail: { text: 'Loading of ' + objLoader2Parallel.modelName + 'completed: ' + message } } );
+						scope._reportProgress( { detail: { text: 'Loading of ' + objLoader2Parallel.modelName + ' completed: ' + message } } );
+						scope.finalize();
 					}
 
 					objLoader2Parallel.load( 'models/obj/cerberus/Cerberus.obj', callbackOnLoad );
@@ -283,6 +290,7 @@
 
 					let objLoader2Parallel = new OBJLoader2Parallel()
 						.setModelName( local.name )
+						.setJsmWorker( this.useJsmWorker, new URL( OBJLoader2Parallel.DEFAULT_JSM_WORKER_PATH, window.location.href ) )
 						.setBaseObject3d( local );
 
 					// Configure WorkerExecutionSupport to not disregard worker after execution
@@ -293,7 +301,7 @@
 
 						let mesh = new THREE.Mesh( event.detail.bufferGeometry, event.detail.material );
 						mesh.name = event.detail.meshName;
-						let helper = new VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
+						let helper = new VertexNormalsHelper( mesh, 2, 0x00ff00 );
 						helper.name = 'VertexNormalsHelper';
 
 						override.addMesh( mesh );
@@ -305,14 +313,20 @@
 
 					let scope = this;
 					function callbackOnLoad ( object3d, message ) {
-						scope._reportProgress( { detail: { text: 'Loading of ' + objLoader2Parallel.modelName + 'completed: ' + message } } );
+						scope._reportProgress( { detail: { text: 'Loading of ' + objLoader2Parallel.modelName + ' completed: ' + message } } );
+						scope.finalize();
 					}
 
 					objLoader2Parallel.load( 'models/obj/ninja/ninjaHead_Low.obj', callbackOnLoad );
 				},
 
 				finalize: function () {
-					this._reportProgress( { detail: { text: '' } } );
+					this.loadCount--;
+					if ( this.loadCount === 0 ) {
+
+						this._reportProgress( { detail: { text: '' } } );
+
+					}
 				},
 
 				_reportProgress: function( event ) {
@@ -408,15 +422,55 @@
 						this.traversalFunction( object3d.material );
 
 					}
+				},
+
+				executeLoading: function () {
+					// Load a file with OBJLoader2.parse on main
+					this.useParseMain();
+
+					// Load a file with OBJLoader2Parallel.parse in parallel in worker
+					this.useParseParallel();
+
+					// Load a file with OBJLoader.load on main
+					this.useLoadMain();
+
+					// Load a file with OBJLoader2Parallel.load in parallel in worker
+					this.useLoadParallel();
+
+					// Load a file with OBJLoader2Parallel.load on main with fallback to OBJLoader2.parse
+					this.useLoadMainFallback();
+
+					// Load a file with OBJLoader2Parallel.load in parallel in worker and add normals during onMeshAlter
+					this.useLoadParallelMeshAlter();
 				}
 
 			};
 
 			let app = new WWOBJLoader2Example( document.getElementById( 'example' ) );
 
+			let handleExecuteLoading;
 			let wwObjLoader2Control = {
 				flatShading: app.flatShading,
-				doubleSide: app.doubleSide
+				doubleSide: app.doubleSide,
+				useJsmWorker: app.useJsmWorker,
+				blockEvent: function ( event ) {
+
+					event.stopPropagation();
+
+				},
+				disableElement: function ( elementHandle ) {
+
+					elementHandle.domElement.addEventListener( 'click', this.blockEvent, true );
+					elementHandle.domElement.parentElement.style.pointerEvents = 'none';
+					elementHandle.domElement.parentElement.style.opacity = 0.5;
+
+				},
+				executeLoading: function() {
+
+					app.executeLoading();
+					this.disableElement( handleExecuteLoading );
+
+				},
 			};
 
 			let menuDiv = document.getElementById( 'dat' );
@@ -426,19 +480,31 @@
 			} );
 			menuDiv.appendChild( gui.domElement );
 
-			let folderOptions = gui.addFolder( 'WWOBJLoader2 Options' );
-			let controlFlat = folderOptions.add( wwObjLoader2Control, 'flatShading' ).name( 'Flat Shading' );
+			let folderRenderingOptions = gui.addFolder( 'Rendering Options' );
+			let controlFlat = folderRenderingOptions.add( wwObjLoader2Control, 'flatShading' ).name( 'Flat Shading' );
 			controlFlat.onChange( function( value ) {
 				console.log( 'Setting flatShading to: ' + value );
 				app.alterShading();
 			});
 
-			let controlDouble = folderOptions.add( wwObjLoader2Control, 'doubleSide' ).name( 'Double Side Materials' );
+			let controlDouble = folderRenderingOptions.add( wwObjLoader2Control, 'doubleSide' ).name( 'Double Side Materials' );
 			controlDouble.onChange( function( value ) {
 				console.log( 'Setting doubleSide to: ' + value );
 				app.alterDouble();
 			});
-			folderOptions.open();
+
+			let folderObjLoader2ParallelOptions = gui.addFolder( 'OBJLoader2Parallel Options' );
+			let controlJsmWorker = folderObjLoader2ParallelOptions.add( wwObjLoader2Control, 'useJsmWorker' ).name( 'Use Module Workers' );
+			controlJsmWorker.onChange( function( value ) {
+				console.log( 'Setting useJsmWorker to: ' + value );
+				app.useJsmWorker = value;
+			});
+			let folderExecution = gui.addFolder( 'Execution' );
+			handleExecuteLoading = folderExecution.add( wwObjLoader2Control, 'executeLoading' ).name( 'Run' );
+			handleExecuteLoading.domElement.id = 'startButton';
+			folderRenderingOptions.open();
+			folderObjLoader2ParallelOptions.open();
+			folderExecution.open();
 
 
 			// init three.js example application
@@ -458,25 +524,6 @@
 
 			// kick render loop
 			render();
-
-			// Load a file with OBJLoader2.parse on main
-			app.useParseMain();
-
-			// Load a file with OBJLoader2Parallel.parse in parallel in worker
-			app.useParseParallel();
-
-			// Load a file with OBJLoader.load on main
-			app.useLoadMain();
-
-			// Load a file with OBJLoader2Parallel.load in parallel in worker
-			app.useLoadParallel();
-
-			// Load a file with OBJLoader2Parallel.load on main with fallback to OBJLoader2.parse
-			app.useLoadMainFallback();
-
-			// Load a file with OBJLoader2Parallel.load in parallel in worker and add normals during onMeshAlter
-			app.useLoadParallelMeshAlter();
-			app.finalize();
 
 		</script>
 	</body>

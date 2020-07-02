@@ -269,7 +269,6 @@
           var key = parseType(scope, str, pos + 2);
           if (!key) return null;
           pos = skipSpace(str, key.end);
-          madeUp = madeUp || key.madeUp;
           if (str.charAt(pos++) != ",") return null;
           var val = parseType(scope, str, pos);
           if (!val) return null;

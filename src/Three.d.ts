@@ -3,6 +3,7 @@ export * from './renderers/WebGLMultisampleRenderTarget';
 export * from './renderers/WebGLCubeRenderTarget';
 export * from './renderers/WebGLRenderTarget';
 export * from './renderers/WebGLRenderer';
+export * from './renderers/WebGL1Renderer';
 export * from './renderers/shaders/ShaderLib';
 export * from './renderers/shaders/UniformsLib';
 export * from './renderers/shaders/UniformsUtils';

@@ -127,7 +127,7 @@ import shadow_vert from './ShaderLib/shadow_vert.glsl.js';
 import sprite_frag from './ShaderLib/sprite_frag.glsl.js';
 import sprite_vert from './ShaderLib/sprite_vert.glsl.js';
 
-export var ShaderChunk = {
+export const ShaderChunk = {
 	alphamap_fragment: alphamap_fragment,
 	alphamap_pars_fragment: alphamap_pars_fragment,
 	alphatest_fragment: alphatest_fragment,

@@ -93,7 +93,6 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.physicallyCorrectLights = true;
-				renderer.toneMapping = THREE.LinearToneMapping;
 
 				//
 
@@ -180,7 +179,7 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				//renderer.toneMapping = ReinhardToneMapping;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				stats = new Stats();

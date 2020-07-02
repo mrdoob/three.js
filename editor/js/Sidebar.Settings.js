@@ -7,7 +7,7 @@ import { UIPanel, UIRow, UISelect, UIText, UIInteger } from './libs/ui.js';
 import { SidebarSettingsViewport } from './Sidebar.Settings.Viewport.js';
 import { SidebarSettingsShortcuts } from './Sidebar.Settings.Shortcuts.js';
 
-var SidebarSettings = function ( editor ) {
+function SidebarSettings( editor ) {
 
 	var config = editor.config;
 	var strings = editor.strings;
@@ -21,6 +21,7 @@ var SidebarSettings = function ( editor ) {
 
 	var options = {
 		en: 'English',
+		fr: 'Français',
 		zh: '中文'
 	};
 
@@ -72,6 +73,6 @@ var SidebarSettings = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarSettings };

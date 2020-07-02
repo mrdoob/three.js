@@ -1,3 +1,4 @@
+console.warn( "THREE.CSS3DRenderer: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
 /**
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  * @author mrdoob / http://mrdoob.com/
@@ -8,7 +9,7 @@ THREE.CSS3DObject = function ( element ) {
 
 	THREE.Object3D.call( this );
 
-	this.element = element;
+	this.element = element || document.createElement( 'div' );
 	this.element.style.position = 'absolute';
 	this.element.style.pointerEvents = 'auto';
 
@@ -28,8 +29,21 @@ THREE.CSS3DObject = function ( element ) {
 
 };
 
-THREE.CSS3DObject.prototype = Object.create( THREE.Object3D.prototype );
-THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject;
+THREE.CSS3DObject.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+
+	constructor: THREE.CSS3DObject,
+
+	copy: function ( source, recursive ) {
+
+		THREE.Object3D.prototype.copy.call( this, source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+} );
 
 THREE.CSS3DSprite = function ( element ) {
 
@@ -210,6 +224,8 @@ THREE.CSS3DRenderer = function () {
 				cache.objects.set( object, objectData );
 
 			}
+
+			element.style.display = object.visible ? '' : 'none';
 
 			if ( element.parentNode !== cameraElement ) {
 

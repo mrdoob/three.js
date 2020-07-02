@@ -72,10 +72,10 @@ export class PerspectiveCamera extends Camera {
 	 *
 	 * then for each monitor you would call it like this:
 	 *
-	 *		 var w = 1920;
-	 *		 var h = 1080;
-	 *		 var fullWidth = w * 3;
-	 *		 var fullHeight = h * 2;
+	 *		 const w = 1920;
+	 *		 const h = 1080;
+	 *		 const fullWidth = w * 3;
+	 *		 const fullHeight = h * 2;
 	 *
 	 *		 // A
 	 *		 camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );

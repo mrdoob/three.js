@@ -103,6 +103,7 @@
 				camera.lookAt( 0, 0, 0 );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.enableZoom = false;
 
 				var geometry = new THREE.PlaneBufferGeometry( terrainWidthExtents, terrainDepthExtents, terrainWidth - 1, terrainDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );

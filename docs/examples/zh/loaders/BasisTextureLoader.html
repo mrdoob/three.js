@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -25,7 +25,7 @@
 			This loader parallelizes the transcoding process across a configurable number
 			of web workers, before transferring the transcoded compressed texture back
 			to the main thread. The required WASM transcoder and JS wrapper are available from the
-			[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/libs/basis examples/jsm/libs/basis]
+			[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/basis examples/js/libs/basis]
 			directory.
 		</p>
 
@@ -33,7 +33,7 @@
 
 		<code>
 		var basisLoader = new BasisTextureLoader();
-		basisLoader.setTranscoderPath( 'examples/jsm/libs/basis/' );
+		basisLoader.setTranscoderPath( 'examples/js/libs/basis/' );
 		basisLoader.detectSupport( renderer );
 		basisLoader.load( 'diffuse.basis', function ( texture ) {
 
@@ -118,7 +118,7 @@
 		</p>
 		<p>
 		The WASM transcoder and JS wrapper are available from the
-		[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm/libs/basis examples/jsm/libs/basis]
+		[link:https://github.com/mrdoob/three.js/tree/dev/examples/js/libs/basis examples/js/libs/basis]
 		directory.
 		</p>
 
