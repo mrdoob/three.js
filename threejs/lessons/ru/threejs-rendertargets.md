@@ -1,6 +1,6 @@
-Title: Three.js Render Targets
-Description: How to render to a texture.
-TOC: Render Targets
+Title: Three.js Цели рендеринга
+Description: Как рендерить в текстуре.
+TOC: Цели рендеринга
 
 Цель рендеринга в three.js - это в основном текстура, которую вы можете рендерить. После рендеринга вы можете использовать эту текстуру как любую другую текстуру. 
 
