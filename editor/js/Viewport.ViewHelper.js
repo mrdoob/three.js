@@ -8,18 +8,28 @@ function ViewHelper() {
 
 	THREE.Object3D.call( this );
 
+	var color1 = new THREE.Color( '#ff3653' );
+	var color2 = new THREE.Color( '#8adb00' );
+	var color3 = new THREE.Color( '#2c8fff' );
+
 	var camera = new THREE.OrthographicCamera( - 2, 2, 2, - 2, 0, 4 );
 	camera.position.set( 0, 0, 2 );
 
 	var axesHelper = new THREE.AxesHelper();
+	color1.toArray( axesHelper.geometry.attributes.color.array, 0 );
+	color1.toArray( axesHelper.geometry.attributes.color.array, 3 );
+	color2.toArray( axesHelper.geometry.attributes.color.array, 6 );
+	color2.toArray( axesHelper.geometry.attributes.color.array, 9 );
+	color3.toArray( axesHelper.geometry.attributes.color.array, 12 );
+	color3.toArray( axesHelper.geometry.attributes.color.array, 15 );
 	this.add( axesHelper );
 
-	var posXAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#ff0000', 'X' ), toneMapped: false } ) );
-	var posYAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#00ff00', 'Y' ), toneMapped: false } ) );
-	var posZAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#0000ff', 'Z' ), toneMapped: false } ) );
-	var negXAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#ff0000' ), toneMapped: false } ) );
-	var negYAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#00ff00' ), toneMapped: false } ) );
-	var negZAxisHelper = new THREE.Sprite( new THREE.SpriteMaterial( { map: generateTexture( '#0000ff' ), toneMapped: false } ) );
+	var posXAxisHelper = new THREE.Sprite( getAxisMaterial( color1, 'X' ) );
+	var posYAxisHelper = new THREE.Sprite( getAxisMaterial( color2, 'Y' ) );
+	var posZAxisHelper = new THREE.Sprite( getAxisMaterial( color3, 'Z' ) );
+	var negXAxisHelper = new THREE.Sprite( getAxisMaterial( color1 ) );
+	var negYAxisHelper = new THREE.Sprite( getAxisMaterial( color2 ) );
+	var negZAxisHelper = new THREE.Sprite( getAxisMaterial( color3 ) );
 
 	posXAxisHelper.position.x = 1;
 	posYAxisHelper.position.y = 1;
@@ -88,18 +98,14 @@ function ViewHelper() {
 		//
 
 		var x = container.dom.offsetWidth - dim;
-		var y = container.dom.offsetHeight - dim;
 
 		renderer.clearDepth();
-		renderer.setScissorTest( true );
-		renderer.setScissor( x, y, dim, dim );
-		renderer.setViewport( x, y, dim, dim );
+		renderer.setViewport( x, 0, dim, dim );
 		renderer.render( this, camera );
-		renderer.setScissorTest( false );
 
 	};
 
-	function generateTexture( color, text = null ) {
+	function getAxisMaterial( color, text = null ) {
 
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = 64;
@@ -109,7 +115,7 @@ function ViewHelper() {
 		context.beginPath();
 		context.arc( 32, 32, 16, 0, 2 * Math.PI );
 		context.closePath();
-		context.fillStyle = color;
+		context.fillStyle = color.getStyle();
 		context.fill();
 
 		if ( text !== null ) {
@@ -121,7 +127,10 @@ function ViewHelper() {
 
 		}
 
-		return new THREE.CanvasTexture( canvas );
+		return new THREE.SpriteMaterial( {
+			map: new THREE.CanvasTexture( canvas ),
+			toneMapped: false
+		} );
 
 	}
 
