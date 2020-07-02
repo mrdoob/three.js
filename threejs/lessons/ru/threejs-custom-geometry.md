@@ -1,6 +1,6 @@
-Title: Three.js Custom Geometry
+Title: Three.js Пользовательская Geometry
 Description: Как сделать свою собственную геометрию.
-TOC: Custom Geometry
+TOC: Пользовательская Geometry
 
 В [предыдущей статье](threejs-primitives.html) рассказывалось о различных встроенных примитивах, включенных в THREE.js. В этой статье мы рассмотрим создание нашей собственной геометрии. 
 
