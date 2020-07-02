@@ -44,11 +44,11 @@ const scene = new THREE.Scene();
 
 <div class="spread">
   <div>
-    <div data-diagram="fog"></div>
+    <div data-diagram="fog" style="height: 300px;"></div>
     <div class="code">THREE.Fog</div>
   </div>
   <div>
-    <div data-diagram="fogExp2"></div>
+    <div data-diagram="fogExp2" style="height: 300px;"></div>
     <div class="code">THREE.FogExp2</div>
   </div>
 </div>
@@ -64,11 +64,11 @@ scene.background = new THREE.Color('#F00');  // red
 
 <div class="spread">
   <div>
-    <div data-diagram="fogBlueBackgroundRed" class="border"></div>
+    <div data-diagram="fogBlueBackgroundRed" style="height: 300px;" class="border"></div>
     <div class="code">fog blue, background red</div>
   </div>
   <div>
-    <div data-diagram="fogBlueBackgroundBlue" class="border"></div>
+    <div data-diagram="fogBlueBackgroundBlue" style="height: 300px;" class="border"></div>
     <div class="code">fog blue, background blue</div>
   </div>
 </div>
