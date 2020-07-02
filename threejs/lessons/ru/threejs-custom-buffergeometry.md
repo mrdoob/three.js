@@ -430,5 +430,5 @@ positionAttribute.needsUpdate = true;
 действительно зависит от ваших потребностей. 
 
 <canvas id="c"></canvas>
-<script type="module" src="resources/threejs-custom-buffergeometry.js"></script>
+<script type="module" src="../resources/threejs-custom-buffergeometry.js"></script>
 

@@ -241,4 +241,4 @@ class FogGUIHelper {
 </div>
 
 <canvas id="c"></canvas>
-<script type="module" src="resources/threejs-fog.js"></script>
+<script type="module" src="../resources/threejs-fog.js"></script>
