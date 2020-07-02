@@ -17,9 +17,9 @@ function ViewHelper() {
 
 	var geometry = new THREE.BoxBufferGeometry( 0.8, 0.05, 0.05 ).translate( 0.4, 0, 0 );
 
-	var xAxis = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color1, toneMapped: false } ) );
-	var yAxis = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color2, toneMapped: false } ) );
-	var zAxis = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color3, toneMapped: false } ) );
+	var xAxis = new THREE.Mesh( geometry, getAxisMaterial( color1 ) );
+	var yAxis = new THREE.Mesh( geometry, getAxisMaterial( color2 ) );
+	var zAxis = new THREE.Mesh( geometry, getAxisMaterial( color3 ) );
 
 	yAxis.rotation.z = Math.PI / 2;
 	zAxis.rotation.y = - Math.PI / 2;
@@ -28,12 +28,12 @@ function ViewHelper() {
 	this.add( zAxis );
 	this.add( yAxis );
 
-	var posXAxisHelper = new THREE.Sprite( getAxisMaterial( color1, 'X' ) );
-	var posYAxisHelper = new THREE.Sprite( getAxisMaterial( color2, 'Y' ) );
-	var posZAxisHelper = new THREE.Sprite( getAxisMaterial( color3, 'Z' ) );
-	var negXAxisHelper = new THREE.Sprite( getAxisMaterial( color1 ) );
-	var negYAxisHelper = new THREE.Sprite( getAxisMaterial( color2 ) );
-	var negZAxisHelper = new THREE.Sprite( getAxisMaterial( color3 ) );
+	var posXAxisHelper = new THREE.Sprite( getSpriteMaterial( color1, 'X' ) );
+	var posYAxisHelper = new THREE.Sprite( getSpriteMaterial( color2, 'Y' ) );
+	var posZAxisHelper = new THREE.Sprite( getSpriteMaterial( color3, 'Z' ) );
+	var negXAxisHelper = new THREE.Sprite( getSpriteMaterial( color1 ) );
+	var negYAxisHelper = new THREE.Sprite( getSpriteMaterial( color2 ) );
+	var negZAxisHelper = new THREE.Sprite( getSpriteMaterial( color3 ) );
 
 	posXAxisHelper.position.x = 1;
 	posYAxisHelper.position.y = 1;
@@ -109,7 +109,13 @@ function ViewHelper() {
 
 	};
 
-	function getAxisMaterial( color, text = null ) {
+	function getAxisMaterial( color ) {
+
+		return new THREE.MeshBasicMaterial( { color: color, toneMapped: false } );
+
+	}
+
+	function getSpriteMaterial( color, text = null ) {
 
 		var canvas = document.createElement( 'canvas' );
 		canvas.width = 64;
@@ -131,10 +137,9 @@ function ViewHelper() {
 
 		}
 
-		return new THREE.SpriteMaterial( {
-			map: new THREE.CanvasTexture( canvas ),
-			toneMapped: false
-		} );
+		var texture = new THREE.CanvasTexture( canvas );
+
+		return new THREE.SpriteMaterial( { map: texture, toneMapped: false } );
 
 	}
 
