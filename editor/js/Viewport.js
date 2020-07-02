@@ -59,7 +59,7 @@ function Viewport( editor ) {
 
 	//
 
-	var viewHelper = new ViewHelper();
+	var viewHelper = new ViewHelper( camera, container );
 
 	//
 
@@ -190,6 +190,8 @@ function Viewport( editor ) {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
+			// only test 3D objects if there is no UI interaction
+
 			var intersects = getIntersects( onUpPosition, objects );
 
 			if ( intersects.length > 0 ) {
@@ -297,6 +299,7 @@ function Viewport( editor ) {
 		signals.refreshSidebarObject3D.dispatch( camera );
 
 	} );
+	viewHelper.controls = controls;
 
 	// signals
 
@@ -694,13 +697,25 @@ function Viewport( editor ) {
 		requestAnimationFrame( animate );
 
 		var mixer = editor.mixer;
+		var delta = clock.getDelta();
+
+		var needsUpdate = false;
 
 		if ( mixer.stats.actions.inUse > 0 ) {
 
-			mixer.update( clock.getDelta() );
-			render();
+			mixer.update( delta );
+			needsUpdate = true;
 
 		}
+
+		if ( viewHelper.animating === true ) {
+
+			viewHelper.update( delta );
+			needsUpdate = true;
+
+		}
+
+		if ( needsUpdate === true ) render();
 
 	}
 
@@ -727,7 +742,7 @@ function Viewport( editor ) {
 
 			renderer.autoClear = false;
 			renderer.render( sceneHelpers, camera );
-			viewHelper.render( renderer, camera, container );
+			viewHelper.render( renderer );
 			renderer.autoClear = true;
 
 		}
