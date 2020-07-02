@@ -3,7 +3,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {
   const loader = new THREE.TextureLoader();
-  const texture = loader.load('../resources/images/star-light.png');
+  const texture = loader.load('/threejs/resources/images/star-light.png');
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.repeat.set(3, 1);

@@ -23,7 +23,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
       roughness: 1,
       metalness: 0,
     };
-    loader.load('../resources/models/simple_house_scene/scene.gltf', (gltf) => {
+    loader.load('/threejs/resources/models/simple_house_scene/scene.gltf', (gltf) => {
       const hackGeometry = new THREE.CircleBufferGeometry(0.5, 32);
       const box = new THREE.Box3();
       const size = new THREE.Vector3();
