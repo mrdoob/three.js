@@ -32,12 +32,12 @@
 			document.body.appendChild( renderer.domElement );
 
 			var scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0xF0F0F0 );
+			scene.background = new THREE.Color( 0x202020 );
 
 			var camera = new THREE.PerspectiveCamera( 60, width / height, 0.1, 100 );
 			camera.position.set( 2, 1.5, 1 );
 			camera.lookAt( scene.position );
-			scene.add(camera);
+			scene.add( camera );
 
 			var controls = new OrbitControls( camera, renderer.domElement );
 			controls.autoRotate = true;
@@ -48,18 +48,18 @@
 				color: 0xFFFFFF,
 				side: THREE.DoubleSide
 			} );
-			var mesh = new THREE.Mesh(geometry, material);
-			scene.add(mesh);
+			var mesh = new THREE.Mesh( geometry, material );
+			scene.add( mesh );
 
 			var formatStrings = {
-					[THREE.RGBA_ASTC_4x4_Format]: "RGBA_ASTC_4x4",
-					[THREE.RGB_S3TC_DXT1_Format]: "RGB_S3TC_DXT1",
-					[THREE.RGBA_S3TC_DXT5_Format]: "RGBA_S3TC_DXT5",
-					[THREE.RGB_PVRTC_4BPPV1_Format]: "RGB_PVRTC_4BPPV1",
-					[THREE.RGBA_PVRTC_4BPPV1_Format]: "RGBA_PVRTC_4BPPV1",
-					[THREE.RGB_ETC1_Format]: "RGB_ETC1",
-					[THREE.RGB_ETC2_Format]: "RGB_ETC2",
-					[THREE.RGBA_ETC2_EAC_Format]: "RGB_ETC2_EAC",
+				[ THREE.RGBA_ASTC_4x4_Format ]: "RGBA_ASTC_4x4",
+				[ THREE.RGB_S3TC_DXT1_Format ]: "RGB_S3TC_DXT1",
+				[ THREE.RGBA_S3TC_DXT5_Format ]: "RGBA_S3TC_DXT5",
+				[ THREE.RGB_PVRTC_4BPPV1_Format ]: "RGB_PVRTC_4BPPV1",
+				[ THREE.RGBA_PVRTC_4BPPV1_Format ]: "RGBA_PVRTC_4BPPV1",
+				[ THREE.RGB_ETC1_Format ]: "RGB_ETC1",
+				[ THREE.RGB_ETC2_Format ]: "RGB_ETC2",
+				[ THREE.RGBA_ETC2_EAC_Format ]: "RGB_ETC2_EAC",
 			};
 
 			// Samples: sample_etc1s.ktx2, sample_uastc.ktx2
@@ -67,7 +67,7 @@
 				.detectSupport( renderer )
 				.load( './textures/compressed/sample_uastc.ktx2', ( texture ) => {
 
-					console.info( `transcoded to ${formatStrings[texture.format]}` );
+					console.info( `transcoded to ${formatStrings[ texture.format ]}` );
 
 					material.map = texture;
 
@@ -99,7 +99,7 @@
 			}, false );
 
 			/** Correct UVs to be compatible with `flipY=false` textures. */
-			function flipY ( geometry ) {
+			function flipY( geometry ) {
 
 				var uv = geometry.attributes.uv;
 
