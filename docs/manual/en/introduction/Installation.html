@@ -131,6 +131,16 @@
 			While most modern JavaScript bundlers now support ES modules by default, some older build tools might not. In those cases you can likely configure the bundler to understand ES modules: [link:http://browserify.org/ Browserify] just needs the [link:https://github.com/babel/babelify babelify] plugin, for example.
 		</p>
 
+		<h3>Import maps</h3>
+
+		<p>
+			Imported paths differ when installing from npm, as compared to installing from static hosting or a CDN. We're aware that this is an ergonomic issue for both groups of users. Developers with build tools and bundlers prefer bare package specifiers (e.g. 'three') rather than relative paths, and files in the <em>examples/</em> folder use relative references to <em>three.module.js</em> that don't follow this expectation. Those who do not use build tools — for fast prototyping, learning, or personal preference — may similarly dislike those relative imports, which require certain folder structures and are less forgiving than a global <em>THREE.*</em> namespace.
+		</p>
+
+		<p>
+			We hope to remove these relative paths when [link:https://github.com/WICG/import-maps import maps] become broadly available, replacing them with bare package specifiers to the npm package name, 'three'. This matches build tool expectations for npm packages more closely, and allows both groups of users to write exactly the same code when importing a file. For users who prefer to avoid build tools, a simple JSON mapping can direct all imports to a CDN or static file folder. Experimentally, you can try using simpler imports today with an import map polyfill, as shown in our [link:https://glitch.com/edit/#!/three-import-map?path=index.html import map example].
+		</p>
+
 		<h3>Node.js</h3>
 
 		<p>
