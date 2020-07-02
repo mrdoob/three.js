@@ -1,6 +1,6 @@
-Title: Three.js Shadows
-Description: Shadows in Three.js
-TOC: Shadows
+Title: Three.js Тени
+Description: Тени в Three.js
+TOC: Тени
 
 Эта статья является частью серии статей о three.js. Первая статья - [основы Three.js](threejs-fundamentals.html). 
 Если вы еще не читали их, и вы новичок в three.js, возможно, вы захотите начать с них.
