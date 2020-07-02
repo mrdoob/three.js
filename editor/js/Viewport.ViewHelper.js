@@ -15,14 +15,18 @@ function ViewHelper() {
 	var camera = new THREE.OrthographicCamera( - 2, 2, 2, - 2, 0, 4 );
 	camera.position.set( 0, 0, 2 );
 
-	var axesHelper = new THREE.AxesHelper();
-	color1.toArray( axesHelper.geometry.attributes.color.array, 0 );
-	color1.toArray( axesHelper.geometry.attributes.color.array, 3 );
-	color2.toArray( axesHelper.geometry.attributes.color.array, 6 );
-	color2.toArray( axesHelper.geometry.attributes.color.array, 9 );
-	color3.toArray( axesHelper.geometry.attributes.color.array, 12 );
-	color3.toArray( axesHelper.geometry.attributes.color.array, 15 );
-	this.add( axesHelper );
+	var geometry = new THREE.BoxBufferGeometry( 0.8, 0.05, 0.05 ).translate( 0.4, 0, 0 );
+
+	var xAxis = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color1, toneMapped: false } ) );
+	var yAxis = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color2, toneMapped: false } ) );
+	var zAxis = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color3, toneMapped: false } ) );
+
+	yAxis.rotation.z = Math.PI / 2;
+	zAxis.rotation.y = - Math.PI / 2;
+
+	this.add( xAxis );
+	this.add( zAxis );
+	this.add( yAxis );
 
 	var posXAxisHelper = new THREE.Sprite( getAxisMaterial( color1, 'X' ) );
 	var posYAxisHelper = new THREE.Sprite( getAxisMaterial( color2, 'Y' ) );
@@ -41,12 +45,12 @@ function ViewHelper() {
 	negZAxisHelper.position.z = - 1;
 	negZAxisHelper.scale.setScalar( 0.8 );
 
-	axesHelper.add( posXAxisHelper );
-	axesHelper.add( posYAxisHelper );
-	axesHelper.add( posZAxisHelper );
-	axesHelper.add( negXAxisHelper );
-	axesHelper.add( negYAxisHelper );
-	axesHelper.add( negZAxisHelper );
+	this.add( posXAxisHelper );
+	this.add( posYAxisHelper );
+	this.add( posZAxisHelper );
+	this.add( negXAxisHelper );
+	this.add( negYAxisHelper );
+	this.add( negZAxisHelper );
 
 	var point = new THREE.Vector3();
 	var dim = 128;
