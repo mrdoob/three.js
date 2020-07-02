@@ -190,8 +190,6 @@ function Viewport( editor ) {
 
 		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
-			// only test 3D objects if there is no UI interaction
-
 			var intersects = getIntersects( onUpPosition, objects );
 
 			if ( intersects.length > 0 ) {
