@@ -80,17 +80,17 @@
   },
   "homepage": "https://threejs.org/",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^3.2.0",
-    "@typescript-eslint/parser": "^3.2.0",
+    "@typescript-eslint/eslint-plugin": "^3.5.0",
+    "@typescript-eslint/parser": "^3.5.0",
     "concurrently": "^5.2.0",
-    "eslint": "^7.2.0",
+    "eslint": "^7.3.1",
     "eslint-config-mdcs": "^5.0.0",
     "eslint-plugin-html": "^6.0.2",
-    "google-closure-compiler": "20200224.0.0",
+    "google-closure-compiler": "20200614.0.0",
     "http-server": "^0.12.3",
-    "rollup": "^2.15.0",
+    "rollup": "^2.18.2",
     "rollup-plugin-buble": "^0.19.8",
-    "typescript": "^3.9.5"
+    "typescript": "^3.9.6"
   },
   "jspm": {
     "files": [
