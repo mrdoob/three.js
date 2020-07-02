@@ -63,7 +63,7 @@ function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 
 			shaderobject = {
 				name: material.name || material.type,
-				uniforms: UniformsUtils.clone( shader.uniforms ),
+				uniforms:  shader.uniforms ,
 				vertexShader: shader.vertexShader,
 				fragmentShader: shader.fragmentShader
 			};
