@@ -20,7 +20,6 @@ function ViewHelper( editorCamera, container ) {
 	panel.setBottom( '0px' );
 	panel.setHeight( '128px' );
 	panel.setWidth( '128px' );
-	panel.setBottom( '0px' );
 
 	var scope = this;
 
