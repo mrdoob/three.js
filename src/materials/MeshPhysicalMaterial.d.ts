@@ -16,6 +16,8 @@ export interface MeshPhysicalMaterialParameters
 
 	clearcoatNormalScale?: Vector2;
 	clearcoatNormalMap?: Texture | null;
+	
+	transparency?: number;
 }
 
 export class MeshPhysicalMaterial extends MeshStandardMaterial {
