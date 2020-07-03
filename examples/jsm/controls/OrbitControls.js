@@ -1134,11 +1134,11 @@ var OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
 
 	scope.domElement.addEventListener( 'mousedown', onMouseDown, false );
-	scope.domElement.addEventListener( 'wheel', onMouseWheel, false );
+	scope.domElement.addEventListener( 'wheel', onMouseWheel, { capture: false, passive: false } );
 
-	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
+	scope.domElement.addEventListener( 'touchstart', onTouchStart, { capture: false, passive: false } );
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
-	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
+	scope.domElement.addEventListener( 'touchmove', onTouchMove, { capture: false, passive: false } );
 
 	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
 
