@@ -21,6 +21,8 @@ import { TDSLoader } from '../../examples/jsm/loaders/TDSLoader.js';
 import { VTKLoader } from '../../examples/jsm/loaders/VTKLoader.js';
 import { VRMLLoader } from '../../examples/jsm/loaders/VRMLLoader.js';
 
+import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
+
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
@@ -66,6 +68,8 @@ function Loader( editor ) {
 				return url;
 
 			} );
+			
+			manager.addHandler( /\.tga$/i, new TGALoader() );
 
 			for ( var i = 0; i < files.length; i ++ ) {
 
