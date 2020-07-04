@@ -2095,16 +2095,30 @@ var GLTFLoader = ( function () {
 
 		}
 
-		return this.loadTextureImage( textureIndex, source );
+		var loader;
+
+		if ( source.uri ) {
+
+			loader = options.manager.getHandler( source.uri );
+
+		}
+
+		if ( ! loader ) {
+
+			loader = textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ]
+			? parser.extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].ddsLoader
+			: this.textureLoader;
+
+		}
+
+		return this.loadTextureImage( textureIndex, source, loader );
 	};
 
-	GLTFParser.prototype.loadTextureImage = function ( textureIndex, source, loaderOverride ) {
+	GLTFParser.prototype.loadTextureImage = function ( textureIndex, source, loader ) {
 
 		var parser = this;
 		var json = this.json;
 		var options = this.options;
-
-		var textureLoader = this.textureLoader;
 
 		var textureDef = json.textures[ textureIndex ];
 		var textureExtensions = textureDef.extensions || {};
@@ -2130,22 +2144,6 @@ var GLTFLoader = ( function () {
 		}
 
 		return Promise.resolve( sourceURI ).then( function ( sourceURI ) {
-
-			var loader = loaderOverride;
-
-			if ( ! loader ) {
-
-				loader = options.manager.getHandler( sourceURI );
-
-			}
-
-			if ( ! loader ) {
-
-				loader = textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ]
-					? parser.extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].ddsLoader
-					: textureLoader;
-
-			}
 
 			return new Promise( function ( resolve, reject ) {
 
