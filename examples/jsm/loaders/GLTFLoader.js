@@ -637,7 +637,7 @@ var GLTFLoader = ( function () {
 
 		if ( ! textureDef.extensions || ! textureDef.extensions[ this.name ] ) {
 
-			return Promise.resolve();
+			return null;
 
 		}
 
@@ -2078,7 +2078,6 @@ var GLTFLoader = ( function () {
 		var parser = this;
 		var json = this.json;
 		var options = this.options;
-		var textureLoader = this.textureLoader;
 
 		var textureDef = json.textures[ textureIndex ];
 
@@ -2096,7 +2095,7 @@ var GLTFLoader = ( function () {
 
 		}
 
-		return loadTextureImage( textureIndex, source );
+		return this.loadTextureImage( textureIndex, source );
 	};
 
 	GLTFParser.prototype.loadTextureImage = function ( textureIndex, source, loaderOverride ) {
@@ -2105,7 +2104,10 @@ var GLTFLoader = ( function () {
 		var json = this.json;
 		var options = this.options;
 
+		var textureLoader = this.textureLoader;
+
 		var textureDef = json.textures[ textureIndex ];
+		var textureExtensions = textureDef.extensions || {};
 
 		var URL = self.URL || self.webkitURL;
 
@@ -2202,7 +2204,6 @@ var GLTFLoader = ( function () {
 		} );
 
 	};
-
 
 	/**
 	 * Asynchronously assigns a texture to the given material parameters.
