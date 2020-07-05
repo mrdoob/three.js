@@ -1533,6 +1533,11 @@ var GLTFLoader = ( function () {
 		// BufferGeometry caching
 		this.primitiveCache = {};
 
+		// Object3D instance caches
+		this.meshCache = {refs: {}, uses: {}};
+		this.cameraCache = {refs: {}, uses: {}};
+		this.lightCache = {refs: {}, uses: {}};
+
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
 		if ( typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false ) {
@@ -1580,7 +1585,7 @@ var GLTFLoader = ( function () {
 		this.cache.removeAll();
 
 		// Mark the special nodes/meshes in json for efficient parse
-		this.markDefs();
+		this._markDefs();
 
 		Promise.all( [
 
@@ -1613,14 +1618,11 @@ var GLTFLoader = ( function () {
 	/**
 	 * Marks the special nodes/meshes in json for efficient parse.
 	 */
-	GLTFParser.prototype.markDefs = function () {
+	GLTFParser.prototype._markDefs = function () {
 
 		var nodeDefs = this.json.nodes || [];
 		var skinDefs = this.json.skins || [];
 		var meshDefs = this.json.meshes || [];
-
-		var meshReferences = {};
-		var meshUses = {};
 
 		// Nothing in the node definition indicates whether it is a Bone or an
 		// Object3D. Use the skins' joint references to mark bones.
@@ -1636,24 +1638,15 @@ var GLTFLoader = ( function () {
 
 		}
 
-		// Meshes can (and should) be reused by multiple nodes in a glTF asset. To
-		// avoid having more than one Mesh with the same name, count
-		// references and rename instances below.
-		//
-		// Example: CesiumMilkTruck sample model reuses "Wheel" meshes.
+		// Iterate over all nodes, marking references to shared resources,
+		// as well as skeleton joints.
 		for ( var nodeIndex = 0, nodeLength = nodeDefs.length; nodeIndex < nodeLength; nodeIndex ++ ) {
 
 			var nodeDef = nodeDefs[ nodeIndex ];
 
 			if ( nodeDef.mesh !== undefined ) {
 
-				if ( meshReferences[ nodeDef.mesh ] === undefined ) {
-
-					meshReferences[ nodeDef.mesh ] = meshUses[ nodeDef.mesh ] = 0;
-
-				}
-
-				meshReferences[ nodeDef.mesh ] ++;
+				this._addNodeRef( this.meshCache, nodeDef.mesh );
 
 				// Nothing in the mesh definition indicates whether it is
 				// a SkinnedMesh or Mesh. Use the node's mesh reference
@@ -1666,12 +1659,59 @@ var GLTFLoader = ( function () {
 
 			}
 
+			if ( nodeDef.camera !== undefined ) {
+
+				this._addNodeRef( this.cameraCache, nodeDef.camera );
+
+			}
+
+			if ( nodeDef.extensions
+				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
+				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
+
+				this._addNodeRef( this.lightCache, nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light );
+
+			}
+
 		}
 
-		this.json.meshReferences = meshReferences;
-		this.json.meshUses = meshUses;
+	};
+
+	/**
+	 * Counts references to shared node / Object3D resources. These resources
+	 * can be reused, or "instantiated", at multiple nodes in the scene
+	 * hierarchy. Mesh, Camera, and Light instances are instantiated and must
+	 * be marked. Non-scenegraph resources (like Materials, Geometries, and
+	 * Textures) can be reused directly and are not marked here.
+	 *
+	 * Example: CesiumMilkTruck sample model reuses "Wheel" meshes.
+	 */
+	GLTFParser.prototype._addNodeRef = function ( cache, index ) {
+
+		if ( index === undefined ) return;
+
+		if ( cache.refs[ index ] === undefined ) {
+
+			cache.refs[ index ] = cache.uses[ index ] = 0;
+
+		}
+
+		cache.refs[ index ] ++ ;
 
 	};
+
+	/** Returns a reference to a shared resource, cloning it if necessary. */
+	GLTFParser.prototype._getNodeRef = function ( cache, index, object ) {
+
+		if ( cache.refs[ index ] <= 1 ) return object;
+
+		var ref = object.clone();
+
+		ref.name += '_instance_' + ( cache.uses[ index ] ++ );
+
+		return ref;
+
+	}
 
 	GLTFParser.prototype._invokeOne = function ( func ) {
 
@@ -2861,7 +2901,7 @@ var GLTFLoader = ( function () {
 					primitive.mode === WEBGL_CONSTANTS.TRIANGLE_FAN ||
 					primitive.mode === undefined ) {
 
-					// .isSkinnedMesh isn't in glTF spec. See .markDefs()
+					// .isSkinnedMesh isn't in glTF spec. See ._markDefs()
 					mesh = meshDef.isSkinnedMesh === true
 						? new SkinnedMesh( geometry, material )
 						: new Mesh( geometry, material );
@@ -3212,9 +3252,6 @@ var GLTFLoader = ( function () {
 		var extensions = this.extensions;
 		var parser = this;
 
-		var meshReferences = json.meshReferences;
-		var meshUses = json.meshUses;
-
 		var nodeDef = json.nodes[ nodeIndex ];
 
 		return ( function () {
@@ -3225,20 +3262,7 @@ var GLTFLoader = ( function () {
 
 				pending.push( parser.getDependency( 'mesh', nodeDef.mesh ).then( function ( mesh ) {
 
-					var node;
-
-					if ( meshReferences[ nodeDef.mesh ] > 1 ) {
-
-						var instanceNum = meshUses[ nodeDef.mesh ] ++;
-
-						node = mesh.clone();
-						node.name += '_instance_' + instanceNum;
-
-					} else {
-
-						node = mesh;
-
-					}
+					var node = parser._getNodeRef( parser.meshCache, nodeDef.mesh, mesh );
 
 					// if weights are provided on the node, override weights on the mesh.
 					if ( nodeDef.weights !== undefined ) {
@@ -3265,7 +3289,11 @@ var GLTFLoader = ( function () {
 
 			if ( nodeDef.camera !== undefined ) {
 
-				pending.push( parser.getDependency( 'camera', nodeDef.camera ) );
+				pending.push( parser.getDependency( 'camera', nodeDef.camera ).then( function ( camera ) {
+
+					return parser._getNodeRef( parser.cameraCache, nodeDef.camera, camera );
+
+				} ) );
 
 			}
 
@@ -3273,7 +3301,13 @@ var GLTFLoader = ( function () {
 				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
 				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
 
-				pending.push( parser.getDependency( 'light', nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light ) );
+				var lightIndex = nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light;
+
+				pending.push( parser.getDependency( 'light', lightIndex ).then( function ( light ) {
+
+					return parser._getNodeRef( parser.lightCache, lightIndex, light );
+
+				} ) );
 
 			}
 
@@ -3283,7 +3317,7 @@ var GLTFLoader = ( function () {
 
 			var node;
 
-			// .isBone isn't in glTF spec. See .markDefs
+			// .isBone isn't in glTF spec. See ._markDefs
 			if ( nodeDef.isBone === true ) {
 
 				node = new Bone();
