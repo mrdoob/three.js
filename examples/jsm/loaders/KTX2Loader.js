@@ -68,6 +68,7 @@ class KTX2Loader extends CompressedTextureLoader {
 		super( manager );
 
 		this.basisModule = null;
+		this.basisModulePending = null;
 
 		this.transcoderConfig = {};
 
@@ -88,14 +89,20 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	init () {
+	initModule () {
+
+		if ( this.basisModulePending ) {
+
+			return;
+
+		}
 
 		var scope = this;
 
 		// The Emscripten wrapper returns a fake Promise, which can cause
 		// infinite recursion when mixed with native Promises. Wrap the module
 		// initialization to return a native Promise.
-		return new Promise( function ( resolve ) {
+		scope.basisModulePending = new Promise( function ( resolve ) {
 
 			MSC_TRANSCODER().then( function ( basisModule ) {
 
@@ -126,7 +133,9 @@ class KTX2Loader extends CompressedTextureLoader {
 
 		} );
 
-		Promise.all( [ bufferPending, this.init() ] ).then( function ( [ buffer ] ) {
+		this.initModule();
+
+		Promise.all( [ bufferPending, this.basisModulePending ] ).then( function ( [ buffer ] ) {
 
 			scope.parse( buffer, function ( _texture ) {
 
