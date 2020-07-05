@@ -37,6 +37,10 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	this.texture.format = texture.format;
 	this.texture.encoding = texture.encoding;
 
+	this.texture.generateMipmaps = texture.generateMipmaps;
+	this.texture.minFilter = texture.minFilter;
+	this.texture.magFilter = texture.magFilter;
+
 	const scene = new Scene();
 
 	const shader = {
