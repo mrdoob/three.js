@@ -2257,7 +2257,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		if ( this.type === THREE.UnsignedByteType ) {
 
-			let v, i, j;
+			let v, i;
 			const size = byteArray.length;
 			const RGBEArray = new Uint8Array( size );
 
@@ -2266,11 +2266,10 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 				for ( let w = 0; w < width; ++ w ) {
 
 					i = h * width * 4 + w * 4;
-					j = ( height - 1 - h ) * width * 4 + w * 4;
 
-					const red = byteArray[ j ];
-					const green = byteArray[ j + 1 ];
-					const blue = byteArray[ j + 2 ];
+					const red = byteArray[ i ];
+					const green = byteArray[ i + 1 ];
+					const blue = byteArray[ i + 2 ];
 
 					v = ( red > green ) ? red : green;
 					v = ( blue > v ) ? blue : v;
@@ -2331,7 +2330,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 					texture.minFilter = THREE.NearestFilter;
 					texture.magFilter = THREE.NearestFilter;
 					texture.generateMipmaps = false;
-					texture.flipY = true;
+					texture.flipY = false;
 					break;
 
 				case THREE.FloatType:
