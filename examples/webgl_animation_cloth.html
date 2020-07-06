@@ -477,12 +477,6 @@
 				object.castShadow = true;
 				scene.add( object );
 
-				object.customDepthMaterial = new THREE.MeshDepthMaterial( {
-					depthPacking: THREE.RGBADepthPacking,
-					map: clothTexture,
-					alphaTest: 0.5
-				} );
-
 				// sphere
 
 				var ballGeo = new THREE.SphereBufferGeometry( ballSize, 32, 16 );

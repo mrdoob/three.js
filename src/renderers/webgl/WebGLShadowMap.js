@@ -231,7 +231,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function getDepthMaterialVariant( useMorphing, useSkinning, useInstancing ) {
+	function getDepthMaterialVariant( useMorphing, useSkinning, useInstancing, alphaTest, alphaMap, map ) {
 
 		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
 
@@ -244,7 +244,10 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 				depthPacking: RGBADepthPacking,
 
 				morphTargets: useMorphing,
-				skinning: useSkinning
+				skinning: useSkinning,
+				alphaTest: alphaTest,
+				alphaMap: alphaMap,
+				map: map
 
 			} );
 
@@ -256,7 +259,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	}
 
-	function getDistanceMaterialVariant( useMorphing, useSkinning, useInstancing ) {
+	function getDistanceMaterialVariant( useMorphing, useSkinning, useInstancing, alphaTest, alphaMap, map ) {
 
 		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
 
@@ -267,7 +270,10 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 			material = new MeshDistanceMaterial( {
 
 				morphTargets: useMorphing,
-				skinning: useSkinning
+				skinning: useSkinning,
+				alphaTest: alphaTest,
+				alphaMap: alphaMap,
+				map: map
 
 			} );
 
@@ -321,7 +327,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			const useInstancing = object.isInstancedMesh === true;
 
-			result = getMaterialVariant( useMorphing, useSkinning, useInstancing );
+			result = getMaterialVariant( useMorphing, useSkinning, useInstancing, material.alphaTest, material.alphaMap,  material.map );
 
 		} else {
 
