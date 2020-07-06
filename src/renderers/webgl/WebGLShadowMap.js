@@ -327,7 +327,7 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 			const useInstancing = object.isInstancedMesh === true;
 
-			result = getMaterialVariant( useMorphing, useSkinning, useInstancing, material.alphaTest, material.alphaMap,  material.map );
+			result = getMaterialVariant( useMorphing, useSkinning, useInstancing, material.alphaTest, material.alphaMap, material.map );
 
 		} else {
 
