@@ -554,7 +554,7 @@ ColladaLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						let baseVec = new Vector3(outputSource.array[ stride],outputSource.array[ stride + 1 ],outputSource.array[ stride + 2]);
 						
 						data[ time ].quaternion =tmpQuat.clone();
-						data[ time ].quaternion.multiply(new Quaternion().setFromAxisAngle(baseVec,_Math.degToRad(outputSource.array[ stride+3])));
+						data[ time ].quaternion.multiply(new Quaternion().setFromAxisAngle(baseVec,MathUtils.degToRad(outputSource.array[ stride+3])));
 					}
 					break;
 
