@@ -333,6 +333,7 @@ THREE.GLTFLoader = ( function () {
 		KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
 		KHR_MATERIALS_UNLIT: 'KHR_materials_unlit',
+		KHR_TEXTURE_BASISU: 'KHR_texture_basisu',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 		KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
 		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
@@ -559,7 +560,7 @@ THREE.GLTFLoader = ( function () {
 	function GLTFTextureBasisU( parser ) {
 
 		this.parser = parser;
-		this.name = "KHR_texture_basisu";
+		this.name = EXTENSIONS.KHR_TEXTURE_BASISU;
 
 	}
 
