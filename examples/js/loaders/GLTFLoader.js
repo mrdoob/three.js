@@ -26,7 +26,7 @@ THREE.GLTFLoader = ( function () {
 		} );
 		this.register( function ( parser ) {
 
-			return new GLTFTextureBasisU( parser );
+			return new GLTFTextureBasisUExtension( parser );
 
 		} );
 
@@ -555,16 +555,16 @@ THREE.GLTFLoader = ( function () {
 	 * BasisU Texture Extension
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_basisu
-	 * (Link above TBD, currently in PR https://github.com/KhronosGroup/glTF/pull/1751)
+	 * (draft PR https://github.com/KhronosGroup/glTF/pull/1751)
 	 */
-	function GLTFTextureBasisU( parser ) {
+	function GLTFTextureBasisUExtension( parser ) {
 
 		this.parser = parser;
 		this.name = EXTENSIONS.KHR_TEXTURE_BASISU;
 
 	}
 
-	GLTFTextureBasisU.prototype.loadTexture = function ( textureIndex ) {
+	GLTFTextureBasisUExtension.prototype.loadTexture = function ( textureIndex ) {
 
 		var parser = this.parser;
 		var json = parser.json;
