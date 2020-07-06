@@ -19,7 +19,7 @@ export const threejsLessonUtils = {
     this.pixelRatio = Math.max(2, window.devicePixelRatio);
 
     this.renderer = renderer;
-    this.renderFuncs = [];
+    this.elemToRenderFuncMap = new Map();
 
     const resizeRendererToDisplaySize = (renderer) => {
       const canvas = renderer.domElement;
@@ -34,8 +34,11 @@ export const threejsLessonUtils = {
 
     const clearColor = new THREE.Color('#000');
     let needsUpdate = true;
+    let rafRequestId;
+    let rafRunning;
 
     const render = (time) => {
+      rafRequestId = undefined;
       time *= 0.001;
 
       const resized = resizeRendererToDisplaySize(renderer);
@@ -52,7 +55,8 @@ export const threejsLessonUtils = {
         renderer.setScissorTest(true);
       }
 
-      this.renderFuncs.forEach((fn) => {
+      this.elementsOnScreen.forEach(elem => {
+        const fn = this.elemToRenderFuncMap.get(elem);
         const wasRendered = fn(renderer, time, resized);
         needsUpdate = needsUpdate || wasRendered;
       });
@@ -75,10 +79,44 @@ export const threejsLessonUtils = {
         renderer.domElement.style.transform = transform;
       }
 
-      requestAnimationFrame(render);
+      if (rafRunning) {
+        startRAFLoop();
+      }
     };
 
-    requestAnimationFrame(render);
+    function startRAFLoop() {
+      rafRunning = true;
+      if (!rafRequestId) {
+        rafRequestId = requestAnimationFrame(render);
+      }
+    }
+
+    this.elementsOnScreen = new Set();
+    this.intersectionObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          this.elementsOnScreen.add(entry.target);
+        } else {
+          this.elementsOnScreen.delete(entry.target);
+        }
+        // Each entry describes an intersection change for one observed
+        // target element:
+        //   entry.boundingClientRect
+        //   entry.intersectionRatio
+        //   entry.intersectionRect
+        //   entry.isIntersecting
+        //   entry.rootBounds
+        //   entry.target
+        //   entry.time
+      });
+      if (this.elementsOnScreen.size > 0) {
+        startRAFLoop();
+      } else {
+        rafRunning = false;
+      }
+    });
+
+
   },
   addDiagrams(diagrams) {
     [...document.querySelectorAll('[data-diagram]')].forEach((elem) => {
@@ -220,7 +258,8 @@ export const threejsLessonUtils = {
       return true;
     };
 
-    this.renderFuncs.push(render);
+    this.intersectionObserver.observe(elem);
+    this.elemToRenderFuncMap.set(elem, render);
   },
   onAfterPrettify(fn) {
     this._afterPrettifyFuncs.push(fn);

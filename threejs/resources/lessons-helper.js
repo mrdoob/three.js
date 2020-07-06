@@ -408,76 +408,81 @@
     }
   };
 
-  /**
-   * Gets the iframe in the parent document
-   * that is displaying the specified window .
-   * @param {Window} window window to check.
-   * @return {HTMLIFrameElement?) the iframe element if window is in an iframe
-   */
-  function getIFrameForWindow(window) {
-    if (!isInIFrame(window)) {
-      return;
-    }
-    const iframes = window.parent.document.getElementsByTagName('iframe');
-    for (let ii = 0; ii < iframes.length; ++ii) {
-      const iframe = iframes[ii];
-      if (iframe.contentDocument === window.document) {
-        return iframe;  // eslint-disable-line
-      }
-    }
-  }
-
-  /**
-   * Returns true if window is on screen. The main window is
-   * always on screen windows in iframes might not be.
-   * @param {Window} window the window to check.
-   * @return {boolean} true if window is on screen.
-   */
-  function isFrameVisible(window) {
-    try {
-      const iframe = getIFrameForWindow(window);
-      if (!iframe) {
-        return true;
-      }
-
-      const bounds = iframe.getBoundingClientRect();
-      const isVisible = bounds.top < window.parent.innerHeight && bounds.bottom >= 0 &&
-                        bounds.left < window.parent.innerWidth && bounds.right >= 0;
-
-      return isVisible && isFrameVisible(window.parent);
-    } catch (e) {
-      return true;  // We got a security error?
-    }
-  }
-
-  /**
-   * Returns true if element is on screen.
-   * @param {HTMLElement} element the element to check.
-   * @return {boolean} true if element is on screen.
-   */
-  function isOnScreen(element) {
-    let isVisible = true;
-
-    if (element) {
-      const bounds = element.getBoundingClientRect();
-      isVisible = bounds.top < topWindow.innerHeight && bounds.bottom >= 0;
-    }
-
-    return isVisible && isFrameVisible(topWindow);
-  }
-
-  // Replace requestAnimationFrame.
+  // Replace requestAnimationFrame and cancelAnimationFrame with one
+  // that only executes when the body is visible (we're in an iframe).
+  // It's frustrating that th browsers don't do this automatically.
+  // It's half of the point of rAF that it shouldn't execute when
+  // content is not visible but browsers execute rAF in iframes even
+  // if they are not visible.
   if (topWindow.requestAnimationFrame) {
-    topWindow.requestAnimationFrame = (function(oldRAF) {
+    topWindow.requestAnimationFrame = (function(oldRAF, oldCancelRAF) {
+      let nextFakeRAFId = 1;
+      const fakeRAFIdToCallbackMap = new Map();
+      let rafRequestId;
+      let isBodyOnScreen;
 
-      return function(callback, element) {
-        const handler = function() {
-          return oldRAF(isOnScreen(element) ? callback : handler, element);
-        };
-        return handler();
+      function rAFHandler(time) {
+        rafRequestId = undefined;
+        const ids = [...fakeRAFIdToCallbackMap.keys()];  // WTF! Map.keys() iterates over live keys!
+        for (const id of ids) {
+          const callback = fakeRAFIdToCallbackMap.get(id);
+          fakeRAFIdToCallbackMap.delete(id);
+          if (callback) {
+            callback(time);
+          }
+        }
+      }
+
+      function startRAFIfIntersectingAndNeeded() {
+        if (!rafRequestId && isBodyOnScreen && fakeRAFIdToCallbackMap.size > 0) {
+          rafRequestId = oldRAF(rAFHandler);
+        }
+      }
+
+      function stopRAF() {
+        if (rafRequestId) {
+          oldCancelRAF(rafRequestId);
+          rafRequestId = undefined;
+        }
+      }
+
+      function initIntersectionObserver() {
+        const intersectionObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            isBodyOnScreen = entry.isIntersecting;
+          });
+          if (isBodyOnScreen) {
+            startRAFIfIntersectingAndNeeded();
+          } else {
+            stopRAF();
+          }
+        });
+        intersectionObserver.observe(document.body);
+      }
+
+      function betterRAF(callback) {
+        const fakeRAFId = nextFakeRAFId++;
+        fakeRAFIdToCallbackMap.set(fakeRAFId, callback);
+        startRAFIfIntersectingAndNeeded();
+        return fakeRAFId;
+      }
+
+      function betterCancelRAF(id) {
+        fakeRAFIdToCallbackMap.delete(id);
+      }
+
+      topWindow.cancelAnimationFrame = betterCancelRAF;
+
+      return function(callback) {
+        // we need to lazy init this because this code gets parsed
+        // before body exists. We could fix it by moving lesson-helper.js
+        // after <body> but that would require changing 100s of examples
+        initIntersectionObserver();
+        topWindow.requestAnimationFrame = betterRAF;
+        return betterRAF(callback);
       };
 
-    }(topWindow.requestAnimationFrame));
+    }(topWindow.requestAnimationFrame, topWindow.cancelAnimationFrame));
   }
 
   updateCSSIfInIFrame();
