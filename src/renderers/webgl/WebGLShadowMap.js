@@ -27,8 +27,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 		_viewport = new Vector4(),
 
-		_depthMaterials = [],
-		_distanceMaterials = [],
+		_depthMaterials = {},
+		_distanceMaterials = {},
 
 		_materialCache = {};
 
@@ -233,25 +233,22 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	function getDepthMaterialVariant( useMorphing, useSkinning, useInstancing, alphaTest, alphaMap, map ) {
 
-		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		const key = ( useMorphing << 0 | useSkinning << 1 | useInstancing << 2 | ( !! alphaMap ) << 3 | ( !! map ) << 4 ) + ',' + alphaTest;
 
-		let material = _depthMaterials[ index ];
+		let material = _depthMaterials[ key ];
 
 		if ( material === undefined ) {
 
 			material = new MeshDepthMaterial( {
 
 				depthPacking: RGBADepthPacking,
-
 				morphTargets: useMorphing,
 				skinning: useSkinning,
-				alphaTest: alphaTest,
-				alphaMap: alphaMap,
-				map: map
+				alphaTest: alphaTest
 
 			} );
 
-			_depthMaterials[ index ] = material;
+			_depthMaterials[ key ] = material;
 
 		}
 
@@ -261,9 +258,9 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 	function getDistanceMaterialVariant( useMorphing, useSkinning, useInstancing, alphaTest, alphaMap, map ) {
 
-		const index = useMorphing << 0 | useSkinning << 1 | useInstancing << 2;
+		const key = ( useMorphing << 0 | useSkinning << 1 | useInstancing << 2 | ( !! alphaMap ) << 3 | ( !! map ) << 4 ) + ',' + alphaTest;
 
-		let material = _distanceMaterials[ index ];
+		let material = _distanceMaterials[ key ];
 
 		if ( material === undefined ) {
 
@@ -271,13 +268,11 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
 				morphTargets: useMorphing,
 				skinning: useSkinning,
-				alphaTest: alphaTest,
-				alphaMap: alphaMap,
-				map: map
+				alphaTest: alphaTest
 
 			} );
 
-			_distanceMaterials[ index ] = material;
+			_distanceMaterials[ key ] = material;
 
 		}
 
@@ -334,6 +329,9 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 			result = customMaterial;
 
 		}
+
+		result.alphaMap = material.alphaMap;
+		result.map = material.map;
 
 		if ( _renderer.localClippingEnabled &&
 				material.clipShadows === true &&
