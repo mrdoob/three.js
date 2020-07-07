@@ -62,6 +62,8 @@ export class Quaternion {
 	angleTo( q: Quaternion ): number;
 	rotateTowards( q: Quaternion, step: number ): Quaternion;
 
+	identity(): Quaternion;
+
 	/**
 	 * Inverts this quaternion.
 	 */

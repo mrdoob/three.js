@@ -437,6 +437,12 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	identity: function () {
+
+		return this.set( 0, 0, 0, 1 );
+
+	},
+
 	inverse: function () {
 
 		// quaternion is assumed to have unit length
