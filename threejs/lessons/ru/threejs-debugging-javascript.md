@@ -525,4 +525,4 @@ requestAnimationFrame(render);
 
 ---
 
-Это были несколько советов для отладки JavaScript. Давайте также [some tips for debugging GLSL](threejs-debugging-glsl.html).
+Это были несколько советов для отладки JavaScript. Давайте перейдём к [некоторым советам для отладки на GLSL](threejs-debugging-glsl.html).
