@@ -3069,6 +3069,12 @@
 
 		},
 
+		identity: function () {
+
+			return this.set( 0, 0, 0, 1 );
+
+		},
+
 		inverse: function () {
 
 			// quaternion is assumed to have unit length
@@ -6150,6 +6156,7 @@
 			this.up.copy( source.up );
 
 			this.position.copy( source.position );
+			this.rotation.order = source.rotation.order;
 			this.quaternion.copy( source.quaternion );
 			this.scale.copy( source.scale );
 
@@ -14081,6 +14088,10 @@
 		this.texture.type = texture.type;
 		this.texture.format = texture.format;
 		this.texture.encoding = texture.encoding;
+
+		this.texture.generateMipmaps = texture.generateMipmaps;
+		this.texture.minFilter = texture.minFilter;
+		this.texture.magFilter = texture.magFilter;
 
 		var scene = new Scene();
 
