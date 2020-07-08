@@ -103,7 +103,7 @@ canvas 요소에는 두 종류의 크기값이 있습니다. 하나는 아까 CS
 크기라고 부르겠습니다.
 
 ```html
-<img src="128x64이미지.jpg" style="width:400px; height:200px">
+<img src="some128x64image.jpg" style="width:400px; height:200px">
 ```
 
 canvas의 원본 크기, 해상도는 드로잉버퍼(drawingbuffer)라고 불립니다.

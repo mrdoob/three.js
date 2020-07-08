@@ -1,6 +1,6 @@
 Title: Three.js 기초
 
-Three.js 입문자를 위한 튜토리얼입니다.
+Three.js 입문자를 위한 튜토리얼 시리즈입니다.
 
 {{{include "threejs/lessons/toc.html"}}}
 
