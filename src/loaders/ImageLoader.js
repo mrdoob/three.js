@@ -81,7 +81,7 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		image.src = url;
 
-		if (url && url.substr( 0, 5 ) === 'data:' ) onImageLoad();
+		if ( url && url.substr( 0, 5 ) === 'data:' ) onImageLoad();
 
 		return image;
 
