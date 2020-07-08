@@ -101,6 +101,15 @@ THREE.SVGRenderer = function () {
 
 	};
 
+	this.getSize = function () {
+
+		return {
+			width: _svgWidth,
+			height: _svgHeight
+		};
+
+	};
+
 	this.setPrecision = function ( precision ) {
 
 		_precision = precision;
