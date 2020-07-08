@@ -2145,7 +2145,7 @@ THREE.GLTFLoader = ( function () {
 
 			if ( isObjectURL === true ) {
 
-				URL.revokeObjectURL( sourceURI );
+			  if (URL.revokeObjectURL) URL.revokeObjectURL( sourceURI );
 
 			}
 
