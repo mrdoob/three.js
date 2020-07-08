@@ -37314,7 +37314,7 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			Cache.add( url, this );
 
-			if ( onLoad ) onLoad( this );
+			if ( onLoad ) onLoad( this || image );
 
 			scope.manager.itemEnd( url );
 
@@ -37344,6 +37344,8 @@ ImageLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		scope.manager.itemStart( url );
 
 		image.src = url;
+
+		if (url && url.substr( 0, 5 ) === 'data:') onImageLoad();
 
 		return image;
 
