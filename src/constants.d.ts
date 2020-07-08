@@ -24,10 +24,6 @@ export const CullFaceBack: CullFace;
 export const CullFaceFront: CullFace;
 export const CullFaceFrontBack: CullFace;
 
-export enum FrontFaceDirection {}
-export const FrontFaceDirectionCW: FrontFaceDirection;
-export const FrontFaceDirectionCCW: FrontFaceDirection;
-
 // Shadowing Type
 export enum ShadowMapType {}
 export const BasicShadowMap: ShadowMapType;
