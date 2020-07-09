@@ -165,6 +165,13 @@ function Viewport( editor ) {
 
 	// events
 
+	function updateAspectRatio() {
+
+		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+		camera.updateProjectionMatrix();
+
+	}
+
 	function getIntersects( point, objects ) {
 
 		mouse.set( ( point.x * 2 ) - 1, - ( point.y * 2 ) + 1 );
@@ -665,13 +672,7 @@ function Viewport( editor ) {
 
 	signals.windowResize.add( function () {
 
-		// TODO: Move this out?
-
-		editor.DEFAULT_CAMERA.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-		editor.DEFAULT_CAMERA.updateProjectionMatrix();
-
-		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-		camera.updateProjectionMatrix();
+		updateAspectRatio();
 
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -685,6 +686,8 @@ function Viewport( editor ) {
 		render();
 
 	} );
+
+	signals.cameraResetted.add( updateAspectRatio );
 
 	// animations
 
