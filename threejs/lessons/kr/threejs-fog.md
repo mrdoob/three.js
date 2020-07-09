@@ -12,7 +12,7 @@ TOC: 안개(Fog)
 
 3D 엔진에서 안개란, 일반적으로 카메라로부터의 거리에 따라 특정 색상으로
 점차 변화하는 것을 말합니다. Three.js에서는 `Fog`나 `FogExp2` 객체를
-생성한 뒤 장면(scene)의 [`fog`](Scene.fog) 속성에 지정해 안개를 사용합니다.
+생성한 뒤, 장면(scene)의 [`fog`](Scene.fog) 속성에 지정해 안개를 사용합니다.
 
 `Fog`는 인자로 `near`와 `far`값을 받는데, 이는 카메라로부터의 거리값입니다.
 `near`값보다 가까운 공간은 안개의 영향이 전혀 없고, `far`값보다 먼 공간은
@@ -70,11 +70,11 @@ scene.background = new THREE.Color('#F00');  // 빨강
 
 <div class="spread">
   <div>
-    <div data-diagram="fogBlueBackgroundRed" class="border"></div>
+    <div data-diagram="fogBlueBackgroundRed" style="height:300px" class="border"></div>
     <div class="code">파란 안개, 빨간 배경</div>
   </div>
   <div>
-    <div data-diagram="fogBlueBackgroundBlue" class="border"></div>
+    <div data-diagram="fogBlueBackgroundBlue" style="height:300px" class="border"></div>
     <div class="code">파란 안개, 파란 배경</div>
   </div>
 </div>
@@ -101,19 +101,18 @@ const scene = new THREE.Scene();
 
 {{{example url="../threejs-fog.html" }}}
 
-Let's add an interface so we can adjust the fog. Again we'll use
-[dat.GUI](https://github.com/dataarts/dat.gui). dat.GUI takes
-an object and a property and automagically makes an interface
-for that type of property. We could just simply let it manipulate
-the fog's `near` and `far` properties but it's invalid to have
-`near` be greater than `far` so let's make a helper so dat.GUI
-can manipulate a `near` and `far` property but we'll make sure `near`
-is less than or equal to `far` and `far` is greater than or equal `near`.
+인터페이스를 추가해 안개를 조정할 수 있도록 하겠습니다. 이번에도 [dat.GUI](https://github.com/dataarts/dat.gui)를
+사용할 거예요. dat.GUI는 객체와 객체의 속성 키값을 받아 자동으로 인터페이스를
+생성합니다. 단순히 안개의 `near`와 `far` 제어하도록 설정할 수도 있지만, `near`값이
+`far`값보다 큰 경우는 없기에 헬퍼를 만들어 `near`값을 항상 `far`보다 같거나
+작게, `far`값을 항상 `near`보다 같거나 크게 설정하도록 하겠습니다.
 
 ```js
-// We use this class to pass to dat.gui
-// so when it manipulates near or far
-// near is never > far and far is never < near
+/**
+ * 이 클래스의 인스턴스를 dat.GUI에 넘겨
+ * near나 far 속성을 조정할 때 항상
+ * near는 never >= far, far는 never <= near가 되도록 합니다
+ **/
 class FogGUIHelper {
   constructor(fog) {
     this.fog = fog;
@@ -135,7 +134,7 @@ class FogGUIHelper {
 }
 ```
 
-We can then add it like this
+방금 만든 클래스를 아래처럼 활용합니다.
 
 ```js
 {
@@ -151,33 +150,33 @@ We can then add it like this
 }
 ```
 
-The `near` and `far` parameters set the minimum and maximum values
-for adjusting the fog. They are set when we setup the camera.
+`near`와 `far` 인자는 각 안개 속성의 최솟값과 최댓값입니다.
 
-The `.listen()` at the end of the last 2 lines tells dat.GUI to *listen*
-for changes. That way when we change `near` because of an edit to `far`
-or we change `far` in response to an edit to `near` dat.GUI will update
-the other property's UI for us.
+마지막 2줄의 `.listen()` 메서드를 호출하면 dat.GUI가 변화를 *감지*합니다.
+`near` 속성을 바꿀 때 동시에 `far` 속성을 재할당하고, `far` 속성을 바꿀 때도
+동시에 `near`를 재할당하는데, 이 메서드를 호출하면 조작한 속성 외의 다른
+속성의 변화도 UI에 업데이트됩니다.
 
-It might also be nice to be able to change the fog color but like was
-mentioned above we need to keep both the fog color and the background
-color in sync. So, let's add another *virtual* property to our helper
-that will set both colors when dat.GUI manipulates it.
+여기에 안개의 색까지 조정할 수 있으면 금상첨화겠네요. 하지만 아까 설명했듯
+안개의 색을 바꾸려면 배경색도 같이 바꿔야 합니다. 헬퍼 클래스에 *가상* 속성을
+하나 만들어 dat.GUI가 이 속성을 변경할 때 배경색과 안개색을 같은 값으로
+바꿔주면 어떨까요?
 
-dat.GUI can manipulate colors in 4 ways, as a CSS 6 digit hex string (eg: `#112233`). As an hue, saturation, value, object (eg: `{h: 60, s: 1, v: }`).
-As an RGB array (eg: `[255, 128, 64]`). Or, as an RGBA array (eg: `[127, 200, 75, 0.3]`).
+dat.GUI의 색상 타입은 4가지입니다. 하나는 CSS의 6자리 16진수 문자열(hex string, 예: `#f8f8f8`)이고,
+하나는 hue(색상), saturation(채도), value 객체(예: `{ h: 60, s: 1, v: 0 }`),
+하나는 RGB 배열(예: `[ 255, 128, 64 ]`) 또는 RGBA 색상 배열(예: `[ 127, 200, 75, 0.3 ]`)이죠.
 
-It's easiest for our purpose to use the hex string version since that way
-dat.GUI is only manipulating a single value. Fortunately `THREE.Color`
-as a [`getHexString`](Color.getHexString) method
-we get use to easily get such a string, we just have to prepend a '#' to the front.
+`dat.GUI`가 하나의 값만 조작하도록 하는 게 제일 간단하니, 16진수 문자열을 사용하겠습니다.
+다행히 `THREE.Color`에는 [`getHexString`](Color.getHexString) 메서드가 있어 색상을
+문자열로 쉽게 바꿀 수 있죠. 앞에 '#'만 덧붙이면 됩니다.
 
 ```js
-// We use this class to pass to dat.gui
-// so when it manipulates near or far
-// near is never > far and far is never < near
-+// Also when dat.gui manipulates color we'll
-+// update both the fog and background colors.
+/**
+ * 이 클래스의 인스턴스를 dat.GUI에 넘겨
+ * near나 far 속성을 조정할 때 항상
+ * near는 never >= far, far는 never <= near가 되도록 합니다
+ **/
++// 또 dat.GUI가 color 속성을 조작할 때 안개와 배경색을 동시에 변경합니다
 class FogGUIHelper {
 *  constructor(fog, backgroundColor) {
     this.fog = fog;
@@ -207,7 +206,8 @@ class FogGUIHelper {
 }
 ```
 
-We then call `gui.addColor` to add a color UI for our helper's virtual property.
+이번에는 `gui.addColor` 메서드를 호출합니다. 색상 UI를 생성하는 메서드로,
+방금 추가한 가상 속성을 조작하도록 설정합니다.
 
 ```js
 {
@@ -226,45 +226,39 @@ We then call `gui.addColor` to add a color UI for our helper's virtual property.
 
 {{{example url="../threejs-fog-gui.html" }}}
 
-You can see setting `near` to like 1.9 and `far` to 2.0 gives
-a very sharp transition between un-fogged and completely fogged.
-where as `near` = 1.1 and `far` = 2.9 should just about be
-the smoothest given our cubes are spinning 2 units away from the camera.
+`near`를 1.9 정도, `far`를 2.0 정도로 설정하면 안개의 경계가 굉장히
+선명해질 겁니다. 정육면체들이 카메라에서 2칸 떨어져 있으므로 `near`를
+1.1, `far`를 2.9 정도로 설정하면 경계가 가장 부드러운 것이라고 할 수
+있죠.
 
-One last thing, there is a boolean [`fog`](Material.fog)
-property on a material for whether or not objects rendered
-with that material are affected by fog. It defaults to `true`
-for most materials. As an example of why you might want
-to turn the fog off, imagine you're making a 3D vehicle
-simulator with a view from the driver's seat or cockpit.
-You probably want the fog off for everything inside the vehicle when
-viewing from inside the vehicle.
+추가로 재질(material)에는 불린 타입의 [`fog`](Material.fog) 속성이 있습니다.
+해당 재질로 렌더링되는 물체가 안개의 영향을 받을지의 여부를 결정하는 속성이죠.
+"안개 효과를 없애버리면 그만 아닌가?" 생각할 수 있지만, 3D 운전 시뮬레이터를
+만드는 경우를 상상해봅시다. 차 밖은 안개가 자욱하더라도 차 안에서 볼 때 차 내부는
+깔끔해야 할 수도 있죠.
 
-A better example might be a house
-and thick fog outside house. Let's say the fog is set to start
-2 meters away (near = 2) and completely fogged out at 4 meters (far = 4).
-Rooms are longer than 2 meters and the house is probably longer
-than 4 meters so you need to set the materials for the inside
-of the house to not apply fog otherwise when standing inside the
-house looking outside the wall at the far end of the room will look
-like it's in the fog.
+안개가 짙은 날, 집 안에서 창 밖을 바라보는 장면이 더 와닿을지도 모르겠네요.
+안개가 카메라로부터 2미터 이후부터 끼기 시작하고(near = 2), 4미터 이후에는
+완전히 안개에 덮히도록(far = 4) 설정합니다. 방은 2미터이고, 집은 최소 4미터입니다.
+여기서 집 안의 재질이 안개의 영향을 받도록 놔둔다면 방 끝에서 창 밖을 바라볼
+때 방 안도 안개가 낀 것처럼 보이겠죠.
 
 <div class="spread">
   <div>
     <div data-diagram="fogHouseAll" style="height: 300px;" class="border"></div>
-    <div class="code">fog: true, all</div>
+    <div class="code">모든 재질의 fog: true</div>
   </div>
 </div>
 
-Notice the walls and ceiling at the far end of the room are getting fog applied.
-By turning fog off on the materials for the house we can fix that issue.
+방 끝 쪽 천장과 벽에 안개가 낀 것이 보일 겁니다. 집 내부 재질의 fog 옵션을 끄면
+안개를 없앨 수 있죠.
 
 <div class="spread">
   <div>
     <div data-diagram="fogHouseInsideNoFog" style="height: 300px;" class="border"></div>
-    <div class="code">fog: true, only outside materials</div>
+    <div class="code">집 밖 물체의 재질만 fog: true</div>
   </div>
 </div>
 
 <canvas id="c"></canvas>
-<script type="module" src="resources/threejs-fog.js"></script>
+<script type="module" src="../resources/threejs-fog.js"></script>
