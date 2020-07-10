@@ -5,7 +5,7 @@ TOC: Lights
 This article is part of a series of articles about three.js. The
 first article is [three.js fundamentals](threejs-fundamentals.html). If
 you haven't read that yet and you're new to three.js you might want to
-consider starting there. The
+consider starting there and also the article on [setting up your environment](threejs-setup.html). The
 [previous article was about textures](threejs-textures.html).
 
 Let's go over how to use the various kinds of lights in three.
