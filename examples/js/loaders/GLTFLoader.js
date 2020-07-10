@@ -581,7 +581,7 @@ THREE.GLTFLoader = ( function () {
 		var source = json.images[ extension.source ];
 		var loader = parser.options.ktx2Loader;
 
-		if ( !loader ) {
+		if ( ! loader ) {
 
 			throw new Error( 'THREE.GLTFLoader: setKTX2Loader must be called before loading KTX2 textures' );
 
@@ -1525,9 +1525,9 @@ THREE.GLTFLoader = ( function () {
 		this.primitiveCache = {};
 
 		// Object3D instance caches
-		this.meshCache = {refs: {}, uses: {}};
-		this.cameraCache = {refs: {}, uses: {}};
-		this.lightCache = {refs: {}, uses: {}};
+		this.meshCache = { refs: {}, uses: {} };
+		this.cameraCache = { refs: {}, uses: {} };
+		this.lightCache = { refs: {}, uses: {} };
 
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
@@ -1687,7 +1687,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		cache.refs[ index ] ++ ;
+		cache.refs[ index ] ++;
 
 	};
 
@@ -1702,7 +1702,7 @@ THREE.GLTFLoader = ( function () {
 
 		return ref;
 
-	}
+	};
 
 	GLTFParser.prototype._invokeOne = function ( func ) {
 
@@ -2082,12 +2082,13 @@ THREE.GLTFLoader = ( function () {
 		if ( ! loader ) {
 
 			loader = textureExtensions[ EXTENSIONS.MSFT_TEXTURE_DDS ]
-			? parser.extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].ddsLoader
-			: this.textureLoader;
+				? parser.extensions[ EXTENSIONS.MSFT_TEXTURE_DDS ].ddsLoader
+				: this.textureLoader;
 
 		}
 
 		return this.loadTextureImage( textureIndex, source, loader );
+
 	};
 
 	GLTFParser.prototype.loadTextureImage = function ( textureIndex, source, loader ) {
@@ -2097,7 +2098,6 @@ THREE.GLTFLoader = ( function () {
 		var options = this.options;
 
 		var textureDef = json.textures[ textureIndex ];
-		var textureExtensions = textureDef.extensions || {};
 
 		var URL = self.URL || self.webkitURL;
 

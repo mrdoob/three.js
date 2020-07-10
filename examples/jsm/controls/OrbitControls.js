@@ -186,7 +186,7 @@ var OrbitControls = function ( object, domElement ) {
 			var min = scope.minAzimuthAngle;
 			var max = scope.maxAzimuthAngle;
 
-			if ( isFinite ( min ) && isFinite( max ) ) {
+			if ( isFinite( min ) && isFinite( max ) ) {
 
 				if ( min < - Math.PI ) min += twoPI; else if ( min > Math.PI ) min -= twoPI;
 
