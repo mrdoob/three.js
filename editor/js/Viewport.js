@@ -646,23 +646,24 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.viewportCameraChanged.add( function ( viewportCamera ) {
+	signals.viewportCameraChanged.add( function () {
+
+		var viewportCamera = editor.viewportCamera;
 
 		if ( viewportCamera.isPerspectiveCamera ) {
 
 			viewportCamera.aspect = editor.camera.aspect;
 			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
 
-		} else if ( ! viewportCamera.isOrthographicCamera ) {
+		} else if ( viewportCamera.isOrthographicCamera ) {
 
-			throw "Invalid camera set as viewport";
+			// TODO
 
 		}
 
-		// Disable EditorControls when setting a user camera
-		controls.enabled = viewportCamera === editor.camera;
+		// disable EditorControls when setting a user camera
 
-		camera = viewportCamera;
+		controls.enabled = ( viewportCamera === editor.camera );
 
 		render();
 
@@ -736,10 +737,10 @@ function Viewport( editor ) {
 
 		scene.add( grid );
 		renderer.setViewport( 0, 0, container.dom.offsetWidth, container.dom.offsetHeight );
-		renderer.render( scene, camera );
+		renderer.render( scene, editor.viewportCamera );
 		scene.remove( grid );
 
-		if ( camera === editor.camera ) {
+		if ( camera === editor.viewportCamera ) {
 
 			renderer.autoClear = false;
 			renderer.render( sceneHelpers, camera );
