@@ -683,5 +683,5 @@ The result looks the same
 
 One other advantage to this solution is you could potentially use
 [`OffscreenCanvas`](https://developer.mozilla.org/en-US/docs/Web/API/OffscreenCanvas)
-to render from a web worker and still use this technique. Unfortunately as of April 2019
+to render from a web worker and still use this technique. Unfortunately as of July 2020
 `OffscreenCanvas` is only supported by Chrome.
