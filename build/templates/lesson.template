@@ -95,6 +95,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <link href="/threejs/lessons/resources/threejsfundamentals-icon.png" rel="shortcut icon" type="image/png">
 <link rel="apple-touch-icon" href="/threejs/lessons/resources/threejsfundamentals-icon.png">
 <link rel="icon" href="/threejs/lessons/resources/threejsfundamentals-icon.png">
+
+<link rel="stylesheet" href="/threejs/lessons/lang.css" />
+{{#ifexists filename="/threejs/lessons/{{langCode}}/lang.css" langCode=langInfo.baseDirname}}
+<link rel="stylesheet" href="/threejs/lessons/{{langInfo.baseDirname}}/lang.css" />
+{{/ifexists}}
 <link rel="stylesheet" href="/threejs/lessons/resources/lesson.css" />
 </head>
 <body>
