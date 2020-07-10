@@ -1,10 +1,3 @@
----
-name: Pull Request
-about: Helping Development of Three.js
-title: ''
-labels: ''
-assignees: ''
----
 Related issues:
 
 #XXXX
