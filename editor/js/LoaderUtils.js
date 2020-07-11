@@ -77,7 +77,13 @@ var LoaderUtils = {
 
 		for ( var i = 0; i < items.length; i ++ ) {
 
-			handleEntry( items[ i ].webkitGetAsEntry() );
+			var item = items[ i ];
+
+			if ( item.kind === 'file' ) {
+
+				handleEntry( item.webkitGetAsEntry() );
+
+			}
 
 		}
 
