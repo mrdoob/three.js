@@ -21,6 +21,7 @@ export class Node {
 	getName( builder: NodeBuilder ): string;
 	getType( builder: NodeBuilder, output?: string ): string;
 	getJSONNode( meta?: object | string ): object | undefined;
+	getHash(): string;
 	copy( source: Node ): this;
 	createJSONNode( meta?: object | string ): object;
 	toJSON( meta?: object | string ): object;
