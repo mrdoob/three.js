@@ -99,7 +99,7 @@ NodeMaterial.prototype.getHash = function () {
 	hash += '}'
 
 	return hash;
-	
+
 };
 
 NodeMaterial.prototype.updateFrame = function ( frame ) {

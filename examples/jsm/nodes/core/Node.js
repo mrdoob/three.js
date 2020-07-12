@@ -101,25 +101,25 @@ Node.prototype = {
 	},
 
 	getHash: function() {
-		
+
 		var hash = '{';
-		
+
 		for(var prop in this) {
 
 			var obj = this[ prop ];
-			
+
 			if (obj instanceof Node) {
-				
+
 				hash += '"' + prop + '":' + obj.getHash() + ',';
-				
+
 			}
 
 		}
-		
+
 		hash += '"id":"' + this.uuid + '"}';
-		
+
 		return hash;		
-		
+
 	},
 
 	appendDepsNode: function ( builder, data, output ) {
