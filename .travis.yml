@@ -2,7 +2,7 @@ language: node_js
 node_js:
   - "12.16.2"
 script:
-  - npm run build
+  - npm run build-ci
 env:
   global:
     - COMMIT_AUTHOR_EMAIL: "github@greggman.com"
