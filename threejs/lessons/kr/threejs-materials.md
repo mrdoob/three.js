@@ -12,7 +12,7 @@ Three.js에는 기본으로 제공하는 재질(materials) 몇 개가 있습니�
 어떤 재질을 사용할지는 전적으로 상황에 따라 판단해야 합니다.
 
 재질의 속성(property)를 정하는 방법은 크게 두 가지로 나뉩니다. 하나는
-이전에 보았든 생성자를 호출할 때 값을 넘겨주는 것이고,
+이전처럼 생성자를 호출할 때 값을 넘겨주는 것이고,
 
 ```js
 const material = new THREE.MeshPhongMaterial({
@@ -194,12 +194,12 @@ const m5 = new THREE.MeshBasicMaterial({color: 'hsl(0,100%,50%)'); // 빨강
 `MeshBasicMaterial` ➡ `MeshLambertMaterial` ➡ `MeshPhongMaterial` ➡
 `MeshStandardMaterial` ➡ `MeshPhysicalMaterial`
 
-입니다. 성능에 부담이
+입니다. 성능 부담이
 클수록 더 현실적인 결과물을 얻을 수 있지만, 저사양 지원을 위해서는 코드
-최적화에 그만큼 신경을 써야합니다.
+최적화에 그만큼 신경을 써야 합니다.
 
 또 특수한 경우에 사용하는 세 가지 재질이 있습니다. `ShadowMaterial`은
-그림자로부터 데이터를 가져오는데 사용하죠. 아직 그림자에 대해서는 다루지
+그림자로부터 데이터를 가져오는 데 사용하죠. 아직 그림자에 대해서는 다루지
 않았지만, 그림자에 대해서 살펴볼 때 씬 뒤에서 무슨 일이 일어나는지
 자세히 살펴볼 것입니다.
 
