@@ -107,11 +107,11 @@ Node.prototype = {
 		var hash = '{';
 		var prop, obj;
 
-		for(prop in this) {
+		for ( prop in this ) {
 
 			obj = this[ prop ];
 
-			if (obj instanceof Node) {
+			if ( obj instanceof Node ) {
 
 				hash += '"' + prop + '":' + obj.getHash() + ',';
 
@@ -119,9 +119,9 @@ Node.prototype = {
 
 		}
 
-		if (this.hashProperties) {
+		if ( this.hashProperties ) {
 
-			for(var i = 0; i < this.hashProperties.length; i++) {
+			for ( var i = 0; i < this.hashProperties.length; i ++ ) {
 
 				prop = this.hashProperties[ i ];
 				obj = this[ prop ];
@@ -134,7 +134,7 @@ Node.prototype = {
 
 		hash += '"id":"' + this.uuid + '"}';
 
-		return hash;		
+		return hash;
 
 	},
 
