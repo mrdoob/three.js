@@ -10,6 +10,7 @@ export class Node {
 	userData: object;
 	readonly isNode: true;
 	frameId: number | undefined;
+	hashProperties: string[] | undefined;
 
 	analyze( builder: NodeBuilder, settings?: object ): void;
 	analyzeAndFlow( builder: NodeBuilder, output: string, settings?: object ): object;
