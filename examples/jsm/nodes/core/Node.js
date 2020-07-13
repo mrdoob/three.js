@@ -22,6 +22,8 @@ Node.prototype = {
 
 	isNode: true,
 
+	hashProperties: undefined,
+
 	analyze: function ( builder, settings ) {
 
 		settings = settings || {};
@@ -97,6 +99,42 @@ Node.prototype = {
 	generate: function ( /* builder, output, uuid, type, ns */ ) {
 
 		// This method needs to be implemented in subclasses
+
+	},
+
+	getHash: function() {
+
+		var hash = '{';
+		var prop, obj;
+
+		for ( prop in this ) {
+
+			obj = this[ prop ];
+
+			if ( obj instanceof Node ) {
+
+				hash += '"' + prop + '":' + obj.getHash() + ',';
+
+			}
+
+		}
+
+		if ( this.hashProperties ) {
+
+			for ( var i = 0; i < this.hashProperties.length; i ++ ) {
+
+				prop = this.hashProperties[ i ];
+				obj = this[ prop ];
+
+				hash += '"' + prop + '":"' + String( obj ) + '",';
+
+			}
+
+		}
+
+		hash += '"id":"' + this.uuid + '"}';
+
+		return hash;
 
 	},
 

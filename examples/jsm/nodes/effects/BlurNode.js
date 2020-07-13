@@ -73,6 +73,7 @@ BlurNode.Nodes = ( function () {
 BlurNode.prototype = Object.create( TempNode.prototype );
 BlurNode.prototype.constructor = BlurNode;
 BlurNode.prototype.nodeType = "Blur";
+BlurNode.prototype.hashProperties = [ "blurX", "blurY" ];
 
 BlurNode.prototype.updateFrame = function ( /* frame */ ) {
 
