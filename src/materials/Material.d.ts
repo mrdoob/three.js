@@ -1,5 +1,4 @@
 import { Plane } from './../math/Plane';
-import { Shader } from './../renderers/shaders/ShaderLib';
 import { EventDispatcher } from './../core/EventDispatcher';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
 import {
@@ -322,10 +321,10 @@ export class Material extends EventDispatcher {
 
 	/**
 	 * An optional callback that is executed immediately before the shader program is compiled. This function is called with the shader source code as a parameter. Useful for the modification of built-in materials.
-	 * @param shader Source code of the shader
+	 * @param shaderobject Represents the shader source code and program information.
 	 * @param renderer WebGLRenderer Context that is initializing the material
 	 */
-	onBeforeCompile ( shader : Shader, renderer : WebGLRenderer ) : void;
+	onBeforeCompile ( shaderobject : object, renderer : WebGLRenderer ) : void;
 
 	/**
 	 * In case onBeforeCompile is used, this callback can be used to identify values of settings used in onBeforeCompile, so three.js can reuse a cached shader or recompile the shader as needed.

@@ -53,36 +53,6 @@ function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 		"sheen"
 	];
 
-	function getShaderObject( material, shaderID ) {
-
-		let shaderobject;
-
-		if ( shaderID ) {
-
-			const shader = ShaderLib[ shaderID ];
-
-			shaderobject = {
-				name: material.name || material.type,
-				uniforms: UniformsUtils.clone( shader.uniforms ),
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-			};
-
-		} else {
-
-			shaderobject = {
-				name: material.name || material.type,
-				uniforms: material.uniforms,
-				vertexShader: material.vertexShader,
-				fragmentShader: material.fragmentShader
-			};
-
-		}
-
-		return shaderobject;
-
-	}
-
 	function allocateBones( object ) {
 
 		const skeleton = object.skeleton;
@@ -168,8 +138,21 @@ function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 
 		}
 
-		const shaderobject = getShaderObject( material, shaderID );
-		material.onBeforeCompile( shaderobject, renderer );
+		let vertexShader, fragmentShader;
+
+		if ( shaderID ) {
+
+			const shader = ShaderLib[ shaderID ];
+
+			vertexShader = shader.vertexShader;
+			fragmentShader = shader.fragmentShader;
+
+		} else {
+
+			vertexShader = material.vertexShader;
+			fragmentShader = material.fragmentShader;
+
+		}
 
 		const currentRenderTarget = renderer.getRenderTarget();
 
@@ -178,11 +161,10 @@ function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 			isWebGL2: isWebGL2,
 
 			shaderID: shaderID,
-			shaderName: shaderobject.name,
+			shaderName: material.name || material.type,
 
-			uniforms: shaderobject.uniforms,
-			vertexShader: shaderobject.vertexShader,
-			fragmentShader: shaderobject.fragmentShader,
+			vertexShader: vertexShader,
+			fragmentShader: fragmentShader,
 			defines: material.defines,
 
 			isRawShaderMaterial: material.isRawShaderMaterial,
@@ -342,6 +324,26 @@ function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 
 	}
 
+	function getUniforms( material ) {
+
+		const shaderID = shaderIDs[ material.type ];
+		let uniforms;
+
+		if ( shaderID ) {
+
+			const shader = ShaderLib[ shaderID ];
+			uniforms = UniformsUtils.clone( shader.uniforms );
+
+		} else {
+
+			uniforms = material.uniforms;
+
+		}
+
+		return uniforms;
+
+	}
+
 	function acquireProgram( parameters, cacheKey ) {
 
 		let program;
@@ -392,6 +394,7 @@ function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 	return {
 		getParameters: getParameters,
 		getProgramCacheKey: getProgramCacheKey,
+		getUniforms: getUniforms,
 		acquireProgram: acquireProgram,
 		releaseProgram: releaseProgram,
 		// Exposed for resource monitoring & error feedback via renderer.info:

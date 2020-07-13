@@ -1350,6 +1350,10 @@ function WebGLRenderer( parameters ) {
 
 		if ( programChange ) {
 
+			parameters.uniforms = programCache.getUniforms( material, parameters );
+
+			material.onBeforeCompile( parameters, _this );
+
 			program = programCache.acquireProgram( parameters, programCacheKey );
 
 			materialProperties.program = program;
