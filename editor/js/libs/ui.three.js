@@ -506,7 +506,7 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 	function onDrop( event ) {
 
-		if ( this === currentDrag ) return;
+		if ( this === currentDrag || currentDrag === undefined ) return;
 
 		this.className = 'option';
 
