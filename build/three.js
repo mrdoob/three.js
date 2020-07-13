@@ -104,8 +104,6 @@
 	var CullFaceBack = 1;
 	var CullFaceFront = 2;
 	var CullFaceFrontBack = 3;
-	var FrontFaceDirectionCW = 0;
-	var FrontFaceDirectionCCW = 1;
 	var BasicShadowMap = 0;
 	var PCFShadowMap = 1;
 	var PCFSoftShadowMap = 2;
@@ -19221,36 +19219,6 @@
 			"sheen"
 		];
 
-		function getShaderObject( material, shaderID ) {
-
-			var shaderobject;
-
-			if ( shaderID ) {
-
-				var shader = ShaderLib[ shaderID ];
-
-				shaderobject = {
-					name: material.name || material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader
-				};
-
-			} else {
-
-				shaderobject = {
-					name: material.name || material.type,
-					uniforms: material.uniforms,
-					vertexShader: material.vertexShader,
-					fragmentShader: material.fragmentShader
-				};
-
-			}
-
-			return shaderobject;
-
-		}
-
 		function allocateBones( object ) {
 
 			var skeleton = object.skeleton;
@@ -19336,8 +19304,21 @@
 
 			}
 
-			var shaderobject = getShaderObject( material, shaderID );
-			material.onBeforeCompile( shaderobject, renderer );
+			var vertexShader, fragmentShader;
+
+			if ( shaderID ) {
+
+				var shader = ShaderLib[ shaderID ];
+
+				vertexShader = shader.vertexShader;
+				fragmentShader = shader.fragmentShader;
+
+			} else {
+
+				vertexShader = material.vertexShader;
+				fragmentShader = material.fragmentShader;
+
+			}
 
 			var currentRenderTarget = renderer.getRenderTarget();
 
@@ -19346,11 +19327,10 @@
 				isWebGL2: isWebGL2,
 
 				shaderID: shaderID,
-				shaderName: shaderobject.name,
+				shaderName: material.name || material.type,
 
-				uniforms: shaderobject.uniforms,
-				vertexShader: shaderobject.vertexShader,
-				fragmentShader: shaderobject.fragmentShader,
+				vertexShader: vertexShader,
+				fragmentShader: fragmentShader,
 				defines: material.defines,
 
 				isRawShaderMaterial: material.isRawShaderMaterial,
@@ -19510,6 +19490,26 @@
 
 		}
 
+		function getUniforms( material ) {
+
+			var shaderID = shaderIDs[ material.type ];
+			var uniforms;
+
+			if ( shaderID ) {
+
+				var shader = ShaderLib[ shaderID ];
+				uniforms = UniformsUtils.clone( shader.uniforms );
+
+			} else {
+
+				uniforms = material.uniforms;
+
+			}
+
+			return uniforms;
+
+		}
+
 		function acquireProgram( parameters, cacheKey ) {
 
 			var program;
@@ -19560,6 +19560,7 @@
 		return {
 			getParameters: getParameters,
 			getProgramCacheKey: getProgramCacheKey,
+			getUniforms: getUniforms,
 			acquireProgram: acquireProgram,
 			releaseProgram: releaseProgram,
 			// Exposed for resource monitoring & error feedback via renderer.info:
@@ -26061,6 +26062,10 @@
 			}
 
 			if ( programChange ) {
+
+				parameters.uniforms = programCache.getUniforms( material, parameters );
+
+				material.onBeforeCompile( parameters, _this );
 
 				program = programCache.acquireProgram( parameters, programCacheKey );
 
@@ -40613,6 +40618,7 @@
 			if ( json.side !== undefined ) { material.side = json.side; }
 			if ( json.opacity !== undefined ) { material.opacity = json.opacity; }
 			if ( json.transparent !== undefined ) { material.transparent = json.transparent; }
+			if ( json.transparency !== undefined ) { material.transparency = json.transparency; }
 			if ( json.alphaTest !== undefined ) { material.alphaTest = json.alphaTest; }
 			if ( json.depthTest !== undefined ) { material.depthTest = json.depthTest; }
 			if ( json.depthWrite !== undefined ) { material.depthWrite = json.depthWrite; }
@@ -51521,8 +51527,6 @@
 	exports.FogExp2 = FogExp2;
 	exports.Font = Font;
 	exports.FontLoader = FontLoader;
-	exports.FrontFaceDirectionCCW = FrontFaceDirectionCCW;
-	exports.FrontFaceDirectionCW = FrontFaceDirectionCW;
 	exports.FrontSide = FrontSide;
 	exports.Frustum = Frustum;
 	exports.GammaEncoding = GammaEncoding;
