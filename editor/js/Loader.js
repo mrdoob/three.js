@@ -68,7 +68,7 @@ function Loader( editor ) {
 				return url;
 
 			} );
-			
+
 			manager.addHandler( /\.tga$/i, new TGALoader() );
 
 			for ( var i = 0; i < files.length; i ++ ) {
