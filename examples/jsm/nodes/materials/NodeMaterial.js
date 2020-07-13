@@ -96,7 +96,7 @@ NodeMaterial.prototype.getHash = function () {
 	hash += '"vertex":' + this.vertex.getHash() + ',\n';
 	hash += '"fragment":' + this.fragment.getHash() + '\n';
 
-	hash += '}'
+	hash += '}';
 
 	return hash;
 
