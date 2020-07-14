@@ -43,12 +43,12 @@ function DodecahedronBufferGeometry( radius, detail ) {
 		1, 1, - 1, 1, 1, 1,
 
 		// (0, ±1/φ, ±φ)
-		 0, - r, - t, 0, - r, t,
-		 0, r, - t, 0, r, t,
+		0, - r, - t, 0, - r, t,
+		0, r, - t, 0, r, t,
 
 		// (±1/φ, ±φ, 0)
 		- r, - t, 0, - r, t, 0,
-		 r, - t, 0, r, t, 0,
+		r, - t, 0, r, t, 0,
 
 		// (±φ, 0, ±1/φ)
 		- t, 0, - r, t, 0, - r,

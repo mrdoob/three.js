@@ -10,7 +10,7 @@ import { Vector4 } from '../math/Vector4.js';
  */
 
 /*
- In options, we can specify:
+ * In options, we can specify:
  * Texture parameters for an auto-generated target texture
  * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
 */

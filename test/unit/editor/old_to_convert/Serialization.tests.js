@@ -357,4 +357,3 @@ QUnit.test( "Test Serialization", function( assert ) {
 	}
 
 } );
-

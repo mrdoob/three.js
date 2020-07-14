@@ -8,7 +8,7 @@ export default /* glsl */`
 	#endif
 
 	#ifdef ENV_WORLDPOS
-		
+
 		varying vec3 vWorldPosition;
 
 	#else

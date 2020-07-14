@@ -64,4 +64,3 @@ ScreenUVNode.prototype.toJSON = function ( meta ) {
 };
 
 export { ScreenUVNode };
-

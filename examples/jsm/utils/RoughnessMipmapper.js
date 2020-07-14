@@ -42,7 +42,7 @@ RoughnessMipmapper.prototype = {
 
 		var { roughnessMap, normalMap } = material;
 		if ( roughnessMap == null || normalMap == null || ! roughnessMap.generateMipmaps ||
-              material.userData.roughnessUpdated ) return;
+	material.userData.roughnessUpdated ) return;
 
 		material.userData.roughnessUpdated = true;
 

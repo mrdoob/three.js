@@ -5,6 +5,3 @@ export class ShadowMapViewer {
 	constructor( light: Light )
 
 }
-
-
-

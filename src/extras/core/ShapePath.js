@@ -133,7 +133,7 @@ Object.assign( ShapePath.prototype, {
 					if ( inPt.y !== edgeLowPt.y ) 		continue;			// parallel
 					// edge lies on the same horizontal line as inPt
 					if ( ( ( edgeHighPt.x <= inPt.x ) && ( inPt.x <= edgeLowPt.x ) ) ||
-						 ( ( edgeLowPt.x <= inPt.x ) && ( inPt.x <= edgeHighPt.x ) ) )		return	true;	// inPt: Point on contour !
+						( ( edgeLowPt.x <= inPt.x ) && ( inPt.x <= edgeHighPt.x ) ) )	return true;	// inPt: Point on contour !
 					// continue;
 
 				}

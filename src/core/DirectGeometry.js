@@ -106,7 +106,7 @@ Object.assign( DirectGeometry.prototype, {
 
 				morphTargetsPosition[ i ] = {
 					name: morphTargets[ i ].name,
-				 	data: []
+					data: []
 				};
 
 			}
@@ -128,7 +128,7 @@ Object.assign( DirectGeometry.prototype, {
 
 				morphTargetsNormal[ i ] = {
 					name: morphNormals[ i ].name,
-				 	data: []
+					data: []
 				};
 
 			}

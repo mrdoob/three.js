@@ -158,10 +158,10 @@ ParametricGeometries.TubeGeometry.prototype.constructor = ParametricGeometries.T
 
 
 /*********************************************
-  *
-  * Parametric Replacement for TorusKnotGeometry
-  *
-  *********************************************/
+	*
+	* Parametric Replacement for TorusKnotGeometry
+	*
+	*********************************************/
 ParametricGeometries.TorusKnotGeometry = function ( radius, tube, segmentsT, segmentsR, p, q ) {
 
 	this.radius = radius || 200;
@@ -209,10 +209,10 @@ ParametricGeometries.TorusKnotGeometry.prototype.constructor = ParametricGeometr
 
 
 /*********************************************
-  *
-  * Parametric Replacement for SphereGeometry
-  *
-  *********************************************/
+	*
+	* Parametric Replacement for SphereGeometry
+	*
+	*********************************************/
 ParametricGeometries.SphereGeometry = function ( size, u, v ) {
 
 	function sphere( u, v, target ) {
@@ -237,10 +237,10 @@ ParametricGeometries.SphereGeometry.prototype.constructor = ParametricGeometries
 
 
 /*********************************************
-  *
-  * Parametric Replacement for PlaneGeometry
-  *
-  *********************************************/
+	*
+	* Parametric Replacement for PlaneGeometry
+	*
+	*********************************************/
 
 ParametricGeometries.PlaneGeometry = function ( width, depth, segmentsWidth, segmentsDepth ) {
 

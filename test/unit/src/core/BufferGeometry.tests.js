@@ -576,14 +576,14 @@ export default QUnit.module( 'Core', () => {
 
 			uvs.push( [
 				new Vector2( 1, 0 ),
-			  new Vector2( 1, 1 ),
-			  new Vector2( 0, 1 )
+				new Vector2( 1, 1 ),
+				new Vector2( 0, 1 )
 			] );
 
 			uvs.push( [
 				new Vector2( 0, 1 ),
-			  new Vector2( 0, 0 ),
-			  new Vector2( 1, 0 )
+				new Vector2( 0, 0 ),
+				new Vector2( 1, 0 )
 			] );
 
 			// skin weights
@@ -595,7 +595,7 @@ export default QUnit.module( 'Core', () => {
 
 			geometry.skinWeights.push( sw1, sw2, sw3, sw4 );
 
-			 // skin indices
+			// skin indices
 
 			var si1 = new Vector4( 0, 1, 2, 3 );
 			var si2 = new Vector4( 2, 3, 4, 5 );

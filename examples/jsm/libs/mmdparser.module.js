@@ -21,8 +21,8 @@ CharsetEncoder.prototype.s2u = function ( uint8Array ) {
 		var key = uint8Array[ p ++ ];
 
 		if ( ! ( ( key >= 0x00 && key <= 0x7e ) ||
-          ( key >= 0xa1 && key <= 0xdf ) ) &&
-       p < uint8Array.length ) {
+			( key >= 0xa1 && key <= 0xdf ) ) &&
+		p < uint8Array.length ) {
 
 			key = ( key << 8 ) | uint8Array[ p ++ ];
 

@@ -12,30 +12,30 @@ import {
 
 export interface MaterialCreatorOptions {
 	/**
-   * side: Which side to apply the material
-   * THREE.FrontSide (default), THREE.BackSide, THREE.DoubleSide
-   */
+	* side: Which side to apply the material
+	* THREE.FrontSide (default), THREE.BackSide, THREE.DoubleSide
+	*/
 	side?: Side;
 	/*
-   * wrap: What type of wrapping to apply for textures
-   * THREE.RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping
-   */
+	* wrap: What type of wrapping to apply for textures
+	* THREE.RepeatWrapping (default), THREE.ClampToEdgeWrapping, THREE.MirroredRepeatWrapping
+	*/
 	wrap?: Wrapping;
 	/*
-   * normalizeRGB: RGBs need to be normalized to 0-1 from 0-255
-   * Default: false, assumed to be already normalized
-   */
+	* normalizeRGB: RGBs need to be normalized to 0-1 from 0-255
+	* Default: false, assumed to be already normalized
+	*/
 	normalizeRGB?: boolean;
 	/*
-   * ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
-   * Default: false
-   */
+	* ignoreZeroRGBs: Ignore values of RGBs (Ka,Kd,Ks) that are all 0's
+	* Default: false
+	*/
 	ignoreZeroRGBs?: boolean;
 	/*
-   * invertTrProperty: Use values 1 of Tr field for fully opaque. This option is useful for obj
-   * exported from 3ds MAX, vcglib or meshlab.
-   * Default: false
-   */
+	* invertTrProperty: Use values 1 of Tr field for fully opaque. This option is useful for obj
+	* exported from 3ds MAX, vcglib or meshlab.
+	* Default: false
+	*/
 	invertTrProperty?: boolean;
 }
 

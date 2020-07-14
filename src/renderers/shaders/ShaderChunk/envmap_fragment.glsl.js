@@ -4,7 +4,7 @@ export default /* glsl */`
 	#ifdef ENV_WORLDPOS
 
 		vec3 cameraToFrag;
-		
+
 		if ( isOrthographic ) {
 
 			cameraToFrag = normalize( vec3( - viewMatrix[ 0 ][ 2 ], - viewMatrix[ 1 ][ 2 ], - viewMatrix[ 2 ][ 2 ] ) );

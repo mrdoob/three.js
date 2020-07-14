@@ -15,8 +15,8 @@ import { Curve } from '../core/Curve.js';
 
 /*
 Based on an optimized c++ solution in
- - http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
- - http://ideone.com/NoEbVM
+- http://stackoverflow.com/questions/9489736/catmull-rom-curve-with-no-cusps-and-no-self-intersections/
+- http://ideone.com/NoEbVM
 
 This CubicPoly class could be used for reusing some variables and calculations,
 but for three.js curve use, it could be possible inlined and flatten into a single function call

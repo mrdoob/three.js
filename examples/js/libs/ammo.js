@@ -1,11 +1,11 @@
 
-  // This is ammo.js, a port of Bullet Physics to JavaScript. zlib licensed.
-  
+	// This is ammo.js, a port of Bullet Physics to JavaScript. zlib licensed.
+
 var Ammo = (function() {
-  var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
-  return (
+	var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
+	return (
 function(Ammo) {
-  Ammo = Ammo || {};
+	Ammo = Ammo || {};
 
 var c;var d;d||(d=typeof Ammo !== 'undefined' ? Ammo : {});var aa={},ba;for(ba in d)d.hasOwnProperty(ba)&&(aa[ba]=d[ba]);d.arguments=[];d.thisProgram="./this.program";d.quit=function(a,b){throw b;};d.preRun=[];d.postRun=[];var ca=!1,da=!1,ea=!1,fa=!1;ca="object"===typeof window;da="function"===typeof importScripts;ea="object"===typeof process&&"function"===typeof require&&!ca&&!da;fa=!ca&&!ea&&!da;var ia="";
 if(ea){ia=__dirname+"/";var ja,ka;d.read=function(a,b){var e=la(a);e||(ja||(ja=require("fs")),ka||(ka=require("path")),a=ka.normalize(a),e=ja.readFileSync(a));return b?e:e.toString()};d.readBinary=function(a){a=d.read(a,!0);a.buffer||(a=new Uint8Array(a));assert(a.buffer);return a};1<process.argv.length&&(d.thisProgram=process.argv[1].replace(/\\/g,"/"));d.arguments=process.argv.slice(2);process.on("uncaughtException",function(a){if(!(a instanceof ma))throw a;});process.on("unhandledRejection",na);
@@ -641,14 +641,14 @@ Object.defineProperty(Z.prototype,"m_hitFraction",{get:Z.prototype.Rb,set:Z.prot
 
 
 
-  return Ammo;
+	return Ammo;
 }
 );
 })();
 if (typeof exports === 'object' && typeof module === 'object')
-      module.exports = Ammo;
-    else if (typeof define === 'function' && define['amd'])
-      define([], function() { return Ammo; });
-    else if (typeof exports === 'object')
-      exports["Ammo"] = Ammo;
-    
+			module.exports = Ammo;
+		else if (typeof define === 'function' && define['amd'])
+			define([], function() { return Ammo; });
+		else if (typeof exports === 'object')
+			exports["Ammo"] = Ammo;
+

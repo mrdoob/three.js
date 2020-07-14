@@ -394,4 +394,3 @@ THREE.LineMaterial.prototype = Object.create( THREE.ShaderMaterial.prototype );
 THREE.LineMaterial.prototype.constructor = THREE.LineMaterial;
 
 THREE.LineMaterial.prototype.isLineMaterial = true;
-

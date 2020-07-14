@@ -2759,8 +2759,8 @@ Common.extend( GUI.prototype,
 			var newGuiParams = { name: name, parent: this };
 			newGuiParams.autoPlace = this.autoPlace;
 			if ( this.load &&
-    this.load.folders &&
-    this.load.folders[ name ] ) {
+	this.load.folders &&
+	this.load.folders[ name ] ) {
 
 				newGuiParams.closed = this.load.folders[ name ].closed;
 				newGuiParams.load = this.load.folders[ name ];
@@ -2778,8 +2778,8 @@ Common.extend( GUI.prototype,
 			this.__ul.removeChild( folder.domElement.parentElement );
 			delete this.__folders[ folder.name ];
 			if ( this.load &&
-    this.load.folders &&
-    this.load.folders[ folder.name ] ) {
+	this.load.folders &&
+	this.load.folders[ folder.name ] ) {
 
 				delete this.load.folders[ folder.name ];
 

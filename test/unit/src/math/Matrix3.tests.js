@@ -383,11 +383,11 @@ export default QUnit.module( 'Maths', () => {
 			);
 
 			b.identity()
-			 .translate( - params.centerX, - params.centerY )
-			 .rotate( params.rotation )
-			 .scale( params.repeatX, params.repeatY )
-			 .translate( params.centerX, params.centerY )
-			 .translate( params.offsetX, params.offsetY );
+				.translate( - params.centerX, - params.centerY )
+				.rotate( params.rotation )
+				.scale( params.repeatX, params.repeatY )
+				.translate( params.centerX, params.centerY )
+				.translate( params.offsetX, params.offsetY );
 
 			assert.ok( matrixEquals3( a, expected ), "Check direct method" );
 			assert.ok( matrixEquals3( b, expected ), "Check indirect method" );

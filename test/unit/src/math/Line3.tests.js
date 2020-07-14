@@ -154,7 +154,7 @@ export default QUnit.module( 'Maths', () => {
 
 			// nearby the ray
 			assert.ok( a.closestPointToPointParameter( zero3.clone(), false ) == - 1, "Passed!" );
-			 a.closestPointToPoint( zero3.clone(), false, point );
+				a.closestPointToPoint( zero3.clone(), false, point );
 			assert.ok( point.distanceTo( new Vector3( 1, 1, 0 ) ) < 0.0001, "Passed!" );
 
 			// nearby the ray

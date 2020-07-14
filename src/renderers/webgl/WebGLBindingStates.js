@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @author Mugen87 / https://github.com/Mugen87
  * @author Takahiro / https://github.com/takahirox
  */

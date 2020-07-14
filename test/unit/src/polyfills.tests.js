@@ -39,16 +39,16 @@ export default QUnit.module( 'Polyfills', () => {
 	//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign
 	//http://people.mozilla.org/~jorendorff/es6-draft.html#sec-math.sign
 	/*
-	 20.2.2.29 Math.sign(x)
+		20.2.2.29 Math.sign(x)
 
-	 Returns the sign of the x, indicating whether x is positive, negative or zero.
+		Returns the sign of the x, indicating whether x is positive, negative or zero.
 
-	 If x is NaN, the result is NaN.
-	 If x is -0, the result is -0.
-	 If x is +0, the result is +0.
-	 If x is negative and not -0, the result is -1.
-	 If x is positive and not +0, the result is +1.
-	 */
+		If x is NaN, the result is NaN.
+		If x is -0, the result is -0.
+		If x is +0, the result is +0.
+		If x is negative and not -0, the result is -1.
+		If x is positive and not +0, the result is +1.
+	*/
 	QUnit.test( "Math.sign", ( assert ) => {
 
 		assert.ok( isNaN( Math.sign( NaN ) ), "If x is NaN<NaN>, the result is NaN." );

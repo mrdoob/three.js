@@ -59,4 +59,3 @@ QUnit.test( "Test AddScriptCommand (Undo and Redo)", function( assert ) {
 
 
 } );
-

@@ -71,4 +71,3 @@ export class MarchingCubes extends ImmediateRenderObject {
 
 export const edgeTable: Int32Array[];
 export const triTable: Int32Array[];
-
