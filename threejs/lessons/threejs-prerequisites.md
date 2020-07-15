@@ -186,9 +186,9 @@ new code
  };
 ```
 
-### Use the spread operator `...`
+### Use the rest parameter and the spread operator `...`
 
-The spread operator has a ton of uses. Example
+The rest parameter can be used to consume any number of parameters. Example
 
 ```js
  function log(className, ...args) {
@@ -199,11 +199,15 @@ The spread operator has a ton of uses. Example
  }
 ```
 
-Another example
+The spread operator can be used to expand an iterable into arguments, or copy an array
 
 ```js
 const position = [1, 2, 3];
 somemesh.position.set(...position);
+
+const copiedPositionArray = [...position]
+copiedPositionArray.push(4) // [1,2,3,4] 
+console.log(position) // [1,2,3] position is unaffected
 ```
 
 ### Use `class`
