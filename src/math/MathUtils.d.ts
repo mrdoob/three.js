@@ -66,7 +66,7 @@ export namespace MathUtils {
 	/**
 	 * Deterministic pseudo-random float in the interval [ 0, 1 ].
 	 */
-	export function prng( seed?: number ): number;
+	export function seededRandom( seed?: number ): number;
 
 	export function degToRad( degrees: number ): number;
 

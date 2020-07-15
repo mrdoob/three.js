@@ -117,11 +117,11 @@ const MathUtils = {
 
 	// Deterministic pseudo-random float in the interval [ 0, 1 ]
 
-	prng: function () {
+	seededRandom: function () {
 
 		var seed = 1234567;
 
-		return function prng( s ) {
+		return function seededRandom( s ) {
 
 			if ( s !== undefined ) seed = s % 2147483647;
 
