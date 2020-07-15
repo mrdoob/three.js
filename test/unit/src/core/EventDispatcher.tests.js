@@ -92,6 +92,27 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
+		QUnit.test( "removeAllEventListeners", ( assert ) => {
+
+			var eventDispatcher = new EventDispatcher();
+
+			var callCount = 0;
+			var listener = function () {
+
+				callCount ++;
+
+			};
+
+			eventDispatcher.addEventListener( 'anyType', listener );
+			eventDispatcher.removeAllEventListeners();
+
+			assert.ok( ! eventDispatcher.hasEventListener( 'anyType', listener ), "listener was not found" );
+
+			eventDispatcher.dispatchEvent( { type: 'anyType' } );
+			assert.ok( callCount === 0, "no event, no call" );
+
+		} );
+
 	} );
 
 } );

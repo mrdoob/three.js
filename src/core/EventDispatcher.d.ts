@@ -46,4 +46,9 @@ export class EventDispatcher {
 	 */
 	dispatchEvent( event: { type: string; [attachment: string]: any } ): void;
 
+	/**
+	 * Remove all listeners.
+	 */
+	removeAllEventListeners(): void;
+
 }

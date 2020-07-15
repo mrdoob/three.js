@@ -79,6 +79,12 @@ Object.assign( EventDispatcher.prototype, {
 
 		}
 
+	},
+
+	removeAllEventListeners: function () {
+
+		this._listeners = undefined;
+
 	}
 
 } );
