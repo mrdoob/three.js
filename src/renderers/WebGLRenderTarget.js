@@ -66,6 +66,64 @@ WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prot
 
 	},
 
+	swapTexture: function ( newTexture ) {
+
+		var oldTexture = this.texture;
+
+		if ( ! newTexture ) {
+
+			newTexture = new Texture( undefined, oldTexture.mapping, oldTexture.wrapS, oldTexture.wrapT, oldTexture.magFilter, oldTexture.minFilter, oldTexture.format, oldTexture.type, oldTexture.anisotropy, oldTexture.encoding );
+
+			this.texture.image = {};
+			this.texture.image.width = this.width;
+			this.texture.image.height = this.height;
+
+		} else {
+
+			// Check that the format and type of the new texture match the old - otherwise we can't swap.
+
+			if ( newTexture.isCubeTexture === true || newTexture.isCanvasTexture === true || newTexture.isCompressedTexture === true || newTexture.isDataTexture === true || newTexture.isDepthTexture === true || newTexture.isVideoTexture === true || newTexture.isDataTexture3D === true || newTexture.isDataTexture2DArray === true ) {
+
+				console.error( "Can only swap a regular Texture on a WebGLRenderTarget" );
+				return null;
+
+			}
+
+			if ( newTexture.format !== oldTexture.format ) {
+
+				console.error( "Render target texture can only be swapped with a texture with the same format." );
+				return null;
+
+			}
+
+			if ( newTexture.type !== oldTexture.type ) {
+
+				console.error( "Render target texture can only be swapped with a texture with the same type." );
+				return null;
+
+			}
+
+			if ( newTexture.image !== undefined ) {
+
+				if ( newTexture.image.width !== undefined && newTexture.image.height !== undefined ) {
+
+					this.width = newTexture.image.width;
+					this.height = newTexture.image.height;
+
+				}
+
+			}
+
+		}
+
+		this.texture = newTexture;
+
+		this.dispatchEvent( { type: 'textureAttachmentChange' } );
+
+		return oldTexture;
+
+	},
+
 	clone: function () {
 
 		return new this.constructor().copy( this );
