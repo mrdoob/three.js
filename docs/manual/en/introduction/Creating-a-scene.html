@@ -46,7 +46,7 @@
 		var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-		var renderer = new THREE.WebGLRenderer();
+		var renderer = new THREE.WebGLRenderer({ powerPreference: "high-performance" });
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 		</code>
@@ -67,7 +67,7 @@
 
 		<p>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling <strong>setSize</strong> with false as <strong>updateStyle</strong> (the third argument). For example, <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</p>
 
-		<p>Last but not least, we add the <strong>renderer</strong> element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</p>
+		<p>Last but not least, we add the <strong>renderer</strong> element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us. Note that you can specify whether you want to prioritize performance over power consumption using the `powerPreference` parameter. This provides a <i>hint</i> to the user agent regarding which GPU to use for this WebGL context if you have multiple. See the [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.2.1 WebGL spec] for details.</p>
 
 		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
 
