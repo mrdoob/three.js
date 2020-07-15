@@ -5,6 +5,7 @@ import { Group } from './../../objects/Group';
 import { Scene } from './../../scenes/Scene';
 import { Camera } from './../../cameras/Camera';
 import { BufferGeometry } from '../../core/BufferGeometry';
+import { WebGLProperties } from './WebGLProperties';
 
 export interface RenderTarget {} // not defined in the code, used in LightShadow and WebGRenderer classes
 
@@ -21,6 +22,8 @@ export interface RenderItem {
 }
 
 export class WebGLRenderList {
+
+	constructor( properties: WebGLProperties );
 
 	opaque: Array<RenderItem>;
 	transparent: Array<RenderItem>;
@@ -47,6 +50,8 @@ export class WebGLRenderList {
 }
 
 export class WebGLRenderLists {
+
+	constructor( properties: WebGLProperties );
 
 	dispose(): void;
 	get( scene: Scene, camera: Camera ): WebGLRenderList;
