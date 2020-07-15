@@ -19676,7 +19676,7 @@
 	}
 
 
-	function WebGLRenderList() {
+	function WebGLRenderList( properties ) {
 
 		var renderItems = [];
 		var renderItemsIndex = 0;
@@ -19698,6 +19698,7 @@
 		function getNextRenderItem( object, geometry, material, groupOrder, z, group ) {
 
 			var renderItem = renderItems[ renderItemsIndex ];
+			var materialProperties = properties.get( material );
 
 			if ( renderItem === undefined ) {
 
@@ -19706,7 +19707,7 @@
 					object: object,
 					geometry: geometry,
 					material: material,
-					program: material.program || defaultProgram,
+					program: materialProperties.program || defaultProgram,
 					groupOrder: groupOrder,
 					renderOrder: object.renderOrder,
 					z: z,
@@ -19721,7 +19722,7 @@
 				renderItem.object = object;
 				renderItem.geometry = geometry;
 				renderItem.material = material;
-				renderItem.program = material.program || defaultProgram;
+				renderItem.program = materialProperties.program || defaultProgram;
 				renderItem.groupOrder = groupOrder;
 				renderItem.renderOrder = object.renderOrder;
 				renderItem.z = z;
@@ -19794,7 +19795,7 @@
 
 	}
 
-	function WebGLRenderLists() {
+	function WebGLRenderLists( properties ) {
 
 		var lists = new WeakMap();
 
@@ -19815,7 +19816,7 @@
 
 			if ( cameras === undefined ) {
 
-				list = new WebGLRenderList();
+				list = new WebGLRenderList( properties );
 				lists.set( scene, new WeakMap() );
 				lists.get( scene ).set( camera, list );
 
@@ -19826,7 +19827,7 @@
 				list = cameras.get( camera );
 				if ( list === undefined ) {
 
-					list = new WebGLRenderList();
+					list = new WebGLRenderList( properties );
 					cameras.set( camera, list );
 
 				}
@@ -25016,7 +25017,7 @@
 			morphtargets = new WebGLMorphtargets( _gl );
 			programCache = new WebGLPrograms( _this, extensions, capabilities, bindingStates );
 			materials = new WebGLMaterials( properties );
-			renderLists = new WebGLRenderLists();
+			renderLists = new WebGLRenderLists( properties );
 			renderStates = new WebGLRenderStates();
 
 			background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
@@ -25364,8 +25365,6 @@
 		function releaseMaterialProgramReference( material ) {
 
 			var programInfo = properties.get( material ).program;
-
-			material.program = undefined;
 
 			if ( programInfo !== undefined ) {
 
@@ -26072,7 +26071,6 @@
 				materialProperties.program = program;
 				materialProperties.uniforms = parameters.uniforms;
 				materialProperties.outputEncoding = parameters.outputEncoding;
-				material.program = program;
 
 			}
 
