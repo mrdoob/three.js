@@ -310,6 +310,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/settings/viewport/grid': 'Grid',
+			'sidebar/settings/viewport/helpers': 'Helpers',
 
 			'sidebar/history': 'History',
 			'sidebar/history/persistent': 'persistent',
@@ -628,6 +629,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/settings/viewport/grid': 'Grille',
+			'sidebar/settings/viewport/helpers': 'Helpers',
 
 			'sidebar/history': 'Historique',
 			'sidebar/history/persistent': 'permanent',
@@ -920,6 +922,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
 			'sidebar/settings/viewport/grid': '网格',
+			'sidebar/settings/viewport/helpers': 'Helpers',
 
 			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',
