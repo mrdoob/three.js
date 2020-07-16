@@ -2,8 +2,6 @@ import {
 	UVMapping,
 	CubeReflectionMapping,
 	CubeRefractionMapping,
-	EquirectangularReflectionMapping,
-	EquirectangularRefractionMapping,
 	CubeUVReflectionMapping,
 	CubeUVRefractionMapping,
 
@@ -984,8 +982,6 @@ const TEXTURE_MAPPING = {
 	UVMapping: UVMapping,
 	CubeReflectionMapping: CubeReflectionMapping,
 	CubeRefractionMapping: CubeRefractionMapping,
-	EquirectangularReflectionMapping: EquirectangularReflectionMapping,
-	EquirectangularRefractionMapping: EquirectangularRefractionMapping,
 	CubeUVReflectionMapping: CubeUVReflectionMapping,
 	CubeUVRefractionMapping: CubeUVRefractionMapping
 };
