@@ -25,16 +25,19 @@ import {
 	LinearEncoding,
 	LinearFilter,
 	LinearMipmapLinearFilter,
-	RGB_ETC1_Format,
-	RGB_ETC2_Format,
-	RGBA_ETC2_EAC_Format,
-	RGB_PVRTC_4BPPV1_Format,
-	RGB_S3TC_DXT1_Format,
+	MathUtils,
+	RGBAFormat,
 	RGBA_ASTC_4x4_Format,
+	RGBA_BPTC_Format,
+	RGBA_ETC2_EAC_Format,
 	RGBA_PVRTC_4BPPV1_Format,
 	RGBA_S3TC_DXT5_Format,
-	sRGBEncoding,
+	RGB_ETC1_Format,
+	RGB_ETC2_Format,
+	RGB_PVRTC_4BPPV1_Format,
+	RGB_S3TC_DXT1_Format,
 	UnsignedByteType,
+	sRGBEncoding,
 } from '../../../build/three.module.js';
 
 // Data Format Descriptor (DFD) constants.
@@ -81,6 +84,7 @@ class KTX2Loader extends CompressedTextureLoader {
 			etc1Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
 			etc2Supported: renderer.extensions.has( 'WEBGL_compressed_texture_etc' ),
 			dxtSupported: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
+			bptcSupported: renderer.extensions.has( 'EXT_texture_compression_bptc' ),
 			pvrtcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
 				|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' )
 		};
@@ -437,6 +441,9 @@ class KTX2Container {
 		var hasAlpha = this.getAlpha();
 		var isVideo = false;
 
+		// PVRTC1 transcoders (from both ETC1S and UASTC) only support power of 2 dimensions.
+		var pvrtcTranscodable = MathUtils.isPowerOfTwo( width ) && MathUtils.isPowerOfTwo( height );
+
 		if ( texFormat === TextureFormat.ETC1S ) {
 
 			var numEndpoints = this.sgd.endpointCount;
@@ -458,12 +465,17 @@ class KTX2Container {
 			targetFormat = TranscodeTarget.ASTC_4x4_RGBA;
 			this.transcodedFormat = RGBA_ASTC_4x4_Format;
 
+		} else if ( config.bptcSupported && texFormat === TextureFormat.UASTC4x4 ) {
+
+			targetFormat = hasAlpha ? TranscodeTarget.BC7_M5_RGBA : BC7_M6_RGB;
+			this.transcodedFormat = RGBA_BPTC_Format;
+
 		} else if ( config.dxtSupported ) {
 
 			targetFormat = hasAlpha ? TranscodeTarget.BC3_RGBA : TranscodeTarget.BC1_RGB;
 			this.transcodedFormat = hasAlpha ? RGBA_S3TC_DXT5_Format : RGB_S3TC_DXT1_Format;
 
-		} else if ( config.pvrtcSupported ) {
+		} else if ( config.pvrtcSupported && pvrtcTranscodable ) {
 
 			targetFormat = hasAlpha ? TranscodeTarget.PVRTC1_4_RGBA : TranscodeTarget.PVRTC1_4_RGB;
 			this.transcodedFormat = hasAlpha ? RGBA_PVRTC_4BPPV1_Format : RGB_PVRTC_4BPPV1_Format;
@@ -480,7 +492,10 @@ class KTX2Container {
 
 		} else {
 
-			throw new Error( 'THREE.KTX2Loader: No suitable compressed texture format found.' );
+			console.warn( 'THREE.KTX2Loader: No suitable compressed texture format found. Decoding to RGBA32.' );
+
+			targetFormat = TranscodeTarget.RGBA32;
+			this.transcodedFormat = RGBAFormat;
 
 		}
 
