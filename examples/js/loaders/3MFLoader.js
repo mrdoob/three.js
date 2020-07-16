@@ -984,7 +984,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
-		function buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData ) {
+		function buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData, objectData ) {
 
 			// geometry
 
@@ -1018,21 +1018,21 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				//
 
-				var p1 = triangleProperty.p1;
-				var p2 = triangleProperty.p2;
-				var p3 = triangleProperty.p3;
+				var p1 = ( triangleProperty.p1 !== undefined ) ? triangleProperty.p1 : objectData.pindex;
+				var p2 = ( triangleProperty.p2 !== undefined ) ? triangleProperty.p2 : p1;
+				var p3 = ( triangleProperty.p3 !== undefined ) ? triangleProperty.p3 : p1;
 
 				colorData.push( colors[ ( p1 * 3 ) + 0 ] );
 				colorData.push( colors[ ( p1 * 3 ) + 1 ] );
 				colorData.push( colors[ ( p1 * 3 ) + 2 ] );
 
-				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 0 ] );
-				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 1 ] );
-				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 2 ] );
+				colorData.push( colors[ ( p2 * 3 ) + 0 ] );
+				colorData.push( colors[ ( p2 * 3 ) + 1 ] );
+				colorData.push( colors[ ( p2 * 3 ) + 2 ] );
 
-				colorData.push( colors[ ( ( p3 || p1 ) * 3 ) + 0 ] );
-				colorData.push( colors[ ( ( p3 || p1 ) * 3 ) + 1 ] );
-				colorData.push( colors[ ( ( p3 || p1 ) * 3 ) + 2 ] );
+				colorData.push( colors[ ( p3 * 3 ) + 0 ] );
+				colorData.push( colors[ ( p3 * 3 ) + 1 ] );
+				colorData.push( colors[ ( p3 * 3 ) + 2 ] );
 
 			}
 
@@ -1097,7 +1097,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 					case 'vertexColors':
 						var colorgroup = modelData.resources.colorgroup[ resourceId ];
-						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData ) );
+						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData, objectData ) );
 						break;
 
 					case 'default':
