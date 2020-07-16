@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Sidebar.Geometry.LatheGeometry';
+import { } from '../../../editor/js/Sidebar.Geometry.LatheGeometry';
 
 export default QUnit.module( 'Editor', () => {
 

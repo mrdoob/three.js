@@ -12,7 +12,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param object THREE.Object3D
  * @constructor
  */
-var RemoveObjectCommand = function ( editor, object ) {
+function RemoveObjectCommand( editor, object ) {
 
 	Command.call( this, editor );
 
@@ -27,7 +27,7 @@ var RemoveObjectCommand = function ( editor, object ) {
 
 	}
 
-};
+}
 
 RemoveObjectCommand.prototype = {
 

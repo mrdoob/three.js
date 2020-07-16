@@ -6,6 +6,8 @@
 
 	/* Deterministic random */
 
+	window.Math._random = window.Math.random;
+
 	let seed = Math.PI / 4;
 	window.Math.random = function () {
 

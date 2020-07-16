@@ -14,7 +14,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param optionalOldRotation THREE.Euler
  * @constructor
  */
-var SetRotationCommand = function ( editor, object, newRotation, optionalOldRotation ) {
+function SetRotationCommand( editor, object, newRotation, optionalOldRotation ) {
 
 	Command.call( this, editor );
 
@@ -37,7 +37,7 @@ var SetRotationCommand = function ( editor, object, newRotation, optionalOldRota
 
 	}
 
-};
+}
 
 SetRotationCommand.prototype = {
 

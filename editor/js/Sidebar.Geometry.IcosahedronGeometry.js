@@ -8,7 +8,7 @@ import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryIcosahedronGeometry = function ( editor, object ) {
+function SidebarGeometryIcosahedronGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -54,6 +54,6 @@ var SidebarGeometryIcosahedronGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryIcosahedronGeometry };

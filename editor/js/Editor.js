@@ -10,12 +10,12 @@ import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
 
-var Editor = function () {
+var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
+_DEFAULT_CAMERA.name = 'Camera';
+_DEFAULT_CAMERA.position.set( 0, 5, 10 );
+_DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
 
-	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
-	this.DEFAULT_CAMERA.name = 'Camera';
-	this.DEFAULT_CAMERA.position.set( 0, 5, 10 );
-	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
+function Editor() {
 
 	var Signal = signals.Signal;
 
@@ -44,11 +44,14 @@ var Editor = function () {
 		rendererUpdated: new Signal(),
 
 		sceneBackgroundChanged: new Signal(),
+		sceneEnvironmentChanged: new Signal(),
 		sceneFogChanged: new Signal(),
+		sceneFogSettingsChanged: new Signal(),
 		sceneGraphChanged: new Signal(),
 		sceneRendered: new Signal(),
 
 		cameraChanged: new Signal(),
+		cameraResetted: new Signal(),
 
 		geometryChanged: new Signal(),
 
@@ -90,11 +93,10 @@ var Editor = function () {
 
 	this.loader = new Loader( this );
 
-	this.camera = this.DEFAULT_CAMERA.clone();
+	this.camera = _DEFAULT_CAMERA.clone();
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
-	this.scene.background = new THREE.Color( 0xaaaaaa );
 
 	this.sceneHelpers = new THREE.Scene();
 
@@ -117,7 +119,7 @@ var Editor = function () {
 
 	this.addCamera( this.camera );
 
-};
+}
 
 Editor.prototype = {
 
@@ -530,7 +532,7 @@ Editor.prototype = {
 	setViewportCamera: function ( uuid ) {
 
 		this.viewportCamera = this.cameras[ uuid ];
-		this.signals.viewportCameraChanged.dispatch( this.viewportCamera );
+		this.signals.viewportCameraChanged.dispatch();
 
 	},
 
@@ -611,10 +613,13 @@ Editor.prototype = {
 		this.history.clear();
 		this.storage.clear();
 
-		this.camera.copy( this.DEFAULT_CAMERA );
+		this.camera.copy( _DEFAULT_CAMERA );
+		this.signals.cameraResetted.dispatch();
+
 		this.scene.name = "Scene";
 		this.scene.userData = {};
-		this.scene.background = new THREE.Color( 0xaaaaaa );
+		this.scene.background = null;
+		this.scene.environment = null;
 		this.scene.fog = null;
 
 		var objects = this.scene.children;
@@ -651,8 +656,7 @@ Editor.prototype = {
 		var camera = loader.parse( json.camera );
 
 		this.camera.copy( camera );
-		this.camera.aspect = this.DEFAULT_CAMERA.aspect;
-		this.camera.updateProjectionMatrix();
+		this.signals.cameraResetted.dispatch();
 
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;
@@ -695,8 +699,7 @@ Editor.prototype = {
 				vr: this.config.getKey( 'project/vr' ),
 				physicallyCorrectLights: this.config.getKey( 'project/renderer/physicallyCorrectLights' ),
 				toneMapping: this.config.getKey( 'project/renderer/toneMapping' ),
-				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' ),
-				toneMappingWhitePoint: this.config.getKey( 'project/renderer/toneMappingWhitePoint' ),
+				toneMappingExposure: this.config.getKey( 'project/renderer/toneMappingExposure' )
 			},
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),

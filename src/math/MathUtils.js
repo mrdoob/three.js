@@ -115,6 +115,26 @@ const MathUtils = {
 
 	},
 
+	// Deterministic pseudo-random float in the interval [ 0, 1 ]
+
+	seededRandom: function () {
+
+		var seed = 1234567;
+
+		return function seededRandom( s ) {
+
+			if ( s !== undefined ) seed = s % 2147483647;
+
+			// Park-Miller algorithm
+
+			seed = seed * 16807 % 2147483647;
+
+			return ( seed - 1 ) / 2147483646;
+
+		};
+
+	}(),
+
 	degToRad: function ( degrees ) {
 
 		return degrees * MathUtils.DEG2RAD;

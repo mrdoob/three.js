@@ -90,7 +90,28 @@ const pup = puppeteer.launch( {
 	const injection = fs.readFileSync( 'test/e2e/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
+	const threeJsBuild = fs.readFileSync( 'build/three.module.js', 'utf8' )
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+	await page.setRequestInterception( true );
+
 	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
+	page.on( 'request', async ( request ) => {
+
+		if ( request.url() === 'http://localhost:1234/build/three.module.js' ) {
+
+			await request.respond( {
+				status: 200,
+				contentType: 'application/javascript; charset=utf-8',
+				body: threeJsBuild
+			} );
+
+		} else {
+
+			await request.continue();
+
+		}
+
+	} );
 	page.on( 'response', async ( response ) => {
 
 		try {
@@ -108,12 +129,16 @@ const pup = puppeteer.launch( {
 
 	/* Find files */
 
-	const exactList = process.argv.slice( 2 ).map( f => f.replace( '.html', '' ) );
+	const isMakeScreenshot = process.argv[ 2 ] == '--make';
+	const isExactList = process.argv.length > ( 2 + isMakeScreenshot );
+
+	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
+		.map( f => f.replace( '.html', '' ) );
 
 	const files = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => ( process.argv.length > 2 ) ? exactList.includes( f ) : ! exceptionList.includes( f ) );
+		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 
 	/* Loop for each file, with CI parallelism */
@@ -129,7 +154,7 @@ const pup = puppeteer.launch( {
 
 		/* At least 3 attempts before fail */
 
-		let attemptId = process.env.MAKE ? 1.5 : 0;
+		let attemptId = isMakeScreenshot ? 1.5 : 0;
 
 		while ( attemptId < maxAttemptId ) {
 
@@ -218,7 +243,7 @@ const pup = puppeteer.launch( {
 			}
 
 
-			if ( process.env.MAKE ) {
+			if ( isMakeScreenshot ) {
 
 
 				/* Make screenshots */
@@ -315,7 +340,7 @@ const pup = puppeteer.launch( {
 
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endId - beginId } screenshots not pass.` );
 
-	} else if ( ! process.env.MAKE ) {
+	} else if ( ! isMakeScreenshot ) {
 
 		console.green( `TEST PASSED! ${ endId - beginId } screenshots correctly rendered.` );
 

@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Sidebar.Geometry.SphereGeometry';
+import { } from '../../../editor/js/Sidebar.Geometry.SphereGeometry';
 
 export default QUnit.module( 'Editor', () => {
 

@@ -48,14 +48,14 @@
 				// Check for float-RT support
 				// TODO (abelnation): figure out fall-back for float textures
 
-				if ( ! renderer.extensions.get( 'OES_texture_float' ) ) {
+				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_float' ) ) {
 
 					alert( 'OES_texture_float not supported' );
 					throw 'missing webgl extension';
 
 				}
 
-				if ( ! renderer.extensions.get( 'OES_texture_float_linear' ) ) {
+				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_float_linear' ) ) {
 
 					alert( 'OES_texture_float_linear not supported' );
 					throw 'missing webgl extension';

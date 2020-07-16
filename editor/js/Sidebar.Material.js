@@ -31,7 +31,7 @@ var materialClasses = {
 	'SpriteMaterial': THREE.SpriteMaterial
 };
 
-var SidebarMaterial = function ( editor ) {
+function SidebarMaterial( editor ) {
 
 	var strings = editor.strings;
 
@@ -561,6 +561,26 @@ var SidebarMaterial = function ( editor ) {
 	materialAlphaTestRow.add( materialAlphaTest );
 
 	container.add( materialAlphaTestRow );
+
+	// depth test
+
+	var materialDepthTestRow = new UIRow();
+	var materialDepthTest = new UICheckbox().onChange( update );
+
+	materialDepthTestRow.add( new UIText( strings.getKey( 'sidebar/material/depthtest' ) ).setWidth( '90px' ) );
+	materialDepthTestRow.add( materialDepthTest );
+
+	container.add( materialDepthTestRow );
+
+	// depth write
+
+	var materialDepthWriteRow = new UIRow();
+	var materialDepthWrite = new UICheckbox().onChange( update );
+
+	materialDepthWriteRow.add( new UIText( strings.getKey( 'sidebar/material/depthwrite' ) ).setWidth( '90px' ) );
+	materialDepthWriteRow.add( materialDepthWrite );
+
+	container.add( materialDepthWriteRow );
 
 	// wireframe
 
@@ -1136,6 +1156,18 @@ var SidebarMaterial = function ( editor ) {
 
 			}
 
+			if ( material.depthTest !== undefined && material.depthTest !== materialDepthTest.getValue() ) {
+
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthTest', materialDepthTest.getValue(), currentMaterialSlot ) );
+
+			}
+
+			if ( material.depthWrite !== undefined && material.depthWrite !== materialDepthWrite.getValue() ) {
+
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'depthWrite', materialDepthWrite.getValue(), currentMaterialSlot ) );
+
+			}
+
 			if ( material.wireframe !== undefined && material.wireframe !== materialWireframe.getValue() ) {
 
 				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'wireframe', materialWireframe.getValue(), currentMaterialSlot ) );
@@ -1217,6 +1249,8 @@ var SidebarMaterial = function ( editor ) {
 			'opacity': materialOpacityRow,
 			'transparent': materialTransparentRow,
 			'alphaTest': materialAlphaTestRow,
+			'depthTest': materialDepthTestRow,
+			'depthWrite': materialDepthWriteRow,
 			'wireframe': materialWireframeRow
 		};
 
@@ -1592,6 +1626,18 @@ var SidebarMaterial = function ( editor ) {
 
 		}
 
+		if ( material.depthTest !== undefined ) {
+
+			materialDepthTest.setValue( material.depthTest );
+
+		}
+
+		if ( material.depthWrite !== undefined ) {
+
+			materialDepthWrite.setValue( material.depthWrite );
+
+		}
+
 		if ( material.wireframe !== undefined ) {
 
 			materialWireframe.setValue( material.wireframe );
@@ -1651,6 +1697,6 @@ var SidebarMaterial = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarMaterial };

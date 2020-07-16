@@ -10,7 +10,7 @@ import { Command } from '../Command.js';
  * @param cmdArray array containing command objects
  * @constructor
  */
-var MultiCmdsCommand = function ( editor, cmdArray ) {
+function MultiCmdsCommand( editor, cmdArray ) {
 
 	Command.call( this, editor );
 
@@ -19,7 +19,7 @@ var MultiCmdsCommand = function ( editor, cmdArray ) {
 
 	this.cmdArray = ( cmdArray !== undefined ) ? cmdArray : [];
 
-};
+}
 
 MultiCmdsCommand.prototype = {
 

@@ -14,7 +14,7 @@ import { MoveObjectCommand } from '../commands/MoveObjectCommand.js';
  * @author mrdoob / http://mrdoob.com/
  */
 
-var UITexture = function ( mapping ) {
+function UITexture( mapping ) {
 
 	UIElement.call( this );
 
@@ -55,18 +55,59 @@ var UITexture = function ( mapping ) {
 
 	function loadFile( file ) {
 
-		if ( file.type.match( 'image.*' ) ) {
+		var extension = file.name.split( '.' ).pop().toLowerCase()
+		var reader = new FileReader();
 
-			var reader = new FileReader();
+		if ( extension === 'hdr' ) {
 
-			if ( file.type === 'image/targa' ) {
+			reader.addEventListener( 'load', function ( event ) {
 
-				reader.addEventListener( 'load', function ( event ) {
+				// assuming RGBE/Radiance HDR iamge format
 
-					var canvas = new TGALoader().parse( event.target.result );
+				var loader = new RGBELoader().setDataType( THREE.UnsignedByteType );
+				loader.load( event.target.result, function ( hdrTexture ) {
 
-					var texture = new THREE.CanvasTexture( canvas, mapping );
+					hdrTexture.sourceFile = file.name;
+					hdrTexture.isHDRTexture = true;
+
+					scope.setValue( hdrTexture );
+
+					if ( scope.onChangeCallback ) scope.onChangeCallback( hdrTexture );
+
+				} );
+
+			} );
+
+			reader.readAsDataURL( file );
+
+		} else if ( extension === 'tga' ) {
+
+			reader.addEventListener( 'load', function ( event ) {
+
+				var canvas = new TGALoader().parse( event.target.result );
+
+				var texture = new THREE.CanvasTexture( canvas, mapping );
+				texture.sourceFile = file.name;
+
+				scope.setValue( texture );
+
+				if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
+
+			}, false );
+
+			reader.readAsArrayBuffer( file );
+
+		} else if ( file.type.match( 'image.*' ) ) {
+
+			reader.addEventListener( 'load', function ( event ) {
+
+				var image = document.createElement( 'img' );
+				image.addEventListener( 'load', function () {
+
+					var texture = new THREE.Texture( this, mapping );
 					texture.sourceFile = file.name;
+					texture.format = file.type === 'image/jpeg' ? THREE.RGBFormat : THREE.RGBAFormat;
+					texture.needsUpdate = true;
 
 					scope.setValue( texture );
 
@@ -74,61 +115,11 @@ var UITexture = function ( mapping ) {
 
 				}, false );
 
-				reader.readAsArrayBuffer( file );
+				image.src = event.target.result;
 
-			} else {
-
-				reader.addEventListener( 'load', function ( event ) {
-
-					var image = document.createElement( 'img' );
-					image.addEventListener( 'load', function () {
-
-						var texture = new THREE.Texture( this, mapping );
-						texture.sourceFile = file.name;
-						texture.format = file.type === 'image/jpeg' ? THREE.RGBFormat : THREE.RGBAFormat;
-						texture.needsUpdate = true;
-
-						scope.setValue( texture );
-
-						if ( scope.onChangeCallback ) scope.onChangeCallback( texture );
-
-					}, false );
-
-					image.src = event.target.result;
-
-				}, false );
-
-				reader.readAsDataURL( file );
-
-			}
-
-		} else {
-
-			var reader = new FileReader();
-			reader.addEventListener( 'load', function ( event ) {
-
-				if ( file.name.split( '.' ).pop() === 'hdr' ) {
-
-					// assuming RGBE/Radiance HDR iamge format
-
-					var loader = new RGBELoader().setDataType( THREE.UnsignedByteType );
-					loader.load( event.target.result, function ( hdrTexture ) {
-
-						hdrTexture.sourceFile = file.name;
-						hdrTexture.isHDRTexture = true;
-
-						scope.setValue( hdrTexture );
-
-						if ( scope.onChangeCallback ) scope.onChangeCallback( hdrTexture );
-
-					} );
-
-				}
-
-			} );
+			}, false );
 
 			reader.readAsDataURL( file );
-
 		}
 
 		form.reset();
@@ -141,7 +132,7 @@ var UITexture = function ( mapping ) {
 
 	return this;
 
-};
+}
 
 UITexture.prototype = Object.create( UIElement.prototype );
 UITexture.prototype.constructor = UITexture;
@@ -156,6 +147,14 @@ UITexture.prototype.setValue = function ( texture ) {
 
 	var canvas = this.dom.children[ 0 ];
 	var context = canvas.getContext( '2d' );
+
+	// Seems like context can be null if the canvas is not visible
+	if ( context ) {
+
+		// Always clear the context before set new texture, because new texture may has transparency
+		context.clearRect( 0, 0, canvas.width, canvas.height );
+
+	}
 
 	if ( texture !== null ) {
 
@@ -180,21 +179,12 @@ UITexture.prototype.setValue = function ( texture ) {
 		} else {
 
 			canvas.title = texture.sourceFile + ' (error)';
-			context.clearRect( 0, 0, canvas.width, canvas.height );
 
 		}
 
 	} else {
 
 		canvas.title = 'empty';
-
-		if ( context !== null ) {
-
-			// Seems like context can be null if the canvas is not visible
-
-			context.clearRect( 0, 0, canvas.width, canvas.height );
-
-		}
 
 	}
 
@@ -225,7 +215,7 @@ UITexture.prototype.onChange = function ( callback ) {
 
 // UICubeTexture
 
-var UICubeTexture = function () {
+function UICubeTexture() {
 
 	UIElement.call( this );
 
@@ -295,7 +285,7 @@ var UICubeTexture = function () {
 
 	}
 
-};
+}
 
 UICubeTexture.prototype = Object.create( UIElement.prototype );
 UICubeTexture.prototype.constructor = UICubeTexture;
@@ -366,7 +356,7 @@ UICubeTexture.prototype.onChange = function ( callback ) {
 
 // UIOutliner
 
-var UIOutliner = function ( editor ) {
+function UIOutliner( editor ) {
 
 	UIElement.call( this );
 
@@ -419,7 +409,7 @@ var UIOutliner = function ( editor ) {
 
 	return this;
 
-};
+}
 
 UIOutliner.prototype = Object.create( UIElement.prototype );
 UIOutliner.prototype.constructor = UIOutliner;
@@ -506,7 +496,7 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 	function onDrop( event ) {
 
-		if ( this === currentDrag ) return;
+		if ( this === currentDrag || currentDrag === undefined ) return;
 
 		this.className = 'option';
 
@@ -584,16 +574,16 @@ UIOutliner.prototype.setOptions = function ( options ) {
 
 		scope.options.push( div );
 
-		div.addEventListener( 'click', onClick, false );
+		div.addEventListener( 'click', onClick );
 
 		if ( div.draggable === true ) {
 
-			div.addEventListener( 'drag', onDrag, false );
-			div.addEventListener( 'dragstart', onDragStart, false ); // Firefox needs this
+			div.addEventListener( 'drag', onDrag );
+			div.addEventListener( 'dragstart', onDragStart ); // Firefox needs this
 
-			div.addEventListener( 'dragover', onDragOver, false );
-			div.addEventListener( 'dragleave', onDragLeave, false );
-			div.addEventListener( 'drop', onDrop, false );
+			div.addEventListener( 'dragover', onDragOver );
+			div.addEventListener( 'dragleave', onDragLeave );
+			div.addEventListener( 'drop', onDrop );
 
 		}
 
@@ -652,7 +642,7 @@ UIOutliner.prototype.setValue = function ( value ) {
 
 };
 
-var UIPoints = function ( onAddClicked ) {
+function UIPoints( onAddClicked ) {
 
 	UIElement.call( this );
 
@@ -683,7 +673,7 @@ var UIPoints = function ( onAddClicked ) {
 	this.onChangeCallback = null;
 	return this;
 
-};
+}
 
 UIPoints.prototype = Object.create( UIElement.prototype );
 UIPoints.prototype.constructor = UIPoints;
@@ -727,13 +717,13 @@ UIPoints.prototype.deletePointRow = function ( idx, dontUpdate ) {
 
 };
 
-var UIPoints2 = function () {
+function UIPoints2() {
 
 	UIPoints.call( this, UIPoints2.addRow.bind( this ) );
 
 	return this;
 
-};
+}
 
 UIPoints2.prototype = Object.create( UIPoints.prototype );
 UIPoints2.prototype.constructor = UIPoints2;
@@ -817,13 +807,13 @@ UIPoints2.prototype.createPointRow = function ( x, y ) {
 
 };
 
-var UIPoints3 = function () {
+function UIPoints3() {
 
 	UIPoints.call( this, UIPoints3.addRow.bind( this ) );
 
 	return this;
 
-};
+}
 
 UIPoints3.prototype = Object.create( UIPoints.prototype );
 UIPoints3.prototype.constructor = UIPoints3;
@@ -908,7 +898,7 @@ UIPoints3.prototype.createPointRow = function ( x, y, z ) {
 
 };
 
-var UIBoolean = function ( boolean, text ) {
+function UIBoolean( boolean, text ) {
 
 	UISpan.call( this );
 
@@ -920,7 +910,7 @@ var UIBoolean = function ( boolean, text ) {
 	this.add( this.checkbox );
 	this.add( this.text );
 
-};
+}
 
 UIBoolean.prototype = Object.create( UISpan.prototype );
 UIBoolean.prototype.constructor = UIBoolean;
@@ -943,16 +933,14 @@ function renderToCanvas( texture ) {
 
 	if ( renderer === undefined ) {
 
-		renderer = new THREE.WebGLRenderer( { canvas: new OffscreenCanvas( 1, 1 ) } );
+		renderer = new THREE.WebGLRenderer();
+		renderer.outputEncoding = THREE.sRGBEncoding;
 
 	}
 
 	var image = texture.image;
 
 	renderer.setSize( image.width, image.height, false );
-	renderer.toneMapping = THREE.ReinhardToneMapping;
-	renderer.toneMappingExposure = 2;
-	renderer.outputEncoding = THREE.sRGBEncoding;
 
 	var scene = new THREE.Scene();
 	var camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );

@@ -21,6 +21,8 @@ import { TDSLoader } from '../../examples/jsm/loaders/TDSLoader.js';
 import { VTKLoader } from '../../examples/jsm/loaders/VTKLoader.js';
 import { VRMLLoader } from '../../examples/jsm/loaders/VRMLLoader.js';
 
+import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
+
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
 import { SetSceneCommand } from './commands/SetSceneCommand.js';
 
@@ -28,7 +30,7 @@ import { LoaderUtils } from './LoaderUtils.js';
 
 import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
 
-var Loader = function ( editor ) {
+function Loader( editor ) {
 
 	var scope = this;
 
@@ -66,6 +68,8 @@ var Loader = function ( editor ) {
 				return url;
 
 			} );
+
+			manager.addHandler( /\.tga$/i, new TGALoader() );
 
 			for ( var i = 0; i < files.length; i ++ ) {
 
@@ -521,7 +525,7 @@ var Loader = function ( editor ) {
 
 			default:
 
-				// alert( 'Unsupported file format (' + extension +  ').' );
+				console.error( 'Unsupported file format (' + extension + ').' );
 
 				break;
 
@@ -717,6 +721,6 @@ var Loader = function ( editor ) {
 
 	}
 
-};
+}
 
 export { Loader };

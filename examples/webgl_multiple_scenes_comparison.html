@@ -6,6 +6,7 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
+
 			.container {
 				position: absolute;
 				width: 100%;
@@ -18,7 +19,7 @@
 
 				width: 40px;
 				height: 40px;
-				background-color: #2196F3;
+				background-color: #F32196;
 				opacity: 0.7;
 				border-radius: 50%;
 
@@ -56,13 +57,13 @@
 				container = document.querySelector( '.container' );
 
 				sceneL = new THREE.Scene();
-				sceneL.background = new THREE.Color( 0xff00ff );
+				sceneL.background = new THREE.Color( 0xBCD48F );
 
 				sceneR = new THREE.Scene();
 				sceneR.background = new THREE.Color( 0x8FBCD4 );
 
-				camera = new THREE.PerspectiveCamera( 35, container.clientWidth / container.clientHeight, 0.1, 10 );
-				camera.position.set( 2, 4, 7 );
+				camera = new THREE.PerspectiveCamera( 35, container.clientWidth / container.clientHeight, 0.1, 100 );
+				camera.position.z = 6;
 
 				controls = new OrbitControls( camera, container );
 
@@ -88,13 +89,13 @@
 
 			function initMeshes() {
 
-				var geoB = new THREE.BoxBufferGeometry( 2, 2, 2 );
-				var matB = new THREE.MeshStandardMaterial( { color: 0x0000ff } );
+				var geoB = new THREE.IcosahedronBufferGeometry( 1, 2 );
+				var matB = new THREE.MeshStandardMaterial();
 				var meshB = new THREE.Mesh( geoB, matB );
 				sceneL.add( meshB );
 
-				var geoA = new THREE.IcosahedronBufferGeometry( 1, 0 );
-				var matA = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				var geoA = new THREE.IcosahedronBufferGeometry( 1, 2 );
+				var matA = new THREE.MeshStandardMaterial( { wireframe: true } );
 				var meshA = new THREE.Mesh( geoA, matA );
 				sceneR.add( meshA );
 
@@ -102,15 +103,10 @@
 
 			function initLights() {
 
-				var light1 = new THREE.DirectionalLight();
-				light1.position.set( 20, 20, 20 );
-				sceneL.add( light1 );
-				sceneR.add( light1.clone() );
-
-				var light2 = new THREE.DirectionalLight();
-				light2.position.set( - 20, 20, 20 );
-				sceneL.add( light2 );
-				sceneR.add( light2.clone() );
+				var light = new THREE.HemisphereLight( 0xffffff, 0x444444, 1 );
+				light.position.set( - 2, 2, 2 );
+				sceneL.add( light.clone() );
+				sceneR.add( light.clone() );
 
 			}
 

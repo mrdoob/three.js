@@ -8,7 +8,7 @@ import { SidebarObject } from './Sidebar.Object.js';
 import { SidebarGeometry } from './Sidebar.Geometry.js';
 import { SidebarMaterial } from './Sidebar.Material.js';
 
-var SidebarProperties = function ( editor ) {
+function SidebarProperties( editor ) {
 
 	var strings = editor.strings;
 
@@ -22,6 +22,6 @@ var SidebarProperties = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarProperties };

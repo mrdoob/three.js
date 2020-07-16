@@ -1,4 +1,4 @@
-console.warn( "THREE.Water: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
+console.warn( "THREE.Water: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author jbouny / https://github.com/jbouny
  *
@@ -103,6 +103,8 @@ THREE.Water = function ( geometry, options ) {
 			'	vec4 mvPosition =  modelViewMatrix * vec4( position, 1.0 );',
 			'	gl_Position = projectionMatrix * mvPosition;',
 
+			'#include <beginnormal_vertex>',
+			'#include <defaultnormal_vertex>',
 			'#include <logdepthbuf_vertex>',
 			'#include <fog_vertex>',
 			'#include <shadowmap_vertex>',
@@ -283,7 +285,25 @@ THREE.Water = function ( geometry, options ) {
 
 		eye.setFromMatrixPosition( camera.matrixWorld );
 
-		//
+		// Render
+
+		if ( renderer.outputEncoding !== THREE.LinearEncoding ) {
+
+			console.warn( 'THREE.Water: WebGLRenderer must use LinearEncoding as outputEncoding.' );
+			scope.onBeforeRender = function () {};
+
+			return;
+
+		}
+
+		if ( renderer.toneMapping !== THREE.NoToneMapping ) {
+
+			console.warn( 'THREE.Water: WebGLRenderer must use NoToneMapping as toneMapping.' );
+			scope.onBeforeRender = function () {};
+
+			return;
+
+		}
 
 		var currentRenderTarget = renderer.getRenderTarget();
 

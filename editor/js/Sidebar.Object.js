@@ -14,7 +14,7 @@ import { SetRotationCommand } from './commands/SetRotationCommand.js';
 import { SetScaleCommand } from './commands/SetScaleCommand.js';
 import { SetColorCommand } from './commands/SetColorCommand.js';
 
-var SidebarObject = function ( editor ) {
+function SidebarObject( editor ) {
 
 	var strings = editor.strings;
 
@@ -302,6 +302,28 @@ var SidebarObject = function ( editor ) {
 
 	container.add( objectShadowRow );
 
+	// shadow bias
+
+	var objectShadowBiasRow = new UIRow();
+
+	objectShadowBiasRow.add( new UIText( strings.getKey( 'sidebar/object/shadowBias' ) ).setWidth( '90px' ) );
+
+	var objectShadowBias = new UINumber( 0 ).setPrecision( 5 ).setStep( 0.0001 ).setNudge( 0.00001 ).onChange( update );
+	objectShadowBiasRow.add( objectShadowBias );
+
+	container.add( objectShadowBiasRow );
+
+	// shadow normal offset
+
+	var objectShadowNormalBiasRow = new UIRow();
+
+	objectShadowNormalBiasRow.add( new UIText( strings.getKey( 'sidebar/object/shadowNormalBias' ) ).setWidth( '90px' ) );
+
+	var objectShadowNormalBias = new UINumber( 0 ).onChange( update );
+	objectShadowNormalBiasRow.add( objectShadowNormalBias );
+
+	container.add( objectShadowNormalBiasRow );
+
 	// shadow radius
 
 	var objectShadowRadiusRow = new UIRow();
@@ -312,17 +334,6 @@ var SidebarObject = function ( editor ) {
 	objectShadowRadiusRow.add( objectShadowRadius );
 
 	container.add( objectShadowRadiusRow );
-
-	// shadow bias
-
-	var objectShadowBiasRow = new UIRow();
-
-	objectShadowBiasRow.add( new UIText( strings.getKey( 'sidebar/object/shadowBias' ) ).setWidth( '90px' ) );
-
-	var objectShadowBias = new UINumber( 0 ).setPrecision( 6 ).setStep( 0.001 ).setNudge( 0.000001 ).onChange( update );
-	objectShadowBiasRow.add( objectShadowBias );
-
-	container.add( objectShadowBiasRow );
 
 	// visible
 
@@ -594,15 +605,21 @@ var SidebarObject = function ( editor ) {
 
 			if ( object.shadow !== undefined ) {
 
-				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
-
-					editor.execute( new SetValueCommand( editor, object.shadow, 'radius', objectShadowRadius.getValue() ) );
-
-				}
-
 				if ( object.shadow.bias !== objectShadowBias.getValue() ) {
 
 					editor.execute( new SetValueCommand( editor, object.shadow, 'bias', objectShadowBias.getValue() ) );
+
+				}
+
+				if ( object.shadow.normalBias !== objectShadowNormalBias.getValue() ) {
+
+					editor.execute( new SetValueCommand( editor, object.shadow, 'normalBias', objectShadowNormalBias.getValue() ) );
+
+				}
+
+				if ( object.shadow.radius !== objectShadowRadius.getValue() ) {
+
+					editor.execute( new SetValueCommand( editor, object.shadow, 'radius', objectShadowRadius.getValue() ) );
 
 				}
 
@@ -646,7 +663,7 @@ var SidebarObject = function ( editor ) {
 			'decay': objectDecayRow,
 			'castShadow': objectShadowRow,
 			'receiveShadow': objectReceiveShadow,
-			'shadow': [ objectShadowRadiusRow, objectShadowBiasRow ]
+			'shadow': [ objectShadowBiasRow, objectShadowNormalBiasRow, objectShadowRadiusRow ]
 		};
 
 		for ( var property in properties ) {
@@ -840,8 +857,9 @@ var SidebarObject = function ( editor ) {
 
 		if ( object.shadow !== undefined ) {
 
-			objectShadowRadius.setValue( object.shadow.radius );
 			objectShadowBias.setValue( object.shadow.bias );
+			objectShadowNormalBias.setValue( object.shadow.normalBias );
+			objectShadowRadius.setValue( object.shadow.radius );
 
 		}
 
@@ -868,6 +886,6 @@ var SidebarObject = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarObject };
