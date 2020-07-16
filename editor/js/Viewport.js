@@ -38,6 +38,7 @@ function Viewport( editor ) {
 	var camera = editor.camera;
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
+	var showSceneHelpers = true;
 
 	var objects = [];
 
@@ -688,6 +689,15 @@ function Viewport( editor ) {
 
 	} );
 
+	signals.showHelpersChanged.add( function ( showHelpers ) {
+
+		showSceneHelpers = showHelpers;
+		transformControls.enabled = showHelpers;
+
+		render();
+
+	} );
+
 	signals.cameraResetted.add( updateAspectRatio );
 
 	// animations
@@ -743,7 +753,7 @@ function Viewport( editor ) {
 		if ( camera === editor.viewportCamera ) {
 
 			renderer.autoClear = false;
-			renderer.render( sceneHelpers, camera );
+			if ( showSceneHelpers === true ) renderer.render( sceneHelpers, camera );
 			viewHelper.render( renderer );
 			renderer.autoClear = true;
 
