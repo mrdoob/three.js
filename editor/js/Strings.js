@@ -841,6 +841,16 @@ function Strings( config ) {
 			'sidebar/geometry/torusKnot_geometry/p': '管长弧度',
 			'sidebar/geometry/torusKnot_geometry/q': '扭曲弧度',
 
+
+			'sidebar/geometry/tube_geometry/path': '路径',
+			'sidebar/geometry/tube_geometry/radius': '半径',
+			'sidebar/geometry/tube_geometry/tube': '管厚',
+			'sidebar/geometry/tube_geometry/tubularsegments': '管厚分段',
+			'sidebar/geometry/tube_geometry/radialsegments': '半径分段',
+			'sidebar/geometry/tube_geometry/closed': '闭合',
+			'sidebar/geometry/tube_geometry/curvetype': '曲线类型',
+			'sidebar/geometry/tube_geometry/tension': '张力',
+
 			'sidebar/material/new': '更新',
 			'sidebar/material/copy': '复制',
 			'sidebar/material/paste': '粘贴',
