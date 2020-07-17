@@ -99,7 +99,7 @@ Material.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			const newValue = values[ key ];
 
-			if ( newValue === undefined ) {
+			if ( Object.prototype.toString.call(key) === '[object Undefined]' ) {
 
 				console.warn( "THREE.Material: '" + key + "' parameter is undefined." );
 				continue;
