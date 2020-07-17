@@ -841,7 +841,6 @@ function Strings( config ) {
 			'sidebar/geometry/torusKnot_geometry/p': '管长弧度',
 			'sidebar/geometry/torusKnot_geometry/q': '扭曲弧度',
 
-
 			'sidebar/geometry/tube_geometry/path': '路径',
 			'sidebar/geometry/tube_geometry/radius': '半径',
 			'sidebar/geometry/tube_geometry/tube': '管厚',
