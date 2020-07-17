@@ -922,7 +922,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
 			'sidebar/settings/viewport/grid': '网格',
-			'sidebar/settings/viewport/helpers': 'Helpers',
+			'sidebar/settings/viewport/helpers': '辅助',
 
 			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',
