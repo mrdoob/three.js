@@ -6,7 +6,7 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { Geometry } from '../core/Geometry.js';
-import { _Math } from '../math/Math.js';
+import { MathUtils } from '../math/MathUtils.js';
 
 function EdgesGeometry( geometry, thresholdAngle ) {
 
@@ -22,17 +22,18 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	// buffer
 
-	var vertices = [];
+	const vertices = [];
 
 	// helper variables
 
-	var thresholdDot = Math.cos( _Math.DEG2RAD * thresholdAngle );
-	var edge = [ 0, 0 ], edges = {}, edge1, edge2;
-	var key, keys = [ 'a', 'b', 'c' ];
+	const thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
+	const edge = [ 0, 0 ], edges = {};
+	let edge1, edge2, key;
+	const keys = [ 'a', 'b', 'c' ];
 
 	// prepare source geometry
 
-	var geometry2;
+	let geometry2;
 
 	if ( geometry.isBufferGeometry ) {
 
@@ -48,16 +49,16 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 	geometry2.mergeVertices();
 	geometry2.computeFaceNormals();
 
-	var sourceVertices = geometry2.vertices;
-	var faces = geometry2.faces;
+	const sourceVertices = geometry2.vertices;
+	const faces = geometry2.faces;
 
 	// now create a data structure where each entry represents an edge with its adjoining faces
 
-	for ( var i = 0, l = faces.length; i < l; i ++ ) {
+	for ( let i = 0, l = faces.length; i < l; i ++ ) {
 
-		var face = faces[ i ];
+		const face = faces[ i ];
 
-		for ( var j = 0; j < 3; j ++ ) {
+		for ( let j = 0; j < 3; j ++ ) {
 
 			edge1 = face[ keys[ j ] ];
 			edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
@@ -84,13 +85,13 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	for ( key in edges ) {
 
-		var e = edges[ key ];
+		const e = edges[ key ];
 
 		// an edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
 
 		if ( e.face2 === undefined || faces[ e.face1 ].normal.dot( faces[ e.face2 ].normal ) <= thresholdDot ) {
 
-			var vertex = sourceVertices[ e.index1 ];
+			let vertex = sourceVertices[ e.index1 ];
 			vertices.push( vertex.x, vertex.y, vertex.z );
 
 			vertex = sourceVertices[ e.index2 ];
@@ -102,7 +103,7 @@ function EdgesGeometry( geometry, thresholdAngle ) {
 
 	// build geometry
 
-	this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 }
 

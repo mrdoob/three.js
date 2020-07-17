@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			WebGL Render 用[link:https://en.wikipedia.org/wiki/WebGL WebGL]渲染出你精心制作的场景。
+		</p>
+
+		<h2>构造器</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (可选) 该对象的属性定义了渲染器的行为。也可以完全不传参数。在所有情况下，当缺少参数时，它将采用合理的默认值。
+			以下是合法参数：<br /><br />
+
+		[page:DOMElement canvas] - 一个供渲染器绘制其输出的[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas]
+		它和下面的[page:WebGLRenderer.domElement domElement]属性对应。
+		如果没有传这个参数，会创建一个新canvas<br />
+
+
+		[page:WebGLRenderingContext context] - 可用于将渲染器附加到已有的渲染环境([link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext])中。默认值是null<br />
+
+		[page:String precision] - 着色器精度. 可以是 *"highp"*, *"mediump"* 或者 *"lowp"*.
+		如果设备支持，默认为*"highp"* . 点击[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices here] 查看"应该避免的事"<br />
+
+		[page:Boolean alpha] - canvas是否包含alpha (透明度)。默认为 *false*<br />
+
+		[page:Boolean premultipliedAlpha] - renderer是否假设颜色有
+		[link:https://en.wikipedia.org/wiki/Glossary_of_computer_graphics#Premultiplied_alpha premultiplied alpha].
+		默认为*true* <br />
+
+		[page:Boolean antialias] - 是否执行抗锯齿。默认为*false*.<br />
+
+		[page:Boolean stencil] - 绘图缓存是否有一个至少8位的模板缓存([link:https://en.wikipedia.org/wiki/Stencil_buffer stencil buffer])。默认为*true*<br />
+
+		[page:Boolean preserveDrawingBuffer] -是否保留缓直到手动清除或被覆盖。 默认*false*.<br />
+
+		[page:String powerPreference] - 提示用户代理怎样的配置更适用于当前WebGL环境。 可能是*"high-performance"*, *"low-power"* 或 *"default"*。默认是*"default"*.
+		详见[link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec]<br />
+
+
+		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
+
+		[page:Boolean depth] - 绘图缓存是否有一个至少6位的深度缓存([link:https://en.wikipedia.org/wiki/Z-buffering depth buffer] )。
+		默认是*true*.<br />
+
+		[page:Boolean logarithmicDepthBuffer] -  是否使用对数深度缓存。如果要在单个场景中处理巨大的比例差异，就有必要使用。
+		Note that this setting uses gl_FragDepth if available which disables the [link:https://www.khronos.org/opengl/wiki/Early_Fragment_Test Early Fragment Test]
+		optimization and can cause a decrease in performance.
+		默认是*false*。 示例：[example:webgl_camera_logarithmicdepthbuffer camera / logarithmicdepthbuffer]
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Boolean autoClear]</h3>
+		<p>定义渲染器是否在渲染每一帧之前自动清除其输出。</p>
+
+
+		<h3>[property:Boolean autoClearColor]</h3>
+		<p>
+			如果[page:.autoClear autoClear]为true, 定义renderer是否清除颜色缓存。
+			默认是*true*
+		</p>
+
+
+		<h3>[property:Boolean autoClearDepth]</h3>
+		<p>
+			如果[page:.autoClear autoClear]是true, 定义renderer是否清除深度缓存。
+			默认是*true*
+		</p>
+
+
+		<h3>[property:Boolean autoClearStencil]</h3>
+		<p>
+			如果[page:.autoClear autoClear]是true, 定义renderer是否清除模板缓存.
+			默认是*true*
+		</p>
+
+		<h3>[property:Boolean debug.checkShaderErrors]</h3>
+		<p>
+			如果[page:.checkShaderErrors checkShaderErrors]为true，定义是否检查材质着色器程序
+			编译和链接过程中的错误。 禁用此检查生产以获得性能增益可能很有用。
+			强烈建议在开发期间保持启用这些检查。
+			如果着色器没有编译和链接 - 它将无法工作，并且相关材料将不会呈现。
+			默认是*true*
+		</p>
+
+		<h3>[property:Object capabilities]</h3>
+		<p>
+			一个包含当前渲染环境([link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext])的功能细节的对象。<br />
+
+		- [page:Boolean floatFragmentTextures]: 环境是否支持[link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float]扩展。
+			根据[link:https://webglstats.com/ WebGLStats], 截至2016年2月，超过95％的支持WebGL的设备支持此功能<br />
+		- [page:Boolean floatVertexTextures]: 如果[page:Boolean floatFragmentTextures]和[page:Boolean vertexTextures]都是true， 则此值为*true* <br />
+		- [page:Method getMaxAnisotropy](): 返回最大可用各向异性。<br />
+		- [page:Method getMaxPrecision](): 返回顶点着色器和片元着色器的最大可用精度。 <br />
+		- [page:Boolean isWebGL2]: *true* if the context in use is a WebGL2RenderingContext object.<br />
+		- [page:Boolean logarithmicDepthBuffer]: 如果[page:parameter logarithmicDepthBuffer]在构造器中被设为true且
+		环境支持[link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth]扩展，则此值为*true*
+			根据[link:https://webglstats.com/ WebGLStats], 截至2016年2月， 约66%的支持WebGL的设备支持此功能<br />
+		- [page:Integer maxAttributes]: *gl.MAX_VERTEX_ATTRIBS*的值<br />
+		- [page:Integer maxCubemapSize]: *gl.MAX_CUBE_MAP_TEXTURE_SIZE* 的值，着色器可使用的立方体贴图纹理的最大宽度*高度<br />
+		- [page:Integer maxFragmentUniforms]: *gl.MAX_FRAGMENT_UNIFORM_VECTORS*的值，片元着色器可使用的全局变量(uniforms)数量<br />
+		- [page:Integer maxTextureSize]: *gl.MAX_TEXTURE_SIZE*的值，着色器可使用纹理的最大宽度*高度<br />
+		- [page:Integer maxTextures]: *gl.MAX_TEXTURE_IMAGE_UNITS的值，着色器可使用的纹理数量<br />
+		- [page:Integer maxVaryings]: *gl.MAX_VARYING_VECTORS*的值，着色器可使用矢量的数量<br />
+		- [page:Integer maxVertexTextures]: *gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS*的值，顶点着色器可使用的纹理数量。<br />
+		- [page:Integer maxVertexUniforms]: *gl.MAX_VERTEX_UNIFORM_VECTORS*的值，顶点着色器可使用的全局变量(uniforms)数量<br />
+		- [page:String precision]: 渲染器当前使用的着色器的精度<br />
+		- [page:Boolean vertexTextures]: 如果[property:Integer maxVertexTextures]大于0，此值为*true* (即可以使用顶点纹理)<br />
+		</p>
+
+		<h3>[property:Array clippingPlanes]</h3>
+		<p>
+			用户自定义的剪裁平面，在世界空间中被指定为THREE.Plane对象。
+			这些平面全局使用。空间中与该平面点积为负的点将被切掉。
+			默认值是[]
+		</p>
+
+		<h3>[property:DOMElement domElement]</h3>
+		<p>
+		一个[link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas]，渲染器在其上绘制输出。<br />
+		渲染器的构造函数会自动创建(如果没有传入canvas参数);你需要做的仅仅是像下面这样将它加页面里去:<br />
+		<code>
+			document.body.appendChild( renderer.domElement );
+		</code>
+	  </p>
+
+		<h3>[property:Object extensions]</h3>
+		<p>
+		[page:WebGLRenderer.extensions.get .extensions.get]方法的包装, 用于检查是否支持各种WebGL扩展
+		</p>
+
+		<h3>[property:Float gammaFactor]</h3>
+		<p>默认是 *2*. </p>
+
+		<h3>[property:number outputEncoding]</h3>
+		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<p>If a render target has been set using [page:WebGLRenderer.setRenderTarget .setRenderTarget] then renderTarget.texture.encoding will be used instead.</p>
+		<p>See the [page:Textures texture constants] page for details of other formats.</p>
+
+		<h3>[property:Object info]</h3>
+		<p>一个对象，包含有关图形板内存和渲染过程的一系列统计信息。这些信息可用于调试或仅仅满足下好奇心。改对象包含以下字段:</p>
+		<p>
+		<ul>
+			<li>memory:
+				<ul>
+					<li>geometries</li>
+					<li>textures</li>
+				</ul>
+			</li>
+			<li>render:
+				<ul>
+					<li>calls</li>
+					<li>triangles</li>
+					<li>points</li>
+					<li>lines</li>
+					<li>frame</li>
+				</ul>
+			</li>
+			<li>programs
+			</li>
+		</ul>
+		</p>
+		<p>默认情况下，每次调用渲染时这些数据都会重置。 但当时用一个或多个镜像时，最好使用自定义模式重置它们：
+		<code>
+		renderer.info.autoReset = false;
+		renderer.info.reset();
+		</code>
+		</p>
+
+		<h3>[property:Boolean localClippingEnabled]</h3>
+		<p>定义渲染器是否考虑对象级剪切平面。 默认为*false*.</p>
+
+		<h3>[property:Integer maxMorphTargets]</h3>
+		<p>
+		默认是8。 一个着色器中允许的最大MorphTargets数。
+		切记标准材质只允许8个MorphTargets。
+		</p>
+
+		<h3>[property:Integer maxMorphNormals]</h3>
+		<p>
+		默认是4。 色器中允许的最大MorphNormal数。
+		切记标准材质只允许4个MorphNormal。
+		</p>
+
+		<h3>[property:Boolean physicallyCorrectLights]</h3>
+		<p>
+		是否使用物理上正确的光照模式。 默认是*false*。
+		示例：[example:webgl_lights_physical lights / physical]
+		</p>
+
+		<h3>[property:Object properties]</h3>
+		<p>
+		渲染器内部使用，以跟踪各种子对象属性。
+		</p>
+
+		<h3>[property:WebGLRenderLists renderLists]</h3>
+		<p>
+		在内部用于处理场景渲染对象的排序。
+		</p>
+
+		<h3>[property:WebGLShadowMap shadowMap]</h3>
+		<p>
+		如果使用，它包含阴影贴图的引用。
+		</p>
+
+		<h3>[property:Boolean shadowMap.enabled]</h3>
+		<p>如果设置开启，允许在场景中使用阴影贴图。默认是 *false*。</p>
+
+		<h3>[property:Boolean shadowMap.autoUpdate]</h3>
+		<p>启用场景中的阴影自动更新。默认是*true*</p>
+		<p>如果不需要动态光照/阴影, 则可以在实例化渲染器时将之设为false</p>
+
+		<h3>[property:Boolean shadowMap.needsUpdate]</h3>
+		<p>当被设为*true*, 场景中的阴影贴图会在下次*render*调用时刷新。默认是*false* </p>
+		<p>如果你已经禁用了阴影贴图的自动更新(*shadowMap.autoUpdate = false*), 那么想要在下一次渲染时更新阴影的话就需要将此值设为*true*</p>
+
+		<h3>[property:Integer shadowMap.type]</h3>
+		<p>定义阴影贴图类型 (未过滤, 关闭部分过滤, 关闭部分双线性过滤)</p>
+		<p>可选值有THREE.BasicShadowMap, THREE.PCFShadowMap (默认), THREE.PCFSoftShadowMap 和 THREE.VSMShadowMap。详见[page:Renderer Renderer constants]</p>
+
+		<h3>[property:Boolean sortObjects]</h3>
+		<p>
+		定义渲染器是否应对对象进行排序。默认是*true*.<br /><br />
+
+		说明: 排序用于尝试正确渲染出具有一定透明度的对象。根据定义，排序可能不总是有用。根据应用的需求，可能需要关闭排序并使其他方法来处理透明度的渲染，例如，
+		手动确定每个对象的显然顺序。
+		</p>
+
+		<h3>[property:Object state]</h3>
+		<p>
+		包含设置[page:WebGLRenderer.context]状态的各种属性的函数。
+		</p>
+
+		<h3>[property:Constant toneMapping]</h3>
+		<p>
+		默认是[page:Renderer NoToneMapping]。查看[page:Renderer Renderer constants]以获取其它备选项
+		</p>
+
+		<h3>[property:Number toneMappingExposure]</h3>
+		<p>
+		色调映射的曝光级别。默认是*1*
+		</p>
+
+		<h3>[property:WebXRManager xr]</h3>
+		<p>
+		Provides access to the WebXR related [page:WebXRManager interface] of the renderer.
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
+		<p>
+		告诉渲染器清除颜色、深度或模板缓存.
+		此方法将颜色缓存初始化为当前颜色。参数们默认都是*true*
+		</p>
+
+		<h3>[method:null clearColor]( )</h3>
+		<p>清除颜色缓存。 相当于调用[page:WebGLRenderer.clear .clear]( true, false, false )</p>
+
+		<h3>[method:null clearDepth]( )</h3>
+		<p>清除深度缓存。相当于调用[page:WebGLRenderer.clear .clear]( false, true, false )</p>
+
+		<h3>[method:null clearStencil]( )</h3>
+		<p>清除模板缓存。相当于调用[page:WebGLRenderer.clear .clear]( false, false, true )</p>
+
+		<h3>[method:null clearTarget]([param:WebGLRenderTarget renderTarget], [param:boolean color], [param:boolean depth], [param:boolean stencil])</h3>
+		<p>
+		renderTarget -- 需要被清除的[page:WebGLRenderTarget renderTarget]<br />
+		color -- 如果设置, 颜色会被清除 <br />
+		depth -- 如果设置, 深度缓存会被清除 <br />
+		stencil -- 如果设置, 模板缓存会被清除
+		</p>
+		<p>
+		该方法清楚了一个rendertarget。为此它会激活此endertarget
+		</p>
+
+		<h3>[method:null compile]( [param:Object3D scene], [param:Camera camera] )</h3>
+		<p>使用相机编译场景中的所有材质。这对于在首次渲染之前预编译着色器很有用。</p>
+
+		<h3>[method:null copyFramebufferToTexture]( [param:Vector2 position], [param:Texture texture], [param:Number level] )</h3>
+		<p>将当前WebGLFramebuffer中的像素复制到2D纹理中。可访问[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].</p>
+
+		<h3>[method:null copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
+		<p>将纹理的所有像素复制到一个已有的从给定位置开始的纹理中。可访问[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].</p>
+
+		<h3>[method:null dispose]( )</h3>
+		<p>处理当前的渲染环境</p>
+
+		<h3>[method:Object extensions.get]( [param:String extensionName] )</h3>
+		<p>
+		用于检查是否支持各种扩展，并返回一个对象，其中包含扩展的详细信息。
+		该方法检查以下扩展：<br /><br />
+
+		- *WEBGL_depth_texture*<br />
+		- *EXT_texture_filter_anisotropic*<br />
+		- *WEBGL_compressed_texture_s3tc*<br />
+		- *WEBGL_compressed_texture_pvrtc*<br />
+		- *WEBGL_compressed_texture_etc1*
+		</p>
+
+		<h3>[method:null forceContextLoss]( )</h3>
+		<p>
+		模拟WebGL环境的丢失。需要支持
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context]扩展才能用。
+		根据[link:https://webglstats.com/ WebGLStats], as of February 2016 90% of WebGL enabled devices support this.
+		</p>
+
+		<h3>[method:Float getClearAlpha]()</h3>
+		<p>返回一个表示当前alpha值的[page:Float float]，范围0到1</p>
+
+		<h3>[method:Color getClearColor]()</h3>
+		<p>返回一个表示当前颜色值的[page:Color THREE.Color]实例</p>
+
+		<h3>[method:WebGLRenderingContext getContext]()</h3>
+		<p>返回当前WebGL环境</p>
+
+		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
+		<p>返回一个对象，这个对象中存有在WebGL环境在创建的时候所设置的属性</p>
+
+		<h3>[method:Integer getActiveCubeFace]()</h3>
+		<p>Returns the current active cube face.</p>
+
+		<h3>[method:Integer getActiveMipmapLevel]()</h3>
+		<p>Returns the current active mipmap level.</p>
+
+		<h3>[method:RenderTarget getRenderTarget]()</h3>
+		<p>如果当前存在[page:RenderTarget RenderTarget]，则返回该值；否则返回*null*。</p>
+
+		<h3>[method:RenderTarget getCurrentViewport]()</h3>
+		<p>返回当前视口</p>
+
+		<h3>[method:Object getDrawingBufferSize]()</h3>
+		<p>返回一个包含渲染器绘图缓存宽度和高度(单位像素)的对象。</p>
+
+		<h3>[method:number getPixelRatio]()</h3>
+		<p>返回当前使用设备像素比</p>
+
+		<h3>[method:Object getSize]()</h3>
+		<p>返回包含渲染器输出canvas的宽度和高度(单位像素)的对象。</p>
+
+		<h3>[method:null initTexture]( [param:Texture texture] )</h3>
+		<p> Initializes the given texture. Useful for preloading a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).</p>
+
+		<h3>[method:null resetGLState]( )</h3>
+		<p>将GL状态重置为默认值。WebGL环境丢失时会内部调用</p>
+
+		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )</h3>
+		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
+		<p>将enderTarget中的像素数据读取到传入的缓冲区中。这是[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]()的包装器<br />
+		示例：[example:webgl_interactive_cubes_gpu interactive / cubes / gpu]</p>
+		<p>For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
+
+		<h3>[method:null render]( [param:Object3D scene], [param:Camera camera] )</h3>
+		<p>
+			用相机([page:Camera camera])渲染一个场景([page:Scene scene])<br />
+
+			渲染一般是在canvas上完成的，或者是[page:WebGLRenderTarget renderTarget](如果有指定)<br />
+
+			如果[page:Boolean forceClear]值是*true*，那么颜色、深度及模板缓存将会在渲染之前清除，即使渲染器的[page:WebGLRenderer.autoClear autoClear]属性值是false<br />
+
+			即便forceClear设为true, 也可以通过将[page:WebGLRenderer.autoClearColor autoClearColor]、[page:WebGLRenderer.autoClearStencil autoClearStencil]或[page:WebGLRenderer.autoClearDepth autoClearDepth]属性的值设为false来阻止对应缓存被清除。
+		</p>
+
+		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
+		<p>使用相机和指定材质渲染缓冲几何组。</p>
+
+		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
+		<p>object - 一个[page:Object3D]实例<br />
+		program - 一个[page:WebGLProgram]实例<br />
+
+		渲染即使缓冲，由renderObjectImmediate对象调用
+		</p>
+
+		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
+		<p>[page:Function callback] — 每个可用帧都会调用的函数。 如果传入‘null’,所有正在进行的动画都会停止。</p>
+		<p>可用来代替[link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]的内置函数. 对于WebXR项目，必须使用此函数。</p>
+
+		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
+		<p>设置alpha。合法参数是一个*0.0*到 *1.0*之间的浮点数</p>
+
+		<h3>[method:null setClearColor]( [param:Color color], [param:Float alpha] )</h3>
+		<p>设置颜色及其透明度</p>
+
+		<h3>[method:null setFramebuffer]( [param:WebGLFramebuffer value] )</h3>
+		<p>Sets the given WebGLFramebuffer. This method can only be used if no render target is set via [page:WebGLRenderer.setRenderTarget .setRenderTarget]().</p>
+
+		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
+		<p>设置设备像素比。通常用于避免HiDPI设备上绘图模糊</p>
+
+		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
+		<p>
+		renderTarget -- 需要被激活的[page:WebGLRenderTarget renderTarget](可选)。若此参数为空，则将canvas设置成活跃render target。<br />
+		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLCubeRenderTarget] (optional).<br />
+		activeMipmapLevel -- Specifies the active mipmap level (optional).<br /><br />
+		该方法设置活跃rendertarget。
+		</p>
+
+		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
+		<p>
+		将剪裁区域设为(x, y)到(x + width, y + height)
+		Sets the scissor area from
+		</p>
+
+		<h3>[method:null setScissorTest]( [param:Boolean boolean] )</h3>
+		<p>
+		启用或禁用剪裁检测. 若启用，则只有在所定义的裁剪区域内的像素才会受之后的渲染器影响。
+		</p>
+
+		<h3>[method:null setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>
+		<p>
+		将输出canvas的大小调整为(width, height)并考虑设备像素比，且将视口从(0, 0)开始调整到适合大小
+		将[page:Boolean updateStyle]设置为false以阻止对canvas的样式做任何改变。
+		</p>
+
+		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )</h3>
+		<p>将视口大小设置为(x, y)到 (x + width, y + height).</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

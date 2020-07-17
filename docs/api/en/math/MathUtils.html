@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">An object with several math utility functions.</p>
+
+		<h2>Functions</h2>
+
+		<h3>[method:Float clamp]( [param:Float value], [param:Float min], [param:Float max] )</h3>
+		<p>
+		[page:Float value] — Value to be clamped.<br />
+		[page:Float min] — Minimum value.<br />
+		[page:Float max] — Maximum value.<br /><br />
+
+		Clamps the [page:Float value] to be between [page:Float min] and [page:Float max].
+		</p>
+
+		<h3>[method:Float degToRad]( [param:Float degrees] )</h3>
+		<p>Converts degrees to radians.</p>
+
+		<h3>[method:Integer euclideanModulo]( [param:Integer n], [param:Integer m] )</h3>
+		<p>
+		[page:Integer n], [page:Integer m] - Integers<br /><br />
+
+		Computes the Euclidean modulo of [page:Integer m] % [page:Integer n], that is:
+		<code>( ( n % m ) + m ) % m</code>
+		</p>
+
+		<h3>[method:UUID generateUUID]( )</h3>
+		<p>
+		Generate a [link:https://en.wikipedia.org/wiki/Universally_unique_identifier UUID]
+		(universally unique identifier).
+		</p>
+
+		<h3>[method:Boolean isPowerOfTwo]( [param:Number n] )</h3>
+		<p>Return *true* if [page:Number n] is a power of 2.</p>
+
+		<h3>[method:Float lerp]( [param:Float x], [param:Float y], [param:Float t] )</h3>
+		<p>
+		[page:Float x] - Start point. <br />
+		[page:Float y] - End point. <br />
+		[page:Float t] - interpolation factor in the closed interval [0, 1].<br><br />
+
+		Returns a value [link:https://en.wikipedia.org/wiki/Linear_interpolation linearly interpolated]
+		from two known points based on the given interval - [page:Float t] = 0 will return [page:Float x]
+		and [page:Float t] = 1 will return [page:Float y].
+		</p>
+
+		<h3>[method:Float mapLinear]( [param:Float x], [param:Float a1], [param:Float a2], [param:Float b1], [param:Float b2] )</h3>
+		<p>
+		[page:Float x] — Value to be mapped.<br />
+		[page:Float a1] — Minimum value for range A.<br />
+		[page:Float a2] — Maximum value for range A.<br />
+		[page:Float b1] — Minimum value for range B.<br />
+		[page:Float b2] — Maximum value for range B.<br /><br />
+
+		Linear mapping of [page:Float x] from range [[page:Float a1], [page:Float a2]] to range [[page:Float b1], [page:Float b2]].
+		</p>
+
+		<h3>[method:Integer ceilPowerOfTwo]( [param:Number n] )</h3>
+		<p>Returns the smallest power of 2 that is greater than or equal to [page:Number n].</p>
+
+		<h3>[method:Integer floorPowerOfTwo]( [param:Number n] )</h3>
+		<p>Returns the largest power of 2 that is less than or equal to [page:Number n].</p>
+
+		<h3>[method:Float radToDeg]( [param:Float radians] )</h3>
+		<p>Converts radians to degrees.</p>
+
+		<h3>[method:Float randFloat]( [param:Float low], [param:Float high] )</h3>
+		<p>Random float in the interval [page:Float low] to [page:Float high].</p>
+
+		<h3>[method:Float randFloatSpread]( [param:Float range] )</h3>
+		<p>Random float in the interval *- [page:Float range] / 2* to *[page:Float range] / 2*.</p>
+
+		<h3>[method:Integer randInt]( [param:Integer low], [param:Integer high] )</h3>
+		<p>Random integer in the interval [page:Float low] to [page:Float high].</p>
+
+		<h3>[method:Float seededRandom]( [param:Integer seed] )</h3>
+		<p>Deterministic pseudo-random float in the interval [ 0, 1 ]. The integer [page:Integer seed] is optional.</p>
+
+		<h3>[method:Float smoothstep]( [param:Float x], [param:Float min], [param:Float max] )</h3>
+		<p>
+		[page:Float x] - The value to evaluate based on its position between min and max. <br />
+		[page:Float min] - Any x value below min will be 0.<br />
+		[page:Float max] - Any x value above max will be 1.<br /><br />
+
+		Returns a value between 0-1 that represents the percentage that x has moved between min and max,
+		but smoothed or slowed down the closer X is to the min and max.<br/><br/>
+
+		See [link:http://en.wikipedia.org/wiki/Smoothstep Smoothstep] for details.
+		</p>
+
+		<h3>[method:Float smootherstep]( [param:Float x], [param:Float min], [param:Float max] )</h3>
+		<p>
+		[page:Float x] - The value to evaluate based on its position between min and max. <br />
+		[page:Float min] - Any x value below min will be 0.<br />
+		[page:Float max] - Any x value above max will be 1.<br /><br />
+
+		Returns a value between 0-1. A [link:https://en.wikipedia.org/wiki/Smoothstep#Variations variation on smoothstep]
+		that has zero 1st and 2nd order derivatives at x=0 and x=1.
+		</p>
+
+		<h3>[method:null setQuaternionFromProperEuler]( [param:Quaternion q], [param:Float a], [param:Float b], [param:Float c], [param:String order] )</h3>
+		<p>
+		[page:Quaternion q] - the quaternion to be set<br />
+		[page:Float a] - the rotation applied to the first axis, in radians <br />
+		[page:Float b] - the rotation applied to the second axis, in radians <br />
+		[page:Float c] - the rotation applied to the third axis, in radians <br />
+		[page:String order] - a string specifying the axes order: 'XYX', 'XZX', 'YXY', 'YZY', 'ZXZ', or 'ZYZ'<br /><br />
+
+		Sets quaternion [page:Quaternion q] from the [link:http://en.wikipedia.org/wiki/Euler_angles intrinsic Proper Euler Angles] defined by angles [page:Float a], [page:Float b], and [page:Float c], and order [page:String order].<br />
+
+		Rotations are applied to the axes in the order specified by [page:String order]: rotation by angle [page:Float a] is applied first, then by angle [page:Float b], then by angle [page:Float c]. Angles are in radians.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

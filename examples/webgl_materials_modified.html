@@ -4,107 +4,49 @@
 		<title>three.js webgl - materials - modified</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				color:#fff;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				z-index:1000;
-			}
-
-			#oldie {
-				background:rgb(200,100,0) !important;
-				color:#fff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified material.
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> wegbl - modified material.
 			<a href="http://graphics.cs.williams.edu/data/meshes.xml#14" target="_blank" rel="noopener">Lee Perry-Smith</a> head.
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 			var camera, scene, renderer, stats;
-
-			var mesh, materialShader;
-
-			var mouseX = 0;
-			var mouseY = 0;
-
-			var targetX = 0;
-			var targetY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.z = 1200;
+				camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 0.1, 100 );
+				camera.position.z = 20;
 
 				scene = new THREE.Scene();
 
-				var material = new THREE.MeshNormalMaterial();
-				material.onBeforeCompile = function ( shader ) {
+				var loader = new GLTFLoader();
+				loader.load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
 
-					// console.log( shader )
+					var geometry = gltf.scene.children[ 0 ].geometry;
 
-					shader.uniforms.time = { value: 0 };
+					var mesh = new THREE.Mesh( geometry, buildTwistMaterial( 2.0 ) );
+					mesh.position.x = - 3.5;
+					mesh.position.y = - 0.5;
+					scene.add( mesh );
 
-					shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
-					shader.vertexShader = shader.vertexShader.replace(
-						'#include <begin_vertex>',
-						[
-							'float theta = sin( time + position.y ) / 2.0;',
-							'float c = cos( theta );',
-							'float s = sin( theta );',
-							'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
-							'vec3 transformed = vec3( position ) * m;',
-							'vNormal = vNormal * m;'
-						].join( '\n' )
-					);
-
-					materialShader = shader;
-
-				};
-
-				var loader = new THREE.JSONLoader();
-				loader.load( 'models/json/leeperrysmith/LeePerrySmith.json', function( geometry ) {
-
-					mesh = new THREE.Mesh( geometry, material );
-					mesh.position.y = - 50;
-					mesh.scale.setScalar( 100 );
+					var mesh = new THREE.Mesh( geometry, buildTwistMaterial( - 2.0 ) );
+					mesh.position.x = 3.5;
+					mesh.position.y = - 0.5;
 					scene.add( mesh );
 
 				} );
@@ -114,6 +56,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1000;
+				controls.maxDistance = 5000;
+
 				//
 
 				stats = new Stats();
@@ -121,32 +67,57 @@
 
 				// EVENTS
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function buildTwistMaterial( amount ) {
+
+				var material = new THREE.MeshNormalMaterial();
+				material.onBeforeCompile = function ( shader ) {
+
+					shader.uniforms.time = { value: 0 };
+
+					shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
+					shader.vertexShader = shader.vertexShader.replace(
+						'#include <begin_vertex>',
+						[
+							`float theta = sin( time + position.y ) / ${ amount.toFixed( 1 ) };`,
+							'float c = cos( theta );',
+							'float s = sin( theta );',
+							'mat3 m = mat3( c, 0, s, 0, 1, 0, -s, 0, c );',
+							'vec3 transformed = vec3( position ) * m;',
+							'vNormal = vNormal * m;'
+						].join( '\n' )
+					);
+
+					material.userData.shader = shader;
+
+				};
+
+				// Make sure WebGLRenderer doesnt reuse a single program
+
+				material.customProgramCacheKey = function () {
+
+					return amount;
+
+				};
+
+				return material;
 
 			}
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				var width = window.innerWidth;
 				var height = window.innerHeight;
-
-				windowHalfX = width / 2;
-				windowHalfY = height / 2;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-
-			}
-
-			function onDocumentMouseMove( event ) {
-
-				mouseX = ( event.clientX - windowHalfX );
-				mouseY = ( event.clientY - windowHalfY );
 
 			}
 
@@ -164,21 +135,21 @@
 
 			function render() {
 
-				targetX = mouseX * .001;
-				targetY = mouseY * .001;
+				scene.traverse( function ( child ) {
 
-				if ( mesh ) {
+					if ( child.isMesh ) {
 
-					mesh.rotation.y += 0.05 * ( targetX - mesh.rotation.y );
-					mesh.rotation.x += 0.05 * ( targetY - mesh.rotation.x );
+						const shader = child.material.userData.shader;
 
-				}
+						if ( shader ) {
 
-				if ( materialShader ) {
+							shader.uniforms.time.value = performance.now() / 1000;
 
-					materialShader.uniforms.time.value = performance.now() / 1000;
+						}
 
-				}
+					}
+
+				} );
 
 				renderer.render( scene, camera );
 

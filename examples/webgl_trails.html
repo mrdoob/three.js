@@ -4,32 +4,18 @@
 		<title>three.js webgl - trails</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#000;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+		<script type="module">
 
-		<script src="../build/three.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 
 			var camera, scene, renderer;
-
-			var mouseX = 0, mouseY = 0;
-
-			var windowHalfX = window.innerWidth / 2;
-			var windowHalfY = window.innerHeight / 2;
 
 			init();
 			animate();
@@ -39,8 +25,8 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 );
-				camera.position.set( 0, 0, 1000 );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
+				camera.position.set( 0, 0, 1 );
 
 				scene = new THREE.Scene();
 
@@ -50,7 +36,7 @@
 
 				for ( var i = 0; i < 100; i ++ ) {
 
-					positions.push( 4000 * ( Math.random() - 0.5 ), 4000 * ( Math.random() - 0.5 ), 4000 * ( Math.random() - 0.5 ) );
+					positions.push( Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5 );
 
 					var clr = colorArray[ Math.floor( Math.random() * colorArray.length ) ];
 
@@ -59,10 +45,10 @@
 				}
 
 				var geometry = new THREE.BufferGeometry();
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.PointsMaterial( { size: 4, vertexColors: THREE.VertexColors, depthTest: false, sizeAttenuation: false } );
+				var material = new THREE.PointsMaterial( { size: 4, vertexColors: true, depthTest: false, sizeAttenuation: false } );
 
 				var mesh = new THREE.Points( geometry, material );
 				scene.add( mesh );
@@ -78,16 +64,15 @@
 
 				//
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				//
+
+				if ( typeof TESTING !== 'undefined'  ) { for ( var i = 0; i < 1000; i ++ ) { render( 1000 - i ); } };
 
 			}
 
 			function onWindowResize() {
-
-				windowHalfX = window.innerWidth / 2;
-				windowHalfY = window.innerHeight / 2;
 
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
@@ -96,30 +81,20 @@
 
 			}
 
-			function onDocumentMouseMove(event) {
-
-				mouseX = ( event.clientX - windowHalfX ) * 10;
-				mouseY = ( event.clientY - windowHalfY ) * 10;
-
-			}
-
 			//
 
-			function animate() {
+			function animate( now ) {
 
 				requestAnimationFrame( animate );
 
-				render();
+				render( now );
 				stats.update();
 
 			}
 
-			function render() {
+			function render( now ) {
 
-				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - mouseY - camera.position.y ) * .05;
-
-				camera.lookAt( scene.position );
+				scene.rotation.y = now / 2000;
 
 				renderer.render( scene, camera );
 

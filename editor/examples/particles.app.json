@@ -3,8 +3,6 @@
 		"type": "App"
 	},
 	"project": {
-		"gammaInput": true,
-		"gammaOutput": true,
 		"shadows": true,
 		"vr": false
 	},
@@ -39,7 +37,7 @@
 		"geometries": [
 			{
 				"uuid": "C3C0CE7D-10B8-43FC-8F74-011CC6E57800",
-				"type": "PlaneGeometry",
+				"type": "PlaneBufferGeometry",
 				"width": 100,
 				"height": 100,
 				"widthSegments": 1,

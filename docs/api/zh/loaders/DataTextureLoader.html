@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			用于加载二进制文件格式的(rgbe, hdr, ...)的抽象类。
+		内部使用[page:FileLoader]来加载文件， 和创建一个新的
+		[page:DataTexture].
+		</p>
+
+		<h2>例子</h2>
+
+		<p>
+			请参考[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/loaders/RGBELoader.js RGBELoader]
+			这个子类的例子。
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器所使用的[page:LoadingManager loadingManager]。
+		默认为[page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		创建一个新的[name].
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
+
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 文件的URL或者路径，也可以为
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — 加载完成时将调用。回调参数为将要加载的纹理。<br />
+		[page:Function onProgress] — 将在加载过程中进行调用。参数为XMLHttpRequest实例，实例包含[page:Integer total]和[page:Integer loaded]字节。<br />
+		[page:Function onError] —在加载错误时被调用。<br />
+		</p>
+		<p>
+			从URL中进行加载，并将被加载的纹理传递给onLoad。
+		</p>
+
+		<h2>源</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

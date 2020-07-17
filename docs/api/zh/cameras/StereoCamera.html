@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>立体相机（[name]）</h1>
+
+		<p class="desc">
+			双透视摄像机（立体相机）常被用于创建[link:https://en.wikipedia.org/wiki/Anaglyph_3D 3D Anaglyph]（3D立体影像）或者[link:https://en.wikipedia.org/wiki/parallax_barrier Parallax Barrier]（视差效果）。
+
+		</p>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_effects_anaglyph effects / anaglyph ]<br />
+			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
+			[example:webgl_effects_stereo effects / stereo ]
+		</p>
+
+		<h2>构造器</h2>
+
+		<h3>[name]( )</h3>
+
+		<h2>属性</h2>
+
+		<h3>[property:Float aspect]</h3>
+		<p>默认值是*1*.</p>
+
+		<h3>[property:Float eyeSep]</h3>
+		<p>默认值是*0.064*.</p>
+
+		<h3>[property:PerspectiveCamera cameraL]</h3>
+		<p>左摄像机，它被加入到了[page:Layers layer 1]中 —— 需要被左摄像机渲染的物体也应当要加入到这一层中。</p>
+
+		<h3>[property:PerspectiveCamera cameraR]</h3>
+		<p>右摄像机，它被加入到了[page:Layers layer 2]中 —— 需要被右摄像机渲染的物体也应当要加入到这一层中。</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:null update]( [param:PerspectiveCamera camera] )</h3>
+		<p>
+			基于摄像机通过场景，更新立体摄像机。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

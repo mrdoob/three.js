@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>视频纹理（[name]）</h1>
+
+		<p class="desc">
+		创建一个使用视频来作为贴图的纹理对象。<br /><br />
+
+		它和其基类[page:Texture Texture]几乎是相同的，除了它总是将[page:Texture.needsUpdate needsUpdate]设置为*true*，以便使得贴图能够在视频播放时进行更新。自动创建[page:Texture.mipmaps mipmaps]也会被禁用。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+//assuming you have created a HTML video element with id="video"
+var video = document.getElementById( 'video' );
+
+var texture = new THREE.VideoTexture( video );
+texture.minFilter = THREE.LinearFilter;
+texture.magFilter = THREE.LinearFilter;
+texture.format = THREE.RGBFormat;
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_materials_video materials / video ]</p>
+
+		<h2>构造函数</h2>
+		<h3>[name]( [param:Video video], [param:Constant mapping], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Constant format], [param:Constant type], [param:Number anisotropy] )</h3>
+		<p>
+		[page:Video video] -- 将被作为纹理贴图来使用的Video元素。<br />
+
+		[page:Constant mapping] --  纹理贴图将被如何应用（映射）到物体上，它是[page:Textures THREE.UVMapping]中的对象类型。
+		请参阅[page:Textures mapping constants]（映射模式常量）来了解其他选项。<br />
+
+		[page:Constant wrapS] -- 默认值是[page:Textures THREE.ClampToEdgeWrapping].
+		请参阅[page:Textures wrap mode constants]（包裹模式常量）来了解其他选项。<br />
+
+		[page:Constant wrapT] -- 默认值是[page:Textures THREE.ClampToEdgeWrapping].
+		请参阅[page:Textures wrap mode constants]（包裹模式常量）来了解其他选项。<br />
+
+		[page:Constant magFilter] -- 当一个纹素覆盖大于一个像素时，贴图将如何采样。
+		其默认值为[page:Textures THREE.LinearFilter]。请参阅[page:Textures magnification filter constants]（放大滤镜常量）来了解其它选项。<br />
+
+		[page:Constant minFilter] -- 当一个纹素覆盖小于一个像素时，贴图将如何采样。
+		其默认值为[page:Textures THREE.LinearMipmapLinearFilter]。请参阅[page:Textures minification filter constants]（缩小滤镜常量）来了解其它选项。<br />
+
+		[page:Constant format] -- 在纹理贴图中使用的格式。
+	 	请参阅[page:Textures format constants]（格式常量）来了解各个选项。<br />
+
+		[page:Constant type] -- 默认值是[page:Textures THREE.UnsignedByteType].
+	 	请参阅[page:Textures type constants]（类型常量）来了解其他选项。<br />
+
+		[page:Number anisotropy] -- 沿着轴，通过具有最高纹素密度的像素的采样数。
+		默认情况下，这个值为1。设置一个较高的值将会比基本的mipmap产生更清晰的效果，代价是需要使用更多纹理样本。
+		使用[page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() 来查询GPU中各向异性的最大有效值；这个值通常是2的幂。<br /><br />
+		</p>
+
+
+		<h2>属性</h2>
+
+		<p>
+		共有属性请参见其基类[page:Texture Texture]。
+	</p>
+
+		<h3>[property:boolean needsUpdate]</h3>
+		<p>
+		在这里，你不必手动设置这个值，因为它是由[page:VideoTexture.update update]方法来进行控制的。
+		</p>
+
+		<h2>方法</h2>
+
+	<p>
+		共有方法请参见其基类[page:Texture Texture]。
+	</p>
+
+	<h3>[method:null update]()</h3>
+		<p>
+		在每一次新的一帧可用时，这个方法将被自动调用，
+		并将[property:boolean needsUpdate]设置为*true*。
+		</p>
+
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

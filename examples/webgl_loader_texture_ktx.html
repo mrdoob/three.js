@@ -4,41 +4,19 @@
 	<title>three.js webgl - materials - compressed textures</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<style>
-		body {
-			margin: 0px;
-			background-color: #050505;
-			color: #fff;
-			overflow: hidden;
-		}
-
-		a { color: #e00 }
-
-		#info {
-			position: absolute;
-			top: 0px; width: 100%;
-			color: #ffffff;
-			padding: 5px;
-			font-family:Monospace;
-			font-size:13px;
-			text-align:center;
-			z-index:1000;
-		}
-	</style>
+	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 <body>
 
 <div id="info">
-	<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed KTX textures<br />
+	<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl - compressed KTX textures<br />
 	<a href="https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/">Khronos Texture</a> is a lightweight file format for OpenGL
 </div>
 
-<script src="../build/three.js"></script>
-<script src="js/loaders/KTXLoader.js"></script>
+<script type="module">
+	import * as THREE from '../build/three.module.js';
 
-<script src="js/Detector.js"></script>
-
-<script>
+	import { KTXLoader } from './jsm/loaders/KTXLoader.js';
 
 	/*
 	This is how compressed textures are supposed to be used:
@@ -55,8 +33,6 @@
 	ASTC_4x4, ASTC8x8 - transparent textures with full alpha range
 	*/
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
 	var camera, scene, renderer;
 	var meshes = [];
 
@@ -71,10 +47,10 @@
 		document.body.appendChild( renderer.domElement );
 
 		var formats = {
-			astc: renderer.extensions.get( 'WEBGL_compressed_texture_astc' ),
-			etc1: renderer.extensions.get( 'WEBGL_compressed_texture_etc1' ),
-			s3tc: renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' ),
-			pvrtc: renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
+			astc: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
+			etc1: renderer.extensions.has( 'WEBGL_compressed_texture_etc1' ),
+			s3tc: renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' ),
+			pvrtc: renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
 		};
 
 		camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 1, 2000 );
@@ -86,7 +62,7 @@
 		var material1, material2;
 
 		// TODO: add cubemap support
-		var loader = new THREE.KTXLoader();
+		var loader = new KTXLoader();
 
 		if ( formats.pvrtc ) {
 

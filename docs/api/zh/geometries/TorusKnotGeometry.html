@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Geometry] &rarr;
+
+		<h1>圆环扭结几何体（[name]）</h1>
+
+		<p class="desc">
+			创建一个圆环扭结，其特殊形状由一对互质的整数，p和q所定义。如果p和q不互质，创建出来的几何体将是一个环面链接。</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#TorusKnotGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>代码示例</h2>
+
+		<code>var geometry = new THREE.TorusKnotGeometry( 10, 3, 100, 16 );
+		var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+		var torusKnot = new THREE.Mesh( geometry, material );
+		scene.add( torusKnot );
+		</code>
+
+		<h2>构造器</h2>
+
+		<h3>[name]([param:Float radius], [param:Float tube], [param:Integer tubularSegments], [param:Integer radialSegments], [param:Integer p], [param:Integer q])</h3>
+		<p>
+			<ul>
+				<li>radius - 圆环的半径，默认值为1。</li>
+				<li>tube — 管道的半径，默认值为0.4。</li>
+				<li>tubularSegments — 管道的分段数量，默认值为64。</li>
+				<li>radialSegments — 横截面分段数量，默认值为8。</li>
+				<li>p — 这个值决定了几何体将绕着其旋转对称轴旋转多少次，默认值是2。</li>
+				<li>q — 这个值决定了几何体将绕着其内部圆环旋转多少次，默认值是3。</li>
+			</ul>
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Geometry]。</p>
+
+		<h3>.parameters</h3>
+		<p>
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Geometry]。</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

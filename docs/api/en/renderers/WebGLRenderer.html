@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			The WebGL renderer displays your beautifully crafted scenes using
+			[link:https://en.wikipedia.org/wiki/WebGL WebGL].
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>
+		[page:Object parameters] - (optional) object with properties defining the renderer's behaviour.
+			The constructor also accepts no parameters at all. In all cases, it will assume sane defaults
+			when parameters are missing. The following are valid parameters:<br /><br />
+
+		[page:DOMElement canvas] - A [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas]
+		where the renderer draws its output.
+		This corresponds to the [page:WebGLRenderer.domElement domElement] property below.
+		If not passed in here, a new canvas element will be created.<br />
+
+
+		[page:WebGLRenderingContext context] - This can be used to attach the renderer to an existing
+	  [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext].
+		Default is null.<br />
+
+		[page:String precision] - Shader precision. Can be *"highp"*, *"mediump"* or *"lowp"*.
+		Defaults to *"highp"* if supported by the device. See the note in "Things to Avoid"
+		[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices here].<br />
+
+		[page:Boolean alpha] - whether the canvas contains an alpha (transparency) buffer or not.
+	  Default is *false*.<br />
+
+		[page:Boolean premultipliedAlpha] - whether the renderer will assume that colors have
+		[link:https://en.wikipedia.org/wiki/Glossary_of_computer_graphics#Premultiplied_alpha premultiplied alpha].
+		Default is *true*.<br />
+
+		[page:Boolean antialias] - whether to perform antialiasing. Default is *false*.<br />
+
+		[page:Boolean stencil] - whether the drawing buffer has a
+		[link:https://en.wikipedia.org/wiki/Stencil_buffer stencil buffer] of at least 8 bits.
+		Default is *true*.<br />
+
+		[page:Boolean preserveDrawingBuffer] - whether to preserve the buffers until manually cleared
+		or overwritten. Default is *false*.<br />
+
+		[page:String powerPreference] - Provides a hint to the user agent indicating what configuration
+		of GPU is suitable for this WebGL context. Can be *"high-performance"*, *"low-power"* or *"default"*. Default is *"default"*.
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
+
+		[page:Boolean failIfMajorPerformanceCaveat] - whether the renderer creation will fail upon low perfomance is detected. Default is *false*.
+		See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.<br />
+
+		[page:Boolean depth] - whether the drawing buffer has a
+		[link:https://en.wikipedia.org/wiki/Z-buffering depth buffer] of at least 16 bits.
+		Default is *true*.<br />
+
+		[page:Boolean logarithmicDepthBuffer] -  whether to use a logarithmic depth buffer. It may
+		be neccesary to use this if dealing with huge differences in scale in a single scene. Note that this setting
+		uses gl_FragDepth if available which disables the [link:https://www.khronos.org/opengl/wiki/Early_Fragment_Test Early Fragment Test]
+		optimization and can cause a decrease in performance.
+		Default is *false*. See the [example:webgl_camera_logarithmicdepthbuffer camera / logarithmicdepthbuffer] example.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Boolean autoClear]</h3>
+		<p>Defines whether the renderer should automatically clear its output before rendering a frame.</p>
+
+
+		<h3>[property:Boolean autoClearColor]</h3>
+		<p>
+			If [page:.autoClear autoClear] is true, defines whether the renderer should clear the color buffer.
+			Default is *true*.
+		</p>
+
+
+		<h3>[property:Boolean autoClearDepth]</h3>
+		<p>
+			If [page:.autoClear autoClear] is true, defines whether the renderer should clear the depth buffer.
+			Default is *true*.
+		</p>
+
+
+		<h3>[property:Boolean autoClearStencil]</h3>
+		<p>
+			If [page:.autoClear autoClear] is true, defines whether the renderer should clear the stencil buffer.
+			Default is *true*.
+		</p>
+
+		<h3>[property:Boolean debug.checkShaderErrors]</h3>
+		<p>
+			If [page:.checkShaderErrors checkShaderErrors] is true, defines whether material shader programs are checked
+			for errors during compilation and linkage process. It may be useful to disable this check in production for performance gain.
+			It is strongly recommended to keep these checks enabled during development.
+			If the shader does not compile and link - it will not work and associated material will not render.
+			Default is *true*.
+		</p>
+
+		<h3>[property:Object capabilities]</h3>
+		<p>
+		An object containing details about the capabilities of the current [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext RenderingContext].<br />
+
+		- [page:Boolean floatFragmentTextures]: whether the context supports the [link:https://developer.mozilla.org/en-US/docs/Web/API/OES_texture_float OES_texture_float] extension.
+			According to [link:https://webglstats.com/ WebGLStats], as of February 2016 over 95% of WebGL enabled devices support this.<br />
+		- [page:Boolean floatVertexTextures]: *true* if [page:Boolean floatFragmentTextures] and [page:Boolean vertexTextures] are both true.<br />
+		- [page:Method getMaxAnisotropy](): Returns the maximum available anisotropy.<br />
+		- [page:Method getMaxPrecision](): Returns the maximum available precision for vertex and fragment shaders. <br />
+		- [page:Boolean isWebGL2]: *true* if the context in use is a WebGL2RenderingContext object.<br />
+		- [page:Boolean logarithmicDepthBuffer]: *true* if the [page:parameter logarithmicDepthBuffer] was set to true in the constructor and
+		the context supports the [link:https://developer.mozilla.org/en-US/docs/Web/API/EXT_frag_depth EXT_frag_depth] extension.
+			According to [link:https://webglstats.com/ WebGLStats], as of February 2016 around 66% of WebGL enabled devices support this.<br />
+		- [page:Integer maxAttributes]: The value of *gl.MAX_VERTEX_ATTRIBS*.<br />
+		- [page:Integer maxCubemapSize]: The value of *gl.MAX_CUBE_MAP_TEXTURE_SIZE*.
+		Maximum height * width of cube map textures that a shader can use.<br />
+		- [page:Integer maxFragmentUniforms]: The value of *gl.MAX_FRAGMENT_UNIFORM_VECTORS*.
+		  The number of uniforms that can be used by a fragment shader.<br />
+		- [page:Integer maxTextureSize]: The value of *gl.MAX_TEXTURE_SIZE*.
+		Maximum height * width of a texture that a shader use.<br />
+		- [page:Integer maxTextures]: The value of *gl.MAX_TEXTURE_IMAGE_UNITS*.
+		  The maximum number of textures that can be used by a shader.<br />
+		- [page:Integer maxVaryings]: The value of *gl.MAX_VARYING_VECTORS*.
+		  The number of varying vectors that can used by shaders.<br />
+		- [page:Integer maxVertexTextures]: The value of *gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS*.
+		   The number of textures that can be used in a vertex shader.<br />
+		- [page:Integer maxVertexUniforms]: The value of *gl.MAX_VERTEX_UNIFORM_VECTORS*.
+		   The maximum number of uniforms that can be used in a vertex shader.<br />
+		- [page:String precision]: The shader precision currently being used by the renderer.<br />
+		- [page:Boolean vertexTextures]: *true* if [property:Integer maxVertexTextures] is greater than 0 (i.e. vertext textures can be used).<br />
+		</p>
+
+		<h3>[property:Array clippingPlanes]</h3>
+		<p>
+		User-defined clipping planes specified as THREE.Plane objects in world space.
+			These planes apply globally. Points in space whose dot product with the plane is negative are cut away.
+		 Default is [].
+		</p>
+
+		<h3>[property:DOMElement domElement]</h3>
+		<p>
+		A [link:https://developer.mozilla.org/en-US/docs/Web/HTML/Element/canvas canvas] where the renderer draws its output.<br />
+			This is automatically created by the renderer in the constructor (if not provided already);
+			you just need to add it to your page like so:<br />
+		<code>
+			document.body.appendChild( renderer.domElement );
+		</code>
+	  </p>
+
+		<h3>[property:Object extensions]</h3>
+		<p>
+		A wrapper for the [page:WebGLRenderer.extensions.get .extensions.get] method, used to check whether
+		various WebGL extensions are supported.
+		</p>
+
+		<h3>[property:Float gammaFactor]</h3>
+		<p>Default is *2*. </p>
+
+		<h3>[property:number outputEncoding]</h3>
+		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<p>If a render target has been set using [page:WebGLRenderer.setRenderTarget .setRenderTarget] then renderTarget.texture.encoding will be used instead.</p>
+		<p>See the [page:Textures texture constants] page for details of other formats.</p>
+
+		<h3>[property:Object info]</h3>
+		<p>An object with a series of statistical information about the graphics board memory and the rendering process. Useful for debugging or just for the sake of curiosity. The object contains the following fields:</p>
+		<p>
+		<ul>
+			<li>memory:
+				<ul>
+					<li>geometries</li>
+					<li>textures</li>
+				</ul>
+			</li>
+			<li>render:
+				<ul>
+					<li>calls</li>
+					<li>triangles</li>
+					<li>points</li>
+					<li>lines</li>
+					<li>frame</li>
+				</ul>
+			</li>
+			<li>programs
+			</li>
+		</ul>
+		</p>
+		<p>By default these data are reset at each render calls, but when using the composer or mirrors it can be preferred to reset them with a custom pattern :
+		<code>
+		renderer.info.autoReset = false;
+		renderer.info.reset();
+		</code>
+		</p>
+
+		<h3>[property:Boolean localClippingEnabled]</h3>
+		<p>Defines whether the renderer respects object-level clipping planes. Default is *false*.</p>
+
+		<h3>[property:Integer maxMorphTargets]</h3>
+		<p>
+		Default is 8. The maximum number of MorphTargets allowed in a shader.
+			Keep in mind that the standard materials only allow 8 MorphTargets.
+		</p>
+
+		<h3>[property:Integer maxMorphNormals]</h3>
+		<p>
+		Default is 4. The maximum number of MorphNormals allowed in a shader.
+			Keep in mind that the standard materials only allow 4 MorphNormals.
+		</p>
+
+		<h3>[property:Boolean physicallyCorrectLights]</h3>
+		<p>
+		Whether to use physically correct lighting mode. Default is *false*.
+		See the [example:webgl_lights_physical lights / physical] example.
+		</p>
+
+		<h3>[property:Object properties]</h3>
+		<p>
+		Used internally by the renderer to keep track of various sub object properties.
+		</p>
+
+		<h3>[property:WebGLRenderLists renderLists]</h3>
+		<p>
+		Used internally to handle ordering of scene object rendering.
+		</p>
+
+		<h3>[property:WebGLShadowMap shadowMap]</h3>
+		<p>
+		This contains the reference to the shadow map, if used.
+		</p>
+
+		<h3>[property:Boolean shadowMap.enabled]</h3>
+		<p>If set, use shadow maps in the scene. Default is *false*.</p>
+
+		<h3>[property:Boolean shadowMap.autoUpdate]</h3>
+		<p>Enables automatic updates to the shadows in the scene. Default is *true*.</p>
+		<p>If you do not require dynamic lighting / shadows, you may set this to *false* when the renderer is instantiated.</p>
+
+		<h3>[property:Boolean shadowMap.needsUpdate]</h3>
+		<p>When set to *true*, shadow maps in the scene will be updated in the next *render* call. Default is *false*. </p>
+		<p>If you have disabled automatic updates to shadow maps (*shadowMap.autoUpdate = false*), you will need to set this to *true* and then make a render call to update the shadows in your scene.</p>
+
+		<h3>[property:Integer shadowMap.type]</h3>
+		<p>Defines shadow map type (unfiltered, percentage close filtering, percentage close filtering with bilinear filtering in shader)</p>
+		<p>Options are THREE.BasicShadowMap, THREE.PCFShadowMap (default), THREE.PCFSoftShadowMap and THREE.VSMShadowMap. See [page:Renderer Renderer constants] for details.</p>
+
+		<h3>[property:Boolean sortObjects]</h3>
+		<p>
+		Defines whether the renderer should sort objects. Default is *true*.<br /><br />
+
+		Note: Sorting is used to attempt to properly render objects that have some degree of transparency.
+		By definition, sorting objects may not work in all cases.  Depending on the needs of application,
+		it may be necessary to turn off sorting and use other methods to deal with transparency
+		rendering e.g. manually determining each object's rendering order.
+		</p>
+
+		<h3>[property:Object state]</h3>
+		<p>
+		Contains functions for setting various properties of the [page:WebGLRenderer.context] state.
+		</p>
+
+		<h3>[property:Constant toneMapping]</h3>
+		<p>
+		Default is [page:Renderer NoToneMapping]. See the [page:Renderer Renderer constants] for other choices.
+		</p>
+
+		<h3>[property:Number toneMappingExposure]</h3>
+		<p>
+		Exposure level of tone mapping. Default is *1*.
+		</p>
+
+		<h3>[property:WebXRManager xr]</h3>
+		<p>
+		Provides access to the WebXR related [page:WebXRManager interface] of the renderer.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null clear]( [param:Boolean color], [param:Boolean depth], [param:Boolean stencil] )</h3>
+		<p>
+		Tells the renderer to clear its color, depth or stencil drawing buffer(s).
+			This method initializes the color buffer to the current clear color value.<br />
+		Arguments default to *true*.
+		</p>
+
+		<h3>[method:null clearColor]( )</h3>
+		<p>Clear the color buffer. Equivalent to calling [page:WebGLRenderer.clear .clear]( true, false, false ).</p>
+
+		<h3>[method:null clearDepth]( )</h3>
+		<p>Clear the depth buffer. Equivalent to calling [page:WebGLRenderer.clear .clear]( false, true, false ).</p>
+
+		<h3>[method:null clearStencil]( )</h3>
+		<p>Clear the stencil buffers. Equivalent to calling [page:WebGLRenderer.clear .clear]( false, false, true ).</p>
+
+		<h3>[method:null compile]( [param:Object3D scene], [param:Camera camera] )</h3>
+		<p>Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.</p>
+
+		<h3>[method:null copyFramebufferToTexture]( [param:Vector2 position], [param:Texture texture], [param:Number level] )</h3>
+		<p>Copies pixels from the current WebGLFramebuffer into a 2D texture. Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/copyTexImage2D WebGLRenderingContext.copyTexImage2D].</p>
+
+		<h3>[method:null copyTextureToTexture]( [param:Vector2 position], [param:Texture srcTexture], [param:Texture dstTexture], [param:Number level] )</h3>
+		<p>Copies all pixels of a texture to an existing texture starting from the given position. Enables access to [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texSubImage2D WebGLRenderingContext.texSubImage2D].</p>
+
+		<h3>[method:null dispose]( )</h3>
+		<p>Dispose of the current rendering context.</p>
+
+		<h3>[method:Object extensions.get]( [param:String extensionName] )</h3>
+		<p>
+		Used to check whether various extensions are supported and returns an object with details of the extension if available.
+		This method can check for the following extensions:<br /><br />
+
+		- *WEBGL_depth_texture*<br />
+		- *EXT_texture_filter_anisotropic*<br />
+		- *WEBGL_compressed_texture_s3tc*<br />
+		- *WEBGL_compressed_texture_pvrtc*<br />
+		- *WEBGL_compressed_texture_etc1*
+		</p>
+
+		<h3>[method:null forceContextLoss]( )</h3>
+		<p>
+		Simulate loss of the WebGL context. This requires support for the
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_lose_context WEBGL_lose_context] extensions.
+		According to [link:https://webglstats.com/ WebGLStats], as of February 2016 90% of WebGL enabled devices support this.
+		</p>
+
+		<h3>[method:Float getClearAlpha]()</h3>
+		<p>Returns a [page:Float float] with the current clear alpha. Ranges from 0 to 1.</p>
+
+		<h3>[method:Color getClearColor]()</h3>
+		<p>Returns a [page:Color THREE.Color] instance with the current clear color.</p>
+
+		<h3>[method:WebGLRenderingContext getContext]()</h3>
+		<p>Return the current WebGL context.</p>
+
+		<h3>[method:WebGLContextAttributes getContextAttributes]()</h3>
+		<p>Returns an object that describes the attributes set on the WebGL context when it was created.</p>
+
+		<h3>[method:Integer getActiveCubeFace]()</h3>
+		<p>Returns the current active cube face.</p>
+
+		<h3>[method:Integer getActiveMipmapLevel]()</h3>
+		<p>Returns the current active mipmap level.</p>
+
+		<h3>[method:RenderTarget getRenderTarget]()</h3>
+		<p>Returns the current [page:RenderTarget RenderTarget] if there are; returns *null* otherwise.</p>
+
+		<h3>[method:Vector4 getCurrentViewport]( [param:Vector4 target] )</h3>
+		<p>
+		[page:Vector4 target] — the result will be copied into this Vector4.<br /><br />
+
+		Returns the current viewport.
+		</p>
+
+		<h3>[method:Vector2 getDrawingBufferSize]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — the result will be copied into this Vector2.<br /><br />
+
+		Returns the width and height of the renderer's drawing buffer, in pixels.
+		</p>
+
+		<h3>[method:number getPixelRatio]()</h3>
+		<p>Returns current device pixel ratio used.</p>
+
+		<h3>[method:Vector4 getScissor]( [param:Vector4 target] )</h3>
+		<p>
+		[page:Vector4 target] — the result will be copied into this Vector4.<br /><br />
+
+		Returns the scissor region.
+		</p>
+
+		<h3>[method:Boolean getScissorTest]()</h3>
+		<p>Returns *true* if scissor test is enabled; returns *false* otherwise.</p>
+
+		<h3>[method:Vector2 getSize]( [param:Vector2 target] )</h3>
+		<p>
+		[page:Vector2 target] — the result will be copied into this Vector2.<br /><br />
+
+		Returns the width and height of the renderer's output canvas, in pixels.
+		</p>
+
+		<h3>[method:Vector4 getViewport]( [param:Vector4 target] )</h3>
+		<p>
+		[page:Vector4 target] — the result will be copied into this Vector4.<br /><br />
+
+		Returns the viewport.
+		</p>
+
+		<h3>[method:null initTexture]( [param:Texture texture] )</h3>
+		<p> Initializes the given texture. Useful for preloading a texture rather than waiting until first render (which can cause noticeable lags due to decode and GPU upload overhead).</p>
+
+		<h3>[method:null resetGLState]( )</h3>
+		<p>Reset the GL state to default. Called internally if the WebGL context is lost.</p>
+
+		<h3>[method:null readRenderTargetPixels]( [param:WebGLRenderTarget renderTarget], [param:Float x], [param:Float y], [param:Float width], [param:Float height], [param:TypedArray buffer], [param:Integer activeCubeFaceIndex] )</h3>
+		<p>buffer - Uint8Array is the only destination type supported in all cases, other types are renderTarget and platform dependent. See [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#5.14.12 WebGL spec] for details.</p>
+		<p>Reads the pixel data from the renderTarget into the buffer you pass in. This is a wrapper around [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/readPixels WebGLRenderingContext.readPixels]().</p>
+		<p>See the [example:webgl_interactive_cubes_gpu interactive / cubes / gpu] example.</p>
+		<p>For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
+
+
+		<h3>[method:null render]( [param:Object3D scene], [param:Camera camera] )</h3>
+		<p>
+			Render a [page:Scene scene] or another type of [page:Object3D object] using a [page:Camera camera].<br />
+
+			The render is done to a previously specified [page:WebGLRenderTarget renderTarget] set by calling [page:WebGLRenderer.setRenderTarget .setRenderTarget] or to the canvas as usual.<br />
+
+			By default render buffers are cleared before rendering but you can prevent this by setting the property [page:WebGLRenderer.autoClear autoClear] to false.
+			If you want to prevent only certain buffers being cleared you can set either the [page:WebGLRenderer.autoClearColor autoClearColor], [page:WebGLRenderer.autoClearStencil autoClearStencil] or
+			[page:WebGLRenderer.autoClearDepth autoClearDepth] properties to false. To forcibly clear one ore more buffers call [page:WebGLRenderer.clear .clear].
+		</p>
+
+		<h3>[method:null renderBufferDirect]( [param:Camera camera], [param:Fog fog], [param:Geometry geometry], [param:Material material], [param:Object3D object], [param:Object group] )</h3>
+		<p>Render a buffer geometry group using the camera and with the specified material.</p>
+
+		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
+		<p>object - an instance of [page:Object3D]<br />
+		program - an instance of [page:WebGLProgram]<br />
+
+		Renders an instance of [page:ImmediateRenderObject]. Gets called by renderObjectImmediate().
+		</p>
+
+		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>
+		<p>[page:Function callback] — The function will be called every available frame. If `null` is passed it will stop any already ongoing animation.</p>
+		<p>A built in function that can be used instead of [link:https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame requestAnimationFrame]. For WebXR projects this function must be used.</p>
+
+		<h3>[method:null setClearAlpha]( [param:Float alpha] )</h3>
+		<p>Sets the clear alpha. Valid input is a float between *0.0* and *1.0*.</p>
+
+		<h3>[method:null setClearColor]( [param:Color color], [param:Float alpha] )</h3>
+		<p>Sets the clear color and opacity.</p>
+
+		<h3>[method:null setFramebuffer]( [param:WebGLFramebuffer value] )</h3>
+		<p>Sets the given WebGLFramebuffer. This method can only be used if no render target is set via [page:WebGLRenderer.setRenderTarget .setRenderTarget]().</p>
+
+		<h3>[method:null setPixelRatio]( [param:number value] )</h3>
+		<p>Sets device pixel ratio. This is usually used for HiDPI device to prevent bluring output canvas.</p>
+
+		<h3>[method:null setRenderTarget]( [param:WebGLRenderTarget renderTarget], [param:Integer activeCubeFace], [param:Integer activeMipmapLevel] )</h3>
+		<p>
+		renderTarget -- The [page:WebGLRenderTarget renderTarget] that needs to be activated. When *null* is given, the canvas is set as the active render target instead.<br />
+		activeCubeFace -- Specifies the active cube side (PX 0, NX 1, PY 2, NY 3, PZ 4, NZ 5) of [page:WebGLCubeRenderTarget] (optional).<br />
+		activeMipmapLevel -- Specifies the active mipmap level (optional).<br /><br />
+		This method sets the active rendertarget.
+		</p>
+
+		<h3>[method:null setScissor]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
+		[method:null setScissor]( [param:Vector4 vector] )</h3>
+
+		<p>
+		The x, y, width, and height parameters of the scissor region.<br />
+		Optionally, a 4-component vector specifying the parameters of the region.<br /><br />
+
+		Sets the scissor region from (x, y) to (x + width, y + height).<br />
+		(x, y) is the lower-left corner of the scissor region.
+		</p>
+
+		<h3>[method:null setScissorTest]( [param:Boolean boolean] )</h3>
+		<p>
+		Enable or disable the scissor test. When this is enabled, only the pixels within the defined
+			scissor area will be affected by further renderer actions.
+		</p>
+
+		<h3>[method:null setOpaqueSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom opaque sort function for the WebGLRenderLists. Pass null to use the default painterSortStable function.
+		</p>
+
+		<h3>[method:null setTransparentSort]( [param:Function method] )</h3>
+		<p>
+		Sets the custom transparent sort function for the WebGLRenderLists. Pass null to use the default reversePainterSortStable function.
+		</p>
+
+		<h3>[method:null setSize]( [param:Integer width], [param:Integer height], [param:Boolean updateStyle] )</h3>
+		<p>
+		Resizes the output canvas to (width, height) with device pixel ratio taken into account,
+			and also sets the viewport to fit that size, starting in (0, 0).
+			Setting [page:Boolean updateStyle] to false prevents any style changes to the output canvas.
+		</p>
+
+		<h3>[method:null setViewport]( [param:Integer x], [param:Integer y], [param:Integer width], [param:Integer height] )<br />
+		[method:null setViewport]( [param:Vector4 vector] )</h3>
+
+		<p>
+		The x, y, width, and height parameters of the viewport.<br />
+		Optionally, a 4-component vector specifying the parameters of a viewport.<br /><br />
+
+		Sets the viewport to render from (x, y) to (x + width, y + height).<br />
+		(x, y) is the lower-left corner of the region.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

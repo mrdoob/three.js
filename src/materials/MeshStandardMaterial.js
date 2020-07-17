@@ -64,8 +64,8 @@ function MeshStandardMaterial( parameters ) {
 	this.type = 'MeshStandardMaterial';
 
 	this.color = new Color( 0xffffff ); // diffuse
-	this.roughness = 0.5;
-	this.metalness = 0.5;
+	this.roughness = 1.0;
+	this.metalness = 0.0;
 
 	this.map = null;
 
@@ -109,6 +109,8 @@ function MeshStandardMaterial( parameters ) {
 	this.skinning = false;
 	this.morphTargets = false;
 	this.morphNormals = false;
+
+	this.vertexTangents = false;
 
 	this.setValues( parameters );
 
@@ -171,6 +173,8 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
 	this.skinning = source.skinning;
 	this.morphTargets = source.morphTargets;
 	this.morphNormals = source.morphNormals;
+
+	this.vertexTangents = source.vertexTangents;
 
 	return this;
 

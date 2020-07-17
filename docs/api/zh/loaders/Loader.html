@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>加载器（[name]）</h1>
+
+		<p class="desc">用于实现加载器的基类。</p>
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+			[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].
+		</p>
+		<p>
+			Creates a new [name].
+		</p>
+
+
+		<h2>属性</h2>
+
+		<h3>[property:string crossOrigin]</h3>
+		<p>
+		The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		Default is *anonymous*.
+		</p>
+
+		<h3>[property:LoadingManager manager]</h3>
+		<p>
+			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
+		</p>
+
+		<h3>[property:String path]</h3>
+		<p>
+			The base path from which the asset will be loaded.
+			Default is the empty string.
+		</p>
+
+		<h3>[property:String resourcePath]</h3>
+		<p>
+			The base path from which additional resources like textures will be loaded.
+			Default is the empty string.
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:void load]()</h3>
+		<p>
+			This method needs to be implement by all concrete loaders. It holds the logic for loading the asset from the backend.
+		</p>
+
+		<h3>[method:Promise loadAsync]( [param:String url], [param:Function onProgress] )</h3>
+		<p>
+		[page:String url] — A string containing the path/URL of the file to be loaded.<br />
+		[page:Function onProgress] — (optional) A function to be called while the loading is in progress. The argument will be the XMLHttpRequest instance, that contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		</p>
+		<p>
+		This method is equivalent to [page:.load], but returns a [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise Promise].
+		</p>
+		<p>
+		[page:Function onLoad] is handled by [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/resolve Promise.resolve] and [page:Function onError] is handled by [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/reject Promise.reject].
+		</p>
+
+		<h3>[method:void parse]()</h3>
+		<p>
+			This method needs to be implement by all concrete loaders. It holds the logic for parsing the asset into three.js entities.
+		</p>
+
+		<h3>[method:Loader setCrossOrigin]( [param:String crossOrigin] )</h3>
+		<p>
+			[page:String crossOrigin] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</p>
+
+		<h3>[method:Loader setPath]( [param:String path] )</h3>
+		<p>
+			[page:String path] — Set the base path for the asset.
+		</p>
+
+		<h3>[method:Loader setResourcePath]( [param:String resourcePath] )</h3>
+		<p>
+			[page:String resourcePath] — Set the base path for dependent resources like textures.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

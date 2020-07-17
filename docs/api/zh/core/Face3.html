@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			在 [page:Geometry] 中被使用到的三角形面。这些三角形面会为所有标准几何体自动创建。
+			然而，如果你正在构建一个自定义几何体，你需要手动创建这些三角形面。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		var material = new THREE.MeshStandardMaterial( { color : 0x00cc00 } );
+
+		// 创建仅有一个三角形面的几何体
+		var geometry = new THREE.Geometry();
+		geometry.vertices.push( new THREE.Vector3( -50, -50, 0 ) );
+		geometry.vertices.push( new THREE.Vector3(  50, -50, 0 ) );
+		geometry.vertices.push( new THREE.Vector3(  50,  50, 0 ) );
+
+		// 利用顶点 0, 1, 2 创建一个面
+		var normal = new THREE.Vector3( 0, 0, 1 ); //optional
+		var color = new THREE.Color( 0xffaa00 ); //optional
+		var materialIndex = 0; //optional
+		var face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
+
+		// 将创建的面添加到几何体的面的队列
+		geometry.faces.push( face );
+
+		// 如果没有特别指明，面和顶点的法向量可以通过如下代码自动计算
+		geometry.computeFaceNormals();
+		geometry.computeVertexNormals();
+
+		scene.add( new THREE.Mesh( geometry, material ) );
+	</code>
+
+	<h2>例子</h2>
+
+	<p>
+		[example:svg_sandbox svg / sandbox ]<br />
+		[example:misc_exporter_obj exporter / obj ]<br />
+		[example:webgl_shaders_vector WebGL / shaders / vector ]
+	</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Integer a], [param:Integer b], [param:Integer c], [param:Vector3 normal], [param:Color color], [param:Integer materialIndex] )</h3>
+		<p>
+			a — 顶点 A 的索引。<br />
+			b — 顶点 B 的索引。<br />
+			c — 顶点 C 的索引。<br /><br />
+
+			normal — (可选) 面的法向量 ([page:Vector3 Vector3]) 或顶点法向量队列。
+			如果参数传入单一矢量，则用该量设置面的法向量 [page:.normal]，如果传入的是包含三个矢量的队列，
+			则用该量设置 [page:.vertexNormals]<br /><br />
+
+			color — (可选) 面的颜色值 [page:Color color] 或顶点颜色值的队列。
+			如果参数传入单一矢量，则用该量设置 [page:.color]，如果传入的是包含三个矢量的队列，
+			则用该量设置 [page:.vertexColors]<br /><br />
+
+			materialIndex — (可选) 材质队列中与该面对应的材质的索引。
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Integer a]</h3>
+		<p>
+			顶点 A 的索引。
+		</p>
+
+		<h3>[property:Integer b]</h3>
+		<p>
+			顶点 B 的索引。
+		</p>
+
+		<h3>[property:Integer c]</h3>
+		<p>
+			顶点 C 的索引。
+		</p>
+
+		<h3>[property:Vector3 normal]</h3>
+		<p>
+			面的法向量 - 矢量展示 Face3 的方向。如果该量是通过调用 [page:Geometry.computeFaceNormals] 自动计算的，
+			该值等于归一化的两条边的差积。默认值是 *(0, 0, 0)*。
+		</p>
+
+		<h3>[property:Color color]</h3>
+		<p>
+			面的颜色值 - 在被用于指定材质的 [page:Material.vertexColors vertexColors] 属性时，该值必须被设置为
+			*true*。
+		</p>
+
+		<h3>[property:Array vertexNormals]</h3>
+		<p>
+			包含三个 [page:Vector3 vertex normals] 的队列。
+		</p>
+
+		<h3>[property:Array vertexColors]</h3>
+		<p>
+			包含 3 个顶点颜色值的队列 - 在被用于指定材质的 [page:Material.vertexColors vertexColors] 属性时，该值必须被设置为
+			*true*。
+		</p>
+
+		<h3>[property:Integer materialIndex]</h3>
+		<p>
+			材质队列中与该面相关的材质的索引。默认值为 *0*。
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:Face3 clone]()</h3>
+		<p>克隆该 Face3 对象。</p>
+
+		<h3>[method:Face3 copy]( [param:Face3 face3] )</h3>
+		<p>将参数指定的 Face3 对象的数据拷贝到当前对象。</p>
+
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

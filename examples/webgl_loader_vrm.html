@@ -4,50 +4,25 @@
 		<title>three.js webgl - vrm loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a {
-				color: #75ddc1;
-				font-weight: bold;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - VRMLoader<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - VRMLoader<br />
 			Alicia by
 			<a href="https://3d.nicovideo.jp/works/td32797" target="_blank" rel="noopener">Dwango</a> /
 			<a href="http://3d.nicovideo.jp/alicia/rule.html">License</a><br />
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
-		<script src="js/loaders/VRMLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { VRMLoader } from './jsm/loaders/VRMLoader.js';
 
 			var container, stats, controls;
 			var camera, scene, renderer, light;
@@ -63,10 +38,6 @@
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
 				camera.position.set( 0, 1.6, - 2.2 );
 
-				controls = new THREE.OrbitControls( camera );
-				controls.target.set( 0, 0.9, 0 );
-				controls.update();
-
 				scene = new THREE.Scene();
 
 				light = new THREE.HemisphereLight( 0xbbbbff, 0x444422 );
@@ -74,11 +45,11 @@
 				scene.add( light );
 
 				// model
-				var loader = new THREE.VRMLoader();
+				var loader = new VRMLoader();
 				loader.load( 'models/vrm/Alicia/AliciaSolid.vrm', function ( vrm ) {
 
 					// VRMLoader doesn't support VRM Unlit extension yet so
-					// converting all materials to MeshBasicMaterial here as workaround so far.
+					// converting all materials to THREE.MeshBasicMaterial here as workaround so far.
 					vrm.scene.traverse( function ( object ) {
 
 						if ( object.material ) {
@@ -91,7 +62,9 @@
 									THREE.Material.prototype.copy.call( material, object.material[ i ] );
 									material.color.copy( object.material[ i ].color );
 									material.map = object.material[ i ].map;
-									material.lights = false;
+									material.skinning = object.material[ i ].skinning;
+									material.morphTargets = object.material[ i ].morphTargets;
+									material.morphNormals = object.material[ i ].morphNormals;
 									object.material[ i ] = material;
 
 								}
@@ -102,7 +75,9 @@
 								THREE.Material.prototype.copy.call( material, object.material );
 								material.color.copy( object.material.color );
 								material.map = object.material.map;
-								material.lights = false;
+								material.skinning = object.material.skinning;
+								material.morphTargets = object.material.morphTargets;
+								material.morphNormals = object.material.morphNormals;
 								object.material = material;
 
 							}
@@ -118,8 +93,15 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 5;
+				controls.enableDamping = true;
+				controls.target.set( 0, 0.9, 0 );
+				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -143,6 +125,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				controls.update(); // to support damping
 
 				renderer.render( scene, camera );
 

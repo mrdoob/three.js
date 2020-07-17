@@ -79,21 +79,36 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "getCenter", ( assert ) => {
+		QUnit.test( "getCenter", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var center = new Vector3();
 
-		} );
-
-		QUnit.todo( "delta", ( assert ) => {
-
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Line3( zero3.clone(), two3.clone() );
+			assert.ok( a.getCenter( center ).equals( one3.clone() ), "Passed" );
 
 		} );
 
-		QUnit.todo( "distanceSq", ( assert ) => {
+		QUnit.test( "delta", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var delta = new Vector3();
+
+			var a = new Line3( zero3.clone(), two3.clone() );
+			assert.ok( a.delta( delta ).equals( two3.clone() ), "Passed" );
+
+		} );
+
+		QUnit.test( "distanceSq", ( assert ) => {
+
+			var a = new Line3( zero3, zero3 );
+			var b = new Line3( zero3, one3 );
+			var c = new Line3( one3.clone().negate(), one3 );
+			var d = new Line3( two3.clone().multiplyScalar( - 2 ), two3.clone().negate() );
+
+			assert.numEqual( a.distanceSq(), 0, "Check squared distance for zero-length line" );
+			assert.numEqual( b.distanceSq(), 3, "Check squared distance for simple line" );
+			assert.numEqual( c.distanceSq(), 12, "Check squared distance for negative to positive endpoints" );
+			assert.numEqual( d.distanceSq(), 12, "Check squared distance for negative to negative endpoints" );
+
 
 		} );
 
@@ -192,9 +207,11 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.todo( "equals", ( assert ) => {
+		QUnit.test( "equals", ( assert ) => {
 
-			assert.ok( false, "everything's gonna be alright" );
+			var a = new Line3( zero3.clone(), zero3.clone() );
+			var b = new Line3();
+			assert.ok( a.equals( b ), "Passed" );
 
 		} );
 

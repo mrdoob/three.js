@@ -4,27 +4,14 @@
 		<title>three.js webgl - interactive - voxel painter</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				font-weight: bold;
-				overflow:hidden;
+				background-color: #f0f0f0;
+				color: #444;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
 			a {
-				color: #ff0000;
+				color: #08f;
 			}
 		</style>
 	</head>
@@ -35,16 +22,12 @@
 			<strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
 			var camera, scene, renderer;
-			var plane, cube;
+			var plane;
 			var mouse, raycaster, isShiftDown = false;
 
 			var rollOverMesh, rollOverMaterial;
@@ -59,7 +42,7 @@
 
 				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 				camera.position.set( 500, 800, 1300 );
-				camera.lookAt( new THREE.Vector3() );
+				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xf0f0f0 );
@@ -177,7 +160,7 @@
 
 						}
 
-					// create cube
+						// create cube
 
 					} else {
 
@@ -198,7 +181,7 @@
 
 			function onDocumentKeyDown( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 16: isShiftDown = true; break;
 

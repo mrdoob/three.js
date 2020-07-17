@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Creates a visual aid consisting of a spherical [page:Mesh] for a [page:HemisphereLight HemisphereLight].
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		var helper = new THREE.HemisphereLightHelper( light, 5 );
+		scene.add( helper );
+		</code>
+
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:HemisphereLight light], [param:Number sphereSize], [param:Hex color] )</h3>
+		<p>
+			[page:HemisphereLight light] -- The light being visualized. <br /><br />
+
+			[page:Number size] -- The size of the mesh used to visualize the light.<br /><br />
+
+			[page:Hex color] -- (optional) if this is not the set the helper will take the color of the light.
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:Object3D] class for common properties.</p>
+
+		<h3>[property:HemisphereLight light]</h3>
+		<p>Reference to the HemisphereLight being visualized.</p>
+
+		<h3>[property:object matrix]</h3>
+		<p>Reference to the hemisphereLight's [page:Object3D.matrixWorld matrixWorld].</p>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
+		<p>
+			See [page:Object3D.matrixAutoUpdate]. Set to *false* here as the helper is using the
+			hemisphereLight's [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+		<h3>[property:hex color]</h3>
+		<p>
+			 The color parameter passed in the constructor. Default is *undefined*. If this is changed, the helper's color will update
+			the next time [page:.update update] is called.
+		</p>
+
+
+		<h2>Methods</h2>
+		<p>See the base [page:Object3D] class for common methods.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>Dispose of the hemisphereLightHelper.</p>
+
+		<h3>[method:null update]()</h3>
+		<p>Updates the helper to match the position and direction of the [page:.light].</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

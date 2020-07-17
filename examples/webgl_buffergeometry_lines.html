@@ -4,49 +4,33 @@
 		<title>three.js webgl - buffergeometry - lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #cccccc;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-
-			a {
-				color: #0080ff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - lines</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - buffergeometry - lines</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-			var container, stats;
+			var container, stats, clock;
 
 			var camera, scene, renderer;
 
-			var mesh;
+			var line;
+
+			var segments = 10000;
+			var r = 800;
+			var t = 0;
+
+			var params = {
+				morphTargets: false
+			};
 
 			init();
 			animate();
@@ -62,15 +46,13 @@
 
 				scene = new THREE.Scene();
 
-				var segments = 10000;
+				clock = new THREE.Clock();
 
 				var geometry = new THREE.BufferGeometry();
-				var material = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
+				var material = new THREE.LineBasicMaterial( { vertexColors: true, morphTargets: true } );
 
 				var positions = [];
 				var colors = [];
-
-				var r = 800;
 
 				for ( var i = 0; i < segments; i ++ ) {
 
@@ -90,22 +72,21 @@
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
-				geometry.addAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
+				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
+				generateMorphTargets( geometry );
 
 				geometry.computeBoundingSphere();
 
-				mesh = new THREE.Line( geometry, material );
-				scene.add( mesh );
+				line = new THREE.Line( geometry, material );
+				scene.add( line );
 
 				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				container.appendChild( renderer.domElement );
 
@@ -113,6 +94,13 @@
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
+
+				//
+
+				var gui = new GUI();
+				gui.add( params, 'morphTargets' );
+				gui.open();
+
 
 				//
 
@@ -142,12 +130,41 @@
 
 			function render() {
 
-				var time = Date.now() * 0.001;
+				var delta = clock.getDelta();
+				var time = clock.getElapsedTime();
 
-				mesh.rotation.x = time * 0.25;
-				mesh.rotation.y = time * 0.5;
+				line.rotation.x = time * 0.25;
+				line.rotation.y = time * 0.5;
+
+				if ( params.morphTargets ) {
+
+					t += delta * 0.5;
+					line.morphTargetInfluences[ 0 ] = Math.abs( Math.sin( t ) );
+
+				}
 
 				renderer.render( scene, camera );
+
+			}
+
+			function generateMorphTargets( geometry ) {
+
+				var data = [];
+
+				for ( var i = 0; i < segments; i ++ ) {
+
+					var x = Math.random() * r - r / 2;
+					var y = Math.random() * r - r / 2;
+					var z = Math.random() * r - r / 2;
+
+					data.push( x, y, z );
+
+				}
+
+				var morphTarget = new THREE.Float32BufferAttribute( data, 3 );
+				morphTarget.name = 'target1';
+
+				geometry.morphAttributes.position = [ morphTarget ];
 
 			}
 

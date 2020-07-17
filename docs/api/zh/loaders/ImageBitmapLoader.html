@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			一个把[page:Image]加载为[link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap]的加载器。
+			ImageBitmap提供了一种异步且有效的资源的途径，用于在WebGL中渲染的纹理。<br/>
+			不像[page:FileLoader], [name]无需避免对同一的URL进行多次请求。
+		</p>
+
+		<p>
+			Note that [page:Texture.flipY] and [page:Texture.premultiplyAlpha] with [link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] are ignored.
+			[link:https://developer.mozilla.org/de/docs/Web/API/ImageBitmap ImageBitmap] needs these configuration on bitmap creation
+			unlike regular images need them on uploading to GPU. You need to set the equivalent options via [page:ImageBitmapLoader.setOptions]
+			instead. Refer to [link:https://www.khronos.org/registry/webgl/specs/latest/1.0/#6.10 WebGL specification] for the detail.
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// 初始化一个加载器
+		var loader = new THREE.ImageBitmapLoader();
+
+		// set options if needed
+		loader.setOptions( { imageOrientation: 'flipY' } );
+
+		// 加载一个图片资源
+		loader.load(
+			// 资源的URL
+			'textures/skyboxsun25degtest.png',
+
+			// onLoad回调
+			function ( imageBitmap ) {
+				var texture = new THREE.CanvasTexture( imageBitmap );
+				var material = new THREE.MeshBasicMaterial( { map: texture } );
+			},
+
+			// 目前暂不支持onProgress的回调
+			undefined,
+
+			// onError回调
+			function ( err ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_loader_imagebitmap WebGL / loader / ImageBitmap]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — 加载器使用的[page:LoadingManager loadingManager]，默认为[page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		创建一个新的[name].
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Loader]。</p>
+
+
+		<h3>[property:String options]</h3>
+		<p>一个可选对象，用来设置内部使用的[link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap]工厂方法，
+			默认为*undefined*.</p>
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Loader]。</p>
+
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — 文件的URL或者路径，也可以为
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — 加载完成时将调用。回调参数为将要加载的[page:Image image].<br />
+		[page:Function onProgress] — 此回调函数暂时不支持<br />
+		[page:Function onError] —  在加载错误时被调用。<br />
+		</p>
+		<p>
+			从URL中进行加载，并返回将包含数据的[page:ImageBitmap image]对象。
+		</p>
+
+		<h3>[method:ImageBitmapLoader setOptions]( [param:Object options] )</h3>
+		<p>
+			设置[link:https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/createImageBitmap createImageBitmap]的选项对象。
+		</p>
+
+		<h2>源</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

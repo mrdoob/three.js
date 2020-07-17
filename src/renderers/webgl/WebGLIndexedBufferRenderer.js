@@ -2,9 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLIndexedBufferRenderer( gl, extensions, info ) {
+function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
-	var mode;
+	const isWebGL2 = capabilities.isWebGL2;
+
+	let mode;
 
 	function setMode( value ) {
 
@@ -12,7 +14,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 	}
 
-	var type, bytesPerElement;
+	let type, bytesPerElement;
 
 	function setIndex( value ) {
 
@@ -29,17 +31,21 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 	}
 
-	function renderInstances( geometry, start, count ) {
+	function renderInstances( geometry, start, count, primcount ) {
 
-		var extension;
+		if ( primcount === 0 ) return;
 
-		if ( gl.isWebGL2 ) {
+		let extension, methodName;
+
+		if ( isWebGL2 ) {
 
 			extension = gl;
+			methodName = 'drawElementsInstanced';
 
 		} else {
 
-			var extension = extensions.get( 'ANGLE_instanced_arrays' );
+			extension = extensions.get( 'ANGLE_instanced_arrays' );
+			methodName = 'drawElementsInstancedANGLE';
 
 			if ( extension === null ) {
 
@@ -50,9 +56,9 @@ function WebGLIndexedBufferRenderer( gl, extensions, info ) {
 
 		}
 
-		extension[ gl.isWebGL2 ? 'drawElementsInstanced' : 'drawElementsInstancedANGLE' ]( mode, count, type, start * bytesPerElement, geometry.maxInstancedCount );
+		extension[ methodName ]( mode, count, type, start * bytesPerElement, primcount );
 
-		info.update( count, mode, geometry.maxInstancedCount );
+		info.update( count, mode, primcount );
 
 	}
 

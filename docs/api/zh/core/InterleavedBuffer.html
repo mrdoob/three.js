@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			"交叉存储" 表明多个类型的 attributes （例如，顶点位置、法向量、UV 和颜色值）被存储到一个队列中。
+			<br/><br/>
+			如下链接有对交叉存储更详细的介绍: [link:https://blog.tojicode.com/2011/05/interleaved-array-basics.html Interleaved array basics]
+		</p>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_buffergeometry_points_interleaved webgl / buffergeometry / points / interleaved]</p>
+
+		<h2>构造函数</h2>
+		<h3>[name]( [param:TypedArray array], [param:Integer stride] )</h3>
+		<p>
+			[page:TypedArray array] -- 一个基于共享缓存的类型化队列。该队列存储几何体相关数据。<br/>
+			[page:Integer stride] -- 每个顶点占用类型化队列的多少个元素。
+		</p>
+
+		<h2>属性</h2>
+
+		<h3>[property:Array array]</h3>
+		<p>
+			一个基于共享缓存的类型化队列。该队列存储几何体相关数据。
+		</p>
+
+		<h3>[property:Integer stride]</h3>
+		<p>
+			每个顶点占用类型化队列的多少个元素。
+		</p>
+
+		<h3>[property:Integer count]</h3>
+		<p>
+			类型化队列中，所有元素的数目。
+		</p>
+
+		<h3>[property:Object updateRange]</h3>
+		<p>
+			对象存储着需要更新的数据的偏移量和数量。
+		</p>
+
+		<h3>[property:Number updateRange.offset]</h3>
+		<p>
+			默认值为 *0*。
+		</p>
+
+		<h3>[property:Number updateRange.count]</h3>
+		<p>
+			默认值为 *-1*。
+		</p>
+
+		<h3>[property:String uuid]</h3>
+		<p>
+		该类所创建的实例的[link:http://en.wikipedia.org/wiki/Universally_unique_identifier UUID]。它是自动被指定的，因此它不应当被编辑、更改。
+		</p>
+
+		<h3>[property:Integer version]</h3>
+		<p>
+			版本号，每次 needsUpdate 属性设置为 true 时，版本号增加。
+		</p>
+
+		<h3>[property:Integer isInterleavedBuffer]</h3>
+		<p>
+			默认值为 *true*。
+		</p>
+
+		<h3>[property:Integer needsUpdate]</h3>
+		<p>
+			默认值为 *false*。该值被设置为 true 时，会导致 [page:InterleavedBuffer.version version] 增加。
+		</p>
+
+		<h3>[property:Usage usage]</h3>
+		<p>
+			Defines the intended usage pattern of the data store for optimization purposes. Corresponds to the *usage* parameter of
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/bufferData WebGLRenderingContext.bufferData]().
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:InterleavedBuffer copy]( [param:InterleavedBuffer source] ) </h3>
+		<p>
+			将参数指定的 [name] 拷贝到当前 [name]。
+		</p>
+
+		<h3>[method:InterleavedBuffer copyAt]( [param:Integer index1], [param:InterleavedBuffer attribute], [param:Integer index2] ) </h3>
+		<p> 将数据从 attribute[index2] 拷贝到 [page:InterleavedBuffer.array array][index1]。</p>
+
+		<h3>[method:InterleavedBuffer set]( [param:TypedArray value], [param:Integer offset] ) </h3>
+		<p>
+			value - 被拷贝的源（类型化）队列。<br/>
+			offset - 源队列中，数据开始拷贝的偏移量。默认值是 *0*.<br/><br />
+
+			将源队列数据拷贝到目标队列缓存中。
+		</p>
+
+		<h3>[method:InterleavedBuffer clone]( [param:Object data] ) </h3>
+		<p>
+			data - This object holds shared array buffers required for properly cloning geometries with interleaved attributes.<br/><br />
+
+			Creates a clone of this [name].
+		</p>
+
+		<h3>[method:InterleavedBuffer setUsage] ( [param:Usage value] ) </h3>
+		<p>Set [page:InterleavedBuffer.usage usage] to value.</p>
+
+		<h3>[method:InterleavedBuffer toJSON]( [param:Object data] ) </h3>
+		<p>
+			data - This object holds shared array buffers required for properly serializing geometries with interleaved attributes.<br/><br />
+
+			Serializes this [name].
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

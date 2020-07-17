@@ -1,6 +1,8 @@
 import { Box3 } from './Box3.js';
 import { Vector3 } from './Vector3.js';
 
+const _box = new Box3();
+
 /**
  * @author bhouston / http://clara.io
  * @author mrdoob / http://mrdoob.com/
@@ -9,7 +11,7 @@ import { Vector3 } from './Vector3.js';
 function Sphere( center, radius ) {
 
 	this.center = ( center !== undefined ) ? center : new Vector3();
-	this.radius = ( radius !== undefined ) ? radius : 0;
+	this.radius = ( radius !== undefined ) ? radius : - 1;
 
 }
 
@@ -24,39 +26,33 @@ Object.assign( Sphere.prototype, {
 
 	},
 
-	setFromPoints: function () {
+	setFromPoints: function ( points, optionalCenter ) {
 
-		var box = new Box3();
+		const center = this.center;
 
-		return function setFromPoints( points, optionalCenter ) {
+		if ( optionalCenter !== undefined ) {
 
-			var center = this.center;
+			center.copy( optionalCenter );
 
-			if ( optionalCenter !== undefined ) {
+		} else {
 
-				center.copy( optionalCenter );
+			_box.setFromPoints( points ).getCenter( center );
 
-			} else {
+		}
 
-				box.setFromPoints( points ).getCenter( center );
+		let maxRadiusSq = 0;
 
-			}
+		for ( let i = 0, il = points.length; i < il; i ++ ) {
 
-			var maxRadiusSq = 0;
+			maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
 
-			for ( var i = 0, il = points.length; i < il; i ++ ) {
+		}
 
-				maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
+		this.radius = Math.sqrt( maxRadiusSq );
 
-			}
+		return this;
 
-			this.radius = Math.sqrt( maxRadiusSq );
-
-			return this;
-
-		};
-
-	}(),
+	},
 
 	clone: function () {
 
@@ -73,9 +69,18 @@ Object.assign( Sphere.prototype, {
 
 	},
 
-	empty: function () {
+	isEmpty: function () {
 
-		return ( this.radius <= 0 );
+		return ( this.radius < 0 );
+
+	},
+
+	makeEmpty: function () {
+
+		this.center.set( 0, 0, 0 );
+		this.radius = - 1;
+
+		return this;
 
 	},
 
@@ -93,7 +98,7 @@ Object.assign( Sphere.prototype, {
 
 	intersectsSphere: function ( sphere ) {
 
-		var radiusSum = this.radius + sphere.radius;
+		const radiusSum = this.radius + sphere.radius;
 
 		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
 
@@ -113,7 +118,7 @@ Object.assign( Sphere.prototype, {
 
 	clampPoint: function ( point, target ) {
 
-		var deltaLengthSq = this.center.distanceToSquared( point );
+		const deltaLengthSq = this.center.distanceToSquared( point );
 
 		if ( target === undefined ) {
 
@@ -141,6 +146,14 @@ Object.assign( Sphere.prototype, {
 
 			console.warn( 'THREE.Sphere: .getBoundingBox() target is now required' );
 			target = new Box3();
+
+		}
+
+		if ( this.isEmpty() ) {
+
+			// Empty sphere produces empty bounding box
+			target.makeEmpty();
+			return target;
 
 		}
 

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		[page:KeyframeTrack] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			布尔类型的关键帧轨道。
+		</p>
+
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values] )</h3>
+		<p>
+			[page:String name] - (必须) 关键帧轨道(KeyframeTrack)的标识符.<br />
+			[page:Array times] - (必须) 关键帧的时间数组.<br />
+			[page:Array values] - 与时间数组中的时间点对应的值数组.<br />
+		</p>
+
+
+		<h2>属性</h2>
+
+
+		<p class="desc">
+			参见 [page:KeyframeTrack] 查看继承的属性.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			默认的插值类型。 参见 [page:Animation InterpolateDiscrete].
+		</p>
+
+		<h3>[property:Array ValueBufferType]</h3>
+		<p>
+			一个基本数组 (不是 Float32Array 类型, 与 [page:KeyframeTrack] 内的 *ValueBufferType* 属性不一样).
+		</p>
+
+		<h3>[property:String ValueTypeName]</h3>
+		<p>
+			String 'bool'.
+		</p>
+
+
+		<h2>方法</h2>
+
+
+		<p class="desc">
+			参见 [page:KeyframeTrack] 查看继承的方法.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodLinear ]()</h3>
+		<p>
+			这个方法在这里的值为 'undefined', 因为他对离散属性没有意义.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodSmooth ]()</h3>
+		<p>
+			这个方法在这里的值为 'undefined', 因为他对离散属性没有意义.
+		</p>
+
+
+		<h2>源码</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

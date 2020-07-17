@@ -1,9 +1,12 @@
 import { Vector3 } from './Vector3.js';
-import { _Math } from './Math.js';
+import { MathUtils } from './MathUtils.js';
 
 /**
  * @author bhouston / http://clara.io
  */
+
+const _startP = new Vector3();
+const _startEnd = new Vector3();
 
 function Line3( start, end ) {
 
@@ -89,36 +92,29 @@ Object.assign( Line3.prototype, {
 
 	},
 
-	closestPointToPointParameter: function () {
+	closestPointToPointParameter: function ( point, clampToLine ) {
 
-		var startP = new Vector3();
-		var startEnd = new Vector3();
+		_startP.subVectors( point, this.start );
+		_startEnd.subVectors( this.end, this.start );
 
-		return function closestPointToPointParameter( point, clampToLine ) {
+		const startEnd2 = _startEnd.dot( _startEnd );
+		const startEnd_startP = _startEnd.dot( _startP );
 
-			startP.subVectors( point, this.start );
-			startEnd.subVectors( this.end, this.start );
+		let t = startEnd_startP / startEnd2;
 
-			var startEnd2 = startEnd.dot( startEnd );
-			var startEnd_startP = startEnd.dot( startP );
+		if ( clampToLine ) {
 
-			var t = startEnd_startP / startEnd2;
+			t = MathUtils.clamp( t, 0, 1 );
 
-			if ( clampToLine ) {
+		}
 
-				t = _Math.clamp( t, 0, 1 );
+		return t;
 
-			}
-
-			return t;
-
-		};
-
-	}(),
+	},
 
 	closestPointToPoint: function ( point, clampToLine, target ) {
 
-		var t = this.closestPointToPointParameter( point, clampToLine );
+		const t = this.closestPointToPointParameter( point, clampToLine );
 
 		if ( target === undefined ) {
 

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+
+		<h1>Polyfills</h1>
+
+		<p class="desc">Three.js includes polyfills for the following functions and constants.</p>
+
+		<h3>[page:Number.EPSILON Number.EPSILON]</h3>
+		<p>
+			 The difference between one and the smallest value greater than one that can be represented as a Number.
+			 [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/EPSILON MDN reference].
+		</p>
+
+		<h3>[page:Math.sign Math.sign]( [page:Number x] )</h3>
+		<p>
+			If the argument is a positive number, negative number, positive zero or negative zero,
+			the function will return 1, -1, 0 or -0 respectively. Otherwise, NaN is returned.
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/sign MDN reference].
+		</p>
+
+		<h3>[page:Function.prototype.name Function.prototype.name]( [page:Number x] )</h3>
+		<p>
+			Returns the name of a function, or (before ES6 implementations) an empty string for anonymous functions.
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/name MDN reference].
+		</p>
+
+		<h3>[page:Object.assign Object.assign]( [page:Object target], [page:Object ...sources] )</h3>
+		<p>
+			The Object.assign() method is used to copy the values of all enumerable own properties from one or more source objects to a target object.
+			It will return the target object.
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign MDN reference].
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/polyfills.js src/polyfills.js]
+		</p>
+	</body>
+</html>

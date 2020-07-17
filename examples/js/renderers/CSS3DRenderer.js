@@ -1,3 +1,4 @@
+console.warn( "THREE.CSS3DRenderer: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  * @author mrdoob / http://mrdoob.com/
@@ -8,23 +9,41 @@ THREE.CSS3DObject = function ( element ) {
 
 	THREE.Object3D.call( this );
 
-	this.element = element;
+	this.element = element || document.createElement( 'div' );
 	this.element.style.position = 'absolute';
+	this.element.style.pointerEvents = 'auto';
 
 	this.addEventListener( 'removed', function () {
 
-		if ( this.element.parentNode !== null ) {
+		this.traverse( function ( object ) {
 
-			this.element.parentNode.removeChild( this.element );
+			if ( object.element instanceof Element && object.element.parentNode !== null ) {
 
-		}
+				object.element.parentNode.removeChild( object.element );
+
+			}
+
+		} );
 
 	} );
 
 };
 
-THREE.CSS3DObject.prototype = Object.create( THREE.Object3D.prototype );
-THREE.CSS3DObject.prototype.constructor = THREE.CSS3DObject;
+THREE.CSS3DObject.prototype = Object.assign( Object.create( THREE.Object3D.prototype ), {
+
+	constructor: THREE.CSS3DObject,
+
+	copy: function ( source, recursive ) {
+
+		THREE.Object3D.prototype.copy.call( this, source, recursive );
+
+		this.element = source.element.cloneNode( true );
+
+		return this;
+
+	}
+
+} );
 
 THREE.CSS3DSprite = function ( element ) {
 
@@ -39,7 +58,7 @@ THREE.CSS3DSprite.prototype.constructor = THREE.CSS3DSprite;
 
 THREE.CSS3DRenderer = function () {
 
-	console.log( 'THREE.CSS3DRenderer', THREE.REVISION );
+	var _this = this;
 
 	var _width, _height;
 	var _widthHalf, _heightHalf;
@@ -60,6 +79,7 @@ THREE.CSS3DRenderer = function () {
 
 	cameraElement.style.WebkitTransformStyle = 'preserve-3d';
 	cameraElement.style.transformStyle = 'preserve-3d';
+	cameraElement.style.pointerEvents = 'none';
 
 	domElement.appendChild( cameraElement );
 
@@ -155,9 +175,11 @@ THREE.CSS3DRenderer = function () {
 
 	}
 
-	function renderObject( object, camera, cameraCSSMatrix ) {
+	function renderObject( object, scene, camera, cameraCSSMatrix ) {
 
 		if ( object instanceof THREE.CSS3DObject ) {
+
+			object.onBeforeRender( _this, scene, camera );
 
 			var style;
 
@@ -184,9 +206,9 @@ THREE.CSS3DRenderer = function () {
 			}
 
 			var element = object.element;
-			var cachedStyle = cache.objects.get( object );
+			var cachedObject = cache.objects.get( object );
 
-			if ( cachedStyle === undefined || cachedStyle !== style ) {
+			if ( cachedObject === undefined || cachedObject.style !== style ) {
 
 				element.style.WebkitTransform = style;
 				element.style.transform = style;
@@ -203,17 +225,21 @@ THREE.CSS3DRenderer = function () {
 
 			}
 
+			element.style.display = object.visible ? '' : 'none';
+
 			if ( element.parentNode !== cameraElement ) {
 
 				cameraElement.appendChild( element );
 
 			}
 
+			object.onAfterRender( _this, scene, camera );
+
 		}
 
 		for ( var i = 0, l = object.children.length; i < l; i ++ ) {
 
-			renderObject( object.children[ i ], camera, cameraCSSMatrix );
+			renderObject( object.children[ i ], scene, camera, cameraCSSMatrix );
 
 		}
 
@@ -281,18 +307,29 @@ THREE.CSS3DRenderer = function () {
 				domElement.style.WebkitPerspective = fov + 'px';
 				domElement.style.perspective = fov + 'px';
 
+			} else {
+
+				domElement.style.WebkitPerspective = '';
+				domElement.style.perspective = '';
+
 			}
 
 			cache.camera.fov = fov;
 
 		}
 
-		scene.updateMatrixWorld();
-
+		if ( scene.autoUpdate === true ) scene.updateMatrixWorld();
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
+		if ( camera.isOrthographicCamera ) {
+
+			var tx = - ( camera.right + camera.left ) / 2;
+			var ty = ( camera.top + camera.bottom ) / 2;
+
+		}
+
 		var cameraCSSMatrix = camera.isOrthographicCamera ?
-			'scale(' + fov + ')' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
+			'scale(' + fov + ')' + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
 			'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
 		var style = cameraCSSMatrix +
@@ -307,7 +344,7 @@ THREE.CSS3DRenderer = function () {
 
 		}
 
-		renderObject( scene, camera, cameraCSSMatrix );
+		renderObject( scene, scene, camera, cameraCSSMatrix );
 
 		if ( isIE ) {
 

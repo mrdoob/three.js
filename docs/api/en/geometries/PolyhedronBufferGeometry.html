@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A polyhedron is a solid in three dimensions with flat faces. This class will take an array of vertices,
+			project them onto a sphere, and then divide them up to the desired level of detail. This class is used
+			by [page:DodecahedronBufferGeometry], [page:IcosahedronBufferGeometry], [page:OctahedronBufferGeometry],
+			and [page:TetrahedronBufferGeometry] to generate their respective geometries.
+		</p>
+
+		<h2>Code Example</h2>
+<code>
+var verticesOfCube = [
+    -1,-1,-1,    1,-1,-1,    1, 1,-1,    -1, 1,-1,
+    -1,-1, 1,    1,-1, 1,    1, 1, 1,    -1, 1, 1,
+];
+
+var indicesOfFaces = [
+    2,1,0,    0,3,2,
+    0,4,7,    7,3,0,
+    0,1,5,    5,4,0,
+    1,2,6,    6,5,1,
+    2,3,7,    7,6,2,
+    4,5,6,    6,7,4
+];
+
+var geometry = new THREE.PolyhedronBufferGeometry( verticesOfCube, indicesOfFaces, 6, 2 );
+</code>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]([param:Array vertices], [param:Array indices], [param:Float radius], [param:Integer detail])</h3>
+		<p>
+		vertices — [page:Array] of points of the form [1,1,1, -1,-1,-1, ... ] <br />
+		indices — [page:Array] of indices that make up the faces of the form [0,1,2, 2,3,0, ... ] <br />
+		radius — [page:Float] - The radius of the final shape <br />
+		detail — [page:Integer] - How many levels to subdivide the geometry. The more detail, the smoother the shape.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/PolyhedronGeometry.js src/geometries/PolyhedronGeometry.js]
+		</p>
+	</body>
+</html>

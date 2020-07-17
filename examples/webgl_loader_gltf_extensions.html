@@ -4,62 +4,30 @@
 		<title>three.js webgl - glTF 2.0 - extensions</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #222222;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color: #808080;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-
-			#container {
-				position: absolute;
-				top: 0px;
-				width:100%;
-				height:100%;
-				z-index: -1;
-			}
-
-			#info a, .button {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 			<a href="https://github.com/KhronosGroup/glTF" target="_blank" rel="noopener">glTF</a> 2.0 loader<br />
 			<div id="description"></div>
 		</div>
 
-		<div id="container"></div>
+		<script type="module">
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/DRACOLoader.js"></script>
-		<script src="js/loaders/DDSLoader.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DDSLoader } from './jsm/loaders/DDSLoader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+
 			var orbitControls;
-			var container, camera, scene, renderer, loader;
-			var gltf, envMap, mixer, gui, extensionControls;
+			var camera, scene, renderer, loader;
+			var gltf, background, envMap, mixer, gui, extensionControls;
 
 			var clock = new THREE.Clock();
 
@@ -71,7 +39,6 @@
 					authorURL: 'https://www.microsoft.com/',
 					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
 					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
-					addLights: true,
 					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
 					addEnvMap: true
 				},
@@ -95,8 +62,16 @@
 					authorURL: 'https://twitter.com/emackey',
 					cameraPos: new THREE.Vector3( 2, 1, 15 ),
 					objectRotation: new THREE.Euler( 0, 0, 0 ),
-					addLights: true,
 					extensions: [ 'glTF', 'glTF-Embedded' ],
+					addEnvMap: true
+				},
+				'Clearcoat Test': {
+					name: 'Clearcoat Test',
+					url: './models/gltf/ClearcoatTest/ClearcoatTest.glb',
+					author: 'Ed Mackey (Analytical Graphics, Inc.)',
+					authorURL: 'https://www.agi.com/',
+					cameraPos: new THREE.Vector3( 0, 0, 20 ),
+					extensions: [ 'glTF' ],
 					addEnvMap: true
 				},
 				Duck: {
@@ -115,9 +90,9 @@
 					url: './models/gltf/Monster/%s/Monster.gltf',
 					author: '3drt.com',
 					authorURL: 'http://www.3drt.com/downloads.htm',
-					cameraPos: new THREE.Vector3( 30, 10, 70 ),
-					objectScale: new THREE.Vector3( 0.4, 0.4, 0.4 ),
-					objectPosition: new THREE.Vector3( 2, 1, 0 ),
+					cameraPos: new THREE.Vector3( 3, 1, 7 ),
+					objectScale: new THREE.Vector3( 0.04, 0.04, 0.04 ),
+					objectPosition: new THREE.Vector3( 0.2, 0.1, 0 ),
 					objectRotation: new THREE.Euler( 0, - 3 * Math.PI / 4, 0 ),
 					animationTime: 3,
 					addLights: true,
@@ -170,17 +145,43 @@
 
 			function onload() {
 
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				renderer.physicallyCorrectLights = true;
+				document.body.appendChild( renderer.domElement );
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				buildGUI();
-				initScene( scenes[ state.scene ] );
-				animate();
+				// Load background and generate envMap
+
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'venice_sunset_1k.hdr', function ( texture ) {
+
+						envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						pmremGenerator.dispose();
+
+						background = envMap;
+
+						//
+
+						buildGUI();
+						initScene( scenes[ state.scene ] );
+						animate();
+
+					} );
+
+				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
 
 			}
 
 			function initScene( sceneInfo ) {
-
-				container = document.getElementById( 'container' );
 
 				var descriptionEl = document.getElementById( 'description' );
 
@@ -193,7 +194,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.001, 1000 );
 				scene.add( camera );
 
 				var spot1;
@@ -208,9 +209,11 @@
 					scene.add( directionalLight );
 
 					spot1 = new THREE.SpotLight( 0xffffff, 1 );
-					spot1.position.set( 10, 20, 10 );
-					spot1.angle = 0.25;
+					spot1.position.set( 5, 10, 5 );
+					spot1.angle = 0.50;
 					spot1.penumbra = 0.75;
+					spot1.intensity = 100;
+					spot1.decay = 2;
 
 					if ( sceneInfo.shadows ) {
 
@@ -225,15 +228,6 @@
 
 				}
 
-				// RENDERER
-
-				// TODO: Reuse existing WebGLRenderer, GLTFLoaders, and so on
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderer.gammaOutput = true;
-				renderer.physicallyCorrectLights = true;
-
 				if ( sceneInfo.shadows ) {
 
 					renderer.shadowMap.enabled = true;
@@ -241,9 +235,9 @@
 
 				}
 
-				container.appendChild( renderer.domElement );
+				// TODO: Reuse existing OrbitControls, GLTFLoaders, and so on
 
-				orbitControls = new THREE.OrbitControls( camera, renderer.domElement );
+				orbitControls = new OrbitControls( camera, renderer.domElement );
 
 				if ( sceneInfo.addGround ) {
 
@@ -267,10 +261,13 @@
 
 				}
 
-				loader = new THREE.GLTFLoader();
+				loader = new GLTFLoader();
 
-				THREE.DRACOLoader.setDecoderPath( 'js/libs/draco/gltf/' );
-				loader.setDRACOLoader( new THREE.DRACOLoader() );
+				var dracoLoader = new DRACOLoader();
+				dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+				loader.setDRACOLoader( dracoLoader );
+
+				loader.setDDSLoader( new DDSLoader() );
 
 				var url = sceneInfo.url.replace( /%s/g, state.extension );
 
@@ -282,7 +279,7 @@
 
 				var loadStartTime = performance.now();
 
-				loader.load( url, function( data ) {
+				loader.load( url, function ( data ) {
 
 					gltf = data;
 
@@ -308,7 +305,6 @@
 
 						if ( spot1 ) {
 
-							spot1.position.set( sceneInfo.objectPosition.x - 100, sceneInfo.objectPosition.y + 200, sceneInfo.objectPosition.z - 100 );
 							spot1.target.position.copy( sceneInfo.objectPosition );
 
 						}
@@ -329,21 +325,19 @@
 
 					if ( sceneInfo.addEnvMap ) {
 
-						if ( ! envMap ) envMap = getEnvMap();
-
-						object.traverse( function( node ) {
+						object.traverse( function ( node ) {
 
 							if ( node.material && ( node.material.isMeshStandardMaterial ||
 								 ( node.material.isShaderMaterial && node.material.envMap !== undefined ) ) ) {
 
 								node.material.envMap = envMap;
-								node.material.needsUpdate = true;
+								node.material.envMapIntensity = 1.5; // boombox seems too dark otherwise
 
 							}
 
 						} );
 
-						scene.background = envMap;
+						scene.background = background;
 
 					}
 
@@ -392,7 +386,7 @@
 
 			function onWindowResize() {
 
-				camera.aspect = container.offsetWidth / container.offsetHeight;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -417,26 +411,9 @@
 
 			}
 
-			function getEnvMap() {
-
-				var path = 'textures/cube/Park2/';
-				var format = '.jpg';
-				var urls = [
-					path + 'posx' + format, path + 'negx' + format,
-					path + 'posy' + format, path + 'negy' + format,
-					path + 'posz' + format, path + 'negz' + format
-				];
-
-				envMap = new THREE.CubeTextureLoader().load( urls );
-				envMap.format = THREE.RGBFormat;
-
-				return envMap;
-
-			}
-
 			function buildGUI() {
 
-				gui = new dat.GUI( { width: 330 } );
+				gui = new GUI( { width: 330 } );
 				gui.domElement.parentElement.style.zIndex = 101;
 
 				var sceneCtrl = gui.add( state, 'scene', Object.keys( scenes ) );
@@ -480,12 +457,6 @@
 			}
 
 			function reload() {
-
-				if ( container && renderer ) {
-
-					container.removeChild( renderer.domElement );
-
-				}
 
 				if ( loader && mixer ) mixer.stopAllAction();
 

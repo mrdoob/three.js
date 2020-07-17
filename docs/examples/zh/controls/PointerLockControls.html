@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:EventDispatcher] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		The implementation of this class is based on the [link:https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API Pointer Lock API].
+		[name] is a perfect choice for first person 3D games.
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		var controls = new PointerLockControls( camera, document.body );
+
+		// add event listener to show/hide a UI (e.g. the game's menu)
+
+		controls.addEventListener( 'lock', function () {
+
+			menu.style.display = 'none';
+
+		} );
+
+		controls.addEventListener( 'unlock', function () {
+
+			menu.style.display = 'block';
+
+		} );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:misc_controls_pointerlock misc / controls / pointerlock ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+			[page:Camera camera]: The camera of the rendered scene.
+			</p>
+			<p>
+			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+			</p>
+			<p>
+				Creates a new instance of [name].
+			</p>
+		</p>
+
+		<h2>Events</h2>
+
+		<h3>change</h3>
+		<p>
+			Fires when the user moves the mouse.
+		</p>
+
+		<h3>lock</h3>
+		<p>
+			Fires when the pointer lock status is "locked" (in other words: the mouse is captured).
+		</p>
+
+		<h3>unlock</h3>
+		<p>
+			Fires when the pointer lock status is "unlocked" (in other words: the mouse is not captured anymore).
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
+			not set up new event listeners.
+		</p>
+
+
+		<h3>[property:Boolean isLocked]</h3>
+		<p>
+			Whether or not the controls are locked.
+		</p>
+
+		<h3>[property:Float maxPolarAngle]</h3>
+		<p>
+			Camera pitch, upper limit. Range is 0 to Math.PI radians. Default is Math.PI.
+		</p>
+
+		<h3>[property:Float minPolarAngle]</h3>
+		<p>
+			Camera pitch, lower limit. Range is 0 to Math.PI radians. Default is 0.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>See the base [page:EventDispatcher] class for common methods.</p>
+
+		<h3>[method:null connect] ()</h3>
+		<p>
+			Adds the event listeners of the controls.
+		</p>
+
+		<h3>[method:null disconnect] ()</h3>
+		<p>
+			Removes the event listeners of the controls.
+		</p>
+
+		<h3>[method:Vector3 getDirection] ( [param:Vector3 target] )</h3>
+		<p>
+			<p>
+				[page:Vector3 target]: The target vector.
+			</p>
+			<p>
+				Returns the look direction of the camera.
+			</p>
+		</p>
+
+		<h3>[method:null lock] ()</h3>
+		<p>
+			Activates the pointer lock.
+		</p>
+
+		<h3>[method:null moveForward] ( [param:Number distance] )</h3>
+		<p>
+			<p>
+				[page:Number distance]: The signed distance.
+			</p>
+			<p>
+				Moves the camera forward parallel to the xz-plane. Assumes camera.up is y-up.
+			</p>
+		</p>
+
+		<h3>[method:null moveRight] ( [param:Number distance] )</h3>
+		<p>
+			<p>
+				[page:Number distance]: The signed distance.
+			</p>
+			<p>
+				Moves the camera sidewards parallel to the xz-plane.
+			</p>
+		</p>
+
+		<h3>[method:null unlock] ()</h3>
+		<p>
+			Exits the pointer lock.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/PointerLockControls.js examples/jsm/controls/PointerLockControls.js]
+		</p>
+	</body>
+</html>

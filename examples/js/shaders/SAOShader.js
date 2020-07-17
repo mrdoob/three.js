@@ -1,31 +1,36 @@
+console.warn( "THREE.SAOShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
+/**
+ * TODO
+ */
+
 THREE.SAOShader = {
 	defines: {
-		'NUM_SAMPLES': 7,
-		'NUM_RINGS': 4,
-		'NORMAL_TEXTURE': 0,
-		'DIFFUSE_TEXTURE': 0,
-		'DEPTH_PACKING': 1,
-		'PERSPECTIVE_CAMERA': 1
+		"NUM_SAMPLES": 7,
+		"NUM_RINGS": 4,
+		"NORMAL_TEXTURE": 0,
+		"DIFFUSE_TEXTURE": 0,
+		"DEPTH_PACKING": 1,
+		"PERSPECTIVE_CAMERA": 1
 	},
 	uniforms: {
 
-		'tDepth': { type: 't', value: null },
-		'tDiffuse': { type: 't', value: null },
-		'tNormal': { type: 't', value: null },
-		'size': { type: 'v2', value: new THREE.Vector2( 512, 512 ) },
+		"tDepth": { value: null },
+		"tDiffuse": { value: null },
+		"tNormal": { value: null },
+		"size": { value: new THREE.Vector2( 512, 512 ) },
 
-		'cameraNear': { type: 'f', value: 1 },
-		'cameraFar': { type: 'f', value: 100 },
-		'cameraProjectionMatrix': { type: 'm4', value: new THREE.Matrix4() },
-		'cameraInverseProjectionMatrix': { type: 'm4', value: new THREE.Matrix4() },
+		"cameraNear": { value: 1 },
+		"cameraFar": { value: 100 },
+		"cameraProjectionMatrix": { value: new THREE.Matrix4() },
+		"cameraInverseProjectionMatrix": { value: new THREE.Matrix4() },
 
-		'scale': { type: 'f', value: 1.0 },
-		'intensity': { type: 'f', value: 0.1 },
-		'bias': { type: 'f', value: 0.5 },
+		"scale": { value: 1.0 },
+		"intensity": { value: 0.1 },
+		"bias": { value: 0.5 },
 
-		'minResolution': { type: 'f', value: 0.0 },
-		'kernelRadius': { type: 'f', value: 100.0 },
-		'randomSeed': { type: 'f', value: 0.0 }
+		"minResolution": { value: 0.0 },
+		"kernelRadius": { value: 100.0 },
+		"randomSeed": { value: 0.0 }
 	},
 	vertexShader: [
 		"varying vec2 vUv;",

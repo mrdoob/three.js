@@ -4,30 +4,9 @@
 		<title>three.js webgl - framebuffer - texture</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-			#overlay {
+			#selection {
 				position: fixed;
 				display: flex;
 				flex-direction: column;
@@ -39,33 +18,28 @@
 				z-index: 999;
 			}
 
-			#overlay > div {
+			#selection > div {
 				height: 128px;
 				width: 128px;
 				border: 1px solid white;
 			}
 		</style>
-
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/Detector.js"></script>
-
 	</head>
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture <br/>
-			The area of the white square is copied from the framebuffer to a texture (shown in the top-left corner).
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> framebuffer to texture
 		</div>
 
-		<div id="overlay">
-			<div>
-			</div>
+		<div id="selection">
+			<div></div>
 		</div>
 
-		<script>
+		<script type="module">
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer;
 			var mesh, sprite, texture;
@@ -120,7 +94,6 @@
 				texture = new THREE.DataTexture( data, textureSize, textureSize, THREE.RGBFormat );
 				texture.minFilter = THREE.NearestFilter;
 				texture.magFilter = THREE.NearestFilter;
-				texture.needsUpdate = true;
 
 				//
 
@@ -141,8 +114,8 @@
 
 				//
 
-				var overlay = document.getElementById( 'overlay' );
-				var controls = new THREE.OrbitControls( camera, overlay );
+				var selection = document.getElementById( 'selection' );
+				var controls = new OrbitControls( camera, selection );
 				controls.enablePan = false;
 
 				//

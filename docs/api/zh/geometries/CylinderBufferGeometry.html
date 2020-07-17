@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>圆柱缓冲几何体（[name]）</h1>
+
+		<p class="desc">这是[page:CylinderGeometry]中的[page:BufferGeometry]接口。</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#CylinderBufferGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>代码示例</h2>
+
+		<code>var geometry = new THREE.CylinderBufferGeometry( 5, 5, 20, 32 );
+		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+		var cylinder = new THREE.Mesh( geometry, material );
+		scene.add( cylinder );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([param:Float radiusTop], [param:Float radiusBottom], [param:Float height], [param:Integer radialSegments], [param:Integer heightSegments], [param:Boolean openEnded], [param:Float thetaStart], [param:Float thetaLength])</h3>
+		<p>
+		radiusTop — 圆柱的顶部半径，默认值是1。<br />
+		radiusBottom — 圆柱的底部半径，默认值是1。<br />
+		height — 圆柱的高度，默认值是1。<br />
+		radialSegments —  圆柱侧面周围的分段数，默认为8。<br />
+		heightSegments — 圆柱侧面沿着其高度的分段数，默认值为1。<br />
+		openEnded — 一个Boolean值，指明该圆锥的底面是开放的还是封顶的。默认值为false，即其底面默认是封顶的。<br />
+		thetaStart — 第一个分段的起始角度，默认为0。（three o'clock position）<br />
+		thetaLength — 圆柱底面圆扇区的中心角，通常被称为“θ”（西塔）。默认值是2*Pi，这使其成为一个完整的圆柱。
+		</p>
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:BufferGeometry]。</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+				一个包含着构造函数中每个参数的对象。在对象实例化之后，对该属性的任何修改都不会改变这个几何体。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:BufferGeometry]。</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/CylinderGeometry.js src/geometries/CylinderGeometry.js]
+		</p>
+	</body>
+</html>

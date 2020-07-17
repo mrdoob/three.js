@@ -2,28 +2,34 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-Menubar.Examples = function ( editor ) {
+import * as THREE from '../../build/three.module.js';
 
-	var container = new UI.Panel();
+import { UIPanel, UIRow } from './libs/ui.js';
+
+function MenubarExamples( editor ) {
+
+	var strings = editor.strings;
+
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new UI.Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
-	title.setTextContent( 'Examples' );
+	title.setTextContent( strings.getKey( 'menubar/examples' ) );
 	container.add( title );
 
-	var options = new UI.Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
 	// Examples
 
 	var items = [
-		{ title: 'Arkanoid', file: 'arkanoid.app.json' },
-		{ title: 'Camera', file: 'camera.app.json' },
-		{ title: 'Particles', file: 'particles.app.json' },
-		{ title: 'Pong', file: 'pong.app.json' },
-		{ title: 'Shaders', file: 'shaders.app.json' }
+		{ title: 'menubar/examples/Arkanoid', file: 'arkanoid.app.json' },
+		{ title: 'menubar/examples/Camera', file: 'camera.app.json' },
+		{ title: 'menubar/examples/Particles', file: 'particles.app.json' },
+		{ title: 'menubar/examples/Pong', file: 'pong.app.json' },
+		{ title: 'menubar/examples/Shaders', file: 'shaders.app.json' }
 	];
 
 	var loader = new THREE.FileLoader();
@@ -34,9 +40,9 @@ Menubar.Examples = function ( editor ) {
 
 			var item = items[ i ];
 
-			var option = new UI.Row();
+			var option = new UIRow();
 			option.setClass( 'option' );
-			option.setTextContent( item.title );
+			option.setTextContent( strings.getKey( item.title ) );
 			option.onClick( function () {
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
@@ -53,10 +59,12 @@ Menubar.Examples = function ( editor ) {
 			} );
 			options.add( option );
 
-		} )( i )
+		} )( i );
 
 	}
 
 	return container;
 
-};
+}
+
+export { MenubarExamples };

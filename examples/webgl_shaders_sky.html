@@ -4,61 +4,24 @@
 		<title>three.js webgl - shaders - sky sun shader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-
-			body {
-				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				color:#ccc;
-				text-shadow: 1px 1px rgba(0,0,0,0.25);
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
-			}
-
-			a {
-				color: #fff;
-			}
-
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sky + sun shader
-
-			<br/><a href="https://plus.google.com/117614030945250277079/posts/MYkgKdvLhNj">More info</a> by <a href="http://twitter.com/blurspline">@blurspline</a>
-
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - sky + sun shader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/objects/Sky.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
-
-		<script>
-
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
-			var container;
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { Sky } from './jsm/objects/Sky.js';
 
 			var camera, controls, scene, renderer;
 
-			var sky, sunSphere;
+			var sky, sun;
 
 			init();
 			render();
@@ -66,68 +29,55 @@
 			function initSky() {
 
 				// Add Sky
-				sky = new THREE.Sky();
+				sky = new Sky();
 				sky.scale.setScalar( 450000 );
 				scene.add( sky );
 
-				// Add Sun Helper
-				sunSphere = new THREE.Mesh(
-					new THREE.SphereBufferGeometry( 20000, 16, 8 ),
-					new THREE.MeshBasicMaterial( { color: 0xffffff } )
-				);
-				sunSphere.position.y = - 700000;
-				sunSphere.visible = false;
-				scene.add( sunSphere );
+				sun = new THREE.Vector3();
 
 				/// GUI
 
-				var effectController  = {
+				var effectController = {
 					turbidity: 10,
-					rayleigh: 2,
+					rayleigh: 3,
 					mieCoefficient: 0.005,
-					mieDirectionalG: 0.8,
-					luminance: 1,
+					mieDirectionalG: 0.7,
 					inclination: 0.49, // elevation / inclination
 					azimuth: 0.25, // Facing front,
-					sun: ! true
+					exposure: renderer.toneMappingExposure
 				};
-
-				var distance = 400000;
 
 				function guiChanged() {
 
 					var uniforms = sky.material.uniforms;
-					uniforms.turbidity.value = effectController.turbidity;
-					uniforms.rayleigh.value = effectController.rayleigh;
-					uniforms.luminance.value = effectController.luminance;
-					uniforms.mieCoefficient.value = effectController.mieCoefficient;
-					uniforms.mieDirectionalG.value = effectController.mieDirectionalG;
+					uniforms[ "turbidity" ].value = effectController.turbidity;
+					uniforms[ "rayleigh" ].value = effectController.rayleigh;
+					uniforms[ "mieCoefficient" ].value = effectController.mieCoefficient;
+					uniforms[ "mieDirectionalG" ].value = effectController.mieDirectionalG;
 
 					var theta = Math.PI * ( effectController.inclination - 0.5 );
 					var phi = 2 * Math.PI * ( effectController.azimuth - 0.5 );
 
-					sunSphere.position.x = distance * Math.cos( phi );
-					sunSphere.position.y = distance * Math.sin( phi ) * Math.sin( theta );
-					sunSphere.position.z = distance * Math.sin( phi ) * Math.cos( theta );
+					sun.x = Math.cos( phi );
+					sun.y = Math.sin( phi ) * Math.sin( theta );
+					sun.z = Math.sin( phi ) * Math.cos( theta );
 
-					sunSphere.visible = effectController.sun;
+					uniforms[ "sunPosition" ].value.copy( sun );
 
-					uniforms.sunPosition.value.copy( sunSphere.position );
-
+					renderer.toneMappingExposure = effectController.exposure;
 					renderer.render( scene, camera );
 
 				}
 
-				var gui = new dat.GUI();
+				var gui = new GUI();
 
-				gui.add( effectController, "turbidity", 1.0, 20.0, 0.1 ).onChange( guiChanged );
+				gui.add( effectController, "turbidity", 0.0, 20.0, 0.1 ).onChange( guiChanged );
 				gui.add( effectController, "rayleigh", 0.0, 4, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, "mieCoefficient", 0.0, 0.1, 0.001 ).onChange( guiChanged );
 				gui.add( effectController, "mieDirectionalG", 0.0, 1, 0.001 ).onChange( guiChanged );
-				gui.add( effectController, "luminance", 0.0, 2 ).onChange( guiChanged );
 				gui.add( effectController, "inclination", 0, 1, 0.0001 ).onChange( guiChanged );
 				gui.add( effectController, "azimuth", 0, 1, 0.0001 ).onChange( guiChanged );
-				gui.add( effectController, "sun" ).onChange( guiChanged );
+				gui.add( effectController, "exposure", 0, 1, 0.0001 ).onChange( guiChanged );
 
 				guiChanged();
 
@@ -138,8 +88,6 @@
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 100, 2000000 );
 				camera.position.set( 0, 100, 2000 );
 
-				//camera.setLens(20);
-
 				scene = new THREE.Scene();
 
 				var helper = new THREE.GridHelper( 10000, 2, 0xffffff, 0xffffff );
@@ -148,9 +96,12 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 0.5;
 				document.body.appendChild( renderer.domElement );
 
-				controls = new THREE.OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				//controls.maxPolarAngle = Math.PI / 2;
 				controls.enableZoom = false;

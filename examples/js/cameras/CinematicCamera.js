@@ -1,3 +1,4 @@
+console.warn( "THREE.CinematicCamera: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author greggman / http://games.greggman.com/
@@ -177,21 +178,30 @@ THREE.CinematicCamera.prototype.renderCinematic = function ( scene, renderer ) {
 
 	if ( this.postprocessing.enabled ) {
 
+		var currentRenderTarget = renderer.getRenderTarget();
+
 		renderer.clear();
 
 		// Render scene into texture
 
 		scene.overrideMaterial = null;
-		renderer.render( scene, camera, this.postprocessing.rtTextureColor, true );
+		renderer.setRenderTarget( this.postprocessing.rtTextureColor );
+		renderer.clear();
+		renderer.render( scene, this );
 
 		// Render depth into texture
 
 		scene.overrideMaterial = this.materialDepth;
-		renderer.render( scene, camera, this.postprocessing.rtTextureDepth, true );
+		renderer.setRenderTarget( this.postprocessing.rtTextureDepth );
+		renderer.clear();
+		renderer.render( scene, this );
 
 		// Render bokeh composite
 
+		renderer.setRenderTarget( null );
 		renderer.render( this.postprocessing.scene, this.postprocessing.camera );
+
+		renderer.setRenderTarget( currentRenderTarget );
 
 	}
 

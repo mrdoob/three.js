@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">极坐标格辅助对象. 坐标格实际上是2维线数组.</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		var radius = 10;
+		var radials = 16;
+		var circles = 8;
+		var divisions = 64;
+
+		var helper = new THREE.PolarGridHelper( radius, radials, circles, divisions );
+		scene.add( helper );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_helpers WebGL / helpers]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:Number radius], [param:Number radials], [param:Number circles], [param:Number divisions], [param:Color color1], [param:Color color2] )</h3>
+		<p>
+		radius -- 极坐标格半径. 可以为任何正数. 默认为 10.<br />
+		radials -- 径向辐射线数量. 可以为任何正整数. 默认为 16.<br />
+		circles -- 圆圈的数量. 可以为任何正整数. 默认为 8.<br />
+		divisions -- 圆圈细分段数. 可以为任何大于或等于3的正整数. 默认为 64.<br />
+		color1 -- 极坐标格使用的第一个颜色. 值可以为 [page:Color] 类型, 16进制 和 CSS 颜色名. 默认为 0x444444 <br />
+		color2 -- 极坐标格使用的第二个颜色. 值可以为 [page:Color] 类型, 16进制 和 CSS 颜色名. 默认为 0x888888
+		</p>
+		<p>
+		创建一个半径为'radius' 包含 'radials' 条径向辐射线 和 'circles' 个细分成 'divisions' 段的圆圈的极坐标格辅助对象. 颜色可选.
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

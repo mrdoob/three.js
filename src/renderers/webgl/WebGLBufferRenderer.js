@@ -2,9 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLBufferRenderer( gl, extensions, info ) {
+function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
-	var mode;
+	const isWebGL2 = capabilities.isWebGL2;
+
+	let mode;
 
 	function setMode( value ) {
 
@@ -20,17 +22,21 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 	}
 
-	function renderInstances( geometry, start, count ) {
+	function renderInstances( geometry, start, count, primcount ) {
 
-		var extension;
+		if ( primcount === 0 ) return;
 
-		if ( gl.isWebGL2 ) {
+		let extension, methodName;
+
+		if ( isWebGL2 ) {
 
 			extension = gl;
+			methodName = 'drawArraysInstanced';
 
 		} else {
 
 			extension = extensions.get( 'ANGLE_instanced_arrays' );
+			methodName = 'drawArraysInstancedANGLE';
 
 			if ( extension === null ) {
 
@@ -41,9 +47,9 @@ function WebGLBufferRenderer( gl, extensions, info ) {
 
 		}
 
-		extension[ gl.isWebGL2 ? 'drawArraysInstanced' : 'drawArraysInstancedANGLE' ]( mode, start, count, geometry.maxInstancedCount );
+		extension[ methodName ]( mode, start, count, primcount );
 
-		info.update( count, mode, geometry.maxInstancedCount );
+		info.update( count, mode, primcount );
 
 	}
 

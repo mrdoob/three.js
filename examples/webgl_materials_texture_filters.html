@@ -4,24 +4,8 @@
 		<title>three.js webgl - materials - texture filtering</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #aaa;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index:100;
-			}
 
 			.lbl { color:#fff; font-size:16px; font-weight:bold; position: absolute; bottom:0px; z-index:100; text-shadow:#000 1px 1px 1px; background-color:rgba(0,0,0,0.85); padding:1em }
 			#lbl_left { text-align:left; left:0px }
@@ -30,21 +14,19 @@
 			.g { color:#aaa }
 			.c { color:#fa0 }
 
-			a { color:red }
-
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - texture filtering example
-			- painting by <a href="http://en.wikipedia.org/wiki/Basket_of_Fruit_%28Caravaggio%29">Caravaggio</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - texture filtering example<br/>
+			painting by <a href="http://en.wikipedia.org/wiki/Basket_of_Fruit_%28Caravaggio%29">Caravaggio</a>
 		</div>
 
 		<div id="lbl_left" class="lbl">
 		Floor <span class="g">(128x128)</span><br/>
 		mag: <span class="c">Linear</span><br/>
-		min: <span class="c">LinearMipMapLinear</span><br/>
+		min: <span class="c">LinearMipmapLinear</span><br/>
 		<br/>
 		Painting <span class="g">(748x600)</span><br/>
 		mag: <span class="c">Linear</span><br/>
@@ -61,19 +43,14 @@
 		min: <span class="c">Nearest</span>
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-
-		<script>
-
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
 
-			var container,stats;
+			var container;
 
 			var camera, scene, scene2, renderer;
 
@@ -113,7 +90,7 @@
 				context.fillRect( 0, 0, 128, 128 );
 
 				context.fillStyle = "#fff";
-				context.fillRect( 0, 0, 64, 64);
+				context.fillRect( 0, 0, 64, 64 );
 				context.fillRect( 64, 64, 64, 64 );
 
 				var textureCanvas = new THREE.CanvasTexture( imageCanvas );
@@ -141,7 +118,7 @@
 
 				// PAINTING
 
-				var callbackPainting = function() {
+				var callbackPainting = function () {
 
 					var image = texturePainting.image;
 
@@ -172,14 +149,14 @@
 						zscene.add( meshFrame );
 
 						var meshShadow = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: 0x000000, opacity: 0.75, transparent: true } ) );
-						meshShadow.position.y = - 1.1 * image.height/2;
-						meshShadow.position.z = - 1.1 * image.height/2;
+						meshShadow.position.y = - 1.1 * image.height / 2;
+						meshShadow.position.z = - 1.1 * image.height / 2;
 						meshShadow.rotation.x = - Math.PI / 2;
 						meshShadow.scale.x = 1.1 * image.width / 100;
 						meshShadow.scale.y = 1.1 * image.height / 100;
 						zscene.add( meshShadow );
 
-						var floorHeight = - 1.117 * image.height/2;
+						var floorHeight = - 1.117 * image.height / 2;
 						meshCanvas.position.y = meshCanvas2.position.y = floorHeight;
 
 					}
@@ -205,15 +182,12 @@
 				renderer.domElement.style.position = "relative";
 				container.appendChild( renderer.domElement );
 
-				stats = new Stats();
-				//container.appendChild( stats.dom );
-
 				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
 
 			}
 
 
-			function onDocumentMouseMove(event) {
+			function onDocumentMouseMove( event ) {
 
 				mouseX = ( event.clientX - windowHalfX );
 				mouseY = ( event.clientY - windowHalfY );
@@ -226,24 +200,23 @@
 				requestAnimationFrame( animate );
 
 				render();
-				stats.update();
 
 			}
 
 			function render() {
 
 				camera.position.x += ( mouseX - camera.position.x ) * .05;
-				camera.position.y += ( - ( mouseY - 200) - camera.position.y ) * .05;
+				camera.position.y += ( - ( mouseY - 200 ) - camera.position.y ) * .05;
 
 				camera.lookAt( scene.position );
 
 				renderer.clear();
 				renderer.setScissorTest( true );
 
-				renderer.setScissor( 0, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT );
+				renderer.setScissor( 0, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene, camera );
 
-				renderer.setScissor( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2 - 2, SCREEN_HEIGHT  );
+				renderer.setScissor( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2 - 2, SCREEN_HEIGHT );
 				renderer.render( scene2, camera );
 
 				renderer.setScissorTest( false );

@@ -1,3 +1,4 @@
+console.warn( "THREE.BVHLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author herzig / http://github.com/herzig
  * @author Mugen87 / https://github.com/Mugen87
@@ -10,14 +11,14 @@
 
 THREE.BVHLoader = function ( manager ) {
 
-	this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+	THREE.Loader.call( this, manager );
 
 	this.animateBonePositions = true;
 	this.animateBoneRotations = true;
 
 };
 
-THREE.BVHLoader.prototype = {
+THREE.BVHLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
 	constructor: THREE.BVHLoader,
 
@@ -26,9 +27,28 @@ THREE.BVHLoader.prototype = {
 		var scope = this;
 
 		var loader = new THREE.FileLoader( scope.manager );
+		loader.setPath( scope.path );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -381,6 +401,7 @@ THREE.BVHLoader.prototype = {
 			var line;
 			// skip empty lines
 			while ( ( line = lines.shift().trim() ).length === 0 ) { }
+
 			return line;
 
 		}
@@ -403,4 +424,4 @@ THREE.BVHLoader.prototype = {
 
 	}
 
-};
+} );

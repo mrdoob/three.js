@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			动画混合器是用于场景中特定对象的动画的播放器。当场景中的多个对象独立动画时，每个对象都可以使用同一个动画混合器。<br /><br />
+
+			在使用手册的“下一步”章节中，“动画系统”一文对three.js动画系统中的不同元素作出了概述
+		</p>
+
+
+		<h2>构造器</h2>
+
+
+		<h3>[name]( [param:Object3D rootObject] )</h3>
+		<p>
+			[page:Object3D rootObject] - 混合器播放的动画所属的对象<br />
+		</p>
+
+
+		<h2>属性</h2>
+
+
+		<h3>[property:Number time]</h3>
+		<p>
+			全局的混合器时间(单位秒; 混合器创建的时刻记作0时刻)
+		</p>
+
+		<h3>[property:Number timeScale]</h3>
+		<p>
+			全局时间([page:.time mixer time])的比例因子<br /><br />
+
+			说明: 将混合器的时间比例设为0, 稍后再设置为1，可以暂停/取消暂停由该混合器控制的所有动作。
+		</p>
+
+		<h3>[method:AnimationMixer setTime]([param:Number timeInSeconds]) </h3>
+		<p>
+			设置全局混合器到一个给定的时间，并相应地更新动画。<br /><br />
+
+			当你需要在一个动画里跳转到一个精确的时间，该函数将是十分有用的。输入的参数将会被混合器的[page:.timeScale timeScale]进行缩放。
+		</p>
+
+
+		<h2>方法</h2>
+
+
+		<h3>[method:AnimationAction clipAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<p>
+			返回所传入的剪辑参数的[page:AnimationAction], 根对象参数可选，默认值为混合器的默认根对象。第一个参数可以是动画剪辑([page:AnimationClip])对象或者动画剪辑的名称。<br /><br />
+
+			如果不存在符合传入的剪辑和根对象这两个参数的动作, 该方法将会创建一个。传入相同的参数多次调用将会返回同一个剪辑实例。
+		</p>
+
+		<h3>[method:AnimationAction existingAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<p>
+			返回传入剪辑的已有[page:AnimationAction], 根对象参数可选，默认值为混合器的默认根对象。<br /><br />
+
+			第一个参数可以是动画剪辑([page:AnimationClip])对象或者动画剪辑的名称。
+		</p>
+
+		<h3>[method:Object3D getRoot]()</h3>
+		<p>
+			返回混合器的根对象
+		</p>
+
+		<h3>[method:AnimationMixer stopAllAction]()</h3>
+		<p>
+			停用混合器上所有预定的动作
+		</p>
+
+		<h3>[method:AnimationMixer update]([param:Number deltaTimeInSeconds]) </h3>
+		<p>
+			推进混合器时间并更新动画 <br /><br />
+
+			通常在渲染循环中完成, 传入按照混合器的时间比例([page:.timeScale timeScale])缩放过的[page:Clock.getDelta clock.getDelta]
+		</p>
+
+		<h3>[method:null uncacheClip]([param:AnimationClip clip])</h3>
+
+		<p>
+			释放剪辑的所有内存资源
+		</p>
+
+		<h3>[method:null uncacheRoot]([param:Object3D root]) </h3>
+		<p>
+			释放根对象的所有内存资源
+		</p>
+
+		<h3>[method:null uncacheAction]([param:AnimationClip clip], [param:Object3D optionalRoot])</h3>
+		<p>
+			释放动作的所有内存资源
+		</p>
+
+
+		<h2>源码</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

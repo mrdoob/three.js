@@ -1,103 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - loaders - vrml loader</title>
+		<title>three.js webgl - loaders - VRML loader</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #000;
-				color: #fff;
-				margin: 0px;
-				overflow: hidden;
-			}
-			#info {
-				color: #fff;
-				position: absolute;
-				top: 10px;
-				width: 100%;
-				text-align: center;
-				z-index: 100;
-				display:block;
-			}
-			#info a, .button {
-				color: #f00;
-				font-weight: bold;
-				text-decoration: underline;
-				cursor: pointer
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 
 	<body>
 		<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		vrml format loader test -
-		<!--model from <a href="http://cs.iupui.edu/~aharris/webDesign/vrml/" target="_blank" rel="noopener">VRML 2.0 Tutorial</a>,-->
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - VRML loader
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/OrbitControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/loaders/VRMLLoader.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { VRMLLoader } from './jsm/loaders/VRMLLoader.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			var camera, scene, renderer, stats, controls, loader;
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			var params = {
+				asset: 'house'
+			};
 
-			var container, stats;
+			var assets = [
+				'creaseAngle',
+				'crystal',
+				'house',
+				'elevationGrid1',
+				'elevationGrid2',
+				'extrusion1',
+				'extrusion2',
+				'extrusion3',
+				'lines',
+				'meshWithLines',
+				'meshWithTexture',
+				'pixelTexture',
+				'points',
+			];
 
-			var camera, controls, scene, renderer;
+			var vrmlScene;
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.01, 1e10 );
-				camera.position.z = 6;
-
-				controls = new THREE.OrbitControls( camera );
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 1e10 );
+				camera.position.set( - 10, 5, 10 );
 
 				scene = new THREE.Scene();
 				scene.add( camera );
 
 				// light
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff );
-				dirLight.position.set( 200, 200, 1000 ).normalize();
+				var hemiLight = new THREE.HemisphereLight( 0xffffff, 0x000000, 1 );
+				scene.add( hemiLight );
 
-				camera.add( dirLight );
-				camera.add( dirLight.target );
+				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+				dirLight.position.set( 200, 200, 200 );
+				scene.add( dirLight );
 
-				var loader = new THREE.VRMLLoader();
-				loader.load( 'models/vrml/house.wrl', function ( object ) {
-
-					scene.add( object );
-
-				} );
+				loader = new VRMLLoader();
+				loadAsset( params.asset );
 
 				// renderer
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
 
-				container = document.createElement( 'div' );
-				document.body.appendChild( container );
-				container.appendChild( renderer.domElement );
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 1;
+				controls.maxDistance = 200;
+				controls.enableDamping = true;
+
+				//
 
 				stats = new Stats();
-				container.appendChild( stats.dom );
+				document.body.appendChild( stats.dom );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				//
+
+				var gui = new GUI( { width: 300 } );
+				gui.add( params, 'asset', assets ).onChange( function ( value ) {
+
+					if ( vrmlScene ) {
+
+						vrmlScene.traverse( function ( object ) {
+
+							if ( object.material ) object.material.dispose();
+							if ( object.material && object.material.map ) object.material.map.dispose();
+							if ( object.geometry ) object.geometry.dispose();
+
+						} );
+
+						scene.remove( vrmlScene );
+
+					}
+
+					loadAsset( value );
+
+				} );
+
+			}
+
+			function loadAsset( asset ) {
+
+				loader.load( 'models/vrml/' + asset + '.wrl', function ( object ) {
+
+					vrmlScene = object;
+					scene.add( object );
+					controls.reset();
+
+				} );
 
 			}
 
@@ -113,6 +141,8 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				controls.update(); // to support damping
 
 				renderer.render( scene, camera );
 

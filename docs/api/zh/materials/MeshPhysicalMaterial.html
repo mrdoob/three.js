@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:MeshStandardMaterial] &rarr;
+
+		<h1>物理网格材质([name])</h1>
+
+		<p class="desc"> [page:MeshStandardMaterial]的扩展，能够更好地控制反射率。<br /><br />
+			请注意，为了获得最佳效果，您在使用此材质时应始终指定环境贴图。
+		</p>
+
+		<ul>
+			<li>
+				<b>Clearcoat:</b> Some materials — like car paints, carbon fiber, and wet surfaces — require a
+				clear, reflective layer on top of another layer that may be irregular or rough. Clearcoat
+				approximates this effect, without the need for a separate transparent surface.
+			</li>
+			<li>
+				<b>Physically-based transparency:</b> One limitation of [page:Material.opacity .opacity] is
+				that highly transparent materials are less reflective. Physically-based [page:.transparency]
+				provides a more realistic option for thin, transparent surfaces like glass.
+			</li>
+			<li>
+				<b>Advanced reflectivity:</b> More flexible reflectivity for non-metallic materials.
+			</li>
+		</ul>
+
+		<p>
+			As a result of these complex shading features, MeshPhysicalMaterial has a higher performance
+			cost, per pixel, than other three.js materials. Most effects are disabled by default, and add
+			cost as they are enabled. For best results, always specify an [page:.envMap environment map]
+			when using this material.
+		</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshPhysicalMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_materials_variations_physical materials / variations / physical]<br />
+			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
+			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
+			[example:webgl_materials_physical_transparency materials / physical / transparency]
+		</p>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)<br /><br />
+			属性[page:Hexadecimal color]例外，其可以作为十六进制字符串传递，默认情况下为 *0xffffff*（白色），内部调用[page:Color.set](color)。
+		</p>
+
+
+		<h2>属性(Properties)</h2>
+		<p>共有属性请参见其基类[page:Material]。</p>
+
+		<h3>[property:Float clearcoat]</h3>
+		<p>
+		Represents the thickness of the clear coat layer, from *0.0* to *1.0*. Use clear coat related properties to enable multilayer
+		materials that have a thin translucent layer over the base layer. Default is *0.0*.
+		</p>
+
+		<h3>[property:Texture clearcoatMap]</h3>
+		<p>
+		The red channel of this texture is multiplied against [page:.clearcoat], for per-pixel control
+		over a coating's thickness. Default is *null*.
+		</p>
+
+		<h3>[property:Texture clearcoatNormalMap]</h3>
+		<p>Can be used to enable independent normals for the clear coat layer. Default is *null*.</p>
+
+		<h3>[property:Vector2 clearcoatNormalScale]</h3>
+		<p>How much [page:.clearcoatNormalMap] affects the clear coat layer, from *(0,0)* to *(1,1)*. Default is *(1,1)*.</p>
+
+		<h3>[property:Float clearcoatRoughness]</h3>
+		<p>Roughness of the clear coat layer, from *0.0* to *1.0*. Default is *0.0*.</p>
+
+		<h3>[property:Texture clearcoatRoughnessMap]</h3>
+		<p>
+		The green channel of this texture is multiplied against [page:.clearcoatRoughness], for per-pixel control
+		over a coating's roughness. Default is *null*.
+		</p>
+
+		<h3>[property:Object defines]</h3>
+		<p> 如下形式的对象:
+			<code>
+				{
+
+					'STANDARD': ''
+					'PHYSICAL': '',
+
+				};
+			</code>
+			[page:WebGLRenderer]使用它来选择shaders。
+		</p>
+
+		<h3>[property:Float reflectivity]</h3>
+		<p> 反射度，从*0.0*到*1.0*。默认值为*0.5*。<br />
+			这模拟了非金属材质的反射率。当[page:MeshStandardMaterial]为*1.0*时，此属性无效。
+		</p>
+
+		<h3>[property:Float transparency]</h3>
+		<p>
+		Degree of transparency, from *0.0* to *1.0*. Default is *0.0*.<br />
+
+		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are mostly transparent.
+
+		The transparency property can be used to model these materials.<br />
+
+		When transparency is non-zero, [page:Material.opacity opacity] should be set to *1*.
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Material] 和[page:MeshStandardMaterial]。</p>
+
+
+		<h2>源码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

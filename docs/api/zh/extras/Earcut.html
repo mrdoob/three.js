@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+		切割多边形三角剖分算法的实现。这份代码是[link:https://github.com/mapbox/earcut mapbox/earcut]的一个端口。
+		</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:Array triangulate]( data, holeIndices, dim )</h3>
+		<p>
+		data -- 一个顶点坐标的平面数组。<br />
+		holeIndices -- 空洞索引的数组（如果有的话）。<br />
+		dim -- 输入数组中每个顶点的坐标数。<br /><br />
+
+		Triangulates the given shape definition by returning an array of triangles. A triangle is defined by three consecutive integers representing vertex indices.
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

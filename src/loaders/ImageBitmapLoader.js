@@ -3,7 +3,7 @@
  */
 
 import { Cache } from './Cache.js';
-import { DefaultLoadingManager } from './LoadingManager.js';
+import { Loader } from './Loader.js';
 
 
 function ImageBitmapLoader( manager ) {
@@ -20,14 +20,17 @@ function ImageBitmapLoader( manager ) {
 
 	}
 
-	this.manager = manager !== undefined ? manager : DefaultLoadingManager;
-	this.options = undefined;
+	Loader.call( this, manager );
+
+	this.options = { premultiplyAlpha: 'none' };
 
 }
 
-ImageBitmapLoader.prototype = {
+ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: ImageBitmapLoader,
+
+	isImageBitmapLoader: true,
 
 	setOptions: function setOptions( options ) {
 
@@ -45,9 +48,9 @@ ImageBitmapLoader.prototype = {
 
 		url = this.manager.resolveURL( url );
 
-		var scope = this;
+		const scope = this;
 
-		var cached = Cache.get( url );
+		const cached = Cache.get( url );
 
 		if ( cached !== undefined ) {
 
@@ -85,26 +88,15 @@ ImageBitmapLoader.prototype = {
 
 			if ( onError ) onError( e );
 
-			scope.manager.itemEnd( url );
 			scope.manager.itemError( url );
+			scope.manager.itemEnd( url );
 
 		} );
 
-	},
-
-	setCrossOrigin: function ( /* value */ ) {
-
-		return this;
-
-	},
-
-	setPath: function ( value ) {
-
-		this.path = value;
-		return this;
+		scope.manager.itemStart( url );
 
 	}
 
-};
+} );
 
 export { ImageBitmapLoader };

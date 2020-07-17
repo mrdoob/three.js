@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr;
+
+		<h1>深度网格材质([name])</h1>
+
+		<p class="desc">一种按深度绘制几何体的材质。深度基于相机远近平面。白色最近，黑色最远。</p>
+
+		<iframe id="scene" src="scenes/material-browser.html#MeshDepthMaterial"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p>[page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material]继承的任何属性)。
+		</p>
+
+		<h2>属性(Properties)</h2>
+		<p>共有属性请参见其基类[page:Material]。</p>
+
+		<h3>[property:Texture alphaMap]</h3>
+		<p>alpha贴图是一张灰度纹理，用于控制整个表面的不透明度。（黑色：完全透明；白色：完全不透明）。
+			默认值为null。<br /><br />
+
+			仅使用纹理的颜色，忽略alpha通道（如果存在）。
+			对于RGB和RGBA纹理，[page:WebGLRenderer WebGL]渲染器在采样此纹理时将使用绿色通道，
+			因为在DXT压缩和未压缩RGB 565格式中为绿色提供了额外的精度。
+			Luminance-only以及luminance/alpha纹理也仍然有效。
+		</p>
+
+		<h3>[property:Constant depthPacking]</h3>
+		<p> depth packing的编码。默认为[page:Textures BasicDepthPacking]。</p>
+
+		<h3>[property:Texture displacementMap]</h3>
+		<p> 位移贴图会影响网格顶点的位置，与仅影响材质的光照和阴影的其他贴图不同，移位的顶点可以投射阴影，阻挡其他对象，以及充当真实的几何体。
+			位移纹理是指：网格的所有顶点被映射为图像中每个像素的值（白色是最高的），并且被重定位。
+		</p>
+
+		<h3>[property:Float displacementScale]</h3>
+		<p>位移贴图对网格的影响程度（黑色是无位移，白色是最大位移）。如果没有设置位移贴图，则不会应用此值。默认值为1。
+		</p>
+
+		<h3>[property:Float displacementBias]</h3>
+		<p> 位移贴图在网格顶点上的偏移量。如果没有设置位移贴图，则不会应用此值。默认值为0。
+		</p>
+
+		<h3>[property:Boolean fog]</h3>
+		<p> 材质是否受雾影响。默认值为*false*。</p>
+
+		<h3>[property:Texture map]</h3>
+		<p>颜色贴图。默认为null。</p>
+
+		<h3>[property:boolean morphTargets]</h3>
+		<p>材质是否使用morphTargets。默认值为false。</p>
+
+		<h3>[property:Boolean skinning]</h3>
+		<p>材质是否使用蒙皮。默认值为false。</p>
+
+		<h3>[property:boolean wireframe]</h3>
+		<p> 将几何体渲染为线框。默认值为*false*（即渲染为平滑着色）。</p>
+
+		<h3>[property:Float wireframeLinewidth]</h3>
+		<p>控制线框宽度。默认值为1。<br /><br />
+		由于[link:https://www.khronos.org/registry/OpenGL/specs/gl/glspec46.core.pdf OpenGL Core Profile]
+		与大多数平台上[page:WebGLRenderer WebGL]渲染器限制，无论如何设置该值，线宽始终为1。
+		</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Material]。</p>
+
+
+		<h2>源码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

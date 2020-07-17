@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Material] &rarr; [page:ShaderMaterial] &rarr;
+
+		<h1>原始着色器材质([name])</h1>
+
+		<p class="desc"> 此类的工作方式与[page:ShaderMaterial]类似，不同之处在于内置的uniforms和attributes的定义不会自动添加到GLSL shader代码中。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		var material = new THREE.RawShaderMaterial( {
+
+			uniforms: {
+				time: { value: 1.0 }
+			},
+			vertexShader: document.getElementById( 'vertexShader' ).textContent,
+			fragmentShader: document.getElementById( 'fragmentShader' ).textContent,
+
+		} );
+		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_buffergeometry_rawshader WebGL / buffergeometry / rawshader]<br />
+			[example:webgl_buffergeometry_instancing_billboards WebGL / buffergeometry / instancing / billboards]<br />
+			[example:webgl_buffergeometry_instancing_dynamic WebGL / buffergeometry / instancing / dynamic]<br />
+			[example:webgl_buffergeometry_instancing_interleaved_dynamic WebGL / buffergeometry / instancing / interleaved / dynamic]<br />
+			[example:webgl_buffergeometry_instancing WebGL / buffergeometry / instancing]<br />
+			[example:webgl_interactive_instances_gpu WebGL / interactive / instances /gpu]<br />
+			[example:webgl_raymarching_reflect WebGL / raymarching / reflect]
+		</p>
+
+		<h2>构造函数(Constructor)</h2>
+
+		<h3>[name]( [param:Object parameters] )</h3>
+		<p> [page:Object parameters] - (可选)用于定义材质外观的对象，具有一个或多个属性。
+			材质的任何属性都可以从此处传入(包括从[page:Material] 和 [page:ShaderMaterial]继承的任何属性)。<br /><br />
+		</p>
+
+
+		<h2>属性(Properties)</h2>
+		<p>共有属性请参见其基类[page:Material]和[page:ShaderMaterial]。</p>
+
+		<h2>方法(Methods)</h2>
+		<p>共有方法请参见其基类[page:Material]和[page:ShaderMaterial]。</p>
+
+
+		<h2>源码(Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">[page:LoadingManager LoadingManager]是一个全局实例, 当其他加载器没有指定加载管理器时，它将被其他大多数的加载器设为默认的加载管理器。<br /><br />
+
+
+			LoadingManager对于大多数加载器来说已经足够了，但有时您可能需要单独设置加载管理器，例如纹理、模型加载器。
+		</p>
+
+		<h2>代码示例</h2>
+
+		<p>
+			你可以选择性的为你的管理器设置 [page:LoadingManager.onStart onStart], [page:LoadingManager.onLoad onLoad],
+			[page:LoadingManager.onProgress onProgress], [page:LoadingManager.onStart onError] 这些方法。
+			当你的加载器使用默认加载管理器时，这些方法都将被应用到加载器上。<br /><br />
+
+			请注意，个人的加载器的不应具有类似上面类似的命名函数，以避免混淆。因为这些函数时用于显示有关加载总体状态的信息，而不是处理已加载的数据。
+		</p>
+		<code>
+		THREE.DefaultLoadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
+
+			console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+
+		};
+
+		THREE.DefaultLoadingManager.onLoad = function ( ) {
+
+			console.log( 'Loading Complete!');
+
+		};
+
+
+		THREE.DefaultLoadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
+
+			console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+
+		};
+
+		THREE.DefaultLoadingManager.onError = function ( url ) {
+
+			console.log( 'There was an error loading ' + url );
+
+		};
+		</code>
+
+
+		<h2>属性</h2>
+
+		<p>有关LoadingManager属性的详细信息，请查看[page:LoadingManager LoadingManager] 页面。</p>
+
+		<h2>方法</h2>
+
+		<p>有关LoadingManager方法的详细信息，请查看[page:LoadingManager LoadingManager] 页面。</p>
+
+		<h2>源</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/loaders/LoadingManager.js src/loaders/LoadingManager.js]
+		</p>
+	</body>
+</html>

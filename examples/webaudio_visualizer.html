@@ -4,70 +4,7 @@
 		<title>three.js webaudio - visualizer</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				background:#777;
-				padding:0;
-				margin:0;
-				overflow:hidden;
-				font-family: Monospace;
-			}
-
-			#info {
-				position: absolute;
-				z-index: 2;
-				top: 0px;
-				width: 100%;
-				color: #ffffff;
-				padding: 5px;
-
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-			}
-
-			a {
-				color: #ffffff;
-			}
-
-			#overlay {
-				position: absolute;
-				z-index: 1;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height:100%;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				opacity: 1;
-				background-color: #000000;
-				color: #ffffff;
-			}
-
-			#overlay > div {
-				text-align: center;
-			}
-
-			#overlay > div > button {
-				height: 20px;
-				width: 100px;
-				background: transparent;
-				color: #ffffff;
-				outline: 1px solid #ffffff;
-				border: 0px;
-				cursor: pointer;
-			}
-
-			#overlay > div > p {
-				color: #777777;
-				font-size: 12px;
-			}
-
-		</style>
-
-		<script src="../build/three.js"></script>
-		<script src="js/Detector.js"></script>
+		<link type="text/css" rel="stylesheet" href="main.css">
 
 		<script id="vertexShader" type="x-shader/x-vertex">
 
@@ -106,117 +43,128 @@
 	</head>
 	<body>
 		<div id="overlay">
-			<div>
-				<button id="startButton">Click to Play</button>
-				<p>Automatic audio playback requires a user interaction.</p>
-			</div>
+			<button id="startButton">Play</button>
 		</div>
 		<div id="container"></div>
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio - visualizer |
+			<a href="https://threejs.org" target="_blank" rel="noopener noreferrer">three.js</a> webaudio - visualizer<br/>
 			music by <a href="http://www.newgrounds.com/audio/listen/376737" target="_blank" rel="noopener">skullbeatz</a>
 		</div>
 
-	<script>
+		<script type="module">
 
-	if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import * as THREE from '../build/three.module.js';
 
-	var scene, camera, renderer, analyser, uniforms;
+			var scene, camera, renderer, analyser, uniforms;
 
-	var startButton = document.getElementById( 'startButton' );
-	startButton.addEventListener( 'click', init );
+			var startButton = document.getElementById( 'startButton' );
+			startButton.addEventListener( 'click', init );
 
-	function init() {
+			function init() {
 
-		var fftSize = 128;
+				var fftSize = 128;
 
-		//
+				//
 
-		var overlay = document.getElementById( 'overlay' );
-		overlay.remove();
+				var overlay = document.getElementById( 'overlay' );
+				overlay.remove();
 
-		//
+				//
 
-		var container = document.getElementById( 'container' );
+				var container = document.getElementById( 'container' );
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		renderer.setClearColor( 0x000000 );
-		renderer.setPixelRatio( window.devicePixelRatio );
-		container.appendChild( renderer.domElement );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setClearColor( 0x000000 );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				container.appendChild( renderer.domElement );
 
-		scene = new THREE.Scene();
+				scene = new THREE.Scene();
 
-		camera = new THREE.Camera();
+				camera = new THREE.Camera();
 
-		//
+				//
 
-		var listener = new THREE.AudioListener();
+				var listener = new THREE.AudioListener();
 
-		var audio = new THREE.Audio( listener );
+				var audio = new THREE.Audio( listener );
+				var file = './sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3';
 
-		var mediaElement = new Audio( 'sounds/376737_Skullbeatz___Bad_Cat_Maste.mp3' );
-		mediaElement.loop = true;
-		mediaElement.play();
+				if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
 
-		audio.setMediaElementSource( mediaElement );
+					var loader = new THREE.AudioLoader();
+					loader.load( file, function ( buffer ) {
 
-		analyser = new THREE.AudioAnalyser( audio, fftSize );
+						audio.setBuffer( buffer );
+						audio.play();
 
-		//
+					} );
 
-		uniforms = {
+				} else {
 
-			tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, THREE.LuminanceFormat ) }
+					var mediaElement = new Audio( file );
+					mediaElement.play();
 
-		};
+					audio.setMediaElementSource( mediaElement );
 
-		var material = new THREE.ShaderMaterial( {
+				}
 
-			uniforms: uniforms,
-			vertexShader: document.getElementById( 'vertexShader' ).textContent,
-			fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+				analyser = new THREE.AudioAnalyser( audio, fftSize );
 
-		} );
+				//
 
-		var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
+				uniforms = {
 
-		var mesh = new THREE.Mesh( geometry, material );
-		scene.add( mesh );
+					tAudioData: { value: new THREE.DataTexture( analyser.data, fftSize / 2, 1, THREE.LuminanceFormat ) }
 
-		//
+				};
 
-		window.addEventListener( 'resize', onResize, false );
+				var material = new THREE.ShaderMaterial( {
 
-		animate();
+					uniforms: uniforms,
+					vertexShader: document.getElementById( 'vertexShader' ).textContent,
+					fragmentShader: document.getElementById( 'fragmentShader' ).textContent
 
-	}
+				} );
 
-	function onResize() {
+				var geometry = new THREE.PlaneBufferGeometry( 1, 1 );
 
-		renderer.setSize( window.innerWidth, window.innerHeight );
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
 
-	}
+				//
 
-	function animate() {
+				window.addEventListener( 'resize', onResize, false );
 
-		requestAnimationFrame( animate );
+				animate();
 
-		render();
+			}
 
-	}
+			function onResize() {
 
-	function render() {
+				renderer.setSize( window.innerWidth, window.innerHeight );
 
-		analyser.getFrequencyData();
+			}
 
-		uniforms.tAudioData.value.needsUpdate = true;
+			function animate() {
 
-		renderer.render( scene, camera );
+				requestAnimationFrame( animate );
 
-	}
+				render();
 
-	</script>
+			}
+
+			function render() {
+
+				analyser.getFrequencyData();
+
+				uniforms.tAudioData.value.needsUpdate = true;
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
 
 	</body>
 </html>

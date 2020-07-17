@@ -4,75 +4,53 @@
 		<title>three.js webgl - trackball controls</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
+				background-color: #ccc;
 				color: #000;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				font-weight: bold;
-
-				background-color: #fff;
-				margin: 0px;
-				overflow: hidden;
 			}
-
-			#info {
-				color:#000;
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-
-			}
-
 			a {
-				color: red;
+				color: #f00;
 			}
 		</style>
 	</head>
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - trackball controls example<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - trackball controls<br />
 			MOVE mouse &amp; press LEFT/A: rotate, MIDDLE/S: zoom, RIGHT/D: pan
 		</div>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/controls/TrackballControls.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-		<script>
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
-			var camera, controls, scene, renderer, stats;
+			var params = {
+				orthographicCamera: false
+			};
+
+			var frustumSize = 400;
 
 			init();
 			animate();
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.z = 500;
+				var aspect = window.innerWidth / window.innerHeight;
 
-				controls = new THREE.TrackballControls( camera );
+				perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 1000 );
+				perspectiveCamera.position.z = 500;
 
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
-
-				controls.noZoom = false;
-				controls.noPan = false;
-
-				controls.staticMoving = true;
-				controls.dynamicDampingFactor = 0.3;
-
-				controls.keys = [ 65, 83, 68 ];
-
-				controls.addEventListener( 'change', render );
+				orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
+				orthographicCamera.position.z = 500;
 
 				// world
 
@@ -95,7 +73,6 @@
 
 				}
 
-
 				// lights
 
 				var light = new THREE.DirectionalLight( 0xffffff );
@@ -103,12 +80,11 @@
 				scene.add( light );
 
 				var light = new THREE.DirectionalLight( 0x002288 );
-				light.position.set( -1, -1, -1 );
+				light.position.set( - 1, - 1, - 1 );
 				scene.add( light );
 
 				var light = new THREE.AmbientLight( 0x222222 );
 				scene.add( light );
-
 
 				// renderer
 
@@ -122,37 +98,71 @@
 
 				//
 
-				window.addEventListener( 'resize', onWindowResize, false );
+				var gui = new GUI();
+				gui.add( params, 'orthographicCamera' ).name( 'use orthographic' ).onChange( function ( value ) {
+
+					controls.dispose();
+
+					createControls( value ? orthographicCamera : perspectiveCamera );
+
+				} );
+
 				//
 
-				render();
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				createControls( perspectiveCamera );
+
+			}
+
+			function createControls( camera ) {
+
+				controls = new TrackballControls( camera, renderer.domElement );
+
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
+
+				controls.keys = [ 65, 83, 68 ];
 
 			}
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
+				var aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera.aspect = aspect;
+				perspectiveCamera.updateProjectionMatrix();
+
+				orthographicCamera.left = - frustumSize * aspect / 2;
+				orthographicCamera.right = frustumSize * aspect / 2;
+				orthographicCamera.top = frustumSize / 2;
+				orthographicCamera.bottom = - frustumSize / 2;
+				orthographicCamera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
 				controls.handleResize();
-
-				render();
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
+
 				controls.update();
+
+				stats.update();
+
+				render();
 
 			}
 
 			function render() {
 
+				var camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
+
 				renderer.render( scene, camera );
-				stats.update();
 
 			}
 

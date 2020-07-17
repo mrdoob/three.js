@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">Uniforms are global [link:https://www.opengl.org/documentation/glsl/ GLSL] variables. They are passed to shader programs.
+		</p>
+
+		<h2>Code Example</h2>
+		<p>
+		When declaring a uniform of a [page:ShaderMaterial], it is declared by value or by object.
+		</p>
+		<code>
+		uniforms: {
+			time: { value: 1.0 },
+			resolution: new Uniform( new Vector2() )
+		};
+		</code>
+
+		<h2>Uniform types</h2>
+
+		<p>
+		Each uniform must have a *value* property. The type of the value must correspond to the
+		type of the uniform variable in the GLSL code as specified for the primitive GLSL types
+		in the table below. Uniform structures and arrays are also supported. GLSL arrays of primitive
+		type must either be specified as an array of the corresponding THREE objects or as a flat
+		array containing the data of all the objects. In other words; GLSL primitives in arrays
+		must not be represented by arrays. This rule does not apply transitively.
+		An array of *vec2* arrays, each with a length of five vectors, must be an array of arrays,
+		of either five [page:Vector2] objects or ten *number*s.
+		</p>
+		<table>
+			<caption><a id="uniform-types">Uniform types</a></caption>
+			<thead>
+				<tr>
+					<th>GLSL type</th>
+					<th>JavaScript type</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<tr>
+					<td>int</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td>uint (WebGL 2)</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td>float</td>
+					<td>[page:Number]</td>
+				</tr>
+				<tr>
+					<td>bool</td>
+					<td>[page:Boolean]</td>
+				</tr>
+				<tr>
+					<td>bool</td>
+					<td>[page:Number]</td>
+				</tr>
+
+				<tr>
+					<td>vec2</td>
+					<td>[page:Vector2 THREE.Vector2]</td>
+				</tr>
+				<tr>
+					<td>vec2</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec2</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec3</td>
+					<td>[page:Vector3 THREE.Vector3]</td>
+				</tr>
+				<tr>
+					<td>vec3</td>
+					<td>[page:Color THREE.Color]</td>
+				</tr>
+				<tr>
+					<td>vec3</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec3</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Vector4 THREE.Vector4]</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Quaternion THREE.Quaternion]</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>vec4</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+
+				<tr>
+					<td>mat2</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat2</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat3</td>
+					<td>[page:Matrix3 THREE.Matrix3]</td>
+				</tr>
+				<tr>
+					<td>mat3</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat3</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat4</td>
+					<td>[page:Matrix3 THREE.Matrix4]</td>
+				</tr>
+				<tr>
+					<td>mat4</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>mat4</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+
+				<tr>
+					<td>ivec2, bvec2</td>
+					<td>[page:Float32Array Float32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec2, bvec2</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec3, bvec3</td>
+					<td>[page:Int32Array Int32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec3, bvec3</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec4, bvec4</td>
+					<td>[page:Int32Array Int32Array] (*)</td>
+				</tr>
+				<tr>
+					<td>ivec4, bvec4</td>
+					<td>[page:Array Array] (*)</td>
+				</tr>
+
+				<tr>
+					<td>sampler2D</td>
+					<td>[page:Texture THREE.Texture]</td>
+				</tr>
+				<tr>
+					<td>samplerCube</td>
+					<td>[page:CubeTexture THREE.CubeTexture]</td>
+				</tr>
+
+			</tbody>
+		</table>
+
+		<p>
+		(*) Same for an (innermost) array (dimension) of the same GLSL type, containing the components of all vectors or matrices in the array.
+		</p>
+
+		<h2>Structured Uniforms</h2>
+
+		<p>
+			Sometimes you want to organize uniforms as *structs* in your shader code. The following style must be used so *three.js* is able
+			to process structured uniform data.
+		</p>
+		<code>
+		uniforms = {
+			data: {
+				value: {
+					position: new Vector3(),
+					direction: new Vector3( 0, 0, 1 )
+				 }
+			}
+		};
+		</code>
+		This definition can be mapped on the following GLSL code:
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data;
+		</code>
+
+		<h2>Structured Uniforms with Arrays</h2>
+
+		<p>
+			It's also possible to manage *structs* in arrays. The syntax for this use case looks like so:
+		</p>
+		<code>
+		var entry1 = {
+			position: new Vector3(),
+			direction: new Vector3( 0, 0, 1 )
+		};
+		var entry2 = {
+			position: new Vector3( 1, 1, 1 ),
+			direction: new Vector3( 0, 1, 0 )
+		};
+
+		uniforms = {
+			data: {
+				value: [ entry1, entry2 ]
+			}
+		};
+		</code>
+		This definition can be mapped on the following GLSL code:
+		<code>
+		struct Data {
+			vec3 position;
+			vec3 direction;
+		};
+
+		uniform Data data[ 2 ];
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Object value] )</h3>
+		<p>
+		value -- An object containing the value to set up the uniform. It's type must be one of the Uniform Types described above.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Object value]</h3>
+		<p>
+		Current value of the uniform.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:Uniform clone]()</h3>
+		<p>
+		Returns a clone of this uniform.<br />
+		If the uniform's value property is an [page:Object] with a clone() method, this is used, otherwise the value is copied by assignment.
+		Array values are shared between cloned [page:Uniform]s.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

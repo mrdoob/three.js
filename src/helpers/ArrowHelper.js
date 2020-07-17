@@ -24,7 +24,8 @@ import { Mesh } from '../objects/Mesh.js';
 import { Line } from '../objects/Line.js';
 import { Vector3 } from '../math/Vector3.js';
 
-var lineGeometry, coneGeometry;
+const _axis = new Vector3();
+let _lineGeometry, _coneGeometry;
 
 function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
@@ -32,28 +33,32 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 
 	Object3D.call( this );
 
-	if ( color === undefined ) color = 0xffff00;
+	this.type = 'ArrowHelper';
+
+	if ( dir === undefined ) dir = new Vector3( 0, 0, 1 );
+	if ( origin === undefined ) origin = new Vector3( 0, 0, 0 );
 	if ( length === undefined ) length = 1;
+	if ( color === undefined ) color = 0xffff00;
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	if ( lineGeometry === undefined ) {
+	if ( _lineGeometry === undefined ) {
 
-		lineGeometry = new BufferGeometry();
-		lineGeometry.addAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
+		_lineGeometry = new BufferGeometry();
+		_lineGeometry.setAttribute( 'position', new Float32BufferAttribute( [ 0, 0, 0, 0, 1, 0 ], 3 ) );
 
-		coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
-		coneGeometry.translate( 0, - 0.5, 0 );
+		_coneGeometry = new CylinderBufferGeometry( 0, 0.5, 1, 5, 1 );
+		_coneGeometry.translate( 0, - 0.5, 0 );
 
 	}
 
 	this.position.copy( origin );
 
-	this.line = new Line( lineGeometry, new LineBasicMaterial( { color: color } ) );
+	this.line = new Line( _lineGeometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
 	this.line.matrixAutoUpdate = false;
 	this.add( this.line );
 
-	this.cone = new Mesh( coneGeometry, new MeshBasicMaterial( { color: color } ) );
+	this.cone = new Mesh( _coneGeometry, new MeshBasicMaterial( { color: color, toneMapped: false } ) );
 	this.cone.matrixAutoUpdate = false;
 	this.add( this.cone );
 
@@ -65,43 +70,36 @@ function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
 ArrowHelper.prototype = Object.create( Object3D.prototype );
 ArrowHelper.prototype.constructor = ArrowHelper;
 
-ArrowHelper.prototype.setDirection = ( function () {
+ArrowHelper.prototype.setDirection = function ( dir ) {
 
-	var axis = new Vector3();
-	var radians;
+	// dir is assumed to be normalized
 
-	return function setDirection( dir ) {
+	if ( dir.y > 0.99999 ) {
 
-		// dir is assumed to be normalized
+		this.quaternion.set( 0, 0, 0, 1 );
 
-		if ( dir.y > 0.99999 ) {
+	} else if ( dir.y < - 0.99999 ) {
 
-			this.quaternion.set( 0, 0, 0, 1 );
+		this.quaternion.set( 1, 0, 0, 0 );
 
-		} else if ( dir.y < - 0.99999 ) {
+	} else {
 
-			this.quaternion.set( 1, 0, 0, 0 );
+		_axis.set( dir.z, 0, - dir.x ).normalize();
 
-		} else {
+		const radians = Math.acos( dir.y );
 
-			axis.set( dir.z, 0, - dir.x ).normalize();
+		this.quaternion.setFromAxisAngle( _axis, radians );
 
-			radians = Math.acos( dir.y );
+	}
 
-			this.quaternion.setFromAxisAngle( axis, radians );
-
-		}
-
-	};
-
-}() );
+};
 
 ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 
 	if ( headLength === undefined ) headLength = 0.2 * length;
 	if ( headWidth === undefined ) headWidth = 0.2 * headLength;
 
-	this.line.scale.set( 1, Math.max( 0, length - headLength ), 1 );
+	this.line.scale.set( 1, Math.max( 0.0001, length - headLength ), 1 ); // see #17458
 	this.line.updateMatrix();
 
 	this.cone.scale.set( headWidth, headLength, headWidth );
@@ -112,10 +110,26 @@ ArrowHelper.prototype.setLength = function ( length, headLength, headWidth ) {
 
 ArrowHelper.prototype.setColor = function ( color ) {
 
-	this.line.material.color.copy( color );
-	this.cone.material.color.copy( color );
+	this.line.material.color.set( color );
+	this.cone.material.color.set( color );
 
 };
 
+ArrowHelper.prototype.copy = function ( source ) {
+
+	Object3D.prototype.copy.call( this, source, false );
+
+	this.line.copy( source.line );
+	this.cone.copy( source.cone );
+
+	return this;
+
+};
+
+ArrowHelper.prototype.clone = function () {
+
+	return new this.constructor().copy( this );
+
+};
 
 export { ArrowHelper };

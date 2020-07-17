@@ -1,5 +1,8 @@
-var fs = require( 'fs' );
-var path = require( 'path' );
+import fs from 'fs';
+import path from 'path';
+
+import { FBXLoader } from '../../examples/jsm/loaders/FBXLoader.js';
+import { ImageLoader, ImageUtils, LoaderUtils } from '../../build/three.module.js';
 
 if ( process.argv.length <= 2 ) {
 
@@ -10,7 +13,7 @@ if ( process.argv.length <= 2 ) {
 
 //
 
-var PRECISION = 6;
+const PRECISION = 6;
 
 function parseNumber( key, value ) {
 
@@ -18,29 +21,27 @@ function parseNumber( key, value ) {
 
 }
 
-THREE = require( '../../build/three.js' );
-require( '../../examples/js/curves/NURBSCurve.js' );
-require( '../../examples/js/curves/NURBSUtils.js' );
-require( '../../examples/js/loaders/FBXLoader.js' );
-global.Zlib = require( '../../examples/js/libs/inflate.min.js' ).Zlib;
-
 global.window = {
 	innerWidth: 1024,
 	innerHeight: 768,
 	URL: {
+
 		createObjectURL: function () {
+
 			throw new Error( 'fbx2three: Images in binary format not yet supported.' );
+
 		}
+
 	}
 };
 
 // HTML Images are not available, so use a Buffer instead.
-THREE.ImageLoader.prototype.load = function ( url, onLoad ) {
+ImageLoader.prototype.load = function ( url, onLoad ) {
 
 	if ( this.path !== undefined ) url = this.path + url;
 
 	// If image isn't found, try to ignore it.
-	if ( !fs.existsSync( url ) ) {
+	if ( ! fs.existsSync( url ) ) {
 
 		onLoad( new Buffer( '' ) );
 		return;
@@ -52,15 +53,15 @@ THREE.ImageLoader.prototype.load = function ( url, onLoad ) {
 };
 
 // Convert image buffer to data URL.
-THREE.ImageUtils.getDataURL = function ( image ) {
+ImageUtils.getDataURL = function ( image ) {
 
-	if ( !( image instanceof Buffer ) ) {
+	if ( ! ( image instanceof Buffer ) ) {
 
 		throw new Error( 'fbx2three: Image should be loaded as Buffer.' );
 
 	}
 
-	var dataURL = 'data:';
+	let dataURL = 'data:';
 	dataURL += this.format === THREE.RGBAFormat ? 'image/png' : 'image/jpeg';
 	dataURL += ';base64,';
 	dataURL += image.toString( 'base64' );
@@ -70,11 +71,11 @@ THREE.ImageUtils.getDataURL = function ( image ) {
 
 //
 
-var file = process.argv[ 2 ];
-var resourceDirectory = THREE.LoaderUtils.extractUrlBase( file );
-var loader = new THREE.FBXLoader();
+const file = process.argv[ 2 ];
+const resourceDirectory = LoaderUtils.extractUrlBase( file );
+const loader = new FBXLoader();
 
-var arraybuffer = fs.readFileSync( file ).buffer;
-var object = loader.parse( arraybuffer, resourceDirectory );
-var content = JSON.stringify( object.toJSON(), parseNumber );
+const arraybuffer = fs.readFileSync( file ).buffer;
+const object = loader.parse( arraybuffer, resourceDirectory );
+const content = JSON.stringify( object.toJSON(), parseNumber );
 fs.writeFileSync( path.basename( file, '.fbx' ) + '.json', content, 'utf8' );

@@ -4,22 +4,18 @@
 		<title>three.js webgl - clipping planes</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				margin: 0px;
-				background-color: #000000;
-				overflow: hidden;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/libs/dat.gui.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var camera, scene, renderer, startTime, object, stats;
 
@@ -72,15 +68,15 @@
 				// Geometry
 
 				var material = new THREE.MeshPhongMaterial( {
-						color: 0x80ee10,
-						shininess: 100,
-						side: THREE.DoubleSide,
+					color: 0x80ee10,
+					shininess: 100,
+					side: THREE.DoubleSide,
 
-						// ***** Clipping setup (material): *****
-						clippingPlanes: [ localPlane ],
-						clipShadows: true
+					// ***** Clipping setup (material): *****
+					clippingPlanes: [ localPlane ],
+					clipShadows: true
 
-					} );
+				} );
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 0.4, 0.08, 95, 20 );
 
@@ -89,9 +85,9 @@
 				scene.add( object );
 
 				var ground = new THREE.Mesh(
-						new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
-						new THREE.MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
-					);
+					new THREE.PlaneBufferGeometry( 9, 9, 1, 1 ),
+					new THREE.MeshPhongMaterial( { color: 0xa0adaf, shininess: 150 } )
+				);
 
 				ground.rotation.x = - Math.PI / 2; // rotates X/Y to X/Z
 				ground.receiveShadow = true;
@@ -119,36 +115,75 @@
 
 				// Controls
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( 0, 1, 0 );
 				controls.update();
 
 				// GUI
 
-				var gui = new dat.GUI(),
+				var gui = new GUI(),
 					folderLocal = gui.addFolder( 'Local Clipping' ),
 					propsLocal = {
 
-						get 'Enabled'() { return renderer.localClippingEnabled; },
-						set 'Enabled'( v ) { renderer.localClippingEnabled = v; },
+						get 'Enabled'() {
 
-						get 'Shadows'() { return material.clipShadows; },
-						set 'Shadows'( v ) { material.clipShadows = v; },
+							return renderer.localClippingEnabled;
 
-						get 'Plane'() { return localPlane.constant; },
-						set 'Plane'( v ) { localPlane.constant = v }
+						},
+						set 'Enabled'( v ) {
+
+							renderer.localClippingEnabled = v;
+
+						},
+
+						get 'Shadows'() {
+
+							return material.clipShadows;
+
+						},
+						set 'Shadows'( v ) {
+
+							material.clipShadows = v;
+
+						},
+
+						get 'Plane'() {
+
+							return localPlane.constant;
+
+						},
+						set 'Plane'( v ) {
+
+							localPlane.constant = v;
+
+						}
 
 					},
 
 					folderGlobal = gui.addFolder( 'Global Clipping' ),
 					propsGlobal = {
 
-						get 'Enabled'() { return renderer.clippingPlanes !== Empty; },
-						set 'Enabled'( v  ) {
-								renderer.clippingPlanes = v ? globalPlanes : Empty; },
+						get 'Enabled'() {
 
-						get 'Plane'() { return globalPlane.constant; },
-						set 'Plane'( v ) { globalPlane.constant = v; }
+							return renderer.clippingPlanes !== Empty;
+
+						},
+						set 'Enabled'( v ) {
+
+							renderer.clippingPlanes = v ? globalPlanes : Empty;
+
+						},
+
+						get 'Plane'() {
+
+							return globalPlane.constant;
+
+						},
+						set 'Plane'( v ) {
+
+							globalPlane.constant = v;
+
+						}
 
 					};
 
@@ -157,7 +192,7 @@
 				folderLocal.add( propsLocal, 'Plane', 0.3, 1.25 );
 
 				folderGlobal.add( propsGlobal, 'Enabled' );
-				folderGlobal.add( propsGlobal, 'Plane', -0.4, 3 );
+				folderGlobal.add( propsGlobal, 'Plane', - 0.4, 3 );
 
 				// Start
 

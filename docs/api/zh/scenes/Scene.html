@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+		<h1>场景（[name]）</h1>
+
+		<p class="desc">
+			场景允许你在什么地方、摆放什么东西来交给three.js来渲染，这是你放置物体、灯光和摄像机的地方。</p>
+
+
+		<h2>构造器</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+		创建一个新的场景对象。
+		</p>
+
+
+		<h2>属性</h2>
+
+		<h3>[property:boolean autoUpdate]</h3>
+		<p>
+			默认值为true，若设置了这个值，则渲染器会检查每一帧是否需要更新场景及其中物体的矩阵。
+			当设为false时，你必须亲自手动维护场景中的矩阵。
+		</p>
+
+		<h3>[property:Object background]</h3>
+		<p>
+			若不为空，在渲染场景的时候将设置背景，且背景总是首先被渲染的。
+			可以设置一个用于的“clear”的[page:Color]（颜色）、一个覆盖canvas的[page:Texture]（纹理），或是一个[page:CubeTexture]。默认值为null。
+		</p>
+
+		<h3>[property:Texture environment]</h3>
+		<p>
+		If not null, this texture is set as the environment map for all physical materials in the scene.
+		However, it's not possible to overwrite an existing texture assigned to [page:MeshStandardMaterial.envmap]. Default is null.
+		</p>
+
+		<h3>[property:Fog fog]</h3>
+
+		<p>一个[page:Fog fog]实例定义了影响场景中的每个物体的雾的类型。默认值为null。
+		</p>
+
+		<h3>[property:Material overrideMaterial]</h3>
+
+		<p>如果不为空，它将强制场景中的每个物体使用这里的材质来渲染。默认值为null。</p>
+
+		<h2>方法</h2>
+
+		<h3>[method:null dispose]()</h3>
+		<p>
+			清除[page:WebGLRenderer]内部所缓存的场景相关的数据。
+		</p>
+
+		<h3>[method:JSON toJSON]</h3>
+		<p>
+			meta -- 包含有元数据的对象，例如场景中的的纹理或图片。
+			将scene对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
+		</p>
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

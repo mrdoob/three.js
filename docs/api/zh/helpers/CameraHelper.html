@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		用于模拟相机视锥体的辅助对象.<br />
+		它使用 [page:LineSegments] 来模拟相机视锥体.
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		var helper = new THREE.CameraHelper( camera );
+		scene.add( helper );
+		</code>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_camera WebGL / camera]<br/>
+			[example:webgl_geometry_extrude_splines WebGL / extrude / splines]
+		</p>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:Camera camera] )</h3>
+		<p>
+		[page:Camera camera] -- 被模拟的相机.<br /><br />
+
+		为指定相机创建一个新的相机辅助对象 [Name] .
+		</p>
+
+
+
+		<h2>属性</h2>
+		<p>请到基类 [page:LineSegments] 页面查看公共属性.</p>
+
+
+
+		<h3>[property:Camera camera]</h3>
+		<p>被模拟的相机.</p>
+
+		<h3>[property:object pointMap]</h3>
+		<p>包含用于模拟相机的点.</p>
+
+		<h3>[property:object matrix]</h3>
+		<p>请参考相机的世界矩阵 [page:Object3D.matrixWorld camera.matrixWorld].</p>
+
+		<h3>[property:object matrixAutoUpdate]</h3>
+		<p>
+			请查看 [page:Object3D.matrixAutoUpdate]. 这里设置为 *false* 表示辅助对象
+			使用相机的 [page:Object3D.matrixWorld matrixWorld].
+		</p>
+
+
+
+
+
+		<h2>方法</h2>
+		<p>请到基类 [page:LineSegments] 页面查看公共方法.</p>
+
+
+		<h3>[method:null update]()</h3>
+		<p>基于相机的投影矩阵更新辅助对象.</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

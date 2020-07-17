@@ -2,23 +2,25 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-function WebGLAttributes( gl ) {
+function WebGLAttributes( gl, capabilities ) {
 
-	var buffers = new WeakMap();
+	const isWebGL2 = capabilities.isWebGL2;
+
+	const buffers = new WeakMap();
 
 	function createBuffer( attribute, bufferType ) {
 
-		var array = attribute.array;
-		var usage = attribute.dynamic ? gl.DYNAMIC_DRAW : gl.STATIC_DRAW;
+		const array = attribute.array;
+		const usage = attribute.usage;
 
-		var buffer = gl.createBuffer();
+		const buffer = gl.createBuffer();
 
 		gl.bindBuffer( bufferType, buffer );
 		gl.bufferData( bufferType, array, usage );
 
 		attribute.onUploadCallback();
 
-		var type = gl.FLOAT;
+		let type = gl.FLOAT;
 
 		if ( array instanceof Float32Array ) {
 
@@ -65,29 +67,30 @@ function WebGLAttributes( gl ) {
 
 	function updateBuffer( buffer, attribute, bufferType ) {
 
-		var array = attribute.array;
-		var updateRange = attribute.updateRange;
+		const array = attribute.array;
+		const updateRange = attribute.updateRange;
 
 		gl.bindBuffer( bufferType, buffer );
 
-		if ( attribute.dynamic === false ) {
-
-			gl.bufferData( bufferType, array, gl.STATIC_DRAW );
-
-		} else if ( updateRange.count === - 1 ) {
+		if ( updateRange.count === - 1 ) {
 
 			// Not using update ranges
 
 			gl.bufferSubData( bufferType, 0, array );
 
-		} else if ( updateRange.count === 0 ) {
-
-			console.error( 'THREE.WebGLObjects.updateBuffer: dynamic THREE.BufferAttribute marked as needsUpdate but updateRange.count is 0, ensure you are using set methods or updating manually.' );
-
 		} else {
 
-			gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
-				array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+			if ( isWebGL2 ) {
+
+				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+					array, updateRange.offset, updateRange.count );
+
+			} else {
+
+				gl.bufferSubData( bufferType, updateRange.offset * array.BYTES_PER_ELEMENT,
+					array.subarray( updateRange.offset, updateRange.offset + updateRange.count ) );
+
+			}
 
 			updateRange.count = - 1; // reset range
 
@@ -109,7 +112,7 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers.get( attribute );
+		const data = buffers.get( attribute );
 
 		if ( data ) {
 
@@ -125,7 +128,7 @@ function WebGLAttributes( gl ) {
 
 		if ( attribute.isInterleavedBufferAttribute ) attribute = attribute.data;
 
-		var data = buffers.get( attribute );
+		const data = buffers.get( attribute );
 
 		if ( data === undefined ) {
 

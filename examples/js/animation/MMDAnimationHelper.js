@@ -1,3 +1,4 @@
+console.warn( "THREE.MMDAnimationHelper: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author takahiro / https://github.com/takahirox
  *
@@ -19,7 +20,7 @@ THREE.MMDAnimationHelper = ( function () {
 	 * @param {Object} params - (optional)
 	 * @param {boolean} params.sync - Whether animation durations of added objects are synched. Default is true.
 	 * @param {Number} params.afterglow - Default is 0.0.
-	 * @param {boolean} params resetPhysicsOnLoop - Default is true.
+	 * @param {boolean} params.resetPhysicsOnLoop - Default is true.
 	 */
 	function MMDAnimationHelper( params ) {
 
@@ -53,7 +54,7 @@ THREE.MMDAnimationHelper = ( function () {
 			cameraAnimation: true
 		};
 
-		this.onBeforePhysics = function ( mesh ) {};
+		this.onBeforePhysics = function ( /* mesh */ ) {};
 
 		// experimental
 		this.sharedPhysics = false;
@@ -221,7 +222,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( params.ik !== false ) {
 
-				this._createCCDIKSolver( mesh ).update( params.saveOriginalBonesBeforeIK );  // this param is experimental
+				this._createCCDIKSolver( mesh ).update( params.saveOriginalBonesBeforeIK ); // this param is experimental
 
 			}
 
@@ -239,7 +240,7 @@ THREE.MMDAnimationHelper = ( function () {
 		 * Enabes/Disables an animation feature.
 		 *
 		 * @param {string} key
-		 * @param {boolean} enebled
+		 * @param {boolean} enabled
 		 * @return {THREE.MMDAnimationHelper}
 		 */
 		enable: function ( key, enabled ) {
@@ -324,7 +325,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( params.animation !== undefined ) {
 
-				this._setupCameraAnimation( camera, params.animation )
+				this._setupCameraAnimation( camera, params.animation );
 
 			}
 
@@ -488,7 +489,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 				var masterPhysics = this._getMasterPhysics();
 
-				if ( masterPhysics !== null ) world = masterPhysics.world;
+				if ( masterPhysics !== null ) world = masterPhysics.world; // eslint-disable-line no-undef
 
 			}
 
@@ -668,7 +669,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 						objects.set( clip, {
 							duration: clip.duration
-						} )
+						} );
 
 					}
 
@@ -692,7 +693,7 @@ THREE.MMDAnimationHelper = ( function () {
 
 							objects.set( clip, {
 								duration: clip.duration
-							} )
+							} );
 
 						}
 
@@ -946,7 +947,8 @@ THREE.MMDAnimationHelper = ( function () {
 
 			if ( this.currentTime < this.delayTime ) return false;
 
-			this.audio.startTime = this.currentTime - this.delayTime;
+			// 'duration' can be bigger than 'audioDuration + delayTime' because of sync configuration
+			if ( ( this.currentTime - this.delayTime ) > this.audioDuration ) return false;
 
 			return true;
 

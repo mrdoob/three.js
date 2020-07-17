@@ -4,43 +4,24 @@
 		<title>three.js webgl - materials</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				color: #fff;
-				font-family: Monospace;
-				font-size: 13px;
-				text-align: center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Basic Material Variantions by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Basic Material Variantions by <a href="http://clara.io/" target="_blank" rel="noopener">Ben Houston</a>.</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
+		<script type="module">
 
-		<script src="js/Detector.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
-			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
 			var container, stats;
 
-			var camera, scene, renderer, controls;
+			var camera, scene, renderer;
 			var particleLight;
 
 			var loader = new THREE.FontLoader();
@@ -56,7 +37,7 @@
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 2500 );
 				camera.position.set( 0.0, 400, 400 * 3.5 );
 
 				//
@@ -64,7 +45,7 @@
 				var reflectionCube = new THREE.CubeTextureLoader()
 					.setPath( 'textures/cube/SwedishRoyalCastle/' )
 					.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-				reflectionCube.format = THREE.RGBFormat;
+				reflectionCube.encoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 				scene.background = reflectionCube;
@@ -73,12 +54,9 @@
 
 				var imgTexture = new THREE.TextureLoader().load( "textures/planets/moon_1024.jpg" );
 				imgTexture.wrapS = imgTexture.wrapT = THREE.RepeatWrapping;
+				imgTexture.encoding = THREE.sRGBEncoding;
 				imgTexture.anisotropy = 16;
 				imgTexture = null;
-
-				var shininess = 50, specular = 0x333333;
-
-				var materials = [];
 
 				var cubeWidth = 400;
 				var numberOfSphersPerSide = 5;
@@ -126,7 +104,7 @@
 						height: 1,
 						curveSegments: 1
 
-					});
+					} );
 
 					var textMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff } );
 					var textMesh = new THREE.Mesh( textGeo, textMaterial );
@@ -135,16 +113,16 @@
 
 				}
 
-				addLabel( "+hue", new THREE.Vector3( -350, 0, 0 ) );
+				addLabel( "+hue", new THREE.Vector3( - 350, 0, 0 ) );
 				addLabel( "-hue", new THREE.Vector3( 350, 0, 0 ) );
 
-				addLabel( "-reflectivity", new THREE.Vector3( 0, -300, 0 ) );
+				addLabel( "-reflectivity", new THREE.Vector3( 0, - 300, 0 ) );
 				addLabel( "+reflectivity", new THREE.Vector3( 0, 300, 0 ) );
 
-				addLabel( "-diffuse", new THREE.Vector3( 0, 0, -300 ) );
+				addLabel( "-diffuse", new THREE.Vector3( 0, 0, - 300 ) );
 				addLabel( "+diffuse", new THREE.Vector3( 0, 0, 300 ) );
 
-				addLabel( "envMap", new THREE.Vector3( -350, 300, 0 ) );
+				addLabel( "envMap", new THREE.Vector3( - 350, 300, 0 ) );
 				addLabel( "no envMap", new THREE.Vector3( 350, 300, 0 ) );
 
 				particleLight = new THREE.Mesh( new THREE.SphereBufferGeometry( 4, 8, 8 ), new THREE.MeshBasicMaterial( { color: 0xffffff } ) );
@@ -167,16 +145,16 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
-
-				renderer.gammaInput = true;
-				renderer.gammaOutput = true;
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				//
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				controls = new THREE.OrbitControls( camera );
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 200;
+				controls.maxDistance = 2000;
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

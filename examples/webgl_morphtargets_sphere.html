@@ -4,53 +4,30 @@
 		<title>three.js webgl - morph targets - sphere</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			body {
-				font-family: Monospace;
-				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
-			}
-
-			#info {
-				position: absolute;
-				top: 0px;
-				width: 100%;
-				padding: 5px;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-				color: #ffffff;
-			}
-
-			a {
-				color: #ffffff;
-			}
-		</style>
+		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - WebGL morph target example
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
-		<script src="js/controls/OrbitControls.js"></script>
-		<script src="js/loaders/GLTFLoader.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
 
-			var container, stats;
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
-			var camera, scene, renderer;
+			var container;
 
-			var geometry, objects;
+			var camera, scene, renderer, clock;
 
 			var mesh;
 
 			var sign = 1;
+			var speed = 0.5;
 
 			init();
 			animate();
@@ -64,6 +41,8 @@
 
 				scene = new THREE.Scene();
 
+				clock = new THREE.Clock();
+
 				var light = new THREE.PointLight( 0xff2200, 0.7 );
 				light.position.set( 100, 100, 100 );
 				scene.add( light );
@@ -75,7 +54,7 @@
 				light = new THREE.AmbientLight( 0x111111 );
 				scene.add( light );
 
-				var loader = new THREE.GLTFLoader();
+				var loader = new GLTFLoader();
 				loader.load( 'models/gltf/AnimatedMorphSphere/glTF/AnimatedMorphSphere.gltf', function ( gltf ) {
 
 					gltf.scene.traverse( function ( node ) {
@@ -122,13 +101,15 @@
 
 				//
 
-				var controls = new THREE.OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
 				controls.minDistance = 1;
 				controls.maxDistance = 20;
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				document.addEventListener( 'visibilitychange', onVisibilityChange );
 
 			}
 
@@ -141,6 +122,20 @@
 
 			}
 
+			function onVisibilityChange() {
+
+				if ( document.hidden === true ) {
+
+					clock.stop();
+
+				} else {
+
+					clock.start();
+
+				}
+
+			}
+
 			function animate() {
 
 				requestAnimationFrame( animate );
@@ -150,11 +145,15 @@
 
 			function render() {
 
+				var delta = clock.getDelta();
+
 				if ( mesh !== undefined ) {
 
-					mesh.rotation.y += 0.01;
+					var step = delta * speed;
 
-					mesh.morphTargetInfluences[ 1 ] = mesh.morphTargetInfluences[ 1 ] + 0.01 * sign;
+					mesh.rotation.y += step;
+
+					mesh.morphTargetInfluences[ 1 ] = mesh.morphTargetInfluences[ 1 ] + step * sign;
 
 					if ( mesh.morphTargetInfluences[ 1 ] <= 0 || mesh.morphTargetInfluences[ 1 ] >= 1 ) {
 

@@ -1,18 +1,23 @@
+console.warn( "THREE.DepthLimitedBlurShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
+/**
+ * TODO
+ */
+
 THREE.DepthLimitedBlurShader = {
 	defines: {
-		'KERNEL_RADIUS': 4,
-		'DEPTH_PACKING': 1,
-		'PERSPECTIVE_CAMERA': 1
+		"KERNEL_RADIUS": 4,
+		"DEPTH_PACKING": 1,
+		"PERSPECTIVE_CAMERA": 1
 	},
 	uniforms: {
-		'tDiffuse': { type: 't', value: null },
-		'size': { type: 'v2', value: new THREE.Vector2( 512, 512 ) },
-		'sampleUvOffsets': { type: 'v2v', value: [ new THREE.Vector2( 0, 0 ) ] },
-		'sampleWeights': { type: '1fv', value: [ 1.0 ] },
-		'tDepth': { type: 't', value: null },
-		'cameraNear': { type: 'f', value: 10 },
-		'cameraFar': { type: 'f', value: 1000 },
-		'depthCutoff': { type: 'f', value: 10 },
+		"tDiffuse": { value: null },
+		"size": { value: new THREE.Vector2( 512, 512 ) },
+		"sampleUvOffsets": { value: [ new THREE.Vector2( 0, 0 ) ] },
+		"sampleWeights": { value: [ 1.0 ] },
+		"tDepth": { value: null },
+		"cameraNear": { value: 10 },
+		"cameraFar": { value: 1000 },
+		"depthCutoff": { value: 10 },
 	},
 	vertexShader: [
 		"#include <common>",
@@ -145,9 +150,9 @@ THREE.BlurShaderUtils = {
 
 	configure: function ( material, kernelRadius, stdDev, uvIncrement ) {
 
-		material.defines[ 'KERNEL_RADIUS' ] = kernelRadius;
-		material.uniforms[ 'sampleUvOffsets' ].value = THREE.BlurShaderUtils.createSampleOffsets( kernelRadius, uvIncrement );
-		material.uniforms[ 'sampleWeights' ].value = THREE.BlurShaderUtils.createSampleWeights( kernelRadius, stdDev );
+		material.defines[ "KERNEL_RADIUS" ] = kernelRadius;
+		material.uniforms[ "sampleUvOffsets" ].value = THREE.BlurShaderUtils.createSampleOffsets( kernelRadius, uvIncrement );
+		material.uniforms[ "sampleWeights" ].value = THREE.BlurShaderUtils.createSampleWeights( kernelRadius, stdDev );
 		material.needsUpdate = true;
 
 	}

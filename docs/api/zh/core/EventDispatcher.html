@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			自定义对象的 JavaScript 事件。<br />
+			[link:https://github.com/mrdoob/eventdispatcher.js Eventdispatcher on GitHub]
+		</p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		// 为自定义对象添加事件
+
+		var Car = function () {
+
+			this.start = function () {
+
+				this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+
+			};
+
+		};
+
+		// 将 EventDispatcher.prototype 与自定义对象 prototype 进行混合
+
+		Object.assign( Car.prototype, EventDispatcher.prototype );
+
+		// 使用自定义对象的事件
+
+		var car = new Car();
+
+		car.addEventListener( 'start', function ( event ) {
+
+			alert( event.message );
+
+		} );
+
+		car.start();
+		</code>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]()</h3>
+		<p>
+		创建 EventDispatcher 对象。
+		</p>
+
+
+		<h2>方法</h2>
+
+		<h3>[method:null addEventListener]( [param:String type], [param:Function listener] )</h3>
+		<p>
+		type - 需要添加监听的事件类型。<br />
+		listener - 事件发生时被调用到的函数。
+		</p>
+		<p>
+		为指定事件增加监听函数。
+		</p>
+
+		<h3>[method:Boolean hasEventListener]( [param:String type], [param:Function listener] )</h3>
+		<p>
+		type - 需要被监听的事件类型。<br />
+		listener - 事件发生时被调用到的函数。
+		</p>
+		<p>
+		检查监听函数是否已经添加到指定事件。
+		</p>
+
+		<h3>[method:null removeEventListener]( [param:String type], [param:Function listener] )</h3>
+		<p>
+		type - 需要移除监听的事件类型。<br />
+		listener - 需要被移除的监听函数。
+		</p>
+		<p>
+		从指定事件类型中移除监听函数。
+		</p>
+
+		<h3>[method:null dispatchEvent]( [param:object event] )</h3>
+		<p>
+		event - 将被触发的事件。
+		</p>
+		<p>
+		触发一个事件。
+		</p>
+
+
+		<h2>源代码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

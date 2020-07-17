@@ -11,6 +11,8 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
+const _vector = new Vector3();
+
 function SpotLightHelper( light, color ) {
 
 	Object3D.call( this );
@@ -23,9 +25,9 @@ function SpotLightHelper( light, color ) {
 
 	this.color = color;
 
-	var geometry = new BufferGeometry();
+	const geometry = new BufferGeometry();
 
-	var positions = [
+	const positions = [
 		0, 0, 0, 	0, 0, 1,
 		0, 0, 0, 	1, 0, 1,
 		0, 0, 0,	- 1, 0, 1,
@@ -33,10 +35,10 @@ function SpotLightHelper( light, color ) {
 		0, 0, 0, 	0, - 1, 1
 	];
 
-	for ( var i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
+	for ( let i = 0, j = 1, l = 32; i < l; i ++, j ++ ) {
 
-		var p1 = ( i / l ) * Math.PI * 2;
-		var p2 = ( j / l ) * Math.PI * 2;
+		const p1 = ( i / l ) * Math.PI * 2;
+		const p2 = ( j / l ) * Math.PI * 2;
 
 		positions.push(
 			Math.cos( p1 ), Math.sin( p1 ), 1,
@@ -45,9 +47,9 @@ function SpotLightHelper( light, color ) {
 
 	}
 
-	geometry.addAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( positions, 3 ) );
 
-	var material = new LineBasicMaterial( { fog: false } );
+	const material = new LineBasicMaterial( { fog: false, toneMapped: false } );
 
 	this.cone = new LineSegments( geometry, material );
 	this.add( this.cone );
@@ -68,36 +70,28 @@ SpotLightHelper.prototype.dispose = function () {
 
 SpotLightHelper.prototype.update = function () {
 
-	var vector = new Vector3();
-	var vector2 = new Vector3();
+	this.light.updateMatrixWorld();
 
-	return function update() {
+	const coneLength = this.light.distance ? this.light.distance : 1000;
+	const coneWidth = coneLength * Math.tan( this.light.angle );
 
-		this.light.updateMatrixWorld();
+	this.cone.scale.set( coneWidth, coneWidth, coneLength );
 
-		var coneLength = this.light.distance ? this.light.distance : 1000;
-		var coneWidth = coneLength * Math.tan( this.light.angle );
+	_vector.setFromMatrixPosition( this.light.target.matrixWorld );
 
-		this.cone.scale.set( coneWidth, coneWidth, coneLength );
+	this.cone.lookAt( _vector );
 
-		vector.setFromMatrixPosition( this.light.matrixWorld );
-		vector2.setFromMatrixPosition( this.light.target.matrixWorld );
+	if ( this.color !== undefined ) {
 
-		this.cone.lookAt( vector2.sub( vector ) );
+		this.cone.material.color.set( this.color );
 
-		if ( this.color !== undefined ) {
+	} else {
 
-			this.cone.material.color.set( this.color );
+		this.cone.material.color.copy( this.light.color );
 
-		} else {
+	}
 
-			this.cone.material.color.copy( this.light.color );
-
-		}
-
-	};
-
-}();
+};
 
 
 export { SpotLightHelper };

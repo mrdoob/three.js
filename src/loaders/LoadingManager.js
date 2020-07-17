@@ -4,12 +4,16 @@
 
 function LoadingManager( onLoad, onProgress, onError ) {
 
-	var scope = this;
+	const scope = this;
 
-	var isLoading = false;
-	var itemsLoaded = 0;
-	var itemsTotal = 0;
-	var urlModifier = undefined;
+	let isLoading = false;
+	let itemsLoaded = 0;
+	let itemsTotal = 0;
+	let urlModifier = undefined;
+	const handlers = [];
+
+	// Refer to #5689 for the reason why we don't set .onStart
+	// in the constructor
 
 	this.onStart = undefined;
 	this.onLoad = onLoad;
@@ -83,13 +87,57 @@ function LoadingManager( onLoad, onProgress, onError ) {
 	this.setURLModifier = function ( transform ) {
 
 		urlModifier = transform;
+
 		return this;
+
+	};
+
+	this.addHandler = function ( regex, loader ) {
+
+		handlers.push( regex, loader );
+
+		return this;
+
+	};
+
+	this.removeHandler = function ( regex ) {
+
+		const index = handlers.indexOf( regex );
+
+		if ( index !== - 1 ) {
+
+			handlers.splice( index, 2 );
+
+		}
+
+		return this;
+
+	};
+
+	this.getHandler = function ( file ) {
+
+		for ( let i = 0, l = handlers.length; i < l; i += 2 ) {
+
+			const regex = handlers[ i ];
+			const loader = handlers[ i + 1 ];
+
+			if ( regex.global ) regex.lastIndex = 0; // see #17920
+
+			if ( regex.test( file ) ) {
+
+				return loader;
+
+			}
+
+		}
+
+		return null;
 
 	};
 
 }
 
-var DefaultLoadingManager = new LoadingManager();
+const DefaultLoadingManager = new LoadingManager();
 
 
 export { DefaultLoadingManager, LoadingManager };

@@ -2,7 +2,7 @@
  * @author Don McCurdy / https://www.donmccurdy.com
  */
 
-var LoaderUtils = {
+const LoaderUtils = {
 
 	decodeText: function ( array ) {
 
@@ -15,23 +15,32 @@ var LoaderUtils = {
 		// Avoid the String.fromCharCode.apply(null, array) shortcut, which
 		// throws a "maximum call stack size exceeded" error for large arrays.
 
-		var s = '';
+		let s = '';
 
-		for ( var i = 0, il = array.length; i < il; i ++ ) {
+		for ( let i = 0, il = array.length; i < il; i ++ ) {
 
 			// Implicitly assumes little-endian.
 			s += String.fromCharCode( array[ i ] );
 
 		}
 
-		// Merges multi-byte utf-8 characters.
-		return decodeURIComponent( escape( s ) );
+		try {
+
+			// merges multi-byte utf-8 characters.
+
+			return decodeURIComponent( escape( s ) );
+
+		} catch ( e ) { // see #16358
+
+			return s;
+
+		}
 
 	},
 
 	extractUrlBase: function ( url ) {
 
-		var index = url.lastIndexOf( '/' );
+		const index = url.lastIndexOf( '/' );
 
 		if ( index === - 1 ) return './';
 

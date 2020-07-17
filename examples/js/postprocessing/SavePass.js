@@ -1,3 +1,4 @@
+console.warn( "THREE.SavePass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author alteredq / http://alteredqualia.com/
  */
@@ -34,12 +35,7 @@ THREE.SavePass = function ( renderTarget ) {
 
 	this.needsSwap = false;
 
-	this.camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene = new THREE.Scene();
-
-	this.quad = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad.frustumCulled = false; // Avoid getting clipped
-	this.scene.add( this.quad );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.material );
 
 };
 
@@ -55,9 +51,9 @@ THREE.SavePass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 
 		}
 
-		this.quad.material = this.material;
-
-		renderer.render( this.scene, this.camera, this.renderTarget, this.clear );
+		renderer.setRenderTarget( this.renderTarget );
+		if ( this.clear ) renderer.clear();
+		this.fsQuad.render( renderer );
 
 	}
 

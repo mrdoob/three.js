@@ -1,17 +1,9 @@
+console.warn( "THREE.XLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author adrs2002 / https://github.com/adrs2002
  */
 
-
-( function ( global, factory ) {
-
-	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-		typeof define === 'function' && define.amd ? define( factory ) :
-			( global.THREE = global.THREE || {}, global.THREE.XLoader = factory() );
-
-}( this, ( function () {
-
-	'use strict';
+THREE.XLoader = ( function () {
 
 	var classCallCheck = function ( instance, Constructor ) {
 
@@ -92,11 +84,13 @@
 				this.putFlags.putPos = true;
 
 			}
+
 			if ( this.putFlags.putRot === undefined ) {
 
 				this.putFlags.putRot = true;
 
 			}
+
 			if ( this.putFlags.putScl === undefined ) {
 
 				this.putFlags.putScl = true;
@@ -114,6 +108,7 @@
 					this.hierarchy.push( this.makeBonekeys( XAnimationInfoArray[ i ] ) );
 
 				}
+
 				this.length = this.hierarchy[ 0 ].keys[ this.hierarchy[ 0 ].keys.length - 1 ].time;
 
 			}
@@ -137,6 +132,7 @@
 					return Object.assign( {}, this );
 
 				};
+
 				return refObj;
 
 			}
@@ -154,16 +150,19 @@
 						keyframe.pos = XAnimationInfo.keyFrames[ i ].pos;
 
 					}
+
 					if ( XAnimationInfo.keyFrames[ i ].rot && this.putFlags.putRot ) {
 
 						keyframe.rot = XAnimationInfo.keyFrames[ i ].rot;
 
 					}
+
 					if ( XAnimationInfo.keyFrames[ i ].scl && this.putFlags.putScl ) {
 
 						keyframe.scl = XAnimationInfo.keyFrames[ i ].scl;
 
 					}
+
 					if ( XAnimationInfo.keyFrames[ i ].matrix ) {
 
 						keyframe.matrix = XAnimationInfo.keyFrames[ i ].matrix;
@@ -172,11 +171,13 @@
 							keyframe.pos = new THREE.Vector3().setFromMatrixPosition( keyframe.matrix );
 
 						}
+
 						if ( this.putFlags.putRot ) {
 
 							keyframe.rot = new THREE.Quaternion().setFromRotationMatrix( keyframe.matrix );
 
 						}
+
 						if ( this.putFlags.putScl ) {
 
 							keyframe.scl = new THREE.Vector3().setFromMatrixScale( keyframe.matrix );
@@ -184,9 +185,11 @@
 						}
 
 					}
+
 					keys.push( keyframe );
 
 				}
+
 				return keys;
 
 			}
@@ -210,13 +213,13 @@
 
 		function XLoader( manager ) {
 
+			THREE.Loader.call( this, manager );
+
 			classCallCheck( this, XLoader );
 
 			this.debug = false;
-			this.manager = manager !== undefined ? manager : new THREE.DefaultLoadingManager();
 			this.texloader = new THREE.TextureLoader( this.manager );
 			this.url = "";
-			this.baseDir = "";
 			this._putMatLength = 0;
 			this._nowMat = null;
 			this._nowFrameName = "";
@@ -248,6 +251,7 @@
 					return;
 
 				}
+
 				for ( var i = _start; i < _arg.length; i ++ ) {
 
 					switch ( i ) {
@@ -262,6 +266,7 @@
 					}
 
 				}
+
 				if ( this.options === undefined ) {
 
 					this.options = {};
@@ -277,20 +282,31 @@
 
 				this._setArgOption( _arg );
 				var loader = new THREE.FileLoader( this.manager );
+				loader.setPath( this.path );
 				loader.setResponseType( 'arraybuffer' );
 				loader.load( this.url, function ( response ) {
 
-					_this._parse( response, onLoad );
+					try {
+
+						_this.parse( response, onLoad );
+
+					} catch ( e ) {
+
+						if ( onError ) {
+
+							onError( e );
+
+						} else {
+
+							console.error( e );
+
+						}
+
+						_this.manager.itemError( _this.url );
+
+					}
 
 				}, onProgress, onError );
-
-			}
-		}, {
-			key: 'fromResponsedData',
-			value: function fromResponsedData( _data, _arg, onLoad ) {
-
-				this._setArgOption( _arg );
-				this._parse( _data, onLoad );
 
 			}
 		}, {
@@ -307,6 +323,7 @@
 						find = line.indexOf( '#', readed );
 
 					}
+
 					if ( find > - 1 && find < 2 ) {
 
 						var foundNewLine = - 1;
@@ -337,6 +354,7 @@
 					}
 
 				}
+
 				return line.substr( readed );
 
 			}
@@ -354,6 +372,7 @@
 						find = line.indexOf( '#', readed );
 
 					}
+
 					if ( find > - 1 && find < 2 ) {
 
 						var foundNewLine = - 1;
@@ -384,6 +403,7 @@
 					}
 
 				}
+
 				return line.substr( readed );
 
 			}
@@ -400,6 +420,7 @@
 					return true;
 
 				}
+
 				var fileLength = reader.byteLength;
 				for ( var index = 0; index < fileLength; index ++ ) {
 
@@ -410,12 +431,13 @@
 					}
 
 				}
+
 				return false;
 
 			}
 		}, {
-			key: 'ensureBinary',
-			value: function ensureBinary( buf ) {
+			key: '_ensureBinary',
+			value: function _ensureBinary( buf ) {
 
 				if ( typeof buf === "string" ) {
 
@@ -425,6 +447,7 @@
 						array_buffer[ i ] = buf.charCodeAt( i ) & 0xff;
 
 					}
+
 					return array_buffer.buffer || array_buffer;
 
 				} else {
@@ -435,8 +458,8 @@
 
 			}
 		}, {
-			key: 'ensureString',
-			value: function ensureString( buf ) {
+			key: '_ensureString',
+			value: function _ensureString( buf ) {
 
 				if ( typeof buf !== "string" ) {
 
@@ -450,11 +473,11 @@
 
 			}
 		}, {
-			key: '_parse',
+			key: 'parse',
 			value: function _parse( data, onLoad ) {
 
-				var binData = this.ensureBinary( data );
-				this._data = this.ensureString( data );
+				var binData = this._ensureBinary( data );
+				this._data = this._ensureString( data );
 				this.onLoad = onLoad;
 				return this._isBinary( binData ) ? this._parseBinary( binData ) : this._parseASCII();
 
@@ -470,17 +493,30 @@
 			key: '_parseASCII',
 			value: function _parseASCII() {
 
-				if ( this.url.lastIndexOf( "/" ) > 0 ) {
+				var path;
 
-					this.baseDir = this.url.substr( 0, this.url.lastIndexOf( "/" ) + 1 );
+				if ( this.resourcePath !== '' ) {
+
+					path = this.resourcePath;
+
+				} else if ( this.path !== '' ) {
+
+					path = this.path;
+
+				} else {
+
+					path = THREE.LoaderUtils.extractUrlBase( this.url );
 
 				}
+
+				this.texloader.setPath( path ).setCrossOrigin( this.crossOrigin );
+
 				var endRead = 16;
 				this.Hierarchies.children = [];
 				this._hierarchieParse( this.Hierarchies, endRead );
 				this._changeRoot();
 				this._currentObject = this.Hierarchies.children.shift();
-				this.mainloop();
+				this._mainloop();
 
 			}
 		}, {
@@ -518,6 +554,7 @@
 							_currentObject.type = "";
 
 						}
+
 						if ( _currentObject.type === "Animation" ) {
 
 							_currentObject.data = this._data.substr( findNext, findEnd - findNext ).trim();
@@ -543,6 +580,7 @@
 							}
 
 						}
+
 						_currentObject.parent = _parent;
 						if ( _currentObject.type != "template" ) {
 
@@ -558,6 +596,7 @@
 					}
 
 				}
+
 				return {
 					parent: _parent,
 					end: endRead
@@ -565,17 +604,17 @@
 
 			}
 		}, {
-			key: 'mainloop',
-			value: function mainloop() {
+			key: '_mainloop',
+			value: function _mainloop() {
 
 				var _this2 = this;
 
-				this.mainProc();
+				this._mainProc();
 				if ( this._currentObject.parent || this._currentObject.children.length > 0 || ! this._currentObject.worked ) {
 
 					setTimeout( function () {
 
-						_this2.mainloop();
+						_this2._mainloop();
 
 					}, 1 );
 
@@ -594,8 +633,8 @@
 
 			}
 		}, {
-			key: 'mainProc',
-			value: function mainProc() {
+			key: '_mainProc',
+			value: function _mainProc() {
 
 				var breakFlag = false;
 				while ( true ) {
@@ -667,6 +706,7 @@
 									this._currentAnime.AnimeFrames.push( this._currentAnimeFrames );
 
 								}
+
 								this._currentAnimeFrames = new XAnimationInfo();
 								this._currentAnimeFrames.boneName = this._currentObject.data.trim();
 								break;
@@ -676,9 +716,11 @@
 								break;
 
 						}
+
 						this._currentObject.worked = true;
 
 					}
+
 					if ( this._currentObject.children.length > 0 ) {
 
 						this._currentObject = this._currentObject.children.shift();
@@ -687,6 +729,7 @@
 							console.log( 'processing ' + this._currentObject.name );
 
 						}
+
 						if ( breakFlag ) break;
 
 					} else {
@@ -700,6 +743,7 @@
 							}
 
 						}
+
 						if ( this._currentObject.parent ) {
 
 							this._currentObject = this._currentObject.parent;
@@ -709,11 +753,13 @@
 							breakFlag = true;
 
 						}
+
 						if ( breakFlag ) break;
 
 					}
 
 				}
+
 				return;
 
 			}
@@ -726,6 +772,7 @@
 					this._makeOutputGeometry();
 
 				}
+
 				this._currentGeo = {};
 				if ( this._currentAnime != null && this._currentAnime.name ) {
 
@@ -735,9 +782,11 @@
 						this._currentAnimeFrames = null;
 
 					}
+
 					this._makeOutputAnimation();
 
 				}
+
 				this._currentAnime = {};
 
 			}
@@ -777,6 +826,7 @@
 					this._currentFrame.parentName = this._currentObject.parent.name;
 
 				}
+
 				this.frameHierarchie.push( this._nowFrameName );
 				this.HieStack[ this._nowFrameName ] = this._currentFrame;
 
@@ -800,9 +850,10 @@
 					return;
 
 				}
+
 				var b = new THREE.Bone();
 				b.name = this._currentFrame.name;
-				b.applyMatrix( this._currentFrame.FrameTransformMatrix );
+				b.applyMatrix4( this._currentFrame.FrameTransformMatrix );
 				b.matrixWorld = b.matrix;
 				b.FrameTransformMatrix = this._currentFrame.FrameTransformMatrix;
 				this._currentFrame.putBone = b;
@@ -857,6 +908,7 @@
 								break;
 
 						}
+
 						if ( find === 0 || find > maxLength ) {
 
 							find = maxLength;
@@ -864,6 +916,7 @@
 							changeMode = true;
 
 						}
+
 						switch ( this._currentObject.type ) {
 
 							case "Mesh":
@@ -877,6 +930,7 @@
 										break;
 
 								}
+
 								break;
 							case "MeshNormals":
 								switch ( mode ) {
@@ -886,9 +940,11 @@
 										break;
 
 								}
+
 								break;
 
 						}
+
 						endRead = find + 1;
 						if ( changeMode ) {
 
@@ -897,6 +953,7 @@
 						}
 
 					}
+
 					if ( endRead >= this._currentObject.data.length ) {
 
 						break;
@@ -975,11 +1032,11 @@
 
 				//
 
-				bufferGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
-				bufferGeometry.addAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
-				bufferGeometry.addAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
-				bufferGeometry.addAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
-				bufferGeometry.addAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+				bufferGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( position, 3 ) );
+				bufferGeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( normals, 3 ) );
+				bufferGeometry.setAttribute( 'uv', new THREE.Float32BufferAttribute( uvs, 2 ) );
+				bufferGeometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+				bufferGeometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
 
 				this._computeGroups( bufferGeometry, data.materialIndices );
 
@@ -1056,6 +1113,7 @@
 									mode_local = 0;
 
 								}
+
 								var line = this._currentObject.data.substr( endRead, find - endRead );
 								var data = this._readLine( line.trim() ).split( ";" );
 								if ( this.IsUvYReverse ) {
@@ -1067,12 +1125,15 @@
 									this._currentGeo.GeometryData.uvs.push( parseFloat( data[ 0 ] ), parseFloat( data[ 1 ] ) );
 
 								}
+
 								endRead = find + 1;
 
 							}
+
 							break;
 
 					}
+
 					if ( endRead >= this._currentObject.data.length ) {
 
 						break;
@@ -1107,6 +1168,7 @@
 							mode_local = 0;
 
 						}
+
 						var line = this._currentObject.data.substr( endRead, find - endRead );
 						var data = this._readLine( line.trim() ).split( "," );
 						for ( var i = 0; i < data.length; i ++ ) {
@@ -1114,9 +1176,11 @@
 							this._currentGeo.GeometryData.materialIndices[ i ] = parseInt( data[ i ] );
 
 						}
+
 						endRead = this._currentObject.data.length;
 
 					}
+
 					if ( endRead >= this._currentObject.data.length || mode >= 3 ) {
 
 						break;
@@ -1160,6 +1224,7 @@
 					find = this._currentObject.data.length;
 
 				}
+
 				line = this._currentObject.data.substr( endRead, find - endRead );
 				var data3 = this._readLine( line.trim() ).split( ";" );
 				_nowMat.emissive.r = parseFloat( data3[ 0 ] );
@@ -1176,25 +1241,26 @@
 							console.log( 'processing ' + localObject.name );
 
 						}
+
 						var fileName = localObject.data.substr( 1, localObject.data.length - 2 );
 						switch ( localObject.type ) {
 
 							case "TextureFilename":
-								_nowMat.map = this.texloader.load( this.baseDir + fileName );
+								_nowMat.map = this.texloader.load( fileName );
 								break;
 							case "BumpMapFilename":
-								_nowMat.bumpMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.bumpMap = this.texloader.load( fileName );
 								_nowMat.bumpScale = 0.05;
 								break;
 							case "NormalMapFilename":
-								_nowMat.normalMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.normalMap = this.texloader.load( fileName );
 								_nowMat.normalScale = new THREE.Vector2( 2, 2 );
 								break;
 							case "EmissiveMapFilename":
-								_nowMat.emissiveMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.emissiveMap = this.texloader.load( fileName );
 								break;
 							case "LightMapFilename":
-								_nowMat.lightMap = this.texloader.load( this.baseDir + fileName );
+								_nowMat.lightMap = this.texloader.load( fileName );
 								break;
 
 						}
@@ -1206,6 +1272,7 @@
 					}
 
 				}
+
 				this._currentGeo.Materials.push( _nowMat );
 
 			}
@@ -1230,6 +1297,7 @@
 					boneInf.Indeces.push( parseInt( data[ i ] ) );
 
 				}
+
 				endRead = find + 1;
 				find = this._currentObject.data.indexOf( ';', endRead );
 				line = this._currentObject.data.substr( endRead, find - endRead );
@@ -1239,6 +1307,7 @@
 					boneInf.Weights.push( parseFloat( data2[ _i ] ) );
 
 				}
+
 				endRead = find + 1;
 				find = this._currentObject.data.indexOf( ';', endRead );
 				if ( find <= 0 ) {
@@ -1246,6 +1315,7 @@
 					find = this._currentObject.data.length;
 
 				}
+
 				line = this._currentObject.data.substr( endRead, find - endRead );
 				var data3 = this._readLine( line.trim() ).split( "," );
 				boneInf.OffsetMatrix = new THREE.Matrix4();
@@ -1265,7 +1335,7 @@
 						putting = true;
 						var b = new THREE.Bone();
 						b.name = this.HieStack[ frame ].name;
-						b.applyMatrix( this.HieStack[ frame ].FrameTransformMatrix );
+						b.applyMatrix4( this.HieStack[ frame ].FrameTransformMatrix );
 						b.matrixWorld = b.matrix;
 						b.FrameTransformMatrix = this.HieStack[ frame ].FrameTransformMatrix;
 						b.pos = new THREE.Vector3().setFromMatrixPosition( b.FrameTransformMatrix ).toArray();
@@ -1286,6 +1356,7 @@
 							}
 
 						}
+
 						_bones.push( b );
 
 					}
@@ -1317,6 +1388,7 @@
 							}
 
 						}
+
 						for ( var vi = 0; vi < this._currentGeo.BoneInfs[ bi ].Indeces.length; vi ++ ) {
 
 							var nowVertexID = this._currentGeo.BoneInfs[ bi ].Indeces[ vi ];
@@ -1344,6 +1416,7 @@
 									break;
 
 							}
+
 							this._currentGeo.VertexSetedBoneCount[ nowVertexID ] ++;
 							if ( this._currentGeo.VertexSetedBoneCount[ nowVertexID ] > 4 ) {
 
@@ -1354,11 +1427,13 @@
 						}
 
 					}
+
 					for ( var sk = 0; sk < this._currentGeo.Materials.length; sk ++ ) {
 
 						this._currentGeo.Materials[ sk ].skinning = true;
 
 					}
+
 					var offsetList = [];
 					for ( var _bi = 0; _bi < putBones.length; _bi ++ ) {
 
@@ -1375,9 +1450,9 @@
 					}
 
 					var bufferGeometry = this._buildGeometry();
-					bufferGeometry.bones = putBones;
 					mesh = new THREE.SkinnedMesh( bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
-					mesh.skeleton.boneInverses = offsetList;
+
+					this._initSkeleton( mesh, putBones, offsetList );
 
 				} else {
 
@@ -1385,6 +1460,7 @@
 					mesh = new THREE.Mesh( _bufferGeometry, this._currentGeo.Materials.length === 1 ? this._currentGeo.Materials[ 0 ] : this._currentGeo.Materials );
 
 				}
+
 				mesh.name = this._currentGeo.name;
 				var worldBaseMx = new THREE.Matrix4();
 				var currentMxFrame = this._currentGeo.baseFrame.putBone;
@@ -1404,12 +1480,58 @@
 						}
 
 					}
-					mesh.applyMatrix( worldBaseMx );
+
+					mesh.applyMatrix4( worldBaseMx );
 
 				}
+
 				this.Meshes.push( mesh );
 
 			}
+		}, {
+			key: '_initSkeleton',
+			value: function _initSkeleton( mesh, boneList, boneInverses ) {
+
+				var bones = [], bone, gbone;
+				var i, il;
+
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
+
+					gbone = boneList[ i ];
+
+					bone = new THREE.Bone();
+					bones.push( bone );
+
+					bone.name = gbone.name;
+					bone.position.fromArray( gbone.pos );
+					bone.quaternion.fromArray( gbone.rotq );
+					if ( gbone.scl !== undefined ) bone.scale.fromArray( gbone.scl );
+
+				}
+
+				for ( i = 0, il = boneList.length; i < il; i ++ ) {
+
+					gbone = boneList[ i ];
+
+					if ( ( gbone.parent !== - 1 ) && ( gbone.parent !== null ) && ( bones[ gbone.parent ] !== undefined ) ) {
+
+						bones[ gbone.parent ].add( bones[ i ] );
+
+					} else {
+
+						mesh.add( bones[ i ] );
+
+					}
+
+				}
+
+				mesh.updateMatrixWorld( true );
+
+				var skeleton = new THREE.Skeleton( bones, boneInverses );
+				mesh.bind( skeleton, mesh.matrixWorld );
+
+			}
+
 		}, {
 			key: '_readAnimationKey',
 			value: function _readAnimationKey() {
@@ -1445,6 +1567,7 @@
 							}
 
 						}
+
 						var frameValue = data2[ 2 ].split( "," );
 						switch ( nowKeyType ) {
 
@@ -1459,6 +1582,7 @@
 								break;
 
 						}
+
 						if ( ! frameFound ) {
 
 							this._currentAnimeFrames.keyFrames.push( keyInfo );
@@ -1489,7 +1613,7 @@
 			}
 		}, {
 			key: 'assignAnimation',
-			value: function assignAnimation( _model, _animation, _isBind ) {
+			value: function assignAnimation( _model, _animation ) {
 
 				var model = _model;
 				var animation = _animation;
@@ -1498,16 +1622,19 @@
 					model = this.Meshes[ 0 ];
 
 				}
+
 				if ( ! animation ) {
 
 					animation = this.animations[ 0 ];
 
 				}
+
 				if ( ! model || ! animation ) {
 
 					return null;
 
 				}
+
 				var put = {};
 				put.fps = animation.fps;
 				put.name = animation.name;
@@ -1537,12 +1664,14 @@
 								}
 
 							}
+
 							put.hierarchy.push( c_key );
 							break;
 
 						}
 
 					}
+
 					if ( ! findAnimation ) {
 
 						var _c_key = animation.hierarchy[ 0 ].copy();
@@ -1555,11 +1684,13 @@
 								_c_key.keys[ k ].pos.set( 0, 0, 0 );
 
 							}
+
 							if ( _c_key.keys[ k ].scl ) {
 
 								_c_key.keys[ k ].scl.set( 1, 1, 1 );
 
 							}
+
 							if ( _c_key.keys[ k ].rot ) {
 
 								_c_key.keys[ k ].rot.set( 0, 0, 0, 1 );
@@ -1567,11 +1698,13 @@
 							}
 
 						}
+
 						put.hierarchy.push( _c_key );
 
 					}
 
 				}
+
 				if ( ! model.geometry.animations ) {
 
 					model.geometry.animations = [];
@@ -1602,4 +1735,4 @@
 
 	return XLoader;
 
-} ) ) );
+} )();

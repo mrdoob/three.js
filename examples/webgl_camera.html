@@ -4,42 +4,23 @@
 		<title>three.js webgl - cameras</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
-			body {
-				color: #808080;
-				font-family:Monospace;
-				font-size:13px;
-				text-align:center;
-
-				background-color: #000;
-				margin: 0px;
-				overflow: hidden;
+			b {
+				color: lightgreen;
 			}
-
-			#info {
-				position: absolute;
-				top: 0px; width: 100%;
-				padding: 5px;
-				z-index: 100;
-			}
-
-			a {
-
-				color: #0080ff;
-			}
-
-			b { color: lightgreen }
 		</style>
 	</head>
 	<body>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras<br/>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras<br/>
 		<b>O</b> orthographic <b>P</b> perspective
 		</div>
 
-		<script src="../build/three.js"></script>
-		<script src="js/libs/stats.min.js"></script>
+		<script type="module">
 
-		<script>
+			import * as THREE from '../build/three.module.js';
+
+			import Stats from './jsm/libs/stats.module.js';
 
 			var SCREEN_WIDTH = window.innerWidth;
 			var SCREEN_HEIGHT = window.innerHeight;
@@ -125,19 +106,18 @@
 
 				for ( var i = 0; i < 10000; i ++ ) {
 
-					vertices.push(  THREE.Math.randFloatSpread( 2000 ) ); // x
-					vertices.push(  THREE.Math.randFloatSpread( 2000 ) ); // y
-					vertices.push(  THREE.Math.randFloatSpread( 2000 ) ); // z
+					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // x
+					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // y
+					vertices.push( THREE.MathUtils.randFloatSpread( 2000 ) ); // z
 
 				}
 
-				geometry.addAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
+				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
 				var particles = new THREE.Points( geometry, new THREE.PointsMaterial( { color: 0x888888 } ) );
 				scene.add( particles );
 
 				//
-
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -160,9 +140,9 @@
 
 			//
 
-			function onKeyDown ( event ) {
+			function onKeyDown( event ) {
 
-				switch( event.keyCode ) {
+				switch ( event.keyCode ) {
 
 					case 79: /*O*/
 
@@ -184,7 +164,7 @@
 
 			//
 
-			function onWindowResize( event ) {
+			function onWindowResize() {
 
 				SCREEN_WIDTH = window.innerWidth;
 				SCREEN_HEIGHT = window.innerHeight;
@@ -198,9 +178,9 @@
 				cameraPerspective.aspect = 0.5 * aspect;
 				cameraPerspective.updateProjectionMatrix();
 
-				cameraOrtho.left   = - 0.5 * frustumSize * aspect / 2;
-				cameraOrtho.right  =   0.5 * frustumSize * aspect / 2;
-				cameraOrtho.top    =   frustumSize / 2;
+				cameraOrtho.left = - 0.5 * frustumSize * aspect / 2;
+				cameraOrtho.right = 0.5 * frustumSize * aspect / 2;
+				cameraOrtho.top = frustumSize / 2;
 				cameraOrtho.bottom = - frustumSize / 2;
 				cameraOrtho.updateProjectionMatrix();
 
@@ -258,12 +238,12 @@
 
 				activeHelper.visible = false;
 
-				renderer.setViewport( 0, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+				renderer.setViewport( 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
 				renderer.render( scene, activeCamera );
 
 				activeHelper.visible = true;
 
-				renderer.setViewport( SCREEN_WIDTH/2, 0, SCREEN_WIDTH/2, SCREEN_HEIGHT );
+				renderer.setViewport( SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT );
 				renderer.render( scene, camera );
 
 			}

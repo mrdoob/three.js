@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "target": "ES6",
+    "strict": true
+  },
+  "include": [
+    "../../src/**/*.ts"
+  ]
+}

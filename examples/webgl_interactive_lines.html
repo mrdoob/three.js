@@ -4,30 +4,30 @@
 		<title>three.js webgl - interactive lines</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body {
-				font-family: Monospace;
 				background-color: #f0f0f0;
-				margin: 0px;
-				overflow: hidden;
+				color: #444;
+			}
+			a {
+				color: #08f;
 			}
 		</style>
 	</head>
 	<body>
 
-		<script src="../build/three.js"></script>
+		<script type="module">
 
-		<script src="js/libs/stats.min.js"></script>
+			import * as THREE from '../build/three.module.js';
 
-		<script>
+			import Stats from './jsm/libs/stats.module.js';
 
 			var container, stats;
 			var camera, scene, raycaster, renderer, parentTransform, sphereInter;
 
 			var mouse = new THREE.Vector2();
 			var radius = 100, theta = 0;
-
-			var currentIntersected;
 
 			init();
 			animate();
@@ -42,7 +42,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive lines';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive lines';
 				container.appendChild( info );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 10000 );
@@ -75,7 +75,7 @@
 
 				}
 
-				lineGeometry.addAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
+				lineGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( points, 3 ) );
 
 				parentTransform = new THREE.Object3D();
 				parentTransform.position.x = Math.random() * 40 - 20;
@@ -94,13 +94,15 @@
 
 					var object;
 
+					var lineMaterial = new THREE.LineBasicMaterial( { color: Math.random() * 0xffffff } );
+
 					if ( Math.random() > 0.5 ) {
 
-						object = new THREE.Line( lineGeometry );
+						object = new THREE.Line( lineGeometry, lineMaterial );
 
 					} else {
 
-						object = new THREE.LineSegments( lineGeometry );
+						object = new THREE.LineSegments( lineGeometry, lineMaterial );
 
 					}
 
@@ -123,12 +125,12 @@
 				scene.add( parentTransform );
 
 				raycaster = new THREE.Raycaster();
-				raycaster.linePrecision = 3;
+				raycaster.params.Line.threshold = 3;
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild(renderer.domElement);
+				container.appendChild( renderer.domElement );
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -174,9 +176,9 @@
 
 				theta += 0.1;
 
-				camera.position.x = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.y = radius * Math.sin( THREE.Math.degToRad( theta ) );
-				camera.position.z = radius * Math.cos( THREE.Math.degToRad( theta ) );
+				camera.position.x = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.y = radius * Math.sin( THREE.MathUtils.degToRad( theta ) );
+				camera.position.z = radius * Math.cos( THREE.MathUtils.degToRad( theta ) );
 				camera.lookAt( scene.position );
 
 				camera.updateMatrixWorld();
@@ -185,31 +187,14 @@
 
 				raycaster.setFromCamera( mouse, camera );
 
-				var intersects = raycaster.intersectObjects( parentTransform.children, true);
+				var intersects = raycaster.intersectObjects( parentTransform.children, true );
 
 				if ( intersects.length > 0 ) {
-
-					if ( currentIntersected !== undefined ) {
-
-						currentIntersected.material.linewidth = 1;
-
-					}
-
-					currentIntersected = intersects[ 0 ].object;
-					currentIntersected.material.linewidth = 5;
 
 					sphereInter.visible = true;
 					sphereInter.position.copy( intersects[ 0 ].point );
 
 				} else {
-
-					if ( currentIntersected !== undefined ) {
-
-						currentIntersected.material.linewidth = 1;
-
-					}
-
-					currentIntersected = undefined;
 
 					sphereInter.visible = false;
 

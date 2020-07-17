@@ -7,6 +7,9 @@ import { Matrix4 } from '../math/Matrix4.js';
  * @author ikerr / http://verold.com
  */
 
+const _offsetMatrix = new Matrix4();
+const _identityMatrix = new Matrix4();
+
 function Skeleton( bones, boneInverses ) {
 
 	// copy the bone array
@@ -15,6 +18,8 @@ function Skeleton( bones, boneInverses ) {
 
 	this.bones = bones.slice( 0 );
 	this.boneMatrices = new Float32Array( this.bones.length * 16 );
+
+	this.frame = - 1;
 
 	// use the supplied bone inverses or calculate the inverses
 
@@ -34,7 +39,7 @@ function Skeleton( bones, boneInverses ) {
 
 			this.boneInverses = [];
 
-			for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
+			for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
 
 				this.boneInverses.push( new Matrix4() );
 
@@ -52,9 +57,9 @@ Object.assign( Skeleton.prototype, {
 
 		this.boneInverses = [];
 
-		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
+		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
 
-			var inverse = new Matrix4();
+			const inverse = new Matrix4();
 
 			if ( this.bones[ i ] ) {
 
@@ -70,13 +75,11 @@ Object.assign( Skeleton.prototype, {
 
 	pose: function () {
 
-		var bone, i, il;
-
 		// recover the bind-time world matrices
 
-		for ( i = 0, il = this.bones.length; i < il; i ++ ) {
+		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
 
-			bone = this.bones[ i ];
+			const bone = this.bones[ i ];
 
 			if ( bone ) {
 
@@ -88,9 +91,9 @@ Object.assign( Skeleton.prototype, {
 
 		// compute the local matrices, positions, rotations and scales
 
-		for ( i = 0, il = this.bones.length; i < il; i ++ ) {
+		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
 
-			bone = this.bones[ i ];
+			const bone = this.bones[ i ];
 
 			if ( bone ) {
 
@@ -113,40 +116,33 @@ Object.assign( Skeleton.prototype, {
 
 	},
 
-	update: ( function () {
+	update: function () {
 
-		var offsetMatrix = new Matrix4();
-		var identityMatrix = new Matrix4();
+		const bones = this.bones;
+		const boneInverses = this.boneInverses;
+		const boneMatrices = this.boneMatrices;
+		const boneTexture = this.boneTexture;
 
-		return function update() {
+		// flatten bone matrices to array
 
-			var bones = this.bones;
-			var boneInverses = this.boneInverses;
-			var boneMatrices = this.boneMatrices;
-			var boneTexture = this.boneTexture;
+		for ( let i = 0, il = bones.length; i < il; i ++ ) {
 
-			// flatten bone matrices to array
+			// compute the offset between the current and the original transform
 
-			for ( var i = 0, il = bones.length; i < il; i ++ ) {
+			const matrix = bones[ i ] ? bones[ i ].matrixWorld : _identityMatrix;
 
-				// compute the offset between the current and the original transform
+			_offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
+			_offsetMatrix.toArray( boneMatrices, i * 16 );
 
-				var matrix = bones[ i ] ? bones[ i ].matrixWorld : identityMatrix;
+		}
 
-				offsetMatrix.multiplyMatrices( matrix, boneInverses[ i ] );
-				offsetMatrix.toArray( boneMatrices, i * 16 );
+		if ( boneTexture !== undefined ) {
 
-			}
+			boneTexture.needsUpdate = true;
 
-			if ( boneTexture !== undefined ) {
+		}
 
-				boneTexture.needsUpdate = true;
-
-			}
-
-		};
-
-	} )(),
+	},
 
 	clone: function () {
 
@@ -156,9 +152,9 @@ Object.assign( Skeleton.prototype, {
 
 	getBoneByName: function ( name ) {
 
-		for ( var i = 0, il = this.bones.length; i < il; i ++ ) {
+		for ( let i = 0, il = this.bones.length; i < il; i ++ ) {
 
-			var bone = this.bones[ i ];
+			const bone = this.bones[ i ];
 
 			if ( bone.name === name ) {
 
@@ -169,6 +165,18 @@ Object.assign( Skeleton.prototype, {
 		}
 
 		return undefined;
+
+	},
+
+	dispose: function ( ) {
+
+		if ( this.boneTexture ) {
+
+			this.boneTexture.dispose();
+
+			this.boneTexture = undefined;
+
+		}
 
 	}
 

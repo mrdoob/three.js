@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			光源的基类 - 所有其他的光类型都继承了该类描述的属性和方法。
+		</p>
+
+
+		<h2>构造器（Constructor）</h2>
+
+
+		<h3>[name]( [param:Integer color], [param:float intensity] )</h3>
+		<p>
+		[page:Integer color] - (可选参数) 16进制表示光的颜色。 缺省值 0xffffff (白色)。<br />
+		[page:Float intensity] - (可选参数) 光照强度。 缺省值 1。<br /><br />
+
+		创造一个新的光源。注意，这并不是直接调用的（而是使用派生类之一）。
+		</p>
+
+		<h2>属性（Properties）</h2>
+		<p>
+			公共属性请查看基类[page:Object3D Object3D]。
+		</p>
+
+		<h3>[property:Color color]</h3>
+		<p>
+			光源的颜色。如果构造的时候没有传递，默认会创建一个新的 [page:Color] 并设置为白色。
+		</p>
+
+		<h3>[property:Float intensity]</h3>
+		<p>
+			光照的强度，或者说能量。
+			在 [page:WebGLRenderer.physicallyCorrectLights physically correct] 模式下, [page:.color color] 和强度
+			的乘积被解析为以坎德拉（candela）为单位的发光强度。
+			默认值 - *1.0*
+		<br />
+		</p>
+
+
+		<h2>Methods</h2>
+		<p>
+			公共方法请查看基类 [page:Object3D Object3D]。
+		</p>
+
+
+		<h3>[method:Light copy]( [param:Light source] )</h3>
+		<p>
+		从[page:Light source]复制 [page:.color color], [page:.intensity intensity] 
+		的值到当前光源对象中。
+		</p>
+
+		<h3>[method:Object toJSON]( [param:object meta] )</h3>
+		<p>
+			以JSON格式返回光数据。
+		</p>
+		<p>
+			meta -- 包含有元数据的对象，例如该对象的材质、纹理或图片。
+			将该light对象转换为 three.js [link:https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4 JSON Object/Scene format]（three.js JSON 物体/场景格式）。
+		</p>
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

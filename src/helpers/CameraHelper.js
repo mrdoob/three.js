@@ -12,28 +12,30 @@ import { Camera } from '../cameras/Camera.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LineSegments } from '../objects/LineSegments.js';
 import { Color } from '../math/Color.js';
-import { FaceColors } from '../constants.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
+const _vector = new Vector3();
+const _camera = new Camera();
+
 function CameraHelper( camera ) {
 
-	var geometry = new BufferGeometry();
-	var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: FaceColors } );
+	const geometry = new BufferGeometry();
+	const material = new LineBasicMaterial( { color: 0xffffff, vertexColors: true, toneMapped: false } );
 
-	var vertices = [];
-	var colors = [];
+	const vertices = [];
+	const colors = [];
 
-	var pointMap = {};
+	const pointMap = {};
 
 	// colors
 
-	var colorFrustum = new Color( 0xffaa00 );
-	var colorCone = new Color( 0xff0000 );
-	var colorUp = new Color( 0x00aaff );
-	var colorTarget = new Color( 0xffffff );
-	var colorCross = new Color( 0x333333 );
+	const colorFrustum = new Color( 0xffaa00 );
+	const colorCone = new Color( 0xff0000 );
+	const colorUp = new Color( 0x00aaff );
+	const colorTarget = new Color( 0xffffff );
+	const colorCross = new Color( 0x333333 );
 
 	// near
 
@@ -104,10 +106,12 @@ function CameraHelper( camera ) {
 
 	}
 
-	geometry.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
-	geometry.addAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
+	geometry.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
+	geometry.setAttribute( 'color', new Float32BufferAttribute( colors, 3 ) );
 
 	LineSegments.call( this, geometry, material );
+
+	this.type = 'CameraHelper';
 
 	this.camera = camera;
 	if ( this.camera.updateProjectionMatrix ) this.camera.updateProjectionMatrix();
@@ -126,85 +130,75 @@ CameraHelper.prototype.constructor = CameraHelper;
 
 CameraHelper.prototype.update = function () {
 
-	var geometry, pointMap;
+	const geometry = this.geometry;
+	const pointMap = this.pointMap;
 
-	var vector = new Vector3();
-	var camera = new Camera();
+	const w = 1, h = 1;
 
-	function setPoint( point, x, y, z ) {
+	// we need just camera projection matrix inverse
+	// world matrix must be identity
 
-		vector.set( x, y, z ).unproject( camera );
+	_camera.projectionMatrixInverse.copy( this.camera.projectionMatrixInverse );
 
-		var points = pointMap[ point ];
+	// center / target
 
-		if ( points !== undefined ) {
+	setPoint( 'c', pointMap, geometry, _camera, 0, 0, - 1 );
+	setPoint( 't', pointMap, geometry, _camera, 0, 0, 1 );
 
-			var position = geometry.getAttribute( 'position' );
+	// near
 
-			for ( var i = 0, l = points.length; i < l; i ++ ) {
+	setPoint( 'n1', pointMap, geometry, _camera, - w, - h, - 1 );
+	setPoint( 'n2', pointMap, geometry, _camera, w, - h, - 1 );
+	setPoint( 'n3', pointMap, geometry, _camera, - w, h, - 1 );
+	setPoint( 'n4', pointMap, geometry, _camera, w, h, - 1 );
 
-				position.setXYZ( points[ i ], vector.x, vector.y, vector.z );
+	// far
 
-			}
+	setPoint( 'f1', pointMap, geometry, _camera, - w, - h, 1 );
+	setPoint( 'f2', pointMap, geometry, _camera, w, - h, 1 );
+	setPoint( 'f3', pointMap, geometry, _camera, - w, h, 1 );
+	setPoint( 'f4', pointMap, geometry, _camera, w, h, 1 );
+
+	// up
+
+	setPoint( 'u1', pointMap, geometry, _camera, w * 0.7, h * 1.1, - 1 );
+	setPoint( 'u2', pointMap, geometry, _camera, - w * 0.7, h * 1.1, - 1 );
+	setPoint( 'u3', pointMap, geometry, _camera, 0, h * 2, - 1 );
+
+	// cross
+
+	setPoint( 'cf1', pointMap, geometry, _camera, - w, 0, 1 );
+	setPoint( 'cf2', pointMap, geometry, _camera, w, 0, 1 );
+	setPoint( 'cf3', pointMap, geometry, _camera, 0, - h, 1 );
+	setPoint( 'cf4', pointMap, geometry, _camera, 0, h, 1 );
+
+	setPoint( 'cn1', pointMap, geometry, _camera, - w, 0, - 1 );
+	setPoint( 'cn2', pointMap, geometry, _camera, w, 0, - 1 );
+	setPoint( 'cn3', pointMap, geometry, _camera, 0, - h, - 1 );
+	setPoint( 'cn4', pointMap, geometry, _camera, 0, h, - 1 );
+
+	geometry.getAttribute( 'position' ).needsUpdate = true;
+
+};
+
+function setPoint( point, pointMap, geometry, camera, x, y, z ) {
+
+	_vector.set( x, y, z ).unproject( camera );
+
+	const points = pointMap[ point ];
+
+	if ( points !== undefined ) {
+
+		const position = geometry.getAttribute( 'position' );
+
+		for ( let i = 0, l = points.length; i < l; i ++ ) {
+
+			position.setXYZ( points[ i ], _vector.x, _vector.y, _vector.z );
 
 		}
 
 	}
 
-	return function update() {
-
-		geometry = this.geometry;
-		pointMap = this.pointMap;
-
-		var w = 1, h = 1;
-
-		// we need just camera projection matrix
-		// world matrix must be identity
-
-		camera.projectionMatrix.copy( this.camera.projectionMatrix );
-
-		// center / target
-
-		setPoint( 'c', 0, 0, - 1 );
-		setPoint( 't', 0, 0, 1 );
-
-		// near
-
-		setPoint( 'n1', - w, - h, - 1 );
-		setPoint( 'n2', w, - h, - 1 );
-		setPoint( 'n3', - w, h, - 1 );
-		setPoint( 'n4', w, h, - 1 );
-
-		// far
-
-		setPoint( 'f1', - w, - h, 1 );
-		setPoint( 'f2', w, - h, 1 );
-		setPoint( 'f3', - w, h, 1 );
-		setPoint( 'f4', w, h, 1 );
-
-		// up
-
-		setPoint( 'u1', w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u2', - w * 0.7, h * 1.1, - 1 );
-		setPoint( 'u3', 0, h * 2, - 1 );
-
-		// cross
-
-		setPoint( 'cf1', - w, 0, 1 );
-		setPoint( 'cf2', w, 0, 1 );
-		setPoint( 'cf3', 0, - h, 1 );
-		setPoint( 'cf4', 0, h, 1 );
-
-		setPoint( 'cn1', - w, 0, - 1 );
-		setPoint( 'cn2', w, 0, - 1 );
-		setPoint( 'cn3', 0, - h, - 1 );
-		setPoint( 'cn4', 0, h, - 1 );
-
-		geometry.getAttribute( 'position' ).needsUpdate = true;
-
-	};
-
-}();
-
+}
 
 export { CameraHelper };

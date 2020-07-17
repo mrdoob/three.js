@@ -1,3 +1,4 @@
+console.warn( "THREE.AnaglyphEffect: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author mrdoob / http://mrdoob.com/
  * @author marklundin / http://mark-lundin.com/
@@ -12,9 +13,9 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	this.colorMatrixLeft = new THREE.Matrix3().fromArray( [
 
-			1.0671679973602295, 	-0.0016435992438346148,		 0.0001777536963345483, // r out
-			-0.028107794001698494,	-0.00019593400065787137,	-0.0002875397040043026, // g out
-			-0.04279090091586113,	 0.000015809757314855233,	-0.00024287120322696865 // b out
+		1.0671679973602295, - 0.0016435992438346148, 0.0001777536963345483, // r out
+		- 0.028107794001698494, - 0.00019593400065787137, - 0.0002875397040043026, // g out
+		- 0.04279090091586113, 0.000015809757314855233, - 0.00024287120322696865 // b out
 
 	] );
 
@@ -22,9 +23,9 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	this.colorMatrixRight = new THREE.Matrix3().fromArray( [
 
-			-0.0355340838432312,	-0.06440307199954987,		 0.018319187685847282,	// r out
-			-0.10269022732973099,	 0.8079727292060852,		-0.04835830628871918,	// g out
-			0.0001224992738571018,	-0.009558862075209618,		 0.567823588848114		// b out
+		- 0.0355340838432312, - 0.06440307199954987, 0.018319187685847282, // r out
+		- 0.10269022732973099, 0.8079727292060852, - 0.04835830628871918, // g out
+		0.0001224992738571018, - 0.009558862075209618, 0.567823588848114 // b out
 
 	] );
 
@@ -114,8 +115,8 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	} );
 
-	var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
-	_scene.add( mesh );
+	var _mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), _material );
+	_scene.add( _mesh );
 
 	this.setSize = function ( width, height ) {
 
@@ -130,22 +131,35 @@ THREE.AnaglyphEffect = function ( renderer, width, height ) {
 
 	this.render = function ( scene, camera ) {
 
+		var currentRenderTarget = renderer.getRenderTarget();
+
 		scene.updateMatrixWorld();
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
 
 		_stereo.update( camera );
 
-		renderer.render( scene, _stereo.cameraL, _renderTargetL, true );
-		renderer.render( scene, _stereo.cameraR, _renderTargetR, true );
+		renderer.setRenderTarget( _renderTargetL );
+		renderer.clear();
+		renderer.render( scene, _stereo.cameraL );
+
+		renderer.setRenderTarget( _renderTargetR );
+		renderer.clear();
+		renderer.render( scene, _stereo.cameraR );
+
+		renderer.setRenderTarget( null );
 		renderer.render( _scene, _camera );
+
+		renderer.setRenderTarget( currentRenderTarget );
 
 	};
 
-	this.dispose = function() {
+	this.dispose = function () {
 
 		if ( _renderTargetL ) _renderTargetL.dispose();
 		if ( _renderTargetR ) _renderTargetR.dispose();
+		if ( _mesh ) _mesh.geometry.dispose();
+		if ( _material ) _material.dispose();
 
 	};
 

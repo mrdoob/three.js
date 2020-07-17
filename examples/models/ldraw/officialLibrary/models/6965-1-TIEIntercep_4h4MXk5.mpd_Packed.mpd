@@ -1,0 +1,2839 @@
+0 LDraw.org Configuration File
+0 Name: LDConfig.ldr
+0 Author: LDraw.org
+0 !LDRAW_ORG Configuration UPDATE 2017-12-15
+
+0 // LDraw Solid Colours
+0                              // LEGOID  26 - Black
+0 !COLOUR Black                                                 CODE   0   VALUE #05131D   EDGE #595959
+0                              // LEGOID  23 - Bright Blue
+0 !COLOUR Blue                                                  CODE   1   VALUE #0055BF   EDGE #333333
+0                              // LEGOID  28 - Dark Green
+0 !COLOUR Green                                                 CODE   2   VALUE #257A3E   EDGE #333333
+0                              // LEGOID 107 - Bright Bluish Green
+0 !COLOUR Dark_Turquoise                                        CODE   3   VALUE #00838F   EDGE #333333
+0                              // LEGOID  21 - Bright Red
+0 !COLOUR Red                                                   CODE   4   VALUE #C91A09   EDGE #333333
+0                              // LEGOID 221 - Bright Purple
+0 !COLOUR Dark_Pink                                             CODE   5   VALUE #C870A0   EDGE #333333
+0                              // LEGOID 217 - Brown
+0 !COLOUR Brown                                                 CODE   6   VALUE #583927   EDGE #1E1E1E
+0                              // LEGOID   2 - Grey
+0 !COLOUR Light_Grey                                            CODE   7   VALUE #9BA19D   EDGE #333333
+0                              // LEGOID  27 - Dark Grey
+0 !COLOUR Dark_Grey                                             CODE   8   VALUE #6D6E5C   EDGE #333333
+0                              // LEGOID  45 - Light Blue
+0 !COLOUR Light_Blue                                            CODE   9   VALUE #B4D2E3   EDGE #333333
+0                              // LEGOID  37 - Bright Green
+0 !COLOUR Bright_Green                                          CODE  10   VALUE #4B9F4A   EDGE #333333
+0                              // LEGOID 116 - Medium Bluish Green
+0 !COLOUR Light_Turquoise                                       CODE  11   VALUE #55A5AF   EDGE #333333
+0                              // LEGOID   4 - Brick Red
+0 !COLOUR Salmon                                                CODE  12   VALUE #F2705E   EDGE #333333
+0                              // LEGOID   9 - Light Reddish Violet
+0 !COLOUR Pink                                                  CODE  13   VALUE #FC97AC   EDGE #333333
+0                              // LEGOID  24 - Bright Yellow
+0 !COLOUR Yellow                                                CODE  14   VALUE #F2CD37   EDGE #333333
+0                              // LEGOID   1 - White
+0 !COLOUR White                                                 CODE  15   VALUE #FFFFFF   EDGE #333333
+0                              // LEGOID   6 - Light Green
+0 !COLOUR Light_Green                                           CODE  17   VALUE #C2DAB8   EDGE #333333
+0                              // LEGOID   3 - Light Yellow
+0 !COLOUR Light_Yellow                                          CODE  18   VALUE #FBE696   EDGE #333333
+0                              // LEGOID   5 - Brick Yellow
+0 !COLOUR Tan                                                   CODE  19   VALUE #E4CD9E   EDGE #333333
+0                              // LEGOID  39 - Light Bluish Violet
+0 !COLOUR Light_Violet                                          CODE  20   VALUE #C9CAE2   EDGE #333333
+0                              // LEGOID 104 - Bright Violet
+0 !COLOUR Purple                                                CODE  22   VALUE #81007B   EDGE #333333
+0                              // LEGOID 196 - Dark Royal Blue
+0 !COLOUR Dark_Blue_Violet                                      CODE  23   VALUE #2032B0   EDGE #1E1E1E
+0                              // LEGOID 106 - Bright Orange
+0 !COLOUR Orange                                                CODE  25   VALUE #FE8A18   EDGE #333333
+0                              // LEGOID 124 - Bright Reddish Violet
+0 !COLOUR Magenta                                               CODE  26   VALUE #923978   EDGE #333333
+0                              // LEGOID 119 - Bright Yellowish Green
+0 !COLOUR Lime                                                  CODE  27   VALUE #BBE90B   EDGE #333333
+0                              // LEGOID 138 - Sand Yellow
+0 !COLOUR Dark_Tan                                              CODE  28   VALUE #958A73   EDGE #333333
+0                              // LEGOID 222 - Light Purple
+0 !COLOUR Bright_Pink                                           CODE  29   VALUE #E4ADC8   EDGE #333333
+0                              // LEGOID 324 - Medium Lavender
+0 !COLOUR Medium_Lavender                                       CODE  30   VALUE #AC78BA   EDGE #333333
+0                              // LEGOID 325 - Lavender
+0 !COLOUR Lavender                                              CODE  31   VALUE #E1D5ED   EDGE #333333
+0                              // LEGOID  36 - Light Yellowish Orange
+0 !COLOUR Very_Light_Orange                                     CODE  68   VALUE #F3CF9B   EDGE #333333
+0                              // LEGOID 198 - Bright Reddish Lilac
+0 !COLOUR Bright_Reddish_Lilac                                  CODE  69   VALUE #CD6298   EDGE #333333
+0                              // LEGOID 192 - Reddish Brown
+0 !COLOUR Reddish_Brown                                         CODE  70   VALUE #582A12   EDGE #595959
+0                              // LEGOID 194 - Medium Stone Grey
+0 !COLOUR Light_Bluish_Grey                                     CODE  71   VALUE #A0A5A9   EDGE #333333
+0                              // LEGOID 199 - Dark Stone Grey
+0 !COLOUR Dark_Bluish_Grey                                      CODE  72   VALUE #6C6E68   EDGE #333333
+0                              // LEGOID 102 - Medium Blue
+0 !COLOUR Medium_Blue                                           CODE  73   VALUE #5C9DD1   EDGE #333333
+0                              // LEGOID  29 - Medium Green
+0 !COLOUR Medium_Green                                          CODE  74   VALUE #73DCA1   EDGE #333333
+0                              // LEGOID 223 - Light Pink
+0 !COLOUR Light_Pink                                            CODE  77   VALUE #FECCCF   EDGE #333333
+0                              // LEGOID 283 - Light Nougat
+0 !COLOUR Light_Flesh                                           CODE  78   VALUE #F6D7B3   EDGE #333333
+0                              // LEGOID  38 - Dark Orange
+0 !COLOUR Medium_Dark_Flesh                                     CODE  84   VALUE #CC702A   EDGE #333333
+0                              // LEGOID 268 - Medium Lilac
+0 !COLOUR Medium_Lilac                                          CODE  85   VALUE #3F3691   EDGE #1E1E1E
+0                              // LEGOID 312 - Medium Nougat
+0 !COLOUR Dark_Flesh                                            CODE  86   VALUE #7C503A   EDGE #333333
+0                              // LEGOID 195 - Medium Royal Blue
+0 !COLOUR Blue_Violet                                           CODE  89   VALUE #4C61DB   EDGE #333333
+0                              // LEGOID  18 - Nougat
+0 !COLOUR Flesh                                                 CODE  92   VALUE #D09168   EDGE #333333
+0                              // LEGOID 100 - Light Red
+0 !COLOUR Light_Salmon                                          CODE 100   VALUE #FEBABD   EDGE #333333
+0                              // LEGOID 110 - Bright Bluish Violet
+0 !COLOUR Violet                                                CODE 110   VALUE #4354A3   EDGE #333333
+0                              // LEGOID 112 - Medium Bluish Violet
+0 !COLOUR Medium_Violet                                         CODE 112   VALUE #6874CA   EDGE #333333
+0                              // LEGOID 115 - Medium Yellowish Green
+0 !COLOUR Medium_Lime                                           CODE 115   VALUE #C7D23C   EDGE #333333
+0                              // LEGOID 118 - Light Bluish Green
+0 !COLOUR Aqua                                                  CODE 118   VALUE #B3D7D1   EDGE #333333
+0                              // LEGOID 120 - Light Yellowish Green
+0 !COLOUR Light_Lime                                            CODE 120   VALUE #D9E4A7   EDGE #333333
+0                              // LEGOID 125 - Light Orange
+0 !COLOUR Light_Orange                                          CODE 125   VALUE #F9BA61   EDGE #333333
+0                              // LEGOID 208 - Light Stone Grey
+0 !COLOUR Very_Light_Bluish_Grey                                CODE 151   VALUE #E6E3E0   EDGE #333333
+0                              // LEGOID 191 - Flame Yellowish Orange
+0 !COLOUR Bright_Light_Orange                                   CODE 191   VALUE #F8BB3D   EDGE #333333
+0                              // LEGOID 212 - Light Royal Blue
+0 !COLOUR Bright_Light_Blue                                     CODE 212   VALUE #86C1E1   EDGE #333333
+0                              // LEGOID 216 - Rust
+0 !COLOUR Rust                                                  CODE 216   VALUE #B31004   EDGE #333333
+0                              // LEGOID 226 - Cool Yellow
+0 !COLOUR Bright_Light_Yellow                                   CODE 226   VALUE #FFF03A   EDGE #333333
+0                              // LEGOID 232 - Dove Blue
+0 !COLOUR Sky_Blue                                              CODE 232   VALUE #56BED6   EDGE #333333
+0                              // LEGOID 140 - Earth Blue
+0 !COLOUR Dark_Blue                                             CODE 272   VALUE #0D325B   EDGE #1E1E1E
+0                              // LEGOID 141 - Earth Green
+0 !COLOUR Dark_Green                                            CODE 288   VALUE #184632   EDGE #595959
+0                              // LEGOID 308 - Dark Brown
+0 !COLOUR Dark_Brown                                            CODE 308   VALUE #352100   EDGE #595959
+0                              // LEGOID  11 - Pastel Blue
+0 !COLOUR Maersk_Blue                                           CODE 313   VALUE #54A9C8   EDGE #333333
+0                              // LEGOID 154 - New Dark Red
+0 !COLOUR Dark_Red                                              CODE 320   VALUE #720E0F   EDGE #333333
+0                              // LEGOID 321 - Dark Azur
+0 !COLOUR Dark_Azure                                            CODE 321   VALUE #1498D7   EDGE #333333
+0                              // LEGOID 322 - Medium Azur
+0 !COLOUR Medium_Azure                                          CODE 322   VALUE #3EC2DD   EDGE #333333
+0                              // LEGOID 323 - Aqua
+0 !COLOUR Light_Aqua                                            CODE 323   VALUE #BDDCD8   EDGE #333333
+0                              // LEGOID 326 - Spring Yellowish Green
+0 !COLOUR Yellowish_Green                                       CODE 326   VALUE #DFEEA5   EDGE #333333
+0                              // LEGOID 330 - Olive Green
+0 !COLOUR Olive_Green                                           CODE 330   VALUE #9B9A5A   EDGE #333333
+0                              // LEGOID 153 - Sand Red
+0 !COLOUR Sand_Red                                              CODE 335   VALUE #D67572   EDGE #333333
+0                              // LEGOID  22 - Medium Reddish Violet
+0 !COLOUR Medium_Dark_Pink                                      CODE 351   VALUE #F785B1   EDGE #333333
+0                              // LEGOID  25 - Earth Orange
+0 !COLOUR Earth_Orange                                          CODE 366   VALUE #FA9C1C   EDGE #333333
+0                              // LEGOID 136 - Sand Violet
+0 !COLOUR Sand_Purple                                           CODE 373   VALUE #845E84   EDGE #333333
+0                              // LEGOID 151 - Sand Green
+0 !COLOUR Sand_Green                                            CODE 378   VALUE #A0BCAC   EDGE #333333
+0                              // LEGOID 135 - Sand Blue
+0 !COLOUR Sand_Blue                                             CODE 379   VALUE #597184   EDGE #333333
+0                              // LEGOID  12 - Light Orange Brown
+0 !COLOUR Fabuland_Brown                                        CODE 450   VALUE #B67B50   EDGE #333333
+0                              // LEGOID 105 - Bright Yellowish Orange
+0 !COLOUR Medium_Orange                                         CODE 462   VALUE #FFA70B   EDGE #333333
+0                              // LEGOID  38 - Dark Orange
+0 !COLOUR Dark_Orange                                           CODE 484   VALUE #A95500   EDGE #333333
+0                              // LEGOID 103 - Light Grey
+0 !COLOUR Very_Light_Grey                                       CODE 503   VALUE #E6E3DA   EDGE #333333
+0                              // LEGOID 218 - Reddish Lilac
+0 !COLOUR Reddish_Lilac                                         CODE 218   VALUE #8E5597   EDGE #333333
+0                              // LEGOID 295 - Flamingo Pink
+0 !COLOUR Flamingo_Pink                                         CODE 295   VALUE #FF94C2   EDGE #333333
+0                              // LEGOID 219 - Lilac
+0 !COLOUR Lilac                                                 CODE 219   VALUE #564E9D   EDGE #333333
+0                              // LEGOID 128 - Dark Nougat
+0 !COLOUR Dark_Nougat                                           CODE 128   VALUE #AD6140   EDGE #333333
+
+
+0 // LDraw Transparent Colours
+0                              // LEGOID  40 - Transparent
+0 !COLOUR Trans_Clear                                           CODE  47   VALUE #FCFCFC   EDGE #C3C3C3   ALPHA 128
+0                              // LEGOID 111 - Transparent Brown
+0 !COLOUR Trans_Black                                           CODE  40   VALUE #635F52   EDGE #171316   ALPHA 128
+0                              // LEGOID  41 - Transparent Red
+0 !COLOUR Trans_Red                                             CODE  36   VALUE #C91A09   EDGE #880000   ALPHA 128
+0                              // LEGOID  47 - Transparent Fluorescent Reddish Orange
+0 !COLOUR Trans_Neon_Orange                                     CODE  38   VALUE #FF800D   EDGE #BD2400   ALPHA 128
+0                              // LEGOID 182 - Trans Bright Orange
+0 !COLOUR Trans_Orange                                          CODE  57   VALUE #F08F1C   EDGE #A45C28   ALPHA 128
+0                              // LEGOID 157 - Transparent Fluorescent Yellow
+0 !COLOUR Trans_Neon_Yellow                                     CODE  54   VALUE #DAB000   EDGE #C3BA3F   ALPHA 128
+0                              // LEGOID  44 - Transparent Yellow
+0 !COLOUR Trans_Yellow                                          CODE  46   VALUE #F5CD2F   EDGE #8E7400   ALPHA 128
+0                              // LEGOID  49 - Transparent Fluorescent Green
+0 !COLOUR Trans_Neon_Green                                      CODE  42   VALUE #C0FF00   EDGE #84C300   ALPHA 128
+0                              // LEGOID 311 / 227 - Transparent Bright Green / Transparent Bright Yellowish Green 
+0 !COLOUR Trans_Bright_Green                                    CODE  35   VALUE #56E646   EDGE #9DA86B   ALPHA 128
+0                              // LEGOID  48 - Transparent Green
+0 !COLOUR Trans_Green                                           CODE  34   VALUE #237841   EDGE #1E6239   ALPHA 128
+0                              // LEGOID  43 - Transparent Blue
+0 !COLOUR Trans_Dark_Blue                                       CODE  33   VALUE #0020A0   EDGE #000064   ALPHA 128
+0                              // LEGOID 143 - Transparent Fluorescent Blue
+0 !COLOUR Trans_Medium_Blue                                     CODE  41   VALUE #559AB7   EDGE #196973   ALPHA 128
+0                              // LEGOID  42 - Transparent Light Blue
+0 !COLOUR Trans_Light_Blue                                      CODE  43   VALUE #AEE9EF   EDGE #72B3B0   ALPHA 128
+0                              // LEGOID 229 - Transparent Light Bluish Green
+0 !COLOUR Trans_Very_Light_Blue                                 CODE  39   VALUE #C1DFF0   EDGE #85A3B4   ALPHA 128
+0                              // LEGOID 236 - Transparent Bright Reddish Lilac
+0 !COLOUR Trans_Bright_Reddish_Lilac                            CODE  44   VALUE #96709F   EDGE #5A3463   ALPHA 128
+0                              // LEGOID 126 - Transparent Bright Bluish Violet
+0 !COLOUR Trans_Purple                                          CODE  52   VALUE #A5A5CB   EDGE #280025   ALPHA 128
+0                              // LEGOID 113 - Transparent Medium Reddish Violet
+0 !COLOUR Trans_Dark_Pink                                       CODE  37   VALUE #DF6695   EDGE #A32A59   ALPHA 128
+0                              // LEGOID 230 - Transparent Bright Pink
+0 !COLOUR Trans_Pink                                            CODE  45   VALUE #FC97AC   EDGE #A8718C   ALPHA 128
+0                              // LEGOID 285 - Transparent Light Green 
+0 !COLOUR Trans_Light_Green                                     CODE  285  VALUE #7DC291   EDGE #52805F   ALPHA 128
+0                              // LEGOID 234 - Transparent Fire Yellow
+0 !COLOUR Trans_Fire_Yellow                                     CODE  234  VALUE #FBE890   EDGE #BAAB6A   ALPHA 128
+0                              // LEGOID 293 - Transparent Light Royal Blue
+0 !COLOUR Trans_Light_Blue_Violet                               CODE  293  VALUE #6BABE4   EDGE #4D7BA3   ALPHA 128
+0                              // LEGOID 231 - Transparent Flame Yellowish Orange
+0 !COLOUR Trans_Bright_Light_Orange                             CODE  231  VALUE #FCB76D   EDGE #BD8951   ALPHA 128
+0                              // LEGOID 284 - Transparent Reddish Lilac
+0 !COLOUR Trans_Reddish_Lilac                                   CODE  284  VALUE #C281A5   EDGE #82566E   ALPHA 128
+
+
+0 // LDraw Chrome Colours
+0                              // LEGOID 299 - Warm Gold Drum Lacq
+0 !COLOUR Chrome_Gold                                           CODE 334   VALUE #BBA53D   EDGE #BBB23D                               CHROME
+0                              // LEGOID 298 - Cool Silver Drum Lacq
+0 !COLOUR Chrome_Silver                                         CODE 383   VALUE #E0E0E0   EDGE #A4A4A4                               CHROME
+0                              // LEGOID 187 - Metallic Earth Orange
+0 !COLOUR Chrome_Antique_Brass                                  CODE  60   VALUE #645A4C   EDGE #281E10                               CHROME
+0 !COLOUR Chrome_Black                                          CODE  64   VALUE #1B2A34   EDGE #595959                               CHROME
+0                              // LEGOID 185 - Metallic Bright Blue
+0 !COLOUR Chrome_Blue                                           CODE  61   VALUE #6C96BF   EDGE #202A68                               CHROME
+0                              // LEGOID 147 - Metallic Dark Green
+0 !COLOUR Chrome_Green                                          CODE  62   VALUE #3CB371   EDGE #007735                               CHROME
+0 !COLOUR Chrome_Pink                                           CODE  63   VALUE #AA4D8E   EDGE #6E1152                               CHROME
+
+
+0 // LDraw Pearl Colours
+0                              // LEGOID 183 - Metallic White
+0 !COLOUR Pearl_White                                           CODE 183   VALUE #F2F3F2   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 150 - Metallic Light Grey
+0 !COLOUR Pearl_Very_Light_Grey                                 CODE 150   VALUE #BBBDBC   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 179 / 296 / 131 / 315 - Silver Flip-flop / Cool Silver / Silver / Silver Metallic
+0 !COLOUR Pearl_Light_Grey                                      CODE 135   VALUE #9CA3A8   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 131 - Silver
+0 !COLOUR Flat_Silver                                           CODE 179   VALUE #898788   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 148 - Metallic Dark Grey
+0 !COLOUR Pearl_Dark_Grey                                       CODE 148   VALUE #575857   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 145 - Sand Blue Metallic
+0 !COLOUR Metal_Blue                                            CODE 137   VALUE #5677BA   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 127 - Gold
+0 !COLOUR Pearl_Light_Gold                                      CODE 142   VALUE #DCBE61   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 297 - Warm Gold
+0 !COLOUR Pearl_Gold                                            CODE 297   VALUE #CC9C2B   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 147 - Metallic Sand Yellow
+0 !COLOUR Flat_Dark_Gold                                        CODE 178   VALUE #B4883E   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 139 - Copper
+0 !COLOUR Copper                                                CODE 134   VALUE #964A27   EDGE #333333                               PEARLESCENT
+0                              // LEGOID 189 - Reddish Gold
+0 !COLOUR Reddish_Gold                                          CODE 189   VALUE #AC8247   EDGE #333333                               PEARLESCENT
+
+
+0 // LDraw Metallic Colours
+0                              // LEGOID 315 - Silver Metallic
+0 !COLOUR Metallic_Silver                                       CODE  80   VALUE #A5A9B4   EDGE #333333                               METAL
+0                              // LEGOID 200 - Lemon Metallic
+0 !COLOUR Metallic_Green                                        CODE  81   VALUE #899B5F   EDGE #333333                               METAL
+0                              // LEGOID 310 / 335  Metalized Gold / Gold Ink
+0 !COLOUR Metallic_Gold                                         CODE  82   VALUE #DBAC34   EDGE #333333                               METAL
+0                              // LEGOID 149 - Metallic Black
+0 !COLOUR Metallic_Black                                        CODE  83   VALUE #1A2831   EDGE #333333                               METAL
+0                              // LEGOID 309 / 336 - Metalized Silver / Silver Ink
+0 !COLOUR Metallic_Dark_Grey                                    CODE  87   VALUE #6D6E5C   EDGE #333333                               METAL
+0                              // LEGOID 300 / 334 - Copper Drum Lacq / Copper Ink
+0 !COLOUR Metallic_Copper                                       CODE 300   VALUE #C27F53   EDGE #333333                               METAL
+0                              // LEGOID 184 - Metallic Bright Red
+0 !COLOUR Metallic_Bright_Red                                   CODE 184   VALUE #D60026   EDGE #333333                               METAL
+0                              // LEGOID 186 - Metallic Dark Green
+0 !COLOUR Metallic_Dark_Green                                   CODE 186   VALUE #008E3C   EDGE #333333                               METAL
+
+
+0 // LDraw Milky Colours
+0                              // LEGOID  20 - Nature
+0 !COLOUR Milky_White                                           CODE  79   VALUE #FFFFFF   EDGE #C3C3C3   ALPHA 240
+0                              // LEGOID 294 - Phosphorescent Green
+0 !COLOUR Glow_In_Dark_Opaque                                   CODE  21   VALUE #E0FFB0   EDGE #A4C374   ALPHA 240   LUMINANCE 15
+0                              // LEGOID  50 - Phosphorescent White
+0 !COLOUR Glow_In_Dark_Trans                                    CODE 294   VALUE #BDC6AD   EDGE #818A71   ALPHA 240   LUMINANCE 15
+0                              // LEGOID 329 - White Glow
+0 !COLOUR Glow_In_Dark_White                                    CODE 329   VALUE #F5F3D7   EDGE #B5B49F   ALPHA 240   LUMINANCE 15
+
+
+0 // LDraw Glitter Colours
+0                              // LEGOID 114 - Tr. Medium Reddish-Violet w. Glitter 2%
+0 !COLOUR Glitter_Trans_Dark_Pink                               CODE 114   VALUE #DF6695   EDGE #9A2A66   ALPHA 128                   MATERIAL GLITTER VALUE #923978 FRACTION 0.17 VFRACTION 0.2 SIZE 1
+0                              // LEGOID 117 - Transparent Glitter
+0 !COLOUR Glitter_Trans_Clear                                   CODE 117   VALUE #FFFFFF   EDGE #C3C3C3   ALPHA 128                   MATERIAL GLITTER VALUE #FFFFFF FRACTION 0.08 VFRACTION 0.1 SIZE 1
+0                              // LEGOID 129 - Tr. Bright Bluish Violet w. Glitter 2%
+0 !COLOUR Glitter_Trans_Purple                                  CODE 129   VALUE #640061   EDGE #280025   ALPHA 128                   MATERIAL GLITTER VALUE #8C00FF FRACTION 0.3 VFRACTION 0.4 SIZE 1
+0                              // LEGOID 302  Tr. Light Blue with Glitter 2%
+0 !COLOUR Glitter_Trans_Light_Blue                              CODE 302   VALUE #AEE9EF   EDGE #72B3B0   ALPHA 128                   MATERIAL GLITTER VALUE #923978 FRACTION 0.17 VFRACTION 0.2 SIZE 1
+0                              // LEGOID 339  Tr Fluorescent Green with Glitter 2%
+0 !COLOUR Glitter_Trans_Neon_Green                              CODE 339   VALUE #C0FF00   EDGE #84C300   ALPHA 128                   MATERIAL GLITTER VALUE #923978 FRACTION 0.17 VFRACTION 0.2 SIZE 1 
+
+
+0 // LDraw Speckle Colours
+0 !COLOUR Speckle_Black_Silver                                  CODE 132   VALUE #000000   EDGE #898788                               MATERIAL SPECKLE VALUE #898788 FRACTION 0.4 MINSIZE 1 MAXSIZE 3
+0                              // LEGOID 132 - Black Glitter
+0 !COLOUR Speckle_Black_Gold                                    CODE 133   VALUE #000000   EDGE #DBAC34                               MATERIAL SPECKLE VALUE #DBAC34 FRACTION 0.4 MINSIZE 1 MAXSIZE 3
+0 !COLOUR Speckle_Black_Copper                                  CODE  75   VALUE #000000   EDGE #AB6038                               MATERIAL SPECKLE VALUE #AB6038 FRACTION 0.4 MINSIZE 1 MAXSIZE 3
+0 !COLOUR Speckle_Dark_Bluish_Grey_Silver                       CODE  76   VALUE #635F61   EDGE #898788                               MATERIAL SPECKLE VALUE #898788 FRACTION 0.4 MINSIZE 1 MAXSIZE 3
+
+
+0 // LDraw Rubber Colours
+0 !COLOUR Rubber_Yellow                                         CODE  65   VALUE #F5CD2F   EDGE #333333                               RUBBER
+0 !COLOUR Rubber_Trans_Yellow                                   CODE  66   VALUE #CAB000   EDGE #8E7400   ALPHA 128                   RUBBER
+0 !COLOUR Rubber_Trans_Clear                                    CODE  67   VALUE #FFFFFF   EDGE #C3C3C3   ALPHA 128                   RUBBER
+0 !COLOUR Rubber_Black                                          CODE 256   VALUE #212121   EDGE #595959                               RUBBER
+0 !COLOUR Rubber_Blue                                           CODE 273   VALUE #0033B2   EDGE #333333                               RUBBER
+0 !COLOUR Rubber_Red                                            CODE 324   VALUE #C40026   EDGE #333333                               RUBBER
+0 !COLOUR Rubber_Orange                                         CODE 350   VALUE #D06610   EDGE #333333                               RUBBER
+0 !COLOUR Rubber_Light_Grey                                     CODE 375   VALUE #C1C2C1   EDGE #333333                               RUBBER
+0 !COLOUR Rubber_Dark_Blue                                      CODE 406   VALUE #001D68   EDGE #595959                               RUBBER
+0 !COLOUR Rubber_Purple                                         CODE 449   VALUE #81007B   EDGE #333333                               RUBBER
+0 !COLOUR Rubber_Lime                                           CODE 490   VALUE #D7F000   EDGE #333333                               RUBBER
+0 !COLOUR Rubber_Light_Bluish_Grey                              CODE 496   VALUE #A3A2A4   EDGE #333333                               RUBBER
+0 !COLOUR Rubber_Flat_Silver                                    CODE 504   VALUE #898788   EDGE #333333                               RUBBER
+0 !COLOUR Rubber_White                                          CODE 511   VALUE #FAFAFA   EDGE #333333                               RUBBER
+
+
+0 // LDraw Internal Common Material Colours
+0 !COLOUR Main_Colour                                           CODE  16   VALUE #FFFF80   EDGE #333333
+0 !COLOUR Edge_Colour                                           CODE  24   VALUE #7F7F7F   EDGE #333333
+0                              // LEGOID 109 - Black IR
+0 !COLOUR Trans_Black_IR_Lens                                   CODE  32   VALUE #000000   EDGE #333333   ALPHA 210
+0 !COLOUR Magnet                                                CODE 493   VALUE #656761   EDGE #595959                               METAL
+0 !COLOUR Electric_Contact_Alloy                                CODE 494   VALUE #D0D0D0   EDGE #333333                               METAL
+0 !COLOUR Electric_Contact_Copper                               CODE 495   VALUE #AE7A59   EDGE #333333                               METAL
+0
+
+0 TIE Interceptor - Mini
+0 Name: 6965 - TIE Interceptor - Mini.mpd
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom" 
+0 ROTATION CONFIG 0 0
+1 0 0 0 0 1 0 0 0 1 0 0 0 1 6965 - 1.ldr
+1 0 -40 10 12 0 -1 0 1 0 0 0 0 1 6965 - 2.ldr
+1 0 40 10 12 0 1 0 -1 0 0 0 0 1 6965 - 2.ldr
+0
+0 FILE 6965 - 1.ldr
+0 1
+0 Name: 6965 - 1.ldr
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom" 
+0 ROTATION CONFIG 0 0
+1 0 0 0 0 1 0 0 0 1 0 0 0 1 parts/4733.dat
+1 379 -0 -8 0 1 0 0 0 1 0 0 0 1 parts/3070bps3.dat
+0 STEP
+1 379 0 10 18 1 0 0 0 0 1 0 -1 0 parts/4740.dat
+1 47 0 10 -18 -1 0 0 0 0 1 0 1 0 parts/4740.dat
+0 STEP
+1 0 24 10 22 0 1 0 -1 0 0 0 0 1 parts/4623.dat
+1 0 -24 10 22 0 -1 0 1 0 0 0 0 1 parts/4623.dat
+0 
+0
+0 FILE 6965 - 2.ldr
+0 2
+0 Name: 6965 - 2.ldr
+0 Author: Evert-Jan Boer [ejboer]
+0 !LDRAW_ORG Model
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+0 ROTATION CENTER 0 0 0 1 "Custom" 
+0 ROTATION CONFIG 0 0
+1 0 0 0 0 0 0 1 0 1 0 -1 0 0 parts/4871.dat
+1 0 -10 -8 10 0 0 1 0 1 0 -1 0 0 parts/4589.dat
+1 0 10 -8 10 0 0 1 0 1 0 -1 0 0 parts/4589.dat
+0 STEP
+1 0 -10 8 -10 -1 0 0 0 1 0 0 0 -1 parts/2555.dat
+1 0 10 8 -10 -1 0 0 0 1 0 0 0 -1 parts/2555.dat
+0 STEP
+1 0 -30 -8 0 0 0 -1 0 1 0 1 0 0 parts/3069b.dat
+1 0 30 -8 0 0 0 -1 0 1 0 1 0 0 parts/3069b.dat
+1 72 -10 2 0 -0.707107 0 -0.707107 0.707107 0 -0.707107 0 -1 0 parts/30374.dat
+1 72 10 2 0 0.707107 0 -0.707107 0.707107 0 0.707107 0 -1 0 parts/30374.dat
+0 STEP
+1 0 -26.97 4.828 -60 0.707107 -0.707107 0 0.707107 0.707107 0 0 0 1 parts/41769.dat
+1 0 -14.243 6.242 -30 0.707107 -0.707107 0 0.707107 0.707107 0 0 0 1 parts/2555.dat
+0 STEP
+1 0 26.97 4.828 -60 0.707107 0.707107 0 -0.707107 0.707107 0 0 0 1 parts/41770.dat
+1 0 14.243 6.242 -30 0.707107 0.707107 0 -0.707107 0.707107 0 0 0 1 parts/2555.dat
+0 
+0
+0
+
+0 FILE parts/41770.dat
+0 Wing  2 x  4 Left
+0 Name: 41770.dat
+0 Author: Marc Schickele [samrotule]
+0 !LDRAW_ORG Part UPDATE 2005-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+0 !KEYWORDS wedge plate
+
+0 !HISTORY 2002-12-31 [PTadmin] Official Update 2002-06
+0 !HISTORY 2003-03-12 [PTadmin] Official Update 2003-01
+0 !HISTORY 2004-10-02 [guyvivan] made BFC Compliant, corrected mirrored stud
+0 !HISTORY 2004-10-15 [Steffen] un-mirrored all studs
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-07-04 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 parts/s/41770s01.dat
+1 16 -10 0 30 0 0 -1 0 1 0 1 0 0 p/stud.dat
+1 16 -10 0 10 0 0 -1 0 1 0 1 0 0 p/stud.dat
+1 16 -10 0 -10 0 0 -1 0 1 0 1 0 0 p/stud.dat
+1 16 -10 0 -30 0 0 -1 0 1 0 1 0 0 p/stud.dat
+0
+
+0 FILE parts/41769.dat
+0 Wing  2 x  4 Right
+0 Name: 41769.dat
+0 Author: Marc Schickele [samrotule]
+0 !LDRAW_ORG Part UPDATE 2005-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+0 !KEYWORDS wedge plate
+
+0 !HISTORY 2002-12-31 [PTadmin] Official Update 2002-06
+0 !HISTORY 2004-10-02 [guyvivan] made BFC Compliant, corected mirrored stud
+0 !HISTORY 2004-10-15 [Steffen] corrected mirroed stud logos
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-07-04 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 0 0 0 -1 0 0 0 1 0 0 0 1 parts/s/41770s01.dat
+1 16 10 0 30 0 0 -1 0 1 0 1 0 0 p/stud.dat
+1 16 10 0 10 0 0 -1 0 1 0 1 0 0 p/stud.dat
+1 16 10 0 -10 0 0 -1 0 1 0 1 0 0 p/stud.dat
+1 16 10 0 -30 0 0 -1 0 1 0 1 0 0 p/stud.dat
+0
+
+0 FILE parts/s/41770s01.dat
+0 ~Wing  2 x  4 Left without studs
+0 Name: s\41770s01.dat
+0 Author: Guy Vivan [guyvivan]
+0 !LDRAW_ORG Subpart UPDATE 2004-04
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2004-11-06 [PTadmin] Official Update 2004-04
+0 !HISTORY 2007-09-05 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 0 4 20 -1 0 0 0 -1 0 0 0 1 p/stud4.dat
+1 16 0 4 0 -1 0 0 0 -1 0 0 0 1 p/stud4.dat
+1 16 0 8 -20 -2.2961 0 -5.54328 0 -1 0 -5.54328 0 2.2961 p/2-4edge.dat
+1 16 0 4 -20 -2.2961 0 -5.54328 0 -1 0 -5.54328 0 2.2961 p/2-4edge.dat
+1 16 0 4 -20 -2.2961 0 -5.54328 0 -1 0 -5.54328 0 2.2961 p/2-4disc.dat
+1 16 0 4 0 0 0 -6 0 -1 0 -6 0 0 p/4-4disc.dat
+0 BFC INVERTNEXT
+1 16 0 8 -20 -2.2961 0 -5.54328 0 -4 0 -5.54328 0 2.2961 p/2-4cyli.dat
+1 16 0 8 -20 -3.06147 0 -7.39104 0 -1 0 -7.39104 0 3.06147 p/2-4edge.dat
+1 16 0 4 -20 -3.06147 0 -7.39104 0 -1 0 -7.39104 0 3.06147 p/2-4edge.dat
+1 16 0 8 -20 -3.06147 0 -7.39104 0 -4 0 -7.39104 0 3.06147 p/2-4cyli.dat
+1 16 0 8 -20 -0.765367 0 -1.84776 0 -1 0 -1.84776 0 0.765367 p/2-4ring3.dat
+1 16 0 4 -20 0 0 -8 0 -1 0 -8 0 0 p/2-4ndis.dat
+1 16 0 4 0 0 0 -8 0 -1 0 -8 0 0 p/2-4ndis.dat
+4 16 -20 0 40 -20 0 -40 0 0 -40 20 0 40
+2 24 0 0 -40 20 0 40
+1 16 -10 4 -40 0 0 10 4 0 0 0 1 0 p/rect3.dat
+1 16 0 4 40 0 0 20 -4 0 0 0 -1 0 p/rect3.dat
+1 16 -20 4 0 0 1 0 -4 0 0 0 0 40 p/rect.dat
+1 16 -16 6 0 0 -1 0 2 0 0 0 0 36 p/rect.dat
+4 16 20 8 40 20 0 40 18.27 4 33.06 18.27 8 33.06
+2 24 18.27 4 33.06 18.27 8 33.06
+2 24 18.27 8 33.06 20 8 40
+2 24 15.86 4 23.423 18.27 4 33.06
+4 16 13.81 8 15.25 15.86 8 23.423 15.86 4 23.423 13.81 4 15.25
+2 24 13.81 8 15.25 15.86 8 23.423
+2 24 15.86 8 23.423 15.86 4 23.423
+2 24 13.81 4 15.25 13.81 8 15.25
+2 24 10.91 4 3.62 13.81 4 15.25
+4 16 8.95 8 -4.21 10.91 8 3.62 10.91 4 3.62 8.95 4 -4.21
+2 24 8.95 8 -4.21 10.91 8 3.62
+2 24 10.91 8 3.62 10.91 4 3.62
+2 24 8.95 4 -4.21 8.95 8 -4.21
+2 24 6.25 4 -14.99 8.95 4 -4.21
+3 16 6.25 4 -14.99 20 0 40 0 0 -40
+3 16 6.25 4 -14.99 18.27 4 33.06 20 0 40
+4 16 0 8 -40 6.25 8 -14.99 6.25 4 -14.99 0 0 -40
+2 24 0 8 -40 6.25 8 -14.99
+2 24 6.25 8 -14.99 6.25 4 -14.99
+4 16 8.95 4 -4.21 6.956 4 -3.714 6.956 8 -3.714 8.95 8 -4.21
+2 24 8.95 4 -4.21 6.956 4 -3.714
+2 24 6.956 4 -3.714 6.956 8 -3.714
+2 24 6.956 8 -3.714 8.95 8 -4.21
+3 16 6.956 8 -3.714 7.392 8 -3.064 8.95 8 -4.21
+3 16 8.95 8 -4.21 7.392 8 -3.064 8 8 0
+3 16 10.91 8 3.62 8.95 8 -4.21 8 8 0
+3 16 10.91 8 3.62 8 8 0 7.392 8 3.064
+3 16 10.91 8 3.62 7.392 8 3.064 6.235 8 4.791
+2 24 6.235 4 4.791 6.235 8 4.791
+4 16 10.91 8 3.62 6.235 8 4.791 6.235 4 4.791 10.91 4 3.62
+2 24 10.91 8 3.62 6.235 8 4.791
+2 24 6.235 4 4.791 10.91 4 3.62
+4 16 18.27 4 33.06 14.38 4 34.03 14.38 8 34.03 18.27 8 33.06
+2 24 18.27 4 33.06 14.38 4 34.03
+2 24 14.38 4 34.03 14.38 8 34.03
+2 24 14.38 8 34.03 18.27 8 33.06
+4 16 14.88 4 36 14.88 8 36 14.38 8 34.03 14.38 4 34.03
+2 24 14.88 4 36 14.88 8 36
+2 24 14.88 8 36 14.38 8 34.03
+2 24 14.38 4 34.03 14.88 4 36
+4 16 14.88 8 36 14.88 4 36 -16 4 36 -16 8 36
+2 24 14.88 4 36 -16 4 36
+2 24 -16 8 36 14.88 8 36
+3 16 -16 4 36 14.88 4 36 -8 4 8
+4 16 -3.123 8 -36 -16 8 -36 -16 4 -36 -3.123 4 -36
+2 24 -3.123 8 -36 -16 8 -36
+2 24 -16 4 -36 -3.123 4 -36
+2 24 -3.123 4 -36 -3.123 8 -36
+4 16 -3.123 4 -36 -1.103 4 -27.92 -1.103 8 -27.92 -3.123 8 -36
+2 24 -3.123 4 -36 -1.103 4 -27.92
+2 24 -1.103 4 -27.92 -1.103 8 -27.92
+2 24 -1.103 8 -27.92 -3.123 8 -36
+4 16 -3.064 4 -27.392 -3.064 8 -27.392 -1.103 8 -27.92 -1.103 4 -27.92
+2 24 -3.064 8 -27.392 -1.103 8 -27.92
+2 24 -1.103 4 -27.92 -3.064 4 -27.392
+4 16 3.064 4 -12.608 5.656 4 -14.344 5.656 8 -14.344 3.064 8 -12.608
+2 24 3.064 4 -12.608 5.656 4 -14.344
+5 24 5.656 4 -14.344 5.656 8 -14.344 3.064 8 -12.608 6.25 4 -14.99
+2 24 5.656 8 -14.344 3.064 8 -12.608
+4 16 5.656 4 -14.344 6.25 4 -14.99 6.25 8 -14.99 5.656 8 -14.344
+2 24 5.656 4 -14.344 6.25 4 -14.99
+2 24 6.25 8 -14.99 5.656 8 -14.344
+4 16 0 4 -8 0 4 -12 -8 4 -12 -8 4 -8
+2 24 9.93 4 16.22 13.81 4 15.25
+3 16 0 4 -8 3.064 4 -12.608 0 4 -12
+4 16 -16 4 -36 -16 4 36 -8 4 8 -8 4 -28
+4 16 3.064 4 -7.392 5.656 4 -5.656 6.25 4 -14.99 5.656 4 -14.344
+4 16 -8 4 -28 -1.103 4 -27.92 -3.123 4 -36 -16 4 -36
+4 16 5.656 4 -14.344 3.064 4 -12.608 0 4 -8 3.064 4 -7.392
+3 16 3.064 4 7.392 0 4 8 9.93 4 16.22
+3 16 9.93 4 16.22 5.656 4 5.656 3.064 4 7.392
+3 16 9.93 4 16.22 6.235 4 4.791 5.656 4 5.656
+4 16 13.81 4 15.25 10.91 4 3.62 6.235 4 4.791 9.93 4 16.22
+4 16 14.88 4 36 9.93 4 16.22 0 4 8 -8 4 8
+2 24 11.98 4 24.393 9.93 4 16.22
+4 16 15.86 4 23.423 11.98 4 24.393 14.38 4 34.03 18.27 4 33.06
+2 24 15.86 4 23.423 11.98 4 24.393
+4 16 8.95 4 -4.21 6.25 4 -14.99 5.656 4 -5.656 6.956 4 -3.714
+4 16 15.86 8 23.423 13.81 8 15.25 9.93 8 16.22 11.98 8 24.393
+2 24 13.81 8 15.25 9.93 8 16.22
+2 24 9.93 8 16.22 11.98 8 24.393
+2 24 11.98 8 24.393 15.86 8 23.423
+4 16 11.98 4 24.393 15.86 4 23.423 15.86 8 23.423 11.98 8 24.393
+2 24 11.98 8 24.393 11.98 4 24.393
+4 16 13.81 8 15.25 13.81 4 15.25 9.93 4 16.22 9.93 8 16.22
+2 24 9.93 4 16.22 9.93 8 16.22
+4 16 9.93 4 16.22 11.98 4 24.393 11.98 8 24.393 9.93 8 16.22
+4 16 -1.103 8 -27.92 -3.064 8 -27.392 -2.298 8 -25.544 -0.594 8 -25.88
+2 24 -2.298 8 -25.544 -0.594 8 -25.88
+3 16 -0.594 4 -25.88 -2.298 4 -25.544 2.298 4 -14.456
+4 16 -0.594 8 -25.88 2.26 8 -14.45 5.656 8 -14.344 6.25 8 -14.99
+2 24 -0.594 8 -25.88 2.26 8 -14.45
+3 16 0 8 -40 -3.123 8 -36 -1.103 8 -27.92
+4 16 0 8 -40 -20 8 -40 -16 8 -36 -3.123 8 -36
+4 16 6.25 8 -14.99 0 8 -40 -1.103 8 -27.92 -0.594 8 -25.88
+4 16 -20 8 40 -16 8 36 -16 8 -36 -20 8 -40
+3 16 3.064 8 -12.608 5.656 8 -14.344 2.26 8 -14.45
+4 16 -20 8 40 20 8 40 14.88 8 36 -16 8 36
+4 16 18.27 8 33.06 14.38 8 34.03 14.88 8 36 20 8 40
+4 16 -2.298 8 -25.544 -2.298 4 -25.544 -0.594 4 -25.88 -0.594 8 -25.88
+2 24 -2.298 4 -25.544 -0.594 4 -25.88
+2 24 -0.594 4 -25.88 -0.594 8 -25.88
+2 24 2.26 4 -14.45 -0.594 4 -25.88
+2 24 2.26 8 -14.45 2.26 4 -14.45
+4 16 2.26 8 -14.45 -0.594 8 -25.88 -0.594 4 -25.88 2.26 4 -14.45
+0
+
+0 FILE p/2-4ndis.dat
+0 Disc Negative 0.5
+0 Name: 2-4ndis.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-03-23 [sbliss] Added BFC statement; compacted code
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+3 16 0.9239 0 0.3827 1 0 0 1 0 1
+3 16 0.7071 0 0.7071 0.9239 0 0.3827 1 0 1
+3 16 0.3827 0 0.9239 0.7071 0 0.7071 1 0 1
+3 16 0 0 1 0.3827 0 0.9239 1 0 1
+3 16 -0.3827 0 0.9239 0 0 1 -1 0 1
+3 16 -0.7071 0 0.7071 -0.3827 0 0.9239 -1 0 1
+3 16 -0.9239 0 0.3827 -0.7071 0 0.7071 -1 0 1
+3 16 -1 0 0 -0.9239 0 0.3827 -1 0 1
+
+0 FILE p/2-4ring3.dat
+0 Ring  3 x 0.5
+0 Name: 2-4ring3.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1998-12-15 [PTadmin] Official Update 1998-10
+0 !HISTORY 2003-01-21 [cavehop] Update Added BFC and some header info
+0 !HISTORY 2003-03-12 [PTadmin] Official Update 2003-01
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+4 16 4 0 0 3.6956 0 1.5308 2.7717 0 1.1481 3 0 0
+4 16 3.6956 0 1.5308 2.8284 0 2.8284 2.1213 0 2.1213 2.7717 0 1.1481
+4 16 2.8284 0 2.8284 1.5308 0 3.6956 1.1481 0 2.7717 2.1213 0 2.1213
+4 16 1.5308 0 3.6956 0 0 4 0 0 3 1.1481 0 2.7717
+4 16 0 0 4 -1.5308 0 3.6956 -1.1481 0 2.7717 0 0 3
+4 16 -1.5308 0 3.6956 -2.8284 0 2.8284 -2.1213 0 2.1213 -1.1481 0 2.7717
+4 16 -2.8284 0 2.8284 -3.6956 0 1.5308 -2.7717 0 1.1481 -2.1213 0 2.1213
+4 16 -3.6956 0 1.5308 -4 0 0 -3 0 0 -2.7717 0 1.1481
+
+0 FILE p/2-4cyli.dat
+0 Cylinder 0.5
+0 Name: 2-4cyli.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2005-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-03-23 [sbliss] Added BFC statement; compacted code
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2004-12-11 [nielsk] Recreated using Primitive Generator, Edge lines fixed, BFC changed to CCW
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+4 16 .9239 1 .3827 .9239 0 .3827 1 0 0 1 1 0
+4 16 .7071 1 .7071 .7071 0 .7071 .9239 0 .3827 .9239 1 .3827
+4 16 .3827 1 .9239 .3827 0 .9239 .7071 0 .7071 .7071 1 .7071
+4 16 0 1 1 0 0 1 .3827 0 .9239 .3827 1 .9239
+4 16 -.3827 1 .9239 -.3827 0 .9239 0 0 1 0 1 1
+4 16 -.7071 1 .7071 -.7071 0 .7071 -.3827 0 .9239 -.3827 1 .9239
+4 16 -.9239 1 .3827 -.9239 0 .3827 -.7071 0 .7071 -.7071 1 .7071
+4 16 -1 1 0 -1 0 0 -.9239 0 .3827 -.9239 1 .3827
+5 24 1 1 0 1 0 0 1 1 -.4142 .9239 1 .3827
+5 24 .9239 1 .3827 .9239 0 .3827 1 1 0 .7071 1 .7071
+5 24 .7071 1 .7071 .7071 0 .7071 .9239 1 .3827 .3827 1 .9239
+5 24 .3827 1 .9239 .3827 0 .9239 .7071 1 .7071 0 1 1
+5 24 0 1 1 0 0 1 .3827 1 .9239 -.3827 1 .9239
+5 24 -.3827 1 .9239 -.3827 0 .9239 0 1 1 -.7071 1 .7071
+5 24 -.7071 1 .7071 -.7071 0 .7071 -.3827 1 .9239 -.9239 1 .3827
+5 24 -.9239 1 .3827 -.9239 0 .3827 -.7071 1 .7071 -1 1 0
+5 24 -1 1 0 -1 0 0 -.9239 1 .3827 -1 1 -.4142
+0
+
+0 FILE p/2-4disc.dat
+0 Disc 0.5
+0 Name: 2-4disc.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2002-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1998-12-15 [PTadmin] Official Update 1998-10
+0 !HISTORY 2002-03-23 [sbliss] Added BFC statement
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+3 16 0 0 0 1 0 0 0.9239 0 0.3827
+3 16 0 0 0 0.9239 0 0.3827 0.7071 0 0.7071
+3 16 0 0 0 0.7071 0 0.7071 0.3827 0 0.9239
+3 16 0 0 0 0.3827 0 0.9239 0 0 1
+3 16 0 0 0 0 0 1 -0.3827 0 0.9239
+3 16 0 0 0 -0.3827 0 0.9239 -0.7071 0 0.7071
+3 16 0 0 0 -0.7071 0 0.7071 -0.9239 0 0.3827
+3 16 0 0 0 -0.9239 0 0.3827 -1 0 -0
+0
+
+0 FILE p/stud4.dat
+0 Stud Tube Open
+0 Name: stud4.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2009-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1999-07-05 [PTadmin] Official Update 1999-05
+0 !HISTORY 2002-04-04 [sbliss] Modified for BFC compliance
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2009-06-21 [cwdee] Update ring references to 4-4ring
+0 !HISTORY 2009-09-03 [PTadmin] Official Update 2009-02
+
+1 16 0 -4 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+1 16 0 -4 0 8 0 0 0 1 0 0 0 8 p/4-4edge.dat
+1 16 0 0 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+1 16 0 0 0 8 0 0 0 1 0 0 0 8 p/4-4edge.dat
+0 BFC INVERTNEXT
+1 16 0 -4 0 6 0 0 0 4 0 0 0 6 p/4-4cyli.dat
+1 16 0 -4 0 8 0 0 0 4 0 0 0 8 p/4-4cyli.dat
+1 16 0 -4 0 2 0 0 0 1 0 0 0 2 p/4-4ring3.dat
+0
+
+0 FILE parts/30374.dat
+0 Bar  4L Lightsaber Blade
+0 Name: 30374.dat
+0 Author: Steve Bliss [sbliss]
+0 !LDRAW_ORG Part UPDATE 2018-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+0 !KEYWORDS minifig accessory, tool, saber, bar, star wars
+
+0 !HISTORY 2002-07-26 [sbliss] Corrected spacing in title, applied BFC
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-06-07 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2017-12-31 [cwdee] Correct lightsaber spelling
+0 !HISTORY 2018-01-30 [PTadmin] Official Update 2018-01
+
+1 16 0 0 0 4 0 0 0 1 0 0 0 4 p/4-4edge.dat
+1 16 0 80 0 4 0 0 0 1 0 0 0 4 p/4-4edge.dat
+1 16 0 0 0 4 0 0 0 1 0 0 0 4 p/4-4disc.dat
+1 16 0 0 0 4 0 0 0 80 0 0 0 4 p/4-4cyli.dat
+1 16 0 80 0 -4 0 0 0 -1 0 0 0 4 p/4-4disc.dat
+0
+
+0 FILE parts/3069b.dat
+0 Tile  1 x  2 with Groove
+0 Name: 3069b.dat
+0 Author: Santeri Piippo [arezey]
+0 !LDRAW_ORG Part UPDATE 2010-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2010-07-05 [PTadmin] Official Update 2010-02
+
+4 16 20 0 -10 20 0 10 -20 0 10 -20 0 -10
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 parts/s/3069bs01.dat
+0 //
+
+0 FILE parts/s/3069bs01.dat
+0 ~Tile  1 x  2 with Groove without Top Face
+0 Name: s\3069bs01.dat
+0 Author: Santeri Piippo [arezey]
+0 !LDRAW_ORG Subpart UPDATE 2010-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2010-07-05 [PTadmin] Official Update 2010-02
+
+1 16 0 0 0 20 0 0 0 7 0 0 0 10 p/box4.dat
+1 16 0 7 0 19 0 0 0 1 0 0 0 9 p/box4.dat
+0 BFC INVERTNEXT
+1 16 0 8 0 16 0 0 0 -4 0 0 0 6 p/box5.dat
+4 16 -19 8 9 -16 8 6 -16 8 -6 -19 8 -9
+4 16 19 8 -9 16 8 -6 16 8 6 19 8 9
+4 16 19 8 9 16 8 6 -16 8 6 -19 8 9
+4 16 -19 8 -9 -16 8 -6 16 8 -6 19 8 -9
+4 16 -20 7 10 -19 7 9 -19 7 -9 -20 7 -10
+4 16 20 7 -10 19 7 -9 19 7 9 20 7 10
+4 16 20 7 10 19 7 9 -19 7 9 -20 7 10
+4 16 -20 7 -10 -19 7 -9 19 7 -9 20 7 -10
+0 //
+
+0 FILE parts/2555.dat
+0 Tile  1 x  1 with Clip
+0 Name: 2555.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2013-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+
+0 !HISTORY 2003-11-13 [sbliss] Updated 3070 reference to 3070a
+0 !HISTORY 2003-11-13 [Steffen] BFCed
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-05-14 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2013-12-15 [MagFors] Added edge lines inside the clip
+0 !HISTORY 2013-12-23 [PTadmin] Official Update 2013-02
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 parts/3070a.dat
+
+2 24 10 0 4 -10 0 4
+2 24 10 0 -4 -10 0 -4
+4 16 -10 0 -4 -4 -2 -4 4 -2 -4 10 0 -4
+4 16 10 0 4 4 -2 4 -4 -2 4 -10 0 4
+1 16 0 -6 4 0 0 -4 4 0 0 0 -1 0 p/5-16ndis.dat
+1 16 0 -6 4 0 0 4 4 0 0 0 -1 0 p/5-16ndis.dat
+1 16 0 -6 -4 0 0 -4 4 0 0 0 1 0 p/5-16ndis.dat
+1 16 0 -6 -4 0 0 4 4 0 0 0 1 0 p/5-16ndis.dat
+0 BFC INVERTNEXT
+1 16 0 -6 4 0 0 -4 4 0 0 0 -8 0 p/5-16cylo.dat
+0 BFC INVERTNEXT
+1 16 0 -6 4 0 0 4 4 0 0 0 -8 0 p/5-16cylo.dat
+1 16 -3.8478 -8.7654 0 0 -1 -0.1522 0 0 -1.2346 -4 0 0 p/rect.dat
+1 16 3.8478 -8.7654 0 0 1 0.1522 0 0 -1.2346 4 0 0 p/rect.dat
+1 16 7 -5 0 0 2 -1 0 0 -5 -4 0 0 p/box2-7.dat
+1 16 -7 -5 0 0 -2 1 0 0 -5 4 0 0 p/box2-7.dat
+4 16 4 -2 -4 4 -6 -4 8 -10 -4 10 0 -4
+3 16 8 -10 -4 4 -6 -4 4 -10 -4
+4 16 -10 0 -4 -8 -10 -4 -4 -6 -4 -4 -2 -4
+3 16 -4 -10 -4 -4 -6 -4 -8 -10 -4
+4 16 10 0 4 8 -10 4 4 -6 4 4 -2 4
+3 16 4 -10 4 4 -6 4 8 -10 4
+4 16 -4 -2 4 -4 -6 4 -8 -10 4 -10 0 4
+3 16 -8 -10 4 -4 -6 4 -4 -10 4
+
+
+0 FILE p/box2-7.dat
+0 Box with 2 Faces without 7 Edges
+0 Name: box2-7.dat
+0 Author: Guy Vivan [guyvivan]
+0 !LDRAW_ORG Primitive UPDATE 2009-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2009-05-02 [PTadmin] Official Update 2009-01
+
+2 24 1 1 1 -1 1 1
+2 24 -1 -1 1 -1 1 1
+2 24 1 -1 1 1 1 1
+2 24 -1 1 -1 -1 1 1
+2 24 1 1 -1 1 1 1
+4 16 1 1 1 1 1 -1 -1 1 -1 -1 1 1
+4 16 1 1 1 -1 1 1 -1 -1 1 1 -1 1
+0
+
+0 FILE p/5-16cylo.dat
+0 Cylinder Open 0.3125
+0 Name: 5-16cylo.dat
+0 Author: Max Martin Richter [MMR1988]
+0 !LDRAW_ORG Primitive UPDATE 2013-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2013-07-21 [PTadmin] Official Update 2013-01
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 p/5-16cyli.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 p/5-16edge.dat
+1 16 0 1 0 1 0 0 0 1 0 0 0 1 p/5-16edge.dat
+
+0 FILE p/5-16edge.dat
+0 Circle 0.3125
+0 Name: 5-16edge.dat
+0 Author: Philippe Hurbain [Philo]
+0 !LDRAW_ORG Primitive UPDATE 2009-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
+
+2 24 1 0 0 0.9239 0 0.3827
+2 24 0.9239 0 0.3827 0.7071 0 0.7071
+2 24 0.7071 0 0.7071 0.3827 0 0.9239
+2 24 0.3827 0 0.9239 0 0 1
+2 24 0 0 1 -0.3827 0 0.9239
+
+0 end of file
+
+
+
+0 FILE p/5-16cyli.dat
+0 Cylinder 0.3125
+0 Name: 5-16cyli.dat
+0 Author: Philippe Hurbain [Philo]
+0 !LDRAW_ORG Primitive UPDATE 2009-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
+
+4 16 0.9239 0 0.3827 1 0 0 1 1 0 0.9239 1 0.3827
+4 16 0.7071 0 0.7071 0.9239 0 0.3827 0.9239 1 0.3827 0.7071 1 0.7071
+4 16 0.3827 0 0.9239 0.7071 0 0.7071 0.7071 1 0.7071 0.3827 1 0.9239
+4 16 0 0 1 0.3827 0 0.9239 0.3827 1 0.9239 0 1 1
+4 16 -0.3827 0 0.9239 0 0 1 0 1 1 -0.3827 1 0.9239
+
+0 conditional lines
+5 24 1 1 0 1 0 0 1 1 -0.4142 0.9239 1 0.3827
+5 24 0.9239 1 0.3827 0.9239 0 0.3827 1 1 0 0.7071 1 0.7071
+5 24 0.7071 1 0.7071 0.7071 0 0.7071 0.9239 1 0.3827 0.3827 1 0.9239
+5 24 0.3827 1 0.9239 0.3827 0 0.9239 0.7071 1 0.7071 0 1 1
+5 24 0 1 1 0 0 1 0.3827 1 0.9239 -0.3827 1 0.9239
+5 24 -0.3827 1 0.9239 -0.3827 0 0.9239 0 1 1 -0.7654 1 0.7654
+
+0 end of file
+
+
+
+0 FILE p/5-16ndis.dat
+0 Disc Negative 0.3125
+0 Name: 5-16ndis.dat
+0 Author: Max Martin Richter [MMR1988]
+0 !LDRAW_ORG Primitive UPDATE 2013-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2013-07-21 [PTadmin] Official Update 2013-01
+
+3 16 1 0 1 0.9239 0 0.3827 1 0 0
+3 16 1 0 1 0.7071 0 0.7071 0.9239 0 0.3827
+3 16 1 0 1 0.3827 0 0.9239 0.7071 0 0.7071
+3 16 1 0 1 0 0 1 0.3827 0 0.9239
+3 16 -1 0 1 -0.3827 0 0.9239 0 0 1
+0 // Build by Primitive Generator 2
+
+0 FILE parts/3070a.dat
+0 Tile  1 x  1 without Groove
+0 Name: 3070a.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2003-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+
+0 !HISTORY 2003-07-01 [Steffen] BFCed
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-10-13 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 0 8 0 10 0 0 0 -8 0 0 0 10 p/box4.dat
+0 BFC INVERTNEXT
+1 16 0 8 0 6 0 0 0 -4 0 0 0 6 p/box5.dat
+4 16 -10 8 10 -6 8 6 6 8 6 10 8 10
+4 16 -10 8 -10 -6 8 -6 -6 8 6 -10 8 10
+4 16 10 8 -10 6 8 -6 -6 8 -6 -10 8 -10
+4 16 10 8 10 6 8 6 6 8 -6 10 8 -10
+4 16 -10 0 10 10 0 10 10 0 -10 -10 0 -10
+0
+
+0 FILE parts/4589.dat
+0 Cone  1 x  1
+0 Name: 4589.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2010-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+0 !KEYWORDS round, pylon, 299.dat
+
+0 !HISTORY 1997-12-05 [PTadmin] Official Update 1997-17
+0 !HISTORY 1999-03-01 [sbliss] Replaced conic code with primitives. Cleaned up format.
+0 !HISTORY 2000-05-07 [PTadmin] Official Update 2000-01
+0 !HISTORY 2003-08-07 [jriley] BFC compliant
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-07-08 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2010-09-12 [mikeheide] changed references
+0 !HISTORY 2010-12-31 [PTadmin] Official Update 2010-03
+
+1 16 0 19 0 8 0 0 0 2.5 0 0 0 8 p/4-4edge.dat
+1 16 0 24 0 8 0 0 0 2.5 0 0 0 8 p/4-4edge.dat
+1 16 0 24 0 6 0 0 0 2.5 0 0 0 6 p/4-4edge.dat
+1 16 0 24 0 2 0 0 0 -2.5 0 0 0 2 p/4-4ring3.dat
+1 16 0 19 0 8 0 0 0 5 0 0 0 8 p/4-4cyli.dat
+0 BFC INVERTNEXT
+1 16 0 24 0 -6 0 0 0 -5 0 0 0 6 p/4-4cyli.dat
+0 BFC INVERTNEXT
+1 16 0 18 0 6 0 0 0 1 0 0 0 6 p/4-4cyli.dat
+1 16 0 12 0 1 0 0 0 6 0 0 0 1 p/axlehole.dat
+1 16 0 12 0 1 0 0 0 1 0 0 0 1 p/axlehol2.dat
+1 16 0 18 0 1 0 0 0 1 0 0 0 1 p/axlehol3.dat
+1 16 0 12 0 4 0 0 0 1 0 0 0 4 p/4-4edge.dat
+1 16 0 19 0 10 0 0 0 1 0 0 0 10 p/4-4edge.dat
+1 16 0 0 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+0 BFC INVERTNEXT
+1 16 0 0 0 4 0 0 0 12 0 0 0 4 p/4-4cyli.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 p/stud2a.dat
+1 16 0 19 0 -2 0 0 0 -1 0 0 0 2 p/4-4ring4.dat
+1 16 0 12 0 -2 0 0 0 -1 0 0 0 2 p/4-4ring2.dat
+1 16 0 9.5 0 -2 0 0 0 -9.5 0 0 0 2 p/4-4con3.dat
+1 16 0 19 0 0 0 -2 0 -9.5 0 -2 0 0 p/4-4con4.dat
+0 //
+
+0 FILE p/4-4ring4.dat
+0 Ring  4 x 1.0
+0 Name: 4-4ring4.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2009-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1998-12-15 [PTadmin] Official Update 1998-10
+0 !HISTORY 2002-04-08 [BrickCaster] Modified for BFC compliance
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2008-08-26 [cwdee] Switch polygon winding and rename
+0 !HISTORY 2009-05-02 [PTadmin] Official Update 2009-01
+
+4 16 -1.9135 0 4.6195 -1.5308 0 3.6956 0 0 4 0 0 5
+4 16 -3.5355 0 3.5355 -2.8284 0 2.8284 -1.5308 0 3.6956 -1.9135 0 4.6195
+4 16 -4.6195 0 1.9135 -3.6956 0 1.5308 -2.8284 0 2.8284 -3.5355 0 3.5355
+4 16 -5 0 0 -4 0 0 -3.6956 0 1.5308 -4.6195 0 1.9135
+4 16 -4.6195 0 -1.9135 -3.6956 0 -1.5308 -4 0 0 -5 0 0
+4 16 -3.5355 0 -3.5355 -2.8284 0 -2.8284 -3.6956 0 -1.5308 -4.6195 0 -1.9135
+4 16 -1.9135 0 -4.6195 -1.5308 0 -3.6956 -2.8284 0 -2.8284 -3.5355 0 -3.5355
+4 16 0 0 -5 0 0 -4 -1.5308 0 -3.6956 -1.9135 0 -4.6195
+4 16 1.9135 0 -4.6195 1.5308 0 -3.6956 0 0 -4 0 0 -5
+4 16 3.5355 0 -3.5355 2.8284 0 -2.8284 1.5308 0 -3.6956 1.9135 0 -4.6195
+4 16 4.6195 0 -1.9135 3.6956 0 -1.5308 2.8284 0 -2.8284 3.5355 0 -3.5355
+4 16 5 0 0 4 0 0 3.6956 0 -1.5308 4.6195 0 -1.9135
+4 16 4.6195 0 1.9135 3.6956 0 1.5308 4 0 0 5 0 0
+4 16 3.5355 0 3.5355 2.8284 0 2.8284 3.6956 0 1.5308 4.6195 0 1.9135
+4 16 1.9135 0 4.6195 1.5308 0 3.6956 2.8284 0 2.8284 3.5355 0 3.5355
+4 16 0 0 5 0 0 4 1.5308 0 3.6956 1.9135 0 4.6195
+0
+
+0 FILE p/axlehol3.dat
+0 Technic Axle Hole Tooth Outer Edges
+0 Name: axlehol3.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2003-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-11-08 [OrionP] Adjusted fit and precision
+0 !HISTORY 2003-03-12 [PTadmin] Official Update 2003-01
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+2 24 5.602 0 2    5.543 0 2.296
+2 24 5.543 0 2.296 4.243 0 4.243
+2 24 4.243 0 4.243 2.296 0 5.543
+2 24 2.296 0 5.543 2    0 5.602
+2 24 -5.602 0 2    -5.543 0 2.296
+2 24 -5.543 0 2.296 -4.243 0 4.243
+2 24 -4.243 0 4.243 -2.296 0 5.543
+2 24 -2.296 0 5.543 -2    0 5.602
+2 24 5.602 0 -2    5.543 0 -2.296
+2 24 5.543 0 -2.296 4.243 0 -4.243
+2 24 4.243 0 -4.243 2.296 0 -5.543
+2 24 2.296 0 -5.543 2    0 -5.602
+2 24 -5.602 0 -2    -5.543 0 -2.296
+2 24 -5.543 0 -2.296 -4.243 0 -4.243
+2 24 -4.243 0 -4.243 -2.296 0 -5.543
+2 24 -2.296 0 -5.543 -2    0 -5.602
+0
+
+0 FILE p/axlehol2.dat
+0 Technic Axle Hole Side Edges
+0 Name: axlehol2.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2003-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-11-08 [OrionP] Adjusted fit and precision
+0 !HISTORY 2003-03-12 [PTadmin] Official Update 2003-01
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+2 24 6  0 0      5.602 0 2
+2 24 2  0 5.602  0    0 6
+2 24 -6 0 0      -5.602 0 2
+2 24 -2 0 5.602  -0    0 6
+2 24 6  0 -0     5.602 0 -2
+2 24 2  0 -5.602 0    0 -6
+2 24 -6 0 -0     -5.602 0 -2
+2 24 -2 0 -5.602 -0    0 -6
+0
+
+0 FILE p/axlehole.dat
+0 Technic Axle Hole Closed
+0 Name: axlehole.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2005-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2000-04-23 [sbliss] Added conditional edges along outermost diameters
+0 !HISTORY 2000-05-07 [PTadmin] Official Update 2000-01
+0 !HISTORY 2002-05-08 [OrionP] Made BFC compliant
+0 !HISTORY 2002-08-18 [PTadmin] Official Update 2002-04
+0 !HISTORY 2002-11-08 [OrionP] Adjusted fit and precision
+0 !HISTORY 2003-03-12 [PTadmin] Official Update 2003-01
+0 !HISTORY 2005-05-15 [guyvivan] Use 1-8chrd.dat primitive and made BFC'ed CCW
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+5 24 6 0 0 6 1 0 5.602 0 2 5.602 0 -2
+5 24 0 0 6 0 1 6 2 0 5.602 -2 0 5.602
+5 24 -6 0 0 -6 1 0 -5.602 0 -2 -5.602 0 2
+5 24 0 0 -6 0 1 -6 -2 0 -5.602 2 0 -5.602
+2 24 5.602 0 2 2 0 2
+2 24 2 0 2 2 0 5.602
+2 24 -5.602 0 2 -2 0 2
+2 24 -2 0 2 -2 0 5.602
+2 24 5.602 0 -2 2 0 -2
+2 24 2 0 -2 2 0 -5.602
+2 24 -5.602 0 -2 -2 0 -2
+2 24 -2 0 -2 -2 0 -5.602
+2 24 5.602 1 2 2 1 2
+2 24 2 1 2 2 1 5.602
+2 24 -5.602 1 2 -2 1 2
+2 24 -2 1 2 -2 1 5.602
+2 24 5.602 1 -2 2 1 -2
+2 24 2 1 -2 2 1 -5.602
+2 24 -5.602 1 -2 -2 1 -2
+2 24 -2 1 -2 -2 1 -5.602
+2 24 5.602 0 2 5.602 1 2
+2 24 2 0 2 2 1 2
+2 24 2 0 5.602 2 1 5.602
+2 24 -5.602 0 2 -5.602 1 2
+2 24 -2 0 2 -2 1 2
+2 24 -2 0 5.602 -2 1 5.602
+2 24 5.602 0 -2 5.602 1 -2
+2 24 2 0 -2 2 1 -2
+2 24 2 0 -5.602 2 1 -5.602
+2 24 -5.602 0 -2 -5.602 1 -2
+2 24 -2 0 -2 -2 1 -2
+2 24 -2 0 -5.602 -2 1 -5.602
+4 16 5.602 0 2 5.602 1 2 6 1 0 6 0 0
+4 16 2 0 2 2 1 2 5.602 1 2 5.602 0 2
+4 16 2 0 5.602 2 1 5.602 2 1 2 2 0 2
+4 16 0 0 6 0 1 6 2 1 5.602 2 0 5.602
+4 16 -6 1 0 -5.602 1 2 -5.602 0 2 -6 0 0
+4 16 -5.602 1 2 -2 1 2 -2 0 2 -5.602 0 2
+4 16 -2 1 2 -2 1 5.602 -2 0 5.602 -2 0 2
+4 16 -2 1 5.602 0 1 6 0 0 6 -2 0 5.602
+4 16 6 1 0 5.602 1 -2 5.602 0 -2 6 0 0
+4 16 5.602 1 -2 2 1 -2 2 0 -2 5.602 0 -2
+4 16 2 1 -2 2 1 -5.602 2 0 -5.602 2 0 -2
+4 16 2 1 -5.602 0 1 -6 0 0 -6 2 0 -5.602
+4 16 -5.602 0 -2 -5.602 1 -2 -6 1 0 -6 0 0
+4 16 -2 0 -2 -2 1 -2 -5.602 1 -2 -5.602 0 -2
+4 16 -2 0 -5.602 -2 1 -5.602 -2 1 -2 -2 0 -2
+4 16 0 0 -6 0 1 -6 -2 1 -5.602 -2 0 -5.602
+3 16 2 0 -2 5.543 0 -2.296 5.602 0 -2
+3 16 2 0 -2 2 0 -5.602 2.296 0 -5.543
+3 16 -5.602 0 -2 -5.543 0 -2.296 -2 0 -2
+3 16 -2.296 0 -5.543 -2 0 -5.602 -2 0 -2
+3 16 5.602 0 2 5.543 0 2.296 2 0 2
+3 16 2.296 0 5.543 2 0 5.602 2 0 2
+3 16 -2 0 2 -5.543 0 2.296 -5.602 0 2
+3 16 -2 0 2 -2 0 5.602 -2.296 0 5.543
+3 16 5.602 1 -2 5.543 1 -2.296 2 1 -2
+3 16 2.296 1 -5.543 2 1 -5.602 2 1 -2
+3 16 -2 1 -2 -5.543 1 -2.296 -5.602 1 -2
+3 16 -2 1 -2 -2 1 -5.602 -2.296 1 -5.543
+3 16 2 1 2 5.543 1 2.296 5.602 1 2
+3 16 2 1 2 2 1 5.602 2.296 1 5.543
+3 16 -5.602 1 2 -5.543 1 2.296 -2 1 2
+3 16 -2.296 1 5.543 -2 1 5.602 -2 1 2
+3 16 2 0 -2 2.296 0 -5.543 5.543 0 -2.296
+1 16 0 0 0 5.54328 0 -2.2961 0 1 0 2.2961 0 5.54328 p/1-8chrd.dat
+3 16 -2 0 -2 -5.543 0 -2.296 -2.296 0 -5.543
+1 16 0 0 0 -2.2961 0 -5.54328 0 1 0 5.54328 0 -2.2961 p/1-8chrd.dat
+3 16 -2 0 2 -2.296 0 5.543 -5.543 0 2.296
+1 16 0 0 0 -5.54328 0 2.2961 0 1 0 -2.2961 0 -5.54328 p/1-8chrd.dat
+3 16 2 0 2 5.543 0 2.296 2.296 0 5.543
+1 16 0 0 0 2.2961 0 5.54328 0 1 0 -5.54328 0 2.2961 p/1-8chrd.dat
+3 16 2 1 2 2.296 1 5.543 5.543 1 2.296
+1 16 0 1 0 5.54328 0 -2.2961 0 -1 0 -2.2961 0 -5.54328 p/1-8chrd.dat
+3 16 -2 1 2 -5.543 1 2.296 -2.296 1 5.543
+1 16 0 1 0 -2.2961 0 -5.54328 0 -1 0 -5.54328 0 2.2961 p/1-8chrd.dat
+3 16 -2 1 -2 -2.296 1 -5.543 -5.543 1 -2.296
+1 16 0 1 0 -5.54328 0 2.2961 0 -1 0 2.2961 0 5.54328 p/1-8chrd.dat
+3 16 2 1 -2 5.543 1 -2.296 2.296 1 -5.543
+1 16 0 1 0 2.2961 0 5.54328 0 -1 0 5.54328 0 -2.2961 p/1-8chrd.dat
+0
+
+0 FILE p/1-8chrd.dat
+0 Chord 0.125
+0 Name: 1-8chrd.dat
+0 Author: Andy Westrate [westrate]
+0 !LDRAW_ORG Primitive UPDATE 2004-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2004-04-22 [PTadmin] Official Update 2004-02
+0 !HISTORY 2007-06-22 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+3 16 0.7071 0 0.7071 1 0 0 0.9239 0 0.3827
+
+0
+
+0 FILE parts/4871.dat
+0 Slope Brick 45  4 x  2 Double Inverted with Open Centre
+0 Name: 4871.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2016-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CW
+
+0 !HISTORY 2002-09-13 [izanette] Modified with WINDZ for BFC compliance
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-07-09 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2008-10-16 [mkennedy] Made use of stud2s, stug2, more box and rect primitives.
+0 !HISTORY 2008-11-02 [mikeheide] improved underside with box3u6.dat,stud4f2w.dat,box4o8a.dat and rect.dat
+0 !HISTORY 2012-08-09 [PTadmin] Official Update 2012-02
+0 !HISTORY 2016-01-03 [mikeheide] Changed word center to centre
+0 !HISTORY 2016-12-31 [PTadmin] Official Update 2016-01
+
+1 16 0 20 0 0 0 1 0 -1 0 1 0 0 p/stud4f2w.dat
+1 16 0 20 0 0 0 6 0 -1 0 6 0 0 p/4-4edge.dat
+1 16 0 20 12 0 0 2 0 4 0 4 0 0 p/box3u6.dat
+1 16 0 20 -12 0 0 -2 0 4 0 -4 0 0 p/box3u6.dat
+0 BFC INVERTNEXT
+1 16 0 24 0 16 0 0 0 -4 0 0 0 16 p/box4o8a.dat
+1 16 0 20 0 16 0 0 0 -4 0 0 0 16 p/rect.dat
+4 16 -20 24 20 -16 24 16 16 24 16 20 24 20
+4 16 -20 24 -20 -16 24 -16 -16 24 16 -20 24 20
+4 16 20 24 -20 16 24 -16 -16 24 -16 -20 24 -20
+4 16 20 24 20 16 24 16 16 24 -16 20 24 -20
+2 24 20 24 -20 20 24 20
+2 24 -20 24 -20 -20 24 20
+2 24 -20 0 20 -20 0 40
+2 24 20 0 40 20 0 20
+2 24 -20 0 -20 -20 0 -40
+2 24 20 0 -40 20 0 -20
+2 24 -18 0 22 -18 0 38
+2 24 18 0 38 18 0 22
+2 24 -18 0 -22 -18 0 -38
+2 24 18 0 -38 18 0 -22
+1 16 -10 4 30 0 0 1 0 6 0 1 0 0 p/stud2s.dat
+1 16 10 4 30 0 0 1 0 6 0 1 0 0 p/stud2s.dat
+1 16 -10 4 -30 0 0 1 0 6 0 -1 0 0 p/stud2s.dat
+1 16 10 4 -30 0 0 1 0 6 0 -1 0 0 p/stud2s.dat
+4 16 20 0 20 20 0 40 20 4 40 20 24 20
+4 16 20 4 -40 20 0 -40 20 0 -20 20 24 -20
+4 16 -20 4 40 -20 0 40 -20 0 20 -20 24 20
+4 16 -20 0 -20 -20 0 -40 -20 4 -40 -20 24 -20
+4 16 18 0 38 18 0 22 18 18 22 18 2 38
+4 16 18 18 -22 18 0 -22 18 0 -38 18 2 -38
+4 16 -18 18 22 -18 0 22 -18 0 38 -18 2 38
+4 16 -18 0 -38 -18 0 -22 -18 18 -22 -18 2 -38
+1 16 0 24 0 0 0 20 0 -8 0 20 0 0 p/box3u8p.dat
+1 16 0 8 20 20 0 0 0 0 8 0 1 0 p/rect.dat
+1 16 0 8 -20 20 0 0 0 0 8 0 -1 0 p/rect.dat
+1 16 0 12 30 20 0 0 0 2 -10 0 0 10 p/box2-5.dat
+1 16 0 12 -30 20 0 0 0 2 -10 0 0 -10 p/box2-5.dat
+0 BFC INVERTNEXT
+1 16 0 9 30 18 0 0 0 1 -8 0 0 8 p/box2-5.dat
+0 BFC INVERTNEXT
+1 16 0 9 -30 18 0 0 0 1 -8 0 0 -8 p/box2-5.dat
+1 16 0 9 22 18 0 0 0 0 -9 0 -1 0 p/rect3.dat
+1 16 0 9 -22 18 0 0 0 0 -9 0 1 0 p/rect3.dat
+4 16 18 0 38 -18 0 38 -20 0 40 20 0 40
+4 16 -18 0 38 -18 0 22 -20 0 20 -20 0 40
+4 16 -18 0 22 18 0 22 20 0 20 -20 0 20
+4 16 18 0 22 18 0 38 20 0 40 20 0 20
+4 16 -20 0 -40 -18 0 -38 18 0 -38 20 0 -40
+4 16 -20 0 -20 -18 0 -22 -18 0 -38 -20 0 -40
+4 16 20 0 -20 18 0 -22 -18 0 -22 -20 0 -20
+4 16 20 0 -40 18 0 -38 18 0 -22 20 0 -20
+1 16 0 16 0 1 0 0 0 1 0 0 0 1 p/stug-2x2.dat
+1 16 10 4 30 1 0 0 0 2 0 0 0 1 p/stud2a.dat
+1 16 -10 4 30 1 0 0 0 2 0 0 0 1 p/stud2a.dat
+1 16 10 4 -30 1 0 0 0 2 0 0 0 1 p/stud2a.dat
+1 16 -10 4 -30 1 0 0 0 2 0 0 0 1 p/stud2a.dat
+2 24 -16 24 16 -16 24 -16
+2 24 16 24 16 16 24 -16
+2 24 2 24 -16 16 24 -16
+2 24 -16 24 -16 -2 24 -16
+2 24 2 24 16 16 24 16
+2 24 -16 24 16 -2 24 16
+
+0 FILE p/stug-2x2.dat
+0 Stud Group  2 x  2
+0 Name: stug-2x2.dat
+0 Author: Steffen [Steffen]
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-05-04 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2011-07-01 [PTadmin] Renamed from stug2
+0 !HISTORY 2011-07-25 [PTadmin] Official Update 2011-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+1 16 -10 0 -10 1 0 0 0 1 0 0 0 1 p/stud.dat
+1 16 10 0 -10 1 0 0 0 1 0 0 0 1 p/stud.dat
+1 16 -10 0 10 1 0 0 0 1 0 0 0 1 p/stud.dat
+1 16 10 0 10 1 0 0 0 1 0 0 0 1 p/stud.dat
+
+0 FILE p/rect3.dat
+0 Rectangle with 3 Edges
+0 Name: rect3.dat
+0 Author: Mark Kennedy [mkennedy]
+0 !LDRAW_ORG Primitive UPDATE 2010-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2010-01-17 [mikeheide] Change winding to CCW
+0 !HISTORY 2010-04-05 [PTadmin] Official Update 2010-01
+
+2 24 1 0 1 -1 0 1
+2 24 1 0 1 1 0 -1
+2 24 -1 0 1 -1 0 -1
+4 16 -1 0 1 -1 0 -1 1 0 -1 1 0 1
+0 //
+
+0 FILE p/box2-5.dat
+0 Box with 2 Faces without 5 Edges
+0 Name: box2-5.dat
+0 Author: Steffen [Steffen]
+0 !LDRAW_ORG Primitive UPDATE 2003-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+2 24 1 1 1 -1 1 1
+2 24 1 1 -1 -1 1 -1
+2 24 1 -1 1 -1 -1 1
+2 24 -1 -1 1 -1 1 1
+2 24 1 -1 1 1 1 1
+2 24 -1 1 -1 -1 1 1
+2 24 1 1 -1 1 1 1
+4 16 1 1 1 1 1 -1 -1 1 -1 -1 1 1
+4 16 1 1 1 -1 1 1 -1 -1 1 1 -1 1
+0
+
+0 FILE p/box3u8p.dat
+0 Box with 3 Faces and 4 Parallel Edges
+0 Name: box3u8p.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-12-13 [hafhead] Made BFC compliant
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+2 24 1 1 1 -1 1 1
+2 24 -1 1 -1 1 1 -1
+2 24 1 0 1 -1 0 1 
+2 24 -1 0 -1 1 0 -1
+4 16 1 1 -1 -1 1 -1 -1 1 1 1 1 1
+4 16 -1 1 1 -1 0 1 1 0 1 1 1 1
+4 16 1 1 -1 1 0 -1 -1 0 -1 -1 1 -1
+
+0 FILE p/stud2s.dat
+0 Stud Tube Open Sliced
+0 Name: stud2s.dat
+0 Author: Dee Earley [DeannaEarley]
+0 !LDRAW_ORG Primitive UPDATE 2009-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2006-02-20 [guyvivan] Adjust precision
+0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
+
+1 16 0 0 0 6 0 0 0 1 0 0 0 6 p/4-4cyls.dat
+0 BFC INVERTNEXT
+1 16 0 0.333 0 4 0 0 0 0.667 0 0 0 4 p/4-4cyls.dat
+0 BFC INVERTNEXT
+1 16 0 0 0 4 0 0 0 0.333 0 0 0 4 p/4-4cyli.dat
+1 16 0 1 0 4 0 0 -0.667 1 0 0 0 4 p/4-4edge.dat
+1 16 0 1 0 6 0 0 -1 1 0 0 0 6 p/4-4edge.dat
+
+0 FILE p/4-4cyls.dat
+0 Cylinder Sloped 1.0
+0 Name: 4-4cyls.dat
+0 Author: Donald Sutter [technog]
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+3 16 0.9239 0.0761 0.3827 0.9239 0 0.3827 1 0 0
+5 24 0.9239 0 0.3827 0.9239 0.0761 0.3827 0.7071 0 0.7071 1 0 0
+4 16 0.9239 0.0761 0.3827 0.7071 0.2929 0.7071 0.7071 0 0.7071 0.9239 0 0.3827
+5 24 0.7071 0 0.7071 0.7071 0.2929 0.7071 0.3827 0 0.9239 0.9239 0 0.3827
+4 16 0.7071 0.2929 0.7071 0.3827 0.6173 0.9239 0.3827 0 0.9239 0.7071 0 0.7071
+5 24 0.3827 0 0.9239 0.3827 0.6173 0.9239 0 0 1 0.7071 0 0.7071
+4 16 0.3827 0.6173 0.9239 0 1 1 0 0 1 0.3827 0 0.9239
+5 24 0 0 1 0 1 1 -0.3827 0 0.9239 0.3827 0 0.9239
+4 16 0 1 1 -0.3827 1.3827 0.9239 -0.3827 0 0.9239 0 0 1
+5 24 -0.3827 0 0.9239 -0.3827 1.3827 0.9239 -0.7071 0 0.7071 0 0 1
+4 16 -0.3827 1.3827 0.9239 -0.7071 1.7071 0.7071 -0.7071 0 0.7071 -0.3827 0 0.9239
+5 24 -0.7071 0 0.7071 -0.7071 1.7071 0.7071 -0.9239 0 0.3827 -0.3827 0 0.9239
+4 16 -0.7071 1.7071 0.7071 -0.9239 1.9239 0.3827 -0.9239 0 0.3827 -0.7071 0 0.7071
+5 24 -0.9239 0 0.3827 -0.9239 1.9239 0.3827 -1 0 0 -0.7071 0 0.7071
+4 16 -0.9239 1.9239 0.3827 -1 2 0 -1 0 0 -0.9239 0 0.3827
+5 24 -1 0 0 -1 2 0 -0.9239 0 -0.3827 -0.9239 0 0.3827
+4 16 -1 2 0 -0.9239 1.9239 -0.3827 -0.9239 0 -0.3827 -1 0 0
+5 24 -0.9239 0 -0.3827 -0.9239 1.9239 -0.3827 -1 0 0 -0.7071 0 -0.7071
+4 16 -0.9239 1.9239 -0.3827 -0.7071 1.7071 -0.7071 -0.7071 0 -0.7071 -0.9239 0 -0.3827
+5 24 -0.7071 0 -0.7071 -0.7071 1.7071 -0.7071 -0.9239 0 -0.3827 -0.3827 0 -0.9239
+4 16 -0.7071 1.7071 -0.7071 -0.3827 1.3827 -0.9239 -0.3827 0 -0.9239 -0.7071 0 -0.7071
+5 24 -0.3827 0 -0.9239 -0.3827 1.3827 -0.9239 -0.7071 0 -0.7071 0 0 -1
+4 16 -0.3827 1.3827 -0.9239 0 1 -1 0 0 -1 -0.3827 0 -0.9239
+5 24 0 0 -1 0 1 -1 -0.3827 0 -0.9239 0.3827 0 -0.9239
+4 16 0 1 -1 0.3827 0.6173 -0.9239 0.3827 0 -0.9239 0 0 -1
+5 24 0.3827 0 -0.9239 0.3827 0.6173 -0.9239 0 0 -1 0.7071 0 -0.7071
+4 16 0.3827 0.6173 -0.9239 0.7071 0.2929 -0.7071 0.7071 0 -0.7071 0.3827 0 -0.9239
+5 24 0.7071 0 -0.7071 0.7071 0.2929 -0.7071 0.3827 0 -0.9239 0.9239 0 -0.3827
+4 16 0.7071 0.2929 -0.7071 0.9239 0.0761 -0.3827 0.9239 0 -0.3827 0.7071 0 -0.7071
+5 24 0.9239 0 -0.3827 0.9239 0.0761 -0.3827 0.7071 0 -0.7071 1 0 0
+3 16 0.9239 0 -0.3827 0.9239 0.0761 -0.3827 1 0 0
+
+0 FILE p/rect.dat
+0 Rectangle
+0 Name: rect.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2010-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-04-05 [hafhead] Added BFC statement
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2010-01-17 [mikeheide] changed winding to CCW
+0 !HISTORY 2010-04-05 [PTadmin] Official Update 2010-01
+
+2 24 1 0 1 -1 0 1
+2 24 -1 0 1 -1 0 -1
+2 24 -1 0 -1 1 0 -1
+2 24 1 0 -1 1 0 1
+4 16 -1 0 1 -1 0 -1 1 0 -1 1 0 1
+0
+
+0 FILE p/box4o8a.dat
+0 Box with 4 Faces (2 Parallel Pairs) without Top and Bottom Edges
+0 Name: box4o8a.dat
+0 Author: Steffen [Steffen]
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2004-04-22 [PTadmin] Official Update 2004-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+2 24 1 0 1 1 1 1
+2 24 -1 0 1 -1 1 1
+2 24 1 0 -1 1 1 -1
+2 24 -1 0 -1 -1 1 -1
+4 16 -1 1 1 -1 0 1 1 0 1 1 1 1
+4 16 -1 1 -1 -1 0 -1 -1 0 1 -1 1 1
+4 16 1 1 -1 1 0 -1 -1 0 -1 -1 1 -1
+4 16 1 1 1 1 0 1 1 0 -1 1 1 -1
+
+0 FILE p/box3u6.dat
+0 Box with 3 Faces without 6 Edges
+0 Name: box3u6.dat
+0 Author: William Howard [WilliamH]
+0 !LDRAW_ORG Primitive UPDATE 2011-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2011-07-25 [PTadmin] Official Update 2011-01
+
+2 24 1 1 1 -1 1 1
+2 24 -1 1 -1 1 1 -1
+2 24 1 0 1 -1 0 1
+2 24 -1 0 -1 1 0 -1
+2 24 1 1 1 1 0 1
+2 24 1 1 -1 1 0 -1
+4 16 -1 1 -1 -1 1 1 1 1 1 1 1 -1
+4 16 -1 1 1 -1 0 1 1 0 1 1 1 1
+4 16 1 1 -1 1 0 -1 -1 0 -1 -1 1 -1
+0
+
+0 FILE p/stud4f2w.dat
+0 Stud Tube Open with  2 Fillets Wide Opposite
+0 Name: stud4f2w.dat
+0 Author: William Howard [WilliamH]
+0 !LDRAW_ORG Primitive UPDATE 2012-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2012-04-06 [MagFors] subfiled fillet
+0 !HISTORY 2012-08-09 [PTadmin] Official Update 2012-02
+
+1 16 0 -4 0 6 0 0 0 5 0 0 0 -6 p/4-4edge.dat
+1 16 0 -4 0 7.3912 0 -3.0616 0 1 0 -3.0616 0 -7.3912 p/3-8edge.dat
+1 16 0 -4 0 -7.3912 0 3.0616 0 1 0 3.0616 0 7.3912 p/3-8edge.dat
+1 16 0 0 0 7.3912 0 -3.0616 0 1 0 -3.0616 0 -7.3912 p/3-8edge.dat
+1 16 0 0 0 -7.3912 0 3.0616 0 1 0 3.0616 0 7.3912 p/3-8edge.dat
+0 BFC INVERTNEXT
+1 16 0 -4 0 6 0 0 0 4 0 0 0 -6 p/4-4cyli.dat
+1 16 0 -4 0 7.3912 0 -3.0616 0 4 0 -3.0616 0 -7.3912 p/3-8cyli.dat
+1 16 0 -4 0 -7.3912 0 3.0616 0 4 0 3.0616 0 7.3912 p/3-8cyli.dat
+1 16 0 -4 0 1.8478 0 -0.7654 0 1 0 0.7654 0 1.8478 p/3-8ring3.dat
+1 16 0 -4 0 -1.8478 0 0.7654 0 1 0 -0.7654 0 -1.8478 p/3-8ring3.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 p/st4jfil4.dat
+1 16 0 0 0 -1 0 0 0 1 0 0 0 -1 p/st4jfil4.dat
+
+0 FILE p/st4jfil4.dat
+0 Stud Tube Open to Fillet Wide (4LDu) Joint
+0 Name: st4jfil4.dat
+0 Author: Magnus Forsberg [MagFors]
+0 !LDRAW_ORG Primitive UPDATE 2012-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2012-08-09 [PTadmin] Official Update 2012-02
+
+0 // 1 16 0 -4 0 8 0 0 0 1 0 0 0 8 4-4edge.dat
+
+2 24 7.3912 -4 -3.0616 7.602 -4 -2
+2 24 7.602 -4 -2 8 -4 -2
+4 16 7.3912 -4 -3.0616 7.602 -4 -2 6 -4 0 5.5433 -4 -2.2961
+2 24 7.3912 0 -3.0616 7.602 0 -2
+2 24 7.602 0 -2 8 0 -2
+2 24 7.602 0 -2 7.602 -4 -2
+4 16 7.3912 0 -3.0616 7.602 0 -2 7.602 -4 -2 7.3912 -4 -3.0616
+4 16 7.602 0 -2 8 0 -2 8 -4 -2 7.602 -4 -2
+2 24 7.3912 -4 3.0616 7.602 -4 2
+2 24 7.602 -4 2 8 -4 2
+4 16 5.5433 -4 2.2961 6 -4 0 7.602 -4 2 7.3912 -4 3.0616
+2 24 7.3912 0 3.0616 7.602 0 2
+2 24 7.602 0 2 8 0 2
+2 24 7.602 0 2 7.602 -4 2
+4 16 7.3912 -4 3.0616 7.602 -4 2 7.602 0 2 7.3912 0 3.0616
+4 16 7.602 -4 2 8 -4 2 8 0 2 7.602 0 2
+3 16 6 -4 0 7.602 -4 -2 7.602 -4 2
+4 16 7.602 -4 -2 8 -4 -2 8 -4 2 7.602 -4 2
+5 24 7.3912 0 -3.0616 7.3912 -4 -3.0616 8 0 0 5.6568 0 -5.6568
+5 24 7.3912 0 3.0616 7.3912 -4 3.0616 8 0 0 5.6568 0 5.6568
+
+
+0 FILE p/3-8ring3.dat
+0 Ring  3 x 0.375
+0 Name: 3-8ring3.dat
+0 Author: Niels Karsdorp [nielsk]
+0 !LDRAW_ORG Primitive UPDATE 2005-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2004-11-10 [nielsk] changed to CCW
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+4 16 4 0 0 3.6956 0 1.5308 2.7717 0 1.1481 3 0 0
+4 16 3.6956 0 1.5308 2.8284 0 2.8284 2.1213 0 2.1213 2.7717 0 1.1481
+4 16 2.8284 0 2.8284 1.5308 0 3.6956 1.1481 0 2.7717 2.1213 0 2.1213
+4 16 1.5308 0 3.6956 0 0 4 0 0 3 1.1481 0 2.7717
+4 16 0 0 4 -1.5308 0 3.6956 -1.1481 0 2.7717 0 0 3
+4 16 -1.5308 0 3.6956 -2.8284 0 2.8284 -2.1213 0 2.1213 -1.1481 0 2.7717
+0
+
+0 FILE p/3-8cyli.dat
+0 Cylinder 0.375
+0 Name: 3-8cyli.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2005-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-05-08 [OrionP] Made BFC compliant
+0 !HISTORY 2002-08-18 [PTadmin] Official Update 2002-04
+0 !HISTORY 2004-12-11 [nielsk] Recreated using Primitive Generator, Edge lines fixed, BFC changed to CCW
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+4 16 .9239 1 .3827 .9239 0 .3827 1 0 0 1 1 0
+4 16 .7071 1 .7071 .7071 0 .7071 .9239 0 .3827 .9239 1 .3827
+4 16 .3827 1 .9239 .3827 0 .9239 .7071 0 .7071 .7071 1 .7071
+4 16 0 1 1 0 0 1 .3827 0 .9239 .3827 1 .9239
+4 16 -.3827 1 .9239 -.3827 0 .9239 0 0 1 0 1 1
+4 16 -.7071 1 .7071 -.7071 0 .7071 -.3827 0 .9239 -.3827 1 .9239
+5 24 1 1 0 1 0 0 1 1 -.4142 .9239 1 .3827
+5 24 .9239 1 .3827 .9239 0 .3827 1 1 0 .7071 1 .7071
+5 24 .7071 1 .7071 .7071 0 .7071 .9239 1 .3827 .3827 1 .9239
+5 24 .3827 1 .9239 .3827 0 .9239 .7071 1 .7071 0 1 1
+5 24 0 1 1 0 0 1 .3827 1 .9239 -.3827 1 .9239
+5 24 -.3827 1 .9239 -.3827 0 .9239 0 1 1 -.7071 1 .7071
+5 24 -.7071 1 .7071 -.7071 0 .7071 -.3827 1 .9239 -1 1 .4142
+0
+
+0 FILE p/3-8edge.dat
+0 Circle 0.375
+0 Name: 3-8edge.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2017-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2017-01-15 [Steffen] BFCed
+0 !HISTORY 2017-12-30 [PTadmin] Official Update 2017-01
+
+2 24 1 0 0 0.9239 0 0.3827
+2 24 0.9239 0 0.3827 0.7071 0 0.7071
+2 24 0.7071 0 0.7071 0.3827 0 0.9239
+2 24 0.3827 0 0.9239 0 0 1
+2 24 0 0 1 -0.3827 0 0.9239
+2 24 -0.3827 0 0.9239 -0.7071 0 0.7071
+
+0 FILE parts/4623.dat
+0 Plate  1 x  2 with Vertical Bar on Long Side and Long Arm
+0 Name: 4623.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2011-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+0 !KEYWORDS hook, handle
+
+0 !HISTORY 2004-10-09 [guyvivan] Made BFC Compliant
+0 !HISTORY 2004-11-06 [PTadmin] Official Update 2004-04
+0 !HISTORY 2007-07-08 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2011-12-18 [cwdee] Update description to distinguish from 88072
+0 !HISTORY 2011-12-29 [PTadmin] Official Update 2011-02
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 parts/3023.dat
+1 16 0 4 -10 4 0 0 0 0 4 0 1 0 p/4-4edge.dat
+1 16 0 -16 -22 4 0 0 0 1 0 0 0 4 p/4-4edge.dat
+1 16 0 4 -22 4 0 0 0 1 -4 0 0 4 p/2-4edge.dat
+1 16 0 -16 -22 4 0 0 0 1 0 0 0 4 p/4-4disc.dat
+1 16 0 4 -22 4 0 0 0 4 0 0 0 -4 p/2-8sphe.dat
+1 16 0 4 -10 4 0 0 0 0 4 0 -12 0 p/4-4cyli.dat
+1 16 0 -16 -22 4 0 0 0 20 0 0 0 4 p/4-4cyli.dat
+0
+
+0 FILE p/2-8sphe.dat
+0 Sphere 0.25
+0 Name: 2-8sphe.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2003-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-08-31 [izanette] Modified with WINDZ for BFC compliance
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 p/1-8sphe.dat
+1 16 0 0 0 -1 0 0 0 1 0 0 0 1 p/1-8sphe.dat
+0
+
+
+
+0 FILE p/1-8sphe.dat
+0 Sphere 0.125
+0 Name: 1-8sphe.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2012-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2000-08-01 {Axel Poque} fixes to resolve L3P error messages.
+0 !HISTORY 2000-08-01 {Manfred Moolhuysen} fixes to resolve L3P error messages.
+0 !HISTORY 2000-09-30 [PTadmin] Official Update 2000-02
+0 !HISTORY 2002-03-28 [hafhead] Made BFC compliant
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-22 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2010-09-12 [MagFors] Changed winding, removed duplicated cond-line, optimized filesize
+0 !HISTORY 2010-12-31 [PTadmin] Official Update 2010-03
+0 !HISTORY 2012-07-01 [tcobbs] Replaced with geometry from LDView
+0 !HISTORY 2012-12-28 [PTadmin] Official Update 2012-03
+
+3 16 1 0 0 0.9239 0.3827 0 0.9239 0 0.3827
+3 16 0.9239 0.3827 0 0.7836 0.4393 0.4393 0.9239 0 0.3827
+3 16 0.9239 0 0.3827 0.7836 0.4393 0.4393 0.7071 0 0.7071
+3 16 0.7836 0.4393 0.4393 0.4393 0.4393 0.7836 0.7071 0 0.7071
+3 16 0.7071 0 0.7071 0.4393 0.4393 0.7836 0.3827 0 0.9239
+3 16 0.4393 0.4393 0.7836 0 0.3827 0.9239 0.3827 0 0.9239
+3 16 0.3827 0 0.9239 0 0.3827 0.9239 0 0 1
+3 16 0.9239 0.3827 0 0.7071 0.7071 0 0.7836 0.4393 0.4393
+3 16 0.7071 0.7071 0 0.4393 0.7836 0.4393 0.7836 0.4393 0.4393
+3 16 0.7836 0.4393 0.4393 0.4393 0.7836 0.4393 0.4393 0.4393 0.7836
+3 16 0.4393 0.7836 0.4393 0 0.7071 0.7071 0.4393 0.4393 0.7836
+3 16 0.4393 0.4393 0.7836 0 0.7071 0.7071 0 0.3827 0.9239
+3 16 0.7071 0.7071 0 0.3827 0.9239 0 0.4393 0.7836 0.4393
+3 16 0.3827 0.9239 0 0 0.9239 0.3827 0.4393 0.7836 0.4393
+3 16 0.4393 0.7836 0.4393 0 0.9239 0.3827 0 0.7071 0.7071
+3 16 0.3827 0.9239 0 0 1 0 0 0.9239 0.3827
+
+5 24 1 0 0 0.9239 0.3827 0 1 0 -0.1 0.9239 0 0.3827
+5 24 0.9239 0.3827 0 0.9239 0 0.3827 1 0 0 0.7836 0.4393 0.4393
+5 24 1 0 0 0.9239 0 0.3827 0.9239 0.3827 0 1 -0.1 0
+5 24 0.9239 0 0.3827 0.7836 0.4393 0.4393 0.9239 0.3827 0 0.7071 0 0.7071
+5 24 0.7836 0.4393 0.4393 0.7071 0 0.7071 0.9239 0 0.3827 0.4393 0.4393 0.7836
+5 24 0.9239 0 0.3827 0.7071 0 0.7071 0.7836 0.4393 0.4393 0.9239 -0.1 0.3827
+5 24 0.7071 0 0.7071 0.4393 0.4393 0.7836 0.7836 0.4393 0.4393 0.3827 0 0.9239
+5 24 0.4393 0.4393 0.7836 0.3827 0 0.9239 0.7071 0 0.7071 0 0.3827 0.9239
+5 24 0.7071 0 0.7071 0.3827 0 0.9239 0.4393 0.4393 0.7836 0.7071 -0.1 0.7071
+5 24 0.3827 0 0.9239 0 0.3827 0.9239 0.4393 0.4393 0.7836 0 0 1
+5 24 0 0.3827 0.9239 0 0 1 0.3827 0 0.9239 -0.1 0.3827 0.9239
+5 24 0.3827 0 0.9239 0 0 1 0 0.3827 0.9239 0.3827 -0.1 0.9239
+5 24 0.9239 0.3827 0 0.7071 0.7071 0 0.9239 0.3827 -0.1 0.7836 0.4393 0.4393
+5 24 0.7071 0.7071 0 0.7836 0.4393 0.4393 0.9239 0.3827 0 0.4393 0.7836 0.4393
+5 24 0.9239 0.3827 0 0.7836 0.4393 0.4393 0.7071 0.7071 0 0.9239 0 0.3827
+5 24 0.7836 0.4393 0.4393 0.4393 0.7836 0.4393 0.7071 0.7071 0 0.4393 0.4393 0.7836
+5 24 0.4393 0.7836 0.4393 0.4393 0.4393 0.7836 0.7836 0.4393 0.4393 0 0.7071 0.7071
+5 24 0.7836 0.4393 0.4393 0.4393 0.4393 0.7836 0.4393 0.7836 0.4393 0.7071 0 0.7071
+5 24 0.4393 0.4393 0.7836 0 0.7071 0.7071 0.4393 0.7836 0.4393 0 0.3827 0.9239
+5 24 0 0.7071 0.7071 0 0.3827 0.9239 0.4393 0.4393 0.7836 -0.1 0.7071 0.7071
+5 24 0.4393 0.4393 0.7836 0 0.3827 0.9239 0 0.7071 0.7071 0.3827 0 0.9239
+5 24 0.7071 0.7071 0 0.3827 0.9239 0 0.7071 0.7071 -0.1 0.4393 0.7836 0.4393
+5 24 0.3827 0.9239 0 0.4393 0.7836 0.4393 0.7071 0.7071 0 0 0.9239 0.3827
+5 24 0.7071 0.7071 0 0.4393 0.7836 0.4393 0.3827 0.9239 0 0.7836 0.4393 0.4393
+5 24 0.4393 0.7836 0.4393 0 0.9239 0.3827 0.3827 0.9239 0 0 0.7071 0.7071
+5 24 0 0.9239 0.3827 0 0.7071 0.7071 0.4393 0.7836 0.4393 -0.1 0.9239 0.3827
+5 24 0.4393 0.7836 0.4393 0 0.7071 0.7071 0 0.9239 0.3827 0.4393 0.4393 0.7836
+5 24 0.3827 0.9239 0 0 1 0 0.3827 0.9239 -0.1 0 0.9239 0.3827
+5 24 0 1 0 0 0.9239 0.3827 0.3827 0.9239 0 -0.1 1 0
+5 24 0.3827 0.9239 0 0 0.9239 0.3827 0 1 0 0.4393 0.7836 0.4393
+
+0 FILE p/2-4edge.dat
+0 Circle 0.5
+0 Name: 2-4edge.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2017-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2017-01-15 [Steffen] BFCed
+0 !HISTORY 2017-12-30 [PTadmin] Official Update 2017-01
+
+2 24 1 0 0 0.9239 0 0.3827
+2 24 0.9239 0 0.3827 0.7071 0 0.7071
+2 24 0.7071 0 0.7071 0.3827 0 0.9239
+2 24 0.3827 0 0.9239 0 0 1
+2 24 0 0 1 -0.3827 0 0.9239
+2 24 -0.3827 0 0.9239 -0.7071 0 0.7071
+2 24 -0.7071 0 0.7071 -0.9239 0 0.3827
+2 24 -0.9239 0 0.3827 -1 0 0
+
+0 FILE parts/3023.dat
+0 Plate  1 x  2
+0 Name: 3023.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2002-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2001-10-26 [PTadmin] Official Update 2001-01
+0 !HISTORY 2002-05-07 [unknown] BFC Certification
+0 !HISTORY 2002-06-11 [PTadmin] Official Update 2002-03
+0 !HISTORY 2007-06-07 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+1 16 0 4 0 1 0 0 0 -1 0 0 0 1 p/stud3.dat
+
+0 BFC INVERTNEXT
+1 16 0 8 0 16 0 0 0 -4 0 0 0 6 p/box5.dat
+
+4 16 20 8 10 16 8 6 -16 8 6 -20 8 10
+4 16 -20 8 10 -16 8 6 -16 8 -6 -20 8 -10
+4 16 -20 8 -10 -16 8 -6 16 8 -6 20 8 -10
+4 16 20 8 -10 16 8 -6 16 8 6 20 8 10
+
+1 16 0 8 0 20 0 0 0 -8 0 0 0 10 p/box5.dat
+
+1 16 10 0 0 1 0 0 0 1 0 0 0 1 p/stud.dat
+1 16 -10 0 0 1 0 0 0 1 0 0 0 1 p/stud.dat
+0
+
+0 FILE p/stud.dat
+0 Stud
+0 Name: stud.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-04-04 [sbliss] Modified for BFC compliance
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+1 16 0 0 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+1 16 0 -4 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+1 16 0 0 0 6 0 0 0 -4 0 0 0 6 p/4-4cyli.dat
+1 16 0 -4 0 6 0 0 0 1 0 0 0 6 p/4-4disc.dat
+
+0 FILE p/stud3.dat
+0 Stud Tube Solid
+0 Name: stud3.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-04-04 [sbliss] Modified for BFC compliance
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+1 16 0 -4 0 4 0 0 0 1 0 0 0 4 p/4-4edge.dat
+1 16 0 0 0 4 0 0 0 1 0 0 0 4 p/4-4edge.dat
+1 16 0 -4 0 4 0 0 0 1 0 0 0 4 p/4-4disc.dat
+1 16 0 -4 0 4 0 0 0 4 0 0 0 4 p/4-4cyli.dat
+
+0 FILE p/4-4disc.dat
+0 Disc 1.0
+0 Name: 4-4disc.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2002-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1998-12-15 [PTadmin] Official Update 1998-10
+0 !HISTORY 2002-03-23 [sbliss] Added BFC statement
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+3 16 0 0 0 1 0 0 0.9239 0 0.3827
+3 16 0 0 0 0.9239 0 0.3827 0.7071 0 0.7071
+3 16 0 0 0 0.7071 0 0.7071 0.3827 0 0.9239
+3 16 0 0 0 0.3827 0 0.9239 0 0 1
+3 16 0 0 0 0 0 1 -0.3827 0 0.9239
+3 16 0 0 0 -0.3827 0 0.9239 -0.7071 0 0.7071
+3 16 0 0 0 -0.7071 0 0.7071 -0.9239 0 0.3827
+3 16 0 0 0 -0.9239 0 0.3827 -1 0 -0
+3 16 0 0 0 -1 0 -0 -0.9239 0 -0.3827
+3 16 0 0 0 -0.9239 0 -0.3827 -0.7071 0 -0.7071
+3 16 0 0 0 -0.7071 0 -0.7071 -0.3827 0 -0.9239
+3 16 0 0 0 -0.3827 0 -0.9239 0 0 -1
+3 16 0 0 0 0 0 -1 0.3827 0 -0.9239
+3 16 0 0 0 0.3827 0 -0.9239 0.7071 0 -0.7071
+3 16 0 0 0 0.7071 0 -0.7071 0.9239 0 -0.3827
+3 16 0 0 0 0.9239 0 -0.3827 1 0 0
+0
+
+0 FILE parts/4740.dat
+0 Dish  2 x  2 Inverted
+0 Name: 4740.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2014-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !KEYWORDS Space, Radar Dish, Round
+
+0 !HISTORY 1998-06-20 [PTadmin] Official Update 1998-06
+0 !HISTORY 2003-06-08 [jriley] BFC compliant, cone & ring substitutions
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2004-09-15 [PTadmin] Official Update 2004-03
+0 !HISTORY 2007-07-08 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2010-05-09 [cwdee] Remove CATEGORY Round
+0 !HISTORY 2010-07-05 [PTadmin] Official Update 2010-02
+0 !HISTORY 2014-09-03 [Philo] Improved part shape, subparted for patterns
+0 !HISTORY 2014-12-23 [PTadmin] Official Update 2014-02
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 parts/s/4740s01.dat
+1 16 0 1.7 0 6 0 0 0 -1.7 0 0 0 6 p/4-4con1.dat
+1 16 0 3.3 0 4 0 0 0 -1.6 0 0 0 4 p/4-4con3.dat
+1 16 0 5.6 0 4 0 0 0 -2.3 0 0 0 4 p/4-4con4.dat
+5 24 12 1.7 0 11.0868 1.7 4.5924 5.5434 0 2.2962 14.7824 3.3 6.1232
+5 24 11.0868 1.7 4.5924 8.4852 1.7 8.4852 4.2426 0 4.2426 11.3136 3.3 11.3136
+5 24 8.4852 1.7 8.4852 4.5924 1.7 11.0868 2.2962 0 5.5434 6.1232 3.3 14.7824
+5 24 4.5924 1.7 11.0868 0 1.7 12 0 0 6 0 3.3 16
+5 24 0 1.7 12 -4.5924 1.7 11.0868 -2.2962 0 5.5434 -6.1232 3.3 14.7824
+5 24 -4.5924 1.7 11.0868 -8.4852 1.7 8.4852 -4.2426 0 4.2426 -11.3136 3.3 11.3136
+5 24 -8.4852 1.7 8.4852 -11.0868 1.7 4.5924 -5.5434 0 2.2962 -14.7824 3.3 6.1232
+5 24 -11.0868 1.7 4.5924 -12 1.7 0 -6 0 0 -16 3.3 0
+5 24 -12 1.7 0 -11.0868 1.7 -4.5924 -5.5434 0 -2.2962 -14.7824 3.3 -6.1232
+5 24 -11.0868 1.7 -4.5924 -8.4852 1.7 -8.4852 -4.2426 0 -4.2426 -11.3136 3.3 -11.3136
+5 24 -8.4852 1.7 -8.4852 -4.5924 1.7 -11.0868 -2.2962 0 -5.5434 -6.1232 3.3 -14.7824
+5 24 -4.5924 1.7 -11.0868 0 1.7 -12 0 0 -6 0 3.3 -16
+5 24 0 1.7 -12 4.5924 1.7 -11.0868 2.2962 0 -5.5434 6.1232 3.3 -14.7824
+5 24 4.5924 1.7 -11.0868 8.4852 1.7 -8.4852 4.2426 0 -4.2426 11.3136 3.3 -11.3136
+5 24 8.4852 1.7 -8.4852 11.0868 1.7 -4.5924 5.5434 0 -2.2962 14.7824 3.3 -6.1232
+5 24 11.0868 1.7 -4.5924 12 1.7 0 6 0 0 16 3.3 0
+5 24 16 3.3 0 14.7824 3.3 6.1232 11.0868 1.7 4.5924 20 5.6 0
+5 24 14.7824 3.3 6.1232 11.3136 3.3 11.3136 8.4852 1.7 8.4852 18.478 5.6 7.654
+5 24 11.3136 3.3 11.3136 6.1232 3.3 14.7824 4.5924 1.7 11.0868 14.142 5.6 14.142
+5 24 6.1232 3.3 14.7824 0 3.3 16 0 1.7 12 7.654 5.6 18.478
+5 24 0 3.3 16 -6.1232 3.3 14.7824 -4.5924 1.7 11.0868 0 5.6 20
+5 24 -6.1232 3.3 14.7824 -11.3136 3.3 11.3136 -8.4852 1.7 8.4852 -7.654 5.6 18.478
+5 24 -11.3136 3.3 11.3136 -14.7824 3.3 6.1232 -11.0868 1.7 4.5924 -14.142 5.6 14.142
+5 24 -14.7824 3.3 6.1232 -16 3.3 0 -12 1.7 0 -18.478 5.6 7.654
+5 24 -16 3.3 0 -14.7824 3.3 -6.1232 -11.0868 1.7 -4.5924 -20 5.6 0
+5 24 -14.7824 3.3 -6.1232 -11.3136 3.3 -11.3136 -8.4852 1.7 -8.4852 -18.478 5.6 -7.654
+5 24 -11.3136 3.3 -11.3136 -6.1232 3.3 -14.7824 -4.5924 1.7 -11.0868 -14.142 5.6 -14.142
+5 24 -6.1232 3.3 -14.7824 0 3.3 -16 0 1.7 -12 -7.654 5.6 -18.478
+5 24 0 3.3 -16 6.1232 3.3 -14.7824 4.5924 1.7 -11.0868 0 5.6 -20
+5 24 6.1232 3.3 -14.7824 11.3136 3.3 -11.3136 8.4852 1.7 -8.4852 7.654 5.6 -18.478
+5 24 11.3136 3.3 -11.3136 14.7824 3.3 -6.1232 11.0868 1.7 -4.5924 14.142 5.6 -14.142
+5 24 14.7824 3.3 -6.1232 16 3.3 0 12 1.7 0 18.478 5.6 -7.654
+
+0 FILE p/4-4con3.dat
+0 Cone  3 x 1.0
+0 Name: 4-4con3.dat
+0 Author: Niels Karsdorp [nielsk]
+0 !LDRAW_ORG Primitive UPDATE 2003-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+5 24 3 1 0 4 0 0 2.7717 1 1.1481 2.7717 1 -1.1481
+5 24 2.7717 1 1.1481 3.6956 0 1.5308 2.1213 1 2.1213 3 1 0
+5 24 2.1213 1 2.1213 2.8284 0 2.8284 1.1481 1 2.7717 2.7717 1 1.1481
+5 24 1.1481 1 2.7717 1.5308 0 3.6956 0 1 3 2.1213 1 2.1213
+5 24 0 1 3 0 0 4 -1.1481 1 2.7717 1.1481 1 2.7717
+5 24 -1.1481 1 2.7717 -1.5308 0 3.6956 -2.1213 1 2.1213 0 1 3
+5 24 -2.1213 1 2.1213 -2.8284 0 2.8284 -2.7717 1 1.1481 -1.1481 1 2.7717
+5 24 -2.7717 1 1.1481 -3.6956 0 1.5308 -3 1 0 -2.1213 1 2.1213
+5 24 -3 1 0 -4 0 0 -2.7717 1 -1.1481 -2.7717 1 1.1481
+5 24 -2.7717 1 -1.1481 -3.6956 0 -1.5308 -2.1213 1 -2.1213 -3 1 0
+5 24 -2.1213 1 -2.1213 -2.8284 0 -2.8284 -1.1481 1 -2.7717 -2.7717 1 -1.1481
+5 24 -1.1481 1 -2.7717 -1.5308 0 -3.6956 0 1 -3 -2.1213 1 -2.1213
+5 24 0 1 -3 0 0 -4 1.1481 1 -2.7717 -1.1481 1 -2.7717
+5 24 1.1481 1 -2.7717 1.5308 0 -3.6956 2.1213 1 -2.1213 0 1 -3
+5 24 2.1213 1 -2.1213 2.8284 0 -2.8284 2.7717 1 -1.1481 1.1481 1 -2.7717
+5 24 2.7717 1 -1.1481 3.6956 0 -1.5308 3 1 0 2.1213 1 -2.1213
+
+4 16 3 1 0 2.7717 1 1.1481 3.6956 0 1.5308 4 0 0
+4 16 2.7717 1 1.1481 2.1213 1 2.1213 2.8284 0 2.8284 3.6956 0 1.5308
+4 16 2.1213 1 2.1213 1.1481 1 2.7717 1.5308 0 3.6956 2.8284 0 2.8284
+4 16 1.1481 1 2.7717 0 1 3 0 0 4 1.5308 0 3.6956
+4 16 0 1 3 -1.1481 1 2.7717 -1.5308 0 3.6956 0 0 4
+4 16 -1.1481 1 2.7717 -2.1213 1 2.1213 -2.8284 0 2.8284 -1.5308 0 3.6956
+4 16 -2.1213 1 2.1213 -2.7717 1 1.1481 -3.6956 0 1.5308 -2.8284 0 2.8284
+4 16 -2.7717 1 1.1481 -3 1 0 -4 0 0 -3.6956 0 1.5308
+4 16 -3 1 0 -2.7717 1 -1.1481 -3.6956 0 -1.5308 -4 0 0
+4 16 -2.7717 1 -1.1481 -2.1213 1 -2.1213 -2.8284 0 -2.8284 -3.6956 0 -1.5308
+4 16 -2.1213 1 -2.1213 -1.1481 1 -2.7717 -1.5308 0 -3.6956 -2.8284 0 -2.8284
+4 16 -1.1481 1 -2.7717 0 1 -3 0 0 -4 -1.5308 0 -3.6956
+4 16 0 1 -3 1.1481 1 -2.7717 1.5308 0 -3.6956 0 0 -4
+4 16 1.1481 1 -2.7717 2.1213 1 -2.1213 2.8284 0 -2.8284 1.5308 0 -3.6956
+4 16 2.1213 1 -2.1213 2.7717 1 -1.1481 3.6956 0 -1.5308 2.8284 0 -2.8284
+4 16 2.7717 1 -1.1481 3 1 0 4 0 0 3.6956 0 -1.5308
+
+0
+
+
+0 FILE parts/s/4740s01.dat
+0 ~Dish  2 x  2 Inverted without Convex Surface
+0 Name: s\4740s01.dat
+0 Author: Philippe Hurbain [Philo]
+0 !LDRAW_ORG Subpart UPDATE 2014-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2014-12-23 [PTadmin] Official Update 2014-02
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 p/stud2a.dat
+1 16 0 4 0 1 0 0 0 -1 0 0 0 1 p/stud4a.dat
+1 16 0 0 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+1 16 0 5.6 0 20 0 0 0 2.4 0 0 0 20 p/4-4cylo.dat
+0 BFC INVERTNEXT
+1 16 0 0 0 4 0 0 0 2.7 0 0 0 4 p/4-4cyli.dat
+0 BFC INVERTNEXT
+1 16 0 4 0 6 0 0 0 -1.3 0 0 0 6 p/4-4cyli.dat
+1 16 0 4 0 8 0 0 0 -1.3 0 0 0 8 p/4-4cyli.dat
+1 16 0 2.7 0 4 0 0 0 1 0 0 0 4 p/4-4edge.dat
+1 16 0 2.7 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+1 16 0 2.7 0 8 0 0 0 1 0 0 0 8 p/4-4edge.dat
+1 16 0 2.7 0 2 0 0 0 -1 0 0 0 2 p/4-4ring2.dat
+0 BFC INVERTNEXT
+1 16 0 5.8 0 8 0 0 0 -3.1 0 0 0 8 p/4-4con1.dat
+0 BFC INVERTNEXT
+1 16 0 8 0 4 0 0 0 -2.2 0 0 0 4 p/4-4con4.dat
+5 24 14.7824 5.8 6.1232 16 5.8 0 8 2.7 0 18.478 8 7.654
+5 24 11.3136 5.8 11.3136 14.7824 5.8 6.1232 7.3912 2.7 3.0616 14.142 8 14.142
+5 24 6.1232 5.8 14.7824 11.3136 5.8 11.3136 5.6568 2.7 5.6568 7.654 8 18.478
+5 24 0 5.8 16 6.1232 5.8 14.7824 3.0616 2.7 7.3912 0 8 20
+5 24 -6.1232 5.8 14.7824 0 5.8 16 0 2.7 8 -7.654 8 18.478
+5 24 -11.3136 5.8 11.3136 -6.1232 5.8 14.7824 -3.0616 2.7 7.3912 -14.142 8 14.142
+5 24 -14.7824 5.8 6.1232 -11.3136 5.8 11.3136 -5.6568 2.7 5.6568 -18.478 8 7.654
+5 24 -16 5.8 0 -14.7824 5.8 6.1232 -7.3912 2.7 3.0616 -20 8 0
+5 24 -14.7824 5.8 -6.1232 -16 5.8 0 -8 2.7 0 -18.478 8 -7.654
+5 24 -11.3136 5.8 -11.3136 -14.7824 5.8 -6.1232 -7.3912 2.7 -3.0616 -14.142 8 -14.142
+5 24 -6.1232 5.8 -14.7824 -11.3136 5.8 -11.3136 -5.6568 2.7 -5.6568 -7.654 8 -18.478
+5 24 0 5.8 -16 -6.1232 5.8 -14.7824 -3.0616 2.7 -7.3912 0 8 -20
+5 24 6.1232 5.8 -14.7824 0 5.8 -16 0 2.7 -8 7.654 8 -18.478
+5 24 11.3136 5.8 -11.3136 6.1232 5.8 -14.7824 3.0616 2.7 -7.3912 14.142 8 -14.142
+5 24 14.7824 5.8 -6.1232 11.3136 5.8 -11.3136 5.6568 2.7 -5.6568 18.478 8 -7.654
+5 24 16 5.8 0 14.7824 5.8 -6.1232 7.3912 2.7 -3.0616 20 8 0
+
+0 FILE p/4-4con4.dat
+0 Cone  4 x 1.0
+0 Name: 4-4con4.dat
+0 Author: John Riley [jriley]
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+4 16 3.6956 1 1.5308 4.6195 0 1.9135 5 0 0 4 1 0
+4 16 2.8284 1 2.8284 3.5355 0 3.5355 4.6195 0 1.9135 3.6956 1 1.5308
+4 16 1.5308 1 3.6956 1.9135 0 4.6195 3.5355 0 3.5355 2.8284 1 2.8284
+4 16 0 1 4 0 0 5 1.9135 0 4.6195 1.5308 1 3.6956
+4 16 -1.5308 1 3.6956 -1.9135 0 4.6195 0 0 5 0 1 4
+4 16 -2.8284 1 2.8284 -3.5355 0 3.5355 -1.9135 0 4.6195 -1.5308 1 3.6956
+4 16 -3.6956 1 1.5308 -4.6195 0 1.9135 -3.5355 0 3.5355 -2.8284 1 2.8284
+4 16 -4 1 0 -5 0 0 -4.6195 0 1.9135 -3.6956 1 1.5308
+4 16 -3.6956 1 -1.5308 -4.6195 0 -1.9135 -5 0 0 -4 1 0
+4 16 -2.8284 1 -2.8284 -3.5355 0 -3.5355 -4.6195 0 -1.9135 -3.6956 1 -1.5308
+4 16 -1.5308 1 -3.6956 -1.9135 0 -4.6195 -3.5355 0 -3.5355 -2.8284 1 -2.8284
+4 16 0 1 -4 0 0 -5 -1.9135 0 -4.6195 -1.5308 1 -3.6956
+4 16 1.5308 1 -3.6956 1.9135 0 -4.6195 0 0 -5 0 1 -4
+4 16 2.8284 1 -2.8284 3.5355 0 -3.5355 1.9135 0 -4.6195 1.5308 1 -3.6956
+4 16 3.6956 1 -1.5308 4.6195 0 -1.9135 3.5355 0 -3.5355 2.8284 1 -2.8284
+4 16 4 1 0 5 0 0 4.6195 0 -1.9135 3.6956 1 -1.5308
+
+5 24 4 1 0 5 0 0 3.6956 1 -1.5308 3.6956 1 1.5308
+5 24 3.6956 1 1.5308 4.6195 0 1.9135 4 1 0 2.8284 1 2.8284
+5 24 2.8284 1 2.8284 3.5355 0 3.5355 3.6956 1 1.5308 1.5308 1 3.6956
+5 24 1.5308 1 3.6956 1.9135 0 4.6195 2.8284 1 2.8284 0 1 4
+5 24 0 1 4 0 0 5 1.5308 1 3.6956 -1.5308 1 3.6956
+5 24 -1.5308 1 3.6956 -1.9135 0 4.6195 0 1 4 -2.8284 1 2.8284
+5 24 -2.8284 1 2.8284 -3.5355 0 3.5355 -1.5308 1 3.6956 -3.6956 1 1.5308
+5 24 -3.6956 1 1.5308 -4.6195 0 1.9135 -2.8284 1 2.8284 -4 1 0
+5 24 -4 1 0 -5 0 0 -3.6956 1 1.5308 -3.6956 1 -1.5308
+5 24 -3.6956 1 -1.5308 -4.6195 0 -1.9135 -4 1 0 -2.8284 1 -2.8284
+5 24 -2.8284 1 -2.8284 -3.5355 0 -3.5355 -3.6956 1 -1.5308 -1.5308 1 -3.6956
+5 24 -1.5308 1 -3.6956 -1.9135 0 -4.6195 -2.8284 1 -2.8284 0 1 -4
+5 24 0 1 -4 0 0 -5 -1.5308 1 -3.6956 1.5308 1 -3.6956
+5 24 1.5308 1 -3.6956 1.9135 0 -4.6195 0 1 -4 2.8284 1 -2.8284
+5 24 2.8284 1 -2.8284 3.5355 0 -3.5355 1.5308 1 -3.6956 3.6956 1 -1.5308
+5 24 3.6956 1 -1.5308 4.6195 0 -1.9135 2.8284 1 -2.8284 4 1 0
+
+0 FILE p/4-4con1.dat
+0 Cone  1 x 1.0
+0 Name: 4-4con1.dat
+0 Author: Steve Bliss [sbliss]
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1999-08-19 [sbliss] Renamed 4-4con12.dat to 4-4con1.dat, Moved all conditional lines before quads
+0 !HISTORY 2000-05-07 [PTadmin] Official Update 2000-01
+0 !HISTORY 2002-12-11 [cwdee] Standardised title and made BFC compliant
+0 !HISTORY 2003-08-01 [PTadmin] Official Update 2003-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW, reordered
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+5 24 1 1 0 2 0 0 0.9239 1 -0.3827 0.9239 1 0.3827
+5 24 0.9239 1 0.3827 1.8478 0 0.7654 1 1 0 0.7071 1 0.7071
+5 24 0.7071 1 0.7071 1.4142 0 1.4142 0.9239 1 0.3827 0.3827 1 0.9239
+5 24 0.3827 1 0.9239 0.7654 0 1.8478 0.7071 1 0.7071 0 1 1
+5 24 0 1 1 0 0 2 0.3827 1 0.9239 -0.3827 1 0.9239
+5 24 -0.3827 1 0.9239 -0.7654 0 1.8478 0 1 1 -0.7071 1 0.7071
+5 24 -0.7071 1 0.7071 -1.4142 0 1.4142 -0.3827 1 0.9239 -0.9239 1 0.3827
+5 24 -0.9239 1 0.3827 -1.8478 0 0.7654 -0.7071 1 0.7071 -1 1 0
+5 24 -1 1 0 -2 0 0 -0.9239 1 0.3827 -0.9239 1 -0.3827
+5 24 -0.9239 1 -0.3827 -1.8478 0 -0.7654 -1 1 0 -0.7071 1 -0.7071
+5 24 -0.7071 1 -0.7071 -1.4142 0 -1.4142 -0.9239 1 -0.3827 -0.3827 1 -0.9239
+5 24 -0.3827 1 -0.9239 -0.7654 0 -1.8478 -0.7071 1 -0.7071 0 1 -1
+5 24 0 1 -1 0 0 -2 -0.3827 1 -0.9239 0.3827 1 -0.9239
+5 24 0.3827 1 -0.9239 0.7654 0 -1.8478 0 1 -1 0.7071 1 -0.7071
+5 24 0.7071 1 -0.7071 1.4142 0 -1.4142 0.3827 1 -0.9239 0.9239 1 -0.3827
+5 24 0.9239 1 -0.3827 1.8478 0 -0.7654 0.7071 1 -0.7071 1 1 0
+
+4 16 2 0 0 1 1 0 0.9239 1 0.3827 1.8478 0 0.7654
+4 16 1.8478 0 0.7654 0.9239 1 0.3827 0.7071 1 0.7071 1.4142 0 1.4142
+4 16 1.4142 0 1.4142 0.7071 1 0.7071 0.3827 1 0.9239 0.7654 0 1.8478
+4 16 0.7654 0 1.8478 0.3827 1 0.9239 0 1 1 0 0 2
+4 16 0 0 2 0 1 1 -0.3827 1 0.9239 -0.7654 0 1.8478
+4 16 -0.7654 0 1.8478 -0.3827 1 0.9239 -0.7071 1 0.7071 -1.4142 0 1.4142
+4 16 -1.4142 0 1.4142 -0.7071 1 0.7071 -0.9239 1 0.3827 -1.8478 0 0.7654
+4 16 -1.8478 0 0.7654 -0.9239 1 0.3827 -1 1 0 -2 0 0
+4 16 -2 0 0 -1 1 0 -0.9239 1 -0.3827 -1.8478 0 -0.7654
+4 16 -1.8478 0 -0.7654 -0.9239 1 -0.3827 -0.7071 1 -0.7071 -1.4142 0 -1.4142
+4 16 -1.4142 0 -1.4142 -0.7071 1 -0.7071 -0.3827 1 -0.9239 -0.7654 0 -1.8478
+4 16 -0.7654 0 -1.8478 -0.3827 1 -0.9239 0 1 -1 0 0 -2
+4 16 0 0 -2 0 1 -1 0.3827 1 -0.9239 0.7654 0 -1.8478
+4 16 0.7654 0 -1.8478 0.3827 1 -0.9239 0.7071 1 -0.7071 1.4142 0 -1.4142
+4 16 1.4142 0 -1.4142 0.7071 1 -0.7071 0.9239 1 -0.3827 1.8478 0 -0.7654
+4 16 1.8478 0 -0.7654 0.9239 1 -0.3827 1 1 0 2 0 0
+
+0 FILE p/4-4cylo.dat
+0 Cylinder Open 1.0
+0 Name: 4-4cylo.dat
+0 Author: Mark Kennedy [mkennedy]
+0 !LDRAW_ORG Primitive UPDATE 2010-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2010-04-05 [PTadmin] Official Update 2010-01
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 p/4-4edge.dat
+1 16 0 1 0 1 0 0 0 1 0 0 0 1 p/4-4edge.dat
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 p/4-4cyli.dat
+0
+0 FILE p/stud4a.dat
+0 Stud Tube Open without Base Edges
+0 Name: stud4a.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2009-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1999-07-05 [PTadmin] Official Update 1999-05
+0 !HISTORY 2002-04-04 [sbliss] Modified for BFC compliance
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2009-06-21 [cwdee] Update ring references to 4-4ring
+0 !HISTORY 2009-09-03 [PTadmin] Official Update 2009-02
+
+1 16 0 -4 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+1 16 0 -4 0 8 0 0 0 1 0 0 0 8 p/4-4edge.dat
+0 BFC INVERTNEXT
+1 16 0 -4 0 6 0 0 0 4 0 0 0 6 p/4-4cyli.dat
+1 16 0 -4 0 8 0 0 0 4 0 0 0 8 p/4-4cyli.dat
+1 16 0 -4 0 2 0 0 0 1 0 0 0 2 p/4-4ring3.dat
+0
+
+0 FILE p/4-4ring3.dat
+0 Ring  3 x 1.0
+0 Name: 4-4ring3.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2009-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1998-12-15 [PTadmin] Official Update 1998-10
+0 !HISTORY 2002-04-05 [hafhead] Added BFC statement
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2008-08-26 [cwdee] Switch polygon winding and rename
+0 !HISTORY 2009-05-02 [PTadmin] Official Update 2009-01
+
+4 16 -1.5308 0 3.6956 -1.1481 0 2.7717 0 0 3 0 0 4
+4 16 -2.8284 0 2.8284 -2.1213 0 2.1213 -1.1481 0 2.7717 -1.5308 0 3.6956
+4 16 -3.6956 0 1.5308 -2.7717 0 1.1481 -2.1213 0 2.1213 -2.8284 0 2.8284
+4 16 -4 0 0 -3 0 0 -2.7717 0 1.1481 -3.6956 0 1.5308
+4 16 -3.6956 0 -1.5308 -2.7717 0 -1.1481 -3 0 0 -4 0 0
+4 16 -2.8284 0 -2.8284 -2.1213 0 -2.1213 -2.7717 0 -1.1481 -3.6956 0 -1.5308
+4 16 -1.5308 0 -3.6956 -1.1481 0 -2.7717 -2.1213 0 -2.1213 -2.8284 0 -2.8284
+4 16 0 0 -4 0 0 -3 -1.1481 0 -2.7717 -1.5308 0 -3.6956
+4 16 1.5308 0 -3.6956 1.1481 0 -2.7717 0 0 -3 0 0 -4
+4 16 2.8284 0 -2.8284 2.1213 0 -2.1213 1.1481 0 -2.7717 1.5308 0 -3.6956
+4 16 3.6956 0 -1.5308 2.7717 0 -1.1481 2.1213 0 -2.1213 2.8284 0 -2.8284
+4 16 4 0 0 3 0 0 2.7717 0 -1.1481 3.6956 0 -1.5308
+4 16 3.6956 0 1.5308 2.7717 0 1.1481 3 0 0 4 0 0
+4 16 2.8284 0 2.8284 2.1213 0 2.1213 2.7717 0 1.1481 3.6956 0 1.5308
+4 16 1.5308 0 3.6956 1.1481 0 2.7717 2.1213 0 2.1213 2.8284 0 2.8284
+4 16 0 0 4 0 0 3 1.1481 0 2.7717 1.5308 0 3.6956
+0
+
+0 FILE parts/3070bps3.dat
+0 Tile  1 x  1 with SW Hatch Pattern
+0 Name: 3070bps3.dat
+0 Author: Michael Heidemann [mikeheide]
+0 !LDRAW_ORG Part UPDATE 2009-03
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+0 !KEYWORDS Star Wars, TIE Interceptor
+
+0 !HISTORY 2009-12-29 [PTadmin] Official Update 2009-03
+
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 parts/s/3070bs01.dat
+4 0 -1 0 8.75 -1.5 0 8 0 0 8 0 0 8.75
+4 0 -1 0 8.75 -2.75 0 8.5 -3.25 0 7.5 -1.5 0 8
+4 0 -3.25 0 -0.5 -1.5 0 -0.5 -1.5 0 8 -3.25 0 7.5
+4 0 -4.5 0 7.75 -4.25 0 7 -3.25 0 7.5 -2.75 0 8.5
+4 0 -4.25 0 7 -6 0 6 -6 0 1 -4.25 0 1
+4 0 -4.5 0 7.75 -6.5 0 6.5 -6 0 6 -4.25 0 7
+4 0 -8.25 0 4 -7.5 0 4 -6 0 6 -6.5 0 6.5
+4 0 -9 0 2 -8.25 0 2 -7.5 0 4 -8.25 0 4
+4 0 -9 0 2 -9.25 0 0 -8.5 0 0 -8.25 0 2
+4 0 -7.853 0 -3.253 -8.5 0 0 -9.25 0 0 -8.546 0 -3.54
+4 0 -6.01 0 -6.01 -7.853 0 -3.253 -8.546 0 -3.54 -6.541 0 -6.541
+4 0 -3.54 0 -8.546 -3.253 0 -7.853 -6.01 0 -6.01 -6.541 0 -6.541
+4 0 0 0 -9.25 0 0 -8.5 -3.253 0 -7.853 -3.54 0 -8.546
+4 16 -10 0 -10 0 0 -10 0 0 -9.25 -3.54 0 -8.546
+3 16 -10 0 -10 -3.54 0 -8.546 -6.541 0 -6.541
+3 16 -6.541 0 -6.541 -8.546 0 -3.54 -10 0 -10
+3 16 -10 0 -10 -8.546 0 -3.54 -9.25 0 0
+3 16 -9.25 0 0 -10 0 10 -10 0 -10
+3 16 -9.25 0 0 -9 0 2 -10 0 10
+3 16 -9 0 2 -8.25 0 4 -10 0 10
+3 16 -10 0 10 -8.25 0 4 -6.5 0 6.5
+3 16 -4.5 0 7.75 -10 0 10 -6.5 0 6.5
+3 16 -4.5 0 7.75 -2.75 0 8.5 -10 0 10
+3 16 -10 0 10 -2.75 0 8.5 -1 0 8.75
+4 16 0 0 8.75 0 0 10 -10 0 10 -1 0 8.75
+4 15 0 0 8 -1 0 8 -0.25 0 7.25 0 0 7.25
+4 15 -1 0 1.5 -0.25 0 1.25 -0.25 0 7.25 -1 0 8
+4 15 0 0 0.5 0 0 1.25 -0.25 0 1.25 -0.25 0 0.5
+3 15 -1 0 0.25 -0.25 0 0.25 -0.25 0 0.5
+4 15 -1 0 1.5 -1 0 0.25 -0.25 0 0.5 -0.25 0 1.25
+4 15 -0.25 0 0.25 -0.25 0 -0.75 0 0 -0.75 0 0 0.25
+4 15 -1 0 -1.75 -0.25 0 -1.25 -0.25 0 -0.75 -1 0 -0.75
+4 15 -0.25 0 0.25 -1 0 0.25 -1 0 -0.75 -0.25 0 -0.75
+4 15 0 0 -1.75 0 0 -1.25 -0.25 0 -1.25 -1 0 -1.75
+4 15 -3.5 0 -0.75 -2.75 0 -1.75 -1.75 0 -1.75 -1 0 -0.75
+4 15 -1.75 0 -2.75 -1 0 -2.25 -1 0 -1.75 -1.75 0 -1.75
+3 15 -1 0 -1.75 -1 0 -0.75 -1.75 0 -1.75
+4 15 -3.5 0 -0.75 -3.5 0 0.75 -4.25 0 0 -4.25 0 -1
+4 15 -6.5 0 0.75 -7.25 0 0 -4.25 0 0 -3.5 0 0.75
+4 15 -6.5 0 0.75 -6.5 0 5 -7.25 0 4 -7.25 0 0
+4 15 -6.25 0 -1.75 -6.25 0 -3.5 -5.75 0 -4.75 -5.75 0 -1
+4 15 -8 0 -1 -7 0 -1.75 -6.25 0 -1.75 -5.75 0 -1
+4 15 -8 0 -1 -7.25 0 -3 -5.75 0 -4.75 -6.25 0 -3.5
+3 15 -6.25 0 -3.5 -7 0 -1.75 -8 0 -1
+3 15 -5.25 0 -6.25 -4.5 0 -6.75 -4.5 0 -4.25
+3 15 -4.5 0 -4.25 -5.25 0 -3.5 -5.25 0 -6.25
+4 15 -4.5 0 -4.25 -2.75 0 -4.25 -3.5 0 -3.5 -5.25 0 -3.5
+3 15 -2.75 0 -4.25 -2.75 0 -3.5 -3.5 0 -3.5
+4 15 -1 0 -3.5 -1.75 0 -2.75 -2.75 0 -2.75 -2.75 0 -3.5
+3 15 -1 0 -3.5 -1 0 -3 -1.75 0 -2.75
+4 15 0 0 -3 0 0 -2.25 -1 0 -2.25 -1 0 -3
+3 15 -1 0 -2.25 -1.75 0 -2.75 -1 0 -3
+4 15 0 0 -4.75 0 0 -4.25 -1 0 -4.25 -0.25 0 -4.75
+4 15 -1 0 -7 -0.25 0 -6.5 -0.25 0 -4.75 -1 0 -4.25
+4 15 0 0 -7 0 0 -6.5 -0.25 0 -6.5 -1 0 -7
+4 15 -1.5 0 -5.25 -1.5 0 -4.25 -2.5 0 -4.25 -2.5 0 -5.25
+3 15 -4.25 0 -1 -3.5 0 -1 -3.5 0 -0.75
+4 15 -2.75 0 -1.75 -3.5 0 -0.75 -3.5 0 -1 -2.75 0 -2.75
+4 15 -2.75 0 -2.75 -3.5 0 -1 -3.5 0 -3.5 -2.75 0 -3.5
+4 16 0 0 1.25 0 0 7.25 -0.25 0 7.25 -0.25 0 1.25
+4 16 0 0 0.5 -0.25 0 0.5 -0.25 0 0.25 0 0 0.25
+4 16 0 0 -0.75 -0.25 0 -0.75 -0.25 0 -1.25 0 0 -1.25
+4 16 0 0 -1.75 -1 0 -1.75 -1 0 -2.25 0 0 -2.25
+4 16 0 0 -4.75 -0.25 0 -4.75 -0.25 0 -6.5 0 0 -6.5
+4 16 -1.75 0 -2.75 -1.75 0 -1.75 -2.75 0 -1.75 -2.75 0 -2.75
+3 16 -6.25 0 -3.5 -6.25 0 -1.75 -7 0 -1.75
+4 16 -3.5 0 0.75 -3.25 0 7.5 -4.25 0 7 -4.25 0 1
+4 16 -4.25 0 1 -6 0 1 -6.5 0 0.75 -3.5 0 0.75
+4 16 -6 0 1 -6 0 6 -6.5 0 5 -6.5 0 0.75
+4 16 -7.5 0 4 -7.25 0 4 -6.5 0 5 -6 0 6
+4 16 -7.25 0 0 -7.25 0 4 -7.5 0 4 -8.25 0 2
+4 16 -8.25 0 2 -8.5 0 0 -8 0 -1 -7.25 0 0
+4 16 -7.853 0 -3.253 -7.25 0 -3 -8 0 -1 -8.5 0 0
+4 16 -5.75 0 -1 -4.25 0 0 -7.25 0 0 -8 0 -1
+4 16 -3.5 0 -3.5 -3.5 0 -1 -4.25 0 -1 -5.25 0 -3.5
+4 16 -4.25 0 0 -5.75 0 -1 -5.25 0 -3.5 -4.25 0 -1
+4 16 -5.75 0 -4.75 -5.25 0 -6.25 -5.25 0 -3.5 -5.75 0 -1
+4 16 -5.75 0 -4.75 -7.25 0 -3 -7.853 0 -3.253 -6.01 0 -6.01
+4 16 -5.25 0 -6.25 -6.01 0 -6.01 -3.253 0 -7.853 -4.5 0 -6.75
+3 16 -5.75 0 -4.75 -6.01 0 -6.01 -5.25 0 -6.25
+4 16 -2.75 0 -4.25 -4.5 0 -4.25 -4.5 0 -6.75 -3.253 0 -7.853
+4 16 -2.5 0 -5.25 -2.5 0 -4.25 -2.75 0 -4.25 -3.253 0 -7.853
+4 16 -1.5 0 -5.25 -2.5 0 -5.25 -3.253 0 -7.853 -1 0 -7
+4 16 0 0 -8.5 0 0 -7 -1 0 -7 -3.253 0 -7.853
+4 16 -1 0 -4.25 -1.5 0 -4.25 -1.5 0 -5.25 -1 0 -7
+4 16 0 0 -3 -1 0 -3 -1 0 -3.5 0 0 -4.25
+3 16 -1 0 -3.5 -1 0 -4.25 0 0 -4.25
+3 16 -1 0 -3.5 -1.5 0 -4.25 -1 0 -4.25
+3 16 -2.5 0 -4.25 -2.75 0 -3.5 -2.75 0 -4.25
+4 16 -1.5 0 -4.25 -1 0 -3.5 -2.75 0 -3.5 -2.5 0 -4.25
+4 16 -1 0 1.5 -1 0 8 -1.5 0 8 -1.5 0 -0.5
+3 16 -1 0 0.25 -1 0 1.5 -1.5 0 -0.5
+3 16 -1 0 0.25 -1.5 0 -0.5 -1 0 -0.75
+3 16 -3.5 0 0.75 -3.5 0 -0.75 -3.25 0 -0.5
+3 16 -3.25 0 -0.5 -3.25 0 7.5 -3.5 0 0.75
+4 16 -1.5 0 -0.5 -3.25 0 -0.5 -3.5 0 -0.75 -1 0 -0.75
+
+4 0 0 0 8.75 0 0 8 1.5 0 8 1 0 8.75
+4 0 1.5 0 8 3.25 0 7.5 2.75 0 8.5 1 0 8.75
+4 0 3.25 0 7.5 1.5 0 8 1.5 0 -0.5 3.25 0 -0.5
+4 0 2.75 0 8.5 3.25 0 7.5 4.25 0 7 4.5 0 7.75
+4 0 4.25 0 1 6 0 1 6 0 6 4.25 0 7
+4 0 4.25 0 7 6 0 6 6.5 0 6.5 4.5 0 7.75
+4 0 6.5 0 6.5 6 0 6 7.5 0 4 8.25 0 4
+4 0 8.25 0 4 7.5 0 4 8.25 0 2 9 0 2
+4 0 8.25 0 2 8.5 0 0 9.25 0 0 9 0 2
+4 0 8.546 0 -3.54 9.25 0 0 8.5 0 0 7.853 0 -3.253
+4 0 6.541 0 -6.541 8.546 0 -3.54 7.853 0 -3.253 6.01 0 -6.01
+4 0 6.541 0 -6.541 6.01 0 -6.01 3.253 0 -7.853 3.54 0 -8.546
+4 0 3.54 0 -8.546 3.253 0 -7.853 0 0 -8.5 0 0 -9.25
+4 16 3.54 0 -8.546 0 0 -9.25 0 0 -10 10 0 -10
+3 16 6.541 0 -6.541 3.54 0 -8.546 10 0 -10
+3 16 10 0 -10 8.546 0 -3.54 6.541 0 -6.541
+3 16 9.25 0 0 8.546 0 -3.54 10 0 -10
+3 16 10 0 -10 10 0 10 9.25 0 0
+3 16 10 0 10 9 0 2 9.25 0 0
+3 16 10 0 10 8.25 0 4 9 0 2
+3 16 6.5 0 6.5 8.25 0 4 10 0 10
+3 16 6.5 0 6.5 10 0 10 4.5 0 7.75
+3 16 10 0 10 2.75 0 8.5 4.5 0 7.75
+3 16 1 0 8.75 2.75 0 8.5 10 0 10
+4 16 1 0 8.75 10 0 10 0 0 10 0 0 8.75
+4 15 0 0 7.25 0.25 0 7.25 1 0 8 0 0 8
+4 15 1 0 8 0.25 0 7.25 0.25 0 1.25 1 0 1.5
+4 15 0.25 0 0.5 0.25 0 1.25 0 0 1.25 0 0 0.5
+3 15 0.25 0 0.5 0.25 0 0.25 1 0 0.25
+4 15 0.25 0 1.25 0.25 0 0.5 1 0 0.25 1 0 1.5
+4 15 0 0 0.25 0 0 -0.75 0.25 0 -0.75 0.25 0 0.25
+4 15 1 0 -0.75 0.25 0 -0.75 0.25 0 -1.25 1 0 -1.75
+4 15 0.25 0 -0.75 1 0 -0.75 1 0 0.25 0.25 0 0.25
+4 15 1 0 -1.75 0.25 0 -1.25 0 0 -1.25 0 0 -1.75
+4 15 1 0 -0.75 1.75 0 -1.75 2.75 0 -1.75 3.5 0 -0.75
+4 15 1.75 0 -1.75 1 0 -1.75 1 0 -2.25 1.75 0 -2.75
+3 15 1.75 0 -1.75 1 0 -0.75 1 0 -1.75
+4 15 4.25 0 -1 4.25 0 0 3.5 0 0.75 3.5 0 -0.75
+4 15 3.5 0 0.75 4.25 0 0 7.25 0 0 6.5 0 0.75
+4 15 7.25 0 0 7.25 0 4 6.5 0 5 6.5 0 0.75
+4 15 5.75 0 -1 5.75 0 -4.75 6.25 0 -3.5 6.25 0 -1.75
+4 15 5.75 0 -1 6.25 0 -1.75 7 0 -1.75 8 0 -1
+4 15 6.25 0 -3.5 5.75 0 -4.75 7.25 0 -3 8 0 -1
+3 15 8 0 -1 7 0 -1.75 6.25 0 -3.5
+3 15 4.5 0 -4.25 4.5 0 -6.75 5.25 0 -6.25
+3 15 5.25 0 -6.25 5.25 0 -3.5 4.5 0 -4.25
+4 15 5.25 0 -3.5 3.5 0 -3.5 2.75 0 -4.25 4.5 0 -4.25
+3 15 3.5 0 -3.5 2.75 0 -3.5 2.75 0 -4.25
+4 15 2.75 0 -3.5 2.75 0 -2.75 1.75 0 -2.75 1 0 -3.5
+3 15 1.75 0 -2.75 1 0 -3 1 0 -3.5
+4 15 1 0 -3 1 0 -2.25 0 0 -2.25 0 0 -3
+3 15 1 0 -3 1.75 0 -2.75 1 0 -2.25
+4 15 0.25 0 -4.75 1 0 -4.25 0 0 -4.25 0 0 -4.75
+4 15 1 0 -4.25 0.25 0 -4.75 0.25 0 -6.5 1 0 -7
+4 15 1 0 -7 0.25 0 -6.5 0 0 -6.5 0 0 -7
+4 16 2.5 0 -5.25 2.5 0 -4.25 1.5 0 -4.25 1.5 0 -5.25
+3 15 3.5 0 -0.75 3.5 0 -1 4.25 0 -1
+4 15 2.75 0 -2.75 3.5 0 -1 3.5 0 -0.75 2.75 0 -1.75
+4 15 2.75 0 -3.5 3.5 0 -3.5 3.5 0 -1 2.75 0 -2.75
+4 16 0.25 0 1.25 0.25 0 7.25 0 0 7.25 0 0 1.25
+4 16 0 0 0.25 0.25 0 0.25 0.25 0 0.5 0 0 0.5
+4 16 0 0 -1.25 0.25 0 -1.25 0.25 0 -0.75 0 0 -0.75
+4 16 0 0 -2.25 1 0 -2.25 1 0 -1.75 0 0 -1.75
+4 16 0 0 -6.5 0.25 0 -6.5 0.25 0 -4.75 0 0 -4.75
+4 16 2.75 0 -2.75 2.75 0 -1.75 1.75 0 -1.75 1.75 0 -2.75
+3 16 7 0 -1.75 6.25 0 -1.75 6.25 0 -3.5
+4 16 4.25 0 1 4.25 0 7 3.25 0 7.5 3.5 0 0.75
+4 16 3.5 0 0.75 6.5 0 0.75 6 0 1 4.25 0 1
+4 16 6.5 0 0.75 6.5 0 5 6 0 6 6 0 1
+4 16 6 0 6 6.5 0 5 7.25 0 4 7.5 0 4
+4 16 8.25 0 2 7.5 0 4 7.25 0 4 7.25 0 0
+4 16 7.25 0 0 8 0 -1 8.5 0 0 8.25 0 2
+4 16 8.5 0 0 8 0 -1 7.25 0 -3 7.853 0 -3.253
+4 16 8 0 -1 7.25 0 0 4.25 0 0 5.75 0 -1
+4 16 5.25 0 -3.5 4.25 0 -1 3.5 0 -1 3.5 0 -3.5
+4 16 4.25 0 -1 5.25 0 -3.5 5.75 0 -1 4.25 0 0
+4 16 5.75 0 -1 5.25 0 -3.5 5.25 0 -6.25 5.75 0 -4.75
+4 16 6.01 0 -6.01 7.853 0 -3.253 7.25 0 -3 5.75 0 -4.75
+4 16 4.5 0 -6.75 3.253 0 -7.853 6.01 0 -6.01 5.25 0 -6.25
+3 16 5.25 0 -6.25 6.01 0 -6.01 5.75 0 -4.75
+4 16 3.253 0 -7.853 4.5 0 -6.75 4.5 0 -4.25 2.75 0 -4.25
+4 16 3.253 0 -7.853 2.75 0 -4.25 2.5 0 -4.25 2.5 0 -5.25
+4 16 1 0 -7 3.253 0 -7.853 2.5 0 -5.25 1.5 0 -5.25
+4 16 3.253 0 -7.853 1 0 -7 0 0 -7 0 0 -8.5
+4 16 1 0 -7 1.5 0 -5.25 1.5 0 -4.25 1 0 -4.25
+4 16 0 0 -4.25 1 0 -3.5 1 0 -3 0 0 -3
+3 16 0 0 -4.25 1 0 -4.25 1 0 -3.5
+3 16 1 0 -4.25 1.5 0 -4.25 1 0 -3.5
+3 16 2.75 0 -4.25 2.75 0 -3.5 2.5 0 -4.25
+4 16 2.5 0 -4.25 2.75 0 -3.5 1 0 -3.5 1.5 0 -4.25
+4 16 1.5 0 -0.5 1.5 0 8 1 0 8 1 0 1.5
+3 16 1.5 0 -0.5 1 0 1.5 1 0 0.25
+3 16 1 0 -0.75 1.5 0 -0.5 1 0 0.25
+3 16 3.25 0 -0.5 3.5 0 -0.75 3.5 0 0.75
+3 16 3.5 0 0.75 3.25 0 7.5 3.25 0 -0.5
+4 16 1 0 -0.75 3.5 0 -0.75 3.25 0 -0.5 1.5 0 -0.5
+
+0 // Pattern created wholly or in part by Quad2Dat
+0 // Thanks James
+
+
+
+
+
+0 FILE parts/s/3070bs01.dat
+0 ~Tile  1 x  1 with Groove without Top Face
+0 Name: s\3070bs01.dat
+0 Author: Chris Dee [cwdee]
+0 !LDRAW_ORG Subpart UPDATE 2009-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2009-09-03 [PTadmin] Official Update 2009-02
+
+1 16 0 0 0 10 0 0 0 7 0 0 0 10 p/box4.dat
+0 BFC INVERTNEXT
+1 16 0 8 0 6 0 0 0 -4 0 0 0 6 p/box5.dat
+1 16 0 7 0 9 0 0 0 1 0 0 0 9 p/box4.dat
+
+4 16 9 8 9 6 8 6 -6 8 6 -9 8 9
+4 16 -9 8 9 -6 8 6 -6 8 -6 -9 8 -9
+4 16 -9 8 -9 -6 8 -6 6 8 -6 9 8 -9
+4 16 9 8 -9 6 8 -6 6 8 6 9 8 9
+
+4 16 10 7 10 9 7 9 -9 7 9 -10 7 10
+4 16 -10 7 10 -9 7 9 -9 7 -9 -10 7 -10
+4 16 -10 7 -10 -9 7 -9 9 7 -9 10 7 -10
+4 16 10 7 -10 9 7 -9 9 7 9 10 7 10
+0
+
+0 FILE p/box5.dat
+0 Box with 5 Faces and All Edges
+0 Name: box5.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-04-03 [sbliss] Modified for BFC compliance
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+2 24 1 1 1 -1 1 1
+2 24 -1 1 1 -1 1 -1
+2 24 -1 1 -1 1 1 -1
+2 24 1 1 -1 1 1 1
+2 24 1 0 1 -1 0 1
+2 24 -1 0 1 -1 0 -1
+2 24 -1 0 -1 1 0 -1
+2 24 1 0 -1 1 0 1
+2 24 1 0 1 1 1 1
+2 24 -1 0 1 -1 1 1
+2 24 1 0 -1 1 1 -1
+2 24 -1 0 -1 -1 1 -1
+4 16 -1 1 1 1 1 1 1 1 -1 -1 1 -1
+4 16 -1 1 1 -1 0 1 1 0 1 1 1 1
+4 16 -1 1 -1 -1 0 -1 -1 0 1 -1 1 1
+4 16 1 1 -1 1 0 -1 -1 0 -1 -1 1 -1
+4 16 1 1 1 1 0 1 1 0 -1 1 1 -1
+
+0 FILE p/box4.dat
+0 Box with 4 Faces (2 Parallel Pairs) and All Edges
+0 Name: box4.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-04-03 [sbliss] Modified for BFC compliance
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+2 24 1 1 1 -1 1 1
+2 24 -1 1 1 -1 1 -1
+2 24 -1 1 -1 1 1 -1
+2 24 1 1 -1 1 1 1
+2 24 1 0 1 -1 0 1
+2 24 -1 0 1 -1 0 -1
+2 24 -1 0 -1 1 0 -1
+2 24 1 0 -1 1 0 1
+2 24 1 0 1 1 1 1
+2 24 -1 0 1 -1 1 1
+2 24 1 0 -1 1 1 -1
+2 24 -1 0 -1 -1 1 -1
+4 16 -1 1 1 -1 0 1 1 0 1 1 1 1
+4 16 -1 1 -1 -1 0 -1 -1 0 1 -1 1 1
+4 16 1 1 -1 1 0 -1 -1 0 -1 -1 1 -1
+4 16 1 1 1 1 0 1 1 0 -1 1 1 -1
+
+0 FILE parts/4733.dat
+0 Brick  1 x  1 with Studs on Four Sides
+0 Name: 4733.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Part UPDATE 2004-04
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1998-06-20 [PTadmin] Official Update 1998-06
+0 !HISTORY 2003-06-08 [jriley] BFC compliant
+0 !HISTORY 2003-12-19 [PTadmin] Official Update 2003-03
+0 !HISTORY 2004-07-24 [cwdee] Add "Four" to part title
+0 !HISTORY 2004-11-06 [PTadmin] Official Update 2004-04
+0 !HISTORY 2007-07-08 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+2 24 6 24 6 -6 24 6
+2 24 -6 24 6 -6 24 -6
+2 24 -6 24 -6 6 24 -6
+2 24 6 24 -6 6 24 6
+2 24 6 4 6 -6 4 6
+2 24 -6 4 6 -6 4 -6
+2 24 -6 4 -6 6 4 -6
+2 24 6 4 -6 6 4 6
+2 24 6 4 6 6 24 6
+2 24 -6 4 6 -6 24 6
+2 24 -6 4 -6 -6 24 -6
+2 24 6 4 -6 6 24 -6
+2 24 10 24 10 -10 24 10
+2 24 -10 24 10 -10 24 -10
+2 24 -10 24 -10 10 24 -10
+2 24 10 24 -10 10 24 10
+2 24 10 0 10 -10 0 10
+2 24 -10 0 10 -10 0 -10
+2 24 -10 0 -10 10 0 -10
+2 24 10 0 -10 10 0 10
+2 24 10 0 10 10 24 10
+2 24 -10 0 10 -10 24 10
+2 24 -10 0 -10 -10 24 -10
+2 24 10 0 -10 10 24 -10
+1 16 0 4 0 4 0 0 0 -1 0 0 0 4 p/4-4edge.dat
+1 16 6 10 0 0 -1 0 4 0 0 0 0 4 p/4-4edge.dat
+1 16 0 10 -6 4 0 0 0 0 4 0 -1 0 p/4-4edge.dat
+1 16 -6 10 0 0 1 0 4 0 0 0 0 4 p/4-4edge.dat
+1 16 0 10 6 4 0 0 0 0 4 0 1 0 p/4-4edge.dat
+1 16 0 0 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+1 16 10 10 0 0 1 0 6 0 0 0 0 6 p/4-4edge.dat
+1 16 0 10 -10 6 0 0 0 0 6 0 1 0 p/4-4edge.dat
+1 16 -10 10 0 0 1 0 6 0 0 0 0 6 p/4-4edge.dat
+1 16 0 10 10 6 0 0 0 0 6 0 1 0 p/4-4edge.dat
+1 16 0 4 0 4 0 0 0 -1 0 0 0 4 p/4-4ndis.dat
+1 16 6 10 0 0 1 0 4 0 0 0 0 4 p/4-4ndis.dat
+1 16 0 10 -6 -4 0 0 0 0 4 0 -1 0 p/4-4ndis.dat
+1 16 -6 10 0 0 -1 0 4 0 0 0 0 -4 p/4-4ndis.dat
+1 16 0 10 6 4 0 0 0 0 4 0 1 0 p/4-4ndis.dat
+1 16 0 0 0 6 0 0 0 1 0 0 0 6 p/4-4ndis.dat
+1 16 10 10 0 0 -1 0 6 0 0 0 0 -6 p/4-4ndis.dat
+1 16 0 10 -10 6 0 0 0 0 6 0 1 0 p/4-4ndis.dat
+1 16 -10 10 0 0 1 0 6 0 0 0 0 6 p/4-4ndis.dat
+1 16 0 10 10 -6 0 0 0 0 6 0 -1 0 p/4-4ndis.dat
+0 BFC INVERTNEXT
+1 16 0 0 0 4 0 0 0 4 0 0 0 4 p/4-4cyli.dat
+0 BFC INVERTNEXT
+1 16 10 10 0 0 -4 0 4 0 0 0 0 4 p/4-4cyli.dat
+0 BFC INVERTNEXT
+1 16 0 10 -10 4 0 0 0 0 4 0 4 0 p/4-4cyli.dat
+0 BFC INVERTNEXT
+1 16 -10 10 0 0 4 0 4 0 0 0 0 4 p/4-4cyli.dat
+0 BFC INVERTNEXT
+1 16 0 10 10 4 0 0 0 0 4 0 -4 0 p/4-4cyli.dat
+4 16 10 24 10 6 24 6 -6 24 6 -10 24 10
+4 16 -10 24 10 -6 24 6 -6 24 -6 -10 24 -10
+4 16 -10 24 -10 -6 24 -6 6 24 -6 10 24 -10
+4 16 10 24 -10 6 24 -6 6 24 6 10 24 10
+4 16 6 4 6 4 4 4 -4 4 4 -6 4 6
+4 16 -6 4 6 -4 4 4 -4 4 -4 -6 4 -6
+4 16 -6 4 -6 -4 4 -4 4 4 -4 6 4 -6
+4 16 6 4 -6 4 4 -4 4 4 4 6 4 6
+4 16 -10 0 10 -6 0 6 6 0 6 10 0 10
+4 16 -10 0 -10 -6 0 -6 -6 0 6 -10 0 10
+4 16 10 0 -10 6 0 -6 -6 0 -6 -10 0 -10
+4 16 10 0 10 6 0 6 6 0 -6 10 0 -10
+4 16 -10 24 10 -6 16 10 6 16 10 10 24 10
+4 16 -10 24 10 -10 0 10 -6 4 10 -6 16 10
+4 16 10 0 10 6 4 10 -6 4 10 -10 0 10
+4 16 10 0 10 10 24 10 6 16 10 6 4 10
+4 16 6 24 6 4 14 6 -4 14 6 -6 24 6
+4 16 -6 24 6 -4 14 6 -4 6 6 -6 4 6
+4 16 -6 4 6 -4 6 6 4 6 6 6 4 6
+4 16 6 4 6 4 6 6 4 14 6 6 24 6
+4 16 -6 24 -6 -4 14 -6 4 14 -6 6 24 -6
+4 16 6 24 -6 4 14 -6 4 6 -6 6 4 -6
+4 16 6 4 -6 4 6 -6 -4 6 -6 -6 4 -6
+4 16 -6 4 -6 -4 6 -6 -4 14 -6 -6 24 -6
+4 16 10 24 -10 6 16 -10 -6 16 -10 -10 24 -10
+4 16 -10 24 -10 -6 16 -10 -6 4 -10 -10 0 -10
+4 16 -10 0 -10 -6 4 -10 6 4 -10 10 0 -10
+4 16 10 0 -10 6 4 -10 6 16 -10 10 24 -10
+4 16 10 24 10 10 16 6 10 16 -6 10 24 -10
+4 16 10 24 -10 10 16 -6 10 4 -6 10 0 -10
+4 16 10 0 -10 10 4 -6 10 4 6 10 0 10
+4 16 10 0 10 10 4 6 10 16 6 10 24 10
+4 16 6 24 -6 6 14 -4 6 14 4 6 24 6
+4 16 6 24 6 6 14 4 6 6 4 6 4 6
+4 16 6 4 6 6 6 4 6 6 -4 6 4 -6
+4 16 6 4 -6 6 6 -4 6 14 -4 6 24 -6
+4 16 -6 24 6 -6 14 4 -6 14 -4 -6 24 -6
+4 16 -6 24 -6 -6 14 -4 -6 6 -4 -6 4 -6
+4 16 -6 4 -6 -6 6 -4 -6 6 4 -6 4 6
+4 16 -6 4 6 -6 6 4 -6 14 4 -6 24 6
+4 16 -10 24 -10 -10 16 -6 -10 16 6 -10 24 10
+4 16 -10 24 -10 -10 0 -10 -10 4 -6 -10 16 -6
+4 16 -10 0 10 -10 4 6 -10 4 -6 -10 0 -10
+4 16 -10 0 10 -10 24 10 -10 16 6 -10 4 6
+1 16 0 0 0 1 0 0 0 1 0 0 0 1 p/stud2a.dat
+1 16 10 10 0 0 -1 0 1 0 0 0 0 1 p/stud2a.dat
+1 16 0 10 -10 1 0 0 0 0 1 0 1 0 p/stud2a.dat
+1 16 -10 10 0 0 1 0 1 0 0 0 0 1 p/stud2a.dat
+1 16 0 10 10 1 0 0 0 0 1 0 -1 0 p/stud2a.dat
+0
+
+0 FILE p/stud2a.dat
+0 Stud Open without Base Edges
+0 Name: stud2a.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2009-02
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1999-07-05 [PTadmin] Official Update 1999-05
+0 !HISTORY 2002-04-04 [sbliss] Modified for BFC compliance
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2009-06-21 [cwdee] Update ring references to 4-4ring
+0 !HISTORY 2009-09-03 [PTadmin] Official Update 2009-02
+
+1 16 0 -4 0 4 0 0 0 1 0 0 0 4 p/4-4edge.dat
+1 16 0 -4 0 6 0 0 0 1 0 0 0 6 p/4-4edge.dat
+0 BFC INVERTNEXT
+1 16 0 -4 0 4 0 0 0 4 0 0 0 4 p/4-4cyli.dat
+1 16 0 -4 0 6 0 0 0 4 0 0 0 6 p/4-4cyli.dat
+1 16 0 -4 0 2 0 0 0 1 0 0 0 2 p/4-4ring2.dat
+0
+
+0 FILE p/4-4ring2.dat
+0 Ring  2 x 1.0
+0 Name: 4-4ring2.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2009-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1998-12-15 [PTadmin] Official Update 1998-10
+0 !HISTORY 2002-04-05 [hafhead] Added BFC statement
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2008-08-26 [cwdee] Switch polygon winding and rename
+0 !HISTORY 2009-05-02 [PTadmin] Official Update 2009-01
+
+4 16 -1.1481 0 2.7717 -0.7654 0 1.8478 0 0 2 0 0 3
+4 16 -2.1213 0 2.1213 -1.4142 0 1.4142 -0.7654 0 1.8478 -1.1481 0 2.7717
+4 16 -2.7717 0 1.1481 -1.8478 0 0.7654 -1.4142 0 1.4142 -2.1213 0 2.1213
+4 16 -3 0 0 -2 0 0 -1.8478 0 0.7654 -2.7717 0 1.1481
+4 16 -2.7717 0 -1.1481 -1.8478 0 -0.7654 -2 0 0 -3 0 0
+4 16 -2.1213 0 -2.1213 -1.4142 0 -1.4142 -1.8478 0 -0.7654 -2.7717 0 -1.1481
+4 16 -1.1481 0 -2.7717 -0.7654 0 -1.8478 -1.4142 0 -1.4142 -2.1213 0 -2.1213
+4 16 0 0 -3 0 0 -2 -0.7654 0 -1.8478 -1.1481 0 -2.7717
+4 16 1.1481 0 -2.7717 0.7654 0 -1.8478 0 0 -2 0 0 -3
+4 16 2.1213 0 -2.1213 1.4142 0 -1.4142 0.7654 0 -1.8478 1.1481 0 -2.7717
+4 16 2.7717 0 -1.1481 1.8478 0 -0.7654 1.4142 0 -1.4142 2.1213 0 -2.1213
+4 16 3 0 0 2 0 0 1.8478 0 -0.7654 2.7717 0 -1.1481
+4 16 2.7717 0 1.1481 1.8478 0 0.7654 2 0 0 3 0 0
+4 16 2.1213 0 2.1213 1.4142 0 1.4142 1.8478 0 0.7654 2.7717 0 1.1481
+4 16 1.1481 0 2.7717 0.7654 0 1.8478 1.4142 0 1.4142 2.1213 0 2.1213
+4 16 0 0 3 0 0 2 0.7654 0 1.8478 1.1481 0 2.7717
+0
+
+0 FILE p/4-4cyli.dat
+0 Cylinder 1.0
+0 Name: 4-4cyli.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2005-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1998-12-15 [PTadmin] Official Update 1998-10
+0 !HISTORY 2002-03-23 [sbliss] Added BFC statement; merged headers from files in distributions LDraw 0.27 and Complete.
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2004-12-14 [guyvivan] BFC CCW
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+
+4 16 1 1 0 0.9239 1 0.3827 0.9239 0 0.3827 1 0 0
+5 24 1 0 0 1 1 0 0.9239 0 0.3827 0.9239 0 -0.3827
+4 16 0.9239 1 0.3827 0.7071 1 0.7071 0.7071 0 0.7071 0.9239 0 0.3827
+5 24 0.9239 0 0.3827 0.9239 1 0.3827 0.7071 0 0.7071 1 0 0
+4 16 0.7071 1 0.7071 0.3827 1 0.9239 0.3827 0 0.9239 0.7071 0 0.7071
+5 24 0.7071 0 0.7071 0.7071 1 0.7071 0.3827 0 0.9239 0.9239 0 0.3827
+4 16 0.3827 1 0.9239 0 1 1 0 0 1 0.3827 0 0.9239
+5 24 0.3827 0 0.9239 0.3827 1 0.9239 0 0 1 0.7071 0 0.7071
+4 16 0 1 1 -0.3827 1 0.9239 -0.3827 0 0.9239 0 0 1
+5 24 0 0 1 0 1 1 -0.3827 0 0.9239 0.3827 0 0.9239
+4 16 -0.3827 1 0.9239 -0.7071 1 0.7071 -0.7071 0 0.7071 -0.3827 0 0.9239
+5 24 -0.3827 0 0.9239 -0.3827 1 0.9239 -0.7071 0 0.7071 0 0 1
+4 16 -0.7071 1 0.7071 -0.9239 1 0.3827 -0.9239 0 0.3827 -0.7071 0 0.7071
+5 24 -0.7071 0 0.7071 -0.7071 1 0.7071 -0.9239 0 0.3827 -0.3827 0 0.9239
+4 16 -0.9239 1 0.3827 -1 1 0 -1 0 0 -0.9239 0 0.3827
+5 24 -0.9239 0 0.3827 -0.9239 1 0.3827 -1 0 0 -0.7071 0 0.7071
+4 16 -1 1 0 -0.9239 1 -0.3827 -0.9239 0 -0.3827 -1 0 0
+5 24 -1 0 0 -1 1 0 -0.9239 0 -0.3827 -0.9239 0 0.3827
+4 16 -0.9239 1 -0.3827 -0.7071 1 -0.7071 -0.7071 0 -0.7071 -0.9239 0 -0.3827
+5 24 -0.9239 0 -0.3827 -0.9239 1 -0.3827 -0.7071 0 -0.7071 -1 0 0
+4 16 -0.7071 1 -0.7071 -0.3827 1 -0.9239 -0.3827 0 -0.9239 -0.7071 0 -0.7071
+5 24 -0.7071 0 -0.7071 -0.7071 1 -0.7071 -0.3827 0 -0.9239 -0.9239 0 -0.3827
+4 16 -0.3827 1 -0.9239 0 1 -1 0 0 -1 -0.3827 0 -0.9239
+5 24 -0.3827 0 -0.9239 -0.3827 1 -0.9239 0 0 -1 -0.7071 0 -0.7071
+4 16 0 1 -1 0.3827 1 -0.9239 0.3827 0 -0.9239 0 0 -1
+5 24 0 0 -1 0 1 -1 0.3827 0 -0.9239 -0.3827 0 -0.9239
+4 16 0.3827 1 -0.9239 0.7071 1 -0.7071 0.7071 0 -0.7071 0.3827 0 -0.9239
+5 24 0.3827 0 -0.9239 0.3827 1 -0.9239 0.7071 0 -0.7071 0 0 -1
+4 16 0.7071 1 -0.7071 0.9239 1 -0.3827 0.9239 0 -0.3827 0.7071 0 -0.7071
+5 24 0.7071 0 -0.7071 0.7071 1 -0.7071 0.9239 0 -0.3827 0.3827 0 -0.9239
+4 16 0.9239 1 -0.3827 1 1 0 1 0 0 0.9239 0 -0.3827
+5 24 0.9239 0 -0.3827 0.9239 1 -0.3827 1 0 0 0.7071 0 -0.7071
+0
+
+0 FILE p/4-4ndis.dat
+0 Disc Negative 1.0
+0 Name: 4-4ndis.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2012-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 2002-03-23 [sbliss] Added BFC statement; compacted code
+0 !HISTORY 2002-04-25 [PTadmin] Official Update 2002-02
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2012-02-16 [Philo] Changed to CCW
+0 !HISTORY 2012-03-30 [PTadmin] Official Update 2012-01
+
+3 16 0.9239 0 0.3827 1 0 0 1 0 1
+3 16 0.7071 0 0.7071 0.9239 0 0.3827 1 0 1
+3 16 0.3827 0 0.9239 0.7071 0 0.7071 1 0 1
+3 16 0 0 1 0.3827 0 0.9239 1 0 1
+3 16 -0.3827 0 0.9239 0 0 1 -1 0 1
+3 16 -0.7071 0 0.7071 -0.3827 0 0.9239 -1 0 1
+3 16 -0.9239 0 0.3827 -0.7071 0 0.7071 -1 0 1
+3 16 -1 0 0 -0.9239 0 0.3827 -1 0 1
+3 16 -0.9239 0 -0.3827 -1 0 0 -1 0 -1
+3 16 -0.7071 0 -0.7071 -0.9239 0 -0.3827 -1 0 -1
+3 16 -0.3827 0 -0.9239 -0.7071 0 -0.7071 -1 0 -1
+3 16 0 0 -1 -0.3827 0 -0.9239 -1 0 -1
+3 16 0.3827 0 -0.9239 0 0 -1 1 0 -1
+3 16 0.7071 0 -0.7071 0.3827 0 -0.9239 1 0 -1
+3 16 0.9239 0 -0.3827 0.7071 0 -0.7071 1 0 -1
+3 16 1 0 0 0.9239 0 -0.3827 1 0 -1
+
+0 FILE p/4-4edge.dat
+0 Circle 1.0
+0 Name: 4-4edge.dat
+0 Author: James Jessiman
+0 !LDRAW_ORG Primitive UPDATE 2017-01
+0 !LICENSE Redistributable under CCAL version 2.0 : see CAreadme.txt
+
+0 BFC CERTIFY CCW
+
+0 !HISTORY 1998-12-15 [PTadmin] Official Update 1998-10
+0 !HISTORY 2005-12-28 [PTadmin] Official Update 2005-01
+0 !HISTORY 2007-06-24 [PTadmin] Header formatted for Contributor Agreement
+0 !HISTORY 2008-07-01 [PTadmin] Official Update 2008-01
+0 !HISTORY 2017-01-15 [Steffen] BFCed
+0 !HISTORY 2017-12-30 [PTadmin] Official Update 2017-01
+
+2 24 1 0 0 0.9239 0 0.3827
+2 24 0.9239 0 0.3827 0.7071 0 0.7071
+2 24 0.7071 0 0.7071 0.3827 0 0.9239
+2 24 0.3827 0 0.9239 0 0 1
+2 24 0 0 1 -0.3827 0 0.9239
+2 24 -0.3827 0 0.9239 -0.7071 0 0.7071
+2 24 -0.7071 0 0.7071 -0.9239 0 0.3827
+2 24 -0.9239 0 0.3827 -1 0 -0
+2 24 -1 0 -0 -0.9239 0 -0.3827
+2 24 -0.9239 0 -0.3827 -0.7071 0 -0.7071
+2 24 -0.7071 0 -0.7071 -0.3827 0 -0.9239
+2 24 -0.3827 0 -0.9239 0 0 -1
+2 24 0 0 -1 0.3827 0 -0.9239
+2 24 0.3827 0 -0.9239 0.7071 0 -0.7071
+2 24 0.7071 0 -0.7071 0.9239 0 -0.3827
+2 24 0.9239 0 -0.3827 1 0 0
+
+

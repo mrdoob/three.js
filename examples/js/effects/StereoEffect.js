@@ -1,3 +1,4 @@
+console.warn( "THREE.StereoEffect: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author alteredq / http://alteredqualia.com/
  * @authod mrdoob / http://mrdoob.com/
@@ -9,6 +10,7 @@ THREE.StereoEffect = function ( renderer ) {
 
 	var _stereo = new THREE.StereoCamera();
 	_stereo.aspect = 0.5;
+	var size = new THREE.Vector2();
 
 	this.setEyeSeparation = function ( eyeSep ) {
 
@@ -30,7 +32,7 @@ THREE.StereoEffect = function ( renderer ) {
 
 		_stereo.update( camera );
 
-		var size = renderer.getSize();
+		renderer.getSize( size );
 
 		if ( renderer.autoClear ) renderer.clear();
 		renderer.setScissorTest( true );

@@ -1,7 +1,7 @@
+console.warn( "THREE.BokehPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Depth-of-field post-process with bokeh shader
  */
-
 
 THREE.BokehPass = function ( scene, camera, params ) {
 
@@ -20,14 +20,12 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	var width = params.width || window.innerWidth || 1;
 	var height = params.height || window.innerHeight || 1;
 
-	this.renderTargetColor = new THREE.WebGLRenderTarget( width, height, {
-		minFilter: THREE.LinearFilter,
-		magFilter: THREE.LinearFilter,
-		format: THREE.RGBFormat
+	this.renderTargetDepth = new THREE.WebGLRenderTarget( width, height, {
+		minFilter: THREE.NearestFilter,
+		magFilter: THREE.NearestFilter,
+		stencilBuffer: false
 	} );
-	this.renderTargetColor.texture.name = "BokehPass.color";
 
-	this.renderTargetDepth = this.renderTargetColor.clone();
 	this.renderTargetDepth.texture.name = "BokehPass.depth";
 
 	// depth material
@@ -66,15 +64,9 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	this.uniforms = bokehUniforms;
 	this.needsSwap = false;
 
-	this.camera2 = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-	this.scene2  = new THREE.Scene();
-
-	this.quad2 = new THREE.Mesh( new THREE.PlaneBufferGeometry( 2, 2 ), null );
-	this.quad2.frustumCulled = false; // Avoid getting clipped
-	this.scene2.add( this.quad2 );
+	this.fsQuad = new THREE.Pass.FullScreenQuad( this.materialBokeh );
 
 	this.oldClearColor = new THREE.Color();
-	this.oldClearAlpha = 1;
 
 };
 
@@ -82,22 +74,22 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 	constructor: THREE.BokehPass,
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
-
-		this.quad2.material = this.materialBokeh;
+	render: function ( renderer, writeBuffer, readBuffer/*, deltaTime, maskActive*/ ) {
 
 		// Render depth into texture
 
 		this.scene.overrideMaterial = this.materialDepth;
 
 		this.oldClearColor.copy( renderer.getClearColor() );
-		this.oldClearAlpha = renderer.getClearAlpha();
+		var oldClearAlpha = renderer.getClearAlpha();
 		var oldAutoClear = renderer.autoClear;
 		renderer.autoClear = false;
 
 		renderer.setClearColor( 0xffffff );
 		renderer.setClearAlpha( 1.0 );
-		renderer.render( this.scene, this.camera, this.renderTargetDepth, true );
+		renderer.setRenderTarget( this.renderTargetDepth );
+		renderer.clear();
+		renderer.render( this.scene, this.camera );
 
 		// Render bokeh composite
 
@@ -107,19 +99,22 @@ THREE.BokehPass.prototype = Object.assign( Object.create( THREE.Pass.prototype )
 
 		if ( this.renderToScreen ) {
 
-			renderer.render( this.scene2, this.camera2 );
+			renderer.setRenderTarget( null );
+			this.fsQuad.render( renderer );
 
 		} else {
 
-			renderer.render( this.scene2, this.camera2, writeBuffer, this.clear );
+			renderer.setRenderTarget( writeBuffer );
+			renderer.clear();
+			this.fsQuad.render( renderer );
 
 		}
 
 		this.scene.overrideMaterial = null;
 		renderer.setClearColor( this.oldClearColor );
-		renderer.setClearAlpha( this.oldClearAlpha );
-		renderer.autoClear = this.oldAutoClear;
-	
+		renderer.setClearAlpha( oldClearAlpha );
+		renderer.autoClear = oldAutoClear;
+
 	}
 
 } );

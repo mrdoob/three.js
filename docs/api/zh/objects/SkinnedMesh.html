@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>蒙皮网格（[name]）</h1>
+
+		<p class="desc">
+			具有[page:Skeleton]（骨架）和[page:Bone bones]（骨骼）的网格，可用于给几何体上的顶点添加动画。
+			其材质必须支持蒙皮，并且已经启用了蒙皮 —— 请阅读[page:MeshStandardMaterial.skinning]。
+		</p>
+
+		<iframe id="scene" src="scenes/bones-browser.html"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>代码示例</h2>
+
+		<code>
+		var geometry = new THREE.CylinderBufferGeometry( 5, 5, 5, 5, 15, 5, 30 );
+
+		// create the skin indices and skin weights
+
+		var position = geometry.attributes.position;
+
+		var vertex = new THREE.Vector3();
+
+		var skinIndices = [];
+		var skinWeights = [];
+
+		for ( var i = 0; i < position.count; i ++ ) {
+
+			vertex.fromBufferAttribute( position, i );
+
+			// compute skinIndex and skinWeight based on some configuration data
+
+			var y = ( vertex.y + sizing.halfHeight );
+
+			var skinIndex = Math.floor( y / sizing.segmentHeight );
+			var skinWeight = ( y % sizing.segmentHeight ) / sizing.segmentHeight;
+
+			skinIndices.push( skinIndex, skinIndex + 1, 0, 0 );
+			skinWeights.push( 1 - skinWeight, skinWeight, 0, 0 );
+
+		}
+
+		geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+		geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+
+		// create skinned mesh and skeleton
+
+		var mesh = new THREE.SkinnedMesh( geometry, material );
+		var skeleton = new THREE.Skeleton( bones );
+
+		// see example from THREE.Skeleton
+
+		var rootBone = skeleton.bones[ 0 ];
+		mesh.add( rootBone );
+
+		// bind the skeleton to the mesh
+
+		mesh.bind( skeleton );
+
+		// move the bones and manipulate the model
+
+		skeleton.bones[ 0 ].rotation.x = -0.1;
+		skeleton.bones[ 1 ].rotation.x = 0.2;
+		</code>
+
+		<h2>构造器</h2>
+		<h3>[name]( [param:BufferGeometry geometry], [param:Material material] )</h3>
+		<p>
+	[page:BufferGeometry geometry] —— 一个[page:BufferGeometry]实例。<br />
+	[page:Material material] —— （可选）一个[page:Material]实例，默认值是一个新的[page:MeshBasicMaterial]。
+		</p>
+
+
+
+
+
+		<h2>属性</h2>
+		<p>共有属性请参见其基类[page:Mesh]。</p>
+
+		<h3>[property:string bindMode]</h3>
+		<p>
+			“attached”（附加）或者“detached”（分离）。“attached”使用[page:SkinnedMesh.matrixWorld]
+			属性作为对骨骼的基本变换矩阵，“detached”则使用[page:SkinnedMesh.bindMatrix]。
+			默认值是“attached”。
+		</p>
+
+		<h3>[property:Matrix4 bindMatrix]</h3>
+		<p>
+			该基础矩阵用于绑定骨骼的变换。
+		</p>
+
+		<h3>[property:Matrix4 bindMatrixInverse]</h3>
+		<p>
+			该基础矩阵用于重置绑定骨骼的变换。
+		</p>
+
+		<h3>[property:Skeleton skeleton]</h3>
+		<p>
+			用于表示蒙皮网格中骨骼的层次结构的[page:Skeleton]（骨架）。
+		</p>
+
+
+
+		<h2>方法</h2>
+		<p>共有方法请参见其基类[page:Mesh]。</p>
+
+		<h3>[method:null bind]( [param:Skeleton skeleton], [param:Matrix4 bindMatrix] )</h3>
+		<p>
+		[page:Skeleton skeleton] —— 由一棵[page:Bone Bones]树创建的[page:Skeleton]。<br/>
+		[page:Matrix4 bindMatrix] —— 表示骨架基本变换的[page:Matrix4]（4x4矩阵）。<br /><br />
+		将骨架绑定到一个蒙皮网格上。bindMatrix会被保存到.bindMatrix属性中，其逆矩阵.bindMatrixInverse也会被计算出来。
+		</p>
+
+		<h3>[method:SkinnedMesh clone]()</h3>
+		<p>
+		返回当前SkinnedMesh对象的一个克隆及其任何后代。
+		</p>
+
+		<h3>[method:null normalizeSkinWeights]()</h3>
+		<p>
+		标准化蒙皮的权重。
+		</p>
+
+		<h3>[method:null pose]()</h3>
+		<p>
+		这个方法设置了在“休息”状态下蒙皮网格的姿势（重置姿势）。
+		</p>
+
+		<h3>[method:null updateMatrixWorld]( [param:Boolean force] )</h3>
+		<p>
+		更新[page:Matrix4 MatrixWorld]矩阵。
+		</p>
+
+		<h2>源代码</h2>
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
