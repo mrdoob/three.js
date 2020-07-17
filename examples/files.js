@@ -156,7 +156,7 @@ var files = {
 		"webgl_materials_physical_clearcoat",
 		"webgl_materials_physical_reflectivity",
 		"webgl_materials_physical_sheen",
-		"webgl_materials_physical_transparency",
+		"webgl_materials_physical_transmission",
 		"webgl_materials_shaders_fresnel",
 		"webgl_materials_standard",
 		"webgl_materials_subsurface_scattering",

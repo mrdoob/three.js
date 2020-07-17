@@ -17,7 +17,8 @@ import { Color } from '../math/Color.js';
  *
  *  sheen: <Color>,
  *
- *  transparency: <float>
+ *  transmission: <float>,
+ *  transmissionMap: new THREE.Texture( <Image> )
  * }
  */
 
@@ -45,7 +46,8 @@ function MeshPhysicalMaterial( parameters ) {
 
 	this.sheen = null; // null will disable sheen bsdf
 
-	this.transparency = 0.0;
+	this.transmission = 0.0;
+	this.transmissionMap = null;
 
 	this.setValues( parameters );
 
@@ -86,7 +88,8 @@ MeshPhysicalMaterial.prototype.copy = function ( source ) {
 
 	}
 
-	this.transparency = source.transparency;
+	this.transmission = source.transmission;
+	this.transmissionMap = source.transmissionMap;
 
 	return this;
 
