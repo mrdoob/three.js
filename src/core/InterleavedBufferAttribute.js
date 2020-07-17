@@ -39,6 +39,16 @@ Object.defineProperties( InterleavedBufferAttribute.prototype, {
 
 		}
 
+	},
+
+	needsUpdate: {
+
+		set: function ( value ) {
+
+			this.data.needsUpdate = value;
+
+		}
+
 	}
 
 } );

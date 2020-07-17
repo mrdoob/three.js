@@ -21,6 +21,7 @@ export class InterleavedBufferAttribute {
 
 	get count(): number;
 	get array(): ArrayLike<number>;
+	set needsUpdate( value: boolean );
 
 	readonly isInterleavedBufferAttribute: true;
 
