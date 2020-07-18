@@ -247,7 +247,7 @@
 
 			var dolly, camera, scene, renderer;
 			var geometry, material, mesh;
-			var stats;
+			var stats, clock;
 
 			var canvas = document.querySelector( '#canvas' );
 
@@ -277,6 +277,8 @@
 
 				dolly = new THREE.Group();
 				scene.add( dolly );
+
+				clock = new THREE.Clock();
 
 				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
 				camera.position.z = 4;
@@ -330,11 +332,13 @@
 
 			}
 
-			function render( time ) {
+			function render() {
 
 				stats.begin();
 
-				dolly.position.z = - time / 1000;
+				var elapsedTime = clock.getElapsedTime();
+
+				dolly.position.z = - elapsedTime;
 
 				renderer.render( scene, camera );
 
