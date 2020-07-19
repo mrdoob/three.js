@@ -117,14 +117,9 @@ window.addEventListener('resize', render);
 controls.enableDamping = true;
 ```
 
-With `enableDamping` on we need to call `controls.update` in our render function
-so that the `OrbitControls` can continue to give us new camera settings as they
-smooth out the movement. But, that means we can't call `render` directly from
-the `change` event because we'll end up in an infinite loop. The controls will
-send us a `change` event and call `render`, `render` will call `controls.update`.
-`controls.update` will send another `change` event.
 
-С включенной функцией `enableDamping` нам нужно вызвать `Control.update` в нашей функции рендеринга, 
+
+С включенной функцией `enableDamping` нам нужно вызвать `controls.update` в нашей функции рендеринга, 
 чтобы `OrbitControls` продолжал предоставлять нам новые настройки камеры, поскольку они сглаживают движение. 
 Но это означает, что мы не можем вызвать `render` напрямую из события `change`, потому что мы окажемся в бесконечном цикле. 
 Элементы управления отправят нам событие `change` и вызовут `render`, `render` вызовет `controls.update`.
@@ -170,7 +165,7 @@ render();
 Может быть трудно увидеть разницу. Попробуйте нажать на приведенный ниже пример и использовать
 клавиши со стрелками для перемещения или перетаскивать для вращения. 
 Затем попробуйте нажать на приведенный выше пример и сделайте то же самое, и вы сможете увидеть разницу. 
-В приведенный выше примере при нажатии клавиши со стрелкой или перетаскивании мышью, кубики проскальзывают. 
+В приведенном примере при нажатии клавиши со стрелкой или перетаскивании мышью, кубики проскальзывают. 
 
 {{{example url="../threejs-render-on-demand-w-damping.html" }}}
 
