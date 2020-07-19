@@ -36,7 +36,11 @@
 
 		</div>
 
-		<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
+		<div id="right">
+			<iframe id="viewer" name="viewer" allowfullscreen allowvr onmousewheel=""></iframe>
+			<div id="thumbnails"></div>
+			<div id="showThumbnails" class="hidden">X</div>
+		</div>
 
 		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
@@ -47,13 +51,16 @@
 		var panel = document.getElementById( 'panel' );
 		var content = document.getElementById( 'content' );
 		var viewer = document.getElementById( 'viewer' );
+		var thumbnails = document.getElementById( 'thumbnails' );
+		var showThumbnailsElem = document.getElementById( 'showThumbnails' );
 		var filterInput = document.getElementById( 'filterInput' );
 		var exitSearchButton = document.getElementById( 'exitSearchButton' );
 		var expandButton = document.getElementById( 'expandButton' );
 		var viewSrcButton = document.getElementById( 'button' );
 		var panelScrim = document.getElementById( 'panelScrim' );
 
-		var links = {};
+
+		var linkInfos = {};
 		var selected = null;
 		var container = document.createElement( 'div' );
 
@@ -78,20 +85,57 @@
 
 					var file = section[ i ];
 
-					var link = createLink( file );
-					container.appendChild( link );
+					var linkInfo = createLink( file );
+					container.appendChild( linkInfo.link );
+					thumbnails.appendChild( linkInfo.thumbnail );
 
-					links[ file ] = link;
+					linkInfos[ file ] = linkInfo;
 
 				}
 
 			}
 
-			if ( window.location.hash !== '' && links[ window.location.hash.substring( 1 ) ] ) {
+			function setViewerToHash() {
 
-				loadFile( window.location.hash.substring( 1 ) );
+				if ( window.location.hash !== '' && linkInfos[ window.location.hash.substring( 1 ) ] ) {
+
+					var file = window.location.hash.substring( 1 )
+
+					if ( selected !== null ) linkInfos[ selected ].link.classList.remove( 'selected' );
+
+					linkInfos[ file ].link.classList.add( 'selected' );
+
+					viewer.focus();
+					viewer.classList.remove( 'hidden' );
+					thumbnails.classList.add( 'hidden' );
+					showThumbnailsElem.classList.remove( 'hidden' );
+
+					panel.classList.remove( 'open' );
+
+					selected = file;
+
+					// Reveal "View source" button and set attributes to this example
+					viewSrcButton.style.display = '';
+					viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
+					viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
+					// change the viewer without adding history to this page
+					viewer.contentWindow.location.replace( file + '.html' );
+
+				} else {
+
+					showThumbnailsElem.classList.add( 'hidden' );
+					thumbnails.classList.remove( 'hidden' );
+					viewer.classList.add( 'hidden' );
+					// change the viewer without adding history to this page
+					viewer.contentWindow.location.replace( 'about:blank' );
+
+				}
 
 			}
+
+			setViewerToHash();
+			window.addEventListener( 'hashchange', setViewerToHash );
+			window.addEventListener( 'popstate', setViewerToHash );
 
 			filterInput.value = extractQuery();
 
@@ -124,6 +168,7 @@
 			exitSearchButton.onclick = function ( ) {
 
 				filterInput.value = '';
+				showThumbnails();
 				updateFilter();
 				panel.classList.remove( 'searchFocused' );
 
@@ -131,6 +176,7 @@
 
 			filterInput.addEventListener( 'input', function () {
 
+				showThumbnails();
 				updateFilter();
 
 			} );
@@ -150,6 +196,8 @@
 
 			};
 
+			showThumbnailsElem.addEventListener( 'click', showThumbnails );
+
 			// iOS iframe auto-resize workaround
 
 			if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
@@ -162,21 +210,51 @@
 
 		}
 
+		function showThumbnails() {
+
+			// the hashchange listener does the real work
+			window.location.hash = '';
+
+		}
+
 		function createLink( file ) {
 
 
-			var template = [
-				'<div class="card">',
-				'	<a href="' + file + '.html" target="viewer">',
-				'		<div class="cover">',
-				'			<img src="screenshots/' + file + '.jpg" loading="lazy" width="400" />',
-				'		</div>',
-				'		<div class="title">' + getName( file ) + '</div>',
-				'	</a>',
-				'</div>'
-			].join( "\n" );
+			const template = `
+				<div class="link">
+					<a href="${file}.html" target="viewer" class="title">${getName( file )}</a>,
+				</div>
+			`;
 
-			var link = createElementFromHTML( template );
+			const link = createElementFromHTML( template );
+
+			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
+
+				if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+
+				selectFile( file );
+
+			} );
+
+			return { link, thumbnail: createThumbnailLink( file ) };
+
+		}
+
+		function createThumbnailLink( file ) {
+
+
+			const template = `
+				<div class="card">
+					<a href="${file}.html" target="viewer">
+						<div class="cover">
+							<img src="screenshots/${file}.jpg" loading="lazy" width="400" />
+						</div>
+						<div class="title">${getName( file )}</div>
+					</a>
+				</div>
+			`;
+
+			const link = createElementFromHTML( template );
 
 			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
 
@@ -190,30 +268,10 @@
 
 		}
 
-		function loadFile( file ) {
-
-			selectFile( file );
-			viewer.src = file + '.html';
-
-		}
-
 		function selectFile( file ) {
 
-			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
-
-			links[ file ].classList.add( 'selected' );
-
+			// the hashchange listener does the real work
 			window.location.hash = file;
-			viewer.focus();
-
-			panel.classList.remove( 'open' );
-
-			selected = file;
-
-			// Reveal "View source" button and set attributes to this example
-			viewSrcButton.style.display = '';
-			viewSrcButton.href = 'https://github.com/mrdoob/three.js/blob/master/examples/' + selected + '.html';
-			viewSrcButton.title = 'View source code for ' + getName( selected ) + ' on GitHub';
 
 		}
 
@@ -251,7 +309,7 @@
 
 		function filterExample( file, exp ) {
 
-			var link = links[ file ];
+			var { link, thumbnail } = linkInfos[ file ];
 			var name = getName( file );
 			if ( file in tags ) file += tags[ file ].join( ' ' );
 			var res = file.match( exp );
@@ -260,6 +318,7 @@
 			if ( res && res.length > 0 ) {
 
 				link.classList.remove( 'hidden' );
+				thumbnail.classList.remove( 'hidden' );
 
 				for ( var i = 0; i < res.length; i ++ ) {
 
@@ -272,6 +331,7 @@
 			} else {
 
 				link.classList.add( 'hidden' );
+				thumbnail.classList.add( 'hidden' );
 				link.querySelector( '.title' ).innerHTML = name;
 
 			}
@@ -298,7 +358,7 @@
 
 					var file = section[ i ];
 
-					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
+					if ( linkInfos[ file ].link.classList.contains( 'hidden' ) === false ) {
 
 						collapsed = false;
 						break;

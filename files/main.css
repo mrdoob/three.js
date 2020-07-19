@@ -2,7 +2,7 @@
 	color-scheme: light dark;
 
 	--background-color: #fff;
-	--secondary-background-color: #f7f7f7;
+	--secondary-background-color: #eee;
 
 	--color-blue: #049EF4;
 	--text-color: #444;
@@ -327,7 +327,7 @@ h1 a {
 			text-decoration: underline;
 		}
 
-		#panel #content .hidden {
+		.hidden {
 			display: none !important;
 		}
 
@@ -345,6 +345,16 @@ h1 a {
 	padding-right: 2px;
 }
 
+#right {
+	position: absolute;
+	border: 0px;
+	left: var(--panel-width);
+	right: 0;
+	width: calc(100% - var(--panel-width));
+	height: 100%;
+	overflow: auto;
+}
+
 #viewer,
 iframe {
 	position: absolute;
@@ -356,8 +366,21 @@ iframe {
 	overflow: auto;
 }
 
-#viewer {
-	padding-left: var(--panel-width);
+#thumbnails {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+#thumbnails>* {
+	justify-self: stretch;
+}
+
+#showThumbnails {
+	background: rgba(0,0,0,0.8);
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	font-size: 16pt;
+	padding: 5px;
 }
 
 #button {
@@ -469,8 +492,17 @@ iframe {
 	border-radius: 3px;
 	overflow: hidden;
 	background-color: var(--secondary-background-color);
-	padding-bottom: 6px;
-	margin-bottom: 16px;
+	margin: 0.5em;
+	display: inline-flex;
+	flex-direction: column;
+	vertical-align: top;
+	position: relative;
+}
+.card a {
+	color: var(--text-color);
+}
+.card:hover {
+	box-shadow: 0 0 6px var(--text-color);
 }
 
 .card.selected {
@@ -493,6 +525,8 @@ iframe {
 }
 
 .card .title {
+	bottom: 0px;
+	vertical-align: bottom;
 	padding: 8px 12px 4px;
 	font-size: calc(var(--font-size) - 1px);
 	font-weight: 500;
@@ -568,8 +602,7 @@ iframe {
 	#panel.open #contentWrapper {
 		transform: translate3d(-380px, 0 ,0);
 	}
-	#viewer,
-	iframe {
+	#right {
 		left: 0;
 		top: var(--header-height);
 		width: 100%;
