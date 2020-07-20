@@ -8,11 +8,6 @@
 	</head>
 	<body>
 
-		<video id="video" loop muted crossOrigin="anonymous" playsinline style="display:none">
-			<source src="textures/kinect.webm">
-			<source src="textures/kinect.mp4">
-		</video>
-
 		<script id="vs" type="x-shader/x-vertex">
 
 			uniform sampler2D map;
@@ -100,7 +95,22 @@
 				center = new THREE.Vector3();
 				center.z = - 1000;
 
-				var video = document.getElementById( 'video' );
+				//
+
+				var video = document.createElement( 'video' );
+				video.crossOrigin = 'anonymous';
+				video.loop = true;
+				video.muted = true;
+				video.playsinline = true; // Safari/iOS
+
+				var source = document.createElement( 'source' );
+				source.src = 'textures/kinect.webm';
+				video.appendChild( source );
+
+				var source = document.createElement( 'source' );
+				source.src = 'textures/kinect.mp4';
+				video.appendChild( source );
+
 				video.addEventListener( 'loadedmetadata', function () {
 
 					var texture = new THREE.VideoTexture( video );
@@ -152,7 +162,6 @@
 					gui.add( material.uniforms.farClipping, 'value', 1, 10000, 1.0 ).name( 'farClipping' );
 					gui.add( material.uniforms.pointSize, 'value', 1, 10, 1.0 ).name( 'pointSize' );
 					gui.add( material.uniforms.zOffset, 'value', 0, 4000, 1.0 ).name( 'zOffset' );
-					gui.close();
 
 
 				}, false );
