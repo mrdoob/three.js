@@ -30,6 +30,10 @@
 		--border-style: 1px solid #444;
 	}
 
+	#previewsToggler {
+		filter: invert(100%);
+	}
+
 }
 
 @font-face {
@@ -120,19 +124,6 @@ h1 a {
 	padding: 0px 2px;
 	margin-left: 6px;
 	font-size: .9rem;
-}
-#previewToggle {
-	display: flex;
-	height: var(--header-height);
-	border-bottom: var(--border-style);
-	align-items: center;
-}
-#previewToggle h2 {
-	padding-left: var(--panel-padding);
-	flex: 1;
-	display: flex;
-	align-items: center;
-	color: var(--color-blue);
 }
 #panel {
 	position: fixed;
@@ -294,8 +285,16 @@ h1 a {
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
-		transform: translate3d(0,0,0);
 	}
+
+	#previewsToggler {
+		cursor: pointer;
+		float: right;
+		margin-top: 18px;
+		margin-bottom: -18px;
+		opacity: 0.25;
+	}
+
 	#panel #content {
 		flex: 1;
 		overflow-y: auto;
@@ -351,37 +350,6 @@ h1 a {
 			border-top: none;
 			padding-top: 6px;
 		}
-
-	#panel #toggles {
-		display: flex;
-		justify-content: center;
-		z-index: 1000;
-		position: relative;
-		height: 100%;
-		align-items: center;
-		font-weight: 500;
-	}
-	#panel #toggles * {
-		padding: 0 var(--panel-padding);
-		height: 100%;
-		position: relative;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-	#panel #toggles .selected:after {
-		content: "";
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: -1px;
-		border-bottom: 1px solid var(--text-color);
-	}
-
-	#panel #toggles :hover,
-	#panel #toggles .selected {
-		color: var(--color-blue);
-	}
 
 .spacer {
 	color: var(--secondary-text-color);

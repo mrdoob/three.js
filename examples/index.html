@@ -31,15 +31,9 @@
 					<div id="exitSearchButton"></div>
 				</div>
 
-			<div id="previewToggle">
-				<h2>Previews</h2>
-				<div id="toggles">
-					<h3 id="toggleOn" class="selected">On</h3>
-					<h3 id="toggleOff">Off</h3>
+				<div id="content">
+					<img id="previewsToggler" src="./files/thumbnails.svg" width="20" height="20" />
 				</div>
-			</div>
-			
-				<div id="content"></div>
 			</div>
 
 		</div>
@@ -60,9 +54,9 @@
 		var expandButton = document.getElementById( 'expandButton' );
 		var viewSrcButton = document.getElementById( 'button' );
 		var panelScrim = document.getElementById( 'panelScrim' );
-		var toggleOn = document.getElementById( 'toggleOn' );
-		var toggleOff = document.getElementById( 'toggleOff' );
-		var previews = document.getElementsByClassName('cover');
+
+		var previewsToggler = document.getElementById( 'previewsToggler' );
+		var previewsVisible = true;
 
 		var links = {};
 		var selected = null;
@@ -161,23 +155,26 @@
 
 			};
 
-			toggleOn.onclick = function ( event ) {
+			previewsToggler.onclick = function ( event ) {
 
 				event.preventDefault();
-				toggleOff.classList.remove('selected');
-				toggleOn.classList.add( 'selected' );
-				for(i = 0; i< previews.length; i++){
-					previews[i].style.display = 'block';
-				}
 
-			};
-			toggleOff.onclick = function ( event ) {
+				var styles = document.styleSheets[ 0 ];
 
-				event.preventDefault();
-				toggleOn.classList.remove('selected');
-				toggleOff.classList.add( 'selected' );
-				for(i = 0; i< previews.length; i++){
-					previews[i].style.display = 'none';
+				if ( previewsVisible ) {
+
+					styles.insertRule( '.cover { display: none } ', 0 );
+
+					previewsToggler.style.opacity = 1;
+					previewsVisible = false;
+
+				} else {
+
+					styles.deleteRule( 0 );
+
+					previewsToggler.style.opacity = 0.25;
+					previewsVisible = true;
+
 				}
 
 			};
