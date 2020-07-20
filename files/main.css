@@ -343,6 +343,10 @@ h1 a {
 			display: none !important;
 		}
 
+		#panel #content.minimal .cover {
+			display: none;
+		}
+
 		body.home #panel #content h2 {
 			margin-bottom: 2px;
 			padding-bottom: 0px;

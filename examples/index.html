@@ -56,7 +56,6 @@
 		var panelScrim = document.getElementById( 'panelScrim' );
 
 		var previewsToggler = document.getElementById( 'previewsToggler' );
-		var previewsVisible = true;
 
 		var links = {};
 		var selected = null;
@@ -159,23 +158,8 @@
 
 				event.preventDefault();
 
-				var styles = document.styleSheets[ 0 ];
-
-				if ( previewsVisible ) {
-
-					styles.insertRule( '.cover { display: none } ', 0 );
-
-					previewsToggler.style.opacity = 1;
-					previewsVisible = false;
-
-				} else {
-
-					styles.deleteRule( 0 );
-
-					previewsToggler.style.opacity = 0.25;
-					previewsVisible = true;
-
-				}
+				content.classList.toggle( 'minimal' );
+				previewsToggler.style.opacity = content.classList.contains( 'minimal' ) ? 1 : 0.25;
 
 			};
 
