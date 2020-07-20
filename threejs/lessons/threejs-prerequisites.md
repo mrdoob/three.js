@@ -149,12 +149,49 @@ Assume an object `const dims = {width: 300, height: 150}`
 
 old code
 
-     const width = dims.width;
-     const height = dims.height;
+```js
+const width = dims.width;
+const height = dims.height;
+```
 
 new code
 
-     const {width, height} = dims;
+```js
+const {width, height} = dims;
+```
+
+Destructuring works with arrays too. Assume an array `const position = [1, 2, 3, 4]`;
+
+old code
+
+```js
+const x = position[2];
+const y = position[1];
+```
+
+new code
+
+```js
+const [x, y] = position;
+```
+
+Destructuring also works in function arguments
+
+```js
+const dims = {width: 300, height: 150};
+const position = [1, 2, 3, 4];
+
+function distFromOrig([x, y]) {
+  return Math.sqrt(x * x + y * y);
+}
+
+const dist = distFromOrig(position);  // dist = 2.236...
+
+function area({width, height}) {
+  return width * height;
+}
+const a = area(dims);  // a = 45000
+```
 
 ### Use object declaration short cuts
 
@@ -194,20 +231,32 @@ The rest parameter can be used to consume any number of parameters. Example
  function log(className, ...args) {
    const elem = document.createElement('div');
    elem.className = className;
-   elem.textContent = [...args].join(' ');
+   elem.textContent = args.join(' ');
    document.body.appendChild(elem);
  }
 ```
 
-The spread operator can be used to expand an iterable into arguments, or copy an array
+The spread operator can be used to expand an iterable into arguments
 
 ```js
 const position = [1, 2, 3];
-somemesh.position.set(...position);
+someMesh.position.set(...position);
+```
 
-const copiedPositionArray = [...position]
-copiedPositionArray.push(4) // [1,2,3,4] 
-console.log(position) // [1,2,3] position is unaffected
+or copy an array
+
+```js
+const copiedPositionArray = [...position];
+copiedPositionArray.push(4); // [1,2,3,4] 
+console.log(position); // [1,2,3] position is unaffected
+```
+
+or to merge objects
+
+```
+const a = {abc: 123};
+const b = {def: 456};
+const c = {...a, ...b};  // c is now {abc: 123, def: 456}
 ```
 
 ### Use `class`
@@ -234,7 +283,7 @@ loader.load((texture) => {
 });
 ```
 
-Arrow functions bind `this`. 
+Arrow functions bind `this` of the context in which you create the arrow function.
 
 ```js
 const foo = (args) => {/* code */};
@@ -245,6 +294,8 @@ is a shortcut for
 ```js
 const foo = (function(args) {/* code */}).bind(this));
 ```
+
+See link above for more info on `this`.
 
 ### Promises as well as async/await
 
@@ -307,7 +358,7 @@ JavaScript are all lowerCasedCamelCase. Constructors, the names of classes are
 CapitalizedCamelCase. If you follow this rule you code will match most other
 JavaScript. Many [linters](https://eslint.org), programs that check for obvious errors in your code,
 will point out errors if you use the wrong case since by following the convention
-above they know these are wrong
+above they can know when you're using something incorrectly.
 
 ```js
 const v = new vector(); // clearly an error if all classes start with a capital letter
