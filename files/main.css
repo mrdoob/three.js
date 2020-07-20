@@ -287,14 +287,6 @@ h1 a {
 		flex-direction: column;
 	}
 
-	#previewsToggler {
-		cursor: pointer;
-		float: right;
-		margin-top: 18px;
-		margin-bottom: -18px;
-		opacity: 0.25;
-	}
-
 	#panel #content {
 		flex: 1;
 		overflow-y: auto;
@@ -343,8 +335,20 @@ h1 a {
 			display: none !important;
 		}
 
+		#panel #content #previewsToggler {
+			cursor: pointer;
+			float: right;
+			margin-top: 18px;
+			margin-bottom: -18px;
+			opacity: 0.25;
+		}
+
 		#panel #content.minimal .cover {
 			display: none;
+		}
+
+		#panel #content.minimal #previewsToggler {
+			opacity: 1;
 		}
 
 		body.home #panel #content h2 {
