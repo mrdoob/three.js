@@ -6,12 +6,12 @@ export class GridHelper extends LineSegments {
 	constructor(
 		size: number,
 		divisions: number,
-		color1?: Color | number,
-		color2?: Color | number
+		color1?: Color | string | number,
+		color2?: Color | string | number
 	);
 	/**
 	 * @deprecated Colors should be specified in the constructor.
 	 */
-	setColors( color1?: Color | number, color2?: Color | number ): void;
+	setColors( color1?: Color | string | number, color2?: Color | string | number ): void;
 
 }
