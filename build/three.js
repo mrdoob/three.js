@@ -19001,21 +19001,6 @@
 
 		if ( parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
 
-			var isGLSL3ShaderMaterial = false;
-
-			var versionRegex = /^\s*#version\s+300\s+es\s*\n/;
-
-			if ( parameters.isShaderMaterial &&
-				vertexShader.match( versionRegex ) !== null &&
-				fragmentShader.match( versionRegex ) !== null ) {
-
-				isGLSL3ShaderMaterial = true;
-
-				vertexShader = vertexShader.replace( versionRegex, '' );
-				fragmentShader = fragmentShader.replace( versionRegex, '' );
-
-			}
-
 			// GLSL 3.0 conversion
 
 			prefixVertex = [
@@ -19028,8 +19013,8 @@
 			prefixFragment = [
 				'#version 300 es\n',
 				'#define varying in',
-				isGLSL3ShaderMaterial ? '' : 'out highp vec4 pc_fragColor;',
-				isGLSL3ShaderMaterial ? '' : '#define gl_FragColor pc_fragColor',
+				'out highp vec4 pc_fragColor;',
+				'#define gl_FragColor pc_fragColor',
 				'#define gl_FragDepthEXT gl_FragDepth',
 				'#define texture2D texture',
 				'#define textureCube texture',
