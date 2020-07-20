@@ -7,8 +7,6 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<script id="vs" type="x-shader/x-vertex">
-	#version 300 es
-
 	uniform vec2 size;
 	out vec2 vUv;
 
@@ -25,8 +23,6 @@
 	</script>
 
 	<script id="fs" type="x-shader/x-fragment">
-	#version 300 es
-
 	precision highp float;
 	precision highp int;
 	precision highp sampler2DArray;
@@ -34,14 +30,13 @@
 	uniform sampler2DArray diffuse;
 	in vec2 vUv;
 	uniform int depth;
-	out vec4 out_FragColor;
 
 	void main() {
 
 		vec4 color = texture( diffuse, vec3( vUv, depth ) );
 
 		// lighten a bit
-		out_FragColor = vec4( color.rrr * 1.5, 1.0 );
+		gl_FragColor = vec4( color.rrr * 1.5, 1.0 );
 
 	}
 	</script>
