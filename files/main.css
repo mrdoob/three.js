@@ -121,7 +121,19 @@ h1 a {
 	margin-left: 6px;
 	font-size: .9rem;
 }
-
+#previewToggle {
+	display: flex;
+	height: var(--header-height);
+	border-bottom: var(--border-style);
+	align-items: center;
+}
+#previewToggle h2 {
+	padding-left: var(--panel-padding);
+	flex: 1;
+	display: flex;
+	align-items: center;
+	color: var(--color-blue);
+}
 #panel {
 	position: fixed;
 	z-index: 100;
@@ -216,6 +228,7 @@ h1 a {
 	body.home #panel #sections {
 		display: none;
 	}
+
 
 #panel #inputWrapper {
 	display: flex;
@@ -338,6 +351,37 @@ h1 a {
 			border-top: none;
 			padding-top: 6px;
 		}
+
+	#panel #toggles {
+		display: flex;
+		justify-content: center;
+		z-index: 1000;
+		position: relative;
+		height: 100%;
+		align-items: center;
+		font-weight: 500;
+	}
+	#panel #toggles * {
+		padding: 0 var(--panel-padding);
+		height: 100%;
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	#panel #toggles .selected:after {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: -1px;
+		border-bottom: 1px solid var(--text-color);
+	}
+
+	#panel #toggles :hover,
+	#panel #toggles .selected {
+		color: var(--color-blue);
+	}
 
 .spacer {
 	color: var(--secondary-text-color);
