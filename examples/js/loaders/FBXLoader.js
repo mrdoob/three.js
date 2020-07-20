@@ -3263,7 +3263,11 @@ THREE.FBXLoader = ( function () {
 
 			var version = reader.getUint32();
 
-			console.log( 'THREE.FBXLoader: FBX binary version: ' + version );
+			if ( version < 6400 ) {
+
+				throw new Error( 'THREE.FBXLoader: FBX version not supported, FileVersion: ' + version );
+
+			}
 
 			var allNodes = new FBXTree();
 
