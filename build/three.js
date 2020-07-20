@@ -16075,7 +16075,7 @@
 
 			if ( capabilities.isWebGL2 === true && ( type === 5124 || type === 5125 ) ) {
 
-				gl.vertexAttribIPointer( index, size, type, normalized, stride, offset );
+				gl.vertexAttribIPointer( index, size, type, stride, offset );
 
 			} else {
 
@@ -24267,7 +24267,13 @@
 				uniforms.reflectivity.value = material.reflectivity;
 				uniforms.refractionRatio.value = material.refractionRatio;
 
-				uniforms.maxMipLevel.value = properties.get( envMap ).__maxMipLevel;
+				var maxMipLevel = properties.get( envMap ).__maxMipLevel;
+
+				if ( maxMipLevel !== undefined ) {
+
+					uniforms.maxMipLevel.value = maxMipLevel;
+
+				}
 
 			}
 
@@ -27035,6 +27041,16 @@
 			get: function () {
 
 				return this.data.array;
+
+			}
+
+		},
+
+		needsUpdate: {
+
+			set: function ( value ) {
+
+				this.data.needsUpdate = value;
 
 			}
 
@@ -40652,7 +40668,6 @@
 			if ( json.side !== undefined ) { material.side = json.side; }
 			if ( json.opacity !== undefined ) { material.opacity = json.opacity; }
 			if ( json.transparent !== undefined ) { material.transparent = json.transparent; }
-			if ( json.transparency !== undefined ) { material.transparency = json.transparency; }
 			if ( json.alphaTest !== undefined ) { material.alphaTest = json.alphaTest; }
 			if ( json.depthTest !== undefined ) { material.depthTest = json.depthTest; }
 			if ( json.depthWrite !== undefined ) { material.depthWrite = json.depthWrite; }
@@ -50784,6 +50799,25 @@
 			set: function () {
 
 				console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshStandardMaterial instead' );
+
+			}
+		}
+
+	} );
+
+	Object.defineProperties( MeshPhysicalMaterial.prototype, {
+
+		transparency: {
+			get: function () {
+
+				console.warn( 'THREE.MeshPhysicalMaterial: .transparency has been renamed to .transmission.' );
+				return this.transmission;
+
+			},
+			set: function ( value ) {
+
+				console.warn( 'THREE.MeshPhysicalMaterial: .transparency has been renamed to .transmission.' );
+				this.transmission = value;
 
 			}
 		}
