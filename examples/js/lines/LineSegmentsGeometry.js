@@ -37,7 +37,7 @@ THREE.LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.Insta
 
 			end.applyMatrix4( matrix );
 
-			start.data.needsUpdate = true;
+			start.needsUpdate = true;
 
 		}
 
