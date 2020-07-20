@@ -31,6 +31,14 @@
 					<div id="exitSearchButton"></div>
 				</div>
 
+			<div id="previewToggle">
+				<h2>Previews</h2>
+				<div id="toggles">
+					<h3 id="toggleOn" class="selected">On</h3>
+					<h3 id="toggleOff">Off</h3>
+				</div>
+			</div>
+			
 				<div id="content"></div>
 			</div>
 
@@ -52,6 +60,9 @@
 		var expandButton = document.getElementById( 'expandButton' );
 		var viewSrcButton = document.getElementById( 'button' );
 		var panelScrim = document.getElementById( 'panelScrim' );
+		var toggleOn = document.getElementById( 'toggleOn' );
+		var toggleOff = document.getElementById( 'toggleOff' );
+		var previews = document.getElementsByClassName('cover');
 
 		var links = {};
 		var selected = null;
@@ -147,6 +158,27 @@
 
 				event.preventDefault();
 				panel.classList.toggle( 'open' );
+
+			};
+
+			toggleOn.onclick = function ( event ) {
+
+				event.preventDefault();
+				toggleOff.classList.remove('selected');
+				toggleOn.classList.add( 'selected' );
+				for(i = 0; i< previews.length; i++){
+					previews[i].style.display = 'block';
+				}
+
+			};
+			toggleOff.onclick = function ( event ) {
+
+				event.preventDefault();
+				toggleOn.classList.remove('selected');
+				toggleOff.classList.add( 'selected' );
+				for(i = 0; i< previews.length; i++){
+					previews[i].style.display = 'none';
+				}
 
 			};
 
