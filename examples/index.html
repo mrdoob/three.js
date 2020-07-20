@@ -158,8 +158,8 @@
 
 				event.preventDefault();
 
-				content.classList.toggle( 'minimal' );
-				previewsToggler.style.opacity = content.classList.contains( 'minimal' ) ? 1 : 0.25;
+				var enabled = content.classList.toggle( 'minimal' );
+				previewsToggler.style.opacity = enabled ? 1 : 0.25;
 
 			};
 
