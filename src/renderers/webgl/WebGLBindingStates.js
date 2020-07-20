@@ -282,7 +282,7 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 		if ( capabilities.isWebGL2 === true && ( type === gl.INT || type === gl.UNSIGNED_INT ) ) {
 
-			gl.vertexAttribIPointer( index, size, type, normalized, stride, offset );
+			gl.vertexAttribIPointer( index, size, type, stride, offset );
 
 		} else {
 
