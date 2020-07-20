@@ -3,6 +3,9 @@
 const assets = [
 	'./',
 
+	'./manifest.json',
+	'./images/icon.png',
+
 	'../files/favicon.ico',
 
 	'../build/three.module.js',
@@ -57,8 +60,6 @@ const assets = [
 
 	'../examples/jsm/webxr/VRButton.js',
 
-	'./manifest.json',
-	'./images/icon.png',
 	'./images/rotate.svg',
 	'./images/scale.svg',
 	'./images/translate.svg',
