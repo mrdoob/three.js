@@ -432,7 +432,7 @@ document.querySelectorAll('[data-diagram]').forEach((elem) => {
   const sceneName = elem.dataset.diagram;
   const sceneInitFunction = sceneInitFunctionsByName[sceneName];
   const sceneRenderFunction = sceneInitFunction(elem);
-  addScene(elem, sceneRenderFunction());
+  addScene(elem, sceneRenderFunction);
 });
 ```
 
