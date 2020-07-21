@@ -27,6 +27,8 @@ Object.assign( Vector3.prototype, {
 
 	set: function ( x, y, z ) {
 
+		if ( z === undefined ) z = this.z; // sprite.scale.set(x,y)
+
 		this.x = x;
 		this.y = y;
 		this.z = z;
