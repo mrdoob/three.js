@@ -3350,6 +3350,8 @@
 
 		set: function ( x, y, z ) {
 
+			if ( z === undefined ) { z = this.z; } // sprite.scale.set(x,y)
+
 			this.x = x;
 			this.y = y;
 			this.z = z;
@@ -19337,7 +19339,7 @@
 				isWebGL2: isWebGL2,
 
 				shaderID: shaderID,
-				shaderName: material.name || material.type,
+				shaderName: material.type,
 
 				vertexShader: vertexShader,
 				fragmentShader: fragmentShader,

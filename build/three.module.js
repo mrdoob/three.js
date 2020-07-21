@@ -3327,6 +3327,8 @@ Object.assign( Vector3.prototype, {
 
 	set: function ( x, y, z ) {
 
+		if ( z === undefined ) z = this.z; // sprite.scale.set(x,y)
+
 		this.x = x;
 		this.y = y;
 		this.z = z;
@@ -19330,7 +19332,7 @@ function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 			isWebGL2: isWebGL2,
 
 			shaderID: shaderID,
-			shaderName: material.name || material.type,
+			shaderName: material.type,
 
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
