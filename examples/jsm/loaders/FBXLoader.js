@@ -91,6 +91,7 @@ var FBXLoader = ( function () {
 			var loader = new FileLoader( this.manager );
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( scope.requestHeader );
 
 			loader.load( url, function ( buffer ) {
 

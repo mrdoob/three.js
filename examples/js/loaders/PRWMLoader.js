@@ -240,6 +240,7 @@ THREE.PRWMLoader = ( function () {
 			var loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( scope.requestHeader );
 
 			url = url.replace( /\*/g, isBigEndianPlatform() ? 'be' : 'le' );
 

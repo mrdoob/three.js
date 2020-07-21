@@ -36,6 +36,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( text ) {
 
 			try {

@@ -33,6 +33,7 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 
 		let loaded = 0;
 

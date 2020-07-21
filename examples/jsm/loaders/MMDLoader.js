@@ -219,6 +219,7 @@ var MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmd( buffer, true ) );
@@ -243,6 +244,7 @@ var MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmx( buffer, true ) );
@@ -272,7 +274,8 @@ var MMDLoader = ( function () {
 			this.loader
 				.setMimeType( undefined )
 				.setPath( this.animationPath )
-				.setResponseType( 'arraybuffer' );
+				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader );
 
 			for ( var i = 0, il = urls.length; i < il; i ++ ) {
 
@@ -305,6 +308,7 @@ var MMDLoader = ( function () {
 				.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
 				.setPath( this.animationPath )
 				.setResponseType( 'text' )
+				.setRequestHeader( this.requestHeader )
 				.load( url, function ( text ) {
 
 					onLoad( parser.parseVpd( text, true ) );

@@ -29,6 +29,7 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 

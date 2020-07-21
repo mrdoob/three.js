@@ -36,6 +36,7 @@ THREE.MTLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
 		loader.load( url, function ( text ) {
 
 			try {

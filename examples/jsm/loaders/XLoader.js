@@ -305,6 +305,7 @@ var XLoader = ( function () {
 				var loader = new FileLoader( this.manager );
 				loader.setPath( this.path );
 				loader.setResponseType( 'arraybuffer' );
+				loader.setRequestHeader( this.requestHeader );
 				loader.load( this.url, function ( response ) {
 
 					try {
