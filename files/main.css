@@ -343,8 +343,17 @@ h1 a {
 			opacity: 0.25;
 		}
 
+		#panel #content.minimal .card {
+			background-color: transparent;
+			margin-bottom: 4px;
+		}
+
 		#panel #content.minimal .cover {
 			display: none;
+		}
+
+		#panel #content.minimal .title {
+			padding: 0;
 		}
 
 		#panel #content.minimal #previewsToggler {
