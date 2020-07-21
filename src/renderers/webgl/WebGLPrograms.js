@@ -161,7 +161,7 @@ function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 			isWebGL2: isWebGL2,
 
 			shaderID: shaderID,
-			shaderName: material.name || material.type,
+			shaderName: material.type,
 
 			vertexShader: vertexShader,
 			fragmentShader: fragmentShader,
