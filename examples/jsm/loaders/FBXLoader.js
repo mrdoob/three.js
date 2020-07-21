@@ -1772,7 +1772,12 @@ var FBXLoader = ( function () {
 				var i = 0;
 				while ( geoNode.LayerElementUV[ i ] ) {
 
-					geoInfo.uv.push( this.parseUVs( geoNode.LayerElementUV[ i ] ) );
+					if ( geoNode.LayerElementUV[ i ].UV ) {
+
+						geoInfo.uv.push( this.parseUVs( geoNode.LayerElementUV[ i ] ) );
+
+					}
+
 					i ++;
 
 				}
