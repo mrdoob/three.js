@@ -1,5 +1,4 @@
 import { BackSide, NoBlending } from '../constants.js';
-import { Scene } from '../scenes/Scene.js';
 import { Mesh } from '../objects/Mesh.js';
 import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
@@ -36,12 +35,6 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	this.texture.type = texture.type;
 	this.texture.format = texture.format;
 	this.texture.encoding = texture.encoding;
-
-	this.texture.generateMipmaps = texture.generateMipmaps;
-	this.texture.minFilter = texture.minFilter;
-	this.texture.magFilter = texture.magFilter;
-
-	const scene = new Scene();
 
 	const shader = {
 
@@ -89,6 +82,8 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 		`
 	};
 
+	const geometry = new BoxBufferGeometry( 5, 5, 5 );
+
 	const material = new ShaderMaterial( {
 
 		name: 'CubemapFromEquirect',
@@ -103,12 +98,34 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 	material.uniforms.tEquirect.value = texture;
 
-	const mesh = new Mesh( new BoxBufferGeometry( 5, 5, 5 ), material );
+	const mesh = new Mesh( geometry, material );
 
-	scene.add( mesh );
+	//
 
 	const camera = new CubeCamera( 1, 10, this );
-	camera.update( renderer, scene );
+	camera.updateMatrixWorld();
+
+	const currentRenderTarget = renderer.getRenderTarget();
+	const generateMipmaps = this.texture.generateMipmaps;
+
+	this.texture.generateMipmaps = false;
+
+	renderer.compile( mesh, camera );
+
+	for ( let i = 0; i < 6; i ++ ) {
+
+		if ( i === 5 ) this.texture.generateMipmaps = generateMipmaps;
+
+		const camera2 = camera.children[ i ];
+
+		mesh.modelViewMatrix.multiplyMatrices( camera2.matrixWorldInverse, mesh.matrixWorld );
+
+		renderer.setRenderTarget( this, i );
+		renderer.renderBufferDirect( camera2, null, geometry, material, mesh, null );
+
+	}
+
+	renderer.setRenderTarget( currentRenderTarget );
 
 	mesh.geometry.dispose();
 	mesh.material.dispose();

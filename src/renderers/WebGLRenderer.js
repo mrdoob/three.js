@@ -902,7 +902,9 @@ function WebGLRenderer( parameters ) {
 
 		scene.traverse( function ( object ) {
 
-			let material = object.material;
+			objects.update( object ); // Upload geometry attributes
+
+			const material = object.material;
 
 			if ( material ) {
 
@@ -910,7 +912,7 @@ function WebGLRenderer( parameters ) {
 
 					for ( let i = 0; i < material.length; i ++ ) {
 
-						let material2 = material[ i ];
+						const material2 = material[ i ];
 
 						if ( compiled.has( material2 ) === false ) {
 
