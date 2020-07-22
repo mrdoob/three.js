@@ -66,7 +66,7 @@ function NodeBuilder() {
 		lights: false,
 		fog: false,
 		transparent: false,
-		irradiance: false,
+		irradiance: false
 	};
 
 	this.includes = {
