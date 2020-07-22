@@ -3,7 +3,7 @@ import { NodeBuilder } from './NodeBuilder';
 export interface Flow {
   result: string;
   code: string;
-  extra: string;
+  extra: object;
 }
 
 export class Node {
