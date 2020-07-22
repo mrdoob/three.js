@@ -64,7 +64,9 @@ function NodeBuilder() {
 		uv: [],
 		color: [],
 		lights: false,
-		fog: false
+		fog: false,
+		transparent: false,
+		irradiance: false,
 	};
 
 	this.includes = {
