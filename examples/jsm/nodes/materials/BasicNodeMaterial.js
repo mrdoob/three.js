@@ -3,13 +3,13 @@
  * @author martinRenou / https://github.com/martinRenou
  */
 
-import { SimpleNode } from './nodes/SimpleNode.js';
+import { BasicNode } from './nodes/BasicNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
 function BasicNodeMaterial() {
 
-	var node = new SimpleNode();
+	var node = new BasicNode();
 
 	NodeMaterial.call( this, node, node );
 
