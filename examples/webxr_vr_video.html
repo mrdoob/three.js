@@ -32,11 +32,6 @@
 			function init() {
 
 				var container = document.getElementById( 'container' );
-				container.addEventListener( 'click', function () {
-
-					video.play();
-
-				} );
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 2000 );
 				camera.layers.enable( 1 ); // render left view when no stereo available
@@ -46,21 +41,7 @@
 				var video = document.getElementById( 'video' );
 				video.play();
 
-				var texture = new THREE.Texture( video );
-				texture.generateMipmaps = false;
-				texture.minFilter = THREE.NearestFilter;
-				texture.magFilter = THREE.NearestFilter;
-				texture.format = THREE.RGBFormat;
-
-				setInterval( function () {
-
-					if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
-
-						texture.needsUpdate = true;
-
-					}
-
-				}, 1000 / 24 );
+				var texture = new THREE.VideoTexture( video );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x101010 );
