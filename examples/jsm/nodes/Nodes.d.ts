@@ -85,6 +85,7 @@ export * from './effects/LuminanceNode';
 // material nodes
 
 export * from './materials/nodes/RawNode';
+export * from './materials/nodes/SimpleNode';
 export * from './materials/nodes/SpriteNode';
 export * from './materials/nodes/PhongNode';
 export * from './materials/nodes/StandardNode';
@@ -93,6 +94,7 @@ export * from './materials/nodes/MeshStandardNode';
 // materials
 
 export * from './materials/NodeMaterial';
+export * from './materials/RawNodeMaterial';
 export * from './materials/SpriteNodeMaterial';
 export * from './materials/PhongNodeMaterial';
 export * from './materials/StandardNodeMaterial';
