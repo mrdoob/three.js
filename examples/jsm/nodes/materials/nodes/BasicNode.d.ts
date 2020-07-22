@@ -1,7 +1,7 @@
 import { NodeBuilder } from '../../core/NodeBuilder';
 import { Node } from '../../core/Node';
 
-export class SimpleNode extends Node {
+export class BasicNode extends Node {
 
 	constructor();
 
@@ -11,6 +11,6 @@ export class SimpleNode extends Node {
 	nodeType: string;
 
 	build( builder: NodeBuilder ): string;
-	copy( source: SimpleNode ): this;
+	copy( source: BasicNode ): this;
 
 }

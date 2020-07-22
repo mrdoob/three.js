@@ -1,7 +1,7 @@
 import { Node } from '../core/Node';
 import { NodeMaterial } from './NodeMaterial';
 
-export class RawNodeMaterial extends NodeMaterial {
+export class BasicNodeMaterial extends NodeMaterial {
 
 	constructor();
 

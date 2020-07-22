@@ -5,7 +5,7 @@
 import { Node } from '../../core/Node.js';
 import { ColorNode } from '../../inputs/ColorNode.js';
 
-function SimpleNode() {
+function BasicNode() {
 
 	Node.call( this );
 
@@ -13,11 +13,11 @@ function SimpleNode() {
 
 }
 
-SimpleNode.prototype = Object.create( Node.prototype );
-SimpleNode.prototype.constructor = SimpleNode;
-SimpleNode.prototype.nodeType = "Simple";
+BasicNode.prototype = Object.create( Node.prototype );
+BasicNode.prototype.constructor = BasicNode;
+BasicNode.prototype.nodeType = "Basic";
 
-SimpleNode.prototype.generate = function ( builder ) {
+BasicNode.prototype.generate = function ( builder ) {
 
 	var code;
 
@@ -92,7 +92,7 @@ SimpleNode.prototype.generate = function ( builder ) {
 
 };
 
-SimpleNode.prototype.copy = function ( source ) {
+BasicNode.prototype.copy = function ( source ) {
 
 	Node.prototype.copy.call( this, source );
 
@@ -104,7 +104,7 @@ SimpleNode.prototype.copy = function ( source ) {
 
 };
 
-SimpleNode.prototype.toJSON = function ( meta ) {
+BasicNode.prototype.toJSON = function ( meta ) {
 
 	var data = this.getJSONNode( meta );
 
@@ -122,4 +122,4 @@ SimpleNode.prototype.toJSON = function ( meta ) {
 
 };
 
-export { SimpleNode };
+export { BasicNode };

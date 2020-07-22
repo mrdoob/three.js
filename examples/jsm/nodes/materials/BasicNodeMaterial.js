@@ -6,23 +6,23 @@ import { SimpleNode } from './nodes/SimpleNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';
 
-function RawNodeMaterial() {
+function BasicNodeMaterial() {
 
 	var node = new SimpleNode();
 
 	NodeMaterial.call( this, node, node );
 
-	this.type = "RawNodeMaterial";
+	this.type = "BasicNodeMaterial";
 
 }
 
-RawNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
-RawNodeMaterial.prototype.constructor = RawNodeMaterial;
+BasicNodeMaterial.prototype = Object.create( NodeMaterial.prototype );
+BasicNodeMaterial.prototype.constructor = BasicNodeMaterial;
 
-NodeUtils.addShortcuts( RawNodeMaterial.prototype, 'fragment', [
+NodeUtils.addShortcuts( BasicNodeMaterial.prototype, 'fragment', [
 	'color',
 	'alpha',
 	'position'
 ] );
 
-export { RawNodeMaterial };
+export { BasicNodeMaterial };
