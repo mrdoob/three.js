@@ -148,12 +148,50 @@ ES5에서 배열에 [`forEach`](https://developer.mozilla.org/ko/docs/Web/JavaSc
 
 기존 방법
 
-     const width = dims.width;
-     const height = dims.height;
+```js
+const width = dims.width;
+const height = dims.height;
+```
 
 새로운 방법
 
-     const { width, height } = dims;
+```js
+const { width, height } = dims;
+```
+
+구조분해할당은 배열에도 적용할 수 있습니다. `const position = [1, 2, 3, 4]`.
+이런 배열이 있다고 해보죠.
+
+기존 방법
+
+```js
+const x = position[2];
+const y = position[1];
+```
+
+새로운 방법
+
+```js
+const [ , y, x ] = position;
+```
+
+또한 매개변수에도 구조분해할당을 적용할 수 있습니다.
+
+```js
+const dims = { width: 300, height: 150 };
+const position = [1, 2, 3, 4];
+
+function distFromOrig([x, y]) {
+  return Math.sqrt(x * x + y * y);
+}
+
+const dist = distFromOrig(position);  // dist = 2.236...
+
+function area({ width, height }) {
+  return width * height;
+}
+const a = area(dims);  // a = 45000
+```
 
 ### 객체 선언 시 축약 문법 사용
 
@@ -193,7 +231,7 @@ ES5에서 배열에 [`forEach`](https://developer.mozilla.org/ko/docs/Web/JavaSc
  function log(className, ...args) {
    const elem = document.createElement('div');
    elem.className = className;
-   elem.textContent = [...args].join(' ');
+   elem.textContent = args.join(' ');
    document.body.appendChild(elem);
  }
 ```
@@ -203,6 +241,22 @@ ES5에서 배열에 [`forEach`](https://developer.mozilla.org/ko/docs/Web/JavaSc
 ```js
 const position = [1, 2, 3];
 somemesh.position.set(...position);
+```
+
+배열을 얕은 복사할 때 사용할 수도 있고
+
+```js
+const copiedPositionArray = [...position];
+copiedPositionArray.push(4); // [1,2,3,4] 
+console.log(position); // [1,2,3] 기존 배열은 영향을 받지 않음
+```
+
+객체를 합칠 때도 사용할 수 있죠.
+
+```
+const a = { abc: 123 };
+const b = { def: 456 };
+const c = { ...a, ...b };  // c = { abc: 123, def: 456 }
 ```
 
 ### `class` 사용하기
