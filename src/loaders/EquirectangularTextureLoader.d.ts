@@ -11,6 +11,6 @@ export class EquirectangularTextureLoader extends Loader {
 		onLoad?: ( texture: EquirectangularTexture ) => void,
 		onProgress?: ( event: ProgressEvent ) => void,
 		onError?: ( event: ErrorEvent ) => void
-	): CubeTexture;
+	): EquirectangularTexture;
 
 }
