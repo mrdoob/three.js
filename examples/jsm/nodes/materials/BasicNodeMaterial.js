@@ -1,5 +1,6 @@
 /**
  * @author sunag / http://www.sunag.com.br/
+ * @author martinRenou / https://github.com/martinRenou
  */
 
 import { SimpleNode } from './nodes/SimpleNode.js';
