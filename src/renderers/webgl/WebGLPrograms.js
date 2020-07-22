@@ -7,7 +7,7 @@ import { WebGLProgram } from './WebGLProgram.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
 
-function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
+function WebGLPrograms( renderer, textures, extensions, capabilities, bindingStates ) {
 
 	const programs = [];
 
@@ -117,7 +117,7 @@ function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 
-		const envMap = material.envMap || environment;
+		const envMap = textures.getCubeTexture( material.envMap || environment );
 
 		const shaderID = shaderIDs[ material.type ];
 

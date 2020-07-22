@@ -295,14 +295,14 @@ function WebGLRenderer( parameters ) {
 
 		info = new WebGLInfo( _gl );
 		properties = new WebGLProperties();
-		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
+		textures = new WebGLTextures( _gl, _this, extensions, state, properties, capabilities, utils, info );
 		attributes = new WebGLAttributes( _gl, capabilities );
 		bindingStates = new WebGLBindingStates( _gl, extensions, attributes, capabilities );
 		geometries = new WebGLGeometries( _gl, attributes, info, bindingStates );
 		objects = new WebGLObjects( _gl, geometries, attributes, info );
 		morphtargets = new WebGLMorphtargets( _gl );
-		programCache = new WebGLPrograms( _this, extensions, capabilities, bindingStates );
-		materials = new WebGLMaterials( properties );
+		programCache = new WebGLPrograms( _this, textures, extensions, capabilities, bindingStates );
+		materials = new WebGLMaterials( properties, textures );
 		renderLists = new WebGLRenderLists( properties );
 		renderStates = new WebGLRenderStates();
 

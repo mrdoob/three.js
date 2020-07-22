@@ -2,10 +2,11 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping } from '../../constants.js';
+import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping, LinearFilter, LinearMipmapLinearFilter, LinearMipmapNearestFilter, NearestFilter, NearestMipmapLinearFilter, NearestMipmapNearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, MirroredRepeatWrapping, ClampToEdgeWrapping, RepeatWrapping } from '../../constants.js';
 import { MathUtils } from '../../math/MathUtils.js';
+import { WebGLCubeRenderTarget } from "../WebGLCubeRenderTarget.js";
 
-function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
+function WebGLTextures( _gl, renderer, extensions, state, properties, capabilities, utils, info ) {
 
 	const isWebGL2 = capabilities.isWebGL2;
 	const maxTextures = capabilities.maxTextures;
@@ -1270,6 +1271,57 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function getCubeTexture( envMap ) {
+
+		if ( envMap === null || envMap.isCubeTexture ) {
+
+			return envMap;
+
+		}
+
+		const isEquirectangularTexture = envMap.isEquirectangularTexture || /* DEPRECATED */ ( envMap.isTexture && ( envMap.mapping === EquirectangularReflectionMapping || envMap.mapping === EquirectangularRefractionMapping ) );
+
+		if ( isEquirectangularTexture ) {
+
+			const data = properties.get( envMap );
+
+			if ( data.cubeRenderTarget ) {
+
+				const texture = data.cubeRenderTarget.texture;
+
+				if ( envMap.mapping === EquirectangularReflectionMapping ) {
+
+					texture.mapping = CubeReflectionMapping;
+
+				} else if ( envMap.mapping === EquirectangularRefractionMapping ) {
+
+					texture.mapping = CubeRefractionMapping;
+
+				}
+
+				return texture;
+
+			} else {
+
+				const image = envMap.image;
+
+				if ( image.complete === true ) {
+
+					const cubeRenderTarget = new WebGLCubeRenderTarget( image.height / 2 );
+					cubeRenderTarget.fromEquirectangularTexture( renderer, envMap );
+
+					data.cubeRenderTarget = cubeRenderTarget;
+
+					return cubeRenderTarget.texture;
+
+				}
+
+			}
+
+		}
+
+	}
+
 	//
 
 	this.allocateTextureUnit = allocateTextureUnit;
@@ -1286,6 +1338,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	this.safeSetTexture2D = safeSetTexture2D;
 	this.safeSetTextureCube = safeSetTextureCube;
+
+	this.getCubeTexture = getCubeTexture;
 
 }
 
