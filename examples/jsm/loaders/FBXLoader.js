@@ -27,7 +27,6 @@ import {
 	ClampToEdgeWrapping,
 	Color,
 	DirectionalLight,
-	EquirectangularReflectionMapping,
 	Euler,
 	FileLoader,
 	Float32BufferAttribute,
@@ -645,12 +644,6 @@ var FBXLoader = ( function () {
 						parameters.normalMap = scope.getTexture( textureMap, child.ID );
 						break;
 
-					case 'ReflectionColor':
-						parameters.envMap = scope.getTexture( textureMap, child.ID );
-						parameters.envMap.mapping = EquirectangularReflectionMapping;
-						parameters.envMap.encoding = sRGBEncoding;
-						break;
-
 					case 'SpecularColor':
 						parameters.specularMap = scope.getTexture( textureMap, child.ID );
 						parameters.specularMap.encoding = sRGBEncoding;
@@ -666,6 +659,7 @@ var FBXLoader = ( function () {
 					case 'ShininessExponent': // AKA glossiness map
 					case 'SpecularFactor': // AKA specularLevel
 					case 'VectorDisplacementColor': // NOTE: Seems to be a copy of DisplacementColor
+					case 'ReflectionColor':
 					default:
 						console.warn( 'THREE.FBXLoader: %s map is not supported in three.js, skipping texture.', type );
 						break;

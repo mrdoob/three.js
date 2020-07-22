@@ -42,14 +42,6 @@ export default /* glsl */`
 
 		vec4 envColor = textureCubeUV( envMap, reflectVec, 0.0 );
 
-	#elif defined( ENVMAP_TYPE_EQUIREC )
-
-		reflectVec = normalize( reflectVec );
-
-		vec2 sampleUV = equirectUv( reflectVec );
-
-		vec4 envColor = texture2D( envMap, sampleUV );
-
 	#else
 
 		vec4 envColor = vec4( 0.0 );

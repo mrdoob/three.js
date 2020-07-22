@@ -95,22 +95,6 @@ export default /* glsl */`
 
 			vec4 envMapColor = textureCubeUV( envMap, reflectVec, roughness );
 
-		#elif defined( ENVMAP_TYPE_EQUIREC )
-
-			vec2 sampleUV = equirectUv( reflectVec );
-
-			#ifdef TEXTURE_LOD_EXT
-
-				vec4 envMapColor = texture2DLodEXT( envMap, sampleUV, specularMIPLevel );
-
-			#else
-
-				vec4 envMapColor = texture2D( envMap, sampleUV, specularMIPLevel );
-
-			#endif
-
-			envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
-
 		#endif
 
 		return envMapColor.rgb * envMapIntensity;
