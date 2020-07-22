@@ -16,6 +16,18 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	this.generateMipmaps = false;
 
+	this._videoMayHaveData = ! video.requestVideoFrameCallback;
+
+	if ( video.requestVideoFrameCallback ) {
+
+		video.requestVideoFrameCallback( () => {
+
+			this._videoMayHaveData = true;
+
+		} );
+
+	}
+
 }
 
 VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
@@ -28,7 +40,7 @@ VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
 		const video = this.image;
 
-		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+		if ( this._videoMayHaveData && video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 			this.needsUpdate = true;
 
