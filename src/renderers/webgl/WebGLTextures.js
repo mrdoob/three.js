@@ -1271,54 +1271,69 @@ function WebGLTextures( _gl, renderer, extensions, state, properties, capabiliti
 
 	}
 
-	function getCubeTexture( envMap ) {
+	function mapTextureMapping( texture, mapping ) {
 
-		if ( envMap === null || envMap.isCubeTexture ) {
+		if ( mapping === EquirectangularReflectionMapping ) {
 
-			return envMap;
+			texture.mapping = CubeReflectionMapping;
+
+		} else if ( mapping === EquirectangularRefractionMapping ) {
+
+			texture.mapping = CubeRefractionMapping;
 
 		}
 
-		const isEquirectangularTexture = envMap.isEquirectangularTexture || /* DEPRECATED */ ( envMap.isTexture && ( envMap.mapping === EquirectangularReflectionMapping || envMap.mapping === EquirectangularRefractionMapping ) );
+	}
 
-		if ( isEquirectangularTexture ) {
+	function getCubeTexture( envMap ) {
 
-			const data = properties.get( envMap );
+		if ( envMap && ( envMap.isCubeTexture || envMap.isWebGLCubeTexture ) ) {
 
-			if ( data.cubeRenderTarget ) {
+			return envMap;
 
-				const texture = data.cubeRenderTarget.texture;
+		} else if ( envMap && envMap.isTexture ) {
 
-				if ( envMap.mapping === EquirectangularReflectionMapping ) {
+			const mapping = envMap.mapping;
+			const isDeprecatedEquirectangular = mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping;
 
-					texture.mapping = CubeReflectionMapping;
+			if ( envMap.isEquirectangularTexture || isDeprecatedEquirectangular ) {
 
-				} else if ( envMap.mapping === EquirectangularRefractionMapping ) {
+				const data = properties.get( envMap );
 
-					texture.mapping = CubeRefractionMapping;
+				if ( data.cubeRenderTarget ) {
 
-				}
+					const texture = data.cubeRenderTarget.texture;
 
-				return texture;
+					mapTextureMapping( texture, envMap.mapping );
 
-			} else {
+					return texture;
 
-				const image = envMap.image;
+				} else {
 
-				if ( image.complete === true ) {
+					const image = envMap.image;
 
-					const cubeRenderTarget = new WebGLCubeRenderTarget( image.height / 2 );
-					cubeRenderTarget.fromEquirectangularTexture( renderer, envMap );
+					if ( image.complete === true ) {
 
-					data.cubeRenderTarget = cubeRenderTarget;
+						const cubeRenderTarget = new WebGLCubeRenderTarget( image.height / 2 );
+						cubeRenderTarget.fromEquirectangularTexture( renderer, envMap );
 
-					return cubeRenderTarget.texture;
+						data.cubeRenderTarget = cubeRenderTarget;
+
+						const texture = cubeRenderTarget.texture;
+
+						mapTextureMapping( texture, envMap.mapping );
+
+						return texture;
+
+					}
 
 				}
 
 			}
 
 		}
+
+		return null;
 
 	}
 
