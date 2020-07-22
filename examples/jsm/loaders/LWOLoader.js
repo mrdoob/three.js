@@ -700,7 +700,7 @@ MaterialParser.prototype = {
 	parseEnvMap( connections, maps, attributes ) {
 
 		if ( connections.envMap ) {
-			/*
+
 			var envMap = this.loadTexture( connections.envMap );
 
 			if ( attributes.transparent && attributes.opacity < 0.999 ) {
@@ -724,7 +724,7 @@ MaterialParser.prototype = {
 			} else envMap.mapping = EquirectangularReflectionMapping;
 
 			maps.envMap = envMap;
-			*/
+
 		}
 
 	},

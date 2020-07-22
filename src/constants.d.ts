@@ -111,6 +111,8 @@ export enum Mapping {}
 export const UVMapping: Mapping;
 export const CubeReflectionMapping: Mapping;
 export const CubeRefractionMapping: Mapping;
+export const EquirectangularReflectionMapping: Mapping;
+export const EquirectangularRefractionMapping: Mapping;
 export const CubeUVReflectionMapping: Mapping;
 export const CubeUVRefractionMapping: Mapping;
 
