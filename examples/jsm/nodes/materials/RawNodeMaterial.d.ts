@@ -3,10 +3,10 @@ import { NodeMaterial } from './NodeMaterial';
 
 export class RawNodeMaterial extends NodeMaterial {
 
-  constructor();
+	constructor();
 
-  color: Node;
-  alpha: Node;
-  position: Node;
+	color: Node;
+	alpha: Node;
+	position: Node;
 
 }

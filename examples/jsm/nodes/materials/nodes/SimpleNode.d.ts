@@ -3,14 +3,14 @@ import { Node } from '../../core/Node';
 
 export class SimpleNode extends Node {
 
-  constructor();
+	constructor();
 
-  position: Node;
-  color: Node;
-  alpha: Node;
-  nodeType: string;
+	position: Node;
+	color: Node;
+	alpha: Node;
+	nodeType: string;
 
-  build( builder: NodeBuilder ): string;
-  copy( source: SimpleNode ): this;
+	build( builder: NodeBuilder ): string;
+	copy( source: SimpleNode ): this;
 
 }
