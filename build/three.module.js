@@ -28857,6 +28857,21 @@ function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, forma
 
 	this.generateMipmaps = false;
 
+	const scope = this;
+
+	function updateVideo() {
+
+		scope.needsUpdate = true;
+		video.requestVideoFrameCallback( updateVideo );
+
+	}
+
+	if ( 'requestVideoFrameCallback' in video ) {
+
+		video.requestVideoFrameCallback( updateVideo );
+
+	}
+
 }
 
 VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
@@ -28868,8 +28883,9 @@ VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 	update: function () {
 
 		const video = this.image;
+		const hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
 
-		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+		if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 			this.needsUpdate = true;
 
@@ -37044,6 +37060,7 @@ AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -37118,6 +37135,7 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 
 		let loaded = 0;
 
@@ -37242,6 +37260,7 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		const loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 		loader.setPath( this.path );
 		loader.load( url, function ( buffer ) {
 
@@ -40589,6 +40608,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -41027,6 +41047,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -41249,6 +41270,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
 		loader.load( url, function ( text ) {
 
 			let json = null;
@@ -42733,6 +42755,7 @@ FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
 		loader.load( url, function ( text ) {
 
 			let json;
@@ -42813,6 +42836,7 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		const loader = new FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( buffer ) {
 
 			try {

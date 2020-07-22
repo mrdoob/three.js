@@ -28859,6 +28859,21 @@
 
 		this.generateMipmaps = false;
 
+		var scope = this;
+
+		function updateVideo() {
+
+			scope.needsUpdate = true;
+			video.requestVideoFrameCallback( updateVideo );
+
+		}
+
+		if ( 'requestVideoFrameCallback' in video ) {
+
+			video.requestVideoFrameCallback( updateVideo );
+
+		}
+
 	}
 
 	VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
@@ -28870,8 +28885,9 @@
 		update: function () {
 
 			var video = this.image;
+			var hasVideoFrameCallback = 'requestVideoFrameCallback' in video;
 
-			if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
+			if ( hasVideoFrameCallback === false && video.readyState >= video.HAVE_CURRENT_DATA ) {
 
 				this.needsUpdate = true;
 
@@ -37048,6 +37064,7 @@
 
 			var loader = new FileLoader( scope.manager );
 			loader.setPath( scope.path );
+			loader.setRequestHeader( scope.requestHeader );
 			loader.load( url, function ( text ) {
 
 				try {
@@ -37122,6 +37139,7 @@
 			var loader = new FileLoader( this.manager );
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( this.requestHeader );
 
 			var loaded = 0;
 
@@ -37246,6 +37264,7 @@
 
 			var loader = new FileLoader( this.manager );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( this.requestHeader );
 			loader.setPath( this.path );
 			loader.load( url, function ( buffer ) {
 
@@ -40593,6 +40612,7 @@
 
 			var loader = new FileLoader( scope.manager );
 			loader.setPath( scope.path );
+			loader.setRequestHeader( scope.requestHeader );
 			loader.load( url, function ( text ) {
 
 				try {
@@ -41031,6 +41051,7 @@
 
 			var loader = new FileLoader( scope.manager );
 			loader.setPath( scope.path );
+			loader.setRequestHeader( scope.requestHeader );
 			loader.load( url, function ( text ) {
 
 				try {
@@ -41253,6 +41274,7 @@
 
 			var loader = new FileLoader( scope.manager );
 			loader.setPath( this.path );
+			loader.setRequestHeader( this.requestHeader );
 			loader.load( url, function ( text ) {
 
 				var json = null;
@@ -42737,6 +42759,7 @@
 
 			var loader = new FileLoader( this.manager );
 			loader.setPath( this.path );
+			loader.setRequestHeader( this.requestHeader );
 			loader.load( url, function ( text ) {
 
 				var json;
@@ -42817,6 +42840,7 @@
 			var loader = new FileLoader( scope.manager );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setPath( scope.path );
+			loader.setRequestHeader( scope.requestHeader );
 			loader.load( url, function ( buffer ) {
 
 				try {
