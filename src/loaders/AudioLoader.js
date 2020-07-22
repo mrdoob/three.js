@@ -23,6 +23,7 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		const loader = new FileLoader( scope.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( buffer ) {
 
 			try {

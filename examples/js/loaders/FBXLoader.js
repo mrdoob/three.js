@@ -45,6 +45,7 @@ THREE.FBXLoader = ( function () {
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( scope.requestHeader );
 
 			loader.load( url, function ( buffer ) {
 

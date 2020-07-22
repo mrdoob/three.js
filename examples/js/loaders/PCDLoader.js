@@ -26,6 +26,7 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( data ) {
 
 			try {

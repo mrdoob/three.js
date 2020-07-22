@@ -28,6 +28,7 @@ THREE.GCodeLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( text ) {
 
 			try {

@@ -19,9 +19,10 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 
 		loader.load( url, function ( buffer ) {
 

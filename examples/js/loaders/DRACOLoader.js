@@ -87,6 +87,7 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 
 		if ( this.crossOrigin === 'use-credentials' ) {
 

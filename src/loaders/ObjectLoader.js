@@ -79,6 +79,7 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( this.path );
+		loader.setRequestHeader( this.requestHeader );
 		loader.load( url, function ( text ) {
 
 			let json = null;

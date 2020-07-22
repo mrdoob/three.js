@@ -70,8 +70,9 @@ var VRMLLoader = ( function () {
 
 			var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
-			var loader = new FileLoader( this.manager );
+			var loader = new FileLoader( scope.manager );
 			loader.setPath( scope.path );
+			loader.setRequestHeader( scope.requestHeader );
 			loader.load( url, function ( text ) {
 
 				try {

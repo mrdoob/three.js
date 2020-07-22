@@ -33,8 +33,9 @@ THREE.VRMLLoader = ( function () {
 
 			var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
-			var loader = new THREE.FileLoader( this.manager );
+			var loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( scope.path );
+			loader.setRequestHeader( scope.requestHeader );
 			loader.load( url, function ( text ) {
 
 				try {
