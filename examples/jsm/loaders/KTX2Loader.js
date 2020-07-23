@@ -45,7 +45,7 @@ import {
 const DFDModel = {
 	ETC1S: 163,
 	UASTC: 166,
-}
+};
 
 const DFDChannel = {
 	ETC1S: {
@@ -66,7 +66,7 @@ const DFDChannel = {
 
 class KTX2Loader extends CompressedTextureLoader {
 
-	constructor ( manager ) {
+	constructor( manager ) {
 
 		super( manager );
 
@@ -77,7 +77,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	detectSupport ( renderer ) {
+	detectSupport( renderer ) {
 
 		this.transcoderConfig = {
 			astcSupported: renderer.extensions.has( 'WEBGL_compressed_texture_astc' ),
@@ -93,7 +93,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	initModule () {
+	initModule() {
 
 		if ( this.basisModulePending ) {
 
@@ -122,13 +122,13 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	load ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		var scope = this;
 
 		var texture = new CompressedTexture();
 
-		var bufferPending = new Promise( function (resolve, reject ) {
+		var bufferPending = new Promise( function ( resolve, reject ) {
 
 			new FileLoader( scope.manager )
 				.setPath( scope.path )
@@ -156,7 +156,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 	}
 
-	parse ( buffer, onLoad, onError ) {
+	parse( buffer, onLoad, onError ) {
 
 		var BasisLzEtc1sImageTranscoder = this.basisModule.BasisLzEtc1sImageTranscoder;
 		var UastcImageTranscoder = this.basisModule.UastcImageTranscoder;
@@ -201,7 +201,7 @@ class KTX2Loader extends CompressedTextureLoader {
 
 class KTX2Container {
 
-	constructor ( basisModule, arrayBuffer ) {
+	constructor( basisModule, arrayBuffer ) {
 
 		this.basisModule = basisModule;
 		this.arrayBuffer = arrayBuffer;
@@ -213,18 +213,18 @@ class KTX2Container {
 		var idByteLength = 12;
 		var id = new Uint8Array( this.arrayBuffer, 0, idByteLength );
 		if ( id[ 0 ] !== 0xAB || // '´'
-				id[ 1 ] !== 0x4B ||  // 'K'
-				id[ 2 ] !== 0x54 ||  // 'T'
-				id[ 3 ] !== 0x58 ||  // 'X'
-				id[ 4 ] !== 0x20 ||  // ' '
-				id[ 5 ] !== 0x32 ||  // '2'
-				id[ 6 ] !== 0x30 ||  // '0'
-				id[ 7 ] !== 0xBB ||  // 'ª'
-				id[ 8 ] !== 0x0D ||  // '\r'
-				id[ 9 ] !== 0x0A ||  // '\n'
+				id[ 1 ] !== 0x4B || // 'K'
+				id[ 2 ] !== 0x54 || // 'T'
+				id[ 3 ] !== 0x58 || // 'X'
+				id[ 4 ] !== 0x20 || // ' '
+				id[ 5 ] !== 0x32 || // '2'
+				id[ 6 ] !== 0x30 || // '0'
+				id[ 7 ] !== 0xBB || // 'ª'
+				id[ 8 ] !== 0x0D || // '\r'
+				id[ 9 ] !== 0x0A || // '\n'
 				id[ 10 ] !== 0x1A || // '\x1A'
-				id[ 11 ] !== 0x0A    // '\n'
-			) {
+				id[ 11 ] !== 0x0A // '\n'
+		) {
 
 			throw new Error( 'THREE.KTX2Loader: Missing KTX 2.0 identifier.' );
 
@@ -343,9 +343,9 @@ class KTX2Container {
 
 		dfdReader.skip( 7 /* bytesPlane[1-7] */ );
 
-		for ( var i = 0; i < this.dfd.numSamples; i++ ) {
+		for ( var i = 0; i < this.dfd.numSamples; i ++ ) {
 
-			this.dfd.samples[i] = {
+			this.dfd.samples[ i ] = {
 
 				channelID: dfdReader.skip( 3 /* bitOffset + bitLength */ ).nextUint8(),
 				// ... remainder not implemented.
@@ -426,7 +426,7 @@ class KTX2Container {
 
 	}
 
-	initMipmaps ( transcoder, config ) {
+	initMipmaps( transcoder, config ) {
 
 		var TranscodeTarget = this.basisModule.TranscodeTarget;
 		var TextureFormat = this.basisModule.TextureFormat;
@@ -482,7 +482,7 @@ class KTX2Container {
 
 		} else if ( config.etc2Supported ) {
 
-			targetFormat = hasAlpha ? TranscodeTarget.ETC2_RGBA : TranscodeTarget.ETC1_RGB /* subset of ETC2 */;
+			targetFormat = hasAlpha ? TranscodeTarget.ETC2_RGBA : TranscodeTarget.ETC1_RGB/* subset of ETC2 */;
 			this.transcodedFormat = hasAlpha ? RGBA_ETC2_EAC_Format : RGB_ETC2_Format;
 
 		} else if ( config.etc1Supported ) {
@@ -540,7 +540,7 @@ class KTX2Container {
 
 					// ETC1S
 
-					var imageDesc = this.sgd.imageDescs[ imageDescIndex++ ];
+					var imageDesc = this.sgd.imageDescs[ imageDescIndex ++ ];
 
 					imageInfo.flags = imageDesc.imageFlags;
 					imageInfo.rgbByteOffset = 0;
@@ -585,11 +585,19 @@ class KTX2Container {
 
 	}
 
-	getWidth () { return this.header.pixelWidth; }
+	getWidth() {
 
-	getHeight () { return this.header.pixelHeight; }
+		return this.header.pixelWidth;
 
-	getEncoding () {
+	}
+
+	getHeight() {
+
+		return this.header.pixelHeight;
+
+	}
+
+	getEncoding() {
 
 		return this.dfd.transferFunction === 2 /* KHR_DF_TRANSFER_SRGB */
 			? sRGBEncoding
@@ -597,7 +605,7 @@ class KTX2Container {
 
 	}
 
-	getTexFormat () {
+	getTexFormat() {
 
 		var TextureFormat = this.basisModule.TextureFormat;
 
@@ -605,7 +613,7 @@ class KTX2Container {
 
 	}
 
-	getAlpha () {
+	getAlpha() {
 
 		var TextureFormat = this.basisModule.TextureFormat;
 
@@ -639,7 +647,7 @@ class KTX2Container {
 
 	}
 
-	getPremultiplyAlpha () {
+	getPremultiplyAlpha() {
 
 		return !! ( this.dfd.flags & 1 /* KHR_DF_FLAG_ALPHA_PREMULTIPLIED */ );
 
@@ -649,7 +657,7 @@ class KTX2Container {
 
 class KTX2BufferReader {
 
-	constructor ( arrayBuffer, byteOffset, byteLength, littleEndian ) {
+	constructor( arrayBuffer, byteOffset, byteLength, littleEndian ) {
 
 		this.dataView = new DataView( arrayBuffer, byteOffset, byteLength );
 		this.littleEndian = littleEndian;
@@ -657,7 +665,7 @@ class KTX2BufferReader {
 
 	}
 
-	nextUint8 () {
+	nextUint8() {
 
 		var value = this.dataView.getUint8( this.offset, this.littleEndian );
 
@@ -667,7 +675,7 @@ class KTX2BufferReader {
 
 	}
 
-	nextUint16 () {
+	nextUint16() {
 
 		var value = this.dataView.getUint16( this.offset, this.littleEndian );
 
@@ -677,7 +685,7 @@ class KTX2BufferReader {
 
 	}
 
-	nextUint32 () {
+	nextUint32() {
 
 		var value = this.dataView.getUint32( this.offset, this.littleEndian );
 
@@ -687,10 +695,10 @@ class KTX2BufferReader {
 
 	}
 
-	nextUint64 () {
+	nextUint64() {
 
 		// https://stackoverflow.com/questions/53103695/
-		var left =  this.dataView.getUint32( this.offset, this.littleEndian );
+		var left = this.dataView.getUint32( this.offset, this.littleEndian );
 		var right = this.dataView.getUint32( this.offset + 4, this.littleEndian );
 		var value = this.littleEndian ? left + ( 2 ** 32 * right ) : ( 2 ** 32 * left ) + right;
 
@@ -706,7 +714,7 @@ class KTX2BufferReader {
 
 	}
 
-	skip ( bytes ) {
+	skip( bytes ) {
 
 		this.offset += bytes;
 

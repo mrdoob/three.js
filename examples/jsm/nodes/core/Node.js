@@ -102,7 +102,7 @@ Node.prototype = {
 
 	},
 
-	getHash: function() {
+	getHash: function () {
 
 		var hash = '{';
 		var prop, obj;
