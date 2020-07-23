@@ -23,6 +23,7 @@ BasicNodeMaterial.prototype.constructor = BasicNodeMaterial;
 NodeUtils.addShortcuts( BasicNodeMaterial.prototype, 'fragment', [
 	'color',
 	'alpha',
+	'mask',
 	'position'
 ] );
 
