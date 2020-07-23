@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
+import { CubeReflectionMapping, CubeRefractionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
 import { WebGLCubeRenderTarget } from "../WebGLCubeRenderTarget.js";
 
 function WebGLCubeMaps( renderer ) {
@@ -34,7 +34,11 @@ function WebGLCubeMaps( renderer ) {
 			const mapping = texture.mapping;
 			const isDeprecatedEquirectangular = mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping;
 
-			if ( texture.isEquirectangularTexture || isDeprecatedEquirectangular ) {
+			if ( mapping === CubeUVReflectionMapping || mapping === CubeUVRefractionMapping ) {
+
+				return texture;
+
+			} else if ( texture.isEquirectangularTexture || isDeprecatedEquirectangular ) {
 
 				if ( cubemaps.has( texture ) ) {
 
