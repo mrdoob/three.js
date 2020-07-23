@@ -3,7 +3,7 @@ import {
 	WebGLRenderer
 } from '../../../../src/Three';
 
-import { Node } from '../../core/Node.js';
+import { Node } from '../core/Node.js';
 import { NodeBuilder } from '../core/NodeBuilder';
 import { NodeFrame } from '../core/NodeFrame';
 import { RawNode } from './nodes/RawNode';

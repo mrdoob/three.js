@@ -1,9 +1,9 @@
 import { NodeBuilder } from './NodeBuilder';
 
 export interface Flow {
-  result: string;
-  code: string;
-  extra: object;
+	result: string;
+	code: string;
+	extra: object;
 }
 
 export class Node {
