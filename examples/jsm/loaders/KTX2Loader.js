@@ -467,7 +467,7 @@ class KTX2Container {
 
 		} else if ( config.bptcSupported && texFormat === TextureFormat.UASTC4x4 ) {
 
-			targetFormat = hasAlpha ? TranscodeTarget.BC7_M5_RGBA : BC7_M6_RGB;
+			targetFormat = TranscodeTarget.BC7_M5_RGBA;
 			this.transcodedFormat = RGBA_BPTC_Format;
 
 		} else if ( config.dxtSupported ) {
