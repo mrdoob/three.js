@@ -27,6 +27,7 @@ import {
 	ClampToEdgeWrapping,
 	Color,
 	DirectionalLight,
+	EquirectangularReflectionMapping,
 	Euler,
 	FileLoader,
 	Float32BufferAttribute,

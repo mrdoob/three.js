@@ -22,6 +22,8 @@ import {
 	ClampToEdgeWrapping,
 	Color,
 	DoubleSide,
+	EquirectangularReflectionMapping,
+	EquirectangularRefractionMapping,
 	FileLoader,
 	Float32BufferAttribute,
 	FrontSide,
