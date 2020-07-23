@@ -32,13 +32,12 @@ function WebGLCubeMaps( renderer ) {
 		} else if ( texture && texture.isTexture ) {
 
 			const mapping = texture.mapping;
-			const isDeprecatedEquirectangular = mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping;
 
 			if ( mapping === CubeUVReflectionMapping || mapping === CubeUVRefractionMapping ) {
 
 				return texture;
 
-			} else if ( texture.isEquirectangularTexture || isDeprecatedEquirectangular ) {
+			} else if ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) {
 
 				if ( cubemaps.has( texture ) ) {
 
