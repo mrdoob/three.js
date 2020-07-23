@@ -8,6 +8,7 @@ export class BasicNode extends Node {
 	position: Node;
 	color: Node;
 	alpha: Node;
+	mask: Node;
 	nodeType: string;
 
 	build( builder: NodeBuilder ): string;

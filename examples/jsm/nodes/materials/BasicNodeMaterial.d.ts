@@ -7,6 +7,7 @@ export class BasicNodeMaterial extends NodeMaterial {
 
 	color: Node;
 	alpha: Node;
+	mask: Node;
 	position: Node;
 
 }
