@@ -23,7 +23,7 @@ function WebGLCubeRenderTarget( size, options, dummy ) {
 
 	WebGLRenderTarget.call( this, size, size, options );
 
-	this.texture.isWebGLCubeTexture = true; // TODO Why is texture not a CubeTexture?
+	this.texture.isWebGLCubeRenderTargetTexture = true; // HACK Why is texture not a CubeTexture?
 
 }
 

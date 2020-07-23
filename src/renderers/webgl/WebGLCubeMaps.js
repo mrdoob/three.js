@@ -25,7 +25,7 @@ function WebGLCubeMaps( renderer ) {
 
 	function get( texture ) {
 
-		if ( texture && ( texture.isCubeTexture || texture.isWebGLCubeTexture ) ) {
+		if ( texture && ( texture.isCubeTexture || texture.isWebGLCubeRenderTargetTexture ) ) {
 
 			return texture;
 
