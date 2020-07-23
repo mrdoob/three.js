@@ -25,7 +25,13 @@ function WebGLBackground( renderer, textures, state, objects, premultipliedAlpha
 
 	function render( renderList, scene, camera, forceClear ) {
 
-		let background = scene.isScene === true ? textures.getCubeTexture( scene.background ) : null;
+		let background = scene.isScene === true ? scene.background : null;
+
+		if ( background && background.isTexture ) {
+
+			background = textures.getCubeTexture( background );
+
+		}
 
 		// Ignore background in AR
 		// TODO: Reconsider this.
