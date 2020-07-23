@@ -4,7 +4,7 @@
 
 import { BackSide } from "../../constants.js";
 
-function WebGLMaterials( properties, textures ) {
+function WebGLMaterials( properties, cubemaps ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
@@ -143,7 +143,7 @@ function WebGLMaterials( properties, textures ) {
 
 		}
 
-		const envMap = textures.getCubeTexture( material.envMap || environment );
+		const envMap = cubemaps.get( material.envMap || environment );
 
 		if ( envMap ) {
 

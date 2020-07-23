@@ -11,7 +11,7 @@ import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { cloneUniforms } from '../shaders/UniformsUtils.js';
 
-function WebGLBackground( renderer, textures, state, objects, premultipliedAlpha ) {
+function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha ) {
 
 	const clearColor = new Color( 0x000000 );
 	let clearAlpha = 0;
@@ -29,7 +29,7 @@ function WebGLBackground( renderer, textures, state, objects, premultipliedAlpha
 
 		if ( background && background.isTexture ) {
 
-			background = textures.getCubeTexture( background );
+			background = cubemaps.get( background );
 
 		}
 
