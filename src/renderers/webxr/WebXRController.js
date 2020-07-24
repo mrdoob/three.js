@@ -39,7 +39,6 @@ Object.assign( WebXRController.prototype, {
 					// ??
 					this._hand.add( joint );
 
-
 				}
 
 			}
@@ -167,8 +166,10 @@ Object.assign( WebXRController.prototype, {
 						const indexTip = hand.joints[ XRHand.INDEX_PHALANX_TIP ];
 						const thumbTip = hand.joints[ XRHand.THUMB_PHALANX_TIP ];
 						const distance = indexTip.position.distanceTo( thumbTip.position );
+
 						const distanceToPinch = 0.02;
-						if ( hand.inputState.pinching && distance > distanceToPinch ) {
+						const threshold = 0.005;
+						if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
 
 							hand.inputState.pinching = false;
 							this.dispatchEvent( {
@@ -176,7 +177,7 @@ Object.assign( WebXRController.prototype, {
 								target: this
 							} );
 
-						} else if ( ! hand.inputState.pinching && distance <= distanceToPinch ) {
+						} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
 
 							hand.inputState.pinching = true;
 							this.dispatchEvent( {
