@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-import { CubeReflectionMapping, CubeRefractionMapping, CubeUVReflectionMapping, CubeUVRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
+import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
 import { WebGLCubeRenderTarget } from "../WebGLCubeRenderTarget.js";
 
 function WebGLCubeMaps( renderer ) {
@@ -21,29 +21,22 @@ function WebGLCubeMaps( renderer ) {
 
 		}
 
+		return texture;
+
 	}
 
 	function get( texture ) {
 
-		if ( texture && ( texture.isCubeTexture || texture.isWebGLCubeRenderTargetTexture ) ) {
-
-			return texture;
-
-		} else if ( texture && texture.isTexture ) {
+		if ( texture && texture.isTexture ) {
 
 			const mapping = texture.mapping;
 
-			if ( mapping === CubeUVReflectionMapping || mapping === CubeUVRefractionMapping ) {
-
-				return texture;
-
-			} else if ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) {
+			if ( mapping === EquirectangularReflectionMapping || mapping === EquirectangularRefractionMapping ) {
 
 				if ( cubemaps.has( texture ) ) {
 
 					const cubemap = cubemaps.get( texture ).texture;
-					mapTextureMapping( cubemap, texture.mapping );
-					return cubemap;
+					return mapTextureMapping( cubemap, texture.mapping );
 
 				} else {
 
@@ -55,9 +48,7 @@ function WebGLCubeMaps( renderer ) {
 						renderTarget.fromEquirectangularTexture( renderer, texture );
 						cubemaps.set( texture, renderTarget );
 
-						const cubemap = renderTarget.texture;
-						mapTextureMapping( cubemap, texture.mapping );
-						return cubemap;
+						return mapTextureMapping( renderTarget.texture, texture.mapping );
 
 					}
 
@@ -67,7 +58,7 @@ function WebGLCubeMaps( renderer ) {
 
 		}
 
-		return null;
+		return texture;
 
 	}
 
