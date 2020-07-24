@@ -24,6 +24,8 @@ export class NodeBuilder {
 		color: boolean[];
 		lights: boolean;
 		fog: boolean;
+		transparent: boolean;
+		irradiance: boolean;
 	};
 
 	includes: {
