@@ -60,7 +60,6 @@ var files = {
 		"webgl_interactive_points",
 		"webgl_interactive_raycasting_points",
 		"webgl_interactive_voxelpainter",
-		"webgl_kinect",
 		"webgl_layers",
 		"webgl_lensflares",
 		"webgl_lightprobe",
@@ -229,6 +228,7 @@ var files = {
 		"webgl_test_memory2",
 		"webgl_tonemapping",
 		"webgl_trails",
+		"webgl_video_kinect",
 		"webgl_video_panorama_equirectangular",
 		"webgl_water",
 		"webgl_water_flowmap"
