@@ -8,12 +8,27 @@ function WebXRController() {
 
 	this._targetRay = null;
 	this._grip = null;
+	this._hand = null;
 
 }
 
 Object.assign( WebXRController.prototype, {
 
 	constructor: WebXRController,
+
+	getHandSpace: function () {
+
+		if ( this._hand === null ) {
+
+			this._hand = new Group();
+			this._hand.matrixAutoUpdate = false;
+			this._hand.visible = false;
+
+		}
+
+		return this._hand;
+
+	},
 
 	getTargetRaySpace: function () {
 
@@ -57,6 +72,12 @@ Object.assign( WebXRController.prototype, {
 
 		}
 
+		if ( this._hand !== null ) {
+
+			this._hand.dispatchEvent( event );
+
+		}
+
 		return this;
 
 	},
@@ -77,6 +98,12 @@ Object.assign( WebXRController.prototype, {
 
 		}
 
+		if ( this._hand !== null ) {
+
+			this._hand.visible = false;
+
+		}
+
 		return this;
 
 	},
@@ -85,33 +112,41 @@ Object.assign( WebXRController.prototype, {
 
 		let inputPose = null;
 		let gripPose = null;
+		let handPose = null;
 
 		const targetRay = this._targetRay;
 		const grip = this._grip;
+		const hand = this._hand;
 
 		if ( inputSource ) {
 
-			if ( targetRay !== null ) {
+			if ( inputSource.hand ) {
 
-				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+			} else {
 
-				if ( inputPose !== null ) {
+				if ( targetRay !== null ) {
 
-					targetRay.matrix.fromArray( inputPose.transform.matrix );
-					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+
+					if ( inputPose !== null ) {
+
+						targetRay.matrix.fromArray( inputPose.transform.matrix );
+						targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+
+					}
 
 				}
 
-			}
+				if ( grip !== null && inputSource.gripSpace ) {
 
-			if ( grip !== null && inputSource.gripSpace ) {
+					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
 
-				gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
+					if ( gripPose !== null ) {
 
-				if ( gripPose !== null ) {
+						grip.matrix.fromArray( gripPose.transform.matrix );
+						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
 
-					grip.matrix.fromArray( gripPose.transform.matrix );
-					grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+					}
 
 				}
 
@@ -128,6 +163,12 @@ Object.assign( WebXRController.prototype, {
 		if ( grip !== null ) {
 
 			grip.visible = ( gripPose !== null );
+
+		}
+
+		if ( hand !== null ) {
+
+			hand.visible = ( handPose !== null );
 
 		}
 
