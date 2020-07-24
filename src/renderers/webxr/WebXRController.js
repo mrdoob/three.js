@@ -24,6 +24,26 @@ Object.assign( WebXRController.prototype, {
 			this._hand.matrixAutoUpdate = false;
 			this._hand.visible = false;
 
+			this._hand.joints = [];
+			this._hand.inputState = { pinching: false };
+
+			if ( window.XRHand ) {
+
+				for ( let i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+
+					// The transform of this joint will be updated with the joint pose on each frame
+					let joint = new Group();
+					joint.matrixAutoUpdate = false;
+					joint.visible = false;
+					this._hand.joints.push( joint );
+					// ??
+					this._hand.add( joint );
+
+
+				}
+
+			}
+
 		}
 
 		return this._hand;
@@ -121,6 +141,54 @@ Object.assign( WebXRController.prototype, {
 		if ( inputSource ) {
 
 			if ( inputSource.hand ) {
+
+				handPose = true;
+				for ( let i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+
+					if ( inputSource.hand[ i ] ) {
+
+						// Update the joints groups with the XRJoint poses
+						let jointPose = frame.getJointPose( inputSource.hand[ i ], referenceSpace );
+						const joint = hand.joints[ i ];
+
+						if ( jointPose !== null ) {
+
+							joint.matrix.fromArray( jointPose.transform.matrix );
+							joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
+							joint.jointRadius = jointPose.radius;
+
+						}
+
+						joint.visible = jointPose !== null;
+
+						// Custom events
+
+						// Check pinch
+						const indexTip = hand.joints[ XRHand.INDEX_PHALANX_TIP ];
+						const thumbTip = hand.joints[ XRHand.THUMB_PHALANX_TIP ];
+						const distance = indexTip.position.distanceTo( thumbTip.position );
+						const distanceToPinch = 0.02;
+						if ( hand.inputState.pinching && distance > distanceToPinch ) {
+
+							hand.inputState.pinching = false;
+							this.dispatchEvent( {
+								type: "pinchend",
+								target: this
+							} );
+
+						} else if ( ! hand.inputState.pinching && distance <= distanceToPinch ) {
+
+							hand.inputState.pinching = true;
+							this.dispatchEvent( {
+								type: "pinchstart",
+								target: this
+							} );
+
+						}
+
+					}
+
+				}
 
 			} else {
 
