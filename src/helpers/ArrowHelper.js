@@ -126,10 +126,4 @@ ArrowHelper.prototype.copy = function ( source ) {
 
 };
 
-ArrowHelper.prototype.clone = function () {
-
-	return new this.constructor().copy( this );
-
-};
-
 export { ArrowHelper };
