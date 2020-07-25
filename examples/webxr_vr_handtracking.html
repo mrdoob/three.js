@@ -137,13 +137,9 @@
 				// controllers
 
 				controller1 = renderer.xr.getController( 0 );
-				controller1.addEventListener( 'selectstart', onSelectStart );
-				controller1.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller1 );
 
 				controller2 = renderer.xr.getController( 1 );
-				controller2.addEventListener( 'selectstart', onSelectStart );
-				controller2.addEventListener( 'selectend', onSelectEnd );
 				scene.add( controller2 );
 
 				var controllerModelFactory = new XRControllerModelFactory();
@@ -304,92 +300,6 @@
 
 			}
 
-			function onSelectStart( event ) {
-
-				var controller = event.target;
-
-				var intersections = getIntersections( controller );
-
-				if ( intersections.length > 0 ) {
-
-					var intersection = intersections[ 0 ];
-
-					var object = intersection.object;
-					object.material.emissive.b = 1;
-					controller.attach( object );
-
-					controller.userData.selected = object;
-
-				}
-
-			}
-
-			function onSelectEnd( event ) {
-
-				var controller = event.target;
-
-				if ( controller.userData.selected !== undefined ) {
-
-					var object = controller.userData.selected;
-					object.material.emissive.b = 0;
-					group.attach( object );
-
-					controller.userData.selected = undefined;
-
-				}
-
-
-			}
-
-			function getIntersections( controller ) {
-
-				tempMatrix.identity().extractRotation( controller.matrixWorld );
-
-				raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-				raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( tempMatrix );
-
-				return raycaster.intersectObjects( group.children );
-
-			}
-
-			function intersectObjects( controller ) {
-
-				// Do not highlight when already selected
-
-				if ( controller.userData.selected !== undefined ) return;
-
-				var line = controller.getObjectByName( 'line' );
-				var intersections = getIntersections( controller );
-
-				if ( intersections.length > 0 ) {
-
-					var intersection = intersections[ 0 ];
-
-					var object = intersection.object;
-					object.material.emissive.r = 1;
-					intersected.push( object );
-
-					line.scale.z = intersection.distance;
-
-				} else {
-
-					line.scale.z = 5;
-
-				}
-
-			}
-
-			function cleanIntersected() {
-
-				while ( intersected.length ) {
-
-					var object = intersected.pop();
-					object.material.emissive.r = 0;
-
-				}
-
-			}
-
 			//
 
 			function animate() {
@@ -400,8 +310,6 @@
 
 			function render() {
 
-				cleanIntersected();
-
 				if ( scaling.active ) {
 
 					const indexTip1Pos = hand1.joints[ XRHand.INDEX_PHALANX_TIP ].position;
@@ -410,9 +318,6 @@
 					const newScale = scaling.initialScale + distance / scaling.initialDistance - 1;
 					scaling.object.scale.setScalar( newScale );
 				}
-
-				intersectObjects( controller1 );
-				intersectObjects( controller2 );
 
 				renderer.render( scene, camera );
 
