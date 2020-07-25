@@ -230,8 +230,6 @@ function WebXRManager( renderer, gl ) {
 
 		const inputSources = session.inputSources;
 
-		console.log("Update sources", inputSources);
-
 		// Assign inputSources to available controllers
 
 		for ( let i = 0; i < controllers.length; i ++ ) {
