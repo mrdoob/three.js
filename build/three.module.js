@@ -23497,12 +23497,46 @@ function WebXRController() {
 
 	this._targetRay = null;
 	this._grip = null;
+	this._hand = null;
 
 }
 
 Object.assign( WebXRController.prototype, {
 
 	constructor: WebXRController,
+
+	getHandSpace: function () {
+
+		if ( this._hand === null ) {
+
+			this._hand = new Group();
+			this._hand.matrixAutoUpdate = false;
+			this._hand.visible = false;
+
+			this._hand.joints = [];
+			this._hand.inputState = { pinching: false };
+
+			if ( window.XRHand ) {
+
+				for ( let i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+
+					// The transform of this joint will be updated with the joint pose on each frame
+					let joint = new Group();
+					joint.matrixAutoUpdate = false;
+					joint.visible = false;
+					this._hand.joints.push( joint );
+					// ??
+					this._hand.add( joint );
+
+				}
+
+			}
+
+		}
+
+		return this._hand;
+
+	},
 
 	getTargetRaySpace: function () {
 
@@ -23546,6 +23580,12 @@ Object.assign( WebXRController.prototype, {
 
 		}
 
+		if ( this._hand !== null ) {
+
+			this._hand.dispatchEvent( event );
+
+		}
+
 		return this;
 
 	},
@@ -23566,6 +23606,12 @@ Object.assign( WebXRController.prototype, {
 
 		}
 
+		if ( this._hand !== null ) {
+
+			this._hand.visible = false;
+
+		}
+
 		return this;
 
 	},
@@ -23574,33 +23620,91 @@ Object.assign( WebXRController.prototype, {
 
 		let inputPose = null;
 		let gripPose = null;
+		let handPose = null;
 
 		const targetRay = this._targetRay;
 		const grip = this._grip;
+		const hand = this._hand;
 
 		if ( inputSource ) {
 
-			if ( targetRay !== null ) {
+			if ( inputSource.hand ) {
 
-				inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
+				handPose = true;
+				for ( let i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
 
-				if ( inputPose !== null ) {
+					if ( inputSource.hand[ i ] ) {
 
-					targetRay.matrix.fromArray( inputPose.transform.matrix );
-					targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+						// Update the joints groups with the XRJoint poses
+						let jointPose = frame.getJointPose( inputSource.hand[ i ], referenceSpace );
+						const joint = hand.joints[ i ];
+
+						if ( jointPose !== null ) {
+
+							joint.matrix.fromArray( jointPose.transform.matrix );
+							joint.matrix.decompose( joint.position, joint.rotation, joint.scale );
+							joint.jointRadius = jointPose.radius;
+
+						}
+
+						joint.visible = jointPose !== null;
+
+						// Custom events
+
+						// Check pinch
+						const indexTip = hand.joints[ XRHand.INDEX_PHALANX_TIP ];
+						const thumbTip = hand.joints[ XRHand.THUMB_PHALANX_TIP ];
+						const distance = indexTip.position.distanceTo( thumbTip.position );
+
+						const distanceToPinch = 0.02;
+						const threshold = 0.005;
+						if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
+
+							hand.inputState.pinching = false;
+							this.dispatchEvent( {
+								type: "pinchend",
+								target: this
+							} );
+
+						} else if ( ! hand.inputState.pinching && distance <= distanceToPinch - threshold ) {
+
+							hand.inputState.pinching = true;
+							this.dispatchEvent( {
+								type: "pinchstart",
+								target: this
+							} );
+
+						}
+
+					}
 
 				}
 
-			}
+			} else {
 
-			if ( grip !== null && inputSource.gripSpace ) {
+				if ( targetRay !== null ) {
 
-				gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
+					inputPose = frame.getPose( inputSource.targetRaySpace, referenceSpace );
 
-				if ( gripPose !== null ) {
+					if ( inputPose !== null ) {
 
-					grip.matrix.fromArray( gripPose.transform.matrix );
-					grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+						targetRay.matrix.fromArray( inputPose.transform.matrix );
+						targetRay.matrix.decompose( targetRay.position, targetRay.rotation, targetRay.scale );
+
+					}
+
+				}
+
+				if ( grip !== null && inputSource.gripSpace ) {
+
+					gripPose = frame.getPose( inputSource.gripSpace, referenceSpace );
+
+					if ( gripPose !== null ) {
+
+						grip.matrix.fromArray( gripPose.transform.matrix );
+						grip.matrix.decompose( grip.position, grip.rotation, grip.scale );
+
+					}
 
 				}
 
@@ -23617,6 +23721,12 @@ Object.assign( WebXRController.prototype, {
 		if ( grip !== null ) {
 
 			grip.visible = ( gripPose !== null );
+
+		}
+
+		if ( hand !== null ) {
+
+			hand.visible = ( handPose !== null );
 
 		}
 
@@ -23698,6 +23808,21 @@ function WebXRManager( renderer, gl ) {
 		}
 
 		return controller.getGripSpace();
+
+	};
+
+	this.getHand = function ( index ) {
+
+		let controller = controllers[ index ];
+
+		if ( controller === undefined ) {
+
+			controller = new WebXRController();
+			controllers[ index ] = controller;
+
+		}
+
+		return controller.getHandSpace();
 
 	};
 
@@ -47880,28 +48005,8 @@ function GridHelper( size, divisions, color1, color2 ) {
 
 }
 
-GridHelper.prototype = Object.assign( Object.create( LineSegments.prototype ), {
-
-	constructor: GridHelper,
-
-	copy: function ( source ) {
-
-		LineSegments.prototype.copy.call( this, source );
-
-		this.geometry.copy( source.geometry );
-		this.material.copy( source.material );
-
-		return this;
-
-	},
-
-	clone: function () {
-
-		return new this.constructor().copy( this );
-
-	}
-
-} );
+GridHelper.prototype = Object.create( LineSegments.prototype );
+GridHelper.prototype.constructor = GridHelper;
 
 /**
  * @author mrdoob / http://mrdoob.com/
@@ -48375,12 +48480,6 @@ BoxHelper.prototype.copy = function ( source ) {
 
 };
 
-BoxHelper.prototype.clone = function () {
-
-	return new this.constructor().copy( this );
-
-};
-
 /**
  * @author WestLangley / http://github.com/WestLangley
  */
@@ -48598,12 +48697,6 @@ ArrowHelper.prototype.copy = function ( source ) {
 	this.cone.copy( source.cone );
 
 	return this;
-
-};
-
-ArrowHelper.prototype.clone = function () {
-
-	return new this.constructor().copy( this );
 
 };
 
