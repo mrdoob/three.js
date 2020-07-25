@@ -6,5 +6,5 @@ var performance;
 var createImageBitmap;
 var WebGL2RenderingContext;
 var WebGL2ComputeRenderingContext;
-var XRHands;
+var XRHand;
 var XRWebGLLayer;
