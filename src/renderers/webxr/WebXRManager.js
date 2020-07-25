@@ -81,6 +81,21 @@ function WebXRManager( renderer, gl ) {
 
 	};
 
+	this.getHand = function ( index ) {
+
+		let controller = controllers[ index ];
+
+		if ( controller === undefined ) {
+
+			controller = new WebXRController();
+			controllers[ index ] = controller;
+
+		}
+
+		return controller.getHandSpace();
+
+	};
+
 	//
 
 	function onSessionEvent( event ) {
@@ -214,6 +229,8 @@ function WebXRManager( renderer, gl ) {
 	function updateInputSources( event ) {
 
 		const inputSources = session.inputSources;
+
+		console.log("Update sources", inputSources);
 
 		// Assign inputSources to available controllers
 
