@@ -536,17 +536,26 @@ function render(time) {
 
   ...
 
-  const xRange = Math.max(20, canvas.width - planeSize) * 2;
-  const yRange = Math.max(20, canvas.height - planeSize) * 2;
+  const distAcross = Math.max(20, canvas.width - planeSize);
+  const distDown = Math.max(20, canvas.height - planeSize);
+
+  // total distance to move across and back
+  const xRange = distAcross * 2;
+  const yRange = distDown * 2;
+  const speed = 180;
 
   planes.forEach((plane, ndx) => {
-    const speed = 180;
+    // compute a unique time for each plane
     const t = time * speed + ndx * 300;
+
+    // get a value between 0 and range
     const xt = t % xRange;
     const yt = t % yRange;
 
-    const x = xt < xRange / 2 ? xt : xRange - xt;
-    const y = yt < yRange / 2 ? yt : yRange - yt;
+    // set our position going forward if 0 to half of range
+    // and backward if half of range to range
+    const x = xt < distAcross ? xt : xRange - xt;
+    const y = yt < distDown   ? yt : yRange - yt;
 
     plane.position.set(x, y, 0);
   });
