@@ -5,12 +5,7 @@
  * W3C Device Orientation control (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
  */
 
-import {
-	Euler,
-	MathUtils,
-	Quaternion,
-	Vector3
-} from "../../../build/three.module.js";
+import { EventDispatcher, Euler, MathUtils, Quaternion, Vector3 } from '../../../build/three.module.js';
 
 var DeviceOrientationControls = function ( object ) {
 
@@ -26,6 +21,10 @@ var DeviceOrientationControls = function ( object ) {
 
 	this.alphaOffset = 0; // radians
 
+	var changeEvent = { type: 'change' };
+
+	var EPS = 0.000001;
+
 	var onDeviceOrientationChangeEvent = function ( event ) {
 
 		scope.deviceOrientation = event;
@@ -40,7 +39,7 @@ var DeviceOrientationControls = function ( object ) {
 
 	// The angles alpha, beta and gamma form a set of intrinsic Tait-Bryan angles of type Z-X'-Y''
 
-	var setObjectQuaternion = function () {
+	var setObjectQuaternion = (function () {
 
 		var zee = new Vector3( 0, 0, 1 );
 
@@ -62,7 +61,7 @@ var DeviceOrientationControls = function ( object ) {
 
 		};
 
-	}();
+	})();
 
 	this.connect = function () {
 
@@ -107,28 +106,40 @@ var DeviceOrientationControls = function ( object ) {
 
 	};
 
-	this.update = function () {
+	this.update = ( function () {
 
-		if ( scope.enabled === false ) return;
+		const lastQuaternion = new Quaternion();
 
-		var device = scope.deviceOrientation;
+		return () => {
 
-		if ( device ) {
+			if ( scope.enabled === false ) return;
 
-			var alpha = device.alpha ? MathUtils.degToRad( device.alpha ) + scope.alphaOffset : 0; // Z
+			var device = scope.deviceOrientation;
 
-			var beta = device.beta ? MathUtils.degToRad( device.beta ) : 0; // X'
+			if ( device ) {
 
-			var gamma = device.gamma ? MathUtils.degToRad( device.gamma ) : 0; // Y''
+				var alpha = device.alpha ? MathUtils.degToRad( device.alpha ) + scope.alphaOffset : 0; // Z
 
-			var orient = scope.screenOrientation ? MathUtils.degToRad( scope.screenOrientation ) : 0; // O
+				var beta = device.beta ? MathUtils.degToRad( device.beta ) : 0; // X'
 
-			setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
+				var gamma = device.gamma ? MathUtils.degToRad( device.gamma ) : 0; // Y''
 
-		}
+				var orient = scope.screenOrientation ? MathUtils.degToRad( scope.screenOrientation ) : 0; // O
 
+				setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
 
-	};
+				if ( 8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
+
+					lastQuaternion.copy( scope.object.quaternion );
+					scope.dispatchEvent( changeEvent );
+
+				}
+
+			}
+
+		};
+
+	} )();
 
 	this.dispose = function () {
 
@@ -139,5 +150,8 @@ var DeviceOrientationControls = function ( object ) {
 	this.connect();
 
 };
+
+DeviceOrientationControls.prototype = Object.create( EventDispatcher.prototype );
+DeviceOrientationControls.prototype.constructor = DeviceOrientationControls;
 
 export { DeviceOrientationControls };

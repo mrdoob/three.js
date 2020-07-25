@@ -2,10 +2,7 @@
  * @author James Baicoianu / http://www.baicoianu.com/
  */
 
-import {
-	Quaternion,
-	Vector3
-} from "../../../build/three.module.js";
+import { EventDispatcher, Quaternion, Vector3 } from '../../../build/three.module.js';
 
 var FlyControls = function ( object, domElement ) {
 
@@ -32,6 +29,10 @@ var FlyControls = function ( object, domElement ) {
 	// disable default target object behavior
 
 	// internals
+
+	var changeEvent = { type: 'change' };
+
+	var EPS = 0.000001;
 
 	this.tmpQuaternion = new Quaternion();
 
@@ -186,23 +187,40 @@ var FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.update = function ( delta ) {
+	this.update = ( () => {
 
-		var moveMult = delta * this.movementSpeed;
-		var rotMult = delta * this.rollSpeed;
+		var lastQuaternion = new Quaternion();
+		var lastPosition = new Vector3();
 
-		this.object.translateX( this.moveVector.x * moveMult );
-		this.object.translateY( this.moveVector.y * moveMult );
-		this.object.translateZ( this.moveVector.z * moveMult );
+		return ( delta ) => {
 
-		this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
-		this.object.quaternion.multiply( this.tmpQuaternion );
+			var moveMult = delta * this.movementSpeed;
+			var rotMult = delta * this.rollSpeed;
 
-		// expose the rotation vector for convenience
-		this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
+			this.object.translateX( this.moveVector.x * moveMult );
+			this.object.translateY( this.moveVector.y * moveMult );
+			this.object.translateZ( this.moveVector.z * moveMult );
 
+			this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
+			this.object.quaternion.multiply( this.tmpQuaternion );
 
-	};
+			// expose the rotation vector for convenience
+			this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
+
+			if (
+				lastPosition.distanceToSquared( this.object.position ) > EPS ||
+				8 * ( 1 - lastQuaternion.dot( this.object.quaternion ) ) > EPS
+			) {
+
+				this.dispatchEvent( changeEvent );
+				lastQuaternion.copy( this.object.quaternion );
+				lastPosition.copy( this.object.position );
+
+			}
+
+		};
+
+	} )();
 
 	this.updateMovementVector = function () {
 
@@ -293,5 +311,8 @@ var FlyControls = function ( object, domElement ) {
 	this.updateRotationVector();
 
 };
+
+FlyControls.prototype = Object.create( EventDispatcher.prototype );
+FlyControls.prototype.constructor = FlyControls;
 
 export { FlyControls };
