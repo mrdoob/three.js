@@ -20724,7 +20724,7 @@
 
 				if ( shadow.map === null && ! shadow.isPointLightShadow && this.type === VSMShadowMap ) {
 
-					var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
+					var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, stencilBuffer: false };
 
 					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 					shadow.map.texture.name = light.name + ".shadowMap";
@@ -20737,7 +20737,7 @@
 
 				if ( shadow.map === null ) {
 
-					var pars$1 = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
+					var pars$1 = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat, stencilBuffer: false };
 
 					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars$1 );
 					shadow.map.texture.name = light.name + ".shadowMap";
@@ -23520,7 +23520,7 @@
 
 				if ( window.XRHand ) {
 
-					for ( var i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+					for ( var i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
 
 						// The transform of this joint will be updated with the joint pose on each frame
 						var joint = new Group();
@@ -23633,7 +23633,7 @@
 				if ( inputSource.hand ) {
 
 					handPose = true;
-					for ( var i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+					for ( var i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
 
 						if ( inputSource.hand[ i ] ) {
 
@@ -23654,8 +23654,8 @@
 							// Custom events
 
 							// Check pinch
-							var indexTip = hand.joints[ XRHand.INDEX_PHALANX_TIP ];
-							var thumbTip = hand.joints[ XRHand.THUMB_PHALANX_TIP ];
+							var indexTip = hand.joints[ window.XRHand.INDEX_PHALANX_TIP ];
+							var thumbTip = hand.joints[ window.XRHand.THUMB_PHALANX_TIP ];
 							var distance = indexTip.position.distanceTo( thumbTip.position );
 
 							var distanceToPinch = 0.02;
