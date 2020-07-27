@@ -2,7 +2,11 @@
  * @author James Baicoianu / http://www.baicoianu.com/
  */
 
-import { EventDispatcher, Quaternion, Vector3 } from '../../../build/three.module.js';
+import {
+	EventDispatcher,
+	Quaternion,
+	Vector3
+} from "../../../build/three.module.js";
 
 var FlyControls = function ( object, domElement ) {
 
@@ -30,8 +34,8 @@ var FlyControls = function ( object, domElement ) {
 
 	// internals
 
-	var changeEvent = { type: 'change' };
-
+	var scope = this;
+	var changeEvent = { type: "change" };
 	var EPS = 0.000001;
 
 	this.tmpQuaternion = new Quaternion();
@@ -187,40 +191,40 @@ var FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.update = ( () => {
+	this.update = function () {
 
 		var lastQuaternion = new Quaternion();
 		var lastPosition = new Vector3();
 
-		return ( delta ) => {
+		return function ( delta ) {
 
-			var moveMult = delta * this.movementSpeed;
-			var rotMult = delta * this.rollSpeed;
+			var moveMult = delta * scope.movementSpeed;
+			var rotMult = delta * scope.rollSpeed;
 
-			this.object.translateX( this.moveVector.x * moveMult );
-			this.object.translateY( this.moveVector.y * moveMult );
-			this.object.translateZ( this.moveVector.z * moveMult );
+			scope.object.translateX( scope.moveVector.x * moveMult );
+			scope.object.translateY( scope.moveVector.y * moveMult );
+			scope.object.translateZ( scope.moveVector.z * moveMult );
 
-			this.tmpQuaternion.set( this.rotationVector.x * rotMult, this.rotationVector.y * rotMult, this.rotationVector.z * rotMult, 1 ).normalize();
-			this.object.quaternion.multiply( this.tmpQuaternion );
+			scope.tmpQuaternion.set( scope.rotationVector.x * rotMult, scope.rotationVector.y * rotMult, scope.rotationVector.z * rotMult, 1 ).normalize();
+			scope.object.quaternion.multiply( scope.tmpQuaternion );
 
 			// expose the rotation vector for convenience
-			this.object.rotation.setFromQuaternion( this.object.quaternion, this.object.rotation.order );
+			scope.object.rotation.setFromQuaternion( scope.object.quaternion, scope.object.rotation.order );
 
 			if (
-				lastPosition.distanceToSquared( this.object.position ) > EPS ||
-				8 * ( 1 - lastQuaternion.dot( this.object.quaternion ) ) > EPS
+				lastPosition.distanceToSquared( scope.object.position ) > EPS ||
+				8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS
 			) {
 
-				this.dispatchEvent( changeEvent );
-				lastQuaternion.copy( this.object.quaternion );
-				lastPosition.copy( this.object.position );
+				scope.dispatchEvent( changeEvent );
+				lastQuaternion.copy( scope.object.quaternion );
+				lastPosition.copy( scope.object.position );
 
 			}
 
 		};
 
-	} )();
+	}();
 
 	this.updateMovementVector = function () {
 

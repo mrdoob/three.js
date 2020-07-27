@@ -5,11 +5,19 @@
  * W3C Device Orientation control (http://w3c.github.io/deviceorientation/spec-source-orientation.html)
  */
 
-import { EventDispatcher, Euler, MathUtils, Quaternion, Vector3 } from '../../../build/three.module.js';
+import {
+	Euler,
+	EventDispatcher,
+	MathUtils,
+	Quaternion,
+	Vector3
+} from "../../../build/three.module.js";
 
 var DeviceOrientationControls = function ( object ) {
 
 	var scope = this;
+	var changeEvent = { type: "change" };
+	var EPS = 0.000001;
 
 	this.object = object;
 	this.object.rotation.reorder( 'YXZ' );
@@ -20,10 +28,6 @@ var DeviceOrientationControls = function ( object ) {
 	this.screenOrientation = 0;
 
 	this.alphaOffset = 0; // radians
-
-	var changeEvent = { type: 'change' };
-
-	var EPS = 0.000001;
 
 	var onDeviceOrientationChangeEvent = function ( event ) {
 
@@ -39,7 +43,7 @@ var DeviceOrientationControls = function ( object ) {
 
 	// The angles alpha, beta and gamma form a set of intrinsic Tait-Bryan angles of type Z-X'-Y''
 
-	var setObjectQuaternion = (function () {
+	var setObjectQuaternion = function () {
 
 		var zee = new Vector3( 0, 0, 1 );
 
@@ -61,7 +65,7 @@ var DeviceOrientationControls = function ( object ) {
 
 		};
 
-	})();
+	}();
 
 	this.connect = function () {
 
@@ -108,9 +112,9 @@ var DeviceOrientationControls = function ( object ) {
 
 	this.update = ( function () {
 
-		const lastQuaternion = new Quaternion();
+		var lastQuaternion = new Quaternion();
 
-		return () => {
+		return function () {
 
 			if ( scope.enabled === false ) return;
 
@@ -138,6 +142,7 @@ var DeviceOrientationControls = function ( object ) {
 			}
 
 		};
+
 
 	} )();
 
