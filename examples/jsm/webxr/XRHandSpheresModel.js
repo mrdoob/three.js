@@ -1,8 +1,8 @@
 import {
-	Object3D,
 	SphereBufferGeometry,
 	MeshStandardMaterial,
-	Mesh
+	Mesh,
+	Group
 } from "../../../build/three.module.js";
 
 class XRHandSpheresModel {
@@ -12,6 +12,9 @@ class XRHandSpheresModel {
 		this.controller = controller;
 
 	  this.envMap = null;
+
+		this.handMesh = new Group();
+		this.controller.add(this.handMesh);
 
 		if ( window.XRHand ) {
 
@@ -30,7 +33,7 @@ class XRHandSpheresModel {
 
 				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
 				cube.castShadow = true;
-				this.add( cube );
+				this.handMesh.add( cube );
 
 			}
 
@@ -41,12 +44,13 @@ class XRHandSpheresModel {
 	updateMesh() {
 
 		const defaultRadius = 0.008;
+		const objects = this.handMesh.children;
 
 		// XR Joints
 		const XRJoints = this.controller.joints;
-		for ( var i = 0; i < this.children.length; i ++ ) {
+		for ( var i = 0; i < objects.length; i ++ ) {
 
-			const jointMesh = this.children[ i ];
+			const jointMesh = objects[ i ];
 			const XRJoint = XRJoints[ i ];
 
 			if ( XRJoint.visible ) {

@@ -12,7 +12,6 @@ class XRHandOculusMeshModel {
 
 			this.controller.add( object );
 			object.scale.setScalar( 0.01 );
-			object.frustumCulled = false;
 
 			const bonesMapping = [
 				'b_%_wrist', // XRHand.WRIST,
