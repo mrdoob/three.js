@@ -14059,7 +14059,7 @@ WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer, texture ) {
 
 	this.texture.type = texture.type;
-	this.texture.format = texture.format;
+	this.texture.format = RGBAFormat; // see #18859
 	this.texture.encoding = texture.encoding;
 
 	this.texture.generateMipmaps = texture.generateMipmaps;
