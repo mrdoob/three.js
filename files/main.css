@@ -507,6 +507,10 @@ iframe {
 	grid-gap: 16px;
 }
 
+#panel #content.minimal .grid {
+	display: unset;
+}
+
 .card {
 	border-radius: 3px;
 	overflow: hidden;
