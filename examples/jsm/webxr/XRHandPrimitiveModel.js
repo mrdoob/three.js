@@ -8,14 +8,15 @@ import {
 
 class XRHandPrimitiveModel {
 
-	constructor( controller, handedness, options ) {
+	constructor( handModel, controller, handedness, options ) {
 
 		this.controller = controller;
+		this.handModel = handModel;
 
 	  this.envMap = null;
 
 		this.handMesh = new Group();
-		this.controller.add( this.handMesh );
+		this.handModel.add( this.handMesh );
 
 		if ( window.XRHand ) {
 

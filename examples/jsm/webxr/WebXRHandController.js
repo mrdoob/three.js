@@ -65,15 +65,15 @@ var XRHandModelFactory = ( function () {
 					// @todo Detect profile if not provided
 					if ( profile === undefined || profile === "spheres" ) {
 
-						handModel.motionController = new XRHandPrimitiveModel( controller, xrInputSource.handedness, { primitive: "sphere" } );
+						handModel.motionController = new XRHandPrimitiveModel( handModel, controller, xrInputSource.handedness, { primitive: "sphere" } );
 
 					} else if ( profile === "boxes" ) {
 
-						handModel.motionController = new XRHandPrimitiveModel( controller, xrInputSource.handedness, { primitive: "box" } );
+						handModel.motionController = new XRHandPrimitiveModel( handModel, controller, xrInputSource.handedness, { primitive: "box" } );
 
 					} else if ( profile === "oculus" ) {
 
-						handModel.motionController = new XRHandOculusMeshModel( controller, xrInputSource.handedness, options );
+						handModel.motionController = new XRHandOculusMeshModel( handModel, controller, xrInputSource.handedness, options );
 
 					}
 
