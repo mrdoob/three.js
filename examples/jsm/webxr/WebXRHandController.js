@@ -1,39 +1,24 @@
 import {
-	Object3D,
-	SphereBufferGeometry,
-	MeshStandardMaterial,
-	Mesh
+	Object3D
 } from "../../../build/three.module.js";
+
+import {
+	XRHandPrimitiveModel
+} from "./XRHandPrimitiveModel.js";
+
+import {
+	XRHandOculusMeshModel
+} from "./XRHandOculusMeshModel.js";
 
 function XRHandModel( controller ) {
 
 	Object3D.call( this );
 
 	this.controller = controller;
+	this.motionController = null;
 	this.envMap = null;
 
-	if ( window.XRHand ) {
-
-		var geometry = new SphereBufferGeometry( 1, 10, 10 );
-		var jointMaterial = new MeshStandardMaterial( { color: 0x000000, roughness: 0.2, metalness: 0.8 } );
-		var tipMaterial = new MeshStandardMaterial( { color: 0x333333, roughness: 0.2, metalness: 0.8 } );
-
-		const tipIndexes = [
-			XRHand.THUMB_PHALANX_TIP,
-			XRHand.INDEX_PHALANX_TIP,
-			XRHand.MIDDLE_PHALANX_TIP,
-			XRHand.RING_PHALANX_TIP,
-			XRHand.LITTLE_PHALANX_TIP
-		];
-		for ( let i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
-
-			var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
-			cube.castShadow = true;
-			this.add( cube );
-
-		}
-
-	}
+	this.mesh = null;
 
 }
 
@@ -45,34 +30,13 @@ XRHandModel.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		Object3D.prototype.updateMatrixWorld.call( this, force );
 
-		this.updateMesh();
+		if ( this.motionController ) {
 
-	},
-
-	updateMesh: function () {
-
-		const defaultRadius = 0.008;
-
-		// XR Joints
-		const XRJoints = this.controller.joints;
-		for ( var i = 0; i < this.children.length; i ++ ) {
-
-			const jointMesh = this.children[ i ];
-			const XRJoint = XRJoints[ i ];
-
-			if ( XRJoint.visible ) {
-
-				jointMesh.position.copy( XRJoint.position );
-				jointMesh.quaternion.copy( XRJoint.quaternion );
-				jointMesh.scale.setScalar( XRJoint.jointRadius || defaultRadius );
-
-			}
-
-			jointMesh.visible = XRJoint.visible;
+			this.motionController.updateMesh();
 
 		}
 
-	}
+	},
 } );
 
 
@@ -84,7 +48,7 @@ var XRHandModelFactory = ( function () {
 
 		constructor: XRHandModelFactory,
 
-		createHandModel: function ( controller ) {
+		createHandModel: function ( controller, profile, options ) {
 
 			const handModel = new XRHandModel( controller );
 			let scene = null;
@@ -92,11 +56,26 @@ var XRHandModelFactory = ( function () {
 			controller.addEventListener( 'connected', ( event ) => {
 
 				const xrInputSource = event.data;
-				console.log( "Connected!", xrInputSource );
 
-				if ( xrInputSource.hand ) {
+				if ( xrInputSource.hand && ! handModel.motionController ) {
 
+					handModel.visible = true;
 					handModel.xrInputSource = xrInputSource;
+
+					// @todo Detect profile if not provided
+					if ( profile === undefined || profile === "spheres" ) {
+
+						handModel.motionController = new XRHandPrimitiveModel( handModel, controller, xrInputSource.handedness, { primitive: "sphere" } );
+
+					} else if ( profile === "boxes" ) {
+
+						handModel.motionController = new XRHandPrimitiveModel( handModel, controller, xrInputSource.handedness, { primitive: "box" } );
+
+					} else if ( profile === "oculus" ) {
+
+						handModel.motionController = new XRHandOculusMeshModel( handModel, controller, xrInputSource.handedness, options );
+
+					}
 
 				}
 
@@ -104,9 +83,9 @@ var XRHandModelFactory = ( function () {
 
 			controller.addEventListener( 'disconnected', () => {
 
-				handModel.motionController = null;
-				handModel.remove( scene );
-				scene = null;
+				// handModel.motionController = null;
+				// handModel.remove( scene );
+				// scene = null;
 
 			} );
 

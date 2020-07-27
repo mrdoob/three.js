@@ -174,6 +174,7 @@ Object.assign( WebXRController.prototype, {
 							hand.inputState.pinching = false;
 							this.dispatchEvent( {
 								type: "pinchend",
+								handedness: inputSource.handedness,
 								target: this
 							} );
 
@@ -182,6 +183,7 @@ Object.assign( WebXRController.prototype, {
 							hand.inputState.pinching = true;
 							this.dispatchEvent( {
 								type: "pinchstart",
+								handedness: inputSource.handedness,
 								target: this
 							} );
 
