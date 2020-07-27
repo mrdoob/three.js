@@ -18,7 +18,7 @@
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { VRButton } from './jsm/webxr/VRButton.js';
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
-			import { XRHandModelFactory } from './jsm/webxr/WebXRHandController.js';
+			import { XRHandModelFactory } from './jsm/webxr/XRHandModelFactory.js';
 
 			var container;
 			var camera, scene, renderer;
@@ -200,6 +200,7 @@
 				spheres.push( spawn );
 
 				scene.add( spawn );
+
 			}
 
 			function collideObject( indexTip ) {
@@ -273,6 +274,7 @@
 					const distance = indexTip1Pos.distanceTo( indexTip2Pos );
 					const newScale = scaling.initialScale + distance / scaling.initialDistance - 1;
 					scaling.object.scale.setScalar( newScale );
+
 				}
 
 				renderer.render( scene, camera );
