@@ -203,14 +203,14 @@ function glsl() {
 
 function bubleCleanup() {
 
-	const begin1 = /var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {/;
+	const begin1 = /var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n/;
 	const end1 = /if \( (\w+) \) (\w+)\.__proto__ = (\w+);\s+(\w+)\.prototype = Object\.create\( (\w+) && (\w+)\.prototype \);\s+(\w+)\.prototype\.constructor = (\w+);\s+return (\w+);\s+}\((\w+)\)\)/;
 
 	return {
 
 		transform( code ) {
 
-			if ( begin1.test( code ) ) {
+			while ( begin1.test( code ) ) {
 
 				code = code.replace( begin1, function () {
 
@@ -220,7 +220,7 @@ function bubleCleanup() {
 
 				code = code.replace( end1, function ( match, p1, p2 ) {
 
-					return `${p2}.prototype = Object.create( ${p1}.prototype );\n\t${p2}.prototype.constructor = ${p2};`;
+					return `${p2}.prototype = Object.create( ${p1}.prototype );\n\t${p2}.prototype.constructor = ${p2};\n`;
 
 				} );
 
