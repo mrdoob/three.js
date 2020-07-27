@@ -5,51 +5,40 @@ import {
 	Mesh
 } from "../../../build/three.module.js";
 
-function XRHandSpheresModel( controller ) {
+class XRHandSpheresModel {
 
-	Object3D.call( this );
+	constructor( controller/*, handedness */ ) {
 
-	this.controller = controller;
-	this.envMap = null;
+		this.controller = controller;
 
-	if ( window.XRHand ) {
+	  this.envMap = null;
 
-		var geometry = new SphereBufferGeometry( 1, 10, 10 );
-		var jointMaterial = new MeshStandardMaterial( { color: 0x000000, roughness: 0.2, metalness: 0.8 } );
-		var tipMaterial = new MeshStandardMaterial( { color: 0x333333, roughness: 0.2, metalness: 0.8 } );
+		if ( window.XRHand ) {
 
-		const tipIndexes = [
-			XRHand.THUMB_PHALANX_TIP,
-			XRHand.INDEX_PHALANX_TIP,
-			XRHand.MIDDLE_PHALANX_TIP,
-			XRHand.RING_PHALANX_TIP,
-			XRHand.LITTLE_PHALANX_TIP
-		];
-		for ( let i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+			var geometry = new SphereBufferGeometry( 1, 10, 10 );
+			var jointMaterial = new MeshStandardMaterial( { color: 0x000000, roughness: 0.2, metalness: 0.8 } );
+			var tipMaterial = new MeshStandardMaterial( { color: 0x333333, roughness: 0.2, metalness: 0.8 } );
 
-			var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
-			cube.castShadow = true;
-			this.add( cube );
+			const tipIndexes = [
+				XRHand.THUMB_PHALANX_TIP,
+				XRHand.INDEX_PHALANX_TIP,
+				XRHand.MIDDLE_PHALANX_TIP,
+				XRHand.RING_PHALANX_TIP,
+				XRHand.LITTLE_PHALANX_TIP
+			];
+			for ( let i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+
+				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
+				cube.castShadow = true;
+				this.add( cube );
+
+			}
 
 		}
 
 	}
 
-}
-
-XRHandSpheresModel.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-	constructor: XRHandModel,
-
-	updateMatrixWorld: function ( force ) {
-
-		Object3D.prototype.updateMatrixWorld.call( this, force );
-
-		this.updateMesh();
-
-	},
-
-	updateMesh: function () {
+	updateMesh() {
 
 		const defaultRadius = 0.008;
 
@@ -73,6 +62,7 @@ XRHandSpheresModel.prototype = Object.assign( Object.create( Object3D.prototype 
 		}
 
 	}
-} );
+
+}
 
 export { XRHandSpheresModel };
