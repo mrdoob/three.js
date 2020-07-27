@@ -14,7 +14,9 @@ class XRHandOculusMeshModel {
 		loader.load( `/examples/models/fbx/OculusHand_${handedness === "right" ? "R" : "L"}${low}.fbx`, object => {
 
 			this.handModel.add( object );
+			// Hack because of the scale of the skinnedmesh
 			object.scale.setScalar( 0.01 );
+			object.getObjectByProperty( "type", "SkinnedMesh" ).frustumCulled = false;
 
 			const bonesMapping = [
 				'b_%_wrist', // XRHand.WRIST,
@@ -100,4 +102,4 @@ class XRHandOculusMeshModel {
 
 }
 
-export { XRHandOculusMeshModel }
+export { XRHandOculusMeshModel };
