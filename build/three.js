@@ -16362,7 +16362,7 @@
 
 			gl.drawArrays( mode, start, count );
 
-			info.update( count, mode );
+			info.update( count, mode, 1 );
 
 		}
 
@@ -16993,7 +16993,7 @@
 
 			gl.drawElements( mode, count, type, start * bytesPerElement );
 
-			info.update( count, mode );
+			info.update( count, mode, 1 );
 
 		}
 
@@ -17057,8 +17057,6 @@
 		};
 
 		function update( count, mode, instanceCount ) {
-
-			instanceCount = instanceCount || 1;
 
 			render.calls ++;
 
