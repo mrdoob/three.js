@@ -355,14 +355,14 @@ $(document).ready(function($){
   $('pre>code')
     .unwrap()
     .replaceWith(function() {
-      return $('<pre class="prettyprint showlinemods" translate="no">' + this.innerHTML + '</pre>');
+      return $('<pre class="prettyprint showlinemods notranslate" translate="no">' + this.innerHTML + '</pre>');
     });
   if (window.prettyPrint) {
     window.prettyPrint();
   }
   $('span[class=com]')
     .replaceWith(function() {
-      return $('<span class="com" translate="yes">' + this.innerHTML + '</span>');
+      return $('<span class="com notranslate" translate="yes">' + this.innerHTML + '</span>');
     });
 
   const params = getQueryParams();
