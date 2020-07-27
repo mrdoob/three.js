@@ -1,4 +1,4 @@
-import { BackSide, NoBlending } from '../constants.js';
+import { BackSide, NoBlending, RGBAFormat } from '../constants.js';
 import { Mesh } from '../objects/Mesh.js';
 import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
@@ -35,7 +35,7 @@ WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer, texture ) {
 
 	this.texture.type = texture.type;
-	this.texture.format = texture.format;
+	this.texture.format = RGBAFormat;
 	this.texture.encoding = texture.encoding;
 
 	const shader = {

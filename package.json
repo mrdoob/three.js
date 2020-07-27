@@ -46,6 +46,7 @@
   },
   "scripts": {
     "start": "npm run dev",
+    "test": "npm run test-lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
     "build-closure": "rollup -c utils/build/rollup.config.js && google-closure-compiler --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"http-server -c-1 -p 8080\"",
