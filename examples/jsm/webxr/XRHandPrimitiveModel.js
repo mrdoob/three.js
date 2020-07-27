@@ -8,7 +8,7 @@ import {
 
 class XRHandPrimitiveModel {
 
-	constructor( handModel, controller, handedness, options ) {
+	constructor( handModel, controller, path, handedness, options ) {
 
 		this.controller = controller;
 		this.handModel = handModel;

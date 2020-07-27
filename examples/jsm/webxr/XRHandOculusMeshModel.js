@@ -2,7 +2,7 @@ import { FBXLoader } from "../loaders/FBXLoader.js";
 
 class XRHandOculusMeshModel {
 
-	constructor( handModel, controller, handedness, options ) {
+	constructor( handModel, controller, path, handedness, options ) {
 
 		this.controller = controller;
 		this.handModel = handModel;
@@ -11,7 +11,8 @@ class XRHandOculusMeshModel {
 		var loader = new FBXLoader();
 		const low = options && options.model === "lowpoly" ? "_low" : "";
 
-		loader.load( `../../models/fbx/OculusHand_${handedness === "right" ? "R" : "L"}${low}.fbx`, object => {
+		loader.setPath( path );
+		loader.load( `fbx/OculusHand_${handedness === "right" ? "R" : "L"}${low}.fbx`, object => {
 
 			this.handModel.add( object );
 			// Hack because of the scale of the skinnedmesh
