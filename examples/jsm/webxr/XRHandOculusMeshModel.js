@@ -2,13 +2,14 @@ import { FBXLoader } from "../loaders/FBXLoader.js";
 
 class XRHandOculusMeshModel {
 
-	constructor( controller, handedness ) {
+	constructor( controller, handedness, options ) {
 
 		this.controller = controller;
 		this.bones = [];
 		var loader = new FBXLoader();
+		const low = options && options.model === "lowpoly" ? "_low" : "";
 
-		loader.load( `/examples/models/fbx/OculusHand_${handedness === "right" ? "R" : "L"}.fbx`, object => {
+		loader.load( `/examples/models/fbx/OculusHand_${handedness === "right" ? "R" : "L"}${low}.fbx`, object => {
 
 			this.controller.add( object );
 			object.scale.setScalar( 0.01 );
