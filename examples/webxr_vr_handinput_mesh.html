@@ -115,10 +115,10 @@
 				scene.add( hand1 );
 
 				handModels.left = [
-					handModelFactory.createHandModel( hand1, "oculus", { model: "lowpoly" } ),
-					handModelFactory.createHandModel( hand1, "oculus" ),
+					handModelFactory.createHandModel( hand1, "boxes" ),
 					handModelFactory.createHandModel( hand1, "spheres" ),
-					handModelFactory.createHandModel( hand1, "boxes" )
+					handModelFactory.createHandModel( hand1, "oculus", { model: "lowpoly" } ),
+					handModelFactory.createHandModel( hand1, "oculus" )
 				];
 
 				handModels.left.forEach( model => {
@@ -154,10 +154,10 @@
 				scene.add( hand2 );
 
 				handModels.right = [
-					handModelFactory.createHandModel( hand2, "oculus", { model: "lowpoly" } ),
-					handModelFactory.createHandModel( hand2, "oculus" ),
+					handModelFactory.createHandModel( hand2, "boxes" ),
 					handModelFactory.createHandModel( hand2, "spheres" ),
-					handModelFactory.createHandModel( hand2, "boxes" )
+					handModelFactory.createHandModel( hand2, "oculus", { model: "lowpoly" } ),
+					handModelFactory.createHandModel( hand2, "oculus" )
 				];
 				handModels.right.forEach( model => {
 

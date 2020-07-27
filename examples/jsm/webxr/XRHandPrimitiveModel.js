@@ -31,8 +31,8 @@ class XRHandPrimitiveModel {
 
 			}
 
-			var jointMaterial = new MeshStandardMaterial( { color: 0x000000, roughness: 0.2, metalness: 0.8 } );
-			var tipMaterial = new MeshStandardMaterial( { color: 0x333333, roughness: 0.2, metalness: 0.8 } );
+			var jointMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 1, metalness: 0 } );
+			var tipMaterial = new MeshStandardMaterial( { color: 0x999999, roughness: 1, metalness: 0 } );
 
 			const tipIndexes = [
 				XRHand.THUMB_PHALANX_TIP,
