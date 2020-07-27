@@ -62,7 +62,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTargetTexture || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.isWebGLCubeRenderTargetTexture || background.mapping === CubeUVReflectionMapping ) ) {
 
 			if ( boxMesh === undefined ) {
 
@@ -101,6 +101,14 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 				} );
 
 				objects.update( boxMesh );
+
+			}
+
+			if ( background.isWebGLCubeRenderTarget ) {
+
+				// TODO Deprecate
+
+				background = background.texture;
 
 			}
 
