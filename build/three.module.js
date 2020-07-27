@@ -47048,19 +47048,19 @@ Object.assign( Raycaster.prototype, {
  * The azimuthal angle (theta) is measured from the positive z-axis.
  */
 
-function Spherical( radius, phi, theta ) {
+class Spherical {
 
-	this.radius = ( radius !== undefined ) ? radius : 1.0;
-	this.phi = ( phi !== undefined ) ? phi : 0; // polar angle
-	this.theta = ( theta !== undefined ) ? theta : 0; // azimuthal angle
+	constructor( radius = 1, phi = 0, theta = 0 ) {
 
-	return this;
+		this.radius = radius;
+		this.phi = phi; // polar angle
+		this.theta = theta; // azimuthal angle
 
-}
+		return this;
 
-Object.assign( Spherical.prototype, {
+	}
 
-	set: function ( radius, phi, theta ) {
+	set( radius, phi, theta ) {
 
 		this.radius = radius;
 		this.phi = phi;
@@ -47068,15 +47068,15 @@ Object.assign( Spherical.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	copy: function ( other ) {
+	copy( other ) {
 
 		this.radius = other.radius;
 		this.phi = other.phi;
@@ -47084,25 +47084,25 @@ Object.assign( Spherical.prototype, {
 
 		return this;
 
-	},
+	}
 
 	// restrict phi to be betwee EPS and PI-EPS
-	makeSafe: function () {
+	makeSafe() {
 
 		const EPS = 0.000001;
 		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
 
 		return this;
 
-	},
+	}
 
-	setFromVector3: function ( v ) {
+	setFromVector3( v ) {
 
 		return this.setFromCartesianCoords( v.x, v.y, v.z );
 
-	},
+	}
 
-	setFromCartesianCoords: function ( x, y, z ) {
+	setFromCartesianCoords( x, y, z ) {
 
 		this.radius = Math.sqrt( x * x + y * y + z * z );
 
@@ -47122,7 +47122,7 @@ Object.assign( Spherical.prototype, {
 
 	}
 
-} );
+}
 
 /**
  * @author Mugen87 / https://github.com/Mugen87

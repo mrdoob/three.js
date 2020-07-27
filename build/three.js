@@ -13167,7 +13167,6 @@
 
 	// BoxGeometry
 
-	var BoxGeometry = /*@__PURE__*/(function (Geometry) {
 		function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 
 			Geometry.call(this);
@@ -13188,16 +13187,11 @@
 
 		}
 
-		if ( Geometry ) BoxGeometry.__proto__ = Geometry;
-		BoxGeometry.prototype = Object.create( Geometry && Geometry.prototype );
+		BoxGeometry.prototype = Object.create( Geometry.prototype );
 		BoxGeometry.prototype.constructor = BoxGeometry;
-
-		return BoxGeometry;
-	}(Geometry));
 
 	// BoxBufferGeometry
 
-	var BoxBufferGeometry = /*@__PURE__*/(function (BufferGeometry) {
 		function BoxBufferGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
 			if ( width === void 0 ) width = 1;
 			if ( height === void 0 ) height = 1;
@@ -13360,12 +13354,8 @@
 
 		}
 
-		if ( BufferGeometry ) BoxBufferGeometry.__proto__ = BufferGeometry;
-		BoxBufferGeometry.prototype = Object.create( BufferGeometry && BufferGeometry.prototype );
+		BoxBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 		BoxBufferGeometry.prototype.constructor = BoxBufferGeometry;
-
-		return BoxBufferGeometry;
-	}(BufferGeometry));
 
 	/**
 	 * Uniform Utilities
@@ -47052,81 +47042,81 @@
 	 * The azimuthal angle (theta) is measured from the positive z-axis.
 	 */
 
-	function Spherical( radius, phi, theta ) {
+	var Spherical = function Spherical( radius, phi, theta ) {
+		if ( radius === void 0 ) radius = 1;
+		if ( phi === void 0 ) phi = 0;
+		if ( theta === void 0 ) theta = 0;
 
-		this.radius = ( radius !== undefined ) ? radius : 1.0;
-		this.phi = ( phi !== undefined ) ? phi : 0; // polar angle
-		this.theta = ( theta !== undefined ) ? theta : 0; // azimuthal angle
+
+		this.radius = radius;
+		this.phi = phi; // polar angle
+		this.theta = theta; // azimuthal angle
 
 		return this;
 
-	}
+	};
 
-	Object.assign( Spherical.prototype, {
+	Spherical.prototype.set = function set ( radius, phi, theta ) {
 
-		set: function ( radius, phi, theta ) {
+		this.radius = radius;
+		this.phi = phi;
+		this.theta = theta;
 
-			this.radius = radius;
-			this.phi = phi;
-			this.theta = theta;
+		return this;
 
-			return this;
+	};
 
-		},
+	Spherical.prototype.clone = function clone () {
 
-		clone: function () {
+		return new this.constructor().copy( this );
 
-			return new this.constructor().copy( this );
+	};
 
-		},
+	Spherical.prototype.copy = function copy ( other ) {
 
-		copy: function ( other ) {
+		this.radius = other.radius;
+		this.phi = other.phi;
+		this.theta = other.theta;
 
-			this.radius = other.radius;
-			this.phi = other.phi;
-			this.theta = other.theta;
+		return this;
 
-			return this;
+	};
 
-		},
+	// restrict phi to be betwee EPS and PI-EPS
+	Spherical.prototype.makeSafe = function makeSafe () {
 
-		// restrict phi to be betwee EPS and PI-EPS
-		makeSafe: function () {
+		var EPS = 0.000001;
+		this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
 
-			var EPS = 0.000001;
-			this.phi = Math.max( EPS, Math.min( Math.PI - EPS, this.phi ) );
+		return this;
 
-			return this;
+	};
 
-		},
+	Spherical.prototype.setFromVector3 = function setFromVector3 ( v ) {
 
-		setFromVector3: function ( v ) {
+		return this.setFromCartesianCoords( v.x, v.y, v.z );
 
-			return this.setFromCartesianCoords( v.x, v.y, v.z );
+	};
 
-		},
+	Spherical.prototype.setFromCartesianCoords = function setFromCartesianCoords ( x, y, z ) {
 
-		setFromCartesianCoords: function ( x, y, z ) {
+		this.radius = Math.sqrt( x * x + y * y + z * z );
 
-			this.radius = Math.sqrt( x * x + y * y + z * z );
+		if ( this.radius === 0 ) {
 
-			if ( this.radius === 0 ) {
+			this.theta = 0;
+			this.phi = 0;
 
-				this.theta = 0;
-				this.phi = 0;
+		} else {
 
-			} else {
-
-				this.theta = Math.atan2( x, z );
-				this.phi = Math.acos( MathUtils.clamp( y / this.radius, - 1, 1 ) );
-
-			}
-
-			return this;
+			this.theta = Math.atan2( x, z );
+			this.phi = Math.acos( MathUtils.clamp( y / this.radius, - 1, 1 ) );
 
 		}
 
-	} );
+		return this;
+
+	};
 
 	/**
 	 * @author Mugen87 / https://github.com/Mugen87
