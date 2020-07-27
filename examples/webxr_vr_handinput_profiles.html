@@ -92,7 +92,7 @@
 
 				container.appendChild( renderer.domElement );
 
-				document.body.appendChild( VRButton.createButton( renderer ) );
+				document.body.appendChild( VRButton.createButton( renderer, { handTracking: true } ) );
 
 				// controllers
 
@@ -104,6 +104,7 @@
 
 				var controllerModelFactory = new XRControllerModelFactory();
 				var handModelFactory = new XRHandModelFactory();
+				handModelFactory.setPath( "./models/" );
 
 				// Hand 1
 
