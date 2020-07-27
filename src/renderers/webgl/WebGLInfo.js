@@ -19,8 +19,6 @@ function WebGLInfo( gl ) {
 
 	function update( count, mode, instanceCount ) {
 
-		instanceCount = instanceCount || 1;
-
 		render.calls ++;
 
 		switch ( mode ) {
