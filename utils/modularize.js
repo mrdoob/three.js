@@ -252,7 +252,7 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	// remove examples/js deprecation warning
 
-	contents = contents.replace( /^console\.warn.*\n/, '' );
+	contents = contents.replace( /^console\.warn.*(\r\n|\r|\n)/, '' );
 
 	// imports
 
