@@ -905,12 +905,6 @@ function WebGLRenderer( parameters ) {
 
 		scene.traverse( function ( object ) {
 
-			if ( object.geometry ) {
-
-				objects.update( object ); // Upload geometry attributes
-
-			}
-
 			const material = object.material;
 
 			if ( material ) {
@@ -1787,6 +1781,18 @@ function WebGLRenderer( parameters ) {
 	this.getActiveMipmapLevel = function () {
 
 		return _currentActiveMipmapLevel;
+
+	};
+
+	this.getRenderList = function () {
+
+		return currentRenderList;
+
+	};
+
+	this.setRenderList = function ( renderList ) {
+
+		currentRenderList = renderList;
 
 	};
 

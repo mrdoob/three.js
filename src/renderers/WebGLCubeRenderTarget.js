@@ -102,32 +102,14 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 	const mesh = new Mesh( geometry, material );
 
-	//
+	const currentRenderList = renderer.getRenderList();
+	const currentRenderTarget = renderer.getRenderTarget();
 
 	const camera = new CubeCamera( 1, 10, this );
-	camera.updateMatrixWorld();
-
-	const currentRenderTarget = renderer.getRenderTarget();
-	const generateMipmaps = this.texture.generateMipmaps;
-
-	this.texture.generateMipmaps = false;
-
-	renderer.compile( mesh, camera );
-
-	for ( let i = 0; i < 6; i ++ ) {
-
-		if ( i === 5 ) this.texture.generateMipmaps = generateMipmaps;
-
-		const camera2 = camera.children[ i ];
-
-		mesh.modelViewMatrix.multiplyMatrices( camera2.matrixWorldInverse, mesh.matrixWorld );
-
-		renderer.setRenderTarget( this, i );
-		renderer.renderBufferDirect( camera2, null, geometry, material, mesh, null );
-
-	}
+	camera.update( renderer, mesh );
 
 	renderer.setRenderTarget( currentRenderTarget );
+	renderer.setRenderList( currentRenderList );
 
 	mesh.geometry.dispose();
 	mesh.material.dispose();
