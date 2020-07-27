@@ -55,6 +55,7 @@ var XRHandModelFactory = ( function () {
 		setPath: function ( path ) {
 
 			this.path = path;
+			return this;
 
 		},
 

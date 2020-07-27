@@ -101,7 +101,7 @@
 				scene.add( controller2 );
 
 				var controllerModelFactory = new XRControllerModelFactory();
-				var handModelFactory = new XRHandModelFactory();
+				var handModelFactory = new XRHandModelFactory().setPath( "./models/" );
 
 				// Hand 1
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
