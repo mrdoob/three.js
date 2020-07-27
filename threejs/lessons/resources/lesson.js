@@ -355,11 +355,15 @@ $(document).ready(function($){
   $('pre>code')
     .unwrap()
     .replaceWith(function() {
-      return $('<pre class="prettyprint showlinemods">' + this.innerHTML + '</pre>');
+      return $('<pre class="prettyprint showlinemods" translate="no">' + this.innerHTML + '</pre>');
     });
   if (window.prettyPrint) {
     window.prettyPrint();
   }
+  $('span[class=com]')
+    .replaceWith(function() {
+      return $('<span class="com" translate="yes">' + this.innerHTML + '</span>');
+    });
 
   const params = getQueryParams();
   if (params.doubleSpace || params.doublespace) {
