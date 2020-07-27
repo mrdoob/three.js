@@ -7,11 +7,11 @@ var VRButton = {
 
 	createButton: function ( renderer, options ) {
 
-		if ( options ) {
+		var DEFAULT_OPTIONS = {
+			handTracking: false
+		};
 
-			console.error( 'THREE.VRButton: The "options" parameter has been removed. Please set the reference space type via renderer.xr.setReferenceSpaceType() instead.' );
-
-		}
+		options = Object.assign( {}, DEFAULT_OPTIONS, options );
 
 		function showEnterVR( /*device*/ ) {
 
@@ -71,7 +71,13 @@ var VRButton = {
 					// ('local' is always available for immersive sessions and doesn't need to
 					// be requested separately.)
 
-					var sessionInit = { optionalFeatures: [ 'local-floor', 'bounded-floor', 'hand-tracking' ] };
+					var sessionOptions = [ 'local-floor', 'bounded-floor' ];
+					if ( options.handTracking ) {
+
+						sessionOptions.push( "hand-tracking" );
+
+					}
+					var sessionInit = { optionalFeatures: sessionOptions };
 					navigator.xr.requestSession( 'immersive-vr', sessionInit ).then( onSessionStarted );
 
 				} else {
