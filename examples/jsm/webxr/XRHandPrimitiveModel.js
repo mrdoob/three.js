@@ -1,24 +1,35 @@
 import {
 	SphereBufferGeometry,
+	BoxBufferGeometry,
 	MeshStandardMaterial,
 	Mesh,
 	Group
 } from "../../../build/three.module.js";
 
-class XRHandSpheresModel {
+class XRHandPrimitiveModel {
 
-	constructor( controller/*, handedness */ ) {
+	constructor( controller, handedness, options ) {
 
 		this.controller = controller;
 
 	  this.envMap = null;
 
 		this.handMesh = new Group();
-		this.controller.add(this.handMesh);
+		this.controller.add( this.handMesh );
 
 		if ( window.XRHand ) {
 
-			var geometry = new SphereBufferGeometry( 1, 10, 10 );
+			var geometry;
+			if ( ! options || ! options.primitive || options.primitive === "sphere" ) {
+
+				geometry = new SphereBufferGeometry( 1, 10, 10 );
+
+			} else if ( options.primitive === "box" ) {
+
+				geometry = new BoxBufferGeometry( 1, 1, 1 );
+
+			}
+
 			var jointMaterial = new MeshStandardMaterial( { color: 0x000000, roughness: 0.2, metalness: 0.8 } );
 			var tipMaterial = new MeshStandardMaterial( { color: 0x333333, roughness: 0.2, metalness: 0.8 } );
 
@@ -69,4 +80,4 @@ class XRHandSpheresModel {
 
 }
 
-export { XRHandSpheresModel };
+export { XRHandPrimitiveModel };

@@ -3,8 +3,8 @@ import {
 } from "../../../build/three.module.js";
 
 import {
-	XRHandSpheresModel
-} from "./XRHandSpheresModel.js";
+	XRHandPrimitiveModel
+} from "./XRHandPrimitiveModel.js";
 
 import {
 	XRHandOculusMeshModel
@@ -48,7 +48,7 @@ var XRHandModelFactory = ( function () {
 
 		constructor: XRHandModelFactory,
 
-		createHandModel: function ( controller, profile ) {
+		createHandModel: function ( controller, profile, options ) {
 
 			const handModel = new XRHandModel( controller );
 			let scene = null;
@@ -63,13 +63,17 @@ var XRHandModelFactory = ( function () {
 					handModel.xrInputSource = xrInputSource;
 
 					// @todo Detect profile if not provided
-					if ( profile === "spheres" ) {
+					if ( profile === undefined || profile === "spheres" ) {
 
-						handModel.motionController = new XRHandSpheresModel( controller, xrInputSource.handedness );
+						handModel.motionController = new XRHandPrimitiveModel( controller, xrInputSource.handedness, { primitive: "sphere" } );
 
-					} else {
+					} else if ( profile === "boxes" ) {
 
-						handModel.motionController = new XRHandOculusMeshModel( controller, xrInputSource.handedness );
+						handModel.motionController = new XRHandPrimitiveModel( controller, xrInputSource.handedness, { primitive: "box" } );
+
+					} else if ( profile === "oculus" ) {
+
+						handModel.motionController = new XRHandOculusMeshModel( controller, xrInputSource.handedness, options );
 
 					}
 
