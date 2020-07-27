@@ -174,3 +174,9 @@ export * from './constants';
 export * from './Three.Legacy';
 
 export as namespace THREE;
+
+declare global {
+	const __THREE_DEVTOOLS__: undefined | {
+		dispatchEvent( event: Event ): void
+	};
+}

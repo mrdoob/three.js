@@ -1,0 +1,18 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "strict": false,
+
+    // This makes things like window, document, HTMLCanvasElement, WeakMap, etc,
+    // available as global types.
+    "lib": ["dom", "es2015"],
+
+    // This allows us to emit declaration files from the plain JS files, so we
+    // don't have to write those separately.
+    "declaration": true,
+    "emitDeclarationOnly": true
+  },
+  "include": ["src/**/*.d.ts", "src/**/*.js"]
+}

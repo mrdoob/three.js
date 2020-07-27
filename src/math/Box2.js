@@ -6,6 +6,11 @@ import { Vector2 } from './Vector2.js';
 
 const _vector = new Vector2();
 
+/**
+ * @class
+ * @param {Vector2=} min
+ * @param {Vector2=} max
+ */
 function Box2( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
@@ -13,9 +18,13 @@ function Box2( min, max ) {
 
 }
 
-Object.assign( Box2.prototype, {
+Box2.prototype = {
 
-	set: function ( min, max ) {
+	/**
+	 * @param {Vector2} min
+	 * @param {Vector2} max
+	 */
+	set( min, max ) {
 
 		this.min.copy( min );
 		this.max.copy( max );
@@ -24,7 +33,7 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	setFromPoints: function ( points ) {
+	setFromPoints( /** @type {Vector2[]} */ points ) {
 
 		this.makeEmpty();
 
@@ -38,7 +47,10 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	setFromCenterAndSize: function ( center, size ) {
+	setFromCenterAndSize(
+		/** @type {Vector2} */ center,
+		/** @type {Vector2} */ size,
+	) {
 
 		const halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
 		this.min.copy( center ).sub( halfSize );
@@ -48,13 +60,18 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	clone: function () {
+	clone() {
 
-		return new this.constructor().copy( this );
+		// For now type casting is needed for the static constructor calls to be
+		// properly typed (issue: https://github.com/microsoft/TypeScript/issues/3841)
+		const Ctor = /** @type {typeof Box2}  */( this.constructor );
+
+		return new Ctor().copy( this );
 
 	},
 
-	copy: function ( box ) {
+	/** @param {Box2} box */
+	copy( box ) {
 
 		this.min.copy( box.min );
 		this.max.copy( box.max );
@@ -63,7 +80,7 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	makeEmpty: function () {
+	makeEmpty() {
 
 		this.min.x = this.min.y = + Infinity;
 		this.max.x = this.max.y = - Infinity;
@@ -72,7 +89,7 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	isEmpty: function () {
+	isEmpty() {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
 
@@ -80,7 +97,8 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	getCenter: function ( target ) {
+	/** @param {Vector2} target */
+	getCenter( target ) {
 
 		if ( target === undefined ) {
 
@@ -93,7 +111,8 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	getSize: function ( target ) {
+	/** @param {Vector2} target */
+	getSize( target ) {
 
 		if ( target === undefined ) {
 
@@ -106,7 +125,8 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	expandByPoint: function ( point ) {
+	/** @param {Vector2} point */
+	expandByPoint( point ) {
 
 		this.min.min( point );
 		this.max.max( point );
@@ -115,7 +135,8 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	expandByVector: function ( vector ) {
+	/** @param {Vector2} vector */
+	expandByVector( vector ) {
 
 		this.min.sub( vector );
 		this.max.add( vector );
@@ -124,7 +145,8 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	expandByScalar: function ( scalar ) {
+	/** @param {number} scalar */
+	expandByScalar( scalar ) {
 
 		this.min.addScalar( - scalar );
 		this.max.addScalar( scalar );
@@ -133,21 +155,27 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	containsPoint: function ( point ) {
+	/** @param {Vector2} point */
+	containsPoint( point ) {
 
 		return point.x < this.min.x || point.x > this.max.x ||
 			point.y < this.min.y || point.y > this.max.y ? false : true;
 
 	},
 
-	containsBox: function ( box ) {
+	/** @param {Box2} box */
+	containsBox( box ) {
 
 		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
 			this.min.y <= box.min.y && box.max.y <= this.max.y;
 
 	},
 
-	getParameter: function ( point, target ) {
+	/**
+	 * @param {Vector2} point
+	 * @param {Vector2} target
+	 */
+	getParameter( point, target ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
@@ -166,7 +194,8 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	intersectsBox: function ( box ) {
+	/** @param {Box2} box */
+	intersectsBox( box ) {
 
 		// using 4 splitting planes to rule out intersections
 
@@ -175,7 +204,11 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	clampPoint: function ( point, target ) {
+	/**
+	 * @param {Vector2} point
+	 * @param {Vector2} target
+	 */
+	clampPoint( point, target ) {
 
 		if ( target === undefined ) {
 
@@ -188,14 +221,16 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	distanceToPoint: function ( point ) {
+	/** @param {Vector2} point */
+	distanceToPoint( point ) {
 
 		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
 		return clampedPoint.sub( point ).length();
 
 	},
 
-	intersect: function ( box ) {
+	/** @param {Box2} box */
+	intersect( box ) {
 
 		this.min.max( box.min );
 		this.max.min( box.max );
@@ -204,7 +239,8 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	union: function ( box ) {
+	/** @param {Box2} box */
+	union( box ) {
 
 		this.min.min( box.min );
 		this.max.max( box.max );
@@ -213,7 +249,8 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	translate: function ( offset ) {
+	/** @param {Vector2} offset */
+	translate( offset ) {
 
 		this.min.add( offset );
 		this.max.add( offset );
@@ -222,13 +259,14 @@ Object.assign( Box2.prototype, {
 
 	},
 
-	equals: function ( box ) {
+	/** @param {Box2} box */
+	equals( box ) {
 
 		return box.min.equals( this.min ) && box.max.equals( this.max );
 
 	}
 
-} );
+};
 
 
 export { Box2 };

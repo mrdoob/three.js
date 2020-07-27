@@ -2,6 +2,10 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
+/**
+ * @class
+ * @param {boolean=} autoStart
+ */
 function Clock( autoStart ) {
 
 	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
@@ -14,9 +18,9 @@ function Clock( autoStart ) {
 
 }
 
-Object.assign( Clock.prototype, {
+Clock.prototype = {
 
-	start: function () {
+	start() {
 
 		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
 
@@ -26,7 +30,7 @@ Object.assign( Clock.prototype, {
 
 	},
 
-	stop: function () {
+	stop() {
 
 		this.getElapsedTime();
 		this.running = false;
@@ -34,14 +38,14 @@ Object.assign( Clock.prototype, {
 
 	},
 
-	getElapsedTime: function () {
+	getElapsedTime() {
 
 		this.getDelta();
 		return this.elapsedTime;
 
 	},
 
-	getDelta: function () {
+	getDelta() {
 
 		let diff = 0;
 
@@ -67,7 +71,6 @@ Object.assign( Clock.prototype, {
 
 	}
 
-} );
-
+};
 
 export { Clock };
