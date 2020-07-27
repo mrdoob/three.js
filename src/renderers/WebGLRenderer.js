@@ -905,7 +905,11 @@ function WebGLRenderer( parameters ) {
 
 		scene.traverse( function ( object ) {
 
-			objects.update( object ); // Upload geometry attributes
+			if ( object.geometry ) {
+
+				objects.update( object ); // Upload geometry attributes
+
+			}
 
 			const material = object.material;
 
