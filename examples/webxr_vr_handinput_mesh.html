@@ -26,6 +26,16 @@
 			var controller1, controller2;
 			var controllerGrip1, controllerGrip2;
 
+			var currentHandModel = {
+				left: 0,
+				right: 0
+			};
+
+			var handModels = {
+				left: null,
+				right: null
+			};
+
 			var controls;
 
 			init();
@@ -102,8 +112,37 @@
 				scene.add( controllerGrip1 );
 
 				hand1 = renderer.xr.getHand( 0 );
-				hand1.add( handModelFactory.createHandModel( hand1, "oculus", { model: "lowpoly" } ) );
 				scene.add( hand1 );
+
+				handModels.left = [
+					handModelFactory.createHandModel( hand1, "oculus", { model: "lowpoly" } ),
+					handModelFactory.createHandModel( hand1, "oculus" ),
+					handModelFactory.createHandModel( hand1, "spheres" ),
+					handModelFactory.createHandModel( hand1, "boxes" )
+				];
+
+				handModels.left.forEach( model => {
+
+					model.visible = false;
+					hand1.add( model );
+
+				} );
+
+				handModels.left[ currentHandModel.left ].visible = true;
+
+				function cycleHandModel( hand ) {
+
+					handModels[ hand ][ currentHandModel[ hand ] ].visible = false;
+					currentHandModel[ hand ] = ( currentHandModel[ hand ] + 1 ) % handModels[ hand ].length;
+					handModels[ hand ][ currentHandModel[ hand ] ].visible = true;
+
+				}
+
+				hand1.addEventListener( 'pinchend', evt => {
+
+					cycleHandModel( evt.handedness );
+
+				} );
 
 				// Hand 2
 
@@ -112,10 +151,33 @@
 				scene.add( controllerGrip2 );
 
 				hand2 = renderer.xr.getHand( 1 );
-				hand2.add( handModelFactory.createHandModel( hand2, "oculus" ) );
 				scene.add( hand2 );
 
+				handModels.right = [
+					handModelFactory.createHandModel( hand2, "oculus", { model: "lowpoly" } ),
+					handModelFactory.createHandModel( hand2, "oculus" ),
+					handModelFactory.createHandModel( hand2, "spheres" ),
+					handModelFactory.createHandModel( hand2, "boxes" )
+				];
+				handModels.right.forEach( model => {
+
+					model.visible = false;
+					hand2.add( model );
+
+				} );
+
+				handModels.right[ currentHandModel.right ].visible = true;
+
+				window.handModels = handModels;
+
+				hand2.addEventListener( 'pinchend', evt => {
+
+					cycleHandModel( evt.handedness );
+
+				} );
+
 				//
+				window.hands = [ hand1, hand2 ];
 
 				var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
