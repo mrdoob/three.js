@@ -28,8 +28,6 @@ import { MathUtils } from '../math/MathUtils.js';
  *
  *  - A single property can either be controlled through a
  *    target group or directly, but not both.
- *
- * @author tschw
  */
 
 function AnimationObjectGroup() {

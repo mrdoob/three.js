@@ -2,8 +2,6 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Curve } from '../core/Curve.js';
 
 /**
- * @author zz85 https://github.com/zz85
- *
  * Centripetal CatmullRom Curve - which is useful for avoiding
  * cusps and self-intersections in non-uniform catmull rom curves.
  * http://www.cemyuksel.com/research/catmullrom_param/catmullrom.pdf

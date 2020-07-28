@@ -10,15 +10,6 @@ import { Color } from '../math/Color.js';
 import { Object3D } from './Object3D.js';
 import { MathUtils } from '../math/MathUtils.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author kile / http://kile.stravaganza.org/
- * @author alteredq / http://alteredqualia.com/
- * @author mikael emtinger / http://gomo.se/
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author bhouston / http://clara.io
- */
-
 let _geometryId = 0; // Geometry uses even numbers as Id
 const _m1 = new Matrix4();
 const _obj = new Object3D();

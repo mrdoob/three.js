@@ -1,9 +1,3 @@
-/**
- * @author zz85 / https://github.com/zz85
- * @author bhouston / http://clara.io
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { Geometry } from '../core/Geometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';

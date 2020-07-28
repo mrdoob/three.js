@@ -2,13 +2,6 @@ import { Camera } from './Camera.js';
 import { Object3D } from '../core/Object3D.js';
 import { MathUtils } from '../math/MathUtils.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author greggman / http://games.greggman.com/
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author tschw
- */
-
 function PerspectiveCamera( fov, aspect, near, far ) {
 
 	Camera.call( this );

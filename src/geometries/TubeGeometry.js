@@ -1,13 +1,3 @@
-/**
- * @author oosmoxiecode / https://github.com/oosmoxiecode
- * @author WestLangley / https://github.com/WestLangley
- * @author zz85 / https://github.com/zz85
- * @author miningold / https://github.com/miningold
- * @author jonobr1 / https://github.com/jonobr1
- * @author Mugen87 / https://github.com/Mugen87
- *
- */
-
 import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';

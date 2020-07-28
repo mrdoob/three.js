@@ -2,12 +2,6 @@ import { Vector3 } from './Vector3.js';
 import { Sphere } from './Sphere.js';
 import { Plane } from './Plane.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author bhouston / http://clara.io
- */
-
 const _sphere = new Sphere();
 const _vector = new Vector3();
 

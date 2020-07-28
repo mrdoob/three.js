@@ -1,11 +1,6 @@
 import { Curve } from './Curve.js';
 import * as Curves from '../curves/Curves.js';
 
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- *
- **/
-
 /**************************************************************
  *	Curved Path - a curve path is simply a array of connected
  *  curves, but retains the api of a curve

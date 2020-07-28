@@ -1,7 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import { Color } from '../math/Color.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LightProbe } from './LightProbe.js';

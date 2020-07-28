@@ -1,7 +1,3 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 function WebGLInfo( gl ) {
 
 	const memory = {

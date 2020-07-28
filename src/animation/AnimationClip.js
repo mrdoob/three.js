@@ -9,14 +9,6 @@ import { VectorKeyframeTrack } from './tracks/VectorKeyframeTrack.js';
 import { MathUtils } from '../math/MathUtils.js';
 import { NormalAnimationBlendMode } from '../constants.js';
 
-/**
- *
- * Reusable set of Tracks that represent an animation.
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- */
-
 function AnimationClip( name, duration, tracks, blendMode ) {
 
 	this.name = name;

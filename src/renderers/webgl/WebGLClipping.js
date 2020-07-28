@@ -1,7 +1,3 @@
-/**
- * @author tschw
- */
-
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Plane } from '../../math/Plane.js';
 

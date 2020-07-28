@@ -1,7 +1,3 @@
-/**
- * @author abelnation / http://github.com/abelnation
- */
-
 import { CylinderGeometry } from './CylinderGeometry.js';
 import { CylinderBufferGeometry } from './CylinderGeometry.js';
 

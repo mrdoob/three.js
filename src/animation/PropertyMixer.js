@@ -1,15 +1,5 @@
 import { Quaternion } from '../math/Quaternion.js';
 
-/**
- *
- * Buffered scene graph property that allows weighted accumulation.
- *
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
- */
-
 function PropertyMixer( binding, typeName, valueSize ) {
 
 	this.binding = binding;

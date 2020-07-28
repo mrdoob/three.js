@@ -1,8 +1,3 @@
-/**
- * @author timothypratley / https://github.com/timothypratley
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { Geometry } from '../core/Geometry.js';
 import { PolyhedronBufferGeometry } from './PolyhedronGeometry.js';
 

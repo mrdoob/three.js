@@ -1,17 +1,3 @@
-/**
- * @author Emmett Lalish / elalish
- *
- * This class generates a Prefiltered, Mipmapped Radiance Environment Map
- * (PMREM) from a cubeMap environment texture. This allows different levels of
- * blur to be quickly accessed based on material roughness. It is packed into a
- * special CubeUV format that allows us to perform custom interpolation so that
- * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
- * chain, it only goes down to the LOD_MIN level (above), and then creates extra
- * even more filtered 'mips' at the same LOD_MIN resolution, associated with
- * higher roughness levels. In this way we maintain resolution to smoothly
- * interpolate diffuse lighting while limiting sampling computation.
- */
-
 import {
 	CubeUVReflectionMapping,
 	GammaEncoding,
@@ -85,6 +71,18 @@ const _axisDirections = [
 	new Vector3( - INV_PHI, 0, PHI ),
 	new Vector3( PHI, INV_PHI, 0 ),
 	new Vector3( - PHI, INV_PHI, 0 ) ];
+
+/**
+ * This class generates a Prefiltered, Mipmapped Radiance Environment Map
+ * (PMREM) from a cubeMap environment texture. This allows different levels of
+ * blur to be quickly accessed based on material roughness. It is packed into a
+ * special CubeUV format that allows us to perform custom interpolation so that
+ * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
+ * chain, it only goes down to the LOD_MIN level (above), and then creates extra
+ * even more filtered 'mips' at the same LOD_MIN resolution, associated with
+ * higher roughness levels. In this way we maintain resolution to smoothly
+ * interpolate diffuse lighting while limiting sampling computation.
+ */
 
 function PMREMGenerator( renderer ) {
 

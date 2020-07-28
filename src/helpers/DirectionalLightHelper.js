@@ -1,9 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import { Vector3 } from '../math/Vector3.js';
 import { Object3D } from '../core/Object3D.js';
 import { Line } from '../objects/Line.js';

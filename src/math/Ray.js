@@ -9,10 +9,6 @@ const _edge1 = new Vector3();
 const _edge2 = new Vector3();
 const _normal = new Vector3();
 
-/**
- * @author bhouston / http://clara.io
- */
-
 function Ray( origin, direction ) {
 
 	this.origin = ( origin !== undefined ) ? origin : new Vector3();

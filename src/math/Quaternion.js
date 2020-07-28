@@ -1,10 +1,3 @@
-/**
- * @author mikael emtinger / http://gomo.se/
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://clara.io
- */
-
 import { MathUtils } from './MathUtils.js';
 
 function Quaternion( x = 0, y = 0, z = 0, w = 1 ) {

@@ -1,8 +1,3 @@
-/**
- * @author Kaleb Murphy
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
