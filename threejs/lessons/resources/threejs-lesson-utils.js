@@ -97,7 +97,12 @@ export const threejsLessonUtils = {
         if (entry.isIntersecting) {
           this.elementsOnScreen.add(entry.target);
         } else {
-          this.elementsOnScreen.delete(entry.target);
+          // Google Translate overrides the Set class!
+          if (this.elementsOnScreen.delete) {
+            this.elementsOnScreen.delete(entry.target);
+          } else if (this.elementsOnScreen.remove) {
+            this.elementsOnScreen.remove(entry.target);
+          }
         }
         // Each entry describes an intersection change for one observed
         // target element:
