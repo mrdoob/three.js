@@ -1,4 +1,4 @@
-import { FBXLoader } from "../loaders/FBXLoader.js";
+import { FBXLoader } from '../loaders/FBXLoader.js';
 
 class XRHandOculusMeshModel {
 
@@ -8,17 +8,17 @@ class XRHandOculusMeshModel {
 		this.handModel = handModel;
 
 		this.bones = [];
-		var loader = new FBXLoader();
-		const low = options && options.model === "lowpoly" ? "_low" : "";
+		const loader = new FBXLoader();
+		const low = options && options.model === 'lowpoly' ? '_low' : '';
 
 		loader.setPath( path );
-		loader.load( `OculusHand_${handedness === "right" ? "R" : "L"}${low}.fbx`, object => {
+		loader.load( `OculusHand_${handedness === 'right' ? 'R' : 'L'}${low}.fbx`, object => {
 
 			this.handModel.add( object );
 			// Hack because of the scale of the skinnedmesh
 			object.scale.setScalar( 0.01 );
 
-			const mesh = object.getObjectByProperty( "type", "SkinnedMesh" );
+			const mesh = object.getObjectByProperty( 'type', 'SkinnedMesh' );
 			mesh.frustumCulled = false;
 			mesh.castShadow = true;
 			mesh.receiveShadow = true;
@@ -59,7 +59,7 @@ class XRHandOculusMeshModel {
 
 				if ( boneName ) {
 
-					const bone = object.getObjectByName( boneName.replace( "%", handedness === "right" ? "r" : "l" ) );
+					const bone = object.getObjectByName( boneName.replace( /%/g, handedness === 'right' ? 'r' : 'l' ) );
 					this.bones.push( bone );
 
 				} else {
@@ -78,7 +78,7 @@ class XRHandOculusMeshModel {
 
 		// XR Joints
 		const XRJoints = this.controller.joints;
-		for ( var i = 0; i < this.bones.length; i ++ ) {
+		for ( let i = 0; i < this.bones.length; i ++ ) {
 
 			const bone = this.bones[ i ];
 			const XRJoint = XRJoints[ i ];
@@ -93,7 +93,7 @@ class XRHandOculusMeshModel {
 
 						bone.position.copy( position.clone().multiplyScalar( 100 ) );
 						bone.quaternion.copy( XRJoint.quaternion );
-						// bone.scale.setScalar( XRJoint.jointRadius || defaultRadius );
+						// bone.scale.setScalar( XRJoint.jointRadius || defaultRadius );
 
 					}
 
