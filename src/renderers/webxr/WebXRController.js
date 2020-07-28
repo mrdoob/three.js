@@ -1,8 +1,8 @@
-import { Group } from '../../objects/Group.js';
-
 /**
  * @author Mugen87 / https://github.com/Mugen87
  */
+
+import { Group } from '../../objects/Group.js';
 
 function WebXRController() {
 
@@ -142,6 +142,7 @@ Object.assign( WebXRController.prototype, {
 			if ( inputSource.hand ) {
 
 				handPose = true;
+
 				for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
 
 					if ( inputSource.hand[ i ] ) {
@@ -169,6 +170,7 @@ Object.assign( WebXRController.prototype, {
 
 						const distanceToPinch = 0.02;
 						const threshold = 0.005;
+
 						if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
 
 							hand.inputState.pinching = false;
