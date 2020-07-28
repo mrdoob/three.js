@@ -4,7 +4,7 @@ import {
 	MeshStandardMaterial,
 	Mesh,
 	Group
-} from "../../../build/three.module.js";
+} from '../../../build/three.module.js';
 
 class XRHandPrimitiveModel {
 
@@ -20,28 +20,29 @@ class XRHandPrimitiveModel {
 
 		if ( window.XRHand ) {
 
-			var geometry;
-			if ( ! options || ! options.primitive || options.primitive === "sphere" ) {
+			let geometry;
+
+			if ( ! options || ! options.primitive || options.primitive === 'sphere' ) {
 
 				geometry = new SphereBufferGeometry( 1, 10, 10 );
 
-			} else if ( options.primitive === "box" ) {
+			} else if ( options.primitive === 'box' ) {
 
 				geometry = new BoxBufferGeometry( 1, 1, 1 );
 
 			}
 
-			var jointMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 1, metalness: 0 } );
-			var tipMaterial = new MeshStandardMaterial( { color: 0x999999, roughness: 1, metalness: 0 } );
+			const jointMaterial = new MeshStandardMaterial( { color: 0xffffff, roughness: 1, metalness: 0 } );
+			const tipMaterial = new MeshStandardMaterial( { color: 0x999999, roughness: 1, metalness: 0 } );
 
 			const tipIndexes = [
-				XRHand.THUMB_PHALANX_TIP,
-				XRHand.INDEX_PHALANX_TIP,
-				XRHand.MIDDLE_PHALANX_TIP,
-				XRHand.RING_PHALANX_TIP,
-				XRHand.LITTLE_PHALANX_TIP
+				window.XRHand.THUMB_PHALANX_TIP,
+				window.XRHand.INDEX_PHALANX_TIP,
+				window.XRHand.MIDDLE_PHALANX_TIP,
+				window.XRHand.RING_PHALANX_TIP,
+				window.XRHand.LITTLE_PHALANX_TIP
 			];
-			for ( let i = 0; i <= XRHand.LITTLE_PHALANX_TIP; i ++ ) {
+			for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
 
 				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
 				cube.castShadow = true;
@@ -61,7 +62,8 @@ class XRHandPrimitiveModel {
 
 		// XR Joints
 		const XRJoints = this.controller.joints;
-		for ( var i = 0; i < objects.length; i ++ ) {
+
+		for ( let i = 0; i < objects.length; i ++ ) {
 
 			const jointMesh = objects[ i ];
 			const XRJoint = XRJoints[ i ];
