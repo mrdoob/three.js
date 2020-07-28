@@ -1,7 +1,3 @@
-/**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- */
-
 import { Earcut } from './Earcut.js';
 
 const ShapeUtils = {

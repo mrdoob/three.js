@@ -1,11 +1,6 @@
 import { Object3D } from '../core/Object3D.js';
 import { Color } from '../math/Color.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
 function Light( color, intensity ) {
 
 	Object3D.call( this );

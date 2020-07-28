@@ -1,6 +1,11 @@
+import { Geometry } from '../core/Geometry.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Float32BufferAttribute } from '../core/BufferAttribute.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { ShapeUtils } from '../extras/ShapeUtils.js';
+
 /**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- *
  * Creates extruded geometry from a path shape.
  *
  * parameters = {
@@ -21,13 +26,6 @@
  *
  * }
  */
-
-import { Geometry } from '../core/Geometry.js';
-import { BufferGeometry } from '../core/BufferGeometry.js';
-import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Vector2 } from '../math/Vector2.js';
-import { Vector3 } from '../math/Vector3.js';
-import { ShapeUtils } from '../extras/ShapeUtils.js';
 
 // ExtrudeGeometry
 

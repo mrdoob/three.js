@@ -1,11 +1,3 @@
-/**
- * @author Sean Griffin / http://twitter.com/sgrif
- * @author Michael Guerrero / http://realitymeltdown.com
- * @author mrdoob / http://mrdoob.com/
- * @author ikerr / http://verold.com
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { LineSegments } from '../objects/LineSegments.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';

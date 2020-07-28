@@ -3,8 +3,6 @@ import { MeshStandardMaterial } from './MeshStandardMaterial.js';
 import { Color } from '../math/Color.js';
 
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *  clearcoat: <float>,
  *  clearcoatMap: new THREE.Texture( <Image> ),

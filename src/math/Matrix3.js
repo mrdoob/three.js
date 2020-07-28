@@ -1,10 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://clara.io
- * @author tschw
- */
-
 function Matrix3() {
 
 	this.elements = [

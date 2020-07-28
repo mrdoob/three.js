@@ -1,7 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import { LineSegments } from '../objects/LineSegments.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';

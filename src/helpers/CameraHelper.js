@@ -1,13 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author Mugen87 / https://github.com/Mugen87
- *
- *	- shows frustum, line of sight and up of the camera
- *	- suitable for fast updates
- * 	- based on frustum visualization in lightgl.js shadowmap example
- *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
- */
-
 import { Camera } from '../cameras/Camera.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LineSegments } from '../objects/LineSegments.js';
@@ -18,6 +8,13 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
 const _vector = new Vector3();
 const _camera = new Camera();
+
+/**
+ *	- shows frustum, line of sight and up of the camera
+ *	- suitable for fast updates
+ * 	- based on frustum visualization in lightgl.js shadowmap example
+ *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
+ */
 
 function CameraHelper( camera ) {
 

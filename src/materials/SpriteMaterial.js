@@ -2,8 +2,6 @@ import { Material } from './Material.js';
 import { Color } from '../math/Color.js';
 
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * parameters = {
  *  color: <hex>,
  *  map: new THREE.Texture( <Image> ),

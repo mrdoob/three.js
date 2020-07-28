@@ -3,12 +3,6 @@ import { Vector3 } from './Vector3.js';
 import { Matrix4 } from './Matrix4.js';
 import { MathUtils } from './MathUtils.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://clara.io
- */
-
 const _matrix = new Matrix4();
 const _quaternion = new Quaternion();
 

@@ -17,7 +17,6 @@
  *
  * 		http://www.oodesign.com/template-method-pattern.html
  *
- * @author tschw
  */
 
 function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {

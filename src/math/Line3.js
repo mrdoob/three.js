@@ -1,10 +1,6 @@
 import { Vector3 } from './Vector3.js';
 import { MathUtils } from './MathUtils.js';
 
-/**
- * @author bhouston / http://clara.io
- */
-
 const _startP = new Vector3();
 const _startEnd = new Vector3();
 

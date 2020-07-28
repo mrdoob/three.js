@@ -1,10 +1,5 @@
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 
-/**
- * @author Mugen87 / https://github.com/Mugen87
- * @author Matt DesLauriers / @mattdesl
- */
-
 function WebGLMultisampleRenderTarget( width, height, options ) {
 
 	WebGLRenderTarget.call( this, width, height, options );

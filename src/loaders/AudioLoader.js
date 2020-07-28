@@ -2,10 +2,6 @@ import { AudioContext } from '../audio/AudioContext.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 
-/**
- * @author Reece Aaron Lecrivain / http://reecenotes.com/
- */
-
 function AudioLoader( manager ) {
 
 	Loader.call( this, manager );

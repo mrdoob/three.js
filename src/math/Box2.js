@@ -1,9 +1,5 @@
 import { Vector2 } from './Vector2.js';
 
-/**
- * @author bhouston / http://clara.io
- */
-
 const _vector = new Vector2();
 
 function Box2( min, max ) {

@@ -1,7 +1,7 @@
+import { Geometry } from '../core/Geometry.js';
+import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
+
 /**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- * @author alteredq / http://alteredqualia.com/
- *
  * Text = 3D Text
  *
  * parameters = {
@@ -17,9 +17,6 @@
  *  bevelOffset: <float> // how far from text outline does bevel start
  * }
  */
-
-import { Geometry } from '../core/Geometry.js';
-import { ExtrudeBufferGeometry } from './ExtrudeGeometry.js';
 
 // TextGeometry
 

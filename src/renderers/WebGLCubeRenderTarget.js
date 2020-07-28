@@ -7,11 +7,6 @@ import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { CubeCamera } from '../cameras/CubeCamera.js';
 
-/**
- * @author alteredq / http://alteredqualia.com
- * @author WestLangley / http://github.com/WestLangley
- */
-
 function WebGLCubeRenderTarget( size, options, dummy ) {
 
 	if ( Number.isInteger( options ) ) {
