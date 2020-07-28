@@ -744,9 +744,6 @@ const geometry = new THREE.WireframeGeometry(
       throw new Error(`no primitive ${name}`);
     }
 
-    base.classList.add('notranslate');
-    base.setAttribute('translate', 'no');
-
     const text = base.innerHTML;
     base.innerHTML = '';
 
