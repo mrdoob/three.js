@@ -380,13 +380,6 @@
 
 	} );
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author thezwap
-	 */
-
 	var _lut = [];
 
 	for ( var i = 0; i < 256; i ++ ) {
@@ -600,13 +593,6 @@
 		}
 
 	};
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author philogb / http://blog.thejit.org/
-	 * @author egraether / http://egraether.com/
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 */
 
 	function Vector2( x, y ) {
 		if ( x === void 0 ) x = 0;
@@ -1104,13 +1090,6 @@
 
 	} );
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author bhouston / http://clara.io
-	 * @author tschw
-	 */
-
 	function Matrix3() {
 
 		this.elements = [
@@ -1459,12 +1438,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author szimek / https://github.com/szimek/
-	 */
-
 	var _canvas;
 
 	var ImageUtils = {
@@ -1525,12 +1498,6 @@
 		}
 
 	};
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author szimek / https://github.com/szimek/
-	 */
 
 	var textureId = 0;
 
@@ -1842,14 +1809,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author supereggbert / http://www.paulbrunt.co.uk/
-	 * @author philogb / http://blog.thejit.org/
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author egraether / http://egraether.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
 
 	function Vector4( x, y, z, w ) {
 		if ( x === void 0 ) x = 0;
@@ -2516,12 +2475,6 @@
 
 	} );
 
-	/**
-	 * @author szimek / https://github.com/szimek/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author Marius Kintel / https://github.com/kintel
-	 */
-
 	/*
 	 In options, we can specify:
 	 * Texture parameters for an auto-generated target texture
@@ -2610,11 +2563,6 @@
 
 	} );
 
-	/**
-	 * @author Mugen87 / https://github.com/Mugen87
-	 * @author Matt DesLauriers / @mattdesl
-	 */
-
 	function WebGLMultisampleRenderTarget( width, height, options ) {
 
 		WebGLRenderTarget.call( this, width, height, options );
@@ -2640,13 +2588,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author bhouston / http://clara.io
-	 */
 
 	function Quaternion( x, y, z, w ) {
 		if ( x === void 0 ) x = 0;
@@ -3319,15 +3260,6 @@
 		_onChangeCallback: function () {}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author kile / http://kile.stravaganza.org/
-	 * @author philogb / http://blog.thejit.org/
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author egraether / http://egraether.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
 
 	var _vector = new Vector3();
 	var _quaternion = new Quaternion();
@@ -4062,19 +3994,6 @@
 	var _x = new Vector3();
 	var _y = new Vector3();
 	var _z = new Vector3();
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author supereggbert / http://www.paulbrunt.co.uk/
-	 * @author philogb / http://blog.thejit.org/
-	 * @author jordi_ros / http://plattsoft.com
-	 * @author D1plo1d / http://github.com/D1plo1d
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author timknip / http://www.floorplanner.com/
-	 * @author bhouston / http://clara.io
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
 
 	function Matrix4() {
 
@@ -4945,12 +4864,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author bhouston / http://clara.io
-	 */
-
 	var _matrix = new Matrix4();
 	var _quaternion$1 = new Quaternion();
 
@@ -5300,10 +5213,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function Layers() {
 
 		this.mask = 1 | 0;
@@ -5373,14 +5282,6 @@
 
 	var _addedEvent = { type: 'added' };
 	var _removedEvent = { type: 'removed' };
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author elephantatwork / www.elephantatwork.ch
-	 */
 
 	function Object3D() {
 
@@ -6210,10 +6111,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function Scene() {
 
 		Object3D.call( this );
@@ -6310,11 +6207,6 @@
 	var _extents = new Vector3();
 	var _triangleNormal = new Vector3();
 	var _testAxis = new Vector3();
-
-	/**
-	 * @author bhouston / http://clara.io
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
 
 	function Box3( min, max ) {
 
@@ -6837,11 +6729,6 @@
 
 	var _box$1 = new Box3();
 
-	/**
-	 * @author bhouston / http://clara.io
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function Sphere( center, radius ) {
 
 		this.center = ( center !== undefined ) ? center : new Vector3();
@@ -7031,10 +6918,6 @@
 	var _edge1 = new Vector3();
 	var _edge2 = new Vector3();
 	var _normal = new Vector3();
-
-	/**
-	 * @author bhouston / http://clara.io
-	 */
 
 	function Ray( origin, direction ) {
 
@@ -7534,10 +7417,6 @@
 
 	} );
 
-	/**
-	 * @author bhouston / http://clara.io
-	 */
-
 	var _vector1 = new Vector3();
 	var _vector2 = new Vector3();
 	var _normalMatrix = new Matrix3();
@@ -7759,11 +7638,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author bhouston / http://clara.io
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var _v0$1 = new Vector3();
 	var _v1$3 = new Vector3();
@@ -8089,10 +7963,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var _colorKeywords = { 'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
 		'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
@@ -8700,11 +8570,6 @@
 
 	Color.NAMES = _colorKeywords;
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	function Face3( a, b, c, normal, color, materialIndex ) {
 
 		this.a = a;
@@ -8757,11 +8622,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
 
 	var materialId = 0;
 
@@ -9208,9 +9068,6 @@
 	} );
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *  opacity: <float>,
@@ -9318,10 +9175,6 @@
 		return this;
 
 	};
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var _vector$3 = new Vector3();
 	var _vector2$1 = new Vector2();
@@ -9817,10 +9670,6 @@
 	Float64BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 	Float64BufferAttribute.prototype.constructor = Float64BufferAttribute;
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function DirectGeometry() {
 
 		this.vertices = [];
@@ -10100,10 +9949,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function arrayMax( array ) {
 
 		if ( array.length === 0 ) { return - Infinity; }
@@ -10119,11 +9964,6 @@
 		return max;
 
 	}
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
 
@@ -11334,13 +11174,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author jonobr1 / http://jonobr1.com/
-	 */
-
 	var _inverseMatrix = new Matrix4();
 	var _ray = new Ray();
 	var _sphere = new Sphere();
@@ -11783,15 +11616,6 @@
 		return intersection;
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author kile / http://kile.stravaganza.org/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * @author bhouston / http://clara.io
-	 */
 
 	var _geometryId = 0; // Geometry uses even numbers as Id
 	var _m1$3 = new Matrix4();
@@ -13160,11 +12984,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
-
 	// BoxGeometry
 
 		function BoxGeometry( width, height, depth, widthSegments, heightSegments, depthSegments ) {
@@ -13427,8 +13246,6 @@
 	var default_fragment = "void main() {\n\tgl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );\n}";
 
 	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 *
 	 * parameters = {
 	 *  defines: { "label" : "value" },
 	 *  uniforms: { "parameter1": { value: 1.0 }, "parameter2": { value2: 2 } },
@@ -13628,12 +13445,6 @@
 
 	};
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author WestLangley / http://github.com/WestLangley
-	*/
-
 	function Camera() {
 
 		Object3D.call( this );
@@ -13706,13 +13517,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author greggman / http://games.greggman.com/
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * @author tschw
-	 */
 
 	function PerspectiveCamera( fov, aspect, near, far ) {
 
@@ -13945,13 +13749,6 @@
 
 	} );
 
-	/**
-	 * Camera for rendering cube maps
-	 *	- renders scene into axis-aligned cube
-	 *
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	var fov = 90, aspect = 1;
 
 	function CubeCamera( near, far, renderTarget ) {
@@ -14065,11 +13862,6 @@
 	CubeCamera.prototype = Object.create( Object3D.prototype );
 	CubeCamera.prototype.constructor = CubeCamera;
 
-	/**
-	 * @author alteredq / http://alteredqualia.com
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
 	function WebGLCubeRenderTarget( size, options, dummy ) {
 
 		if ( Number.isInteger( options ) ) {
@@ -14140,10 +13932,6 @@
 
 	};
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	function DataTexture( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
 		Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
@@ -14165,12 +13953,6 @@
 	DataTexture.prototype.constructor = DataTexture;
 
 	DataTexture.prototype.isDataTexture = true;
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author bhouston / http://clara.io
-	 */
 
 	var _sphere$1 = new Sphere();
 	var _vector$5 = new Vector3();
@@ -14543,10 +14325,6 @@
 
 	};
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function WebGLAnimation() {
 
 		var context = null;
@@ -14598,10 +14376,6 @@
 		};
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function WebGLAttributes( gl, capabilities ) {
 
@@ -14754,11 +14528,6 @@
 		};
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	// PlaneGeometry
 
@@ -15264,12 +15033,6 @@
 		sprite_vert: sprite_vert
 	};
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author mikael emtinger / http://gomo.se/
-	 */
-
 	var ShaderLib = {
 
 		basic: {
@@ -15570,10 +15333,6 @@
 
 	};
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 		var clearColor = new Color( 0x000000 );
@@ -15782,11 +15541,6 @@
 		};
 
 	}
-
-	/**
-	 * @author Mugen87 / https://github.com/Mugen87
-	 * @author Takahiro / https://github.com/takahirox
-	 */
 
 	function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
@@ -16342,10 +16096,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function WebGLBufferRenderer( gl, extensions, info, capabilities ) {
 
 		var isWebGL2 = capabilities.isWebGL2;
@@ -16404,10 +16154,6 @@
 		this.renderInstances = renderInstances;
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function WebGLCapabilities( gl, extensions, parameters ) {
 
@@ -16525,10 +16271,6 @@
 		};
 
 	}
-
-	/**
-	 * @author tschw
-	 */
 
 	function WebGLClipping() {
 
@@ -16686,10 +16428,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function WebGLExtensions( gl ) {
 
 		var extensions = {};
@@ -16750,10 +16488,6 @@
 		};
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function WebGLGeometries( gl, attributes, info, bindingStates ) {
 
@@ -16964,10 +16698,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 		var isWebGL2 = capabilities.isWebGL2;
@@ -17036,10 +16766,6 @@
 		this.renderInstances = renderInstances;
 
 	}
-
-	/**
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	function WebGLInfo( gl ) {
 
@@ -17110,10 +16836,6 @@
 		};
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function numericalSort( a, b ) {
 
@@ -17264,10 +16986,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function WebGLObjects( gl, geometries, attributes, info ) {
 
 		var updateMap = new WeakMap();
@@ -17320,10 +17038,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function CubeTexture( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
 		images = images !== undefined ? images : [];
@@ -17357,10 +17071,6 @@
 
 	} );
 
-	/**
-	 * @author Takahiro https://github.com/takahirox
-	 */
-
 	function DataTexture2DArray( data, width, height, depth ) {
 
 		Texture.call( this, null );
@@ -17382,10 +17092,6 @@
 	DataTexture2DArray.prototype = Object.create( Texture.prototype );
 	DataTexture2DArray.prototype.constructor = DataTexture2DArray;
 	DataTexture2DArray.prototype.isDataTexture2DArray = true;
-
-	/**
-	 * @author Artur Trzesiok
-	 */
 
 	function DataTexture3D( data, width, height, depth ) {
 
@@ -17419,10 +17125,6 @@
 	DataTexture3D.prototype.isDataTexture3D = true;
 
 	/**
-	 * @author tschw
-	 * @author Mugen87 / https://github.com/Mugen87
-	 * @author mrdoob / http://mrdoob.com/
-	 *
 	 * Uniforms of a program.
 	 * Those form a tree structure with a special top-level container for the root,
 	 * which you get by calling 'new WebGLUniforms( gl, program )'.
@@ -18309,10 +18011,6 @@
 
 	};
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function WebGLShader( gl, type, string ) {
 
 		var shader = gl.createShader( type );
@@ -18323,10 +18021,6 @@
 		return shader;
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var programIdCount = 0;
 
@@ -19169,10 +18863,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function WebGLPrograms( renderer, extensions, capabilities, bindingStates ) {
 
 		var programs = [];
@@ -19571,10 +19261,6 @@
 
 	}
 
-	/**
-	 * @author fordacious / fordacious.github.io
-	 */
-
 	function WebGLProperties() {
 
 		var properties = new WeakMap();
@@ -19620,10 +19306,6 @@
 		};
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function painterSortStable( a, b ) {
 
@@ -19852,10 +19534,6 @@
 		};
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function UniformsCache() {
 
@@ -20310,10 +19988,6 @@
 
 	}
 
-	/**
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
-
 	function WebGLRenderState() {
 
 		var lights = new WebGLLights();
@@ -20423,11 +20097,6 @@
 	}
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author bhouston / https://clara.io
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
 	 * parameters = {
 	 *
 	 *  opacity: <float>,
@@ -20503,8 +20172,6 @@
 	};
 
 	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
 	 * parameters = {
 	 *
 	 *  referencePosition: <float>,
@@ -20583,11 +20250,6 @@
 	var vsm_frag = "uniform sampler2D shadow_pass;\nuniform vec2 resolution;\nuniform float radius;\n#include <packing>\nvoid main() {\n  float mean = 0.0;\n  float squared_mean = 0.0;\n\tfloat depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy  ) / resolution ) );\n  for ( float i = -1.0; i < 1.0 ; i += SAMPLE_RATE) {\n    #ifdef HORIZONAL_PASS\n      vec2 distribution = unpackRGBATo2Half( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( i, 0.0 ) * radius ) / resolution ) );\n      mean += distribution.x;\n      squared_mean += distribution.y * distribution.y + distribution.x * distribution.x;\n    #else\n      float depth = unpackRGBAToDepth( texture2D( shadow_pass, ( gl_FragCoord.xy + vec2( 0.0,  i )  * radius ) / resolution ) );\n      mean += depth;\n      squared_mean += depth * depth;\n    #endif\n  }\n  mean = mean * HALF_SAMPLE_RATE;\n  squared_mean = squared_mean * HALF_SAMPLE_RATE;\n  float std_dev = sqrt( squared_mean - mean * mean );\n  gl_FragColor = pack2HalfToRGBA( vec2( mean, std_dev ) );\n}";
 
 	var vsm_vert = "void main() {\n\tgl_Position = vec4( position, 1.0 );\n}";
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 
@@ -21020,10 +20682,6 @@
 		}
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function WebGLState( gl, extensions, capabilities ) {
 
@@ -21956,10 +21614,6 @@
 		};
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info ) {
 
@@ -23242,10 +22896,6 @@
 
 	}
 
-	/**
-	 * @author thespite / http://www.twitter.com/thespite
-	 */
-
 	function WebGLUtils( gl, extensions, capabilities ) {
 
 		var isWebGL2 = capabilities.isWebGL2;
@@ -23439,10 +23089,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function ArrayCamera( array ) {
 
 		PerspectiveCamera.call( this );
@@ -23459,10 +23105,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function Group() {
 
 		Object3D.call( this );
@@ -23478,10 +23120,6 @@
 		isGroup: true
 
 	} );
-
-	/**
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	function WebXRController() {
 
@@ -23621,6 +23259,7 @@
 				if ( inputSource.hand ) {
 
 					handPose = true;
+
 					for ( var i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
 
 						if ( inputSource.hand[ i ] ) {
@@ -23648,6 +23287,7 @@
 
 							var distanceToPinch = 0.02;
 							var threshold = 0.005;
+
 							if ( hand.inputState.pinching && distance > distanceToPinch + threshold ) {
 
 								hand.inputState.pinching = false;
@@ -23727,10 +23367,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function WebXRManager( renderer, gl ) {
 
@@ -23999,8 +23635,6 @@
 		var cameraRPos = new Vector3();
 
 		/**
-		 * @author jsantell / https://www.jsantell.com/
-		 *
 		 * Assumes 2 cameras that are parallel and share an X-axis, and that
 		 * the cameras' projection and world matrices have already been set.
 		 * And that near and far planes are identical for both cameras.
@@ -24214,10 +23848,6 @@
 	}
 
 	Object.assign( WebXRManager.prototype, EventDispatcher.prototype );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function WebGLMaterials( properties ) {
 
@@ -24893,14 +24523,6 @@
 		};
 
 	}
-
-	/**
-	 * @author supereggbert / http://www.paulbrunt.co.uk/
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author szimek / https://github.com/szimek/
-	 * @author tschw
-	 */
 
 	function WebGLRenderer( parameters ) {
 
@@ -26864,10 +26486,6 @@
 
 	}
 
-	/**
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
-
 	function WebGL1Renderer( parameters ) {
 
 		WebGLRenderer.call( this, parameters );
@@ -26881,11 +26499,6 @@
 		isWebGL1Renderer: true
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
 
 	function FogExp2( color, density ) {
 
@@ -26917,11 +26530,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
 
 	function Fog( color, near, far ) {
 
@@ -26956,10 +26564,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author benaadams / https://twitter.com/ben_a_adams
-	 */
 
 	function InterleavedBuffer( array, stride ) {
 
@@ -27107,10 +26711,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author benaadams / https://twitter.com/ben_a_adams
-	 */
 
 	var _vector$6 = new Vector3();
 
@@ -27376,8 +26976,6 @@
 	} );
 
 	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *  map: new THREE.Texture( <Image> ),
@@ -27430,11 +27028,6 @@
 		return this;
 
 	};
-
-	/**
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
 
 	var _geometry;
 
@@ -27607,12 +27200,6 @@
 		vertexPosition.applyMatrix4( _viewWorldMatrix );
 
 	}
-
-	/**
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var _v1$4 = new Vector3();
 	var _v2$2 = new Vector3();
@@ -27807,12 +27394,6 @@
 
 	} );
 
-	/**
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author ikerr / http://verold.com
-	 */
-
 	function SkinnedMesh( geometry, material ) {
 
 		if ( geometry && geometry.isGeometry ) {
@@ -27972,13 +27553,6 @@
 		}() )
 
 	} );
-
-	/**
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author michael guerrero / http://realitymeltdown.com
-	 * @author ikerr / http://verold.com
-	 */
 
 	var _offsetMatrix = new Matrix4();
 	var _identityMatrix = new Matrix4();
@@ -28155,12 +27729,6 @@
 
 	} );
 
-	/**
-	 * @author mikael emtinger / http://gomo.se/
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author ikerr / http://verold.com
-	 */
-
 	function Bone() {
 
 		Object3D.call( this );
@@ -28176,10 +27744,6 @@
 		isBone: true
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var _instanceLocalMatrix = new Matrix4();
 	var _instanceWorldMatrix = new Matrix4();
@@ -28277,9 +27841,6 @@
 	} );
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *  opacity: <float>,
@@ -28328,10 +27889,6 @@
 		return this;
 
 	};
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var _start = new Vector3();
 	var _end = new Vector3();
@@ -28616,10 +28173,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	var _start$1 = new Vector3();
 	var _end$1 = new Vector3();
 
@@ -28691,10 +28244,6 @@
 
 	} );
 
-	/**
-	 * @author mgreter / http://github.com/mgreter
-	 */
-
 	function LineLoop( geometry, material ) {
 
 		Line.call( this, geometry, material );
@@ -28712,9 +28261,6 @@
 	} );
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *  opacity: <float>,
@@ -28772,10 +28318,6 @@
 		return this;
 
 	};
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
 
 	var _inverseMatrix$2 = new Matrix4();
 	var _ray$2 = new Ray();
@@ -28959,10 +28501,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function VideoTexture( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
 		Texture.call( this, video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
@@ -29012,10 +28550,6 @@
 
 	} );
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	function CompressedTexture( mipmaps, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
 		Texture.call( this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
@@ -29040,10 +28574,6 @@
 
 	CompressedTexture.prototype.isCompressedTexture = true;
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function CanvasTexture( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy ) {
 
 		Texture.call( this, canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
@@ -29055,11 +28585,6 @@
 	CanvasTexture.prototype = Object.create( Texture.prototype );
 	CanvasTexture.prototype.constructor = CanvasTexture;
 	CanvasTexture.prototype.isCanvasTexture = true;
-
-	/**
-	 * @author Matt DesLauriers / @mattdesl
-	 * @author atix / arthursilber.de
-	 */
 
 	function DepthTexture( width, height, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, format ) {
 
@@ -29089,11 +28614,6 @@
 	DepthTexture.prototype = Object.create( Texture.prototype );
 	DepthTexture.prototype.constructor = DepthTexture;
 	DepthTexture.prototype.isDepthTexture = true;
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	function WireframeGeometry( geometry ) {
 
@@ -29258,9 +28778,6 @@
 	WireframeGeometry.prototype.constructor = WireframeGeometry;
 
 	/**
-	 * @author zz85 / https://github.com/zz85
-	 * @author Mugen87 / https://github.com/Mugen87
-	 *
 	 * Parametric Surfaces Geometry
 	 * based on the brilliant article by @prideout https://prideout.net/blog/old/blog/index.html@p=44.html
 	 */
@@ -29410,13 +28927,6 @@
 
 	ParametricBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	ParametricBufferGeometry.prototype.constructor = ParametricBufferGeometry;
-
-	/**
-	 * @author clockworkgeek / https://github.com/clockworkgeek
-	 * @author timothypratley / https://github.com/timothypratley
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	// PolyhedronGeometry
 
@@ -29742,11 +29252,6 @@
 	PolyhedronBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	PolyhedronBufferGeometry.prototype.constructor = PolyhedronBufferGeometry;
 
-	/**
-	 * @author timothypratley / https://github.com/timothypratley
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
-
 	// TetrahedronGeometry
 
 	function TetrahedronGeometry( radius, detail ) {
@@ -29793,11 +29298,6 @@
 
 	TetrahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 	TetrahedronBufferGeometry.prototype.constructor = TetrahedronBufferGeometry;
-
-	/**
-	 * @author timothypratley / https://github.com/timothypratley
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	// OctahedronGeometry
 
@@ -29848,11 +29348,6 @@
 
 	OctahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 	OctahedronBufferGeometry.prototype.constructor = OctahedronBufferGeometry;
-
-	/**
-	 * @author timothypratley / https://github.com/timothypratley
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	// IcosahedronGeometry
 
@@ -29907,11 +29402,6 @@
 
 	IcosahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 	IcosahedronBufferGeometry.prototype.constructor = IcosahedronBufferGeometry;
-
-	/**
-	 * @author Abe Pazos / https://hamoid.com
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	// DodecahedronGeometry
 
@@ -29990,16 +29480,6 @@
 
 	DodecahedronBufferGeometry.prototype = Object.create( PolyhedronBufferGeometry.prototype );
 	DodecahedronBufferGeometry.prototype.constructor = DodecahedronBufferGeometry;
-
-	/**
-	 * @author oosmoxiecode / https://github.com/oosmoxiecode
-	 * @author WestLangley / https://github.com/WestLangley
-	 * @author zz85 / https://github.com/zz85
-	 * @author miningold / https://github.com/miningold
-	 * @author jonobr1 / https://github.com/jonobr1
-	 * @author Mugen87 / https://github.com/Mugen87
-	 *
-	 */
 
 	// TubeGeometry
 
@@ -30214,13 +29694,6 @@
 
 	};
 
-	/**
-	 * @author oosmoxiecode
-	 * @author Mugen87 / https://github.com/Mugen87
-	 *
-	 * based on http://www.blackpawn.com/texts/pqtorus/
-	 */
-
 	// TorusKnotGeometry
 
 	function TorusKnotGeometry( radius, tube, tubularSegments, radialSegments, p, q, heightScale ) {
@@ -30399,12 +29872,6 @@
 	TorusKnotBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	TorusKnotBufferGeometry.prototype.constructor = TorusKnotBufferGeometry;
 
-	/**
-	 * @author oosmoxiecode
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
-
 	// TorusGeometry
 
 	function TorusGeometry( radius, tube, radialSegments, tubularSegments, arc ) {
@@ -30533,7 +30000,6 @@
 	TorusBufferGeometry.prototype.constructor = TorusBufferGeometry;
 
 	/**
-	 * @author Mugen87 / https://github.com/Mugen87
 	 * Port from https://github.com/mapbox/earcut (v2.2.2)
 	 */
 
@@ -31325,10 +30791,6 @@
 
 	}
 
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 */
-
 	var ShapeUtils = {
 
 		// calculate area of the contour polygon
@@ -31419,8 +30881,6 @@
 	}
 
 	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 *
 	 * Creates extruded geometry from a path shape.
 	 *
 	 * parameters = {
@@ -32236,9 +31696,6 @@
 	}
 
 	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * @author alteredq / http://alteredqualia.com/
-	 *
 	 * Text = 3D Text
 	 *
 	 * parameters = {
@@ -32311,12 +31768,6 @@
 
 	TextBufferGeometry.prototype = Object.create( ExtrudeBufferGeometry.prototype );
 	TextBufferGeometry.prototype.constructor = TextBufferGeometry;
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author benaadams / https://twitter.com/ben_a_adams
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	// SphereGeometry
 
@@ -32469,11 +31920,6 @@
 	SphereBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	SphereBufferGeometry.prototype.constructor = SphereBufferGeometry;
 
-	/**
-	 * @author Kaleb Murphy
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
-
 	// RingGeometry
 
 	function RingGeometry( innerRadius, outerRadius, thetaSegments, phiSegments, thetaStart, thetaLength ) {
@@ -32610,12 +32056,6 @@
 
 	RingBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	RingBufferGeometry.prototype.constructor = RingBufferGeometry;
-
-	/**
-	 * @author zz85 / https://github.com/zz85
-	 * @author bhouston / http://clara.io
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	// LatheGeometry
 
@@ -32785,11 +32225,6 @@
 
 	LatheBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	LatheBufferGeometry.prototype.constructor = LatheBufferGeometry;
-
-	/**
-	 * @author jonobr1 / http://jonobr1.com
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	// ShapeGeometry
 
@@ -32997,11 +32432,6 @@
 
 	}
 
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
-
 	function EdgesGeometry( geometry, thresholdAngle ) {
 
 		BufferGeometry.call( this );
@@ -33103,11 +32533,6 @@
 
 	EdgesGeometry.prototype = Object.create( BufferGeometry.prototype );
 	EdgesGeometry.prototype.constructor = EdgesGeometry;
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	// CylinderGeometry
 
@@ -33411,10 +32836,6 @@
 	CylinderBufferGeometry.prototype = Object.create( BufferGeometry.prototype );
 	CylinderBufferGeometry.prototype.constructor = CylinderBufferGeometry;
 
-	/**
-	 * @author abelnation / http://github.com/abelnation
-	 */
-
 	// ConeGeometry
 
 	function ConeGeometry( radius, height, radialSegments, heightSegments, openEnded, thetaStart, thetaLength ) {
@@ -33460,12 +32881,6 @@
 
 	ConeBufferGeometry.prototype = Object.create( CylinderBufferGeometry.prototype );
 	ConeBufferGeometry.prototype.constructor = ConeBufferGeometry;
-
-	/**
-	 * @author benaadams / https://twitter.com/ben_a_adams
-	 * @author Mugen87 / https://github.com/Mugen87
-	 * @author hughes
-	 */
 
 	// CircleGeometry
 
@@ -33620,8 +33035,6 @@
 	});
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 *
 	 * parameters = {
 	 *  color: <THREE.Color>
 	 * }
@@ -33655,10 +33068,6 @@
 
 	};
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function RawShaderMaterial( parameters ) {
 
 		ShaderMaterial.call( this, parameters );
@@ -33673,8 +33082,6 @@
 	RawShaderMaterial.prototype.isRawShaderMaterial = true;
 
 	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *  roughness: <float>,
@@ -33850,8 +33257,6 @@
 	};
 
 	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
 	 * parameters = {
 	 *  clearcoat: <float>,
 	 *  clearcoatMap: new THREE.Texture( <Image> ),
@@ -33943,9 +33348,6 @@
 	};
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *  specular: <hex>,
@@ -34107,8 +33509,6 @@
 	};
 
 	/**
-	 * @author takahirox / http://github.com/takahirox
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *
@@ -34247,9 +33647,6 @@
 	};
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
 	 * parameters = {
 	 *  opacity: <float>,
 	 *
@@ -34335,9 +33732,6 @@
 	};
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *  opacity: <float>,
@@ -34460,8 +33854,6 @@
 	};
 
 	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *  opacity: <float>,
@@ -34563,8 +33955,6 @@
 	};
 
 	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 *
 	 * parameters = {
 	 *  color: <hex>,
 	 *  opacity: <float>,
@@ -34629,12 +34019,6 @@
 		LineBasicMaterial: LineBasicMaterial,
 		Material: Material
 	});
-
-	/**
-	 * @author tschw
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 */
 
 	var AnimationUtils = {
 
@@ -34994,7 +34378,6 @@
 	 *
 	 * 		http://www.oodesign.com/template-method-pattern.html
 	 *
-	 * @author tschw
 	 */
 
 	function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
@@ -35238,8 +34621,6 @@
 	 * It was derived from a Hermitian construction setting the first derivative
 	 * at each sample position to the linear slope between neighboring positions
 	 * over their parameter interval.
-	 *
-	 * @author tschw
 	 */
 
 	function CubicInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
@@ -35382,10 +34763,6 @@
 
 	} );
 
-	/**
-	 * @author tschw
-	 */
-
 	function LinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 		Interpolant.call( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
@@ -35426,8 +34803,6 @@
 	 *
 	 * Interpolant that evaluates to the sample value at the position preceeding
 	 * the parameter.
-	 *
-	 * @author tschw
 	 */
 
 	function DiscreteInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
@@ -35447,16 +34822,6 @@
 		}
 
 	} );
-
-	/**
-	 *
-	 * A timed sequence of keyframes for a specific property.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
 
 	function KeyframeTrack( name, times, values, interpolation ) {
 
@@ -35920,13 +35285,7 @@
 	} );
 
 	/**
-	 *
 	 * A Track of Boolean keyframe values.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
 	 */
 
 	function BooleanKeyframeTrack( name, times, values ) {
@@ -35954,13 +35313,7 @@
 	} );
 
 	/**
-	 *
 	 * A Track of keyframe values that represent color.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
 	 */
 
 	function ColorKeyframeTrack( name, times, values, interpolation ) {
@@ -35985,12 +35338,7 @@
 	} );
 
 	/**
-	 *
 	 * A Track of numeric keyframe values.
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
 	 */
 
 	function NumberKeyframeTrack( name, times, values, interpolation ) {
@@ -36013,8 +35361,6 @@
 
 	/**
 	 * Spherical linear unit quaternion interpolant.
-	 *
-	 * @author tschw
 	 */
 
 	function QuaternionLinearInterpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
@@ -36050,12 +35396,7 @@
 	} );
 
 	/**
-	 *
 	 * A Track of quaternion keyframe values.
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
 	 */
 
 	function QuaternionKeyframeTrack( name, times, values, interpolation ) {
@@ -36085,13 +35426,7 @@
 	} );
 
 	/**
-	 *
 	 * A Track that interpolates Strings
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
 	 */
 
 	function StringKeyframeTrack( name, times, values, interpolation ) {
@@ -36116,13 +35451,7 @@
 	} );
 
 	/**
-	 *
 	 * A Track of vectored keyframe values.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
 	 */
 
 	function VectorKeyframeTrack( name, times, values, interpolation ) {
@@ -36142,14 +35471,6 @@
 		// DefaultInterpolation is inherited
 
 	} );
-
-	/**
-	 *
-	 * Reusable set of Tracks that represent an animation.
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 */
 
 	function AnimationClip( name, duration, tracks, blendMode ) {
 
@@ -36606,10 +35927,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	var Cache = {
 
 		enabled: false,
@@ -36649,10 +35966,6 @@
 		}
 
 	};
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function LoadingManager( onLoad, onProgress, onError ) {
 
@@ -36791,10 +36104,6 @@
 
 	var DefaultLoadingManager = new LoadingManager();
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	function Loader( manager ) {
 
 		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
@@ -36853,10 +36162,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var loading = {};
 
@@ -37159,10 +36464,6 @@
 
 	} );
 
-	/**
-	 * @author bhouston / http://clara.io/
-	 */
-
 	function AnimationLoader( manager ) {
 
 		Loader.call( this, manager );
@@ -37225,8 +36526,6 @@
 	} );
 
 	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 *
 	 * Abstract Base class to block based textures loader (dds, pvr, ...)
 	 *
 	 * Sub classes have to implement the parse() method which will be used in load().
@@ -37354,8 +36653,6 @@
 	} );
 
 	/**
-	 * @author Nikos M. / https://github.com/foo123/
-	 *
 	 * Abstract Base class to load generic binary textures formats (rgbe, hdr, ...)
 	 *
 	 * Sub classes have to implement the parse() method which will be used in load().
@@ -37445,10 +36742,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function ImageLoader( manager ) {
 
 		Loader.call( this, manager );
@@ -37531,11 +36824,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
-
 	function CubeTextureLoader( manager ) {
 
 		Loader.call( this, manager );
@@ -37588,10 +36876,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function TextureLoader( manager ) {
 
 		Loader.call( this, manager );
@@ -37635,8 +36919,7 @@
 	} );
 
 	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * Extensible curve object
+	 * Extensible curve object.
 	 *
 	 * Some common of curve methods:
 	 * .getPoint( t, optionalTarget ), .getTangent( t, optionalTarget )
@@ -37664,10 +36947,6 @@
 	 * A series of curves can be represented as a THREE.CurvePath.
 	 *
 	 **/
-
-	/**************************************************************
-	 *	Abstract Curve base class
-	 **************************************************************/
 
 	function Curve() {
 
@@ -38220,8 +37499,6 @@
 	ArcCurve.prototype.isArcCurve = true;
 
 	/**
-	 * @author zz85 https://github.com/zz85
-	 *
 	 * Centripetal CatmullRom Curve - which is useful for avoiding
 	 * cusps and self-intersections in non-uniform catmull rom curves.
 	 * http://www.cemyuksel.com/research/catmullrom_param/catmullrom.pdf
@@ -38470,8 +37747,6 @@
 	};
 
 	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 *
 	 * Bezier Curves formulas obtained from
 	 * http://en.wikipedia.org/wiki/Bézier_curve
 	 */
@@ -38993,7 +38268,7 @@
 
 	};
 
-	function SplineCurve( points /* array of Vector2 */ ) {
+	function SplineCurve( points ) {
 
 		Curve.call( this );
 
@@ -39097,11 +38372,6 @@
 		QuadraticBezierCurve3: QuadraticBezierCurve3,
 		SplineCurve: SplineCurve
 	});
-
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 *
-	 **/
 
 	/**************************************************************
 	 *	Curved Path - a curve path is simply a array of connected
@@ -39356,11 +38626,6 @@
 
 	} );
 
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * Creates free form 2d path using series of points, lines or curves.
-	 **/
-
 	function Path( points ) {
 
 		CurvePath.call( this );
@@ -39549,17 +38814,6 @@
 
 	} );
 
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * Defines a 2d shape plane using paths.
-	 **/
-
-	// STEP 1 Create a path.
-	// STEP 2 Turn path into shape.
-	// STEP 3 ExtrudeGeometry takes in Shape/Shapes
-	// STEP 3a - Extract points from each shape, turn to vertices
-	// STEP 3b - Triangulate each shape, add faces.
-
 	function Shape( points ) {
 
 		Path.call( this, points );
@@ -39659,11 +38913,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	function Light( color, intensity ) {
 
 		Object3D.call( this );
@@ -39716,10 +38965,6 @@
 
 	} );
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	function HemisphereLight( skyColor, groundColor, intensity ) {
 
 		Light.call( this, skyColor, intensity );
@@ -39752,10 +38997,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function LightShadow( camera ) {
 
@@ -39886,10 +39127,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function SpotLightShadow() {
 
 		LightShadow.call( this, new PerspectiveCamera( 50, 1, 0.5, 500 ) );
@@ -39924,10 +39161,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
 
 	function SpotLight( color, intensity, distance, angle, penumbra, decay ) {
 
@@ -40073,11 +39306,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
-
 	function PointLight( color, intensity, distance, decay ) {
 
 		Light.call( this, color, intensity );
@@ -40128,11 +39356,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author arose / http://github.com/arose
-	 */
 
 	function OrthographicCamera( left, right, top, bottom, near, far ) {
 
@@ -40269,10 +39492,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function DirectionalLightShadow() {
 
 		LightShadow.call( this, new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
@@ -40292,11 +39511,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author alteredq / http://alteredqualia.com/
-	 */
 
 	function DirectionalLight( color, intensity ) {
 
@@ -40333,10 +39547,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function AmbientLight( color, intensity ) {
 
 		Light.call( this, color, intensity );
@@ -40354,10 +39564,6 @@
 		isAmbientLight: true
 
 	} );
-
-	/**
-	 * @author abelnation / http://github.com/abelnation
-	 */
 
 	function RectAreaLight( color, intensity, width, height ) {
 
@@ -40401,9 +39607,6 @@
 	} );
 
 	/**
-	 * @author bhouston / http://clara.io
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
 	 * Primary reference:
 	 *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
 	 *
@@ -40652,12 +39855,6 @@
 
 	} );
 
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
-	 * A LightProbe is a source of indirect-diffuse light
-	 */
-
 	function LightProbe( sh, intensity ) {
 
 		Light.call( this, undefined, intensity );
@@ -40704,10 +39901,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function MaterialLoader( manager ) {
 
@@ -40993,10 +40186,6 @@
 
 	} );
 
-	/**
-	 * @author Don McCurdy / https://www.donmccurdy.com
-	 */
-
 	var LoaderUtils = {
 
 		decodeText: function ( array ) {
@@ -41045,10 +40234,6 @@
 
 	};
 
-	/**
-	 * @author benaadams / https://twitter.com/ben_a_adams
-	 */
-
 	function InstancedBufferGeometry() {
 
 		BufferGeometry.call( this );
@@ -41093,10 +40278,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author benaadams / https://twitter.com/ben_a_adams
-	 */
 
 	function InstancedBufferAttribute( array, itemSize, normalized, meshPerAttribute ) {
 
@@ -41145,10 +40326,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function BufferGeometryLoader( manager ) {
 
@@ -41365,10 +40542,6 @@
 		Float32Array: Float32Array,
 		Float64Array: Float64Array
 	};
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function ObjectLoader( manager ) {
 
@@ -42316,11 +41489,6 @@
 		LinearMipmapLinearFilter: LinearMipmapLinearFilter
 	};
 
-	/**
-	 * @author thespite / http://clicktorelease.com/
-	 */
-
-
 	function ImageBitmapLoader( manager ) {
 
 		if ( typeof createImageBitmap === 'undefined' ) {
@@ -42413,11 +41581,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * minimal class for proxing functions to Path. Replaces old "extractSubpaths()"
-	 **/
 
 	function ShapePath() {
 
@@ -42706,12 +41869,6 @@
 
 	} );
 
-	/**
-	 * @author zz85 / http://www.lab4games.net/zz85/blog
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
-
 	function Font( data ) {
 
 		this.type = 'Font';
@@ -42854,10 +42011,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function FontLoader( manager ) {
 
 		Loader.call( this, manager );
@@ -42906,10 +42059,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	var _context;
 
 	var AudioContext = {
@@ -42933,10 +42082,6 @@
 		}
 
 	};
-
-	/**
-	 * @author Reece Aaron Lecrivain / http://reecenotes.com/
-	 */
 
 	function AudioLoader( manager ) {
 
@@ -42993,10 +42138,6 @@
 
 	} );
 
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
 	function HemisphereLightProbe( skyColor, groundColor, intensity ) {
 
 		LightProbe.call( this, undefined, intensity );
@@ -43042,10 +42183,6 @@
 
 	} );
 
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
 	function AmbientLightProbe( color, intensity ) {
 
 		LightProbe.call( this, undefined, intensity );
@@ -43085,10 +42222,6 @@
 
 	var _eyeRight = new Matrix4();
 	var _eyeLeft = new Matrix4();
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function StereoCamera() {
 
@@ -43181,10 +42314,6 @@
 
 	} );
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	function Clock( autoStart ) {
 
 		this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
@@ -43251,10 +42380,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	var _position$2 = new Vector3();
 	var _quaternion$3 = new Quaternion();
@@ -43387,11 +42512,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author Reece Aaron Lecrivain / http://reecenotes.com/
-	 */
 
 	function Audio( listener ) {
 
@@ -43779,10 +42899,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	var _position$3 = new Vector3();
 	var _quaternion$4 = new Quaternion();
 	var _scale$2 = new Vector3();
@@ -43910,10 +43026,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function AudioAnalyser( audio, fftSize ) {
 
 		this.analyser = audio.context.createAnalyser();
@@ -43951,16 +43063,6 @@
 		}
 
 	} );
-
-	/**
-	 *
-	 * Buffered scene graph property that allows weighted accumulation.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
 
 	function PropertyMixer( binding, typeName, valueSize ) {
 
@@ -44275,16 +43377,6 @@
 		}
 
 	} );
-
-	/**
-	 *
-	 * A reference to a real property in the scene graph.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
 
 	// Characters [].:/ are reserved for track binding syntax.
 	var _RESERVED_CHARS_RE = '\\[\\]\\.:\\/';
@@ -44996,8 +44088,6 @@
 	 *
 	 *  - A single property can either be controlled through a
 	 *    target group or directly, but not both.
-	 *
-	 * @author tschw
 	 */
 
 	function AnimationObjectGroup() {
@@ -45348,17 +44438,6 @@
 		}
 
 	} );
-
-	/**
-	 *
-	 * Action provided by AnimationMixer for scheduling clip playback on specific
-	 * objects.
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 *
-	 */
 
 	function AnimationAction( mixer, clip, localRoot, blendMode ) {
 
@@ -46053,16 +45132,6 @@
 		}
 
 	} );
-
-	/**
-	 *
-	 * Player for AnimationClips.
-	 *
-	 *
-	 * @author Ben Houston / http://clara.io/
-	 * @author David Sarno / http://lighthaus.us/
-	 * @author tschw
-	 */
 
 	function AnimationMixer( root ) {
 
@@ -46824,10 +45893,6 @@
 
 	} );
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function Uniform( value ) {
 
 		if ( typeof value === 'string' ) {
@@ -46846,10 +45911,6 @@
 		return new Uniform( this.value.clone === undefined ? this.value : this.value.clone() );
 
 	};
-
-	/**
-	 * @author benaadams / https://twitter.com/ben_a_adams
-	 */
 
 	function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
@@ -46897,12 +45958,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author bhouston / http://clara.io/
-	 * @author stephomi / http://stephaneginier.com/
-	 */
 
 	function Raycaster( origin, direction, near, far ) {
 
@@ -47033,9 +46088,6 @@
 	} );
 
 	/**
-	 * @author bhouston / http://clara.io
-	 * @author WestLangley / http://github.com/WestLangley
-	 *
 	 * Ref: https://en.wikipedia.org/wiki/Spherical_coordinate_system
 	 *
 	 * The polar angle (phi) is measured from the positive y-axis. The positive y-axis is up.
@@ -47119,10 +46171,7 @@
 	};
 
 	/**
-	 * @author Mugen87 / https://github.com/Mugen87
-	 *
 	 * Ref: https://en.wikipedia.org/wiki/Cylindrical_coordinate_system
-	 *
 	 */
 
 	function Cylindrical( radius, theta, y ) {
@@ -47180,10 +46229,6 @@
 		}
 
 	} );
-
-	/**
-	 * @author bhouston / http://clara.io
-	 */
 
 	var _vector$7 = new Vector2();
 
@@ -47411,10 +46456,6 @@
 
 	} );
 
-	/**
-	 * @author bhouston / http://clara.io
-	 */
-
 	var _startP = new Vector3();
 	var _startEnd = new Vector3();
 
@@ -47554,10 +46595,6 @@
 
 	} );
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 */
-
 	function ImmediateRenderObject( material ) {
 
 		Object3D.call( this );
@@ -47583,12 +46620,6 @@
 	ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
 
 	ImmediateRenderObject.prototype.isImmediateRenderObject = true;
-
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
 
 	var _vector$8 = new Vector3();
 
@@ -47671,14 +46702,6 @@
 		}
 
 	};
-
-	/**
-	 * @author Sean Griffin / http://twitter.com/sgrif
-	 * @author Michael Guerrero / http://realitymeltdown.com
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author ikerr / http://verold.com
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
 
 	var _vector$9 = new Vector3();
 	var _boneMatrix = new Matrix4();
@@ -47788,11 +46811,6 @@
 
 	};
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function PointLightHelper( light, sphereSize, color ) {
 
 		this.light = light;
@@ -47876,12 +46894,6 @@
 
 	};
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author Mugen87 / https://github.com/Mugen87
-	 */
-
 	var _vector$a = new Vector3();
 	var _color1 = new Color();
 	var _color2 = new Color();
@@ -47956,10 +46968,6 @@
 
 	};
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function GridHelper( size, divisions, color1, color2 ) {
 
 		size = size || 10;
@@ -48001,12 +47009,6 @@
 
 	GridHelper.prototype = Object.create( LineSegments.prototype );
 	GridHelper.prototype.constructor = GridHelper;
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author Mugen87 / http://github.com/Mugen87
-	 * @author Hectate / http://www.github.com/Hectate
-	 */
 
 	function PolarGridHelper( radius, radials, circles, divisions, color1, color2 ) {
 
@@ -48088,12 +47090,6 @@
 	PolarGridHelper.prototype = Object.create( LineSegments.prototype );
 	PolarGridHelper.prototype.constructor = PolarGridHelper;
 
-	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
 	var _v1$5 = new Vector3();
 	var _v2$3 = new Vector3();
 	var _v3$1 = new Vector3();
@@ -48173,18 +47169,15 @@
 
 	};
 
+	var _vector$b = new Vector3();
+	var _camera = new Camera();
+
 	/**
-	 * @author alteredq / http://alteredqualia.com/
-	 * @author Mugen87 / https://github.com/Mugen87
-	 *
 	 *	- shows frustum, line of sight and up of the camera
 	 *	- suitable for fast updates
 	 * 	- based on frustum visualization in lightgl.js shadowmap example
 	 *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
 	 */
-
-	var _vector$b = new Vector3();
-	var _camera = new Camera();
 
 	function CameraHelper( camera ) {
 
@@ -48368,11 +47361,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 * @author Mugen87 / http://github.com/Mugen87
-	 */
-
 	var _box$3 = new Box3();
 
 	function BoxHelper( object, color ) {
@@ -48474,10 +47462,6 @@
 
 	};
 
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
-
 	function Box3Helper( box, color ) {
 
 		this.type = 'Box3Helper';
@@ -48522,10 +47506,6 @@
 		Object3D.prototype.updateMatrixWorld.call( this, force );
 
 	};
-
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 */
 
 	function PlaneHelper( plane, size, hex ) {
 
@@ -48575,22 +47555,6 @@
 		Object3D.prototype.updateMatrixWorld.call( this, force );
 
 	};
-
-	/**
-	 * @author WestLangley / http://github.com/WestLangley
-	 * @author zz85 / http://github.com/zz85
-	 * @author bhouston / http://clara.io
-	 *
-	 * Creates an arrow for visualizing directions
-	 *
-	 * Parameters:
-	 *  dir - Vector3
-	 *  origin - Vector3
-	 *  length - Number
-	 *  color - color in hex value
-	 *  headLength - Number
-	 *  headWidth - Number
-	 */
 
 	var _axis = new Vector3();
 	var _lineGeometry, _coneGeometry;
@@ -48694,11 +47658,6 @@
 
 	};
 
-	/**
-	 * @author sroucheray / http://sroucheray.org/
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function AxesHelper( size ) {
 
 		size = size || 1;
@@ -48729,20 +47688,6 @@
 
 	AxesHelper.prototype = Object.create( LineSegments.prototype );
 	AxesHelper.prototype.constructor = AxesHelper;
-
-	/**
-	 * @author Emmett Lalish / elalish
-	 *
-	 * This class generates a Prefiltered, Mipmapped Radiance Environment Map
-	 * (PMREM) from a cubeMap environment texture. This allows different levels of
-	 * blur to be quickly accessed based on material roughness. It is packed into a
-	 * special CubeUV format that allows us to perform custom interpolation so that
-	 * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
-	 * chain, it only goes down to the LOD_MIN level (above), and then creates extra
-	 * even more filtered 'mips' at the same LOD_MIN resolution, associated with
-	 * higher roughness levels. In this way we maintain resolution to smoothly
-	 * interpolate diffuse lighting while limiting sampling computation.
-	 */
 
 	var LOD_MIN = 4;
 	var LOD_MAX = 8;
@@ -48793,6 +47738,18 @@
 		new Vector3( - INV_PHI, 0, PHI ),
 		new Vector3( PHI, INV_PHI, 0 ),
 		new Vector3( - PHI, INV_PHI, 0 ) ];
+
+	/**
+	 * This class generates a Prefiltered, Mipmapped Radiance Environment Map
+	 * (PMREM) from a cubeMap environment texture. This allows different levels of
+	 * blur to be quickly accessed based on material roughness. It is packed into a
+	 * special CubeUV format that allows us to perform custom interpolation so that
+	 * we can support nonlinear formats such as RGBE. Unlike a traditional mipmap
+	 * chain, it only goes down to the LOD_MIN level (above), and then creates extra
+	 * even more filtered 'mips' at the same LOD_MIN resolution, associated with
+	 * higher roughness levels. In this way we maintain resolution to smoothly
+	 * interpolate diffuse lighting while limiting sampling computation.
+	 */
 
 	function PMREMGenerator( renderer ) {
 
@@ -49411,10 +48368,6 @@
 		return /* glsl */"\n\n\t\tuniform int inputEncoding;\n\t\tuniform int outputEncoding;\n\n\t\t#include <encodings_pars_fragment>\n\n\t\tvec4 inputTexelToLinear( vec4 value ) {\n\n\t\t\tif ( inputEncoding == 0 ) {\n\n\t\t\t\treturn value;\n\n\t\t\t} else if ( inputEncoding == 1 ) {\n\n\t\t\t\treturn sRGBToLinear( value );\n\n\t\t\t} else if ( inputEncoding == 2 ) {\n\n\t\t\t\treturn RGBEToLinear( value );\n\n\t\t\t} else if ( inputEncoding == 3 ) {\n\n\t\t\t\treturn RGBMToLinear( value, 7.0 );\n\n\t\t\t} else if ( inputEncoding == 4 ) {\n\n\t\t\t\treturn RGBMToLinear( value, 16.0 );\n\n\t\t\t} else if ( inputEncoding == 5 ) {\n\n\t\t\t\treturn RGBDToLinear( value, 256.0 );\n\n\t\t\t} else {\n\n\t\t\t\treturn GammaToLinear( value, 2.2 );\n\n\t\t\t}\n\n\t\t}\n\n\t\tvec4 linearToOutputTexel( vec4 value ) {\n\n\t\t\tif ( outputEncoding == 0 ) {\n\n\t\t\t\treturn value;\n\n\t\t\t} else if ( outputEncoding == 1 ) {\n\n\t\t\t\treturn LinearTosRGB( value );\n\n\t\t\t} else if ( outputEncoding == 2 ) {\n\n\t\t\t\treturn LinearToRGBE( value );\n\n\t\t\t} else if ( outputEncoding == 3 ) {\n\n\t\t\t\treturn LinearToRGBM( value, 7.0 );\n\n\t\t\t} else if ( outputEncoding == 4 ) {\n\n\t\t\t\treturn LinearToRGBM( value, 16.0 );\n\n\t\t\t} else if ( outputEncoding == 5 ) {\n\n\t\t\t\treturn LinearToRGBD( value, 256.0 );\n\n\t\t\t} else {\n\n\t\t\t\treturn LinearToGamma( value, 2.2 );\n\n\t\t\t}\n\n\t\t}\n\n\t\tvec4 envMapTexelToLinear( vec4 color ) {\n\n\t\t\treturn inputTexelToLinear( color );\n\n\t\t}\n\t";
 
 	}
-
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
 
 	function Face4( a, b, c, d, normal, color, materialIndex ) {
 
