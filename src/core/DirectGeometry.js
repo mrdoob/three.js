@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Vector2 } from '../math/Vector2.js';
 
 function DirectGeometry() {

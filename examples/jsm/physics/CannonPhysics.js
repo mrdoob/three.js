@@ -1,9 +1,5 @@
 import CANNON from "../libs/cannon.module.min.js";
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function compose( position, quaternion, array, index ) {
 
 	var x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;

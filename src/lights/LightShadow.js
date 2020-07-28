@@ -4,10 +4,6 @@ import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 import { Frustum } from '../math/Frustum.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function LightShadow( camera ) {
 
 	this.camera = camera;

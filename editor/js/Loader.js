@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { ThreeMFLoader } from '../../examples/jsm/loaders/3MFLoader.js';

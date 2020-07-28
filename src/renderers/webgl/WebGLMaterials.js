@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { BackSide } from "../../constants.js";
 
 function WebGLMaterials( properties ) {
