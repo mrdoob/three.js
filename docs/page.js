@@ -140,6 +140,6 @@ function onDocumentLoad( event ) {
 
 	document.head.appendChild( prettify );
 
-};
+}
 
 document.addEventListener( 'DOMContentLoaded', onDocumentLoad, false );

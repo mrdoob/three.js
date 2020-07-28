@@ -299,6 +299,8 @@
 
 		function layoutList() {
 
+			var firstCategory = null;
+
 			for ( var key in files ) {
 
 				var collapsed = true;
@@ -319,6 +321,7 @@
 				}
 
 				var element = document.querySelector( 'h2[data-category="' + key + '"]' );
+				element.classList.remove( 'first' );
 
 				if ( collapsed ) {
 
@@ -327,6 +330,13 @@
 				} else {
 
 					element.classList.remove( 'hidden' );
+
+					if ( firstCategory === null ) {
+
+						firstCategory = element;
+						firstCategory.classList.add( 'first' );
+
+					}
 
 				}
 

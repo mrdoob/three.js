@@ -204,6 +204,7 @@
 				content.appendChild( navigation );
 
 				var localList = list[ language ];
+				var firstSection = null;
 
 				for ( var section in localList ) {
 
@@ -214,6 +215,13 @@
 					var sectionHead = document.createElement( 'h2' );
 					sectionHead.textContent = section;
 					navigation.appendChild( sectionHead );
+
+					if ( firstSection === null ) {
+
+						firstSection = sectionHead;
+						firstSection.classList.add( 'first' );
+
+					}
 
 					for ( var category in categories ) {
 

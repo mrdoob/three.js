@@ -310,7 +310,7 @@ h1 a {
 			padding-top: 12px;
 		}
 
-		#panel #content h2:first-child {
+		#panel #content h2.first {
 			margin-top: 16px !important;
 			border-top: none;
 			padding-top: 0;
