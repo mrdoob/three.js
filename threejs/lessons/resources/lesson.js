@@ -361,9 +361,8 @@ $(document).ready(function($){
     window.prettyPrint();
   }
   $('span[class=com]')
-    .replaceWith(function() {
-      return $('<span class="com notranslate" translate="yes">' + this.innerHTML + '</span>');
-    });
+    .addClass('translate yestranslate')
+    .attr('translate', 'yes');
 
   const params = getQueryParams();
   if (params.doubleSpace || params.doublespace) {

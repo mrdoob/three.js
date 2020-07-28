@@ -1,5 +1,5 @@
 <div translate="no" class="threejs_example_container notranslate">
-  <div><iframe class="threejs_example" style="{{width}} {{height}}" src="/threejs/resources/editor.html?url={{{examplePath}}}{{{encodedUrl}}}{{{params}}}"></iframe></div>
+  <div><iframe class="threejs_example notranslate" translate="no" style="{{width}} {{height}}" src="/threejs/resources/editor.html?url={{{examplePath}}}{{{encodedUrl}}}{{{params}}}"></iframe></div>
   <a class="threejs_center" href="{{{examplePath}}}{{{url}}}" target="_blank">{{{caption}}}</a>
 </div>
 
