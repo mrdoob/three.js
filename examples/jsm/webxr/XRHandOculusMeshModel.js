@@ -17,7 +17,11 @@ class XRHandOculusMeshModel {
 			this.handModel.add( object );
 			// Hack because of the scale of the skinnedmesh
 			object.scale.setScalar( 0.01 );
-			object.getObjectByProperty( "type", "SkinnedMesh" ).frustumCulled = false;
+
+			const mesh = object.getObjectByProperty( "type", "SkinnedMesh" );
+			mesh.frustumCulled = false;
+			mesh.castShadow = true;
+			mesh.receiveShadow = true;
 
 			const bonesMapping = [
 				'b_%_wrist', // XRHand.WRIST,

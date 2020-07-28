@@ -45,6 +45,7 @@ class XRHandPrimitiveModel {
 
 				var cube = new Mesh( geometry, tipIndexes.indexOf( i ) !== - 1 ? tipMaterial : jointMaterial );
 				cube.castShadow = true;
+				cube.receiveShadow = true;
 				this.handMesh.add( cube );
 
 			}
