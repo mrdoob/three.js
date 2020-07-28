@@ -402,6 +402,23 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 					gl.vertexAttribPointer( programAttribute + 2, 4, type, false, 64, 32 );
 					gl.vertexAttribPointer( programAttribute + 3, 4, type, false, 64, 48 );
 
+				} else if ( name === 'instanceColor' ) {
+
+					const attribute = attributes.get( object.instanceColor );
+
+					// TODO Attribute may not be available on context restore
+
+					if ( attribute === undefined ) continue;
+
+					const buffer = attribute.buffer;
+					const type = attribute.type;
+
+					enableAttributeAndDivisor( programAttribute, 1 );
+
+					gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+
+					gl.vertexAttribPointer( programAttribute, 3, type, false, 12, 0 );
+
 				} else if ( materialDefaultAttributeValues !== undefined ) {
 
 					const value = materialDefaultAttributeValues[ name ];

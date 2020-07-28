@@ -29,6 +29,12 @@ function WebGLObjects( gl, geometries, attributes, info ) {
 
 			attributes.update( object.instanceMatrix, gl.ARRAY_BUFFER );
 
+			if ( object.instanceColor !== null ) {
+
+				attributes.update( object.instanceColor, gl.ARRAY_BUFFER );
+
+			}
+
 		}
 
 		return buffergeometry;
