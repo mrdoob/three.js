@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UISelect, UIText, UINumber } from './libs/ui.js';

@@ -24,7 +24,7 @@
 			</li>
 			<li>
 				<b>Physically-based transparency:</b> One limitation of [page:Material.opacity .opacity] is
-				that highly transparent materials are less reflective. Physically-based [page:.transparency]
+				that highly transparent materials are less reflective. Physically-based [page:.transmission]
 				provides a more realistic option for thin, transparent surfaces like glass.
 			</li>
 			<li>
@@ -63,7 +63,7 @@
 			[example:webgl_materials_variations_physical materials / variations / physical]<br />
 			[example:webgl_materials_physical_clearcoat materials / physical / clearcoat]<br />
 			[example:webgl_materials_physical_reflectivity materials / physical / reflectivity]<br />
-			[example:webgl_materials_physical_transparency materials / physical / transparency]
+			[example:webgl_materials_physical_transmission materials / physical / transmission]
 		</p>
 
 		<h2>构造函数(Constructor)</h2>
@@ -123,15 +123,21 @@
 			这模拟了非金属材质的反射率。当[page:MeshStandardMaterial]为*1.0*时，此属性无效。
 		</p>
 
-		<h3>[property:Float transparency]</h3>
+		<h3>[property:Float transmission]</h3>
 		<p>
-		Degree of transparency, from *0.0* to *1.0*. Default is *0.0*.<br />
+		Degree of transmission (or optical transparency), from *0.0* to *1.0*. Default is *0.0*.<br />
 
-		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are mostly transparent.
+		Thin, transparent or semitransparent, plastic or glass materials remain largely reflective even if they are fully transmissive.
 
-		The transparency property can be used to model these materials.<br />
+		The transmission property can be used to model these materials.<br />
 
-		When transparency is non-zero, [page:Material.opacity opacity] should be set to *1*.
+		When transmission is non-zero, [page:Material.opacity opacity] should be set to *1*.
+		</p>
+
+		<h3>[property:Texture transmissionMap]</h3>
+		<p>
+			The red channel of this texture is multiplied against [page:.transmission], for per-pixel control
+			over optical transparency. Default is *null*.
 		</p>
 
 		<h2>方法(Methods)</h2>

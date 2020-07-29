@@ -1,7 +1,5 @@
-console.warn( "THREE.Water2: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
+console.warn( "THREE.Water2: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author Mugen87 / https://github.com/Mugen87
- *
  * References:
  *	http://www.valvesoftware.com/publications/2010/siggraph2010_vlachos_waterflow.pdf
  * 	http://graphicsrunner.blogspot.de/2010/08/water-using-flow-maps.html

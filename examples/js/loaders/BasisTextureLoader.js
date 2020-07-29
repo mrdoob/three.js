@@ -1,10 +1,4 @@
-console.warn( "THREE.BasisTextureLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- * @author Austin Eng / https://github.com/austinEng
- * @author Shrek Shao / https://github.com/shrekshao
- * @author Senya Pugach / https://upisfr.ee
- */
+console.warn( "THREE.BasisTextureLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 /**
  * Loader for Basis Universal GPU Texture Codec.
@@ -67,12 +61,12 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 		var config = this.workerConfig;
 
-		config.astcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_astc' );
-		config.bptcSupported = !! renderer.extensions.get( 'EXT_texture_compression_bptc' );
-		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
-		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
-		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
-			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+		config.astcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_astc' );
+		config.bptcSupported = renderer.extensions.has( 'EXT_texture_compression_bptc' );
+		config.etcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_etc1' );
+		config.dxtSupported = renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' );
+		config.pvrtcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
+			|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		if ( config.astcSupported ) {
 

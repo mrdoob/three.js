@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function Strings( config ) {
 
 	var language = config.getKey( 'language' );
@@ -310,6 +306,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/settings/viewport/grid': 'Grid',
+			'sidebar/settings/viewport/helpers': 'Helpers',
 
 			'sidebar/history': 'History',
 			'sidebar/history/persistent': 'persistent',
@@ -628,6 +625,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/settings/viewport/grid': 'Grille',
+			'sidebar/settings/viewport/helpers': 'Helpers',
 
 			'sidebar/history': 'Historique',
 			'sidebar/history/persistent': 'permanent',
@@ -839,6 +837,15 @@ function Strings( config ) {
 			'sidebar/geometry/torusKnot_geometry/p': '管长弧度',
 			'sidebar/geometry/torusKnot_geometry/q': '扭曲弧度',
 
+			'sidebar/geometry/tube_geometry/path': '路径',
+			'sidebar/geometry/tube_geometry/radius': '半径',
+			'sidebar/geometry/tube_geometry/tube': '管厚',
+			'sidebar/geometry/tube_geometry/tubularsegments': '管厚分段',
+			'sidebar/geometry/tube_geometry/radialsegments': '半径分段',
+			'sidebar/geometry/tube_geometry/closed': '闭合',
+			'sidebar/geometry/tube_geometry/curvetype': '曲线类型',
+			'sidebar/geometry/tube_geometry/tension': '张力',
+
 			'sidebar/material/new': '更新',
 			'sidebar/material/copy': '复制',
 			'sidebar/material/paste': '粘贴',
@@ -920,6 +927,7 @@ function Strings( config ) {
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
 			'sidebar/settings/viewport/grid': '网格',
+			'sidebar/settings/viewport/helpers': '辅助',
 
 			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',

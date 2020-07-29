@@ -1,7 +1,4 @@
-console.warn( "THREE.AssimpLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author Virtulous / https://virtulo.us/
- */
+console.warn( "THREE.AssimpLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.AssimpLoader = function ( manager ) {
 
@@ -19,9 +16,10 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 
 		loader.load( url, function ( buffer ) {
 

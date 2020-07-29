@@ -1,3 +1,9 @@
+import {
+	AnimationClip,
+	AnimationMixer,
+	AnimationUtils,
+	PropertyBinding
+} from "../../../build/three.module.js";
 /**
  * Controller class for the Timeliner GUI.
  *
@@ -9,17 +15,7 @@
  *
  * 		https://github.com/tschw/timeliner_gui
  * 		https://github.com/zz85/timeliner (fork's origin)
- *
- * @author tschw
- *
  */
-
-import {
-	AnimationClip,
-	AnimationMixer,
-	AnimationUtils,
-	PropertyBinding
-} from "../../../build/three.module.js";
 
 var TimelinerController = function TimelinerController( scene, trackInfo, onUpdate ) {
 

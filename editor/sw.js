@@ -1,7 +1,10 @@
-// r118.3
+// r119
 
 const assets = [
 	'./',
+
+	'./manifest.json',
+	'./images/icon.png',
 
 	'../files/favicon.ico',
 
@@ -57,8 +60,6 @@ const assets = [
 
 	'../examples/jsm/webxr/VRButton.js',
 
-	'./manifest.json',
-	'./images/icon.png',
 	'./images/rotate.svg',
 	'./images/scale.svg',
 	'./images/translate.svg',
@@ -159,6 +160,7 @@ const assets = [
 	'./js/Viewport.js',
 	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
+	'./js/Viewport.ViewHelper.js',
 
 	'./js/Command.js',
 	'./js/commands/AddObjectCommand.js',

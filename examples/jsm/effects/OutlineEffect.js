@@ -1,6 +1,11 @@
+import {
+	BackSide,
+	Color,
+	ShaderMaterial,
+	UniformsLib,
+	UniformsUtils
+} from "../../../build/three.module.js";
 /**
- * @author takahirox / http://github.com/takahirox/
- *
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
  *
  * API
@@ -55,14 +60,6 @@
  * 	keepAlive: true
  * };
  */
-
-import {
-	BackSide,
-	Color,
-	ShaderMaterial,
-	UniformsLib,
-	UniformsUtils
-} from "../../../build/three.module.js";
 
 var OutlineEffect = function ( renderer, parameters ) {
 

@@ -1,11 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author yomboprime / https://github.com/yomboprime/
- * @author gkjohnson / https://github.com/gkjohnson/
- *
- *
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -608,6 +600,7 @@ var LDrawLoader = ( function () {
 
 			var fileLoader = new FileLoader( this.manager );
 			fileLoader.setPath( this.path );
+			fileLoader.setRequestHeader( this.requestHeader );
 			fileLoader.load( url, function ( text ) {
 
 				scope.processObject( text, onLoad, null, url );
@@ -1921,6 +1914,7 @@ var LDrawLoader = ( function () {
 				// and use it when processing the next model.
 				var fileLoader = new FileLoader( scope.manager );
 				fileLoader.setPath( scope.path );
+				fileLoader.setRequestHeader( scope.requestHeader );
 				fileLoader.load( subobjectURL, function ( text ) {
 
 					scope.processObject( text, function ( subobjectGroup ) {

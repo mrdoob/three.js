@@ -1,9 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author zz85 / http://joshuakoo.com/
- * @author yomboprime / https://yombo.org
- */
-
 import {
 	BufferGeometry,
 	FileLoader,
@@ -38,6 +32,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( text ) {
 
 			try {

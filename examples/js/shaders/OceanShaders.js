@@ -1,6 +1,4 @@
-console.warn( "THREE.OceanShaders: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/* Author: Aleksandr Albert
-// Website: www.routter.co.tt
+console.warn( "THREE.OceanShaders: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 // Description: A deep water ocean shader set
 // based on an implementation of a Tessendorf Waves
@@ -21,7 +19,6 @@ console.warn( "THREE.OceanShaders: As part of the transition to ES6 Modules, the
 
 // -- Rendering Shader
 // [7] ocean_main               -> Vertex and Fragment shader used to create the final render
-*/
 
 THREE.OceanShaders = {};
 THREE.OceanShaders[ "ocean_sim_vertex" ] = {

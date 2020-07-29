@@ -1,7 +1,3 @@
-/**
- * @author Slayvin / http://slayvin.net
- */
-
 import {
 	Color,
 	LinearFilter,

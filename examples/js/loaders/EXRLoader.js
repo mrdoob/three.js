@@ -1,8 +1,5 @@
-console.warn( "THREE.EXRLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
+console.warn( "THREE.EXRLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author Richard M. / https://github.com/richardmonette
- * @author ScieCode / http://github.com/sciecode
- *
  * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
  * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
  *
@@ -1280,13 +1277,13 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			var compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
 
-			if ( typeof Zlib === 'undefined' ) {
+			if ( typeof Inflate === 'undefined' ) {
 
 				console.error( 'THREE.EXRLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 			}
 
-			var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
+			var inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
 
 			var rawBuffer = new Uint8Array( inflate.decompress().buffer );
 			var tmpBuffer = new Uint8Array( rawBuffer.length );
@@ -1514,7 +1511,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 					case DEFLATE:
 
 						var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
-						var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } );
+						var inflate = new Inflate( compressed, { resize: true, verify: true } );
 						var acBuffer = new Uint16Array( inflate.decompress().buffer );
 						inOffset.value += dwaHeader.totalAcUncompressedCount;
 						break;
@@ -1541,7 +1538,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			if ( dwaHeader.rleRawSize > 0 ) {
 
 				var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
-				var inflate = new Zlib.Inflate( compressed, { resize: true, verify: true } );
+				var inflate = new Inflate( compressed, { resize: true, verify: true } );
 				var rleBuffer = decodeRunLength( inflate.decompress().buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;
@@ -2257,7 +2254,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		if ( this.type === THREE.UnsignedByteType ) {
 
-			let v, i, j;
+			let v, i;
 			const size = byteArray.length;
 			const RGBEArray = new Uint8Array( size );
 
@@ -2266,11 +2263,10 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 				for ( let w = 0; w < width; ++ w ) {
 
 					i = h * width * 4 + w * 4;
-					j = ( height - 1 - h ) * width * 4 + w * 4;
 
-					const red = byteArray[ j ];
-					const green = byteArray[ j + 1 ];
-					const blue = byteArray[ j + 2 ];
+					const red = byteArray[ i ];
+					const green = byteArray[ i + 1 ];
+					const blue = byteArray[ i + 2 ];
 
 					v = ( red > green ) ? red : green;
 					v = ( blue > v ) ? blue : v;
@@ -2331,7 +2327,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 					texture.minFilter = THREE.NearestFilter;
 					texture.magFilter = THREE.NearestFilter;
 					texture.generateMipmaps = false;
-					texture.flipY = true;
+					texture.flipY = false;
 					break;
 
 				case THREE.FloatType:

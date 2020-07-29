@@ -1,14 +1,11 @@
-/**
- * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
- * @author mrdoob / http://mrdoob.com/
- * @author yomotsu / https://yomotsu.net/
- */
-
 import {
 	Matrix4,
 	Object3D,
 	Vector3
 } from "../../../build/three.module.js";
+/**
+ * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
+ */
 
 var CSS3DObject = function ( element ) {
 

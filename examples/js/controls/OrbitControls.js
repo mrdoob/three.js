@@ -1,12 +1,4 @@
-console.warn( "THREE.OrbitControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author qiao / https://github.com/qiao
- * @author mrdoob / http://mrdoob.com
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author erich666 / http://erichaines.com
- * @author ScieCode / http://github.com/sciecode
- */
+console.warn( "THREE.OrbitControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -177,7 +169,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 			var min = scope.minAzimuthAngle;
 			var max = scope.maxAzimuthAngle;
 
-			if ( isFinite ( min ) && isFinite( max ) ) {
+			if ( isFinite( min ) && isFinite( max ) ) {
 
 				if ( min < - Math.PI ) min += twoPI; else if ( min > Math.PI ) min -= twoPI;
 

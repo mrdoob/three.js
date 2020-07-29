@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIDiv, UIBreak, UISelect, UIButton, UIText } from './libs/ui.js';
 
 function SidebarAnimation( editor ) {

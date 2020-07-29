@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>threejs webgl - materials - transparency</title>
+		<title>threejs webgl - materials - transmission</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="container"></div>
-		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transparency with Premultiplied Alpha (right) and without (left)</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">threejs</a> - Transmission with Premultiplied Alpha (right) and without (left)</div>
 
 		<script type="module">
 
@@ -23,7 +23,7 @@
 
 			var params = {
 				color: 0xffffff,
-				transparency: 0.90,
+				transmission: 0.90,
 				envMapIntensity: 1,
 				lightIntensity: 1,
 				exposure: 1
@@ -96,8 +96,8 @@
 					envMap: hdrCubeRenderTarget.texture,
 					envMapIntensity: params.envMapIntensity,
 					depthWrite: false,
-					transparency: params.transparency, // use material.transparency for glass materials
-					opacity: 1,                        // set material.opacity to 1 when material.transparency is non-zero
+					transmission: params.transmission, // use material.transmission for glass materials
+					opacity: 1,                        // set material.opacity to 1 when material.transmission is non-zero
 					transparent: true
 				} );
 
@@ -166,11 +166,11 @@
 
 					} );
 
-				gui.add( params, 'transparency', 0, 1 )
+				gui.add( params, 'transmission', 0, 1 )
 					.onChange( function () {
 
-						material1.transparency = material2.transparency = params.transparency;
-						material1b.transparency = material2b.transparency = params.transparency;
+						material1.transmission = material2.transmission = params.transmission;
+						material1b.transmission = material2b.transmission = params.transmission;
 
 					} );
 

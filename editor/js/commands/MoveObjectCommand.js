@@ -1,8 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
 import { Command } from '../Command.js';
 
 /**
@@ -95,12 +90,15 @@ MoveObjectCommand.prototype = {
 			this.oldParent = this.editor.scene;
 
 		}
+
 		this.newParent = this.editor.objectByUuid( json.newParentUuid );
+
 		if ( this.newParent === undefined ) {
 
 			this.newParent = this.editor.scene;
 
 		}
+
 		this.newIndex = json.newIndex;
 		this.oldIndex = json.oldIndex;
 

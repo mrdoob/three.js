@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function UIElement( dom ) {
 
 	this.dom = dom;

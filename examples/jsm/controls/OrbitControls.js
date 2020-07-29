@@ -1,12 +1,3 @@
-/**
- * @author qiao / https://github.com/qiao
- * @author mrdoob / http://mrdoob.com
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author erich666 / http://erichaines.com
- * @author ScieCode / http://github.com/sciecode
- */
-
 import {
 	EventDispatcher,
 	MOUSE,
@@ -186,7 +177,7 @@ var OrbitControls = function ( object, domElement ) {
 			var min = scope.minAzimuthAngle;
 			var max = scope.maxAzimuthAngle;
 
-			if ( isFinite ( min ) && isFinite( max ) ) {
+			if ( isFinite( min ) && isFinite( max ) ) {
 
 				if ( min < - Math.PI ) min += twoPI; else if ( min > Math.PI ) min -= twoPI;
 

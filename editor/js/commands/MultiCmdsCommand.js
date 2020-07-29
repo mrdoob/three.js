@@ -1,8 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
 import { Command } from '../Command.js';
 
 /**
@@ -63,6 +58,7 @@ MultiCmdsCommand.prototype = {
 			cmds.push( this.cmdArray[ i ].toJSON() );
 
 		}
+
 		output.cmds = cmds;
 
 		return output;
