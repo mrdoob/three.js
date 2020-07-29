@@ -102,7 +102,6 @@ import {
 	ClampToEdgeWrapping,
 	DataTexture,
 	FloatType,
-	HalfFloatType,
 	Mesh,
 	NearestFilter,
 	PlaneBufferGeometry,
@@ -118,6 +117,8 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 
 	this.currentTextureIndex = 0;
 
+	var dataType = FloatType;
+
 	var scene = new Scene();
 
 	var camera = new Camera();
@@ -132,6 +133,13 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 	var mesh = new Mesh( new PlaneBufferGeometry( 2, 2 ), passThruShader );
 	scene.add( mesh );
 
+
+	this.setDataType = function ( type ) {
+
+		dataType = type;
+		return this;
+
+	};
 
 	this.addVariable = function ( variableName, computeFragmentShader, initialValueTexture ) {
 
@@ -325,7 +333,7 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 			minFilter: minFilter,
 			magFilter: magFilter,
 			format: RGBAFormat,
-			type: ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) ? HalfFloatType : FloatType,
+			type: dataType,
 			stencilBuffer: false,
 			depthBuffer: false
 		} );
