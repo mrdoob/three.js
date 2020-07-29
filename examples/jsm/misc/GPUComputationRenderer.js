@@ -1,6 +1,4 @@
 /**
- * @author yomboprime https://github.com/yomboprime
- *
  * GPUComputationRenderer, based on SimulationRenderer by zz85
  *
  * The GPUComputationRenderer uses the concept of variables. These variables are RGBA float textures that hold 4 floats

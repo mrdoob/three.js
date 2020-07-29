@@ -445,7 +445,9 @@
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
 				if ( isSafari() ) {
+
 					gpuCompute.setDataType( THREE.HalfFloatType );
+
 				}
 
 				var heightmap0 = gpuCompute.createTexture();
@@ -497,7 +499,9 @@
 			}
 
 			function isSafari() {
-				return !!navigator.userAgent.match(/Safari/i) && !navigator.userAgent.match(/Chrome/i);
+
+				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
+
 			}
 
 			function fillTexture( texture ) {
@@ -516,6 +520,7 @@
 						mult *= 1.25;
 
 					}
+
 					return r;
 
 				}
