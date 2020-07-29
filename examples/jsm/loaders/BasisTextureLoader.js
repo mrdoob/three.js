@@ -1,10 +1,3 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- * @author Austin Eng / https://github.com/austinEng
- * @author Shrek Shao / https://github.com/shrekshao
- * @author Senya Pugach / https://upisfr.ee
- */
-
 import {
 	CompressedTexture,
 	FileLoader,

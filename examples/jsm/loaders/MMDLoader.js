@@ -1,34 +1,3 @@
-/**
- * @author takahiro / https://github.com/takahirox
- *
- * Dependencies
- *  - mmd-parser https://github.com/takahirox/mmd-parser
- *  - TGALoader
- *  - OutlineEffect
- *
- * MMDLoader creates Three.js Objects from MMD resources as
- * PMD, PMX, VMD, and VPD files.
- *
- * PMD/PMX is a model data format, VMD is a motion data format
- * VPD is a posing data format used in MMD(Miku Miku Dance).
- *
- * MMD official site
- *  - https://sites.google.com/view/evpvp/
- *
- * PMD, VMD format (in Japanese)
- *  - http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
- *
- * PMX format
- *  - https://gist.github.com/felixjones/f8a06bd48f9da9a4539f
- *
- * TODO
- *  - light motion in vmd support.
- *  - SDEF support.
- *  - uv/material/bone morphing support.
- *  - more precise grant skinning support.
- *  - shadow support.
- */
-
 import {
 	AddOperation,
 	AnimationClip,
@@ -63,6 +32,34 @@ import {
 } from "../../../build/three.module.js";
 import { TGALoader } from "../loaders/TGALoader.js";
 import { MMDParser } from "../libs/mmdparser.module.js";
+/**
+ * Dependencies
+ *  - mmd-parser https://github.com/takahirox/mmd-parser
+ *  - TGALoader
+ *  - OutlineEffect
+ *
+ * MMDLoader creates Three.js Objects from MMD resources as
+ * PMD, PMX, VMD, and VPD files.
+ *
+ * PMD/PMX is a model data format, VMD is a motion data format
+ * VPD is a posing data format used in MMD(Miku Miku Dance).
+ *
+ * MMD official site
+ *  - https://sites.google.com/view/evpvp/
+ *
+ * PMD, VMD format (in Japanese)
+ *  - http://blog.goo.ne.jp/torisu_tetosuki/e/209ad341d3ece2b1b4df24abf619d6e4
+ *
+ * PMX format
+ *  - https://gist.github.com/felixjones/f8a06bd48f9da9a4539f
+ *
+ * TODO
+ *  - light motion in vmd support.
+ *  - SDEF support.
+ *  - uv/material/bone morphing support.
+ *  - more precise grant skinning support.
+ *  - shadow support.
+ */
 
 var MMDLoader = ( function () {
 

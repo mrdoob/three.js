@@ -10,9 +10,6 @@ console.warn( "THREE.TimelinerController: As part of the transition to ES6 Modul
  *
  * 		https://github.com/tschw/timeliner_gui
  * 		https://github.com/zz85/timeliner (fork's origin)
- *
- * @author tschw
- *
  */
 
 THREE.TimelinerController = function TimelinerController( scene, trackInfo, onUpdate ) {

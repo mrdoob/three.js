@@ -1,9 +1,6 @@
 /**
  * @version 1.1.1
  *
- * @author Lewy Blue / https://github.com/looeee
- * @author Guilherme Avila / https://github/sciecode
- *
  * @desc Load files in LWO3 and LWO2 format on Three.js
  *
  * LWO3 format specification:

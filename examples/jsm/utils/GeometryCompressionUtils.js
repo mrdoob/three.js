@@ -1,8 +1,6 @@
 /**
- * @author LeonYuanYao / https://github.com/LeonYuanYao
- *
  * Octahedron and Quantization encodings based on work by:
- * @auther Tarek Sherif @tsherif
+ *
  * @link https://github.com/tsherif/mesh-quantization-example
  *
  */

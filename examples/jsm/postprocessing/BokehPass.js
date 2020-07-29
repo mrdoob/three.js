@@ -1,7 +1,3 @@
-/**
- * Depth-of-field post-process with bokeh shader
- */
-
 import {
 	Color,
 	MeshDepthMaterial,
@@ -14,6 +10,9 @@ import {
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 import { BokehShader } from "../shaders/BokehShader.js";
+/**
+ * Depth-of-field post-process with bokeh shader
+ */
 
 var BokehPass = function ( scene, camera, params ) {
 

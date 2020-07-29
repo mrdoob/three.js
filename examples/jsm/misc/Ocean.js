@@ -1,7 +1,3 @@
-/*
-	three.js Ocean
-*/
-
 import {
 	ClampToEdgeWrapping,
 	DataTexture,

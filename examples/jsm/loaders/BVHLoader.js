@@ -1,13 +1,3 @@
-/**
- * @author herzig / http://github.com/herzig
- * @author Mugen87 / https://github.com/Mugen87
- *
- * Description: reads BVH files and outputs a single Skeleton and an AnimationClip
- *
- * Currently only supports bvh files containing a single root.
- *
- */
-
 import {
 	AnimationClip,
 	Bone,
@@ -19,6 +9,12 @@ import {
 	Vector3,
 	VectorKeyframeTrack
 } from "../../../build/three.module.js";
+/**
+ * Description: reads BVH files and outputs a single Skeleton and an AnimationClip
+ *
+ * Currently only supports bvh files containing a single root.
+ *
+ */
 
 var BVHLoader = function ( manager ) {
 

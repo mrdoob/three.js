@@ -1,3 +1,16 @@
+import {
+	Camera,
+	ClampToEdgeWrapping,
+	DataTexture,
+	FloatType,
+	Mesh,
+	NearestFilter,
+	PlaneBufferGeometry,
+	RGBAFormat,
+	Scene,
+	ShaderMaterial,
+	WebGLRenderTarget
+} from "../../../build/three.module.js";
 /**
  * GPUComputationRenderer, based on SimulationRenderer by zz85
  *
@@ -94,20 +107,6 @@
  * @param {int} sizeY Computation problem size is always 2d: sizeX * sizeY elements.
  * @param {WebGLRenderer} renderer The renderer
   */
-
-import {
-	Camera,
-	ClampToEdgeWrapping,
-	DataTexture,
-	FloatType,
-	Mesh,
-	NearestFilter,
-	PlaneBufferGeometry,
-	RGBAFormat,
-	Scene,
-	ShaderMaterial,
-	WebGLRenderTarget
-} from "../../../build/three.module.js";
 
 var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 

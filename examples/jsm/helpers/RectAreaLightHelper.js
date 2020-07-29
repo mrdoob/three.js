@@ -1,11 +1,3 @@
-/**
- * @author abelnation / http://github.com/abelnation
- * @author Mugen87 / http://github.com/Mugen87
- * @author WestLangley / http://github.com/WestLangley
- *
- *  This helper must be added as a child of the light
- */
-
 import {
 	BackSide,
 	BufferGeometry,
@@ -15,6 +7,10 @@ import {
 	Mesh,
 	MeshBasicMaterial
 } from '../../../build/three.module.js';
+
+/**
+ *  This helper must be added as a child of the light
+ */
 
 function RectAreaLightHelper( light, color ) {
 

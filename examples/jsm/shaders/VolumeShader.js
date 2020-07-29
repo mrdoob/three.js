@@ -1,15 +1,12 @@
-/**
- * @author Almar Klein / http://almarklein.org
- *
- * Shaders to render 3D volumes using raycasting.
- * The applied techniques are based on similar implementations in the Visvis and Vispy projects.
- * This is not the only approach, therefore it's marked 1.
- */
-
 import {
 	Vector2,
 	Vector3
 } from "../../../build/three.module.js";
+/**
+ * Shaders to render 3D volumes using raycasting.
+ * The applied techniques are based on similar implementations in the Visvis and Vispy projects.
+ * This is not the only approach, therefore it's marked 1.
+ */
 
 var VolumeRenderShader1 = {
 	uniforms: {

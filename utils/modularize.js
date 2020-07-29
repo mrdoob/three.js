@@ -254,14 +254,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	contents = contents.replace( /^console\.warn.*(\r\n|\r|\n)/, '' );
 
-	// imports
-
-	contents = contents.replace( /^\/\*+[^*]*\*+(?:[^/*][^*]*\*+)*\//, function ( match ) {
-
-		return `${match}\n\n_IMPORTS_`;
-
-	} );
-
 	// class name
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {
@@ -342,7 +334,7 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	var exports = `export { ${classNames.join( ", " )} };\n`;
 
-	var output = contents.replace( '_IMPORTS_', imports ) + '\n' + exports;
+	var output = imports + '\n' + contents + '\n' + exports;
 
 	// console.log( output );
 

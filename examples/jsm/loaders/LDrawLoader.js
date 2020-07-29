@@ -1,11 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author yomboprime / https://github.com/yomboprime/
- * @author gkjohnson / https://github.com/gkjohnson/
- *
- *
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,

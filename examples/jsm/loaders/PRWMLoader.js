@@ -1,14 +1,12 @@
-/**
- * @author Kevin Chapelier / https://github.com/kchapelier
- * See https://github.com/kchapelier/PRWM for more informations about this file format
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
 	FileLoader,
 	Loader
 } from "../../../build/three.module.js";
+/**
+ * See https://github.com/kchapelier/PRWM for more informations about this file format
+ */
 
 var PRWMLoader = ( function () {
 
