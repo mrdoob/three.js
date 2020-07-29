@@ -7,7 +7,7 @@ export class VOXLoader extends Loader {
 
 	constructor( manager?: LoadingManager );
 
-	load( url: string, onLoad: ( geometry: BufferGeometry ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
-	parse( data: ArrayBuffer ): Object;
+	load( url: string, onLoad: ( chunks: Array ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ): void;
+	parse( data: ArrayBuffer ): Array;
 
 }
