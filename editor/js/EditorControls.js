@@ -1,10 +1,3 @@
-/**
- * @author qiao / https://github.com/qiao
- * @author mrdoob / http://mrdoob.com
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import * as THREE from '../../build/three.module.js';
 
 function EditorControls( object, domElement ) {

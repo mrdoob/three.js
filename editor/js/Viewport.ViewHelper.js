@@ -1,7 +1,3 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { UIPanel } from './libs/ui.js';
 
 import * as THREE from '../../build/three.module.js';
