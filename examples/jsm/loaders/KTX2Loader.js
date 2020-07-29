@@ -40,6 +40,8 @@ import {
 	sRGBEncoding,
 } from '../../../build/three.module.js';
 
+import { ZSTDDecoder } from '../libs/zstddec.module.js';
+
 // Data Format Descriptor (DFD) constants.
 
 const DFDModel = {
@@ -205,6 +207,9 @@ class KTX2Container {
 
 		this.basisModule = basisModule;
 		this.arrayBuffer = arrayBuffer;
+
+		this.zstd = new ZSTDDecoder();
+		this.zstd.init();
 
 		this.mipmaps = null;
 		this.transcodedFormat = null;
@@ -426,7 +431,9 @@ class KTX2Container {
 
 	}
 
-	initMipmaps( transcoder, config ) {
+	async initMipmaps( transcoder, config ) {
+
+		await this.zstd.init();
 
 		var TranscodeTarget = this.basisModule.TranscodeTarget;
 		var TextureFormat = this.basisModule.TextureFormat;
@@ -515,7 +522,8 @@ class KTX2Container {
 			var numImagesInLevel = 1; // TODO(donmccurdy): Support cubemaps, arrays and 3D.
 			var imageOffsetInLevel = 0;
 			var imageInfo = new ImageInfo( texFormat, levelWidth, levelHeight, level );
-			var levelImageByteLength = imageInfo.numBlocksX * imageInfo.numBlocksY * this.dfd.bytesPlane0;
+			var levelByteLength = this.levels[ level ].byteLength;
+			var levelUncompressedByteLength = this.levels[ level ].uncompressedByteLength;
 
 			for ( var imageIndex = 0; imageIndex < numImagesInLevel; imageIndex ++ ) {
 
@@ -528,11 +536,17 @@ class KTX2Container {
 
 					imageInfo.flags = 0;
 					imageInfo.rgbByteOffset = 0;
-					imageInfo.rgbByteLength = levelImageByteLength;
+					imageInfo.rgbByteLength = levelUncompressedByteLength;
 					imageInfo.alphaByteOffset = 0;
 					imageInfo.alphaByteLength = 0;
 
-					encodedData = new Uint8Array( this.arrayBuffer, this.levels[ level ].byteOffset + imageOffsetInLevel, levelImageByteLength );
+					encodedData = new Uint8Array( this.arrayBuffer, this.levels[ level ].byteOffset + imageOffsetInLevel, levelByteLength );
+
+					if ( this.header.supercompressionScheme === 2 /* ZSTD */ ) {
+
+						encodedData = this.zstd.decode( encodedData, levelUncompressedByteLength );
+
+					}
 
 					result = transcoder.transcodeImage( targetFormat, encodedData, imageInfo, 0, hasAlpha, isVideo );
 
@@ -569,19 +583,13 @@ class KTX2Container {
 				result.transcodedImage.delete();
 
 				mipmaps.push( { data: levelData, width: levelWidth, height: levelHeight } );
-				imageOffsetInLevel += levelImageByteLength;
+				imageOffsetInLevel += levelByteLength;
 
 			}
 
 		}
 
-		return new Promise( function ( resolve, reject ) {
-
-			scope.mipmaps = mipmaps;
-
-			resolve();
-
-		} );
+		scope.mipmaps = mipmaps;
 
 	}
 
