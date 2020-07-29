@@ -1,8 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author tschw
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
