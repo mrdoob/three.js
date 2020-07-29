@@ -315,17 +315,17 @@ Object.assign( Vector4.prototype, {
 			m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
 
 		if ( ( Math.abs( m12 - m21 ) < epsilon ) &&
-		     ( Math.abs( m13 - m31 ) < epsilon ) &&
-		     ( Math.abs( m23 - m32 ) < epsilon ) ) {
+			 ( Math.abs( m13 - m31 ) < epsilon ) &&
+			 ( Math.abs( m23 - m32 ) < epsilon ) ) {
 
 			// singularity found
 			// first check for identity matrix which must have +1 for all terms
 			// in leading diagonal and zero in other terms
 
 			if ( ( Math.abs( m12 + m21 ) < epsilon2 ) &&
-			     ( Math.abs( m13 + m31 ) < epsilon2 ) &&
-			     ( Math.abs( m23 + m32 ) < epsilon2 ) &&
-			     ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
+				 ( Math.abs( m13 + m31 ) < epsilon2 ) &&
+				 ( Math.abs( m23 + m32 ) < epsilon2 ) &&
+				 ( Math.abs( m11 + m22 + m33 - 3 ) < epsilon2 ) ) {
 
 				// this singularity is identity matrix so angle = 0
 
