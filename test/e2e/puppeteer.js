@@ -1,6 +1,3 @@
-/**
- * @author munrocket / https://twitter.com/munrocket_twit
- */
 
 try {
 
