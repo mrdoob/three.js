@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js vr - hand and controller - simple</title>
+		<title>three.js vr - handinput - profiles</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -9,7 +9,8 @@
 	<body>
 
 		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - hand and controller support (profiles)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - handinput - profiles<br/>
+			(Oculus Browser with #webxr-hands flag enabled)
 		</div>
 
 		<script type="module">
@@ -59,11 +60,7 @@
 				controls.update();
 
 				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( {
-					color: 0x222222,
-					roughness: 1.0,
-					metalness: 0.0
-				} );
+				var material = new THREE.MeshStandardMaterial( { color: 0x222222 } );
 				var floor = new THREE.Mesh( geometry, material );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;

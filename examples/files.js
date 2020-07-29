@@ -331,7 +331,7 @@ var files = {
 		"webxr_vr_cubes",
 		"webxr_vr_dragging",
 		"webxr_vr_handinput",
-		"webxr_vr_handinput_simple",
+		"webxr_vr_handinput_cubes",
 		"webxr_vr_handinput_profiles",
 		"webxr_vr_lorenzattractor",
 		"webxr_vr_panorama",
