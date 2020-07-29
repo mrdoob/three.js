@@ -21,22 +21,45 @@ BasicNode.prototype.generate = function ( builder ) {
 
 		var position = this.position ? this.position.analyzeAndFlow( builder, 'v3', { cache: 'position' } ) : undefined;
 
+		builder.addParsCode( [
+			"varying vec3 vViewPosition;",
+
+			"#ifndef FLAT_SHADED",
+
+			" varying vec3 vNormal;",
+
+			"#endif",
+		].join( "\n" ) );
+
 		var output = [
-			"vec3 transformed = position;"
+			"#include <beginnormal_vertex>",
+			"#include <defaultnormal_vertex>",
+
+			"#ifndef FLAT_SHADED", // Normal computed with derivatives when FLAT_SHADED
+
+			" vNormal = normalize( transformedNormal );",
+
+			"#endif",
+
+			"#include <begin_vertex>",
 		];
 
 		if ( position ) {
 
 			output.push(
 				position.code,
-				position.result ? "gl_Position = projectionMatrix * modelViewMatrix * vec4(" + position.result + ", 1.0);" : ''
+				position.result ? "transformed = " + position.result + ";" : ''
 			);
 
-		} else {
-
-			output.push( "gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);" );
-
 		}
+
+		output.push(
+			"#include <project_vertex>",
+
+			" vViewPosition = - mvPosition.xyz;",
+
+			"#include <worldpos_vertex>",
+		);
 
 		code = output.join( "\n" );
 
