@@ -1,7 +1,3 @@
-/**
- * @author arodic / https://github.com/arodic
- */
-
 import {
 	BoxBufferGeometry,
 	BufferGeometry,

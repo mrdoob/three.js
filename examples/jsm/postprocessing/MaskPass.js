@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 
 import { Pass } from "../postprocessing/Pass.js";
 

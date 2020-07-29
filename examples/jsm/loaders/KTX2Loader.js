@@ -1,7 +1,4 @@
 /**
- * @author donmccurdy / https://www.donmccurdy.com
- * @author MarkCallow / https://github.com/MarkCallow
- *
  * References:
  * - KTX: http://github.khronos.org/KTX-Specification/
  * - DFD: https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#basicdescriptor

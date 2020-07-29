@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from './TempNode.js';
 
 function FunctionCallNode( func, inputs ) {

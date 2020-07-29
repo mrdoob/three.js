@@ -1,12 +1,9 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- *
- * Colorify shader
- */
-
 import {
 	Color
 } from "../../../build/three.module.js";
+/**
+ * Colorify shader
+ */
 
 var ColorifyShader = {
 

@@ -1,8 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- * @author martinRenou / https://github.com/martinRenou
- */
-
 import { BasicNode } from './nodes/BasicNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';

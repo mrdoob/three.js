@@ -1,7 +1,3 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
