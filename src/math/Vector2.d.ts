@@ -1,5 +1,6 @@
 import { Matrix3 } from './Matrix3';
 import { BufferAttribute } from './../core/BufferAttribute';
+import { Vector3 } from './Vector3';
 
 /**
  * ( interface Vector<T> )
@@ -428,6 +429,13 @@ export class Vector2 implements Vector {
 	 * @return The provided array-like.
 	 */
 	toArray( array: ArrayLike<number>, offset?: number ): ArrayLike<number>;
+
+	/**
+	 * Creates a new Vector3, containing this vectors x and y coordinate, and the given z value.
+	 * @param z the value to use for z (defaults to 0).
+	 * @return a new Vector3.
+	 */
+	toVector3( z: number ): Vector3;
 
 	/**
 	 * Sets this vector's x and y values from the attribute.

@@ -1,5 +1,6 @@
 import { MathUtils } from './MathUtils.js';
 import { Quaternion } from './Quaternion.js';
+import { Vector2 } from './Vector2.js';
 
 const _vector = new Vector3();
 const _quaternion = new Quaternion();
@@ -692,6 +693,12 @@ Object.assign( Vector3.prototype, {
 		array[ offset + 2 ] = this.z;
 
 		return array;
+
+	},
+
+	toVector2: function () {
+
+		return new Vector2( this.x, this.y );
 
 	},
 

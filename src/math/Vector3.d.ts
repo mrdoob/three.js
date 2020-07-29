@@ -281,6 +281,12 @@ export class Vector3 implements Vector {
 	 */
 	toArray( array: ArrayLike<number>, offset?: number ): ArrayLike<number>;
 
+	/**
+	 * Creates a new Vector2, containing this vectors x and y coordinate.
+	 * @return a new Vector2.
+	 */
+	toVector2(): Vector3;
+
 	fromBufferAttribute(
 		attribute: BufferAttribute,
 		index: number

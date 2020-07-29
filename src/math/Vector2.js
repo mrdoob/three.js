@@ -1,3 +1,5 @@
+import { Vector3 } from './Vector3.js';
+
 function Vector2( x = 0, y = 0 ) {
 
 	this.x = x;
@@ -448,6 +450,12 @@ Object.assign( Vector2.prototype, {
 		array[ offset + 1 ] = this.y;
 
 		return array;
+
+	},
+
+	toVector3: function ( z = 0 ) {
+
+		return new Vector3( this.x, this.y, z );
 
 	},
 
