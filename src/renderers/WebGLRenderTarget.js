@@ -74,9 +74,9 @@ WebGLRenderTarget.prototype = Object.assign( Object.create( EventDispatcher.prot
 
 			newTexture = new Texture( undefined, oldTexture.mapping, oldTexture.wrapS, oldTexture.wrapT, oldTexture.magFilter, oldTexture.minFilter, oldTexture.format, oldTexture.type, oldTexture.anisotropy, oldTexture.encoding );
 
-			this.texture.image = {};
-			this.texture.image.width = this.width;
-			this.texture.image.height = this.height;
+			newTexture.image = {};
+			newTexture.image.width = this.width;
+			newTexture.image.height = this.height;
 
 		} else {
 
