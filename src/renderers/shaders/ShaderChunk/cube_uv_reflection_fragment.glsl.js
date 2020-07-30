@@ -11,39 +11,39 @@ export default /* glsl */`
 // sampling a textureCube (not generally normalized).
 
 float getFace(vec3 direction) {
-		vec3 absDirection = abs(direction);
-		float face = -1.0;
-		if (absDirection.x > absDirection.z) {
-			if (absDirection.x > absDirection.y)
-				face = direction.x > 0.0 ? 0.0 : 3.0;
-			else
-				face = direction.y > 0.0 ? 1.0 : 4.0;
-		} else {
-			if (absDirection.z > absDirection.y)
-				face = direction.z > 0.0 ? 2.0 : 5.0;
-			else
-				face = direction.y > 0.0 ? 1.0 : 4.0;
-		}
-		return face;
+	vec3 absDirection = abs(direction);
+	float face = -1.0;
+	if (absDirection.x > absDirection.z) {
+		if (absDirection.x > absDirection.y)
+			face = direction.x > 0.0 ? 0.0 : 3.0;
+		else
+			face = direction.y > 0.0 ? 1.0 : 4.0;
+	} else {
+		if (absDirection.z > absDirection.y)
+			face = direction.z > 0.0 ? 2.0 : 5.0;
+		else
+			face = direction.y > 0.0 ? 1.0 : 4.0;
+	}
+	return face;
 }
 
 // RH coordinate system; PMREM face-indexing convention
 vec2 getUV(vec3 direction, float face) {
-		vec2 uv;
-		if (face == 0.0) {
-			uv = vec2(direction.z, direction.y) / abs(direction.x); // pos x
-		} else if (face == 1.0) {
-			uv = vec2(-direction.x, -direction.z) / abs(direction.y); // pos y
-		} else if (face == 2.0) {
-			uv = vec2(-direction.x, direction.y) / abs(direction.z); // pos z
-		} else if (face == 3.0) {
-			uv = vec2(-direction.z, direction.y) / abs(direction.x); // neg x
-		} else if (face == 4.0) {
-			uv = vec2(-direction.x, direction.z) / abs(direction.y); // neg y
-		} else {
-			uv = vec2(direction.x, direction.y) / abs(direction.z); // neg z
-		}
-		return 0.5 * (uv + 1.0);
+	vec2 uv;
+	if (face == 0.0) {
+		uv = vec2(direction.z, direction.y) / abs(direction.x); // pos x
+	} else if (face == 1.0) {
+		uv = vec2(-direction.x, -direction.z) / abs(direction.y); // pos y
+	} else if (face == 2.0) {
+		uv = vec2(-direction.x, direction.y) / abs(direction.z); // pos z
+	} else if (face == 3.0) {
+		uv = vec2(-direction.z, direction.y) / abs(direction.x); // neg x
+	} else if (face == 4.0) {
+		uv = vec2(-direction.x, direction.z) / abs(direction.y); // neg y
+	} else {
+		uv = vec2(direction.x, direction.y) / abs(direction.z); // neg z
+	}
+	return 0.5 * (uv + 1.0);
 }
 
 vec3 bilinearCubeUV(sampler2D envMap, vec3 direction, float mipInt) {
