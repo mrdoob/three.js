@@ -22,6 +22,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	let useOffscreenCanvas = false;
 
+	let currentFramebuffer = null;
+
 	try {
 
 		useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
@@ -259,13 +261,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			}
 
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
 
 		} else {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
 			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, textureProperties.__webglTexture, 0 );
-			_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
 
 		}
 
@@ -879,7 +881,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
 
 	}
 
@@ -1045,7 +1047,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
 
 	}
 
@@ -1113,7 +1115,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+					_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
 
 
 				} else {
@@ -1333,6 +1335,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	this.safeSetTexture2D = safeSetTexture2D;
 	this.safeSetTextureCube = safeSetTextureCube;
+
+	Object.defineProperty(this, "currentFramebuffer", { get() { return currentFramebuffer; }, set(newValue) { currentFramebuffer = newValue; } })
 
 }
 

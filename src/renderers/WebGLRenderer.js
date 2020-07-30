@@ -128,7 +128,6 @@ function WebGLRenderer( parameters ) {
 	let _currentActiveCubeFace = 0;
 	let _currentActiveMipmapLevel = 0;
 	let _currentRenderTarget = null;
-	let _currentFramebuffer = null;
 	let _currentMaterialId = - 1;
 
 	let _currentCamera = null;
@@ -1833,10 +1832,10 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		if ( _currentFramebuffer !== framebuffer ) {
+		if ( textures.currentFramebuffer !== framebuffer ) {
 
 			_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
-			_currentFramebuffer = framebuffer;
+			textures.currentFramebuffer = framebuffer;
 
 		}
 
@@ -1874,7 +1873,7 @@ function WebGLRenderer( parameters ) {
 
 			let restore = false;
 
-			if ( framebuffer !== _currentFramebuffer ) {
+			if ( framebuffer !== textures.currentFramebuffer ) {
 
 				_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 
@@ -1924,7 +1923,7 @@ function WebGLRenderer( parameters ) {
 
 				if ( restore ) {
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, _currentFramebuffer );
+					_gl.bindFramebuffer( _gl.FRAMEBUFFER, textures.currentFramebuffer );
 
 				}
 
