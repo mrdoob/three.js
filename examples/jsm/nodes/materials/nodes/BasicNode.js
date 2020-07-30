@@ -54,11 +54,17 @@ BasicNode.prototype.generate = function ( builder ) {
 		}
 
 		output.push(
+			"#include <morphtarget_vertex>",
+			"#include <skinning_vertex>",
 			"#include <project_vertex>",
+			"#include <fog_vertex>",
+			"#include <logdepthbuf_vertex>",
+			"#include <clipping_planes_vertex>",
 
-			" vViewPosition = - mvPosition.xyz;",
+			"	vViewPosition = - mvPosition.xyz;",
 
 			"#include <worldpos_vertex>",
+			"#include <shadowmap_vertex>"
 		);
 
 		code = output.join( "\n" );
@@ -78,7 +84,20 @@ BasicNode.prototype.generate = function ( builder ) {
 
 		builder.requires.transparent = alpha !== undefined;
 
+		builder.addParsCode( [
+			"varying vec3 vViewPosition;",
+
+			"#ifndef FLAT_SHADED",
+
+			" varying vec3 vNormal;",
+
+			"#endif",
+		].join( "\n" ) );
+
 		var output = [
+			// add before: prevent undeclared normal
+			"#include <normal_fragment_begin>",
+
 			color.code,
 		];
 
