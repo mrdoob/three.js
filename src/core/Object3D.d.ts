@@ -143,6 +143,11 @@ export class Object3D extends EventDispatcher {
 	 * Same as customDepthMaterial, but used with PointLight.
 	 */
 	customDistanceMaterial: Material;
+	
+	/**
+	 *
+	 */
+	material: Material | Material[];
 
 	/**
 	 * Used to check whether this or derived classes are Object3Ds. Default is true.
@@ -217,6 +222,21 @@ export class Object3D extends EventDispatcher {
 	 * @param angle	The angle in radians.
 	 */
 	rotateOnWorldAxis( axis: Vector3, angle: number ): this;
+	
+	/**
+	 *
+	 */
+	readonly isMesh: boolean;
+	
+	/**
+	 *
+	 */
+	readonly isLine: boolean;
+	
+	/**
+	 *
+	 */
+	readonly isPoints: boolean;
 
 	/**
 	 *
