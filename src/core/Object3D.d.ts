@@ -147,7 +147,7 @@ export class Object3D extends EventDispatcher {
 	/**
 	 *
 	 */
-	material: Material | Material[];
+	material?: Material | Material[];
 
 	/**
 	 * Used to check whether this or derived classes are Object3Ds. Default is true.
