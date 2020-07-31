@@ -34,23 +34,6 @@ export default QUnit.module( 'Renderers', () => {
 
 			} );
 
-			QUnit.test( "dispose", ( assert ) => {
-
-				var properties = new WebGLProperties();
-				var renderLists = new WebGLRenderLists( properties );
-				var scene = new Scene();
-				var camera = new Camera();
-
-				var list1 = renderLists.get( scene, camera );
-
-				scene.dispose();
-
-				var list2 = renderLists.get( scene, camera );
-
-				assert.ok( list1 !== list2, "New list should be different after disposing of the scene." );
-
-			} );
-
 		} );
 
 
