@@ -33,8 +33,8 @@
 				//
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 100 );
-				camera.position.set( - 1, 1, 2 );
-				camera.lookAt( 0, 0, 0 );
+				camera.position.set( - 1, 1.5, 2 );
+				camera.lookAt( 0, 0.5, 0 );
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x666666 );
@@ -110,7 +110,9 @@
 
 				//
 
-				new OrbitControls( camera, renderer.domElement );
+				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.y = 0.5;
+				controls.update();
 
 			}
 
