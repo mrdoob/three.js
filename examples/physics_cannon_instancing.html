@@ -74,11 +74,13 @@
 				scene.add( mesh );
 
 				var matrix = new THREE.Matrix4();
+				var color = new THREE.Color();
 
 				for ( var i = 0; i < mesh.count; i ++ ) {
 
 					matrix.setPosition( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
 					mesh.setMatrixAt( i, matrix );
+					mesh.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
 
 				}
 
