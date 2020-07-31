@@ -186,7 +186,7 @@ function CannonPhysics() {
 			var delta = ( time - lastTime ) / 1000;
 
 			// console.time( 'world.step' );
-			world.step( frameTime, delta, frameRate );
+			world.step( frameTime, delta );
 			// console.timeEnd( 'world.step' );
 
 		}
