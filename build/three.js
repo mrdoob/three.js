@@ -14666,9 +14666,9 @@
 
 	var color_pars_fragment = "#ifdef USE_COLOR\n\tvarying vec3 vColor;\n#endif";
 
-	var color_pars_vertex = "#ifdef USE_COLOR\n\tvarying vec3 vColor;\n#endif";
+	var color_pars_vertex = "#if defined( USE_COLOR ) || defined( USE_INSTANCING_COLOR )\n\tvarying vec3 vColor;\n#endif";
 
-	var color_vertex = "#ifdef USE_COLOR\n\tvColor.xyz = color.xyz;\n#endif";
+	var color_vertex = "#if defined( USE_COLOR ) || defined( USE_INSTANCING_COLOR )\n\tvColor = vec3( 1.0 );\n#endif\n#ifdef USE_COLOR\n\tvColor.xyz *= color.xyz;\n#endif\n#ifdef USE_INSTANCING_COLOR\n\tvColor.xyz *= instanceColor.xyz;\n#endif";
 
 	var common = "#define PI 3.141592653589793\n#define PI2 6.283185307179586\n#define PI_HALF 1.5707963267948966\n#define RECIPROCAL_PI 0.3183098861837907\n#define RECIPROCAL_PI2 0.15915494309189535\n#define EPSILON 1e-6\n#ifndef saturate\n#define saturate(a) clamp( a, 0.0, 1.0 )\n#endif\n#define whiteComplement(a) ( 1.0 - saturate( a ) )\nfloat pow2( const in float x ) { return x*x; }\nfloat pow3( const in float x ) { return x*x*x; }\nfloat pow4( const in float x ) { float x2 = x*x; return x2*x2; }\nfloat average( const in vec3 color ) { return dot( color, vec3( 0.3333 ) ); }\nhighp float rand( const in vec2 uv ) {\n\tconst highp float a = 12.9898, b = 78.233, c = 43758.5453;\n\thighp float dt = dot( uv.xy, vec2( a,b ) ), sn = mod( dt, PI );\n\treturn fract(sin(sn) * c);\n}\n#ifdef HIGH_PRECISION\n\tfloat precisionSafeLength( vec3 v ) { return length( v ); }\n#else\n\tfloat max3( vec3 v ) { return max( max( v.x, v.y ), v.z ); }\n\tfloat precisionSafeLength( vec3 v ) {\n\t\tfloat maxComponent = max3( abs( v ) );\n\t\treturn length( v / maxComponent ) * maxComponent;\n\t}\n#endif\nstruct IncidentLight {\n\tvec3 color;\n\tvec3 direction;\n\tbool visible;\n};\nstruct ReflectedLight {\n\tvec3 directDiffuse;\n\tvec3 directSpecular;\n\tvec3 indirectDiffuse;\n\tvec3 indirectSpecular;\n};\nstruct GeometricContext {\n\tvec3 position;\n\tvec3 normal;\n\tvec3 viewDir;\n#ifdef CLEARCOAT\n\tvec3 clearcoatNormal;\n#endif\n};\nvec3 transformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );\n}\nvec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {\n\treturn normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );\n}\nvec3 projectOnPlane(in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\tfloat distance = dot( planeNormal, point - pointOnPlane );\n\treturn - distance * planeNormal + point;\n}\nfloat sideOfPlane( in vec3 point, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\treturn sign( dot( point - pointOnPlane, planeNormal ) );\n}\nvec3 linePlaneIntersect( in vec3 pointOnLine, in vec3 lineDirection, in vec3 pointOnPlane, in vec3 planeNormal ) {\n\treturn lineDirection * ( dot( planeNormal, pointOnPlane - pointOnLine ) / dot( planeNormal, lineDirection ) ) + pointOnLine;\n}\nmat3 transposeMat3( const in mat3 m ) {\n\tmat3 tmp;\n\ttmp[ 0 ] = vec3( m[ 0 ].x, m[ 1 ].x, m[ 2 ].x );\n\ttmp[ 1 ] = vec3( m[ 0 ].y, m[ 1 ].y, m[ 2 ].y );\n\ttmp[ 2 ] = vec3( m[ 0 ].z, m[ 1 ].z, m[ 2 ].z );\n\treturn tmp;\n}\nfloat linearToRelativeLuminance( const in vec3 color ) {\n\tvec3 weights = vec3( 0.2126, 0.7152, 0.0722 );\n\treturn dot( weights, color.rgb );\n}\nbool isPerspectiveMatrix( mat4 m ) {\n\treturn m[ 2 ][ 3 ] == - 1.0;\n}\nvec2 equirectUv( in vec3 dir ) {\n\tfloat u = atan( dir.z, dir.x ) * RECIPROCAL_PI2 + 0.5;\n\tfloat v = asin( clamp( dir.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;\n\treturn vec2( u, v );\n}";
 
@@ -15935,6 +15935,23 @@
 						gl.vertexAttribPointer( programAttribute + 2, 4, type$1, false, 64, 32 );
 						gl.vertexAttribPointer( programAttribute + 3, 4, type$1, false, 64, 48 );
 
+					} else if ( name === 'instanceColor' ) {
+
+						var attribute$2 = attributes.get( object.instanceColor );
+
+						// TODO Attribute may not be available on context restore
+
+						if ( attribute$2 === undefined ) { continue; }
+
+						var buffer$2 = attribute$2.buffer;
+						var type$2 = attribute$2.type;
+
+						enableAttributeAndDivisor( programAttribute, 1 );
+
+						gl.bindBuffer( 34962, buffer$2 );
+
+						gl.vertexAttribPointer( programAttribute, 3, type$2, false, 12, 0 );
+
 					} else if ( materialDefaultAttributeValues !== undefined ) {
 
 						var value = materialDefaultAttributeValues[ name ];
@@ -17010,6 +17027,12 @@
 			if ( object.isInstancedMesh ) {
 
 				attributes.update( object.instanceMatrix, 34962 );
+
+				if ( object.instanceColor !== null ) {
+
+					attributes.update( object.instanceColor, 34962 );
+
+				}
 
 			}
 
@@ -18457,6 +18480,8 @@
 				customDefines,
 
 				parameters.instancing ? '#define USE_INSTANCING' : '',
+				parameters.instancingColor ? '#define USE_INSTANCING_COLOR' : '',
+
 				parameters.supportsVertexTextures ? '#define VERTEX_TEXTURES' : '',
 
 				'#define GAMMA_FACTOR ' + gammaFactorDefine,
@@ -18519,7 +18544,13 @@
 
 				'#ifdef USE_INSTANCING',
 
-				' attribute mat4 instanceMatrix;',
+				'	attribute mat4 instanceMatrix;',
+
+				'#endif',
+
+				'#ifdef USE_INSTANCING_COLOR',
+
+				'	attribute vec3 instanceColor;',
 
 				'#endif',
 
@@ -18617,7 +18648,7 @@
 				parameters.transmissionMap ? '#define USE_TRANSMISSIONMAP' : '',
 
 				parameters.vertexTangents ? '#define USE_TANGENT' : '',
-				parameters.vertexColors ? '#define USE_COLOR' : '',
+				parameters.vertexColors || parameters.instancingColor ? '#define USE_COLOR' : '',
 				parameters.vertexUvs ? '#define USE_UV' : '',
 				parameters.uvsVertexOnly ? '#define UVS_VERTEX_ONLY' : '',
 
@@ -18888,7 +18919,7 @@
 		};
 
 		var parameterNames = [
-			"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing",
+			"precision", "isWebGL2", "supportsVertexTextures", "outputEncoding", "instancing", "instancingColor",
 			"map", "mapEncoding", "matcap", "matcapEncoding", "envMap", "envMapMode", "envMapEncoding", "envMapCubeUV",
 			"lightMap", "lightMapEncoding", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "objectSpaceNormalMap", "tangentSpaceNormalMap", "clearcoatMap", "clearcoatRoughnessMap", "clearcoatNormalMap", "displacementMap", "specularMap",
 			"roughnessMap", "metalnessMap", "gradientMap",
@@ -19023,6 +19054,7 @@
 				precision: precision,
 
 				instancing: object.isInstancedMesh === true,
+				instancingColor: object.isInstancedMesh === true && object.instanceColor !== null,
 
 				supportsVertexTextures: vertexTextures,
 				outputEncoding: ( currentRenderTarget !== null ) ? getTextureEncodingFromMap( currentRenderTarget.texture ) : renderer.outputEncoding,
@@ -27727,6 +27759,7 @@
 		Mesh.call( this, geometry, material );
 
 		this.instanceMatrix = new BufferAttribute( new Float32Array( count * 16 ), 16 );
+		this.instanceColor = null;
 
 		this.count = count;
 
@@ -27748,6 +27781,18 @@
 			this.count = source.count;
 
 			return this;
+
+		},
+
+		setColorAt: function ( index, color ) {
+
+			if ( this.instanceColor === null ) {
+
+				this.instanceColor = new BufferAttribute( new Float32Array( this.count * 3 ), 3 );
+
+			}
+
+			color.toArray( this.instanceColor.array, index * 3 );
 
 		},
 
