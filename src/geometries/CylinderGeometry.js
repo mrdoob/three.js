@@ -192,7 +192,8 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	function generateCap( top ) {
 
-		let centerIndexStart, centerIndexEnd;
+		// save the index of the first center vertex
+		const centerIndexStart = index;
 
 		const uv = new Vector2();
 		const vertex = new Vector3();
@@ -201,9 +202,6 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 		const radius = ( top === true ) ? radiusTop : radiusBottom;
 		const sign = ( top === true ) ? 1 : - 1;
-
-		// save the index of the first center vertex
-		centerIndexStart = index;
 
 		// first we generate the center vertex data of the cap.
 		// because the geometry needs one set of uvs per face,
@@ -230,8 +228,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 		}
 
 		// save the index of the last center vertex
-
-		centerIndexEnd = index;
+		const centerIndexEnd = index;
 
 		// now we generate the surrounding vertices, normals and uvs
 

@@ -195,7 +195,7 @@ Object.assign( AnimationAction.prototype, {
 
 	stopFading: function () {
 
-		let weightInterpolant = this._weightInterpolant;
+		const weightInterpolant = this._weightInterpolant;
 
 		if ( weightInterpolant !== null ) {
 
@@ -282,7 +282,7 @@ Object.assign( AnimationAction.prototype, {
 
 	stopWarping: function () {
 
-		let timeScaleInterpolant = this._timeScaleInterpolant;
+		const timeScaleInterpolant = this._timeScaleInterpolant;
 
 		if ( timeScaleInterpolant !== null ) {
 

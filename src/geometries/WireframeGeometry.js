@@ -64,7 +64,7 @@ function WireframeGeometry( geometry ) {
 
 	} else if ( geometry && geometry.isBufferGeometry ) {
 
-		let vertex = new Vector3();
+		const vertex = new Vector3();
 
 		if ( geometry.index !== null ) {
 
