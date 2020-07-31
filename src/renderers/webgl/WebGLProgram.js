@@ -433,15 +433,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		}
 
-		if ( parameters.isWebGL2 === true ) {
-
-			const glslVersionString = '#version 300 es\n';
-
-			prefixVertex = glslVersionString + prefixVertex;
-			prefixFragment = glslVersionString + prefixFragment;
-
-		}
-
 	} else {
 
 		prefixVertex = [
