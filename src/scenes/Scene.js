@@ -55,12 +55,6 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return data;
 
-	},
-
-	dispose: function () {
-
-		this.dispatchEvent( { type: 'dispose' } );
-
 	}
 
 } );
