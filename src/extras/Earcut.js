@@ -329,7 +329,7 @@ function splitEarcut( start, triangles, dim, minX, minY, invSize ) {
 function eliminateHoles( data, holeIndices, outerNode, dim ) {
 
 	const queue = [];
-	let	i, len, start, end, list;
+	let i, len, start, end, list;
 
 	for ( i = 0, len = holeIndices.length; i < len; i ++ ) {
 
@@ -381,9 +381,9 @@ function eliminateHole( hole, outerNode ) {
 function findHoleBridge( hole, outerNode ) {
 
 	let p = outerNode;
-	const	hx = hole.x;
-	const	hy = hole.y;
-	let	qx = - Infinity, m;
+	const hx = hole.x;
+	const hy = hole.y;
+	let qx = - Infinity, m;
 
 	// find a segment intersected by a ray from the hole's leftmost point to the left;
 	// segment's endpoint with lesser x will be potential connection point

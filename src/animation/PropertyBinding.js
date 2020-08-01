@@ -448,9 +448,9 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 		let targetObject = this.node;
 		const parsedPath = this.parsedPath;
 
-		const	objectName = parsedPath.objectName;
-		const	propertyName = parsedPath.propertyName;
-		let	propertyIndex = parsedPath.propertyIndex;
+		const objectName = parsedPath.objectName;
+		const propertyName = parsedPath.propertyName;
+		let propertyIndex = parsedPath.propertyIndex;
 
 		if ( ! targetObject ) {
 
