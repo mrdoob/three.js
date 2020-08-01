@@ -160,7 +160,7 @@ function glconstants() {
 
 			return {
 				code: code,
-				map: { mappings: '' }
+				map: null
 			};
 
 		}
@@ -192,7 +192,7 @@ function glsl() {
 
 			return {
 				code: code,
-				map: { mappings: '' }
+				map: null
 			};
 
 		}
@@ -228,7 +228,7 @@ function bubleCleanup() {
 
 			return {
 				code: code,
-				map: { mappings: '' }
+				map: null
 			};
 
 		}
