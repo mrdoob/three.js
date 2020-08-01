@@ -58,17 +58,10 @@
 				scene.add( plane );
 				physics.addMesh( plane );
 
-				/*
-				function getSize() {
-
-					return Math.random() * 0.1 + 0.05;
-
-				}
-				*/
-
 				var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
-				var material = new THREE.MeshLambertMaterial( /*{ vertexColors: true }*/ );
+				var material = new THREE.MeshLambertMaterial();
 				var mesh = new THREE.InstancedMesh( geometry, material, 200 );
+				mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
@@ -83,18 +76,6 @@
 					mesh.setColorAt( i, color.setHex( 0xffffff * Math.random() ) );
 
 				}
-
-				/*
-				var instanceColors = [];
-
-				for ( var i = 0; i < mesh.count; i ++ ) {
-
-					instanceColors.push( Math.random(), Math.random(), Math.random() );
-
-				}
-
-				mesh.geometry.setAttribute( 'instanceColor', new THREE.InstancedBufferAttribute( new Float32Array( instanceColors ), 3 ) );
-				*/
 
 				physics.addMesh( mesh, 1 );
 
