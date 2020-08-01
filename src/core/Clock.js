@@ -1,18 +1,18 @@
-function Clock( autoStart ) {
+class Clock {
 
-	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
+	constructor( autoStart ) {
 
-	this.startTime = 0;
-	this.oldTime = 0;
-	this.elapsedTime = 0;
+		this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
 
-	this.running = false;
+		this.startTime = 0;
+		this.oldTime = 0;
+		this.elapsedTime = 0;
 
-}
+		this.running = false;
 
-Object.assign( Clock.prototype, {
+	}
 
-	start: function () {
+	start() {
 
 		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
 
@@ -20,24 +20,24 @@ Object.assign( Clock.prototype, {
 		this.elapsedTime = 0;
 		this.running = true;
 
-	},
+	}
 
-	stop: function () {
+	stop() {
 
 		this.getElapsedTime();
 		this.running = false;
 		this.autoStart = false;
 
-	},
+	}
 
-	getElapsedTime: function () {
+	getElapsedTime() {
 
 		this.getDelta();
 		return this.elapsedTime;
 
-	},
+	}
 
-	getDelta: function () {
+	getDelta() {
 
 		let diff = 0;
 
@@ -63,7 +63,6 @@ Object.assign( Clock.prototype, {
 
 	}
 
-} );
-
+}
 
 export { Clock };
