@@ -445,12 +445,12 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 	// create getter / setter pair for a property in the scene graph
 	bind: function () {
 
-		let targetObject = this.node,
-			parsedPath = this.parsedPath,
+		let targetObject = this.node;
+		const parsedPath = this.parsedPath;
 
-			objectName = parsedPath.objectName,
-			propertyName = parsedPath.propertyName,
-			propertyIndex = parsedPath.propertyIndex;
+		const objectName = parsedPath.objectName;
+		const propertyName = parsedPath.propertyName;
+		let propertyIndex = parsedPath.propertyIndex;
 
 		if ( ! targetObject ) {
 

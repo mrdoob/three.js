@@ -28,7 +28,7 @@ Object.assign( WebXRController.prototype, {
 				for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
 
 					// The transform of this joint will be updated with the joint pose on each frame
-					let joint = new Group();
+					const joint = new Group();
 					joint.matrixAutoUpdate = false;
 					joint.visible = false;
 					this._hand.joints.push( joint );
@@ -144,7 +144,7 @@ Object.assign( WebXRController.prototype, {
 					if ( inputSource.hand[ i ] ) {
 
 						// Update the joints groups with the XRJoint poses
-						let jointPose = frame.getJointPose( inputSource.hand[ i ], referenceSpace );
+						const jointPose = frame.getJointPose( inputSource.hand[ i ], referenceSpace );
 						const joint = hand.joints[ i ];
 
 						if ( jointPose !== null ) {

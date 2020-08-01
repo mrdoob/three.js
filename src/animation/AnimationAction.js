@@ -196,7 +196,7 @@ class AnimationAction {
 
 	stopFading() {
 
-		let weightInterpolant = this._weightInterpolant;
+		const weightInterpolant = this._weightInterpolant;
 
 		if ( weightInterpolant !== null ) {
 
@@ -283,7 +283,7 @@ class AnimationAction {
 
 	stopWarping() {
 
-		let timeScaleInterpolant = this._timeScaleInterpolant;
+		const timeScaleInterpolant = this._timeScaleInterpolant;
 
 		if ( timeScaleInterpolant !== null ) {
 
