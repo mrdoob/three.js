@@ -38,6 +38,10 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	this.texture.format = RGBAFormat; // see #18859
 	this.texture.encoding = texture.encoding;
 
+	this.texture.generateMipmaps = texture.generateMipmaps;
+	this.texture.minFilter = texture.minFilter;
+	this.texture.magFilter = texture.magFilter;
+
 	const shader = {
 
 		uniforms: {
