@@ -193,11 +193,14 @@
 							if ( box.intersectsSphere( sphere ) ) {
 
 								child.material.emissive.b = 1;
-								gamepad.hapticActuators[ 0 ].pulse( child.userData.index / group.children.length, 100 );
+								const intensity = child.userData.index / group.children.length;
+								child.scale.setScalar( 1 + Math.random() * 0.1 * intensity );
+								gamepad.hapticActuators[ 0 ].pulse( intensity, 100 );
 
 							} else {
 
 								child.material.emissive.b = 0;
+								child.scale.setScalar( 1 );
 
 							}
 
