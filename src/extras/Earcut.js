@@ -423,7 +423,7 @@ function findHoleBridge( hole, outerNode ) {
 	const stop = m,
 		mx = m.x,
 		my = m.y;
-	let	tanMin = Infinity, tan;
+	let tanMin = Infinity, tan;
 
 	p = m;
 
@@ -676,7 +676,7 @@ function middleInside( a, b ) {
 
 	let p = a,
 		inside = false;
-	const	px = ( a.x + b.x ) / 2,
+	const px = ( a.x + b.x ) / 2,
 		py = ( a.y + b.y ) / 2;
 	do {
 
