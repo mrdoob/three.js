@@ -26,10 +26,41 @@
 			var box = new THREE.Box3();
 
 			var controllers = [];
+			var oscillators = [];
 			var controls, group;
+			var audioCtx = null;
 
 			init();
 			animate();
+
+			function initAudio() {
+
+				if ( audioCtx !== null ) {
+
+					return;
+
+				}
+
+				audioCtx = new ( window.AudioContext || window.webkitAudioContext )();
+				function createOscillator() {
+
+					let oscillator = audioCtx.createOscillator();
+					const real = Array.from( { length: 8192 }, ( _, n ) => (
+						n === 0 ?
+							0 :
+							4 / ( n * Math.PI ) * Math.sin( Math.PI * n * 0.18 )
+					) );
+					const imag = real.map( () => 0 );
+					oscillator.setPeriodicWave( audioCtx.createPeriodicWave( Float32Array.from( real ), Float32Array.from( imag ) ) );
+					oscillator.start();
+					return oscillator;
+
+				}
+
+				oscillators.push( createOscillator() );
+				oscillators.push( createOscillator() );
+				window.oscillators = oscillators;
+			}
 
 			function init() {
 
@@ -75,12 +106,13 @@
 
 				for ( var i = 0; i < 10; i ++ ) {
 
+					const intensity = ( i + 1 ) / 10;
 					const w = 0.1;
 					const h = 0.1;
 					const minH = 1;
 					var geometry = new THREE.BoxBufferGeometry( w, h * i + minH, w );
 					var material = new THREE.MeshStandardMaterial( {
-						color: Math.random() * 0xffffff,
+						color: new THREE.Color( intensity, 0.1, 0.1 ),
 						roughness: 0.7,
 						metalness: 0.0
 					} );
@@ -90,7 +122,8 @@
 					object.castShadow = true;
 					object.receiveShadow = true;
 					object.userData = {
-						index: i + 1
+						index: i + 1,
+						intensity: intensity
 					};
 
 					group.add( object );
@@ -108,6 +141,12 @@
 				container.appendChild( renderer.domElement );
 
 				document.body.appendChild( VRButton.createButton( renderer ) );
+
+				document.getElementById( "VRButton" ).addEventListener( "click", () => {
+
+					initAudio();
+
+				} );
 
 				// controllers
 
@@ -141,7 +180,9 @@
 
 				controllers.push( {
 					gamepad: evt.data.gamepad,
-					grip: evt.target
+					grip: evt.target,
+					colliding: false,
+					playing: false
 				} );
 
 			}
@@ -178,6 +219,8 @@
 
 				for ( var g = 0; g < controllers.length; g ++ ) {
 
+					controllers[ g ].colliding = false;
+
 					const { grip, gamepad } = controllers[ g ];
 					var sphere = {
 						radius: 0.03,
@@ -196,6 +239,8 @@
 								const intensity = child.userData.index / group.children.length;
 								child.scale.setScalar( 1 + Math.random() * 0.1 * intensity );
 								gamepad.hapticActuators[ 0 ].pulse( intensity, 100 );
+								oscillators[ g ].frequency.value = 100 + intensity * 60;
+								controllers[ g ].colliding = true;
 
 							} else {
 
@@ -203,6 +248,26 @@
 								child.scale.setScalar( 1 );
 
 							}
+
+						}
+
+					}
+
+					if ( controllers[ g ].colliding ) {
+
+						if ( ! controllers[ g ].playing ) {
+
+							controllers[ g ].playing = true;
+							oscillators[ g ].connect( audioCtx.destination );
+
+						}
+
+					} else {
+
+						if ( controllers[ g ].playing ) {
+
+							controllers[ g ].playing = false;
+							oscillators[ g ].disconnect( audioCtx.destination );
 
 						}
 
