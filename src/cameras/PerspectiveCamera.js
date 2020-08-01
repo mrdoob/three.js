@@ -9,6 +9,8 @@ function PerspectiveCamera( fov, aspect, near, far ) {
 	this.type = 'PerspectiveCamera';
 
 	this.fov = fov !== undefined ? fov : 50;
+	this.fovMode = 'auto';
+
 	this.zoom = 1;
 
 	this.near = near !== undefined ? near : 0.1;
@@ -16,6 +18,7 @@ function PerspectiveCamera( fov, aspect, near, far ) {
 	this.focus = 10;
 
 	this.aspect = aspect !== undefined ? aspect : 1;
+
 	this.view = null;
 
 	this.filmGauge = 35;	// width of the film (default in millimeters)
@@ -36,6 +39,8 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		Camera.prototype.copy.call( this, source, recursive );
 
 		this.fov = source.fov;
+		this.fovMode = source.fovMode;
+
 		this.zoom = source.zoom;
 
 		this.near = source.near;
@@ -43,6 +48,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		this.focus = source.focus;
 
 		this.aspect = source.aspect;
+
 		this.view = source.view === null ? null : Object.assign( {}, source.view );
 
 		this.filmGauge = source.filmGauge;
@@ -181,10 +187,21 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	updateProjectionMatrix: function () {
 
+		const aspect = this.aspect;
+		const fovMode = this.fovMode;
+
+		let fov = this.fov;
+
+		if ( fovMode === 'horizontal' || ( fovMode === 'auto' && aspect < 1 ) ) {
+
+			fov = Math.atan( Math.tan( fov * Math.PI / 360 ) / aspect ) * 360 / Math.PI;
+
+		}
+
 		let near = this.near,
-			top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom,
+			top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * fov ) / this.zoom,
 			height = 2 * top,
-			width = this.aspect * height,
+			width = aspect * height,
 			left = - 0.5 * width,
 			view = this.view;
 
@@ -214,6 +231,8 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 		const data = Object3D.prototype.toJSON.call( this, meta );
 
 		data.object.fov = this.fov;
+		data.object.fovMode = this.fovMode;
+
 		data.object.zoom = this.zoom;
 
 		data.object.near = this.near;
