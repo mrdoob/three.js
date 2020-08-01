@@ -203,26 +203,29 @@ function glsl() {
 
 function bubleCleanup() {
 
-	const begin1 = /var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n/;
-	const end1 = /if \( (\w+) \) (\w+)\.__proto__ = (\w+);\s+(\w+)\.prototype = Object\.create\( (\w+) && (\w+)\.prototype \);\s+(\w+)\.prototype\.constructor = (\w+);\s+return (\w+);\s+}\((\w+)\)\)/;
+	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
+	const wrappedClass = /(var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n).*(return \2;\s+}\(\3\)\);\n)/s;
+	const unwrap = function ( match, wrapperStart, klass, parentClass, wrapperEnd ) {
+
+		return match
+			.replace( wrapperStart, '' )
+			.replace( `if ( ${parentClass} ) ${klass}.__proto__ = ${parentClass};`, '' )
+			.replace(
+				`${klass}.prototype = Object.create( ${parentClass} && ${parentClass}.prototype );`,
+				`${klass}.prototype = Object.create( ${parentClass}.prototype );`
+			)
+			.replace( wrapperEnd, '' )
+			.replace( danglingTabs, '' );
+
+	};
 
 	return {
 
 		transform( code ) {
 
-			while ( begin1.test( code ) ) {
+			while ( wrappedClass.test( code ) ) {
 
-				code = code.replace( begin1, function () {
-
-					return '';
-
-				} );
-
-				code = code.replace( end1, function ( match, p1, p2 ) {
-
-					return `${p2}.prototype = Object.create( ${p1}.prototype );\n\t${p2}.prototype.constructor = ${p2};\n`;
-
-				} );
+				code = code.replace( wrappedClass, unwrap );
 
 			}
 
