@@ -1018,7 +1018,6 @@ THREE.MMDLoader = ( function () {
 				 *
 				 * MMD         MeshToonMaterial
 				 * diffuse  -  color
-				 * specular -  specular
 				 * ambient  -  emissive * a
 				 *               (a = 1.0 without map texture or 0.2 with map texture)
 				 *
@@ -1027,9 +1026,7 @@ THREE.MMDLoader = ( function () {
 				 */
 				params.color = new THREE.Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
-				params.specular = new THREE.Color().fromArray( material.specular );
 				params.emissive = new THREE.Color().fromArray( material.ambient );
-				params.shininess = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 				params.transparent = params.opacity !== 1.0;
 
 				//

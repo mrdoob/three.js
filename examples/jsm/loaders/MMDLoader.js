@@ -1051,7 +1051,6 @@ var MMDLoader = ( function () {
 				 *
 				 * MMD         MeshToonMaterial
 				 * diffuse  -  color
-				 * specular -  specular
 				 * ambient  -  emissive * a
 				 *               (a = 1.0 without map texture or 0.2 with map texture)
 				 *
@@ -1060,9 +1059,7 @@ var MMDLoader = ( function () {
 				 */
 				params.color = new Color().fromArray( material.diffuse );
 				params.opacity = material.diffuse[ 3 ];
-				params.specular = new Color().fromArray( material.specular );
 				params.emissive = new Color().fromArray( material.ambient );
-				params.shininess = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 				params.transparent = params.opacity !== 1.0;
 
 				//
