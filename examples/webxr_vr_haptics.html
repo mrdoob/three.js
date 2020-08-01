@@ -215,7 +215,7 @@
 
 			}
 
-			function render() {
+			function handleCollisions() {
 
 				for ( var g = 0; g < controllers.length; g ++ ) {
 
@@ -274,6 +274,12 @@
 					}
 
 				}
+
+			}
+
+			function render() {
+
+				handleCollisions();
 
 				renderer.render( scene, camera );
 
