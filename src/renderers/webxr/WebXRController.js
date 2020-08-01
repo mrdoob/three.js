@@ -135,7 +135,7 @@ Object.assign( WebXRController.prototype, {
 
 		if ( inputSource ) {
 
-			if ( inputSource.hand ) {
+			if ( hand && inputSource.hand ) {
 
 				handPose = true;
 
