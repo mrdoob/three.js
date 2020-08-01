@@ -113,7 +113,7 @@ function WebGLClipping() {
 	function projectPlanes( planes, camera, dstOffset, skipTransform ) {
 
 		const nPlanes = planes !== null ? planes.length : 0;
-		let	dstArray = null;
+		let dstArray = null;
 
 		if ( nPlanes !== 0 ) {
 

@@ -522,7 +522,7 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 		const clipUuid = clipObject !== null ? clipObject.uuid : clip;
 
 		const actionsForClip = this._actionsByClip[ clipUuid ];
-		let	prototypeAction = null;
+		let prototypeAction = null;
 
 		if ( blendMode === undefined ) {
 

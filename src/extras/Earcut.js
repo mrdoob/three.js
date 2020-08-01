@@ -9,9 +9,9 @@ const Earcut = {
 		dim = dim || 2;
 
 		const hasHoles = holeIndices && holeIndices.length;
-		const	outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
-		let	outerNode = linkedList( data, 0, outerLen, dim, true );
-		const	triangles = [];
+		const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
+		let outerNode = linkedList( data, 0, outerLen, dim, true );
+		const triangles = [];
 
 		if ( ! outerNode || outerNode.next === outerNode.prev ) return triangles;
 

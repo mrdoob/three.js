@@ -314,8 +314,8 @@ Object.assign( AnimationObjectGroup.prototype, {
 		// according to the contained objects in the group
 
 		const indicesByPath = this._bindingsIndicesByPath;
-		let	index = indicesByPath[ path ];
-		const	bindings = this._bindings;
+		let index = indicesByPath[ path ];
+		const bindings = this._bindings;
 
 		if ( index !== undefined ) return bindings[ index ];
 

@@ -641,7 +641,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 		}
 
 		let normalMatrix;
-		const	vertexOffset = this.vertices.length,
+		const vertexOffset = this.vertices.length,
 			vertices1 = this.vertices,
 			vertices2 = geometry.vertices,
 			faces1 = this.faces,
@@ -685,7 +685,7 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 			const face = faces2[ i ];
 			let normal, color;
-			const	faceVertexNormals = face.vertexNormals,
+			const faceVertexNormals = face.vertexNormals,
 				faceVertexColors = face.vertexColors;
 
 			const faceCopy = new Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );

@@ -75,7 +75,7 @@ function flatten( array, nBlocks, blockSize ) {
 	// see http://jacksondunstan.com/articles/983
 
 	const n = nBlocks * blockSize;
-	let	r = arrayCacheF32[ n ];
+	let r = arrayCacheF32[ n ];
 
 	if ( r === undefined ) {
 
@@ -781,7 +781,7 @@ function parseUniform( activeInfo, addr, container ) {
 			matchEnd = RePathPart.lastIndex;
 
 		let id = match[ 1 ];
-		const	idIsIndex = match[ 2 ] === ']',
+		const idIsIndex = match[ 2 ] === ']',
 			subscript = match[ 3 ];
 
 		if ( idIsIndex ) id = id | 0; // convert to integer
