@@ -2608,10 +2608,8 @@ Object.assign( Quaternion, {
 
 		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
 
-			let s = 1 - t,
-
-				cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
-
+			let s = 1 - t;
+			const cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
 				dir = ( cos >= 0 ? 1 : - 1 ),
 				sqrSin = 1 - cos * cos;
 
@@ -4693,8 +4691,8 @@ Object.assign( Matrix4.prototype, {
 		const te = this.elements;
 
 		let sx = _v1.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-		let sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-		let sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
+		const sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
+		const sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
 		// if determine is negative, we need to invert one scale
 		const det = this.determinant();
@@ -5185,57 +5183,57 @@ Object.assign( Euler.prototype, {
 
 } );
 
-function Layers() {
+class Layers {
 
-	this.mask = 1 | 0;
+	constructor() {
 
-}
+		this.mask = 1 | 0;
 
-Object.assign( Layers.prototype, {
+	}
 
-	set: function ( channel ) {
+	set( channel ) {
 
 		this.mask = 1 << channel | 0;
 
-	},
+	}
 
-	enable: function ( channel ) {
+	enable( channel ) {
 
 		this.mask |= 1 << channel | 0;
 
-	},
+	}
 
-	enableAll: function () {
+	enableAll() {
 
 		this.mask = 0xffffffff | 0;
 
-	},
+	}
 
-	toggle: function ( channel ) {
+	toggle( channel ) {
 
 		this.mask ^= 1 << channel | 0;
 
-	},
+	}
 
-	disable: function ( channel ) {
+	disable( channel ) {
 
 		this.mask &= ~ ( 1 << channel | 0 );
 
-	},
+	}
 
-	disableAll: function () {
+	disableAll() {
 
 		this.mask = 0;
 
-	},
+	}
 
-	test: function ( layers ) {
+	test( layers ) {
 
 		return ( this.mask & layers.mask ) !== 0;
 
 	}
 
-} );
+}
 
 let _object3DId = 0;
 
@@ -6885,40 +6883,40 @@ const _edge1 = new Vector3();
 const _edge2 = new Vector3();
 const _normal = new Vector3();
 
-function Ray( origin, direction ) {
+class Ray {
 
-	this.origin = ( origin !== undefined ) ? origin : new Vector3();
-	this.direction = ( direction !== undefined ) ? direction : new Vector3( 0, 0, - 1 );
+	constructor( origin, direction ) {
 
-}
+		this.origin = ( origin !== undefined ) ? origin : new Vector3();
+		this.direction = ( direction !== undefined ) ? direction : new Vector3( 0, 0, - 1 );
 
-Object.assign( Ray.prototype, {
+	}
 
-	set: function ( origin, direction ) {
+	set( origin, direction ) {
 
 		this.origin.copy( origin );
 		this.direction.copy( direction );
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	copy: function ( ray ) {
+	copy( ray ) {
 
 		this.origin.copy( ray.origin );
 		this.direction.copy( ray.direction );
 
 		return this;
 
-	},
+	}
 
-	at: function ( t, target ) {
+	at( t, target ) {
 
 		if ( target === undefined ) {
 
@@ -6929,25 +6927,25 @@ Object.assign( Ray.prototype, {
 
 		return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
-	},
+	}
 
-	lookAt: function ( v ) {
+	lookAt( v ) {
 
 		this.direction.copy( v ).sub( this.origin ).normalize();
 
 		return this;
 
-	},
+	}
 
-	recast: function ( t ) {
+	recast( t ) {
 
 		this.origin.copy( this.at( t, _vector$2 ) );
 
 		return this;
 
-	},
+	}
 
-	closestPointToPoint: function ( point, target ) {
+	closestPointToPoint( point, target ) {
 
 		if ( target === undefined ) {
 
@@ -6968,15 +6966,15 @@ Object.assign( Ray.prototype, {
 
 		return target.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-	},
+	}
 
-	distanceToPoint: function ( point ) {
+	distanceToPoint( point ) {
 
 		return Math.sqrt( this.distanceSqToPoint( point ) );
 
-	},
+	}
 
-	distanceSqToPoint: function ( point ) {
+	distanceSqToPoint( point ) {
 
 		const directionDistance = _vector$2.subVectors( point, this.origin ).dot( this.direction );
 
@@ -6992,9 +6990,9 @@ Object.assign( Ray.prototype, {
 
 		return _vector$2.distanceToSquared( point );
 
-	},
+	}
 
-	distanceSqToSegment: function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+	distanceSqToSegment( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
 		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
 		// It returns the min distance between the ray and the segment
@@ -7111,9 +7109,9 @@ Object.assign( Ray.prototype, {
 
 		return sqrDist;
 
-	},
+	}
 
-	intersectSphere: function ( sphere, target ) {
+	intersectSphere( sphere, target ) {
 
 		_vector$2.subVectors( sphere.center, this.origin );
 		const tca = _vector$2.dot( this.direction );
@@ -7141,15 +7139,15 @@ Object.assign( Ray.prototype, {
 		// else t0 is in front of the ray, so return the first collision point scaled by t0
 		return this.at( t0, target );
 
-	},
+	}
 
-	intersectsSphere: function ( sphere ) {
+	intersectsSphere( sphere ) {
 
 		return this.distanceSqToPoint( sphere.center ) <= ( sphere.radius * sphere.radius );
 
-	},
+	}
 
-	distanceToPlane: function ( plane ) {
+	distanceToPlane( plane ) {
 
 		const denominator = plane.normal.dot( this.direction );
 
@@ -7174,9 +7172,9 @@ Object.assign( Ray.prototype, {
 
 		return t >= 0 ? t : null;
 
-	},
+	}
 
-	intersectPlane: function ( plane, target ) {
+	intersectPlane( plane, target ) {
 
 		const t = this.distanceToPlane( plane );
 
@@ -7188,9 +7186,9 @@ Object.assign( Ray.prototype, {
 
 		return this.at( t, target );
 
-	},
+	}
 
-	intersectsPlane: function ( plane ) {
+	intersectsPlane( plane ) {
 
 		// check if the ray lies on the plane first
 
@@ -7214,9 +7212,9 @@ Object.assign( Ray.prototype, {
 
 		return false;
 
-	},
+	}
 
-	intersectBox: function ( box, target ) {
+	intersectBox( box, target ) {
 
 		let tmin, tmax, tymin, tymax, tzmin, tzmax;
 
@@ -7283,15 +7281,15 @@ Object.assign( Ray.prototype, {
 
 		return this.at( tmin >= 0 ? tmin : tmax, target );
 
-	},
+	}
 
-	intersectsBox: function ( box ) {
+	intersectsBox( box ) {
 
 		return this.intersectBox( box, _vector$2 ) !== null;
 
-	},
+	}
 
-	intersectTriangle: function ( a, b, c, backfaceCulling, target ) {
+	intersectTriangle( a, b, c, backfaceCulling, target ) {
 
 		// Compute the offset origin, edges, and normal.
 
@@ -7364,24 +7362,24 @@ Object.assign( Ray.prototype, {
 		// Ray intersects triangle.
 		return this.at( QdN / DdN, target );
 
-	},
+	}
 
-	applyMatrix4: function ( matrix4 ) {
+	applyMatrix4( matrix4 ) {
 
 		this.origin.applyMatrix4( matrix4 );
 		this.direction.transformDirection( matrix4 );
 
 		return this;
 
-	},
+	}
 
-	equals: function ( ray ) {
+	equals( ray ) {
 
 		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
 
 	}
 
-} );
+}
 
 const _vector1 = new Vector3();
 const _vector2 = new Vector3();
@@ -9636,39 +9634,39 @@ function Float64BufferAttribute( array, itemSize, normalized ) {
 Float64BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 Float64BufferAttribute.prototype.constructor = Float64BufferAttribute;
 
-function DirectGeometry() {
+class DirectGeometry {
 
-	this.vertices = [];
-	this.normals = [];
-	this.colors = [];
-	this.uvs = [];
-	this.uvs2 = [];
+	constructor() {
 
-	this.groups = [];
+		this.vertices = [];
+		this.normals = [];
+		this.colors = [];
+		this.uvs = [];
+		this.uvs2 = [];
 
-	this.morphTargets = {};
+		this.groups = [];
 
-	this.skinWeights = [];
-	this.skinIndices = [];
+		this.morphTargets = {};
 
-	// this.lineDistances = [];
+		this.skinWeights = [];
+		this.skinIndices = [];
 
-	this.boundingBox = null;
-	this.boundingSphere = null;
+		// this.lineDistances = [];
 
-	// update flags
+		this.boundingBox = null;
+		this.boundingSphere = null;
 
-	this.verticesNeedUpdate = false;
-	this.normalsNeedUpdate = false;
-	this.colorsNeedUpdate = false;
-	this.uvsNeedUpdate = false;
-	this.groupsNeedUpdate = false;
+		// update flags
 
-}
+		this.verticesNeedUpdate = false;
+		this.normalsNeedUpdate = false;
+		this.colorsNeedUpdate = false;
+		this.uvsNeedUpdate = false;
+		this.groupsNeedUpdate = false;
 
-Object.assign( DirectGeometry.prototype, {
+	}
 
-	computeGroups: function ( geometry ) {
+	computeGroups( geometry ) {
 
 		const groups = [];
 
@@ -9712,9 +9710,9 @@ Object.assign( DirectGeometry.prototype, {
 
 		this.groups = groups;
 
-	},
+	}
 
-	fromGeometry: function ( geometry ) {
+	fromGeometry( geometry ) {
 
 		const faces = geometry.faces;
 		const vertices = geometry.vertices;
@@ -9913,7 +9911,7 @@ Object.assign( DirectGeometry.prototype, {
 
 	}
 
-} );
+}
 
 function arrayMax( array ) {
 
@@ -12213,8 +12211,8 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		}
 
-		let normalMatrix,
-			vertexOffset = this.vertices.length,
+		let normalMatrix;
+		const vertexOffset = this.vertices.length,
 			vertices1 = this.vertices,
 			vertices2 = geometry.vertices,
 			faces1 = this.faces,
@@ -12256,11 +12254,12 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		for ( let i = 0, il = faces2.length; i < il; i ++ ) {
 
-			let face = faces2[ i ], faceCopy, normal, color,
-				faceVertexNormals = face.vertexNormals,
+			const face = faces2[ i ];
+			let normal, color;
+			const faceVertexNormals = face.vertexNormals,
 				faceVertexColors = face.vertexColors;
 
-			faceCopy = new Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
+			const faceCopy = new Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 			faceCopy.normal.copy( face.normal );
 
 			if ( normalMatrix !== undefined ) {
@@ -13658,12 +13657,12 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	updateProjectionMatrix: function () {
 
-		let near = this.near,
-			top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom,
-			height = 2 * top,
-			width = this.aspect * height,
-			left = - 0.5 * width,
-			view = this.view;
+		const near = this.near;
+		let top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
+		let height = 2 * top;
+		let width = this.aspect * height;
+		let left = - 0.5 * width;
+		const view = this.view;
 
 		if ( this.view !== null && this.view.enabled ) {
 
@@ -16397,8 +16396,8 @@ function WebGLClipping() {
 
 	function projectPlanes( planes, camera, dstOffset, skipTransform ) {
 
-		let nPlanes = planes !== null ? planes.length : 0,
-			dstArray = null;
+		const nPlanes = planes !== null ? planes.length : 0;
+		let dstArray = null;
 
 		if ( nPlanes !== 0 ) {
 
@@ -17215,8 +17214,8 @@ function flatten( array, nBlocks, blockSize ) {
 	// unoptimized: ! isNaN( firstElem )
 	// see http://jacksondunstan.com/articles/983
 
-	let n = nBlocks * blockSize,
-		r = arrayCacheF32[ n ];
+	const n = nBlocks * blockSize;
+	let r = arrayCacheF32[ n ];
 
 	if ( r === undefined ) {
 
@@ -17852,7 +17851,7 @@ function PureArrayUniform( id, activeInfo, addr ) {
 
 PureArrayUniform.prototype.updateCache = function ( data ) {
 
-	let cache = this.cache;
+	const cache = this.cache;
 
 	if ( data instanceof Float32Array && cache.length !== data.length ) {
 
@@ -17921,8 +17920,8 @@ function parseUniform( activeInfo, addr, container ) {
 		const match = RePathPart.exec( path ),
 			matchEnd = RePathPart.lastIndex;
 
-		let id = match[ 1 ],
-			idIsIndex = match[ 2 ] === ']',
+		let id = match[ 1 ];
+		const idIsIndex = match[ 2 ] === ']',
 			subscript = match[ 3 ];
 
 		if ( idIsIndex ) id = id | 0; // convert to integer
@@ -23159,7 +23158,7 @@ Object.assign( WebXRController.prototype, {
 				for ( let i = 0; i <= window.XRHand.LITTLE_PHALANX_TIP; i ++ ) {
 
 					// The transform of this joint will be updated with the joint pose on each frame
-					let joint = new Group();
+					const joint = new Group();
 					joint.matrixAutoUpdate = false;
 					joint.visible = false;
 					this._hand.joints.push( joint );
@@ -23275,7 +23274,7 @@ Object.assign( WebXRController.prototype, {
 					if ( inputSource.hand[ i ] ) {
 
 						// Update the joints groups with the XRJoint poses
-						let jointPose = frame.getJointPose( inputSource.hand[ i ], referenceSpace );
+						const jointPose = frame.getJointPose( inputSource.hand[ i ], referenceSpace );
 						const joint = hand.joints[ i ];
 
 						if ( jointPose !== null ) {
@@ -25389,7 +25388,7 @@ function WebGLRenderer( parameters ) {
 
 		scene.traverse( function ( object ) {
 
-			let material = object.material;
+			const material = object.material;
 
 			if ( material ) {
 
@@ -25397,7 +25396,7 @@ function WebGLRenderer( parameters ) {
 
 					for ( let i = 0; i < material.length; i ++ ) {
 
-						let material2 = material[ i ];
+						const material2 = material[ i ];
 
 						if ( compiled.has( material2 ) === false ) {
 
@@ -28700,7 +28699,7 @@ function WireframeGeometry( geometry ) {
 
 	} else if ( geometry && geometry.isBufferGeometry ) {
 
-		let vertex = new Vector3();
+		const vertex = new Vector3();
 
 		if ( geometry.index !== null ) {
 
@@ -30032,10 +30031,10 @@ const Earcut = {
 
 		dim = dim || 2;
 
-		let hasHoles = holeIndices && holeIndices.length,
-			outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length,
-			outerNode = linkedList( data, 0, outerLen, dim, true ),
-			triangles = [];
+		const hasHoles = holeIndices && holeIndices.length;
+		const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
+		let outerNode = linkedList( data, 0, outerLen, dim, true );
+		const triangles = [];
 
 		if ( ! outerNode || outerNode.next === outerNode.prev ) return triangles;
 
@@ -30201,7 +30200,7 @@ function earcutLinked( ear, triangles, dim, minX, minY, invSize, pass ) {
 // check whether a polygon node forms a valid ear with adjacent nodes
 function isEar( ear ) {
 
-	let a = ear.prev,
+	const a = ear.prev,
 		b = ear,
 		c = ear.next;
 
@@ -30224,20 +30223,20 @@ function isEar( ear ) {
 
 function isEarHashed( ear, minX, minY, invSize ) {
 
-	let a = ear.prev,
+	const a = ear.prev,
 		b = ear,
 		c = ear.next;
 
 	if ( area( a, b, c ) >= 0 ) return false; // reflex, can't be an ear
 
 	// triangle bbox; min & max are calculated like this for speed
-	let minTX = a.x < b.x ? ( a.x < c.x ? a.x : c.x ) : ( b.x < c.x ? b.x : c.x ),
+	const minTX = a.x < b.x ? ( a.x < c.x ? a.x : c.x ) : ( b.x < c.x ? b.x : c.x ),
 		minTY = a.y < b.y ? ( a.y < c.y ? a.y : c.y ) : ( b.y < c.y ? b.y : c.y ),
 		maxTX = a.x > b.x ? ( a.x > c.x ? a.x : c.x ) : ( b.x > c.x ? b.x : c.x ),
 		maxTY = a.y > b.y ? ( a.y > c.y ? a.y : c.y ) : ( b.y > c.y ? b.y : c.y );
 
 	// z-order range for the current triangle bbox;
-	let minZ = zOrder( minTX, minTY, minX, minY, invSize ),
+	const minZ = zOrder( minTX, minTY, minX, minY, invSize ),
 		maxZ = zOrder( maxTX, maxTY, minX, minY, invSize );
 
 	let p = ear.prevZ,
@@ -30288,7 +30287,7 @@ function cureLocalIntersections( start, triangles, dim ) {
 	let p = start;
 	do {
 
-		let a = p.prev,
+		const a = p.prev,
 			b = p.next.next;
 
 		if ( ! equals( a, b ) && intersects( a, p, p.next, b ) && locallyInside( a, b ) && locallyInside( b, a ) ) {
@@ -30352,8 +30351,8 @@ function splitEarcut( start, triangles, dim, minX, minY, invSize ) {
 // link every hole into the outer loop, producing a single-ring polygon without holes
 function eliminateHoles( data, holeIndices, outerNode, dim ) {
 
-	let queue = [],
-		i, len, start, end, list;
+	const queue = [];
+	let i, len, start, end, list;
 
 	for ( i = 0, len = holeIndices.length; i < len; i ++ ) {
 
@@ -30404,11 +30403,10 @@ function eliminateHole( hole, outerNode ) {
 // David Eberly's algorithm for finding a bridge between hole and outer polygon
 function findHoleBridge( hole, outerNode ) {
 
-	let p = outerNode,
-		hx = hole.x,
-		hy = hole.y,
-		qx = - Infinity,
-		m;
+	let p = outerNode;
+	const hx = hole.x;
+	const hy = hole.y;
+	let qx = - Infinity, m;
 
 	// find a segment intersected by a ray from the hole's leftmost point to the left;
 	// segment's endpoint with lesser x will be potential connection point
@@ -30416,7 +30414,7 @@ function findHoleBridge( hole, outerNode ) {
 
 		if ( hy <= p.y && hy >= p.next.y && p.next.y !== p.y ) {
 
-			let x = p.x + ( hy - p.y ) * ( p.next.x - p.x ) / ( p.next.y - p.y );
+			const x = p.x + ( hy - p.y ) * ( p.next.x - p.x ) / ( p.next.y - p.y );
 			if ( x <= hx && x > qx ) {
 
 				qx = x;
@@ -30445,11 +30443,10 @@ function findHoleBridge( hole, outerNode ) {
 	// if there are no points found, we have a valid connection;
 	// otherwise choose the point of the minimum angle with the ray as connection point
 
-	let stop = m,
+	const stop = m,
 		mx = m.x,
-		my = m.y,
-		tanMin = Infinity,
-		tan;
+		my = m.y;
+	let tanMin = Infinity, tan;
 
 	p = m;
 
@@ -30701,8 +30698,8 @@ function locallyInside( a, b ) {
 function middleInside( a, b ) {
 
 	let p = a,
-		inside = false,
-		px = ( a.x + b.x ) / 2,
+		inside = false;
+	const px = ( a.x + b.x ) / 2,
 		py = ( a.y + b.y ) / 2;
 	do {
 
@@ -30721,7 +30718,7 @@ function middleInside( a, b ) {
 // if one belongs to the outer ring and another to a hole, it merges it into a single ring
 function splitPolygon( a, b ) {
 
-	let a2 = new Node( a.i, a.x, a.y ),
+	const a2 = new Node( a.i, a.x, a.y ),
 		b2 = new Node( b.i, b.x, b.y ),
 		an = a.next,
 		bp = b.prev;
@@ -32745,7 +32742,8 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 	function generateCap( top ) {
 
-		let centerIndexStart, centerIndexEnd;
+		// save the index of the first center vertex
+		const centerIndexStart = index;
 
 		const uv = new Vector2();
 		const vertex = new Vector3();
@@ -32754,9 +32752,6 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 
 		const radius = ( top === true ) ? radiusTop : radiusBottom;
 		const sign = ( top === true ) ? 1 : - 1;
-
-		// save the index of the first center vertex
-		centerIndexStart = index;
 
 		// first we generate the center vertex data of the cap.
 		// because the geometry needs one set of uvs per face,
@@ -32783,8 +32778,7 @@ function CylinderBufferGeometry( radiusTop, radiusBottom, height, radialSegments
 		}
 
 		// save the index of the last center vertex
-
-		centerIndexEnd = index;
+		const centerIndexEnd = index;
 
 		// now we generate the surrounding vertices, normals and uvs
 
@@ -34417,9 +34411,8 @@ Object.assign( Interpolant.prototype, {
 
 	evaluate: function ( t ) {
 
-		let pp = this.parameterPositions,
-			i1 = this._cachedIndex,
-
+		const pp = this.parameterPositions;
+		let i1 = this._cachedIndex,
 			t1 = pp[ i1 ],
 			t0 = pp[ i1 - 1 ];
 
@@ -34668,8 +34661,8 @@ CubicInterpolant.prototype = Object.assign( Object.create( Interpolant.prototype
 
 	intervalChanged_: function ( i1, t0, t1 ) {
 
-		let pp = this.parameterPositions,
-			iPrev = i1 - 2,
+		const pp = this.parameterPositions;
+		let iPrev = i1 - 2,
 			iNext = i1 + 1,
 
 			tPrev = pp[ iPrev ],
@@ -37094,7 +37087,8 @@ Object.assign( Curve.prototype, {
 
 		const arcLengths = this.getLengths();
 
-		let i = 0, il = arcLengths.length;
+		let i = 0;
+		const il = arcLengths.length;
 
 		let targetArcLength; // The targeted u distance value to get
 
@@ -37639,7 +37633,7 @@ CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
 	}
 
-	let p0, p1, p2, p3; // 4 points
+	let p0, p3; // 4 points (p1 & p2 defined below)
 
 	if ( this.closed || intPoint > 0 ) {
 
@@ -37653,8 +37647,8 @@ CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
 	}
 
-	p1 = points[ intPoint % l ];
-	p2 = points[ ( intPoint + 1 ) % l ];
+	const p1 = points[ intPoint % l ];
+	const p2 = points[ ( intPoint + 1 ) % l ];
 
 	if ( this.closed || intPoint + 2 < l ) {
 
@@ -41747,7 +41741,8 @@ Object.assign( ShapePath.prototype, {
 		if ( noHoles === true )	return	toShapesNoHoles( subPaths );
 
 
-		let solid, tmpPath, tmpShape, shapes = [];
+		let solid, tmpPath, tmpShape;
+		const shapes = [];
 
 		if ( subPaths.length === 1 ) {
 
@@ -43846,12 +43841,12 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 	// create getter / setter pair for a property in the scene graph
 	bind: function () {
 
-		let targetObject = this.node,
-			parsedPath = this.parsedPath,
+		let targetObject = this.node;
+		const parsedPath = this.parsedPath;
 
-			objectName = parsedPath.objectName,
-			propertyName = parsedPath.propertyName,
-			propertyIndex = parsedPath.propertyIndex;
+		const objectName = parsedPath.objectName;
+		const propertyName = parsedPath.propertyName;
+		let propertyIndex = parsedPath.propertyIndex;
 
 		if ( ! targetObject ) {
 
@@ -44394,9 +44389,9 @@ Object.assign( AnimationObjectGroup.prototype, {
 		// returns an array of bindings for the given path that is changed
 		// according to the contained objects in the group
 
-		let indicesByPath = this._bindingsIndicesByPath,
-			index = indicesByPath[ path ],
-			bindings = this._bindings;
+		const indicesByPath = this._bindingsIndicesByPath;
+		let index = indicesByPath[ path ];
+		const bindings = this._bindings;
 
 		if ( index !== undefined ) return bindings[ index ];
 
@@ -44655,7 +44650,7 @@ class AnimationAction {
 
 	stopFading() {
 
-		let weightInterpolant = this._weightInterpolant;
+		const weightInterpolant = this._weightInterpolant;
 
 		if ( weightInterpolant !== null ) {
 
@@ -44742,7 +44737,7 @@ class AnimationAction {
 
 	stopWarping() {
 
-		let timeScaleInterpolant = this._timeScaleInterpolant;
+		const timeScaleInterpolant = this._timeScaleInterpolant;
 
 		if ( timeScaleInterpolant !== null ) {
 
@@ -45669,8 +45664,8 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		const clipUuid = clipObject !== null ? clipObject.uuid : clip;
 
-		let actionsForClip = this._actionsByClip[ clipUuid ],
-			prototypeAction = null;
+		const actionsForClip = this._actionsByClip[ clipUuid ];
+		let prototypeAction = null;
 
 		if ( blendMode === undefined ) {
 
@@ -45914,24 +45909,28 @@ AnimationMixer.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 } );
 
-function Uniform( value ) {
+class Uniform {
 
-	if ( typeof value === 'string' ) {
+	constructor( value ) {
 
-		console.warn( 'THREE.Uniform: Type parameter is no longer needed.' );
-		value = arguments[ 1 ];
+		if ( typeof value === 'string' ) {
+
+			console.warn( 'THREE.Uniform: Type parameter is no longer needed.' );
+			value = arguments[ 1 ];
+
+		}
+
+		this.value = value;
 
 	}
 
-	this.value = value;
+	clone() {
+
+		return new Uniform( this.value.clone === undefined ? this.value : this.value.clone() );
+
+	}
 
 }
-
-Uniform.prototype.clone = function () {
-
-	return new Uniform( this.value.clone === undefined ? this.value : this.value.clone() );
-
-};
 
 function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
@@ -47770,22 +47769,20 @@ const _axisDirections = [
  * interpolate diffuse lighting while limiting sampling computation.
  */
 
-function PMREMGenerator( renderer ) {
+class PMREMGenerator {
 
-	this._renderer = renderer;
-	this._pingPongRenderTarget = null;
+	constructor( renderer ) {
 
-	this._blurMaterial = _getBlurShader( MAX_SAMPLES );
-	this._equirectShader = null;
-	this._cubemapShader = null;
+		this._renderer = renderer;
+		this._pingPongRenderTarget = null;
 
-	this._compileMaterial( this._blurMaterial );
+		this._blurMaterial = _getBlurShader( MAX_SAMPLES );
+		this._equirectShader = null;
+		this._cubemapShader = null;
 
-}
+		this._compileMaterial( this._blurMaterial );
 
-PMREMGenerator.prototype = {
-
-	constructor: PMREMGenerator,
+	}
 
 	/**
 	 * Generates a PMREM from a supplied Scene, which can be faster than using an
@@ -47794,7 +47791,7 @@ PMREMGenerator.prototype = {
 	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 	 * is placed at the origin).
 	 */
-	fromScene: function ( scene, sigma = 0, near = 0.1, far = 100 ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = this._allocateTargets();
@@ -47811,35 +47808,35 @@ PMREMGenerator.prototype = {
 
 		return cubeUVRenderTarget;
 
-	},
+	}
 
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
 	 * (RGBFormat) or HDR (RGBEFormat). The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromEquirectangular: function ( equirectangular ) {
+	fromEquirectangular( equirectangular ) {
 
 		return this._fromTexture( equirectangular );
 
-	},
+	}
 
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
 	 * (RGBFormat) or HDR (RGBEFormat). The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromCubemap: function ( cubemap ) {
+	fromCubemap( cubemap ) {
 
 		return this._fromTexture( cubemap );
 
-	},
+	}
 
 	/**
 	 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileCubemapShader: function () {
+	compileCubemapShader() {
 
 		if ( this._cubemapShader === null ) {
 
@@ -47848,13 +47845,13 @@ PMREMGenerator.prototype = {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileEquirectangularShader: function () {
+	compileEquirectangularShader() {
 
 		if ( this._equirectShader === null ) {
 
@@ -47863,14 +47860,14 @@ PMREMGenerator.prototype = {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
 	 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
 	 * one of them will cause any others to also become unusable.
 	 */
-	dispose: function () {
+	dispose() {
 
 		this._blurMaterial.dispose();
 
@@ -47883,20 +47880,20 @@ PMREMGenerator.prototype = {
 
 		}
 
-	},
+	}
 
 	// private interface
 
-	_cleanup: function ( outputTarget ) {
+	_cleanup( outputTarget ) {
 
 		this._pingPongRenderTarget.dispose();
 		this._renderer.setRenderTarget( _oldTarget );
 		outputTarget.scissorTest = false;
 		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
 
-	},
+	}
 
-	_fromTexture: function ( texture ) {
+	_fromTexture( texture ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = this._allocateTargets( texture );
@@ -47906,9 +47903,9 @@ PMREMGenerator.prototype = {
 
 		return cubeUVRenderTarget;
 
-	},
+	}
 
-	_allocateTargets: function ( texture ) { // warning: null texture is valid
+	_allocateTargets( texture ) { // warning: null texture is valid
 
 		const params = {
 			magFilter: NearestFilter,
@@ -47926,16 +47923,16 @@ PMREMGenerator.prototype = {
 		this._pingPongRenderTarget = _createRenderTarget( params );
 		return cubeUVRenderTarget;
 
-	},
+	}
 
-	_compileMaterial: function ( material ) {
+	_compileMaterial( material ) {
 
 		const tmpMesh = new Mesh( _lodPlanes[ 0 ], material );
 		this._renderer.compile( tmpMesh, _flatCamera );
 
-	},
+	}
 
-	_sceneToCubeUV: function ( scene, near, far, cubeUVRenderTarget ) {
+	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 
 		const fov = 90;
 		const aspect = 1;
@@ -47997,9 +47994,9 @@ PMREMGenerator.prototype = {
 		renderer.outputEncoding = outputEncoding;
 		renderer.setClearColor( clearColor, clearAlpha );
 
-	},
+	}
 
-	_textureToCubeUV: function ( texture, cubeUVRenderTarget ) {
+	_textureToCubeUV( texture, cubeUVRenderTarget ) {
 
 		const renderer = this._renderer;
 
@@ -48042,9 +48039,9 @@ PMREMGenerator.prototype = {
 		renderer.setRenderTarget( cubeUVRenderTarget );
 		renderer.render( mesh, _flatCamera );
 
-	},
+	}
 
-	_applyPMREM: function ( cubeUVRenderTarget ) {
+	_applyPMREM( cubeUVRenderTarget ) {
 
 		const renderer = this._renderer;
 		const autoClear = renderer.autoClear;
@@ -48062,7 +48059,7 @@ PMREMGenerator.prototype = {
 
 		renderer.autoClear = autoClear;
 
-	},
+	}
 
 	/**
 	 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
@@ -48071,7 +48068,7 @@ PMREMGenerator.prototype = {
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
 	 */
-	_blur: function ( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
+	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
@@ -48093,9 +48090,9 @@ PMREMGenerator.prototype = {
 			'longitudinal',
 			poleAxis );
 
-	},
+	}
 
-	_halfBlur: function ( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
+	_halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
 
 		const renderer = this._renderer;
 		const blurMaterial = this._blurMaterial;
@@ -48179,7 +48176,7 @@ PMREMGenerator.prototype = {
 
 	}
 
-};
+}
 
 function _isLDR( texture ) {
 

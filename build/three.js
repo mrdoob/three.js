@@ -2627,10 +2627,8 @@
 
 			if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
 
-				var s = 1 - t,
-
-					cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
-
+				var s = 1 - t;
+				var cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
 					dir = ( cos >= 0 ? 1 : - 1 ),
 					sqrSin = 1 - cos * cos;
 
@@ -5213,57 +5211,53 @@
 
 	} );
 
-	function Layers() {
+	var Layers = function Layers() {
 
 		this.mask = 1 | 0;
 
-	}
+	};
 
-	Object.assign( Layers.prototype, {
+	Layers.prototype.set = function set ( channel ) {
 
-		set: function ( channel ) {
+		this.mask = 1 << channel | 0;
 
-			this.mask = 1 << channel | 0;
+	};
 
-		},
+	Layers.prototype.enable = function enable ( channel ) {
 
-		enable: function ( channel ) {
+		this.mask |= 1 << channel | 0;
 
-			this.mask |= 1 << channel | 0;
+	};
 
-		},
+	Layers.prototype.enableAll = function enableAll () {
 
-		enableAll: function () {
+		this.mask = 0xffffffff | 0;
 
-			this.mask = 0xffffffff | 0;
+	};
 
-		},
+	Layers.prototype.toggle = function toggle ( channel ) {
 
-		toggle: function ( channel ) {
+		this.mask ^= 1 << channel | 0;
 
-			this.mask ^= 1 << channel | 0;
+	};
 
-		},
+	Layers.prototype.disable = function disable ( channel ) {
 
-		disable: function ( channel ) {
+		this.mask &= ~ ( 1 << channel | 0 );
 
-			this.mask &= ~ ( 1 << channel | 0 );
+	};
 
-		},
+	Layers.prototype.disableAll = function disableAll () {
 
-		disableAll: function () {
+		this.mask = 0;
 
-			this.mask = 0;
+	};
 
-		},
+	Layers.prototype.test = function test ( layers ) {
 
-		test: function ( layers ) {
+		return ( this.mask & layers.mask ) !== 0;
 
-			return ( this.mask & layers.mask ) !== 0;
-
-		}
-
-	} );
+	};
 
 	var _object3DId = 0;
 
@@ -6913,173 +6907,161 @@
 	var _edge2 = new Vector3();
 	var _normal = new Vector3();
 
-	function Ray( origin, direction ) {
+	var Ray = function Ray( origin, direction ) {
 
 		this.origin = ( origin !== undefined ) ? origin : new Vector3();
 		this.direction = ( direction !== undefined ) ? direction : new Vector3( 0, 0, - 1 );
 
-	}
+	};
 
-	Object.assign( Ray.prototype, {
+	Ray.prototype.set = function set ( origin, direction ) {
 
-		set: function ( origin, direction ) {
+		this.origin.copy( origin );
+		this.direction.copy( direction );
 
-			this.origin.copy( origin );
-			this.direction.copy( direction );
+		return this;
 
-			return this;
+	};
 
-		},
+	Ray.prototype.clone = function clone () {
 
-		clone: function () {
+		return new this.constructor().copy( this );
 
-			return new this.constructor().copy( this );
+	};
 
-		},
+	Ray.prototype.copy = function copy ( ray ) {
 
-		copy: function ( ray ) {
+		this.origin.copy( ray.origin );
+		this.direction.copy( ray.direction );
 
-			this.origin.copy( ray.origin );
-			this.direction.copy( ray.direction );
+		return this;
 
-			return this;
+	};
 
-		},
+	Ray.prototype.at = function at ( t, target ) {
 
-		at: function ( t, target ) {
+		if ( target === undefined ) {
 
-			if ( target === undefined ) {
+			console.warn( 'THREE.Ray: .at() target is now required' );
+			target = new Vector3();
 
-				console.warn( 'THREE.Ray: .at() target is now required' );
-				target = new Vector3();
+		}
 
-			}
+		return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
 
-			return target.copy( this.direction ).multiplyScalar( t ).add( this.origin );
+	};
 
-		},
+	Ray.prototype.lookAt = function lookAt ( v ) {
 
-		lookAt: function ( v ) {
+		this.direction.copy( v ).sub( this.origin ).normalize();
 
-			this.direction.copy( v ).sub( this.origin ).normalize();
+		return this;
 
-			return this;
+	};
 
-		},
+	Ray.prototype.recast = function recast ( t ) {
 
-		recast: function ( t ) {
+		this.origin.copy( this.at( t, _vector$2 ) );
 
-			this.origin.copy( this.at( t, _vector$2 ) );
+		return this;
 
-			return this;
+	};
 
-		},
+	Ray.prototype.closestPointToPoint = function closestPointToPoint ( point, target ) {
 
-		closestPointToPoint: function ( point, target ) {
+		if ( target === undefined ) {
 
-			if ( target === undefined ) {
+			console.warn( 'THREE.Ray: .closestPointToPoint() target is now required' );
+			target = new Vector3();
 
-				console.warn( 'THREE.Ray: .closestPointToPoint() target is now required' );
-				target = new Vector3();
+		}
 
-			}
+		target.subVectors( point, this.origin );
 
-			target.subVectors( point, this.origin );
+		var directionDistance = target.dot( this.direction );
 
-			var directionDistance = target.dot( this.direction );
+		if ( directionDistance < 0 ) {
 
-			if ( directionDistance < 0 ) {
+			return target.copy( this.origin );
 
-				return target.copy( this.origin );
+		}
 
-			}
+		return target.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-			return target.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+	};
 
-		},
+	Ray.prototype.distanceToPoint = function distanceToPoint ( point ) {
 
-		distanceToPoint: function ( point ) {
+		return Math.sqrt( this.distanceSqToPoint( point ) );
 
-			return Math.sqrt( this.distanceSqToPoint( point ) );
+	};
 
-		},
+	Ray.prototype.distanceSqToPoint = function distanceSqToPoint ( point ) {
 
-		distanceSqToPoint: function ( point ) {
+		var directionDistance = _vector$2.subVectors( point, this.origin ).dot( this.direction );
 
-			var directionDistance = _vector$2.subVectors( point, this.origin ).dot( this.direction );
+		// point behind the ray
 
-			// point behind the ray
+		if ( directionDistance < 0 ) {
 
-			if ( directionDistance < 0 ) {
+			return this.origin.distanceToSquared( point );
 
-				return this.origin.distanceToSquared( point );
+		}
 
-			}
+		_vector$2.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
 
-			_vector$2.copy( this.direction ).multiplyScalar( directionDistance ).add( this.origin );
+		return _vector$2.distanceToSquared( point );
 
-			return _vector$2.distanceToSquared( point );
+	};
 
-		},
+	Ray.prototype.distanceSqToSegment = function distanceSqToSegment ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
 
-		distanceSqToSegment: function ( v0, v1, optionalPointOnRay, optionalPointOnSegment ) {
+		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
+		// It returns the min distance between the ray and the segment
+		// defined by v0 and v1
+		// It can also set two optional targets :
+		// - The closest point on the ray
+		// - The closest point on the segment
 
-			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistRaySegment.h
-			// It returns the min distance between the ray and the segment
-			// defined by v0 and v1
-			// It can also set two optional targets :
-			// - The closest point on the ray
-			// - The closest point on the segment
+		_segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
+		_segDir.copy( v1 ).sub( v0 ).normalize();
+		_diff.copy( this.origin ).sub( _segCenter );
 
-			_segCenter.copy( v0 ).add( v1 ).multiplyScalar( 0.5 );
-			_segDir.copy( v1 ).sub( v0 ).normalize();
-			_diff.copy( this.origin ).sub( _segCenter );
+		var segExtent = v0.distanceTo( v1 ) * 0.5;
+		var a01 = - this.direction.dot( _segDir );
+		var b0 = _diff.dot( this.direction );
+		var b1 = - _diff.dot( _segDir );
+		var c = _diff.lengthSq();
+		var det = Math.abs( 1 - a01 * a01 );
+		var s0, s1, sqrDist, extDet;
 
-			var segExtent = v0.distanceTo( v1 ) * 0.5;
-			var a01 = - this.direction.dot( _segDir );
-			var b0 = _diff.dot( this.direction );
-			var b1 = - _diff.dot( _segDir );
-			var c = _diff.lengthSq();
-			var det = Math.abs( 1 - a01 * a01 );
-			var s0, s1, sqrDist, extDet;
+		if ( det > 0 ) {
 
-			if ( det > 0 ) {
+			// The ray and segment are not parallel.
 
-				// The ray and segment are not parallel.
+			s0 = a01 * b1 - b0;
+			s1 = a01 * b0 - b1;
+			extDet = segExtent * det;
 
-				s0 = a01 * b1 - b0;
-				s1 = a01 * b0 - b1;
-				extDet = segExtent * det;
+			if ( s0 >= 0 ) {
 
-				if ( s0 >= 0 ) {
+				if ( s1 >= - extDet ) {
 
-					if ( s1 >= - extDet ) {
+					if ( s1 <= extDet ) {
 
-						if ( s1 <= extDet ) {
+						// region 0
+						// Minimum at interior points of ray and segment.
 
-							// region 0
-							// Minimum at interior points of ray and segment.
-
-							var invDet = 1 / det;
-							s0 *= invDet;
-							s1 *= invDet;
-							sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
-
-						} else {
-
-							// region 1
-
-							s1 = segExtent;
-							s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-							sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-						}
+						var invDet = 1 / det;
+						s0 *= invDet;
+						s1 *= invDet;
+						sqrDist = s0 * ( s0 + a01 * s1 + 2 * b0 ) + s1 * ( a01 * s0 + s1 + 2 * b1 ) + c;
 
 					} else {
 
-						// region 5
+						// region 1
 
-						s1 = - segExtent;
+						s1 = segExtent;
 						s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
 						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
@@ -7087,329 +7069,337 @@
 
 				} else {
 
-					if ( s1 <= - extDet ) {
+					// region 5
 
-						// region 4
-
-						s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
-						s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-					} else if ( s1 <= extDet ) {
-
-						// region 3
-
-						s0 = 0;
-						s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
-						sqrDist = s1 * ( s1 + 2 * b1 ) + c;
-
-					} else {
-
-						// region 2
-
-						s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
-						s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
-						sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
-
-					}
+					s1 = - segExtent;
+					s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 				}
 
 			} else {
 
-				// Ray and segment are parallel.
+				if ( s1 <= - extDet ) {
 
-				s1 = ( a01 > 0 ) ? - segExtent : segExtent;
-				s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
-				sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
+					// region 4
 
-			}
+					s0 = Math.max( 0, - ( - a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? - segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
-			if ( optionalPointOnRay ) {
+				} else if ( s1 <= extDet ) {
 
-				optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
+					// region 3
 
-			}
+					s0 = 0;
+					s1 = Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = s1 * ( s1 + 2 * b1 ) + c;
 
-			if ( optionalPointOnSegment ) {
+				} else {
 
-				optionalPointOnSegment.copy( _segDir ).multiplyScalar( s1 ).add( _segCenter );
+					// region 2
 
-			}
-
-			return sqrDist;
-
-		},
-
-		intersectSphere: function ( sphere, target ) {
-
-			_vector$2.subVectors( sphere.center, this.origin );
-			var tca = _vector$2.dot( this.direction );
-			var d2 = _vector$2.dot( _vector$2 ) - tca * tca;
-			var radius2 = sphere.radius * sphere.radius;
-
-			if ( d2 > radius2 ) { return null; }
-
-			var thc = Math.sqrt( radius2 - d2 );
-
-			// t0 = first intersect point - entrance on front of sphere
-			var t0 = tca - thc;
-
-			// t1 = second intersect point - exit point on back of sphere
-			var t1 = tca + thc;
-
-			// test to see if both t0 and t1 are behind the ray - if so, return null
-			if ( t0 < 0 && t1 < 0 ) { return null; }
-
-			// test to see if t0 is behind the ray:
-			// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
-			// in order to always return an intersect point that is in front of the ray.
-			if ( t0 < 0 ) { return this.at( t1, target ); }
-
-			// else t0 is in front of the ray, so return the first collision point scaled by t0
-			return this.at( t0, target );
-
-		},
-
-		intersectsSphere: function ( sphere ) {
-
-			return this.distanceSqToPoint( sphere.center ) <= ( sphere.radius * sphere.radius );
-
-		},
-
-		distanceToPlane: function ( plane ) {
-
-			var denominator = plane.normal.dot( this.direction );
-
-			if ( denominator === 0 ) {
-
-				// line is coplanar, return origin
-				if ( plane.distanceToPoint( this.origin ) === 0 ) {
-
-					return 0;
+					s0 = Math.max( 0, - ( a01 * segExtent + b0 ) );
+					s1 = ( s0 > 0 ) ? segExtent : Math.min( Math.max( - segExtent, - b1 ), segExtent );
+					sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 				}
 
-				// Null is preferable to undefined since undefined means.... it is undefined
-
-				return null;
-
 			}
 
-			var t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
+		} else {
 
-			// Return if the ray never intersects the plane
+			// Ray and segment are parallel.
 
-			return t >= 0 ? t : null;
-
-		},
-
-		intersectPlane: function ( plane, target ) {
-
-			var t = this.distanceToPlane( plane );
-
-			if ( t === null ) {
-
-				return null;
-
-			}
-
-			return this.at( t, target );
-
-		},
-
-		intersectsPlane: function ( plane ) {
-
-			// check if the ray lies on the plane first
-
-			var distToPoint = plane.distanceToPoint( this.origin );
-
-			if ( distToPoint === 0 ) {
-
-				return true;
-
-			}
-
-			var denominator = plane.normal.dot( this.direction );
-
-			if ( denominator * distToPoint < 0 ) {
-
-				return true;
-
-			}
-
-			// ray origin is behind the plane (and is pointing behind it)
-
-			return false;
-
-		},
-
-		intersectBox: function ( box, target ) {
-
-			var tmin, tmax, tymin, tymax, tzmin, tzmax;
-
-			var invdirx = 1 / this.direction.x,
-				invdiry = 1 / this.direction.y,
-				invdirz = 1 / this.direction.z;
-
-			var origin = this.origin;
-
-			if ( invdirx >= 0 ) {
-
-				tmin = ( box.min.x - origin.x ) * invdirx;
-				tmax = ( box.max.x - origin.x ) * invdirx;
-
-			} else {
-
-				tmin = ( box.max.x - origin.x ) * invdirx;
-				tmax = ( box.min.x - origin.x ) * invdirx;
-
-			}
-
-			if ( invdiry >= 0 ) {
-
-				tymin = ( box.min.y - origin.y ) * invdiry;
-				tymax = ( box.max.y - origin.y ) * invdiry;
-
-			} else {
-
-				tymin = ( box.max.y - origin.y ) * invdiry;
-				tymax = ( box.min.y - origin.y ) * invdiry;
-
-			}
-
-			if ( ( tmin > tymax ) || ( tymin > tmax ) ) { return null; }
-
-			// These lines also handle the case where tmin or tmax is NaN
-			// (result of 0 * Infinity). x !== x returns true if x is NaN
-
-			if ( tymin > tmin || tmin !== tmin ) { tmin = tymin; }
-
-			if ( tymax < tmax || tmax !== tmax ) { tmax = tymax; }
-
-			if ( invdirz >= 0 ) {
-
-				tzmin = ( box.min.z - origin.z ) * invdirz;
-				tzmax = ( box.max.z - origin.z ) * invdirz;
-
-			} else {
-
-				tzmin = ( box.max.z - origin.z ) * invdirz;
-				tzmax = ( box.min.z - origin.z ) * invdirz;
-
-			}
-
-			if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) { return null; }
-
-			if ( tzmin > tmin || tmin !== tmin ) { tmin = tzmin; }
-
-			if ( tzmax < tmax || tmax !== tmax ) { tmax = tzmax; }
-
-			//return point closest to the ray (positive side)
-
-			if ( tmax < 0 ) { return null; }
-
-			return this.at( tmin >= 0 ? tmin : tmax, target );
-
-		},
-
-		intersectsBox: function ( box ) {
-
-			return this.intersectBox( box, _vector$2 ) !== null;
-
-		},
-
-		intersectTriangle: function ( a, b, c, backfaceCulling, target ) {
-
-			// Compute the offset origin, edges, and normal.
-
-			// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
-
-			_edge1.subVectors( b, a );
-			_edge2.subVectors( c, a );
-			_normal.crossVectors( _edge1, _edge2 );
-
-			// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
-			// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
-			//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
-			//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
-			//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-			var DdN = this.direction.dot( _normal );
-			var sign;
-
-			if ( DdN > 0 ) {
-
-				if ( backfaceCulling ) { return null; }
-				sign = 1;
-
-			} else if ( DdN < 0 ) {
-
-				sign = - 1;
-				DdN = - DdN;
-
-			} else {
-
-				return null;
-
-			}
-
-			_diff.subVectors( this.origin, a );
-			var DdQxE2 = sign * this.direction.dot( _edge2.crossVectors( _diff, _edge2 ) );
-
-			// b1 < 0, no intersection
-			if ( DdQxE2 < 0 ) {
-
-				return null;
-
-			}
-
-			var DdE1xQ = sign * this.direction.dot( _edge1.cross( _diff ) );
-
-			// b2 < 0, no intersection
-			if ( DdE1xQ < 0 ) {
-
-				return null;
-
-			}
-
-			// b1+b2 > 1, no intersection
-			if ( DdQxE2 + DdE1xQ > DdN ) {
-
-				return null;
-
-			}
-
-			// Line intersects triangle, check if ray does.
-			var QdN = - sign * _diff.dot( _normal );
-
-			// t < 0, no intersection
-			if ( QdN < 0 ) {
-
-				return null;
-
-			}
-
-			// Ray intersects triangle.
-			return this.at( QdN / DdN, target );
-
-		},
-
-		applyMatrix4: function ( matrix4 ) {
-
-			this.origin.applyMatrix4( matrix4 );
-			this.direction.transformDirection( matrix4 );
-
-			return this;
-
-		},
-
-		equals: function ( ray ) {
-
-			return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
+			s1 = ( a01 > 0 ) ? - segExtent : segExtent;
+			s0 = Math.max( 0, - ( a01 * s1 + b0 ) );
+			sqrDist = - s0 * s0 + s1 * ( s1 + 2 * b1 ) + c;
 
 		}
 
-	} );
+		if ( optionalPointOnRay ) {
+
+			optionalPointOnRay.copy( this.direction ).multiplyScalar( s0 ).add( this.origin );
+
+		}
+
+		if ( optionalPointOnSegment ) {
+
+			optionalPointOnSegment.copy( _segDir ).multiplyScalar( s1 ).add( _segCenter );
+
+		}
+
+		return sqrDist;
+
+	};
+
+	Ray.prototype.intersectSphere = function intersectSphere ( sphere, target ) {
+
+		_vector$2.subVectors( sphere.center, this.origin );
+		var tca = _vector$2.dot( this.direction );
+		var d2 = _vector$2.dot( _vector$2 ) - tca * tca;
+		var radius2 = sphere.radius * sphere.radius;
+
+		if ( d2 > radius2 ) { return null; }
+
+		var thc = Math.sqrt( radius2 - d2 );
+
+		// t0 = first intersect point - entrance on front of sphere
+		var t0 = tca - thc;
+
+		// t1 = second intersect point - exit point on back of sphere
+		var t1 = tca + thc;
+
+		// test to see if both t0 and t1 are behind the ray - if so, return null
+		if ( t0 < 0 && t1 < 0 ) { return null; }
+
+		// test to see if t0 is behind the ray:
+		// if it is, the ray is inside the sphere, so return the second exit point scaled by t1,
+		// in order to always return an intersect point that is in front of the ray.
+		if ( t0 < 0 ) { return this.at( t1, target ); }
+
+		// else t0 is in front of the ray, so return the first collision point scaled by t0
+		return this.at( t0, target );
+
+	};
+
+	Ray.prototype.intersectsSphere = function intersectsSphere ( sphere ) {
+
+		return this.distanceSqToPoint( sphere.center ) <= ( sphere.radius * sphere.radius );
+
+	};
+
+	Ray.prototype.distanceToPlane = function distanceToPlane ( plane ) {
+
+		var denominator = plane.normal.dot( this.direction );
+
+		if ( denominator === 0 ) {
+
+			// line is coplanar, return origin
+			if ( plane.distanceToPoint( this.origin ) === 0 ) {
+
+				return 0;
+
+			}
+
+			// Null is preferable to undefined since undefined means.... it is undefined
+
+			return null;
+
+		}
+
+		var t = - ( this.origin.dot( plane.normal ) + plane.constant ) / denominator;
+
+		// Return if the ray never intersects the plane
+
+		return t >= 0 ? t : null;
+
+	};
+
+	Ray.prototype.intersectPlane = function intersectPlane ( plane, target ) {
+
+		var t = this.distanceToPlane( plane );
+
+		if ( t === null ) {
+
+			return null;
+
+		}
+
+		return this.at( t, target );
+
+	};
+
+	Ray.prototype.intersectsPlane = function intersectsPlane ( plane ) {
+
+		// check if the ray lies on the plane first
+
+		var distToPoint = plane.distanceToPoint( this.origin );
+
+		if ( distToPoint === 0 ) {
+
+			return true;
+
+		}
+
+		var denominator = plane.normal.dot( this.direction );
+
+		if ( denominator * distToPoint < 0 ) {
+
+			return true;
+
+		}
+
+		// ray origin is behind the plane (and is pointing behind it)
+
+		return false;
+
+	};
+
+	Ray.prototype.intersectBox = function intersectBox ( box, target ) {
+
+		var tmin, tmax, tymin, tymax, tzmin, tzmax;
+
+		var invdirx = 1 / this.direction.x,
+			invdiry = 1 / this.direction.y,
+			invdirz = 1 / this.direction.z;
+
+		var origin = this.origin;
+
+		if ( invdirx >= 0 ) {
+
+			tmin = ( box.min.x - origin.x ) * invdirx;
+			tmax = ( box.max.x - origin.x ) * invdirx;
+
+		} else {
+
+			tmin = ( box.max.x - origin.x ) * invdirx;
+			tmax = ( box.min.x - origin.x ) * invdirx;
+
+		}
+
+		if ( invdiry >= 0 ) {
+
+			tymin = ( box.min.y - origin.y ) * invdiry;
+			tymax = ( box.max.y - origin.y ) * invdiry;
+
+		} else {
+
+			tymin = ( box.max.y - origin.y ) * invdiry;
+			tymax = ( box.min.y - origin.y ) * invdiry;
+
+		}
+
+		if ( ( tmin > tymax ) || ( tymin > tmax ) ) { return null; }
+
+		// These lines also handle the case where tmin or tmax is NaN
+		// (result of 0 * Infinity). x !== x returns true if x is NaN
+
+		if ( tymin > tmin || tmin !== tmin ) { tmin = tymin; }
+
+		if ( tymax < tmax || tmax !== tmax ) { tmax = tymax; }
+
+		if ( invdirz >= 0 ) {
+
+			tzmin = ( box.min.z - origin.z ) * invdirz;
+			tzmax = ( box.max.z - origin.z ) * invdirz;
+
+		} else {
+
+			tzmin = ( box.max.z - origin.z ) * invdirz;
+			tzmax = ( box.min.z - origin.z ) * invdirz;
+
+		}
+
+		if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) { return null; }
+
+		if ( tzmin > tmin || tmin !== tmin ) { tmin = tzmin; }
+
+		if ( tzmax < tmax || tmax !== tmax ) { tmax = tzmax; }
+
+		//return point closest to the ray (positive side)
+
+		if ( tmax < 0 ) { return null; }
+
+		return this.at( tmin >= 0 ? tmin : tmax, target );
+
+	};
+
+	Ray.prototype.intersectsBox = function intersectsBox ( box ) {
+
+		return this.intersectBox( box, _vector$2 ) !== null;
+
+	};
+
+	Ray.prototype.intersectTriangle = function intersectTriangle ( a, b, c, backfaceCulling, target ) {
+
+		// Compute the offset origin, edges, and normal.
+
+		// from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
+
+		_edge1.subVectors( b, a );
+		_edge2.subVectors( c, a );
+		_normal.crossVectors( _edge1, _edge2 );
+
+		// Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
+		// E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
+		//   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
+		//   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
+		//   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
+		var DdN = this.direction.dot( _normal );
+		var sign;
+
+		if ( DdN > 0 ) {
+
+			if ( backfaceCulling ) { return null; }
+			sign = 1;
+
+		} else if ( DdN < 0 ) {
+
+			sign = - 1;
+			DdN = - DdN;
+
+		} else {
+
+			return null;
+
+		}
+
+		_diff.subVectors( this.origin, a );
+		var DdQxE2 = sign * this.direction.dot( _edge2.crossVectors( _diff, _edge2 ) );
+
+		// b1 < 0, no intersection
+		if ( DdQxE2 < 0 ) {
+
+			return null;
+
+		}
+
+		var DdE1xQ = sign * this.direction.dot( _edge1.cross( _diff ) );
+
+		// b2 < 0, no intersection
+		if ( DdE1xQ < 0 ) {
+
+			return null;
+
+		}
+
+		// b1+b2 > 1, no intersection
+		if ( DdQxE2 + DdE1xQ > DdN ) {
+
+			return null;
+
+		}
+
+		// Line intersects triangle, check if ray does.
+		var QdN = - sign * _diff.dot( _normal );
+
+		// t < 0, no intersection
+		if ( QdN < 0 ) {
+
+			return null;
+
+		}
+
+		// Ray intersects triangle.
+		return this.at( QdN / DdN, target );
+
+	};
+
+	Ray.prototype.applyMatrix4 = function applyMatrix4 ( matrix4 ) {
+
+		this.origin.applyMatrix4( matrix4 );
+		this.direction.transformDirection( matrix4 );
+
+		return this;
+
+	};
+
+	Ray.prototype.equals = function equals ( ray ) {
+
+		return ray.origin.equals( this.origin ) && ray.direction.equals( this.direction );
+
+	};
 
 	var _vector1 = new Vector3();
 	var _vector2 = new Vector3();
@@ -9664,7 +9654,7 @@
 	Float64BufferAttribute.prototype = Object.create( BufferAttribute.prototype );
 	Float64BufferAttribute.prototype.constructor = Float64BufferAttribute;
 
-	function DirectGeometry() {
+	var DirectGeometry = function DirectGeometry() {
 
 		this.vertices = [];
 		this.normals = [];
@@ -9692,256 +9682,252 @@
 		this.uvsNeedUpdate = false;
 		this.groupsNeedUpdate = false;
 
-	}
+	};
 
-	Object.assign( DirectGeometry.prototype, {
+	DirectGeometry.prototype.computeGroups = function computeGroups ( geometry ) {
 
-		computeGroups: function ( geometry ) {
+		var groups = [];
 
-			var groups = [];
+		var group, i;
+		var materialIndex = undefined;
 
-			var group, i;
-			var materialIndex = undefined;
+		var faces = geometry.faces;
 
-			var faces = geometry.faces;
+		for ( i = 0; i < faces.length; i ++ ) {
 
-			for ( i = 0; i < faces.length; i ++ ) {
+			var face = faces[ i ];
 
-				var face = faces[ i ];
+			// materials
 
-				// materials
+			if ( face.materialIndex !== materialIndex ) {
 
-				if ( face.materialIndex !== materialIndex ) {
+				materialIndex = face.materialIndex;
 
-					materialIndex = face.materialIndex;
+				if ( group !== undefined ) {
 
-					if ( group !== undefined ) {
+					group.count = ( i * 3 ) - group.start;
+					groups.push( group );
 
-						group.count = ( i * 3 ) - group.start;
-						groups.push( group );
+				}
 
-					}
+				group = {
+					start: i * 3,
+					materialIndex: materialIndex
+				};
 
-					group = {
-						start: i * 3,
-						materialIndex: materialIndex
-					};
+			}
+
+		}
+
+		if ( group !== undefined ) {
+
+			group.count = ( i * 3 ) - group.start;
+			groups.push( group );
+
+		}
+
+		this.groups = groups;
+
+	};
+
+	DirectGeometry.prototype.fromGeometry = function fromGeometry ( geometry ) {
+
+		var faces = geometry.faces;
+		var vertices = geometry.vertices;
+		var faceVertexUvs = geometry.faceVertexUvs;
+
+		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
+		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
+
+		// morphs
+
+		var morphTargets = geometry.morphTargets;
+		var morphTargetsLength = morphTargets.length;
+
+		var morphTargetsPosition;
+
+		if ( morphTargetsLength > 0 ) {
+
+			morphTargetsPosition = [];
+
+			for ( var i = 0; i < morphTargetsLength; i ++ ) {
+
+				morphTargetsPosition[ i ] = {
+					name: morphTargets[ i ].name,
+					 data: []
+				};
+
+			}
+
+			this.morphTargets.position = morphTargetsPosition;
+
+		}
+
+		var morphNormals = geometry.morphNormals;
+		var morphNormalsLength = morphNormals.length;
+
+		var morphTargetsNormal;
+
+		if ( morphNormalsLength > 0 ) {
+
+			morphTargetsNormal = [];
+
+			for ( var i$1 = 0; i$1 < morphNormalsLength; i$1 ++ ) {
+
+				morphTargetsNormal[ i$1 ] = {
+					name: morphNormals[ i$1 ].name,
+					 data: []
+				};
+
+			}
+
+			this.morphTargets.normal = morphTargetsNormal;
+
+		}
+
+		// skins
+
+		var skinIndices = geometry.skinIndices;
+		var skinWeights = geometry.skinWeights;
+
+		var hasSkinIndices = skinIndices.length === vertices.length;
+		var hasSkinWeights = skinWeights.length === vertices.length;
+
+		//
+
+		if ( vertices.length > 0 && faces.length === 0 ) {
+
+			console.error( 'THREE.DirectGeometry: Faceless geometries are not supported.' );
+
+		}
+
+		for ( var i$2 = 0; i$2 < faces.length; i$2 ++ ) {
+
+			var face = faces[ i$2 ];
+
+			this.vertices.push( vertices[ face.a ], vertices[ face.b ], vertices[ face.c ] );
+
+			var vertexNormals = face.vertexNormals;
+
+			if ( vertexNormals.length === 3 ) {
+
+				this.normals.push( vertexNormals[ 0 ], vertexNormals[ 1 ], vertexNormals[ 2 ] );
+
+			} else {
+
+				var normal = face.normal;
+
+				this.normals.push( normal, normal, normal );
+
+			}
+
+			var vertexColors = face.vertexColors;
+
+			if ( vertexColors.length === 3 ) {
+
+				this.colors.push( vertexColors[ 0 ], vertexColors[ 1 ], vertexColors[ 2 ] );
+
+			} else {
+
+				var color = face.color;
+
+				this.colors.push( color, color, color );
+
+			}
+
+			if ( hasFaceVertexUv === true ) {
+
+				var vertexUvs = faceVertexUvs[ 0 ][ i$2 ];
+
+				if ( vertexUvs !== undefined ) {
+
+					this.uvs.push( vertexUvs[ 0 ], vertexUvs[ 1 ], vertexUvs[ 2 ] );
+
+				} else {
+
+					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv ', i$2 );
+
+					this.uvs.push( new Vector2(), new Vector2(), new Vector2() );
 
 				}
 
 			}
 
-			if ( group !== undefined ) {
+			if ( hasFaceVertexUv2 === true ) {
 
-				group.count = ( i * 3 ) - group.start;
-				groups.push( group );
+				var vertexUvs$1 = faceVertexUvs[ 1 ][ i$2 ];
+
+				if ( vertexUvs$1 !== undefined ) {
+
+					this.uvs2.push( vertexUvs$1[ 0 ], vertexUvs$1[ 1 ], vertexUvs$1[ 2 ] );
+
+				} else {
+
+					console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv2 ', i$2 );
+
+					this.uvs2.push( new Vector2(), new Vector2(), new Vector2() );
+
+				}
 
 			}
-
-			this.groups = groups;
-
-		},
-
-		fromGeometry: function ( geometry ) {
-
-			var faces = geometry.faces;
-			var vertices = geometry.vertices;
-			var faceVertexUvs = geometry.faceVertexUvs;
-
-			var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
-			var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 			// morphs
 
-			var morphTargets = geometry.morphTargets;
-			var morphTargetsLength = morphTargets.length;
+			for ( var j = 0; j < morphTargetsLength; j ++ ) {
 
-			var morphTargetsPosition;
+				var morphTarget = morphTargets[ j ].vertices;
 
-			if ( morphTargetsLength > 0 ) {
-
-				morphTargetsPosition = [];
-
-				for ( var i = 0; i < morphTargetsLength; i ++ ) {
-
-					morphTargetsPosition[ i ] = {
-						name: morphTargets[ i ].name,
-					 	data: []
-					};
-
-				}
-
-				this.morphTargets.position = morphTargetsPosition;
+				morphTargetsPosition[ j ].data.push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
 
-			var morphNormals = geometry.morphNormals;
-			var morphNormalsLength = morphNormals.length;
+			for ( var j$1 = 0; j$1 < morphNormalsLength; j$1 ++ ) {
 
-			var morphTargetsNormal;
+				var morphNormal = morphNormals[ j$1 ].vertexNormals[ i$2 ];
 
-			if ( morphNormalsLength > 0 ) {
-
-				morphTargetsNormal = [];
-
-				for ( var i$1 = 0; i$1 < morphNormalsLength; i$1 ++ ) {
-
-					morphTargetsNormal[ i$1 ] = {
-						name: morphNormals[ i$1 ].name,
-					 	data: []
-					};
-
-				}
-
-				this.morphTargets.normal = morphTargetsNormal;
+				morphTargetsNormal[ j$1 ].data.push( morphNormal.a, morphNormal.b, morphNormal.c );
 
 			}
 
 			// skins
 
-			var skinIndices = geometry.skinIndices;
-			var skinWeights = geometry.skinWeights;
+			if ( hasSkinIndices ) {
 
-			var hasSkinIndices = skinIndices.length === vertices.length;
-			var hasSkinWeights = skinWeights.length === vertices.length;
-
-			//
-
-			if ( vertices.length > 0 && faces.length === 0 ) {
-
-				console.error( 'THREE.DirectGeometry: Faceless geometries are not supported.' );
+				this.skinIndices.push( skinIndices[ face.a ], skinIndices[ face.b ], skinIndices[ face.c ] );
 
 			}
 
-			for ( var i$2 = 0; i$2 < faces.length; i$2 ++ ) {
+			if ( hasSkinWeights ) {
 
-				var face = faces[ i$2 ];
-
-				this.vertices.push( vertices[ face.a ], vertices[ face.b ], vertices[ face.c ] );
-
-				var vertexNormals = face.vertexNormals;
-
-				if ( vertexNormals.length === 3 ) {
-
-					this.normals.push( vertexNormals[ 0 ], vertexNormals[ 1 ], vertexNormals[ 2 ] );
-
-				} else {
-
-					var normal = face.normal;
-
-					this.normals.push( normal, normal, normal );
-
-				}
-
-				var vertexColors = face.vertexColors;
-
-				if ( vertexColors.length === 3 ) {
-
-					this.colors.push( vertexColors[ 0 ], vertexColors[ 1 ], vertexColors[ 2 ] );
-
-				} else {
-
-					var color = face.color;
-
-					this.colors.push( color, color, color );
-
-				}
-
-				if ( hasFaceVertexUv === true ) {
-
-					var vertexUvs = faceVertexUvs[ 0 ][ i$2 ];
-
-					if ( vertexUvs !== undefined ) {
-
-						this.uvs.push( vertexUvs[ 0 ], vertexUvs[ 1 ], vertexUvs[ 2 ] );
-
-					} else {
-
-						console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv ', i$2 );
-
-						this.uvs.push( new Vector2(), new Vector2(), new Vector2() );
-
-					}
-
-				}
-
-				if ( hasFaceVertexUv2 === true ) {
-
-					var vertexUvs$1 = faceVertexUvs[ 1 ][ i$2 ];
-
-					if ( vertexUvs$1 !== undefined ) {
-
-						this.uvs2.push( vertexUvs$1[ 0 ], vertexUvs$1[ 1 ], vertexUvs$1[ 2 ] );
-
-					} else {
-
-						console.warn( 'THREE.DirectGeometry.fromGeometry(): Undefined vertexUv2 ', i$2 );
-
-						this.uvs2.push( new Vector2(), new Vector2(), new Vector2() );
-
-					}
-
-				}
-
-				// morphs
-
-				for ( var j = 0; j < morphTargetsLength; j ++ ) {
-
-					var morphTarget = morphTargets[ j ].vertices;
-
-					morphTargetsPosition[ j ].data.push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
-
-				}
-
-				for ( var j$1 = 0; j$1 < morphNormalsLength; j$1 ++ ) {
-
-					var morphNormal = morphNormals[ j$1 ].vertexNormals[ i$2 ];
-
-					morphTargetsNormal[ j$1 ].data.push( morphNormal.a, morphNormal.b, morphNormal.c );
-
-				}
-
-				// skins
-
-				if ( hasSkinIndices ) {
-
-					this.skinIndices.push( skinIndices[ face.a ], skinIndices[ face.b ], skinIndices[ face.c ] );
-
-				}
-
-				if ( hasSkinWeights ) {
-
-					this.skinWeights.push( skinWeights[ face.a ], skinWeights[ face.b ], skinWeights[ face.c ] );
-
-				}
+				this.skinWeights.push( skinWeights[ face.a ], skinWeights[ face.b ], skinWeights[ face.c ] );
 
 			}
-
-			this.computeGroups( geometry );
-
-			this.verticesNeedUpdate = geometry.verticesNeedUpdate;
-			this.normalsNeedUpdate = geometry.normalsNeedUpdate;
-			this.colorsNeedUpdate = geometry.colorsNeedUpdate;
-			this.uvsNeedUpdate = geometry.uvsNeedUpdate;
-			this.groupsNeedUpdate = geometry.groupsNeedUpdate;
-
-			if ( geometry.boundingSphere !== null ) {
-
-				this.boundingSphere = geometry.boundingSphere.clone();
-
-			}
-
-			if ( geometry.boundingBox !== null ) {
-
-				this.boundingBox = geometry.boundingBox.clone();
-
-			}
-
-			return this;
 
 		}
 
-	} );
+		this.computeGroups( geometry );
+
+		this.verticesNeedUpdate = geometry.verticesNeedUpdate;
+		this.normalsNeedUpdate = geometry.normalsNeedUpdate;
+		this.colorsNeedUpdate = geometry.colorsNeedUpdate;
+		this.uvsNeedUpdate = geometry.uvsNeedUpdate;
+		this.groupsNeedUpdate = geometry.groupsNeedUpdate;
+
+		if ( geometry.boundingSphere !== null ) {
+
+			this.boundingSphere = geometry.boundingSphere.clone();
+
+		}
+
+		if ( geometry.boundingBox !== null ) {
+
+			this.boundingBox = geometry.boundingBox.clone();
+
+		}
+
+		return this;
+
+	};
 
 	function arrayMax( array ) {
 
@@ -12241,8 +12227,8 @@
 
 			}
 
-			var normalMatrix,
-				vertexOffset = this.vertices.length,
+			var normalMatrix;
+			var vertexOffset = this.vertices.length,
 				vertices1 = this.vertices,
 				vertices2 = geometry.vertices,
 				faces1 = this.faces,
@@ -12284,11 +12270,12 @@
 
 			for ( var i$2 = 0, il$2 = faces2.length; i$2 < il$2; i$2 ++ ) {
 
-				var face = faces2[ i$2 ], faceCopy = (void 0), normal = (void 0), color = (void 0),
-					faceVertexNormals = face.vertexNormals,
+				var face = faces2[ i$2 ];
+				var normal = (void 0), color = (void 0);
+				var faceVertexNormals = face.vertexNormals,
 					faceVertexColors = face.vertexColors;
 
-				faceCopy = new Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
+				var faceCopy = new Face3( face.a + vertexOffset, face.b + vertexOffset, face.c + vertexOffset );
 				faceCopy.normal.copy( face.normal );
 
 				if ( normalMatrix !== undefined ) {
@@ -13691,12 +13678,12 @@
 
 		updateProjectionMatrix: function () {
 
-			var near = this.near,
-				top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom,
-				height = 2 * top,
-				width = this.aspect * height,
-				left = - 0.5 * width,
-				view = this.view;
+			var near = this.near;
+			var top = near * Math.tan( MathUtils.DEG2RAD * 0.5 * this.fov ) / this.zoom;
+			var height = 2 * top;
+			var width = this.aspect * height;
+			var left = - 0.5 * width;
+			var view = this.view;
 
 			if ( this.view !== null && this.view.enabled ) {
 
@@ -16394,8 +16381,8 @@
 
 		function projectPlanes( planes, camera, dstOffset, skipTransform ) {
 
-			var nPlanes = planes !== null ? planes.length : 0,
-				dstArray = null;
+			var nPlanes = planes !== null ? planes.length : 0;
+			var dstArray = null;
 
 			if ( nPlanes !== 0 ) {
 
@@ -17212,8 +17199,8 @@
 		// unoptimized: ! isNaN( firstElem )
 		// see http://jacksondunstan.com/articles/983
 
-		var n = nBlocks * blockSize,
-			r = arrayCacheF32[ n ];
+		var n = nBlocks * blockSize;
+		var r = arrayCacheF32[ n ];
 
 		if ( r === undefined ) {
 
@@ -17918,8 +17905,8 @@
 			var match = RePathPart.exec( path ),
 				matchEnd = RePathPart.lastIndex;
 
-			var id = match[ 1 ],
-				idIsIndex = match[ 2 ] === ']',
+			var id = match[ 1 ];
+			var idIsIndex = match[ 2 ] === ']',
 				subscript = match[ 3 ];
 
 			if ( idIsIndex ) { id = id | 0; } // convert to integer
@@ -30024,10 +30011,10 @@
 
 			dim = dim || 2;
 
-			var hasHoles = holeIndices && holeIndices.length,
-				outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length,
-				outerNode = linkedList( data, 0, outerLen, dim, true ),
-				triangles = [];
+			var hasHoles = holeIndices && holeIndices.length;
+			var outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
+			var outerNode = linkedList( data, 0, outerLen, dim, true );
+			var triangles = [];
 
 			if ( ! outerNode || outerNode.next === outerNode.prev ) { return triangles; }
 
@@ -30344,8 +30331,8 @@
 	// link every hole into the outer loop, producing a single-ring polygon without holes
 	function eliminateHoles( data, holeIndices, outerNode, dim ) {
 
-		var queue = [],
-			i, len, start, end, list;
+		var queue = [];
+		var i, len, start, end, list;
 
 		for ( i = 0, len = holeIndices.length; i < len; i ++ ) {
 
@@ -30396,11 +30383,10 @@
 	// David Eberly's algorithm for finding a bridge between hole and outer polygon
 	function findHoleBridge( hole, outerNode ) {
 
-		var p = outerNode,
-			hx = hole.x,
-			hy = hole.y,
-			qx = - Infinity,
-			m;
+		var p = outerNode;
+		var hx = hole.x;
+		var hy = hole.y;
+		var qx = - Infinity, m;
 
 		// find a segment intersected by a ray from the hole's leftmost point to the left;
 		// segment's endpoint with lesser x will be potential connection point
@@ -30439,9 +30425,8 @@
 
 		var stop = m,
 			mx = m.x,
-			my = m.y,
-			tanMin = Infinity,
-			tan;
+			my = m.y;
+		var tanMin = Infinity, tan;
 
 		p = m;
 
@@ -30693,8 +30678,8 @@
 	function middleInside( a, b ) {
 
 		var p = a,
-			inside = false,
-			px = ( a.x + b.x ) / 2,
+			inside = false;
+		var px = ( a.x + b.x ) / 2,
 			py = ( a.y + b.y ) / 2;
 		do {
 
@@ -32737,7 +32722,8 @@
 
 		function generateCap( top ) {
 
-			var centerIndexStart, centerIndexEnd;
+			// save the index of the first center vertex
+			var centerIndexStart = index;
 
 			var uv = new Vector2();
 			var vertex = new Vector3();
@@ -32746,9 +32732,6 @@
 
 			var radius = ( top === true ) ? radiusTop : radiusBottom;
 			var sign = ( top === true ) ? 1 : - 1;
-
-			// save the index of the first center vertex
-			centerIndexStart = index;
 
 			// first we generate the center vertex data of the cap.
 			// because the geometry needs one set of uvs per face,
@@ -32775,8 +32758,7 @@
 			}
 
 			// save the index of the last center vertex
-
-			centerIndexEnd = index;
+			var centerIndexEnd = index;
 
 			// now we generate the surrounding vertices, normals and uvs
 
@@ -34411,9 +34393,8 @@
 
 		evaluate: function ( t ) {
 
-			var pp = this.parameterPositions,
-				i1 = this._cachedIndex,
-
+			var pp = this.parameterPositions;
+			var i1 = this._cachedIndex,
 				t1 = pp[ i1 ],
 				t0 = pp[ i1 - 1 ];
 
@@ -34662,8 +34643,8 @@
 
 		intervalChanged_: function ( i1, t0, t1 ) {
 
-			var pp = this.parameterPositions,
-				iPrev = i1 - 2,
+			var pp = this.parameterPositions;
+			var iPrev = i1 - 2,
 				iNext = i1 + 1,
 
 				tPrev = pp[ iPrev ],
@@ -37088,7 +37069,8 @@
 
 			var arcLengths = this.getLengths();
 
-			var i = 0, il = arcLengths.length;
+			var i = 0;
+			var il = arcLengths.length;
 
 			var targetArcLength; // The targeted u distance value to get
 
@@ -37633,7 +37615,7 @@
 
 		}
 
-		var p0, p1, p2, p3; // 4 points
+		var p0, p3; // 4 points (p1 & p2 defined below)
 
 		if ( this.closed || intPoint > 0 ) {
 
@@ -37647,8 +37629,8 @@
 
 		}
 
-		p1 = points[ intPoint % l ];
-		p2 = points[ ( intPoint + 1 ) % l ];
+		var p1 = points[ intPoint % l ];
+		var p2 = points[ ( intPoint + 1 ) % l ];
 
 		if ( this.closed || intPoint + 2 < l ) {
 
@@ -41741,7 +41723,8 @@
 			if ( noHoles === true )	{ return	toShapesNoHoles( subPaths ); }
 
 
-			var solid, tmpPath, tmpShape, shapes = [];
+			var solid, tmpPath, tmpShape;
+			var shapes = [];
 
 			if ( subPaths.length === 1 ) {
 
@@ -43840,12 +43823,12 @@
 		// create getter / setter pair for a property in the scene graph
 		bind: function () {
 
-			var targetObject = this.node,
-				parsedPath = this.parsedPath,
+			var targetObject = this.node;
+			var parsedPath = this.parsedPath;
 
-				objectName = parsedPath.objectName,
-				propertyName = parsedPath.propertyName,
-				propertyIndex = parsedPath.propertyIndex;
+			var objectName = parsedPath.objectName;
+			var propertyName = parsedPath.propertyName;
+			var propertyIndex = parsedPath.propertyIndex;
 
 			if ( ! targetObject ) {
 
@@ -44388,9 +44371,9 @@
 			// returns an array of bindings for the given path that is changed
 			// according to the contained objects in the group
 
-			var indicesByPath = this._bindingsIndicesByPath,
-				index = indicesByPath[ path ],
-				bindings = this._bindings;
+			var indicesByPath = this._bindingsIndicesByPath;
+			var index = indicesByPath[ path ];
+			var bindings = this._bindings;
 
 			if ( index !== undefined ) { return bindings[ index ]; }
 
@@ -45659,8 +45642,8 @@
 
 			var clipUuid = clipObject !== null ? clipObject.uuid : clip;
 
-			var actionsForClip = this._actionsByClip[ clipUuid ],
-				prototypeAction = null;
+			var actionsForClip = this._actionsByClip[ clipUuid ];
+			var prototypeAction = null;
 
 			if ( blendMode === undefined ) {
 
@@ -45904,7 +45887,7 @@
 
 	} );
 
-	function Uniform( value ) {
+	var Uniform = function Uniform( value ) {
 
 		if ( typeof value === 'string' ) {
 
@@ -45915,9 +45898,9 @@
 
 		this.value = value;
 
-	}
+	};
 
-	Uniform.prototype.clone = function () {
+	Uniform.prototype.clone = function clone () {
 
 		return new Uniform( this.value.clone === undefined ? this.value : this.value.clone() );
 
@@ -47762,7 +47745,7 @@
 	 * interpolate diffuse lighting while limiting sampling computation.
 	 */
 
-	function PMREMGenerator( renderer ) {
+	var PMREMGenerator = function PMREMGenerator( renderer ) {
 
 		this._renderer = renderer;
 		this._pingPongRenderTarget = null;
@@ -47773,405 +47756,399 @@
 
 		this._compileMaterial( this._blurMaterial );
 
-	}
+	};
 
-	PMREMGenerator.prototype = {
-
-		constructor: PMREMGenerator,
-
-		/**
+	/**
 		 * Generates a PMREM from a supplied Scene, which can be faster than using an
 		 * image if networking bandwidth is low. Optional sigma specifies a blur radius
 		 * in radians to be applied to the scene before PMREM generation. Optional near
 		 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 		 * is placed at the origin).
 		 */
-		fromScene: function ( scene, sigma, near, far ) {
+	PMREMGenerator.prototype.fromScene = function fromScene ( scene, sigma, near, far ) {
 			if ( sigma === void 0 ) sigma = 0;
 			if ( near === void 0 ) near = 0.1;
 			if ( far === void 0 ) far = 100;
 
 
-			_oldTarget = this._renderer.getRenderTarget();
-			var cubeUVRenderTarget = this._allocateTargets();
+		_oldTarget = this._renderer.getRenderTarget();
+		var cubeUVRenderTarget = this._allocateTargets();
 
-			this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
-			if ( sigma > 0 ) {
+		this._sceneToCubeUV( scene, near, far, cubeUVRenderTarget );
+		if ( sigma > 0 ) {
 
-				this._blur( cubeUVRenderTarget, 0, 0, sigma );
+			this._blur( cubeUVRenderTarget, 0, 0, sigma );
 
-			}
+		}
 
-			this._applyPMREM( cubeUVRenderTarget );
-			this._cleanup( cubeUVRenderTarget );
+		this._applyPMREM( cubeUVRenderTarget );
+		this._cleanup( cubeUVRenderTarget );
 
-			return cubeUVRenderTarget;
+		return cubeUVRenderTarget;
 
-		},
+	};
 
-		/**
+	/**
 		 * Generates a PMREM from an equirectangular texture, which can be either LDR
 		 * (RGBFormat) or HDR (RGBEFormat). The ideal input image size is 1k (1024 x 512),
 		 * as this matches best with the 256 x 256 cubemap output.
 		 */
-		fromEquirectangular: function ( equirectangular ) {
+	PMREMGenerator.prototype.fromEquirectangular = function fromEquirectangular ( equirectangular ) {
 
-			return this._fromTexture( equirectangular );
+		return this._fromTexture( equirectangular );
 
-		},
+	};
 
-		/**
+	/**
 		 * Generates a PMREM from an cubemap texture, which can be either LDR
 		 * (RGBFormat) or HDR (RGBEFormat). The ideal input cube size is 256 x 256,
 		 * as this matches best with the 256 x 256 cubemap output.
 		 */
-		fromCubemap: function ( cubemap ) {
+	PMREMGenerator.prototype.fromCubemap = function fromCubemap ( cubemap ) {
 
-			return this._fromTexture( cubemap );
+		return this._fromTexture( cubemap );
 
-		},
+	};
 
-		/**
+	/**
 		 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
 		 * your texture's network fetch for increased concurrency.
 		 */
-		compileCubemapShader: function () {
+	PMREMGenerator.prototype.compileCubemapShader = function compileCubemapShader () {
 
-			if ( this._cubemapShader === null ) {
+		if ( this._cubemapShader === null ) {
 
-				this._cubemapShader = _getCubemapShader();
-				this._compileMaterial( this._cubemapShader );
+			this._cubemapShader = _getCubemapShader();
+			this._compileMaterial( this._cubemapShader );
 
-			}
+		}
 
-		},
+	};
 
-		/**
+	/**
 		 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
 		 * your texture's network fetch for increased concurrency.
 		 */
-		compileEquirectangularShader: function () {
+	PMREMGenerator.prototype.compileEquirectangularShader = function compileEquirectangularShader () {
 
-			if ( this._equirectShader === null ) {
+		if ( this._equirectShader === null ) {
 
-				this._equirectShader = _getEquirectShader();
-				this._compileMaterial( this._equirectShader );
+			this._equirectShader = _getEquirectShader();
+			this._compileMaterial( this._equirectShader );
 
-			}
+		}
 
-		},
+	};
 
-		/**
+	/**
 		 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
 		 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
 		 * one of them will cause any others to also become unusable.
 		 */
-		dispose: function () {
+	PMREMGenerator.prototype.dispose = function dispose () {
 
-			this._blurMaterial.dispose();
+		this._blurMaterial.dispose();
 
-			if ( this._cubemapShader !== null ) { this._cubemapShader.dispose(); }
-			if ( this._equirectShader !== null ) { this._equirectShader.dispose(); }
+		if ( this._cubemapShader !== null ) { this._cubemapShader.dispose(); }
+		if ( this._equirectShader !== null ) { this._equirectShader.dispose(); }
 
-			for ( var i = 0; i < _lodPlanes.length; i ++ ) {
+		for ( var i = 0; i < _lodPlanes.length; i ++ ) {
 
-				_lodPlanes[ i ].dispose();
+			_lodPlanes[ i ].dispose();
 
-			}
+		}
 
-		},
+	};
 
-		// private interface
+	// private interface
 
-		_cleanup: function ( outputTarget ) {
+	PMREMGenerator.prototype._cleanup = function _cleanup ( outputTarget ) {
 
-			this._pingPongRenderTarget.dispose();
-			this._renderer.setRenderTarget( _oldTarget );
-			outputTarget.scissorTest = false;
-			_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
+		this._pingPongRenderTarget.dispose();
+		this._renderer.setRenderTarget( _oldTarget );
+		outputTarget.scissorTest = false;
+		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
 
-		},
+	};
 
-		_fromTexture: function ( texture ) {
+	PMREMGenerator.prototype._fromTexture = function _fromTexture ( texture ) {
 
-			_oldTarget = this._renderer.getRenderTarget();
-			var cubeUVRenderTarget = this._allocateTargets( texture );
-			this._textureToCubeUV( texture, cubeUVRenderTarget );
-			this._applyPMREM( cubeUVRenderTarget );
-			this._cleanup( cubeUVRenderTarget );
+		_oldTarget = this._renderer.getRenderTarget();
+		var cubeUVRenderTarget = this._allocateTargets( texture );
+		this._textureToCubeUV( texture, cubeUVRenderTarget );
+		this._applyPMREM( cubeUVRenderTarget );
+		this._cleanup( cubeUVRenderTarget );
 
-			return cubeUVRenderTarget;
+		return cubeUVRenderTarget;
 
-		},
+	};
 
-		_allocateTargets: function ( texture ) { // warning: null texture is valid
+	PMREMGenerator.prototype._allocateTargets = function _allocateTargets ( texture ) { // warning: null texture is valid
 
-			var params = {
-				magFilter: NearestFilter,
-				minFilter: NearestFilter,
-				generateMipmaps: false,
-				type: UnsignedByteType,
-				format: RGBEFormat,
-				encoding: _isLDR( texture ) ? texture.encoding : RGBEEncoding,
-				depthBuffer: false,
-				stencilBuffer: false
-			};
+		var params = {
+			magFilter: NearestFilter,
+			minFilter: NearestFilter,
+			generateMipmaps: false,
+			type: UnsignedByteType,
+			format: RGBEFormat,
+			encoding: _isLDR( texture ) ? texture.encoding : RGBEEncoding,
+			depthBuffer: false,
+			stencilBuffer: false
+		};
 
-			var cubeUVRenderTarget = _createRenderTarget( params );
-			cubeUVRenderTarget.depthBuffer = texture ? false : true;
-			this._pingPongRenderTarget = _createRenderTarget( params );
-			return cubeUVRenderTarget;
+		var cubeUVRenderTarget = _createRenderTarget( params );
+		cubeUVRenderTarget.depthBuffer = texture ? false : true;
+		this._pingPongRenderTarget = _createRenderTarget( params );
+		return cubeUVRenderTarget;
 
-		},
+	};
 
-		_compileMaterial: function ( material ) {
+	PMREMGenerator.prototype._compileMaterial = function _compileMaterial ( material ) {
 
-			var tmpMesh = new Mesh( _lodPlanes[ 0 ], material );
-			this._renderer.compile( tmpMesh, _flatCamera );
+		var tmpMesh = new Mesh( _lodPlanes[ 0 ], material );
+		this._renderer.compile( tmpMesh, _flatCamera );
 
-		},
+	};
 
-		_sceneToCubeUV: function ( scene, near, far, cubeUVRenderTarget ) {
+	PMREMGenerator.prototype._sceneToCubeUV = function _sceneToCubeUV ( scene, near, far, cubeUVRenderTarget ) {
 
-			var fov = 90;
-			var aspect = 1;
-			var cubeCamera = new PerspectiveCamera( fov, aspect, near, far );
-			var upSign = [ 1, - 1, 1, 1, 1, 1 ];
-			var forwardSign = [ 1, 1, 1, - 1, - 1, - 1 ];
-			var renderer = this._renderer;
+		var fov = 90;
+		var aspect = 1;
+		var cubeCamera = new PerspectiveCamera( fov, aspect, near, far );
+		var upSign = [ 1, - 1, 1, 1, 1, 1 ];
+		var forwardSign = [ 1, 1, 1, - 1, - 1, - 1 ];
+		var renderer = this._renderer;
 
-			var outputEncoding = renderer.outputEncoding;
-			var toneMapping = renderer.toneMapping;
-			var clearColor = renderer.getClearColor();
-			var clearAlpha = renderer.getClearAlpha();
+		var outputEncoding = renderer.outputEncoding;
+		var toneMapping = renderer.toneMapping;
+		var clearColor = renderer.getClearColor();
+		var clearAlpha = renderer.getClearAlpha();
 
-			renderer.toneMapping = NoToneMapping;
-			renderer.outputEncoding = LinearEncoding;
+		renderer.toneMapping = NoToneMapping;
+		renderer.outputEncoding = LinearEncoding;
 
-			var background = scene.background;
-			if ( background && background.isColor ) {
+		var background = scene.background;
+		if ( background && background.isColor ) {
 
-				background.convertSRGBToLinear();
-				// Convert linear to RGBE
-				var maxComponent = Math.max( background.r, background.g, background.b );
-				var fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
-				background = background.multiplyScalar( Math.pow( 2.0, - fExp ) );
-				var alpha = ( fExp + 128.0 ) / 255.0;
-				renderer.setClearColor( background, alpha );
-				scene.background = null;
+			background.convertSRGBToLinear();
+			// Convert linear to RGBE
+			var maxComponent = Math.max( background.r, background.g, background.b );
+			var fExp = Math.min( Math.max( Math.ceil( Math.log2( maxComponent ) ), - 128.0 ), 127.0 );
+			background = background.multiplyScalar( Math.pow( 2.0, - fExp ) );
+			var alpha = ( fExp + 128.0 ) / 255.0;
+			renderer.setClearColor( background, alpha );
+			scene.background = null;
 
-			}
+		}
 
-			for ( var i = 0; i < 6; i ++ ) {
+		for ( var i = 0; i < 6; i ++ ) {
 
-				var col = i % 3;
-				if ( col == 0 ) {
+			var col = i % 3;
+			if ( col == 0 ) {
 
-					cubeCamera.up.set( 0, upSign[ i ], 0 );
-					cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
+				cubeCamera.up.set( 0, upSign[ i ], 0 );
+				cubeCamera.lookAt( forwardSign[ i ], 0, 0 );
 
-				} else if ( col == 1 ) {
+			} else if ( col == 1 ) {
 
-					cubeCamera.up.set( 0, 0, upSign[ i ] );
-					cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
-
-				} else {
-
-					cubeCamera.up.set( 0, upSign[ i ], 0 );
-					cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
-
-				}
-
-				_setViewport( cubeUVRenderTarget,
-					col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
-				renderer.setRenderTarget( cubeUVRenderTarget );
-				renderer.render( scene, cubeCamera );
-
-			}
-
-			renderer.toneMapping = toneMapping;
-			renderer.outputEncoding = outputEncoding;
-			renderer.setClearColor( clearColor, clearAlpha );
-
-		},
-
-		_textureToCubeUV: function ( texture, cubeUVRenderTarget ) {
-
-			var renderer = this._renderer;
-
-			if ( texture.isCubeTexture ) {
-
-				if ( this._cubemapShader == null ) {
-
-					this._cubemapShader = _getCubemapShader();
-
-				}
+				cubeCamera.up.set( 0, 0, upSign[ i ] );
+				cubeCamera.lookAt( 0, forwardSign[ i ], 0 );
 
 			} else {
 
-				if ( this._equirectShader == null ) {
-
-					this._equirectShader = _getEquirectShader();
-
-				}
+				cubeCamera.up.set( 0, upSign[ i ], 0 );
+				cubeCamera.lookAt( 0, 0, forwardSign[ i ] );
 
 			}
 
-			var material = texture.isCubeTexture ? this._cubemapShader : this._equirectShader;
-			var mesh = new Mesh( _lodPlanes[ 0 ], material );
-
-			var uniforms = material.uniforms;
-
-			uniforms[ 'envMap' ].value = texture;
-
-			if ( ! texture.isCubeTexture ) {
-
-				uniforms[ 'texelSize' ].value.set( 1.0 / texture.image.width, 1.0 / texture.image.height );
-
-			}
-
-			uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
-			uniforms[ 'outputEncoding' ].value = ENCODINGS[ cubeUVRenderTarget.texture.encoding ];
-
-			_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
-
+			_setViewport( cubeUVRenderTarget,
+				col * SIZE_MAX, i > 2 ? SIZE_MAX : 0, SIZE_MAX, SIZE_MAX );
 			renderer.setRenderTarget( cubeUVRenderTarget );
-			renderer.render( mesh, _flatCamera );
+			renderer.render( scene, cubeCamera );
 
-		},
+		}
 
-		_applyPMREM: function ( cubeUVRenderTarget ) {
+		renderer.toneMapping = toneMapping;
+		renderer.outputEncoding = outputEncoding;
+		renderer.setClearColor( clearColor, clearAlpha );
 
-			var renderer = this._renderer;
-			var autoClear = renderer.autoClear;
-			renderer.autoClear = false;
+	};
 
-			for ( var i = 1; i < TOTAL_LODS; i ++ ) {
+	PMREMGenerator.prototype._textureToCubeUV = function _textureToCubeUV ( texture, cubeUVRenderTarget ) {
 
-				var sigma = Math.sqrt( _sigmas[ i ] * _sigmas[ i ] - _sigmas[ i - 1 ] * _sigmas[ i - 1 ] );
+		var renderer = this._renderer;
 
-				var poleAxis = _axisDirections[ ( i - 1 ) % _axisDirections.length ];
+		if ( texture.isCubeTexture ) {
 
-				this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
+			if ( this._cubemapShader == null ) {
+
+				this._cubemapShader = _getCubemapShader();
 
 			}
 
-			renderer.autoClear = autoClear;
+		} else {
 
-		},
+			if ( this._equirectShader == null ) {
 
-		/**
+				this._equirectShader = _getEquirectShader();
+
+			}
+
+		}
+
+		var material = texture.isCubeTexture ? this._cubemapShader : this._equirectShader;
+		var mesh = new Mesh( _lodPlanes[ 0 ], material );
+
+		var uniforms = material.uniforms;
+
+		uniforms[ 'envMap' ].value = texture;
+
+		if ( ! texture.isCubeTexture ) {
+
+			uniforms[ 'texelSize' ].value.set( 1.0 / texture.image.width, 1.0 / texture.image.height );
+
+		}
+
+		uniforms[ 'inputEncoding' ].value = ENCODINGS[ texture.encoding ];
+		uniforms[ 'outputEncoding' ].value = ENCODINGS[ cubeUVRenderTarget.texture.encoding ];
+
+		_setViewport( cubeUVRenderTarget, 0, 0, 3 * SIZE_MAX, 2 * SIZE_MAX );
+
+		renderer.setRenderTarget( cubeUVRenderTarget );
+		renderer.render( mesh, _flatCamera );
+
+	};
+
+	PMREMGenerator.prototype._applyPMREM = function _applyPMREM ( cubeUVRenderTarget ) {
+
+		var renderer = this._renderer;
+		var autoClear = renderer.autoClear;
+		renderer.autoClear = false;
+
+		for ( var i = 1; i < TOTAL_LODS; i ++ ) {
+
+			var sigma = Math.sqrt( _sigmas[ i ] * _sigmas[ i ] - _sigmas[ i - 1 ] * _sigmas[ i - 1 ] );
+
+			var poleAxis = _axisDirections[ ( i - 1 ) % _axisDirections.length ];
+
+			this._blur( cubeUVRenderTarget, i - 1, i, sigma, poleAxis );
+
+		}
+
+		renderer.autoClear = autoClear;
+
+	};
+
+	/**
 		 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
 		 * vertically and horizontally, but this breaks down on a cube. Here we apply
 		 * the blur latitudinally (around the poles), and then longitudinally (towards
 		 * the poles) to approximate the orthogonally-separable blur. It is least
 		 * accurate at the poles, but still does a decent job.
 		 */
-		_blur: function ( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
+	PMREMGenerator.prototype._blur = function _blur ( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
 
-			var pingPongRenderTarget = this._pingPongRenderTarget;
+		var pingPongRenderTarget = this._pingPongRenderTarget;
 
-			this._halfBlur(
-				cubeUVRenderTarget,
-				pingPongRenderTarget,
-				lodIn,
-				lodOut,
-				sigma,
-				'latitudinal',
-				poleAxis );
+		this._halfBlur(
+			cubeUVRenderTarget,
+			pingPongRenderTarget,
+			lodIn,
+			lodOut,
+			sigma,
+			'latitudinal',
+			poleAxis );
 
-			this._halfBlur(
-				pingPongRenderTarget,
-				cubeUVRenderTarget,
-				lodOut,
-				lodOut,
-				sigma,
-				'longitudinal',
-				poleAxis );
+		this._halfBlur(
+			pingPongRenderTarget,
+			cubeUVRenderTarget,
+			lodOut,
+			lodOut,
+			sigma,
+			'longitudinal',
+			poleAxis );
 
-		},
+	};
 
-		_halfBlur: function ( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
+	PMREMGenerator.prototype._halfBlur = function _halfBlur ( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
 
-			var renderer = this._renderer;
-			var blurMaterial = this._blurMaterial;
+		var renderer = this._renderer;
+		var blurMaterial = this._blurMaterial;
 
-			if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
+		if ( direction !== 'latitudinal' && direction !== 'longitudinal' ) {
 
-				console.error(
-					'blur direction must be either latitudinal or longitudinal!' );
-
-			}
-
-			// Number of standard deviations at which to cut off the discrete approximation.
-			var STANDARD_DEVIATIONS = 3;
-
-			var blurMesh = new Mesh( _lodPlanes[ lodOut ], blurMaterial );
-			var blurUniforms = blurMaterial.uniforms;
-
-			var pixels = _sizeLods[ lodIn ] - 1;
-			var radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
-			var sigmaPixels = sigmaRadians / radiansPerPixel;
-			var samples = isFinite( sigmaRadians ) ? 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels ) : MAX_SAMPLES;
-
-			if ( samples > MAX_SAMPLES ) {
-
-				console.warn( ("sigmaRadians, " + sigmaRadians + ", is too large and will clip, as it requested " + samples + " samples when the maximum is set to " + MAX_SAMPLES) );
-
-			}
-
-			var weights = [];
-			var sum = 0;
-
-			for ( var i = 0; i < MAX_SAMPLES; ++ i ) {
-
-				var x$1 = i / sigmaPixels;
-				var weight = Math.exp( - x$1 * x$1 / 2 );
-				weights.push( weight );
-
-				if ( i == 0 ) {
-
-					sum += weight;
-
-				} else if ( i < samples ) {
-
-					sum += 2 * weight;
-
-				}
-
-			}
-
-			for ( var i$1 = 0; i$1 < weights.length; i$1 ++ ) {
-
-				weights[ i$1 ] = weights[ i$1 ] / sum;
-
-			}
-
-			blurUniforms[ 'envMap' ].value = targetIn.texture;
-			blurUniforms[ 'samples' ].value = samples;
-			blurUniforms[ 'weights' ].value = weights;
-			blurUniforms[ 'latitudinal' ].value = direction === 'latitudinal';
-
-			if ( poleAxis ) {
-
-				blurUniforms[ 'poleAxis' ].value = poleAxis;
-
-			}
-
-			blurUniforms[ 'dTheta' ].value = radiansPerPixel;
-			blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
-			blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
-			blurUniforms[ 'outputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
-
-			var outputSize = _sizeLods[ lodOut ];
-			var x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
-			var y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) + 2 * outputSize * ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
-
-			_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
-			renderer.setRenderTarget( targetOut );
-			renderer.render( blurMesh, _flatCamera );
+			console.error(
+				'blur direction must be either latitudinal or longitudinal!' );
 
 		}
+
+		// Number of standard deviations at which to cut off the discrete approximation.
+		var STANDARD_DEVIATIONS = 3;
+
+		var blurMesh = new Mesh( _lodPlanes[ lodOut ], blurMaterial );
+		var blurUniforms = blurMaterial.uniforms;
+
+		var pixels = _sizeLods[ lodIn ] - 1;
+		var radiansPerPixel = isFinite( sigmaRadians ) ? Math.PI / ( 2 * pixels ) : 2 * Math.PI / ( 2 * MAX_SAMPLES - 1 );
+		var sigmaPixels = sigmaRadians / radiansPerPixel;
+		var samples = isFinite( sigmaRadians ) ? 1 + Math.floor( STANDARD_DEVIATIONS * sigmaPixels ) : MAX_SAMPLES;
+
+		if ( samples > MAX_SAMPLES ) {
+
+			console.warn( ("sigmaRadians, " + sigmaRadians + ", is too large and will clip, as it requested " + samples + " samples when the maximum is set to " + MAX_SAMPLES) );
+
+		}
+
+		var weights = [];
+		var sum = 0;
+
+		for ( var i = 0; i < MAX_SAMPLES; ++ i ) {
+
+			var x$1 = i / sigmaPixels;
+			var weight = Math.exp( - x$1 * x$1 / 2 );
+			weights.push( weight );
+
+			if ( i == 0 ) {
+
+				sum += weight;
+
+			} else if ( i < samples ) {
+
+				sum += 2 * weight;
+
+			}
+
+		}
+
+		for ( var i$1 = 0; i$1 < weights.length; i$1 ++ ) {
+
+			weights[ i$1 ] = weights[ i$1 ] / sum;
+
+		}
+
+		blurUniforms[ 'envMap' ].value = targetIn.texture;
+		blurUniforms[ 'samples' ].value = samples;
+		blurUniforms[ 'weights' ].value = weights;
+		blurUniforms[ 'latitudinal' ].value = direction === 'latitudinal';
+
+		if ( poleAxis ) {
+
+			blurUniforms[ 'poleAxis' ].value = poleAxis;
+
+		}
+
+		blurUniforms[ 'dTheta' ].value = radiansPerPixel;
+		blurUniforms[ 'mipInt' ].value = LOD_MAX - lodIn;
+		blurUniforms[ 'inputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
+		blurUniforms[ 'outputEncoding' ].value = ENCODINGS[ targetIn.texture.encoding ];
+
+		var outputSize = _sizeLods[ lodOut ];
+		var x = 3 * Math.max( 0, SIZE_MAX - 2 * outputSize );
+		var y = ( lodOut === 0 ? 0 : 2 * SIZE_MAX ) + 2 * outputSize * ( lodOut > LOD_MAX - LOD_MIN ? lodOut - LOD_MAX + LOD_MIN : 0 );
+
+		_setViewport( targetOut, x, y, 3 * outputSize, 2 * outputSize );
+		renderer.setRenderTarget( targetOut );
+		renderer.render( blurMesh, _flatCamera );
 
 	};
 
