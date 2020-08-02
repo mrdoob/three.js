@@ -1,4 +1,5 @@
 import { Group } from '../../objects/Group.js';
+import { EventDispatcher } from '../../core/EventDispatcher.js';
 
 function WebXRController() {
 
@@ -6,9 +7,11 @@ function WebXRController() {
 	this._grip = null;
 	this._hand = null;
 
+	this.inputSource = null;
+
 }
 
-Object.assign( WebXRController.prototype, {
+WebXRController.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 	constructor: WebXRController,
 
@@ -97,7 +100,17 @@ Object.assign( WebXRController.prototype, {
 
 	},
 
+	connect: function ( inputSource ) {
+
+		this.inputSource = inputSource;
+
+		this.dispatchEvent( { type: 'connected', data: inputSource } );
+
+	},
+
 	disconnect: function ( inputSource ) {
+
+		this.inputSource = null;
 
 		this.dispatchEvent( { type: 'disconnected', data: inputSource } );
 

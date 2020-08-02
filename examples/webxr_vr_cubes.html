@@ -107,7 +107,7 @@
 
 				}
 
-				controller = renderer.xr.getController( 0 );
+				controller = renderer.xr.getControllerTargetRay( 0 );
 				controller.addEventListener( 'selectstart', onSelectStart );
 				controller.addEventListener( 'selectend', onSelectEnd );
 				controller.addEventListener( 'connected', function ( event ) {
