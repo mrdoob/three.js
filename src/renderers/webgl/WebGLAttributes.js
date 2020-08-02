@@ -126,18 +126,16 @@ function WebGLAttributes( gl, capabilities ) {
 
 			var cached = buffers.get( attribute );
 
-			if ( cached && cached.version >= attribute.version ) {
+			if ( ! cached || cached.version < attribute.version ) {
 
-				return;
+				buffers.set( attribute, {
+					buffer: attribute.buffer,
+					type: attribute.type,
+					bytesPerElement: attribute.elementSize,
+					version: attribute.version
+				} );
 
 			}
-
-			buffers.set( attribute, {
-				buffer: attribute.buffer,
-				type: attribute.type,
-				bytesPerElement: attribute.elementSize,
-				version: attribute.version
-			} );
 
 			return;
 

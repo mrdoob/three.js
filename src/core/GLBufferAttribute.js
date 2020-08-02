@@ -2,36 +2,23 @@
  * @author raub / https://github.com/raub
  */
 
-
-function GLBufferAttribute( gl, buffer, type, itemSize, count, normalized ) {
-
-	this.sizes = [
-		[ gl.FLOAT, 4 ],
-		[ gl.UNSIGNED_SHORT, 2 ],
-		[ gl.SHORT, 2 ],
-		[ gl.UNSIGNED_INT, 4 ],
-		[ gl.INT, 4 ],
-		[ gl.BYTE, 1 ],
-		[ gl.UNSIGNED_BYTE, 1 ],
-	].reduce( function ( accum, current ) {
-
-		accum[ current[ 0 ] ] = current[ 1 ];
-		return accum;
-
-	}, {} );
-
-	if ( ! this.sizes[ type ] ) {
-
-		throw new TypeError( 'THREE.GLBufferAttribute: unsupported GL data type.' );
-
-	}
+/**
+ * Element size is one of:
+ * gl.FLOAT: 4
+ * gl.UNSIGNED_SHORT: 2
+ * gl.SHORT: 2
+ * gl.UNSIGNED_INT: 4
+ * gl.INT: 4
+ * gl.BYTE: 1
+ * gl.UNSIGNED_BYTE: 1
+ */
+function GLBufferAttribute( buffer, type, itemSize, elementSize, count ) {
 
 	this.buffer = buffer;
 	this.type = type;
 	this.itemSize = itemSize;
-	this.elementSize = this.sizes[ type ];
+	this.elementSize = elementSize;
 	this.count = count;
-	this.normalized = normalized === true;
 
 	this.version = 0;
 
@@ -59,16 +46,10 @@ Object.assign( GLBufferAttribute.prototype, {
 
 	},
 
-	setType: function ( type ) {
-
-		if ( ! this.sizes[ type ] ) {
-
-			throw new TypeError( 'THREE.GLBufferAttribute: unsupported GL data type.' );
-
-		}
+	setType: function ( type, elementSize ) {
 
 		this.type = type;
-		this.elementSize = this.sizes[ type ];
+		this.elementSize = elementSize;
 
 		return this;
 
