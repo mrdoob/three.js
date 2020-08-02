@@ -1,7 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
 import { Command } from '../Command.js';
 
@@ -12,7 +8,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param object THREE.Object3D
  * @constructor
  */
-var RemoveObjectCommand = function ( editor, object ) {
+function RemoveObjectCommand( editor, object ) {
 
 	Command.call( this, editor );
 
@@ -27,7 +23,7 @@ var RemoveObjectCommand = function ( editor, object ) {
 
 	}
 
-};
+}
 
 RemoveObjectCommand.prototype = {
 

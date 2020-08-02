@@ -1,10 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com
- * @author chaht01 / http://hyuntak.com
- * Port of http://webglsamples.org/blob/blob.html
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -12,6 +5,9 @@ import {
 	ImmediateRenderObject,
 	NoColors
 } from "../../../build/three.module.js";
+/**
+ * Port of http://webglsamples.org/blob/blob.html
+ */
 
 var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 

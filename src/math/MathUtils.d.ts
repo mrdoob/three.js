@@ -1,8 +1,7 @@
 import { Quaternion } from './Quaternion';
 
 /**
- *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/math/Math.js">src/math/Math.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/MathUtils.js|src/math/MathUtils.js}
  */
 export namespace MathUtils {
 	export const DEG2RAD: number;
@@ -63,6 +62,11 @@ export namespace MathUtils {
 	 * Random float from - range / 2 to range / 2 interval.
 	 */
 	export function randFloatSpread( range: number ): number;
+
+	/**
+	 * Deterministic pseudo-random float in the interval [ 0, 1 ].
+	 */
+	export function seededRandom( seed?: number ): number;
 
 	export function degToRad( degrees: number ): number;
 

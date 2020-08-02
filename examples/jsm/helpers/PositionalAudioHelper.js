@@ -1,7 +1,3 @@
-/**
- * @author Mugen87 / http://github.com/Mugen87
- */
-
 import {
 	BufferGeometry,
 	BufferAttribute,

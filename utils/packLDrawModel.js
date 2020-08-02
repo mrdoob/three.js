@@ -1,6 +1,4 @@
 /**
- * @author yomboprime / https://github.com/yomboprime/
- *
  * LDraw object packer
  *
  * Usage:

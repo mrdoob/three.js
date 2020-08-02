@@ -1,6 +1,4 @@
-/**
- * @author Joe Pea / http://github.com/trusktr
- */
+import { BufferAttribute } from './../core/BufferAttribute';
 
 export interface HSL {
 	h: number;
@@ -12,9 +10,9 @@ export interface HSL {
  * Represents a color. See also {@link ColorUtils}.
  *
  * @example
- * var color = new THREE.Color( 0xff0000 );
+ * const color = new THREE.Color( 0xff0000 );
  *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/math/Color.js">src/math/Color.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/math/Color.js|src/math/Color.js}
  */
 export class Color {
 
@@ -38,9 +36,7 @@ export class Color {
 	 */
 	b: number;
 
-	set( color: Color ): Color;
-	set( color: number ): Color;
-	set( color: string ): Color;
+	set( color: Color | string | number ): Color;
 	setScalar( scalar: number ): Color;
 	setHex( hex: number ): Color;
 
@@ -189,6 +185,8 @@ export class Color {
 	 * @return The provided array-like.
 	 */
 	toArray( xyz: ArrayLike<number>, offset?: number ): ArrayLike<number>;
+
+	fromBufferAttribute( attribute: BufferAttribute, index: number ): this;
 
 	/**
 	 * List of X11 color names.

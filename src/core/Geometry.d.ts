@@ -37,7 +37,7 @@ export let GeometryIdCount: number;
 /**
  * Base class for geometries
  *
- * @see https://github.com/mrdoob/three.js/blob/master/src/core/Geometry.js
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/core/Geometry.js|src/core/Geometry.js}
  */
 export class Geometry extends EventDispatcher {
 

@@ -62,7 +62,7 @@ PointLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype
 
 		if ( viewportIndex === undefined ) viewportIndex = 0;
 
-		var camera = this.camera,
+		const camera = this.camera,
 			shadowMatrix = this.matrix,
 			lightPositionWorld = this._lightPositionWorld,
 			lookTarget = this._lookTarget,

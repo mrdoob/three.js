@@ -1,9 +1,3 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- * @author Austin Eng / https://github.com/austinEng
- * @author Shrek Shao / https://github.com/shrekshao
- */
-
 import {
 	CompressedTexture,
 	FileLoader,
@@ -53,6 +47,8 @@ var BasisTextureLoader = function ( manager ) {
 
 };
 
+BasisTextureLoader.taskCache = new WeakMap();
+
 BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: BasisTextureLoader,
@@ -77,12 +73,12 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 		var config = this.workerConfig;
 
-		config.astcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_astc' );
-		config.bptcSupported = !! renderer.extensions.get( 'EXT_texture_compression_bptc' );
-		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
-		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
-		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
-			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+		config.astcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_astc' );
+		config.bptcSupported = renderer.extensions.has( 'EXT_texture_compression_bptc' );
+		config.etcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_etc1' );
+		config.dxtSupported = renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' );
+		config.pvrtcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
+			|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		if ( config.astcSupported ) {
 
@@ -122,7 +118,17 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 		loader.load( url, ( buffer ) => {
 
-			this._createTexture( buffer )
+			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+			// again from this thread.
+			if ( BasisTextureLoader.taskCache.has( buffer ) ) {
+
+				var cachedTask = BasisTextureLoader.taskCache.get( buffer );
+
+				return cachedTask.promise.then( onLoad ).catch( onError );
+
+			}
+
+			this._createTexture( buffer, url )
 				.then( onLoad )
 				.catch( onError );
 
@@ -131,10 +137,11 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 	},
 
 	/**
-	 * @param  {ArrayBuffer} buffer
+	 * @param	{ArrayBuffer} buffer
+	 * @param	{string} url
 	 * @return {Promise<CompressedTexture>}
 	 */
-	_createTexture: function ( buffer ) {
+	_createTexture: function ( buffer, url ) {
 
 		var worker;
 		var taskID;
@@ -199,8 +206,10 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 
 			} );
 
+		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 		texturePending
-			.finally( () => {
+			.catch( () => true )
+			.then( () => {
 
 				if ( worker && taskID ) {
 
@@ -210,6 +219,14 @@ BasisTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ),
 				}
 
 			} );
+
+		// Cache the task result.
+		BasisTextureLoader.taskCache.set( buffer, {
+
+			url: url,
+			promise: texturePending
+
+		} );
 
 		return texturePending;
 
@@ -477,7 +494,7 @@ BasisTextureLoader.BasisWorker = function () {
 		if ( ! width || ! height || ! levels ) {
 
 			cleanup();
-			throw new Error( 'THREE.BasisTextureLoader:  Invalid .basis file' );
+			throw new Error( 'THREE.BasisTextureLoader:	Invalid .basis file' );
 
 		}
 

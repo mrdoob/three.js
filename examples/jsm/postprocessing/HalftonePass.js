@@ -1,16 +1,12 @@
-/**
- * @author meatbags / xavierburrow.com, github/meatbags
- *
- * RGB Halftone pass for three.js effects composer. Requires HalftoneShader.
- *
- */
-
 import {
 	ShaderMaterial,
 	UniformsUtils
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 import { HalftoneShader } from "../shaders/HalftoneShader.js";
+/**
+ * RGB Halftone pass for three.js effects composer. Requires HalftoneShader.
+ */
 
 var HalftonePass = function ( width, height, params ) {
 

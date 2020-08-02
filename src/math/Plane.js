@@ -1,13 +1,9 @@
 import { Matrix3 } from './Matrix3.js';
 import { Vector3 } from './Vector3.js';
 
-/**
- * @author bhouston / http://clara.io
- */
-
-var _vector1 = new Vector3();
-var _vector2 = new Vector3();
-var _normalMatrix = new Matrix3();
+const _vector1 = new Vector3();
+const _vector2 = new Vector3();
+const _normalMatrix = new Matrix3();
 
 function Plane( normal, constant ) {
 
@@ -51,7 +47,7 @@ Object.assign( Plane.prototype, {
 
 	setFromCoplanarPoints: function ( a, b, c ) {
 
-		var normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
+		const normal = _vector1.subVectors( c, b ).cross( _vector2.subVectors( a, b ) ).normalize();
 
 		// Q: should an error be thrown if normal is zero (e.g. degenerate plane)?
 
@@ -80,7 +76,7 @@ Object.assign( Plane.prototype, {
 
 		// Note: will lead to a divide by zero if the plane is invalid.
 
-		var inverseNormalLength = 1.0 / this.normal.length();
+		const inverseNormalLength = 1.0 / this.normal.length();
 		this.normal.multiplyScalar( inverseNormalLength );
 		this.constant *= inverseNormalLength;
 
@@ -131,9 +127,9 @@ Object.assign( Plane.prototype, {
 
 		}
 
-		var direction = line.delta( _vector1 );
+		const direction = line.delta( _vector1 );
 
-		var denominator = this.normal.dot( direction );
+		const denominator = this.normal.dot( direction );
 
 		if ( denominator === 0 ) {
 
@@ -149,7 +145,7 @@ Object.assign( Plane.prototype, {
 
 		}
 
-		var t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
+		const t = - ( line.start.dot( this.normal ) + this.constant ) / denominator;
 
 		if ( t < 0 || t > 1 ) {
 
@@ -165,8 +161,8 @@ Object.assign( Plane.prototype, {
 
 		// Note: this tests if a line intersects the plane, not whether it (or its end-points) are coplanar with it.
 
-		var startSign = this.distanceToPoint( line.start );
-		var endSign = this.distanceToPoint( line.end );
+		const startSign = this.distanceToPoint( line.start );
+		const endSign = this.distanceToPoint( line.end );
 
 		return ( startSign < 0 && endSign > 0 ) || ( endSign < 0 && startSign > 0 );
 
@@ -199,11 +195,11 @@ Object.assign( Plane.prototype, {
 
 	applyMatrix4: function ( matrix, optionalNormalMatrix ) {
 
-		var normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
+		const normalMatrix = optionalNormalMatrix || _normalMatrix.getNormalMatrix( matrix );
 
-		var referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
+		const referencePoint = this.coplanarPoint( _vector1 ).applyMatrix4( matrix );
 
-		var normal = this.normal.applyMatrix3( normalMatrix ).normalize();
+		const normal = this.normal.applyMatrix3( normalMatrix ).normalize();
 
 		this.constant = - referencePoint.dot( normal );
 

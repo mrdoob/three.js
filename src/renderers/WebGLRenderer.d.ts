@@ -24,7 +24,7 @@ import { Texture } from '../textures/Texture';
 export interface Renderer {
 	domElement: HTMLCanvasElement;
 
-	render( scene: Scene, camera: Camera ): void;
+	render( scene: Object3D, camera: Camera ): void;
 	setSize( width: number, height: number, updateStyle?: boolean ): void;
 }
 
@@ -100,7 +100,7 @@ export interface WebGLDebug {
  * The WebGL renderer displays your beautifully crafted scenes using WebGL, if your device supports it.
  * This renderer has way better performance than CanvasRenderer.
  *
- * @see <a href="https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js">src/renderers/WebGLRenderer.js</a>
+ * @see {@link https://github.com/mrdoob/three.js/blob/master/src/renderers/WebGLRenderer.js|src/renderers/WebGLRenderer.js}
  */
 export class WebGLRenderer implements Renderer {
 
@@ -163,7 +163,6 @@ export class WebGLRenderer implements Renderer {
 	physicallyCorrectLights: boolean;
 	toneMapping: ToneMapping;
 	toneMappingExposure: number;
-	toneMappingWhitePoint: number;
 
 	/**
 	 * Default is false.
@@ -274,9 +273,7 @@ export class WebGLRenderer implements Renderer {
 	/**
 	 * Sets the clear color, using color for the color and alpha for the opacity.
 	 */
-	setClearColor( color: Color, alpha?: number ): void;
-	setClearColor( color: string, alpha?: number ): void;
-	setClearColor( color: number, alpha?: number ): void;
+	setClearColor( color: Color | string | number, alpha?: number ): void;
 
 	/**
 	 * Returns a float with the current clear alpha. Ranges from 0 to 1.
@@ -336,12 +333,12 @@ export class WebGLRenderer implements Renderer {
 	 * Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
 	 */
 	compile(
-		scene: Scene,
+		scene: Object3D,
 		camera: Camera
 	): void;
 
 	/**
-	 * Render a scene using a camera.
+	 * Render a scene or an object using a camera.
 	 * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling
 	 * {@link WebGLRenderer#setRenderTarget .setRenderTarget} or to the canvas as usual.
 	 *
@@ -352,7 +349,7 @@ export class WebGLRenderer implements Renderer {
 	 * properties to false. To forcibly clear one ore more buffers call {@link WebGLRenderer#clear .clear}.
 	 */
 	render(
-		scene: Scene,
+		scene: Object3D,
 		camera: Camera
 	): void;
 

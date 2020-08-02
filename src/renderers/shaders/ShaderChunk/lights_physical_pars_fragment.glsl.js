@@ -1,9 +1,9 @@
 export default /* glsl */`
 struct PhysicalMaterial {
 
-	vec3	diffuseColor;
-	float	specularRoughness;
-	vec3	specularColor;
+	vec3 diffuseColor;
+	float specularRoughness;
+	vec3 specularColor;
 
 #ifdef CLEARCOAT
 	float clearcoat;

@@ -65,15 +65,15 @@ if ( Object.assign === undefined ) {
 
 		}
 
-		var output = Object( target );
+		const output = Object( target );
 
-		for ( var index = 1; index < arguments.length; index ++ ) {
+		for ( let index = 1; index < arguments.length; index ++ ) {
 
-			var source = arguments[ index ];
+			const source = arguments[ index ];
 
 			if ( source !== undefined && source !== null ) {
 
-				for ( var nextKey in source ) {
+				for ( const nextKey in source ) {
 
 					if ( Object.prototype.hasOwnProperty.call( source, nextKey ) ) {
 

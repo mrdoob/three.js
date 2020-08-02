@@ -1,6 +1,12 @@
+import {
+	AnimationMixer,
+	Object3D,
+	Quaternion,
+	Vector3
+} from "../../../build/three.module.js";
+import { CCDIKSolver } from "../animation/CCDIKSolver.js";
+import { MMDPhysics } from "../animation/MMDPhysics.js";
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * MMDAnimationHelper handles animation of MMD assets loaded by MMDLoader
  * with MMD special features as IK, Grant, and Physics.
  *
@@ -12,15 +18,6 @@
  * TODO
  *  - more precise grant skinning support.
  */
-
-import {
-	AnimationMixer,
-	Object3D,
-	Quaternion,
-	Vector3
-} from "../../../build/three.module.js";
-import { CCDIKSolver } from "../animation/CCDIKSolver.js";
-import { MMDPhysics } from "../animation/MMDPhysics.js";
 
 var MMDAnimationHelper = ( function () {
 
@@ -957,8 +954,6 @@ var MMDAnimationHelper = ( function () {
 
 			// 'duration' can be bigger than 'audioDuration + delayTime' because of sync configuration
 			if ( ( this.currentTime - this.delayTime ) > this.audioDuration ) return false;
-
-			this.audio.startTime = this.currentTime - this.delayTime;
 
 			return true;
 

@@ -1,7 +1,3 @@
-/**
- * @author vHawk / https://github.com/vHawk/
- */
-
 import {
 	Vector2,
 	Vector3,
@@ -276,6 +272,7 @@ export class CSM {
 			shaders.set( material, shader );
 
 		};
+
 		shaders.set( material, null );
 
 	}
@@ -319,6 +316,7 @@ export class CSM {
 			target.push( new Vector2() );
 
 		}
+
 		target.length = this.breaks.length;
 
 		for ( let i = 0; i < this.cascades; i ++ ) {

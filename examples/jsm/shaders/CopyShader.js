@@ -1,10 +1,7 @@
+
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Full-screen textured quad shader
  */
-
-
 
 var CopyShader = {
 

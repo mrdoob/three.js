@@ -1,9 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import { Vector3 } from '../math/Vector3.js';
 import { Object3D } from '../core/Object3D.js';
 import { Line } from '../objects/Line.js';
@@ -11,9 +5,9 @@ import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 
-var _v1 = new Vector3();
-var _v2 = new Vector3();
-var _v3 = new Vector3();
+const _v1 = new Vector3();
+const _v2 = new Vector3();
+const _v3 = new Vector3();
 
 function DirectionalLightHelper( light, size, color ) {
 
@@ -29,7 +23,7 @@ function DirectionalLightHelper( light, size, color ) {
 
 	if ( size === undefined ) size = 1;
 
-	var geometry = new BufferGeometry();
+	let geometry = new BufferGeometry();
 	geometry.setAttribute( 'position', new Float32BufferAttribute( [
 		- size, size, 0,
 		size, size, 0,
@@ -38,7 +32,7 @@ function DirectionalLightHelper( light, size, color ) {
 		- size, size, 0
 	], 3 ) );
 
-	var material = new LineBasicMaterial( { fog: false, toneMapped: false } );
+	const material = new LineBasicMaterial( { fog: false, toneMapped: false } );
 
 	this.lightPlane = new Line( geometry, material );
 	this.add( this.lightPlane );

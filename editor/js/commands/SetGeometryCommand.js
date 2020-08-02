@@ -1,8 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
 import { Command } from '../Command.js';
 
 import * as THREE from '../../../build/three.module.js';
@@ -14,7 +9,7 @@ import * as THREE from '../../../build/three.module.js';
  * @constructor
  */
 
-var SetGeometryCommand = function ( editor, object, newGeometry ) {
+function SetGeometryCommand( editor, object, newGeometry ) {
 
 	Command.call( this, editor );
 
@@ -26,7 +21,7 @@ var SetGeometryCommand = function ( editor, object, newGeometry ) {
 	this.oldGeometry = ( object !== undefined ) ? object.geometry : undefined;
 	this.newGeometry = newGeometry;
 
-};
+}
 
 SetGeometryCommand.prototype = {
 

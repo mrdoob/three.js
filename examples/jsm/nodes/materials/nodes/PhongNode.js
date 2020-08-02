@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import {
 	UniformsLib,
 	UniformsUtils
@@ -316,6 +312,7 @@ PhongNode.prototype.build = function ( builder ) {
 
 		}
 	*/
+
 		if ( alpha ) {
 
 			output.push( "gl_FragColor = vec4( outgoingLight, " + alpha.result + " );" );

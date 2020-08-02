@@ -1,11 +1,3 @@
-/**
- * @author Mike Piecuch / https://github.com/mikepiecuch
- *
- * Based on research paper "Real-Time Fluid Dynamics for Games" by Jos Stam
- * http://www.dgp.toronto.edu/people/stam/reality/Research/pdf/GDC03.pdf
- *
- */
-
 import {
 	Clock,
 	Color,
@@ -23,6 +15,11 @@ import {
 	Vector2,
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
+/**
+ * Based on research paper "Real-Time Fluid Dynamics for Games" by Jos Stam
+ * http://www.dgp.toronto.edu/people/stam/reality/Research/pdf/GDC03.pdf
+ *
+ */
 
 var Fire = function ( geometry, options ) {
 
@@ -107,6 +104,7 @@ var Fire = function ( geometry, options ) {
 						this.sourceData[ stride ] = Math.min( Math.max( density, 0.0 ), 1.0 ) * 255;
 
 					}
+
 					if ( windX != null ) {
 
 						var wind = Math.min( Math.max( windX, - 1.0 ), 1.0 );
@@ -114,6 +112,7 @@ var Fire = function ( geometry, options ) {
 						this.sourceData[ stride + 1 ] = wind;
 
 					}
+
 					if ( windY != null ) {
 
 						var wind = Math.min( Math.max( windY, - 1.0 ), 1.0 );
@@ -291,6 +290,7 @@ var Fire = function ( geometry, options ) {
 		shader = Fire.ColorShader;
 
 	}
+
 	this.material = new ShaderMaterial( {
 		uniforms: shader.uniforms,
 		vertexShader: shader.vertexShader,
@@ -452,11 +452,13 @@ var Fire = function ( geometry, options ) {
 	this.onBeforeRender = function ( renderer ) {
 
 		var delta = this.clock.getDelta();
+
 		if ( delta > 0.1 ) {
 
 			delta = 0.1;
 
 		}
+
 		var dt = delta * ( this.speed * 0.1 );
 
 		this.configShaders( dt );
@@ -478,11 +480,13 @@ var Fire = function ( geometry, options ) {
 		this.renderSource( renderer );
 
 		this.clearDiffuse();
+
 		for ( var i = 0; i < 21; i ++ ) {
 
 			this.renderDiffuse( renderer );
 
 		}
+
 		this.configShaders( dt );
 		this.renderDiffuse( renderer );
 

@@ -15,7 +15,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			init();
 			animate();
@@ -27,6 +27,8 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 0, 1 );
+
+				clock = new THREE.Clock();
 
 				scene = new THREE.Scene();
 
@@ -90,7 +92,9 @@
 
 			function render() {
 
-				scene.rotation.y = Date.now() / 2000;
+				var elapsedTime = clock.getElapsedTime();
+
+				scene.rotation.y = elapsedTime * 0.5;
 
 				renderer.render( scene, camera );
 

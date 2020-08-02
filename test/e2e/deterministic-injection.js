@@ -1,10 +1,9 @@
-/**
- * @author munrocket / https://github.com/munrocket
- */
 
 ( function () {
 
 	/* Deterministic random */
+
+	window.Math._random = window.Math.random;
 
 	let seed = Math.PI / 4;
 	window.Math.random = function () {
@@ -27,7 +26,7 @@
 
 	/* Deterministic RAF */
 
-	window.chromeMaxFrameId = 1;
+	window.chromeMaxFrameId = 2;
 	window.chromeRenderStarted = false;
 	window.chromeRenderFinished = false;
 	const RAF = window.requestAnimationFrame;
@@ -77,8 +76,11 @@
 			RAF( renew );
 
 		}
+
 		RAF( renew );
 
 	};
+
+	TESTING = true;
 
 }() );

@@ -1,8 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
 import { Command } from '../Command.js';
 
 /**
@@ -11,7 +6,7 @@ import { Command } from '../Command.js';
  * @param script javascript object
  * @constructor
  */
-var RemoveScriptCommand = function ( editor, object, script ) {
+function RemoveScriptCommand( editor, object, script ) {
 
 	Command.call( this, editor );
 
@@ -26,7 +21,7 @@ var RemoveScriptCommand = function ( editor, object, script ) {
 
 	}
 
-};
+}
 
 RemoveScriptCommand.prototype = {
 

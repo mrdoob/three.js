@@ -1,9 +1,3 @@
-/**
- * @author zz85 / https://github.com/zz85
- * @author mrdoob / http://mrdoob.com
- * Running this will allow you to drag three.js objects around the screen.
- */
-
 import {
 	EventDispatcher,
 	Matrix4,
@@ -52,6 +46,8 @@ var DragControls = function ( _objects, _camera, _domElement ) {
 		_domElement.removeEventListener( 'touchmove', onDocumentTouchMove, false );
 		_domElement.removeEventListener( 'touchstart', onDocumentTouchStart, false );
 		_domElement.removeEventListener( 'touchend', onDocumentTouchEnd, false );
+
+		_domElement.style.cursor = '';
 
 	}
 

@@ -1,21 +1,11 @@
 import { Quaternion } from '../math/Quaternion.js';
 
-/**
- *
- * Buffered scene graph property that allows weighted accumulation.
- *
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
- */
-
 function PropertyMixer( binding, typeName, valueSize ) {
 
 	this.binding = binding;
 	this.valueSize = valueSize;
 
-	var mixFunction,
+	let mixFunction,
 		mixFunctionAdditive,
 		setIdentity;
 
@@ -42,7 +32,7 @@ function PropertyMixer( binding, typeName, valueSize ) {
 			mixFunctionAdditive = this._slerpAdditive;
 			setIdentity = this._setAdditiveIdentityQuaternion;
 
-			this.buffer = new Float64Array( 24 );
+			this.buffer = new Float64Array( valueSize * 6 );
 			this._workIndex = 5;
 			break;
 
@@ -90,17 +80,17 @@ Object.assign( PropertyMixer.prototype, {
 		// note: happily accumulating nothing when weight = 0, the caller knows
 		// the weight and shouldn't have made the call in the first place
 
-		var buffer = this.buffer,
+		const buffer = this.buffer,
 			stride = this.valueSize,
-			offset = accuIndex * stride + stride,
+			offset = accuIndex * stride + stride;
 
-			currentWeight = this.cumulativeWeight;
+		let currentWeight = this.cumulativeWeight;
 
 		if ( currentWeight === 0 ) {
 
 			// accuN := incoming * weight
 
-			for ( var i = 0; i !== stride; ++ i ) {
+			for ( let i = 0; i !== stride; ++ i ) {
 
 				buffer[ offset + i ] = buffer[ i ];
 
@@ -113,7 +103,7 @@ Object.assign( PropertyMixer.prototype, {
 			// accuN := accuN + incoming * weight
 
 			currentWeight += weight;
-			var mix = weight / currentWeight;
+			const mix = weight / currentWeight;
 			this._mixBufferRegion( buffer, offset, 0, mix, stride );
 
 		}
@@ -125,7 +115,7 @@ Object.assign( PropertyMixer.prototype, {
 	// accumulate data in the 'incoming' region into 'add'
 	accumulateAdditive: function ( weight ) {
 
-		var buffer = this.buffer,
+		const buffer = this.buffer,
 			stride = this.valueSize,
 			offset = stride * this._addIndex;
 
@@ -147,7 +137,7 @@ Object.assign( PropertyMixer.prototype, {
 	// apply the state of 'accu<i>' to the binding when accus differ
 	apply: function ( accuIndex ) {
 
-		var stride = this.valueSize,
+		const stride = this.valueSize,
 			buffer = this.buffer,
 			offset = accuIndex * stride + stride,
 
@@ -163,7 +153,7 @@ Object.assign( PropertyMixer.prototype, {
 
 			// accuN := accuN + original * ( 1 - cumulativeWeight )
 
-			var originalValueOffset = stride * this._origIndex;
+			const originalValueOffset = stride * this._origIndex;
 
 			this._mixBufferRegion(
 				buffer, offset, originalValueOffset, 1 - weight, stride );
@@ -178,7 +168,7 @@ Object.assign( PropertyMixer.prototype, {
 
 		}
 
-		for ( var i = stride, e = stride + stride; i !== e; ++ i ) {
+		for ( let i = stride, e = stride + stride; i !== e; ++ i ) {
 
 			if ( buffer[ i ] !== buffer[ i + stride ] ) {
 
@@ -196,9 +186,9 @@ Object.assign( PropertyMixer.prototype, {
 	// remember the state of the bound property and copy it to both accus
 	saveOriginalState: function () {
 
-		var binding = this.binding;
+		const binding = this.binding;
 
-		var buffer = this.buffer,
+		const buffer = this.buffer,
 			stride = this.valueSize,
 
 			originalValueOffset = stride * this._origIndex;
@@ -206,7 +196,7 @@ Object.assign( PropertyMixer.prototype, {
 		binding.getValue( buffer, originalValueOffset );
 
 		// accu[0..1] := orig -- initially detect changes against the original
-		for ( var i = stride, e = originalValueOffset; i !== e; ++ i ) {
+		for ( let i = stride, e = originalValueOffset; i !== e; ++ i ) {
 
 			buffer[ i ] = buffer[ originalValueOffset + ( i % stride ) ];
 
@@ -223,16 +213,21 @@ Object.assign( PropertyMixer.prototype, {
 	// apply the state previously taken via 'saveOriginalState' to the binding
 	restoreOriginalState: function () {
 
-		var originalValueOffset = this.valueSize * 3;
+		const originalValueOffset = this.valueSize * 3;
 		this.binding.setValue( this.buffer, originalValueOffset );
 
 	},
 
 	_setAdditiveIdentityNumeric: function () {
 
-		var startIndex = this._addIndex * this.valueSize;
+		const startIndex = this._addIndex * this.valueSize;
+		const endIndex = startIndex + this.valueSize;
 
-		this.buffer.fill( 0, startIndex, startIndex + this.valueSize );
+		for ( let i = startIndex; i < endIndex; i ++ ) {
+
+			this.buffer[ i ] = 0;
+
+		}
 
 	},
 
@@ -245,10 +240,14 @@ Object.assign( PropertyMixer.prototype, {
 
 	_setAdditiveIdentityOther: function () {
 
-		var startIndex = this._origIndex * this.valueSize;
-		var targetIndex = this._addIndex * this.valueSize;
+		const startIndex = this._origIndex * this.valueSize;
+		const targetIndex = this._addIndex * this.valueSize;
 
-		this.buffer.copyWithin( targetIndex, startIndex, this.valueSize );
+		for ( let i = 0; i < this.valueSize; i ++ ) {
+
+			this.buffer[ targetIndex + i ] = this.buffer[ startIndex + i ];
+
+		}
 
 	},
 
@@ -259,7 +258,7 @@ Object.assign( PropertyMixer.prototype, {
 
 		if ( t >= 0.5 ) {
 
-			for ( var i = 0; i !== stride; ++ i ) {
+			for ( let i = 0; i !== stride; ++ i ) {
 
 				buffer[ dstOffset + i ] = buffer[ srcOffset + i ];
 
@@ -277,7 +276,7 @@ Object.assign( PropertyMixer.prototype, {
 
 	_slerpAdditive: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
-		var workOffset = this._workIndex * stride;
+		const workOffset = this._workIndex * stride;
 
 		// Store result in intermediate buffer offset
 		Quaternion.multiplyQuaternionsFlat( buffer, workOffset, buffer, dstOffset, buffer, srcOffset );
@@ -289,11 +288,11 @@ Object.assign( PropertyMixer.prototype, {
 
 	_lerp: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
-		var s = 1 - t;
+		const s = 1 - t;
 
-		for ( var i = 0; i !== stride; ++ i ) {
+		for ( let i = 0; i !== stride; ++ i ) {
 
-			var j = dstOffset + i;
+			const j = dstOffset + i;
 
 			buffer[ j ] = buffer[ j ] * s + buffer[ srcOffset + i ] * t;
 
@@ -303,9 +302,9 @@ Object.assign( PropertyMixer.prototype, {
 
 	_lerpAdditive: function ( buffer, dstOffset, srcOffset, t, stride ) {
 
-		for ( var i = 0; i !== stride; ++ i ) {
+		for ( let i = 0; i !== stride; ++ i ) {
 
-			var j = dstOffset + i;
+			const j = dstOffset + i;
 
 			buffer[ j ] = buffer[ j ] + buffer[ srcOffset + i ] * t;
 

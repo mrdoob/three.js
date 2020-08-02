@@ -27,6 +27,12 @@
 
 		<h2>属性</h2>
 
+		<h3>[property:Boolean autoUpdate]</h3>
+		<p>
+			Enables automatic updates of the light's shadow. Default is *true*.
+			If you do not require dynamic lighting / shadows, you may set this to *false*.
+		</p>
+
 		<h3>[property:Camera camera]</h3>
 		<p>
 			光的世界里。这用于生成场景的深度图;从光的角度来看，其他物体背后的物体将处于阴影中。
@@ -45,7 +51,7 @@
 
 		<h3>[property:WebGLRenderTarget mapPass]</h3>
 		<p>
-			The distribution map generated using the internal camera; an occlusion is calculated based 
+			The distribution map generated using the internal camera; an occlusion is calculated based
 			on the distribution of depths. Computed internally during rendering.
 		</p>
 
@@ -64,20 +70,32 @@
 			模拟阴影相机空间，计算阴影贴图中的位置和深度。存储在[page:Matrix4 Matrix4]中。这是在渲染期间内部计算的。
 		</p>
 
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			When set to *true*, shadow maps will be updated in the next *render* call. Default is *false*.
+			If you have set [page:.autoUpdate] to *false*, you will need to set this property to *true* and then make a render call to update the light's shadow.
+		</p>
+
+		<h3>[property:Float normalBias]</h3>
+		<p>
+			Defines how much the position used to query the shadow map is offset along the object normal.
+			The default is 0. Increasing this value can be used to reduce shadow acne especially in large scenes where light shines onto geometry at a shallow angle. The cost is that shadows may appear distorted.
+		</p>
+
 		<h3>[property:Float radius]</h3>
 		<p>
 			将此值设置为大于1的值将模糊阴影的边缘。<br />
 
 			较高的值会在阴影中产生不必要的条带效果 - 更大的[page:.mapSize mapSize]将允许在这些效果变得可见之前使用更高的值。<br />
-			If [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer PCFSoftShadowMap], radius has 
+			If [page:WebGLRenderer.shadowMap.type] is set to [page:Renderer PCFSoftShadowMap], radius has
 			no effect and it is recommended to increase softness by decreasing [page:.mapSize mapSize] instead.<br /><br />
-			
+
 			请注意，如果[page：WebGLRenderer.shadowMap.type]设置为[page:Renderer BasicShadowMap]，将会无效。
 		</p>
 
 
 		<h2>方法</h2>
-		
+
 		<h3>[method:Vector2 getFrameExtents]()</h3>
 		<p>
 		Used internally by the renderer to extend the shadow map to contain all viewports

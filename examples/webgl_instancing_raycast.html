@@ -24,9 +24,7 @@
 			var raycaster = new THREE.Raycaster();
 			var mouse = new THREE.Vector2( 1, 1 );
 
-			var rotationMatrix = new THREE.Matrix4().makeRotationY( 0.1 );
-			var instanceMatrix = new THREE.Matrix4();
-			var matrix = new THREE.Matrix4();
+			var color = new THREE.Color();
 
 			init();
 			animate();
@@ -47,15 +45,15 @@
 				light.position.set( - 1, - 1.5, - 1 );
 				scene.add( light );
 
-				var geometry = new THREE.SphereBufferGeometry( 0.5 );
-				var material = new THREE.MeshPhongMaterial( { flatShading: true } );
+				var geometry = new THREE.IcosahedronGeometry( 0.5, 2 );
+				var material = new THREE.MeshPhongMaterial();
 
 				mesh = new THREE.InstancedMesh( geometry, material, count );
 
 				var i = 0;
 				var offset = ( amount - 1 ) / 2;
 
-				var transform = new THREE.Object3D();
+				var matrix = new THREE.Matrix4();
 
 				for ( var x = 0; x < amount; x ++ ) {
 
@@ -63,10 +61,12 @@
 
 						for ( var z = 0; z < amount; z ++ ) {
 
-							transform.position.set( offset - x, offset - y, offset - z );
-							transform.updateMatrix();
+							matrix.setPosition( offset - x, offset - y, offset - z );
 
-							mesh.setMatrixAt( i ++, transform.matrix );
+							mesh.setMatrixAt( i, matrix );
+							mesh.setColorAt( i, color );
+
+							i ++;
 
 						}
 
@@ -132,11 +132,8 @@
 
 					var instanceId = intersection[ 0 ].instanceId;
 
-					mesh.getMatrixAt( instanceId, instanceMatrix );
-					matrix.multiplyMatrices( instanceMatrix, rotationMatrix );
-
-					mesh.setMatrixAt( instanceId, matrix );
-					mesh.instanceMatrix.needsUpdate = true;
+					mesh.setColorAt( instanceId, color.setHex( Math.random() * 0xffffff ) );
+					mesh.instanceColor.needsUpdate = true;
 
 				}
 

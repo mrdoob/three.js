@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Node } from '../core/Node.js';
 
 function SwitchNode( node, components ) {

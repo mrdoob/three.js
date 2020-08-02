@@ -1,10 +1,10 @@
+console.warn( "THREE.Volume: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * This class had been written to handle the output of the NRRD loader.
  * It contains a volume of data and informations about it.
  * For now it only handles 3 dimensional data.
  * See the webgl_loader_nrrd.html example and the loaderNRRD.js file to see how to use this class.
  * @class
- * @author Valentin Demeusy / https://github.com/stity
  * @param   {number}        xLength         Width of the volume
  * @param   {number}        yLength         Length of the volume
  * @param   {number}        zLength         Depth of the volume
@@ -435,6 +435,7 @@ THREE.Volume.prototype = {
 		var datasize = this.data.length;
 
 		var i = 0;
+
 		for ( i = 0; i < datasize; i ++ ) {
 
 			if ( ! isNaN( this.data[ i ] ) ) {
@@ -446,6 +447,7 @@ THREE.Volume.prototype = {
 			}
 
 		}
+
 		this.min = min;
 		this.max = max;
 

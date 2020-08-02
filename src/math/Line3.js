@@ -1,12 +1,8 @@
 import { Vector3 } from './Vector3.js';
 import { MathUtils } from './MathUtils.js';
 
-/**
- * @author bhouston / http://clara.io
- */
-
-var _startP = new Vector3();
-var _startEnd = new Vector3();
+const _startP = new Vector3();
+const _startEnd = new Vector3();
 
 function Line3( start, end ) {
 
@@ -97,10 +93,10 @@ Object.assign( Line3.prototype, {
 		_startP.subVectors( point, this.start );
 		_startEnd.subVectors( this.end, this.start );
 
-		var startEnd2 = _startEnd.dot( _startEnd );
-		var startEnd_startP = _startEnd.dot( _startP );
+		const startEnd2 = _startEnd.dot( _startEnd );
+		const startEnd_startP = _startEnd.dot( _startP );
 
-		var t = startEnd_startP / startEnd2;
+		let t = startEnd_startP / startEnd2;
 
 		if ( clampToLine ) {
 
@@ -114,7 +110,7 @@ Object.assign( Line3.prototype, {
 
 	closestPointToPoint: function ( point, clampToLine, target ) {
 
-		var t = this.closestPointToPointParameter( point, clampToLine );
+		const t = this.closestPointToPointParameter( point, clampToLine );
 
 		if ( target === undefined ) {
 

@@ -1,13 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author Mugen87 / https://github.com/Mugen87
- *
- *	- shows frustum, line of sight and up of the camera
- *	- suitable for fast updates
- * 	- based on frustum visualization in lightgl.js shadowmap example
- *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
- */
-
 import { Camera } from '../cameras/Camera.js';
 import { Vector3 } from '../math/Vector3.js';
 import { LineSegments } from '../objects/LineSegments.js';
@@ -16,26 +6,33 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
-var _vector = new Vector3();
-var _camera = new Camera();
+const _vector = new Vector3();
+const _camera = new Camera();
+
+/**
+ *	- shows frustum, line of sight and up of the camera
+ *	- suitable for fast updates
+ * 	- based on frustum visualization in lightgl.js shadowmap example
+ *		http://evanw.github.com/lightgl.js/tests/shadowmap.html
+ */
 
 function CameraHelper( camera ) {
 
-	var geometry = new BufferGeometry();
-	var material = new LineBasicMaterial( { color: 0xffffff, vertexColors: true, toneMapped: false } );
+	const geometry = new BufferGeometry();
+	const material = new LineBasicMaterial( { color: 0xffffff, vertexColors: true, toneMapped: false } );
 
-	var vertices = [];
-	var colors = [];
+	const vertices = [];
+	const colors = [];
 
-	var pointMap = {};
+	const pointMap = {};
 
 	// colors
 
-	var colorFrustum = new Color( 0xffaa00 );
-	var colorCone = new Color( 0xff0000 );
-	var colorUp = new Color( 0x00aaff );
-	var colorTarget = new Color( 0xffffff );
-	var colorCross = new Color( 0x333333 );
+	const colorFrustum = new Color( 0xffaa00 );
+	const colorCone = new Color( 0xff0000 );
+	const colorUp = new Color( 0x00aaff );
+	const colorTarget = new Color( 0xffffff );
+	const colorCross = new Color( 0x333333 );
 
 	// near
 
@@ -130,10 +127,10 @@ CameraHelper.prototype.constructor = CameraHelper;
 
 CameraHelper.prototype.update = function () {
 
-	var geometry = this.geometry;
-	var pointMap = this.pointMap;
+	const geometry = this.geometry;
+	const pointMap = this.pointMap;
 
-	var w = 1, h = 1;
+	const w = 1, h = 1;
 
 	// we need just camera projection matrix inverse
 	// world matrix must be identity
@@ -185,13 +182,13 @@ function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
 	_vector.set( x, y, z ).unproject( camera );
 
-	var points = pointMap[ point ];
+	const points = pointMap[ point ];
 
 	if ( points !== undefined ) {
 
-		var position = geometry.getAttribute( 'position' );
+		const position = geometry.getAttribute( 'position' );
 
-		for ( var i = 0, l = points.length; i < l; i ++ ) {
+		for ( let i = 0, l = points.length; i < l; i ++ ) {
 
 			position.setXYZ( points[ i ], _vector.x, _vector.y, _vector.z );
 

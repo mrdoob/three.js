@@ -1,13 +1,9 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIElement, UIPanel, UIText } from './libs/ui.js';
 
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 
-var Script = function ( editor ) {
+function Script( editor ) {
 
 	var signals = editor.signals;
 
@@ -461,6 +457,6 @@ var Script = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { Script };

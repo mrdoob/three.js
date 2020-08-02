@@ -186,7 +186,7 @@
 			scene.background = new THREE.Color( 0x111111 );
 
 			var renderer = new THREE.WebGLRenderer();
-			renderer.toneMapping = THREE.LinearToneMapping;
+			renderer.toneMapping = THREE.NoToneMapping;
 			container.appendChild( renderer.domElement );
 
 			var renderTarget = new THREE.WebGLRenderTarget();
@@ -195,7 +195,7 @@
 			// At least one regular Pointlight is needed to activate light support
 			scene.add( new THREE.PointLight( 0xff0000, 0.1, 0.1 ) );
 
-			var bloom = new UnrealBloomPass( new THREE.Vector2(), 0.8, 0.6, 0.8 );
+			var bloom = new UnrealBloomPass( new THREE.Vector2( window.innerWidth, window.innerHeight ), 0.8, 0.6, 0.8 );
 			bloom.renderToScreen = true;
 
 			var stats = new Stats();

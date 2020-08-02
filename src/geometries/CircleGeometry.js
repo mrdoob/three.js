@@ -1,9 +1,3 @@
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- * @author Mugen87 / https://github.com/Mugen87
- * @author hughes
- */
-
 import { Geometry } from '../core/Geometry.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
@@ -56,16 +50,15 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// helper variables
 
-	var i, s;
-	var vertex = new Vector3();
-	var uv = new Vector2();
+	const vertex = new Vector3();
+	const uv = new Vector2();
 
 	// center point
 
@@ -73,9 +66,9 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 	normals.push( 0, 0, 1 );
 	uvs.push( 0.5, 0.5 );
 
-	for ( s = 0, i = 3; s <= segments; s ++, i += 3 ) {
+	for ( let s = 0, i = 3; s <= segments; s ++, i += 3 ) {
 
-		var segment = thetaStart + s / segments * thetaLength;
+		const segment = thetaStart + s / segments * thetaLength;
 
 		// vertex
 
@@ -99,7 +92,7 @@ function CircleBufferGeometry( radius, segments, thetaStart, thetaLength ) {
 
 	// indices
 
-	for ( i = 1; i <= segments; i ++ ) {
+	for ( let i = 1; i <= segments; i ++ ) {
 
 		indices.push( i, i + 1, 0 );
 

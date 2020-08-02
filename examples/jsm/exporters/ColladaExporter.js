@@ -1,16 +1,3 @@
-/**
- * @author Garrett Johnson / http://gkjohnson.github.io/
- * https://github.com/gkjohnson/collada-exporter-js
- *
- * Usage:
- *  var exporter = new ColladaExporter();
- *
- *  var data = exporter.parse(mesh);
- *
- * Format Definition:
- *  https://www.khronos.org/collada/
- */
-
 import {
 	BufferGeometry,
 	Color,
@@ -21,6 +8,17 @@ import {
 	MeshBasicMaterial,
 	MeshLambertMaterial
 } from "../../../build/three.module.js";
+/**
+ * https://github.com/gkjohnson/collada-exporter-js
+ *
+ * Usage:
+ *  var exporter = new ColladaExporter();
+ *
+ *  var data = exporter.parse(mesh);
+ *
+ * Format Definition:
+ *  https://www.khronos.org/collada/
+ */
 
 var ColladaExporter = function () {};
 
@@ -582,8 +580,8 @@ ColladaExporter.prototype = {
 					matidsArray = new Array( materials.length );
 
 				}
-				matids = matidsArray.fill()
-					.map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
+
+				matids = matidsArray.fill().map( ( v, i ) => processMaterial( materials[ i % materials.length ] ) );
 
 				node +=
 					`<instance_geometry url="#${ meshid }">` +

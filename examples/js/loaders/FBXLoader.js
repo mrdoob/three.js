@@ -1,8 +1,5 @@
+console.warn( "THREE.FBXLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author Kyle-Larson https://github.com/Kyle-Larson
- * @author Takahiro https://github.com/takahirox
- * @author Lewy Blue https://github.com/looeee
- *
  * Loader loads FBX file and generates Group representing FBX scene.
  * Requires FBX file to be >= 7.0 and in ASCII or >= 6400 in Binary format
  * Versions lower than this may load but will probably have errors
@@ -44,6 +41,7 @@ THREE.FBXLoader = ( function () {
 			var loader = new THREE.FileLoader( this.manager );
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
+			loader.setRequestHeader( scope.requestHeader );
 
 			loader.load( url, function ( buffer ) {
 
@@ -51,15 +49,19 @@ THREE.FBXLoader = ( function () {
 
 					onLoad( scope.parse( buffer, path ) );
 
-				} catch ( error ) {
+				} catch ( e ) {
 
-					setTimeout( function () {
+					if ( onError ) {
 
-						if ( onError ) onError( error );
+						onError( e );
 
-						scope.manager.itemError( url );
+					} else {
 
-					}, 0 );
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
 
 				}
 
@@ -488,6 +490,7 @@ THREE.FBXLoader = ( function () {
 				parameters.bumpScale = materialNode.BumpFactor.value;
 
 			}
+
 			if ( materialNode.Diffuse ) {
 
 				parameters.color = new THREE.Color().fromArray( materialNode.Diffuse.value );
@@ -1720,7 +1723,12 @@ THREE.FBXLoader = ( function () {
 				var i = 0;
 				while ( geoNode.LayerElementUV[ i ] ) {
 
-					geoInfo.uv.push( this.parseUVs( geoNode.LayerElementUV[ i ] ) );
+					if ( geoNode.LayerElementUV[ i ].UV ) {
+
+						geoInfo.uv.push( this.parseUVs( geoNode.LayerElementUV[ i ] ) );
+
+					}
+
 					i ++;
 
 				}
@@ -2491,6 +2499,13 @@ THREE.FBXLoader = ( function () {
 
 										var rawModel = fbxTree.Objects.Model[ modelID.toString() ];
 
+										if ( rawModel === undefined ) {
+
+											console.warn( 'THREE.FBXLoader: Encountered a unused curve.', child );
+											return;
+
+										}
+
 										var node = {
 
 											modelName: rawModel.attrName ? THREE.PropertyBinding.sanitizeNodeName( rawModel.attrName ) : '',
@@ -2689,12 +2704,14 @@ THREE.FBXLoader = ( function () {
 				curves.x.values = curves.x.values.map( THREE.MathUtils.degToRad );
 
 			}
+
 			if ( curves.y !== undefined ) {
 
 				this.interpolateRotations( curves.y );
 				curves.y.values = curves.y.values.map( THREE.MathUtils.degToRad );
 
 			}
+
 			if ( curves.z !== undefined ) {
 
 				this.interpolateRotations( curves.z );
@@ -3248,7 +3265,11 @@ THREE.FBXLoader = ( function () {
 
 			var version = reader.getUint32();
 
-			console.log( 'THREE.FBXLoader: FBX binary version: ' + version );
+			if ( version < 6400 ) {
+
+				throw new Error( 'THREE.FBXLoader: FBX version not supported, FileVersion: ' + version );
+
+			}
 
 			var allNodes = new FBXTree();
 
@@ -3524,13 +3545,13 @@ THREE.FBXLoader = ( function () {
 
 					}
 
-					if ( typeof Zlib === 'undefined' ) {
+					if ( typeof Inflate === 'undefined' ) {
 
 						console.error( 'THREE.FBXLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
 
 					}
 
-					var inflate = new Zlib.Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
+					var inflate = new Inflate( new Uint8Array( reader.getArrayBuffer( compressedLength ) ) ); // eslint-disable-line no-undef
 					var reader2 = new BinaryReader( inflate.decompress().buffer );
 
 					switch ( type ) {
@@ -3867,12 +3888,14 @@ THREE.FBXLoader = ( function () {
 
 		var versionRegExp = /FBXVersion: (\d+)/;
 		var match = text.match( versionRegExp );
+
 		if ( match ) {
 
 			var version = parseInt( match[ 1 ] );
 			return version;
 
 		}
+
 		throw new Error( 'THREE.FBXLoader: Cannot find the version number for the file given.' );
 
 	}

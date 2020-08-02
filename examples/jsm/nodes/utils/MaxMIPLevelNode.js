@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { FloatNode } from '../inputs/FloatNode.js';
 
 function MaxMIPLevelNode( texture ) {

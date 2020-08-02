@@ -1,20 +1,16 @@
-/**
- * @author tschw
- */
-
 import { Matrix3 } from '../../math/Matrix3.js';
 import { Plane } from '../../math/Plane.js';
 
 function WebGLClipping() {
 
-	var scope = this,
+	const scope = this;
 
-		globalState = null,
+	let globalState = null,
 		numGlobalPlanes = 0,
 		localClippingEnabled = false,
-		renderingShadows = false,
+		renderingShadows = false;
 
-		plane = new Plane(),
+	const plane = new Plane(),
 		viewNormalMatrix = new Matrix3(),
 
 		uniform = { value: null, needsUpdate: false };
@@ -25,7 +21,7 @@ function WebGLClipping() {
 
 	this.init = function ( planes, enableLocalClipping, camera ) {
 
-		var enabled =
+		const enabled =
 			planes.length !== 0 ||
 			enableLocalClipping ||
 			// enable state of previous frame - the clipping code has to
@@ -76,16 +72,16 @@ function WebGLClipping() {
 
 		} else {
 
-			var nGlobal = renderingShadows ? 0 : numGlobalPlanes,
-				lGlobal = nGlobal * 4,
+			const nGlobal = renderingShadows ? 0 : numGlobalPlanes,
+				lGlobal = nGlobal * 4;
 
-				dstArray = cache.clippingState || null;
+			let dstArray = cache.clippingState || null;
 
 			uniform.value = dstArray; // ensure unique state
 
 			dstArray = projectPlanes( planes, camera, lGlobal, fromCache );
 
-			for ( var i = 0; i !== lGlobal; ++ i ) {
+			for ( let i = 0; i !== lGlobal; ++ i ) {
 
 				dstArray[ i ] = globalState[ i ];
 
@@ -116,8 +112,8 @@ function WebGLClipping() {
 
 	function projectPlanes( planes, camera, dstOffset, skipTransform ) {
 
-		var nPlanes = planes !== null ? planes.length : 0,
-			dstArray = null;
+		const nPlanes = planes !== null ? planes.length : 0;
+		let dstArray = null;
 
 		if ( nPlanes !== 0 ) {
 
@@ -125,7 +121,7 @@ function WebGLClipping() {
 
 			if ( skipTransform !== true || dstArray === null ) {
 
-				var flatSize = dstOffset + nPlanes * 4,
+				const flatSize = dstOffset + nPlanes * 4,
 					viewMatrix = camera.matrixWorldInverse;
 
 				viewNormalMatrix.getNormalMatrix( viewMatrix );
@@ -136,7 +132,7 @@ function WebGLClipping() {
 
 				}
 
-				for ( var i = 0, i4 = dstOffset; i !== nPlanes; ++ i, i4 += 4 ) {
+				for ( let i = 0, i4 = dstOffset; i !== nPlanes; ++ i, i4 += 4 ) {
 
 					plane.copy( planes[ i ] ).applyMatrix4( viewMatrix, viewNormalMatrix );
 

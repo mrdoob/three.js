@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	CompressedTextureLoader,
 	RGBAFormat,
@@ -105,6 +101,7 @@ DDSLoader.prototype = Object.assign( Object.create( CompressedTextureLoader.prot
 				}
 
 			}
+
 			return byteArray;
 
 		}

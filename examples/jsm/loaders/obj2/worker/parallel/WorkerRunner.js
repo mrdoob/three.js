@@ -1,5 +1,4 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
@@ -65,6 +64,7 @@ DefaultWorkerPayloadHandler.prototype = {
 			this.logging.debug = payload.logging.debug === true;
 
 		}
+
 		if ( payload.cmd === 'parse' ) {
 
 			let scope = this;
@@ -87,6 +87,7 @@ DefaultWorkerPayloadHandler.prototype = {
 				parser.setLogging( this.logging.enabled, this.logging.debug );
 
 			}
+
 			let objectManipulator = new ObjectManipulator();
 			objectManipulator.applyProperties( parser, payload.params, false );
 			objectManipulator.applyProperties( parser, callbacks, false );
@@ -103,6 +104,7 @@ DefaultWorkerPayloadHandler.prototype = {
 				parser[ executeFunctionName ]( arraybuffer, payload.data.options );
 
 			}
+
 			if ( this.logging.enabled ) console.log( 'WorkerRunner: Run complete!' );
 
 			self.postMessage( {
@@ -134,6 +136,7 @@ const WorkerRunner = function ( payloadHandler ) {
 		scope.processMessage( event.data );
 
 	};
+
 	self.addEventListener( 'message', scopedRunner, false );
 
 };

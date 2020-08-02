@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIText, UIInput, UIButton, UISpan } from './libs/ui.js';
@@ -52,7 +48,7 @@ var geometryUIClasses = {
 	'TubeBufferGeometry': SidebarGeometryTubeGeometry
 };
 
-var SidebarGeometry = function ( editor ) {
+function SidebarGeometry( editor ) {
 
 	var strings = editor.strings;
 
@@ -285,6 +281,6 @@ var SidebarGeometry = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometry };

@@ -1,8 +1,10 @@
+console.warn( "THREE.ACESFilmicToneMappingShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * ACES Filmic Tone Mapping Shader by Stephen Hill
  * source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
+ *
+ * this implementation of ACES is modified to accommodate a brighter viewing environment.
+ * the scale factor of 1/0.6 is subjective. see discussion in #19621.
  */
 
 THREE.ACESFilmicToneMappingShader = {
@@ -47,14 +49,14 @@ THREE.ACESFilmicToneMappingShader = {
 
 		'vec3 ACESFilmicToneMapping( vec3 color ) {',
 
-			// sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
+		// sRGB => XYZ => D65_2_D60 => AP1 => RRT_SAT
 		'	const mat3 ACESInputMat = mat3(',
 		'		vec3( 0.59719, 0.07600, 0.02840 ),', // transposed from source
 		'		vec3( 0.35458, 0.90834, 0.13383 ),',
 		'		vec3( 0.04823, 0.01566, 0.83777 )',
 		'	);',
 
-			// ODT_SAT => XYZ => D60_2_D65 => sRGB
+		// ODT_SAT => XYZ => D60_2_D65 => sRGB
 		'	const mat3 ACESOutputMat = mat3(',
 		'		vec3(  1.60475, -0.10208, -0.00327 ),', // transposed from source
 		'		vec3( -0.53108,  1.10813, -0.07276 ),',
@@ -63,12 +65,12 @@ THREE.ACESFilmicToneMappingShader = {
 
 		'	color = ACESInputMat * color;',
 
-			// Apply RRT and ODT
+		// Apply RRT and ODT
 		'	color = RRTAndODTFit( color );',
 
 		'	color = ACESOutputMat * color;',
 
-			// Clamp to [0, 1]
+		// Clamp to [0, 1]
 		'	return saturate( color );',
 
 		'}',
@@ -77,7 +79,7 @@ THREE.ACESFilmicToneMappingShader = {
 
 		'	vec4 tex = texture2D( tDiffuse, vUv );',
 
-		'	tex.rgb *= exposure;', // pre-exposed, outside of the tone mapping function
+		'	tex.rgb *= exposure / 0.6;', // pre-exposed, outside of the tone mapping function
 
 		'	gl_FragColor = vec4( ACESFilmicToneMapping( tex.rgb ), tex.a );',
 

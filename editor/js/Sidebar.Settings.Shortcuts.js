@@ -1,12 +1,8 @@
-/**
- * @author TyLindberg / https://github.com/TyLindberg
- */
-
 import { UIDiv, UIBreak, UIText, UIRow, UIInput } from './libs/ui.js';
 
 import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 
-var SidebarSettingsShortcuts = function ( editor ) {
+function SidebarSettingsShortcuts( editor ) {
 
 	var strings = editor.strings;
 
@@ -170,6 +166,6 @@ var SidebarSettingsShortcuts = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarSettingsShortcuts };

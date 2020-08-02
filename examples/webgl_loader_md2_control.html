@@ -145,6 +145,7 @@
 
 				cameraControls = new OrbitControls( camera, renderer.domElement );
 				cameraControls.target.set( 0, 50, 0 );
+				cameraControls.enableKeys = false;
 				cameraControls.update();
 
 				// CHARACTER
@@ -247,8 +248,6 @@
 
 			function onKeyDown( event ) {
 
-				event.stopPropagation();
-
 				switch ( event.keyCode ) {
 
 					case 38: /*up*/
@@ -272,8 +271,6 @@
 			}
 
 			function onKeyUp( event ) {
-
-				event.stopPropagation();
 
 				switch ( event.keyCode ) {
 

@@ -1,6 +1,4 @@
-/**
- * @author Virtulous / https://virtulo.us/
- */
+console.warn( "THREE.AssimpLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.AssimpLoader = function ( manager ) {
 
@@ -18,13 +16,32 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 
 		var path = ( scope.path === '' ) ? THREE.LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		var loader = new THREE.FileLoader( this.manager );
+		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer, path ) );
+			try {
+
+				onLoad( scope.parse( buffer, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -51,6 +68,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				return n;
 
 			};
+
 			this.lerp = function ( nextKey, time ) {
 
 				time -= this.time;
@@ -94,6 +112,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				this.keys.push( key );
 
 			};
+
 			this.init = function () {
 
 				this.sortKeys();
@@ -137,6 +156,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 					this.addKey( new Virtulous.KeyFrame( i / fps || track[ i ].time, track[ i ].targets[ 0 ].data ) );
 
 				}
+
 				this.init();
 
 			};
@@ -498,6 +518,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
+
 		function cloneTreeToBones( root, scene ) {
 
 			var rootBone = new THREE.Bone();
@@ -655,6 +676,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 					}
 
 				}
+
 				var skeleton = new THREE.Skeleton( allBones, offsetMatrix );
 
 				this.threeNode.bind( skeleton, new THREE.Matrix4() );
@@ -957,6 +979,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			};
 
 		}
+
 		var namePropMapping = {
 
 			"?mat.name": "name",
@@ -1749,6 +1772,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// write faces. There are no floating-point calculations involved
 			// in these, so we can write a simple hash over the face data
 			// to the dump file. We generate a single 32 Bit hash for 512 faces
@@ -1814,6 +1838,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// write bones
 			if ( mesh.mNumBones ) {
 
@@ -1876,7 +1901,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryNodeAnim( stream, nd ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -1942,7 +1967,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryAnim( stream, anim ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -1996,7 +2021,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryLight( stream, l ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2026,7 +2051,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryCamera( stream, cam ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2073,6 +2098,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read materials
 			if ( scene.mNumMaterials ) {
 
@@ -2086,6 +2112,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read all animations
 			if ( scene.mNumAnimations ) {
 
@@ -2099,6 +2126,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read all textures
 			if ( scene.mNumTextures ) {
 
@@ -2112,6 +2140,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read lights
 			if ( scene.mNumLights ) {
 
@@ -2125,6 +2154,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				}
 
 			}
+
 			// Read cameras
 			if ( scene.mNumCameras ) {
 
@@ -2140,6 +2170,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 			}
 
 		}
+
 		var aiOrigin_CUR = 0;
 		var aiOrigin_BEG = 1;
 
@@ -2153,6 +2184,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 					stream.readOffset += off;
 
 				}
+
 				if ( ori == aiOrigin_BEG ) {
 
 					stream.readOffset = off;

@@ -1,15 +1,23 @@
 import { Object3D } from '../../core/Object3D.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 function ImmediateRenderObject( material ) {
 
 	Object3D.call( this );
 
 	this.material = material;
 	this.render = function ( /* renderCallback */ ) {};
+
+	this.hasPositions = false;
+	this.hasNormals = false;
+	this.hasColors = false;
+	this.hasUvs = false;
+
+	this.positionArray = null;
+	this.normalArray = null;
+	this.colorArray = null;
+	this.uvArray = null;
+
+	this.count = 0;
 
 }
 

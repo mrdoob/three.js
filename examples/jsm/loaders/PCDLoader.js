@@ -1,10 +1,3 @@
-/**
- * @author Filipe Caixeta / http://filipecaixeta.com.br
- * @author Mugen87 / https://github.com/Mugen87
- *
- * Description: A THREE loader for PCD ascii and binary files.
- */
-
 import {
 	BufferGeometry,
 	FileLoader,
@@ -35,6 +28,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( data ) {
 
 			try {
@@ -49,9 +43,11 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				} else {
 
-					throw e;
+					console.error( e );
 
 				}
+
+				scope.manager.itemError( url );
 
 			}
 
@@ -97,6 +93,7 @@ PCDLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						if ( inPtr >= inLength ) throw new Error( 'Invalid compressed data' );
 
 					}
+
 					ref -= inData[ inPtr ++ ];
 					if ( outPtr + len + 2 > outLength ) throw new Error( 'Output buffer is not large enough' );
 					if ( ref < 0 ) throw new Error( 'Invalid compressed data' );
