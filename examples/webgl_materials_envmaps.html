@@ -62,7 +62,7 @@
 
 				//
 
-				var geometry = new THREE.SphereBufferGeometry( 400.0, 48, 24 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 400, 4 );
 				sphereMaterial = new THREE.MeshLambertMaterial( { envMap: textureCube } );
 				sphereMesh = new THREE.Mesh( geometry, sphereMaterial );
 				scene.add( sphereMesh );
