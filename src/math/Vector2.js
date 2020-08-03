@@ -33,7 +33,7 @@ class Vector2 {
 
 	get isVector2() {
 
-		return true
+		return true;
 
 	}
 
