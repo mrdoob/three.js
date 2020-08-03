@@ -31,52 +31,175 @@ function compose( position, quaternion, array, index ) {
 
 }
 
-function CannonPhysics() {
+//
 
-	const frameRate = 60;
-	const frameTime = 1 / frameRate;
+function getShape( geometry ) {
 
-	const world = new CANNON.World();
-	world.gravity.set( 0, - 9.8, 0 );
-	world.broadphase = new CANNON.SAPBroadphase( world );
-	// world.solver.iterations = 20;
-	// world.solver.tolerance = 0.001;
-	// world.allowSleep = true;
+	const parameters = geometry.parameters;
 
-	//
+	// TODO change type to is*
 
-	function getShape( geometry ) {
+	switch ( geometry.type ) {
 
-		const parameters = geometry.parameters;
+		case 'BoxBufferGeometry':
+			const halfExtents = new CANNON.Vec3();
+			halfExtents.x = parameters.width !== undefined ? parameters.width / 2 : 0.5;
+			halfExtents.y = parameters.height !== undefined ? parameters.height / 2 : 0.5;
+			halfExtents.z = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
+			return new CANNON.Box( halfExtents );
 
-		// TODO change type to is*
+		case 'PlaneBufferGeometry':
+			return new CANNON.Plane();
 
-		switch ( geometry.type ) {
-
-			case 'BoxBufferGeometry':
-				const halfExtents = new CANNON.Vec3();
-				halfExtents.x = parameters.width !== undefined ? parameters.width / 2 : 0.5;
-				halfExtents.y = parameters.height !== undefined ? parameters.height / 2 : 0.5;
-				halfExtents.z = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
-				return new CANNON.Box( halfExtents );
-
-			case 'PlaneBufferGeometry':
-				return new CANNON.Plane();
-
-			case 'SphereBufferGeometry':
-				const radius = parameters.radius;
-				return new CANNON.Sphere( radius );
-
-		}
-
-		return null;
+		case 'SphereBufferGeometry':
+			const radius = parameters.radius;
+			return new CANNON.Sphere( radius );
 
 	}
 
-	const meshes = [];
-	const meshMap = new WeakMap();
+	return null;
 
-	function addMesh( mesh, mass = 0 ) {
+}
+
+class CannonPhysics {
+
+	constructor() {
+
+		const frameRate = 60;
+		const frameTime = 1 / frameRate;
+
+		const world = new CANNON.World();
+		world.gravity.set( 0, - 9.8, 0 );
+		world.broadphase = new CANNON.SAPBroadphase( world );
+		// world.solver.iterations = 20;
+		// world.solver.tolerance = 0.001;
+		// world.allowSleep = true;
+		this.world = world;
+
+		const meshes = [];
+		this.meshes = meshes;
+		const meshMap = new WeakMap();
+		this.meshMap = meshMap;
+
+		const lastTime = 0;
+		this.lastTime = lastTime;
+
+		this.handleMesh = function ( mesh, mass, shape ) {
+
+			const position = new CANNON.Vec3();
+			position.copy( mesh.position );
+
+			const quaternion = new CANNON.Quaternion();
+			quaternion.copy( mesh.quaternion );
+
+			const body = new CANNON.Body( {
+				position: position,
+				quaternion: quaternion,
+				mass: mass,
+				shape: shape
+			} );
+			world.addBody( body );
+
+			if ( mass > 0 ) {
+
+				meshes.push( mesh );
+				meshMap.set( mesh, body );
+
+			}
+
+		};
+
+		this.handleInstancedMesh = function ( mesh, mass, shape ) {
+
+			const array = mesh.instanceMatrix.array;
+
+			const bodies = [];
+
+			for ( let i = 0; i < mesh.count; i ++ ) {
+
+				const index = i * 16;
+
+				const position = new CANNON.Vec3();
+				position.set( array[ index + 12 ], array[ index + 13 ], array[ index + 14 ] );
+
+				const body = new CANNON.Body( {
+					position: position,
+					mass: mass,
+					shape: shape
+				} );
+				world.addBody( body );
+
+				bodies.push( body );
+
+			}
+
+			if ( mass > 0 ) {
+
+				mesh.instanceMatrix.setUsage( 35048 ); // THREE.DynamicDrawUsage = 35048
+				meshes.push( mesh );
+
+				meshMap.set( mesh, bodies );
+
+			}
+
+		};
+
+
+		function step() {
+
+			const time = performance.now();
+
+			if ( lastTime > 0 ) {
+
+				const delta = ( time - lastTime ) / 1000;
+
+				// console.time( 'world.step' );
+				world.step( frameTime, delta );
+				// console.timeEnd( 'world.step' );
+
+			}
+
+			lastTime = time;
+
+			//
+
+			for ( let i = 0, l = meshes.length; i < l; i ++ ) {
+
+				const mesh = meshes[ i ];
+
+				if ( mesh.isInstancedMesh ) {
+
+					const array = mesh.instanceMatrix.array;
+					const bodies = meshMap.get( mesh );
+
+					for ( let j = 0; j < bodies.length; j ++ ) {
+
+						const body = bodies[ j ];
+						compose( body.position, body.quaternion, array, j * 16 );
+
+					}
+
+					mesh.instanceMatrix.needsUpdate = true;
+
+				} else if ( mesh.isMesh ) {
+
+					const body = meshMap.get( mesh );
+					mesh.position.copy( body.position );
+					mesh.quaternion.copy( body.quaternion );
+
+				}
+
+			}
+
+		}
+
+		// animate
+
+		setInterval( step, 1000 / frameRate );
+
+	}
+
+	addMesh( mesh, mass = 0 ) {
 
 		const shape = getShape( mesh.geometry );
 
@@ -84,11 +207,11 @@ function CannonPhysics() {
 
 			if ( mesh.isInstancedMesh ) {
 
-				handleInstancedMesh( mesh, mass, shape );
+				this.handleInstancedMesh( mesh, mass, shape );
 
 			} else if ( mesh.isMesh ) {
 
-				handleMesh( mesh, mass, shape );
+				this.handleMesh( mesh, mass, shape );
 
 			}
 
@@ -96,145 +219,23 @@ function CannonPhysics() {
 
 	}
 
-	function handleMesh( mesh, mass, shape ) {
-
-		const position = new CANNON.Vec3();
-		position.copy( mesh.position );
-
-		const quaternion = new CANNON.Quaternion();
-		quaternion.copy( mesh.quaternion );
-
-		const body = new CANNON.Body( {
-			position: position,
-			quaternion: quaternion,
-			mass: mass,
-			shape: shape
-		} );
-		world.addBody( body );
-
-		if ( mass > 0 ) {
-
-			meshes.push( mesh );
-			meshMap.set( mesh, body );
-
-		}
-
-	}
-
-	function handleInstancedMesh( mesh, mass, shape ) {
-
-		const array = mesh.instanceMatrix.array;
-
-		const bodies = [];
-
-		for ( let i = 0; i < mesh.count; i ++ ) {
-
-			const index = i * 16;
-
-			const position = new CANNON.Vec3();
-			position.set( array[ index + 12 ], array[ index + 13 ], array[ index + 14 ] );
-
-			const body = new CANNON.Body( {
-				position: position,
-				mass: mass,
-				shape: shape
-			} );
-			world.addBody( body );
-
-			bodies.push( body );
-
-		}
-
-		if ( mass > 0 ) {
-
-			mesh.instanceMatrix.setUsage( 35048 ); // THREE.DynamicDrawUsage = 35048
-			meshes.push( mesh );
-
-			meshMap.set( mesh, bodies );
-
-		}
-
-	}
-
-	//
-
-	function setMeshPosition( mesh, position, index = 0 ) {
+	setMeshPosition( mesh, position, index = 0 ) {
 
 		if ( mesh.isInstancedMesh ) {
 
-			const bodies = meshMap.get( mesh );
+			const bodies = this.meshMap.get( mesh );
 			bodies[ index ].position.copy( position );
 
 		} else if ( mesh.isMesh ) {
 
-			const body = meshMap.get( mesh );
+			const body = this.meshMap.get( mesh );
 			body.position.copy( position );
 
 		}
 
 	}
 
-	//
-
-	let lastTime = 0;
-
-	function step() {
-
-		const time = performance.now();
-
-		if ( lastTime > 0 ) {
-
-			const delta = ( time - lastTime ) / 1000;
-
-			// console.time( 'world.step' );
-			world.step( frameTime, delta );
-			// console.timeEnd( 'world.step' );
-
-		}
-
-		lastTime = time;
-
-		//
-
-		for ( let i = 0, l = meshes.length; i < l; i ++ ) {
-
-			const mesh = meshes[ i ];
-
-			if ( mesh.isInstancedMesh ) {
-
-				const array = mesh.instanceMatrix.array;
-				const bodies = meshMap.get( mesh );
-
-				for ( let j = 0; j < bodies.length; j ++ ) {
-
-					const body = bodies[ j ];
-					compose( body.position, body.quaternion, array, j * 16 );
-
-				}
-
-				mesh.instanceMatrix.needsUpdate = true;
-
-			} else if ( mesh.isMesh ) {
-
-				const body = meshMap.get( mesh );
-				mesh.position.copy( body.position );
-				mesh.quaternion.copy( body.quaternion );
-
-			}
-
-		}
-
-	}
-
-	// animate
-
-	setInterval( step, 1000 / frameRate );
-
-	return {
-		addMesh: addMesh,
-		setMeshPosition: setMeshPosition
-		// addCompoundMesh
-	};
+	// addCompoundMesh
 
 }
 

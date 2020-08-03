@@ -33,6 +33,7 @@ class PlaneBufferGeometry extends BufferGeometry {
 	constructor( width, height, widthSegments, heightSegments ) {
 
 		super();
+
 		this.type = 'PlaneBufferGeometry';
 
 		this.parameters = {
@@ -115,6 +116,5 @@ class PlaneBufferGeometry extends BufferGeometry {
 	}
 
 }
-
 
 export { PlaneGeometry, PlaneBufferGeometry };

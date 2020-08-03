@@ -15,9 +15,11 @@ const _m1 = new Matrix4();
 const _obj = new Object3D();
 const _offset = new Vector3();
 
-class Geometry {
+class Geometry extends EventDispatcher {
 
 	constructor() {
+
+		super();
 
 		this.isGeometry = true;
 
