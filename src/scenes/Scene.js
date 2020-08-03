@@ -1,34 +1,31 @@
 import { Object3D } from '../core/Object3D.js';
 
-function Scene() {
+class Scene extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this.type = 'Scene';
+		super();
+		this.type = 'Scene';
 
-	this.background = null;
-	this.environment = null;
-	this.fog = null;
+		this.background = null;
+		this.environment = null;
+		this.fog = null;
 
-	this.overrideMaterial = null;
+		this.overrideMaterial = null;
 
-	this.autoUpdate = true; // checked by the renderer
+		this.autoUpdate = true; // checked by the renderer
 
-	if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
-		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+
+		}
+
+		this.isScene = true;
 
 	}
 
-}
-
-Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-	constructor: Scene,
-
-	isScene: true,
-
-	copy: function ( source, recursive ) {
+	copy( source, recursive ) {
 
 		Object3D.prototype.copy.call( this, source, recursive );
 
@@ -43,9 +40,9 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
 		const data = Object3D.prototype.toJSON.call( this, meta );
 
@@ -57,8 +54,6 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
-
-
+}
 
 export { Scene };
