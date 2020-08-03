@@ -34,18 +34,18 @@ const _trackRe = new RegExp( ''
 
 const _supportedObjectNames = [ 'material', 'materials', 'bones' ];
 
-function Composite( targetGroup, path, optionalParsedPath ) {
+class Composite {
 
-	const parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
+	constructor( targetGroup, path, optionalParsedPath ) {
 
-	this._targetGroup = targetGroup;
-	this._bindings = targetGroup.subscribe_( path, parsedPath );
+		const parsedPath = optionalParsedPath || PropertyBinding.parseTrackName( path );
 
-}
+		this._targetGroup = targetGroup;
+		this._bindings = targetGroup.subscribe_( path, parsedPath );
 
-Object.assign( Composite.prototype, {
+	}
 
-	getValue: function ( array, offset ) {
+	getValue( array, offset ) {
 
 		this.bind(); // bind all binding
 
@@ -55,9 +55,9 @@ Object.assign( Composite.prototype, {
 		// and only call .getValue on the first
 		if ( binding !== undefined ) binding.getValue( array, offset );
 
-	},
+	}
 
-	setValue: function ( array, offset ) {
+	setValue( array, offset ) {
 
 		const bindings = this._bindings;
 
@@ -67,9 +67,9 @@ Object.assign( Composite.prototype, {
 
 		}
 
-	},
+	}
 
-	bind: function () {
+	bind() {
 
 		const bindings = this._bindings;
 
@@ -79,9 +79,9 @@ Object.assign( Composite.prototype, {
 
 		}
 
-	},
+	}
 
-	unbind: function () {
+	unbind() {
 
 		const bindings = this._bindings;
 
@@ -93,7 +93,7 @@ Object.assign( Composite.prototype, {
 
 	}
 
-} );
+}
 
 
 function PropertyBinding( rootNode, path, parsedPath ) {
