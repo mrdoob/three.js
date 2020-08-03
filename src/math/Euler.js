@@ -17,9 +17,17 @@ class Euler {
 
 	}
 
-	static RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+	static get RotationOrders() {
 
-	static DefaultOrder = 'XYZ';
+		return [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+
+	}
+
+	static get DefaultOrder() {
+
+		return 'XYZ';
+
+	}
 
 	get x() {
 
