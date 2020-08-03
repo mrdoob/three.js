@@ -76,7 +76,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			// Load transcoder wrapper.
 			var jsLoader = new FileLoader( this.manager );
-			jsLoader.setPath( this.transcoderPath );
+			jsLoader.setPath( this.libraryPath );
 			var jsContent = new Promise( ( resolve, reject ) => {
 
 				jsLoader.load( 'rhino3dm.js', resolve, undefined, reject );
@@ -85,7 +85,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			// Load transcoder WASM binary.
 			var binaryLoader = new FileLoader( this.manager );
-			binaryLoader.setPath( this.transcoderPath );
+			binaryLoader.setPath( this.libraryPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
 			var binaryContent = new Promise( ( resolve, reject ) => {
 
@@ -123,6 +123,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 	var libraryConfig;
 	var libraryPending;
+	var _RhinoFile;
 
 	onmessage = function ( e ) {
 
@@ -140,7 +141,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 					};
 
-					DracoDecoderModule( decoderConfig );
+					//DracoDecoderModule( decoderConfig );
 
 				} );
 				break;
@@ -152,18 +153,18 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 	function init( wasmBinary ) {
 
 		var rhino3dmModule;
-		transcoderPending = new Promise( ( resolve ) => {
+		libraryPending = new Promise( ( resolve ) => {
 
 			rhino3dmModule = { wasmBinary, onRuntimeInitialized: resolve };
-			BASIS( rhino3dmModule );
+			//BASIS( rhino3dmModule );
 
 		} ).then( () => {
 
 			var { BasisFile, initializeBasis } = rhino3dmModule;
 
-			_BasisFile = BasisFile;
+			_RhinoFile = BasisFile;
 
-			initializeBasis();
+			//initializeBasis();
 
 		} );
 
