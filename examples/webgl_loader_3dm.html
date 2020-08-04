@@ -27,11 +27,12 @@
 
 			function init() {
 
+				THREE.Object3D.DefaultUp = new THREE.Vector3(0,0,1);
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camera.position.z = 2;
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera.position.set(26,-40,5)
 
 				scene = new THREE.Scene();
 				scene.add( new THREE.HemisphereLight() );
@@ -43,21 +44,19 @@
 				var loader = new Rhino3dmLoader( );
 				loader.setLibraryPath('jsm/libs/rhino3dm/');
 				
-				loader.load( 'models/3dm/hello_mesh.3dm', function ( object ) {
+				loader.load( 'models/3dm/hello_mesh.3dm', function ( objects ) {
 
-                    /*
-					object.traverse( function ( child ) {
+					console.log('onLoad');
+					console.log(objects);
 
-						if ( child.isMesh ) {
+					// they need materials
 
-							child.material.normalMap = normal;
-
-						}
-
-					} );
-
-					scene.add( object );
-                    */
+					var material = new THREE.MeshNormalMaterial();
+					for(var i = 0; i < objects.length; i++) {
+						var mesh = new THREE.Mesh(objects[i], material);
+						scene.add( mesh );
+					}
+                    
 
                 } );
                 

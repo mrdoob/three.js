@@ -5,6 +5,7 @@
 import {
 	BufferAttribute,
 	BufferGeometry,
+	BufferGeometryLoader,
 	FileLoader,
 	Loader
 } from "../../../build/three.module.js";
@@ -106,7 +107,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				} );
 
 			} )
-			.then( ( message ) => this._createGeometry( message.geometry ) );
+			.then( ( message ) => this._createGeometry( message.geometryList ) );
 
 		// Remove task from the task list.
 		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
@@ -144,26 +145,19 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	_createGeometry: function ( geometryData ) {
 
-		var geometry = new BufferGeometry();
+		var geometries = [];
+		let loader = new BufferGeometryLoader();
+		console.log(geometryData);
 
-		if ( geometryData.index ) {
+		for(var i = 0; i < geometryData.length; i++){
 
-			geometry.setIndex( new BufferAttribute( geometryData.index.array, 1 ) );
+			var geometry = loader.parse( geometryData[i] );
 
-		}
-
-		for ( var i = 0; i < geometryData.attributes.length; i ++ ) {
-
-			var attribute = geometryData.attributes[ i ];
-			var name = attribute.name;
-			var array = attribute.array;
-			var itemSize = attribute.itemSize;
-
-			geometry.setAttribute( name, new BufferAttribute( array, itemSize ) );
+			geometries.push(geometry);
 
 		}
-
-		return geometry;
+		
+		return geometries;
 
 	},
 
@@ -334,17 +328,48 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				break;
 
 			case 'decode':
-
+				// console.log(message);
+				var buffer = message.buffer;
 				libraryPending.then( () => { 
 
 					// TODO
 					var sphere = new rhino.Sphere([0,0,0], 10);
 					console.log(sphere.radius);
 
+
+
 					var arr = new Uint8Array(buffer);
 					var doc = rhino.File3dm.fromByteArray(arr);
-
 					console.log(doc);
+
+					var objects = doc.objects();
+					var geometryList = [];
+					var geometry;
+					
+					for (var i = 0; i < objects.count; i++) {
+						var obj = objects.get(i).geometry();
+						if(obj instanceof rhino.Mesh) {
+							// convert all meshes in 3dm model into threejs objects
+							
+							geometry = obj.toThreejsJSON();
+							geometryList.push(geometry);
+							
+							
+							
+						}
+
+						/*
+					
+						if(obj instanceof rhino.PointCloud){
+							let threePts = pointsToThreejs(obj, ptMat);
+							scene.add(threePts);
+						}
+
+						*/
+						
+					}
+
+					self.postMessage( { type: 'decode', id: message.id, geometryList } );
 
 				} );
 				
