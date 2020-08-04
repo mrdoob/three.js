@@ -147,7 +147,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var geometries = [];
 		let loader = new BufferGeometryLoader();
-		console.log(geometryData);
 
 		for( var i = 0; i < geometryData.length; i++ ){
 
