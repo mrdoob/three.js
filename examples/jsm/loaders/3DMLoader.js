@@ -338,8 +338,13 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				libraryPending.then( () => { 
 
 					// TODO
-					let sphere = new rhino.Sphere([0,0,0], 10);
+					var sphere = new rhino.Sphere([0,0,0], 10);
 					console.log(sphere.radius);
+
+					var arr = new Uint8Array(buffer);
+					var doc = rhino.File3dm.fromByteArray(arr);
+
+					console.log(doc);
 
 				} );
 				
