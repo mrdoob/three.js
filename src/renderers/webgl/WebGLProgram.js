@@ -405,11 +405,13 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	const program = gl.createProgram();
 
 	let prefixVertex, prefixFragment;
+	let versionString = parameters.glslVersion ? '#version ' + parameters.glslVersion : ''
 
 	if ( parameters.isRawShaderMaterial ) {
 
 		prefixVertex = [
 
+			versionString,
 			customDefines
 
 		].filter( filterEmptyLine ).join( '\n' );
@@ -422,6 +424,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		prefixFragment = [
 
+			versionString,
 			customExtensions,
 			customDefines
 

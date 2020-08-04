@@ -29,6 +29,7 @@ export interface ShaderMaterialParameters extends MaterialParameters {
 		drawBuffers?: boolean;
 		shaderTextureLOD?: boolean;
 	};
+	glslVersion?: string;
 }
 
 export class ShaderMaterial extends Material {
@@ -59,6 +60,7 @@ export class ShaderMaterial extends Material {
 	defaultAttributeValues: any;
 	index0AttributeName: string | undefined;
 	uniformsNeedUpdate: boolean;
+	glslVersion: string;
 
 	setValues( parameters: ShaderMaterialParameters ): void;
 	toJSON( meta: any ): any;
