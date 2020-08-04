@@ -3,16 +3,9 @@ import { KeyframeTrack } from '../KeyframeTrack.js';
 /**
  * A Track of vectored keyframe values.
  */
+class VectorKeyframeTrack extends KeyframeTrack {}
 
-function VectorKeyframeTrack( name, times, values, interpolation ) {
-
-	KeyframeTrack.call( this, name, times, values, interpolation );
-
-}
-
-VectorKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: VectorKeyframeTrack,
+Object.assign( VectorKeyframeTrack.prototype, {
 
 	ValueTypeName: 'vector'
 
