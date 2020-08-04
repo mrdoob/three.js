@@ -1,17 +1,15 @@
 import { WebGLRenderer } from './WebGLRenderer.js';
 
-function WebGL1Renderer( parameters ) {
+class WebGL1Renderer extends WebGLRenderer {
 
-	WebGLRenderer.call( this, parameters );
+	constructor( parameters ) {
+
+		super( parameters );
+
+		this.isWebGL1Renderer = true;
+
+	}
 
 }
-
-WebGL1Renderer.prototype = Object.assign( Object.create( WebGLRenderer.prototype ), {
-
-	constructor: WebGL1Renderer,
-
-	isWebGL1Renderer: true
-
-} );
 
 export { WebGL1Renderer };
