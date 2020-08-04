@@ -16,8 +16,17 @@ var Rhino3dmLoader = function ( manager ) {
 	this.libraryPath = '';
 	this.libraryPending = null;
 	this.libraryBinary = null;
+	this.libraryConfig = {};
+
+	this.workerLimit = 4;
+	this.workerPool = [];
+	this.workerNextTaskID = 1;
+	this.workerSourceURL = '';
+	this.workerConfig = {};
 
 };
+
+Rhino3dmLoader.taskCache = new WeakMap();
 
 Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
@@ -31,36 +40,99 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
+	setWorkerLimit: function ( workerLimit ) {
+
+		this.workerLimit = workerLimit;
+
+		return this;
+
+	},
+
 	load: function ( url, onLoad, onProgress, onError ) {
 
-		var scope = this;
+		var loader = new FileLoader( this.manager );
 
-		var path = ( this.path !== undefined ) ? this.path : LoaderUtils.extractUrlBase( url );
+		loader.setPath( this.path );
+		loader.setResponseType( 'arraybuffer' );
 
-		var loader = new FileLoader( scope.manager );
+		loader.load( url, ( buffer ) => {
 
-		loader.load( url, function ( text ) {
+			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+			// again from this thread.
+			if ( Rhino3dmLoader.taskCache.has( buffer ) ) {
 
-			try {
+				var cachedTask = Rhino3dmLoader.taskCache.get( buffer );
 
-				scope.parse( text, path, onLoad, onError );
-
-			} catch ( e ) {
-
-				if ( onError !== undefined ) {
-
-					onError( e );
-
-				} else {
-
-					throw e;
-
-				}
+				return cachedTask.promise.then( onLoad ).catch( onError );
 
 			}
 
+			this.decodeObjects( buffer, url )
+				.then( onLoad )
+				.catch( onError );
+
 		}, onProgress, onError );
 
+
+	},
+
+	debug: function () {
+
+		console.log( 'Task load: ', this.workerPool.map( ( worker ) => worker._taskLoad ) );
+
+	},
+
+	decodeObjects: function ( buffer, url ) {
+
+		var worker;
+		var taskID;
+
+		var taskCost = buffer.byteLength;
+
+		var objectPending = this._getWorker( taskCost )
+			.then( ( _worker ) => {
+
+				worker = _worker;
+				taskID = this.workerNextTaskID ++; //hmmm
+
+				return new Promise( ( resolve, reject ) => {
+
+					worker._callbacks[ taskID ] = { resolve, reject };
+
+					worker.postMessage( { type: 'decode', id: taskID, buffer }, [ buffer ] );
+
+					//this.debug();
+
+				} );
+
+			} )
+			.then( ( message ) => this._createGeometry( message.geometry ) );
+
+		// Remove task from the task list.
+		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
+		objectPending
+			.catch( () => true )
+			.then( () => {
+
+				if ( worker && taskID ) {
+
+					this._releaseTask( worker, taskID );
+
+					//this.debug();
+
+				}
+
+			} );
+
+		// Cache the task result.
+		Rhino3dmLoader.taskCache.set( buffer, {
+
+			url: url,
+			promise: objectPending
+
+		} );
+
+		return objectPending;
 	},
 
 	parse: function ( ) {
@@ -70,11 +142,36 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
+	_createGeometry: function ( geometryData ) {
+
+		var geometry = new BufferGeometry();
+
+		if ( geometryData.index ) {
+
+			geometry.setIndex( new BufferAttribute( geometryData.index.array, 1 ) );
+
+		}
+
+		for ( var i = 0; i < geometryData.attributes.length; i ++ ) {
+
+			var attribute = geometryData.attributes[ i ];
+			var name = attribute.name;
+			var array = attribute.array;
+			var itemSize = attribute.itemSize;
+
+			geometry.setAttribute( name, new BufferAttribute( array, itemSize ) );
+
+		}
+
+		return geometry;
+
+	},
+
 	_initLibrary: function () {
 
 		if ( ! this.libraryPending ) {
 
-			// Load transcoder wrapper.
+			// Load rhino3dm wrapper.
 			var jsLoader = new FileLoader( this.manager );
 			jsLoader.setPath( this.libraryPath );
 			var jsContent = new Promise( ( resolve, reject ) => {
@@ -83,7 +180,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			} );
 
-			// Load transcoder WASM binary.
+			// Load rhino3dm WASM binary.
 			var binaryLoader = new FileLoader( this.manager );
 			binaryLoader.setPath( this.libraryPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
@@ -96,6 +193,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			this.libraryPending = Promise.all( [ jsContent, binaryContent ] )
 				.then( ( [ jsContent, binaryContent ] ) => {
 
+					//this.libraryBinary = binaryContent;
+					this.libraryConfig.wasmBinary = binaryContent;
+
 					var fn = Rhino3dmLoader.Rhino3dmWorker.toString();
 
 					var body = [
@@ -106,7 +206,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					].join( '\n' );
 
 					this.workerSourceURL = URL.createObjectURL( new Blob( [ body ] ) );
-					this.libraryBinary = binaryContent;
 
 				} );
 
@@ -114,16 +213,98 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		return this.libraryPending;
 
+	},
+
+	_getWorker: function ( taskCost ) {
+
+		return this._initLibrary().then( () => {
+
+			if ( this.workerPool.length < this.workerLimit ) {
+
+				var worker = new Worker( this.workerSourceURL );
+
+				worker._callbacks = {};
+				worker._taskCosts = {};
+				worker._taskLoad = 0;
+
+				worker.postMessage( {
+					type: 'init',
+					libraryConfig: this.libraryConfig
+				} );
+
+				worker.onmessage = function ( e ) {
+
+					var message = e.data;
+
+					switch ( message.type ) {
+
+						case 'decode':
+							worker._callbacks[ message.id ].resolve( message );
+							break;
+
+						case 'error':
+							worker._callbacks[ message.id ].reject( message );
+							break;
+
+						default:
+							console.error( 'THREE.Rhino3dmLoader: Unexpected message, "' + message.type + '"' );
+
+					}
+
+				};
+
+				this.workerPool.push( worker );
+
+			} else {
+
+				this.workerPool.sort( function ( a, b ) {
+
+					return a._taskLoad > b._taskLoad ? - 1 : 1;
+
+				} );
+
+			}
+
+			var worker = this.workerPool[ this.workerPool.length - 1 ];
+
+			worker._taskLoad += taskCost;
+
+			return worker;
+
+		} );
+	},
+
+	_releaseTask: function ( worker, taskID ) {
+
+		worker._taskLoad -= worker._taskCosts[ taskID ];
+		delete worker._callbacks[ taskID ];
+		delete worker._taskCosts[ taskID ];
+
+	},
+
+	dispose: function () {
+
+		for ( var i = 0; i < this.workerPool.length; ++ i ) {
+
+			this.workerPool[ i ].terminate();
+
+		}
+
+		this.workerPool.length = 0;
+
+		return this;
+
 	}
+
 } );
 
 /* WEB WORKER */
 
 Rhino3dmLoader.Rhino3dmWorker = function () {
 
-	var libraryConfig;
 	var libraryPending;
-	var _RhinoFile;
+	var libraryConfig;
+	var rhino;
 
 	onmessage = function ( e ) {
 
@@ -132,42 +313,38 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		switch ( message.type ) {
 
 			case 'init':
-				libraryPending = new Promise( function ( resolve/*, reject*/ ) {
 
-					libraryPending.onModuleLoaded = function ( draco ) {
+				libraryConfig = message.libraryConfig;
+				var wasmBinary = libraryConfig.wasmBinary;
+				var RhinoModule;
+				libraryPending = new Promise( function ( resolve ) { 
 
-						// Module is Promise-like. Wrap before resolving to avoid loop.
-						resolve( { rhino3dm: rhino3dm } );
+					/* Like Basis Loader */
+					RhinoModule = { wasmBinary, onRuntimeInitialized: resolve };
 
-					};
+					rhino3dm( RhinoModule );
 
-					//DracoDecoderModule( decoderConfig );
+
+				 } ).then( () => {
+
+					rhino = RhinoModule;
+
+				 });
+				 
+				break;
+
+			case 'decode':
+
+				libraryPending.then( () => { 
+
+					// TODO
+					let sphere = new rhino.Sphere([0,0,0], 10);
+					console.log(sphere.radius);
 
 				} );
-				break;
-			case 'decode':
+				
 				break;
 		}
-	}
-
-	function init( wasmBinary ) {
-
-		var rhino3dmModule;
-		libraryPending = new Promise( ( resolve ) => {
-
-			rhino3dmModule = { wasmBinary, onRuntimeInitialized: resolve };
-			//BASIS( rhino3dmModule );
-
-		} ).then( () => {
-
-			var { BasisFile, initializeBasis } = rhino3dmModule;
-
-			_RhinoFile = BasisFile;
-
-			//initializeBasis();
-
-		} );
-
 	}
 
 };
