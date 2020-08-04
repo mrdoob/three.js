@@ -3,9 +3,6 @@ import { Vector3 } from './Vector3.js';
 import { Matrix4 } from './Matrix4.js';
 import { MathUtils } from './MathUtils.js';
 
-const _matrix = new Matrix4();
-const _quaternion = new Quaternion();
-
 class Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
@@ -338,6 +335,9 @@ class Euler {
 	_onChangeCallback() {}
 
 }
+
+const _matrix = new Matrix4();
+const _quaternion = new Quaternion();
 
 
 export { Euler };

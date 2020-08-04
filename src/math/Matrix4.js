@@ -1,13 +1,5 @@
 import { Vector3 } from './Vector3.js';
 
-const _v1 = new Vector3();
-let _m1;
-const _zero = new Vector3( 0, 0, 0 );
-const _one = new Vector3( 1, 1, 1 );
-const _x = new Vector3();
-const _y = new Vector3();
-const _z = new Vector3();
-
 class Matrix4 {
 
 	constructor() {
@@ -881,6 +873,13 @@ class Matrix4 {
 
 }
 
-_m1 = new Matrix4();
+const _v1 = new Vector3();
+const _m1 = new Matrix4();
+const _zero = new Vector3( 0, 0, 0 );
+const _one = new Vector3( 1, 1, 1 );
+const _x = new Vector3();
+const _y = new Vector3();
+const _z = new Vector3();
+
 
 export { Matrix4 };
