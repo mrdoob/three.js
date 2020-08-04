@@ -4,16 +4,9 @@ import { KeyframeTrack } from '../KeyframeTrack.js';
 /**
  * A Track of Boolean keyframe values.
  */
+class BooleanKeyframeTrack extends KeyframeTrack {}
 
-function BooleanKeyframeTrack( name, times, values ) {
-
-	KeyframeTrack.call( this, name, times, values );
-
-}
-
-BooleanKeyframeTrack.prototype = Object.assign( Object.create( KeyframeTrack.prototype ), {
-
-	constructor: BooleanKeyframeTrack,
+Object.assign( BooleanKeyframeTrack.prototype, {
 
 	ValueTypeName: 'bool',
 	ValueBufferType: Array,
