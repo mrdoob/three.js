@@ -149,11 +149,11 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		let loader = new BufferGeometryLoader();
 		console.log(geometryData);
 
-		for(var i = 0; i < geometryData.length; i++){
+		for( var i = 0; i < geometryData.length; i++ ){
 
 			var geometry = loader.parse( geometryData[i] );
 
-			geometries.push(geometry);
+			geometries.push( geometry );
 
 		}
 		
@@ -328,34 +328,23 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				break;
 
 			case 'decode':
-				// console.log(message);
+
 				var buffer = message.buffer;
-				libraryPending.then( () => { 
-
-					// TODO
-					var sphere = new rhino.Sphere([0,0,0], 10);
-					console.log(sphere.radius);
-
-
+				libraryPending.then( () => {
 
 					var arr = new Uint8Array(buffer);
 					var doc = rhino.File3dm.fromByteArray(arr);
-					console.log(doc);
 
 					var objects = doc.objects();
 					var geometryList = [];
-					var geometry;
 					
-					for (var i = 0; i < objects.count; i++) {
+					for ( var i = 0; i < objects.count; i++ ) {
 						var obj = objects.get(i).geometry();
-						if(obj instanceof rhino.Mesh) {
-							// convert all meshes in 3dm model into threejs objects
-							
-							geometry = obj.toThreejsJSON();
-							geometryList.push(geometry);
-							
-							
-							
+						if( obj instanceof rhino.Mesh ) {
+
+							var geometry = obj.toThreejsJSON();
+							geometryList.push( geometry );
+
 						}
 
 						/*

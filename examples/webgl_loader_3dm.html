@@ -46,14 +46,13 @@
 				
 				loader.load( 'models/3dm/hello_mesh.3dm', function ( objects ) {
 
-					console.log('onLoad');
-					console.log(objects);
-
-					// they need materials
+					// TODO: return an object 3d
 
 					var material = new THREE.MeshNormalMaterial();
-					for(var i = 0; i < objects.length; i++) {
-						var mesh = new THREE.Mesh(objects[i], material);
+
+					for( var i = 0; i < objects.length; i++ ) {
+
+						var mesh = new THREE.Mesh( objects[i], material );
 						scene.add( mesh );
 					}
                     
