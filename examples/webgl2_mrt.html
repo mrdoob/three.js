@@ -27,8 +27,16 @@
 		<script id="gbuffer-vert" type="x-shader/x-vertex">
 			#version 300 es
 
+			in vec3 position;
+			in vec3 normal;
+			in vec2 uv;
+
 			out vec3 vNormal;
 			out vec2 vUv;
+
+			uniform mat4 modelViewMatrix;
+			uniform mat4 projectionMatrix;
+			uniform mat3 normalMatrix;
 
 			void main() {
 
@@ -46,6 +54,9 @@
 		</script>
 		<script id="gbuffer-frag" type="x-shader/x-fragment">
 			#version 300 es
+
+			precision highp float;
+			precision highp int;
 
 			layout(location = 0) out vec4 gColor;
 			layout(location = 1) out vec4 gNormal;
@@ -71,7 +82,13 @@
 		<script id="render-vert" type="x-shader/x-vertex">
 			#version 300 es
 
+			in vec3 position;
+			in vec2 uv;
+
 			out vec2 vUv;
+
+			uniform mat4 modelViewMatrix;
+			uniform mat4 projectionMatrix;
 
 			void main() {
 
@@ -82,6 +99,9 @@
 		</script>
 		<script id="render-frag" type="x-shader/x-fragment">
 			#version 300 es
+
+			precision highp float;
+			precision highp int;
 
 			layout(location = 0) out vec4 pc_FragColor;
 
@@ -186,7 +206,7 @@
 
 				scene.add( new THREE.Mesh(
 					new THREE.TorusKnotGeometry( 1, 0.3, 128, 64 ),
-					new THREE.ShaderMaterial( {
+					new THREE.RawShaderMaterial( {
 						vertexShader: document.querySelector( '#gbuffer-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#gbuffer-frag' ).textContent.trim(),
 						uniforms: {
@@ -204,7 +224,7 @@
 
 				postScene.add( new THREE.Mesh(
 					new THREE.PlaneGeometry( 2, 2 ),
-					new THREE.ShaderMaterial( {
+					new THREE.RawShaderMaterial( {
 						vertexShader: document.querySelector( '#render-vert' ).textContent.trim(),
 						fragmentShader: document.querySelector( '#render-frag' ).textContent.trim(),
 						uniforms: {
