@@ -1,11 +1,6 @@
 import { Vector3 } from './Vector3.js';
 import { Plane } from './Plane.js';
 
-/**
- * @author bhouston / http://clara.io
- * @author mrdoob / http://mrdoob.com/
- */
-
 const _v0 = new Vector3();
 const _v1 = new Vector3();
 const _v2 = new Vector3();

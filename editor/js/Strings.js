@@ -1,8 +1,4 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-var Strings = function ( config ) {
+function Strings( config ) {
 
 	var language = config.getKey( 'language' );
 
@@ -81,6 +77,7 @@ var Strings = function ( config ) {
 
 			'sidebar/scene': 'Scene',
 			'sidebar/scene/background': 'Background',
+			'sidebar/scene/environment': 'Environment',
 			'sidebar/scene/fog': 'Fog',
 
 			'sidebar/properties/object': 'Object',
@@ -110,8 +107,9 @@ var Strings = function ( config ) {
 			'sidebar/object/penumbra': 'Penumbra',
 			'sidebar/object/decay': 'Decay',
 			'sidebar/object/shadow': 'Shadow',
-			'sidebar/object/shadowRadius': 'Shadow Radius',
 			'sidebar/object/shadowBias': 'Shadow Bias',
+			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowRadius': 'Shadow Radius',
 			'sidebar/object/cast': 'cast',
 			'sidebar/object/receive': 'receive',
 			'sidebar/object/visible': 'Visible',
@@ -276,6 +274,8 @@ var Strings = function ( config ) {
 			'sidebar/material/opacity': 'Opacity',
 			'sidebar/material/transparent': 'Transparent',
 			'sidebar/material/alphatest': 'Alpha Test',
+			'sidebar/material/depthtest': 'Depth Test',
+			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
 
 			'sidebar/script': 'Script',
@@ -290,10 +290,8 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
-			'sidebar/project/shadowType': 'Shadow Type',
-			'sidebar/project/physicallyCorrectLights': 'Physically correct lights',
+			'sidebar/project/physicallyCorrectLights': 'Physical lights',
 			'sidebar/project/toneMapping': 'Tone mapping',
-			'sidebar/project/toneMappingExposure': 'Exposure',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
@@ -308,6 +306,7 @@ var Strings = function ( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/settings/viewport/grid': 'Grid',
+			'sidebar/settings/viewport/helpers': 'Helpers',
 
 			'sidebar/history': 'History',
 			'sidebar/history/persistent': 'persistent',
@@ -323,7 +322,9 @@ var Strings = function ( config ) {
 			'viewport/info/frametime': 'Frametime'
 
 		},
+
 		fr: {
+
 			'menubar/file': 'Fichier',
 			'menubar/file/new': 'Nouveau',
 			'menubar/file/import': 'Importer',
@@ -395,6 +396,7 @@ var Strings = function ( config ) {
 
 			'sidebar/scene': 'Scène',
 			'sidebar/scene/background': 'Arrière Plan',
+			'sidebar/scene/environment': 'Environment',
 			'sidebar/scene/fog': 'Brouillard',
 
 			'sidebar/properties/object': 'Objet',
@@ -424,8 +426,9 @@ var Strings = function ( config ) {
 			'sidebar/object/penumbra': 'Pénombre',
 			'sidebar/object/decay': 'Affaiblissement',
 			'sidebar/object/shadow': 'Ombre',
-			'sidebar/object/shadowRadius': 'Rayon de l\'ombre',
 			'sidebar/object/shadowBias': 'Biais directionnel des ombres',
+			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowRadius': 'Rayon de l\'ombre',
 			'sidebar/object/cast': 'Projète',
 			'sidebar/object/receive': 'Reçoit',
 			'sidebar/object/visible': 'Visible',
@@ -590,6 +593,8 @@ var Strings = function ( config ) {
 			'sidebar/material/opacity': 'Opacité',
 			'sidebar/material/transparent': 'Transparence',
 			'sidebar/material/alphatest': 'Test de transparence',
+			'sidebar/material/depthtest': 'Depth Test',
+			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Fil de fer',
 
 			'sidebar/script': 'Script',
@@ -604,10 +609,8 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Rendus',
 			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
-			'sidebar/project/shadowType': 'Type d\'ombre',
-			'sidebar/project/physicallyCorrectLights': 'Rendu physique lumineux',
+			'sidebar/project/physicallyCorrectLights': 'Physical lights',
 			'sidebar/project/toneMapping': 'Mappage des nuances',
-			'sidebar/project/toneMappingExposure': 'Réglage d\'exposition',
 			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
@@ -622,6 +625,7 @@ var Strings = function ( config ) {
 			'sidebar/settings/shortcuts/focus': 'Focus',
 
 			'sidebar/settings/viewport/grid': 'Grille',
+			'sidebar/settings/viewport/helpers': 'Helpers',
 
 			'sidebar/history': 'Historique',
 			'sidebar/history/persistent': 'permanent',
@@ -635,7 +639,9 @@ var Strings = function ( config ) {
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
 			'viewport/info/frametime': 'Temps de trame'
+
 		},
+
 		zh: {
 
 			'menubar/file': '文件',
@@ -709,6 +715,7 @@ var Strings = function ( config ) {
 
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
+			'sidebar/scene/environment': '环境',
 			'sidebar/scene/fog': '雾',
 
 			'sidebar/properties/object': '属性',
@@ -738,8 +745,9 @@ var Strings = function ( config ) {
 			'sidebar/object/penumbra': '边缘',
 			'sidebar/object/decay': '衰减',
 			'sidebar/object/shadow': '阴影',
-			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/shadowBias': '阴影偏移',
+			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/cast': '产生',
 			'sidebar/object/receive': '接受',
 			'sidebar/object/visible': '可见性',
@@ -829,6 +837,15 @@ var Strings = function ( config ) {
 			'sidebar/geometry/torusKnot_geometry/p': '管长弧度',
 			'sidebar/geometry/torusKnot_geometry/q': '扭曲弧度',
 
+			'sidebar/geometry/tube_geometry/path': '路径',
+			'sidebar/geometry/tube_geometry/radius': '半径',
+			'sidebar/geometry/tube_geometry/tube': '管厚',
+			'sidebar/geometry/tube_geometry/tubularsegments': '管厚分段',
+			'sidebar/geometry/tube_geometry/radialsegments': '半径分段',
+			'sidebar/geometry/tube_geometry/closed': '闭合',
+			'sidebar/geometry/tube_geometry/curvetype': '曲线类型',
+			'sidebar/geometry/tube_geometry/tension': '张力',
+
 			'sidebar/material/new': '更新',
 			'sidebar/material/copy': '复制',
 			'sidebar/material/paste': '粘贴',
@@ -878,6 +895,8 @@ var Strings = function ( config ) {
 			'sidebar/material/opacity': '透明度',
 			'sidebar/material/transparent': '透明性',
 			'sidebar/material/alphatest': 'α测试',
+			'sidebar/material/depthtest': '深度测试',
+			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
 
 			'sidebar/script': '脚本',
@@ -892,10 +911,8 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/shadowType': '阴影类型',
-			'sidebar/project/physicallyCorrectLights': '物理光照',
+			'sidebar/project/physicallyCorrectLights': '物理灯',
 			'sidebar/project/toneMapping': '色调映射',
-			'sidebar/project/toneMappingExposure': '曝光',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 
@@ -910,6 +927,7 @@ var Strings = function ( config ) {
 			'sidebar/settings/shortcuts/focus': '聚焦',
 
 			'sidebar/settings/viewport/grid': '网格',
+			'sidebar/settings/viewport/helpers': '辅助',
 
 			'sidebar/history': '历史记录',
 			'sidebar/history/persistent': '本地存储',
@@ -938,6 +956,6 @@ var Strings = function ( config ) {
 
 	};
 
-};
+}
 
 export { Strings };

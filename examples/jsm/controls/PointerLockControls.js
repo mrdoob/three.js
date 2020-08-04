@@ -1,8 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import {
 	Euler,
 	EventDispatcher,
@@ -64,7 +59,7 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	function onPointerlockChange() {
 
-		if ( document.pointerLockElement === scope.domElement ) {
+		if ( scope.domElement.ownerDocument.pointerLockElement === scope.domElement ) {
 
 			scope.dispatchEvent( lockEvent );
 
@@ -88,17 +83,17 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	this.connect = function () {
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.addEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockchange', onPointerlockChange, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockerror', onPointerlockError, false );
 
 	};
 
 	this.disconnect = function () {
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.removeEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockerror', onPointerlockError, false );
 
 	};
 
@@ -155,7 +150,7 @@ var PointerLockControls = function ( camera, domElement ) {
 
 	this.unlock = function () {
 
-		document.exitPointerLock();
+		scope.domElement.ownerDocument.exitPointerLock();
 
 	};
 

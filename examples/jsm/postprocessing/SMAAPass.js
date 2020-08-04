@@ -1,7 +1,3 @@
-/**
- * @author mpk / http://polko.me/
- */
-
 import {
 	LinearFilter,
 	NearestFilter,

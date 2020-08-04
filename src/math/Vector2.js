@@ -1,14 +1,7 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author philogb / http://blog.thejit.org/
- * @author egraether / http://egraether.com/
- * @author zz85 / http://www.lab4games.net/zz85/blog
- */
+function Vector2( x = 0, y = 0 ) {
 
-function Vector2( x, y ) {
-
-	this.x = x || 0;
-	this.y = y || 0;
+	this.x = x;
+	this.y = y;
 
 }
 

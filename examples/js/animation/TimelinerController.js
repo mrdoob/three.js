@@ -1,4 +1,4 @@
-console.warn( "THREE.TimelinerController: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
+console.warn( "THREE.TimelinerController: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Controller class for the Timeliner GUI.
  *
@@ -10,9 +10,6 @@ console.warn( "THREE.TimelinerController: As part of the transition to ES6 Modul
  *
  * 		https://github.com/tschw/timeliner_gui
  * 		https://github.com/zz85/timeliner (fork's origin)
- *
- * @author tschw
- *
  */
 
 THREE.TimelinerController = function TimelinerController( scene, trackInfo, onUpdate ) {

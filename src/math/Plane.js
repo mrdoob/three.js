@@ -1,10 +1,6 @@
 import { Matrix3 } from './Matrix3.js';
 import { Vector3 } from './Vector3.js';
 
-/**
- * @author bhouston / http://clara.io
- */
-
 const _vector1 = new Vector3();
 const _vector2 = new Vector3();
 const _normalMatrix = new Matrix3();

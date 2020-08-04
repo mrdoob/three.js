@@ -1,18 +1,11 @@
-/**
- * @author mikael emtinger / http://gomo.se/
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://clara.io
- */
-
 import { MathUtils } from './MathUtils.js';
 
-function Quaternion( x, y, z, w ) {
+function Quaternion( x = 0, y = 0, z = 0, w = 1 ) {
 
-	this._x = x || 0;
-	this._y = y || 0;
-	this._z = z || 0;
-	this._w = ( w !== undefined ) ? w : 1;
+	this._x = x;
+	this._y = y;
+	this._z = z;
+	this._w = w;
 
 }
 
@@ -40,10 +33,8 @@ Object.assign( Quaternion, {
 
 		if ( w0 !== w1 || x0 !== x1 || y0 !== y1 || z0 !== z1 ) {
 
-			let s = 1 - t,
-
-				cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
-
+			let s = 1 - t;
+			const cos = x0 * x1 + y0 * y1 + z0 * z1 + w0 * w1,
 				dir = ( cos >= 0 ? 1 : - 1 ),
 				sqrSin = 1 - cos * cos;
 
@@ -434,6 +425,12 @@ Object.assign( Quaternion.prototype, {
 		this.slerp( q, t );
 
 		return this;
+
+	},
+
+	identity: function () {
+
+		return this.set( 0, 0, 0, 1 );
 
 	},
 

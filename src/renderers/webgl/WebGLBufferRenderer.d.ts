@@ -9,6 +9,10 @@ export class WebGLBufferRenderer {
 
 	setMode( value: any ): void;
 	render( start: any, count: number ): void;
-	renderInstances( geometry: any ): void;
+	renderInstances(
+		start: any,
+		count: number,
+		primcount: number
+	): void;
 
 }

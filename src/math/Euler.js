@@ -3,21 +3,15 @@ import { Vector3 } from './Vector3.js';
 import { Matrix4 } from './Matrix4.js';
 import { MathUtils } from './MathUtils.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://clara.io
- */
-
 const _matrix = new Matrix4();
 const _quaternion = new Quaternion();
 
-function Euler( x, y, z, order ) {
+function Euler( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
-	this._x = x || 0;
-	this._y = y || 0;
-	this._z = z || 0;
-	this._order = order || Euler.DefaultOrder;
+	this._x = x;
+	this._y = y;
+	this._z = z;
+	this._order = order;
 
 }
 

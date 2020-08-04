@@ -1,8 +1,4 @@
-console.warn( "THREE.PointerLockControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
+console.warn( "THREE.PointerLockControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.PointerLockControls = function ( camera, domElement ) {
 
@@ -59,7 +55,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	function onPointerlockChange() {
 
-		if ( document.pointerLockElement === scope.domElement ) {
+		if ( scope.domElement.ownerDocument.pointerLockElement === scope.domElement ) {
 
 			scope.dispatchEvent( lockEvent );
 
@@ -83,17 +79,17 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	this.connect = function () {
 
-		document.addEventListener( 'mousemove', onMouseMove, false );
-		document.addEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.addEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockchange', onPointerlockChange, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointerlockerror', onPointerlockError, false );
 
 	};
 
 	this.disconnect = function () {
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
-		document.removeEventListener( 'pointerlockerror', onPointerlockError, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockchange', onPointerlockChange, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerlockerror', onPointerlockError, false );
 
 	};
 
@@ -150,7 +146,7 @@ THREE.PointerLockControls = function ( camera, domElement ) {
 
 	this.unlock = function () {
 
-		document.exitPointerLock();
+		scope.domElement.ownerDocument.exitPointerLock();
 
 	};
 

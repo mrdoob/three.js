@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function WebGLCapabilities( gl, extensions, parameters ) {
 
 	let maxAnisotropy;

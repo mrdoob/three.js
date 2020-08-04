@@ -49,14 +49,19 @@
 		Optional name for this attribute instance. Default is an empty string.
 		</p>
 
-		<h3>[property:Integer offset]</h3>
+		<h3>[property:Boolean needsUpdate]</h3>
 		<p>
-			缓存队列中每个元素的起始位置的偏移量。
+			Default is *false*. Setting this to *true* will send the entire interleaved buffer (not just the specific attribute data) to the GPU again.
 		</p>
 
 		<h3>[property:Boolean normalized]</h3>
 		<p>
 			默认值为 *false*。
+		</p>
+
+		<h3>[property:Integer offset]</h3>
+		<p>
+			缓存队列中每个元素的起始位置的偏移量。
 		</p>
 
 		<h2>方法</h2>

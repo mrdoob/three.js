@@ -24,7 +24,7 @@ import { Texture } from '../textures/Texture';
 export interface Renderer {
 	domElement: HTMLCanvasElement;
 
-	render( scene: Scene, camera: Camera ): void;
+	render( scene: Object3D, camera: Camera ): void;
 	setSize( width: number, height: number, updateStyle?: boolean ): void;
 }
 
@@ -333,12 +333,12 @@ export class WebGLRenderer implements Renderer {
 	 * Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.
 	 */
 	compile(
-		scene: Scene,
+		scene: Object3D,
 		camera: Camera
 	): void;
 
 	/**
-	 * Render a scene using a camera.
+	 * Render a scene or an object using a camera.
 	 * The render is done to a previously specified {@link WebGLRenderTarget#renderTarget .renderTarget} set by calling
 	 * {@link WebGLRenderer#setRenderTarget .setRenderTarget} or to the canvas as usual.
 	 *
@@ -349,7 +349,7 @@ export class WebGLRenderer implements Renderer {
 	 * properties to false. To forcibly clear one ore more buffers call {@link WebGLRenderer#clear .clear}.
 	 */
 	render(
-		scene: Scene,
+		scene: Object3D,
 		camera: Camera
 	): void;
 

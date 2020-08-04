@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIBreak, UIText, UIButton, UIRow, UIInput } from './libs/ui.js';
 
 import { AddScriptCommand } from './commands/AddScriptCommand.js';
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';
 import { RemoveScriptCommand } from './commands/RemoveScriptCommand.js';
 
-var SidebarScript = function ( editor ) {
+function SidebarScript( editor ) {
 
 	var strings = editor.strings;
 
@@ -130,6 +126,6 @@ var SidebarScript = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarScript };

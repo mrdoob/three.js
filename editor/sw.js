@@ -1,7 +1,10 @@
-// r117.1
+// r119
 
 const assets = [
 	'./',
+
+	'./manifest.json',
+	'./images/icon.png',
 
 	'../files/favicon.ico',
 
@@ -17,6 +20,10 @@ const assets = [
 	'../examples/js/libs/draco/draco_decoder.wasm',
 	'../examples/js/libs/draco/draco_encoder.js',
 	'../examples/js/libs/draco/draco_wasm_wrapper.js',
+
+	'../examples/js/libs/draco/gltf/draco_decoder.js',
+	'../examples/js/libs/draco/gltf/draco_decoder.wasm',
+	'../examples/js/libs/draco/gltf/draco_wasm_wrapper.js',
 
 	'../examples/jsm/loaders/3MFLoader.js',
 	'../examples/jsm/loaders/AMFLoader.js',
@@ -51,11 +58,8 @@ const assets = [
 
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
 
-	'../examples/js/vr/HelioWebXRPolyfill.js',
 	'../examples/jsm/webxr/VRButton.js',
 
-	'./manifest.json',
-	'./images/icon.png',
 	'./images/rotate.svg',
 	'./images/scale.svg',
 	'./images/translate.svg',
@@ -156,6 +160,7 @@ const assets = [
 	'./js/Viewport.js',
 	'./js/Viewport.Camera.js',
 	'./js/Viewport.Info.js',
+	'./js/Viewport.ViewHelper.js',
 
 	'./js/Command.js',
 	'./js/commands/AddObjectCommand.js',

@@ -1,10 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIButton, UICheckbox } from './libs/ui.js';
 
-var Toolbar = function ( editor ) {
+function Toolbar( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
@@ -83,6 +79,6 @@ var Toolbar = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { Toolbar };

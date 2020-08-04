@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { WebGLUniforms } from '../../../../../src/renderers/webgl/WebGLUniforms';

@@ -32,11 +32,6 @@ const _extents = new Vector3();
 const _triangleNormal = new Vector3();
 const _testAxis = new Vector3();
 
-/**
- * @author bhouston / http://clara.io
- * @author WestLangley / http://github.com/WestLangley
- */
-
 function Box3( min, max ) {
 
 	this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );

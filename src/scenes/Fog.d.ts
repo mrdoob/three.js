@@ -12,7 +12,7 @@ export interface IFog {
  */
 export class Fog implements IFog {
 
-	constructor( hex: number, near?: number, far?: number );
+	constructor( color: Color | number | string, near?: number, far?: number );
 
 	name: string;
 

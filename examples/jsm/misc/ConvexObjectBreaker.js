@@ -1,6 +1,11 @@
+import {
+	Line3,
+	Mesh,
+	Plane,
+	Vector3
+} from "../../../build/three.module.js";
+import { ConvexBufferGeometry } from "../geometries/ConvexGeometry.js";
 /**
- * @author yomboprime https://github.com/yomboprime
- *
  * @fileoverview This class can be used to subdivide a convex Geometry object into pieces.
  *
  * Usage:
@@ -28,14 +33,6 @@
  * @param {double} smallDelta Max distance to consider that a point belongs to a plane.
  *
 */
-
-import {
-	Line3,
-	Mesh,
-	Plane,
-	Vector3
-} from "../../../build/three.module.js";
-import { ConvexBufferGeometry } from "../geometries/ConvexGeometry.js";
 
 var ConvexObjectBreaker = function ( minSizeForBreak, smallDelta ) {
 

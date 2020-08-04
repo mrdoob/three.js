@@ -1,7 +1,3 @@
-/*
-	three.js Ocean
-*/
-
 import {
 	ClampToEdgeWrapping,
 	DataTexture,
@@ -204,6 +200,7 @@ var Ocean = function ( renderer, camera, scene, options ) {
 	this.materialOcean.uniforms.u_skyColor = { value: this.skyColor };
 	this.materialOcean.uniforms.u_sunDirection = { value: new Vector3( this.sunDirectionX, this.sunDirectionY, this.sunDirectionZ ) };
 	this.materialOcean.uniforms.u_exposure = { value: this.exposure };
+	this.materialOcean.uniforms.u_size = { value: this.size };
 
 	// Disable blending to prevent default premultiplied alpha values
 	this.materialOceanHorizontal.blending = 0;

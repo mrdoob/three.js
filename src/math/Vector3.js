@@ -1,23 +1,14 @@
 import { MathUtils } from './MathUtils.js';
 import { Quaternion } from './Quaternion.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author kile / http://kile.stravaganza.org/
- * @author philogb / http://blog.thejit.org/
- * @author mikael emtinger / http://gomo.se/
- * @author egraether / http://egraether.com/
- * @author WestLangley / http://github.com/WestLangley
- */
-
 const _vector = new Vector3();
 const _quaternion = new Quaternion();
 
-function Vector3( x, y, z ) {
+function Vector3( x = 0, y = 0, z = 0 ) {
 
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
+	this.x = x;
+	this.y = y;
+	this.z = z;
 
 }
 
@@ -26,6 +17,8 @@ Object.assign( Vector3.prototype, {
 	isVector3: true,
 
 	set: function ( x, y, z ) {
+
+		if ( z === undefined ) z = this.z; // sprite.scale.set(x,y)
 
 		this.x = x;
 		this.y = y;

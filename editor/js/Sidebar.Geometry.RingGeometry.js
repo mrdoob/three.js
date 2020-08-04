@@ -1,14 +1,10 @@
-/**
- * @author Temdog007 / http://github.com/Temdog007
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryRingGeometry = function ( editor, object ) {
+function SidebarGeometryRingGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -94,6 +90,6 @@ var SidebarGeometryRingGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryRingGeometry };

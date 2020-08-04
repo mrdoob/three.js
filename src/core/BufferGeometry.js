@@ -10,11 +10,6 @@ import { Matrix3 } from '../math/Matrix3.js';
 import { MathUtils } from '../math/MathUtils.js';
 import { arrayMax } from '../utils.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- */
-
 let _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
 
 const _m1 = new Matrix4();
@@ -858,9 +853,7 @@ BufferGeometry.prototype = Object.assign( Object.create( EventDispatcher.prototy
 
 		for ( let i = 0, il = normals.count; i < il; i ++ ) {
 
-			_vector.x = normals.getX( i );
-			_vector.y = normals.getY( i );
-			_vector.z = normals.getZ( i );
+			_vector.fromBufferAttribute( normals, i );
 
 			_vector.normalize();
 

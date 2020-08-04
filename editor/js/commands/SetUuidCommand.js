@@ -1,8 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
 import { Command } from '../Command.js';
 
 /**
@@ -11,7 +6,7 @@ import { Command } from '../Command.js';
  * @param newUuid string
  * @constructor
  */
-var SetUuidCommand = function ( editor, object, newUuid ) {
+function SetUuidCommand( editor, object, newUuid ) {
 
 	Command.call( this, editor );
 
@@ -23,7 +18,7 @@ var SetUuidCommand = function ( editor, object, newUuid ) {
 	this.oldUuid = ( object !== undefined ) ? object.uuid : undefined;
 	this.newUuid = newUuid;
 
-};
+}
 
 SetUuidCommand.prototype = {
 

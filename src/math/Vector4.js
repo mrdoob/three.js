@@ -1,17 +1,9 @@
-/**
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author philogb / http://blog.thejit.org/
- * @author mikael emtinger / http://gomo.se/
- * @author egraether / http://egraether.com/
- * @author WestLangley / http://github.com/WestLangley
- */
+function Vector4( x = 0, y = 0, z = 0, w = 1 ) {
 
-function Vector4( x, y, z, w ) {
-
-	this.x = x || 0;
-	this.y = y || 0;
-	this.z = z || 0;
-	this.w = ( w !== undefined ) ? w : 1;
+	this.x = x;
+	this.y = y;
+	this.z = z;
+	this.w = w;
 
 }
 

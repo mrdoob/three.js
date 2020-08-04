@@ -1,7 +1,5 @@
-console.warn( "THREE.3MFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
+console.warn( "THREE.3MFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author technohippy / https://github.com/technohippy
- * @author Mugen87 / https://github.com/Mugen87
  *
  * 3D Manufacturing Format (3MF) specification: https://3mf.io/specification/
  *
@@ -37,6 +35,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( buffer ) {
 
 			try {
@@ -984,7 +983,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 		}
 
-		function buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData ) {
+		function buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData, objectData ) {
 
 			// geometry
 
@@ -1018,21 +1017,21 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 				//
 
-				var p1 = triangleProperty.p1;
-				var p2 = triangleProperty.p2;
-				var p3 = triangleProperty.p3;
+				var p1 = ( triangleProperty.p1 !== undefined ) ? triangleProperty.p1 : objectData.pindex;
+				var p2 = ( triangleProperty.p2 !== undefined ) ? triangleProperty.p2 : p1;
+				var p3 = ( triangleProperty.p3 !== undefined ) ? triangleProperty.p3 : p1;
 
 				colorData.push( colors[ ( p1 * 3 ) + 0 ] );
 				colorData.push( colors[ ( p1 * 3 ) + 1 ] );
 				colorData.push( colors[ ( p1 * 3 ) + 2 ] );
 
-				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 0 ] );
-				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 1 ] );
-				colorData.push( colors[ ( ( p2 || p1 ) * 3 ) + 2 ] );
+				colorData.push( colors[ ( p2 * 3 ) + 0 ] );
+				colorData.push( colors[ ( p2 * 3 ) + 1 ] );
+				colorData.push( colors[ ( p2 * 3 ) + 2 ] );
 
-				colorData.push( colors[ ( ( p3 || p1 ) * 3 ) + 0 ] );
-				colorData.push( colors[ ( ( p3 || p1 ) * 3 ) + 1 ] );
-				colorData.push( colors[ ( ( p3 || p1 ) * 3 ) + 2 ] );
+				colorData.push( colors[ ( p3 * 3 ) + 0 ] );
+				colorData.push( colors[ ( p3 * 3 ) + 1 ] );
+				colorData.push( colors[ ( p3 * 3 ) + 2 ] );
 
 			}
 
@@ -1097,7 +1096,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 					case 'vertexColors':
 						var colorgroup = modelData.resources.colorgroup[ resourceId ];
-						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData ) );
+						meshes.push( buildVertexColorMesh( colorgroup, triangleProperties, modelData, meshData, objectData ) );
 						break;
 
 					case 'default':

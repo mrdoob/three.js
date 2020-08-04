@@ -1,9 +1,5 @@
 import { Object3D } from '../core/Object3D.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function Scene() {
 
 	Object3D.call( this );
@@ -58,12 +54,6 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		if ( this.fog !== null ) data.object.fog = this.fog.toJSON();
 
 		return data;
-
-	},
-
-	dispose: function () {
-
-		this.dispatchEvent( { type: 'dispose' } );
 
 	}
 

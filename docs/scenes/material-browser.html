@@ -62,10 +62,6 @@
 
 			import { GUI } from '../../examples/jsm/libs/dat.gui.module.js';
 
-			/**
-			 * @author TatumCreative (Greg Tatum) / http://gregtatum.com/
-			 */
-
 			var constants = {
 
 				combine: {
@@ -299,7 +295,7 @@
 
 			function updateCombine( material ) {
 
-				return function (combine) {
+				return function ( combine ) {
 
 					material.combine = parseInt( combine );
 					material.needsUpdate = true;
