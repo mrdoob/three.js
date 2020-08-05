@@ -10,9 +10,9 @@ export interface MeshPhysicalMaterialParameters
 	extends MeshStandardMaterialParameters {
 
 	clearcoat?: number;
-	clearcoatMap: Texture | null;
+	clearcoatMap?: Texture | null;
 	clearcoatRoughness?: number;
-	clearcoatRoughnessMap: Texture | null;
+	clearcoatRoughnessMap?: Texture | null;
 	clearcoatNormalScale?: Vector2;
 	clearcoatNormalMap?: Texture | null;
 
