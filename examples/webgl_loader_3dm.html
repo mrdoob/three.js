@@ -36,6 +36,7 @@
 
 				scene = new THREE.Scene();
 				scene.add( new THREE.HemisphereLight() );
+				scene.add( new THREE.AmbientLight() );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
 				directionalLight.position.set( 0, 0, 2 );
@@ -44,18 +45,9 @@
 				var loader = new Rhino3dmLoader( );
 				loader.setLibraryPath('jsm/libs/rhino3dm/');
 				
-				loader.load( 'models/3dm/hello_mesh.3dm', function ( objects ) {
+				loader.load( 'models/3dm/hello_mesh.3dm', function ( object ) {
 
-					// TODO: return an object 3d
-
-					var material = new THREE.MeshNormalMaterial();
-
-					for( var i = 0; i < objects.length; i++ ) {
-
-						var mesh = new THREE.Mesh( objects[i], material );
-						scene.add( mesh );
-					}
-                    
+					scene.add( object );
 
                 } );
                 

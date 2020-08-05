@@ -7,7 +7,11 @@ import {
 	BufferGeometry,
 	BufferGeometryLoader,
 	FileLoader,
-	Loader
+	Loader,
+	Object3D,
+	MeshStandardMaterial,
+	Mesh,
+	Color
 } from "../../../build/three.module.js";
 
 var Rhino3dmLoader = function ( manager ) {
@@ -40,7 +44,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		return this;
 
 	},
-
+	
 	setWorkerLimit: function ( workerLimit ) {
 
 		this.workerLimit = workerLimit;
@@ -107,7 +111,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				} );
 
 			} )
-			.then( ( message ) => this._createGeometry( message.geometryList ) );
+			.then( ( message ) => this._createGeometry( message.data ) );
 
 		// Remove task from the task list.
 		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
@@ -143,20 +147,35 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
-	_createGeometry: function ( geometryData ) {
+	_createGeometry: function ( data ) {
 
-		var geometries = [];
+		// console.log(data);
+
+		var object = new Object3D();
 		let loader = new BufferGeometryLoader();
 
-		for( var i = 0; i < geometryData.length; i++ ){
+		var objects = data.objects;
+		var materials = data.materials;
 
-			var geometry = loader.parse( geometryData[i] );
+		for( var i = 0; i < objects.length; i++ ){
 
-			geometries.push( geometry );
+			var obj = objects[i];
+
+			var geometry = loader.parse( obj.geometry );
+			var attributes = obj.attributes;
+			var mat = materials[attributes.materialIndex];
+
+			// console.log(mat);
+
+			var material = new MeshStandardMaterial( { color: new Color(mat.diffuseColor.r, mat.diffuseColor.g, mat.diffuseColor.b) } );
+
+			var mesh = new Mesh(geometry, material);
+
+			object.add(mesh)
 
 		}
 		
-		return geometries;
+		return object;
 
 	},
 
@@ -317,7 +336,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 					rhino3dm( RhinoModule );
 
-
 				 } ).then( () => {
 
 					rhino = RhinoModule;
@@ -331,11 +349,18 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				var buffer = message.buffer;
 				libraryPending.then( () => {
 
+					var data = decodeObjects( rhino, buffer );
+
+					self.postMessage( { type: 'decode', id: message.id, data } );
+
+					/*
 					var arr = new Uint8Array(buffer);
 					var doc = rhino.File3dm.fromByteArray(arr);
 
 					var objects = doc.objects();
 					var geometryList = [];
+
+					
 					
 					for ( var i = 0; i < objects.count; i++ ) {
 						var obj = objects.get(i).geometry();
@@ -346,23 +371,99 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 						}
 
-						/*
+						
 					
 						if(obj instanceof rhino.PointCloud){
 							let threePts = pointsToThreejs(obj, ptMat);
 							scene.add(threePts);
 						}
 
-						*/
+						
 						
 					}
 
-					self.postMessage( { type: 'decode', id: message.id, geometryList } );
+					*/
 
 				} );
 				
-				break;
+			break;
 		}
+	};
+
+	function decodeObjects( rhino, buffer ) {
+
+		var arr = new Uint8Array(buffer);
+		var doc = rhino.File3dm.fromByteArray(arr);
+
+		var objects = doc.objects();
+		var materials = doc.materials();
+
+		var objs = [];
+		var mats = [];
+
+		for( var i = 0; i < objects.count; i++ ) {
+
+			var obj = objects.get(i);
+
+			var geo = obj.geometry();
+
+			// TODO: handle other geometry types
+			if( geo instanceof rhino.Mesh ) {
+
+				var attr = obj.attributes();
+				var attributes = {};
+
+				for ( var property in attr ) {
+
+					// console.log(`${property}: ${attr[property]}`);
+
+					if( typeof attr[property] !== 'function' ){
+
+						attributes[property] = attr[property];
+
+					} else {
+
+						// TODO: extract data from functions such as user strings
+
+					}
+				}
+
+				objs.push( { geometry: geo.toThreejsJSON(), attributes } );
+
+			}
+			
+		}
+
+		for( var i = 0; i < materials.count(); i++) {
+
+			var mat = materials.get( i );
+
+			var material = {};
+
+			// console.log(mat);
+
+			for ( var property in mat ) { 
+
+				// console.log(`${property}: ${mat[property]}`);
+
+				if( typeof mat[property] !== 'function' ){
+
+					material[property] = mat[property];
+
+				} else {
+
+					// TODO: extract data from functions
+
+				}
+
+			}
+
+			mats.push( material );
+
+		}
+
+		return { objects: objs, materials: mats };
+
 	}
 
 };
