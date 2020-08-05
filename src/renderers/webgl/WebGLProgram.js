@@ -2,7 +2,6 @@ import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
 import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding } from '../../constants.js';
-import { GLSL3 } from '../../constants.js';
 
 let programIdCount = 0;
 
@@ -411,7 +410,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	if ( parameters.isRawShaderMaterial ) {
 
 		prefixVertex = [
-			
+
 			customDefines
 
 		].filter( filterEmptyLine ).join( '\n' );
@@ -679,15 +678,15 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 		// Automated GLSL 3.0 conversion. The shader chunks of standard shaders (eg MeshStandardMaterial) require GLSL 3.0 features.
 		// Apply these conversions if no glslVersion is specified.
 
-		versionString = '#version 300 es\n'
+		versionString = '#version 300 es\n';
 
-		prefixVertex = [			
+		prefixVertex = [
 			'#define attribute in',
 			'#define varying out',
 			'#define texture2D texture'
 		].join( '\n' ) + '\n' + prefixVertex;
 
-		prefixFragment = [			
+		prefixFragment = [
 			'#define varying in',
 			'out highp vec4 pc_fragColor;',
 			'#define gl_FragColor pc_fragColor',
