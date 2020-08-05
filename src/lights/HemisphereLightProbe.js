@@ -7,7 +7,7 @@ class HemisphereLightProbe extends LightProbe {
 	constructor( skyColor, groundColor, intensity ) {
 
 		super( undefined, intensity );
-		
+
 		const color1 = new Color().set( skyColor );
 		const color2 = new Color().set( groundColor );
 

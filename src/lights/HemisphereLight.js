@@ -7,7 +7,7 @@ class HemisphereLight extends Light {
 	constructor( skyColor, groundColor, intensity ) {
 
 		super( skyColor, intensity );
-		
+
 		this.type = 'HemisphereLight';
 
 		this.castShadow = undefined;
