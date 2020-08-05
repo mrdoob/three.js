@@ -1,34 +1,32 @@
 import { Color } from '../math/Color.js';
 import { LightProbe } from './LightProbe.js';
 
-function AmbientLightProbe( color, intensity ) {
+class AmbientLightProbe extends LightProbe {
 
-	LightProbe.call( this, undefined, intensity );
+	constructor( color, intensity ) {
 
-	const color1 = new Color().set( color );
+		super( undefined, intensity );
 
-	// without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
-	this.sh.coefficients[ 0 ].set( color1.r, color1.g, color1.b ).multiplyScalar( 2 * Math.sqrt( Math.PI ) );
+		this.isAmbientLightProbe = true;
 
-}
+		const color1 = new Color().set( color );
 
-AmbientLightProbe.prototype = Object.assign( Object.create( LightProbe.prototype ), {
+		// without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
+		this.sh.coefficients[ 0 ].set( color1.r, color1.g, color1.b ).multiplyScalar( 2 * Math.sqrt( Math.PI ) );
 
-	constructor: AmbientLightProbe,
+	}
 
-	isAmbientLightProbe: true,
+	copy( source ) { // modifying color not currently supported
 
-	copy: function ( source ) { // modifying color not currently supported
-
-		LightProbe.prototype.copy.call( this, source );
+		super.copy( source );
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		const data = LightProbe.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		// data.sh = this.sh.toArray(); // todo
 
@@ -36,6 +34,7 @@ AmbientLightProbe.prototype = Object.assign( Object.create( LightProbe.prototype
 
 	}
 
-} );
+}
+
 
 export { AmbientLightProbe };

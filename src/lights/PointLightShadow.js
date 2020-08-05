@@ -4,15 +4,16 @@ import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
 
-function PointLightShadow() {
+class PointLightShadow extends LightShadow {
 
-	LightShadow.call( this, new PerspectiveCamera( 90, 1, 0.5, 500 ) );
+	constructor() {
 
-	this._frameExtents = new Vector2( 4, 2 );
+		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
+		this._frameExtents = new Vector2( 4, 2 );
 
-	this._viewportCount = 6;
+		this._viewportCount = 6;
 
-	this._viewports = [
+		this._viewports = [
 		// These viewports map a cube-map onto a 2D texture with the
 		// following orientation:
 		//
@@ -26,39 +27,35 @@ function PointLightShadow() {
 		// Z - Positive z direction
 		// z - Negative z direction
 
-		// positive X
-		new Vector4( 2, 1, 1, 1 ),
-		// negative X
-		new Vector4( 0, 1, 1, 1 ),
-		// positive Z
-		new Vector4( 3, 1, 1, 1 ),
-		// negative Z
-		new Vector4( 1, 1, 1, 1 ),
-		// positive Y
-		new Vector4( 3, 0, 1, 1 ),
-		// negative Y
-		new Vector4( 1, 0, 1, 1 )
-	];
+			// positive X
+			new Vector4( 2, 1, 1, 1 ),
+			// negative X
+			new Vector4( 0, 1, 1, 1 ),
+			// positive Z
+			new Vector4( 3, 1, 1, 1 ),
+			// negative Z
+			new Vector4( 1, 1, 1, 1 ),
+			// positive Y
+			new Vector4( 3, 0, 1, 1 ),
+			// negative Y
+			new Vector4( 1, 0, 1, 1 )
+		];
 
-	this._cubeDirections = [
-		new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
-		new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
-	];
+		this._cubeDirections = [
+			new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
+			new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
+		];
 
-	this._cubeUps = [
-		new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ),
-		new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ),	new Vector3( 0, 0, - 1 )
-	];
+		this._cubeUps = [
+			new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ),
+			new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ),	new Vector3( 0, 0, - 1 )
+		];
 
-}
+		this.isPointLightShadow = true;
 
-PointLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype ), {
+	}
 
-	constructor: PointLightShadow,
-
-	isPointLightShadow: true,
-
-	updateMatrices: function ( light, viewportIndex ) {
+	updateMatrices( light, viewportIndex ) {
 
 		if ( viewportIndex === undefined ) viewportIndex = 0;
 
@@ -84,7 +81,7 @@ PointLightShadow.prototype = Object.assign( Object.create( LightShadow.prototype
 
 	}
 
-} );
+}
 
 
 export { PointLightShadow };

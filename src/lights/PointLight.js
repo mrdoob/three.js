@@ -1,45 +1,42 @@
 import { Light } from './Light.js';
 import { PointLightShadow } from './PointLightShadow.js';
 
-function PointLight( color, intensity, distance, decay ) {
+class PointLight extends Light {
 
-	Light.call( this, color, intensity );
+	constructor( color, intensity, distance, decay ) {
 
-	this.type = 'PointLight';
+		super( color, intensity );
 
-	Object.defineProperty( this, 'power', {
-		get: function () {
+		this.type = 'PointLight';
 
-			// intensity = power per solid angle.
-			// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-			return this.intensity * 4 * Math.PI;
+		this.distance = ( distance !== undefined ) ? distance : 0;
+		this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
 
-		},
-		set: function ( power ) {
+		this.shadow = new PointLightShadow();
 
-			// intensity = power per solid angle.
-			// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
-			this.intensity = power / ( 4 * Math.PI );
+		this.isPointLight = true;
 
-		}
-	} );
+	}
 
-	this.distance = ( distance !== undefined ) ? distance : 0;
-	this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.
+	get power() {
 
-	this.shadow = new PointLightShadow();
+		// intensity = power per solid angle.
+		// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+		return this.intensity * 4 * Math.PI;
 
-}
+	}
 
-PointLight.prototype = Object.assign( Object.create( Light.prototype ), {
+	set power( value ) {
 
-	constructor: PointLight,
+		// intensity = power per solid angle.
+		// ref: equation (15) from https://seblagarde.files.wordpress.com/2015/07/course_notes_moving_frostbite_to_pbr_v32.pdf
+		this.intensity = value / ( 4 * Math.PI );
 
-	isPointLight: true,
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
-		Light.prototype.copy.call( this, source );
+		super.copy( source );
 
 		this.distance = source.distance;
 		this.decay = source.decay;
@@ -50,7 +47,7 @@ PointLight.prototype = Object.assign( Object.create( Light.prototype ), {
 
 	}
 
-} );
+}
 
 
 export { PointLight };
