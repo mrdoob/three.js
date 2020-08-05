@@ -109,11 +109,11 @@ class Box3 {
 
 	}
 
-	setFromObject( object ) {
+	setFromObject( object, precise = false ) {
 
 		this.makeEmpty();
 
-		return this.expandByObject( object );
+		return this.expandByObject( object, precise );
 
 	}
 
@@ -188,7 +188,7 @@ class Box3 {
 
 	}
 
-	expandByObject( object ) {
+	expandByObject( object, precise = false ) {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
@@ -199,16 +199,30 @@ class Box3 {
 
 		if ( geometry !== undefined ) {
 
-			if ( geometry.boundingBox === null ) {
+			if ( precise && geometry.attributes != undefined && geometry.attributes.position !== undefined ) {
 
-				geometry.computeBoundingBox();
+				const position = geometry.attributes.position;
+				for ( let i = 0, l = position.count; i < l; i ++ ) {
+
+					_vector.fromBufferAttribute( position, i ).applyMatrix4( object.matrixWorld );
+					this.expandByPoint( _vector );
+
+				}
+
+			} else {
+
+				if ( geometry.boundingBox === null ) {
+
+					geometry.computeBoundingBox();
+
+				}
+
+				_box.copy( geometry.boundingBox );
+				_box.applyMatrix4( object.matrixWorld );
+
+				this.union( _box );
 
 			}
-
-			_box.copy( geometry.boundingBox );
-			_box.applyMatrix4( object.matrixWorld );
-
-			this.union( _box );
 
 		}
 
@@ -216,7 +230,7 @@ class Box3 {
 
 		for ( let i = 0, l = children.length; i < l; i ++ ) {
 
-			this.expandByObject( children[ i ] );
+			this.expandByObject( children[ i ], precise );
 
 		}
 
