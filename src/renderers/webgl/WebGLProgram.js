@@ -2,6 +2,7 @@ import { WebGLUniforms } from './WebGLUniforms.js';
 import { WebGLShader } from './WebGLShader.js';
 import { ShaderChunk } from '../shaders/ShaderChunk.js';
 import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, EquirectangularRefractionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, CubeUVRefractionMapping, CubeUVReflectionMapping, CubeReflectionMapping, PCFSoftShadowMap, PCFShadowMap, VSMShadowMap, ACESFilmicToneMapping, CineonToneMapping, CustomToneMapping, ReinhardToneMapping, LinearToneMapping, GammaEncoding, RGBDEncoding, RGBM16Encoding, RGBM7Encoding, RGBEEncoding, sRGBEncoding, LinearEncoding, LogLuvEncoding } from '../../constants.js';
+import { GLSL3 } from '../../constants.js';
 
 let programIdCount = 0;
 
@@ -405,13 +406,12 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	const program = gl.createProgram();
 
 	let prefixVertex, prefixFragment;
-	let versionString = parameters.glslVersion ? '#version ' + parameters.glslVersion : '';
+	let versionString = parameters.glslVersion ? '#version ' + parameters.glslVersion + "\n" : '';
 
 	if ( parameters.isRawShaderMaterial ) {
 
 		prefixVertex = [
-
-			versionString,
+			
 			customDefines
 
 		].filter( filterEmptyLine ).join( '\n' );
@@ -424,7 +424,6 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		prefixFragment = [
 
-			versionString,
 			customExtensions,
 			customDefines
 
@@ -675,19 +674,20 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
 
-	if ( parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
+	if ( parameters.glslVersion == null && parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
 
-		// GLSL 3.0 conversion
+		// Automated GLSL 3.0 conversion. The shader chunks of standard shaders (eg MeshStandardMaterial) require GLSL 3.0 features.
+		// Apply these conversions if no glslVersion is specified.
 
-		prefixVertex = [
-			'#version 300 es\n',
+		versionString = '#version 300 es\n'
+
+		prefixVertex = [			
 			'#define attribute in',
 			'#define varying out',
 			'#define texture2D texture'
 		].join( '\n' ) + '\n' + prefixVertex;
 
-		prefixFragment = [
-			'#version 300 es\n',
+		prefixFragment = [			
 			'#define varying in',
 			'out highp vec4 pc_fragColor;',
 			'#define gl_FragColor pc_fragColor',
@@ -705,8 +705,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	}
 
-	const vertexGlsl = prefixVertex + vertexShader;
-	const fragmentGlsl = prefixFragment + fragmentShader;
+	const vertexGlsl = versionString + prefixVertex + vertexShader;
+	const fragmentGlsl = versionString + prefixFragment + fragmentShader;
 
 	// console.log( '*VERTEX*', vertexGlsl );
 	// console.log( '*FRAGMENT*', fragmentGlsl );
