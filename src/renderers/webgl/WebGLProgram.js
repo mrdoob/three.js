@@ -673,9 +673,10 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	vertexShader = unrollLoops( vertexShader );
 	fragmentShader = unrollLoops( fragmentShader );
 
-	if ( parameters.glslVersion == null && parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
+	if ( ( parameters.glslVersion === null || parameters.glslVersion === undefined ) &&
+	       parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
 
-		// Automated GLSL 3.0 conversion. The shader chunks of standard shaders (eg MeshStandardMaterial) require GLSL 3.0 features.
+		// Automated GLSL 3.0 conversion. The shader chunks of standard shaders (eg MeshStandardMaterial) require GLSL 3.0 features within WebGL2.
 		// Apply these conversions if no glslVersion is specified.
 
 		versionString = '#version 300 es\n';
