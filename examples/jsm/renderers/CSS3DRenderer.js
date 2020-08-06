@@ -338,19 +338,11 @@ var CSS3DRenderer = function () {
 		var cameraTranslateX = _widthHalf;
 		var cameraTranslateY = _heightHalf;
 
-		if( isSafari ) {
+		if( isSafari && camera.isOrthographicCamera ) {
 
-			if(camera.isOrthographicCamera) {
+			cameraTranslateX = Math.round(cameraTranslateX);
+			cameraTranslateY = Math.round(cameraTranslateY);
 
-				cameraTranslateX = Math.round(cameraTranslateX);
-				cameraTranslateY = Math.round(cameraTranslateY);
-			}
-
-			if(camera.isPerspectiveCamera && _height % 2 === 1) {
-
-				cameraTranslateY = _heightHalf + 1;
-
-			}
 		}
 
 		var style = cameraCSSMatrix +
