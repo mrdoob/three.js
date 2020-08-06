@@ -244,4 +244,5 @@ And that's all there is to it.
 
 {{{example url="../threejs-background-equirectangularmap.html" }}}
 
-Using equirectagular images requires more complicated shaders and so is slower than using cubemaps. Fortunately it's easy to convert from an equirectangular image to a cubemap. [Here's a site that will do it for you](https://matheowis.github.io/HDRI-to-CubeMap/).
+Rather than do it at load time you can also convert an equirectangular image
+to a cubemap beforehand. [Here's a site that will do it for you](https://matheowis.github.io/HDRI-to-CubeMap/).
