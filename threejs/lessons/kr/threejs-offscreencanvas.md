@@ -61,7 +61,7 @@ self.onmessage = function(e) {
 물론 그전에 먼저 Three.js를 `offscreencanvas-cubes.js`에 불러와야겠죠.
 
 ```js
-importScripts('resources/threejs/r115/build/three.min.js');
+importScripts('resources/threejs/r119/build/three.min.js');
 ```
 
 DOM에서 캔버스에 접근하는 대신 이벤트의 `data`에서 캔버스를 받습니다.
@@ -240,7 +240,7 @@ function main() {
 
 /* global importScripts, init, state */
 
-importScripts('resources/threejs/r115/build/three.min.js');
+importScripts('resources/threejs/r119/build/three.min.js');
 +importScripts('shared-cubes.js');
 
 function size(data) {
@@ -268,7 +268,7 @@ self.onmessage = function(e) {
 메인 페이지에서도 마찬가지로 Three.js와 `shared-cubes.js`를 추가합니다.
 
 ```html
-<script src="resources/threejs/r115/build/three.min.js"></script>
+<script src="resources/threejs/r119/build/three.min.js"></script>
 <script src="shared-cubes.js"><script>
 ```
 
@@ -543,7 +543,7 @@ window.addEventListener('touchend', clearPickPosition);
 
 여태까지는 전역 `state` 객체를 사용했지만, `OrbitControls`의 경우는 객체 속성이 너무 많아 그걸 전부 다 하드 코딩하는 건 너무 번거롭습니다. `OrbitControls`는 필요한 DOM 이벤트의 대부분을 인자로 받는 HTML 요소에 바인딩합니다. 이를 이용해 DOM 요소와 같은 구조의 객체를 넘겨준다면 어떨까요? `OrbitControls`에 필요한 기능만 살려서 말이죠.
 
-[`OrbitControls`의 소스 코드](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r115/examples/js/controls/OrbitControls.js)를 분석해보니 아래의 이벤트만 지원하면 될 듯합니다.
+[`OrbitControls`의 소스 코드](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r119/examples/js/controls/OrbitControls.js)를 분석해보니 아래의 이벤트만 지원하면 될 듯합니다.
 
 * contextmenu
 * mousedown
@@ -644,8 +644,8 @@ self.onmessage = function(e) {
 `OrbitControls` 모듈도 불러와야겠죠.
 
 ```js
-importScripts('resources/threejs/r115/build/three.min/js');
-+importScripts('resources/threejs/r115/examples/js/controls/OrbitControls.js');
+importScripts('resources/threejs/r119/build/three.min/js');
++importScripts('resources/threejs/r119/examples/js/controls/OrbitControls.js');
 *importScripts('shared-orbitcontrols.js');
 ```
 

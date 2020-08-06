@@ -1,5 +1,5 @@
-import * as THREE from '../../resources/threejs/r115/build/three.module.js';
-import {OrbitControls} from '../../resources/threejs/r115/examples/jsm/controls/OrbitControls.js';
+import * as THREE from '../../resources/threejs/r119/build/three.module.js';
+import {OrbitControls} from '../../resources/threejs/r119/examples/jsm/controls/OrbitControls.js';
 import {threejsLessonUtils} from './threejs-lesson-utils.js';
 
 {

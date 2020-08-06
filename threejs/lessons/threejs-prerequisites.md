@@ -24,7 +24,7 @@ both
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r115/build/three.module.js';
+import * as THREE from './resources/threejs/r119/build/three.module.js';
 
 ...
 

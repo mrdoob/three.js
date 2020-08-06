@@ -20,8 +20,8 @@
     <canvas id="c"></canvas>
   </body>
 <script type="module">
-import * as THREE from './resources/threejs/r115/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r115/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r119/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r119/examples/jsm/controls/OrbitControls.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -71,28 +71,15 @@ function main() {
     makeInstance(geometry, 0xaa8844,  2),
   ];
 
-  const bgScene = new THREE.Scene();
-  let bgMesh;
   {
     const loader = new THREE.TextureLoader();
     const texture = loader.load(
       'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
-    );
-    texture.magFilter = THREE.LinearFilter;
-    texture.minFilter = THREE.LinearFilter;
-
-    const shader = THREE.ShaderLib.equirect;
-		const material = new THREE.ShaderMaterial({
-      fragmentShader: shader.fragmentShader,
-      vertexShader: shader.vertexShader,
-      uniforms: shader.uniforms,
-      depthWrite: false,
-      side: THREE.BackSide,
-    });
-		material.uniforms.tEquirect.value = texture;
-    const plane = new THREE.BoxBufferGeometry(2, 2, 2);
-    bgMesh = new THREE.Mesh(plane, material);
-    bgScene.add(bgMesh);
+      () => {
+        const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
+        rt.fromEquirectangularTexture(renderer, texture);
+        scene.background = rt;
+      });
   }
 
   function resizeRendererToDisplaySize(renderer) {
@@ -122,8 +109,6 @@ function main() {
       cube.rotation.y = rot;
     });
 
-    bgMesh.position.copy(camera.position);
-    renderer.render(bgScene, camera);
     renderer.render(scene, camera);
 
     requestAnimationFrame(render);

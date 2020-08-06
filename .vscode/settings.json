@@ -33,6 +33,7 @@
     "devtools",
     "divs",
     "drawingbuffer",
+    "equirectangular",
     "grayscale",
     "heightmap",
     "ifdef",

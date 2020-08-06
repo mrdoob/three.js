@@ -20,7 +20,7 @@ ES2015 모듈은 스크립트 안에서 `import` 키워드나, 인라인 `<scrip
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r115/build/three.module.js';
+import * as THREE from './resources/threejs/r119/build/three.module.js';
 
 ...
 
