@@ -33,39 +33,39 @@ import { Matrix4 } from '../../math/Matrix4.js';
  *
  **/
 
-function Curve() {
+class Curve {
 
-	this.type = 'Curve';
+	constructor() {
 
-	this.arcLengthDivisions = 200;
+		this.type = 'Curve';
 
-}
+		this.arcLengthDivisions = 200;
 
-Object.assign( Curve.prototype, {
+	}
 
 	// Virtual base class method to overwrite and implement in subclasses
 	//	- t [0 .. 1]
 
-	getPoint: function ( /* t, optionalTarget */ ) {
+	getPoint( /* t, optionalTarget */ ) {
 
 		console.warn( 'THREE.Curve: .getPoint() not implemented.' );
 		return null;
 
-	},
+	}
 
 	// Get point at relative position in curve according to arc length
 	// - u [0 .. 1]
 
-	getPointAt: function ( u, optionalTarget ) {
+	getPointAt( u, optionalTarget ) {
 
 		const t = this.getUtoTmapping( u );
 		return this.getPoint( t, optionalTarget );
 
-	},
+	}
 
 	// Get sequence of points using getPoint( t )
 
-	getPoints: function ( divisions ) {
+	getPoints( divisions ) {
 
 		if ( divisions === undefined ) divisions = 5;
 
@@ -79,11 +79,11 @@ Object.assign( Curve.prototype, {
 
 		return points;
 
-	},
+	}
 
 	// Get sequence of points using getPointAt( u )
 
-	getSpacedPoints: function ( divisions ) {
+	getSpacedPoints( divisions ) {
 
 		if ( divisions === undefined ) divisions = 5;
 
@@ -97,20 +97,20 @@ Object.assign( Curve.prototype, {
 
 		return points;
 
-	},
+	}
 
 	// Get total curve arc length
 
-	getLength: function () {
+	getLength() {
 
 		const lengths = this.getLengths();
 		return lengths[ lengths.length - 1 ];
 
-	},
+	}
 
 	// Get list of cumulative segment lengths
 
-	getLengths: function ( divisions ) {
+	getLengths( divisions ) {
 
 		if ( divisions === undefined ) divisions = this.arcLengthDivisions;
 
@@ -143,18 +143,18 @@ Object.assign( Curve.prototype, {
 
 		return cache; // { sums: cache, sum: sum }; Sum is in the last element.
 
-	},
+	}
 
-	updateArcLengths: function () {
+	updateArcLengths() {
 
 		this.needsUpdate = true;
 		this.getLengths();
 
-	},
+	}
 
 	// Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
 
-	getUtoTmapping: function ( u, distance ) {
+	getUtoTmapping( u, distance ) {
 
 		const arcLengths = this.getLengths();
 
@@ -227,14 +227,14 @@ Object.assign( Curve.prototype, {
 
 		return t;
 
-	},
+	}
 
 	// Returns a unit vector tangent at t
 	// In case any sub curve does not implement its tangent derivation,
 	// 2 points a small delta apart will be used to find its gradient
 	// which seems to give a reasonable approximation
 
-	getTangent: function ( t, optionalTarget ) {
+	getTangent( t, optionalTarget ) {
 
 		const delta = 0.0001;
 		let t1 = t - delta;
@@ -254,16 +254,16 @@ Object.assign( Curve.prototype, {
 
 		return tangent;
 
-	},
+	}
 
-	getTangentAt: function ( u, optionalTarget ) {
+	getTangentAt( u, optionalTarget ) {
 
 		const t = this.getUtoTmapping( u );
 		return this.getTangent( t, optionalTarget );
 
-	},
+	}
 
-	computeFrenetFrames: function ( segments, closed ) {
+	computeFrenetFrames( segments, closed ) {
 
 		// see http://www.cs.indiana.edu/pub/techreports/TR425.pdf
 
@@ -376,23 +376,23 @@ Object.assign( Curve.prototype, {
 			binormals: binormals
 		};
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
-		return new this.constructor().copy( this );
+		return new Curve().copy( this );
 
-	},
+	}
 
-	copy: function ( source ) {
+	copy( source ) {
 
 		this.arcLengthDivisions = source.arcLengthDivisions;
 
 		return this;
 
-	},
+	}
 
-	toJSON: function () {
+	toJSON() {
 
 		const data = {
 			metadata: {
@@ -407,9 +407,9 @@ Object.assign( Curve.prototype, {
 
 		return data;
 
-	},
+	}
 
-	fromJSON: function ( json ) {
+	fromJSON( json ) {
 
 		this.arcLengthDivisions = json.arcLengthDivisions;
 
@@ -417,7 +417,7 @@ Object.assign( Curve.prototype, {
 
 	}
 
-} );
+}
 
 
 export { Curve };

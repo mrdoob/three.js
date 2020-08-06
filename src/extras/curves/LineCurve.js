@@ -1,91 +1,92 @@
 import { Vector2 } from '../../math/Vector2.js';
 import { Curve } from '../core/Curve.js';
 
-function LineCurve( v1, v2 ) {
+class LineCurve extends Curve {
 
-	Curve.call( this );
+	constructor( v1, v2 ) {
 
-	this.type = 'LineCurve';
+		super();
 
-	this.v1 = v1 || new Vector2();
-	this.v2 = v2 || new Vector2();
+		this.type = 'LineCurve';
 
-}
+		this.v1 = v1 || new Vector2();
+		this.v2 = v2 || new Vector2();
 
-LineCurve.prototype = Object.create( Curve.prototype );
-LineCurve.prototype.constructor = LineCurve;
-
-LineCurve.prototype.isLineCurve = true;
-
-LineCurve.prototype.getPoint = function ( t, optionalTarget ) {
-
-	const point = optionalTarget || new Vector2();
-
-	if ( t === 1 ) {
-
-		point.copy( this.v2 );
-
-	} else {
-
-		point.copy( this.v2 ).sub( this.v1 );
-		point.multiplyScalar( t ).add( this.v1 );
+		this.isLineCurve = true;
 
 	}
 
-	return point;
+	getPoint( t, optionalTarget ) {
 
-};
+		const point = optionalTarget || new Vector2();
 
-// Line curve is linear, so we can overwrite default getPointAt
+		if ( t === 1 ) {
 
-LineCurve.prototype.getPointAt = function ( u, optionalTarget ) {
+			point.copy( this.v2 );
 
-	return this.getPoint( u, optionalTarget );
+		} else {
 
-};
+			point.copy( this.v2 ).sub( this.v1 );
+			point.multiplyScalar( t ).add( this.v1 );
 
-LineCurve.prototype.getTangent = function ( t, optionalTarget ) {
+		}
 
-	const tangent = optionalTarget || new Vector2();
+		return point;
 
-	tangent.copy( this.v2 ).sub( this.v1 ).normalize();
+	}
 
-	return tangent;
+	// Line curve is linear, so we can overwrite default getPointAt
 
-};
+	getPointAt( u, optionalTarget ) {
 
-LineCurve.prototype.copy = function ( source ) {
+		return this.getPoint( u, optionalTarget );
 
-	Curve.prototype.copy.call( this, source );
+	}
 
-	this.v1.copy( source.v1 );
-	this.v2.copy( source.v2 );
+	getTangent( t, optionalTarget ) {
 
-	return this;
+		const tangent = optionalTarget || new Vector2();
 
-};
+		tangent.copy( this.v2 ).sub( this.v1 ).normalize();
 
-LineCurve.prototype.toJSON = function () {
+		return tangent;
 
-	const data = Curve.prototype.toJSON.call( this );
+	}
 
-	data.v1 = this.v1.toArray();
-	data.v2 = this.v2.toArray();
+	copy( source ) {
 
-	return data;
+		super.copy( source );
 
-};
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
 
-LineCurve.prototype.fromJSON = function ( json ) {
+		return this;
 
-	Curve.prototype.fromJSON.call( this, json );
+	}
 
-	this.v1.fromArray( json.v1 );
-	this.v2.fromArray( json.v2 );
+	toJSON() {
 
-	return this;
+		const data = super.toJSON();
 
-};
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+
+		return data;
+
+	}
+
+	fromJSON( json ) {
+
+		super.fromJSON( json );
+
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+
+		return this;
+
+	}
+
+}
 
 
 export { LineCurve };

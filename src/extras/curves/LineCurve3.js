@@ -1,81 +1,82 @@
 import { Vector3 } from '../../math/Vector3.js';
 import { Curve } from '../core/Curve.js';
 
-function LineCurve3( v1, v2 ) {
+class LineCurve3 extends Curve {
 
-	Curve.call( this );
+	constructor( v1, v2 ) {
 
-	this.type = 'LineCurve3';
+		super();
 
-	this.v1 = v1 || new Vector3();
-	this.v2 = v2 || new Vector3();
+		this.type = 'LineCurve3';
 
-}
+		this.v1 = v1 || new Vector3();
+		this.v2 = v2 || new Vector3();
 
-LineCurve3.prototype = Object.create( Curve.prototype );
-LineCurve3.prototype.constructor = LineCurve3;
-
-LineCurve3.prototype.isLineCurve3 = true;
-
-LineCurve3.prototype.getPoint = function ( t, optionalTarget ) {
-
-	const point = optionalTarget || new Vector3();
-
-	if ( t === 1 ) {
-
-		point.copy( this.v2 );
-
-	} else {
-
-		point.copy( this.v2 ).sub( this.v1 );
-		point.multiplyScalar( t ).add( this.v1 );
+		this.isLineCurve3 = true;
 
 	}
 
-	return point;
+	getPoint( t, optionalTarget ) {
 
-};
+		const point = optionalTarget || new Vector3();
 
-// Line curve is linear, so we can overwrite default getPointAt
+		if ( t === 1 ) {
 
-LineCurve3.prototype.getPointAt = function ( u, optionalTarget ) {
+			point.copy( this.v2 );
 
-	return this.getPoint( u, optionalTarget );
+		} else {
 
-};
+			point.copy( this.v2 ).sub( this.v1 );
+			point.multiplyScalar( t ).add( this.v1 );
 
-LineCurve3.prototype.copy = function ( source ) {
+		}
 
-	Curve.prototype.copy.call( this, source );
+		return point;
 
-	this.v1.copy( source.v1 );
-	this.v2.copy( source.v2 );
+	}
 
-	return this;
+	// Line curve is linear, so we can overwrite default getPointAt
 
-};
+	getPointAt( u, optionalTarget ) {
 
-LineCurve3.prototype.toJSON = function () {
+		return this.getPoint( u, optionalTarget );
 
-	const data = Curve.prototype.toJSON.call( this );
+	}
 
-	data.v1 = this.v1.toArray();
-	data.v2 = this.v2.toArray();
+	copy( source ) {
 
-	return data;
+		Curve.prototype.copy.call( this, source );
 
-};
+		this.v1.copy( source.v1 );
+		this.v2.copy( source.v2 );
 
-LineCurve3.prototype.fromJSON = function ( json ) {
+		return this;
 
-	Curve.prototype.fromJSON.call( this, json );
+	}
 
-	this.v1.fromArray( json.v1 );
-	this.v2.fromArray( json.v2 );
+	toJSON() {
 
-	return this;
+		const data = Curve.prototype.toJSON.call( this );
 
-};
+		data.v1 = this.v1.toArray();
+		data.v2 = this.v2.toArray();
+
+		return data;
+
+	}
+
+	fromJSON( json ) {
+
+		Curve.prototype.fromJSON.call( this, json );
+
+		this.v1.fromArray( json.v1 );
+		this.v2.fromArray( json.v2 );
+
+		return this;
+
+	}
+
+}
 
 
 export { LineCurve3 };
