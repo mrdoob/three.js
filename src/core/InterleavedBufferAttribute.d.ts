@@ -21,11 +21,12 @@ export class InterleavedBufferAttribute {
 
 	get count(): number;
 	get array(): ArrayLike<number>;
+	set needsUpdate( value: boolean );
 
 	readonly isInterleavedBufferAttribute: true;
 
 	applyMatrix4( m: Matrix4 ): this;
-	clone(): BufferAttribute;
+	clone( data?: object ): BufferAttribute;
 	getX( index: number ): number;
 	setX( index: number, x: number ): InterleavedBufferAttribute;
 	getY( index: number ): number;
@@ -48,10 +49,11 @@ export class InterleavedBufferAttribute {
 		z: number,
 		w: number
 	): InterleavedBufferAttribute;
-	toJSON(): {
+	toJSON( data?: object ): {
+		isInterleavedBufferAttribute: true,
 		itemSize: number,
-		type: string,
-		array: number[],
+		data: string,
+		offset: number,
 		normalized: boolean
 	};
 

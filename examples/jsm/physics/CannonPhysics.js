@@ -1,6 +1,4 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import CANNON from "../libs/cannon.module.min.js";
 
 function compose( position, quaternion, array, index ) {
 

@@ -3,21 +3,15 @@ import { Vector3 } from './Vector3.js';
 import { Matrix4 } from './Matrix4.js';
 import { MathUtils } from './MathUtils.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author bhouston / http://clara.io
- */
+const _matrix = new Matrix4();
+const _quaternion = new Quaternion();
 
-var _matrix = new Matrix4();
-var _quaternion = new Quaternion();
+function Euler( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
-function Euler( x, y, z, order ) {
-
-	this._x = x || 0;
-	this._y = y || 0;
-	this._z = z || 0;
-	this._order = order || Euler.DefaultOrder;
+	this._x = x;
+	this._y = y;
+	this._z = z;
+	this._order = order;
 
 }
 
@@ -135,14 +129,14 @@ Object.assign( Euler.prototype, {
 
 	setFromRotationMatrix: function ( m, order, update ) {
 
-		var clamp = MathUtils.clamp;
+		const clamp = MathUtils.clamp;
 
 		// assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
 
-		var te = m.elements;
-		var m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ];
-		var m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ];
-		var m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
+		const te = m.elements;
+		const m11 = te[ 0 ], m12 = te[ 4 ], m13 = te[ 8 ];
+		const m21 = te[ 1 ], m22 = te[ 5 ], m23 = te[ 9 ];
+		const m31 = te[ 2 ], m32 = te[ 6 ], m33 = te[ 10 ];
 
 		order = order || this._order;
 

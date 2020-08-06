@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { MathUtils } from '../../../../build/three.module.js';
 
 import { ShaderPass } from '../../postprocessing/ShaderPass.js';

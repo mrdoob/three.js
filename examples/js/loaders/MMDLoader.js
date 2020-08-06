@@ -1,6 +1,5 @@
+console.warn( "THREE.MMDLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * Dependencies
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  *  - THREE.TGALoader
@@ -184,6 +183,7 @@ THREE.MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmd( buffer, true ) );
@@ -208,6 +208,7 @@ THREE.MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmx( buffer, true ) );
@@ -237,7 +238,8 @@ THREE.MMDLoader = ( function () {
 			this.loader
 				.setMimeType( undefined )
 				.setPath( this.animationPath )
-				.setResponseType( 'arraybuffer' );
+				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader );
 
 			for ( var i = 0, il = urls.length; i < il; i ++ ) {
 
@@ -270,6 +272,7 @@ THREE.MMDLoader = ( function () {
 				.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
 				.setPath( this.animationPath )
 				.setResponseType( 'text' )
+				.setRequestHeader( this.requestHeader )
 				.load( url, function ( text ) {
 
 					onLoad( parser.parseVpd( text, true ) );
@@ -1075,8 +1078,7 @@ THREE.MMDLoader = ( function () {
 
 							params.envMap = this._loadTexture(
 								fileNames[ 1 ],
-								textures,
-								{ sphericalReflectionMapping: true }
+								textures
 							);
 
 							params.combine = extension === '.sph'
@@ -1127,7 +1129,7 @@ THREE.MMDLoader = ( function () {
 
 						params.envMap = this._loadTexture(
 							data.textures[ material.envTextureIndex ],
-							textures, { sphericalReflectionMapping: true }
+							textures
 						);
 
 						params.combine = material.envFlag === 1
@@ -1342,12 +1344,6 @@ THREE.MMDLoader = ( function () {
 				delete texture.readyCallbacks;
 
 			}, onProgress, onError );
-
-			if ( params.sphericalReflectionMapping === true ) {
-
-				texture.mapping = THREE.SphericalReflectionMapping;
-
-			}
 
 			texture.readyCallbacks = [];
 

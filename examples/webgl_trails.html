@@ -15,7 +15,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			init();
 			animate();
@@ -27,6 +27,8 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 0, 1 );
+
+				clock = new THREE.Clock();
 
 				scene = new THREE.Scene();
 
@@ -66,10 +68,6 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				//
-
-				if ( typeof TESTING !== 'undefined'  ) { for ( var i = 0; i < 1000; i ++ ) { render( 1000 - i ); } };
-
 			}
 
 			function onWindowResize() {
@@ -83,18 +81,20 @@
 
 			//
 
-			function animate( now ) {
+			function animate() {
 
 				requestAnimationFrame( animate );
 
-				render( now );
+				render();
 				stats.update();
 
 			}
 
-			function render( now ) {
+			function render() {
 
-				scene.rotation.y = now / 2000;
+				var elapsedTime = clock.getElapsedTime();
+
+				scene.rotation.y = elapsedTime * 0.5;
 
 				renderer.render( scene, camera );
 

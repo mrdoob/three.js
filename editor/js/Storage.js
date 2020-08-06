@@ -1,8 +1,4 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-var Storage = function () {
+function Storage() {
 
 	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
 
@@ -95,6 +91,6 @@ var Storage = function () {
 
 	};
 
-};
+}
 
 export { Storage };

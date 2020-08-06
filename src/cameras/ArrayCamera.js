@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
 function ArrayCamera( array ) {

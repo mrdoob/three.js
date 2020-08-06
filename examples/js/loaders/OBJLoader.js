@@ -1,6 +1,4 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+console.warn( "THREE.OBJLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.OBJLoader = ( function () {
 
@@ -437,9 +435,28 @@ THREE.OBJLoader = ( function () {
 
 			var loader = new THREE.FileLoader( scope.manager );
 			loader.setPath( this.path );
+			loader.setRequestHeader( this.requestHeader );
 			loader.load( url, function ( text ) {
 
-				onLoad( scope.parse( text ) );
+				try {
+
+					onLoad( scope.parse( text ) );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
 
 			}, onProgress, onError );
 

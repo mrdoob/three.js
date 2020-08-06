@@ -1,8 +1,5 @@
 /**
- * @author Mugen87 / https://github.com/Mugen87
- *
  * Ref: https://en.wikipedia.org/wiki/Cylindrical_coordinate_system
- *
  */
 
 function Cylindrical( radius, theta, y ) {

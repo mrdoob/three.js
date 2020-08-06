@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { BackSide } from "../../constants.js";
 
 function WebGLMaterials( properties ) {
@@ -143,7 +139,7 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		var envMap = material.envMap || environment;
+		const envMap = material.envMap || environment;
 
 		if ( envMap ) {
 
@@ -154,7 +150,13 @@ function WebGLMaterials( properties ) {
 			uniforms.reflectivity.value = material.reflectivity;
 			uniforms.refractionRatio.value = material.refractionRatio;
 
-			uniforms.maxMipLevel.value = properties.get( envMap ).__maxMipLevel;
+			var maxMipLevel = properties.get( envMap ).__maxMipLevel;
+
+			if ( maxMipLevel !== undefined ) {
+
+				uniforms.maxMipLevel.value = maxMipLevel;
+
+			}
 
 		}
 
@@ -180,7 +182,7 @@ function WebGLMaterials( properties ) {
 		// 5. alpha map
 		// 6. emissive map
 
-		var uvScaleMap;
+		let uvScaleMap;
 
 		if ( material.map ) {
 
@@ -243,7 +245,7 @@ function WebGLMaterials( properties ) {
 		// 1. ao map
 		// 2. light map
 
-		var uv2ScaleMap;
+		let uv2ScaleMap;
 
 		if ( material.aoMap ) {
 
@@ -314,7 +316,7 @@ function WebGLMaterials( properties ) {
 		// 1. color map
 		// 2. alpha map
 
-		var uvScaleMap;
+		let uvScaleMap;
 
 		if ( material.map ) {
 
@@ -362,7 +364,7 @@ function WebGLMaterials( properties ) {
 		// 1. color map
 		// 2. alpha map
 
-		var uvScaleMap;
+		let uvScaleMap;
 
 		if ( material.map ) {
 
@@ -436,9 +438,6 @@ function WebGLMaterials( properties ) {
 	}
 
 	function refreshUniformsToon( uniforms, material ) {
-
-		uniforms.specular.value.copy( material.specular );
-		uniforms.shininess.value = Math.max( material.shininess, 1e-4 ); // to prevent pow( 0.0, 0.0 )
 
 		if ( material.gradientMap ) {
 
@@ -569,7 +568,13 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		uniforms.transparency.value = material.transparency;
+		uniforms.transmission.value = material.transmission;
+
+		if ( material.transmissionMap ) {
+
+			uniforms.transmissionMap.value = material.transmissionMap;
+
+		}
 
 	}
 

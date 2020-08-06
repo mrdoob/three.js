@@ -1,12 +1,3 @@
-/**
- * @author qiao / https://github.com/qiao
- * @author mrdoob / http://mrdoob.com
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author erich666 / http://erichaines.com
- * @author ScieCode / http://github.com/sciecode
- */
-
 import {
 	EventDispatcher,
 	MOUSE,
@@ -15,7 +6,7 @@ import {
 	TOUCH,
 	Vector2,
 	Vector3
-} from "../../../build/three.module.js";
+} from "../../../../build/three.module.js";
 
 var CameraControls = function ( object, domElement ) {
 

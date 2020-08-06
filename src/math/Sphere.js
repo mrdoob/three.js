@@ -1,12 +1,7 @@
 import { Box3 } from './Box3.js';
 import { Vector3 } from './Vector3.js';
 
-var _box = new Box3();
-
-/**
- * @author bhouston / http://clara.io
- * @author mrdoob / http://mrdoob.com/
- */
+const _box = new Box3();
 
 function Sphere( center, radius ) {
 
@@ -28,7 +23,7 @@ Object.assign( Sphere.prototype, {
 
 	setFromPoints: function ( points, optionalCenter ) {
 
-		var center = this.center;
+		const center = this.center;
 
 		if ( optionalCenter !== undefined ) {
 
@@ -40,9 +35,9 @@ Object.assign( Sphere.prototype, {
 
 		}
 
-		var maxRadiusSq = 0;
+		let maxRadiusSq = 0;
 
-		for ( var i = 0, il = points.length; i < il; i ++ ) {
+		for ( let i = 0, il = points.length; i < il; i ++ ) {
 
 			maxRadiusSq = Math.max( maxRadiusSq, center.distanceToSquared( points[ i ] ) );
 
@@ -98,7 +93,7 @@ Object.assign( Sphere.prototype, {
 
 	intersectsSphere: function ( sphere ) {
 
-		var radiusSum = this.radius + sphere.radius;
+		const radiusSum = this.radius + sphere.radius;
 
 		return sphere.center.distanceToSquared( this.center ) <= ( radiusSum * radiusSum );
 
@@ -118,7 +113,7 @@ Object.assign( Sphere.prototype, {
 
 	clampPoint: function ( point, target ) {
 
-		var deltaLengthSq = this.center.distanceToSquared( point );
+		const deltaLengthSq = this.center.distanceToSquared( point );
 
 		if ( target === undefined ) {
 

@@ -177,7 +177,7 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.*|\n|\r\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`((.|\n)*)\`/, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -201,6 +201,42 @@ function glsl() {
 
 }
 
+function bubleCleanup() {
+
+	const begin1 = /var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n/;
+	const end1 = /if \( (\w+) \) (\w+)\.__proto__ = (\w+);\s+(\w+)\.prototype = Object\.create\( (\w+) && (\w+)\.prototype \);\s+(\w+)\.prototype\.constructor = (\w+);\s+return (\w+);\s+}\((\w+)\)\)/;
+
+	return {
+
+		transform( code ) {
+
+			while ( begin1.test( code ) ) {
+
+				code = code.replace( begin1, function () {
+
+					return '';
+
+				} );
+
+				code = code.replace( end1, function ( match, p1, p2 ) {
+
+					return `${p2}.prototype = Object.create( ${p1}.prototype );\n\t${p2}.prototype.constructor = ${p2};\n`;
+
+				} );
+
+			}
+
+			return {
+				code: code,
+				map: { mappings: '' }
+			};
+
+		}
+
+	};
+
+}
+
 export default [
 	{
 		input: 'src/Three.js',
@@ -212,7 +248,8 @@ export default [
 					arrow: false,
 					classes: true
 				}
-			} )
+			} ),
+			bubleCleanup()
 		],
 		output: [
 			{

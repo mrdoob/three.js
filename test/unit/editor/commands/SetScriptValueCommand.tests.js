@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/SetScriptValueCommand';
+import { } from '../../../../editor/js/commands/SetScriptValueCommand';
 
 export default QUnit.module( 'Editor', () => {
 

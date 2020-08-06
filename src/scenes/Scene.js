@@ -1,9 +1,5 @@
 import { Object3D } from '../core/Object3D.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function Scene() {
 
 	Object3D.call( this );
@@ -51,7 +47,7 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	toJSON: function ( meta ) {
 
-		var data = Object3D.prototype.toJSON.call( this, meta );
+		const data = Object3D.prototype.toJSON.call( this, meta );
 
 		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
 		if ( this.environment !== null ) data.object.environment = this.environment.toJSON( meta );

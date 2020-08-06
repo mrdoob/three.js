@@ -1,7 +1,7 @@
 import { Plane } from './../math/Plane';
-import { Shader } from './../renderers/shaders/ShaderLib';
 import { EventDispatcher } from './../core/EventDispatcher';
 import { WebGLRenderer } from './../renderers/WebGLRenderer';
+import { Shader } from './../renderers/shaders/ShaderLib';
 import {
 	BlendingDstFactor,
 	BlendingEquation,
@@ -326,6 +326,11 @@ export class Material extends EventDispatcher {
 	 * @param renderer WebGLRenderer Context that is initializing the material
 	 */
 	onBeforeCompile ( shader : Shader, renderer : WebGLRenderer ) : void;
+
+	/**
+	 * In case onBeforeCompile is used, this callback can be used to identify values of settings used in onBeforeCompile, so three.js can reuse a cached shader or recompile the shader as needed.
+	 */
+	customProgramCacheKey(): string;
 
 	/**
 	 * Sets the properties based on the values.

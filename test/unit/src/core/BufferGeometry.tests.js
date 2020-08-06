@@ -1,7 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';

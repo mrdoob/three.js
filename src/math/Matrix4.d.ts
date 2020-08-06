@@ -7,13 +7,13 @@ import { Matrix } from './Matrix3';
  *
  * @example
  * // Simple rig for rotating around 3 axes
- * var m = new THREE.Matrix4();
- * var m1 = new THREE.Matrix4();
- * var m2 = new THREE.Matrix4();
- * var m3 = new THREE.Matrix4();
- * var alpha = 0;
- * var beta = Math.PI;
- * var gamma = Math.PI/2;
+ * const m = new THREE.Matrix4();
+ * const m1 = new THREE.Matrix4();
+ * const m2 = new THREE.Matrix4();
+ * const m3 = new THREE.Matrix4();
+ * const alpha = 0;
+ * const beta = Math.PI;
+ * const gamma = Math.PI/2;
  * m1.makeRotationX( alpha );
  * m2.makeRotationY( beta );
  * m3.makeRotationZ( gamma );

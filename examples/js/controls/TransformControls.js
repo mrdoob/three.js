@@ -1,6 +1,4 @@
-/**
- * @author arodic / https://github.com/arodic
- */
+console.warn( "THREE.TransformControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.TransformControls = function ( camera, domElement ) {
 
@@ -132,7 +130,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.addEventListener( "mousemove", onPointerHover, false );
 		domElement.addEventListener( "touchmove", onPointerHover, false );
 		domElement.addEventListener( "touchmove", onPointerMove, false );
-		document.addEventListener( "mouseup", onPointerUp, false );
+		scope.domElement.ownerDocument.addEventListener( "mouseup", onPointerUp, false );
 		domElement.addEventListener( "touchend", onPointerUp, false );
 		domElement.addEventListener( "touchcancel", onPointerUp, false );
 		domElement.addEventListener( "touchleave", onPointerUp, false );
@@ -144,10 +142,10 @@ THREE.TransformControls = function ( camera, domElement ) {
 		domElement.removeEventListener( "mousedown", onPointerDown );
 		domElement.removeEventListener( "touchstart", onPointerDown );
 		domElement.removeEventListener( "mousemove", onPointerHover );
-		document.removeEventListener( "mousemove", onPointerMove );
+		scope.domElement.ownerDocument.removeEventListener( "mousemove", onPointerMove );
 		domElement.removeEventListener( "touchmove", onPointerHover );
 		domElement.removeEventListener( "touchmove", onPointerMove );
-		document.removeEventListener( "mouseup", onPointerUp );
+		scope.domElement.ownerDocument.removeEventListener( "mouseup", onPointerUp );
 		domElement.removeEventListener( "touchend", onPointerUp );
 		domElement.removeEventListener( "touchcancel", onPointerUp );
 		domElement.removeEventListener( "touchleave", onPointerUp );
@@ -598,7 +596,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 	function getPointer( event ) {
 
-		if ( document.pointerLockElement ) {
+		if ( scope.domElement.ownerDocument.pointerLockElement ) {
 
 			return {
 				x: 0,
@@ -636,7 +634,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( ! scope.enabled ) return;
 
-		document.addEventListener( "mousemove", onPointerMove, false );
+		scope.domElement.ownerDocument.addEventListener( "mousemove", onPointerMove, false );
 
 		scope.pointerHover( getPointer( event ) );
 		scope.pointerDown( getPointer( event ) );
@@ -655,7 +653,7 @@ THREE.TransformControls = function ( camera, domElement ) {
 
 		if ( ! scope.enabled ) return;
 
-		document.removeEventListener( "mousemove", onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( "mousemove", onPointerMove, false );
 
 		scope.pointerUp( getPointer( event ) );
 
@@ -737,7 +735,8 @@ THREE.TransformControlsGizmo = function () {
 		depthWrite: false,
 		transparent: true,
 		side: THREE.DoubleSide,
-		fog: false
+		fog: false,
+		toneMapped: false
 	} );
 
 	var gizmoLineMaterial = new THREE.LineBasicMaterial( {
@@ -745,7 +744,8 @@ THREE.TransformControlsGizmo = function () {
 		depthWrite: false,
 		transparent: true,
 		linewidth: 1,
-		fog: false
+		fog: false,
+		toneMapped: false
 	} );
 
 	// Make unique material for each axis/color
@@ -810,7 +810,7 @@ THREE.TransformControlsGizmo = function () {
 
 	var scaleHandleGeometry = new THREE.BoxBufferGeometry( 0.125, 0.125, 0.125 );
 
-	var lineGeometry = new THREE.BufferGeometry( );
+	var lineGeometry = new THREE.BufferGeometry();
 	lineGeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( [ 0, 0, 0,	1, 0, 0 ], 3 ) );
 
 	var CircleGeometry = function ( radius, arc ) {
@@ -1567,7 +1567,7 @@ THREE.TransformControlsPlane = function () {
 
 	THREE.Mesh.call( this,
 		new THREE.PlaneBufferGeometry( 100000, 100000, 2, 2 ),
-		new THREE.MeshBasicMaterial( { visible: false, wireframe: true, side: THREE.DoubleSide, transparent: true, opacity: 0.1 } )
+		new THREE.MeshBasicMaterial( { visible: false, wireframe: true, side: THREE.DoubleSide, transparent: true, opacity: 0.1, toneMapped: false } )
 	);
 
 	this.type = 'TransformControlsPlane';

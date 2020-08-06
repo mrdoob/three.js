@@ -1,6 +1,38 @@
+import {
+	AddOperation,
+	AnimationClip,
+	Bone,
+	BufferGeometry,
+	Color,
+	CustomBlending,
+	DoubleSide,
+	DstAlphaFactor,
+	Euler,
+	FileLoader,
+	Float32BufferAttribute,
+	FrontSide,
+	Interpolant,
+	Loader,
+	LoaderUtils,
+	MeshToonMaterial,
+	MultiplyOperation,
+	NearestFilter,
+	NumberKeyframeTrack,
+	OneMinusSrcAlphaFactor,
+	Quaternion,
+	QuaternionKeyframeTrack,
+	RepeatWrapping,
+	Skeleton,
+	SkinnedMesh,
+	SrcAlphaFactor,
+	TextureLoader,
+	Uint16BufferAttribute,
+	Vector3,
+	VectorKeyframeTrack
+} from "../../../build/three.module.js";
+import { TGALoader } from "../loaders/TGALoader.js";
+import { MMDParser } from "../libs/mmdparser.module.js";
 /**
- * @author takahiro / https://github.com/takahirox
- *
  * Dependencies
  *  - mmd-parser https://github.com/takahirox/mmd-parser
  *  - TGALoader
@@ -28,42 +60,6 @@
  *  - more precise grant skinning support.
  *  - shadow support.
  */
-
-import {
-	AddOperation,
-	AnimationClip,
-	Bone,
-	BufferGeometry,
-	Color,
-	CustomBlending,
-	DoubleSide,
-	DstAlphaFactor,
-	Euler,
-	FileLoader,
-	Float32BufferAttribute,
-	FrontSide,
-	Interpolant,
-	Loader,
-	LoaderUtils,
-	MeshToonMaterial,
-	MultiplyOperation,
-	NearestFilter,
-	NumberKeyframeTrack,
-	OneMinusSrcAlphaFactor,
-	Quaternion,
-	QuaternionKeyframeTrack,
-	RepeatWrapping,
-	Skeleton,
-	SkinnedMesh,
-	SphericalReflectionMapping,
-	SrcAlphaFactor,
-	TextureLoader,
-	Uint16BufferAttribute,
-	Vector3,
-	VectorKeyframeTrack
-} from "../../../build/three.module.js";
-import { TGALoader } from "../loaders/TGALoader.js";
-import { MMDParser } from "../libs/mmdparser.module.js";
 
 var MMDLoader = ( function () {
 
@@ -220,6 +216,7 @@ var MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmd( buffer, true ) );
@@ -244,6 +241,7 @@ var MMDLoader = ( function () {
 				.setMimeType( undefined )
 				.setPath( this.path )
 				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader )
 				.load( url, function ( buffer ) {
 
 					onLoad( parser.parsePmx( buffer, true ) );
@@ -273,7 +271,8 @@ var MMDLoader = ( function () {
 			this.loader
 				.setMimeType( undefined )
 				.setPath( this.animationPath )
-				.setResponseType( 'arraybuffer' );
+				.setResponseType( 'arraybuffer' )
+				.setRequestHeader( this.requestHeader );
 
 			for ( var i = 0, il = urls.length; i < il; i ++ ) {
 
@@ -306,6 +305,7 @@ var MMDLoader = ( function () {
 				.setMimeType( isUnicode ? undefined : 'text/plain; charset=shift_jis' )
 				.setPath( this.animationPath )
 				.setResponseType( 'text' )
+				.setRequestHeader( this.requestHeader )
 				.load( url, function ( text ) {
 
 					onLoad( parser.parseVpd( text, true ) );
@@ -1111,8 +1111,7 @@ var MMDLoader = ( function () {
 
 							params.envMap = this._loadTexture(
 								fileNames[ 1 ],
-								textures,
-								{ sphericalReflectionMapping: true }
+								textures
 							);
 
 							params.combine = extension === '.sph'
@@ -1163,7 +1162,7 @@ var MMDLoader = ( function () {
 
 						params.envMap = this._loadTexture(
 							data.textures[ material.envTextureIndex ],
-							textures, { sphericalReflectionMapping: true }
+							textures
 						);
 
 						params.combine = material.envFlag === 1
@@ -1378,12 +1377,6 @@ var MMDLoader = ( function () {
 				delete texture.readyCallbacks;
 
 			}, onProgress, onError );
-
-			if ( params.sphericalReflectionMapping === true ) {
-
-				texture.mapping = SphericalReflectionMapping;
-
-			}
 
 			texture.readyCallbacks = [];
 

@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import {
 	GammaEncoding,
 	LinearEncoding,
@@ -239,6 +235,7 @@ ColorSpaceNode.getEncodingComponents = function ( encoding ) {
 ColorSpaceNode.prototype = Object.create( TempNode.prototype );
 ColorSpaceNode.prototype.constructor = ColorSpaceNode;
 ColorSpaceNode.prototype.nodeType = "ColorSpace";
+ColorSpaceNode.prototype.hashProperties = [ "method" ];
 
 ColorSpaceNode.prototype.generate = function ( builder, output ) {
 

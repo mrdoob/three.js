@@ -10,10 +10,10 @@ varying vec3 vViewPosition;
 
 struct BlinnPhongMaterial {
 
-	vec3	diffuseColor;
-	vec3	specularColor;
-	float	specularShininess;
-	float	specularStrength;
+	vec3 diffuseColor;
+	vec3 specularColor;
+	float specularShininess;
+	float specularStrength;
 
 };
 

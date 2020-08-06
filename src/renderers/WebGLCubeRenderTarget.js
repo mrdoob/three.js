@@ -1,4 +1,4 @@
-import { BackSide, NoBlending } from '../constants.js';
+import { BackSide, NoBlending, RGBAFormat } from '../constants.js';
 import { Scene } from '../scenes/Scene.js';
 import { Mesh } from '../objects/Mesh.js';
 import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
@@ -6,11 +6,6 @@ import { ShaderMaterial } from '../materials/ShaderMaterial.js';
 import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { CubeCamera } from '../cameras/CubeCamera.js';
-
-/**
- * @author alteredq / http://alteredqualia.com
- * @author WestLangley / http://github.com/WestLangley
- */
 
 function WebGLCubeRenderTarget( size, options, dummy ) {
 
@@ -34,67 +29,64 @@ WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer, texture ) {
 
 	this.texture.type = texture.type;
-	this.texture.format = texture.format;
+	this.texture.format = RGBAFormat; // see #18859
 	this.texture.encoding = texture.encoding;
 
-	var scene = new Scene();
+	this.texture.generateMipmaps = texture.generateMipmaps;
+	this.texture.minFilter = texture.minFilter;
+	this.texture.magFilter = texture.magFilter;
 
-	var shader = {
+	const scene = new Scene();
+
+	const shader = {
 
 		uniforms: {
 			tEquirect: { value: null },
 		},
 
-		vertexShader: [
+		vertexShader: /* glsl */`
 
-			"varying vec3 vWorldDirection;",
+			varying vec3 vWorldDirection;
 
-			"vec3 transformDirection( in vec3 dir, in mat4 matrix ) {",
+			vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
-			"	return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );",
+				return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
 
-			"}",
+			}
 
-			"void main() {",
+			void main() {
 
-			"	vWorldDirection = transformDirection( position, modelMatrix );",
+				vWorldDirection = transformDirection( position, modelMatrix );
 
-			"	#include <begin_vertex>",
-			"	#include <project_vertex>",
+				#include <begin_vertex>
+				#include <project_vertex>
 
-			"}"
+			}
+		`,
 
-		].join( '\n' ),
+		fragmentShader: /* glsl */`
 
-		fragmentShader: [
+			uniform sampler2D tEquirect;
 
-			"uniform sampler2D tEquirect;",
+			varying vec3 vWorldDirection;
 
-			"varying vec3 vWorldDirection;",
+			#include <common>
 
-			"#define RECIPROCAL_PI 0.31830988618",
-			"#define RECIPROCAL_PI2 0.15915494",
+			void main() {
 
-			"void main() {",
+				vec3 direction = normalize( vWorldDirection );
 
-			"	vec3 direction = normalize( vWorldDirection );",
+				vec2 sampleUV = equirectUv( direction );
 
-			"	vec2 sampleUV;",
+				gl_FragColor = texture2D( tEquirect, sampleUV );
 
-			"	sampleUV.y = asin( clamp( direction.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;",
-
-			"	sampleUV.x = atan( direction.z, direction.x ) * RECIPROCAL_PI2 + 0.5;",
-
-			"	gl_FragColor = texture2D( tEquirect, sampleUV );",
-
-			"}"
-
-		].join( '\n' ),
+			}
+		`
 	};
 
-	var material = new ShaderMaterial( {
+	const material = new ShaderMaterial( {
 
-		type: 'CubemapFromEquirect',
+		name: 'CubemapFromEquirect',
 
 		uniforms: cloneUniforms( shader.uniforms ),
 		vertexShader: shader.vertexShader,
@@ -106,11 +98,11 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 	material.uniforms.tEquirect.value = texture;
 
-	var mesh = new Mesh( new BoxBufferGeometry( 5, 5, 5 ), material );
+	const mesh = new Mesh( new BoxBufferGeometry( 5, 5, 5 ), material );
 
 	scene.add( mesh );
 
-	var camera = new CubeCamera( 1, 10, this );
+	const camera = new CubeCamera( 1, 10, this );
 	camera.update( renderer, scene );
 
 	mesh.geometry.dispose();

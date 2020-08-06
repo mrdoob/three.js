@@ -1,6 +1,3 @@
-/**
- * @author munrocket / https://twitter.com/munrocket_twit
- */
 
 try {
 
@@ -8,8 +5,8 @@ try {
 
 } catch {
 
-	console.log( '\x1b[31mError! You not installed dependencies. Please run `npm i --prefix test`\x1b[37m' );
-	process.exit( 1 );
+	console.log( 'Error: Can\'t find Puppeteer. Run `npm install --prefix test`.' );
+	process.exit( 0 );
 
 }
 
@@ -43,12 +40,12 @@ const exceptionList = [
 	'index',
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
-	'webgl_kinect', // video tag not deterministic enough
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
 	'webgl_materials_envmaps_parallax', // empty for some reason
 	'webgl_raymarching_reflect', // exception for Github Actions
 	'webgl_test_memory2', // gives fatal error in puppeteer
 	'webgl_tiled_forward', // exception for Github Actions
+	'webgl_video_kinect', // video tag not deterministic enough
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
 ].concat( ( process.platform === "win32" ) ? [
@@ -90,7 +87,28 @@ const pup = puppeteer.launch( {
 	const injection = fs.readFileSync( 'test/e2e/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
+	const threeJsBuild = fs.readFileSync( 'build/three.module.js', 'utf8' )
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+	await page.setRequestInterception( true );
+
 	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
+	page.on( 'request', async ( request ) => {
+
+		if ( request.url() === 'http://localhost:1234/build/three.module.js' ) {
+
+			await request.respond( {
+				status: 200,
+				contentType: 'application/javascript; charset=utf-8',
+				body: threeJsBuild
+			} );
+
+		} else {
+
+			await request.continue();
+
+		}
+
+	} );
 	page.on( 'response', async ( response ) => {
 
 		try {
@@ -108,12 +126,16 @@ const pup = puppeteer.launch( {
 
 	/* Find files */
 
-	const exactList = process.argv.slice( 2 ).map( f => f.replace( '.html', '' ) );
+	const isMakeScreenshot = process.argv[ 2 ] == '--make';
+	const isExactList = process.argv.length > ( 2 + isMakeScreenshot );
+
+	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
+		.map( f => f.replace( '.html', '' ) );
 
 	const files = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => ( process.argv.length > 2 ) ? exactList.includes( f ) : ! exceptionList.includes( f ) );
+		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 
 	/* Loop for each file, with CI parallelism */
@@ -129,7 +151,7 @@ const pup = puppeteer.launch( {
 
 		/* At least 3 attempts before fail */
 
-		let attemptId = process.env.MAKE ? 1.5 : 0;
+		let attemptId = isMakeScreenshot ? 1.5 : 0;
 
 		while ( attemptId < maxAttemptId ) {
 
@@ -188,6 +210,7 @@ const pup = puppeteer.launch( {
 									console.log( 'Warning. Render timeout exceeded...' );
 
 								}
+
 								clearInterval( waitingLoop );
 								resolve();
 
@@ -217,15 +240,15 @@ const pup = puppeteer.launch( {
 			}
 
 
-			if ( process.env.MAKE ) {
+			if ( isMakeScreenshot ) {
 
 
 				/* Make screenshots */
 
 				attemptId = maxAttemptId;
-				let bitmap= ( await jimp.read( await page.screenshot() ) )
-						.scale( 1 / viewScale ).quality( jpgQuality )
-						.write( `./examples/screenshots/${ file }.jpg` ).bitmap;
+				let bitmap = ( await jimp.read( await page.screenshot() ) )
+					.scale( 1 / viewScale ).quality( jpgQuality )
+					.write( `./examples/screenshots/${ file }.jpg` ).bitmap;
 
 				printImage( bitmap, console );
 				console.green( `file: ${ file } generated` );
@@ -258,8 +281,8 @@ const pup = puppeteer.launch( {
 					continue;
 
 				}
-				numFailedPixels /= actual.width * actual.height;
 
+				numFailedPixels /= actual.width * actual.height;
 
 				/* Print results */
 
@@ -304,7 +327,7 @@ const pup = puppeteer.launch( {
 
 		if ( failedScreenshots.length > 1 ) {
 
-			console.red( 'List of failed screenshots: ' + failedScreenshots.join(' ') );
+			console.red( 'List of failed screenshots: ' + failedScreenshots.join( ' ' ) );
 
 		} else {
 
@@ -314,7 +337,7 @@ const pup = puppeteer.launch( {
 
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endId - beginId } screenshots not pass.` );
 
-	} else if ( ! process.env.MAKE ) {
+	} else if ( ! isMakeScreenshot ) {
 
 		console.green( `TEST PASSED! ${ endId - beginId } screenshots correctly rendered.` );
 

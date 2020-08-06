@@ -1,7 +1,3 @@
-/**
- * @author vHawk / https://github.com/vHawk/
- */
-
 import {
 	Vector2,
 	Vector3,

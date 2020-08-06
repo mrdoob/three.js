@@ -19,7 +19,6 @@ export class TorusKnotBufferGeometry extends BufferGeometry {
 		radialSegments: number;
 		p: number;
 		q: number;
-		heightScale: number;
 	};
 
 }
@@ -42,7 +41,6 @@ export class TorusKnotGeometry extends Geometry {
 		radialSegments: number;
 		p: number;
 		q: number;
-		heightScale: number;
 	};
 
 }

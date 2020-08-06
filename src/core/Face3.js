@@ -1,11 +1,6 @@
 import { Color } from '../math/Color.js';
 import { Vector3 } from '../math/Vector3.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
 function Face3( a, b, c, normal, color, materialIndex ) {
 
 	this.a = a;
@@ -41,13 +36,13 @@ Object.assign( Face3.prototype, {
 
 		this.materialIndex = source.materialIndex;
 
-		for ( var i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
+		for ( let i = 0, il = source.vertexNormals.length; i < il; i ++ ) {
 
 			this.vertexNormals[ i ] = source.vertexNormals[ i ].clone();
 
 		}
 
-		for ( var i = 0, il = source.vertexColors.length; i < il; i ++ ) {
+		for ( let i = 0, il = source.vertexColors.length; i < il; i ++ ) {
 
 			this.vertexColors[ i ] = source.vertexColors[ i ].clone();
 

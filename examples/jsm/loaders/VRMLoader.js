@@ -1,7 +1,3 @@
-/**
- * @author Takahiro / https://github.com/takahirox
- */
-
 import {
 	Loader
 } from "../../../build/three.module.js";
@@ -38,7 +34,25 @@ var VRMLoader = ( function () {
 
 			this.gltfLoader.load( url, function ( gltf ) {
 
-				scope.parse( gltf, onLoad );
+				try {
+
+					scope.parse( gltf, onLoad );
+
+				} catch ( e ) {
+
+					if ( onError ) {
+
+						onError( e );
+
+					} else {
+
+						console.error( e );
+
+					}
+
+					scope.manager.itemError( url );
+
+				}
 
 			}, onProgress, onError );
 
@@ -46,7 +60,7 @@ var VRMLoader = ( function () {
 
 		setDRACOLoader: function ( dracoLoader ) {
 
-			this.glTFLoader.setDRACOLoader( dracoLoader );
+			this.gltfLoader.setDRACOLoader( dracoLoader );
 			return this;
 
 		},
