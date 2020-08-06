@@ -10,8 +10,10 @@ import {
 	Loader,
 	Object3D,
 	MeshStandardMaterial,
+	MeshPhongMaterial,
 	Mesh,
-	Color
+	Color,
+	RingGeometry
 } from "../../../build/three.module.js";
 
 var Rhino3dmLoader = function ( manager ) {
@@ -165,13 +167,28 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var attributes = obj.attributes;
 			var mat = materials[attributes.materialIndex];
 
-			// console.log(mat);
+			let diffusecolor = new Color(mat.diffuseColor.r/ 255.0, mat.diffuseColor.g / 255.0, mat.diffuseColor.b / 255.0);
+			if ( mat.diffuseColor.r === 0 && mat.diffuseColor.g === 0 && mat.diffuseColor.b === 0) {
+				diffusecolor.r = 1;
+				diffusecolor.g = 1;
+				diffusecolor.b = 1;
+			}
 
-			var material = new MeshStandardMaterial( { color: new Color(mat.diffuseColor.r, mat.diffuseColor.g, mat.diffuseColor.b) } );
+			var material = new MeshStandardMaterial( { 
+				color: diffusecolor, 
+				metalness: 0.8,
+				name: mat.name 
+			} );
 
 			var mesh = new Mesh(geometry, material);
+			mesh.castShadow = attributes.castsShadows;
+			mesh.receiveShadow = attributes.receivesShadows;
+			mesh.userData['attributes'] = attributes;
 
-			object.add(mesh)
+			//console.log(mesh);
+			//console.log(mat);
+
+			object.add(mesh);
 
 		}
 		
@@ -353,37 +370,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 					self.postMessage( { type: 'decode', id: message.id, data } );
 
-					/*
-					var arr = new Uint8Array(buffer);
-					var doc = rhino.File3dm.fromByteArray(arr);
-
-					var objects = doc.objects();
-					var geometryList = [];
-
-					
-					
-					for ( var i = 0; i < objects.count; i++ ) {
-						var obj = objects.get(i).geometry();
-						if( obj instanceof rhino.Mesh ) {
-
-							var geometry = obj.toThreejsJSON();
-							geometryList.push( geometry );
-
-						}
-
-						
-					
-						if(obj instanceof rhino.PointCloud){
-							let threePts = pointsToThreejs(obj, ptMat);
-							scene.add(threePts);
-						}
-
-						
-						
-					}
-
-					*/
-
 				} );
 				
 			break;
@@ -401,16 +387,30 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		var objs = [];
 		var mats = [];
 
+		//Handle document objects
+
 		for( var i = 0; i < objects.count; i++ ) {
 
 			var obj = objects.get(i);
-
 			var geo = obj.geometry();
+			var attr = obj.attributes();
+			var objectType = geo.objectType;
+			var geometry = null;
 
 			// TODO: handle other geometry types
-			if( geo instanceof rhino.Mesh ) {
+			switch( objectType ) {
 
-				var attr = obj.attributes();
+				case rhino.ObjectType.PointCloud:
+				case rhino.ObjectType.Mesh:
+
+					geometry = geo.toThreejsJSON();
+
+					break;
+
+			}
+
+			if( geometry ) {
+
 				var attributes = {};
 
 				for ( var property in attr ) {
@@ -428,11 +428,13 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 					}
 				}
 
-				objs.push( { geometry: geo.toThreejsJSON(), attributes } );
+				objs.push( { geometry, attributes } );
 
 			}
 			
 		}
+
+		//Handle document materials
 
 		for( var i = 0; i < materials.count(); i++) {
 
@@ -444,7 +446,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			for ( var property in mat ) { 
 
-				// console.log(`${property}: ${mat[property]}`);
+				//console.log(material.IsPhysicallyBased);
 
 				if( typeof mat[property] !== 'function' ){
 
@@ -453,6 +455,20 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				} else {
 
 					// TODO: extract data from functions
+					// console.log(`${property}: ${mat[property]}`);
+
+				}
+
+			}
+
+			// extract physically based material properties
+			var pbMat = mat.physicallyBased();
+
+			for ( var property in pbMat ) {
+
+				if( typeof mat[property] !== 'function' ){
+
+					material[property] = pbMat[property];
 
 				}
 
@@ -461,6 +477,8 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			mats.push( material );
 
 		}
+
+		//TODO: Handle other document stuff like lights, views, etc.
 
 		return { objects: objs, materials: mats };
 
