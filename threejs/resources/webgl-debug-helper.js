@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* global define */
+/* global define, globalThis */
 
 (function(root, factory) {  // eslint-disable-line
   if (typeof define === 'function' && define.amd) {
@@ -41,7 +41,7 @@
     // Browser globals
     root.webglDebugHelper = factory.call(root);
   }
-}(this, function() {
+}(this || globalThis, function() {
   'use strict';  // eslint-disable-line
 
   //------------ [ from https://github.com/KhronosGroup/WebGLDeveloperTools ]
