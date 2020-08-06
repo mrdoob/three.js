@@ -86,6 +86,7 @@ var CSS3DRenderer = function () {
 	domElement.appendChild( cameraElement );
 
 	var isIE = /Trident/i.test( navigator.userAgent );
+	var isSafari = !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
 
 	this.getSize = function () {
 
@@ -334,8 +335,26 @@ var CSS3DRenderer = function () {
 			'scale(' + fov + ')' + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
 			'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
+		var cameraTranslateX = _widthHalf;
+		var cameraTranslateY = _heightHalf;
+
+		if( isSafari ) {
+
+			cameraTranslateX = Math.round(cameraTranslateX);
+
+			if(camera.isPerspectiveCamera && _height % 2 === 1) {
+
+				cameraTranslateY = _heightHalf + 1;
+
+			} else {
+
+				cameraTranslateY = Math.round(cameraTranslateY);
+
+			}
+		}
+
 		var style = cameraCSSMatrix +
-			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
+			'translate(' + cameraTranslateX + 'px,' + cameraTranslateY + 'px)';
 
 		if ( cache.camera.style !== style && ! isIE ) {
 
