@@ -86,7 +86,7 @@ var CSS3DRenderer = function () {
 	domElement.appendChild( cameraElement );
 
 	var isIE = /Trident/i.test( navigator.userAgent );
-	var isSafari = !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
+	var isSafari = /Safari/.test( navigator.userAgent ) && ! /Chrome/.test( navigator.userAgent );
 
 	this.getSize = function () {
 
