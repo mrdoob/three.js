@@ -252,7 +252,7 @@ const AnimationUtils = {
 			const targetTrack = targetClip.tracks.find( function ( track ) {
 
 				return track.name === referenceTrack.name
-				&& track.ValueTypeName === referenceTrackType;
+					&& track.ValueTypeName === referenceTrackType;
 
 			} );
 
@@ -334,7 +334,7 @@ const AnimationUtils = {
 
 				} else {
 
-					const valueEnd = targetValueSize - targetOffset;
+					const valueEnd = targetValueSize - targetOffset * 2;
 
 					// Subtract each value for all other numeric track types
 					for ( let k = 0; k < valueEnd; ++ k ) {
