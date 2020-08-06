@@ -203,11 +203,16 @@
       addLine(type, str, prefix);
     }
 
+    const threePukeRE = /WebGLRenderer.*?extension not supported/;
     function wrapFunc(obj, funcName, prefix) {
       const oldFn = obj[funcName];
       origConsole[funcName] = oldFn.bind(obj);
       return function(...args) {
-        addLines(funcName, [...args].join(' '), prefix);
+        // three.js pukes all over so filter here
+        const src = [...args].join(' ');
+        if (!threePukeRE.test(src)) {
+          addLines(funcName, src, prefix);
+        }
         oldFn.apply(obj, arguments);
       };
     }
@@ -334,8 +339,8 @@
     };
     const OrigWorker = self.Worker;
     class WrappedWorker extends OrigWorker {
-      constructor(url) {
-        super(url);
+      constructor(url, ...args) {
+        super(url, ...args);
         let listener;
         this.onmessage = function(e) {
           if (!e || !e.data || !e.data.type === '___editor___') {
