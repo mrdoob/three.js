@@ -1,9 +1,11 @@
-const state = {
+import * as THREE from './resources/threejs/r119/build/three.module.js';
+
+export const state = {
   width: 300,   // canvas default
   height: 150,  // canvas default
 };
 
-function init(data) {  /* eslint-disable-line no-unused-vars */
+export function init(data) {  /* eslint-disable-line no-unused-vars */
   const {canvas} = data;
   const renderer = new THREE.WebGLRenderer({canvas});
 

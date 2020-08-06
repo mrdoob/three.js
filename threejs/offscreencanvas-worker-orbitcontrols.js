@@ -1,15 +1,10 @@
-'use strict';
-
-/* global importScripts, init, THREE */
-
-importScripts('resources/threejs/r119/build/three.min.js');
-importScripts('resources/threejs/r119/examples/js/controls/OrbitControls.js');
-importScripts('shared-orbitcontrols.js');
+import {init} from './shared-orbitcontrols.js';
+import {EventDispatcher} from './resources/threejs/r119/build/three.module.js';
 
 function noop() {
 }
 
-class ElementProxyReceiver extends THREE.EventDispatcher {
+class ElementProxyReceiver extends EventDispatcher {
   constructor() {
     super();
   }
@@ -68,12 +63,8 @@ const proxyManager = new ProxyManager();
 
 function start(data) {
   const proxy = proxyManager.getProxy(data.canvasId);
-  proxy.body = proxy;  // HACK!
-  self.window = proxy;
-  self.document = {
-    addEventListener: proxy.addEventListener.bind(proxy),
-    removeEventListener: proxy.removeEventListener.bind(proxy),
-  };
+  proxy.ownerDocument = proxy; // HACK!
+  self.document = {};  // HACK!
   init({
     canvas: data.canvas,
     inputElement: proxy,

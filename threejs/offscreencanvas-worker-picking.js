@@ -1,9 +1,4 @@
-'use strict';
-
-/* global importScripts, init, state, pickPosition */
-
-importScripts('resources/threejs/r119/build/three.min.js');
-importScripts('shared-picking.js');
+import {state, init, pickPosition} from './shared-picking.js';
 
 function size(data) {
   state.width = data.width;

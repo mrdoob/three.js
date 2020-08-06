@@ -10,15 +10,11 @@ to a web worker so as not to slow down the responsiveness of the browser. It
 also means data is loaded and parsed in the worker so possibly less jank while
 the page loads.
 
-One big issue with offscreen canvas is, at least in Chrome, es6 modules are not yet
-supported on web workers, so, unlike all the other examples on this site that use
-es6 modules these examples will use class scripts.
-
 Getting *started* using it is pretty straight forward. Let's port the 3 spinning cube
 example from [the article on responsiveness](threejs-responsive.html).
 
 Workers generally have their code separated
-into another script file. Most of the examples on this site have had
+into another script file whereas most of the examples on this site have had
 their scripts embedded into the HTML file of the page they are on.
 
 In our case we'll make a file called `offscreencanvas-cubes.js` and
@@ -37,14 +33,14 @@ function main() {
   ...
 ```
 
-We can then start our worker with `new Worker(pathToScript)`.
+We can then start our worker with `new Worker(pathToScript, {type: 'module'})`.
 and pass the `offscreen` object to it.
 
 ```js
 function main() {
   const canvas = document.querySelector('#c');
   const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-cubes.js');
+  const worker = new Worker('offscreencanvas-cubes.js', {type: 'module'});
   worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 }
 main();
@@ -53,7 +49,7 @@ main();
 It's important to note that workers can't access the `DOM`. They
 can't look at HTML elements nor can they receive mouse events or
 keyboard events. The only thing they can generally do is respond
-to messages sent to them.
+to messages sent to them and send messages back to the page.
 
 To send a message to a worker we call [`worker.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Worker/postMessage) and
 pass it 1 or 2 arguments. The first argument is a JavaScript object
@@ -69,7 +65,8 @@ so once transferred the `offscreen` object back in the main page is useless.
 Workers receive messages from their `onmessage` handler. The object
 we passed to `postMessage` arrives on `event.data` passed to the `onmessage`
 handler on the worker. The code above declares a `type: 'main'` in the object it passes
-to the worker. We'll make a handler that based on `type` calls
+to the worker. This object has no meaning to the browser. It's entirely for
+our own usage. We'll make a handler that based on `type` calls
 a different function in the worker. Then we can add functions as
 needed and easily call them from the main page.
 
@@ -93,13 +90,7 @@ that was sent from the main page.
 So now we just need to start changing the `main` we pasted into 
 `offscreencanvas-cubes.js` from [the responsive article](threejs-responsive.html).
 
-The first thing we need to do is include THREE.js into our worker.
-
-```js
-importScripts('resources/threejs/r119/build/three.min.js');
-```
-
-Then instead of looking up the canvas from the DOM we'll receive it from the
+Instead of looking up the canvas from the DOM we'll receive it from the
 event data.
 
 ```js
@@ -189,7 +180,7 @@ function render(time) {
 Back in the main page we'll send a `size` event anytime the page changes size.
 
 ```js
-const worker = new Worker('offscreencanvas-picking.js');
+const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
 worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 
 +function sendSize() {
@@ -245,7 +236,7 @@ function main() {
 +    return;
 +  }
   const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-picking.js');
+  const worker = new Worker('offscreencanvas-picking.js', {type: 'module});
   worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 
   ...
@@ -266,7 +257,7 @@ the canvas in the main page like normal.
 > running in the main page. What you do is really up to you.
 
 The first thing we should probably do is separate out the three.js
-code from the code that is specific to the worker. That we we can
+code from the code that is specific to the worker. That way we can
 use the same code on both the main page and the worker. In other words
 we will now have 3 files
 
@@ -283,19 +274,53 @@ we will now have 3 files
    `offscreencanvas-worker-cubes.js`
 
 `shared-cubes.js` and `offscreencanvas-worker-cubes.js` are basically
-the split of our previous `offscreencanvas-cubes.js` file. 
-We renamed `main` to `init` since we already have a `main` in our
-HTML file.
-
-`offscreencanvas-worker-cubes.js` is just
+the split of our previous `offscreencanvas-cubes.js` file. First we
+copy all of `offscreencanvas-cubes.js` to `shared-cube.js`. Then
+we rename `main` to `init` since we already have a `main` in our
+HTML file and we need to export `init` and `state`
 
 ```js
-'use strict';
+import * as THREE from './resources/threejs/r119/build/three.module.js';
 
-/* global importScripts, init, state */
+-const state = {
++export const state = {
+  width: 300,   // canvas default
+  height: 150,  // canvas default
+};
 
-importScripts('resources/threejs/r119/build/three.min.js');
-+importScripts('shared-cubes.js');
+-function main(data) {
++export function init(data) {
+  const {canvas} = data;
+  const renderer = new THREE.WebGLRenderer({canvas});
+```
+
+and cut out the just the non three.js relates parts
+
+```js
+-function size(data) {
+-  state.width = data.width;
+-  state.height = data.height;
+-}
+-
+-const handlers = {
+-  main,
+-  size,
+-};
+-
+-self.onmessage = function(e) {
+-  const fn = handlers[e.data.type];
+-  if (!fn) {
+-    throw new Error('no handler for type: ' + e.data.type);
+-  }
+-  fn(e.data);
+-};
+```
+
+Then we copy those parts we just deleted to `offscreencanvas-worker-cubes.js`
+and import `shared-cubes.js` as well as call `init` instead of `main`.
+
+```js
+import {init, state} from './shared-cubes.js';
 
 function size(data) {
   state.width = data.width;
@@ -317,13 +342,11 @@ self.onmessage = function(e) {
 };
 ```
 
-note we include `shared-cubes.js` which is all our three.js code
-
-Similarly we need to include three.js and  `shared-cubes.js` in the main page
+Similarly we need to include `shared-cubes.js` in the main page
 
 ```html
-<script src="resources/threejs/r119/build/three.min.js"></script>
-<script src="shared-cubes.js"><script>
+<script type="module">
++import {init, state} from './shared-cubes.js';
 ```
 We can remove the HTML and CSS we added previously
 
@@ -362,7 +385,7 @@ function main() {
 -    return;
 -  }
 -  const offscreen = canvas.transferControlToOffscreen();
--  const worker = new Worker('offscreencanvas-picking.js');
+-  const worker = new Worker('offscreencanvas-picking.js', {type: 'module'});
 -  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 +  if (canvas.transferControlToOffscreen) {
 +    startWorker(canvas);
@@ -377,8 +400,8 @@ We'll move all the code we had to setup the worker inside `startWorker`
 ```js
 function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-worker-cubes.js');
-  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
+  const worker = new Worker('offscreencanvas-worker-cubes.js', {type: 'module'});
+  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 
   function sendSize() {
     worker.postMessage({
@@ -393,6 +416,13 @@ function startWorker(canvas) {
 
   console.log('using OffscreenCanvas');
 }
+```
+
+and send `init` instead of `main`
+
+```js
+-  worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
++  worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
 ```
 
 for starting in the main page we can do this
@@ -514,7 +544,7 @@ to the worker or the main page.
 
 function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-worker-picking.js');
+  const worker = new Worker('offscreencanvas-worker-picking.js', {type: 'module'});
   worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
 
 +  sendMouse = (x, y) => {
@@ -609,7 +639,7 @@ and the keyboard.
 
 Unlike our code so far we can't really use a global `state` object
 without re-writing all the OrbitControls code to work with it.
-The OrbitControls take an element to which they attach most
+The OrbitControls take an `HTMLElement` to which they attach most
 of the DOM events they use. Maybe we could pass in our own
 object that has the same API surface as a DOM element. 
 We only need to support the features the OrbitControls need.
@@ -648,7 +678,9 @@ tell the difference.
 Here's the code for the worker part.
 
 ```js
-class ElementProxyReceiver extends THREE.EventDispatcher {
+import {EventDispatcher} from './resources/threejs/r119/build/three.module.js';
+
+class ElementProxyReceiver extends EventDispatcher {
   constructor() {
     super();
   }
@@ -728,19 +760,13 @@ self.onmessage = function(e) {
 };
 ```
 
-We also need to actually add the `OrbitControls` to the top of
-the script
+In our shared three.js code we need to import the `OrbitControls` and set them up.
 
 ```js
-importScripts('resources/threejs/r119/build/three.min/js');
-+importScripts('resources/threejs/r119/examples/js/controls/OrbitControls.js');
-*importScripts('shared-orbitcontrols.js');
-```
+import * as THREE from './resources/threejs/r119/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r119/examples/jsm/controls/OrbitControls.js';
 
-and in our shared three.js code we need to set them up
-
-```js
-function init(data) {
+export function init(data) {
 -  const {canvas} = data;
 +  const {canvas, inputElement} = data;
   const renderer = new THREE.WebGLRenderer({canvas});
@@ -849,7 +875,7 @@ When we start the worker we first make a proxy and pass in our event handlers.
 ```js
 function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-worker-orbitcontrols.js');
+  const worker = new Worker('offscreencanvas-worker-orbitcontrols.js', {type: 'module'});
 
 +  const eventHandlers = {
 +    contextmenu: preventDefaultHandler,
@@ -1085,7 +1111,7 @@ class ElementProxy {
 and in our shared three.js code we no longer need `state`
 
 ```js
--const state = {
+-export const state = {
 -  width: 300,   // canvas default
 -  height: 150,  // canvas default
 -};
@@ -1117,28 +1143,21 @@ function render(time) {
   ...
 ```
 
-A few more hacks. The OrbitControls attach event handlers to `window` to
-get keyboard events. Not sure that's the right place to attach them but that's beyond our control
-unless we fork the OrbitControls. In any case `window` doesn't exist in a worker.
+A few more hacks. The OrbitControls add `mousemove` and `mouseup` events to the
+`ownerDocument` of the element to handle mouse capture (when the mouse goes
+outside the window).
 
-They also also add `mousemove` and `mouseup` events to the `document`
-to handle mouse capture (when the mouse goes outside the window) but
-like `window` there is no `document` in a worker.
+Further the code references the global `document` but there is no global document
+in a worker. 
 
-Further the code compares `document` to the element we pass into `OrbitControls`
-and expects them to not be equal.
-
-We can solve all of these with a few quick hacks. In our worker
-code we'll re-use our proxy for all 3 problems.
+We can solve all of these with a 2 quick hacks. In our worker
+code we'll re-use our proxy for both problems.
 
 ```js
 function start(data) {
   const proxy = proxyManager.getProxy(data.canvasId);
-+  self.window = proxy;  // HACK!
-+  self.document = {  // HACK!
-+    addEventListener: proxy.addEventListener.bind(proxy),
-+    removeEventListener: proxy.removeEventListener.bind(proxy),
-+  };
++  proxy.ownerDocument = proxy; // HACK!
++  self.document = {} // HACK!
   init({
     canvas: data.canvas,
     inputElement: proxy,

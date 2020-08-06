@@ -19,16 +19,12 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r119/build/three.min.js"></script>
-<script src="shared-cubes.js"></script>
-<script>
-'use strict';  // eslint-disable-line
-
-/* globals state, init */
+<script type="module">
+import {init, state} from './shared-cubes.js';
 
 function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-worker-cubes.js');
+  const worker = new Worker('offscreencanvas-worker-cubes.js', {type: 'module'});
   worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
 
   function sendSize() {

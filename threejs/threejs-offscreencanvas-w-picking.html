@@ -19,19 +19,14 @@
   <body>
     <canvas id="c"></canvas>
   </body>
-<script src="resources/threejs/r119/build/three.min.js"></script>
-<script src="resources/threejs/r119/examples/js/controls/OrbitControls.js"></script>
-<script src="shared-picking.js"></script>
-<script>
-'use strict';  // eslint-disable-line
-
-/* global state, init, pickPosition */
+<script type="module">
+import {state, init, pickPosition} from './shared-picking.js';
 
 let sendMouse;
 
 function startWorker(canvas) {
   const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-worker-picking.js');
+  const worker = new Worker('offscreencanvas-worker-picking.js', {type: 'module'});
   worker.postMessage({type: 'init', canvas: offscreen}, [offscreen]);
 
   sendMouse = (x, y) => {

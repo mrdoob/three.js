@@ -31,9 +31,7 @@
       <div>no OffscreenCanvas support</div>
     </div>
   </body>
-<script>
-'use strict';  // eslint-disable-line
-
+<script type="module">
 function main() {  /* eslint consistent-return: 0 */
   const canvas = document.querySelector('#c');
   if (!canvas.transferControlToOffscreen) {
@@ -42,7 +40,7 @@ function main() {  /* eslint consistent-return: 0 */
     return;
   }
   const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-cubes.js');
+  const worker = new Worker('offscreencanvas-cubes.js', {type: 'module'});
   worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 
   function sendSize() {

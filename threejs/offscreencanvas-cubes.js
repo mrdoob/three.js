@@ -1,8 +1,4 @@
-'use strict';  // eslint-disable-line
-
-/* global importScripts, THREE */
-
-importScripts('resources/threejs/r119/build/three.min.js');
+import * as THREE from './resources/threejs/r119/build/three.module.js';
 
 const state = {
   width: 300,   // canvas default

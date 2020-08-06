@@ -22,13 +22,8 @@
   <body>
     <canvas id="c" tabindex="1"></canvas>
   </body>
-<script src="resources/threejs/r119/build/three.min.js"></script>
-<script src="resources/threejs/r119/examples/js/controls/OrbitControls.js"></script>
-<script src="shared-orbitcontrols.js"></script>
-<script>
-'use strict';  // eslint-disable-line
-
-/* global init */
+<script type="module">
+import {init} from './shared-orbitcontrols.js';
 
 const mouseEventHandler = makeSendPropertiesHandler([
   'ctrlKey',
@@ -146,7 +141,7 @@ class ElementProxy {
 function startWorker(canvas) {
   canvas.focus();
   const offscreen = canvas.transferControlToOffscreen();
-  const worker = new Worker('offscreencanvas-worker-orbitcontrols.js');
+  const worker = new Worker('offscreencanvas-worker-orbitcontrols.js', {type: 'module'});
 
   const eventHandlers = {
     contextmenu: preventDefaultHandler,
