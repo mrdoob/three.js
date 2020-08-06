@@ -1,12 +1,12 @@
-Title: Three.js Tips
-Description: Small issues that might trip you up using three.js
+Title: Three.js Советы
+Description: Небольшие вопросы, которые могут появится, используя three.js
 TOC: #
 
 Эта статья представляет собой набор небольших проблем, с которыми вы можете столкнуться при использовании three.js, которые кажутся слишком маленькими, чтобы иметь собственную статью. 
 
 ---
 
-<a id="screenshot" data-toc="Taking a screenshot"></a>
+<a id="screenshot" data-toc="Делаем скриншот холста"></a>
 
 # Делаем скриншот холста 
 
@@ -124,12 +124,12 @@ elem.addEventListener('click', () => {
 
 ---
 
-<a id="preservedrawingbuffer" data-toc="Prevent the Canvas Being Cleared"></a>
+<a id="preservedrawingbuffer" data-toc="Предотвращение очистки холста "></a>
 
 # Предотвращение очистки холста 
 
 Допустим, вы хотели, чтобы пользователь рисовал анимированный объект. 
-Вам нужно передать `preserveDrawingBuffer: true` Вам нужно передать  `WebGLRenderer`. 
+Вам нужно передать `preserveDrawingBuffer: true` при создании  `WebGLRenderer`. 
 Это мешает браузеру очистить холст. Вы также должны сказать three.js не очищать холст. 
 
 ```js
@@ -156,24 +156,23 @@ const canvas = document.querySelector('#c');
 
 ---
 
-<a id="tabindex" data-toc="Get Keyboard Input From a Canvas"></a>
+<a id="tabindex" data-toc="Ввод с клавиатуры"></a>
 
 # Ввод с клавиатуры
 
 В этих уроках мы часто прикрепляли слушателей событий `canvas`.
 Хотя многие события работают, по умолчанию не работают события клавиатуры. 
 
-Чтобы получить события клавиатуры, установите для  [`tabindex`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex)
-холста значение 0 или более. Например.
+Чтобы получить события клавиатуры, установите для холста [`tabindex`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/tabIndex)
+ значение 0 или более. Например.
 
 ```html
 <canvas tabindex="0"></canvas>
 ```
 
 Это в конечном итоге вызывает новую проблему, хотя. Все, что имеет установленный `tabindex` будет выделено, когда оно будет в фокусе. 
-Чтобы исправить это, установите фокус CSS.  
+Чтобы исправить это, установите фокус CSS `outline:none`.  
 
-to none
 
 ```css
 canvas:focus {
@@ -234,7 +233,7 @@ document.querySelectorAll('canvas').forEach((canvas) => {
 
 ---
 
-<a id="transparent-canvas" data-toc="Make the Canvas Transparent"></a>
+<a id="transparent-canvas" data-toc="Делаем холст прозрачным "></a>
  
 # Делаем холст прозрачным 
 
@@ -333,9 +332,9 @@ body {
 
 ---
 
-<a id="html-background" data-toc="Use three.js as Background in HTML"></a>
+<a id="html-background" data-toc="Создание анимированного фона в three.js "></a>
 
-# Создание фона для анимации three.js 
+# Создание анимированного фона в three.js 
 
 Распространенный вопрос - как сделать анимацию three.js фоном веб-страницы. 
 
