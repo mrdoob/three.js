@@ -340,15 +340,15 @@ var CSS3DRenderer = function () {
 
 		if( isSafari ) {
 
-			cameraTranslateX = Math.round(cameraTranslateX);
+			if(camera.isOrthographicCamera) {
+
+				cameraTranslateX = Math.round(cameraTranslateX);
+				cameraTranslateY = Math.round(cameraTranslateY);
+			}
 
 			if(camera.isPerspectiveCamera && _height % 2 === 1) {
 
 				cameraTranslateY = _heightHalf + 1;
-
-			} else {
-
-				cameraTranslateY = Math.round(cameraTranslateY);
 
 			}
 		}
