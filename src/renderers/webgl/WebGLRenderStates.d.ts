@@ -12,7 +12,8 @@ interface WebGLRenderState {
 		shadowsArray: Light[];
 		lights: WebGLLights;
 	};
-	setupLights( camera: Camera ): void;
+	setupLights(): void;
+	setupLightsView( camera: Camera ): void;
 	pushLight( light: Light ): void;
 	pushShadow( shadowLight: Light ): void;
 
@@ -20,7 +21,7 @@ interface WebGLRenderState {
 
 export class WebGLRenderStates {
 
-	get( scene: Scene, camera: Camera ): WebGLRenderState;
+	get( scene: Scene, renderCallNesting: number ): WebGLRenderState;
 	dispose(): void;
 
 }
