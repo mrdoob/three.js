@@ -42,10 +42,13 @@
           "SwitchCase": 1
         }
       ],
-      "prefer-const": ["error", {
-        "destructuring": "any",
-        "ignoreReadBeforeAssign": false
-      }]
+      "prefer-const": [
+        "error",
+        {
+          "destructuring": "any",
+          "ignoreReadBeforeAssign": false
+        }
+      ]
     }
   },
   "scripts": {
