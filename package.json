@@ -41,6 +41,13 @@
         {
           "SwitchCase": 1
         }
+      ],
+      "prefer-const": [
+        "error",
+        {
+          "destructuring": "any",
+          "ignoreReadBeforeAssign": false
+        }
       ]
     }
   },
