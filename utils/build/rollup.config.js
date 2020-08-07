@@ -150,7 +150,7 @@ function glconstants() {
 
 		transform( code ) {
 
-			code = code.replace( /_?gl\.([A-Z0-9_]+)/g, function ( match, p1 ) {
+			code = code.replace( /(this\.)?_?gl\.([A-Z0-9_]+)/g, function ( match, _, p1 ) {
 
 				if ( p1 in constants ) return constants[ p1 ];
 				console.log( '* Unhandled GL Constant:', p1 );
