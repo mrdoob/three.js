@@ -10,6 +10,11 @@ export class ParametricBufferGeometry extends BufferGeometry {
 		stacks: number
 	);
 
+	/**
+	 * @default 'ParametricBufferGeometry'
+	 */
+	type: string;
+
 	parameters: {
 		func: ( u: number, v: number, dest: Vector3 ) => void;
 		slices: number;
@@ -25,6 +30,11 @@ export class ParametricGeometry extends Geometry {
 		slices: number,
 		stacks: number
 	);
+
+	/**
+	 * @default 'ParametricGeometry'
+	 */
+	type: string;
 
 	parameters: {
 		func: ( u: number, v: number, dest: Vector3 ) => void;

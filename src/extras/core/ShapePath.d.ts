@@ -1,11 +1,29 @@
 import { Vector2 } from './../../math/Vector2';
 import { Shape } from './Shape';
+import { Color } from '../../math/Color';
 
 export class ShapePath {
 
 	constructor();
 
+	/**
+	 * @default 'ShapePath'
+	 */
+	type: string;
+
+	/**
+	 * @default new THREE.Color()
+	 */
+	color: Color;
+
+	/**
+	 * @default []
+	 */
 	subPaths: any[];
+
+	/**
+	 * @default null
+	 */
 	currentPath: any;
 
 	moveTo( x: number, y: number ): this;

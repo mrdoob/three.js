@@ -11,6 +11,9 @@ export class InstancedInterleavedBuffer extends InterleavedBuffer {
 		meshPerAttribute?: number
 	);
 
+	/**
+	 * @default 1
+	 */
 	meshPerAttribute: number;
 
 }

@@ -13,10 +13,34 @@ export class LineBasicMaterial extends Material {
 
 	constructor( parameters?: LineBasicMaterialParameters );
 
-	color: Color;
+	/**
+	 * @default 'LineBasicMaterial'
+	 */
+	type: string;
+
+	/**
+	 * @default 0xffffff
+	 */
+	color: Color | string | number;
+
+	/**
+	 * @default 1
+	 */
 	linewidth: number;
+
+	/**
+	 * @default 'round'
+	 */
 	linecap: string;
+
+	/**
+	 * @default 'round'
+	 */
 	linejoin: string;
+
+	/**
+	 * @default false
+	 */
 	morphTargets: boolean;
 
 	setValues( parameters: LineBasicMaterialParameters ): void;

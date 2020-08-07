@@ -25,8 +25,16 @@ export class WebGLRenderList {
 
 	constructor( properties: WebGLProperties );
 
+	/**
+	 * @default []
+	 */
 	opaque: Array<RenderItem>;
+
+	/**
+	 * @default []
+	 */
 	transparent: Array<RenderItem>;
+
 	init(): void;
 	push(
 		object: Object3D,

@@ -5,8 +5,16 @@ export class WebXRManager {
 
 	constructor( renderer: any, gl: WebGLRenderingContext );
 
+	/**
+	 * @default false
+	 */
 	enabled: boolean;
+
+	/**
+	 * @default false
+	 */
 	isPresenting: boolean;
+
 	getController( id: number ): Group;
 	getControllerGrip( id: number ): Group;
 	setFramebufferScaleFactor( value: number ): void;
