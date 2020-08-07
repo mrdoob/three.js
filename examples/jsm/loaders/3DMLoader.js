@@ -472,7 +472,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				case rhino.ObjectType.Point:
 				case rhino.ObjectType.Light:
 				case rhino.ObjectType.Curve:
-				case rhino.ObjectType.Surface:
 				case rhino.ObjectType.Annotation:
 				case rhino.ObjectType.InstanceReference:
 				case rhino.ObjectType.TextDot:
