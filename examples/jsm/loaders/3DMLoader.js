@@ -10,10 +10,10 @@ import {
 	Loader,
 	Object3D,
 	MeshStandardMaterial,
-	MeshPhongMaterial,
 	Mesh,
 	Color,
-	RingGeometry
+	Points,
+	PointsMaterial
 } from "../../../build/three.module.js";
 
 var Rhino3dmLoader = function ( manager ) {
@@ -151,10 +151,12 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	_createGeometry: function ( data ) {
 
-		// console.log(data);
-
 		var object = new Object3D();
-		let loader = new BufferGeometryLoader();
+		object.userData['layers'] = data.layers;
+
+		console.log(data);
+
+		var loader = new BufferGeometryLoader();
 
 		var objects = data.objects;
 		var materials = data.materials;
@@ -163,32 +165,50 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var obj = objects[i];
 
-			var geometry = loader.parse( obj.geometry );
+			//console.log(obj);
+
 			var attributes = obj.attributes;
-			var mat = materials[attributes.materialIndex];
+			var geometry = null;
+			var material = null;
+			
+			switch( obj.objectType ) {
+				case 'PointSet':
 
-			let diffusecolor = new Color(mat.diffuseColor.r/ 255.0, mat.diffuseColor.g / 255.0, mat.diffuseColor.b / 255.0);
-			if ( mat.diffuseColor.r === 0 && mat.diffuseColor.g === 0 && mat.diffuseColor.b === 0) {
-				diffusecolor.r = 1;
-				diffusecolor.g = 1;
-				diffusecolor.b = 1;
+					geometry = loader.parse( obj.geometry );
+					material = new PointsMaterial( { sizeAttenuation: true, vertexColors:true } );
+					var points = new Points( geometry, material );
+					points.userData['attributes'] = attributes;
+					object.add(points);
+
+					break;
+
+				case 'Mesh':
+
+					geometry = loader.parse( obj.geometry );
+
+					mat = materials[attributes.materialIndex];
+
+					let diffusecolor = new Color(mat.diffuseColor.r/ 255.0, mat.diffuseColor.g / 255.0, mat.diffuseColor.b / 255.0);
+					if ( mat.diffuseColor.r === 0 && mat.diffuseColor.g === 0 && mat.diffuseColor.b === 0) {
+						diffusecolor.r = 1;
+						diffusecolor.g = 1;
+						diffusecolor.b = 1;
+					}
+
+					// check obj type
+					var material = new MeshStandardMaterial( { 
+						color: diffusecolor, 
+						metalness: 0.8,
+						name: mat.name 
+					} );
+
+					var mesh = new Mesh(geometry, material);
+					mesh.castShadow = attributes.castsShadows;
+					mesh.receiveShadow = attributes.receivesShadows;
+					mesh.userData['attributes'] = attributes;
+
+					break;
 			}
-
-			var material = new MeshStandardMaterial( { 
-				color: diffusecolor, 
-				metalness: 0.8,
-				name: mat.name 
-			} );
-
-			var mesh = new Mesh(geometry, material);
-			mesh.castShadow = attributes.castsShadows;
-			mesh.receiveShadow = attributes.receivesShadows;
-			mesh.userData['attributes'] = attributes;
-
-			//console.log(mesh);
-			//console.log(mat);
-
-			object.add(mesh);
 
 		}
 		
@@ -381,29 +401,29 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		var arr = new Uint8Array(buffer);
 		var doc = rhino.File3dm.fromByteArray(arr);
 
-		var objects = doc.objects();
-		var materials = doc.materials();
+		var objects = [];
+		var materials = [];
+		var layers = [];
+		var views = [];
+		var namedViews = [];
 
-		var objs = [];
-		var mats = [];
+		//Handle objects
 
-		//Handle document objects
+		for( var i = 0; i < doc.objects().count; i++ ) {
 
-		for( var i = 0; i < objects.count; i++ ) {
-
-			var obj = objects.get(i);
-			var geo = obj.geometry();
-			var attr = obj.attributes();
-			var objectType = geo.objectType;
+			var _object = doc.objects().get(i);
+			var _geometry = _object.geometry();
+			var _attributes = _object.attributes();
+			var objectType = _geometry.objectType;
 			var geometry = null;
 
 			// TODO: handle other geometry types
 			switch( objectType ) {
 
-				case rhino.ObjectType.PointCloud:
+				case rhino.ObjectType.PointSet:
 				case rhino.ObjectType.Mesh:
 
-					geometry = geo.toThreejsJSON();
+					geometry = _geometry.toThreejsJSON();
 
 					break;
 
@@ -411,77 +431,96 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			if( geometry ) {
 
-				var attributes = {};
+				var attributes = extractProperties( _attributes );
 
-				for ( var property in attr ) {
+				objectType = objectType.constructor.name;
+				objectType = objectType.substring( 11, objectType.length );
 
-					// console.log(`${property}: ${attr[property]}`);
-
-					if( typeof attr[property] !== 'function' ){
-
-						attributes[property] = attr[property];
-
-					} else {
-
-						// TODO: extract data from functions such as user strings
-
-					}
-				}
-
-				objs.push( { geometry, attributes } );
+				objects.push( { geometry, attributes, objectType: objectType } );
 
 			}
+
+			_geometry.delete();
+			_object.delete();
 			
 		}
 
-		//Handle document materials
+		//Handle materials
 
-		for( var i = 0; i < materials.count(); i++) {
+		for( var i = 0; i < doc.materials().count(); i++) {
 
-			var mat = materials.get( i );
+			var _material = doc.materials().get( i );
+			var materialProperties = extractProperties( _material );
+			var pbMaterialProperties = extractProperties( _material.physicallyBased() );
+			
+			var material = Object.assign(materialProperties, pbMaterialProperties);
 
-			var material = {};
+			materials.push( material );
 
-			// console.log(mat);
+			_material.delete();
 
-			for ( var property in mat ) { 
+		}
 
-				//console.log(material.IsPhysicallyBased);
+		// Handle layers
 
-				if( typeof mat[property] !== 'function' ){
+		for( var i = 0; i < doc.layers().count(); i++) {
 
-					material[property] = mat[property];
+			var _layer = doc.layers().get( i );
+			var layer = extractProperties( _layer );
 
-				} else {
+			layers.push( layer );
 
-					// TODO: extract data from functions
-					// console.log(`${property}: ${mat[property]}`);
+			_layer.delete();
+			
+		} 
 
-				}
+		// Handle views
 
-			}
+		for( var i = 0; i < doc.views().count(); i++) {
 
-			// extract physically based material properties
-			var pbMat = mat.physicallyBased();
+			var _view = doc.views().get( i );
+			var view = extractProperties( _view );
 
-			for ( var property in pbMat ) {
+			views.push( view );
 
-				if( typeof mat[property] !== 'function' ){
+			_view.delete();
+		}
 
-					material[property] = pbMat[property];
+		// Handle named views
 
-				}
+		for( var i = 0; i < doc.namedViews().count(); i++) {
 
-			}
+			var _namedView = doc.namedViews().get( i );
+			var namedView = extractProperties( _namedView );
 
-			mats.push( material );
+			namedViews.push( namedView );
 
+			_namedView.delete();
 		}
 
 		//TODO: Handle other document stuff like lights, views, etc.
 
-		return { objects: objs, materials: mats };
+		doc.delete();
 
+		return { objects, materials, layers, views, namedViews };
+
+	}
+
+	function extractProperties( object ) {
+
+		var result = {};
+
+		for ( var property in object ) {
+
+			if( typeof object[property] !== 'function' ){
+
+				result[property] = object[property];
+
+			}
+
+		}
+
+		return result;
 	}
 
 };
