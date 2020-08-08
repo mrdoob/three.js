@@ -55,7 +55,7 @@
     "start": "npm run dev",
     "test": "npm run test-lint && npm run test-unit",
     "build": "rollup -c utils/build/rollup.config.js",
-    "build-closure": "rollup -c utils/build/rollup.config.js && google-closure-compiler --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
+    "build-closure": "npm run build && google-closure-compiler --warning_level=VERBOSE --jscomp_off=globalThis --jscomp_off=checkTypes --externs utils/build/externs.js --language_in=ECMASCRIPT5_STRICT --js build/three.js --js_output_file build/three.min.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"npm run dev --prefix test\" \"http-server -p 8080\"",
     "lint-fix": "eslint src --ext js --ext ts --fix && eslint examples/jsm --ext js --ext ts --ignore-pattern libs --fix",
