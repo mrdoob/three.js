@@ -16,11 +16,14 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
 
 			var container, controls;
 			var camera, scene, renderer;
+			var gui;
 
 			init();
 			animate();
@@ -50,6 +53,7 @@
 				loader.load( 'models/3dm/hello_mesh.3dm', function ( object ) {
 
 					scene.add( object );
+					initGUI( object.userData.layers );
 
                 } );
                 
@@ -80,6 +84,43 @@
 				renderer.render( scene, camera );
 
 				requestAnimationFrame( animate );
+
+			}
+
+			function initGUI( layers ) {
+
+				gui = new GUI( { width: 330 } );
+				var layersControl= gui.addFolder( 'layers' );
+				for( var i = 0; i < layers.length; i++) {
+					var layer = layers[i];
+					layersControl.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
+
+						scene.traverse( function ( child ) {
+
+							if( child.userData.hasOwnProperty('attributes') ) {
+
+								if( 'layerIndex' in child.userData.attributes ){
+
+									var layerName = layers[child.userData.attributes.layerIndex].name;
+
+									if( layerName === layer.name ) {
+										
+										child.visible = val;
+										layer.visible = val;
+										animate();
+
+									}
+
+								}
+
+							}
+
+						} );
+
+					} );
+				}
+				layersControl.open();
+				console.log( layers );
 
 			}
 		</script>
