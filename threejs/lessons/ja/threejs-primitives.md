@@ -1,5 +1,5 @@
 Title: Three.js のプリミティブ　
-Description: three.js プリミティブの旅。
+Description: three.js プリミティブの旅
 TOC: プリミティブ
 
 この記事はthree.jsについてのシリーズ記事の一つです。
