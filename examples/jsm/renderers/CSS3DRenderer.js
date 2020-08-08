@@ -338,15 +338,14 @@ var CSS3DRenderer = function () {
 		var cameraTranslateX = _widthHalf;
 		var cameraTranslateY = _heightHalf;
 
-		if( isSafari && camera.isOrthographicCamera ) {
+		if ( isSafari && camera.isOrthographicCamera ) {
 
-			cameraTranslateX = Math.round(cameraTranslateX);
-			cameraTranslateY = Math.round(cameraTranslateY);
+			cameraTranslateX = Math.round( cameraTranslateX );
+			cameraTranslateY = Math.round( cameraTranslateY );
 
 		}
 
-		var style = cameraCSSMatrix +
-			'translate(' + cameraTranslateX + 'px,' + cameraTranslateY + 'px)';
+		var style = cameraCSSMatrix + 'translate(' + cameraTranslateX + 'px,' + cameraTranslateY + 'px)';
 
 		if ( cache.camera.style !== style && ! isIE ) {
 
