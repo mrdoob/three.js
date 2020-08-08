@@ -1,4 +1,4 @@
-import { BackSide, LinearFilter, NoBlending, RGBAFormat } from '../constants.js';
+import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending, RGBAFormat } from '../constants.js';
 import { Mesh } from '../objects/Mesh.js';
 import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
@@ -110,12 +110,14 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	const currentRenderList = renderer.getRenderList();
 	const currentRenderTarget = renderer.getRenderTarget();
 
-	texture.minFilter = LinearFilter;
+	// Avoid blurred poles
+	if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
 
 	const camera = new CubeCamera( 1, 10, this );
 	camera.update( renderer, mesh );
 
 	texture.minFilter = currentMinFilter;
+
 	renderer.setRenderTarget( currentRenderTarget );
 	renderer.setRenderList( currentRenderList );
 
