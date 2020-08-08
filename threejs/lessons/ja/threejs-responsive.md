@@ -131,33 +131,27 @@ function render(time) {
   ...
 ```
 
-Since the aspect is only going to change if the canvas's display size
-changed we only set the camera's aspect if `resizeRendererToDisplaySize`
-returns `true`.
+キャンバスの表示サイズが変更されて `resizeRendererToDisplaySize` が `true` を返した場合のみ、カメラのアスペクトを設定します。
 
 {{{example url="../threejs-responsive.html" }}}
 
-It should now render with a resolution that matches the display
-size of the canvas.
+これでキャンバスの表示サイズに合った解像度でレンダリングされるようになりました。
 
-To make the point about letting CSS handle the resizing let's take
-our code and put it in a [separate `.js` file](../threejs-responsive.js).
-Here then are a few more examples where we let CSS choose the size and notice we had
-to change zero code for them to work.
+CSSにリサイズ処理を任せた場合のポイントを明確にするために、このコードを [分離した `.js` ファイル](../threejs-responsive.js) に入れてみましょう。
+ここではCSSがサイズを選択するいくつかのサンプルがあります。
+それらが動作するようにゼロからコードを変更しなければならなかった事に気づくでしょう。
 
-Let's put our cubes in the middle of a paragraph of text.
+文章の段落の真ん中にキューブを置いてみましょう。
 
 {{{example url="../threejs-responsive-paragraph.html" startPane="html" }}}
 
-and here's our same code used in an editor style layout
-where the control area on the right can be resized.
+エディタスタイルのレイアウトで右側のコントロールエリアのサイズを変更できるようにしたのと同じコードです。
 
 {{{example url="../threejs-responsive-editor.html" startPane="html" }}}
 
-The important part to notice is no code changed. Only our HTML and CSS
-changed.
+注目すべき重要な部分はコードが変更されていない事です。HTMLとCSSだけが変更されました。
 
-## Handling HD-DPI displays
+## HD-DPIディスプレイの取り扱い
 
 HD-DPI stands for high-density dot per inch displays.
 That's most Macs nowadays and many Windows machines
