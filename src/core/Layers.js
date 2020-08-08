@@ -1,54 +1,54 @@
-function Layers() {
+class Layers {
 
-	this.mask = 1 | 0;
+	constructor() {
 
-}
+		this.mask = 1 | 0;
 
-Object.assign( Layers.prototype, {
+	}
 
-	set: function ( channel ) {
+	set( channel ) {
 
 		this.mask = 1 << channel | 0;
 
-	},
+	}
 
-	enable: function ( channel ) {
+	enable( channel ) {
 
 		this.mask |= 1 << channel | 0;
 
-	},
+	}
 
-	enableAll: function () {
+	enableAll() {
 
 		this.mask = 0xffffffff | 0;
 
-	},
+	}
 
-	toggle: function ( channel ) {
+	toggle( channel ) {
 
 		this.mask ^= 1 << channel | 0;
 
-	},
+	}
 
-	disable: function ( channel ) {
+	disable( channel ) {
 
 		this.mask &= ~ ( 1 << channel | 0 );
 
-	},
+	}
 
-	disableAll: function () {
+	disableAll() {
 
 		this.mask = 0;
 
-	},
+	}
 
-	test: function ( layers ) {
+	test( layers ) {
 
 		return ( this.mask & layers.mask ) !== 0;
 
 	}
 
-} );
+}
 
 
 export { Layers };

@@ -74,8 +74,8 @@ function flatten( array, nBlocks, blockSize ) {
 	// unoptimized: ! isNaN( firstElem )
 	// see http://jacksondunstan.com/articles/983
 
-	let n = nBlocks * blockSize,
-		r = arrayCacheF32[ n ];
+	const n = nBlocks * blockSize;
+	let r = arrayCacheF32[ n ];
 
 	if ( r === undefined ) {
 
@@ -711,7 +711,7 @@ function PureArrayUniform( id, activeInfo, addr ) {
 
 PureArrayUniform.prototype.updateCache = function ( data ) {
 
-	let cache = this.cache;
+	const cache = this.cache;
 
 	if ( data instanceof Float32Array && cache.length !== data.length ) {
 
@@ -780,8 +780,8 @@ function parseUniform( activeInfo, addr, container ) {
 		const match = RePathPart.exec( path ),
 			matchEnd = RePathPart.lastIndex;
 
-		let id = match[ 1 ],
-			idIsIndex = match[ 2 ] === ']',
+		let id = match[ 1 ];
+		const idIsIndex = match[ 2 ] === ']',
 			subscript = match[ 3 ];
 
 		if ( idIsIndex ) id = id | 0; // convert to integer

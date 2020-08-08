@@ -84,22 +84,20 @@ const _axisDirections = [
  * interpolate diffuse lighting while limiting sampling computation.
  */
 
-function PMREMGenerator( renderer ) {
+class PMREMGenerator {
 
-	this._renderer = renderer;
-	this._pingPongRenderTarget = null;
+	constructor( renderer ) {
 
-	this._blurMaterial = _getBlurShader( MAX_SAMPLES );
-	this._equirectShader = null;
-	this._cubemapShader = null;
+		this._renderer = renderer;
+		this._pingPongRenderTarget = null;
 
-	this._compileMaterial( this._blurMaterial );
+		this._blurMaterial = _getBlurShader( MAX_SAMPLES );
+		this._equirectShader = null;
+		this._cubemapShader = null;
 
-}
+		this._compileMaterial( this._blurMaterial );
 
-PMREMGenerator.prototype = {
-
-	constructor: PMREMGenerator,
+	}
 
 	/**
 	 * Generates a PMREM from a supplied Scene, which can be faster than using an
@@ -108,7 +106,7 @@ PMREMGenerator.prototype = {
 	 * and far planes ensure the scene is rendered in its entirety (the cubeCamera
 	 * is placed at the origin).
 	 */
-	fromScene: function ( scene, sigma = 0, near = 0.1, far = 100 ) {
+	fromScene( scene, sigma = 0, near = 0.1, far = 100 ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = this._allocateTargets();
@@ -125,35 +123,35 @@ PMREMGenerator.prototype = {
 
 		return cubeUVRenderTarget;
 
-	},
+	}
 
 	/**
 	 * Generates a PMREM from an equirectangular texture, which can be either LDR
 	 * (RGBFormat) or HDR (RGBEFormat). The ideal input image size is 1k (1024 x 512),
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromEquirectangular: function ( equirectangular ) {
+	fromEquirectangular( equirectangular ) {
 
 		return this._fromTexture( equirectangular );
 
-	},
+	}
 
 	/**
 	 * Generates a PMREM from an cubemap texture, which can be either LDR
 	 * (RGBFormat) or HDR (RGBEFormat). The ideal input cube size is 256 x 256,
 	 * as this matches best with the 256 x 256 cubemap output.
 	 */
-	fromCubemap: function ( cubemap ) {
+	fromCubemap( cubemap ) {
 
 		return this._fromTexture( cubemap );
 
-	},
+	}
 
 	/**
 	 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileCubemapShader: function () {
+	compileCubemapShader() {
 
 		if ( this._cubemapShader === null ) {
 
@@ -162,13 +160,13 @@ PMREMGenerator.prototype = {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
 	 * your texture's network fetch for increased concurrency.
 	 */
-	compileEquirectangularShader: function () {
+	compileEquirectangularShader() {
 
 		if ( this._equirectShader === null ) {
 
@@ -177,14 +175,14 @@ PMREMGenerator.prototype = {
 
 		}
 
-	},
+	}
 
 	/**
 	 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
 	 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
 	 * one of them will cause any others to also become unusable.
 	 */
-	dispose: function () {
+	dispose() {
 
 		this._blurMaterial.dispose();
 
@@ -197,20 +195,20 @@ PMREMGenerator.prototype = {
 
 		}
 
-	},
+	}
 
 	// private interface
 
-	_cleanup: function ( outputTarget ) {
+	_cleanup( outputTarget ) {
 
 		this._pingPongRenderTarget.dispose();
 		this._renderer.setRenderTarget( _oldTarget );
 		outputTarget.scissorTest = false;
 		_setViewport( outputTarget, 0, 0, outputTarget.width, outputTarget.height );
 
-	},
+	}
 
-	_fromTexture: function ( texture ) {
+	_fromTexture( texture ) {
 
 		_oldTarget = this._renderer.getRenderTarget();
 		const cubeUVRenderTarget = this._allocateTargets( texture );
@@ -220,9 +218,9 @@ PMREMGenerator.prototype = {
 
 		return cubeUVRenderTarget;
 
-	},
+	}
 
-	_allocateTargets: function ( texture ) { // warning: null texture is valid
+	_allocateTargets( texture ) { // warning: null texture is valid
 
 		const params = {
 			magFilter: NearestFilter,
@@ -240,16 +238,16 @@ PMREMGenerator.prototype = {
 		this._pingPongRenderTarget = _createRenderTarget( params );
 		return cubeUVRenderTarget;
 
-	},
+	}
 
-	_compileMaterial: function ( material ) {
+	_compileMaterial( material ) {
 
 		const tmpMesh = new Mesh( _lodPlanes[ 0 ], material );
 		this._renderer.compile( tmpMesh, _flatCamera );
 
-	},
+	}
 
-	_sceneToCubeUV: function ( scene, near, far, cubeUVRenderTarget ) {
+	_sceneToCubeUV( scene, near, far, cubeUVRenderTarget ) {
 
 		const fov = 90;
 		const aspect = 1;
@@ -311,9 +309,9 @@ PMREMGenerator.prototype = {
 		renderer.outputEncoding = outputEncoding;
 		renderer.setClearColor( clearColor, clearAlpha );
 
-	},
+	}
 
-	_textureToCubeUV: function ( texture, cubeUVRenderTarget ) {
+	_textureToCubeUV( texture, cubeUVRenderTarget ) {
 
 		const renderer = this._renderer;
 
@@ -356,9 +354,9 @@ PMREMGenerator.prototype = {
 		renderer.setRenderTarget( cubeUVRenderTarget );
 		renderer.render( mesh, _flatCamera );
 
-	},
+	}
 
-	_applyPMREM: function ( cubeUVRenderTarget ) {
+	_applyPMREM( cubeUVRenderTarget ) {
 
 		const renderer = this._renderer;
 		const autoClear = renderer.autoClear;
@@ -376,7 +374,7 @@ PMREMGenerator.prototype = {
 
 		renderer.autoClear = autoClear;
 
-	},
+	}
 
 	/**
 	 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
@@ -385,7 +383,7 @@ PMREMGenerator.prototype = {
 	 * the poles) to approximate the orthogonally-separable blur. It is least
 	 * accurate at the poles, but still does a decent job.
 	 */
-	_blur: function ( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
+	_blur( cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis ) {
 
 		const pingPongRenderTarget = this._pingPongRenderTarget;
 
@@ -407,9 +405,9 @@ PMREMGenerator.prototype = {
 			'longitudinal',
 			poleAxis );
 
-	},
+	}
 
-	_halfBlur: function ( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
+	_halfBlur( targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis ) {
 
 		const renderer = this._renderer;
 		const blurMaterial = this._blurMaterial;
@@ -493,7 +491,7 @@ PMREMGenerator.prototype = {
 
 	}
 
-};
+}
 
 function _isLDR( texture ) {
 
