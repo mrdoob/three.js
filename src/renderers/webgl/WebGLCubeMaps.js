@@ -42,7 +42,7 @@ function WebGLCubeMaps( renderer ) {
 
 					const image = texture.image;
 
-					if ( texture.isDataTexture === true || image.complete === true ) {
+					if ( image.height > 0 ) {
 
 						const renderTarget = new WebGLCubeRenderTarget( image.height / 2 );
 						renderTarget.fromEquirectangularTexture( renderer, texture );
