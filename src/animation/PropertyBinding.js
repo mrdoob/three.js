@@ -95,6 +95,11 @@ class Composite {
 
 }
 
+// Note: This class uses a State pattern on a per-method basis:
+// 'bind' sets 'this.getValue' / 'setValue' and shadows the
+// prototype version of these methods with one that represents
+// the bound state. When the property is not found, the methods
+// become no-ops.
 class PropertyBinding {
 
 	constructor( rootNode, path, parsedPath ) {
@@ -105,6 +110,10 @@ class PropertyBinding {
 		this.node = PropertyBinding.findNode( rootNode, this.parsedPath.nodeName ) || rootNode;
 
 		this.rootNode = rootNode;
+
+		// initial state of these methods that calls 'bind'
+		this.getValue = this._getValue_unbound;
+		this.setValue = this._setValue_unbound;
 
 	}
 
@@ -388,20 +397,14 @@ class PropertyBinding {
 
 	}
 
-	getValue( targetArray, offset ) {
+	_getValue_unbound( targetArray, offset ) {
 
 		this.bind();
 		this.getValue( targetArray, offset );
 
-		// Note: This class uses a State pattern on a per-method basis:
-		// 'bind' sets 'this.getValue' / 'setValue' and shadows the
-		// prototype version of these methods with one that represents
-		// the bound state. When the property is not found, the methods
-		// become no-ops.
-
 	}
 
-	setValue( sourceArray, offset ) {
+	_setValue_unbound( sourceArray, offset ) {
 
 		this.bind();
 		this.setValue( sourceArray, offset );
@@ -704,10 +707,6 @@ Object.assign( PropertyBinding.prototype, {
 	Versioning,
 	GetterByBindingType,
 	SetterByBindingTypeAndVersioning,
-
-	// initial state of these methods that calls 'bind'
-	_getValue_unbound: PropertyBinding.prototype.getValue,
-	_setValue_unbound: PropertyBinding.prototype.setValue,
 
 } );
 
