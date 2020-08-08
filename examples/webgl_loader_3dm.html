@@ -41,7 +41,7 @@
 
 				scene.add( new THREE.AmbientLight( { intensity: 0.0001 } ) );
 
-				var directionalLight = new THREE.DirectionalLight( 0xffeedd );
+				var directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 0, 2 );
 				directionalLight.castShadow = true;
 				directionalLight.intensity = 2;
@@ -50,8 +50,9 @@
 				var loader = new Rhino3dmLoader( );
 				loader.setLibraryPath('jsm/libs/rhino3dm/');
 				
-				loader.load( 'models/3dm/hello_mesh.3dm', function ( object ) {
+				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
+					console.log( object );
 					scene.add( object );
 					initGUI( object.userData.layers );
 
@@ -89,11 +90,16 @@
 
 			function initGUI( layers ) {
 
-				gui = new GUI( { width: 330 } );
+				gui = new GUI( { width: 300 } );
 				var layersControl= gui.addFolder( 'layers' );
+				layersControl.open();
+
 				for( var i = 0; i < layers.length; i++) {
+
 					var layer = layers[i];
 					layersControl.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
+
+						var name = this.object.name;
 
 						scene.traverse( function ( child ) {
 
@@ -103,11 +109,10 @@
 
 									var layerName = layers[child.userData.attributes.layerIndex].name;
 
-									if( layerName === layer.name ) {
+									if( layerName === name ) {
 										
 										child.visible = val;
 										layer.visible = val;
-										animate();
 
 									}
 
@@ -119,8 +124,6 @@
 
 					} );
 				}
-				layersControl.open();
-				console.log( layers );
 
 			}
 		</script>
