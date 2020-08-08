@@ -1,6 +1,6 @@
 import { BackSide } from "../../constants.js";
 
-function WebGLMaterials( properties ) {
+function WebGLMaterials( properties, cubemaps ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
@@ -139,7 +139,7 @@ function WebGLMaterials( properties ) {
 
 		}
 
-		const envMap = material.envMap || environment;
+		const envMap = cubemaps.get( material.envMap || environment );
 
 		if ( envMap ) {
 
@@ -150,7 +150,7 @@ function WebGLMaterials( properties ) {
 			uniforms.reflectivity.value = material.reflectivity;
 			uniforms.refractionRatio.value = material.refractionRatio;
 
-			var maxMipLevel = properties.get( envMap ).__maxMipLevel;
+			const maxMipLevel = properties.get( envMap ).__maxMipLevel;
 
 			if ( maxMipLevel !== undefined ) {
 
