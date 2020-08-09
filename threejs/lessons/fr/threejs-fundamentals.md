@@ -97,7 +97,7 @@ Tout d'abord, chargeons three.js :
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r114/build/three.module.js';
+import * as THREE from './resources/threejs/r119/build/three.module.js';
 </script>
 ```
 
@@ -121,7 +121,7 @@ dans le document html :
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r114/build/three.module.js';
+import * as THREE from './resources/threejs/r119/build/three.module.js';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -415,7 +415,7 @@ par le biais d'une balise <code>&lt;script type="module"&gt;</code>. Voici un ex
 </p>
 <pre class=prettyprint>
 &lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r114/build/three.module.js';
+import * as THREE from './resources/threejs/r119/build/three.module.js';
 
 ...
 

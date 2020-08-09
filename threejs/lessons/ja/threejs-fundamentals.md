@@ -33,7 +33,7 @@ Three.jsはcanvasに描画するため、canvasをthree.jsに渡す必要があ�
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r110/build/three.module.js';
+import * as THREE from './resources/threejs/r119/build/three.module.js';
 
 function main() {
   const canvas = document.querySelector('#c');
@@ -292,7 +292,7 @@ es6モジュールはスクリプトのロードに <code>import</code> を使�
 </p>
 <pre class=prettyprint>
 &lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r110/build/three.module.js';
+import * as THREE from './resources/threejs/r119/build/three.module.js';
 
 ...
 
