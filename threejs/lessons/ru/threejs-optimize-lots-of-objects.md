@@ -519,4 +519,4 @@ scene.add(mesh);
 [другой статье](threejs-optimize-lots-of-objects-animated.html).
 
 <canvas id="c"></canvas>
-<script type="module" src="resources/threejs-lots-of-objects.js"></script>
+<script type="module" src="../resources/threejs-lots-of-objects.js"></script>
