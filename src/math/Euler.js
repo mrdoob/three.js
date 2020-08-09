@@ -20,12 +20,6 @@ class Euler {
 
 	}
 
-	static get DefaultOrder() {
-
-		return 'XYZ';
-
-	}
-
 	get x() {
 
 		return this._x;
@@ -335,6 +329,8 @@ class Euler {
 	_onChangeCallback() {}
 
 }
+
+Euler.DefaultOrder = 'XYZ';
 
 const _matrix = new Matrix4();
 const _quaternion = new Quaternion();
