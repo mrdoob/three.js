@@ -50,7 +50,7 @@ htmlとbodyの高さは100%にし、ウィンドウ一杯に設定します。
 {{{example url="../threejs-responsive-no-resize.html" }}}
 
 canvasがページを埋め尽くすようになりましたが、2つ問題があります。
-1つはキューブが伸びています。キューブは立方体でなく箱のようなものです。高すぎて広がりすぎています。サンプルを開いてブラウザのウィンドウサイズをリサイズします。キューブが伸びていて高すぎるのがわかります。
+1つはキューブが伸びています。キューブは立方体でなく箱のようなものです。高すぎて広がりすぎています。サンプルを開いてブラウザのウィンドウサイズをリサイズすると、キューブが伸びていて高すぎるのがわかります。
 
 <img src="resources/images/resize-incorrect-aspect.png" width="407" class="threejs_center nobg">
 
@@ -93,7 +93,7 @@ function render(time) {
 キャンバス内部のサイズ、その解像度は描画バッファサイズと呼ばれます。
 three.jsでは `renderer.setSize` を呼び出す事でキャンバスの描画バッファサイズを設定する事ができます。
 どのサイズを選ぶべきでしょうか？一番わかりやすい答えは"キャンバスが表示されているサイズと同じ"です。
-もう一度、キャンバスの `clientWidth` と `clientHeight` を見てみましょう。
+もう一度キャンバスの `clientWidth` と `clientHeight` を見てみましょう。
 
 レンダラーのキャンバスが表示されているサイズになっていないかどうかを確認し、表示されている場合はサイズを設定する関数を書いてみましょう。
 
@@ -153,49 +153,29 @@ CSSにリサイズ処理を任せた場合のポイントを明確にするた�
 
 ## HD-DPIディスプレイの取り扱い
 
-HD-DPI stands for high-density dot per inch displays.
-That's most Macs nowadays and many Windows machines
-as well as pretty much all smartphones.
+HD-DPIとは、高解像度ディスプレイの略です。
+最近ではほとんどのスマートフォンと同じくらい、Macや多くのWindowsマシンで採用されています。
 
-The way this works in the browser is they use
-CSS pixels to set the sizes which are supposed to be the same
-regardless of how high res the display is. The browser
-will just render text with more detail but the
-same physical size.
+ブラウザでの動作方法は、CSSを使用してディスプレイの高解像度に関係なく同じサイズを設定する事です。ブラウザはテキストをさらに詳細にレンダリングしますが、物理的なサイズは同じです。
 
-There are various ways to handle HD-DPI with three.js.
+three.jsでHD-DPIを扱う方法は色々あります。
 
-The first one is just not to do anything special. This
-is arguably the most common. Rendering 3D graphics
-takes a lot of GPU processing power. Mobile GPUs have
-less power than desktops, at least as of 2018, and yet
-mobile phones often have very high resolution displays.
-The current top of the line phones have an HD-DPI ratio
-of 3x meaning for every one pixel from a non-HD-DPI display
-those phones have 9 pixels. That means they have to do 9x
-the rendering.
+1つ目の方法は特に何もしない事です。これは間違いなく最も一般的な方法です。3DグラフィックのレンダリングにはたくさんのGPUの処理パワーが必要です。モバイルのGPUは少なくとも2018年時点ではデスクトップよりも電力が少ないが、それでも携帯電話は非常に高解像度のディスプレイを搭載している事が多いです。現在の上位機種はHD-DPI比が3倍という事は、非HD-DPIディスプレイの1ピクセルごとに9ピクセルを持っている事を意味します。つまり、9倍のレンダリングをしなければならないという事です。
 
-Computing 9x the pixels is a lot of work so if we just
-leave the code as it is we'll compute 1x the pixels and the
-browser will just draw it at 3x the size (3x by 3x = 9x pixels).
+9倍のピクセルを計算するのは大変な作業なので、コードをそのままにしておくと1倍のピクセルを計算して、ブラウザは3倍のサイズ(3x x 3x = 9xピクセル)で描画します。
 
-For any heavy three.js app that's probably what you want
-otherwise you're likely to get a slow framerate.
+重いthree.jsアプリの場合はこれが必要でしょう。そうしないとフレームレートが遅くなる可能性があります。
 
-That said if you actually do want to render at the resolution
-of the device there are a couple of ways to do this in three.js.
+デバイスの解像度でレンダリングしたい場合、three.jsにはいくつかのデバイスを変更する方法があります。
 
-One is to tell three.js a resolution multiplier using `renderer.setPixelRatio`.
-You ask the browser what the multiplier is from CSS pixels to device pixels
-and pass that to three.js
+1つは `renderer.setPixelRatio` でthree.jsに解像度の乗数を伝える事です。
+CSSピクセルからデバイスピクセルへの乗数をブラウザに伝え、それをthree.jsに渡します。
 
      renderer.setPixelRatio(window.devicePixelRatio);
 
-After that any calls to `renderer.setSize` will magically
-use the size you request multiplied by whatever pixel ratio
-you passed in. **This is strongly NOT RECOMMENDED**. See below
+`renderer.setSize` を呼び出し後、要求されたサイズに渡されたピクセル比を乗算したものが使用されます。**これは強く非推奨です**。以下を参照して下さい。
 
-The other way is to do it yourself when you resize the canvas.
+もう1つの方法は、キャンバスのサイズを変更する時に自分で設定する事です。
 
 ```js
     function resizeRendererToDisplaySize(renderer) {
@@ -211,25 +191,17 @@ The other way is to do it yourself when you resize the canvas.
     }
 ```
 
-This second way is objectively better. Why? Because it means I get what I ask for.
-There are many cases when using three.js where we need to know the actual
-size of the canvas's drawingBuffer. For example when making a post processing filter,
-or if we are making a shader that accesses `gl_FragCoord`, if we are making
-a screenshot, or reading pixels for GPU picking, for drawing into a 2D canvas,
-etc... There many many cases where if we use `setPixelRatio` then our actual size will be different
-than the size we requested and we'll have to guess when to use the size
-we asked for and when to use the size three.js is actually using.
-By doing it ourselves we always know the size being used is the size we requested.
-There is no special case where magic is happening behind the scenes.
+この2つ目の方法の方が客観的には優れています。なぜかと言うと私が求めるものを手に入れる事ができるからです。
 
-Here's an example using the code above.
+three.jsを使っていると、実際のキャンバスの描画バッファのサイズを指定します。例えば、後処理フィルタを作成する場合などです。
+または `gl_FragCoord` にアクセスするシェーダを作成している場合、あるいは2Dキャンバスに描画するためのスクリーンショット、またはGPUピッキング用のピクセルを読み込んだ場合などに使用する事ができます。 `setPixelRatio` を使うと、実際のサイズと違ってしまう事が多々あります。要求したサイズよりも、サイズを使うタイミングを推測して自分たちが要求したサイズと、three.jsが実際に使用しているサイズをいつ使用するかを確認します。
+これを自分で行う事で、使用されているサイズが要求したサイズであるのを常に知る事ができます。
+裏で魔法がかかっているという特殊なケースはありません。
+
+上のコードを使った例です。
 
 {{{example url="../threejs-responsive-hd-dpi.html" }}}
 
-It might be hard to see the difference but if you have an HD-DPI
-display and you compare this sample to those above you should
-notice the edges are more crisp.
+違いがわかりにくいかもしれませんが、HD-DPIディスプレイをお持ちの方でこのサンプルを上のサンプルと比較してみると、エッジがより鮮明になっている事がわかると思います。
 
-This article covered a very basic but fundamental topic. Next up lets quickly
-[go over the basic primitives that three.js provides](threejs-primitives.html).
-
+この記事では、非常に基本的でありながらも基本的なことを取り上げました。次は[three.jsが提供する基本的なプリミティブについて簡単に説明します。]((threejs-primitives.html).)
