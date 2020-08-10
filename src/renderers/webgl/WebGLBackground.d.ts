@@ -5,11 +5,12 @@ import { WebGLState } from './WebGLState';
 import { WebGLObjects } from './WebGLObjects';
 import { WebGLRenderList } from './WebGLRenderLists';
 import { Scene } from '../../scenes/Scene';
-import { Camera } from "../../cameras/Camera";
+import { Camera } from '../../cameras/Camera';
+import { WebGLCubeMaps } from './WebGLCubeMaps';
 
 export class WebGLBackground {
 
-	constructor( renderer: WebGLRenderer, state: WebGLState, objects: WebGLObjects, premultipliedAlpha: boolean );
+	constructor( renderer: WebGLRenderer, cubemaps: WebGLCubeMaps, state: WebGLState, objects: WebGLObjects, premultipliedAlpha: boolean );
 
 	getClearColor(): Color;
 	setClearColor( color: Color, alpha: number ): void;
