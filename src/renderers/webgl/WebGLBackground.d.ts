@@ -5,7 +5,7 @@ import { WebGLState } from './WebGLState';
 import { WebGLObjects } from './WebGLObjects';
 import { WebGLRenderList } from './WebGLRenderLists';
 import { Scene } from '../../scenes/Scene';
-import { Camera } from "../../cameras/Camera";
+import { Camera } from '../../cameras/Camera';
 import { WebGLCubeMaps } from './WebGLCubeMaps';
 
 export class WebGLBackground {
