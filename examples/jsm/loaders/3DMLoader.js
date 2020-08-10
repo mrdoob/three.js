@@ -13,8 +13,11 @@ import {
 	Mesh,
 	Color,
 	Points,
-	PointsMaterial
+	PointsMaterial,
+	Line,
+	LineBasicMaterial
 } from "../../../build/three.module.js";
+import { CSS2DObject } from '../renderers/CSS2DRenderer.js'
 
 var Rhino3dmLoader = function ( manager ) {
 
@@ -194,22 +197,24 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var objects = data.objects;
 		var materials = data.materials;
 
-		for( var i = 0; i < objects.length; i++ ){
+		var ptMaterial = new PointsMaterial( { sizeAttenuation: true, vertexColors:true } );
+
+		for( var i = 0; i < objects.length; i++ ) {
 
 			var obj = objects[i];
 
-			//console.log(obj);
+			// console.log(obj);
 
 			var attributes = obj.attributes;
 			var geometry = null;
 			var material = null;
 			
 			switch( obj.objectType ) {
+				case 'Point':
 				case 'PointSet':
 
 					geometry = loader.parse( obj.geometry );
-					material = new PointsMaterial( { sizeAttenuation: true, vertexColors:true } );
-					var points = new Points( geometry, material );
+					var points = new Points( geometry, ptMaterial );
 					points.userData['attributes'] = attributes;
 					object.add(points);
 
@@ -253,6 +258,62 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					brepObject.userData['objectType'] = obj.objectType;
 
 					object.add( brepObject );
+
+					break;
+				
+				case 'Curve':
+
+					geometry = loader.parse( obj.geometry );
+
+					var _color = attributes.drawColor;
+					var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+
+					var lines = new Line(geometry, new LineBasicMaterial( { color: color } ) );
+					lines.userData['attributes'] = attributes;
+					lines.userData['objectType'] = obj.objectType;
+
+					object.add(lines);
+
+					break;
+
+				case 'TextDot':
+
+					geometry = obj.geometry;
+					var dotDiv = document.createElement('div');
+					dotDiv.style.fontFamily = geometry.fontFace;
+					dotDiv.style.fontSize = `${geometry.fontHeight}px`;
+					dotDiv.style.marginTop = '-1em';
+					dotDiv.style.color = '#FFF';
+					dotDiv.style.padding = '2px';
+					dotDiv.style.paddingRight = '5px';
+					dotDiv.style.paddingLeft = '5px';
+					dotDiv.style.borderRadius = '5px';
+					var color = attributes.drawColor;
+					dotDiv.style.background = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+					dotDiv.textContent = geometry.text;
+					var dot = new CSS2DObject(dotDiv);
+					var location = geometry.point;
+					dot.position.set(location[0], location[1], location[2]);
+
+					dot.userData['attributes'] = attributes;
+					dot.userData['objectType'] = obj.objectType;
+
+					object.add(dot);
+
+					break;
+				case 'InstanceDefinition':
+					
+					var instanceDefinitionObject = new Object3D();
+					var instanceReferences = [];
+
+					for( var j = 0; j < objects.length; j++ ) {
+						if( objects[j].objectType === 'InstanceReference' &&
+							objects[j].geometry.parentIdefId === attributes.id ) {
+								instanceReferences.push( objects[j] );
+						}
+					}
+
+					// console.log( instanceReferences );
 
 					break;
 			}
@@ -454,98 +515,56 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		var views = [];
 		var namedViews = [];
 		var groups = [];
-		// var strings = [];
+		var strings = [];
 
 		//Handle objects
 
 		for( var i = 0; i < doc.objects().count; i++ ) {
 
 			var _object = doc.objects().get(i);
-			var _geometry = _object.geometry();
-			var _attributes = _object.attributes();
-			var objectType = _geometry.objectType;
-			var geometry = null;
 
-			// TODO: handle other geometry types
-			switch( objectType ) {
+			// console.log(objectType);
 
-				case rhino.ObjectType.Point:
-				case rhino.ObjectType.Light:
-				case rhino.ObjectType.Curve:
-				case rhino.ObjectType.Annotation:
-				case rhino.ObjectType.InstanceReference:
-				case rhino.ObjectType.TextDot:
-				case rhino.ObjectType.Hatch:
-				case rhino.ObjectType.SubD:
-				case rhino.ObjectType.ClipPlane:
+			// skip instance definition objects
+			if( _object.attributes().isInstanceDefinitionObject ) { 
 
-					console.warn(`THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}`);
-					
-					break;
+				continue;
+				
+			} else {
 
-				case rhino.ObjectType.PointSet:
-				case rhino.ObjectType.Mesh:
+				var object = extractObjectData( _object, doc );
 
-					geometry = _geometry.toThreejsJSON();
-
-					break;
-
-				case rhino.ObjectType.Brep:
-
-					var faces = _geometry.faces();
-					geometry = [];
-
-					for (var faceIndex = 0; faceIndex < faces.count; faceIndex++) {
-
-						var face = faces.get( faceIndex );
-						var mesh = face.getMesh( rhino.MeshType.Any );
-
-						if ( mesh ) {
-
-							geometry.push( mesh.toThreejsJSON() );
-							mesh.delete();
-
-						}
-
-						face.delete();
-					}
-
-					faces.delete();
-
-					break;
-
-				case rhino.ObjectType.Extrusion:
-
-					var mesh = _geometry.getMesh(rhino.MeshType.Any);
-
-					if( mesh ) {
-
-						geometry = mesh.toThreejsJSON();
-						mesh.delete();
-
-					} 
-
-					break;
-
+				if( object !== undefined ){
+					objects.push( object );
+				}
 			}
 
-			if( geometry ) {
-
-				var attributes = extractProperties( _attributes );
-
-				objectType = objectType.constructor.name;
-				objectType = objectType.substring( 11, objectType.length );
-
-				objects.push( { geometry, attributes, objectType: objectType } );
-
-			}
-
-			_geometry.delete();
 			_object.delete();
 			
 		}
 
-		//Handle materials
+		// Handle instance definitions
+
+		for( var i = 0; i < doc.instanceDefinitions().count(); i++ ) {
+
+			var idef = doc.instanceDefinitions().get( i );
+			var idefAttributes = extractProperties( idef );
+			
+			var ids = idef.getObjectIds();
+			var idefObjects = [];
+
+			// extract object data from each of these
+			for( var j = 0; j < ids.length; j++ ) {
+				var _object = doc.objects().findId( ids[ j ] );
+				var object = extractObjectData( _object, doc );
+				idefObjects.push( object );
+			}
+
+			objects.push( { geometry: idefObjects, attributes: idefAttributes, objectType: 'InstanceDefinition' } );
+
+		}
+
+		// Handle materials
 
 		for( var i = 0; i < doc.materials().count(); i++) {
 
@@ -628,7 +647,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle strings -- this seems to be broken at the moment in rhino3dm
 		// console.log(`Strings Count: ${doc.strings().count()}`); 
-
 		/*
 		for( var i = 0; i < doc.strings().count(); i++ ){
 
@@ -647,6 +665,169 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		doc.delete();
 
 		return { objects, materials, layers, views, namedViews, groups, settings };
+
+	}
+
+	function extractObjectData( object, doc ) {
+
+		var _geometry = object.geometry();
+		var _attributes = object.attributes();
+		var objectType = _geometry.objectType;
+		var geometry = null;
+		var attributes = null;
+
+		// skip instance definition objects
+		//if( _attributes.isInstanceDefinitionObject ) { continue; }
+
+		// TODO: handle other geometry types
+		switch( objectType ) {
+
+			case rhino.ObjectType.Curve:
+
+				var pts = curveToPoints( _geometry, 100 );
+
+				var position = {};
+				var color = {};
+				var attributes = {}
+				var data = {};
+
+				position.itemSize = 3;
+				position.type = 'Float32Array';
+				position.array = [];
+
+				for( var j = 0; j < pts.length; j++ ) {
+
+					position.array.push( pts[j][0] );
+					position.array.push( pts[j][1] );
+					position.array.push( pts[j][2] );
+
+				}
+
+				attributes.position = position;
+				data.attributes = attributes;
+
+				geometry = { data };
+
+				break;
+
+			case rhino.ObjectType.Point:
+
+				var pt = _geometry.location;
+
+				var position = {};
+				var color = {};
+				var attributes = {}
+				var data = {};
+
+				position.itemSize = 3;
+				position.type = 'Float32Array';
+				position.array = [ pt[0], pt[1], pt[2] ];
+
+				_color = _attributes.drawColor( doc );
+
+				color.itemSize = 3;
+				color.type = 'Float32Array';
+				color.array = [ _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 ];
+
+				attributes.position = position;
+				attributes.color = color;
+				data.attributes = attributes;
+
+				geometry = { data };
+
+				break;
+
+			case rhino.ObjectType.PointSet:
+			case rhino.ObjectType.Mesh:
+
+				geometry = _geometry.toThreejsJSON();
+
+				break;
+
+			case rhino.ObjectType.Brep:
+
+				var faces = _geometry.faces();
+				geometry = [];
+
+				for (var faceIndex = 0; faceIndex < faces.count; faceIndex++) {
+
+					var face = faces.get( faceIndex );
+					var mesh = face.getMesh( rhino.MeshType.Any );
+
+					if ( mesh ) {
+
+						geometry.push( mesh.toThreejsJSON() );
+						mesh.delete();
+
+					}
+
+					face.delete();
+				}
+
+				faces.delete();
+
+				break;
+
+			case rhino.ObjectType.Extrusion:
+
+				var mesh = _geometry.getMesh(rhino.MeshType.Any);
+
+				if( mesh ) {
+
+					geometry = mesh.toThreejsJSON();
+					mesh.delete();
+
+				} 
+
+				break;
+
+			case rhino.ObjectType.TextDot:
+				
+				geometry = extractProperties( _geometry );
+
+				break;
+			
+			case rhino.ObjectType.InstanceReference:
+
+				geometry = extractProperties( _geometry );
+				geometry.xform = extractProperties( _geometry.xform );
+				geometry.xform.array = _geometry.xform.toFloatArray( true );
+
+				break;
+			
+			/*
+			case rhino.ObjectType.Light:
+			case rhino.ObjectType.Annotation:
+			case rhino.ObjectType.Hatch:
+			case rhino.ObjectType.SubD:
+			case rhino.ObjectType.ClipPlane:
+			*/
+
+			default:
+				console.warn(`THREE.3DMLoader: TODO: Implement ${objectType.constructor.name}`);
+				break;
+		}
+
+		if( geometry ) {
+
+			var attributes = extractProperties( _attributes );
+
+			if( _attributes.groupCount > 0 ) {
+				attributes.groupIds = _attributes.getGroupList();
+			}
+
+			attributes.drawColor = _attributes.drawColor( doc );
+
+			objectType = objectType.constructor.name;
+			objectType = objectType.substring( 11, objectType.length );
+
+			//objects.push( { geometry, attributes, objectType: objectType } );
+
+			return { geometry, attributes, objectType };
+
+		}
+
+		
 
 	}
 
@@ -669,6 +850,76 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		}
 
 		return result;
+	}
+
+	function curveToPoints (curve, pointLimit) {
+
+		var pointCount = pointLimit;
+		var rc = [];
+		var ts = [];
+
+		// console.log(curve);
+	  
+		if (curve instanceof rhino.LineCurve) {
+		  return [curve.pointAtStart, curve.pointAtEnd];
+		}
+	  
+		if (curve instanceof rhino.PolylineCurve) {
+		  pointCount = curve.pointCount;
+		  for (let i = 0; i < pointCount; i++) {
+			rc.push(curve.point(i));
+		  }
+		  return rc;
+		}
+	  
+		if (curve instanceof rhino.PolyCurve) {
+		  let segmentCount = curve.segmentCount;
+		  for (let i = 0; i < segmentCount; i++) {
+			let segment = curve.segmentCurve(i);
+			let segmentArray = curveToPoints(segment);
+			rc = rc.concat(segmentArray);
+			segment.delete();
+		  }
+		  return rc;
+		}
+	  
+		if (curve instanceof rhino.NurbsCurve && curve.degree === 1) {
+		  console.info('degree 1 curve');
+		}
+	  
+		let domain = curve.domain;
+		let divisions = pointCount - 1.0;
+		for (let j = 0; j < pointCount; j++) {
+		  let t = domain[0] + (j / divisions) * (domain[1] - domain[0]);
+		  if (t === domain[0] || t === domain[1]) {
+			ts.push(t);
+			continue;
+		  }
+		  let tan = curve.tangentAt(t);
+		  let prevTan = curve.tangentAt(ts.slice(-1)[0]);
+
+		  // Duplicaated from THREE.Vector3
+		  // How to pass imports to worker?
+
+		  tS = tan[0] * tan[0] + tan[1] * tan[1] + tan[2] * tan[2];
+		  ptS = prevTan[0] * prevTan[0] + prevTan[1] * prevTan[1] + prevTan[2] * prevTan[2];
+
+		  var denominator = Math.sqrt( tS * ptS );
+
+		  var angle;
+		  if( denominator === 0 ) {
+			angle = Math.PI / 2;
+		  } else {
+			  var theta = ( tan.x * prevTan.x + tan.y * prevTan.y + tan.z * prevTan.z ) / denominator;
+			  angle = Math.acos( Math.max( - 1, Math.min( 1, theta ) ) );
+		  }
+
+		  if (angle < 0.1) { continue; }
+		  ts.push(t);
+		}
+	  
+		rc = ts.map(t => curve.pointAt(t));
+		return rc;
 	}
 
 };

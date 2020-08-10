@@ -15,14 +15,15 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import { CSS2DRenderer } from './jsm/renderers/CSS2DRenderer.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
 
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
 			var container, controls;
-			var camera, scene, renderer;
+			var camera, scene, renderer, labelRenderer;
 			var gui;
 
 			init();
@@ -57,14 +58,22 @@
 					initGUI( object.userData.layers );
 
                 } );
-                
+				
+				var width = window.innerWidth;
+				var height = window.innerHeight;
                 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
-				controls = new OrbitControls( camera, renderer.domElement );
+				labelRenderer = new CSS2DRenderer();
+				labelRenderer.setSize( width, height );
+				labelRenderer.domElement.style.position = 'absolute';
+				labelRenderer.domElement.style.top = '0px';
+				container.appendChild( labelRenderer.domElement );
+
+				controls = new OrbitControls( camera, container );
 
 				window.addEventListener( 'resize', resize, false );
 
@@ -72,10 +81,14 @@
 
 			function resize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setSize( width, height);
+				labelRenderer.setSize( width, height);
 
 			}
 
@@ -83,6 +96,7 @@
 
 				controls.update();
 				renderer.render( scene, camera );
+				labelRenderer.render( scene, camera );
 
 				requestAnimationFrame( animate );
 
@@ -96,7 +110,7 @@
 
 				for( var i = 0; i < layers.length; i++) {
 
-					var layer = layers[i];
+					var layer = layers[ i ];
 					layersControl.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
 
 						var name = this.object.name;
@@ -105,7 +119,7 @@
 
 							if( child.userData.hasOwnProperty('attributes') ) {
 
-								if( 'layerIndex' in child.userData.attributes ){
+								if( 'layerIndex' in child.userData.attributes ) {
 
 									var layerName = layers[child.userData.attributes.layerIndex].name;
 
