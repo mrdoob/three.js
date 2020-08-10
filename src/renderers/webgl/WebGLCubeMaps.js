@@ -1,9 +1,5 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
-import { WebGLCubeRenderTarget } from "../WebGLCubeRenderTarget.js";
+import { WebGLCubeRenderTarget } from '../WebGLCubeRenderTarget.js';
 
 function WebGLCubeMaps( renderer ) {
 
@@ -42,13 +38,19 @@ function WebGLCubeMaps( renderer ) {
 
 					const image = texture.image;
 
-					if ( image.height > 0 ) {
+					if ( image && image.height > 0 ) {
 
 						const renderTarget = new WebGLCubeRenderTarget( image.height / 2 );
 						renderTarget.fromEquirectangularTexture( renderer, texture );
 						cubemaps.set( texture, renderTarget );
 
 						return mapTextureMapping( renderTarget.texture, texture.mapping );
+
+					} else {
+
+						// image not yet ready. try the conversion next frame
+
+						return null;
 
 					}
 
