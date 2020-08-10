@@ -1,51 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - postprocessing - afterimage</title>
+		<title>three.js webgl - postprocessing - Screen Space Ambient Occlusion</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				background-color: #aaa;
+			}
+		</style>
 	</head>
 	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space ambient occlusion<br/>
+		</div>
 
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 
+			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
-			import { SSRPass } from './jsm/postprocessing/SSRPass.js';
+			import { SSAOPass } from './jsm/postprocessing/SSAOPass.js';
 
-			var camera, scene, renderer, composer;
-			var mesh;
-			var group
-
-			var ssrPass;
-
-			var params = {
-
-				enable: true
-
-			};
+			var container, stats;
+			var camera, scene, renderer;
+			var composer;
+			var group;
 
 			init();
-			// createGUI();
 			animate();
 
 			function init() {
 
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
 				renderer = new THREE.WebGLRenderer();
-				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
-				scene.fog = new THREE.Fog( 0x000000, 1, 1000 );
+				scene.background = new THREE.Color( 0xaaaaaa );
 
 				scene.add( new THREE.DirectionalLight() );
 				scene.add( new THREE.HemisphereLight() );
@@ -74,59 +76,71 @@
 
 				}
 
-				// postprocessing
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+				var width = window.innerWidth;
+				var height = window.innerHeight;
 
 				composer = new EffectComposer( renderer );
-				composer.addPass( new RenderPass( scene, camera ) );
 
-				ssrPass = new SSRPass();
-				composer.addPass( ssrPass );
+				var ssaoPass = new SSAOPass( scene, camera, width, height );
+				ssaoPass.kernelRadius = 16;
+				composer.addPass( ssaoPass );
+
+				// Init gui
+				var gui = new GUI();
+
+				gui.add( ssaoPass, 'output', {
+					'Default': SSAOPass.OUTPUT.Default,
+					'SSAO Only': SSAOPass.OUTPUT.SSAO,
+					'SSAO Only + Blur': SSAOPass.OUTPUT.Blur,
+					'Beauty': SSAOPass.OUTPUT.Beauty,
+					'Depth': SSAOPass.OUTPUT.Depth,
+					'Normal': SSAOPass.OUTPUT.Normal
+				} ).onChange( function ( value ) {
+
+					ssaoPass.output = parseInt( value );
+
+				} );
+				gui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
+				gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
+				gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
-
-				if ( typeof TESTING !== 'undefined' ) { for ( var i = 0; i < 45; i ++ ) { render(); }; };
-
-			}
-
-			function createGUI() {
-
-				var gui = new GUI( { name: 'Damp setting' } );
-				gui.add( ssrPass.uniforms[ "damp" ], 'value', 0, 1 ).step( 0.001 );
-				gui.add( params, 'enable' );
 
 			}
 
 			function onWindowResize() {
 
-				camera.aspect = window.innerWidth / window.innerHeight;
+				var width = window.innerWidth;
+				var height = window.innerHeight;
+
+				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				composer.setSize( window.innerWidth, window.innerHeight );
-
-			}
-
-			function render() {
-
-				group.rotation.x += 0.005;
-				group.rotation.y += 0.01;
-
-				if ( params.enable ) {
-
-					composer.render();
-
-				} else {
-
-					renderer.render( scene, camera );
-
-				}
+				renderer.setSize( width, height );
+				composer.setSize( width, height );
 
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
+
+				stats.begin();
 				render();
+				stats.end();
+
+			}
+
+			function render() {
+
+				var timer = performance.now();
+				group.rotation.x = timer * 0.0002;
+				group.rotation.y = timer * 0.0001;
+
+				composer.render();
 
 			}
 
