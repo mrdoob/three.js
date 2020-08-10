@@ -4,12 +4,12 @@ import {
 } from "../../../build/three.module.js";
 /**
  * References:
- * http://john-chapman-graphics.blogspot.com/2013/01/ssao-tutorial.html
- * https://learnopengl.com/Advanced-Lighting/SSAO
- * https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssao.frag.glsl
+ * http://john-chapman-graphics.blogspot.com/2013/01/ssr-tutorial.html
+ * https://learnopengl.com/Advanced-Lighting/SSR
+ * https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssr.frag.glsl
  */
 
-var SSAOShader = {
+var SSRShader = {
 
 	defines: {
 		"PERSPECTIVE_CAMERA": 1,
@@ -177,7 +177,7 @@ var SSAOShader = {
 
 };
 
-var SSAODepthShader = {
+var SSRDepthShader = {
 
 	defines: {
 		"PERSPECTIVE_CAMERA": 1
@@ -242,7 +242,7 @@ var SSAODepthShader = {
 
 };
 
-var SSAOBlurShader = {
+var SSRBlurShader = {
 
 	uniforms: {
 
@@ -296,4 +296,4 @@ var SSAOBlurShader = {
 
 };
 
-export { SSAOShader, SSAODepthShader, SSAOBlurShader };
+export { SSRShader, SSRDepthShader, SSRBlurShader };

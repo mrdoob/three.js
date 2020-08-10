@@ -24,7 +24,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-			import { SSAOPass } from './jsm/postprocessing/SSAOPass.js';
+			import { SSRPass } from './jsm/postprocessing/SSRPass.js';
 
 			var container, stats;
 			var camera, scene, renderer;
@@ -84,28 +84,28 @@
 
 				composer = new EffectComposer( renderer );
 
-				var ssaoPass = new SSAOPass( scene, camera, width, height );
-				ssaoPass.kernelRadius = 16;
-				composer.addPass( ssaoPass );
+				var ssrPass = new SSRPass( scene, camera, width, height );
+				ssrPass.kernelRadius = 16;
+				composer.addPass( ssrPass );
 
 				// Init gui
 				var gui = new GUI();
 
-				gui.add( ssaoPass, 'output', {
-					'Default': SSAOPass.OUTPUT.Default,
-					'SSAO Only': SSAOPass.OUTPUT.SSAO,
-					'SSAO Only + Blur': SSAOPass.OUTPUT.Blur,
-					'Beauty': SSAOPass.OUTPUT.Beauty,
-					'Depth': SSAOPass.OUTPUT.Depth,
-					'Normal': SSAOPass.OUTPUT.Normal
+				gui.add( ssrPass, 'output', {
+					'Default': SSRPass.OUTPUT.Default,
+					'SSR Only': SSRPass.OUTPUT.SSR,
+					'SSR Only + Blur': SSRPass.OUTPUT.Blur,
+					'Beauty': SSRPass.OUTPUT.Beauty,
+					'Depth': SSRPass.OUTPUT.Depth,
+					'Normal': SSRPass.OUTPUT.Normal
 				} ).onChange( function ( value ) {
 
-					ssaoPass.output = parseInt( value );
+					ssrPass.output = parseInt( value );
 
 				} );
-				gui.add( ssaoPass, 'kernelRadius' ).min( 0 ).max( 32 );
-				gui.add( ssaoPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
-				gui.add( ssaoPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
+				gui.add( ssrPass, 'kernelRadius' ).min( 0 ).max( 32 );
+				gui.add( ssrPass, 'minDistance' ).min( 0.001 ).max( 0.02 );
+				gui.add( ssrPass, 'maxDistance' ).min( 0.01 ).max( 0.3 );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -23,12 +23,12 @@ import {
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 import { SimplexNoise } from "../math/SimplexNoise.js";
-import { SSAOShader } from "../shaders/SSAOShader.js";
-import { SSAOBlurShader } from "../shaders/SSAOShader.js";
-import { SSAODepthShader } from "../shaders/SSAOShader.js";
+import { SSRShader } from "../shaders/SSRShader.js";
+import { SSRBlurShader } from "../shaders/SSRShader.js";
+import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var SSAOPass = function ( scene, camera, width, height ) {
+var SSRPass = function ( scene, camera, width, height ) {
 
 	Pass.call( this );
 
@@ -77,42 +77,42 @@ var SSAOPass = function ( scene, camera, width, height ) {
 		format: RGBAFormat
 	} );
 
-	// ssao render target
+	// ssr render target
 
-	this.ssaoRenderTarget = new WebGLRenderTarget( this.width, this.height, {
+	this.ssrRenderTarget = new WebGLRenderTarget( this.width, this.height, {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBAFormat
 	} );
 
-	this.blurRenderTarget = this.ssaoRenderTarget.clone();
+	this.blurRenderTarget = this.ssrRenderTarget.clone();
 
-	// ssao material
+	// ssr material
 
-	if ( SSAOShader === undefined ) {
+	if ( SSRShader === undefined ) {
 
-		console.error( 'THREE.SSAOPass: The pass relies on SSAOShader.' );
+		console.error( 'THREE.SSRPass: The pass relies on SSRShader.' );
 
 	}
 
-	this.ssaoMaterial = new ShaderMaterial( {
-		defines: Object.assign( {}, SSAOShader.defines ),
-		uniforms: UniformsUtils.clone( SSAOShader.uniforms ),
-		vertexShader: SSAOShader.vertexShader,
-		fragmentShader: SSAOShader.fragmentShader,
+	this.ssrMaterial = new ShaderMaterial( {
+		defines: Object.assign( {}, SSRShader.defines ),
+		uniforms: UniformsUtils.clone( SSRShader.uniforms ),
+		vertexShader: SSRShader.vertexShader,
+		fragmentShader: SSRShader.fragmentShader,
 		blending: NoBlending
 	} );
 
-	this.ssaoMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
-	this.ssaoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
-	this.ssaoMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
-	this.ssaoMaterial.uniforms[ 'tNoise' ].value = this.noiseTexture;
-	this.ssaoMaterial.uniforms[ 'kernel' ].value = this.kernel;
-	this.ssaoMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
-	this.ssaoMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
-	this.ssaoMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
-	this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-	this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+	this.ssrMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
+	this.ssrMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
+	this.ssrMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+	this.ssrMaterial.uniforms[ 'tNoise' ].value = this.noiseTexture;
+	this.ssrMaterial.uniforms[ 'kernel' ].value = this.kernel;
+	this.ssrMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+	this.ssrMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
+	this.ssrMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
+	this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
+	this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
 
 	// normal material
 
@@ -122,21 +122,21 @@ var SSAOPass = function ( scene, camera, width, height ) {
 	// blur material
 
 	this.blurMaterial = new ShaderMaterial( {
-		defines: Object.assign( {}, SSAOBlurShader.defines ),
-		uniforms: UniformsUtils.clone( SSAOBlurShader.uniforms ),
-		vertexShader: SSAOBlurShader.vertexShader,
-		fragmentShader: SSAOBlurShader.fragmentShader
+		defines: Object.assign( {}, SSRBlurShader.defines ),
+		uniforms: UniformsUtils.clone( SSRBlurShader.uniforms ),
+		vertexShader: SSRBlurShader.vertexShader,
+		fragmentShader: SSRBlurShader.fragmentShader
 	} );
-	this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
+	this.blurMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
 	this.blurMaterial.uniforms[ 'resolution' ].value.set( this.width, this.height );
 
 	// material for rendering the depth
 
 	this.depthRenderMaterial = new ShaderMaterial( {
-		defines: Object.assign( {}, SSAODepthShader.defines ),
-		uniforms: UniformsUtils.clone( SSAODepthShader.uniforms ),
-		vertexShader: SSAODepthShader.vertexShader,
-		fragmentShader: SSAODepthShader.fragmentShader,
+		defines: Object.assign( {}, SSRDepthShader.defines ),
+		uniforms: UniformsUtils.clone( SSRDepthShader.uniforms ),
+		vertexShader: SSRDepthShader.vertexShader,
+		fragmentShader: SSRDepthShader.fragmentShader,
 		blending: NoBlending
 	} );
 	this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
@@ -166,9 +166,9 @@ var SSAOPass = function ( scene, camera, width, height ) {
 
 };
 
-SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
+SSRPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
-	constructor: SSAOPass,
+	constructor: SSRPass,
 
 	dispose: function () {
 
@@ -176,7 +176,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.beautyRenderTarget.dispose();
 		this.normalRenderTarget.dispose();
-		this.ssaoRenderTarget.dispose();
+		this.ssrRenderTarget.dispose();
 		this.blurRenderTarget.dispose();
 
 		// dispose materials
@@ -204,12 +204,12 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		this.renderOverride( renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0 );
 
-		// render SSAO
+		// render SSR
 
-		this.ssaoMaterial.uniforms[ 'kernelRadius' ].value = this.kernelRadius;
-		this.ssaoMaterial.uniforms[ 'minDistance' ].value = this.minDistance;
-		this.ssaoMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
-		this.renderPass( renderer, this.ssaoMaterial, this.ssaoRenderTarget );
+		this.ssrMaterial.uniforms[ 'kernelRadius' ].value = this.kernelRadius;
+		this.ssrMaterial.uniforms[ 'minDistance' ].value = this.minDistance;
+		this.ssrMaterial.uniforms[ 'maxDistance' ].value = this.maxDistance;
+		this.renderPass( renderer, this.ssrMaterial, this.ssrRenderTarget );
 
 		// render blur
 
@@ -219,15 +219,15 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		switch ( this.output ) {
 
-			case SSAOPass.OUTPUT.SSAO:
+			case SSRPass.OUTPUT.SSR:
 
-				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssaoRenderTarget.texture;
+				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.ssrRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
 				this.renderPass( renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case SSAOPass.OUTPUT.Blur:
+			case SSRPass.OUTPUT.Blur:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.blurRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
@@ -235,7 +235,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 				break;
 
-			case SSAOPass.OUTPUT.Beauty:
+			case SSRPass.OUTPUT.Beauty:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
@@ -243,13 +243,13 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 				break;
 
-			case SSAOPass.OUTPUT.Depth:
+			case SSRPass.OUTPUT.Depth:
 
 				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
 
 				break;
 
-			case SSAOPass.OUTPUT.Normal:
+			case SSRPass.OUTPUT.Normal:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.normalRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
@@ -257,7 +257,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 				break;
 
-			case SSAOPass.OUTPUT.Default:
+			case SSRPass.OUTPUT.Default:
 
 				this.copyMaterial.uniforms[ 'tDiffuse' ].value = this.beautyRenderTarget.texture;
 				this.copyMaterial.blending = NoBlending;
@@ -270,7 +270,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 				break;
 
 			default:
-				console.warn( 'THREE.SSAOPass: Unknown output type.' );
+				console.warn( 'THREE.SSRPass: Unknown output type.' );
 
 		}
 
@@ -343,13 +343,13 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 		this.height = height;
 
 		this.beautyRenderTarget.setSize( width, height );
-		this.ssaoRenderTarget.setSize( width, height );
+		this.ssrRenderTarget.setSize( width, height );
 		this.normalRenderTarget.setSize( width, height );
 		this.blurRenderTarget.setSize( width, height );
 
-		this.ssaoMaterial.uniforms[ 'resolution' ].value.set( width, height );
-		this.ssaoMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
-		this.ssaoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+		this.ssrMaterial.uniforms[ 'resolution' ].value.set( width, height );
+		this.ssrMaterial.uniforms[ 'cameraProjectionMatrix' ].value.copy( this.camera.projectionMatrix );
+		this.ssrMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
 
 		this.blurMaterial.uniforms[ 'resolution' ].value.set( width, height );
 
@@ -385,7 +385,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 		if ( SimplexNoise === undefined ) {
 
-			console.error( 'THREE.SSAOPass: The pass relies on SimplexNoise.' );
+			console.error( 'THREE.SSRPass: The pass relies on SimplexNoise.' );
 
 		}
 
@@ -419,13 +419,13 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 
 } );
 
-SSAOPass.OUTPUT = {
+SSRPass.OUTPUT = {
 	'Default': 0,
-	'SSAO': 1,
+	'SSR': 1,
 	'Blur': 2,
 	'Beauty': 3,
 	'Depth': 4,
 	'Normal': 5
 };
 
-export { SSAOPass };
+export { SSRPass };
