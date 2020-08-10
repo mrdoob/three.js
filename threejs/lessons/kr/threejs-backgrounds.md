@@ -202,63 +202,32 @@ const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
 
 <div class="threejs_center"><img src="../resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg" style="width: 600px"></div>
 
-등장방형도법을 사용하려면 몇 가지를 추가해야 합니다. 별도의 `Scene`과
-`BoxBufferGeometry`를 만들고, 내장 쉐이더를 이용해 `ShaderMaterial`를
-만듭니다. 만든 요소들은 기존 장면을 렌더링하기 전 배경을 렌더링할 때
-사용할 겁니다.
+등장방형도법의 사용법은 별로 다르지 않습니다. 먼저 등장방형도법 이미지를 텍스처로 불러온 뒤, 콜백에서 불러온 이미지 텍스처를 `WebGLCubeRenderTarget.fromEquirectangularTexture`를 호출할 때 넘겨주면 큐브맵(정육면체를 펼친 모양의 텍스처)를 만들 수 있습니다. `WebGLCubeRenderTarget`을 생성할 때 큐브맵의 크기를 지정해주기만 하면 되죠. 예제의 경우 등장방형도법 이미지의 높이를 넘겨주면 될 겁니다.
 
 ```js
-const bgScene = new THREE.Scene();
-let bgMesh;
 {
-  const loader = new THREE.TextureLoader();
-  const texture = loader.load('resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg');
-  texture.magFilter = THREE.LinearFilter;
-  texture.minFilter = THREE.LinearFilter;
-
-  const shader = THREE.ShaderLib.equirect;
-  const material = new THREE.ShaderMaterial({
-    fragmentShader: shader.fragmentShader,
-    vertexShader: shader.vertexShader,
-    uniforms: shader.uniforms,
-    depthWrite: false,
-    side: THREE.BackSide,
-  });
-  material.uniforms.tEquirect.value = texture;
-  const plane = new THREE.BoxBufferGeometry(2, 2, 2);
-  bgMesh = new THREE.Mesh(plane, material);
-  bgScene.add(bgMesh);
+-  const loader = new THREE.CubeTextureLoader();
+-  const texture = loader.load([
+-    'resources/images/cubemaps/computer-history-museum/pos-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-x.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-y.jpg',
+-    'resources/images/cubemaps/computer-history-museum/pos-z.jpg',
+-    'resources/images/cubemaps/computer-history-museum/neg-z.jpg',
+-  ]);
+-  scene.background = texture;
++  const loader = new THREE.TextureLoader();
++  const texture = loader.load(
++    'resources/images/equirectangularmaps/tears_of_steel_bridge_2k.jpg',
++    () => {
++      const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
++      rt.fromEquirectangularTexture(renderer, texture);
++      scene.background = rt;
++    });
 }
 ```
 
-상자(BoxBufferGeometry)는 카메라의 `near`보다는 커야 하나, 동시에 `far`보다는
-작아야 합니다.
-
-또 상자의 안이 보여야 하니 `side: THREE.BackSide`로 설정하고, 깊이에 관한
-연산을 하지 않도록 `depthWrite: false`로 설정합니다.
-
-렌더링 시 배경 상자와 기존 카메라가 같은 위치에 있도록 설정하고, 배경용 장면을
-렌더링합니다.
-
-```js
-function render(time)
-
-    /* ... */
-
-+    bgMesh.position.copy(camera.position);
-+    renderer.render(bgScene, bgCamera);
-    renderer.render(scene, camera);
-```
-
-Three.js는 기본적으로 `renderer.render` 메서드를 호출 할 때마다 canvas를
-초기화합니다. 예제의 경우 `renderer.render`를 2번 호출하므로, 만약 설정을
-바꾸지 않으면 첫 결과물을 초기화할 테니 배경이 제대로 보이지 않겠죠. 설정을
-끄려면 `renderer.autoClearColor = false`를 설정하면 됩니다.
-
-```js
-const renderer = new THREE.WebGLRenderer({ canvas });
-+renderer.autoClearColor = false;
-```
+어렵지 않게 등장방형도법 텍스처를 구현했습니다.
 
 {{{example url="../threejs-background-equirectangularmap.html" }}}
 
