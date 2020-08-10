@@ -1,13 +1,14 @@
 import { WebGLRenderer } from './../WebGLRenderer';
 import { WebGLProgram } from './WebGLProgram';
 import { WebGLCapabilities } from './WebGLCapabilities';
+import { WebGLCubeMaps } from './WebGLCubeMaps';
 import { WebGLExtensions } from './WebGLExtensions';
 import { Material } from './../../materials/Material';
 import { Scene } from './../../scenes/Scene';
 
 export class WebGLPrograms {
 
-	constructor( renderer: WebGLRenderer, extensions: WebGLExtensions, capabilities: WebGLCapabilities );
+	constructor( renderer: WebGLRenderer, cubemaps: WebGLCubeMaps, extensions: WebGLExtensions, capabilities: WebGLCapabilities );
 
 	programs: WebGLProgram[];
 
