@@ -7,6 +7,6 @@ Mesh. Вот таблица, показывающая, какие функции
 
 <div>
 <div id="material-table" class="threejs_center"></div>
-<script type="module" src="../resources/threejs-material-table.js"></script>
-<link rel="stylesheet" href="../resources/threejs-material-table.css">
+<script type="module" src="resources/threejs-material-table.js"></script>
+<link rel="stylesheet" href="resources/threejs-material-table.css">
 </div>

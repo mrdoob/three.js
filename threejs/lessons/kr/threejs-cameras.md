@@ -581,4 +581,4 @@ function render(time) {
 대해 먼저 살펴보겠습니다.
 
 <canvas id="c"></canvas>
-<script type="module" src="../resources/threejs-cameras.js"></script>
+<script type="module" src="resources/threejs-cameras.js"></script>

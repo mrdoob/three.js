@@ -552,4 +552,4 @@ gui.add(light, 'power', 0, 2000);
 다음 장에서는 [카메라 조작법](threejs-cameras.html)에 대해 알아보겠습니다.
 
 <canvas id="c"></canvas>
-<script type="module" src="../resources/threejs-lights.js"></script>
+<script type="module" src="resources/threejs-lights.js"></script>

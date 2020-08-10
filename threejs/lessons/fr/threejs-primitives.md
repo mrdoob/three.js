@@ -406,5 +406,5 @@ ou votre [BufferGeometry](threejs-custom-buffergeometry.html).
 
 Voyons maintenant l'article traitant sur [comment fonctionne un graphe de scène three.js et comment l'utiliser](threejs-scenegraph.html).
 
-<link rel="stylesheet" href="../resources/threejs-primitives.css">
-<script type="module" src="../resources/threejs-primitives.js"></script>
+<link rel="stylesheet" href="resources/threejs-primitives.css">
+<script type="module" src="resources/threejs-primitives.js"></script>

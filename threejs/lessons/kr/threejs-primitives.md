@@ -366,6 +366,6 @@ const material = new THREE.PointsMaterial({
 다음 장에서는 [씬 그래프와 그 사용법](threejs-scenegraph.html)에 대해
 알아보겠습니다.
 
-<link rel="stylesheet" href="../resources/threejs-primitives.css">
-<script type="module" src="../resources/threejs-primitives.js"></script>
+<link rel="stylesheet" href="resources/threejs-primitives.css">
+<script type="module" src="resources/threejs-primitives.js"></script>
 

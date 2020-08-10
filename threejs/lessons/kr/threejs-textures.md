@@ -613,5 +613,5 @@ metalness
 roughness
 -->
 
-<link rel="stylesheet" href="../resources/threejs-textures.css">
-<script type="module" src="../resources/threejs-textures.js"></script>
+<link rel="stylesheet" href="resources/threejs-textures.css">
+<script type="module" src="resources/threejs-textures.js"></script>

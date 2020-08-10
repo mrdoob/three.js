@@ -329,5 +329,5 @@ function addLineGeometry(x, y, geometry) {
 
 Далее давайте рассмотрим [как работает граф сцены и как его использовать](threejs-scenegraph.html).
 
-<script type="module" src="../resources/threejs-primitives.js"></script>
-<link rel="stylesheet" href="../resources/threejs-primitives.css">
+<script type="module" src="resources/threejs-primitives.js"></script>
+<link rel="stylesheet" href="resources/threejs-primitives.css">

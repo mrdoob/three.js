@@ -318,5 +318,5 @@ flat shaded
 </div>
 
 <canvas id="c"></canvas>
-<script type="module" src="../resources/threejs-materials.js"></script>
+<script type="module" src="resources/threejs-materials.js"></script>
 

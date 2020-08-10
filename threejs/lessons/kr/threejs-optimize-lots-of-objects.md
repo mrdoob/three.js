@@ -464,4 +464,4 @@ geometry를 합치는 건 꽤 자주 사용하는 최적화 기법입니다. 예
 하지만 요소를 하나의 mesh로 합쳐버리면 별도의 요소였던 특정 부분을 조작하기가 어렵습니다. 상황에 따라 좋은 방법도 다 다를 테죠. [다음 글](threejs-optimize-lots-of-objects-animated.html)에서는 그 방법 중 하나를 살펴보겠습니다.
 
 <canvas id="c"></canvas>
-<script type="module" src="../resources/threejs-lots-of-objects.js"></script>
+<script type="module" src="resources/threejs-lots-of-objects.js"></script>

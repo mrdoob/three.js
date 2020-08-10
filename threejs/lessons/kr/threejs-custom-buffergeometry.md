@@ -446,4 +446,4 @@ positionAttribute.needsUpdate = true;
 데 도움이 되었으면 좋겠네요.
 
 <canvas id="c"></canvas>
-<script type="module" src="../resources/threejs-custom-buffergeometry.js"></script>
+<script type="module" src="resources/threejs-custom-buffergeometry.js"></script>

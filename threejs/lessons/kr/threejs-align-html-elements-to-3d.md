@@ -702,5 +702,5 @@ function updateLabels() {
 
 다음 글에서는 더 나아가 [지구본 위의 나라를 선택하고 강조](threejs-indexed-textures.html)해보겠습니다.
 
-<link rel="stylesheet" href="../resources/threejs-align-html-elements-to-3d.css">
-<script type="module" src="../resources/threejs-align-html-elements-to-3d.js"></script>
+<link rel="stylesheet" href="resources/threejs-align-html-elements-to-3d.css">
+<script type="module" src="resources/threejs-align-html-elements-to-3d.js"></script>

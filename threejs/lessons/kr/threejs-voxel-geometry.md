@@ -1085,4 +1085,4 @@ function updateCellGeometry(x, y, z) {
 이 글이 Three.js로 마인크래프트 같은 그래픽을 구현할 때 좋은 시작점을 마련하고, geometry를 최적화하는 데 도움이 되었으면 합니다.
 
 <canvas id="c"></canvas>
-<script type="module" src="../resources/threejs-voxel-geometry.js"></script>
+<script type="module" src="resources/threejs-voxel-geometry.js"></script>

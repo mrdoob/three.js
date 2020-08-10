@@ -573,4 +573,4 @@ gui.add(light, 'power', 0, 2000);
 Далее давайте перейдем к  [работе с камерами](threejs-cameras.html).
 
 <canvas id="c"></canvas>
-<script type="module" src="../resources/threejs-lights.js"></script>
+<script type="module" src="resources/threejs-lights.js"></script>

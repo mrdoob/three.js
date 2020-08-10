@@ -499,4 +499,4 @@ updateGUI();
 
 이 글에서는 쉐이더가 어떻게 작동하는지에 대해서는 아예 설명하지 않았습니다. 나중에 GLSL에 대해 더 다룰 기회가 있었으면 좋겠네요. 쉐이더의 작동 방식을 알고 싶다면 [후처리에 관한 글](threejs-post-processing.html)에 있는 링크 또는 [이 유튜브 영상](https://www.youtube.com/watch?v=rfQ8rKGTVlg#t=24m30s)을 참고하기 바랍니다.
 
-<script type="module" src="../resources/threejs-post-processing-3dlut.js"></script>
+<script type="module" src="resources/threejs-post-processing-3dlut.js"></script>

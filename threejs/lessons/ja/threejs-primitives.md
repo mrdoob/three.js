@@ -352,6 +352,6 @@ const material = new THREE.PointsMaterial({
 
 次は、[threeのシーングラフの動き方と使い方](threejs-scenegraph.html)を説明します。
 
-<link rel="stylesheet" href="../resources/threejs-primitives.css">
-<script type="module" src="../resources/threejs-primitives.js"></script>
+<link rel="stylesheet" href="resources/threejs-primitives.css">
+<script type="module" src="resources/threejs-primitives.js"></script>
 

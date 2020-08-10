@@ -319,4 +319,4 @@ Three.js는 기본적으로 처음 한 번만 재질의 설정을 적용합니�
 </div>
 
 <canvas id="c"></canvas>
-<script type="module" src="../resources/threejs-materials.js"></script>
+<script type="module" src="resources/threejs-materials.js"></script>
