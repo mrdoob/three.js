@@ -224,6 +224,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					var material = this._createMaterial( materials[ attributes.materialIndex ] );
 					var _object = this._createObject( obj, material );
+					_object.visible = data.layers[ attributes.layerIndex ].visible;
 
 					if ( attributes.isInstanceDefinitionObject ) {
 
@@ -952,7 +953,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		if ( curve instanceof rhino.NurbsCurve && curve.degree === 1 ) {
 
-		  	console.info( 'degree 1 curve' );
+		  	// console.info( 'degree 1 curve' );
 
 		}
 
