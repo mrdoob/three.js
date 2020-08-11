@@ -28,6 +28,7 @@ import { Pass } from "../postprocessing/Pass.js";
 import { SimplexNoise } from "../math/SimplexNoise.js";
 import { SSRShader } from "../shaders/SSRShader.js";
 import { SSRBlurShader } from "../shaders/SSRShader.js";
+import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
 var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, cameraFar) {
@@ -47,7 +48,7 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
   this.kernelSize = 32;
   this.kernel = [];
   this.noiseTexture = null;
-  this.output = 0;
+  this.output = 1;
 
   this.minDistance = 0.005;
   this.maxDistance = 0.1;
@@ -57,10 +58,19 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
   this.generateSampleKernel();
   this.generateRandomKernelRotations();
 
+  // beauty render target with depth buffer
+
+  var depthTexture = new DepthTexture();
+  depthTexture.type = UnsignedShortType;
+  depthTexture.minFilter = NearestFilter;
+  depthTexture.maxFilter = NearestFilter;
+
   this.beautyRenderTarget = new WebGLRenderTarget(this.width, this.height, {
     minFilter: LinearFilter,
     magFilter: LinearFilter,
     format: RGBAFormat,
+    depthTexture: depthTexture,
+    depthBuffer: true
   });
 
   // normal render target
@@ -71,13 +81,7 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
     format: RGBAFormat
   });
 
-  // depth render target
 
-  this.depthRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-    minFilter: NearestFilter,
-    magFilter: NearestFilter,
-    format: RGBAFormat
-  });
 
   // ssr render target
 
@@ -107,7 +111,7 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
 
   this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
   this.ssrMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
-  this.ssrMaterial.uniforms['tDepth'].value = this.depthRenderTarget.texture;
+  this.ssrMaterial.uniforms['tDepth'].value = this.beautyRenderTarget.depthTexture;
   this.ssrMaterial.uniforms['tNoise'].value = this.noiseTexture;
   this.ssrMaterial.uniforms['kernel'].value = this.kernel;
   this.ssrMaterial.uniforms['cameraNear'].value = this.camera.near;
@@ -115,19 +119,13 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
   this.ssrMaterial.uniforms['resolution'].value.set(this.width, this.height);
   this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
   this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
-  this.ssrMaterial.uniforms['cameraNear2'].value = cameraNear
-  this.ssrMaterial.uniforms['cameraRange'].value = cameraFar - cameraNear
-  this.ssrMaterial.uniforms['UVWR'].value = cameraRadius * 2
 
   // normal material
 
   this.normalMaterial = new MeshNormalMaterial();
   this.normalMaterial.blending = NoBlending;
 
-  // depth material
 
-  this.depthMaterial = new MeshDepthMaterial();
-  this.depthMaterial.blending = NoBlending;
 
   // blur material
 
@@ -139,6 +137,18 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
   });
   this.blurMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
   this.blurMaterial.uniforms['resolution'].value.set(this.width, this.height);
+  // material for rendering the depth
+
+  this.depthRenderMaterial = new ShaderMaterial({
+    defines: Object.assign({}, SSRDepthShader.defines),
+    uniforms: UniformsUtils.clone(SSRDepthShader.uniforms),
+    vertexShader: SSRDepthShader.vertexShader,
+    fragmentShader: SSRDepthShader.fragmentShader,
+    blending: NoBlending
+  });
+  this.depthRenderMaterial.uniforms['tDepth'].value = this.beautyRenderTarget.depthTexture;
+  this.depthRenderMaterial.uniforms['cameraNear'].value = this.camera.near;
+  this.depthRenderMaterial.uniforms['cameraFar'].value = this.camera.far;
 
   // material for rendering the content of a render target
 
@@ -173,16 +183,15 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     this.beautyRenderTarget.dispose();
     this.normalRenderTarget.dispose();
-    this.depthRenderTarget.dispose();
     this.ssrRenderTarget.dispose();
     this.blurRenderTarget.dispose();
 
     // dispose materials
 
     this.normalMaterial.dispose();
-    this.depthMaterial.dispose();
     this.blurMaterial.dispose();
     this.copyMaterial.dispose();
+    this.depthRenderMaterial.dispose();
 
     // dipsose full screen quad
 
@@ -201,10 +210,6 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     // render normals
 
     this.renderOverride(renderer, this.normalMaterial, this.normalRenderTarget, 0, 0);
-
-    // render depths
-
-    this.renderOverride(renderer, this.depthMaterial, this.depthRenderTarget, 0, 0);
 
     // render SSR
 
@@ -247,9 +252,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
       case SSRPass.OUTPUT.Depth:
 
-        this.copyMaterial.uniforms['tDiffuse'].value = this.depthRenderTarget.texture;
-        this.copyMaterial.blending = NoBlending;
-        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+        this.renderPass(renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer);
 
         break;
 
@@ -282,8 +285,6 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 
   renderPass: function(renderer, passMaterial, renderTarget, clearColor, clearAlpha) {
-    // clearColor = 'black'
-    // clearAlpha = 1
 
     // save original state
     this.originalClearColor.copy(renderer.getClearColor());
@@ -313,8 +314,6 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 
   renderOverride: function(renderer, overrideMaterial, renderTarget, clearColor, clearAlpha) {
-    // clearColor = 'black'
-    // clearAlpha = 1
 
     this.originalClearColor.copy(renderer.getClearColor());
     var originalClearAlpha = renderer.getClearAlpha();

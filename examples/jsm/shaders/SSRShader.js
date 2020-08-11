@@ -12,7 +12,7 @@ import {
 var SSRShader = {
 
   defines: {
-    "PERSPECTIVE_CAMERA": 1,
+    "PERSPECTIVE_CAMERA": 0,
     "KERNEL_SIZE": 32
   },
 
@@ -63,53 +63,52 @@ var SSRShader = {
 		uniform float cameraNear2;
 		uniform float UVWR; //uv unit to world unit ratio
 		uniform vec2 resolution;
-		float depthToDistance(float depth){
-			return (1.-depth)*cameraRange+cameraNear2;
+		uniform float cameraNear;
+		uniform float cameraFar;
+		uniform mat4 cameraProjectionMatrix;
+		uniform mat4 cameraInverseProjectionMatrix;
+		#include <packing>
+		float getDepth( const in vec2 screenPosition ) {
+			return texture2D( tDepth, screenPosition ).x;
 		}
-		vec3 getPos(vec2 uv,float depth){
-			vec3 pos;
-			vec3 viewDir=vec3(0,0,-1);
-			float distance=depthToDistance(depth)/UVWR;
-			vec3 viewRay=viewDir*distance;
-			pos=vec3(uv,0)+viewRay;
-			return pos;
+		float getLinearDepth( const in vec2 screenPosition ) {
+			#if PERSPECTIVE_CAMERA == 1
+				float fragCoordZ = texture2D( tDepth, screenPosition ).x;
+				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
+				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
+			#else
+				return texture2D( tDepth, screenPosition ).x;
+			#endif
 		}
-		vec3 getPos(vec2 uv){
-			float depth=texture2D(tDepth,uv).r;
-			return getPos(uv,depth);
+		float getViewZ( const in float depth ) {
+			#if PERSPECTIVE_CAMERA == 1
+				return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
+			#else
+				return orthographicDepthToViewZ( depth, cameraNear, cameraFar );
+			#endif
+		}
+		vec3 getViewPosition( const in vec2 screenPosition, const in float depth, const in float viewZ ) {
+			float clipW = cameraProjectionMatrix[2][3] * viewZ + cameraProjectionMatrix[3][3];
+			vec4 clipPosition = vec4( ( vec3( screenPosition, depth ) - 0.5 ) * 2.0, 1.0 );
+			clipPosition *= clipW; // unprojection.
+			return ( cameraInverseProjectionMatrix * clipPosition ).xyz;
+		}
+		vec3 getViewNormal( const in vec2 screenPosition ) {
+			return unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );
 		}
 		void main(){
-			//use uv unit/coordinate primarily
-			vec2 uv=vUv;
+			float depth = getDepth( vUv );
+			float viewZ = getViewZ( depth );
+			vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
+			vec3 viewNormal = getViewNormal( vUv );
 
-			// gl_FragColor=texture2D(tDepth,uv);
-			// gl_FragColor=texture2D(tNormal,uv);
-			// gl_FragColor=texture2D(tDiffuse,uv);
-			// gl_FragColor=texture2D(tNormal,uv)*2.-1.;
-			// gl_FragColor.x=abs(gl_FragColor.x);
-			// gl_FragColor=vec4(depthToDistance(texture2D(tDepth,uv).r)/UVWR);
-			// gl_FragColor.a=1.;
-			// return;
-
-			// vec4 color=texture2D(tDiffuse,uv);
-			// vec4 reflectDiffuse;
-			// gl_FragColor=color;
-
-			float depth=texture2D(tDepth,uv).r;
-			if(depth<=0.) return;
+			// if(depth<=0.) return;
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
-			vec3 pos=getPos(uv,depth);
-			// gl_FragColor.xyz=abs(pos);
-			// gl_FragColor.a=1.;
-			// return;
+			vec3 pos=viewPosition;
 
-			vec3 normal=texture2D(tNormal,uv).xyz*2.-1.;//screen rigth always red
+			vec3 normal=viewNormal;
 			vec3 reflectDir=reflect(vec3(0,0,-1),normal);
-			// float reflectDirLen=length(reflectDir);
-			// if(reflectDirLen<=0.) return;
-			// reflectDir.x=abs(reflectDir.x);
-			// reflectDir=normalize(vec3(-1,-1,0));
 			d1=d0+(reflectDir*MAX_DISTuv).xy*vec2(resolution.x,resolution.y);
 			float totalLen=length(d1-d0);
 			float xLen=d1.x-d0.x;
@@ -125,27 +124,19 @@ var SSRShader = {
 				if(y<0.||y>resolution.y) break;
 				float u=x/resolution.x;
 				float v=y/resolution.y;
-				vec3 p=getPos(vec2(u,v));
+				vec2 uv=vec2(u,v);
+
+				float d = getDepth(uv);
+				float vZ = getViewZ( d );
+				vec3 p=getViewPosition( uv, d, vZ );
 				vec3 rayPos=pos+(length(vec2(x,y)-d0)/totalLen)*(reflectDir*MAX_DISTuv);
 				float away=length(rayPos-p);
 				if(away<SURF_DISTuv){
-					// float d=texture2D(tDepth,vec2(u,v)).r;
-					// if(d<=0.) continue;
-					vec3 n=texture2D(tNormal,vec2(u,v)).xyz*2.-1.;
-					// gl_FragColor=vec4(dot(reflectDir,n));
-					// gl_FragColor.a=1.;
-					// break;
+					vec3 n=getViewNormal( uv );
 					if(dot(reflectDir,n)>=0.) continue;
-					// gl_FragColor=vec4(away*100.,0,0,1);
-					// break;
-					// gl_FragColor=vec4(u,v,0,1);
-					// break;
-					vec4 reflect=texture2D(tDiffuse,vec2(u,v));
-					// gl_FragColor=color;
+					vec4 reflect=texture2D(tDiffuse,uv);
 					gl_FragColor=reflect;
 					gl_FragColor.a=.5;
-					// gl_FragColor=mix(color,reflect,.5);
-					// gl_FragColor=vec4(u,v,0,1);
 					break;
 				}
 			}
@@ -157,7 +148,7 @@ var SSRShader = {
 var SSRDepthShader = {
 
   defines: {
-    "PERSPECTIVE_CAMERA": 1
+    "PERSPECTIVE_CAMERA": 0
   },
 
   uniforms: {
@@ -202,7 +193,7 @@ var SSRDepthShader = {
 
     "	#else",
 
-    "		return texture2D( depthSampler, coord ).x;",
+    "		return texture2D( tDepth, screenPosition ).x;",
 
     "	#endif",
 
