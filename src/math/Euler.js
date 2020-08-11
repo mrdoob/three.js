@@ -14,12 +14,6 @@ class Euler {
 
 	}
 
-	static get RotationOrders() {
-
-		return [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
-
-	}
-
 	get x() {
 
 		return this._x;
@@ -331,6 +325,7 @@ class Euler {
 }
 
 Euler.DefaultOrder = 'XYZ';
+Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
 const _matrix = new Matrix4();
 const _quaternion = new Quaternion();
