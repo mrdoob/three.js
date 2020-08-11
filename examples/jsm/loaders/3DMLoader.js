@@ -15,7 +15,8 @@ import {
 	Points,
 	PointsMaterial,
 	Line,
-	LineBasicMaterial
+	LineBasicMaterial,
+	Matrix4
 } from "../../../build/three.module.js";
 import { CSS2DObject } from '../renderers/CSS2DRenderer.js'
 
@@ -191,6 +192,10 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		// console.log(data);
 
 		var object = new Object3D();
+		var instanceDefinitionObjects = [];
+		var instanceDefinitions = [];
+		var instanceReferences = [];
+
 		object.userData[ 'layers' ] = data.layers;
 		object.userData[ 'groups' ] = data.groups;
 
@@ -202,44 +207,94 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var obj = objects[ i ];
 			var attributes = obj.attributes;
 
-			if ( obj.objectType !== 'InstanceDefinition' &&
-				obj.objectType !== 'InstanceReference' ) {
+			switch ( obj.objectType ) {
 
-				var material = this._createMaterial( materials[ attributes.materialIndex ] );
-				var _object = this._createObject( obj, material );
-				object.add( _object );
+				case 'InstanceDefinition':
 
-			}
+					instanceDefinitions.push( obj );
 
-			/*
-			if( obj.objectType === 'InstanceDefinition' ) {
+					break;
 
-				var instanceDefinitionObject = new Object3D();
-				var instanceReferences = [];
+				case 'InstanceReference':
 
-				for( var j = 0; j < obj.geometry.length; j++ ) {
-					var _obj = obj.geometry[ j ];
-					var _attributes = _obj.attributes;
-					
-					var material = this._createMaterial( materials[_attributes.materialIndex] );
-					var _object = this._createObject( _obj, material );
+					instanceReferences.push( obj );
 
-					instanceDefinitionObject.add(_object);
+					break;
 
-				}
+				default:
 
-				for( var j = 0; j < objects.length; j++ ) {
-					if( objects[j].objectType === 'InstanceReference' &&
-						objects[j].geometry.parentIdefId === attributes.id ) {
-							instanceReferences.push( objects[j] );
-							//create reference
+					var material = this._createMaterial( materials[ attributes.materialIndex ] );
+					var _object = this._createObject( obj, material );
+
+					if ( attributes.isInstanceDefinitionObject ) {
+
+						instanceDefinitionObjects.push( _object );
+
+					} else {
+
+						object.add( _object );
+
 					}
-				}
 
-				console.log(instanceReferences);
+					break;
 
 			}
-			*/
+
+		}
+
+		for ( var i = 0; i < instanceDefinitions.length; i ++ ) {
+
+			var iDef = instanceDefinitions[ i ];
+
+			var objects = [];
+
+			for ( var j = 0; j < iDef.attributes.objectIds.length; j ++ ) {
+
+				var objId = iDef.attributes.objectIds[ j ];
+
+				for ( var p = 0; p < instanceDefinitionObjects.length; p ++ ) {
+
+					var idoId = instanceDefinitionObjects[ p ].userData.attributes.id;
+
+					if ( objId === idoId ) {
+
+						objects.push( instanceDefinitionObjects[ p ] );
+
+					}
+
+				}
+
+			}
+
+			console.log(instanceReferences);
+
+			for ( var j = 0; j < instanceReferences.length; j ++ ) {
+
+				var iRef = instanceReferences[ j ];
+
+				if ( iRef.geometry.parentIdefId === iDef.attributes.id ) {
+
+					//console.log(iRef);
+					var iRefObject = new Object3D();
+					var xf = iRef.geometry.xform.array;
+
+					var matrix = new Matrix4();
+          			matrix.set(xf[0], xf[1], xf[2], xf[3], xf[4], xf[5], xf[6], xf[7],
+					xf[8], xf[9], xf[10], xf[11], xf[12], xf[13], xf[14], xf[15]);
+					
+					iRefObject.applyMatrix4( matrix );
+
+					for( var p = 0; p < objects.length; p ++ ) {
+
+						iRefObject.add( objects[ p ].clone( true ) );
+
+					}
+
+					object.add( iRefObject );
+
+				}
+
+			}
 
 		}
 		
@@ -536,18 +591,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			var _object = doc.objects().get( i );
 
-			// skip instance definition objects
-			if ( _object.attributes().isInstanceDefinitionObject ) { 
+			var object = extractObjectData( _object, doc );
 
-				continue;
-				
-			} else {
-
-				var object = extractObjectData( _object, doc );
-
-				if( object !== undefined ){
-					objects.push( object );
-				}
+			if ( object !== undefined ){
+				objects.push( object );
 			}
 
 			_object.delete();
@@ -560,20 +607,9 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			var idef = doc.instanceDefinitions().get( i );
 			var idefAttributes = extractProperties( idef );
-			
-			var ids = idef.getObjectIds();
-			var idefObjects = [];
+			idefAttributes.objectIds = idef.getObjectIds();
 
-			// extract object data from each of these
-			for ( var j = 0; j < ids.length; j ++ ) {
-
-				var _object = doc.objects().findId( ids[ j ] );
-				var object = extractObjectData( _object, doc );
-				idefObjects.push( object );
-
-			}
-
-			objects.push( { geometry: idefObjects, attributes: idefAttributes, objectType: 'InstanceDefinition' } );
+			objects.push( { geometry: null, attributes: idefAttributes, objectType: 'InstanceDefinition' } );
 
 		}
 
@@ -943,7 +979,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			  var theta = ( tan.x * prevTan.x + tan.y * prevTan.y + tan.z * prevTan.z ) / denominator;
 			  angle = Math.acos( Math.max( - 1, Math.min( 1, theta ) ) );
-			  
+
 		  }
 
 		  if ( angle < 0.1 ) { continue; }
