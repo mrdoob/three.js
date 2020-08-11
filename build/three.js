@@ -2810,7 +2810,7 @@
 
 			}
 
-			var x = euler._x, y = euler._y, z = euler._z, order = euler.order;
+			var x = euler._x, y = euler._y, z = euler._z, order = euler._order;
 
 			// http://www.mathworks.com/matlabcentral/fileexchange/
 			// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
@@ -16386,10 +16386,6 @@
 
 	}
 
-	/**
-	 * @author mrdoob / http://mrdoob.com/
-	 */
-
 	function WebGLCubeMaps( renderer ) {
 
 		var cubemaps = new WeakMap();
@@ -16427,13 +16423,19 @@
 
 						var image = texture.image;
 
-						if ( image.height > 0 ) {
+						if ( image && image.height > 0 ) {
 
 							var renderTarget = new WebGLCubeRenderTarget( image.height / 2 );
 							renderTarget.fromEquirectangularTexture( renderer, texture );
 							cubemaps.set( texture, renderTarget );
 
 							return mapTextureMapping( renderTarget.texture, texture.mapping );
+
+						} else {
+
+							// image not yet ready. try the conversion next frame
+
+							return null;
 
 						}
 

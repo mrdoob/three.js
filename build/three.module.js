@@ -2791,7 +2791,7 @@ Object.assign( Quaternion.prototype, {
 
 		}
 
-		const x = euler._x, y = euler._y, z = euler._z, order = euler.order;
+		const x = euler._x, y = euler._y, z = euler._z, order = euler._order;
 
 		// http://www.mathworks.com/matlabcentral/fileexchange/
 		// 	20696-function-to-convert-between-dcm-euler-angles-quaternions-and-euler-vectors/
@@ -16407,10 +16407,6 @@ function WebGLClipping() {
 
 }
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function WebGLCubeMaps( renderer ) {
 
 	let cubemaps = new WeakMap();
@@ -16448,13 +16444,19 @@ function WebGLCubeMaps( renderer ) {
 
 					const image = texture.image;
 
-					if ( image.height > 0 ) {
+					if ( image && image.height > 0 ) {
 
 						const renderTarget = new WebGLCubeRenderTarget( image.height / 2 );
 						renderTarget.fromEquirectangularTexture( renderer, texture );
 						cubemaps.set( texture, renderTarget );
 
 						return mapTextureMapping( renderTarget.texture, texture.mapping );
+
+					} else {
+
+						// image not yet ready. try the conversion next frame
+
+						return null;
 
 					}
 
