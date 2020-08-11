@@ -63,6 +63,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 
 		loader.load( url, ( buffer ) => {
 
