@@ -74,7 +74,8 @@
 				let geo = new THREE.BoxBufferGeometry(1, 1, 1)
 				// let geo = new THREE.IcosahedronBufferGeometry(.5, 3)
 				let mtl = new THREE.MeshBasicMaterial({
-					color: 'red'
+					color: 'red',
+					side: THREE.DoubleSide,
 				})
 				let mesh = new THREE.Mesh(geo, mtl)
 				s.mesh = mesh
@@ -95,7 +96,8 @@
 			{//ground
 				let geo = new THREE.PlaneBufferGeometry(4, 4)
 				let mtl = new THREE.MeshBasicMaterial({
-					color: 'blue'
+					color: 'blue',
+					side: THREE.DoubleSide,
 				})
 				let mesh = new THREE.Mesh(geo, mtl)
 				s.ground = mesh

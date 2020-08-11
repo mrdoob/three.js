@@ -1,7 +1,8 @@
 import {
   AddEquation,
   Color,
-  CustomBlending,
+	CustomBlending,
+	AdditiveBlending,
   DataTexture,
   DepthTexture,
   DstAlphaFactor,
@@ -288,7 +289,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
         // this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
         this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
-        // this.copyMaterial.blending = CustomBlending;
+        this.copyMaterial.blending = AdditiveBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
         break;
@@ -301,8 +302,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 
   renderPass: function(renderer, passMaterial, renderTarget, clearColor, clearAlpha) {
-    clearColor = 'black'
-    clearAlpha = 1
+    // clearColor = 'black'
+    // clearAlpha = 1
 
     // save original state
     this.originalClearColor.copy(renderer.getClearColor());
@@ -332,8 +333,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 
   renderOverride: function(renderer, overrideMaterial, renderTarget, clearColor, clearAlpha) {
-    clearColor = 'black'
-    clearAlpha = 1
+    // clearColor = 'black'
+    // clearAlpha = 1
 
     this.originalClearColor.copy(renderer.getClearColor());
     var originalClearAlpha = renderer.getClearAlpha();
