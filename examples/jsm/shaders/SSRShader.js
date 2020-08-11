@@ -105,6 +105,8 @@ var SSRShader = {
 
 			vec3 normal=texture2D(tNormal,uv).xyz*2.-1.;//screen rigth always red
 			vec3 reflectDir=reflect(vec3(0,0,-1),normal);
+			// float reflectDirLen=length(reflectDir);
+			// if(reflectDirLen<=0.) return;
 			// reflectDir.x=abs(reflectDir.x);
 			// reflectDir=normalize(vec3(-1,-1,0));
 			d1=d0+(reflectDir*MAX_DISTuv).xy*vec2(${innerWidth}.,${innerHeight}.);
@@ -114,7 +116,7 @@ var SSRShader = {
 			float totalStep=max(abs(xLen),abs(yLen));
 			float xSpan=xLen/totalStep;
 			float ySpan=yLen/totalStep;
-			for(float i=20.;i<MAX_STEP;i++){
+			for(float i=0.;i<MAX_STEP;i++){
 				if(i>=totalStep) break;
 				float x=d0.x+i*xSpan;
 				float y=d0.y+i*ySpan;
@@ -124,7 +126,19 @@ var SSRShader = {
 				float v=y/${innerHeight}.;
 				vec3 p=getPos(vec2(u,v));
 				vec3 rayPos=pos+(length(vec2(x,y)-d0)/totalLen)*(reflectDir*MAX_DISTuv);
-				if(length(rayPos-p)<SURF_DISTuv){
+				float away=length(rayPos-p);
+				if(away<SURF_DISTuv){
+					// float d=texture2D(tDepth,vec2(u,v)).r;
+					// if(d<=0.) continue;
+					vec3 n=texture2D(tNormal,vec2(u,v)).xyz*2.-1.;
+					// gl_FragColor=vec4(dot(reflectDir,n));
+					// gl_FragColor.a=1.;
+					// break;
+					if(dot(reflectDir,n)>=0.) continue;
+					// gl_FragColor=vec4(away*100.,0,0,1);
+					// break;
+					// gl_FragColor=vec4(u,v,0,1);
+					// break;
 					vec4 reflect=texture2D(tDiffuse,vec2(u,v));
 					// gl_FragColor=color;
 					gl_FragColor=reflect;
@@ -237,20 +251,20 @@ var SSRBlurShader = {
     "void main() {",
 
     "	vec2 texelSize = ( 1.0 / resolution );",
-    "	float result = 0.0;",
+    "	vec3 result = vec3(0);",
 
     "	for ( int i = - 2; i <= 2; i ++ ) {",
 
     "		for ( int j = - 2; j <= 2; j ++ ) {",
 
     "			vec2 offset = ( vec2( float( i ), float( j ) ) ) * texelSize;",
-    "			result += texture2D( tDiffuse, vUv + offset ).r;",
+    "			result += texture2D( tDiffuse, vUv + offset ).xyz;",
 
     "		}",
 
     "	}",
 
-    "	gl_FragColor = vec4( vec3( result / ( 5.0 * 5.0 ) ), 1.0 );",
+    "	gl_FragColor = vec4(  result / ( 5.0 * 5.0 ) , 1.0 );",
 
     "}"
 

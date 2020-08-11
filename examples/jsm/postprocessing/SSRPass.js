@@ -224,7 +224,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render normals
 
-    this.renderOverride(renderer, this.normalMaterial, this.normalRenderTarget, 0x7777ff, 1.0);
+    this.renderOverride(renderer, this.normalMaterial, this.normalRenderTarget, 0, 0);
 
     // render depths
 
