@@ -48,9 +48,9 @@
 				directionalLight.intensity = 2;
 				scene.add( directionalLight );
 
-				var loader = new Rhino3dmLoader( );
+				var loader = new Rhino3dmLoader();
 				loader.setLibraryPath( 'jsm/libs/rhino3dm/' );
-				
+
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
 					console.log( object );
@@ -58,11 +58,11 @@
 					initGUI( object.userData.layers );
 
                 } );
-				
+
 				var width = window.innerWidth;
 				var height = window.innerHeight;
-                
-				renderer = new THREE.WebGLRenderer();
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );

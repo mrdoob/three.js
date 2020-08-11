@@ -76,6 +76,7 @@ var files = {
 		"webgl_lines_fat",
 		"webgl_lines_fat_wireframe",
 		"webgl_lines_sphere",
+		"webgl_loader_3dm",
 		"webgl_loader_3ds",
 		"webgl_loader_3mf",
 		"webgl_loader_3mf_materials",
