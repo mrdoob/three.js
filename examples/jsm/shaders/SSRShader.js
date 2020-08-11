@@ -30,10 +30,10 @@ var SSRShader = {
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
     "kernelRadius": { value: 8 },
     "minDistance": { value: 0.005 },
-		"maxDistance": { value: 0.05 },
-		"cameraNear2": { value: 0 },
-		"cameraRange": { value: 0 },
-		"UVWR": { value: 0 },
+    "maxDistance": { value: 0.05 },
+    "cameraNear2": { value: 0 },
+    "cameraRange": { value: 0 },
+    "UVWR": { value: 0 },
 
   },
 
@@ -128,6 +128,7 @@ var SSRShader = {
 					vec4 reflect=texture2D(tDiffuse,vec2(u,v));
 					// gl_FragColor=color;
 					gl_FragColor=reflect;
+					gl_FragColor.a=.5;
 					// gl_FragColor=mix(color,reflect,.5);
 					// gl_FragColor=vec4(u,v,0,1);
 					break;
