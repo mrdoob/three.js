@@ -56,12 +56,12 @@
 
 			if (1) {
 
-				s.cameraNear = 1
-				s.cameraFar = 11
-				s.cameraZ = 6
+				s.cameraNear = 0.1
+				s.cameraFar = 10
+				s.cameraZ = 5
 				s.cameraRadius = 2
-				// s.camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, s.cameraNear, s.cameraFar)
-				camera = new THREE.OrthographicCamera(-s.cameraRadius, s.cameraRadius, s.cameraRadius, -s.cameraRadius, s.cameraNear, s.cameraFar)
+				camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, s.cameraNear, s.cameraFar)
+				// camera = new THREE.OrthographicCamera(-s.cameraRadius, s.cameraRadius, s.cameraRadius, -s.cameraRadius, s.cameraNear, s.cameraFar)
 				s.camera = camera
 				s.camera.position.z = s.cameraZ
 
@@ -70,6 +70,7 @@
 				// scene.background = new THREE.Color(0xaaaaaa);
 				{//mesh
 					let geo = new THREE.BoxBufferGeometry(1, 1, 1)
+					// let geo = new THREE.PlaneBufferGeometry(2, 2)
 					// let geo = new THREE.IcosahedronBufferGeometry(.5, 3)
 					let mtl = new THREE.MeshBasicMaterial({
 						color: 'red',
@@ -92,7 +93,7 @@
 				//   mesh.position.x = 2
 				// }
 				{//ground
-					let geo = new THREE.PlaneBufferGeometry(4, 4)
+					let geo = new THREE.PlaneBufferGeometry(10, 10)
 					let mtl = new THREE.MeshBasicMaterial({
 						color: 'blue',
 						side: THREE.DoubleSide,

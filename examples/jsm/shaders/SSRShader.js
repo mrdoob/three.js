@@ -12,7 +12,7 @@ import {
 var SSRShader = {
 
   defines: {
-    "PERSPECTIVE_CAMERA": 0,
+    "PERSPECTIVE_CAMERA": 1,
     "KERNEL_SIZE": 32
   },
 
@@ -52,9 +52,9 @@ var SSRShader = {
   ].join("\n"),
 
   fragmentShader: `
-		#define MAX_DISTuv 1. //uv unit
+		#define MAX_DIST 10.
 		#define MAX_STEP ${innerWidth * Math.sqrt(2)}
-		#define SURF_DISTuv .01
+		#define SURF_DIST .05
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
@@ -100,16 +100,18 @@ var SSRShader = {
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
 			vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
-			vec3 viewNormal = getViewNormal( vUv );
+			viewPosition=vec3(viewPosition.xy,viewZ);
 
 			// if(depth<=0.) return;
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
-			vec3 pos=viewPosition;
 
-			vec3 normal=viewNormal;
-			vec3 reflectDir=reflect(vec3(0,0,-1),normal);
-			d1=d0+(reflectDir*MAX_DISTuv).xy*vec2(resolution.x,resolution.y);
+			vec3 viewNormal=getViewNormal( vUv );;
+			vec3 reflectDir=reflect(vec3(0,0,-1),viewNormal);
+
+			vec3 d1pos=viewPosition+reflectDir*MAX_DIST;
+			d1=d0+(reflectDir*MAX_DIST).xy*vec2(resolution.x,resolution.y);///todo
+
 			float totalLen=length(d1-d0);
 			float xLen=d1.x-d0.x;
 			float yLen=d1.y-d0.y;
@@ -128,12 +130,13 @@ var SSRShader = {
 
 				float d = getDepth(uv);
 				float vZ = getViewZ( d );
-				vec3 p=getViewPosition( uv, d, vZ );
-				vec3 rayPos=pos+(length(vec2(x,y)-d0)/totalLen)*(reflectDir*MAX_DISTuv);
-				float away=length(rayPos-p);
-				if(away<SURF_DISTuv){
-					vec3 n=getViewNormal( uv );
-					if(dot(reflectDir,n)>=0.) continue;
+				vec3 vP=getViewPosition( uv, d, vZ );
+				vP=vec3(vP.xy,vZ);
+				vec3 rayPos=viewPosition+(length(vec2(x,y)-d0)/totalLen)*(reflectDir*MAX_DIST);
+				float away=length(rayPos-vP);
+				if(away<SURF_DIST){
+					vec3 vN=getViewNormal( uv );
+					if(dot(reflectDir,vN)>=0.) continue;
 					vec4 reflect=texture2D(tDiffuse,uv);
 					gl_FragColor=reflect;
 					gl_FragColor.a=.5;
