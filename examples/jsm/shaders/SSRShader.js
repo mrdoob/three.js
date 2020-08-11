@@ -30,7 +30,10 @@ var SSRShader = {
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
     "kernelRadius": { value: 8 },
     "minDistance": { value: 0.005 },
-    "maxDistance": { value: 0.05 },
+		"maxDistance": { value: 0.05 },
+		"cameraNear2": { value: 0 },
+		"cameraRange": { value: 0 },
+		"UVWR": { value: 0 },
 
   },
 
@@ -52,13 +55,15 @@ var SSRShader = {
 		#define MAX_DISTuv 1. //uv unit
 		#define MAX_STEP ${innerWidth * Math.sqrt(2)}
 		#define SURF_DISTuv .01
-		#define UVWR 4.//uv unit to world unit ratio
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
 		uniform sampler2D tDiffuse;
+		uniform float cameraRange;
+		uniform float cameraNear2;
+		uniform float UVWR; //uv unit to world unit ratio
 		float depthToDistance(float depth){
-			return (1.-depth)*${10}.+${1}.;
+			return (1.-depth)*cameraRange+cameraNear2;
 		}
 		vec3 getPos(vec2 uv,float depth){
 			vec3 pos;
@@ -81,7 +86,7 @@ var SSRShader = {
 			// gl_FragColor=texture2D(tDiffuse,uv);
 			// gl_FragColor=texture2D(tNormal,uv)*2.-1.;
 			// gl_FragColor.x=abs(gl_FragColor.x);
-			// gl_FragColor=vec4(depthToDistance(texture2D(tDepth,uv).r)/4.);
+			// gl_FragColor=vec4(depthToDistance(texture2D(tDepth,uv).r)/UVWR);
 			// gl_FragColor.a=1.;
 			// return;
 

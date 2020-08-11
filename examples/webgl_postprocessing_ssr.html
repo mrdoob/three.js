@@ -55,10 +55,10 @@
 
 			s.cameraNear = 1
 			s.cameraFar = 11
-			s.cameraRange = s.cameraFar - s.cameraNear
 			s.cameraZ = 6
+			s.cameraRadius = 2
 			// s.camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, s.cameraNear, s.cameraFar)
-			camera = new THREE.OrthographicCamera(-2, 2, 2, -2, s.cameraNear, s.cameraFar)
+			camera = new THREE.OrthographicCamera(-s.cameraRadius, s.cameraRadius, s.cameraRadius, -s.cameraRadius, s.cameraNear, s.cameraFar)
 			s.camera = camera
 			s.camera.position.z = s.cameraZ
 
@@ -118,7 +118,7 @@
 
 			composer = new EffectComposer(renderer);
 
-			var ssrPass = new SSRPass(scene, camera, width, height);
+			var ssrPass = new SSRPass(scene, camera, width, height, s.cameraRadius, s.cameraNear, s.cameraFar);
 			ssrPass.kernelRadius = 16;
 			composer.addPass(ssrPass);
 

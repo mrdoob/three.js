@@ -1,8 +1,8 @@
 import {
   AddEquation,
   Color,
-	CustomBlending,
-	AdditiveBlending,
+  CustomBlending,
+  AdditiveBlending,
   DataTexture,
   DepthTexture,
   DstAlphaFactor,
@@ -31,7 +31,8 @@ import { SSRBlurShader } from "../shaders/SSRShader.js";
 import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var SSRPass = function(scene, camera, width, height) {
+var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, cameraFar) {
+  // console.log(cameraRadius, cameraNear, cameraFar)
 
   Pass.call(this);
 
@@ -124,6 +125,9 @@ var SSRPass = function(scene, camera, width, height) {
   this.ssrMaterial.uniforms['resolution'].value.set(this.width, this.height);
   this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
   this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
+  this.ssrMaterial.uniforms['cameraNear2'].value = cameraNear
+  this.ssrMaterial.uniforms['cameraRange'].value = cameraFar - cameraNear
+  this.ssrMaterial.uniforms['UVWR'].value = cameraRadius * 2
 
   // normal material
 
