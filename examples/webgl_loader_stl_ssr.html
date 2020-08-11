@@ -56,7 +56,8 @@
 			var cameraFar = 7
 			var cameraZ = 5
 			var cameraRadius = 1.5
-			camera = new THREE.OrthographicCamera(-cameraRadius, cameraRadius, cameraRadius, -cameraRadius, cameraNear, cameraFar)
+			// camera = new THREE.OrthographicCamera(-cameraRadius, cameraRadius, cameraRadius, -cameraRadius, cameraNear, cameraFar)
+			camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, cameraNear, cameraFar)
 			camera.position.z = cameraZ
 
 			scene = new THREE.Scene();

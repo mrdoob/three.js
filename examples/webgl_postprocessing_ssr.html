@@ -10,9 +10,6 @@
 				rel="stylesheet"
 				href="main.css">
 	<style>
-		body {
-			/* background-color: #aaa; */
-		}
 	</style>
 </head>
 
@@ -63,6 +60,7 @@
 				camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, s.cameraNear, s.cameraFar)
 				// camera = new THREE.OrthographicCamera(-s.cameraRadius, s.cameraRadius, s.cameraRadius, -s.cameraRadius, s.cameraNear, s.cameraFar)
 				s.camera = camera
+				window.camera = camera
 				s.camera.position.z = s.cameraZ
 
 				scene = new THREE.Scene();
