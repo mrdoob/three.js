@@ -85,9 +85,9 @@ var SSRShader = {
 			// gl_FragColor.a=1.;
 			// return;
 
-			vec4 color=texture2D(tDiffuse,uv);
-			vec4 reflectDiffuse;
-			gl_FragColor=color;
+			// vec4 color=texture2D(tDiffuse,uv);
+			// vec4 reflectDiffuse;
+			// gl_FragColor=color;
 
 			float depth=texture2D(tDepth,uv).r;
 			if(depth<=0.) return;
@@ -122,8 +122,8 @@ var SSRShader = {
 				if(length(rayPos-p)<SURF_DISTuv){
 					vec4 reflect=texture2D(tDiffuse,vec2(u,v));
 					// gl_FragColor=color;
-					// gl_FragColor=reflect;
-					gl_FragColor=mix(color,reflect,.5);
+					gl_FragColor=reflect;
+					// gl_FragColor=mix(color,reflect,.5);
 					// gl_FragColor=vec4(u,v,0,1);
 					break;
 				}
