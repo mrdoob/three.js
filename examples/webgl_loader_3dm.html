@@ -31,12 +31,12 @@
 
 			function init() {
 
-				THREE.Object3D.DefaultUp = new THREE.Vector3(0,0,1);
+				THREE.Object3D.DefaultUp = new THREE.Vector3( 0, 0, 1 );
 				container = document.createElement( 'div' );
 				document.body.appendChild( container );
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set(26,-40,5)
+				camera.position.set( 26, - 40, 5 );
 
 				scene = new THREE.Scene();
 
@@ -49,7 +49,7 @@
 				scene.add( directionalLight );
 
 				var loader = new Rhino3dmLoader( );
-				loader.setLibraryPath('jsm/libs/rhino3dm/');
+				loader.setLibraryPath( 'jsm/libs/rhino3dm/' );
 				
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
@@ -87,8 +87,8 @@
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
 
-				renderer.setSize( width, height);
-				labelRenderer.setSize( width, height);
+				renderer.setSize( width, height );
+				labelRenderer.setSize( width, height );
 
 			}
 
@@ -105,10 +105,10 @@
 			function initGUI( layers ) {
 
 				gui = new GUI( { width: 300 } );
-				var layersControl= gui.addFolder( 'layers' );
+				var layersControl = gui.addFolder( 'layers' );
 				layersControl.open();
 
-				for( var i = 0; i < layers.length; i++) {
+				for ( var i = 0; i < layers.length; i ++ ) {
 
 					var layer = layers[ i ];
 					layersControl.add( layer, 'visible' ).name( layer.name ).onChange( function ( val ) {
@@ -117,13 +117,13 @@
 
 						scene.traverse( function ( child ) {
 
-							if( child.userData.hasOwnProperty('attributes') ) {
+							if ( child.userData.hasOwnProperty( 'attributes' ) ) {
 
-								if( 'layerIndex' in child.userData.attributes ) {
+								if ( 'layerIndex' in child.userData.attributes ) {
 
-									var layerName = layers[child.userData.attributes.layerIndex].name;
+									var layerName = layers[ child.userData.attributes.layerIndex ].name;
 
-									if( layerName === name ) {
+									if ( layerName === name ) {
 										
 										child.visible = val;
 										layer.visible = val;
@@ -137,6 +137,7 @@
 						} );
 
 					} );
+
 				}
 
 			}
