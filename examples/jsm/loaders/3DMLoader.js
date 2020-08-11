@@ -145,10 +145,10 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		return objectPending;
 	},
 
-	parse: function ( ) {
+	parse: function () {
 
 		// parsing logic goes here
-		console.log('3dm parsing');
+		// console.log( '3dm parsing' );
 
 	},
 
@@ -156,27 +156,29 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		if ( material === undefined ) {
 
-			return  new MeshStandardMaterial( { 
-				color: new Color( 1,1,1 ), 
+			return new MeshStandardMaterial( {
+				color: new Color( 1, 1, 1 ),
 				metalness: 0.8,
 				name: 'default',
 				side: 2
 			} );
-
+	
 		}
 
 		var _diffuseColor = material.diffuseColor;
 
-		var diffusecolor = new Color( _diffuseColor.r/ 255.0, _diffuseColor.g / 255.0, _diffuseColor.b / 255.0 );
+		var diffusecolor = new Color( _diffuseColor.r / 255.0, _diffuseColor.g / 255.0, _diffuseColor.b / 255.0 );
 
 		if ( _diffuseColor.r === 0 && _diffuseColor.g === 0 && _diffuseColor.b === 0 ) {
+
 			diffusecolor.r = 1;
 			diffusecolor.g = 1;
 			diffusecolor.b = 1;
+
 		}
 
-		return  new MeshStandardMaterial( { 
-			color: diffusecolor, 
+		return new MeshStandardMaterial( {
+			color: diffusecolor,
 			metalness: 0.8,
 			name: material.name,
 			side: 2
@@ -186,144 +188,155 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	_createGeometry: function ( data ) {
 
-		console.log(data);
+		// console.log(data);
 
 		var object = new Object3D();
-		object.userData['layers'] = data.layers;
-		object.userData['groups'] = data.groups;
-
-		var loader = new BufferGeometryLoader();
+		object.userData[ 'layers' ] = data.layers;
+		object.userData[ 'groups' ] = data.groups;
 
 		var objects = data.objects;
 		var materials = data.materials;
 
-		var ptMaterial = new PointsMaterial( { sizeAttenuation: true, vertexColors:true } );
+		for ( var i = 0; i < objects.length; i ++ ) {
 
-		for( var i = 0; i < objects.length; i++ ) {
-
-			var obj = objects[i];
-
-			// console.log(obj);
-
+			var obj = objects[ i ];
 			var attributes = obj.attributes;
-			var geometry = null;
-			var material = null;
-			
-			switch( obj.objectType ) {
-				case 'Point':
-				case 'PointSet':
 
-					geometry = loader.parse( obj.geometry );
-					var points = new Points( geometry, ptMaterial );
-					points.userData['attributes'] = attributes;
-					object.add(points);
+			if ( obj.objectType !== 'InstanceDefinition' &&
+				obj.objectType !== 'InstanceReference' ) {
 
-					break;
+				var material = this._createMaterial( materials[ attributes.materialIndex ] );
+				var _object = this._createObject( obj, material );
+				object.add( _object );
 
-				case 'Mesh':
-				case 'Extrusion':
-
-					geometry = loader.parse( obj.geometry );
-
-					var material = this._createMaterial( materials[attributes.materialIndex] );
-
-					var mesh = new Mesh(geometry, material);
-					mesh.castShadow = attributes.castsShadows;
-					mesh.receiveShadow = attributes.receivesShadows;
-					mesh.userData['attributes'] = attributes;
-					mesh.userData['objectType'] = obj.objectType;
-
-					object.add( mesh );
-
-					break;
-
-				case 'Brep':
-
-					var brepObject = new Object3D();
-
-					var material = this._createMaterial( materials[attributes.materialIndex] );
-
-					for( var j = 0; j < obj.geometry.length; j++ ) {
-
-						geometry = loader.parse( obj.geometry[j] );
-						var mesh = new Mesh(geometry, material);
-						mesh.castShadow = attributes.castsShadows;
-						mesh.receiveShadow = attributes.receivesShadows;
-
-						brepObject.add( mesh );
-
-					}
-
-					brepObject.userData['attributes'] = attributes;
-					brepObject.userData['objectType'] = obj.objectType;
-
-					object.add( brepObject );
-
-					break;
-				
-				case 'Curve':
-
-					geometry = loader.parse( obj.geometry );
-
-					var _color = attributes.drawColor;
-					var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
-
-					var lines = new Line(geometry, new LineBasicMaterial( { color: color } ) );
-					lines.userData['attributes'] = attributes;
-					lines.userData['objectType'] = obj.objectType;
-
-					object.add(lines);
-
-					break;
-
-				case 'TextDot':
-
-					geometry = obj.geometry;
-					var dotDiv = document.createElement('div');
-					dotDiv.style.fontFamily = geometry.fontFace;
-					dotDiv.style.fontSize = `${geometry.fontHeight}px`;
-					dotDiv.style.marginTop = '-1em';
-					dotDiv.style.color = '#FFF';
-					dotDiv.style.padding = '2px';
-					dotDiv.style.paddingRight = '5px';
-					dotDiv.style.paddingLeft = '5px';
-					dotDiv.style.borderRadius = '5px';
-					var color = attributes.drawColor;
-					dotDiv.style.background = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-					dotDiv.textContent = geometry.text;
-					var dot = new CSS2DObject(dotDiv);
-					var location = geometry.point;
-					dot.position.set(location[0], location[1], location[2]);
-
-					dot.userData['attributes'] = attributes;
-					dot.userData['objectType'] = obj.objectType;
-
-					object.add(dot);
-
-					break;
-				case 'InstanceDefinition':
-					
-					var instanceDefinitionObject = new Object3D();
-					var instanceReferences = [];
-
-					for( var j = 0; j < objects.length; j++ ) {
-						if( objects[j].objectType === 'InstanceReference' &&
-							objects[j].geometry.parentIdefId === attributes.id ) {
-								instanceReferences.push( objects[j] );
-						}
-					}
-
-					// console.log( instanceReferences );
-
-					break;
 			}
+
+			/*
+			if( obj.objectType === 'InstanceDefinition' ) {
+
+				var instanceDefinitionObject = new Object3D();
+				var instanceReferences = [];
+
+				for( var j = 0; j < obj.geometry.length; j++ ) {
+					var _obj = obj.geometry[ j ];
+					var _attributes = _obj.attributes;
+					
+					var material = this._createMaterial( materials[_attributes.materialIndex] );
+					var _object = this._createObject( _obj, material );
+
+					instanceDefinitionObject.add(_object);
+
+				}
+
+				for( var j = 0; j < objects.length; j++ ) {
+					if( objects[j].objectType === 'InstanceReference' &&
+						objects[j].geometry.parentIdefId === attributes.id ) {
+							instanceReferences.push( objects[j] );
+							//create reference
+					}
+				}
+
+				console.log(instanceReferences);
+
+			}
+			*/
 
 		}
 		
 		return object;
 
 	},
+	_createObject: function ( obj, mat ) {
 
+		var loader = new BufferGeometryLoader();
+
+		var attributes = obj.attributes;
+		
+		switch(  obj.objectType ) {
+
+			case 'Point':
+			case 'PointSet':
+
+				var geometry = loader.parse( obj.geometry );
+				var material = new PointsMaterial( { sizeAttenuation: true, vertexColors: true } );
+				var points = new Points( geometry, material );
+				points.userData[ 'attributes' ] = attributes;
+				points.userData[ 'objectType' ] = obj.objectType;
+				return points;
+
+			case 'Mesh':
+			case 'Extrusion':
+
+				var geometry = loader.parse( obj.geometry );
+
+				var mesh = new Mesh( geometry, mat );
+				mesh.castShadow = attributes.castsShadows;
+				mesh.receiveShadow = attributes.receivesShadows;
+				mesh.userData[ 'attributes' ] = attributes;
+				mesh.userData[ 'objectType' ] = obj.objectType;
+
+				return mesh;
+
+			case 'Brep':
+
+				var brepObject = new Object3D();
+
+				for ( var j = 0; j < obj.geometry.length; j ++ ) {
+
+					geometry = loader.parse( obj.geometry[ j ] );
+					var mesh = new Mesh( geometry, mat );
+					mesh.castShadow = attributes.castsShadows;
+					mesh.receiveShadow = attributes.receivesShadows;
+
+					brepObject.add( mesh );
+
+				}
+
+				brepObject.userData[ 'attributes' ] = attributes;
+				brepObject.userData[ 'objectType' ] = obj.objectType;
+
+				return brepObject;
+			
+			case 'Curve':
+
+				geometry = loader.parse( obj.geometry );
+
+				var _color = attributes.drawColor;
+				var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+
+				var lines = new Line( geometry, new LineBasicMaterial( { color: color } ) );
+				lines.userData[ 'attributes' ] = attributes;
+				lines.userData[ 'objectType' ] = obj.objectType;
+
+				return lines;
+
+			case 'TextDot':
+
+				geometry = obj.geometry;
+				var dotDiv = document.createElement( 'div' );
+				dotDiv.style.fontFamily = geometry.fontFace;
+				dotDiv.style.fontSize = `${geometry.fontHeight}px`;
+				dotDiv.style.marginTop = '-1em';
+				dotDiv.style.color = '#FFF';
+				dotDiv.style.padding = '2px';
+				dotDiv.style.paddingRight = '5px';
+				dotDiv.style.paddingLeft = '5px';
+				dotDiv.style.borderRadius = '5px';
+				var color = attributes.drawColor;
+				dotDiv.style.background = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+				dotDiv.textContent = geometry.text;
+				var dot = new CSS2DObject( dotDiv );
+				var location = geometry.point;
+				dot.position.set( location[ 0 ], location[ 1 ], location[ 2 ] );
+
+				dot.userData[ 'attributes' ] = attributes;
+				dot.userData[ 'objectType' ] = obj.objectType;
+
+				return dot;
+
+		}
+		
+	},
 	_initLibrary: function () {
 
 		if ( ! this.libraryPending ) {
@@ -506,8 +519,8 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 	function decodeObjects( rhino, buffer ) {
 
-		var arr = new Uint8Array(buffer);
-		var doc = rhino.File3dm.fromByteArray(arr);
+		var arr = new Uint8Array( buffer );
+		var doc = rhino.File3dm.fromByteArray( arr );
 
 		var objects = [];
 		var materials = [];
@@ -519,14 +532,12 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		//Handle objects
 
-		for( var i = 0; i < doc.objects().count; i++ ) {
+		for ( var i = 0; i < doc.objects().count; i ++ ) {
 
-			var _object = doc.objects().get(i);
-
-			// console.log(objectType);
+			var _object = doc.objects().get( i );
 
 			// skip instance definition objects
-			if( _object.attributes().isInstanceDefinitionObject ) { 
+			if ( _object.attributes().isInstanceDefinitionObject ) { 
 
 				continue;
 				
@@ -545,7 +556,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle instance definitions
 
-		for( var i = 0; i < doc.instanceDefinitions().count(); i++ ) {
+		for ( var i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
 
 			var idef = doc.instanceDefinitions().get( i );
 			var idefAttributes = extractProperties( idef );
@@ -554,10 +565,12 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			var idefObjects = [];
 
 			// extract object data from each of these
-			for( var j = 0; j < ids.length; j++ ) {
+			for ( var j = 0; j < ids.length; j ++ ) {
+
 				var _object = doc.objects().findId( ids[ j ] );
 				var object = extractObjectData( _object, doc );
 				idefObjects.push( object );
+
 			}
 
 			objects.push( { geometry: idefObjects, attributes: idefAttributes, objectType: 'InstanceDefinition' } );
@@ -566,7 +579,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle materials
 
-		for( var i = 0; i < doc.materials().count(); i++) {
+		for ( var i = 0; i < doc.materials().count(); i ++) {
 
 			var _material = doc.materials().get( i );
 			var materialProperties = extractProperties( _material );
@@ -582,7 +595,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle layers
 
-		for( var i = 0; i < doc.layers().count(); i++) {
+		for ( var i = 0; i < doc.layers().count(); i ++) {
 
 			var _layer = doc.layers().get( i );
 			var layer = extractProperties( _layer );
@@ -595,7 +608,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle views
 
-		for( var i = 0; i < doc.views().count(); i++) {
+		for ( var i = 0; i < doc.views().count(); i ++) {
 
 			var _view = doc.views().get( i );
 			var view = extractProperties( _view );
@@ -607,7 +620,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle named views
 
-		for( var i = 0; i < doc.namedViews().count(); i++) {
+		for ( var i = 0; i < doc.namedViews().count(); i ++) {
 
 			var _namedView = doc.namedViews().get( i );
 			var namedView = extractProperties( _namedView );
@@ -619,7 +632,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle groups
 
-		for( var i = 0; i < doc.groups().count(); i++ ){
+		for ( var i = 0; i < doc.groups().count(); i ++ ){
 
 			var _group = doc.groups().get( i );
 			var group = extractProperties( _group );
@@ -680,7 +693,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		//if( _attributes.isInstanceDefinitionObject ) { continue; }
 
 		// TODO: handle other geometry types
-		switch( objectType ) {
+		switch ( objectType ) {
 
 			case rhino.ObjectType.Curve:
 
@@ -808,11 +821,11 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				break;
 		}
 
-		if( geometry ) {
+		if ( geometry ) {
 
 			var attributes = extractProperties( _attributes );
 
-			if( _attributes.groupCount > 0 ) {
+			if ( _attributes.groupCount > 0 ) {
 				attributes.groupIds = _attributes.getGroupList();
 			}
 
@@ -821,13 +834,9 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			objectType = objectType.constructor.name;
 			objectType = objectType.substring( 11, objectType.length );
 
-			//objects.push( { geometry, attributes, objectType: objectType } );
-
 			return { geometry, attributes, objectType };
 
 		}
-
-		
 
 	}
 
@@ -837,9 +846,9 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		for ( var property in object ) {
 
-			if( typeof object[property] !== 'function' ){
+			if( typeof object[ property ] !== 'function' ){
 
-				result[property] = object[property];
+				result[ property ] = object[ property ];
 
 			} else {
 
@@ -852,7 +861,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		return result;
 	}
 
-	function curveToPoints (curve, pointLimit) {
+	function curveToPoints ( curve, pointLimit ) {
 
 		var pointCount = pointLimit;
 		var rc = [];
@@ -860,65 +869,88 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// console.log(curve);
 	  
-		if (curve instanceof rhino.LineCurve) {
-		  return [curve.pointAtStart, curve.pointAtEnd];
+		if ( curve instanceof rhino.LineCurve ) {
+
+		  return [ curve.pointAtStart, curve.pointAtEnd ];
+
 		}
 	  
-		if (curve instanceof rhino.PolylineCurve) {
+		if ( curve instanceof rhino.PolylineCurve ) {
+
 		  pointCount = curve.pointCount;
-		  for (let i = 0; i < pointCount; i++) {
-			rc.push(curve.point(i));
+		  for ( var i = 0; i < pointCount; i ++ ) {
+
+			rc.push( curve.point( i )) ;
+
 		  }
 		  return rc;
 		}
 	  
-		if (curve instanceof rhino.PolyCurve) {
-		  let segmentCount = curve.segmentCount;
-		  for (let i = 0; i < segmentCount; i++) {
-			let segment = curve.segmentCurve(i);
-			let segmentArray = curveToPoints(segment);
-			rc = rc.concat(segmentArray);
+		if ( curve instanceof rhino.PolyCurve ) {
+
+		  var segmentCount = curve.segmentCount;
+
+		  for ( var i = 0; i < segmentCount; i ++ ) {
+
+			var segment = curve.segmentCurve( i );
+			var segmentArray = curveToPoints( segment );
+			rc = rc.concat( segmentArray );
 			segment.delete();
+
 		  }
 		  return rc;
+
 		}
 	  
-		if (curve instanceof rhino.NurbsCurve && curve.degree === 1) {
-		  console.info('degree 1 curve');
+		if ( curve instanceof rhino.NurbsCurve && curve.degree === 1 ) {
+
+		  console.info( 'degree 1 curve' );
+
 		}
 	  
-		let domain = curve.domain;
-		let divisions = pointCount - 1.0;
-		for (let j = 0; j < pointCount; j++) {
-		  let t = domain[0] + (j / divisions) * (domain[1] - domain[0]);
-		  if (t === domain[0] || t === domain[1]) {
-			ts.push(t);
+		var domain = curve.domain;
+		var divisions = pointCount - 1.0;
+
+		for ( var j = 0; j < pointCount; j ++ ) {
+
+		  var t = domain[ 0 ] + ( j / divisions ) * ( domain[ 1 ] - domain[ 0 ] );
+
+		  if ( t === domain[ 0 ] || t === domain[ 1 ] ) {
+
+			ts.push( t );
 			continue;
+
 		  }
-		  let tan = curve.tangentAt(t);
-		  let prevTan = curve.tangentAt(ts.slice(-1)[0]);
+
+		  var tan = curve.tangentAt( t );
+		  var prevTan = curve.tangentAt( ts.slice( -1 )[ 0 ]);
 
 		  // Duplicaated from THREE.Vector3
 		  // How to pass imports to worker?
 
-		  tS = tan[0] * tan[0] + tan[1] * tan[1] + tan[2] * tan[2];
-		  ptS = prevTan[0] * prevTan[0] + prevTan[1] * prevTan[1] + prevTan[2] * prevTan[2];
+		  tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
+		  ptS = prevTan[ 0 ] * prevTan[ 0 ] + prevTan[ 1 ] * prevTan[ 1 ] + prevTan[ 2 ] * prevTan[ 2 ];
 
 		  var denominator = Math.sqrt( tS * ptS );
 
 		  var angle;
+
 		  if( denominator === 0 ) {
+
 			angle = Math.PI / 2;
+
 		  } else {
+
 			  var theta = ( tan.x * prevTan.x + tan.y * prevTan.y + tan.z * prevTan.z ) / denominator;
 			  angle = Math.acos( Math.max( - 1, Math.min( 1, theta ) ) );
+			  
 		  }
 
-		  if (angle < 0.1) { continue; }
-		  ts.push(t);
+		  if ( angle < 0.1 ) { continue; }
+		  ts.push( t );
 		}
 	  
-		rc = ts.map(t => curve.pointAt(t));
+		rc = ts.map( t => curve.pointAt( t ) );
 		return rc;
 	}
 
