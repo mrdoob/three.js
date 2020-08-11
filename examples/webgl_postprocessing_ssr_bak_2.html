@@ -32,13 +32,11 @@
 
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
-		import { OrbitControls } from './jsm/controls/OrbitControls.js'
 
 		var container, stats;
 		var camera, scene, renderer;
 		var composer;
 		var group;
-		var s = {}
 
 		init();
 		animate();
@@ -49,64 +47,41 @@
 			document.body.appendChild(container);
 
 			renderer = new THREE.WebGLRenderer();
-			s.renderer = renderer
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			document.body.appendChild(renderer.domElement);
 
-			s.cameraNear = 1
-			s.cameraFar = 11
-			s.cameraRange = s.cameraFar - s.cameraNear
-			s.cameraZ = 6
-			// s.camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, s.cameraNear, s.cameraFar)
-			camera = new THREE.OrthographicCamera(-2, 2, 2, -2, s.cameraNear, s.cameraFar)
-			s.camera = camera
-			s.camera.position.z = s.cameraZ
+			camera = new THREE.OrthographicCamera(-300, 300, 300, -300, 100, 700);
+			camera.position.z = 500;
 
 			scene = new THREE.Scene();
-			s.scene = scene
 			scene.background = new THREE.Color(0xaaaaaa);
 
 			scene.add(new THREE.DirectionalLight());
 			scene.add(new THREE.HemisphereLight());
 
+			group = new THREE.Group();
+			scene.add(group);
 
-			{//mesh
-				let geo = new THREE.BoxBufferGeometry(1, 1, 1)
-				// let geo = new THREE.IcosahedronBufferGeometry(.5, 3)
-				let mtl = new THREE.MeshBasicMaterial({
-					color: 'red'
-				})
-				let mesh = new THREE.Mesh(geo, mtl)
-				s.mesh = mesh
-				s.scene.add(mesh)
-				window.mesh = mesh
-				// mesh.position.x=2
-				// mesh.position.y=1
-			}
-			// {//mesh 2
-			//   let geo = new THREE.BoxBufferGeometry(1, 1, 1)
-			//   // let geo = new THREE.IcosahedronBufferGeometry(.5, 2)
-			//   let mesh = new THREE.Mesh(geo, s.mtl_depth)
-			//   s.mesh_2 = mesh
-			//   // s.scene.add(mesh)
-			//   window.mesh = mesh
-			//   mesh.position.x = 2
-			// }
-			{//ground
-				let geo = new THREE.PlaneBufferGeometry(4, 4)
-				let mtl = new THREE.MeshBasicMaterial({
-					color: 'blue'
-				})
-				let mesh = new THREE.Mesh(geo, mtl)
-				s.ground = mesh
-				s.scene.add(mesh)
-				// mesh.rotation.x = -Math.PI / 2
-				// mesh.position.y = -.5
-				geo.rotateX(-Math.PI / 2)
-				geo.translate(0, -.5, 0)
-			}
+			var geometry = new THREE.BoxBufferGeometry(10, 10, 10);
 
-			new OrbitControls(s.camera, s.renderer.domElement)
+			for (var i = 0; i < 100; i++) {
+
+				var material = new THREE.MeshLambertMaterial({
+					color: Math.random() * 0xffffff
+				});
+
+				var mesh = new THREE.Mesh(geometry, material);
+				mesh.position.x = Math.random() * 400 - 200;
+				mesh.position.y = Math.random() * 400 - 200;
+				mesh.position.z = Math.random() * 400 - 200;
+				mesh.rotation.x = Math.random();
+				mesh.rotation.y = Math.random();
+				mesh.rotation.z = Math.random();
+
+				mesh.scale.setScalar(Math.random() * 10 + 2);
+				group.add(mesh);
+
+			}
 
 			stats = new Stats();
 			container.appendChild(stats.dom);
@@ -169,6 +144,8 @@
 		function render() {
 
 			var timer = performance.now();
+			group.rotation.x = timer * 0.0002;
+			group.rotation.y = timer * 0.0001;
 
 			composer.render();
 
