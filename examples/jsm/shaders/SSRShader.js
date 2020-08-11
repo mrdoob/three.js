@@ -62,6 +62,7 @@ var SSRShader = {
 		uniform float cameraRange;
 		uniform float cameraNear2;
 		uniform float UVWR; //uv unit to world unit ratio
+		uniform vec2 resolution;
 		float depthToDistance(float depth){
 			return (1.-depth)*cameraRange+cameraNear2;
 		}
@@ -109,7 +110,7 @@ var SSRShader = {
 			// if(reflectDirLen<=0.) return;
 			// reflectDir.x=abs(reflectDir.x);
 			// reflectDir=normalize(vec3(-1,-1,0));
-			d1=d0+(reflectDir*MAX_DISTuv).xy*vec2(${innerWidth}.,${innerHeight}.);
+			d1=d0+(reflectDir*MAX_DISTuv).xy*vec2(resolution.x,resolution.y);
 			float totalLen=length(d1-d0);
 			float xLen=d1.x-d0.x;
 			float yLen=d1.y-d0.y;
@@ -120,10 +121,10 @@ var SSRShader = {
 				if(i>=totalStep) break;
 				float x=d0.x+i*xSpan;
 				float y=d0.y+i*ySpan;
-				if(x<0.||x>${innerWidth}.) break;
-				if(y<0.||y>${innerHeight}.) break;
-				float u=x/${innerWidth}.;
-				float v=y/${innerHeight}.;
+				if(x<0.||x>resolution.x) break;
+				if(y<0.||y>resolution.y) break;
+				float u=x/resolution.x;
+				float v=y/resolution.y;
 				vec3 p=getPos(vec2(u,v));
 				vec3 rayPos=pos+(length(vec2(x,y)-d0)/totalLen)*(reflectDir*MAX_DISTuv);
 				float away=length(rayPos-p);

@@ -54,7 +54,7 @@
 			document.body.appendChild(renderer.domElement);
 
 
-			if (0) {
+			if (1) {
 
 				s.cameraNear = 1
 				s.cameraFar = 11
@@ -107,7 +107,7 @@
 				}
 			}
 
-			if (1) {
+			if (0) {
 
 				s.cameraNear = 100
 				s.cameraFar = 700
@@ -167,6 +167,7 @@
 			// Init gui
 			var gui = new GUI();
 
+			// console.log(ssrPass)
 			gui.add(ssrPass, 'output', {
 				'Default': SSRPass.OUTPUT.Default,
 				'SSR Only': SSRPass.OUTPUT.SSR,

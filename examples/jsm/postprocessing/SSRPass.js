@@ -28,7 +28,6 @@ import { Pass } from "../postprocessing/Pass.js";
 import { SimplexNoise } from "../math/SimplexNoise.js";
 import { SSRShader } from "../shaders/SSRShader.js";
 import { SSRBlurShader } from "../shaders/SSRShader.js";
-import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
 var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, cameraFar) {
@@ -58,19 +57,10 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
   this.generateSampleKernel();
   this.generateRandomKernelRotations();
 
-  // beauty render target with depth buffer
-
-  var depthTexture = new DepthTexture();
-  depthTexture.type = UnsignedShortType;
-  depthTexture.minFilter = NearestFilter;
-  depthTexture.maxFilter = NearestFilter;
-
   this.beautyRenderTarget = new WebGLRenderTarget(this.width, this.height, {
     minFilter: LinearFilter,
     magFilter: LinearFilter,
     format: RGBAFormat,
-    depthTexture: depthTexture,
-    depthBuffer: true
   });
 
   // normal render target
@@ -150,19 +140,6 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
   this.blurMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
   this.blurMaterial.uniforms['resolution'].value.set(this.width, this.height);
 
-  // material for rendering the depth
-
-  this.depthRenderMaterial = new ShaderMaterial({
-    defines: Object.assign({}, SSRDepthShader.defines),
-    uniforms: UniformsUtils.clone(SSRDepthShader.uniforms),
-    vertexShader: SSRDepthShader.vertexShader,
-    fragmentShader: SSRDepthShader.fragmentShader,
-    blending: NoBlending
-  });
-  this.depthRenderMaterial.uniforms['tDepth'].value = this.beautyRenderTarget.depthTexture;
-  this.depthRenderMaterial.uniforms['cameraNear'].value = this.camera.near;
-  this.depthRenderMaterial.uniforms['cameraFar'].value = this.camera.far;
-
   // material for rendering the content of a render target
 
   this.copyMaterial = new ShaderMaterial({
@@ -206,7 +183,6 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.depthMaterial.dispose();
     this.blurMaterial.dispose();
     this.copyMaterial.dispose();
-    this.depthRenderMaterial.dispose();
 
     // dipsose full screen quad
 
