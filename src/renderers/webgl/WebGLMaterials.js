@@ -1,6 +1,6 @@
 import { BackSide } from "../../constants.js";
 
-function WebGLMaterials( properties, cubemaps ) {
+function WebGLMaterials( properties ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
@@ -19,7 +19,7 @@ function WebGLMaterials( properties, cubemaps ) {
 
 	}
 
-	function refreshMaterialUniforms( uniforms, material, environment, pixelRatio, height ) {
+	function refreshMaterialUniforms( uniforms, material, pixelRatio, height ) {
 
 		if ( material.isMeshBasicMaterial ) {
 
@@ -42,15 +42,15 @@ function WebGLMaterials( properties, cubemaps ) {
 
 		} else if ( material.isMeshStandardMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, environment );
+			refreshUniformsCommon( uniforms, material );
 
 			if ( material.isMeshPhysicalMaterial ) {
 
-				refreshUniformsPhysical( uniforms, material, environment );
+				refreshUniformsPhysical( uniforms, material );
 
 			} else {
 
-				refreshUniformsStandard( uniforms, material, environment );
+				refreshUniformsStandard( uniforms, material );
 
 			}
 
@@ -105,7 +105,7 @@ function WebGLMaterials( properties, cubemaps ) {
 
 	}
 
-	function refreshUniformsCommon( uniforms, material, environment ) {
+	function refreshUniformsCommon( uniforms, material ) {
 
 		uniforms.opacity.value = material.opacity;
 
@@ -139,7 +139,7 @@ function WebGLMaterials( properties, cubemaps ) {
 
 		}
 
-		const envMap = cubemaps.get( material.envMap || environment );
+		const envMap = properties.get( material ).envMap;
 
 		if ( envMap ) {
 
@@ -477,7 +477,7 @@ function WebGLMaterials( properties, cubemaps ) {
 
 	}
 
-	function refreshUniformsStandard( uniforms, material, environment ) {
+	function refreshUniformsStandard( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
 		uniforms.metalness.value = material.metalness;
@@ -524,7 +524,9 @@ function WebGLMaterials( properties, cubemaps ) {
 
 		}
 
-		if ( material.envMap || environment ) {
+		const envMap = properties.get( material ).envMap;
+
+		if ( envMap ) {
 
 			//uniforms.envMap.value = material.envMap; // part of uniforms common
 			uniforms.envMapIntensity.value = material.envMapIntensity;
@@ -533,9 +535,9 @@ function WebGLMaterials( properties, cubemaps ) {
 
 	}
 
-	function refreshUniformsPhysical( uniforms, material, environment ) {
+	function refreshUniformsPhysical( uniforms, material ) {
 
-		refreshUniformsStandard( uniforms, material, environment );
+		refreshUniformsStandard( uniforms, material );
 
 		uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
 
