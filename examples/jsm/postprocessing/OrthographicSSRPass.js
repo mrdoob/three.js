@@ -92,17 +92,17 @@ var OrthographicSSRPass = function(scene, camera, width, height, cameraRadius, c
 
   // orthographicSSR material
 
-  if (SSRShader === undefined) {
+  if (OrthographicSSRShader === undefined) {
 
-    console.error('THREE.SSRPass: The pass relies on SSRShader.');
+    console.error('THREE.OrthographicSSRPass: The pass relies on OrthographicSSRShader.');
 
   }
 
   this.orthographicSSRMaterial = new ShaderMaterial({
-    defines: Object.assign({}, SSRShader.defines),
-    uniforms: UniformsUtils.clone(SSRShader.uniforms),
-    vertexShader: SSRShader.vertexShader,
-    fragmentShader: SSRShader.fragmentShader,
+    defines: Object.assign({}, OrthographicSSRShader.defines),
+    uniforms: UniformsUtils.clone(OrthographicSSRShader.uniforms),
+    vertexShader: OrthographicSSRShader.vertexShader,
+    fragmentShader: OrthographicSSRShader.fragmentShader,
     blending: NoBlending
   });
 
@@ -134,10 +134,10 @@ var OrthographicSSRPass = function(scene, camera, width, height, cameraRadius, c
   // blur material
 
   this.blurMaterial = new ShaderMaterial({
-    defines: Object.assign({}, SSRBlurShader.defines),
-    uniforms: UniformsUtils.clone(SSRBlurShader.uniforms),
-    vertexShader: SSRBlurShader.vertexShader,
-    fragmentShader: SSRBlurShader.fragmentShader
+    defines: Object.assign({}, OrthographicSSRBlurShader.defines),
+    uniforms: UniformsUtils.clone(OrthographicSSRBlurShader.uniforms),
+    vertexShader: OrthographicSSRBlurShader.vertexShader,
+    fragmentShader: OrthographicSSRBlurShader.fragmentShader
   });
   this.blurMaterial.uniforms['tDiffuse'].value = this.orthographicSSRRenderTarget.texture;
   this.blurMaterial.uniforms['resolution'].value.set(this.width, this.height);
@@ -165,9 +165,9 @@ var OrthographicSSRPass = function(scene, camera, width, height, cameraRadius, c
 
 };
 
-SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
+OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
-  constructor: SSRPass,
+  constructor: OrthographicSSRPass,
 
   dispose: function() {
 
