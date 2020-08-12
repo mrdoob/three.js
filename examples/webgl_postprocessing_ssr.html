@@ -23,6 +23,7 @@
 	<script type="module">
 
 		import * as THREE from '../build/three.module.js';
+		window.THREE=THREE
 
 		import Stats from './jsm/libs/stats.module.js';
 		import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -112,8 +113,8 @@
 				s.cameraFar = 700
 				s.cameraZ = 500
 				s.cameraRadius = 300
-				// s.camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, s.cameraNear, s.cameraFar)
-				camera = new THREE.OrthographicCamera(-s.cameraRadius, s.cameraRadius, s.cameraRadius, -s.cameraRadius, s.cameraNear, s.cameraFar)
+				s.camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, s.cameraNear, s.cameraFar)
+				// camera = new THREE.OrthographicCamera(-s.cameraRadius, s.cameraRadius, s.cameraRadius, -s.cameraRadius, s.cameraNear, s.cameraFar)
 				s.camera = camera
 				s.camera.position.z = s.cameraZ
 
