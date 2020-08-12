@@ -97,11 +97,7 @@ function makeDiffFile(baseFile, otherFile, compareFn) {
   });
   // make a copy of baseFile and replace min, max, and data
   // with the new data
-  return Object.assign({}, baseFile, {
-    min,
-    max,
-    data,
-  });
+  return {...baseFile, min, max, data};
 }
 ```
 

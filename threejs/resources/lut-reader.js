@@ -121,7 +121,7 @@ function lut1Dto3D(lut) {
   for (let i = 0; i < lut.size * lut.size; ++i) {
     data.push(...src);
   }
-  return Object.assign({}, lut, {data});
+  return {...lut, data};
 }
 
 export function lutTo2D3Drgb8(lut) {
@@ -140,5 +140,5 @@ export function lutTo2D3Drgb8(lut) {
     data[i + 1] = (src[i + 1] - min[1]) / range[1] * 255;
     data[i + 2] = (src[i + 2] - min[2]) / range[2] * 255;
   }
-  return Object.assign({}, lut, {data});
+  return {...lut, data};
 }

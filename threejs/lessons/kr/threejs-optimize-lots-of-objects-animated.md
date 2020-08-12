@@ -80,11 +80,7 @@ function makeDiffFile(baseFile, otherFile, compareFn) {
       return value;
   });
   // baseFile을 복사한 뒤 min, max, data를 새 값으로 교체합니다.
-  return Object.assign({}, baseFile, {
-    min,
-    max,
-    data,
-  });
+  return {...baseFile, min, max, data};
 }
 ```
 

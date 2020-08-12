@@ -785,7 +785,7 @@ const geometry = new THREE.WireframeGeometry(
 
       addElem(base, 'pre', 'prettyprint showmods', trimmedLines.join('\n'));
 
-      createLiveImage(elem, Object.assign({}, info, {create: createFn}), name);
+      createLiveImage(elem, {...info, create: createFn}, name);
     }
 
     makeExample(elem, info.create, info.src);

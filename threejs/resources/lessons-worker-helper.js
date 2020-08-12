@@ -119,9 +119,10 @@
           setupLesson(this);
         }
         const args = [].slice.apply(arguments);
-        args[1] = Object.assign({
+        args[1] = {
           powerPreference: 'low-power',
-        }, args[1]);
+          ...args[1],
+        };
         return oldFn.apply(this, args);
       };
     }(OffscreenCanvas.prototype.getContext));

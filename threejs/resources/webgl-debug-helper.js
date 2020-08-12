@@ -517,7 +517,7 @@
           ext = wrapped.apply(ctx, arguments);
           if (ext) {
             const origExt = ext;
-            ext = makeDebugContext(ext, Object.assign({}, options, {errCtx: ctx}));
+            ext = makeDebugContext(ext, {...options, errCtx: ctx});
             sharedState.wrappers[extensionName] = { wrapper: ext, orig: origExt };
             addEnumsForContext(origExt, extensionName);
           }

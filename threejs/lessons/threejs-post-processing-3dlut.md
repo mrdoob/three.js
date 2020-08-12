@@ -147,7 +147,7 @@ const lutShader = {
 };
 
 const lutNearestShader = {
-  uniforms: Object.assign( {}, lutShader.uniforms ),
+  uniforms: {...lutShader.uniforms},
   vertexShader: lutShader.vertexShader,
   fragmentShader: lutShader.fragmentShader.replace('#define FILTER_LUT', '//'),
 };

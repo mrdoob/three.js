@@ -166,9 +166,7 @@ module.exports = function(grunt) {
       });
     });
     const buildStuff = require('@gfxfundamentals/lesson-builder');
-    const settings = Object.assign({}, buildSettings, {
-      filenames,
-    });
+    const settings = {...buildSettings, filenames};
     const finish = this.async();
     buildStuff(settings).finally(finish);
   });
