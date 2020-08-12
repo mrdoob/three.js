@@ -488,7 +488,12 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	GLTFMaterialsClearcoatExtension.prototype.getMaterialType = function ( /* materialIndex */ ) {
+	GLTFMaterialsClearcoatExtension.prototype.getMaterialType = function ( materialIndex ) {
+
+		var parser = this.parser;
+		var materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
 
 		return THREE.MeshPhysicalMaterial;
 
@@ -564,7 +569,12 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	GLTFMaterialsTransmissionExtension.prototype.getMaterialType = function ( /* materialIndex */ ) {
+	GLTFMaterialsTransmissionExtension.prototype.getMaterialType = function ( materialIndex ) {
+
+		var parser = this.parser;
+		var materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
 
 		return THREE.MeshPhysicalMaterial;
 
