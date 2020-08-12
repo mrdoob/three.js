@@ -26,7 +26,6 @@ var OrthographicSSRShader = {
     "resolution": { value: new Vector2() },
     "cameraProjectionMatrix": { value: new Matrix4() },
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
-    // "kernelRadius": { value: 8 },
     "opacity": { value: .5 },
     "minDistance": { value: 0.005 },
     "maxDistance": { value: 1 },
@@ -83,34 +82,14 @@ var OrthographicSSRShader = {
 			//use uv unit/coordinate primarily
 			vec2 uv=vUv;
 
-			// gl_FragColor=texture2D(tDepth,uv);
-			// gl_FragColor=texture2D(tNormal,uv);
-			// gl_FragColor=texture2D(tDiffuse,uv);
-			// gl_FragColor=texture2D(tNormal,uv)*2.-1.;
-			// gl_FragColor.x=abs(gl_FragColor.x);
-			// gl_FragColor=vec4(depthToDistance(texture2D(tDepth,uv).r)/UVWR);
-			// gl_FragColor.a=1.;
-			// return;
-
-			// vec4 color=texture2D(tDiffuse,uv);
-			// vec4 reflectDiffuse;
-			// gl_FragColor=color;
-
 			float depth=texture2D(tDepth,uv).r;
 			if(depth<=0.) return;
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 			vec3 pos=getPos(uv,depth);
-			// gl_FragColor.xyz=abs(pos);
-			// gl_FragColor.a=1.;
-			// return;
 
-			vec3 normal=texture2D(tNormal,uv).xyz*2.-1.;//screen rigth always red
+			vec3 normal=texture2D(tNormal,uv).xyz*2.-1.;
 			vec3 reflectDir=reflect(vec3(0,0,-1),normal);
-			// float reflectDirLen=length(reflectDir);
-			// if(reflectDirLen<=0.) return;
-			// reflectDir.x=abs(reflectDir.x);
-			// reflectDir=normalize(vec3(-1,-1,0));
 			d1=d0+(reflectDir*maxDistance).xy*vec2(resolution.x,resolution.y);
 			float totalLen=length(d1-d0);
 			float xLen=d1.x-d0.x;
@@ -130,23 +109,11 @@ var OrthographicSSRShader = {
 				vec3 rayPos=pos+(length(vec2(x,y)-d0)/totalLen)*(reflectDir*maxDistance);
 				float away=length(rayPos-p);
 				if(away<SURF_DISTuv){
-					// float d=texture2D(tDepth,vec2(u,v)).r;
-					// if(d<=0.) continue;
 					vec3 n=texture2D(tNormal,vec2(u,v)).xyz*2.-1.;
-					// gl_FragColor=vec4(dot(reflectDir,n));
-					// gl_FragColor.a=1.;
-					// break;
 					if(dot(reflectDir,n)>=0.) continue;
-					// gl_FragColor=vec4(away*100.,0,0,1);
-					// break;
-					// gl_FragColor=vec4(u,v,0,1);
-					// break;
 					vec4 reflect=texture2D(tDiffuse,vec2(u,v));
-					// gl_FragColor=color;
 					gl_FragColor=reflect;
 					gl_FragColor.a=opacity;
-					// gl_FragColor=mix(color,reflect,.5);
-					// gl_FragColor=vec4(u,v,0,1);
 					break;
 				}
 			}

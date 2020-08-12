@@ -31,7 +31,6 @@ import { OrthographicSSRBlurShader } from "../shaders/OrthographicSSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
 var OrthographicSSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, cameraFar) {
-  // console.log(cameraRadius, cameraNear, cameraFar)
 
   Pass.call(this);
 
@@ -43,7 +42,6 @@ var OrthographicSSRPass = function(scene, camera, width, height, cameraRadius, c
   this.camera = camera;
   this.scene = scene;
 
-  // this.kernelRadius = 8;
   this.opacity = .5;
   this.kernelSize = 32;
   this.kernel = [];
@@ -210,7 +208,6 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render OrthographicSSR
 
-    // this.orthographicSSRMaterial.uniforms['kernelRadius'].value = this.kernelRadius;
     this.orthographicSSRMaterial.uniforms['opacity'].value = this.opacity;
     this.orthographicSSRMaterial.uniforms['minDistance'].value = this.minDistance;
     this.orthographicSSRMaterial.uniforms['maxDistance'].value = this.maxDistance;
@@ -297,8 +294,6 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 
   renderPass: function(renderer, passMaterial, renderTarget, clearColor, clearAlpha) {
-    // clearColor = 'black'
-    // clearAlpha = 1
 
     // save original state
     this.originalClearColor.copy(renderer.getClearColor());
@@ -328,8 +323,6 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 
   renderOverride: function(renderer, overrideMaterial, renderTarget, clearColor, clearAlpha) {
-    // clearColor = 'black'
-    // clearAlpha = 1
 
     this.originalClearColor.copy(renderer.getClearColor());
     var originalClearAlpha = renderer.getClearAlpha();
