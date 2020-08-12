@@ -26,11 +26,11 @@ import {
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 import { SimplexNoise } from "../math/SimplexNoise.js";
-import { SSRShader } from "../shaders/SSRShader.js";
-import { SSRBlurShader } from "../shaders/SSRShader.js";
+import { OrthographicSSRShader } from "../shaders/OrthographicSSRShader.js";
+import { OrthographicSSRBlurShader } from "../shaders/OrthographicSSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, cameraFar) {
+var OrthographicSSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, cameraFar) {
   // console.log(cameraRadius, cameraNear, cameraFar)
 
   Pass.call(this);
@@ -80,17 +80,17 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
     format: RGBAFormat
   });
 
-  // ssr render target
+  // orthographicSSR render target
 
-  this.ssrRenderTarget = new WebGLRenderTarget(this.width, this.height, {
+  this.orthographicSSRRenderTarget = new WebGLRenderTarget(this.width, this.height, {
     minFilter: LinearFilter,
     magFilter: LinearFilter,
     format: RGBAFormat
   });
 
-  this.blurRenderTarget = this.ssrRenderTarget.clone();
+  this.blurRenderTarget = this.orthographicSSRRenderTarget.clone();
 
-  // ssr material
+  // orthographicSSR material
 
   if (SSRShader === undefined) {
 
@@ -98,7 +98,7 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
 
   }
 
-  this.ssrMaterial = new ShaderMaterial({
+  this.orthographicSSRMaterial = new ShaderMaterial({
     defines: Object.assign({}, SSRShader.defines),
     uniforms: UniformsUtils.clone(SSRShader.uniforms),
     vertexShader: SSRShader.vertexShader,
@@ -106,20 +106,20 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
     blending: NoBlending
   });
 
-  this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
-  this.ssrMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
-  this.ssrMaterial.uniforms['tDepth'].value = this.depthRenderTarget.texture;
-  this.ssrMaterial.uniforms['tNoise'].value = this.noiseTexture;
-  this.ssrMaterial.uniforms['kernel'].value = this.kernel;
-  this.ssrMaterial.uniforms['cameraNear'].value = this.camera.near;
-  this.ssrMaterial.uniforms['cameraFar'].value = this.camera.far;
-  this.ssrMaterial.uniforms['resolution'].value.set(this.width, this.height);
-  this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
-  this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
-  this.ssrMaterial.uniforms['cameraNear2'].value = cameraNear
-  this.ssrMaterial.uniforms['cameraRange'].value = cameraFar - cameraNear
-  this.ssrMaterial.uniforms['UVWR'].value = cameraRadius * 2
-  this.ssrMaterial.uniforms['MAX_STEP'].value = Math.sqrt(this.width * this.width + this.height * this.height)
+  this.orthographicSSRMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+  this.orthographicSSRMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
+  this.orthographicSSRMaterial.uniforms['tDepth'].value = this.depthRenderTarget.texture;
+  this.orthographicSSRMaterial.uniforms['tNoise'].value = this.noiseTexture;
+  this.orthographicSSRMaterial.uniforms['kernel'].value = this.kernel;
+  this.orthographicSSRMaterial.uniforms['cameraNear'].value = this.camera.near;
+  this.orthographicSSRMaterial.uniforms['cameraFar'].value = this.camera.far;
+  this.orthographicSSRMaterial.uniforms['resolution'].value.set(this.width, this.height);
+  this.orthographicSSRMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
+  this.orthographicSSRMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
+  this.orthographicSSRMaterial.uniforms['cameraNear2'].value = cameraNear
+  this.orthographicSSRMaterial.uniforms['cameraRange'].value = cameraFar - cameraNear
+  this.orthographicSSRMaterial.uniforms['UVWR'].value = cameraRadius * 2
+  this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(this.width * this.width + this.height * this.height)
 
   // normal material
 
@@ -139,7 +139,7 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
     vertexShader: SSRBlurShader.vertexShader,
     fragmentShader: SSRBlurShader.fragmentShader
   });
-  this.blurMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+  this.blurMaterial.uniforms['tDiffuse'].value = this.orthographicSSRRenderTarget.texture;
   this.blurMaterial.uniforms['resolution'].value.set(this.width, this.height);
 
   // material for rendering the content of a render target
@@ -176,7 +176,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.beautyRenderTarget.dispose();
     this.normalRenderTarget.dispose();
     this.depthRenderTarget.dispose();
-    this.ssrRenderTarget.dispose();
+    this.orthographicSSRRenderTarget.dispose();
     this.blurRenderTarget.dispose();
 
     // dispose materials
@@ -208,13 +208,13 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     this.renderOverride(renderer, this.depthMaterial, this.depthRenderTarget, 0, 0);
 
-    // render SSR
+    // render OrthographicSSR
 
-    // this.ssrMaterial.uniforms['kernelRadius'].value = this.kernelRadius;
-    this.ssrMaterial.uniforms['opacity'].value = this.opacity;
-    this.ssrMaterial.uniforms['minDistance'].value = this.minDistance;
-    this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
-    this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
+    // this.orthographicSSRMaterial.uniforms['kernelRadius'].value = this.kernelRadius;
+    this.orthographicSSRMaterial.uniforms['opacity'].value = this.opacity;
+    this.orthographicSSRMaterial.uniforms['minDistance'].value = this.minDistance;
+    this.orthographicSSRMaterial.uniforms['maxDistance'].value = this.maxDistance;
+    this.renderPass(renderer, this.orthographicSSRMaterial, this.orthographicSSRRenderTarget);
 
     // render blur
 
@@ -225,15 +225,15 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     switch (this.output) {
 
-      case SSRPass.OUTPUT.SSR:
+      case OrthographicSSRPass.OUTPUT.OrthographicSSR:
 
-        this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+        this.copyMaterial.uniforms['tDiffuse'].value = this.orthographicSSRRenderTarget.texture;
         this.copyMaterial.blending = NoBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
         break;
 
-      case SSRPass.OUTPUT.Blur:
+      case OrthographicSSRPass.OUTPUT.Blur:
 
         this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
         this.copyMaterial.blending = NoBlending;
@@ -241,7 +241,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
         break;
 
-      case SSRPass.OUTPUT.Beauty:
+      case OrthographicSSRPass.OUTPUT.Beauty:
 
         this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
         this.copyMaterial.blending = NoBlending;
@@ -249,7 +249,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
         break;
 
-      case SSRPass.OUTPUT.Depth:
+      case OrthographicSSRPass.OUTPUT.Depth:
 
         this.copyMaterial.uniforms['tDiffuse'].value = this.depthRenderTarget.texture;
         this.copyMaterial.blending = NoBlending;
@@ -257,7 +257,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
         break;
 
-      case SSRPass.OUTPUT.Normal:
+      case OrthographicSSRPass.OUTPUT.Normal:
 
         this.copyMaterial.uniforms['tDiffuse'].value = this.normalRenderTarget.texture;
         this.copyMaterial.blending = NoBlending;
@@ -265,19 +265,19 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
         break;
 
-      case SSRPass.OUTPUT.Default:
+      case OrthographicSSRPass.OUTPUT.Default:
 
         this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
         this.copyMaterial.blending = NoBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
-        this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+        this.copyMaterial.uniforms['tDiffuse'].value = this.orthographicSSRRenderTarget.texture;
         this.copyMaterial.blending = AdditiveBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
         break;
 
-      case SSRPass.OUTPUT.DefaultBlur:
+      case OrthographicSSRPass.OUTPUT.DefaultBlur:
 
         this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
         this.copyMaterial.blending = NoBlending;
@@ -290,7 +290,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
         break;
 
       default:
-        console.warn('THREE.SSRPass: Unknown output type.');
+        console.warn('THREE.OrthographicSSRPass: Unknown output type.');
 
     }
 
@@ -367,14 +367,14 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.height = height;
 
     this.beautyRenderTarget.setSize(width, height);
-    this.ssrRenderTarget.setSize(width, height);
+    this.orthographicSSRRenderTarget.setSize(width, height);
     this.normalRenderTarget.setSize(width, height);
     this.blurRenderTarget.setSize(width, height);
 
-    this.ssrMaterial.uniforms['resolution'].value.set(width, height);
-    this.ssrMaterial.uniforms['MAX_STEP'].value = Math.sqrt(width * width + height * height)
-    this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
-    this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
+    this.orthographicSSRMaterial.uniforms['resolution'].value.set(width, height);
+    this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(width * width + height * height)
+    this.orthographicSSRMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
+    this.orthographicSSRMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
 
     this.blurMaterial.uniforms['resolution'].value.set(width, height);
 
@@ -411,7 +411,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     if (SimplexNoise === undefined) {
 
-      console.error('THREE.SSRPass: The pass relies on SimplexNoise.');
+      console.error('THREE.OrthographicSSRPass: The pass relies on SimplexNoise.');
 
     }
 
@@ -445,9 +445,9 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
 });
 
-SSRPass.OUTPUT = {
+OrthographicSSRPass.OUTPUT = {
   'Default': 0,
-  'SSR': 1,
+  'OrthographicSSR': 1,
   'Blur': 2,
   'Beauty': 3,
   'Depth': 4,
@@ -455,4 +455,4 @@ SSRPass.OUTPUT = {
   'DefaultBlur': 6
 };
 
-export { SSRPass };
+export { OrthographicSSRPass };

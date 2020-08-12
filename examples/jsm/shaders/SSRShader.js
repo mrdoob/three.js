@@ -4,12 +4,10 @@ import {
 } from "../../../build/three.module.js";
 /**
  * References:
- * http://john-chapman-graphics.blogspot.com/2013/01/ssr-tutorial.html
- * https://learnopengl.com/Advanced-Lighting/SSR
- * https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssr.frag.glsl
+ * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
  */
 
-var SSRShader = {
+var OrthographicSSRShader = {
 
   defines: {
     "PERSPECTIVE_CAMERA": 1,
@@ -157,7 +155,7 @@ var SSRShader = {
 
 };
 
-var SSRDepthShader = {
+var OrthographicSSRDepthShader = {
 
   defines: {
     "PERSPECTIVE_CAMERA": 1
@@ -222,7 +220,7 @@ var SSRDepthShader = {
 
 };
 
-var SSRBlurShader = {
+var OrthographicSSRBlurShader = {
 
   uniforms: {
 
@@ -278,4 +276,4 @@ var SSRBlurShader = {
 
 };
 
-export { SSRShader, SSRDepthShader, SSRBlurShader };
+export { OrthographicSSRShader, OrthographicSSRDepthShader, OrthographicSSRBlurShader };

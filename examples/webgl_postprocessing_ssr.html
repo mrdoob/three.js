@@ -31,7 +31,7 @@
 		import { GUI } from './jsm/libs/dat.gui.module.js';
 
 		import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
-		import { SSRPass } from './jsm/postprocessing/SSRPass.js';
+		import { OrthographicSSRPass } from './jsm/postprocessing/OrthographicSSRPass.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js'
 
 		var container, stats;
@@ -160,29 +160,28 @@
 
 			composer = new EffectComposer(renderer);
 
-			var ssrPass = new SSRPass(scene, camera, width, height, s.cameraRadius, s.cameraNear, s.cameraFar);
-			ssrPass.kernelRadius = 16;
-			composer.addPass(ssrPass);
+			var orthographicSSRPass = new OrthographicSSRPass(scene, camera, width, height, s.cameraRadius, s.cameraNear, s.cameraFar);
+			composer.addPass(orthographicSSRPass);
 
 			// Init gui
 			var gui = new GUI();
 
-			// console.log(ssrPass)
-			gui.add(ssrPass, 'output', {
-				'Default': SSRPass.OUTPUT.Default,
-				'SSR Only': SSRPass.OUTPUT.SSR,
-				'SSR Only + Blur': SSRPass.OUTPUT.Blur,
-				'Beauty': SSRPass.OUTPUT.Beauty,
-				'Depth': SSRPass.OUTPUT.Depth,
-				'Normal': SSRPass.OUTPUT.Normal
+			// console.log(orthographicSSRPass)
+			gui.add(orthographicSSRPass, 'output', {
+				'Default': OrthographicSSRPass.OUTPUT.Default,
+				'OrthographicSSR Only': OrthographicSSRPass.OUTPUT.OrthographicSSR,
+				'OrthographicSSR Only + Blur': OrthographicSSRPass.OUTPUT.Blur,
+				'Beauty': OrthographicSSRPass.OUTPUT.Beauty,
+				'Depth': OrthographicSSRPass.OUTPUT.Depth,
+				'Normal': OrthographicSSRPass.OUTPUT.Normal
 			}).onChange(function (value) {
 
-				ssrPass.output = parseInt(value);
+				orthographicSSRPass.output = parseInt(value);
 
 			});
-			gui.add(ssrPass, 'kernelRadius').min(0).max(32);
-			gui.add(ssrPass, 'minDistance').min(0.001).max(0.02);
-			gui.add(ssrPass, 'maxDistance').min(0.01).max(0.3);
+			gui.add(orthographicSSRPass, 'kernelRadius').min(0).max(32);
+			gui.add(orthographicSSRPass, 'minDistance').min(0.001).max(0.02);
+			gui.add(orthographicSSRPass, 'maxDistance').min(0.01).max(0.3);
 
 			window.addEventListener('resize', onWindowResize, false);
 
