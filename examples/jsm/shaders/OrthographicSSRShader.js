@@ -29,7 +29,6 @@ var OrthographicSSRShader = {
     "opacity": { value: .5 },
     "minDistance": { value: 0.005 },
     "maxDistance": { value: 1 },
-    "cameraNear2": { value: 0 },
     "cameraRange": { value: 0 },
     "UVWR": { value: 0 },
     "MAX_STEP": { value: 0 },
@@ -56,15 +55,15 @@ var OrthographicSSRShader = {
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
 		uniform sampler2D tDiffuse;
+		uniform float cameraNear;
 		uniform float cameraRange;
-		uniform float cameraNear2;
 		uniform float UVWR; //uv unit to world unit ratio
 		uniform vec2 resolution;
 		uniform float MAX_STEP;
 		uniform float opacity;
 		uniform float maxDistance;//uv unit
 		float depthToDistance(float depth){
-			return (1.-depth)*cameraRange+cameraNear2;
+			return (1.-depth)*cameraRange+cameraNear;
 		}
 		vec3 getPos(vec2 uv,float depth){
 			vec3 pos;

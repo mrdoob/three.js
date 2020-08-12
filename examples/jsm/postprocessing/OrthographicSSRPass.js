@@ -30,7 +30,7 @@ import { OrthographicSSRShader } from "../shaders/OrthographicSSRShader.js";
 import { OrthographicSSRBlurShader } from "../shaders/OrthographicSSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var OrthographicSSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, cameraFar) {
+var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
 
   Pass.call(this);
 
@@ -114,9 +114,8 @@ var OrthographicSSRPass = function(scene, camera, width, height, cameraRadius, c
   this.orthographicSSRMaterial.uniforms['resolution'].value.set(this.width, this.height);
   this.orthographicSSRMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
   this.orthographicSSRMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
-  this.orthographicSSRMaterial.uniforms['cameraNear2'].value = cameraNear
-  this.orthographicSSRMaterial.uniforms['cameraRange'].value = cameraFar - cameraNear
-  this.orthographicSSRMaterial.uniforms['UVWR'].value = cameraRadius * 2
+  this.orthographicSSRMaterial.uniforms['cameraRange'].value = this.camera.far; - this.camera.near;
+  this.orthographicSSRMaterial.uniforms['UVWR'].value = frustumSize
   this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(this.width * this.width + this.height * this.height)
 
   // normal material

@@ -36,6 +36,7 @@
 		window.is_reflect = true
 
 		var container, stats;
+		var frustumSize = 3;
 
 		var camera, cameraTarget, scene, renderer, composer;
 
@@ -49,8 +50,8 @@
 
 			var cameraNear = 1
 			var cameraFar = 7
-			var cameraRadius = 1.5
-			camera = new THREE.OrthographicCamera(-cameraRadius, cameraRadius, cameraRadius, -cameraRadius, cameraNear, cameraFar)
+			var aspect = window.innerWidth / window.innerHeight;
+			camera = new THREE.OrthographicCamera(frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, cameraNear, cameraFar);
 			camera.position.set(-3.841971267097966, 1.628450668378282, 2.7545244967964964)
 
 			scene = new THREE.Scene();
@@ -168,7 +169,7 @@
 
 
 			composer = new EffectComposer(renderer);
-			var orthographicSSRPass = new OrthographicSSRPass(scene, camera, innerWidth, innerHeight, cameraRadius, cameraNear, cameraFar);
+			var orthographicSSRPass = new OrthographicSSRPass(scene, camera, innerWidth, innerHeight, frustumSize);
 			composer.addPass(orthographicSSRPass);
 
 			// Init gui
@@ -226,7 +227,13 @@
 
 		function onWindowResize() {
 
-			camera.aspect = window.innerWidth / window.innerHeight;
+			var aspect = window.innerWidth / window.innerHeight;
+
+			camera.left = - frustumSize * aspect / 2;
+			camera.right = frustumSize * aspect / 2;
+			camera.top = frustumSize / 2;
+			camera.bottom = - frustumSize / 2;
+
 			camera.updateProjectionMatrix();
 
 			renderer.setSize(window.innerWidth, window.innerHeight);
