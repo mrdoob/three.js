@@ -23,7 +23,7 @@
 	<script type="module">
 
 		import * as THREE from '../build/three.module.js';
-		window.THREE=THREE
+		window.THREE = THREE
 
 		import Stats from './jsm/libs/stats.module.js';
 		import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -52,8 +52,7 @@
 			document.body.appendChild(renderer.domElement);
 
 
-			if (1) {
-
+			{
 				s.cameraNear = 0.1
 				s.cameraFar = 10
 				s.cameraZ = 5
@@ -104,49 +103,6 @@
 					// mesh.position.y = -.5
 					geo.rotateX(-Math.PI / 2)
 					geo.translate(0, -.5, 0)
-				}
-			}
-
-			if (0) {
-
-				s.cameraNear = 100
-				s.cameraFar = 700
-				s.cameraZ = 500
-				s.cameraRadius = 300
-				s.camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, s.cameraNear, s.cameraFar)
-				// camera = new THREE.OrthographicCamera(-s.cameraRadius, s.cameraRadius, s.cameraRadius, -s.cameraRadius, s.cameraNear, s.cameraFar)
-				s.camera = camera
-				s.camera.position.z = s.cameraZ
-
-				scene = new THREE.Scene();
-				s.scene = scene
-				// scene.background = new THREE.Color(0xaaaaaa);
-
-				scene.add(new THREE.DirectionalLight());
-				scene.add(new THREE.HemisphereLight());
-
-				group = new THREE.Group();
-				scene.add(group);
-
-				var geometry = new THREE.BoxBufferGeometry(10, 10, 10);
-
-				for (var i = 0; i < 100; i++) {
-
-					var material = new THREE.MeshLambertMaterial({
-						color: Math.random() * 0xffffff
-					});
-
-					var mesh = new THREE.Mesh(geometry, material);
-					mesh.position.x = Math.random() * 400 - 200;
-					mesh.position.y = Math.random() * 400 - 200;
-					mesh.position.z = Math.random() * 400 - 200;
-					mesh.rotation.x = Math.random();
-					mesh.rotation.y = Math.random();
-					mesh.rotation.z = Math.random();
-
-					mesh.scale.setScalar(Math.random() * 10 + 2);
-					group.add(mesh);
-
 				}
 			}
 
