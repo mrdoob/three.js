@@ -107,7 +107,26 @@ var SSRShader = {
 		vec3 getViewNormal( const in vec2 screenPosition ) {
 			return unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );
 		}
+		vec2 viewPositionToXY(vec3 viewPosition){
+			vec2 xy;
+			// d1=getViewPositionReverse(viewPosition);
+			float clipW = cameraProjectionMatrix[2][3] * viewPosition.z + cameraProjectionMatrix[3][3];
+			xy=(cameraProjectionMatrix*vec4(viewPosition,1)).xy;
+			xy/=clipW;
+			xy+=1.;
+			xy/=2.;
+			// gl_FragColor=vec4(vUv,0,1); return;
+			// gl_FragColor=vec4(d1,0,1); return;
+			xy*=resolution;
+			return xy;
+		}
 		void main(){
+
+			// vec3 pos=vec3(1,0,-2);
+			// vec4 projected=cameraProjectionMatrix*vec4(pos,1);
+			// float clipW = cameraProjectionMatrix[2][3] * pos.z + cameraProjectionMatrix[3][3];
+			// gl_FragColor=vec4(projected.xyz/clipW,1);return;
+
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
 			vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
@@ -118,6 +137,7 @@ var SSRShader = {
 
 			// if(depth<=0.) return;
 			vec2 d0=vUv*resolution;
+			// vec2 d0=gl_FragCoord.xy;
 
 			// vec2 test=(transpose(cameraProjectionMatrix)*vec4(viewPosition,1)).xy;
 			// test+=1.;
@@ -129,18 +149,13 @@ var SSRShader = {
 			vec2 d1;
 
 			vec3 viewNormal=getViewNormal( vUv );;
-			vec3 viewReflectDir=reflect(vec3(0,0,-1),viewNormal);
+			// gl_FragColor=vec4(viewNormal,1); return;
+			// vec3 viewReflectDir=reflect(vec3(0,0,-1),viewNormal);
+			vec3 viewReflectDir=reflect(normalize(viewPosition),viewNormal);
 			// gl_FragColor=vec4(viewReflectDir,1); return;
 
 			vec3 d1viewPosition=viewPosition+viewReflectDir*MAX_DIST;
-			d1=getViewPositionReverse(d1viewPosition);
-			// d1=(transpose(cameraProjectionMatrix)*vec4(d1viewPosition,1)).xy;
-			// d1=(cameraInverseProjectionMatrix*vec4(d1viewPosition,1)).xy;
-			// d1+=1.;
-			// d1/=2.;
-			// gl_FragColor=vec4(vUv,0,1); return;
-			// gl_FragColor=vec4(d1,0,1); return;
-			d1*=resolution;
+			d1=viewPositionToXY(d1viewPosition);
 
 			float totalLen=length(d1-d0);
 			float xLen=d1.x-d0.x;
@@ -161,13 +176,13 @@ var SSRShader = {
 				float d = getDepth(uv);
 				float vZ = getViewZ( d );
 				vec3 vP=getViewPosition( uv, d, vZ );
-				vec3 vRayPos=viewPosition+(length(vec2(x,y)-d0)/totalLen)*(viewReflectDir*MAX_DIST);
+				vec3 vRayPos=viewPosition+(length(vec2(x,y)-d0)/totalLen)*(viewReflectDir*MAX_DIST);///todo line cone intersection
 				float away=length(vRayPos-vP);
 				if(away<SURF_DIST){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;
-					vec4 reflect=texture2D(tDiffuse,uv);
-					gl_FragColor=reflect;
+					vec4 reflectColor=texture2D(tDiffuse,uv);
+					gl_FragColor=reflectColor;
 					gl_FragColor.a=.5;
 					break;
 				}
