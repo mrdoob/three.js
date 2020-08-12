@@ -43,14 +43,15 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
   this.camera = camera;
   this.scene = scene;
 
-  this.kernelRadius = 8;
+  // this.kernelRadius = 8;
+  this.opacity = .5;
   this.kernelSize = 32;
   this.kernel = [];
   this.noiseTexture = null;
   this.output = 0;
 
   this.minDistance = 0.005;
-  this.maxDistance = 0.1;
+  this.maxDistance = 1;
 
   //
 
@@ -118,6 +119,7 @@ var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, c
   this.ssrMaterial.uniforms['cameraNear2'].value = cameraNear
   this.ssrMaterial.uniforms['cameraRange'].value = cameraFar - cameraNear
   this.ssrMaterial.uniforms['UVWR'].value = cameraRadius * 2
+  this.ssrMaterial.uniforms['MAX_STEP'].value = Math.sqrt(this.width * this.width + this.height * this.height)
 
   // normal material
 
@@ -208,13 +210,15 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render SSR
 
-    this.ssrMaterial.uniforms['kernelRadius'].value = this.kernelRadius;
+    // this.ssrMaterial.uniforms['kernelRadius'].value = this.kernelRadius;
+    this.ssrMaterial.uniforms['opacity'].value = this.opacity;
     this.ssrMaterial.uniforms['minDistance'].value = this.minDistance;
     this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
     this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
 
     // render blur
 
+    this.blurMaterial.uniforms['opacity'].value = this.opacity;
     this.renderPass(renderer, this.blurMaterial, this.blurRenderTarget);
 
     // output result to screen
@@ -267,8 +271,19 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
         this.copyMaterial.blending = NoBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
-        // this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
         this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+        this.copyMaterial.blending = AdditiveBlending;
+        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+
+        break;
+
+      case SSRPass.OUTPUT.DefaultBlur:
+
+        this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+        this.copyMaterial.blending = NoBlending;
+        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+
+        this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
         this.copyMaterial.blending = AdditiveBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
@@ -357,6 +372,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.blurRenderTarget.setSize(width, height);
 
     this.ssrMaterial.uniforms['resolution'].value.set(width, height);
+    this.ssrMaterial.uniforms['MAX_STEP'].value = Math.sqrt(width * width + height * height)
     this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
     this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
 
@@ -435,7 +451,8 @@ SSRPass.OUTPUT = {
   'Blur': 2,
   'Beauty': 3,
   'Depth': 4,
-  'Normal': 5
+  'Normal': 5,
+  'DefaultBlur': 6
 };
 
 export { SSRPass };

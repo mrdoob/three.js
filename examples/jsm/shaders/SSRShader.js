@@ -28,12 +28,14 @@ var SSRShader = {
     "resolution": { value: new Vector2() },
     "cameraProjectionMatrix": { value: new Matrix4() },
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
-    "kernelRadius": { value: 8 },
+    // "kernelRadius": { value: 8 },
+    "opacity": { value: .5 },
     "minDistance": { value: 0.005 },
-    "maxDistance": { value: 0.05 },
+    "maxDistance": { value: 1 },
     "cameraNear2": { value: 0 },
     "cameraRange": { value: 0 },
     "UVWR": { value: 0 },
+    "MAX_STEP": { value: 0 },
 
   },
 
@@ -52,8 +54,6 @@ var SSRShader = {
   ].join("\n"),
 
   fragmentShader: `
-		#define MAX_DISTuv 1. //uv unit
-		#define MAX_STEP ${innerWidth * Math.sqrt(2)}
 		#define SURF_DISTuv .01
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
@@ -63,6 +63,9 @@ var SSRShader = {
 		uniform float cameraNear2;
 		uniform float UVWR; //uv unit to world unit ratio
 		uniform vec2 resolution;
+		uniform float MAX_STEP;
+		uniform float opacity;
+		uniform float maxDistance;//uv unit
 		float depthToDistance(float depth){
 			return (1.-depth)*cameraRange+cameraNear2;
 		}
@@ -110,7 +113,7 @@ var SSRShader = {
 			// if(reflectDirLen<=0.) return;
 			// reflectDir.x=abs(reflectDir.x);
 			// reflectDir=normalize(vec3(-1,-1,0));
-			d1=d0+(reflectDir*MAX_DISTuv).xy*vec2(resolution.x,resolution.y);
+			d1=d0+(reflectDir*maxDistance).xy*vec2(resolution.x,resolution.y);
 			float totalLen=length(d1-d0);
 			float xLen=d1.x-d0.x;
 			float yLen=d1.y-d0.y;
@@ -126,7 +129,7 @@ var SSRShader = {
 				float u=x/resolution.x;
 				float v=y/resolution.y;
 				vec3 p=getPos(vec2(u,v));
-				vec3 rayPos=pos+(length(vec2(x,y)-d0)/totalLen)*(reflectDir*MAX_DISTuv);
+				vec3 rayPos=pos+(length(vec2(x,y)-d0)/totalLen)*(reflectDir*maxDistance);
 				float away=length(rayPos-p);
 				if(away<SURF_DISTuv){
 					// float d=texture2D(tDepth,vec2(u,v)).r;
@@ -143,7 +146,7 @@ var SSRShader = {
 					vec4 reflect=texture2D(tDiffuse,vec2(u,v));
 					// gl_FragColor=color;
 					gl_FragColor=reflect;
-					gl_FragColor.a=.5;
+					gl_FragColor.a=opacity;
 					// gl_FragColor=mix(color,reflect,.5);
 					// gl_FragColor=vec4(u,v,0,1);
 					break;
@@ -224,7 +227,8 @@ var SSRBlurShader = {
   uniforms: {
 
     "tDiffuse": { value: null },
-    "resolution": { value: new Vector2() }
+    "resolution": { value: new Vector2() },
+    "opacity": { value: .5 },
 
   },
 
@@ -246,6 +250,7 @@ var SSRBlurShader = {
     "uniform sampler2D tDiffuse;",
 
     "uniform vec2 resolution;",
+    "uniform float opacity;",
 
     "varying vec2 vUv;",
 
@@ -265,7 +270,7 @@ var SSRBlurShader = {
 
     "	}",
 
-    "	gl_FragColor = vec4(  result / ( 5.0 * 5.0 ) , 1.0 );",
+    "	gl_FragColor = vec4(  result / ( 5.0 * 5.0 ) , opacity );",
 
     "}"
 

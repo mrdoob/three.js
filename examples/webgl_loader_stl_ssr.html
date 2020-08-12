@@ -16,10 +16,8 @@
 		<a href="https://threejs.org"
 			 target="_blank"
 			 rel="noopener">three.js</a> -
-		STL loader test by <a href="https://github.com/aleeper"
-			 target="_blank"
-			 rel="noopener">aleeper</a>.<br />
-		PR2 head from <a href="http://www.ros.org/wiki/pr2_description">www.ros.org</a>
+		OrthographicSSRPass test by <a href="http://gonnavis.com/"
+			 target="_blank">gonnavis</a>.<br />
 	</div>
 
 	<script type="module">
@@ -27,6 +25,7 @@
 		import * as THREE from '../build/three.module.js';
 
 		import Stats from './jsm/libs/stats.module.js';
+		import { GUI } from './jsm/libs/dat.gui.module.js';
 
 		import { STLLoader } from './jsm/loaders/STLLoader.js';
 
@@ -54,10 +53,12 @@
 
 			var cameraNear = 1
 			var cameraFar = 7
-			var cameraZ = 5
+			// var cameraZ = 5
 			var cameraRadius = 1.5
 			camera = new THREE.OrthographicCamera(-cameraRadius, cameraRadius, cameraRadius, -cameraRadius, cameraNear, cameraFar)
-			camera.position.z = cameraZ
+			// camera.position.z = cameraZ
+			camera.position.set(-3.841971267097966, 1.628450668378282, 2.7545244967964964)
+			window.camera = camera///test
 
 			scene = new THREE.Scene();
 			// scene.background = new THREE.Color(0x72645b);
@@ -177,6 +178,28 @@
 			composer = new EffectComposer(renderer);
 			var ssrPass = new SSRPass(scene, camera, innerWidth, innerHeight, cameraRadius, cameraNear, cameraFar);
 			composer.addPass(ssrPass);
+
+			// Init gui
+			var gui = new GUI();
+
+			// console.log(ssrPass)
+			gui.add(ssrPass, 'output', {
+				'Default': SSRPass.OUTPUT.Default,
+				'DefaultBlur': SSRPass.OUTPUT.DefaultBlur,
+				'SSR Only': SSRPass.OUTPUT.SSR,
+				'SSR Only + Blur': SSRPass.OUTPUT.Blur,
+				'Beauty': SSRPass.OUTPUT.Beauty,
+				'Depth': SSRPass.OUTPUT.Depth,
+				'Normal': SSRPass.OUTPUT.Normal
+			}).onChange(function (value) {
+
+				ssrPass.output = parseInt(value);
+
+			});
+			// gui.add(ssrPass, 'kernelRadius').min(0).max(32);
+			gui.add(ssrPass, 'opacity').min(0).max(1);
+			// gui.add(ssrPass, 'minDistance').min(0.001).max(0.02);
+			gui.add(ssrPass, 'maxDistance').min(0).max(2);
 
 			new OrbitControls(camera, renderer.domElement)
 
