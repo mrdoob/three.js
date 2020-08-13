@@ -225,10 +225,11 @@ const material = new THREE.MeshBasicMaterial({color: 0x44aa88});
 ```
 
 We then create a `Mesh`. A `Mesh` in three represents the combination
-of a `Geometry` (the shape of the object) and a `Material` (how to draw
-the object, shiny or flat, what color, what texture(s) to apply. Etc.)
-as well as the position, orientation, and scale of that
-object in the scene.
+of a three things
+
+1. A `Geometry` (the shape of the object)
+2. A `Material` (how to draw the object, shiny or flat, what color, what texture(s) to apply. Etc.)
+3. The position, orientation, and scale of that object in the scene relative to its parent. In the code below that parent is the scene.
 
 ```js
 const cube = new THREE.Mesh(geometry, material);
