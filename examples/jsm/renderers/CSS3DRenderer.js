@@ -96,18 +96,24 @@ var CSS3DRenderer = function () {
 
 	};
 
+	function makeEven( value ) {
+
+		return 2 * Math.round( value / 2 );
+
+	}
+
 	this.setSize = function ( width, height ) {
 
-		_width = width;
-		_height = height;
+		_width = makeEven( width ); // #19854
+		_height = makeEven( height );
 		_widthHalf = _width / 2;
 		_heightHalf = _height / 2;
 
-		domElement.style.width = width + 'px';
-		domElement.style.height = height + 'px';
+		domElement.style.width = _width + 'px';
+		domElement.style.height = _height + 'px';
 
-		cameraElement.style.width = width + 'px';
-		cameraElement.style.height = height + 'px';
+		cameraElement.style.width = _width + 'px';
+		cameraElement.style.height = _height + 'px';
 
 	};
 
