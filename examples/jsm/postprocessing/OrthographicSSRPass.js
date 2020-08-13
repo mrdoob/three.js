@@ -115,7 +115,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.orthographicSSRMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
   this.orthographicSSRMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
   this.orthographicSSRMaterial.uniforms['cameraRange'].value = this.camera.far; - this.camera.near;
-  this.orthographicSSRMaterial.uniforms['UVWR'].value = frustumSize
+  this.orthographicSSRMaterial.uniforms['frustumSize'].value = frustumSize
   this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(this.width * this.width + this.height * this.height)
 
   // normal material

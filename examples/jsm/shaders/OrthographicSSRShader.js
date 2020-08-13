@@ -30,7 +30,7 @@ var OrthographicSSRShader = {
     "minDistance": { value: 0.005 },
     "maxDistance": { value: 1 },
     "cameraRange": { value: 0 },
-    "UVWR": { value: 0 },
+    "frustumSize": { value: 0 },
     "MAX_STEP": { value: 0 },
 
   },
@@ -57,7 +57,7 @@ var OrthographicSSRShader = {
 		uniform sampler2D tDiffuse;
 		uniform float cameraNear;
 		uniform float cameraRange;
-		uniform float UVWR; //uv unit to world unit ratio
+		uniform float frustumSize;
 		uniform vec2 resolution;
 		uniform float MAX_STEP;
 		uniform float opacity;
@@ -68,7 +68,7 @@ var OrthographicSSRShader = {
 		vec3 getPos(vec2 uv,float depth){
 			vec3 pos;
 			vec3 viewDir=vec3(0,0,-1);
-			float distance=depthToDistance(depth)/UVWR;
+			float distance=depthToDistance(depth)/frustumSize;
 			vec3 viewRay=viewDir*distance;
 			pos=vec3(uv,0)+viewRay;
 			return pos;
