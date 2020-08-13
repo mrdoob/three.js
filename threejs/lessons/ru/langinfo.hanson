@@ -11,6 +11,7 @@
   categoryMapping: {
     'basics': 'Введение',
     'solutions': 'Решения',
+    'optimization': 'Оптимизация',
     'tips': 'Советы',
     'fundamentals': 'Фунаментальные понятия',
     'reference': 'Ссылки',
