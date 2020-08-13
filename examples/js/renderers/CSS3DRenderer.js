@@ -82,7 +82,6 @@ THREE.CSS3DRenderer = function () {
 	domElement.appendChild( cameraElement );
 
 	var isIE = /Trident/i.test( navigator.userAgent );
-	var isSafari = /Safari/.test( navigator.userAgent ) && ! /Chrome/.test( navigator.userAgent );
 
 	this.getSize = function () {
 
@@ -331,17 +330,8 @@ THREE.CSS3DRenderer = function () {
 			'scale(' + fov + ')' + 'translate(' + epsilon( tx ) + 'px,' + epsilon( ty ) + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse ) :
 			'translateZ(' + fov + 'px)' + getCameraCSSMatrix( camera.matrixWorldInverse );
 
-		var cameraTranslateX = _widthHalf;
-		var cameraTranslateY = _heightHalf;
-
-		if ( isSafari && camera.isOrthographicCamera ) {
-
-			cameraTranslateX = Math.round( cameraTranslateX );
-			cameraTranslateY = Math.round( cameraTranslateY );
-
-		}
-
-		var style = cameraCSSMatrix + 'translate(' + cameraTranslateX + 'px,' + cameraTranslateY + 'px)';
+		var style = cameraCSSMatrix +
+			'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)';
 
 		if ( cache.camera.style !== style && ! isIE ) {
 
