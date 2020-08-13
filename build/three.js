@@ -15510,9 +15510,9 @@
 
 				}
 
-				updateBuffers = needsUpdate( geometry );
+				updateBuffers = needsUpdate( geometry, index );
 
-				if ( updateBuffers ) { saveCache( geometry ); }
+				if ( updateBuffers ) { saveCache( geometry, index ); }
 
 			} else {
 
@@ -15642,13 +15642,14 @@
 				enabledAttributes: enabledAttributes,
 				attributeDivisors: attributeDivisors,
 				object: vao,
-				attributes: {}
+				attributes: {},
+				index: null
 
 			};
 
 		}
 
-		function needsUpdate( geometry ) {
+		function needsUpdate( geometry, index ) {
 
 			var cachedAttributes = currentState.attributes;
 			var geometryAttributes = geometry.attributes;
@@ -15660,17 +15661,21 @@
 				var cachedAttribute = cachedAttributes[ key ];
 				var geometryAttribute = geometryAttributes[ key ];
 
+				if ( cachedAttribute === undefined ) { return true; }
+
 				if ( cachedAttribute.attribute !== geometryAttribute ) { return true; }
 
 				if ( cachedAttribute.data !== geometryAttribute.data ) { return true; }
 
 			}
 
+			if ( currentState.index !== index ) { return true; }
+
 			return false;
 
 		}
 
-		function saveCache( geometry ) {
+		function saveCache( geometry, index ) {
 
 			var cache = {};
 			var attributes = geometry.attributes;
@@ -15693,6 +15698,8 @@
 			}
 
 			currentState.attributes = cache;
+
+			currentState.index = index;
 
 		}
 
@@ -40154,6 +40161,7 @@
 
 						case 'm3':
 							material.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
+							break;
 
 						case 'm4':
 							material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );

@@ -15531,9 +15531,9 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 
 			}
 
-			updateBuffers = needsUpdate( geometry );
+			updateBuffers = needsUpdate( geometry, index );
 
-			if ( updateBuffers ) saveCache( geometry );
+			if ( updateBuffers ) saveCache( geometry, index );
 
 		} else {
 
@@ -15663,13 +15663,14 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 			enabledAttributes: enabledAttributes,
 			attributeDivisors: attributeDivisors,
 			object: vao,
-			attributes: {}
+			attributes: {},
+			index: null
 
 		};
 
 	}
 
-	function needsUpdate( geometry ) {
+	function needsUpdate( geometry, index ) {
 
 		const cachedAttributes = currentState.attributes;
 		const geometryAttributes = geometry.attributes;
@@ -15681,17 +15682,21 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 			const cachedAttribute = cachedAttributes[ key ];
 			const geometryAttribute = geometryAttributes[ key ];
 
+			if ( cachedAttribute === undefined ) return true;
+
 			if ( cachedAttribute.attribute !== geometryAttribute ) return true;
 
 			if ( cachedAttribute.data !== geometryAttribute.data ) return true;
 
 		}
 
+		if ( currentState.index !== index ) return true;
+
 		return false;
 
 	}
 
-	function saveCache( geometry ) {
+	function saveCache( geometry, index ) {
 
 		const cache = {};
 		const attributes = geometry.attributes;
@@ -15714,6 +15719,8 @@ function WebGLBindingStates( gl, extensions, attributes, capabilities ) {
 		}
 
 		currentState.attributes = cache;
+
+		currentState.index = index;
 
 	}
 
@@ -40214,6 +40221,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					case 'm3':
 						material.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
+						break;
 
 					case 'm4':
 						material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
