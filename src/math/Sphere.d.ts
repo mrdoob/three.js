@@ -7,7 +7,14 @@ export class Sphere {
 
 	constructor( center?: Vector3, radius?: number );
 
+	/**
+	 * @default new Vector3()
+	 */
 	center: Vector3;
+
+	/**
+	 * @default 1
+	 */
 	radius: number;
 
 	set( center: Vector3, radius: number ): Sphere;

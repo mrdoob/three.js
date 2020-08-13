@@ -8,7 +8,14 @@ export class Ray {
 
 	constructor( origin?: Vector3, direction?: Vector3 );
 
+	/**
+	 * @default new THREE.Vector3()
+	 */
 	origin: Vector3;
+
+	/**
+	 * @default new THREE.Vector3( 0, 0, - 1 )
+	 */
 	direction: Vector3;
 
 	set( origin: Vector3, direction: Vector3 ): Ray;

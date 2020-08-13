@@ -16,16 +16,19 @@ export class Camera extends Object3D {
 
 	/**
 	 * This is the inverse of matrixWorld. MatrixWorld contains the Matrix which has the world transform of the Camera.
+	 * @default new THREE.Matrix4()
 	 */
 	matrixWorldInverse: Matrix4;
 
 	/**
 	 * This is the matrix which contains the projection.
+	 * @default new THREE.Matrix4()
 	 */
 	projectionMatrix: Matrix4;
 
 	/**
 	 * This is the inverse of projectionMatrix.
+	 * @default new THREE.Matrix4()
 	 */
 	projectionMatrixInverse: Matrix4;
 

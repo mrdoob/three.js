@@ -29,18 +29,64 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 	constructor( parameters: MeshPhysicalMaterialParameters );
 
+	/**
+	 * @default 'MeshPhysicalMaterial'
+	 */
+	type: string;
+
+	/**
+	 * @default { 'STANDARD': '', 'PHYSICAL': '' }
+	 */
+	defines: { [key: string]: any };
+
+	/**
+	 * @default 0
+	 */
 	clearcoat: number;
+
+	/**
+	 * @default null
+	 */
 	clearcoatMap: Texture | null;
+
+	/**
+	 * @default 0
+	 */
 	clearcoatRoughness: number;
+
+	/**
+	 * @default null
+	 */
 	clearcoatRoughnessMap: Texture | null;
+
+	/**
+	 * @default new THREE.Vector2( 1, 1 )
+	 */
 	clearcoatNormalScale: Vector2;
+
+	/**
+	 * @default null
+	 */
 	clearcoatNormalMap: Texture | null;
 
+	/**
+	 * @default 0.5
+	 */
 	reflectivity: number;
 
+	/**
+	 * @default null
+	 */
 	sheen: Color | null;
 
+	/**
+	 * @default 0
+	 */
 	transmission: number;
+
+	/**
+	 * @default null
+	 */
 	transmissionMap: Texture | null;
 
 }
