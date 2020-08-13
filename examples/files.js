@@ -268,6 +268,7 @@ var files = {
 		"webgl_postprocessing_smaa",
 		"webgl_postprocessing_sobel",
 		"webgl_postprocessing_ssao",
+		"webgl_postprocessing_orthographicssr",
 		"webgl_postprocessing_taa",
 		"webgl_postprocessing_unreal_bloom",
 		"webgl_postprocessing_unreal_bloom_selective"
@@ -483,6 +484,7 @@ var tags = {
 	"webgl_postprocessing_smaa": [ "msaa", "multisampled" ],
 	"webgl_postprocessing_sobel": [ "filter", "edge detection" ],
 	"webgl_postprocessing_ssao": [ "ambient occlusion" ],
+	"webgl_postprocessing_orthographicSSR": [ "orthographic screen space reflection" ],
 	"webgl_postprocessing_unreal_bloom": [ "glow" ],
 	"webgl_postprocessing_unreal_bloom_selective": [ "glow" ],
 	"webgl_fire": [ "smoke" ],
