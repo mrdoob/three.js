@@ -3,6 +3,13 @@ import { BufferGeometry } from './../core/BufferGeometry';
 
 export class TorusBufferGeometry extends BufferGeometry {
 
+	/**
+	 * @param [radius=1]
+	 * @param [tube=0.4]
+	 * @param [radialSegments=8]
+	 * @param [tubularSegments=6]
+	 * @param [arc=Math.PI * 2]
+	 */
 	constructor(
 		radius?: number,
 		tube?: number,
@@ -10,6 +17,11 @@ export class TorusBufferGeometry extends BufferGeometry {
 		tubularSegments?: number,
 		arc?: number
 	);
+
+	/**
+	 * @default 'TorusBufferGeometry'
+	 */
+	type: string;
 
 	parameters: {
 		radius: number;
@@ -23,6 +35,13 @@ export class TorusBufferGeometry extends BufferGeometry {
 
 export class TorusGeometry extends Geometry {
 
+	/**
+	 * @param [radius=1]
+	 * @param [tube=0.4]
+	 * @param [radialSegments=8]
+	 * @param [tubularSegments=6]
+	 * @param [arc=Math.PI * 2]
+	 */
 	constructor(
 		radius?: number,
 		tube?: number,
@@ -30,6 +49,11 @@ export class TorusGeometry extends Geometry {
 		tubularSegments?: number,
 		arc?: number
 	);
+
+	/**
+	 * @default 'TorusGeometry'
+	 */
+	type: string;
 
 	parameters: {
 		radius: number;

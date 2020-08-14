@@ -21,6 +21,7 @@ import { WebGLBindingStates } from './webgl/WebGLBindingStates.js';
 import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
 import { WebGLClipping } from './webgl/WebGLClipping.js';
+import { WebGLCubeMaps } from './webgl/WebGLCubeMaps.js';
 import { WebGLExtensions } from './webgl/WebGLExtensions.js';
 import { WebGLGeometries } from './webgl/WebGLGeometries.js';
 import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
@@ -251,7 +252,7 @@ function WebGLRenderer( parameters ) {
 	}
 
 	let extensions, capabilities, state, info;
-	let properties, textures, attributes, geometries, objects;
+	let properties, textures, cubemaps, attributes, geometries, objects;
 	let programCache, materials, renderLists, renderStates;
 
 	let background, morphtargets, bufferRenderer, indexedBufferRenderer;
@@ -288,17 +289,18 @@ function WebGLRenderer( parameters ) {
 		info = new WebGLInfo( _gl );
 		properties = new WebGLProperties();
 		textures = new WebGLTextures( _gl, extensions, state, properties, capabilities, utils, info );
+		cubemaps = new WebGLCubeMaps( _this );
 		attributes = new WebGLAttributes( _gl, capabilities );
 		bindingStates = new WebGLBindingStates( _gl, extensions, attributes, capabilities );
 		geometries = new WebGLGeometries( _gl, attributes, info, bindingStates );
 		objects = new WebGLObjects( _gl, geometries, attributes, info );
 		morphtargets = new WebGLMorphtargets( _gl );
-		programCache = new WebGLPrograms( _this, extensions, capabilities, bindingStates );
-		materials = new WebGLMaterials( properties );
+		programCache = new WebGLPrograms( _this, cubemaps, extensions, capabilities, bindingStates );
+		materials = new WebGLMaterials( properties, cubemaps );
 		renderLists = new WebGLRenderLists( properties );
 		renderStates = new WebGLRenderStates();
 
-		background = new WebGLBackground( _this, state, objects, _premultipliedAlpha );
+		background = new WebGLBackground( _this, cubemaps, state, objects, _premultipliedAlpha );
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info, capabilities );
@@ -588,6 +590,7 @@ function WebGLRenderer( parameters ) {
 		renderLists.dispose();
 		renderStates.dispose();
 		properties.dispose();
+		cubemaps.dispose();
 		objects.dispose();
 		bindingStates.dispose();
 
@@ -1400,6 +1403,7 @@ function WebGLRenderer( parameters ) {
 
 		materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 		materialProperties.fog = scene.fog;
+		materialProperties.envMap = cubemaps.get( material.envMap || materialProperties.environment );
 
 		// store the light setup it was created for
 
@@ -1448,6 +1452,7 @@ function WebGLRenderer( parameters ) {
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
+		const envMap = cubemaps.get( material.envMap || environment );
 
 		const materialProperties = properties.get( material );
 		const lights = currentRenderState.state.lights;
@@ -1496,6 +1501,10 @@ function WebGLRenderer( parameters ) {
 				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.outputEncoding !== encoding ) {
+
+				initMaterial( material, scene, object );
+
+			} else if ( materialProperties.envMap !== envMap ) {
 
 				initMaterial( material, scene, object );
 
@@ -1691,7 +1700,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			materials.refreshMaterialUniforms( m_uniforms, material, environment, _pixelRatio, _height );
+			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height );
 
 			// RectAreaLight Texture
 			// TODO (mrdoob): Find a nicer implementation
@@ -1770,6 +1779,30 @@ function WebGLRenderer( parameters ) {
 	this.getActiveMipmapLevel = function () {
 
 		return _currentActiveMipmapLevel;
+
+	};
+
+	this.getRenderList = function () {
+
+		return currentRenderList;
+
+	};
+
+	this.setRenderList = function ( renderList ) {
+
+		currentRenderList = renderList;
+
+	};
+
+	this.getRenderState = function () {
+
+		return currentRenderState;
+
+	};
+
+	this.setRenderState = function ( renderState ) {
+
+		currentRenderState = renderState;
 
 	};
 

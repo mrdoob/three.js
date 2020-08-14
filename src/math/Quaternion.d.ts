@@ -21,9 +21,24 @@ export class Quaternion {
 	 */
 	constructor( x?: number, y?: number, z?: number, w?: number );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
+
+	/**
+	 * @default 0
+	 */
 	z: number;
+
+	/**
+	 * @default 1
+	 */
 	w: number;
 	readonly isQuaternion: true;
 

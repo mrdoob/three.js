@@ -76,6 +76,7 @@ var files = {
 		"webgl_lines_fat",
 		"webgl_lines_fat_wireframe",
 		"webgl_lines_sphere",
+		"webgl_loader_3dm",
 		"webgl_loader_3ds",
 		"webgl_loader_3mf",
 		"webgl_loader_3mf_materials",
@@ -316,6 +317,7 @@ var files = {
 		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
 		"webgl2_multisampled_renderbuffers",
+		"webgl2_volume_instancing",
 		"webgl2_volume_perlin"
 	],
 	"webaudio": [

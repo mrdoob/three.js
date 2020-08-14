@@ -13,6 +13,10 @@ export class WebGLProgram {
 	name: string;
 	id: number;
 	cacheKey: string; // unique identifier for this program, used for looking up compiled programs from cache.
+
+	/**
+	 * @default 1
+	 */
 	usedTimes: number;
 	program: any;
 	vertexShader: WebGLShader;

@@ -91,12 +91,12 @@
 					out vec3 vDirection;
 
 					void main() {
-						vec4 worldPosition = modelViewMatrix * vec4( position, 1.0 );
+						vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
 						vOrigin = vec3( inverse( modelMatrix ) * vec4( cameraPos, 1.0 ) ).xyz;
 						vDirection = position - vOrigin;
 
-						gl_Position = projectionMatrix * worldPosition;
+						gl_Position = projectionMatrix * mvPosition;
 					}
 				`;
 

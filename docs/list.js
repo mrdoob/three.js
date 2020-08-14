@@ -462,6 +462,17 @@ var list = {
 
 	},
 
+	"ar": {
+		"الكتيب": {
+
+			"البدء": {
+				"إنشاء مشهد": "manual/ar/introduction/Creating-a-scene",
+				"التنصيب": "manual/ar/introduction/Installation",
+			},
+
+		},
+	},
+
 	"zh": {
 
 		"手册": {

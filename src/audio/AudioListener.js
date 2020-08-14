@@ -9,38 +9,36 @@ const _quaternion = new Quaternion();
 const _scale = new Vector3();
 const _orientation = new Vector3();
 
-function AudioListener() {
+class AudioListener extends Object3D {
 
-	Object3D.call( this );
+	constructor() {
 
-	this.type = 'AudioListener';
+		super();
 
-	this.context = AudioContext.getContext();
+		this.type = 'AudioListener';
 
-	this.gain = this.context.createGain();
-	this.gain.connect( this.context.destination );
+		this.context = AudioContext.getContext();
 
-	this.filter = null;
+		this.gain = this.context.createGain();
+		this.gain.connect( this.context.destination );
 
-	this.timeDelta = 0;
+		this.filter = null;
 
-	// private
+		this.timeDelta = 0;
 
-	this._clock = new Clock();
+		// private
 
-}
+		this._clock = new Clock();
 
-AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
+	}
 
-	constructor: AudioListener,
-
-	getInput: function () {
+	getInput() {
 
 		return this.gain;
 
-	},
+	}
 
-	removeFilter: function ( ) {
+	removeFilter() {
 
 		if ( this.filter !== null ) {
 
@@ -53,15 +51,15 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getFilter: function () {
+	getFilter() {
 
 		return this.filter;
 
-	},
+	}
 
-	setFilter: function ( value ) {
+	setFilter( value ) {
 
 		if ( this.filter !== null ) {
 
@@ -80,25 +78,25 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	getMasterVolume: function () {
+	getMasterVolume() {
 
 		return this.gain.gain.value;
 
-	},
+	}
 
-	setMasterVolume: function ( value ) {
+	setMasterVolume( value ) {
 
 		this.gain.gain.setTargetAtTime( value, this.context.currentTime, 0.01 );
 
 		return this;
 
-	},
+	}
 
-	updateMatrixWorld: function ( force ) {
+	updateMatrixWorld( force ) {
 
-		Object3D.prototype.updateMatrixWorld.call( this, force );
+		super.updateMatrixWorld( force );
 
 		const listener = this.context.listener;
 		const up = this.up;
@@ -134,6 +132,6 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
 
 export { AudioListener };
