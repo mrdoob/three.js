@@ -68,7 +68,7 @@ export class Audio<NodeType extends AudioNode = GainNode> extends Object3D {
 	 * @default 'empty'
 	 */
 	sourceType: string;
-	source: AudioBufferSourceNode;
+	source: null | AudioBufferSourceNode;
 
 	/**
 	 * @default []
