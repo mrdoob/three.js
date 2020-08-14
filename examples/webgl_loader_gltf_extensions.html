@@ -373,8 +373,12 @@
 
 					}
 
-					scene.add( object );
-					onWindowResize();
+					renderer.compileTarget( scene, object, function() {
+
+						scene.add( object );
+						onWindowResize();
+
+					} );
 
 				}, undefined, function ( error ) {
 

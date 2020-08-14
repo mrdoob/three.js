@@ -269,6 +269,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			rendererExtensionFragDepth: isWebGL2 || extensions.get( 'EXT_frag_depth' ) !== null,
 			rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
 			rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
+			rendererExtensionParallelShaderCompile: extensions.get( 'KHR_parallel_shader_compile' ) !== null,
 
 			customProgramCacheKey: material.customProgramCacheKey()
 

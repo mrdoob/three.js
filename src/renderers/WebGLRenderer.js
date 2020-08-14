@@ -929,6 +929,164 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	// compileTarget
+
+	this.compileTarget = function ( scene, target, callback ) {
+
+		// temporary camera just for the compile
+		const camera = new Camera();
+
+		currentRenderState = renderStates.get( scene, camera );
+		currentRenderState.init();
+
+		// if no explicit target was given use the full scene
+
+		if ( typeof target === 'unknown' ) {
+
+			target = scene;
+
+		}
+
+		let foundTarget = scene === target;
+
+		// Gather lights from both the scene and the new object that will be added
+		// to the scene.
+		scene.traverse( function ( object ) {
+
+			if ( object === target ) {
+
+				foundTarget = true;
+
+			}
+
+			if ( object.isLight ) {
+
+				currentRenderState.pushLight( object );
+
+				if ( object.castShadow ) {
+
+					currentRenderState.pushShadow( object );
+
+				}
+
+			}
+
+		} );
+
+		// If the target wasn't already part of the scene, add any lights it
+		// contains as well.
+
+		if ( !foundTarget ) {
+
+			target.traverse( function ( object ) {
+
+				if ( object.isLight ) {
+
+					currentRenderState.pushLight( object );
+
+					if ( object.castShadow ) {
+
+						currentRenderState.pushShadow( object );
+
+					}
+
+				}
+
+			} );
+
+		}
+
+		currentRenderState.setupLights( camera );
+
+		const compiling = new Set();
+
+		// only initialize materials in the new object
+
+		target.traverse( function ( object ) {
+
+			let material = object.material;
+
+			if ( material ) {
+
+				if ( Array.isArray( material ) ) {
+
+					for ( let i = 0; i < material.length; i ++ ) {
+
+						let material2 = material[ i ];
+
+						if ( compiling.has( material2 ) === false ) {
+
+							initMaterial( material2, scene, object );
+							compiling.add( material2 );
+
+						}
+
+					}
+
+				} else if ( compiling.has( material ) === false ) {
+
+					initMaterial( material, scene, object );
+					compiling.add( material );
+
+				}
+
+			}
+
+		} );
+
+		if ( typeof callback === 'undefined' ) return;
+
+		// if we've been given a callback, wait for all the materials in the new
+		// object to indicate that they're ready to be used before calling it
+
+		function checkMaterialsReady() {
+
+			compiling.forEach( function ( material ) {
+
+				const materialProperties = properties.get( material );
+				const program = materialProperties.program;
+
+				if ( program.isReady() ) {
+
+					// remove any programs that report they're ready to use from the list
+					compiling.delete( material );
+
+				}
+
+			} );
+
+			// once the list of compiling materials is empty, call the callback
+
+			if ( compiling.size === 0 ) {
+
+				callback( target );
+				return;
+
+			}
+
+			// if some materials are still not ready, wait a bit and check again
+
+			setTimeout( checkMaterialsReady, 10 );
+
+		}
+
+		if ( extensions.get( 'KHR_parallel_shader_compile' ) !== null ) {
+
+			// if we can check the compilation status of the materials without
+			// blocking then do so right away.
+
+			checkMaterialsReady();
+
+		} else {
+
+			// otherwise start by waiting a bit to give the materials we just
+			// initialized a chance to finish.
+
+			setTimeout( checkMaterialsReady, 10 );
+
+		}
+	};
+
 	// Animation Loop
 
 	let onAnimationFrameCallback = null;
@@ -1355,33 +1513,37 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		const programAttributes = program.getAttributes();
+		if ( material.morphTargets || material.morphNormals ) {
 
-		if ( material.morphTargets ) {
+			const programAttributes = program.getAttributes();
 
-			material.numSupportedMorphTargets = 0;
+			if ( material.morphTargets ) {
 
-			for ( let i = 0; i < _this.maxMorphTargets; i ++ ) {
+				material.numSupportedMorphTargets = 0;
 
-				if ( programAttributes[ 'morphTarget' + i ] >= 0 ) {
+				for ( let i = 0; i < _this.maxMorphTargets; i ++ ) {
 
-					material.numSupportedMorphTargets ++;
+					if ( programAttributes[ 'morphTarget' + i ] >= 0 ) {
+
+						material.numSupportedMorphTargets ++;
+
+					}
 
 				}
 
 			}
 
-		}
+			if ( material.morphNormals ) {
 
-		if ( material.morphNormals ) {
+				material.numSupportedMorphNormals = 0;
 
-			material.numSupportedMorphNormals = 0;
+				for ( let i = 0; i < _this.maxMorphNormals; i ++ ) {
 
-			for ( let i = 0; i < _this.maxMorphNormals; i ++ ) {
+					if ( programAttributes[ 'morphNormal' + i ] >= 0 ) {
 
-				if ( programAttributes[ 'morphNormal' + i ] >= 0 ) {
+						material.numSupportedMorphNormals ++;
 
-					material.numSupportedMorphNormals ++;
+					}
 
 				}
 
@@ -1435,11 +1597,20 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		const progUniforms = materialProperties.program.getUniforms(),
-			uniformsList =
-				WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
+		materialProperties.uniformsList = null;
 
-		materialProperties.uniformsList = uniformsList;
+	}
+
+	function getUniformList( materialProperties ) {
+
+		if ( materialProperties.uniformsList === null ) {
+
+			const progUniforms = materialProperties.program.getUniforms();
+			materialProperties.uniformsList = WebGLUniforms.seqWithValue( progUniforms.seq, materialProperties.uniforms );
+
+		}
+
+		return materialProperties.uniformsList;
 
 	}
 
@@ -1708,13 +1879,13 @@ function WebGLRenderer( parameters ) {
 			if ( m_uniforms.ltc_1 !== undefined ) m_uniforms.ltc_1.value = UniformsLib.LTC_1;
 			if ( m_uniforms.ltc_2 !== undefined ) m_uniforms.ltc_2.value = UniformsLib.LTC_2;
 
-			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+			WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 
 		}
 
 		if ( material.isShaderMaterial && material.uniformsNeedUpdate === true ) {
 
-			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+			WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 			material.uniformsNeedUpdate = false;
 
 		}
