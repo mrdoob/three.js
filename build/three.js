@@ -34276,13 +34276,30 @@
 				var targetTrack = targetClip.tracks.find( function ( track ) {
 
 					return track.name === referenceTrack.name
-					&& track.ValueTypeName === referenceTrackType;
+						&& track.ValueTypeName === referenceTrackType;
 
 				} );
 
 				if ( targetTrack === undefined ) { return; }
 
-				var valueSize = referenceTrack.getValueSize();
+				var referenceOffset = 0;
+				var referenceValueSize = referenceTrack.getValueSize();
+
+				if ( referenceTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+
+					referenceOffset = referenceValueSize / 3;
+
+				}
+
+				var targetOffset = 0;
+				var targetValueSize = targetTrack.getValueSize();
+
+				if ( targetTrack.createInterpolant.isInterpolantFactoryMethodGLTFCubicSpline ) {
+
+					targetOffset = targetValueSize / 3;
+
+				}
+
 				var lastIndex = referenceTrack.times.length - 1;
 				var referenceValue = (void 0);
 
@@ -34290,32 +34307,32 @@
 				if ( referenceTime <= referenceTrack.times[ 0 ] ) {
 
 					// Reference frame is earlier than the first keyframe, so just use the first keyframe
-					referenceValue = AnimationUtils.arraySlice( referenceTrack.values, 0, referenceTrack.valueSize );
+					var startIndex = referenceOffset;
+					var endIndex = referenceValueSize - referenceOffset;
+					referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex, endIndex );
 
 				} else if ( referenceTime >= referenceTrack.times[ lastIndex ] ) {
 
 					// Reference frame is after the last keyframe, so just use the last keyframe
-					var startIndex = lastIndex * valueSize;
-					referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex );
+					var startIndex$1 = lastIndex * referenceValueSize + referenceOffset;
+					var endIndex$1 = startIndex$1 + referenceValueSize - referenceOffset;
+					referenceValue = AnimationUtils.arraySlice( referenceTrack.values, startIndex$1, endIndex$1 );
 
 				} else {
 
 					// Interpolate to the reference value
 					var interpolant = referenceTrack.createInterpolant();
+					var startIndex$2 = referenceOffset;
+					var endIndex$2 = referenceValueSize - referenceOffset;
 					interpolant.evaluate( referenceTime );
-					referenceValue = interpolant.resultBuffer;
+					referenceValue = AnimationUtils.arraySlice( interpolant.resultBuffer, startIndex$2, endIndex$2 );
 
 				}
 
 				// Conjugate the quaternion
 				if ( referenceTrackType === 'quaternion' ) {
 
-					var referenceQuat = new Quaternion(
-						referenceValue[ 0 ],
-						referenceValue[ 1 ],
-						referenceValue[ 2 ],
-						referenceValue[ 3 ]
-					).normalize().conjugate();
+					var referenceQuat = new Quaternion().fromArray( referenceValue ).normalize().conjugate();
 					referenceQuat.toArray( referenceValue );
 
 				}
@@ -34325,7 +34342,7 @@
 				var numTimes = targetTrack.times.length;
 				for ( var j = 0; j < numTimes; ++ j ) {
 
-					var valueStart = j * valueSize;
+					var valueStart = j * targetValueSize + targetOffset;
 
 					if ( referenceTrackType === 'quaternion' ) {
 
@@ -34341,8 +34358,10 @@
 
 					} else {
 
+						var valueEnd = targetValueSize - targetOffset * 2;
+
 						// Subtract each value for all other numeric track types
-						for ( var k = 0; k < valueSize; ++ k ) {
+						for ( var k = 0; k < valueEnd; ++ k ) {
 
 							targetTrack.values[ valueStart + k ] -= referenceValue[ k ];
 
@@ -43290,7 +43309,7 @@
 		_setAdditiveIdentityQuaternion: function () {
 
 			this._setAdditiveIdentityNumeric();
-			this.buffer[ this._addIndex * 4 + 3 ] = 1;
+			this.buffer[ this._addIndex * this.valueSize + 3 ] = 1;
 
 		},
 
