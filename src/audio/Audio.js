@@ -26,6 +26,7 @@ class Audio extends Object3D {
 		this.playbackRate = 1;
 		this.isPlaying = false;
 		this.hasPlaybackControl = true;
+		this.source = null;
 		this.sourceType = 'empty';
 
 		this._startedAt = 0;
