@@ -13761,6 +13761,7 @@
 		var currentMinFilter = texture.minFilter;
 		var currentRenderList = renderer.getRenderList();
 		var currentRenderTarget = renderer.getRenderTarget();
+		var currentRenderState = renderer.getRenderState();
 
 		// Avoid blurred poles
 		if ( texture.minFilter === LinearMipmapLinearFilter ) { texture.minFilter = LinearFilter; }
@@ -13772,6 +13773,7 @@
 
 		renderer.setRenderTarget( currentRenderTarget );
 		renderer.setRenderList( currentRenderList );
+		renderer.setRenderState( currentRenderState );
 
 		mesh.geometry.dispose();
 		mesh.material.dispose();
@@ -23793,7 +23795,7 @@
 
 	Object.assign( WebXRManager.prototype, EventDispatcher.prototype );
 
-	function WebGLMaterials( properties, cubemaps ) {
+	function WebGLMaterials( properties ) {
 
 		function refreshFogUniforms( uniforms, fog ) {
 
@@ -23812,7 +23814,7 @@
 
 		}
 
-		function refreshMaterialUniforms( uniforms, material, environment, pixelRatio, height ) {
+		function refreshMaterialUniforms( uniforms, material, pixelRatio, height ) {
 
 			if ( material.isMeshBasicMaterial ) {
 
@@ -23835,15 +23837,15 @@
 
 			} else if ( material.isMeshStandardMaterial ) {
 
-				refreshUniformsCommon( uniforms, material, environment );
+				refreshUniformsCommon( uniforms, material );
 
 				if ( material.isMeshPhysicalMaterial ) {
 
-					refreshUniformsPhysical( uniforms, material, environment );
+					refreshUniformsPhysical( uniforms, material );
 
 				} else {
 
-					refreshUniformsStandard( uniforms, material, environment );
+					refreshUniformsStandard( uniforms, material );
 
 				}
 
@@ -23898,7 +23900,7 @@
 
 		}
 
-		function refreshUniformsCommon( uniforms, material, environment ) {
+		function refreshUniformsCommon( uniforms, material ) {
 
 			uniforms.opacity.value = material.opacity;
 
@@ -23932,7 +23934,7 @@
 
 			}
 
-			var envMap = cubemaps.get( material.envMap || environment );
+			var envMap = properties.get( material ).envMap;
 
 			if ( envMap ) {
 
@@ -24270,7 +24272,7 @@
 
 		}
 
-		function refreshUniformsStandard( uniforms, material, environment ) {
+		function refreshUniformsStandard( uniforms, material ) {
 
 			uniforms.roughness.value = material.roughness;
 			uniforms.metalness.value = material.metalness;
@@ -24317,7 +24319,9 @@
 
 			}
 
-			if ( material.envMap || environment ) {
+			var envMap = properties.get( material ).envMap;
+
+			if ( envMap ) {
 
 				//uniforms.envMap.value = material.envMap; // part of uniforms common
 				uniforms.envMapIntensity.value = material.envMapIntensity;
@@ -24326,9 +24330,9 @@
 
 		}
 
-		function refreshUniformsPhysical( uniforms, material, environment ) {
+		function refreshUniformsPhysical( uniforms, material ) {
 
-			refreshUniformsStandard( uniforms, material, environment );
+			refreshUniformsStandard( uniforms, material );
 
 			uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
 
@@ -25831,6 +25835,7 @@
 
 			materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 			materialProperties.fog = scene.fog;
+			materialProperties.envMap = cubemaps.get( material.envMap || materialProperties.environment );
 
 			// store the light setup it was created for
 
@@ -25879,6 +25884,7 @@
 			var fog = scene.fog;
 			var environment = material.isMeshStandardMaterial ? scene.environment : null;
 			var encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
+			var envMap = cubemaps.get( material.envMap || environment );
 
 			var materialProperties = properties.get( material );
 			var lights = currentRenderState.state.lights;
@@ -25927,6 +25933,10 @@
 					initMaterial( material, scene, object );
 
 				} else if ( materialProperties.outputEncoding !== encoding ) {
+
+					initMaterial( material, scene, object );
+
+				} else if ( materialProperties.envMap !== envMap ) {
 
 					initMaterial( material, scene, object );
 
@@ -26122,7 +26132,7 @@
 
 				}
 
-				materials.refreshMaterialUniforms( m_uniforms, material, environment, _pixelRatio, _height );
+				materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height );
 
 				// RectAreaLight Texture
 				// TODO (mrdoob): Find a nicer implementation
@@ -26213,6 +26223,18 @@
 		this.setRenderList = function ( renderList ) {
 
 			currentRenderList = renderList;
+
+		};
+
+		this.getRenderState = function () {
+
+			return currentRenderState;
+
+		};
+
+		this.setRenderState = function ( renderState ) {
+
+			currentRenderState = renderState;
 
 		};
 

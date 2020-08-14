@@ -13791,6 +13791,7 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	const currentMinFilter = texture.minFilter;
 	const currentRenderList = renderer.getRenderList();
 	const currentRenderTarget = renderer.getRenderTarget();
+	const currentRenderState = renderer.getRenderState();
 
 	// Avoid blurred poles
 	if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
@@ -13802,6 +13803,7 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 	renderer.setRenderTarget( currentRenderTarget );
 	renderer.setRenderList( currentRenderList );
+	renderer.setRenderState( currentRenderState );
 
 	mesh.geometry.dispose();
 	mesh.material.dispose();
@@ -23831,7 +23833,7 @@ function WebXRManager( renderer, gl ) {
 
 Object.assign( WebXRManager.prototype, EventDispatcher.prototype );
 
-function WebGLMaterials( properties, cubemaps ) {
+function WebGLMaterials( properties ) {
 
 	function refreshFogUniforms( uniforms, fog ) {
 
@@ -23850,7 +23852,7 @@ function WebGLMaterials( properties, cubemaps ) {
 
 	}
 
-	function refreshMaterialUniforms( uniforms, material, environment, pixelRatio, height ) {
+	function refreshMaterialUniforms( uniforms, material, pixelRatio, height ) {
 
 		if ( material.isMeshBasicMaterial ) {
 
@@ -23873,15 +23875,15 @@ function WebGLMaterials( properties, cubemaps ) {
 
 		} else if ( material.isMeshStandardMaterial ) {
 
-			refreshUniformsCommon( uniforms, material, environment );
+			refreshUniformsCommon( uniforms, material );
 
 			if ( material.isMeshPhysicalMaterial ) {
 
-				refreshUniformsPhysical( uniforms, material, environment );
+				refreshUniformsPhysical( uniforms, material );
 
 			} else {
 
-				refreshUniformsStandard( uniforms, material, environment );
+				refreshUniformsStandard( uniforms, material );
 
 			}
 
@@ -23936,7 +23938,7 @@ function WebGLMaterials( properties, cubemaps ) {
 
 	}
 
-	function refreshUniformsCommon( uniforms, material, environment ) {
+	function refreshUniformsCommon( uniforms, material ) {
 
 		uniforms.opacity.value = material.opacity;
 
@@ -23970,7 +23972,7 @@ function WebGLMaterials( properties, cubemaps ) {
 
 		}
 
-		const envMap = cubemaps.get( material.envMap || environment );
+		const envMap = properties.get( material ).envMap;
 
 		if ( envMap ) {
 
@@ -24308,7 +24310,7 @@ function WebGLMaterials( properties, cubemaps ) {
 
 	}
 
-	function refreshUniformsStandard( uniforms, material, environment ) {
+	function refreshUniformsStandard( uniforms, material ) {
 
 		uniforms.roughness.value = material.roughness;
 		uniforms.metalness.value = material.metalness;
@@ -24355,7 +24357,9 @@ function WebGLMaterials( properties, cubemaps ) {
 
 		}
 
-		if ( material.envMap || environment ) {
+		const envMap = properties.get( material ).envMap;
+
+		if ( envMap ) {
 
 			//uniforms.envMap.value = material.envMap; // part of uniforms common
 			uniforms.envMapIntensity.value = material.envMapIntensity;
@@ -24364,9 +24368,9 @@ function WebGLMaterials( properties, cubemaps ) {
 
 	}
 
-	function refreshUniformsPhysical( uniforms, material, environment ) {
+	function refreshUniformsPhysical( uniforms, material ) {
 
-		refreshUniformsStandard( uniforms, material, environment );
+		refreshUniformsStandard( uniforms, material );
 
 		uniforms.reflectivity.value = material.reflectivity; // also part of uniforms common
 
@@ -25869,6 +25873,7 @@ function WebGLRenderer( parameters ) {
 
 		materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 		materialProperties.fog = scene.fog;
+		materialProperties.envMap = cubemaps.get( material.envMap || materialProperties.environment );
 
 		// store the light setup it was created for
 
@@ -25917,6 +25922,7 @@ function WebGLRenderer( parameters ) {
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
+		const envMap = cubemaps.get( material.envMap || environment );
 
 		const materialProperties = properties.get( material );
 		const lights = currentRenderState.state.lights;
@@ -25965,6 +25971,10 @@ function WebGLRenderer( parameters ) {
 				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.outputEncoding !== encoding ) {
+
+				initMaterial( material, scene, object );
+
+			} else if ( materialProperties.envMap !== envMap ) {
 
 				initMaterial( material, scene, object );
 
@@ -26160,7 +26170,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			materials.refreshMaterialUniforms( m_uniforms, material, environment, _pixelRatio, _height );
+			materials.refreshMaterialUniforms( m_uniforms, material, _pixelRatio, _height );
 
 			// RectAreaLight Texture
 			// TODO (mrdoob): Find a nicer implementation
@@ -26251,6 +26261,18 @@ function WebGLRenderer( parameters ) {
 	this.setRenderList = function ( renderList ) {
 
 		currentRenderList = renderList;
+
+	};
+
+	this.getRenderState = function () {
+
+		return currentRenderState;
+
+	};
+
+	this.setRenderState = function ( renderState ) {
+
+		currentRenderState = renderState;
 
 	};
 
