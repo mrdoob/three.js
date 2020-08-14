@@ -1355,33 +1355,37 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		const programAttributes = program.getAttributes();
+		if ( material.morphTargets || material.morphNormals ) {
 
-		if ( material.morphTargets ) {
+			const programAttributes = program.getAttributes();
 
-			material.numSupportedMorphTargets = 0;
+			if ( material.morphTargets ) {
 
-			for ( let i = 0; i < _this.maxMorphTargets; i ++ ) {
+				material.numSupportedMorphTargets = 0;
 
-				if ( programAttributes[ 'morphTarget' + i ] >= 0 ) {
+				for ( let i = 0; i < _this.maxMorphTargets; i ++ ) {
 
-					material.numSupportedMorphTargets ++;
+					if ( programAttributes[ 'morphTarget' + i ] >= 0 ) {
+
+						material.numSupportedMorphTargets ++;
+
+					}
 
 				}
 
 			}
 
-		}
+			if ( material.morphNormals ) {
 
-		if ( material.morphNormals ) {
+				material.numSupportedMorphNormals = 0;
 
-			material.numSupportedMorphNormals = 0;
+				for ( let i = 0; i < _this.maxMorphNormals; i ++ ) {
 
-			for ( let i = 0; i < _this.maxMorphNormals; i ++ ) {
+					if ( programAttributes[ 'morphNormal' + i ] >= 0 ) {
 
-				if ( programAttributes[ 'morphNormal' + i ] >= 0 ) {
+						material.numSupportedMorphNormals ++;
 
-					material.numSupportedMorphNormals ++;
+					}
 
 				}
 
@@ -1435,11 +1439,20 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		const progUniforms = materialProperties.program.getUniforms(),
-			uniformsList =
-				WebGLUniforms.seqWithValue( progUniforms.seq, uniforms );
+		materialProperties.uniformsList = null;
 
-		materialProperties.uniformsList = uniformsList;
+	}
+
+	function getUniformList( materialProperties ) {
+
+		if ( materialProperties.uniformsList === null ) {
+
+			const progUniforms = materialProperties.program.getUniforms();
+			materialProperties.uniformsList = WebGLUniforms.seqWithValue( progUniforms.seq, materialProperties.uniforms );
+
+		}
+
+		return materialProperties.uniformsList;
 
 	}
 
@@ -1708,13 +1721,13 @@ function WebGLRenderer( parameters ) {
 			if ( m_uniforms.ltc_1 !== undefined ) m_uniforms.ltc_1.value = UniformsLib.LTC_1;
 			if ( m_uniforms.ltc_2 !== undefined ) m_uniforms.ltc_2.value = UniformsLib.LTC_2;
 
-			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+			WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 
 		}
 
 		if ( material.isShaderMaterial && material.uniformsNeedUpdate === true ) {
 
-			WebGLUniforms.upload( _gl, materialProperties.uniformsList, m_uniforms, textures );
+			WebGLUniforms.upload( _gl, getUniformList( materialProperties ), m_uniforms, textures );
 			material.uniformsNeedUpdate = false;
 
 		}
