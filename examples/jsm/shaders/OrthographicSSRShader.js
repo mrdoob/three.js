@@ -89,7 +89,7 @@ var OrthographicSSRShader = {
 
 			vec3 normal=texture2D(tNormal,uv).xyz*2.-1.;
 			vec3 reflectDir=reflect(vec3(0,0,-1),normal);
-			d1=d0+(reflectDir*maxDistance).xy*vec2(resolution.x,resolution.y);
+			d1=d0+(reflectDir*maxDistance).xy*resolution;
 			float totalLen=length(d1-d0);
 			float xLen=d1.x-d0.x;
 			float yLen=d1.y-d0.y;
@@ -98,21 +98,18 @@ var OrthographicSSRShader = {
 			float ySpan=yLen/totalStep;
 			for(float i=0.;i<MAX_STEP;i++){
 				if(i>=totalStep) break;
-				float x=d0.x+i*xSpan;
-				float y=d0.y+i*ySpan;
-				if(x<0.||x>resolution.x) break;
-				if(y<0.||y>resolution.y) break;
-				float u=x/resolution.x;
-				float v=y/resolution.y;
-				vec3 p=getPos(vec2(u,v));
-				vec3 rayPos=pos+(length(vec2(x,y)-d0)/totalLen)*(reflectDir*maxDistance);
+				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
+				if(xy.x<0.||xy.x>resolution.x) break;
+				if(xy.y<0.||xy.y>resolution.y) break;
+				vec2 uv=xy/resolution;
+				vec3 p=getPos(uv);
+				vec3 rayPos=pos+(length(xy-d0)/totalLen)*(reflectDir*maxDistance);
 				float away=length(rayPos-p);
 				if(away<SURF_DISTuv){
-					vec3 n=texture2D(tNormal,vec2(u,v)).xyz*2.-1.;
+					vec3 n=texture2D(tNormal,uv).xyz*2.-1.;
 					if(dot(reflectDir,n)>=0.) continue;
-					vec4 reflect=texture2D(tDiffuse,vec2(u,v));
-					gl_FragColor=reflect;
-					gl_FragColor.a=opacity;
+					vec4 reflectColor=texture2D(tDiffuse,uv);
+					gl_FragColor=vec4(reflectColor.xyz,opacity);
 					break;
 				}
 			}
