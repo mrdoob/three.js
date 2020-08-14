@@ -160,32 +160,32 @@ new code
 const {width, height} = dims;
 ```
 
-Destructuring works with arrays too. Assume an array `const position = [1, 2, 3, 4]`;
+Destructuring works with arrays too. Assume an array `const position = [5, 6, 7, 1]`;
 
 old code
 
 ```js
-const x = position[2]; // 3
-const y = position[1]; // 2
+const y = position[1];
+const z = position[2];
 ```
 
 new code
 
 ```js
-const [, y, x] = position; // x = 3, y = 2
+const [, y, z] = position;
 ```
 
 Destructuring also works in function arguments
 
 ```js
 const dims = {width: 300, height: 150};
-const position = [1, 2, 3, 4];
+const vector = [3, 4];
 
-function distFromOrig([x, y]) {
+function lengthOfVector([x, y]) {
   return Math.sqrt(x * x + y * y);
 }
 
-const dist = distFromOrig(position);  // dist = 2.236...
+const dist = lengthOfVector(vector);  // dist = 5
 
 function area({width, height}) {
   return width * height;
