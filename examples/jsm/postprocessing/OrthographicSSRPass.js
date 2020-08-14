@@ -433,6 +433,10 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.noiseTexture.wrapS = RepeatWrapping;
     this.noiseTexture.wrapT = RepeatWrapping;
 
+  },
+
+  setFrustumSize: function(frustumSize) {
+    this.orthographicSSRMaterial.uniforms['frustumSize'].value = frustumSize
   }
 
 });

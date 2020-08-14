@@ -2,27 +2,21 @@
 <html lang="en">
 
 <head>
-	<title>three.js webgl - postprocessing - Orthographic Screen Space Reflection</title>
-	<meta charset="utf-8">
-	<meta name="viewport"
-				content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link type="text/css"
-				rel="stylesheet"
-				href="main.css">
+  <title>three.js webgl - postprocessing - Orthographic Screen Space Reflection</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
 <body>
-	<div id="info">
-		<a href="https://threejs.org"
-			 target="_blank"
-			 rel="noopener">three.js</a> -
-		OrthographicSSRPass test by <a href="https://github.com/gonnavis"
-			 target="_blank">gonnavis</a>.<br />
-	</div>
+<div id="info">
+  <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+  OrthographicSSRPass test by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
+</div>
 
-	<script type="module">
+<script type="module">
 
-		import * as THREE from '../build/three.module.js';
+  import * as THREE from '../build/three.module.js';
 
 		import Stats from './jsm/libs/stats.module.js';
 		import { GUI } from './jsm/libs/dat.gui.module.js';
@@ -36,22 +30,22 @@
 		window.is_reflect = true
 
 		var container, stats;
-		var frustumSize = 3;
+		var initialFrustumSize = 3;
 
-		var camera, cameraTarget, scene, renderer, composer;
-
+		var camera, cameraTarget, scene, renderer, composer, orthographicSSRPass;
+		
 		init();
 		animate();
-
+		
 		function init() {
-
+			
 			container = document.createElement('div');
 			document.body.appendChild(container);
-
+			
 			var cameraNear = 1
 			var cameraFar = 7
 			var aspect = window.innerWidth / window.innerHeight;
-			camera = new THREE.OrthographicCamera(frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, cameraNear, cameraFar);
+			camera = new THREE.OrthographicCamera(initialFrustumSize * aspect / - 2, initialFrustumSize * aspect / 2, initialFrustumSize / 2, initialFrustumSize / - 2, cameraNear, cameraFar);
 			camera.position.set(-3.841971267097966, 1.628450668378282, 2.7545244967964964)
 
 			scene = new THREE.Scene();
@@ -169,7 +163,7 @@
 
 
 			composer = new EffectComposer(renderer);
-			var orthographicSSRPass = new OrthographicSSRPass(scene, camera, innerWidth, innerHeight, frustumSize);
+			orthographicSSRPass = new OrthographicSSRPass(scene, camera, innerWidth, innerHeight, initialFrustumSize);
 			composer.addPass(orthographicSSRPass);
 
 			// Init gui
@@ -229,10 +223,10 @@
 
 			var aspect = window.innerWidth / window.innerHeight;
 
-			camera.left = - frustumSize * aspect / 2;
-			camera.right = frustumSize * aspect / 2;
-			camera.top = frustumSize / 2;
-			camera.bottom = - frustumSize / 2;
+			camera.left = - initialFrustumSize * aspect / 2;
+			camera.right = initialFrustumSize * aspect / 2;
+			camera.top = initialFrustumSize / 2;
+			camera.bottom = - initialFrustumSize / 2;
 
 			camera.updateProjectionMatrix();
 
@@ -245,6 +239,7 @@
 
 			requestAnimationFrame(animate);
 
+			orthographicSSRPass.setFrustumSize(initialFrustumSize/camera.zoom)
 			render();
 			stats.update();
 
