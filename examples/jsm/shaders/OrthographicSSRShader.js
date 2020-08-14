@@ -79,15 +79,14 @@ var OrthographicSSRShader = {
 		}
 		void main(){
 			//use uv unit/coordinate primarily
-			vec2 uv=vUv;
 
-			float depth=texture2D(tDepth,uv).r;
+			float depth=texture2D(tDepth,vUv).r;
 			if(depth<=0.) return;
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
-			vec3 pos=getPos(uv,depth);
+			vec3 pos=getPos(vUv,depth);
 
-			vec3 normal=texture2D(tNormal,uv).xyz*2.-1.;
+			vec3 normal=texture2D(tNormal,vUv).xyz*2.-1.;
 			vec3 reflectDir=reflect(vec3(0,0,-1),normal);
 			d1=d0+(reflectDir*maxDistance).xy*resolution;
 			float totalLen=length(d1-d0);
