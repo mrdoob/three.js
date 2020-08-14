@@ -165,14 +165,14 @@ Destructuring works with arrays too. Assume an array `const position = [1, 2, 3,
 old code
 
 ```js
-const x = position[2];
-const y = position[1];
+const x = position[2]; // 3
+const y = position[1]; // 2
 ```
 
 new code
 
 ```js
-const [x, y] = position;
+const [, y, x] = position; // x = 3, y = 2
 ```
 
 Destructuring also works in function arguments
