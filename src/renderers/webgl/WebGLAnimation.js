@@ -7,6 +7,9 @@ class WebGLAnimation {
 		this._animationLoop = null;
 		this._requestId = null;
 
+		// Re-bind the prototype function so that `this` can be used with rAF:
+		this._onAnimationFrame = this._onAnimationFrame.bind( this );
+
 	}
 
 	_onAnimationFrame( time, frame ) {
