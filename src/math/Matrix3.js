@@ -18,12 +18,6 @@ class Matrix3 {
 
 	}
 
-	get isMatrix3() {
-
-		return true;
-
-	}
-
 	set( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 		const te = this.elements;
@@ -350,5 +344,6 @@ class Matrix3 {
 
 }
 
+Matrix3.prototype.isMatrix3 = true;
 
 export { Matrix3 };

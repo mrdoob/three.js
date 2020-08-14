@@ -150,12 +150,6 @@ class Quaternion {
 
 	}
 
-	get isQuaternion() {
-
-		return true;
-
-	}
-
 	set( x, y, z, w ) {
 
 		this._x = x;
@@ -645,5 +639,6 @@ class Quaternion {
 
 }
 
+Quaternion.prototype.isQuaternion = true;
 
 export { Quaternion };

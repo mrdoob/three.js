@@ -21,12 +21,6 @@ class Matrix4 {
 
 	}
 
-	get isMatrix4() {
-
-		return true;
-
-	}
-
 	set( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
 		const te = this.elements;
@@ -872,6 +866,8 @@ class Matrix4 {
 	}
 
 }
+
+Matrix4.prototype.isMatrix4 = true;
 
 const _v1 = new Vector3();
 const _m1 = new Matrix4();

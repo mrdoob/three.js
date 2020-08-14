@@ -11,12 +11,6 @@ class Vector3 {
 
 	}
 
-	get isVector3() {
-
-		return true;
-
-	}
-
 	set( x, y, z ) {
 
 		if ( z === undefined ) z = this.z; // sprite.scale.set(x,y)
@@ -723,6 +717,8 @@ class Vector3 {
 	}
 
 }
+
+Vector3.prototype.isVector3 = true;
 
 const _vector = new Vector3();
 const _quaternion = new Quaternion();

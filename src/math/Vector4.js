@@ -33,12 +33,6 @@ class Vector4 {
 
 	}
 
-	get isVector4() {
-
-		return true;
-
-	}
-
 	set( x, y, z, w ) {
 
 		this.x = x;
@@ -649,5 +643,7 @@ class Vector4 {
 	}
 
 }
+
+Vector4.prototype.isVector4 = true;
 
 export { Vector4 };

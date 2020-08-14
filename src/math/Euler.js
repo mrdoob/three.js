@@ -66,12 +66,6 @@ class Euler {
 
 	}
 
-	get isEuler() {
-
-		return true;
-
-	}
-
 	set( x, y, z, order ) {
 
 		this._x = x;
@@ -326,6 +320,7 @@ class Euler {
 
 Euler.DefaultOrder = 'XYZ';
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+Euler.prototype.isEuler = true;
 
 const _matrix = new Matrix4();
 const _quaternion = new Quaternion();

@@ -31,12 +31,6 @@ class Vector2 {
 
 	}
 
-	get isVector2() {
-
-		return true;
-
-	}
-
 	set( x, y ) {
 
 		this.x = x;
@@ -482,5 +476,7 @@ class Vector2 {
 	}
 
 }
+
+Vector2.prototype.isVector2 = true;
 
 export { Vector2 };
