@@ -145,7 +145,7 @@ function WebGLRenderer( parameters ) {
 
 	//
 
-	let _currentDrawBuffers = [];
+	const _currentDrawBuffers = [];
 
 	// frustum
 
