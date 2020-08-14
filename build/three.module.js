@@ -588,88 +588,74 @@ const MathUtils = {
 
 };
 
-function Vector2( x = 0, y = 0 ) {
+class Vector2 {
 
-	this.x = x;
-	this.y = y;
+	constructor( x = 0, y = 0 ) {
 
-}
-
-Object.defineProperties( Vector2.prototype, {
-
-	"width": {
-
-		get: function () {
-
-			return this.x;
-
-		},
-
-		set: function ( value ) {
-
-			this.x = value;
-
-		}
-
-	},
-
-	"height": {
-
-		get: function () {
-
-			return this.y;
-
-		},
-
-		set: function ( value ) {
-
-			this.y = value;
-
-		}
+		this.x = x;
+		this.y = y;
 
 	}
 
-} );
+	get width() {
 
-Object.assign( Vector2.prototype, {
+		return this.x;
 
-	isVector2: true,
+	}
 
-	set: function ( x, y ) {
+	set width( value ) {
+
+		this.x = value;
+
+	}
+
+	get height() {
+
+		return this.y;
+
+	}
+
+	set height( value ) {
+
+		this.y = value;
+
+	}
+
+	set( x, y ) {
 
 		this.x = x;
 		this.y = y;
 
 		return this;
 
-	},
+	}
 
-	setScalar: function ( scalar ) {
+	setScalar( scalar ) {
 
 		this.x = scalar;
 		this.y = scalar;
 
 		return this;
 
-	},
+	}
 
-	setX: function ( x ) {
+	setX( x ) {
 
 		this.x = x;
 
 		return this;
 
-	},
+	}
 
-	setY: function ( y ) {
+	setY( y ) {
 
 		this.y = y;
 
 		return this;
 
-	},
+	}
 
-	setComponent: function ( index, value ) {
+	setComponent( index, value ) {
 
 		switch ( index ) {
 
@@ -681,9 +667,9 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getComponent: function ( index ) {
+	getComponent( index ) {
 
 		switch ( index ) {
 
@@ -693,24 +679,24 @@ Object.assign( Vector2.prototype, {
 
 		}
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this.x, this.y );
 
-	},
+	}
 
-	copy: function ( v ) {
+	copy( v ) {
 
 		this.x = v.x;
 		this.y = v.y;
 
 		return this;
 
-	},
+	}
 
-	add: function ( v, w ) {
+	add( v, w ) {
 
 		if ( w !== undefined ) {
 
@@ -724,36 +710,36 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addScalar: function ( s ) {
+	addScalar( s ) {
 
 		this.x += s;
 		this.y += s;
 
 		return this;
 
-	},
+	}
 
-	addVectors: function ( a, b ) {
+	addVectors( a, b ) {
 
 		this.x = a.x + b.x;
 		this.y = a.y + b.y;
 
 		return this;
 
-	},
+	}
 
-	addScaledVector: function ( v, s ) {
+	addScaledVector( v, s ) {
 
 		this.x += v.x * s;
 		this.y += v.y * s;
 
 		return this;
 
-	},
+	}
 
-	sub: function ( v, w ) {
+	sub( v, w ) {
 
 		if ( w !== undefined ) {
 
@@ -767,60 +753,60 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
-	},
+	}
 
-	subScalar: function ( s ) {
+	subScalar( s ) {
 
 		this.x -= s;
 		this.y -= s;
 
 		return this;
 
-	},
+	}
 
-	subVectors: function ( a, b ) {
+	subVectors( a, b ) {
 
 		this.x = a.x - b.x;
 		this.y = a.y - b.y;
 
 		return this;
 
-	},
+	}
 
-	multiply: function ( v ) {
+	multiply( v ) {
 
 		this.x *= v.x;
 		this.y *= v.y;
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( scalar ) {
+	multiplyScalar( scalar ) {
 
 		this.x *= scalar;
 		this.y *= scalar;
 
 		return this;
 
-	},
+	}
 
-	divide: function ( v ) {
+	divide( v ) {
 
 		this.x /= v.x;
 		this.y /= v.y;
 
 		return this;
 
-	},
+	}
 
-	divideScalar: function ( scalar ) {
+	divideScalar( scalar ) {
 
 		return this.multiplyScalar( 1 / scalar );
 
-	},
+	}
 
-	applyMatrix3: function ( m ) {
+	applyMatrix3( m ) {
 
 		const x = this.x, y = this.y;
 		const e = m.elements;
@@ -830,27 +816,27 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
-	},
+	}
 
-	min: function ( v ) {
+	min( v ) {
 
 		this.x = Math.min( this.x, v.x );
 		this.y = Math.min( this.y, v.y );
 
 		return this;
 
-	},
+	}
 
-	max: function ( v ) {
+	max( v ) {
 
 		this.x = Math.max( this.x, v.x );
 		this.y = Math.max( this.y, v.y );
 
 		return this;
 
-	},
+	}
 
-	clamp: function ( min, max ) {
+	clamp( min, max ) {
 
 		// assumes min < max, componentwise
 
@@ -859,107 +845,107 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clampScalar: function ( minVal, maxVal ) {
+	clampScalar( minVal, maxVal ) {
 
 		this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
 		this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
 
 		return this;
 
-	},
+	}
 
-	clampLength: function ( min, max ) {
+	clampLength( min, max ) {
 
 		const length = this.length();
 
 		return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
 
-	},
+	}
 
-	floor: function () {
+	floor() {
 
 		this.x = Math.floor( this.x );
 		this.y = Math.floor( this.y );
 
 		return this;
 
-	},
+	}
 
-	ceil: function () {
+	ceil() {
 
 		this.x = Math.ceil( this.x );
 		this.y = Math.ceil( this.y );
 
 		return this;
 
-	},
+	}
 
-	round: function () {
+	round() {
 
 		this.x = Math.round( this.x );
 		this.y = Math.round( this.y );
 
 		return this;
 
-	},
+	}
 
-	roundToZero: function () {
+	roundToZero() {
 
 		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
 		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
 
 		return this;
 
-	},
+	}
 
-	negate: function () {
+	negate() {
 
 		this.x = - this.x;
 		this.y = - this.y;
 
 		return this;
 
-	},
+	}
 
-	dot: function ( v ) {
+	dot( v ) {
 
 		return this.x * v.x + this.y * v.y;
 
-	},
+	}
 
-	cross: function ( v ) {
+	cross( v ) {
 
 		return this.x * v.y - this.y * v.x;
 
-	},
+	}
 
-	lengthSq: function () {
+	lengthSq() {
 
 		return this.x * this.x + this.y * this.y;
 
-	},
+	}
 
-	length: function () {
+	length() {
 
 		return Math.sqrt( this.x * this.x + this.y * this.y );
 
-	},
+	}
 
-	manhattanLength: function () {
+	manhattanLength() {
 
 		return Math.abs( this.x ) + Math.abs( this.y );
 
-	},
+	}
 
-	normalize: function () {
+	normalize() {
 
 		return this.divideScalar( this.length() || 1 );
 
-	},
+	}
 
-	angle: function () {
+	angle() {
 
 		// computes the angle in radians with respect to the positive x-axis
 
@@ -967,58 +953,58 @@ Object.assign( Vector2.prototype, {
 
 		return angle;
 
-	},
+	}
 
-	distanceTo: function ( v ) {
+	distanceTo( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
 
-	},
+	}
 
-	distanceToSquared: function ( v ) {
+	distanceToSquared( v ) {
 
 		const dx = this.x - v.x, dy = this.y - v.y;
 		return dx * dx + dy * dy;
 
-	},
+	}
 
-	manhattanDistanceTo: function ( v ) {
+	manhattanDistanceTo( v ) {
 
 		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y );
 
-	},
+	}
 
-	setLength: function ( length ) {
+	setLength( length ) {
 
 		return this.normalize().multiplyScalar( length );
 
-	},
+	}
 
-	lerp: function ( v, alpha ) {
+	lerp( v, alpha ) {
 
 		this.x += ( v.x - this.x ) * alpha;
 		this.y += ( v.y - this.y ) * alpha;
 
 		return this;
 
-	},
+	}
 
-	lerpVectors: function ( v1, v2, alpha ) {
+	lerpVectors( v1, v2, alpha ) {
 
 		this.x = v1.x + ( v2.x - v1.x ) * alpha;
 		this.y = v1.y + ( v2.y - v1.y ) * alpha;
 
 		return this;
 
-	},
+	}
 
-	equals: function ( v ) {
+	equals( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) );
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -1027,9 +1013,9 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -1039,9 +1025,9 @@ Object.assign( Vector2.prototype, {
 
 		return array;
 
-	},
+	}
 
-	fromBufferAttribute: function ( attribute, index, offset ) {
+	fromBufferAttribute( attribute, index, offset ) {
 
 		if ( offset !== undefined ) {
 
@@ -1054,9 +1040,9 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
-	},
+	}
 
-	rotateAround: function ( center, angle ) {
+	rotateAround( center, angle ) {
 
 		const c = Math.cos( angle ), s = Math.sin( angle );
 
@@ -1068,9 +1054,9 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
-	},
+	}
 
-	random: function () {
+	random() {
 
 		this.x = Math.random();
 		this.y = Math.random();
@@ -1079,31 +1065,31 @@ Object.assign( Vector2.prototype, {
 
 	}
 
-} );
+}
 
-function Matrix3() {
+Vector2.prototype.isVector2 = true;
 
-	this.elements = [
+class Matrix3 {
 
-		1, 0, 0,
-		0, 1, 0,
-		0, 0, 1
+	constructor() {
 
-	];
+		this.elements = [
 
-	if ( arguments.length > 0 ) {
+			1, 0, 0,
+			0, 1, 0,
+			0, 0, 1
 
-		console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
+		];
+
+		if ( arguments.length > 0 ) {
+
+			console.error( 'THREE.Matrix3: the constructor no longer reads arguments. use .set() instead.' );
+
+		}
 
 	}
 
-}
-
-Object.assign( Matrix3.prototype, {
-
-	isMatrix3: true,
-
-	set: function ( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
+	set( n11, n12, n13, n21, n22, n23, n31, n32, n33 ) {
 
 		const te = this.elements;
 
@@ -1113,9 +1099,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	identity: function () {
+	identity() {
 
 		this.set(
 
@@ -1127,15 +1113,15 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().fromArray( this.elements );
 
-	},
+	}
 
-	copy: function ( m ) {
+	copy( m ) {
 
 		const te = this.elements;
 		const me = m.elements;
@@ -1146,9 +1132,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	extractBasis: function ( xAxis, yAxis, zAxis ) {
+	extractBasis( xAxis, yAxis, zAxis ) {
 
 		xAxis.setFromMatrix3Column( this, 0 );
 		yAxis.setFromMatrix3Column( this, 1 );
@@ -1156,9 +1142,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromMatrix4: function ( m ) {
+	setFromMatrix4( m ) {
 
 		const me = m.elements;
 
@@ -1172,21 +1158,21 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiply: function ( m ) {
+	multiply( m ) {
 
 		return this.multiplyMatrices( this, m );
 
-	},
+	}
 
-	premultiply: function ( m ) {
+	premultiply( m ) {
 
 		return this.multiplyMatrices( m, this );
 
-	},
+	}
 
-	multiplyMatrices: function ( a, b ) {
+	multiplyMatrices( a, b ) {
 
 		const ae = a.elements;
 		const be = b.elements;
@@ -1214,9 +1200,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar( s ) {
 
 		const te = this.elements;
 
@@ -1226,9 +1212,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	determinant: function () {
+	determinant() {
 
 		const te = this.elements;
 
@@ -1238,9 +1224,9 @@ Object.assign( Matrix3.prototype, {
 
 		return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
 
-	},
+	}
 
-	getInverse: function ( matrix, throwOnDegenerate ) {
+	getInverse( matrix, throwOnDegenerate ) {
 
 		if ( throwOnDegenerate !== undefined ) {
 
@@ -1279,9 +1265,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	transpose: function () {
+	transpose() {
 
 		let tmp;
 		const m = this.elements;
@@ -1292,15 +1278,15 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getNormalMatrix: function ( matrix4 ) {
+	getNormalMatrix( matrix4 ) {
 
 		return this.setFromMatrix4( matrix4 ).getInverse( this ).transpose();
 
-	},
+	}
 
-	transposeIntoArray: function ( r ) {
+	transposeIntoArray( r ) {
 
 		const m = this.elements;
 
@@ -1316,9 +1302,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setUvTransform: function ( tx, ty, sx, sy, rotation, cx, cy ) {
+	setUvTransform( tx, ty, sx, sy, rotation, cx, cy ) {
 
 		const c = Math.cos( rotation );
 		const s = Math.sin( rotation );
@@ -1329,9 +1315,9 @@ Object.assign( Matrix3.prototype, {
 			0, 0, 1
 		);
 
-	},
+	}
 
-	scale: function ( sx, sy ) {
+	scale( sx, sy ) {
 
 		const te = this.elements;
 
@@ -1340,9 +1326,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	rotate: function ( theta ) {
+	rotate( theta ) {
 
 		const c = Math.cos( theta );
 		const s = Math.sin( theta );
@@ -1362,9 +1348,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	translate: function ( tx, ty ) {
+	translate( tx, ty ) {
 
 		const te = this.elements;
 
@@ -1373,9 +1359,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	equals: function ( matrix ) {
+	equals( matrix ) {
 
 		const te = this.elements;
 		const me = matrix.elements;
@@ -1388,9 +1374,9 @@ Object.assign( Matrix3.prototype, {
 
 		return true;
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -1402,9 +1388,9 @@ Object.assign( Matrix3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -1427,7 +1413,9 @@ Object.assign( Matrix3.prototype, {
 
 	}
 
-} );
+}
+
+Matrix3.prototype.isMatrix3 = true;
 
 let _canvas;
 
@@ -1801,56 +1789,42 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
 
 } );
 
-function Vector4( x = 0, y = 0, z = 0, w = 1 ) {
+class Vector4 {
 
-	this.x = x;
-	this.y = y;
-	this.z = z;
-	this.w = w;
+	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-}
-
-Object.defineProperties( Vector4.prototype, {
-
-	"width": {
-
-		get: function () {
-
-			return this.z;
-
-		},
-
-		set: function ( value ) {
-
-			this.z = value;
-
-		}
-
-	},
-
-	"height": {
-
-		get: function () {
-
-			return this.w;
-
-		},
-
-		set: function ( value ) {
-
-			this.w = value;
-
-		}
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.w = w;
 
 	}
 
-} );
+	get width() {
 
-Object.assign( Vector4.prototype, {
+		return this.z;
 
-	isVector4: true,
+	}
 
-	set: function ( x, y, z, w ) {
+	set width( value ) {
+
+		this.z = value;
+
+	}
+
+	get height() {
+
+		return this.w;
+
+	}
+
+	set height( value ) {
+
+		this.w = value;
+
+	}
+
+	set( x, y, z, w ) {
 
 		this.x = x;
 		this.y = y;
@@ -1859,9 +1833,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setScalar: function ( scalar ) {
+	setScalar( scalar ) {
 
 		this.x = scalar;
 		this.y = scalar;
@@ -1870,41 +1844,41 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setX: function ( x ) {
+	setX( x ) {
 
 		this.x = x;
 
 		return this;
 
-	},
+	}
 
-	setY: function ( y ) {
+	setY( y ) {
 
 		this.y = y;
 
 		return this;
 
-	},
+	}
 
-	setZ: function ( z ) {
+	setZ( z ) {
 
 		this.z = z;
 
 		return this;
 
-	},
+	}
 
-	setW: function ( w ) {
+	setW( w ) {
 
 		this.w = w;
 
 		return this;
 
-	},
+	}
 
-	setComponent: function ( index, value ) {
+	setComponent( index, value ) {
 
 		switch ( index ) {
 
@@ -1918,9 +1892,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getComponent: function ( index ) {
+	getComponent( index ) {
 
 		switch ( index ) {
 
@@ -1932,15 +1906,15 @@ Object.assign( Vector4.prototype, {
 
 		}
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this.x, this.y, this.z, this.w );
 
-	},
+	}
 
-	copy: function ( v ) {
+	copy( v ) {
 
 		this.x = v.x;
 		this.y = v.y;
@@ -1949,9 +1923,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	add: function ( v, w ) {
+	add( v, w ) {
 
 		if ( w !== undefined ) {
 
@@ -1967,9 +1941,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addScalar: function ( s ) {
+	addScalar( s ) {
 
 		this.x += s;
 		this.y += s;
@@ -1978,9 +1952,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addVectors: function ( a, b ) {
+	addVectors( a, b ) {
 
 		this.x = a.x + b.x;
 		this.y = a.y + b.y;
@@ -1989,9 +1963,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addScaledVector: function ( v, s ) {
+	addScaledVector( v, s ) {
 
 		this.x += v.x * s;
 		this.y += v.y * s;
@@ -2000,9 +1974,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	sub: function ( v, w ) {
+	sub( v, w ) {
 
 		if ( w !== undefined ) {
 
@@ -2018,9 +1992,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	subScalar: function ( s ) {
+	subScalar( s ) {
 
 		this.x -= s;
 		this.y -= s;
@@ -2029,9 +2003,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	subVectors: function ( a, b ) {
+	subVectors( a, b ) {
 
 		this.x = a.x - b.x;
 		this.y = a.y - b.y;
@@ -2040,9 +2014,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( scalar ) {
+	multiplyScalar( scalar ) {
 
 		this.x *= scalar;
 		this.y *= scalar;
@@ -2051,9 +2025,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyMatrix4: function ( m ) {
+	applyMatrix4( m ) {
 
 		const x = this.x, y = this.y, z = this.z, w = this.w;
 		const e = m.elements;
@@ -2065,15 +2039,15 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	divideScalar: function ( scalar ) {
+	divideScalar( scalar ) {
 
 		return this.multiplyScalar( 1 / scalar );
 
-	},
+	}
 
-	setAxisAngleFromQuaternion: function ( q ) {
+	setAxisAngleFromQuaternion( q ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/quaternionToAngle/index.htm
 
@@ -2099,9 +2073,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setAxisAngleFromRotationMatrix: function ( m ) {
+	setAxisAngleFromRotationMatrix( m ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToAngle/index.htm
 
@@ -2229,9 +2203,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	min: function ( v ) {
+	min( v ) {
 
 		this.x = Math.min( this.x, v.x );
 		this.y = Math.min( this.y, v.y );
@@ -2240,9 +2214,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	max: function ( v ) {
+	max( v ) {
 
 		this.x = Math.max( this.x, v.x );
 		this.y = Math.max( this.y, v.y );
@@ -2251,9 +2225,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clamp: function ( min, max ) {
+	clamp( min, max ) {
 
 		// assumes min < max, componentwise
 
@@ -2264,9 +2238,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clampScalar: function ( minVal, maxVal ) {
+	clampScalar( minVal, maxVal ) {
 
 		this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
 		this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
@@ -2275,17 +2249,17 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clampLength: function ( min, max ) {
+	clampLength( min, max ) {
 
 		const length = this.length();
 
 		return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
 
-	},
+	}
 
-	floor: function () {
+	floor() {
 
 		this.x = Math.floor( this.x );
 		this.y = Math.floor( this.y );
@@ -2294,9 +2268,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	ceil: function () {
+	ceil() {
 
 		this.x = Math.ceil( this.x );
 		this.y = Math.ceil( this.y );
@@ -2305,9 +2279,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	round: function () {
+	round() {
 
 		this.x = Math.round( this.x );
 		this.y = Math.round( this.y );
@@ -2316,9 +2290,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	roundToZero: function () {
+	roundToZero() {
 
 		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
 		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
@@ -2327,9 +2301,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	negate: function () {
+	negate() {
 
 		this.x = - this.x;
 		this.y = - this.y;
@@ -2338,45 +2312,45 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	dot: function ( v ) {
+	dot( v ) {
 
 		return this.x * v.x + this.y * v.y + this.z * v.z + this.w * v.w;
 
-	},
+	}
 
-	lengthSq: function () {
+	lengthSq() {
 
 		return this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w;
 
-	},
+	}
 
-	length: function () {
+	length() {
 
 		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z + this.w * this.w );
 
-	},
+	}
 
-	manhattanLength: function () {
+	manhattanLength() {
 
 		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z ) + Math.abs( this.w );
 
-	},
+	}
 
-	normalize: function () {
+	normalize() {
 
 		return this.divideScalar( this.length() || 1 );
 
-	},
+	}
 
-	setLength: function ( length ) {
+	setLength( length ) {
 
 		return this.normalize().multiplyScalar( length );
 
-	},
+	}
 
-	lerp: function ( v, alpha ) {
+	lerp( v, alpha ) {
 
 		this.x += ( v.x - this.x ) * alpha;
 		this.y += ( v.y - this.y ) * alpha;
@@ -2385,9 +2359,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	lerpVectors: function ( v1, v2, alpha ) {
+	lerpVectors( v1, v2, alpha ) {
 
 		this.x = v1.x + ( v2.x - v1.x ) * alpha;
 		this.y = v1.y + ( v2.y - v1.y ) * alpha;
@@ -2396,15 +2370,15 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	equals: function ( v ) {
+	equals( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) && ( v.w === this.w ) );
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -2415,9 +2389,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -2429,9 +2403,9 @@ Object.assign( Vector4.prototype, {
 
 		return array;
 
-	},
+	}
 
-	fromBufferAttribute: function ( attribute, index, offset ) {
+	fromBufferAttribute( attribute, index, offset ) {
 
 		if ( offset !== undefined ) {
 
@@ -2446,9 +2420,9 @@ Object.assign( Vector4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	random: function () {
+	random() {
 
 		this.x = Math.random();
 		this.y = Math.random();
@@ -2459,7 +2433,9 @@ Object.assign( Vector4.prototype, {
 
 	}
 
-} );
+}
+
+Vector4.prototype.isVector4 = true;
 
 /*
  In options, we can specify:
@@ -2575,24 +2551,24 @@ WebGLMultisampleRenderTarget.prototype = Object.assign( Object.create( WebGLRend
 
 } );
 
-function Quaternion( x = 0, y = 0, z = 0, w = 1 ) {
+class Quaternion {
 
-	this._x = x;
-	this._y = y;
-	this._z = z;
-	this._w = w;
+	constructor( x = 0, y = 0, z = 0, w = 1 ) {
 
-}
+		this._x = x;
+		this._y = y;
+		this._z = z;
+		this._w = w;
 
-Object.assign( Quaternion, {
+	}
 
-	slerp: function ( qa, qb, qm, t ) {
+	static slerp( qa, qb, qm, t ) {
 
 		return qm.copy( qa ).slerp( qb, t );
 
-	},
+	}
 
-	slerpFlat: function ( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
+	static slerpFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1, t ) {
 
 		// fuzz-free, array-based Quaternion SLERP operation
 
@@ -2650,9 +2626,9 @@ Object.assign( Quaternion, {
 		dst[ dstOffset + 2 ] = z0;
 		dst[ dstOffset + 3 ] = w0;
 
-	},
+	}
 
-	multiplyQuaternionsFlat: function ( dst, dstOffset, src0, srcOffset0, src1, srcOffset1 ) {
+	static multiplyQuaternionsFlat( dst, dstOffset, src0, srcOffset0, src1, srcOffset1 ) {
 
 		const x0 = src0[ srcOffset0 ];
 		const y0 = src0[ srcOffset0 + 1 ];
@@ -2673,85 +2649,59 @@ Object.assign( Quaternion, {
 
 	}
 
-} );
+	get x() {
 
-Object.defineProperties( Quaternion.prototype, {
-
-	x: {
-
-		get: function () {
-
-			return this._x;
-
-		},
-
-		set: function ( value ) {
-
-			this._x = value;
-			this._onChangeCallback();
-
-		}
-
-	},
-
-	y: {
-
-		get: function () {
-
-			return this._y;
-
-		},
-
-		set: function ( value ) {
-
-			this._y = value;
-			this._onChangeCallback();
-
-		}
-
-	},
-
-	z: {
-
-		get: function () {
-
-			return this._z;
-
-		},
-
-		set: function ( value ) {
-
-			this._z = value;
-			this._onChangeCallback();
-
-		}
-
-	},
-
-	w: {
-
-		get: function () {
-
-			return this._w;
-
-		},
-
-		set: function ( value ) {
-
-			this._w = value;
-			this._onChangeCallback();
-
-		}
+		return this._x;
 
 	}
 
-} );
+	set x( value ) {
 
-Object.assign( Quaternion.prototype, {
+		this._x = value;
+		this._onChangeCallback();
 
-	isQuaternion: true,
+	}
 
-	set: function ( x, y, z, w ) {
+	get y() {
+
+		return this._y;
+
+	}
+
+	set y( value ) {
+
+		this._y = value;
+		this._onChangeCallback();
+
+	}
+
+	get z() {
+
+		return this._z;
+
+	}
+
+	set z( value ) {
+
+		this._z = value;
+		this._onChangeCallback();
+
+	}
+
+	get w() {
+
+		return this._w;
+
+	}
+
+	set w( value ) {
+
+		this._w = value;
+		this._onChangeCallback();
+
+	}
+
+	set( x, y, z, w ) {
 
 		this._x = x;
 		this._y = y;
@@ -2762,15 +2712,15 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this._x, this._y, this._z, this._w );
 
-	},
+	}
 
-	copy: function ( quaternion ) {
+	copy( quaternion ) {
 
 		this._x = quaternion.x;
 		this._y = quaternion.y;
@@ -2781,9 +2731,9 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromEuler: function ( euler, update ) {
+	setFromEuler( euler, update ) {
 
 		if ( ! ( euler && euler.isEuler ) ) {
 
@@ -2861,9 +2811,9 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromAxisAngle: function ( axis, angle ) {
+	setFromAxisAngle( axis, angle ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/angleToQuaternion/index.htm
 
@@ -2880,9 +2830,9 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromRotationMatrix: function ( m ) {
+	setFromRotationMatrix( m ) {
 
 		// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
 
@@ -2938,9 +2888,9 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromUnitVectors: function ( vFrom, vTo ) {
+	setFromUnitVectors( vFrom, vTo ) {
 
 		// assumes direction vectors vFrom and vTo are normalized
 
@@ -2981,15 +2931,15 @@ Object.assign( Quaternion.prototype, {
 
 		return this.normalize();
 
-	},
+	}
 
-	angleTo: function ( q ) {
+	angleTo( q ) {
 
 		return 2 * Math.acos( Math.abs( MathUtils.clamp( this.dot( q ), - 1, 1 ) ) );
 
-	},
+	}
 
-	rotateTowards: function ( q, step ) {
+	rotateTowards( q, step ) {
 
 		const angle = this.angleTo( q );
 
@@ -3001,23 +2951,23 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	identity: function () {
+	identity() {
 
 		return this.set( 0, 0, 0, 1 );
 
-	},
+	}
 
-	inverse: function () {
+	inverse() {
 
 		// quaternion is assumed to have unit length
 
 		return this.conjugate();
 
-	},
+	}
 
-	conjugate: function () {
+	conjugate() {
 
 		this._x *= - 1;
 		this._y *= - 1;
@@ -3027,27 +2977,27 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	dot: function ( v ) {
+	dot( v ) {
 
 		return this._x * v._x + this._y * v._y + this._z * v._z + this._w * v._w;
 
-	},
+	}
 
-	lengthSq: function () {
+	lengthSq() {
 
 		return this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w;
 
-	},
+	}
 
-	length: function () {
+	length() {
 
 		return Math.sqrt( this._x * this._x + this._y * this._y + this._z * this._z + this._w * this._w );
 
-	},
+	}
 
-	normalize: function () {
+	normalize() {
 
 		let l = this.length();
 
@@ -3073,9 +3023,9 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiply: function ( q, p ) {
+	multiply( q, p ) {
 
 		if ( p !== undefined ) {
 
@@ -3086,15 +3036,15 @@ Object.assign( Quaternion.prototype, {
 
 		return this.multiplyQuaternions( this, q );
 
-	},
+	}
 
-	premultiply: function ( q ) {
+	premultiply( q ) {
 
 		return this.multiplyQuaternions( q, this );
 
-	},
+	}
 
-	multiplyQuaternions: function ( a, b ) {
+	multiplyQuaternions( a, b ) {
 
 		// from http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm
 
@@ -3110,9 +3060,9 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	slerp: function ( qb, t ) {
+	slerp( qb, t ) {
 
 		if ( t === 0 ) return this;
 		if ( t === 1 ) return this.copy( qb );
@@ -3180,15 +3130,15 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	equals: function ( quaternion ) {
+	equals( quaternion ) {
 
 		return ( quaternion._x === this._x ) && ( quaternion._y === this._y ) && ( quaternion._z === this._z ) && ( quaternion._w === this._w );
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -3201,9 +3151,9 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -3215,9 +3165,9 @@ Object.assign( Quaternion.prototype, {
 
 		return array;
 
-	},
+	}
 
-	fromBufferAttribute: function ( attribute, index ) {
+	fromBufferAttribute( attribute, index ) {
 
 		this._x = attribute.getX( index );
 		this._y = attribute.getY( index );
@@ -3226,36 +3176,33 @@ Object.assign( Quaternion.prototype, {
 
 		return this;
 
-	},
+	}
 
-	_onChange: function ( callback ) {
+	_onChange( callback ) {
 
 		this._onChangeCallback = callback;
 
 		return this;
 
-	},
+	}
 
-	_onChangeCallback: function () {}
-
-} );
-
-const _vector = new Vector3();
-const _quaternion = new Quaternion();
-
-function Vector3( x = 0, y = 0, z = 0 ) {
-
-	this.x = x;
-	this.y = y;
-	this.z = z;
+	_onChangeCallback() {}
 
 }
 
-Object.assign( Vector3.prototype, {
+Quaternion.prototype.isQuaternion = true;
 
-	isVector3: true,
+class Vector3 {
 
-	set: function ( x, y, z ) {
+	constructor( x = 0, y = 0, z = 0 ) {
+
+		this.x = x;
+		this.y = y;
+		this.z = z;
+
+	}
+
+	set( x, y, z ) {
 
 		if ( z === undefined ) z = this.z; // sprite.scale.set(x,y)
 
@@ -3265,9 +3212,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setScalar: function ( scalar ) {
+	setScalar( scalar ) {
 
 		this.x = scalar;
 		this.y = scalar;
@@ -3275,33 +3222,33 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setX: function ( x ) {
+	setX( x ) {
 
 		this.x = x;
 
 		return this;
 
-	},
+	}
 
-	setY: function ( y ) {
+	setY( y ) {
 
 		this.y = y;
 
 		return this;
 
-	},
+	}
 
-	setZ: function ( z ) {
+	setZ( z ) {
 
 		this.z = z;
 
 		return this;
 
-	},
+	}
 
-	setComponent: function ( index, value ) {
+	setComponent( index, value ) {
 
 		switch ( index ) {
 
@@ -3314,9 +3261,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getComponent: function ( index ) {
+	getComponent( index ) {
 
 		switch ( index ) {
 
@@ -3327,15 +3274,15 @@ Object.assign( Vector3.prototype, {
 
 		}
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this.x, this.y, this.z );
 
-	},
+	}
 
-	copy: function ( v ) {
+	copy( v ) {
 
 		this.x = v.x;
 		this.y = v.y;
@@ -3343,9 +3290,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	add: function ( v, w ) {
+	add( v, w ) {
 
 		if ( w !== undefined ) {
 
@@ -3360,9 +3307,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addScalar: function ( s ) {
+	addScalar( s ) {
 
 		this.x += s;
 		this.y += s;
@@ -3370,9 +3317,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addVectors: function ( a, b ) {
+	addVectors( a, b ) {
 
 		this.x = a.x + b.x;
 		this.y = a.y + b.y;
@@ -3380,9 +3327,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	addScaledVector: function ( v, s ) {
+	addScaledVector( v, s ) {
 
 		this.x += v.x * s;
 		this.y += v.y * s;
@@ -3390,9 +3337,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	sub: function ( v, w ) {
+	sub( v, w ) {
 
 		if ( w !== undefined ) {
 
@@ -3407,9 +3354,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	subScalar: function ( s ) {
+	subScalar( s ) {
 
 		this.x -= s;
 		this.y -= s;
@@ -3417,9 +3364,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	subVectors: function ( a, b ) {
+	subVectors( a, b ) {
 
 		this.x = a.x - b.x;
 		this.y = a.y - b.y;
@@ -3427,9 +3374,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiply: function ( v, w ) {
+	multiply( v, w ) {
 
 		if ( w !== undefined ) {
 
@@ -3444,9 +3391,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( scalar ) {
+	multiplyScalar( scalar ) {
 
 		this.x *= scalar;
 		this.y *= scalar;
@@ -3454,9 +3401,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyVectors: function ( a, b ) {
+	multiplyVectors( a, b ) {
 
 		this.x = a.x * b.x;
 		this.y = a.y * b.y;
@@ -3464,9 +3411,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyEuler: function ( euler ) {
+	applyEuler( euler ) {
 
 		if ( ! ( euler && euler.isEuler ) ) {
 
@@ -3476,15 +3423,15 @@ Object.assign( Vector3.prototype, {
 
 		return this.applyQuaternion( _quaternion.setFromEuler( euler ) );
 
-	},
+	}
 
-	applyAxisAngle: function ( axis, angle ) {
+	applyAxisAngle( axis, angle ) {
 
 		return this.applyQuaternion( _quaternion.setFromAxisAngle( axis, angle ) );
 
-	},
+	}
 
-	applyMatrix3: function ( m ) {
+	applyMatrix3( m ) {
 
 		const x = this.x, y = this.y, z = this.z;
 		const e = m.elements;
@@ -3495,15 +3442,15 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyNormalMatrix: function ( m ) {
+	applyNormalMatrix( m ) {
 
 		return this.applyMatrix3( m ).normalize();
 
-	},
+	}
 
-	applyMatrix4: function ( m ) {
+	applyMatrix4( m ) {
 
 		const x = this.x, y = this.y, z = this.z;
 		const e = m.elements;
@@ -3516,9 +3463,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	applyQuaternion: function ( q ) {
+	applyQuaternion( q ) {
 
 		const x = this.x, y = this.y, z = this.z;
 		const qx = q.x, qy = q.y, qz = q.z, qw = q.w;
@@ -3538,21 +3485,21 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	project: function ( camera ) {
+	project( camera ) {
 
 		return this.applyMatrix4( camera.matrixWorldInverse ).applyMatrix4( camera.projectionMatrix );
 
-	},
+	}
 
-	unproject: function ( camera ) {
+	unproject( camera ) {
 
 		return this.applyMatrix4( camera.projectionMatrixInverse ).applyMatrix4( camera.matrixWorld );
 
-	},
+	}
 
-	transformDirection: function ( m ) {
+	transformDirection( m ) {
 
 		// input: THREE.Matrix4 affine matrix
 		// vector interpreted as a direction
@@ -3566,9 +3513,9 @@ Object.assign( Vector3.prototype, {
 
 		return this.normalize();
 
-	},
+	}
 
-	divide: function ( v ) {
+	divide( v ) {
 
 		this.x /= v.x;
 		this.y /= v.y;
@@ -3576,15 +3523,15 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	divideScalar: function ( scalar ) {
+	divideScalar( scalar ) {
 
 		return this.multiplyScalar( 1 / scalar );
 
-	},
+	}
 
-	min: function ( v ) {
+	min( v ) {
 
 		this.x = Math.min( this.x, v.x );
 		this.y = Math.min( this.y, v.y );
@@ -3592,9 +3539,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	max: function ( v ) {
+	max( v ) {
 
 		this.x = Math.max( this.x, v.x );
 		this.y = Math.max( this.y, v.y );
@@ -3602,9 +3549,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clamp: function ( min, max ) {
+	clamp( min, max ) {
 
 		// assumes min < max, componentwise
 
@@ -3614,9 +3561,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clampScalar: function ( minVal, maxVal ) {
+	clampScalar( minVal, maxVal ) {
 
 		this.x = Math.max( minVal, Math.min( maxVal, this.x ) );
 		this.y = Math.max( minVal, Math.min( maxVal, this.y ) );
@@ -3624,17 +3571,17 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clampLength: function ( min, max ) {
+	clampLength( min, max ) {
 
 		const length = this.length();
 
 		return this.divideScalar( length || 1 ).multiplyScalar( Math.max( min, Math.min( max, length ) ) );
 
-	},
+	}
 
-	floor: function () {
+	floor() {
 
 		this.x = Math.floor( this.x );
 		this.y = Math.floor( this.y );
@@ -3642,9 +3589,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	ceil: function () {
+	ceil() {
 
 		this.x = Math.ceil( this.x );
 		this.y = Math.ceil( this.y );
@@ -3652,9 +3599,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	round: function () {
+	round() {
 
 		this.x = Math.round( this.x );
 		this.y = Math.round( this.y );
@@ -3662,9 +3609,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	roundToZero: function () {
+	roundToZero() {
 
 		this.x = ( this.x < 0 ) ? Math.ceil( this.x ) : Math.floor( this.x );
 		this.y = ( this.y < 0 ) ? Math.ceil( this.y ) : Math.floor( this.y );
@@ -3672,9 +3619,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	negate: function () {
+	negate() {
 
 		this.x = - this.x;
 		this.y = - this.y;
@@ -3682,47 +3629,47 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	dot: function ( v ) {
+	dot( v ) {
 
 		return this.x * v.x + this.y * v.y + this.z * v.z;
 
-	},
+	}
 
 	// TODO lengthSquared?
 
-	lengthSq: function () {
+	lengthSq() {
 
 		return this.x * this.x + this.y * this.y + this.z * this.z;
 
-	},
+	}
 
-	length: function () {
+	length() {
 
 		return Math.sqrt( this.x * this.x + this.y * this.y + this.z * this.z );
 
-	},
+	}
 
-	manhattanLength: function () {
+	manhattanLength() {
 
 		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
 
-	},
+	}
 
-	normalize: function () {
+	normalize() {
 
 		return this.divideScalar( this.length() || 1 );
 
-	},
+	}
 
-	setLength: function ( length ) {
+	setLength( length ) {
 
 		return this.normalize().multiplyScalar( length );
 
-	},
+	}
 
-	lerp: function ( v, alpha ) {
+	lerp( v, alpha ) {
 
 		this.x += ( v.x - this.x ) * alpha;
 		this.y += ( v.y - this.y ) * alpha;
@@ -3730,9 +3677,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	lerpVectors: function ( v1, v2, alpha ) {
+	lerpVectors( v1, v2, alpha ) {
 
 		this.x = v1.x + ( v2.x - v1.x ) * alpha;
 		this.y = v1.y + ( v2.y - v1.y ) * alpha;
@@ -3740,9 +3687,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	cross: function ( v, w ) {
+	cross( v, w ) {
 
 		if ( w !== undefined ) {
 
@@ -3753,9 +3700,9 @@ Object.assign( Vector3.prototype, {
 
 		return this.crossVectors( this, v );
 
-	},
+	}
 
-	crossVectors: function ( a, b ) {
+	crossVectors( a, b ) {
 
 		const ax = a.x, ay = a.y, az = a.z;
 		const bx = b.x, by = b.y, bz = b.z;
@@ -3766,9 +3713,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	projectOnVector: function ( v ) {
+	projectOnVector( v ) {
 
 		const denominator = v.lengthSq();
 
@@ -3778,26 +3725,26 @@ Object.assign( Vector3.prototype, {
 
 		return this.copy( v ).multiplyScalar( scalar );
 
-	},
+	}
 
-	projectOnPlane: function ( planeNormal ) {
+	projectOnPlane( planeNormal ) {
 
 		_vector.copy( this ).projectOnVector( planeNormal );
 
 		return this.sub( _vector );
 
-	},
+	}
 
-	reflect: function ( normal ) {
+	reflect( normal ) {
 
 		// reflect incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
 
 		return this.sub( _vector.copy( normal ).multiplyScalar( 2 * this.dot( normal ) ) );
 
-	},
+	}
 
-	angleTo: function ( v ) {
+	angleTo( v ) {
 
 		const denominator = Math.sqrt( this.lengthSq() * v.lengthSq() );
 
@@ -3809,35 +3756,35 @@ Object.assign( Vector3.prototype, {
 
 		return Math.acos( MathUtils.clamp( theta, - 1, 1 ) );
 
-	},
+	}
 
-	distanceTo: function ( v ) {
+	distanceTo( v ) {
 
 		return Math.sqrt( this.distanceToSquared( v ) );
 
-	},
+	}
 
-	distanceToSquared: function ( v ) {
+	distanceToSquared( v ) {
 
 		const dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
 
 		return dx * dx + dy * dy + dz * dz;
 
-	},
+	}
 
-	manhattanDistanceTo: function ( v ) {
+	manhattanDistanceTo( v ) {
 
 		return Math.abs( this.x - v.x ) + Math.abs( this.y - v.y ) + Math.abs( this.z - v.z );
 
-	},
+	}
 
-	setFromSpherical: function ( s ) {
+	setFromSpherical( s ) {
 
 		return this.setFromSphericalCoords( s.radius, s.phi, s.theta );
 
-	},
+	}
 
-	setFromSphericalCoords: function ( radius, phi, theta ) {
+	setFromSphericalCoords( radius, phi, theta ) {
 
 		const sinPhiRadius = Math.sin( phi ) * radius;
 
@@ -3847,15 +3794,15 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromCylindrical: function ( c ) {
+	setFromCylindrical( c ) {
 
 		return this.setFromCylindricalCoords( c.radius, c.theta, c.y );
 
-	},
+	}
 
-	setFromCylindricalCoords: function ( radius, theta, y ) {
+	setFromCylindricalCoords( radius, theta, y ) {
 
 		this.x = radius * Math.sin( theta );
 		this.y = y;
@@ -3863,9 +3810,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromMatrixPosition: function ( m ) {
+	setFromMatrixPosition( m ) {
 
 		const e = m.elements;
 
@@ -3875,9 +3822,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromMatrixScale: function ( m ) {
+	setFromMatrixScale( m ) {
 
 		const sx = this.setFromMatrixColumn( m, 0 ).length();
 		const sy = this.setFromMatrixColumn( m, 1 ).length();
@@ -3889,27 +3836,27 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromMatrixColumn: function ( m, index ) {
+	setFromMatrixColumn( m, index ) {
 
 		return this.fromArray( m.elements, index * 4 );
 
-	},
+	}
 
-	setFromMatrix3Column: function ( m, index ) {
+	setFromMatrix3Column( m, index ) {
 
 		return this.fromArray( m.elements, index * 3 );
 
-	},
+	}
 
-	equals: function ( v ) {
+	equals( v ) {
 
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -3919,9 +3866,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -3932,9 +3879,9 @@ Object.assign( Vector3.prototype, {
 
 		return array;
 
-	},
+	}
 
-	fromBufferAttribute: function ( attribute, index, offset ) {
+	fromBufferAttribute( attribute, index, offset ) {
 
 		if ( offset !== undefined ) {
 
@@ -3948,9 +3895,9 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	random: function () {
+	random() {
 
 		this.x = Math.random();
 		this.y = Math.random();
@@ -3960,7 +3907,12 @@ Object.assign( Vector3.prototype, {
 
 	}
 
-} );
+}
+
+Vector3.prototype.isVector3 = true;
+
+const _vector = new Vector3();
+const _quaternion = new Quaternion();
 
 const _points = [
 	new Vector3(),
@@ -5203,38 +5155,28 @@ class Ray {
 
 }
 
-const _v1$1 = new Vector3();
-const _m1 = new Matrix4();
-const _zero = new Vector3( 0, 0, 0 );
-const _one = new Vector3( 1, 1, 1 );
-const _x = new Vector3();
-const _y = new Vector3();
-const _z = new Vector3();
+class Matrix4 {
 
-function Matrix4() {
+	constructor() {
 
-	this.elements = [
+		this.elements = [
 
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
 
-	];
+		];
 
-	if ( arguments.length > 0 ) {
+		if ( arguments.length > 0 ) {
 
-		console.error( 'THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.' );
+			console.error( 'THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.' );
+
+		}
 
 	}
 
-}
-
-Object.assign( Matrix4.prototype, {
-
-	isMatrix4: true,
-
-	set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
+	set( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
 		const te = this.elements;
 
@@ -5245,9 +5187,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	identity: function () {
+	identity() {
 
 		this.set(
 
@@ -5260,15 +5202,15 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new Matrix4().fromArray( this.elements );
 
-	},
+	}
 
-	copy: function ( m ) {
+	copy( m ) {
 
 		const te = this.elements;
 		const me = m.elements;
@@ -5280,9 +5222,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyPosition: function ( m ) {
+	copyPosition( m ) {
 
 		const te = this.elements, me = m.elements;
 
@@ -5292,9 +5234,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	extractBasis: function ( xAxis, yAxis, zAxis ) {
+	extractBasis( xAxis, yAxis, zAxis ) {
 
 		xAxis.setFromMatrixColumn( this, 0 );
 		yAxis.setFromMatrixColumn( this, 1 );
@@ -5302,9 +5244,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeBasis: function ( xAxis, yAxis, zAxis ) {
+	makeBasis( xAxis, yAxis, zAxis ) {
 
 		this.set(
 			xAxis.x, yAxis.x, zAxis.x, 0,
@@ -5315,9 +5257,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	extractRotation: function ( m ) {
+	extractRotation( m ) {
 
 		// this method does not support reflection matrices
 
@@ -5350,9 +5292,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationFromEuler: function ( euler ) {
+	makeRotationFromEuler( euler ) {
 
 		if ( ! ( euler && euler.isEuler ) ) {
 
@@ -5478,15 +5420,15 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationFromQuaternion: function ( q ) {
+	makeRotationFromQuaternion( q ) {
 
 		return this.compose( _zero, q, _one );
 
-	},
+	}
 
-	lookAt: function ( eye, target, up ) {
+	lookAt( eye, target, up ) {
 
 		const te = this.elements;
 
@@ -5531,9 +5473,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiply: function ( m, n ) {
+	multiply( m, n ) {
 
 		if ( n !== undefined ) {
 
@@ -5544,15 +5486,15 @@ Object.assign( Matrix4.prototype, {
 
 		return this.multiplyMatrices( this, m );
 
-	},
+	}
 
-	premultiply: function ( m ) {
+	premultiply( m ) {
 
 		return this.multiplyMatrices( m, this );
 
-	},
+	}
 
-	multiplyMatrices: function ( a, b ) {
+	multiplyMatrices( a, b ) {
 
 		const ae = a.elements;
 		const be = b.elements;
@@ -5590,9 +5532,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar( s ) {
 
 		const te = this.elements;
 
@@ -5603,9 +5545,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	determinant: function () {
+	determinant() {
 
 		const te = this.elements;
 
@@ -5653,9 +5595,9 @@ Object.assign( Matrix4.prototype, {
 
 		);
 
-	},
+	}
 
-	transpose: function () {
+	transpose() {
 
 		const te = this.elements;
 		let tmp;
@@ -5670,9 +5612,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setPosition: function ( x, y, z ) {
+	setPosition( x, y, z ) {
 
 		const te = this.elements;
 
@@ -5692,9 +5634,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getInverse: function ( m, throwOnDegenerate ) {
+	getInverse( m, throwOnDegenerate ) {
 
 		if ( throwOnDegenerate !== undefined ) {
 
@@ -5744,9 +5686,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	scale: function ( v ) {
+	scale( v ) {
 
 		const te = this.elements;
 		const x = v.x, y = v.y, z = v.z;
@@ -5758,9 +5700,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getMaxScaleOnAxis: function () {
+	getMaxScaleOnAxis() {
 
 		const te = this.elements;
 
@@ -5770,9 +5712,9 @@ Object.assign( Matrix4.prototype, {
 
 		return Math.sqrt( Math.max( scaleXSq, scaleYSq, scaleZSq ) );
 
-	},
+	}
 
-	makeTranslation: function ( x, y, z ) {
+	makeTranslation( x, y, z ) {
 
 		this.set(
 
@@ -5785,9 +5727,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationX: function ( theta ) {
+	makeRotationX( theta ) {
 
 		const c = Math.cos( theta ), s = Math.sin( theta );
 
@@ -5802,9 +5744,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationY: function ( theta ) {
+	makeRotationY( theta ) {
 
 		const c = Math.cos( theta ), s = Math.sin( theta );
 
@@ -5819,9 +5761,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationZ: function ( theta ) {
+	makeRotationZ( theta ) {
 
 		const c = Math.cos( theta ), s = Math.sin( theta );
 
@@ -5836,9 +5778,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationAxis: function ( axis, angle ) {
+	makeRotationAxis( axis, angle ) {
 
 		// Based on http://www.gamedev.net/reference/articles/article1199.asp
 
@@ -5857,11 +5799,11 @@ Object.assign( Matrix4.prototype, {
 
 		);
 
-		 return this;
+		return this;
 
-	},
+	}
 
-	makeScale: function ( x, y, z ) {
+	makeScale( x, y, z ) {
 
 		this.set(
 
@@ -5874,9 +5816,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeShear: function ( x, y, z ) {
+	makeShear( x, y, z ) {
 
 		this.set(
 
@@ -5889,9 +5831,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	compose: function ( position, quaternion, scale ) {
+	compose( position, quaternion, scale ) {
 
 		const te = this.elements;
 
@@ -5925,9 +5867,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	decompose: function ( position, quaternion, scale ) {
+	decompose( position, quaternion, scale ) {
 
 		const te = this.elements;
 
@@ -5970,9 +5912,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makePerspective: function ( left, right, top, bottom, near, far ) {
+	makePerspective( left, right, top, bottom, near, far ) {
 
 		if ( far === undefined ) {
 
@@ -5996,9 +5938,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeOrthographic: function ( left, right, top, bottom, near, far ) {
+	makeOrthographic( left, right, top, bottom, near, far ) {
 
 		const te = this.elements;
 		const w = 1.0 / ( right - left );
@@ -6016,9 +5958,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	equals: function ( matrix ) {
+	equals( matrix ) {
 
 		const te = this.elements;
 		const me = matrix.elements;
@@ -6031,9 +5973,9 @@ Object.assign( Matrix4.prototype, {
 
 		return true;
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -6045,9 +5987,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -6078,101 +6020,82 @@ Object.assign( Matrix4.prototype, {
 
 	}
 
-} );
-
-const _matrix = new Matrix4();
-const _quaternion$1 = new Quaternion();
-
-function Euler( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
-
-	this._x = x;
-	this._y = y;
-	this._z = z;
-	this._order = order;
-
 }
 
-Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+Matrix4.prototype.isMatrix4 = true;
 
-Euler.DefaultOrder = 'XYZ';
+const _v1$1 = new Vector3();
+const _m1 = new Matrix4();
+const _zero = new Vector3( 0, 0, 0 );
+const _one = new Vector3( 1, 1, 1 );
+const _x = new Vector3();
+const _y = new Vector3();
+const _z = new Vector3();
 
-Object.defineProperties( Euler.prototype, {
+class Euler {
 
-	x: {
+	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
-		get: function () {
-
-			return this._x;
-
-		},
-
-		set: function ( value ) {
-
-			this._x = value;
-			this._onChangeCallback();
-
-		}
-
-	},
-
-	y: {
-
-		get: function () {
-
-			return this._y;
-
-		},
-
-		set: function ( value ) {
-
-			this._y = value;
-			this._onChangeCallback();
-
-		}
-
-	},
-
-	z: {
-
-		get: function () {
-
-			return this._z;
-
-		},
-
-		set: function ( value ) {
-
-			this._z = value;
-			this._onChangeCallback();
-
-		}
-
-	},
-
-	order: {
-
-		get: function () {
-
-			return this._order;
-
-		},
-
-		set: function ( value ) {
-
-			this._order = value;
-			this._onChangeCallback();
-
-		}
+		this._x = x;
+		this._y = y;
+		this._z = z;
+		this._order = order;
 
 	}
 
-} );
+	get x() {
 
-Object.assign( Euler.prototype, {
+		return this._x;
 
-	isEuler: true,
+	}
 
-	set: function ( x, y, z, order ) {
+	set x( value ) {
+
+		this._x = value;
+		this._onChangeCallback();
+
+	}
+
+	get y() {
+
+		return this._y;
+
+	}
+
+	set y( value ) {
+
+		this._y = value;
+		this._onChangeCallback();
+
+	}
+
+	get z() {
+
+		return this._z;
+
+	}
+
+	set z( value ) {
+
+		this._z = value;
+		this._onChangeCallback();
+
+	}
+
+	get order() {
+
+		return this._order;
+
+	}
+
+	set order( value ) {
+
+		this._order = value;
+		this._onChangeCallback();
+
+	}
+
+	set( x, y, z, order ) {
 
 		this._x = x;
 		this._y = y;
@@ -6183,15 +6106,15 @@ Object.assign( Euler.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor( this._x, this._y, this._z, this._order );
 
-	},
+	}
 
-	copy: function ( euler ) {
+	copy( euler ) {
 
 		this._x = euler._x;
 		this._y = euler._y;
@@ -6202,9 +6125,9 @@ Object.assign( Euler.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromRotationMatrix: function ( m, order, update ) {
+	setFromRotationMatrix( m, order, update ) {
 
 		const clamp = MathUtils.clamp;
 
@@ -6339,23 +6262,23 @@ Object.assign( Euler.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromQuaternion: function ( q, order, update ) {
+	setFromQuaternion( q, order, update ) {
 
 		_matrix.makeRotationFromQuaternion( q );
 
 		return this.setFromRotationMatrix( _matrix, order, update );
 
-	},
+	}
 
-	setFromVector3: function ( v, order ) {
+	setFromVector3( v, order ) {
 
 		return this.set( v.x, v.y, v.z, order || this._order );
 
-	},
+	}
 
-	reorder: function ( newOrder ) {
+	reorder( newOrder ) {
 
 		// WARNING: this discards revolution information -bhouston
 
@@ -6363,15 +6286,15 @@ Object.assign( Euler.prototype, {
 
 		return this.setFromQuaternion( _quaternion$1, newOrder );
 
-	},
+	}
 
-	equals: function ( euler ) {
+	equals( euler ) {
 
 		return ( euler._x === this._x ) && ( euler._y === this._y ) && ( euler._z === this._z ) && ( euler._order === this._order );
 
-	},
+	}
 
-	fromArray: function ( array ) {
+	fromArray( array ) {
 
 		this._x = array[ 0 ];
 		this._y = array[ 1 ];
@@ -6382,9 +6305,9 @@ Object.assign( Euler.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -6396,9 +6319,9 @@ Object.assign( Euler.prototype, {
 
 		return array;
 
-	},
+	}
 
-	toVector3: function ( optionalResult ) {
+	toVector3( optionalResult ) {
 
 		if ( optionalResult ) {
 
@@ -6410,19 +6333,26 @@ Object.assign( Euler.prototype, {
 
 		}
 
-	},
+	}
 
-	_onChange: function ( callback ) {
+	_onChange( callback ) {
 
 		this._onChangeCallback = callback;
 
 		return this;
 
-	},
+	}
 
-	_onChangeCallback: function () {}
+	_onChangeCallback() {}
 
-} );
+}
+
+Euler.DefaultOrder = 'XYZ';
+Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+Euler.prototype.isEuler = true;
+
+const _matrix = new Matrix4();
+const _quaternion$1 = new Quaternion();
 
 class Layers {
 
@@ -42686,6 +42616,7 @@ class Audio extends Object3D {
 		this.playbackRate = 1;
 		this.isPlaying = false;
 		this.hasPlaybackControl = true;
+		this.source = null;
 		this.sourceType = 'empty';
 
 		this._startedAt = 0;
