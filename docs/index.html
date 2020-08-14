@@ -1,483 +1,480 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>three.js docs</title>
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link rel="shortcut icon" href="../files/favicon.ico" />
+		<link rel="stylesheet" type="text/css" href="../files/main.css">
+		<!-- console sandbox -->
+		<script src="../build/three.min.js" async defer></script>
+	</head>
+	<body>
+		<div id="panel">
 
-<head>
-	<meta charset="utf-8">
-	<title>three.js docs</title>
-	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-	<link rel="shortcut icon" href="../files/favicon.ico" />
-	<link rel="stylesheet" type="text/css" href="../files/main.css">
-	<!-- console sandbox -->
-	<script src="../build/three.min.js" async defer></script>
-</head>
+			<div id="header">
+				<h1><a href="http://threejs.org">three.js</a></h1>
 
-<body>
-	<div id="panel">
+				<div id="sections">
+					<span class="selected">docs</span>
+					<a href="../examples/#webgl_animation_cloth">examples</a>
+				</div>
 
-		<div id="header">
-			<h1><a href="http://threejs.org">three.js</a></h1>
-
-			<div id="sections">
-				<span class="selected">docs</span>
-				<a href="../examples/#webgl_animation_cloth">examples</a>
+				<div id="expandButton"></div>
 			</div>
 
-			<div id="expandButton"></div>
-		</div>
+			<div id="panelScrim"></div>
 
-		<div id="panelScrim"></div>
-
-		<div id="contentWrapper">
-			<div id="inputWrapper">
-				<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off"
-					spellcheck="false" />
-				<div id="exitSearchButton"></div>
-				<select id="language">
-					<option value="en">en</option>
-					<option value="ar">ar</option>
-					<option value="zh">中文</option>
-				</select>
+			<div id="contentWrapper">
+				<div id="inputWrapper">
+					<input placeholder="" type="text" id="filterInput" autocorrect="off" autocapitalize="off" spellcheck="false" />
+					<div id="exitSearchButton"></div>
+					<select id="language">
+						<option value="en">en</option>
+						<option value="ar">ar</option>
+						<option value="zh">中文</option>
+					</select>
+				</div>
+				<div id="content"></div>
 			</div>
-			<div id="content"></div>
+
 		</div>
 
-	</div>
+		<iframe name="viewer"></iframe>
 
-	<iframe name="viewer"></iframe>
+		<script src="list.js"></script>
 
-	<script src="list.js"></script>
+		<script>
 
-	<script>
+			var hash = window.location.hash.substring( 1 );
 
-		var hash = window.location.hash.substring(1);
+			// Localisation
 
-		// Localisation
+			var language = 'en';
 
-		var language = 'en';
+			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-		if (/^(api|manual|examples)/.test(hash)) {
+				var hashLanguage = /^(api|manual|examples)\/(en|ar|zh)\//.exec( hash );
 
-			var hashLanguage = /^(api|manual|examples)\/(en|ar|zh)\//.exec(hash);
+				if ( hashLanguage === null ) {
 
-			if (hashLanguage === null) {
+					// Route old non-localised api links
 
-				// Route old non-localised api links
+					window.location.hash = hash.replace( /^(api|manual|examples)/, '$1/en' );
 
-				window.location.hash = hash.replace(/^(api|manual|examples)/, '$1/en');
+				} else {
 
-			} else {
-
-				language = hashLanguage[2];
-
-			}
-
-		}
-
-		//
-
-		var languageSelect = document.getElementById('language');
-		languageSelect.value = language;
-		languageSelect.addEventListener('change', function (event) {
-
-			setLanguage(this.value);
-
-		});
-
-		function setLanguage(value) {
-
-			language = value;
-
-			createNavigation();
-			updateFilter();
-			autoChangeUrlLanguage(language);
-
-		}
-
-		var panel = document.getElementById('panel');
-		var content = document.getElementById('content');
-		var expandButton = document.getElementById('expandButton');
-		var exitSearchButton = document.getElementById('exitSearchButton');
-		var panelScrim = document.getElementById('panelScrim');
-		var filterInput = document.getElementById('filterInput');
-		var iframe = document.querySelector('iframe');
-
-		var pageProperties = {};
-		var titles = {};
-		var categoryElements = [];
-
-		var navigation;
-
-		// Functionality for hamburger button (on small devices)
-
-		expandButton.onclick = function (event) {
-
-			event.preventDefault();
-			panel.classList.toggle('open');
-
-		};
-
-		panelScrim.onclick = function (event) {
-
-			event.preventDefault();
-			panel.classList.toggle('open');
-
-		};
-
-
-		// Functionality for search/filter input field
-		filterInput.onfocus = function (event) {
-
-			panel.classList.add('searchFocused');
-
-		};
-
-		filterInput.onblur = function (event) {
-
-			if (filterInput.value === '') {
-
-				panel.classList.remove('searchFocused');
-
-			}
-
-		};
-
-		exitSearchButton.onclick = function (event) {
-
-			filterInput.value = '';
-			updateFilter();
-			panel.classList.remove('searchFocused');
-
-		};
-
-		filterInput.oninput = function (event) {
-
-			updateFilter();
-
-		};
-
-		// Activate content and title change on browser navigation
-
-		window.onpopstate = createNewIframe;
-
-		// Create the navigation panel and configure the iframe
-
-		createNavigation();
-		createNewIframe();
-
-		// Navigation Panel
-
-		function createLink(pageName, pageURL) {
-
-			var link = document.createElement('a');
-			link.href = pageURL + '.html';
-			link.textContent = pageName;
-			link.setAttribute('target', 'viewer');
-			link.addEventListener('click', function (event) {
-
-				if (event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey) return;
-
-				window.location.hash = pageURL;
-				panel.classList.remove('open');
-
-
-				content.querySelectorAll('a').forEach(function (item) {
-
-					item.classList.remove('selected');
-
-				});
-
-				link.classList.add('selected');
-
-			});
-
-			return link;
-
-		}
-
-		function createNavigation() {
-
-			if (navigation !== undefined) {
-
-				content.removeChild(navigation);
-
-			}
-
-			// Create the navigation panel using data from list.js
-
-			navigation = document.createElement('div');
-			content.appendChild(navigation);
-
-			var localList = list[language];
-
-			for (var section in localList) {
-
-				// Create sections
-
-				var categories = localList[section];
-
-				var sectionHead = document.createElement('h2');
-				sectionHead.textContent = section;
-				navigation.appendChild(sectionHead);
-
-				for (var category in categories) {
-
-					// Create categories
-
-					var pages = categories[category];
-
-					var categoryContainer = document.createElement('div');
-					navigation.appendChild(categoryContainer);
-
-					var categoryHead = document.createElement('h3');
-					categoryHead.textContent = category;
-					categoryContainer.appendChild(categoryHead);
-
-					var categoryContent = document.createElement('ul');
-					categoryContainer.appendChild(categoryContent);
-
-					for (var pageName in pages) {
-
-						// Create page links
-
-						var pageURL = pages[pageName];
-
-						// Localisation
-
-						var listElement = document.createElement('li');
-						categoryContent.appendChild(listElement);
-
-						var linkElement = createLink(pageName, pageURL);
-						listElement.appendChild(linkElement);
-
-						// Gather the main properties for the current subpage
-
-						pageProperties[pageName] = {
-							section: section,
-							category: category,
-							pageURL: pageURL,
-							linkElement: linkElement
-						};
-
-						// Gather the document titles (used for easy access on browser navigation)
-
-						titles[pageURL] = pageName;
-
-					}
-
-					// Gather the category elements for easy access on filtering
-
-					categoryElements.push(categoryContent);
+					language = hashLanguage[ 2 ];
 
 				}
 
 			}
 
-		}
+			//
 
-		// Auto change language url. If a reader open a document in English, when he click "zh", the document he read will auto change into Chinese version
+			var languageSelect = document.getElementById( 'language' );
+			languageSelect.value = language;
+			languageSelect.addEventListener( 'change', function ( event ) {
 
-		function autoChangeUrlLanguage(language) {
+				setLanguage( this.value );
 
-			var hash = location.hash;
-			if (hash === '') return;
-			var docType = hash.substr(0, hash.indexOf('/') + 1);
-			var docLink = hash.substr(hash.indexOf('/') + 1);
-			docLink = docLink.substr(docLink.indexOf('/'));
-			location.href = docType + language + docLink;
+			} );
 
-		}
+			function setLanguage( value ) {
 
-		// Filtering
+				language = value;
 
-		function updateFilter() {
+				createNavigation();
+				updateFilter();
+				autoChangeUrlLanguage( language );
 
-			// (uncomment the following line and the "Query strings" section, if you want query strings):
-			// updateQueryString();
+			}
 
-			var regExp = new RegExp(filterInput.value, 'gi');
+			var panel = document.getElementById( 'panel' );
+			var content = document.getElementById( 'content' );
+			var expandButton = document.getElementById( 'expandButton' );
+			var exitSearchButton = document.getElementById( 'exitSearchButton' );
+			var panelScrim = document.getElementById( 'panelScrim' );
+			var filterInput = document.getElementById( 'filterInput' );
+			var iframe = document.querySelector( 'iframe' );
 
-			for (var pageName in pageProperties) {
+			var pageProperties = {};
+			var titles = {};
+			var categoryElements = [];
 
-				var linkElement = pageProperties[pageName].linkElement;
-				var categoryClassList = linkElement.parentElement.classList;
-				var filterResults = pageName.match(regExp);
+			var navigation;
 
-				if (filterResults && filterResults.length > 0) {
+			// Functionality for hamburger button (on small devices)
 
-					// Accentuate matching characters
+			expandButton.onclick = function ( event ) {
 
-					for (var i = 0; i < filterResults.length; i++) {
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
 
-						var result = filterResults[i];
+			};
 
-						if (result !== '') {
+			panelScrim.onclick = function ( event ) {
 
-							pageName = pageName.replace(result, '<b>' + result + '</b>');
+				event.preventDefault();
+				panel.classList.toggle( 'open' );
+
+			};
+
+
+			// Functionality for search/filter input field
+			filterInput.onfocus = function ( event ) {
+
+				panel.classList.add( 'searchFocused' );
+
+			};
+
+			filterInput.onblur = function ( event ) {
+
+				if ( filterInput.value === '' ) {
+
+					panel.classList.remove( 'searchFocused' );
+
+				}
+
+			};
+
+			exitSearchButton.onclick = function ( event ) {
+
+				filterInput.value = '';
+				updateFilter();
+				panel.classList.remove( 'searchFocused' );
+
+			};
+
+			filterInput.oninput = function ( event ) {
+
+				updateFilter();
+
+			};
+
+			// Activate content and title change on browser navigation
+
+			window.onpopstate = createNewIframe;
+
+			// Create the navigation panel and configure the iframe
+
+			createNavigation();
+			createNewIframe();
+
+			// Navigation Panel
+
+			function createLink( pageName, pageURL ) {
+
+				var link = document.createElement( 'a' );
+				link.href = pageURL + '.html';
+				link.textContent = pageName;
+				link.setAttribute( 'target', 'viewer' );
+				link.addEventListener( 'click', function ( event ) {
+
+					if ( event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey ) return;
+
+					window.location.hash = pageURL;
+					panel.classList.remove( 'open' );
+
+
+					content.querySelectorAll( 'a' ).forEach( function ( item ) {
+
+						item.classList.remove( 'selected' );
+
+					} );
+
+					link.classList.add( 'selected' );
+
+				} );
+
+				return link;
+
+			}
+
+			function createNavigation() {
+
+				if ( navigation !== undefined ) {
+
+					content.removeChild( navigation );
+
+				}
+
+				// Create the navigation panel using data from list.js
+
+				navigation = document.createElement( 'div' );
+				content.appendChild( navigation );
+
+				var localList = list[ language ];
+
+				for ( var section in localList ) {
+
+					// Create sections
+
+					var categories = localList[ section ];
+
+					var sectionHead = document.createElement( 'h2' );
+					sectionHead.textContent = section;
+					navigation.appendChild( sectionHead );
+
+					for ( var category in categories ) {
+
+						// Create categories
+
+						var pages = categories[ category ];
+
+						var categoryContainer = document.createElement( 'div' );
+						navigation.appendChild( categoryContainer );
+
+						var categoryHead = document.createElement( 'h3' );
+						categoryHead.textContent = category;
+						categoryContainer.appendChild( categoryHead );
+
+						var categoryContent = document.createElement( 'ul' );
+						categoryContainer.appendChild( categoryContent );
+
+						for ( var pageName in pages ) {
+
+							// Create page links
+
+							var pageURL = pages[ pageName ];
+
+							// Localisation
+
+							var listElement = document.createElement( 'li' );
+							categoryContent.appendChild( listElement );
+
+							var linkElement = createLink( pageName, pageURL );
+							listElement.appendChild( linkElement );
+
+							// Gather the main properties for the current subpage
+
+							pageProperties[ pageName ] = {
+								section: section,
+								category: category,
+								pageURL: pageURL,
+								linkElement: linkElement
+							};
+
+							// Gather the document titles (used for easy access on browser navigation)
+
+							titles[ pageURL ] = pageName;
+
+						}
+
+						// Gather the category elements for easy access on filtering
+
+						categoryElements.push( categoryContent );
+
+					}
+
+				}
+
+			}
+
+			// Auto change language url. If a reader open a document in English, when he click "zh", the document he read will auto change into Chinese version
+
+			function autoChangeUrlLanguage( language ) {
+
+				var hash = location.hash;
+				if ( hash === '' ) return;
+				var docType = hash.substr( 0, hash.indexOf( '/' ) + 1 );
+				var docLink = hash.substr( hash.indexOf( '/' ) + 1 );
+				docLink = docLink.substr( docLink.indexOf( '/' ) );
+				location.href = docType + language + docLink;
+
+			}
+
+			// Filtering
+
+			function updateFilter() {
+
+				// (uncomment the following line and the "Query strings" section, if you want query strings):
+				// updateQueryString();
+
+				var regExp = new RegExp( filterInput.value, 'gi' );
+
+				for ( var pageName in pageProperties ) {
+
+					var linkElement = pageProperties[ pageName ].linkElement;
+					var categoryClassList = linkElement.parentElement.classList;
+					var filterResults = pageName.match( regExp );
+
+					if ( filterResults && filterResults.length > 0 ) {
+
+						// Accentuate matching characters
+
+						for ( var i = 0; i < filterResults.length; i ++ ) {
+
+							var result = filterResults[ i ];
+
+							if ( result !== '' ) {
+
+								pageName = pageName.replace( result, '<b>' + result + '</b>' );
+
+							}
+
+						}
+
+						categoryClassList.remove( 'hidden' );
+						linkElement.innerHTML = pageName;
+
+					} else {
+
+						// Hide all non-matching page names
+
+						categoryClassList.add( 'hidden' );
+
+					}
+
+				}
+
+				displayFilteredPanel();
+
+			}
+
+			function displayFilteredPanel() {
+
+				// Show/hide categories depending on their content
+				// First check if at least one page in this category is not hidden
+
+				categoryElements.forEach( function ( category ) {
+
+					var pages = category.children;
+					var pagesLength = pages.length;
+					var sectionClassList = category.parentElement.classList;
+
+					var hideCategory = true;
+
+					for ( var i = 0; i < pagesLength; i ++ ) {
+
+						var pageClassList = pages[ i ].classList;
+
+						if ( ! pageClassList.contains( 'hidden' ) ) {
+
+							hideCategory = false;
 
 						}
 
 					}
 
-					categoryClassList.remove('hidden');
-					linkElement.innerHTML = pageName;
+					// If and only if all page names are hidden, hide the whole category
 
-				} else {
+					if ( hideCategory ) {
 
-					// Hide all non-matching page names
+						sectionClassList.add( 'hidden' );
 
-					categoryClassList.add('hidden');
+					} else {
 
-				}
-
-			}
-
-			displayFilteredPanel();
-
-		}
-
-		function displayFilteredPanel() {
-
-			// Show/hide categories depending on their content
-			// First check if at least one page in this category is not hidden
-
-			categoryElements.forEach(function (category) {
-
-				var pages = category.children;
-				var pagesLength = pages.length;
-				var sectionClassList = category.parentElement.classList;
-
-				var hideCategory = true;
-
-				for (var i = 0; i < pagesLength; i++) {
-
-					var pageClassList = pages[i].classList;
-
-					if (!pageClassList.contains('hidden')) {
-
-						hideCategory = false;
+						sectionClassList.remove( 'hidden' );
 
 					}
 
+				} );
+
+			}
+
+			// Routing
+
+			function setUrlFragment( pageName ) {
+
+				// Handle navigation from the subpages (iframes):
+				// First separate the memeber (if existing) from the page name,
+				// then identify the subpage's URL and set it as URL fragment (re-adding the member)
+
+				var splitPageName = decomposePageName( pageName, '.', '.' );
+
+				var currentProperties = pageProperties[ splitPageName[ 0 ] ];
+
+				if ( currentProperties ) {
+
+					window.location.hash = currentProperties.pageURL + splitPageName[ 1 ];
+
+					createNewIframe();
+
 				}
 
-				// If and only if all page names are hidden, hide the whole category
+			}
 
-				if (hideCategory) {
+			function createNewIframe() {
 
-					sectionClassList.add('hidden');
+				// Change the content displayed in the iframe
+				// First separate the member part of the fragment (if existing)
+
+				var hash = window.location.hash.substring( 1 );
+				var splitHash = decomposePageName( hash, '.', '#' );
+
+				// Creating a new Iframe instead of assigning a new src is
+				// a cross-browser solution to allow normal browser navigation;
+				// - only assigning a new src would result in two history states each time.
+
+				// Note: iframe.contentWindow.location.replace(hash) should work, too,
+				// but it doesn't work in Edge with links from the subpages!
+
+				var oldIframe;
+				var subtitle;
+
+				oldIframe = iframe;
+				iframe = oldIframe.cloneNode();
+
+				if ( hash ) {
+
+					iframe.src = splitHash[ 0 ] + '.html' + splitHash[ 1 ];
+					subtitle = titles[ splitHash[ 0 ] ] + splitHash[ 1 ] + ' – ';
 
 				} else {
 
-					sectionClassList.remove('hidden');
+					iframe.src = '';
+					subtitle = '';
 
 				}
 
-			});
-
-		}
-
-		// Routing
-
-		function setUrlFragment(pageName) {
-
-			// Handle navigation from the subpages (iframes):
-			// First separate the memeber (if existing) from the page name,
-			// then identify the subpage's URL and set it as URL fragment (re-adding the member)
-
-			var splitPageName = decomposePageName(pageName, '.', '.');
-
-			var currentProperties = pageProperties[splitPageName[0]];
-
-			if (currentProperties) {
-
-				window.location.hash = currentProperties.pageURL + splitPageName[1];
-
-				createNewIframe();
+				document.body.replaceChild( iframe, oldIframe );
+				document.title = subtitle + 'three.js docs';
 
 			}
 
-		}
+			function decomposePageName( pageName, oldDelimiter, newDelimiter ) {
 
-		function createNewIframe() {
+				// Helper function for separating the member (if existing) from the pageName
+				// For example: 'Geometry.morphTarget' can be converted to
+				// ['Geometry', '.morphTarget'] or ['Geometry', '#morphTarget']
+				// Note: According RFC 3986 no '#' allowed inside of an URL fragment!
 
-			// Change the content displayed in the iframe
-			// First separate the member part of the fragment (if existing)
+				var parts = [];
 
-			var hash = window.location.hash.substring(1);
-			var splitHash = decomposePageName(hash, '.', '#');
+				var dotIndex = pageName.indexOf( oldDelimiter );
 
-			// Creating a new Iframe instead of assigning a new src is
-			// a cross-browser solution to allow normal browser navigation;
-			// - only assigning a new src would result in two history states each time.
+				if ( dotIndex !== - 1 ) {
 
-			// Note: iframe.contentWindow.location.replace(hash) should work, too,
-			// but it doesn't work in Edge with links from the subpages!
+					parts = pageName.split( oldDelimiter );
+					parts[ 1 ] = newDelimiter + parts[ 1 ];
 
-			var oldIframe;
-			var subtitle;
+				} else {
 
-			oldIframe = iframe;
-			iframe = oldIframe.cloneNode();
+					parts[ 0 ] = pageName;
+					parts[ 1 ] = '';
 
-			if (hash) {
+				}
 
-				iframe.src = splitHash[0] + '.html' + splitHash[1];
-				subtitle = titles[splitHash[0]] + splitHash[1] + ' – ';
-
-			} else {
-
-				iframe.src = '';
-				subtitle = '';
+				return parts;
 
 			}
 
-			document.body.replaceChild(iframe, oldIframe);
-			document.title = subtitle + 'three.js docs';
+			//
 
-		}
+			console.log( [
+				'    __     __',
+				' __/ __\\  / __\\__   ____   _____   _____',
+				'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
+				'\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
+				'/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
+				'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
+				'                                         / __/  /  \\__  \\',
+				'                                         \\/____/\\/_____/'
+			].join( '\n' ) );
 
-		function decomposePageName(pageName, oldDelimiter, newDelimiter) {
+		</script>
 
-			// Helper function for separating the member (if existing) from the pageName
-			// For example: 'Geometry.morphTarget' can be converted to
-			// ['Geometry', '.morphTarget'] or ['Geometry', '#morphTarget']
-			// Note: According RFC 3986 no '#' allowed inside of an URL fragment!
-
-			var parts = [];
-
-			var dotIndex = pageName.indexOf(oldDelimiter);
-
-			if (dotIndex !== - 1) {
-
-				parts = pageName.split(oldDelimiter);
-				parts[1] = newDelimiter + parts[1];
-
-			} else {
-
-				parts[0] = pageName;
-				parts[1] = '';
-
-			}
-
-			return parts;
-
-		}
-
-		//
-
-		console.log([
-			'    __     __',
-			' __/ __\\  / __\\__   ____   _____   _____',
-			'/ __/  /\\/ /  /___\\/ ____\\/ _____\\/ _____\\',
-			'\\/_   __/ /   _   / /  __/ / __  / / __  /_   __   _____',
-			'/ /  / / /  / /  / /  / / /  ___/ /  ___/\\ _\\/ __\\/ _____\\',
-			'\\/__/  \\/__/\\/__/\\/__/  \\/_____/\\/_____/\\/__/ /  / /  ___/',
-			'                                         / __/  /  \\__  \\',
-			'                                         \\/____/\\/_____/'
-		].join('\n'));
-
-	</script>
-
-</body>
+	</body>
 
 </html>
