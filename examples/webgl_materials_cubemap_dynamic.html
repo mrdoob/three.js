@@ -17,7 +17,7 @@
 			var camera, scene, renderer;
 			var cube, sphere, torus, material;
 
-			var count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
+			var cubeCamera, cubeRenderTarget;
 
 			var onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
 
@@ -25,6 +25,8 @@
 			var phi = 0, theta = 0;
 
 			var textureLoader = new THREE.TextureLoader();
+
+			var frontBuffer = undefined;
 
 			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
 
@@ -57,21 +59,15 @@
 
 				//
 
-				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( 256, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
-				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
-				scene.add( cubeCamera1 );
-
-				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
-				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
-				scene.add( cubeCamera2 );
+				cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 256, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+				cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
+				scene.add( cubeCamera );
 
 				document.body.appendChild( renderer.domElement );
 
 				//
 
-				material = new THREE.MeshBasicMaterial( {
-					envMap: cubeRenderTarget2.texture
-				} );
+				material = new THREE.MeshBasicMaterial();
 
 				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 3 ), material );
 				scene.add( sphere );
@@ -178,19 +174,10 @@
 
 				// pingpong
 
-				if ( count % 2 === 0 ) {
-
-					cubeCamera1.update( renderer, scene );
-					material.envMap = cubeRenderTarget1.texture;
-
-				} else {
-
-					cubeCamera2.update( renderer, scene );
-					material.envMap = cubeRenderTarget2.texture;
-
-				}
-
-				count ++;
+				cubeCamera.update( renderer, scene );
+				frontBuffer = cubeRenderTarget.swapTexture( frontBuffer );
+				material.envMap = frontBuffer;
+				material.needsUpdate = true;
 
 				renderer.render( scene, camera );
 

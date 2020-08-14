@@ -18,6 +18,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	let useOffscreenCanvas = false;
 
+	let currentFramebuffer = null;
+
 	try {
 
 		useOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
@@ -228,13 +230,52 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	}
 
+	function onRenderTargetTextureAttachmentChange( event ) {
+
+		const renderTarget = event.target;
+
+		const renderTargetProperties = properties.get( renderTarget );
+
+		const textureProperties = properties.get( renderTarget.texture );
+
+		if ( textureProperties.__webglTexture === undefined ) {
+
+			// Framebuffer has been set up but the texture has not.
+			setupColorBuffer( renderTarget, renderTargetProperties );
+			return;
+
+		}
+
+		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
+
+		if ( isCube ) {
+
+			for ( let i = 0; i < 6; i ++ ) {
+
+				_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer[ i ] );
+				_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, textureProperties.__webglTexture, 0 );
+
+			}
+
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
+
+		} else {
+
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer );
+			_gl.framebufferTexture2D( _gl.FRAMEBUFFER, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D, textureProperties.__webglTexture, 0 );
+			_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
+
+		}
+
+	}
+
 	//
 
 	function deallocateTexture( texture ) {
 
 		const textureProperties = properties.get( texture );
 
-		if ( textureProperties.__webglInit === undefined ) return;
+		if ( textureProperties.__webglTexture === undefined ) return;
 
 		_gl.deleteTexture( textureProperties.__webglTexture );
 
@@ -601,9 +642,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	function initTexture( textureProperties, texture ) {
 
-		if ( textureProperties.__webglInit === undefined ) {
-
-			textureProperties.__webglInit = true;
+		if ( textureProperties.__webglTexture === undefined ) {
 
 			texture.addEventListener( 'dispose', onTextureDispose );
 
@@ -838,7 +877,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 		state.texImage2D( textureTarget, 0, glInternalFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
 		_gl.bindFramebuffer( _gl.FRAMEBUFFER, framebuffer );
 		_gl.framebufferTexture2D( _gl.FRAMEBUFFER, attachment, textureTarget, properties.get( renderTarget.texture ).__webglTexture, 0 );
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
 
 	}
 
@@ -1004,7 +1043,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+		_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
 
 	}
 
@@ -1012,17 +1051,13 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 	function setupRenderTarget( renderTarget ) {
 
 		const renderTargetProperties = properties.get( renderTarget );
-		const textureProperties = properties.get( renderTarget.texture );
 
 		renderTarget.addEventListener( 'dispose', onRenderTargetDispose );
 
-		textureProperties.__webglTexture = _gl.createTexture();
-
-		info.memory.textures ++;
+		renderTarget.addEventListener( 'textureAttachmentChange', onRenderTargetTextureAttachmentChange );
 
 		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
 		const isMultisample = ( renderTarget.isWebGLMultisampleRenderTarget === true );
-		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
 
 		// Handles WebGL2 RGBFormat fallback - #18858
 
@@ -1076,7 +1111,7 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 					}
 
-					_gl.bindFramebuffer( _gl.FRAMEBUFFER, null );
+					_gl.bindFramebuffer( _gl.FRAMEBUFFER, currentFramebuffer );
 
 
 				} else {
@@ -1089,7 +1124,29 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 		}
 
-		// Setup color buffer
+		setupColorBuffer( renderTarget, renderTargetProperties );
+
+		// Setup depth and stencil buffers
+
+		if ( renderTarget.depthBuffer ) {
+
+			setupDepthRenderbuffer( renderTarget );
+
+		}
+
+	}
+
+	// Set up GL resources for the non-multisampled color buffer
+	function setupColorBuffer( renderTarget, renderTargetProperties ) {
+
+		const textureProperties = properties.get( renderTarget.texture );
+
+		const isCube = ( renderTarget.isWebGLCubeRenderTarget === true );
+		const supportsMips = isPowerOfTwo( renderTarget ) || isWebGL2;
+
+		textureProperties.__webglTexture = _gl.createTexture();
+
+		info.memory.textures ++;
 
 		if ( isCube ) {
 
@@ -1123,14 +1180,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 			}
 
 			state.bindTexture( _gl.TEXTURE_2D, null );
-
-		}
-
-		// Setup depth and stencil buffers
-
-		if ( renderTarget.depthBuffer ) {
-
-			setupDepthRenderbuffer( renderTarget );
 
 		}
 
@@ -1282,6 +1331,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 	this.safeSetTexture2D = safeSetTexture2D;
 	this.safeSetTextureCube = safeSetTextureCube;
+
+	Object.defineProperty(this, "currentFramebuffer", { get() { return currentFramebuffer; }, set(newValue) { currentFramebuffer = newValue; } })
 
 }
 
