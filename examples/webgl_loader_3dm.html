@@ -53,7 +53,6 @@
 
 				loader.load( 'models/3dm/Rhino_Logo.3dm', function ( object ) {
 
-					console.log( object );
 					scene.add( object );
 					initGUI( object.userData.layers );
 
@@ -124,7 +123,7 @@
 									var layerName = layers[ child.userData.attributes.layerIndex ].name;
 
 									if ( layerName === name ) {
-										
+
 										child.visible = val;
 										layer.visible = val;
 

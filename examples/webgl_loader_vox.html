@@ -109,34 +109,34 @@
 
 			}
 
-			function displayPalette( palette ) {
-
-				const canvas = document.createElement( 'canvas' );
-				canvas.width = 8;
-				canvas.height = 32;
-				canvas.style.position = 'absolute';
-				canvas.style.top = '0';
-				canvas.style.width = 100 + 'px';
-				canvas.style.imageRendering = 'pixelated';
-				document.body.appendChild( canvas );
-
-				const context = canvas.getContext( '2d' );
-
-				for ( var c = 0; c < 256; c ++ ) {
-
-					const x = c % 8;
-					const y = Math.floor( c / 8 );
-
-					const hex = palette[ c + 1 ];
-					const r = hex >> 0 & 0xff;
-					const g = hex >> 8 & 0xff;
-					const b = hex >> 16 & 0xff;
-					context.fillStyle = `rgba(${r},${g},${b},1)`;
-					context.fillRect( x, 31 - y, 1, 1 );
-
-				}
-
-			}
+			// function displayPalette( palette ) {
+			//
+			// 	const canvas = document.createElement( 'canvas' );
+			// 	canvas.width = 8;
+			// 	canvas.height = 32;
+			// 	canvas.style.position = 'absolute';
+			// 	canvas.style.top = '0';
+			// 	canvas.style.width = 100 + 'px';
+			// 	canvas.style.imageRendering = 'pixelated';
+			// 	document.body.appendChild( canvas );
+			//
+			// 	const context = canvas.getContext( '2d' );
+			//
+			// 	for ( var c = 0; c < 256; c ++ ) {
+			//
+			// 		const x = c % 8;
+			// 		const y = Math.floor( c / 8 );
+			//
+			// 		const hex = palette[ c + 1 ];
+			// 		const r = hex >> 0 & 0xff;
+			// 		const g = hex >> 8 & 0xff;
+			// 		const b = hex >> 16 & 0xff;
+			// 		context.fillStyle = `rgba(${r},${g},${b},1)`;
+			// 		context.fillRect( x, 31 - y, 1, 1 );
+			//
+			// 	}
+			//
+			// }
 
 			function onWindowResize() {
 
