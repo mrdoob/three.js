@@ -71,8 +71,6 @@ class Texture extends EventDispatcher {
 		this.DEFAULT_IMAGE = undefined;
 		this.DEFAULT_MAPPING = UVMapping;
 
-		this.isTexture = true;
-
 	}
 
 	updateMatrix() {
@@ -322,5 +320,6 @@ class Texture extends EventDispatcher {
 
 }
 
+Texture.prototype.isTexture = true;
 
 export { Texture };

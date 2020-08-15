@@ -29,8 +29,6 @@ class VideoTexture extends Texture {
 
 		}
 
-		this.isVideoTexture = true;
-
 	}
 
 	update() {
@@ -48,5 +46,6 @@ class VideoTexture extends Texture {
 
 }
 
+VideoTexture.prototype.isVideoTexture = true;
 
 export { VideoTexture };

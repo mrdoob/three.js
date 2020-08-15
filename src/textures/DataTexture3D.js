@@ -27,11 +27,10 @@ class DataTexture3D extends Texture {
 
 		this.needsUpdate = true;
 
-		this.isDataTexture3D = true;
-
 	}
 
 }
 
+DataTexture3D.prototype.isDataTexture3D = true;
 
 export { DataTexture3D };

@@ -6,11 +6,11 @@ class CanvasTexture extends Texture {
 
 		super( canvas, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 		this.needsUpdate = true;
-		this.isCanvasTexture = true;
 
 	}
 
 }
 
+CanvasTexture.prototype.isCanvasTexture = true;
 
 export { CanvasTexture };

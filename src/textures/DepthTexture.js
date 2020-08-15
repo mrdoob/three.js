@@ -26,12 +26,11 @@ class DepthTexture extends Texture {
 		this.flipY = false;
 		this.generateMipmaps	= false;
 
-		this.isDepthTexture = true;
-
 	}
 
 
 }
 
+DepthTexture.prototype.isDepthTexture = true;
 
 export { DepthTexture };

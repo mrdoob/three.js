@@ -16,11 +16,11 @@ class DataTexture extends Texture {
 		this.unpackAlignment = 1;
 
 		this.needsUpdate = true;
-		this.isDataTexture = true;
 
 	}
 
 }
 
+DataTexture.prototype.isDataTexture = true;
 
 export { DataTexture };

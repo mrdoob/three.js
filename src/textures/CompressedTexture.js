@@ -18,11 +18,10 @@ class CompressedTexture extends Texture {
 
 		this.generateMipmaps = false;
 
-		this.isCompressedTexture = true;
-
 	}
 
 }
 
+CompressedTexture.prototype.isCompressedTexture = true;
 
 export { CompressedTexture };

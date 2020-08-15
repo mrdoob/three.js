@@ -19,11 +19,10 @@ class DataTexture2DArray extends Texture {
 
 		this.needsUpdate = true;
 
-		this.isDataTexture2DArray = true;
-
 	}
 
 }
 
+DataTexture2DArray.prototype.isDataTexture2DArray = true;
 
 export { DataTexture2DArray };
