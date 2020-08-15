@@ -3,7 +3,7 @@ Description: three.js プリミティブの旅
 TOC: プリミティブ
 
 この記事はthree.jsについてのシリーズ記事の一つです。
-最初の記事は[Three.jsの基礎](threejs-fundamentals.html)です。
+最初の記事は[Three.jsの基礎知識](threejs-fundamentals.html)です。
 まだ読んでない人は、そちらから先に読んでみるといいかもしれません。
 
 Three.jsは多くのプリミティブがあります。
