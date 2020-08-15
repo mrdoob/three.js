@@ -9,17 +9,15 @@ import { InstancedBufferAttribute } from '../core/InstancedBufferAttribute.js';
 import { InterleavedBufferAttribute } from '../core/InterleavedBufferAttribute.js';
 import { InterleavedBuffer } from '../core/InterleavedBuffer.js';
 
-function BufferGeometryLoader( manager ) {
+class BufferGeometryLoader extends Loader {
 
-	Loader.call( this, manager );
+	constructor( manager ) {
 
-}
+		super( manager );
 
-BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+	}
 
-	constructor: BufferGeometryLoader,
-
-	load: function ( url, onLoad, onProgress, onError ) {
+	load( url, onLoad, onProgress, onError ) {
 
 		const scope = this;
 
@@ -50,9 +48,9 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 		}, onProgress, onError );
 
-	},
+	}
 
-	parse: function ( json ) {
+	parse( json ) {
 
 		const interleavedBufferMap = {};
 		const arrayBufferMap = {};
@@ -210,7 +208,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 
 	}
 
-} );
+}
 
 const TYPED_ARRAYS = {
 	Int8Array: Int8Array,
