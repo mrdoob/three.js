@@ -76,6 +76,7 @@ var files = {
 		"webgl_lines_fat",
 		"webgl_lines_fat_wireframe",
 		"webgl_lines_sphere",
+		"webgl_loader_3dm",
 		"webgl_loader_3ds",
 		"webgl_loader_3mf",
 		"webgl_loader_3mf_materials",
@@ -122,6 +123,7 @@ var files = {
 		"webgl_loader_texture_rgbm",
 		"webgl_loader_texture_tga",
 		"webgl_loader_ttf",
+		"webgl_loader_vox",
 		"webgl_loader_vrm",
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
@@ -313,7 +315,9 @@ var files = {
 		"webgl2_buffergeometry_attributes_integer",
 		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
-		"webgl2_multisampled_renderbuffers"
+		"webgl2_multisampled_renderbuffers",
+		"webgl2_volume_instancing",
+		"webgl2_volume_perlin"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -329,7 +333,8 @@ var files = {
 		"webxr_vr_cubes",
 		"webxr_vr_dragging",
 		"webxr_vr_handinput",
-		"webxr_vr_handinput_simple",
+		"webxr_vr_handinput_cubes",
+		"webxr_vr_handinput_profiles",
 		"webxr_vr_lorenzattractor",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",

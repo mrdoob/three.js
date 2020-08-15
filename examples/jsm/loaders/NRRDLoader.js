@@ -1,7 +1,3 @@
-/*
- *  three.js NRRD file loader
- */
-
 import {
 	FileLoader,
 	Loader,

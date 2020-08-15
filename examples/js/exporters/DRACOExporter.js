@@ -11,9 +11,6 @@ console.warn( "THREE.DRACOExporter: As part of the transition to ES6 Modules, th
  *  - quantization, indicates the presision of each type of data stored in the draco file in the order (POSITION, NORMAL, COLOR, TEX_COORD, GENERIC)
  *  - exportUvs
  *  - exportNormals
- *
- * @class DRACOExporter
- * @author tentone
  */
 
 /* global DracoEncoderModule */

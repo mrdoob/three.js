@@ -1,6 +1,12 @@
+import {
+	BackSide,
+	BoxBufferGeometry,
+	Mesh,
+	ShaderMaterial,
+	UniformsUtils,
+	Vector3
+} from "../../../build/three.module.js";
 /**
- * @author zz85 / https://github.com/zz85
- *
  * Based on "A Practical Analytic Model for Daylight"
  * aka The Preetham Model, the de facto standard analytic skydome model
  * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
@@ -13,15 +19,6 @@
  *
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
-
-import {
-	BackSide,
-	BoxBufferGeometry,
-	Mesh,
-	ShaderMaterial,
-	UniformsUtils,
-	Vector3
-} from "../../../build/three.module.js";
 
 var Sky = function () {
 

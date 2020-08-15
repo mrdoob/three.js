@@ -1,9 +1,6 @@
 import { Vector3 } from './Vector3.js';
 
 /**
- * @author bhouston / http://clara.io
- * @author WestLangley / http://github.com/WestLangley
- *
  * Primary reference:
  *   https://graphics.stanford.edu/papers/envmap/envmap.pdf
  *

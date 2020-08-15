@@ -1,14 +1,11 @@
+
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * ACES Filmic Tone Mapping Shader by Stephen Hill
  * source: https://github.com/selfshadow/ltc_code/blob/master/webgl/shaders/ltc/ltc_blit.fs
  *
  * this implementation of ACES is modified to accommodate a brighter viewing environment.
  * the scale factor of 1/0.6 is subjective. see discussion in #19621.
  */
-
-
 
 var ACESFilmicToneMappingShader = {
 

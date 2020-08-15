@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function Strings( config ) {
 
 	var language = config.getKey( 'language' );

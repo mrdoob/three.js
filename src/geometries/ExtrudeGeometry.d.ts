@@ -6,13 +6,34 @@ import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 
 export interface ExtrudeGeometryOptions {
+	/**
+	 * @default 12
+	 */
 	curveSegments?: number;
+	/**
+	 * @default 1
+	 */
 	steps?: number;
+	/**
+	 * @default 100
+	 */
 	depth?: number;
+	/**
+	 * @default true
+	 */
 	bevelEnabled?: boolean;
+	/**
+	 * @default 6
+	 */
 	bevelThickness?: number;
 	bevelSize?: number;
+	/**
+	 * @default 0
+	 */
 	bevelOffset?: number;
+	/**
+	 * @default 3
+	 */
 	bevelSegments?: number;
 	extrudePath?: Curve<Vector3>;
 	UVGenerator?: UVGenerator;
@@ -42,6 +63,11 @@ export class ExtrudeBufferGeometry extends BufferGeometry {
 
 	static WorldUVGenerator: UVGenerator;
 
+	/**
+	 * @default 'ExtrudeBufferGeometry'
+	 */
+	type: string;
+
 	addShapeList( shapes: Shape[], options?: any ): void;
 	addShape( shape: Shape, options?: any ): void;
 
@@ -52,6 +78,11 @@ export class ExtrudeGeometry extends Geometry {
 	constructor( shapes: Shape | Shape[], options?: ExtrudeGeometryOptions );
 
 	static WorldUVGenerator: UVGenerator;
+
+	/**
+	 * @default 'ExtrudeGeometry'
+	 */
+	type: string;
 
 	addShapeList( shapes: Shape[], options?: any ): void;
 	addShape( shape: Shape, options?: any ): void;

@@ -1,7 +1,3 @@
-/**
- * @author Virtulous / https://virtulo.us/
- */
-
 import {
 	Bone,
 	BufferAttribute,

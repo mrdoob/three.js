@@ -1,14 +1,11 @@
+import {
+	Vector2
+} from "../../../build/three.module.js";
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Dot screen shader
  * based on glfx.js sepia shader
  * https://github.com/evanw/glfx.js
  */
-
-import {
-	Vector2
-} from "../../../build/three.module.js";
 
 var DotScreenShader = {
 

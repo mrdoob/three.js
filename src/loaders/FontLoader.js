@@ -2,10 +2,6 @@ import { Font } from '../extras/core/Font.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function FontLoader( manager ) {
 
 	Loader.call( this, manager );

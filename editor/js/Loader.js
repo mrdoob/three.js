@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { ThreeMFLoader } from '../../examples/jsm/loaders/3MFLoader.js';
@@ -654,7 +650,12 @@ function Loader( editor ) {
 
 				case 'glb':
 
+					var dracoLoader = new DRACOLoader();
+					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+
 					var loader = new GLTFLoader();
+					loader.setDRACOLoader( dracoLoader );
+
 					loader.parse( file.asArrayBuffer(), '', function ( result ) {
 
 						var scene = result.scene;
@@ -668,7 +669,11 @@ function Loader( editor ) {
 
 				case 'gltf':
 
+					var dracoLoader = new DRACOLoader();
+					dracoLoader.setDecoderPath( '../examples/js/libs/draco/gltf/' );
+
 					var loader = new GLTFLoader( manager );
+					loader.setDRACOLoader( dracoLoader );
 					loader.parse( file.asText(), '', function ( result ) {
 
 						var scene = result.scene;

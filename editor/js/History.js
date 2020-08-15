@@ -1,7 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
 import * as Commands from './commands/Commands.js';
 
@@ -69,6 +65,7 @@ History.prototype = {
 			cmd.id = ++ this.idCounter;
 
 		}
+
 		cmd.name = ( optionalName !== undefined ) ? optionalName : cmd.name;
 		cmd.execute();
 		cmd.inMemory = true;
@@ -78,6 +75,7 @@ History.prototype = {
 			cmd.json = cmd.toJSON();	// serialize the cmd immediately after execution and append the json to the cmd
 
 		}
+
 		this.lastCmdTime = new Date();
 
 		// clearing all the redo-commands
@@ -307,6 +305,7 @@ History.prototype = {
 				cmd.json = cmd.toJSON();
 
 			}
+
 			cmd = this.redo();
 
 		}

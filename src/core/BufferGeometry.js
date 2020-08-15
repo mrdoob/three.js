@@ -10,11 +10,6 @@ import { Matrix3 } from '../math/Matrix3.js';
 import { MathUtils } from '../math/MathUtils.js';
 import { arrayMax } from '../utils.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- */
-
 let _bufferGeometryId = 1; // BufferGeometry uses odd numbers as Id
 
 const _m1 = new Matrix4();

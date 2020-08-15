@@ -1,5 +1,12 @@
 export namespace Cache {
+	/**
+	 * @default false
+	 */
 	export let enabled: boolean;
+
+	/**
+	 * @default {}
+	 */
 	export let files: any;
 
 	export function add( key: string, file: any ): void;

@@ -1,9 +1,5 @@
 console.warn( "THREE.TTFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author gero3 / https://github.com/gero3
- * @author tentone / https://github.com/tentone
- * @author troy351 / https://github.com/troy351
- *
  * Requires opentype.js to be included in the project.
  * Loads TTF files and converts them into typeface JSON that can be used directly
  * to create THREE.Font objects.

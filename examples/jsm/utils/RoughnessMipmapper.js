@@ -1,6 +1,4 @@
 /**
- * @author Emmett Lalish / elalish
- *
  * This class generates custom mipmaps for a roughness map by encoding the lost variation in the
  * normal map mip levels as increased roughness in the corresponding roughness mip levels. This
  * helps with rendering accuracy for MeshStandardMaterial, and also helps with anti-aliasing when

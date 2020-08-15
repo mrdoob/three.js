@@ -1,14 +1,3 @@
-/**
- * @author Richard M. / https://github.com/richardmonette
- * @author ScieCode / http://github.com/sciecode
- *
- * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
- * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
- *
- * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
- * implementation, so I have preserved their copyright notices.
- */
-
 import {
 	DataTextureLoader,
 	FloatType,
@@ -23,6 +12,13 @@ import {
 	UnsignedByteType
 } from "../../../build/three.module.js";
 import { Inflate } from "../libs/inflate.module.min.js";
+/**
+ * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
+ *
+ * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
+ * implementation, so I have preserved their copyright notices.
+ */
 
 // /*
 // Copyright (c) 2014 - 2017, Syoyo Fujita

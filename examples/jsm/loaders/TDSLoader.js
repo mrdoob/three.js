@@ -1,14 +1,3 @@
-/**
- * Autodesk 3DS three.js file loader, based on lib3ds.
- *
- * Loads geometry with uv and materials basic properties with texture support.
- *
- * @author @tentone
- * @author @timknip
- * @class TDSLoader
- * @constructor
- */
-
 import {
 	AdditiveBlending,
 	BufferGeometry,
@@ -24,6 +13,14 @@ import {
 	MeshPhongMaterial,
 	TextureLoader
 } from "../../../build/three.module.js";
+/**
+ * Autodesk 3DS three.js file loader, based on lib3ds.
+ *
+ * Loads geometry with uv and materials basic properties with texture support.
+ *
+ * @class TDSLoader
+ * @constructor
+ */
 
 var TDSLoader = function ( manager ) {
 

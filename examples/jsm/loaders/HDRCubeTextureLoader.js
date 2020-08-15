@@ -1,8 +1,3 @@
-/**
-* @author Prashant Sharma / spidersharma03
-* @author Ben Houston / http://clara.io / bhouston
-*/
-
 import {
 	CubeTexture,
 	DataTexture,

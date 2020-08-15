@@ -1,6 +1,3 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
 /* global QUnit */
 
 import { GLTFExporter } from '../../../../examples/jsm/exporters/GLTFExporter';

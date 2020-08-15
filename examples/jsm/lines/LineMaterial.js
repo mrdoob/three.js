@@ -1,6 +1,11 @@
+import {
+	ShaderLib,
+	ShaderMaterial,
+	UniformsLib,
+	UniformsUtils,
+	Vector2
+} from "../../../build/three.module.js";
 /**
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *  color: <hex>,
  *  linewidth: <float>,
@@ -11,14 +16,6 @@
  *  resolution: <Vector2>, // to be set by renderer
  * }
  */
-
-import {
-	ShaderLib,
-	ShaderMaterial,
-	UniformsLib,
-	UniformsUtils,
-	Vector2
-} from "../../../build/three.module.js";
 
 UniformsLib.line = {
 
@@ -401,6 +398,5 @@ LineMaterial.prototype = Object.create( ShaderMaterial.prototype );
 LineMaterial.prototype.constructor = LineMaterial;
 
 LineMaterial.prototype.isLineMaterial = true;
-
 
 export { LineMaterial };

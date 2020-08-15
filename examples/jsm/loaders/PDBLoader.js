@@ -1,8 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import {
 	BufferGeometry,
 	FileLoader,

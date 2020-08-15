@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 	const isWebGL2 = capabilities.isWebGL2;
@@ -27,7 +23,7 @@ function WebGLIndexedBufferRenderer( gl, extensions, info, capabilities ) {
 
 		gl.drawElements( mode, count, type, start * bytesPerElement );
 
-		info.update( count, mode );
+		info.update( count, mode, 1 );
 
 	}
 

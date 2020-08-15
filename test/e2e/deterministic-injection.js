@@ -1,6 +1,3 @@
-/**
- * @author munrocket / https://twitter.com/munrocket_twit
- */
 
 ( function () {
 
@@ -79,6 +76,7 @@
 			RAF( renew );
 
 		}
+
 		RAF( renew );
 
 	};

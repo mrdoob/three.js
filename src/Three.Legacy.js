@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
@@ -92,6 +88,7 @@ import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
+import { Scene } from './scenes/Scene.js';
 
 export { BoxGeometry as CubeGeometry };
 export { MathUtils as Math };
@@ -1464,6 +1461,18 @@ Object.assign( ExtrudeBufferGeometry.prototype, {
 	addShape: function () {
 
 		console.error( 'THREE.ExtrudeBufferGeometry: .addShape() has been removed.' );
+
+	}
+
+} );
+
+//
+
+Object.assign( Scene.prototype, {
+
+	dispose: function () {
+
+		console.error( 'THREE.Scene: .dispose() has been removed.' );
 
 	}
 

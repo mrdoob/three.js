@@ -1,7 +1,3 @@
-/**
- * @author spidersharma / http://eduperiment.com/
- */
-
 import {
 	AdditiveBlending,
 	Color,

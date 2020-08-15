@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 var LoaderUtils = {
 
 	createFilesMap: function ( files ) {

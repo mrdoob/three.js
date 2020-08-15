@@ -1,16 +1,10 @@
-import { BackSide, NoBlending } from '../constants.js';
-import { Scene } from '../scenes/Scene.js';
+import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending, RGBAFormat } from '../constants.js';
 import { Mesh } from '../objects/Mesh.js';
 import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
 import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { CubeCamera } from '../cameras/CubeCamera.js';
-
-/**
- * @author alteredq / http://alteredqualia.com
- * @author WestLangley / http://github.com/WestLangley
- */
 
 function WebGLCubeRenderTarget( size, options, dummy ) {
 
@@ -24,6 +18,8 @@ function WebGLCubeRenderTarget( size, options, dummy ) {
 
 	WebGLRenderTarget.call( this, size, size, options );
 
+	this.texture.isWebGLCubeRenderTargetTexture = true; // HACK Why is texture not a CubeTexture?
+
 }
 
 WebGLCubeRenderTarget.prototype = Object.create( WebGLRenderTarget.prototype );
@@ -34,14 +30,12 @@ WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer, texture ) {
 
 	this.texture.type = texture.type;
-	this.texture.format = texture.format;
+	this.texture.format = RGBAFormat; // see #18859
 	this.texture.encoding = texture.encoding;
 
 	this.texture.generateMipmaps = texture.generateMipmaps;
 	this.texture.minFilter = texture.minFilter;
 	this.texture.magFilter = texture.magFilter;
-
-	const scene = new Scene();
 
 	const shader = {
 
@@ -89,6 +83,8 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 		`
 	};
 
+	const geometry = new BoxBufferGeometry( 5, 5, 5 );
+
 	const material = new ShaderMaterial( {
 
 		name: 'CubemapFromEquirect',
@@ -103,12 +99,24 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 	material.uniforms.tEquirect.value = texture;
 
-	const mesh = new Mesh( new BoxBufferGeometry( 5, 5, 5 ), material );
+	const mesh = new Mesh( geometry, material );
 
-	scene.add( mesh );
+	const currentMinFilter = texture.minFilter;
+	const currentRenderList = renderer.getRenderList();
+	const currentRenderTarget = renderer.getRenderTarget();
+	const currentRenderState = renderer.getRenderState();
+
+	// Avoid blurred poles
+	if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
 
 	const camera = new CubeCamera( 1, 10, this );
-	camera.update( renderer, scene );
+	camera.update( renderer, mesh );
+
+	texture.minFilter = currentMinFilter;
+
+	renderer.setRenderTarget( currentRenderTarget );
+	renderer.setRenderList( currentRenderList );
+	renderer.setRenderState( currentRenderState );
 
 	mesh.geometry.dispose();
 	mesh.material.dispose();

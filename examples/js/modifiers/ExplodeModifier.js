@@ -2,8 +2,6 @@ console.warn( "THREE.ExplodeModifier: As part of the transition to ES6 Modules, 
 /**
  * Make all faces use unique vertices
  * so that each face can be separated from others
- *
- * @author alteredq / http://alteredqualia.com/
  */
 
 THREE.ExplodeModifier = function () {

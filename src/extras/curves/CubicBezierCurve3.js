@@ -2,7 +2,6 @@ import { Curve } from '../core/Curve.js';
 import { CubicBezier } from '../core/Interpolations.js';
 import { Vector3 } from '../../math/Vector3.js';
 
-
 function CubicBezierCurve3( v0, v1, v2, v3 ) {
 
 	Curve.call( this );

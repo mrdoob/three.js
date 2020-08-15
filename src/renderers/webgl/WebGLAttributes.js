@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function WebGLAttributes( gl, capabilities ) {
 
 	const isWebGL2 = capabilities.isWebGL2;

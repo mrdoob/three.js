@@ -1,8 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
-
 import { Color } from '../math/Color.js';
 
 function FogExp2( color, density ) {

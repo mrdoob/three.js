@@ -8,10 +8,6 @@ import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 import * as Materials from '../materials/Materials.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function MaterialLoader( manager ) {
 
 	Loader.call( this, manager );
@@ -184,6 +180,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					case 'm3':
 						material.uniforms[ name ].value = new Matrix3().fromArray( uniform.value );
+						break;
 
 					case 'm4':
 						material.uniforms[ name ].value = new Matrix4().fromArray( uniform.value );
