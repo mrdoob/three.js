@@ -587,7 +587,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		var views = [];
 		var namedViews = [];
 		var groups = [];
-		var strings = [];
 
 		//Handle objects
 
@@ -780,7 +779,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				position.type = 'Float32Array';
 				position.array = [ pt[ 0 ], pt[ 1 ], pt[ 2 ] ];
 
-				_color = _attributes.drawColor( doc );
+				var _color = _attributes.drawColor( doc );
 
 				color.itemSize = 3;
 				color.type = 'Float32Array';
@@ -918,28 +917,28 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		if ( curve instanceof rhino.LineCurve ) {
 
-		  	return [ curve.pointAtStart, curve.pointAtEnd ];
+			return [ curve.pointAtStart, curve.pointAtEnd ];
 
 		}
 
 		if ( curve instanceof rhino.PolylineCurve ) {
 
-		  	pointCount = curve.pointCount;
-		  	for ( var i = 0; i < pointCount; i ++ ) {
+			pointCount = curve.pointCount;
+			for ( var i = 0; i < pointCount; i ++ ) {
 
 				rc.push( curve.point( i ) );
 
-		  	}
+			}
 
-		  	return rc;
+			return rc;
 
 		}
 
 		if ( curve instanceof rhino.PolyCurve ) {
 
-		  	var segmentCount = curve.segmentCount;
+			var segmentCount = curve.segmentCount;
 
-		  	for ( var i = 0; i < segmentCount; i ++ ) {
+			for ( var i = 0; i < segmentCount; i ++ ) {
 
 				var segment = curve.segmentCurve( i );
 				var segmentArray = curveToPoints( segment );
@@ -948,13 +947,13 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			}
 
-		  	return rc;
+			return rc;
 
 		}
 
 		if ( curve instanceof rhino.NurbsCurve && curve.degree === 1 ) {
 
-		  	// console.info( 'degree 1 curve' );
+			// console.info( 'degree 1 curve' );
 
 		}
 
@@ -970,34 +969,35 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				ts.push( t );
 				continue;
 
-		  	}
+			}
 
-		  	var tan = curve.tangentAt( t );
-		  	var prevTan = curve.tangentAt( ts.slice( - 1 )[ 0 ] );
+			var tan = curve.tangentAt( t );
+			var prevTan = curve.tangentAt( ts.slice( - 1 )[ 0 ] );
 
-		  	// Duplicaated from THREE.Vector3
-		  	// How to pass imports to worker?
+			// Duplicaated from THREE.Vector3
+			// How to pass imports to worker?
 
-		  	tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
-		  	ptS = prevTan[ 0 ] * prevTan[ 0 ] + prevTan[ 1 ] * prevTan[ 1 ] + prevTan[ 2 ] * prevTan[ 2 ];
+			var tS = tan[ 0 ] * tan[ 0 ] + tan[ 1 ] * tan[ 1 ] + tan[ 2 ] * tan[ 2 ];
+			var ptS = prevTan[ 0 ] * prevTan[ 0 ] + prevTan[ 1 ] * prevTan[ 1 ] + prevTan[ 2 ] * prevTan[ 2 ];
 
-		  	var denominator = Math.sqrt( tS * ptS );
+			var denominator = Math.sqrt( tS * ptS );
 
-		  	var angle;
+			var angle;
 
-		  	if ( denominator === 0 ) {
+			if ( denominator === 0 ) {
 
 				angle = Math.PI / 2;
 
-		  	} else {
+			} else {
 
 				var theta = ( tan.x * prevTan.x + tan.y * prevTan.y + tan.z * prevTan.z ) / denominator;
 				angle = Math.acos( Math.max( - 1, Math.min( 1, theta ) ) );
 
-		  	}
+			}
 
-		  	if ( angle < 0.1 ) continue;
-		  	ts.push( t );
+			if ( angle < 0.1 ) continue;
+
+			ts.push( t );
 
 		}
 
