@@ -62,5 +62,4 @@ class AnimationLoader extends Loader {
 }
 
 
-
 export { AnimationLoader };
