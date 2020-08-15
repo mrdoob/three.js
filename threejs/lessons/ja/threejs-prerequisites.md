@@ -1,6 +1,6 @@
 Title: Three.jsの前提条件
 Description: このサイトを使用するために必要なスキル
-TOC: Prerequisites
+TOC: 前提条件
 
 これらの記事は、three.jsの使用方法を学習するためものです。
 JavaScriptのプログラミング方法を把握してる事を前提とします。
