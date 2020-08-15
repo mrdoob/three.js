@@ -26462,38 +26462,34 @@
 
 	} );
 
-	function FogExp2( color, density ) {
+	var FogExp2 = function FogExp2( color, density ) {
 
 		this.name = '';
 
 		this.color = new Color( color );
 		this.density = ( density !== undefined ) ? density : 0.00025;
 
-	}
+	};
 
-	Object.assign( FogExp2.prototype, {
+	FogExp2.prototype.clone = function clone () {
 
-		isFogExp2: true,
+		return new FogExp2( this.color, this.density );
 
-		clone: function () {
+	};
 
-			return new FogExp2( this.color, this.density );
+	FogExp2.prototype.toJSON = function toJSON ( /* meta */ ) {
 
-		},
+		return {
+			type: 'FogExp2',
+			color: this.color.getHex(),
+			density: this.density
+		};
 
-		toJSON: function ( /* meta */ ) {
+	};
 
-			return {
-				type: 'FogExp2',
-				color: this.color.getHex(),
-				density: this.density
-			};
+	FogExp2.prototype.isFogExp2 = true;
 
-		}
-
-	} );
-
-	function Fog( color, near, far ) {
+	var Fog = function Fog( color, near, far ) {
 
 		this.name = '';
 
@@ -26502,60 +26498,52 @@
 		this.near = ( near !== undefined ) ? near : 1;
 		this.far = ( far !== undefined ) ? far : 1000;
 
-	}
+	};
 
-	Object.assign( Fog.prototype, {
+	Fog.prototype.clone = function clone () {
 
-		isFog: true,
+		return new Fog( this.color, this.near, this.far );
 
-		clone: function () {
+	};
 
-			return new Fog( this.color, this.near, this.far );
+	Fog.prototype.toJSON = function toJSON ( /* meta */ ) {
 
-		},
+		return {
+			type: 'Fog',
+			color: this.color.getHex(),
+			near: this.near,
+			far: this.far
+		};
 
-		toJSON: function ( /* meta */ ) {
+	};
 
-			return {
-				type: 'Fog',
-				color: this.color.getHex(),
-				near: this.near,
-				far: this.far
-			};
-
-		}
-
-	} );
+	Fog.prototype.isFog = true;
 
 	function Scene() {
 
-		Object3D.call( this );
+			Object3D.call(this);
+			this.type = 'Scene';
 
-		this.type = 'Scene';
+			this.background = null;
+			this.environment = null;
+			this.fog = null;
 
-		this.background = null;
-		this.environment = null;
-		this.fog = null;
+			this.overrideMaterial = null;
 
-		this.overrideMaterial = null;
+			this.autoUpdate = true; // checked by the renderer
 
-		this.autoUpdate = true; // checked by the renderer
+			if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
 
-		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+				__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
 
-			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+			}
 
 		}
 
-	}
+		Scene.prototype = Object.create( Object3D.prototype );
+		Scene.prototype.constructor = Scene;
 
-	Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-		constructor: Scene,
-
-		isScene: true,
-
-		copy: function ( source, recursive ) {
+		Scene.prototype.copy = function copy ( source, recursive ) {
 
 			Object3D.prototype.copy.call( this, source, recursive );
 
@@ -26570,9 +26558,9 @@
 
 			return this;
 
-		},
+		};
 
-		toJSON: function ( meta ) {
+		Scene.prototype.toJSON = function toJSON ( meta ) {
 
 			var data = Object3D.prototype.toJSON.call( this, meta );
 
@@ -26582,9 +26570,9 @@
 
 			return data;
 
-		}
+		};
 
-	} );
+	Scene.prototype.isScene = true;
 
 	function InterleavedBuffer( array, stride ) {
 

@@ -26520,26 +26520,24 @@ WebGL1Renderer.prototype = Object.assign( Object.create( WebGLRenderer.prototype
 
 } );
 
-function FogExp2( color, density ) {
+class FogExp2 {
 
-	this.name = '';
+	constructor( color, density ) {
 
-	this.color = new Color( color );
-	this.density = ( density !== undefined ) ? density : 0.00025;
+		this.name = '';
 
-}
+		this.color = new Color( color );
+		this.density = ( density !== undefined ) ? density : 0.00025;
 
-Object.assign( FogExp2.prototype, {
+	}
 
-	isFogExp2: true,
-
-	clone: function () {
+	clone() {
 
 		return new FogExp2( this.color, this.density );
 
-	},
+	}
 
-	toJSON: function ( /* meta */ ) {
+	toJSON( /* meta */ ) {
 
 		return {
 			type: 'FogExp2',
@@ -26549,30 +26547,30 @@ Object.assign( FogExp2.prototype, {
 
 	}
 
-} );
-
-function Fog( color, near, far ) {
-
-	this.name = '';
-
-	this.color = new Color( color );
-
-	this.near = ( near !== undefined ) ? near : 1;
-	this.far = ( far !== undefined ) ? far : 1000;
-
 }
 
-Object.assign( Fog.prototype, {
+FogExp2.prototype.isFogExp2 = true;
 
-	isFog: true,
+class Fog {
 
-	clone: function () {
+	constructor( color, near, far ) {
+
+		this.name = '';
+
+		this.color = new Color( color );
+
+		this.near = ( near !== undefined ) ? near : 1;
+		this.far = ( far !== undefined ) ? far : 1000;
+
+	}
+
+	clone() {
 
 		return new Fog( this.color, this.near, this.far );
 
-	},
+	}
 
-	toJSON: function ( /* meta */ ) {
+	toJSON( /* meta */ ) {
 
 		return {
 			type: 'Fog',
@@ -26583,39 +26581,36 @@ Object.assign( Fog.prototype, {
 
 	}
 
-} );
+}
 
-function Scene() {
+Fog.prototype.isFog = true;
 
-	Object3D.call( this );
+class Scene extends Object3D {
 
-	this.type = 'Scene';
+	constructor() {
 
-	this.background = null;
-	this.environment = null;
-	this.fog = null;
+		super();
+		this.type = 'Scene';
 
-	this.overrideMaterial = null;
+		this.background = null;
+		this.environment = null;
+		this.fog = null;
 
-	this.autoUpdate = true; // checked by the renderer
+		this.overrideMaterial = null;
 
-	if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+		this.autoUpdate = true; // checked by the renderer
 
-		__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+		if ( typeof __THREE_DEVTOOLS__ !== 'undefined' ) {
+
+			__THREE_DEVTOOLS__.dispatchEvent( new CustomEvent( 'observe', { detail: this } ) ); // eslint-disable-line no-undef
+
+		}
 
 	}
 
-}
+	copy( source, recursive ) {
 
-Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
-
-	constructor: Scene,
-
-	isScene: true,
-
-	copy: function ( source, recursive ) {
-
-		Object3D.prototype.copy.call( this, source, recursive );
+		super.copy( source, recursive );
 
 		if ( source.background !== null ) this.background = source.background.clone();
 		if ( source.environment !== null ) this.environment = source.environment.clone();
@@ -26628,11 +26623,11 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return this;
 
-	},
+	}
 
-	toJSON: function ( meta ) {
+	toJSON( meta ) {
 
-		const data = Object3D.prototype.toJSON.call( this, meta );
+		const data = super.toJSON( meta );
 
 		if ( this.background !== null ) data.object.background = this.background.toJSON( meta );
 		if ( this.environment !== null ) data.object.environment = this.environment.toJSON( meta );
@@ -26642,7 +26637,9 @@ Scene.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	}
 
-} );
+}
+
+Scene.prototype.isScene = true;
 
 function InterleavedBuffer( array, stride ) {
 
