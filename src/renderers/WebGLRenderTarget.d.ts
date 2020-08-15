@@ -13,7 +13,7 @@ export interface WebGLRenderTargetOptions {
 	type?: TextureDataType; // UnsignedByteType;
 	anisotropy?: number; // 1;
 	depthBuffer?: boolean; // true;
-	stencilBuffer?: boolean; // true;
+	stencilBuffer?: boolean; // false;
 	generateMipmaps?: boolean; // true;
 	depthTexture?: DepthTexture;
 	encoding?: TextureEncoding;
