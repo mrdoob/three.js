@@ -10,8 +10,11 @@ import { Mesh } from '../../../../src/objects/Mesh';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import {
 	BoxGeometry,
-	BoxBufferGeometry
+	BoxBufferGeometry,
 } from '../../../../src/geometries/BoxGeometry';
+import {
+	SphereBufferGeometry,
+} from '../../../../src/geometries/SphereGeometry';
 import {
 	negInf3,
 	posInf3,
@@ -166,6 +169,30 @@ export default QUnit.module( 'Maths', () => {
 			assert.ok( a.min.equals( new Vector3( - 1, - 1, - 1 ) ), "Correct new minimum" );
 			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Correct new maximum" );
 
+		} );
+
+		QUnit.test( "setFromObject/Minimal", ( assert ) => {
+
+			var a = new Box3( zero3.clone(), one3.clone() );
+			var object = new Mesh( new SphereBufferGeometry( 1, 32, 32 ) );
+			var child = new Mesh( new SphereBufferGeometry( 2, 32, 32 ) );
+			object.add( child );
+
+			object.rotation.setFromVector3(new Vector3(0, 0, Math.PI / 4.0));
+
+			a.setFromObject( object );
+			var rotatedBox = new Box3(
+				new Vector3( - 2 * Math.SQRT2, - 2 * Math.SQRT2, - 2 ),
+				new Vector3( 2 * Math.SQRT2, 2 * Math.SQRT2, 2 )
+			);
+			assert.ok( compareBox( a, rotatedBox ), "Passed!" );
+
+			a.setFromObject( object, true );
+			var rotatedMinBox = new Box3(
+				new Vector3( - 2, - 2, - 2 ),
+				new Vector3( 2, 2, 2 )
+			);
+			assert.ok( compareBox( a, rotatedMinBox ), "Passed!" );
 		} );
 
 		QUnit.test( "clone", ( assert ) => {
