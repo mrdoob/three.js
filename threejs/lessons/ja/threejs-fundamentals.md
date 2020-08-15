@@ -1,6 +1,6 @@
-Title: Three.jsの基礎
+Title: Three.jsの基礎知識
 Description: fundamentalsで初めてのThree.jsレッスンを始めましょう
-TOC: Fundamentals
+TOC: 基礎知識
 
 これはthree.jsシリーズの最初の記事です。
 [Three.js](https://threejs.org) は、できるだけ簡単にWebページ上に3Dコンテンツを表示する3Dライブラリです。
