@@ -21,8 +21,6 @@ class SpotLight extends Light {
 
 		this.shadow = new SpotLightShadow();
 
-		this.isSpotLight = true;
-
 	}
 
 	get power() {
@@ -60,5 +58,6 @@ class SpotLight extends Light {
 
 }
 
+SpotLight.prototype.isSpotLight = true;
 
 export { SpotLight };

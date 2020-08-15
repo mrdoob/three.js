@@ -7,8 +7,6 @@ class DirectionalLightShadow extends LightShadow {
 
 		super( new OrthographicCamera( - 5, 5, 5, - 5, 0.5, 500 ) );
 
-		this.isDirectionalLightShadow = true;
-
 	}
 
 	updateMatrices( light ) {
@@ -19,5 +17,6 @@ class DirectionalLightShadow extends LightShadow {
 
 }
 
+DirectionalLightShadow.prototype.isDirectionalLightShadow = true;
 
 export { DirectionalLightShadow };

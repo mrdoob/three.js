@@ -21,8 +21,6 @@ class HemisphereLightProbe extends LightProbe {
 		this.sh.coefficients[ 0 ].copy( sky ).add( ground ).multiplyScalar( c0 );
 		this.sh.coefficients[ 1 ].copy( sky ).sub( ground ).multiplyScalar( c1 );
 
-		this.isHemisphereLightProbe = true;
-
 	}
 
 	copy( source ) { // modifying colors not currently supported
@@ -45,5 +43,6 @@ class HemisphereLightProbe extends LightProbe {
 
 }
 
+HemisphereLightProbe.prototype.isHemisphereLightProbe = true;
 
 export { HemisphereLightProbe };

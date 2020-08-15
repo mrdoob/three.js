@@ -15,7 +15,6 @@ class DirectionalLight extends Light {
 		this.target = new Object3D();
 
 		this.shadow = new DirectionalLightShadow();
-		this.isDirectionalLight = true;
 
 	}
 
@@ -33,5 +32,6 @@ class DirectionalLight extends Light {
 
 }
 
+DirectionalLight.prototype.isDirectionalLight = true;
 
 export { DirectionalLight };

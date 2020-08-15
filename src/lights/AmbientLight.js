@@ -8,11 +8,11 @@ class AmbientLight extends Light {
 		this.type = 'AmbientLight';
 
 		this.castShadow = undefined;
-		this.isAmbientLight = true;
 
 	}
 
 }
 
+AmbientLight.prototype.isAmbientLight = true;
 
 export { AmbientLight };

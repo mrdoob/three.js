@@ -14,8 +14,6 @@ class PointLight extends Light {
 
 		this.shadow = new PointLightShadow();
 
-		this.isPointLight = true;
-
 	}
 
 	get power() {
@@ -49,5 +47,6 @@ class PointLight extends Light {
 
 }
 
+PointLight.prototype.isPointLight = true;
 
 export { PointLight };

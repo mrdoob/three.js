@@ -10,8 +10,6 @@ class RectAreaLight extends Light {
 		this.width = ( width !== undefined ) ? width : 10;
 		this.height = ( height !== undefined ) ? height : 10;
 
-		this.isRectAreaLight = true;
-
 	}
 
 	copy( source ) {
@@ -38,5 +36,6 @@ class RectAreaLight extends Light {
 
 }
 
+RectAreaLight.prototype.isRectAreaLight = true;
 
 export { RectAreaLight };

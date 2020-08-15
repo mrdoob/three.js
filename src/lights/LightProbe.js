@@ -10,8 +10,6 @@ class LightProbe extends Light {
 
 		this.sh = ( sh !== undefined ) ? sh : new SphericalHarmonics3();
 
-		this.isLightProbe = true;
-
 	}
 
 	copy( source ) {
@@ -45,5 +43,6 @@ class LightProbe extends Light {
 
 }
 
+LightProbe.prototype.isLightProbe = true;
 
 export { LightProbe };

@@ -51,8 +51,6 @@ class PointLightShadow extends LightShadow {
 			new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ),	new Vector3( 0, 0, - 1 )
 		];
 
-		this.isPointLightShadow = true;
-
 	}
 
 	updateMatrices( light, viewportIndex ) {
@@ -83,5 +81,6 @@ class PointLightShadow extends LightShadow {
 
 }
 
+PointLightShadow.prototype.isPointLightShadow = true;
 
 export { PointLightShadow };

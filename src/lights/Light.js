@@ -14,8 +14,6 @@ class Light extends Object3D {
 
 		this.receiveShadow = undefined;
 
-		this.isLight = true;
-
 	}
 
 	copy( source ) {
@@ -51,5 +49,6 @@ class Light extends Object3D {
 
 }
 
+Light.prototype.isLight = true;
 
 export { Light };

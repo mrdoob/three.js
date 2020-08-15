@@ -7,7 +7,6 @@ class SpotLightShadow extends LightShadow {
 	constructor() {
 
 		super( new PerspectiveCamera( 50, 1, 0.5, 500 ) );
-		this.isSpotLightShadow = true;
 
 	}
 
@@ -34,5 +33,6 @@ class SpotLightShadow extends LightShadow {
 
 }
 
+SpotLightShadow.prototype.isSpotLightShadow = true;
 
 export { SpotLightShadow };

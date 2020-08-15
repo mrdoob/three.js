@@ -17,8 +17,6 @@ class HemisphereLight extends Light {
 
 		this.groundColor = new Color( groundColor );
 
-		this.isHemisphereLight = true;
-
 	}
 
 	copy( source ) {
@@ -33,5 +31,6 @@ class HemisphereLight extends Light {
 
 }
 
+HemisphereLight.prototype.isHemisphereLight = true;
 
 export { HemisphereLight };

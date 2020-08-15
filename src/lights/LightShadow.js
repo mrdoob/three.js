@@ -133,5 +133,6 @@ class LightShadow {
 
 }
 
+LightShadow.prototype.isLightShadow = true;
 
 export { LightShadow };
