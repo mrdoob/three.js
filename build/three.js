@@ -2474,7 +2474,7 @@
 		this.texture.minFilter = options.minFilter !== undefined ? options.minFilter : LinearFilter;
 
 		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
-		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
+		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : false;
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
 	}
