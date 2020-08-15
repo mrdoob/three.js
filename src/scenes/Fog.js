@@ -6,8 +6,6 @@ class Fog {
 
 		this.name = '';
 
-		this.isFog = true;
-
 		this.color = new Color( color );
 
 		this.near = ( near !== undefined ) ? near : 1;
@@ -34,5 +32,6 @@ class Fog {
 
 }
 
+Fog.prototype.isFog = true;
 
 export { Fog };

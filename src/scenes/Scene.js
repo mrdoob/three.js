@@ -7,7 +7,6 @@ class Scene extends Object3D {
 		super();
 		this.type = 'Scene';
 
-		this.isScene = true;
 		this.background = null;
 		this.environment = null;
 		this.fog = null;
@@ -55,5 +54,6 @@ class Scene extends Object3D {
 
 }
 
+Scene.prototype.isScene = true;
 
 export { Scene };
