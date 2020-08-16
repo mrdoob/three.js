@@ -776,7 +776,8 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, utils,
 
 			setTextureParameters( textureType, texture, supportsMips );
 
-			let mipmap, mipmaps = texture.mipmaps;
+			let mipmap;
+			const mipmaps = texture.mipmaps;
 
 			if ( texture.isDepthTexture ) {
 
