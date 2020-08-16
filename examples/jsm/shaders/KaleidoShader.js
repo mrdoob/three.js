@@ -1,6 +1,5 @@
+
 /**
- * @author felixturner / http://airtight.cc/
- *
  * Kaleidoscope Shader
  * Radial reflection around center point
  * Ported from: http://pixelshaders.com/editor/
@@ -9,8 +8,6 @@
  * sides: number of reflections
  * angle: initial angle in radians
  */
-
-
 
 var KaleidoShader = {
 

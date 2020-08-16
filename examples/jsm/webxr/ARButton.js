@@ -1,8 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 var ARButton = {
 
 	createButton: function ( renderer, sessionInit = {} ) {
@@ -120,6 +115,7 @@ var ARButton = {
 		if ( 'xr' in navigator ) {
 
 			var button = document.createElement( 'button' );
+			button.id = 'ARButton';
 			button.style.display = 'none';
 
 			stylizeElement( button );

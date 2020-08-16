@@ -24,8 +24,19 @@ export class Vector3 implements Vector {
 
 	constructor( x?: number, y?: number, z?: number );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
+
+	/**
+	 * @default 0
+	 */
 	z: number;
 	readonly isVector3: true;
 
@@ -71,7 +82,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Adds v to this vector.
 	 */
-	add( v: Vector3, w?: Vector3 ): this;
+	add( v: Vector3 ): this;
 
 	addScalar( s: number ): this;
 
@@ -211,7 +222,7 @@ export class Vector3 implements Vector {
 	/**
 	 * Sets this vector to cross product of itself and v.
 	 */
-	cross( a: Vector3, w?: Vector3 ): this;
+	cross( a: Vector3 ): this;
 
 	/**
 	 * Sets this vector to cross product of a and b.
@@ -283,8 +294,7 @@ export class Vector3 implements Vector {
 
 	fromBufferAttribute(
 		attribute: BufferAttribute,
-		index: number,
-		offset?: number
+		index: number
 	): this;
 
 	/**

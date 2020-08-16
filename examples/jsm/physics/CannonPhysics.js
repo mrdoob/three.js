@@ -1,14 +1,13 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import CANNON from "../libs/cannon.module.min.js";
+// import * as CANNON from "https://unpkg.com/cannon-es/dist/cannon-es.js";
 
 function compose( position, quaternion, array, index ) {
 
-	var x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
-	var x2 = x + x,	y2 = y + y, z2 = z + z;
-	var xx = x * x2, xy = x * y2, xz = x * z2;
-	var yy = y * y2, yz = y * z2, zz = z * z2;
-	var wx = w * x2, wy = w * y2, wz = w * z2;
+	const x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
+	const x2 = x + x,	y2 = y + y, z2 = z + z;
+	const xx = x * x2, xy = x * y2, xz = x * z2;
+	const yy = y * y2, yz = y * z2, zz = z * z2;
+	const wx = w * x2, wy = w * y2, wz = w * z2;
 
 	array[ index + 0 ] = ( 1 - ( yy + zz ) );
 	array[ index + 1 ] = ( xy + wz );
@@ -34,10 +33,10 @@ function compose( position, quaternion, array, index ) {
 
 function CannonPhysics() {
 
-	var frameRate = 60;
-	var frameTime = 1 / frameRate;
+	const frameRate = 60;
+	const frameTime = 1 / frameRate;
 
-	var world = new CANNON.World();
+	const world = new CANNON.World();
 	world.gravity.set( 0, - 9.8, 0 );
 	world.broadphase = new CANNON.SAPBroadphase( world );
 	// world.solver.iterations = 20;
@@ -48,14 +47,14 @@ function CannonPhysics() {
 
 	function getShape( geometry ) {
 
-		var parameters = geometry.parameters;
+		const parameters = geometry.parameters;
 
 		// TODO change type to is*
 
 		switch ( geometry.type ) {
 
 			case 'BoxBufferGeometry':
-				var halfExtents = new CANNON.Vec3();
+				const halfExtents = new CANNON.Vec3();
 				halfExtents.x = parameters.width !== undefined ? parameters.width / 2 : 0.5;
 				halfExtents.y = parameters.height !== undefined ? parameters.height / 2 : 0.5;
 				halfExtents.z = parameters.depth !== undefined ? parameters.depth / 2 : 0.5;
@@ -65,7 +64,7 @@ function CannonPhysics() {
 				return new CANNON.Plane();
 
 			case 'SphereBufferGeometry':
-				var radius = parameters.radius;
+				const radius = parameters.radius;
 				return new CANNON.Sphere( radius );
 
 		}
@@ -74,12 +73,12 @@ function CannonPhysics() {
 
 	}
 
-	var meshes = [];
-	var meshMap = new WeakMap();
+	const meshes = [];
+	const meshMap = new WeakMap();
 
 	function addMesh( mesh, mass = 0 ) {
 
-		var shape = getShape( mesh.geometry );
+		const shape = getShape( mesh.geometry );
 
 		if ( shape !== null ) {
 
@@ -99,13 +98,13 @@ function CannonPhysics() {
 
 	function handleMesh( mesh, mass, shape ) {
 
-		var position = new CANNON.Vec3();
+		const position = new CANNON.Vec3();
 		position.copy( mesh.position );
 
-		var quaternion = new CANNON.Quaternion();
+		const quaternion = new CANNON.Quaternion();
 		quaternion.copy( mesh.quaternion );
 
-		var body = new CANNON.Body( {
+		const body = new CANNON.Body( {
 			position: position,
 			quaternion: quaternion,
 			mass: mass,
@@ -124,18 +123,18 @@ function CannonPhysics() {
 
 	function handleInstancedMesh( mesh, mass, shape ) {
 
-		var array = mesh.instanceMatrix.array;
+		const array = mesh.instanceMatrix.array;
 
-		var bodies = [];
+		const bodies = [];
 
-		for ( var i = 0; i < mesh.count; i ++ ) {
+		for ( let i = 0; i < mesh.count; i ++ ) {
 
-			var index = i * 16;
+			const index = i * 16;
 
-			var position = new CANNON.Vec3();
+			const position = new CANNON.Vec3();
 			position.set( array[ index + 12 ], array[ index + 13 ], array[ index + 14 ] );
 
-			var body = new CANNON.Body( {
+			const body = new CANNON.Body( {
 				position: position,
 				mass: mass,
 				shape: shape
@@ -163,12 +162,12 @@ function CannonPhysics() {
 
 		if ( mesh.isInstancedMesh ) {
 
-			var bodies = meshMap.get( mesh );
+			const bodies = meshMap.get( mesh );
 			bodies[ index ].position.copy( position );
 
 		} else if ( mesh.isMesh ) {
 
-			var body = meshMap.get( mesh );
+			const body = meshMap.get( mesh );
 			body.position.copy( position );
 
 		}
@@ -177,18 +176,18 @@ function CannonPhysics() {
 
 	//
 
-	var lastTime = 0;
+	let lastTime = 0;
 
 	function step() {
 
-		var time = performance.now();
+		const time = performance.now();
 
 		if ( lastTime > 0 ) {
 
-			var delta = ( time - lastTime ) / 1000;
+			const delta = ( time - lastTime ) / 1000;
 
 			// console.time( 'world.step' );
-			world.step( frameTime, delta, frameRate );
+			world.step( frameTime, delta );
 			// console.timeEnd( 'world.step' );
 
 		}
@@ -197,18 +196,18 @@ function CannonPhysics() {
 
 		//
 
-		for ( var i = 0, l = meshes.length; i < l; i ++ ) {
+		for ( let i = 0, l = meshes.length; i < l; i ++ ) {
 
-			var mesh = meshes[ i ];
+			const mesh = meshes[ i ];
 
 			if ( mesh.isInstancedMesh ) {
 
-				var array = mesh.instanceMatrix.array;
-				var bodies = meshMap.get( mesh );
+				const array = mesh.instanceMatrix.array;
+				const bodies = meshMap.get( mesh );
 
-				for ( var j = 0; j < bodies.length; j ++ ) {
+				for ( let j = 0; j < bodies.length; j ++ ) {
 
-					var body = bodies[ j ];
+					const body = bodies[ j ];
 					compose( body.position, body.quaternion, array, j * 16 );
 
 				}
@@ -217,7 +216,7 @@ function CannonPhysics() {
 
 			} else if ( mesh.isMesh ) {
 
-				var body = meshMap.get( mesh );
+				const body = meshMap.get( mesh );
 				mesh.position.copy( body.position );
 				mesh.quaternion.copy( body.quaternion );
 

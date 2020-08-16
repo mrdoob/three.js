@@ -1,12 +1,9 @@
+
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Depth-of-field shader with bokeh
  * ported from GLSL shader by Martins Upitis
  * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
  */
-
-
 
 var BokehShader = {
 

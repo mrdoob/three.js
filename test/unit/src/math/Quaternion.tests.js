@@ -1,8 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author tschw
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
@@ -525,6 +520,20 @@ export default QUnit.module( 'Maths', () => {
 			a.set( 0, 0, 0, 1 );
 			a.rotateTowards( b, halfPI );
 			assert.ok( a.angleTo( c ) - halfPI <= eps, "Passed!" );
+
+		} );
+
+		QUnit.test( "identity", ( assert ) => {
+
+			var a = new Quaternion();
+
+			a.set( x, y, z, w );
+			a.identity();
+
+			assert.ok( a.x == 0, "Passed!" );
+			assert.ok( a.y == 0, "Passed!" );
+			assert.ok( a.z === 0, "Passed!" );
+			assert.ok( a.w === 1, "Passed!" );
 
 		} );
 

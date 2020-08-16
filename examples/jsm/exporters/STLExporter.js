@@ -1,9 +1,9 @@
+import {
+	Geometry,
+	Matrix3,
+	Vector3
+} from "../../../build/three.module.js";
 /**
- * @author kovacsv / http://kovacsv.hu/
- * @author mrdoob / http://mrdoob.com/
- * @author mudcube / http://mudcu.be/
- * @author Mugen87 / https://github.com/Mugen87
- *
  * Usage:
  *  var exporter = new STLExporter();
  *
@@ -11,12 +11,6 @@
  *  var data = exporter.parse( mesh, { binary: true } );
  *
  */
-
-import {
-	Geometry,
-	Matrix3,
-	Vector3
-} from "../../../build/three.module.js";
 
 var STLExporter = function () {};
 

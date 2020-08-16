@@ -1,8 +1,4 @@
-console.warn( "THREE.Refractor: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author Mugen87 / https://github.com/Mugen87
- *
- */
+console.warn( "THREE.Refractor: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.Refractor = function ( geometry, options ) {
 
@@ -19,7 +15,6 @@ THREE.Refractor = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || THREE.Refractor.RefractorShader;
-	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	//
 
@@ -38,8 +33,7 @@ THREE.Refractor = function ( geometry, options ) {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBFormat,
-		stencilBuffer: false,
-		encoding: encoding
+		stencilBuffer: false
 	};
 
 	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -223,6 +217,10 @@ THREE.Refractor = function ( geometry, options ) {
 	//
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
+
+		// Render
+
+		renderTarget.texture.encoding = renderer.outputEncoding;
 
 		// ensure refractors are rendered only once per frame
 

@@ -1,7 +1,3 @@
-/**
- * @author donmccurdy / https://www.donmccurdy.com/
- */
-
 import {
 	Triangle
 } from "../../../build/three.module.js";
@@ -128,7 +124,7 @@ var MeshSurfaceSampler = ( function () {
 
 			while ( start <= end ) {
 
-				var mid = Math.floor( ( start + end ) / 2 );
+				var mid = Math.ceil( ( start + end ) / 2 );
 
 				if ( mid === 0 || dist[ mid - 1 ] <= x && dist[ mid ] > x ) {
 

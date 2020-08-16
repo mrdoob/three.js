@@ -1,6 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
 import { InterleavedBuffer } from '../../../../src/core/InterleavedBuffer';
@@ -89,16 +86,6 @@ export default QUnit.module( 'Core', () => {
 
 			instance.set( [ 0, - 1 ] );
 			assert.ok( instance.array[ 0 ] === 0 && instance.array[ 1 ] === - 1, "replace at first by default" );
-
-		} );
-
-		QUnit.test( "clone", ( assert ) => {
-
-			var array = new Float32Array( [ 1, 2, 3, 7, 8, 9 ] );
-			var instance = new InterleavedBuffer( array, 3 );
-			instance.setUsage( DynamicDrawUsage );
-
-			checkInstanceAgainstCopy( instance, instance.clone(), assert );
 
 		} );
 

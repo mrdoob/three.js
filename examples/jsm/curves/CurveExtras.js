@@ -1,6 +1,9 @@
+import {
+	Curve,
+	Vector3
+} from "../../../build/three.module.js";
 /**
  * A bunch of parametric curves
- * @author zz85
  *
  * Formulas collected from various sources
  * http://mathworld.wolfram.com/HeartCurve.html
@@ -10,11 +13,6 @@
  * http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
  * https://prideout.net/blog/old/blog/index.html@p=44.html
  */
-
-import {
-	Curve,
-	Vector3
-} from "../../../build/three.module.js";
 
 var Curves = ( function () {
 

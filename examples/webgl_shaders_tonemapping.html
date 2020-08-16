@@ -333,11 +333,14 @@
 				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				ldrEffectComposer = new EffectComposer( renderer, regularRenderTarget );
 
-				if ( renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+				parameters.type = THREE.FloatType;
 
-					parameters.type = THREE.FloatType;
+				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
 
-	}
+					parameters.type = undefined; // avoid usage of floating point textures
+
+				}
+
 				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				dynamicHdrEffectComposer = new EffectComposer( renderer, hdrRenderTarget );
 				dynamicHdrEffectComposer.setSize( window.innerWidth, window.innerHeight );

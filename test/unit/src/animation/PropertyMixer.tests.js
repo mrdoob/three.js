@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { PropertyMixer } from '../../../../src/animation/PropertyMixer';

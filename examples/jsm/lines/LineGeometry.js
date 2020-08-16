@@ -1,8 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 
 import { LineSegmentsGeometry } from "../lines/LineSegmentsGeometry.js";
 

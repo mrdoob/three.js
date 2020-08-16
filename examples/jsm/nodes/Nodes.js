@@ -88,6 +88,7 @@ export { LuminanceNode } from './effects/LuminanceNode.js';
 // material nodes
 
 export { RawNode } from './materials/nodes/RawNode.js';
+export { BasicNode } from './materials/nodes/BasicNode.js';
 export { SpriteNode } from './materials/nodes/SpriteNode.js';
 export { PhongNode } from './materials/nodes/PhongNode.js';
 export { StandardNode } from './materials/nodes/StandardNode.js';
@@ -96,6 +97,7 @@ export { MeshStandardNode } from './materials/nodes/MeshStandardNode.js';
 // materials
 
 export { NodeMaterial } from './materials/NodeMaterial.js';
+export { BasicNodeMaterial } from './materials/BasicNodeMaterial.js';
 export { SpriteNodeMaterial } from './materials/SpriteNodeMaterial.js';
 export { PhongNodeMaterial } from './materials/PhongNodeMaterial.js';
 export { StandardNodeMaterial } from './materials/StandardNodeMaterial.js';

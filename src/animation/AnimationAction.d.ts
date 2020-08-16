@@ -9,15 +9,55 @@ export class AnimationAction {
 	constructor( mixer: AnimationMixer, clip: AnimationClip, localRoot?: Object3D, blendMode?: AnimationBlendMode );
 
 	blendMode: AnimationBlendMode;
+
+	/**
+	 * @default THREE.LoopRepeat
+	 */
 	loop: AnimationActionLoopStyles;
+
+	/**
+	 * @default 0
+	 */
 	time: number;
+
+	/**
+	 * @default 1
+	 */
 	timeScale: number;
+
+	/**
+	 * @default 1
+	 */
 	weight: number;
+
+	/**
+	 * @default Infinity
+	 */
 	repetitions: number;
+
+	/**
+	 * @default false
+	 */
 	paused: boolean;
+
+	/**
+	 * @default true
+	 */
 	enabled: boolean;
+
+	/**
+	 * @default false
+	 */
 	clampWhenFinished: boolean;
+
+	/**
+	 * @default true
+	 */
 	zeroSlopeAtStart: boolean;
+
+	/**
+	 * @default true
+	 */
 	zeroSlopeAtEnd: boolean;
 
 	play(): AnimationAction;

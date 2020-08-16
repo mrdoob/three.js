@@ -1,18 +1,13 @@
-/**
- * @author gero3 / https://github.com/gero3
- * @author tentone / https://github.com/tentone
- * @author troy351 / https://github.com/troy351
- *
- * Requires opentype.js to be included in the project.
- * Loads TTF files and converts them into typeface JSON that can be used directly
- * to create THREE.Font objects.
- */
-
 import {
 	FileLoader,
 	Loader
 } from "../../../build/three.module.js";
 import { opentype } from "../libs/opentype.module.min.js";
+/**
+ * Requires opentype.js to be included in the project.
+ * Loads TTF files and converts them into typeface JSON that can be used directly
+ * to create THREE.Font objects.
+ */
 
 var TTFLoader = function ( manager ) {
 
@@ -34,6 +29,7 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( this.requestHeader );
 		loader.load( url, function ( buffer ) {
 
 			try {

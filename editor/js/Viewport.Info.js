@@ -1,10 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIBreak, UIText } from './libs/ui.js';
 
-var ViewportInfo = function ( editor ) {
+function ViewportInfo( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
@@ -98,6 +94,6 @@ var ViewportInfo = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { ViewportInfo };

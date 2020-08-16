@@ -106,10 +106,7 @@
 
 				//
 
-				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( 'webgl2', { alpha: false, antialias: false } );
-
-				renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.autoClear = false;
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( container.offsetWidth, container.offsetHeight );

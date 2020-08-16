@@ -1,8 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
-
 import { Command } from '../Command.js';
 
 import * as THREE from '../../../build/three.module.js';
@@ -13,7 +8,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param newMaterial THREE.Material
  * @constructor
  */
-var SetMaterialCommand = function ( editor, object, newMaterial, materialSlot ) {
+function SetMaterialCommand( editor, object, newMaterial, materialSlot ) {
 
 	Command.call( this, editor );
 
@@ -26,7 +21,7 @@ var SetMaterialCommand = function ( editor, object, newMaterial, materialSlot ) 
 	this.oldMaterial = this.editor.getObjectMaterial( object, materialSlot );
 	this.newMaterial = newMaterial;
 
-};
+}
 
 SetMaterialCommand.prototype = {
 

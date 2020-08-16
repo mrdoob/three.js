@@ -1,14 +1,10 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometrySphereGeometry = function ( editor, object ) {
+function SidebarGeometrySphereGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -106,6 +102,6 @@ var SidebarGeometrySphereGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometrySphereGeometry };

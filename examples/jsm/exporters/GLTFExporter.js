@@ -1,9 +1,3 @@
-/**
- * @author fernandojsg / http://fernandojsg.com
- * @author Don McCurdy / https://www.donmccurdy.com
- * @author Takahiro / https://github.com/takahirox
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,

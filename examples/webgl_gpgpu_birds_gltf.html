@@ -261,13 +261,26 @@
 
 						if ( j < durationAnimation ) {
 
-							tData[ offset + i * 3 ] = Math.lerp( morphAttributes[ curMorph ].array[ i * 3 ], morphAttributes[ nextMorph ].array[ i * 3 ], lerpAmount );
-							tData[ offset + i * 3 + 1 ] = Math.lerp( morphAttributes[ curMorph ].array[ i * 3 + 1 ], morphAttributes[ nextMorph ].array[ i * 3 + 1 ], lerpAmount );
-							tData[ offset + i * 3 + 2 ] = Math.lerp( morphAttributes[ curMorph ].array[ i * 3 + 2 ], morphAttributes[ nextMorph ].array[ i * 3 + 2 ], lerpAmount );
+							var d0, d1;
+
+							d0 = morphAttributes[ curMorph ].array[ i * 3 ];
+							d1 = morphAttributes[ nextMorph ].array[ i * 3 ];
+
+							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 3 ] = Math.lerp( d0, d1, lerpAmount );
+
+							d0 = morphAttributes[ curMorph ].array[ i * 3 + 1 ];
+							d1 = morphAttributes[ nextMorph ].array[ i * 3 + 1 ];
+
+							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 3 + 1 ] = Math.lerp( d0, d1, lerpAmount );
+
+							d0 = morphAttributes[ curMorph ].array[ i * 3 + 2 ];
+							d1 = morphAttributes[ nextMorph ].array[ i * 3 + 2 ];
+
+							if ( d0 !== undefined && d1 !== undefined ) tData[ offset + i * 3 + 2 ] = Math.lerp( d0, d1, lerpAmount );
 
 						}
 
-		}
+					}
 
 				}
 
@@ -418,6 +431,12 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
+				if ( isSafari() ) {
+
+					gpuCompute.setDataType( THREE.HalfFloatType );
+
+				}
+
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();
 				fillPositionTexture( dtPosition );
@@ -456,6 +475,12 @@
 					console.error( error );
 
 				}
+
+			}
+
+			function isSafari() {
+
+				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
 
 			}
 

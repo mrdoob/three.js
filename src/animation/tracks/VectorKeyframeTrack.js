@@ -1,13 +1,7 @@
 import { KeyframeTrack } from '../KeyframeTrack.js';
 
 /**
- *
  * A Track of vectored keyframe values.
- *
- *
- * @author Ben Houston / http://clara.io/
- * @author David Sarno / http://lighthaus.us/
- * @author tschw
  */
 
 function VectorKeyframeTrack( name, times, values, interpolation ) {

@@ -2,11 +2,6 @@ import { Material } from './Material.js';
 import { BasicDepthPacking } from '../constants.js';
 
 /**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author bhouston / https://clara.io
- * @author WestLangley / http://github.com/WestLangley
- *
  * parameters = {
  *
  *  opacity: <float>,

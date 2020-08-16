@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
 import { AddObjectCommand } from './commands/AddObjectCommand.js';
@@ -9,7 +5,7 @@ import { RemoveObjectCommand } from './commands/RemoveObjectCommand.js';
 import { MultiCmdsCommand } from './commands/MultiCmdsCommand.js';
 import { SetMaterialValueCommand } from './commands/SetMaterialValueCommand.js';
 
-var MenubarEdit = function ( editor ) {
+function MenubarEdit( editor ) {
 
 	var strings = editor.strings;
 
@@ -272,6 +268,6 @@ var MenubarEdit = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarEdit };

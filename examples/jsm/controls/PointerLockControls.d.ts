@@ -14,6 +14,9 @@ export class PointerLockControls extends EventDispatcher {
 
 	isLocked: boolean;
 
+	minPolarAngle: number;
+	maxPolarAngle: number;
+
 	connect(): void;
 	disconnect(): void;
 	dispose(): void;

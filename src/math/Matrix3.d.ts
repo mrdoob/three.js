@@ -55,6 +55,7 @@ export class Matrix3 implements Matrix {
 
 	/**
 	 * Array with matrix values.
+	 * @default [1, 0, 0, 0, 1, 0, 0, 0, 1]
 	 */
 	elements: number[];
 
@@ -76,7 +77,7 @@ export class Matrix3 implements Matrix {
 	setFromMatrix4( m: Matrix4 ): Matrix3;
 	multiplyScalar( s: number ): Matrix3;
 	determinant(): number;
-	getInverse( matrix: Matrix3, throwOnDegenerate?: boolean ): Matrix3;
+	getInverse( matrix: Matrix3 ): Matrix3;
 
 	/**
 	 * Transposes this matrix in place.

@@ -154,9 +154,9 @@ vec3 BRDF_Specular_GGX( const in IncidentLight incidentLight, const in vec3 view
 
 vec2 LTC_Uv( const in vec3 N, const in vec3 V, const in float roughness ) {
 
-	const float LUT_SIZE  = 64.0;
+	const float LUT_SIZE = 64.0;
 	const float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
-	const float LUT_BIAS  = 0.5 / LUT_SIZE;
+	const float LUT_BIAS = 0.5 / LUT_SIZE;
 
 	float dotNV = saturate( dot( N, V ) );
 
@@ -244,9 +244,9 @@ vec3 LTC_Evaluate( const in vec3 N, const in vec3 V, const in vec3 P, const in m
 	float len = length( vectorFormFactor );
 	float z = vectorFormFactor.z / len;
 
-	const float LUT_SIZE  = 64.0;
+	const float LUT_SIZE = 64.0;
 	const float LUT_SCALE = ( LUT_SIZE - 1.0 ) / LUT_SIZE;
-	const float LUT_BIAS  = 0.5 / LUT_SIZE;
+	const float LUT_BIAS = 0.5 / LUT_SIZE;
 
 	// tabulated horizon-clipped sphere, apparently...
 	vec2 uv = vec2( z * 0.5 + 0.5, len );
@@ -342,7 +342,7 @@ float BlinnExponentToGGXRoughness( const in float blinnExponent ) {
 // https://github.com/google/filament/blob/master/shaders/src/brdf.fs#L94
 float D_Charlie(float roughness, float NoH) {
 	// Estevez and Kulla 2017, "Production Friendly Microfacet Sheen BRDF"
-	float invAlpha  = 1.0 / roughness;
+	float invAlpha = 1.0 / roughness;
 	float cos2h = NoH * NoH;
 	float sin2h = max(1.0 - cos2h, 0.0078125); // 2^(-14/2), so sin2h^2 > 0 in fp16
 	return (2.0 + invAlpha) * pow(sin2h, invAlpha * 0.5) / (2.0 * PI);

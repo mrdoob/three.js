@@ -35,7 +35,7 @@ export interface Vector {
 	 *
 	 * add(v:T):T;
 	 */
-	add( v: Vector, w?: Vector ): this;
+	add( v: Vector ): this;
 
 	/**
 	 * addVectors(a:T, b:T):T;
@@ -138,7 +138,14 @@ export class Vector2 implements Vector {
 
 	constructor( x?: number, y?: number );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
 	width: number;
 	height: number;

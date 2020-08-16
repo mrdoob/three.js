@@ -28,6 +28,12 @@
 
 		<h2>Properties</h2>
 
+		<h3>[property:Boolean autoUpdate]</h3>
+		<p>
+			Enables automatic updates of the light's shadow. Default is *true*.
+			If you do not require dynamic lighting / shadows, you may set this to *false*.
+		</p>
+
 		<h3>[property:Camera camera]</h3>
 		<p>
 			The light's view of the world. This is used to generate a depth map of the scene; objects behind
@@ -66,6 +72,18 @@
 		<p>
 			Model to shadow camera space, to compute location and depth in shadow map. Stored
 			in a [page:Matrix4 Matrix4]. This is computed internally during rendering.
+		</p>
+
+		<h3>[property:Boolean needsUpdate]</h3>
+		<p>
+			When set to *true*, shadow maps will be updated in the next *render* call. Default is *false*.
+			If you have set [page:.autoUpdate] to *false*, you will need to set this property to *true* and then make a render call to update the light's shadow.
+		</p>
+
+		<h3>[property:Float normalBias]</h3>
+		<p>
+			Defines how much the position used to query the shadow map is offset along the object normal.
+			The default is 0. Increasing this value can be used to reduce shadow acne especially in large scenes where light shines onto geometry at a shallow angle. The cost is that shadows may appear distorted.
 		</p>
 
 		<h3>[property:Float radius]</h3>

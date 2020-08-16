@@ -31,7 +31,8 @@
 					<div id="exitSearchButton"></div>
 					<select id="language">
 						<option value="en">en</option>
-						<option value="zh">zh</option>
+						<option value="ar">ar</option>
+						<option value="zh">中文</option>
 					</select>
 				</div>
 				<div id="content"></div>
@@ -53,7 +54,7 @@
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				var hashLanguage = /^(api|manual|examples)\/(en|zh)\//.exec( hash );
+				var hashLanguage = /^(api|manual|examples)\/(en|ar|zh)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 
@@ -203,6 +204,12 @@
 				navigation = document.createElement( 'div' );
 				content.appendChild( navigation );
 
+				if ( language === 'ar' ) {
+
+					navigation.style.direction = 'rtl';
+
+				}
+
 				var localList = list[ language ];
 
 				for ( var section in localList ) {
@@ -309,7 +316,7 @@
 							if ( result !== '' ) {
 
 								pageName = pageName.replace( result, '<b>' + result + '</b>' );
-			
+
 							}
 
 						}
