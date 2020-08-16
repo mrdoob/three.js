@@ -295,6 +295,9 @@
 	var DynamicCopyUsage = 35050;
 	var StreamCopyUsage = 35042;
 
+	var GLSL1 = "100";
+	var GLSL3 = "300 es";
+
 	/**
 	 * https://github.com/mrdoob/eventdispatcher.js/
 	 */
@@ -13141,6 +13144,8 @@
 		this.index0AttributeName = undefined;
 		this.uniformsNeedUpdate = false;
 
+		this.glslVersion = null;
+
 		if ( parameters !== undefined ) {
 
 			if ( parameters.attributes !== undefined ) {
@@ -13184,6 +13189,8 @@
 
 		this.extensions = Object.assign( {}, source.extensions );
 
+		this.glslVersion = source.glslVersion;
+
 		return this;
 
 	};
@@ -13192,6 +13199,7 @@
 
 		var data = Material.prototype.toJSON.call( this, meta );
 
+		data.glslVersion = this.glslVersion;
 		data.uniforms = {};
 
 		for ( var name in this.uniforms ) {
@@ -18409,6 +18417,7 @@
 		var program = gl.createProgram();
 
 		var prefixVertex, prefixFragment;
+		var versionString = parameters.glslVersion ? '#version ' + parameters.glslVersion + "\n" : '';
 
 		if ( parameters.isRawShaderMaterial ) {
 
@@ -18678,20 +18687,20 @@
 
 		if ( parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
 
-			// GLSL 3.0 conversion
+			// overwrite GLSL version for built-in materials
+
+			versionString = '#version 300 es\n';
 
 			prefixVertex = [
-				'#version 300 es\n',
 				'#define attribute in',
 				'#define varying out',
 				'#define texture2D texture'
 			].join( '\n' ) + '\n' + prefixVertex;
 
 			prefixFragment = [
-				'#version 300 es\n',
 				'#define varying in',
-				'out highp vec4 pc_fragColor;',
-				'#define gl_FragColor pc_fragColor',
+				( parameters.glslVersion === GLSL3 ) ? '' : 'out highp vec4 pc_fragColor;',
+				( parameters.glslVersion === GLSL3 ) ? '' : '#define gl_FragColor pc_fragColor',
 				'#define gl_FragDepthEXT gl_FragDepth',
 				'#define texture2D texture',
 				'#define textureCube texture',
@@ -18706,8 +18715,8 @@
 
 		}
 
-		var vertexGlsl = prefixVertex + vertexShader;
-		var fragmentGlsl = prefixFragment + fragmentShader;
+		var vertexGlsl = versionString + prefixVertex + vertexShader;
+		var fragmentGlsl = versionString + prefixFragment + fragmentShader;
 
 		// console.log( '*VERTEX*', vertexGlsl );
 		// console.log( '*FRAGMENT*', fragmentGlsl );
@@ -19123,7 +19132,9 @@
 				rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
 				rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
 
-				customProgramCacheKey: material.customProgramCacheKey()
+				customProgramCacheKey: material.customProgramCacheKey(),
+
+				glslVersion: material.glslVersion
 
 			};
 
@@ -50750,6 +50761,8 @@
 	exports.FrontSide = FrontSide;
 	exports.Frustum = Frustum;
 	exports.GLBufferAttribute = GLBufferAttribute;
+	exports.GLSL1 = GLSL1;
+	exports.GLSL3 = GLSL3;
 	exports.GammaEncoding = GammaEncoding;
 	exports.Geometry = Geometry;
 	exports.GeometryUtils = GeometryUtils;
