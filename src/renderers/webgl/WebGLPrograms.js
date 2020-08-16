@@ -270,7 +270,9 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
 			rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
 
-			customProgramCacheKey: material.customProgramCacheKey()
+			customProgramCacheKey: material.customProgramCacheKey(),
+
+			glslVersion: material.glslVersion
 
 		};
 
