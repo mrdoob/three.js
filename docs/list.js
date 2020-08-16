@@ -469,9 +469,9 @@ var list = {
 				"إنشاء مشهد": "manual/ar/introduction/Creating-a-scene",
 				"التثبيت": "manual/ar/introduction/Installation",
 				"دعم المتصفح": "manual/ar/introduction/Browser-support",
-				"WebGL فحص توافق": "manual/ar/introduction/WebGL-compatibility-check",
+				"فحص توافق WebGL": "manual/ar/introduction/WebGL-compatibility-check",
 				"كيف تدير الأشياء محليًا": "manual/ar/introduction/How-to-run-things-locally",
-				"Typescript إعدادات": "manual/ar/introduction/Typescript-setup"
+				"إعدادات Typescript": "manual/ar/introduction/Typescript-setup"
 			},
 
 		},
