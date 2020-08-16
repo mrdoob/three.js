@@ -471,7 +471,8 @@ var list = {
 				"دعم المتصفح": "manual/ar/introduction/Browser-support",
 				"فحص توافق WebGL": "manual/ar/introduction/WebGL-compatibility-check",
 				"كيف تدير الأشياء محليًا": "manual/ar/introduction/How-to-run-things-locally",
-				"إعدادات Typescript": "manual/ar/introduction/Typescript-setup"
+				"إعدادات Typescript": "manual/ar/introduction/Typescript-setup",
+				"رسم خطوط": "manual/ar/introduction/Drawing-lines"
 			},
 
 		},
