@@ -2,6 +2,7 @@ import { Color } from '../../math/Color.js';
 import { Matrix4 } from '../../math/Matrix4.js';
 import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
+import { UniformsLib } from '../shaders/UniformsLib.js';
 
 function UniformsCache() {
 
@@ -182,6 +183,8 @@ function WebGLLights() {
 		spotShadowMap: [],
 		spotShadowMatrix: [],
 		rectArea: [],
+		rectAreaLTC1: null,
+		rectAreaLTC2: null,
 		point: [],
 		pointShadow: [],
 		pointShadowMap: [],
@@ -399,6 +402,13 @@ function WebGLLights() {
 				hemiLength ++;
 
 			}
+
+		}
+
+		if ( rectAreaLength > 0 ) {
+
+			state.rectAreaLTC1 = UniformsLib.LTC_1;
+			state.rectAreaLTC2 = UniformsLib.LTC_2;
 
 		}
 

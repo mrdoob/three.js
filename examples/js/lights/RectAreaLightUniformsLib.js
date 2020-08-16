@@ -34,13 +34,6 @@ THREE.RectAreaLightUniformsLib = {
 		THREE.UniformsLib.LTC_1 = ltc_1;
 		THREE.UniformsLib.LTC_2 = ltc_2;
 
-		// add ltc data textures to material uniforms
-
-		var ltc = { ltc_1: { value: null }, ltc_2: { value: null } };
-
-		Object.assign( THREE.ShaderLib.standard.uniforms, ltc );
-		Object.assign( THREE.ShaderLib.physical.uniforms, ltc );
-
 	}
 
 };

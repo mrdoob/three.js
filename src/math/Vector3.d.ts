@@ -24,8 +24,19 @@ export class Vector3 implements Vector {
 
 	constructor( x?: number, y?: number, z?: number );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
+
+	/**
+	 * @default 0
+	 */
 	z: number;
 	readonly isVector3: true;
 

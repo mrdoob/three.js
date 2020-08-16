@@ -462,6 +462,7 @@ var list = {
 	},
 
 	"ar": {
+
 		"الكتيب": {
 
 			"البدء": {
@@ -470,10 +471,11 @@ var list = {
 				"دعم المتصفح": "manual/ar/introduction/Browser-support",
 				"WebGL فحص توافق": "manual/ar/introduction/WebGL-compatibility-check",
 				"كيف تدير الأشياء محليًا": "manual/ar/introduction/How-to-run-things-locally",
-				"Typescript إعدادات": "manual/ar/introduction/Typescript-setup",
+				"Typescript إعدادات": "manual/ar/introduction/Typescript-setup"
 			},
 
 		},
+
 	},
 
 	"zh": {

@@ -6,9 +6,24 @@ export class Euler {
 
 	constructor( x?: number, y?: number, z?: number, order?: string );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
+
+	/**
+	 * @default 0
+	 */
 	z: number;
+
+	/**
+	 * @default THREE.Euler.DefaultOrder
+	 */
 	order: string;
 	readonly isEuler: true;
 

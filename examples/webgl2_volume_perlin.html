@@ -49,7 +49,7 @@
 				// Texture
 
 				const size = 128;
-				const data = new Float32Array( size * size * size );
+				const data = new Uint8Array( size * size * size );
 
 				let i = 0;
 				const scale = 0.051;
@@ -61,7 +61,7 @@
 
 						for ( let x = 0; x < size; x ++ ) {
 
-							data[ i ] = 0.5 + 0.5 * perlin.noise( x * scale, y * scale, z * scale );
+							data[ i ] = 128 + 128 * perlin.noise( x * scale, y * scale, z * scale );
 							i ++;
 
 						}
@@ -72,7 +72,6 @@
 
 				const texture = new THREE.DataTexture3D( data, size, size, size );
 				texture.format = THREE.RedFormat;
-				texture.type = THREE.FloatType;
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
@@ -216,7 +215,7 @@
 
 				const gui = new GUI();
 				gui.add( parameters, 'threshold', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'steps', 0, 200, 1 ).onChange( update );
+				gui.add( parameters, 'steps', 0, 300, 1 ).onChange( update );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

@@ -23,7 +23,10 @@ export class LineSegments <
 		mode?: number
 	);
 
-	type: 'LineSegments';
+	/**
+	 * @default 'LineSegments'
+	 */
+	type: 'LineSegments' | string;
 	readonly isLineSegments: true;
 
 }

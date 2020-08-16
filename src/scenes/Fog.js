@@ -1,27 +1,25 @@
 import { Color } from '../math/Color.js';
 
-function Fog( color, near, far ) {
+class Fog {
 
-	this.name = '';
+	constructor( color, near, far ) {
 
-	this.color = new Color( color );
+		this.name = '';
 
-	this.near = ( near !== undefined ) ? near : 1;
-	this.far = ( far !== undefined ) ? far : 1000;
+		this.color = new Color( color );
 
-}
+		this.near = ( near !== undefined ) ? near : 1;
+		this.far = ( far !== undefined ) ? far : 1000;
 
-Object.assign( Fog.prototype, {
+	}
 
-	isFog: true,
-
-	clone: function () {
+	clone() {
 
 		return new Fog( this.color, this.near, this.far );
 
-	},
+	}
 
-	toJSON: function ( /* meta */ ) {
+	toJSON( /* meta */ ) {
 
 		return {
 			type: 'Fog',
@@ -32,6 +30,8 @@ Object.assign( Fog.prototype, {
 
 	}
 
-} );
+}
+
+Fog.prototype.isFog = true;
 
 export { Fog };

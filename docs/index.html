@@ -204,6 +204,12 @@
 				navigation = document.createElement( 'div' );
 				content.appendChild( navigation );
 
+				if ( language === 'ar' ) {
+
+					navigation.style.direction = 'rtl';
+
+				}
+
 				var localList = list[ language ];
 
 				for ( var section in localList ) {

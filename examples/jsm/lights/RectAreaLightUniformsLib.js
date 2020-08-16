@@ -5,7 +5,6 @@ import {
 	LinearFilter,
 	NearestFilter,
 	RGBAFormat,
-	ShaderLib,
 	UVMapping,
 	UniformsLib
 } from "../../../build/three.module.js";
@@ -43,13 +42,6 @@ var RectAreaLightUniformsLib = {
 
 		UniformsLib.LTC_1 = ltc_1;
 		UniformsLib.LTC_2 = ltc_2;
-
-		// add ltc data textures to material uniforms
-
-		var ltc = { ltc_1: { value: null }, ltc_2: { value: null } };
-
-		Object.assign( ShaderLib.standard.uniforms, ltc );
-		Object.assign( ShaderLib.physical.uniforms, ltc );
 
 	}
 

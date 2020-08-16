@@ -5,6 +5,12 @@ import { InterpolationModes } from '../constants';
 
 export class KeyframeTrack {
 
+	/**
+	 * @param name
+	 * @param times
+	 * @param values
+	 * @param [interpolation=THREE.InterpolateLinear]
+	 */
 	constructor(
 		name: string,
 		times: any[],
@@ -20,6 +26,9 @@ export class KeyframeTrack {
 	TimeBufferType: Float32Array;
 	ValueBufferType: Float32Array;
 
+	/**
+	 * @default THREE.InterpolateLinear
+	 */
 	DefaultInterpolation: InterpolationModes;
 
 	InterpolantFactoryMethodDiscrete( result: any ): DiscreteInterpolant;
