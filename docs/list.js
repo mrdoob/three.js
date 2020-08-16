@@ -472,7 +472,8 @@ var list = {
 				"فحص توافق WebGL": "manual/ar/introduction/WebGL-compatibility-check",
 				"كيف تدير الأشياء محليًا": "manual/ar/introduction/How-to-run-things-locally",
 				"إعدادات Typescript": "manual/ar/introduction/Typescript-setup",
-				"رسم خطوط": "manual/ar/introduction/Drawing-lines"
+				"رسم خطوط": "manual/ar/introduction/Drawing-lines",
+				"إنشاء نص": "manual/ar/introduction/Creating-text"
 			},
 
 		},
