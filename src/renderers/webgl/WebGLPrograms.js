@@ -3,7 +3,7 @@ import { WebGLProgram } from './WebGLProgram.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { UniformsUtils } from '../shaders/UniformsUtils.js';
 
-function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingStates ) {
+function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingStates, clipping ) {
 
 	const programs = [];
 
@@ -108,7 +108,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 	}
 
-	function getParameters( material, lights, shadows, scene, nClipPlanes, nClipIntersection, object ) {
+	function getParameters( material, lights, shadows, scene, object ) {
 
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
@@ -240,8 +240,8 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			numPointLightShadows: lights.pointShadowMap.length,
 			numSpotLightShadows: lights.spotShadowMap.length,
 
-			numClippingPlanes: nClipPlanes,
-			numClipIntersection: nClipIntersection,
+			numClippingPlanes: clipping.numPlanes,
+			numClipIntersection: clipping.numIntersection,
 
 			dithering: material.dithering,
 
