@@ -61,7 +61,6 @@
 				var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
 				var material = new THREE.MeshLambertMaterial();
 				var mesh = new THREE.InstancedMesh( geometry, material, 200 );
-				mesh.instanceMatrix.setUsage( THREE.DynamicDrawUsage ); // will be updated every frame
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add( mesh );
