@@ -25813,7 +25813,11 @@ function WebGLRenderer( parameters ) {
 
 		} else if ( parameters.shaderID !== undefined ) {
 
-			// same glsl and uniform list
+			// same glsl and uniform list, envMap still needs the update here to avoid a frame-late effect
+
+			const environment = material.isMeshStandardMaterial ? scene.environment : null;
+			materialProperties.envMap = cubemaps.get( material.envMap || environment );
+
 			return;
 
 		} else {
@@ -25988,7 +25992,6 @@ function WebGLRenderer( parameters ) {
 			} else if ( materialProperties.envMap !== envMap ) {
 
 				initMaterial( material, scene, object );
-				materialProperties.envMap = envMap;
 
 			}
 
