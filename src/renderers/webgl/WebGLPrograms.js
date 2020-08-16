@@ -49,7 +49,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		"sheen", "transmissionMap"
 	];
 
-	function allocateBones( object ) {
+	function getMaxBones( object ) {
 
 		const skeleton = object.skeleton;
 		const bones = skeleton.bones;
@@ -120,7 +120,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		// heuristics to create shader parameters according to lights in the scene
 		// (not to blow over maxLights budget)
 
-		const maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
+		const maxBones = object.isSkinnedMesh ? getMaxBones( object ) : 0;
 
 		if ( material.precision !== null ) {
 
