@@ -348,6 +348,7 @@ var files = {
 	"physics": [
 		"physics_ammo_break",
 		"physics_ammo_cloth",
+		"physics_ammo_instancing",
 		"physics_ammo_rope",
 		"physics_ammo_terrain",
 		"physics_ammo_volume",
