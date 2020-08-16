@@ -156,6 +156,9 @@ async function AmmoPhysics() {
 			const bodies = meshMap.get( mesh );
 			const body = bodies[ index ];
 
+			body.setAngularVelocity( new AmmoLib.btVector3( 0, 0, 0 ) );
+			body.setLinearVelocity( new AmmoLib.btVector3( 0, 0, 0 ) );
+
 			worldTransform.setIdentity();
 			worldTransform.setOrigin( new AmmoLib.btVector3( position.x, position.y, position.z ) );
 			body.setWorldTransform( worldTransform );
@@ -163,6 +166,9 @@ async function AmmoPhysics() {
 		} else if ( mesh.isMesh ) {
 
 			const body = meshMap.get( mesh );
+
+			body.setAngularVelocity( new AmmoLib.btVector3( 0, 0, 0 ) );
+			body.setLinearVelocity( new AmmoLib.btVector3( 0, 0, 0 ) );
 
 			worldTransform.setIdentity();
 			worldTransform.setOrigin( new AmmoLib.btVector3( position.x, position.y, position.z ) );
