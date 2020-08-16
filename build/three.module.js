@@ -25985,6 +25985,7 @@ function WebGLRenderer( parameters ) {
 			} else if ( materialProperties.envMap !== envMap ) {
 
 				initMaterial( material, scene, object );
+				materialProperties.envMap = envMap;
 
 			}
 
