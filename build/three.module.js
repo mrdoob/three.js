@@ -16188,7 +16188,7 @@ function WebGLCapabilities( gl, extensions, parameters ) {
 
 }
 
-function WebGLClipping() {
+function WebGLClipping( properties ) {
 
 	const scope = this;
 
@@ -16239,7 +16239,13 @@ function WebGLClipping() {
 
 	};
 
-	this.setState = function ( planes, clipIntersection, clipShadows, camera, cache, fromCache ) {
+	this.setState = function ( material, camera, useCache ) {
+
+		const planes = material.clippingPlanes,
+			clipIntersection = material.clipIntersection,
+			clipShadows = material.clipShadows;
+
+		const materialProperties = properties.get( material );
 
 		if ( ! localClippingEnabled || planes === null || planes.length === 0 || renderingShadows && ! clipShadows ) {
 
@@ -16262,11 +16268,11 @@ function WebGLClipping() {
 			const nGlobal = renderingShadows ? 0 : numGlobalPlanes,
 				lGlobal = nGlobal * 4;
 
-			let dstArray = cache.clippingState || null;
+			let dstArray = materialProperties.clippingState || null;
 
 			uniform.value = dstArray; // ensure unique state
 
-			dstArray = projectPlanes( planes, camera, lGlobal, fromCache );
+			dstArray = projectPlanes( planes, camera, lGlobal, useCache );
 
 			for ( let i = 0; i !== lGlobal; ++ i ) {
 
@@ -16274,7 +16280,7 @@ function WebGLClipping() {
 
 			}
 
-			cache.clippingState = dstArray;
+			materialProperties.clippingState = dstArray;
 			this.numIntersection = clipIntersection ? this.numPlanes : 0;
 			this.numPlanes += nGlobal;
 
@@ -18863,7 +18869,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 }
 
-function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingStates ) {
+function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingStates, clipping ) {
 
 	const programs = [];
 
@@ -18968,7 +18974,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 	}
 
-	function getParameters( material, lights, shadows, scene, nClipPlanes, nClipIntersection, object ) {
+	function getParameters( material, lights, shadows, scene, object ) {
 
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
@@ -19100,8 +19106,8 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			numPointLightShadows: lights.pointShadowMap.length,
 			numSpotLightShadows: lights.spotShadowMap.length,
 
-			numClippingPlanes: nClipPlanes,
-			numClipIntersection: nClipIntersection,
+			numClippingPlanes: clipping.numPlanes,
+			numClipIntersection: clipping.numIntersection,
 
 			dithering: material.dithering,
 
@@ -24627,7 +24633,6 @@ function WebGLRenderer( parameters ) {
 
 	// clipping
 
-	const _clipping = new WebGLClipping();
 	let _clippingEnabled = false;
 	let _localClippingEnabled = false;
 
@@ -24730,7 +24735,7 @@ function WebGLRenderer( parameters ) {
 
 	let extensions, capabilities, state, info;
 	let properties, textures, cubemaps, attributes, geometries, objects;
-	let programCache, materials, renderLists, renderStates;
+	let programCache, materials, renderLists, renderStates, clipping;
 
 	let background, morphtargets, bufferRenderer, indexedBufferRenderer;
 
@@ -24772,11 +24777,11 @@ function WebGLRenderer( parameters ) {
 		geometries = new WebGLGeometries( _gl, attributes, info, bindingStates );
 		objects = new WebGLObjects( _gl, geometries, attributes, info );
 		morphtargets = new WebGLMorphtargets( _gl );
-		programCache = new WebGLPrograms( _this, cubemaps, extensions, capabilities, bindingStates );
+		clipping = new WebGLClipping( properties );
+		programCache = new WebGLPrograms( _this, cubemaps, extensions, capabilities, bindingStates, clipping );
 		materials = new WebGLMaterials( properties );
 		renderLists = new WebGLRenderLists( properties );
 		renderStates = new WebGLRenderStates();
-
 		background = new WebGLBackground( _this, cubemaps, state, objects, _premultipliedAlpha );
 
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info, capabilities );
@@ -25490,7 +25495,7 @@ function WebGLRenderer( parameters ) {
 		_frustum.setFromProjectionMatrix( _projScreenMatrix );
 
 		_localClippingEnabled = this.localClippingEnabled;
-		_clippingEnabled = _clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
+		_clippingEnabled = clipping.init( this.clippingPlanes, _localClippingEnabled, camera );
 
 		currentRenderList = renderLists.get( scene, camera );
 		currentRenderList.init();
@@ -25507,7 +25512,7 @@ function WebGLRenderer( parameters ) {
 
 		//
 
-		if ( _clippingEnabled === true ) _clipping.beginShadows();
+		if ( _clippingEnabled === true ) clipping.beginShadows();
 
 		const shadowsArray = currentRenderState.state.shadowsArray;
 
@@ -25515,7 +25520,7 @@ function WebGLRenderer( parameters ) {
 
 		currentRenderState.setupLights( camera );
 
-		if ( _clippingEnabled === true ) _clipping.endShadows();
+		if ( _clippingEnabled === true ) clipping.endShadows();
 
 		//
 
@@ -25784,7 +25789,7 @@ function WebGLRenderer( parameters ) {
 
 		const lightsStateVersion = lights.state.version;
 
-		const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, _clipping.numPlanes, _clipping.numIntersection, object );
+		const parameters = programCache.getParameters( material, lights.state, shadowsArray, scene, object );
 		const programCacheKey = programCache.getProgramCacheKey( parameters );
 
 		let program = materialProperties.program;
@@ -25872,9 +25877,9 @@ function WebGLRenderer( parameters ) {
 			! material.isRawShaderMaterial ||
 			material.clipping === true ) {
 
-			materialProperties.numClippingPlanes = _clipping.numPlanes;
-			materialProperties.numIntersection = _clipping.numIntersection;
-			uniforms.clippingPlanes = _clipping.uniform;
+			materialProperties.numClippingPlanes = clipping.numPlanes;
+			materialProperties.numIntersection = clipping.numIntersection;
+			uniforms.clippingPlanes = clipping.uniform;
 
 		}
 
@@ -25946,9 +25951,7 @@ function WebGLRenderer( parameters ) {
 				// we might want to call this function with some ClippingGroup
 				// object instead of the material, once it becomes feasible
 				// (#8465, #8379)
-				_clipping.setState(
-					material.clippingPlanes, material.clipIntersection, material.clipShadows,
-					camera, materialProperties, useCache );
+				clipping.setState( material, camera, useCache );
 
 			}
 
@@ -25973,8 +25976,8 @@ function WebGLRenderer( parameters ) {
 				initMaterial( material, scene, object );
 
 			} else if ( materialProperties.numClippingPlanes !== undefined &&
-				( materialProperties.numClippingPlanes !== _clipping.numPlanes ||
-				materialProperties.numIntersection !== _clipping.numIntersection ) ) {
+				( materialProperties.numClippingPlanes !== clipping.numPlanes ||
+				materialProperties.numIntersection !== clipping.numIntersection ) ) {
 
 				initMaterial( material, scene, object );
 
