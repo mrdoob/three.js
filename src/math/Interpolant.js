@@ -17,6 +17,8 @@
  *
  * 		http://www.oodesign.com/template-method-pattern.html
  *
+ * Notice: Interpolant class can't be converted to ES6 class.
+ * see https://github.com/mrdoob/three.js/pull/19934#issuecomment-664240797
  */
 
 function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
