@@ -211,7 +211,7 @@ function CannonPhysics() {
 function compose( position, quaternion, array, index ) {
 
 	const x = quaternion.x, y = quaternion.y, z = quaternion.z, w = quaternion.w;
-	const x2 = x + x,	y2 = y + y, z2 = z + z;
+	const x2 = x + x, y2 = y + y, z2 = z + z;
 	const xx = x * x2, xy = x * y2, xz = x * z2;
 	const yy = y * y2, yz = y * z2, zz = z * z2;
 	const wx = w * x2, wy = w * y2, wz = w * z2;
