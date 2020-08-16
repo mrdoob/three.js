@@ -13,14 +13,22 @@ export class InterleavedBufferAttribute {
 		normalized?: boolean
 	);
 
+	/**
+	 * @default ''
+	 */
 	name: string;
 	data: InterleavedBuffer;
 	itemSize: number;
 	offset: number;
+
+	/**
+	 * @default false
+	 */
 	normalized: boolean;
 
 	get count(): number;
 	get array(): ArrayLike<number>;
+	set needsUpdate( value: boolean );
 
 	readonly isInterleavedBufferAttribute: true;
 

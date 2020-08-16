@@ -1,10 +1,9 @@
-/**
- * @author munrocket / https://twitter.com/munrocket_twit
- */
 
 ( function () {
 
 	/* Deterministic random */
+
+	window.Math._random = window.Math.random;
 
 	let seed = Math.PI / 4;
 	window.Math.random = function () {
@@ -77,6 +76,7 @@
 			RAF( renew );
 
 		}
+
 		RAF( renew );
 
 	};

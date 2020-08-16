@@ -1,8 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- * @thanks bhouston / https://clara.io/
- */
-
 import { TempNode } from './TempNode.js';
 import { NodeLib } from './NodeLib.js';
 

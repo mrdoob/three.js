@@ -55,6 +55,7 @@ export class Matrix3 implements Matrix {
 
 	/**
 	 * Array with matrix values.
+	 * @default [1, 0, 0, 0, 1, 0, 0, 0, 1]
 	 */
 	elements: number[];
 

@@ -444,6 +444,12 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
+				if ( isSafari() ) {
+
+					gpuCompute.setDataType( THREE.HalfFloatType );
+
+				}
+
 				var heightmap0 = gpuCompute.createTexture();
 
 				fillTexture( heightmap0 );
@@ -492,6 +498,12 @@
 
 			}
 
+			function isSafari() {
+
+				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
+
+			}
+
 			function fillTexture( texture ) {
 
 				var waterMaxHeight = 10;
@@ -508,6 +520,7 @@
 						mult *= 1.25;
 
 					}
+
 					return r;
 
 				}

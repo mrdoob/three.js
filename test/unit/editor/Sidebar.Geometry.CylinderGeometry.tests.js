@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Sidebar.Geometry.CylinderGeometry';
+import { } from '../../../editor/js/Sidebar.Geometry.CylinderGeometry';
 
 export default QUnit.module( 'Editor', () => {
 

@@ -17,7 +17,6 @@
  *
  * 		http://www.oodesign.com/template-method-pattern.html
  *
- * @author tschw
  */
 
 function Interpolant( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
@@ -36,9 +35,8 @@ Object.assign( Interpolant.prototype, {
 
 	evaluate: function ( t ) {
 
-		let pp = this.parameterPositions,
-			i1 = this._cachedIndex,
-
+		const pp = this.parameterPositions;
+		let i1 = this._cachedIndex,
 			t1 = pp[ i1 ],
 			t0 = pp[ i1 - 1 ];
 

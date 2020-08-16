@@ -1,9 +1,15 @@
+import {
+	BackSide,
+	BoxBufferGeometry,
+	Mesh,
+	ShaderMaterial,
+	UniformsUtils,
+	Vector3
+} from "../../../build/three.module.js";
 /**
- * @author zz85 / https://github.com/zz85
- *
  * Based on "A Practical Analytic Model for Daylight"
  * aka The Preetham Model, the de facto standard analytic skydome model
- * http://www.cs.utah.edu/~shirley/papers/sunsky/sunsky.pdf
+ * https://www.researchgate.net/publication/220720443_A_Practical_Analytic_Model_for_Daylight
  *
  * First implemented by Simon Wallner
  * http://www.simonwallner.at/projects/atmospheric-scattering
@@ -14,20 +20,12 @@
  * Three.js integration by zz85 http://twitter.com/blurspline
 */
 
-import {
-	BackSide,
-	BoxBufferGeometry,
-	Mesh,
-	ShaderMaterial,
-	UniformsUtils,
-	Vector3
-} from "../../../build/three.module.js";
-
 var Sky = function () {
 
 	var shader = Sky.SkyShader;
 
 	var material = new ShaderMaterial( {
+		name: 'SkyShader',
 		fragmentShader: shader.fragmentShader,
 		vertexShader: shader.vertexShader,
 		uniforms: UniformsUtils.clone( shader.uniforms ),
@@ -44,7 +42,6 @@ Sky.prototype = Object.create( Mesh.prototype );
 Sky.SkyShader = {
 
 	uniforms: {
-		"luminance": { value: 1 },
 		"turbidity": { value: 2 },
 		"rayleigh": { value: 1 },
 		"mieCoefficient": { value: 0.005 },
@@ -134,7 +131,6 @@ Sky.SkyShader = {
 		'varying vec3 vBetaM;',
 		'varying float vSunE;',
 
-		'uniform float luminance;',
 		'uniform float mieDirectionalG;',
 		'uniform vec3 up;',
 
@@ -166,21 +162,6 @@ Sky.SkyShader = {
 		'	float inverse = 1.0 / pow( 1.0 - 2.0 * g * cosTheta + g2, 1.5 );',
 		'	return ONE_OVER_FOURPI * ( ( 1.0 - g2 ) * inverse );',
 		'}',
-
-		// Filmic ToneMapping http://filmicgames.com/archives/75
-		'const float A = 0.15;',
-		'const float B = 0.50;',
-		'const float C = 0.10;',
-		'const float D = 0.20;',
-		'const float E = 0.02;',
-		'const float F = 0.30;',
-
-		'const float whiteScale = 1.0748724675633854;', // 1.0 / Uncharted2Tonemap(1000.0)
-
-		'vec3 Uncharted2Tonemap( vec3 x ) {',
-		'	return ( ( x * ( A * x + C * B ) + D * E ) / ( x * ( A * x + B ) + D * F ) ) - E / F;',
-		'}',
-
 
 		'void main() {',
 
@@ -220,12 +201,12 @@ Sky.SkyShader = {
 
 		'	vec3 texColor = ( Lin + L0 ) * 0.04 + vec3( 0.0, 0.0003, 0.00075 );',
 
-		'	vec3 curr = Uncharted2Tonemap( ( log2( 2.0 / pow( luminance, 4.0 ) ) ) * texColor );',
-		'	vec3 color = curr * whiteScale;',
-
-		'	vec3 retColor = pow( color, vec3( 1.0 / ( 1.2 + ( 1.2 * vSunfade ) ) ) );',
+		'	vec3 retColor = pow( texColor, vec3( 1.0 / ( 1.2 + ( 1.2 * vSunfade ) ) ) );',
 
 		'	gl_FragColor = vec4( retColor, 1.0 );',
+
+		'#include <tonemapping_fragment>',
+		'#include <encodings_fragment>',
 
 		'}'
 	].join( '\n' )

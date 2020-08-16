@@ -1,7 +1,3 @@
-/**
- * @author humbletim / https://github.com/humbletim
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { MathUtils } from '../../../../src/math/MathUtils';

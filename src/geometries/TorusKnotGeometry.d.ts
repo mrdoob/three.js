@@ -3,6 +3,14 @@ import { BufferGeometry } from './../core/BufferGeometry';
 
 export class TorusKnotBufferGeometry extends BufferGeometry {
 
+	/**
+	 * @param [radius=1]
+	 * @param [tube=0.4]
+	 * @param [radialSegments=64]
+	 * @param [tubularSegments=8]
+	 * @param [p=2]
+	 * @param [q=3]
+	 */
 	constructor(
 		radius?: number,
 		tube?: number,
@@ -11,6 +19,11 @@ export class TorusKnotBufferGeometry extends BufferGeometry {
 		p?: number,
 		q?: number
 	);
+
+	/**
+	 * @default 'TorusKnotBufferGeometry'
+	 */
+	type: string;
 
 	parameters: {
 		radius: number;
@@ -25,6 +38,14 @@ export class TorusKnotBufferGeometry extends BufferGeometry {
 
 export class TorusKnotGeometry extends Geometry {
 
+	/**
+	 * @param [radius=1]
+	 * @param [tube=0.4]
+	 * @param [radialSegments=64]
+	 * @param [tubularSegments=8]
+	 * @param [p=2]
+	 * @param [q=3]
+	 */
 	constructor(
 		radius?: number,
 		tube?: number,
@@ -33,6 +54,11 @@ export class TorusKnotGeometry extends Geometry {
 		p?: number,
 		q?: number
 	);
+
+	/**
+	 * @default 'TorusKnotGeometry'
+	 */
+	type: string;
 
 	parameters: {
 		radius: number;

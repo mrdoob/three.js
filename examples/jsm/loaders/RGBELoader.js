@@ -1,7 +1,3 @@
-/**
- * @author Nikos M. / https://github.com/foo123/
- */
-
 import {
 	DataTextureLoader,
 	FloatType,

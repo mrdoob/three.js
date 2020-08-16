@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/RemoveObjectCommand';
+import { } from '../../../../editor/js/commands/RemoveObjectCommand';
 
 export default QUnit.module( 'Editor', () => {
 

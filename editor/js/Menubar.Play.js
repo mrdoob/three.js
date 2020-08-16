@@ -1,10 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel } from './libs/ui.js';
 
-var MenubarPlay = function ( editor ) {
+function MenubarPlay( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
@@ -38,6 +34,6 @@ var MenubarPlay = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarPlay };

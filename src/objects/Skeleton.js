@@ -1,12 +1,5 @@
 import { Matrix4 } from '../math/Matrix4.js';
 
-/**
- * @author mikael emtinger / http://gomo.se/
- * @author alteredq / http://alteredqualia.com/
- * @author michael guerrero / http://realitymeltdown.com
- * @author ikerr / http://verold.com
- */
-
 const _offsetMatrix = new Matrix4();
 const _identityMatrix = new Matrix4();
 

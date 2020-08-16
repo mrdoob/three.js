@@ -1,12 +1,8 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
 import { UIPanel, UIBreak, UIText } from './libs/ui.js';
 import { UIBoolean, UIOutliner } from './libs/ui.three.js';
 
-var SidebarHistory = function ( editor ) {
+function SidebarHistory( editor ) {
 
 	var strings = editor.strings;
 
@@ -132,6 +128,6 @@ var SidebarHistory = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarHistory };

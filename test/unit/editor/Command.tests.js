@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Command';
+import { } from '../../../editor/js/Command';
 
 export default QUnit.module( 'Editor', () => {
 

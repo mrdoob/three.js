@@ -1,6 +1,4 @@
-/**
- * @author Joe Pea / http://github.com/trusktr
- */
+import { BufferAttribute } from './../core/BufferAttribute';
 
 export interface HSL {
 	h: number;
@@ -25,16 +23,19 @@ export class Color {
 
 	/**
 	 * Red channel value between 0 and 1. Default is 1.
+	 * @default 1
 	 */
 	r: number;
 
 	/**
 	 * Green channel value between 0 and 1. Default is 1.
+	 * @default 1
 	 */
 	g: number;
 
 	/**
 	 * Blue channel value between 0 and 1. Default is 1.
+	 * @default 1
 	 */
 	b: number;
 
@@ -187,6 +188,8 @@ export class Color {
 	 * @return The provided array-like.
 	 */
 	toArray( xyz: ArrayLike<number>, offset?: number ): ArrayLike<number>;
+
+	fromBufferAttribute( attribute: BufferAttribute, index: number ): this;
 
 	/**
 	 * List of X11 color names.

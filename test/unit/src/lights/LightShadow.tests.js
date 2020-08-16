@@ -1,7 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author moraxy / https://github.com/moraxy
- */
 /* global QUnit */
 
 import { LightShadow } from '../../../../src/lights/LightShadow';

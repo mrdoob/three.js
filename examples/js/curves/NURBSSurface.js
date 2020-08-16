@@ -1,16 +1,9 @@
-console.warn( "THREE.NURBSSurface: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
+console.warn( "THREE.NURBSSurface: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author renej
  * NURBS surface object
  *
  * Implementation is based on (x, y [, z=0 [, w=1]]) control points with w=weight.
- *
  **/
-
-
-/**************************************************************
- *	NURBS surface
- **************************************************************/
 
 THREE.NURBSSurface = function ( degree1, degree2, knots1, knots2 /* arrays of reals */, controlPoints /* array^2 of Vector(2|3|4) */ ) {
 

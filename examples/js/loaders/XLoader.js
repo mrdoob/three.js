@@ -1,7 +1,4 @@
-console.warn( "THREE.XLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author adrs2002 / https://github.com/adrs2002
- */
+console.warn( "THREE.XLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.XLoader = ( function () {
 
@@ -284,6 +281,7 @@ THREE.XLoader = ( function () {
 				var loader = new THREE.FileLoader( this.manager );
 				loader.setPath( this.path );
 				loader.setResponseType( 'arraybuffer' );
+				loader.setRequestHeader( this.requestHeader );
 				loader.load( this.url, function ( response ) {
 
 					try {

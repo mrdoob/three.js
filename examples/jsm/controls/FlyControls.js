@@ -1,7 +1,3 @@
-/**
- * @author James Baicoianu / http://www.baicoianu.com/
- */
-
 import {
 	Quaternion,
 	Vector3

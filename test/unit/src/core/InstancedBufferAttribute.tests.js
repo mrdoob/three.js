@@ -1,6 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
 import { InstancedBufferAttribute } from '../../../../src/core/InstancedBufferAttribute';

@@ -119,11 +119,11 @@
 
 			//
 
-			function animate( timestamp ) {
+			function animate() {
 
 				requestAnimationFrame( animate );
 
-				uniforms[ "time" ].value = timestamp / 1000;
+				uniforms[ "time" ].value = performance.now() / 1000;
 
 				renderer.render( scene, camera );
 

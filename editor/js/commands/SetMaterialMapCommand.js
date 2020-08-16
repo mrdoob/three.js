@@ -1,7 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
 import { Command } from '../Command.js';
 
@@ -14,7 +10,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param newMap THREE.Texture
  * @constructor
  */
-var SetMaterialMapCommand = function ( editor, object, mapName, newMap, materialSlot ) {
+function SetMaterialMapCommand( editor, object, mapName, newMap, materialSlot ) {
 
 	Command.call( this, editor );
 
@@ -29,7 +25,7 @@ var SetMaterialMapCommand = function ( editor, object, mapName, newMap, material
 
 	this.mapName = mapName;
 
-};
+}
 
 SetMaterialMapCommand.prototype = {
 
@@ -99,6 +95,7 @@ SetMaterialMapCommand.prototype = {
 				values.push( data );
 
 			}
+
 			return values;
 
 		}
@@ -126,6 +123,7 @@ SetMaterialMapCommand.prototype = {
 				map.sourceFile = json.sourceFile;
 
 			}
+
 			return map;
 
 		}

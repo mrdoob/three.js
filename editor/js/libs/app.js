@@ -1,8 +1,4 @@
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 var APP = {
 
 	Player: function () {
@@ -35,7 +31,6 @@ var APP = {
 			if ( project.shadowType !== undefined ) renderer.shadowMap.type = project.shadowType;
 			if ( project.toneMapping !== undefined ) renderer.toneMapping = project.toneMapping;
 			if ( project.toneMappingExposure !== undefined ) renderer.toneMappingExposure = project.toneMappingExposure;
-			if ( project.toneMappingWhitePoint !== undefined ) renderer.toneMappingWhitePoint = project.toneMappingWhitePoint;
 			if ( project.physicallyCorrectLights !== undefined ) renderer.physicallyCorrectLights = project.physicallyCorrectLights;
 
 			this.setScene( loader.parse( json.scene ) );

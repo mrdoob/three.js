@@ -21,9 +21,24 @@ export class Quaternion {
 	 */
 	constructor( x?: number, y?: number, z?: number, w?: number );
 
+	/**
+	 * @default 0
+	 */
 	x: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
+
+	/**
+	 * @default 0
+	 */
 	z: number;
+
+	/**
+	 * @default 1
+	 */
 	w: number;
 	readonly isQuaternion: true;
 
@@ -61,6 +76,8 @@ export class Quaternion {
 	setFromUnitVectors( vFrom: Vector3, vTo: Vector3 ): Quaternion;
 	angleTo( q: Quaternion ): number;
 	rotateTowards( q: Quaternion, step: number ): Quaternion;
+
+	identity(): Quaternion;
 
 	/**
 	 * Inverts this quaternion.

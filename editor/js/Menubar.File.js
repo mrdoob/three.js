@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { ColladaExporter } from '../../examples/jsm/exporters/ColladaExporter.js';
@@ -15,7 +11,7 @@ import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
 
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
-var MenubarFile = function ( editor ) {
+function MenubarFile( editor ) {
 
 	function parseNumber( key, value ) {
 
@@ -446,11 +442,6 @@ var MenubarFile = function ( editor ) {
 			zip.file( 'js/VRButton.js', content );
 
 		} );
-		loader.load( '../examples/js/vr/HelioWebXRPolyfill.js', function ( content ) {
-
-			zip.file( 'js/HelioWebXRPolyfill.js', content );
-
-		} );
 
 	} );
 	options.add( option );
@@ -482,6 +473,6 @@ var MenubarFile = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarFile };

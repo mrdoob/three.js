@@ -6,5 +6,18 @@
 npm-debug.log
 .jshintrc
 .vs/
-**/node_modules
+
+# The command'npm install --prefix test' adds files in the test folder (https://docs.npmjs.com/configuring-npm/folders.html#executables).
+# There are 2 kinds of files, those without extension and those with cmd extension.
+# To ignore files without a extension, following procedure is nessecary:
+# - ignore all files in the test folder
+# - unignore all files in subdirectories of the test folder
+# - unignore all files with an extension in the test folder
+test/*
+!test/*/
+!test/*.*
+test/*.cmd
 test/unit/build
+
+
+**/node_modules

@@ -1,12 +1,6 @@
 import { Ray } from '../math/Ray.js';
 import { Layers } from './Layers.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author bhouston / http://clara.io/
- * @author stephomi / http://stephaneginier.com/
- */
-
 function Raycaster( origin, direction, near, far ) {
 
 	this.ray = new Ray( origin, direction );

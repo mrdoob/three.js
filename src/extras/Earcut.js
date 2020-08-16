@@ -1,5 +1,4 @@
 /**
- * @author Mugen87 / https://github.com/Mugen87
  * Port from https://github.com/mapbox/earcut (v2.2.2)
  */
 
@@ -9,10 +8,10 @@ const Earcut = {
 
 		dim = dim || 2;
 
-		let hasHoles = holeIndices && holeIndices.length,
-			outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length,
-			outerNode = linkedList( data, 0, outerLen, dim, true ),
-			triangles = [];
+		const hasHoles = holeIndices && holeIndices.length;
+		const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
+		let outerNode = linkedList( data, 0, outerLen, dim, true );
+		const triangles = [];
 
 		if ( ! outerNode || outerNode.next === outerNode.prev ) return triangles;
 
@@ -178,7 +177,7 @@ function earcutLinked( ear, triangles, dim, minX, minY, invSize, pass ) {
 // check whether a polygon node forms a valid ear with adjacent nodes
 function isEar( ear ) {
 
-	let a = ear.prev,
+	const a = ear.prev,
 		b = ear,
 		c = ear.next;
 
@@ -201,20 +200,20 @@ function isEar( ear ) {
 
 function isEarHashed( ear, minX, minY, invSize ) {
 
-	let a = ear.prev,
+	const a = ear.prev,
 		b = ear,
 		c = ear.next;
 
 	if ( area( a, b, c ) >= 0 ) return false; // reflex, can't be an ear
 
 	// triangle bbox; min & max are calculated like this for speed
-	let minTX = a.x < b.x ? ( a.x < c.x ? a.x : c.x ) : ( b.x < c.x ? b.x : c.x ),
+	const minTX = a.x < b.x ? ( a.x < c.x ? a.x : c.x ) : ( b.x < c.x ? b.x : c.x ),
 		minTY = a.y < b.y ? ( a.y < c.y ? a.y : c.y ) : ( b.y < c.y ? b.y : c.y ),
 		maxTX = a.x > b.x ? ( a.x > c.x ? a.x : c.x ) : ( b.x > c.x ? b.x : c.x ),
 		maxTY = a.y > b.y ? ( a.y > c.y ? a.y : c.y ) : ( b.y > c.y ? b.y : c.y );
 
 	// z-order range for the current triangle bbox;
-	let minZ = zOrder( minTX, minTY, minX, minY, invSize ),
+	const minZ = zOrder( minTX, minTY, minX, minY, invSize ),
 		maxZ = zOrder( maxTX, maxTY, minX, minY, invSize );
 
 	let p = ear.prevZ,
@@ -265,7 +264,7 @@ function cureLocalIntersections( start, triangles, dim ) {
 	let p = start;
 	do {
 
-		let a = p.prev,
+		const a = p.prev,
 			b = p.next.next;
 
 		if ( ! equals( a, b ) && intersects( a, p, p.next, b ) && locallyInside( a, b ) && locallyInside( b, a ) ) {
@@ -329,8 +328,8 @@ function splitEarcut( start, triangles, dim, minX, minY, invSize ) {
 // link every hole into the outer loop, producing a single-ring polygon without holes
 function eliminateHoles( data, holeIndices, outerNode, dim ) {
 
-	let queue = [],
-		i, len, start, end, list;
+	const queue = [];
+	let i, len, start, end, list;
 
 	for ( i = 0, len = holeIndices.length; i < len; i ++ ) {
 
@@ -381,11 +380,10 @@ function eliminateHole( hole, outerNode ) {
 // David Eberly's algorithm for finding a bridge between hole and outer polygon
 function findHoleBridge( hole, outerNode ) {
 
-	let p = outerNode,
-		hx = hole.x,
-		hy = hole.y,
-		qx = - Infinity,
-		m;
+	let p = outerNode;
+	const hx = hole.x;
+	const hy = hole.y;
+	let qx = - Infinity, m;
 
 	// find a segment intersected by a ray from the hole's leftmost point to the left;
 	// segment's endpoint with lesser x will be potential connection point
@@ -393,7 +391,7 @@ function findHoleBridge( hole, outerNode ) {
 
 		if ( hy <= p.y && hy >= p.next.y && p.next.y !== p.y ) {
 
-			let x = p.x + ( hy - p.y ) * ( p.next.x - p.x ) / ( p.next.y - p.y );
+			const x = p.x + ( hy - p.y ) * ( p.next.x - p.x ) / ( p.next.y - p.y );
 			if ( x <= hx && x > qx ) {
 
 				qx = x;
@@ -422,11 +420,10 @@ function findHoleBridge( hole, outerNode ) {
 	// if there are no points found, we have a valid connection;
 	// otherwise choose the point of the minimum angle with the ray as connection point
 
-	let stop = m,
+	const stop = m,
 		mx = m.x,
-		my = m.y,
-		tanMin = Infinity,
-		tan;
+		my = m.y;
+	let tanMin = Infinity, tan;
 
 	p = m;
 
@@ -678,8 +675,8 @@ function locallyInside( a, b ) {
 function middleInside( a, b ) {
 
 	let p = a,
-		inside = false,
-		px = ( a.x + b.x ) / 2,
+		inside = false;
+	const px = ( a.x + b.x ) / 2,
 		py = ( a.y + b.y ) / 2;
 	do {
 
@@ -698,7 +695,7 @@ function middleInside( a, b ) {
 // if one belongs to the outer ring and another to a hole, it merges it into a single ring
 function splitPolygon( a, b ) {
 
-	let a2 = new Node( a.i, a.x, a.y ),
+	const a2 = new Node( a.i, a.x, a.y ),
 		b2 = new Node( b.i, b.x, b.y ),
 		an = a.next,
 		bp = b.prev;

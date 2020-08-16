@@ -1,7 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
 import { EdgesGeometry } from '../../../../src/geometries/EdgesGeometry';

@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../../editor/js/commands/SetGeometryValueCommand';
+import { } from '../../../../editor/js/commands/SetGeometryValueCommand';
 
 export default QUnit.module( 'Editor', () => {
 

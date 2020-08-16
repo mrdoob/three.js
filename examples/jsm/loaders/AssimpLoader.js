@@ -1,7 +1,3 @@
-/**
- * @author Virtulous / https://virtulo.us/
- */
-
 import {
 	Bone,
 	BufferAttribute,
@@ -38,9 +34,10 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var path = ( scope.path === '' ) ? LoaderUtils.extractUrlBase( url ) : scope.path;
 
-		var loader = new FileLoader( this.manager );
+		var loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 
 		loader.load( url, function ( buffer ) {
 

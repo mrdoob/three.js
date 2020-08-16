@@ -91,7 +91,7 @@
 
 				renderer = new THREE.WebGLRenderer();
 
-				if ( ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
+				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
 
 					supportsExtension = false;
 					document.querySelector( '#error' ).style.display = 'block';
