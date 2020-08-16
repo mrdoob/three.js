@@ -5,9 +5,9 @@ import { Quaternion } from '../Quaternion.js';
  * Spherical linear unit quaternion interpolant.
  */
 
-class QuaternionLinearInterpolant {
+class QuaternionLinearInterpolant extends Interpolant {
 
-	constructor ( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
+	constructor( parameterPositions, sampleValues, sampleSize, resultBuffer ) {
 
 		super( this, parameterPositions, sampleValues, sampleSize, resultBuffer );
 
