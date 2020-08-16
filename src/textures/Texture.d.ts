@@ -51,14 +51,12 @@ export class Texture extends EventDispatcher {
 	name: string;
 
 	/**
-	 * @default []
+	 * @default new THREE.TextureImage( image || Texture.DEFAULT_IMAGE )
 	 */
 	textureImage: TextureImage;
 
-	sourceFile: string;
-
 	/**
-	 * @default new THREE.TextureImage( image || Texture.DEFAULT_IMAGE )
+	 * @default THREE.Texture.DEFAULT_IMAGE
 	 */
 	image: any; // HTMLImageElement or ImageData or { width: number, height: number } in some children;
 
