@@ -10323,6 +10323,19 @@
 			var position = this.attributes.position;
 			var morphAttributesPosition = this.morphAttributes.position;
 
+			if ( position && position.isGLBufferAttribute ) {
+
+				console.error( 'THREE.BufferGeometry.computeBoundingBox(): GLBufferAttribute requires a manual bounding box. Alternatively set "mesh.frustumCulled" to "false".', this );
+
+				this.boundingBox.set(
+					new Vector3( - Infinity, - Infinity, - Infinity ),
+					new Vector3( + Infinity, + Infinity, + Infinity )
+				);
+
+				return;
+
+			}
+
 			if ( position !== undefined ) {
 
 				this.boundingBox.setFromBufferAttribute( position );
@@ -10363,7 +10376,7 @@
 
 			if ( isNaN( this.boundingBox.min.x ) || isNaN( this.boundingBox.min.y ) || isNaN( this.boundingBox.min.z ) ) {
 
-				console.error( 'THREE.BufferGeometry.computeBoundingBox: Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
+				console.error( 'THREE.BufferGeometry.computeBoundingBox(): Computed min/max have NaN values. The "position" attribute is likely to have NaN values.', this );
 
 			}
 
@@ -10379,6 +10392,16 @@
 
 			var position = this.attributes.position;
 			var morphAttributesPosition = this.morphAttributes.position;
+
+			if ( position && position.isGLBufferAttribute ) {
+
+				console.error( 'THREE.BufferGeometry.computeBoundingSphere(): GLBufferAttribute requires a manual bounding sphere. Alternatively set "mesh.frustumCulled" to "false".', this );
+
+				this.boundingSphere.set( new Vector3(), Infinity );
+
+				return;
+
+			}
 
 			if ( position ) {
 
@@ -14120,6 +14143,25 @@
 
 		function update( attribute, bufferType ) {
 
+			if ( attribute.isGLBufferAttribute ) {
+
+				var cached = buffers.get( attribute );
+
+				if ( ! cached || cached.version < attribute.version ) {
+
+					buffers.set( attribute, {
+						buffer: attribute.buffer,
+						type: attribute.type,
+						bytesPerElement: attribute.elementSize,
+						version: attribute.version
+					} );
+
+				}
+
+				return;
+
+			}
+
 			if ( attribute.isInterleavedBufferAttribute ) { attribute = attribute.data; }
 
 			var data = buffers.get( attribute );
@@ -15558,6 +15600,8 @@
 
 				var cachedAttribute = cachedAttributes[ key ];
 				var geometryAttribute = geometryAttributes[ key ];
+
+				if ( geometryAttribute.isGLBufferAttribute ) { return true; }
 
 				if ( cachedAttribute === undefined ) { return true; }
 
@@ -18862,7 +18906,7 @@
 			"sheen", "transmissionMap"
 		];
 
-		function allocateBones( object ) {
+		function getMaxBones( object ) {
 
 			var skeleton = object.skeleton;
 			var bones = skeleton.bones;
@@ -18933,7 +18977,7 @@
 			// heuristics to create shader parameters according to lights in the scene
 			// (not to blow over maxLights budget)
 
-			var maxBones = object.isSkinnedMesh ? allocateBones( object ) : 0;
+			var maxBones = object.isSkinnedMesh ? getMaxBones( object ) : 0;
 
 			if ( material.precision !== null ) {
 
@@ -45957,6 +46001,81 @@
 
 	} );
 
+	/**
+	 * @author raub / https://github.com/raub
+	 */
+
+	/**
+	 * Element size is one of:
+	 * 5126: 4
+	 * 5123: 2
+	 * 5122: 2
+	 * 5125: 4
+	 * 5124: 4
+	 * 5120: 1
+	 * 5121: 1
+	 */
+	function GLBufferAttribute( buffer, type, itemSize, elementSize, count ) {
+
+		this.buffer = buffer;
+		this.type = type;
+		this.itemSize = itemSize;
+		this.elementSize = elementSize;
+		this.count = count;
+
+		this.version = 0;
+
+	}
+
+	Object.defineProperty( GLBufferAttribute.prototype, 'needsUpdate', {
+
+		set: function ( value ) {
+
+			if ( value === true ) { this.version ++; }
+
+		}
+
+	} );
+
+	Object.assign( GLBufferAttribute.prototype, {
+
+		isGLBufferAttribute: true,
+
+		setBuffer: function ( buffer ) {
+
+			this.buffer = buffer;
+
+			return this;
+
+		},
+
+		setType: function ( type, elementSize ) {
+
+			this.type = type;
+			this.elementSize = elementSize;
+
+			return this;
+
+		},
+
+		setItemSize: function ( itemSize ) {
+
+			this.itemSize = itemSize;
+
+			return this;
+
+		},
+
+		setCount: function ( count ) {
+
+			this.count = count;
+
+			return this;
+
+		},
+
+	} );
+
 	function Raycaster( origin, direction, near, far ) {
 
 		this.ray = new Ray( origin, direction );
@@ -50634,6 +50753,7 @@
 	exports.FontLoader = FontLoader;
 	exports.FrontSide = FrontSide;
 	exports.Frustum = Frustum;
+	exports.GLBufferAttribute = GLBufferAttribute;
 	exports.GammaEncoding = GammaEncoding;
 	exports.Geometry = Geometry;
 	exports.GeometryUtils = GeometryUtils;
