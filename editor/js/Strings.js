@@ -29,7 +29,6 @@ function Strings( config ) {
 			'menubar/edit/clear_history': 'Clear History',
 			'menubar/edit/clone': 'Clone',
 			'menubar/edit/delete': 'Delete (Del)',
-			'menubar/edit/minify_shaders': 'Minify Shaders',
 			'menubar/edit/fixcolormaps': 'Fix Color Maps',
 
 			'menubar/add': 'Add',
@@ -348,7 +347,6 @@ function Strings( config ) {
 			'menubar/edit/clear_history': 'Supprimer Historique',
 			'menubar/edit/clone': 'Cloner',
 			'menubar/edit/delete': 'Supprimer (Supp)',
-			'menubar/edit/minify_shaders': 'Minimiser les Shaders',
 			'menubar/edit/fixcolormaps': 'Correction des couleurs',
 
 			'menubar/add': 'Ajouter',
@@ -667,7 +665,6 @@ function Strings( config ) {
 			'menubar/edit/clear_history': '清空历史记录',
 			'menubar/edit/clone': '拷贝',
 			'menubar/edit/delete': '删除 (Del)',
-			'menubar/edit/minify_shaders': '压缩着色器',
 			'menubar/edit/fixcolormaps': '修复颜色贴图',
 
 			'menubar/add': '添加',

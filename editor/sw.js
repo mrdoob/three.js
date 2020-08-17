@@ -73,7 +73,6 @@ const assets = [
 
 	'./js/libs/esprima.js',
 	'./js/libs/jsonlint.js',
-	'./js/libs/glslprep.min.js',
 
 	'./js/libs/codemirror/addon/dialog.css',
 	'./js/libs/codemirror/addon/show-hint.css',
