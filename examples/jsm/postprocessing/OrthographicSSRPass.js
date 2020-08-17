@@ -47,7 +47,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.kernelSize = 32;
   this.kernel = [];
   this.noiseTexture = null;
-  this.output = 0;
+  this.output = 6;
 
   this.minDistance = 0.005;
   this.maxDistance = 1;
