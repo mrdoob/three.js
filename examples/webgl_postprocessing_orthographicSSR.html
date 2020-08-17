@@ -33,6 +33,9 @@
 		var initialFrustumSize = 3;
 
 		var camera, cameraTarget, scene, renderer, composer, orthographicSSRPass;
+		var params = {
+			enableSSR: true,
+		}
 		
 		init();
 		animate();
@@ -154,7 +157,7 @@
 			renderer = new THREE.WebGLRenderer({ antialias: false });
 			// renderer.setPixelRatio(window.devicePixelRatio);
 			renderer.setSize(window.innerWidth, window.innerHeight);
-			renderer.outputEncoding = THREE.sRGBEncoding;
+			// renderer.outputEncoding = THREE.sRGBEncoding;
 
 			renderer.shadowMap.enabled = true;
 
@@ -182,6 +185,7 @@
 				orthographicSSRPass.output = parseInt(value);
 
 			});
+			gui.add(params, 'enableSSR').name( 'Enable SSR' );
 			gui.add(orthographicSSRPass, 'opacity').min(0).max(1);
 			gui.add(orthographicSSRPass, 'maxDistance').min(0).max(2);
 			gui.add(orthographicSSRPass, 'stepStride').min(1).max(10).step(1);
@@ -241,7 +245,6 @@
 
 			requestAnimationFrame(animate);
 
-			orthographicSSRPass.setFrustumSize(initialFrustumSize/camera.zoom)
 			render();
 			stats.update();
 
@@ -249,7 +252,12 @@
 
 		function render() {
 
-			composer.render();
+			if(params.enableSSR){
+				orthographicSSRPass.setFrustumSize(initialFrustumSize/camera.zoom)
+				composer.render();
+			}else{
+				renderer.render(scene,camera)
+			}
 
 		}
 
