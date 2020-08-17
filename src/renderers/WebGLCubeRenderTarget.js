@@ -6,82 +6,82 @@ import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';
 import { CubeCamera } from '../cameras/CubeCamera.js';
 
-function WebGLCubeRenderTarget( size, options, dummy ) {
+class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
-	if ( Number.isInteger( options ) ) {
+	constructor( size, options, dummy ) {
 
-		console.warn( 'THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )' );
+		if ( Number.isInteger( options ) ) {
 
-		options = dummy;
+			console.warn( 'THREE.WebGLCubeRenderTarget: constructor signature is now WebGLCubeRenderTarget( size, options )' );
+
+			options = dummy;
+
+		}
+
+		super( size, size, options );
+
+		this.texture.isWebGLCubeRenderTargetTexture = true; // HACK Why is texture not a CubeTexture?
 
 	}
 
-	WebGLRenderTarget.call( this, size, size, options );
+	fromEquirectangularTexture( renderer, texture ) {
 
-	this.texture.isWebGLCubeRenderTargetTexture = true; // HACK Why is texture not a CubeTexture?
+		this.texture.type = texture.type;
+		this.texture.format = RGBAFormat; // see #18859
+		this.texture.encoding = texture.encoding;
 
-}
+		this.texture.generateMipmaps = texture.generateMipmaps;
+		this.texture.minFilter = texture.minFilter;
+		this.texture.magFilter = texture.magFilter;
 
-WebGLCubeRenderTarget.prototype = Object.create( WebGLRenderTarget.prototype );
-WebGLCubeRenderTarget.prototype.constructor = WebGLCubeRenderTarget;
+		const scene = new Scene();
 
-WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
+		const shader = {
 
-WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer, texture ) {
+			uniforms: {
+				tEquirect: { value: null },
+			},
 
-	this.texture.type = texture.type;
-	this.texture.format = RGBAFormat; // see #18859
-	this.texture.encoding = texture.encoding;
+			vertexShader: /* glsl */`
 
-	this.texture.generateMipmaps = texture.generateMipmaps;
-	this.texture.minFilter = texture.minFilter;
-	this.texture.magFilter = texture.magFilter;
+				varying vec3 vWorldDirection;
 
-	const shader = {
+				vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
 
-		uniforms: {
-			tEquirect: { value: null },
-		},
+					return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
 
-		vertexShader: /* glsl */`
+				}
 
-			varying vec3 vWorldDirection;
+				void main() {
 
-			vec3 transformDirection( in vec3 dir, in mat4 matrix ) {
+					vWorldDirection = transformDirection( position, modelMatrix );
 
-				return normalize( ( matrix * vec4( dir, 0.0 ) ).xyz );
+					#include <begin_vertex>
+					#include <project_vertex>
 
-			}
+				}
+			`,
 
-			void main() {
+			fragmentShader: /* glsl */`
 
-				vWorldDirection = transformDirection( position, modelMatrix );
+				uniform sampler2D tEquirect;
 
-				#include <begin_vertex>
-				#include <project_vertex>
+				varying vec3 vWorldDirection;
 
-			}
-		`,
+				#include <common>
 
-		fragmentShader: /* glsl */`
+				void main() {
 
-			uniform sampler2D tEquirect;
+					vec3 direction = normalize( vWorldDirection );
 
-			varying vec3 vWorldDirection;
+					vec2 sampleUV = equirectUv( direction );
 
-			#include <common>
+					gl_FragColor = texture2D( tEquirect, sampleUV );
 
-			void main() {
+				}
+			`
+		};
 
-				vec3 direction = normalize( vWorldDirection );
-
-				vec2 sampleUV = equirectUv( direction );
-
-				gl_FragColor = texture2D( tEquirect, sampleUV );
-
-			}
-		`
-	};
 
 	const geometry = new BoxBufferGeometry( 5, 5, 5 );
 
@@ -109,20 +109,21 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	// Avoid blurred poles
 	if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
 
-	const camera = new CubeCamera( 1, 10, this );
-	camera.update( renderer, mesh );
+		const camera = new CubeCamera( 1, 10, this );
+		camera.update( renderer, mesh );
 
-	texture.minFilter = currentMinFilter;
+		texture.minFilter = currentMinFilter;
 
-	renderer.setRenderTarget( currentRenderTarget );
-	renderer.setRenderList( currentRenderList );
-	renderer.setRenderState( currentRenderState );
+		renderer.setRenderTarget( currentRenderTarget );
+		renderer.setRenderList( currentRenderList );
+		renderer.setRenderState( currentRenderState );
 
-	mesh.geometry.dispose();
-	mesh.material.dispose();
+		return this;
 
-	return this;
+	}
 
-};
+}
+
+WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 
 export { WebGLCubeRenderTarget };
