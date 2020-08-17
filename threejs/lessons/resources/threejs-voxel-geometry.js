@@ -10,7 +10,7 @@ import {threejsLessonUtils} from './threejs-lesson-utils.js';
     wire: '#DDD',
   };
   const lightColors = {
-    wore: '#000',
+    wire: '#000',
   };
   const colors = isDarkMode ? darkColors : lightColors;
 
