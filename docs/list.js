@@ -474,7 +474,8 @@ var list = {
 				"إعدادات Typescript": "manual/ar/introduction/Typescript-setup",
 				"رسم خطوط": "manual/ar/introduction/Drawing-lines",
 				"إنشاء نص": "manual/ar/introduction/Creating-text",
-				"تحميل نماذج ثلاثية الأبعاد": "manual/ar/introduction/Loading-3D-models"
+				"تحميل نماذج ثلاثية الأبعاد": "manual/ar/introduction/Loading-3D-models",
+				"الأسئلة الشائعة": "manual/ar/introduction/FAQ",
 			},
 
 		},
