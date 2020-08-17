@@ -36,6 +36,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
 
   this.width = (width !== undefined) ? width : 512;
   this.height = (height !== undefined) ? height : 512;
+  this.frustumSize = frustumSize
 
   this.clear = true;
 
@@ -51,6 +52,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.minDistance = 0.005;
   this.maxDistance = 1;
   this.stepAddend = 1;
+  this.surfDist = .022;
 
   //
 
@@ -116,7 +118,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.orthographicSSRMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
   this.orthographicSSRMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
   this.orthographicSSRMaterial.uniforms['cameraRange'].value = this.camera.far; - this.camera.near;
-  this.orthographicSSRMaterial.uniforms['frustumSize'].value = frustumSize
+  this.orthographicSSRMaterial.uniforms['frustumSize'].value = this.frustumSize
   this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(this.width * this.width + this.height * this.height)
 
   // normal material
@@ -212,6 +214,7 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.orthographicSSRMaterial.uniforms['minDistance'].value = this.minDistance;
     this.orthographicSSRMaterial.uniforms['maxDistance'].value = this.maxDistance;
     this.orthographicSSRMaterial.uniforms['stepAddend'].value = this.stepAddend;
+    this.orthographicSSRMaterial.uniforms['surfDist'].value = this.surfDist / this.frustumSize;
     this.renderPass(renderer, this.orthographicSSRMaterial, this.orthographicSSRRenderTarget);
 
     // render blur
@@ -438,7 +441,8 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 
   setFrustumSize: function(frustumSize) {
-    this.orthographicSSRMaterial.uniforms['frustumSize'].value = frustumSize
+    this.frustumSize = frustumSize
+    this.orthographicSSRMaterial.uniforms['frustumSize'].value = this.frustumSize
   }
 
 });

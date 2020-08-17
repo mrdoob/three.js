@@ -32,7 +32,8 @@ var OrthographicSSRShader = {
     "cameraRange": { value: 0 },
     "frustumSize": { value: 0 },
     "MAX_STEP": { value: 0 },
-    "stepAddend": { value: 1 },
+    "stepAddend": { value: null },
+    "surfDist": { value: null },
 
   },
 
@@ -51,7 +52,6 @@ var OrthographicSSRShader = {
   ].join("\n"),
 
   fragmentShader: `
-		#define SURF_DISTuv .01///todo
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
@@ -64,6 +64,7 @@ var OrthographicSSRShader = {
 		uniform float opacity;
 		uniform float maxDistance;//uv unit
 		uniform float stepAddend;
+		uniform float surfDist;
 		float depthToDistance(float depth){
 			return (1.-depth)*cameraRange+cameraNear;
 		}
@@ -106,7 +107,7 @@ var OrthographicSSRShader = {
 				vec3 p=getPos(uv);
 				vec3 rayPos=pos+(length(xy-d0)/totalLen)*(reflectDir*maxDistance);
 				float away=length(rayPos-p);
-				if(away<SURF_DISTuv){
+				if(away<surfDist){
 					vec3 n=texture2D(tNormal,uv).xyz*2.-1.;
 					if(dot(reflectDir,n)>=0.) continue;
 					vec4 reflectColor=texture2D(tDiffuse,uv);
