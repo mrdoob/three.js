@@ -184,7 +184,7 @@
 			});
 			gui.add(orthographicSSRPass, 'opacity').min(0).max(1);
 			gui.add(orthographicSSRPass, 'maxDistance').min(0).max(2);
-			gui.add(orthographicSSRPass, 'stepAddend').min(1).max(10).step(1);
+			gui.add(orthographicSSRPass, 'stepStride').min(1).max(10).step(1);
 			gui.add(orthographicSSRPass, 'surfDist').min(.001).max(.05).step(.001);
 
 			new OrbitControls(camera, renderer.domElement)
