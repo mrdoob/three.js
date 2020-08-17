@@ -669,7 +669,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	if ( parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
 
-		// overwrite GLSL version for built-in materials
+		// GLSL 3.0 conversion for built-in materials and ShaderMaterial
 
 		versionString = '#version 300 es\n';
 
