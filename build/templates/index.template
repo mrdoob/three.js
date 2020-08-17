@@ -58,7 +58,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <title>{{title}}</title>
 
-<link rel="alternate" type="application/atom+xml" title="threejs fundamentals" href="https://threejsfundamentals.org/atom.xml" />
+{{{include "build/templates/langs-meta.template"}}}
+
+<link rel="alternate" type="application/atom+xml" title="threejs fundamentals" href="https://threejsfundamentals.org/atom.xml">
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
