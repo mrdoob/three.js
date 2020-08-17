@@ -439,7 +439,7 @@ var tags = {
 	"webgl_materials_envmaps_parallax": [ "onBeforeCompile" ],
 	"webgl_materials_lightmap": [ "shadows" ],
 	"webgl_materials_physical_clearcoat": [ "anisotropy" ],
-	"webgl_materials_physical_transparency": [ "alpha" ],
+	"webgl_materials_physical_transmission": [ "alpha" ],
 	"webgl_materials_shaders_fresnel": [ "refraction" ],
 	"webgl_materials_standard": [ "pbr" ],
 	"webgl_materials_texture_canvas": [ "paint" ],
