@@ -32,6 +32,7 @@ var OrthographicSSRShader = {
     "cameraRange": { value: 0 },
     "frustumSize": { value: 0 },
     "MAX_STEP": { value: 0 },
+    "stepAddend": { value: 1 },
 
   },
 
@@ -50,7 +51,7 @@ var OrthographicSSRShader = {
   ].join("\n"),
 
   fragmentShader: `
-		#define SURF_DISTuv .01
+		#define SURF_DISTuv .01///todo
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
@@ -62,6 +63,7 @@ var OrthographicSSRShader = {
 		uniform float MAX_STEP;
 		uniform float opacity;
 		uniform float maxDistance;//uv unit
+		uniform float stepAddend;
 		float depthToDistance(float depth){
 			return (1.-depth)*cameraRange+cameraNear;
 		}
@@ -95,7 +97,7 @@ var OrthographicSSRShader = {
 			float totalStep=max(abs(xLen),abs(yLen));
 			float xSpan=xLen/totalStep;
 			float ySpan=yLen/totalStep;
-			for(float i=0.;i<MAX_STEP;i++){
+			for(float i=0.;i<MAX_STEP;i+=stepAddend){
 				if(i>=totalStep) break;
 				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
 				if(xy.x<0.||xy.x>resolution.x) break;

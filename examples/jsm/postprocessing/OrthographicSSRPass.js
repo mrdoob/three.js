@@ -50,6 +50,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
 
   this.minDistance = 0.005;
   this.maxDistance = 1;
+  this.stepAddend = 1;
 
   //
 
@@ -210,6 +211,7 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.orthographicSSRMaterial.uniforms['opacity'].value = this.opacity;
     this.orthographicSSRMaterial.uniforms['minDistance'].value = this.minDistance;
     this.orthographicSSRMaterial.uniforms['maxDistance'].value = this.maxDistance;
+    this.orthographicSSRMaterial.uniforms['stepAddend'].value = this.stepAddend;
     this.renderPass(renderer, this.orthographicSSRMaterial, this.orthographicSSRRenderTarget);
 
     // render blur
