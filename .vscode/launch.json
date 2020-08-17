@@ -9,9 +9,12 @@
       "type": "node",
       "request": "launch",
       "name": "Build Lessons",
-      "program": "${workspaceFolder}/node_modules/grunt-cli/bin/grunt",
+      "program": "${workspaceFolder}/node_modules/grunt/bin/grunt",
       "args": ["buildlessons"],
       "console": "internalConsole",
+      "env": {
+        "ARTICLE_FILTER": "tips"
+      }
     }
   ]
 }
