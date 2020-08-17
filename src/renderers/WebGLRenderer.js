@@ -1479,11 +1479,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.version === materialProperties.__version ) {
 
-			if ( materialProperties.program === undefined ) {
-
-				initMaterial( material, scene, object );
-
-			} else if ( material.fog && materialProperties.fog !== fog ) {
+			if ( material.fog && materialProperties.fog !== fog ) {
 
 				initMaterial( material, scene, object );
 
