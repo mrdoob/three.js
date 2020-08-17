@@ -37,14 +37,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Three.js tutorials and solutions" />
-<meta name="keywords" content="webgl graphics three.js" />
-<meta name="thumbnail" content="https://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg" />
+<meta name="description" content="Three.js tutorials and solutions">
+<meta name="keywords" content="webgl graphics three.js">
+<meta name="thumbnail" content="https://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg">
 
-<meta property="og:title" content="{{title}}" />
-<meta property="og:type" content="website" />
-<meta property="og:image" content="https://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg" />
-<meta property="og:description" content="{{templateOptions.description}}" />
+<meta property="og:title" content="{{title}}">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg">
+<meta property="og:description" content="{{templateOptions.description}}">
 <meta property="og:url" content="https://threejsfundamentals.org">
 
 <meta name="twitter:card" content="summary_large_image">
@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <meta name="twitter:domain" content="threejsfundamentals.org">
 <meta name="twitter:title" content="threejsfundamentals.org">
 <meta name="twitter:url" content="https://threejsfundamentals.org">
-<meta name="twitter:description" content="{{templateOptions.description}}" />
+<meta name="twitter:description" content="{{templateOptions.description}}">
 <meta name="twitter:image:src" content="https://threejsfundamentals.org/threejs/lessons/resources/threejsfundamentals.jpg">
 
 <title>{{title}}</title>
@@ -73,12 +73,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <link rel="apple-touch-icon" href="/threejs/lessons/resources/threejsfundamentals-icon.png">
 <link rel="icon" href="/threejs/lessons/resources/threejsfundamentals-icon.png">
 
-<link rel="stylesheet" href="/threejs/lessons/lang.css" />
+<link rel="stylesheet" href="/threejs/lessons/lang.css">
 {{#ifexists filename="/threejs/lessons/{{langCode}}/lang.css" langCode=langInfo.baseDirname}}
-<link rel="stylesheet" href="/threejs/lessons/{{langInfo.baseDirname}}/lang.css" />
+<link rel="stylesheet" href="/threejs/lessons/{{langInfo.baseDirname}}/lang.css">
 {{/ifexists}}
-<link rel="stylesheet" href="/threejs/lessons/resources/lesson.css" />
-<link rel="stylesheet" href="/threejs/lessons/resources/index.css" />
+<link rel="stylesheet" href="/threejs/lessons/resources/lesson.css">
+<link rel="stylesheet" href="/threejs/lessons/resources/index.css">
 </head>
 <body>
 <div id="canvas">
