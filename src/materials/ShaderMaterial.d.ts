@@ -1,5 +1,6 @@
 import { IUniform } from '../renderers/shaders/UniformsLib';
 import { MaterialParameters, Material } from './Material';
+import { GLSLVersion } from '../constants';
 
 /**
  * @deprecated Use {@link PointsMaterial THREE.PointsMaterial} instead
@@ -29,7 +30,7 @@ export interface ShaderMaterialParameters extends MaterialParameters {
 		drawBuffers?: boolean;
 		shaderTextureLOD?: boolean;
 	};
-	glslVersion?: string;
+	glslVersion?: GLSLVersion;
 }
 
 export class ShaderMaterial extends Material {
@@ -126,7 +127,11 @@ export class ShaderMaterial extends Material {
 	 * @default false
 	 */
 	uniformsNeedUpdate: boolean;
-	glslVersion: string;
+
+	/**
+	 * @default null
+	 */
+	glslVersion: GLSLVersion | null;
 
 	setValues( parameters: ShaderMaterialParameters ): void;
 	toJSON( meta: any ): any;
