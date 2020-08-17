@@ -31,6 +31,7 @@ class Audio extends Object3D {
 
 		this._startedAt = 0;
 		this._progress = 0;
+		this._connected = false;
 
 		this.filters = [];
 
@@ -198,6 +199,8 @@ class Audio extends Object3D {
 
 		}
 
+		this._connected = true;
+
 		return this;
 
 	}
@@ -222,6 +225,8 @@ class Audio extends Object3D {
 
 		}
 
+		this._connected = false;
+
 		return this;
 
 	}
@@ -236,7 +241,7 @@ class Audio extends Object3D {
 
 		if ( ! value ) value = [];
 
-		if ( this.isPlaying === true ) {
+		if ( this._connected === true ) {
 
 			this.disconnect();
 			this.filters = value;
