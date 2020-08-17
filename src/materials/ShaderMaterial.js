@@ -80,8 +80,6 @@ class ShaderMaterial extends Material {
 
 		}
 
-		this.isShaderMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -205,6 +203,6 @@ class ShaderMaterial extends Material {
 
 }
 
-
+ShaderMaterial.prototype.isShaderMaterial = true;
 
 export { ShaderMaterial };

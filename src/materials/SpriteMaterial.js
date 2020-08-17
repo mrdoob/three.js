@@ -33,8 +33,6 @@ class SpriteMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isSpriteMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -56,5 +54,7 @@ class SpriteMaterial extends Material {
 	}
 
 }
+
+SpriteMaterial.prototype.isSpriteMaterial = true;
 
 export { SpriteMaterial };

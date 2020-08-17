@@ -20,8 +20,6 @@ class ShadowMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isShadowMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -35,5 +33,7 @@ class ShadowMaterial extends Material {
 	}
 
 }
+
+ShadowMaterial.prototype.isShadowMaterial = true;
 
 export { ShadowMaterial };

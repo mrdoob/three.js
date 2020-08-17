@@ -27,8 +27,6 @@ class LineDashedMaterial extends LineBasicMaterial {
 
 		this.setValues( parameters );
 
-		this.isLineDashedMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -44,5 +42,7 @@ class LineDashedMaterial extends LineBasicMaterial {
 	}
 
 }
+
+LineBasicMaterial.prototype.isLineDashedMaterial = true;
 
 export { LineDashedMaterial };

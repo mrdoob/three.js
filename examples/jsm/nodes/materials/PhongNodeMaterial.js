@@ -14,7 +14,6 @@ class PhongNodeMaterial extends NodeMaterial {
 
 	}
 
-
 }
 
 NodeUtils.addShortcuts( PhongNodeMaterial.prototype, 'fragment', [

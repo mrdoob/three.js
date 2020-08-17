@@ -29,8 +29,6 @@ class LineBasicMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isLineBasicMaterial = true;
-
 	}
 
 
@@ -51,5 +49,7 @@ class LineBasicMaterial extends Material {
 	}
 
 }
+
+LineBasicMaterial.prototype.isDirectionalLight = true;
 
 export { LineBasicMaterial };

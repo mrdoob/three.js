@@ -66,8 +66,6 @@ class MeshMatcapMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isMeshMatcapMaterial = true;
-
 	}
 
 
@@ -105,5 +103,7 @@ class MeshMatcapMaterial extends Material {
 	}
 
 }
+
+MeshMatcapMaterial.prototype.isMeshMatcapMaterial = true;
 
 export { MeshMatcapMaterial };

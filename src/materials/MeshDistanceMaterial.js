@@ -1,5 +1,6 @@
 import { Material } from './Material.js';
 import { Vector3 } from '../math/Vector3.js';
+import { MeshDepthMaterial } from './MeshDepthMaterial.js';
 
 /**
  * parameters = {
@@ -49,8 +50,6 @@ class MeshDistanceMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isMeshDistanceMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -77,5 +76,7 @@ class MeshDistanceMaterial extends Material {
 	}
 
 }
+
+MeshDepthMaterial.prototype.isMeshDistanceMaterial = true;
 
 export { MeshDistanceMaterial };

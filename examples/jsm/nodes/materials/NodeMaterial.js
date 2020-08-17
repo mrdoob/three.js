@@ -24,7 +24,24 @@ class NodeMaterial extends ShaderMaterial {
 
 		this.type = "NodeMaterial";
 
-		this.isNodeMaterial = true;
+	}
+
+	get properties() {
+
+		return this.fragment.properties;
+
+	}
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
+		this.needsCompile = value;
+
+	}
+
+	get needsUpdate() {
+
+		return this.needsCompile;
 
 	}
 
@@ -197,35 +214,6 @@ class NodeMaterial extends ShaderMaterial {
 
 }
 
-Object.defineProperties( NodeMaterial.prototype, {
-
-	properties: {
-
-		get: function () {
-
-			return this.fragment.properties;
-
-		}
-
-	},
-
-	needsUpdate: {
-
-		set: function ( value ) {
-
-			if ( value === true ) this.version ++;
-			this.needsCompile = value;
-
-		},
-
-		get: function () {
-
-			return this.needsCompile;
-
-		}
-
-	}
-
-} );
+NodeMaterial.prototype.isNodeMaterial = true;
 
 export { NodeMaterial };

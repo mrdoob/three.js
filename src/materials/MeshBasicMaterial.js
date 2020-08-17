@@ -71,8 +71,6 @@ class MeshBasicMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isMeshBasicMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -111,5 +109,7 @@ class MeshBasicMaterial extends Material {
 	}
 
 }
+
+MeshBasicMaterial.prototype.isMeshBasicMaterial = true;
 
 export { MeshBasicMaterial };

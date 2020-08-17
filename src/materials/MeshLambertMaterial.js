@@ -79,8 +79,6 @@ class MeshLambertMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isMeshLambertMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -124,5 +122,7 @@ class MeshLambertMaterial extends Material {
 	}
 
 }
+
+MeshLambertMaterial.prototype.isMeshLambertMaterial = true;
 
 export { MeshLambertMaterial };

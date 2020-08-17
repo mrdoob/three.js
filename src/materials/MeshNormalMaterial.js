@@ -56,8 +56,6 @@ class MeshNormalMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isMeshNormalMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -87,5 +85,7 @@ class MeshNormalMaterial extends Material {
 	}
 
 }
+
+MeshNormalMaterial.prototype.isMeshNormalMaterial = true;
 
 export { MeshNormalMaterial };

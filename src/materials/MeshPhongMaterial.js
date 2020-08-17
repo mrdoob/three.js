@@ -106,8 +106,6 @@ class MeshPhongMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isMeshPhongMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -164,5 +162,7 @@ class MeshPhongMaterial extends Material {
 	}
 
 }
+
+MeshPhongMaterial.prototype.isMeshPhongMaterial = true;
 
 export { MeshPhongMaterial };

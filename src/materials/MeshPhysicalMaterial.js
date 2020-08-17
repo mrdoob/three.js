@@ -51,8 +51,6 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 
 		this.setValues( parameters );
 
-		this.isMeshPhysicalMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -93,5 +91,7 @@ class MeshPhysicalMaterial extends MeshStandardMaterial {
 	}
 
 }
+
+MeshPhysicalMaterial.prototype.isMeshPhysicalMaterial = true;
 
 export { MeshPhysicalMaterial };

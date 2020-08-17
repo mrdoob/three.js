@@ -36,8 +36,6 @@ class PointsMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isPointsMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -60,5 +58,7 @@ class PointsMaterial extends Material {
 	}
 
 }
+
+PointsMaterial.prototype.isPointsMaterial = true;
 
 export { PointsMaterial };

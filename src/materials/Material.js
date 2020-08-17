@@ -74,7 +74,11 @@ class Material extends EventDispatcher {
 
 		this.version = 0;
 
-		this.isMaterial = true;
+	}
+
+	set needsUpdate( value ) {
+
+		if ( value === true ) this.version ++;
 
 	}
 
@@ -436,14 +440,6 @@ class Material extends EventDispatcher {
 
 }
 
-Object.defineProperty( Material.prototype, 'needsUpdate', {
-
-	set( value ) {
-
-		if ( value === true ) this.version ++;
-
-	}
-
-} );
+Material.prototype.isMaterial = true;
 
 export { Material };

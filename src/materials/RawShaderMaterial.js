@@ -8,10 +8,10 @@ class RawShaderMaterial extends ShaderMaterial {
 
 		this.type = 'RawShaderMaterial';
 
-		this.isRawShaderMaterial = true;
-
 	}
 
 }
+
+RawShaderMaterial.prototype.isRawShaderMaterial = true;
 
 export { RawShaderMaterial };

@@ -47,8 +47,6 @@ class MeshDepthMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isMeshDepthMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -76,5 +74,7 @@ class MeshDepthMaterial extends Material {
 	}
 
 }
+
+MeshDepthMaterial.prototype.isMeshDepthMaterial = true;
 
 export { MeshDepthMaterial };

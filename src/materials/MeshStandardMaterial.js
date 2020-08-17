@@ -114,8 +114,6 @@ class MeshStandardMaterial extends Material {
 
 		this.setValues( parameters );
 
-		this.isMeshStandardMaterial = true;
-
 	}
 
 	copy( source ) {
@@ -178,5 +176,7 @@ class MeshStandardMaterial extends Material {
 	}
 
 }
+
+MeshStandardMaterial.prototype.isMeshStandardMaterial = true;
 
 export { MeshStandardMaterial };
