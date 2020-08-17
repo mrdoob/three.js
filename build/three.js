@@ -18238,7 +18238,7 @@
 	// Unroll Loops
 
 	var deprecatedUnrollLoopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
-	var unrollLoopPattern = /#pragma unroll_loop_start[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}[\s]+?#pragma unroll_loop_end/g;
+	var unrollLoopPattern = /#pragma unroll_loop_start[\s]+?for\s*\(\s*int i \= (\d+)\; i < (\d+)\; i\s*\+\+\s*\)\s*{([\s\S]+?)(?=\})\}[\s]+?#pragma unroll_loop_end/g;
 
 	function unrollLoops( string ) {
 
