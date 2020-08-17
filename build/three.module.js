@@ -18744,7 +18744,7 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 	if ( parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
 
-		// overwrite GLSL version for built-in materials
+		// GLSL 3.0 conversion for built-in materials and ShaderMaterial
 
 		versionString = '#version 300 es\n';
 
@@ -26018,11 +26018,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.version === materialProperties.__version ) {
 
-			if ( materialProperties.program === undefined ) {
-
-				initMaterial( material, scene, object );
-
-			} else if ( material.fog && materialProperties.fog !== fog ) {
+			if ( material.fog && materialProperties.fog !== fog ) {
 
 				initMaterial( material, scene, object );
 
@@ -42719,6 +42715,7 @@ class Audio extends Object3D {
 
 		this._startedAt = 0;
 		this._progress = 0;
+		this._connected = false;
 
 		this.filters = [];
 
@@ -42886,6 +42883,8 @@ class Audio extends Object3D {
 
 		}
 
+		this._connected = true;
+
 		return this;
 
 	}
@@ -42910,6 +42909,8 @@ class Audio extends Object3D {
 
 		}
 
+		this._connected = false;
+
 		return this;
 
 	}
@@ -42924,7 +42925,7 @@ class Audio extends Object3D {
 
 		if ( ! value ) value = [];
 
-		if ( this.isPlaying === true ) {
+		if ( this._connected === true ) {
 
 			this.disconnect();
 			this.filters = value;

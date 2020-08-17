@@ -18687,7 +18687,7 @@
 
 		if ( parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
 
-			// overwrite GLSL version for built-in materials
+			// GLSL 3.0 conversion for built-in materials and ShaderMaterial
 
 			versionString = '#version 300 es\n';
 
@@ -25956,11 +25956,7 @@
 
 			if ( material.version === materialProperties.__version ) {
 
-				if ( materialProperties.program === undefined ) {
-
-					initMaterial( material, scene, object );
-
-				} else if ( material.fog && materialProperties.fog !== fog ) {
+				if ( material.fog && materialProperties.fog !== fog ) {
 
 					initMaterial( material, scene, object );
 
@@ -42603,6 +42599,7 @@
 
 			this._startedAt = 0;
 			this._progress = 0;
+			this._connected = false;
 
 			this.filters = [];
 
@@ -42773,6 +42770,8 @@
 
 			}
 
+			this._connected = true;
+
 			return this;
 
 		};
@@ -42797,6 +42796,8 @@
 
 			}
 
+			this._connected = false;
+
 			return this;
 
 		};
@@ -42811,7 +42812,7 @@
 
 			if ( ! value ) { value = []; }
 
-			if ( this.isPlaying === true ) {
+			if ( this._connected === true ) {
 
 				this.disconnect();
 				this.filters = value;
