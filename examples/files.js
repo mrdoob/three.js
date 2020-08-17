@@ -351,8 +351,7 @@ var files = {
 		"physics_ammo_instancing",
 		"physics_ammo_rope",
 		"physics_ammo_terrain",
-		"physics_ammo_volume",
-		"physics_cannon_instancing"
+		"physics_ammo_volume"
 	],
 	"misc": [
 		"misc_animation_authoring",
