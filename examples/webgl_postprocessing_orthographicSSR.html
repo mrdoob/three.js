@@ -151,8 +151,8 @@
 			addShadowedLight(0.5, 1, - 1, 0xffaa00, 1);
 			// renderer
 
-			renderer = new THREE.WebGLRenderer({ antialias: true });
-			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer = new THREE.WebGLRenderer({ antialias: false });
+			// renderer.setPixelRatio(window.devicePixelRatio);
 			renderer.setSize(window.innerWidth, window.innerHeight);
 			renderer.outputEncoding = THREE.sRGBEncoding;
 
