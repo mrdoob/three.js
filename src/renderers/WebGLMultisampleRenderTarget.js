@@ -8,8 +8,6 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 
 		this.samples = 4;
 
-		this.isWebGLMultisampleRenderTarget = true;
-
 	}
 
 	copy( source ) {
@@ -23,5 +21,7 @@ class WebGLMultisampleRenderTarget extends WebGLRenderTarget {
 	}
 
 }
+
+WebGLMultisampleRenderTarget.prototype.isWebGLMultisampleRenderTarget = true;
 
 export { WebGLMultisampleRenderTarget };

@@ -37,8 +37,6 @@ class WebGLRenderTarget extends EventDispatcher {
 		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
 		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
 
-		this.isWebGLRenderTarget = true;
-
 	}
 
 	setSize( width, height ) {
@@ -90,5 +88,7 @@ class WebGLRenderTarget extends EventDispatcher {
 	}
 
 }
+
+WebGLRenderTarget.prototype.isWebGLRenderTarget = true;
 
 export { WebGLRenderTarget };

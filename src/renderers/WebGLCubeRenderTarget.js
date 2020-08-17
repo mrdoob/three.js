@@ -21,8 +21,6 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		super( size, size, options );
 
-		this.isWebGLCubeRenderTarget = true;
-
 	}
 
 	fromEquirectangularTexture( renderer, texture ) {
@@ -112,5 +110,7 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 	}
 
 }
+
+WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 
 export { WebGLCubeRenderTarget };
