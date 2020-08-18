@@ -1678,6 +1678,15 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		}
 
+		function parsePreview( dataView, offset ) {
+
+			var width = parseUint32( dataView, offset );
+			var height = parseUint32( dataView, offset );
+
+			offset.value += 4 * width * height;
+
+		}
+
 		function parseInt32( dataView, offset ) {
 
 			var Int32 = dataView.getInt32( offset.value, true );
@@ -1984,6 +1993,10 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 			} else if ( type === 'timecode' ) {
 
 				return parseTimecode( dataView, offset );
+
+			} else if ( type === 'preview' ) {
+
+				return parsePreview( dataView, offset );
 
 			} else {
 
