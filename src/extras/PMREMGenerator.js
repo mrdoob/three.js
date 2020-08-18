@@ -229,8 +229,7 @@ class PMREMGenerator {
 			type: UnsignedByteType,
 			format: RGBEFormat,
 			encoding: _isLDR( texture ) ? texture.encoding : RGBEEncoding,
-			depthBuffer: false,
-			stencilBuffer: false
+			depthBuffer: false
 		};
 
 		const cubeUVRenderTarget = _createRenderTarget( params );
