@@ -331,7 +331,6 @@ var GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 			magFilter: magFilter,
 			format: RGBAFormat,
 			type: dataType,
-			stencilBuffer: false,
 			depthBuffer: false
 		} );
 

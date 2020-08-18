@@ -33,8 +33,7 @@ var BokehPass = function ( scene, camera, params ) {
 
 	this.renderTargetDepth = new WebGLRenderTarget( width, height, {
 		minFilter: NearestFilter,
-		magFilter: NearestFilter,
-		stencilBuffer: false
+		magFilter: NearestFilter
 	} );
 
 	this.renderTargetDepth.texture.name = "BokehPass.depth";
