@@ -315,6 +315,7 @@ var files = {
 	"webgl2": [
 		"webgl2_buffergeometry_attributes_integer",
 		"webgl2_materials_texture2darray",
+		"webgl2_texture2darray_rendertarget",
 		"webgl2_materials_texture3d",
 		"webgl2_multisampled_renderbuffers",
 		"webgl2_volume_instancing",
