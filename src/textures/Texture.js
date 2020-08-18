@@ -22,7 +22,7 @@ class Texture extends EventDispatcher {
 	constructor( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
 		super();
-		
+
 		Object.defineProperty( this, 'id', { value: textureId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
