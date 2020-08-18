@@ -102,9 +102,6 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	const mesh = new Mesh( geometry, material );
 
 	const currentMinFilter = texture.minFilter;
-	const currentRenderList = renderer.getRenderList();
-	const currentRenderTarget = renderer.getRenderTarget();
-	const currentRenderState = renderer.getRenderState();
 
 	// Avoid blurred poles
 	if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
@@ -113,10 +110,6 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 	camera.update( renderer, mesh );
 
 	texture.minFilter = currentMinFilter;
-
-	renderer.setRenderTarget( currentRenderTarget );
-	renderer.setRenderList( currentRenderList );
-	renderer.setRenderState( currentRenderState );
 
 	mesh.geometry.dispose();
 	mesh.material.dispose();
