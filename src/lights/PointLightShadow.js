@@ -10,6 +10,8 @@ class PointLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
+		this._frameExtents = new Vector2( 4, 2 );
+
 	}
 
 	updateMatrices( light, viewportIndex ) {
@@ -45,10 +47,7 @@ PointLightShadow.prototype._cubeDirections = [
 	new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
 	new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
 ];
-PointLightShadow.prototype._frameExtents = new Vector2( 4, 2 );
-
 PointLightShadow.prototype._viewportCount = 6;
-
 PointLightShadow.prototype._viewports = [
 	// These viewports map a cube-map onto a 2D texture with the
 	// following orientation:
@@ -76,7 +75,6 @@ PointLightShadow.prototype._viewports = [
 	// negative Y
 	new Vector4( 1, 0, 1, 1 )
 ];
-
 PointLightShadow.prototype._cubeUps = [
 	new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ),
 	new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ),	new Vector3( 0, 0, - 1 )
