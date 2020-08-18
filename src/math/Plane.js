@@ -9,6 +9,8 @@ class Plane {
 
 	constructor( normal, constant ) {
 
+		Object.defineProperty( this, 'isPlane', { value: true } );
+
 		// normal is assumed to be normalized
 
 		this.normal = ( normal !== undefined ) ? normal : new Vector3( 1, 0, 0 );
@@ -220,8 +222,6 @@ class Plane {
 	}
 
 }
-
-Plane.prototype.isPlane = true;
 
 
 export { Plane };

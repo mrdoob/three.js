@@ -5,6 +5,9 @@ class Scene extends Object3D {
 	constructor() {
 
 		super();
+
+		Object.defineProperty( this, 'isScene', { value: true } );
+
 		this.type = 'Scene';
 
 		this.background = null;
@@ -54,6 +57,5 @@ class Scene extends Object3D {
 
 }
 
-Scene.prototype.isScene = true;
 
 export { Scene };
