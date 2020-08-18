@@ -16,7 +16,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import Stats from './jsm/libs/stats.module.js';
-			
+
 			var container, stats;
 
 			var camera, scene, renderer;
@@ -98,13 +98,15 @@
 				gl.bindBuffer( gl.ARRAY_BUFFER, rgb );
 				gl.bufferData( gl.ARRAY_BUFFER, new Float32Array( colors ), gl.STATIC_DRAW );
 
-				var posAttr = new THREE.GLBufferAttribute( pos, gl.FLOAT, 3, 4, particles );
-				geometry.setAttribute( 'position', posAttr );
+				var posAttr1 = new THREE.GLBufferAttribute( pos, gl.FLOAT, 3, 4, particles );
+				var posAttr2 = new THREE.GLBufferAttribute( pos2, gl.FLOAT, 3, 4, particles );
+				geometry.setAttribute( 'position', posAttr1 );
 
 				setInterval( function () {
 
-					posAttr.buffer = ( posAttr.buffer === pos ) ? pos2 : pos;
-					posAttr.needsUpdate = true;
+					var attr = geometry.getAttribute( 'position' );
+
+					geometry.setAttribute( 'position', ( attr === posAttr1 ) ? posAttr2 : posAttr1 );
 
 				}, 2000 );
 
