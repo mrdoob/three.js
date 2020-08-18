@@ -22,8 +22,8 @@ class Texture extends EventDispatcher {
 	constructor( image, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding ) {
 
 		super();
-		// Object.defineProperty( this, 'id', { value: textureId ++ } );
-		this.id = textureId ++;
+		
+		Object.defineProperty( this, 'id', { value: textureId ++ } );
 
 		this.uuid = MathUtils.generateUUID();
 
@@ -67,9 +67,6 @@ class Texture extends EventDispatcher {
 
 		this.version = 0;
 		this.onUpdate = null;
-
-		this.DEFAULT_IMAGE = undefined;
-		this.DEFAULT_MAPPING = UVMapping;
 
 	}
 
@@ -321,5 +318,7 @@ class Texture extends EventDispatcher {
 }
 
 Texture.prototype.isTexture = true;
+Texture.prototype.DEFAULT_IMAGE = undefined;
+Texture.prototype.DEFAULT_MAPPING = UVMapping;
 
 export { Texture };
