@@ -1691,15 +1691,6 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
-		function parsePreview( dataView, offset ) {
-
-			var width = parseUint32( dataView, offset );
-			var height = parseUint32( dataView, offset );
-
-			offset.value += 4 * width * height;
-
-		}
-
 		function parseInt32( dataView, offset ) {
 
 			var Int32 = dataView.getInt32( offset.value, true );
@@ -2007,13 +1998,9 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				return parseTimecode( dataView, offset );
 
-			} else if ( type === 'preview' ) {
-
-				return parsePreview( dataView, offset );
-
 			} else {
 
-				throw 'Cannot parse value for unsupported type: ' + type;
+				return undefined;
 
 			}
 
@@ -2048,7 +2035,16 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 				var attributeSize = parseUint32( bufferDataView, offset );
 				var attributeValue = parseValue( bufferDataView, buffer, offset, attributeType, attributeSize );
 
-				EXRHeader[ attributeName ] = attributeValue;
+				if ( attributeValue === undefined ) {
+
+					console.warn( `EXRLoader.parse: skipped unknown header attribute type \'${attributeType}\'.` );
+					offset.value += attributeSize;
+
+				} else {
+
+					EXRHeader[ attributeName ] = attributeValue;
+
+				}
 
 			}
 
