@@ -480,6 +480,11 @@ var list = {
 				"روابط مفيدة": "manual/ar/introduction/Useful-links"
 			},
 
+			"الخطوات التالية": {
+				"كيفية تحديث الأشياء": "manual/ar/introduction/How-to-update-things",
+				"كيفية التخلص من الأشياء": "manual/ar/introduction/How-to-dispose-of-objects"
+			},
+
 		},
 
 	},
