@@ -1411,6 +1411,83 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		function uncompressPXR( info ) {
+
+			var compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
+
+			if ( typeof Inflate === 'undefined' ) {
+
+				console.error( 'THREE.EXRLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+
+			}
+
+			const inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
+			const rawBuffer = new Uint8Array( inflate.decompress().buffer );
+
+			const sz = info.lines * info.channels * info.width;
+			const tmpBuffer = ( info.type == 1 ) ? new Uint16Array( sz ) : new Uint32Array( sz );
+
+			let tmpBufferEnd = 0;
+			let writePtr = 0;
+			let ptr = new Array(4);
+
+			for ( let y = 0; y < info.lines; y++ ) {
+
+				for ( let c = 0; c < info.channels; c++ ) {
+
+					let pixel = 0;
+
+					switch ( info.type ) {
+
+						case 1:
+
+							ptr[0] = tmpBufferEnd;
+							ptr[1] = ptr[0] + info.width;
+							tmpBufferEnd = ptr[1] + info.width;
+
+							for ( let j = 0; j < info.width; ++j ) {
+
+								const diff = ( rawBuffer[ ptr[0]++ ] << 8 ) | rawBuffer[ ptr[1]++ ];
+
+								pixel += diff;
+
+								tmpBuffer[ writePtr ] = pixel;
+								writePtr ++;
+
+							}
+
+							break;
+
+						case 2:
+
+							ptr[0] = tmpBufferEnd;
+							ptr[1] = ptr[0] + info.width;
+							ptr[2] = ptr[1] + info.width;
+							tmpBufferEnd = ptr[2] + info.width;
+
+							for ( let j = 0; j < info.width; ++j ) {
+
+								const diff = ( rawBuffer[ ptr[0]++ ] << 24 ) | ( rawBuffer[ ptr[1]++ ] << 16 ) | ( rawBuffer[ ptr[2]++ ] << 8 );
+
+								pixel += diff;
+
+								tmpBuffer[ writePtr ] = pixel;
+								writePtr ++;
+
+							}
+
+							break;
+
+					}
+
+				}
+
+			}
+
+			return new DataView( tmpBuffer.buffer );
+
+		}
+
 		function uncompressDWA( info ) {
 
 			var inDataView = info.viewer;
@@ -2086,6 +2163,12 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				scanlineBlockSize = 32;
 				uncompress = uncompressPIZ;
+				break;
+
+			case 'PXR24_COMPRESSION':
+
+				scanlineBlockSize = 16;
+				uncompress = uncompressPXR;
 				break;
 
 			case 'DWAA_COMPRESSION':
