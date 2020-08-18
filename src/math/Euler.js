@@ -320,11 +320,11 @@ class Euler {
 
 }
 
-const _matrix = new Matrix4();
-const _quaternion = new Quaternion();
-
 Euler.DefaultOrder = 'XYZ';
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+
+const _matrix = new Matrix4();
+const _quaternion = new Quaternion();
 
 
 export { Euler };
