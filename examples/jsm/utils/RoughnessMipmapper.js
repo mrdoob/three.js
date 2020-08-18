@@ -56,7 +56,7 @@ RoughnessMipmapper.prototype = {
 
 			if ( _tempTarget != null ) _tempTarget.dispose();
 
-			_tempTarget = new WebGLRenderTarget( width, height, { depthBuffer: false, stencilBuffer: false } );
+			_tempTarget = new WebGLRenderTarget( width, height, { depthBuffer: false } );
 			_tempTarget.scissorTest = true;
 
 		}
@@ -65,8 +65,7 @@ RoughnessMipmapper.prototype = {
 
 			var newRoughnessTarget = new WebGLRenderTarget( width, height, {
 				minFilter: LinearMipMapLinearFilter,
-				depthBuffer: false,
-				stencilBuffer: false
+				depthBuffer: false
 			} );
 			newRoughnessTarget.texture.generateMipmaps = true;
 			// Setting the render target causes the memory to be allocated.
