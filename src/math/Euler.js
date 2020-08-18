@@ -7,6 +7,8 @@ class Euler {
 
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
+		Object.defineProperty( this, 'isEuler', { value: true } );
+
 		this._x = x;
 		this._y = y;
 		this._z = z;
@@ -318,12 +320,11 @@ class Euler {
 
 }
 
-Euler.DefaultOrder = 'XYZ';
-Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
-Euler.prototype.isEuler = true;
-
 const _matrix = new Matrix4();
 const _quaternion = new Quaternion();
+
+Euler.DefaultOrder = 'XYZ';
+Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
 
 export { Euler };

@@ -6,6 +6,8 @@ class Box2 {
 
 	constructor( min, max ) {
 
+		Object.defineProperty( this, 'isBox2', { value: true } );
+
 		this.min = ( min !== undefined ) ? min : new Vector2( + Infinity, + Infinity );
 		this.max = ( max !== undefined ) ? max : new Vector2( - Infinity, - Infinity );
 

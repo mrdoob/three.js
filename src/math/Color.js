@@ -55,6 +55,8 @@ class Color {
 
 	constructor( r, g, b ) {
 
+		Object.defineProperty( this, 'isColor', { value: true } );
+
 		if ( g === undefined && b === undefined ) {
 
 			// r is THREE.Color, hex or string
@@ -601,9 +603,9 @@ class Color {
 }
 
 Color.NAMES = _colorKeywords;
-Color.prototype.isColor = true;
 Color.prototype.r = 1;
 Color.prototype.g = 1;
 Color.prototype.b = 1;
+
 
 export { Color };
