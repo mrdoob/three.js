@@ -27,15 +27,16 @@
 		import { OrthographicSSRPass } from './jsm/postprocessing/OrthographicSSRPass.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js'
 
-		window.is_reflect = true
-
-		var container, stats;
 		var initialFrustumSize = 3;
-
-		var camera, cameraTarget, scene, renderer, composer, orthographicSSRPass;
 		var params = {
 			enableSSR: true,
 		}
+		var composer
+		var orthographicSSRPass
+
+		var container, stats;
+
+		var camera, cameraTarget, scene, renderer;
 		
 		init();
 		animate();
