@@ -864,6 +864,7 @@ function Strings( config ) {
 			'sidebar/material/vertexcolors': '顶点颜色',
 			'sidebar/material/vertextangents': '顶点切线',
 			'sidebar/material/skinning': '皮肤',
+			'sidebar/material/matcap': '材质捕获',
 			'sidebar/material/map': '贴图',
 			'sidebar/material/alphamap': '透明贴图',
 			'sidebar/material/bumpmap': '凹凸贴图',
