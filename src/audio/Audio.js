@@ -241,15 +241,27 @@ class Audio extends Object3D {
 
 		if ( ! value ) value = [];
 
+		this.filters.length = 0;
+
 		if ( this._connected === true ) {
 
 			this.disconnect();
-			this.filters = value;
+
+			for ( var i = 0; i < value.length; i ++ ) {
+
+				this.filters.push( value[ i ] );
+
+			}
+
 			this.connect();
 
 		} else {
 
-			this.filters = value;
+			for ( var i = 0; i < value.length; i ++ ) {
+
+				this.filters.push( value[ i ] );
+
+			}
 
 		}
 
