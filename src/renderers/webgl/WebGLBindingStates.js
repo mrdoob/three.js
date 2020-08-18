@@ -176,8 +176,6 @@
 			const cachedAttribute = cachedAttributes[ key ];
 			const geometryAttribute = geometryAttributes[ key ];
 
-			if ( geometryAttribute.isGLBufferAttribute ) return true;
-
 			if ( cachedAttribute === undefined ) return true;
 
 			if ( cachedAttribute.attribute !== geometryAttribute ) return true;
