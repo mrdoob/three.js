@@ -52,8 +52,8 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.minDistance = 0.005;
   this.maxDistance = 1;
   // this.stepStride = 1;
-  this.surfDist = .022;
-  this.isFade = false;
+  this.surfDist = 1;
+  this.isFade = true;
   this.fadeIntensity = 1.5;
 
   //

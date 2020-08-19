@@ -108,16 +108,17 @@ var OrthographicSSRShader = {
 				vec2 uv=xy/resolution;
 				vec3 p=getPos(uv);
 				vec3 ray=(length(xy-d0)/totalLen)*(reflectDir*maxDistance);
+				float op=opacity;
+				if(isFade){
+					op=opacity*(1.-length(ray)*fadeIntensity);
+					if(op<=.0) break;
+				}
 				vec3 rayPos=pos+ray;
 				float away=length(rayPos-p);
 				if(away<surfDist){
 					vec3 n=texture2D(tNormal,uv).xyz*2.-1.;
 					if(dot(reflectDir,n)>=0.) continue;
 					vec4 reflectColor=texture2D(tDiffuse,uv);
-					float op=opacity;
-					if(isFade){
-						op=opacity*(1.-length(ray)*fadeIntensity);
-					}
 					gl_FragColor=vec4(reflectColor.xyz,op);
 					break;
 				}
