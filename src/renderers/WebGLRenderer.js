@@ -1345,7 +1345,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( programChange ) {
 
-			parameters.uniforms = programCache.getUniforms( material, parameters );
+			parameters.uniforms = programCache.getUniforms( material );
 
 			material.onBeforeCompile( parameters, _this );
 
