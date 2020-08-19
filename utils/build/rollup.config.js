@@ -201,23 +201,22 @@ function glsl() {
 
 }
 
-function bubleCleanup() {
+function babelCleanup() {
 
 	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
-	const wrappedClass = /(var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n).*(return \2;\s+}\(\3\)\);\n)/s;
-	const unwrap = function ( match, wrapperStart, klass, parentClass, wrapperEnd ) {
+	const wrappedClass = /(var (\w+) = \/\*#__PURE__\*\/function \(_?(\w+)?\) {\n).*(return \2;\s+}\(\3(\w+)?\);)/gs;
+	const inheritsLoose = /_inheritsLoose\((\w+), (\w+)\);\n/
+
+	function unwrap ( match, wrapperStart, klass, parentClass, wrapperEnd ) {
 
 		return match
 			.replace( wrapperStart, '' )
-			.replace( `if ( ${parentClass} ) ${klass}.__proto__ = ${parentClass};`, '' )
-			.replace(
-				`${klass}.prototype = Object.create( ${parentClass} && ${parentClass}.prototype );`,
-				`${klass}.prototype = Object.create( ${parentClass}.prototype );`
-			)
+			.replace( inheritsLoose, '' )
 			.replace( wrapperEnd, '' )
+			.replace( `_${parentClass}`, parentClass )
 			.replace( danglingTabs, '' );
 
-	};
+	}
 
 	return {
 
@@ -270,7 +269,7 @@ export default [
 					]
 				]
 			} ),
-			bubleCleanup()
+			babelCleanup()
 		],
 		output: [
 			{
