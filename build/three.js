@@ -20365,7 +20365,7 @@
 
 				if ( shadow.map === null && ! shadow.isPointLightShadow && this.type === VSMShadowMap ) {
 
-					var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat, stencilBuffer: false };
+					var pars = { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBAFormat };
 
 					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars );
 					shadow.map.texture.name = light.name + ".shadowMap";
@@ -20378,7 +20378,7 @@
 
 				if ( shadow.map === null ) {
 
-					var pars$1 = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat, stencilBuffer: false };
+					var pars$1 = { minFilter: NearestFilter, magFilter: NearestFilter, format: RGBAFormat };
 
 					shadow.map = new WebGLRenderTarget( _shadowMapSize.x, _shadowMapSize.y, pars$1 );
 					shadow.map.texture.name = light.name + ".shadowMap";
@@ -25823,7 +25823,7 @@
 
 			if ( programChange ) {
 
-				parameters.uniforms = programCache.getUniforms( material, parameters );
+				parameters.uniforms = programCache.getUniforms( material );
 
 				material.onBeforeCompile( parameters, _this );
 
@@ -48010,8 +48010,7 @@
 			type: UnsignedByteType,
 			format: RGBEFormat,
 			encoding: _isLDR( texture ) ? texture.encoding : RGBEEncoding,
-			depthBuffer: false,
-			stencilBuffer: false
+			depthBuffer: false
 		};
 
 		var cubeUVRenderTarget = _createRenderTarget( params );
