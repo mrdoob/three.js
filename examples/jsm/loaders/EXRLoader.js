@@ -2078,13 +2078,11 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			} else if ( type === 'preview' ) {
 
 				offset.value += size;
-
-				return `[skipped]`;
+				return 'skipped';
 
 			} else {
 
 				offset.value += size;
-
 				return undefined;
 
 			}
