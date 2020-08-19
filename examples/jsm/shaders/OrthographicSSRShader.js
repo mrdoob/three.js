@@ -33,6 +33,8 @@ var OrthographicSSRShader = {
     "frustumSize": { value: 0 },
     // "stepStride": { value: null },
     "surfDist": { value: null },
+    "isFade": { value: null },
+    "fadeIntesity": { value: null },
 
   },
 
@@ -63,6 +65,8 @@ var OrthographicSSRShader = {
 		uniform float maxDistance;//uv unit
 		// uniform float stepStride;
 		uniform float surfDist;
+		uniform bool isFade;
+		uniform float fadeIntesity;
 		float depthToDistance(float depth){
 			return (1.-depth)*cameraRange+cameraNear;
 		}
@@ -103,13 +107,18 @@ var OrthographicSSRShader = {
 				if(xy.y<0.||xy.y>resolution.y) break;
 				vec2 uv=xy/resolution;
 				vec3 p=getPos(uv);
-				vec3 rayPos=pos+(length(xy-d0)/totalLen)*(reflectDir*maxDistance);
+				vec3 ray=(length(xy-d0)/totalLen)*(reflectDir*maxDistance);
+				vec3 rayPos=pos+ray;
 				float away=length(rayPos-p);
 				if(away<surfDist){
 					vec3 n=texture2D(tNormal,uv).xyz*2.-1.;
 					if(dot(reflectDir,n)>=0.) continue;
 					vec4 reflectColor=texture2D(tDiffuse,uv);
-					gl_FragColor=vec4(reflectColor.xyz,opacity);
+					float op=opacity;
+					if(isFade){
+						op=opacity*(1.-length(ray)*fadeIntesity);
+					}
+					gl_FragColor=vec4(reflectColor.xyz,op);
 					break;
 				}
 			}
@@ -211,27 +220,26 @@ var OrthographicSSRBlurShader = {
     "uniform sampler2D tDiffuse;",
 
     "uniform vec2 resolution;",
-    "uniform float opacity;",
 
     "varying vec2 vUv;",
 
     "void main() {",
 
     "	vec2 texelSize = ( 1.0 / resolution );",
-    "	vec3 result = vec3(0);",
+    "	vec4 result = vec4(0);",
 
     "	for ( int i = - 2; i <= 2; i ++ ) {",
 
     "		for ( int j = - 2; j <= 2; j ++ ) {",
 
     "			vec2 offset = ( vec2( float( i ), float( j ) ) ) * texelSize;",
-    "			result += texture2D( tDiffuse, vUv + offset ).xyz;",
+    "			result += texture2D( tDiffuse, vUv + offset );",
 
     "		}",
 
     "	}",
 
-    "	gl_FragColor = vec4(  result / ( 5.0 * 5.0 ) , opacity );",
+    "	gl_FragColor = vec4(  result / ( 5.0 * 5.0 ) );",
 
     "}"
 
