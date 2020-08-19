@@ -648,55 +648,82 @@ const material = new THREE.MeshBasicMaterial({
 
 Three.js also sorts morphtargets and applies only the highest influences.
 This lets it allow many more morphtargets as long as only a few are used at
-a time. We need to figure out how it sorted the morphtargets and then set
-our color attributes to match. We can do this by first removing all our
-color attributes and then checking the `morphTarget` attributes and and
-seeing which `BufferAttribute` was assigned. Using the name of the
-`BufferAttribute` we can tell which corresponding color attribute needed.
+a time. Unfortunately three.js does not provide any way to know how many
+morph targets will be used nor which attributes the morph targets will be
+assigned. So, we'll have to look into the code and reproduce what it does
+here. If that algorithm changes in three.js we'll need to refactor this
+code.
 
-First we'll go change the names of the morphtarget `BufferAttributes` so they
-are easier to parse later
-
-```js
-// use the first geometry as the base
-// and add all the geometries as morphtargets
-const baseGeometry = geometries[0];
-baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) => {
-  const attribute = geometry.getAttribute('position');
--  const name = `target${ndx}`;
-+  // put the number in front so we can more easily parse it later
-+  const name = `${ndx}target`;
-  attribute.name = name;
-  return attribute;
-});
-
-```
-
-Then we can setup the corresponding color attributes in
-`Object3D.onBeforeRender` which is a property of our `Mesh`. Three.js will call
-it just before rendering giving us a chance to fix things up.
+First removing all our color attributes. It doesn't matter if we added them
+before as it's safe to remove an attribute that was not previously added.
+Then we'll compute which targets we think three.js will use and finally
+assign those targets to the attribute we think three.js would assign them.
 
 ```js
+
 const mesh = new THREE.Mesh(baseGeometry, material);
 scene.add(mesh);
-+mesh.onBeforeRender = function(renderer, scene, camera, geometry) {
+
++function updateMorphTargets() {
 +  // remove all the color attributes
 +  for (const {name} of colorAttributes) {
-+    geometry.deleteAttribute(name);
++    baseGeometry.deleteAttribute(name);
 +  }
 +
-+  for (let i = 0; i < colorAttributes.length; ++i) {
-+    const attrib = geometry.getAttribute(`morphTarget${i}`);
-+    if (!attrib) {
-+      break;
-+    }
-+    // The name will be something like "2target" as we named it above
-+    // where 2 is the index of the data set
-+    const ndx = parseInt(attrib.name);
-+    const name = `morphColor${i}`;
-+    geometry.setAttribute(name, colorAttributes[ndx].attribute);
-+  }
-+};
++  // three.js provides no way to query this so we have to guess and hope it doesn't change.
++  const maxInfluences = 8;
++
++  // three provides no way to query which morph targets it will use
++  // nor which attributes it will assign them to so we'll guess.
++  // If the algorithm in three.js changes we'll need to refactor this.
++  mesh.morphTargetInfluences
++    .map((influence, i) => [i, influence])            // map indices to influence
++    .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))  // sort by highest influence first
++    .slice(0, maxInfluences)                          // keep only top influences
++    .sort((a, b) => a[0] - b[0])                      // sort by index
++    .filter(a => !!a[1])                              // remove no influence entries
++    .forEach(([ndx], i) => {                          // assign the attributes
++      const name = `morphColor${i}`;
++      baseGeometry.setAttribute(name, colorAttributes[ndx].attribute);
++    });
++}
+```
+
+We'll return this function from our `loadAll` function. This way we don't
+need to leak any variables.
+
+```js
+async function loadAll() {
+  ...
+
++  return updateMorphTargets;
+}
+
++// use a no-op update function until the data is ready
++let updateMorphTargets = () => {};
+-loadAll();
++loadAll().then(fn => {
++  updateMorphTargets = fn;
++});
+```
+
+And finally we need to call `updateMorphTargets` after we've let the values
+be updated by the tween manager and before rendering.
+
+```js
+function render() {
+
+  ...
+
+  if (tweenManager.update()) {
+    requestRenderIfNotRequested();
+  }
+
++  updateMorphTargets();
+
+  controls.update();
+  renderer.render(scene, camera);
+}
 ```
 
 And with that we should have the colors animating as well as the boxes.

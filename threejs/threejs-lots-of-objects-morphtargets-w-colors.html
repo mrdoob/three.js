@@ -367,24 +367,6 @@ function main() {
     };
     const mesh = new THREE.Mesh(baseGeometry, material);
     scene.add(mesh);
-    mesh.onBeforeRender = function(renderer, scene, camera, geometry) {
-      // remove all the color attributes
-      for (const {name} of colorAttributes) {
-        geometry.deleteAttribute(name);
-      }
-
-      for (let i = 0; i < colorAttributes.length; ++i) {
-        const attrib = geometry.getAttribute(`morphTarget${i}`);
-        if (!attrib) {
-          break;
-        }
-        // The name will be something like "2target" as we named it above
-        // where 2 is the index of the data set
-        const ndx = parseInt(attrib.name);
-        const name = `morphColor${i}`;
-        geometry.setAttribute(name, colorAttributes[ndx].attribute);
-      }
-    };
 
     // show the selected data, hide the rest
     function showFileInfo(fileInfos, fileInfo) {
@@ -417,8 +399,39 @@ function main() {
     });
     // show the first set of data
     showFileInfo(fileInfos, fileInfos[0]);
+
+    function updateMorphTargets() {
+      // remove all the color attributes
+      for (const {name} of colorAttributes) {
+        baseGeometry.deleteAttribute(name);
+      }
+
+      // three.js provides no way to query this so we have to guess and hope it doesn't change.
+      const maxInfluences = 8;
+
+      // three provides no way to query which morph targets it will use
+      // nor which attributes it will assign them to so we'll guess.
+      // If the algorithm in three.js changes we'll need to refactor this.
+      mesh.morphTargetInfluences
+        .map((influence, i) => [i, influence])            // map indices to influence
+        .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))  // sort by highest influence first
+        .slice(0, maxInfluences)                          // keep only top influences
+        .sort((a, b) => a[0] - b[0])                      // sort by index
+        .filter(a => !!a[1])                              // remove no influence entries
+        .forEach(([ndx], i) => {                          // assign the attributes
+          const name = `morphColor${i}`;
+          baseGeometry.setAttribute(name, colorAttributes[ndx].attribute);
+        });
+    }
+
+    return updateMorphTargets;
   }
-  loadAll();
+
+  // use a no-op update function until the data is ready
+  let updateMorphTargets = () => {};
+  loadAll().then(fn => {
+    updateMorphTargets = fn;
+  });
 
   function resizeRendererToDisplaySize(renderer) {
     const canvas = renderer.domElement;
@@ -445,6 +458,8 @@ function main() {
     if (tweenManager.update()) {
       requestRenderIfNotRequested();
     }
+
+    updateMorphTargets();
 
     controls.update();
     renderer.render(scene, camera);
