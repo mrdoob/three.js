@@ -482,7 +482,8 @@ var list = {
 			"الخطوات التالية": {
 				"كيفية تحديث الأشياء": "manual/ar/introduction/How-to-update-things",
 				"كيفية التخلص من الأشياء": "manual/ar/introduction/How-to-dispose-of-objects",
-				"كيفية إنشاء محتوى VR": "manual/ar/introduction/How-to-create-VR-content"
+				"كيفية إنشاء محتوى VR": "manual/ar/introduction/How-to-create-VR-content",
+				"كيفية استخدام المعالجة اللاحقة (post-processing)": "manual/ar/introduction/How-to-use-post-processing"
 			},
 
 		},
