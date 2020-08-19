@@ -17,6 +17,10 @@
   based on <a href="https://threejs.org/examples/?q=physic#webgl_shading_physical" target="_blank">this scene</a>
 </div>
 
+<!-- <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
+<script>
+  var vConsole = new VConsole();
+</script> -->
 <script type="module">
 
   import * as THREE from '../build/three.module.js';
@@ -285,7 +289,7 @@
 		gui.add(params, 'enableSSR').name( 'Enable SSR' );
 		gui.add(orthographicSSRPass, 'opacity').min(0).max(1);
 		gui.add(orthographicSSRPass, 'maxDistance').min(0).max(2);
-		gui.add(orthographicSSRPass, 'stepStride').min(1).max(10).step(1);
+		// gui.add(orthographicSSRPass, 'stepStride').min(1).max(10).step(1);
 		gui.add(orthographicSSRPass, 'surfDist').min(1).max(10).step(.1);
 
 	}

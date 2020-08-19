@@ -51,7 +51,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
 
   this.minDistance = 0.005;
   this.maxDistance = 1;
-  this.stepStride = 1;
+  // this.stepStride = 1;
   this.surfDist = .022;
 
   //
@@ -119,7 +119,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.orthographicSSRMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
   this.orthographicSSRMaterial.uniforms['cameraRange'].value = this.camera.far; - this.camera.near;
   this.orthographicSSRMaterial.uniforms['frustumSize'].value = this.frustumSize
-  this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(this.width * this.width + this.height * this.height)
+  // this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(this.width * this.width + this.height * this.height)
 
   // normal material
 
@@ -213,7 +213,7 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.orthographicSSRMaterial.uniforms['opacity'].value = this.opacity;
     this.orthographicSSRMaterial.uniforms['minDistance'].value = this.minDistance;
     this.orthographicSSRMaterial.uniforms['maxDistance'].value = this.maxDistance;
-    this.orthographicSSRMaterial.uniforms['stepStride'].value = this.stepStride;
+    // this.orthographicSSRMaterial.uniforms['stepStride'].value = this.stepStride;
     this.orthographicSSRMaterial.uniforms['surfDist'].value = this.surfDist / this.frustumSize;
     this.renderPass(renderer, this.orthographicSSRMaterial, this.orthographicSSRRenderTarget);
 
@@ -359,6 +359,30 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   },
 
   setSize: function(width, height) {
+		// console.log('setSize')
+
+    // OrthographicSSRShader.defines.MAX_STEP = Math.sqrt(width * width + height * height)///todo
+    // this.orthographicSSRMaterial = new ShaderMaterial({
+    //   defines: Object.assign({}, OrthographicSSRShader.defines),
+    //   uniforms: UniformsUtils.clone(OrthographicSSRShader.uniforms),
+    //   vertexShader: OrthographicSSRShader.vertexShader,
+    //   fragmentShader: OrthographicSSRShader.fragmentShader,
+    //   blending: NoBlending
+    // });
+
+		// this.orthographicSSRMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+		// this.orthographicSSRMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
+		// this.orthographicSSRMaterial.uniforms['tDepth'].value = this.depthRenderTarget.texture;
+		// this.orthographicSSRMaterial.uniforms['tNoise'].value = this.noiseTexture;
+		// this.orthographicSSRMaterial.uniforms['kernel'].value = this.kernel;
+		// this.orthographicSSRMaterial.uniforms['cameraNear'].value = this.camera.near;
+		// this.orthographicSSRMaterial.uniforms['cameraFar'].value = this.camera.far;
+		// this.orthographicSSRMaterial.uniforms['resolution'].value.set(this.width, this.height);
+		// this.orthographicSSRMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
+		// this.orthographicSSRMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
+		// this.orthographicSSRMaterial.uniforms['cameraRange'].value = this.camera.far; - this.camera.near;
+		// this.orthographicSSRMaterial.uniforms['frustumSize'].value = this.frustumSize
+		// // this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(this.width * this.width + this.height * this.height)
 
     this.width = width;
     this.height = height;
@@ -369,7 +393,7 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.blurRenderTarget.setSize(width, height);
 
     this.orthographicSSRMaterial.uniforms['resolution'].value.set(width, height);
-    this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(width * width + height * height)
+    // this.orthographicSSRMaterial.uniforms['MAX_STEP'].value = Math.sqrt(width * width + height * height)
     this.orthographicSSRMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
     this.orthographicSSRMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
 

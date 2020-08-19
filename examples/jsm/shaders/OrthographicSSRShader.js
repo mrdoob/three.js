@@ -11,7 +11,7 @@ var OrthographicSSRShader = {
 
   defines: {
     "PERSPECTIVE_CAMERA": 1,
-    "KERNEL_SIZE": 32
+    "MAX_STEP": Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight)
   },
 
   uniforms: {
@@ -31,8 +31,7 @@ var OrthographicSSRShader = {
     "maxDistance": { value: 1 },
     "cameraRange": { value: 0 },
     "frustumSize": { value: 0 },
-    "MAX_STEP": { value: 0 },
-    "stepStride": { value: null },
+    // "stepStride": { value: null },
     "surfDist": { value: null },
 
   },
@@ -60,10 +59,9 @@ var OrthographicSSRShader = {
 		uniform float cameraRange;
 		uniform float frustumSize;
 		uniform vec2 resolution;
-		uniform float MAX_STEP;
 		uniform float opacity;
 		uniform float maxDistance;//uv unit
-		uniform float stepStride;
+		// uniform float stepStride;
 		uniform float surfDist;
 		float depthToDistance(float depth){
 			return (1.-depth)*cameraRange+cameraNear;
@@ -98,7 +96,7 @@ var OrthographicSSRShader = {
 			float totalStep=max(abs(xLen),abs(yLen));
 			float xSpan=xLen/totalStep;
 			float ySpan=yLen/totalStep;
-			for(float i=0.;i<MAX_STEP;i+=stepStride){
+			for(float i=0.;i<MAX_STEP;i++){
 				if(i>=totalStep) break;
 				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
 				if(xy.x<0.||xy.x>resolution.x) break;
