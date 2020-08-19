@@ -20,6 +20,8 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 
 		super( size, size, options );
 
+		Object.defineProperty( this, 'isWebGLCubeRenderTarget', { value: true } );
+
 		this.texture.isWebGLCubeRenderTargetTexture = true; // HACK Why is texture not a CubeTexture?
 
 	}
@@ -82,32 +84,31 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 			`
 		};
 
+		const geometry = new BoxBufferGeometry( 5, 5, 5 );
 
-	const geometry = new BoxBufferGeometry( 5, 5, 5 );
+		const material = new ShaderMaterial( {
 
-	const material = new ShaderMaterial( {
+			name: 'CubemapFromEquirect',
 
-		name: 'CubemapFromEquirect',
+			uniforms: cloneUniforms( shader.uniforms ),
+			vertexShader: shader.vertexShader,
+			fragmentShader: shader.fragmentShader,
+			side: BackSide,
+			blending: NoBlending
 
-		uniforms: cloneUniforms( shader.uniforms ),
-		vertexShader: shader.vertexShader,
-		fragmentShader: shader.fragmentShader,
-		side: BackSide,
-		blending: NoBlending
+		} );
 
-	} );
+		material.uniforms.tEquirect.value = texture;
 
-	material.uniforms.tEquirect.value = texture;
+		const mesh = new Mesh( geometry, material );
 
-	const mesh = new Mesh( geometry, material );
+		const currentMinFilter = texture.minFilter;
+		const currentRenderList = renderer.getRenderList();
+		const currentRenderTarget = renderer.getRenderTarget();
+		const currentRenderState = renderer.getRenderState();
 
-	const currentMinFilter = texture.minFilter;
-	const currentRenderList = renderer.getRenderList();
-	const currentRenderTarget = renderer.getRenderTarget();
-	const currentRenderState = renderer.getRenderState();
-
-	// Avoid blurred poles
-	if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
+		// Avoid blurred poles
+		if ( texture.minFilter === LinearMipmapLinearFilter ) texture.minFilter = LinearFilter;
 
 		const camera = new CubeCamera( 1, 10, this );
 		camera.update( renderer, mesh );
@@ -123,7 +124,5 @@ class WebGLCubeRenderTarget extends WebGLRenderTarget {
 	}
 
 }
-
-WebGLCubeRenderTarget.prototype.isWebGLCubeRenderTarget = true;
 
 export { WebGLCubeRenderTarget };

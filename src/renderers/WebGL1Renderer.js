@@ -6,10 +6,10 @@ class WebGL1Renderer extends WebGLRenderer {
 
 		super( parameters );
 
+		Object.defineProperty( this, 'isWebGL1Renderer', { value: true } );
+
 	}
 
 }
-
-WebGL1Renderer.prototype.isWebGL1Renderer = true;
 
 export { WebGL1Renderer };
