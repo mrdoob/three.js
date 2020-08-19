@@ -7,7 +7,9 @@ class DirectionalLight extends Light {
 	constructor( color, intensity ) {
 
 		super( color, intensity );
+
 		this.type = 'DirectionalLight';
+		Object.defineProperty( this, 'isDirectionalLight', true );
 
 		this.position.copy( Object3D.DefaultUp );
 		this.updateMatrix();
@@ -31,7 +33,5 @@ class DirectionalLight extends Light {
 	}
 
 }
-
-DirectionalLight.prototype.isDirectionalLight = true;
 
 export { DirectionalLight };

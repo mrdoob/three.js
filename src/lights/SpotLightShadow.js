@@ -8,6 +8,8 @@ class SpotLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 50, 1, 0.5, 500 ) );
 
+		Object.defineProperty( this, 'isSpotLightShadow', true );
+
 	}
 
 	updateMatrices( light ) {
@@ -32,7 +34,5 @@ class SpotLightShadow extends LightShadow {
 	}
 
 }
-
-SpotLightShadow.prototype.isSpotLightShadow = true;
 
 export { SpotLightShadow };

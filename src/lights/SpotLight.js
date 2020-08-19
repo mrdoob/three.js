@@ -7,7 +7,9 @@ class SpotLight extends Light {
 	constructor( color, intensity, distance, angle, penumbra, decay ) {
 
 		super( color, intensity );
+
 		this.type = 'SpotLight';
+		Object.defineProperty( this, 'isSpotLight', true );
 
 		this.position.copy( Object3D.DefaultUp );
 		this.updateMatrix();
@@ -57,7 +59,5 @@ class SpotLight extends Light {
 	}
 
 }
-
-SpotLight.prototype.isSpotLight = true;
 
 export { SpotLight };

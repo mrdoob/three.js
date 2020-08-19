@@ -8,6 +8,7 @@ class LightShadow {
 
 	constructor( camera ) {
 
+		Object.defineProperty( this, 'isLightShadow', true );
 		this.camera = camera;
 
 		this.bias = 0;
@@ -132,7 +133,5 @@ class LightShadow {
 	}
 
 }
-
-LightShadow.prototype.isLightShadow = true;
 
 export { LightShadow };

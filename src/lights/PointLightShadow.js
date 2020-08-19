@@ -10,6 +10,8 @@ class PointLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
+		Object.defineProperty( this, 'isPointLightShadow', true );
+
 	}
 
 	updateMatrices( light, viewportIndex ) {
@@ -40,7 +42,6 @@ class PointLightShadow extends LightShadow {
 
 }
 
-PointLightShadow.prototype.isPointLightShadow = true;
 PointLightShadow.prototype._cubeDirections = [
 	new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
 	new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
