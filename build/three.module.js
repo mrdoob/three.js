@@ -6036,6 +6036,9 @@ const _z = new Vector3();
 
 class Euler {
 
+	static DefaultOrder = 'XYZ';
+	static RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
 		Object.defineProperty( this, 'isEuler', { value: true } );
@@ -6350,9 +6353,6 @@ class Euler {
 	_onChangeCallback() {}
 
 }
-
-Euler.DefaultOrder = 'XYZ';
-Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
 const _matrix = new Matrix4();
 const _quaternion$1 = new Quaternion();
@@ -7851,6 +7851,12 @@ function LinearToSRGB( c ) {
 
 class Color {
 
+	static NAMES = _colorKeywords;
+
+	r = 1;
+	g = 1;
+	b = 1;
+
 	constructor( r, g, b ) {
 
 		Object.defineProperty( this, 'isColor', { value: true } );
@@ -8399,11 +8405,6 @@ class Color {
 	}
 
 }
-
-Color.NAMES = _colorKeywords;
-Color.prototype.r = 1;
-Color.prototype.g = 1;
-Color.prototype.b = 1;
 
 class Face3 {
 
@@ -24077,10 +24078,16 @@ function WebGLMaterials( properties ) {
 		// uv repeat and offset setting priorities
 		// 1. color map
 		// 2. specular map
-		// 3. normal map
-		// 4. bump map
-		// 5. alpha map
-		// 6. emissive map
+		// 3. displacementMap map
+		// 4. normal map
+		// 5. bump map
+		// 6. roughnessMap map
+		// 7. metalnessMap map
+		// 8. alphaMap map
+		// 9. emissiveMap map
+		// 10. clearcoat map
+		// 11. clearcoat normal map
+		// 12. clearcoat roughnessMap map
 
 		let uvScaleMap;
 
@@ -24119,6 +24126,18 @@ function WebGLMaterials( properties ) {
 		} else if ( material.emissiveMap ) {
 
 			uvScaleMap = material.emissiveMap;
+
+		} else if ( material.clearcoatMap ) {
+
+			uvScaleMap = material.clearcoatMap;
+
+		} else if ( material.clearcoatNormalMap ) {
+
+			uvScaleMap = material.clearcoatNormalMap;
+
+		} else if ( material.clearcoatRoughnessMap ) {
+
+			uvScaleMap = material.clearcoatRoughnessMap;
 
 		}
 
