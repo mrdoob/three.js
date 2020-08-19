@@ -11,6 +11,8 @@ class CubeTexture extends Texture {
 
 		super( images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
 
+		Object.defineProperty( this, 'isCubeTexture', { value: true } );
+
 		this.flipY = false;
 
 	}
@@ -28,7 +30,5 @@ class CubeTexture extends Texture {
 	}
 
 }
-
-CubeTexture.prototype.isCubeTexture = true;
 
 export { CubeTexture };

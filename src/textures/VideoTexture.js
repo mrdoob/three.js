@@ -7,6 +7,8 @@ class VideoTexture extends Texture {
 
 		super( video, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy );
 
+		Object.defineProperty( this, 'isVideoTexture', { value: true } );
+
 		this.format = format !== undefined ? format : RGBFormat;
 
 		this.minFilter = minFilter !== undefined ? minFilter : LinearFilter;
@@ -45,7 +47,5 @@ class VideoTexture extends Texture {
 	}
 
 }
-
-VideoTexture.prototype.isVideoTexture = true;
 
 export { VideoTexture };

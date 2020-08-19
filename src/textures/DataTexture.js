@@ -6,6 +6,9 @@ class DataTexture extends Texture {
 	constructor( data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding ) {
 
 		super( null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding );
+
+		Object.defineProperty( this, 'isDataTexture', { value: true } );
+
 		this.image = { data: data || null, width: width || 1, height: height || 1 };
 
 		this.magFilter = magFilter !== undefined ? magFilter : NearestFilter;
@@ -20,7 +23,5 @@ class DataTexture extends Texture {
 	}
 
 }
-
-DataTexture.prototype.isDataTexture = true;
 
 export { DataTexture };

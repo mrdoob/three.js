@@ -24,6 +24,9 @@ class Texture extends EventDispatcher {
 		super();
 
 		Object.defineProperty( this, 'id', { value: textureId ++ } );
+		Object.defineProperty( this, 'isTexture', { value: true } );
+		Object.defineProperty( this, 'DEFAULT_IMAGE', { value: undefined } );
+		Object.defineProperty( this, 'DEFAULT_MAPPING', { value: UVMapping } );
 
 		this.uuid = MathUtils.generateUUID();
 
@@ -316,9 +319,5 @@ class Texture extends EventDispatcher {
 	}
 
 }
-
-Texture.prototype.isTexture = true;
-Texture.prototype.DEFAULT_IMAGE = undefined;
-Texture.prototype.DEFAULT_MAPPING = UVMapping;
 
 export { Texture };
