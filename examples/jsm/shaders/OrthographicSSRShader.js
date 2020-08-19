@@ -34,7 +34,7 @@ var OrthographicSSRShader = {
     // "stepStride": { value: null },
     "surfDist": { value: null },
     "isFade": { value: null },
-    "fadeIntesity": { value: null },
+    "fadeIntensity": { value: null },
 
   },
 
@@ -66,7 +66,7 @@ var OrthographicSSRShader = {
 		// uniform float stepStride;
 		uniform float surfDist;
 		uniform bool isFade;
-		uniform float fadeIntesity;
+		uniform float fadeIntensity;
 		float depthToDistance(float depth){
 			return (1.-depth)*cameraRange+cameraNear;
 		}
@@ -116,7 +116,7 @@ var OrthographicSSRShader = {
 					vec4 reflectColor=texture2D(tDiffuse,uv);
 					float op=opacity;
 					if(isFade){
-						op=opacity*(1.-length(ray)*fadeIntesity);
+						op=opacity*(1.-length(ray)*fadeIntensity);
 					}
 					gl_FragColor=vec4(reflectColor.xyz,op);
 					break;

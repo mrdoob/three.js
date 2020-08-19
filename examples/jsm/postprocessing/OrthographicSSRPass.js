@@ -54,7 +54,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   // this.stepStride = 1;
   this.surfDist = .022;
   this.isFade = false;
-  this.fadeIntesity = 1.5;
+  this.fadeIntensity = 1.5;
 
   //
 
@@ -218,7 +218,7 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     // this.orthographicSSRMaterial.uniforms['stepStride'].value = this.stepStride;
     this.orthographicSSRMaterial.uniforms['surfDist'].value = this.surfDist / this.frustumSize;
     this.orthographicSSRMaterial.uniforms['isFade'].value = this.isFade;
-    this.orthographicSSRMaterial.uniforms['fadeIntesity'].value = this.fadeIntesity;
+    this.orthographicSSRMaterial.uniforms['fadeIntensity'].value = this.fadeIntensity;
     this.renderPass(renderer, this.orthographicSSRMaterial, this.orthographicSSRRenderTarget);
 
     // render blur
