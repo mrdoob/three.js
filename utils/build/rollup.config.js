@@ -1,5 +1,11 @@
 import babel from '@rollup/plugin-babel';
 
+if (!String.prototype.replaceAll) {
+  String.prototype.replaceAll = function(find, replace) {
+    return this.split(find).join(replace);
+  };
+}
+
 function glconstants() {
 
 	var constants = {
@@ -203,17 +209,19 @@ function glsl() {
 
 function babelCleanup() {
 
-	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
-	const wrappedClass = /(var (\w+) = \/\*#__PURE__\*\/function \(_?(\w+)?\) {\n).*(return \2;\s+}\(\3(\w+)?\);)/gs;
+	const wrappedClass = /(var (\w+) = \/\*#__PURE__\*\/function \((\w+)?\) {\n).*(return \2;\s+}\((\w+)?\);)/gs;
 	const inheritsLoose = /_inheritsLoose\((\w+), (\w+)\);\n/
+	const suspiciousLeftOperandWarning = / \|\| _assertThisInitialized\((\w+)\)/g
+	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
 
-	function unwrap ( match, wrapperStart, klass, parentClass, wrapperEnd ) {
+	function unwrap ( match, wrapperStart, klass, _parentClass, wrapperEnd, parentClass ) {
 
 		return match
 			.replace( wrapperStart, '' )
 			.replace( inheritsLoose, '' )
 			.replace( wrapperEnd, '' )
-			.replace( `_${parentClass}`, parentClass )
+			.replaceAll( _parentClass, parentClass )
+			.replace( suspiciousLeftOperandWarning, '' )
 			.replace( danglingTabs, '' );
 
 	}
