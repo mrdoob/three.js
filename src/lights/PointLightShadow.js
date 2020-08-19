@@ -10,8 +10,44 @@ class PointLightShadow extends LightShadow {
 
 		super( new PerspectiveCamera( 90, 1, 0.5, 500 ) );
 
-		Object.defineProperty( this, 'isPointLightShadow', true );
+		Object.defineProperty( this, 'isPointLightShadow', { value: true } );
 
+		this._cubeDirections = [
+			new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
+			new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
+		];
+		this._viewportCount = 6;
+		this._viewports = [
+			// These viewports map a cube-map onto a 2D texture with the
+			// following orientation:
+			//
+			//  xzXZ
+			//   y Y
+			//
+			// X - Positive x direction
+			// x - Negative x direction
+			// Y - Positive y direction
+			// y - Negative y direction
+			// Z - Positive z direction
+			// z - Negative z direction
+
+			// positive X
+			new Vector4( 2, 1, 1, 1 ),
+			// negative X
+			new Vector4( 0, 1, 1, 1 ),
+			// positive Z
+			new Vector4( 3, 1, 1, 1 ),
+			// negative Z
+			new Vector4( 1, 1, 1, 1 ),
+			// positive Y
+			new Vector4( 3, 0, 1, 1 ),
+			// negative Y
+			new Vector4( 1, 0, 1, 1 )
+		];
+		this._cubeUps = [
+			new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ),
+			new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ),	new Vector3( 0, 0, - 1 )
+		];
 		this._frameExtents = new Vector2( 4, 2 );
 
 	}
@@ -43,42 +79,5 @@ class PointLightShadow extends LightShadow {
 	}
 
 }
-
-PointLightShadow.prototype._cubeDirections = [
-	new Vector3( 1, 0, 0 ), new Vector3( - 1, 0, 0 ), new Vector3( 0, 0, 1 ),
-	new Vector3( 0, 0, - 1 ), new Vector3( 0, 1, 0 ), new Vector3( 0, - 1, 0 )
-];
-PointLightShadow.prototype._viewportCount = 6;
-PointLightShadow.prototype._viewports = [
-	// These viewports map a cube-map onto a 2D texture with the
-	// following orientation:
-	//
-	//  xzXZ
-	//   y Y
-	//
-	// X - Positive x direction
-	// x - Negative x direction
-	// Y - Positive y direction
-	// y - Negative y direction
-	// Z - Positive z direction
-	// z - Negative z direction
-
-	// positive X
-	new Vector4( 2, 1, 1, 1 ),
-	// negative X
-	new Vector4( 0, 1, 1, 1 ),
-	// positive Z
-	new Vector4( 3, 1, 1, 1 ),
-	// negative Z
-	new Vector4( 1, 1, 1, 1 ),
-	// positive Y
-	new Vector4( 3, 0, 1, 1 ),
-	// negative Y
-	new Vector4( 1, 0, 1, 1 )
-];
-PointLightShadow.prototype._cubeUps = [
-	new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ), new Vector3( 0, 1, 0 ),
-	new Vector3( 0, 1, 0 ), new Vector3( 0, 0, 1 ),	new Vector3( 0, 0, - 1 )
-];
 
 export { PointLightShadow };

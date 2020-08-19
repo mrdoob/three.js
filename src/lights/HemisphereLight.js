@@ -9,7 +9,7 @@ class HemisphereLight extends Light {
 		super( skyColor, intensity );
 
 		this.type = 'HemisphereLight';
-		Object.defineProperty( this, 'isHemisphereLight', true );
+		Object.defineProperty( this, 'isHemisphereLight', { value: true } );
 
 		this.castShadow = undefined;
 

@@ -9,7 +9,7 @@ class SpotLight extends Light {
 		super( color, intensity );
 
 		this.type = 'SpotLight';
-		Object.defineProperty( this, 'isSpotLight', true );
+		Object.defineProperty( this, 'isSpotLight', { value: true } );
 
 		this.position.copy( Object3D.DefaultUp );
 		this.updateMatrix();

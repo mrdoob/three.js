@@ -8,7 +8,7 @@ class Light extends Object3D {
 		super();
 
 		this.type = 'Light';
-		Object.defineProperty( this, 'isLight', true );
+		Object.defineProperty( this, 'isLight', { value: true } );
 
 		this.color = new Color( color );
 		this.intensity = intensity !== undefined ? intensity : 1;

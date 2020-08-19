@@ -8,7 +8,7 @@ class LightProbe extends Light {
 		super( undefined, intensity );
 
 		this.type = 'LightProbe';
-		Object.defineProperty( this, 'isLightProbe', true );
+		Object.defineProperty( this, 'isLightProbe', { value: true } );
 
 		this.sh = ( sh !== undefined ) ? sh : new SphericalHarmonics3();
 

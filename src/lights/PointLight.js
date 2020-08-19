@@ -8,7 +8,7 @@ class PointLight extends Light {
 		super( color, intensity );
 
 		this.type = 'PointLight';
-		Object.defineProperty( this, 'isPointLight', true );
+		Object.defineProperty( this, 'isPointLight', { value: true } );
 
 		this.distance = ( distance !== undefined ) ? distance : 0;
 		this.decay = ( decay !== undefined ) ? decay : 1;	// for physically correct lights, should be 2.

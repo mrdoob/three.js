@@ -7,7 +7,8 @@ class AmbientLightProbe extends LightProbe {
 
 		super( undefined, intensity );
 
-		Object.defineProperty( this, 'isAmbientLightProbe', true );
+		Object.defineProperty( this, 'isAmbientLightProbe', { value: true } );
+
 		const color1 = new Color().set( color );
 
 		// without extra factor of PI in the shader, would be 2 / Math.sqrt( Math.PI );
