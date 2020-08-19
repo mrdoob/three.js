@@ -1416,11 +1416,11 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			let tmpBufferEnd = 0;
 			let writePtr = 0;
-			let ptr = new Array(4);
+			let ptr = new Array( 4 );
 
-			for ( let y = 0; y < info.lines; y++ ) {
+			for ( let y = 0; y < info.lines; y ++ ) {
 
-				for ( let c = 0; c < info.channels; c++ ) {
+				for ( let c = 0; c < info.channels; c ++ ) {
 
 					let pixel = 0;
 
@@ -1428,13 +1428,13 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 						case 1:
 
-							ptr[0] = tmpBufferEnd;
-							ptr[1] = ptr[0] + info.width;
-							tmpBufferEnd = ptr[1] + info.width;
+							ptr[ 0 ] = tmpBufferEnd;
+							ptr[ 1 ] = ptr[ 0 ] + info.width;
+							tmpBufferEnd = ptr[ 1 ] + info.width;
 
-							for ( let j = 0; j < info.width; ++j ) {
+							for ( let j = 0; j < info.width; ++ j ) {
 
-								const diff = ( rawBuffer[ ptr[0]++ ] << 8 ) | rawBuffer[ ptr[1]++ ];
+								const diff = ( rawBuffer[ ptr[ 0 ] ++ ] << 8 ) | rawBuffer[ ptr[ 1 ] ++ ];
 
 								pixel += diff;
 
@@ -1447,14 +1447,14 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 						case 2:
 
-							ptr[0] = tmpBufferEnd;
-							ptr[1] = ptr[0] + info.width;
-							ptr[2] = ptr[1] + info.width;
-							tmpBufferEnd = ptr[2] + info.width;
+							ptr[ 0 ] = tmpBufferEnd;
+							ptr[ 1 ] = ptr[ 0 ] + info.width;
+							ptr[ 2 ] = ptr[ 1 ] + info.width;
+							tmpBufferEnd = ptr[ 2 ] + info.width;
 
-							for ( let j = 0; j < info.width; ++j ) {
+							for ( let j = 0; j < info.width; ++ j ) {
 
-								const diff = ( rawBuffer[ ptr[0]++ ] << 24 ) | ( rawBuffer[ ptr[1]++ ] << 16 ) | ( rawBuffer[ ptr[2]++ ] << 8 );
+								const diff = ( rawBuffer[ ptr[ 0 ] ++ ] << 24 ) | ( rawBuffer[ ptr[ 1 ] ++ ] << 16 ) | ( rawBuffer[ ptr[ 2 ] ++ ] << 8 );
 
 								pixel += diff;
 
@@ -2062,8 +2062,14 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 				return parseTimecode( dataView, offset );
 
+			} else if ( type === 'preview' ) {
+
+				offset.value += size;
+				return 'skipped';
+
 			} else {
 
+				offset.value += size;
 				return undefined;
 
 			}
@@ -2101,8 +2107,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 				if ( attributeValue === undefined ) {
 
-					console.warn( `EXRLoader.parse: skipped unknown header attribute type \'${attributeType}\'.` );
-					offset.value += attributeSize;
+					console.warn( `EXRLoader.parse: skipped unknown header attribute type \'${ attributeType }\'.` );
 
 				} else {
 
