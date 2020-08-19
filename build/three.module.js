@@ -1,3 +1,7 @@
+/**
+* @license threejs.org/license 
+*/
+
 // Polyfills
 
 if ( Number.EPSILON === undefined ) {
