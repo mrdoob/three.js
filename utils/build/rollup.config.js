@@ -209,7 +209,7 @@ function glsl() {
 
 function babelCleanup() {
 
-	const wrappedClass = /(var (\w+) = \/\*#__PURE__\*\/function \((\w+)?\) {\n).*(return \2;\s+}\((\w+)?\);)/gs;
+	const wrappedClass = /(var\s*(\w+) = \/\*#__PURE__\*\/function \((\w+)?\) {\s*).*(return \2;\s*}\((\w+)?\);)/gs;
 	const inheritsLoose = /_inheritsLoose\((\w+), (\w+)\);\n/
 	const suspiciousLeftOperandWarning = / \|\| _assertThisInitialized\((\w+)\)/g
 	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
@@ -256,6 +256,8 @@ export default [
 			babel( {
 				babelHelpers: 'bundled',
 				babelrc: false,
+				retainLines: true,
+				compact: false,
 				presets: [
 					[
 						'@babel/preset-env',
