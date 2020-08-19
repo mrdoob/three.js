@@ -53,6 +53,12 @@ function LinearToSRGB( c ) {
 
 class Color {
 
+	static NAMES = _colorKeywords;
+
+	r = 1;
+	g = 1;
+	b = 1;
+
 	constructor( r, g, b ) {
 
 		Object.defineProperty( this, 'isColor', { value: true } );
@@ -601,11 +607,6 @@ class Color {
 	}
 
 }
-
-Color.NAMES = _colorKeywords;
-Color.prototype.r = 1;
-Color.prototype.g = 1;
-Color.prototype.b = 1;
 
 
 export { Color };

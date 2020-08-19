@@ -5,6 +5,9 @@ import { MathUtils } from './MathUtils.js';
 
 class Euler {
 
+	static DefaultOrder = 'XYZ';
+	static RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
+
 	constructor( x = 0, y = 0, z = 0, order = Euler.DefaultOrder ) {
 
 		Object.defineProperty( this, 'isEuler', { value: true } );
@@ -319,9 +322,6 @@ class Euler {
 	_onChangeCallback() {}
 
 }
-
-Euler.DefaultOrder = 'XYZ';
-Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
 const _matrix = new Matrix4();
 const _quaternion = new Quaternion();
