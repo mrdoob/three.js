@@ -284,7 +284,8 @@ export default [
 				format: 'umd',
 				name: 'THREE',
 				file: 'build/three.js',
-				indent: '\t'
+				indent: '\t',
+				banner: '/**\n* @license threejs.org/license \n*/'
 			}
 		]
 	},
@@ -298,7 +299,8 @@ export default [
 			{
 				format: 'esm',
 				file: 'build/three.module.js',
-				indent: '\t'
+				indent: '\t',
+				banner: '/**\n* @license threejs.org/license \n*/\n'
 			}
 		]
 	}
