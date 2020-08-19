@@ -11,7 +11,6 @@ var OrthographicSSRShader = {
 
   defines: {
     "PERSPECTIVE_CAMERA": 1,
-    "MAX_STEP": Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight)
   },
 
   uniforms: {
@@ -52,7 +51,8 @@ var OrthographicSSRShader = {
 
   ].join("\n"),
 
-  fragmentShader: `
+	fragmentShader: `
+		#define MAX_STEP TO_BE_REPLACE
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
