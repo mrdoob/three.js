@@ -646,18 +646,17 @@ const material = new THREE.MeshBasicMaterial({
 +};
 ```
 
-Three.js also sorts morphtargets and applies only the highest influences.
-This lets it allow many more morphtargets as long as only a few are used at
-a time. Unfortunately three.js does not provide any way to know how many
-morph targets will be used nor which attributes the morph targets will be
-assigned. So, we'll have to look into the code and reproduce what it does
-here. If that algorithm changes in three.js we'll need to refactor this
-code.
+Three.js also sorts morphtargets and applies only the highest influences. This
+lets it allow many more morphtargets as long as only a few are used at a time.
+Unfortunately three.js does not provide any way to know how many morph targets
+will be used nor which attributes the morph targets will be assigned to. So,
+we'll have to look into the code and reproduce what it does here. If that
+algorithm changes in three.js we'll need to refactor this code.
 
-First removing all our color attributes. It doesn't matter if we added them
-before as it's safe to remove an attribute that was not previously added.
-Then we'll compute which targets we think three.js will use and finally
-assign those targets to the attribute we think three.js would assign them.
+First we remove all the color attributes. It doesn't matter if we did not add
+them before as it's safe to remove an attribute that was not previously added.
+Then we'll compute which targets we think three.js will use and finally assign
+those targets to the attributes we think three.js would assign them to.
 
 ```js
 
