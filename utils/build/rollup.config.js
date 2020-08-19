@@ -1,4 +1,4 @@
-import buble from 'rollup-plugin-buble';
+import babel from '@rollup/plugin-babel';
 
 function glconstants() {
 
@@ -246,11 +246,29 @@ export default [
 		plugins: [
 			glconstants(),
 			glsl(),
-			buble( {
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+			babel( {
+				babelHelpers: 'bundled',
+				babelrc: false,
+				presets: [
+					[
+						'@babel/preset-env',
+						{
+							modules: false,
+							// the supported browsers of the build/three.js bundle
+							// https://browsersl.ist/?q=%3E0.3%25%2C+not+dead
+							targets: '>0.3%, not dead',
+							loose: true
+						},
+					],
+				],
+				plugins: [
+					[
+						'@babel/plugin-proposal-class-properties',
+						{
+							loose: true
+						}
+					]
+				]
 			} ),
 			bubleCleanup()
 		],
