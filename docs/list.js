@@ -482,7 +482,11 @@ var list = {
 
 			"الخطوات التالية": {
 				"كيفية تحديث الأشياء": "manual/ar/introduction/How-to-update-things",
-				"كيفية التخلص من الأشياء": "manual/ar/introduction/How-to-dispose-of-objects"
+				"كيفية التخلص من الأشياء": "manual/ar/introduction/How-to-dispose-of-objects",
+				"كيفية إنشاء محتوى VR": "manual/ar/introduction/How-to-create-VR-content",
+				"كيفية استخدام المعالجة اللاحقة (post-processing)": "manual/ar/introduction/How-to-use-post-processing",
+				"تحولات المصفوفة (Matrix transformations)": "manual/ar/introduction/Matrix-transformations",
+				"نظام الحركات": "manual/ar/introduction/Animation-system"
 			},
 
 		},
