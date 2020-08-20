@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>[name]</h1>
+
+		<p class="desc">
+			تقوم AnimationActions بجدولة أداء الرسوم المتحركة المخزنة في [page:AnimationClip AnimationClips].
+			<br /><br />
+
+			ملاحظة: يمكن ربط معظم أساليب AnimationAction.<br /><br />
+
+			للحصول على نظرة عامة حول العناصر المختلفة لنظام الرسوم المتحركة three.js ، راجع مقالة "نظام الحركات" في قسم "الخطوات التالية" من الدليل.
+		</p>
+
+
+		<h2>المنشئ (Constructor)</h2>
+
+
+		<h3>[name]( [param:AnimationMixer mixer], [param:AnimationClip clip], [param:Object3D localRoot] )</h3>
+		<p>
+			[page:AnimationMixer mixer] هو *AnimationMixer* الذي يتحكم فيه هذا الإجراء.<br />
+			[page:AnimationClip clip] هو *AnimationClip* الذي يحتفظ ببيانات الرسوم المتحركة لهذا الإجراء.<br />
+			[page:Object3D localRoot] هو الكائن الجذر الذي يتم تنفيذ هذا الإجراء عليه.<br /><br />
+
+			ملاحظة: بدلاً من استدعاء هذا المُنشئ مباشرةً ، يجب إنشاء AnimationAction برقم [page:AnimationMixer.clipAction] نظرًا لأن هذه الطريقة توفر التخزين المؤقت للحصول على أداء أفضل.
+		</p>
+
+
+		<h2>الخصائص (Properties)</h2>
+
+
+		<h3>[property:Boolean clampWhenFinished]</h3>
+		<p>
+			إذا تم ضبط *clampWhenFinished* على true ، فسيتم تلقائيًا إيقاف [page:.paused paused] للرسوم المتحركة مؤقتًا في إطارها الأخير.<br /><br />
+
+			إذا تم ضبط *clampWhenFinished* على false ، فسيتم تحويل [page:.enabled enabled] تلقائيًا إلى false عند انتهاء آخر حلقة من الإجراء ، بحيث لا يكون لهذا الإجراء أي تأثير آخر.<br /><br />
+
+			القيمة الافتراضية هو خطأ (false).<br /><br />
+
+			ملاحظة: *clampWhenFinished* ليس له أي تأثير إذا تم مقاطعة الإجراء (يكون له تأثير فقط إذا انتهت الحلقة الأخيرة بالفعل).
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			يؤدي تعيين *enabled* إلى *false* إلى تعطيل هذا الإجراء ، بحيث لا يكون له أي تأثير. الافتراضي هو *true*.<br /><br />
+
+			عند إعادة تمكين الإجراء ، يستمر الرسم المتحرك من وقته الحالي [page:.time time] (الإعداد *enabled* إلى *false* لا يعيد تعيين الإجراء).<br /><br />
+
+			ملاحظة: لا يؤدي إعداد *enabled* إلى *true* إلى إعادة تشغيل الرسوم المتحركة تلقائيًا. سيؤدي ضبط *enabled* إلى *true* إلى إعادة تشغيل الرسوم المتحركة فورًا فقط إذا تم استيفاء الشرط التالي:
+			[page:.paused paused] تحتوي قيمة *false* ، لم يتم إلغاء تنشيط هذا الإجراء في هذه الأثناء (بتنفيذ أمر [page:.stop stop] أو [page:.reset reset]) ، وليس [page:.weight weight] أو [page:.timeScale timeScale] يساوي 0.
+		</p>
+
+		<h3>[property:Number loop]</h3>
+		<p>
+			وضع التكرار (يمكن تغييره بـ [page:.setLoop setLoop]). الافتراضي هو [page:Animation THREE.LoopRepeat] (مع عدد لا نهائي من [page:.repetitions repetitions])<br /><br />
+
+			يجب أن يكون أحد هذه الثوابت:<br /><br />
+			[page:Animation THREE.LoopOnce] - تشغيل المقطع مرة واحدة ،<br />
+			[page:Animation THREE.LoopRepeat] - تشغيل المقطع مع العدد المختار من *التكرارات* ،
+			في كل مرة تقفز من نهاية المقطع مباشرة إلى بدايته ،<br />
+			[page:Animation THREE.LoopPingPong] - تشغيل المقطع مع العدد المختار من *التكرارات* ، بدلاً من التشغيل للأمام والخلف.
+		</p>
+
+		<h3>[property:Boolean paused]</h3>
+		<p>
+			يؤدي تعيين *paused* إلى *true* إلى إيقاف تنفيذ الإجراء مؤقتًا عن طريق تعيين مقياس الوقت الفعال على 0. الافتراضي هو *false*.<br /><br />
+		</p>
+
+		<h3>[property:Number repetitions]</h3>
+		<p>
+			عدد التكرارات التي تم إجراؤها [page:AnimationClip] على مدار هذا الإجراء. يمكن تعيينه عبر [page:.setLoop setLoop]. الافتراضي هو *Infinity*.<br /><br />
+			ضبط هذا الرقم ليس له أي تأثير ، إذا تم ضبط [page:.loop loop mode] على [page:Animation THREE.LoopOnce].
+		</p>
+
+		<h3>[property:Number time]</h3>
+		<p>
+			the local time of this action (in seconds, starting with 0).<br /><br />
+
+			يتم تثبيت القيمة أو لفها إلى 0 ... مدة المقطع (وفقًا لحالة الحلقة).
+			يمكن تغير قيمتها بالنسبة إلى وقت لخالط الحركات الرئيسي عن طريق تغيير [page:.timeScale timeScale] (باستخدام [page:.setEffectiveTimeScale setEffectiveTimeScale] أو [page:.setDuration setDuration]).<br />
+		</p>
+
+		<h3>[property:Number timeScale]</h3>
+		<p>
+			Sعامل التحجيم للوقت [page:.time time]. تؤدي القيمة 0 إلى توقف الرسوم المتحركة مؤقتًا. تؤدي القيم السالبة إلى تشغيل الرسوم المتحركة بشكل عكسي. الافتراضي هو 1.<br /><br />
+			الخصائص / الطرق المتعلقة *timeScale* (على التوالي *time*) هم:
+			[page:.getEffectiveTimeScale getEffectiveTimeScale],
+			[page:.halt halt],
+			[page:.paused paused],
+			[page:.setDuration setDuration],
+			[page:.setEffectiveTimeScale setEffectiveTimeScale],
+			[page:.stopWarping stopWarping],
+			[page:.syncWith syncWith],
+			[page:.warp warp].
+		</p>
+
+		<h3>[property:Number weight]</h3>
+		<p>
+			درجة تأثير هذا الإجراء (في المجال القائم بين [0 ، 1]). يمكن استخدام القيم بين 0 (بدون تأثير) و 1 (تأثير كامل) للمزج بين عدة إجراءات. الافتراضي هو 1. <br /><br />
+			الخصائص / الطرق المتعلقة *weight* هي:
+			[page:.crossFadeFrom crossFadeFrom],
+			[page:.crossFadeTo crossFadeTo],
+			[page:.enabled enabled],
+			[page:.fadeIn fadeIn],
+			[page:.fadeOut fadeOut],
+			[page:.getEffectiveWeight getEffectiveWeight],
+			[page:.setEffectiveWeight setEffectiveWeight],
+			[page:.stopFading stopFading].
+		</p>
+
+		<h3>[property:Boolean zeroSlopeAtEnd]</h3>
+		<p>
+			يتيح تشغيل السلس بدون مقاطع منفصلة للبداية والحلقة والنهاية. الافتراضي هو *true*.
+		</p>
+
+		<h3>[property:Boolean zeroSlopeAtStart]</h3>
+		<p>
+			يتيح تشغيل السلس بدون مقاطع منفصلة للبداية والحلقة والنهاية. الافتراضي هو *true*.
+		</p>
+
+
+		<h2>الوظائف (Methods)</h2>
+
+
+		<h3>[method:AnimationAction crossFadeFrom]( [param:AnimationAction fadeOutAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<p>
+			يؤدي هذا الإجراء إلى تلاشي [page:.fadeIn fade in] ، مما يؤدي إلى تلاشي إجراء آخر في نفس الوقت ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة.<br /><br />
+
+			إذا كانت warpBoolean تحمل قيمة true ، فسيتم تطبيق [page:.warp warping] إضافيًا (تغييرات تدريجية في المقاييس الزمنية).<br /><br />
+
+			ملاحظة: كما هو الحال مع *fadeIn*/*fadeOut* ، يبدأ / ينتهي التلاشي بوزن 1.
+
+		</p>
+
+		<h3>[method:AnimationAction crossFadeTo]( [param:AnimationAction fadeInAction], [param:Number durationInSeconds], [param:Boolean warpBoolean] )</h3>
+		<p>
+			يؤدي هذا الإجراء إلى تلاشي [page:.fadeOut fade out] ، يتلاشى في إجراء آخر في وقت واحد ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة ضمن سلسلة.<br /><br />
+			إذا كانت warpBoolean صحيحة ، فسيتم تطبيق [page:.warp warping] إضافيًا (تغييرات تدريجية في المقاييس الزمنية).<br /><br />
+
+			ملاحظة: كما هو الحال مع *fadeIn*/*fadeOut* ، يبدأ / ينتهي التلاشي بوزن 1.
+		</p>
+
+		<h3>[method:AnimationAction fadeIn]( [param:Number durationInSeconds] )</h3>
+		<p>
+			يزيد [page:.weight weight] هذا الإجراء تدريجياً من 0 إلى 1 ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة ضمن سلسلة.
+		</p>
+
+		<h3>[method:AnimationAction fadeOut]( [param:Number durationInSeconds] )</h3>
+		<p>
+			يقلل [page:.weight weight] هذا الإجراء تدريجيًا من 1 إلى 0 ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة ضمن سلسلة.
+		</p>
+
+		<h3>[method:Number getEffectiveTimeScale]()</h3>
+		<p>
+			تُرجع مقياس الوقت الفعال (مع الأخذ في الاعتبار حالات التواء و قيمة [page:.paused paused] الحالية).
+		</p>
+
+		<h3>[method:number getEffectiveWeight]()</h3>
+		<p>
+			تُرجع الوزن الفعال (مع الأخذ في الاعتبار حالات التلاشي الحالية و [page:.enabled enabled]).
+		</p>
+
+		<h3>[method:AnimationClip getClip]()</h3>
+		<p>
+			تُرجع المقطع الذي يحتوي على بيانات الرسوم المتحركة لهذا الإجراء.
+		</p>
+
+		<h3>[method:AnimationMixer getMixer]()</h3>
+		<p>
+			تُرجع الخالط المسؤول عن تشغيل هذا الإجراء.
+		</p>
+
+		<h3>[method:Object3D getRoot]()</h3>
+		<p>
+			تُرجع الكائن الجذر الذي تم تنفيذ هذا الإجراء عليه.
+		</p>
+
+		<h3>[method:AnimationAction halt]( [param:Number durationInSeconds] )</h3>
+		<p>
+			تعمل على إبطاء سرعة هذه الرسوم المتحركة إلى 0 من خلال إنقاص [page:.timeScale timeScale] تدريجيًا (بدءًا من قيمتها الحالية) ، خلال الفترة الزمنية المنقضية. يمكن تقييد هذه الطريقة ضمن سلسلة.
+		</p>
+
+		<h3>[method:Boolean isRunning]()</h3>
+		<p>
+			تُرجع true إذا كان الإجراء [page:.time time] قيد التشغيل حاليًا.<br /><br />
+
+			بالإضافة إلى تفعيله في الخالط (انظر [page:.isScheduled isScheduled]) ، يجب استيفاء الشروط التالية:
+			<br/>
+			[page:.paused paused] يساوي false ،<br/> [page:.enabled enabled] يساوي true ،
+			<br/>
+			[page:.timeScale timeScale] يختلف عن 0 ، ولا توجد جدولة لبدء متأخر ([page:.startAt startAt]).<br /><br />
+
+			ملاحظة: لا يعني كون *isRunning* تحمل قيمة *true* أنه يمكن رؤية الرسوم المتحركة بالفعل. هذا هو الحال فقط ، إذا تم تعيين [page:.weight weight] بشكل إضافي على قيمة غير صفرية.
+		</p>
+
+		<h3>[method:Boolean isScheduled]()</h3>
+		<p>
+			تُرجع قيمة *true* ، إذا تم تنشيط هذا الإجراء في الخالط.<br /><br />
+			ملاحظة: هذا لا يعني بالضرورة أن الرسوم المتحركة تعمل بالفعل (قارن الشروط الإضافية لـ [page:.isRunning isRunning]).
+		</p>
+
+		<h3>[method:AnimationAction play]()</h3>
+		<p>
+			يعلم الخالط بضرورة البدء في تنشيط الحدث (action). يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
+
+			ملاحظة: لا يعني تنشيط هذا الإجراء بالضرورة أن الرسوم المتحركة تبدأ على الفور: إذا كان الإجراء قد انتهى بالفعل من قبل (من خلال الوصول إلى نهاية الحلقة الأخيرة) ، أو إذا تم تعيين وقت لبدء متأخر (عبر [page:.startAt startAt]) ،
+			يجب تنفيذ [page:.reset reset] أولاً. يمكن لبعض الإعدادات الأخرى ([page:.paused paused]=true, [page:.enabled enabled]=false,
+			[page:.weight weight]=0, [page:.timeScale timeScale]=0) منع تشغيل الرسوم المتحركة أيضًا.
+		</p>
+
+		<h3>[method:AnimationAction reset]()</h3>
+		<p>
+			يتم إعادة الحدث إلى وضع البداية. يمكن تقييد هذه الطريقة ضمن سلسلة.<br /><br />
+
+			تقوم هذه الطريقة بتعيين [page:.paused paused] إلى false ، و [page:.enabled enabled] إلى true ، ومن [page:.time time] إلى 0 ، وتقطع أي تزييف مجدول ، وتزيل عدد الحلقات الداخلية وجدولة البدء المتأخر.<br /><br />
+
+			ملاحظة: يتم استدعاء. *reset* دائمًا بواسطة [page:.stop stop] ، ولكن *reset* لا يتصل بـ *stop* نفسه.
+			هذا يعني: إذا كنت تريد كلاهما ، reset وstop ، لا تتصل بـ *reset* بل إتصل بـ *stop* بدلا من ذلك.
+		</p>
+
+		<h3>[method:AnimationAction setDuration]( [param:Number durationInSeconds] )</h3>
+		<p>
+			يضبط المدة لحلقة واحدة من هذا الإجراء (بضبط [page:.timeScale timeScale] وإيقاف أي إلتفاف مجدول). يمكن تقييد هذه الطريقة ضمن سلسلة.
+		</p>
+
+		<h3>[method:AnimationAction setEffectiveTimeScale]( [param:Number timeScale] )</h3>
+		<p>
+			يضبط [page:.timeScale timeScale] ويوقف أي إلتفاف مجدول. يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
+
+			إذا كانت القيمة [page:.paused paused] تحمل false ، فسيتم أيضًا تعيين المقياس الزمني الفعال (خاصية داخلية) على هذه القيمة ؛
+			وإلا فسيتم تعيين النطاق الزمني الفعال (الذي يؤثر بشكل مباشر على الرسم المتحرك في هذه اللحظة) على 0.<br /><br />
+
+			ملاحظة: *paused* لن يتم تحويله إلى *true* تلقائيًا ، إذا تم ضبط *timeScale* على 0 بهذه الطريقة.
+		</p>
+
+		<h3>[method:AnimationAction setEffectiveWeight]( [param:Number weight] )</h3>
+		<p>
+			تضبط [page:.weight weight] وتوقف أي تضاؤل مجدول. يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
+
+			إذا كانت قيمة [page:.enabled enabled] هي true ، فسيتم أيضًا تعيين الوزن الفعال (خاصية داخلية) على هذه القيمة ؛
+			وإلا فسيتم تعيين الوزن الفعال (الذي يؤثر بشكل مباشر على الرسم المتحرك في هذه اللحظة) على 0.<br /><br />
+
+			ملاحظة: لن يتم تحويل *enabled* إلى false تلقائيًا ، إذا تم ضبط *weight* على 0 بهذه الطريقة.
+		</p>
+
+		<h3>[method:AnimationAction setLoop]( [param:Number loopMode], [param:Number repetitions] )</h3>
+		<p>
+			يعين [page:.loop loop mode] وعدد [page:.repetitions repetitions]. يمكن تقييد هذه الطريقة ضمن سلسلة
+		</p>
+
+		<h3>[method:AnimationAction startAt]( [param:Number startTimeInSeconds] )</h3>
+		<p>
+			يحدد وقت البداية المتأخرة (عادةً ما يتم تمريره كـ [page:AnimationMixer.time] + deltaTimeInSeconds). يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
+
+			ملاحظة: ستبدأ الرسوم المتحركة فقط في الوقت المحدد ، إذا تم ربط *startAt* بـ [page:.play play] ،
+			أو إذا تم بالفعل تنشيط الإجراء في الخالط (عن طريق استدعاء سابق لـ. *play* ، دون إيقافه أو إعادة تعيينه في هذه الأثناء).
+		</p>
+
+		<h3>[method:AnimationAction stop]()</h3>
+		<p>
+			يخبر الخالط بإلغاء تنشيط هذا الإجراء. يمكن تقييد هذه الطريقة ضمن سلسلة. <br /><br />
+
+			سيتم إيقاف الإجراء على الفور وإعادة تعيين [page:.reset reset] بالكامل.<br /><br />
+
+			ملاحظة: يمكنك إيقاف جميع الإجراءات النشطة على نفس الخالط دفعة واحدة عبر [page:AnimationMixer.stopAllAction mixer.stopAllAction].
+		</p>
+
+		<h3>[method:AnimationAction stopFading]()</h3>
+		<p>
+			يوقف أي [page:.fadeIn fading] مجدولًا يتم تطبيقه على هذا الحدث. يمكن تقييد هذه الطريقة ضمن سلسلة.
+		</p>
+
+		<h3>[method:AnimationAction stopWarping]()</h3>
+		<p>
+			يوقف أي [page:.warp warping] مجدولًا يتم تطبيقه على هذا الحدث. يمكن تقييد هذه الوظيفة ضمن سلسلة.
+		</p>
+
+		<h3>[method:AnimationAction syncWith]( [param:AnimationAction otherAction] )</h3>
+		<p>
+			يزامن هذا الإجراء مع الإجراء الآخر الذي تم تمريره. يمكن تقييد هذه الوظيفة ضمن سلسلة. <br /><br />
+
+			تتم المزامنة عن طريق تعيين قيم [page:.time time] و [page:.timeScale timeScale] لهذا الإجراء على القيم المقابلة للإجراء الآخر (إيقاف أي التواء مجدول).<br /><br />
+
+			ملاحظة: لن يتم الكشف عن التغييرات المستقبلية في *time* و *timeScale* للإجراء الآخر.
+		</p>
+
+		<h3>[method:AnimationAction warp]( [param:Number startTimeScale], [param:Number endTimeScale], [param:Number durationInSeconds] )</h3>
+		<p>
+			يغير سرعة التشغيل ، خلال الفترة الزمنية المنقضية ، عن طريق تعديل [page:.timeScale timeScale] تدريجيًا من *startTimeScale* إلى *endTimeScale*.يمكن تقييد هذه الوظيفة ضمن سلسلة.
+		</p>
+
+
+		<h2>الأحداث (Events)</h2>
+
+
+		<p class="desc">
+			هناك حدثان يشيران عند انتهاء حلقة واحدة من الإجراء على التوالي. يمكنك الرد عليهم من خلال:
+		</p>
+		<code>
+		mixer.addEventListener( 'loop', function( e ) { …} ); // properties of e: type, action and loopDelta
+		mixer.addEventListener( 'finished', function( e ) { …} ); // properties of e: type, action and direction
+		</code>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

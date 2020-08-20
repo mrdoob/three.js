@@ -495,6 +495,14 @@ var list = {
 
 		},
 
+		"المرجع": {
+
+			"الحركات": {
+				"AnimationAction": "api/ar/animation/AnimationAction",
+			}
+
+		}
+
 	},
 
 	"zh": {
