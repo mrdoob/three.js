@@ -12,7 +12,7 @@ TOC: #
 
 브라우저에서 스크린샷을 찍을 수 있는 방법은 2가지 정도가 있습니다. 예전부터 사용하던 [`canvas.toDataURL`](https://developer.mozilla.org/ko/docs/Web/API/HTMLCanvasElement/toDataURL)과, 새로 등장한 [`canvas.toBlob`](https://developer.mozilla.org/ko/docs/Web/API/HTMLCanvasElement/toBlob)이 있죠.
 
-그냥 메서만 호출하면 되는 거라니, 얼핏 쉬워 보입니다. 아래 정도의 코드면 손쉽게 스크린샷을 찍을 수 있을 것 같네요.
+그냥 메서드만 호출하면 되는 거라니, 얼핏 쉬워 보입니다. 아래 정도의 코드면 손쉽게 스크린샷을 찍을 수 있을 것 같네요.
 
 ```html
 <canvas id="c"></canvas>
