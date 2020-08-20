@@ -24,6 +24,7 @@
 			var points;
 
 			var particles = 300000;
+			var drawCount = 10000;
 
 			init();
 			animate();
@@ -155,7 +156,6 @@
 
 			}
 
-			var drawCount = 10000;
 			function render() {
 
 				drawCount = ( Math.max( 5000, drawCount ) + Math.floor( 500 * Math.random() ) ) % particles;
