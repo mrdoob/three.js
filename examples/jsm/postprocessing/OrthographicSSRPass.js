@@ -1,31 +1,23 @@
 import {
   AddEquation,
   Color,
-  CustomBlending,
   AdditiveBlending,
-  DataTexture,
-  DepthTexture,
   DstAlphaFactor,
   DstColorFactor,
-  FloatType,
   LinearFilter,
   MathUtils,
   MeshNormalMaterial,
   NearestFilter,
   NoBlending,
   RGBAFormat,
-  RepeatWrapping,
   ShaderMaterial,
   UniformsUtils,
-  UnsignedShortType,
   Vector3,
   WebGLRenderTarget,
   ZeroFactor,
   MeshDepthMaterial,
-  DoubleSide
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
-import { SimplexNoise } from "../math/SimplexNoise.js";
 import { OrthographicSSRShader } from "../shaders/OrthographicSSRShader.js";
 import { OrthographicSSRBlurShader } from "../shaders/OrthographicSSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
@@ -44,9 +36,6 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.scene = scene;
 
   this.opacity = .5;
-  this.kernelSize = 32;
-  this.kernel = [];
-  this.noiseTexture = null;
   this.output = 6;
 
   this.minDistance = 0.005;
@@ -57,9 +46,6 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.fadeIntensity = 1.5;
 
   //
-
-  this.generateSampleKernel();
-  this.generateRandomKernelRotations();
 
   this.beautyRenderTarget = new WebGLRenderTarget(this.width, this.height, {
     minFilter: LinearFilter,
@@ -113,8 +99,6 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.orthographicSSRMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
   this.orthographicSSRMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
   this.orthographicSSRMaterial.uniforms['tDepth'].value = this.depthRenderTarget.texture;
-  this.orthographicSSRMaterial.uniforms['tNoise'].value = this.noiseTexture;
-  this.orthographicSSRMaterial.uniforms['kernel'].value = this.kernel;
   this.orthographicSSRMaterial.uniforms['cameraNear'].value = this.camera.near;
   this.orthographicSSRMaterial.uniforms['cameraFar'].value = this.camera.far;
   this.orthographicSSRMaterial.uniforms['resolution'].value.set(this.width, this.height);
@@ -199,7 +183,6 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     // render beauty and depth
 
     renderer.setRenderTarget(this.beautyRenderTarget);
-    renderer.clear();
     renderer.render(this.scene, this.camera);
 
     // render normals
@@ -380,69 +363,6 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.orthographicSSRMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
 
     this.blurMaterial.uniforms['resolution'].value.set(width, height);
-
-  },
-
-  generateSampleKernel: function() {
-
-    var kernelSize = this.kernelSize;
-    var kernel = this.kernel;
-
-    for (var i = 0; i < kernelSize; i++) {
-
-      var sample = new Vector3();
-      sample.x = (Math.random() * 2) - 1;
-      sample.y = (Math.random() * 2) - 1;
-      sample.z = Math.random();
-
-      sample.normalize();
-
-      var scale = i / kernelSize;
-      scale = MathUtils.lerp(0.1, 1, scale * scale);
-      sample.multiplyScalar(scale);
-
-      kernel.push(sample);
-
-    }
-
-  },
-
-  generateRandomKernelRotations: function() {
-
-    var width = 4,
-      height = 4;
-
-    if (SimplexNoise === undefined) {
-
-      console.error('THREE.OrthographicSSRPass: The pass relies on SimplexNoise.');
-
-    }
-
-    var simplex = new SimplexNoise();
-
-    var size = width * height;
-    var data = new Float32Array(size * 4);
-
-    for (var i = 0; i < size; i++) {
-
-      var stride = i * 4;
-
-      var x = (Math.random() * 2) - 1;
-      var y = (Math.random() * 2) - 1;
-      var z = 0;
-
-      var noise = simplex.noise3d(x, y, z);
-
-      data[stride] = noise;
-      data[stride + 1] = noise;
-      data[stride + 2] = noise;
-      data[stride + 3] = 1;
-
-    }
-
-    this.noiseTexture = new DataTexture(data, width, height, RGBAFormat, FloatType);
-    this.noiseTexture.wrapS = RepeatWrapping;
-    this.noiseTexture.wrapT = RepeatWrapping;
 
   },
 

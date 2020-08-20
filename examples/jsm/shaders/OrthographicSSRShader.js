@@ -18,8 +18,6 @@ var OrthographicSSRShader = {
     "tDiffuse": { value: null },
     "tNormal": { value: null },
     "tDepth": { value: null },
-    "tNoise": { value: null },
-    "kernel": { value: null },
     "cameraNear": { value: null },
     "cameraFar": { value: null },
     "resolution": { value: new Vector2() },
