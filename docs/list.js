@@ -488,6 +488,10 @@ var list = {
 				"نظام الحركات": "manual/ar/introduction/Animation-system"
 			},
 
+			"أدوات البناء": {
+				"الاختبار مع NPM": "manual/ar/buildTools/Testing-with-NPM"
+			}
+
 		},
 
 	},
