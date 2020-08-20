@@ -113,7 +113,7 @@ class LightShadow {
 
 	clone() {
 
-		return new LightShadow().copy( this );
+		return new this.constructor().copy( this );
 
 	}
 
