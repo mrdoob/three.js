@@ -31,8 +31,7 @@ import { SSRBlurShader } from "../shaders/SSRShader.js";
 import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var SSRPass = function(scene, camera, width, height, cameraRadius, cameraNear, cameraFar) {
-  // console.log(cameraRadius, cameraNear, cameraFar)
+var SSRPass = function(scene, camera, width, height) {
 
   Pass.call(this);
 

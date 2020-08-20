@@ -53,21 +53,16 @@
 
 
 			{
-				s.cameraNear = 0.1
-				s.cameraFar = 10
-				s.cameraZ = 5
-				s.cameraRadius = 2
-				camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, s.cameraNear, s.cameraFar)
-				// camera = new THREE.OrthographicCamera(-s.cameraRadius, s.cameraRadius, s.cameraRadius, -s.cameraRadius, s.cameraNear, s.cameraFar)
-				s.camera = camera
-				window.camera = camera
-				s.camera.position.z = s.cameraZ
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
+				s.camera=camera
+				camera.position.z = 300;
 
 				scene = new THREE.Scene();
+
 				s.scene = scene
 				// scene.background = new THREE.Color(0xaaaaaa);
 				{//mesh
-					let geo = new THREE.BoxBufferGeometry(1, 1, 1)
+					let geo = new THREE.BoxBufferGeometry(100, 100, 100)
 					// let geo = new THREE.PlaneBufferGeometry(2, 2)
 					// let geo = new THREE.IcosahedronBufferGeometry(.5, 3)
 					let mtl = new THREE.MeshBasicMaterial({
@@ -91,7 +86,7 @@
 				//   mesh.position.x = 2
 				// }
 				{//ground
-					let geo = new THREE.PlaneBufferGeometry(5, 5)
+					let geo = new THREE.PlaneBufferGeometry(500, 500)
 					let mtl = new THREE.MeshBasicMaterial({
 						color: 'blue',
 						side: THREE.DoubleSide,
@@ -102,7 +97,7 @@
 					// mesh.rotation.x = -Math.PI / 2
 					// mesh.position.y = -.5
 					geo.rotateX(-Math.PI / 2)
-					geo.translate(0, -.5, 0)
+					geo.translate(0, -50, 0)
 				}
 			}
 
@@ -116,7 +111,7 @@
 
 			composer = new EffectComposer(renderer);
 
-			var ssrPass = new SSRPass(scene, camera, width, height, s.cameraRadius, s.cameraNear, s.cameraFar);
+			var ssrPass = new SSRPass(scene, camera, width, height);
 			ssrPass.kernelRadius = 16;
 			composer.addPass(ssrPass);
 
