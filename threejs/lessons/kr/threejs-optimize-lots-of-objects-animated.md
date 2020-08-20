@@ -565,47 +565,71 @@ const material = new THREE.MeshBasicMaterial({
 +};
 ```
 
-Three.js는 morphtargets을 정렬해 그 중 가장 높은 influence 값을 가진 morphtarget만 적용합니다. 이러면 많은 morphtarget 후보를 지정할 수 있죠. 이 정렬 방식을 이용해 적절한 색을 지정할 겁니다. 먼저 색을 지정하는 코드를 제거한 뒤, `morphTarget`을 확인해 어떤 `BufferAttribute`가 지정되었는지 알아냅니다. 그리고 이 `BufferAttribute`의 이름값으로 지정할 색을 가져오는 거죠.
+Three.js는 morphtargets을 정렬해 그 중 가장 높은 influence 값을 가진 morphtarget만 적용합니다. 이러면 많은 morphtarget 후보를 지정할 수 있죠. 하지만 Three.js는 어떤 morphtarget을 사용하고 어떤 속성에 morphtarget을 지정할 건지 알려주지 않습니다. Three.js가 하는 일을 따라해보는 수밖에 없는데, 이 방법으로는 Three.js의 알고리즘이 바뀔 때마다 코드를 수정해야 합니다.
 
-먼저 morphtarget의 `BufferAttributes` 속성 이름을 바꿔 나중에 숫자로 파싱하기 쉽도록 바꾸겠습니다.
-
-```js
-// 첫 번째 geometry를 기준으로 다른 geometry를 morphtargets로 지정합니다.
-const baseGeometry = geometries[0];
-baseGeometry.morphAttributes.position = geometries.map((geometry, ndx) => {
-  const attribute = geometry.getAttribute('position');
--  const name = `target${ ndx }`;
-+  // 숫자를 앞에 두어 나중에 숫자형으로 파싱하기 쉽게 합니다.
-+  const name = `${ ndx }target`;
-  attribute.name = name;
-  return attribute;
-});
-
-```
-
-다음으로 가져온 색 속성을 `Object3D.onBeforeRender` 안에서 지정합니다(이 경우 `Mesh`의 속성). Three.js가 렌더링 직전에 이 속성에 지정한 함수를 호출하므로 여기서 수정사항을 반영할 수 있습니다.
+먼저 색 속성을 전부 제거합니다. 속성을 따로 지정하지 않더라도 에러는 뜨지 않으니 그냥 반복문으로 전부 제거하면 됩니다. 그리고 Three.js가 어떤 morphtarget을 쓸 건지 계산한 뒤 Three.js가 사용할 속성에 morphtarget을 지정합니다.
 
 ```js
 const mesh = new THREE.Mesh(baseGeometry, material);
 scene.add(mesh);
-+mesh.onBeforeRender = function(renderer, scene, camera, geometry) {
-+  // 다른 색 속성을 제거합니다
+
++function updateMorphTargets() {
++  // 색 속성을 전부 제거합니다.
 +  for (const { name } of colorAttributes) {
-+    geometry.deleteAttribute(name);
++    baseGeometry.deleteAttribute(name);
 +  }
 +
-+  for (let i = 0; i < colorAttributes.length; ++i) {
-+    const attrib = geometry.getAttribute(`morphTarget${ i }`);
-+    if (!attrib) {
-+      break;
-+    }
-+    // name 속성은 "2target"과 같은 형태로, 여기서 2는 데이터 그룹의
-+    // 인덱스입니다.
-+    const ndx = parseInt(attrib.name);
-+    const name = `morphColor${ i }`;
-+    geometry.setAttribute(name, colorAttributes[ndx].attribute);
-+  }
-+};
++  // Three.js는 influence 값을 제공하지 않기에 추측하는 수밖에 없습니다. 물론 소스 코드가 바뀌면 이 값을 수정해야 하겠죠.
++  const maxInfluences = 8;
++
++  // Three.js는 어떤 morphtarget을 사용할 건지, 어떤 속성에 morphtarget을 지정할 건지 알려주지 않습니다.
++  // Three.js의 알고리즘이 바뀌면 이 코드를 수정해야 할 겁니다.
++  mesh.morphTargetInfluences
++    .map((influence, i) => [i, influence])            // 인덱스값과 influence 값을 매핑합니다.
++    .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))  // influence 값을 내림차순으로 정렬합니다.
++    .slice(0, maxInfluences)                          // 상위 값들만 남겨둡니다.
++    .sort((a, b) => a[0] - b[0])                      // 인덱스값을 기준으로 정렬합니다.
++    .filter(a => !!a[1])                              // influence 값이 없는 요소를 제거합니다.
++    .forEach(([ndx], i) => {                          // 속성에 지정합니다.
++      const name = `morphColor${ i }`;
++      baseGeometry.setAttribute(name, colorAttributes[ndx].attribute);
++    });
++}
+```
+
+방금 만든 함수를 `loadAll` 함수에서 반환할 겁니다. 이러면 불필요한 변수를 줄일 수 있죠.
+
+```js
+async function loadAll() {
+  ...
+
++  return updateMorphTargets;
+}
+
++// 데이터를 불러오기 전까지 빈 함수를 실행합니다.
++let updateMorphTargets = () => {};
+-loadAll();
++loadAll().then(fn => {
++  updateMorphTargets = fn;
++});
+```
+
+마지막으로 tweenManager로 값들을 업데이트한 뒤, 렌더링 메서드 호출 전에 `updateMorphTarget`을 호출해야 합니다.
+
+```js
+function render() {
+
+  ...
+
+  if (tweenManager.update()) {
+    requestRenderIfNotRequested();
+  }
+
++  updateMorphTargets();
+
+  controls.update();
+  renderer.render(scene, camera);
+}
 ```
 
 색과 육면체 그래프에 애니메이션을 모두 적용했습니다.
