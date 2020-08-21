@@ -80,8 +80,9 @@
 		// camera = new THREE.OrthographicCamera(initialFrustumSize * aspect / - 2, initialFrustumSize * aspect / 2, initialFrustumSize / 2, initialFrustumSize / - 2, cameraNear, cameraFar);
 		// camera.position.set(394.8768477903498,  424.03752576248496,  815.0242032138592)
 
-		camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 2, 10000 );
-		camera.position.set( 500, 400, 1200 );
+		camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 2, 10000 );
+		camera.position.set( 307.043866722481,  340.37194439741677,  673.1047168390921);
+		window.camera=camera
 
 		// SCENE
 
@@ -275,7 +276,7 @@
 		// GUI
 
 		gui = new GUI( { width: 400 } );
-		ssrPass.surfDist=10
+		ssrPass.surfDist=4.2
 		gui.add(ssrPass, 'output', {
 			'Default': SSRPass.OUTPUT.Default,
 			'DefaultBlur': SSRPass.OUTPUT.DefaultBlur,
