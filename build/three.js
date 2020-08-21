@@ -18686,7 +18686,7 @@
 		vertexShader = unrollLoops( vertexShader );
 		fragmentShader = unrollLoops( fragmentShader );
 
-		if ( parameters.isWebGL2 && ! parameters.isRawShaderMaterial ) {
+		if ( parameters.isWebGL2 && parameters.isRawShaderMaterial !== true ) {
 
 			// GLSL 3.0 conversion for built-in materials and ShaderMaterial
 
@@ -19026,8 +19026,8 @@
 				fragmentShader: fragmentShader,
 				defines: material.defines,
 
-				isRawShaderMaterial: material.isRawShaderMaterial,
-				isShaderMaterial: material.isShaderMaterial,
+				isRawShaderMaterial: material.isRawShaderMaterial === true,
+				glslVersion: material.glslVersion,
 
 				precision: precision,
 
@@ -19133,9 +19133,7 @@
 				rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
 				rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
 
-				customProgramCacheKey: material.customProgramCacheKey(),
-
-				glslVersion: material.glslVersion
+				customProgramCacheKey: material.customProgramCacheKey()
 
 			};
 
@@ -25800,8 +25798,6 @@
 				releaseMaterialProgramReference( material );
 
 			} else if ( materialProperties.lightsStateVersion !== lightsStateVersion ) {
-
-				materialProperties.lightsStateVersion = lightsStateVersion;
 
 				programChange = false;
 
@@ -50726,7 +50722,6 @@
 	exports.DepthTexture = DepthTexture;
 	exports.DirectionalLight = DirectionalLight;
 	exports.DirectionalLightHelper = DirectionalLightHelper;
-	exports.DirectionalLightShadow = DirectionalLightShadow;
 	exports.DiscreteInterpolant = DiscreteInterpolant;
 	exports.DodecahedronBufferGeometry = DodecahedronBufferGeometry;
 	exports.DodecahedronGeometry = DodecahedronGeometry;
@@ -50820,7 +50815,6 @@
 	exports.LessStencilFunc = LessStencilFunc;
 	exports.Light = Light;
 	exports.LightProbe = LightProbe;
-	exports.LightShadow = LightShadow;
 	exports.Line = Line;
 	exports.Line3 = Line3;
 	exports.LineBasicMaterial = LineBasicMaterial;
@@ -51023,7 +51017,6 @@
 	exports.SplineCurve3 = SplineCurve3;
 	exports.SpotLight = SpotLight;
 	exports.SpotLightHelper = SpotLightHelper;
-	exports.SpotLightShadow = SpotLightShadow;
 	exports.Sprite = Sprite;
 	exports.SpriteMaterial = SpriteMaterial;
 	exports.SrcAlphaFactor = SrcAlphaFactor;
