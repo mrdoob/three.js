@@ -1563,7 +1563,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 		function ReadBounds( stream, T /*p*/, n ) {
 
 			// not sure what to do here, the data isn't really useful.
-			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR );
+			return stream.Seek( sizeof( T ) * n, aiOrigin_CUR ); // eslint-disable-line no-undef
 
 		}
 
@@ -2265,7 +2265,7 @@ THREE.AssimpLoader.prototype = Object.assign( Object.create( THREE.Loader.protot
 				var compressedData = [];
 				stream.Read( compressedData, 1, compressedSize );
 				var uncompressedData = [];
-				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize );
+				uncompress( uncompressedData, uncompressedSize, compressedData, compressedSize ); // eslint-disable-line no-undef
 				var buff = new ArrayBuffer( uncompressedData );
 				ReadBinaryScene( buff, pScene );
 

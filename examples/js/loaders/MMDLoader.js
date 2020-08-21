@@ -300,7 +300,7 @@ THREE.MMDLoader = ( function () {
 
 				}
 
-				this.parser = new MMDParser.Parser();
+				this.parser = new MMDParser.Parser(); // eslint-disable-line no-undef
 
 			}
 
