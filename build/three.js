@@ -19167,7 +19167,7 @@
 
 			}
 
-			if ( parameters.isRawShaderMaterial === undefined ) {
+			if ( parameters.isRawShaderMaterial === false ) {
 
 				for ( var i = 0; i < parameterNames.length; i ++ ) {
 

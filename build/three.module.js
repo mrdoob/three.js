@@ -19224,7 +19224,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 
 		}
 
-		if ( parameters.isRawShaderMaterial === undefined ) {
+		if ( parameters.isRawShaderMaterial === false ) {
 
 			for ( let i = 0; i < parameterNames.length; i ++ ) {
 
