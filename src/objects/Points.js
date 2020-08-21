@@ -160,7 +160,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 
-	if ( !object.material.sizeAttenuation )
+	if ( ! object.material.sizeAttenuation )
 		new Ray( _ray.origin ).lookAt( point ).at( new Vector3().distanceTo( _ray.origin ), point );
 
 	const rayPointDistanceSq = _ray.distanceSqToPoint( point );
