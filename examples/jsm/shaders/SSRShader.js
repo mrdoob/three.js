@@ -31,9 +31,7 @@ var SSRShader = {
     "kernelRadius": { value: 8 },
     "minDistance": { value: 0.005 },
     "maxDistance": { value: 0.05 },
-    "cameraNear2": { value: 0 },
     "cameraRange": { value: 0 },
-    "UVWR": { value: 0 },
 
   },
 
@@ -54,16 +52,14 @@ var SSRShader = {
   ].join("\n"),
 
   fragmentShader: `
-		#define MAX_DIST 10.0
+		#define MAX_DIST 1000.0
 		#define MAX_STEP ${innerWidth * Math.sqrt(2)}
-		#define SURF_DIST .1
+		#define SURF_DIST 1.
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
 		uniform sampler2D tDiffuse;
 		uniform float cameraRange;
-		uniform float cameraNear2;
-		uniform float UVWR; //uv unit to world unit ratio
 		uniform vec2 resolution;
 		uniform float cameraNear;
 		uniform float cameraFar;
