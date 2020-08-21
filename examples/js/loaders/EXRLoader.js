@@ -938,7 +938,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 				for ( let comp = 0; comp < numComp; ++ comp ) {
 
-					let type = channelData[ cscSet.idx[ comp ] ].type;
+					const type = channelData[ cscSet.idx[ comp ] ].type;
 
 					for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
 
@@ -946,7 +946,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 						for ( let blockx = 0; blockx < numFullBlocksX; ++ blockx ) {
 
-							let src = blockx * 64 + ( ( y & 0x7 ) * 8 );
+							const src = blockx * 64 + ( ( y & 0x7 ) * 8 );
 
 							dataView.setUint16( offset + 0 * INT16_SIZE * type, rowBlock[ comp ][ src + 0 ], true );
 							dataView.setUint16( offset + 1 * INT16_SIZE * type, rowBlock[ comp ][ src + 1 ], true );
@@ -969,8 +969,8 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 						for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
 
-							let offset = rowOffsets[ comp ][ y ] + 8 * numFullBlocksX * INT16_SIZE * type;
-							let src = numFullBlocksX * 64 + ( ( y & 0x7 ) * 8 );
+							const offset = rowOffsets[ comp ][ y ] + 8 * numFullBlocksX * INT16_SIZE * type;
+							const src = numFullBlocksX * 64 + ( ( y & 0x7 ) * 8 );
 
 							for ( let x = 0; x < maxX; ++ x ) {
 
@@ -999,7 +999,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 				for ( var y = 0; y < height; ++ y ) {
 
-					let offset = rowOffsets[ comp ][ y ];
+					const offset = rowOffsets[ comp ][ y ];
 
 					for ( var x = 0; x < width; ++ x ) {
 
@@ -1416,7 +1416,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 			let tmpBufferEnd = 0;
 			let writePtr = 0;
-			let ptr = new Array( 4 );
+			const ptr = new Array( 4 );
 
 			for ( let y = 0; y < info.lines; y ++ ) {
 
@@ -2392,7 +2392,7 @@ THREE.EXRLoader.prototype = Object.assign( Object.create( THREE.DataTextureLoade
 
 		}
 
-		let format = ( this.type === THREE.UnsignedByteType ) ? THREE.RGBEFormat : ( numChannels === 4 ) ? THREE.RGBAFormat : THREE.RGBFormat;
+		const format = ( this.type === THREE.UnsignedByteType ) ? THREE.RGBEFormat : ( numChannels === 4 ) ? THREE.RGBAFormat : THREE.RGBFormat;
 
 		return {
 			header: EXRHeader,
