@@ -498,7 +498,8 @@ var list = {
 
 			"الحركات": {
 				"AnimationAction": "api/ar/animation/AnimationAction",
-				"AnimationClip": "api/ar/animation/AnimationClip"
+				"AnimationClip": "api/ar/animation/AnimationClip",
+				"AnimationMixer": "api/ar/animation/AnimationMixer"
 			}
 
 		}
