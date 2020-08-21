@@ -91,15 +91,6 @@ var SSRShader = {
 			clipPosition *= clipW; // unprojection.
 			return ( cameraInverseProjectionMatrix * clipPosition ).xyz;
 		}
-		vec2 getViewPositionReverse( const in vec3 viewPosition ) {
-			float clipW = cameraProjectionMatrix[2][3] * viewPosition.z + cameraProjectionMatrix[3][3];
-			vec4 clipPosition=cameraProjectionMatrix*vec4(viewPosition,1);
-			clipPosition/=clipW;
-			clipPosition.xyz/=2.;
-			clipPosition.xyz+=.5;
-			vec2 uv= clipPosition.xy;
-			return uv;
-		}
 		vec3 getViewNormal( const in vec2 screenPosition ) {
 			return unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );
 		}
@@ -111,44 +102,27 @@ var SSRShader = {
 			xy/=clipW;
 			xy+=1.;
 			xy/=2.;
-			// gl_FragColor=vec4(vUv,0,1); return;
-			// gl_FragColor=vec4(d1,0,1); return;
 			xy*=resolution;
 			return xy;
 		}
+		float pointToLineDistance(vec3 point, vec3 lineStart, vec3 lineEnd) {
+			//https://math.stackexchange.com/questions/1905533/find-perpendicular-distance-from-point-to-line-in-3d  //Marco13
+			vec3 d = (lineEnd - lineStart) / length(lineEnd-lineStart);
+			vec3 v = point - lineStart;
+			float t = dot(v,d);
+			vec3 p = lineStart + t * d;
+			return length(p-point);
+		}
 		void main(){
-
-			// vec3 pos=vec3(1,0,-2);
-			// vec4 projected=cameraProjectionMatrix*vec4(pos,1);
-			// float clipW = cameraProjectionMatrix[2][3] * pos.z + cameraProjectionMatrix[3][3];
-			// gl_FragColor=vec4(projected.xyz/clipW,1);return;
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
 			vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
-			// gl_FragColor=vec4(viewPosition.xy,-viewPosition.z,1);return;
-
-			// vec2 uv2=getViewPositionReverse(viewPosition);
-			// gl_FragColor=vec4(uv2,0,1);return;
-
-			// if(depth<=0.) return;
-			vec2 d0=vUv*resolution;
-			// vec2 d0=gl_FragCoord.xy;
-
-			// vec2 test=(transpose(cameraProjectionMatrix)*vec4(viewPosition,1)).xy;
-			// test+=1.;
-			// test/=2.;
-			// vec2 test=getViewPositionReverse(viewPosition,depth,viewZ);
-			// gl_FragColor=vec4(test,0,1);return;
-
-
+			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 
 			vec3 viewNormal=getViewNormal( vUv );;
-			// gl_FragColor=vec4(viewNormal,1); return;
-			// vec3 viewReflectDir=reflect(vec3(0,0,-1),viewNormal);
 			vec3 viewReflectDir=reflect(normalize(viewPosition),viewNormal);
-			// gl_FragColor=vec4(viewReflectDir,1); return;
 
 			vec3 d1viewPosition=viewPosition+viewReflectDir*MAX_DIST;
 			d1=viewPositionToXY(d1viewPosition);
@@ -172,8 +146,7 @@ var SSRShader = {
 				float d = getDepth(uv);
 				float vZ = getViewZ( d );
 				vec3 vP=getViewPosition( uv, d, vZ );
-				vec3 vRayPos=viewPosition+(length(vec2(x,y)-d0)/totalLen)*(viewReflectDir*MAX_DIST);///todo line cone intersection
-				float away=length(vRayPos-vP);
+				float away=pointToLineDistance(vP,viewPosition,viewPosition+viewReflectDir*MAX_DIST);
 				if(away<SURF_DIST){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;
