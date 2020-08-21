@@ -71,7 +71,15 @@ RoughnessMipmapper.prototype = {
 
 		if ( width !== roughnessMap.image.width || height !== roughnessMap.image.height ) {
 
-			var newRoughnessTarget = new WebGLRenderTarget( width, height, { wrapS: roughnessMap.wrapS, wrapT: roughnessMap.wrapT, magFilter: roughnessMap.magFilter, minFilter: roughnessMap.minFilter, depthBuffer: false } );
+			var params = {
+				wrapS: roughnessMap.wrapS,
+				wrapT: roughnessMap.wrapT,
+				magFilter: roughnessMap.magFilter,
+				minFilter: roughnessMap.minFilter,
+				depthBuffer: false
+			};
+
+			var newRoughnessTarget = new WebGLRenderTarget( width, height, params );
 
 			newRoughnessTarget.texture.generateMipmaps = true;
 
