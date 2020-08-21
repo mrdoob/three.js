@@ -202,6 +202,7 @@ var files = {
 		"webgl_points_dynamic",
 		"webgl_points_sprites",
 		"webgl_points_waves",
+		"webgl_raycaster",
 		"webgl_raycast_sprite",
 		"webgl_raycast_texture",
 		"webgl_read_float_buffer",
