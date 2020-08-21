@@ -2,6 +2,7 @@ import {
   AddEquation,
   Color,
   AdditiveBlending,
+	DepthTexture,
   DstAlphaFactor,
   DstColorFactor,
   LinearFilter,
@@ -12,6 +13,7 @@ import {
   RGBAFormat,
   ShaderMaterial,
   UniformsUtils,
+	UnsignedShortType,
   Vector3,
   WebGLRenderTarget,
   ZeroFactor,
@@ -20,6 +22,7 @@ import {
 import { Pass } from "../postprocessing/Pass.js";
 import { OrthographicSSRShader } from "../shaders/OrthographicSSRShader.js";
 import { OrthographicSSRBlurShader } from "../shaders/OrthographicSSRShader.js";
+import { OrthographicSSRDepthShader } from "../shaders/OrthographicSSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
 var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
@@ -45,25 +48,24 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.isFade = true;
   this.fadeIntensity = 1.5;
 
-  //
+	// beauty render target with depth buffer
+
+	var depthTexture = new DepthTexture();
+	depthTexture.type = UnsignedShortType;
+	depthTexture.minFilter = NearestFilter;
+	depthTexture.maxFilter = NearestFilter;
 
   this.beautyRenderTarget = new WebGLRenderTarget(this.width, this.height, {
     minFilter: LinearFilter,
     magFilter: LinearFilter,
     format: RGBAFormat,
+		depthTexture: depthTexture,
+		depthBuffer: true
   });
 
   // normal render target
 
   this.normalRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-    minFilter: NearestFilter,
-    magFilter: NearestFilter,
-    format: RGBAFormat
-  });
-
-  // depth render target
-
-  this.depthRenderTarget = new WebGLRenderTarget(this.width, this.height, {
     minFilter: NearestFilter,
     magFilter: NearestFilter,
     format: RGBAFormat
@@ -98,7 +100,7 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
 
   this.orthographicSSRMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
   this.orthographicSSRMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
-  this.orthographicSSRMaterial.uniforms['tDepth'].value = this.depthRenderTarget.texture;
+  this.orthographicSSRMaterial.uniforms['tDepth'].value = this.beautyRenderTarget.depthTexture;
   this.orthographicSSRMaterial.uniforms['cameraNear'].value = this.camera.near;
   this.orthographicSSRMaterial.uniforms['cameraFar'].value = this.camera.far;
   this.orthographicSSRMaterial.uniforms['resolution'].value.set(this.width, this.height);
@@ -112,11 +114,6 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   this.normalMaterial = new MeshNormalMaterial();
   this.normalMaterial.blending = NoBlending;
 
-  // depth material
-
-  this.depthMaterial = new MeshDepthMaterial();
-  this.depthMaterial.blending = NoBlending;
-
   // blur material
 
   this.blurMaterial = new ShaderMaterial({
@@ -127,6 +124,19 @@ var OrthographicSSRPass = function(scene, camera, width, height, frustumSize) {
   });
   this.blurMaterial.uniforms['tDiffuse'].value = this.orthographicSSRRenderTarget.texture;
   this.blurMaterial.uniforms['resolution'].value.set(this.width, this.height);
+
+	// material for rendering the depth
+
+	this.depthRenderMaterial = new ShaderMaterial( {
+		defines: Object.assign( {}, OrthographicSSRDepthShader.defines ),
+		uniforms: UniformsUtils.clone( OrthographicSSRDepthShader.uniforms ),
+		vertexShader: OrthographicSSRDepthShader.vertexShader,
+		fragmentShader: OrthographicSSRDepthShader.fragmentShader,
+		blending: NoBlending
+	} );
+	this.depthRenderMaterial.uniforms[ 'tDepth' ].value = this.beautyRenderTarget.depthTexture;
+	this.depthRenderMaterial.uniforms[ 'cameraNear' ].value = this.camera.near;
+	this.depthRenderMaterial.uniforms[ 'cameraFar' ].value = this.camera.far;
 
   // material for rendering the content of a render target
 
@@ -161,16 +171,15 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     this.beautyRenderTarget.dispose();
     this.normalRenderTarget.dispose();
-    this.depthRenderTarget.dispose();
     this.orthographicSSRRenderTarget.dispose();
     this.blurRenderTarget.dispose();
 
     // dispose materials
 
     this.normalMaterial.dispose();
-    this.depthMaterial.dispose();
     this.blurMaterial.dispose();
     this.copyMaterial.dispose();
+		this.depthRenderMaterial.dispose();
 
     // dipsose full screen quad
 
@@ -183,15 +192,12 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     // render beauty and depth
 
     renderer.setRenderTarget(this.beautyRenderTarget);
+		renderer.clear();
     renderer.render(this.scene, this.camera);
 
     // render normals
 
     this.renderOverride(renderer, this.normalMaterial, this.normalRenderTarget, 0, 0);
-
-    // render depths
-
-    this.renderOverride(renderer, this.depthMaterial, this.depthRenderTarget, 0, 0);
 
     // render OrthographicSSR
 
@@ -237,13 +243,11 @@ OrthographicSSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
         break;
 
-      case OrthographicSSRPass.OUTPUT.Depth:
+			case OrthographicSSRPass.OUTPUT.Depth:
 
-        this.copyMaterial.uniforms['tDiffuse'].value = this.depthRenderTarget.texture;
-        this.copyMaterial.blending = NoBlending;
-        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+				this.renderPass( renderer, this.depthRenderMaterial, this.renderToScreen ? null : writeBuffer );
 
-        break;
+				break;
 
       case OrthographicSSRPass.OUTPUT.Normal:
 

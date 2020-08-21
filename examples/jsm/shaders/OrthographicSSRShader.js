@@ -49,7 +49,7 @@ var OrthographicSSRShader = {
 
   ].join("\n"),
 
-	fragmentShader: `
+  fragmentShader: `
 		#define MAX_STEP TO_BE_REPLACE
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
@@ -66,7 +66,7 @@ var OrthographicSSRShader = {
 		uniform bool isFade;
 		uniform float fadeIntensity;
 		float depthToDistance(float depth){
-			return (1.-depth)*cameraRange+cameraNear;
+			return depth*cameraRange+cameraNear;
 		}
 		vec3 getPos(vec2 uv,float depth){
 			vec3 pos;
