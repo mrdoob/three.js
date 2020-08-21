@@ -61,6 +61,7 @@ export { HemisphereLightProbe } from './lights/HemisphereLightProbe.js';
 export { DirectionalLight } from './lights/DirectionalLight.js';
 export { AmbientLight } from './lights/AmbientLight.js';
 export { AmbientLightProbe } from './lights/AmbientLightProbe.js';
+export { LightShadow } from './lights/LightShadow.js';
 export { Light } from './lights/Light.js';
 export { LightProbe } from './lights/LightProbe.js';
 export { StereoCamera } from './cameras/StereoCamera.js';
