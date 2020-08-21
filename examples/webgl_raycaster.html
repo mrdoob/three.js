@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 	<head>
 		<title>three.js webgl - raycaster</title>
@@ -15,9 +15,10 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-			//import * as THREE from 'https://threejs.org/build/three.module.js';
 
-			var camera, scene, renderer, raycaster, mouse, intersects;//, effect;
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+			var camera, scene, renderer, raycaster, mouse, intersects;
 			const arrayintersectObjects = [];
 
 			init();
@@ -34,15 +35,18 @@
 
 				camera.position.z = 5;
 
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( scene.position.x * 2, scene.position.y * 2, scene.position.z * 2 );
+				controls.update();
+
 				const points = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
-//						new THREE.Vector3( 2, 0.5 , 0.5 ),
-						new THREE.Vector3( 0, 0 , 4.5 ),
+						new THREE.Vector3( 0.5, 0.2 , 4.5 ),
 						new THREE.Vector3( 2, -0.5 , -0.5 )
 					] ),
 					new THREE.PointsMaterial( {
 
 						color: 0xffffff,
-						size: 5,//0.05,
+						size: 5,
 						sizeAttenuation: false,
 						alphaTest: 0.5,
 
@@ -56,7 +60,7 @@
 					new THREE.PointsMaterial( {
 
 						color: 0xffffff,
-						size: 1,//0.05,
+						size: 1,
 						sizeAttenuation: true,
 						alphaTest: 0.5,
 
@@ -70,9 +74,6 @@
 				//Raycaster
 
 				const cursor = renderer.domElement.style.cursor;
-				function getIntersectionPosition( intersection )
-				{ return new THREE.Vector3().fromArray( points.geometry.attributes.position.array, intersection.index * points.geometry.attributes.position.itemSize ); }
-
 				if ( typeof points !== 'undefined' ) {
 
 					points.userData.raycaster = {
@@ -154,7 +155,6 @@
 
 			}
 
-//			var bIntersectedOut = false;
 			var intersectedObject;
 
 			window.addEventListener( 'mousemove', function( event ) {
@@ -164,9 +164,8 @@
 
 				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-	//			console.warn( 'mouse.x = ' + mouse.x + ' mouse.y = ' + mouse.y );
 
-				//Raycaster https://threejs.org/docs/index.html#api/en/core/Raycaster
+				//Raycaster
 
 				// update the picking ray with the camera and mouse position
 				raycaster.setFromCamera( mouse, camera );
@@ -178,7 +177,6 @@
 
 				arrayintersectObjects.forEach( function ( object ) {
 
-//					var bIntersected = false;
 					if ( intersectedObject && ( intersects.length === 0 ) ) {
 
 						intersectedObject.userData.raycaster.onIntersectionOut();
@@ -200,14 +198,6 @@
 							}
 
 						}
-/*
-					if ( bIntersectedOut && ( intersects.length === 0 ) ) {
-
-						object.userData.raycaster.onIntersectionOut();
-						bIntersectedOut = false;
-
-					}
-*/
 
 				} );
 
