@@ -47,10 +47,11 @@ var SSRPass = function(scene, camera, width, height) {
   this.kernelSize = 32;
   this.kernel = [];
   this.noiseTexture = null;
-  this.output = 1;
+  this.output = 0;
 
   this.minDistance = 0.005;
   this.maxDistance = 0.1;
+  this.surfDist = 1.
 
   //
 
@@ -115,6 +116,7 @@ var SSRPass = function(scene, camera, width, height) {
   this.ssrMaterial.uniforms['kernel'].value = this.kernel;
   this.ssrMaterial.uniforms['cameraNear'].value = this.camera.near;
   this.ssrMaterial.uniforms['cameraFar'].value = this.camera.far;
+  this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
   this.ssrMaterial.uniforms['resolution'].value.set(this.width, this.height);
   this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
   this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
@@ -215,6 +217,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.ssrMaterial.uniforms['kernelRadius'].value = this.kernelRadius;
     this.ssrMaterial.uniforms['minDistance'].value = this.minDistance;
     this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
+		this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
     this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
 
     // render blur

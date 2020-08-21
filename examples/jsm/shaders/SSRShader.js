@@ -13,7 +13,6 @@ var SSRShader = {
 
   defines: {
     "PERSPECTIVE_CAMERA": 1,
-    "KERNEL_SIZE": 32
   },
 
   uniforms: {
@@ -32,6 +31,7 @@ var SSRShader = {
     "minDistance": { value: 0.005 },
     "maxDistance": { value: 0.05 },
     "cameraRange": { value: 0 },
+    "surfDist": { value: 0 },
 
   },
 
@@ -54,7 +54,6 @@ var SSRShader = {
   fragmentShader: `
 		#define MAX_DIST 1000.0
 		#define MAX_STEP ${innerWidth * Math.sqrt(2)}
-		#define SURF_DIST 1.
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
@@ -63,6 +62,7 @@ var SSRShader = {
 		uniform vec2 resolution;
 		uniform float cameraNear;
 		uniform float cameraFar;
+		uniform float surfDist;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
 		#include <packing>
@@ -147,7 +147,7 @@ var SSRShader = {
 				float vZ = getViewZ( d );
 				vec3 vP=getViewPosition( uv, d, vZ );
 				float away=pointToLineDistance(vP,viewPosition,viewPosition+viewReflectDir*MAX_DIST);
-				if(away<SURF_DIST){
+				if(away<surfDist){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;
 					vec4 reflectColor=texture2D(tDiffuse,uv);
