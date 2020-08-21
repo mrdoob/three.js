@@ -163,8 +163,8 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			fragmentShader: fragmentShader,
 			defines: material.defines,
 
-			isRawShaderMaterial: material.isRawShaderMaterial,
-			isShaderMaterial: material.isShaderMaterial,
+			isRawShaderMaterial: material.isRawShaderMaterial === true,
+			glslVersion: material.glslVersion,
 
 			precision: precision,
 
@@ -270,9 +270,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			rendererExtensionDrawBuffers: isWebGL2 || extensions.get( 'WEBGL_draw_buffers' ) !== null,
 			rendererExtensionShaderTextureLod: isWebGL2 || extensions.get( 'EXT_shader_texture_lod' ) !== null,
 
-			customProgramCacheKey: material.customProgramCacheKey(),
-
-			glslVersion: material.glslVersion
+			customProgramCacheKey: material.customProgramCacheKey()
 
 		};
 
