@@ -308,7 +308,6 @@ export default [
 			{
 				format: 'esm',
 				file: 'build/three.module.js',
-				indent: '\t',
 				banner: '/**\n* @license threejs.org/license \n*/\n'
 			}
 		]
