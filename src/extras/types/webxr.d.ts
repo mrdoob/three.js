@@ -1,18 +1,18 @@
-export declare type XRSessionMode = "inline" | "immersive-vr" | "immersive-ar";
+export declare type XRSessionMode = 'inline' | 'immersive-vr' | 'immersive-ar';
 
-export declare type XRReferenceSpaceType = "viewer" | "local" | "local-floor" | "bounded-floor" | "unbounded";
+export declare type XRReferenceSpaceType = 'viewer' | 'local' | 'local-floor' | 'bounded-floor' | 'unbounded';
 
-export declare type XREnvironmentBlendMode = "opaque" | "additive" | "alpha-blend";
+export declare type XREnvironmentBlendMode = 'opaque' | 'additive' | 'alpha-blend';
 
-export declare type XRVisibilityState = "visible" | "visible-blurred" | "hidden";
+export declare type XRVisibilityState = 'visible' | 'visible-blurred' | 'hidden';
 
-export declare type XRHandedness = "none" | "left" | "right";
+export declare type XRHandedness = 'none' | 'left' | 'right';
 
-export declare type XRTargetRayMode = "gaze" | "tracked-pointer" | "screen";
+export declare type XRTargetRayMode = 'gaze' | 'tracked-pointer' | 'screen';
 
-export declare type XREye = "none" | "left" | "right";
+export declare type XREye = 'none' | 'left' | 'right';
 
-export declare type XREventType = "end" | "select" | "selectstart" | "selectend" | "squeeze" | "squeezestart" | "squeezeend" | "inputsourceschange";
+export declare type XREventType = 'end' | 'select' | 'selectstart' | 'selectend' | 'squeeze' | 'squeezestart' | 'squeezeend' | 'inputsourceschange';
 
 export interface XRSpace extends EventTarget {}
 
@@ -208,7 +208,7 @@ export declare class XRRay {
 }
 
 export declare enum XRHitTestTrackableType {
-	"point", "plane", "mesh",
+	'point', 'plane', 'mesh',
 }
 
 export interface XRHitResult {
@@ -252,7 +252,7 @@ export interface XRAnchor {
 }
 
 export interface XRPlane {
-	orientation: "Horizontal" | "Vertical";
+	orientation: 'Horizontal' | 'Vertical';
 	planeSpace: XRSpace;
 	polygon: Array<DOMPointReadOnly>;
 	lastChangedTime: number;

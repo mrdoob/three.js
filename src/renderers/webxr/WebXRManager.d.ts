@@ -1,7 +1,7 @@
 import { Group } from '../../objects/Group';
 import { Camera } from '../../cameras/Camera';
 import { EventDispatcher } from "../../core/EventDispatcher";
-import { XRFrameRequestCallback, XRReferenceSpace, XRReferenceSpaceType, XRSession } from "../../extras/types/webxr";
+import { XRFrameRequestCallback, XRReferenceSpace, XRReferenceSpaceType, XRSession } from '../../extras/types/webxr';
 
 export class WebXRManager extends EventDispatcher {
 

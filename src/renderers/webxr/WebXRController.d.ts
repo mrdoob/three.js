@@ -1,5 +1,5 @@
 import { Group } from '../../objects/Group';
-import { XREventType, XRFrame, XRInputSource, XRReferenceSpace } from "../../extras/types/webxr";
+import { XREventType, XRFrame, XRInputSource, XRReferenceSpace } from '../../extras/types/webxr';
 
 export type XRControllerEventType = XREventType | 'disconnected' | 'connected'
 
