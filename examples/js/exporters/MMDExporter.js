@@ -13,7 +13,7 @@ THREE.MMDExporter = function () {
 
 		if ( u2sTable === undefined ) {
 
-			var encoder = new MMDParser.CharsetEncoder();
+			var encoder = new MMDParser.CharsetEncoder(); // eslint-disable-line no-undef
 			var table = encoder.s2uTable;
 			u2sTable = {};
 
