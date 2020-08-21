@@ -106,7 +106,7 @@ var SSRShader = {
 			return xy;
 		}
 		float pointToLineDistance(vec3 point, vec3 lineStart, vec3 lineEnd) {
-			//https://math.stackexchange.com/questions/1905533/find-perpendicular-distance-from-point-to-line-in-3d  //Marco13
+			//modified from https://math.stackexchange.com/questions/1905533/find-perpendicular-distance-from-point-to-line-in-3d  answer: Marco13
 			vec3 d = (lineEnd - lineStart) / length(lineEnd-lineStart);
 			vec3 v = point - lineStart;
 			float t = dot(v,d);
