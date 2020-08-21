@@ -13,5 +13,4 @@ class ArcCurve extends EllipseCurve {
 
 }
 
-
 export { ArcCurve };
