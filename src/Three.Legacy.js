@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Audio } from './audio/Audio.js';
 import { AudioAnalyser } from './audio/AudioAnalyser.js';
 import { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
@@ -59,6 +55,7 @@ import { TextureLoader } from './loaders/TextureLoader.js';
 import { Material } from './materials/Material.js';
 import { LineBasicMaterial } from './materials/LineBasicMaterial.js';
 import { MeshPhongMaterial } from './materials/MeshPhongMaterial.js';
+import { MeshPhysicalMaterial } from './materials/MeshPhysicalMaterial.js';
 import { PointsMaterial } from './materials/PointsMaterial.js';
 import { ShaderMaterial } from './materials/ShaderMaterial.js';
 import { Box2 } from './math/Box2.js';
@@ -91,6 +88,7 @@ import { WebGLShadowMap } from './renderers/webgl/WebGLShadowMap.js';
 import { ImageUtils } from './extras/ImageUtils.js';
 import { Shape } from './extras/core/Shape.js';
 import { CubeCamera } from './cameras/CubeCamera.js';
+import { Scene } from './scenes/Scene.js';
 
 export { BoxGeometry as CubeGeometry };
 export { MathUtils as Math };
@@ -102,11 +100,11 @@ export function Face4( a, b, c, d, normal, color, materialIndex ) {
 
 }
 
-export var LineStrip = 0;
-export var LinePieces = 1;
-export var NoColors = 0;
-export var FaceColors = 1;
-export var VertexColors = 2;
+export const LineStrip = 0;
+export const LinePieces = 1;
+export const NoColors = 0;
+export const FaceColors = 1;
+export const VertexColors = 2;
 
 export function MeshFaceMaterial( materials ) {
 
@@ -277,7 +275,7 @@ Object.assign( CurvePath.prototype, {
 
 		// generate geometry from path points (for Line or Points objects)
 
-		var pts = this.getPoints( divisions );
+		const pts = this.getPoints( divisions );
 		return this.createGeometry( pts );
 
 	},
@@ -288,7 +286,7 @@ Object.assign( CurvePath.prototype, {
 
 		// generate geometry from equidistant sampling along the path
 
-		var pts = this.getSpacedPoints( divisions );
+		const pts = this.getSpacedPoints( divisions );
 		return this.createGeometry( pts );
 
 	},
@@ -297,11 +295,11 @@ Object.assign( CurvePath.prototype, {
 
 		console.warn( 'THREE.CurvePath: .createGeometry() has been removed. Use new THREE.Geometry().setFromPoints( points ) instead.' );
 
-		var geometry = new Geometry();
+		const geometry = new Geometry();
 
-		for ( var i = 0, l = points.length; i < l; i ++ ) {
+		for ( let i = 0, l = points.length; i < l; i ++ ) {
 
-			var point = points[ i ];
+			const point = points[ i ];
 			geometry.vertices.push( new Vector3( point.x, point.y, point.z || 0 ) );
 
 		}
@@ -1470,6 +1468,18 @@ Object.assign( ExtrudeBufferGeometry.prototype, {
 
 //
 
+Object.assign( Scene.prototype, {
+
+	dispose: function () {
+
+		console.error( 'THREE.Scene: .dispose() has been removed.' );
+
+	}
+
+} );
+
+//
+
 Object.defineProperties( Uniform.prototype, {
 
 	dynamic: {
@@ -1572,6 +1582,25 @@ Object.defineProperties( MeshPhongMaterial.prototype, {
 		set: function () {
 
 			console.warn( 'THREE.MeshPhongMaterial: .metal has been removed. Use THREE.MeshStandardMaterial instead' );
+
+		}
+	}
+
+} );
+
+Object.defineProperties( MeshPhysicalMaterial.prototype, {
+
+	transparency: {
+		get: function () {
+
+			console.warn( 'THREE.MeshPhysicalMaterial: .transparency has been renamed to .transmission.' );
+			return this.transmission;
+
+		},
+		set: function ( value ) {
+
+			console.warn( 'THREE.MeshPhysicalMaterial: .transparency has been renamed to .transmission.' );
+			this.transmission = value;
 
 		}
 	}
@@ -1829,7 +1858,20 @@ Object.defineProperties( WebGLRenderer.prototype, {
 			this.outputEncoding = ( value === true ) ? sRGBEncoding : LinearEncoding;
 
 		}
-	}
+	},
+	toneMappingWhitePoint: {
+		get: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .toneMappingWhitePoint has been removed.' );
+			return 1.0;
+
+		},
+		set: function () {
+
+			console.warn( 'THREE.WebGLRenderer: .toneMappingWhitePoint has been removed.' );
+
+		}
+	},
 
 } );
 
@@ -2039,8 +2081,8 @@ Object.defineProperties( Audio.prototype, {
 		value: function ( file ) {
 
 			console.warn( 'THREE.Audio: .load has been deprecated. Use THREE.AudioLoader instead.' );
-			var scope = this;
-			var audioLoader = new AudioLoader();
+			const scope = this;
+			const audioLoader = new AudioLoader();
 			audioLoader.load( file, function ( buffer ) {
 
 				scope.setBuffer( buffer );
@@ -2078,12 +2120,12 @@ CubeCamera.prototype.updateCubeMap = function ( renderer, scene ) {
 
 //
 
-export var GeometryUtils = {
+export const GeometryUtils = {
 
 	merge: function ( geometry1, geometry2, materialIndexOffset ) {
 
 		console.warn( 'THREE.GeometryUtils: .merge() has been moved to Geometry. Use geometry.merge( geometry2, matrix, materialIndexOffset ) instead.' );
-		var matrix;
+		let matrix;
 
 		if ( geometry2.isMesh ) {
 
@@ -2113,10 +2155,10 @@ ImageUtils.loadTexture = function ( url, mapping, onLoad, onError ) {
 
 	console.warn( 'THREE.ImageUtils.loadTexture has been deprecated. Use THREE.TextureLoader() instead.' );
 
-	var loader = new TextureLoader();
+	const loader = new TextureLoader();
 	loader.setCrossOrigin( this.crossOrigin );
 
-	var texture = loader.load( url, onLoad, undefined, onError );
+	const texture = loader.load( url, onLoad, undefined, onError );
 
 	if ( mapping ) texture.mapping = mapping;
 
@@ -2128,10 +2170,10 @@ ImageUtils.loadTextureCube = function ( urls, mapping, onLoad, onError ) {
 
 	console.warn( 'THREE.ImageUtils.loadTextureCube has been deprecated. Use THREE.CubeTextureLoader() instead.' );
 
-	var loader = new CubeTextureLoader();
+	const loader = new CubeTextureLoader();
 	loader.setCrossOrigin( this.crossOrigin );
 
-	var texture = loader.load( urls, onLoad, undefined, onError );
+	const texture = loader.load( urls, onLoad, undefined, onError );
 
 	if ( mapping ) texture.mapping = mapping;
 
@@ -2169,7 +2211,7 @@ export function JSONLoader() {
 
 //
 
-export var SceneUtils = {
+export const SceneUtils = {
 
 	createMultiMaterialObject: function ( /* geometry, materials */ ) {
 

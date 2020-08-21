@@ -4,12 +4,8 @@ import { Vector2 } from '../math/Vector2.js';
 import { Color } from '../math/Color.js';
 
 /**
- * @author takahirox / http://github.com/takahirox
- *
  * parameters = {
  *  color: <hex>,
- *  specular: <hex>,
- *  shininess: <float>,
  *
  *  map: new THREE.Texture( <Image> ),
  *  gradientMap: new THREE.Texture( <Image> ),
@@ -35,8 +31,6 @@ import { Color } from '../math/Color.js';
  *  displacementScale: <float>,
  *  displacementBias: <float>,
  *
- *  specularMap: new THREE.Texture( <Image> ),
- *
  *  alphaMap: new THREE.Texture( <Image> ),
  *
  *  wireframe: <boolean>,
@@ -57,8 +51,6 @@ function MeshToonMaterial( parameters ) {
 	this.type = 'MeshToonMaterial';
 
 	this.color = new Color( 0xffffff );
-	this.specular = new Color( 0x111111 );
-	this.shininess = 30;
 
 	this.map = null;
 	this.gradientMap = null;
@@ -83,8 +75,6 @@ function MeshToonMaterial( parameters ) {
 	this.displacementMap = null;
 	this.displacementScale = 1;
 	this.displacementBias = 0;
-
-	this.specularMap = null;
 
 	this.alphaMap = null;
 
@@ -111,8 +101,6 @@ MeshToonMaterial.prototype.copy = function ( source ) {
 	Material.prototype.copy.call( this, source );
 
 	this.color.copy( source.color );
-	this.specular.copy( source.specular );
-	this.shininess = source.shininess;
 
 	this.map = source.map;
 	this.gradientMap = source.gradientMap;
@@ -137,8 +125,6 @@ MeshToonMaterial.prototype.copy = function ( source ) {
 	this.displacementMap = source.displacementMap;
 	this.displacementScale = source.displacementScale;
 	this.displacementBias = source.displacementBias;
-
-	this.specularMap = source.specularMap;
 
 	this.alphaMap = source.alphaMap;
 

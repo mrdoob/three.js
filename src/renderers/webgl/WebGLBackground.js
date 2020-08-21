@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { BackSide, FrontSide, CubeUVReflectionMapping } from '../../constants.js';
 import { BoxBufferGeometry } from '../../geometries/BoxGeometry.js';
 import { PlaneBufferGeometry } from '../../geometries/PlaneGeometry.js';
@@ -11,27 +7,33 @@ import { Mesh } from '../../objects/Mesh.js';
 import { ShaderLib } from '../shaders/ShaderLib.js';
 import { cloneUniforms } from '../shaders/UniformsUtils.js';
 
-function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
+function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha ) {
 
-	var clearColor = new Color( 0x000000 );
-	var clearAlpha = 0;
+	const clearColor = new Color( 0x000000 );
+	let clearAlpha = 0;
 
-	var planeMesh;
-	var boxMesh;
+	let planeMesh;
+	let boxMesh;
 
-	var currentBackground = null;
-	var currentBackgroundVersion = 0;
-	var currentTonemapping = null;
+	let currentBackground = null;
+	let currentBackgroundVersion = 0;
+	let currentTonemapping = null;
 
 	function render( renderList, scene, camera, forceClear ) {
 
-		var background = scene.background;
+		let background = scene.isScene === true ? scene.background : null;
+
+		if ( background && background.isTexture ) {
+
+			background = cubemaps.get( background );
+
+		}
 
 		// Ignore background in AR
 		// TODO: Reconsider this.
 
-		var xr = renderer.xr;
-		var session = xr.getSession && xr.getSession();
+		const xr = renderer.xr;
+		const session = xr.getSession && xr.getSession();
 
 		if ( session && session.environmentBlendMode === 'additive' ) {
 
@@ -56,14 +58,14 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 		}
 
-		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.mapping === CubeUVReflectionMapping ) ) {
+		if ( background && ( background.isCubeTexture || background.isWebGLCubeRenderTarget || background.isWebGLCubeRenderTargetTexture || background.mapping === CubeUVReflectionMapping ) ) {
 
 			if ( boxMesh === undefined ) {
 
 				boxMesh = new Mesh(
 					new BoxBufferGeometry( 1, 1, 1 ),
 					new ShaderMaterial( {
-						type: 'BackgroundCubeMaterial',
+						name: 'BackgroundCubeMaterial',
 						uniforms: cloneUniforms( ShaderLib.cube.uniforms ),
 						vertexShader: ShaderLib.cube.vertexShader,
 						fragmentShader: ShaderLib.cube.fragmentShader,
@@ -98,19 +100,25 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 
 			}
 
-			var texture = background.isWebGLCubeRenderTarget ? background.texture : background;
+			if ( background.isWebGLCubeRenderTarget ) {
 
-			boxMesh.material.uniforms.envMap.value = texture;
-			boxMesh.material.uniforms.flipEnvMap.value = texture.isCubeTexture ? - 1 : 1;
+				// TODO Deprecate
+
+				background = background.texture;
+
+			}
+
+			boxMesh.material.uniforms.envMap.value = background;
+			boxMesh.material.uniforms.flipEnvMap.value = background.isCubeTexture ? - 1 : 1;
 
 			if ( currentBackground !== background ||
-				currentBackgroundVersion !== texture.version ||
+				currentBackgroundVersion !== background.version ||
 				currentTonemapping !== renderer.toneMapping ) {
 
 				boxMesh.material.needsUpdate = true;
 
 				currentBackground = background;
-				currentBackgroundVersion = texture.version;
+				currentBackgroundVersion = background.version;
 				currentTonemapping = renderer.toneMapping;
 
 			}
@@ -125,7 +133,7 @@ function WebGLBackground( renderer, state, objects, premultipliedAlpha ) {
 				planeMesh = new Mesh(
 					new PlaneBufferGeometry( 2, 2 ),
 					new ShaderMaterial( {
-						type: 'BackgroundMaterial',
+						name: 'BackgroundMaterial',
 						uniforms: cloneUniforms( ShaderLib.background.uniforms ),
 						vertexShader: ShaderLib.background.vertexShader,
 						fragmentShader: ShaderLib.background.fragmentShader,

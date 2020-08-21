@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>الاختبار مع NPM</h1>
+
+		<p class="desc">
+			يوضح هذه المقال كيفية الحصول على three.js في بيئة [link:https://nodejs.org/en/ node.js] حتى تتمكن من تنفيذ الاختبارات الآلية. يمكن إجراء الاختبارات على سطر الأوامر ، أو بواسطة أدوات CI الآلية مثل [link:https://travis-ci.org/ Travis].
+		</p>
+
+		<h2>النسخة القصيرة</h2>
+
+		<p>
+			إذا كنت مرتاحًا مع node و npm ،
+			<code>
+				$ npm install three --save-dev
+			</code>
+			و من ثم قم بإضافة
+		<code>
+			var THREE = require('three');
+		</code>
+			للاختبار الخاص بك.
+		</p>
+
+		<h2>إنشاء مشروع قابلة للاختبار من الصفر</h2>
+		<p>
+			إذا لم تكن معتادًا على هذه الأدوات ، فإليك دليلًا سريعًا (بالنسبة لنظام التشغيل Linux ، ستكون عملية التثبيت مختلفة قليلاً باستخدام windows ، لكن أوامر NPM متطابقة).
+		</p>
+
+		<h3>الإعدادات الأساسية</h3>
+		<div>
+			<ol>
+				<li>
+					قم بتثبيت [link:https://www.npmjs.org/ npm] و nodejs. عادةً ما يبدو أقصر طريق كالأتي
+					<code>
+$ sudo apt-get install -y npm nodejs-legacy
+# fix any problems with SSL in the default registry URL
+$ npm config set registry http://registry.npmjs.org/
+					</code>
+				</li>
+
+				<li>
+					أنشئ دليل مشروع جديد
+					<code>
+						 $ mkdir test-example; cd test-example
+					</code>
+				</li>
+
+				<li>
+					اطلب من npm إنشاء ملف مشروع جديد لك:
+					<code>
+					 $ npm init
+					</code>
+					 واقبل جميع الإعدادات الافتراضية عن طريق الضغط على Enter في جميع المطالبات ، سيؤدي هذا إلى إنشاء package.json.
+				</li><br />
+
+				<li>
+					جرب وابدأ اختبار الميزة بـ
+					<code>
+$ npm test
+					</code>
+					هذا سيفشل ، وهو أمر متوقع. إذا نظرت في package.json ، فإن تعريف البرنامج النصي للاختبار هو
+					<code>
+						"test": "echo \"Error: no test specified\" && exit 1"
+					</code>
+				</li>
+
+			</ol>
+		</div>
+
+		<h2>إضافة mocha</h2>
+		<div>
+			سنقوم بإستخدام [link:https://mochajs.org/ mocha].
+
+			<ol>
+				<li>
+					تثبيت mocha من خلال
+					<code>
+$ npm install mocha --save-dev
+					</code>
+					لاحظ أنه تم إنشاء node_modules/ وتظهر تبعياتك هناك. لاحظ أيضًا أنه تم تحديث package.json: تمت إضافة خاصية devDependencies وتحديثها باستخدام --save-dev.
+				</li><br />
+
+				<li>
+					قم بتحرير package.json لاستخدام mocha للاختبار. عندما يتم استدعاء الاختبار ، نريد فقط تشغيل المخاوي وتحديد مراسل مطول. بشكل افتراضي ، سيؤدي هذا إلى تشغيل أي شيء في test (لا يمكن تشغيل الدليل test في npm ERR! ، قم بإنشائه عبر اختبار mkdir)
+					<code>
+						"test": "mocha --reporter list"
+					</code>
+				</li>
+
+				<li>
+					أعد الاختبار باستخدام
+					<code>
+						$ npm test
+					</code>
+
+					يجب أن ينجح هذا الآن ، حيث يتم الإبلاغ عن 0 تمرير (1 جزء من الثانية) أو ما شابه.
+				</li>
+
+			</ol>
+		</div>
+
+		<h2>أضف three.js</h2>
+		<div>
+			<ol>
+				<li>
+					دعنا نسحب تبعية three.js لدينا مع
+					<code>
+$ npm install three --save-dev
+					</code>
+					<ul>
+						<li>
+							إذا كنت بحاجة إلى إصدار مختلف ، فاستخدم
+							<code>
+								$ npm show three versions
+							</code>
+							لمعرفة ما هو متاح. لإخبار npm بالقيمة الصحيحة ، استخدم
+							<code>
+ $ npm install three@0.84.0 --save
+							</code>
+							(0.84.0 في هذا المثال). - حفظ يجعل هذا تبعية لهذا المشروع ، بدلاً من dev تبعية. انظر المستندات هنا [link:https://www.npmjs.org/doc/json.html here] لمزيد من المعلومات.
+						</li>
+					</ul>
+				</li>
+
+				<li>
+					سيبحث Mocha عن الاختبارات في test/ ، لذلك دعونا
+					<code>
+					$ mkdir test
+					</code>
+				</li>
+
+				<li>
+					أخيرًا ، نحتاج بالفعل إلى اختبار JS للتشغيل. دعنا نضيف اختبارًا بسيطًا للتحقق من أن الكائن three.js متاح ويعمل. أنشئ test/verify-three.js تحتوي على:
+<code>
+var THREE = require('three');
+var assert = require("assert");
+
+describe('The THREE object', function() {
+  it('should have a defined BasicShadowMap constant', function() {
+    assert.notEqual('undefined', THREE.BasicShadowMap);
+  }),
+
+  it('should be able to construct a Vector3 with default of x=0', function() {
+    var vec3 = new THREE.Vector3();
+    assert.equal(0, vec3.x);
+  })
+})
+</code>
+				</li>
+
+				<li>
+				أخيرًا ، دعنا نختبر مرة أخرى باستخدام $ npm اختبار. يجب أن يؤدي هذا إلى إجراء الاختبارات أعلاه وأن ينجح ، ويظهر شيئًا مثل:
+				<code>
+The THREE object should have a defined BasicShadowMap constant: 0ms
+The THREE object should be able to construct a Vector3 with default of x=0: 0ms
+2 passing (8ms)
+				</code>
+				</li>
+			</ol>
+		</div>
+
+		<h2>أضف الرمز الخاص بك</h2>
+		<div>
+			<p>عليك القيام بثلاثة أشياء:</p>
+
+			<ol>
+				<li>
+					اكتب اختبارًا للسلوك المتوقع لشفرتك ، وضعه تحت test/.
+					هنا مثال من مشروع حقيقي
+					[link:https://github.com/air/encounter/blob/master/test/Physics-test.js Here].
+				</li>
+
+				<li>
+					قم بتصدير الكود الوظيفي الخاص بك بطريقة يمكن للعقدة js رؤيتها ، لاستخدامها مع طلب.
+					شاهده هنا [link:https://github.com/air/encounter/blob/master/js/Physics.js here].
+				</li>
+
+				<li>
+					اطلب الكود الخاص بك في ملف الاختبار ، بنفس الطريقة التي فعلنا بها require('three')  في المثال أعلاه.
+				</li>
+			</ol>
+
+			<p>
+				سيختلف البندان 2 و 3 بناءً على كيفية إدارتك للرمز. في مثال Physics.js الموضح أعلاه ، يكون جزء التصدير في النهاية. نقوم بتعيين كائن إلى module.exports:
+			</p>
+			<code>
+//=============================================================================
+// make available in nodejs
+//=============================================================================
+if (typeof exports !== 'undefined')
+{
+  module.exports = Physics;
+}
+			</code>
+		</div>
+
+		<h2>التعامل مع التبعيات (dependencies)</h2>
+		<div>
+			<p>
+				إذا كنت تستخدم بالفعل شيئًا ذكيًا مثل request.js أو browserify فتخط هذا الجزء.
+			</p>
+			<p>
+				عادةً ما يتم تشغيل مشروع three.js في المتصفح. يتم تحميل الوحدة النمطية عن طريق المتصفح الذي يقوم بتنفيذ مجموعة من علامات البرنامج النصي. فبالنسبة لملفاتك الفردية فلا داعي للقلق بشأن التبعيات. ومع ذلك ، في سياق nodejs ، لا يوجد index.html يربط كل شيء معًا ، لذلك يجب أن تكون واضحًا.
+			</p>
+			<p>
+				إذا كنت تقوم بتصدير وحدة تعتمد على ملفات أخرى ، فسيتعين عليك إخبار العقدة بتحميلها.
+				إليك طريقة واحدة:
+			</p>
+			<ol>
+				<li>
+					في بداية الوحدة النمطية الخاصة بك ، تحقق لمعرفة ما إذا كنت في بيئة nodejs.
+				</li>
+				<li>
+					إذا كان هذا هو الحال، فيتوجب عليك أن تعلن عن التبعيات الخاصة بك.
+				</li>
+				<li>
+					إذا لم يكن الأمر كذلك ، فمن المحتمل أنك في متصفح لذلك لا تحتاج إلى القيام بأي شيء آخر.
+				</li>
+			</ol>
+			مثال لإستعمال Physics.js:
+			<code>
+//=============================================================================
+// setup for server-side testing
+//=============================================================================
+if (typeof require === 'function') // test for nodejs environment
+{
+  var THREE = require('three');
+  var MY3 = require('./MY3.js');
+}
+			</code>
+		</div>
+
+	</body>
+</html>

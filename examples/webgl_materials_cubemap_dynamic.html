@@ -28,7 +28,7 @@
 
 			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
 
-				texture.mapping = THREE.UVMapping;
+				texture.encoding = THREE.sRGBEncoding;
 
 				init( texture );
 				animate();
@@ -40,6 +40,9 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				renderer.outputEncoding = THREE.sRGBEncoding;
 
 				scene = new THREE.Scene();
 
@@ -47,30 +50,35 @@
 
 				// background
 
-				var options = {
-					generateMipmaps: true,
-					minFilter: THREE.LinearMipmapLinearFilter,
-					magFilter: THREE.LinearFilter
-				};
-
+				var options = {}; // none required
 				scene.background = new THREE.WebGLCubeRenderTarget( 1024, options ).fromEquirectangularTexture( renderer, texture );
 
 				//
 
-				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( 256, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+				cubeRenderTarget1 = new THREE.WebGLCubeRenderTarget( 256, {
+					format: THREE.RGBFormat,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter,
+					encoding: THREE.sRGBEncoding // temporary -- to prevent the material's shader from recompiling every frame
+				} );
+
 				cubeCamera1 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget1 );
-				scene.add( cubeCamera1 );
 
-				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256, { format: THREE.RGBFormat, generateMipmaps: true, minFilter: THREE.LinearMipmapLinearFilter } );
+				cubeRenderTarget2 = new THREE.WebGLCubeRenderTarget( 256, {
+					format: THREE.RGBFormat,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter,
+					encoding: THREE.sRGBEncoding
+				} );
+
 				cubeCamera2 = new THREE.CubeCamera( 1, 1000, cubeRenderTarget2 );
-				scene.add( cubeCamera2 );
-
-				document.body.appendChild( renderer.domElement );
 
 				//
 
 				material = new THREE.MeshBasicMaterial( {
-					envMap: cubeRenderTarget2.texture
+					envMap: cubeRenderTarget2.texture,
+					combine: THREE.MultiplyOperation,
+					reflectivity: 1
 				} );
 
 				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 3 ), material );
@@ -79,7 +87,7 @@
 				cube = new THREE.Mesh( new THREE.BoxBufferGeometry( 20, 20, 20 ), material );
 				scene.add( cube );
 
-				torus = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 10, 5, 100, 25 ), material );
+				torus = new THREE.Mesh( new THREE.TorusKnotBufferGeometry( 10, 5, 128, 16 ), material );
 				scene.add( torus );
 
 				//

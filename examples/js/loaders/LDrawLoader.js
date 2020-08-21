@@ -1,11 +1,4 @@
-console.warn( "THREE.LDrawLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author yomboprime / https://github.com/yomboprime/
- * @author gkjohnson / https://github.com/gkjohnson/
- *
- *
- */
+console.warn( "THREE.LDrawLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.LDrawLoader = ( function () {
 
@@ -591,6 +584,7 @@ THREE.LDrawLoader = ( function () {
 
 			var fileLoader = new THREE.FileLoader( this.manager );
 			fileLoader.setPath( this.path );
+			fileLoader.setRequestHeader( this.requestHeader );
 			fileLoader.load( url, function ( text ) {
 
 				scope.processObject( text, onLoad, null, url );
@@ -1904,6 +1898,7 @@ THREE.LDrawLoader = ( function () {
 				// and use it when processing the next model.
 				var fileLoader = new THREE.FileLoader( scope.manager );
 				fileLoader.setPath( scope.path );
+				fileLoader.setRequestHeader( scope.requestHeader );
 				fileLoader.load( subobjectURL, function ( text ) {
 
 					scope.processObject( text, function ( subobjectGroup ) {

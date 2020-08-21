@@ -13,9 +13,24 @@ export class WebGLShadowMap {
 		maxTextureSize: number
 	);
 
+	/**
+	 * @default false
+	 */
 	enabled: boolean;
+
+	/**
+	 * @default true
+	 */
 	autoUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
 	needsUpdate: boolean;
+
+	/**
+	 * @default THREE.PCFShadowMap
+	 */
 	type: ShadowMapType;
 
 	render( shadowsArray: Light[], scene: Scene, camera: Camera ): void;

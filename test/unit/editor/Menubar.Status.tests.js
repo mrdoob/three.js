@@ -1,9 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Menubar.Status';
+import { } from '../../../editor/js/Menubar.Status';
 
 export default QUnit.module( 'Editor', () => {
 

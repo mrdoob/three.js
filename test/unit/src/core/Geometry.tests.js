@@ -1,6 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
 import { Geometry } from '../../../../src/core/Geometry';

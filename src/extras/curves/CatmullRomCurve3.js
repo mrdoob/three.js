@@ -2,8 +2,6 @@ import { Vector3 } from '../../math/Vector3.js';
 import { Curve } from '../core/Curve.js';
 
 /**
- * @author zz85 https://github.com/zz85
- *
  * Centripetal CatmullRom Curve - which is useful for avoiding
  * cusps and self-intersections in non-uniform catmull rom curves.
  * http://www.cemyuksel.com/research/catmullrom_param/catmullrom.pdf
@@ -25,7 +23,7 @@ which can be placed in CurveUtils.
 
 function CubicPoly() {
 
-	var c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+	let c0 = 0, c1 = 0, c2 = 0, c3 = 0;
 
 	/*
 	 * Compute coefficients for a cubic polynomial
@@ -55,8 +53,8 @@ function CubicPoly() {
 		initNonuniformCatmullRom: function ( x0, x1, x2, x3, dt0, dt1, dt2 ) {
 
 			// compute tangents when parameterized in [t1,t2]
-			var t1 = ( x1 - x0 ) / dt0 - ( x2 - x0 ) / ( dt0 + dt1 ) + ( x2 - x1 ) / dt1;
-			var t2 = ( x2 - x1 ) / dt1 - ( x3 - x1 ) / ( dt1 + dt2 ) + ( x3 - x2 ) / dt2;
+			let t1 = ( x1 - x0 ) / dt0 - ( x2 - x0 ) / ( dt0 + dt1 ) + ( x2 - x1 ) / dt1;
+			let t2 = ( x2 - x1 ) / dt1 - ( x3 - x1 ) / ( dt1 + dt2 ) + ( x3 - x2 ) / dt2;
 
 			// rescale tangents for parametrization in [0,1]
 			t1 *= dt1;
@@ -68,8 +66,8 @@ function CubicPoly() {
 
 		calc: function ( t ) {
 
-			var t2 = t * t;
-			var t3 = t2 * t;
+			const t2 = t * t;
+			const t3 = t2 * t;
 			return c0 + c1 * t + c2 * t2 + c3 * t3;
 
 		}
@@ -80,8 +78,8 @@ function CubicPoly() {
 
 //
 
-var tmp = new Vector3();
-var px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
+const tmp = new Vector3();
+const px = new CubicPoly(), py = new CubicPoly(), pz = new CubicPoly();
 
 function CatmullRomCurve3( points, closed, curveType, tension ) {
 
@@ -92,7 +90,7 @@ function CatmullRomCurve3( points, closed, curveType, tension ) {
 	this.points = points || [];
 	this.closed = closed || false;
 	this.curveType = curveType || 'centripetal';
-	this.tension = tension || 0.5;
+	this.tension = ( tension !== undefined ) ? tension : 0.5;
 
 }
 
@@ -103,14 +101,14 @@ CatmullRomCurve3.prototype.isCatmullRomCurve3 = true;
 
 CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
-	var point = optionalTarget || new Vector3();
+	const point = optionalTarget || new Vector3();
 
-	var points = this.points;
-	var l = points.length;
+	const points = this.points;
+	const l = points.length;
 
-	var p = ( l - ( this.closed ? 0 : 1 ) ) * t;
-	var intPoint = Math.floor( p );
-	var weight = p - intPoint;
+	const p = ( l - ( this.closed ? 0 : 1 ) ) * t;
+	let intPoint = Math.floor( p );
+	let weight = p - intPoint;
 
 	if ( this.closed ) {
 
@@ -123,7 +121,7 @@ CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
 	}
 
-	var p0, p1, p2, p3; // 4 points
+	let p0, p3; // 4 points (p1 & p2 defined below)
 
 	if ( this.closed || intPoint > 0 ) {
 
@@ -137,8 +135,8 @@ CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 
 	}
 
-	p1 = points[ intPoint % l ];
-	p2 = points[ ( intPoint + 1 ) % l ];
+	const p1 = points[ intPoint % l ];
+	const p2 = points[ ( intPoint + 1 ) % l ];
 
 	if ( this.closed || intPoint + 2 < l ) {
 
@@ -155,10 +153,10 @@ CatmullRomCurve3.prototype.getPoint = function ( t, optionalTarget ) {
 	if ( this.curveType === 'centripetal' || this.curveType === 'chordal' ) {
 
 		// init Centripetal / Chordal Catmull-Rom
-		var pow = this.curveType === 'chordal' ? 0.5 : 0.25;
-		var dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
-		var dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
-		var dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
+		const pow = this.curveType === 'chordal' ? 0.5 : 0.25;
+		let dt0 = Math.pow( p0.distanceToSquared( p1 ), pow );
+		let dt1 = Math.pow( p1.distanceToSquared( p2 ), pow );
+		let dt2 = Math.pow( p2.distanceToSquared( p3 ), pow );
 
 		// safety check for repeated points
 		if ( dt1 < 1e-4 ) dt1 = 1.0;
@@ -193,9 +191,9 @@ CatmullRomCurve3.prototype.copy = function ( source ) {
 
 	this.points = [];
 
-	for ( var i = 0, l = source.points.length; i < l; i ++ ) {
+	for ( let i = 0, l = source.points.length; i < l; i ++ ) {
 
-		var point = source.points[ i ];
+		const point = source.points[ i ];
 
 		this.points.push( point.clone() );
 
@@ -211,13 +209,13 @@ CatmullRomCurve3.prototype.copy = function ( source ) {
 
 CatmullRomCurve3.prototype.toJSON = function () {
 
-	var data = Curve.prototype.toJSON.call( this );
+	const data = Curve.prototype.toJSON.call( this );
 
 	data.points = [];
 
-	for ( var i = 0, l = this.points.length; i < l; i ++ ) {
+	for ( let i = 0, l = this.points.length; i < l; i ++ ) {
 
-		var point = this.points[ i ];
+		const point = this.points[ i ];
 		data.points.push( point.toArray() );
 
 	}
@@ -236,9 +234,9 @@ CatmullRomCurve3.prototype.fromJSON = function ( json ) {
 
 	this.points = [];
 
-	for ( var i = 0, l = json.points.length; i < l; i ++ ) {
+	for ( let i = 0, l = json.points.length; i < l; i ++ ) {
 
-		var point = json.points[ i ];
+		const point = json.points[ i ];
 		this.points.push( new Vector3().fromArray( point ) );
 
 	}

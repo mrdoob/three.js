@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { EllipseCurve } from '../../../../../src/extras/curves/EllipseCurve';

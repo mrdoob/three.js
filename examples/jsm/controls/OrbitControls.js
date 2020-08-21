@@ -1,12 +1,3 @@
-/**
- * @author qiao / https://github.com/qiao
- * @author mrdoob / http://mrdoob.com
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author erich666 / http://erichaines.com
- * @author ScieCode / http://github.com/sciecode
- */
-
 import {
 	EventDispatcher,
 	MOUSE,
@@ -52,7 +43,7 @@ var OrbitControls = function ( object, domElement ) {
 	this.maxPolarAngle = Math.PI; // radians
 
 	// How far you can orbit horizontally, upper and lower limits.
-	// If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
+	// If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI )
 	this.minAzimuthAngle = - Infinity; // radians
 	this.maxAzimuthAngle = Infinity; // radians
 
@@ -73,7 +64,7 @@ var OrbitControls = function ( object, domElement ) {
 	// Set to false to disable panning
 	this.enablePan = true;
 	this.panSpeed = 1.0;
-	this.screenSpacePanning = false; // if true, pan in screen-space
+	this.screenSpacePanning = true; // if false, pan orthogonal to world-space direction camera.up
 	this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
 
 	// Set to true to automatically rotate around the target
@@ -149,6 +140,8 @@ var OrbitControls = function ( object, domElement ) {
 		var lastPosition = new Vector3();
 		var lastQuaternion = new Quaternion();
 
+		var twoPI = 2 * Math.PI;
+
 		return function update() {
 
 			var position = scope.object.position;
@@ -180,7 +173,29 @@ var OrbitControls = function ( object, domElement ) {
 			}
 
 			// restrict theta to be between desired limits
-			spherical.theta = Math.max( scope.minAzimuthAngle, Math.min( scope.maxAzimuthAngle, spherical.theta ) );
+
+			var min = scope.minAzimuthAngle;
+			var max = scope.maxAzimuthAngle;
+
+			if ( isFinite( min ) && isFinite( max ) ) {
+
+				if ( min < - Math.PI ) min += twoPI; else if ( min > Math.PI ) min -= twoPI;
+
+				if ( max < - Math.PI ) max += twoPI; else if ( max > Math.PI ) max -= twoPI;
+
+				if ( min < max ) {
+
+					spherical.theta = Math.max( min, Math.min( max, spherical.theta ) );
+
+				} else {
+
+					spherical.theta = ( spherical.theta > ( min + max ) / 2 ) ?
+						Math.max( min, spherical.theta ) :
+						Math.min( max, spherical.theta );
+
+				}
+
+			}
 
 			// restrict phi to be between desired limits
 			spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
@@ -265,8 +280,8 @@ var OrbitControls = function ( object, domElement ) {
 		scope.domElement.removeEventListener( 'touchend', onTouchEnd, false );
 		scope.domElement.removeEventListener( 'touchmove', onTouchMove, false );
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mouseup', onMouseUp, false );
 
 		scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
 
@@ -859,8 +874,8 @@ var OrbitControls = function ( object, domElement ) {
 
 		if ( state !== STATE.NONE ) {
 
-			document.addEventListener( 'mousemove', onMouseMove, false );
-			document.addEventListener( 'mouseup', onMouseUp, false );
+			scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove, false );
+			scope.domElement.ownerDocument.addEventListener( 'mouseup', onMouseUp, false );
 
 			scope.dispatchEvent( startEvent );
 
@@ -910,8 +925,8 @@ var OrbitControls = function ( object, domElement ) {
 
 		handleMouseUp( event );
 
-		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener( 'mouseup', onMouseUp, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mouseup', onMouseUp, false );
 
 		scope.dispatchEvent( endEvent );
 
@@ -1147,6 +1162,8 @@ OrbitControls.prototype.constructor = OrbitControls;
 var MapControls = function ( object, domElement ) {
 
 	OrbitControls.call( this, object, domElement );
+
+	this.screenSpacePanning = false; // pan orthogonal to world-space direction camera.up
 
 	this.mouseButtons.LEFT = MOUSE.PAN;
 	this.mouseButtons.RIGHT = MOUSE.ROTATE;

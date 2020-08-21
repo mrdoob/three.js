@@ -11,7 +11,6 @@ export class WebGLIndexedBufferRenderer {
 	setIndex( index: any ): void;
 	render( start: any, count: number ): void;
 	renderInstances(
-		geometry: any,
 		start: any,
 		count: number,
 		primcount: number

@@ -1,9 +1,3 @@
-/**
- * @author mikael emtinger / http://gomo.se/
- * @author alteredq / http://alteredqualia.com/
- * @author ikerr / http://verold.com
- */
-
 import { Mesh } from './Mesh.js';
 import { Matrix4 } from '../math/Matrix4.js';
 import { Vector3 } from '../math/Vector3.js';
@@ -32,6 +26,20 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 	constructor: SkinnedMesh,
 
 	isSkinnedMesh: true,
+
+	copy: function ( source ) {
+
+		Mesh.prototype.copy.call( this, source );
+
+		this.bindMode = source.bindMode;
+		this.bindMatrix.copy( source.bindMatrix );
+		this.bindMatrixInverse.copy( source.bindMatrixInverse );
+
+		this.skeleton = source.skeleton;
+
+		return this;
+
+	},
 
 	bind: function ( skeleton, bindMatrix ) {
 
@@ -106,12 +114,6 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 			console.warn( 'THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode );
 
 		}
-
-	},
-
-	clone: function () {
-
-		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	},
 

@@ -10,13 +10,6 @@ import { DoubleSide, BackSide } from '../constants.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author mikael emtinger / http://gomo.se/
- * @author jonobr1 / http://jonobr1.com/
- */
-
 const _inverseMatrix = new Matrix4();
 const _ray = new Ray();
 const _sphere = new Sphere();
@@ -74,6 +67,9 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			this.morphTargetDictionary = Object.assign( {}, source.morphTargetDictionary );
 
 		}
+
+		this.material = source.material;
+		this.geometry = source.geometry;
 
 		return this;
 
@@ -331,12 +327,6 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			}
 
 		}
-
-	},
-
-	clone: function () {
-
-		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
 

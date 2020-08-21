@@ -329,15 +329,18 @@
 				// var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
 
-				var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBuffer: false };
+				var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				ldrEffectComposer = new EffectComposer( renderer, regularRenderTarget );
 
-				if ( renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
+				parameters.type = THREE.FloatType;
 
-					parameters.type = THREE.FloatType;
+				if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
 
-	}
+					parameters.type = undefined; // avoid usage of floating point textures
+
+				}
+
 				var hdrRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				dynamicHdrEffectComposer = new EffectComposer( renderer, hdrRenderTarget );
 				dynamicHdrEffectComposer.setSize( window.innerWidth, window.innerHeight );

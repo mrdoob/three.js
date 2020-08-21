@@ -7,8 +7,8 @@ import { Matrix4 } from './../math/Matrix4';
 
 export class InstancedMesh <
 	TGeometry extends Geometry | BufferGeometry = Geometry | BufferGeometry,
-	TMaterial extends Material = Material
-> extends Mesh {
+	TMaterial extends Material | Material[] = Material | Material[]
+> extends Mesh<TGeometry, TMaterial> {
 
 	constructor(
 		geometry: TGeometry,

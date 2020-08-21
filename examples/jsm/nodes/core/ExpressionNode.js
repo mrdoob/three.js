@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { FunctionNode } from './FunctionNode.js';
 
 function ExpressionNode( src, type, keywords, extensions, includes ) {

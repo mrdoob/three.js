@@ -220,6 +220,7 @@
 					'misc / reserved-keywords': 'reserved-keywords',
 					'misc / varying': 'varying',
 					'misc / void-function': 'void-function',
+					'misc / basic-material': 'basic-material',
 					'misc / readonly': 'readonly',
 					'misc / label': 'label',
 					'misc / custom-attribute': 'custom-attribute'
@@ -2700,6 +2701,37 @@
 						} );
 
 						mtl.color = new Nodes.BypassNode( clipFromPosCall, varying );
+
+						break;
+
+					case 'basic-material':
+
+						// MATERIAL
+
+						mtl = new Nodes.BasicNodeMaterial();
+
+						var positionNode = new Nodes.PositionNode();
+
+						var a = new Nodes.OperatorNode(
+							new Nodes.SwitchNode( positionNode, 'x' ),
+							new Nodes.SwitchNode( positionNode, 'y' ),
+							Nodes.OperatorNode.ADD
+						);
+						var b = new Nodes.FloatNode( 0. );
+						var ifNode = new Nodes.FloatNode( 1. );
+						var elseNode = new Nodes.FloatNode( 0. );
+
+						mtl.mask = new Nodes.CondNode( a, b, Nodes.CondNode.GREATER, ifNode, elseNode );
+
+						var sin = new Nodes.MathNode( new Nodes.TimerNode(), Nodes.MathNode.SIN );
+
+						mtl.position = new Nodes.OperatorNode(
+							positionNode,
+							sin,
+							Nodes.OperatorNode.ADD
+						);
+
+						mtl.color = new Nodes.ColorNode( 'green' );
 
 						break;
 

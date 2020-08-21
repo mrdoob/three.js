@@ -1,6 +1,3 @@
-/**
- * @author munrocket / https://twitter.com/munrocket_twit
- */
 
 try {
 
@@ -43,12 +40,12 @@ const exceptionList = [
 	'index',
 	'css3d_youtube', // video tag not deterministic enough
 	'webaudio_visualizer', // audio can't be analyzed without proper audio hook
-	'webgl_kinect', // video tag not deterministic enough
 	'webgl_loader_texture_pvrtc', // not supported in CI, useless
 	'webgl_materials_envmaps_parallax', // empty for some reason
 	'webgl_raymarching_reflect', // exception for Github Actions
 	'webgl_test_memory2', // gives fatal error in puppeteer
 	'webgl_tiled_forward', // exception for Github Actions
+	'webgl_video_kinect', // video tag not deterministic enough
 	'webgl_worker_offscreencanvas', // in a worker, not robust
 
 ].concat( ( process.platform === "win32" ) ? [
@@ -90,7 +87,28 @@ const pup = puppeteer.launch( {
 	const injection = fs.readFileSync( 'test/e2e/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
+	const threeJsBuild = fs.readFileSync( 'build/three.module.js', 'utf8' )
+		.replace( /Math\.random\(\) \* 0xffffffff/g, 'Math._random() * 0xffffffff' );
+	await page.setRequestInterception( true );
+
 	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
+	page.on( 'request', async ( request ) => {
+
+		if ( request.url() === 'http://localhost:1234/build/three.module.js' ) {
+
+			await request.respond( {
+				status: 200,
+				contentType: 'application/javascript; charset=utf-8',
+				body: threeJsBuild
+			} );
+
+		} else {
+
+			await request.continue();
+
+		}
+
+	} );
 	page.on( 'response', async ( response ) => {
 
 		try {
@@ -108,12 +126,16 @@ const pup = puppeteer.launch( {
 
 	/* Find files */
 
-	const exactList = process.argv.slice( 2 ).map( f => f.replace( '.html', '' ) );
+	const isMakeScreenshot = process.argv[ 2 ] == '--make';
+	const isExactList = process.argv.length > ( 2 + isMakeScreenshot );
+
+	const exactList = process.argv.slice( isMakeScreenshot ? 3 : 2 )
+		.map( f => f.replace( '.html', '' ) );
 
 	const files = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => ( process.argv.length > 2 ) ? exactList.includes( f ) : ! exceptionList.includes( f ) );
+		.filter( f => isExactList ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 
 	/* Loop for each file, with CI parallelism */
@@ -129,7 +151,7 @@ const pup = puppeteer.launch( {
 
 		/* At least 3 attempts before fail */
 
-		let attemptId = process.env.MAKE ? 1.5 : 0;
+		let attemptId = isMakeScreenshot ? 1.5 : 0;
 
 		while ( attemptId < maxAttemptId ) {
 
@@ -172,16 +194,16 @@ const pup = puppeteer.launch( {
 
 					/* Resolve render promise */
 
-					window.chromeRenderStarted = true;
+					window._renderStarted = true;
 					await new Promise( function ( resolve ) {
 
-						performance.wow = performance.wow || performance.now;
-						let renderStart = performance.wow();
+						performance._now = performance._now || performance.now;
+						let renderStart = performance._now();
 
 						let waitingLoop = setInterval( function () {
 
-							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * attemptProgress );
-							if ( window.chromeRenderFinished || renderEcceded ) {
+							let renderEcceded = ( performance._now() - renderStart > renderTimeout * attemptProgress );
+							if ( window._renderFinished || renderEcceded ) {
 
 								if ( renderEcceded ) {
 
@@ -204,7 +226,7 @@ const pup = puppeteer.launch( {
 
 				if ( ++ attemptId === maxAttemptId ) {
 
-					console.red( `WTF? 'Network timeout' is small for your machine. file: ${ file } \n${ e }` );
+					console.red( `Something completely wrong. 'Network timeout' is small for your machine. file: ${ file } \n${ e }` );
 					failedScreenshots.push( file );
 					continue;
 
@@ -218,7 +240,7 @@ const pup = puppeteer.launch( {
 			}
 
 
-			if ( process.env.MAKE ) {
+			if ( isMakeScreenshot ) {
 
 
 				/* Make screenshots */
@@ -254,7 +276,7 @@ const pup = puppeteer.launch( {
 				} catch {
 
 					attemptId = maxAttemptId;
-					console.red( `ERROR! Image sizes does not match in file: ${ file }` );
+					console.red( `Something completely wrong. Image sizes does not match in file: ${ file }` );
 					failedScreenshots.push( file );
 					continue;
 
@@ -315,7 +337,7 @@ const pup = puppeteer.launch( {
 
 		console.red( `TEST FAILED! ${ failedScreenshots.length } from ${ endId - beginId } screenshots not pass.` );
 
-	} else if ( ! process.env.MAKE ) {
+	} else if ( ! isMakeScreenshot ) {
 
 		console.green( `TEST PASSED! ${ endId - beginId } screenshots correctly rendered.` );
 

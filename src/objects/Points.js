@@ -6,10 +6,6 @@ import { Vector3 } from '../math/Vector3.js';
 import { PointsMaterial } from '../materials/PointsMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 const _inverseMatrix = new Matrix4();
 const _ray = new Ray();
 const _sphere = new Sphere();
@@ -33,6 +29,17 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 	constructor: Points,
 
 	isPoints: true,
+
+	copy: function ( source ) {
+
+		Object3D.prototype.copy.call( this, source );
+
+		this.material = source.material;
+		this.geometry = source.geometry;
+
+		return this;
+
+	},
 
 	raycast: function ( raycaster, intersects ) {
 
@@ -146,12 +153,6 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			}
 
 		}
-
-	},
-
-	clone: function () {
-
-		return new this.constructor( this.geometry, this.material ).copy( this );
 
 	}
 

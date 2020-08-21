@@ -24,10 +24,6 @@ export const CullFaceBack: CullFace;
 export const CullFaceFront: CullFace;
 export const CullFaceFrontBack: CullFace;
 
-export enum FrontFaceDirection {}
-export const FrontFaceDirectionCW: FrontFaceDirection;
-export const FrontFaceDirectionCCW: FrontFaceDirection;
-
 // Shadowing Type
 export enum ShadowMapType {}
 export const BasicShadowMap: ShadowMapType;
@@ -107,7 +103,6 @@ export enum ToneMapping {}
 export const NoToneMapping: ToneMapping;
 export const LinearToneMapping: ToneMapping;
 export const ReinhardToneMapping: ToneMapping;
-export const Uncharted2ToneMapping: ToneMapping;
 export const CineonToneMapping: ToneMapping;
 export const ACESFilmicToneMapping: ToneMapping;
 
@@ -118,7 +113,6 @@ export const CubeReflectionMapping: Mapping;
 export const CubeRefractionMapping: Mapping;
 export const EquirectangularReflectionMapping: Mapping;
 export const EquirectangularRefractionMapping: Mapping;
-export const SphericalReflectionMapping: Mapping;
 export const CubeUVReflectionMapping: Mapping;
 export const CubeUVRefractionMapping: Mapping;
 
@@ -371,3 +365,7 @@ export const StreamReadUsage: Usage;
 export const StaticCopyUsage: Usage;
 export const DynamicCopyUsage: Usage;
 export const StreamCopyUsage: Usage;
+
+export enum GLSLVersion {}
+export const GLSL1: GLSLVersion;
+export const GLSL3: GLSLVersion;

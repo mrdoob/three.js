@@ -160,7 +160,7 @@ function glconstants() {
 
 			return {
 				code: code,
-				map: { mappings: '' }
+				map: null
 			};
 
 		}
@@ -177,7 +177,7 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.*|\n|\r\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`((.|\n)*)\`/, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -192,7 +192,46 @@ function glsl() {
 
 			return {
 				code: code,
-				map: { mappings: '' }
+				map: null
+			};
+
+		}
+
+	};
+
+}
+
+function bubleCleanup() {
+
+	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
+	const wrappedClass = /(var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n).*(return \2;\s+}\(\3\)\);\n)/s;
+	const unwrap = function ( match, wrapperStart, klass, parentClass, wrapperEnd ) {
+
+		return match
+			.replace( wrapperStart, '' )
+			.replace( `if ( ${parentClass} ) ${klass}.__proto__ = ${parentClass};`, '' )
+			.replace(
+				`${klass}.prototype = Object.create( ${parentClass} && ${parentClass}.prototype );`,
+				`${klass}.prototype = Object.create( ${parentClass}.prototype );`
+			)
+			.replace( wrapperEnd, '' )
+			.replace( danglingTabs, '' );
+
+	};
+
+	return {
+
+		transform( code ) {
+
+			while ( wrappedClass.test( code ) ) {
+
+				code = code.replace( wrappedClass, unwrap );
+
+			}
+
+			return {
+				code: code,
+				map: null
 			};
 
 		}
@@ -212,7 +251,8 @@ export default [
 					arrow: false,
 					classes: true
 				}
-			} )
+			} ),
+			bubleCleanup()
 		],
 		output: [
 			{

@@ -1,10 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIDiv, UIBreak, UISelect, UIButton, UIText } from './libs/ui.js';
 
-var SidebarAnimation = function ( editor ) {
+function SidebarAnimation( editor ) {
 
 	var signals = editor.signals;
 	var mixer = editor.mixer;
@@ -83,6 +79,6 @@ var SidebarAnimation = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarAnimation };

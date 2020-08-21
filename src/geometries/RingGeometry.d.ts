@@ -3,6 +3,14 @@ import { BufferGeometry } from './../core/BufferGeometry';
 
 export class RingBufferGeometry extends BufferGeometry {
 
+	/**
+	 * @param [innerRadius=0.5]
+	 * @param [outerRadius=1]
+	 * @param [thetaSegments=8]
+	 * @param [phiSegments=1]
+	 * @param [thetaStart=0]
+	 * @param [thetaLength=Math.PI * 2]
+	 */
 	constructor(
 		innerRadius?: number,
 		outerRadius?: number,
@@ -11,6 +19,11 @@ export class RingBufferGeometry extends BufferGeometry {
 		thetaStart?: number,
 		thetaLength?: number
 	);
+
+	/**
+	 * @default 'RingBufferGeometry'
+	 */
+	type: string;
 
 	parameters: {
 		innerRadius: number;
@@ -25,6 +38,14 @@ export class RingBufferGeometry extends BufferGeometry {
 
 export class RingGeometry extends Geometry {
 
+	/**
+	 * @param [innerRadius=0.5]
+	 * @param [outerRadius=1]
+	 * @param [thetaSegments=8]
+	 * @param [phiSegments=1]
+	 * @param [thetaStart=0]
+	 * @param [thetaLength=Math.PI * 2]
+	 */
 	constructor(
 		innerRadius?: number,
 		outerRadius?: number,
@@ -33,6 +54,11 @@ export class RingGeometry extends Geometry {
 		thetaStart?: number,
 		thetaLength?: number
 	);
+
+	/**
+	 * @default 'RingGeometry'
+	 */
+	type: string;
 
 	parameters: {
 		innerRadius: number;

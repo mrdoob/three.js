@@ -1,12 +1,10 @@
 /**
- * @author mrdoob / http://mrdoob.com/
- *
  * https://github.com/google/model-viewer/blob/master/packages/model-viewer/src/three-components/EnvironmentScene.ts
  */
 
 import * as THREE from '../../../build/three.module.js';
 
-function RoomEnvironment( renderer ) {
+function RoomEnvironment() {
 
 	const scene = new THREE.Scene();
 
@@ -106,10 +104,7 @@ function RoomEnvironment( renderer ) {
 
 	}
 
-	let pmremGenerator = new THREE.PMREMGenerator( renderer );
-	let renderTarget = pmremGenerator.fromScene( scene );
-
-	return renderTarget.texture;
+	return scene;
 
 }
 

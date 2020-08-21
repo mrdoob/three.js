@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	Box2,
 	Camera,
@@ -111,6 +107,15 @@ var SVGRenderer = function () {
 
 		_clipBox.min.set( - _svgWidthHalf, - _svgHeightHalf );
 		_clipBox.max.set( _svgWidthHalf, _svgHeightHalf );
+
+	};
+
+	this.getSize = function () {
+
+		return {
+			width: _svgWidth,
+			height: _svgHeight
+		};
 
 	};
 
