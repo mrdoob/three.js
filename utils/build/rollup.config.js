@@ -212,6 +212,7 @@ function babelCleanup() {
 	const wrappedClass = /(var\s*(\w+) = \/\*#__PURE__\*\/function \((\w+)?\) {\s*).*(return \2;\s*}\((\w+)?\);)/gs;
 	const inheritsLoose = /_inheritsLoose\((\w+), (\w+)\);\n/
 	const suspiciousLeftOperandWarning = / \|\| _assertThisInitialized\((\w+)\)/g
+	const doubleSpaces = /  /g;
 	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
 
 	function unwrap ( match, wrapperStart, klass, _parentClass, wrapperEnd, parentClass ) {
@@ -222,6 +223,7 @@ function babelCleanup() {
 			.replace( wrapperEnd, '' )
 			.replaceAll( _parentClass, parentClass )
 			.replace( suspiciousLeftOperandWarning, '' )
+			.replace( doubleSpaces, '	' )
 			.replace( danglingTabs, '' );
 
 	}
