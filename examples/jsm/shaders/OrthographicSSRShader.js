@@ -112,7 +112,7 @@ var OrthographicSSRShader = {
 					if(op<=.0) break;
 				}
 				vec3 rayPos=pos+ray;
-				float away=length(rayPos-p);
+				float away=abs(rayPos.z-p.z);
 				if(away<surfDist){
 					vec3 n=texture2D(tNormal,uv).xyz*2.-1.;
 					if(dot(reflectDir,n)>=0.) continue;
