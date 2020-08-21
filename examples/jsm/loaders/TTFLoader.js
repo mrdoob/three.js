@@ -213,7 +213,7 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		return convert( opentype.parse( arraybuffer ), this.reversed );
+		return convert( opentype.parse( arraybuffer ), this.reversed ); // eslint-disable-line no-undef
 
 	}
 

@@ -951,7 +951,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				for ( let comp = 0; comp < numComp; ++ comp ) {
 
-					let type = channelData[ cscSet.idx[ comp ] ].type;
+					const type = channelData[ cscSet.idx[ comp ] ].type;
 
 					for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
 
@@ -959,7 +959,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 						for ( let blockx = 0; blockx < numFullBlocksX; ++ blockx ) {
 
-							let src = blockx * 64 + ( ( y & 0x7 ) * 8 );
+							const src = blockx * 64 + ( ( y & 0x7 ) * 8 );
 
 							dataView.setUint16( offset + 0 * INT16_SIZE * type, rowBlock[ comp ][ src + 0 ], true );
 							dataView.setUint16( offset + 1 * INT16_SIZE * type, rowBlock[ comp ][ src + 1 ], true );
@@ -982,8 +982,8 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 						for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
 
-							let offset = rowOffsets[ comp ][ y ] + 8 * numFullBlocksX * INT16_SIZE * type;
-							let src = numFullBlocksX * 64 + ( ( y & 0x7 ) * 8 );
+							const offset = rowOffsets[ comp ][ y ] + 8 * numFullBlocksX * INT16_SIZE * type;
+							const src = numFullBlocksX * 64 + ( ( y & 0x7 ) * 8 );
 
 							for ( let x = 0; x < maxX; ++ x ) {
 
@@ -1012,7 +1012,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				for ( var y = 0; y < height; ++ y ) {
 
-					let offset = rowOffsets[ comp ][ y ];
+					const offset = rowOffsets[ comp ][ y ];
 
 					for ( var x = 0; x < width; ++ x ) {
 
@@ -1429,7 +1429,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 			let tmpBufferEnd = 0;
 			let writePtr = 0;
-			let ptr = new Array( 4 );
+			const ptr = new Array( 4 );
 
 			for ( let y = 0; y < info.lines; y ++ ) {
 
@@ -1601,7 +1601,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 					case DEFLATE:
 
 						var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
-						var inflate = new Inflate( compressed, { resize: true, verify: true } );
+						var inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
 						var acBuffer = new Uint16Array( inflate.decompress().buffer );
 						inOffset.value += dwaHeader.totalAcUncompressedCount;
 						break;
@@ -1628,7 +1628,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			if ( dwaHeader.rleRawSize > 0 ) {
 
 				var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
-				var inflate = new Inflate( compressed, { resize: true, verify: true } );
+				var inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
 				var rleBuffer = decodeRunLength( inflate.decompress().buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;
@@ -2405,7 +2405,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
-		let format = ( this.type === UnsignedByteType ) ? RGBEFormat : ( numChannels === 4 ) ? RGBAFormat : RGBFormat;
+		const format = ( this.type === UnsignedByteType ) ? RGBEFormat : ( numChannels === 4 ) ? RGBAFormat : RGBFormat;
 
 		return {
 			header: EXRHeader,
