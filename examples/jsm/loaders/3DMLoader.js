@@ -1,7 +1,3 @@
-/**
- * @author Luis Fraguada / https://github.com/fraguada
- */
-
 import {
 	BufferGeometryLoader,
 	FileLoader,
@@ -146,10 +142,11 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
-	parse: function () {
+	parse: function ( data, onLoad, onError ) {
 
-		// parsing logic goes here
-		console.warn( 'THREE.3DMLoader: TODO: Implement parse function' );
+		this.decodeObjects( data, '' )
+			.then( onLoad )
+			.catch( onError );
 
 	},
 
