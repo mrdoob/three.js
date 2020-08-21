@@ -1,7 +1,3 @@
-/**
- * @author Luis Fraguada / https://github.com/fraguada
- */
-
 import {
 	BufferGeometryLoader,
 	FileLoader,
