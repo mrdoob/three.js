@@ -501,7 +501,8 @@ var list = {
 				"AnimationClip": "api/ar/animation/AnimationClip",
 				"AnimationMixer": "api/ar/animation/AnimationMixer",
 				"AnimationObjectGroup": "api/ar/animation/AnimationObjectGroup",
-				"AnimationUtils": "api/ar/animation/AnimationUtils"
+				"AnimationUtils": "api/ar/animation/AnimationUtils",
+				"KeyframeTrack": "api/ar/animation/KeyframeTrack"
 			}
 
 		}
