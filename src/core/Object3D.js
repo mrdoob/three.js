@@ -495,6 +495,26 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
+	isVisible: function () {
+
+		var visible = true;
+
+		var parent = this;
+
+		while ( parent != null && visible === true ) {
+
+			//traverse up the hierarchy and check if all parents are visible
+
+			visible = visible && parent.visible;
+
+			parent = parent.parent;
+
+		}
+
+		return visible;
+
+	},
+
 	raycast: function () {},
 
 	traverse: function ( callback ) {

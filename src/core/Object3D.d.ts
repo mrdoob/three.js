@@ -342,6 +342,11 @@ export class Object3D extends EventDispatcher {
 	getWorldScale( target: Vector3 ): Vector3;
 	getWorldDirection( target: Vector3 ): Vector3;
 
+	/**
+	 * checks visibility based on ancestors
+	 */
+	isVisible(): boolean;
+
 	raycast( raycaster: Raycaster, intersects: Intersection[] ): void;
 
 	traverse( callback: ( object: Object3D ) => any ): void;
