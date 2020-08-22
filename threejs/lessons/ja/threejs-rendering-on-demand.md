@@ -1,10 +1,9 @@
-Title: Three.jsの必要に応じたレンダリング
+Title: Three.jsの要求されたレンダリング
 Description: 少ないエネルギーの使い方
-TOC: 必要に応じたレンダリング
+TOC: 要求されたレンダリング
 
-The topic might be obvious to many people but just in case ... most Three.js
-examples render continuously. In other words they setup a
-`requestAnimationFrame` loop or "*rAF loop*" something like this
+多くの人にとっては当たり前の事かもしれませんが、ほとんどのThree.js Exampleでは連続したレンダリングをします。
+言い換えると `requestAnimationFrame`ループ、または "*rAF loop*"ループは以下のようになります。
 
 ```js
 function render() {
@@ -14,27 +13,22 @@ function render() {
 requestAnimationFrame(render);
 ```
 
-For something that animates this makes sense but what about for something that
-does not animate? In that case rendering continuously is a waste of the devices
-power and if the user is on portable device it wastes the user's battery. 
+アニメーションするものには意味がありますがしないものにはどうでしょう？
+連続してレンダリングする事はデバイスの電力浪費しますし、ポータブルデバイスを使用している場合はバッテリーを浪費します。
 
-The most obvious way to solve this is to render once at the start and then
-render only when something changes. Changes include textures or models finally
-loading, data arriving from some external source, the user adjusting a setting
-or the camera or giving other relevant input.
+これを解決する最も明確な方法は、最初に一度レンダリングして何かが変更された時だけレンダリングする事です。
+テクスチャやモデルの最終的な読込、外部ソースからのデータ受取、ユーザーによる設定やカメラ調整などその他の関連する入力などが含まれます。
 
-Let's take an example from [the article on responsiveness](threejs-responsive.html)
-and modify it to render on demand.
+[レスポンシブデザインの記事](threejs-responsive.html)を例に要求に応じてレンダリングするように修正してみましょう。
 
-First we'll add in the `OrbitControls` so there is something that could change
-that we can render in response to.
+最初に `OrbitControls` を追加します。
 
 ```js
 import * as THREE from './resources/three/r119/build/three.module.js';
 +import {OrbitControls} from './resources/threejs/r119/examples/jsm/controls/OrbitControls.js';
 ```
 
-and set them up
+次に以下のようにセットアップします。
 
 ```js
 const fov = 75;
@@ -49,7 +43,7 @@ camera.position.z = 2;
 +controls.update();
 ```
 
-Since we won't be animating the cubes anymore we no longer need to keep track of them
+キューブはアニメーションの必要がないのでトラッキングは必要はありません。
 
 ```js
 -const cubes = [
@@ -62,7 +56,7 @@ Since we won't be animating the cubes anymore we no longer need to keep track of
 +makeInstance(geometry, 0xaa8844,  2);
 ```
 
-We can remove the code to animate the cubes and the calls to `requestAnimationFrame`
+つまり、キューブをアニメーションさせるコードと `requestAnimationFrame` の呼出を削除する事ができます。
 
 ```js
 -function render(time) {
@@ -90,49 +84,44 @@ We can remove the code to animate the cubes and the calls to `requestAnimationFr
 -requestAnimationFrame(render);
 ```
 
-then we need to render once
+そして、もう一度レンダリングする必要があります。
 
 ```js
 render();
 ```
 
-We need to render anytime the `OrbitControls` change the camera settings.
-Fortunately the `OrbitControls` dispatch a `change` event anytime something
-changes.
+`OrbitControls` がカメラ設定を変更する時はレンダリングする必要があります。
+幸いな事に`OrbitControls` は何かが変更された時は `change` イベントをdispatchします。
 
 ```js
 controls.addEventListener('change', render);
 ```
 
-We also need to handle the case where the user resizes the window. That was
-handled automatically before since we were rendering continuously but now what
-we are not we need to render when the window changes size.
+ウィンドウのサイズを変更した時の対応も必要です。
+前は連続してレンダリングしていたので自動的に処理をしてたのですが、ウィンドウのサイズが変わった時にレンダリングする必要があります。
 
 ```js
 window.addEventListener('resize', render);
 ```
 
-And with that we get something that renders on demand.
+これで要求されたらレンダリングする事ができます。
 
 {{{example url="../threejs-render-on-demand.html" }}}
 
-The `OrbitControls` have options to add a kind of inertia to make them feel less
-stiff. We can enable this by setting the `enableDamping` property to true.
+`OrbitControls`には柔軟な慣性を加えるオプションがあります。
+これを有効にするには `enableDamping` プロパティをtrueに設定します。
 
 ```js
 controls.enableDamping = true;
 ```
 
-With `enableDamping` on we need to call `controls.update` in our render function
-so that the `OrbitControls` can continue to give us new camera settings as they
-smooth out the movement. But, that means we can't call `render` directly from
-the `change` event because we'll end up in an infinite loop. The controls will
-send us a `change` event and call `render`, `render` will call `controls.update`.
-`controls.update` will send another `change` event.
+render関数で `controls.update` を呼び出す必要があるので `OrbitControls` が動きを滑らかにするために新しいカメラ設定を反映する事ができます。
+この設定は動きを滑らかにしてくれます。ただ、無限ループになってしまうので `change` イベントから直接 `render` を呼び出す事はできません。
+コントロールは `change` イベントを送信して `render` を呼び出し `render` は `controls.update` を呼び出します。
+`controltrols.update` は別の `change` イベントを送信します。
 
-We can fix that by using `requestAnimationFrame` to call `render` but we need to
-make sure we only ask for a new frame if one has not already been requested
-which we can do by keeping a variable that tracks if we've already requested a frame.
+この問題は `requestAnimationFrame` を使い `render` を呼び出す事で解決できます。
+まだ新しいフレームが要求されていない場合、新しいフレームを要求するようにしなければなりません。
 
 ```js
 +let renderRequested = false;
@@ -161,22 +150,20 @@ render();
 +controls.addEventListener('change', requestRenderIfNotRequested);
 ```
 
-We should probably also use `requestRenderIfNotRequested` for resizing as well
+リサイズにも `requestRenderIfNotRequested` を使うべきでしょう。
 
 ```js
 -window.addEventListener('resize', render);
 +window.addEventListener('resize', requestRenderIfNotRequested);
 ```
 
-It might be hard to see the difference. Try clicking on the example below and
-use the arrow keys to move around or dragging to spin. Then try clicking on the
-example above and do the same thing and you should be able to tell the
-difference. The one above snaps when you press an arrow key or drag, the one
-below slides.
+違いがわかりにくいかもしれませんが、以下の例をクリックして矢印キーを使って移動したりドラッグして回転させてみて下さい。
+次に上記の例をクリックして同じ事をしてみて下さい。
+上記の例は矢印キーを押したりドラッグしたりするとスナップし以下の例はスライドします。
 
 {{{example url="../threejs-render-on-demand-w-damping.html" }}}
 
-Let's also add a simple dat.GUI GUI and make its changes render on demand.
+シンプルなdat.GUIのGUIを追加し、変更を要求に応じてレンダリングできるようにしてみましょう。
 
 ```js
 import * as THREE from './resources/three/r119/build/three.module.js';
@@ -184,18 +171,17 @@ import {OrbitControls} from './resources/threejs/r119/examples/jsm/controls/Orbi
 +import {GUI} from '../3rdparty/dat.gui.module.js';
 ```
 
-Let's allow setting the color and x scale of each cube. To be able to set the
-color we'll use the `ColorGUIHelper` we created in the [article on
-lights](threejs-lights.html).
+各キューブの色と×スケールを設定できるようにしましょう。
+色を設定するには[照明の記事](threejs-lights.html)で作成した `ColorGUIHelper` を使います。
 
-First we need to create a GUI
+まずはGUIを作成する必要があります。
 
 ```js
 const gui = new GUI();
 ```
 
-and then for each cube we'll create a folder and add 2 controls, one for
-`material.color` and another for `cube.scale.x`.
+次に各キューブに対してフォルダを作成し、2つのコントロールを追加します。
+1つは `material.color`、もう1つは `cube.scale.x`です。
 
 ```js
 function makeInstance(geometry, color, x) {
@@ -219,15 +205,10 @@ function makeInstance(geometry, color, x) {
 }
 ```
 
-You can see above dat.GUI controls have an `onChange` method that you can pass a
-callback to be called when the GUI changes a value. In our case we just need it
-to call `requestRenderIfNotRequested`. The call to `folder.open` makes the
-folder start expanded.
+dat.GUIコントロールには`onChange`メソッドがあり、GUIが値を変更した時に呼び出されるコールバックを渡す事ができます。今回は `requestRenderIfNotRequested`を呼び出すだけです。
+`folder.open` を呼び出すとフォルダが展開できます。
 
 {{{example url="../threejs-render-on-demand-w-gui.html" }}}
 
-I hope this gives some idea of how to make three.js render on demand instead of
-continuously. Apps/pages that render three.js on demand are not as common as
-most pages using three.js are either games or 3D animated art but examples of
-pages that might be better rendering on demand would be say a map viewer, a 3d
-editor, a 3d graph generator, a product catalog, etc...
+three.jsを連続ではなく、要求に応じてレンダリングさせる方法のヒントになれば幸いです。
+three.jsを要求に応じてレンダリングするアプリ/ページはあまり一般的ではありませんが、three.jsを使用しているページの多くはゲームや3Dアニメーション、エディタ、3Dグラフ生成、商品カタログなどのアートです。
