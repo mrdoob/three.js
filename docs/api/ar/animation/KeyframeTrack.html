@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			إن [link:https://en.wikipedia.org/wiki/Key_frame keyframes] عبارة عن سلسلة زمنية من الإطارات الرئيسية ، والتي تتكون من قوائم بالأوقات والقيم ذات الصلة ، والتي تُستخدم لتحريك خاصية معينة لكائن.
+		</p>
+
+		<p>
+			للحصول على نظرة عامة على العناصر المختلفة لنظام الرسوم المتحركة three.js ، راجع ملف
+			مقالة "نظام الحركات" في قسم "الخطوات التالية" من الدليل.
+		</p>
+
+		<p>
+			على النقيض من التسلسل الهرمي للرسوم المتحركة لتنسيق نموذج [link:https://github.com/mrdoob/three.js/wiki/JSON-Model-format-3 JSON model format] ، فإن *KeyframeTrack* لا يخزن إطارات المفاتيح الفردية الخاصة به ككائنات في مصفوفة "keys" (مع الاحتفاظ بالأوقات والقيم لكل إطار معًا في مكان واحد).
+		</p>
+
+		<p>
+			بدلاً من ذلك ، هناك دائمًا صفيفتان في *KeyframeTrack*: تقوم المصفوفة [page:.times times] بتخزين قيم الوقت لجميع الإطارات الرئيسية لهذا المسار بترتيب تسلسلي ، وتحتوي المصفوفة [page:.values values] على القيم المتغيرة المقابلة للخاصية المتحركة.
+		</p>
+
+		<p>
+			لا يمكن أن تكون القيمة المفردة ، التي تنتمي إلى نقطة زمنية معينة ، رقمًا بسيطًا فحسب ، بل يمكن (على سبيل المثال) أن تكون *vector* (إذا كان الموضع متحركًا) أو رباعي (إذا كان الدوران متحركًا). لهذا السبب ، قد تكون مصفوفة القيم (وهي مصفوفة مسطحة أيضًا) ثلاثة أو أربعة أضعاف طول مصفوفة الأوقات.
+		</p>
+
+		<p>
+			بالمقابلة مع الأنواع المختلفة الممكنة للقيم المتحركة ، توجد عدة فئات فرعية من *KeyframeTrack* ، ترث معظم الخصائص والطرق:
+		</p>
+
+		<ul>
+			<li>[page:BooleanKeyframeTrack]</li>
+			<li>[page:ColorKeyframeTrack]</li>
+			<li>[page:NumberKeyframeTrack]</li>
+			<li>[page:QuaternionKeyframeTrack]</li>
+			<li>[page:StringKeyframeTrack]</li>
+			<li>[page:VectorKeyframeTrack]</li>
+		</ul>
+
+		<p>
+			يمكن العثور على بعض الأمثلة حول كيفية إنشاء [page:AnimationClip AnimationClips] يدويًا بأنواع مختلفة من KeyframeTracks في ملف [link:https://threejs.org/examples/jsm/animation/AnimationClipCreator.js AnimationClipCreator].
+		</p>
+
+		<p>
+			نظرًا لأن القيم الصريحة محددة فقط لنقاط الوقت المنفصلة المخزنة في مصفوفة الأوقات ، يجب استيفاء جميع القيم الموجودة بينهما.
+		</p>
+
+		<p>
+			يعد اسم المسار مهمًا لربط هذا المسار بخاصية معينة للعقدة المتحركة (تم إجراؤه بواسطة [page:PropertyBinding]).
+		</p>
+
+
+		<h2>المنشئ (Constructor)</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values], [param:Constant interpolation] )</h3>
+		<p>
+			[page:String name] - معرّف *KeyframeTrack*.<br />
+			[page:Array times] - مصفوفة من مرات الإطار الرئيسي ، يتم تحويلها داخليًا إلى ملف
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
+			[page:Array values] - مصفوفة بالقيم المتعلقة بمصفوفة الأوقات ، يتم تحويلها داخليًا إلى
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array].<br />
+			[page:Constant interpolation] - نوع الاستيفاء المطلوب استخدامه. أنظر
+			[page:Animation Animation Constants] للقيم الممكنة. القيمة الافتراضية هي [page:Animation InterpolateLinear].
+		</p>
+
+
+		<h2>الخصائص (Properties)</h2>
+
+
+		<h3>[property:String name]</h3>
+		<p>
+			يمكن أن يشير اسم المسار إلى [page:Geometry.morphTargets morph targets] أو [page:SkinnedMesh bones] أو ربما إلى قيم أخرى داخل كائن متحرك. راجع [page:PropertyBinding.parseTrackName] للتعرف على أشكال السلاسل التي يمكن تحليلها لربط الخاصية:
+		</p>
+
+		<p>
+			يمكن أن يحدد الاسم العقدة إما باستخدام اسمها أو uuid الخاص بها (على الرغم من أنها تحتاج إلى أن تكون في الشجرة الفرعية لعقدة الرسم البياني للمشهد التي تم تمريرها إلى جهاز المزج). أو ، إذا كان اسم المسار يبدأ بنقطة ، فإن المسار ينطبق على عقدة الجذر التي تم تمريرها إلى الخالط.
+		</p>
+
+		<p>
+			عادة ، بعد العقدة ، سيتم تحديد خاصية مباشرة. ولكن يمكنك أيضًا تحديد خاصية فرعية ، مثل. rotation[x] ، إذا كنت تريد فقط قيادة المكون X للدوران عبر مسار عائم.
+		</p>
+
+		<p>
+			يمكنك أيضًا تحديد العظام أو المواد المتعددة باستخدام اسم كائن ، على سبيل المثال: .bones[R_hand].scale; القناة الحمراء للون المنتشر للمادة الرابعة في مصفوفة المواد - كمثال آخر - يمكن الوصول إليها من خلال .bones[R_hand].scale;.
+		</p>
+
+		<p>
+			ستعمل خاصية PropertyBinding أيضًا على حل أسماء أهداف التحويل ، على سبيل المثال: .morphTargetInfluences[run].
+		</p>
+
+		<p>
+			ملاحظة: ليس بالضرورة أن يكون اسم المسار فريدًا. يمكن أن تقود مسارات متعددة نفس الممتلكات. يجب أن تستند النتيجة إلى مزيج مرجح بين المسارات المتعددة وفقًا لأوزان الإجراءات الخاصة بكل منها.
+		</p>
+
+		<h3>[property:Float32Array times]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array] تم تحويله من مصفوفة الأوقات التي تم تمريرها في المنشئ.
+		</p>
+
+		<h3>[property:Float32Array values]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array] تم تمحوله من صفيف القيم الذي تم تمريره في المنشئ.
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			نوع الاستيفاء (interpolation) الافتراضي: [page:Animation InterpolateLinear].
+		</p>
+
+		<h3>[property:Constant TimeBufferType ]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			نوع المخزن المؤقت المستخدم داخليا للأوقات.
+		</p>
+
+		<h3>[property:Constant ValueBufferType ]</h3>
+		<p>
+			[link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array Float32Array],
+			نوع المخزن المؤقت المستخدم داخليًا للقيم.
+		</p>
+
+
+		<h2>الوظائف (Methods)</h2>
+
+
+		<h3>[method:KeyframeTrack clone]()</h3>
+		<p>
+			ترجع نسخة من هذا المسار.
+		</p>
+
+		<h3>[method:null createInterpolant]()</h3>
+		<p>
+			ينشئ [page:LinearInterpolant LinearInterpolant] أو [page:CubicInterpolant CubicInterpolant] أو [page:DiscreteInterpolant DiscreteInterpolant] ، اعتمادًا على قيمة معلمة الاستيفاء التي تم تمريرها في الباني.
+		</p>
+
+		<h3>[method:null getInterpolation]()</h3>
+		<p>
+			إرجاع نوع الاستيفاء (interpolation).
+		</p>
+
+		<h3>[method:Number getValueSize]()</h3>
+		<p>
+			ترجع حجم كل قيمة (طول صفيف القيم [page:.values values] مقسومًا على طول صفيف الأوقات [page:.times times]).
+		</p>
+
+		<h3>[method:DiscreteInterpolant InterpolantFactoryMethodDiscrete]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			ينشئ [page:DiscreteInterpolant DiscreteInterpolant] جديدًا من [page:KeyframeTrack.times times] و [page:KeyframeTrack.times values]. يمكن تمرير Float32Array الذي سيحصل على النتائج. وإلا فسيتم إنشاء مصفوفة جديدة بالحجم المناسب تلقائيًا.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodLinear]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			ينشئ [page:LinearInterpolant LinearInterpolant] جديدًا من page:KeyframeTrack.times times] و [page:KeyframeTrack.times values]. يمكن تمرير Float32Array الذي سيتلقى النتائج. وإلا فسيتم إنشاء مصفوفة جديدة بالحجم المناسب تلقائيًا.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodSmooth]( [link:https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array result] )</h3>
+		<p>
+			قم بإنشاء [page:CubicInterpolant CubicInterpolant] جديد من [page:KeyframeTrack.times times] و [page:KeyframeTrack.times values]. يمكن تمرير Float32Array الذي سيحصل على النتائج. وإلا فسيتم إنشاء مصفوفة جديدة بالحجم المناسب تلقائيًا.
+		</p>
+
+		<h3>[method:this optimize]()</h3>
+		<p>
+			يزيل المفاتيح المتسلسلة المكافئة الشائعة في تسلسلات الهدف التحويلية.
+		</p>
+
+		<h3>[method:this scale]()</h3>
+		<p>
+			يغير قياس جميع مرات الإطار الرئيسي بعامل.<br /><br />
+
+			ملاحظة: هذا مفيد ، على سبيل المثال ، للتحويلات إلى معدل معين من الإطارات في الثانية (كما يتم داخليًا بواسطة [page:AnimationClip.CreateFromMorphTargetSequence animationClip.CreateFromMorphTargetSequence]).
+		</p>
+
+		<h3>[method:this setInterpolation]( [param:Constant interpolationType] )</h3>
+		<p>
+			يحدد نوع الاستيفاء. انظر [page:Animation Animation Constants] للاختيارات.
+		</p>
+
+		<h3>[method:this shift]( [param:Number timeOffsetInSeconds] )</h3>
+		<p>
+			ينقل جميع الإطارات الرئيسية إما للأمام أو للخلف في الوقت المناسب.
+		</p>
+
+
+		<h3>[method:this trim]( [param:Number startTimeInSeconds], [param:Number endTimeInSeconds] )</h3>
+		<p>
+			يزيل الإطارات الرئيسية قبل *startTime* وبعد *endTime* ، بدون تغيير أي قيم في النطاق  [*startTime*, *endTime*].
+		</p>
+
+		<h3>[method:Boolean validate]()</h3>
+		<p>
+			يؤدي الحد الأدنى من التحقق من الصحة على المسارات. يرجع *true* إذا كان صحيحا.
+		</p>
+
+		<p>
+			تقوم هذه الطريقة بتسجيل الأخطاء في وحدة التحكم ، إذا كان المسار فارغًا ، أو إذا كان [page:.valueSize value size] غير صالح ، أو إذا كان عنصر في المصفوفة [page:.times times] أو [page:.values values] ليس رقمًا صالحًا أو إذا كانت العناصر الموجودة في المصفوفة *times* خارج الترتيب.
+		</p>
+
+		<h2>الوظائف الساكنة (Static Methods)</h2>
+
+		<h3>[method:KeyframeTrack parse]( [param:JSON json] )</h3>
+		<p>
+		يحلل كائن JSON ويعيد مسار إطار رئيسي جديد من النوع الصحيح.
+		</p>
+
+		<h3>[method:JSON toJSON]( [param:KeyframeTrack track] )</h3>
+		<p>
+		يحول المسار إلى JSON.
+		</p>
+
+
+		<h2>المصدر (Source)</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
