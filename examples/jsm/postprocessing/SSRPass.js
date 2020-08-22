@@ -45,7 +45,7 @@ var SSRPass = function(scene, camera, width, height) {
   // this.opacity = .5;
   this.output = 0;
 
-  this.maxDistance = 500;
+  this.maxDistance = 550;
   this.surfDist = 1.
 
   // beauty render target with depth buffer
