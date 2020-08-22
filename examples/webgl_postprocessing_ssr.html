@@ -290,13 +290,8 @@
 			ssrPass.output = parseInt(value);
 
 		});
-		// gui.add(params, 'enableSSR').name( 'Enable SSR' );
-		// gui.add(ssrPass, 'opacity').min(0).max(1);
-		// gui.add(ssrPass, 'maxDistance').min(0).max(2);
-		// gui.add(ssrPass, 'stepStride').min(1).max(10).step(1);
-		gui.add(ssrPass, 'surfDist').min(1).max(20).step(.1);
-		// gui.add(ssrPass, 'isFade');
-		// gui.add(ssrPass, 'fadeIntensity').min(0).max(10).step(.1);
+		gui.add(ssrPass, 'maxDistance').min(1).max(1000);
+		gui.add(ssrPass, 'surfDist').min(1).max(10).step(.1);
 
 	}
 

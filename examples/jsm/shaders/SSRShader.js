@@ -4,9 +4,7 @@ import {
 } from "../../../build/three.module.js";
 /**
  * References:
- * http://john-chapman-graphics.blogspot.com/2013/01/ssr-tutorial.html
- * https://learnopengl.com/Advanced-Lighting/SSR
- * https://github.com/McNopper/OpenGL/blob/master/Example28/shader/ssr.frag.glsl
+ * https://lettier.github.io/3d-game-shaders-for-beginners/screen-space-reflection.html
  */
 
 var SSRShader = {
@@ -20,15 +18,12 @@ var SSRShader = {
     "tDiffuse": { value: null },
     "tNormal": { value: null },
     "tDepth": { value: null },
-    "tNoise": { value: null },
-    "kernel": { value: null },
     "cameraNear": { value: null },
     "cameraFar": { value: null },
     "resolution": { value: new Vector2() },
     "cameraProjectionMatrix": { value: new Matrix4() },
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
-    "kernelRadius": { value: 8 },
-    "minDistance": { value: 0.005 },
+    // "opacity": { value: .5 },
     "maxDistance": { value: 0.05 },
     "cameraRange": { value: 0 },
     "surfDist": { value: 0 },
@@ -38,12 +33,10 @@ var SSRShader = {
   vertexShader: [
 
     "varying vec2 vUv;",
-    "varying mat4 vProjectionMatrix;",
 
     "void main() {",
 
     "	vUv = uv;",
-    "	vProjectionMatrix = projectionMatrix;",
 
     "	gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );",
 
@@ -52,7 +45,6 @@ var SSRShader = {
   ].join("\n"),
 
   fragmentShader: `
-		#define MAX_DIST 1000.0
 		#define MAX_STEP ${innerWidth * Math.sqrt(2)}
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
@@ -62,6 +54,8 @@ var SSRShader = {
 		uniform vec2 resolution;
 		uniform float cameraNear;
 		uniform float cameraFar;
+		// uniform float opacity;
+		uniform float maxDistance;
 		uniform float surfDist;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
@@ -124,7 +118,7 @@ var SSRShader = {
 			vec3 viewNormal=getViewNormal( vUv );;
 			vec3 viewReflectDir=reflect(normalize(viewPosition),viewNormal);
 
-			vec3 d1viewPosition=viewPosition+viewReflectDir*MAX_DIST;
+			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
 			d1=viewPositionToXY(d1viewPosition);
 
 			float totalLen=length(d1-d0);
@@ -146,7 +140,7 @@ var SSRShader = {
 				float d = getDepth(uv);
 				float vZ = getViewZ( d );
 				vec3 vP=getViewPosition( uv, d, vZ );
-				float away=pointToLineDistance(vP,viewPosition,viewPosition+viewReflectDir*MAX_DIST);
+				float away=pointToLineDistance(vP,viewPosition,viewPosition+viewReflectDir*maxDistance);
 				if(away<surfDist){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;

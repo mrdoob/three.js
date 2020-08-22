@@ -25,7 +25,6 @@ import {
   DoubleSide
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
-import { SimplexNoise } from "../math/SimplexNoise.js";
 import { SSRShader } from "../shaders/SSRShader.js";
 import { SSRBlurShader } from "../shaders/SSRShader.js";
 import { SSRDepthShader } from "../shaders/SSRShader.js";
@@ -43,20 +42,11 @@ var SSRPass = function(scene, camera, width, height) {
   this.camera = camera;
   this.scene = scene;
 
-  this.kernelRadius = 8;
-  this.kernelSize = 32;
-  this.kernel = [];
-  this.noiseTexture = null;
+  // this.opacity = .5;
   this.output = 0;
 
-  this.minDistance = 0.005;
-  this.maxDistance = 0.1;
+  this.maxDistance = 500;
   this.surfDist = 1.
-
-  //
-
-  this.generateSampleKernel();
-  this.generateRandomKernelRotations();
 
   // beauty render target with depth buffer
 
@@ -112,8 +102,6 @@ var SSRPass = function(scene, camera, width, height) {
   this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
   this.ssrMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
   this.ssrMaterial.uniforms['tDepth'].value = this.beautyRenderTarget.depthTexture;
-  this.ssrMaterial.uniforms['tNoise'].value = this.noiseTexture;
-  this.ssrMaterial.uniforms['kernel'].value = this.kernel;
   this.ssrMaterial.uniforms['cameraNear'].value = this.camera.near;
   this.ssrMaterial.uniforms['cameraFar'].value = this.camera.far;
   this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
@@ -214,14 +202,14 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render SSR
 
-    this.ssrMaterial.uniforms['kernelRadius'].value = this.kernelRadius;
-    this.ssrMaterial.uniforms['minDistance'].value = this.minDistance;
+    // this.ssrMaterial.uniforms['opacity'].value = this.opacity;
     this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
-		this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
+    this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
     this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
 
     // render blur
 
+    // this.blurMaterial.uniforms['opacity'].value = this.opacity;
     this.renderPass(renderer, this.blurMaterial, this.blurRenderTarget);
 
     // output result to screen
@@ -364,69 +352,6 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.blurMaterial.uniforms['resolution'].value.set(width, height);
 
   },
-
-  generateSampleKernel: function() {
-
-    var kernelSize = this.kernelSize;
-    var kernel = this.kernel;
-
-    for (var i = 0; i < kernelSize; i++) {
-
-      var sample = new Vector3();
-      sample.x = (Math.random() * 2) - 1;
-      sample.y = (Math.random() * 2) - 1;
-      sample.z = Math.random();
-
-      sample.normalize();
-
-      var scale = i / kernelSize;
-      scale = MathUtils.lerp(0.1, 1, scale * scale);
-      sample.multiplyScalar(scale);
-
-      kernel.push(sample);
-
-    }
-
-  },
-
-  generateRandomKernelRotations: function() {
-
-    var width = 4,
-      height = 4;
-
-    if (SimplexNoise === undefined) {
-
-      console.error('THREE.SSRPass: The pass relies on SimplexNoise.');
-
-    }
-
-    var simplex = new SimplexNoise();
-
-    var size = width * height;
-    var data = new Float32Array(size * 4);
-
-    for (var i = 0; i < size; i++) {
-
-      var stride = i * 4;
-
-      var x = (Math.random() * 2) - 1;
-      var y = (Math.random() * 2) - 1;
-      var z = 0;
-
-      var noise = simplex.noise3d(x, y, z);
-
-      data[stride] = noise;
-      data[stride + 1] = noise;
-      data[stride + 2] = noise;
-      data[stride + 3] = 1;
-
-    }
-
-    this.noiseTexture = new DataTexture(data, width, height, RGBAFormat, FloatType);
-    this.noiseTexture.wrapS = RepeatWrapping;
-    this.noiseTexture.wrapT = RepeatWrapping;
-
-  }
 
 });
 

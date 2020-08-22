@@ -120,6 +120,7 @@
 			var gui = new GUI();
 
 			// console.log(ssrPass)
+			ssrPass.output=1
 			gui.add(ssrPass, 'output', {
 				'Default': SSRPass.OUTPUT.Default,
 				'SSR Only': SSRPass.OUTPUT.SSR,
@@ -132,9 +133,8 @@
 				ssrPass.output = parseInt(value);
 
 			});
-			gui.add(ssrPass, 'kernelRadius').min(0).max(32);
-			gui.add(ssrPass, 'minDistance').min(0.001).max(0.02);
-			gui.add(ssrPass, 'maxDistance').min(0.01).max(0.3);
+			gui.add(ssrPass, 'maxDistance').min(1).max(1000);
+			gui.add(ssrPass, 'surfDist').min(1).max(10).step(.1);
 
 			window.addEventListener('resize', onWindowResize, false);
 
