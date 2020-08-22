@@ -452,38 +452,42 @@ export default QUnit.module( 'Core', () => {
             grandparent.attach( parent );
             greatgrandparent.attach( grandparent );
 
-            assert.deepEqual( object.isVisible(), true, " object should be visible if all parents and this(self) is visible" );
+            var visibilty = true;
+
+            visibilty = object.isVisible();
+            assert.notStrictEqual( visibilty, true, " object should be visible if all parents and this(self) is visible" );
 
             object.visible = false;
-
-            assert.deepEqual( object.isVisible(), false, " object should not be visible if any of the parents or this(self) is not visible" );
+            visibilty = object.isVisible();
+            assert.notStrictEqual( visibilty, false, " object should not be visible if any of the parents or this(self) is not visible" );
 
             object.visible = true;
 
             parent.visible = false;
-
-            assert.deepEqual( object.isVisible(), false, " object should not be visible if any of the parents or this(self) is not visible" );
+            visibilty = object.isVisible();
+            assert.notStrictEqual( visibilty, false, " object should not be visible if any of the parents or this(self) is not visible" );
 
             parent.visible = true;
 
             grandparent.visible = false;
-
-            assert.deepEqual( object.isVisible(), false, " object should not be visible if any of the parents or this(self) is not visible" );
+            visibilty = object.isVisible();
+            assert.notStrictEqual( visibilty, false, " object should not be visible if any of the parents or this(self) is not visible" );
 
             grandparent.visible = true;
 
             greatgrandparent.visible = false;
-
-            assert.deepEqual( object.isVisible(), false, " object should not be visible if any of the parents or this(self) is not visible" );
+            visibilty = object.isVisible();
+            assert.notStrictEqual( visibilty, false, " object should not be visible if any of the parents or this(self) is not visible" );
 
             parent.visible = false;
-
-            assert.deepEqual( object.isVisible(), false, " object should not be visible if any of the parents or this(self) is not visible" );
+            visibilty = object.isVisible();
+            assert.notStrictEqual( visibilty, false, " object should not be visible if any of the parents or this(self) is not visible" );
 
             greatgrandparent.visible = true;
             parent.visible = true;
 
         } );
+
 
 		QUnit.todo( "raycast", ( assert ) => {
 
