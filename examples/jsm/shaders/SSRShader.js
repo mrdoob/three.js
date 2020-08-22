@@ -117,9 +117,15 @@ var SSRShader = {
 
 			vec3 viewNormal=getViewNormal( vUv );;
 			vec3 viewReflectDir=reflect(normalize(viewPosition),viewNormal);
-
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
+			if(d1viewPosition.z>0.){
+				float scale=viewPosition.z/(viewPosition.z+-d1viewPosition.z);
+				d1viewPosition.xy*=scale;
+				d1viewPosition.z=0.;
+			}
+			// gl_FragColor=vec4(d1viewPosition/100.,1);return;
 			d1=viewPositionToXY(d1viewPosition);
+			// gl_FragColor=vec4(d1/resolution,0,1);return;
 
 			float totalLen=length(d1-d0);
 			float xLen=d1.x-d0.x;
