@@ -1,7 +1,3 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -436,7 +432,7 @@ DRACOLoader.DRACOWorker = function () {
 
 					};
 
-					DracoDecoderModule( decoderConfig );
+					DracoDecoderModule( decoderConfig ); // eslint-disable-line no-undef
 
 				} );
 				break;

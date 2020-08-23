@@ -56,10 +56,6 @@ import { FileLoader } from './FileLoader.js';
 import * as Geometries from '../geometries/Geometries.js';
 import * as Curves from '../extras/curves/Curves.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function ObjectLoader( manager ) {
 
 	Loader.call( this, manager );

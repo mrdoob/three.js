@@ -1,9 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- * A LightProbe is a source of indirect-diffuse light
- */
-
 import { SphericalHarmonics3 } from '../math/SphericalHarmonics3.js';
 import { Light } from './Light.js';
 

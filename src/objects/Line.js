@@ -7,10 +7,6 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 const _start = new Vector3();
 const _end = new Vector3();
 const _inverseMatrix = new Matrix4();

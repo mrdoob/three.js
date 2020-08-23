@@ -10,13 +10,6 @@ import { DoubleSide, BackSide } from '../constants.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author mikael emtinger / http://gomo.se/
- * @author jonobr1 / http://jonobr1.com/
- */
-
 const _inverseMatrix = new Matrix4();
 const _ray = new Ray();
 const _sphere = new Sphere();

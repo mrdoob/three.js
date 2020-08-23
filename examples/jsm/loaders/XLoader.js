@@ -1,7 +1,3 @@
-/**
- * @author adrs2002 / https://github.com/adrs2002
- */
-
 import {
 	AnimationClip,
 	AnimationMixer,

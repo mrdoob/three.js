@@ -1,14 +1,3 @@
-/**
- * GCodeLoader is used to load gcode files usually used for 3D printing or CNC applications.
- *
- * Gcode files are composed by commands used by machines to create objects.
- *
- * @class GCodeLoader
- * @param {Manager} manager Loading manager.
- * @author tentone
- * @author joewalnes
- */
-
 import {
 	BufferGeometry,
 	Euler,
@@ -19,6 +8,14 @@ import {
 	LineSegments,
 	Loader
 } from "../../../build/three.module.js";
+/**
+ * GCodeLoader is used to load gcode files usually used for 3D printing or CNC applications.
+ *
+ * Gcode files are composed by commands used by machines to create objects.
+ *
+ * @class GCodeLoader
+ * @param {Manager} manager Loading manager.
+ */
 
 var GCodeLoader = function ( manager ) {
 

@@ -17,20 +17,33 @@ export class PointLight extends Light {
 		decay?: number
 	);
 
-	/*
+	/**
+	 * @default 'PointLight'
+	 */
+	type: string;
+
+	/**
 	 * Light's intensity.
-	 * Default - 1.0.
+	 * @default 1
 	 */
 	intensity: number;
 
 	/**
 	 * If non-zero, light will attenuate linearly from maximum intensity at light position down to zero at distance.
-	 * Default - 0.0.
+	 * @default 0
 	 */
 	distance: number;
 
+	/**
+	 * @default 1
+	 */
 	decay: number;
+
+	/**
+	 * @default new THREE.PointLightShadow()
+	 */
 	shadow: PointLightShadow;
+
 	power: number;
 
 }

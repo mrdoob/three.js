@@ -1,6 +1,11 @@
+import {
+	BufferGeometry,
+	FileLoader,
+	Float32BufferAttribute,
+	Loader,
+	LoaderUtils
+} from "../../../build/three.module.js";
 /**
- * @author Wei Meng / http://about.me/menway
- *
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
  * File Format or the Stanford Triangle Format).
  *
@@ -25,14 +30,6 @@
  * } );
  *
  */
-
-import {
-	BufferGeometry,
-	FileLoader,
-	Float32BufferAttribute,
-	Loader,
-	LoaderUtils
-} from "../../../build/three.module.js";
 
 
 var PLYLoader = function ( manager ) {

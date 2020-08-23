@@ -1,64 +1,26 @@
 import { Vector3 } from './Vector3.js';
 
-const _points = [
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3()
-];
+class Box3 {
 
-const _vector = new Vector3();
+	constructor( min, max ) {
 
-const _box = new Box3();
+		Object.defineProperty( this, 'isBox3', { value: true } );
 
-// triangle centered vertices
+		this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
+		this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
 
-const _v0 = new Vector3();
-const _v1 = new Vector3();
-const _v2 = new Vector3();
+	}
 
-// triangle edge vectors
-
-const _f0 = new Vector3();
-const _f1 = new Vector3();
-const _f2 = new Vector3();
-
-const _center = new Vector3();
-const _extents = new Vector3();
-const _triangleNormal = new Vector3();
-const _testAxis = new Vector3();
-
-/**
- * @author bhouston / http://clara.io
- * @author WestLangley / http://github.com/WestLangley
- */
-
-function Box3( min, max ) {
-
-	this.min = ( min !== undefined ) ? min : new Vector3( + Infinity, + Infinity, + Infinity );
-	this.max = ( max !== undefined ) ? max : new Vector3( - Infinity, - Infinity, - Infinity );
-
-}
-
-
-Object.assign( Box3.prototype, {
-
-	isBox3: true,
-
-	set: function ( min, max ) {
+	set( min, max ) {
 
 		this.min.copy( min );
 		this.max.copy( max );
 
 		return this;
 
-	},
+	}
 
-	setFromArray: function ( array ) {
+	setFromArray( array ) {
 
 		let minX = + Infinity;
 		let minY = + Infinity;
@@ -89,9 +51,9 @@ Object.assign( Box3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromBufferAttribute: function ( attribute ) {
+	setFromBufferAttribute( attribute ) {
 
 		let minX = + Infinity;
 		let minY = + Infinity;
@@ -122,9 +84,9 @@ Object.assign( Box3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromPoints: function ( points ) {
+	setFromPoints( points ) {
 
 		this.makeEmpty();
 
@@ -136,9 +98,9 @@ Object.assign( Box3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromCenterAndSize: function ( center, size ) {
+	setFromCenterAndSize( center, size ) {
 
 		const halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
 
@@ -147,49 +109,49 @@ Object.assign( Box3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setFromObject: function ( object ) {
+	setFromObject( object ) {
 
 		this.makeEmpty();
 
 		return this.expandByObject( object );
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new this.constructor().copy( this );
 
-	},
+	}
 
-	copy: function ( box ) {
+	copy( box ) {
 
 		this.min.copy( box.min );
 		this.max.copy( box.max );
 
 		return this;
 
-	},
+	}
 
-	makeEmpty: function () {
+	makeEmpty() {
 
 		this.min.x = this.min.y = this.min.z = + Infinity;
 		this.max.x = this.max.y = this.max.z = - Infinity;
 
 		return this;
 
-	},
+	}
 
-	isEmpty: function () {
+	isEmpty() {
 
 		// this is a more robust check for empty than ( volume <= 0 ) because volume can get positive with two negative axes
 
 		return ( this.max.x < this.min.x ) || ( this.max.y < this.min.y ) || ( this.max.z < this.min.z );
 
-	},
+	}
 
-	getCenter: function ( target ) {
+	getCenter( target ) {
 
 		if ( target === undefined ) {
 
@@ -200,9 +162,9 @@ Object.assign( Box3.prototype, {
 
 		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.addVectors( this.min, this.max ).multiplyScalar( 0.5 );
 
-	},
+	}
 
-	getSize: function ( target ) {
+	getSize( target ) {
 
 		if ( target === undefined ) {
 
@@ -213,36 +175,36 @@ Object.assign( Box3.prototype, {
 
 		return this.isEmpty() ? target.set( 0, 0, 0 ) : target.subVectors( this.max, this.min );
 
-	},
+	}
 
-	expandByPoint: function ( point ) {
+	expandByPoint( point ) {
 
 		this.min.min( point );
 		this.max.max( point );
 
 		return this;
 
-	},
+	}
 
-	expandByVector: function ( vector ) {
+	expandByVector( vector ) {
 
 		this.min.sub( vector );
 		this.max.add( vector );
 
 		return this;
 
-	},
+	}
 
-	expandByScalar: function ( scalar ) {
+	expandByScalar( scalar ) {
 
 		this.min.addScalar( - scalar );
 		this.max.addScalar( scalar );
 
 		return this;
 
-	},
+	}
 
-	expandByObject: function ( object ) {
+	expandByObject( object ) {
 
 		// Computes the world-axis-aligned bounding box of an object (including its children),
 		// accounting for both the object's, and children's, world transforms
@@ -276,25 +238,25 @@ Object.assign( Box3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	containsPoint: function ( point ) {
+	containsPoint( point ) {
 
 		return point.x < this.min.x || point.x > this.max.x ||
 			point.y < this.min.y || point.y > this.max.y ||
 			point.z < this.min.z || point.z > this.max.z ? false : true;
 
-	},
+	}
 
-	containsBox: function ( box ) {
+	containsBox( box ) {
 
 		return this.min.x <= box.min.x && box.max.x <= this.max.x &&
 			this.min.y <= box.min.y && box.max.y <= this.max.y &&
 			this.min.z <= box.min.z && box.max.z <= this.max.z;
 
-	},
+	}
 
-	getParameter: function ( point, target ) {
+	getParameter( point, target ) {
 
 		// This can potentially have a divide by zero if the box
 		// has a size dimension of 0.
@@ -312,18 +274,18 @@ Object.assign( Box3.prototype, {
 			( point.z - this.min.z ) / ( this.max.z - this.min.z )
 		);
 
-	},
+	}
 
-	intersectsBox: function ( box ) {
+	intersectsBox( box ) {
 
 		// using 6 splitting planes to rule out intersections.
 		return box.max.x < this.min.x || box.min.x > this.max.x ||
 			box.max.y < this.min.y || box.min.y > this.max.y ||
 			box.max.z < this.min.z || box.min.z > this.max.z ? false : true;
 
-	},
+	}
 
-	intersectsSphere: function ( sphere ) {
+	intersectsSphere( sphere ) {
 
 		// Find the point on the AABB closest to the sphere center.
 		this.clampPoint( sphere.center, _vector );
@@ -331,9 +293,9 @@ Object.assign( Box3.prototype, {
 		// If that point is inside the sphere, the AABB and sphere intersect.
 		return _vector.distanceToSquared( sphere.center ) <= ( sphere.radius * sphere.radius );
 
-	},
+	}
 
-	intersectsPlane: function ( plane ) {
+	intersectsPlane( plane ) {
 
 		// We compute the minimum and maximum dot product values. If those values
 		// are on the same side (back or front) of the plane, then there is no intersection.
@@ -378,9 +340,9 @@ Object.assign( Box3.prototype, {
 
 		return ( min <= - plane.constant && max >= - plane.constant );
 
-	},
+	}
 
-	intersectsTriangle: function ( triangle ) {
+	intersectsTriangle( triangle ) {
 
 		if ( this.isEmpty() ) {
 
@@ -431,9 +393,9 @@ Object.assign( Box3.prototype, {
 
 		return satForAxes( axes, _v0, _v1, _v2, _extents );
 
-	},
+	}
 
-	clampPoint: function ( point, target ) {
+	clampPoint( point, target ) {
 
 		if ( target === undefined ) {
 
@@ -444,17 +406,17 @@ Object.assign( Box3.prototype, {
 
 		return target.copy( point ).clamp( this.min, this.max );
 
-	},
+	}
 
-	distanceToPoint: function ( point ) {
+	distanceToPoint( point ) {
 
 		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
 
 		return clampedPoint.sub( point ).length();
 
-	},
+	}
 
-	getBoundingSphere: function ( target ) {
+	getBoundingSphere( target ) {
 
 		if ( target === undefined ) {
 
@@ -469,9 +431,9 @@ Object.assign( Box3.prototype, {
 
 		return target;
 
-	},
+	}
 
-	intersect: function ( box ) {
+	intersect( box ) {
 
 		this.min.max( box.min );
 		this.max.min( box.max );
@@ -481,18 +443,18 @@ Object.assign( Box3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	union: function ( box ) {
+	union( box ) {
 
 		this.min.min( box.min );
 		this.max.max( box.max );
 
 		return this;
 
-	},
+	}
 
-	applyMatrix4: function ( matrix ) {
+	applyMatrix4( matrix ) {
 
 		// transform of empty box is an empty box.
 		if ( this.isEmpty() ) return this;
@@ -511,24 +473,24 @@ Object.assign( Box3.prototype, {
 
 		return this;
 
-	},
+	}
 
-	translate: function ( offset ) {
+	translate( offset ) {
 
 		this.min.add( offset );
 		this.max.add( offset );
 
 		return this;
 
-	},
+	}
 
-	equals: function ( box ) {
+	equals( box ) {
 
 		return box.min.equals( this.min ) && box.max.equals( this.max );
 
 	}
 
-} );
+}
 
 function satForAxes( axes, v0, v1, v2, extents ) {
 
@@ -555,5 +517,38 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 	return true;
 
 }
+
+const _points = [
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3(),
+	new Vector3()
+];
+
+const _vector = new Vector3();
+
+const _box = new Box3();
+
+// triangle centered vertices
+
+const _v0 = new Vector3();
+const _v1 = new Vector3();
+const _v2 = new Vector3();
+
+// triangle edge vectors
+
+const _f0 = new Vector3();
+const _f1 = new Vector3();
+const _f2 = new Vector3();
+
+const _center = new Vector3();
+const _extents = new Vector3();
+const _triangleNormal = new Vector3();
+const _testAxis = new Vector3();
+
 
 export { Box3 };

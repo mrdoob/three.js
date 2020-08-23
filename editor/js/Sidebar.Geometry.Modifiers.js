@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIRow, UIButton } from './libs/ui.js';
 
 function SidebarGeometryModifiers( editor, object ) {

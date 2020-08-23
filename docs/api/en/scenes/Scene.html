@@ -33,7 +33,8 @@
 
 		<h3>[property:Object background]</h3>
 		<p>
-		If not null, sets the background used when rendering the scene, and is always rendered first. Can be set to a [page:Color] which sets the clear color, a [page:Texture] covering the canvas, or a cubemap as a [page:CubeTexture] or [page:WebGLCubeRenderTarget]. Default is null.
+		If not null, sets the background used when rendering the scene, and is always rendered first.
+		Can be set to a [page:Color] which sets the clear color, a [page:Texture] covering the canvas, a cubemap as a [page:CubeTexture] or [page:WebGLCubeRenderTarget] or an equirectangular as a [page:Texture] . Default is null.
 		</p>
 
 		<h3>[property:Texture environment]</h3>
@@ -51,11 +52,6 @@
 		<p>If not null, it will force everything in the scene to be rendered with that material. Default is null.</p>
 
 		<h2>Methods</h2>
-
-		<h3>[method:null dispose]()</h3>
-		<p>
-		Clears scene related data internally cached by [page:WebGLRenderer].
-		</p>
 
 		<h3>[method:Object toJSON]( [param:Object meta] )</h3>
 		<p>

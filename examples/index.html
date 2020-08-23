@@ -231,6 +231,7 @@
 		function updateFilter() {
 
 			var v = filterInput.value.trim();
+			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
 
 			if ( v !== '' ) {
 
@@ -340,7 +341,7 @@
 
 			if ( p !== - 1 ) {
 
-				return window.location.search.substr( 3 );
+				return decodeURI( window.location.search.substr( 3 ) );
 
 			}
 

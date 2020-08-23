@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIDiv, UIText, UIRow } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
 

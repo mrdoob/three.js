@@ -1,14 +1,3 @@
-/**
- * @author Richard M. / https://github.com/richardmonette
- * @author ScieCode / http://github.com/sciecode
- *
- * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
- * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
- *
- * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
- * implementation, so I have preserved their copyright notices.
- */
-
 import {
 	DataTextureLoader,
 	FloatType,
@@ -23,6 +12,13 @@ import {
 	UnsignedByteType
 } from "../../../build/three.module.js";
 import { Inflate } from "../libs/inflate.module.min.js";
+/**
+ * OpenEXR loader currently supports uncompressed, ZIP(S), RLE, PIZ and DWA/B compression.
+ * Supports reading as UnsignedByte, HalfFloat and Float type data texture.
+ *
+ * Referred to the original Industrial Light & Magic OpenEXR implementation and the TinyEXR / Syoyo Fujita
+ * implementation, so I have preserved their copyright notices.
+ */
 
 // /*
 // Copyright (c) 2014 - 2017, Syoyo Fujita
@@ -955,7 +951,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				for ( let comp = 0; comp < numComp; ++ comp ) {
 
-					let type = channelData[ cscSet.idx[ comp ] ].type;
+					const type = channelData[ cscSet.idx[ comp ] ].type;
 
 					for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
 
@@ -963,7 +959,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 						for ( let blockx = 0; blockx < numFullBlocksX; ++ blockx ) {
 
-							let src = blockx * 64 + ( ( y & 0x7 ) * 8 );
+							const src = blockx * 64 + ( ( y & 0x7 ) * 8 );
 
 							dataView.setUint16( offset + 0 * INT16_SIZE * type, rowBlock[ comp ][ src + 0 ], true );
 							dataView.setUint16( offset + 1 * INT16_SIZE * type, rowBlock[ comp ][ src + 1 ], true );
@@ -986,8 +982,8 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 						for ( let y = 8 * blocky; y < 8 * blocky + maxY; ++ y ) {
 
-							let offset = rowOffsets[ comp ][ y ] + 8 * numFullBlocksX * INT16_SIZE * type;
-							let src = numFullBlocksX * 64 + ( ( y & 0x7 ) * 8 );
+							const offset = rowOffsets[ comp ][ y ] + 8 * numFullBlocksX * INT16_SIZE * type;
+							const src = numFullBlocksX * 64 + ( ( y & 0x7 ) * 8 );
 
 							for ( let x = 0; x < maxX; ++ x ) {
 
@@ -1016,7 +1012,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				for ( var y = 0; y < height; ++ y ) {
 
-					let offset = rowOffsets[ comp ][ y ];
+					const offset = rowOffsets[ comp ][ y ];
 
 					for ( var x = 0; x < width; ++ x ) {
 
@@ -1415,6 +1411,83 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
+		function uncompressPXR( info ) {
+
+			var compressed = info.array.slice( info.offset.value, info.offset.value + info.size );
+
+			if ( typeof Inflate === 'undefined' ) {
+
+				console.error( 'THREE.EXRLoader: External library Inflate.min.js required, obtain or import from https://github.com/imaya/zlib.js' );
+
+			}
+
+			const inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
+			const rawBuffer = new Uint8Array( inflate.decompress().buffer );
+
+			const sz = info.lines * info.channels * info.width;
+			const tmpBuffer = ( info.type == 1 ) ? new Uint16Array( sz ) : new Uint32Array( sz );
+
+			let tmpBufferEnd = 0;
+			let writePtr = 0;
+			const ptr = new Array( 4 );
+
+			for ( let y = 0; y < info.lines; y ++ ) {
+
+				for ( let c = 0; c < info.channels; c ++ ) {
+
+					let pixel = 0;
+
+					switch ( info.type ) {
+
+						case 1:
+
+							ptr[ 0 ] = tmpBufferEnd;
+							ptr[ 1 ] = ptr[ 0 ] + info.width;
+							tmpBufferEnd = ptr[ 1 ] + info.width;
+
+							for ( let j = 0; j < info.width; ++ j ) {
+
+								const diff = ( rawBuffer[ ptr[ 0 ] ++ ] << 8 ) | rawBuffer[ ptr[ 1 ] ++ ];
+
+								pixel += diff;
+
+								tmpBuffer[ writePtr ] = pixel;
+								writePtr ++;
+
+							}
+
+							break;
+
+						case 2:
+
+							ptr[ 0 ] = tmpBufferEnd;
+							ptr[ 1 ] = ptr[ 0 ] + info.width;
+							ptr[ 2 ] = ptr[ 1 ] + info.width;
+							tmpBufferEnd = ptr[ 2 ] + info.width;
+
+							for ( let j = 0; j < info.width; ++ j ) {
+
+								const diff = ( rawBuffer[ ptr[ 0 ] ++ ] << 24 ) | ( rawBuffer[ ptr[ 1 ] ++ ] << 16 ) | ( rawBuffer[ ptr[ 2 ] ++ ] << 8 );
+
+								pixel += diff;
+
+								tmpBuffer[ writePtr ] = pixel;
+								writePtr ++;
+
+							}
+
+							break;
+
+					}
+
+				}
+
+			}
+
+			return new DataView( tmpBuffer.buffer );
+
+		}
+
 		function uncompressDWA( info ) {
 
 			var inDataView = info.viewer;
@@ -1528,7 +1601,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 					case DEFLATE:
 
 						var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.totalAcUncompressedCount );
-						var inflate = new Inflate( compressed, { resize: true, verify: true } );
+						var inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
 						var acBuffer = new Uint16Array( inflate.decompress().buffer );
 						inOffset.value += dwaHeader.totalAcUncompressedCount;
 						break;
@@ -1555,7 +1628,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 			if ( dwaHeader.rleRawSize > 0 ) {
 
 				var compressed = info.array.slice( inOffset.value, inOffset.value + dwaHeader.rleCompressedSize );
-				var inflate = new Inflate( compressed, { resize: true, verify: true } );
+				var inflate = new Inflate( compressed, { resize: true, verify: true } ); // eslint-disable-line no-undef
 				var rleBuffer = decodeRunLength( inflate.decompress().buffer );
 
 				inOffset.value += dwaHeader.rleCompressedSize;
@@ -2002,9 +2075,15 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				return parseTimecode( dataView, offset );
 
+			} else if ( type === 'preview' ) {
+
+				offset.value += size;
+				return 'skipped';
+
 			} else {
 
-				throw 'Cannot parse value for unsupported type: ' + type;
+				offset.value += size;
+				return undefined;
 
 			}
 
@@ -2039,7 +2118,15 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 				var attributeSize = parseUint32( bufferDataView, offset );
 				var attributeValue = parseValue( bufferDataView, buffer, offset, attributeType, attributeSize );
 
-				EXRHeader[ attributeName ] = attributeValue;
+				if ( attributeValue === undefined ) {
+
+					console.warn( `EXRLoader.parse: skipped unknown header attribute type \'${ attributeType }\'.` );
+
+				} else {
+
+					EXRHeader[ attributeName ] = attributeValue;
+
+				}
 
 			}
 
@@ -2081,6 +2168,12 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 				scanlineBlockSize = 32;
 				uncompress = uncompressPIZ;
+				break;
+
+			case 'PXR24_COMPRESSION':
+
+				scanlineBlockSize = 16;
+				uncompress = uncompressPXR;
 				break;
 
 			case 'DWAA_COMPRESSION':
@@ -2312,7 +2405,7 @@ EXRLoader.prototype = Object.assign( Object.create( DataTextureLoader.prototype 
 
 		}
 
-		let format = ( this.type === UnsignedByteType ) ? RGBEFormat : ( numChannels === 4 ) ? RGBAFormat : RGBFormat;
+		const format = ( this.type === UnsignedByteType ) ? RGBEFormat : ( numChannels === 4 ) ? RGBAFormat : RGBFormat;
 
 		return {
 			header: EXRHeader,

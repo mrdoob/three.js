@@ -1,7 +1,5 @@
 console.warn( "THREE.3MFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author technohippy / https://github.com/technohippy
- * @author Mugen87 / https://github.com/Mugen87
  *
  * 3D Manufacturing Format (3MF) specification: https://3mf.io/specification/
  *
@@ -90,7 +88,7 @@ THREE.ThreeMFLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 
 			try {
 
-				zip = new JSZip( data );
+				zip = new JSZip( data ); // eslint-disable-line no-undef
 
 			} catch ( e ) {
 

@@ -76,6 +76,7 @@ var files = {
 		"webgl_lines_fat",
 		"webgl_lines_fat_wireframe",
 		"webgl_lines_sphere",
+		"webgl_loader_3dm",
 		"webgl_loader_3ds",
 		"webgl_loader_3mf",
 		"webgl_loader_3mf_materials",
@@ -122,6 +123,7 @@ var files = {
 		"webgl_loader_texture_rgbm",
 		"webgl_loader_texture_tga",
 		"webgl_loader_ttf",
+		"webgl_loader_vox",
 		"webgl_loader_vrm",
 		"webgl_loader_vrml",
 		"webgl_loader_vtk",
@@ -277,6 +279,7 @@ var files = {
 		"webgl_buffergeometry_constructed_from_geometry",
 		"webgl_buffergeometry_custom_attributes_particles",
 		"webgl_buffergeometry_drawrange",
+		"webgl_buffergeometry_glbufferattribute",
 		"webgl_buffergeometry_indexed",
 		"webgl_buffergeometry_instancing",
 		"webgl_buffergeometry_instancing_billboards",
@@ -313,7 +316,9 @@ var files = {
 		"webgl2_buffergeometry_attributes_integer",
 		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
-		"webgl2_multisampled_renderbuffers"
+		"webgl2_multisampled_renderbuffers",
+		"webgl2_volume_instancing",
+		"webgl2_volume_perlin"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -329,7 +334,8 @@ var files = {
 		"webxr_vr_cubes",
 		"webxr_vr_dragging",
 		"webxr_vr_handinput",
-		"webxr_vr_handinput_simple",
+		"webxr_vr_handinput_cubes",
+		"webxr_vr_handinput_profiles",
 		"webxr_vr_lorenzattractor",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
@@ -342,10 +348,10 @@ var files = {
 	"physics": [
 		"physics_ammo_break",
 		"physics_ammo_cloth",
+		"physics_ammo_instancing",
 		"physics_ammo_rope",
 		"physics_ammo_terrain",
-		"physics_ammo_volume",
-		"physics_cannon_instancing"
+		"physics_ammo_volume"
 	],
 	"misc": [
 		"misc_animation_authoring",
@@ -433,7 +439,7 @@ var tags = {
 	"webgl_materials_envmaps_parallax": [ "onBeforeCompile" ],
 	"webgl_materials_lightmap": [ "shadows" ],
 	"webgl_materials_physical_clearcoat": [ "anisotropy" ],
-	"webgl_materials_physical_transparency": [ "alpha" ],
+	"webgl_materials_physical_transmission": [ "alpha" ],
 	"webgl_materials_shaders_fresnel": [ "refraction" ],
 	"webgl_materials_standard": [ "pbr" ],
 	"webgl_materials_texture_canvas": [ "paint" ],

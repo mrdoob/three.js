@@ -2,10 +2,6 @@ import { AnimationClip } from '../animation/AnimationClip.js';
 import { FileLoader } from './FileLoader.js';
 import { Loader } from './Loader.js';
 
-/**
- * @author bhouston / http://clara.io/
- */
-
 function AnimationLoader( manager ) {
 
 	Loader.call( this, manager );

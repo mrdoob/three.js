@@ -1,12 +1,4 @@
 console.warn( "THREE.GLTFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-/**
- * @author Rich Tibbett / https://github.com/richtr
- * @author mrdoob / http://mrdoob.com/
- * @author Tony Parisi / http://www.tonyparisi.com/
- * @author Takahiro / https://github.com/takahirox
- * @author Don McCurdy / https://www.donmccurdy.com
- * @author Arseny Kapoulkine / https://github.com/zeux
- */
 
 THREE.GLTFLoader = ( function () {
 
@@ -496,7 +488,12 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	GLTFMaterialsClearcoatExtension.prototype.getMaterialType = function ( /* materialIndex */ ) {
+	GLTFMaterialsClearcoatExtension.prototype.getMaterialType = function ( materialIndex ) {
+
+		var parser = this.parser;
+		var materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
 
 		return THREE.MeshPhysicalMaterial;
 
@@ -572,7 +569,12 @@ THREE.GLTFLoader = ( function () {
 
 	}
 
-	GLTFMaterialsTransmissionExtension.prototype.getMaterialType = function ( /* materialIndex */ ) {
+	GLTFMaterialsTransmissionExtension.prototype.getMaterialType = function ( materialIndex ) {
+
+		var parser = this.parser;
+		var materialDef = parser.json.materials[ materialIndex ];
+
+		if ( ! materialDef.extensions || ! materialDef.extensions[ this.name ] ) return null;
 
 		return THREE.MeshPhysicalMaterial;
 
@@ -1314,11 +1316,6 @@ THREE.GLTFLoader = ( function () {
 		OPAQUE: 'OPAQUE',
 		MASK: 'MASK',
 		BLEND: 'BLEND'
-	};
-
-	var MIME_TYPE_FORMATS = {
-		'image/png': THREE.RGBAFormat,
-		'image/jpeg': THREE.RGBFormat
 	};
 
 	/* UTILITY FUNCTIONS */
@@ -2161,12 +2158,22 @@ THREE.GLTFLoader = ( function () {
 
 		var sourceURI = source.uri;
 		var isObjectURL = false;
+		var hasAlpha = true;
+
+		if ( source.mimeType === 'image/jpeg' ) hasAlpha = false;
 
 		if ( source.bufferView !== undefined ) {
 
 			// Load binary image data from bufferView, if provided.
 
 			sourceURI = parser.getDependency( 'bufferView', source.bufferView ).then( function ( bufferView ) {
+
+				if ( source.mimeType === 'image/png' ) {
+
+					// https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
+					hasAlpha = new DataView( bufferView, 25, 1 ).getUint8( 0, false ) === 6;
+
+				}
 
 				isObjectURL = true;
 				var blob = new Blob( [ bufferView ], { type: source.mimeType } );
@@ -2211,12 +2218,8 @@ THREE.GLTFLoader = ( function () {
 
 			if ( textureDef.name ) texture.name = textureDef.name;
 
-			// Ignore unknown mime types, like DDS files.
-			if ( source.mimeType in MIME_TYPE_FORMATS ) {
-
-				texture.format = MIME_TYPE_FORMATS[ source.mimeType ];
-
-			}
+			// When there is definitely no alpha channel in the texture, set RGBFormat to save space.
+			if ( ! hasAlpha ) texture.format = THREE.RGBFormat;
 
 			var samplers = json.samplers || {};
 			var sampler = samplers[ textureDef.sampler ] || {};
@@ -2249,22 +2252,6 @@ THREE.GLTFLoader = ( function () {
 		var parser = this;
 
 		return this.getDependency( 'texture', mapDef.index ).then( function ( texture ) {
-
-			if ( ! texture.isCompressedTexture ) {
-
-				switch ( mapName ) {
-
-					case 'aoMap':
-					case 'emissiveMap':
-					case 'metalnessMap':
-					case 'normalMap':
-					case 'roughnessMap':
-						texture.format = THREE.RGBFormat;
-						break;
-
-				}
-
-			}
 
 			// Materials sample aoMap from UV set 1 and other maps from UV set 0 - this can't be configured
 			// However, we will copy UV set 0 to UV set 1 on demand for aoMap

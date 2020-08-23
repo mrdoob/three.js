@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIElement, UIPanel, UIText } from './libs/ui.js';
 
 import { SetScriptValueCommand } from './commands/SetScriptValueCommand.js';

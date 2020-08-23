@@ -1,10 +1,6 @@
 import { Vector3 } from '../math/Vector3.js';
 import { BufferAttribute } from './BufferAttribute.js';
 
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- */
-
 const _vector = new Vector3();
 
 function InterleavedBufferAttribute( interleavedBuffer, itemSize, offset, normalized ) {

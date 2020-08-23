@@ -1,8 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 import {
 	Box3,
 	Float32BufferAttribute,

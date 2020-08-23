@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { SpriteNode } from './nodes/SpriteNode.js';
 import { NodeMaterial } from './NodeMaterial.js';
 import { NodeUtils } from '../core/NodeUtils.js';

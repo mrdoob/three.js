@@ -36,98 +36,128 @@ export class Object3D extends EventDispatcher {
 
 	/**
 	 * Optional name of the object (doesn't need to be unique).
+	 * @default ''
 	 */
 	name: string;
 
+	/**
+	 * @default 'Object3D'
+	 */
 	type: string;
 
 	/**
 	 * Object's parent in the scene graph.
+	 * @default null
 	 */
 	parent: Object3D | null;
 
 	/**
 	 * Array with object's children.
+	 * @default []
 	 */
 	children: Object3D[];
 
 	/**
 	 * Up direction.
+	 * @default THREE.Object3D.DefaultUp.clone()
 	 */
 	up: Vector3;
 
 	/**
 	 * Object's local position.
+	 * @default new THREE.Vector3()
 	 */
 	readonly position: Vector3;
 
 	/**
 	 * Object's local rotation (Euler angles), in radians.
+	 * @default new THREE.Euler()
 	 */
 	readonly rotation: Euler;
 
 	/**
 	 * Global rotation.
+	 * @default new THREE.Quaternion()
 	 */
 	readonly quaternion: Quaternion;
 
 	/**
 	 * Object's local scale.
+	 * @default new THREE.Vector3()
 	 */
 	readonly scale: Vector3;
 
+	/**
+	 * @default new THREE.Matrix4()
+	 */
 	readonly modelViewMatrix: Matrix4;
 
+	/**
+	 * @default new THREE.Matrix3()
+	 */
 	readonly normalMatrix: Matrix3;
 
 	/**
 	 * Local transform.
+	 * @default new THREE.Matrix4()
 	 */
 	matrix: Matrix4;
 
 	/**
 	 * The global transform of the object. If the Object3d has no parent, then it's identical to the local transform.
+	 * @default new THREE.Matrix4()
 	 */
 	matrixWorld: Matrix4;
 
 	/**
 	 * When this is set, it calculates the matrix of position, (rotation or quaternion) and scale every frame and also recalculates the matrixWorld property.
+	 * @default THREE.Object3D.DefaultMatrixAutoUpdate
 	 */
 	matrixAutoUpdate: boolean;
 
 	/**
 	 * When this is set, it calculates the matrixWorld in that frame and resets this property to false.
+	 * @default false
 	 */
 	matrixWorldNeedsUpdate: boolean;
 
+	/**
+	 * @default new THREE.Layers()
+	 */
 	layers: Layers;
 	/**
 	 * Object gets rendered if true.
+	 * @default true
 	 */
 	visible: boolean;
 
 	/**
 	 * Gets rendered into shadow map.
+	 * @default false
 	 */
 	castShadow: boolean;
 
 	/**
 	 * Material gets baked in shadow receiving.
+	 * @default false
 	 */
 	receiveShadow: boolean;
 
 	/**
 	 * When this is set, it checks every frame if the object is in the frustum of the camera. Otherwise the object gets drawn every frame even if it isn't visible.
+	 * @default true
 	 */
 	frustumCulled: boolean;
 
 	/**
 	 * Overrides the default rendering order of scene graph objects, from lowest to highest renderOrder. Opaque and transparent objects remain sorted independently though. When this property is set for an instance of Group, all descendants objects will be sorted and rendered together.
+	 * @default 0
 	 */
 	renderOrder: number;
 
 	/**
 	 * An object that can be used to store custom data about the Object3d. It should not hold references to functions as these will not be cloned.
+	 * @default {}
 	 */
 	userData: { [key: string]: any };
 

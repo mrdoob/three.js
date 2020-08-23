@@ -1,10 +1,3 @@
-/**
- * @author Eberhard Graether / http://egraether.com/
- * @author Mark Lundin 	/ http://mark-lundin.com
- * @author Simone Manini / http://daron1337.github.io
- * @author Luca Antiga 	/ http://lantiga.github.io
- */
-
 import {
 	EventDispatcher,
 	MOUSE,

@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function painterSortStable( a, b ) {
 
 	if ( a.groupOrder !== b.groupOrder ) {
@@ -178,16 +174,6 @@ function WebGLRenderLists( properties ) {
 
 	let lists = new WeakMap();
 
-	function onSceneDispose( event ) {
-
-		const scene = event.target;
-
-		scene.removeEventListener( 'dispose', onSceneDispose );
-
-		lists.delete( scene );
-
-	}
-
 	function get( scene, camera ) {
 
 		const cameras = lists.get( scene );
@@ -198,8 +184,6 @@ function WebGLRenderLists( properties ) {
 			list = new WebGLRenderList( properties );
 			lists.set( scene, new WeakMap() );
 			lists.get( scene ).set( camera, list );
-
-			scene.addEventListener( 'dispose', onSceneDispose );
 
 		} else {
 

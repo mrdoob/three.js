@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { RGBFormat, LinearFilter } from '../constants.js';
 import { Texture } from './Texture.js';
 

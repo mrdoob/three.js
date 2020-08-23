@@ -1,11 +1,6 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { ImageLoader } from './ImageLoader.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Loader } from './Loader.js';
-
 
 function CubeTextureLoader( manager ) {
 

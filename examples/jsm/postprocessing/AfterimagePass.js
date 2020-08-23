@@ -1,7 +1,3 @@
-/**
- * @author HypnosNova / https://www.threejs.org.cn/gallery/
- */
-
 import {
 	LinearFilter,
 	MeshBasicMaterial,

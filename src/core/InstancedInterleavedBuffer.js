@@ -1,9 +1,5 @@
 import { InterleavedBuffer } from './InterleavedBuffer.js';
 
-/**
- * @author benaadams / https://twitter.com/ben_a_adams
- */
-
 function InstancedInterleavedBuffer( array, stride, meshPerAttribute ) {
 
 	InterleavedBuffer.call( this, array, stride );

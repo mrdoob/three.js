@@ -374,7 +374,7 @@
 				dirLight.position.multiplyScalar( 30 );
 				scene.add( dirLight );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
@@ -431,6 +431,12 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
+				if ( isSafari() ) {
+
+					gpuCompute.setDataType( THREE.HalfFloatType );
+
+				}
+
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();
 				fillPositionTexture( dtPosition );
@@ -469,6 +475,12 @@
 					console.error( error );
 
 				}
+
+			}
+
+			function isSafari() {
+
+				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
 
 			}
 

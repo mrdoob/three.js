@@ -1,9 +1,3 @@
-/**
- * @author Daosheng Mu / https://github.com/DaoshengMu/
- * @author mrdoob / http://mrdoob.com/
- * @author takahirox / https://github.com/takahirox/
- */
-
 import {
 	FileLoader,
 	Loader,
@@ -546,7 +540,7 @@ TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		context.putImageData( imageData, 0, 0 );
 
-		return useOffscreen ? canvas.transferToImageBitmap() : canvas;
+		return canvas;
 
 	}
 

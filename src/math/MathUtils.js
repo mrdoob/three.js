@@ -1,10 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author thezwap
- */
-
 const _lut = [];
 
 for ( let i = 0; i < 256; i ++ ) {

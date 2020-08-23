@@ -57,7 +57,7 @@
 		<p>
 			[page:Camera object]: （必须）将要被控制的相机。该相机不允许是其他任何对象的子级，除非该对象是场景自身。<br><br>
 
-			[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+			[page:HTMLDOMElement domElement]: 用于事件监听的HTML元素。
 		</p>
 
 		<h2>Events</h2>
@@ -77,7 +77,7 @@
 			Fires when an interaction has finished.
 		</p>
 
-		<h2>Properties</h2>
+		<h2>属性</h2>
 
 		<h3>[property:Boolean autoRotate]</h3>
 		<p>
@@ -100,13 +100,12 @@
 
 		<h3>[property:HTMLDOMElement domElement]</h3>
 		<p>
-			用于监听鼠标事件或触摸事件的HTMLDOMElement（DOM元素）。该值必须在构造函数中进行传入；
-			在此更改它将不会设置新的事件监听器
+			该 HTMLDOMElement 用于监听鼠标/触摸事件，该属性必须在构造函数中传入。在此处改变它将不会设置新的事件监听。
 		</p>
 
 		<h3>[property:Boolean enabled]</h3>
 		<p>
-			控制器是否被启用。
+			When set to *false*, the controls will not respond to user input. Default is *true*.
 		</p>
 
 		<h3>[property:Boolean enableDamping]</h3>
@@ -173,7 +172,7 @@ controls.keys = {
 
 		<h3>[property:Float maxZoom]</h3>
 		<p>
-			你能够将相机缩小多少( 仅适用于[page:OrthographicCamera] only )，其默认值为Infinity。
+			你能够将相机缩小多少（仅适用于[page:OrthographicCamera]），其默认值为Infinity。
 		</p>
 
 		<h3>[property:Float minAzimuthAngle]</h3>
@@ -193,13 +192,13 @@ controls.keys = {
 
 		<h3>[property:Float minZoom]</h3>
 		<p>
-			你能够将相机放大多少( 仅适用于[page:OrthographicCamera] )，其默认值为0。
+			你能够将相机放大多少（仅适用于[page:OrthographicCamera]），其默认值为0。
 		</p>
 
 		<h3>
 			[property:Object mouseButtons]</h3>
 		<p>
-			这一对象包含了对用于控制的鼠标按钮的引用。
+			该对象包含由控件所使用的鼠标操作的引用。
 			<code>
 controls.mouseButtons = {
 	LEFT: THREE.MOUSE.ROTATE,
@@ -226,7 +225,7 @@ controls.mouseButtons = {
 
 		<h3>[property:Float rotateSpeed]</h3>
 		<p>
-			旋转的速度，其默认值为1.
+			旋转的速度，其默认值为1。
 		</p>
 
 		<h3>[property:Boolean screenSpacePanning]</h3>

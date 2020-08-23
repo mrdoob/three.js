@@ -4,8 +4,19 @@ export class Cylindrical {
 
 	constructor( radius?: number, theta?: number, y?: number );
 
+	/**
+	 * @default 1
+	 */
 	radius: number;
+
+	/**
+	 * @default 0
+	 */
 	theta: number;
+
+	/**
+	 * @default 0
+	 */
 	y: number;
 
 	clone(): this;

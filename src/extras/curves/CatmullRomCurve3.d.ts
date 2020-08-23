@@ -34,6 +34,12 @@ export namespace CurveUtils {
 
 export class CatmullRomCurve3 extends Curve<Vector3> {
 
+	/**
+	 * @param [points=[]]
+	 * @param [closed=false]
+	 * @param [curveType='centripetal']
+	 * @param [tension=0.5]
+	 */
 	constructor(
 		points?: Vector3[],
 		closed?: boolean,
@@ -41,6 +47,14 @@ export class CatmullRomCurve3 extends Curve<Vector3> {
 		tension?: number
 	);
 
+	/**
+	 * @default 'CatmullRomCurve3'
+	 */
+	type: string;
+
+	/**
+	 * @default []
+	 */
 	points: Vector3[];
 
 }

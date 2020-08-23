@@ -1,7 +1,3 @@
-/**
- * @author Takahiro / https://github.com/takahirox
- */
-
 import {
 	Loader
 } from "../../../build/three.module.js";

@@ -365,3 +365,7 @@ export const StreamReadUsage: Usage;
 export const StaticCopyUsage: Usage;
 export const DynamicCopyUsage: Usage;
 export const StreamCopyUsage: Usage;
+
+export enum GLSLVersion {}
+export const GLSL1: GLSLVersion;
+export const GLSL3: GLSLVersion;

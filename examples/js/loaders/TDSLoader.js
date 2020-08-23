@@ -4,8 +4,6 @@ console.warn( "THREE.TDSLoader: As part of the transition to ES6 Modules, the fi
  *
  * Loads geometry with uv and materials basic properties with texture support.
  *
- * @author @tentone
- * @author @timknip
  * @class TDSLoader
  * @constructor
  */

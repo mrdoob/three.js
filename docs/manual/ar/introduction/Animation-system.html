@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>نظام الحركات</h1>
+
+		<h2>نظرة عامة</h2>
+
+		<p class="desc">
+			يضمن نظام الرسوم المتحركة three.js ، إمكانية تحريك الخصائص المختلفة لنماذجك: عظام [page:SkinnedMesh skinned and rigged model] ، [page:Geometry.morphTargets morph targets] ، خصائص مادة مختلفة (ألوان ، عتامة ، منطقية) ، الرؤية والتحولات. يمكن أن تتلاشى الخصائص المتحركة، أو تتلاشى وتتشوه. يمكن تغيير مقاييس الوزن والوقت للرسوم المتحركة المتزامنة المختلفة على نفس الكائن وكذلك على كائنات مختلفة بشكل مستقل. يمكن مزامنة الرسوم المتحركة المختلفة على نفس الشيء وعلى كائنات مختلفة.
+			<br /><br />
+
+			لتحقيق كل هذا في نظام واحد متجانس ، نظام الرسوم المتحركة three.js شعد تغييرا هامًا في عام [link:https://github.com/mrdoob/three.js/issues/6881 2015] (احذر من المعلومات القديمة!) ، ولديه الآن بنية مشابهة لـ Unity / Unreal Engine 4. تقدم هذه الصفحة لمحة موجزة عن المكونات الرئيسية للنظام وكيف تعمل معًا.
+
+		</p>
+
+		<h3>مقاطع الحركات</h3>
+
+		<p class="desc">
+
+			إذا قمت باستيراد كائن ثلاثي الأبعاد متحرك بنجاح (لا يهم ما إذا كان يحتوي على عظام أو أهداف تشكيل أو كليهما) - على سبيل المثال تصديره من Blender مع [link:https://github.com/KhronosGroup/glTF-Blender-IO glTF Blender exporter] وتحميله في مشهد three.js باستخدام 333 - يضمن أن توجد مصفوفة تسمى "الرسوم المتحركة" ، تحتوي على 444 لهذا النموذج (انظر قائمة برامج التحميل المتوفرة أدناه).
+			<br /><br />
+
+			يحتفظ كل مقطع *AnimationClip* عادةً ببيانات نشاط معين للكائن. إذا كانت الشبكة عبارة عن شخصية ، على سبيل المثال ، فقد يكون هناك مقطع Animation واحد للمشي ، وثاني للقفز ، وثالث للتنقل وما إلى ذلك.
+
+		</p>
+
+		<h3>مسارات الإطار الأساسي (Keyframe tracks)</h3>
+
+		<p class="desc">
+
+			داخل ملف *AnimationClip* ، يتم تخزين البيانات الخاصة بكل خاصية متحركة في [page:KeyframeTrack]. بافتراض أن كائن حرف له هيكل عظمي [page:Skeleton skeleton] ، يمكن لمسار إطار رئيسي واحد تخزين البيانات لتغييرات موضع عظم الذراع السفلي بمرور الوقت ، وهو أمر مختلف تتبع البيانات الخاصة بتغييرات دوران نفس العظم ، وثلث موضع المسار ، دوران أو تحجيم عظم آخر ، وما إلى ذلك. يجب أن يكون واضحًا ، أن AnimationClip يمكن أن يتكون من الكثير من هذه المسارات.
+			<br /><br />
+
+			بافتراض أن النموذج يحتوي على [page:Geometry.morphTargets morph targets] (على سبيل المثال ، أحد أهداف التشكيل يظهر وجهًا ودودًا والآخر يظهر وجهًا غاضبًا) ، فإن كل مسار يحمل المعلومات المتعلقة بكيفية تغيير الرقم [page:Mesh.morphTargetInfluences influence] لهدف تشكيل معين أثناء أداء المقطع.
+
+		</p>
+
+		<h3>خالط الحركات (Animation Mixer)</h3>
+
+		<p class="desc">
+
+			تشكل البيانات المخزنة أساس الرسوم المتحركة فقط - يتم التحكم في التشغيل الفعلي بواسطة [page:AnimationMixer]. يمكنك تخيل هذا ليس فقط كمشغل للرسوم المتحركة ، ولكن ك كجهاز أو مثل وحدة التحكم في المزج الحقيقي ، والتي يمكنها التحكم في العديد من الرسوم المتحركة في وقت واحد ومزجها ودمجها.
+
+		</p>
+
+		<h3>أحداث الحركات (Animation Actions)</h3>
+
+		<p class="desc">
+
+			يحتوي *AnimationMixer* نفسه على عدد قليل جدًا من الخصائص والطرق (العامة) ، لأنه يمكن التحكم فيه بواسطة [page:AnimationAction AnimationActions]. من خلال تكوين *AnimationAction* يمكنك تحديد وقت تشغيل *AnimationClip* معين أو إيقافه مؤقتًا أو إيقاف تشغيله أحد الخلاطات ، إذا كان يجب تكرار المقطع وعدد مرات تكرارها ، سواء كان يجب إجراؤه بتلاشي أو مقياس زمني ، وبعض الأشياء الإضافية ، مثل التلاشي أو التزامن.
+
+		</p>
+
+		<h3>تحريك مجموعة من النماذج</h3>
+
+		<p class="desc">
+
+			إذا كنت تريد أن تطبق على مجموعة من الكائنات حالة حركة مشتركة ، يمكنك استخدام [page:AnimationObjectGroup]..
+
+		</p>
+
+		<h3>التنسيقات و عناصر التحميل المدعومة</h3>
+
+		<p class="desc">
+			لاحظ أنه لا تتضمن جميع تنسيقات النماذج الرسوم المتحركة (لا سيما OBJ) ، وأن بعض أدوات تحميل three.js فقط تدعم [page:AnimationClip AnimationClip] تسلسلًا. العديد منها يدعم هذا النوع من الرسوم المتحركة:
+		</p>
+
+			<ul>
+				<li>[page:ObjectLoader THREE.ObjectLoader]</li>
+				<li>THREE.BVHLoader</li>
+				<li>THREE.ColladaLoader</li>
+				<li>THREE.FBXLoader</li>
+				<li>[page:GLTFLoader THREE.GLTFLoader]</li>
+				<li>THREE.MMDLoader</li>
+			</ul>
+
+		<p class="desc">
+			لاحظ أن 3ds max و Maya لا يمكنهم حاليًا تصدير العديد من الرسوم المتحركة (بمعنى الرسوم المتحركة غير الموجودة في نفس المخطط الزمني) مباشرةً إلى ملف واحد.
+		</p>
+
+		<h2>مثال</h2>
+
+		<code>
+		var mesh;
+
+		// Create an AnimationMixer, and get the list of AnimationClip instances
+		var mixer = new THREE.AnimationMixer( mesh );
+		var clips = mesh.animations;
+
+		// Update the mixer on each frame
+		function update () {
+			mixer.update( deltaSeconds );
+		}
+
+		// Play a specific animation
+		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		var action = mixer.clipAction( clip );
+		action.play();
+
+		// Play all animations
+		clips.forEach( function ( clip ) {
+			mixer.clipAction( clip ).play();
+		} );
+		</code>
+
+	</body>
+</html>

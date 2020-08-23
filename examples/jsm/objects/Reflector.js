@@ -1,7 +1,3 @@
-/**
- * @author Slayvin / http://slayvin.net
- */
-
 import {
 	Color,
 	LinearFilter,
@@ -54,8 +50,7 @@ var Reflector = function ( geometry, options ) {
 	var parameters = {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
-		format: RGBFormat,
-		stencilBuffer: false
+		format: RGBFormat
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );

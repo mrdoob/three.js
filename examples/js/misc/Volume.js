@@ -5,7 +5,6 @@ console.warn( "THREE.Volume: As part of the transition to ES6 Modules, the files
  * For now it only handles 3 dimensional data.
  * See the webgl_loader_nrrd.html example and the loaderNRRD.js file to see how to use this class.
  * @class
- * @author Valentin Demeusy / https://github.com/stity
  * @param   {number}        xLength         Width of the volume
  * @param   {number}        yLength         Length of the volume
  * @param   {number}        zLength         Depth of the volume

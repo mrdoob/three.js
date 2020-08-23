@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import {
 	FileLoader,
 	Group,
@@ -91,7 +87,7 @@ KMZLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		//
 
-		var zip = new JSZip( data );
+		var zip = new JSZip( data ); // eslint-disable-line no-undef
 
 		if ( zip.files[ 'doc.kml' ] ) {
 
