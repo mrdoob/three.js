@@ -536,7 +536,7 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		context.putImageData( imageData, 0, 0 );
 
-		return useOffscreen ? canvas.transferToImageBitmap() : canvas;
+		return canvas;
 
 	}
 
