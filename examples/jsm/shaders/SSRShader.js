@@ -127,7 +127,7 @@ var SSRShader = {
 				d1viewPosition.xy*=ratio;
 				d1viewPosition.z=-cameraNear;
 
-				viewPosition.xy+=tempXY;
+				viewPosition.xy=tempXY;
 				d1viewPosition.xy+=tempXY;
 			}
 			// if(d1viewPosition.z>0.){
