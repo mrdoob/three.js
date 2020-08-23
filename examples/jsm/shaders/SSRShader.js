@@ -45,7 +45,7 @@ var SSRShader = {
   ].join("\n"),
 
   fragmentShader: `
-		#define MAX_STEP ${innerWidth * Math.sqrt(2)}
+		#define MAX_STEP TO_BE_REPLACE
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
@@ -108,17 +108,24 @@ var SSRShader = {
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
 			vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
+			// gl_FragColor=vec4(-viewPosition.z/1000.,0,0,1);return;
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 
 			vec3 viewNormal=getViewNormal( vUv );;
 			vec3 viewReflectDir=reflect(normalize(viewPosition),viewNormal);
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
+			// if(d1viewPosition.z>=.0) return;
 			if(d1viewPosition.z>-cameraNear){
 				float ratio=(viewPosition.z+cameraNear)/(viewPosition.z-d1viewPosition.z);
 				d1viewPosition.xy*=ratio;
 				d1viewPosition.z=-cameraNear;
 			}
+			// if(d1viewPosition.z>0.){
+			// 	float ratio=viewPosition.z/(viewPosition.z-d1viewPosition.z);
+			// 	d1viewPosition.xy*=ratio;
+			// 	d1viewPosition.z=0.;
+			// }
 			// gl_FragColor=vec4(d1viewPosition/100.,1);return;
 			d1=viewPositionToXY(d1viewPosition);
 			// gl_FragColor=vec4(d1/resolution,0,1);return;

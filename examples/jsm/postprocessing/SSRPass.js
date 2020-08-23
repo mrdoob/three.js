@@ -91,6 +91,7 @@ var SSRPass = function(scene, camera, width, height) {
 
   }
 
+  SSRShader.fragmentShader = SSRShader.fragmentShader.replace(/#define MAX_STEP .*/, `#define MAX_STEP ${Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight)}`)
   this.ssrMaterial = new ShaderMaterial({
     defines: Object.assign({}, SSRShader.defines),
     uniforms: UniformsUtils.clone(SSRShader.uniforms),
@@ -350,6 +351,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.width = width;
     this.height = height;
 
+    this.ssrMaterial.fragmentShader = this.ssrMaterial.fragmentShader = SSRShader.fragmentShader.replace(/#define MAX_STEP .*/, `#define MAX_STEP ${Math.sqrt(width * width + height * height)}`)
+    this.ssrMaterial.needsUpdate = true
     this.beautyRenderTarget.setSize(width, height);
     this.ssrRenderTarget.setSize(width, height);
     this.normalRenderTarget.setSize(width, height);
