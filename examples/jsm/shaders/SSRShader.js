@@ -23,7 +23,7 @@ var SSRShader = {
     "resolution": { value: new Vector2() },
     "cameraProjectionMatrix": { value: new Matrix4() },
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
-    // "opacity": { value: .5 },
+    "opacity": { value: .5 },
     "maxDistance": { value: 0.05 },
     "cameraRange": { value: 0 },
     "surfDist": { value: 0 },
@@ -52,9 +52,9 @@ var SSRShader = {
 		uniform sampler2D tDiffuse;
 		uniform float cameraRange;
 		uniform vec2 resolution;
+		uniform float opacity;
 		uniform float cameraNear;
 		uniform float cameraFar;
-		// uniform float opacity;
 		uniform float maxDistance;
 		uniform float surfDist;
 		uniform mat4 cameraProjectionMatrix;
@@ -135,13 +135,10 @@ var SSRShader = {
 			float ySpan=yLen/totalStep;
 			for(float i=0.;i<MAX_STEP;i++){
 				if(i>=totalStep) break;
-				float x=d0.x+i*xSpan;
-				float y=d0.y+i*ySpan;
-				if(x<0.||x>resolution.x) break;
-				if(y<0.||y>resolution.y) break;
-				float u=x/resolution.x;
-				float v=y/resolution.y;
-				vec2 uv=vec2(u,v);
+				vec2 xy=vec2(d0.x+i*xSpan,d0.y+i*ySpan);
+				if(xy.x<0.||xy.x>resolution.x) break;
+				if(xy.y<0.||xy.y>resolution.y) break;
+				vec2 uv=xy/resolution;
 
 				float d = getDepth(uv);
 				float vZ = getViewZ( d );
@@ -152,7 +149,7 @@ var SSRShader = {
 					if(dot(viewReflectDir,vN)>=0.) continue;
 					vec4 reflectColor=texture2D(tDiffuse,uv);
 					gl_FragColor=reflectColor;
-					gl_FragColor.a=.5;
+					gl_FragColor.a=opacity;
 					break;
 				}
 			}
@@ -231,7 +228,8 @@ var SSRBlurShader = {
   uniforms: {
 
     "tDiffuse": { value: null },
-    "resolution": { value: new Vector2() }
+    "resolution": { value: new Vector2() },
+    "opacity": { value: .5 },
 
   },
 
@@ -259,20 +257,20 @@ var SSRBlurShader = {
     "void main() {",
 
     "	vec2 texelSize = ( 1.0 / resolution );",
-    "	vec3 result = vec3(0);",
+    "	vec4 result = vec4(0);",
 
     "	for ( int i = - 2; i <= 2; i ++ ) {",
 
     "		for ( int j = - 2; j <= 2; j ++ ) {",
 
     "			vec2 offset = ( vec2( float( i ), float( j ) ) ) * texelSize;",
-    "			result += texture2D( tDiffuse, vUv + offset ).xyz;",
+    "			result += texture2D( tDiffuse, vUv + offset );",
 
     "		}",
 
     "	}",
 
-    "	gl_FragColor = vec4(  result / ( 5.0 * 5.0 ) , 1.0 );",
+    "	gl_FragColor = vec4(  result / ( 5.0 * 5.0 ) );",
 
     "}"
 

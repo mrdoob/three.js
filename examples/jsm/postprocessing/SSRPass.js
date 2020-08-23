@@ -42,8 +42,8 @@ var SSRPass = function(scene, camera, width, height) {
   this.camera = camera;
   this.scene = scene;
 
-  // this.opacity = .5;
-  this.output = 0;
+  this.opacity = .5;
+  this.output = 6;
 
   this.maxDistance = 900;
   this.surfDist = 1.
@@ -202,14 +202,14 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render SSR
 
-    // this.ssrMaterial.uniforms['opacity'].value = this.opacity;
+    this.ssrMaterial.uniforms['opacity'].value = this.opacity;
     this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
     this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
     this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
 
     // render blur
 
-    // this.blurMaterial.uniforms['opacity'].value = this.opacity;
+    this.blurMaterial.uniforms['opacity'].value = this.opacity;
     this.renderPass(renderer, this.blurMaterial, this.blurRenderTarget);
 
     // output result to screen
@@ -260,8 +260,18 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
         this.copyMaterial.blending = NoBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
-        // this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
         this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+        this.copyMaterial.blending = AdditiveBlending;
+        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+        break;
+
+      case SSRPass.OUTPUT.DefaultBlur:
+
+        this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+        this.copyMaterial.blending = NoBlending;
+        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+
+        this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
         this.copyMaterial.blending = AdditiveBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
@@ -357,11 +367,12 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
 SSRPass.OUTPUT = {
   'Default': 0,
-  'SSR': 1,
+  'OrthographicSSR': 1,
   'Blur': 2,
   'Beauty': 3,
   'Depth': 4,
-  'Normal': 5
+  'Normal': 5,
+  'DefaultBlur': 6
 };
 
 export { SSRPass };

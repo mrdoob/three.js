@@ -279,7 +279,7 @@
 		ssrPass.surfDist=4.2
 		gui.add(ssrPass, 'output', {
 			'Default': SSRPass.OUTPUT.Default,
-			// 'DefaultBlur': SSRPass.OUTPUT.DefaultBlur,
+			'DefaultBlur': SSRPass.OUTPUT.DefaultBlur,
 			'SSR Only': SSRPass.OUTPUT.SSR,
 			'SSR Only + Blur': SSRPass.OUTPUT.Blur,
 			'Beauty': SSRPass.OUTPUT.Beauty,
@@ -290,6 +290,8 @@
 			ssrPass.output = parseInt(value);
 
 		});
+		gui.add(params, 'enableSSR').name( 'Enable SSR' );
+		gui.add(ssrPass, 'opacity').min(0).max(1);
 		gui.add(ssrPass, 'maxDistance').min(0).max(1000);
 		gui.add(ssrPass, 'surfDist').min(0).max(10).step(.1);
 
