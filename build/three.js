@@ -25831,40 +25831,6 @@
 
 			}
 
-			var programAttributes = program.getAttributes();
-
-			if ( material.morphTargets ) {
-
-				material.numSupportedMorphTargets = 0;
-
-				for ( var i = 0; i < _this.maxMorphTargets; i ++ ) {
-
-					if ( programAttributes[ 'morphTarget' + i ] >= 0 ) {
-
-						material.numSupportedMorphTargets ++;
-
-					}
-
-				}
-
-			}
-
-			if ( material.morphNormals ) {
-
-				material.numSupportedMorphNormals = 0;
-
-				for ( var i$1 = 0; i$1 < _this.maxMorphNormals; i$1 ++ ) {
-
-					if ( programAttributes[ 'morphNormal' + i$1 ] >= 0 ) {
-
-						material.numSupportedMorphNormals ++;
-
-					}
-
-				}
-
-			}
-
 			var uniforms = materialProperties.uniforms;
 
 			if ( ! material.isShaderMaterial &&
