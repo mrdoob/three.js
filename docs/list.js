@@ -503,7 +503,8 @@ var list = {
 				"AnimationObjectGroup": "api/ar/animation/AnimationObjectGroup",
 				"AnimationUtils": "api/ar/animation/AnimationUtils",
 				"KeyframeTrack": "api/ar/animation/KeyframeTrack",
-				"PropertyBinding": "api/ar/animation/PropertyBinding"
+				"PropertyBinding": "api/ar/animation/PropertyBinding",
+				"PropertyMixer": "api/ar/animation/PropertyMixer"
 			}
 
 		}
