@@ -98,14 +98,10 @@ var SSRShader = {
 			xy*=resolution;
 			return xy;
 		}
-		float pointToLineDistance(vec3 point, vec3 lineStart, vec3 lineEnd) {
-			//modified from https://math.stackexchange.com/questions/1905533/find-perpendicular-distance-from-point-to-line-in-3d  answer: Marco13
-			///todo: This function considers the length of the line? Isn't it considered infinite?
-			vec3 d = (lineEnd - lineStart) / length(lineEnd-lineStart);
-			vec3 v = point - lineStart;
-			float t = dot(v,d);
-			vec3 p = lineStart + t * d;
-			return length(p-point);
+		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
+			//x0: point, x1: linePointA, x2: linePointB
+			//https://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+			return length(cross(x0-x1,x0-x2))/length(x2-x1);
 		}
 		void main(){
 
