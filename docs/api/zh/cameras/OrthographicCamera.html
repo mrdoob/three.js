@@ -18,7 +18,6 @@
 			在这种投影模式下，无论物体距离相机距离远或者近，在最终渲染的图片中物体的大小都保持不变。
 			<br /><br />
 
-
 			这对于渲染2D场景或者UI元素是非常有用的。
 		</p>
 
@@ -75,7 +74,7 @@
 		<h3>[property:Float far]</h3>
 		<p>
 			摄像机视锥体远端面，其默认值为*2000*。<br /><br />
-			Must be greater than the current value of [page:.near near] plane.
+			该值必须大于[page:.near near] plane（摄像机视锥体近端面）的值。
 
 		</p>
 
@@ -102,8 +101,7 @@
 		<p>这个值是由[page:OrthographicCamera.setViewOffset setViewOffset]来设置的，其默认值为*null*。</p>
 
 		<h3>[property:number zoom]</h3>
-		<p>
-			获取或者设置摄像机的缩放倍数，其默认值为*1*。</p>
+		<p>获取或者设置摄像机的缩放倍数，其默认值为*1*。</p>
 
 		<h2>方法</h2>
 		<p>共有方法请参见其基类[page:Camera]。</p>
@@ -124,13 +122,12 @@
 
 		<h3>[method:null clearViewOffset]()</h3>
 		<p>
-			清除任何由.setViewOffset设置的偏移量。
+		清除任何由.setViewOffset设置的偏移量。
 		</p>
 
 		<h3>[method:null updateProjectionMatrix]()</h3>
 		<p>
-			更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
-
+		更新摄像机投影矩阵。在任何参数被改变以后必须被调用。
 		</p>
 
 		<h3>[method:Object toJSON]([param:object meta])</h3>

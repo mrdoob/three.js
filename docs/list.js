@@ -513,7 +513,7 @@ var list = {
 
 			"起步": {
 				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
-				"Installation": "manual/zh/introduction/Installation",
+				"安装": "manual/zh/introduction/Installation",
 				"浏览器支持": "manual/zh/introduction/Browser-support",
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
@@ -882,10 +882,6 @@ var list = {
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
 			},
 
-			"灯光": {
-				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
-			},
-
 			"辅助对象": {
 				"FaceNormalsHelper": "examples/zh/helpers/FaceNormalsHelper",
 				"LightProbeHelper": "examples/zh/helpers/LightProbeHelper",
@@ -893,6 +889,10 @@ var list = {
 				"RectAreaLightHelper": "examples/zh/helpers/RectAreaLightHelper",
 				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper",
 				"VertexTangentsHelper": "examples/zh/helpers/VertexTangentsHelper"
+			},
+
+			"灯光": {
+				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
 			},
 
 			"加载器": {
@@ -903,6 +903,7 @@ var list = {
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"OBJLoader2": "examples/zh/loaders/OBJLoader2",
+				"OBJLoader2Parallel": "examples/zh/loaders/OBJLoader2Parallel",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
 				"PDBLoader": "examples/zh/loaders/PDBLoader",
 				"PRWMLoader": "examples/zh/loaders/PRWMLoader",
