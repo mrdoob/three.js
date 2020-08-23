@@ -367,12 +367,12 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
 SSRPass.OUTPUT = {
   'Default': 0,
-  'OrthographicSSR': 1,
+  'DefaultBlur': 6,
+  'SSR': 1,
   'Blur': 2,
   'Beauty': 3,
   'Depth': 4,
   'Normal': 5,
-  'DefaultBlur': 6
 };
 
 export { SSRPass };

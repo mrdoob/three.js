@@ -90,7 +90,6 @@ var SSRShader = {
 		}
 		vec2 viewPositionToXY(vec3 viewPosition){
 			vec2 xy;
-			// d1=getViewPositionReverse(viewPosition);
 			float clipW = cameraProjectionMatrix[2][3] * viewPosition.z + cameraProjectionMatrix[3][3];
 			xy=(cameraProjectionMatrix*vec4(viewPosition,1)).xy;
 			xy/=clipW;
@@ -101,6 +100,7 @@ var SSRShader = {
 		}
 		float pointToLineDistance(vec3 point, vec3 lineStart, vec3 lineEnd) {
 			//modified from https://math.stackexchange.com/questions/1905533/find-perpendicular-distance-from-point-to-line-in-3d  answer: Marco13
+			///todo: This function considers the length of the line? Isn't it considered infinite?
 			vec3 d = (lineEnd - lineStart) / length(lineEnd-lineStart);
 			vec3 v = point - lineStart;
 			float t = dot(v,d);
@@ -118,10 +118,10 @@ var SSRShader = {
 			vec3 viewNormal=getViewNormal( vUv );;
 			vec3 viewReflectDir=reflect(normalize(viewPosition),viewNormal);
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
-			if(d1viewPosition.z>0.){
-				float scale=viewPosition.z/(viewPosition.z+-d1viewPosition.z);
-				d1viewPosition.xy*=scale;
-				d1viewPosition.z=0.;
+			if(d1viewPosition.z>-cameraNear){
+				float ratio=(viewPosition.z+cameraNear)/(viewPosition.z-d1viewPosition.z);
+				d1viewPosition.xy*=ratio;
+				d1viewPosition.z=-cameraNear;
 			}
 			// gl_FragColor=vec4(d1viewPosition/100.,1);return;
 			d1=viewPositionToXY(d1viewPosition);
@@ -143,7 +143,7 @@ var SSRShader = {
 				float d = getDepth(uv);
 				float vZ = getViewZ( d );
 				vec3 vP=getViewPosition( uv, d, vZ );
-				float away=pointToLineDistance(vP,viewPosition,viewPosition+viewReflectDir*maxDistance);
+				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
 				if(away<surfDist){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;
