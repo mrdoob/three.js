@@ -53,6 +53,7 @@ export * from './loaders/AudioLoader';
 export * from './lights/SpotLightShadow';
 export * from './lights/SpotLight';
 export * from './lights/PointLight';
+export * from './lights/PointLightShadow';
 export * from './lights/RectAreaLight';
 export * from './lights/HemisphereLight';
 export * from './lights/DirectionalLightShadow';

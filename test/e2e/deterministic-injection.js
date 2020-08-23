@@ -16,23 +16,25 @@
 
 	/* Deterministic timer */
 
+	window.performance._now = performance.now;
+
 	let frameId = 0;
 	const now = () => frameId * 16;
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
-	window.performance.wow = performance.now;
 	window.performance.now = now;
 
 
 	/* Deterministic RAF */
 
-	window.chromeMaxFrameId = 2;
-	window.chromeRenderStarted = false;
-	window.chromeRenderFinished = false;
 	const RAF = window.requestAnimationFrame;
+	window._renderStarted = false;
+	window._renderFinished = false;
+
+	const maxFrameId = 2;
 	window.requestAnimationFrame = function ( cb ) {
 
-		if ( ! chromeRenderStarted ) {
+		if ( ! _renderStarted ) {
 
 			setTimeout( function () {
 
@@ -44,13 +46,13 @@
 
 			RAF( function () {
 
-				if ( frameId ++ < chromeMaxFrameId ) {
+				if ( frameId ++ < maxFrameId ) {
 
 					cb( now() );
 
 				} else {
 
-					chromeRenderFinished = true;
+					_renderFinished = true;
 
 				}
 
@@ -63,7 +65,8 @@
 
 	/* Semi-determitistic video */
 
-	let play = HTMLVideoElement.prototype.play;
+	const play = HTMLVideoElement.prototype.play;
+
 	HTMLVideoElement.prototype.play = async function () {
 
 		play.call( this );
@@ -81,6 +84,8 @@
 
 	};
 
-	TESTING = true;
+	/* Additional variable for ~5 examples */
+
+	window.TESTING = true;
 
 }() );

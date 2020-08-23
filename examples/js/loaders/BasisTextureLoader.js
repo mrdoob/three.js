@@ -435,7 +435,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 		transcoderPending = new Promise( ( resolve ) => {
 
 			BasisModule = { wasmBinary, onRuntimeInitialized: resolve };
-			BASIS( BasisModule );
+			BASIS( BasisModule ); // eslint-disable-line no-undef
 
 		} ).then( () => {
 

@@ -66,6 +66,8 @@ function ShaderMaterial( parameters ) {
 	this.index0AttributeName = undefined;
 	this.uniformsNeedUpdate = false;
 
+	this.glslVersion = null;
+
 	if ( parameters !== undefined ) {
 
 		if ( parameters.attributes !== undefined ) {
@@ -109,6 +111,8 @@ ShaderMaterial.prototype.copy = function ( source ) {
 
 	this.extensions = Object.assign( {}, source.extensions );
 
+	this.glslVersion = source.glslVersion;
+
 	return this;
 
 };
@@ -117,6 +121,7 @@ ShaderMaterial.prototype.toJSON = function ( meta ) {
 
 	const data = Material.prototype.toJSON.call( this, meta );
 
+	data.glslVersion = this.glslVersion;
 	data.uniforms = {};
 
 	for ( const name in this.uniforms ) {

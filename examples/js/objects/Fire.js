@@ -129,8 +129,7 @@ THREE.Fire = function ( geometry, options ) {
 	var parameters = {
 		minFilter: THREE.NearestFilter,
 		magFilter: THREE.NearestFilter,
-		depthBuffer: false,
-		stencilBuffer: false
+		depthBuffer: false
 	};
 
 

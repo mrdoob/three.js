@@ -427,7 +427,7 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 					};
 
-					DracoDecoderModule( decoderConfig );
+					DracoDecoderModule( decoderConfig ); // eslint-disable-line no-undef
 
 				} );
 				break;
