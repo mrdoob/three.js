@@ -108,6 +108,7 @@ var SSRShader = {
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
 			vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
+			// gl_FragColor=vec4(viewPosition/100.*vec3(1,1,-1),1);return;
 			// gl_FragColor=vec4(-viewPosition.z/1000.,0,0,1);return;
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
@@ -117,9 +118,17 @@ var SSRShader = {
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
 			// if(d1viewPosition.z>=.0) return;
 			if(d1viewPosition.z>-cameraNear){
+				vec2 tempXY=viewPosition.xy;
+				viewPosition.x=0.;
+				viewPosition.y=0.;
+				d1viewPosition.xy-=tempXY;
+
 				float ratio=(viewPosition.z+cameraNear)/(viewPosition.z-d1viewPosition.z);
 				d1viewPosition.xy*=ratio;
 				d1viewPosition.z=-cameraNear;
+
+				viewPosition.xy+=tempXY;
+				d1viewPosition.xy+=tempXY;
 			}
 			// if(d1viewPosition.z>0.){
 			// 	float ratio=viewPosition.z/(viewPosition.z-d1viewPosition.z);
