@@ -503,7 +503,15 @@ var list = {
 				"AnimationMixer": "api/ar/animation/AnimationMixer",
 				"AnimationObjectGroup": "api/ar/animation/AnimationObjectGroup",
 				"AnimationUtils": "api/ar/animation/AnimationUtils",
-				"KeyframeTrack": "api/ar/animation/KeyframeTrack"
+				"KeyframeTrack": "api/ar/animation/KeyframeTrack",
+				"PropertyBinding": "api/ar/animation/PropertyBinding",
+				"PropertyMixer": "api/ar/animation/PropertyMixer"
+			},
+
+			"الحركات / Tracks": {
+				"BooleanKeyframeTrack": "api/ar/animation/tracks/BooleanKeyframeTrack",
+				"ColorKeyframeTrack": "api/ar/animation/tracks/ColorKeyframeTrack",
+				"NumberKeyframeTrack": "api/ar/animation/tracks/NumberKeyframeTrack"
 			}
 
 		}

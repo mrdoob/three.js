@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+
+		[page:KeyframeTrack] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			تتبع للقيمة الخاصة بـ*boolean keyframe*.
+		</p>
+
+
+		<h2>المنشئ (Constructor)</h2>
+
+
+		<h3>[name]( [param:String name], [param:Array times], [param:Array values] )</h3>
+		<p>
+			[page:String name] - (ضرورية) المعرف الخاص بـ*KeyframeTrack*.<br />
+			[page:Array times] - (ضرورية) جدول يتضمن مجموعة من الـ*keyframe times*.<br />
+			[page:Array values] - القيم الخاصة بـ *keyframes* في وقت محدد لها.<br />
+		</p>
+
+
+		<h2>الخصائص (Properties)</h2>
+
+
+		<p class="desc">
+			أنظر [page:KeyframeTrack] من أجل الخصائص الموروثة
+		</p>
+
+		<h3>[property:Constant DefaultInterpolation]</h3>
+		<p>
+			الـ*interpolation* الإفتراضي للإستعمال، [page:Animation InterpolateDiscrete].
+		</p>
+
+		<h3>[property:Array ValueBufferType]</h3>
+		<p>
+			جدول عادي (ليس *Float32Array* في هذه الحالة، ما عدى *ValueBufferType* الخاص بـ [page:KeyframeTrack]).
+		</p>
+
+		<h3>[property:String ValueTypeName]</h3>
+		<p>
+			String 'bool'.
+		</p>
+
+
+		<h2>الوظائف (Methods)</h2>
+
+
+		<p class="desc">
+			أنظر [page:KeyframeTrack] من أجل الخصائص الموروثة
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodLinear ]()</h3>
+		<p>
+			قيمة هذه الوضيفة هي 'undefined'، حيث أنه لا يوجد سبب لإستعمالها على الخصائص المتفردة.
+		</p>
+
+		<h3>[method:null InterpolantFactoryMethodSmooth ]()</h3>
+		<p>
+			قيمة هذه الوضيفة هي 'undefined'، حيث أنه لا يوجد سبب لإستعمالها على الخصائص المتفردة.
+		</p>
+
+
+		<h2>المصدر (Source)</h2>
+
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
