@@ -16432,7 +16432,7 @@
 
 				if ( extensions[ name ] !== undefined ) {
 
-					return extensions[ name ];
+					return extensions[ name ] !== null;
 
 				}
 
@@ -16463,7 +16463,7 @@
 
 				extensions[ name ] = extension;
 
-				return !! extension;
+				return extension !== null;
 
 			},
 
@@ -50781,6 +50781,7 @@
 	exports.LessStencilFunc = LessStencilFunc;
 	exports.Light = Light;
 	exports.LightProbe = LightProbe;
+	exports.LightShadow = LightShadow;
 	exports.Line = Line;
 	exports.Line3 = Line3;
 	exports.LineBasicMaterial = LineBasicMaterial;
