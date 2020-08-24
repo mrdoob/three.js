@@ -509,7 +509,8 @@ var list = {
 
 			"الحركات / Tracks": {
 				"BooleanKeyframeTrack": "api/ar/animation/tracks/BooleanKeyframeTrack",
-				"ColorKeyframeTrack": "api/ar/animation/tracks/ColorKeyframeTrack"
+				"ColorKeyframeTrack": "api/ar/animation/tracks/ColorKeyframeTrack",
+				"NumberKeyframeTrack": "api/ar/animation/tracks/NumberKeyframeTrack"
 			}
 
 		}
