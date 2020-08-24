@@ -45,6 +45,8 @@ var SSRShader = {
   ].join("\n"),
 
   fragmentShader: `
+		precision highp float;
+		precision highp sampler2D;
 		#define MAX_STEP TO_BE_REPLACE
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
