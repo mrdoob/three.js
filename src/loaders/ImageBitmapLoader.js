@@ -1,10 +1,5 @@
-/**
- * @author thespite / http://clicktorelease.com/
- */
-
 import { Cache } from './Cache.js';
 import { Loader } from './Loader.js';
-
 
 function ImageBitmapLoader( manager ) {
 
@@ -29,6 +24,8 @@ function ImageBitmapLoader( manager ) {
 ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	constructor: ImageBitmapLoader,
+
+	isImageBitmapLoader: true,
 
 	setOptions: function setOptions( options ) {
 

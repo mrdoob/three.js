@@ -30,6 +30,10 @@
 		--border-style: 1px solid #444;
 	}
 
+	#previewsToggler {
+		filter: invert(100%);
+	}
+
 }
 
 @font-face {
@@ -121,7 +125,6 @@ h1 a {
 	margin-left: 6px;
 	font-size: .9rem;
 }
-
 #panel {
 	position: fixed;
 	z-index: 100;
@@ -217,6 +220,7 @@ h1 a {
 		display: none;
 	}
 
+
 #panel #inputWrapper {
 	display: flex;
 	align-items: center;
@@ -281,8 +285,8 @@ h1 a {
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
-		transform: translate3d(0,0,0);
 	}
+
 	#panel #content {
 		flex: 1;
 		overflow-y: auto;
@@ -329,6 +333,31 @@ h1 a {
 
 		#panel #content .hidden {
 			display: none !important;
+		}
+
+		#panel #content #previewsToggler {
+			cursor: pointer;
+			float: right;
+			margin-top: 18px;
+			margin-bottom: -18px;
+			opacity: 0.25;
+		}
+
+		#panel #content.minimal .card {
+			background-color: transparent;
+			margin-bottom: 4px;
+		}
+
+		#panel #content.minimal .cover {
+			display: none;
+		}
+
+		#panel #content.minimal .title {
+			padding: 0;
+		}
+
+		#panel #content.minimal #previewsToggler {
+			opacity: 1;
 		}
 
 		body.home #panel #content h2 {

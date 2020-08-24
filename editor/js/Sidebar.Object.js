@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UIInteger, UITextArea, UIText, UINumber } from './libs/ui.js';
@@ -137,13 +133,11 @@ function SidebarObject( editor ) {
 	// scale
 
 	var objectScaleRow = new UIRow();
-	var objectScaleLock = new UICheckbox( true ).setPosition( 'absolute' ).setLeft( '75px' );
-	var objectScaleX = new UINumber( 1 ).setPrecision( 3 ).setRange( 0.001, Infinity ).setWidth( '50px' ).onChange( updateScaleX );
-	var objectScaleY = new UINumber( 1 ).setPrecision( 3 ).setRange( 0.001, Infinity ).setWidth( '50px' ).onChange( updateScaleY );
-	var objectScaleZ = new UINumber( 1 ).setPrecision( 3 ).setRange( 0.001, Infinity ).setWidth( '50px' ).onChange( updateScaleZ );
+	var objectScaleX = new UINumber( 1 ).setPrecision( 3 ).setWidth( '50px' ).onChange( update );
+	var objectScaleY = new UINumber( 1 ).setPrecision( 3 ).setWidth( '50px' ).onChange( update );
+	var objectScaleZ = new UINumber( 1 ).setPrecision( 3 ).setWidth( '50px' ).onChange( update );
 
 	objectScaleRow.add( new UIText( strings.getKey( 'sidebar/object/scale' ) ).setWidth( '90px' ) );
-	objectScaleRow.add( objectScaleLock );
 	objectScaleRow.add( objectScaleX, objectScaleY, objectScaleZ );
 
 	container.add( objectScaleRow );
@@ -315,14 +309,14 @@ function SidebarObject( editor ) {
 
 	// shadow normal offset
 
-	var objectShadowNormalOffsetRow = new UIRow();
+	var objectShadowNormalBiasRow = new UIRow();
 
-	objectShadowNormalOffsetRow.add( new UIText( strings.getKey( 'sidebar/object/shadowNormalOffset' ) ).setWidth( '90px' ) );
+	objectShadowNormalBiasRow.add( new UIText( strings.getKey( 'sidebar/object/shadowNormalBias' ) ).setWidth( '90px' ) );
 
-	var objectShadowNormalOffset = new UINumber( 0 ).onChange( update );
-	objectShadowNormalOffsetRow.add( objectShadowNormalOffset );
+	var objectShadowNormalBias = new UINumber( 0 ).onChange( update );
+	objectShadowNormalBiasRow.add( objectShadowNormalBias );
 
-	container.add( objectShadowNormalOffsetRow );
+	container.add( objectShadowNormalBiasRow );
 
 	// shadow radius
 
@@ -394,57 +388,6 @@ function SidebarObject( editor ) {
 
 
 	//
-
-	function updateScaleX() {
-
-		var object = editor.selected;
-
-		if ( objectScaleLock.getValue() === true ) {
-
-			var scale = objectScaleX.getValue() / object.scale.x;
-
-			objectScaleY.setValue( objectScaleY.getValue() * scale );
-			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
-
-		}
-
-		update();
-
-	}
-
-	function updateScaleY() {
-
-		var object = editor.selected;
-
-		if ( objectScaleLock.getValue() === true ) {
-
-			var scale = objectScaleY.getValue() / object.scale.y;
-
-			objectScaleX.setValue( objectScaleX.getValue() * scale );
-			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
-
-		}
-
-		update();
-
-	}
-
-	function updateScaleZ() {
-
-		var object = editor.selected;
-
-		if ( objectScaleLock.getValue() === true ) {
-
-			var scale = objectScaleZ.getValue() / object.scale.z;
-
-			objectScaleX.setValue( objectScaleX.getValue() * scale );
-			objectScaleY.setValue( objectScaleY.getValue() * scale );
-
-		}
-
-		update();
-
-	}
 
 	function update() {
 
@@ -611,9 +554,9 @@ function SidebarObject( editor ) {
 
 				}
 
-				if ( object.shadow.normalOffset !== objectShadowNormalOffset.getValue() ) {
+				if ( object.shadow.normalBias !== objectShadowNormalBias.getValue() ) {
 
-					editor.execute( new SetValueCommand( editor, object.shadow, 'normalOffset', objectShadowNormalOffset.getValue() ) );
+					editor.execute( new SetValueCommand( editor, object.shadow, 'normalBias', objectShadowNormalBias.getValue() ) );
 
 				}
 
@@ -663,7 +606,7 @@ function SidebarObject( editor ) {
 			'decay': objectDecayRow,
 			'castShadow': objectShadowRow,
 			'receiveShadow': objectReceiveShadow,
-			'shadow': [ objectShadowBiasRow, objectShadowNormalOffsetRow, objectShadowRadiusRow ]
+			'shadow': [ objectShadowBiasRow, objectShadowNormalBiasRow, objectShadowRadiusRow ]
 		};
 
 		for ( var property in properties ) {
@@ -858,7 +801,7 @@ function SidebarObject( editor ) {
 		if ( object.shadow !== undefined ) {
 
 			objectShadowBias.setValue( object.shadow.bias );
-			objectShadowNormalOffset.setValue( object.shadow.normalOffset );
+			objectShadowNormalBias.setValue( object.shadow.normalBias );
 			objectShadowRadius.setValue( object.shadow.radius );
 
 		}

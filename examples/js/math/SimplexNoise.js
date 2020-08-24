@@ -1,4 +1,4 @@
-console.warn( "THREE.SimplexNoise: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
+console.warn( "THREE.SimplexNoise: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 // Ported from Stefan Gustavson's java implementation
 // http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
 // Read Stefan's excellent paper for details on how this code works.
@@ -6,7 +6,6 @@ console.warn( "THREE.SimplexNoise: As part of the transition to ES6 Modules, the
 // Sean McCullough banksean@gmail.com
 //
 // Added 4D noise
-// Joshua Koo zz85nus@gmail.com
 
 /**
  * You can pass in a random number generator object if you like.

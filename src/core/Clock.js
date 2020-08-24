@@ -1,22 +1,18 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
+class Clock {
 
-function Clock( autoStart ) {
+	constructor( autoStart ) {
 
-	this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
+		this.autoStart = ( autoStart !== undefined ) ? autoStart : true;
 
-	this.startTime = 0;
-	this.oldTime = 0;
-	this.elapsedTime = 0;
+		this.startTime = 0;
+		this.oldTime = 0;
+		this.elapsedTime = 0;
 
-	this.running = false;
+		this.running = false;
 
-}
+	}
 
-Object.assign( Clock.prototype, {
-
-	start: function () {
+	start() {
 
 		this.startTime = ( typeof performance === 'undefined' ? Date : performance ).now(); // see #10732
 
@@ -24,24 +20,24 @@ Object.assign( Clock.prototype, {
 		this.elapsedTime = 0;
 		this.running = true;
 
-	},
+	}
 
-	stop: function () {
+	stop() {
 
 		this.getElapsedTime();
 		this.running = false;
 		this.autoStart = false;
 
-	},
+	}
 
-	getElapsedTime: function () {
+	getElapsedTime() {
 
 		this.getDelta();
 		return this.elapsedTime;
 
-	},
+	}
 
-	getDelta: function () {
+	getDelta() {
 
 		let diff = 0;
 
@@ -67,7 +63,6 @@ Object.assign( Clock.prototype, {
 
 	}
 
-} );
-
+}
 
 export { Clock };

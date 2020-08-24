@@ -1,8 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { FrontSide, BackSide, DoubleSide, RGBAFormat, NearestFilter, LinearFilter, PCFShadowMap, VSMShadowMap, RGBADepthPacking, NoBlending } from '../../constants.js';
 import { WebGLRenderTarget } from '../WebGLRenderTarget.js';
 import { MeshDepthMaterial } from '../../materials/MeshDepthMaterial.js';
@@ -102,6 +97,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 			const light = lights[ i ];
 			const shadow = light.shadow;
 
+			if ( shadow.autoUpdate === false && shadow.needsUpdate === false ) continue;
+
 			if ( shadow === undefined ) {
 
 				console.warn( 'THREE.WebGLShadowMap:', light, 'has no shadow.' );
@@ -194,6 +191,8 @@ function WebGLShadowMap( _renderer, _objects, maxTextureSize ) {
 				VSMPass( shadow, camera );
 
 			}
+
+			shadow.needsUpdate = false;
 
 		}
 

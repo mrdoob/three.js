@@ -1,9 +1,5 @@
 import { DefaultLoadingManager } from './LoadingManager.js';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 function Loader( manager ) {
 
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;

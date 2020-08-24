@@ -1,12 +1,4 @@
-console.warn( "THREE.OrbitControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author qiao / https://github.com/qiao
- * @author mrdoob / http://mrdoob.com
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- * @author erich666 / http://erichaines.com
- * @author ScieCode / http://github.com/sciecode
- */
+console.warn( "THREE.OrbitControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 // This set of controls performs orbiting, dollying (zooming), and panning.
 // Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -43,7 +35,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.maxPolarAngle = Math.PI; // radians
 
 	// How far you can orbit horizontally, upper and lower limits.
-	// If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
+	// If set, the interval [ min, max ] must be a sub-interval of [ - 2 PI, 2 PI ], with ( max - min < 2 PI )
 	this.minAzimuthAngle = - Infinity; // radians
 	this.maxAzimuthAngle = Infinity; // radians
 
@@ -140,6 +132,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 		var lastPosition = new THREE.Vector3();
 		var lastQuaternion = new THREE.Quaternion();
 
+		var twoPI = 2 * Math.PI;
+
 		return function update() {
 
 			var position = scope.object.position;
@@ -171,7 +165,29 @@ THREE.OrbitControls = function ( object, domElement ) {
 			}
 
 			// restrict theta to be between desired limits
-			spherical.theta = Math.max( scope.minAzimuthAngle, Math.min( scope.maxAzimuthAngle, spherical.theta ) );
+
+			var min = scope.minAzimuthAngle;
+			var max = scope.maxAzimuthAngle;
+
+			if ( isFinite( min ) && isFinite( max ) ) {
+
+				if ( min < - Math.PI ) min += twoPI; else if ( min > Math.PI ) min -= twoPI;
+
+				if ( max < - Math.PI ) max += twoPI; else if ( max > Math.PI ) max -= twoPI;
+
+				if ( min < max ) {
+
+					spherical.theta = Math.max( min, Math.min( max, spherical.theta ) );
+
+				} else {
+
+					spherical.theta = ( spherical.theta > ( min + max ) / 2 ) ?
+						Math.max( min, spherical.theta ) :
+						Math.min( max, spherical.theta );
+
+				}
+
+			}
 
 			// restrict phi to be between desired limits
 			spherical.phi = Math.max( scope.minPolarAngle, Math.min( scope.maxPolarAngle, spherical.phi ) );
@@ -249,15 +265,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 	this.dispose = function () {
 
 		scope.domElement.removeEventListener( 'contextmenu', onContextMenu, false );
-		scope.domElement.removeEventListener( 'mousedown', onMouseDown, false );
+
+		scope.domElement.removeEventListener( 'pointerdown', onPointerDown, false );
 		scope.domElement.removeEventListener( 'wheel', onMouseWheel, false );
 
 		scope.domElement.removeEventListener( 'touchstart', onTouchStart, false );
 		scope.domElement.removeEventListener( 'touchend', onTouchEnd, false );
 		scope.domElement.removeEventListener( 'touchmove', onTouchMove, false );
 
-		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'mouseup', onMouseUp, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
 
 		scope.domElement.removeEventListener( 'keydown', onKeyDown, false );
 
@@ -749,9 +766,57 @@ THREE.OrbitControls = function ( object, domElement ) {
 	// event handlers - FSM: listen for events and reset state
 	//
 
-	function onMouseDown( event ) {
+	function onPointerDown( event ) {
 
 		if ( scope.enabled === false ) return;
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+				onMouseDown( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onPointerMove( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+				onMouseMove( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onPointerUp( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+				onMouseUp( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	var isMouseDown = false;
+
+	function onMouseDown( event ) {
 
 		// Prevent the browser from scrolling.
 		event.preventDefault();
@@ -850,8 +915,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( state !== STATE.NONE ) {
 
-			scope.domElement.ownerDocument.addEventListener( 'mousemove', onMouseMove, false );
-			scope.domElement.ownerDocument.addEventListener( 'mouseup', onMouseUp, false );
+			isMouseDown = true;
 
 			scope.dispatchEvent( startEvent );
 
@@ -861,7 +925,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseMove( event ) {
 
-		if ( scope.enabled === false ) return;
+		if ( isMouseDown === false ) return;
 
 		event.preventDefault();
 
@@ -897,16 +961,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
-		if ( scope.enabled === false ) return;
+		if ( isMouseDown === false ) return;
 
 		handleMouseUp( event );
-
-		scope.domElement.ownerDocument.removeEventListener( 'mousemove', onMouseMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'mouseup', onMouseUp, false );
 
 		scope.dispatchEvent( endEvent );
 
 		state = STATE.NONE;
+
+		isMouseDown = false;
 
 	}
 
@@ -1100,12 +1163,15 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	scope.domElement.addEventListener( 'contextmenu', onContextMenu, false );
 
-	scope.domElement.addEventListener( 'mousedown', onMouseDown, false );
+	scope.domElement.addEventListener( 'pointerdown', onPointerDown, false );
 	scope.domElement.addEventListener( 'wheel', onMouseWheel, false );
 
 	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
+
+	scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
+	scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
 	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
 

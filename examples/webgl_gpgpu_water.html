@@ -444,6 +444,12 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
+				if ( isSafari() ) {
+
+					gpuCompute.setDataType( THREE.HalfFloatType );
+
+				}
+
 				var heightmap0 = gpuCompute.createTexture();
 
 				fillTexture( heightmap0 );
@@ -486,9 +492,14 @@
 					magFilter: THREE.NearestFilter,
 					format: THREE.RGBAFormat,
 					type: THREE.UnsignedByteType,
-					stencilBuffer: false,
 					depthBuffer: false
 				} );
+
+			}
+
+			function isSafari() {
+
+				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
 
 			}
 
@@ -508,6 +519,7 @@
 						mult *= 1.25;
 
 					}
+
 					return r;
 
 				}

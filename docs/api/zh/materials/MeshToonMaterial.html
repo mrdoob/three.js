@@ -64,8 +64,7 @@
 
 		<h3>[property:Texture aoMap]</h3>
 		<p>The red channel of this texture is used as the ambient occlusion map. Default is null.
-		The aoMap requires a second set of UVs, and consequently will ignore the [page:Texture repeat]
-		and [page:Texture offset] Texture properties.</p>
+		The aoMap requires a second set of UVs.</p>
 
 		<h3>[property:Float aoMapIntensity]</h3>
 		<p>Intensity of the ambient occlusion effect. Default is 1. Zero is no occlusion effect.</p>
@@ -127,9 +126,7 @@
 			[page:Textures THREE.NearestFilter] when using this type of texture. Default is *null*.</p>
 
 		<h3>[property:Texture lightMap]</h3>
-		<p>The light map. Default is null. The lightMap requires a second set of UVs,
-		and consequently will ignore the [page:Texture repeat] and [page:Texture offset]
-		Texture properties.</p>
+		<p>The light map. Default is null. The lightMap requires a second set of UVs.</p>
 
 		<h3>[property:Float lightMapIntensity]</h3>
 		<p>Intensity of the baked light. Default is 1.</p>
@@ -150,6 +147,8 @@
 		<p>
 			The texture to create a normal map. The RGB values affect the surface normal for each pixel fragment and change
 			the way the color is lit. Normal maps do not change the actual shape of the surface, only the lighting.
+			In case the material has a normal map authored using the left handed convention, the y component of normalScale
+			should be negated to compensate for the different handedness.
 		</p>
 
 		<h3>[property:Integer normalMapType]</h3>
@@ -165,25 +164,8 @@
 			Default is a [page:Vector2] set to (1,1).
 		</p>
 
-		<h3>[property:Float shininess]</h3>
-		<p>How shiny the [page:.specular] highlight is; a higher value gives a sharper highlight. Default is *30*.</p>
-
-
 		<h3>[property:Boolean skinning]</h3>
 		<p>Define whether the material uses skinning. Default is false.</p>
-
-		<h3>[property:Color specular]</h3>
-		<p>
-			Specular color of the material. Default is a [page:Color] set to *0x111111* (very dark grey).<br /><br />
-
-			This defines how shiny the material is and the color of its shine.
-		</p>
-
-		<h3>[property:Texture specularMap]</h3>
-		<p>
-			The specular map value affects both how much the specular surface highlight
-			contributes and how much of the environment map affects the surface. Default is null.
-		</p>
 
 		<h3>[property:Boolean wireframe]</h3>
 		<p>Render geometry as wireframe. Default is *false* (i.e. render as flat polygons).</p>

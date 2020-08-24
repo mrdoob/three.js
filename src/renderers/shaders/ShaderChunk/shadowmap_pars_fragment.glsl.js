@@ -8,7 +8,7 @@ export default /* glsl */`
 
 		struct DirectionalLightShadow {
 			float shadowBias;
-			float shadowNormalOffset;
+			float shadowNormalBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
 		};
@@ -24,7 +24,7 @@ export default /* glsl */`
 
 		struct SpotLightShadow {
 			float shadowBias;
-			float shadowNormalOffset;
+			float shadowNormalBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
 		};
@@ -40,7 +40,7 @@ export default /* glsl */`
 
 		struct PointLightShadow {
 			float shadowBias;
-			float shadowNormalOffset;
+			float shadowNormalBias;
 			float shadowRadius;
 			vec2 shadowMapSize;
 			float shadowCameraNear;

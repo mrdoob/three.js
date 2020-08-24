@@ -1,6 +1,3 @@
-/**
- * @author moraxy / https://github.com/moraxy
- */
 /* global QUnit */
 
 import { Layers } from '../../../../src/core/Layers';

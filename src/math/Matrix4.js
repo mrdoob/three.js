@@ -1,50 +1,29 @@
 import { Vector3 } from './Vector3.js';
 
-const _v1 = new Vector3();
-const _m1 = new Matrix4();
-const _zero = new Vector3( 0, 0, 0 );
-const _one = new Vector3( 1, 1, 1 );
-const _x = new Vector3();
-const _y = new Vector3();
-const _z = new Vector3();
+class Matrix4 {
 
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author supereggbert / http://www.paulbrunt.co.uk/
- * @author philogb / http://blog.thejit.org/
- * @author jordi_ros / http://plattsoft.com
- * @author D1plo1d / http://github.com/D1plo1d
- * @author alteredq / http://alteredqualia.com/
- * @author mikael emtinger / http://gomo.se/
- * @author timknip / http://www.floorplanner.com/
- * @author bhouston / http://clara.io
- * @author WestLangley / http://github.com/WestLangley
- */
+	constructor() {
 
-function Matrix4() {
+		Object.defineProperty( this, 'isMatrix4', { value: true } );
 
-	this.elements = [
+		this.elements = [
 
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1
 
-	];
+		];
 
-	if ( arguments.length > 0 ) {
+		if ( arguments.length > 0 ) {
 
-		console.error( 'THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.' );
+			console.error( 'THREE.Matrix4: the constructor no longer reads arguments. use .set() instead.' );
+
+		}
 
 	}
 
-}
-
-Object.assign( Matrix4.prototype, {
-
-	isMatrix4: true,
-
-	set: function ( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
+	set( n11, n12, n13, n14, n21, n22, n23, n24, n31, n32, n33, n34, n41, n42, n43, n44 ) {
 
 		const te = this.elements;
 
@@ -55,9 +34,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	identity: function () {
+	identity() {
 
 		this.set(
 
@@ -70,15 +49,15 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	clone: function () {
+	clone() {
 
 		return new Matrix4().fromArray( this.elements );
 
-	},
+	}
 
-	copy: function ( m ) {
+	copy( m ) {
 
 		const te = this.elements;
 		const me = m.elements;
@@ -90,9 +69,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	copyPosition: function ( m ) {
+	copyPosition( m ) {
 
 		const te = this.elements, me = m.elements;
 
@@ -102,9 +81,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	extractBasis: function ( xAxis, yAxis, zAxis ) {
+	extractBasis( xAxis, yAxis, zAxis ) {
 
 		xAxis.setFromMatrixColumn( this, 0 );
 		yAxis.setFromMatrixColumn( this, 1 );
@@ -112,9 +91,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeBasis: function ( xAxis, yAxis, zAxis ) {
+	makeBasis( xAxis, yAxis, zAxis ) {
 
 		this.set(
 			xAxis.x, yAxis.x, zAxis.x, 0,
@@ -125,9 +104,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	extractRotation: function ( m ) {
+	extractRotation( m ) {
 
 		// this method does not support reflection matrices
 
@@ -160,9 +139,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationFromEuler: function ( euler ) {
+	makeRotationFromEuler( euler ) {
 
 		if ( ! ( euler && euler.isEuler ) ) {
 
@@ -288,15 +267,15 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationFromQuaternion: function ( q ) {
+	makeRotationFromQuaternion( q ) {
 
 		return this.compose( _zero, q, _one );
 
-	},
+	}
 
-	lookAt: function ( eye, target, up ) {
+	lookAt( eye, target, up ) {
 
 		const te = this.elements;
 
@@ -341,9 +320,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiply: function ( m, n ) {
+	multiply( m, n ) {
 
 		if ( n !== undefined ) {
 
@@ -354,15 +333,15 @@ Object.assign( Matrix4.prototype, {
 
 		return this.multiplyMatrices( this, m );
 
-	},
+	}
 
-	premultiply: function ( m ) {
+	premultiply( m ) {
 
 		return this.multiplyMatrices( m, this );
 
-	},
+	}
 
-	multiplyMatrices: function ( a, b ) {
+	multiplyMatrices( a, b ) {
 
 		const ae = a.elements;
 		const be = b.elements;
@@ -400,9 +379,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	multiplyScalar: function ( s ) {
+	multiplyScalar( s ) {
 
 		const te = this.elements;
 
@@ -413,9 +392,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	determinant: function () {
+	determinant() {
 
 		const te = this.elements;
 
@@ -463,9 +442,9 @@ Object.assign( Matrix4.prototype, {
 
 		);
 
-	},
+	}
 
-	transpose: function () {
+	transpose() {
 
 		const te = this.elements;
 		let tmp;
@@ -480,9 +459,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	setPosition: function ( x, y, z ) {
+	setPosition( x, y, z ) {
 
 		const te = this.elements;
 
@@ -502,9 +481,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getInverse: function ( m, throwOnDegenerate ) {
+	getInverse( m, throwOnDegenerate ) {
 
 		if ( throwOnDegenerate !== undefined ) {
 
@@ -554,9 +533,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	scale: function ( v ) {
+	scale( v ) {
 
 		const te = this.elements;
 		const x = v.x, y = v.y, z = v.z;
@@ -568,9 +547,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	getMaxScaleOnAxis: function () {
+	getMaxScaleOnAxis() {
 
 		const te = this.elements;
 
@@ -580,9 +559,9 @@ Object.assign( Matrix4.prototype, {
 
 		return Math.sqrt( Math.max( scaleXSq, scaleYSq, scaleZSq ) );
 
-	},
+	}
 
-	makeTranslation: function ( x, y, z ) {
+	makeTranslation( x, y, z ) {
 
 		this.set(
 
@@ -595,9 +574,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationX: function ( theta ) {
+	makeRotationX( theta ) {
 
 		const c = Math.cos( theta ), s = Math.sin( theta );
 
@@ -612,9 +591,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationY: function ( theta ) {
+	makeRotationY( theta ) {
 
 		const c = Math.cos( theta ), s = Math.sin( theta );
 
@@ -629,9 +608,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationZ: function ( theta ) {
+	makeRotationZ( theta ) {
 
 		const c = Math.cos( theta ), s = Math.sin( theta );
 
@@ -646,9 +625,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeRotationAxis: function ( axis, angle ) {
+	makeRotationAxis( axis, angle ) {
 
 		// Based on http://www.gamedev.net/reference/articles/article1199.asp
 
@@ -667,11 +646,11 @@ Object.assign( Matrix4.prototype, {
 
 		);
 
-		 return this;
+		return this;
 
-	},
+	}
 
-	makeScale: function ( x, y, z ) {
+	makeScale( x, y, z ) {
 
 		this.set(
 
@@ -684,9 +663,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeShear: function ( x, y, z ) {
+	makeShear( x, y, z ) {
 
 		this.set(
 
@@ -699,9 +678,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	compose: function ( position, quaternion, scale ) {
+	compose( position, quaternion, scale ) {
 
 		const te = this.elements;
 
@@ -735,15 +714,15 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	decompose: function ( position, quaternion, scale ) {
+	decompose( position, quaternion, scale ) {
 
 		const te = this.elements;
 
 		let sx = _v1.set( te[ 0 ], te[ 1 ], te[ 2 ] ).length();
-		let sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
-		let sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
+		const sy = _v1.set( te[ 4 ], te[ 5 ], te[ 6 ] ).length();
+		const sz = _v1.set( te[ 8 ], te[ 9 ], te[ 10 ] ).length();
 
 		// if determine is negative, we need to invert one scale
 		const det = this.determinant();
@@ -780,9 +759,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makePerspective: function ( left, right, top, bottom, near, far ) {
+	makePerspective( left, right, top, bottom, near, far ) {
 
 		if ( far === undefined ) {
 
@@ -806,9 +785,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	makeOrthographic: function ( left, right, top, bottom, near, far ) {
+	makeOrthographic( left, right, top, bottom, near, far ) {
 
 		const te = this.elements;
 		const w = 1.0 / ( right - left );
@@ -826,9 +805,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	equals: function ( matrix ) {
+	equals( matrix ) {
 
 		const te = this.elements;
 		const me = matrix.elements;
@@ -841,9 +820,9 @@ Object.assign( Matrix4.prototype, {
 
 		return true;
 
-	},
+	}
 
-	fromArray: function ( array, offset ) {
+	fromArray( array, offset ) {
 
 		if ( offset === undefined ) offset = 0;
 
@@ -855,9 +834,9 @@ Object.assign( Matrix4.prototype, {
 
 		return this;
 
-	},
+	}
 
-	toArray: function ( array, offset ) {
+	toArray( array, offset ) {
 
 		if ( array === undefined ) array = [];
 		if ( offset === undefined ) offset = 0;
@@ -888,7 +867,15 @@ Object.assign( Matrix4.prototype, {
 
 	}
 
-} );
+}
+
+const _v1 = new Vector3();
+const _m1 = new Matrix4();
+const _zero = new Vector3( 0, 0, 0 );
+const _one = new Vector3( 1, 1, 1 );
+const _x = new Vector3();
+const _y = new Vector3();
+const _z = new Vector3();
 
 
 export { Matrix4 };

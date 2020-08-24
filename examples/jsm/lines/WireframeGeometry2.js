@@ -1,8 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
 import {
 	WireframeGeometry
 } from "../../../build/three.module.js";

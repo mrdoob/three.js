@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UISelect, UIText, UINumber } from './libs/ui.js';
@@ -52,7 +48,7 @@ function SidebarMaterial( editor ) {
 
 	var materialSlotRow = new UIRow();
 
-	materialSlotRow.add( new UIText( 'Slot' ).setWidth( '90px' ) );
+	materialSlotRow.add( new UIText( strings.getKey( 'sidebar/material/slot' ) ).setWidth( '90px' ) );
 
 	var materialSlotSelect = new UISelect().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
 	materialSlotSelect.setOptions( { 0: '' } ).setValue( 0 );

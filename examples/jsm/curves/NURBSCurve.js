@@ -1,5 +1,10 @@
+import {
+	Curve,
+	Vector3,
+	Vector4
+} from "../../../build/three.module.js";
+import { NURBSUtils } from "../curves/NURBSUtils.js";
 /**
- * @author renej
  * NURBS curve object
  *
  * Derives from Curve, overriding getPoint and getTangent.
@@ -7,18 +12,6 @@
  * Implementation is based on (x, y [, z=0 [, w=1]]) control points with w=weight.
  *
  **/
-
-import {
-	Curve,
-	Vector3,
-	Vector4
-} from "../../../build/three.module.js";
-import { NURBSUtils } from "../curves/NURBSUtils.js";
-
-
-/**************************************************************
- *	NURBS curve
- **************************************************************/
 
 var NURBSCurve = function ( degree, knots /* array of reals */, controlPoints /* array of Vector(2|3|4) */, startKnot /* index in knots */, endKnot /* index in knots */ ) {
 

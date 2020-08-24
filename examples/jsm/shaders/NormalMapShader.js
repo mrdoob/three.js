@@ -1,13 +1,10 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- *
- * Normal map shader
- * - compute normals from heightmap
- */
-
 import {
 	Vector2
 } from "../../../build/three.module.js";
+/**
+ * Normal map shader
+ * - compute normals from heightmap
+ */
 
 var NormalMapShader = {
 

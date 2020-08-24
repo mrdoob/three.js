@@ -9,7 +9,15 @@ export class AnimationClip {
 
 	name: string;
 	tracks: KeyframeTrack[];
+
+	/**
+	 * @default THREE.NormalAnimationBlendMode
+	 */
 	blendMode: AnimationBlendMode;
+
+	/**
+	 * @default -1
+	 */
 	duration: number;
 	uuid: string;
 	results: any[];

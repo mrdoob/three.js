@@ -1,13 +1,10 @@
-/**
- * Break faces with edges longer than maxEdgeLength
- * - not recursive
- *
- * @author alteredq / http://alteredqualia.com/
- */
-
 import {
 	Face3
 } from "../../../build/three.module.js";
+/**
+ * Break faces with edges longer than maxEdgeLength
+ * - not recursive
+ */
 
 var TessellateModifier = function ( maxEdgeLength ) {
 

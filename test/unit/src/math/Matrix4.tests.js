@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Matrix4 } from '../../../../src/math/Matrix4';

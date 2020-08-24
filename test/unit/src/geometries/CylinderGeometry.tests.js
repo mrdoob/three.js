@@ -1,7 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';

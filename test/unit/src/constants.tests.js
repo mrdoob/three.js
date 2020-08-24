@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import * as Constants from '../../../src/constants';
@@ -15,8 +12,6 @@ export default QUnit.module( 'Constants', () => {
 		assert.equal( Constants.CullFaceBack, 1, 'CullFaceBack equal 1' );
 		assert.equal( Constants.CullFaceFront, 2, 'CullFaceFront is equal to 2' );
 		assert.equal( Constants.CullFaceFrontBack, 3, 'CullFaceFrontBack is equal to 3' );
-		assert.equal( Constants.FrontFaceDirectionCW, 0, 'FrontFaceDirectionCW is equal to 0' );
-		assert.equal( Constants.FrontFaceDirectionCCW, 1, 'FrontFaceDirectionCCW is equal to 1' );
 		assert.equal( Constants.BasicShadowMap, 0, 'BasicShadowMap is equal to 0' );
 		assert.equal( Constants.PCFShadowMap, 1, 'PCFShadowMap is equal to 1' );
 		assert.equal( Constants.PCFSoftShadowMap, 2, 'PCFSoftShadowMap is equal to 2' );

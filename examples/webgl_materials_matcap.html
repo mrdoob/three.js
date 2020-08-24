@@ -40,7 +40,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				// tone mapping
-				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			 	renderer.toneMappingExposure = API.exposure;
 
 				renderer.outputEncoding = THREE.sRGBEncoding;

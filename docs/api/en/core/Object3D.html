@@ -286,9 +286,9 @@
 
 		<h3>[method:Vector3 localToWorld]( [param:Vector3 vector] )</h3>
 		<p>
-		vector - A vector representing a position in local (object) space.<br /><br />
+		vector - A vector representing a position in this object's local space.<br /><br />
 
-		Converts the vector from local space to world space.
+		Converts the vector from this object's local space to world space.
 		</p>
 
 		<h3>[method:null lookAt]( [param:Vector3 vector] )<br />
@@ -447,9 +447,9 @@
 
 		<h3>[method:Vector3 worldToLocal]( [param:Vector3 vector] )</h3>
 		<p>
-		vector - A world vector.<br /><br />
+		vector - A vector representing a position in world space.<br /><br />
 
-		Updates the vector from world space to local space.
+		Converts the vector from world space to this object's local space.
 		</p>
 
 		<h2>Source</h2>

@@ -117,7 +117,7 @@ vec3 getAmbientLightIrradiance( const in vec3 ambientLightColor ) {
 	uniform SpotLight spotLights[ NUM_SPOT_LIGHTS ];
 
 	// directLight is an out parameter as having it as a return value caused compiler errors on some devices
-	void getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight  ) {
+	void getSpotDirectLightIrradiance( const in SpotLight spotLight, const in GeometricContext geometry, out IncidentLight directLight ) {
 
 		vec3 lVector = spotLight.position - geometry.position;
 		directLight.direction = normalize( lVector );

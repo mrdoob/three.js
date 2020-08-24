@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Texture } from './Texture.js';
 import { CubeReflectionMapping, RGBFormat } from '../constants.js';
 

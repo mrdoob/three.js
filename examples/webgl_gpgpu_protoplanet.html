@@ -316,6 +316,12 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
+				if ( isSafari() ) {
+
+					gpuCompute.setDataType( THREE.HalfFloatType );
+
+				}
+
 				var dtPosition = gpuCompute.createTexture();
 				var dtVelocity = gpuCompute.createTexture();
 
@@ -339,6 +345,12 @@
 					console.error( error );
 
 				}
+
+			}
+
+			function isSafari() {
+
+				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
 
 			}
 

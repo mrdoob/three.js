@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute.js';
 import { BufferGeometry } from '../../core/BufferGeometry.js';
 import { arrayMax } from '../../utils.js';
@@ -42,6 +38,12 @@ function WebGLGeometries( gl, attributes, info, bindingStates ) {
 		}
 
 		bindingStates.releaseStatesOfGeometry( geometry );
+
+		if ( geometry.isInstancedBufferGeometry === true ) {
+
+			delete geometry._maxInstanceCount;
+
+		}
 
 		//
 

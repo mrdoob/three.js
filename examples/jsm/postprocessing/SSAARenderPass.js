@@ -1,15 +1,3 @@
-/**
-*
-* Supersample Anti-Aliasing Render Pass
-*
-* @author bhouston / http://clara.io/
-*
-* This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
-*
-* References: https://en.wikipedia.org/wiki/Supersampling
-*
-*/
-
 import {
 	AdditiveBlending,
 	LinearFilter,
@@ -20,6 +8,15 @@ import {
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 import { CopyShader } from "../shaders/CopyShader.js";
+/**
+*
+* Supersample Anti-Aliasing Render Pass
+*
+* This manual approach to SSAA re-renders the scene ones for each sample with camera jitter and accumulates the results.
+*
+* References: https://en.wikipedia.org/wiki/Supersampling
+*
+*/
 
 var SSAARenderPass = function ( scene, camera, clearColor, clearAlpha ) {
 

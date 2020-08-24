@@ -329,7 +329,7 @@
 				// var width = window.innerWidth || 1;
 				var height = window.innerHeight || 1;
 
-				var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat, stencilBuffer: false };
+				var parameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBAFormat };
 				var regularRenderTarget = new THREE.WebGLRenderTarget( windowThirdX, height, parameters );
 				ldrEffectComposer = new EffectComposer( renderer, regularRenderTarget );
 
