@@ -62,6 +62,8 @@ const assets = [
 
 	'../examples/jsm/geometries/TeapotBufferGeometry.js',
 
+	'../examples/jsm/renderers/CSS2DRenderer.js', // 3DMLoader dependency
+
 	'../examples/jsm/webxr/VRButton.js',
 
 	'./images/rotate.svg',
