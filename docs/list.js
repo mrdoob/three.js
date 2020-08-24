@@ -512,7 +512,8 @@ var list = {
 				"ColorKeyframeTrack": "api/ar/animation/tracks/ColorKeyframeTrack",
 				"NumberKeyframeTrack": "api/ar/animation/tracks/NumberKeyframeTrack",
 				"QuaternionKeyframeTrack": "api/ar/animation/tracks/QuaternionKeyframeTrack",
-				"StringKeyframeTrack": "api/ar/animation/tracks/StringKeyframeTrack"
+				"StringKeyframeTrack": "api/ar/animation/tracks/StringKeyframeTrack",
+				"VectorKeyframeTrack": "api/ar/animation/tracks/VectorKeyframeTrack"
 			}
 
 		}
