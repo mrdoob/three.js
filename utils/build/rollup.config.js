@@ -1,9 +1,13 @@
 import babel from '@rollup/plugin-babel';
 
-if (!String.prototype.replaceAll) {
-  String.prototype.replaceAll = function(find, replace) {
-    return this.split(find).join(replace);
-  };
+if ( ! String.prototype.replaceAll ) {
+
+	String.prototype.replaceAll = function ( find, replace ) {
+
+		return this.split( find ).join( replace );
+
+	};
+
 }
 
 function glconstants() {
@@ -210,13 +214,13 @@ function glsl() {
 function babelCleanup() {
 
 	const wrappedClass = /(var\s*(\w+) = \/\*#__PURE__\*\/function \((\w+)?\) {\s*).*(return \2;\s*}\((\w+)?\);)/gs;
-	const inheritsLoose = /_inheritsLoose\((\w+), (\w+)\);\n/
+	const inheritsLoose = /_inheritsLoose\((\w+), (\w+)\);\n/;
 
-	const suspiciousLeftOperandWarning = / \|\| _assertThisInitialized\((\w+)\)/g
+	const suspiciousLeftOperandWarning = / \|\| _assertThisInitialized\((\w+)\)/g;
 	const doubleSpaces = / {2}/g;
 	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
 
-	function unwrap ( match, wrapperStart, klass, _parentClass, wrapperEnd, parentClass ) {
+	function unwrap( match, wrapperStart, klass, _parentClass, wrapperEnd, parentClass ) {
 
 		return match
 			.replace( wrapperStart, '' )
@@ -241,7 +245,7 @@ function babelCleanup() {
 			code = code
 				.replace( suspiciousLeftOperandWarning, '' )
 				.replace( doubleSpaces, '\t' )
-				.replace( danglingTabs, '' )
+				.replace( danglingTabs, '' );
 
 			return {
 				code: code,
@@ -273,7 +277,8 @@ export default [
 							// the supported browsers of the build/three.js bundle
 							// https://browsersl.ist/?q=%3E0.3%25%2C+not+dead
 							targets: '>0.3%, not dead',
-							loose: true
+							loose: true,
+							bugfixes: true,
 						},
 					],
 				],
