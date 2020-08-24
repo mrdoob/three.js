@@ -186,7 +186,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		return null;
+		this.materials.push( material );
+
+		return material;
 
 	},
 
@@ -262,17 +264,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					var material = this._createMaterial( materials[ attributes.materialIndex ] );
 
-					var m = this._compareMaterials( material );
-
-					if ( m === null ) {
-
-						this.materials.push( material );
-
-					} else {
-
-						material = m;
-
-					}
+					material = this._compareMaterials( material );
 
 					var _object = this._createObject( obj, material );
 
@@ -360,7 +352,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		console.log( this.materials );
+		this.materials = [];
 
 		return object;
 
@@ -380,17 +372,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var geometry = loader.parse( obj.geometry );
 				var material = new PointsMaterial( { sizeAttenuation: true, vertexColors: true } );
 
-				var m = this._compareMaterials( material );
-
-				if ( m === null ) {
-
-					this.materials.push( material );
-
-				} else {
-
-					material = m;
-
-				}
+				material = this._compareMaterials( material );
 
 				var points = new Points( geometry, material );
 				points.userData[ 'attributes' ] = attributes;
@@ -438,18 +420,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
 
 				var material = new LineBasicMaterial( { color: color } );
-
-				var m = this._compareMaterials( material );
-
-				if ( m === null ) {
-
-					this.materials.push( material );
-
-				} else {
-
-					material = m;
-
-				}
+				material = this._compareMaterials( material );
 
 				var lines = new Line( geometry, material );
 				lines.userData[ 'attributes' ] = attributes;
