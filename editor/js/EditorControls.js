@@ -154,7 +154,7 @@ function EditorControls( object, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
-				onMouseUp( event );
+				onMouseUp();
 				break;
 
 			// TODO touch
@@ -213,7 +213,7 @@ function EditorControls( object, domElement ) {
 
 	}
 
-	function onMouseUp( /* event */ ) {
+	function onMouseUp() {
 
 		state = STATE.NONE;
 
