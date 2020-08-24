@@ -32,7 +32,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	this.tmpQuaternion = new THREE.Quaternion();
 
-	this.mouseStatus = 0;
+	this.pointerStatus = 0;
 
 	this.moveState = { up: 0, down: 0, left: 0, right: 0, forward: 0, back: 0, pitchUp: 0, pitchDown: 0, yawLeft: 0, yawRight: 0, rollLeft: 0, rollRight: 0 };
 	this.moveVector = new THREE.Vector3( 0, 0, 0 );
@@ -108,7 +108,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.mousedown = function ( event ) {
+	this.pointerdown = function ( event ) {
 
 		if ( this.domElement !== document ) {
 
@@ -121,7 +121,7 @@ THREE.FlyControls = function ( object, domElement ) {
 
 		if ( this.dragToLook ) {
 
-			this.mouseStatus ++;
+			this.pointerStatus ++;
 
 		} else {
 
@@ -138,9 +138,9 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.mousemove = function ( event ) {
+	this.pointermove = function ( event ) {
 
-		if ( ! this.dragToLook || this.mouseStatus > 0 ) {
+		if ( ! this.dragToLook || this.pointerStatus > 0 ) {
 
 			var container = this.getContainerDimensions();
 			var halfWidth = container.size[ 0 ] / 2;
@@ -155,14 +155,14 @@ THREE.FlyControls = function ( object, domElement ) {
 
 	};
 
-	this.mouseup = function ( event ) {
+	this.pointerup = function ( event ) {
 
 		event.preventDefault();
 		event.stopPropagation();
 
 		if ( this.dragToLook ) {
 
-			this.mouseStatus --;
+			this.pointerStatus --;
 
 			this.moveState.yawLeft = this.moveState.pitchDown = 0;
 
@@ -279,26 +279,26 @@ THREE.FlyControls = function ( object, domElement ) {
 	this.dispose = function () {
 
 		this.domElement.removeEventListener( 'contextmenu', contextmenu, false );
-		this.domElement.removeEventListener( 'mousedown', _mousedown, false );
-		this.domElement.removeEventListener( 'mousemove', _mousemove, false );
-		this.domElement.removeEventListener( 'mouseup', _mouseup, false );
+		this.domElement.removeEventListener( 'pointerdown', _pointerdown, false );
+		this.domElement.removeEventListener( 'pointermove', _pointermove, false );
+		this.domElement.removeEventListener( 'pointerup', _pointerup, false );
 
 		window.removeEventListener( 'keydown', _keydown, false );
 		window.removeEventListener( 'keyup', _keyup, false );
 
 	};
 
-	var _mousemove = bind( this, this.mousemove );
-	var _mousedown = bind( this, this.mousedown );
-	var _mouseup = bind( this, this.mouseup );
+	var _pointermove = bind( this, this.pointermove );
+	var _pointerdown = bind( this, this.pointerdown );
+	var _pointerup = bind( this, this.pointerup );
 	var _keydown = bind( this, this.keydown );
 	var _keyup = bind( this, this.keyup );
 
 	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
 
-	this.domElement.addEventListener( 'mousemove', _mousemove, false );
-	this.domElement.addEventListener( 'mousedown', _mousedown, false );
-	this.domElement.addEventListener( 'mouseup', _mouseup, false );
+	this.domElement.addEventListener( 'pointerdown', _pointerdown, false );
+	this.domElement.addEventListener( 'pointermove', _pointermove, false );
+	this.domElement.addEventListener( 'pointerup', _pointerup, false );
 
 	window.addEventListener( 'keydown', _keydown, false );
 	window.addEventListener( 'keyup', _keyup, false );
