@@ -505,6 +505,10 @@ var list = {
 				"KeyframeTrack": "api/ar/animation/KeyframeTrack",
 				"PropertyBinding": "api/ar/animation/PropertyBinding",
 				"PropertyMixer": "api/ar/animation/PropertyMixer"
+			},
+
+			"الحركات / Tracks": {
+				"BooleanKeyframeTrack": "api/ar/animation/tracks/BooleanKeyframeTrack"
 			}
 
 		}
