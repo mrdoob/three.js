@@ -24015,10 +24015,16 @@
 			// uv repeat and offset setting priorities
 			// 1. color map
 			// 2. specular map
-			// 3. normal map
-			// 4. bump map
-			// 5. alpha map
-			// 6. emissive map
+			// 3. displacementMap map
+			// 4. normal map
+			// 5. bump map
+			// 6. roughnessMap map
+			// 7. metalnessMap map
+			// 8. alphaMap map
+			// 9. emissiveMap map
+			// 10. clearcoat map
+			// 11. clearcoat normal map
+			// 12. clearcoat roughnessMap map
 
 			var uvScaleMap;
 
@@ -24057,6 +24063,18 @@
 			} else if ( material.emissiveMap ) {
 
 				uvScaleMap = material.emissiveMap;
+
+			} else if ( material.clearcoatMap ) {
+
+				uvScaleMap = material.clearcoatMap;
+
+			} else if ( material.clearcoatNormalMap ) {
+
+				uvScaleMap = material.clearcoatNormalMap;
+
+			} else if ( material.clearcoatRoughnessMap ) {
+
+				uvScaleMap = material.clearcoatRoughnessMap;
 
 			}
 
