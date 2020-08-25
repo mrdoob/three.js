@@ -336,6 +336,7 @@ var files = {
 		"webxr_vr_handinput",
 		"webxr_vr_handinput_cubes",
 		"webxr_vr_handinput_profiles",
+		"webxr_vr_haptics",
 		"webxr_vr_lorenzattractor",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
