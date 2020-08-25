@@ -81,11 +81,14 @@ var SSRShader = {
 				return orthographicDepthToViewZ( depth, cameraNear, cameraFar );
 			#endif
 		}
-		vec3 getViewPosition( const in vec2 screenPosition, const in float depth, const in float viewZ ) {
-			float clipW = cameraProjectionMatrix[2][3] * viewZ + cameraProjectionMatrix[3][3];
+		vec3 getViewPosition( const in vec2 screenPosition, const in float depth, const in float viewZ, const in float clipW ) {
 			vec4 clipPosition = vec4( ( vec3( screenPosition, depth ) - 0.5 ) * 2.0, 1.0 );
 			clipPosition *= clipW; // unprojection.
 			return ( cameraInverseProjectionMatrix * clipPosition ).xyz;
+		}
+		vec3 getViewPosition( const in vec2 screenPosition, const in float depth, const in float viewZ ) {
+			float clipW = cameraProjectionMatrix[2][3] * viewZ + cameraProjectionMatrix[3][3];
+			return getViewPosition(screenPosition, depth, viewZ, clipW);
 		}
 		vec3 getViewNormal( const in vec2 screenPosition ) {
 			return unpackRGBToNormal( texture2D( tNormal, screenPosition ).xyz );
@@ -156,9 +159,11 @@ var SSRShader = {
 
 				float d = getDepth(uv);
 				float vZ = getViewZ( d );
-				vec3 vP=getViewPosition( uv, d, vZ );
+				float clipW = cameraProjectionMatrix[2][3] * vZ + cameraProjectionMatrix[3][3];
+				vec3 vP=getViewPosition( uv, d, vZ, clipW );
 				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
-				if(away<surfDist){
+				float sD=surfDist*clipW;
+				if(away<sD){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;
 					vec4 reflectColor=texture2D(tDiffuse,uv);

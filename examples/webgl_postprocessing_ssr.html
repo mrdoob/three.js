@@ -276,7 +276,9 @@
 		// GUI
 
 		gui = new GUI( { width: 400 } );
-		ssrPass.surfDist=4.2
+		// ssrPass.surfDist=4.2
+		ssrPass.surfDist=.007
+		// ssrPass.output=SSRPass.OUTPUT.SSR
 		gui.add(ssrPass, 'output', {
 			'Default': SSRPass.OUTPUT.Default,
 			'DefaultBlur': SSRPass.OUTPUT.DefaultBlur,
@@ -292,8 +294,9 @@
 		});
 		gui.add(params, 'enableSSR').name( 'Enable SSR' );
 		gui.add(ssrPass, 'opacity').min(0).max(1);
-		gui.add(ssrPass, 'maxDistance').min(0).max(1000);
-		gui.add(ssrPass, 'surfDist').min(0).max(10).step(.1);
+		gui.add(ssrPass, 'maxDistance').min(0).max(2000);
+		// gui.add(ssrPass, 'surfDist').min(0).max(10).step(.1);
+		gui.add(ssrPass, 'surfDist').min(0).max(.02).step(.0001);
 
 	}
 
