@@ -26262,6 +26262,9 @@
 		};
 
 		this.setRenderTarget = function ( renderTarget, activeCubeFace, activeMipmapLevel ) {
+			if ( activeCubeFace === void 0 ) activeCubeFace = 0;
+			if ( activeMipmapLevel === void 0 ) activeMipmapLevel = 0;
+
 
 			_currentRenderTarget = renderTarget;
 			_currentActiveCubeFace = activeCubeFace;
@@ -26282,7 +26285,7 @@
 
 				if ( renderTarget.isWebGLCubeRenderTarget ) {
 
-					framebuffer = _webglFramebuffer[ activeCubeFace || 0 ];
+					framebuffer = _webglFramebuffer[ activeCubeFace ];
 					isCube = true;
 
 				} else if ( renderTarget.isWebGLMultisampleRenderTarget ) {
@@ -26321,7 +26324,7 @@
 			if ( isCube ) {
 
 				var textureProperties = properties.get( renderTarget.texture );
-				_gl.framebufferTexture2D( 36160, 36064, 34069 + ( activeCubeFace || 0 ), textureProperties.__webglTexture, activeMipmapLevel || 0 );
+				_gl.framebufferTexture2D( 36160, 36064, 34069 + activeCubeFace, textureProperties.__webglTexture, activeMipmapLevel );
 
 			}
 
@@ -47461,8 +47464,8 @@
 	var _box$3 = new Box3();
 
 		function BoxHelper( object, color ) {
+			if ( color === void 0 ) color = 0xffff00;
 
-			if ( color === undefined ) { color = 0xffff00; }
 
 			var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 			var positions = new Float32Array( 8 * 3 );
@@ -47559,8 +47562,8 @@
 		};
 
 	function Box3Helper( box, color ) {
+			if ( color === void 0 ) color = 0xffff00;
 
-			if ( color === undefined ) { color = 0xffff00; }
 
 			var indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 
@@ -47602,7 +47605,6 @@
 		};
 
 	function PlaneHelper( plane, size, hex ) {
-
 
 			var color = ( hex !== undefined ) ? hex : 0xffff00;
 
@@ -47751,8 +47753,8 @@
 		};
 
 	function AxesHelper( size ) {
+			if ( size === void 0 ) size = 1;
 
-			size = size || 1;
 
 			var vertices = [
 				0, 0, 0,	size, 0, 0,

@@ -26323,7 +26323,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-	this.setRenderTarget = function ( renderTarget, activeCubeFace, activeMipmapLevel ) {
+	this.setRenderTarget = function ( renderTarget, activeCubeFace = 0, activeMipmapLevel = 0 ) {
 
 		_currentRenderTarget = renderTarget;
 		_currentActiveCubeFace = activeCubeFace;
@@ -26344,7 +26344,7 @@ function WebGLRenderer( parameters ) {
 
 			if ( renderTarget.isWebGLCubeRenderTarget ) {
 
-				framebuffer = __webglFramebuffer[ activeCubeFace || 0 ];
+				framebuffer = __webglFramebuffer[ activeCubeFace ];
 				isCube = true;
 
 			} else if ( renderTarget.isWebGLMultisampleRenderTarget ) {
@@ -26383,7 +26383,7 @@ function WebGLRenderer( parameters ) {
 		if ( isCube ) {
 
 			const textureProperties = properties.get( renderTarget.texture );
-			_gl.framebufferTexture2D( 36160, 36064, 34069 + ( activeCubeFace || 0 ), textureProperties.__webglTexture, activeMipmapLevel || 0 );
+			_gl.framebufferTexture2D( 36160, 36064, 34069 + activeCubeFace, textureProperties.__webglTexture, activeMipmapLevel );
 
 		}
 
@@ -47610,9 +47610,7 @@ const _box$3 = new Box3();
 
 class BoxHelper extends LineSegments {
 
-	constructor( object, color ) {
-
-		if ( color === undefined ) color = 0xffff00;
+	constructor( object, color = 0xffff00 ) {
 
 		const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 		const positions = new Float32Array( 8 * 3 );
@@ -47709,9 +47707,7 @@ class BoxHelper extends LineSegments {
 
 class Box3Helper extends LineSegments {
 
-	constructor( box, color ) {
-
-		if ( color === undefined ) color = 0xffff00;
+	constructor( box, color = 0xffff00 ) {
 
 		const indices = new Uint16Array( [ 0, 1, 1, 2, 2, 3, 3, 0, 4, 5, 5, 6, 6, 7, 7, 4, 0, 4, 1, 5, 2, 6, 3, 7 ] );
 
@@ -47754,7 +47750,6 @@ class Box3Helper extends LineSegments {
 class PlaneHelper extends Line {
 
 	constructor( plane, size, hex ) {
-
 
 		const color = ( hex !== undefined ) ? hex : 0xffff00;
 
@@ -47904,9 +47899,7 @@ class ArrowHelper extends Object3D {
 
 class AxesHelper extends LineSegments {
 
-	constructor( size ) {
-
-		size = size || 1;
+	constructor( size = 1 ) {
 
 		const vertices = [
 			0, 0, 0,	size, 0, 0,
