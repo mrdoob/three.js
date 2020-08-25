@@ -15,9 +15,13 @@ import {
 	PointLight,
 	SpotLight,
 	RectAreaLight,
-	Vector3
+	Vector3,
+	Sprite,
+	SpriteMaterial,
+	CanvasTexture,
+	LinearFilter,
+	ClampToEdgeWrapping
 } from "../../../build/three.module.js";
-import { CSS2DObject } from '../renderers/CSS2DRenderer.js';
 
 var Rhino3dmLoader = function ( manager ) {
 
@@ -431,26 +435,39 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'TextDot':
 
 				geometry = obj.geometry;
-				var dotDiv = document.createElement( 'div' );
-				dotDiv.style.fontFamily = geometry.fontFace;
-				dotDiv.style.fontSize = `${geometry.fontHeight}px`;
-				dotDiv.style.marginTop = '-1em';
-				dotDiv.style.color = '#FFF';
-				dotDiv.style.padding = '2px';
-				dotDiv.style.paddingRight = '5px';
-				dotDiv.style.paddingLeft = '5px';
-				dotDiv.style.borderRadius = '5px';
+
+				var ctx = document.createElement( 'canvas' ).getContext( '2d' );
+				var font = `${geometry.fontHeight}px ${geometry.fontFace}`;
+				ctx.font = font;
+				var width = ctx.measureText( geometry.text ).width + 10;
+				var height = geometry.fontHeight + 10;
+
+				ctx.canvas.width = width;
+				ctx.canvas.height = height;
+
+				ctx.font = font;
+				ctx.textBaseline = 'middle';
+				ctx.textAlign = 'center';
 				var color = attributes.drawColor;
-				dotDiv.style.background = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-				dotDiv.textContent = geometry.text;
-				var dot = new CSS2DObject( dotDiv );
-				var location = geometry.point;
-				dot.position.set( location[ 0 ], location[ 1 ], location[ 2 ] );
+				ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+				ctx.fillRect( 0, 0, width, height );
+				ctx.fillStyle = 'white';
+				ctx.fillText( geometry.text, width / 2, height / 2 );
 
-				dot.userData[ 'attributes' ] = attributes;
-				dot.userData[ 'objectType' ] = obj.objectType;
+				var texture = new CanvasTexture( ctx.canvas );
+				texture.minFilter = LinearFilter;
+				texture.wrapS = ClampToEdgeWrapping;
+				texture.wrapT = ClampToEdgeWrapping;
 
-				return dot;
+				var material = new SpriteMaterial( { map: texture, depthTest: false } );
+				var sprite = new Sprite( material );
+				sprite.position.set( geometry.point[ 0 ], geometry.point[ 1 ], geometry.point[ 2 ] );
+				sprite.scale.set( width / 10, height / 10, 1.0 );
+
+				sprite.userData[ 'attributes' ] = attributes;
+				sprite.userData[ 'objectType' ] = obj.objectType;
+
+				return sprite;
 
 			case 'Light':
 
