@@ -517,7 +517,8 @@ var list = {
 			},
 
 			"Audio": {
-				"Audio": "api/ar/audio/Audio"
+				"Audio": "api/ar/audio/Audio",
+				"AudioAnalyser": "api/ar/audio/AudioAnalyser"
 			}
 
 		}
