@@ -382,6 +382,12 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var geometry = loader.parse( obj.geometry );
 
+				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
+
+					mat.vertexColors = true;
+
+				}
+
 				var mesh = new Mesh( geometry, mat );
 				mesh.castShadow = attributes.castsShadows;
 				mesh.receiveShadow = attributes.receivesShadows;
