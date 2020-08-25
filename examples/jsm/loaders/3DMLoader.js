@@ -272,12 +272,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					var _object = this._createObject( obj, material );
 
-					if ( ! this.materials.includes( material ) ) {
-
-						this.materials.push( material );
-
-					}
-
 					if ( _object === undefined ) {
 
 						continue;
