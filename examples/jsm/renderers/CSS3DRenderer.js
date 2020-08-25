@@ -7,13 +7,14 @@ import {
  * Based on http://www.emagix.net/academic/mscs-project/item/camera-sync-with-css3-and-webgl-threejs
  */
 
-var CSS3DObject = function ( element ) {
+var CSS3DObject = function ( element, offset = {x:"-50%", y:"-50%"} ) {
 
 	Object3D.call( this );
 
 	this.element = element || document.createElement( 'div' );
 	this.element.style.position = 'absolute';
 	this.element.style.pointerEvents = 'auto';
+	this.offset = offset;
 
 	this.addEventListener( 'removed', function () {
 
@@ -40,6 +41,7 @@ CSS3DObject.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		Object3D.prototype.copy.call( this, source, recursive );
 
 		this.element = source.element.cloneNode( true );
+		this.offset = source.offset
 
 		return this;
 
@@ -142,7 +144,7 @@ var CSS3DRenderer = function () {
 
 	}
 
-	function getObjectCSSMatrix( matrix, cameraCSSMatrix ) {
+	function getObjectCSSMatrix( matrix, cameraCSSMatrix, offset ) {
 
 		var elements = matrix.elements;
 		var matrix3d = 'matrix3d(' +
@@ -166,14 +168,14 @@ var CSS3DRenderer = function () {
 
 		if ( isIE ) {
 
-			return 'translate(-50%,-50%)' +
+			return 'translate(' + offset.x + ',' + offset.y + ')' +
 				'translate(' + _widthHalf + 'px,' + _heightHalf + 'px)' +
 				cameraCSSMatrix +
 				matrix3d;
 
 		}
 
-		return 'translate(-50%,-50%)' + matrix3d;
+		return 'translate(' + offset.x + ',' + offset.y + ')' + matrix3d;
 
 	}
 
@@ -199,11 +201,11 @@ var CSS3DRenderer = function () {
 				matrix.elements[ 11 ] = 0;
 				matrix.elements[ 15 ] = 1;
 
-				style = getObjectCSSMatrix( matrix, cameraCSSMatrix );
+				style = getObjectCSSMatrix( matrix, cameraCSSMatrix, object.offset );
 
 			} else {
 
-				style = getObjectCSSMatrix( object.matrixWorld, cameraCSSMatrix );
+				style = getObjectCSSMatrix( object.matrixWorld, cameraCSSMatrix, object.offset );
 
 			}
 
