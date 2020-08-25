@@ -3,10 +3,10 @@ import { Material } from './../materials/Material';
 import { Object3D } from './../core/Object3D';
 import { Color } from '../math/Color';
 import { Texture } from '../textures/Texture';
-import { WebGLRenderer } from "../renderers/WebGLRenderer";
-import { Camera } from "../cameras/Camera";
-import { WebGLRenderTarget } from "../renderers/WebGLRenderTarget";
-import { WebGLCubeRenderTarget } from "../renderers/WebGLCubeRenderTarget";
+import { WebGLRenderer } from '../renderers/WebGLRenderer';
+import { Camera } from '../cameras/Camera';
+import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget';
+import { WebGLCubeRenderTarget } from '../renderers/WebGLCubeRenderTarget';
 
 // Scenes /////////////////////////////////////////////////////////////////////
 

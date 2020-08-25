@@ -12,17 +12,17 @@ import {
 	RGBM7Encoding,
 	UnsignedByteType,
 	sRGBEncoding
-} from "../constants.js";
+} from '../constants.js';
 
-import { BufferAttribute } from "../core/BufferAttribute.js";
-import { BufferGeometry } from "../core/BufferGeometry.js";
-import { Mesh } from "../objects/Mesh.js";
-import { OrthographicCamera } from "../cameras/OrthographicCamera.js";
-import { PerspectiveCamera } from "../cameras/PerspectiveCamera.js";
-import { RawShaderMaterial } from "../materials/RawShaderMaterial.js";
-import { Vector2 } from "../math/Vector2.js";
-import { Vector3 } from "../math/Vector3.js";
-import { WebGLRenderTarget } from "../renderers/WebGLRenderTarget.js";
+import { BufferAttribute } from '../core/BufferAttribute.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { Mesh } from '../objects/Mesh.js';
+import { OrthographicCamera } from '../cameras/OrthographicCamera.js';
+import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
+import { RawShaderMaterial } from '../materials/RawShaderMaterial.js';
+import { Vector2 } from '../math/Vector2.js';
+import { Vector3 } from '../math/Vector3.js';
+import { WebGLRenderTarget } from '../renderers/WebGLRenderTarget.js';
 
 const LOD_MIN = 4;
 const LOD_MAX = 8;

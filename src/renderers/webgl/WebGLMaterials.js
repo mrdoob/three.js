@@ -1,4 +1,4 @@
-import { BackSide } from "../../constants.js";
+import { BackSide } from '../../constants.js';
 
 function WebGLMaterials( properties ) {
 
