@@ -673,27 +673,27 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 
 		versionString = '#version 300 es\n';
 
-		prefixVertex = [
-			'#define attribute in',
-			'#define varying out',
-			'#define texture2D texture'
-		].join( '\n' ) + '\n' + prefixVertex;
+		prefixVertex = /* glsl */`
+			#define attribute in
+			#define varying out
+			#define texture2D texture
+		` + prefixVertex;
 
-		prefixFragment = [
-			'#define varying in',
-			( parameters.glslVersion === GLSL3 ) ? '' : 'out highp vec4 pc_fragColor;',
-			( parameters.glslVersion === GLSL3 ) ? '' : '#define gl_FragColor pc_fragColor',
-			'#define gl_FragDepthEXT gl_FragDepth',
-			'#define texture2D texture',
-			'#define textureCube texture',
-			'#define texture2DProj textureProj',
-			'#define texture2DLodEXT textureLod',
-			'#define texture2DProjLodEXT textureProjLod',
-			'#define textureCubeLodEXT textureLod',
-			'#define texture2DGradEXT textureGrad',
-			'#define texture2DProjGradEXT textureProjGrad',
-			'#define textureCubeGradEXT textureGrad'
-		].join( '\n' ) + '\n' + prefixFragment;
+		prefixFragment = /* glsl */`
+			#define varying in
+			${( parameters.glslVersion === GLSL3 ) ? '' : 'out highp vec4 pc_fragColor'}
+			${( parameters.glslVersion === GLSL3 ) ? '' : '#define gl_FragColor pc_fragColor'}
+			#define gl_FragDepthEXT gl_FragDepth
+			#define texture2D texture
+			#define textureCube texture
+			#define texture2DProj textureProj
+			#define texture2DLodEXT textureLod
+			#define texture2DProjLodEXT textureProjLod
+			#define textureCubeLodEXT textureLod
+			#define texture2DGradEXT textureGrad
+			#define texture2DProjGradEXT textureProjGrad
+			#define textureCubeGradEXT textureGra
+		` + prefixFragment;
 
 	}
 
