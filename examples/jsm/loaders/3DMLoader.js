@@ -10,9 +10,18 @@ import {
 	PointsMaterial,
 	Line,
 	LineBasicMaterial,
-	Matrix4
+	Matrix4,
+	DirectionalLight,
+	PointLight,
+	SpotLight,
+	RectAreaLight,
+	Vector3,
+	Sprite,
+	SpriteMaterial,
+	CanvasTexture,
+	LinearFilter,
+	ClampToEdgeWrapping
 } from "../../../build/three.module.js";
-import { CSS2DObject } from '../renderers/CSS2DRenderer.js';
 
 var Rhino3dmLoader = function ( manager ) {
 
@@ -28,6 +37,8 @@ var Rhino3dmLoader = function ( manager ) {
 	this.workerNextTaskID = 1;
 	this.workerSourceURL = '';
 	this.workerConfig = {};
+
+	this.materials = [];
 
 };
 
@@ -150,6 +161,41 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
+	_compareMaterials: function ( material ) {
+
+		var mat = {};
+		mat.name = material.name;
+		mat.color = {};
+		mat.color.r = material.color.r;
+		mat.color.g = material.color.g;
+		mat.color.b = material.color.b;
+		mat.type = material.type;
+
+		for ( var i = 0; i < this.materials.length; i ++ ) {
+
+			var m = this.materials[ i ];
+			var _mat = {};
+			_mat.name = m.name;
+			_mat.color = {};
+			_mat.color.r = m.color.r;
+			_mat.color.g = m.color.g;
+			_mat.color.b = m.color.b;
+			_mat.type = m.type;
+
+			if ( JSON.stringify( mat ) === JSON.stringify( _mat ) ) {
+
+				return m;
+
+			}
+
+		}
+
+		this.materials.push( material );
+
+		return material;
+
+	},
+
 	_createMaterial: function ( material ) {
 
 		if ( material === undefined ) {
@@ -221,7 +267,17 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				default:
 
 					var material = this._createMaterial( materials[ attributes.materialIndex ] );
+
+					material = this._compareMaterials( material );
+
 					var _object = this._createObject( obj, material );
+
+					if ( _object === undefined ) {
+
+						continue;
+
+					}
+
 					_object.visible = data.layers[ attributes.layerIndex ].visible;
 
 					if ( attributes.isInstanceDefinitionObject ) {
@@ -294,6 +350,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		this.materials = [];
+
 		return object;
 
 	},
@@ -311,6 +369,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				var geometry = loader.parse( obj.geometry );
 				var material = new PointsMaterial( { sizeAttenuation: true, vertexColors: true } );
+
+				material = this._compareMaterials( material );
+
 				var points = new Points( geometry, material );
 				points.userData[ 'attributes' ] = attributes;
 				points.userData[ 'objectType' ] = obj.objectType;
@@ -356,7 +417,10 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var _color = attributes.drawColor;
 				var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
 
-				var lines = new Line( geometry, new LineBasicMaterial( { color: color } ) );
+				var material = new LineBasicMaterial( { color: color } );
+				material = this._compareMaterials( material );
+
+				var lines = new Line( geometry, material );
 				lines.userData[ 'attributes' ] = attributes;
 				lines.userData[ 'objectType' ] = obj.objectType;
 
@@ -365,26 +429,102 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'TextDot':
 
 				geometry = obj.geometry;
-				var dotDiv = document.createElement( 'div' );
-				dotDiv.style.fontFamily = geometry.fontFace;
-				dotDiv.style.fontSize = `${geometry.fontHeight}px`;
-				dotDiv.style.marginTop = '-1em';
-				dotDiv.style.color = '#FFF';
-				dotDiv.style.padding = '2px';
-				dotDiv.style.paddingRight = '5px';
-				dotDiv.style.paddingLeft = '5px';
-				dotDiv.style.borderRadius = '5px';
+
+				var ctx = document.createElement( 'canvas' ).getContext( '2d' );
+				var font = `${geometry.fontHeight}px ${geometry.fontFace}`;
+				ctx.font = font;
+				var width = ctx.measureText( geometry.text ).width + 10;
+				var height = geometry.fontHeight + 10;
+
+				ctx.canvas.width = width;
+				ctx.canvas.height = height;
+
+				ctx.font = font;
+				ctx.textBaseline = 'middle';
+				ctx.textAlign = 'center';
 				var color = attributes.drawColor;
-				dotDiv.style.background = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-				dotDiv.textContent = geometry.text;
-				var dot = new CSS2DObject( dotDiv );
-				var location = geometry.point;
-				dot.position.set( location[ 0 ], location[ 1 ], location[ 2 ] );
+				ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+				ctx.fillRect( 0, 0, width, height );
+				ctx.fillStyle = 'white';
+				ctx.fillText( geometry.text, width / 2, height / 2 );
 
-				dot.userData[ 'attributes' ] = attributes;
-				dot.userData[ 'objectType' ] = obj.objectType;
+				var texture = new CanvasTexture( ctx.canvas );
+				texture.minFilter = LinearFilter;
+				texture.wrapS = ClampToEdgeWrapping;
+				texture.wrapT = ClampToEdgeWrapping;
 
-				return dot;
+				var material = new SpriteMaterial( { map: texture, depthTest: false } );
+				var sprite = new Sprite( material );
+				sprite.position.set( geometry.point[ 0 ], geometry.point[ 1 ], geometry.point[ 2 ] );
+				sprite.scale.set( width / 10, height / 10, 1.0 );
+
+				sprite.userData[ 'attributes' ] = attributes;
+				sprite.userData[ 'objectType' ] = obj.objectType;
+
+				return sprite;
+
+			case 'Light':
+
+				geometry = obj.geometry;
+
+				var light;
+
+				if ( geometry.isDirectionalLight ) {
+
+					light = new DirectionalLight();
+					light.castShadow = attributes.castsShadows;
+					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+
+					light.shadow.normalBias = 0.1;
+
+				} else if ( geometry.isPointLight ) {
+
+					light = new PointLight();
+					light.castShadow = attributes.castsShadows;
+					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+					light.shadow.normalBias = 0.1;
+
+				} else if ( geometry.isRectangularLight ) {
+
+					light = new RectAreaLight();
+
+					var width = Math.abs( geometry.width[ 2 ] );
+					var height = Math.abs( geometry.length[ 0 ] );
+
+					light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
+
+					light.height = height;
+					light.width = width;
+
+					light.lookAt( new Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
+
+				} else if ( geometry.isSpotLight ) {
+
+					light = new SpotLight();
+					light.castShadow = attributes.castsShadows;
+					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+					light.angle = geometry.spotAngleRadians;
+					light.shadow.normalBias = 0.1;
+
+				} else if ( geometry.isLinearLight ) {
+
+					console.warn( `THREE.3DMLoader:  No conversion exists for linear lights.` );
+
+					return;
+
+				}
+
+				if ( light ) {
+
+					light.intensity = geometry.intensity;
+					light.userData[ 'attributes' ] = attributes;
+					light.userData[ 'objectType' ] = obj.objectType;
+
+				}
+
+				return light;
 
 		}
 
@@ -841,6 +981,12 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				break;
 
+			case rhino.ObjectType.Light:
+
+				geometry = extractProperties( _geometry );
+
+				break;
+
 			case rhino.ObjectType.InstanceReference:
 
 				geometry = extractProperties( _geometry );
@@ -850,7 +996,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				break;
 
 				/*
-				case rhino.ObjectType.Light:
 				case rhino.ObjectType.Annotation:
 				case rhino.ObjectType.Hatch:
 				case rhino.ObjectType.SubD:
