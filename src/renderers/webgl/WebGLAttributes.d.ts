@@ -1,6 +1,6 @@
-import { WebGLCapabilities } from "./WebGLCapabilities";
-import { BufferAttribute } from "../../core/BufferAttribute";
-import { InterleavedBufferAttribute } from "../../core/InterleavedBufferAttribute";
+import { WebGLCapabilities } from './WebGLCapabilities';
+import { BufferAttribute } from '../../core/BufferAttribute';
+import { InterleavedBufferAttribute } from '../../core/InterleavedBufferAttribute';
 
 export class WebGLAttributes {
 
