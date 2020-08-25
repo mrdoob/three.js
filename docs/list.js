@@ -515,6 +515,11 @@ var list = {
 				"QuaternionKeyframeTrack": "api/ar/animation/tracks/QuaternionKeyframeTrack",
 				"StringKeyframeTrack": "api/ar/animation/tracks/StringKeyframeTrack",
 				"VectorKeyframeTrack": "api/ar/animation/tracks/VectorKeyframeTrack"
+			},
+
+			"Audio": {
+				"Audio": "api/ar/audio/Audio",
+				"AudioAnalyser": "api/ar/audio/AudioAnalyser"
 			}
 
 		}
