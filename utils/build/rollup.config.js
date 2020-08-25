@@ -219,6 +219,7 @@ function babelCleanup() {
 	const suspiciousLeftOperandWarning = / \|\| _assertThisInitialized\((\w+)\)/g;
 	const doubleSpaces = / {2}/g;
 	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
+	const commentOutside = /function (\w+)?\(\)\s*\/\*(.*)\*\/\s*{/g;
 
 	function unwrap( match, wrapperStart, klass, _parentClass, wrapperEnd, parentClass ) {
 
@@ -227,6 +228,12 @@ function babelCleanup() {
 			.replace( inheritsLoose, '' )
 			.replace( wrapperEnd, '' )
 			.replaceAll( _parentClass, parentClass );
+
+	}
+
+	function commentInside( match, functionName = '', comment ) {
+
+		return `function ${functionName}(/*${comment}*/) {`;
 
 	}
 
@@ -244,8 +251,10 @@ function babelCleanup() {
 
 			code = code
 				.replace( suspiciousLeftOperandWarning, '' )
+				.replace( commentOutside, commentInside )
 				.replace( doubleSpaces, '\t' )
 				.replace( danglingTabs, '' );
+
 
 			return {
 				code: code,
@@ -267,7 +276,6 @@ export default [
 			babel( {
 				babelHelpers: 'bundled',
 				babelrc: false,
-				retainLines: true,
 				compact: false,
 				presets: [
 					[
