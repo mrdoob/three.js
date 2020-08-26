@@ -16,6 +16,7 @@ import { SVGLoader } from '../../examples/jsm/loaders/SVGLoader.js';
 import { TDSLoader } from '../../examples/jsm/loaders/TDSLoader.js';
 import { VTKLoader } from '../../examples/jsm/loaders/VTKLoader.js';
 import { VRMLLoader } from '../../examples/jsm/loaders/VRMLLoader.js';
+import { Rhino3dmLoader } from '../../examples/jsm/loaders/3DMLoader.js';
 
 import { TGALoader } from '../../examples/jsm/loaders/TGALoader.js';
 
@@ -93,6 +94,25 @@ function Loader( editor ) {
 		} );
 
 		switch ( extension ) {
+
+			case '3dm':
+
+				reader.addEventListener( 'load', function ( event ) {
+
+					var contents = event.target.result;
+
+					var loader = new Rhino3dmLoader();
+					loader.setLibraryPath( '../examples/jsm/libs/rhino3dm/' );
+					loader.parse( contents, function ( object ) {
+
+						editor.execute( new AddObjectCommand( editor, object ) );
+
+					} );
+
+				}, false );
+				reader.readAsArrayBuffer( file );
+
+				break;
 
 			case '3ds':
 

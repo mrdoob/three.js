@@ -50,7 +50,6 @@ THREE.Ocean = function ( renderer, camera, scene, options ) {
 		wrapS: THREE.ClampToEdgeWrapping,
 		wrapT: THREE.ClampToEdgeWrapping,
 		format: THREE.RGBAFormat,
-		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
 		type: renderTargetType
@@ -61,7 +60,6 @@ THREE.Ocean = function ( renderer, camera, scene, options ) {
 		wrapS: THREE.ClampToEdgeWrapping,
 		wrapT: THREE.ClampToEdgeWrapping,
 		format: THREE.RGBAFormat,
-		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
 		type: renderTargetType
@@ -72,7 +70,6 @@ THREE.Ocean = function ( renderer, camera, scene, options ) {
 		wrapS: THREE.RepeatWrapping,
 		wrapT: THREE.RepeatWrapping,
 		format: THREE.RGBAFormat,
-		stencilBuffer: false,
 		depthBuffer: false,
 		premultiplyAlpha: false,
 		type: renderTargetType

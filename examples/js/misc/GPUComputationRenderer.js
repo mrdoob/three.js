@@ -319,7 +319,6 @@ THREE.GPUComputationRenderer = function ( sizeX, sizeY, renderer ) {
 			magFilter: magFilter,
 			format: THREE.RGBAFormat,
 			type: dataType,
-			stencilBuffer: false,
 			depthBuffer: false
 		} );
 

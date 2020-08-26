@@ -9,8 +9,7 @@ THREE.EffectComposer = function ( renderer, renderTarget ) {
 		var parameters = {
 			minFilter: THREE.LinearFilter,
 			magFilter: THREE.LinearFilter,
-			format: THREE.RGBAFormat,
-			stencilBuffer: false
+			format: THREE.RGBAFormat
 		};
 
 		var size = renderer.getSize( new THREE.Vector2() );

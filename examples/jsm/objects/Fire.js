@@ -145,8 +145,7 @@ var Fire = function ( geometry, options ) {
 	var parameters = {
 		minFilter: NearestFilter,
 		magFilter: NearestFilter,
-		depthBuffer: false,
-		stencilBuffer: false
+		depthBuffer: false
 	};
 
 

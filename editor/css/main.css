@@ -296,6 +296,16 @@ select {
 
 /* UI */
 
+#resizer {
+	position: absolute;
+	top: 32px;
+	right: 295px;
+	width: 5px;
+	bottom: 0px;
+	/* background-color: rgba(255,0,0,0.5); */
+	cursor: ew-resize;
+}
+
 #viewport {
 	position: absolute;
 	top: 32px;
@@ -518,6 +528,10 @@ select {
 /* */
 
 @media all and ( max-width: 600px ) {
+
+	#resizer {
+		display: none;
+	}
 
 	#menubar .menu .options {
 		max-height: calc(100% - 372px);

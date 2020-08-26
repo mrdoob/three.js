@@ -363,7 +363,7 @@
 
 		<h3>[method:null render]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>
-			用相机([page:Camera camera])渲染一个场景([page:Scene scene])<br />
+			用相机([page:Camera camera])渲染一个场景([page:Scene scene])或是其它类型的[page:Object3D object]。<br />
 
 			渲染一般是在canvas上完成的，或者是[page:WebGLRenderTarget renderTarget](如果有指定)<br />
 
@@ -376,10 +376,10 @@
 		<p>使用相机和指定材质渲染缓冲几何组。</p>
 
 		<h3>[method:null renderBufferImmediate]( [param:Object3D object], [param:WebGLProgram program] )</h3>
-		<p>object - 一个[page:Object3D]实例<br />
-		program - 一个[page:WebGLProgram]实例<br />
+		<p>object - an instance of [page:Object3D]<br />
+		program - an instance of [page:WebGLProgram]<br />
 
-		渲染即使缓冲，由renderObjectImmediate对象调用
+		Renders an instance of [page:ImmediateRenderObject]，由renderObjectImmediate对象调用。
 		</p>
 
 		<h3>[method:null setAnimationLoop]( [param:Function callback] )</h3>

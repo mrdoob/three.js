@@ -82,7 +82,7 @@ THREE.TimelinerController.prototype = {
 
 		var track = this._tracks[ channelName ],
 			times = track.times,
-			index = Timeliner.binarySearch( times, time ),
+			index = Timeliner.binarySearch( times, time ), // eslint-disable-line no-undef
 			values = track.values,
 			stride = track.getValueSize(),
 			offset = index * stride;
@@ -120,7 +120,7 @@ THREE.TimelinerController.prototype = {
 
 		var track = this._tracks[ channelName ],
 			times = track.times,
-			index = Timeliner.binarySearch( times, time );
+			index = Timeliner.binarySearch( times, time ); // eslint-disable-line no-undef
 
 		// we disallow to remove the keyframe when it is the last one we have,
 		// since the animation system is designed to always produce a defined
@@ -159,7 +159,7 @@ THREE.TimelinerController.prototype = {
 
 		var track = this._tracks[ channelName ],
 			times = track.times,
-			index = Timeliner.binarySearch( times, time );
+			index = Timeliner.binarySearch( times, time ); // eslint-disable-line no-undef
 
 		if ( index >= 0 ) {
 

@@ -110,7 +110,7 @@ ThreeMFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			try {
 
-				zip = new JSZip( data );
+				zip = new JSZip( data ); // eslint-disable-line no-undef
 
 			} catch ( e ) {
 

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>كيف تدير الأشياء محليًا</h1>
+		<p>
+			إذا كنت تستخدم الأشكال الهندسية الإجرائية فقط ولا تقوم بتحميل أي مواد ، فيجب أن تعمل صفحات الويب مباشرة من نظام الملفات ، فقط انقر نقرًا مزدوجًا فوق ملف HTML في مدير الملفات
+			يجب أن يعرض محتوى الصفحة في المتصفح (سترى <em>file:///yourFile.html</em> في شريط العناوين).
+		</p>
+
+		<h2>المحتوى الذي تم تحميله من ملفات خارجية</h2>
+		<div>
+			<p>
+				إذا قمت بتحميل نماذج وأنسجة من ملفات خارجية ، نظرًا لقيود أمان المتصفحات [link:http://en.wikipedia.org/wiki/Same_origin_policy same origin policy] ، فسيفشل التحميل من نظام الملفات مع استثناء أمان.
+		 	</p>
+
+			<p>هناك طريقتان لحل هذا:</p>
+
+			<ol>
+				<li>
+					قم بتغيير أمان الملفات المحلية في المستعرض. يتيح لك ذلك الوصول إلى صفحتك على النحو التالي: <code>file:///yourFile.html</code>
+				</li>
+				<li>
+					قم بتشغيل الملفات من خادم ويب محلي. يتيح لك هذا الوصول إلى صفحتك على النحو التالي: <code>http://localhost/yourFile.html</code>
+				</li>
+			</ol>
+
+			<p>
+				إذا كنت تستخدم الخيار 1 ، فاعلم أنك قد تفتح نفسك لبعض نقاط الضعف إذا كنت تستخدم نفس المتصفح لتصفح الويب. قد ترغب في إنشاء ملف تعريف / اختصار متصفح منفصل يستخدم فقط للتطور لتكون في مأمن. دعنا نمر إلى كل خيار على حدة.
+			</p>
+		</div>
+
+
+		<h2>قم بتشغيل خادم محلي</h2>
+		<div>
+			<p>
+				تحتوي العديد من لغات البرمجة على خوادم HTTP بسيطة مضمنة فيها. فهي ليست كاملة الميزات مثل خوادم الإنتاج مثل [link:https://www.apache.org/ Apache] أو [link:https://nginx.org NGINX] ، ولكن يجب أن تكون كافية لاختبار تطبيق three.js الخاص بك.
+			</p>
+
+			<h3>إضافات لمحررات الأكواد الأكثر إستعمالا</h3>
+			<div>
+				<p>تحتوي بعض برامج تحرير الأكواد على مكونات إضافية والتي ستنتج خادمًا بسيطًا عند الطلب.</p>
+				<ul>
+					<li>[link:https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer Live Server] لـ Visual Studio Code.</li>
+					<li>[link:https://atom.io/packages/atom-live-server Live Server] لـ Atom.</li>
+				</ul>
+			</div>
+
+			<h3>Servez</h3>
+			<div>
+				<p>
+					[link:https://greggman.github.io/servez Servez] هو خادم بسيط مع واجهة المستخدم.
+				</p>
+			</div>
+
+			<h3>Node.js http-server</h3>
+			<div>
+				<p>يحتوي Node.js على حزمة خادم HTTP بسيطة. لتثبيت:</p>
+				<code>npm install http-server -g</code>
+
+				<p>للتشغيل (من دليلك المحلي):</p>
+				<code>http-server . -p 8000</code>
+			</div>
+
+			<h3>خادم Python</h3>
+			<div>
+				<p>
+					إذا كان لديك [link:http://python.org/ Python] مثبتًا ، فيجب أن يكون كافيًا لتشغيل هذا من سطر أوامر (من دليل العمل الخاص بك):
+				</p>
+				<code>
+//Python 2.x
+python -m SimpleHTTPServer
+
+//Python 3.x
+python -m http.server
+				</code>
+
+				<p>سيخدم هذا الملفات من الدليل الحالي في المضيف المحلي تحت المنفذ 8000 ، كمثال في شريط العنوان اكتب:</p>
+
+				<code>http://localhost:8000/</code>
+			</div>
+
+			<h3>خادم Ruby</h3>
+			<div>
+				<p>إذا قمت بتثبيت Ruby ، فيمكنك الحصول على نفس النتيجة بتشغيل هذا بدلاً من ذلك:</p>
+				<code>
+ruby -r webrick -e "s = WEBrick::HTTPServer.new(:Port => 8000, :DocumentRoot => Dir.pwd); trap('INT') { s.shutdown }; s.start"
+				</code>
+			</div>
+
+			<h3>خادم PHP</h3>
+			<div>
+				<p>تحتوي PHP أيضًا على خادم ويب مدمج ، بدءًا من php 5.4.0:</p>
+				<code>php -S localhost:8000</code>
+			</div>
+
+			<h3>Lighttpd</h3>
+			<div>
+				<p>
+					Lighttpd هو خادم ويب خفيف الوزن للغاية للأغراض العامة. سنغطي تثبيته على OSX مع HomeBrew هنا. على عكس الخوادم الأخرى التي تمت مناقشتها هنا ، فإن lighttpd هو خادم جاهز للإنتاج الكامل.
+				</p>
+
+				<ol>
+					<li>
+						تثبيته بواسطة homebrew
+						<code>brew install lighttpd</code>
+					</li>
+					<li>
+						قم بإنشاء ملف ترتيب (configuration) يسمى lighttpd.conf في المجلد حيث تريد تشغيل خادم الويب الخاص بك. يوجد نموذج [link:http://redmine.lighttpd.net/projects/lighttpd/wiki/TutorialConfiguration here].
+					 </li>
+					<li>
+						في ملف conf ، قم بتغيير server.document-root إلى الدليل الذي تريد خدمة الملفات منه.
+					</li>
+					<li>
+						شغله من خلال الأمر التالي:
+						<code>lighttpd -f lighttpd.conf</code>
+					</li>
+					<li>
+						انتقل إلى http://localhost:3000 وسيخدم الملفات الثابتة من الدليل الذي تختاره.
+					</li>
+				</ol>
+			</div>
+			<h3>IIS</h3>
+			<div>
+				<p>إذا كنت تستخدم Microsoft IIS كخادم ويب. الرجاء إضافة إعدادات نوع MIME فيما يتعلق بامتداد .fbx قبل التحميل.</p>
+				<code>File name extension: fbx        MIME Type: text/plain</code>
+				<p>بشكل تلقائي ، يقوم IIS بحظر تنزيل ملفات .fbx و .obj. يجب عليك تعديل IIS لتمكين تنزيل هذا النوع من الملفات.</p>
+			</div>
+			<p>
+				تمت مناقشة البدائل البسيطة الأخرى هنا [link:http://stackoverflow.com/q/12905426/24874 here] على Stack Overflow.
+			</p>
+		</div>
+
+	</body>
+</html>

@@ -8,7 +8,6 @@ THREE.SMAAPass = function ( width, height ) {
 
 	this.edgesRT = new THREE.WebGLRenderTarget( width, height, {
 		depthBuffer: false,
-		stencilBuffer: false,
 		generateMipmaps: false,
 		minFilter: THREE.LinearFilter,
 		format: THREE.RGBFormat
@@ -17,7 +16,6 @@ THREE.SMAAPass = function ( width, height ) {
 
 	this.weightsRT = new THREE.WebGLRenderTarget( width, height, {
 		depthBuffer: false,
-		stencilBuffer: false,
 		generateMipmaps: false,
 		minFilter: THREE.LinearFilter,
 		format: THREE.RGBAFormat
