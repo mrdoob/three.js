@@ -182,7 +182,7 @@ var SSRShader = {
 var SSRDepthShader = {
 
   defines: {
-    "PERSPECTIVE_CAMERA": 0
+    "PERSPECTIVE_CAMERA": 1
   },
 
   uniforms: {

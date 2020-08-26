@@ -27,19 +27,20 @@
 
 	import Stats from './jsm/libs/stats.module.js';
 
-	import { GUI } from './jsm/libs/dat.gui.module.js';
-	import { OrbitControls } from './jsm/controls/OrbitControls.js'
 	import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
-
+	
+	import { OrbitControls } from './jsm/controls/OrbitControls.js'
+	
+	import { GUI } from './jsm/libs/dat.gui.module.js';
 	import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 	import { SSRPass } from './jsm/postprocessing/SSRPass.js';
 
-	// var initialFrustumSize = 1200;
 	var params = {
 		enableSSR: true,
 	}
 	var composer
 	var ssrPass
+	var gui
 
 	var container, stats;
 
@@ -55,7 +56,7 @@
 
 	var clock = new THREE.Clock();
 
-	var gui, shadowCameraHelper, shadowConfig = {
+	var shadowCameraHelper, shadowConfig = {
 
 		shadowCameraVisible: false,
 		shadowCameraNear: 750,
@@ -339,7 +340,6 @@
 		}
 
 		if(params.enableSSR){
-			// ssrPass.setFrustumSize(initialFrustumSize/camera.zoom)
 			composer.render();
 		}else{
 			renderer.render(scene,camera)
