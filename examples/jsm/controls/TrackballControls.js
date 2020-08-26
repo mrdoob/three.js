@@ -401,54 +401,6 @@ var TrackballControls = function ( object, domElement ) {
 
 	// listeners
 
-	function onPointerDown( event ) {
-
-		if ( scope.enabled === false ) return;
-
-		switch ( event.pointerType ) {
-
-			case 'mouse':
-				onMouseDown( event );
-				break;
-
-			// TODO touch
-
-		}
-
-	}
-
-	function onPointerMove( event ) {
-
-		if ( scope.enabled === false ) return;
-
-		switch ( event.pointerType ) {
-
-			case 'mouse':
-				onMouseMove( event );
-				break;
-
-			// TODO touch
-
-		}
-
-	}
-
-	function onPointerUp( event ) {
-
-		if ( scope.enabled === false ) return;
-
-		switch ( event.pointerType ) {
-
-			case 'mouse':
-				onMouseUp( event );
-				break;
-
-			// TODO touch
-
-		}
-
-	}
-
 	function keydown( event ) {
 
 		if ( scope.enabled === false ) return;
@@ -485,9 +437,9 @@ var TrackballControls = function ( object, domElement ) {
 
 	}
 
-	var isMouseDown = false;
+	function mousedown( event ) {
 
-	function onMouseDown( event ) {
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -534,15 +486,16 @@ var TrackballControls = function ( object, domElement ) {
 
 		}
 
-		scope.dispatchEvent( startEvent );
+		scope.domElement.ownerDocument.addEventListener( 'mousemove', mousemove, false );
+		scope.domElement.ownerDocument.addEventListener( 'mouseup', mouseup, false );
 
-		isMouseDown = true;
+		scope.dispatchEvent( startEvent );
 
 	}
 
-	function onMouseMove( event ) {
+	function mousemove( event ) {
 
-		if ( isMouseDown === false ) return;
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -566,16 +519,18 @@ var TrackballControls = function ( object, domElement ) {
 
 	}
 
-	function onMouseUp( event ) {
+	function mouseup( event ) {
+
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
 
 		_state = STATE.NONE;
 
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', mousemove );
+		scope.domElement.ownerDocument.removeEventListener( 'mouseup', mouseup );
 		scope.dispatchEvent( endEvent );
-
-		isMouseDown = false;
 
 	}
 
@@ -705,16 +660,15 @@ var TrackballControls = function ( object, domElement ) {
 	this.dispose = function () {
 
 		scope.domElement.removeEventListener( 'contextmenu', contextmenu, false );
-
-		scope.domElement.removeEventListener( 'pointerdown', onPointerDown, false );
+		scope.domElement.removeEventListener( 'mousedown', mousedown, false );
 		scope.domElement.removeEventListener( 'wheel', mousewheel, false );
 
 		scope.domElement.removeEventListener( 'touchstart', touchstart, false );
 		scope.domElement.removeEventListener( 'touchend', touchend, false );
 		scope.domElement.removeEventListener( 'touchmove', touchmove, false );
 
-		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mousemove', mousemove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'mouseup', mouseup, false );
 
 		window.removeEventListener( 'keydown', keydown, false );
 		window.removeEventListener( 'keyup', keyup, false );
@@ -722,16 +676,12 @@ var TrackballControls = function ( object, domElement ) {
 	};
 
 	this.domElement.addEventListener( 'contextmenu', contextmenu, false );
-
-	this.domElement.addEventListener( 'pointerdown', onPointerDown, false );
+	this.domElement.addEventListener( 'mousedown', mousedown, false );
 	this.domElement.addEventListener( 'wheel', mousewheel, false );
 
 	this.domElement.addEventListener( 'touchstart', touchstart, false );
 	this.domElement.addEventListener( 'touchend', touchend, false );
 	this.domElement.addEventListener( 'touchmove', touchmove, false );
-
-	this.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
-	this.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
 	window.addEventListener( 'keydown', keydown, false );
 	window.addEventListener( 'keyup', keyup, false );
