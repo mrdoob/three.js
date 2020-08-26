@@ -20,7 +20,7 @@ import { RenderTarget } from './webgl/WebGLRenderLists';
 import { Geometry } from './../core/Geometry';
 import { BufferGeometry } from './../core/BufferGeometry';
 import { Texture } from '../textures/Texture';
-import { XRAnimationLoopCallback } from "../extras/types/webxr";
+import { XRAnimationLoopCallback } from './webxr/WebXR';
 
 export interface Renderer {
 	domElement: HTMLCanvasElement;
