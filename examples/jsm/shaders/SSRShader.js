@@ -112,6 +112,8 @@ var SSRShader = {
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
+			// gl_FragColor=vec4(vec3(-viewZ/cameraFar),1);return;
+			if(-viewZ>=cameraFar) return;
 			vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
 			// gl_FragColor=vec4(viewPosition/100.*vec3(1,1,-1),1);return;
 			// gl_FragColor=vec4(-viewPosition.z/1000.,0,0,1);return;
