@@ -20,7 +20,8 @@ import {
 	SpriteMaterial,
 	CanvasTexture,
 	LinearFilter,
-	ClampToEdgeWrapping
+	ClampToEdgeWrapping,
+	TextureLoader
 } from "../../../build/three.module.js";
 
 var Rhino3dmLoader = function ( manager ) {
@@ -221,12 +222,60 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		return new MeshStandardMaterial( {
+		console.log( material );
+
+		var mat = new MeshStandardMaterial( {
 			color: diffusecolor,
-			metalness: 0.8,
 			name: material.name,
-			side: 2
+			side: 2,
+			transparent: material.transparency > 0 ? true : false,
+			opacity: 1.0 - material.transparency
 		} );
+
+		var textureLoader = new TextureLoader();
+
+		for ( var i = 0; i < material.textures.length; i ++ ) {
+
+			var texture = material.textures[ i ];
+
+			if ( texture.image !== null ) {
+
+				var map = textureLoader.load( texture.image );
+
+				switch ( texture.type ) {
+
+					case 'Diffuse':
+
+						mat.map = map;
+
+						break;
+
+					case 'Bump':
+
+						mat.bumpMap = map;
+
+						break;
+
+					case 'Transparency':
+
+						mat.alphaMap = map;
+						mat.transparent = true;
+
+						break;
+
+					case 'Emap':
+
+						mat.envMap = map;
+
+						break;
+
+				}
+
+			}
+
+		}
+
+		return mat;
 
 	},
 
@@ -763,17 +812,110 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle materials
 
+		var textureTypes = [
+			// rhino.TextureType.Bitmap,
+			rhino.TextureType.Diffuse,
+			rhino.TextureType.Bump,
+			rhino.TextureType.Transparency,
+			rhino.TextureType.Opacity,
+			rhino.TextureType.Emap
+		];
+
+		var pbrTextureTypes = [
+			rhino.TextureType.PBR_BaseColor,
+			rhino.TextureType.PBR_Subsurface,
+			rhino.TextureType.PBR_SubsurfaceScattering,
+			rhino.TextureType.PBR_SubsurfaceScatteringRadius,
+			rhino.TextureType.PBR_Metallic,
+			rhino.TextureType.PBR_Specular,
+			rhino.TextureType.PBR_SpecularTint,
+			rhino.TextureType.PBR_Roughness,
+			rhino.TextureType.PBR_Anisotropic,
+			rhino.TextureType.PBR_Anisotropic_Rotation,
+			rhino.TextureType.PBR_Sheen,
+			rhino.TextureType.PBR_SheenTint,
+			rhino.TextureType.PBR_Clearcoat,
+			rhino.TextureType.PBR_ClearcoatBump,
+			rhino.TextureType.PBR_ClearcoatRoughness,
+			rhino.TextureType.PBR_OpacityIor,
+			rhino.TextureType.PBR_OpacityRoughness,
+			rhino.TextureType.PBR_Emission,
+			rhino.TextureType.PBR_AmbientOcclusion,
+			rhino.TextureType.PBR_Displacement
+		];
+
 		for ( var i = 0; i < doc.materials().count(); i ++ ) {
 
 			var _material = doc.materials().get( i );
-			var materialProperties = extractProperties( _material );
-			var pbMaterialProperties = extractProperties( _material.physicallyBased() );
+			var _pbrMaterial = _material.physicallyBased();
 
-			var material = Object.assign( materialProperties, pbMaterialProperties );
+			var material = extractProperties( _material );
+
+			var textures = [];
+
+			for ( var j = 0; j < textureTypes.length; j ++ ) {
+
+				var _texture = _material.getTexture( textureTypes[ j ] );
+				if ( _texture ) {
+
+					var textureType = textureTypes[ j ].constructor.name;
+					textureType = textureType.substring( 12, textureType.length );
+					var texture = { type: textureType };
+
+					var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+
+					if ( image ) {
+
+						texture.image = 'data:image/png;base64,' + image;
+
+					} else {
+
+						console.warn( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
+						texture.image = null;
+
+					}
+
+					textures.push( texture );
+
+					_texture.delete();
+
+				}
+
+			}
+
+			material.textures = textures;
+
+			if ( _pbrMaterial.supported ) {
+
+				console.log( 'pbr true' );
+
+				for ( var j = 0; j < pbrTextureTypes.length; j ++ ) {
+
+					var _texture = _material.getTexture( textureTypes[ j ] );
+					if ( _texture ) {
+
+						var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+						var textureType = textureTypes[ j ].constructor.name;
+						textureType = textureType.substring( 12, textureType.length );
+						var texture = { type: textureType, image: 'data:image/png;base64,' + image };
+						textures.push( texture );
+
+						_texture.delete();
+
+					}
+
+				}
+
+				var pbMaterialProperties = extractProperties( _material.physicallyBased() );
+
+				material = Object.assign( pbMaterialProperties, material );
+
+			}
 
 			materials.push( material );
 
 			_material.delete();
+			_pbrMaterial.delete();
 
 		}
 
@@ -836,10 +978,10 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		//TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
 
 		// Handle dimstyles
-		// console.log(`Dimstyle Count: ${doc.dimstyles().count()}`);
+		// console.log( `Dimstyle Count: ${doc.dimstyles().count()}` );
 
 		// Handle bitmaps
-		// console.log(`Bitmap Count: ${doc.bitmaps().count()}`);
+		// console.log( `Bitmap Count: ${doc.bitmaps().count()}` );
 
 		// Handle instance definitions
 		// console.log(`Instance Definitions Count: ${doc.instanceDefinitions().count()}`);
