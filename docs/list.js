@@ -520,7 +520,8 @@ var list = {
 				"Audio": "api/ar/audio/Audio",
 				"AudioAnalyser": "api/ar/audio/AudioAnalyser",
 				"AudioContext": "api/ar/audio/AudioContext",
-				"AudioListener": "api/ar/audio/AudioListener"
+				"AudioListener": "api/ar/audio/AudioListener",
+				"PositionalAudio": "api/ar/audio/PositionalAudio"
 			}
 
 		}
