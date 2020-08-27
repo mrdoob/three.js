@@ -23,6 +23,8 @@ function WebGLCubeRenderTarget( size, options, dummy ) {
 
 	this.texture = new CubeTexture( undefined, options.mapping, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
 
+	this.texture._needsFlipEnvMap = false;
+
 }
 
 WebGLCubeRenderTarget.prototype = Object.create( WebGLRenderTarget.prototype );
