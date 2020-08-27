@@ -69,6 +69,8 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var transform = getNodeTransform( node );
 
+			var traverseChildNodes = true;
+
 			var path = null;
 
 			switch ( node.nodeName ) {
@@ -119,6 +121,17 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					path = parseLineNode( node );
 					break;
 
+				case 'defs':
+					traverseChildNodes = false;
+					break;
+
+				case 'use':
+					var usedNode = node.viewportElement.getElementById( node.href.baseVal.substring( 1 ) );
+					parseNode( usedNode, style );
+					break;
+
+				break;
+
 				default:
 					// console.log( node );
 
@@ -140,11 +153,15 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			}
 
-			var nodes = node.childNodes;
+			if ( traverseChildNodes ) {
 
-			for ( var i = 0; i < nodes.length; i ++ ) {
+				var nodes = node.childNodes;
 
-				parseNode( nodes[ i ], style );
+				for ( var i = 0; i < nodes.length; i ++ ) {
+
+					parseNode( nodes[ i ], style );
+
+				}
 
 			}
 
@@ -1079,7 +1096,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function getNodeTransform( node ) {
 
-			if ( ! node.hasAttribute( 'transform' ) ) {
+			if ( ! ( node.hasAttribute( 'transform' ) || node.nodeName === 'use' ) ) {
 
 				return null;
 
@@ -1104,142 +1121,155 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			var transform = new Matrix3();
 			var currentTransform = tempTransform0;
-			var transformsTexts = node.getAttribute( 'transform' ).split( ')' );
 
-			for ( var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
+			if ( node.nodeName === 'use' ) {
 
-				var transformText = transformsTexts[ tIndex ].trim();
+				var tx = parseFloatWithUnits( node.getAttribute( 'x' ) );
+				var ty = parseFloatWithUnits( node.getAttribute( 'y' ) );
 
-				if ( transformText === '' ) continue;
+				transform.translate( tx, ty );
 
-				var openParPos = transformText.indexOf( '(' );
-				var closeParPos = transformText.length;
+			}
+			else {
 
-				if ( openParPos > 0 && openParPos < closeParPos ) {
+				var transformsTexts = node.getAttribute( 'transform' ).split( ')' );
 
-					var transformType = transformText.substr( 0, openParPos );
+				for ( var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
 
-					var array = parseFloats( transformText.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
+					var transformText = transformsTexts[ tIndex ].trim();
 
-					currentTransform.identity();
+					if ( transformText === '' ) continue;
 
-					switch ( transformType ) {
+					var openParPos = transformText.indexOf( '(' );
+					var closeParPos = transformText.length;
 
-						case "translate":
+					if ( openParPos > 0 && openParPos < closeParPos ) {
 
-							if ( array.length >= 1 ) {
+						var transformType = transformText.substr( 0, openParPos );
 
-								var tx = array[ 0 ];
-								var ty = tx;
+						var array = parseFloats( transformText.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
 
-								if ( array.length >= 2 ) {
+						currentTransform.identity();
 
-									ty = array[ 1 ];
+						switch ( transformType ) {
 
-								}
+							case "translate":
 
-								currentTransform.translate( tx, ty );
+								if ( array.length >= 1 ) {
 
-							}
+									var tx = array[ 0 ];
+									var ty = tx;
 
-							break;
+									if ( array.length >= 2 ) {
 
-						case "rotate":
+										ty = array[ 1 ];
 
-							if ( array.length >= 1 ) {
+									}
 
-								var angle = 0;
-								var cx = 0;
-								var cy = 0;
-
-								// Angle
-								angle = - array[ 0 ] * Math.PI / 180;
-
-								if ( array.length >= 3 ) {
-
-									// Center x, y
-									cx = array[ 1 ];
-									cy = array[ 2 ];
+									currentTransform.translate( tx, ty );
 
 								}
 
-								// Rotate around center (cx, cy)
-								tempTransform1.identity().translate( - cx, - cy );
-								tempTransform2.identity().rotate( angle );
-								tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
-								tempTransform1.identity().translate( cx, cy );
-								currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
+								break;
 
-							}
+							case "rotate":
 
-							break;
+								if ( array.length >= 1 ) {
 
-						case "scale":
+									var angle = 0;
+									var cx = 0;
+									var cy = 0;
 
-							if ( array.length >= 1 ) {
+									// Angle
+									angle = - array[ 0 ] * Math.PI / 180;
 
-								var scaleX = array[ 0 ];
-								var scaleY = scaleX;
+									if ( array.length >= 3 ) {
 
-								if ( array.length >= 2 ) {
+										// Center x, y
+										cx = array[ 1 ];
+										cy = array[ 2 ];
 
-									scaleY = array[ 1 ];
+									}
+
+									// Rotate around center (cx, cy)
+									tempTransform1.identity().translate( - cx, - cy );
+									tempTransform2.identity().rotate( angle );
+									tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
+									tempTransform1.identity().translate( cx, cy );
+									currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
 
 								}
 
-								currentTransform.scale( scaleX, scaleY );
+								break;
 
-							}
+							case "scale":
 
-							break;
+								if ( array.length >= 1 ) {
 
-						case "skewX":
+									var scaleX = array[ 0 ];
+									var scaleY = scaleX;
 
-							if ( array.length === 1 ) {
+									if ( array.length >= 2 ) {
 
-								currentTransform.set(
-									1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
-									0, 1, 0,
-									0, 0, 1
-								);
+										scaleY = array[ 1 ];
 
-							}
+									}
 
-							break;
+									currentTransform.scale( scaleX, scaleY );
 
-						case "skewY":
+								}
 
-							if ( array.length === 1 ) {
+								break;
 
-								currentTransform.set(
-									1, 0, 0,
-									Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
-									0, 0, 1
-								);
+							case "skewX":
 
-							}
+								if ( array.length === 1 ) {
 
-							break;
+									currentTransform.set(
+										1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
+										0, 1, 0,
+										0, 0, 1
+									);
 
-						case "matrix":
+								}
 
-							if ( array.length === 6 ) {
+								break;
 
-								currentTransform.set(
-									array[ 0 ], array[ 2 ], array[ 4 ],
-									array[ 1 ], array[ 3 ], array[ 5 ],
-									0, 0, 1
-								);
+							case "skewY":
 
-							}
+								if ( array.length === 1 ) {
 
-							break;
+									currentTransform.set(
+										1, 0, 0,
+										Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
+										0, 0, 1
+									);
+
+								}
+
+								break;
+
+							case "matrix":
+
+								if ( array.length === 6 ) {
+
+									currentTransform.set(
+										array[ 0 ], array[ 2 ], array[ 4 ],
+										array[ 1 ], array[ 3 ], array[ 5 ],
+										0, 0, 1
+									);
+
+								}
+
+								break;
+
+						}
 
 					}
 
-				}
+					transform.premultiply( currentTransform );
 
-				transform.premultiply( currentTransform );
+				}
 
 			}
 
