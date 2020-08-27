@@ -29,6 +29,7 @@
 			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
 
 				texture.encoding = THREE.sRGBEncoding;
+				texture.mapping = THREE.EquirectangularReflectionMapping;
 
 				init( texture );
 				animate();
@@ -40,18 +41,13 @@
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
-				renderer.outputEncoding = THREE.sRGBEncoding;
-
 				scene = new THREE.Scene();
+				scene.background = texture;
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-
-				// background
-
-				var options = {}; // none required
-				scene.background = new THREE.WebGLCubeRenderTarget( 1024, options ).fromEquirectangularTexture( renderer, texture );
 
 				//
 
