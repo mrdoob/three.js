@@ -90,6 +90,7 @@ function Script( editor ) {
 					editor.execute( new SetScriptValueCommand( editor, currentObject, currentScript, 'source', value ) );
 
 				}
+
 				return;
 
 			}
@@ -105,6 +106,7 @@ function Script( editor ) {
 				editor.execute( cmd );
 
 			}
+
 			if ( JSON.stringify( currentObject.material.uniforms ) !== JSON.stringify( json.uniforms ) ) {
 
 				var cmd = new SetMaterialValueCommand( editor, currentObject, 'uniforms', json.uniforms );
@@ -112,6 +114,7 @@ function Script( editor ) {
 				editor.execute( cmd );
 
 			}
+
 			if ( JSON.stringify( currentObject.material.attributes ) !== JSON.stringify( json.attributes ) ) {
 
 				var cmd = new SetMaterialValueCommand( editor, currentObject, 'attributes', json.attributes );
@@ -217,35 +220,6 @@ function Script( editor ) {
 					break;
 
 				case 'glsl':
-
-					try {
-
-						var shaderType = currentScript === 'vertexShader' ?
-							glslprep.Shader.VERTEX : glslprep.Shader.FRAGMENT;
-
-						glslprep.parseGlsl( string, shaderType );
-
-					} catch ( error ) {
-
-						if ( error instanceof glslprep.SyntaxError ) {
-
-							errors.push( {
-
-								lineNumber: error.line,
-								message: "Syntax Error: " + error.message
-
-							} );
-
-						} else {
-
-							console.error( error.stack || error );
-
-						}
-
-					}
-
-					if ( errors.length !== 0 ) break;
-					if ( renderer instanceof THREE.WebGLRenderer === false ) break;
 
 					currentObject.material[ currentScript ] = string;
 					currentObject.material.needsUpdate = true;
