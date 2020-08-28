@@ -304,12 +304,6 @@ h1 a {
 			margin: 1px 0;
 		}
 
-		#panel #content h2 {
-			margin-top: 32px;
-			border-top: var(--border-style);
-			padding-top: 12px;
-		}
-
 		#panel #content h2:first-child {
 			margin-top: 16px !important;
 			border-top: none;
