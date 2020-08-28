@@ -1186,7 +1186,7 @@ function SidebarMaterial( editor ) {
 
 		if ( texture !== null ) {
 
-			if ( texture.encoding !== THREE.sRGBEncoding ) {
+			if ( texture.isDataTexture !== true && texture.encoding !== THREE.sRGBEncoding ) {
 
 				texture.encoding = THREE.sRGBEncoding;
 				var object = currentObject;
