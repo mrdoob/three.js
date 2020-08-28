@@ -59,6 +59,8 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			var transform = getNodeTransform( node );
 
+			var traverseChildNodes = true;
+
 			var path = null;
 
 			switch ( node.nodeName ) {
@@ -109,6 +111,24 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 					path = parseLineNode( node );
 					break;
 
+				case 'defs':
+					traverseChildNodes = false;
+					break;
+
+				case 'use':
+					style = parseStyle( node, style );
+					var usedNodeId = node.href.baseVal.substring( 1 );
+					var usedNode = node.viewportElement.getElementById( usedNodeId );
+					if ( usedNode ) {
+
+						parseNode( usedNode, style );
+
+					}
+					else console.warn( "SVGLoader: 'use node' references non-existent 'defs node' id: " + usedNodeId );
+					break;
+
+				break;
+
 				default:
 					// console.log( node );
 
@@ -130,11 +150,15 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 			}
 
-			var nodes = node.childNodes;
+			if ( traverseChildNodes ) {
 
-			for ( var i = 0; i < nodes.length; i ++ ) {
+				var nodes = node.childNodes;
 
-				parseNode( nodes[ i ], style );
+				for ( var i = 0; i < nodes.length; i ++ ) {
+
+					parseNode( nodes[ i ], style );
+
+				}
 
 			}
 
@@ -641,13 +665,13 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			rx = Math.abs( rx );
 			ry = Math.abs( ry );
 
-			// Compute (x1′, y1′)
+			// Compute (x1â², y1â²)
 			var dx2 = ( start.x - end.x ) / 2.0;
 			var dy2 = ( start.y - end.y ) / 2.0;
 			var x1p = Math.cos( x_axis_rotation ) * dx2 + Math.sin( x_axis_rotation ) * dy2;
 			var y1p = - Math.sin( x_axis_rotation ) * dx2 + Math.cos( x_axis_rotation ) * dy2;
 
-			// Compute (cx′, cy′)
+			// Compute (cxâ², cyâ²)
 			var rxs = rx * rx;
 			var rys = ry * ry;
 			var x1ps = x1p * x1p;
@@ -674,11 +698,11 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			var cxp = q * rx * y1p / ry;
 			var cyp = - q * ry * x1p / rx;
 
-			// Step 3: Compute (cx, cy) from (cx′, cy′)
+			// Step 3: Compute (cx, cy) from (cxâ², cyâ²)
 			var cx = Math.cos( x_axis_rotation ) * cxp - Math.sin( x_axis_rotation ) * cyp + ( start.x + end.x ) / 2;
 			var cy = Math.sin( x_axis_rotation ) * cxp + Math.cos( x_axis_rotation ) * cyp + ( start.y + end.y ) / 2;
 
-			// Step 4: Compute θ1 and Δθ
+			// Step 4: Compute Î¸1 and ÎÎ¸
 			var theta = svgAngle( 1, 0, ( x1p - cxp ) / rx, ( y1p - cyp ) / ry );
 			var delta = svgAngle( ( x1p - cxp ) / rx, ( y1p - cyp ) / ry, ( - x1p - cxp ) / rx, ( - y1p - cyp ) / ry ) % ( Math.PI * 2 );
 
@@ -1069,7 +1093,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function getNodeTransform( node ) {
 
-			if ( ! node.hasAttribute( 'transform' ) ) {
+			if ( ! ( node.hasAttribute( 'transform' ) || ( node.nodeName == 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) ) ) {
 
 				return null;
 
@@ -1092,144 +1116,158 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function parseNodeTransform( node ) {
 
-			var transform = new THREE.Matrix3();
+			var transform = new Matrix3();
 			var currentTransform = tempTransform0;
-			var transformsTexts = node.getAttribute( 'transform' ).split( ')' );
 
-			for ( var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
+			if ( node.nodeName == 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) {
 
-				var transformText = transformsTexts[ tIndex ].trim();
+				var tx = parseFloatWithUnits( node.getAttribute( 'x' ) );
+				var ty = parseFloatWithUnits( node.getAttribute( 'y' ) );
 
-				if ( transformText === '' ) continue;
+				transform.translate( tx, ty );
 
-				var openParPos = transformText.indexOf( '(' );
-				var closeParPos = transformText.length;
+			}
 
-				if ( openParPos > 0 && openParPos < closeParPos ) {
+			if ( node.hasAttribute( 'transform' ) ) {
 
-					var transformType = transformText.substr( 0, openParPos );
+				var transformsTexts = node.getAttribute( 'transform' ).split( ')' );
 
-					var array = parseFloats( transformText.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
+				for ( var tIndex = transformsTexts.length - 1; tIndex >= 0; tIndex -- ) {
 
-					currentTransform.identity();
+					var transformText = transformsTexts[ tIndex ].trim();
 
-					switch ( transformType ) {
+					if ( transformText === '' ) continue;
 
-						case "translate":
+					var openParPos = transformText.indexOf( '(' );
+					var closeParPos = transformText.length;
 
-							if ( array.length >= 1 ) {
+					if ( openParPos > 0 && openParPos < closeParPos ) {
 
-								var tx = array[ 0 ];
-								var ty = tx;
+						var transformType = transformText.substr( 0, openParPos );
 
-								if ( array.length >= 2 ) {
+						var array = parseFloats( transformText.substr( openParPos + 1, closeParPos - openParPos - 1 ) );
 
-									ty = array[ 1 ];
+						currentTransform.identity();
 
-								}
+						switch ( transformType ) {
 
-								currentTransform.translate( tx, ty );
+							case "translate":
 
-							}
+								if ( array.length >= 1 ) {
 
-							break;
+									var tx = array[ 0 ];
+									var ty = tx;
 
-						case "rotate":
+									if ( array.length >= 2 ) {
 
-							if ( array.length >= 1 ) {
+										ty = array[ 1 ];
 
-								var angle = 0;
-								var cx = 0;
-								var cy = 0;
+									}
 
-								// Angle
-								angle = - array[ 0 ] * Math.PI / 180;
-
-								if ( array.length >= 3 ) {
-
-									// Center x, y
-									cx = array[ 1 ];
-									cy = array[ 2 ];
+									currentTransform.translate( tx, ty );
 
 								}
 
-								// Rotate around center (cx, cy)
-								tempTransform1.identity().translate( - cx, - cy );
-								tempTransform2.identity().rotate( angle );
-								tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
-								tempTransform1.identity().translate( cx, cy );
-								currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
+								break;
 
-							}
+							case "rotate":
 
-							break;
+								if ( array.length >= 1 ) {
 
-						case "scale":
+									var angle = 0;
+									var cx = 0;
+									var cy = 0;
 
-							if ( array.length >= 1 ) {
+									// Angle
+									angle = - array[ 0 ] * Math.PI / 180;
 
-								var scaleX = array[ 0 ];
-								var scaleY = scaleX;
+									if ( array.length >= 3 ) {
 
-								if ( array.length >= 2 ) {
+										// Center x, y
+										cx = array[ 1 ];
+										cy = array[ 2 ];
 
-									scaleY = array[ 1 ];
+									}
+
+									// Rotate around center (cx, cy)
+									tempTransform1.identity().translate( - cx, - cy );
+									tempTransform2.identity().rotate( angle );
+									tempTransform3.multiplyMatrices( tempTransform2, tempTransform1 );
+									tempTransform1.identity().translate( cx, cy );
+									currentTransform.multiplyMatrices( tempTransform1, tempTransform3 );
 
 								}
 
-								currentTransform.scale( scaleX, scaleY );
+								break;
 
-							}
+							case "scale":
 
-							break;
+								if ( array.length >= 1 ) {
 
-						case "skewX":
+									var scaleX = array[ 0 ];
+									var scaleY = scaleX;
 
-							if ( array.length === 1 ) {
+									if ( array.length >= 2 ) {
 
-								currentTransform.set(
-									1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
-									0, 1, 0,
-									0, 0, 1
-								);
+										scaleY = array[ 1 ];
 
-							}
+									}
 
-							break;
+									currentTransform.scale( scaleX, scaleY );
 
-						case "skewY":
+								}
 
-							if ( array.length === 1 ) {
+								break;
 
-								currentTransform.set(
-									1, 0, 0,
-									Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
-									0, 0, 1
-								);
+							case "skewX":
 
-							}
+								if ( array.length === 1 ) {
 
-							break;
+									currentTransform.set(
+										1, Math.tan( array[ 0 ] * Math.PI / 180 ), 0,
+										0, 1, 0,
+										0, 0, 1
+									);
 
-						case "matrix":
+								}
 
-							if ( array.length === 6 ) {
+								break;
 
-								currentTransform.set(
-									array[ 0 ], array[ 2 ], array[ 4 ],
-									array[ 1 ], array[ 3 ], array[ 5 ],
-									0, 0, 1
-								);
+							case "skewY":
 
-							}
+								if ( array.length === 1 ) {
 
-							break;
+									currentTransform.set(
+										1, 0, 0,
+										Math.tan( array[ 0 ] * Math.PI / 180 ), 1, 0,
+										0, 0, 1
+									);
+
+								}
+
+								break;
+
+							case "matrix":
+
+								if ( array.length === 6 ) {
+
+									currentTransform.set(
+										array[ 0 ], array[ 2 ], array[ 4 ],
+										array[ 1 ], array[ 3 ], array[ 5 ],
+										0, 0, 1
+									);
+
+								}
+
+								break;
+
+						}
 
 					}
 
-				}
+					transform.premultiply( currentTransform );
 
-				transform.premultiply( currentTransform );
+				}
 
 			}
 
