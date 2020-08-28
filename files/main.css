@@ -522,7 +522,7 @@ iframe {
 	line-height: calc(var(--line-height) - 6px);
 }
 
-// https://github.com/mrdoob/three.js/issues/20208
+/* https://github.com/mrdoob/three.js/issues/20208 */
 .card:not(.hidden) ~ h2 {
     margin-top: 32px;
     border-top: var(--border-style);
