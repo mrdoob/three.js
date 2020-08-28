@@ -126,6 +126,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					break;
 
 				case 'use':
+					style = parseStyle( node, style );
 					var usedNode = node.viewportElement.getElementById( node.href.baseVal.substring( 1 ) );
 					parseNode( usedNode, style );
 					break;
