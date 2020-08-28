@@ -72,17 +72,18 @@
 			for ( var key in files ) {
 
 				var section = files[ key ];
-
+		
 				var header = document.createElement( 'h2' );
 				header.textContent = key;
 				header.setAttribute( 'data-category', key );
 				container.appendChild( header );
-
+		
 				for ( var i = 0; i < section.length; i ++ ) {
-
+		
 					var file = section[ i ];
+					var isNew = newExamples.includes( file );
 
-					var link = createLink( file );
+					var link = createLink( file, isNew );
 					container.appendChild( link );
 
 					links[ file ] = link;
@@ -173,8 +174,9 @@
 
 		}
 
-		function createLink( file ) {
+		function createLink( file, isNew ) {
 
+			var newTag = ( isNew ? ' <div class="is-new">NEW</div>' : undefined );
 
 			var template = [
 				'<div class="card">',
@@ -182,7 +184,10 @@
 				'		<div class="cover">',
 				'			<img src="screenshots/' + file + '.jpg" loading="lazy" width="400" />',
 				'		</div>',
-				'		<div class="title">' + getName( file ) + '</div>',
+				'		<div class="title-container">',
+				newTag,
+				'			<div class="title">' + getName( file ) + '</div>',
+				'		</div>',
 				'	</a>',
 				'</div>'
 			].join( "\n" );
