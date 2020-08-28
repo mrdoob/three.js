@@ -124,7 +124,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						parseNode( usedNode, style );
 
 					}
-					else console.warn( "SVGLoader: 'use node' references non-existent 'defs node' id: " + usedNodeId );
+					else console.warn( "SVGLoader: 'use node' references non-existent node id: " + usedNodeId );
 					break;
 
 				break;
