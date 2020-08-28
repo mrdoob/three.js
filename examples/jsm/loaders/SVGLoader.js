@@ -1097,7 +1097,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		function getNodeTransform( node ) {
 
-			if ( ! ( node.hasAttribute( 'transform' ) || node.nodeName === 'use' ) ) {
+			if ( ! ( node.hasAttribute( 'transform' ) || ( node.nodeName == 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) ) ) {
 
 				return null;
 
@@ -1123,7 +1123,7 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			var transform = new Matrix3();
 			var currentTransform = tempTransform0;
 
-			if ( node.nodeName === 'use' ) {
+			if ( node.nodeName == 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) {
 
 				var tx = parseFloatWithUnits( node.getAttribute( 'x' ) );
 				var ty = parseFloatWithUnits( node.getAttribute( 'y' ) );
@@ -1131,7 +1131,8 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				transform.translate( tx, ty );
 
 			}
-			else {
+
+			if ( node.hasAttribute( 'transform' ) ) {
 
 				var transformsTexts = node.getAttribute( 'transform' ).split( ')' );
 
