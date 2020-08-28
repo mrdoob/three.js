@@ -271,7 +271,10 @@
 			var link = links[ file ];
 			var name = getName( file );
 			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
-			var res = file.match( exp );
+		
+			var isNew = newExamples.includes( file );
+			var res = ( file + ( isNew ? "new" : "" ) ).match( exp );
+		
 			var text;
 
 			if ( res && res.length > 0 ) {
