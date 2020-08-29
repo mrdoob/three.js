@@ -245,11 +245,15 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	localToWorld: function ( vector ) {
 
+		this.updateWorldMatrix( true, false );
+
 		return vector.applyMatrix4( this.matrixWorld );
 
 	},
 
 	worldToLocal: function ( vector ) {
+
+		this.updateWorldMatrix( true, false );
 
 		return vector.applyMatrix4( _m1.getInverse( this.matrixWorld ) );
 
