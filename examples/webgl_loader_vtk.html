@@ -146,15 +146,11 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
-
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
 
 				renderer.render( scene, camera );
 

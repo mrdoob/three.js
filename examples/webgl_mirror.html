@@ -39,7 +39,7 @@
 
 			var camera, scene, renderer;
 
-			var cameraControls;
+			var controls;
 
 			var sphereGroup, smallSphere;
 
@@ -63,11 +63,10 @@
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 0, 75, 160 );
 
-				cameraControls = new OrbitControls( camera, renderer.domElement );
-				cameraControls.target.set( 0, 40, 0 );
-				cameraControls.maxDistance = 400;
-				cameraControls.minDistance = 10;
-				cameraControls.update();
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, 40, 0 );
+				controls.maxDistance = 400;
+				controls.minDistance = 10;
 
 				//
 

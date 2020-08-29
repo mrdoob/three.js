@@ -1,15 +1,11 @@
-import { Camera, EventDispatcher, Vector3 } from '../../../src/Three';
+import { Camera } from '../../../src/Three';
+import { Controls } from './Controls.js';
 
-export class TrackballControls extends EventDispatcher {
+export class TrackballControls extends Controls {
 
-	constructor( object: Camera, domElement?: HTMLElement );
-
-	object: Camera;
-	domElement: HTMLElement;
+	constructor( camera: Camera, domElement: HTMLElement );
 
 	// API
-	enabled: boolean;
-	screen: {left: number; top: number; width: number; height: number};
 	rotateSpeed: number;
 	zoomSpeed: number;
 	panSpeed: number;
@@ -17,31 +13,18 @@ export class TrackballControls extends EventDispatcher {
 	noZoom: boolean;
 	noPan: boolean;
 	noRoll: boolean;
-	staticMoving: boolean;
-	dynamicDampingFactor: number;
 	minDistance: number;
 	maxDistance: number;
 	keys: number[];
 
-	target: Vector3;
-	position0: Vector3;
-	target0: Vector3;
-	up0: Vector3;
-
 	update(): void;
 
 	reset(): void;
-
-	dispose(): void;
-
-	checkDistances(): void;
 
 	zoomCamera(): void;
 
 	panCamera(): void;
 
 	rotateCamera(): void;
-
-	handleResize(): void;
 
 }

@@ -34,13 +34,14 @@
 			var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
 
 			var params = {
-				orthographicCamera: false
+				orthographicCamera: false,
+				damping: false
 			};
 
 			var frustumSize = 400;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -48,9 +49,11 @@
 
 				perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 1000 );
 				perspectiveCamera.position.z = 500;
+				perspectiveCamera.focus = 500;
 
 				orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
 				orthographicCamera.position.z = 500;
+				orthographicCamera.focus = 500;
 
 				// world
 
@@ -99,31 +102,41 @@
 				//
 
 				var gui = new GUI();
-				gui.add( params, 'orthographicCamera' ).name( 'use orthographic' ).onChange( function ( value ) {
-
-					controls.dispose();
-
-					createControls( value ? orthographicCamera : perspectiveCamera );
-
-				} );
+				gui.add( params, 'orthographicCamera' ).name( 'use orthographic' ).onChange( createControls );
+				gui.add( params, 'damping' ).name( 'use damping' ).onChange( createControls );
 
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				createControls( perspectiveCamera );
+				createControls();
 
 			}
 
 			function createControls( camera ) {
 
-				controls = new TrackballControls( camera, renderer.domElement );
+				var ortho = params.orthographicCamera;
+				var useDamping = params.damping;
 
-				controls.rotateSpeed = 1.0;
-				controls.zoomSpeed = 1.2;
-				controls.panSpeed = 0.8;
+				if ( controls )	controls.dispose();
+
+				controls = new TrackballControls( ortho ? orthographicCamera : perspectiveCamera, renderer.domElement );
+
+				controls.addEventListener( 'change', render );
+
+				controls.minDistance = 10;
+				controls.maxDistance = 1000;
+
+				if ( params.damping ) {
+
+					controls.enableDamping = true;
+					controls.dampingFactor = 0.02;
+
+				}
 
 				controls.keys = [ 65, 83, 68 ];
+
+				render();
 
 			}
 
@@ -142,23 +155,11 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
-
-			}
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				controls.update();
-
-				stats.update();
-
-				render();
-
 			}
 
 			function render() {
+
+				stats.update();
 
 				var camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
 

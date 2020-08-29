@@ -247,6 +247,10 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	contents = contents.replace( /^console\.warn.*(\r\n|\r|\n)/, '' );
 
+	// Uncomment imports
+
+	contents = contents.replace( '// import { ', 'import { ' );
+
 	// class name
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {

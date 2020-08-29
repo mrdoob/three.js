@@ -192,7 +192,7 @@
 
 			var camera, cubeCamera, scene, renderer;
 
-			var cameraControls;
+			var controls;
 
 			var groundPlane, wallMat;
 
@@ -238,12 +238,11 @@
 				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR );
 				camera.position.set( 280, 106, - 5 );
 
-				cameraControls = new OrbitControls( camera, renderer.domElement );
-				cameraControls.target.set( 0, - 10, 0 );
-				cameraControls.maxDistance = 400;
-				cameraControls.minDistance = 10;
-				cameraControls.addEventListener( 'change', render );
-				cameraControls.update();
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.target.set( 0, - 10, 0 );
+				controls.maxDistance = 400;
+				controls.minDistance = 10;
+				controls.addEventListener( 'change', render );
 
 				// cube camera for environment map
 

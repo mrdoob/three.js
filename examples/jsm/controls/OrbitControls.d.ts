@@ -1,14 +1,13 @@
 import { Camera, MOUSE, TOUCH, Vector3 } from '../../../src/Three';
+import { Controls } from './Controls.js';
 
-export class OrbitControls {
+export class OrbitControls extends Controls {
 
-	constructor( object: Camera, domElement?: HTMLElement );
+	constructor( object: Camera, domElement: HTMLElement );
 
 	object: Camera;
-	domElement: HTMLElement | HTMLDocument;
 
 	// API
-	enabled: boolean;
 	target: Vector3;
 
 	// deprecated
@@ -54,25 +53,8 @@ export class OrbitControls {
 
 	reset(): void;
 
-	dispose(): void;
-
 	getPolarAngle(): number;
 
 	getAzimuthalAngle(): number;
-
-	// EventDispatcher mixins
-	addEventListener( type: string, listener: ( event: any ) => void ): void;
-
-	hasEventListener( type: string, listener: ( event: any ) => void ): boolean;
-
-	removeEventListener( type: string, listener: ( event: any ) => void ): void;
-
-	dispatchEvent( event: { type: string; target: any; } ): void;
-
-}
-
-export class MapControls extends OrbitControls {
-
-	constructor( object: Camera, domElement?: HTMLElement );
 
 }

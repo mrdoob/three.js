@@ -119,8 +119,7 @@
 				//
 
 				var controls = new OrbitControls( camera, renderer.domElement );
-				controls.target.y = 0.5;
-				controls.update();
+				controls.target.set( 0, 0.5, 0 );
 
 				animate();
 

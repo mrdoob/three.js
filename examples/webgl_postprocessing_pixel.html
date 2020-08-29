@@ -63,7 +63,6 @@
 				camera.position.set( 0, 0, 30 );
 				controls = new TrackballControls( camera, renderer.domElement );
 				controls.rotateSpeed = 2.0;
-				controls.panSpeed = 0.8;
 				controls.zoomSpeed = 1.5;
 
 				scene = new THREE.Scene();
@@ -134,7 +133,6 @@
 
 			function update() {
 
-				controls.update();
 				updateGUI();
 
 				group.rotation.y += .0015;

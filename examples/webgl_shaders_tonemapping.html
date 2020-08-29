@@ -61,7 +61,7 @@
 
 			var directionalLight;
 
-			var orbitControls;
+			var controls;
 
 			var windowHalfX = window.innerWidth / 2;
 			var windowHalfY = window.innerHeight / 2;
@@ -99,9 +99,9 @@
 				cameraBG = new THREE.OrthographicCamera( - windowHalfX, windowHalfX, windowHalfY, - windowHalfY, - 10000, 10000 );
 				cameraBG.position.z = 100;
 
-				orbitControls = new OrbitControls( camera, container );
-				orbitControls.autoRotate = true;
-				orbitControls.autoRotateSpeed = 1;
+				controls = new OrbitControls( camera, container );
+				controls.autoRotate = true;
+				controls.autoRotateSpeed = 1;
 
 				// SCENE
 
@@ -456,8 +456,6 @@
 				}
 
 				directionalLight.intensity = params.sunLight;
-
-				orbitControls.update();
 
 				render();
 

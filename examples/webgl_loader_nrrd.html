@@ -177,7 +177,6 @@
 				controls.maxDistance = 500;
 				controls.rotateSpeed = 5.0;
 				controls.zoomSpeed = 5;
-				controls.panSpeed = 2;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -197,15 +196,11 @@
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
 
-				controls.handleResize();
-
 			}
 
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update();
 
 				//copy position of the camera into inset
 				camera2.position.copy( camera.position );

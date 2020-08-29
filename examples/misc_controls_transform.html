@@ -26,7 +26,6 @@
 			var scene, renderer, control, orbit;
 
 			init();
-			render();
 
 			function init() {
 
@@ -58,7 +57,7 @@
 				var material = new THREE.MeshLambertMaterial( { map: texture, transparent: true } );
 
 				orbit = new OrbitControls( currentCamera, renderer.domElement );
-				orbit.update();
+				orbit.enableDamping = true;
 				orbit.addEventListener( 'change', render );
 
 				control = new TransformControls( currentCamera, renderer.domElement );
@@ -188,8 +187,6 @@
 				cameraOrtho.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				render();
 
 			}
 

@@ -67,7 +67,6 @@
 				controls.minDistance = 50;
 				controls.maxDistance = 400;
 				controls.enablePan = false;
-				controls.update();
 
 				var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
 				camera.add( pointLight );
@@ -83,7 +82,7 @@
 					object.position.y += ( object.position.y - center.y );
 					object.position.z += ( object.position.z - center.z );
 
-					controls.reset();
+					controls.resetCameraState();
 
 					scene.add( object );
 					render();

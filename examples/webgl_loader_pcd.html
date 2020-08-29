@@ -52,7 +52,6 @@
 					scene.add( points );
 					var center = points.geometry.boundingSphere.center;
 					controls.target.set( center.x, center.y, center.z );
-					controls.update();
 
 				} );
 
@@ -64,9 +63,8 @@
 
 				controls.rotateSpeed = 2.0;
 				controls.zoomSpeed = 0.3;
-				controls.panSpeed = 0.2;
 
-				controls.staticMoving = true;
+				controls.enableDamping = false;
 
 				controls.minDistance = 0.3;
 				controls.maxDistance = 0.3 * 100;
@@ -85,7 +83,6 @@
 				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				controls.handleResize();
 
 			}
 
@@ -117,7 +114,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				controls.update();
 				renderer.render( scene, camera );
 				stats.update();
 

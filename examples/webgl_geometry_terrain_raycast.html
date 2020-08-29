@@ -70,10 +70,9 @@
 
 				var data = generateHeight( worldWidth, worldDepth );
 
-				controls.target.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500;
-				camera.position.y = controls.target.y + 2000;
+				camera.position.y = data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 2500;
 				camera.position.x = 2000;
-				controls.update();
+				controls.target.set( 0, data[ worldHalfWidth + worldHalfDepth * worldWidth ] + 500, 0 );
 
 				var geometry = new THREE.PlaneBufferGeometry( 7500, 7500, worldWidth - 1, worldDepth - 1 );
 				geometry.rotateX( - Math.PI / 2 );

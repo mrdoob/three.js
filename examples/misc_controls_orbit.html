@@ -26,45 +26,41 @@
 
 			import * as THREE from '../build/three.module.js';
 
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var camera, controls, scene, renderer;
+			var perspectiveCamera, orthographicCamera, controls, scene, renderer, stats;
+
+			var params = {
+				orthographicCamera: false,
+				damping: true,
+				screenSpace: false,
+			};
+
+			var frustumSize = 400;
 
 			init();
-			//render(); // remove when using next line for animation loop (requestAnimationFrame)
-			animate();
+			render();
 
 			function init() {
+
+				var aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera = new THREE.PerspectiveCamera( 60, aspect, 1, 1000 );
+				perspectiveCamera.position.set( 400, 200, 0 );
+				perspectiveCamera.focus = 500;
+
+				orthographicCamera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, 1, 1000 );
+				orthographicCamera.position.set( 400, 200, 0 );
+				orthographicCamera.focus = 500;
+
+				// world
 
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0xcccccc );
 				scene.fog = new THREE.FogExp2( 0xcccccc, 0.002 );
-
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 1000 );
-				camera.position.set( 400, 200, 0 );
-
-				// controls
-
-				controls = new OrbitControls( camera, renderer.domElement );
-
-				//controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
-
-				controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
-				controls.dampingFactor = 0.05;
-
-				controls.screenSpacePanning = false;
-
-				controls.minDistance = 100;
-				controls.maxDistance = 500;
-
-				controls.maxPolarAngle = Math.PI / 2;
-
-				// world
 
 				var geometry = new THREE.CylinderBufferGeometry( 0, 10, 30, 4, 1 );
 				var material = new THREE.MeshPhongMaterial( { color: 0xffffff, flatShading: true } );
@@ -94,32 +90,83 @@
 				var light = new THREE.AmbientLight( 0x222222 );
 				scene.add( light );
 
+				// renderer
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.body.appendChild( renderer.domElement );
+
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
+				//
+
+				var gui = new GUI();
+				gui.add( params, 'orthographicCamera' ).name( 'use orthographic' ).onChange( createControls );
+				gui.add( params, 'damping' ).name( 'use damping' ).onChange( createControls );
+				gui.add( params, 'screenSpace' ).name( 'screen space panning' ).onChange( createControls );
+
 				//
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-			}
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
+				createControls();
 
 			}
 
-			function animate() {
+			function createControls( camera ) {
 
-				requestAnimationFrame( animate );
+				var ortho = params.orthographicCamera;
+				var useDamping = params.damping;
 
-				controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+				if ( controls )	controls.dispose();
+
+				controls = new OrbitControls( ortho ? orthographicCamera : perspectiveCamera, renderer.domElement );
+
+				controls.addEventListener( 'change', render );
+
+				controls.minDistance = 100;
+				controls.maxDistance = 1000;
+				controls.maxPolarAngle = Math.PI / 2;
+
+				controls.screenSpacePanning = params.screenSpace;
+
+				if ( params.damping ) {
+
+					controls.enableDamping = true;
+					controls.dampingFactor = 0.02;
+
+				}
+
+				controls.keys = [ 65, 83, 68 ];
 
 				render();
 
 			}
 
+			function onWindowResize() {
+
+				var aspect = window.innerWidth / window.innerHeight;
+
+				perspectiveCamera.aspect = aspect;
+				perspectiveCamera.updateProjectionMatrix();
+
+				orthographicCamera.left = - frustumSize * aspect / 2;
+				orthographicCamera.right = frustumSize * aspect / 2;
+				orthographicCamera.top = frustumSize / 2;
+				orthographicCamera.bottom = - frustumSize / 2;
+				orthographicCamera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
 			function render() {
+
+				stats.update();
+
+				var camera = ( params.orthographicCamera ) ? orthographicCamera : perspectiveCamera;
 
 				renderer.render( scene, camera );
 

@@ -101,7 +101,6 @@
 				controls.maxDistance = 5;
 				controls.enableDamping = true;
 				controls.target.set( 0, 0.9, 0 );
-				controls.update();
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -125,8 +124,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-
-				controls.update(); // to support damping
 
 				renderer.render( scene, camera );
 

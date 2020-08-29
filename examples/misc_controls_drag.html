@@ -104,6 +104,8 @@
 				container.appendChild( renderer.domElement );
 
 				controls = new DragControls( [ ... objects ], camera, renderer.domElement );
+				controls.enableDamping = true;
+
 				controls.addEventListener( 'drag', render );
 
 				//
@@ -111,8 +113,12 @@
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				document.addEventListener( 'click', onClick, false );
-				window.addEventListener( 'keydown', onKeyDown, false );
-				window.addEventListener( 'keyup', onKeyUp, false );
+
+				controls.addEventListener( 'keydown', onKeyDown, false );
+				controls.addEventListener( 'keyup', onKeyUp, false );
+
+				controls.addEventListener( 'hoveron', onHoverOn, false );
+				controls.addEventListener( 'hoveroff', onHoverOff, false );
 
 				render();
 
@@ -141,13 +147,37 @@
 
 			}
 
+			function onHoverOn ( event ) {
+
+				event.object.material.emissive.set( 0x00ff00 );
+
+				render();
+
+			}
+
+			function onHoverOff ( event ) {
+
+				if ( group.children.includes( event.object ) === true ) {
+
+					event.object.material.emissive.set( 0xaaaaaa );
+
+				} else {
+
+					event.object.material.emissive.set( 0x000000 );
+
+				}
+
+				render();
+
+			}
+
 			function onClick( event ) {
 
 				event.preventDefault();
 
 				if ( enableSelection === true ) {
 
-					var draggableObjects = controls.getObjects();
+					var draggableObjects = controls.objects;
 					draggableObjects.length = 0;
 
 					mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;

@@ -336,7 +336,7 @@
 				// Controls
 
 				var controls = new OrbitControls( scene.userData.camera, renderer.domElement );
-				controls.target.y = ( conesDistance + coneHeight ) * 0.5;
+				controls.target.set( 0, ( conesDistance + coneHeight ) * 0.5, 0 );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.05;
 
@@ -351,8 +351,6 @@
 					lightningStrike.rayParameters.destOffset.y += coneHeightHalf;
 
 					lightningStrike.update( time );
-
-					controls.update();
 
 					// Update point light position to the middle of the ray
 					posLight.position.lerpVectors( lightningStrike.rayParameters.sourceOffset, lightningStrike.rayParameters.destOffset, 0.5 );
@@ -545,8 +543,6 @@
 					rayDirection.normalize();
 
 					lightningStrike.update( time );
-
-					controls.update();
 
 					outlinePass.enabled = scene.userData.outlineEnabled;
 
@@ -747,15 +743,13 @@
 				// Controls
 
 				var controls = new OrbitControls( scene.userData.camera, renderer.domElement );
-				controls.target.y = GROUND_SIZE * 0.05;
+				controls.target.set( 0, GROUND_SIZE * 0.05, 0 );
 				controls.enableDamping = true;
 				controls.dampingFactor = 0.05;
 
 				scene.userData.render = function ( time ) {
 
 					storm.update( time );
-
-					controls.update();
 
 					if ( scene.userData.outlineEnabled ) {
 

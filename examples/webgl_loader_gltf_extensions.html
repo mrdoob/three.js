@@ -25,7 +25,7 @@
 			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			var orbitControls;
+			var controls;
 			var camera, scene, renderer, loader;
 			var gltf, background, envMap, mixer, gui, extensionControls;
 
@@ -237,7 +237,7 @@
 
 				// TODO: Reuse existing OrbitControls, GLTFLoaders, and so on
 
-				orbitControls = new OrbitControls( camera, renderer.domElement );
+				controls = new OrbitControls( camera, renderer.domElement );
 
 				if ( sceneInfo.addGround ) {
 
@@ -295,9 +295,11 @@
 
 					if ( sceneInfo.center ) {
 
-						orbitControls.target.copy( sceneInfo.center );
+						controls.target.copy( sceneInfo.center );
 
 					}
+
+					camera.lookAt( controls.target );
 
 					if ( sceneInfo.objectPosition ) {
 
@@ -398,8 +400,6 @@
 				requestAnimationFrame( animate );
 
 				if ( mixer ) mixer.update( clock.getDelta() );
-
-				orbitControls.update();
 
 				render();
 
