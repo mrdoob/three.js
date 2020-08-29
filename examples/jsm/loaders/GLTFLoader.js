@@ -539,7 +539,7 @@ var GLTFLoader = ( function () {
 
 	};
 
-	GLTFLightsExtension.prototype.createNode = function ( nodeIndex ) {
+	GLTFLightsExtension.prototype.createNodeAttachment = function ( nodeIndex ) {
 
 		var self = this;
 		var parser = this.parser;
@@ -3484,7 +3484,7 @@ var GLTFLoader = ( function () {
 
 			parser._invokeAll( function ( ext ) {
 
-				return ext.createNode && ext.createNode( nodeIndex );
+				return ext.createNodeAttachment && ext.createNodeAttachment( nodeIndex );
 
 			} ).forEach( function ( promise ) {
 
