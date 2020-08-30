@@ -1093,7 +1093,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function getNodeTransform( node ) {
 
-			if ( ! ( node.hasAttribute( 'transform' ) || ( node.nodeName == 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) ) ) {
+			if ( ! ( node.hasAttribute( 'transform' ) || ( node.nodeName === 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) ) ) {
 
 				return null;
 
@@ -1119,7 +1119,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			var transform = new Matrix3();
 			var currentTransform = tempTransform0;
 
-			if ( node.nodeName == 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) {
+			if ( node.nodeName === 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) {
 
 				var tx = parseFloatWithUnits( node.getAttribute( 'x' ) );
 				var ty = parseFloatWithUnits( node.getAttribute( 'y' ) );
