@@ -479,8 +479,6 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	}
 
-	var isMouseDown = false;
-
 	function onMouseDown( event ) {
 
 		event.preventDefault();
@@ -528,15 +526,16 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 		}
 
-		scope.dispatchEvent( startEvent );
+		scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
-		isMouseDown = true;
+		scope.dispatchEvent( startEvent );
 
 	}
 
 	function onMouseMove( event ) {
 
-		if ( isMouseDown === false ) return;
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 		event.stopPropagation();
@@ -562,14 +561,17 @@ THREE.TrackballControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
+		if ( scope.enabled === false ) return;
+
 		event.preventDefault();
 		event.stopPropagation();
 
 		_state = STATE.NONE;
 
-		scope.dispatchEvent( endEvent );
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
 
-		isMouseDown = false;
+		scope.dispatchEvent( endEvent );
 
 	}
 
