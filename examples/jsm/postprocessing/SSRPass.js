@@ -50,7 +50,7 @@ var SSRPass = function(scene, camera, width, height,selects) {
   this.surfDist = 1.
 
   this.selects=selects
-  this.isSelective=this.selects.length>0
+  this.isSelective=this.selects?this.selects.length>0:false
 
   // beauty render target with depth buffer
 
