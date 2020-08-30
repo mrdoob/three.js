@@ -228,7 +228,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render metalnesses
 
-    this.renderOverride(renderer, this.metalnessOnMaterial, this.metalnessRenderTarget, 0, 0);
+    this.renderMetalness(renderer, this.metalnessOnMaterial, this.metalnessRenderTarget, 0, 0);
 
     // render SSR
 
@@ -403,9 +403,18 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
   	}
 
-  	this.scene.overrideMaterial = overrideMaterial;
+    this.scene.traverse(child=>{
+      child._material=child.material
+      if(child===this.scene.children[3]){
+        child.material=this.metalnessOnMaterial
+      }else{
+        child.material=this.metalnessOffMaterial
+      }
+    })
   	renderer.render(this.scene, this.camera);
-  	this.scene.overrideMaterial = null;
+  	this.scene.traverse(child => {
+  		child.material = child._material
+  	})
 
   	// restore original state
 

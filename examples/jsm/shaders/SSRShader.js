@@ -111,6 +111,8 @@ var SSRShader = {
 			return length(cross(x0-x1,x0-x2))/length(x2-x1);
 		}
 		void main(){
+			float metalness=texture2D(tMetalness,vUv).r;
+			if(metalness==0.) return;
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
