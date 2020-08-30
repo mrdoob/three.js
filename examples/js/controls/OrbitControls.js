@@ -814,8 +814,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	}
 
-	var isMouseDown = false;
-
 	function onMouseDown( event ) {
 
 		// Prevent the browser from scrolling.
@@ -915,7 +913,8 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		if ( state !== STATE.NONE ) {
 
-			isMouseDown = true;
+			scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
+			scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
 			scope.dispatchEvent( startEvent );
 
@@ -925,7 +924,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseMove( event ) {
 
-		if ( isMouseDown === false ) return;
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 
@@ -961,15 +960,16 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
-		if ( isMouseDown === false ) return;
+		if ( scope.enabled === false ) return;
 
 		handleMouseUp( event );
+
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
 
 		scope.dispatchEvent( endEvent );
 
 		state = STATE.NONE;
-
-		isMouseDown = false;
 
 	}
 
@@ -1169,9 +1169,6 @@ THREE.OrbitControls = function ( object, domElement ) {
 	scope.domElement.addEventListener( 'touchstart', onTouchStart, false );
 	scope.domElement.addEventListener( 'touchend', onTouchEnd, false );
 	scope.domElement.addEventListener( 'touchmove', onTouchMove, false );
-
-	scope.domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
-	scope.domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
 	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
 

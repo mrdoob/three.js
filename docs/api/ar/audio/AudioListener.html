@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			يمثل هذا المكون [link:https://developer.mozilla.org/de/docs/Web/API/AudioListener listener] افتراضيًا من جميع المؤثرات الصوتية الموضعية وغير الموضعية في المشهد.<br />
+			عادةً ما يُنشئ تطبيق three.js مثيلاً واحدًا من هذا الكائن. إنها معلمة تفسير إلزامية لكيانات الصوت مثل [page:Audio Audio] و [page:PositionalAudio PositionalAudio].<br />
+			في معظم الحالات ، يكون الكائن المستمع هو كائن فرعي للكاميرا. لذا فإن التحول ثلاثي الأبعاد للكاميرا يمثل التحول ثلاثي الأبعاد للمستمع.
+		</p>
+
+		<h2>مثال التعليمة البرمجية</h2>
+
+		<code>
+		// create an AudioListener and add it to the camera
+		var listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create a global audio source
+		var sound = new THREE.Audio( listener );
+
+		// load a sound and set it as the Audio object's buffer
+		var audioLoader = new THREE.AudioLoader();
+		audioLoader.load( 'sounds/ambient.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setLoop(true);
+			sound.setVolume(0.5);
+			sound.play();
+		});
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
+			[example:webaudio_timing webaudio / timing ]<br />
+			[example:webaudio_visualizer webaudio / visualizer ]
+		</p>
+
+		<h2>المنشئ (Constructor)</h2>
+
+
+		<h3>[name](  )</h3>
+		<p>
+		يقوم بإنشاء AudioListener جديد.
+		</p>
+
+
+		<h2>الخصائص (Properties)</h2>
+
+		<h3>[property:AudioContext context]</h3>
+		<p>الـ[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext AudioContext] الخاصة بـ[page:AudioListener listener] المعطاة في المنشئ.</p>
+
+		<h3>[property:GainNode gain]</h3>
+		<p>[link:https://developer.mozilla.org/en-US/docs/Web/API/GainNode GainNode] تم إنشاؤه باستخدام [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createGain AudioContext.createGain](). </p>
+
+		<h3>[property:AudioNode filter]</h3>
+		<p>الافتراضي هو *null*.</p>
+
+		<h3>[property:Number timeDelta]</h3>
+		<p>قيمة دلتا الخاصة بالوقت للكيانات الصوتية. استخدم في سياق [link:https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/linearRampToValueAtTime AudioParam.linearRampToValueAtTimeDefault](). الافتراضي هو *0*.</p>
+
+		<h2>الوظائف (Methods)</h2>
+
+
+		<h3>[method:GainNode getInput]()</h3>
+		<p>
+		ترجع قيمة [page:AudioListener.gain gainNode].
+		</p>
+
+		<h3>[method:AudioListener removeFilter]()</h3>
+		<p>
+		اضبط قيمة [page:AudioListener.filter filter] على *null*.
+		</p>
+
+		<h3>[method:AudioNode getFilter]()</h3>
+		<p>
+		ترجع قيمة الخاصة بـ[page:AudioListener.filter filter].
+		</p>
+
+		<h3>[method:AudioListener setFilter]( [param:AudioNode value] )</h3>
+		<p>
+		تقوم بتعيين خاصية [page:AudioListener.filter filter] إلى *value*.
+		</p>
+
+		<h3>[method:Float getMasterVolume]()</h3>
+		<p>
+		إعادة *volume*.
+		</p>
+
+		<h3>[method:AudioListener setMasterVolume]( [param:Number value] )</h3>
+		<p>
+		ضبط مستوى الصوت (volume).
+		</p>
+
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
