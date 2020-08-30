@@ -3,27 +3,27 @@
 
 <head>
 
-  <head>
-    <title>three.js webgl - postprocessing - Screen Space Reflection</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="main.css">
-  </head>
+	<head>
+		<title>three.js webgl - postprocessing - Screen Space Reflection</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
 
 <body>
-<div id="info">
-  <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-  SSRPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
-  based on <a href="https://threejs.org/examples/?q=physic#webgl_shading_physical" target="_blank">this scene</a>
-</div>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
+		SSRPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
+		based on <a href="https://threejs.org/examples/?q=physic#webgl_shading_physical" target="_blank">this scene</a>
+	</div>
 
-<!-- <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
+	<!-- <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
 <script>
   var vConsole = new VConsole();
 </script> -->
-<script type="module">
+	<script type="module">
 
-  import * as THREE from '../build/three.module.js';
+		import * as THREE from '../build/three.module.js';
 
 	import Stats from './jsm/libs/stats.module.js';
 
@@ -272,7 +272,17 @@
 		// composer
 
 		composer = new EffectComposer(renderer);
-		ssrPass = new SSRPass(scene, camera, innerWidth, innerHeight);
+		ssrPass = new SSRPass(
+			scene, 
+			camera, 
+		   	innerWidth,
+			innerHeight,
+			[
+				scene.children[3],
+				scene.children[4],
+				scene.children[10],
+			]
+		);
 		composer.addPass(ssrPass);
 
 		// GUI

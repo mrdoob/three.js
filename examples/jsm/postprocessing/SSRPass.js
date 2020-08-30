@@ -31,7 +31,7 @@ import { SSRBlurShader } from "../shaders/SSRShader.js";
 import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var SSRPass = function(scene, camera, width, height) {
+var SSRPass = function(scene, camera, width, height,selects) {
 
   Pass.call(this);
 
@@ -48,6 +48,9 @@ var SSRPass = function(scene, camera, width, height) {
 
   this.maxDistance = 900;
   this.surfDist = 1.
+
+  this.selects=selects
+  this.isSelective=this.selects.length>0
 
   // beauty render target with depth buffer
 
@@ -74,11 +77,13 @@ var SSRPass = function(scene, camera, width, height) {
 
   // metalness render target
 
-  this.metalnessRenderTarget = new WebGLRenderTarget(this.width, this.height, {
-  	minFilter: NearestFilter,
-  	magFilter: NearestFilter,
-  	format: RGBAFormat
-  });
+  if(this.isSelective){
+    this.metalnessRenderTarget = new WebGLRenderTarget(this.width, this.height, {
+      minFilter: NearestFilter,
+      magFilter: NearestFilter,
+      format: RGBAFormat
+    });
+  }
 
 
 
@@ -111,7 +116,10 @@ var SSRPass = function(scene, camera, width, height) {
 
   this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
   this.ssrMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
-  this.ssrMaterial.uniforms['tMetalness'].value = this.metalnessRenderTarget.texture;
+  if (this.isSelective){
+    this.ssrMaterial.uniforms['isSelective'].value = true;
+    this.ssrMaterial.uniforms['tMetalness'].value = this.metalnessRenderTarget.texture;
+  }
   this.ssrMaterial.uniforms['tDepth'].value = this.beautyRenderTarget.depthTexture;
   this.ssrMaterial.uniforms['cameraNear'].value = this.camera.near;
   this.ssrMaterial.uniforms['cameraFar'].value = this.camera.far;
@@ -125,17 +133,19 @@ var SSRPass = function(scene, camera, width, height) {
   this.normalMaterial = new MeshNormalMaterial();
   this.normalMaterial.blending = NoBlending;
 
-  // metalnessOn material
+  if (this.isSelective) {
+  	// metalnessOn material
 
-  this.metalnessOnMaterial = new MeshBasicMaterial({
-    color:'white'
-  });
+    this.metalnessOnMaterial = new MeshBasicMaterial({
+      color:'white'
+    });
 
-  // metalnessOff material
+    // metalnessOff material
 
-  this.metalnessOffMaterial = new MeshBasicMaterial({
-  	color: 'black'
-  });
+    this.metalnessOffMaterial = new MeshBasicMaterial({
+      color: 'black'
+    });
+  }
 
 
 
@@ -195,15 +205,17 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     this.beautyRenderTarget.dispose();
     this.normalRenderTarget.dispose();
-    this.metalnessRenderTarget.dispose();
+    if (this.isSelective) this.metalnessRenderTarget.dispose();
     this.ssrRenderTarget.dispose();
     this.blurRenderTarget.dispose();
 
     // dispose materials
 
     this.normalMaterial.dispose();
-    this.metalnessOnMaterial.dispose();
-    this.metalnessOffMaterial.dispose();
+    if (this.isSelective) {
+      this.metalnessOnMaterial.dispose();
+      this.metalnessOffMaterial.dispose();
+    }
     this.blurMaterial.dispose();
     this.copyMaterial.dispose();
     this.depthRenderMaterial.dispose();
@@ -228,7 +240,9 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render metalnesses
 
-    this.renderMetalness(renderer, this.metalnessOnMaterial, this.metalnessRenderTarget, 0, 0);
+    if (this.isSelective) {
+      this.renderMetalness(renderer, this.metalnessOnMaterial, this.metalnessRenderTarget, 0, 0);
+    }
 
     // render SSR
 
@@ -404,8 +418,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
   	}
 
     this.scene.traverse(child=>{
-      child._material=child.material
-      if(child===this.scene.children[3]){
+      child._SSRPassMaterialBack=child.material
+      if(this.selects.includes(child)){
         child.material=this.metalnessOnMaterial
       }else{
         child.material=this.metalnessOffMaterial
@@ -413,7 +427,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     })
   	renderer.render(this.scene, this.camera);
   	this.scene.traverse(child => {
-  		child.material = child._material
+  		child.material = child._SSRPassMaterialBack
   	})
 
   	// restore original state
@@ -434,7 +448,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.beautyRenderTarget.setSize(width, height);
     this.ssrRenderTarget.setSize(width, height);
     this.normalRenderTarget.setSize(width, height);
-    this.metalnessRenderTarget.setSize(width, height);
+    if (this.isSelective) this.metalnessRenderTarget.setSize(width, height);
     this.blurRenderTarget.setSize(width, height);
 
     this.ssrMaterial.uniforms['resolution'].value.set(width, height);
