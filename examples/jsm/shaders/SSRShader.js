@@ -17,6 +17,7 @@ var SSRShader = {
 
     "tDiffuse": { value: null },
     "tNormal": { value: null },
+    "tMetalness": { value: null },
     "tDepth": { value: null },
     "cameraNear": { value: null },
     "cameraFar": { value: null },
@@ -51,6 +52,7 @@ var SSRShader = {
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
+		uniform sampler2D tMetalness;
 		uniform sampler2D tDiffuse;
 		uniform float cameraRange;
 		uniform vec2 resolution;
