@@ -547,6 +547,7 @@ function UINumber( number ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
+	dom.style.cursor = 'ns-resize';
 	dom.className = 'Number';
 	dom.value = '0.00';
 
@@ -690,7 +691,7 @@ function UINumber( number ) {
 	function onBlur() {
 
 		dom.style.backgroundColor = 'transparent';
-		dom.style.cursor = 'col-resize';
+		dom.style.cursor = 'ns-resize';
 
 	}
 
@@ -812,6 +813,7 @@ function UIInteger( number ) {
 	var scope = this;
 
 	var dom = document.createElement( 'input' );
+	dom.style.cursor = 'ns-resize';
 	dom.className = 'Number';
 	dom.value = '0';
 
@@ -903,7 +905,7 @@ function UIInteger( number ) {
 	function onBlur() {
 
 		dom.style.backgroundColor = 'transparent';
-		dom.style.cursor = 'col-resize';
+		dom.style.cursor = 'ns-resize';
 
 	}
 
