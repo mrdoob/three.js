@@ -7,37 +7,41 @@ function Resizer( editor ) {
 	const dom = document.createElement( 'div' );
 	dom.id = 'resizer';
 
-	let isPointerDown = false;
+	function onPointerDown( event ) {
 
-	dom.addEventListener( 'pointerdown', function ( event ) {
+		if ( event.isPrimary === false ) return;
 
-		if ( event.isPrimary ) isPointerDown = true;
+		dom.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
+		dom.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
 
-	} );
+	}
 
-	dom.ownerDocument.addEventListener( 'pointermove', function ( event ) {
+	function onPointerUp( event ) {
 
-		if ( event.isPrimary && isPointerDown ) {
+		if ( event.isPrimary === false ) return;
 
-			const rect = dom.getBoundingClientRect();
-			const x = ( document.body.offsetWidth - rect.right ) - event.movementX;
+		dom.ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+		dom.ownerDocument.removeEventListener( 'pointerup', onPointerUp );
 
-			dom.style.right = x + 'px';
+	}
 
-			document.getElementById( 'sidebar' ).style.width = ( x + rect.width ) + 'px';
-			document.getElementById( 'viewport' ).style.right = ( x + rect.width ) + 'px';
+	function onPointerMove( event ) {
 
-			signals.windowResize.dispatch();
+		if ( event.isPrimary === false ) return;
 
-		}
+		const rect = dom.getBoundingClientRect();
+		const x = ( document.body.offsetWidth - rect.right ) - event.movementX;
 
-	} );
+		dom.style.right = x + 'px';
 
-	dom.ownerDocument.addEventListener( 'pointerup', function ( event ) {
+		document.getElementById( 'sidebar' ).style.width = ( x + rect.width ) + 'px';
+		document.getElementById( 'viewport' ).style.right = ( x + rect.width ) + 'px';
 
-		if ( event.isPrimary ) isPointerDown = false;
+		signals.windowResize.dispatch();
 
-	} );
+	}
+
+	dom.addEventListener( 'pointerdown', onPointerDown, false );
 
 	return new UIElement( dom );
 
