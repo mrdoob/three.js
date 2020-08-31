@@ -7,6 +7,10 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 
+			html, body {
+				touch-action: none;
+			}
+
 			.container {
 				position: absolute;
 				width: 100%;
@@ -137,46 +141,51 @@
 
 				var slider = document.querySelector( '.slider' );
 
-				var clicked = false;
+				var isPointerDown = false;
 
 				function slideReady() {
 
-					clicked = true;
-					controls.enabled = false;
+					if ( event.isPrimary ) {
+
+						isPointerDown = true;
+						controls.enabled = false;
+
+					}
 
 				}
 
 				function slideFinish() {
 
-					clicked = false;
-					controls.enabled = true;
+					if ( event.isPrimary ) {
+
+						isPointerDown = false;
+						controls.enabled = true;
+
+					}
 
 				}
 
 				function slideMove( e ) {
 
-					if ( ! clicked ) return false;
+					if ( event.isPrimary && isPointerDown ) {
 
-					sliderMoved = true;
+						sliderMoved = true;
 
-					sliderPos = ( e.pageX === undefined ) ? e.touches[ 0 ].pageX : e.pageX;
+						sliderPos = e.pageX;
 
-					//prevent the slider from being positioned outside the window bounds
-					if ( sliderPos < 0 ) sliderPos = 0;
-					if ( sliderPos > window.innerWidth ) sliderPos = window.innerWidth;
+						//prevent the slider from being positioned outside the window bounds
+						if ( sliderPos < 0 ) sliderPos = 0;
+						if ( sliderPos > window.innerWidth ) sliderPos = window.innerWidth;
 
-					slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + "px";
+						slider.style.left = sliderPos - ( slider.offsetWidth / 2 ) + "px";
+
+					}
 
 				}
 
-				slider.addEventListener( 'mousedown', slideReady );
-				slider.addEventListener( 'touchstart', slideReady );
-
-				window.addEventListener( 'mouseup', slideFinish );
-				window.addEventListener( 'touchend', slideFinish );
-
-				window.addEventListener( 'mousemove', slideMove );
-				window.addEventListener( 'touchmove', slideMove );
+				slider.addEventListener( 'pointerdown', slideReady );
+				window.addEventListener( 'pointerup', slideFinish );
+				window.addEventListener( 'pointermove', slideMove );
 
 			}
 
