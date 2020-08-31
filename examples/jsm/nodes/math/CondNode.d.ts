@@ -22,5 +22,7 @@ export class CondNode extends TempNode {
 	static GREATER_EQUAL: string;
 	static LESS: string;
 	static LESS_EQUAL: string;
+	static AND: string;
+	static OR: string;
 
 }
