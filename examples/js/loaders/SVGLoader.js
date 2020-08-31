@@ -698,11 +698,11 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			var cxp = q * rx * y1p / ry;
 			var cyp = - q * ry * x1p / rx;
 
-			// Step 3: Compute (cx, cy) from (cxâ², cyâ²)
+			// Step 3: Compute (cx, cy) from (cx', cy')
 			var cx = Math.cos( x_axis_rotation ) * cxp - Math.sin( x_axis_rotation ) * cyp + ( start.x + end.x ) / 2;
 			var cy = Math.sin( x_axis_rotation ) * cxp + Math.cos( x_axis_rotation ) * cyp + ( start.y + end.y ) / 2;
 
-			// Step 4: Compute Î¸1 and ÎÎ¸
+			// Step 4: Compute θ1 and Δθ
 			var theta = svgAngle( 1, 0, ( x1p - cxp ) / rx, ( y1p - cyp ) / ry );
 			var delta = svgAngle( ( x1p - cxp ) / rx, ( y1p - cyp ) / ry, ( - x1p - cxp ) / rx, ( - y1p - cyp ) / ry ) % ( Math.PI * 2 );
 
