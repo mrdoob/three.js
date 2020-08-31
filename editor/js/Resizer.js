@@ -27,6 +27,8 @@ function Resizer( editor ) {
 
 	function onPointerMove( event ) {
 
+		// PointerEvent's movementX/movementY are 0 in WebKit
+
 		if ( event.isPrimary === false ) return;
 
 		const rect = dom.getBoundingClientRect();
