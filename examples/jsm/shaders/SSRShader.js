@@ -10,7 +10,6 @@ import {
 var SSRShader = {
 
   defines: {
-    "PERSPECTIVE_CAMERA": 1,
   },
 
   uniforms: {
@@ -29,6 +28,7 @@ var SSRShader = {
     "cameraRange": { value: 0 },
     "surfDist": { value: 0 },
     "isSelective": { value: null },
+    "isPerspectiveCamera": { value: null },
 
   },
 
@@ -65,25 +65,18 @@ var SSRShader = {
 		uniform float surfDist;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
+		uniform bool isPerspectiveCamera;
 		#include <packing>
 		float getDepth( const in vec2 screenPosition ) {
 			return texture2D( tDepth, screenPosition ).x;
 		}
 		float getLinearDepth( const in vec2 screenPosition ) {
-			#if PERSPECTIVE_CAMERA == 1
-				float fragCoordZ = texture2D( tDepth, screenPosition ).x;
-				float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
-				return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
-			#else
-				return texture2D( tDepth, screenPosition ).x;
-			#endif
+			float fragCoordZ = texture2D( tDepth, screenPosition ).x;
+			float viewZ = perspectiveDepthToViewZ( fragCoordZ, cameraNear, cameraFar );
+			return viewZToOrthographicDepth( viewZ, cameraNear, cameraFar );
 		}
 		float getViewZ( const in float depth ) {
-			#if PERSPECTIVE_CAMERA == 1
-				return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
-			#else
-				return orthographicDepthToViewZ( depth, cameraNear, cameraFar );
-			#endif
+			return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
 		}
 		vec3 getViewPosition( const in vec2 screenPosition, const in float depth, const in float viewZ, const in float clipW ) {
 			vec4 clipPosition = vec4( ( vec3( screenPosition, depth ) - 0.5 ) * 2.0, 1.0 );
@@ -128,8 +121,13 @@ var SSRShader = {
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 
-			vec3 viewNormal=getViewNormal( vUv );;
-			vec3 viewReflectDir=reflect(normalize(viewPosition),viewNormal);
+			vec3 viewNormal=getViewNormal( vUv );
+			vec3 viewReflectDir;
+			if(isPerspectiveCamera){
+				viewReflectDir=reflect(normalize(viewPosition),viewNormal);
+			}else{
+				viewReflectDir=reflect(vec3(0,0,-1),viewNormal);
+			}
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
 			// if(d1viewPosition.z>=.0) return;
 			if(d1viewPosition.z>-cameraNear){

@@ -31,7 +31,7 @@ import { SSRBlurShader } from "../shaders/SSRShader.js";
 import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var SSRPass = function({ scene, camera, width, height, selects, encoding }) {
+var SSRPass = function({ scene, camera, width, height, selects, encoding, isPerspectiveCamera = true }) {
 
   Pass.call(this);
 
@@ -129,6 +129,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding }) {
   this.ssrMaterial.uniforms['resolution'].value.set(this.width, this.height);
   this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
   this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
+  this.ssrMaterial.uniforms['isPerspectiveCamera'].value = isPerspectiveCamera
 
   // normal material
 
