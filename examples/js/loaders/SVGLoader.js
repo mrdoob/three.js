@@ -665,13 +665,13 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 			rx = Math.abs( rx );
 			ry = Math.abs( ry );
 
-			// Compute (x1â², y1â²)
+			// Compute (x1', y1')
 			var dx2 = ( start.x - end.x ) / 2.0;
 			var dy2 = ( start.y - end.y ) / 2.0;
 			var x1p = Math.cos( x_axis_rotation ) * dx2 + Math.sin( x_axis_rotation ) * dy2;
 			var y1p = - Math.sin( x_axis_rotation ) * dx2 + Math.cos( x_axis_rotation ) * dy2;
 
-			// Compute (cxâ², cyâ²)
+			// Compute (cx', cy')
 			var rxs = rx * rx;
 			var rys = ry * ry;
 			var x1ps = x1p * x1p;
