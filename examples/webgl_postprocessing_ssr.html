@@ -13,8 +13,8 @@
 <body>
 	<div id="info">
 		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
-		SSRPass demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
-		based on <a href="https://threejs.org/examples/?q=physic#webgl_shading_physical" target="_blank">this scene</a>
+		<a href="https://github.com/mrdoob/three.js/pull/20156" target="_blank" rel="noopener">SSRPass</a> demo by <a href="https://github.com/gonnavis" target="_blank">Vis</a>.<br />
+		based on <a href="https://threejs.org/examples/?q=physic#webgl_shading_physical" target="_blank" rel="noopener">this scene</a>
 	</div>
 
 <!-- <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
@@ -276,8 +276,8 @@
 		ssrPass = new SSRPass({
 			scene, 
 			camera, 
-			innerWidth, 
-			innerHeight,
+			width: innerWidth, 
+			height: innerHeight,
 			// encoding: THREE.sRGBEncoding,
 		});
 		composer.addPass(ssrPass);
@@ -304,7 +304,7 @@
 			'Beauty': SSRPass.OUTPUT.Beauty,
 			'Depth': SSRPass.OUTPUT.Depth,
 			'Normal': SSRPass.OUTPUT.Normal,
-			'Metalness': SSRPass.OUTPUT.Metalness,
+			// 'Metalness': SSRPass.OUTPUT.Metalness,
 		}).onChange(function (value) {
 
 			ssrPass.output = parseInt(value);

@@ -421,7 +421,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     }
 
-    this.scene.traverse(child => {
+    this.scene.traverseVisible(child => {
       child._SSRPassMaterialBack = child.material
       if (this.selects.includes(child)) {
         child.material = this.metalnessOnMaterial
@@ -430,7 +430,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
       }
     })
     renderer.render(this.scene, this.camera);
-    this.scene.traverse(child => {
+    this.scene.traverseVisible(child => {
       child.material = child._SSRPassMaterialBack
     })
 
