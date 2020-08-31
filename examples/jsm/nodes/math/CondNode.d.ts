@@ -4,13 +4,13 @@ import { Node } from '../core/Node';
 
 export class CondNode extends TempNode {
 
-	constructor( a: Node, b: Node, op: string, ifNode: Node, elseNode: Node );
+	constructor( a: Node, b: Node, op: string, ifNode?: Node, elseNode?: Node );
 
 	a: Node;
 	b: Node;
 	op: string;
-	ifNode: Node;
-	elseNode: Node;
+	ifNode: Node | undefined;
+	elseNode: Node | undefined;
 	nodeType: string;
 
 	getCondType( builder: NodeBuilder ): string;
