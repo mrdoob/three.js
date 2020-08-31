@@ -8,13 +8,13 @@ export class WebGLAttributes {
 
 	get( attribute: BufferAttribute | InterleavedBufferAttribute ): {
 		buffer: WebGLBuffer,
-		type: GLenum,
+		type: number,
 		bytesPerElement: number,
 		version: number
 	};
 
 	remove( attribute: BufferAttribute | InterleavedBufferAttribute ): void;
 
-	update( attribute: BufferAttribute | InterleavedBufferAttribute, bufferType: GLenum ): void;
+	update( attribute: BufferAttribute | InterleavedBufferAttribute, bufferType: number ): void;
 
 }
