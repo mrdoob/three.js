@@ -921,6 +921,8 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				if ( adjustFunction === undefined ) adjustFunction = function copy( v ) {
 
+					if ( v.startsWith( 'url' ) ) console.warn( "SVGLoader: url access in attributes is not implemented." );
+
 					return v;
 
 				};
