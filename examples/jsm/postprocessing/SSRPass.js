@@ -31,7 +31,7 @@ import { SSRBlurShader } from "../shaders/SSRShader.js";
 import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var SSRPass = function(scene, camera, width, height,selects) {
+var SSRPass = function({ scene, camera, width, height, selects, encoding }) {
 
   Pass.call(this);
 
@@ -49,8 +49,10 @@ var SSRPass = function(scene, camera, width, height,selects) {
   this.maxDistance = 900;
   this.surfDist = 1.
 
-  this.selects=selects
-  this.isSelective=this.selects?this.selects.length>0:false
+  this.selects = selects
+  this.isSelective = Array.isArray(this.selects)
+
+  this.encoding = encoding
 
   // beauty render target with depth buffer
 
@@ -77,7 +79,7 @@ var SSRPass = function(scene, camera, width, height,selects) {
 
   // metalness render target
 
-  if(this.isSelective){
+  if (this.isSelective) {
     this.metalnessRenderTarget = new WebGLRenderTarget(this.width, this.height, {
       minFilter: NearestFilter,
       magFilter: NearestFilter,
@@ -116,7 +118,7 @@ var SSRPass = function(scene, camera, width, height,selects) {
 
   this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
   this.ssrMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
-  if (this.isSelective){
+  if (this.isSelective) {
     this.ssrMaterial.uniforms['isSelective'].value = true;
     this.ssrMaterial.uniforms['tMetalness'].value = this.metalnessRenderTarget.texture;
   }
@@ -134,10 +136,10 @@ var SSRPass = function(scene, camera, width, height,selects) {
   this.normalMaterial.blending = NoBlending;
 
   if (this.isSelective) {
-  	// metalnessOn material
+    // metalnessOn material
 
     this.metalnessOnMaterial = new MeshBasicMaterial({
-      color:'white'
+      color: 'white'
     });
 
     // metalnessOff material
@@ -230,6 +232,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render beauty and depth
 
+    if (this.encoding) this.beautyRenderTarget.texture.encoding = this.encoding
     renderer.setRenderTarget(this.beautyRenderTarget);
     renderer.clear();
     renderer.render(this.scene, this.camera);
@@ -397,44 +400,44 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
   },
 
-  renderMetalness: function (renderer, overrideMaterial, renderTarget, clearColor, clearAlpha) {
+  renderMetalness: function(renderer, overrideMaterial, renderTarget, clearColor, clearAlpha) {
 
-  	this.originalClearColor.copy(renderer.getClearColor());
-  	var originalClearAlpha = renderer.getClearAlpha();
-  	var originalAutoClear = renderer.autoClear;
+    this.originalClearColor.copy(renderer.getClearColor());
+    var originalClearAlpha = renderer.getClearAlpha();
+    var originalAutoClear = renderer.autoClear;
 
-  	renderer.setRenderTarget(renderTarget);
-  	renderer.autoClear = false;
+    renderer.setRenderTarget(renderTarget);
+    renderer.autoClear = false;
 
-  	clearColor = overrideMaterial.clearColor || clearColor;
-  	clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
+    clearColor = overrideMaterial.clearColor || clearColor;
+    clearAlpha = overrideMaterial.clearAlpha || clearAlpha;
 
-  	if ((clearColor !== undefined) && (clearColor !== null)) {
+    if ((clearColor !== undefined) && (clearColor !== null)) {
 
-  		renderer.setClearColor(clearColor);
-  		renderer.setClearAlpha(clearAlpha || 0.0);
-  		renderer.clear();
+      renderer.setClearColor(clearColor);
+      renderer.setClearAlpha(clearAlpha || 0.0);
+      renderer.clear();
 
-  	}
+    }
 
-    this.scene.traverse(child=>{
-      child._SSRPassMaterialBack=child.material
-      if(this.selects.includes(child)){
-        child.material=this.metalnessOnMaterial
-      }else{
-        child.material=this.metalnessOffMaterial
+    this.scene.traverse(child => {
+      child._SSRPassMaterialBack = child.material
+      if (this.selects.includes(child)) {
+        child.material = this.metalnessOnMaterial
+      } else {
+        child.material = this.metalnessOffMaterial
       }
     })
-  	renderer.render(this.scene, this.camera);
-  	this.scene.traverse(child => {
-  		child.material = child._SSRPassMaterialBack
-  	})
+    renderer.render(this.scene, this.camera);
+    this.scene.traverse(child => {
+      child.material = child._SSRPassMaterialBack
+    })
 
-  	// restore original state
+    // restore original state
 
-  	renderer.autoClear = originalAutoClear;
-  	renderer.setClearColor(this.originalClearColor);
-  	renderer.setClearAlpha(originalClearAlpha);
+    renderer.autoClear = originalAutoClear;
+    renderer.setClearColor(this.originalClearColor);
+    renderer.setClearAlpha(originalClearAlpha);
 
   },
 

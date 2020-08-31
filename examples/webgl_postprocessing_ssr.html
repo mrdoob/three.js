@@ -17,13 +17,13 @@
 		based on <a href="https://threejs.org/examples/?q=physic#webgl_shading_physical" target="_blank">this scene</a>
 	</div>
 
-	<!-- <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
+<!-- <script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.3.4/vconsole.min.js"></script>
 <script>
   var vConsole = new VConsole();
 </script> -->
-	<script type="module">
+<script type="module">
 
-		import * as THREE from '../build/three.module.js';
+	import * as THREE from '../build/three.module.js';
 
 	import Stats from './jsm/libs/stats.module.js';
 
@@ -37,6 +37,7 @@
 
 	var params = {
 		enableSSR: true,
+		darken: true,
 	}
 	var composer
 	var ssrPass
@@ -272,7 +273,13 @@
 		// composer
 
 		composer = new EffectComposer(renderer);
-		ssrPass = new SSRPass(scene, camera, innerWidth, innerHeight);
+		ssrPass = new SSRPass({
+			scene, 
+			camera, 
+			innerWidth, 
+			innerHeight,
+			// encoding: THREE.sRGBEncoding,
+		});
 		composer.addPass(ssrPass);
 
 		// GUI
@@ -281,6 +288,14 @@
 		// ssrPass.surfDist=4.2
 		ssrPass.surfDist=.007
 		// ssrPass.output=SSRPass.OUTPUT.SSR
+		gui.add(params, 'enableSSR').name( 'Enable SSR' );
+		gui.add(params, 'darken').onChange(function(value){
+			if(value){
+				ssrPass.encoding = THREE.LinearEncoding
+			}else{
+				ssrPass.encoding = THREE.sRGBEncoding
+			}
+		});
 		gui.add(ssrPass, 'output', {
 			'Default': SSRPass.OUTPUT.Default,
 			'DefaultBlur': SSRPass.OUTPUT.DefaultBlur,
@@ -295,7 +310,6 @@
 			ssrPass.output = parseInt(value);
 
 		});
-		gui.add(params, 'enableSSR').name( 'Enable SSR' );
 		gui.add(ssrPass, 'opacity').min(0).max(1);
 		gui.add(ssrPass, 'maxDistance').min(0).max(2000);
 		// gui.add(ssrPass, 'surfDist').min(0).max(10).step(.1);
