@@ -131,13 +131,8 @@
 
 				}
 
+				slider.style.touchAction = 'none'; // disable touch scroll
 				slider.addEventListener( 'pointerdown', onPointerDown );
-
-				slider.addEventListener( 'touchstart', function ( event ) {
-
-					event.preventDefault(); // prevent scrolling
-
-				} );
 
 			}
 
