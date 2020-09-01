@@ -198,13 +198,14 @@ function testSizeAttenuation() {
 
 		if ( object.material.sizeAttenuation )
 			return;
-		if ( !this.distanceToCamera )
+		if ( ! this.distanceToCamera )
 			this.distanceToCamera = new Vector3().distanceTo( _ray.origin );
 		ray.lookAt( point ).at( this.distanceToCamera, point );
 
-	}
+	};
 
 }
+
 Points.testSizeAttenuation = new testSizeAttenuation();
 
 export { Points };
