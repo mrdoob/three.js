@@ -24,6 +24,23 @@ function Points( geometry, material ) {
 
 }
 
+function testSizeAttenuation() {
+
+	const ray = new Ray( _ray.origin );
+	this.distanceToCamera;
+	this.testPoint = function ( point, object ) {
+
+		if ( object.material.sizeAttenuation )
+			return;
+		if ( ! this.distanceToCamera )
+			this.distanceToCamera = new Vector3().distanceTo( _ray.origin );
+		ray.lookAt( point ).at( this.distanceToCamera, point );
+
+	}
+
+}
+const _testSizeAttenuation = new testSizeAttenuation();
+
 Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: Points,
@@ -154,14 +171,15 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-	}
+	},
+
+	testSizeAttenuation: _testSizeAttenuation
 
 } );
 
 function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 
-	if ( ! object.material.sizeAttenuation )
-		new Ray( _ray.origin ).lookAt( point ).at( new Vector3().distanceTo( _ray.origin ), point );
+	_testSizeAttenuation.testPoint( point, object );
 
 	const rayPointDistanceSq = _ray.distanceSqToPoint( point );
 
