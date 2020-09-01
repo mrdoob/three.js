@@ -1,237 +1,260 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>three.js webgl - raycaster</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<link type="text/css" rel="stylesheet" href="main.css">
-	</head>
+<head>
+	<title>three.js webgl - raycaster</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="https://threejs.org/examples/main.css">
+</head>
 
-	<body>
-		<div id="info">
-			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - raycaster. by <a href="https://github.com/anhr" target="_blank" rel="noopener">anhr</a>
-		</div>
+<body>
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - raycaster. by <a href="https://github.com/anhr" target="_blank" rel="noopener">anhr</a>
+	</div>
 
-		<script type="module">
+	<script type="module">
 
-			import * as THREE from '../build/three.module.js';
+		import * as THREE from '../build/three.module.js';
+		//import * as THREE from 'https://threejs.org/build/three.module.js';
+		//import * as THREE from 'http://localhost/anhr/three.js/dev/build/three.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { OrbitControls } from '../examples/jsm/controls/OrbitControls.js';
+		//import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
+		//import { OrbitControls } from 'http://localhost/anhr/three.js/dev/examples/jsm/controls/OrbitControls.js';
 
-			var camera, scene, renderer, raycaster, mouse, intersects;
-			const arrayintersectObjects = [];
+		var camera, scene, renderer, raycaster, mouse, intersects, controls;
+		const arrayintersectObjects = [];
 
-			init();
-			animate();
+		init();
+		animate();
 
-			function init() {
+		function init() {
 
-				scene = new THREE.Scene();
-				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+			scene = new THREE.Scene();
+			camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-				renderer = new THREE.WebGLRenderer();
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
+			renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
 
-				camera.position.z = 5;
+			camera.position.z = 5;
 
-				const controls = new OrbitControls( camera, renderer.domElement );
+			const points = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
+				new THREE.Vector3( 0.3, 0, 4.5 ),
+			] ),
+				new THREE.PointsMaterial( {
+
+					color: 0xffffff,
+					size: 5,//0.05,
+					sizeAttenuation: false,
+					alphaTest: 0.5,
+
+				} ) );
+			if ( points.testSizeAttenuation )
+				points.testSizeAttenuation.distanceToCamera = 2;
+			scene.add( points );
+
+			const pointsSizeAttenuation = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
+				new THREE.Vector3( -0.3, 0, 4.5 ),
+			] ),
+				new THREE.PointsMaterial( {
+
+					color: 0xffffff,
+					size: 0.2,//0.05,
+					sizeAttenuation: true,
+					alphaTest: 0.5,
+
+				} ) );
+			scene.add( pointsSizeAttenuation );
+			/*
+			const cube = new THREE.Mesh( new THREE.BoxGeometry(), new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) );
+			cube.position.x = 5;
+			scene.add( cube );
+			*/
+
+			if ( typeof OrbitControls !== 'undefined' ) {
+
+				controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.set( scene.position.x * 2, scene.position.y * 2, scene.position.z * 2 );
 				controls.update();
 
-				const points = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
-						new THREE.Vector3( 0.5, 0.2 , 4.5 ),
-						new THREE.Vector3( 2, -0.5 , -0.5 )
-					] ),
-					new THREE.PointsMaterial( {
+			}
 
-						color: 0xffffff,
-						size: 5,
-						sizeAttenuation: false,
-						alphaTest: 0.5,
+			//Raycaster
 
-					} ) );
-				scene.add( points );
+			const cursor = renderer.domElement.style.cursor;
+			function getIntersectionPosition( intersection ) { return new THREE.Vector3().fromArray( points.geometry.attributes.position.array, intersection.index * points.geometry.attributes.position.itemSize ); }
 
-				const pointsSizeAttenuation = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
-						new THREE.Vector3( -3, -0.5 ,0.5 ),
-						new THREE.Vector3( -5, 0.5 ,-0.5 )
-					] ),
-					new THREE.PointsMaterial( {
+			if ( typeof points !== 'undefined' ) {
 
-						color: 0xffffff,
-						size: 1,
-						sizeAttenuation: true,
-						alphaTest: 0.5,
+				points.userData.raycaster = {
 
-					} ) );
-				scene.add( pointsSizeAttenuation );
+					onIntersection: function ( intersection ) {
 
-				const cube = new THREE.Mesh( new THREE.BoxGeometry(), new THREE.MeshBasicMaterial( { color: 0x00ff00 } ) );
-				cube.position.x = 5;
-				scene.add( cube );
+						renderer.domElement.style.cursor = 'pointer';
 
-				//Raycaster
+					},
+					onIntersectionOut: function () {
 
-				const cursor = renderer.domElement.style.cursor;
-				if ( typeof points !== 'undefined' ) {
+						renderer.domElement.style.cursor = cursor;
 
-					points.userData.raycaster = {
+					},
+					onMouseDown: function ( intersect ) {
 
-						onIntersection: function ( intersection ) {
-
-							renderer.domElement.style.cursor = 'pointer';
-
-						},
-						onIntersectionOut: function () {
-
-							renderer.domElement.style.cursor = cursor;
-
-						},
-						onMouseDown: function ( intersect ) {
-
-							alert( 'You are clicked the point' );
-
-						}
+						//alert( 'You are clicked the point' );
+						console.log( 'You are clicked the point' );
 
 					}
-					arrayintersectObjects.push( points );
 
 				}
-
-				if ( typeof pointsSizeAttenuation !== 'undefined' ) {
-
-					pointsSizeAttenuation.userData.raycaster = {
-
-						onIntersection: function ( intersection ) {
-
-							renderer.domElement.style.cursor = 'pointer';
-
-						},
-						onIntersectionOut: function () {
-
-							renderer.domElement.style.cursor = cursor;
-
-						},
-						onMouseDown: function ( intersect ) {
-
-							alert( 'You are clicked the point with size attenuation' );
-
-						}
-
-					}
-					arrayintersectObjects.push( pointsSizeAttenuation );
-
-				}
-
-				if ( typeof cube !== 'undefined' ) {
-
-					cube.userData.raycaster = {
-
-						onIntersection: function ( intersection ) {
-
-							renderer.domElement.style.cursor = 'pointer';
-
-						},
-						onIntersectionOut: function () {
-
-							renderer.domElement.style.cursor = cursor;
-
-						},
-						onMouseDown: function ( intersect ) {
-
-							alert( 'You are clicked the cube' );
-
-						}
-
-					}
-					arrayintersectObjects.push( cube );
-
-				}
-
-				raycaster = new THREE.Raycaster();
-				raycaster.params.Points.threshold = 0.08;
-				mouse = new THREE.Vector2();
+				arrayintersectObjects.push( points );
 
 			}
 
-			var intersectedObject;
+			if ( typeof pointsSizeAttenuation !== 'undefined' ) {
 
-			window.addEventListener( 'mousemove', function( event ) {
+				pointsSizeAttenuation.userData.raycaster = {
 
-				// calculate mouse position in normalized device coordinates
-				// (-1 to +1) for both components
+					onIntersection: function ( intersection ) {
 
-				mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-				mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+						renderer.domElement.style.cursor = 'pointer';
 
-				//Raycaster
+					},
+					onIntersectionOut: function () {
 
-				// update the picking ray with the camera and mouse position
-				raycaster.setFromCamera( mouse, camera );
+						renderer.domElement.style.cursor = cursor;
 
-				// calculate objects intersecting the picking ray
-				intersects = raycaster.intersectObjects( arrayintersectObjects );
-				if ( !intersects )
-					return;
+					},
+					onMouseDown: function ( intersect ) {
 
-				arrayintersectObjects.forEach( function ( object ) {
-
-					if ( intersectedObject && ( intersects.length === 0 ) ) {
-
-						intersectedObject.userData.raycaster.onIntersectionOut();
-						intersectedObject = undefined;
+						//alert( 'You are clicked the point with size attenuation' );
+						console.log( 'You are clicked the point with size attenuation' );
 
 					}
-					else if ( !intersectedObject ) 
-						for ( var i = 0; i < intersects.length; i++ ) {
 
-							const intersect = intersects[ i ];
-							if ( Object.is( object, intersect.object ) ) {
+				}
+				arrayintersectObjects.push( pointsSizeAttenuation );
 
-								if ( object.userData.raycaster && object.userData.raycaster.onIntersection ) {
+			}
 
-									object.userData.raycaster.onIntersection( intersect );
-									intersectedObject = object;
-								}
+			if ( typeof cube !== 'undefined' ) {
+
+				cube.userData.raycaster = {
+
+					onIntersection: function ( intersection ) {
+
+						renderer.domElement.style.cursor = 'pointer';
+
+					},
+					onIntersectionOut: function () {
+
+						renderer.domElement.style.cursor = cursor;
+
+					},
+					onMouseDown: function ( intersect ) {
+
+						alert( 'You are clicked the cube' );
+
+					}
+
+				}
+				arrayintersectObjects.push( cube );
+
+			}
+
+			raycaster = new THREE.Raycaster();
+			raycaster.params.Points.threshold = 0.08;
+			mouse = new THREE.Vector2();
+
+		}
+
+		var intersectedObject;
+
+		window.addEventListener( 'mousemove', function ( event ) {
+
+			// calculate mouse position in normalized device coordinates
+			// (-1 to +1) for both components
+
+			mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+			mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+			//Raycaster https://threejs.org/docs/index.html#api/en/core/Raycaster
+
+			// update the picking ray with the camera and mouse position
+			raycaster.setFromCamera( mouse, camera );
+
+			// calculate objects intersecting the picking ray
+			intersects = raycaster.intersectObjects( arrayintersectObjects );
+			if ( !intersects )
+				return;
+
+			arrayintersectObjects.forEach( function ( object ) {
+
+				if ( intersectedObject && ( intersects.length === 0 ) ) {
+
+					intersectedObject.userData.raycaster.onIntersectionOut();
+					intersectedObject = undefined;
+
+				}
+				else if ( !intersectedObject )
+					for ( var i = 0; i < intersects.length; i++ ) {
+
+						const intersect = intersects[i];
+						if ( Object.is( object, intersect.object ) ) {
+
+							if ( object.userData.raycaster && object.userData.raycaster.onIntersection ) {
+
+								object.userData.raycaster.onIntersection( intersect );
+								intersectedObject = object;
 
 							}
 
 						}
 
-				} );
-
-			}, false );
-			window.addEventListener( 'mousedown', function( event ) {
-
-				if ( raycaster === undefined )
-					return;
-
-				if ( intersects.length > 0 ) {
-
-					if ( intersects[0].object.userData.raycaster ) {
-
-						const intersect = intersects[0];
-						intersect.object.userData.raycaster.onMouseDown( intersect );
-
 					}
+
+			} );
+
+		}, false );
+		window.addEventListener( 'mousedown', function ( event ) {
+
+			if ( raycaster === undefined )
+				return;
+
+			if ( intersects.length > 0 ) {
+
+				if ( intersects[0].object.userData.raycaster ) {
+
+					const intersect = intersects[0];
+					intersect.object.userData.raycaster.onMouseDown( intersect );
 
 				}
 
-			}, false );
-
-
-			//
-
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				renderer.render( scene, camera );
-
 			}
 
-		</script>
+		}, { capture: true } );
 
-	</body>
+		window.addEventListener( 'resize', onWindowResize, false );
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		//
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			renderer.render( scene, camera );
+
+		}
+
+	</script>
+
+</body>
 </html>
