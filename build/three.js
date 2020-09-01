@@ -6840,7 +6840,7 @@
 
 			}
 
-			this.updateMatrixWorld( true );
+			this.updateWorldMatrix( true, false );
 
 			return target.setFromMatrixPosition( this.matrixWorld );
 
@@ -6855,7 +6855,7 @@
 
 			}
 
-			this.updateMatrixWorld( true );
+			this.updateWorldMatrix( true, false );
 
 			this.matrixWorld.decompose( _position, target, _scale );
 
@@ -6872,7 +6872,7 @@
 
 			}
 
-			this.updateMatrixWorld( true );
+			this.updateWorldMatrix( true, false );
 
 			this.matrixWorld.decompose( _position, _quaternion$2, target );
 
@@ -6889,7 +6889,7 @@
 
 			}
 
-			this.updateMatrixWorld( true );
+			this.updateWorldMatrix( true, false );
 
 			var e = this.matrixWorld.elements;
 
