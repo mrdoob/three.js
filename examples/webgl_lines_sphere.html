@@ -63,9 +63,8 @@
 				renderer.setSize( SCREEN_WIDTH, SCREEN_HEIGHT );
 				document.body.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				document.body.style.touchAction = 'none';
+				document.body.addEventListener( 'pointermove', onPointerMove, false );
 
 				//
 
@@ -132,33 +131,11 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				mouseY = event.clientY - windowHalfY;
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length > 1 ) {
-
-					event.preventDefault();
-
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
 
 			}
 

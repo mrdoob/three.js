@@ -192,9 +192,9 @@
 
 				// EVENTS
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointerdown', onPointerDown, false );
+
 				document.addEventListener( 'keypress', onDocumentKeyPress, false );
 				document.addEventListener( 'keydown', onDocumentKeyDown, false );
 
@@ -444,20 +444,21 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
+			function onPointerDown( event ) {
 
-				event.preventDefault();
-
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'mouseout', onDocumentMouseOut, false );
+				if ( event.isPrimary === false ) return;
 
 				mouseXOnMouseDown = event.clientX - windowHalfX;
 				targetRotationOnMouseDown = targetRotation;
 
+				document.addEventListener( 'pointermove', onPointerMove, false );
+				document.addEventListener( 'pointerup', onPointerUp, false );
+
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				mouseX = event.clientX - windowHalfX;
 
@@ -465,45 +466,12 @@
 
 			}
 
-			function onDocumentMouseUp() {
+			function onPointerUp() {
 
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
+				if ( event.isPrimary === false ) return;
 
-			}
-
-			function onDocumentMouseOut() {
-
-				document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.removeEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.removeEventListener( 'mouseout', onDocumentMouseOut, false );
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotationOnMouseDown = targetRotation;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length == 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.05;
-
-				}
+				document.removeEventListener( 'pointermove', onPointerMove );
+				document.removeEventListener( 'pointerup', onPointerUp );
 
 			}
 

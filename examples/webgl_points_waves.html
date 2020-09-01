@@ -128,9 +128,8 @@
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointermove', onPointerMove, false );
 
 				//
 
@@ -152,36 +151,12 @@
 
 			//
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				mouseX = event.clientX - windowHalfX;
 				mouseY = event.clientY - windowHalfY;
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					mouseX = event.touches[ 0 ].pageX - windowHalfX;
-					mouseY = event.touches[ 0 ].pageY - windowHalfY;
-
-				}
 
 			}
 
@@ -214,8 +189,8 @@
 						positions[ i + 1 ] = ( Math.sin( ( ix + count ) * 0.3 ) * 50 ) +
 										( Math.sin( ( iy + count ) * 0.5 ) * 50 );
 
-						scales[ j ] = ( Math.sin( ( ix + count ) * 0.3 ) + 1 ) * 8 +
-										( Math.sin( ( iy + count ) * 0.5 ) + 1 ) * 8;
+						scales[ j ] = ( Math.sin( ( ix + count ) * 0.3 ) + 1 ) * 20 +
+										( Math.sin( ( iy + count ) * 0.5 ) + 1 ) * 20;
 
 						i += 3;
 						j ++;
