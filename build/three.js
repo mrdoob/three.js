@@ -97,7 +97,7 @@
 
 	}
 
-	var REVISION = '120';
+	var REVISION = '121dev';
 	var MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 	var TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 	var CullFaceNone = 0;
@@ -3929,8 +3929,8 @@
 
 	};
 
-	var _vector = new Vector3();
-	var _quaternion = new Quaternion();
+	var _vector = /*@__PURE__*/ new Vector3();
+	var _quaternion = /*@__PURE__*/ new Quaternion();
 
 	var Box3 = function Box3( min, max ) {
 
@@ -4447,38 +4447,38 @@
 	}
 
 	var _points = [
-		new Vector3(),
-		new Vector3(),
-		new Vector3(),
-		new Vector3(),
-		new Vector3(),
-		new Vector3(),
-		new Vector3(),
-		new Vector3()
+		/*@__PURE__*/ new Vector3(),
+		/*@__PURE__*/ new Vector3(),
+		/*@__PURE__*/ new Vector3(),
+		/*@__PURE__*/ new Vector3(),
+		/*@__PURE__*/ new Vector3(),
+		/*@__PURE__*/ new Vector3(),
+		/*@__PURE__*/ new Vector3(),
+		/*@__PURE__*/ new Vector3()
 	];
 
-	var _vector$1 = new Vector3();
+	var _vector$1 = /*@__PURE__*/ new Vector3();
 
-	var _box = new Box3();
+	var _box = /*@__PURE__*/ new Box3();
 
 	// triangle centered vertices
 
-	var _v0 = new Vector3();
-	var _v1 = new Vector3();
-	var _v2 = new Vector3();
+	var _v0 = /*@__PURE__*/ new Vector3();
+	var _v1 = /*@__PURE__*/ new Vector3();
+	var _v2 = /*@__PURE__*/ new Vector3();
 
 	// triangle edge vectors
 
-	var _f0 = new Vector3();
-	var _f1 = new Vector3();
-	var _f2 = new Vector3();
+	var _f0 = /*@__PURE__*/ new Vector3();
+	var _f1 = /*@__PURE__*/ new Vector3();
+	var _f2 = /*@__PURE__*/ new Vector3();
 
-	var _center = new Vector3();
-	var _extents = new Vector3();
-	var _triangleNormal = new Vector3();
-	var _testAxis = new Vector3();
+	var _center = /*@__PURE__*/ new Vector3();
+	var _extents = /*@__PURE__*/ new Vector3();
+	var _triangleNormal = /*@__PURE__*/ new Vector3();
+	var _testAxis = /*@__PURE__*/ new Vector3();
 
-	var _box$1 = new Box3();
+	var _box$1 = /*@__PURE__*/ new Box3();
 
 	var Sphere = function Sphere( center, radius ) {
 
@@ -4657,14 +4657,14 @@
 
 	};
 
-	var _vector$2 = new Vector3();
-	var _segCenter = new Vector3();
-	var _segDir = new Vector3();
-	var _diff = new Vector3();
+	var _vector$2 = /*@__PURE__*/ new Vector3();
+	var _segCenter = /*@__PURE__*/ new Vector3();
+	var _segDir = /*@__PURE__*/ new Vector3();
+	var _diff = /*@__PURE__*/ new Vector3();
 
-	var _edge1 = new Vector3();
-	var _edge2 = new Vector3();
-	var _normal = new Vector3();
+	var _edge1 = /*@__PURE__*/ new Vector3();
+	var _edge2 = /*@__PURE__*/ new Vector3();
+	var _normal = /*@__PURE__*/ new Vector3();
 
 	var Ray = function Ray( origin, direction ) {
 
@@ -6025,13 +6025,13 @@
 
 	};
 
-	var _v1$1 = new Vector3();
-	var _m1 = new Matrix4();
-	var _zero = new Vector3( 0, 0, 0 );
-	var _one = new Vector3( 1, 1, 1 );
-	var _x = new Vector3();
-	var _y = new Vector3();
-	var _z = new Vector3();
+	var _v1$1 = /*@__PURE__*/ new Vector3();
+	var _m1 = /*@__PURE__*/ new Matrix4();
+	var _zero = /*@__PURE__*/ new Vector3( 0, 0, 0 );
+	var _one = /*@__PURE__*/ new Vector3( 1, 1, 1 );
+	var _x = /*@__PURE__*/ new Vector3();
+	var _y = /*@__PURE__*/ new Vector3();
+	var _z = /*@__PURE__*/ new Vector3();
 
 	var Euler = function Euler( x, y, z, order ) {
 		if ( x === void 0 ) x = 0;
@@ -6358,8 +6358,8 @@
 	Euler.DefaultOrder = 'XYZ';
 	Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
-	var _matrix = new Matrix4();
-	var _quaternion$1 = new Quaternion();
+	var _matrix = /*@__PURE__*/ new Matrix4();
+	var _quaternion$1 = /*@__PURE__*/ new Quaternion();
 
 	var Layers = function Layers() {
 
@@ -7255,9 +7255,9 @@
 
 	} );
 
-	var _vector1 = new Vector3();
-	var _vector2 = new Vector3();
-	var _normalMatrix = new Matrix3();
+	var _vector1 = /*@__PURE__*/ new Vector3();
+	var _vector2 = /*@__PURE__*/ new Vector3();
+	var _normalMatrix = /*@__PURE__*/ new Matrix3();
 
 	var Plane = function Plane( normal, constant ) {
 
@@ -7473,17 +7473,17 @@
 
 	};
 
-	var _v0$1 = new Vector3();
-	var _v1$3 = new Vector3();
-	var _v2$1 = new Vector3();
-	var _v3 = new Vector3();
+	var _v0$1 = /*@__PURE__*/ new Vector3();
+	var _v1$3 = /*@__PURE__*/ new Vector3();
+	var _v2$1 = /*@__PURE__*/ new Vector3();
+	var _v3 = /*@__PURE__*/ new Vector3();
 
-	var _vab = new Vector3();
-	var _vac = new Vector3();
-	var _vbc = new Vector3();
-	var _vap = new Vector3();
-	var _vbp = new Vector3();
-	var _vcp = new Vector3();
+	var _vab = /*@__PURE__*/ new Vector3();
+	var _vac = /*@__PURE__*/ new Vector3();
+	var _vbc = /*@__PURE__*/ new Vector3();
+	var _vap = /*@__PURE__*/ new Vector3();
+	var _vbp = /*@__PURE__*/ new Vector3();
+	var _vcp = /*@__PURE__*/ new Vector3();
 
 	var Triangle = function Triangle( a, b, c ) {
 
@@ -13805,8 +13805,8 @@
 
 	DataTexture.prototype.isDataTexture = true;
 
-	var _sphere$1 = new Sphere();
-	var _vector$5 = new Vector3();
+	var _sphere$1 = /*@__PURE__*/ new Sphere();
+	var _vector$5 = /*@__PURE__*/ new Vector3();
 
 	var Frustum = function Frustum( p0, p1, p2, p3, p4, p5 ) {
 
@@ -42426,10 +42426,10 @@
 
 	};
 
-	var _position$2 = new Vector3();
-	var _quaternion$3 = new Quaternion();
-	var _scale$1 = new Vector3();
-	var _orientation = new Vector3();
+	var _position$2 = /*@__PURE__*/ new Vector3();
+	var _quaternion$3 = /*@__PURE__*/ new Quaternion();
+	var _scale$1 = /*@__PURE__*/ new Vector3();
+	var _orientation = /*@__PURE__*/ new Vector3();
 
 		function AudioListener() {
 
@@ -42944,10 +42944,10 @@
 
 		};
 
-	var _position$3 = new Vector3();
-	var _quaternion$4 = new Quaternion();
-	var _scale$2 = new Vector3();
-	var _orientation$1 = new Vector3();
+	var _position$3 = /*@__PURE__*/ new Vector3();
+	var _quaternion$4 = /*@__PURE__*/ new Quaternion();
+	var _scale$2 = /*@__PURE__*/ new Vector3();
+	var _orientation$1 = /*@__PURE__*/ new Vector3();
 
 		function PositionalAudio( listener ) {
 
@@ -46336,7 +46336,7 @@
 
 	};
 
-	var _vector$7 = new Vector2();
+	var _vector$7 = /*@__PURE__*/ new Vector2();
 
 	var Box2 = function Box2( min, max ) {
 
@@ -46560,8 +46560,8 @@
 
 	};
 
-	var _startP = new Vector3();
-	var _startEnd = new Vector3();
+	var _startP = /*@__PURE__*/ new Vector3();
+	var _startEnd = /*@__PURE__*/ new Vector3();
 
 	var Line3 = function Line3( start, end ) {
 
@@ -46721,7 +46721,7 @@
 
 	ImmediateRenderObject.prototype.isImmediateRenderObject = true;
 
-	var _vector$8 = new Vector3();
+	var _vector$8 = /*@__PURE__*/ new Vector3();
 
 		function SpotLightHelper( light, color ) {
 
@@ -46802,9 +46802,9 @@
 
 		};
 
-	var _vector$9 = new Vector3();
-	var _boneMatrix = new Matrix4();
-	var _matrixWorldInv = new Matrix4();
+	var _vector$9 = /*@__PURE__*/ new Vector3();
+	var _boneMatrix = /*@__PURE__*/ new Matrix4();
+	var _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 
 
 		function SkeletonHelper( object ) {
@@ -46995,9 +46995,9 @@
 
 		};
 
-	var _vector$a = new Vector3();
-	var _color1 = new Color();
-	var _color2 = new Color();
+	var _vector$a = /*@__PURE__*/ new Vector3();
+	var _color1 = /*@__PURE__*/ new Color();
+	var _color2 = /*@__PURE__*/ new Color();
 
 		function HemisphereLightHelper( light, size, color ) {
 
@@ -47190,9 +47190,9 @@
 		PolarGridHelper.prototype = Object.create( LineSegments.prototype );
 		PolarGridHelper.prototype.constructor = PolarGridHelper;
 
-	var _v1$5 = new Vector3();
-	var _v2$3 = new Vector3();
-	var _v3$1 = new Vector3();
+	var _v1$5 = /*@__PURE__*/ new Vector3();
+	var _v2$3 = /*@__PURE__*/ new Vector3();
+	var _v3$1 = /*@__PURE__*/ new Vector3();
 
 		function DirectionalLightHelper( light, size, color ) {
 
@@ -47268,8 +47268,8 @@
 
 		};
 
-	var _vector$b = new Vector3();
-	var _camera = new Camera();
+	var _vector$b = /*@__PURE__*/ new Vector3();
+	var _camera = /*@__PURE__*/ new Camera();
 
 	/**
 	 *	- shows frustum, line of sight and up of the camera
@@ -47461,7 +47461,7 @@
 
 	}
 
-	var _box$3 = new Box3();
+	var _box$3 = /*@__PURE__*/ new Box3();
 
 		function BoxHelper( object, color ) {
 			if ( color === void 0 ) color = 0xffff00;
@@ -47651,7 +47651,7 @@
 
 		};
 
-	var _axis = new Vector3();
+	var _axis = /*@__PURE__*/ new Vector3();
 	var _lineGeometry, _coneGeometry;
 
 		function ArrowHelper( dir, origin, length, color, headLength, headWidth ) {
@@ -47808,8 +47808,8 @@
 	ENCODINGS[ RGBDEncoding ] = 5;
 	ENCODINGS[ GammaEncoding ] = 6;
 
-	var _flatCamera = new OrthographicCamera();
-	var ref = _createPlanes();
+	var _flatCamera = /*@__PURE__*/ new OrthographicCamera();
+	var ref = /*@__PURE__*/ _createPlanes();
 	var _lodPlanes = ref._lodPlanes;
 	var _sizeLods = ref._sizeLods;
 	var _sigmas = ref._sigmas;
@@ -47822,16 +47822,16 @@
 	// Vertices of a dodecahedron (except the opposites, which represent the
 	// same axis), used as axis directions evenly spread on a sphere.
 	var _axisDirections = [
-		new Vector3( 1, 1, 1 ),
-		new Vector3( - 1, 1, 1 ),
-		new Vector3( 1, 1, - 1 ),
-		new Vector3( - 1, 1, - 1 ),
-		new Vector3( 0, PHI, INV_PHI ),
-		new Vector3( 0, PHI, - INV_PHI ),
-		new Vector3( INV_PHI, 0, PHI ),
-		new Vector3( - INV_PHI, 0, PHI ),
-		new Vector3( PHI, INV_PHI, 0 ),
-		new Vector3( - PHI, INV_PHI, 0 ) ];
+		/*@__PURE__*/ new Vector3( 1, 1, 1 ),
+		/*@__PURE__*/ new Vector3( - 1, 1, 1 ),
+		/*@__PURE__*/ new Vector3( 1, 1, - 1 ),
+		/*@__PURE__*/ new Vector3( - 1, 1, - 1 ),
+		/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
+		/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
+		/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
+		/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
+		/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
+		/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ) ];
 
 	/**
 	 * This class generates a Prefiltered, Mipmapped Radiance Environment Map

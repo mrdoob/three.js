@@ -91,7 +91,7 @@ if ( Object.assign === undefined ) {
 
 }
 
-const REVISION = '120';
+const REVISION = '121dev';
 const MOUSE = { LEFT: 0, MIDDLE: 1, RIGHT: 2, ROTATE: 0, DOLLY: 1, PAN: 2 };
 const TOUCH = { ROTATE: 0, PAN: 1, DOLLY_PAN: 2, DOLLY_ROTATE: 3 };
 const CullFaceNone = 0;
@@ -3914,8 +3914,8 @@ class Vector3 {
 
 }
 
-const _vector = new Vector3();
-const _quaternion = new Quaternion();
+const _vector = /*@__PURE__*/ new Vector3();
+const _quaternion = /*@__PURE__*/ new Quaternion();
 
 class Box3 {
 
@@ -4436,38 +4436,38 @@ function satForAxes( axes, v0, v1, v2, extents ) {
 }
 
 const _points = [
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3(),
-	new Vector3()
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3(),
+	/*@__PURE__*/ new Vector3()
 ];
 
-const _vector$1 = new Vector3();
+const _vector$1 = /*@__PURE__*/ new Vector3();
 
-const _box = new Box3();
+const _box = /*@__PURE__*/ new Box3();
 
 // triangle centered vertices
 
-const _v0 = new Vector3();
-const _v1 = new Vector3();
-const _v2 = new Vector3();
+const _v0 = /*@__PURE__*/ new Vector3();
+const _v1 = /*@__PURE__*/ new Vector3();
+const _v2 = /*@__PURE__*/ new Vector3();
 
 // triangle edge vectors
 
-const _f0 = new Vector3();
-const _f1 = new Vector3();
-const _f2 = new Vector3();
+const _f0 = /*@__PURE__*/ new Vector3();
+const _f1 = /*@__PURE__*/ new Vector3();
+const _f2 = /*@__PURE__*/ new Vector3();
 
-const _center = new Vector3();
-const _extents = new Vector3();
-const _triangleNormal = new Vector3();
-const _testAxis = new Vector3();
+const _center = /*@__PURE__*/ new Vector3();
+const _extents = /*@__PURE__*/ new Vector3();
+const _triangleNormal = /*@__PURE__*/ new Vector3();
+const _testAxis = /*@__PURE__*/ new Vector3();
 
-const _box$1 = new Box3();
+const _box$1 = /*@__PURE__*/ new Box3();
 
 class Sphere {
 
@@ -4650,14 +4650,14 @@ class Sphere {
 
 }
 
-const _vector$2 = new Vector3();
-const _segCenter = new Vector3();
-const _segDir = new Vector3();
-const _diff = new Vector3();
+const _vector$2 = /*@__PURE__*/ new Vector3();
+const _segCenter = /*@__PURE__*/ new Vector3();
+const _segDir = /*@__PURE__*/ new Vector3();
+const _diff = /*@__PURE__*/ new Vector3();
 
-const _edge1 = new Vector3();
-const _edge2 = new Vector3();
-const _normal = new Vector3();
+const _edge1 = /*@__PURE__*/ new Vector3();
+const _edge2 = /*@__PURE__*/ new Vector3();
+const _normal = /*@__PURE__*/ new Vector3();
 
 class Ray {
 
@@ -6026,13 +6026,13 @@ class Matrix4 {
 
 }
 
-const _v1$1 = new Vector3();
-const _m1 = new Matrix4();
-const _zero = new Vector3( 0, 0, 0 );
-const _one = new Vector3( 1, 1, 1 );
-const _x = new Vector3();
-const _y = new Vector3();
-const _z = new Vector3();
+const _v1$1 = /*@__PURE__*/ new Vector3();
+const _m1 = /*@__PURE__*/ new Matrix4();
+const _zero = /*@__PURE__*/ new Vector3( 0, 0, 0 );
+const _one = /*@__PURE__*/ new Vector3( 1, 1, 1 );
+const _x = /*@__PURE__*/ new Vector3();
+const _y = /*@__PURE__*/ new Vector3();
+const _z = /*@__PURE__*/ new Vector3();
 
 class Euler {
 
@@ -6354,8 +6354,8 @@ class Euler {
 Euler.DefaultOrder = 'XYZ';
 Euler.RotationOrders = [ 'XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX' ];
 
-const _matrix = new Matrix4();
-const _quaternion$1 = new Quaternion();
+const _matrix = /*@__PURE__*/ new Matrix4();
+const _quaternion$1 = /*@__PURE__*/ new Quaternion();
 
 class Layers {
 
@@ -7255,9 +7255,9 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 } );
 
-const _vector1 = new Vector3();
-const _vector2 = new Vector3();
-const _normalMatrix = new Matrix3();
+const _vector1 = /*@__PURE__*/ new Vector3();
+const _vector2 = /*@__PURE__*/ new Vector3();
+const _normalMatrix = /*@__PURE__*/ new Matrix3();
 
 class Plane {
 
@@ -7477,17 +7477,17 @@ class Plane {
 
 }
 
-const _v0$1 = new Vector3();
-const _v1$3 = new Vector3();
-const _v2$1 = new Vector3();
-const _v3 = new Vector3();
+const _v0$1 = /*@__PURE__*/ new Vector3();
+const _v1$3 = /*@__PURE__*/ new Vector3();
+const _v2$1 = /*@__PURE__*/ new Vector3();
+const _v3 = /*@__PURE__*/ new Vector3();
 
-const _vab = new Vector3();
-const _vac = new Vector3();
-const _vbc = new Vector3();
-const _vap = new Vector3();
-const _vbp = new Vector3();
-const _vcp = new Vector3();
+const _vab = /*@__PURE__*/ new Vector3();
+const _vac = /*@__PURE__*/ new Vector3();
+const _vbc = /*@__PURE__*/ new Vector3();
+const _vap = /*@__PURE__*/ new Vector3();
+const _vbp = /*@__PURE__*/ new Vector3();
+const _vcp = /*@__PURE__*/ new Vector3();
 
 class Triangle {
 
@@ -13855,8 +13855,8 @@ DataTexture.prototype.constructor = DataTexture;
 
 DataTexture.prototype.isDataTexture = true;
 
-const _sphere$1 = new Sphere();
-const _vector$5 = new Vector3();
+const _sphere$1 = /*@__PURE__*/ new Sphere();
+const _vector$5 = /*@__PURE__*/ new Vector3();
 
 class Frustum {
 
@@ -42536,10 +42536,10 @@ class Clock {
 
 }
 
-const _position$2 = new Vector3();
-const _quaternion$3 = new Quaternion();
-const _scale$1 = new Vector3();
-const _orientation = new Vector3();
+const _position$2 = /*@__PURE__*/ new Vector3();
+const _quaternion$3 = /*@__PURE__*/ new Quaternion();
+const _scale$1 = /*@__PURE__*/ new Vector3();
+const _orientation = /*@__PURE__*/ new Vector3();
 
 class AudioListener extends Object3D {
 
@@ -43056,10 +43056,10 @@ class Audio extends Object3D {
 
 }
 
-const _position$3 = new Vector3();
-const _quaternion$4 = new Quaternion();
-const _scale$2 = new Vector3();
-const _orientation$1 = new Vector3();
+const _position$3 = /*@__PURE__*/ new Vector3();
+const _quaternion$4 = /*@__PURE__*/ new Quaternion();
+const _scale$2 = /*@__PURE__*/ new Vector3();
+const _orientation$1 = /*@__PURE__*/ new Vector3();
 
 class PositionalAudio extends Audio {
 
@@ -46465,7 +46465,7 @@ class Cylindrical {
 
 }
 
-const _vector$7 = new Vector2();
+const _vector$7 = /*@__PURE__*/ new Vector2();
 
 class Box2 {
 
@@ -46693,8 +46693,8 @@ class Box2 {
 
 }
 
-const _startP = new Vector3();
-const _startEnd = new Vector3();
+const _startP = /*@__PURE__*/ new Vector3();
+const _startEnd = /*@__PURE__*/ new Vector3();
 
 class Line3 {
 
@@ -46858,7 +46858,7 @@ ImmediateRenderObject.prototype.constructor = ImmediateRenderObject;
 
 ImmediateRenderObject.prototype.isImmediateRenderObject = true;
 
-const _vector$8 = new Vector3();
+const _vector$8 = /*@__PURE__*/ new Vector3();
 
 class SpotLightHelper extends Object3D {
 
@@ -46940,9 +46940,9 @@ class SpotLightHelper extends Object3D {
 
 }
 
-const _vector$9 = new Vector3();
-const _boneMatrix = new Matrix4();
-const _matrixWorldInv = new Matrix4();
+const _vector$9 = /*@__PURE__*/ new Vector3();
+const _boneMatrix = /*@__PURE__*/ new Matrix4();
+const _matrixWorldInv = /*@__PURE__*/ new Matrix4();
 
 
 class SkeletonHelper extends LineSegments {
@@ -47135,9 +47135,9 @@ class PointLightHelper extends Mesh {
 
 }
 
-const _vector$a = new Vector3();
-const _color1 = new Color();
-const _color2 = new Color();
+const _vector$a = /*@__PURE__*/ new Vector3();
+const _color1 = /*@__PURE__*/ new Color();
+const _color2 = /*@__PURE__*/ new Color();
 
 class HemisphereLightHelper extends Object3D {
 
@@ -47333,9 +47333,9 @@ class PolarGridHelper extends LineSegments {
 
 }
 
-const _v1$5 = new Vector3();
-const _v2$3 = new Vector3();
-const _v3$1 = new Vector3();
+const _v1$5 = /*@__PURE__*/ new Vector3();
+const _v2$3 = /*@__PURE__*/ new Vector3();
+const _v3$1 = /*@__PURE__*/ new Vector3();
 
 class DirectionalLightHelper extends Object3D {
 
@@ -47412,8 +47412,8 @@ class DirectionalLightHelper extends Object3D {
 
 }
 
-const _vector$b = new Vector3();
-const _camera = new Camera();
+const _vector$b = /*@__PURE__*/ new Vector3();
+const _camera = /*@__PURE__*/ new Camera();
 
 /**
  *	- shows frustum, line of sight and up of the camera
@@ -47606,7 +47606,7 @@ function setPoint( point, pointMap, geometry, camera, x, y, z ) {
 
 }
 
-const _box$3 = new Box3();
+const _box$3 = /*@__PURE__*/ new Box3();
 
 class BoxHelper extends LineSegments {
 
@@ -47795,7 +47795,7 @@ class PlaneHelper extends Line {
 
 }
 
-const _axis = new Vector3();
+const _axis = /*@__PURE__*/ new Vector3();
 let _lineGeometry, _coneGeometry;
 
 class ArrowHelper extends Object3D {
@@ -47953,8 +47953,8 @@ const ENCODINGS = {
 	[ GammaEncoding ]: 6
 };
 
-const _flatCamera = new OrthographicCamera();
-const { _lodPlanes, _sizeLods, _sigmas } = _createPlanes();
+const _flatCamera = /*@__PURE__*/ new OrthographicCamera();
+const { _lodPlanes, _sizeLods, _sigmas } = /*@__PURE__*/ _createPlanes();
 let _oldTarget = null;
 
 // Golden Ratio
@@ -47964,16 +47964,16 @@ const INV_PHI = 1 / PHI;
 // Vertices of a dodecahedron (except the opposites, which represent the
 // same axis), used as axis directions evenly spread on a sphere.
 const _axisDirections = [
-	new Vector3( 1, 1, 1 ),
-	new Vector3( - 1, 1, 1 ),
-	new Vector3( 1, 1, - 1 ),
-	new Vector3( - 1, 1, - 1 ),
-	new Vector3( 0, PHI, INV_PHI ),
-	new Vector3( 0, PHI, - INV_PHI ),
-	new Vector3( INV_PHI, 0, PHI ),
-	new Vector3( - INV_PHI, 0, PHI ),
-	new Vector3( PHI, INV_PHI, 0 ),
-	new Vector3( - PHI, INV_PHI, 0 ) ];
+	/*@__PURE__*/ new Vector3( 1, 1, 1 ),
+	/*@__PURE__*/ new Vector3( - 1, 1, 1 ),
+	/*@__PURE__*/ new Vector3( 1, 1, - 1 ),
+	/*@__PURE__*/ new Vector3( - 1, 1, - 1 ),
+	/*@__PURE__*/ new Vector3( 0, PHI, INV_PHI ),
+	/*@__PURE__*/ new Vector3( 0, PHI, - INV_PHI ),
+	/*@__PURE__*/ new Vector3( INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( - INV_PHI, 0, PHI ),
+	/*@__PURE__*/ new Vector3( PHI, INV_PHI, 0 ),
+	/*@__PURE__*/ new Vector3( - PHI, INV_PHI, 0 ) ];
 
 /**
  * This class generates a Prefiltered, Mipmapped Radiance Environment Map
