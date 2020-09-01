@@ -5,7 +5,7 @@ import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 
-const _vector = new Vector3();
+const _vector = /*@__PURE__*/ new Vector3();
 
 class SpotLightHelper extends Object3D {
 
