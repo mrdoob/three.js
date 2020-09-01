@@ -1118,7 +1118,7 @@ THREE.SVGLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		function parseNodeTransform( node ) {
 
-			var transform = new Matrix3();
+			var transform = new THREE.Matrix3();
 			var currentTransform = tempTransform0;
 
 			if ( node.nodeName === 'use' && ( node.hasAttribute( 'x' ) || node.hasAttribute( 'y' ) ) ) {
