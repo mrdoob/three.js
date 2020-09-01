@@ -53,8 +53,26 @@ import { LoaderUtils } from './LoaderUtils.js';
 import { BufferGeometryLoader } from './BufferGeometryLoader.js';
 import { Loader } from './Loader.js';
 import { FileLoader } from './FileLoader.js';
-import * as Geometries from '../geometries/Geometries.js';
 import * as Curves from '../extras/curves/Curves.js';
+
+import { PlaneGeometry, PlaneBufferGeometry } from '../geometries/PlaneGeometry.js';
+import { BoxGeometry, BoxBufferGeometry } from '../geometries/BoxGeometry.js';
+import { CircleGeometry, CircleBufferGeometry } from '../geometries/CircleGeometry.js';
+import { CylinderGeometry, CylinderBufferGeometry } from '../geometries/CylinderGeometry.js';
+import { ConeGeometry, ConeBufferGeometry } from '../geometries/ConeGeometry.js';
+import { SphereGeometry, SphereBufferGeometry } from '../geometries/SphereGeometry.js';
+import { DodecahedronGeometry, DodecahedronBufferGeometry } from '../geometries/DodecahedronGeometry.js';
+import { IcosahedronGeometry, IcosahedronBufferGeometry } from '../geometries/IcosahedronGeometry.js';
+import { OctahedronGeometry, OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
+import { TetrahedronGeometry, TetrahedronBufferGeometry } from '../geometries/TetrahedronGeometry.js';
+import { RingGeometry, RingBufferGeometry } from '../geometries/RingGeometry.js';
+import { TorusGeometry, TorusBufferGeometry } from '../geometries/TorusGeometry.js';
+import { TorusKnotGeometry, TorusKnotBufferGeometry } from '../geometries/TorusKnotGeometry.js';
+import { TubeGeometry, TubeBufferGeometry } from '../geometries/TubeGeometry.js';
+import { LatheGeometry, LatheBufferGeometry } from '../geometries/LatheGeometry.js';
+import { PolyhedronGeometry, PolyhedronBufferGeometry } from '../geometries/PolyhedronGeometry.js';
+import { ShapeGeometry, ShapeBufferGeometry } from '../geometries/ShapeGeometry.js';
+import { ExtrudeGeometry, ExtrudeBufferGeometry } from '../geometries/ExtrudeGeometry.js';
 
 function ObjectLoader( manager ) {
 
@@ -164,7 +182,6 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	parseGeometries: function ( json, shapes ) {
 
 		const geometries = {};
-		let geometryShapes;
 
 		if ( json !== undefined ) {
 
@@ -178,252 +195,163 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				switch ( data.type ) {
 
 					case 'PlaneGeometry':
+						geometry = new PlaneGeometry( data.width, data.height, data.widthSegments, data.heightSegments );
+						break;
+
 					case 'PlaneBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.width,
-							data.height,
-							data.widthSegments,
-							data.heightSegments
-						);
-
+						geometry = new PlaneBufferGeometry( data.width, data.height, data.widthSegments, data.heightSegments );
 						break;
 
 					case 'BoxGeometry':
-					case 'BoxBufferGeometry':
 					case 'CubeGeometry': // backwards compatible
+						geometry = new BoxGeometry( data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments );
+						break;
 
-						geometry = new Geometries[ data.type ](
-							data.width,
-							data.height,
-							data.depth,
-							data.widthSegments,
-							data.heightSegments,
-							data.depthSegments
-						);
-
+					case 'BoxBufferGeometry':
+						geometry = new BoxBufferGeometry( data.width, data.height, data.depth, data.widthSegments, data.heightSegments, data.depthSegments );
 						break;
 
 					case 'CircleGeometry':
+						geometry = new CircleGeometry( data.radius, data.segments, data.thetaStart, data.thetaLength );
+						break;
+
 					case 'CircleBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.radius,
-							data.segments,
-							data.thetaStart,
-							data.thetaLength
-						);
-
+						geometry = new CircleBufferGeometry( data.radius, data.segments, data.thetaStart, data.thetaLength );
 						break;
 
 					case 'CylinderGeometry':
+						geometry = new CylinderGeometry( data.radiusTop, data.radiusBottom, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
+						break;
+
 					case 'CylinderBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.radiusTop,
-							data.radiusBottom,
-							data.height,
-							data.radialSegments,
-							data.heightSegments,
-							data.openEnded,
-							data.thetaStart,
-							data.thetaLength
-						);
-
+						geometry = new CylinderBufferGeometry( data.radiusTop, data.radiusBottom, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
 						break;
 
 					case 'ConeGeometry':
+						geometry = new ConeGeometry( data.radius, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
+						break;
 					case 'ConeBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.radius,
-							data.height,
-							data.radialSegments,
-							data.heightSegments,
-							data.openEnded,
-							data.thetaStart,
-							data.thetaLength
-						);
-
+						geometry = new ConeBufferGeometry( data.radius, data.height, data.radialSegments, data.heightSegments, data.openEnded, data.thetaStart, data.thetaLength );
 						break;
 
 					case 'SphereGeometry':
+						geometry = new SphereGeometry( data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength );
+						break;
+
 					case 'SphereBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.radius,
-							data.widthSegments,
-							data.heightSegments,
-							data.phiStart,
-							data.phiLength,
-							data.thetaStart,
-							data.thetaLength
-						);
-
+						geometry = new SphereBufferGeometry( data.radius, data.widthSegments, data.heightSegments, data.phiStart, data.phiLength, data.thetaStart, data.thetaLength );
 						break;
 
 					case 'DodecahedronGeometry':
+						geometry = new DodecahedronGeometry( data.radius, data.detail );
+						break;
+
 					case 'DodecahedronBufferGeometry':
+						geometry = new DodecahedronBufferGeometry( data.radius, data.detail );
+						break;
+
 					case 'IcosahedronGeometry':
+						geometry = new IcosahedronGeometry( data.radius, data.detail );
+						break;
+
 					case 'IcosahedronBufferGeometry':
+						geometry = new IcosahedronBufferGeometry( data.radius, data.detail );
+						break;
+
 					case 'OctahedronGeometry':
+						geometry = new OctahedronGeometry( data.radius, data.detail );
+						break;
+
 					case 'OctahedronBufferGeometry':
+						geometry = new OctahedronBufferGeometry( data.radius, data.detail );
+						break;
+
 					case 'TetrahedronGeometry':
+						geometry = new TetrahedronGeometry( data.radius, data.detail );
+						break;
+
 					case 'TetrahedronBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.radius,
-							data.detail
-						);
-
+						geometry = new TetrahedronBufferGeometry( data.radius, data.detail );
 						break;
 
 					case 'RingGeometry':
+						geometry = new RingGeometry( data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength );
+						break;
+
 					case 'RingBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.innerRadius,
-							data.outerRadius,
-							data.thetaSegments,
-							data.phiSegments,
-							data.thetaStart,
-							data.thetaLength
-						);
-
+						geometry = new RingBufferGeometry( data.innerRadius, data.outerRadius, data.thetaSegments, data.phiSegments, data.thetaStart, data.thetaLength );
 						break;
 
 					case 'TorusGeometry':
+						geometry = new TorusGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc );
+						break;
+
 					case 'TorusBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.radius,
-							data.tube,
-							data.radialSegments,
-							data.tubularSegments,
-							data.arc
-						);
-
+						geometry = new TorusBufferGeometry( data.radius, data.tube, data.radialSegments, data.tubularSegments, data.arc );
 						break;
 
 					case 'TorusKnotGeometry':
+						geometry = new TorusKnotGeometry( data.radius, data.tube, data.tubularSegments, data.radialSegments, data.p, data.q );
+						break;
+
 					case 'TorusKnotBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.radius,
-							data.tube,
-							data.tubularSegments,
-							data.radialSegments,
-							data.p,
-							data.q
-						);
-
+						geometry = new TorusKnotBufferGeometry( data.radius, data.tube, data.tubularSegments, data.radialSegments, data.p, data.q );
 						break;
 
 					case 'TubeGeometry':
-					case 'TubeBufferGeometry':
-
 						// This only works for built-in curves (e.g. CatmullRomCurve3).
 						// User defined curves or instances of CurvePath will not be deserialized.
-						geometry = new Geometries[ data.type ](
-							new Curves[ data.path.type ]().fromJSON( data.path ),
-							data.tubularSegments,
-							data.radius,
-							data.radialSegments,
-							data.closed
-						);
-
+						geometry = new TubeGeometry( new Curves[ data.path.type ]().fromJSON( data.path ), data.tubularSegments, data.radius, data.radialSegments, data.closed );
+						break;
+					case 'TubeBufferGeometry':
+						// This only works for built-in curves (e.g. CatmullRomCurve3).
+						// User defined curves or instances of CurvePath will not be deserialized.
+						geometry = new TubeBufferGeometry( new Curves[ data.path.type ]().fromJSON( data.path ), data.tubularSegments, data.radius, data.radialSegments, data.closed );
 						break;
 
 					case 'LatheGeometry':
+						geometry = new LatheGeometry( data.points, data.segments, data.phiStart, data.phiLength );
+						break;
+
 					case 'LatheBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.points,
-							data.segments,
-							data.phiStart,
-							data.phiLength
-						);
-
+						geometry = new LatheBufferGeometry( data.points, data.segments, data.phiStart, data.phiLength );
 						break;
 
 					case 'PolyhedronGeometry':
+						geometry = new PolyhedronGeometry( data.vertices, data.indices, data.radius, data.details );
+						break;
+
 					case 'PolyhedronBufferGeometry':
-
-						geometry = new Geometries[ data.type ](
-							data.vertices,
-							data.indices,
-							data.radius,
-							data.details
-						);
-
+						geometry = new PolyhedronBufferGeometry( data.vertices, data.indices, data.radius, data.details );
 						break;
 
 					case 'ShapeGeometry':
-					case 'ShapeBufferGeometry':
-
-						geometryShapes = [];
-
-						for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
-
-							const shape = shapes[ data.shapes[ j ] ];
-
-							geometryShapes.push( shape );
-
-						}
-
-						geometry = new Geometries[ data.type ](
-							geometryShapes,
-							data.curveSegments
-						);
-
+						geometry = new ShapeGeometry( getGeometryShapes( data, shapes ), data.curveSegments );
 						break;
 
+					case 'ShapeBufferGeometry':
+						geometry = new ShapeBufferGeometry( getGeometryShapes( data, shapes ), data.curveSegments );
+						break;
 
 					case 'ExtrudeGeometry':
+						geometry = new ExtrudeGeometry( getGeometryShapes( data, shapes ), getExtrudeOptions( data.options ) );
+						break;
+
 					case 'ExtrudeBufferGeometry':
-
-						geometryShapes = [];
-
-						for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
-
-							const shape = shapes[ data.shapes[ j ] ];
-
-							geometryShapes.push( shape );
-
-						}
-
-						const extrudePath = data.options.extrudePath;
-
-						if ( extrudePath !== undefined ) {
-
-							data.options.extrudePath = new Curves[ extrudePath.type ]().fromJSON( extrudePath );
-
-						}
-
-						geometry = new Geometries[ data.type ](
-							geometryShapes,
-							data.options
-						);
-
+						geometry = new ExtrudeBufferGeometry( getGeometryShapes( data, shapes ), getExtrudeOptions( data.options ) );
 						break;
 
 					case 'BufferGeometry':
 					case 'InstancedBufferGeometry':
-
 						geometry = bufferGeometryLoader.parse( data );
-
 						break;
 
 					case 'Geometry':
-
 						console.error( 'THREE.ObjectLoader: Loading "Geometry" is not supported anymore.' );
-
 						break;
 
 					default:
-
 						console.warn( 'THREE.ObjectLoader: Unsupported geometry type "' + data.type + '"' );
-
 						continue;
 
 				}
@@ -977,6 +905,36 @@ ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 } );
 
+function getGeometryShapes( data, shapes ) {
+
+	const array = [];
+
+	for ( let j = 0, jl = data.shapes.length; j < jl; j ++ ) {
+
+		const shape = shapes[ data.shapes[ j ] ];
+
+		array.push( shape );
+
+	}
+
+	return array;
+
+}
+
+function getExtrudeOptions( options ) {
+
+	const extrudePath = options.extrudePath;
+
+	if ( extrudePath !== undefined ) {
+
+		options.extrudePath = new Curves[ extrudePath.type ]().fromJSON( extrudePath );
+
+	}
+
+	return options;
+
+}
+
 const TEXTURE_MAPPING = {
 	UVMapping: UVMapping,
 	CubeReflectionMapping: CubeReflectionMapping,
@@ -1001,6 +959,5 @@ const TEXTURE_FILTER = {
 	LinearMipmapNearestFilter: LinearMipmapNearestFilter,
 	LinearMipmapLinearFilter: LinearMipmapLinearFilter
 };
-
 
 export { ObjectLoader };
