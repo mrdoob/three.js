@@ -24,23 +24,6 @@ function Points( geometry, material ) {
 
 }
 
-function testSizeAttenuation() {
-
-	const ray = new Ray( _ray.origin );
-	this.distanceToCamera;
-	this.testPoint = function ( point, object ) {
-
-		if ( object.material.sizeAttenuation )
-			return;
-		if ( ! this.distanceToCamera )
-			this.distanceToCamera = new Vector3().distanceTo( _ray.origin );
-		ray.lookAt( point ).at( this.distanceToCamera, point );
-
-	}
-
-}
-const _testSizeAttenuation = new testSizeAttenuation();
-
 Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	constructor: Points,
@@ -173,13 +156,11 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	},
 
-	testSizeAttenuation: _testSizeAttenuation
-
 } );
 
 function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, intersects, object ) {
 
-	_testSizeAttenuation.testPoint( point, object );
+	Points.testSizeAttenuation.testPoint( point, object );
 
 	const rayPointDistanceSq = _ray.distanceSqToPoint( point );
 
@@ -208,5 +189,22 @@ function testPoint( point, index, localThresholdSq, matrixWorld, raycaster, inte
 	}
 
 }
+
+function testSizeAttenuation() {
+
+	const ray = new Ray( _ray.origin );
+	this.distanceToCamera;
+	this.testPoint = function ( point, object ) {
+
+		if ( object.material.sizeAttenuation )
+			return;
+		if ( !this.distanceToCamera )
+			this.distanceToCamera = new Vector3().distanceTo( _ray.origin );
+		ray.lookAt( point ).at( this.distanceToCamera, point );
+
+	}
+
+}
+Points.testSizeAttenuation = new testSizeAttenuation();
 
 export { Points };

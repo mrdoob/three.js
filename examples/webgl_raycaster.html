@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<title>three.js webgl - raycaster</title>
@@ -50,8 +50,7 @@
 					alphaTest: 0.5,
 
 				} ) );
-			if ( points.testSizeAttenuation )
-				points.testSizeAttenuation.distanceToCamera = 2;
+			THREE.Points.testSizeAttenuation.distanceToCamera = 2;
 			scene.add( points );
 
 			const pointsSizeAttenuation = new THREE.Points( new THREE.BufferGeometry().setFromPoints( [
