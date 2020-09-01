@@ -1,0 +1,6 @@
+File: Svg-defs.svg
+Link: https://commons.wikimedia.org/wiki/File:Svg-defs.svg
+License: CC-BY-SA 2.5
+License link: https://creativecommons.org/licenses/by-sa/3.0/deed.en
+
+The file Svg-defs2.svg is a derived work of the same file.
