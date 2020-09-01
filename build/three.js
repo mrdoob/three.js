@@ -40593,15 +40593,14 @@
 
 	function ObjectLoader( manager ) {
 
-		Loader.call( this, manager );
+			Loader.call( this, manager );
 
-	}
+		}
 
-	ObjectLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
+		ObjectLoader.prototype = Object.create( Loader.prototype );
+		ObjectLoader.prototype.constructor = ObjectLoader;
 
-		constructor: ObjectLoader,
-
-		load: function ( url, onLoad, onProgress, onError ) {
+		ObjectLoader.prototype.load = function load ( url, onLoad, onProgress, onError ) {
 
 			var scope = this;
 
@@ -40642,9 +40641,9 @@
 
 			}, onProgress, onError );
 
-		},
+		};
 
-		parse: function ( json, onLoad ) {
+		ObjectLoader.prototype.parse = function parse ( json, onLoad ) {
 
 			var shapes = this.parseShape( json.shapes );
 			var geometries = this.parseGeometries( json.geometries, shapes );
@@ -40674,9 +40673,9 @@
 
 			return object;
 
-		},
+		};
 
-		parseShape: function ( json ) {
+		ObjectLoader.prototype.parseShape = function parseShape ( json ) {
 
 			var shapes = {};
 
@@ -40694,9 +40693,9 @@
 
 			return shapes;
 
-		},
+		};
 
-		parseGeometries: function ( json, shapes ) {
+		ObjectLoader.prototype.parseGeometries = function parseGeometries ( json, shapes ) {
 
 			var geometries = {};
 			var geometryShapes;
@@ -40976,9 +40975,9 @@
 
 			return geometries;
 
-		},
+		};
 
-		parseMaterials: function ( json, textures ) {
+		ObjectLoader.prototype.parseMaterials = function parseMaterials ( json, textures ) {
 
 			var cache = {}; // MultiMaterial
 			var materials = {};
@@ -41032,9 +41031,9 @@
 
 			return materials;
 
-		},
+		};
 
-		parseAnimations: function ( json ) {
+		ObjectLoader.prototype.parseAnimations = function parseAnimations ( json ) {
 
 			var animations = [];
 
@@ -41052,9 +41051,9 @@
 
 			return animations;
 
-		},
+		};
 
-		parseImages: function ( json, onLoad ) {
+		ObjectLoader.prototype.parseImages = function parseImages ( json, onLoad ) {
 
 			var scope = this;
 			var images = {};
@@ -41122,9 +41121,9 @@
 
 			return images;
 
-		},
+		};
 
-		parseTextures: function ( json, images ) {
+		ObjectLoader.prototype.parseTextures = function parseTextures ( json, images ) {
 
 			function parseConstant( value, type ) {
 
@@ -41209,9 +41208,9 @@
 
 			return textures;
 
-		},
+		};
 
-		parseObject: function ( data, geometries, materials ) {
+		ObjectLoader.prototype.parseObject = function parseObject ( data, geometries, materials ) {
 
 			var object;
 
@@ -41508,9 +41507,16 @@
 
 			return object;
 
-		}
+		};
 
-	} );
+		/* DEPRECATED */
+
+		ObjectLoader.prototype.setTexturePath = function setTexturePath ( value ) {
+
+			console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
+			return this.setResourcePath( value );
+
+		};
 
 	var TEXTURE_MAPPING = {
 		UVMapping: UVMapping,
@@ -48830,17 +48836,6 @@
 		return new DataTextureLoader( manager );
 
 	}
-
-	Object.assign( ObjectLoader.prototype, {
-
-		setTexturePath: function ( value ) {
-
-			console.warn( 'THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().' );
-			return this.setResourcePath( value );
-
-		}
-
-	} );
 
 	//
 
