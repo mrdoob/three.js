@@ -6,8 +6,8 @@ import {
 	Material,
 	ShaderMaterial,
 	Wrapping,
-	TextureFilter
-
+	TextureFilter,
+	TextureDataType
 } from '../../../src/Three';
 
 export interface Variable {

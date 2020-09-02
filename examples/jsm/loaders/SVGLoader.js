@@ -133,11 +133,13 @@ SVGLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 						parseNode( usedNode, style );
 
-					}
-					else console.warn( "SVGLoader: 'use node' references non-existent node id: " + usedNodeId );
-					break;
+					} else {
 
-				break;
+						console.warn( "SVGLoader: 'use node' references non-existent node id: " + usedNodeId );
+
+					}
+
+					break;
 
 				default:
 					// console.log( node );
