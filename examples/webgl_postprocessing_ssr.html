@@ -37,7 +37,7 @@
 
 	var params = {
 		enableSSR: true,
-		darken: false,
+		darken: true,
 	}
 	var composer
 	var ssrPass
@@ -83,9 +83,9 @@
 		// camera.position.set(394.8768477903498,  424.03752576248496,  815.0242032138592)
 
 		camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 2, 10000 );
-		// camera.position.set( 388.5770726262176,  305.6568142796153,  647.1326965696304);
-		camera.position.set( -612.8787517743004,  518.3480614141735,  137.45500830289768);
-		window.camera=camera
+		camera.position.set( 388.5770726262176,  305.6568142796153,  647.1326965696304);
+		// camera.position.set( -612.8787517743004,  518.3480614141735,  137.45500830289768);
+		// window.camera=camera
 
 		// SCENE
 
@@ -279,7 +279,7 @@
 			camera, 
 			width: innerWidth, 
 			height: innerHeight,
-			encoding: THREE.sRGBEncoding,
+			// encoding: THREE.sRGBEncoding,
 		});
 		composer.addPass(ssrPass);
 
@@ -288,7 +288,7 @@
 		gui = new GUI( { width: 400 } );
 		// ssrPass.surfDist=4.2
 		ssrPass.surfDist=.007
-    ssrPass.opacity=.2
+    // ssrPass.opacity=.2
 		// ssrPass.output=SSRPass.OUTPUT.SSR
 		gui.add(params, 'enableSSR').name( 'Enable SSR' );
 		gui.add(params, 'darken').onChange(function(value){
@@ -298,6 +298,7 @@
 				ssrPass.encoding = THREE.sRGBEncoding
 			}
 		});
+		gui.add(ssrPass,'isBouncing')
 		gui.add(ssrPass, 'output', {
 			'Default': SSRPass.OUTPUT.Default,
 			'DefaultBlur': SSRPass.OUTPUT.DefaultBlur,
