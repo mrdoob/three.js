@@ -959,10 +959,10 @@ var GLTFLoader = ( function () {
 			'material.diffuseColor = diffuseColor.rgb * ( 1. - max( specularFactor.r, max( specularFactor.g, specularFactor.b ) ) );',
 			'vec3 dxy = max( abs( dFdx( geometryNormal ) ), abs( dFdy( geometryNormal ) ) );',
 			'float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );',
-			'material.specularRoughness = max( 1.0 - glossinessFactor, 0.0525 );// 0.0525 corresponds to the base mip of a 256 cubemap.',
+			'material.specularRoughness = max( 1.0 - glossinessFactor, 0.0525 ); // 0.0525 corresponds to the base mip of a 256 cubemap.',
 			'material.specularRoughness += geometryRoughness;',
 			'material.specularRoughness = min( material.specularRoughness, 1.0 );',
-			'material.specularColor = specularFactor.rgb;',
+			'material.specularColor = specularFactor;',
 		].join( '\n' );
 
 		var uniforms = {
@@ -974,7 +974,6 @@ var GLTFLoader = ( function () {
 
 		this._extraUniforms = uniforms;
 
-		// please see #14031 or #13198 for an alternate approach
 		this.onBeforeCompile = function ( shader ) {
 
 			for ( var uniformName in uniforms ) {
@@ -983,57 +982,95 @@ var GLTFLoader = ( function () {
 
 			}
 
-			shader.fragmentShader = shader.fragmentShader.replace( 'uniform float roughness;', 'uniform vec3 specular;' );
-			shader.fragmentShader = shader.fragmentShader.replace( 'uniform float metalness;', 'uniform float glossiness;' );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <roughnessmap_pars_fragment>', specularMapParsFragmentChunk );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <metalnessmap_pars_fragment>', glossinessMapParsFragmentChunk );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <roughnessmap_fragment>', specularMapFragmentChunk );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <metalnessmap_fragment>', glossinessMapFragmentChunk );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <lights_physical_fragment>', lightPhysicalFragmentChunk );
+			shader.fragmentShader = shader.fragmentShader
+				.replace( 'uniform float roughness;', 'uniform vec3 specular;' )
+				.replace( 'uniform float metalness;', 'uniform float glossiness;' )
+				.replace( '#include <roughnessmap_pars_fragment>', specularMapParsFragmentChunk )
+				.replace( '#include <metalnessmap_pars_fragment>', glossinessMapParsFragmentChunk )
+				.replace( '#include <roughnessmap_fragment>', specularMapFragmentChunk )
+				.replace( '#include <metalnessmap_fragment>', glossinessMapFragmentChunk )
+				.replace( '#include <lights_physical_fragment>', lightPhysicalFragmentChunk );
 
 		};
 
-		/*eslint-disable*/
-		Object.defineProperties(
-			this,
-			{
-				specular: {
-					get: function () { return uniforms.specular.value; },
-					set: function ( v ) { uniforms.specular.value = v; }
+		Object.defineProperties( this, {
+
+			specular: {
+				get: function () {
+
+					return uniforms.specular.value;
+
 				},
-				specularMap: {
-					get: function () { return uniforms.specularMap.value; },
-					set: function ( v ) { uniforms.specularMap.value = v; }
+				set: function ( v ) {
+
+					uniforms.specular.value = v;
+
+				}
+			},
+
+			specularMap: {
+				get: function () {
+
+					return uniforms.specularMap.value;
+
 				},
-				glossiness: {
-					get: function () { return uniforms.glossiness.value; },
-					set: function ( v ) { uniforms.glossiness.value = v; }
-				},
-				glossinessMap: {
-					get: function () { return uniforms.glossinessMap.value; },
-					set: function ( v ) {
+				set: function ( v ) {
 
-						uniforms.glossinessMap.value = v;
-						//how about something like this - @pailhead
-						if ( v ) {
+					uniforms.specularMap.value = v;
 
-							this.defines.USE_GLOSSINESSMAP = '';
-							// set USE_ROUGHNESSMAP to enable vUv
-							this.defines.USE_ROUGHNESSMAP = '';
+					if ( v ) {
 
-						} else {
+						this.defines.USE_SPECULARMAP = ''; // USE_UV is set by the renderer for specular maps
 
-							delete this.defines.USE_ROUGHNESSMAP;
-							delete this.defines.USE_GLOSSINESSMAP;
+					} else {
 
-						}
+						delete this.defines.USE_SPECULARMAP;
 
 					}
+
+				}
+			},
+
+			glossiness: {
+				get: function () {
+
+					return uniforms.glossiness.value;
+
+				},
+				set: function ( v ) {
+
+					uniforms.glossiness.value = v;
+
+				}
+			},
+
+			glossinessMap: {
+				get: function () {
+
+					return uniforms.glossinessMap.value;
+
+				},
+				set: function ( v ) {
+
+					uniforms.glossinessMap.value = v;
+
+					if ( v ) {
+
+						this.defines.USE_GLOSSINESSMAP = '';
+						this.defines.USE_UV = '';
+
+					} else {
+
+						delete this.defines.USE_GLOSSINESSMAP;
+						delete this.defines.USE_UV;
+
+					}
+
 				}
 			}
-		);
 
-		/*eslint-enable*/
+		} );
+
 		delete this.metalness;
 		delete this.roughness;
 		delete this.metalnessMap;
