@@ -192,7 +192,7 @@ class WebGPUTextures {
 
 			if ( image !== undefined ) {
 
-				// assuming ImageBitmap. Directly start operation of the contents of ImageBitmap into the destination texture
+				// assuming ImageBitmap. Directly start copy operation of the contents of ImageBitmap into the destination texture
 
 				this._uploadTexture( image, textureGPU );
 
