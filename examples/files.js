@@ -321,6 +321,9 @@ var files = {
 		"webgl2_volume_instancing",
 		"webgl2_volume_perlin"
 	],
+	"webgpu": [
+		"webgpu_sandbox"
+	],
 	"webaudio": [
 		"webaudio_orientation",
 		"webaudio_sandbox",
