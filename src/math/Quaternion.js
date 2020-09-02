@@ -384,6 +384,18 @@ class Quaternion {
 
 	}
 
+	localToWorld( object ) {
+
+		return this.premultiply( object.getWorldQuaternion( _q ) );
+
+	}
+
+	worldToLocal( object ) {
+
+		return this.premultiply( object.getWorldQuaternion( _q ).inverse() );
+
+	}
+
 	angleTo( q ) {
 
 		return 2 * Math.acos( Math.abs( MathUtils.clamp( this.dot( q ), - 1, 1 ) ) );
@@ -641,5 +653,6 @@ class Quaternion {
 
 }
 
+const _q = /*@__PURE__*/ new Quaternion();
 
 export { Quaternion };
