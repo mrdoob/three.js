@@ -28,4 +28,4 @@ export const BlurShaderUtils: {
 	createSampleWeights( kernelRadius: number, stdDev: number ): number[];
 	createSampleOffsets( kernelRadius: number, uvIncrement: Vector2 ): Vector2[];
 	configure( configure: Material, kernelRadius: number, stdDev: number, uvIncrement: Vector2 ): void;
-}
+};
