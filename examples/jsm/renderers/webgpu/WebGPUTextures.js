@@ -11,7 +11,6 @@ class WebGPUTextures {
 
 		this.defaultTexture = null;
 		this.defaultSampler = null;
-		this.canvas = null;
 
 		this.samplerCache = new WeakMap();
 
@@ -33,7 +32,7 @@ class WebGPUTextures {
 
 		if ( this.defaultTexture === null ) {
 
-			this.defaultTexture = this._createTexture( new Texture( new Image( 1, 1 ) ) );
+			this.defaultTexture = this._createTexture( new Texture() );
 
 		}
 
@@ -165,88 +164,61 @@ class WebGPUTextures {
 		const device = this.device;
 		const image = texture.image;
 
-		if ( this.canvas === null ) this.canvas = new OffscreenCanvas( 1, 1 );
-
-		const width = image.width;
-		const height = image.height;
-
-		this.canvas.width = width;
-		this.canvas.height = height;
-
-		const context = this.canvas.getContext( '2d' );
-		context.translate( 0, height );
-		context.scale( 1, - 1 );
-		context.drawImage( image, 0, 0, width, height );
-		const imageData = context.getImageData( 0, 0, width, height );
-
-		let data = null;
-
-		const bytesPerRow = Math.ceil( width * 4 / 256 ) * 256;
-
-		if ( bytesPerRow === width * 4 ) {
-
-			data = imageData.data;
-
-		} else {
-
-			// ensure 4 byte alignment
-
-			data = new Uint8Array( bytesPerRow * height );
-			let imagePixelIndex = 0;
-
-			for ( let y = 0; y < height; ++ y ) {
-
-				for ( let x = 0; x < width; ++ x ) {
-
-					const i = x * 4 + y * bytesPerRow;
-					data[ i ] = imageData.data[ imagePixelIndex ];
-					data[ i + 1 ] = imageData.data[ imagePixelIndex + 1 ];
-					data[ i + 2 ] = imageData.data[ imagePixelIndex + 2 ];
-					data[ i + 3 ] = imageData.data[ imagePixelIndex + 3 ];
-					imagePixelIndex += 4;
-
-				}
-
-			}
-
-		}
+		const width = ( image !== undefined ) ? image.width : 1;
+		const height = ( image !== undefined ) ? image.height : 1;
 
 		const textureGPU = device.createTexture( {
 			size: {
-				width: image.width,
-				height: image.height,
+				width: width,
+				height: height,
 				depth: 1,
 			},
 			format: "rgba8unorm",
 			usage: GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST,
 		} );
 
-		const buffer = device.createBuffer( {
-			size: data.byteLength,
-			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
-			mappedAtCreation: true,
-		} );
+		// convert HTML iamges and canvas elements to ImageBitmap before copy
 
-		new Uint8Array( buffer.getMappedRange() ).set( data );
+		if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+			( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ) {
 
-		buffer.unmap();
+			createImageBitmap( image, 0, 0, width, height ).then( imageBitmap => {
 
-		const commandEncoder = device.createCommandEncoder( {} );
+				this._uploadTexture( imageBitmap, textureGPU );
 
-		commandEncoder.copyBufferToTexture(
-			{
-				buffer: buffer, bytesPerRow: bytesPerRow,
-			}, {
-				texture: textureGPU,
-			}, {
-				width: image.width,
-				height: image.height,
-				depth: 1,
 			} );
-		device.defaultQueue.submit( [ commandEncoder.finish() ] );
-		buffer.destroy();
+
+		} else {
+
+			if ( image !== undefined ) {
+
+				// assuming ImageBitmap. Directly start operation of the contents of ImageBitmap into the destination texture
+
+				this._uploadTexture( image, textureGPU );
+
+			}
+
+		}
 
 		return textureGPU;
+
+	}
+
+	_uploadTexture( imageBitmap, textureGPU ) {
+
+		const device = this.device;
+
+		device.defaultQueue.copyImageBitmapToTexture(
+			{
+				imageBitmap: imageBitmap
+			}, {
+				texture: textureGPU
+			}, {
+				width: imageBitmap.width,
+				height: imageBitmap.height,
+				depth: 1
+			}
+		);
 
 	}
 
