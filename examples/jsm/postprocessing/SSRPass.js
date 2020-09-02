@@ -54,6 +54,8 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
   this.encoding = encoding
 
+  this.isFirstRender = true
+
   // beauty render target with depth buffer
 
   var depthTexture = new DepthTexture();
@@ -67,6 +69,12 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
     format: RGBAFormat,
     depthTexture: depthTexture,
     depthBuffer: true
+  });
+
+  this.prevRenderTarget = new WebGLRenderTarget(this.width, this.height, {
+    minFilter: LinearFilter,
+    magFilter: LinearFilter,
+    format: RGBAFormat,
   });
 
   // normal render target
@@ -250,10 +258,18 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render SSR
 
+    if (this.isFirstRender) {
+      this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+      this.isFirstRender = false
+    } else {
+      this.ssrMaterial.uniforms['tDiffuse'].value = this.prevRenderTarget.texture;
+    }
     this.ssrMaterial.uniforms['opacity'].value = this.opacity;
     this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
     this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
-    this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
+		this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
+		// debugger
+
 
     // render blur
 
@@ -330,6 +346,16 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
         this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
         this.copyMaterial.blending = AdditiveBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+
+
+				///todo: need performance improvement
+        this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+        this.copyMaterial.blending = NoBlending;
+        this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
+
+        this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
+        this.copyMaterial.blending = AdditiveBlending;
+        this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
 
         break;
 
