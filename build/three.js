@@ -29090,7 +29090,7 @@
 
 			function subdivideFace( a, b, c, detail ) {
 
-				var cols = Math.pow( 2, detail );
+				var cols = detail + 1;
 
 				// we use this multidimensional array as a data structure for creating the subdivision
 
