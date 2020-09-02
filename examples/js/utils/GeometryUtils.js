@@ -1,18 +1,11 @@
-console.warn( "THREE.GeometryUtils: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- */
+console.warn( "THREE.GeometryUtils: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.GeometryUtils = {
 
 	/**
 	 * Generates 2D-Coordinates in a very fast way.
 	 *
-	 * @author Dylan Grafmyre
-	 *
 	 * Based on work by:
-	 * @author Thomas Diewald
 	 * @link http://www.openprocessing.org/sketch/15493
 	 *
 	 * @param center     Center of Hilbert curve.
@@ -73,10 +66,7 @@ THREE.GeometryUtils = {
 	/**
 	 * Generates 3D-Coordinates in a very fast way.
 	 *
-	 * @author Dylan Grafmyre
-	 *
 	 * Based on work by:
-	 * @author Thomas Diewald
 	 * @link http://www.openprocessing.org/visuals/?visualID=15599
 	 *
 	 * @param center     Center of Hilbert curve.

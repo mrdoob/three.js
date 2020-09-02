@@ -1,7 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import {
 	BufferGeometry,
 	Float32BufferAttribute,

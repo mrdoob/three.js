@@ -1,7 +1,5 @@
-console.warn( "THREE.VerticalBlurShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/index.html#manual/en/introduction/Import-via-modules." );
+console.warn( "THREE.VerticalBlurShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author zz85 / http://www.lab4games.net/zz85/blog
- *
  * Two pass Gaussian blur filter (horizontal and vertical blur shaders)
  * - described in http://www.gamerendering.com/2008/10/11/gaussian-blur-filter-shader/
  *   and used in http://www.cake23.de/traveling-wavefronts-lit-up.html

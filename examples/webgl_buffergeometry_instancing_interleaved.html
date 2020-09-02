@@ -109,6 +109,7 @@
 
 			var material = new THREE.MeshBasicMaterial();
 			material.map = new THREE.TextureLoader().load( 'textures/crate.gif' );
+			material.map.flipY = false;
 
 			// per instance data
 

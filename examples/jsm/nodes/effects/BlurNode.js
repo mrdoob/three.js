@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { Vector2 } from '../../../../build/three.module.js';
 
 import { TempNode } from '../core/TempNode.js';
@@ -73,6 +69,7 @@ BlurNode.Nodes = ( function () {
 BlurNode.prototype = Object.create( TempNode.prototype );
 BlurNode.prototype.constructor = BlurNode;
 BlurNode.prototype.nodeType = "Blur";
+BlurNode.prototype.hashProperties = [ "blurX", "blurY" ];
 
 BlurNode.prototype.updateFrame = function ( /* frame */ ) {
 

@@ -17,7 +17,7 @@
 		</div>
 		<div id="container"></div>
 
-		<script src="js/libs/ammo.js"></script>
+		<script src="js/libs/ammo.wasm.js"></script>
 
 		<script type="module">
 
@@ -345,7 +345,7 @@
 
 			function initInput() {
 
-				window.addEventListener( 'mousedown', function ( event ) {
+				window.addEventListener( 'pointerdown', function ( event ) {
 
 					if ( ! clickRequest ) {
 

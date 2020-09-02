@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { TransformControls } from '../../examples/jsm/controls/TransformControls.js';
@@ -38,27 +34,13 @@ function Viewport( editor ) {
 	var camera = editor.camera;
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
+	var showSceneHelpers = true;
 
 	var objects = [];
 
 	// helpers
 
 	var grid = new THREE.GridHelper( 30, 30, 0x444444, 0x888888 );
-
-	var array = grid.geometry.attributes.color.array;
-
-	for ( var i = 0; i < array.length; i += 60 ) {
-
-		for ( var j = 0; j < 12; j ++ ) {
-
-			array[ i + j ] = 0.26;
-
-		}
-
-	}
-
-	//
-
 	var viewHelper = new ViewHelper( camera, container );
 
 	//
@@ -164,6 +146,13 @@ function Viewport( editor ) {
 	var mouse = new THREE.Vector2();
 
 	// events
+
+	function updateAspectRatio() {
+
+		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+		camera.updateProjectionMatrix();
+
+	}
 
 	function getIntersects( point, objects ) {
 
@@ -364,12 +353,14 @@ function Viewport( editor ) {
 			mediaQuery.addListener( function ( event ) {
 
 				renderer.setClearColor( event.matches ? 0x333333 : 0xaaaaaa );
+				updateGridColors( grid, event.matches ? [ 0x888888, 0x222222 ] : [ 0x282828, 0x888888 ] );
 
-				if ( scene.background === null ) render();
+				render();
 
 			} );
 
 			renderer.setClearColor( mediaQuery.matches ? 0x333333 : 0xaaaaaa );
+			updateGridColors( grid, mediaQuery.matches ? [ 0x888888, 0x222222 ] : [ 0x282828, 0x888888 ] );
 
 		}
 
@@ -639,23 +630,24 @@ function Viewport( editor ) {
 
 	} );
 
-	signals.viewportCameraChanged.add( function ( viewportCamera ) {
+	signals.viewportCameraChanged.add( function () {
+
+		var viewportCamera = editor.viewportCamera;
 
 		if ( viewportCamera.isPerspectiveCamera ) {
 
 			viewportCamera.aspect = editor.camera.aspect;
 			viewportCamera.projectionMatrix.copy( editor.camera.projectionMatrix );
 
-		} else if ( ! viewportCamera.isOrthographicCamera ) {
+		} else if ( viewportCamera.isOrthographicCamera ) {
 
-			throw "Invalid camera set as viewport";
+			// TODO
 
 		}
 
-		// Disable EditorControls when setting a user camera
-		controls.enabled = viewportCamera === editor.camera;
+		// disable EditorControls when setting a user camera
 
-		camera = viewportCamera;
+		controls.enabled = ( viewportCamera === editor.camera );
 
 		render();
 
@@ -665,13 +657,7 @@ function Viewport( editor ) {
 
 	signals.windowResize.add( function () {
 
-		// TODO: Move this out?
-
-		editor.DEFAULT_CAMERA.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-		editor.DEFAULT_CAMERA.updateProjectionMatrix();
-
-		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
-		camera.updateProjectionMatrix();
+		updateAspectRatio();
 
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
@@ -685,6 +671,17 @@ function Viewport( editor ) {
 		render();
 
 	} );
+
+	signals.showHelpersChanged.add( function ( showHelpers ) {
+
+		showSceneHelpers = showHelpers;
+		transformControls.enabled = showHelpers;
+
+		render();
+
+	} );
+
+	signals.cameraResetted.add( updateAspectRatio );
 
 	// animations
 
@@ -733,13 +730,13 @@ function Viewport( editor ) {
 
 		scene.add( grid );
 		renderer.setViewport( 0, 0, container.dom.offsetWidth, container.dom.offsetHeight );
-		renderer.render( scene, camera );
+		renderer.render( scene, editor.viewportCamera );
 		scene.remove( grid );
 
-		if ( camera === editor.camera ) {
+		if ( camera === editor.viewportCamera ) {
 
 			renderer.autoClear = false;
-			renderer.render( sceneHelpers, camera );
+			if ( showSceneHelpers === true ) renderer.render( sceneHelpers, camera );
 			viewHelper.render( renderer );
 			renderer.autoClear = true;
 
@@ -751,6 +748,30 @@ function Viewport( editor ) {
 	}
 
 	return container;
+
+}
+
+function updateGridColors( grid, colors ) {
+
+	const color1 = new THREE.Color( colors[ 0 ] );
+	const color2 = new THREE.Color( colors[ 1 ] );
+
+	const attribute = grid.geometry.attributes.color;
+	const array = attribute.array;
+
+	for ( var i = 0; i < array.length; i += 12 ) {
+
+		const color = ( i % ( 12 * 5 ) === 0 ) ? color1 : color2;
+
+		for ( var j = 0; j < 12; j += 3 ) {
+
+			color.toArray( array, i + j );
+
+		}
+
+	}
+
+	attribute.needsUpdate = true;
 
 }
 

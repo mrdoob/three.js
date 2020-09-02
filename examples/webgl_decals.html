@@ -131,48 +131,42 @@
 
 				} );
 
-				window.addEventListener( 'mousedown', function () {
+				window.addEventListener( 'pointerdown', function () {
 
 					moved = false;
 
 				}, false );
 
-				window.addEventListener( 'mouseup', function () {
+				window.addEventListener( 'pointerup', function ( event ) {
 
-					checkIntersection();
-					if ( ! moved && intersection.intersects ) shoot();
+					if ( moved === false ) {
 
-				} );
+						checkIntersection( event.clientX, event.clientY );
 
-				window.addEventListener( 'mousemove', onTouchMove );
-				window.addEventListener( 'touchmove', onTouchMove );
-
-				function onTouchMove( event ) {
-
-					var x, y;
-
-					if ( event.changedTouches ) {
-
-						x = event.changedTouches[ 0 ].pageX;
-						y = event.changedTouches[ 0 ].pageY;
-
-					} else {
-
-						x = event.clientX;
-						y = event.clientY;
+						if ( intersection.intersects ) shoot();
 
 					}
 
-					mouse.x = ( x / window.innerWidth ) * 2 - 1;
-					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+				} );
 
-					checkIntersection();
+				window.addEventListener( 'pointermove', onPointerMove );
+
+				function onPointerMove( event ) {
+
+					if ( event.isPrimary ) {
+
+						checkIntersection( event.clientX, event.clientY );
+
+					}
 
 				}
 
-				function checkIntersection() {
+				function checkIntersection( x, y ) {
 
-					if ( ! mesh ) return;
+					if ( mesh === undefined ) return;
+
+					mouse.x = ( x / window.innerWidth ) * 2 - 1;
+					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
 
 					raycaster.setFromCamera( mouse, camera );
 					raycaster.intersectObject( mesh, false, intersects );

@@ -10,4 +10,9 @@ export class NumberKeyframeTrack extends KeyframeTrack {
 		interpolation?: InterpolationModes
 	);
 
+	/**
+	 * @default 'number'
+	 */
+	ValueTypeName: string;
+
 }

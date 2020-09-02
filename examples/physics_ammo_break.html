@@ -15,7 +15,7 @@
 	<div id="info">Physics threejs demo with convex objects breaking in real time<br />Press mouse to throw balls and move the camera.</div>
 	<div id="container"></div>
 
-	<script src="js/libs/ammo.js"></script>
+	<script src="js/libs/ammo.wasm.js"></script>
 
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
@@ -376,7 +376,7 @@
 
 		function initInput() {
 
-			window.addEventListener( 'mousedown', function ( event ) {
+			window.addEventListener( 'pointerdown', function ( event ) {
 
 				mouseCoords.set(
 					( event.clientX / window.innerWidth ) * 2 - 1,

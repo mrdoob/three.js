@@ -1,7 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
 import { Command } from '../Command.js';
 
@@ -99,6 +95,7 @@ SetMaterialMapCommand.prototype = {
 				values.push( data );
 
 			}
+
 			return values;
 
 		}
@@ -126,6 +123,7 @@ SetMaterialMapCommand.prototype = {
 				map.sourceFile = json.sourceFile;
 
 			}
+
 			return map;
 
 		}

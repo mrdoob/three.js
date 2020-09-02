@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { FloatNode } from '../inputs/FloatNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
@@ -96,6 +92,7 @@ BumpMapNode.Nodes = ( function () {
 BumpMapNode.prototype = Object.create( TempNode.prototype );
 BumpMapNode.prototype.constructor = BumpMapNode;
 BumpMapNode.prototype.nodeType = "BumpMap";
+BumpMapNode.prototype.hashProperties = [ "toNormalMap" ];
 
 BumpMapNode.prototype.generate = function ( builder, output ) {
 

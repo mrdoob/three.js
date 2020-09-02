@@ -1,7 +1,3 @@
-/**
- * @author donmccurdy / https://www.donmccurdy.com/
- */
-
 import {
 	Triangle
 } from "../../../build/three.module.js";

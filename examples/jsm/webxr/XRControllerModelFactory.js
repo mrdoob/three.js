@@ -1,8 +1,3 @@
-/**
- * @author Nell Waliczek / https://github.com/NellWaliczek
- * @author Brandon Jones / https://github.com/toji
- */
-
 import {
 	Mesh,
 	MeshBasicMaterial,
@@ -253,7 +248,7 @@ var XRControllerModelFactory = ( function () {
 						assetPath
 					);
 
-					let cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
+					const cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
 					if ( cachedAsset ) {
 
 						scene = cachedAsset.scene.clone();

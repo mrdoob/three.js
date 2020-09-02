@@ -56,13 +56,6 @@ The next most important script runs all the appropriate testing.
 The linting is there to keep a consistent code-style across the all of the code and the testing is
 there to help catch bugs and check that the code behaves as expected. It is important that
 neither of these steps comes up with any errors due to your changes.
-* If you’d like the linter to fix any errors that it can change, make the following addition to the “test-lint” script.
-        
-        {
-        ...
-        "test-lint": "eslint src --ext js --ext ts --fix && tsc -p utils/build/tsconfig.lint.json"
-        ...
-        }
 
 If you’d like to make a minified version of the build files i.e. ‘build/three.min.js’ run:
         

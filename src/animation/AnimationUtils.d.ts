@@ -16,6 +16,14 @@ export namespace AnimationUtils {
 		values: any[],
 		valuePropertyName: string
 	): void;
+
+	/**
+	 * @param sourceClip
+	 * @param name
+	 * @param startFrame
+	 * @param endFrame
+	 * @param [fps=30]
+	 */
 	export function subclip(
 		sourceClip: AnimationClip,
 		name: string,
@@ -23,6 +31,13 @@ export namespace AnimationUtils {
 		endFrame: number,
 		fps?: number
 	): AnimationClip;
+
+	/**
+	 * @param targetClip
+	 * @param [referenceFrame=0]
+	 * @param [referenceClip=targetClip]
+	 * @param [fps=30]
+	 */
 	export function makeClipAdditive(
 		targetClip: AnimationClip,
 		referenceFrame?: number,

@@ -1,7 +1,15 @@
+import {
+	ClampToEdgeWrapping,
+	DataTexture,
+	FloatType,
+	LinearFilter,
+	NearestFilter,
+	RGBAFormat,
+	UVMapping,
+	UniformsLib
+} from "../../../build/three.module.js";
 /**
  * Uniforms library for RectAreaLight shared webgl shaders
- * @author abelnation
- * @author WestLangley / http://github.com/WestLangley
  *
  * NOTE: This is a temporary location for the BRDF approximation texture data
  *       based off of Eric Heitz's work (see citation below).  BRDF data for
@@ -12,18 +20,6 @@
  *
  * TODO: figure out a way to compress the LTC BRDF data
  */
-
-import {
-	ClampToEdgeWrapping,
-	DataTexture,
-	FloatType,
-	LinearFilter,
-	NearestFilter,
-	RGBAFormat,
-	ShaderLib,
-	UVMapping,
-	UniformsLib
-} from "../../../build/three.module.js";
 
 // Real-Time Polygonal-Light Shading with Linearly Transformed Cosines
 // by Eric Heitz, Jonathan Dupuy, Stephen Hill and David Neubelt
@@ -46,13 +42,6 @@ var RectAreaLightUniformsLib = {
 
 		UniformsLib.LTC_1 = ltc_1;
 		UniformsLib.LTC_2 = ltc_2;
-
-		// add ltc data textures to material uniforms
-
-		var ltc = { ltc_1: { value: null }, ltc_2: { value: null } };
-
-		Object.assign( ShaderLib.standard.uniforms, ltc );
-		Object.assign( ShaderLib.physical.uniforms, ltc );
 
 	}
 

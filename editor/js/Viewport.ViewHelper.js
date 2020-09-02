@@ -1,7 +1,3 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import { UIPanel } from './libs/ui.js';
 
 import * as THREE from '../../build/three.module.js';
@@ -20,7 +16,6 @@ function ViewHelper( editorCamera, container ) {
 	panel.setBottom( '0px' );
 	panel.setHeight( '128px' );
 	panel.setWidth( '128px' );
-	panel.setBottom( '0px' );
 
 	var scope = this;
 

@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { CubicInterpolant } from '../../../../../src/math/interpolants/CubicInterpolant';

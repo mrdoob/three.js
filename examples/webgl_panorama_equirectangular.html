@@ -56,15 +56,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousedown', onPointerStart, false );
-				document.addEventListener( 'mousemove', onPointerMove, false );
-				document.addEventListener( 'mouseup', onPointerUp, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointerdown', onPointerDown, false );
 
 				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
-
-				document.addEventListener( 'touchstart', onPointerStart, false );
-				document.addEventListener( 'touchmove', onPointerMove, false );
-				document.addEventListener( 'touchend', onPointerUp, false );
 
 				//
 
@@ -119,38 +114,40 @@
 
 			}
 
-			function onPointerStart( event ) {
+			function onPointerDown( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				isUserInteracting = true;
 
-				var clientX = event.clientX || event.touches[ 0 ].clientX;
-				var clientY = event.clientY || event.touches[ 0 ].clientY;
-
-				onMouseDownMouseX = clientX;
-				onMouseDownMouseY = clientY;
+				onMouseDownMouseX = event.clientX;
+				onMouseDownMouseY = event.clientY;
 
 				onMouseDownLon = lon;
 				onMouseDownLat = lat;
+
+				document.addEventListener( 'pointermove', onPointerMove, false );
+				document.addEventListener( 'pointerup', onPointerUp, false );
 
 			}
 
 			function onPointerMove( event ) {
 
-				if ( isUserInteracting === true ) {
+				if ( event.isPrimary === false ) return;
 
-					var clientX = event.clientX || event.touches[ 0 ].clientX;
-					var clientY = event.clientY || event.touches[ 0 ].clientY;
-
-					lon = ( onMouseDownMouseX - clientX ) * 0.1 + onMouseDownLon;
-					lat = ( clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
-
-				}
+				lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
+				lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
 
 			}
 
 			function onPointerUp() {
 
+				if ( event.isPrimary === false ) return;
+
 				isUserInteracting = false;
+
+				document.removeEventListener( 'pointermove', onPointerMove );
+				document.removeEventListener( 'pointerup', onPointerUp );
 
 			}
 

@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { Config } from './Config.js';
@@ -10,12 +6,12 @@ import { History as _History } from './History.js';
 import { Strings } from './Strings.js';
 import { Storage as _Storage } from './Storage.js';
 
-function Editor() {
+var _DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
+_DEFAULT_CAMERA.name = 'Camera';
+_DEFAULT_CAMERA.position.set( 0, 5, 10 );
+_DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
 
-	this.DEFAULT_CAMERA = new THREE.PerspectiveCamera( 50, 1, 0.01, 1000 );
-	this.DEFAULT_CAMERA.name = 'Camera';
-	this.DEFAULT_CAMERA.position.set( 0, 5, 10 );
-	this.DEFAULT_CAMERA.lookAt( new THREE.Vector3() );
+function Editor() {
 
 	var Signal = signals.Signal;
 
@@ -51,6 +47,7 @@ function Editor() {
 		sceneRendered: new Signal(),
 
 		cameraChanged: new Signal(),
+		cameraResetted: new Signal(),
 
 		geometryChanged: new Signal(),
 
@@ -78,6 +75,7 @@ function Editor() {
 		windowResize: new Signal(),
 
 		showGridChanged: new Signal(),
+		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
@@ -92,7 +90,7 @@ function Editor() {
 
 	this.loader = new Loader( this );
 
-	this.camera = this.DEFAULT_CAMERA.clone();
+	this.camera = _DEFAULT_CAMERA.clone();
 
 	this.scene = new THREE.Scene();
 	this.scene.name = 'Scene';
@@ -531,7 +529,7 @@ Editor.prototype = {
 	setViewportCamera: function ( uuid ) {
 
 		this.viewportCamera = this.cameras[ uuid ];
-		this.signals.viewportCameraChanged.dispatch( this.viewportCamera );
+		this.signals.viewportCameraChanged.dispatch();
 
 	},
 
@@ -612,7 +610,8 @@ Editor.prototype = {
 		this.history.clear();
 		this.storage.clear();
 
-		this.camera.copy( this.DEFAULT_CAMERA );
+		this.camera.copy( _DEFAULT_CAMERA );
+		this.signals.cameraResetted.dispatch();
 
 		this.scene.name = "Scene";
 		this.scene.userData = {};
@@ -654,8 +653,7 @@ Editor.prototype = {
 		var camera = loader.parse( json.camera );
 
 		this.camera.copy( camera );
-		this.camera.aspect = this.DEFAULT_CAMERA.aspect;
-		this.camera.updateProjectionMatrix();
+		this.signals.cameraResetted.dispatch();
 
 		this.history.fromJSON( json.history );
 		this.scripts = json.scripts;

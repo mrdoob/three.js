@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIBreak, UIText } from './libs/ui.js';
 
 function ViewportInfo( editor ) {
