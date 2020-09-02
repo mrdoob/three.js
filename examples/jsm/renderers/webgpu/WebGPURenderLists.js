@@ -162,14 +162,13 @@ class WebGPURenderLists {
 	get( scene, camera ) {
 
 		const lists = this.lists;
-		const properties = this.properties;
 
 		const cameras = lists.get( scene );
 		let list;
 
 		if ( cameras === undefined ) {
 
-			list = new WebGPURenderList( properties );
+			list = new WebGPURenderList();
 			lists.set( scene, new WeakMap() );
 			lists.get( scene ).set( camera, list );
 
@@ -178,7 +177,7 @@ class WebGPURenderLists {
 			list = cameras.get( camera );
 			if ( list === undefined ) {
 
-				list = new WebGPURenderList( properties );
+				list = new WebGPURenderList();
 				cameras.set( camera, list );
 
 			}

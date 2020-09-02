@@ -1,4 +1,4 @@
-import { GPUPrimitiveTopology, GPUIndexFormat } from './constants.js';
+import { GPUIndexFormat } from './constants.js';
 import WebGPUObjects from './WebGPUObjects.js';
 import WebGPUAttributes from './WebGPUAttributes.js';
 import WebGPUGeometries from './WebGPUGeometries.js';
@@ -59,9 +59,9 @@ class WebGPURenderer {
 
 	}
 
-	init( parameters ) {
+	init() {
 
-		return initWebGPU( this, parameters );
+		return initWebGPU( this );
 
 	}
 
