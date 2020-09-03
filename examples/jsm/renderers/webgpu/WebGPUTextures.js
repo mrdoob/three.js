@@ -1,5 +1,5 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode } from './constants.js';
-import { Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, RepeatWrapping, MirroredRepeatWrapping } from '../../../../build/three.module.js';
+import { Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, RepeatWrapping, MirroredRepeatWrapping, FloatType, HalfFloatType } from '../../../../build/three.module.js';
 
 class WebGPUTextures {
 
@@ -80,7 +80,7 @@ class WebGPUTextures {
 				if ( textureProperties.textureGPU !== undefined ) {
 
 					// TODO: Avoid calling of destroy() in certain scenarios. When only the contents of a texture
-					// are updated, a  call of _uploadTexture() should be sufficient. However, if the user changes
+					// are updated, a buffer upload should be sufficient. However, if the user changes
 					// the dimensions of the texture, format or usage, a new instance of GPUTexture is required.
 
 					textureProperties.textureGPU.destroy();
@@ -170,6 +170,24 @@ class WebGPUTextures {
 
 	}
 
+	_convertFormat( type ) {
+
+		let formatGPU = GPUTextureFormat.RGBA8Unorm;
+
+		if ( type === FloatType ) {
+
+			formatGPU = GPUTextureFormat.RGBA32Float;
+
+		} else if ( type === HalfFloatType ) {
+
+			formatGPU = GPUTextureFormat.RGBA16Float;
+
+		}
+
+		return formatGPU;
+
+	}
+
 	_createTexture( texture ) {
 
 		const device = this.device;
@@ -178,38 +196,48 @@ class WebGPUTextures {
 		const width = ( image !== undefined ) ? image.width : 1;
 		const height = ( image !== undefined ) ? image.height : 1;
 
+		const format = this._convertFormat( texture.type );
+
 		const textureGPU = device.createTexture( {
 			size: {
 				width: width,
 				height: height,
 				depth: 1,
 			},
-			format: GPUTextureFormat.RGBA8Unorm,
+			format: format,
 			usage: GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST,
 		} );
 
-		// convert HTML iamges and canvas elements to ImageBitmap before copy
+		if ( texture.isDataTexture ) {
 
-		if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
-			( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ) {
-
-			const options = {};
-
-			options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'none';
-
-			createImageBitmap( image, 0, 0, width, height, options ).then( imageBitmap => {
-
-				this._uploadTexture( imageBitmap, textureGPU );
-
-			} );
+			this.__copyBufferToTexture( image, format, textureGPU );
 
 		} else {
 
-			if ( image !== undefined ) {
+			// convert HTML iamges and canvas elements to ImageBitmap before copy
 
-				// assuming ImageBitmap. Directly start copy operation of the contents of ImageBitmap into the destination texture
+			if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+				( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ) {
 
-				this._uploadTexture( image, textureGPU );
+				const options = {};
+
+				options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'none';
+
+				createImageBitmap( image, 0, 0, width, height, options ).then( imageBitmap => {
+
+					this._copyImageBitmapToTexture( imageBitmap, textureGPU );
+
+				} );
+
+			} else {
+
+				if ( image !== undefined ) {
+
+					// assuming ImageBitmap. Directly start copy operation of the contents of ImageBitmap into the destination texture
+
+					this._copyImageBitmapToTexture( image, textureGPU );
+
+				}
 
 			}
 
@@ -219,7 +247,53 @@ class WebGPUTextures {
 
 	}
 
-	_uploadTexture( imageBitmap, textureGPU ) {
+	__copyBufferToTexture( image, format, textureGPU ) {
+
+		// this code assumes data textures in RGBA format
+		// TODO: Consider to support valid buffer layouts with other formats like RGB
+
+		const device = this.device;
+		const data = image.data;
+
+		const bytesPerTexel = this._getBytesPerTexel( format );
+		const bytesPerRow = Math.ceil( image.width * bytesPerTexel / 256 ) * 256;
+
+		const textureDataBuffer = device.createBuffer( {
+			size: data.byteLength,
+			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
+			mappedAtCreation: true,
+		} );
+
+		new data.constructor( textureDataBuffer.getMappedRange() ).set( data );
+		textureDataBuffer.unmap();
+
+		const commandEncoder = device.createCommandEncoder( {} );
+		commandEncoder.copyBufferToTexture(
+			{
+				buffer: textureDataBuffer,
+				bytesPerRow: bytesPerRow
+			}, {
+				texture: textureGPU
+			}, {
+				width: image.width,
+				height: image.height,
+				depth: 1
+			} );
+
+		device.defaultQueue.submit( [ commandEncoder.finish() ] );
+		textureDataBuffer.destroy();
+
+	}
+
+	_getBytesPerTexel( format ) {
+
+		if ( format === GPUTextureFormat.RGBA8Unorm ) return 4;
+		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
+
+	}
+
+	_copyImageBitmapToTexture( imageBitmap, textureGPU ) {
 
 		const device = this.device;
 
