@@ -8,6 +8,7 @@ import WebGPURenderPipelines from './WebGPURenderPipelines.js';
 import WebGPUBindings from './WebGPUBindings.js';
 import WebGPURenderLists from './WebGPURenderLists.js';
 import WebGPUTextures from './WebGPUTextures.js';
+import WebGPUBackground from './WebGPUBackground.js';
 
 import { Frustum, Matrix4, Vector3 } from '../../../../build/three.module.js';
 
@@ -24,6 +25,7 @@ class WebGPURenderer {
 		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
 		this.parameters = parameters;
 
+		this.autoClear = true;
 		this.sortObjects = true;
 
 		// internals
@@ -50,6 +52,7 @@ class WebGPURenderer {
 		this._renderPipelines = null;
 		this._renderLists = null;
 		this._textures = null;
+		this._background = null;
 
 		this._renderPassDescriptor = null;
 
@@ -91,10 +94,11 @@ class WebGPURenderer {
 
 		const colorAttachment = this._renderPassDescriptor.colorAttachments[ 0 ];
 		colorAttachment.attachment = this._swapChain.getCurrentTexture().createView();
-		colorAttachment.loadValue = GPULoadOp.Load;
 
 		const depthStencilAttachment = this._renderPassDescriptor.depthStencilAttachment;
 		depthStencilAttachment.attachment = this._depthBuffer.createView();
+
+		this._background.render( scene, this._renderPassDescriptor, this.autoClear );
 
 		const opaqueObjects = this._currentRenderList.opaque;
 		const transparentObjects = this._currentRenderList.transparent;
@@ -575,6 +579,7 @@ async function initWebGPU( scope ) {
 	scope._objects = new WebGPUObjects( scope._geometries, scope._info );
 	scope._renderPipelines = new WebGPURenderPipelines( device, compiler, scope._bindings );
 	scope._renderLists = new WebGPURenderLists();
+	scope._background = new WebGPUBackground();
 
 	//
 
