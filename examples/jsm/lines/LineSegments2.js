@@ -13,7 +13,7 @@ import { LineMaterial } from "../lines/LineMaterial.js";
 
 var LineSegments2 = function ( geometry, material ) {
 
-	Mesh.call( this );
+	Mesh.call( this, geometry, material );
 
 	this.type = 'LineSegments2';
 

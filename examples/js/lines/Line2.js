@@ -2,7 +2,7 @@ console.warn( "THREE.Line2: As part of the transition to ES6 Modules, the files 
 
 THREE.Line2 = function ( geometry, material ) {
 
-	THREE.LineSegments2.call( this );
+	THREE.LineSegments2.call( this, geometry, material );
 
 	this.type = 'Line2';
 

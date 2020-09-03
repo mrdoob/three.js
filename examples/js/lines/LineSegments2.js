@@ -2,7 +2,7 @@ console.warn( "THREE.LineSegments2: As part of the transition to ES6 Modules, th
 
 THREE.LineSegments2 = function ( geometry, material ) {
 
-	THREE.Mesh.call( this );
+	THREE.Mesh.call( this, geometry, material );
 
 	this.type = 'LineSegments2';
 

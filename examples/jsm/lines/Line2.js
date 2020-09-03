@@ -5,7 +5,7 @@ import { LineMaterial } from "../lines/LineMaterial.js";
 
 var Line2 = function ( geometry, material ) {
 
-	LineSegments2.call( this );
+	LineSegments2.call( this, geometry, material );
 
 	this.type = 'Line2';
 
