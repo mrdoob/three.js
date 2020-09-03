@@ -222,7 +222,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		console.log( material );
+		// console.log( material );
 
 		var mat = new MeshStandardMaterial( {
 			color: diffusecolor,
@@ -315,11 +315,18 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				default:
 
-					var material = this._createMaterial( materials[ attributes.materialIndex ] );
+					if ( attributes.hasOwnProperty( 'materialUUID' ) ) {
 
-					material = this._compareMaterials( material );
+						var rMaterial = materials.find( m => m.id === attributes.materialUUID );
+						var material = this._createMaterial( rMaterial );
+						material = this._compareMaterials( material );
+						var _object = this._createObject( obj, material );
 
-					var _object = this._createObject( obj, material );
+					} else {
+
+						var _object = this._createObject( obj, null );
+
+					}
 
 					if ( _object === undefined ) {
 
@@ -789,6 +796,13 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			var object = extractObjectData( _object, doc );
 
 			if ( object !== undefined ) {
+
+				if ( object.attributes.materialIndex >= 0 ) {
+
+					var mId = doc.materials().findIndex( object.attributes.materialIndex ).id;
+					object.attributes.materialUUID = mId;
+
+				}
 
 				objects.push( object );
 
