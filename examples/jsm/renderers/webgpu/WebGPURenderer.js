@@ -10,7 +10,7 @@ import WebGPURenderLists from './WebGPURenderLists.js';
 import WebGPUTextures from './WebGPUTextures.js';
 import WebGPUBackground from './WebGPUBackground.js';
 
-import { Frustum, Matrix4, Vector3 } from '../../../../build/three.module.js';
+import { Frustum, Matrix4, Vector3, Color } from '../../../../build/three.module.js';
 
 const _frustum = new Frustum();
 const _projScreenMatrix = new Matrix4();
@@ -60,6 +60,9 @@ class WebGPURenderer {
 		this._opaqueSort = null;
 		this._transparentSort = null;
 
+		this._clearAlpha = 1;
+		this._clearColor = new Color( 0x000000 );
+
 	}
 
 	init() {
@@ -98,7 +101,7 @@ class WebGPURenderer {
 		const depthStencilAttachment = this._renderPassDescriptor.depthStencilAttachment;
 		depthStencilAttachment.attachment = this._depthBuffer.createView();
 
-		this._background.render( scene, this._renderPassDescriptor, this.autoClear );
+		this._background.render( scene );
 
 		const opaqueObjects = this._currentRenderList.opaque;
 		const transparentObjects = this._currentRenderList.transparent;
@@ -250,6 +253,31 @@ class WebGPURenderer {
 			};
 
 		}
+
+	}
+
+	getClearColor() {
+
+		return this._clearColor;
+
+	}
+
+	setClearColor( color, alpha = 1 ) {
+
+		this._clearColor.set( color );
+		this._clearAlpha = alpha;
+
+	}
+
+	getClearAlpha() {
+
+		return this._clearAlpha;
+
+	}
+
+	setClearAlpha( alpha ) {
+
+		this._clearAlpha = alpha;
 
 	}
 
@@ -579,7 +607,7 @@ async function initWebGPU( scope ) {
 	scope._objects = new WebGPUObjects( scope._geometries, scope._info );
 	scope._renderPipelines = new WebGPURenderPipelines( device, compiler, scope._bindings );
 	scope._renderLists = new WebGPURenderLists();
-	scope._background = new WebGPUBackground();
+	scope._background = new WebGPUBackground( scope );
 
 	//
 
