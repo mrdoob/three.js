@@ -105,6 +105,9 @@ class WebGPUTextures {
 
 		const array = [];
 
+		array.push( texture.wrapS );
+		array.push( texture.wrapT );
+		array.push( texture.wrapR );
 		array.push( texture.magFilter );
 		array.push( texture.minFilter );
 		array.push( texture.anisotropy );
