@@ -15,14 +15,23 @@
 			import * as THREE from '../build/three.module.js';
 
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
 			let camera, scene, renderer;
 
 			let mesh;
 
-			init().then( animate );
+			init().then( animate ).catch( onInitError );
 
 			async function init() {
+
+				if ( WebGPU.isAvailable() === false ) {
+
+					document.body.appendChild( WebGPU.getErrorMessage() );
+
+					throw 'No WebGPU support';
+
+				}
 
 				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.z = 4;
@@ -90,6 +99,12 @@
 				mesh.rotation.y += 0.02;
 
 				renderer.render( scene, camera );
+
+			}
+
+			function onInitError( error ) {
+
+				console.error( error );
 
 			}
 
