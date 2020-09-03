@@ -26,6 +26,10 @@ class WebGPURenderer {
 		this.parameters = parameters;
 
 		this.autoClear = true;
+		this.autoClearColor = true;
+		this.autoClearDepth = true;
+		this.autoClearStencil = true;
+
 		this.sortObjects = true;
 
 		// internals
@@ -62,6 +66,8 @@ class WebGPURenderer {
 
 		this._clearAlpha = 1;
 		this._clearColor = new Color( 0x000000 );
+		this._clearDepth = 1;
+		this._clearStencil = 0;
 
 	}
 
@@ -278,6 +284,36 @@ class WebGPURenderer {
 	setClearAlpha( alpha ) {
 
 		this._clearAlpha = alpha;
+
+	}
+
+	getClearDepth() {
+
+		return this._clearDepth;
+
+	}
+
+	setClearDepth( depth ) {
+
+		this._clearDepth = depth;
+
+	}
+
+	getClearStencil() {
+
+		return this._clearStencil;
+
+	}
+
+	setClearStencil( stencil ) {
+
+		this._clearStencil = stencil;
+
+	}
+
+	clear() {
+
+		this._background.clear();
 
 	}
 
@@ -617,9 +653,7 @@ async function initWebGPU( scope ) {
 		} ],
 		 depthStencilAttachment: {
 			attachment: null,
-			depthLoadValue: 1,
 			depthStoreOp: GPUStoreOp.Store,
-			stencilLoadValue: 0,
 			stencilStoreOp: GPUStoreOp.Store
 		}
 	};
