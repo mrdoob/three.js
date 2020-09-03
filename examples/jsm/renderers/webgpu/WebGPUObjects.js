@@ -1,4 +1,3 @@
-
 class WebGPUObjects {
 
 	constructor( geometries, info ) {
