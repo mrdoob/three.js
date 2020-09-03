@@ -77,6 +77,16 @@ class WebGPUTextures {
 
 			} else {
 
+				if ( textureProperties.textureGPU !== undefined ) {
+
+					// TODO: Avoid calling of destroy() in certain scenarios. When only the contents of a texture
+					// are updated, a  call of _uploadTexture() should be sufficient. However, if the user changes
+					// the dimensions of the texture, format or usage, a new instance of GPUTexture is required.
+
+					textureProperties.textureGPU.destroy();
+
+				}
+
 				textureProperties.textureGPU = this._createTexture( texture );
 				textureProperties.version = texture.version;
 				updated = true;
@@ -183,7 +193,11 @@ class WebGPUTextures {
 		if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 			( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ) {
 
-			createImageBitmap( image, 0, 0, width, height ).then( imageBitmap => {
+			const options = {};
+
+			options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'none';
+
+			createImageBitmap( image, 0, 0, width, height, options ).then( imageBitmap => {
 
 				this._uploadTexture( imageBitmap, textureGPU );
 
