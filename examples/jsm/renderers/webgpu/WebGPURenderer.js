@@ -1,4 +1,4 @@
-import { GPUIndexFormat } from './constants.js';
+import { GPUIndexFormat, GPUTextureFormat, GPUStoreOp, GPULoadOp } from './constants.js';
 import WebGPUObjects from './WebGPUObjects.js';
 import WebGPUAttributes from './WebGPUAttributes.js';
 import WebGPUGeometries from './WebGPUGeometries.js';
@@ -91,7 +91,7 @@ class WebGPURenderer {
 
 		const colorAttachment = this._renderPassDescriptor.colorAttachments[ 0 ];
 		colorAttachment.attachment = this._swapChain.getCurrentTexture().createView();
-		colorAttachment.loadValue = 'load';
+		colorAttachment.loadValue = GPULoadOp.Load;
 
 		const depthStencilAttachment = this._renderPassDescriptor.depthStencilAttachment;
 		depthStencilAttachment.attachment = this._depthBuffer.createView();
@@ -527,7 +527,7 @@ class WebGPURenderer {
 					height: this._height * this._pixelRatio,
 					depth: 1
 				},
-				format: 'depth24plus-stencil8',
+				format: GPUTextureFormat.Depth24PlusStencil8,
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT
 			} );
 
@@ -561,7 +561,7 @@ async function initWebGPU( scope ) {
 
 	const swapChain = context.configureSwapChain( {
 		device: device,
-		format: 'bgra8unorm'
+		format: GPUTextureFormat.BRGA8Unorm
 	} );
 
 	scope._adapter = adapter;
@@ -588,9 +588,9 @@ async function initWebGPU( scope ) {
 		 depthStencilAttachment: {
 			attachment: null,
 			depthLoadValue: 1,
-			depthStoreOp: 'store',
+			depthStoreOp: GPUStoreOp.Store,
 			stencilLoadValue: 0,
-			stencilStoreOp: 'store'
+			stencilStoreOp: GPUStoreOp.Store
 		}
 	};
 

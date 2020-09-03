@@ -1,4 +1,4 @@
-import { GPUPrimitiveTopology, GPUIndexFormat } from './constants.js';
+import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat } from './constants.js';
 import { FrontSide, BackSide, DoubleSide } from '../../../../build/three.module.js';
 
 class WebGPURenderPipelines {
@@ -56,11 +56,11 @@ class WebGPURenderPipelines {
 
 			if ( moduleVertex === undefined ) {
 
-				const byteCodeVertex = glslang.compileGLSL( shader.vertexShader, "vertex" );
+				const byteCodeVertex = glslang.compileGLSL( shader.vertexShader, 'vertex' );
 
 				moduleVertex = {
 					module: device.createShaderModule( { code: byteCodeVertex } ),
-					entryPoint: "main"
+					entryPoint: 'main'
 				};
 
 				this.shaderModules.vertex.set( shader, moduleVertex );
@@ -71,11 +71,11 @@ class WebGPURenderPipelines {
 
 			if ( moduleFragment === undefined ) {
 
-				const byteCodeFragment = glslang.compileGLSL( shader.fragmentShader, "fragment" );
+				const byteCodeFragment = glslang.compileGLSL( shader.fragmentShader, 'fragment' );
 
 				moduleFragment = {
 					module: device.createShaderModule( { code: byteCodeFragment } ),
-					entryPoint: "main"
+					entryPoint: 'main'
 				};
 
 				this.shaderModules.fragment.set( shader, moduleFragment );
@@ -133,11 +133,11 @@ class WebGPURenderPipelines {
 				fragmentStage: moduleFragment,
 				primitiveTopology: primitiveTopology,
 				rasterizationState: rasterizationState,
-				colorStates: [ { format: 'bgra8unorm' } ],
+				colorStates: [ { format: GPUTextureFormat.BRGA8Unorm } ],
 				depthStencilState: {
 					depthWriteEnabled: material.depthWrite,
-					depthCompare: "less",
-					format: 'depth24plus-stencil8',
+					depthCompare: GPUCompareFunction.Less,
+					format: GPUTextureFormat.Depth24PlusStencil8,
 				},
 				vertexState: {
 					indexFormat: indexFormat,
@@ -192,18 +192,18 @@ class WebGPURenderPipelines {
 		switch ( material.side ) {
 
 			case FrontSide:
-				descriptor.frontFace = 'ccw';
-				descriptor.cullMode = 'back';
+				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.cullMode = GPUCullMode.Back;
 				break;
 
 			case BackSide:
-				descriptor.frontFace = 'cw';
-				descriptor.cullMode = 'back';
+				descriptor.frontFace = GPUFrontFace.CW;
+				descriptor.cullMode = GPUCullMode.Back;
 				break;
 
 			case DoubleSide:
-				descriptor.frontFace = 'ccw';
-				descriptor.cullMode = 'none';
+				descriptor.frontFace = GPUFrontFace.CCW;
+				descriptor.cullMode = GPUCullMode.None;
 				break;
 
 			default:
@@ -222,24 +222,24 @@ class WebGPURenderPipelines {
 
 		if ( array instanceof Float32Array ) {
 
-			if ( attribute.itemSize === 1 ) return 'float';
-			if ( attribute.itemSize === 2 ) return 'float2';
-			if ( attribute.itemSize === 3 ) return 'float3';
-			if ( attribute.itemSize === 4 ) return 'float4';
+			if ( attribute.itemSize === 1 ) return GPUVertexFormat.Float;
+			if ( attribute.itemSize === 2 ) return GPUVertexFormat.Float2;
+			if ( attribute.itemSize === 3 ) return GPUVertexFormat.Float3;
+			if ( attribute.itemSize === 4 ) return GPUVertexFormat.Float4;
 
 		} else if ( array instanceof Uint32Array ) {
 
-			if ( attribute.itemSize === 1 ) return 'uint';
-			if ( attribute.itemSize === 2 ) return 'uint2';
-			if ( attribute.itemSize === 3 ) return 'uint3';
-			if ( attribute.itemSize === 4 ) return 'uint4';
+			if ( attribute.itemSize === 1 ) return GPUVertexFormat.Uint;
+			if ( attribute.itemSize === 2 ) return GPUVertexFormat.Uint2;
+			if ( attribute.itemSize === 3 ) return GPUVertexFormat.Uint3;
+			if ( attribute.itemSize === 4 ) return GPUVertexFormat.Uint4;
 
 		} else if ( array instanceof Int32Array ) {
 
-			if ( attribute.itemSize === 1 ) return 'int';
-			if ( attribute.itemSize === 2 ) return 'int2';
-			if ( attribute.itemSize === 3 ) return 'int3';
-			if ( attribute.itemSize === 4 ) return 'int4';
+			if ( attribute.itemSize === 1 ) return GPUVertexFormat.Int;
+			if ( attribute.itemSize === 2 ) return GPUVertexFormat.Int2;
+			if ( attribute.itemSize === 3 ) return GPUVertexFormat.Int3;
+			if ( attribute.itemSize === 4 ) return GPUVertexFormat.Int4;
 
 		}
 
