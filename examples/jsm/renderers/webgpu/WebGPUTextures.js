@@ -1,3 +1,4 @@
+import { GPUTextureFormat, GPUAddressMode, GPUFilterMode } from './constants.js';
 import { Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, RepeatWrapping, MirroredRepeatWrapping } from '../../../../build/three.module.js';
 
 class WebGPUTextures {
@@ -129,15 +130,15 @@ class WebGPUTextures {
 
 	_convertAddressMode( value ) {
 
-		let addressMode = 'clamp-to-edge';
+		let addressMode = GPUAddressMode.ClampToEdge;
 
 		if ( value === RepeatWrapping ) {
 
-			addressMode = 'repeat';
+			addressMode = GPUAddressMode.Repeat;
 
 		} else if ( value === MirroredRepeatWrapping ) {
 
-			addressMode = 'mirror-repeat';
+			addressMode = GPUAddressMode.MirrorRepeat;
 
 		}
 
@@ -147,11 +148,11 @@ class WebGPUTextures {
 
 	_convertFilterMode( value ) {
 
-		let filterMode = 'linear';
+		let filterMode = GPUFilterMode.Linear;
 
 		if ( value === NearestFilter || value === NearestMipmapNearestFilter || value === NearestMipmapLinearFilter ) {
 
-			filterMode = 'nearest';
+			filterMode = GPUFilterMode.Nearest;
 
 		}
 
@@ -173,7 +174,7 @@ class WebGPUTextures {
 				height: height,
 				depth: 1,
 			},
-			format: "rgba8unorm",
+			format: GPUTextureFormat.RGBA8Unorm,
 			usage: GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST,
 		} );
 

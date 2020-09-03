@@ -164,3 +164,14 @@ export const GPUTextureFormat = {
 	Depth32FloatStencil8: 'depth32float-stencil8',
 
 };
+
+export const GPUAddressMode = {
+	ClampToEdge: 'clamp-to-edge',
+	Repeat: 'repeat',
+	MirrorRepeat: 'mirror-repeat'
+};
+
+export const GPUFilterMode = {
+	Linear: 'linear',
+	Nearest: 'nearest'
+};
