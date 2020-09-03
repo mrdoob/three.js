@@ -450,6 +450,32 @@ class WebGPURenderer {
 		const cmdEncoder = device.createCommandEncoder( {} );
 		const passEncoder = cmdEncoder.beginRenderPass( this._renderPassDescriptor );
 
+		// global rasterization settings for all renderable objects
+
+		const vp = this._viewport;
+
+		if ( vp !== null ) {
+
+			const width = Math.floor( vp.width * this._pixelRatio );
+			const height = Math.floor( vp.height * this._pixelRatio );
+
+			passEncoder.setViewport( vp.x, vp.y, width, height, vp.minDepth, vp.maxDepth );
+
+		}
+
+		const sc = this._scissor;
+
+		if ( sc !== null ) {
+
+			const width = Math.floor( sc.width * this._pixelRatio );
+			const height = Math.floor( sc.height * this._pixelRatio );
+
+			passEncoder.setScissorRect( sc.x, sc.y, width, height );
+
+		}
+
+		// process renderable objects
+
 		for ( let i = 0, l = renderList.length; i < l; i ++ ) {
 
 			const renderItem = renderList[ i ];
@@ -479,30 +505,6 @@ class WebGPURenderer {
 
 		const pipeline = this._renderPipelines.get( object );
 		passEncoder.setPipeline( pipeline );
-
-		// rasterization
-
-		const vp = this._viewport;
-
-		if ( vp !== null ) {
-
-			const width = Math.floor( vp.width * this._pixelRatio );
-			const height = Math.floor( vp.height * this._pixelRatio );
-
-			passEncoder.setViewport( vp.x, vp.y, width, height, vp.minDepth, vp.maxDepth );
-
-		}
-
-		const sc = this._scissor;
-
-		if ( sc !== null ) {
-
-			const width = Math.floor( sc.width * this._pixelRatio );
-			const height = Math.floor( sc.height * this._pixelRatio );
-
-			passEncoder.setScissorRect( sc.x, sc.y, width, height );
-
-		}
 
 		// bind group
 
