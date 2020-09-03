@@ -1,4 +1,4 @@
-import { GPUIndexFormat, GPUTextureFormat, GPUStoreOp, GPULoadOp } from './constants.js';
+import { GPUIndexFormat, GPUTextureFormat, GPUStoreOp } from './constants.js';
 import WebGPUObjects from './WebGPUObjects.js';
 import WebGPUAttributes from './WebGPUAttributes.js';
 import WebGPUGeometries from './WebGPUGeometries.js';
