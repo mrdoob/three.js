@@ -377,6 +377,11 @@ class WebGPURenderer {
 
 	_renderObjects( renderList, camera ) {
 
+		const device = this._device;
+
+		const cmdEncoder = device.createCommandEncoder( {} );
+		const passEncoder = cmdEncoder.beginRenderPass( this._renderPassDescriptor );
+
 		for ( let i = 0, l = renderList.length; i < l; i ++ ) {
 
 			const renderItem = renderList[ i ];
@@ -389,21 +394,18 @@ class WebGPURenderer {
 			this._objects.update( object );
 			this._bindings.update( object, camera );
 
-			this._renderObject( object );
+			this._renderObject( object, passEncoder );
 
 		}
 
+		passEncoder.endPass();
+		device.defaultQueue.submit( [ cmdEncoder.finish() ] );
+
 	}
 
-	_renderObject( object ) {
+	_renderObject( object, passEncoder ) {
 
-		const device = this._device;
 		const info = this._info;
-
-		// begin
-
-		const cmdEncoder = device.createCommandEncoder( {} );
-		const passEncoder = cmdEncoder.beginRenderPass( this._renderPassDescriptor );
 
 		// pipeline
 
@@ -479,11 +481,6 @@ class WebGPURenderer {
 			info.update( object, vertexCount );
 
 		}
-
-		// end
-
-		passEncoder.endPass();
-		device.defaultQueue.submit( [ cmdEncoder.finish() ] );
 
 	}
 
