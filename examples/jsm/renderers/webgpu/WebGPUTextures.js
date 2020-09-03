@@ -3,12 +3,11 @@ import { Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinear
 
 class WebGPUTextures {
 
-	constructor( device, properties ) {
+	constructor( device, properties, info ) {
 
 		this.device = device;
 		this.properties = properties;
-
-		this.textures = new WeakMap();
+		this.info = info;
 
 		this.defaultTexture = null;
 		this.defaultSampler = null;
@@ -76,6 +75,23 @@ class WebGPUTextures {
 				console.warn( 'THREE.WebGPURenderer: Texture marked for update but image is incomplete' );
 
 			} else {
+
+				// texture init
+
+				if ( textureProperties.initialized === undefined ) {
+
+					textureProperties.initialized = true;
+
+					const disposeCallback = onTextureDispose.bind( this );
+					textureProperties.disposeCallback = disposeCallback;
+
+					texture.addEventListener( 'dispose', disposeCallback );
+
+					this.info.memory.textures ++;
+
+				}
+
+				// texture creation
 
 				if ( textureProperties.textureGPU !== undefined ) {
 
@@ -313,6 +329,21 @@ class WebGPUTextures {
 		);
 
 	}
+
+}
+
+function onTextureDispose( event ) {
+
+	const texture = event.target;
+
+	const textureProperties = this.properties.get( texture );
+	textureProperties.textureGPU.destroy();
+
+	texture.removeEventListener( 'dispose', textureProperties.disposeCallback );
+
+	this.properties.remove( texture );
+
+	this.info.memory.textures --;
 
 }
 

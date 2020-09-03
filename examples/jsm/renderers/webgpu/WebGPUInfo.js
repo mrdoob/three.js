@@ -13,7 +13,8 @@ class WebGPUInfo {
 		};
 
 		this.memory = {
-			geometries: 0
+			geometries: 0,
+			textures: 0
 		};
 
 	}
