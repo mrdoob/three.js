@@ -2,12 +2,12 @@ console.warn( "THREE.Line2: As part of the transition to ES6 Modules, the files 
 
 THREE.Line2 = function ( geometry, material ) {
 
-	THREE.LineSegments2.call( this );
+	if ( geometry === undefined ) geometry = new THREE.LineGeometry();
+	if ( material === undefined ) material = new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
+
+	THREE.LineSegments2.call( this, geometry, material );
 
 	this.type = 'Line2';
-
-	this.geometry = geometry !== undefined ? geometry : new THREE.LineGeometry();
-	this.material = material !== undefined ? material : new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
 
 };
 
