@@ -65,7 +65,7 @@ class WebGPUAttributes {
 		buffer.unmap();
 
 		return {
-			version: 0,
+			version: attribute.version,
 			buffer: buffer
 		};
 
