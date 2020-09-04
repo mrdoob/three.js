@@ -89,9 +89,6 @@ class WebGPURenderPipelines {
 
 			// vertex buffers
 
-			const geometry = object.geometry;
-
-			const attributes = geometry.attributes;
 			const vertexBuffers = [];
 
 			// Find "layout (location = num) in type name" in vertex shader
@@ -111,6 +108,7 @@ class WebGPURenderPipelines {
 
 			}
 
+			const geometry = object.geometry;
 			let indexFormat;
 
 			if ( object.isLine ) {
