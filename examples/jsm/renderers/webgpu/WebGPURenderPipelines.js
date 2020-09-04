@@ -89,29 +89,26 @@ class WebGPURenderPipelines {
 
 			// vertex buffers
 
-			const geometry = object.geometry;
-
-			const attributes = geometry.attributes;
 			const vertexBuffers = [];
 
-			let shaderLocation = 0;
+			// Find "layout (location = num) in type name" in vertex shader
+			const regex = /^\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
+			let shaderAttribute = null;
 
-			for ( const name in attributes ) {
+			while ( shaderAttribute = regex.exec( shader.vertexShader ) ) {
 
-				const attribute = attributes[ name ];
-
-				const arrayStride = this._getArrayStride( attribute );
-				const vertexFormat = this._getVertexFormat( attribute );
+				const shaderLocation = parseInt( shaderAttribute.groups.location );
+				const arrayStride = this._getArrayStride( shaderAttribute.groups.type );
+				const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type );
 
 				vertexBuffers.push( {
 					arrayStride: arrayStride,
 					attributes: [ { shaderLocation: shaderLocation, offset: 0, format: vertexFormat } ]
 				} );
 
-				shaderLocation ++;
-
 			}
 
+			const geometry = object.geometry;
 			let indexFormat;
 
 			if ( object.isLine ) {
@@ -163,15 +160,26 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getArrayStride( attribute ) {
+	_getArrayStride( type ) {
 
-		const array = attribute.array;
+		// This code is GLSL specific. We need to update when we switch to WGSL.
 
-		if ( array instanceof Float32Array || array instanceof Uint32Array || array instanceof Int32Array ) {
+		if ( type === 'float' ) return 4;
+		if ( type === 'vec2' ) return 8;
+		if ( type === 'vec3' ) return 12;
+		if ( type === 'vec4' ) return 16;
 
-			return attribute.itemSize * 4;
+		if ( type === 'int' ) return 4;
+		if ( type === 'ivec2' ) return 8;
+		if ( type === 'ivec3' ) return 12;
+		if ( type === 'ivec4' ) return 16;
 
-		}
+		if ( type === 'uint' ) return 4;
+		if ( type === 'uvec2' ) return 8;
+		if ( type === 'uvec3' ) return 12;
+		if ( type === 'uvec4' ) return 16;
+
+		console.error( 'WebGPURenderer: no this shader variable type support yet.', type );
 
 	}
 
@@ -216,32 +224,26 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getVertexFormat( attribute ) {
+	_getVertexFormat( type ) {
 
-		const array = attribute.array;
+		// This code is GLSL specific. We need to update when we switch to WGSL.
 
-		if ( array instanceof Float32Array ) {
+		if ( type === 'float' ) return GPUVertexFormat.Float;
+		if ( type === 'vec2' ) return GPUVertexFormat.Float2;
+		if ( type === 'vec3' ) return GPUVertexFormat.Float3;
+		if ( type === 'vec4' ) return GPUVertexFormat.Float4;
 
-			if ( attribute.itemSize === 1 ) return GPUVertexFormat.Float;
-			if ( attribute.itemSize === 2 ) return GPUVertexFormat.Float2;
-			if ( attribute.itemSize === 3 ) return GPUVertexFormat.Float3;
-			if ( attribute.itemSize === 4 ) return GPUVertexFormat.Float4;
+		if ( type === 'int' ) return GPUVertexFormat.Int;
+		if ( type === 'ivec2' ) return GPUVertexFormat.Int2;
+		if ( type === 'ivec3' ) return GPUVertexFormat.Int3;
+		if ( type === 'ivec4' ) return GPUVertexFormat.Int4;
 
-		} else if ( array instanceof Uint32Array ) {
+		if ( type === 'uint' ) return GPUVertexFormat.UInt;
+		if ( type === 'uvec2' ) return GPUVertexFormat.UInt2;
+		if ( type === 'uvec3' ) return GPUVertexFormat.UInt3;
+		if ( type === 'uvec4' ) return GPUVertexFormat.UInt4;
 
-			if ( attribute.itemSize === 1 ) return GPUVertexFormat.Uint;
-			if ( attribute.itemSize === 2 ) return GPUVertexFormat.Uint2;
-			if ( attribute.itemSize === 3 ) return GPUVertexFormat.Uint3;
-			if ( attribute.itemSize === 4 ) return GPUVertexFormat.Uint4;
-
-		} else if ( array instanceof Int32Array ) {
-
-			if ( attribute.itemSize === 1 ) return GPUVertexFormat.Int;
-			if ( attribute.itemSize === 2 ) return GPUVertexFormat.Int2;
-			if ( attribute.itemSize === 3 ) return GPUVertexFormat.Int3;
-			if ( attribute.itemSize === 4 ) return GPUVertexFormat.Int4;
-
-		}
+		console.error( 'WebGPURenderer: no this shader variable type support yet.', type );
 
 	}
 
