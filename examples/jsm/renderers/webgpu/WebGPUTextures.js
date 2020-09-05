@@ -111,6 +111,16 @@ class WebGPUTextures {
 
 		}
 
+		// if the texture is used for RTT, it's necessary to init it once so the binding
+		// group's resource definition points to the respective GPUTexture
+
+		if ( textureProperties.initializedRTT === false ) {
+
+			textureProperties.initializedRTT = true;
+			updated = true;
+
+		}
+
 		return updated;
 
 	}
@@ -154,6 +164,69 @@ class WebGPUTextures {
 
 		return updated;
 
+
+	}
+
+	initRenderTarget( renderTarget ) {
+
+		const properties = this.properties;
+		const renderTargetProperties = properties.get( renderTarget );
+
+		if ( renderTargetProperties.initialized === undefined ) {
+
+			const device = this.device;
+
+			const width = renderTarget.width;
+			const height = renderTarget.height;
+
+			const colorTextureGPU = device.createTexture( {
+				size: {
+					width: width,
+					height: height,
+					depth: 1
+				},
+				format: GPUTextureFormat.BRGA8Unorm, // TODO: Make configurable
+				usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.SAMPLED
+			} );
+
+			renderTargetProperties.colorTextureGPU = colorTextureGPU;
+
+			// When the ".texture" or ".depthTexture" property of a render target is used as a map,
+			// the renderer has to find the respective GPUTexture objects to setup the bind groups.
+			// Since it's not possible to see just from a texture object whether it belongs to a render
+			// target or not, we need the initializedRTT flag.
+
+			const textureProperties = properties.get( renderTarget.texture );
+			textureProperties.textureGPU = colorTextureGPU;
+			textureProperties.initializedRTT = false;
+
+			if ( renderTarget.depthBuffer === true ) {
+
+				const depthTextureGPU = device.createTexture( {
+					size: {
+						width: width,
+						height: height,
+						depth: 1
+					},
+					format: GPUTextureFormat.Depth24PlusStencil8, // TODO: Make configurable
+					usage: GPUTextureUsage.OUTPUT_ATTACHMENT
+				} );
+
+				renderTargetProperties.depthTextureGPU = depthTextureGPU;
+
+				if ( renderTarget.depthTexture !== null ) {
+
+					const depthTextureProperties = properties.get( renderTarget.depthTexture );
+					depthTextureProperties.textureGPU = depthTextureGPU;
+					depthTextureProperties.initializedRTT = false;
+
+				}
+
+			}
+
+			renderTargetProperties.initialized = true;
+
+		}
 
 	}
 

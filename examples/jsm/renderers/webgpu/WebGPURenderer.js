@@ -69,6 +69,8 @@ class WebGPURenderer {
 		this._clearDepth = 1;
 		this._clearStencil = 0;
 
+		this._renderTarget = null;
+
 	}
 
 	init() {
@@ -102,10 +104,23 @@ class WebGPURenderer {
 		}
 
 		const colorAttachment = this._renderPassDescriptor.colorAttachments[ 0 ];
-		colorAttachment.attachment = this._swapChain.getCurrentTexture().createView();
-
 		const depthStencilAttachment = this._renderPassDescriptor.depthStencilAttachment;
-		depthStencilAttachment.attachment = this._depthBuffer.createView();
+
+		if ( this._renderTarget !== null ) {
+
+			const renderTargetProperties = this._properties.get( this._renderTarget );
+
+			colorAttachment.attachment = renderTargetProperties.colorTextureGPU.createView();
+			depthStencilAttachment.attachment = renderTargetProperties.depthTextureGPU.createView();
+
+
+		} else {
+
+			colorAttachment.attachment = this._swapChain.getCurrentTexture().createView();
+			depthStencilAttachment.attachment = this._depthBuffer.createView();
+
+
+		}
 
 		this._background.render( scene );
 
@@ -325,6 +340,18 @@ class WebGPURenderer {
 		this._bindings.dispose();
 		this._info.dispose();
 		this._renderLists.dispose();
+
+	}
+
+	setRenderTarget( renderTarget ) {
+
+		this._renderTarget = renderTarget;
+
+		if ( renderTarget !== null ) {
+
+			this._textures.initRenderTarget( renderTarget );
+
+		}
 
 	}
 
