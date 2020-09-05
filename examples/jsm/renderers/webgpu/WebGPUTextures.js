@@ -302,7 +302,7 @@ class WebGPUTextures {
 
 		if ( texture.isDataTexture ) {
 
-			this.__copyBufferToTexture( image, format, textureGPU );
+			this._copyBufferToTexture( image, format, textureGPU );
 
 		} else {
 
@@ -340,7 +340,7 @@ class WebGPUTextures {
 
 	}
 
-	__copyBufferToTexture( image, format, textureGPU ) {
+	_copyBufferToTexture( image, format, textureGPU ) {
 
 		// this code assumes data textures in RGBA format
 		// TODO: Consider to support valid buffer layouts with other formats like RGB
