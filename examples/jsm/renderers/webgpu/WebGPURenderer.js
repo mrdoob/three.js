@@ -500,15 +500,16 @@ class WebGPURenderer {
 	_renderObject( object, passEncoder ) {
 
 		const info = this._info;
+		const material = object.material;
 
 		// pipeline
 
-		const pipeline = this._renderPipelines.get( object );
+		const pipeline = this._renderPipelines.get( material );
 		passEncoder.setPipeline( pipeline );
 
 		// bind group
 
-		const bindGroup = this._bindings.get( object ).group;
+		const bindGroup = this._bindings.get( material ).group;
 		passEncoder.setBindGroup( 0, bindGroup );
 
 		// index

@@ -22,13 +22,12 @@ class WebGPUBindings {
 
 	}
 
-	get( object ) {
+	get( material ) {
 
-		let data = this.uniformsData.get( object );
+		let data = this.uniformsData.get( material );
 
 		if ( data === undefined ) {
 
-			const material = object.material;
 			let bindings;
 
 			// each material defines an array of bindings (ubos, textures, samplers etc.)
@@ -62,7 +61,7 @@ class WebGPUBindings {
 				bindings: bindings
 			};
 
-			this.uniformsData.set( object, data );
+			this.uniformsData.set( material, data );
 
 		}
 
@@ -72,7 +71,8 @@ class WebGPUBindings {
 
 	update( object, camera ) {
 
-		const data = this.get( object );
+		const material = object.material;
+		const data = this.get( material );
 		const bindings = data.bindings;
 
 		const updateMap = this.updateMap;
@@ -112,7 +112,6 @@ class WebGPUBindings {
 
 			} else if ( binding.isSampler ) {
 
-				const material = object.material;
 				const texture = material[ binding.name ];
 
 				needsBindGroupRefresh = this.textures.updateSampler( texture );
@@ -125,7 +124,6 @@ class WebGPUBindings {
 
 			} else if ( binding.isSampledTexture ) {
 
-				const material = object.material;
 				const texture = material[ binding.name ];
 
 				needsBindGroupRefresh = this.textures.updateTexture( texture );

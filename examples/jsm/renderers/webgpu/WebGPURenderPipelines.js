@@ -17,14 +17,13 @@ class WebGPURenderPipelines {
 
 	}
 
-	get( object ) {
+	get( material ) {
 
-		let pipeline = this.pipelines.get( object );
+		let pipeline = this.pipelines.get( material );
 
 		if ( pipeline === undefined ) {
 
 			const device = this.device;
-			const material = object.material;
 
 			// shader source
 
@@ -84,7 +83,7 @@ class WebGPURenderPipelines {
 
 			// layout
 
-			const bindLayout = this.bindings.get( object ).layout;
+			const bindLayout = this.bindings.get( material ).layout;
 			const layout = device.createPipelineLayout( { bindGroupLayouts: [ bindLayout ] } );
 
 			// vertex buffers
@@ -108,21 +107,21 @@ class WebGPURenderPipelines {
 
 			}
 
-			const geometry = object.geometry;
 			let indexFormat;
 
-			if ( object.isLine ) {
+			if ( material.isLineBasicMaterial ) {
 
-				const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
+				// define data type and the primitive restart value for "line-strip" or "triangle-strip"
+				// @TODO: How do we determine indexFormat, which Uint16 or Uint32 should be, from material?
 
-				indexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type the primitive restart value
+				indexFormat = GPUIndexFormat.Uint16; 
 
 			}
 
 			// pipeline
 
-			const primitiveTopology = this._getPrimitiveTopology( object );
-			const rasterizationState = this._getRasterizationStateDescriptor( object );
+			const primitiveTopology = this._getPrimitiveTopology( material );
+			const rasterizationState = this._getRasterizationStateDescriptor( material );
 
 			pipeline = device.createRenderPipeline( {
 				layout: layout,
@@ -142,7 +141,7 @@ class WebGPURenderPipelines {
 				}
 			} );
 
-			this.pipelines.set( object, pipeline );
+			this.pipelines.set( material, pipeline );
 
 		}
 
@@ -183,19 +182,21 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getPrimitiveTopology( object ) {
+	_getPrimitiveTopology( material ) {
 
-		if ( object.isMesh ) return GPUPrimitiveTopology.TriangleList;
-		else if ( object.isPoints ) return GPUPrimitiveTopology.PointList;
-		else if ( object.isLine ) return GPUPrimitiveTopology.LineStrip;
-		else if ( object.isLineSegments ) return GPUPrimitiveTopology.LineList;
+		// @TODO: How do we handle GPUPrimitiveTopology.LineList?
+		// LineSegments is an object, not material, but we don't want to have
+		// object dependency with render pipeline.
+
+		if ( material.isPointsMaterial ) return GPUPrimitiveTopology.PointList;
+		if ( material.isLineBasicMaterial ) return GPUPrimitiveTopology.LineStrip;
+		return GPUPrimitiveTopology.TriangleList;
 
 	}
 
-	_getRasterizationStateDescriptor( object ) {
+	_getRasterizationStateDescriptor( material ) {
 
 		const descriptor = {};
-		const material = object.material;
 
 		switch ( material.side ) {
 
