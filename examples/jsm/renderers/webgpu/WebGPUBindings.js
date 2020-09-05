@@ -115,11 +115,13 @@ class WebGPUBindings {
 				const material = object.material;
 				const texture = material[ binding.name ];
 
-				needsBindGroupRefresh = this.textures.updateSampler( texture );
+				this.textures.updateSampler( texture );
+				const samplerGPU = this.textures.getSampler( texture );
 
-				if ( needsBindGroupRefresh === true ) {
+				if ( binding.samplerGPU !== samplerGPU ) {
 
-					binding.samplerGPU = this.textures.getSampler( texture );
+					binding.samplerGPU = samplerGPU;
+					needsBindGroupRefresh = true;
 
 				}
 
@@ -128,11 +130,13 @@ class WebGPUBindings {
 				const material = object.material;
 				const texture = material[ binding.name ];
 
-				needsBindGroupRefresh = this.textures.updateTexture( texture );
+				this.textures.updateTexture( texture );
+				const textureGPU = this.textures.getTextureGPU( texture );
 
-				if ( needsBindGroupRefresh === true ) {
+				if ( binding.textureGPU !== textureGPU ) {
 
-					binding.textureGPU = this.textures.getTextureGPU( texture );
+					binding.textureGPU = textureGPU;
+					needsBindGroupRefresh = true;
 
 				}
 
