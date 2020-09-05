@@ -106,9 +106,11 @@ class WebGPURenderer {
 		const colorAttachment = this._renderPassDescriptor.colorAttachments[ 0 ];
 		const depthStencilAttachment = this._renderPassDescriptor.depthStencilAttachment;
 
-		if ( this._renderTarget !== null ) {
+		const renderTarget = this._renderTarget;
 
-			const renderTargetProperties = this._properties.get( this._renderTarget );
+		if ( renderTarget !== null ) {
+
+			const renderTargetProperties = this._properties.get( renderTarget );
 
 			colorAttachment.attachment = renderTargetProperties.colorTextureGPU.createView();
 			depthStencilAttachment.attachment = renderTargetProperties.depthTextureGPU.createView();
