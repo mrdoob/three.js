@@ -1,4 +1,4 @@
-import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat } from './constants.js';
+import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation } from './constants.js';
 import { FrontSide, BackSide, DoubleSide } from '../../../../build/three.module.js';
 
 class WebGPURenderPipelines {
@@ -131,9 +131,9 @@ class WebGPURenderPipelines {
 				// @TODO: Should be customizable with material.blend* properties.
 
 				colorBlend = {
-					srcFactor: 'src-alpha',
-					dstFactor: 'one-minus-src-alpha',
-					operation: 'add'
+					srcFactor: GPUBlendFactor.SrcAlpha,
+					dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
+					operation: GPUBlendOperation.Add
 				};
 
 			}
