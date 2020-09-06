@@ -95,7 +95,7 @@ class WebGPUTextures {
 
 				if ( textureProperties.textureGPU !== undefined ) {
 
-					// TODO: Avoid calling of destroy() in certain scenarios. When only the contents of a texture
+					// @TODO: Avoid calling of destroy() in certain scenarios. When only the contents of a texture
 					// are updated, a buffer upload should be sufficient. However, if the user changes
 					// the dimensions of the texture, format or usage, a new instance of GPUTexture is required.
 
@@ -178,7 +178,7 @@ class WebGPUTextures {
 					height: height,
 					depth: 1
 				},
-				format: GPUTextureFormat.BRGA8Unorm, // TODO: Make configurable
+				format: GPUTextureFormat.BRGA8Unorm, // @TODO: Make configurable
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.SAMPLED
 			} );
 
@@ -201,7 +201,7 @@ class WebGPUTextures {
 						height: height,
 						depth: 1
 					},
-					format: GPUTextureFormat.Depth24PlusStencil8, // TODO: Make configurable
+					format: GPUTextureFormat.Depth24PlusStencil8, // @TODO: Make configurable
 					usage: GPUTextureUsage.OUTPUT_ATTACHMENT
 				} );
 
@@ -342,7 +342,7 @@ class WebGPUTextures {
 	_copyBufferToTexture( image, format, textureGPU ) {
 
 		// this code assumes data textures in RGBA format
-		// TODO: Consider to support valid buffer layouts with other formats like RGB
+		// @TODO: Consider to support valid buffer layouts with other formats like RGB
 
 		const device = this.device;
 		const data = image.data;
