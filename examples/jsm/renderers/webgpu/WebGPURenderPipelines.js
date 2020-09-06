@@ -10,12 +10,12 @@ class WebGPURenderPipelines {
 		this.bindings = bindings;
 
 		this.pipelines = new WeakMap();
+		this.shaderAttributes = new WeakMap();
 		this.shaderModules = {
 			vertex: new WeakMap(),
 			fragment: new WeakMap()
 		};
 
-		this.shaderAttributes = new WeakMap();
 
 	}
 
@@ -166,6 +166,7 @@ class WebGPURenderPipelines {
 	dispose() {
 
 		this.pipelines = new WeakMap();
+		this.shaderAttributes = new WeakMap();
 		this.shaderModules = {
 			vertex: new WeakMap(),
 			fragment: new WeakMap()
