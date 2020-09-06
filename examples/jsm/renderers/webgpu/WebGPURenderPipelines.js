@@ -15,6 +15,8 @@ class WebGPURenderPipelines {
 			fragment: new WeakMap()
 		};
 
+		this.shaderAttributes = new WeakMap();
+
 	}
 
 	get( object ) {
@@ -90,6 +92,7 @@ class WebGPURenderPipelines {
 			// vertex buffers
 
 			const vertexBuffers = [];
+			const shaderAttributes = [];
 
 			// Find "layout (location = num) in type name" in vertex shader
 			const regex = /^\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
@@ -100,6 +103,8 @@ class WebGPURenderPipelines {
 				const shaderLocation = parseInt( shaderAttribute.groups.location );
 				const arrayStride = this._getArrayStride( shaderAttribute.groups.type );
 				const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type );
+
+				shaderAttributes.push( { name: shaderAttribute.groups.name, slot: shaderLocation } );
 
 				vertexBuffers.push( {
 					arrayStride: arrayStride,
@@ -143,10 +148,18 @@ class WebGPURenderPipelines {
 			} );
 
 			this.pipelines.set( object, pipeline );
+			this.shaderAttributes.set( pipeline, shaderAttributes );
+
 
 		}
 
 		return pipeline;
+
+	}
+
+	getShaderAttributes( pipeline ) {
+
+		return this.shaderAttributes.get( pipeline );
 
 	}
 
@@ -254,8 +267,7 @@ const ShaderLib = {
 		vertexShader: `#version 450
 
 		layout(location = 0) in vec3 position;
-		layout(location = 1) in vec3 normal;
-		layout(location = 2) in vec2 uv;
+		layout(location = 1) in vec2 uv;
 
 		layout(location = 0) out vec2 vUv;
 

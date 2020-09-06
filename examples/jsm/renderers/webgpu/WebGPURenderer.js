@@ -559,13 +559,13 @@ class WebGPURenderer {
 
 		if ( hasIndex === true ) {
 
-			this._setupIndexBuffer( passEncoder, index );
+			this._setupIndexBuffer( index, passEncoder );
 
 		}
 
 		// vertex buffers
 
-		this._setupVertexBuffers( passEncoder, geometry.attributes );
+		this._setupVertexBuffers( geometry.attributes, passEncoder, pipeline );
 
 		// draw
 
@@ -593,7 +593,7 @@ class WebGPURenderer {
 
 	}
 
-	_setupIndexBuffer( encoder, index ) {
+	_setupIndexBuffer( index, encoder ) {
 
 		const buffer = this._attributes.get( index ).buffer;
 		const indexFormat = ( index.array instanceof Uint16Array ) ? GPUIndexFormat.Uint16 : GPUIndexFormat.Uint32;
@@ -602,18 +602,23 @@ class WebGPURenderer {
 
 	}
 
-	_setupVertexBuffers( encoder, geometryAttributes ) {
+	_setupVertexBuffers( geometryAttributes, encoder, pipeline ) {
 
-		let slot = 0;
+		const shaderAttributes = this._renderPipelines.getShaderAttributes( pipeline );
 
-		for ( const name in geometryAttributes ) {
+		for ( const shaderAttribute of shaderAttributes ) {
+
+			const name = shaderAttribute.name;
+			const slot = shaderAttribute.slot;
 
 			const attribute = geometryAttributes[ name ];
-			const buffer = this._attributes.get( attribute ).buffer;
 
-			encoder.setVertexBuffer( slot, buffer );
+			if ( attribute !== undefined ) {
 
-			slot ++;
+				const buffer = this._attributes.get( attribute ).buffer;
+				encoder.setVertexBuffer( slot, buffer );
+
+			}
 
 		}
 
