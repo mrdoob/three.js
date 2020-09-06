@@ -124,6 +124,20 @@ class WebGPURenderPipelines {
 
 			}
 
+			let colorBlend;
+
+			if ( material.transparent ) {
+
+				// @TODO: Should be customizable with material.blend* properties.
+
+				colorBlend = {
+					srcFactor: 'src-alpha',
+					dstFactor: 'one-minus-src-alpha',
+					operation: 'add'
+				};
+
+			}
+
 			// pipeline
 
 			const primitiveTopology = this._getPrimitiveTopology( object );
@@ -135,7 +149,10 @@ class WebGPURenderPipelines {
 				fragmentStage: moduleFragment,
 				primitiveTopology: primitiveTopology,
 				rasterizationState: rasterizationState,
-				colorStates: [ { format: GPUTextureFormat.BRGA8Unorm } ],
+				colorStates: [ {
+					format: GPUTextureFormat.BRGA8Unorm,
+					colorBlend: colorBlend
+				} ],
 				depthStencilState: {
 					depthWriteEnabled: material.depthWrite,
 					depthCompare: GPUCompareFunction.Less,
@@ -287,14 +304,19 @@ const ShaderLib = {
 			gl_Position = cameraUniforms.projectionMatrix * modelUniforms.modelViewMatrix * vec4( position, 1.0 );
 		}`,
 		fragmentShader: `#version 450
-		layout(set = 0, binding = 2) uniform sampler mySampler;
-		layout(set = 0, binding = 3) uniform texture2D myTexture;
+		layout(set = 0, binding = 2) uniform OpacityUniforms {
+			float opacity;
+		} opacityUniforms;
+
+		layout(set = 0, binding = 3) uniform sampler mySampler;
+		layout(set = 0, binding = 4) uniform texture2D myTexture;
 
 		layout(location = 0) in vec2 vUv;
 		layout(location = 0) out vec4 outColor;
 
 		void main() {
 			outColor = texture( sampler2D( myTexture, mySampler ), vUv );
+			outColor.a *= opacityUniforms.opacity;
 		}`
 	},
 	points_basic: {
