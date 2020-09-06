@@ -12,7 +12,7 @@ class WebGPUTextures {
 		this.defaultTexture = null;
 		this.defaultSampler = null;
 
-		this.samplerCache = new WeakMap();
+		this.samplerCache = new Map();
 
 	}
 
@@ -52,13 +52,13 @@ class WebGPUTextures {
 
 		const textureProperties = this.properties.get( texture );
 
-		return textureProperties.sampler;
+		return textureProperties.samplerGPU;
 
 	}
 
 	updateTexture( texture ) {
 
-		let updated = false;
+		let forceUpdate = false;
 
 		const textureProperties = this.properties.get( texture );
 
@@ -105,7 +105,7 @@ class WebGPUTextures {
 
 				textureProperties.textureGPU = this._createTexture( texture );
 				textureProperties.version = texture.version;
-				updated = true;
+				forceUpdate = true;
 
 			}
 
@@ -117,17 +117,15 @@ class WebGPUTextures {
 		if ( textureProperties.initializedRTT === false ) {
 
 			textureProperties.initializedRTT = true;
-			updated = true;
+			forceUpdate = true;
 
 		}
 
-		return updated;
+		return forceUpdate;
 
 	}
 
 	updateSampler( texture ) {
-
-		let updated = false;
 
 		const array = [];
 
@@ -138,14 +136,12 @@ class WebGPUTextures {
 		array.push( texture.minFilter );
 		array.push( texture.anisotropy );
 
-		const newKey = array.join();
-		const key = this.samplerCache.get( texture );
+		const key = array.join();
+		let samplerGPU = this.samplerCache.get( key );
 
-		if ( key !== newKey ) {
+		if ( samplerGPU === undefined ) {
 
-			this.samplerCache.set( texture, newKey );
-
-			const sampler = this.device.createSampler( {
+			samplerGPU = this.device.createSampler( {
 				addressModeU: this._convertAddressMode( texture.wrapS ),
 				addressModeV: this._convertAddressMode( texture.wrapT ),
 				addressModeW: this._convertAddressMode( texture.wrapR ),
@@ -155,15 +151,12 @@ class WebGPUTextures {
 				maxAnisotropy: texture.anisotropy
 			} );
 
-			const textureProperties = this.properties.get( texture );
-			textureProperties.sampler = sampler;
-
-			updated = true;
+			this.samplerCache.set( key, samplerGPU );
 
 		}
 
-		return updated;
-
+		const textureProperties = this.properties.get( texture );
+		textureProperties.samplerGPU = samplerGPU;
 
 	}
 
@@ -227,6 +220,12 @@ class WebGPUTextures {
 			renderTargetProperties.initialized = true;
 
 		}
+
+	}
+
+	dispose() {
+
+		this.samplerCache.clear();
 
 	}
 

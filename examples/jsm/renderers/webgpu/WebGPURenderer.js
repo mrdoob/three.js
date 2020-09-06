@@ -383,6 +383,7 @@ class WebGPURenderer {
 		this._bindings.dispose();
 		this._info.dispose();
 		this._renderLists.dispose();
+		this._textures.dispose();
 
 	}
 
