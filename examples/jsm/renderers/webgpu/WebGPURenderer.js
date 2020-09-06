@@ -103,6 +103,8 @@ class WebGPURenderer {
 
 		}
 
+		// prepare render pass descriptor
+
 		const colorAttachment = this._renderPassDescriptor.colorAttachments[ 0 ];
 		const depthStencilAttachment = this._renderPassDescriptor.depthStencilAttachment;
 
@@ -124,10 +126,11 @@ class WebGPURenderer {
 
 		}
 
-		this._background.render( scene );
+		//
 
-		const opaqueObjects = this._currentRenderList.opaque;
-		const transparentObjects = this._currentRenderList.transparent;
+		this._background.update( scene );
+
+		// start render pass
 
 		const device = this._device;
 		const cmdEncoder = device.createCommandEncoder( {} );
@@ -157,8 +160,15 @@ class WebGPURenderer {
 
 		}
 
+		// process render lists
+
+		const opaqueObjects = this._currentRenderList.opaque;
+		const transparentObjects = this._currentRenderList.transparent;
+
 		if ( opaqueObjects.length > 0 ) this._renderObjects( opaqueObjects, camera, passEncoder );
 		if ( transparentObjects.length > 0 ) this._renderObjects( transparentObjects, camera, passEncoder );
+
+		// finish render pass
 
 		passEncoder.endPass();
 		device.defaultQueue.submit( [ cmdEncoder.finish() ] );

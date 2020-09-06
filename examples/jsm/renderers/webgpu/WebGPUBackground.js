@@ -20,7 +20,7 @@ class WebGPUBackground {
 
 	}
 
-	render( scene ) {
+	update( scene ) {
 
 		const renderer = this.renderer;
 		const background = ( scene.isScene === true ) ? scene.background : null;
