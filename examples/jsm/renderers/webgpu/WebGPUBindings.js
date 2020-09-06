@@ -250,6 +250,28 @@ class WebGPUBindings {
 
 		const cameraGroup = this.sharedUniformsGroups.get( 'cameraUniforms' );
 
+		const opacityGroup = new WebGPUUniformsGroup();
+		opacityGroup.setName( 'opacityUniforms' );
+		opacityGroup.setUniform( 'opacity', 1.0 );
+		opacityGroup.visibility = GPUShaderStage.FRAGMENT;
+		opacityGroup.setUpdateCallback( function ( array, object ) {
+
+			const material = object.material;
+			const opacity = material.transparent ? material.opacity : 1.0;
+
+			let updated = false;
+
+			if ( array[ 0 ] !== opacity ) {
+
+				array[ 0 ] = opacity;
+				updated = true;
+
+			}
+
+			return updated;
+
+		} );
+
 		// samplers
 
 		const diffuseSampler = new WebGPUSampler();
@@ -264,6 +286,7 @@ class WebGPUBindings {
 
 		bindings.push( modelGroup );
 		bindings.push( cameraGroup );
+		bindings.push( opacityGroup );
 		bindings.push( diffuseSampler );
 		bindings.push( diffuseTexture );
 
