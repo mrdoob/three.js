@@ -20,7 +20,7 @@ export class ArrowHelper extends Object3D {
 		dir: Vector3,
 		origin?: Vector3,
 		length?: number,
-		color?: number,
+		color?: Color | string | number,
 		headLength?: number,
 		headWidth?: number
 	);
