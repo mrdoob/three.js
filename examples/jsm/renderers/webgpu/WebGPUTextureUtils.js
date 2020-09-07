@@ -92,13 +92,10 @@ class WebGPUTextureUtils {
 
 	generateMipmappedTexture( imageBitmap, textureGPU, textureGPUDescriptor ) {
 
-		// mipmaps have to computed manually right now, see https://github.com/gpuweb/gpuweb/issues/386
-
 		const pipeline = this.getMipmapPipeline( textureGPUDescriptor.format );
 
 		const commandEncoder = this.device.createCommandEncoder( {} );
-		// @TODO: Consider making this static.
-		const bindGroupLayout = pipeline.getBindGroupLayout( 0 );
+		const bindGroupLayout = pipeline.getBindGroupLayout( 0 ); // @TODO: Consider making this static.
 
 		let srcView = textureGPU.createView( {
 			baseMipLevel: 0,
