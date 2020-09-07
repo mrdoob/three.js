@@ -88,6 +88,12 @@ class Color {
 
 	}
 
+	setSRGB( value ) {
+
+		return this.set( value ).convertSRGBToLinear();
+
+	}
+
 	setScalar( scalar ) {
 
 		this.r = scalar;
