@@ -3,11 +3,12 @@ import { FrontSide, BackSide, DoubleSide } from '../../../../build/three.module.
 
 class WebGPURenderPipelines {
 
-	constructor( device, glslang, bindings ) {
+	constructor( device, glslang, bindings, sampleCount ) {
 
 		this.device = device;
 		this.glslang = glslang;
 		this.bindings = bindings;
+		this.sampleCount = sampleCount;
 
 		this.pipelines = new WeakMap();
 		this.shaderAttributes = new WeakMap();
@@ -161,7 +162,8 @@ class WebGPURenderPipelines {
 				vertexState: {
 					indexFormat: indexFormat,
 					vertexBuffers: vertexBuffers
-				}
+				},
+				sampleCount: this.sampleCount
 			} );
 
 			this.pipelines.set( object, pipeline );

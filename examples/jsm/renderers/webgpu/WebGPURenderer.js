@@ -23,7 +23,7 @@ class WebGPURenderer {
 		// public
 
 		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-		this.parameters = parameters;
+		this.parameters = Object.assign( {}, parameters );
 
 		this.autoClear = true;
 		this.autoClearColor = true;
@@ -45,6 +45,7 @@ class WebGPURenderer {
 		this._device = null;
 		this._context = null;
 		this._swapChain = null;
+		this._colorBuffer = null;
 		this._depthBuffer = null;
 
 		this._info = null;
@@ -70,6 +71,20 @@ class WebGPURenderer {
 		this._clearStencil = 0;
 
 		this._renderTarget = null;
+
+		// ensure some parameters
+
+		this.parameters.antialias = this.parameters.antialias === true;
+
+		if ( this.parameters.antialias ) {
+
+			this.parameters.sampleCount = this.parameters.sampleCount || 4;
+
+		} else {
+
+			this.parameters.sampleCount = 1;
+
+		}
 
 	}
 
@@ -112,17 +127,37 @@ class WebGPURenderer {
 
 		if ( renderTarget !== null ) {
 
+			// @TODO: Support RenderTarget with antialiasing.
+
+			if ( this.parameters.antialias ) {
+
+				console.error( 'WebGPURenderer: RenderTarget with antialiasing is not supported yet.' );
+				return;
+
+			}
+
 			const renderTargetProperties = this._properties.get( renderTarget );
 
 			colorAttachment.attachment = renderTargetProperties.colorTextureGPU.createView();
 			depthStencilAttachment.attachment = renderTargetProperties.depthTextureGPU.createView();
 
-
 		} else {
 
-			colorAttachment.attachment = this._swapChain.getCurrentTexture().createView();
-			depthStencilAttachment.attachment = this._depthBuffer.createView();
+			if ( this.parameters.antialias ) {
 
+				colorAttachment.attachment = this._colorBuffer.createView();
+				colorAttachment.resolveTarget = this._swapChain.getCurrentTexture().createView();
+				colorAttachment.storeOp = GPUStoreOp.Clear;
+
+			} else {
+
+				colorAttachment.attachment = this._swapChain.getCurrentTexture().createView();
+				colorAttachment.resolveTarget = undefined;
+				colorAttachment.storeOp = undefined;
+
+			}
+
+			depthStencilAttachment.attachment = this._depthBuffer.createView();
 
 		}
 
@@ -217,6 +252,7 @@ class WebGPURenderer {
 		this.domElement.width = Math.floor( width * pixelRatio );
 		this.domElement.height = Math.floor( height * pixelRatio );
 
+		this._setupColorBuffer();
 		this._setupDepthBuffer();
 
 	}
@@ -236,6 +272,7 @@ class WebGPURenderer {
 
 		}
 
+		this._setupColorBuffer();
 		this._setupDepthBuffer();
 
 	}
@@ -624,6 +661,29 @@ class WebGPURenderer {
 
 	}
 
+	_setupColorBuffer() {
+
+		const device = this._device;
+
+		if ( device ) {
+
+			if ( this._colorBuffer ) this._colorBuffer.destroy();
+
+			this._colorBuffer = this._device.createTexture({
+				size: {
+					width: this._width * this._pixelRatio,
+					height: this._height * this._pixelRatio,
+					depth: 1
+				},
+				sampleCount: this.parameters.sampleCount,
+				format: GPUTextureFormat.BRGA8Unorm,
+				usage: GPUTextureUsage.OUTPUT_ATTACHMENT
+			});
+
+		}
+
+	}
+
 	_setupDepthBuffer() {
 
 		const device = this._device;
@@ -638,6 +698,7 @@ class WebGPURenderer {
 					height: this._height * this._pixelRatio,
 					depth: 1
 				},
+				sampleCount: this.parameters.sampleCount,
 				format: GPUTextureFormat.Depth24PlusStencil8,
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT
 			} );
@@ -645,7 +706,6 @@ class WebGPURenderer {
 		}
 
 	}
-
 }
 
 async function initWebGPU( scope ) {
@@ -687,7 +747,7 @@ async function initWebGPU( scope ) {
 	scope._textures = new WebGPUTextures( device, scope._properties, scope._info );
 	scope._bindings = new WebGPUBindings( device, scope._info, scope._properties, scope._textures );
 	scope._objects = new WebGPUObjects( scope._geometries, scope._info );
-	scope._renderPipelines = new WebGPURenderPipelines( device, compiler, scope._bindings );
+	scope._renderPipelines = new WebGPURenderPipelines( device, compiler, scope._bindings, scope.parameters.sampleCount );
 	scope._renderLists = new WebGPURenderLists();
 	scope._background = new WebGPUBackground( scope );
 
@@ -704,6 +764,7 @@ async function initWebGPU( scope ) {
 		}
 	};
 
+	scope._setupColorBuffer();
 	scope._setupDepthBuffer();
 
 }
