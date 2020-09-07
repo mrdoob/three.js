@@ -25,7 +25,7 @@
 			var mesh, renderer, scene, camera;
 
 			var API = {
-				color: 0xffffff,
+				color: 0xffffff, // sRGB
 				exposure: 1.0
 			};
 
@@ -80,7 +80,7 @@
 
 					mesh.material = new THREE.MeshMatcapMaterial( {
 
-						color: API.color,
+						color: new THREE.Color().setHex( API.color ).convertSRGBToLinear(),
 						matcap: matcap,
 						normalMap: normalmap
 
@@ -97,14 +97,16 @@
 					.listen()
 					.onChange( function () {
 
-						mesh.material.color.set( API.color ); render();
+						mesh.material.color.set( API.color ).convertSRGBToLinear();
+						render();
 
 					} );
 
 				gui.add( API, 'exposure', 0, 2 )
 					.onChange( function () {
 
-						renderer.toneMappingExposure = API.exposure; render();
+						renderer.toneMappingExposure = API.exposure;
+						render();
 
 					} );
 
