@@ -367,7 +367,7 @@
 				blueRectLight.lookAt( 0, 5, 0 );
 				scene.add( blueRectLight );
 
-				var blueRectLightHelper = new RectAreaLightHelper( blueRectLight, 0xffffff );
+				var blueRectLightHelper = new RectAreaLightHelper( blueRectLight );
 				blueRectLight.add( blueRectLightHelper );
 
 				var redRectLight = new THREE.RectAreaLight( 0x9aaeff, intensity, width, height );
@@ -375,7 +375,7 @@
 				redRectLight.lookAt( 0, 5, 0 );
 				scene.add( redRectLight );
 
-				var redRectLightHelper = new RectAreaLightHelper( redRectLight, 0xffffff );
+				var redRectLightHelper = new RectAreaLightHelper( redRectLight );
 				redRectLight.add( redRectLightHelper );
 
 				render();
