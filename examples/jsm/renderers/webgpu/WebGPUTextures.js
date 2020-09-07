@@ -1,18 +1,21 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode } from './constants.js';
-import { Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, RepeatWrapping, MirroredRepeatWrapping, FloatType, HalfFloatType } from '../../../../build/three.module.js';
+import { Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping, FloatType, HalfFloatType } from '../../../../build/three.module.js';
+import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
 class WebGPUTextures {
 
-	constructor( device, properties, info ) {
+	constructor( device, properties, info, glslang ) {
 
 		this.device = device;
 		this.properties = properties;
 		this.info = info;
+		this.glslang = glslang;
 
 		this.defaultTexture = null;
 		this.defaultSampler = null;
 
 		this.samplerCache = new Map();
+		this.utils = null;
 
 	}
 
@@ -229,6 +232,12 @@ class WebGPUTextures {
 
 	}
 
+	_computeMipLevelCount( width, height ) {
+
+		return Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+
+	}
+
 	_convertAddressMode( value ) {
 
 		let addressMode = GPUAddressMode.ClampToEdge;
@@ -288,16 +297,32 @@ class WebGPUTextures {
 		const height = ( image !== undefined ) ? image.height : 1;
 
 		const format = this._convertFormat( texture.type );
+		const needsMipmaps = this._needsMipmaps( texture );
+		const mipLevelCount = ( needsMipmaps === true ) ? this._computeMipLevelCount( width, height ) : undefined;
 
-		const textureGPU = device.createTexture( {
+		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
+
+		if ( needsMipmaps === true ) {
+
+			usage |= GPUTextureUsage.OUTPUT_ATTACHMENT;
+
+		}
+
+		// texture creation
+
+		const textureGPUDescriptor = {
 			size: {
 				width: width,
 				height: height,
 				depth: 1,
 			},
 			format: format,
-			usage: GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST,
-		} );
+			usage: usage,
+			mipLevelCount: mipLevelCount
+		};
+		const textureGPU = device.createTexture( textureGPUDescriptor );
+
+		// transfer texture data
 
 		if ( texture.isDataTexture ) {
 
@@ -317,7 +342,7 @@ class WebGPUTextures {
 
 				createImageBitmap( image, 0, 0, width, height, options ).then( imageBitmap => {
 
-					this._copyImageBitmapToTexture( imageBitmap, textureGPU );
+					this._copyImageBitmapToTexture( imageBitmap, textureGPU, needsMipmaps, textureGPUDescriptor );
 
 				} );
 
@@ -327,7 +352,7 @@ class WebGPUTextures {
 
 					// assuming ImageBitmap. Directly start copy operation of the contents of ImageBitmap into the destination texture
 
-					this._copyImageBitmapToTexture( image, textureGPU );
+					this._copyImageBitmapToTexture( image, textureGPU, needsMipmaps, textureGPUDescriptor );
 
 				}
 
@@ -342,7 +367,9 @@ class WebGPUTextures {
 	_copyBufferToTexture( image, format, textureGPU ) {
 
 		// this code assumes data textures in RGBA format
+
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
+		// @TODO: Support mipmaps
 
 		const device = this.device;
 		const data = image.data;
@@ -377,15 +404,7 @@ class WebGPUTextures {
 
 	}
 
-	_getBytesPerTexel( format ) {
-
-		if ( format === GPUTextureFormat.RGBA8Unorm ) return 4;
-		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
-		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
-
-	}
-
-	_copyImageBitmapToTexture( imageBitmap, textureGPU ) {
+	_copyImageBitmapToTexture( imageBitmap, textureGPU, needsMipmaps, textureGPUDescriptor ) {
 
 		const device = this.device;
 
@@ -400,6 +419,32 @@ class WebGPUTextures {
 				depth: 1
 			}
 		);
+
+		if ( needsMipmaps === true ) {
+
+			if ( this.utils === null ) {
+
+				this.utils = new WebGPUTextureUtils( this.device, this.glslang ); // only create this helper if necessary
+
+			}
+
+			this.utils.generateMipmappedTexture( imageBitmap, textureGPU, textureGPUDescriptor );
+
+		}
+
+	}
+
+	_getBytesPerTexel( format ) {
+
+		if ( format === GPUTextureFormat.RGBA8Unorm ) return 4;
+		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
+		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+
+	}
+
+	_needsMipmaps( texture ) {
+
+		return ( texture.generateMipmaps === true ) && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
 
 	}
 

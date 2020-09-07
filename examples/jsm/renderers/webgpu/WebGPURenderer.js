@@ -684,7 +684,7 @@ async function initWebGPU( scope ) {
 	scope._properties = new WebGPUProperties();
 	scope._attributes = new WebGPUAttributes( device );
 	scope._geometries = new WebGPUGeometries( scope._attributes, scope._info );
-	scope._textures = new WebGPUTextures( device, scope._properties, scope._info );
+	scope._textures = new WebGPUTextures( device, scope._properties, scope._info, compiler );
 	scope._bindings = new WebGPUBindings( device, scope._info, scope._properties, scope._textures );
 	scope._objects = new WebGPUObjects( scope._geometries, scope._info );
 	scope._renderPipelines = new WebGPURenderPipelines( device, compiler, scope._bindings );
