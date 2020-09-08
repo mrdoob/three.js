@@ -12,6 +12,11 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - spotlight by <a href="http://master-domain.com" target="_blank" rel="noopener">Master James</a><br />
 		</div>
 
+		<video id="video" loop crossOrigin="anonymous" webkit-playsinline style="display:none">
+			<source src="textures/sintel.ogv" type='video/ogg; codecs="theora, vorbis"'>
+			<source src="textures/sintel.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+		</video>
+
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -23,6 +28,8 @@
 			var renderer, scene, camera;
 
 			var spotLight, lightHelper, shadowCameraHelper;
+
+			var textureUrls, textures;
 
 			var gui;
 
@@ -51,6 +58,23 @@
 
 				var ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
+
+				var textureLoader = new THREE.TextureLoader();
+				textureUrls = [ 'none', 'sintel (video)', 'uv_grid_opengl.jpg', 'sprite2.png', 'colors.png' ];
+				textures = { none: null };
+
+				var video = document.getElementById( 'video' );
+				textures[textureUrls[1]] = new THREE.VideoTexture( video );
+				textures[textureUrls[1]].minFilter = THREE.LinearFilter;
+				textures[textureUrls[1]].magFilter = THREE.LinearFilter;
+
+				for ( var i = 2; i < textureUrls.length; ++i ) {
+
+					textures[textureUrls[i]] = textureLoader.load( 'textures/' + textureUrls[i] );
+					textures[textureUrls[i]].minFilter = THREE.LinearFilter;
+					textures[textureUrls[i]].magFilter = THREE.LinearFilter;
+
+				}
 
 				spotLight = new THREE.SpotLight( 0xffffff, 1 );
 				spotLight.position.set( 15, 40, 35 );
@@ -132,7 +156,8 @@
 					angle: spotLight.angle,
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
-					focus: spotLight.shadow.focus
+					focus: spotLight.shadow.focus,
+					map: 'none'
 				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
@@ -185,6 +210,15 @@
 
 				} );
 
+				gui.add( params, 'map', textureUrls ).onChange( function ( val ) {
+
+					if (spotLight.map && spotLight.map.isVideoTexture) video.pause();
+					spotLight.map = textures[val];
+					if (spotLight.map && spotLight.map.isVideoTexture) video.play();
+					animate();
+
+				} );
+
 				gui.open();
 
 			}
@@ -193,7 +227,14 @@
 
 			buildGui();
 
-			render();
+			animate();
+
+			function animate() {
+
+				if (spotLight.map && spotLight.map.isVideoTexture) requestAnimationFrame( animate );
+				render();
+
+			}
 
 		</script>
 

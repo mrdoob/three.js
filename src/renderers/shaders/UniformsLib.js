@@ -144,6 +144,7 @@ const UniformsLib = {
 			shadowMapSize: {}
 		} },
 
+		spotMap: { value: [] },
 		spotShadowMap: { value: [] },
 		spotShadowMatrix: { value: [] },
 

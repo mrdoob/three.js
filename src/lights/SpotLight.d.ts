@@ -3,6 +3,7 @@ import { Vector3 } from '../math/Vector3';
 import { Object3D } from './../core/Object3D';
 import { SpotLightShadow } from './SpotLightShadow';
 import { Light } from './Light';
+import { Texture } from './../textures/Texture';
 
 /**
  * A point light that can cast shadow in one direction.
@@ -15,7 +16,8 @@ export class SpotLight extends Light {
 		distance?: number,
 		angle?: number,
 		penumbra?: number,
-		decay?: number
+		decay?: number,
+		map?: Texture | null,
 	);
 
 	/**
@@ -56,6 +58,11 @@ export class SpotLight extends Light {
 	 * @default 1
 	 */
 	decay: number;
+
+	/**
+	 * @default null
+	 */
+	map: Texture | null;
 
 	/**
 	 * @default new THREE.SpotLightShadow()
