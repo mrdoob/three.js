@@ -54,7 +54,7 @@
 				// data texture
 
 				const geometryPlane = new THREE.PlaneBufferGeometry();
-				const materialPlane = new THREE.MeshBasicMaterial( { map: createDataTexture() } );
+				const materialPlane = new THREE.MeshBasicMaterial( { map: createDataTexture(), transparent: true, opacity: 0.5 } );
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );
 				plane.position.set( - 1, - 1, 0 );
@@ -85,6 +85,8 @@
 				const line = new THREE.Line( geometryLine, materialLine );
 				line.position.set( 1, 1, 0 );
 				scene.add( line );
+
+				//
 
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -138,7 +140,7 @@
 					data[ stride ] = r;
 					data[ stride + 1 ] = g;
 					data[ stride + 2 ] = b;
-					data[ stride + 3 ] = 1;
+					data[ stride + 3 ] = 255;
 
 				}
 

@@ -1,5 +1,10 @@
-import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation } from './constants.js';
-import { FrontSide, BackSide, DoubleSide, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth } from '../../../../build/three.module.js';
+import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor } from './constants.js';
+import {
+	FrontSide, BackSide, DoubleSide,
+	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
+	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
+	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
+} from '../../../../build/three.module.js';
 
 class WebGPURenderPipelines {
 
@@ -129,15 +134,11 @@ class WebGPURenderPipelines {
 
 			let colorBlend;
 
-			if ( material.transparent ) {
+			if ( material.transparent === true ) {
 
-				// @TODO: Should be customizable with material.blend* properties.
+				// @TODO: Add support for blending modes (etc. NormalBlending, AdditiveBlending)
 
-				colorBlend = {
-					srcFactor: GPUBlendFactor.SrcAlpha,
-					dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
-					operation: GPUBlendOperation.Add
-				};
+				colorBlend = this._getColorBlend( material );
 
 			}
 
@@ -216,6 +217,121 @@ class WebGPURenderPipelines {
 		if ( type === 'uvec4' ) return 16;
 
 		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
+
+	}
+
+	_getColorBlend( material ) {
+
+		const colorBlend = {
+			srcFactor: this._getBlendFactor( material.blendSrc ),
+			dstFactor: this._getBlendFactor( material.blendDst ),
+			operation: this._getBlendOperation( material.blendEquation )
+		};
+
+		return colorBlend;
+
+	}
+
+	_getBlendFactor( blend ) {
+
+		let blendFactor;
+
+		switch ( blend ) {
+
+			case ZeroFactor:
+				blendFactor = GPUBlendFactor.Zero;
+				break;
+
+			case OneFactor:
+				blendFactor = GPUBlendFactor.One;
+				break;
+
+			case SrcColorFactor:
+				blendFactor = GPUBlendFactor.SrcColor;
+				break;
+
+			case OneMinusSrcColorFactor:
+				blendFactor = GPUBlendFactor.OneMinusSrcColor;
+				break;
+
+			case SrcAlphaFactor:
+				blendFactor = GPUBlendFactor.SrcAlpha;
+				break;
+
+			case OneMinusSrcAlphaFactor:
+				blendFactor = GPUBlendFactor.OneMinusSrcAlpha;
+				break;
+
+			case DstColorFactor:
+				blendFactor = GPUBlendFactor.DstColor;
+				break;
+
+			case OneMinusDstColorFactor:
+				blendFactor = GPUBlendFactor.OneMinusDstColor;
+				break;
+
+			case DstAlphaFactor:
+				blendFactor = GPUBlendFactor.DstAlpha;
+				break;
+
+			case OneMinusDstAlphaFactor:
+				blendFactor = GPUBlendFactor.OneMinusDstAlpha;
+				break;
+
+			case SrcAlphaSaturateFactor:
+				blendFactor = GPUBlendFactor.SrcAlphaSaturated;
+				break;
+
+			case BlendColorFactor:
+				blendFactor = GPUBlendFactor.BlendColor;
+				break;
+
+			case OneMinusBlendColorFactor:
+				blendFactor = GPUBlendFactor.OneMinusBlendColor;
+				break;
+
+
+			default:
+				console.error( 'THREE.WebGPURenderer: Blend factor not supported.', blend );
+
+		}
+
+		return blendFactor;
+
+	}
+
+	_getBlendOperation( blendEquation ) {
+
+		let blendOperation;
+
+		switch ( blendEquation ) {
+
+			case AddEquation:
+				blendOperation = GPUBlendOperation.Add;
+				break;
+
+			case SubtractEquation:
+				blendOperation = GPUBlendOperation.Subtract;
+				break;
+
+			case ReverseSubtractEquation:
+				blendOperation = GPUBlendOperation.ReverseSubtract;
+				break;
+
+			case MinEquation:
+				blendOperation = GPUBlendOperation.Min;
+				break;
+
+			case MaxEquation:
+				blendOperation = GPUBlendOperation.Max;
+				break;
+
+			default:
+				console.error( 'THREE.WebGPURenderer: Blend equation not supported.', blendEquation );
+
+		}
+
+		return blendOperation;
 
 	}
 

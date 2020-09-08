@@ -199,3 +199,8 @@ export const GPUBlendOperation = {
 	Min: 'min',
 	Max: 'max'
 };
+
+// @TODO Move to src/constants.js
+
+export const BlendColorFactor = 211;
+export const OneMinusBlendColorFactor = 212;
