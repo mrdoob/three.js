@@ -334,7 +334,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					}
 
-					_object.visible = data.layers[ attributes.layerIndex ].visible;
+					var layer = data.layers[ attributes.layerIndex ]
+					
+					_object.visible = layer ? data.layers[ attributes.layerIndex ].visible : true;
 
 					if ( attributes.isInstanceDefinitionObject ) {
 
