@@ -616,7 +616,10 @@ class WebGPURenderer {
 					if ( object.layers.test( camera2.layers ) ) {
 
 						const vp = camera2.viewport;
-						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, 0, 1 );
+						const minDepth = ( vp.minDepth === undefined ) ? 0 : vp.minDepth;
+						const maxDepth = ( vp.maxDepth === undefined ) ? 1 : vp.maxDepth;
+
+						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
 
 						this._renderObject( object, passEncoder );
 
