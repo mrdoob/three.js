@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Texture] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		This class can be used to automatically save the depth information of a rendering into a texture.
+		When using a WebGL 1 rendering context, [name] requires support for the [link:https://www.khronos.org/registry/webgl/extensions/WEBGL_depth_texture/ WEBGL_depth_texture] extension.
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_depth_texture depth / texture]
+		</p>
+
+		<h2>Constructor</h2>
+		<h3>[name]( [param:Number width], [param:Number height], [param:Constant type], [param:Constant wrapS], [param:Constant wrapT], [param:Constant magFilter], [param:Constant minFilter], [param:Number anisotropy], [param:Constant format] )</h3>
+
+		<p>
+		[page:Number width] -- width of the texture.<br />
+
+		[page:Number height] -- height of the texture.<br />
+
+		[page:Constant type] -- Default is [page:Textures THREE.UnsignedShortType] when unsing [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using  [page:Textures DepthStencilFormat].
+		See [page:Textures type constants] for other choices.<br />
+
+		[page:Constant mapping] --
+		See [page:Textures mapping mode constants] for details.<br />
+
+		[page:Constant wrapS] -- The default is [page:Textures THREE.ClampToEdgeWrapping].
+		See [page:Textures wrap mode constants] for other choices.<br />
+
+		[page:Constant wrapT] -- The default is [page:Textures THREE.ClampToEdgeWrapping].
+		See [page:Textures wrap mode constants] for other choices.<br />
+
+		[page:Constant magFilter] -- How the texture is sampled when a texel covers more than one pixel.
+		The default is [page:Textures THREE.NearestFilter]. See [page:Textures magnification filter constants] for other choices.<br />
+
+		[page:Constant minFilter] -- How the texture is sampled when a texel covers less than one pixel.
+		The default is [page:Textures THREE.NearestFilter]. See [page:Textures minification filter constants] for other choices.<br />
+
+		[page:Number anisotropy] -- The number of samples taken along the axis through the pixel that has the highest density of texels.
+		By default, this value is 1. A higher value gives a less blurry result than a basic mipmap, at the cost of more texture samples being used.
+		Use [page:WebGLrenderer.getMaxAnisotropy renderer.getMaxAnisotropy]() to find the maximum valid anisotropy value for the GPU; this value is usually a power of 2.<br />
+
+		[page:Constant format] -- must be either [page:Textures DepthFormat] (default) or [page:Textures DepthStencilFormat].
+		See [page:Textures format constants] for details.<br />
+		</p>
+
+
+		<h2>Properties</h2>
+
+		<p>
+		See the base [page:Texture Texture] class for common properties
+		- the following are also part of the texture class, but have different defaults here.
+		</p>
+
+		<h3>[page:Texture.format .format]</h3>
+		<p>
+		Either [page:Textures DepthFormat] (default) or [page:Textures DepthStencilFormat].
+		See [page:Textures format constants] for details.<br />
+		</p>
+
+		<h3>[page:Texture.type .type]</h3>
+		<p>
+		Default is [page:Textures THREE.UnsignedShortType] when unsing [page:Textures DepthFormat] and [page:Textures THREE.UnsignedInt248Type] when using [page:Textures DepthStencilFormat].
+		See [page:Textures format constants] for details.<br />
+		</p>
+
+		<h3>[page:Texture.magFilter .magFilter]</h3>
+		<p>
+		  How the texture is sampled when a texel covers more than one pixel.
+			The default is [page:Textures THREE.NearestFilter].
+		  See [page:Textures magnification filter constants] for other choices.
+		</p>
+
+		<h3>[page:Texture.minFilter .minFilter]</h3>
+		<p>
+		How the texture is sampled when a texel covers less than one pixel.
+		The default is [page:Textures THREE.NearestFilter].
+		See [page:Textures magnification filter constants] for other choices.
+		</p>
+
+		<h3>[page:Texture.flipY .flipY]</h3>
+		<p>
+		Depth textures do not need to be flipped so this is *false* by default.
+		</p>
+
+		<h3>[page:Texture.generateMipmaps .generateMipmaps]</h3>
+		<p>
+		Depth textures do not use mipmaps.
+		</p>
+
+		<h2>Methods</h2>
+
+		<p>
+		See the base [page:Texture Texture] class for common methods.
+		</p>
+
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

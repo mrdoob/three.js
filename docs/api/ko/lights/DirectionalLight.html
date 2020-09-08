@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A light that gets emitted in a specific direction. This light will behave as though it is
+			infinitely far away and the rays produced from it are all parallel. The common use case
+			for this is to simulate daylight; the sun is far enough away that its position can be
+			considered to be infinite, and all light rays coming from it are parallel.<br /><br />
+
+			This light can cast shadows - see the [page:DirectionalLightShadow] page for details.
+		</p>
+
+		<h2>A Note about Position, Target and rotation</h2>
+		<p>
+			A common point of confusion for directional lights is that setting the rotation has no effect.
+			This is because three.js's DirectionalLight is the equivalent to what is often called a 'Target
+			Direct Light' in other applications.<br /><br />
+
+			This means that its direction is calculated as pointing
+			from the light's [page:Object3D.position position] to	the [page:.target target]'s position
+			(as opposed to a 'Free Direct Light' that just has a rotation component).<br /><br />
+
+			The reason for this is to allow the light to cast shadows - the [page:.shadow shadow]
+			camera needs a position to calculate shadows from.<br /><br />
+
+			See the [page:.target target] property below for details on updating the target.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		// White directional light at half intensity shining from the top.
+		var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
+		scene.add( directionalLight );
+		</code>
+
+		<h2>Examples</h2>
+		<p>
+			[example:misc_controls_fly controls / fly ]<br />
+			[example:webgl_effects_parallaxbarrier effects / parallaxbarrier ]<br />
+			[example:webgl_effects_stereo effects / stereo ]<br />
+			[example:webgl_geometry_extrude_splines geometry / extrude / splines ]<br />
+			[example:webgl_materials_bumpmap materials / bumpmap ]<br />
+			[example:webgl_materials_cubemap_balls_reflection materials / cubemap / balls / reflection ]
+		</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Integer color], [param:Float intensity] )</h3>
+		<p>
+			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
+			[page:Float intensity] - (optional) numeric value of the light's strength/intensity. Default is 1.<br /><br />
+
+			Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+
+		<p>See the base [page:Light Light] class for common properties.</p>
+
+		<h3>[property:Boolean castShadow]</h3>
+		<p>
+			If set to *true* light will cast dynamic shadows. *Warning*: This is expensive and
+			requires tweaking to get shadows looking right. See the [page:DirectionalLightShadow] for details.
+			The default is *false*.
+		</p>
+
+		<h3>[property:Vector3 position]</h3>
+		<p>
+			This is set equal to [page:Object3D.DefaultUp] (0, 1, 0), so that the light shines from the top down.
+		</p>
+
+		<h3>[property:DirectionalLightShadow shadow]</h3>
+		<p>
+			A [page:DirectionalLightShadow] used to calculate shadows for this light.
+		</p>
+
+		<h3>[property:Object3D target]</h3>
+		<p>
+			The DirectionalLight points from its [page:.position position] to target.position. The default
+			position of the target is *(0, 0, 0)*.<br />
+
+			*Note*: For the target's position to be changed to anything other than the default,
+			it must be added to the [page:Scene scene] using
+		</p>
+		<code>
+		scene.add( light.target );
+		</code>
+		<p>
+			This is so that the target's [page:Object3D.matrixWorld matrixWorld] gets automatically
+			updated each frame.<br /><br />
+
+			It is also possible to set the target to be another object in the scene (anything with a
+			[page:Object3D.position position] property), like so:
+		</p>
+		<code>
+		var targetObject = new THREE.Object3D();
+		scene.add(targetObject);
+
+		light.target = targetObject;
+		</code>
+		<p>
+			The directionalLight will now track the target object.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<p>See the base [page:Light Light] class for common methods.</p>
+
+		<h3>[method:DirectionalLight copy]( [param:DirectionalLight source] )</h3>
+		<p>
+		Copies value of all the properties from the [page:DirectionalLight source] to this
+		DirectionalLight.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

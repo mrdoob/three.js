@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:BufferGeometry] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">This is the [page:BufferGeometry] port of [page:CylinderGeometry].</p>
+
+		<iframe id="scene" src="scenes/geometry-browser.html#CylinderBufferGeometry"></iframe>
+
+		<script>
+
+		// iOS iframe auto-resize workaround
+
+		if ( /(iPad|iPhone|iPod)/g.test( navigator.userAgent ) ) {
+
+			var scene = document.getElementById( 'scene' );
+
+			scene.style.width = getComputedStyle( scene ).width;
+			scene.style.height = getComputedStyle( scene ).height;
+			scene.setAttribute( 'scrolling', 'no' );
+
+		}
+
+		</script>
+
+		<h2>Code Example</h2>
+
+		<code>var geometry = new THREE.CylinderBufferGeometry( 5, 5, 20, 32 );
+		var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+		var cylinder = new THREE.Mesh( geometry, material );
+		scene.add( cylinder );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]([param:Float radiusTop], [param:Float radiusBottom], [param:Float height], [param:Integer radialSegments], [param:Integer heightSegments], [param:Boolean openEnded], [param:Float thetaStart], [param:Float thetaLength])</h3>
+		<p>
+		radiusTop — Radius of the cylinder at the top. Default is 1.<br />
+		radiusBottom — Radius of the cylinder at the bottom. Default is 1.<br />
+		height — Height of the cylinder. Default is 1.<br />
+		radialSegments — Number of segmented faces around the circumference of the cylinder. Default is 8<br />
+		heightSegments — Number of rows of faces along the height of the cylinder. Default is 1.<br />
+		openEnded — A Boolean indicating whether the ends of the cylinder are open or capped. Default is false, meaning capped.<br />
+		thetaStart — Start angle for first segment, default = 0 (three o'clock position).<br />
+		thetaLength — The central angle, often called theta, of the circular sector. The default is 2*Pi, which makes for a complete cylinder.
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:BufferGeometry] class for common properties.</p>
+
+		<h3>[property:Object parameters]</h3>
+		<p>
+		An object with a property for each of the constructor parameters. Any modification after instantiation does not change the geometry.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:BufferGeometry] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/geometries/CylinderGeometry.js src/geometries/CylinderGeometry.js]
+		</p>
+	</body>
+</html>

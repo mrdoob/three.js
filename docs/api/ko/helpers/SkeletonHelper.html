@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Line] &rarr; [page:LineSegments] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+		A helper object to assist with visualizing a [page:Skeleton Skeleton].
+		The helper is renderered using a [page:LineBasicMaterial LineBasicMaterial].
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		var helper = new THREE.SkeletonHelper( skinnedMesh );
+		scene.add( helper );
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_animation_skinning_blending WebGL / animation / skinning / blending]<br />
+			[example:webgl_animation_skinning_morph WebGL / animation / skinning / morph]<br />
+			[example:webgl_loader_bvh WebGL / loader / bvh ]
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Object3D object] )</h3>
+		<p>
+		object -- Usually an instance of [page:SkinnedMesh]. However, any instance of [page:Object3D] can be used if it represents
+		a hierarchy of [page:Bone Bone]s (via [page:Object3D.children]).
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Array bones]</h3>
+		<p>
+		The list of bones that the helper renders as [page:Line Lines].
+		</p>
+
+		<h3>[property:Object3D root]</h3>
+		<p>
+		The object passed in the constructor.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:EventDispatcher] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			<p>
+				[name] is similar to [page:OrbitControls]. However, it does not maintain a constant camera [page:Object3D.up up] vector.
+				That means if the camera orbits over the “north” and “south” poles, it does not flip to stay "right side up".
+			</p>
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>[example:misc_controls_trackball misc / controls / trackball ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Camera camera], [param:HTMLDOMElement domElement] )</h3>
+		<p>
+			<p>
+				[page:Camera camera]: The camera of the rendered scene.
+			</p>
+			<p>
+				[page:HTMLDOMElement domElement]: The HTML element used for event listeners.
+			</p>
+			<p>
+				Creates a new instance of [name].
+			</p>
+		</p>
+
+		<h2>Events</h2>
+
+		<h3>change</h3>
+		<p>
+			Fires when the camera has been transformed by the controls.
+		</p>
+
+		<h3>start</h3>
+		<p>
+			Fires when an interaction (e.g. touch) was initiated.
+		</p>
+
+		<h3>end</h3>
+		<p>
+			Fires when an interaction has finished.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:HTMLDOMElement domElement]</h3>
+		<p>
+			The HTMLDOMElement used to listen for mouse / touch events. This must be passed in the constructor; changing it here will
+			not set up new event listeners.
+		</p>
+
+		<h3>[property:Number dynamicDampingFactor]</h3>
+		<p>
+			Defines the intensity of damping. Only considered if [page:.staticMoving staticMoving] is set to *false*. Default is *0.2*.
+		</p>
+
+		<h3>[property:Boolean enabled]</h3>
+		<p>
+			Whether or not the controls are enabled.
+		</p>
+
+		<h3>[property:Array keys]</h3>
+		<p>
+			This array holds keycodes for controlling interactions.
+			<ul>
+				<li>When the first defined key is pressed, all mouse interactions (left, middle, right) performs orbiting.</li>
+				<li>When the second defined key is pressed, all mouse interactions (left, middle, right) performs zooming.</li>
+				<li>When the third defined key is pressed, all mouse interactions (left, middle, right) performs panning.</li>
+			</ul>
+			Default is *65, 83, 68* which represents A, S, D.
+		</p>
+
+		<h3>[property:Number maxDistance]</h3>
+		<p>
+			How far you can zoom out. Default is *Infinity*.
+		</p>
+
+		<h3>[property:Number minDistance]</h3>
+		<p>
+			How far you can zoom in. Default is *0*.
+		</p>
+
+		<h3>
+			[property:Object mouseButtons]</h3>
+		<p>
+			This object contains references to the mouse actions used by the controls.
+			<ul>
+				<li>.LEFT is assigned with *THREE.MOUSE.ROTATE*</li>
+				<li>.MIDDLE is assigned with *THREE.MOUSE.ZOOM*</li>
+				<li>.RIGHT is assigned with *THREE.MOUSE.PAN*</li>
+			</ul>
+		</p>
+
+		<h3>[property:Boolean noPan]</h3>
+		<p>
+			Whether or not panning is disabled. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean noRotate]</h3>
+		<p>
+			Whether or not rotation is disabled. Default is *false*.
+		</p>
+
+		<h3>[property:Boolean noZoom]</h3>
+		<p>
+			Whether or not zooming is disabled. Default is *false*.
+		</p>
+
+		<h3>[property:Camera object]</h3>
+		<p>
+			The camera being controlled.
+		</p>
+
+		<h3>[property:Number panSpeed]</h3>
+		<p>
+			The zoom speed. Default is *0.3*.
+		</p>
+
+		<h3>[property:Number rotateSpeed]</h3>
+		<p>
+			The rotation speed. Default is *1.0*.
+		</p>
+
+		<h3>[property:Object screen]</h3>
+		<p>
+			Represents the properties of the screen. Automatically set when [page:.handleResize handleResize]() is called.
+			<ul>
+				<li>left: Represents the offset in pixels to the screen's left boundary.</li>
+				<li>top: Represents the offset in pixels to the screen's top boundary.</li>
+				<li>width: Represents the screen width in pixels.</li>
+				<li>height: Represents the screen height in pixels.</li>
+			</ul>
+		</p>
+
+		<h3>[property:Boolean staticMoving]</h3>
+		<p>
+			Whether or not damping is disabled. Default is *false*.
+		</p>
+
+		<h3>[property:Number zoomSpeed]</h3>
+		<p>
+			The zoom speed. Default is *1.2*.
+		</p>
+
+		<h2>Methods</h2>
+
+		<h3>[method:null checkDistances] ()</h3>
+		<p>
+			Ensures the controls stay in the range [minDistance, maxDistance]. Called by [page:.update update]().
+		</p>
+
+		<h3>[method:null dispose] ()</h3>
+		<p>
+			Should be called if the controls is no longer required.
+		</p>
+
+		<h3>[method:null handleResize] ()</h3>
+		<p>
+			Should be called if the application window is resized.
+		</p>
+
+		<h3>[method:null panCamera] ()</h3>
+		<p>
+			Performs panning if necessary. Called by [page:.update update]().
+		</p>
+
+		<h3>[method:null reset] ()</h3>
+		<p>
+			Resets the controls to its initial state.
+		</p>
+
+		<h3>[method:null rotateCamera] ()</h3>
+		<p>
+			Rotates the camera if necessary. Called by [page:.update update]().
+		</p>
+
+		<h3>[method:null update] ()</h3>
+		<p>
+			Updates the controls. Usually called in the animation loop.
+		</p>
+
+		<h3>[method:null zoomCamera] ()</h3>
+		<p>
+			Performs zooming if necessary. Called by [page:.update update]().
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/controls/TrackballControls.js examples/jsm/controls/TrackballControls.js]
+		</p>
+	</body>
+</html>

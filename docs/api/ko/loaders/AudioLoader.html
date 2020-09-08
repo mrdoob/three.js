@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Loader] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			Class for loading an
+			[link:https://developer.mozilla.org/en-US/docs/Web/API/AudioBuffer AudioBuffer].
+			This uses the [page:FileLoader] internally for loading files.
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+		// instantiate a listener
+		var audioListener = new THREE.AudioListener();
+
+		// add the listener to the camera
+		camera.add( audioListener );
+
+		// instantiate audio object
+		var oceanAmbientSound = new THREE.Audio( audioListener );
+
+		// add the audio object to the scene
+		scene.add( oceanAmbientSound );
+
+		// instantiate a loader
+		var loader = new THREE.AudioLoader();
+
+		// load a resource
+		loader.load(
+			// resource URL
+			'audio/ambient_ocean.ogg',
+
+			// onLoad callback
+			function ( audioBuffer ) {
+				// set the audio object buffer to the loaded object
+				oceanAmbientSound.setBuffer( audioBuffer );
+
+				// play the audio
+				oceanAmbientSound.play();
+			},
+
+			// onProgress callback
+			function ( xhr ) {
+				console.log( (xhr.loaded / xhr.total * 100) + '% loaded' );
+			},
+
+			// onError callback
+			function ( err ) {
+				console.log( 'An error happened' );
+			}
+		);
+		</code>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:LoadingManager manager] )</h3>
+		<p>
+		[page:LoadingManager manager] — The [page:LoadingManager loadingManager] for the loader to use. Default is [page:LoadingManager THREE.DefaultLoadingManager].<br /><br />
+
+		Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:Loader] class for common properties.</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:Loader] class for common methods.</p>
+
+		<h3>[method:null load]( [param:String url], [param:Function onLoad], [param:Function onProgress], [param:Function onError] )</h3>
+		<p>
+		[page:String url] — the path or URL to the file. This can also be a
+			[link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs Data URI].<br />
+		[page:Function onLoad] — Will be called when load completes. The argument will be the loaded text response.<br />
+		[page:Function onProgress] — Will be called while load progresses. The argument will be the XMLHttpRequest instance, which contains .[page:Integer total] and .[page:Integer loaded] bytes.<br />
+		[page:Function onError] — Will be called when load errors.<br />
+		</p>
+		<p>
+		Begin loading from url and pass the loaded [page:String AudioBuffer] to onLoad.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<h2>Which 3D model format is best supported?</h2>
+		<div>
+			<p>
+				The recommended format for importing and exporting assets is glTF (GL Transmission Format). Because glTF is focused on runtime asset delivery, it is compact to transmit and fast to load.
+			</p>
+			<p>
+				three.js provides loaders for many other popular formats like FBX, Collada or OBJ as well. Nevertheless, you should always try to establish a glTF based workflow in your projects first. For more information, see [link:#manual/introduction/Loading-3D-models loading 3D models].
+			</p>
+		</div>
+
+		<h2>Why are there meta viewport tags in examples?</h2>
+		<div>
+				<code>&lt;meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"&gt;</code>
+
+				<p>These tags control viewport size and scale for mobile browsers (where page content may be rendered at different size than visible viewport).</p>
+
+				<p>[link:https://developer.apple.com/library/content/documentation/AppleApplications/Reference/SafariWebContent/UsingtheViewport/UsingtheViewport.html Safari: Using the Viewport]</p>
+
+				<p>[link:https://developer.mozilla.org/en/Mobile/Viewport_meta_tag MDN: Using the viewport meta tag]</p>
+		</div>
+
+		<h2>How can scene scale be preserved on resize?</h2>
+		<p>
+			We want all objects, regardless of their distance from the camera, to appear the same size, even as the window is resized.
+
+			The key equation to solving this is this formula for the visible height at a given distance:
+
+			<code>
+visible_height = 2 * Math.tan( ( Math.PI / 180 ) * camera.fov / 2 ) * distance_from_camera;
+			</code>
+			If we increase the window height by a certain percentage, then what we want is the visible height at all distances
+			to increase by the same percentage.
+
+			This can not be done by changing the camera position. Instead you have to change the camera field-of-view.
+			[link:http://jsfiddle.net/Q4Jpu/ Example].
+		</p>
+
+		<h2>Why is part of my object invisible?</h2>
+		<p>
+			This could be because of face culling. Faces have an orientation that  decides which side is which. And the culling removes the backside in normal circumstances. To see if this is your problem, change the material side to THREE.DoubleSide.
+			<code>material.side = THREE.DoubleSide</code>
+		</p>
+	</body>
+</html>

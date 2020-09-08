@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			RectAreaLight emits light uniformly across the face a rectangular plane. This light type can be
+			used to simulate light sources such as bright windows or strip lighting.<br /><br />
+
+			Important Notes:
+			<ul>
+				<li>There is no shadow support.</li>
+				<li>Only [page:MeshStandardMaterial MeshStandardMaterial] and [page:MeshPhysicalMaterial MeshPhysicalMaterial] are supported.</li>
+				<li>You have to include [link:https://threejs.org/examples/jsm/lights/RectAreaLightUniformsLib.js RectAreaLightUniformsLib] into your scene and call *init()*.</li>
+			</ul>
+		</p>
+
+		<h2>Code Example</h2>
+
+		<code>
+var width = 10;
+var height = 10;
+var intensity = 1;
+var rectLight = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+rectLight.position.set( 5, 5, 0 );
+rectLight.lookAt( 0, 0, 0 );
+scene.add( rectLight )
+
+rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+rectLight.add( rectLightHelper );
+
+		</code>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_lights_rectarealight WebGL / rectarealight ]
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]( [param:Integer color], [param:Float intensity], [param:Float width], [param:Float height] )</h3>
+		<p>
+			[page:Integer color] - (optional) hexadecimal color of the light. Default is 0xffffff (white).<br />
+			[page:Float intensity] - (optional) the light's intensity, or brightness. Default is 1.<br />
+			[page:Float width] - (optional) width of the light. Default is 10.<br />
+			[page:Float height] - (optional) height of the light. Default is 10.<br /><br />
+
+			Creates a new [name].
+		</p>
+
+		<h2>Properties</h2>
+		<p>
+			See the base [page:Light Light] class for common properties.
+		</p>
+
+		<h2>Methods</h2>
+		<p>
+			See the base [page:Light Light] class for common methods.
+		</p>
+
+
+		<h3>[method:RectAreaLight copy]( [param:RectAreaLight source] )</h3>
+		<p>
+		Copies value of all the properties from the [page:RectAreaLight source] to this
+		RectAreaLight.
+		</p>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

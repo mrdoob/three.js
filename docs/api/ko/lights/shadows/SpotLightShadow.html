@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:LightShadow] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			This is used internally by [page:SpotLight SpotLights] for calculating shadows.
+		</p>
+
+		<h2>Code Example</h2>
+		<code>
+		//Create a WebGLRenderer and turn on shadows in the renderer
+		var renderer = new THREE.WebGLRenderer();
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+
+		//Create a SpotLight and turn on shadows for the light
+		var light = new THREE.SpotLight( 0xffffff );
+		light.castShadow = true;            // default false
+		scene.add( light );
+
+		//Set up shadow properties for the light
+		light.shadow.mapSize.width = 512;  // default
+		light.shadow.mapSize.height = 512; // default
+		light.shadow.camera.near = 0.5;    // default
+		light.shadow.camera.far = 500      // default
+		light.shadow.focus = 1;            // default
+
+		//Create a sphere that cast shadows (but does not receive them)
+		var sphereGeometry = new THREE.SphereBufferGeometry( 5, 32, 32 );
+		var sphereMaterial = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+		var sphere = new THREE.Mesh( sphereGeometry, sphereMaterial );
+		sphere.castShadow = true; //default is false
+		sphere.receiveShadow = false; //default
+		scene.add( sphere );
+
+		//Create a plane that receives shadows (but does not cast them)
+		var planeGeometry = new THREE.PlaneBufferGeometry( 20, 20, 32, 32 );
+		var planeMaterial = new THREE.MeshStandardMaterial( { color: 0x00ff00 } )
+		var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+		plane.receiveShadow = true;
+		scene.add( plane );
+
+		//Create a helper for the shadow camera (optional)
+		var helper = new THREE.CameraHelper( light.shadow.camera );
+		scene.add( helper );
+		</code>
+
+		<h2>Constructor</h2>
+
+		<p>The constructor creates a [param:PerspectiveCamera PerspectiveCamera] to manage the shadow's view of the world.</p>
+
+		<h2>Properties</h2>
+		<p>See the base [page:LightShadow LightShadow] class for common properties.</p>
+
+
+		<h3>[property:Camera camera]</h3>
+		<p>
+			The light's view of the world. This is used to generate a depth map of the scene; objects behind
+			other objects from the light's perspective will be in shadow.<br /><br />
+
+			The default is a  [page:PerspectiveCamera] with [page:PerspectiveCamera.near near] clipping plane at 0.5.
+			The [page:PerspectiveCamera.fov fov] will track the [page:SpotLight.angle angle] property of the owning
+			[page:SpotLight SpotLight] via the [page:SpotLightShadow.update update] method. Similarly, the
+			[page:PerspectiveCamera.aspect aspect] property will track the aspect of the
+			[page:LightShadow.mapSize mapSize]. If the [page:SpotLight.distance distance] property of the light is
+			set, the [page:PerspectiveCamera.far far] clipping plane will track that, otherwise it defaults to 500.
+
+		</p>
+
+		<h3>[property:Number focus]</h3>
+		<p>
+			Used to focus the shadow camera. The camera's field of view is set as a percentage of the spotlight's field-of-view. Range is [0, 1]. Default is 1.0.<br/>
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:LightShadow LightShadow] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/lights/[name].js src/lights/[name].js]
+		</p>
+	</body>
+</html>

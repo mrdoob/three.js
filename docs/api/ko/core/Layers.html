@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		<h1>[name]</h1>
+
+		<p class="desc">
+			A [page:Layers] object assigns an [page:Object3D] to 1 or more of 32 layers numbered 0 to 31
+			- internally the layers are stored as a [link:https://en.wikipedia.org/wiki/Mask_(computing) bit mask], and by default all
+			Object3Ds are a member of layer 0.<br /><br />
+
+			This can be used to control visibility - an object must share a layer with a [page:Camera camera] to be visible when that camera's
+			view is renderered.<br /><br />
+
+			All classes that inherit from [page:Object3D] have an [page:Object3D.layers] property which is an instance of this class.
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_layers WebGL / layers]
+		</p>
+
+		<h2>Constructor</h2>
+
+
+		<h3>[name]()</h3>
+		<p>
+			Create a new Layers object, with membership initially set to layer 0.
+		</p>
+
+		<h2>Properties</h2>
+
+		<h3>[property:Integer mask]</h3>
+		<p>
+			A bit mask storing which of the 32 layers this layers object is currently a member of.
+		</p>
+
+
+		<h2>Methods</h2>
+
+		<h3>[method:null disable]( [param:Integer layer] )</h3>
+		<p>
+			layer - an integer from 0 to 31.<br /><br />
+
+			Remove membership of this *layer*.
+		</p>
+
+		<h3>[method:null enable]( [param:Integer layer] )</h3>
+		<p>
+			layer - an integer from 0 to 31.<br /><br />
+
+			Add membership of this *layer*.
+		</p>
+
+		<h3>[method:null set]( [param:Integer layer] )</h3>
+		<p>
+			layer - an integer from 0 to 31.<br /><br />
+
+			Set membership to *layer*, and remove membership all other layers.
+		</p>
+
+		<h3>[method:Boolean test]( [param:Layers layers] )</h3>
+		<p>
+			layers - a Layers object<br /><br />
+
+			Returns true if this and the passed *layers* object are members of the same set of layers.
+		</p>
+
+		<h3>[method:null toggle]( [param:Integer layer] )</h3>
+		<p>
+			layer - an integer from 0 to 31.<br /><br />
+
+			Toggle membership of *layer*.
+		</p>
+
+		<h3>[method:null enableAll]()</h3>
+		<p>
+			Add membership to all layers.
+		</p>
+
+		<h3>[method:null disableAll]()</h3>
+		<p>
+			Remove membership from all layers.
+		</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

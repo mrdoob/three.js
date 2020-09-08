@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Camera] &rarr; [page:PerspectiveCamera] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			[name] can be used in order to efficiently render a scene with a predefined set of cameras. This is an important performance aspect for rendering VR scenes.<br />
+			An instance of [name] always has an array of sub cameras. It's mandatory to define for each sub camera the *viewport* property which determines the part of the viewport that is rendered with this camera.
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>[example:webgl_camera_array camera / array ]</p>
+
+		<h2>Constructor</h2>
+
+		<h3>[name]( [param:Array array] )</h3>
+		<p>
+			An array of cameras.
+		</p>
+
+
+		<h2>Properties</h2>
+		<p>See the base [page:PerspectiveCamera] class for common properties.</p>
+
+		<h3>[property:Array cameras]</h3>
+		<p>
+			An array of cameras.
+		</p>
+
+		<h2>Methods</h2>
+		<p>See the base [page:PerspectiveCamera] class for common methods.</p>
+
+		<h2>Source</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>
