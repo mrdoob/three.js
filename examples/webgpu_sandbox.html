@@ -19,9 +19,9 @@
 
 			let camera, scene, renderer;
 
-			let mesh;
+			let box;
 
-			init().then( animate ).catch( onInitError );
+			init().then( animate ).catch( error );
 
 			async function init() {
 
@@ -44,31 +44,46 @@
 				const loader = new THREE.TextureLoader();
 				const texture = loader.load( './textures/uv_grid_opengl.jpg' );
 
-				const geometryMesh = new THREE.BoxBufferGeometry();
-				const materialMesh = new THREE.MeshBasicMaterial( { map: texture } );
+				const geometryBox = new THREE.BoxBufferGeometry();
+				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
-				mesh = new THREE.Mesh( geometryMesh, materialMesh );
-				mesh.position.set( - 1, 0.5, 0 );
-				scene.add( mesh );
+				box = new THREE.Mesh( geometryBox, materialBox );
+				box.position.set( - 1, 1, 0 );
+				scene.add( box );
+
+				// data texture
+
+				const geometryPlane = new THREE.PlaneBufferGeometry();
+				const materialPlane = new THREE.MeshBasicMaterial( { map: createDataTexture() } );
+
+				const plane = new THREE.Mesh( geometryPlane, materialPlane );
+				plane.position.set( - 1, - 1, 0 );
+				scene.add( plane );
 
 				// points
 
-				const geometryPoints = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, - 1, 0 ), new THREE.Vector3( 1, - 1, 0 ) ] );
+				const geometryPoints = new THREE.BufferGeometry().setFromPoints( [
+					new THREE.Vector3( 0.5, 0.5, 0 ),
+					new THREE.Vector3( 0.5, - 0.5, 0 ),
+					new THREE.Vector3( - 0.5, 0.5, 0 ),
+					new THREE.Vector3( - 0.5, - 0.5, 0 ) ] );
 				const materialPoints = new THREE.PointsMaterial();
 
 				const points = new THREE.Points( geometryPoints, materialPoints );
+				points.position.set( 1, - 1, 0 );
 				scene.add( points );
 
 				// lines
 
 				const geometryLine = new THREE.BufferGeometry().setFromPoints( [
-					new THREE.Vector3( 1, 0, 0 ),
-					new THREE.Vector3( 2, 0, 0 ),
-					new THREE.Vector3( 2, 1, 0 ),
-					new THREE.Vector3( 1, 1, 0 )
+					new THREE.Vector3( - 0.5, - 0.5, 0 ),
+					new THREE.Vector3( 0.5, - 0.5, 0 ),
+					new THREE.Vector3( 0.5, 0.5, 0 ),
+					new THREE.Vector3( - 0.5, 0.5, 0 )
 				] );
 				const materialLine = new THREE.LineBasicMaterial();
 				const line = new THREE.Line( geometryLine, materialLine );
+				line.position.set( 1, 1, 0 );
 				scene.add( line );
 
 				renderer = new WebGPURenderer();
@@ -95,14 +110,43 @@
 
 				requestAnimationFrame( animate );
 
-				mesh.rotation.x += 0.01;
-				mesh.rotation.y += 0.02;
+				box.rotation.x += 0.01;
+				box.rotation.y += 0.02;
 
 				renderer.render( scene, camera );
 
 			}
 
-			function onInitError( error ) {
+			function createDataTexture() {
+
+				const color = new THREE.Color( 0xff0000 );
+
+				const width = 512;
+				const height = 512;
+
+				const size = width * height;
+				const data = new Uint8Array( 4 * size );
+
+				const r = Math.floor( color.r * 255 );
+				const g = Math.floor( color.g * 255 );
+				const b = Math.floor( color.b * 255 );
+
+				for ( let i = 0; i < size; i ++ ) {
+
+					const stride = i * 4;
+
+					data[ stride ] = r;
+					data[ stride + 1 ] = g;
+					data[ stride + 2 ] = b;
+					data[ stride + 3 ] = 1;
+
+				}
+
+				return new THREE.DataTexture( data, width, height, THREE.RGBAFormat );
+
+			}
+
+			function error( error ) {
 
 				console.error( error );
 
