@@ -64,6 +64,8 @@ class WebGPUAttributes {
 
 		buffer.unmap();
 
+		attribute.onUploadCallback();
+
 		return {
 			version: attribute.version,
 			buffer: buffer
