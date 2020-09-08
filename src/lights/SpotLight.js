@@ -4,7 +4,7 @@ import { Object3D } from '../core/Object3D.js';
 
 class SpotLight extends Light {
 
-	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1 ) {
+	constructor( color, intensity, distance = 0, angle = Math.PI / 3, penumbra = 0, decay = 1, map = null ) {
 
 		super( color, intensity );
 
@@ -21,6 +21,7 @@ class SpotLight extends Light {
 		this.angle = angle;
 		this.penumbra = penumbra;
 		this.decay = decay; // for physically correct lights, should be 2.
+		this.map = map;
 
 		this.shadow = new SpotLightShadow();
 
