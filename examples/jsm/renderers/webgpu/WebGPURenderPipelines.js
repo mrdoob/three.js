@@ -145,6 +145,7 @@ class WebGPURenderPipelines {
 
 			const primitiveTopology = this._getPrimitiveTopology( object );
 			const rasterizationState = this._getRasterizationStateDescriptor( object );
+			const depthCompare = this._getDepthCompare( material );
 
 			pipeline = device.createRenderPipeline( {
 				layout: layout,
@@ -158,7 +159,7 @@ class WebGPURenderPipelines {
 				} ],
 				depthStencilState: {
 					depthWriteEnabled: material.depthWrite,
-					depthCompare: this._getDepthCompare( material ),
+					depthCompare: depthCompare,
 					format: GPUTextureFormat.Depth24PlusStencil8,
 				},
 				vertexState: {
