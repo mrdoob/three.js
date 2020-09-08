@@ -1253,7 +1253,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			for ( var i = 0; i < segmentCount; i ++ ) {
 
 				var segment = curve.segmentCurve( i );
-				var segmentArray = curveToPoints( segment );
+				var segmentArray = curveToPoints( segment, pointCount );
 				rc = rc.concat( segmentArray );
 				segment.delete();
 
