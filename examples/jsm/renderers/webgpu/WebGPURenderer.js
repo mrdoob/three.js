@@ -12,7 +12,7 @@ import WebGPUBackground from './WebGPUBackground.js';
 
 import { Frustum, Matrix4, Vector3, Color } from '../../../../build/three.module.js';
 
-console.warn( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective and Matrix4.makeOrtographic to work with WebGPU.' ); // #20276
+console.warn( 'THREE.WebGPURenderer: Modified Matrix4.makePerspective() and Matrix4.makeOrtographic() to work with WebGPU, see https://github.com/mrdoob/three.js/issues/20276.' );
 
 Matrix4.prototype.makePerspective = function ( left, right, top, bottom, near, far ) {
 
@@ -179,7 +179,7 @@ class WebGPURenderer {
 
 		} else {
 
-			if ( this.parameters.antialias ) {
+			if ( this.parameters.antialias === true ) {
 
 				colorAttachment.attachment = this._colorBuffer.createView();
 				colorAttachment.resolveTarget = this._swapChain.getCurrentTexture().createView();
