@@ -992,10 +992,10 @@ var list = {
 
 	"ko": {
 
-		"Manual": {
+		"매뉴얼": {
 
-			"Getting Started": {
-				"Creating a scene": "manual/ko/introduction/Creating-a-scene",
+			"시작하기": {
+				"장면 생성하기": "manual/ko/introduction/Creating-a-scene",
 				"Installation": "manual/ko/introduction/Installation",
 				"Browser support": "manual/ko/introduction/Browser-support",
 				"WebGL compatibility check": "manual/ko/introduction/WebGL-compatibility-check",
