@@ -19,14 +19,13 @@ export class LineSegments <
 
 	constructor(
 		geometry?: TGeometry,
-		material?: TMaterial,
-		mode?: number
+		material?: TMaterial
 	);
 
 	/**
 	 * @default 'LineSegments'
 	 */
-	type: 'LineSegments' | string;
+	type: 'LineSegments';
 	readonly isLineSegments: true;
 
 }
