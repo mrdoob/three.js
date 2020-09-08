@@ -74,9 +74,9 @@ class WebGPURenderer {
 
 		// ensure some parameters
 
-		this.parameters.antialias = this.parameters.antialias === true;
+		this.parameters.antialias = ( this.parameters.antialias === true );
 
-		if ( this.parameters.antialias ) {
+		if ( this.parameters.antialias === true ) {
 
 			this.parameters.sampleCount = this.parameters.sampleCount || 4;
 
@@ -128,13 +128,6 @@ class WebGPURenderer {
 		if ( renderTarget !== null ) {
 
 			// @TODO: Support RenderTarget with antialiasing.
-
-			if ( this.parameters.antialias ) {
-
-				console.error( 'WebGPURenderer: RenderTarget with antialiasing is not supported yet.' );
-				return;
-
-			}
 
 			const renderTargetProperties = this._properties.get( renderTarget );
 
@@ -669,7 +662,7 @@ class WebGPURenderer {
 
 			if ( this._colorBuffer ) this._colorBuffer.destroy();
 
-			this._colorBuffer = this._device.createTexture({
+			this._colorBuffer = this._device.createTexture( {
 				size: {
 					width: this._width * this._pixelRatio,
 					height: this._height * this._pixelRatio,
@@ -678,7 +671,7 @@ class WebGPURenderer {
 				sampleCount: this.parameters.sampleCount,
 				format: GPUTextureFormat.BRGA8Unorm,
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT
-			});
+			} );
 
 		}
 
@@ -706,6 +699,7 @@ class WebGPURenderer {
 		}
 
 	}
+
 }
 
 async function initWebGPU( scope ) {
