@@ -593,7 +593,7 @@ class WebGPURenderer {
 
 		// process renderable objects
 
-		for ( let i = 0, l = renderList.length; i < l; i ++ ) {
+		for ( let i = 0, il = renderList.length; i < il; i ++ ) {
 
 			const renderItem = renderList[ i ];
 
@@ -605,7 +605,30 @@ class WebGPURenderer {
 			this._objects.update( object );
 			this._bindings.update( object, camera );
 
-			this._renderObject( object, passEncoder );
+			if ( camera.isArrayCamera ) {
+
+				const cameras = camera.cameras;
+
+				for ( let j = 0, jl = cameras.length; j < jl; j ++ ) {
+
+					const camera2 = cameras[ j ];
+
+					if ( object.layers.test( camera2.layers ) ) {
+
+						const vp = camera2.viewport;
+						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, 0, 1 );
+
+						this._renderObject( object, passEncoder );
+
+					}
+
+				}
+
+			} else {
+
+				this._renderObject( object, passEncoder );
+
+			}
 
 		}
 
