@@ -1052,7 +1052,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				var pts = curveToPoints( _geometry, 100 );
 
 				var position = {};
-				var color = {};
 				var attributes = {};
 				var data = {};
 
@@ -1265,9 +1264,20 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
+		if ( curve instanceof rhino.ArcCurve ) {
+
+			pointCount = Math.floor( curve.angleDegrees / 5 );
+			pointCount = pointCount < 1 ? 2 : pointCount;
+
+		}
+
 		if ( curve instanceof rhino.NurbsCurve && curve.degree === 1 ) {
 
-			// console.info( 'degree 1 curve' );
+			if ( curve.segmentCount === undefined || curve.segmentCount === 1 ) {
+
+				return [ curve.pointAtStart, curve.pointAtEnd ];
+
+			}
 
 		}
 
