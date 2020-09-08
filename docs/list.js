@@ -389,6 +389,7 @@ var list = {
 			},
 
 			"Loaders": {
+				"3DMLoader": "examples/en/loaders/3DMLoader",
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
