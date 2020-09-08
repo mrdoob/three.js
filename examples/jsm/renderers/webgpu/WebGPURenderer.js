@@ -66,7 +66,6 @@ class WebGPURenderer {
 		// public
 
 		this.domElement = ( parameters.canvas !== undefined ) ? parameters.canvas : document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-		this.parameters = Object.assign( {}, parameters );
 
 		this.autoClear = true;
 		this.autoClearColor = true;
@@ -76,6 +75,8 @@ class WebGPURenderer {
 		this.sortObjects = true;
 
 		// internals
+
+		this._parameters = Object.assign( {}, parameters );
 
 		this._pixelRatio = 1;
 		this._width = this.domElement.width;
@@ -115,19 +116,22 @@ class WebGPURenderer {
 
 		this._renderTarget = null;
 
-		// ensure some parameters
+		// some parameters require default values other than "undefined"
 
-		this.parameters.antialias = ( this.parameters.antialias === true );
+		this._parameters.antialias = ( parameters.antialias === true );
 
-		if ( this.parameters.antialias === true ) {
+		if ( this._parameters.antialias === true ) {
 
-			this.parameters.sampleCount = this.parameters.sampleCount || 4;
+			this._parameters.sampleCount = ( parameters.sampleCount === undefined ) ? 4 : parameters.sampleCount;
 
 		} else {
 
-			this.parameters.sampleCount = 1;
+			this._parameters.sampleCount = 1;
 
 		}
+
+		this._parameters.enabledExtensions = ( parameters.enabledExtensions === undefined ) ? [] : parameters.enabledExtensions;
+		this._parameters.limits = ( parameters.limits === undefined ) ? {} : parameters.limits;
 
 	}
 
@@ -179,7 +183,7 @@ class WebGPURenderer {
 
 		} else {
 
-			if ( this.parameters.antialias === true ) {
+			if ( this._parameters.antialias === true ) {
 
 				colorAttachment.attachment = this._colorBuffer.createView();
 				colorAttachment.resolveTarget = this._swapChain.getCurrentTexture().createView();
@@ -709,7 +713,7 @@ class WebGPURenderer {
 					height: this._height * this._pixelRatio,
 					depth: 1
 				},
-				sampleCount: this.parameters.sampleCount,
+				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.BRGA8Unorm,
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT
 			} );
@@ -732,7 +736,7 @@ class WebGPURenderer {
 					height: this._height * this._pixelRatio,
 					depth: 1
 				},
-				sampleCount: this.parameters.sampleCount,
+				sampleCount: this._parameters.sampleCount,
 				format: GPUTextureFormat.Depth24PlusStencil8,
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT
 			} );
@@ -745,17 +749,17 @@ class WebGPURenderer {
 
 async function initWebGPU( scope ) {
 
-	const parameters = scope.parameters;
+	const parameters = scope._parameters;
 
 	const adapterOptions = {
-		powerPreference: ( parameters.powerPreference !== undefined ) ? parameters.powerPreference : undefined
+		powerPreference: parameters.powerPreference
 	};
 
 	const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
 	const deviceDescriptor = {
-		enabledExtensions: ( parameters.enabledExtensions !== undefined ) ? parameters.enabledExtensions : [],
-		limits: ( parameters.limits !== undefined ) ? parameters.limits : {}
+		enabledExtensions: parameters.enabledExtensions,
+		limits: parameters.limits
 	};
 
 	const device = await adapter.requestDevice( deviceDescriptor );
@@ -782,7 +786,7 @@ async function initWebGPU( scope ) {
 	scope._textures = new WebGPUTextures( device, scope._properties, scope._info, compiler );
 	scope._bindings = new WebGPUBindings( device, scope._info, scope._properties, scope._textures );
 	scope._objects = new WebGPUObjects( scope._geometries, scope._info );
-	scope._renderPipelines = new WebGPURenderPipelines( device, compiler, scope._bindings, scope.parameters.sampleCount );
+	scope._renderPipelines = new WebGPURenderPipelines( device, compiler, scope._bindings, parameters.sampleCount );
 	scope._renderLists = new WebGPURenderLists();
 	scope._background = new WebGPUBackground( scope );
 
