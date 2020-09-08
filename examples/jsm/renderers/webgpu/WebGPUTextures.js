@@ -71,11 +71,11 @@ class WebGPUTextures {
 
 			if ( image === undefined ) {
 
-				console.warn( 'THREE.WebGPURenderer: Texture marked for update but image is undefined' );
+				console.warn( 'THREE.WebGPURenderer: Texture marked for update but image is undefined.' );
 
 			} else if ( image.complete === false ) {
 
-				console.warn( 'THREE.WebGPURenderer: Texture marked for update but image is incomplete' );
+				console.warn( 'THREE.WebGPURenderer: Texture marked for update but image is incomplete.' );
 
 			} else {
 

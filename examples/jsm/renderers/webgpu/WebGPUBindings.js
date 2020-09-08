@@ -47,7 +47,7 @@ class WebGPUBindings {
 
 			} else {
 
-				console.error( 'WebGPURenderer: Unknwon shader type' );
+				console.error( 'THREE.WebGPURenderer: Unknwon shader type.' );
 
 			}
 

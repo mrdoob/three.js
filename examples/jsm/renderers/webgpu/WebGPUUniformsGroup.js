@@ -121,11 +121,11 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 		} else if ( uniform.isTexture ) {
 
-			console.warn( 'THREE.UniformsGroup: Texture samplers can not be part of an uniforms group.' );
+			console.error( 'THREE.UniformsGroup: Texture samplers can not be part of an uniforms group.' );
 
 		} else {
 
-			console.warn( 'THREE.UniformsGroup: Unsupported uniform value type.', uniform );
+			console.error( 'THREE.UniformsGroup: Unsupported uniform value type.', uniform );
 
 		}
 

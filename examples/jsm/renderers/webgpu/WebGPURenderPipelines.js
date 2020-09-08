@@ -47,7 +47,7 @@ class WebGPURenderPipelines {
 
 			} else {
 
-				console.error( 'WebGPURenderer: Unknwon shader type.' );
+				console.error( 'THREE.WebGPURenderer: Unknwon shader type.' );
 
 			}
 
@@ -214,7 +214,7 @@ class WebGPURenderPipelines {
 		if ( type === 'uvec3' ) return 12;
 		if ( type === 'uvec4' ) return 16;
 
-		console.error( 'WebGPURenderer: no this shader variable type support yet.', type );
+		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
 	}
 
@@ -250,7 +250,7 @@ class WebGPURenderPipelines {
 				break;
 
 			default:
-				console.warn( 'WebGPURenderer: Unknown material.side value.', material.side );
+				console.error( 'THREE.WebGPURenderer: Unknown Material.side value.', material.side );
 				break;
 
 		}
@@ -278,7 +278,7 @@ class WebGPURenderPipelines {
 		if ( type === 'uvec3' ) return GPUVertexFormat.UInt3;
 		if ( type === 'uvec4' ) return GPUVertexFormat.UInt4;
 
-		console.error( 'WebGPURenderer: no this shader variable type support yet.', type );
+		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
 	}
 
