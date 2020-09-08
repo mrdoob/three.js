@@ -251,7 +251,7 @@ class WebGPUBindings {
 			array.set( object.matrixWorld.elements, 0 );
 			array.set( object.modelViewMatrix.elements, 16 );
 
-			return true; // @TODO: implement caching (return false when cache hits occurs)
+			return true; // @TODO: Implement caching (return false when cache hits occurs)
 
 		} );
 
@@ -316,7 +316,7 @@ class WebGPUBindings {
 			array.set( object.matrixWorld.elements, 0 );
 			array.set( object.modelViewMatrix.elements, 16 );
 
-			return true; // @TODO: implement caching (return false when cache hits occurs)
+			return true; // @TODO: Implement caching (return false when cache hits occurs)
 
 		} );
 
@@ -346,7 +346,7 @@ class WebGPUBindings {
 			array.set( object.matrixWorld.elements, 0 );
 			array.set( object.modelViewMatrix.elements, 16 );
 
-			return true; // @TODO: implement caching (return false when cache hits occurs)
+			return true; // @TODO: Implement caching (return false when cache hits occurs)
 
 		} );
 
@@ -372,7 +372,7 @@ class WebGPUBindings {
 			array.set( camera.projectionMatrix.elements, 0 );
 			array.set( camera.matrixWorldInverse.elements, 16 );
 
-			return true; // @TODO: implement caching (return false when cache hits occurs)
+			return true; // @TODO: Implement caching (return false when cache hits occurs)
 
 		} );
 

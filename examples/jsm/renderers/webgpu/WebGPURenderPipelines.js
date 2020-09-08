@@ -47,7 +47,7 @@ class WebGPURenderPipelines {
 
 			} else {
 
-				console.error( 'WebGPURenderer: Unknwon shader type' );
+				console.error( 'WebGPURenderer: Unknwon shader type.' );
 
 			}
 
@@ -95,8 +95,10 @@ class WebGPURenderPipelines {
 			const vertexBuffers = [];
 			const shaderAttributes = [];
 
-			// Find "layout (location = num) in type name" in vertex shader
+			// find "layout (location = num) in type name" in vertex shader
+
 			const regex = /^\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
+
 			let shaderAttribute = null;
 
 			while ( shaderAttribute = regex.exec( shader.vertexShader ) ) {
@@ -121,7 +123,7 @@ class WebGPURenderPipelines {
 
 				const count = ( geometry.index ) ? geometry.index.count : geometry.attributes.position.count;
 
-				indexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type the primitive restart value
+				indexFormat = ( count > 65535 ) ? GPUIndexFormat.Uint32 : GPUIndexFormat.Uint16; // define data type for primitive restart value
 
 			}
 
@@ -195,7 +197,7 @@ class WebGPURenderPipelines {
 
 	_getArrayStride( type ) {
 
-		// This code is GLSL specific. We need to update when we switch to WGSL.
+		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
 
 		if ( type === 'float' ) return 4;
 		if ( type === 'vec2' ) return 8;
@@ -259,7 +261,7 @@ class WebGPURenderPipelines {
 
 	_getVertexFormat( type ) {
 
-		// This code is GLSL specific. We need to update when we switch to WGSL.
+		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
 
 		if ( type === 'float' ) return GPUVertexFormat.Float;
 		if ( type === 'vec2' ) return GPUVertexFormat.Float2;
