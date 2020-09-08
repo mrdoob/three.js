@@ -334,8 +334,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					}
 
-					var layer = data.layers[ attributes.layerIndex ]
-					
+					var layer = data.layers[ attributes.layerIndex ];
+
 					_object.visible = layer ? data.layers[ attributes.layerIndex ].visible : true;
 
 					if ( attributes.isInstanceDefinitionObject ) {
@@ -1182,6 +1182,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		if ( geometry ) {
 
 			var attributes = extractProperties( _attributes );
+			attributes.geometry = extractProperties( _geometry );
 
 			if ( _attributes.groupCount > 0 ) {
 
@@ -1212,7 +1213,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			} else {
 
-				// console.log(`${property}: ${object[property]}`);
+				// console.log( `${property}: ${object[ property ]}` );
 
 			}
 
@@ -1268,6 +1269,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			pointCount = Math.floor( curve.angleDegrees / 5 );
 			pointCount = pointCount < 1 ? 2 : pointCount;
+			// alternative to this hardcoded version: https://stackoverflow.com/a/18499923/2179399
 
 		}
 
