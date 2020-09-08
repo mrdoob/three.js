@@ -290,6 +290,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		object.userData[ 'layers' ] = data.layers;
 		object.userData[ 'groups' ] = data.groups;
+		object.userData[ 'settings' ] = data.settings;
 
 		var objects = data.objects;
 		var materials = data.materials;
@@ -823,6 +824,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		}
 
 		// Handle instance definitions
+		// console.log( `Instance Definitions Count: ${doc.instanceDefinitions().count()}` );
 
 		for ( var i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
 
@@ -1007,11 +1009,9 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		// Handle bitmaps
 		// console.log( `Bitmap Count: ${doc.bitmaps().count()}` );
 
-		// Handle instance definitions
-		// console.log(`Instance Definitions Count: ${doc.instanceDefinitions().count()}`);
-
 		// Handle strings -- this seems to be broken at the moment in rhino3dm
-		// console.log(`Strings Count: ${doc.strings().count()}`);
+		// console.log( `Document Strings Count: ${doc.strings().count()}` );
+
 		/*
 		for( var i = 0; i < doc.strings().count(); i++ ){
 
@@ -1190,10 +1190,17 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			}
 
+			if ( _attributes.userStringCount > 0 ) {
+
+				attributes.userStrings = _attributes.getUserStrings();
+
+			}
+
 			attributes.drawColor = _attributes.drawColor( doc );
 
 			objectType = objectType.constructor.name;
 			objectType = objectType.substring( 11, objectType.length );
+			attributes.geometry.objectType = objectType;
 
 			return { geometry, attributes, objectType };
 
