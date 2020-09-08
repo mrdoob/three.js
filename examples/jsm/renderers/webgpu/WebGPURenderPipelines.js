@@ -1,5 +1,5 @@
 import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation } from './constants.js';
-import { FrontSide, BackSide, DoubleSide } from '../../../../build/three.module.js';
+import { FrontSide, BackSide, DoubleSide, NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth } from '../../../../build/three.module.js';
 
 class WebGPURenderPipelines {
 
@@ -158,7 +158,7 @@ class WebGPURenderPipelines {
 				} ],
 				depthStencilState: {
 					depthWriteEnabled: material.depthWrite,
-					depthCompare: GPUCompareFunction.Less,
+					depthCompare: this._getDepthCompare( material ),
 					format: GPUTextureFormat.Depth24PlusStencil8,
 				},
 				vertexState: {
@@ -215,6 +215,63 @@ class WebGPURenderPipelines {
 		if ( type === 'uvec4' ) return 16;
 
 		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
+
+	}
+
+	_getDepthCompare( material ) {
+
+		let depthCompare;
+
+		if ( material.depthTest === false ) {
+
+			depthCompare = GPUCompareFunction.Always;
+
+		} else {
+
+			const depthFunc = material.depthFunc;
+
+			switch ( depthFunc ) {
+
+				case NeverDepth:
+					depthCompare = GPUCompareFunction.Never;
+					break;
+
+				case AlwaysDepth:
+					depthCompare = GPUCompareFunction.Always;
+					break;
+
+				case LessDepth:
+					depthCompare = GPUCompareFunction.Less;
+					break;
+
+				case LessEqualDepth:
+					depthCompare = GPUCompareFunction.LessEqual;
+					break;
+
+				case EqualDepth:
+					depthCompare = GPUCompareFunction.Equal;
+					break;
+
+				case GreaterEqualDepth:
+					depthCompare = GPUCompareFunction.GreaterEqual;
+					break;
+
+				case GreaterDepth:
+					depthCompare = GPUCompareFunction.Greater;
+					break;
+
+				case NotEqualDepth:
+					depthCompare = GPUCompareFunction.NotEqual;
+					break;
+
+				default:
+					console.error( 'THREE.WebGPURenderer: Invalid depth function.', depthFunc );
+
+			}
+
+		}
+
+		return depthCompare;
 
 	}
 
