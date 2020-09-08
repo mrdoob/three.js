@@ -140,13 +140,11 @@ class WebGPURenderer {
 
 				colorAttachment.attachment = this._colorBuffer.createView();
 				colorAttachment.resolveTarget = this._swapChain.getCurrentTexture().createView();
-				colorAttachment.storeOp = GPUStoreOp.Clear;
 
 			} else {
 
 				colorAttachment.attachment = this._swapChain.getCurrentTexture().createView();
 				colorAttachment.resolveTarget = undefined;
-				colorAttachment.storeOp = undefined;
 
 			}
 
