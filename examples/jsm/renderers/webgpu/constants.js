@@ -200,6 +200,15 @@ export const GPUBlendOperation = {
 	Max: 'max'
 };
 
+export const GPUColorWriteFlags = {
+	None: 0,
+	Red: 0x1,
+	Green: 0x2,
+	Blue: 0x4,
+	Alpha: 0x8,
+	All: 0xF
+};
+
 // @TODO Move to src/constants.js
 
 export const BlendColorFactor = 211;
