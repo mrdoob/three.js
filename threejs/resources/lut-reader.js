@@ -1,5 +1,5 @@
 function splitOnSpaceHandleQuotesWithEscapes(str, splits = ' \t\n\r') {
-  const strs = [];
+  const strings = [];
   let quoteType;
   let escape;
   let s = [];
@@ -12,7 +12,7 @@ function splitOnSpaceHandleQuotesWithEscapes(str, splits = ' \t\n\r') {
       if (quoteType) {  // we're inside quotes
         if (c === quoteType) {
           quoteType = undefined;
-          strs.push(s.join(''));
+          strings.push(s.join(''));
           s = [];
         } else if (c === '\\') {
           escape = true;
@@ -22,7 +22,7 @@ function splitOnSpaceHandleQuotesWithEscapes(str, splits = ' \t\n\r') {
       } else {  // we're not in quotes
         if (splits.indexOf(c) >= 0) {
           if (s.length) {
-            strs.push(s.join(''));
+            strings.push(s.join(''));
             s = [];
           }
         } else if (c === '"' || c === '\'') {
@@ -37,16 +37,16 @@ function splitOnSpaceHandleQuotesWithEscapes(str, splits = ' \t\n\r') {
       }
     }
   }
-  if (s.length || strs.length === 0) {
-    strs.push(s.join(''));
+  if (s.length || strings.length === 0) {
+    strings.push(s.join(''));
   }
-  return strs;
+  return strings;
 }
 
 export function parse(str) {
   const data = [];
   const lut = {
-    name: 'unknonw',
+    name: 'unknown',
     type: '1D',
     size: 0,
     data,
@@ -128,17 +128,28 @@ export function lutTo2D3Drgb8(lut) {
   if (lut.type === '1D') {
     lut = lut1Dto3D(lut);
   }
-  const min = lut.min;
-  const max = lut.max;
+  const {min, max, size} = lut;
   const range = min.map((min, ndx) => {
     return max[ndx] - min;
   });
   const src = lut.data;
   const data = new Uint8Array(src.length);
-  for (let i = 0; i < src.length; i += 3) {
-    data[i + 0] = (src[i + 0] - min[0]) / range[0] * 255;
-    data[i + 1] = (src[i + 1] - min[1]) / range[1] * 255;
-    data[i + 2] = (src[i + 2] - min[2]) / range[2] * 255;
+  const offset = (offX, offY, offZ) => {
+    return (offX + offY * size + offZ * size * size) * 3;
+  };
+  for (let dz = 0; dz < size; ++dz) {
+    for (let dy = 0; dy < size; ++dy) {
+      for (let dx = 0; dx < size; ++dx) {
+        const sx = dx;
+        const sy = dz;
+        const sz = dy;
+        const sOff = offset(sx, sy, sz);
+        const dOff = offset(dx, dy, dz);
+        data[dOff + 0] = (src[sOff + 0] - min[0]) / range[0] * 255;
+        data[dOff + 1] = (src[sOff + 1] - min[1]) / range[1] * 255;
+        data[dOff + 2] = (src[sOff + 2] - min[2]) / range[2] * 255;
+      }
+    }
   }
   return {...lut, data};
 }

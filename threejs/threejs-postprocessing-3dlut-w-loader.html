@@ -397,6 +397,7 @@ function main() {
       const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result));
       const {size, data, name} = lut;
       const texture = new THREE.DataTexture(data, size * size, size, THREE.RGBFormat);
+      texture.magFilter = THREE.LinearFilter;
       texture.minFilter = THREE.LinearFilter;
       texture.needsUpdate = true;
       texture.flipY = false;
