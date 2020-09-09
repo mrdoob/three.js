@@ -2,6 +2,7 @@ import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunct
 import {
 	FrontSide, BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
+	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
 } from '../../../../build/three.module.js';
@@ -132,12 +133,12 @@ class WebGPURenderPipelines {
 
 			}
 
+			let alphaBlend;
 			let colorBlend;
 
-			if ( material.transparent === true ) {
+			if ( material.transparent === true && material.blending !== NoBlending ) {
 
-				// @TODO: Add support for blending modes (etc. NormalBlending, AdditiveBlending)
-
+				alphaBlend = this._getAlphaBlend( material );
 				colorBlend = this._getColorBlend( material );
 
 			}
@@ -156,6 +157,7 @@ class WebGPURenderPipelines {
 				rasterizationState: rasterizationState,
 				colorStates: [ {
 					format: GPUTextureFormat.BRGA8Unorm,
+					alphaBlend: alphaBlend,
 					colorBlend: colorBlend
 				} ],
 				depthStencilState: {
@@ -220,13 +222,134 @@ class WebGPURenderPipelines {
 
 	}
 
+	_getAlphaBlend( material ) {
+
+		const blending = material.blending;
+		const premultipliedAlpha = material.premultipliedAlpha;
+
+		let alphaBlend = undefined;
+
+		switch ( blending ) {
+
+			case NormalBlending:
+
+				if ( premultipliedAlpha === false ) {
+
+					alphaBlend = {
+						srcFactor: GPUBlendFactor.One,
+						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
+						operation: GPUBlendOperation.Add
+					};
+
+				}
+
+				break;
+
+			case AdditiveBlending:
+				// no alphaBlend settings
+				break;
+
+			case SubtractiveBlending:
+
+				if ( premultipliedAlpha === true ) {
+
+					alphaBlend = {
+						srcFactor: GPUBlendFactor.OneMinusSrcColor,
+						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
+						operation: GPUBlendOperation.Add
+					};
+
+				}
+
+				break;
+
+			case MultiplyBlending:
+				if ( premultipliedAlpha === true ) {
+
+					alphaBlend = {
+						srcFactor: GPUBlendFactor.Zero,
+						dstFactor: GPUBlendFactor.SrcAlpha,
+						operation: GPUBlendOperation.Add
+					};
+
+				}
+
+				break;
+
+			case CustomBlending:
+
+				const blendSrcAlpha = material.blendSrcAlpha;
+				const blendDstAlpha = material.blendDstAlpha;
+				const blendEquationAlpha = material.blendEquationAlpha;
+
+				if ( blendSrcAlpha !== null && blendDstAlpha !== null && blendEquationAlpha !== null ) {
+
+					alphaBlend = {
+						srcFactor: this._getBlendFactor( blendSrcAlpha ),
+						dstFactor: this._getBlendFactor( blendDstAlpha ),
+						operation: this._getBlendOperation( blendEquationAlpha )
+					};
+
+				}
+
+				break;
+
+			default:
+				console.error( 'THREE.WebGPURenderer: Blending not supported.', blending );
+
+		}
+
+		return alphaBlend;
+
+	}
+
 	_getColorBlend( material ) {
 
+		const blending = material.blending;
+		const premultipliedAlpha = material.premultipliedAlpha;
+
 		const colorBlend = {
-			srcFactor: this._getBlendFactor( material.blendSrc ),
-			dstFactor: this._getBlendFactor( material.blendDst ),
-			operation: this._getBlendOperation( material.blendEquation )
+			srcFactor: null,
+			dstFactor: null,
+			operation: null
 		};
+
+		switch ( blending ) {
+
+			case NormalBlending:
+
+				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
+				colorBlend.dstFactor = GPUBlendFactor.OneMinusSrcAlpha;
+				colorBlend.operation = GPUBlendOperation.Add;
+				break;
+
+			case AdditiveBlending:
+				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
+				colorBlend.operation = GPUBlendOperation.Add;
+				break;
+
+			case SubtractiveBlending:
+				colorBlend.srcFactor = GPUBlendFactor.Zero;
+				colorBlend.dstFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.Zero : GPUBlendFactor.OneMinusSrcColor;
+				colorBlend.operation = GPUBlendOperation.Add;
+				break;
+
+			case MultiplyBlending:
+				colorBlend.srcFactor = GPUBlendFactor.Zero;
+				colorBlend.dstFactor = GPUBlendFactor.SrcColor;
+				colorBlend.operation = GPUBlendOperation.Add;
+				break;
+
+			case CustomBlending:
+				colorBlend.srcFactor = this._getBlendFactor( material.blendSrc );
+				colorBlend.dstFactor = this._getBlendFactor( material.blendDst );
+				colorBlend.operation = this._getBlendOperation( material.blendEquation );
+				break;
+
+			default:
+				console.error( 'THREE.WebGPURenderer: Blending not supported.', blending );
+
+		}
 
 		return colorBlend;
 
