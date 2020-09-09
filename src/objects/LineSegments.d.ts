@@ -25,7 +25,7 @@ export class LineSegments <
 	/**
 	 * @default 'LineSegments'
 	 */
-	type: 'LineSegments';
+	type: 'LineSegments' | string;
 	readonly isLineSegments: true;
 
 }
