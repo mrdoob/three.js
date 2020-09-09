@@ -146,7 +146,7 @@ class WebGPURenderPipelines {
 			// pipeline
 
 			const primitiveTopology = this._getPrimitiveTopology( object );
-			const rasterizationState = this._getRasterizationStateDescriptor( object );
+			const rasterizationState = this._getRasterizationStateDescriptor( material );
 			const depthCompare = this._getDepthCompare( material );
 			const colorWriteMask = this._getColorWriteMask( material );
 
@@ -532,10 +532,9 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getRasterizationStateDescriptor( object ) {
+	_getRasterizationStateDescriptor( material ) {
 
 		const descriptor = {};
-		const material = object.material;
 
 		switch ( material.side ) {
 
