@@ -209,6 +209,17 @@ export const GPUColorWriteFlags = {
 	All: 0xF
 };
 
+export const GPUStencilOperation = {
+	Keep: 'keep',
+	Zero: 'zero',
+	Replace: 'replace',
+	Invert: 'invert',
+	IncrementClamp: 'increment-clamp',
+	DecrementClamp: 'decrement-clamp',
+	IncrementWrap: 'increment-wrap',
+	DecrementWrap: 'decrement-wrap'
+};
+
 // @TODO Move to src/constants.js
 
 export const BlendColorFactor = 211;
