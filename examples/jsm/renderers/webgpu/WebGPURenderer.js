@@ -135,9 +135,64 @@ class WebGPURenderer {
 
 	}
 
-	init() {
+	async init() {
 
-		return initWebGPU( this );
+		const parameters = this._parameters;
+
+		const adapterOptions = {
+			powerPreference: parameters.powerPreference
+		};
+
+		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
+
+		const deviceDescriptor = {
+			enabledExtensions: parameters.enabledExtensions,
+			limits: parameters.limits
+		};
+
+		const device = await adapter.requestDevice( deviceDescriptor );
+
+		const glslang = await import( 'https://cdn.jsdelivr.net/npm/@webgpu/glslang@0.0.15/dist/web-devel/glslang.js' );
+		const compiler = await glslang.default();
+
+		const context = ( parameters.context !== undefined ) ? parameters.context : this.domElement.getContext( 'gpupresent' );
+
+		const swapChain = context.configureSwapChain( {
+			device: device,
+			format: GPUTextureFormat.BRGA8Unorm
+		} );
+
+		this._adapter = adapter;
+		this._device = device;
+		this._context = context;
+		this._swapChain = swapChain;
+
+		this._info = new WebGPUInfo();
+		this._properties = new WebGPUProperties();
+		this._attributes = new WebGPUAttributes( device );
+		this._geometries = new WebGPUGeometries( this._attributes, this._info );
+		this._textures = new WebGPUTextures( device, this._properties, this._info, compiler );
+		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures );
+		this._objects = new WebGPUObjects( this._geometries, this._info );
+		this._renderPipelines = new WebGPURenderPipelines( device, compiler, this._bindings, parameters.sampleCount );
+		this._renderLists = new WebGPURenderLists();
+		this._background = new WebGPUBackground( this );
+
+		//
+
+		this._renderPassDescriptor = {
+			colorAttachments: [ {
+				attachment: null
+			} ],
+			 depthStencilAttachment: {
+				attachment: null,
+				depthStoreOp: GPUStoreOp.Store,
+				stencilStoreOp: GPUStoreOp.Store
+			}
+		};
+
+		this._setupColorBuffer();
+		this._setupDepthBuffer();
 
 	}
 
@@ -771,67 +826,6 @@ class WebGPURenderer {
 		}
 
 	}
-
-}
-
-async function initWebGPU( scope ) {
-
-	const parameters = scope._parameters;
-
-	const adapterOptions = {
-		powerPreference: parameters.powerPreference
-	};
-
-	const adapter = await navigator.gpu.requestAdapter( adapterOptions );
-
-	const deviceDescriptor = {
-		enabledExtensions: parameters.enabledExtensions,
-		limits: parameters.limits
-	};
-
-	const device = await adapter.requestDevice( deviceDescriptor );
-
-	const glslang = await import( 'https://cdn.jsdelivr.net/npm/@webgpu/glslang@0.0.15/dist/web-devel/glslang.js' );
-	const compiler = await glslang.default();
-
-	const context = ( parameters.context !== undefined ) ? parameters.context : scope.domElement.getContext( 'gpupresent' );
-
-	const swapChain = context.configureSwapChain( {
-		device: device,
-		format: GPUTextureFormat.BRGA8Unorm
-	} );
-
-	scope._adapter = adapter;
-	scope._device = device;
-	scope._context = context;
-	scope._swapChain = swapChain;
-
-	scope._info = new WebGPUInfo();
-	scope._properties = new WebGPUProperties();
-	scope._attributes = new WebGPUAttributes( device );
-	scope._geometries = new WebGPUGeometries( scope._attributes, scope._info );
-	scope._textures = new WebGPUTextures( device, scope._properties, scope._info, compiler );
-	scope._bindings = new WebGPUBindings( device, scope._info, scope._properties, scope._textures );
-	scope._objects = new WebGPUObjects( scope._geometries, scope._info );
-	scope._renderPipelines = new WebGPURenderPipelines( device, compiler, scope._bindings, parameters.sampleCount );
-	scope._renderLists = new WebGPURenderLists();
-	scope._background = new WebGPUBackground( scope );
-
-	//
-
-	scope._renderPassDescriptor = {
-		colorAttachments: [ {
-			attachment: null
-		} ],
-		 depthStencilAttachment: {
-			attachment: null,
-			depthStoreOp: GPUStoreOp.Store,
-			stencilStoreOp: GPUStoreOp.Store
-		}
-	};
-
-	scope._setupColorBuffer();
-	scope._setupDepthBuffer();
 
 }
 
