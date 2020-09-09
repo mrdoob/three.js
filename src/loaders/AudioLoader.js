@@ -33,6 +33,10 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					onLoad( audioBuffer );
 
+				}, function ( error ) {
+
+					throw error;
+
 				} );
 
 			} catch ( e ) {
