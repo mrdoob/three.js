@@ -603,7 +603,6 @@ class WebGPURenderer {
 			object.normalMatrix.getNormalMatrix( object.modelViewMatrix );
 
 			this._objects.update( object );
-			this._bindings.update( object, camera );
 
 			if ( camera.isArrayCamera ) {
 
@@ -621,6 +620,7 @@ class WebGPURenderer {
 
 						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
 
+						this._bindings.update( object, camera2 );
 						this._renderObject( object, passEncoder );
 
 					}
@@ -629,6 +629,7 @@ class WebGPURenderer {
 
 			} else {
 
+				this._bindings.update( object, camera );
 				this._renderObject( object, passEncoder );
 
 			}
