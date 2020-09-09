@@ -20,7 +20,8 @@ import {
 	SpriteMaterial,
 	CanvasTexture,
 	LinearFilter,
-	ClampToEdgeWrapping
+	ClampToEdgeWrapping,
+	TextureLoader
 } from "../../../build/three.module.js";
 
 var Rhino3dmLoader = function ( manager ) {
@@ -221,12 +222,60 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		return new MeshStandardMaterial( {
+		// console.log( material );
+
+		var mat = new MeshStandardMaterial( {
 			color: diffusecolor,
-			metalness: 0.8,
 			name: material.name,
-			side: 2
+			side: 2,
+			transparent: material.transparency > 0 ? true : false,
+			opacity: 1.0 - material.transparency
 		} );
+
+		var textureLoader = new TextureLoader();
+
+		for ( var i = 0; i < material.textures.length; i ++ ) {
+
+			var texture = material.textures[ i ];
+
+			if ( texture.image !== null ) {
+
+				var map = textureLoader.load( texture.image );
+
+				switch ( texture.type ) {
+
+					case 'Diffuse':
+
+						mat.map = map;
+
+						break;
+
+					case 'Bump':
+
+						mat.bumpMap = map;
+
+						break;
+
+					case 'Transparency':
+
+						mat.alphaMap = map;
+						mat.transparent = true;
+
+						break;
+
+					case 'Emap':
+
+						mat.envMap = map;
+
+						break;
+
+				}
+
+			}
+
+		}
+
+		return mat;
 
 	},
 
@@ -241,6 +290,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		object.userData[ 'layers' ] = data.layers;
 		object.userData[ 'groups' ] = data.groups;
+		object.userData[ 'settings' ] = data.settings;
 
 		var objects = data.objects;
 		var materials = data.materials;
@@ -266,11 +316,18 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				default:
 
-					var material = this._createMaterial( materials[ attributes.materialIndex ] );
+					if ( attributes.hasOwnProperty( 'materialUUID' ) ) {
 
-					material = this._compareMaterials( material );
+						var rMaterial = materials.find( m => m.id === attributes.materialUUID );
+						var material = this._createMaterial( rMaterial );
+						material = this._compareMaterials( material );
+						var _object = this._createObject( obj, material );
 
-					var _object = this._createObject( obj, material );
+					} else {
+
+						var _object = this._createObject( obj, null );
+
+					}
 
 					if ( _object === undefined ) {
 
@@ -278,7 +335,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					}
 
-					_object.visible = data.layers[ attributes.layerIndex ].visible;
+					var layer = data.layers[ attributes.layerIndex ];
+
+					_object.visible = layer ? data.layers[ attributes.layerIndex ].visible : true;
 
 					if ( attributes.isInstanceDefinitionObject ) {
 
@@ -368,7 +427,15 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'PointSet':
 
 				var geometry = loader.parse( obj.geometry );
-				var material = new PointsMaterial( { sizeAttenuation: true, vertexColors: true } );
+				var _color = attributes.drawColor;
+				var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+				var material = new PointsMaterial( { color: color, sizeAttenuation: false, size: 2 } );
+
+				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
+
+					material.vertexColors = true;
+
+				}
 
 				material = this._compareMaterials( material );
 
@@ -381,6 +448,12 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'Extrusion':
 
 				var geometry = loader.parse( obj.geometry );
+
+				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
+
+					mat.vertexColors = true;
+
+				}
 
 				var mesh = new Mesh( geometry, mat );
 				mesh.castShadow = attributes.castsShadows;
@@ -735,6 +808,13 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			if ( object !== undefined ) {
 
+				if ( object.attributes.materialIndex >= 0 ) {
+
+					var mId = doc.materials().findIndex( object.attributes.materialIndex ).id;
+					object.attributes.materialUUID = mId;
+
+				}
+
 				objects.push( object );
 
 			}
@@ -744,6 +824,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		}
 
 		// Handle instance definitions
+		// console.log( `Instance Definitions Count: ${doc.instanceDefinitions().count()}` );
 
 		for ( var i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
 
@@ -757,17 +838,110 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle materials
 
+		var textureTypes = [
+			// rhino.TextureType.Bitmap,
+			rhino.TextureType.Diffuse,
+			rhino.TextureType.Bump,
+			rhino.TextureType.Transparency,
+			rhino.TextureType.Opacity,
+			rhino.TextureType.Emap
+		];
+
+		var pbrTextureTypes = [
+			rhino.TextureType.PBR_BaseColor,
+			rhino.TextureType.PBR_Subsurface,
+			rhino.TextureType.PBR_SubsurfaceScattering,
+			rhino.TextureType.PBR_SubsurfaceScatteringRadius,
+			rhino.TextureType.PBR_Metallic,
+			rhino.TextureType.PBR_Specular,
+			rhino.TextureType.PBR_SpecularTint,
+			rhino.TextureType.PBR_Roughness,
+			rhino.TextureType.PBR_Anisotropic,
+			rhino.TextureType.PBR_Anisotropic_Rotation,
+			rhino.TextureType.PBR_Sheen,
+			rhino.TextureType.PBR_SheenTint,
+			rhino.TextureType.PBR_Clearcoat,
+			rhino.TextureType.PBR_ClearcoatBump,
+			rhino.TextureType.PBR_ClearcoatRoughness,
+			rhino.TextureType.PBR_OpacityIor,
+			rhino.TextureType.PBR_OpacityRoughness,
+			rhino.TextureType.PBR_Emission,
+			rhino.TextureType.PBR_AmbientOcclusion,
+			rhino.TextureType.PBR_Displacement
+		];
+
 		for ( var i = 0; i < doc.materials().count(); i ++ ) {
 
 			var _material = doc.materials().get( i );
-			var materialProperties = extractProperties( _material );
-			var pbMaterialProperties = extractProperties( _material.physicallyBased() );
+			var _pbrMaterial = _material.physicallyBased();
 
-			var material = Object.assign( materialProperties, pbMaterialProperties );
+			var material = extractProperties( _material );
+
+			var textures = [];
+
+			for ( var j = 0; j < textureTypes.length; j ++ ) {
+
+				var _texture = _material.getTexture( textureTypes[ j ] );
+				if ( _texture ) {
+
+					var textureType = textureTypes[ j ].constructor.name;
+					textureType = textureType.substring( 12, textureType.length );
+					var texture = { type: textureType };
+
+					var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+
+					if ( image ) {
+
+						texture.image = 'data:image/png;base64,' + image;
+
+					} else {
+
+						console.warn( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
+						texture.image = null;
+
+					}
+
+					textures.push( texture );
+
+					_texture.delete();
+
+				}
+
+			}
+
+			material.textures = textures;
+
+			if ( _pbrMaterial.supported ) {
+
+				console.log( 'pbr true' );
+
+				for ( var j = 0; j < pbrTextureTypes.length; j ++ ) {
+
+					var _texture = _material.getTexture( textureTypes[ j ] );
+					if ( _texture ) {
+
+						var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+						var textureType = textureTypes[ j ].constructor.name;
+						textureType = textureType.substring( 12, textureType.length );
+						var texture = { type: textureType, image: 'data:image/png;base64,' + image };
+						textures.push( texture );
+
+						_texture.delete();
+
+					}
+
+				}
+
+				var pbMaterialProperties = extractProperties( _material.physicallyBased() );
+
+				material = Object.assign( pbMaterialProperties, material );
+
+			}
 
 			materials.push( material );
 
 			_material.delete();
+			_pbrMaterial.delete();
 
 		}
 
@@ -830,16 +1004,14 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		//TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
 
 		// Handle dimstyles
-		// console.log(`Dimstyle Count: ${doc.dimstyles().count()}`);
+		// console.log( `Dimstyle Count: ${doc.dimstyles().count()}` );
 
 		// Handle bitmaps
-		// console.log(`Bitmap Count: ${doc.bitmaps().count()}`);
-
-		// Handle instance definitions
-		// console.log(`Instance Definitions Count: ${doc.instanceDefinitions().count()}`);
+		// console.log( `Bitmap Count: ${doc.bitmaps().count()}` );
 
 		// Handle strings -- this seems to be broken at the moment in rhino3dm
-		// console.log(`Strings Count: ${doc.strings().count()}`);
+		// console.log( `Document Strings Count: ${doc.strings().count()}` );
+
 		/*
 		for( var i = 0; i < doc.strings().count(); i++ ){
 
@@ -880,7 +1052,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				var pts = curveToPoints( _geometry, 100 );
 
 				var position = {};
-				var color = {};
 				var attributes = {};
 				var data = {};
 
@@ -1011,6 +1182,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		if ( geometry ) {
 
 			var attributes = extractProperties( _attributes );
+			attributes.geometry = extractProperties( _geometry );
 
 			if ( _attributes.groupCount > 0 ) {
 
@@ -1018,10 +1190,17 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			}
 
+			if ( _attributes.userStringCount > 0 ) {
+
+				attributes.userStrings = _attributes.getUserStrings();
+
+			}
+
 			attributes.drawColor = _attributes.drawColor( doc );
 
 			objectType = objectType.constructor.name;
 			objectType = objectType.substring( 11, objectType.length );
+			attributes.geometry.objectType = objectType;
 
 			return { geometry, attributes, objectType };
 
@@ -1041,7 +1220,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			} else {
 
-				// console.log(`${property}: ${object[property]}`);
+				// console.log( `${property}: ${object[ property ]}` );
 
 			}
 
@@ -1083,7 +1262,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			for ( var i = 0; i < segmentCount; i ++ ) {
 
 				var segment = curve.segmentCurve( i );
-				var segmentArray = curveToPoints( segment );
+				var segmentArray = curveToPoints( segment, pointCount );
 				rc = rc.concat( segmentArray );
 				segment.delete();
 
@@ -1093,9 +1272,21 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
+		if ( curve instanceof rhino.ArcCurve ) {
+
+			pointCount = Math.floor( curve.angleDegrees / 5 );
+			pointCount = pointCount < 1 ? 2 : pointCount;
+			// alternative to this hardcoded version: https://stackoverflow.com/a/18499923/2179399
+
+		}
+
 		if ( curve instanceof rhino.NurbsCurve && curve.degree === 1 ) {
 
-			// console.info( 'degree 1 curve' );
+			if ( curve.segmentCount === undefined || curve.segmentCount === 1 ) {
+
+				return [ curve.pointAtStart, curve.pointAtEnd ];
+
+			}
 
 		}
 
