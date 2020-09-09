@@ -1,7 +1,10 @@
-import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor } from './constants.js';
+import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation } from './constants.js';
 import {
 	FrontSide, BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
+	NeverStencilFunc, AlwaysStencilFunc, LessStencilFunc, LessEqualStencilFunc, EqualStencilFunc, GreaterEqualStencilFunc, GreaterStencilFunc, NotEqualStencilFunc,
+	KeepStencilOp, ZeroStencilOp, ReplaceStencilOp, InvertStencilOp, IncrementStencilOp, DecrementStencilOp, IncrementWrapStencilOp, DecrementWrapStencilOp,
+	NoBlending, NormalBlending, AdditiveBlending, SubtractiveBlending, MultiplyBlending, CustomBlending,
 	AddEquation, SubtractEquation, ReverseSubtractEquation, MinEquation, MaxEquation,
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
 } from '../../../../build/three.module.js';
@@ -121,6 +124,8 @@ class WebGPURenderPipelines {
 
 			}
 
+			//
+
 			const geometry = object.geometry;
 			let indexFormat;
 
@@ -132,20 +137,38 @@ class WebGPURenderPipelines {
 
 			}
 
-			let colorBlend;
+			//
 
-			if ( material.transparent === true ) {
+			let alphaBlend = {};
+			let colorBlend = {};
 
-				// @TODO: Add support for blending modes (etc. NormalBlending, AdditiveBlending)
+			if ( material.transparent === true && material.blending !== NoBlending ) {
 
+				alphaBlend = this._getAlphaBlend( material );
 				colorBlend = this._getColorBlend( material );
+
+			}
+
+			//
+
+			let stencilFront = {};
+
+			if ( material.stencilWrite === true ) {
+
+				stencilFront = {
+					compare: this._getStencilCompare( material ),
+					failOp: this._getStencilOperation( material.stencilFail ),
+					depthFailOp: this._getStencilOperation( material.stencilZFail ),
+					passOp: this._getStencilOperation( material.stencilZPass )
+				};
 
 			}
 
 			// pipeline
 
 			const primitiveTopology = this._getPrimitiveTopology( object );
-			const rasterizationState = this._getRasterizationStateDescriptor( object );
+			const rasterizationState = this._getRasterizationStateDescriptor( material );
+			const colorWriteMask = this._getColorWriteMask( material );
 			const depthCompare = this._getDepthCompare( material );
 
 			pipeline = device.createRenderPipeline( {
@@ -156,12 +179,18 @@ class WebGPURenderPipelines {
 				rasterizationState: rasterizationState,
 				colorStates: [ {
 					format: GPUTextureFormat.BRGA8Unorm,
-					colorBlend: colorBlend
+					alphaBlend: alphaBlend,
+					colorBlend: colorBlend,
+					writeMask: colorWriteMask
 				} ],
 				depthStencilState: {
+					format: GPUTextureFormat.Depth24PlusStencil8,
 					depthWriteEnabled: material.depthWrite,
 					depthCompare: depthCompare,
-					format: GPUTextureFormat.Depth24PlusStencil8,
+					stencilFront: stencilFront,
+					stencilBack: {}, // three.js does not provide an API to configure the back function (gl.stencilFuncSeparate() was never used)
+					stencilReadMask: material.stencilFuncMask,
+					stencilWriteMask: material.stencilWriteMask
 				},
 				vertexState: {
 					indexFormat: indexFormat,
@@ -220,15 +249,84 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getColorBlend( material ) {
+	_getAlphaBlend( material ) {
 
-		const colorBlend = {
-			srcFactor: this._getBlendFactor( material.blendSrc ),
-			dstFactor: this._getBlendFactor( material.blendDst ),
-			operation: this._getBlendOperation( material.blendEquation )
-		};
+		const blending = material.blending;
+		const premultipliedAlpha = material.premultipliedAlpha;
 
-		return colorBlend;
+		let alphaBlend = undefined;
+
+		switch ( blending ) {
+
+			case NormalBlending:
+
+				if ( premultipliedAlpha === false ) {
+
+					alphaBlend = {
+						srcFactor: GPUBlendFactor.One,
+						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
+						operation: GPUBlendOperation.Add
+					};
+
+				}
+
+				break;
+
+			case AdditiveBlending:
+				// no alphaBlend settings
+				break;
+
+			case SubtractiveBlending:
+
+				if ( premultipliedAlpha === true ) {
+
+					alphaBlend = {
+						srcFactor: GPUBlendFactor.OneMinusSrcColor,
+						dstFactor: GPUBlendFactor.OneMinusSrcAlpha,
+						operation: GPUBlendOperation.Add
+					};
+
+				}
+
+				break;
+
+			case MultiplyBlending:
+				if ( premultipliedAlpha === true ) {
+
+					alphaBlend = {
+						srcFactor: GPUBlendFactor.Zero,
+						dstFactor: GPUBlendFactor.SrcAlpha,
+						operation: GPUBlendOperation.Add
+					};
+
+				}
+
+				break;
+
+			case CustomBlending:
+
+				const blendSrcAlpha = material.blendSrcAlpha;
+				const blendDstAlpha = material.blendDstAlpha;
+				const blendEquationAlpha = material.blendEquationAlpha;
+
+				if ( blendSrcAlpha !== null && blendDstAlpha !== null && blendEquationAlpha !== null ) {
+
+					alphaBlend = {
+						srcFactor: this._getBlendFactor( blendSrcAlpha ),
+						dstFactor: this._getBlendFactor( blendDstAlpha ),
+						operation: this._getBlendOperation( blendEquationAlpha )
+					};
+
+				}
+
+				break;
+
+			default:
+				console.error( 'THREE.WebGPURenderer: Blending not supported.', blending );
+
+		}
+
+		return alphaBlend;
 
 	}
 
@@ -335,6 +433,64 @@ class WebGPURenderPipelines {
 
 	}
 
+	_getColorBlend( material ) {
+
+		const blending = material.blending;
+		const premultipliedAlpha = material.premultipliedAlpha;
+
+		const colorBlend = {
+			srcFactor: null,
+			dstFactor: null,
+			operation: null
+		};
+
+		switch ( blending ) {
+
+			case NormalBlending:
+
+				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
+				colorBlend.dstFactor = GPUBlendFactor.OneMinusSrcAlpha;
+				colorBlend.operation = GPUBlendOperation.Add;
+				break;
+
+			case AdditiveBlending:
+				colorBlend.srcFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.One : GPUBlendFactor.SrcAlpha;
+				colorBlend.operation = GPUBlendOperation.Add;
+				break;
+
+			case SubtractiveBlending:
+				colorBlend.srcFactor = GPUBlendFactor.Zero;
+				colorBlend.dstFactor = ( premultipliedAlpha === true ) ? GPUBlendFactor.Zero : GPUBlendFactor.OneMinusSrcColor;
+				colorBlend.operation = GPUBlendOperation.Add;
+				break;
+
+			case MultiplyBlending:
+				colorBlend.srcFactor = GPUBlendFactor.Zero;
+				colorBlend.dstFactor = GPUBlendFactor.SrcColor;
+				colorBlend.operation = GPUBlendOperation.Add;
+				break;
+
+			case CustomBlending:
+				colorBlend.srcFactor = this._getBlendFactor( material.blendSrc );
+				colorBlend.dstFactor = this._getBlendFactor( material.blendDst );
+				colorBlend.operation = this._getBlendOperation( material.blendEquation );
+				break;
+
+			default:
+				console.error( 'THREE.WebGPURenderer: Blending not supported.', blending );
+
+		}
+
+		return colorBlend;
+
+	}
+
+	_getColorWriteMask( material ) {
+
+		return ( material.colorWrite === true ) ? GPUColorWriteFlags.All : GPUColorWriteFlags.None;
+
+	}
+
 	_getDepthCompare( material ) {
 
 		let depthCompare;
@@ -401,10 +557,9 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getRasterizationStateDescriptor( object ) {
+	_getRasterizationStateDescriptor( material ) {
 
 		const descriptor = {};
-		const material = object.material;
 
 		switch ( material.side ) {
 
@@ -430,6 +585,102 @@ class WebGPURenderPipelines {
 		}
 
 		return descriptor;
+
+	}
+
+	_getStencilCompare( material ) {
+
+		let stencilCompare;
+
+		const stencilFunc = material.stencilFunc;
+
+		switch ( stencilFunc ) {
+
+			case NeverStencilFunc:
+				stencilCompare = GPUCompareFunction.Never;
+				break;
+
+			case AlwaysStencilFunc:
+				stencilCompare = GPUCompareFunction.Always;
+				break;
+
+			case LessStencilFunc:
+				stencilCompare = GPUCompareFunction.Less;
+				break;
+
+			case LessEqualStencilFunc:
+				stencilCompare = GPUCompareFunction.LessEqual;
+				break;
+
+			case EqualStencilFunc:
+				stencilCompare = GPUCompareFunction.Equal;
+				break;
+
+			case GreaterEqualStencilFunc:
+				stencilCompare = GPUCompareFunction.GreaterEqual;
+				break;
+
+			case GreaterStencilFunc:
+				stencilCompare = GPUCompareFunction.Greater;
+				break;
+
+			case NotEqualStencilFunc:
+				stencilCompare = GPUCompareFunction.NotEqual;
+				break;
+
+			default:
+				console.error( 'THREE.WebGPURenderer: Invalid stencil function.', stencilFunc );
+
+		}
+
+		return stencilCompare;
+
+	}
+
+	_getStencilOperation( op ) {
+
+		let stencilOperation;
+
+		switch ( op ) {
+
+			case KeepStencilOp:
+				stencilOperation = GPUStencilOperation.Keep;
+				break;
+
+			case ZeroStencilOp:
+				stencilOperation = GPUStencilOperation.Zero;
+				break;
+
+			case ReplaceStencilOp:
+				stencilOperation = GPUStencilOperation.Replace;
+				break;
+
+			case InvertStencilOp:
+				stencilOperation = GPUStencilOperation.Invert;
+				break;
+
+			case IncrementStencilOp:
+				stencilOperation = GPUStencilOperation.IncrementClamp;
+				break;
+
+			case DecrementStencilOp:
+				stencilOperation = GPUStencilOperation.DecrementClamp;
+				break;
+
+			case IncrementWrapStencilOp:
+				stencilOperation = GPUStencilOperation.IncrementWrap;
+				break;
+
+			case DecrementWrapStencilOp:
+				stencilOperation = GPUStencilOperation.DecrementWrap;
+				break;
+
+			default:
+				console.error( 'THREE.WebGPURenderer: Invalid stencil operation.', stencilOperation );
+
+		}
+
+		return stencilOperation;
 
 	}
 

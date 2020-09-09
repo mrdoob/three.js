@@ -200,6 +200,26 @@ export const GPUBlendOperation = {
 	Max: 'max'
 };
 
+export const GPUColorWriteFlags = {
+	None: 0,
+	Red: 0x1,
+	Green: 0x2,
+	Blue: 0x4,
+	Alpha: 0x8,
+	All: 0xF
+};
+
+export const GPUStencilOperation = {
+	Keep: 'keep',
+	Zero: 'zero',
+	Replace: 'replace',
+	Invert: 'invert',
+	IncrementClamp: 'increment-clamp',
+	DecrementClamp: 'decrement-clamp',
+	IncrementWrap: 'increment-wrap',
+	DecrementWrap: 'decrement-wrap'
+};
+
 // @TODO Move to src/constants.js
 
 export const BlendColorFactor = 211;

@@ -20324,14 +20324,14 @@
 				var light = lights[ i ];
 				var shadow = light.shadow;
 
-				if ( shadow.autoUpdate === false && shadow.needsUpdate === false ) { continue; }
-
 				if ( shadow === undefined ) {
 
 					console.warn( 'THREE.WebGLShadowMap:', light, 'has no shadow.' );
 					continue;
 
 				}
+
+				if ( shadow.autoUpdate === false && shadow.needsUpdate === false ) { continue; }
 
 				_shadowMapSize.copy( shadow.mapSize );
 
@@ -50798,7 +50798,6 @@
 	exports.LessStencilFunc = LessStencilFunc;
 	exports.Light = Light;
 	exports.LightProbe = LightProbe;
-	exports.LightShadow = LightShadow;
 	exports.Line = Line;
 	exports.Line3 = Line3;
 	exports.LineBasicMaterial = LineBasicMaterial;

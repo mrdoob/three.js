@@ -1,40 +1,38 @@
-var ARButton = {
+class ARButton {
 
-	createButton: function ( renderer, sessionInit = {} ) {
+	static createButton( renderer, sessionInit = {} ) {
+
+		let currentSession = null;
+
+		const button = document.createElement( 'button' );
+		const message = document.createElement( 'a' );
+
+		function onSessionEnded( /*event*/ ) {
+
+			if ( currentSession )
+				currentSession.removeEventListener( 'end', onSessionEnded );
+
+			button.textContent = 'START AR';
+
+			currentSession = null;
+
+		}
+
+		function onSessionStarted( session ) {
+
+			session.addEventListener( 'end', onSessionEnded );
+
+			renderer.xr.setReferenceSpaceType( 'local' );
+			renderer.xr.setSession( session );
+			button.textContent = 'STOP AR';
+
+			currentSession = session;
+
+		}
 
 		function showStartAR( /*device*/ ) {
 
-			var currentSession = null;
-
-			function onSessionStarted( session ) {
-
-				session.addEventListener( 'end', onSessionEnded );
-
-				/*
-				session.updateWorldTrackingState( {
-					'planeDetectionState': { 'enabled': true }
-				} );
-				*/
-
-				renderer.xr.setReferenceSpaceType( 'local' );
-				renderer.xr.setSession( session );
-				button.textContent = 'STOP AR';
-
-				currentSession = session;
-
-			}
-
-			function onSessionEnded( /*event*/ ) {
-
-				currentSession.removeEventListener( 'end', onSessionEnded );
-
-				button.textContent = 'START AR';
-
-				currentSession = null;
-
-			}
-
-			//
+			currentSession = null;
 
 			button.style.display = '';
 
@@ -60,7 +58,8 @@ var ARButton = {
 
 				if ( currentSession === null ) {
 
-					navigator.xr.requestSession( 'immersive-ar', sessionInit ).then( onSessionStarted );
+					navigator.xr.requestSession( 'immersive-ar', sessionInit )
+						.then( onSessionStarted );
 
 				} else {
 
@@ -110,15 +109,14 @@ var ARButton = {
 			element.style.outline = 'none';
 			element.style.zIndex = '999';
 
+			return element;
+
 		}
 
 		if ( 'xr' in navigator ) {
 
-			var button = document.createElement( 'button' );
 			button.id = 'ARButton';
 			button.style.display = 'none';
-
-			stylizeElement( button );
 
 			navigator.xr.isSessionSupported( 'immersive-ar' ).then( function ( supported ) {
 
@@ -126,11 +124,15 @@ var ARButton = {
 
 			} ).catch( showARNotSupported );
 
+			stylizeElement( button );
+
 			return button;
 
 		} else {
 
-			var message = document.createElement( 'a' );
+			message.style.left = 'calc(50% - 90px)';
+			message.style.width = '180px';
+			message.style.textDecoration = 'none';
 
 			if ( window.isSecureContext === false ) {
 
@@ -144,10 +146,6 @@ var ARButton = {
 
 			}
 
-			message.style.left = 'calc(50% - 90px)';
-			message.style.width = '180px';
-			message.style.textDecoration = 'none';
-
 			stylizeElement( message );
 
 			return message;
@@ -156,6 +154,6 @@ var ARButton = {
 
 	}
 
-};
+}
 
 export { ARButton };
