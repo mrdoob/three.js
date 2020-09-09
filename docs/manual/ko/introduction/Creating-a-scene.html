@@ -8,7 +8,7 @@
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
 	<body>
-		<h1>[name]</h1>
+		<h1>장면 생성하기 ([name])</h1>
 
 		<p>이 섹션의 목적은 three.js를에 대한 간략한 소개를 제공하는 것입니다. 먼저, 회전하는 큐브의 장면을 설정하는 것으로 시작해봅시다. 뭐가뭔지 모르겠다면 페이지 하단에 있는 정상적으로 작동하는 예제로 도움을 받을 수 있습니다.</p>
 
@@ -55,21 +55,21 @@
 
 		<p>three.js 카메라들에는 몇가지 차이점이 있습니다. 지금은 <strong>PerspectiveCamera</strong>를 사용해봅시다.</p>
 
-		<p>첫 번째 속성은 시야입니다. <strong>시야</strong>는 주어진 순간에 디스플레이에서 볼 수 있는 장면의 범위입니다 이 값은 각도입니다.</p>
+		<p>첫 번째 인수는 시야입니다. <strong>시야</strong>는 주어진 순간에 디스플레이에서 볼 수 있는 장면의 범위입니다 이 값은 각도입니다.</p>
 
 		<p>두 번째는 <strong>종횡비(가로 세로의 비율)</strong>입니다. 거의 높이로 나눠진 엘리먼트의 너비를 사용하겠지만, 그렇지 않다면 와이드 스크린에서 오래된 영화를 볼 때와 비슷한 느낌이 나타납니다. (이미지가 찌그러진 것처럼 보입니다)</p>
 
-		<p>The next two attributes are the <strong>near</strong> and <strong>far</strong> clipping plane. What that means, is that objects further away from the camera than the value of <strong>far</strong> or closer than <strong>near</strong> won't be rendered. You don't have to worry about this now, but you may want to use other values in your apps to get better performance.</p>
+		<p>다음 두가지 인수는 <strong>거리의 하한값</strong>과 <strong>거리의 상한값</strong>을 의미한다. 이것은 <strong>상환값</strong>보다 멀거나 <strong>하한값</strong>보다 작은 오브젝트는 랜더링되지 않는다는 뜻이다. 지금 당장은 걱정할 필요가 없지만, 더 나은 성능을 위해서 다른 값들을 사용하고 싶을지도 모른다.</p>
 
-		<p>Next up is the renderer. This is where the magic happens. In addition to the WebGLRenderer we use here, three.js comes with a few others, often used as fallbacks for users with older browsers or for those who don't have WebGL support for some reason.</p>
+		<p>다음 단계는 랜더러입니다. 이곳에서는 마법이 일어납니다. 이곳에서 사용하는 WebGLRenderer뿐만 아니라, three.js를 종종 오래된 브라우저 또는 어떤 이유로 WebGL을 지원하지 않는 사람들을 위해 폴백 (fallback)으로 사용되는 몇 가지 다른 것들이 함께 제공됩니다.</p>
+		
+		<p>렌더러 인스턴스를 만드는 것 외에도, 또한 앱을 렌더링 할 때의 크기를 설정해야합니다. 채우고 싶은 너비와 높이로 설정하면 됩니다. (이곳에서는 브라우저 창의 너비와 높이로 설정하도록 하겠습니다.) 성능을 최적화할 앱들은 <strong>setSize</strong>를 이용해 절반의 사이즈로 앱을 랜더링할 <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>와 같은 값들을 사용할 수 있습니다.</p>
 
-		<p>In addition to creating the renderer instance, we also need to set the size at which we want it to render our app. It's a good idea to use the width and height of the area we want to fill with our app - in this case, the width and height of the browser window. For performance intensive apps, you can also give <strong>setSize</strong> smaller values, like <strong>window.innerWidth/2</strong> and <strong>window.innerHeight/2</strong>, which will make the app render at half size.</p>
+		<p>만약 앱의 크기를 유지하되 낮은 해상도로 랜더링하고 싶다면 <strong>setSize</strong>에서 <strong>updateStyle</strong>(3번째 인자)를 false로 설정하면 됩니다. 예를 들어, <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> 는 당신의 &lt;canvas&gt;가 100% 폭과 높이를 가지고 있다는 것을 감안할 때 당신의 앱을 절반의 해상도로 렌더링할 것 입니다.</p>
 
-		<p>If you wish to keep the size of your app but render it at a lower resolution, you can do so by calling <strong>setSize</strong> with false as <strong>updateStyle</strong> (the third argument). For example, <strong>setSize(window.innerWidth/2, window.innerHeight/2, false)</strong> will render your app at half resolution, given that your &lt;canvas&gt; has 100% width and height.</p>
+		<p>마지막으로, 우리는 HTML 문서에 <strong>렌더러</strong> 엘리먼트를 추가했습니다. 이 렌더러가 사용하는 우리에게 장면을 표시하는 &lt;canvas&gt; 엘리먼트입니다.</p>
 
-		<p>Last but not least, we add the <strong>renderer</strong> element to our HTML document. This is a &lt;canvas&gt; element the renderer uses to display the scene to us.</p>
-
-		<p><em>"That's all good, but where's that cube you promised?"</em> Let's add it now.</p>
+		<p><em>"아... 다 좋은데 약속했던 그 큐브는 어디 있지?"</em> 워워!! 진정하세요. 이제 추가해봅시다.</p>
 
 		<code>
 		var geometry = new THREE.BoxGeometry();
@@ -80,17 +80,17 @@
 		camera.position.z = 5;
 		</code>
 
-		<p>To create a cube, we need a <strong>BoxGeometry</strong>. This is an object that contains all the points (<strong>vertices</strong>) and fill (<strong>faces</strong>) of the cube. We'll explore this more in the future.</p>
+		<p>먼저 큐브를 만들긴 위해선 <strong>BoxGeometry</strong>가 필요합니다. 큐브의 모든 점(꼭지점)과 채우기(표면)을 포함하고 있는 오브젝트입니다. 나중에 더 알아보겠습니다.</p>
 
-		<p>In addition to the geometry, we need a material to color it. Three.js comes with several materials, but we'll stick to the <strong>MeshBasicMaterial</strong> for now. All materials take an object of properties which will be applied to them. To keep things very simple, we only supply a color attribute of <strong>0x00ff00</strong>, which is green. This works the same way that colors work in CSS or Photoshop (<strong>hex colors</strong>).</p>
+		<p>지오메트리 외에도, 그것을 색칠할 재료가 필요합니다. Three.js는 몇 가지 재료를 제공하지만, 하지만 지금은 <strong>MeshBasicMaterial</strong>를 사용하겠습니다. 모든 재료는 적용될 속성의 객체를 취합니다. 아주 간단하게하기 위해, 우리는 녹색 <strong>0x00ff00</strong>의 색깔 속성만 적용하겠습니다. 이 색상은 CSS 또는 포토샵에서 사용하는 것과 같은 방식으로 작동합니다 (<strong>HEX 색상코드</strong>).</p>
 
-		<p>The third thing we need is a <strong>Mesh</strong>. A mesh is an object that takes a geometry, and applies a material to it, which we then can insert to our scene, and move freely around.</p>
+		<p>세번째로 필요한 것은<strong>Mesh</strong>입니다. 메쉬는 지오메트리를 취해서 그 물체에 물질을 적용하고, 그 물체를 우리의 장면에 추가하고, 자유롭게 움직일 수 있다.</p>
 
-		<p>By default, when we call <strong>scene.add()</strong>, the thing we add will be added to the coordinates <strong>(0,0,0)</strong>. This would cause both the camera and the cube to be inside each other. To avoid this, we simply move the camera out a bit.</p>
+		<p>기본값으로 <strong>scene.add()</strong>를 호출하면 추가한 것들은 <strong>(0,0,0)</strong> 좌표에 추가됩니다. 이는 카메라와 큐브 모두 서로 겹치게될 것입니다. 이를 방지하기 위해 카메라를 약간 빼내줘야합니다.</p>
 
-		<h2>Rendering the scene</h2>
+		<h2>장면 랜더링하기</h2>
 
-		<p>If you copied the code from above into the HTML file we created earlier, you wouldn't be able to see anything. This is because we're not actually rendering anything yet. For that, we need what's called a <strong>render or animate loop</strong>.</p>
+		<p>우리가 이전에 만든 HTML 파일에 위의 코드를 복사 한 경우, 당신은 아무것도 볼 수 없을 것입니다. 왜냐하면 아직 아무것도 랜더링하고 있지 않기 때문입니다. 그러기 위해서는 <strong>렌더링이나 애니메이션 루프</strong>라고 불리는 것이 필요합니다.</p>
 
 		<code>
 		function animate() {
@@ -99,26 +99,24 @@
 		}
 		animate();
 		</code>
+		<p>만약 여러분이 브라우저에 게임을 쓰는 것을 처음이라면, 여러분은 <em>"setInterval을 그냥 만드는 게 어때?"</em>라고 생각할지도 모릅니다. 중요한 것은 가능하겠지만 <strong>requestAnimationFrame</strong>을 사용하면 많은 장점이 있다는 것입니다. 아마도 가장 중요한 것은 사용자가 다른 브라우저 탭으로 이동할 때 일시 중지되므로 귀중한 처리 능력과 배터리 수명을 낭비하지 않는 것입니다.</p>
 
-		<p>This will create a loop that causes the renderer to draw the scene every time the screen is refreshed (on a typical screen this means 60 times per second). If you're new to writing games in the browser, you might say <em>"why don't we just create a setInterval ?"</em> The thing is - we could, but <strong>requestAnimationFrame</strong> has a number of advantages. Perhaps the most important one is that it pauses when the user navigates to another browser tab, hence not wasting their precious processing power and battery life.</p>
+		<h2>큐브 움직이기</h2>
+		<p>우리가 시작하기 전에 작성한 파일에 위의 코드를 모두 입력하면 녹색 상자가 표시되어야 합니다. 이 상자를 돌려서 좀 더 재미있게 만들어봅시다.</p>
 
-		<h2>Animating the cube</h2>
-
-		<p>If you insert all the code above into the file you created before we began, you should see a green box. Let's make it all a little more interesting by rotating it.</p>
-
-		<p>Add the following right above the <strong>renderer.render</strong> call in your <strong>animate</strong> function:</p>
+		<p><strong>애니메이트</strong> 함수의 <strong>renderer.render</strong> 호출 바로 위에 다음을 추가해주세요.</p>
 
 		<code>
 		cube.rotation.x += 0.01;
 		cube.rotation.y += 0.01;
 		</code>
 
-		<p>This will be run every frame (normally 60 times per second), and give the cube a nice rotation animation. Basically, anything you want to move or change while the app is running has to go through the animate loop. You can of course call other functions from there, so that you don't end up with a <strong>animate</strong> function that's hundreds of lines.</p>
+		<p>이 코드는 매프레임마다 실행되며 (일반적으로 초당 60회) 큐브에 멋진 회전 애니메이션을 볼 수 있습니다. 기본적으로 앱이 실행되는 동안 움직이거나 바꾸고 싶은 것은 무엇이든 애니메이트 루프를 거쳐야합니다. 물론 거기서 다른 함수들을 호출할 수 있기 때문에 수백 줄에 달하는 <strong>애니메이션</strong>함수가 되지 않도록 할 수 있습니다.</p>
 
-		<h2>The result</h2>
-		<p>Congratulations! You have now completed your first three.js application. It's simple, you have to start somewhere.</p>
+		<h2>결론</h2>
+		<p>축하합니다! 이제 당신의 첫 three.js 앱을 완성했습니다. 아주 간단하기에 어디서든 시작해보세요.</p>
 
-		<p>The full code is available below and as an editable [link:https://jsfiddle.net/mkba0ecu/ live example]. Play around with it to get a better understanding of how it works.</p>
+		<p>수정 가능한 전체 코드는 다음 링크에서 확인하실 수 있어요. [link:https://jsfiddle.net/mkba0ecu/ 라이브 예시]. 어떻게 작동하는지 더 알아보고 싶으시다면 가지고 놀아보세요!</p>
 
 		<code>
 		&lt;html&gt;
