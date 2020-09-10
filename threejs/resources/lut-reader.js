@@ -43,7 +43,83 @@ function splitOnSpaceHandleQuotesWithEscapes(str, splits = ' \t\n\r') {
   return strings;
 }
 
-export function parse(str) {
+const startWhitespaceRE = /^\s/;
+const intRE = /^\d+$/;
+const isNum = s => intRE.test(s);
+
+const quotesRE = /^".*"$/;
+function trimQuotes(s) {
+  return quotesRE.test(s) ? s.substr(s, s.length - 2) : s;
+}
+
+const splitToNumbers = s => s.split(' ').map(parseFloat);
+
+export function parseCSP(str) {
+  const data = [];
+  const lut = {
+    name: 'unknown',
+    type: '1D',
+    size: 0,
+    data,
+    min: [0, 0, 0],
+    max: [1, 1, 1],
+  };
+
+  const lines = str.split('\n').map(s => s.trim()).filter(s => s.length > 0 && !startWhitespaceRE.test(s));
+
+  // check header
+  lut.type = lines[1];
+  if (lines[0] !== 'CSPLUTV100' ||
+       (lut.type !== '1D' && lut.type !== '3D')) {
+    throw new Error('not CSP');
+  }
+
+  // skip meta (read to first number)
+  let lineNdx = 2;
+  for (; lineNdx < lines.length; ++lineNdx) {
+    const line = lines[lineNdx];
+    if (isNum(line)) {
+      break;
+    }
+    if (line.startsWith('TITLE ')) {
+      lut.name = trimQuotes(line.substr(6).trim());
+    }
+  }
+
+  // read ranges
+  const ranges = [];
+  for (let i = 0; i < 3; ++i) {
+    ++lineNdx;
+    const input = splitToNumbers(lines[lineNdx++]);
+    const output = splitToNumbers(lines[lineNdx++]);
+    ranges.push({input, output});
+    if (input.length !== 2 || output.length !== 2 ||
+        input[0] !== 0 || input[1] !==  1 ||
+        output[0] !== 0 || output[1] !== 1) {
+      throw new Error('mapped ranges not support');
+    }
+  }
+
+  // read sizes
+  const sizes = splitToNumbers(lines[lineNdx++]);
+  if (sizes[0] !== sizes[1] || sizes[0] !== sizes[2]) {
+    throw new Error('only cubic sizes supported');
+  }
+  lut.size = sizes[0];
+
+  // read data
+  for (; lineNdx < lines.length; ++lineNdx) {
+    const parts = splitToNumbers(lines[lineNdx]);
+    if (parts.length !== 3) {
+      throw new Error('malformed file');
+    }
+    data.push(...parts);
+  }
+
+  return lut;
+}
+
+export function parseCUBE(str) {
   const data = [];
   const lut = {
     name: 'unknown',
@@ -85,13 +161,10 @@ export function parse(str) {
     }
   }
 
-  if (!lut.min) {
-    lut.min = data.slice(0, 3);
-    lut.max = data.slice(data.length - 3, data.length);
-  }
-
   if (!lut.size) {
-    lut.size = data.length / 3;
+    lut.size = lut.type === '1D'
+        ? (data.length / 3)
+        : Math.cbrt(data.length / 3);
   }
 
   return lut;
@@ -122,6 +195,20 @@ function lut1Dto3D(lut) {
     data.push(...src);
   }
   return {...lut, data};
+}
+
+const parsers = {
+  'cube': parseCUBE,
+  'csp': parseCSP,
+};
+
+// for backward compatibility
+export function parse(str, format = 'cube') {
+  const parser = parsers[format.toLowerCase()];
+  if (!parser) {
+    throw new Error(`no parser for format: ${format}`);
+  }
+  return parser(str);
 }
 
 export function lutTo2D3Drgb8(lut) {

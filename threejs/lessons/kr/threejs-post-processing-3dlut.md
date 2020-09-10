@@ -441,10 +441,16 @@ import * as dragAndDrop from './resources/drag-and-drop.js';
 dragAndDrop.setup({ msg: 'Drop LUT File here' });
 dragAndDrop.onDropFile(readLUTFile);
 
+function ext(s) {
+  const period = s.lastIndexOf('.');
+  return s.substr(period + 1);
+}
+
 function readLUTFile(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
-    const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result));
+    const type = ext(file.name);
+    const lut = lutParser.lutTo2D3Drgb8(lutParser.parse(e.target.result, type));
     const {size, data, name} = lut;
     const texture = new THREE.DataTexture(data, size * size, size, THREE.RGBFormat);
     texture.minFilter = THREE.LinearFilter;
