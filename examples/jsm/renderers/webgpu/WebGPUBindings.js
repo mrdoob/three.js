@@ -97,7 +97,7 @@ class WebGPUBindings {
 				const array = binding.array;
 				const bufferGPU = binding.bufferGPU;
 
-				const needsBufferWrite = binding.update( array, object, camera );
+				const needsBufferWrite = binding.update( object, camera );
 
 				if ( needsBufferWrite === true ) {
 
@@ -246,12 +246,14 @@ class WebGPUBindings {
 		modelGroup.setName( 'modelUniforms' );
 		modelGroup.setUniform( 'modelMatrix', new Matrix4() );
 		modelGroup.setUniform( 'modelViewMatrix', new Matrix4() );
-		modelGroup.setUpdateCallback( function ( array, object/*, camera */ ) {
+		modelGroup.setUpdateCallback( function ( object/*, camera */ ) {
 
-			array.set( object.matrixWorld.elements, 0 );
-			array.set( object.modelViewMatrix.elements, 16 );
+			let updated = false;
 
-			return true; // @TODO: Implement caching (return false when cache hits occurs)
+			if ( modelGroup.updateMatrix4( object.matrixWorld, 0 ) ) updated = true;
+			if ( modelGroup.updateMatrix4( object.modelViewMatrix, 16 ) ) updated = true;
+
+			return updated;
 
 		} );
 
@@ -261,21 +263,12 @@ class WebGPUBindings {
 		opacityGroup.setName( 'opacityUniforms' );
 		opacityGroup.setUniform( 'opacity', 1.0 );
 		opacityGroup.visibility = GPUShaderStage.FRAGMENT;
-		opacityGroup.setUpdateCallback( function ( array, object ) {
+		opacityGroup.setUpdateCallback( function ( object/*, camera */ ) {
 
 			const material = object.material;
-			const opacity = material.transparent ? material.opacity : 1.0;
+			const opacity = ( material.transparent === true ) ? material.opacity : 1.0;
 
-			let updated = false;
-
-			if ( array[ 0 ] !== opacity ) {
-
-				array[ 0 ] = opacity;
-				updated = true;
-
-			}
-
-			return updated;
+			return opacityGroup.updateNumber( opacity, 0 );
 
 		} );
 
@@ -311,12 +304,14 @@ class WebGPUBindings {
 		modelGroup.setName( 'modelUniforms' );
 		modelGroup.setUniform( 'modelMatrix', new Matrix4() );
 		modelGroup.setUniform( 'modelViewMatrix', new Matrix4() );
-		modelGroup.setUpdateCallback( function ( array, object/*, camera */ ) {
+		modelGroup.setUpdateCallback( function ( object/*, camera */ ) {
 
-			array.set( object.matrixWorld.elements, 0 );
-			array.set( object.modelViewMatrix.elements, 16 );
+			let updated = false;
 
-			return true; // @TODO: Implement caching (return false when cache hits occurs)
+			if ( modelGroup.updateMatrix4( object.matrixWorld, 0 ) ) updated = true;
+			if ( modelGroup.updateMatrix4( object.modelViewMatrix, 16 ) ) updated = true;
+
+			return updated;
 
 		} );
 
@@ -341,12 +336,14 @@ class WebGPUBindings {
 		modelGroup.setName( 'modelUniforms' );
 		modelGroup.setUniform( 'modelMatrix', new Matrix4() );
 		modelGroup.setUniform( 'modelViewMatrix', new Matrix4() );
-		modelGroup.setUpdateCallback( function ( array, object/*, camera */ ) {
+		modelGroup.setUpdateCallback( function ( object/*, camera */ ) {
 
-			array.set( object.matrixWorld.elements, 0 );
-			array.set( object.modelViewMatrix.elements, 16 );
+			let updated = false;
 
-			return true; // @TODO: Implement caching (return false when cache hits occurs)
+			if ( modelGroup.updateMatrix4( object.matrixWorld, 0 ) ) updated = true;
+			if ( modelGroup.updateMatrix4( object.modelViewMatrix, 16 ) ) updated = true;
+
+			return updated;
 
 		} );
 
@@ -367,12 +364,14 @@ class WebGPUBindings {
 		cameraGroup.setName( 'cameraUniforms' );
 		cameraGroup.setUniform( 'projectionMatrix', new Matrix4() );
 		cameraGroup.setUniform( 'viewMatrix', new Matrix4() );
-		cameraGroup.setUpdateCallback( function ( array, object, camera ) {
+		cameraGroup.setUpdateCallback( function ( object, camera ) {
 
-			array.set( camera.projectionMatrix.elements, 0 );
-			array.set( camera.matrixWorldInverse.elements, 16 );
+			let updated = false;
 
-			return true; // @TODO: Implement caching (return false when cache hits occurs)
+			if ( cameraGroup.updateMatrix4( camera.projectionMatrix, 0 ) ) updated = true;
+			if ( cameraGroup.updateMatrix4( camera.matrixWorldInverse, 16 ) ) updated = true;
+
+			return updated;
 
 		} );
 
