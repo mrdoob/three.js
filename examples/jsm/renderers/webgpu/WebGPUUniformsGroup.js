@@ -113,7 +113,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 		} else if ( uniform.isMatrix3 ) {
 
-			size = 36;
+			size = 48; // (3 * 4) * 4 bytes
 
 		} else if ( uniform.isMatrix4 ) {
 
