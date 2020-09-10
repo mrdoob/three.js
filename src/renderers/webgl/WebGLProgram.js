@@ -220,13 +220,18 @@ function includeReplacer( match, include ) {
 // Unroll Loops
 
 const deprecatedUnrollLoopPattern = /#pragma unroll_loop[\s]+?for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
-const unrollLoopPattern = /#pragma unroll_loop_start\s+for\s*\(\s*int\s+i\s*=\s*(\d+)\s*;\s*i\s*<\s*(\d+)\s*;\s*i\s*\+\+\s*\)\s*{([\s\S]+?)}\s+#pragma unroll_loop_end/g;
+const unrollLoopPattern = /#pragma unroll_loop_start\s+for\s*\(\s*int\s+i\s*=\s*([a-zA-Z_0-9]+)\s*;\s*i\s*<\s*([a-zA-Z_0-9]+)\s*;\s*i\s*\+\+\s*\)\s*{([\s\S]+?)}\s+#pragma unroll_loop_end/g;
 
-function unrollLoops( string ) {
+let unrollDefines = null;
+function unrollLoops( string, defines ) {
 
-	return string
+	unrollDefines = defines;
+	const result = string
 		.replace( unrollLoopPattern, loopReplacer )
 		.replace( deprecatedUnrollLoopPattern, deprecatedLoopReplacer );
+
+	unrollDefines = null;
+	return result;
 
 }
 
@@ -240,6 +245,17 @@ function deprecatedLoopReplacer( match, start, end, snippet ) {
 function loopReplacer( match, start, end, snippet ) {
 
 	let string = '';
+	if ( isNaN( start ) ) {
+
+		start = parsunrollDefines[ start ];
+
+	}
+
+	if ( isNaN( end ) ) {
+
+		end = unrollDefines[ end ];
+
+	}
 
 	for ( let i = parseInt( start ); i < parseInt( end ); i ++ ) {
 
@@ -664,8 +680,8 @@ function WebGLProgram( renderer, cacheKey, parameters, bindingStates ) {
 	fragmentShader = replaceLightNums( fragmentShader, parameters );
 	fragmentShader = replaceClippingPlaneNums( fragmentShader, parameters );
 
-	vertexShader = unrollLoops( vertexShader );
-	fragmentShader = unrollLoops( fragmentShader );
+	vertexShader = unrollLoops( vertexShader, defines );
+	fragmentShader = unrollLoops( fragmentShader, defines );
 
 	if ( parameters.isWebGL2 && parameters.isRawShaderMaterial !== true ) {
 
