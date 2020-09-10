@@ -35,10 +35,10 @@
 			var group;
 
 			var targetRotation = 0;
-			var targetRotationOnMouseDown = 0;
+			var targetRotationOnPointerDown = 0;
 
-			var mouseX = 0;
-			var mouseXOnMouseDown = 0;
+			var pointerX = 0;
+			var pointerXOnPointerDown = 0;
 
 			var windowHalfX = window.innerWidth / 2;
 
@@ -195,8 +195,8 @@
 
 				if ( event.isPrimary === false ) return;
 
-				mouseXOnMouseDown = event.clientX - windowHalfX;
-				targetRotationOnMouseDown = targetRotation;
+				pointerXOnPointerDown = event.clientX - windowHalfX;
+				targetRotationOnPointerDown = targetRotation;
 
 				document.addEventListener( 'pointermove', onPointerMove, false );
 				document.addEventListener( 'pointerup', onPointerUp, false );
@@ -207,9 +207,9 @@
 
 				if ( event.isPrimary === false ) return;
 
-				mouseX = event.clientX - windowHalfX;
+				pointerX = event.clientX - windowHalfX;
 
-				targetRotation = targetRotationOnMouseDown + ( mouseX - mouseXOnMouseDown ) * 0.02;
+				targetRotation = targetRotationOnPointerDown + ( pointerX - pointerXOnPointerDown ) * 0.02;
 
 			}
 

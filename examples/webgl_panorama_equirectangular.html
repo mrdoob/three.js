@@ -21,9 +21,9 @@
 			var camera, scene, renderer;
 
 			var isUserInteracting = false,
-				onMouseDownMouseX = 0, onMouseDownMouseY = 0,
-				lon = 0, onMouseDownLon = 0,
-				lat = 0, onMouseDownLat = 0,
+				onPointerDownMouseX = 0, onPointerDownMouseY = 0,
+				lon = 0, onPointerDownLon = 0,
+				lat = 0, onPointerDownLat = 0,
 				phi = 0, theta = 0;
 
 			init();
@@ -120,11 +120,11 @@
 
 				isUserInteracting = true;
 
-				onMouseDownMouseX = event.clientX;
-				onMouseDownMouseY = event.clientY;
+				onPointerDownMouseX = event.clientX;
+				onPointerDownMouseY = event.clientY;
 
-				onMouseDownLon = lon;
-				onMouseDownLat = lat;
+				onPointerDownLon = lon;
+				onPointerDownLat = lat;
 
 				document.addEventListener( 'pointermove', onPointerMove, false );
 				document.addEventListener( 'pointerup', onPointerUp, false );
@@ -135,8 +135,8 @@
 
 				if ( event.isPrimary === false ) return;
 
-				lon = ( onMouseDownMouseX - event.clientX ) * 0.1 + onMouseDownLon;
-				lat = ( event.clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
+				lon = ( onPointerDownMouseX - event.clientX ) * 0.1 + onPointerDownLon;
+				lat = ( event.clientY - onPointerDownMouseY ) * 0.1 + onPointerDownLat;
 
 			}
 
