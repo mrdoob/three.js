@@ -247,7 +247,7 @@ function loopReplacer( match, start, end, snippet ) {
 	let string = '';
 	if ( isNaN( start ) ) {
 
-		start = parsunrollDefines[ start ];
+		start = unrollDefines[ start ];
 
 	}
 
