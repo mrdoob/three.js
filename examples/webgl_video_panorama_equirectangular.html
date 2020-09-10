@@ -5,6 +5,11 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<style>
+			body {
+				touch-action: none;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="info">
@@ -66,10 +71,9 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousedown', onDocumentMouseDown, false );
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'mouseup', onDocumentMouseUp, false );
-				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
+				document.addEventListener( 'pointerdown', onPointerDown, false );
+				document.addEventListener( 'pointermove', onPointerMove, false );
+				document.addEventListener( 'pointerup', onPointerUp, false );
 
 				//
 
@@ -86,9 +90,7 @@
 
 			}
 
-			function onDocumentMouseDown( event ) {
-
-				event.preventDefault();
+			function onPointerDown( event ) {
 
 				isUserInteracting = true;
 
@@ -100,7 +102,7 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
 
 				if ( isUserInteracting === true ) {
 
@@ -111,17 +113,9 @@
 
 			}
 
-			function onDocumentMouseUp() {
+			function onPointerUp() {
 
 				isUserInteracting = false;
-
-			}
-
-			function onDocumentMouseWheel( event ) {
-
-				distance += event.deltaY * 0.05;
-
-				distance = THREE.MathUtils.clamp( distance, 1, 50 );
 
 			}
 
