@@ -234,6 +234,7 @@ function main() {
   }());
 
   document.querySelector('button').addEventListener('click', () => {
+    render();
     renderer.domElement.toBlob((blob) => {
       saveData(blob, `${name}-s${renderer.domElement.height}.png`);
     });
