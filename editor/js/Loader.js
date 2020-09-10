@@ -270,7 +270,7 @@ function Loader( editor ) {
 						scene.name = filename;
 
 						editor.addAnimation( scene, result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+						editor.execute( new SetSceneCommand( editor, scene ) );
 
 					} );
 
@@ -699,7 +699,7 @@ function Loader( editor ) {
 						var scene = result.scene;
 
 						editor.addAnimation( scene, result.animations );
-						editor.execute( new AddObjectCommand( editor, scene ) );
+						editor.execute( new SetSceneCommand( editor, scene ) );
 
 					} );
 
