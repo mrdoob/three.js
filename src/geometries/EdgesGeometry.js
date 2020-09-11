@@ -1,7 +1,13 @@
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
-import { Geometry } from '../core/Geometry.js';
 import { MathUtils } from '../math/MathUtils.js';
+import { Triangle } from '../math/Triangle.js';
+import { Vector3 } from '../math/Vector3.js';
+
+const _v0 = new Vector3();
+const _v1 = new Vector3();
+const _normal = new Vector3();
+const _triangle = new Triangle();
 
 class EdgesGeometry extends BufferGeometry {
 
@@ -17,60 +23,71 @@ class EdgesGeometry extends BufferGeometry {
 
 		thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
-		// buffer
+		const indexAttr = geometry.getIndex();
+		const positionAttr = geometry.getAttribute( 'position' );
+		const indexCount = indexAttr ? indexAttr.count : positionAttr.count / 3;
 
-		const vertices = [];
+		const indexArr = [ 0, 0, 0 ];
+		const vertKeys = [ 'a', 'b', 'c' ];
 
-		// helper variables
+		const edgeData = {};
 
+		const precisionPoints = 4;
+		const precision = Math.pow( 10, precisionPoints );
 		const thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
-		const edge = [ 0, 0 ], edges = {};
-		let edge1, edge2, key;
-		const keys = [ 'a', 'b', 'c' ];
+		const vertices = [];
+		for ( let i = 0; i < indexCount; i += 3 ) {
 
-		// prepare source geometry
+			if ( indexAttr ) {
 
-		let geometry2;
+				indexArr[ 0 ] = indexAttr.getX( i );
+				indexArr[ 1 ] = indexAttr.getX( i + 1 );
+				indexArr[ 2 ] = indexAttr.getX( i + 2 );
 
-		if ( geometry.isBufferGeometry ) {
+			} else {
 
-			geometry2 = new Geometry();
-			geometry2.fromBufferGeometry( geometry );
+				indexArr[ 0 ] = i;
+				indexArr[ 1 ] = i + 1;
+				indexArr[ 2 ] = i + 2;
 
-		} else {
+			}
 
-			geometry2 = geometry.clone();
-
-		}
-
-		geometry2.mergeVertices();
-		geometry2.computeFaceNormals();
-
-		const sourceVertices = geometry2.vertices;
-		const faces = geometry2.faces;
-
-		// now create a data structure where each entry represents an edge with its adjoining faces
-
-		for ( let i = 0, l = faces.length; i < l; i ++ ) {
-
-			const face = faces[ i ];
+			_triangle.a.fromBufferAttribute( positionAttr, indexArr[ 0 ] );
+			_triangle.b.fromBufferAttribute( positionAttr, indexArr[ 1 ] );
+			_triangle.c.fromBufferAttribute( positionAttr, indexArr[ 2 ] );
+			_triangle.getNormal( _normal );
 
 			for ( let j = 0; j < 3; j ++ ) {
 
-				edge1 = face[ keys[ j ] ];
-				edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
-				edge[ 0 ] = Math.min( edge1, edge2 );
-				edge[ 1 ] = Math.max( edge1, edge2 );
+				const jNext = ( j + 1 ) % 3;
+				const v0 = _triangle[ vertKeys[ j ] ];
+				const v1 = _triangle[ vertKeys[ jNext ] ];
 
-				key = edge[ 0 ] + ',' + edge[ 1 ];
+				const vecHash0 = `${ Math.round( v0.x * precision ) },${ Math.round( v0.y * precision ) },${ Math.round( v0.y * precision ) }`;
+				const vecHash1 = `${ Math.round( v1.x * precision ) },${ Math.round( v1.y * precision ) },${ Math.round( v1.y * precision ) }`;
+				const hash = `${ vecHash0 }_${ vecHash1 }`;
+				const reverseHash = `${ vecHash1 }_${ vecHash0 }`;
 
-				if ( edges[ key ] === undefined ) {
+				if ( reverseHash in edgeData ) {
 
-					edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ], face1: i, face2: undefined };
+					if ( _normal.dot( edgeData[ reverseHash ].normal ) <= thresholdDot ) {
+
+						vertices.push( v0.x, v0.y, v0.z );
+						vertices.push( v1.x, v1.y, v1.z );
+
+					}
+
+					delete edgeData[ reverseHash ];
 
 				} else {
 
-					edges[ key ].face2 = i;
+					edgeData[ hash ] = {
+
+						index0: indexArr[ j ],
+						index1: indexArr[ jNext ],
+						normal: _normal.clone(),
+
+					};
 
 				}
 
@@ -78,33 +95,21 @@ class EdgesGeometry extends BufferGeometry {
 
 		}
 
-		// generate vertices
+		for ( const key in edgeData ) {
 
-		for ( key in edges ) {
+			const { index0, index1 } = edgeData[ key ];
+			_v0.fromBufferAttribute( positionAttr, index0 );
+			_v1.fromBufferAttribute( positionAttr, index1 );
 
-			const e = edges[ key ];
-
-			// an edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
-
-			if ( e.face2 === undefined || faces[ e.face1 ].normal.dot( faces[ e.face2 ].normal ) <= thresholdDot ) {
-
-				let vertex = sourceVertices[ e.index1 ];
-				vertices.push( vertex.x, vertex.y, vertex.z );
-
-				vertex = sourceVertices[ e.index2 ];
-				vertices.push( vertex.x, vertex.y, vertex.z );
-
-			}
+			vertices.push( _v0.x, _v0.y, _v0.z );
+			vertices.push( _v1.x, _v1.y, _v1.z );
 
 		}
-
-		// build geometry
 
 		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
 	}
 
 }
-
 
 export { EdgesGeometry };
