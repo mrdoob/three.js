@@ -1,7 +1,7 @@
 import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
 import WebGPUSampler from './WebGPUSampler.js';
 import WebGPUSampledTexture from './WebGPUSampledTexture.js';
-import { Matrix4 } from '../../../../build/three.module.js';
+import { Matrix3, Matrix4, Vector2, Vector3, Vector4 } from '../../../../build/three.module.js';
 
 class WebGPUBindings {
 
@@ -22,7 +22,17 @@ class WebGPUBindings {
 
 	}
 
-	get( object ) {
+	// Here taking shaderUniforms is what I don't really like.
+	// To set up bindings, uniforms information in shader is necessary.
+	// But just getting existing bindings doesn't need uniforms information.
+	// I moved bindings.update() in WebGPURenderer after render pipeline get/creation
+	// (See _renderObject() in WebGPURenderer), and bindings.get() in WebGPURenderPipelines
+	// is only the place where bindings setup can cause now.
+	// So passing bindings.get() call in WebGPURenderPipelines passes shaderUniforms
+	// and other bindings.get() doesn't pass.
+	// I don't think this is a good design and want to simplify...
+
+	get( object, shaderUniforms ) {
 
 		let data = this.uniformsData.get( object );
 
@@ -44,6 +54,10 @@ class WebGPUBindings {
 			} else if ( material.isLineBasicMaterial ) {
 
 				bindings = this._getLinesBasicBindings();
+
+			} else if ( material.isShaderMaterial ) {
+
+				bindings = this._getShaderBindings( material, shaderUniforms );
 
 			} else {
 
@@ -115,7 +129,23 @@ class WebGPUBindings {
 			} else if ( binding.isSampler ) {
 
 				const material = object.material;
-				const texture = material[ binding.name ];
+
+				// Here may be tricky.
+				// Needs to search texture.
+				// Assuming binding name has path from material to texture
+				// separated by '.', like "map" or "uniforms.mySampler.value".
+				// I want to simplify.
+
+				const names = binding.name.split( '.' );
+				let target = material;
+
+				for ( const name of names ) {
+
+					target = target[ name ];
+
+				}
+
+				const texture = target;
 
 				textures.updateSampler( texture );
 
@@ -131,7 +161,17 @@ class WebGPUBindings {
 			} else if ( binding.isSampledTexture ) {
 
 				const material = object.material;
-				const texture = material[ binding.name ];
+
+				const names = binding.name.split( '.' );
+				let target = material;
+
+				for ( const name of names ) {
+
+					target = target[ name ];
+
+				}
+
+				const texture = target;
 
 				const forceUpdate = textures.updateTexture( texture );
 				const textureGPU = textures.getTextureGPU( texture );
@@ -378,6 +418,128 @@ class WebGPUBindings {
 		this.sharedUniformsGroups.set( cameraGroup.name, cameraGroup );
 
 	}
+
+	_getShaderBindings( material, shaderUniforms ) {
+
+		// Creates bindings from shader uniforms information
+
+		const bindings = [];
+
+		for ( const shaderUniform of shaderUniforms ) {
+
+			const name = shaderUniform.name;
+			const type = shaderUniform.type;
+			const groupType = shaderUniform.groupType;
+			const visibility = shaderUniform.visibility === 'vertex|fragment' ? GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT :
+				shaderUniform.visibility === 'vertex' ? GPUShaderStage.VERTEX : GPUShaderStage.FRAGMENT;
+			let group;
+
+			if ( name === 'modelUniforms' ) {
+
+				// Reserved name 'modelUniforms'
+
+				group = new WebGPUUniformsGroup();
+				group.setName( name );
+				group.visibility = visibility;
+				group.setUniform( 'modelMatrix', new Matrix4() );
+				group.setUniform( 'modelViewMatrix', new Matrix4() );
+
+				group.setUpdateCallback( function ( object/*, camera */ ) {
+
+					let updated = false;
+
+					if ( this.updateMatrix4( object.matrixWorld, 0 ) ) updated = true;
+					if ( this.updateMatrix4( object.modelViewMatrix, 16 ) ) updated = true;
+
+					return updated;
+
+				} );
+
+			} else if ( name === 'cameraUniforms' ) {
+
+				// Reserved name 'cameraUniforms'
+
+				group = this.sharedUniformsGroups.get( 'cameraUniforms' );
+
+			} else if ( groupType === 'uniform-buffer' ) {
+
+				group = new WebGPUUniformsGroup();
+				group.setName( name );
+				group.visibility = visibility;
+
+				const entries = shaderUniform.entries;
+
+				for ( const entry of entries ) {
+
+					group.setUniform( entry.name, getInitialValue( entry.type ) );
+
+				}
+
+				group.setUpdateCallback( function ( array, object/*, camera */ ) {
+
+					const values = material.uniforms[ name ].value;
+					let offset = 0;
+					let updated = false;
+
+					for ( let i = 0; i < entries.length; i ++ ) {
+
+						const entry = entries[ i ];
+						const value = values[ i ];
+						if ( this.updateByType( value, offset ) ) updated = true;
+						offset += this.getUniformByteLength( value ) / 4; // Assuming array is Float32 so far
+
+					}
+
+					return updated;
+
+				} );
+
+			} else if ( groupType === 'sampler' ) {
+
+				group = new WebGPUSampler();
+				group.setName( 'uniforms.' + name + '.value' );
+				group.visibility = visibility;
+
+			} else if ( groupType === 'sampled-texture' ) {
+
+				group = new WebGPUSampledTexture();
+				group.setName( 'uniforms.' + name + '.value' );
+				group.visibility = visibility;
+
+			} else {
+
+				console.error( 'THREE.WebGPURenderer: Unknown uniform type ' + type );
+
+			}
+
+			bindings.push( group );
+
+		}
+
+		return bindings;
+
+	}
+
+}
+
+function getInitialValue( type ) {
+
+	switch ( type ) {
+		case 'float':
+			return 0.0;
+		case 'vec2':
+			return new Vector2();
+		case 'vec3':
+			return new Vector3();
+		case 'vec4':
+			return new Vector4();
+		case 'mat3':
+			return new Matrix3();
+		case 'mat4':
+			return new Matrix4();
+	}
+
+	console.error( 'THREE.WebGPURenderer: Unknown uniform type ' + type );
 
 }
 

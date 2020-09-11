@@ -675,8 +675,7 @@ class WebGPURenderer {
 
 						passEncoder.setViewport( vp.x, vp.y, vp.width, vp.height, minDepth, maxDepth );
 
-						this._bindings.update( object, camera2 );
-						this._renderObject( object, passEncoder );
+						this._renderObject( object, camera2, passEncoder );
 
 					}
 
@@ -684,8 +683,7 @@ class WebGPURenderer {
 
 			} else {
 
-				this._bindings.update( object, camera );
-				this._renderObject( object, passEncoder );
+				this._renderObject( object, camera, passEncoder );
 
 			}
 
@@ -693,7 +691,7 @@ class WebGPURenderer {
 
 	}
 
-	_renderObject( object, passEncoder ) {
+	_renderObject( object, camera, passEncoder ) {
 
 		const info = this._info;
 
@@ -704,6 +702,7 @@ class WebGPURenderer {
 
 		// bind group
 
+		this._bindings.update( object, camera );
 		const bindGroup = this._bindings.get( object ).group;
 		passEncoder.setBindGroup( 0, bindGroup );
 

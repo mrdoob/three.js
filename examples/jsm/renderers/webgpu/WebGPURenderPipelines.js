@@ -19,7 +19,7 @@ class WebGPURenderPipelines {
 		this.sampleCount = sampleCount;
 
 		this.pipelines = new WeakMap();
-		this.shaderAttributes = new WeakMap();
+		this.shaderInfos = new WeakMap();
 		this.shaderModules = {
 			vertex: new WeakMap(),
 			fragment: new WeakMap()
@@ -52,6 +52,13 @@ class WebGPURenderPipelines {
 			} else if ( material.isLineBasicMaterial ) {
 
 				shader = ShaderLib.line_basic;
+
+			} else if ( material.isShaderMaterial ) {
+
+				shader = {
+					vertexShader: ShaderLib.shader.vertexShader + material.vertexShader,
+					fragmentShader: ShaderLib.shader.fragmentShader + material.fragmentShader
+				};
 
 			} else {
 
@@ -93,33 +100,25 @@ class WebGPURenderPipelines {
 
 			}
 
+			// parse attributes and uniforms in shader codes
+
+			const shaderAttributes = parseAttributes( shader.vertexShader );
+			const shaderUniforms = parseUniforms( shader.vertexShader, shader.fragmentShader );
+
 			// layout
 
-			const bindLayout = this.bindings.get( object ).layout;
+			const bindLayout = this.bindings.get( object, shaderUniforms ).layout;
 			const layout = device.createPipelineLayout( { bindGroupLayouts: [ bindLayout ] } );
 
 			// vertex buffers
 
 			const vertexBuffers = [];
-			const shaderAttributes = [];
 
-			// find "layout (location = num) in type name" in vertex shader
-
-			const regex = /^\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
-
-			let shaderAttribute = null;
-
-			while ( shaderAttribute = regex.exec( shader.vertexShader ) ) {
-
-				const shaderLocation = parseInt( shaderAttribute.groups.location );
-				const arrayStride = this._getArrayStride( shaderAttribute.groups.type );
-				const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type );
-
-				shaderAttributes.push( { name: shaderAttribute.groups.name, slot: shaderLocation } );
+			for ( const attribute of shaderAttributes ) {
 
 				vertexBuffers.push( {
-					arrayStride: arrayStride,
-					attributes: [ { shaderLocation: shaderLocation, offset: 0, format: vertexFormat } ]
+					arrayStride: attribute.arrayStride,
+					attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ]
 				} );
 
 			}
@@ -200,8 +199,10 @@ class WebGPURenderPipelines {
 			} );
 
 			this.pipelines.set( object, pipeline );
-			this.shaderAttributes.set( pipeline, shaderAttributes );
-
+			this.shaderInfos.set( pipeline, {
+				attributes: shaderAttributes,
+				uniforms: shaderUniforms
+			} );
 
 		}
 
@@ -211,41 +212,24 @@ class WebGPURenderPipelines {
 
 	getShaderAttributes( pipeline ) {
 
-		return this.shaderAttributes.get( pipeline );
+		return this.shaderInfos.get( pipeline ).attributes;
+
+	}
+
+	getShaderUniforms( pipeline ) {
+
+		return this.shaderInfos.get( pipeline ).uniforms;
 
 	}
 
 	dispose() {
 
 		this.pipelines = new WeakMap();
-		this.shaderAttributes = new WeakMap();
+		this.shaderInfos = new WeakMap();
 		this.shaderModules = {
 			vertex: new WeakMap(),
 			fragment: new WeakMap()
 		};
-
-	}
-
-	_getArrayStride( type ) {
-
-		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
-
-		if ( type === 'float' ) return 4;
-		if ( type === 'vec2' ) return 8;
-		if ( type === 'vec3' ) return 12;
-		if ( type === 'vec4' ) return 16;
-
-		if ( type === 'int' ) return 4;
-		if ( type === 'ivec2' ) return 8;
-		if ( type === 'ivec3' ) return 12;
-		if ( type === 'ivec4' ) return 16;
-
-		if ( type === 'uint' ) return 4;
-		if ( type === 'uvec2' ) return 8;
-		if ( type === 'uvec3' ) return 12;
-		if ( type === 'uvec4' ) return 16;
-
-		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
 
 	}
 
@@ -684,30 +668,9 @@ class WebGPURenderPipelines {
 
 	}
 
-	_getVertexFormat( type ) {
-
-		// @TODO: This code is GLSL specific. We need to update when we switch to WGSL.
-
-		if ( type === 'float' ) return GPUVertexFormat.Float;
-		if ( type === 'vec2' ) return GPUVertexFormat.Float2;
-		if ( type === 'vec3' ) return GPUVertexFormat.Float3;
-		if ( type === 'vec4' ) return GPUVertexFormat.Float4;
-
-		if ( type === 'int' ) return GPUVertexFormat.Int;
-		if ( type === 'ivec2' ) return GPUVertexFormat.Int2;
-		if ( type === 'ivec3' ) return GPUVertexFormat.Int3;
-		if ( type === 'ivec4' ) return GPUVertexFormat.Int4;
-
-		if ( type === 'uint' ) return GPUVertexFormat.UInt;
-		if ( type === 'uvec2' ) return GPUVertexFormat.UInt2;
-		if ( type === 'uvec3' ) return GPUVertexFormat.UInt3;
-		if ( type === 'uvec4' ) return GPUVertexFormat.UInt4;
-
-		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
-
-	}
-
 }
+
+// GLSL specific codes. We may switch to WGSL at some point.
 
 const ShaderLib = {
 	mesh_basic: {
@@ -799,7 +762,217 @@ const ShaderLib = {
 		void main() {
 			outColor = vec4( 1.0, 0.0, 0.0, 1.0 );
 		}`
+	},
+	// Shader headers for ShaderMaterial
+	shader: {
+		vertexShader: `#version 450
+
+		layout(location = 0) in vec3 position;
+		layout(location = 1) in vec2 uv;
+
+		layout(location = 0) out vec2 vUv;
+
+		layout(set = 0, binding = 0) uniform ModelUniforms {
+			mat4 modelMatrix;
+			mat4 modelViewMatrix;
+		} modelUniforms;
+
+		layout(set = 0, binding = 1) uniform CameraUniforms {
+			mat4 projectionMatrix;
+			mat4 viewMatrix;
+		} cameraUniforms;
+		`,
+		fragmentShader: `#version 450
+
+		layout(location = 0) in vec2 vUv;
+		layout(location = 0) out vec4 outColor;
+		`
 	}
 };
+
+function parseAttributes( vertexShader ) {
+
+	// Find "layout (location = num) in type name" in vertex shader
+	const regex = /^\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
+	let shaderAttribute = null;
+
+	const attributes = [];
+
+	while ( shaderAttribute = regex.exec( vertexShader ) ) {
+
+		const shaderLocation = parseInt( shaderAttribute.groups.location );
+		const arrayStride = getGLSLArrayStride( shaderAttribute.groups.type );
+		const vertexFormat = getGLSLVertexFormat( shaderAttribute.groups.type );
+
+		attributes.push( {
+			name: shaderAttribute.groups.name,
+			arrayStride: arrayStride,
+			slot: shaderLocation,
+			format: vertexFormat
+		} );
+
+	}
+
+	return attributes.sort( function ( a, b ) {
+
+		return a.shaderLocation - b.shaderLocation;
+
+	} );
+
+}
+
+function parseUniforms( vertexShader, fragmentShader ) {
+
+	const uniforms = [
+		parseUniformsInternal( vertexShader, true ),
+		parseUniformsInternal( fragmentShader, false )
+	].flat().sort( function ( a, b ) {
+
+		return a.binding - b.binding;
+
+	} );
+
+	// Find uniforms existing in both vertex and fragment
+	let writeIndex = 0;
+	for ( let readIndex = 0; readIndex < uniforms.length; readIndex ++ ) {
+
+		const uniform1 = uniforms[ readIndex ];
+		const uniform2 = uniforms[ readIndex + 1 ];
+
+		if ( uniform2 && uniform1.binding === uniform2.binding ) {
+
+			uniform1.visibility = 'vertex|fragment';
+			readIndex ++;
+
+		}
+
+		uniforms[ writeIndex ++ ] = uniform1;
+
+	}
+	uniforms.length = writeIndex;
+
+	return uniforms;
+
+}
+
+function parseUniformsInternal( shader, isVertexShader ) {
+
+	// Find "layout (set = setNum, binding = bindingNum) uniform type name;"
+	const regex = /^\s*layout\s*\(\s*set\s*=\s*(?<set>[0-9]+)\s*,\s*binding\s*=\s*(?<binding>[0-9]+)\s*\)\s*uniform\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
+	// Find "layout (set = setNum, binding = bindingNum) uniform type {
+	//   entries
+	// };
+	const blockRegex = /^\s*layout\s*\(\s*set\s*=\s*(?<set>[0-9]+)\s*,\s*binding\s*=\s*(?<binding>[0-9]+)\s*\)\s*uniform\s+(?<type>\w+)\s*\{(?<entries>[^}]*)\}\s*(?<name>\w+)\s*;/gmi;
+	// Find "type name;"
+	const entryRegex = /^\s*(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
+
+	const visibility = isVertexShader ? 'vertex' : 'fragment';
+	const uniforms = [];
+	let shaderUniform = null;
+
+	while ( shaderUniform = regex.exec( shader ) ) {
+
+		const binding = parseInt( shaderUniform.groups.binding );
+		const type = shaderUniform.groups.type;
+		const name = shaderUniform.groups.name;
+
+		let groupType;
+
+		switch ( type ) {
+			case 'sampler':
+				groupType = 'sampler';
+				break;
+			case 'texture2D':
+				groupType = 'sampled-texture';
+				break;
+			default:
+				console.error( 'WebGPURenderer: Unknown uniform type in shader ' + type );
+				break;
+		}
+
+		uniforms.push( {
+			binding: binding,
+			type: type,
+			name: name,
+			groupType: groupType,
+			visibility: visibility
+		} );
+
+	}
+
+	while ( shaderUniform = blockRegex.exec( shader ) ) {
+
+		const binding = parseInt( shaderUniform.groups.binding );
+		const type = shaderUniform.groups.type;
+		const name = shaderUniform.groups.name;
+		const shaderEntries = shaderUniform.groups.entries;
+
+		const entries = [];
+
+		while ( shaderUniform = entryRegex.exec( shaderEntries ) ) {
+
+			entries.push( {
+				type: shaderUniform.groups.type,
+				name: shaderUniform.groups.name
+			} );
+
+		}
+
+		uniforms.push( {
+			binding: binding,
+			type: type,
+			name: name,
+			entries: entries,
+			groupType: 'uniform-buffer',
+			visibility: visibility
+		} );
+
+	}
+
+	return uniforms;
+
+}
+
+function getGLSLArrayStride( type ) {
+
+	if ( type === 'float' ) return 4;
+	if ( type === 'vec2' ) return 8;
+	if ( type === 'vec3' ) return 12;
+	if ( type === 'vec4' ) return 16;
+
+	if ( type === 'int' ) return 4;
+	if ( type === 'ivec2' ) return 8;
+	if ( type === 'ivec3' ) return 12;
+	if ( type === 'ivec4' ) return 16;
+
+	if ( type === 'uint' ) return 4;
+	if ( type === 'uvec2' ) return 8;
+	if ( type === 'uvec3' ) return 12;
+	if ( type === 'uvec4' ) return 16;
+
+	console.error( 'THREE.WebGPURenderer: no this shader variable type support yet.', type );
+
+}
+
+function getGLSLVertexFormat( type ) {
+
+	if ( type === 'float' ) return GPUVertexFormat.Float;
+	if ( type === 'vec2' ) return GPUVertexFormat.Float2;
+	if ( type === 'vec3' ) return GPUVertexFormat.Float3;
+	if ( type === 'vec4' ) return GPUVertexFormat.Float4;
+
+	if ( type === 'int' ) return GPUVertexFormat.Int;
+	if ( type === 'ivec2' ) return GPUVertexFormat.Int2;
+	if ( type === 'ivec3' ) return GPUVertexFormat.Int3;
+	if ( type === 'ivec4' ) return GPUVertexFormat.Int4;
+
+	if ( type === 'uint' ) return GPUVertexFormat.UInt;
+	if ( type === 'uvec2' ) return GPUVertexFormat.UInt2;
+	if ( type === 'uvec3' ) return GPUVertexFormat.UInt3;
+	if ( type === 'uvec4' ) return GPUVertexFormat.UInt4;
+
+	console.error( 'THREE.WebGPURenderer: no this shader variable type support yet.', type );
+
+}
 
 export default WebGPURenderPipelines;

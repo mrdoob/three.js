@@ -133,6 +133,20 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
+	updateByType( uniform, offset ) {
+
+		if ( typeof uniform === 'number' ) return this.updateNumber( uniform, offset );
+		if ( uniform.isVector2 ) return this.updateVector2( uniform, offset );
+		if ( uniform.isVector3 ) return this.updateVector3( uniform, offset );
+		if ( uniform.isColor ) return this.updateColor( uniform, offset );
+		if ( uniform.isVector4 ) return this.updateVector4( uniform, offset );
+		if ( uniform.isMatrix3 ) return this.updateMatrix3( uniform, offset );
+		if ( uniform.isMatrix4 ) return this.updateMatrix4( uniform, offset );
+
+		console.error( 'THREE.UniformGroup: Unsupported uniform value type.', uniform );
+
+	}
+
 	updateNumber( v, offset ) {
 
 		let updated = false;
