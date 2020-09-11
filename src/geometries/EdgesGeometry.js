@@ -29,7 +29,7 @@ class EdgesGeometry extends BufferGeometry {
 
 		const indexAttr = geometry.getIndex();
 		const positionAttr = geometry.getAttribute( 'position' );
-		const indexCount = indexAttr ? indexAttr.count : positionAttr.count / 3;
+		const indexCount = indexAttr ? indexAttr.count : positionAttr.count;
 
 		const indexArr = [ 0, 0, 0 ];
 		const vertKeys = [ 'a', 'b', 'c' ];
