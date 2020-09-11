@@ -23,6 +23,10 @@ class EdgesGeometry extends BufferGeometry {
 
 		thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
+		const precisionPoints = 4;
+		const precision = Math.pow( 10, precisionPoints );
+		const thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
+
 		const indexAttr = geometry.getIndex();
 		const positionAttr = geometry.getAttribute( 'position' );
 		const indexCount = indexAttr ? indexAttr.count : positionAttr.count / 3;
@@ -31,10 +35,6 @@ class EdgesGeometry extends BufferGeometry {
 		const vertKeys = [ 'a', 'b', 'c' ];
 
 		const edgeData = {};
-
-		const precisionPoints = 4;
-		const precision = Math.pow( 10, precisionPoints );
-		const thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
 		const vertices = [];
 		for ( let i = 0; i < indexCount; i += 3 ) {
 
@@ -57,19 +57,25 @@ class EdgesGeometry extends BufferGeometry {
 			_triangle.c.fromBufferAttribute( positionAttr, indexArr[ 2 ] );
 			_triangle.getNormal( _normal );
 
+			// iterate over every edge
 			for ( let j = 0; j < 3; j ++ ) {
 
+				// get the first and next vertex making up the edge
 				const jNext = ( j + 1 ) % 3;
 				const v0 = _triangle[ vertKeys[ j ] ];
 				const v1 = _triangle[ vertKeys[ jNext ] ];
 
+				// create hashes for the edge from the vertices
 				const vecHash0 = `${ Math.round( v0.x * precision ) },${ Math.round( v0.y * precision ) },${ Math.round( v0.y * precision ) }`;
 				const vecHash1 = `${ Math.round( v1.x * precision ) },${ Math.round( v1.y * precision ) },${ Math.round( v1.y * precision ) }`;
+
 				const hash = `${ vecHash0 }_${ vecHash1 }`;
 				const reverseHash = `${ vecHash1 }_${ vecHash0 }`;
 
 				if ( reverseHash in edgeData ) {
 
+					// if we found a sibling edge add it into the vertex array if
+					// it meets the angle threshold and delete the edge from the map.
 					if ( _normal.dot( edgeData[ reverseHash ].normal ) <= thresholdDot ) {
 
 						vertices.push( v0.x, v0.y, v0.z );
@@ -95,6 +101,7 @@ class EdgesGeometry extends BufferGeometry {
 
 		}
 
+		// iterate over all remaining, unmatched edges and add them to the vertex array
 		for ( const key in edgeData ) {
 
 			const { index0, index1 } = edgeData[ key ];
