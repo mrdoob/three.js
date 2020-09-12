@@ -1,7 +1,7 @@
 import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
+import { FloatUniform, Matrix4Uniform } from './WebGPUUniform.js';
 import WebGPUSampler from './WebGPUSampler.js';
 import WebGPUSampledTexture from './WebGPUSampledTexture.js';
-import { Matrix4 } from '../../../../build/three.module.js';
 
 class WebGPUBindings {
 
@@ -97,7 +97,9 @@ class WebGPUBindings {
 				const array = binding.array;
 				const bufferGPU = binding.bufferGPU;
 
-				const needsBufferWrite = binding.update( object, camera );
+				binding.onBeforeUpdate( object, camera );
+
+				const needsBufferWrite = binding.update();
 
 				if ( needsBufferWrite === true ) {
 
@@ -242,33 +244,36 @@ class WebGPUBindings {
 
 		// ubos
 
+		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
+		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
+
 		const modelGroup = new WebGPUUniformsGroup();
 		modelGroup.setName( 'modelUniforms' );
-		modelGroup.setUniform( 'modelMatrix', new Matrix4() );
-		modelGroup.setUniform( 'modelViewMatrix', new Matrix4() );
-		modelGroup.setUpdateCallback( function ( object/*, camera */ ) {
+		modelGroup.addUniform( modelViewUniform );
+		modelGroup.addUniform( modelViewMatrixUniform );
+		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
 
-			let updated = false;
-
-			if ( modelGroup.updateMatrix4( object.matrixWorld, 0 ) ) updated = true;
-			if ( modelGroup.updateMatrix4( object.modelViewMatrix, 16 ) ) updated = true;
-
-			return updated;
+			modelViewUniform.setValue( object.matrixWorld );
+			modelViewMatrixUniform.setValue( object.modelViewMatrix );
 
 		} );
+
+		// opacity
+
+		const opacityUniform = new FloatUniform( 'opacity', 1 );
 
 		const cameraGroup = this.sharedUniformsGroups.get( 'cameraUniforms' );
 
 		const opacityGroup = new WebGPUUniformsGroup();
 		opacityGroup.setName( 'opacityUniforms' );
-		opacityGroup.setUniform( 'opacity', 1.0 );
+		opacityGroup.addUniform( opacityUniform );
 		opacityGroup.visibility = GPUShaderStage.FRAGMENT;
-		opacityGroup.setUpdateCallback( function ( object/*, camera */ ) {
+		opacityGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
 
 			const material = object.material;
 			const opacity = ( material.transparent === true ) ? material.opacity : 1.0;
 
-			return opacityGroup.updateNumber( opacity, 0 );
+			opacityUniform.setValue( opacity );
 
 		} );
 
@@ -300,18 +305,17 @@ class WebGPUBindings {
 
 		// ubos
 
+		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
+		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
+
 		const modelGroup = new WebGPUUniformsGroup();
 		modelGroup.setName( 'modelUniforms' );
-		modelGroup.setUniform( 'modelMatrix', new Matrix4() );
-		modelGroup.setUniform( 'modelViewMatrix', new Matrix4() );
-		modelGroup.setUpdateCallback( function ( object/*, camera */ ) {
+		modelGroup.addUniform( modelViewUniform );
+		modelGroup.addUniform( modelViewMatrixUniform );
+		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
 
-			let updated = false;
-
-			if ( modelGroup.updateMatrix4( object.matrixWorld, 0 ) ) updated = true;
-			if ( modelGroup.updateMatrix4( object.modelViewMatrix, 16 ) ) updated = true;
-
-			return updated;
+			modelViewUniform.setValue( object.matrixWorld );
+			modelViewMatrixUniform.setValue( object.modelViewMatrix );
 
 		} );
 
@@ -332,18 +336,17 @@ class WebGPUBindings {
 
 		// ubos
 
+		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
+		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
+
 		const modelGroup = new WebGPUUniformsGroup();
 		modelGroup.setName( 'modelUniforms' );
-		modelGroup.setUniform( 'modelMatrix', new Matrix4() );
-		modelGroup.setUniform( 'modelViewMatrix', new Matrix4() );
-		modelGroup.setUpdateCallback( function ( object/*, camera */ ) {
+		modelGroup.addUniform( modelViewUniform );
+		modelGroup.addUniform( modelViewMatrixUniform );
+		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
 
-			let updated = false;
-
-			if ( modelGroup.updateMatrix4( object.matrixWorld, 0 ) ) updated = true;
-			if ( modelGroup.updateMatrix4( object.modelViewMatrix, 16 ) ) updated = true;
-
-			return updated;
+			modelViewUniform.setValue( object.matrixWorld );
+			modelViewMatrixUniform.setValue( object.modelViewMatrix );
 
 		} );
 
@@ -360,18 +363,17 @@ class WebGPUBindings {
 
 	_setupSharedUniformsGroups() {
 
+		const projectionMatrixUniform = new Matrix4Uniform( 'projectionMatrix' );
+		const viewMatrixUniform = new Matrix4Uniform( 'viewMatrix' );
+
 		const cameraGroup = new WebGPUUniformsGroup();
 		cameraGroup.setName( 'cameraUniforms' );
-		cameraGroup.setUniform( 'projectionMatrix', new Matrix4() );
-		cameraGroup.setUniform( 'viewMatrix', new Matrix4() );
-		cameraGroup.setUpdateCallback( function ( object, camera ) {
+		cameraGroup.addUniform( projectionMatrixUniform );
+		cameraGroup.addUniform( viewMatrixUniform );
+		cameraGroup.setOnBeforeUpdate( function ( object, camera ) {
 
-			let updated = false;
-
-			if ( cameraGroup.updateMatrix4( camera.projectionMatrix, 0 ) ) updated = true;
-			if ( cameraGroup.updateMatrix4( camera.matrixWorldInverse, 16 ) ) updated = true;
-
-			return updated;
+			projectionMatrixUniform.setValue( camera.projectionMatrix );
+			viewMatrixUniform.setValue( camera.matrixWorldInverse );
 
 		} );
 
