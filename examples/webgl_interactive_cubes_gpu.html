@@ -191,7 +191,7 @@
 
 				// set the view offset to represent just a single pixel under the mouse
 
-				camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, mouse.x * window.devicePixelRatio | 0, mouse.y * window.devicePixelRatio | 0, 1, 1 );
+				camera.setViewOffset( renderer.domElement.width, renderer.domElement.height, mouse.x | 0, mouse.y | 0, 1, 1 );
 
 				// render the scene
 
