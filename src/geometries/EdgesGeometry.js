@@ -23,6 +23,12 @@ class EdgesGeometry extends BufferGeometry {
 
 		thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
+		if ( geometry.isGeometry ) {
+
+			geometry = new BufferGeometry().fromGeometry( geometry );
+
+		}
+
 		const precisionPoints = 4;
 		const precision = Math.pow( 10, precisionPoints );
 		const thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
@@ -33,6 +39,7 @@ class EdgesGeometry extends BufferGeometry {
 
 		const indexArr = [ 0, 0, 0 ];
 		const vertKeys = [ 'a', 'b', 'c' ];
+		const hashes = new Array( 3 );
 
 		const edgeData = {};
 		const vertices = [];
@@ -52,22 +59,33 @@ class EdgesGeometry extends BufferGeometry {
 
 			}
 
-			_triangle.a.fromBufferAttribute( positionAttr, indexArr[ 0 ] );
-			_triangle.b.fromBufferAttribute( positionAttr, indexArr[ 1 ] );
-			_triangle.c.fromBufferAttribute( positionAttr, indexArr[ 2 ] );
+			const { a, b, c } = _triangle;
+			a.fromBufferAttribute( positionAttr, indexArr[ 0 ] );
+			b.fromBufferAttribute( positionAttr, indexArr[ 1 ] );
+			c.fromBufferAttribute( positionAttr, indexArr[ 2 ] );
 			_triangle.getNormal( _normal );
+
+			// create hashes for the edge from the vertices
+			hashes[ 0 ] = `${ Math.round( a.x * precision ) },${ Math.round( a.y * precision ) },${ Math.round( a.z * precision ) }`;
+			hashes[ 1 ] = `${ Math.round( b.x * precision ) },${ Math.round( b.y * precision ) },${ Math.round( b.z * precision ) }`;
+			hashes[ 2 ] = `${ Math.round( c.x * precision ) },${ Math.round( c.y * precision ) },${ Math.round( c.z * precision ) }`;
+
+			// skip degenerate triangles
+			if ( hashes[ 0 ] === hashes[ 1 ] || hashes[ 1 ] === hashes[ 2 ] || hashes[ 2 ] === hashes[ 0 ] ) {
+
+				continue;
+
+			}
 
 			// iterate over every edge
 			for ( let j = 0; j < 3; j ++ ) {
 
 				// get the first and next vertex making up the edge
 				const jNext = ( j + 1 ) % 3;
+				const vecHash0 = hashes[ j ];
+				const vecHash1 = hashes[ jNext ];
 				const v0 = _triangle[ vertKeys[ j ] ];
 				const v1 = _triangle[ vertKeys[ jNext ] ];
-
-				// create hashes for the edge from the vertices
-				const vecHash0 = `${ Math.round( v0.x * precision ) },${ Math.round( v0.y * precision ) },${ Math.round( v0.y * precision ) }`;
-				const vecHash1 = `${ Math.round( v1.x * precision ) },${ Math.round( v1.y * precision ) },${ Math.round( v1.y * precision ) }`;
 
 				const hash = `${ vecHash0 }_${ vecHash1 }`;
 				const reverseHash = `${ vecHash1 }_${ vecHash0 }`;
@@ -83,10 +101,11 @@ class EdgesGeometry extends BufferGeometry {
 
 					}
 
-					delete edgeData[ reverseHash ];
+					edgeData[ reverseHash ] = null;
 
-				} else {
+				} else if ( ! ( hash in edgeData ) ) {
 
+					// if we've already got an edge here then skip adding a new one
 					edgeData[ hash ] = {
 
 						index0: indexArr[ j ],
@@ -104,12 +123,16 @@ class EdgesGeometry extends BufferGeometry {
 		// iterate over all remaining, unmatched edges and add them to the vertex array
 		for ( const key in edgeData ) {
 
-			const { index0, index1 } = edgeData[ key ];
-			_v0.fromBufferAttribute( positionAttr, index0 );
-			_v1.fromBufferAttribute( positionAttr, index1 );
+			if ( edgeData[ key ] ) {
 
-			vertices.push( _v0.x, _v0.y, _v0.z );
-			vertices.push( _v1.x, _v1.y, _v1.z );
+				const { index0, index1 } = edgeData[ key ];
+				_v0.fromBufferAttribute( positionAttr, index0 );
+				_v1.fromBufferAttribute( positionAttr, index1 );
+
+				vertices.push( _v0.x, _v0.y, _v0.z );
+				vertices.push( _v1.x, _v1.y, _v1.z );
+
+			}
 
 		}
 
