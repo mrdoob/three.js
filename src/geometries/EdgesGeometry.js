@@ -90,7 +90,7 @@ class EdgesGeometry extends BufferGeometry {
 				const hash = `${ vecHash0 }_${ vecHash1 }`;
 				const reverseHash = `${ vecHash1 }_${ vecHash0 }`;
 
-				if ( reverseHash in edgeData ) {
+				if ( reverseHash in edgeData && edgeData[ reverseHash ] ) {
 
 					// if we found a sibling edge add it into the vertex array if
 					// it meets the angle threshold and delete the edge from the map.
