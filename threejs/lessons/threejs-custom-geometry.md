@@ -294,8 +294,7 @@ It's important to notice `faceVertexUvs` is an array of layers. Each layer
 is another set of UV coordinates. By default there is one layer of UV coordinates,
 layer 0, so we just add our UVs to that layer.
 
-Let's [add a texture](threejs-textures.html) to our material and switch back
-back to compute face normals
+Let's [add a texture](threejs-textures.html) to our material and switch back to compute face normals
 
 ```js
 -geometry.computeVertexNormals();
