@@ -6,7 +6,7 @@ function AmbientLight( color, intensity ) {
 
 	this.type = 'AmbientLight';
 
-	this.castShadow = false;
+	this.castShadow = undefined;
 
 }
 
