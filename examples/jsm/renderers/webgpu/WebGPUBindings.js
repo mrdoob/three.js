@@ -5,12 +5,13 @@ import WebGPUSampledTexture from './WebGPUSampledTexture.js';
 
 class WebGPUBindings {
 
-	constructor( device, info, properties, textures ) {
+	constructor( device, info, properties, textures, pipelines ) {
 
 		this.device = device;
 		this.info = info;
 		this.properties = properties;
 		this.textures = textures;
+		this.pipelines = pipelines;
 
 		this.uniformsData = new WeakMap();
 
@@ -28,6 +29,7 @@ class WebGPUBindings {
 
 		if ( data === undefined ) {
 
+			const pipeline = this.pipelines.get( object );
 			const material = object.material;
 			let bindings;
 
@@ -53,7 +55,7 @@ class WebGPUBindings {
 
 			// setup (static) binding layout and (dynamic) binding group
 
-			const bindLayout = this._createBindLayout( bindings );
+			const bindLayout = pipeline.getBindGroupLayout( 0 );
 			const bindGroup = this._createBindGroup( bindings, bindLayout );
 
 			data = {
@@ -161,23 +163,6 @@ class WebGPUBindings {
 
 		this.uniformsData = new WeakMap();
 		this.updateMap = new WeakMap();
-
-	}
-
-	_createBindLayout( bindings ) {
-
-		let bindingPoint = 0;
-		const entries = [];
-
-		for ( const binding of bindings ) {
-
-			entries.push( { binding: bindingPoint, visibility: binding.visibility, type: binding.type } );
-
-			bindingPoint ++;
-
-		}
-
-		return this.device.createBindGroupLayout( { entries: entries } );
 
 	}
 
