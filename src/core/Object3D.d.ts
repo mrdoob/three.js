@@ -135,7 +135,7 @@ export class Object3D extends EventDispatcher {
 	 * Gets rendered into shadow map.
 	 * @default false
 	 */
-	castShadow: boolean;
+	castShadow: undefined | boolean;
 
 	/**
 	 * Material gets baked in shadow receiving.
