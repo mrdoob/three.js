@@ -227,7 +227,9 @@ class WebGPUBindings {
 
 		const bindings = [];
 
-		// ubos
+		// UBOs
+
+		// model
 
 		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
 		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
@@ -243,11 +245,13 @@ class WebGPUBindings {
 
 		} );
 
-		// opacity
-
-		const opacityUniform = new FloatUniform( 'opacity', 1 );
+		// camera
 
 		const cameraGroup = this.sharedUniformsGroups.get( 'cameraUniforms' );
+
+		// material (opacity for testing)
+
+		const opacityUniform = new FloatUniform( 'opacity', 1 );
 
 		const opacityGroup = new WebGPUUniformsGroup();
 		opacityGroup.setName( 'opacityUniforms' );
@@ -262,17 +266,17 @@ class WebGPUBindings {
 
 		} );
 
-		// samplers
+		// sampler
 
 		const diffuseSampler = new WebGPUSampler();
 		diffuseSampler.setName( 'map' );
 
-		// textures
+		// texture
 
 		const diffuseTexture = new WebGPUSampledTexture();
 		diffuseTexture.setName( 'map' );
 
-		//
+		// the order of WebGPUBinding objects must match the binding order in the shader
 
 		bindings.push( modelGroup );
 		bindings.push( cameraGroup );
@@ -288,7 +292,7 @@ class WebGPUBindings {
 
 		const bindings = [];
 
-		// ubos
+		// UBOs
 
 		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
 		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
@@ -319,7 +323,7 @@ class WebGPUBindings {
 
 		const bindings = [];
 
-		// ubos
+		// UBOs
 
 		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
 		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );

@@ -7,6 +7,9 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		super();
 
 		this.name = '';
+
+		 // the order of uniforms in this array must match the order of uniforms in the shader
+
 		this.uniforms = [];
 
 		this.onBeforeUpdate = function () {};
