@@ -2,16 +2,6 @@ import { IUniform } from '../renderers/shaders/UniformsLib';
 import { MaterialParameters, Material } from './Material';
 import { GLSLVersion } from '../constants';
 
-/**
- * @deprecated Use {@link PointsMaterial THREE.PointsMaterial} instead
- */
-/**
- * @deprecated Use {@link PointsMaterial THREE.PointsMaterial} instead
- */
-/**
- * @deprecated Use {@link PointsMaterial THREE.PointsMaterial} instead
- */
-
 export interface ShaderMaterialParameters extends MaterialParameters {
 	uniforms?: { [uniform: string]: IUniform };
 	vertexShader?: string;
