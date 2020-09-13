@@ -23,7 +23,7 @@ export class AmbientLight extends Light {
 	/**
 	 * This light cannot be used to cast shadows as it does not have a direction. 
 	 */
-	castShadow: false;
+	castShadow: undefined;
 	readonly isAmbientLight: true;
 
 }
