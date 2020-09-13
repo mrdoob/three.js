@@ -172,9 +172,9 @@ class WebGPURenderer {
 		this._attributes = new WebGPUAttributes( device );
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
 		this._textures = new WebGPUTextures( device, this._properties, this._info, compiler );
-		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
-		this._renderPipelines = new WebGPURenderPipelines( device, compiler, this._bindings, parameters.sampleCount );
+		this._renderPipelines = new WebGPURenderPipelines( device, compiler, parameters.sampleCount );
+		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines );
 		this._renderLists = new WebGPURenderLists();
 		this._background = new WebGPUBackground( this );
 

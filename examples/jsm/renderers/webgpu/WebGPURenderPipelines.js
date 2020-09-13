@@ -11,11 +11,10 @@ import {
 
 class WebGPURenderPipelines {
 
-	constructor( device, glslang, bindings, sampleCount ) {
+	constructor( device, glslang, sampleCount ) {
 
 		this.device = device;
 		this.glslang = glslang;
-		this.bindings = bindings;
 		this.sampleCount = sampleCount;
 
 		this.pipelines = new WeakMap();
@@ -93,11 +92,6 @@ class WebGPURenderPipelines {
 
 			}
 
-			// layout
-
-			const bindLayout = this.bindings.get( object ).layout;
-			const layout = device.createPipelineLayout( { bindGroupLayouts: [ bindLayout ] } );
-
 			// determine shader attributes
 
 			const shaderAttributes = this._parseShaderAttributes( shader.vertexShader );
@@ -163,7 +157,6 @@ class WebGPURenderPipelines {
 			const depthCompare = this._getDepthCompare( material );
 
 			pipeline = device.createRenderPipeline( {
-				layout: layout,
 				vertexStage: moduleVertex,
 				fragmentStage: moduleFragment,
 				primitiveTopology: primitiveTopology,
