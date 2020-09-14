@@ -451,26 +451,6 @@ export class Vector2 implements Vector {
 	rotateAround( center: Vector2, angle: number ): this;
 
 	/**
-	 * Computes the Manhattan length of this vector.
-	 *
-	 * @return {number}
-	 *
-	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
-	 */
-	manhattanLength(): number;
-
-	/**
-	 * Computes the Manhattan length (distance) from this vector to the given vector v
-	 *
-	 * @param {Vector2} v
-	 *
-	 * @return {number}
-	 *
-	 * @see {@link http://en.wikipedia.org/wiki/Taxicab_geometry|Wikipedia: Taxicab Geometry}
-	 */
-	manhattanDistanceTo( v: Vector2 ): number;
-
-	/**
 	 * Sets this vector's x and y from Math.random
 	 */
 	random(): this;
