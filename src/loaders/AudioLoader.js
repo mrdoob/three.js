@@ -20,20 +20,12 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
-		loader.load( url, function ( buffer ) {
+		loader.setResponseModifier( decodeAudioData );
+		loader.load( url, function ( audioBuffer ) {
 
 			try {
 
-				// Create a copy of the buffer. The `decodeAudioData` method
-				// detaches the buffer when complete, preventing reuse.
-				const bufferCopy = buffer.slice( 0 );
-
-				const context = AudioContext.getContext();
-				context.decodeAudioData( bufferCopy, function ( audioBuffer ) {
-
-					onLoad( audioBuffer );
-
-				} );
+				onLoad( audioBuffer );
 
 			} catch ( e ) {
 
@@ -56,6 +48,18 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	}
 
 } );
+
+function decodeAudioData( response, callback ) {
+
+	var context = AudioContext.getContext();
+
+	context.decodeAudioData( response, function ( audioBuffer ) {
+
+		callback( audioBuffer );
+
+	} );
+
+}
 
 
 export { AudioLoader };

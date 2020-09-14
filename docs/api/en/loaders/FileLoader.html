@@ -69,6 +69,9 @@
 			See [page:.setMimeType]. Default is *undefined*.
 		</p>
 
+		<h3>[property:Function responseModifier]</h3>
+		<p>A callback function that can be used to post-process raw response data. The default implementation performs no modification.</p>
+
 		<h3>[property:String responseType]</h3>
 		<p>The expected response type. See [page:.setResponseType]. Default is *undefined*.</p>
 
@@ -97,6 +100,11 @@
 		<p>
 			Set the expected [link:https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types mimeType]
 			of the file being loaded. Note that in many cases this will be determined automatically, so by default it is *undefined*.
+		</p>
+
+		<h3>[method:FileLoader setResponseModifier]( [param:Function responseModifier] )</h3>
+		<p>
+			Changes the response modifier callback function.
 		</p>
 
 		<h3>[method:FileLoader setResponseType]( [param:String responseType] )</h3>

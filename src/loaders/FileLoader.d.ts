@@ -8,6 +8,10 @@ export class FileLoader extends Loader {
 	mimeType: undefined | MimeType;
 	responseType: undefined |string;
 	withCredentials: undefined |string;
+	responseModifier: (
+		response: string | ArrayBuffer,
+		callback: ( response: any ) => void
+	) => void;
 
 	load(
 		url: string,
@@ -16,6 +20,7 @@ export class FileLoader extends Loader {
 		onError?: ( event: ErrorEvent ) => void
 	): any;
 	setMimeType( mimeType: MimeType ): FileLoader;
+	setResponseModifier( responseModifier: ( response: string | ArrayBuffer, callback: ( response: any ) => void ) => void ): FileLoader;
 	setResponseType( responseType: string ): FileLoader;
 	setWithCredentials( value: boolean ): FileLoader;
 

@@ -7,6 +7,8 @@ function FileLoader( manager ) {
 
 	Loader.call( this, manager );
 
+	this.responseModifier = defaultResponseModifier;
+
 }
 
 FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
@@ -167,8 +169,6 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			request.addEventListener( 'load', function ( event ) {
 
-				const response = this.response;
-
 				const callbacks = loading[ url ];
 
 				delete loading[ url ];
@@ -180,18 +180,23 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					if ( this.status === 0 ) console.warn( 'THREE.FileLoader: HTTP Status 0 received.' );
 
-					// Add to cache only on HTTP success, so that we do not cache
-					// error response bodies as proper responses to requests.
-					Cache.add( url, response );
+					scope.responseModifier( this.response, function ( response ) {
 
-					for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
+						// Add to cache only on HTTP success, so that we do not cache
+						// error response bodies as proper responses to requests.
 
-						const callback = callbacks[ i ];
-						if ( callback.onLoad ) callback.onLoad( response );
+						Cache.add( url, response );
 
-					}
+						for ( let i = 0, il = callbacks.length; i < il; i ++ ) {
 
-					scope.manager.itemEnd( url );
+							const callback = callbacks[ i ];
+							if ( callback.onLoad ) callback.onLoad( response );
+
+						}
+
+						scope.manager.itemEnd( url );
+
+					} );
 
 				} else {
 
@@ -279,6 +284,13 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
+	setResponseModifier: function ( value ) {
+
+		this.responseModifier = value;
+		return this;
+
+	},
+
 	setResponseType: function ( value ) {
 
 		this.responseType = value;
@@ -301,6 +313,12 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 	}
 
 } );
+
+function defaultResponseModifier( response, callback ) {
+
+	callback( response ); // no post-processing of response
+
+}
 
 
 export { FileLoader };
