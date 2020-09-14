@@ -519,7 +519,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				// ref https://bl.ocks.org/duhaime/60c7083009bbd49ce50a58c371d8c818
 				var dpr = window.devicePixelRatio || 1;
-        		var bsr = ctx.webkitBackingStorePixelRatio ||
+				var bsr = ctx.webkitBackingStorePixelRatio ||
 					ctx.mozBackingStorePixelRatio ||
 					ctx.msBackingStorePixelRatio ||
 					ctx.oBackingStorePixelRatio ||
