@@ -569,7 +569,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					light.castShadow = attributes.castsShadows;
 					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
 					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
-
 					light.shadow.normalBias = 0.1;
 
 				} else if ( geometry.isPointLight ) {
@@ -613,6 +612,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				if ( light ) {
 
 					light.intensity = geometry.intensity;
+					var _color = geometry.diffuse;
+					var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+					light.color = color;
 					light.userData[ 'attributes' ] = attributes;
 					light.userData[ 'objectType' ] = obj.objectType;
 
@@ -1204,7 +1206,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				/*
 				case rhino.ObjectType.Annotation:
 				case rhino.ObjectType.Hatch:
-				case rhino.ObjectType.SubD:
 				case rhino.ObjectType.ClipPlane:
 				*/
 
