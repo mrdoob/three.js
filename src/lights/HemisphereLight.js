@@ -8,7 +8,7 @@ function HemisphereLight( skyColor, groundColor, intensity ) {
 
 	this.type = 'HemisphereLight';
 
-	this.castShadow = undefined;
+	this.castShadow = false;
 
 	this.position.copy( Object3D.DefaultUp );
 	this.updateMatrix();
