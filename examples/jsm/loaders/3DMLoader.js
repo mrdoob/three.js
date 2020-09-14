@@ -446,12 +446,20 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			case 'Mesh':
 			case 'Extrusion':
+			case 'SubD':
 
 				var geometry = loader.parse( obj.geometry );
 
 				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
 
 					mat.vertexColors = true;
+
+				}
+
+				if ( mat === null ) {
+
+					mat = this._createMaterial();
+					mat = this._compareMaterials( mat );
 
 				}
 
@@ -509,8 +517,21 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var width = ctx.measureText( geometry.text ).width + 10;
 				var height = geometry.fontHeight + 10;
 
-				ctx.canvas.width = width;
-				ctx.canvas.height = height;
+				// ref https://bl.ocks.org/duhaime/60c7083009bbd49ce50a58c371d8c818
+				var dpr = window.devicePixelRatio || 1;
+        		var bsr = ctx.webkitBackingStorePixelRatio ||
+					ctx.mozBackingStorePixelRatio ||
+					ctx.msBackingStorePixelRatio ||
+					ctx.oBackingStorePixelRatio ||
+					ctx.backingStorePixelRatio || 1;
+
+				var r = dpr / bsr;
+
+				ctx.canvas.width = width * r;
+				ctx.canvas.height = height * r;
+				ctx.canvas.style.width = width + 'px';
+				ctx.canvas.style.height = height + 'px';
+				ctx.setTransform( r, 0, 0, r, 0, 0 );
 
 				ctx.font = font;
 				ctx.textBaseline = 'middle';
@@ -1163,6 +1184,20 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				geometry = extractProperties( _geometry );
 				geometry.xform = extractProperties( _geometry.xform );
 				geometry.xform.array = _geometry.xform.toFloatArray( true );
+
+				break;
+
+			case rhino.ObjectType.SubD:
+
+				// TODO: precalculate resulting vertices and faces and warn on excessive results
+				_geometry.subdivide( 3 );
+				var mesh = rhino.Mesh.createFromSubDControlNet( _geometry );
+				if ( mesh ) {
+
+					geometry = mesh.toThreejsJSON();
+					mesh.delete();
+
+				}
 
 				break;
 
