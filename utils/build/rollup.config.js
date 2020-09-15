@@ -320,5 +320,4 @@ export default [
 			}
 		]
 	}
-
 ];
