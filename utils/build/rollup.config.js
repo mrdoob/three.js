@@ -261,7 +261,6 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			glconstants(),
 			glsl(),
 			buble( {
 				transforms: {
@@ -308,7 +307,6 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
-			glconstants(),
 			glsl(),
 			header()
 		],
