@@ -243,13 +243,11 @@ function bubleCleanup() {
 
 function header() {
 
-	const template = "// threejs.org/license\n${code}";
-
 	return {
 
 		renderChunk( code ) {
 
-			return template.replace( '${code}', code );
+			return "// threejs.org/license\n" + code;
 
 		}
 
