@@ -25,13 +25,6 @@ export class HemisphereLight extends Light {
 	 */
 	position: Vector3;
 
-	/**
-	 * This light cannot be used to cast shadows.
-	 * @default false
-	 * @override
-	 */
-	castShadow: boolean;
-
 	groundColor: Color;
 
 	readonly isHemisphereLight: true;
