@@ -629,6 +629,20 @@ function SidebarObject( editor ) {
 
 		}
 
+		//
+
+		if ( object.isLight ) {
+
+			objectReceiveShadow.setDisplay( 'none' );
+
+		}
+
+		if ( object.isAmbientLight || object.isHemisphereLight ) {
+
+			objectShadowRow.setDisplay( 'none' );
+
+		}
+
 	}
 
 	function updateTransformRows( object ) {
