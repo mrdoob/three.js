@@ -69,6 +69,13 @@ THREE.STLLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+
+		if ( scope.crossOrigin === 'use-credentials' ) {
+
+			loader.setWithCredentials( true );
+
+		}
+
 		loader.load( url, function ( text ) {
 
 			try {
