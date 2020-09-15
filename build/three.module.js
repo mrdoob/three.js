@@ -1,3 +1,4 @@
+// threejs.org/license
 // Polyfills
 
 if ( Number.EPSILON === undefined ) {
@@ -32573,6 +32574,11 @@ function toJSON$1( shapes, data ) {
 
 }
 
+const _v0$2 = new Vector3();
+const _v1$5 = new Vector3();
+const _normal$1 = new Vector3();
+const _triangle = new Triangle();
+
 class EdgesGeometry extends BufferGeometry {
 
 	constructor( geometry, thresholdAngle ) {
@@ -32587,60 +32593,96 @@ class EdgesGeometry extends BufferGeometry {
 
 		thresholdAngle = ( thresholdAngle !== undefined ) ? thresholdAngle : 1;
 
-		// buffer
+		if ( geometry.isGeometry ) {
 
-		const vertices = [];
-
-		// helper variables
-
-		const thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
-		const edge = [ 0, 0 ], edges = {};
-		let edge1, edge2, key;
-		const keys = [ 'a', 'b', 'c' ];
-
-		// prepare source geometry
-
-		let geometry2;
-
-		if ( geometry.isBufferGeometry ) {
-
-			geometry2 = new Geometry();
-			geometry2.fromBufferGeometry( geometry );
-
-		} else {
-
-			geometry2 = geometry.clone();
+			geometry = new BufferGeometry().fromGeometry( geometry );
 
 		}
 
-		geometry2.mergeVertices();
-		geometry2.computeFaceNormals();
+		const precisionPoints = 4;
+		const precision = Math.pow( 10, precisionPoints );
+		const thresholdDot = Math.cos( MathUtils.DEG2RAD * thresholdAngle );
 
-		const sourceVertices = geometry2.vertices;
-		const faces = geometry2.faces;
+		const indexAttr = geometry.getIndex();
+		const positionAttr = geometry.getAttribute( 'position' );
+		const indexCount = indexAttr ? indexAttr.count : positionAttr.count;
 
-		// now create a data structure where each entry represents an edge with its adjoining faces
+		const indexArr = [ 0, 0, 0 ];
+		const vertKeys = [ 'a', 'b', 'c' ];
+		const hashes = new Array( 3 );
 
-		for ( let i = 0, l = faces.length; i < l; i ++ ) {
+		const edgeData = {};
+		const vertices = [];
+		for ( let i = 0; i < indexCount; i += 3 ) {
 
-			const face = faces[ i ];
+			if ( indexAttr ) {
 
+				indexArr[ 0 ] = indexAttr.getX( i );
+				indexArr[ 1 ] = indexAttr.getX( i + 1 );
+				indexArr[ 2 ] = indexAttr.getX( i + 2 );
+
+			} else {
+
+				indexArr[ 0 ] = i;
+				indexArr[ 1 ] = i + 1;
+				indexArr[ 2 ] = i + 2;
+
+			}
+
+			const { a, b, c } = _triangle;
+			a.fromBufferAttribute( positionAttr, indexArr[ 0 ] );
+			b.fromBufferAttribute( positionAttr, indexArr[ 1 ] );
+			c.fromBufferAttribute( positionAttr, indexArr[ 2 ] );
+			_triangle.getNormal( _normal$1 );
+
+			// create hashes for the edge from the vertices
+			hashes[ 0 ] = `${ Math.round( a.x * precision ) },${ Math.round( a.y * precision ) },${ Math.round( a.z * precision ) }`;
+			hashes[ 1 ] = `${ Math.round( b.x * precision ) },${ Math.round( b.y * precision ) },${ Math.round( b.z * precision ) }`;
+			hashes[ 2 ] = `${ Math.round( c.x * precision ) },${ Math.round( c.y * precision ) },${ Math.round( c.z * precision ) }`;
+
+			// skip degenerate triangles
+			if ( hashes[ 0 ] === hashes[ 1 ] || hashes[ 1 ] === hashes[ 2 ] || hashes[ 2 ] === hashes[ 0 ] ) {
+
+				continue;
+
+			}
+
+			// iterate over every edge
 			for ( let j = 0; j < 3; j ++ ) {
 
-				edge1 = face[ keys[ j ] ];
-				edge2 = face[ keys[ ( j + 1 ) % 3 ] ];
-				edge[ 0 ] = Math.min( edge1, edge2 );
-				edge[ 1 ] = Math.max( edge1, edge2 );
+				// get the first and next vertex making up the edge
+				const jNext = ( j + 1 ) % 3;
+				const vecHash0 = hashes[ j ];
+				const vecHash1 = hashes[ jNext ];
+				const v0 = _triangle[ vertKeys[ j ] ];
+				const v1 = _triangle[ vertKeys[ jNext ] ];
 
-				key = edge[ 0 ] + ',' + edge[ 1 ];
+				const hash = `${ vecHash0 }_${ vecHash1 }`;
+				const reverseHash = `${ vecHash1 }_${ vecHash0 }`;
 
-				if ( edges[ key ] === undefined ) {
+				if ( reverseHash in edgeData && edgeData[ reverseHash ] ) {
 
-					edges[ key ] = { index1: edge[ 0 ], index2: edge[ 1 ], face1: i, face2: undefined };
+					// if we found a sibling edge add it into the vertex array if
+					// it meets the angle threshold and delete the edge from the map.
+					if ( _normal$1.dot( edgeData[ reverseHash ].normal ) <= thresholdDot ) {
 
-				} else {
+						vertices.push( v0.x, v0.y, v0.z );
+						vertices.push( v1.x, v1.y, v1.z );
 
-					edges[ key ].face2 = i;
+					}
+
+					edgeData[ reverseHash ] = null;
+
+				} else if ( ! ( hash in edgeData ) ) {
+
+					// if we've already got an edge here then skip adding a new one
+					edgeData[ hash ] = {
+
+						index0: indexArr[ j ],
+						index1: indexArr[ jNext ],
+						normal: _normal$1.clone(),
+
+					};
 
 				}
 
@@ -32648,27 +32690,21 @@ class EdgesGeometry extends BufferGeometry {
 
 		}
 
-		// generate vertices
+		// iterate over all remaining, unmatched edges and add them to the vertex array
+		for ( const key in edgeData ) {
 
-		for ( key in edges ) {
+			if ( edgeData[ key ] ) {
 
-			const e = edges[ key ];
+				const { index0, index1 } = edgeData[ key ];
+				_v0$2.fromBufferAttribute( positionAttr, index0 );
+				_v1$5.fromBufferAttribute( positionAttr, index1 );
 
-			// an edge is only rendered if the angle (in degrees) between the face normals of the adjoining faces exceeds this value. default = 1 degree.
-
-			if ( e.face2 === undefined || faces[ e.face1 ].normal.dot( faces[ e.face2 ].normal ) <= thresholdDot ) {
-
-				let vertex = sourceVertices[ e.index1 ];
-				vertices.push( vertex.x, vertex.y, vertex.z );
-
-				vertex = sourceVertices[ e.index2 ];
-				vertices.push( vertex.x, vertex.y, vertex.z );
+				vertices.push( _v0$2.x, _v0$2.y, _v0$2.z );
+				vertices.push( _v1$5.x, _v1$5.y, _v1$5.z );
 
 			}
 
 		}
-
-		// build geometry
 
 		this.setAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );
 
@@ -39079,8 +39115,6 @@ function Light( color, intensity ) {
 	this.color = new Color( color );
 	this.intensity = intensity !== undefined ? intensity : 1;
 
-	this.receiveShadow = undefined;
-
 }
 
 Light.prototype = Object.assign( Object.create( Object3D.prototype ), {
@@ -39127,8 +39161,6 @@ function HemisphereLight( skyColor, groundColor, intensity ) {
 	Light.call( this, skyColor, intensity );
 
 	this.type = 'HemisphereLight';
-
-	this.castShadow = undefined;
 
 	this.position.copy( Object3D.DefaultUp );
 	this.updateMatrix();
@@ -39711,8 +39743,6 @@ function AmbientLight( color, intensity ) {
 	Light.call( this, color, intensity );
 
 	this.type = 'AmbientLight';
-
-	this.castShadow = undefined;
 
 }
 
@@ -41714,7 +41744,10 @@ ImageBitmapLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 
 		}
 
-		fetch( url ).then( function ( res ) {
+		const fetchOptions = {};
+		fetchOptions.credentials = ( this.crossOrigin === 'anonymous' ) ? 'same-origin' : 'include';
+
+		fetch( url, fetchOptions ).then( function ( res ) {
 
 			return res.blob();
 
@@ -46128,20 +46161,6 @@ InstancedInterleavedBuffer.prototype = Object.assign( Object.create( Interleaved
 
 } );
 
-/**
- * @author raub / https://github.com/raub
- */
-
-/**
- * Element size is one of:
- * 5126: 4
- * 5123: 2
- * 5122: 2
- * 5125: 4
- * 5124: 4
- * 5120: 1
- * 5121: 1
- */
 function GLBufferAttribute( buffer, type, itemSize, elementSize, count ) {
 
 	this.buffer = buffer;
@@ -47342,7 +47361,7 @@ class PolarGridHelper extends LineSegments {
 
 }
 
-const _v1$5 = /*@__PURE__*/ new Vector3();
+const _v1$6 = /*@__PURE__*/ new Vector3();
 const _v2$3 = /*@__PURE__*/ new Vector3();
 const _v3$1 = /*@__PURE__*/ new Vector3();
 
@@ -47396,9 +47415,9 @@ class DirectionalLightHelper extends Object3D {
 
 	update() {
 
-		_v1$5.setFromMatrixPosition( this.light.matrixWorld );
+		_v1$6.setFromMatrixPosition( this.light.matrixWorld );
 		_v2$3.setFromMatrixPosition( this.light.target.matrixWorld );
-		_v3$1.subVectors( _v2$3, _v1$5 );
+		_v3$1.subVectors( _v2$3, _v1$6 );
 
 		this.lightPlane.lookAt( _v2$3 );
 
