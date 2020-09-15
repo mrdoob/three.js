@@ -80,6 +80,7 @@ var GLTFLoader = ( function () {
 			return new GLTFMaterialsClearcoatExtension( parser );
 
 		} );
+
 		this.register( function ( parser ) {
 
 			return new GLTFTextureBasisUExtension( parser );
@@ -89,6 +90,12 @@ var GLTFLoader = ( function () {
 		this.register( function ( parser ) {
 
 			return new GLTFMaterialsTransmissionExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
+			return new GLTFLightsExtension( parser );
 
 		} );
 
@@ -298,10 +305,6 @@ var GLTFLoader = ( function () {
 
 					switch ( extensionName ) {
 
-						case EXTENSIONS.KHR_LIGHTS_PUNCTUAL:
-							extensions[ extensionName ] = new GLTFLightsExtension( json );
-							break;
-
 						case EXTENSIONS.KHR_MATERIALS_UNLIT:
 							extensions[ extensionName ] = new GLTFMaterialsUnlitExtension();
 							break;
@@ -426,21 +429,53 @@ var GLTFLoader = ( function () {
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
 	 */
-	function GLTFLightsExtension( json ) {
+	function GLTFLightsExtension( parser ) {
 
+		this.parser = parser;
 		this.name = EXTENSIONS.KHR_LIGHTS_PUNCTUAL;
 
-		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ] ) || {};
-		this.lightDefs = extension.lights || [];
+		// Object3D instance caches
+		this.cache = { refs: {}, uses: {} };
 
 	}
 
-	GLTFLightsExtension.prototype.loadLight = function ( lightIndex ) {
+	GLTFLightsExtension.prototype._markDefs = function () {
 
-		var lightDef = this.lightDefs[ lightIndex ];
+		var parser = this.parser;
+		var nodeDefs = this.parser.json.nodes || [];
+
+		for ( var nodeIndex = 0, nodeLength = nodeDefs.length; nodeIndex < nodeLength; nodeIndex ++ ) {
+
+			var nodeDef = nodeDefs[ nodeIndex ];
+
+			if ( nodeDef.extensions
+				&& nodeDef.extensions[ this.name ]
+				&& nodeDef.extensions[ this.name ].light !== undefined ) {
+
+				parser._addNodeRef( this.cache, nodeDef.extensions[ this.name ].light );
+
+			}
+
+		}
+
+	};
+
+	GLTFLightsExtension.prototype._loadLight = function ( lightIndex ) {
+
+		var parser = this.parser;
+		var cacheKey = 'light:' + lightIndex;
+		var dependency = parser.cache.get( cacheKey );
+
+		if ( dependency ) return dependency;
+
+		var json = parser.json;
+		var extensions = ( json.extensions && json.extensions[ this.name ] ) || {};
+		var lightDefs = extensions.lights || [];
+		var lightDef = lightDefs[ lightIndex ];
 		var lightNode;
 
 		var color = new Color( 0xffffff );
+
 		if ( lightDef.color !== undefined ) color.fromArray( lightDef.color );
 
 		var range = lightDef.range !== undefined ? lightDef.range : 0;
@@ -486,7 +521,30 @@ var GLTFLoader = ( function () {
 
 		lightNode.name = lightDef.name || ( 'light_' + lightIndex );
 
-		return Promise.resolve( lightNode );
+		dependency = Promise.resolve( lightNode );
+
+		parser.cache.add( cacheKey, dependency );
+
+		return dependency;
+
+	};
+
+	GLTFLightsExtension.prototype.createNodeAttachment = function ( nodeIndex ) {
+
+		var self = this;
+		var parser = this.parser;
+		var json = parser.json;
+		var nodeDef = json.nodes[ nodeIndex ];
+		var lightDef = ( nodeDef.extensions && nodeDef.extensions[ this.name ] ) || {};
+		var lightIndex = lightDef.light;
+
+		if ( lightIndex === undefined ) return null;
+
+		return this._loadLight( lightIndex ).then( function ( light ) {
+
+			return parser._getNodeRef( self.cache, lightIndex, light );
+
+		} );
 
 	};
 
@@ -1731,7 +1789,11 @@ var GLTFLoader = ( function () {
 		this.cache.removeAll();
 
 		// Mark the special nodes/meshes in json for efficient parse
-		this._markDefs();
+		this._invokeAll( function ( ext ) {
+
+			return ext._markDefs && ext._markDefs();
+
+		} );
 
 		Promise.all( [
 
@@ -1811,14 +1873,6 @@ var GLTFLoader = ( function () {
 
 			}
 
-			if ( nodeDef.extensions
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
-
-				this._addNodeRef( this.lightCache, nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light );
-
-			}
-
 		}
 
 	};
@@ -1883,11 +1937,13 @@ var GLTFLoader = ( function () {
 
 		for ( var i = 0; i < extensions.length; i ++ ) {
 
-			pending.push( func( extensions[ i ] ) );
+			var result = func( extensions[ i ] );
+
+			if ( result ) pending.push( result );
 
 		}
 
-		return Promise.all( pending );
+		return pending;
 
 	};
 
@@ -1964,10 +2020,6 @@ var GLTFLoader = ( function () {
 
 				case 'camera':
 					dependency = this.loadCamera( index );
-					break;
-
-				case 'light':
-					dependency = this.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].loadLight( index );
 					break;
 
 				default:
@@ -2579,11 +2631,11 @@ var GLTFLoader = ( function () {
 
 			} );
 
-			pending.push( this._invokeAll( function ( ext ) {
+			pending.push( Promise.all( this._invokeAll( function ( ext ) {
 
 				return ext.extendMaterialParams && ext.extendMaterialParams( materialIndex, materialParams );
 
-			} ) );
+			} ) ) );
 
 		}
 
@@ -3452,19 +3504,15 @@ var GLTFLoader = ( function () {
 
 			}
 
-			if ( nodeDef.extensions
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
+			parser._invokeAll( function ( ext ) {
 
-				var lightIndex = nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light;
+				return ext.createNodeAttachment && ext.createNodeAttachment( nodeIndex );
 
-				pending.push( parser.getDependency( 'light', lightIndex ).then( function ( light ) {
+			} ).forEach( function ( promise ) {
 
-					return parser._getNodeRef( parser.lightCache, lightIndex, light );
+				pending.push( promise );
 
-				} ) );
-
-			}
+			} );
 
 			return Promise.all( pending );
 
