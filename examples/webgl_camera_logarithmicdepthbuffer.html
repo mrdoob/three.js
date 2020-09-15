@@ -6,6 +6,9 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<style>
+			body{
+				touch-action: none;
+			}
 			.renderer_label {
 				position: absolute;
 				bottom: 1em;
@@ -122,7 +125,7 @@
 
 				// Resize border allows the user to easily compare effects of logarithmic depth buffer over the whole scene
 				border = document.getElementById( 'renderer_border' );
-				border.addEventListener( 'mousedown', onBorderMouseDown );
+				border.addEventListener( 'pointerdown', onBorderPointerDown );
 
 				window.addEventListener( 'mousemove', onMouseMove, false );
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -289,27 +292,24 @@
 
 			}
 
-			function onBorderMouseDown( ev ) {
+			function onBorderPointerDown() {
 
 				// activate draggable window resizing bar
-				window.addEventListener( "mousemove", onBorderMouseMove );
-				window.addEventListener( "mouseup", onBorderMouseUp );
-				ev.stopPropagation();
-				ev.preventDefault();
+				window.addEventListener( "pointermove", onBorderPointerMove );
+				window.addEventListener( "pointerup", onBorderPointerUp );
 
 			}
 
-			function onBorderMouseMove( ev ) {
+			function onBorderPointerMove( ev ) {
 
 				screensplit = Math.max( 0, Math.min( 1, ev.clientX / window.innerWidth ) );
-				ev.stopPropagation();
 
 			}
 
-			function onBorderMouseUp() {
+			function onBorderPointerUp() {
 
-				window.removeEventListener( "mousemove", onBorderMouseMove );
-				window.removeEventListener( "mouseup", onBorderMouseUp );
+				window.removeEventListener( "pointermove", onBorderPointerMove );
+				window.removeEventListener( "pointerup", onBorderPointerUp );
 
 			}
 
