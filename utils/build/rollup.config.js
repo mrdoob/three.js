@@ -317,22 +317,6 @@ export default [
 				indent: '\t'
 			}
 		]
-	},
-	{
-		input: 'src/Three.js',
-		plugins: [
-			glconstants(),
-			glsl(),
-			terser(),
-			header()
-		],
-		output: [
-			{
-				format: 'esm',
-				file: 'build/three.module.min.js',
-				indent: '\t'
-			}
-		]
 	}
 
 ];
