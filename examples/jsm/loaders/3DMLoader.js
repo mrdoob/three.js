@@ -517,15 +517,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var width = ctx.measureText( geometry.text ).width + 10;
 				var height = geometry.fontHeight + 10;
 
-				// ref https://bl.ocks.org/duhaime/60c7083009bbd49ce50a58c371d8c818
-				var dpr = window.devicePixelRatio || 1;
-				var bsr = ctx.webkitBackingStorePixelRatio ||
-					ctx.mozBackingStorePixelRatio ||
-					ctx.msBackingStorePixelRatio ||
-					ctx.oBackingStorePixelRatio ||
-					ctx.backingStorePixelRatio || 1;
-
-				var r = dpr / bsr;
+				var r = window.devicePixelRatio;
 
 				ctx.canvas.width = width * r;
 				ctx.canvas.height = height * r;
