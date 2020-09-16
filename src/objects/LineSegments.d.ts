@@ -19,8 +19,7 @@ export class LineSegments <
 
 	constructor(
 		geometry?: TGeometry,
-		material?: TMaterial,
-		mode?: number
+		material?: TMaterial
 	);
 
 	/**

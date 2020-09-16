@@ -13,9 +13,6 @@ import {
 	StencilOp
 } from '../constants';
 
-// Materials //////////////////////////////////////////////////////////////////////////////////
-export let MaterialIdCount: number;
-
 export interface MaterialParameters {
 	alphaTest?: number;
 	blendDst?: BlendingDstFactor;

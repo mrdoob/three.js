@@ -539,7 +539,7 @@ function SidebarObject( editor ) {
 
 			}
 
-			if ( object.receiveShadow !== undefined && object.receiveShadow !== objectReceiveShadow.getValue() ) {
+			if ( object.receiveShadow !== objectReceiveShadow.getValue() ) {
 
 				if ( object.material !== undefined ) object.material.needsUpdate = true;
 				editor.execute( new SetValueCommand( editor, object, 'receiveShadow', objectReceiveShadow.getValue() ) );
@@ -626,6 +626,20 @@ function SidebarObject( editor ) {
 				uiElement.setDisplay( object[ property ] !== undefined ? '' : 'none' );
 
 			}
+
+		}
+
+		//
+
+		if ( object.isLight ) {
+
+			objectReceiveShadow.setDisplay( 'none' );
+
+		}
+
+		if ( object.isAmbientLight || object.isHemisphereLight ) {
+
+			objectShadowRow.setDisplay( 'none' );
 
 		}
 

@@ -9,6 +9,7 @@
 			body {
 				background-color: #f0f0f0;
 				color: #000;
+				touch-action: none;
 			}
 
 			a {
@@ -138,7 +139,7 @@
 			var selectionBox = new SelectionBox( camera, scene );
 			var helper = new SelectionHelper( selectionBox, renderer, 'selectBox' );
 
-			document.addEventListener( 'mousedown', function ( event ) {
+			document.addEventListener( 'pointerdown', function ( event ) {
 
 				for ( var item of selectionBox.collection ) {
 
@@ -153,7 +154,7 @@
 
 			} );
 
-			document.addEventListener( 'mousemove', function ( event ) {
+			document.addEventListener( 'pointermove', function ( event ) {
 
 				if ( helper.isDown ) {
 
@@ -180,7 +181,7 @@
 
 			} );
 
-			document.addEventListener( 'mouseup', function ( event ) {
+			document.addEventListener( 'pointerup', function ( event ) {
 
 				selectionBox.endPoint.set(
 					( event.clientX / window.innerWidth ) * 2 - 1,

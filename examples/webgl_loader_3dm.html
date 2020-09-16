@@ -15,7 +15,6 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-			import { CSS2DRenderer } from './jsm/renderers/CSS2DRenderer.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { Rhino3dmLoader } from './jsm/loaders/3DMLoader.js';
@@ -23,7 +22,7 @@
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			var container, controls;
-			var camera, scene, renderer, labelRenderer;
+			var camera, scene, renderer;
 			var gui;
 
 			init();
@@ -39,8 +38,6 @@
 				camera.position.set( 26, - 40, 5 );
 
 				scene = new THREE.Scene();
-
-				scene.add( new THREE.AmbientLight( { intensity: 0.0001 } ) );
 
 				var directionalLight = new THREE.DirectionalLight( 0xffffff );
 				directionalLight.position.set( 0, 0, 2 );
@@ -66,12 +63,6 @@
 				renderer.setSize( width, height );
 				container.appendChild( renderer.domElement );
 
-				labelRenderer = new CSS2DRenderer();
-				labelRenderer.setSize( width, height );
-				labelRenderer.domElement.style.position = 'absolute';
-				labelRenderer.domElement.style.top = '0px';
-				container.appendChild( labelRenderer.domElement );
-
 				controls = new OrbitControls( camera, container );
 
 				window.addEventListener( 'resize', resize, false );
@@ -87,7 +78,6 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( width, height );
-				labelRenderer.setSize( width, height );
 
 			}
 
@@ -95,7 +85,6 @@
 
 				controls.update();
 				renderer.render( scene, camera );
-				labelRenderer.render( scene, camera );
 
 				requestAnimationFrame( animate );
 

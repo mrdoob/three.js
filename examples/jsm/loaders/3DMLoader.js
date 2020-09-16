@@ -10,9 +10,19 @@ import {
 	PointsMaterial,
 	Line,
 	LineBasicMaterial,
-	Matrix4
+	Matrix4,
+	DirectionalLight,
+	PointLight,
+	SpotLight,
+	RectAreaLight,
+	Vector3,
+	Sprite,
+	SpriteMaterial,
+	CanvasTexture,
+	LinearFilter,
+	ClampToEdgeWrapping,
+	TextureLoader
 } from "../../../build/three.module.js";
-import { CSS2DObject } from '../renderers/CSS2DRenderer.js';
 
 var Rhino3dmLoader = function ( manager ) {
 
@@ -28,6 +38,8 @@ var Rhino3dmLoader = function ( manager ) {
 	this.workerNextTaskID = 1;
 	this.workerSourceURL = '';
 	this.workerConfig = {};
+
+	this.materials = [];
 
 };
 
@@ -150,6 +162,41 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
+	_compareMaterials: function ( material ) {
+
+		var mat = {};
+		mat.name = material.name;
+		mat.color = {};
+		mat.color.r = material.color.r;
+		mat.color.g = material.color.g;
+		mat.color.b = material.color.b;
+		mat.type = material.type;
+
+		for ( var i = 0; i < this.materials.length; i ++ ) {
+
+			var m = this.materials[ i ];
+			var _mat = {};
+			_mat.name = m.name;
+			_mat.color = {};
+			_mat.color.r = m.color.r;
+			_mat.color.g = m.color.g;
+			_mat.color.b = m.color.b;
+			_mat.type = m.type;
+
+			if ( JSON.stringify( mat ) === JSON.stringify( _mat ) ) {
+
+				return m;
+
+			}
+
+		}
+
+		this.materials.push( material );
+
+		return material;
+
+	},
+
 	_createMaterial: function ( material ) {
 
 		if ( material === undefined ) {
@@ -175,12 +222,60 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
-		return new MeshStandardMaterial( {
+		// console.log( material );
+
+		var mat = new MeshStandardMaterial( {
 			color: diffusecolor,
-			metalness: 0.8,
 			name: material.name,
-			side: 2
+			side: 2,
+			transparent: material.transparency > 0 ? true : false,
+			opacity: 1.0 - material.transparency
 		} );
+
+		var textureLoader = new TextureLoader();
+
+		for ( var i = 0; i < material.textures.length; i ++ ) {
+
+			var texture = material.textures[ i ];
+
+			if ( texture.image !== null ) {
+
+				var map = textureLoader.load( texture.image );
+
+				switch ( texture.type ) {
+
+					case 'Diffuse':
+
+						mat.map = map;
+
+						break;
+
+					case 'Bump':
+
+						mat.bumpMap = map;
+
+						break;
+
+					case 'Transparency':
+
+						mat.alphaMap = map;
+						mat.transparent = true;
+
+						break;
+
+					case 'Emap':
+
+						mat.envMap = map;
+
+						break;
+
+				}
+
+			}
+
+		}
+
+		return mat;
 
 	},
 
@@ -195,6 +290,7 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		object.userData[ 'layers' ] = data.layers;
 		object.userData[ 'groups' ] = data.groups;
+		object.userData[ 'settings' ] = data.settings;
 
 		var objects = data.objects;
 		var materials = data.materials;
@@ -220,9 +316,28 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 				default:
 
-					var material = this._createMaterial( materials[ attributes.materialIndex ] );
-					var _object = this._createObject( obj, material );
-					_object.visible = data.layers[ attributes.layerIndex ].visible;
+					if ( attributes.hasOwnProperty( 'materialUUID' ) ) {
+
+						var rMaterial = materials.find( m => m.id === attributes.materialUUID );
+						var material = this._createMaterial( rMaterial );
+						material = this._compareMaterials( material );
+						var _object = this._createObject( obj, material );
+
+					} else {
+
+						var _object = this._createObject( obj, null );
+
+					}
+
+					if ( _object === undefined ) {
+
+						continue;
+
+					}
+
+					var layer = data.layers[ attributes.layerIndex ];
+
+					_object.visible = layer ? data.layers[ attributes.layerIndex ].visible : true;
 
 					if ( attributes.isInstanceDefinitionObject ) {
 
@@ -294,6 +409,8 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		}
 
+		this.materials = [];
+
 		return object;
 
 	},
@@ -310,7 +427,18 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'PointSet':
 
 				var geometry = loader.parse( obj.geometry );
-				var material = new PointsMaterial( { sizeAttenuation: true, vertexColors: true } );
+				var _color = attributes.drawColor;
+				var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+				var material = new PointsMaterial( { color: color, sizeAttenuation: false, size: 2 } );
+
+				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
+
+					material.vertexColors = true;
+
+				}
+
+				material = this._compareMaterials( material );
+
 				var points = new Points( geometry, material );
 				points.userData[ 'attributes' ] = attributes;
 				points.userData[ 'objectType' ] = obj.objectType;
@@ -320,6 +448,12 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'Extrusion':
 
 				var geometry = loader.parse( obj.geometry );
+
+				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
+
+					mat.vertexColors = true;
+
+				}
 
 				var mesh = new Mesh( geometry, mat );
 				mesh.castShadow = attributes.castsShadows;
@@ -356,7 +490,10 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var _color = attributes.drawColor;
 				var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
 
-				var lines = new Line( geometry, new LineBasicMaterial( { color: color } ) );
+				var material = new LineBasicMaterial( { color: color } );
+				material = this._compareMaterials( material );
+
+				var lines = new Line( geometry, material );
 				lines.userData[ 'attributes' ] = attributes;
 				lines.userData[ 'objectType' ] = obj.objectType;
 
@@ -365,26 +502,102 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			case 'TextDot':
 
 				geometry = obj.geometry;
-				var dotDiv = document.createElement( 'div' );
-				dotDiv.style.fontFamily = geometry.fontFace;
-				dotDiv.style.fontSize = `${geometry.fontHeight}px`;
-				dotDiv.style.marginTop = '-1em';
-				dotDiv.style.color = '#FFF';
-				dotDiv.style.padding = '2px';
-				dotDiv.style.paddingRight = '5px';
-				dotDiv.style.paddingLeft = '5px';
-				dotDiv.style.borderRadius = '5px';
+
+				var ctx = document.createElement( 'canvas' ).getContext( '2d' );
+				var font = `${geometry.fontHeight}px ${geometry.fontFace}`;
+				ctx.font = font;
+				var width = ctx.measureText( geometry.text ).width + 10;
+				var height = geometry.fontHeight + 10;
+
+				ctx.canvas.width = width;
+				ctx.canvas.height = height;
+
+				ctx.font = font;
+				ctx.textBaseline = 'middle';
+				ctx.textAlign = 'center';
 				var color = attributes.drawColor;
-				dotDiv.style.background = `rgba(${color.r},${color.g},${color.b},${color.a})`;
-				dotDiv.textContent = geometry.text;
-				var dot = new CSS2DObject( dotDiv );
-				var location = geometry.point;
-				dot.position.set( location[ 0 ], location[ 1 ], location[ 2 ] );
+				ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${color.a})`;
+				ctx.fillRect( 0, 0, width, height );
+				ctx.fillStyle = 'white';
+				ctx.fillText( geometry.text, width / 2, height / 2 );
 
-				dot.userData[ 'attributes' ] = attributes;
-				dot.userData[ 'objectType' ] = obj.objectType;
+				var texture = new CanvasTexture( ctx.canvas );
+				texture.minFilter = LinearFilter;
+				texture.wrapS = ClampToEdgeWrapping;
+				texture.wrapT = ClampToEdgeWrapping;
 
-				return dot;
+				var material = new SpriteMaterial( { map: texture, depthTest: false } );
+				var sprite = new Sprite( material );
+				sprite.position.set( geometry.point[ 0 ], geometry.point[ 1 ], geometry.point[ 2 ] );
+				sprite.scale.set( width / 10, height / 10, 1.0 );
+
+				sprite.userData[ 'attributes' ] = attributes;
+				sprite.userData[ 'objectType' ] = obj.objectType;
+
+				return sprite;
+
+			case 'Light':
+
+				geometry = obj.geometry;
+
+				var light;
+
+				if ( geometry.isDirectionalLight ) {
+
+					light = new DirectionalLight();
+					light.castShadow = attributes.castsShadows;
+					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+
+					light.shadow.normalBias = 0.1;
+
+				} else if ( geometry.isPointLight ) {
+
+					light = new PointLight();
+					light.castShadow = attributes.castsShadows;
+					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+					light.shadow.normalBias = 0.1;
+
+				} else if ( geometry.isRectangularLight ) {
+
+					light = new RectAreaLight();
+
+					var width = Math.abs( geometry.width[ 2 ] );
+					var height = Math.abs( geometry.length[ 0 ] );
+
+					light.position.set( geometry.location[ 0 ] - ( height / 2 ), geometry.location[ 1 ], geometry.location[ 2 ] - ( width / 2 ) );
+
+					light.height = height;
+					light.width = width;
+
+					light.lookAt( new Vector3( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] ) );
+
+				} else if ( geometry.isSpotLight ) {
+
+					light = new SpotLight();
+					light.castShadow = attributes.castsShadows;
+					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
+					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
+					light.angle = geometry.spotAngleRadians;
+					light.shadow.normalBias = 0.1;
+
+				} else if ( geometry.isLinearLight ) {
+
+					console.warn( `THREE.3DMLoader:  No conversion exists for linear lights.` );
+
+					return;
+
+				}
+
+				if ( light ) {
+
+					light.intensity = geometry.intensity;
+					light.userData[ 'attributes' ] = attributes;
+					light.userData[ 'objectType' ] = obj.objectType;
+
+				}
+
+				return light;
 
 		}
 
@@ -595,6 +808,13 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			if ( object !== undefined ) {
 
+				if ( object.attributes.materialIndex >= 0 ) {
+
+					var mId = doc.materials().findIndex( object.attributes.materialIndex ).id;
+					object.attributes.materialUUID = mId;
+
+				}
+
 				objects.push( object );
 
 			}
@@ -604,6 +824,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		}
 
 		// Handle instance definitions
+		// console.log( `Instance Definitions Count: ${doc.instanceDefinitions().count()}` );
 
 		for ( var i = 0; i < doc.instanceDefinitions().count(); i ++ ) {
 
@@ -617,17 +838,110 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		// Handle materials
 
+		var textureTypes = [
+			// rhino.TextureType.Bitmap,
+			rhino.TextureType.Diffuse,
+			rhino.TextureType.Bump,
+			rhino.TextureType.Transparency,
+			rhino.TextureType.Opacity,
+			rhino.TextureType.Emap
+		];
+
+		var pbrTextureTypes = [
+			rhino.TextureType.PBR_BaseColor,
+			rhino.TextureType.PBR_Subsurface,
+			rhino.TextureType.PBR_SubsurfaceScattering,
+			rhino.TextureType.PBR_SubsurfaceScatteringRadius,
+			rhino.TextureType.PBR_Metallic,
+			rhino.TextureType.PBR_Specular,
+			rhino.TextureType.PBR_SpecularTint,
+			rhino.TextureType.PBR_Roughness,
+			rhino.TextureType.PBR_Anisotropic,
+			rhino.TextureType.PBR_Anisotropic_Rotation,
+			rhino.TextureType.PBR_Sheen,
+			rhino.TextureType.PBR_SheenTint,
+			rhino.TextureType.PBR_Clearcoat,
+			rhino.TextureType.PBR_ClearcoatBump,
+			rhino.TextureType.PBR_ClearcoatRoughness,
+			rhino.TextureType.PBR_OpacityIor,
+			rhino.TextureType.PBR_OpacityRoughness,
+			rhino.TextureType.PBR_Emission,
+			rhino.TextureType.PBR_AmbientOcclusion,
+			rhino.TextureType.PBR_Displacement
+		];
+
 		for ( var i = 0; i < doc.materials().count(); i ++ ) {
 
 			var _material = doc.materials().get( i );
-			var materialProperties = extractProperties( _material );
-			var pbMaterialProperties = extractProperties( _material.physicallyBased() );
+			var _pbrMaterial = _material.physicallyBased();
 
-			var material = Object.assign( materialProperties, pbMaterialProperties );
+			var material = extractProperties( _material );
+
+			var textures = [];
+
+			for ( var j = 0; j < textureTypes.length; j ++ ) {
+
+				var _texture = _material.getTexture( textureTypes[ j ] );
+				if ( _texture ) {
+
+					var textureType = textureTypes[ j ].constructor.name;
+					textureType = textureType.substring( 12, textureType.length );
+					var texture = { type: textureType };
+
+					var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+
+					if ( image ) {
+
+						texture.image = 'data:image/png;base64,' + image;
+
+					} else {
+
+						console.warn( `THREE.3DMLoader: Image for ${textureType} texture not embedded in file.` );
+						texture.image = null;
+
+					}
+
+					textures.push( texture );
+
+					_texture.delete();
+
+				}
+
+			}
+
+			material.textures = textures;
+
+			if ( _pbrMaterial.supported ) {
+
+				console.log( 'pbr true' );
+
+				for ( var j = 0; j < pbrTextureTypes.length; j ++ ) {
+
+					var _texture = _material.getTexture( textureTypes[ j ] );
+					if ( _texture ) {
+
+						var image = doc.getEmbeddedFileAsBase64( _texture.fileName );
+						var textureType = textureTypes[ j ].constructor.name;
+						textureType = textureType.substring( 12, textureType.length );
+						var texture = { type: textureType, image: 'data:image/png;base64,' + image };
+						textures.push( texture );
+
+						_texture.delete();
+
+					}
+
+				}
+
+				var pbMaterialProperties = extractProperties( _material.physicallyBased() );
+
+				material = Object.assign( pbMaterialProperties, material );
+
+			}
 
 			materials.push( material );
 
 			_material.delete();
+			_pbrMaterial.delete();
 
 		}
 
@@ -690,16 +1004,14 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		//TODO: Handle other document stuff like dimstyles, instance definitions, bitmaps etc.
 
 		// Handle dimstyles
-		// console.log(`Dimstyle Count: ${doc.dimstyles().count()}`);
+		// console.log( `Dimstyle Count: ${doc.dimstyles().count()}` );
 
 		// Handle bitmaps
-		// console.log(`Bitmap Count: ${doc.bitmaps().count()}`);
-
-		// Handle instance definitions
-		// console.log(`Instance Definitions Count: ${doc.instanceDefinitions().count()}`);
+		// console.log( `Bitmap Count: ${doc.bitmaps().count()}` );
 
 		// Handle strings -- this seems to be broken at the moment in rhino3dm
-		// console.log(`Strings Count: ${doc.strings().count()}`);
+		// console.log( `Document Strings Count: ${doc.strings().count()}` );
+
 		/*
 		for( var i = 0; i < doc.strings().count(); i++ ){
 
@@ -740,7 +1052,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				var pts = curveToPoints( _geometry, 100 );
 
 				var position = {};
-				var color = {};
 				var attributes = {};
 				var data = {};
 
@@ -841,6 +1152,12 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				break;
 
+			case rhino.ObjectType.Light:
+
+				geometry = extractProperties( _geometry );
+
+				break;
+
 			case rhino.ObjectType.InstanceReference:
 
 				geometry = extractProperties( _geometry );
@@ -850,7 +1167,6 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 				break;
 
 				/*
-				case rhino.ObjectType.Light:
 				case rhino.ObjectType.Annotation:
 				case rhino.ObjectType.Hatch:
 				case rhino.ObjectType.SubD:
@@ -866,6 +1182,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 		if ( geometry ) {
 
 			var attributes = extractProperties( _attributes );
+			attributes.geometry = extractProperties( _geometry );
 
 			if ( _attributes.groupCount > 0 ) {
 
@@ -873,10 +1190,17 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			}
 
+			if ( _attributes.userStringCount > 0 ) {
+
+				attributes.userStrings = _attributes.getUserStrings();
+
+			}
+
 			attributes.drawColor = _attributes.drawColor( doc );
 
 			objectType = objectType.constructor.name;
 			objectType = objectType.substring( 11, objectType.length );
+			attributes.geometry.objectType = objectType;
 
 			return { geometry, attributes, objectType };
 
@@ -896,7 +1220,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 			} else {
 
-				// console.log(`${property}: ${object[property]}`);
+				// console.log( `${property}: ${object[ property ]}` );
 
 			}
 
@@ -938,7 +1262,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 			for ( var i = 0; i < segmentCount; i ++ ) {
 
 				var segment = curve.segmentCurve( i );
-				var segmentArray = curveToPoints( segment );
+				var segmentArray = curveToPoints( segment, pointCount );
 				rc = rc.concat( segmentArray );
 				segment.delete();
 
@@ -948,9 +1272,21 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 		}
 
+		if ( curve instanceof rhino.ArcCurve ) {
+
+			pointCount = Math.floor( curve.angleDegrees / 5 );
+			pointCount = pointCount < 1 ? 2 : pointCount;
+			// alternative to this hardcoded version: https://stackoverflow.com/a/18499923/2179399
+
+		}
+
 		if ( curve instanceof rhino.NurbsCurve && curve.degree === 1 ) {
 
-			// console.info( 'degree 1 curve' );
+			if ( curve.segmentCount === undefined || curve.segmentCount === 1 ) {
+
+				return [ curve.pointAtStart, curve.pointAtEnd ];
+
+			}
 
 		}
 

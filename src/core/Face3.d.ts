@@ -89,7 +89,7 @@ export class Face3 {
 	vertexColors: Color[];
 
 	/**
-	 * Material index (points to {@link Geometry.materials}).
+	 * Material index (points to {@link Mesh.material}).
 	 * @default 0
 	 */
 	materialIndex: number;

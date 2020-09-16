@@ -30,12 +30,12 @@
 		scene.add( car );
 
 		// Update the render target cube
-		car.setVisible( false );
+		car.visible = false;
 		cubeCamera.position.copy( car.position );
 		cubeCamera.update( renderer, scene );
 
 		// Render the scene
-		car.setVisible( true );
+		car.visible = true;
 		renderer.render( scene, camera );
 		</code>
 

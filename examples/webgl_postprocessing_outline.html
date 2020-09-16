@@ -268,27 +268,15 @@
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
-				window.addEventListener( 'mousemove', onTouchMove );
-				window.addEventListener( 'touchmove', onTouchMove );
+				renderer.domElement.style.touchAction = 'none';
+				renderer.domElement.addEventListener( 'pointermove', onPointerMove, false );
 
-				function onTouchMove( event ) {
+				function onPointerMove( event ) {
 
-					var x, y;
+					if ( event.isPrimary === false ) return;
 
-					if ( event.changedTouches ) {
-
-						x = event.changedTouches[ 0 ].pageX;
-						y = event.changedTouches[ 0 ].pageY;
-
-					} else {
-
-						x = event.clientX;
-						y = event.clientY;
-
-					}
-
-					mouse.x = ( x / window.innerWidth ) * 2 - 1;
-					mouse.y = - ( y / window.innerHeight ) * 2 + 1;
+					mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+					mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
 					checkIntersection();
 

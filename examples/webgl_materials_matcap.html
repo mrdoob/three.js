@@ -25,7 +25,7 @@
 			var mesh, renderer, scene, camera;
 
 			var API = {
-				color: 0xffffff,
+				color: 0xffffff, // sRGB
 				exposure: 1.0
 			};
 
@@ -62,11 +62,14 @@
 				var manager = new THREE.LoadingManager( render );
 
 				// matcap
-				var loader = new EXRLoader( manager );
+				var loader = new EXRLoader( manager )
+					.setDataType( THREE.UnsignedByteType ); // default: FloatType
+
 				var matcap = loader.load( 'textures/matcaps/040full.exr' );
 
 				// normalmap
 				var loader = new THREE.TextureLoader( manager );
+
 				var normalmap = loader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 
 				// model
@@ -77,7 +80,7 @@
 
 					mesh.material = new THREE.MeshMatcapMaterial( {
 
-						color: API.color,
+						color: new THREE.Color().setHex( API.color ).convertSRGBToLinear(),
 						matcap: matcap,
 						normalMap: normalmap
 
@@ -94,14 +97,16 @@
 					.listen()
 					.onChange( function () {
 
-						mesh.material.color.set( API.color ); render();
+						mesh.material.color.set( API.color ).convertSRGBToLinear();
+						render();
 
 					} );
 
 				gui.add( API, 'exposure', 0, 2 )
 					.onChange( function () {
 
-						renderer.toneMappingExposure = API.exposure; render();
+						renderer.toneMappingExposure = API.exposure;
+						render();
 
 					} );
 
@@ -179,6 +184,8 @@
 
 				var loader = new EXRLoader();
 
+				loader.setDataType( THREE.UnsignedByteType ); // default: FloatType
+
 				var texData = loader.parse( contents );
 
 				var texture = new THREE.DataTexture();
@@ -190,9 +197,28 @@
 				texture.format = texData.format;
 				texture.type = texData.type;
 
-				texture.generateMipmaps = false;
-				texture.magFilter = THREE.LinearFilter;
-				texture.minFilter = THREE.LinearFilter;
+				switch ( texture.type ) {
+
+					case THREE.UnsignedByteType:
+
+						texture.encoding = THREE.RGBEEncoding;
+						texture.minFilter = THREE.NearestFilter;
+						texture.magFilter = THREE.NearestFilter;
+						texture.generateMipmaps = false;
+						texture.flipY = false;
+						break;
+
+					case THREE.FloatType:
+					case THREE.HalfFloatType:
+
+						texture.encoding = THREE.LinearEncoding;
+						texture.minFilter = THREE.LinearFilter;
+						texture.magFilter = THREE.LinearFilter;
+						texture.generateMipmaps = false;
+						texture.flipY = false;
+						break;
+
+				}
 
 				updateMatcap( texture );
 

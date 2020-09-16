@@ -253,7 +253,6 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { GPUComputationRenderer } from './jsm/misc/GPUComputationRenderer.js';
 			import { SimplexNoise } from './jsm/math/SimplexNoise.js';
 
@@ -297,6 +296,7 @@
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 3000 );
 				camera.position.set( 0, 200, 350 );
+				camera.lookAt( 0, 0, 0 );
 
 				scene = new THREE.Scene();
 
@@ -313,16 +313,11 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
-				controls.minDistance = 100;
-				controls.maxDistance = 1000;
-
 				stats = new Stats();
 				container.appendChild( stats.dom );
 
-				document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-				document.addEventListener( 'touchstart', onDocumentTouchStart, false );
-				document.addEventListener( 'touchmove', onDocumentTouchMove, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointermove', onPointerMove, false );
 
 				document.addEventListener( 'keydown', function ( event ) {
 
@@ -671,35 +666,11 @@
 
 			}
 
-			function onDocumentMouseMove( event ) {
+			function onPointerMove( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				setMouseCoords( event.clientX, event.clientY );
-
-			}
-
-			function onDocumentTouchStart( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					setMouseCoords( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
-
-
-				}
-
-			}
-
-			function onDocumentTouchMove( event ) {
-
-				if ( event.touches.length === 1 ) {
-
-					event.preventDefault();
-
-					setMouseCoords( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
-
-
-				}
 
 			}
 

@@ -52,8 +52,8 @@
 				const data = new Uint8Array( size * size * size );
 
 				let i = 0;
-				const scale = 0.051;
 				const perlin = new ImprovedNoise();
+				const vector = new THREE.Vector3();
 
 				for ( let z = 0; z < size; z ++ ) {
 
@@ -61,8 +61,11 @@
 
 						for ( let x = 0; x < size; x ++ ) {
 
-							data[ i ] = 128 + 128 * perlin.noise( x * scale, y * scale, z * scale );
-							i ++;
+							vector.set( x, y, z ).divideScalar( size );
+
+							const d = perlin.noise( vector.x * 6.5, vector.y * 6.5, vector.z * 6.5 );
+
+							data[ i ++ ] = d * 128 + 128;
 
 						}
 

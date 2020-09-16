@@ -248,7 +248,7 @@ var XRControllerModelFactory = ( function () {
 						assetPath
 					);
 
-					let cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
+					const cachedAsset = this._assetCache[ controllerModel.motionController.assetUrl ];
 					if ( cachedAsset ) {
 
 						scene = cachedAsset.scene.clone();

@@ -15,8 +15,6 @@ import { EventDispatcher } from './EventDispatcher';
 import { BufferGeometry } from './BufferGeometry';
 import { Intersection } from './Raycaster';
 
-export let Object3DIdCount: number;
-
 /**
  * Base class for scene graph objects
  */

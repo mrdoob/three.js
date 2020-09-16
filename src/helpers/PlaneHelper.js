@@ -10,7 +10,6 @@ class PlaneHelper extends Line {
 
 	constructor( plane, size, hex ) {
 
-
 		const color = ( hex !== undefined ) ? hex : 0xffff00;
 
 		const positions = [ 1, - 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, 1, 1, - 1, 1, 1, - 1, - 1, 1, 1, - 1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0 ];

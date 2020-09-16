@@ -35,7 +35,7 @@ export class WebGLInfo {
 		points: number;
 		triangles: number;
 	};
-	update( count: number, mode: GLenum, instanceCount: number ): void;
+	update( count: number, mode: number, instanceCount: number ): void;
 	reset(): void;
 
 }

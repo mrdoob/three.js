@@ -32,8 +32,6 @@ export interface MorphNormals {
 	normals: Vector3[];
 }
 
-export let GeometryIdCount: number;
-
 /**
  * Base class for geometries
  *

@@ -21,9 +21,9 @@
 			var camera, scene, renderer;
 
 			var isUserInteracting = false,
-				onMouseDownMouseX = 0, onMouseDownMouseY = 0,
-				lon = 0, onMouseDownLon = 0,
-				lat = 0, onMouseDownLat = 0,
+				onPointerDownMouseX = 0, onPointerDownMouseY = 0,
+				lon = 0, onPointerDownLon = 0,
+				lat = 0, onPointerDownLat = 0,
 				phi = 0, theta = 0;
 
 			init();
@@ -56,15 +56,10 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				container.appendChild( renderer.domElement );
 
-				document.addEventListener( 'mousedown', onPointerStart, false );
-				document.addEventListener( 'mousemove', onPointerMove, false );
-				document.addEventListener( 'mouseup', onPointerUp, false );
+				container.style.touchAction = 'none';
+				container.addEventListener( 'pointerdown', onPointerDown, false );
 
 				document.addEventListener( 'wheel', onDocumentMouseWheel, false );
-
-				document.addEventListener( 'touchstart', onPointerStart, false );
-				document.addEventListener( 'touchmove', onPointerMove, false );
-				document.addEventListener( 'touchend', onPointerUp, false );
 
 				//
 
@@ -119,38 +114,40 @@
 
 			}
 
-			function onPointerStart( event ) {
+			function onPointerDown( event ) {
+
+				if ( event.isPrimary === false ) return;
 
 				isUserInteracting = true;
 
-				var clientX = event.clientX || event.touches[ 0 ].clientX;
-				var clientY = event.clientY || event.touches[ 0 ].clientY;
+				onPointerDownMouseX = event.clientX;
+				onPointerDownMouseY = event.clientY;
 
-				onMouseDownMouseX = clientX;
-				onMouseDownMouseY = clientY;
+				onPointerDownLon = lon;
+				onPointerDownLat = lat;
 
-				onMouseDownLon = lon;
-				onMouseDownLat = lat;
+				document.addEventListener( 'pointermove', onPointerMove, false );
+				document.addEventListener( 'pointerup', onPointerUp, false );
 
 			}
 
 			function onPointerMove( event ) {
 
-				if ( isUserInteracting === true ) {
+				if ( event.isPrimary === false ) return;
 
-					var clientX = event.clientX || event.touches[ 0 ].clientX;
-					var clientY = event.clientY || event.touches[ 0 ].clientY;
-
-					lon = ( onMouseDownMouseX - clientX ) * 0.1 + onMouseDownLon;
-					lat = ( clientY - onMouseDownMouseY ) * 0.1 + onMouseDownLat;
-
-				}
+				lon = ( onPointerDownMouseX - event.clientX ) * 0.1 + onPointerDownLon;
+				lat = ( event.clientY - onPointerDownMouseY ) * 0.1 + onPointerDownLat;
 
 			}
 
 			function onPointerUp() {
 
+				if ( event.isPrimary === false ) return;
+
 				isUserInteracting = false;
+
+				document.removeEventListener( 'pointermove', onPointerMove );
+				document.removeEventListener( 'pointerup', onPointerUp );
 
 			}
 

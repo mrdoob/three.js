@@ -389,6 +389,7 @@ var list = {
 			},
 
 			"Loaders": {
+				"3DMLoader": "examples/en/loaders/3DMLoader",
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
@@ -500,7 +501,29 @@ var list = {
 			"الحركات": {
 				"AnimationAction": "api/ar/animation/AnimationAction",
 				"AnimationClip": "api/ar/animation/AnimationClip",
-				"AnimationMixer": "api/ar/animation/AnimationMixer"
+				"AnimationMixer": "api/ar/animation/AnimationMixer",
+				"AnimationObjectGroup": "api/ar/animation/AnimationObjectGroup",
+				"AnimationUtils": "api/ar/animation/AnimationUtils",
+				"KeyframeTrack": "api/ar/animation/KeyframeTrack",
+				"PropertyBinding": "api/ar/animation/PropertyBinding",
+				"PropertyMixer": "api/ar/animation/PropertyMixer"
+			},
+
+			"الحركات / Tracks": {
+				"BooleanKeyframeTrack": "api/ar/animation/tracks/BooleanKeyframeTrack",
+				"ColorKeyframeTrack": "api/ar/animation/tracks/ColorKeyframeTrack",
+				"NumberKeyframeTrack": "api/ar/animation/tracks/NumberKeyframeTrack",
+				"QuaternionKeyframeTrack": "api/ar/animation/tracks/QuaternionKeyframeTrack",
+				"StringKeyframeTrack": "api/ar/animation/tracks/StringKeyframeTrack",
+				"VectorKeyframeTrack": "api/ar/animation/tracks/VectorKeyframeTrack"
+			},
+
+			"Audio": {
+				"Audio": "api/ar/audio/Audio",
+				"AudioAnalyser": "api/ar/audio/AudioAnalyser",
+				"AudioContext": "api/ar/audio/AudioContext",
+				"AudioListener": "api/ar/audio/AudioListener",
+				"PositionalAudio": "api/ar/audio/PositionalAudio"
 			}
 
 		}
@@ -513,7 +536,7 @@ var list = {
 
 			"起步": {
 				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
-				"Installation": "manual/zh/introduction/Installation",
+				"安装": "manual/zh/introduction/Installation",
 				"浏览器支持": "manual/zh/introduction/Browser-support",
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
@@ -882,10 +905,6 @@ var list = {
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
 			},
 
-			"灯光": {
-				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
-			},
-
 			"辅助对象": {
 				"FaceNormalsHelper": "examples/zh/helpers/FaceNormalsHelper",
 				"LightProbeHelper": "examples/zh/helpers/LightProbeHelper",
@@ -893,6 +912,10 @@ var list = {
 				"RectAreaLightHelper": "examples/zh/helpers/RectAreaLightHelper",
 				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper",
 				"VertexTangentsHelper": "examples/zh/helpers/VertexTangentsHelper"
+			},
+
+			"灯光": {
+				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
 			},
 
 			"加载器": {
@@ -903,6 +926,7 @@ var list = {
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"OBJLoader2": "examples/zh/loaders/OBJLoader2",
+				"OBJLoader2Parallel": "examples/zh/loaders/OBJLoader2Parallel",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
 				"PDBLoader": "examples/zh/loaders/PDBLoader",
 				"PRWMLoader": "examples/zh/loaders/PRWMLoader",

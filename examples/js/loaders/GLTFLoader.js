@@ -17,6 +17,7 @@ THREE.GLTFLoader = ( function () {
 			return new GLTFMaterialsClearcoatExtension( parser );
 
 		} );
+
 		this.register( function ( parser ) {
 
 			return new GLTFTextureBasisUExtension( parser );
@@ -26,6 +27,12 @@ THREE.GLTFLoader = ( function () {
 		this.register( function ( parser ) {
 
 			return new GLTFMaterialsTransmissionExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
+			return new GLTFLightsExtension( parser );
 
 		} );
 
@@ -235,10 +242,6 @@ THREE.GLTFLoader = ( function () {
 
 					switch ( extensionName ) {
 
-						case EXTENSIONS.KHR_LIGHTS_PUNCTUAL:
-							extensions[ extensionName ] = new GLTFLightsExtension( json );
-							break;
-
 						case EXTENSIONS.KHR_MATERIALS_UNLIT:
 							extensions[ extensionName ] = new GLTFMaterialsUnlitExtension();
 							break;
@@ -363,21 +366,53 @@ THREE.GLTFLoader = ( function () {
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_lights_punctual
 	 */
-	function GLTFLightsExtension( json ) {
+	function GLTFLightsExtension( parser ) {
 
+		this.parser = parser;
 		this.name = EXTENSIONS.KHR_LIGHTS_PUNCTUAL;
 
-		var extension = ( json.extensions && json.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ] ) || {};
-		this.lightDefs = extension.lights || [];
+		// Object3D instance caches
+		this.cache = { refs: {}, uses: {} };
 
 	}
 
-	GLTFLightsExtension.prototype.loadLight = function ( lightIndex ) {
+	GLTFLightsExtension.prototype._markDefs = function () {
 
-		var lightDef = this.lightDefs[ lightIndex ];
+		var parser = this.parser;
+		var nodeDefs = this.parser.json.nodes || [];
+
+		for ( var nodeIndex = 0, nodeLength = nodeDefs.length; nodeIndex < nodeLength; nodeIndex ++ ) {
+
+			var nodeDef = nodeDefs[ nodeIndex ];
+
+			if ( nodeDef.extensions
+				&& nodeDef.extensions[ this.name ]
+				&& nodeDef.extensions[ this.name ].light !== undefined ) {
+
+				parser._addNodeRef( this.cache, nodeDef.extensions[ this.name ].light );
+
+			}
+
+		}
+
+	};
+
+	GLTFLightsExtension.prototype._loadLight = function ( lightIndex ) {
+
+		var parser = this.parser;
+		var cacheKey = 'light:' + lightIndex;
+		var dependency = parser.cache.get( cacheKey );
+
+		if ( dependency ) return dependency;
+
+		var json = parser.json;
+		var extensions = ( json.extensions && json.extensions[ this.name ] ) || {};
+		var lightDefs = extensions.lights || [];
+		var lightDef = lightDefs[ lightIndex ];
 		var lightNode;
 
 		var color = new THREE.Color( 0xffffff );
+
 		if ( lightDef.color !== undefined ) color.fromArray( lightDef.color );
 
 		var range = lightDef.range !== undefined ? lightDef.range : 0;
@@ -423,7 +458,30 @@ THREE.GLTFLoader = ( function () {
 
 		lightNode.name = lightDef.name || ( 'light_' + lightIndex );
 
-		return Promise.resolve( lightNode );
+		dependency = Promise.resolve( lightNode );
+
+		parser.cache.add( cacheKey, dependency );
+
+		return dependency;
+
+	};
+
+	GLTFLightsExtension.prototype.createNodeAttachment = function ( nodeIndex ) {
+
+		var self = this;
+		var parser = this.parser;
+		var json = parser.json;
+		var nodeDef = json.nodes[ nodeIndex ];
+		var lightDef = ( nodeDef.extensions && nodeDef.extensions[ this.name ] ) || {};
+		var lightIndex = lightDef.light;
+
+		if ( lightIndex === undefined ) return null;
+
+		return this._loadLight( lightIndex ).then( function ( light ) {
+
+			return parser._getNodeRef( self.cache, lightIndex, light );
+
+		} );
 
 	};
 
@@ -893,13 +951,13 @@ THREE.GLTFLoader = ( function () {
 
 		var lightPhysicalFragmentChunk = [
 			'PhysicalMaterial material;',
-			'material.diffuseColor = diffuseColor.rgb;',
+			'material.diffuseColor = diffuseColor.rgb * ( 1. - max( specularFactor.r, max( specularFactor.g, specularFactor.b ) ) );',
 			'vec3 dxy = max( abs( dFdx( geometryNormal ) ), abs( dFdy( geometryNormal ) ) );',
 			'float geometryRoughness = max( max( dxy.x, dxy.y ), dxy.z );',
-			'material.specularRoughness = max( 1.0 - glossinessFactor, 0.0525 );// 0.0525 corresponds to the base mip of a 256 cubemap.',
+			'material.specularRoughness = max( 1.0 - glossinessFactor, 0.0525 ); // 0.0525 corresponds to the base mip of a 256 cubemap.',
 			'material.specularRoughness += geometryRoughness;',
 			'material.specularRoughness = min( material.specularRoughness, 1.0 );',
-			'material.specularColor = specularFactor.rgb;',
+			'material.specularColor = specularFactor;',
 		].join( '\n' );
 
 		var uniforms = {
@@ -911,7 +969,6 @@ THREE.GLTFLoader = ( function () {
 
 		this._extraUniforms = uniforms;
 
-		// please see #14031 or #13198 for an alternate approach
 		this.onBeforeCompile = function ( shader ) {
 
 			for ( var uniformName in uniforms ) {
@@ -920,57 +977,95 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			shader.fragmentShader = shader.fragmentShader.replace( 'uniform float roughness;', 'uniform vec3 specular;' );
-			shader.fragmentShader = shader.fragmentShader.replace( 'uniform float metalness;', 'uniform float glossiness;' );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <roughnessmap_pars_fragment>', specularMapParsFragmentChunk );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <metalnessmap_pars_fragment>', glossinessMapParsFragmentChunk );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <roughnessmap_fragment>', specularMapFragmentChunk );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <metalnessmap_fragment>', glossinessMapFragmentChunk );
-			shader.fragmentShader = shader.fragmentShader.replace( '#include <lights_physical_fragment>', lightPhysicalFragmentChunk );
+			shader.fragmentShader = shader.fragmentShader
+				.replace( 'uniform float roughness;', 'uniform vec3 specular;' )
+				.replace( 'uniform float metalness;', 'uniform float glossiness;' )
+				.replace( '#include <roughnessmap_pars_fragment>', specularMapParsFragmentChunk )
+				.replace( '#include <metalnessmap_pars_fragment>', glossinessMapParsFragmentChunk )
+				.replace( '#include <roughnessmap_fragment>', specularMapFragmentChunk )
+				.replace( '#include <metalnessmap_fragment>', glossinessMapFragmentChunk )
+				.replace( '#include <lights_physical_fragment>', lightPhysicalFragmentChunk );
 
 		};
 
-		/*eslint-disable*/
-		Object.defineProperties(
-			this,
-			{
-				specular: {
-					get: function () { return uniforms.specular.value; },
-					set: function ( v ) { uniforms.specular.value = v; }
+		Object.defineProperties( this, {
+
+			specular: {
+				get: function () {
+
+					return uniforms.specular.value;
+
 				},
-				specularMap: {
-					get: function () { return uniforms.specularMap.value; },
-					set: function ( v ) { uniforms.specularMap.value = v; }
+				set: function ( v ) {
+
+					uniforms.specular.value = v;
+
+				}
+			},
+
+			specularMap: {
+				get: function () {
+
+					return uniforms.specularMap.value;
+
 				},
-				glossiness: {
-					get: function () { return uniforms.glossiness.value; },
-					set: function ( v ) { uniforms.glossiness.value = v; }
-				},
-				glossinessMap: {
-					get: function () { return uniforms.glossinessMap.value; },
-					set: function ( v ) {
+				set: function ( v ) {
 
-						uniforms.glossinessMap.value = v;
-						//how about something like this - @pailhead
-						if ( v ) {
+					uniforms.specularMap.value = v;
 
-							this.defines.USE_GLOSSINESSMAP = '';
-							// set USE_ROUGHNESSMAP to enable vUv
-							this.defines.USE_ROUGHNESSMAP = '';
+					if ( v ) {
 
-						} else {
+						this.defines.USE_SPECULARMAP = ''; // USE_UV is set by the renderer for specular maps
 
-							delete this.defines.USE_ROUGHNESSMAP;
-							delete this.defines.USE_GLOSSINESSMAP;
+					} else {
 
-						}
+						delete this.defines.USE_SPECULARMAP;
 
 					}
+
+				}
+			},
+
+			glossiness: {
+				get: function () {
+
+					return uniforms.glossiness.value;
+
+				},
+				set: function ( v ) {
+
+					uniforms.glossiness.value = v;
+
+				}
+			},
+
+			glossinessMap: {
+				get: function () {
+
+					return uniforms.glossinessMap.value;
+
+				},
+				set: function ( v ) {
+
+					uniforms.glossinessMap.value = v;
+
+					if ( v ) {
+
+						this.defines.USE_GLOSSINESSMAP = '';
+						this.defines.USE_UV = '';
+
+					} else {
+
+						delete this.defines.USE_GLOSSINESSMAP;
+						delete this.defines.USE_UV;
+
+					}
+
 				}
 			}
-		);
 
-		/*eslint-enable*/
+		} );
+
 		delete this.metalness;
 		delete this.roughness;
 		delete this.metalnessMap;
@@ -1631,7 +1726,11 @@ THREE.GLTFLoader = ( function () {
 		this.cache.removeAll();
 
 		// Mark the special nodes/meshes in json for efficient parse
-		this._markDefs();
+		this._invokeAll( function ( ext ) {
+
+			return ext._markDefs && ext._markDefs();
+
+		} );
 
 		Promise.all( [
 
@@ -1711,14 +1810,6 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			if ( nodeDef.extensions
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
-
-				this._addNodeRef( this.lightCache, nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light );
-
-			}
-
 		}
 
 	};
@@ -1783,11 +1874,13 @@ THREE.GLTFLoader = ( function () {
 
 		for ( var i = 0; i < extensions.length; i ++ ) {
 
-			pending.push( func( extensions[ i ] ) );
+			var result = func( extensions[ i ] );
+
+			if ( result ) pending.push( result );
 
 		}
 
-		return Promise.all( pending );
+		return pending;
 
 	};
 
@@ -1864,10 +1957,6 @@ THREE.GLTFLoader = ( function () {
 
 				case 'camera':
 					dependency = this.loadCamera( index );
-					break;
-
-				case 'light':
-					dependency = this.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].loadLight( index );
 					break;
 
 				default:
@@ -2479,11 +2568,11 @@ THREE.GLTFLoader = ( function () {
 
 			} );
 
-			pending.push( this._invokeAll( function ( ext ) {
+			pending.push( Promise.all( this._invokeAll( function ( ext ) {
 
 				return ext.extendMaterialParams && ext.extendMaterialParams( materialIndex, materialParams );
 
-			} ) );
+			} ) ) );
 
 		}
 
@@ -3352,19 +3441,15 @@ THREE.GLTFLoader = ( function () {
 
 			}
 
-			if ( nodeDef.extensions
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ]
-				&& nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light !== undefined ) {
+			parser._invokeAll( function ( ext ) {
 
-				var lightIndex = nodeDef.extensions[ EXTENSIONS.KHR_LIGHTS_PUNCTUAL ].light;
+				return ext.createNodeAttachment && ext.createNodeAttachment( nodeIndex );
 
-				pending.push( parser.getDependency( 'light', lightIndex ).then( function ( light ) {
+			} ).forEach( function ( promise ) {
 
-					return parser._getNodeRef( parser.lightCache, lightIndex, light );
+				pending.push( promise );
 
-				} ) );
-
-			}
+			} );
 
 			return Promise.all( pending );
 

@@ -540,7 +540,7 @@ TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		context.putImageData( imageData, 0, 0 );
 
-		return useOffscreen ? canvas.transferToImageBitmap() : canvas;
+		return canvas;
 
 	}
 

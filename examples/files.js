@@ -317,8 +317,12 @@ var files = {
 		"webgl2_materials_texture2darray",
 		"webgl2_materials_texture3d",
 		"webgl2_multisampled_renderbuffers",
+		"webgl2_volume_cloud",
 		"webgl2_volume_instancing",
 		"webgl2_volume_perlin"
+	],
+	"webgpu": [
+		"webgpu_sandbox"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -336,6 +340,7 @@ var files = {
 		"webxr_vr_handinput",
 		"webxr_vr_handinput_cubes",
 		"webxr_vr_handinput_profiles",
+		"webxr_vr_haptics",
 		"webxr_vr_lorenzattractor",
 		"webxr_vr_panorama",
 		"webxr_vr_panorama_depth",
