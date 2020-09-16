@@ -17,6 +17,7 @@ export interface MeshPhysicalMaterialParameters
 	clearcoatNormalMap?: Texture | null;
 
 	reflectivity?: number;
+	ior?: number;
 
 	sheen?: Color;
 
@@ -73,6 +74,11 @@ export class MeshPhysicalMaterial extends MeshStandardMaterial {
 	 * @default 0.5
 	 */
 	reflectivity: number;
+
+	/**
+	 * @default 1.5
+	 */
+	ior: number;
 
 	/**
 	 * @default null
