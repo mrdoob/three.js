@@ -6,8 +6,6 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 		super();
 
-		this.name = '';
-
 		 // the order of uniforms in this array must match the order of uniforms in the shader
 
 		this.uniforms = [];
@@ -23,12 +21,6 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		this.bufferGPU = null; // set by the renderer
 
 		Object.defineProperty( this, 'isUniformsGroup', { value: true } );
-
-	}
-
-	setName( name ) {
-
-		this.name = name;
 
 	}
 
@@ -59,23 +51,6 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		this.onBeforeUpdate = callback;
 
 		return this;
-
-	}
-
-	copy( source ) {
-
-		this.name = source.name;
-
-		this.uniforms.length = 0;
-		this.uniforms.push( ...source.uniforms );
-
-		return this;
-
-	}
-
-	clone() {
-
-		return new this.constructor().copy( this );
 
 	}
 
