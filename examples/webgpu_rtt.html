@@ -41,9 +41,6 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				cameraFX = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-				sceneFX = new THREE.Scene();
-
 				// textured mesh
 
 				const loader = new THREE.TextureLoader();
@@ -64,19 +61,27 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
+				// @TODO Rename WebGLRenderTarget to RenderTarget? Or introduce WebGPURenderTarget?
+
 				renderTarget = new THREE.WebGLRenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
 				// FX
 
+				cameraFX = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+				sceneFX = new THREE.Scene();
+
+				const geometryFX = new THREE.PlaneBufferGeometry( 2, 2 );
+
 				// @TODO Until NodeMaterial is available just copy the beauty pass to screen
 
-				var geometryFX = new THREE.PlaneBufferGeometry( 2, 2 );
-				var materialFX = new THREE.MeshBasicMaterial( { map: renderTarget.texture } );
+				const materialFX = new THREE.MeshBasicMaterial( { map: renderTarget.texture } );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );
+
+				//
 
 				return renderer.init();
 
