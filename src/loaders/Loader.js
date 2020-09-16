@@ -5,6 +5,7 @@ function Loader( manager ) {
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 	this.crossOrigin = 'anonymous';
+	this.withCredentials = false;
 	this.path = '';
 	this.resourcePath = '';
 	this.requestHeader = {};
@@ -32,6 +33,13 @@ Object.assign( Loader.prototype, {
 	setCrossOrigin: function ( crossOrigin ) {
 
 		this.crossOrigin = crossOrigin;
+		return this;
+
+	},
+
+	setWithCredentials: function ( value ) {
+
+		this.withCredentials = value;
 		return this;
 
 	},
