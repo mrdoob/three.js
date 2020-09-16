@@ -1,4 +1,5 @@
 import buble from 'rollup-plugin-buble';
+import { terser } from "rollup-plugin-terser";
 
 function glconstants() {
 
@@ -240,6 +241,20 @@ function bubleCleanup() {
 
 }
 
+function header() {
+
+	return {
+
+		renderChunk( code ) {
+
+			return "// threejs.org/license\n" + code;
+
+		}
+
+	};
+
+}
+
 export default [
 	{
 		input: 'src/Three.js',
@@ -252,7 +267,8 @@ export default [
 					classes: true
 				}
 			} ),
-			bubleCleanup()
+			bubleCleanup(),
+			header()
 		],
 		output: [
 			{
@@ -267,7 +283,32 @@ export default [
 		input: 'src/Three.js',
 		plugins: [
 			glconstants(),
-			glsl()
+			glsl(),
+			buble( {
+				transforms: {
+					arrow: false,
+					classes: true
+				}
+			} ),
+			bubleCleanup(),
+			terser(),
+			header()
+		],
+		output: [
+			{
+				format: 'umd',
+				name: 'THREE',
+				file: 'build/three.min.js',
+				indent: '\t'
+			}
+		]
+	},
+	{
+		input: 'src/Three.js',
+		plugins: [
+			glconstants(),
+			glsl(),
+			header()
 		],
 		output: [
 			{
