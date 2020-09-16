@@ -7,9 +7,12 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 		super();
 
 		this.name = '';
-		this.uniforms = new Map();
 
-		this.update = function () {};
+		 // the order of uniforms in this array must match the order of uniforms in the shader
+
+		this.uniforms = [];
+
+		this.onBeforeUpdate = function () {};
 
 		this.type = 'uniform-buffer';
 		this.visibility = GPUShaderStage.VERTEX;
@@ -29,25 +32,31 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	setUniform( name, uniform ) {
+	addUniform( uniform ) {
 
-		this.uniforms.set( name, uniform );
-
-		return this;
-
-	}
-
-	removeUniform( name ) {
-
-		this.uniforms.delete( name );
+		this.uniforms.push( uniform );
 
 		return this;
 
 	}
 
-	setUpdateCallback( callback ) {
+	removeUniform( uniform ) {
 
-		this.update = callback;
+		const index = this.uniforms.indexOf( uniform );
+
+		if ( index !== - 1 ) {
+
+			this.uniforms.splice( index, 1 );
+
+		}
+
+		return this;
+
+	}
+
+	setOnBeforeUpdate( callback ) {
+
+		this.onBeforeUpdate = callback;
 
 		return this;
 
@@ -57,15 +66,8 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 		this.name = source.name;
 
-		const uniformsSource = source.uniforms;
-
-		this.uniforms.clear();
-
-		for ( const entry of uniformsSource ) {
-
-			this.uniforms.set( ...entry );
-
-		}
+		this.uniforms.length = 0;
+		this.uniforms.push( ...source.uniforms );
 
 		return this;
 
@@ -79,65 +81,59 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	getByteLength() {
 
-		let size = 0;
+		let byteLength = 0;
 
-		for ( const uniform of this.uniforms.values() ) {
+		for ( const uniform of this.uniforms ) {
 
-			size += this.getUniformByteLength( uniform );
-
-		}
-
-		return size;
-
-	}
-
-	getUniformByteLength( uniform ) {
-
-		let size;
-
-		if ( typeof uniform === 'number' ) {
-
-			size = 4;
-
-		} else if ( uniform.isVector2 ) {
-
-			size = 8;
-
-		} else if ( uniform.isVector3 || uniform.isColor ) {
-
-			size = 12;
-
-		} else if ( uniform.isVector4 ) {
-
-			size = 16;
-
-		} else if ( uniform.isMatrix3 ) {
-
-			size = 48; // (3 * 4) * 4 bytes
-
-		} else if ( uniform.isMatrix4 ) {
-
-			size = 64;
-
-		} else if ( uniform.isTexture ) {
-
-			console.error( 'THREE.UniformsGroup: Texture samplers can not be part of an uniforms group.' );
-
-		} else {
-
-			console.error( 'THREE.UniformsGroup: Unsupported uniform value type.', uniform );
+			byteLength += uniform.byteLength;
 
 		}
 
-		return size;
+		return byteLength;
 
 	}
 
-	updateNumber( v, offset ) {
+	update() {
+
+		let updated = false;
+		let offset = 0;
+
+		for ( const uniform of this.uniforms ) {
+
+			if ( this.updateByType( uniform, offset ) === true ) {
+
+				updated = true;
+
+			}
+
+			offset += uniform.itemSize;
+
+		}
+
+		return updated;
+
+	}
+
+	updateByType( uniform, offset ) {
+
+		if ( uniform.isFloatUniform ) return this.updateNumber( uniform, offset );
+		if ( uniform.isVector2Uniform ) return this.updateVector2( uniform, offset );
+		if ( uniform.isVector3Uniform ) return this.updateVector3( uniform, offset );
+		if ( uniform.isVector4Uniform ) return this.updateVector4( uniform, offset );
+		if ( uniform.isColorUniform ) return this.updateColor( uniform, offset );
+		if ( uniform.isMatrix3Uniform ) return this.updateMatrix3( uniform, offset );
+		if ( uniform.isMatrix4Uniform ) return this.updateMatrix4( uniform, offset );
+
+		console.error( 'THREE.WebGPUUniformsGroup: Unsupported uniform type.', uniform );
+
+	}
+
+	updateNumber( uniform, offset ) {
 
 		let updated = false;
 
 		const a = this.array;
+		const v = uniform.value;
 
 		if ( a[ offset ] !== v ) {
 
@@ -150,11 +146,12 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateVector2( v, offset ) {
+	updateVector2( uniform, offset ) {
 
 		let updated = false;
 
 		const a = this.array;
+		const v = uniform.value;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y ) {
 
@@ -169,11 +166,12 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateVector3( v, offset ) {
+	updateVector3( uniform, offset ) {
 
 		let updated = false;
 
 		const a = this.array;
+		const v = uniform.value;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z ) {
 
@@ -189,11 +187,12 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateVector4( v, offset ) {
+	updateVector4( uniform, offset ) {
 
 		let updated = false;
 
 		const a = this.array;
+		const v = uniform.value;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 4 ] !== v.w ) {
 
@@ -210,11 +209,12 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateColor( c, offset ) {
+	updateColor( uniform, offset ) {
 
 		let updated = false;
 
 		const a = this.array;
+		const c = uniform.value;
 
 		if ( a[ offset + 0 ] !== c.r || a[ offset + 1 ] !== c.g || a[ offset + 2 ] !== c.b ) {
 
@@ -230,12 +230,12 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateMatrix3( m, offset ) {
+	updateMatrix3( uniform, offset ) {
 
 		let updated = false;
 
 		const a = this.array;
-		const e = m.elements;
+		const e = uniform.value.elements;
 
 		if ( a[ offset + 0 ] !== e[ 0 ] || a[ offset + 1 ] !== e[ 1 ] || a[ offset + 2 ] !== e[ 2 ] ||
 			a[ offset + 4 ] !== e[ 3 ] || a[ offset + 5 ] !== e[ 4 ] || a[ offset + 6 ] !== e[ 5 ] ||
@@ -259,12 +259,12 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateMatrix4( m, offset ) {
+	updateMatrix4( uniform, offset ) {
 
 		let updated = false;
 
 		const a = this.array;
-		const e = m.elements;
+		const e = uniform.value.elements;
 
 		if ( arraysEqual( a, e, offset ) === false ) {
 

@@ -1,17 +1,3 @@
-/**
- * @author raub / https://github.com/raub
- */
-
-/**
- * Element size is one of:
- * gl.FLOAT: 4
- * gl.UNSIGNED_SHORT: 2
- * gl.SHORT: 2
- * gl.UNSIGNED_INT: 4
- * gl.INT: 4
- * gl.BYTE: 1
- * gl.UNSIGNED_BYTE: 1
- */
 function GLBufferAttribute( buffer, type, itemSize, elementSize, count ) {
 
 	this.buffer = buffer;

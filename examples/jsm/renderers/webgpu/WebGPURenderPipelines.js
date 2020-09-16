@@ -11,11 +11,10 @@ import {
 
 class WebGPURenderPipelines {
 
-	constructor( device, glslang, bindings, sampleCount ) {
+	constructor( device, glslang, sampleCount ) {
 
 		this.device = device;
 		this.glslang = glslang;
-		this.bindings = bindings;
 		this.sampleCount = sampleCount;
 
 		this.pipelines = new WeakMap();
@@ -93,33 +92,19 @@ class WebGPURenderPipelines {
 
 			}
 
-			// layout
+			// determine shader attributes
 
-			const bindLayout = this.bindings.get( object ).layout;
-			const layout = device.createPipelineLayout( { bindGroupLayouts: [ bindLayout ] } );
+			const shaderAttributes = this._parseShaderAttributes( shader.vertexShader );
 
 			// vertex buffers
 
 			const vertexBuffers = [];
-			const shaderAttributes = [];
 
-			// find "layout (location = num) in type name" in vertex shader
-
-			const regex = /^\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
-
-			let shaderAttribute = null;
-
-			while ( shaderAttribute = regex.exec( shader.vertexShader ) ) {
-
-				const shaderLocation = parseInt( shaderAttribute.groups.location );
-				const arrayStride = this._getArrayStride( shaderAttribute.groups.type );
-				const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type );
-
-				shaderAttributes.push( { name: shaderAttribute.groups.name, slot: shaderLocation } );
+			for ( const attribute of shaderAttributes ) {
 
 				vertexBuffers.push( {
-					arrayStride: arrayStride,
-					attributes: [ { shaderLocation: shaderLocation, offset: 0, format: vertexFormat } ]
+					arrayStride: attribute.arrayStride,
+					attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ]
 				} );
 
 			}
@@ -172,7 +157,6 @@ class WebGPURenderPipelines {
 			const depthCompare = this._getDepthCompare( material );
 
 			pipeline = device.createRenderPipeline( {
-				layout: layout,
 				vertexStage: moduleVertex,
 				fragmentStage: moduleFragment,
 				primitiveTopology: primitiveTopology,
@@ -201,7 +185,6 @@ class WebGPURenderPipelines {
 
 			this.pipelines.set( object, pipeline );
 			this.shaderAttributes.set( pipeline, shaderAttributes );
-
 
 		}
 
@@ -704,6 +687,40 @@ class WebGPURenderPipelines {
 		if ( type === 'uvec4' ) return GPUVertexFormat.UInt4;
 
 		console.error( 'THREE.WebGPURenderer: Shader variable type not supported yet.', type );
+
+	}
+
+	_parseShaderAttributes( shader ) {
+
+		// find "layout (location = num) in type name" in vertex shader
+
+		const regex = /^\s*layout\s*\(\s*location\s*=\s*(?<location>[0-9]+)\s*\)\s*in\s+(?<type>\w+)\s+(?<name>\w+)\s*;/gmi;
+		let shaderAttribute = null;
+
+		const attributes = [];
+
+		while ( shaderAttribute = regex.exec( shader ) ) {
+
+			const shaderLocation = parseInt( shaderAttribute.groups.location );
+			const arrayStride = this._getArrayStride( shaderAttribute.groups.type );
+			const vertexFormat = this._getVertexFormat( shaderAttribute.groups.type );
+
+			attributes.push( {
+				name: shaderAttribute.groups.name,
+				arrayStride: arrayStride,
+				slot: shaderLocation,
+				format: vertexFormat
+			} );
+
+		}
+
+		// the sort ensures to setup vertex buffers in the correct order
+
+		return attributes.sort( function ( a, b ) {
+
+			return a.slot - b.slot;
+
+		} );
 
 	}
 
