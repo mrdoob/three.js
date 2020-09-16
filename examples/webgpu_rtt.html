@@ -23,6 +23,8 @@
 
 			let box;
 
+			const dpr = window.devicePixelRatio;
+
 			init().then( animate ).catch( error );
 
 			async function init() {
@@ -53,8 +55,6 @@
 				scene.add( box );
 
 				//
-
-				const dpr = window.devicePixelRatio;
 
 				renderer = new WebGPURenderer();
 				renderer.setPixelRatio( dpr );
@@ -93,8 +93,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-
-				// @TODO Resize render target, implement respective .dispose()
+				renderTarget.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
 			}
 

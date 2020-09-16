@@ -220,6 +220,15 @@ class WebGPUTextures {
 
 			}
 
+			//
+
+			const disposeCallback = onRenderTargetDispose.bind( this );
+			renderTargetProperties.disposeCallback = disposeCallback;
+
+			renderTarget.addEventListener( 'dispose', disposeCallback );
+
+			//
+
 			renderTargetProperties.initialized = true;
 
 		}
@@ -447,6 +456,34 @@ class WebGPUTextures {
 		return ( texture.generateMipmaps === true ) && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
 
 	}
+
+}
+
+function onRenderTargetDispose( event ) {
+
+	const renderTarget = event.target;
+	const properties = this.properties;
+
+	const renderTargetProperties = properties.get( renderTarget );
+
+	renderTarget.removeEventListener( 'dispose', renderTargetProperties.disposeCallback );
+
+	renderTargetProperties.colorTextureGPU.destroy();
+	properties.remove( renderTarget.texture );
+
+	if ( renderTarget.depthBuffer === true ) {
+
+		renderTargetProperties.depthTextureGPU.destroy();
+
+		if ( renderTarget.depthTexture !== null ) {
+
+			properties.remove( renderTarget.depthTexture );
+
+		}
+
+	}
+
+	properties.remove( renderTarget );
 
 }
 
