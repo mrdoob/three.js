@@ -450,6 +450,7 @@ var OBJLoader = ( function () {
 			var loader = new FileLoader( scope.manager );
 			loader.setPath( this.path );
 			loader.setRequestHeader( this.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( text ) {
 
 				try {

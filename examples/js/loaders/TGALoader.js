@@ -19,6 +19,7 @@ THREE.TGALoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( this.path );
+		loader.setWithCredentials( scope.withCredentials );
 
 		loader.load( url, function ( buffer ) {
 

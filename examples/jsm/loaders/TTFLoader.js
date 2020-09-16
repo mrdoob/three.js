@@ -30,6 +30,7 @@ TTFLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {

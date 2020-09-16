@@ -19,6 +19,7 @@ THREE.ColladaLoader.prototype = Object.assign( Object.create( THREE.Loader.proto
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {

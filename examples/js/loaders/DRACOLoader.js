@@ -85,12 +85,7 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
-
-		if ( this.crossOrigin === 'use-credentials' ) {
-
-			loader.setWithCredentials( true );
-
-		}
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, ( buffer ) => {
 
@@ -253,6 +248,7 @@ THREE.DRACOLoader.prototype = Object.assign( Object.create( THREE.Loader.prototy
 		var loader = new THREE.FileLoader( this.manager );
 		loader.setPath( this.decoderPath );
 		loader.setResponseType( responseType );
+		loader.setWithCredentials( this.withCredentials );
 
 		return new Promise( ( resolve, reject ) => {
 

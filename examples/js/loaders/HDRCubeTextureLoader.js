@@ -72,6 +72,7 @@ THREE.HDRCubeTextureLoader.prototype = Object.assign( Object.create( THREE.Loade
 			new THREE.FileLoader( scope.manager )
 				.setPath( scope.path )
 				.setResponseType( 'arraybuffer' )
+				.setWithCredentials( scope.withCredentials )
 				.load( urls[ i ], function ( buffer ) {
 
 					loaded ++;

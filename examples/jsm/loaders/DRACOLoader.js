@@ -90,12 +90,7 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
-
-		if ( this.crossOrigin === 'use-credentials' ) {
-
-			loader.setWithCredentials( true );
-
-		}
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, ( buffer ) => {
 
@@ -258,6 +253,7 @@ DRACOLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.decoderPath );
 		loader.setResponseType( responseType );
+		loader.setWithCredentials( this.withCredentials );
 
 		return new Promise( ( resolve, reject ) => {
 
