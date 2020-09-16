@@ -359,7 +359,6 @@ var files = {
 		"physics_ammo_volume"
 	],
 	"misc": [
-		"misc_animation_authoring",
 		"misc_animation_groups",
 		"misc_animation_keys",
 		"misc_boxselection",
