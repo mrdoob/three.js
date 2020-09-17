@@ -52,6 +52,8 @@ function Loader( editor ) {
 			var manager = new THREE.LoadingManager();
 			manager.setURLModifier( function ( url ) {
 
+				url = url.replace( /^(\.?\/)/, '' ); // remove './'
+
 				var file = filesMap[ url ];
 
 				if ( file ) {
