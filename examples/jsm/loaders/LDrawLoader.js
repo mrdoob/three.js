@@ -601,7 +601,7 @@ var LDrawLoader = ( function () {
 			var fileLoader = new FileLoader( this.manager );
 			fileLoader.setPath( this.path );
 			fileLoader.setRequestHeader( this.requestHeader );
-			fileLoader.setWithCredentials( scope.withCredentials );
+			fileLoader.setWithCredentials( this.withCredentials );
 			fileLoader.load( url, function ( text ) {
 
 				scope.processObject( text, onLoad, null, url );

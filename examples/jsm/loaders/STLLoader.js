@@ -73,11 +73,11 @@ STLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		var scope = this;
 
-		var loader = new FileLoader( scope.manager );
-		loader.setPath( scope.path );
+		var loader = new FileLoader( this.manager );
+		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
-		loader.setWithCredentials( scope.withCredentials );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( text ) {
 
