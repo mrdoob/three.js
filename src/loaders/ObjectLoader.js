@@ -74,6 +74,7 @@ class ObjectLoader extends Loader {
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			let json = null;

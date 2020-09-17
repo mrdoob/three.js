@@ -152,12 +152,7 @@ var GLTFLoader = ( function () {
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setRequestHeader( this.requestHeader );
-
-			if ( scope.crossOrigin === 'use-credentials' ) {
-
-				loader.setWithCredentials( true );
-
-			}
+			loader.setWithCredentials( scope.withCredentials );
 
 			loader.load( url, function ( data ) {
 

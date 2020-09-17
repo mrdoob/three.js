@@ -46,6 +46,7 @@ MTLLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
