@@ -128,16 +128,13 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		const vEnd = new Vector3();
 		const interSegment = new Vector3();
 		const interRay = new Vector3();
-		const step = ( this && this.isLineSegments ) ? 2 : 1;
+		const step = this.isLineSegments ? 2 : 1;
 
 		if ( geometry.isBufferGeometry ) {
 
 			const index = geometry.index;
 			const attributes = geometry.attributes;
-			const positions = attributes.position.array;
-
-			const stride = attributes.position.isInterleavedBufferAttribute ? attributes.position.data.stride : 3;
-			const offset = attributes.position.isInterleavedBufferAttribute ? attributes.position.offset : 0;
+			const positionAttr = attributes.position;
 
 			if ( index !== null ) {
 
@@ -148,8 +145,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					const a = indices[ i ];
 					const b = indices[ i + 1 ];
 
-					vStart.fromArray( positions, a * stride + offset );
-					vEnd.fromArray( positions, b * stride + offset );
+					vStart.fromBufferAttribute( positionAttr, a );
+					vEnd.fromBufferAttribute( positionAttr, b );
 
 					const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -178,10 +175,10 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positions.length / 3 - 1; i < l; i += step ) {
+				for ( let i = 0, l = positionAttr.count - 1; i < l; i += step ) {
 
-					vStart.fromArray( positions, i * stride + offset );
-					vEnd.fromArray( positions, ( ( i + 1 ) * stride ) + offset );
+					vStart.fromBufferAttribute( positionAttr, i );
+					vEnd.fromBufferAttribute( positionAttr, i + 1 );
 
 					const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
