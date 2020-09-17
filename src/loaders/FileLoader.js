@@ -298,13 +298,6 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
-	setWithCredentials: function ( value ) {
-
-		this.withCredentials = value;
-		return this;
-
-	},
-
 	setMimeType: function ( value ) {
 
 		this.mimeType = value;

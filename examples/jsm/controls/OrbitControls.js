@@ -781,6 +781,7 @@ var OrbitControls = function ( object, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				onMouseDown( event );
 				break;
 
@@ -797,6 +798,7 @@ var OrbitControls = function ( object, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				onMouseMove( event );
 				break;
 
@@ -813,6 +815,7 @@ var OrbitControls = function ( object, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				onMouseUp( event );
 				break;
 

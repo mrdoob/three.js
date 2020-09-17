@@ -103,6 +103,7 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 		var loader = new THREE.FileLoader( this.manager );
 
 		loader.setResponseType( 'arraybuffer' );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, ( buffer ) => {
 
@@ -227,6 +228,7 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 			// Load transcoder wrapper.
 			var jsLoader = new THREE.FileLoader( this.manager );
 			jsLoader.setPath( this.transcoderPath );
+			jsLoader.setWithCredentials( this.withCredentials );
 			var jsContent = new Promise( ( resolve, reject ) => {
 
 				jsLoader.load( 'basis_transcoder.js', resolve, undefined, reject );
@@ -237,6 +239,7 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 			var binaryLoader = new THREE.FileLoader( this.manager );
 			binaryLoader.setPath( this.transcoderPath );
 			binaryLoader.setResponseType( 'arraybuffer' );
+			binaryLoader.setWithCredentials( this.withCredentials );
 			var binaryContent = new Promise( ( resolve, reject ) => {
 
 				binaryLoader.load( 'basis_transcoder.wasm', resolve, undefined, reject );

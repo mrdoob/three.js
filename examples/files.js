@@ -322,7 +322,8 @@ var files = {
 		"webgl2_volume_perlin"
 	],
 	"webgpu": [
-		"webgpu_sandbox"
+		"webgpu_sandbox",
+		"webgpu_rtt"
 	],
 	"webaudio": [
 		"webaudio_orientation",
@@ -359,7 +360,6 @@ var files = {
 		"physics_ammo_volume"
 	],
 	"misc": [
-		"misc_animation_authoring",
 		"misc_animation_groups",
 		"misc_animation_keys",
 		"misc_boxselection",

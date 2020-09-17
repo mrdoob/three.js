@@ -23,6 +23,7 @@ TGALoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		var loader = new FileLoader( this.manager );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( this.path );
+		loader.setWithCredentials( this.withCredentials );
 
 		loader.load( url, function ( buffer ) {
 

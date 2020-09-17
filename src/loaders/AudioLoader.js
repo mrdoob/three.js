@@ -21,7 +21,8 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setResponseModifier( decodeAudioData );
-		loader.load( url, function ( audioBuffer ) {
+		loader.setWithCredentials( scope.withCredentials );
+		loader.load( url, function ( buffer ) {
 
 			try {
 
