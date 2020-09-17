@@ -220,7 +220,7 @@ export const GPUStencilOperation = {
 	DecrementWrap: 'decrement-wrap'
 };
 
-// @TODO Move to src/constants.js
+// @TODO: Move to src/constants.js
 
 export const BlendColorFactor = 211;
 export const OneMinusBlendColorFactor = 212;

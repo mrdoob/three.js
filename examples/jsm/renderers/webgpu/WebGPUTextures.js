@@ -1,5 +1,7 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode } from './constants.js';
-import { Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping, FloatType, HalfFloatType } from '../../../../build/three.module.js';
+import { Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
+	RGBFormat, RGBAFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType
+} from '../../../../build/three.module.js';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
 class WebGPUTextures {
@@ -279,17 +281,50 @@ class WebGPUTextures {
 
 	}
 
-	_convertFormat( type ) {
+	_convertFormat( format, type ) {
 
-		let formatGPU = GPUTextureFormat.RGBA8Unorm;
+		let formatGPU;
 
-		if ( type === FloatType ) {
+		switch ( format ) {
 
-			formatGPU = GPUTextureFormat.RGBA32Float;
+			case RGBA_S3TC_DXT1_Format:
+				formatGPU = GPUTextureFormat.BC1RGBAUnorm;
+				break;
 
-		} else if ( type === HalfFloatType ) {
+			case RGBA_S3TC_DXT3_Format:
+				formatGPU = GPUTextureFormat.BC2RGBAUnorm;
+				break;
 
-			formatGPU = GPUTextureFormat.RGBA16Float;
+			case RGBA_S3TC_DXT5_Format:
+				formatGPU = GPUTextureFormat.BC3RGBAUnorm;
+				break;
+
+			case RGBFormat:
+			case RGBAFormat:
+
+				switch ( type ) {
+
+					case UnsignedByteType:
+						formatGPU = GPUTextureFormat.RGBA8Unorm;
+						break;
+
+					case FloatType:
+						formatGPU = GPUTextureFormat.RGBA32Float;
+						break;
+
+					case HalfFloatType:
+						formatGPU = GPUTextureFormat.RGBA16Float;
+						break;
+
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
+
+				}
+
+				break;
+
+			default:
+				console.error( 'WebGPURenderer: Unsupported texture format.', format );
 
 		}
 
@@ -305,9 +340,26 @@ class WebGPUTextures {
 		const width = ( image !== undefined ) ? image.width : 1;
 		const height = ( image !== undefined ) ? image.height : 1;
 
-		const format = this._convertFormat( texture.type );
-		const needsMipmaps = this._needsMipmaps( texture );
-		const mipLevelCount = ( needsMipmaps === true ) ? this._computeMipLevelCount( width, height ) : undefined;
+		const format = this._convertFormat( texture.format, texture.type );
+
+		let needsMipmaps;
+		let mipLevelCount;
+
+		if ( texture.isCompressedTexture ) {
+
+			mipLevelCount = texture.mipmaps.length;
+
+		} else {
+
+			needsMipmaps = this._needsMipmaps( texture );
+
+			if ( needsMipmaps === true ) {
+
+				mipLevelCount = this._computeMipLevelCount( width, height );
+
+			}
+
+		}
 
 		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
 
@@ -336,6 +388,10 @@ class WebGPUTextures {
 		if ( texture.isDataTexture ) {
 
 			this._copyBufferToTexture( image, format, textureGPU );
+
+		} else if ( texture.isCompressedTexture ) {
+
+			this._copyCompressedTextureDataToTexture( texture.mipmaps, format, textureGPU );
 
 		} else {
 
@@ -375,41 +431,29 @@ class WebGPUTextures {
 
 	_copyBufferToTexture( image, format, textureGPU ) {
 
-		// this code assumes data textures in RGBA format
-
+		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 		// @TODO: Consider to support valid buffer layouts with other formats like RGB
-		// @TODO: Support mipmaps
 
-		const device = this.device;
 		const data = image.data;
 
 		const bytesPerTexel = this._getBytesPerTexel( format );
 		const bytesPerRow = Math.ceil( image.width * bytesPerTexel / 256 ) * 256;
 
-		const textureDataBuffer = device.createBuffer( {
-			size: data.byteLength,
-			usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.COPY_SRC,
-			mappedAtCreation: true,
-		} );
-
-		new data.constructor( textureDataBuffer.getMappedRange() ).set( data );
-		textureDataBuffer.unmap();
-
-		const commandEncoder = device.createCommandEncoder( {} );
-		commandEncoder.copyBufferToTexture(
+		this.device.defaultQueue.writeTexture(
 			{
-				buffer: textureDataBuffer,
-				bytesPerRow: bytesPerRow
-			}, {
-				texture: textureGPU
-			}, {
+				texture: textureGPU,
+				mipLevel: 0 // @TODO: Support mipmaps
+			},
+			data,
+			{
+				offset: 0,
+				bytesPerRow
+			},
+			{
 				width: image.width,
 				height: image.height,
 				depth: 1
 			} );
-
-		device.defaultQueue.submit( [ commandEncoder.finish() ] );
-		textureDataBuffer.destroy();
 
 	}
 
@@ -443,11 +487,54 @@ class WebGPUTextures {
 
 	}
 
+	_copyCompressedTextureDataToTexture( mipmaps, format, textureGPU ) {
+
+		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
+
+		const blockData = this._getBlockData( format );
+
+		for ( let i = 0; i < mipmaps.length; i ++ ) {
+
+			const mipmap = mipmaps[ i ];
+
+			const width = mipmap.width;
+			const height = mipmap.height;
+
+			const bytesPerRow = Math.ceil( width / blockData.width ) * blockData.byteLength;
+
+			this.device.defaultQueue.writeTexture(
+				{
+					texture: textureGPU,
+					mipLevel: i
+				},
+				mipmap.data,
+				{
+					offset: 0,
+					bytesPerRow
+				},
+				{
+					width: Math.ceil( width / blockData.width ) * blockData.width,
+					height: Math.ceil( height / blockData.width ) * blockData.width,
+					depth: 1,
+				} );
+
+		}
+
+	}
+
 	_getBytesPerTexel( format ) {
 
 		if ( format === GPUTextureFormat.RGBA8Unorm ) return 4;
 		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+
+	}
+
+	_getBlockData( format ) {
+
+		if ( format === GPUTextureFormat.BC1RGBAUnorm ) return { byteLength: 8, width: 4, height: 4 };
+		if ( format === GPUTextureFormat.BC2RGBAUnorm ) return { byteLength: 16, width: 4, height: 4 };
+		if ( format === GPUTextureFormat.BC3RGBAUnorm ) return { byteLength: 16, width: 4, height: 4 };
 
 	}
 
