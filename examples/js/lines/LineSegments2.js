@@ -70,6 +70,13 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 
 			}
 
+			var threshold = 0;
+			if ( 'Line2' in raycaster.params ) {
+
+				threshold = raycaster.params.Line2.threshold || 0.0;
+
+			}
+
 			var ray = raycaster.ray;
 			var camera = raycaster.camera;
 			var projectionMatrix = camera.projectionMatrix;
@@ -77,7 +84,7 @@ THREE.LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototy
 			var geometry = this.geometry;
 			var material = this.material;
 			var resolution = material.resolution;
-			var lineWidth = material.linewidth;
+			var lineWidth = material.linewidth + threshold;
 
 			var instanceStart = geometry.attributes.instanceStart;
 			var instanceEnd = geometry.attributes.instanceEnd;
