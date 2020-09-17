@@ -149,7 +149,7 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					const b = indices[ i + 1 ];
 
 					vStart.fromArray( positions, a * stride + offset );
-					vEnd.fromArray( positions, b * stride + offset);
+					vEnd.fromArray( positions, b * stride + offset );
 
 					const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -180,8 +180,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 				for ( let i = 0, l = positions.length / 3 - 1; i < l; i += step ) {
 
-					vStart.fromArray( positions, i  * stride + offset);
-					vEnd.fromArray( positions,  ((i+1) * stride) + offset );
+					vStart.fromArray( positions, i * stride + offset );
+					vEnd.fromArray( positions, ( ( i + 1 ) * stride ) + offset );
 
 					const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
