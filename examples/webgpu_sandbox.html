@@ -62,16 +62,16 @@
 				plane.position.set( - 1, - 1, 0 );
 				scene.add( plane );
 
-				// compress texture
+				// compressed texture
 
 				const ddsLoader = new DDSLoader();
 				const dxt5Texture = ddsLoader.load( './textures/compressed/explosion_dxt5_mip.dds' );
 
-				const materialBoxCompressed = new THREE.MeshBasicMaterial( { map: dxt5Texture, transparent: true } );
+				const materialCompressed = new THREE.MeshBasicMaterial( { map: dxt5Texture, transparent: true } );
 
-				box = new THREE.Mesh( geometryBox, materialBoxCompressed );
-				box.position.set( - 3, 1, 0 );
-				scene.add( box );
+				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
+				boxCompressed.position.set( - 3, 1, 0 );
+				scene.add( boxCompressed );
 
 				// points
 
