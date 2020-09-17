@@ -70,6 +70,8 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 			const index = geometry.index;
 			const attributes = geometry.attributes;
 			const positions = attributes.position.array;
+			const stride = attributes.position.isInterleavedBufferAttribute ? attributes.position.data.stride : 3;
+			const offset = attributes.position.isInterleavedBufferAttribute ? attributes.position.offset : 0;
 
 			if ( index !== null ) {
 
@@ -79,7 +81,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					const a = indices[ i ];
 
-					_position.fromArray( positions, a * 3 );
+					_position.fromArray( positions, a * stride + offset );
 
 					testPoint( _position, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -87,9 +89,9 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positions.length / 3; i < l; i ++ ) {
+				for ( let i = 0, l = positions.length / stride; i < l; i ++ ) {
 
-					_position.fromArray( positions, i * 3 );
+					_position.fromArray( positions, i * stride + offset );
 
 					testPoint( _position, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
