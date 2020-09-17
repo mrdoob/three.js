@@ -22,7 +22,7 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setRequestHeader( scope.requestHeader );
 		loader.setResponseModifier( decodeAudioData );
 		loader.setWithCredentials( scope.withCredentials );
-		loader.load( url, function ( buffer ) {
+		loader.load( url, function ( audioBuffer ) {
 
 			try {
 
