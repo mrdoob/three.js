@@ -69,8 +69,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			const index = geometry.index;
 			const attributes = geometry.attributes;
-			const positions = attributes.position.array;
-			const stride = attributes.position.isInterleavedBufferAttribute ? attributes.position.data.stride : 3;
+			const positionAttr = attributes.position;
 
 			if ( index !== null ) {
 
@@ -88,7 +87,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positions.length / stride; i < l; i ++ ) {
+				for ( let i = 0, l = positionAttr.count; i < l; i ++ ) {
 
 					_position.fromBufferAttribute( attributes.position, i );
 
