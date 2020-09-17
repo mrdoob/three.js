@@ -116,7 +116,6 @@ export interface XRReferenceSpace extends XRSpace {
 	onreset: any;
 }
 
-interface Set<T> {}
 export declare type XRPlaneSet = Set<XRPlane>;
 export declare type XRAnchorSet = Set<XRAnchor>;
 
@@ -171,6 +170,13 @@ export declare class XRWebGLLayer implements XRWebGLLayer {
 
 	constructor( session: XRSession, gl: WebGLRenderingContext | undefined, options?: XRWebGLLayerInit )
 
+}
+
+export interface DOMPointInit {
+	w?: number;
+	x?: number;
+	y?: number;
+	z?: number;
 }
 
 export declare class XRRigidTransform {
