@@ -130,7 +130,7 @@ class WebGPURenderer {
 
 		}
 
-		this._parameters.enabledExtensions = ( parameters.enabledExtensions === undefined ) ? [] : parameters.enabledExtensions;
+		this._parameters.extensions = ( parameters.extensions === undefined ) ? [] : parameters.extensions;
 		this._parameters.limits = ( parameters.limits === undefined ) ? {} : parameters.limits;
 
 	}
@@ -146,7 +146,7 @@ class WebGPURenderer {
 		const adapter = await navigator.gpu.requestAdapter( adapterOptions );
 
 		const deviceDescriptor = {
-			enabledExtensions: parameters.enabledExtensions,
+			extensions: parameters.extensions,
 			limits: parameters.limits
 		};
 
