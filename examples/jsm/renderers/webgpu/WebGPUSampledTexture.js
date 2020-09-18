@@ -6,6 +6,8 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 		super();
 
+		this.dimension = '2d';
+
 		this.type = 'sampled-texture';
 		this.visibility = GPUShaderStage.FRAGMENT;
 
@@ -15,6 +17,21 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 	}
 
+
 }
 
-export default WebGPUSampledTexture;
+class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
+
+	constructor() {
+
+		super();
+
+		this.dimension = 'cube';
+
+		Object.defineProperty( this, 'isSampledCubeTexture', { value: true } );
+
+	}
+
+}
+
+export { WebGPUSampledTexture, WebGPUSampledCubeTexture };

@@ -1,5 +1,5 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode } from './constants.js';
-import { Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
+import { CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
 	RGBFormat, RGBAFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType
 } from '../../../../build/three.module.js';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
@@ -14,6 +14,7 @@ class WebGPUTextures {
 		this.glslang = glslang;
 
 		this.defaultTexture = null;
+		this.defaultCubeTexture = null;
 		this.defaultSampler = null;
 
 		this.samplerCache = new Map();
@@ -46,6 +47,22 @@ class WebGPUTextures {
 		}
 
 		return this.defaultTexture;
+
+	}
+
+	getDefaultCubeTexture() {
+
+		if ( this.defaultCubeTexture === null ) {
+
+			const texture = new CubeTexture();
+			texture.minFilter = NearestFilter;
+			texture.magFilter = NearestFilter;
+
+			this.defaultCubeTexture = this._createTexture( texture );
+
+		}
+
+		return this.defaultCubeTexture;
 
 	}
 
@@ -284,8 +301,21 @@ class WebGPUTextures {
 		const device = this.device;
 		const image = texture.image;
 
-		const width = ( image !== undefined ) ? image.width : 1;
-		const height = ( image !== undefined ) ? image.height : 1;
+		let width, height, depth;
+
+		if ( texture.isCubeTexture ) {
+
+			width = ( image.length > 0 ) ? image[ 0 ].width : 1;
+			height = ( image.length > 0 ) ? image[ 0 ].height : 1;
+			depth = 6;
+
+		} else {
+
+			width = ( image !== undefined ) ? image.width : 1;
+			height = ( image !== undefined ) ? image.height : 1;
+			depth = 1;
+
+		}
 
 		const format = this._getFormat( texture );
 		const needsMipmaps = this._needsMipmaps( texture );
@@ -317,7 +347,7 @@ class WebGPUTextures {
 			size: {
 				width: width,
 				height: height,
-				depth: 1,
+				depth: depth,
 			},
 			mipLevelCount: mipLevelCount,
 			sampleCount: 1,
@@ -338,37 +368,23 @@ class WebGPUTextures {
 
 			this._copyCompressedBufferToTexture( texture.mipmaps, format, textureGPU );
 
+		} else if ( texture.isCubeTexture ) {
+
+			this._copyCubeMapToTexture( image, texture, textureGPU );
+
 		} else {
 
-			// convert HTML images and canvas elements to ImageBitmap
+			if ( image !== undefined ) {
 
-			if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
-				( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ) {
+				// assume HTMLImageElement, HTMLCanvasElement or ImageBitmap
 
-				const options = {};
-
-				options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'none';
-				options.premultiplyAlpha = ( texture.premultiplyAlpha === true ) ? 'premultiply' : 'default';
-
-				createImageBitmap( image, 0, 0, width, height, options ).then( imageBitmap => {
+				this._getImageBitmap( image, texture ).then( imageBitmap => {
 
 					this._copyImageBitmapToTexture( imageBitmap, textureGPU );
 
 					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
 
 				} );
-
-			} else {
-
-				if ( image !== undefined ) {
-
-					// assume ImageBitmap
-
-					this._copyImageBitmapToTexture( image, textureGPU );
-
-					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
-
-				}
 
 			}
 
@@ -406,14 +422,31 @@ class WebGPUTextures {
 
 	}
 
-	_copyImageBitmapToTexture( image, textureGPU ) {
+	_copyCubeMapToTexture( images, texture, textureGPU ) {
+
+		for ( let i = 0; i < images.length; i ++ ) {
+
+			const image = images[ i ];
+
+			this._getImageBitmap( image, texture ).then( imageBitmap => {
+
+				this._copyImageBitmapToTexture( imageBitmap, textureGPU, { x: 0, y: 0, z: i } );
+
+			} );
+
+		}
+
+	}
+
+	_copyImageBitmapToTexture( image, textureGPU, origin = { x: 0, y: 0, z: 0 } ) {
 
 		this.device.defaultQueue.copyImageBitmapToTexture(
 			{
 				imageBitmap: image
 			}, {
 				texture: textureGPU,
-				mipLevel: 0
+				mipLevel: 0,
+				origin: origin
 			}, {
 				width: image.width,
 				height: image.height,
@@ -537,6 +570,31 @@ class WebGPUTextures {
 		}
 
 		return formatGPU;
+
+	}
+
+	_getImageBitmap( image, texture ) {
+
+		const width = image.width;
+		const height = image.height;
+
+		if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+			( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ) {
+
+			const options = {};
+
+			options.imageOrientation = ( texture.flipY === true ) ? 'flipY' : 'none';
+			options.premultiplyAlpha = ( texture.premultiplyAlpha === true ) ? 'premultiply' : 'default';
+
+			return createImageBitmap( image, 0, 0, width, height, options );
+
+		} else {
+
+			// assume ImageBitmap
+
+			return Promise.resolve( image );
+
+		}
 
 	}
 

@@ -1,7 +1,7 @@
 import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
-import { FloatUniform, Matrix4Uniform } from './WebGPUUniform.js';
+import { FloatUniform, Matrix3Uniform, Matrix4Uniform } from './WebGPUUniform.js';
 import WebGPUSampler from './WebGPUSampler.js';
-import WebGPUSampledTexture from './WebGPUSampledTexture.js';
+import { WebGPUSampledTexture } from './WebGPUSampledTexture.js';
 
 class WebGPUBindings {
 
@@ -212,11 +212,19 @@ class WebGPUBindings {
 
 				if ( binding.textureGPU === null ) {
 
-					binding.textureGPU = this.textures.getDefaultTexture();
+					if ( binding.isSampledCubeTexture ) {
+
+						binding.textureGPU = this.textures.getDefaultCubeTexture();
+
+					} else {
+
+						binding.textureGPU = this.textures.getDefaultTexture();
+
+					}
 
 				}
 
-				entries.push( { binding: bindingPoint, resource: binding.textureGPU.createView() } );
+				entries.push( { binding: bindingPoint, resource: binding.textureGPU.createView( { dimension: binding.dimension } ) } );
 
 			}
 
@@ -241,15 +249,18 @@ class WebGPUBindings {
 
 		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
 		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
+		const normalMatrixUniform = new Matrix3Uniform( 'normalMatrix' );
 
 		const modelGroup = new WebGPUUniformsGroup();
 		modelGroup.setName( 'modelUniforms' );
 		modelGroup.addUniform( modelViewUniform );
 		modelGroup.addUniform( modelViewMatrixUniform );
+		modelGroup.addUniform( normalMatrixUniform );
 		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
 
 			modelViewUniform.setValue( object.matrixWorld );
 			modelViewMatrixUniform.setValue( object.modelViewMatrix );
+			normalMatrixUniform.setValue( object.normalMatrix );
 
 		} );
 
