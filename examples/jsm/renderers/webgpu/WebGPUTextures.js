@@ -389,8 +389,7 @@ class WebGPUTextures {
 
 		this.device.defaultQueue.writeTexture(
 			{
-				texture: textureGPU,
-				mipLevel: 0 // @TODO: Support mipmaps
+				texture: textureGPU
 			},
 			data,
 			{
