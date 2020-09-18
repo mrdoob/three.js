@@ -514,7 +514,7 @@ var GLTFLoader = ( function () {
 
 		if ( lightDef.intensity !== undefined ) lightNode.intensity = lightDef.intensity;
 
-		lightNode.name = lightDef.name || ( 'light_' + lightIndex );
+		lightNode.name = parser.createUniqueName( lightDef.name || ( 'light_' + lightIndex ) );
 
 		dependency = Promise.resolve( lightNode );
 
@@ -1737,6 +1737,9 @@ var GLTFLoader = ( function () {
 		this.cameraCache = { refs: {}, uses: {} };
 		this.lightCache = { refs: {}, uses: {} };
 
+		// Track node names, to ensure no duplicates
+		this.nodeNamesUsed = {};
+
 		// Use an ImageBitmapLoader if imageBitmaps are supported. Moves much of the
 		// expensive work of uploading a texture to the GPU off the main thread.
 		if ( typeof createImageBitmap !== 'undefined' && /Firefox/.test( navigator.userAgent ) === false ) {
@@ -2737,6 +2740,23 @@ var GLTFLoader = ( function () {
 
 	};
 
+	/** When Object3D instances are targeted by animation, they need unique names. */
+	GLTFParser.prototype.createUniqueName = function ( originalName ) {
+
+		var name = PropertyBinding.sanitizeNodeName( originalName || '' );
+
+		for ( var i = 1; this.nodeNamesUsed[ name ]; ++ i ) {
+
+			name = originalName + '_' + i;
+
+		}
+
+		this.nodeNamesUsed[ name ] = true;
+
+		return name;
+
+	};
+
 	/**
 	 * @param {BufferGeometry} geometry
 	 * @param {GLTF.Primitive} primitiveDef
@@ -3160,7 +3180,7 @@ var GLTFLoader = ( function () {
 
 				}
 
-				mesh.name = meshDef.name || ( 'mesh_' + meshIndex );
+				mesh.name = parser.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) );
 
 				if ( geometries.length > 1 ) mesh.name += '_' + i;
 
@@ -3220,7 +3240,7 @@ var GLTFLoader = ( function () {
 
 		}
 
-		if ( cameraDef.name ) camera.name = cameraDef.name;
+		if ( cameraDef.name ) camera.name = this.createUniqueName( cameraDef.name );
 
 		assignExtrasToUserData( camera, cameraDef );
 
@@ -3462,6 +3482,9 @@ var GLTFLoader = ( function () {
 
 		var nodeDef = json.nodes[ nodeIndex ];
 
+		// reserve node's name before its dependencies, so the root has the intended name.
+		var nodeName = nodeDef.name ? parser.createUniqueName( nodeDef.name ) : '';
+
 		return ( function () {
 
 			var pending = [];
@@ -3553,7 +3576,7 @@ var GLTFLoader = ( function () {
 			if ( nodeDef.name ) {
 
 				node.userData.name = nodeDef.name;
-				node.name = PropertyBinding.sanitizeNodeName( nodeDef.name );
+				node.name = nodeName;
 
 			}
 
@@ -3712,7 +3735,7 @@ var GLTFLoader = ( function () {
 			// Loader returns Group, not Scene.
 			// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
 			var scene = new Group();
-			if ( sceneDef.name ) scene.name = sceneDef.name;
+			if ( sceneDef.name ) scene.name = parser.createUniqueName( sceneDef.name );
 
 			assignExtrasToUserData( scene, sceneDef );
 
