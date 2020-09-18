@@ -1180,6 +1180,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 	if ( scope.domElement.tabIndex === - 1 ) {
 
 		scope.domElement.tabIndex = 0;
+		scope.domElement.style.outline = 'none';
 
 	}
 
