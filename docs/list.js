@@ -526,6 +526,7 @@ var list = {
 
 			"Cameras": {
 				"ArrayCamera": "api/ar/cameras/ArrayCamera",
+				"Camera": "api/ar/cameras/Camera",
 			},
 
 		}
