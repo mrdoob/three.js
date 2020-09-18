@@ -69,7 +69,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			const index = geometry.index;
 			const attributes = geometry.attributes;
-			const positions = attributes.position.array;
+			const positionAttr = attributes.position;
 
 			if ( index !== null ) {
 
@@ -79,7 +79,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					const a = indices[ i ];
 
-					_position.fromArray( positions, a * 3 );
+					_position.fromBufferAttribute( attributes.position, a );
 
 					testPoint( _position, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -87,9 +87,9 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positions.length / 3; i < l; i ++ ) {
+				for ( let i = 0, l = positionAttr.count; i < l; i ++ ) {
 
-					_position.fromArray( positions, i * 3 );
+					_position.fromBufferAttribute( attributes.position, i );
 
 					testPoint( _position, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
