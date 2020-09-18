@@ -451,7 +451,7 @@ THREE.GLTFLoader = ( function () {
 
 		if ( lightDef.intensity !== undefined ) lightNode.intensity = lightDef.intensity;
 
-		lightNode.name = lightDef.name || ( 'light_' + lightIndex );
+		lightNode.name = parser.createUniqueName( lightDef.name || ( 'light_' + lightIndex ) );
 
 		dependency = Promise.resolve( lightNode );
 
@@ -2671,9 +2671,10 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-	GLTFParser.prototype.assignUniqueName = function ( object, originalName ) {
+	/** When Object3D instances are targeted by animation, they need unique names. */
+	GLTFParser.prototype.createUniqueName = function ( originalName ) {
 
-		var name = originalName;
+		var name = THREE.PropertyBinding.sanitizeNodeName( originalName || '' );
 
 		for ( var i = 1; this.nodeNamesUsed[ name ]; ++ i ) {
 
@@ -2683,7 +2684,7 @@ THREE.GLTFLoader = ( function () {
 
 		this.nodeNamesUsed[ name ] = true;
 
-		object.name = name;
+		return name;
 
 	};
 
@@ -3110,7 +3111,7 @@ THREE.GLTFLoader = ( function () {
 
 				}
 
-				parser.assignUniqueName( mesh, meshDef.name || ( 'mesh_' + meshIndex ) );
+				mesh.name = parser.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) );
 
 				if ( geometries.length > 1 ) mesh.name += '_' + i;
 
@@ -3170,7 +3171,7 @@ THREE.GLTFLoader = ( function () {
 
 		}
 
-		if ( cameraDef.name ) this.assignUniqueName( camera, cameraDef.name );
+		if ( cameraDef.name ) camera.name = this.createUniqueName( cameraDef.name );
 
 		assignExtrasToUserData( camera, cameraDef );
 
@@ -3504,7 +3505,7 @@ THREE.GLTFLoader = ( function () {
 
 				node.userData.name = nodeDef.name;
 
-				parser.assignUniqueName( node, THREE.PropertyBinding.sanitizeNodeName( nodeDef.name ) );
+				node.name = parser.createUniqueName( nodeDef.name );
 
 			}
 
@@ -3663,7 +3664,7 @@ THREE.GLTFLoader = ( function () {
 			// Loader returns Group, not Scene.
 			// See: https://github.com/mrdoob/three.js/issues/18342#issuecomment-578981172
 			var scene = new THREE.Group();
-			if ( sceneDef.name ) parser.assignUniqueName( scene, sceneDef.name );
+			if ( sceneDef.name ) scene.name = parser.createUniqueName( sceneDef.name );
 
 			assignExtrasToUserData( scene, sceneDef );
 
