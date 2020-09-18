@@ -279,57 +279,6 @@ class WebGPUTextures {
 
 	}
 
-	_convertFormat( format, type ) {
-
-		let formatGPU;
-
-		switch ( format ) {
-
-			case RGBA_S3TC_DXT1_Format:
-				formatGPU = GPUTextureFormat.BC1RGBAUnorm;
-				break;
-
-			case RGBA_S3TC_DXT3_Format:
-				formatGPU = GPUTextureFormat.BC2RGBAUnorm;
-				break;
-
-			case RGBA_S3TC_DXT5_Format:
-				formatGPU = GPUTextureFormat.BC3RGBAUnorm;
-				break;
-
-			case RGBFormat:
-			case RGBAFormat:
-
-				switch ( type ) {
-
-					case UnsignedByteType:
-						formatGPU = GPUTextureFormat.RGBA8Unorm;
-						break;
-
-					case FloatType:
-						formatGPU = GPUTextureFormat.RGBA32Float;
-						break;
-
-					case HalfFloatType:
-						formatGPU = GPUTextureFormat.RGBA16Float;
-						break;
-
-					default:
-						console.error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
-
-				}
-
-				break;
-
-			default:
-				console.error( 'WebGPURenderer: Unsupported texture format.', format );
-
-		}
-
-		return formatGPU;
-
-	}
-
 	_createTexture( texture ) {
 
 		const device = this.device;
@@ -338,7 +287,7 @@ class WebGPUTextures {
 		const width = ( image !== undefined ) ? image.width : 1;
 		const height = ( image !== undefined ) ? image.height : 1;
 
-		const format = this._convertFormat( texture.format, texture.type );
+		const format = this._getFormat( texture );
 		const needsMipmaps = this._needsMipmaps( texture );
 
 		let mipLevelCount;
@@ -528,6 +477,60 @@ class WebGPUTextures {
 		if ( format === GPUTextureFormat.RGBA8Unorm ) return 4;
 		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+
+	}
+
+	_getFormat( texture ) {
+
+		const format = texture.format;
+		const type = texture.type;
+
+		let formatGPU;
+
+		switch ( format ) {
+
+			case RGBA_S3TC_DXT1_Format:
+				formatGPU = GPUTextureFormat.BC1RGBAUnorm;
+				break;
+
+			case RGBA_S3TC_DXT3_Format:
+				formatGPU = GPUTextureFormat.BC2RGBAUnorm;
+				break;
+
+			case RGBA_S3TC_DXT5_Format:
+				formatGPU = GPUTextureFormat.BC3RGBAUnorm;
+				break;
+
+			case RGBFormat:
+			case RGBAFormat:
+
+				switch ( type ) {
+
+					case UnsignedByteType:
+						formatGPU = GPUTextureFormat.RGBA8Unorm;
+						break;
+
+					case FloatType:
+						formatGPU = GPUTextureFormat.RGBA32Float;
+						break;
+
+					case HalfFloatType:
+						formatGPU = GPUTextureFormat.RGBA16Float;
+						break;
+
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RGBAFormat.', type );
+
+				}
+
+				break;
+
+			default:
+				console.error( 'WebGPURenderer: Unsupported texture format.', format );
+
+		}
+
+		return formatGPU;
 
 	}
 
