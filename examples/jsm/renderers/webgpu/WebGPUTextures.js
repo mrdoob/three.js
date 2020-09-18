@@ -337,7 +337,7 @@ class WebGPUTextures {
 
 		} else {
 
-			// convert HTML iamges and canvas elements to ImageBitmap before copy
+			// convert HTML images and canvas elements to ImageBitmap
 
 			if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
 				( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ) {
@@ -357,7 +357,7 @@ class WebGPUTextures {
 
 				if ( image !== undefined ) {
 
-					// assuming ImageBitmap. Directly start copy operation of the contents of ImageBitmap into the destination texture
+					// assume ImageBitmap
 
 					this._copyImageBitmapToTexture( image, textureGPU, needsMipmaps, textureGPUDescriptor );
 
