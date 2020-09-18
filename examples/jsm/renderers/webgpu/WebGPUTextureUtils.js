@@ -90,7 +90,7 @@ class WebGPUTextureUtils {
 
 	}
 
-	generateMipmaps( imageBitmap, textureGPU, textureGPUDescriptor ) {
+	generateMipmaps( textureGPU, textureGPUDescriptor ) {
 
 		const pipeline = this.getMipmapPipeline( textureGPUDescriptor.format );
 

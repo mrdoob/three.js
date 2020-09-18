@@ -331,9 +331,11 @@ class WebGPUTextures {
 
 			this._copyBufferToTexture( image, format, textureGPU );
 
+			if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
+
 		} else if ( texture.isCompressedTexture ) {
 
-			this._copyCompressedTextureDataToTexture( texture.mipmaps, format, textureGPU );
+			this._copyCompressedBufferToTexture( texture.mipmaps, format, textureGPU );
 
 		} else {
 
@@ -349,7 +351,9 @@ class WebGPUTextures {
 
 				createImageBitmap( image, 0, 0, width, height, options ).then( imageBitmap => {
 
-					this._copyImageBitmapToTexture( imageBitmap, textureGPU, needsMipmaps, textureGPUDescriptor );
+					this._copyImageBitmapToTexture( imageBitmap, textureGPU );
+
+					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
 
 				} );
 
@@ -359,7 +363,9 @@ class WebGPUTextures {
 
 					// assume ImageBitmap
 
-					this._copyImageBitmapToTexture( image, textureGPU, needsMipmaps, textureGPUDescriptor );
+					this._copyImageBitmapToTexture( image, textureGPU );
+
+					if ( needsMipmaps === true ) this._generateMipmaps( textureGPU, textureGPUDescriptor );
 
 				}
 
@@ -399,37 +405,23 @@ class WebGPUTextures {
 
 	}
 
-	_copyImageBitmapToTexture( imageBitmap, textureGPU, needsMipmaps, textureGPUDescriptor ) {
+	_copyImageBitmapToTexture( image, textureGPU ) {
 
-		const device = this.device;
-
-		device.defaultQueue.copyImageBitmapToTexture(
+		this.device.defaultQueue.copyImageBitmapToTexture(
 			{
-				imageBitmap: imageBitmap
+				imageBitmap: image
 			}, {
 				texture: textureGPU
 			}, {
-				width: imageBitmap.width,
-				height: imageBitmap.height,
+				width: image.width,
+				height: image.height,
 				depth: 1
 			}
 		);
 
-		if ( needsMipmaps === true ) {
-
-			if ( this.utils === null ) {
-
-				this.utils = new WebGPUTextureUtils( this.device, this.glslang ); // only create this helper if necessary
-
-			}
-
-			this.utils.generateMipmaps( imageBitmap, textureGPU, textureGPUDescriptor );
-
-		}
-
 	}
 
-	_copyCompressedTextureDataToTexture( mipmaps, format, textureGPU ) {
+	_copyCompressedBufferToTexture( mipmaps, format, textureGPU ) {
 
 		// @TODO: Consider to use GPUCommandEncoder.copyBufferToTexture()
 
@@ -461,6 +453,18 @@ class WebGPUTextures {
 				} );
 
 		}
+
+	}
+
+	_generateMipmaps( textureGPU, textureGPUDescriptor ) {
+
+		if ( this.utils === null ) {
+
+			this.utils = new WebGPUTextureUtils( this.device, this.glslang ); // only create this helper if necessary
+
+		}
+
+		this.utils.generateMipmaps( textureGPU, textureGPUDescriptor );
 
 	}
 
