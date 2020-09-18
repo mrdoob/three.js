@@ -3476,6 +3476,9 @@ var GLTFLoader = ( function () {
 
 		var nodeDef = json.nodes[ nodeIndex ];
 
+		// reserve node's name before its dependencies, so the root has the intended name.
+		var nodeName = nodeDef.name ? parser.createUniqueName( nodeDef.name ) : '';
+
 		return ( function () {
 
 			var pending = [];
@@ -3567,8 +3570,7 @@ var GLTFLoader = ( function () {
 			if ( nodeDef.name ) {
 
 				node.userData.name = nodeDef.name;
-
-				node.name = parser.createUniqueName( nodeDef.name );
+				node.name = nodeName;
 
 			}
 
