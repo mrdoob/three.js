@@ -522,7 +522,11 @@ var list = {
 				"AudioContext": "api/ar/audio/AudioContext",
 				"AudioListener": "api/ar/audio/AudioListener",
 				"PositionalAudio": "api/ar/audio/PositionalAudio"
-			}
+			},
+
+			"Cameras": {
+				"ArrayCamera": "api/ar/cameras/ArrayCamera",
+			},
 
 		}
 
