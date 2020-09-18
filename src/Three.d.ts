@@ -172,6 +172,9 @@ export * from './renderers/webgl/WebGLShadowMap';
 export * from './renderers/webgl/WebGLState';
 export * from './renderers/webgl/WebGLTextures';
 export * from './renderers/webgl/WebGLUniforms';
+export * from './renderers/webxr/WebXR';
+export * from './renderers/webxr/WebXRController';
+export * from './renderers/webxr/WebXRManager';
 export * from './constants';
 export * from './Three.Legacy';
 

@@ -1,6 +1,7 @@
 import { Group } from '../../objects/Group';
 import { Camera } from '../../cameras/Camera';
 import { EventDispatcher } from '../../core/EventDispatcher';
+import { XRFrameRequestCallback, XRReferenceSpace, XRReferenceSpaceType, XRSession } from './WebXR';
 
 export class WebXRManager extends EventDispatcher {
 
@@ -19,12 +20,12 @@ export class WebXRManager extends EventDispatcher {
 	getController( id: number ): Group;
 	getControllerGrip( id: number ): Group;
 	setFramebufferScaleFactor( value: number ): void;
-	setReferenceSpaceType( value: string ): void;
-	getReferenceSpace(): any;
-	getSession(): any;
-	setSession( value: any ): void;
+	setReferenceSpaceType( value: XRReferenceSpaceType ): void;
+	getReferenceSpace(): XRReferenceSpace;
+	getSession(): XRSession;
+	setSession( value: XRSession ): void;
 	getCamera( camera: Camera ): Camera;
-	setAnimationLoop( callback: Function ): void;
+	setAnimationLoop( callback: XRFrameRequestCallback ): void;
 	dispose(): void;
 
 }
