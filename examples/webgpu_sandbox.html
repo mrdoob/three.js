@@ -50,7 +50,7 @@
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
-				box.position.set( - 1, 1, 0 );
+				box.position.set( 0, 1, 0 );
 				scene.add( box );
 
 				// data texture
@@ -59,7 +59,7 @@
 				const materialPlane = new THREE.MeshBasicMaterial( { map: createDataTexture(), transparent: true, opacity: 0.5 } );
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );
-				plane.position.set( - 1, - 1, 0 );
+				plane.position.set( 0, - 1, 0 );
 				scene.add( plane );
 
 				// compressed texture
@@ -70,21 +70,26 @@
 				const materialCompressed = new THREE.MeshBasicMaterial( { map: dxt5Texture, transparent: true } );
 
 				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
-				boxCompressed.position.set( - 3, 1, 0 );
+				boxCompressed.position.set( - 2, 1, 0 );
 				scene.add( boxCompressed );
 
 				// points
 
-				const geometryPoints = new THREE.BufferGeometry().setFromPoints( [
-					new THREE.Vector3( 0.5, 0.5, 0 ),
-					new THREE.Vector3( 0.5, - 0.5, 0 ),
-					new THREE.Vector3( - 0.5, 0.5, 0 ),
-					new THREE.Vector3( - 0.5, - 0.5, 0 ) ] );
+				const points = [];
+
+				for ( let i = 0; i < 1000; i ++ ) {
+
+					const point = new THREE.Vector3().random().subScalar( 0.5 );
+					points.push( point );
+
+				}
+
+				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
 				const materialPoints = new THREE.PointsMaterial();
 
-				const points = new THREE.Points( geometryPoints, materialPoints );
-				points.position.set( 1, - 1, 0 );
-				scene.add( points );
+				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
+				pointCloud.position.set( 2, - 1, 0 );
+				scene.add( pointCloud );
 
 				// lines
 
@@ -96,7 +101,7 @@
 				] );
 				const materialLine = new THREE.LineBasicMaterial();
 				const line = new THREE.Line( geometryLine, materialLine );
-				line.position.set( 1, 1, 0 );
+				line.position.set( 2, 1, 0 );
 				scene.add( line );
 
 				//
