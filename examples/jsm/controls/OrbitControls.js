@@ -124,7 +124,22 @@ var OrbitControls = function ( object, domElement ) {
 
 		scope.update();
 
-		state = STATE.NONE;
+		scope.cancel();
+
+	};
+
+	this.cancel = function () {
+
+		if ( state !== STATE.NONE ) {
+
+			scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+			scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+
+			scope.dispatchEvent( endEvent );
+
+			state = STATE.NONE;
+
+		}
 
 	};
 
@@ -975,12 +990,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		handleMouseUp( event );
 
-		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
-		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
-
-		scope.dispatchEvent( endEvent );
-
-		state = STATE.NONE;
+		scope.cancel();
 
 	}
 
