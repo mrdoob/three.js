@@ -2233,8 +2233,14 @@ var GLTFLoader = ( function () {
 
 				if ( source.mimeType === 'image/png' ) {
 
+					// Inspect the PNG 'IHDR' chunk to determine whether the image could have an
+					// alpha channel. This check is conservative — the image could have an alpha
+					// channel with all values == 1, and the indexed type (colorType == 3) only
+					// sometimes contains alpha.
+					//
 					// https://en.wikipedia.org/wiki/Portable_Network_Graphics#File_header
-					hasAlpha = new DataView( bufferView, 25, 1 ).getUint8( 0, false ) === 6;
+					var colorType = new DataView( bufferView, 25, 1 ).getUint8( 0, false );
+					hasAlpha = colorType === 6 || colorType === 4 || colorType === 3;
 
 				}
 
