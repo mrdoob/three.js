@@ -81,12 +81,7 @@ LineSegments2.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 			}
 
-			var threshold = 0;
-			if ( 'Line2' in raycaster.params ) {
-
-				threshold = raycaster.params.Line2.threshold || 0.0;
-
-			}
+			var threshold = ( raycaster.params.Line2 !== undefined ) ? raycaster.params.Line2.threshold || 0 : 0;
 
 			var ray = raycaster.ray;
 			var camera = raycaster.camera;
