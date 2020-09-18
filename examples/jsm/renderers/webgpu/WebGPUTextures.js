@@ -37,7 +37,11 @@ class WebGPUTextures {
 
 		if ( this.defaultTexture === null ) {
 
-			this.defaultTexture = this._createTexture( new Texture() );
+			const texture = new Texture();
+			texture.minFilter = NearestFilter;
+			texture.magFilter = NearestFilter;
+
+			this.defaultTexture = this._createTexture( texture );
 
 		}
 
@@ -243,12 +247,6 @@ class WebGPUTextures {
 
 	}
 
-	_computeMipLevelCount( width, height ) {
-
-		return Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
-
-	}
-
 	_convertAddressMode( value ) {
 
 		let addressMode = GPUAddressMode.ClampToEdge;
@@ -341,9 +339,10 @@ class WebGPUTextures {
 		const height = ( image !== undefined ) ? image.height : 1;
 
 		const format = this._convertFormat( texture.format, texture.type );
+		const needsMipmaps = this._needsMipmaps( texture );
 
-		let needsMipmaps;
 		let mipLevelCount;
+		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
 
 		if ( texture.isCompressedTexture ) {
 
@@ -351,21 +350,15 @@ class WebGPUTextures {
 
 		} else {
 
-			needsMipmaps = this._needsMipmaps( texture );
-
 			if ( needsMipmaps === true ) {
 
-				mipLevelCount = this._computeMipLevelCount( width, height );
+				mipLevelCount = this._getMipLevelCount( width, height );
+
+				// current mipmap generation requires OUTPUT_ATTACHMENT
+
+				usage |= GPUTextureUsage.OUTPUT_ATTACHMENT;
 
 			}
-
-		}
-
-		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
-
-		if ( needsMipmaps === true ) {
-
-			usage |= GPUTextureUsage.OUTPUT_ATTACHMENT;
 
 		}
 
@@ -481,7 +474,7 @@ class WebGPUTextures {
 
 			}
 
-			this.utils.generateMipmappedTexture( imageBitmap, textureGPU, textureGPUDescriptor );
+			this.utils.generateMipmaps( imageBitmap, textureGPU, textureGPUDescriptor );
 
 		}
 
@@ -522,14 +515,6 @@ class WebGPUTextures {
 
 	}
 
-	_getBytesPerTexel( format ) {
-
-		if ( format === GPUTextureFormat.RGBA8Unorm ) return 4;
-		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
-		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
-
-	}
-
 	_getBlockData( format ) {
 
 		if ( format === GPUTextureFormat.BC1RGBAUnorm ) return { byteLength: 8, width: 4, height: 4 };
@@ -538,9 +523,23 @@ class WebGPUTextures {
 
 	}
 
+	_getBytesPerTexel( format ) {
+
+		if ( format === GPUTextureFormat.RGBA8Unorm ) return 4;
+		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
+		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+
+	}
+
+	_getMipLevelCount( width, height ) {
+
+		return Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+
+	}
+
 	_needsMipmaps( texture ) {
 
-		return ( texture.generateMipmaps === true ) && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
+		return ( texture.isCompressedTexture !== true ) && ( texture.generateMipmaps === true ) && ( texture.minFilter !== NearestFilter ) && ( texture.minFilter !== LinearFilter );
 
 	}
 
