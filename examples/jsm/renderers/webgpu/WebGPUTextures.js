@@ -290,7 +290,7 @@ class WebGPUTextures {
 		const format = this._getFormat( texture );
 		const needsMipmaps = this._needsMipmaps( texture );
 
-		let mipLevelCount;
+		let mipLevelCount = 1;
 		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
 
 		if ( texture.isCompressedTexture ) {
@@ -319,9 +319,10 @@ class WebGPUTextures {
 				height: height,
 				depth: 1,
 			},
+			mipLevelCount: mipLevelCount,
+			sampleCount: 1,
 			format: format,
-			usage: usage,
-			mipLevelCount: mipLevelCount
+			usage: usage
 		};
 		const textureGPU = device.createTexture( textureGPUDescriptor );
 
@@ -389,7 +390,8 @@ class WebGPUTextures {
 
 		this.device.defaultQueue.writeTexture(
 			{
-				texture: textureGPU
+				texture: textureGPU,
+				mipLevel: 0
 			},
 			data,
 			{
@@ -410,7 +412,8 @@ class WebGPUTextures {
 			{
 				imageBitmap: image
 			}, {
-				texture: textureGPU
+				texture: textureGPU,
+				mipLevel: 0
 			}, {
 				width: image.width,
 				height: image.height,
