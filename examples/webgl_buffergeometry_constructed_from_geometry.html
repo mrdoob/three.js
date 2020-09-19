@@ -23,7 +23,7 @@
 			var camera, scene, renderer, controls, stats;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -42,6 +42,8 @@
 				controls.minDistance = 100.0;
 				controls.maxDistance = 800.0;
 				controls.dynamicDampingFactor = 0.1;
+
+				controls.addEventListener( 'change', render );
 
 				scene.add( new THREE.AmbientLight( 0xffffff, 0.2 ) );
 
@@ -172,11 +174,8 @@
 
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
-
-				controls.update();
 				stats.update();
 
 				renderer.render( scene, camera );

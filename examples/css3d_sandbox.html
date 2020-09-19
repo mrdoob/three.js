@@ -30,7 +30,7 @@
 			var controls;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -89,6 +89,8 @@
 
 				controls = new TrackballControls( camera, renderer2.domElement );
 
+				controls.addEventListener( 'change', render );
+
 				window.addEventListener( 'resize', onWindowResize, false );
 
 			}
@@ -105,11 +107,7 @@
 
 			}
 
-			function animate() {
-
-				requestAnimationFrame( animate );
-
-				controls.update();
+			function render() {
 
 				renderer.render( scene, camera );
 				renderer2.render( scene2, camera );

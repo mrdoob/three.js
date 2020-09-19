@@ -68,7 +68,8 @@ var TrackballControls = function ( object, domElement ) {
 		_touchZoomDistanceEnd = 0,
 
 		_panStart = new Vector2(),
-		_panEnd = new Vector2();
+		_panEnd = new Vector2(),
+		_animating = false;
 
 	// for reset
 
@@ -317,7 +318,41 @@ var TrackballControls = function ( object, domElement ) {
 
 	};
 
+	this._startUpdate = function () {
+
+		if (!_animating) {
+
+			_animating = true;
+			this._animate();
+
+		}
+
+	}
+
+	this._stopUpdate = function () {
+
+		_animating = false;
+
+	}
+
+	this._animate = function () {
+
+		if ( _animating ) {
+
+			requestAnimationFrame( this._animate );
+			this._update();
+
+		}
+
+	}.bind(this);
+
 	this.update = function () {
+
+		console.warn( 'THREE.TrackballControls: update() function has been deprecated!' );
+
+	}
+
+	this._update = function () {
 
 		_eye.subVectors( scope.object.position, scope.target );
 
@@ -353,6 +388,10 @@ var TrackballControls = function ( object, domElement ) {
 
 				lastPosition.copy( scope.object.position );
 
+			} else {
+
+				scope._stopUpdate();
+
 			}
 
 		} else if ( scope.object.isOrthographicCamera ) {
@@ -365,6 +404,10 @@ var TrackballControls = function ( object, domElement ) {
 
 				lastPosition.copy( scope.object.position );
 				lastZoom = scope.object.zoom;
+
+			} else {
+
+				scope._stopUpdate();
 
 			}
 
@@ -566,6 +609,8 @@ var TrackballControls = function ( object, domElement ) {
 
 		}
 
+		scope._startUpdate();
+
 	}
 
 	function onMouseUp( event ) {
@@ -614,6 +659,8 @@ var TrackballControls = function ( object, domElement ) {
 
 		scope.dispatchEvent( startEvent );
 		scope.dispatchEvent( endEvent );
+
+		scope._startUpdate();
 
 	}
 
@@ -674,6 +721,8 @@ var TrackballControls = function ( object, domElement ) {
 				break;
 
 		}
+
+		scope._startUpdate();
 
 	}
 
@@ -744,7 +793,7 @@ var TrackballControls = function ( object, domElement ) {
 	this.handleResize();
 
 	// force an update at start
-	this.update();
+	this._update();
 
 };
 

@@ -52,7 +52,6 @@
 					scene.add( points );
 					var center = points.geometry.boundingSphere.center;
 					controls.target.set( center.x, center.y, center.z );
-					controls.update();
 
 				} );
 
@@ -117,7 +116,6 @@
 			function animate() {
 
 				requestAnimationFrame( animate );
-				controls.update();
 				renderer.render( scene, camera );
 				stats.update();
 

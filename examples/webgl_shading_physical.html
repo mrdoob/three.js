@@ -245,6 +245,7 @@
 
 				controls = new TrackballControls( camera, renderer.domElement );
 				controls.target.set( 0, 120, 0 );
+				camera.lookAt( controls.target );
 
 				controls.rotateSpeed = 1.0;
 				controls.zoomSpeed = 1.2;
@@ -253,7 +254,6 @@
 				controls.staticMoving = true;
 
 				controls.keys = [ 65, 83, 68 ];
-
 
 				// STATS
 
@@ -334,8 +334,6 @@
 				// update
 
 				var delta = clock.getDelta();
-
-				controls.update();
 
 				if ( mixer ) {
 

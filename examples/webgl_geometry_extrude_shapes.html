@@ -26,7 +26,7 @@
 			var camera, scene, renderer, controls;
 
 			init();
-			animate();
+			render();
 
 			function init() {
 
@@ -54,6 +54,8 @@
 				controls = new TrackballControls( camera, renderer.domElement );
 				controls.minDistance = 200;
 				controls.maxDistance = 500;
+
+				controls.addEventListener( 'change', render );
 
 				scene.add( new THREE.AmbientLight( 0x222222 ) );
 
@@ -172,11 +174,8 @@
 
 			}
 
-			function animate() {
+			function render() {
 
-				requestAnimationFrame( animate );
-
-				controls.update();
 				renderer.render( scene, camera );
 
 			}
