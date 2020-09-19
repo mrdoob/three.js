@@ -301,43 +301,18 @@ class WebGPUTextures {
 		const device = this.device;
 		const image = texture.image;
 
-		let width, height, depth;
-
-		if ( texture.isCubeTexture ) {
-
-			width = ( image.length > 0 ) ? image[ 0 ].width : 1;
-			height = ( image.length > 0 ) ? image[ 0 ].height : 1;
-			depth = 6;
-
-		} else {
-
-			width = ( image !== undefined ) ? image.width : 1;
-			height = ( image !== undefined ) ? image.height : 1;
-			depth = 1;
-
-		}
-
-		const format = this._getFormat( texture );
+		const { width, height, depth } = this._getSize( texture );
 		const needsMipmaps = this._needsMipmaps( texture );
+		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
+		const format = this._getFormat( texture );
 
-		let mipLevelCount = 1;
 		let usage = GPUTextureUsage.SAMPLED | GPUTextureUsage.COPY_DST;
 
-		if ( texture.isCompressedTexture ) {
+		if ( needsMipmaps === true ) {
 
-			mipLevelCount = texture.mipmaps.length;
+			// current mipmap generation requires OUTPUT_ATTACHMENT
 
-		} else {
-
-			if ( needsMipmaps === true ) {
-
-				mipLevelCount = this._getMipLevelCount( width, height );
-
-				// current mipmap generation requires OUTPUT_ATTACHMENT
-
-				usage |= GPUTextureUsage.OUTPUT_ATTACHMENT;
-
-			}
+			usage |= GPUTextureUsage.OUTPUT_ATTACHMENT;
 
 		}
 
@@ -598,9 +573,49 @@ class WebGPUTextures {
 
 	}
 
-	_getMipLevelCount( width, height ) {
+	_getMipLevelCount( texture, width, height, needsMipmaps ) {
 
-		return Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+		let mipLevelCount;
+
+		if ( texture.isCompressedTexture ) {
+
+			mipLevelCount = texture.mipmaps.length;
+
+		} else if ( needsMipmaps === true ) {
+
+			mipLevelCount = Math.floor( Math.log2( Math.max( width, height ) ) ) + 1;
+
+		} else {
+
+			mipLevelCount = 1; // a texture without mipmaps has a base mip (mipLevel 0)
+
+		}
+
+		return mipLevelCount;
+
+	}
+
+	_getSize( texture ) {
+
+		const image = texture.image;
+
+		let width, height, depth;
+
+		if ( texture.isCubeTexture ) {
+
+			width = ( image.length > 0 ) ? image[ 0 ].width : 1;
+			height = ( image.length > 0 ) ? image[ 0 ].height : 1;
+			depth = 6; // one image for each side of the cube map
+
+		} else {
+
+			width = ( image !== undefined ) ? image.width : 1;
+			height = ( image !== undefined ) ? image.height : 1;
+			depth = 1;
+
+		}
+
+		return { width, height, depth };
 
 	}
 
