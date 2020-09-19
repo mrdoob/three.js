@@ -1,6 +1,6 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode } from './constants.js';
 import { CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
-	RGBFormat, RGBAFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType
+	RGBFormat, RGBAFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
 } from '../../../../build/three.module.js';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
@@ -480,15 +480,15 @@ class WebGPUTextures {
 
 	_getBlockData( format ) {
 
-		if ( format === GPUTextureFormat.BC1RGBAUnorm ) return { byteLength: 8, width: 4, height: 4 };
-		if ( format === GPUTextureFormat.BC2RGBAUnorm ) return { byteLength: 16, width: 4, height: 4 };
-		if ( format === GPUTextureFormat.BC3RGBAUnorm ) return { byteLength: 16, width: 4, height: 4 };
+		if ( format === GPUTextureFormat.BC1RGBAUnorm || format === GPUTextureFormat.BC1RGBAUnormSRGB ) return { byteLength: 8, width: 4, height: 4 };
+		if ( format === GPUTextureFormat.BC2RGBAUnorm || format === GPUTextureFormat.BC2RGBAUnormSRGB ) return { byteLength: 16, width: 4, height: 4 };
+		if ( format === GPUTextureFormat.BC3RGBAUnorm || format === GPUTextureFormat.BC3RGBAUnormSRGB ) return { byteLength: 16, width: 4, height: 4 };
 
 	}
 
 	_getBytesPerTexel( format ) {
 
-		if ( format === GPUTextureFormat.RGBA8Unorm ) return 4;
+		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8Unorm ) return 4;
 		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
 
@@ -498,21 +498,22 @@ class WebGPUTextures {
 
 		const format = texture.format;
 		const type = texture.type;
+		const encoding = texture.encoding;
 
 		let formatGPU;
 
 		switch ( format ) {
 
 			case RGBA_S3TC_DXT1_Format:
-				formatGPU = GPUTextureFormat.BC1RGBAUnorm;
+				formatGPU = ( encoding === sRGBEncoding ) ? GPUTextureFormat.BC1RGBAUnormSRGB : GPUTextureFormat.BC1RGBAUnorm;
 				break;
 
 			case RGBA_S3TC_DXT3_Format:
-				formatGPU = GPUTextureFormat.BC2RGBAUnorm;
+				formatGPU = ( encoding === sRGBEncoding ) ? GPUTextureFormat.BC2RGBAUnormSRGB : GPUTextureFormat.BC2RGBAUnorm;
 				break;
 
 			case RGBA_S3TC_DXT5_Format:
-				formatGPU = GPUTextureFormat.BC3RGBAUnorm;
+				formatGPU = ( encoding === sRGBEncoding ) ? GPUTextureFormat.BC3RGBAUnormSRGB : GPUTextureFormat.BC3RGBAUnorm;
 				break;
 
 			case RGBFormat:
@@ -521,7 +522,7 @@ class WebGPUTextures {
 				switch ( type ) {
 
 					case UnsignedByteType:
-						formatGPU = GPUTextureFormat.RGBA8Unorm;
+						formatGPU = ( encoding === sRGBEncoding ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
 						break;
 
 					case FloatType:
