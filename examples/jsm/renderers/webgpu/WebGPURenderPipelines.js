@@ -738,6 +738,7 @@ const ShaderLib = {
 		layout(set = 0, binding = 0) uniform ModelUniforms {
 			mat4 modelMatrix;
 			mat4 modelViewMatrix;
+			mat3 normalMatrix;
 		} modelUniforms;
 
 		layout(set = 0, binding = 1) uniform CameraUniforms {
