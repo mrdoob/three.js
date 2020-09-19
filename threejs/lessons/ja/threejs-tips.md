@@ -6,7 +6,7 @@ TOC: #
 
 ---
 
-<a id="screenshot" data-toc="Taking a screenshot"></a>
+<a id="screenshot" data-toc="スクリーンショットを撮る"></a>
 
 # キャンバスのスクリーンショットを撮る
 
@@ -116,7 +116,7 @@ elem.addEventListener('click', () => {
 
 ---
 
-<a id="preservedrawingbuffer" data-toc="Prevent the Canvas Being Cleared"></a>
+<a id="preservedrawingbuffer" data-toc="キャンバスがクリアされるのを防ぐ"></a>
 
 # キャンバスのクリアを防ぐ
 
@@ -146,7 +146,7 @@ const canvas = document.querySelector('#c');
 
 ---
 
-<a id="tabindex" data-toc="Get Keyboard Input From a Canvas"></a>
+<a id="tabindex" data-toc="キャンバスからキーボード入力を取得する"></a>
 
 # キーボード入力を取得する
 
@@ -220,7 +220,7 @@ document.querySelectorAll('canvas').forEach((canvas) => {
 
 ---
 
-<a id="transparent-canvas" data-toc="Make the Canvas Transparent"></a>
+<a id="transparent-canvas" data-toc="キャンバスを透明にする"></a>
  
 # キャンバスを透明にする
 
@@ -316,7 +316,7 @@ body {
 
 ---
 
-<a id="html-background" data-toc="Use three.js as Background in HTML"></a>
+<a id="html-background" data-toc="HTMLの背景にthree.jsを使う"></a>
 
 # 背景をthree.jsでアニメーションする
 
