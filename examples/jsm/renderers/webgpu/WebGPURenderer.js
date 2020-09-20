@@ -159,7 +159,7 @@ class WebGPURenderer {
 
 		const swapChain = context.configureSwapChain( {
 			device: device,
-			format: GPUTextureFormat.BRGA8Unorm
+			format: GPUTextureFormat.BRGA8Unorm // this is the only valid swap chain format right now (r121)
 		} );
 
 		this._adapter = adapter;
