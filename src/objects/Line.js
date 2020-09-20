@@ -128,13 +128,13 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		const vEnd = new Vector3();
 		const interSegment = new Vector3();
 		const interRay = new Vector3();
-		const step = ( this && this.isLineSegments ) ? 2 : 1;
+		const step = this.isLineSegments ? 2 : 1;
 
 		if ( geometry.isBufferGeometry ) {
 
 			const index = geometry.index;
 			const attributes = geometry.attributes;
-			const positions = attributes.position.array;
+			const positionAttr = attributes.position;
 
 			if ( index !== null ) {
 
@@ -145,8 +145,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					const a = indices[ i ];
 					const b = indices[ i + 1 ];
 
-					vStart.fromArray( positions, a * 3 );
-					vEnd.fromArray( positions, b * 3 );
+					vStart.fromBufferAttribute( positionAttr, a );
+					vEnd.fromBufferAttribute( positionAttr, b );
 
 					const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -175,10 +175,10 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positions.length / 3 - 1; i < l; i += step ) {
+				for ( let i = 0, l = positionAttr.count - 1; i < l; i += step ) {
 
-					vStart.fromArray( positions, 3 * i );
-					vEnd.fromArray( positions, 3 * i + 3 );
+					vStart.fromBufferAttribute( positionAttr, i );
+					vEnd.fromBufferAttribute( positionAttr, i + 1 );
 
 					const distSq = _ray.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
