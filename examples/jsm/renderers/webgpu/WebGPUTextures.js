@@ -488,7 +488,7 @@ class WebGPUTextures {
 
 	_getBytesPerTexel( format ) {
 
-		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8Unorm ) return 4;
+		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8UnormSRGB ) return 4;
 		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
 
