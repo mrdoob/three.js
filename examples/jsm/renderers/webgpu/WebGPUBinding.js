@@ -1,17 +1,18 @@
 class WebGPUBinding {
 
-	constructor() {
+	constructor( name = '' ) {
 
-		this.bindingPoint = 0;
-		this.name = '';
-		this.type = null;
+		this.name = name;
 		this.visibility = null;
+
+		this.type = null; // read-only
+
 
 	}
 
-	setName( name ) {
+	setVisibility( visibility ) {
 
-		this.name = name;
+		this.visibility = visibility;
 
 	}
 

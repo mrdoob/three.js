@@ -251,8 +251,7 @@ class WebGPUBindings {
 		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
 		const normalMatrixUniform = new Matrix3Uniform( 'normalMatrix' );
 
-		const modelGroup = new WebGPUUniformsGroup();
-		modelGroup.setName( 'modelUniforms' );
+		const modelGroup = new WebGPUUniformsGroup( 'modelUniforms' );
 		modelGroup.addUniform( modelViewUniform );
 		modelGroup.addUniform( modelViewMatrixUniform );
 		modelGroup.addUniform( normalMatrixUniform );
@@ -272,10 +271,9 @@ class WebGPUBindings {
 
 		const opacityUniform = new FloatUniform( 'opacity', 1 );
 
-		const opacityGroup = new WebGPUUniformsGroup();
-		opacityGroup.setName( 'opacityUniforms' );
+		const opacityGroup = new WebGPUUniformsGroup( 'opacityUniforms' );
 		opacityGroup.addUniform( opacityUniform );
-		opacityGroup.visibility = GPUShaderStage.FRAGMENT;
+		opacityGroup.setVisibility( GPUShaderStage.FRAGMENT );
 		opacityGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
 
 			const material = object.material;
@@ -287,13 +285,11 @@ class WebGPUBindings {
 
 		// sampler
 
-		const diffuseSampler = new WebGPUSampler();
-		diffuseSampler.setName( 'map' );
+		const diffuseSampler = new WebGPUSampler( 'map' );
 
 		// texture
 
-		const diffuseTexture = new WebGPUSampledTexture();
-		diffuseTexture.setName( 'map' );
+		const diffuseTexture = new WebGPUSampledTexture( 'map' );
 
 		// the order of WebGPUBinding objects must match the binding order in the shader
 
@@ -316,8 +312,7 @@ class WebGPUBindings {
 		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
 		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
 
-		const modelGroup = new WebGPUUniformsGroup();
-		modelGroup.setName( 'modelUniforms' );
+		const modelGroup = new WebGPUUniformsGroup( 'modelUniforms' );
 		modelGroup.addUniform( modelViewUniform );
 		modelGroup.addUniform( modelViewMatrixUniform );
 		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
@@ -347,8 +342,7 @@ class WebGPUBindings {
 		const modelViewUniform = new Matrix4Uniform( 'modelMatrix' );
 		const modelViewMatrixUniform = new Matrix4Uniform( 'modelViewMatrix' );
 
-		const modelGroup = new WebGPUUniformsGroup();
-		modelGroup.setName( 'modelUniforms' );
+		const modelGroup = new WebGPUUniformsGroup( 'modelUniforms' );
 		modelGroup.addUniform( modelViewUniform );
 		modelGroup.addUniform( modelViewMatrixUniform );
 		modelGroup.setOnBeforeUpdate( function ( object/*, camera */ ) {
@@ -374,8 +368,7 @@ class WebGPUBindings {
 		const projectionMatrixUniform = new Matrix4Uniform( 'projectionMatrix' );
 		const viewMatrixUniform = new Matrix4Uniform( 'viewMatrix' );
 
-		const cameraGroup = new WebGPUUniformsGroup();
-		cameraGroup.setName( 'cameraUniforms' );
+		const cameraGroup = new WebGPUUniformsGroup( 'cameraUniforms' );
 		cameraGroup.addUniform( projectionMatrixUniform );
 		cameraGroup.addUniform( viewMatrixUniform );
 		cameraGroup.setOnBeforeUpdate( function ( object, camera ) {

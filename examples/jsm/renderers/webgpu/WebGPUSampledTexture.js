@@ -2,9 +2,9 @@ import WebGPUBinding from './WebGPUBinding.js';
 
 class WebGPUSampledTexture extends WebGPUBinding {
 
-	constructor() {
+	constructor( name ) {
 
-		super();
+		super( name );
 
 		this.dimension = '2d';
 
@@ -22,9 +22,9 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
 
-	constructor() {
+	constructor( name ) {
 
-		super();
+		super( name );
 
 		this.dimension = 'cube';
 

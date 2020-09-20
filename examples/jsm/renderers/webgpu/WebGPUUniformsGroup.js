@@ -2,9 +2,9 @@ import WebGPUBinding from './WebGPUBinding.js';
 
 class WebGPUUniformsGroup extends WebGPUBinding {
 
-	constructor() {
+	constructor( name ) {
 
-		super();
+		super( name );
 
 		 // the order of uniforms in this array must match the order of uniforms in the shader
 

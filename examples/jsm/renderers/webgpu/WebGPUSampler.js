@@ -2,9 +2,9 @@ import WebGPUBinding from './WebGPUBinding.js';
 
 class WebGPUSampler extends WebGPUBinding {
 
-	constructor() {
+	constructor( name ) {
 
-		super();
+		super( name );
 
 		this.type = 'sampler';
 		this.visibility = GPUShaderStage.FRAGMENT;
