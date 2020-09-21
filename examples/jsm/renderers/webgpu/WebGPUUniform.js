@@ -2,14 +2,13 @@ import { Color, Matrix3, Matrix4, Vector2, Vector3, Vector4 } from '../../../../
 
 class WebGPUUniform {
 
-	constructor( name, value ) {
+	constructor( name, value = null ) {
 
 		this.name = name;
 		this.value = value;
 
 		this.byteLength = 0;
 		this.itemSize = 0;
-		this.value = null;
 
 	}
 
