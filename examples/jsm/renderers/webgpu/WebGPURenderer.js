@@ -173,7 +173,7 @@ class WebGPURenderer {
 		this._geometries = new WebGPUGeometries( this._attributes, this._info );
 		this._textures = new WebGPUTextures( device, this._properties, this._info, compiler );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
-		this._renderPipelines = new WebGPURenderPipelines( device, compiler, parameters.sampleCount );
+		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, compiler, parameters.sampleCount );
 		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines );
 		this._renderLists = new WebGPURenderLists();
 		this._background = new WebGPUBackground( this );
@@ -526,6 +526,12 @@ class WebGPURenderer {
 			this._textures.initRenderTarget( renderTarget );
 
 		}
+
+	}
+
+	getRenderTarget() {
+
+		return this._renderTarget;
 
 	}
 

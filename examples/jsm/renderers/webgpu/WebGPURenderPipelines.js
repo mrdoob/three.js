@@ -11,8 +11,10 @@ import {
 
 class WebGPURenderPipelines {
 
-	constructor( device, glslang, sampleCount ) {
+	constructor( renderer, properties, device, glslang, sampleCount ) {
 
+		this.renderer = renderer;
+		this.properties = properties;
 		this.device = device;
 		this.glslang = glslang;
 		this.sampleCount = sampleCount;
@@ -154,6 +156,8 @@ class WebGPURenderPipelines {
 			const rasterizationState = this._getRasterizationStateDescriptor( material );
 			const colorWriteMask = this._getColorWriteMask( material );
 			const depthCompare = this._getDepthCompare( material );
+			const colorFormat = this._getColorFormat( this.renderer );
+			const depthStencilFormat = this._getDepthStencilFormat( this.renderer );
 
 			pipeline = device.createRenderPipeline( {
 				vertexStage: moduleVertex,
@@ -161,13 +165,13 @@ class WebGPURenderPipelines {
 				primitiveTopology: primitiveTopology,
 				rasterizationState: rasterizationState,
 				colorStates: [ {
-					format: GPUTextureFormat.BRGA8Unorm,
+					format: colorFormat,
 					alphaBlend: alphaBlend,
 					colorBlend: colorBlend,
 					writeMask: colorWriteMask
 				} ],
 				depthStencilState: {
-					format: GPUTextureFormat.Depth24PlusStencil8,
+					format: depthStencilFormat,
 					depthWriteEnabled: material.depthWrite,
 					depthCompare: depthCompare,
 					stencilFront: stencilFront,
@@ -467,6 +471,27 @@ class WebGPURenderPipelines {
 
 	}
 
+	_getColorFormat( renderer ) {
+
+		let format;
+
+		const renderTarget = renderer.getRenderTarget();
+
+		if ( renderTarget !== null ) {
+
+			const renderTargetProperties = this.properties.get( renderTarget );
+			format = renderTargetProperties.colorTextureFormat;
+
+		} else {
+
+			format = GPUTextureFormat.BRGA8Unorm; // default swap chain format
+
+		}
+
+		return format;
+
+	}
+
 	_getColorWriteMask( material ) {
 
 		return ( material.colorWrite === true ) ? GPUColorWriteFlags.All : GPUColorWriteFlags.None;
@@ -527,6 +552,27 @@ class WebGPURenderPipelines {
 		}
 
 		return depthCompare;
+
+	}
+
+	_getDepthStencilFormat( renderer ) {
+
+		let format;
+
+		const renderTarget = renderer.getRenderTarget();
+
+		if ( renderTarget !== null ) {
+
+			const renderTargetProperties = this.properties.get( renderTarget );
+			format = renderTargetProperties.depthTextureFormat;
+
+		} else {
+
+			format = GPUTextureFormat.Depth24PlusStencil8;
+
+		}
+
+		return format;
 
 	}
 

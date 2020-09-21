@@ -197,6 +197,7 @@ class WebGPUTextures {
 
 			const width = renderTarget.width;
 			const height = renderTarget.height;
+			const colorTextureFormat = this._getFormat( renderTarget.texture );
 
 			const colorTextureGPU = device.createTexture( {
 				size: {
@@ -204,11 +205,12 @@ class WebGPUTextures {
 					height: height,
 					depth: 1
 				},
-				format: GPUTextureFormat.BRGA8Unorm, // @TODO: Make configurable
+				format: colorTextureFormat,
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.SAMPLED
 			} );
 
 			renderTargetProperties.colorTextureGPU = colorTextureGPU;
+			renderTargetProperties.colorTextureFormat = colorTextureFormat;
 
 			// When the ".texture" or ".depthTexture" property of a render target is used as a map,
 			// the renderer has to find the respective GPUTexture objects to setup the bind groups.
@@ -221,17 +223,20 @@ class WebGPUTextures {
 
 			if ( renderTarget.depthBuffer === true ) {
 
+				const depthTextureFormat = GPUTextureFormat.Depth24PlusStencil8; // @TODO: Make configurable
+
 				const depthTextureGPU = device.createTexture( {
 					size: {
 						width: width,
 						height: height,
 						depth: 1
 					},
-					format: GPUTextureFormat.Depth24PlusStencil8, // @TODO: Make configurable
+					format: depthTextureFormat,
 					usage: GPUTextureUsage.OUTPUT_ATTACHMENT
 				} );
 
 				renderTargetProperties.depthTextureGPU = depthTextureGPU;
+				renderTargetProperties.depthTextureFormat = depthTextureFormat;
 
 				if ( renderTarget.depthTexture !== null ) {
 
