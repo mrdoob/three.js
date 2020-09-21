@@ -1158,9 +1158,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		handleTouchEnd( event );
 
-		scope.dispatchEvent( endEvent );
-
-		state = STATE.NONE;
+		scope.cancel();
 
 	}
 
