@@ -24,7 +24,6 @@ class WebGPURenderPipelines {
 			fragment: new WeakMap()
 		};
 
-
 	}
 
 	get( object ) {
