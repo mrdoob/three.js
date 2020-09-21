@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Community Help and Support
+    url: https://discourse.threejs.org/
+    about: Please ask and answer questions here.
+  - name: Stackoverflow
+    url: http://stackoverflow.com/questions/tagged/three.js
+    about: Stackoverflow questions and answers.
+  - name: Writing and formatting Help
+    url: https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax
+    about: Github article on basic writing and formatting on github
