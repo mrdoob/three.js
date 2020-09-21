@@ -23514,7 +23514,7 @@ function WebXRManager( renderer, gl ) {
 
 		if ( controller ) {
 
-			controller.dispatchEvent( { type: event.type } );
+			controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
 		}
 
@@ -28141,13 +28141,13 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 		const vEnd = new Vector3();
 		const interSegment = new Vector3();
 		const interRay = new Vector3();
-		const step = ( this && this.isLineSegments ) ? 2 : 1;
+		const step = this.isLineSegments ? 2 : 1;
 
 		if ( geometry.isBufferGeometry ) {
 
 			const index = geometry.index;
 			const attributes = geometry.attributes;
-			const positions = attributes.position.array;
+			const positionAttribute = attributes.position;
 
 			if ( index !== null ) {
 
@@ -28158,8 +28158,8 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 					const a = indices[ i ];
 					const b = indices[ i + 1 ];
 
-					vStart.fromArray( positions, a * 3 );
-					vEnd.fromArray( positions, b * 3 );
+					vStart.fromBufferAttribute( positionAttribute, a );
+					vEnd.fromBufferAttribute( positionAttribute, b );
 
 					const distSq = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -28188,10 +28188,10 @@ Line.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positions.length / 3 - 1; i < l; i += step ) {
+				for ( let i = 0, l = positionAttribute.count - 1; i < l; i += step ) {
 
-					vStart.fromArray( positions, 3 * i );
-					vEnd.fromArray( positions, 3 * i + 3 );
+					vStart.fromBufferAttribute( positionAttribute, i );
+					vEnd.fromBufferAttribute( positionAttribute, i + 1 );
 
 					const distSq = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -28512,7 +28512,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			const index = geometry.index;
 			const attributes = geometry.attributes;
-			const positions = attributes.position.array;
+			const positionAttribute = attributes.position;
 
 			if ( index !== null ) {
 
@@ -28522,7 +28522,7 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 					const a = indices[ i ];
 
-					_position$1.fromArray( positions, a * 3 );
+					_position$1.fromBufferAttribute( positionAttribute, a );
 
 					testPoint( _position$1, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -28530,9 +28530,9 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			} else {
 
-				for ( let i = 0, l = positions.length / 3; i < l; i ++ ) {
+				for ( let i = 0, l = positionAttribute.count; i < l; i ++ ) {
 
-					_position$1.fromArray( positions, i * 3 );
+					_position$1.fromBufferAttribute( positionAttribute, i );
 
 					testPoint( _position$1, i, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -33442,6 +33442,7 @@ MeshStandardMaterial.prototype.copy = function ( source ) {
  *  clearcoatNormalMap: new THREE.Texture( <Image> ),
  *
  *  reflectivity: <float>,
+ *  ior: <float>,
  *
  *  sheen: <Color>,
  *
@@ -33471,6 +33472,19 @@ function MeshPhysicalMaterial( parameters ) {
 	this.clearcoatNormalMap = null;
 
 	this.reflectivity = 0.5; // maps to F0 = 0.04
+
+	Object.defineProperty( this, 'ior', {
+		get: function () {
+
+			return ( 1 + 0.4 * this.reflectivity ) / ( 1 - 0.4 * this.reflectivity );
+
+		},
+		set: function ( ior ) {
+
+			this.reflectivity = MathUtils.clamp( 2.5 * ( ior - 1 ) / ( ior + 1 ), 0, 1 );
+
+		}
+	} );
 
 	this.sheen = null; // null will disable sheen bsdf
 
@@ -36301,6 +36315,7 @@ function Loader( manager ) {
 	this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 	this.crossOrigin = 'anonymous';
+	this.withCredentials = false;
 	this.path = '';
 	this.resourcePath = '';
 	this.requestHeader = {};
@@ -36328,6 +36343,13 @@ Object.assign( Loader.prototype, {
 	setCrossOrigin: function ( crossOrigin ) {
 
 		this.crossOrigin = crossOrigin;
+		return this;
+
+	},
+
+	setWithCredentials: function ( value ) {
+
+		this.withCredentials = value;
 		return this;
 
 	},
@@ -36640,13 +36662,6 @@ FileLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 	},
 
-	setWithCredentials: function ( value ) {
-
-		this.withCredentials = value;
-		return this;
-
-	},
-
 	setMimeType: function ( value ) {
 
 		this.mimeType = value;
@@ -36673,6 +36688,7 @@ AnimationLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -36746,6 +36762,7 @@ CompressedTextureLoader.prototype = Object.assign( Object.create( Loader.prototy
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 
 		let loaded = 0;
 
@@ -37004,6 +37021,7 @@ DataTextureLoader.prototype = Object.assign( Object.create( Loader.prototype ), 
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
 		loader.setPath( this.path );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			const texData = scope.parse( buffer );
@@ -40106,6 +40124,7 @@ MaterialLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -40530,6 +40549,7 @@ BufferGeometryLoader.prototype = Object.assign( Object.create( Loader.prototype 
 		const loader = new FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -40744,9 +40764,10 @@ class ObjectLoader extends Loader {
 		const path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 		this.resourcePath = this.resourcePath || path;
 
-		const loader = new FileLoader( scope.manager );
+		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( text ) {
 
 			let json = null;
@@ -42225,6 +42246,7 @@ FontLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		const loader = new FileLoader( this.manager );
 		loader.setPath( this.path );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			let json;
@@ -42298,6 +42320,7 @@ AudioLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setResponseType( 'arraybuffer' );
 		loader.setPath( scope.path );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {

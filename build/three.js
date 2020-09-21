@@ -23452,7 +23452,7 @@
 
 			if ( controller ) {
 
-				controller.dispatchEvent( { type: event.type } );
+				controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
 			}
 
@@ -28073,13 +28073,13 @@
 			var vEnd = new Vector3();
 			var interSegment = new Vector3();
 			var interRay = new Vector3();
-			var step = ( this && this.isLineSegments ) ? 2 : 1;
+			var step = this.isLineSegments ? 2 : 1;
 
 			if ( geometry.isBufferGeometry ) {
 
 				var index = geometry.index;
 				var attributes = geometry.attributes;
-				var positions = attributes.position.array;
+				var positionAttribute = attributes.position;
 
 				if ( index !== null ) {
 
@@ -28090,8 +28090,8 @@
 						var a = indices[ i ];
 						var b = indices[ i + 1 ];
 
-						vStart.fromArray( positions, a * 3 );
-						vEnd.fromArray( positions, b * 3 );
+						vStart.fromBufferAttribute( positionAttribute, a );
+						vEnd.fromBufferAttribute( positionAttribute, b );
 
 						var distSq = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -28120,10 +28120,10 @@
 
 				} else {
 
-					for ( var i$1 = 0, l$1 = positions.length / 3 - 1; i$1 < l$1; i$1 += step ) {
+					for ( var i$1 = 0, l$1 = positionAttribute.count - 1; i$1 < l$1; i$1 += step ) {
 
-						vStart.fromArray( positions, 3 * i$1 );
-						vEnd.fromArray( positions, 3 * i$1 + 3 );
+						vStart.fromBufferAttribute( positionAttribute, i$1 );
+						vEnd.fromBufferAttribute( positionAttribute, i$1 + 1 );
 
 						var distSq$1 = _ray$1.distanceSqToSegment( vStart, vEnd, interRay, interSegment );
 
@@ -28444,7 +28444,7 @@
 
 				var index = geometry.index;
 				var attributes = geometry.attributes;
-				var positions = attributes.position.array;
+				var positionAttribute = attributes.position;
 
 				if ( index !== null ) {
 
@@ -28454,7 +28454,7 @@
 
 						var a = indices[ i ];
 
-						_position$1.fromArray( positions, a * 3 );
+						_position$1.fromBufferAttribute( positionAttribute, a );
 
 						testPoint( _position$1, a, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -28462,9 +28462,9 @@
 
 				} else {
 
-					for ( var i$1 = 0, l = positions.length / 3; i$1 < l; i$1 ++ ) {
+					for ( var i$1 = 0, l = positionAttribute.count; i$1 < l; i$1 ++ ) {
 
-						_position$1.fromArray( positions, i$1 * 3 );
+						_position$1.fromBufferAttribute( positionAttribute, i$1 );
 
 						testPoint( _position$1, i$1, localThresholdSq, matrixWorld, raycaster, intersects, this );
 
@@ -33342,6 +33342,7 @@
 	 *  clearcoatNormalMap: new THREE.Texture( <Image> ),
 	 *
 	 *  reflectivity: <float>,
+	 *  ior: <float>,
 	 *
 	 *  sheen: <Color>,
 	 *
@@ -33371,6 +33372,19 @@
 		this.clearcoatNormalMap = null;
 
 		this.reflectivity = 0.5; // maps to F0 = 0.04
+
+		Object.defineProperty( this, 'ior', {
+			get: function () {
+
+				return ( 1 + 0.4 * this.reflectivity ) / ( 1 - 0.4 * this.reflectivity );
+
+			},
+			set: function ( ior ) {
+
+				this.reflectivity = MathUtils.clamp( 2.5 * ( ior - 1 ) / ( ior + 1 ), 0, 1 );
+
+			}
+		} );
 
 		this.sheen = null; // null will disable sheen bsdf
 
@@ -36203,6 +36217,7 @@
 		this.manager = ( manager !== undefined ) ? manager : DefaultLoadingManager;
 
 		this.crossOrigin = 'anonymous';
+		this.withCredentials = false;
 		this.path = '';
 		this.resourcePath = '';
 		this.requestHeader = {};
@@ -36230,6 +36245,13 @@
 		setCrossOrigin: function ( crossOrigin ) {
 
 			this.crossOrigin = crossOrigin;
+			return this;
+
+		},
+
+		setWithCredentials: function ( value ) {
+
+			this.withCredentials = value;
 			return this;
 
 		},
@@ -36542,13 +36564,6 @@
 
 		},
 
-		setWithCredentials: function ( value ) {
-
-			this.withCredentials = value;
-			return this;
-
-		},
-
 		setMimeType: function ( value ) {
 
 			this.mimeType = value;
@@ -36575,6 +36590,7 @@
 			var loader = new FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( text ) {
 
 				try {
@@ -36648,6 +36664,7 @@
 			loader.setPath( this.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setRequestHeader( this.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 
 			var loaded = 0;
 
@@ -36906,6 +36923,7 @@
 			loader.setResponseType( 'arraybuffer' );
 			loader.setRequestHeader( this.requestHeader );
 			loader.setPath( this.path );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( buffer ) {
 
 				var texData = scope.parse( buffer );
@@ -40004,6 +40022,7 @@
 			var loader = new FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( text ) {
 
 				try {
@@ -40428,6 +40447,7 @@
 			var loader = new FileLoader( scope.manager );
 			loader.setPath( scope.path );
 			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( text ) {
 
 				try {
@@ -40643,9 +40663,10 @@
 			var path = ( this.path === '' ) ? LoaderUtils.extractUrlBase( url ) : this.path;
 			this.resourcePath = this.resourcePath || path;
 
-			var loader = new FileLoader( scope.manager );
+			var loader = new FileLoader( this.manager );
 			loader.setPath( this.path );
 			loader.setRequestHeader( this.requestHeader );
+			loader.setWithCredentials( this.withCredentials );
 			loader.load( url, function ( text ) {
 
 				var json = null;
@@ -42122,6 +42143,7 @@
 			var loader = new FileLoader( this.manager );
 			loader.setPath( this.path );
 			loader.setRequestHeader( this.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( text ) {
 
 				var json;
@@ -42195,6 +42217,7 @@
 			loader.setResponseType( 'arraybuffer' );
 			loader.setPath( scope.path );
 			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 			loader.load( url, function ( buffer ) {
 
 				try {
