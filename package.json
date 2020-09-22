@@ -54,11 +54,10 @@
   "scripts": {
     "start": "npm run dev",
     "test": "npm run test-lint && npm run test-unit",
-    "build": "rollup -c utils/build/rollup.config.js && npm run lint-fix-build",
+    "build": "rollup -c utils/build/rollup.config.js",
     "dev": "concurrently --names \"ROLLUP,HTTP\" -c \"bgBlue.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"http-server -c-1 -p 8080\"",
     "dev-test": "concurrently --names \"ROLLUP,ROLLUPTEST,HTTP\" -c \"bgBlue.bold,bgRed.bold,bgGreen.bold\" \"rollup -c utils/build/rollup.config.js -w -m inline\" \"npm run dev --prefix test\" \"http-server -p 8080\"",
     "lint-fix": "eslint src --ext js --ext ts --fix && eslint examples/js/ --ext js --ext ts --ignore-pattern libs --fix",
-    "lint-fix-build": "eslint build/three.js --fix --quiet",
     "lint-docs": "eslint docs --ext html",
     "lint-examples": "eslint examples/jsm --ext js --ext ts --ignore-pattern libs && tsc -p utils/build/tsconfig-examples.lint.json",
     "test-lint": "eslint src --ext js --ext ts && tsc -p utils/build/tsconfig.lint.json",
