@@ -1,6 +1,7 @@
 import { Vector2 } from './../math/Vector2';
 import { Matrix3 } from './../math/Matrix3';
 import { EventDispatcher } from './../core/EventDispatcher';
+import { TextureImage } from './TextureImage';
 import {
 	Mapping,
 	Wrapping,
@@ -45,7 +46,11 @@ export class Texture extends EventDispatcher {
 	 * @default ''
 	 */
 	name: string;
-	sourceFile: string;
+
+	/**
+	 * @default new THREE.TextureImage( image || Texture.DEFAULT_IMAGE )
+	 */
+	textureImage: TextureImage;
 
 	/**
 	 * @default THREE.Texture.DEFAULT_IMAGE

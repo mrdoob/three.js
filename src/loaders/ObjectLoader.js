@@ -45,6 +45,7 @@ import { PerspectiveCamera } from '../cameras/PerspectiveCamera.js';
 import { Scene } from '../scenes/Scene.js';
 import { CubeTexture } from '../textures/CubeTexture.js';
 import { Texture } from '../textures/Texture.js';
+import { TextureImage } from '../textures/TextureImage.js';
 import { ImageLoader } from './ImageLoader.js';
 import { LoadingManager } from './LoadingManager.js';
 import { AnimationClip } from '../animation/AnimationClip.js';
@@ -558,7 +559,7 @@ class ObjectLoader extends Loader {
 
 					// load array of images e.g CubeTexture
 
-					images[ image.uuid ] = [];
+					const imageArray = [];
 
 					for ( let j = 0, jl = url.length; j < jl; j ++ ) {
 
@@ -566,9 +567,11 @@ class ObjectLoader extends Loader {
 
 						const path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( currentUrl ) ? currentUrl : scope.resourcePath + currentUrl;
 
-						images[ image.uuid ].push( loadImage( path ) );
+						imageArray.push( loadImage( path ) );
 
 					}
+
+					images[ image.uuid ] = new TextureImage( imageArray );
 
 				} else {
 
@@ -576,7 +579,7 @@ class ObjectLoader extends Loader {
 
 					const path = /^(\/\/)|([a-z]+:(\/\/)?)/i.test( image.url ) ? image.url : scope.resourcePath + image.url;
 
-					images[ image.uuid ] = loadImage( path );
+					images[ image.uuid ] = new TextureImage( loadImage( path ) );
 
 				}
 
@@ -620,18 +623,10 @@ class ObjectLoader extends Loader {
 
 				}
 
-				let texture;
+				const textureImage = images[ data.image ];
+				const texture = Array.isArray( textureImage.image ) ? new CubeTexture() : new Texture();
 
-				if ( Array.isArray( images[ data.image ] ) ) {
-
-					texture = new CubeTexture( images[ data.image ] );
-
-				} else {
-
-					texture = new Texture( images[ data.image ] );
-
-				}
-
+				texture.textureImage = textureImage;
 				texture.needsUpdate = true;
 
 				texture.uuid = data.uuid;

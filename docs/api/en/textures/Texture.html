@@ -54,6 +54,12 @@
 		as long as video is playing - the [page:VideoTexture VideoTexture] class handles this automatically.
 		</p>
 
+		<h3>[property:TextureImage textureImage]</h3>
+		<p>
+		This property wraps the actual [page:Texture.image image] property into an object so it can be shared across different textures
+		without causing multiple GPU uploads.
+		</p>
+
 		<h3>[property:array mipmaps]</h3>
 		<p>
 		Array of user-specified mipmaps (optional).

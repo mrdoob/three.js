@@ -13,7 +13,7 @@ import {
 import { MathUtils } from '../math/MathUtils.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Matrix3 } from '../math/Matrix3.js';
-import { ImageUtils } from '../extras/ImageUtils.js';
+import { TextureImage } from './TextureImage.js';
 
 let textureId = 0;
 
@@ -25,7 +25,7 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.name = '';
 
-	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
+	this.textureImage = new TextureImage( image || Texture.DEFAULT_IMAGE );
 	this.mipmaps = [];
 
 	this.mapping = mapping !== undefined ? mapping : Texture.DEFAULT_MAPPING;
@@ -64,6 +64,21 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 	this.version = 0;
 	this.onUpdate = null;
 
+	//
+
+	Object.defineProperty( this, 'image', {
+		set: function ( image ) {
+
+			this.textureImage.image = image;
+
+		},
+		get: function () {
+
+			return this.textureImage.image;
+
+		}
+	} );
+
 }
 
 Texture.DEFAULT_IMAGE = undefined;
@@ -91,7 +106,7 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 
 		this.name = source.name;
 
-		this.image = source.image;
+		this.textureImage = source.textureImage;
 		this.mipmaps = source.mipmaps.slice( 0 );
 
 		this.mapping = source.mapping;
@@ -122,6 +137,8 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 		this.unpackAlignment = source.unpackAlignment;
 		this.encoding = source.encoding;
 
+		this.version = source.version;
+
 		return this;
 
 	},
@@ -147,6 +164,8 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			uuid: this.uuid,
 			name: this.name,
 
+			image: this.textureImage.toJSON( meta ).uuid,
+
 			mapping: this.mapping,
 
 			repeat: [ this.repeat.x, this.repeat.y ],
@@ -170,53 +189,6 @@ Texture.prototype = Object.assign( Object.create( EventDispatcher.prototype ), {
 			unpackAlignment: this.unpackAlignment
 
 		};
-
-		if ( this.image !== undefined ) {
-
-			// TODO: Move to THREE.Image
-
-			const image = this.image;
-
-			if ( image.uuid === undefined ) {
-
-				image.uuid = MathUtils.generateUUID(); // UGH
-
-			}
-
-			if ( ! isRootObject && meta.images[ image.uuid ] === undefined ) {
-
-				let url;
-
-				if ( Array.isArray( image ) ) {
-
-					// process array of images e.g. CubeTexture
-
-					url = [];
-
-					for ( let i = 0, l = image.length; i < l; i ++ ) {
-
-						url.push( ImageUtils.getDataURL( image[ i ] ) );
-
-					}
-
-				} else {
-
-					// process single image
-
-					url = ImageUtils.getDataURL( image );
-
-				}
-
-				meta.images[ image.uuid ] = {
-					uuid: image.uuid,
-					url: url
-				};
-
-			}
-
-			output.image = image.uuid;
-
-		}
 
 		if ( ! isRootObject ) {
 
@@ -320,7 +292,12 @@ Object.defineProperty( Texture.prototype, "needsUpdate", {
 
 	set: function ( value ) {
 
-		if ( value === true ) this.version ++;
+		if ( value === true ) {
+
+			this.version ++;
+			this.textureImage.version ++;
+
+		}
 
 	}
 

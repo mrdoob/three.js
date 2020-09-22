@@ -54,6 +54,12 @@
 		并在视频播放时不断地更新这个纹理贴图。——[page:VideoTexture VideoTexture] 类会对此自动进行处理。
 		</p>
 
+		<h3>[property:TextureImage textureImage]</h3>
+		<p>
+		This property wraps the actual [page:Texture.image image] property into an object so it can be shared across different textures
+		without causing multiple GPU uploads.
+		</p>
+
 		<h3>[property:array mipmaps]</h3>
 		<p>
 		用户所给定的mipmap数组（可选）。
