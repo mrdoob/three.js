@@ -1,17 +1,5 @@
 import { Shape } from './../extras/core/Shape';
 import { Geometry } from './../core/Geometry';
-import { BufferGeometry } from './../core/BufferGeometry';
-
-export class ShapeBufferGeometry extends BufferGeometry {
-
-	/**
-	 * @default 'ShapeBufferGeometry'
-	 */
-	type: string;
-
-	constructor( shapes: Shape | Shape[], curveSegments?: number );
-
-}
 
 export class ShapeGeometry extends Geometry {
 

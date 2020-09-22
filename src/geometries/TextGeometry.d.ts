@@ -1,5 +1,5 @@
 import { Font } from './../extras/core/Font';
-import { ExtrudeGeometry, ExtrudeBufferGeometry } from './ExtrudeGeometry';
+import { Geometry } from './../core/Geometry';
 
 export interface TextGeometryParameters {
 	font: Font;
@@ -13,30 +13,7 @@ export interface TextGeometryParameters {
 	bevelSegments?: number;
 }
 
-export class TextBufferGeometry extends ExtrudeBufferGeometry {
-
-	/**
-	 * @default 'TextBufferGeometry'
-	 */
-	type: string;
-
-	constructor( text: string, parameters: TextGeometryParameters );
-
-	parameters: {
-		font: Font;
-		size: number;
-		height: number;
-		curveSegments: number;
-		bevelEnabled: boolean;
-		bevelThickness: number;
-		bevelSize: number;
-		bevelOffset: number;
-		bevelSegments: number;
-	};
-
-}
-
-export class TextGeometry extends ExtrudeGeometry {
+export class TextGeometry extends Geometry {
 
 	constructor( text: string, parameters: TextGeometryParameters );
 

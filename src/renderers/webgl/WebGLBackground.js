@@ -1,6 +1,6 @@
 import { BackSide, FrontSide, CubeUVReflectionMapping } from '../../constants.js';
-import { BoxBufferGeometry } from '../../geometries/BoxGeometry.js';
-import { PlaneBufferGeometry } from '../../geometries/PlaneGeometry.js';
+import { BoxBufferGeometry } from '../../geometries/BoxBufferGeometry.js';
+import { PlaneBufferGeometry } from '../../geometries/PlaneBufferGeometry.js';
 import { ShaderMaterial } from '../../materials/ShaderMaterial.js';
 import { Color } from '../../math/Color.js';
 import { Mesh } from '../../objects/Mesh.js';
