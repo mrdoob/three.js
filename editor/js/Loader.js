@@ -511,7 +511,7 @@ function Loader( editor ) {
 					editor.execute( new AddObjectCommand( editor, mesh ) );
 
 				}, false );
-				reader.readAsText( file );
+				reader.readAsArrayBuffer( file );
 
 				break;
 
