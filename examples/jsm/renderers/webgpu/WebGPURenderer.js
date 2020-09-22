@@ -5,6 +5,7 @@ import WebGPUGeometries from './WebGPUGeometries.js';
 import WebGPUInfo from './WebGPUInfo.js';
 import WebGPUProperties from './WebGPUProperties.js';
 import WebGPURenderPipelines from './WebGPURenderPipelines.js';
+import WebGPUComputePipelines from './WebGPUComputePipelines.js';
 import WebGPUBindings from './WebGPUBindings.js';
 import WebGPURenderLists from './WebGPURenderLists.js';
 import WebGPUTextures from './WebGPUTextures.js';
@@ -99,6 +100,7 @@ class WebGPURenderer {
 		this._bindings = null;
 		this._objects = null;
 		this._renderPipelines = null;
+		this._computePipelines = null;
 		this._renderLists = null;
 		this._textures = null;
 		this._background = null;
@@ -174,7 +176,8 @@ class WebGPURenderer {
 		this._textures = new WebGPUTextures( device, this._properties, this._info, compiler );
 		this._objects = new WebGPUObjects( this._geometries, this._info );
 		this._renderPipelines = new WebGPURenderPipelines( this, this._properties, device, compiler, parameters.sampleCount );
-		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines );
+		this._computePipelines = new WebGPUComputePipelines( device, compiler );
+		this._bindings = new WebGPUBindings( device, this._info, this._properties, this._textures, this._renderPipelines, this._computePipelines, this._attributes );
 		this._renderLists = new WebGPURenderLists();
 		this._background = new WebGPUBackground( this );
 
@@ -510,6 +513,7 @@ class WebGPURenderer {
 		this._objects.dispose();
 		this._properties.dispose();
 		this._renderPipelines.dispose();
+		this._computePipelines.dispose();
 		this._bindings.dispose();
 		this._info.dispose();
 		this._renderLists.dispose();
@@ -526,6 +530,34 @@ class WebGPURenderer {
 			this._textures.initRenderTarget( renderTarget );
 
 		}
+
+	}
+
+	compute( computeParams ) {
+
+		const device = this._device;
+		const cmdEncoder = device.createCommandEncoder( {} );
+		const passEncoder = cmdEncoder.beginComputePass();
+
+		for ( const param of computeParams ) {
+
+			// pipeline
+
+			const pipeline = this._computePipelines.get( param );
+			passEncoder.setPipeline( pipeline );
+
+			// bind group
+
+			const bindGroup = this._bindings.getForCompute( param ).group;
+			this._bindings.update( param );
+			passEncoder.setBindGroup( 0, bindGroup );
+
+			passEncoder.dispatch( param.num );
+
+		}
+
+		passEncoder.endPass();
+		device.defaultQueue.submit( [ cmdEncoder.finish() ] );
 
 	}
 
