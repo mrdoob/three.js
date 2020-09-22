@@ -1,4 +1,4 @@
-import buble from 'rollup-plugin-buble';
+import babel from "@rollup/plugin-babel";
 import { terser } from "rollup-plugin-terser";
 
 function glconstants() {
@@ -255,17 +255,41 @@ function header() {
 
 }
 
+const babelrc = {
+	presets: [
+		[
+			'@babel/preset-env',
+			{
+				modules: false,
+				// the supported browsers of the three.js browser bundle
+				// https://browsersl.ist/?q=%3E0.3%25%2C+not+dead
+				targets: '>0.3%, not dead',
+				loose: true,
+				bugfixes: true,
+			},
+		],
+	],
+	plugins: [
+		[
+			'@babel/plugin-proposal-class-properties',
+			{
+				loose: true
+			}
+		]
+	]
+};
+
 export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
 			glconstants(),
 			glsl(),
-			buble( {
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+			babel( {
+				babelHelpers: 'bundled',
+				compact: false,
+				babelrc: false,
+				...babelrc
 			} ),
 			bubleCleanup(),
 			header()
@@ -284,11 +308,10 @@ export default [
 		plugins: [
 			glconstants(),
 			glsl(),
-			buble( {
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+			babel( {
+				babelHelpers: 'bundled',
+				babelrc: false,
+				...babelrc
 			} ),
 			bubleCleanup(),
 			terser(),
