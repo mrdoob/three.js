@@ -2,7 +2,7 @@ import WebGPUBinding from './WebGPUBinding.js';
 
 class WebGPUStorageBuffer extends WebGPUBinding {
 
-	constructor ( name, attribute ) {
+	constructor( name, attribute ) {
 
 		super( name );
 

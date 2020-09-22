@@ -1,4 +1,3 @@
-import WebGPUStorageBuffer from './WebGPUStorageBuffer.js';
 import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
 import { FloatUniform, Matrix3Uniform, Matrix4Uniform } from './WebGPUUniform.js';
 import WebGPUSampler from './WebGPUSampler.js';

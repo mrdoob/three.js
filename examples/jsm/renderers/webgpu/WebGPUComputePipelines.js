@@ -45,7 +45,7 @@ class WebGPUComputePipelines {
 				module: moduleCompute,
 				entryPoint: 'main'
 			};
-	
+
 			pipeline = device.createComputePipeline( {
 				computeStage: computeStage
 			} );

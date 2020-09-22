@@ -26,7 +26,7 @@
 
 			const computeParams = [];
 
-			init().then( animate ).catch( onInitError );
+			init().then( animate ).catch( error );
 
 			async function init() {
 
@@ -187,7 +187,7 @@
 					( x / width - 0.5 ) * 2.0,
 					( - y / height + 0.5 ) * 2.0
 				);
-			
+
 			}
 
 			function animate() {
@@ -199,7 +199,7 @@
 
 			}
 
-			function onInitError( error ) {
+			function error( error ) {
 
 				console.error( error );
 
