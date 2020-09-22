@@ -322,7 +322,6 @@ export default [
 				format: 'umd',
 				name: 'THREE',
 				file: 'build/three.min.js',
-				indent: '\t'
 			}
 		]
 	},
@@ -337,7 +336,6 @@ export default [
 			{
 				format: 'esm',
 				file: 'build/three.module.js',
-				indent: '\t'
 			}
 		]
 	}
