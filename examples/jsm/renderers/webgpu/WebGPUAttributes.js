@@ -27,13 +27,25 @@ class WebGPUAttributes {
 
 	}
 
-	update( attribute, isIndex = false ) {
+	update( attribute, isIndex = false, usage = null ) {
 
 		let data = this.buffers.get( attribute );
 
 		if ( data === undefined ) {
 
-			const usage = ( isIndex === true ) ? GPUBufferUsage.INDEX : GPUBufferUsage.VERTEX;
+			if ( usage === null ) {
+
+				usage = ( isIndex === true ) ? GPUBufferUsage.INDEX : GPUBufferUsage.VERTEX;
+
+			}
+
+			data = this._createBuffer( attribute, usage );
+
+			this.buffers.set( attribute, data );
+
+		} else if ( usage && usage !== data.usage ) {
+
+			data.buffer.destroy();
 
 			data = this._createBuffer( attribute, usage );
 
@@ -68,7 +80,8 @@ class WebGPUAttributes {
 
 		return {
 			version: attribute.version,
-			buffer: buffer
+			buffer: buffer,
+			usage: usage
 		};
 
 	}

@@ -323,7 +323,8 @@ var files = {
 	],
 	"webgpu": [
 		"webgpu_sandbox",
-		"webgpu_rtt"
+		"webgpu_rtt",
+		"webgpu_compute",
 	],
 	"webaudio": [
 		"webaudio_orientation",

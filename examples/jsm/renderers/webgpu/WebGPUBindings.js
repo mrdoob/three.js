@@ -1,3 +1,4 @@
+import WebGPUStorageBuffer from './WebGPUStorageBuffer.js';
 import WebGPUUniformsGroup from './WebGPUUniformsGroup.js';
 import { FloatUniform, Matrix3Uniform, Matrix4Uniform } from './WebGPUUniform.js';
 import WebGPUSampler from './WebGPUSampler.js';
@@ -5,13 +6,15 @@ import { WebGPUSampledTexture } from './WebGPUSampledTexture.js';
 
 class WebGPUBindings {
 
-	constructor( device, info, properties, textures, pipelines ) {
+	constructor( device, info, properties, textures, pipelines, computePipelines, attributes ) {
 
 		this.device = device;
 		this.info = info;
 		this.properties = properties;
 		this.textures = textures;
 		this.pipelines = pipelines;
+		this.computePipelines = computePipelines;
+		this.attributes = attributes;
 
 		this.uniformsData = new WeakMap();
 
@@ -72,6 +75,31 @@ class WebGPUBindings {
 
 	}
 
+	getForCompute( param ) {
+
+		let data = this.uniformsData.get( param );
+
+		if ( data === undefined ) {
+
+			const pipeline = this.computePipelines.get( param );
+			const bindings = param.bindings !== undefined ? param.bindings.slice() : [];
+			const bindLayout = pipeline.getBindGroupLayout( 0 );
+			const bindGroup = this._createBindGroup( bindings, bindLayout );
+
+			data = {
+				layout: bindLayout,
+				group: bindGroup,
+				bindings: bindings
+			};
+
+			this.uniformsData.set( param, data );
+
+		}
+
+		return data;
+
+	}
+
 	update( object, camera ) {
 
 		const textures = this.textures;
@@ -115,6 +143,11 @@ class WebGPUBindings {
 				}
 
 				updateMap.set( binding, frame );
+
+			} else if ( binding.isStorageBuffer ) {
+
+				const attribute = binding.attribute;
+				this.attributes.update( attribute, false, binding.usage );
 
 			} else if ( binding.isSampler ) {
 
@@ -193,6 +226,19 @@ class WebGPUBindings {
 						size: byteLength,
 						usage: binding.usage,
 					} );
+
+				}
+
+				entries.push( { binding: bindingPoint, resource: { buffer: binding.bufferGPU } } );
+
+			} else if ( binding.isStorageBuffer ) {
+
+				if ( binding.bufferGPU === null ) {
+
+					const attribute = binding.attribute;
+
+					this.attributes.update( attribute, false, binding.usage );
+					binding.bufferGPU = this.attributes.get( attribute ).buffer;
 
 				}
 
