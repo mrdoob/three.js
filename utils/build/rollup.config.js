@@ -170,6 +170,27 @@ function glconstants() {
 
 }
 
+function addons() {
+
+	return {
+
+		transform( code, id ) {
+
+			if ( /\/examples\/jsm\//.test( id ) === false ) return;
+
+			code = code.replace( 'build/three.module.js', 'src/Three.js' );
+
+			return {
+				code: code,
+				map: null
+			};
+
+		}
+
+	};
+
+}
+
 function glsl() {
 
 	return {
@@ -259,6 +280,7 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			addons(),
 			glconstants(),
 			glsl(),
 			buble( {
@@ -282,6 +304,7 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			addons(),
 			glconstants(),
 			glsl(),
 			buble( {
@@ -306,6 +329,7 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			addons(),
 			glconstants(),
 			glsl(),
 			header()
