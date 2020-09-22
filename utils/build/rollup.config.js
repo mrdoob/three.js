@@ -1,5 +1,15 @@
-import buble from 'rollup-plugin-buble';
+import babel from "@rollup/plugin-babel";
 import { terser } from "rollup-plugin-terser";
+
+if ( ! String.prototype.replaceAll ) {
+
+	String.prototype.replaceAll = function ( find, replace ) {
+
+		return this.split( find ).join( replace );
+
+	};
+
+}
 
 function glconstants() {
 
@@ -202,23 +212,30 @@ function glsl() {
 
 }
 
-function bubleCleanup() {
+function babelCleanup() {
 
+	const wrappedClass = /(var\s*(\w+) = \/\*#__PURE__\*\/function \((\w+)?\) {\s*).*(return \2;\s*}\((\w+)?\);)/gs;
+	const inheritsLoose = /_inheritsLoose\((\w+), (\w+)\);\n/;
+
+	const doubleSpaces = / {2}/g;
 	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
-	const wrappedClass = /(var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n).*(return \2;\s+}\(\3\)\);\n)/s;
-	const unwrap = function ( match, wrapperStart, klass, parentClass, wrapperEnd ) {
+	const commentOutside = /function (\w+)?\(\)\s*\/\*(.*)\*\/\s*{/g;
+
+	function unwrap( match, wrapperStart, klass, _parentClass, wrapperEnd, parentClass ) {
 
 		return match
 			.replace( wrapperStart, '' )
-			.replace( `if ( ${parentClass} ) ${klass}.__proto__ = ${parentClass};`, '' )
-			.replace(
-				`${klass}.prototype = Object.create( ${parentClass} && ${parentClass}.prototype );`,
-				`${klass}.prototype = Object.create( ${parentClass}.prototype );`
-			)
+			.replace( inheritsLoose, '' )
 			.replace( wrapperEnd, '' )
-			.replace( danglingTabs, '' );
+			.replaceAll( _parentClass, parentClass );
 
-	};
+	}
+
+	function commentInside( match, functionName = '', comment ) {
+
+		return `function ${functionName}(/*${comment}*/) {`;
+
+	}
 
 	return {
 
@@ -226,9 +243,17 @@ function bubleCleanup() {
 
 			while ( wrappedClass.test( code ) ) {
 
-				code = code.replace( wrappedClass, unwrap );
+				code = code
+					.replace( wrappedClass, unwrap );
 
 			}
+
+
+			code = code
+				.replace( commentOutside, commentInside )
+				.replace( doubleSpaces, '\t' )
+				.replace( danglingTabs, '' );
+
 
 			return {
 				code: code,
@@ -255,19 +280,43 @@ function header() {
 
 }
 
+const babelrc = {
+	presets: [
+		[
+			'@babel/preset-env',
+			{
+				modules: false,
+				// the supported browsers of the three.js browser bundle
+				// https://browsersl.ist/?q=%3E0.3%25%2C+not+dead
+				targets: '>0.3%, not dead',
+				loose: true,
+				bugfixes: true,
+			},
+		],
+	],
+	plugins: [
+		[
+			'@babel/plugin-proposal-class-properties',
+			{
+				loose: true
+			}
+		]
+	]
+};
+
 export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
 			glconstants(),
 			glsl(),
-			buble( {
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+			babel( {
+				babelHelpers: 'bundled',
+				compact: false,
+				babelrc: false,
+				...babelrc
 			} ),
-			bubleCleanup(),
+			babelCleanup(),
 			header()
 		],
 		output: [
@@ -284,13 +333,12 @@ export default [
 		plugins: [
 			glconstants(),
 			glsl(),
-			buble( {
-				transforms: {
-					arrow: false,
-					classes: true
-				}
+			babel( {
+				babelHelpers: 'bundled',
+				babelrc: false,
+				...babelrc
 			} ),
-			bubleCleanup(),
+			babelCleanup(),
 			terser(),
 			header()
 		],
@@ -299,7 +347,6 @@ export default [
 				format: 'umd',
 				name: 'THREE',
 				file: 'build/three.min.js',
-				indent: '\t'
 			}
 		]
 	},
@@ -314,7 +361,6 @@ export default [
 			{
 				format: 'esm',
 				file: 'build/three.module.js',
-				indent: '\t'
 			}
 		]
 	}
