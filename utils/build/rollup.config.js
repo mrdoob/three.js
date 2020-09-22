@@ -1,7 +1,7 @@
 import babel from "@rollup/plugin-babel";
 import { terser } from "rollup-plugin-terser";
 
-if ( ! String.prototype.replaceAll ) {
+if ( String.prototype.replaceAll === undefined ) {
 
 	String.prototype.replaceAll = function ( find, replace ) {
 
@@ -248,12 +248,10 @@ function babelCleanup() {
 
 			}
 
-
 			code = code
 				.replace( commentOutside, commentInside )
 				.replace( doubleSpaces, '\t' )
 				.replace( danglingTabs, '' );
-
 
 			return {
 				code: code,
@@ -346,7 +344,7 @@ export default [
 			{
 				format: 'umd',
 				name: 'THREE',
-				file: 'build/three.min.js',
+				file: 'build/three.min.js'
 			}
 		]
 	},
@@ -360,7 +358,7 @@ export default [
 		output: [
 			{
 				format: 'esm',
-				file: 'build/three.module.js',
+				file: 'build/three.module.js'
 			}
 		]
 	}
