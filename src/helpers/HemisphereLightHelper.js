@@ -3,7 +3,7 @@ import { Color } from '../math/Color.js';
 import { Object3D } from '../core/Object3D.js';
 import { Mesh } from '../objects/Mesh.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
-import { OctahedronBufferGeometry } from '../geometries/OctahedronGeometry.js';
+import { OctahedronBufferGeometry } from '../geometries/OctahedronBufferGeometry.js';
 import { BufferAttribute } from '../core/BufferAttribute.js';
 
 const _vector = /*@__PURE__*/ new Vector3();

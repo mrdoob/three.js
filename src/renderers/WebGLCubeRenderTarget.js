@@ -1,6 +1,6 @@
 import { BackSide, LinearFilter, LinearMipmapLinearFilter, NoBlending, RGBAFormat } from '../constants.js';
 import { Mesh } from '../objects/Mesh.js';
-import { BoxBufferGeometry } from '../geometries/BoxGeometry.js';
+import { BoxBufferGeometry } from '../geometries/BoxBufferGeometry.js';
 import { ShaderMaterial } from '../materials/ShaderMaterial.js';
 import { cloneUniforms } from './shaders/UniformsUtils.js';
 import { WebGLRenderTarget } from './WebGLRenderTarget.js';

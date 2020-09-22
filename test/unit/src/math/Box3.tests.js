@@ -8,10 +8,8 @@ import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';
 import { Mesh } from '../../../../src/objects/Mesh';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
-import {
-	BoxGeometry,
-	BoxBufferGeometry
-} from '../../../../src/geometries/BoxGeometry';
+import { BoxGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import {
 	negInf3,
 	posInf3,

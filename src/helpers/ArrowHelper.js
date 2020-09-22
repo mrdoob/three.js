@@ -1,7 +1,7 @@
 import { Float32BufferAttribute } from '../core/BufferAttribute.js';
 import { BufferGeometry } from '../core/BufferGeometry.js';
 import { Object3D } from '../core/Object3D.js';
-import { CylinderBufferGeometry } from '../geometries/CylinderGeometry.js';
+import { CylinderBufferGeometry } from '../geometries/CylinderBufferGeometry.js';
 import { MeshBasicMaterial } from '../materials/MeshBasicMaterial.js';
 import { LineBasicMaterial } from '../materials/LineBasicMaterial.js';
 import { Mesh } from '../objects/Mesh.js';
