@@ -29,7 +29,9 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 		set( value ) {
 
-			if ( ! value ) {
+			if ( ! value && state !== STATE.NONE ) {
+
+				scope.dispatchEvent( endEvent );
 
 				state = STATE.NONE;
 
@@ -986,12 +988,12 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onMouseUp( event ) {
 
-		if ( scope.enabled === false ) return;
-
-		handleMouseUp( event );
-
 		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
 		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+
+		if ( scope.enabled === false || state === STATE.NONE ) return;
+
+		handleMouseUp( event );
 
 		scope.dispatchEvent( endEvent );
 
@@ -1167,7 +1169,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 
 	function onTouchEnd( event ) {
 
-		if ( scope.enabled === false ) return;
+		if ( scope.enabled === false || state === STATE.NONE ) return;
 
 		handleTouchEnd( event );
 
