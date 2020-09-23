@@ -299,6 +299,30 @@ function header() {
 
 }
 
+function polyfills() {
+
+	return {
+
+		transform( code, filePath ) {
+
+			if ( filePath.endsWith( 'src/Three.js' ) ) {
+
+				code = "import './polyfills';\n" + code;
+
+			}
+
+
+			return {
+				code: code,
+				map: null
+			};
+
+		}
+
+	};
+
+}
+
 const babelrc = {
 	presets: [
 		[
@@ -327,6 +351,7 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			polyfills(),
 			addons(),
 			glconstants(),
 			glsl(),
@@ -351,6 +376,7 @@ export default [
 	{
 		input: 'src/Three.js',
 		plugins: [
+			polyfills(),
 			addons(),
 			glconstants(),
 			glsl(),
