@@ -24,7 +24,29 @@ var OrbitControls = function ( object, domElement ) {
 	this.domElement = domElement;
 
 	// Set to false to disable this control
-	this.enabled = true;
+	let enabled = true;
+	Object.defineProperty( this, 'enabled', {
+
+		enumerable: true,
+
+		get() {
+
+			return enabled;
+
+		},
+
+		set( value ) {
+
+			if ( ! value ) {
+
+				state = STATE.NONE;
+
+			}
+
+		}
+
+	} );
+
 
 	// "target" sets the location of focus, where the object orbits around
 	this.target = new Vector3();
@@ -124,22 +146,7 @@ var OrbitControls = function ( object, domElement ) {
 
 		scope.update();
 
-		scope.cancel();
-
-	};
-
-	this.cancel = function () {
-
-		if ( state !== STATE.NONE ) {
-
-			scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
-			scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
-
-			scope.dispatchEvent( endEvent );
-
-			state = STATE.NONE;
-
-		}
+		state = STATE.NONE;
 
 	};
 
@@ -990,7 +997,12 @@ var OrbitControls = function ( object, domElement ) {
 
 		handleMouseUp( event );
 
-		scope.cancel();
+		scope.domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+		scope.domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+
+		scope.dispatchEvent( endEvent );
+
+		state = STATE.NONE;
 
 	}
 
@@ -1166,7 +1178,9 @@ var OrbitControls = function ( object, domElement ) {
 
 		handleTouchEnd( event );
 
-		scope.cancel();
+		scope.dispatchEvent( endEvent );
+
+		state = STATE.NONE;
 
 	}
 
