@@ -1,10 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- * @author Anonymous
- */
 /* global QUnit */
 
-import { runStdGeometryTests } from '../../qunit-utils';
+import { runStdGeometryTests } from '../../utils/qunit-utils';
 import {
 	TorusKnotBufferGeometry
 } from '../../../../src/geometries/TorusKnotGeometry';

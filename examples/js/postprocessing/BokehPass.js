@@ -1,3 +1,4 @@
+console.warn( "THREE.BokehPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * Depth-of-field post-process with bokeh shader
  */
@@ -19,14 +20,11 @@ THREE.BokehPass = function ( scene, camera, params ) {
 	var width = params.width || window.innerWidth || 1;
 	var height = params.height || window.innerHeight || 1;
 
-	this.renderTargetColor = new THREE.WebGLRenderTarget( width, height, {
-		minFilter: THREE.LinearFilter,
-		magFilter: THREE.LinearFilter,
-		format: THREE.RGBFormat
+	this.renderTargetDepth = new THREE.WebGLRenderTarget( width, height, {
+		minFilter: THREE.NearestFilter,
+		magFilter: THREE.NearestFilter
 	} );
-	this.renderTargetColor.texture.name = "BokehPass.color";
 
-	this.renderTargetDepth = this.renderTargetColor.clone();
 	this.renderTargetDepth.texture.name = "BokehPass.depth";
 
 	// depth material

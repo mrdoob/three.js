@@ -1,36 +1,44 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UIDiv, UIText, UIRow } from './libs/ui.js';
+import { UIBoolean } from './libs/ui.three.js';
 
-Sidebar.Settings.Viewport = function ( editor ) {
+
+function SidebarSettingsViewport( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
 
-	var container = new UI.Div();
-	container.add( new UI.Break() );
+	var container = new UIDiv();
 
-	container.add( new UI.Text( strings.getKey( 'sidebar/settings/viewport/grid' ) ).setWidth( '90px' ) );
+	// grid
 
-	var show = new UI.THREE.Boolean( true ).onChange( update );
-	container.add( show );
+	var showGridRow = new UIRow();
 
-	/*
-	var snapSize = new UI.Number( 25 ).setWidth( '40px' ).onChange( update );
-	container.add( snapSize );
+	showGridRow.add( new UIText( strings.getKey( 'sidebar/settings/viewport/grid' ) ).setWidth( '90px' ) );
 
-	var snap = new UI.THREE.Boolean( false, 'snap' ).onChange( update );
-	container.add( snap );
-	*/
+	var showGrid = new UIBoolean( true ).onChange( function () {
 
-	function update() {
+		signals.showGridChanged.dispatch( showGrid.getValue() );
 
-		signals.showGridChanged.dispatch( show.getValue() );
+	} );
+	showGridRow.add( showGrid );
+	container.add( showGridRow );
 
-		// signals.snapChanged.dispatch( snap.getValue() === true ? snapSize.getValue() : null );
+	// helpers
 
-	}
+	var showHelpersRow = new UIRow();
+
+	showHelpersRow.add( new UIText( strings.getKey( 'sidebar/settings/viewport/helpers' ) ).setWidth( '90px' ) );
+
+	var showHelpers = new UIBoolean( true ).onChange( function () {
+
+		signals.showHelpersChanged.dispatch( showHelpers.getValue() );
+
+	} );
+	showHelpersRow.add( showHelpers );
+	container.add( showHelpersRow );
 
 	return container;
 
-};
+}
+
+export { SidebarSettingsViewport };

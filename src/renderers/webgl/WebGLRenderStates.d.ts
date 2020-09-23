@@ -6,6 +6,7 @@ import { WebGLLights } from './WebGLLights';
 interface WebGLRenderState {
 
 	init(): void;
+
 	state: {
 		lightsArray: Light[];
 		shadowsArray: Light[];

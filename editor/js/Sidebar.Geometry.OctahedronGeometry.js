@@ -1,32 +1,36 @@
-/**
- * @author Temdog007 / http://github.com/Temdog007
- */
+import * as THREE from '../../build/three.module.js';
 
-Sidebar.Geometry.OctahedronGeometry = function ( editor, object ) {
+import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';
+
+import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
+
+function SidebarGeometryOctahedronGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
-	var container = new UI.Row();
+	var signals = editor.signals;
+
+	var container = new UIRow();
 
 	var geometry = object.geometry;
 	var parameters = geometry.parameters;
 
 	// radius
 
-	var radiusRow = new UI.Row();
-	var radius = new UI.Number( parameters.radius ).onChange( update );
+	var radiusRow = new UIRow();
+	var radius = new UINumber( parameters.radius ).onChange( update );
 
-	radiusRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/octahedron_geometry/radius' ) ).setWidth( '90px' ) );
+	radiusRow.add( new UIText( strings.getKey( 'sidebar/geometry/octahedron_geometry/radius' ) ).setWidth( '90px' ) );
 	radiusRow.add( radius );
 
 	container.add( radiusRow );
 
 	// detail
 
-	var detailRow = new UI.Row();
-	var detail = new UI.Integer( parameters.detail ).setRange( 0, Infinity ).onChange( update );
+	var detailRow = new UIRow();
+	var detail = new UIInteger( parameters.detail ).setRange( 0, Infinity ).onChange( update );
 
-	detailRow.add( new UI.Text( strings.getKey( 'sidebar/geometry/octahedron_geometry/detail' ) ).setWidth( '90px' ) );
+	detailRow.add( new UIText( strings.getKey( 'sidebar/geometry/octahedron_geometry/detail' ) ).setWidth( '90px' ) );
 	detailRow.add( detail );
 
 	container.add( detailRow );
@@ -36,15 +40,17 @@ Sidebar.Geometry.OctahedronGeometry = function ( editor, object ) {
 
 	function update() {
 
-		editor.execute( new SetGeometryCommand( editor, object, new THREE[ geometry.type ](
+		editor.execute( new SetGeometryCommand( editor, object, new THREE.OctahedronBufferGeometry(
 			radius.getValue(),
 			detail.getValue()
 		) ) );
+
+		signals.objectChanged.dispatch( object );
 
 	}
 
 	return container;
 
-};
+}
 
-Sidebar.Geometry.OctahedronBufferGeometry = Sidebar.Geometry.OctahedronGeometry;
+export { SidebarGeometryOctahedronGeometry };

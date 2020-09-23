@@ -10,7 +10,7 @@ vec3 unpackRGBToNormal( const in vec3 rgb ) {
 const float PackUpscale = 256. / 255.; // fraction -> 0..1 (including 1)
 const float UnpackDownscale = 255. / 256.; // 0..1 -> fraction (excluding 1)
 
-const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
+const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );
 const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
 
 const float ShiftRight8 = 1. / 256.;
@@ -29,7 +29,7 @@ vec4 pack2HalfToRGBA( vec2 v ) {
 	vec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ));
 	return vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w);
 }
-vec2 unpack2HalfToRGBA( vec4 v ) {
+vec2 unpackRGBATo2Half( vec4 v ) {
 	return vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );
 }
 

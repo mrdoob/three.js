@@ -10,7 +10,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - box projected cubemap environment mapping. <br> created by <a href="https://codercat.tk" target="_blank" rel="noopener">codercat</a>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - box projected cubemap environment mapping. <br> created by <a href="https://codercat.tk" target="_blank" rel="noopener">codercat</a>
 		</div>
 
 		<script type="module">
@@ -19,10 +19,11 @@
 
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { RectAreaLightHelper } from './jsm/helpers/RectAreaLightHelper.js';
 			import { RectAreaLightUniformsLib } from './jsm/lights/RectAreaLightUniformsLib.js';
 
 			// shader injection for box projected cube environment mapping
-			var worldposReplace = `
+			var worldposReplace = /* glsl */`
 			#define BOX_PROJECTED_ENV_MAP
 
 			#if defined( USE_ENVMAP ) || defined( DISTANCE ) || defined ( USE_SHADOWMAP )
@@ -38,7 +39,7 @@
 			#endif
 			`;
 
-			var envmapPhysicalParsReplace = `
+			var envmapPhysicalParsReplace = /* glsl */`
 			#if defined( USE_ENVMAP )
 
 				#define BOX_PROJECTED_ENV_MAP
@@ -104,8 +105,7 @@
 
 					#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-						vec3 queryVec = vec3( flipEnvMap * worldNormal.x, worldNormal.yz );
-						vec4 envMapColor = textureCubeUV( envMap, queryVec, 1.0 );
+						vec4 envMapColor = textureCubeUV( envMap, worldNormal, 1.0 );
 
 					#else
 
@@ -171,42 +171,7 @@
 
 					#elif defined( ENVMAP_TYPE_CUBE_UV )
 
-						vec3 queryReflectVec = vec3( flipEnvMap * reflectVec.x, reflectVec.yz );
-						vec4 envMapColor = textureCubeUV( envMap, queryReflectVec, roughness );
-
-					#elif defined( ENVMAP_TYPE_EQUIREC )
-
-						vec2 sampleUV;
-						sampleUV.y = asin( clamp( reflectVec.y, - 1.0, 1.0 ) ) * RECIPROCAL_PI + 0.5;
-						sampleUV.x = atan( reflectVec.z, reflectVec.x ) * RECIPROCAL_PI2 + 0.5;
-
-						#ifdef TEXTURE_LOD_EXT
-
-							vec4 envMapColor = texture2DLodEXT( envMap, sampleUV, specularMIPLevel );
-
-						#else
-
-							vec4 envMapColor = texture2D( envMap, sampleUV, specularMIPLevel );
-
-						#endif
-
-						envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
-
-					#elif defined( ENVMAP_TYPE_SPHERE )
-
-						vec3 reflectView = normalize( ( viewMatrix * vec4( reflectVec, 0.0 ) ).xyz + vec3( 0.0,0.0,1.0 ) );
-
-						#ifdef TEXTURE_LOD_EXT
-
-							vec4 envMapColor = texture2DLodEXT( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );
-
-						#else
-
-							vec4 envMapColor = texture2D( envMap, reflectView.xy * 0.5 + 0.5, specularMIPLevel );
-
-						#endif
-
-						envMapColor.rgb = envMapTexelToLinear( envMapColor ).rgb;
+						vec4 envMapColor = textureCubeUV( envMap, reflectVec, roughness );
 
 					#endif
 
@@ -281,10 +246,13 @@
 				cameraControls.update();
 
 				// cube camera for environment map
-				cubeCamera = new THREE.CubeCamera( 1, 1000, 512 );
-				cubeCamera.renderTarget.texture.generateMipmaps = true;
-				cubeCamera.renderTarget.texture.minFilter = THREE.LinearMipmapLinearFilter;
-				cubeCamera.renderTarget.texture.mapping = THREE.CubeReflectionMapping;
+
+				var cubeRenderTarget = new THREE.WebGLCubeRenderTarget( 512, {
+					format: THREE.RGBFormat,
+					generateMipmaps: true,
+					minFilter: THREE.LinearMipmapLinearFilter
+				} );
+				cubeCamera = new THREE.CubeCamera( 1, 1000, cubeRenderTarget );
 
 				cubeCamera.position.set( 0, - 100, 0 );
 				scene.add( cubeCamera );
@@ -298,14 +266,14 @@
 
 				var defaultMat = new THREE.MeshPhysicalMaterial( {
 					roughness: 1,
-					envMap: cubeCamera.renderTarget.texture,
+					envMap: cubeRenderTarget.texture,
 					roughnessMap: rMap
 				} );
 
 				var boxProjectedMat = new THREE.MeshPhysicalMaterial( {
 					color: new THREE.Color( '#ffffff' ),
 					roughness: 1,
-					envMap: cubeCamera.renderTarget.texture,
+					envMap: cubeRenderTarget.texture,
 					roughnessMap: rMap
 				} );
 
@@ -314,7 +282,6 @@
 					//these parameters are for the cubeCamera texture
 					shader.uniforms.cubeMapSize = { value: new THREE.Vector3( 200, 200, 100 ) };
 					shader.uniforms.cubeMapPos = { value: new THREE.Vector3( 0, - 50, 0 ) };
-					shader.uniforms.flipEnvMap.value = true;
 
 					//replace shader chunks with box projection chunks
 					shader.vertexShader = 'varying vec3 vWorldPosition;\n' + shader.vertexShader;
@@ -400,7 +367,7 @@
 				blueRectLight.lookAt( 0, 5, 0 );
 				scene.add( blueRectLight );
 
-				var blueRectLightHelper = new THREE.RectAreaLightHelper( blueRectLight, 0xffffff );
+				var blueRectLightHelper = new RectAreaLightHelper( blueRectLight, 0xffffff );
 				blueRectLight.add( blueRectLightHelper );
 
 				var redRectLight = new THREE.RectAreaLight( 0x9aaeff, intensity, width, height );
@@ -408,7 +375,7 @@
 				redRectLight.lookAt( 0, 5, 0 );
 				scene.add( redRectLight );
 
-				var redRectLightHelper = new THREE.RectAreaLightHelper( redRectLight, 0xffffff );
+				var redRectLightHelper = new RectAreaLightHelper( redRectLight, 0xffffff );
 				redRectLight.add( redRectLightHelper );
 
 				render();

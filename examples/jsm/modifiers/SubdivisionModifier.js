@@ -1,7 +1,10 @@
+import {
+	Face3,
+	Geometry,
+	Vector2,
+	Vector3
+} from "../../../build/three.module.js";
 /**
- *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
- *	@author centerionware / http://www.centerionware.com
- *
  *	Subdivision Geometry Modifier
  *		using Loop Subdivision Scheme
  *
@@ -13,13 +16,6 @@
  *	Known Issues:
  *		- currently doesn't handle "Sharp Edges"
  */
-
-import {
-	Face3,
-	Geometry,
-	Vector2,
-	Vector3
-} from "../../../build/three.module.js";
 
 var SubdivisionModifier = function ( subdivisions ) {
 
@@ -176,7 +172,7 @@ SubdivisionModifier.prototype.modify = function ( geometry ) {
 		oldFaces = geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
 		oldUvs = geometry.faceVertexUvs;
 
-		var hasUvs = oldUvs !== undefined && oldUvs.length > 0;
+		var hasUvs = oldUvs[ 0 ] !== undefined && oldUvs[ 0 ].length > 0;
 
 		if ( hasUvs ) {
 

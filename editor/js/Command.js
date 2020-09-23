@@ -1,7 +1,3 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
 
 /**
  * @param editor pointer to main editor object used to initialize
@@ -9,7 +5,7 @@
  * @constructor
  */
 
-var Command = function ( editor ) {
+function Command( editor ) {
 
 	this.id = - 1;
 	this.inMemory = false;
@@ -18,7 +14,7 @@ var Command = function ( editor ) {
 	this.name = '';
 	this.editor = editor;
 
-};
+}
 
 Command.prototype.toJSON = function () {
 
@@ -38,3 +34,5 @@ Command.prototype.fromJSON = function ( json ) {
 	this.name = json.name;
 
 };
+
+export { Command };

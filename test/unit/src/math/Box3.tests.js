@@ -1,7 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Box3 } from '../../../../src/math/Box3';
@@ -346,6 +342,9 @@ export default QUnit.module( 'Maths', () => {
 			a.expandByObject( smaller );
 			assert.ok( a.min.equals( new Vector3( - 0.25, - 0.25, - 0.25 ) ), "Smaller box: correct new minimum" );
 			assert.ok( a.max.equals( new Vector3( 1, 1, 1 ) ), "Smaller box: correct new maximum" );
+
+			//
+			assert.ok( new Box3().expandByObject( new Mesh() ).isEmpty() === true, "The AABB of a mesh with inital geometry is empty." );
 
 		} );
 

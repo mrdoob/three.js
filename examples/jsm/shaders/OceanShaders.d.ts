@@ -1,7 +1,5 @@
 import {
-	Texture,
 	Uniform,
-	Vector2,
 } from '../../../src/Three';
 
 export const OceanShaders: {

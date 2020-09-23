@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { TempNode } from '../core/TempNode.js';
 import { FunctionNode } from '../core/FunctionNode.js';
 import { LuminanceNode } from './LuminanceNode.js';
@@ -77,6 +73,7 @@ ColorAdjustmentNode.CONTRAST = 'contrast';
 ColorAdjustmentNode.prototype = Object.create( TempNode.prototype );
 ColorAdjustmentNode.prototype.constructor = ColorAdjustmentNode;
 ColorAdjustmentNode.prototype.nodeType = "ColorAdjustment";
+ColorAdjustmentNode.prototype.hashProperties = [ "method" ];
 
 ColorAdjustmentNode.prototype.generate = function ( builder, output ) {
 

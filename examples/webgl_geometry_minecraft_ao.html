@@ -19,7 +19,7 @@
 
 		<div id="container"></div>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo [ambient occlusion]. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <a href="http://www.minecraft.net/" target="_blank" rel="noopener">minecraft</a> demo [ambient occlusion]. featuring <a href="http://painterlypack.net/" target="_blank" rel="noopener">painterly pack</a><br />(left click: forward, right click: backward)
 		</div>
 
 		<script type="module">
@@ -242,7 +242,7 @@
 
 				var mesh = new THREE.Mesh(
 					geometry,
-					new THREE.MeshLambertMaterial( { map: texture, vertexColors: THREE.VertexColors, side: THREE.DoubleSide } )
+					new THREE.MeshLambertMaterial( { map: texture, vertexColors: true, side: THREE.DoubleSide } )
 				);
 				scene.add( mesh );
 

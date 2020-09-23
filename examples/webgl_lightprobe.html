@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - light probe
 		</div>
 
 		<script type="module">
@@ -46,8 +46,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				// tone mapping
-				//renderer.toneMapping = LinearToneMapping;
-			 	//renderer.toneMappingExposure = API.exposure;
+				renderer.toneMapping = THREE.NoToneMapping;
 
 				renderer.outputEncoding = THREE.sRGBEncoding;
 

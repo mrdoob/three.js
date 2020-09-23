@@ -1,5 +1,4 @@
 /**
- * @author Kai Salmen / https://kaisalmen.de
  * Development repository: https://github.com/kaisalmen/WWOBJLoader
  */
 
@@ -7,8 +6,7 @@ import {
 	LineBasicMaterial,
 	MaterialLoader,
 	MeshStandardMaterial,
-	PointsMaterial,
-	VertexColors
+	PointsMaterial
 } from "../../../../../build/three.module.js";
 
 
@@ -65,7 +63,7 @@ MaterialHandler.prototype = {
 
 		let defaultVertexColorMaterial = new MeshStandardMaterial( { color: 0xDCF1FF } );
 		defaultVertexColorMaterial.name = 'defaultVertexColorMaterial';
-		defaultVertexColorMaterial.vertexColors = VertexColors;
+		defaultVertexColorMaterial.vertexColors = true;
 
 		let defaultLineMaterial = new LineBasicMaterial();
 		defaultLineMaterial.name = 'defaultLineMaterial';
@@ -125,21 +123,26 @@ MaterialHandler.prototype = {
 		}
 
 		let materials = materialPayload.materials.serializedMaterials;
+
 		if ( materials !== undefined && materials !== null && Object.keys( materials ).length > 0 ) {
 
 			let loader = new MaterialLoader();
 			let materialJson;
+
 			for ( materialName in materials ) {
 
 				materialJson = materials[ materialName ];
+
 				if ( materialJson !== undefined && materialJson !== null ) {
 
 					material = loader.parse( materialJson );
+
 					if ( this.logging.enabled ) {
 
 						console.info( 'De-serialized material with name "' + materialName + '" will be added.' );
 
 					}
+
 					this.materials[ materialName ] = material;
 					newMaterials[ materialName ] = material;
 
@@ -148,6 +151,7 @@ MaterialHandler.prototype = {
 			}
 
 		}
+
 		materials = materialPayload.materials.runtimeMaterials;
 		newMaterials = this.addMaterials( materials, true, newMaterials );
 
@@ -169,27 +173,32 @@ MaterialHandler.prototype = {
 			newMaterials = {};
 
 		}
+
 		if ( materials !== undefined && materials !== null && Object.keys( materials ).length > 0 ) {
 
 			let material;
 			let existingMaterial;
 			let add;
+
 			for ( let materialName in materials ) {
 
 				material = materials[ materialName ];
 				add = overrideExisting === true;
+
 				if ( ! add ) {
 
 					existingMaterial = this.materials[ materialName ];
 					add = ( existingMaterial === null || existingMaterial === undefined );
 
 				}
+
 				if ( add ) {
 
 					this.materials[ materialName ] = material;
 					newMaterials[ materialName ] = material;
 
 				}
+
 				if ( this.logging.enabled && this.logging.debug ) {
 
 					console.info( 'Material with name "' + materialName + '" was added.' );
@@ -205,6 +214,7 @@ MaterialHandler.prototype = {
 			this.callbacks.onLoadMaterials( newMaterials );
 
 		}
+
 		return newMaterials;
 
 	},
@@ -240,6 +250,7 @@ MaterialHandler.prototype = {
 
 		let materialsJSON = {};
 		let material;
+
 		for ( let materialName in this.materials ) {
 
 			material = this.materials[ materialName ];

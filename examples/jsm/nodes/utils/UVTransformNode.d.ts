@@ -1,5 +1,4 @@
 import { ExpressionNode } from '../core/ExpressionNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 import { Matrix3Node } from '../inputs/Matrix3Node';
 import { UVNode } from '../accessors/UVNode';
 

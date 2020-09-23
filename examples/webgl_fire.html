@@ -72,7 +72,7 @@
 				fire.position.z = - 2;
 				scene.add( fire );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.autoClear = false;
@@ -429,6 +429,8 @@
 				document.body.appendChild( stats.dom );
 
 				window.addEventListener( 'resize', onWindowResize, false );
+
+				if ( typeof TESTING !== 'undefined'  ) { for( var i = 0; i < 60; i ++ ) { renderer.render( scene, camera ); } };
 
 			}
 

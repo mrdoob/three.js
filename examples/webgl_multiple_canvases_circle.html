@@ -123,7 +123,7 @@
 		</div>
 	</div>
 
-	<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple canvases - circle</div>
+	<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - multiple canvases - circle</div>
 	<div id="help" gstyle="display: none">
 		<div>
 		<a href="https://www.google.com/earth/explore/showcase/liquidgalaxy.html">Google's Liquid Galaxy</a> simulator.<br/>
@@ -190,7 +190,7 @@
 			var canvas5 = document.getElementById( 'canvas5' );
 
 			var fudge = 0.45; // I don't know why this is needed :-(
-			var rot = 30 * THREE.Math.DEG2RAD;
+			var rot = 30 * THREE.MathUtils.DEG2RAD;
 
 			views.push( new View( canvas1, rot * - 2 * fudge ) );
 			views.push( new View( canvas2, rot * - 1 * fudge ) );
@@ -260,7 +260,7 @@
 			var material = new THREE.MeshPhongMaterial( {
 				color: 0xffffff,
 				flatShading: true,
-				vertexColors: THREE.VertexColors,
+				vertexColors: true,
 				shininess: 0
 			} );
 

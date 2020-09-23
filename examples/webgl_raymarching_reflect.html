@@ -21,7 +21,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl raymarching example<br/>
 			reflect by <a href="https://github.com/gam0022" target="_blank" rel="noopener">gam0022</a> (<a href="http://qiita.com/gam0022/items/03699a07e4a4b5f2d41f" target="_blank" rel="noopener">article</a>)
 		</div>
 		<div id="container">
@@ -247,7 +247,7 @@
 
 			var dolly, camera, scene, renderer;
 			var geometry, material, mesh;
-			var stats;
+			var stats, clock;
 
 			var canvas = document.querySelector( '#canvas' );
 
@@ -278,6 +278,8 @@
 				dolly = new THREE.Group();
 				scene.add( dolly );
 
+				clock = new THREE.Clock();
+
 				camera = new THREE.PerspectiveCamera( 60, canvas.width / canvas.height, 1, 2000 );
 				camera.position.z = 4;
 				dolly.add( camera );
@@ -298,6 +300,7 @@
 
 				// Controls
 				var controls = new OrbitControls( camera, canvas );
+				controls.enableZoom = false;
 
 				// GUI
 				var gui = new GUI();
@@ -329,11 +332,13 @@
 
 			}
 
-			function render( time ) {
+			function render() {
 
 				stats.begin();
 
-				dolly.position.z = - time / 1000;
+				var elapsedTime = clock.getElapsedTime();
+
+				dolly.position.z = - elapsedTime;
 
 				renderer.render( scene, camera );
 

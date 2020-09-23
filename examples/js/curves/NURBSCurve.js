@@ -1,5 +1,5 @@
+console.warn( "THREE.NURBSCurve: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author renej
  * NURBS curve object
  *
  * Derives from Curve, overriding getPoint and getTangent.
@@ -7,11 +7,6 @@
  * Implementation is based on (x, y [, z=0 [, w=1]]) control points with w=weight.
  *
  **/
-
-
-/**************************************************************
- *	NURBS curve
- **************************************************************/
 
 THREE.NURBSCurve = function ( degree, knots /* array of reals */, controlPoints /* array of Vector(2|3|4) */, startKnot /* index in knots */, endKnot /* index in knots */ ) {
 
@@ -38,7 +33,9 @@ THREE.NURBSCurve.prototype = Object.create( THREE.Curve.prototype );
 THREE.NURBSCurve.prototype.constructor = THREE.NURBSCurve;
 
 
-THREE.NURBSCurve.prototype.getPoint = function ( t ) {
+THREE.NURBSCurve.prototype.getPoint = function ( t, optionalTarget ) {
+
+	var point = optionalTarget || new THREE.Vector3();
 
 	var u = this.knots[ this.startKnot ] + t * ( this.knots[ this.endKnot ] - this.knots[ this.startKnot ] ); // linear mapping t->u
 
@@ -52,17 +49,18 @@ THREE.NURBSCurve.prototype.getPoint = function ( t ) {
 
 	}
 
-	return new THREE.Vector3( hpoint.x, hpoint.y, hpoint.z );
+	return point.set( hpoint.x, hpoint.y, hpoint.z );
 
 };
 
 
-THREE.NURBSCurve.prototype.getTangent = function ( t ) {
+THREE.NURBSCurve.prototype.getTangent = function ( t, optionalTarget ) {
+
+	var tangent = optionalTarget || new THREE.Vector3();
 
 	var u = this.knots[ 0 ] + t * ( this.knots[ this.knots.length - 1 ] - this.knots[ 0 ] );
 	var ders = THREE.NURBSUtils.calcNURBSDerivatives( this.degree, this.knots, this.controlPoints, u, 1 );
-	var tangent = ders[ 1 ].clone();
-	tangent.normalize();
+	tangent.copy( ders[ 1 ] ).normalize();
 
 	return tangent;
 

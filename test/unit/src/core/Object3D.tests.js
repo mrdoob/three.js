@@ -1,7 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { Object3D } from '../../../../src/core/Object3D';
@@ -87,7 +83,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix", ( assert ) => {
+		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var a = new Object3D();
 			var m = new Matrix4();
@@ -97,7 +93,7 @@ export default QUnit.module( 'Core', () => {
 			m.makeRotationX( Math.PI / 2 );
 			m.setPosition( new Vector3( x, y, z ) );
 
-			a.applyMatrix( m );
+			a.applyMatrix4( m );
 
 			assert.deepEqual( a.position, expectedPos, "Position has the expected values" );
 			assert.ok(
@@ -392,7 +388,7 @@ export default QUnit.module( 'Core', () => {
 			var m = new Matrix4().makeScale( x, y, z );
 			var expected = new Vector3( x, y, z );
 
-			a.applyMatrix( m );
+			a.applyMatrix4( m );
 
 			assert.deepEqual( a.getWorldScale( new Vector3() ), expected, "WorldScale as expected" );
 

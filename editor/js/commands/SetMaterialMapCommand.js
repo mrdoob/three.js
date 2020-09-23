@@ -1,7 +1,7 @@
-/**
- * @author dforrer / https://github.com/dforrer
- * Developed as part of a project at University of Applied Sciences and Arts Northwestern Switzerland (www.fhnw.ch)
- */
+
+import { Command } from '../Command.js';
+
+import * as THREE from '../../../build/three.module.js';
 
 /**
  * @param editor Editor
@@ -10,8 +10,7 @@
  * @param newMap THREE.Texture
  * @constructor
  */
-
-var SetMaterialMapCommand = function ( editor, object, mapName, newMap, materialSlot ) {
+function SetMaterialMapCommand( editor, object, mapName, newMap, materialSlot ) {
 
 	Command.call( this, editor );
 
@@ -26,7 +25,7 @@ var SetMaterialMapCommand = function ( editor, object, mapName, newMap, material
 
 	this.mapName = mapName;
 
-};
+}
 
 SetMaterialMapCommand.prototype = {
 
@@ -61,7 +60,7 @@ SetMaterialMapCommand.prototype = {
 
 		// serializes a map (THREE.Texture)
 
-		function serializeMap ( map ) {
+		function serializeMap( map ) {
 
 			if ( map === null || map === undefined ) return null;
 
@@ -86,7 +85,7 @@ SetMaterialMapCommand.prototype = {
 		// extract data from the cache hash
 		// remove metadata on each item
 		// and return as array
-		function extractFromCache ( cache ) {
+		function extractFromCache( cache ) {
 
 			var values = [];
 			for ( var key in cache ) {
@@ -96,6 +95,7 @@ SetMaterialMapCommand.prototype = {
 				values.push( data );
 
 			}
+
 			return values;
 
 		}
@@ -111,18 +111,19 @@ SetMaterialMapCommand.prototype = {
 		this.oldMap = parseTexture( json.oldMap );
 		this.newMap = parseTexture( json.newMap );
 
-		function parseTexture ( json ) {
+		function parseTexture( json ) {
 
 			var map = null;
 			if ( json !== null ) {
 
 				var loader = new THREE.ObjectLoader();
 				var images = loader.parseImages( json.images );
-				var textures  = loader.parseTextures( [ json ], images );
+				var textures = loader.parseTextures( [ json ], images );
 				map = textures[ json.uuid ];
 				map.sourceFile = json.sourceFile;
 
 			}
+
 			return map;
 
 		}
@@ -130,3 +131,5 @@ SetMaterialMapCommand.prototype = {
 	}
 
 };
+
+export { SetMaterialMapCommand };

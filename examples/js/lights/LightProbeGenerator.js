@@ -1,6 +1,4 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- */
+console.warn( "THREE.LightProbeGenerator: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.LightProbeGenerator = {
 
@@ -118,7 +116,7 @@ THREE.LightProbeGenerator = {
 
 	},
 
-	fromRenderTargetCube: function ( renderer, renderTargetCube ) {
+	fromCubeRenderTarget: function ( renderer, cubeRenderTarget ) {
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		var norm, lengthSq, weight, totalWeight = 0;
@@ -136,9 +134,9 @@ THREE.LightProbeGenerator = {
 
 		for ( var faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
 
-			var imageWidth = renderTargetCube.width; // assumed to be square
+			var imageWidth = cubeRenderTarget.width; // assumed to be square
 			var data = new Uint8Array( imageWidth * imageWidth * 4 );
-			renderer.readRenderTargetPixels( renderTargetCube, 0, 0, imageWidth, imageWidth, data, faceIndex );
+			renderer.readRenderTargetPixels( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
 
 			var pixelSize = 2 / imageWidth;
 
@@ -148,7 +146,7 @@ THREE.LightProbeGenerator = {
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
 				// convert to linear color space
-				convertColorToLinear( color, renderTargetCube.texture.encoding );
+				convertColorToLinear( color, cubeRenderTarget.texture.encoding );
 
 				// pixel coordinate on unit cube
 

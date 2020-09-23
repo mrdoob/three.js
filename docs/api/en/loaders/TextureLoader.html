@@ -17,7 +17,7 @@
 			This uses the [page:ImageLoader] internally for loading files.
 		</p>
 
-		<h2>Example</h2>
+		<h2>Code Example</h2>
 
 		<code>
 		var texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
@@ -26,9 +26,7 @@
 		var material = new THREE.MeshBasicMaterial( { map: texture } );
 		</code>
 
-		[example:webgl_geometry_cube geometry / cube]
-
-		<h2>Example with Callbacks</h2>
+		<h2>Code Example with Callbacks</h2>
 
 		<code>
 		// instantiate a loader
@@ -57,7 +55,15 @@
 		);
 		</code>
 
-		Please note three.js r84 dropped support for TextureLoader progress events. For a TextureLoader that supports progress events, see [link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 this thread].
+		<p>
+			Please note three.js r84 dropped support for TextureLoader progress events. For a TextureLoader that supports progress events, see [link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 this thread].
+		</p>
+
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_geometry_cube geometry / cube]
+		</p>
 
 		<h2>Constructor</h2>
 

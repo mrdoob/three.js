@@ -1,19 +1,23 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import { UITabbedPanel } from './libs/ui.js';
 
-Sidebar.Properties = function ( editor ) {
+import { SidebarObject } from './Sidebar.Object.js';
+import { SidebarGeometry } from './Sidebar.Geometry.js';
+import { SidebarMaterial } from './Sidebar.Material.js';
+
+function SidebarProperties( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new UI.TabbedPanel();
+	var container = new UITabbedPanel();
 	container.setId( 'properties' );
 
-	container.addTab( 'object', strings.getKey( 'sidebar/properties/object' ), new Sidebar.Object( editor ) );
-	container.addTab( 'geometry', strings.getKey( 'sidebar/properties/geometry' ), new Sidebar.Geometry( editor ) );
-	container.addTab( 'material', strings.getKey( 'sidebar/properties/material' ), new Sidebar.Material( editor ) );
+	container.addTab( 'object', strings.getKey( 'sidebar/properties/object' ), new SidebarObject( editor ) );
+	container.addTab( 'geometry', strings.getKey( 'sidebar/properties/geometry' ), new SidebarGeometry( editor ) );
+	container.addTab( 'material', strings.getKey( 'sidebar/properties/material' ), new SidebarMaterial( editor ) );
 	container.select( 'object' );
 
 	return container;
 
-};
+}
+
+export { SidebarProperties };

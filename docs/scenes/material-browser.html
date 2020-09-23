@@ -57,15 +57,10 @@
 				Scene,
 				TextureLoader,
 				TorusKnotBufferGeometry,
-				VertexColors, NoColors,
 				WebGLRenderer
 			} from "../../build/three.module.js";
 
 			import { GUI } from '../../examples/jsm/libs/dat.gui.module.js';
-
-			/**
-			 * @author TatumCreative (Greg Tatum) / http://gregtatum.com/
-			 */
 
 			var constants = {
 
@@ -82,13 +77,6 @@
 					'THREE.FrontSide': FrontSide,
 					'THREE.BackSide': BackSide,
 					'THREE.DoubleSide': DoubleSide
-
-				},
-
-				colors: {
-
-					'THREE.NoColors': NoColors,
-					'THREE.VertexColors': VertexColors
 
 				},
 
@@ -294,12 +282,23 @@
 
 				return function () {
 
-					material.vertexColors = parseInt( material.vertexColors ); //Ensure number
+					material.vertexColors = material.vertexColors;
 					material.side = parseInt( material.side ); //Ensure number
 					material.needsUpdate = true;
 					geometry.attributes.position.needsUpdate = true;
 					geometry.attributes.normal.needsUpdate = true;
 					geometry.attributes.color.needsUpdate = true;
+
+				};
+
+			}
+
+			function updateCombine( material ) {
+
+				return function ( combine ) {
+
+					material.combine = parseInt( combine );
+					material.needsUpdate = true;
 
 				};
 
@@ -397,13 +396,13 @@
 				folder.addColor( data, 'color' ).onChange( handleColorChange( material.color ) );
 				folder.add( material, 'wireframe' );
 				folder.add( material, 'wireframeLinewidth', 0, 10 );
-				folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
+				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
-				folder.add( material, 'combine', constants.combine );
+				folder.add( material, 'combine', constants.combine ).onChange( updateCombine( material ) );
 				folder.add( material, 'reflectivity', 0, 1 );
 				folder.add( material, 'refractionRatio', 0, 1 );
 
@@ -446,7 +445,7 @@
 				folder.add( material, 'linewidth', 0, 10 );
 				folder.add( material, 'linecap', [ 'butt', 'round', 'square' ] );
 				folder.add( material, 'linejoin', [ 'round', 'bevel', 'miter' ] );
-				folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
+				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 
 			}
@@ -468,13 +467,13 @@
 
 				folder.add( material, 'wireframe' );
 				folder.add( material, 'wireframeLinewidth', 0, 10 );
-				folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
+				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
-				folder.add( material, 'combine', constants.combine );
+				folder.add( material, 'combine', constants.combine ).onChange( updateCombine( material ) );
 				folder.add( material, 'reflectivity', 0, 1 );
 				folder.add( material, 'refractionRatio', 0, 1 );
 
@@ -517,11 +516,14 @@
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
 				folder.add( material, 'wireframeLinewidth', 0, 10 );
-				folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
+				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
 				folder.add( data, 'alphaMap', alphaMapKeys ).onChange( updateTexture( material, 'alphaMap', alphaMaps ) );
+				folder.add( material, 'combine', constants.combine ).onChange( updateCombine( material ) );
+				folder.add( material, 'reflectivity', 0, 1 );
+				folder.add( material, 'refractionRatio', 0, 1 );
 
 			}
 
@@ -565,7 +567,7 @@
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
 				folder.add( material, 'wireframeLinewidth', 0, 10 );
-				folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
+				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );
@@ -600,7 +602,7 @@
 				folder.add( material, 'flatShading' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'wireframe' );
 				folder.add( material, 'wireframeLinewidth', 0, 10 );
-				folder.add( material, 'vertexColors', constants.colors ).onChange( needsUpdate( material, geometry ) );
+				folder.add( material, 'vertexColors' ).onChange( needsUpdate( material, geometry ) );
 				folder.add( material, 'fog' );
 				folder.add( data, 'envMaps', envMapKeys ).onChange( updateTexture( material, 'envMap', envMaps ) );
 				folder.add( data, 'map', diffuseMapKeys ).onChange( updateTexture( material, 'map', diffuseMaps ) );

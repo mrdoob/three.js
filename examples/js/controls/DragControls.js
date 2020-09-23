@@ -1,8 +1,4 @@
-/**
- * @author zz85 / https://github.com/zz85
- * @author mrdoob / http://mrdoob.com
- * Running this will allow you to drag three.js objects around the screen.
- */
+console.warn( "THREE.DragControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
@@ -14,6 +10,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	var _intersection = new THREE.Vector3();
 	var _worldPosition = new THREE.Vector3();
 	var _inverseMatrix = new THREE.Matrix4();
+	var _intersections = [];
 
 	var _selected = null, _hovered = null;
 
@@ -43,11 +40,19 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 		_domElement.removeEventListener( 'touchstart', onDocumentTouchStart, false );
 		_domElement.removeEventListener( 'touchend', onDocumentTouchEnd, false );
 
+		_domElement.style.cursor = '';
+
 	}
 
 	function dispose() {
 
 		deactivate();
+
+	}
+
+	function getObjects() {
+
+		return _objects;
 
 	}
 
@@ -76,13 +81,14 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		}
 
+		_intersections.length = 0;
+
 		_raycaster.setFromCamera( _mouse, _camera );
+		_raycaster.intersectObjects( _objects, true, _intersections );
 
-		var intersects = _raycaster.intersectObjects( _objects, true );
+		if ( _intersections.length > 0 ) {
 
-		if ( intersects.length > 0 ) {
-
-			var object = intersects[ 0 ].object;
+			var object = _intersections[ 0 ].object;
 
 			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( object.matrixWorld ) );
 
@@ -114,13 +120,14 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 		event.preventDefault();
 
+		_intersections.length = 0;
+
 		_raycaster.setFromCamera( _mouse, _camera );
+		_raycaster.intersectObjects( _objects, true, _intersections );
 
-		var intersects = _raycaster.intersectObjects( _objects, true );
+		if ( _intersections.length > 0 ) {
 
-		if ( intersects.length > 0 ) {
-
-			_selected = intersects[ 0 ].object;
+			_selected = ( scope.transformGroup === true ) ? _objects[ 0 ] : _intersections[ 0 ].object;
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
@@ -192,13 +199,14 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 		_mouse.x = ( ( event.clientX - rect.left ) / rect.width ) * 2 - 1;
 		_mouse.y = - ( ( event.clientY - rect.top ) / rect.height ) * 2 + 1;
 
+		_intersections.length = 0;
+
 		_raycaster.setFromCamera( _mouse, _camera );
+		 _raycaster.intersectObjects( _objects, true, _intersections );
 
-		var intersects = _raycaster.intersectObjects( _objects, true );
+		if ( _intersections.length > 0 ) {
 
-		if ( intersects.length > 0 ) {
-
-			_selected = intersects[ 0 ].object;
+			_selected = ( scope.transformGroup === true ) ? _objects[ 0 ] : _intersections[ 0 ].object;
 
 			_plane.setFromNormalAndCoplanarPoint( _camera.getWorldDirection( _plane.normal ), _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
@@ -239,10 +247,12 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 	// API
 
 	this.enabled = true;
+	this.transformGroup = false;
 
 	this.activate = activate;
 	this.deactivate = deactivate;
 	this.dispose = dispose;
+	this.getObjects = getObjects;
 
 };
 

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Light] &rarr;
+
+		<h1>光照探针[name]</h1>
+
+		<p class="desc">
+			光照探针是一种在3D场景中添加光源的另一种方法。与经典光源（平行光、点光、聚光）不同，
+			光照探针不发光。相反，光照探针存储着有关穿过3D空间的光线的信息。
+			渲染过程中，通过使用来自光照探针的数据，来逼近打到3D物体上的光线。
+		</p>
+
+		<p class="desc">
+			光照探针通常从（辐射）环境贴图中创建。 [page:LightProbeGenerator] 类可以根据 [page:CubeTexture] 或
+			[page:WebGLCubeRenderTarget] 的实例来创建光照探针。
+			但是，光照估算数据同样可以以其他形式提供，例如，通过WebXR。
+			这将能够渲染可对真实世界的光照做出反应的增强现实内容。
+		</p>
+
+		<p class="desc">
+			three.js中，当前的探针实现支持所谓的漫反射光照探针。
+			这种类型的光照探针功能上等效于辐照环境贴图。
+		</p>
+
+		<h2>例子</h2>
+		<p>
+			[example:webgl_lightprobe WebGL / light probe ]<br />
+			[example:webgl_lightprobe_cubecamera WebGL / light probe / cube camera ]
+		</p>
+
+		<h2>构造函数</h2>
+
+		<h3>[name]( [param:SphericalHarmonics3 sh], [param:Float intensity] )</h3>
+		<p>
+		[page:SphericalHarmonics3 sh] - （可选）一个[page:SphericalHarmonics3]的实例。<br />
+		[page:Float intensity] - （可选）光照探针强度的数值。默认值为1。<br /><br />
+
+		创建一个新的 [name] 。
+		</p>
+
+		<h2>属性</h2>
+		<p>
+				See the base [page:Light Light] class for common properties. 
+				[page:Light.color color] 属性当前未做评估，因此不生效。
+		</p>
+
+		<h3>[property:SphericalHarmonics3 sh]</h3>
+		<p>
+			光照探针使用球面谐波（spherical harmonic）来编码光照信息。
+		</p>
+
+		<h2>方法</h2>
+		<p>
+				See the base [page:Light Light] class for common methods.
+		</p>
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

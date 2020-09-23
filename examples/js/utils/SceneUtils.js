@@ -1,8 +1,32 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
+console.warn( "THREE.SceneUtils: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.SceneUtils = {
+
+	createMeshesFromInstancedMesh: function ( instancedMesh ) {
+
+		var group = new THREE.Group();
+
+		var count = instancedMesh.count;
+		var geometry = instancedMesh.geometry;
+		var material = instancedMesh.material;
+
+		for ( var i = 0; i < count; i ++ ) {
+
+			var mesh = new THREE.Mesh( geometry, material );
+
+			instancedMesh.getMatrixAt( i, mesh.matrix );
+			mesh.matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );
+
+			group.add( mesh );
+
+		}
+
+		group.copy( instancedMesh );
+		group.updateMatrixWorld(); // ensure correct world matrices of meshes
+
+		return group;
+
+	},
 
 	createMultiMaterialObject: function ( geometry, materials ) {
 

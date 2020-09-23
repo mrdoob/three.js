@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 function NodeFrame( time ) {
 
 	this.time = time !== undefined ? time : 0;

@@ -1,8 +1,4 @@
-/**
- * @author Don McCurdy / https://www.donmccurdy.com
- * @author Austin Eng / https://github.com/austinEng
- * @author Shrek Shao / https://github.com/shrekshao
- */
+console.warn( "THREE.BasisTextureLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 /**
  * Loader for Basis Universal GPU Texture Codec.
@@ -31,12 +27,15 @@ THREE.BasisTextureLoader = function ( manager ) {
 	this.workerConfig = {
 		format: null,
 		astcSupported: false,
+		bptcSupported: false,
 		etcSupported: false,
 		dxtSupported: false,
 		pvrtcSupported: false,
 	};
 
 };
+
+THREE.BasisTextureLoader.taskCache = new WeakMap();
 
 THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype ), {
 
@@ -62,15 +61,20 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 		var config = this.workerConfig;
 
-		config.astcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_astc' );
-		config.etcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_etc1' );
-		config.dxtSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_s3tc' );
-		config.pvrtcSupported = !! renderer.extensions.get( 'WEBGL_compressed_texture_pvrtc' )
-			|| !! renderer.extensions.get( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
+		config.astcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_astc' );
+		config.bptcSupported = renderer.extensions.has( 'EXT_texture_compression_bptc' );
+		config.etcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_etc1' );
+		config.dxtSupported = renderer.extensions.has( 'WEBGL_compressed_texture_s3tc' );
+		config.pvrtcSupported = renderer.extensions.has( 'WEBGL_compressed_texture_pvrtc' )
+			|| renderer.extensions.has( 'WEBKIT_WEBGL_compressed_texture_pvrtc' );
 
 		if ( config.astcSupported ) {
 
 			config.format = THREE.BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4;
+
+		} else if ( config.bptcSupported ) {
+
+			config.format = THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC7_M5;
 
 		} else if ( config.dxtSupported ) {
 
@@ -102,7 +106,17 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 		loader.load( url, ( buffer ) => {
 
-			this._createTexture( buffer )
+			// Check for an existing task using this buffer. A transferred buffer cannot be transferred
+			// again from this thread.
+			if ( THREE.BasisTextureLoader.taskCache.has( buffer ) ) {
+
+				var cachedTask = THREE.BasisTextureLoader.taskCache.get( buffer );
+
+				return cachedTask.promise.then( onLoad ).catch( onError );
+
+			}
+
+			this._createTexture( buffer, url )
 				.then( onLoad )
 				.catch( onError );
 
@@ -111,10 +125,11 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 	},
 
 	/**
-	 * @param  {ArrayBuffer} buffer
+	 * @param	{ArrayBuffer} buffer
+	 * @param	{string} url
 	 * @return {Promise<THREE.CompressedTexture>}
 	 */
-	_createTexture: function ( buffer ) {
+	_createTexture: function ( buffer, url ) {
 
 		var worker;
 		var taskID;
@@ -149,6 +164,9 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 					case THREE.BasisTextureLoader.BASIS_FORMAT.cTFASTC_4x4:
 						texture = new THREE.CompressedTexture( mipmaps, width, height, THREE.RGBA_ASTC_4x4_Format );
 						break;
+					case THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC7_M5:
+						texture = new THREE.CompressedTexture( mipmaps, width, height, THREE.RGBA_BPTC_Format );
+						break;
 					case THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC1:
 					case THREE.BasisTextureLoader.BASIS_FORMAT.cTFBC3:
 						texture = new THREE.CompressedTexture( mipmaps, width, height, THREE.BasisTextureLoader.DXT_FORMAT_MAP[ config.format ], THREE.UnsignedByteType );
@@ -176,8 +194,10 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 
 			} );
 
+		// Note: replaced '.finally()' with '.catch().then()' block - iOS 11 support (#19416)
 		texturePending
-			.finally( () => {
+			.catch( () => true )
+			.then( () => {
 
 				if ( worker && taskID ) {
 
@@ -187,6 +207,14 @@ THREE.BasisTextureLoader.prototype = Object.assign( Object.create( THREE.Loader.
 				}
 
 			} );
+
+		// Cache the task result.
+		THREE.BasisTextureLoader.taskCache.set( buffer, {
+
+			url: url,
+			promise: texturePending
+
+		} );
 
 		return texturePending;
 
@@ -407,7 +435,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 		transcoderPending = new Promise( ( resolve ) => {
 
 			BasisModule = { wasmBinary, onRuntimeInitialized: resolve };
-			BASIS( BasisModule );
+			BASIS( BasisModule ); // eslint-disable-line no-undef
 
 		} ).then( () => {
 
@@ -454,7 +482,7 @@ THREE.BasisTextureLoader.BasisWorker = function () {
 		if ( ! width || ! height || ! levels ) {
 
 			cleanup();
-			throw new Error( 'THREE.BasisTextureLoader:  Invalid .basis file' );
+			throw new Error( 'THREE.BasisTextureLoader:	Invalid .basis file' );
 
 		}
 

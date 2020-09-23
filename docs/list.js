@@ -6,11 +6,11 @@ var list = {
 
 			"Getting Started": {
 				"Creating a scene": "manual/en/introduction/Creating-a-scene",
-				"Import via modules": "manual/en/introduction/Import-via-modules",
+				"Installation": "manual/en/introduction/Installation",
 				"Browser support": "manual/en/introduction/Browser-support",
 				"WebGL compatibility check": "manual/en/introduction/WebGL-compatibility-check",
 				"How to run things locally": "manual/en/introduction/How-to-run-things-locally",
-				"How to use WebGL 2": "manual/en/introduction/How-to-use-WebGL2",
+				"Typescript setup": "manual/en/introduction/Typescript-setup",
 				"Drawing lines": "manual/en/introduction/Drawing-lines",
 				"Creating text": "manual/en/introduction/Creating-text",
 				"Loading 3D models": "manual/en/introduction/Loading-3D-models",
@@ -89,6 +89,7 @@ var list = {
 				"EventDispatcher": "api/en/core/EventDispatcher",
 				"Face3": "api/en/core/Face3",
 				"Geometry": "api/en/core/Geometry",
+				"GLBufferAttribute": "api/en/core/GLBufferAttribute",
 				"InstancedBufferAttribute": "api/en/core/InstancedBufferAttribute",
 				"InstancedBufferGeometry": "api/en/core/InstancedBufferGeometry",
 				"InstancedInterleavedBuffer": "api/en/core/InstancedInterleavedBuffer",
@@ -104,13 +105,11 @@ var list = {
 				"BufferAttribute Types": "api/en/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"Deprecated": {
-				"DeprecatedList": "api/en/deprecated/DeprecatedList"
-			},
-
 			"Extras": {
 				"Earcut": "api/en/extras/Earcut",
-				"ShapeUtils": "api/en/extras/ShapeUtils"
+				"ImageUtils": "api/en/extras/ImageUtils",
+				"PMREMGenerator": "api/en/extras/PMREMGenerator",
+				"ShapeUtils": "api/en/extras/ShapeUtils",
 			},
 
 			"Extras / Core": {
@@ -192,24 +191,23 @@ var list = {
 				"Box3Helper": "api/en/helpers/Box3Helper",
 				"CameraHelper": "api/en/helpers/CameraHelper",
 				"DirectionalLightHelper": "api/en/helpers/DirectionalLightHelper",
-				"FaceNormalsHelper": "api/en/helpers/FaceNormalsHelper",
 				"GridHelper": "api/en/helpers/GridHelper",
 				"PolarGridHelper": "api/en/helpers/PolarGridHelper",
-				"PositionalAudioHelper": "api/en/helpers/PositionalAudioHelper",
 				"HemisphereLightHelper": "api/en/helpers/HemisphereLightHelper",
 				"PlaneHelper": "api/en/helpers/PlaneHelper",
 				"PointLightHelper": "api/en/helpers/PointLightHelper",
-				"RectAreaLightHelper": "api/en/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/en/helpers/SkeletonHelper",
-				"SpotLightHelper": "api/en/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/en/helpers/VertexNormalsHelper"
+				"SpotLightHelper": "api/en/helpers/SpotLightHelper"
 			},
 
 			"Lights": {
 				"AmbientLight": "api/en/lights/AmbientLight",
+				"AmbientLightProbe": "api/en/lights/AmbientLightProbe",
 				"DirectionalLight": "api/en/lights/DirectionalLight",
 				"HemisphereLight": "api/en/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/en/lights/HemisphereLightProbe",
 				"Light": "api/en/lights/Light",
+				"LightProbe": "api/en/lights/LightProbe",
 				"PointLight": "api/en/lights/PointLight",
 				"RectAreaLight": "api/en/lights/RectAreaLight",
 				"SpotLight": "api/en/lights/SpotLight"
@@ -276,7 +274,7 @@ var list = {
 				"Frustum": "api/en/math/Frustum",
 				"Interpolant": "api/en/math/Interpolant",
 				"Line3": "api/en/math/Line3",
-				"Math": "api/en/math/Math",
+				"MathUtils": "api/en/math/MathUtils",
 				"Matrix3": "api/en/math/Matrix3",
 				"Matrix4": "api/en/math/Matrix4",
 				"Plane": "api/en/math/Plane",
@@ -284,6 +282,7 @@ var list = {
 				"Ray": "api/en/math/Ray",
 				"Sphere": "api/en/math/Sphere",
 				"Spherical": "api/en/math/Spherical",
+				"SphericalHarmonics3": "api/en/math/SphericalHarmonics3",
 				"Triangle": "api/en/math/Triangle",
 				"Vector2": "api/en/math/Vector2",
 				"Vector3": "api/en/math/Vector3",
@@ -315,8 +314,9 @@ var list = {
 			"Renderers": {
 				"WebGLMultisampleRenderTarget": "api/en/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/en/renderers/WebGLRenderer",
+				"WebGL1Renderer": "api/en/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/en/renderers/WebGLRenderTarget",
-				"WebGLRenderTargetCube": "api/en/renderers/WebGLRenderTargetCube"
+				"WebGLCubeRenderTarget": "api/en/renderers/WebGLCubeRenderTarget"
 			},
 
 			"Renderers / Shaders": {
@@ -324,6 +324,10 @@ var list = {
 				"ShaderLib": "api/en/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/en/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/en/renderers/shaders/UniformsUtils"
+			},
+
+			"Renderers / WebXR": {
+				"WebXRManager": "api/en/renderers/webxr/WebXRManager"
 			},
 
 			"Scenes": {
@@ -337,6 +341,7 @@ var list = {
 				"CompressedTexture": "api/en/textures/CompressedTexture",
 				"CubeTexture": "api/en/textures/CubeTexture",
 				"DataTexture": "api/en/textures/DataTexture",
+				"DataTexture2DArray": "api/en/textures/DataTexture2DArray",
 				"DataTexture3D": "api/en/textures/DataTexture3D",
 				"DepthTexture": "api/en/textures/DepthTexture",
 				"Texture": "api/en/textures/Texture",
@@ -368,6 +373,19 @@ var list = {
 				"ConvexBufferGeometry": "examples/en/geometries/ConvexBufferGeometry",
 				"ConvexGeometry": "examples/en/geometries/ConvexGeometry",
 				"DecalGeometry": "examples/en/geometries/DecalGeometry"
+			},
+
+			"Helpers": {
+				"FaceNormalsHelper": "examples/en/helpers/FaceNormalsHelper",
+				"LightProbeHelper": "examples/en/helpers/LightProbeHelper",
+				"PositionalAudioHelper": "examples/en/helpers/PositionalAudioHelper",
+				"RectAreaLightHelper": "examples/en/helpers/RectAreaLightHelper",
+				"VertexNormalsHelper": "examples/en/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "examples/en/helpers/VertexTangentsHelper"
+			},
+
+			"Lights": {
+				"LightProbeGenerator": "examples/en/lights/LightProbeGenerator"
 			},
 
 			"Loaders": {
@@ -444,17 +462,84 @@ var list = {
 
 	},
 
+	"ar": {
+
+		"الكتيب": {
+
+			"البدء": {
+				"إنشاء مشهد": "manual/ar/introduction/Creating-a-scene",
+				"التثبيت": "manual/ar/introduction/Installation",
+				"دعم المتصفح": "manual/ar/introduction/Browser-support",
+				"فحص توافق WebGL": "manual/ar/introduction/WebGL-compatibility-check",
+				"كيف تدير الأشياء محليًا": "manual/ar/introduction/How-to-run-things-locally",
+				"إعدادات Typescript": "manual/ar/introduction/Typescript-setup",
+				"رسم خطوط": "manual/ar/introduction/Drawing-lines",
+				"إنشاء نص": "manual/ar/introduction/Creating-text",
+				"تحميل نماذج ثلاثية الأبعاد": "manual/ar/introduction/Loading-3D-models",
+				"الأسئلة الشائعة": "manual/ar/introduction/FAQ",
+				"روابط مفيدة": "manual/ar/introduction/Useful-links"
+			},
+
+			"الخطوات التالية": {
+				"كيفية تحديث الأشياء": "manual/ar/introduction/How-to-update-things",
+				"كيفية التخلص من الأشياء": "manual/ar/introduction/How-to-dispose-of-objects",
+				"كيفية إنشاء محتوى VR": "manual/ar/introduction/How-to-create-VR-content",
+				"كيفية استخدام المعالجة اللاحقة (post-processing)": "manual/ar/introduction/How-to-use-post-processing",
+				"تحولات المصفوفة (Matrix transformations)": "manual/ar/introduction/Matrix-transformations",
+				"نظام الحركات": "manual/ar/introduction/Animation-system"
+			},
+
+			"أدوات البناء": {
+				"الاختبار مع NPM": "manual/ar/buildTools/Testing-with-NPM"
+			}
+
+		},
+
+		"المرجع": {
+
+			"الحركات": {
+				"AnimationAction": "api/ar/animation/AnimationAction",
+				"AnimationClip": "api/ar/animation/AnimationClip",
+				"AnimationMixer": "api/ar/animation/AnimationMixer",
+				"AnimationObjectGroup": "api/ar/animation/AnimationObjectGroup",
+				"AnimationUtils": "api/ar/animation/AnimationUtils",
+				"KeyframeTrack": "api/ar/animation/KeyframeTrack",
+				"PropertyBinding": "api/ar/animation/PropertyBinding",
+				"PropertyMixer": "api/ar/animation/PropertyMixer"
+			},
+
+			"الحركات / Tracks": {
+				"BooleanKeyframeTrack": "api/ar/animation/tracks/BooleanKeyframeTrack",
+				"ColorKeyframeTrack": "api/ar/animation/tracks/ColorKeyframeTrack",
+				"NumberKeyframeTrack": "api/ar/animation/tracks/NumberKeyframeTrack",
+				"QuaternionKeyframeTrack": "api/ar/animation/tracks/QuaternionKeyframeTrack",
+				"StringKeyframeTrack": "api/ar/animation/tracks/StringKeyframeTrack",
+				"VectorKeyframeTrack": "api/ar/animation/tracks/VectorKeyframeTrack"
+			},
+
+			"Audio": {
+				"Audio": "api/ar/audio/Audio",
+				"AudioAnalyser": "api/ar/audio/AudioAnalyser",
+				"AudioContext": "api/ar/audio/AudioContext",
+				"AudioListener": "api/ar/audio/AudioListener",
+				"PositionalAudio": "api/ar/audio/PositionalAudio"
+			}
+
+		}
+
+	},
+
 	"zh": {
 
 		"手册": {
 
 			"起步": {
 				"创建一个场景": "manual/zh/introduction/Creating-a-scene",
-				"通过模块来引入": "manual/zh/introduction/Import-via-modules",
+				"安装": "manual/zh/introduction/Installation",
 				"浏览器支持": "manual/zh/introduction/Browser-support",
 				"WebGL兼容性检查": "manual/zh/introduction/WebGL-compatibility-check",
 				"如何在本地运行Three.js": "manual/zh/introduction/How-to-run-things-locally",
-				"如何使用WebGL 2": "manual/zh/introduction/How-to-use-WebGL2",
+				"Typescript设置": "manual/zh/introduction/Typescript-setup",
 				"画线": "manual/zh/introduction/Drawing-lines",
 				"创建文字": "manual/zh/introduction/Creating-text",
 				"载入3D模型": "manual/zh/introduction/Loading-3D-models",
@@ -533,6 +618,7 @@ var list = {
 				"EventDispatcher": "api/zh/core/EventDispatcher",
 				"Face3": "api/zh/core/Face3",
 				"Geometry": "api/zh/core/Geometry",
+				"GLBufferAttribute": "api/zh/core/GLBufferAttribute",
 				"InstancedBufferAttribute": "api/zh/core/InstancedBufferAttribute",
 				"InstancedBufferGeometry": "api/zh/core/InstancedBufferGeometry",
 				"InstancedInterleavedBuffer": "api/zh/core/InstancedInterleavedBuffer",
@@ -548,12 +634,10 @@ var list = {
 				"BufferAttribute Types": "api/zh/core/bufferAttributeTypes/BufferAttributeTypes"
 			},
 
-			"弃用列表": {
-				"DeprecatedList": "api/zh/deprecated/DeprecatedList"
-			},
-
 			"附件": {
 				"Earcut": "api/zh/extras/Earcut",
+				"ImageUtils": "api/zh/extras/ImageUtils",
+				"PMREMGenerator": "api/zh/extras/PMREMGenerator",
 				"ShapeUtils": "api/zh/extras/ShapeUtils"
 			},
 
@@ -636,24 +720,23 @@ var list = {
 				"Box3Helper": "api/zh/helpers/Box3Helper",
 				"CameraHelper": "api/zh/helpers/CameraHelper",
 				"DirectionalLightHelper": "api/zh/helpers/DirectionalLightHelper",
-				"FaceNormalsHelper": "api/zh/helpers/FaceNormalsHelper",
 				"GridHelper": "api/zh/helpers/GridHelper",
 				"PolarGridHelper": "api/zh/helpers/PolarGridHelper",
-				"PositionalAudioHelper": "api/zh/helpers/PositionalAudioHelper",
 				"HemisphereLightHelper": "api/zh/helpers/HemisphereLightHelper",
 				"PlaneHelper": "api/zh/helpers/PlaneHelper",
 				"PointLightHelper": "api/zh/helpers/PointLightHelper",
-				"RectAreaLightHelper": "api/zh/helpers/RectAreaLightHelper",
 				"SkeletonHelper": "api/zh/helpers/SkeletonHelper",
-				"SpotLightHelper": "api/zh/helpers/SpotLightHelper",
-				"VertexNormalsHelper": "api/zh/helpers/VertexNormalsHelper"
+				"SpotLightHelper": "api/zh/helpers/SpotLightHelper"
 			},
 
 			"灯光": {
 				"AmbientLight": "api/zh/lights/AmbientLight",
+				"AmbientLightProbe": "api/zh/lights/AmbientLightProbe",
 				"DirectionalLight": "api/zh/lights/DirectionalLight",
 				"HemisphereLight": "api/zh/lights/HemisphereLight",
+				"HemisphereLightProbe": "api/zh/lights/HemisphereLightProbe",
 				"Light": "api/zh/lights/Light",
+				"LightProbe": "api/zh/lights/LightProbe",
 				"PointLight": "api/zh/lights/PointLight",
 				"RectAreaLight": "api/zh/lights/RectAreaLight",
 				"SpotLight": "api/zh/lights/SpotLight"
@@ -720,7 +803,7 @@ var list = {
 				"Frustum": "api/zh/math/Frustum",
 				"Interpolant": "api/zh/math/Interpolant",
 				"Line3": "api/zh/math/Line3",
-				"Math": "api/zh/math/Math",
+				"MathUtils": "api/zh/math/MathUtils",
 				"Matrix3": "api/zh/math/Matrix3",
 				"Matrix4": "api/zh/math/Matrix4",
 				"Plane": "api/zh/math/Plane",
@@ -728,6 +811,7 @@ var list = {
 				"Ray": "api/zh/math/Ray",
 				"Sphere": "api/zh/math/Sphere",
 				"Spherical": "api/zh/math/Spherical",
+				"SphericalHarmonics3": "api/zh/math/SphericalHarmonics3",
 				"Triangle": "api/zh/math/Triangle",
 				"Vector2": "api/zh/math/Vector2",
 				"Vector3": "api/zh/math/Vector3",
@@ -759,8 +843,9 @@ var list = {
 			"渲染器": {
 				"WebGLMultisampleRenderTarget": "api/zh/renderers/WebGLMultisampleRenderTarget",
 				"WebGLRenderer": "api/zh/renderers/WebGLRenderer",
+				"WebGL1Renderer": "api/zh/renderers/WebGL1Renderer",
 				"WebGLRenderTarget": "api/zh/renderers/WebGLRenderTarget",
-				"WebGLRenderTargetCube": "api/zh/renderers/WebGLRenderTargetCube"
+				"WebGLCubeRenderTarget": "api/zh/renderers/WebGLCubeRenderTarget"
 			},
 
 			"渲染器 / 着色器": {
@@ -768,6 +853,10 @@ var list = {
 				"ShaderLib": "api/zh/renderers/shaders/ShaderLib",
 				"UniformsLib": "api/zh/renderers/shaders/UniformsLib",
 				"UniformsUtils": "api/zh/renderers/shaders/UniformsUtils"
+			},
+
+			"渲染器 / WebXR": {
+				"WebXRManager": "api/zh/renderers/webxr/WebXRManager"
 			},
 
 			"场景": {
@@ -781,6 +870,7 @@ var list = {
 				"CompressedTexture": "api/zh/textures/CompressedTexture",
 				"CubeTexture": "api/zh/textures/CubeTexture",
 				"DataTexture": "api/zh/textures/DataTexture",
+				"DataTexture2DArray": "api/zh/textures/DataTexture2DArray",
 				"DataTexture3D": "api/zh/textures/DataTexture3D",
 				"DepthTexture": "api/zh/textures/DepthTexture",
 				"Texture": "api/zh/textures/Texture",
@@ -814,6 +904,19 @@ var list = {
 				"DecalGeometry": "examples/zh/geometries/DecalGeometry"
 			},
 
+			"辅助对象": {
+				"FaceNormalsHelper": "examples/zh/helpers/FaceNormalsHelper",
+				"LightProbeHelper": "examples/zh/helpers/LightProbeHelper",
+				"PositionalAudioHelper": "examples/zh/helpers/PositionalAudioHelper",
+				"RectAreaLightHelper": "examples/zh/helpers/RectAreaLightHelper",
+				"VertexNormalsHelper": "examples/zh/helpers/VertexNormalsHelper",
+				"VertexTangentsHelper": "examples/zh/helpers/VertexTangentsHelper"
+			},
+
+			"灯光": {
+				"LightProbeGenerator": "examples/zh/lights/LightProbeGenerator"
+			},
+
 			"加载器": {
 				"BasisTextureLoader": "examples/zh/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/zh/loaders/DRACOLoader",
@@ -822,6 +925,7 @@ var list = {
 				"MTLLoader": "examples/zh/loaders/MTLLoader",
 				"OBJLoader": "examples/zh/loaders/OBJLoader",
 				"OBJLoader2": "examples/zh/loaders/OBJLoader2",
+				"OBJLoader2Parallel": "examples/zh/loaders/OBJLoader2Parallel",
 				"PCDLoader": "examples/zh/loaders/PCDLoader",
 				"PDBLoader": "examples/zh/loaders/PDBLoader",
 				"PRWMLoader": "examples/zh/loaders/PRWMLoader",

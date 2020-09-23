@@ -37,7 +37,7 @@
 				info.style.textAlign = 'center';
 				info.style.color = '#fff';
 				info.style.link = '#f80';
-				info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometry extrude shapes';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - geometry extrude shapes';
 				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer();
@@ -111,7 +111,7 @@
 
 				for ( var i = 0; i < 10; i ++ ) {
 
-					randomPoints.push( new THREE.Vector3( ( i - 4.5 ) * 50, THREE.Math.randFloat( - 50, 50 ), THREE.Math.randFloat( - 50, 50 ) ) );
+					randomPoints.push( new THREE.Vector3( ( i - 4.5 ) * 50, THREE.MathUtils.randFloat( - 50, 50 ), THREE.MathUtils.randFloat( - 50, 50 ) ) );
 
 				}
 

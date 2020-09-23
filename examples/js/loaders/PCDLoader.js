@@ -1,9 +1,4 @@
-/**
- * @author Filipe Caixeta / http://filipecaixeta.com.br
- * @author Mugen87 / https://github.com/Mugen87
- *
- * Description: A THREE loader for PCD ascii and binary files.
- */
+console.warn( "THREE.PCDLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.PCDLoader = function ( manager ) {
 
@@ -25,6 +20,7 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		var loader = new THREE.FileLoader( scope.manager );
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
+		loader.setRequestHeader( scope.requestHeader );
 		loader.load( url, function ( data ) {
 
 			try {
@@ -39,9 +35,11 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				} else {
 
-					throw e;
+					console.error( e );
 
 				}
+
+				scope.manager.itemError( url );
 
 			}
 
@@ -87,6 +85,7 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 						if ( inPtr >= inLength ) throw new Error( 'Invalid compressed data' );
 
 					}
+
 					ref -= inData[ inPtr ++ ];
 					if ( outPtr + len + 2 > outLength ) throw new Error( 'Output buffer is not large enough' );
 					if ( ref < 0 ) throw new Error( 'Invalid compressed data' );
@@ -200,7 +199,7 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 				} else {
 
 					PCDheader.offset[ PCDheader.fields[ i ] ] = sizeSum;
-					sizeSum += PCDheader.size[ i ];
+					sizeSum += PCDheader.size[ i ] * PCDheader.count[ i ];
 
 				}
 
@@ -298,9 +297,9 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				if ( offset.rgb !== undefined ) {
 
-					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 2 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
-					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 1 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
-					color.push( dataview.getUint8( ( PCDheader.points * ( offset.rgb + 0 ) + PCDheader.size[ 3 ] * i ) / 255.0 ) );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 0 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 1 ) / 255.0 );
+					color.push( dataview.getUint8( ( PCDheader.points * offset.rgb ) + PCDheader.size[ 3 ] * i + 2 ) / 255.0 );
 
 				}
 
@@ -369,7 +368,7 @@ THREE.PCDLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		if ( color.length > 0 ) {
 
-			material.vertexColors = THREE.VertexColors;
+			material.vertexColors = true;
 
 		} else {
 

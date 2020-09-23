@@ -1,5 +1,4 @@
 import {
-	Material,
 	Loader,
 	LoadingManager,
 	Group

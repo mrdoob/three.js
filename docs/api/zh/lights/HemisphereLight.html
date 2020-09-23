@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -19,21 +19,23 @@
 			半球光不能投射阴影。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
-		<div>
+		<code>
+		var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
+		scene.add( light );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>
 			[example:webgl_lights_hemisphere lights / hemisphere ]<br />
-		  [example:misc_controls_pointerlock controls / pointerlock ]<br />
-		  [example:webgl_decals decals ]<br />
-		  [example:webgl_loader_collada_kinematics loader / collada / kinematics ]<br />
-		  [example:webgl_materials_lightmap materials / lightmap ]<br />
-		  [example:webgl_shaders_ocean shaders / ocean ]
-		</div>
-
-<code>
-var light = new THREE.HemisphereLight( 0xffffbb, 0x080820, 1 );
-scene.add( light );
-</code>
+			[example:misc_controls_pointerlock controls / pointerlock ]<br />
+			[example:webgl_decals decals ]<br />
+			[example:webgl_loader_collada_kinematics loader / collada / kinematics ]<br />
+			[example:webgl_materials_lightmap materials / lightmap ]<br />
+			[example:webgl_shaders_ocean shaders / ocean ]
+		</p>
 
 		<h2>构造器（Constructor）</h2>
 		<h3>[name]( [param:Integer skyColor], [param:Integer groundColor], [param:Float intensity] )</h3>
@@ -68,13 +70,6 @@ scene.add( light );
 			默认会创建 [page:Color] 并设置为白色（0xffffff）。
 		</p>
 
-		<h3>[property:Boolean isHemisphereLight]</h3>
-		<p>
-				用来校验这个类或者派生类是不是半球光。缺省值为 *true*。<br /><br />
-
-				不应该去改变这个变量,因为内部使用这个变量做了些优化的工作。
-		</p>
-
 		<h3>[property:Vector3 position]</h3>
 		<p>
 			假如这个值设置等于 [page:Object3D.DefaultUp] (0, 1, 0),那么光线将会从上往下照射。
@@ -84,7 +79,7 @@ scene.add( light );
 
 		<h2>方法（Methods）</h2>
 
-		公共方法请查看基类 [page:Light Light]。
+		<p>公共方法请查看基类 [page:Light Light]。</p>
 
 		<h3>[method:HemisphereLight copy]( [param:HemisphereLight source] )</h3>
 		<p>

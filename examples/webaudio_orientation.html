@@ -14,10 +14,7 @@
 	</audio>
 
 	<div id="overlay">
-		<div>
-			<button id="startButton">Click to Play</button>
-			<p>Audio playback requires user interaction.</p>
-		</div>
+		<button id="startButton">Play</button>
 	</div>
 	<div id="container"></div>
 	<div id="info">
@@ -29,6 +26,7 @@
 		import * as THREE from '../build/three.module.js';
 
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
+		import { PositionalAudioHelper } from './jsm/helpers/PositionalAudioHelper.js';
 		import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 
 		var scene, camera, renderer;
@@ -51,7 +49,6 @@
 			var reflectionCube = new THREE.CubeTextureLoader()
 				.setPath( 'textures/cube/SwedishRoyalCastle/' )
 				.load( [ 'px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg' ] );
-			reflectionCube.format = THREE.RGBFormat;
 
 			scene = new THREE.Scene();
 			scene.background = new THREE.Color( 0xa0a0a0 );
@@ -99,7 +96,7 @@
 			positionalAudio.setRefDistance( 1 );
 			positionalAudio.setDirectionalCone( 180, 230, 0.1 );
 
-			var helper = new THREE.PositionalAudioHelper( positionalAudio, 0.1 );
+			var helper = new PositionalAudioHelper( positionalAudio, 0.1 );
 			positionalAudio.add( helper );
 
 			//

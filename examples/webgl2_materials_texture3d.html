@@ -9,7 +9,7 @@
 
 <body>
 	<div id="info">
-		<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Float volume render test (mip / isosurface)
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Float volume render test (mip / isosurface)
 	</div>
 	<div id="inset"></div>
 
@@ -43,9 +43,7 @@
 			scene = new THREE.Scene();
 
 			// Create renderer
-			var canvas = document.createElement( 'canvas' );
-			var context = canvas.getContext( 'webgl2', { alpha: false, antialias: false } );
-			renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+			renderer = new THREE.WebGLRenderer();
 			renderer.setPixelRatio( window.devicePixelRatio );
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			document.body.appendChild( renderer.domElement );

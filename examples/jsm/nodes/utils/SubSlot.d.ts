@@ -1,5 +1,4 @@
 import { TempNode } from '../core/TempNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 
 export class SubSlots extends TempNode {
 

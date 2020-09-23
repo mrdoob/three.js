@@ -13,7 +13,7 @@ import {
 export interface Variable {
 	name: string;
 	initialValueTexture: Texture;
-	material: Material;
+	material: ShaderMaterial;
 	dependencies: Variable[];
 	renderTargets: RenderTarget[];
 	wrapS: number;
@@ -25,6 +25,8 @@ export interface Variable {
 export class GPUComputationRenderer {
 
 	constructor( sizeX: number, sizeY: number, renderer: WebGLRenderer );
+
+	setDataType ( type: TextureDataType ): void;
 
 	addVariable( variableName: string, computeFragmentShader: string, initialValueTexture: Texture ): Variable;
 	setVariableDependencies( variable: Variable, dependencies: Variable[] | null ): void;

@@ -5,11 +5,14 @@ import { Skeleton } from './Skeleton';
 import { Mesh } from './Mesh';
 import { BufferGeometry } from '../core/BufferGeometry';
 
-export class SkinnedMesh extends Mesh {
+export class SkinnedMesh <
+	TGeometry extends Geometry | BufferGeometry = Geometry | BufferGeometry,
+	TMaterial extends Material | Material[] = Material | Material[]
+> extends Mesh<TGeometry, TMaterial> {
 
 	constructor(
-		geometry?: Geometry | BufferGeometry,
-		material?: Material | Material[],
+		geometry?: TGeometry,
+		material?: TMaterial,
 		useVertexTexture?: boolean
 	);
 
@@ -17,6 +20,7 @@ export class SkinnedMesh extends Mesh {
 	bindMatrix: Matrix4;
 	bindMatrixInverse: Matrix4;
 	skeleton: Skeleton;
+	readonly isSkinnedMesh: true;
 
 	bind( skeleton: Skeleton, bindMatrix?: Matrix4 ): void;
 	pose(): void;

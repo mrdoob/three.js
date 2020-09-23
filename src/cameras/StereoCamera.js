@@ -1,13 +1,9 @@
 import { Matrix4 } from '../math/Matrix4.js';
-import { _Math } from '../math/Math.js';
+import { MathUtils } from '../math/MathUtils.js';
 import { PerspectiveCamera } from './PerspectiveCamera.js';
 
-var _eyeRight = new Matrix4();
-var _eyeLeft = new Matrix4();
-
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+const _eyeRight = new Matrix4();
+const _eyeLeft = new Matrix4();
 
 function StereoCamera() {
 
@@ -41,9 +37,9 @@ Object.assign( StereoCamera.prototype, {
 
 	update: function ( camera ) {
 
-		var cache = this._cache;
+		const cache = this._cache;
 
-		var needsUpdate = cache.focus !== camera.focus || cache.fov !== camera.fov ||
+		const needsUpdate = cache.focus !== camera.focus || cache.fov !== camera.fov ||
 			cache.aspect !== camera.aspect * this.aspect || cache.near !== camera.near ||
 			cache.far !== camera.far || cache.zoom !== camera.zoom || cache.eyeSep !== this.eyeSep;
 
@@ -60,11 +56,11 @@ Object.assign( StereoCamera.prototype, {
 			// Off-axis stereoscopic effect based on
 			// http://paulbourke.net/stereographics/stereorender/
 
-			var projectionMatrix = camera.projectionMatrix.clone();
-			var eyeSepHalf = cache.eyeSep / 2;
-			var eyeSepOnProjection = eyeSepHalf * cache.near / cache.focus;
-			var ymax = ( cache.near * Math.tan( _Math.DEG2RAD * cache.fov * 0.5 ) ) / cache.zoom;
-			var xmin, xmax;
+			const projectionMatrix = camera.projectionMatrix.clone();
+			const eyeSepHalf = cache.eyeSep / 2;
+			const eyeSepOnProjection = eyeSepHalf * cache.near / cache.focus;
+			const ymax = ( cache.near * Math.tan( MathUtils.DEG2RAD * cache.fov * 0.5 ) ) / cache.zoom;
+			let xmin, xmax;
 
 			// translate xOffset
 

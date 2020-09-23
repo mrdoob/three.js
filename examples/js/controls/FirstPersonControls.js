@@ -1,8 +1,4 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- * @author alteredq / http://alteredqualia.com/
- * @author paulirish / http://paulirish.com/
- */
+console.warn( "THREE.FirstPersonControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
 THREE.FirstPersonControls = function ( object, domElement ) {
 
@@ -229,7 +225,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			if ( this.heightSpeed ) {
 
-				var y = THREE.Math.clamp( this.object.position.y, this.heightMin, this.heightMax );
+				var y = THREE.MathUtils.clamp( this.object.position.y, this.heightMin, this.heightMax );
 				var heightDelta = y - this.heightMin;
 
 				this.autoSpeedFactor = delta * ( heightDelta * this.heightCoef );
@@ -272,12 +268,12 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
 			lat = Math.max( - 85, Math.min( 85, lat ) );
 
-			var phi = THREE.Math.degToRad( 90 - lat );
-			var theta = THREE.Math.degToRad( lon );
+			var phi = THREE.MathUtils.degToRad( 90 - lat );
+			var theta = THREE.MathUtils.degToRad( lon );
 
 			if ( this.constrainVertical ) {
 
-				phi = THREE.Math.mapLinear( phi, 0, Math.PI, this.verticalMin, this.verticalMax );
+				phi = THREE.MathUtils.mapLinear( phi, 0, Math.PI, this.verticalMin, this.verticalMax );
 
 			}
 
@@ -340,8 +336,8 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 		lookDirection.set( 0, 0, - 1 ).applyQuaternion( quaternion );
 		spherical.setFromVector3( lookDirection );
 
-		lat = 90 - THREE.Math.radToDeg( spherical.phi );
-		lon = THREE.Math.radToDeg( spherical.theta );
+		lat = 90 - THREE.MathUtils.radToDeg( spherical.phi );
+		lon = THREE.MathUtils.radToDeg( spherical.theta );
 
 	}
 

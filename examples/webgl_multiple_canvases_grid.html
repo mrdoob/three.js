@@ -41,10 +41,10 @@
 			}
 			#canvas1, #canvas2, #canvas3, #canvas4 {
 				position: relative;
+				float: left;
 				width: 300px;
 				height: 200px;
-				border: 1px solid red;
-				float: left;
+				outline: 1px solid red;
 			}
 		</style>
 	</head>
@@ -63,7 +63,7 @@
 				</div>
 			</div>
 		</div>
-		<div id="info"><a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl -  multiple canvases - grid</div>
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl -  multiple canvases - grid</div>
 
 		<script type="module">
 
@@ -208,7 +208,7 @@
 				var material = new THREE.MeshPhongMaterial( {
 					color: 0xffffff,
 					flatShading: true,
-					vertexColors: THREE.VertexColors,
+					vertexColors: true,
 					shininess: 0
 				} );
 

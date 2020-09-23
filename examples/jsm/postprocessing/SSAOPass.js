@@ -1,7 +1,3 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- */
-
 import {
 	AddEquation,
 	Color,
@@ -12,7 +8,7 @@ import {
 	DstColorFactor,
 	FloatType,
 	LinearFilter,
-	Math as _Math,
+	MathUtils,
 	MeshNormalMaterial,
 	NearestFilter,
 	NoBlending,
@@ -374,7 +370,7 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 			sample.normalize();
 
 			var scale = i / kernelSize;
-			scale = _Math.lerp( 0.1, 1, scale * scale );
+			scale = MathUtils.lerp( 0.1, 1, scale * scale );
 			sample.multiplyScalar( scale );
 
 			kernel.push( sample );

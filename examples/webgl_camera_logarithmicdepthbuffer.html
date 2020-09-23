@@ -55,7 +55,7 @@
 		</div>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras - logarithmic depth buffer<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - cameras - logarithmic depth buffer<br/>
 			mousewheel to dolly out
 		</div>
 
@@ -95,9 +95,7 @@
 				{ size: 7.47e12, scale: 1.0, label: "solar system-sized (50Au)" },
 				{ size: 9.4605284e15, scale: 1.0, label: "gargantuan (1 light year)" },
 				{ size: 3.08567758e16, scale: 1.0, label: "ludicrous (1 parsec)" },
-				{ size: 1e19, scale: 1.0, label: "mind boggling (1000 light years)" },
-				{ size: 1.135e21, scale: 1.0, label: "galaxy-sized (120,000 light years)" },
-				{ size: 9.46e23, scale: 1.0, label: "... (100,000,000 light years)" }
+				{ size: 1e19, scale: 1.0, label: "mind boggling (1000 light years)" }
 			];
 
 			init();
@@ -249,7 +247,7 @@
 				var damping = ( Math.abs( zoomspeed ) > minzoomspeed ? .95 : 1.0 );
 
 				// Zoom out faster the further out you go
-				var zoom = THREE.Math.clamp( Math.pow( Math.E, zoompos ), minzoom, maxzoom );
+				var zoom = THREE.MathUtils.clamp( Math.pow( Math.E, zoompos ), minzoom, maxzoom );
 				zoompos = Math.log( zoom );
 
 				// Slow down quickly at the zoom limits

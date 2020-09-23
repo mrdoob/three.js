@@ -1,11 +1,6 @@
-/**
- * @author qiao / https://github.com/qiao
- * @author mrdoob / http://mrdoob.com
- * @author alteredq / http://alteredqualia.com/
- * @author WestLangley / http://github.com/WestLangley
- */
+import * as THREE from '../../build/three.module.js';
 
-THREE.EditorControls = function ( object, domElement ) {
+function EditorControls( object, domElement ) {
 
 	// API
 
@@ -117,11 +112,63 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	};
 
+	//
+
+	function onPointerDown( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+				onMouseDown( event );
+				break;
+
+			// TODO touch
+
+		}
+
+		domElement.ownerDocument.addEventListener( 'pointermove', onPointerMove, false );
+		domElement.ownerDocument.addEventListener( 'pointerup', onPointerUp, false );
+
+	}
+
+	function onPointerMove( event ) {
+
+		if ( scope.enabled === false ) return;
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+				onMouseMove( event );
+				break;
+
+			// TODO touch
+
+		}
+
+	}
+
+	function onPointerUp( event ) {
+
+		switch ( event.pointerType ) {
+
+			case 'mouse':
+				onMouseUp();
+				break;
+
+			// TODO touch
+
+		}
+
+		domElement.ownerDocument.removeEventListener( 'pointermove', onPointerMove, false );
+		domElement.ownerDocument.removeEventListener( 'pointerup', onPointerUp, false );
+
+	}
+
 	// mouse
 
 	function onMouseDown( event ) {
-
-		if ( scope.enabled === false ) return;
 
 		if ( event.button === 0 ) {
 
@@ -139,16 +186,9 @@ THREE.EditorControls = function ( object, domElement ) {
 
 		pointerOld.set( event.clientX, event.clientY );
 
-		domElement.addEventListener( 'mousemove', onMouseMove, false );
-		domElement.addEventListener( 'mouseup', onMouseUp, false );
-		domElement.addEventListener( 'mouseout', onMouseUp, false );
-		domElement.addEventListener( 'dblclick', onMouseUp, false );
-
 	}
 
 	function onMouseMove( event ) {
-
-		if ( scope.enabled === false ) return;
 
 		pointer.set( event.clientX, event.clientY );
 
@@ -173,18 +213,15 @@ THREE.EditorControls = function ( object, domElement ) {
 
 	}
 
-	function onMouseUp( /* event */ ) {
-
-		domElement.removeEventListener( 'mousemove', onMouseMove, false );
-		domElement.removeEventListener( 'mouseup', onMouseUp, false );
-		domElement.removeEventListener( 'mouseout', onMouseUp, false );
-		domElement.removeEventListener( 'dblclick', onMouseUp, false );
+	function onMouseUp() {
 
 		state = STATE.NONE;
 
 	}
 
 	function onMouseWheel( event ) {
+
+		if ( scope.enabled === false ) return;
 
 		event.preventDefault();
 
@@ -202,13 +239,10 @@ THREE.EditorControls = function ( object, domElement ) {
 	this.dispose = function () {
 
 		domElement.removeEventListener( 'contextmenu', contextmenu, false );
-		domElement.removeEventListener( 'mousedown', onMouseDown, false );
+		domElement.removeEventListener( 'dblclick', onMouseUp, false );
 		domElement.removeEventListener( 'wheel', onMouseWheel, false );
 
-		domElement.removeEventListener( 'mousemove', onMouseMove, false );
-		domElement.removeEventListener( 'mouseup', onMouseUp, false );
-		domElement.removeEventListener( 'mouseout', onMouseUp, false );
-		domElement.removeEventListener( 'dblclick', onMouseUp, false );
+		domElement.removeEventListener( 'pointerdown', onPointerDown, false );
 
 		domElement.removeEventListener( 'touchstart', touchStart, false );
 		domElement.removeEventListener( 'touchmove', touchMove, false );
@@ -216,8 +250,10 @@ THREE.EditorControls = function ( object, domElement ) {
 	};
 
 	domElement.addEventListener( 'contextmenu', contextmenu, false );
-	domElement.addEventListener( 'mousedown', onMouseDown, false );
+	domElement.addEventListener( 'dblclick', onMouseUp, false );
 	domElement.addEventListener( 'wheel', onMouseWheel, false );
+
+	domElement.addEventListener( 'pointerdown', onPointerDown, false );
 
 	// touch
 
@@ -307,7 +343,9 @@ THREE.EditorControls = function ( object, domElement ) {
 	domElement.addEventListener( 'touchstart', touchStart, false );
 	domElement.addEventListener( 'touchmove', touchMove, false );
 
-};
+}
 
-THREE.EditorControls.prototype = Object.create( THREE.EventDispatcher.prototype );
-THREE.EditorControls.prototype.constructor = THREE.EditorControls;
+EditorControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+EditorControls.prototype.constructor = EditorControls;
+
+export { EditorControls };

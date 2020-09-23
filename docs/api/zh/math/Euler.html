@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -15,9 +15,10 @@
 			欧拉角描述一个旋转变换，通过指定轴顺序和其各个轴向上的指定旋转角度来旋转一个物体。
 		</p>
 
-		<h2>示例（Example）</h2>
+		<h2>代码示例</h2>
 
-		<code>var a = new THREE.Euler( 0, 1, 1.57, 'XYZ' );
+		<code>
+		var a = new THREE.Euler( 0, 1, 1.57, 'XYZ' );
 		var b = new THREE.Vector3( 1, 0, 1 );
 		b.applyEuler(a);
 		</code>
@@ -37,13 +38,6 @@
 
 
 		<h2>属性（Properties）</h2>
-
-		<h3>[property:Boolean isEuler]</h3>
-		<p>
-			用于判定此对象或者此类的派生对象是否是欧拉角。默认值为 *true*。<br /><br />
-			
-			不应该改变该值，因为它在内部用于优化。
-		</p>
 
 		<h3>[property:String order]</h3>
 		<p>
@@ -84,7 +78,7 @@
 		<h3>[method:Euler fromArray]( [param:Array array] )</h3>
 		<p>
 		长度为3或4的一个 [page:Array array] 。array[3] 是一个可选的 [page:.order order] 参数。<br /><br />
-		
+
 		将欧拉角的x分量设置为 array[0]。 <br />
 		将欧拉角的x分量设置为 array[1]。 <br />
 		将欧拉角的x分量设置为 array[2]。 <br />

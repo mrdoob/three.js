@@ -1,20 +1,20 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
+import * as THREE from '../../build/three.module.js';
 
-Menubar.Examples = function ( editor ) {
+import { UIPanel, UIRow } from './libs/ui.js';
+
+function MenubarExamples( editor ) {
 
 	var strings = editor.strings;
 
-	var container = new UI.Panel();
+	var container = new UIPanel();
 	container.setClass( 'menu' );
 
-	var title = new UI.Panel();
+	var title = new UIPanel();
 	title.setClass( 'title' );
 	title.setTextContent( strings.getKey( 'menubar/examples' ) );
 	container.add( title );
 
-	var options = new UI.Panel();
+	var options = new UIPanel();
 	options.setClass( 'options' );
 	container.add( options );
 
@@ -36,7 +36,7 @@ Menubar.Examples = function ( editor ) {
 
 			var item = items[ i ];
 
-			var option = new UI.Row();
+			var option = new UIRow();
 			option.setClass( 'option' );
 			option.setTextContent( strings.getKey( item.title ) );
 			option.onClick( function () {
@@ -61,4 +61,6 @@ Menubar.Examples = function ( editor ) {
 
 	return container;
 
-};
+}
+
+export { MenubarExamples };

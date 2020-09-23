@@ -69,14 +69,17 @@
 
 				var spline = new THREE.CatmullRomCurve3( points );
 				var divisions = Math.round( 12 * points.length );
+				var point = new THREE.Vector3();
 				var color = new THREE.Color();
 
 				for ( var i = 0, l = divisions; i < l; i ++ ) {
 
-					var point = spline.getPoint( i / l );
+					var t = i / l;
+
+					spline.getPoint( t, point );
 					positions.push( point.x, point.y, point.z );
 
-					color.setHSL( i / l, 1.0, 0.5 );
+					color.setHSL( t, 1.0, 0.5 );
 					colors.push( color.r, color.g, color.b );
 
 				}
@@ -92,7 +95,7 @@
 
 					color: 0xffffff,
 					linewidth: 5, // in pixels
-					vertexColors: THREE.VertexColors,
+					vertexColors: true,
 					//resolution:  // to be set by renderer, eventually
 					dashed: false
 
@@ -110,8 +113,8 @@
 				geo.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 				geo.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				matLineBasic = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
-				matLineDashed = new THREE.LineDashedMaterial( { vertexColors: THREE.VertexColors, scale: 2, dashSize: 1, gapSize: 1 } );
+				matLineBasic = new THREE.LineBasicMaterial( { vertexColors: true } );
+				matLineDashed = new THREE.LineDashedMaterial( { vertexColors: true, scale: 2, dashSize: 1, gapSize: 1 } );
 
 				line1 = new THREE.Line( geo, matLineBasic );
 				line1.computeLineDistances();

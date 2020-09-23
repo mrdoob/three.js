@@ -1,6 +1,11 @@
+import {
+	BackSide,
+	Color,
+	ShaderMaterial,
+	UniformsLib,
+	UniformsUtils
+} from "../../../build/three.module.js";
 /**
- * @author takahirox / http://github.com/takahirox/
- *
  * Reference: https://en.wikipedia.org/wiki/Cel_shading
  *
  * API
@@ -55,14 +60,6 @@
  * 	keepAlive: true
  * };
  */
-
-import {
-	BackSide,
-	Color,
-	ShaderMaterial,
-	UniformsLib,
-	UniformsUtils
-} from "../../../build/three.module.js";
 
 var OutlineEffect = function ( renderer, parameters ) {
 
@@ -166,10 +163,10 @@ var OutlineEffect = function ( renderer, parameters ) {
 
 		"	gl_FragColor = vec4( outlineColor, outlineAlpha );",
 
-		"	#include <premultiplied_alpha_fragment>",
 		"	#include <tonemapping_fragment>",
 		"	#include <encodings_fragment>",
 		"	#include <fog_fragment>",
+		"	#include <premultiplied_alpha_fragment>",
 
 		"}"
 

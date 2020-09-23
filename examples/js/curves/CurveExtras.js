@@ -1,6 +1,6 @@
+console.warn( "THREE.CurveExtras: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * A bunch of parametric curves
- * @author zz85
  *
  * Formulas collected from various sources
  * http://mathworld.wolfram.com/HeartCurve.html
@@ -8,7 +8,7 @@
  * http://en.wikipedia.org/wiki/Viviani%27s_curve
  * http://mathdl.maa.org/images/upload_library/23/stemkoski/knots/page4.html
  * http://www.mi.sanu.ac.rs/vismath/taylorapril2011/Taylor.pdf
- * http://prideout.net/blog/?p=44
+ * https://prideout.net/blog/old/blog/index.html@p=44.html
  */
 
 THREE.Curves = ( function () {

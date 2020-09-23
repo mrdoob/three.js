@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - typed arrays<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - typed arrays<br/>
 			nearest neighbour for 500,000 sprites
 		</div>
 
@@ -193,7 +193,7 @@
 				var _projScreenMatrix = new THREE.Matrix4();
 
 				_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
-				_frustum.setFromMatrix( _projScreenMatrix );
+				_frustum.setFromProjectionMatrix( _projScreenMatrix );
 
 				for ( var i = 0, il = imagePositionsInRange.length; i < il; i ++ ) {
 

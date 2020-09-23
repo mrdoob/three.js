@@ -1,6 +1,6 @@
 import {
 	WebGLRenderer,
-    MeshStandardMaterial
+	MeshStandardMaterial
 } from '../../../src/Three';
 
 export class RoughnessMipmapper {

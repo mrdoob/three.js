@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -19,32 +19,30 @@
 			<ul>
 				<li>不支持阴影。</li>
 				<li>只支持 [page:MeshStandardMaterial MeshStandardMaterial] 和 [page:MeshPhysicalMaterial MeshPhysicalMaterial] 两种材质。</li>
-				<li>你必须在你的场景中加入 [link:https://threejs.org/examples/js/lights/RectAreaLightUniformsLib.js RectAreaLightUniformsLib] ，并调用*init()*。</li>
+				<li>你必须在你的场景中加入 [link:https://threejs.org/examples/jsm/lights/RectAreaLightUniformsLib.js RectAreaLightUniformsLib] ，并调用*init()*。</li>
 			</ul>
 		</p>
 
+		<h2>代码示例</h2>
 
+		<code>
+		var width = 10;
+		var height = 10;
+		var intensity = 1;
+		var rectLight = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
+		rectLight.position.set( 5, 5, 0 );
+		rectLight.lookAt( 0, 0, 0 );
+		scene.add( rectLight )
 
-		<h2>示例</h2>
+		rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
+		scene.add( rectLightHelper );
+		</code>
+
+		<h2>例子</h2>
 
 		<p>
 			[example:webgl_lights_rectarealight WebGL / rectarealight ]
-
-			<code>
-var width = 10;
-var height = 10;
-var intensity = 1;
-var rectLight = new THREE.RectAreaLight( 0xffffff, intensity,  width, height );
-rectLight.position.set( 5, 5, 0 );
-rectLight.lookAt( 0, 0, 0 );
-scene.add( rectLight )
-
-rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
-scene.add( rectLightHelper );
-
-			</code>
 		</p>
-
 
 		<h2>构造器（Constructor）</h2>
 
@@ -62,13 +60,6 @@ scene.add( rectLightHelper );
 		<h2>属性（Properties）</h2>
 		<p>
 			公共属性请查看基类[page:Light Light]。
-		</p>
-
-		<h3>[property:Boolean isRectAreaLight]</h3>
-		<p>
-			用来校验这个类或者它的派生类是不是平面光光源。缺省值是 *true*。<br /><br />
-
-			不应该去改变这个变量,因为内部使用这个变量做了些优化的工作。
 		</p>
 
 		<h2>方法（Methods）</h2>

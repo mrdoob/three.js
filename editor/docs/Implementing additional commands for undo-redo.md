@@ -26,7 +26,7 @@ Every command needs a constructor. In the constructor
 
 ```javascript
 
-var DoSomethingCommand = function ( editor ) {
+function DoSomethingCommand( editor ) {
 
 	Command.call( this, editor ); // Required: Call default constructor
 
@@ -36,7 +36,7 @@ var DoSomethingCommand = function ( editor ) {
 	// TODO: store all the relevant information needed to
 	// restore the old and the new state
 
-};
+}
 ```
 
 And as part of the prototype you need to implement four functions

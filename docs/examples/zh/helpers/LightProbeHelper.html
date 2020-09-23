@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="list.js"></script>
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body>
+		[page:Object3D] &rarr; [page:Mesh] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			在场景中渲染一个球来可视化光照探针。
+		<p>
+
+		<h2>代码示例</h2>
+
+		<code>
+		var helper = new LightProbeHelper( lightProbe, 1 );
+		scene.add( helper );
+		</code>
+
+		<h2>例子</h2>
+
+		<p>[example:webgl_lightprobe_cubecamera WebGL / lightprobe / cubecamera]</p>
+
+		<h2>构造函数</h2>
+
+
+		<h3>[name]( [param:LightProbe lightProbe], [param:Number size] )</h3>
+		<p>
+		[page:LightProbe lightProbe] -- 光照探针。<br />
+		[page:Number size] -- 辅助球体的大小。
+		</p>
+
+
+		<h2>属性</h2>
+		<p>See the base [page:Mesh] class for common properties.</p>
+
+		<h3>[property:LightProbe lightProbe]</h3>
+		<p>光照探针。</p>
+
+		<h3>[property:Number size]</h3>
+		<p>辅助球体的大小。</p>
+
+		<h2>方法</h2>
+		<p>See the base [page:Mesh] class for common methods.</p>
+
+		<h3>[method:null dispose]()</h3>
+		<p>释放内部资源。</p>
+
+
+		<h2>源码</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/examples/jsm/helpers/LightProbeHelper.js examples/jsm/helpers/LightProbeHelper.js]
+		</p>
+	</body>
+</html>

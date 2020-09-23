@@ -17,7 +17,7 @@
 	</head>
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - NURBS curve and surface example
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - NURBS curve and surface example
 		</div>
 
 		<script type="module">
@@ -90,7 +90,7 @@
 					);
 
 					var knot = ( i + 1 ) / ( j - nurbsDegree );
-					nurbsKnots.push( THREE.Math.clamp( knot, 0, 1 ) );
+					nurbsKnots.push( THREE.MathUtils.clamp( knot, 0, 1 ) );
 
 				}
 

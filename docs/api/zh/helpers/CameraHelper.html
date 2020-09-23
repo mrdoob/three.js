@@ -17,17 +17,19 @@
 		它使用 [page:LineSegments] 来模拟相机视锥体.
 		</p>
 
-		<h2>例子</h2>
-
-		<div>[example:webgl_camera WebGL / camera]</div>
-		<div>[example:webgl_geometry_extrude_splines WebGL / extrude / splines]</div>
+		<h2>代码示例</h2>
 
 		<code>
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-var helper = new THREE.CameraHelper( camera );
-scene.add( helper );
+		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		var helper = new THREE.CameraHelper( camera );
+		scene.add( helper );
 		</code>
 
+		<h2>例子</h2>
+		<p>
+			[example:webgl_camera WebGL / camera]<br/>
+			[example:webgl_geometry_extrude_splines WebGL / extrude / splines]
+		</p>
 
 		<h2>构造函数</h2>
 

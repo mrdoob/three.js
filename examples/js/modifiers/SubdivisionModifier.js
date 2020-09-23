@@ -1,7 +1,5 @@
+console.warn( "THREE.SubdivisionModifier: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- *	@author zz85 / http://twitter.com/blurspline / http://www.lab4games.net/zz85/blog
- *	@author centerionware / http://www.centerionware.com
- *
  *	Subdivision Geometry Modifier
  *		using Loop Subdivision Scheme
  *
@@ -169,7 +167,7 @@ THREE.SubdivisionModifier.prototype.modify = function ( geometry ) {
 		oldFaces = geometry.faces; // { a: oldVertex1, b: oldVertex2, c: oldVertex3 }
 		oldUvs = geometry.faceVertexUvs;
 
-		var hasUvs = oldUvs !== undefined && oldUvs.length > 0;
+		var hasUvs = oldUvs[ 0 ] !== undefined && oldUvs[ 0 ].length > 0;
 
 		if ( hasUvs ) {
 

@@ -9,7 +9,7 @@
 
 	<body>
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl materials matcap<br />
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - webgl materials matcap<br />
 			Drag-and-drop JPG, PNG, or EXR MatCap image files<br/>
 		</div>
 
@@ -40,7 +40,7 @@
 				document.body.appendChild( renderer.domElement );
 
 				// tone mapping
-				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 			 	renderer.toneMappingExposure = API.exposure;
 
 				renderer.outputEncoding = THREE.sRGBEncoding;

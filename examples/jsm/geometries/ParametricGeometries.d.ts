@@ -11,7 +11,7 @@ export namespace ParametricGeometries {
 
 	export class TubeGeometry {
 
-  	constructor( path: Curve<Vector3>, segments?: number, radius?: number, segmentsRadius?: number, closed?: boolean, debug?: boolean );
+  	constructor( path: Curve<Vector3>, segments?: number, radius?: number, segmentsRadius?: number, closed?: boolean );
 
 	}
 
@@ -23,7 +23,7 @@ export namespace ParametricGeometries {
 
 	export class SphereGeometry {
 
-  	constructor( size: number, u: number, v );
+  	constructor( size: number, u: number, v: number );
 
 	}
 

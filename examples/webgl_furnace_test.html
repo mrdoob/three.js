@@ -10,7 +10,7 @@
 
 		<div id="container">
 			<div id="info">
-				<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> -
+				<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> -
 				<a href="https://google.github.io/filament/Filament.md.html#toc4.7.2" target="_blank" rel="noopener">White Furnace</a> energy conservation test by <a href="https://jsantell.com/" target="_blank" rel="noopener">Jordan Santell</a>
 			</div>
 		</div>
@@ -18,8 +18,6 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
-
-			import { PMREMGenerator } from './jsm/pmrem/PMREMGenerator.js';
 
 			var scene, camera, renderer, radianceMap;
 
@@ -104,7 +102,7 @@
 					var envScene = new THREE.Scene();
 					envScene.background = new THREE.Color( 0xcccccc );
 
-					var pmremGenerator = new PMREMGenerator( renderer );
+					var pmremGenerator = new THREE.PMREMGenerator( renderer );
 					radianceMap = pmremGenerator.fromScene( envScene ).texture;
 					pmremGenerator.dispose();
 

@@ -1,5 +1,4 @@
 import { TempNode } from '../core/TempNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 
 export class JoinNode extends TempNode {
 
@@ -7,8 +6,8 @@ export class JoinNode extends TempNode {
 
 	x: Node;
 	y: Node;
-	z: Node | undefined;
-	w: Node | undefined;
+	z: Node | undefined;
+	w: Node | undefined;
 	nodeType: string;
 
 	getNumElements(): number;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../../" />
@@ -17,25 +17,25 @@
 			将[page:Number xRadius]与[page:Number yRadius]设为相等的值它将会成为一个圆。
 		</p>
 
-		<h2>示例</h2>
+		<h2>代码示例</h2>
 
-<code>
-var curve = new THREE.EllipseCurve(
-	0,  0,            // ax, aY
-	10, 10,           // xRadius, yRadius
-	0,  2 * Math.PI,  // aStartAngle, aEndAngle
-	false,            // aClockwise
-	0                 // aRotation
-);
+		<code>
+		var curve = new THREE.EllipseCurve(
+			0,  0,            // ax, aY
+			10, 10,           // xRadius, yRadius
+			0,  2 * Math.PI,  // aStartAngle, aEndAngle
+			false,            // aClockwise
+			0                 // aRotation
+		);
 
-var points = curve.getPoints( 50 );
-var geometry = new THREE.BufferGeometry().setFromPoints( points );
+		var points = curve.getPoints( 50 );
+		var geometry = new THREE.BufferGeometry().setFromPoints( points );
 
-var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
+		var material = new THREE.LineBasicMaterial( { color : 0xff0000 } );
 
-// Create the final object to add to the scene
-var ellipse = new THREE.Line( geometry, material );
-</code>
+		// Create the final object to add to the scene
+		var ellipse = new THREE.Line( geometry, material );
+		</code>
 
 		<h2>构造函数</h2>
 
@@ -54,13 +54,6 @@ var ellipse = new THREE.Line( geometry, material );
 
 		<h2>属性</h2>
 		<p>共有属性请参见其基类[page:Curve]。</p>
-
-		<h3>[property:Boolean isEllipseCurve]</h3>
-		<p>
-			用于检查该类或者其派生类是否为EllipseCurves。默认值为*true*。
-			<br /><br />
-			你不应当更改这个属性，它在内部使用，以用于优化。
-		</p>
 
 		<h3>[property:Float aX]</h3>
 		<p>椭圆的中心的X坐标。</p>

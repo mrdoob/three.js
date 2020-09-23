@@ -9,7 +9,7 @@
 	<body>
 
 		<div id="info">
-			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="waterSize"></span> webgl gpgpu water<br/>
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - <span id="waterSize"></span> webgl gpgpu water<br/>
 			Move mouse to disturb water.<br>
 			Press mouse button to orbit around. 'W' key toggles wireframe.
 		</div>
@@ -314,6 +314,8 @@
 				container.appendChild( renderer.domElement );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 100;
+				controls.maxDistance = 1000;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );
@@ -442,6 +444,12 @@
 
 				gpuCompute = new GPUComputationRenderer( WIDTH, WIDTH, renderer );
 
+				if ( isSafari() ) {
+
+					gpuCompute.setDataType( THREE.HalfFloatType );
+
+				}
+
 				var heightmap0 = gpuCompute.createTexture();
 
 				fillTexture( heightmap0 );
@@ -484,9 +492,14 @@
 					magFilter: THREE.NearestFilter,
 					format: THREE.RGBAFormat,
 					type: THREE.UnsignedByteType,
-					stencilBuffer: false,
 					depthBuffer: false
 				} );
+
+			}
+
+			function isSafari() {
+
+				return !! navigator.userAgent.match( /Safari/i ) && ! navigator.userAgent.match( /Chrome/i );
 
 			}
 
@@ -506,6 +519,7 @@
 						mult *= 1.25;
 
 					}
+
 					return r;
 
 				}

@@ -1,13 +1,11 @@
+import { Material } from './Material.js';
+import { Color } from '../math/Color.js';
+
 /**
- * @author mrdoob / http://mrdoob.com/
- *
  * parameters = {
  *  color: <THREE.Color>
  * }
  */
-
-import { Material } from './Material.js';
-import { Color } from '../math/Color.js';
 
 function ShadowMaterial( parameters ) {
 

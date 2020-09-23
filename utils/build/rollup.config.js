@@ -58,6 +58,11 @@ function glconstants() {
 		RGBA: 6408,
 		LUMINANCE: 6409,
 		LUMINANCE_ALPHA: 6410,
+		RED_INTEGER: 36244,
+		RG: 33319,
+		RG_INTEGER: 33320,
+		RGB_INTEGER: 36248,
+		RGBA_INTEGER: 36249,
 		VERSION: 7938,
 		NEAREST: 9728,
 		LINEAR: 9729,
@@ -86,6 +91,8 @@ function glconstants() {
 		TEXTURE_3D: 32879,
 		CLAMP_TO_EDGE: 33071,
 		DEPTH_COMPONENT16: 33189,
+		DEPTH_COMPONENT24: 33190,
+		DEPTH_COMPONENT32F: 36012,
 		DEPTH_STENCIL_ATTACHMENT: 33306,
 		R8: 33321,
 		R16F: 33325,
@@ -121,7 +128,6 @@ function glconstants() {
 		IMPLEMENTATION_COLOR_READ_TYPE: 35738,
 		IMPLEMENTATION_COLOR_READ_FORMAT: 35739,
 		TEXTURE_2D_ARRAY: 35866,
-		DEPTH_COMPONENT32F: 36012,
 		COLOR_ATTACHMENT0: 36064,
 		FRAMEBUFFER_COMPLETE: 36053,
 		DEPTH_ATTACHMENT: 36096,
@@ -154,7 +160,7 @@ function glconstants() {
 
 			return {
 				code: code,
-				map: { mappings: '' }
+				map: null
 			};
 
 		}
@@ -171,7 +177,7 @@ function glsl() {
 
 			if ( /\.glsl.js$/.test( id ) === false ) return;
 
-			code = code.replace( /\/\* glsl \*\/\`((.*|\n|\r\n)*)\`/, function ( match, p1 ) {
+			code = code.replace( /\/\* glsl \*\/\`((.|\n)*)\`/, function ( match, p1 ) {
 
 				return JSON.stringify(
 					p1
@@ -186,7 +192,46 @@ function glsl() {
 
 			return {
 				code: code,
-				map: { mappings: '' }
+				map: null
+			};
+
+		}
+
+	};
+
+}
+
+function bubleCleanup() {
+
+	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
+	const wrappedClass = /(var (\w+) = \/\*@__PURE__*\*\/\(function \((\w+)\) {\n).*(return \2;\s+}\(\3\)\);\n)/s;
+	const unwrap = function ( match, wrapperStart, klass, parentClass, wrapperEnd ) {
+
+		return match
+			.replace( wrapperStart, '' )
+			.replace( `if ( ${parentClass} ) ${klass}.__proto__ = ${parentClass};`, '' )
+			.replace(
+				`${klass}.prototype = Object.create( ${parentClass} && ${parentClass}.prototype );`,
+				`${klass}.prototype = Object.create( ${parentClass}.prototype );`
+			)
+			.replace( wrapperEnd, '' )
+			.replace( danglingTabs, '' );
+
+	};
+
+	return {
+
+		transform( code ) {
+
+			while ( wrappedClass.test( code ) ) {
+
+				code = code.replace( wrappedClass, unwrap );
+
+			}
+
+			return {
+				code: code,
+				map: null
 			};
 
 		}
@@ -206,7 +251,8 @@ export default [
 					arrow: false,
 					classes: true
 				}
-			} )
+			} ),
+			bubleCleanup()
 		],
 		output: [
 			{

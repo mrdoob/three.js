@@ -1,52 +1,49 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { Vector2 } from '../math/Vector2.js';
 
-function DirectGeometry() {
+class DirectGeometry {
 
-	this.vertices = [];
-	this.normals = [];
-	this.colors = [];
-	this.uvs = [];
-	this.uvs2 = [];
+	constructor() {
 
-	this.groups = [];
+		this.vertices = [];
+		this.normals = [];
+		this.colors = [];
+		this.uvs = [];
+		this.uvs2 = [];
 
-	this.morphTargets = {};
+		this.groups = [];
 
-	this.skinWeights = [];
-	this.skinIndices = [];
+		this.morphTargets = {};
 
-	// this.lineDistances = [];
+		this.skinWeights = [];
+		this.skinIndices = [];
 
-	this.boundingBox = null;
-	this.boundingSphere = null;
+		// this.lineDistances = [];
 
-	// update flags
+		this.boundingBox = null;
+		this.boundingSphere = null;
 
-	this.verticesNeedUpdate = false;
-	this.normalsNeedUpdate = false;
-	this.colorsNeedUpdate = false;
-	this.uvsNeedUpdate = false;
-	this.groupsNeedUpdate = false;
+		// update flags
 
-}
+		this.verticesNeedUpdate = false;
+		this.normalsNeedUpdate = false;
+		this.colorsNeedUpdate = false;
+		this.uvsNeedUpdate = false;
+		this.groupsNeedUpdate = false;
 
-Object.assign( DirectGeometry.prototype, {
+	}
 
-	computeGroups: function ( geometry ) {
+	computeGroups( geometry ) {
 
-		var group;
-		var groups = [];
-		var materialIndex = undefined;
+		const groups = [];
 
-		var faces = geometry.faces;
+		let group, i;
+		let materialIndex = undefined;
 
-		for ( var i = 0; i < faces.length; i ++ ) {
+		const faces = geometry.faces;
 
-			var face = faces[ i ];
+		for ( i = 0; i < faces.length; i ++ ) {
+
+			const face = faces[ i ];
 
 			// materials
 
@@ -79,29 +76,29 @@ Object.assign( DirectGeometry.prototype, {
 
 		this.groups = groups;
 
-	},
+	}
 
-	fromGeometry: function ( geometry ) {
+	fromGeometry( geometry ) {
 
-		var faces = geometry.faces;
-		var vertices = geometry.vertices;
-		var faceVertexUvs = geometry.faceVertexUvs;
+		const faces = geometry.faces;
+		const vertices = geometry.vertices;
+		const faceVertexUvs = geometry.faceVertexUvs;
 
-		var hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
-		var hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
+		const hasFaceVertexUv = faceVertexUvs[ 0 ] && faceVertexUvs[ 0 ].length > 0;
+		const hasFaceVertexUv2 = faceVertexUvs[ 1 ] && faceVertexUvs[ 1 ].length > 0;
 
 		// morphs
 
-		var morphTargets = geometry.morphTargets;
-		var morphTargetsLength = morphTargets.length;
+		const morphTargets = geometry.morphTargets;
+		const morphTargetsLength = morphTargets.length;
 
-		var morphTargetsPosition;
+		let morphTargetsPosition;
 
 		if ( morphTargetsLength > 0 ) {
 
 			morphTargetsPosition = [];
 
-			for ( var i = 0; i < morphTargetsLength; i ++ ) {
+			for ( let i = 0; i < morphTargetsLength; i ++ ) {
 
 				morphTargetsPosition[ i ] = {
 					name: morphTargets[ i ].name,
@@ -114,16 +111,16 @@ Object.assign( DirectGeometry.prototype, {
 
 		}
 
-		var morphNormals = geometry.morphNormals;
-		var morphNormalsLength = morphNormals.length;
+		const morphNormals = geometry.morphNormals;
+		const morphNormalsLength = morphNormals.length;
 
-		var morphTargetsNormal;
+		let morphTargetsNormal;
 
 		if ( morphNormalsLength > 0 ) {
 
 			morphTargetsNormal = [];
 
-			for ( var i = 0; i < morphNormalsLength; i ++ ) {
+			for ( let i = 0; i < morphNormalsLength; i ++ ) {
 
 				morphTargetsNormal[ i ] = {
 					name: morphNormals[ i ].name,
@@ -138,11 +135,11 @@ Object.assign( DirectGeometry.prototype, {
 
 		// skins
 
-		var skinIndices = geometry.skinIndices;
-		var skinWeights = geometry.skinWeights;
+		const skinIndices = geometry.skinIndices;
+		const skinWeights = geometry.skinWeights;
 
-		var hasSkinIndices = skinIndices.length === vertices.length;
-		var hasSkinWeights = skinWeights.length === vertices.length;
+		const hasSkinIndices = skinIndices.length === vertices.length;
+		const hasSkinWeights = skinWeights.length === vertices.length;
 
 		//
 
@@ -152,13 +149,13 @@ Object.assign( DirectGeometry.prototype, {
 
 		}
 
-		for ( var i = 0; i < faces.length; i ++ ) {
+		for ( let i = 0; i < faces.length; i ++ ) {
 
-			var face = faces[ i ];
+			const face = faces[ i ];
 
 			this.vertices.push( vertices[ face.a ], vertices[ face.b ], vertices[ face.c ] );
 
-			var vertexNormals = face.vertexNormals;
+			const vertexNormals = face.vertexNormals;
 
 			if ( vertexNormals.length === 3 ) {
 
@@ -166,13 +163,13 @@ Object.assign( DirectGeometry.prototype, {
 
 			} else {
 
-				var normal = face.normal;
+				const normal = face.normal;
 
 				this.normals.push( normal, normal, normal );
 
 			}
 
-			var vertexColors = face.vertexColors;
+			const vertexColors = face.vertexColors;
 
 			if ( vertexColors.length === 3 ) {
 
@@ -180,7 +177,7 @@ Object.assign( DirectGeometry.prototype, {
 
 			} else {
 
-				var color = face.color;
+				const color = face.color;
 
 				this.colors.push( color, color, color );
 
@@ -188,7 +185,7 @@ Object.assign( DirectGeometry.prototype, {
 
 			if ( hasFaceVertexUv === true ) {
 
-				var vertexUvs = faceVertexUvs[ 0 ][ i ];
+				const vertexUvs = faceVertexUvs[ 0 ][ i ];
 
 				if ( vertexUvs !== undefined ) {
 
@@ -206,7 +203,7 @@ Object.assign( DirectGeometry.prototype, {
 
 			if ( hasFaceVertexUv2 === true ) {
 
-				var vertexUvs = faceVertexUvs[ 1 ][ i ];
+				const vertexUvs = faceVertexUvs[ 1 ][ i ];
 
 				if ( vertexUvs !== undefined ) {
 
@@ -224,17 +221,17 @@ Object.assign( DirectGeometry.prototype, {
 
 			// morphs
 
-			for ( var j = 0; j < morphTargetsLength; j ++ ) {
+			for ( let j = 0; j < morphTargetsLength; j ++ ) {
 
-				var morphTarget = morphTargets[ j ].vertices;
+				const morphTarget = morphTargets[ j ].vertices;
 
 				morphTargetsPosition[ j ].data.push( morphTarget[ face.a ], morphTarget[ face.b ], morphTarget[ face.c ] );
 
 			}
 
-			for ( var j = 0; j < morphNormalsLength; j ++ ) {
+			for ( let j = 0; j < morphNormalsLength; j ++ ) {
 
-				var morphNormal = morphNormals[ j ].vertexNormals[ i ];
+				const morphNormal = morphNormals[ j ].vertexNormals[ i ];
 
 				morphTargetsNormal[ j ].data.push( morphNormal.a, morphNormal.b, morphNormal.c );
 
@@ -280,7 +277,7 @@ Object.assign( DirectGeometry.prototype, {
 
 	}
 
-} );
+}
 
 
 export { DirectGeometry };

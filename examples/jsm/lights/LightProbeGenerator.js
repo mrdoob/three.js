@@ -1,7 +1,3 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- */
-
 import {
 	Color,
 	LightProbe,
@@ -127,7 +123,7 @@ var LightProbeGenerator = {
 
 	},
 
-	fromRenderTargetCube: function ( renderer, renderTargetCube ) {
+	fromCubeRenderTarget: function ( renderer, cubeRenderTarget ) {
 
 		// The renderTarget must be set to RGBA in order to make readRenderTargetPixels works
 		var norm, lengthSq, weight, totalWeight = 0;
@@ -145,9 +141,9 @@ var LightProbeGenerator = {
 
 		for ( var faceIndex = 0; faceIndex < 6; faceIndex ++ ) {
 
-			var imageWidth = renderTargetCube.width; // assumed to be square
+			var imageWidth = cubeRenderTarget.width; // assumed to be square
 			var data = new Uint8Array( imageWidth * imageWidth * 4 );
-			renderer.readRenderTargetPixels( renderTargetCube, 0, 0, imageWidth, imageWidth, data, faceIndex );
+			renderer.readRenderTargetPixels( cubeRenderTarget, 0, 0, imageWidth, imageWidth, data, faceIndex );
 
 			var pixelSize = 2 / imageWidth;
 
@@ -157,7 +153,7 @@ var LightProbeGenerator = {
 				color.setRGB( data[ i ] / 255, data[ i + 1 ] / 255, data[ i + 2 ] / 255 );
 
 				// convert to linear color space
-				convertColorToLinear( color, renderTargetCube.texture.encoding );
+				convertColorToLinear( color, cubeRenderTarget.texture.encoding );
 
 				// pixel coordinate on unit cube
 

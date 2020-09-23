@@ -1,5 +1,4 @@
 import { TempNode } from '../core/TempNode';
-import { NodeBuilder } from '../core/NodeBuilder';
 import { Node } from '../core/Node';
 
 export class OperatorNode extends TempNode {

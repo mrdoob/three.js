@@ -20,18 +20,13 @@
 			<ul>
 				<li>There is no shadow support.</li>
 				<li>Only [page:MeshStandardMaterial MeshStandardMaterial] and [page:MeshPhysicalMaterial MeshPhysicalMaterial] are supported.</li>
-				<li>You have to include [link:https://threejs.org/examples/js/lights/RectAreaLightUniformsLib.js RectAreaLightUniformsLib] into your scene and call *init()*.</li>
+				<li>You have to include [link:https://threejs.org/examples/jsm/lights/RectAreaLightUniformsLib.js RectAreaLightUniformsLib] into your scene and call *init()*.</li>
 			</ul>
 		</p>
 
+		<h2>Code Example</h2>
 
-
-		<h2>Examples</h2>
-
-		<p>
-			[example:webgl_lights_rectarealight WebGL / rectarealight ]
-
-			<code>
+		<code>
 var width = 10;
 var height = 10;
 var intensity = 1;
@@ -43,9 +38,13 @@ scene.add( rectLight )
 rectLightHelper = new THREE.RectAreaLightHelper( rectLight );
 rectLight.add( rectLightHelper );
 
-			</code>
-		</p>
+		</code>
 
+		<h2>Examples</h2>
+
+		<p>
+			[example:webgl_lights_rectarealight WebGL / rectarealight ]
+		</p>
 
 		<h2>Constructor</h2>
 
@@ -63,13 +62,6 @@ rectLight.add( rectLightHelper );
 		<h2>Properties</h2>
 		<p>
 			See the base [page:Light Light] class for common properties.
-		</p>
-
-		<h3>[property:Boolean isRectAreaLight]</h3>
-		<p>
-			Used to check whether this or derived classes are RectAreaLights. Default is *true*.<br /><br />
-
-			You should not change this, as it used internally for optimisation.
 		</p>
 
 		<h2>Methods</h2>

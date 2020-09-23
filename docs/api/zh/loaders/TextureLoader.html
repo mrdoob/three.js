@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -17,7 +17,7 @@
 			内部使用[page:ImageLoader]来加载文件。
 		</p>
 
-		<h2>例子</h2>
+		<h2>代码示例</h2>
 
 		<code>
 		var texture = new THREE.TextureLoader().load( 'textures/land_ocean_ice_cloud_2048.jpg' );
@@ -26,9 +26,7 @@
 		var material = new THREE.MeshBasicMaterial( { map: texture } );
 		</code>
 
-		[example:webgl_geometry_cube geometry / cube]
-
-		<h2>Example with Callbacks</h2>
+		<h2>Code Example with Callbacks</h2>
 
 		<code>
 		// 初始化一个加载器
@@ -56,8 +54,16 @@
 			}
 		);
 		</code>
-		请注意three.js r84遗弃了TextureLoader进度事件。对于支持进度事件的TextureLoader ，
-		请参考[link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 this thread]。
+		<p>
+			请注意three.js r84遗弃了TextureLoader进度事件。对于支持进度事件的TextureLoader ，
+			请参考[link:https://github.com/mrdoob/three.js/issues/10439#issuecomment-293260145 this thread]。
+		</p>
+
+		<h2>例子</h2>
+
+		<p>
+			[example:webgl_geometry_cube geometry / cube]
+		</p>
 
 		<h2>构造函数</h2>
 

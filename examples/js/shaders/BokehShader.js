@@ -1,6 +1,5 @@
+console.warn( "THREE.BokehShader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
- * @author alteredq / http://alteredqualia.com/
- *
  * Depth-of-field shader with bokeh
  * ported from GLSL shader by Martins Upitis
  * http://artmartinsh.blogspot.com/2010/02/glsl-lens-blur-filter-with-bokeh.html
@@ -20,7 +19,7 @@ THREE.BokehShader = {
 		"focus": { value: 1.0 },
 		"aspect": { value: 1.0 },
 		"aperture": { value: 0.025 },
-		"maxblur": { value: 1.0 },
+		"maxblur": { value: 0.01 },
 		"nearClip": { value: 1.0 },
 		"farClip": { value: 1000.0 },
 

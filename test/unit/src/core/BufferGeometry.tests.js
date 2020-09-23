@@ -1,7 +1,3 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
@@ -231,7 +227,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "applyMatrix", ( assert ) => {
+		QUnit.test( "applyMatrix4", ( assert ) => {
 
 			var geometry = new BufferGeometry();
 			geometry.setAttribute( "position", new BufferAttribute( new Float32Array( 6 ), 3 ) );
@@ -242,7 +238,7 @@ export default QUnit.module( 'Core', () => {
 				0, 0, 1, 3,
 				0, 0, 0, 1
 			);
-			geometry.applyMatrix( matrix );
+			geometry.applyMatrix4( matrix );
 
 			var position = geometry.attributes.position.array;
 			var m = matrix.elements;

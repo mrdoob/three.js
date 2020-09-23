@@ -1,5 +1,4 @@
 import {
-	Matrix4,
 	Texture
 } from '../../../../src/Three';
 

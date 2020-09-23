@@ -15,7 +15,7 @@
 
 			var container, stats;
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, clock;
 
 			init();
 			animate();
@@ -27,6 +27,8 @@
 
 				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 0.1, 10 );
 				camera.position.set( 0, 0, 1 );
+
+				clock = new THREE.Clock();
 
 				scene = new THREE.Scene();
 
@@ -48,7 +50,7 @@
 				geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 				geometry.setAttribute( 'color', new THREE.Float32BufferAttribute( colors, 3 ) );
 
-				var material = new THREE.PointsMaterial( { size: 4, vertexColors: THREE.VertexColors, depthTest: false, sizeAttenuation: false } );
+				var material = new THREE.PointsMaterial( { size: 4, vertexColors: true, depthTest: false, sizeAttenuation: false } );
 
 				var mesh = new THREE.Points( geometry, material );
 				scene.add( mesh );
@@ -90,7 +92,9 @@
 
 			function render() {
 
-				scene.rotation.y = Date.now() / 2000;
+				var elapsedTime = clock.getElapsedTime();
+
+				scene.rotation.y = elapsedTime * 0.5;
 
 				renderer.render( scene, camera );
 
