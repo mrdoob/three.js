@@ -1,4 +1,3 @@
-import './polyfills.js';
 import { REVISION } from './constants.js';
 
 export { WebGLMultisampleRenderTarget } from './renderers/WebGLMultisampleRenderTarget.js';
