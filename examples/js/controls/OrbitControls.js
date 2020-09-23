@@ -34,6 +34,7 @@ THREE.OrbitControls = function ( object, domElement ) {
 				state = STATE.NONE;
 
 			}
+			enabled = value;
 
 		}
 
