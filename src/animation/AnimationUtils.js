@@ -236,7 +236,7 @@ const AnimationUtils = {
 		if ( referenceClip === undefined ) referenceClip = targetClip;
 		if ( fps === undefined || fps <= 0 ) fps = 30;
 
-		const numTracks = targetClip.tracks.length;
+		const numTracks = referenceClip.tracks.length;
 		const referenceTime = referenceFrame / fps;
 
 		// Make each track's values relative to the values at the reference frame
