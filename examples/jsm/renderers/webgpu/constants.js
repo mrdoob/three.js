@@ -220,6 +220,11 @@ export const GPUStencilOperation = {
 	DecrementWrap: 'decrement-wrap'
 };
 
+export const GPUInputStepMode = {
+	Vertex: 'vertex',
+	Instance: 'instance'
+};
+
 // @TODO: Move to src/constants.js
 
 export const BlendColorFactor = 211;

@@ -771,7 +771,7 @@ class WebGPURenderer {
 
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
-			passEncoder.drawIndexed( indexCount, 1, firstVertex, 0, 0 );
+			passEncoder.drawIndexed( indexCount, geometry.instanceCount || 1, firstVertex, 0, 0 );
 
 			info.update( object, indexCount );
 
@@ -780,7 +780,7 @@ class WebGPURenderer {
 			const positionAttribute = geometry.attributes.position;
 			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
 
-			passEncoder.draw( vertexCount, 1, firstVertex, 0 );
+			passEncoder.draw( vertexCount, geometry.instanceCount || 1, firstVertex, 0 );
 
 			info.update( object, vertexCount );
 
