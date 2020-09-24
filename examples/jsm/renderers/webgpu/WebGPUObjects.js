@@ -17,7 +17,7 @@ class WebGPUObjects {
 
 		if ( geometry.isGeometry ) {
 
-			throw 'THREE.WebGPURenderer: Geometries of type THREE.Geometry are not supported. Please use BufferGeometry.';
+			throw 'THREE.WebGPURenderer: Geometries of type THREE.Geometry are not supported. Please use THREE.BufferGeometry.';
 
 		}
 
