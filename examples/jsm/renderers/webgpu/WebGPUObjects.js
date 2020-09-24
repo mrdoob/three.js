@@ -15,6 +15,12 @@ class WebGPUObjects {
 		const updateMap = this.updateMap;
 		const frame = this.info.render.frame;
 
+		if ( geometry.isGeometry ) {
+
+			throw 'THREE.WebGPURenderer: Geometries of type THREE.Geometry are not supported. Please use BufferGeometry.';
+
+		}
+
 		if ( updateMap.get( geometry ) !== frame ) {
 
 			this.geometries.update( geometry );
