@@ -766,23 +766,24 @@ class WebGPURenderer {
 
 		const drawRange = geometry.drawRange;
 		const firstVertex = drawRange.start;
+		const instanceCount = geometry.instanceCount || 1;
 
 		if ( hasIndex === true ) {
 
 			const indexCount = ( drawRange.count !== Infinity ) ? drawRange.count : index.count;
 
-			passEncoder.drawIndexed( indexCount, geometry.instanceCount || 1, firstVertex, 0, 0 );
+			passEncoder.drawIndexed( indexCount, instanceCount, firstVertex, 0, 0 );
 
-			info.update( object, indexCount );
+			info.update( object, indexCount, instanceCount );
 
 		} else {
 
 			const positionAttribute = geometry.attributes.position;
 			const vertexCount = ( drawRange.count !== Infinity ) ? drawRange.count : positionAttribute.count;
 
-			passEncoder.draw( vertexCount, geometry.instanceCount || 1, firstVertex, 0 );
+			passEncoder.draw( vertexCount, instanceCount, firstVertex, 0 );
 
-			info.update( object, vertexCount );
+			info.update( object, vertexCount, instanceCount );
 
 		}
 
