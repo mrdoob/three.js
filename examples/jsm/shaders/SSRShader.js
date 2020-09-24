@@ -92,9 +92,11 @@ var SSRShader = {
 		}
 		vec2 viewPositionToXY(vec3 viewPosition){
 			vec2 xy;
-			float clipW = cameraProjectionMatrix[2][3] * viewPosition.z + cameraProjectionMatrix[3][3];
-			xy=(cameraProjectionMatrix*vec4(viewPosition,1)).xy;
-			xy/=clipW;
+			// float clipW = cameraProjectionMatrix[2][3] * viewPosition.z + cameraProjectionMatrix[3][3];
+			vec4 clip=cameraProjectionMatrix*vec4(viewPosition,1);
+			xy=clip.xy;//clip
+			float clipW=clip.w;
+			xy/=clipW;//NDC
 			xy+=1.;
 			xy/=2.;
 			xy*=resolution;
