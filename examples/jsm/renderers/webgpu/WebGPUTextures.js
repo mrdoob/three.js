@@ -1,4 +1,4 @@
-import { GPUTextureFormat, GPUAddressMode, GPUFilterMode } from './constants.js';
+import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js';
 import { CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
 	RGBFormat, RGBAFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
 } from '../../../../build/three.module.js';
@@ -308,6 +308,7 @@ class WebGPUTextures {
 
 		const { width, height, depth } = this._getSize( texture );
 		const needsMipmaps = this._needsMipmaps( texture );
+		const dimension = this._getDimension( texture );
 		const mipLevelCount = this._getMipLevelCount( texture, width, height, needsMipmaps );
 		const format = this._getFormat( texture );
 
@@ -331,6 +332,7 @@ class WebGPUTextures {
 			},
 			mipLevelCount: mipLevelCount,
 			sampleCount: 1,
+			dimension: dimension,
 			format: format,
 			usage: usage
 		};
@@ -502,6 +504,24 @@ class WebGPUTextures {
 		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8UnormSRGB ) return 4;
 		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
+
+	}
+
+	_getDimension( texture ) {
+
+		let dimension;
+
+		if ( texture.isDataTexture3D ) {
+
+			dimension = GPUTextureDimension.ThreeD;
+
+		} else {
+
+			dimension = GPUTextureDimension.TwoD;
+
+		}
+
+		return dimension;
 
 	}
 

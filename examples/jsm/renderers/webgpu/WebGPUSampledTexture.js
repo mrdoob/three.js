@@ -1,4 +1,5 @@
 import WebGPUBinding from './WebGPUBinding.js';
+import { GPUBindingType, GPUTextureViewDimension } from './constants.js';
 
 class WebGPUSampledTexture extends WebGPUBinding {
 
@@ -6,9 +7,9 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 		super( name );
 
-		this.dimension = '2d';
+		this.dimension = GPUTextureViewDimension.TwoD;
 
-		this.type = 'sampled-texture';
+		this.type = GPUBindingType.SampledTexture;
 		this.visibility = GPUShaderStage.FRAGMENT;
 
 		this.textureGPU = null; // set by the renderer
@@ -26,7 +27,7 @@ class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
 
 		super( name );
 
-		this.dimension = 'cube';
+		this.dimension = GPUTextureViewDimension.Cube;
 
 		Object.defineProperty( this, 'isSampledCubeTexture', { value: true } );
 

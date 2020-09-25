@@ -19,25 +19,25 @@ class WebGPUInfo {
 
 	}
 
-	update( object, count ) {
+	update( object, count, instanceCount = 1 ) {
 
 		this.render.drawCalls ++;
 
 		if ( object.isMesh ) {
 
-			this.render.triangles += ( count / 3 );
+			this.render.triangles += instanceCount * ( count / 3 );
 
 		} else if ( object.isPoints ) {
 
-			this.render.points += count;
+			this.render.points += instanceCount * count;
 
 		} else if ( object.isLineSegments ) {
 
-			this.render.lines += ( count / 2 );
+			this.render.lines += instanceCount * ( count / 2 );
 
 		} else if ( object.isLine ) {
 
-			this.render.lines += ( count - 1 );
+			this.render.lines += instanceCount * ( count - 1 );
 
 		} else {
 

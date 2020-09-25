@@ -1,4 +1,5 @@
 import WebGPUBinding from './WebGPUBinding.js';
+import { GPUBindingType } from './constants.js';
 
 class WebGPUStorageBuffer extends WebGPUBinding {
 
@@ -6,7 +7,7 @@ class WebGPUStorageBuffer extends WebGPUBinding {
 
 		super( name );
 
-		this.type = 'storage-buffer';
+		this.type = GPUBindingType.StorageBuffer;
 
 		this.usage = GPUBufferUsage.VERTEX | GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST;
 

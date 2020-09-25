@@ -235,44 +235,13 @@ function glsl() {
 
 function babelCleanup() {
 
-	const wrappedClass = /(var\s*(\w+) = \/\*#__PURE__\*\/function \((\w+)?\) {\s*).*(return \2;\s*}\((\w+)?\);)/gs;
-	const inheritsLoose = /_inheritsLoose\((\w+), (\w+)\);\n/;
-
 	const doubleSpaces = / {2}/g;
-	const danglingTabs = /(^\t+$\n)|(\n^\t+$)/gm;
-	const commentOutside = /function (\w+)?\(\)\s*\/\*(.*)\*\/\s*{/g;
-
-	function unwrap( match, wrapperStart, klass, _parentClass, wrapperEnd, parentClass ) {
-
-		return match
-			.replace( wrapperStart, '' )
-			.replace( inheritsLoose, '' )
-			.replace( wrapperEnd, '' )
-			.replaceAll( _parentClass, parentClass );
-
-	}
-
-	function commentInside( match, functionName = '', comment ) {
-
-		return `function ${functionName}(/*${comment}*/) {`;
-
-	}
 
 	return {
 
 		transform( code ) {
 
-			while ( wrappedClass.test( code ) ) {
-
-				code = code
-					.replace( wrappedClass, unwrap );
-
-			}
-
-			code = code
-				.replace( commentOutside, commentInside )
-				.replace( doubleSpaces, '\t' )
-				.replace( danglingTabs, '' );
+			code = code.replace( doubleSpaces, '\t' );
 
 			return {
 				code: code,
