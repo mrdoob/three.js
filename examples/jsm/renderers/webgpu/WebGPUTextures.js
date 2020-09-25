@@ -399,7 +399,7 @@ class WebGPUTextures {
 			{
 				width: image.width,
 				height: image.height,
-				depth: 1
+				depth: ( image.depth !== undefined ) ? image.depth : 1
 			} );
 
 	}
@@ -691,11 +691,15 @@ class WebGPUTextures {
 			height = ( image.length > 0 ) ? image[ 0 ].height : 1;
 			depth = 6; // one image for each side of the cube map
 
+		} else if ( image !== undefined ) {
+
+			width = image.width;
+			height = image.height;
+			depth = ( image.depth !== undefined ) ? image.depth : 1;
+
 		} else {
 
-			width = ( image !== undefined ) ? image.width : 1;
-			height = ( image !== undefined ) ? image.height : 1;
-			depth = 1;
+			width = height = depth = 1;
 
 		}
 
