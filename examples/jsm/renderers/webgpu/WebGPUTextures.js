@@ -1,6 +1,6 @@
 import { GPUTextureFormat, GPUAddressMode, GPUFilterMode, GPUTextureDimension } from './constants.js';
 import { CubeTexture, Texture, NearestFilter, NearestMipmapNearestFilter, NearestMipmapLinearFilter, LinearFilter, RepeatWrapping, MirroredRepeatWrapping,
-	RGBFormat, RGBAFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
+	RGBFormat, RGBAFormat, RedFormat, RGFormat, RGBA_S3TC_DXT1_Format, RGBA_S3TC_DXT3_Format, RGBA_S3TC_DXT5_Format, UnsignedByteType, FloatType, HalfFloatType, sRGBEncoding
 } from '../../../../build/three.module.js';
 import WebGPUTextureUtils from './WebGPUTextureUtils.js';
 
@@ -501,7 +501,13 @@ class WebGPUTextures {
 
 	_getBytesPerTexel( format ) {
 
+		if ( format === GPUTextureFormat.R8Unorm ) return 1;
+		if ( format === GPUTextureFormat.R16Float ) return 2;
+		if ( format === GPUTextureFormat.RG8Unorm ) return 2;
+		if ( format === GPUTextureFormat.RG16Float ) return 4;
+		if ( format === GPUTextureFormat.R32Float ) return 4;
 		if ( format === GPUTextureFormat.RGBA8Unorm || format === GPUTextureFormat.RGBA8UnormSRGB ) return 4;
+		if ( format === GPUTextureFormat.RG32Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA16Float ) return 8;
 		if ( format === GPUTextureFormat.RGBA32Float ) return 16;
 
@@ -569,6 +575,53 @@ class WebGPUTextures {
 
 				}
 
+				break;
+
+			case RedFormat:
+
+				switch ( type ) {
+
+					case UnsignedByteType:
+						formatGPU = GPUTextureFormat.R8Unorm;
+						break;
+
+					case FloatType:
+						formatGPU = GPUTextureFormat.R32Float;
+						break;
+
+					case HalfFloatType:
+						formatGPU = GPUTextureFormat.R16Float;
+						break;
+
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RedFormat.', type );
+
+				}
+
+				break;
+
+			case RGFormat:
+
+				switch ( type ) {
+
+					case UnsignedByteType:
+						formatGPU = GPUTextureFormat.RG8Unorm;
+						break;
+
+					case FloatType:
+						formatGPU = GPUTextureFormat.RG32Float;
+						break;
+
+					case HalfFloatType:
+						formatGPU = GPUTextureFormat.RG16Float;
+						break;
+
+					default:
+						console.error( 'WebGPURenderer: Unsupported texture type with RGFormat.', type );
+
+				}
+
+				break;
 				break;
 
 			default:
