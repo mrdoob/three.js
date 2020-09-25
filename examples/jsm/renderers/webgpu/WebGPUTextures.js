@@ -562,12 +562,12 @@ class WebGPUTextures {
 						formatGPU = ( encoding === sRGBEncoding ) ? GPUTextureFormat.RGBA8UnormSRGB : GPUTextureFormat.RGBA8Unorm;
 						break;
 
-					case FloatType:
-						formatGPU = GPUTextureFormat.RGBA32Float;
-						break;
-
 					case HalfFloatType:
 						formatGPU = GPUTextureFormat.RGBA16Float;
+						break;
+
+					case FloatType:
+						formatGPU = GPUTextureFormat.RGBA32Float;
 						break;
 
 					default:
@@ -585,12 +585,12 @@ class WebGPUTextures {
 						formatGPU = GPUTextureFormat.R8Unorm;
 						break;
 
-					case FloatType:
-						formatGPU = GPUTextureFormat.R32Float;
-						break;
-
 					case HalfFloatType:
 						formatGPU = GPUTextureFormat.R16Float;
+						break;
+
+					case FloatType:
+						formatGPU = GPUTextureFormat.R32Float;
 						break;
 
 					default:
@@ -608,12 +608,12 @@ class WebGPUTextures {
 						formatGPU = GPUTextureFormat.RG8Unorm;
 						break;
 
-					case FloatType:
-						formatGPU = GPUTextureFormat.RG32Float;
-						break;
-
 					case HalfFloatType:
 						formatGPU = GPUTextureFormat.RG16Float;
+						break;
+
+					case FloatType:
+						formatGPU = GPUTextureFormat.RG32Float;
 						break;
 
 					default:
@@ -621,7 +621,6 @@ class WebGPUTextures {
 
 				}
 
-				break;
 				break;
 
 			default:
