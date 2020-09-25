@@ -1,4 +1,5 @@
 import WebGPUBinding from './WebGPUBinding.js';
+import { GPUBindingType } from './constants.js';
 
 class WebGPUUniformsGroup extends WebGPUBinding {
 
@@ -12,7 +13,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 		this.onBeforeUpdate = function () {};
 
-		this.type = 'uniform-buffer';
+		this.type = GPUBindingType.UniformBuffer;
 		this.visibility = GPUShaderStage.VERTEX;
 
 		this.usage = GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST;

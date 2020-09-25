@@ -220,6 +220,33 @@ export const GPUStencilOperation = {
 	DecrementWrap: 'decrement-wrap'
 };
 
+export const GPUBindingType = {
+	UniformBuffer: 'uniform-buffer',
+	StorageBuffer: 'storage-buffer',
+	ReadonlyStorageBuffer: 'readonly-storage-buffer',
+	Sampler: 'sampler',
+	ComparisonSampler: 'comparison-sampler',
+	SampledTexture: 'sampled-texture',
+	MultisampledTexture: 'multisampled-texture',
+	ReadonlyStorageTexture: 'readonly-storage-texture',
+	WriteonlyStorageTexture: 'writeonly-storage-texture'
+};
+
+export const GPUTextureDimension = {
+	OneD: '1d',
+	TwoD: '2d',
+	ThreeD: '3d'
+};
+
+export const GPUTextureViewDimension = {
+	OneD: '1d',
+	TwoD: '2d',
+	TwoDArray: '2d-array',
+	Cube: 'cube',
+	CubeArray: 'cube-array',
+	ThreeD: '3d'
+};
+
 // @TODO: Move to src/constants.js
 
 export const BlendColorFactor = 211;

@@ -1,4 +1,5 @@
 import WebGPUBinding from './WebGPUBinding.js';
+import { GPUBindingType } from './constants.js';
 
 class WebGPUSampler extends WebGPUBinding {
 
@@ -6,7 +7,7 @@ class WebGPUSampler extends WebGPUBinding {
 
 		super( name );
 
-		this.type = 'sampler';
+		this.type = GPUBindingType.Sampler;
 		this.visibility = GPUShaderStage.FRAGMENT;
 
 		this.samplerGPU = null; // set by the renderer
