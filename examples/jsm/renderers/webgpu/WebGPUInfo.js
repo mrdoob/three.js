@@ -19,7 +19,7 @@ class WebGPUInfo {
 
 	}
 
-	update( object, count, instanceCount = 1 ) {
+	update( object, count, instanceCount ) {
 
 		this.render.drawCalls ++;
 

@@ -106,7 +106,7 @@ class WebGPURenderPipelines {
 
 				const name = attribute.name;
 				const geometryAttribute = geometry.getAttribute( name );
-				const stepMode = geometryAttribute && geometryAttribute.isInstancedBufferAttribute ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
+				const stepMode = ( geometryAttribute !== undefined && geometryAttribute.isInstancedBufferAttribute ) ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
 
 				vertexBuffers.push( {
 					arrayStride: attribute.arrayStride,
