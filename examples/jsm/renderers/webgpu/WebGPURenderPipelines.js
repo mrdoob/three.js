@@ -1,4 +1,4 @@
-import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation } from './constants.js';
+import { GPUPrimitiveTopology, GPUIndexFormat, GPUTextureFormat, GPUCompareFunction, GPUFrontFace, GPUCullMode, GPUVertexFormat, GPUBlendFactor, GPUBlendOperation, BlendColorFactor, OneMinusBlendColorFactor, GPUColorWriteFlags, GPUStencilOperation, GPUInputStepMode } from './constants.js';
 import {
 	FrontSide, BackSide, DoubleSide,
 	NeverDepth, AlwaysDepth, LessDepth, LessEqualDepth, EqualDepth, GreaterEqualDepth, GreaterDepth, NotEqualDepth,
@@ -100,19 +100,24 @@ class WebGPURenderPipelines {
 			// vertex buffers
 
 			const vertexBuffers = [];
+			const geometry = object.geometry;
 
 			for ( const attribute of shaderAttributes ) {
 
+				const name = attribute.name;
+				const geometryAttribute = geometry.getAttribute( name );
+				const stepMode = geometryAttribute && geometryAttribute.isInstancedBufferAttribute ? GPUInputStepMode.Instance : GPUInputStepMode.Vertex;
+
 				vertexBuffers.push( {
 					arrayStride: attribute.arrayStride,
-					attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ]
+					attributes: [ { shaderLocation: attribute.slot, offset: 0, format: attribute.format } ],
+					stepMode: stepMode
 				} );
 
 			}
 
 			//
 
-			const geometry = object.geometry;
 			let indexFormat;
 
 			if ( object.isLine ) {
