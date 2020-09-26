@@ -9,6 +9,8 @@ import {
 	ZeroFactor, OneFactor, SrcColorFactor, OneMinusSrcColorFactor, SrcAlphaFactor, OneMinusSrcAlphaFactor, DstAlphaFactor, OneMinusDstAlphaFactor, DstColorFactor, OneMinusDstColorFactor, SrcAlphaSaturateFactor
 } from '../../../../build/three.module.js';
 
+import WebGPUNodeBuilder from './WebGPUNodeBuilder.js';
+
 class WebGPURenderPipelines {
 
 	constructor( renderer, properties, device, glslang, sampleCount ) {
@@ -58,6 +60,14 @@ class WebGPURenderPipelines {
 				console.error( 'THREE.WebGPURenderer: Unknwon shader type.' );
 
 			}
+
+			// parse nodes
+
+			const nodeBuilder = new WebGPUNodeBuilder();
+
+			nodeBuilder.setMaterial( material );
+			
+			shader = nodeBuilder.parse( shader.vertexShader, shader.fragmentShader );
 
 			// shader modules
 
@@ -808,11 +818,19 @@ const ShaderLib = {
 		layout(set = 0, binding = 3) uniform sampler mySampler;
 		layout(set = 0, binding = 4) uniform texture2D myTexture;
 
+		#pragma node_uniforms
+
 		layout(location = 0) in vec2 vUv;
 		layout(location = 0) out vec4 outColor;
 
 		void main() {
 			outColor = texture( sampler2D( myTexture, mySampler ), vUv );
+
+			#ifdef NODE_COLOR
+				NODE_COLOR_CODE
+				outColor.rgb = NODE_COLOR;
+			#endif
+
 			outColor.a *= opacityUniforms.opacity;
 		}`
 	},
