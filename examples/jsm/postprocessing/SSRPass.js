@@ -139,7 +139,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
   this.ssrMaterial.uniforms['resolution'].value.set(this.width, this.height);
   this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
-  this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
+  this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.copy(this.camera.projectionMatrixInverse);
   this.ssrMaterial.uniforms['isPerspectiveCamera'].value = isPerspectiveCamera
 
   // normal material
@@ -529,7 +529,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     this.ssrMaterial.uniforms['resolution'].value.set(width, height);
     this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
-    this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.getInverse(this.camera.projectionMatrix);
+    this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.copy(this.camera.projectionMatrixInverse);
 
     this.blurMaterial.uniforms['resolution'].value.set(width, height);
 
