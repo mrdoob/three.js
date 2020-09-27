@@ -61,7 +61,7 @@ function WebGLRenderer( parameters ) {
 	// render() can be called from within a callback triggered by another render.
 	// We track this so that the nested render call gets its state isolated from the parent render call.
 
-	const currentRenderCallStack = [];
+	const renderStateStack = [];
 
 	// public properties
 
@@ -1008,10 +1008,10 @@ function WebGLRenderer( parameters ) {
 		//
 		if ( scene.isScene === true ) scene.onBeforeRender( _this, scene, camera, renderTarget || _currentRenderTarget );
 
-		currentRenderState = renderStates.get( scene, currentRenderCallStack.length );
+		currentRenderState = renderStates.get( scene, renderStateStack.length );
 		currentRenderState.init();
 
-		currentRenderCallStack.push( currentRenderState );
+		renderStateStack.push( currentRenderState );
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromProjectionMatrix( _projScreenMatrix );
@@ -1095,10 +1095,10 @@ function WebGLRenderer( parameters ) {
 
 		// _gl.finish();
 
-		currentRenderCallStack.pop();
-		if ( currentRenderCallStack.length > 0 ) {
+		renderStateStack.pop();
+		if ( renderStateStack.length > 0 ) {
 
-			currentRenderState = currentRenderCallStack[ currentRenderCallStack.length - 1 ];
+			currentRenderState = renderStateStack[ renderStateStack.length - 1 ];
 
 		} else {
 

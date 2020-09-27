@@ -61,7 +61,7 @@ function WebGLRenderStates() {
 
 	let renderStates = new WeakMap();
 
-	function get( scene, renderCallNesting ) {
+	function get( scene, renderCallDepth ) {
 
 		let renderState;
 
@@ -73,14 +73,14 @@ function WebGLRenderStates() {
 
 		} else {
 
-			if ( renderCallNesting >= renderStates.get( scene ).length ) {
+			if ( renderCallDepth >= renderStates.get( scene ).length ) {
 
 				renderState = new WebGLRenderState();
 				renderStates.get( scene ).push( renderState );
 
 			} else {
 
-				renderState = renderStates.get( scene )[ renderCallNesting ];
+				renderState = renderStates.get( scene )[ renderCallDepth ];
 
 			}
 
