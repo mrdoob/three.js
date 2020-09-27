@@ -167,6 +167,7 @@ var SSRShader = {
 
 				float d = getDepth(uv);
 				float vZ = getViewZ( d );
+				if(-vZ>=cameraFar) continue;
 				float clipW = cameraProjectionMatrix[2][3] * vZ + cameraProjectionMatrix[3][3];
 				vec3 vP=getViewPosition( uv, d, vZ, clipW );
 				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
