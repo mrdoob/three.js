@@ -59,7 +59,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.isFirstRender = true
 
   this.isDistanceAttenuation = true
-  this.attenuationDistance = 400
+  this.attenuationDistance = 200
 
   // beauty render target with depth buffer
 
