@@ -1,4 +1,5 @@
-import { NodeBuilder } from '../../nodes/core/NodeBuilder.js';
+import NodeSlot from '../nodes/core/NodeSlot.js';
+import NodeBuilder from '../nodes/core/NodeBuilder.js';
 
 class WebGPUNodeBuilder extends NodeBuilder {
 
@@ -8,29 +9,20 @@ class WebGPUNodeBuilder extends NodeBuilder {
 
 	}
 	
-	parseDefines( code, defines ) {
+	buildShader( shader, code ) {
 		
 		// use regex maybe for security?
-		let versionStrIndex = code.indexOf("\n");
+		const versionStrIndex = code.indexOf("\n");
 		
 		let shaderCode = code.substr( 0, versionStrIndex ) + "\n";
-		const names = Object.keys( defines );
+
+		let shaderData = this.build( shader );
 		
-		if (names.length) {
-
-			shaderCode += "\n#define NODE\n";
-
-			for ( let i = 0; i < names.length; i ++ ) {
-
-				let name = names[i];
-
-				shaderCode += `#define NODE_${name} ${defines[name]}\n`;
-
-			}
-
-		}
+		shaderCode += shaderData.defines;
 
 		shaderCode += code.substr( versionStrIndex );
+
+		console.log( shaderCode );
 
 		return shaderCode;
 		
@@ -40,42 +32,18 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		
 		const material = this.material;
 		
-		const nodesSlots = [];
-		const defines = [];
-		
-		let i, slot;
-		
 		if ( material.isMeshBasicMaterial ) {
 			
 			if ( material.color.isNode ) {
 				
-				slot = { name: 'COLOR', node: material.color, output: 'v3' };
-				
-				nodesSlots.push( slot );
+				this.addSlot( 'fragment', new NodeSlot( material.color, 'COLOR', 'v3' ) );
 				
 			}
 			
 		}
-		
-		for( i = 0; i < nodesSlots.length; i++) {
-			
-			nodesSlots[i].node.analyze( this );
-			
-		}
-		
-		for( i = 0; i < nodesSlots.length; i++) {
-			
-			slot = nodesSlots[i];
-			
-			let flowData = slot.node.flow( this, slot.output );
-			
-			defines[slot.name] = flowData.result;
-			defines[slot.name + '_CODE'] = flowData.code || '';
-			
-		}
-		
-		vertexShader = this.parseDefines( vertexShader, defines );
-		fragmentShader = this.parseDefines( fragmentShader, defines );
+
+		vertexShader = this.buildShader( 'vertex', vertexShader );
+		fragmentShader = this.buildShader( 'fragment', fragmentShader );
 
 		return {
 			vertexShader,

@@ -827,7 +827,7 @@ const ShaderLib = {
 			outColor = texture( sampler2D( myTexture, mySampler ), vUv );
 
 			#ifdef NODE_COLOR
-				NODE_COLOR_CODE
+				/* NODE_COLOR_CODE ignore (node code group) for now */
 				outColor.rgb = NODE_COLOR;
 			#endif
 

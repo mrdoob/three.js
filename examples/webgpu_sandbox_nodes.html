@@ -19,7 +19,8 @@
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
-			import * as Nodes from './jsm/nodes/Nodes.js';
+			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
+			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 
 			let camera, scene, renderer;
 
@@ -51,7 +52,7 @@
 				const geometryBox = new THREE.BoxBufferGeometry();
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
-				materialBox.color = new Nodes.ColorNode( 0x0099FF ).setReadonly( true );
+				materialBox.color = new OperatorNode( '+', new Vector3Node( new THREE.Vector3( 0, .6, 0 ) ), new Vector3Node( new THREE.Vector3( 0, 0, 1 ) ) );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
 				box.position.set( 0, 1, 0 );
