@@ -147,12 +147,7 @@ const ControlsMixin = ( superclass ) => {
 
 				this._interacting = true;
 
-				if ( _simulatedPointerWithInertia && _simulatedPointerWithInertia.pointerId == event.pointerId ) {
-
-					_simulatedPointerWithInertia = null;
-					this.stopAnimation( _onPointerSimulation );
-
-				}
+				if ( _simulatedPointer ) _simulatedPointer = null;
 
 				this.domElement.focus ? this.domElement.focus() : window.focus();
 
@@ -172,13 +167,12 @@ const ControlsMixin = ( superclass ) => {
 			const _onPointerMove = ( event ) => {
 
 				const pointers = this._pointers;
-				let pointer;
 
-				const i = pointers.findIndex( pointer => pointer.pointerId === event.pointerId );
+				const index = pointers.findIndex( pointer => pointer.pointerId === event.pointerId );
 
-				if ( pointers[ i ] ) {
+				let pointer = pointers[ index ]
 
-					pointer = pointers[ i ];
+				if ( pointer ) {
 
 					pointer.update( event, this.camera, this.target );
 
@@ -189,7 +183,7 @@ const ControlsMixin = ( superclass ) => {
 
 					if ( pointer.button !== 0 && ( x > 1 || x < 0 || y > 1 || y < 0 ) ) {
 
-						pointers.splice( i, 1 );
+						pointers.splice( index, 1 );
 
 						this.domElement.releasePointerCapture( event.pointerId );
 
@@ -201,25 +195,27 @@ const ControlsMixin = ( superclass ) => {
 
 					}
 
-					this._center = this._center || new CenterPointer( event, this.camera, this.target );
-					this._center.update( pointers );
+					/**
+					  * TODO: investigate multi-poiter movement accumulation.
+						* This shouldn't be necessary yet without it, multi pointer gestures result with 
+						* multiplied movement values. TODO: investigate and unhack.
+					  * */
 
-					// TODO: consider throttling once per frame. On Mac pointermove fires up to 120 Hz.
-					this.onTrackedPointerMove( pointer, pointers, this._center );
+					for ( let i = 0; i < pointers.length; i++ ) {
 
-					// TODO: investigate multi-poiter update accumulation. Possibly fixed.
+						if ( pointer.pointerId !== pointers[ i ].pointerId ) {
 
-					for (let j = 0; j < pointers.length; j++) {
-
-						if ( pointer.pointerId !== pointers[j].pointerId ) {
-
-							pointers[j].clear();
+							pointers[ i ].clear();
 
 						}
 
 					}
 
-					// pointer.clear();
+					this._center = this._center || new CenterPointer( event, this.camera, this.target );
+					this._center.update( pointers );
+
+					// TODO: consider throttling once per frame. On Mac pointermove fires up to 120 Hz.
+					this.onTrackedPointerMove( pointer, pointers, this._center );
 
 				} else if ( this._hover && this._hover.pointerId === event.pointerId ) {
 
@@ -245,7 +241,7 @@ const ControlsMixin = ( superclass ) => {
 
 			}
 
-			let _simulatedPointerWithInertia = null;
+			let _simulatedPointer = null;
 
 			const _onPointerUp = ( event ) => {
 
@@ -253,21 +249,25 @@ const ControlsMixin = ( superclass ) => {
 
 				const pointers = this._pointers;
 
-				const i = pointers.findIndex( pointer => pointer.pointerId === event.pointerId );
+				const index = pointers.findIndex( pointer => pointer.pointerId === event.pointerId );
 
-				if ( i !== -1 ) {
+				const pointer = pointers[ index ];
 
-					const pointer = pointers[ i ];
+				if ( pointer ) {
 
-					pointers.splice( i, 1 );
+					pointers.splice( index, 1 );
 
 					this.domElement.releasePointerCapture( event.pointerId );
 
-					if ( pointers.length === 0 && this.enableDamping ) {
+					if ( pointers.length === 0 ) {
 
 						this._interacting = false;
 
-						_simulatedPointerWithInertia = pointer;
+					}
+
+					if ( this.enableDamping ) {
+
+						_simulatedPointer = pointer;
 
 						this.startAnimation( _onPointerSimulation );
 
@@ -283,17 +283,45 @@ const ControlsMixin = ( superclass ) => {
 
 			}
 
+			const _onPointerSimulation = ( timeDelta ) => {
+
+				if ( _simulatedPointer ) {
+
+					const pointer = _simulatedPointer;
+
+					pointer.applyDamping( this.dampingFactor, timeDelta );
+
+					if ( pointer.movement.length() > EPS ) {
+
+						this.onTrackedPointerMove( pointer, [ pointer ], pointer );
+
+					} else {
+
+						this.onTrackedPointerUp( pointer, [] );
+
+						_simulatedPointer = null
+
+					}
+
+				} else {
+
+					this.stopAnimation( _onPointerSimulation );
+
+				}
+
+			}
+
 			const _onPointerLeave = ( event ) => {
 
 				const pointers = this._pointers;
 
-				const i = pointers.findIndex( pointer => pointer.pointerId === event.pointerId );
+				const index = pointers.findIndex( pointer => pointer.pointerId === event.pointerId );
 
-				const pointer = pointers[ i ];
+				const pointer = pointers[ index ];
 
 				if ( pointer ) {
 
-					pointers.splice( i, 1 );
+					pointers.splice( index, 1 );
 
 					this.domElement.releasePointerCapture( event.pointerId );
 
@@ -309,13 +337,13 @@ const ControlsMixin = ( superclass ) => {
 
 				const pointers = this._pointers;
 
-				const i = pointers.findIndex( pointer => pointer.pointerId === event.pointerId );
+				const index = pointers.findIndex( pointer => pointer.pointerId === event.pointerId );
 
-				const pointer = pointers[ i ];
+				const pointer = pointers[ index ];
 
 				if ( pointer ) {
 
-					pointers.splice( i, 1 );
+					pointers.splice( index, 1 );
 
 					this.domElement.releasePointerCapture( event.pointerId );
 
@@ -345,39 +373,12 @@ const ControlsMixin = ( superclass ) => {
 
 			}
 
-			const _onPointerSimulation = ( timeDelta ) => {
-
-				if ( _simulatedPointerWithInertia ) {
-
-					_simulatedPointerWithInertia.applyDamping( this.dampingFactor, timeDelta );
-
-					if ( _simulatedPointerWithInertia.movement.length() > EPS ) {
-
-						this.onTrackedPointerMove( _simulatedPointerWithInertia, [ _simulatedPointerWithInertia ], _simulatedPointerWithInertia );
-
-					} else {
-
-						this.onTrackedPointerUp( _simulatedPointerWithInertia, [] );
-
-						_simulatedPointerWithInertia = null;
-
-					}
-
-				} else {
-
-					this.stopAnimation( _onPointerSimulation );
-
-				}
-
-
-			}
-
 			const _onKeyDown = ( event ) => {
 
 				const keys = this._keys;
-				const i = keys.findIndex( key => key.keyCode === event.keyCode );
+				const index = keys.findIndex( key => key.keyCode === event.keyCode );
 
-				if ( i === -1 ) keys.push( event );
+				if ( index === -1 ) keys.push( event );
 
 				if ( !event.repeat ) {
 
@@ -393,9 +394,9 @@ const ControlsMixin = ( superclass ) => {
 			const _onKeyUp = ( event ) => {
 
 				const keys = this._keys;
-				const i = keys.findIndex( key => key.keyCode === event.keyCode );
+				const index = keys.findIndex( key => key.keyCode === event.keyCode );
 
-				if ( i !== -1 ) keys.splice( i, 1 );
+				if ( index !== -1 ) keys.splice( index, 1 );
 
 				this.onTrackedKeyUp( event.keyCode, keys );
 				this.onTrackedKeyChange( event.keyCode, keys );
@@ -457,7 +458,7 @@ const ControlsMixin = ( superclass ) => {
 
 				for ( let i = 0; i < this._pointers.length; i++ ) {
 
-					this.domElement.releasePointerCapture( this._pointers[i].pointerId );
+					this.domElement.releasePointerCapture( this._pointers[ i ].pointerId );
 
 				}
 
@@ -569,9 +570,9 @@ const ControlsMixin = ( superclass ) => {
 
 		startAnimation( callback ) {
 
-			const i = this._animations.findIndex( animation => animation === callback );
+			const index = this._animations.findIndex( animation => animation === callback );
 
-			if ( i === -1 ) this._animations.push( callback );
+			if ( index === -1 ) this._animations.push( callback );
 
 			_animationQueue.add( callback );
 
@@ -579,9 +580,9 @@ const ControlsMixin = ( superclass ) => {
 
 		stopAnimation( callback ) {
 
-			const i = this._animations.findIndex( animation => animation === callback );
+			const index = this._animations.findIndex( animation => animation === callback );
 
-			if ( i !== -1 ) this._animations.splice( i, 1 );
+			if ( index !== -1 ) this._animations.splice( index, 1 );
 
 			_animationQueue.remove( callback );
 
@@ -830,7 +831,7 @@ class Pointer {
 		raycaster.setFromCamera( this.view.start, this._camera );
 		raycaster.ray.intersectPlane( plane, intersectedPoint );
 		this.planar.start.copy( intersectedPoint );
-		
+
 		intersectedPoint.set( 0, 0, 0 );
 		raycaster.setFromCamera( this.view.current, this._camera );
 		raycaster.ray.intersectPlane( plane, intersectedPoint );
@@ -840,7 +841,7 @@ class Pointer {
 		raycaster.setFromCamera( this.view.previous, this._camera );
 		raycaster.ray.intersectPlane( plane, intersectedPoint );
 		this.planar.previous.copy( intersectedPoint );
-		
+
 		this.planar.movement.copy( this.planar.current ).sub( this.planar.previous );
 		this.planar.offset.copy( this.planar.current ).sub( this.planar.start );
 
@@ -858,9 +859,10 @@ class CenterPointer extends Pointer {
 		this.movement.set( 0, 0 );
 		this.offset.set( 0, 0 );
 
-		for (let i = 0; i < pointers.length; i++) {
+		for ( let i = 0; i < pointers.length; i++ ) {
 
-			const pointer = pointers[i];
+			const pointer = pointers[ i ];
+
 			this.start.add( pointer.start );
 			this.current.add( pointer.current );
 			this.previous.add( pointer.previous );
@@ -898,8 +900,9 @@ class AnimationQueue {
 
 	add( callback ) {
 
-		const i = this._queue.indexOf( callback );
-		if ( i === -1 ) {
+		const index = this._queue.indexOf( callback );
+
+		if ( index === -1 ) {
 
 			this._queue.push( callback );
 			if ( this._queue.length === 1 ) this._start();
@@ -910,10 +913,11 @@ class AnimationQueue {
 
 	remove( callback ) {
 
-		const i = this._queue.indexOf( callback );
-		if ( i !== -1 ) {
+		const index = this._queue.indexOf( callback );
 
-			this._queue.splice( i, 1 );
+		if ( index !== -1 ) {
+
+			this._queue.splice( index, 1 );
 			if ( this._queue.length === 0 ) this._stop();
 
 		}
@@ -953,7 +957,7 @@ class AnimationQueue {
 
 		for ( let i = 0; i < this._queue.length; i++ ) {
 
-			this._queue[i]( timestep, this._time );
+			this._queue[ i ]( timestep, this._time );
 
 		}
 

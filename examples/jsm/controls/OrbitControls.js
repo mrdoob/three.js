@@ -25,6 +25,7 @@ var scale = 1;
 var quat = new Quaternion();
 var quatInverse = new Quaternion();
 var offset = new Vector3();
+var movement = new Vector3();
 
 var twoPI = 2 * Math.PI;
 
@@ -33,6 +34,14 @@ class OrbitControls extends Controls {
 	constructor( camera, domElement ) {
 
 		super( camera, domElement );
+
+		if ( !this.camera.isPerspectiveCamera && !this.camera.isOrthographicCamera ) {
+
+			console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
+			this.enableZoom = false;
+			this.enablePan = false;
+
+		}
 
 		// How far you can dolly in and out ( PerspectiveCamera only )
 		this.minDistance = 0;
@@ -55,20 +64,20 @@ class OrbitControls extends Controls {
 		// This option actually enables dollying in and out; left as "zoom" for backwards compatibility.
 		// Set to false to disable zooming
 		this.enableZoom = true;
-		this.zoomSpeed = 1.0;
+		this.zoomSpeed = 1;
 
 		// Set to false to disable rotating
 		this.enableRotate = true;
-		this.rotateSpeed = 1.0;
+		this.rotateSpeed = 1;
 
 		// Set to false to disable panning
 		this.enablePan = true;
-		this.panSpeed = 1.0;
+		this.panSpeed = 1;
 		this.screenSpacePanning = true; // if false, pan orthogonal to world-space direction camera.up
-		this.keyPanSpeed = 7.0;	// pixels moved per arrow key push
+		this.keyPanSpeed = 7;	// pixels moved per arrow key push
 
 		// Set to true to automatically rotate around the target
-		this.autoRotateSpeed = 2.0; // 30 seconds per round when fps is 60
+		this.autoRotateSpeed = 1; // 30 seconds per round when fps is 60
 		this._autoRotationMagnitude = 0;
 
 		// TODO: restart animation on disable > enable.
@@ -77,11 +86,11 @@ class OrbitControls extends Controls {
 
 			value ? ( () => {
 
-				this.startAnimation( this._update );
+				this.startAnimation( this._autoRotate );
 
 			} )() : ( () => {
 
-				this.stopAnimation( this._update );
+				this.stopAnimation( this._autoRotate );
 
 			} )();
 
@@ -104,23 +113,10 @@ class OrbitControls extends Controls {
 		// Touch fingers // TODO: deprecate touches.ONE
 		this.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
 
-		// for reset
-		this._resetQuaternion = this.camera.quaternion.clone();
-		this._resetPosition = this.camera.position.clone();
-		this._resetZoom = this.camera.zoom;
-		this._resetFocus = this.camera.focus;
-
 		// current position in spherical coordinates
 		this._spherical = new Spherical();
 
-		this.rotateMovement = new Vector3();
-		this.panMovement = new Vector3();
-		this.dollyMovement = new Vector3();
-
-		this._update = this._update.bind( this );
-
-		// TODO debug
-		// this.autoRotate = true;
+		this._autoRotate = this._autoRotate.bind( this );
 
 		//
 		// event handlers
@@ -136,36 +132,27 @@ class OrbitControls extends Controls {
 
 			if ( this.enableKeys === false || this.enablePan === false ) return;
 
-			let needsUpdate = false;
-
 			switch ( event.keyCode ) {
 
 				case this.keys.UP:
 					this._keydownPan( 0, this.keyPanSpeed );
-					needsUpdate = true;
+					event.preventDefault();
 					break;
 
 				case this.keys.BOTTOM:
 					this._keydownPan( 0, - this.keyPanSpeed );
-					needsUpdate = true;
+					event.preventDefault();
 					break;
 
 				case this.keys.LEFT:
 					this._keydownPan( this.keyPanSpeed, 0 );
-					needsUpdate = true;
+					event.preventDefault();
 					break;
 
 				case this.keys.RIGHT:
 					this._keydownPan( - this.keyPanSpeed, 0 );
-					needsUpdate = true;
+					event.preventDefault();
 					break;
-
-			}
-
-			if ( needsUpdate ) {
-
-				event.preventDefault();
-				this._update();
 
 			}
 
@@ -179,27 +166,13 @@ class OrbitControls extends Controls {
 			event.preventDefault();
 			event.stopPropagation();
 
-			if ( event.deltaY < 0 ) {
-
-				this._dollyIn( this._getZoomScale() );
-
-			} else if ( event.deltaY > 0 ) {
-
-				this._dollyOut( this._getZoomScale() );
-
-			}
-
-			this._update();
+			this._applyDollyMovement( event.deltaY );
 
 		}
 
 		this.addEventListener( 'contextmenu', _onContextMenu );
 		this.addEventListener( 'keydown', _onKeyDown );
 		this.addEventListener( 'wheel', _onWheel );
-
-		// force an update at start
-
-		this._update();
 
 		this.dispatchEvent( changeEvent );
 
@@ -339,8 +312,6 @@ class OrbitControls extends Controls {
 
 		}
 
-		this._update();
-
 	}
 
 	onTrackedPointerUp( pointer, pointers ) {
@@ -353,30 +324,9 @@ class OrbitControls extends Controls {
 
 	}
 
-	onTrackedKeyChanged( keyCode, keyCodes ) {
-
-	}
-
-	_pointerRotate( pointer ) {
-
-		var aspect = this.domElement.clientWidth / this.domElement.clientHeight;
-
-		this.rotateMovement.copy( pointer.view.movement ).multiplyScalar( this.rotateSpeed );
-		this.rotateMovement.x *= aspect;
-
-	}
-
 	_pointerDolly( pointer ) {
 
-		if ( pointer.movement.y > 0 ) {
-
-			this._dollyOut( this._getZoomScale() );
-
-		} else if ( pointer.movement.y < 0 ) {
-
-			this._dollyIn( this._getZoomScale() );
-
-		}
+		this._applyDollyMovement( pointer.movement.y );
 
 	}
 
@@ -385,9 +335,30 @@ class OrbitControls extends Controls {
 		var dist0 = pointers[ 0 ].world.current.distanceTo( pointers[ 1 ].world.current );
 		var dist1 = pointers[ 0 ].world.previous.distanceTo( pointers[ 1 ].world.previous );
 
-		// TODO make gesture relative to world-space
-		this.dollyMovement.set( 0, 0, 1 ).applyQuaternion( this.camera.quaternion );
-		this.dollyMovement.multiplyScalar( dist0 - dist1 );
+		this._applyDollyMovement( dist0 - dist1 );
+
+	}
+
+	_applyDollyMovement( dollyMovement ) {
+
+		scale = Math.pow( 1 - dollyMovement / this.domElement.clientHeight, this.zoomSpeed );
+
+		offset.copy( this.camera.position ).sub( this.target );
+
+		// angle from z-axis around y-axis
+		this._spherical.setFromVector3( offset );
+
+		// restrict radius to be between desired limits
+		this._spherical.radius = Math.max( this.minDistance, Math.min( this.maxDistance, this._spherical.radius * scale ) );
+
+		// move target to panned location
+		offset.setFromSpherical( this._spherical );
+
+		this.camera.position.copy( this.target ).add( offset );
+
+		this.camera.lookAt( this.target );
+
+		this.dispatchEvent( changeEvent );
 
 	}
 
@@ -395,17 +366,107 @@ class OrbitControls extends Controls {
 
 		if ( this.screenSpacePanning ) {
 
-			this.panMovement.copy( pointer.world.movement ).multiplyScalar( this.panSpeed );
+			this._applyPanMovement( pointer.world.movement );
 
 		} else {
 
-			this.panMovement.copy( pointer.planar.movement ).multiplyScalar( this.panSpeed );
+			this._applyPanMovement( pointer.planar.movement );
 
 		}
 
 	}
 
-	_update() {
+	// deltaX and deltaY are in pixels; right and down are positive
+	_keydownPan( deltaX, deltaY ) {
+
+		let fovFactor
+
+		if ( this.camera.isPerspectiveCamera ) {
+
+			offset.copy( this.camera.position ).sub( this.target );
+
+			// half of the fov is center to top of screen. We use clientHeight only so aspect ratio does not distort speed
+			fovFactor = offset.length() * Math.tan( ( this.camera.fov / 2 ) * Math.PI / 180.0 ) * 2 / this.domElement.clientHeight;
+
+		} else if ( this.camera.isOrthographicCamera ) {
+
+			fovFactor = ( this.camera.top - this.camera.bottom ) / this.camera.zoom / this.domElement.clientHeight;
+
+		}
+
+		// Pan movement up / down
+		movement.set( 0, 0, 0 );
+
+		if ( this.screenSpacePanning === true ) {
+
+			offset.setFromMatrixColumn( this.camera.matrix, 1 );
+
+		} else {
+
+			offset.setFromMatrixColumn( this.camera.matrix, 0 );
+			offset.crossVectors( this.camera.up, offset );
+
+		}
+
+		offset.multiplyScalar( - deltaY * fovFactor );
+		movement.add( offset );
+
+		// Pan movement left / right
+
+		offset.setFromMatrixColumn( this.camera.matrix, 0 ); // get X column of objectMatrix
+		offset.multiplyScalar( deltaX * fovFactor );
+		movement.add( offset );
+
+		this._applyPanMovement( movement );
+
+	}
+
+	_applyPanMovement( movement ) {
+
+		offset.copy( movement ).multiplyScalar( this.panSpeed );
+
+		this.target.sub( offset );
+		this.camera.position.sub( offset );
+
+		this.dispatchEvent( changeEvent );
+
+	}
+
+	_pointerRotate( pointer ) {
+
+		var aspect = this.domElement.clientWidth / this.domElement.clientHeight;
+		
+		movement.copy( pointer.view.movement ).multiplyScalar( this.rotateSpeed );
+		movement.x *= aspect;
+
+		this._applyRotateMovement( movement );
+
+	}
+
+	_autoRotate( timeDelta ) {
+
+		// TODO: use timeDelta
+
+		const angle = this._interacting ? 0 : 2 * Math.PI / 60 / 60 * this.autoRotateSpeed;
+
+		if ( this.enableDamping ) {
+
+			this._autoRotationMagnitude += angle * this.dampingFactor;
+			this._autoRotationMagnitude *= ( 1 - this.dampingFactor );
+
+		} else {
+
+			this._autoRotationMagnitude = angle;
+
+		}
+
+		movement.set( this._autoRotationMagnitude, 0, 0 );
+
+		this._applyRotateMovement( movement );
+
+	}
+
+	_applyRotateMovement( movement ) {
 
 		offset.copy( this.camera.position ).sub( this.target );
 
@@ -419,15 +480,13 @@ class OrbitControls extends Controls {
 		// angle from z-axis around y-axis
 		this._spherical.setFromVector3( offset );
 
-		this.rotateMovement.x += this._getAutoRotationMagnitude();
-
-		this._spherical.theta -= this.rotateMovement.x;
-		this._spherical.phi += this.rotateMovement.y;
+		this._spherical.theta -= movement.x;
+		this._spherical.theta -= movement.x + this._autoRotationMagnitude;
+		this._spherical.phi += movement.y;
 
 		// restrict theta to be between desired limits
-
-		var min = this.minAzimuthAngle;
-		var max = this.maxAzimuthAngle;
+		const min = this.minAzimuthAngle;
+		const max = this.maxAzimuthAngle;
 
 		if ( isFinite( min ) && isFinite( max ) ) {
 
@@ -454,185 +513,15 @@ class OrbitControls extends Controls {
 
 		this._spherical.makeSafe();
 
-
-		this._spherical.radius *= scale;
-
-		// restrict radius to be between desired limits
-		this._spherical.radius = Math.max( this.minDistance, Math.min( this.maxDistance, this._spherical.radius ) );
-
-		// move target to panned location
-
 		offset.setFromSpherical( this._spherical );
 
 		// rotate offset back to "camera-up-vector-is-up" space
 		offset.applyQuaternion( quatInverse );
 
 		this.camera.position.copy( this.target ).add( offset );
-
 		this.camera.lookAt( this.target );
 
-		scale = 1;
-
-		// update condition is:
-		// min(camera displacement, camera rotation in radians)^2 > EPS
-		// using small-angle approximation cos(x/2) = 1 - x^2 / 8
-
-		// if ( zoomChanged ||
-		// 	lastPosition.distanceToSquared( this.camera.position ) > EPS ||
-		// 	8 * ( 1 - lastQuaternion.dot( this.camera.quaternion ) ) > EPS ) {
-
-		// 	this.dispatchEvent( changeEvent );
-
-		// 	lastPosition.copy( this.camera.position );
-		// 	lastQuaternion.copy( this.camera.quaternion );
-		// 	zoomChanged = false;
-
-		// 	return true;
-
-		// }
-
-		// Apply pan
-
-		this.target.sub( this.panMovement );
-		this.camera.position.sub( this.panMovement );
-
-		// Apply zoom
-
-		this.target.sub( this.dollyMovement );
-		this.camera.position.sub( this.dollyMovement );
-
-		this.rotateMovement.set( 0, 0, 0 );
-		this.panMovement.set( 0, 0, 0 );
-		this.dollyMovement.set( 0, 0, 0 );
-
 		this.dispatchEvent( changeEvent );
-
-		return false;
-
-	}
-
-	_getAutoRotationMagnitude() {
-
-		if ( this.autoRotate ) {
-
-			// TODO: use time delta
-
-			const angle = 2 * Math.PI / 60 / 60 * this.autoRotateSpeed;
-
-			if ( this.enableDamping ) {
-
-				this._autoRotationMagnitude += this._interacting ? 0 : angle * this.dampingFactor;
-				this._autoRotationMagnitude *= ( 1 - this.dampingFactor );
-
-			} else {
-
-				this._autoRotationMagnitude = angle;
-
-			}
-
-			return this._autoRotationMagnitude;
-
-		}
-
-		return 0;
-
-	}
-
-	_getZoomScale() {
-
-		return Math.pow( 0.95, this.zoomSpeed );
-
-	}
-
-	_dollyOut( dollyScale ) {
-
-		if ( this.camera.isPerspectiveCamera ) {
-
-			scale /= dollyScale;
-
-		} else if ( this.camera.isOrthographicCamera ) {
-
-			this.camera.zoom = Math.max( this.minZoom, Math.min( this.maxZoom, this.camera.zoom * dollyScale ) );
-			this.camera.updateProjectionMatrix();
-			zoomChanged = true;
-
-		} else {
-
-			console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
-			this.enableZoom = false;
-
-		}
-
-	}
-
-	_dollyIn( dollyScale ) {
-
-		if ( this.camera.isPerspectiveCamera ) {
-
-			scale *= dollyScale;
-
-		} else if ( this.camera.isOrthographicCamera ) {
-
-			this.camera.zoom = Math.max( this.minZoom, Math.min( this.maxZoom, this.camera.zoom / dollyScale ) );
-			this.camera.updateProjectionMatrix();
-			zoomChanged = true;
-
-		} else {
-
-			console.warn( 'WARNING: OrbitControls.js encountered an unknown camera type - dolly/zoom disabled.' );
-			this.enableZoom = false;
-
-		}
-
-	}
-
-	// deltaX and deltaY are in pixels; right and down are positive
-	_keydownPan( deltaX, deltaY ) {
-
-		let fovFactor
-
-		if ( this.camera.isPerspectiveCamera ) {
-
-			offset.copy( this.camera.position ).sub( this.target );
-
-			// half of the fov is center to top of screen. We use clientHeight only so aspect ratio does not distort speed
-			fovFactor = offset.length() * Math.tan( ( this.camera.fov / 2 ) * Math.PI / 180.0 ) * 2 / this.domElement.clientHeight;
-
-		} else if ( this.camera.isOrthographicCamera ) {
-
-			fovFactor = ( this.camera.top - this.camera.bottom ) / this.camera.zoom / this.domElement.clientHeight;
-
-		} else {
-
-			console.warn( 'THREE.OrbitControls: encountered an unknown camera type - pan disabled.' );
-			this.enablePan = false;
-			return;
-
-		}
-
-		// Pan movement up / down
-
-		this.panMovement.set( 0, 0, 0 );
-
-		if ( this.screenSpacePanning === true ) {
-
-			offset.setFromMatrixColumn( this.camera.matrix, 1 );
-
-		} else {
-
-			offset.setFromMatrixColumn( this.camera.matrix, 0 );
-			offset.crossVectors( this.camera.up, offset );
-
-		}
-
-		offset.multiplyScalar( - deltaY * fovFactor );
-		this.panMovement.add( offset );
-
-		// Pan movement left / right
-
-		offset.setFromMatrixColumn( this.camera.matrix, 0 ); // get X column of objectMatrix
-		offset.multiplyScalar( deltaX * fovFactor );
-		this.panMovement.add( offset );
 
 	}
 
