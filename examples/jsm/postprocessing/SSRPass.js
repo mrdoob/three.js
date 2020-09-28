@@ -64,6 +64,9 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.infiniteThick = false
   this.thickTolerance = .2
 
+  this.isNoise = false
+  this.noiseIntensity = .1
+
   // beauty render target with depth buffer
 
   var depthTexture = new DepthTexture();
@@ -284,6 +287,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.ssrMaterial.uniforms['attenuationDistance'].value = this.attenuationDistance
     this.ssrMaterial.uniforms['infiniteThick'].value = this.infiniteThick
     this.ssrMaterial.uniforms['thickTolerance'].value = this.thickTolerance
+    this.ssrMaterial.uniforms['isNoise'].value = this.isNoise
+    this.ssrMaterial.uniforms['noiseIntensity'].value = this.noiseIntensity
     this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
 
 

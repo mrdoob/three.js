@@ -33,6 +33,8 @@ var SSRShader = {
     "attenuationDistance": { value: null },
     "infiniteThick": { value: null },
     "thickTolerance": { value: null },
+    "isNoise": { value: null },
+    "noiseIntensity": { value: null },
 
   },
 
@@ -73,6 +75,8 @@ var SSRShader = {
 		uniform bool isDistanceAttenuation;
 		uniform bool infiniteThick;
 		uniform float thickTolerance;
+		uniform bool isNoise;
+		uniform float noiseIntensity;
 		uniform float attenuationDistance;
 		#include <packing>
 		float getDepth( const in vec2 screenPosition ) {
@@ -153,6 +157,10 @@ var SSRShader = {
 
 			return resultSegmentPoint1;
 		}
+		vec3 hash3( float n )
+		{
+				return fract(sin(vec3(n,n+1.0,n+2.0))*vec3(43758.5453123,22578.1459123,19642.3490423));
+		}
 		void main(){
 			if(isSelective){
 				float metalness=texture2D(tMetalness,vUv).r;
@@ -170,6 +178,12 @@ var SSRShader = {
 			vec2 d1;
 
 			vec3 viewNormal=getViewNormal( vUv );
+
+			if(isNoise){
+				viewNormal+=(hash3(viewPosition.x+viewPosition.y+viewPosition.z)-.5)*noiseIntensity;
+				viewNormal=normalize(viewNormal);
+			}
+
 			vec3 viewReflectDir;
 			if(isPerspectiveCamera){
 				viewReflectDir=reflect(normalize(viewPosition),viewNormal);
