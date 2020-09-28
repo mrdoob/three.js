@@ -5,7 +5,7 @@ export class ConeBufferGeometry extends CylinderBufferGeometry {
 	/**
 	 * @param [radius=1] — Radius of the cone base.
 	 * @param [height=1] — Height of the cone.
-	 * @param [radiusSegments=8] — Number of segmented faces around the circumference of the cone.
+	 * @param [radialSegment=8] — Number of segmented faces around the circumference of the cone.
 	 * @param [heightSegments=1] — Number of rows of faces along the height of the cone.
 	 * @param [openEnded=false] — A Boolean indicating whether the base of the cone is open or capped.
 	 * @param [thetaStart=0]
