@@ -6,7 +6,7 @@ export class CircleBufferGeometry extends BufferGeometry {
 	 * @param [radius=1]
 	 * @param [segments=8]
 	 * @param [thetaStart=0]
-	 * @param [widthSegments=Math.PI * 2]
+	 * @param [thetaLength=Math.PI * 2]
 	 */
 	constructor(
 		radius?: number,

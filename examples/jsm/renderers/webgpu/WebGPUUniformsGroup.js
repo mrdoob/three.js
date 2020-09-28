@@ -13,6 +13,7 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 		this.onBeforeUpdate = function () {};
 
+		this.bytesPerElement = Float32Array.BYTES_PER_ELEMENT;
 		this.type = GPUBindingType.UniformBuffer;
 		this.visibility = GPUShaderStage.VERTEX;
 
@@ -57,32 +58,49 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	getByteLength() {
 
-		let byteLength = 0;
+		let offset = 0; // global buffer offset in bytes
+		const chunkSize = 16; // size of a chunk in bytes (STD140 layout)
 
-		for ( const uniform of this.uniforms ) {
+		for ( let i = 0, l = this.uniforms.length; i < l; i ++ ) {
 
-			byteLength += uniform.byteLength;
+			const uniform = this.uniforms[ i ];
+
+			// offset within a single chunk in bytes
+
+			const chunkOffset = offset % chunkSize;
+			const remainingSizeInChunk = chunkSize - chunkOffset;
+
+			// check for chunk overflow
+
+			if ( chunkOffset !== 0 && ( remainingSizeInChunk - uniform.boundary ) < 0 ) {
+
+				// add padding and adjust offset
+
+				offset += ( chunkSize - chunkOffset );
+
+			}
+
+			uniform.offset = ( offset / this.bytesPerElement );
+
+			offset += ( uniform.itemSize * this.bytesPerElement );
 
 		}
 
-		return byteLength;
+		return offset;
 
 	}
 
 	update() {
 
 		let updated = false;
-		let offset = 0;
 
 		for ( const uniform of this.uniforms ) {
 
-			if ( this.updateByType( uniform, offset ) === true ) {
+			if ( this.updateByType( uniform ) === true ) {
 
 				updated = true;
 
 			}
-
-			offset += uniform.itemSize;
 
 		}
 
@@ -90,26 +108,27 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateByType( uniform, offset ) {
+	updateByType( uniform ) {
 
-		if ( uniform.isFloatUniform ) return this.updateNumber( uniform, offset );
-		if ( uniform.isVector2Uniform ) return this.updateVector2( uniform, offset );
-		if ( uniform.isVector3Uniform ) return this.updateVector3( uniform, offset );
-		if ( uniform.isVector4Uniform ) return this.updateVector4( uniform, offset );
-		if ( uniform.isColorUniform ) return this.updateColor( uniform, offset );
-		if ( uniform.isMatrix3Uniform ) return this.updateMatrix3( uniform, offset );
-		if ( uniform.isMatrix4Uniform ) return this.updateMatrix4( uniform, offset );
+		if ( uniform.isFloatUniform ) return this.updateNumber( uniform );
+		if ( uniform.isVector2Uniform ) return this.updateVector2( uniform );
+		if ( uniform.isVector3Uniform ) return this.updateVector3( uniform );
+		if ( uniform.isVector4Uniform ) return this.updateVector4( uniform );
+		if ( uniform.isColorUniform ) return this.updateColor( uniform );
+		if ( uniform.isMatrix3Uniform ) return this.updateMatrix3( uniform );
+		if ( uniform.isMatrix4Uniform ) return this.updateMatrix4( uniform );
 
 		console.error( 'THREE.WebGPUUniformsGroup: Unsupported uniform type.', uniform );
 
 	}
 
-	updateNumber( uniform, offset ) {
+	updateNumber( uniform ) {
 
 		let updated = false;
 
 		const a = this.array;
 		const v = uniform.value;
+		const offset = uniform.offset;
 
 		if ( a[ offset ] !== v ) {
 
@@ -122,12 +141,13 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateVector2( uniform, offset ) {
+	updateVector2( uniform ) {
 
 		let updated = false;
 
 		const a = this.array;
 		const v = uniform.value;
+		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y ) {
 
@@ -142,12 +162,13 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateVector3( uniform, offset ) {
+	updateVector3( uniform ) {
 
 		let updated = false;
 
 		const a = this.array;
 		const v = uniform.value;
+		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z ) {
 
@@ -163,12 +184,13 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateVector4( uniform, offset ) {
+	updateVector4( uniform ) {
 
 		let updated = false;
 
 		const a = this.array;
 		const v = uniform.value;
+		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== v.x || a[ offset + 1 ] !== v.y || a[ offset + 2 ] !== v.z || a[ offset + 4 ] !== v.w ) {
 
@@ -185,12 +207,13 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateColor( uniform, offset ) {
+	updateColor( uniform ) {
 
 		let updated = false;
 
 		const a = this.array;
 		const c = uniform.value;
+		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== c.r || a[ offset + 1 ] !== c.g || a[ offset + 2 ] !== c.b ) {
 
@@ -206,12 +229,13 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateMatrix3( uniform, offset ) {
+	updateMatrix3( uniform ) {
 
 		let updated = false;
 
 		const a = this.array;
 		const e = uniform.value.elements;
+		const offset = uniform.offset;
 
 		if ( a[ offset + 0 ] !== e[ 0 ] || a[ offset + 1 ] !== e[ 1 ] || a[ offset + 2 ] !== e[ 2 ] ||
 			a[ offset + 4 ] !== e[ 3 ] || a[ offset + 5 ] !== e[ 4 ] || a[ offset + 6 ] !== e[ 5 ] ||
@@ -235,12 +259,13 @@ class WebGPUUniformsGroup extends WebGPUBinding {
 
 	}
 
-	updateMatrix4( uniform, offset ) {
+	updateMatrix4( uniform ) {
 
 		let updated = false;
 
 		const a = this.array;
 		const e = uniform.value.elements;
+		const offset = uniform.offset;
 
 		if ( arraysEqual( a, e, offset ) === false ) {
 
