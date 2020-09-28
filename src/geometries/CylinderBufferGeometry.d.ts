@@ -10,7 +10,7 @@ export class CylinderBufferGeometry extends BufferGeometry {
 	 * @param [heightSegments=1] — Number of rows of faces along the height of the cylinder.
 	 * @param [openEnded=false] - A Boolean indicating whether or not to cap the ends of the cylinder.
 	 * @param [thetaStart=0]
-	 * @param [widthSegments=Math.PI * 2]
+	 * @param [thetaLength=Math.PI * 2]
 	 */
 	constructor(
 		radiusTop?: number,
