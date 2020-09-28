@@ -2,7 +2,7 @@ import { Color } from './../math/Color';
 import { MaterialParameters, Material } from './Material';
 
 export interface LineBasicMaterialParameters extends MaterialParameters {
-	color?: Color;
+	color?: Color | string | number;
 	linewidth?: number;
 	linecap?: string;
 	linejoin?: string;
