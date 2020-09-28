@@ -31,6 +31,8 @@ var SSRShader = {
     "isPerspectiveCamera": { value: null },
     "isDistanceAttenuation": { value: null },
     "attenuationDistance": { value: null },
+    "infiniteThick": { value: null },
+    "thickTolerance": { value: null },
 
   },
 
@@ -69,6 +71,8 @@ var SSRShader = {
 		uniform mat4 cameraInverseProjectionMatrix;
 		uniform bool isPerspectiveCamera;
 		uniform bool isDistanceAttenuation;
+		uniform bool infiniteThick;
+		uniform float thickTolerance;
 		uniform float attenuationDistance;
 		#include <packing>
 		float getDepth( const in vec2 screenPosition ) {
@@ -226,22 +230,24 @@ var SSRShader = {
 					viewRayPoint=lineLineIntersection(viewPosition,d1viewPosition,vec3(viewNearPlanePoint.x,viewNearPlanePoint.y,0),viewNearPlanePoint);
 				}
 
+				float sD=surfDist*clipW;
+				// float sD=surfDist;
+
+				vec3 viewRay=viewRayPoint-viewPosition;
+				float rayLen=length(viewRay);
+
+				if(infiniteThick&&viewRayPoint.z<vP.z&&rayLen>thickTolerance*clipW) break;
 
 				float away=length(vP-viewRayPoint);
 
 				float op=opacity;
 				if(isDistanceAttenuation){
-
-					vec3 viewRay=viewRayPoint-viewPosition;
-					float rayLen=length(viewRay);
 					if(rayLen>=attenuationDistance) break;
 					float attenuation=(1.-rayLen/attenuationDistance);
-
 					attenuation=attenuation*attenuation;
 					op=opacity*attenuation;
 				}
 
-				float sD=surfDist*clipW;
 				if(away<sD){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;

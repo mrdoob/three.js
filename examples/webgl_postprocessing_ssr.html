@@ -319,6 +319,8 @@
 		gui.add(ssrPass, 'surfDist').min(0).max(.02).step(.0001);
 		gui.add(ssrPass, 'isDistanceAttenuation');
 		gui.add(ssrPass, 'attenuationDistance').min(0).max(2000);
+		gui.add(ssrPass, 'infiniteThick');
+		gui.add(ssrPass, 'thickTolerance').min(0).max(1).step(.001);
 
 	}
 
