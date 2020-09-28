@@ -250,7 +250,7 @@ var SSRShader = {
 				vec3 viewRay=viewRayPoint-viewPosition;
 				float rayLen=length(viewRay);
 
-				if(infiniteThick&&viewRayPoint.z<vP.z&&rayLen>thickTolerance*clipW) break;
+				if(infiniteThick&&viewRayPoint.z+thickTolerance*clipW<vP.z) break;
 
 				float away=length(vP-viewRayPoint);
 

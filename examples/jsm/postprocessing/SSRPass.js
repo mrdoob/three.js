@@ -61,8 +61,8 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.isDistanceAttenuation = true
   this.attenuationDistance = 200
 
-  this.infiniteThick = false
-  this.thickTolerance = .2
+  this.infiniteThick = true
+  this.thickTolerance = .03
 
   this.isNoise = false
   this.noiseIntensity = .1
