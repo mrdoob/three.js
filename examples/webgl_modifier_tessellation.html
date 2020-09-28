@@ -107,11 +107,7 @@
 
 				const tessellateModifier = new TessellateModifier( 8 );
 
-				for ( let i = 0; i < 6; i ++ ) {
-
-					tessellateModifier.modify( geometry );
-
-				}
+				geometry = tessellateModifier.modify( geometry );
 
 				//
 

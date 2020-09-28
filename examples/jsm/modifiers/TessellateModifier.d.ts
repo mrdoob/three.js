@@ -1,5 +1,6 @@
 import {
-	Geometry
+	Geometry,
+	BufferGeometry
 } from '../../../src/Three';
 
 export class TessellateModifier {
@@ -7,6 +8,6 @@ export class TessellateModifier {
 	constructor( maxEdgeLength: number );
 	maxEdgeLength: number;
 
-	modify( geometry: Geometry ): void;
+	modify( geometry: Geometry | BufferGeometry ): Geometry | BufferGeometry;
 
 }

@@ -769,12 +769,12 @@ Geometry.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	 * and faces' vertices are updated.
 	 */
 
-	mergeVertices: function () {
+	mergeVertices: function ( precisionPoints ) {
 
 		const verticesMap = {}; // Hashmap for looking up vertices by position coordinates (and making sure they are unique)
 		const unique = [], changes = [];
 
-		const precisionPoints = 4; // number of decimal points, e.g. 4 for epsilon of 0.0001
+		precisionPoints = precisionPoints || 4;
 		const precision = Math.pow( 10, precisionPoints );
 
 		for ( let i = 0, il = this.vertices.length; i < il; i ++ ) {
