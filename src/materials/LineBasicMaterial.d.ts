@@ -21,7 +21,7 @@ export class LineBasicMaterial extends Material {
 	/**
 	 * @default 0xffffff
 	 */
-	color: Color | string | number;
+	color: Color;
 
 	/**
 	 * @default 1
