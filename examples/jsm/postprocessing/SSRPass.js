@@ -58,6 +58,9 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   //for bouncing
   this.isFirstRender = true
 
+  this.isDistanceAttenuation = true
+  this.attenuationDistance = 400
+
   // beauty render target with depth buffer
 
   var depthTexture = new DepthTexture();
@@ -274,6 +277,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.ssrMaterial.uniforms['opacity'].value = this.opacity;
     this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
     this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
+    this.ssrMaterial.uniforms['isDistanceAttenuation'].value = this.isDistanceAttenuation
+    this.ssrMaterial.uniforms['attenuationDistance'].value = this.attenuationDistance
     this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
 
 
