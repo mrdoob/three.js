@@ -219,7 +219,13 @@ var SSRShader = {
 
 				viewNearPlanePoint=vec3(viewNearPlanePointXY,-cameraNear);//view
 
-				vec3 viewRayPoint=lineLineIntersection(viewPosition,d1viewPosition,vec3_0,viewNearPlanePoint);
+				vec3 viewRayPoint;
+				if(isPerspectiveCamera){
+					viewRayPoint=lineLineIntersection(viewPosition,d1viewPosition,vec3_0,viewNearPlanePoint);
+				}else{
+					viewRayPoint=lineLineIntersection(viewPosition,d1viewPosition,vec3(viewNearPlanePoint.x,viewNearPlanePoint.y,0),viewNearPlanePoint);
+				}
+
 
 				float away=length(vP-viewRayPoint);
 
