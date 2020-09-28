@@ -8,9 +8,11 @@ import {
  * Break faces with edges longer than maxEdgeLength
  */
 
-var TessellateModifier = function ( maxEdgeLength ) {
+const TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6, maxFaces = 1000000 ) {
 
-	this.maxEdgeLength = ( maxEdgeLength === undefined ) ? 0.1 : maxEdgeLength;
+	this.maxEdgeLength = maxEdgeLength;
+	this.maxIterations = maxIterations;
+	this.maxFaces = maxFaces;
 
 };
 
@@ -32,16 +34,18 @@ TessellateModifier.prototype.modify = function ( geometry ) {
 	geometry.mergeVertices( 6 );
 
 	let finalized = false;
+	let iteration = 0;
 	const maxEdgeLengthSquared = this.maxEdgeLength * this.maxEdgeLength;
 
 	let edge;
 
-	while ( ! finalized ) {
+	while ( ! finalized && iteration < this.maxIterations && geometry.faces.length < this.maxFaces ) {
 
 		const faces = [];
 		const faceVertexUvs = [];
 
 		finalized = true;
+		iteration ++;
 
 		for ( var i = 0, il = geometry.faceVertexUvs.length; i < il; i ++ ) {
 
@@ -67,7 +71,9 @@ TessellateModifier.prototype.modify = function ( geometry ) {
 				const dbc = vb.distanceToSquared( vc );
 				const dac = va.distanceToSquared( vc );
 
-				if ( dab > maxEdgeLengthSquared || dbc > maxEdgeLengthSquared || dac > maxEdgeLengthSquared ) {
+				const limitReached = ( faces.length + il - i ) >= this.maxFaces;
+
+				if ( ! limitReached && ( dab > maxEdgeLengthSquared || dbc > maxEdgeLengthSquared || dac > maxEdgeLengthSquared ) ) {
 
 					finalized = false;
 

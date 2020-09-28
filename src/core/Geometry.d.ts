@@ -245,7 +245,7 @@ export class Geometry extends EventDispatcher {
 	 * Checks for duplicate vertices using hashmap for specified number of decimal points, e.g. 4 for epsilon of 0.0001
 	 * Duplicated vertices are removed and faces' vertices are updated.
 	 */
-	mergeVertices( precisionPoints: number ): number;
+	mergeVertices( precisionPoints?: number = 4 ): number;
 
 	setFromPoints( points: Array<Vector2> | Array<Vector3> ): this;
 
