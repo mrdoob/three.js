@@ -146,7 +146,7 @@
 				var material = new THREE.MeshStandardMaterial( { flatShading: true } );
 				var mesh = new THREE.Mesh( geometry, material );
 
-				var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 2 ) );
+				var pivot = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 0.01, 3 ) );
 				pivot.name = 'pivot';
 				pivot.position.z = - 0.05;
 				mesh.add( pivot );
