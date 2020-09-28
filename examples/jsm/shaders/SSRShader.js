@@ -29,6 +29,8 @@ var SSRShader = {
     "surfDist": { value: 0 },
     "isSelective": { value: null },
     "isPerspectiveCamera": { value: null },
+    "isDistanceAttenuation": { value: null },
+    "attenuationDistance": { value: null },
 
   },
 
@@ -66,6 +68,8 @@ var SSRShader = {
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
 		uniform bool isPerspectiveCamera;
+		uniform bool isDistanceAttenuation;
+		uniform float attenuationDistance;
 		#include <packing>
 		float getDepth( const in vec2 screenPosition ) {
 			return texture2D( tDepth, screenPosition ).x;
@@ -101,10 +105,49 @@ var SSRShader = {
 			xy*=resolution;
 			return xy;
 		}
-		float pointToLineDistance(vec3 x0, vec3 x1, vec3 x2) {
-			//x0: point, x1: linePointA, x2: linePointB
-			//https://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
-			return length(cross(x0-x1,x0-x2))/length(x2-x1);
+		vec3 lineLineIntersection(vec3 line1Point1, vec3 line1Point2,
+			vec3 line2Point1, vec3 line2Point2)
+		{
+			// http://paulbourke.net/geometry/pointlineplane/calclineline.cs
+			// http://paulbourke.net/geometry/pointlineplane/
+			// https://stackoverflow.com/a/2316934/3596736
+
+			/////////////////////////////////////////////////////////////////////////////////////
+
+		  // Algorithm is ported from the C algorithm of
+		  // Paul Bourke at http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline3d/
+		  vec3 resultSegmentPoint1 = vec3(0,0,0);
+		  // resultSegmentPoint2 = vec3(0,0,0);
+
+		  vec3 p1 = line1Point1;
+		  vec3 p2 = line1Point2;
+		  vec3 p3 = line2Point1;
+		  vec3 p4 = line2Point2;
+		  vec3 p13 = p1 - p3;
+		  vec3 p43 = p4 - p3;
+
+		  vec3 p21 = p2 - p1;
+
+		  float d1343 = p13.x * p43.x + p13.y * p43.y + p13.z * p43.z;
+		  float d4321 = p43.x * p21.x + p43.y * p21.y + p43.z * p21.z;
+		  float d1321 = p13.x * p21.x + p13.y * p21.y + p13.z * p21.z;
+		  float d4343 = p43.x * p43.x + p43.y * p43.y + p43.z * p43.z;
+		  float d2121 = p21.x * p21.x + p21.y * p21.y + p21.z * p21.z;
+
+		  float denom = d2121 * d4343 - d4321 * d4321;
+		  float numer = d1343 * d4321 - d1321 * d4343;
+
+		  float mua = numer / denom;
+		  // float mub = (d1343 + d4321 * (mua)) / d4343;
+
+		  resultSegmentPoint1.x = p1.x + mua * p21.x;
+		  resultSegmentPoint1.y = p1.y + mua * p21.y;
+		  resultSegmentPoint1.z = p1.z + mua * p21.z;
+		  // resultSegmentPoint2.x = p3.x + mub * p43.x;
+		  // resultSegmentPoint2.y = p3.y + mub * p43.y;
+		  // resultSegmentPoint2.z = p3.z + mub * p43.z;
+
+			return resultSegmentPoint1;
 		}
 		void main(){
 			if(isSelective){
@@ -115,7 +158,10 @@ var SSRShader = {
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
 			if(-viewZ>=cameraFar) return;
-			vec3 viewPosition = getViewPosition( vUv, depth, viewZ );
+
+			float clipW = cameraProjectionMatrix[2][3] * viewZ + cameraProjectionMatrix[3][3];
+			vec3 viewPosition=getViewPosition( vUv, depth, viewZ, clipW );
+
 			vec2 d0=gl_FragCoord.xy;
 			vec2 d1;
 
@@ -160,14 +206,41 @@ var SSRShader = {
 				if(-vZ>=cameraFar) continue;
 				float clipW = cameraProjectionMatrix[2][3] * vZ + cameraProjectionMatrix[3][3];
 				vec3 vP=getViewPosition( uv, d, vZ, clipW );
-				float away=pointToLineDistance(vP,viewPosition,d1viewPosition);
+
+				vec3 viewNearPlanePoint;
+
+				vec2 viewNearPlanePointXY=uv;//uv
+				viewNearPlanePointXY*=2.;
+				viewNearPlanePointXY-=1.;//ndc
+				float cw=cameraNear;
+				viewNearPlanePointXY*=cw;//clip
+				viewNearPlanePointXY=(cameraInverseProjectionMatrix*vec4(viewNearPlanePointXY,0,cw)).xy;//view
+
+				viewNearPlanePoint=vec3(viewNearPlanePointXY,-cameraNear);//view
+
+				vec3 viewRayPoint=lineLineIntersection(viewPosition,d1viewPosition,vec3(0,0,0),viewNearPlanePoint);
+
+				float away=length(vP-viewRayPoint);
+
+				float op=opacity;
+				if(isDistanceAttenuation){
+
+					vec3 viewRay=viewRayPoint-viewPosition;
+					float rayLen=length(viewRay);
+					if(rayLen>=attenuationDistance) break;
+					float attenuation=(1.-rayLen/attenuationDistance);
+
+					attenuation=attenuation*attenuation;
+					op=opacity*attenuation;
+				}
+
 				float sD=surfDist*clipW;
 				if(away<sD){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;
 					vec4 reflectColor=texture2D(tDiffuse,uv);
 					gl_FragColor=reflectColor;
-					gl_FragColor.a=opacity;
+					gl_FragColor.a=op;
 					break;
 				}
 			}
