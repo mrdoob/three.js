@@ -224,9 +224,9 @@ objects.push(earthMesh);
 +objects.push(moonMesh);
 ```
 
-Again we added another invisible scene graph node, an `Object3D` called `earthOrbit`
-and added both the `earthMesh` and the `moonMesh` to it. The new scene graph looks like
-this.
+Again we added more invisible scene graph nodes. The first, an `Object3D` called `earthOrbit`
+and added both the `earthMesh` and the `moonOrbit` to it, also new. We then added the `mooMesh`
+to the `moonRobit`. The new scene graph looks like this.
 
 <img src="resources/images/scenegraph-sun-earth-moon.svg" align="center">
 
@@ -305,6 +305,7 @@ some function to add the helpers for each node
 +makeAxisGrid(sunMesh, 'sunMesh');
 +makeAxisGrid(earthOrbit, 'earthOrbit');
 +makeAxisGrid(earthMesh, 'earthMesh');
++makeAxisGrid(moonOrbit, 'moonOrbit');
 +makeAxisGrid(moonMesh, 'moonMesh');
 ```
 
