@@ -157,9 +157,9 @@ var SSRShader = {
 
 			return resultSegmentPoint1;
 		}
-		vec3 hash3( float n )
-		{
-				return fract(sin(vec3(n,n+1.0,n+2.0))*vec3(43758.5453123,22578.1459123,19642.3490423));
+		vec3 hash3( float n ){
+			// http://glslsandbox.com/e#61476.1
+			return fract(sin(vec3(n,n+1.0,n+2.0))*vec3(43758.5453123,22578.1459123,19642.3490423));
 		}
 		void main(){
 			if(isSelective){
