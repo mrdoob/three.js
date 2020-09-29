@@ -887,6 +887,10 @@ const ShaderLib = {
 				outColor.rgb = NODE_COLOR;
 			#endif
 
+			#ifdef NODE_OPACITY
+				outColor.a *= NODE_OPACITY;
+			#endif
+
 		}`
 	},
 	line_basic: {
