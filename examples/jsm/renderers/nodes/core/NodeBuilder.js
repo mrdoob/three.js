@@ -19,19 +19,13 @@ class NodeBuilder {
 		
 	}
 	
-	setShaderStage( shaderStage ) {
-		
-		this.shaderStage = shaderStage;
-		
-	}
-	
 	addSlot( shader, slot ) {
 		
 		this.slots[ shader ].push( slot );
 		
 	}
 	
-	addDefine( shader, name, value = '' ) {
+	define( shader, name, value = '' ) {
 		
 		this.defines[ shader ][ name ] = value;
 		
@@ -70,9 +64,9 @@ class NodeBuilder {
 	getTypeLength( type ) {
 
 		if ( type === 'float' ) return 1;
-		else if ( type === 'vec2' ) return 2;
-		else if ( type === 'vec3' ) return 3;
-		else if ( type === 'vec4' ) return 3;
+		if ( type === 'vec2' ) return 2;
+		if ( type === 'vec3' ) return 3;
+		if ( type === 'vec4' ) return 4;
 
 		return 0;
 
@@ -116,12 +110,14 @@ class NodeBuilder {
 		return nodeUniform;
 		
 	}
+	
 	/*
 	analyzeNode( node ) {
 		
 		
 	}
 	*/
+	
 	flowNode( node, output ) {
 		
 		let flowData = {};
@@ -149,14 +145,14 @@ class NodeBuilder {
 	
 	build( shaderStage ) {
 		
-		this.setShaderStage( shaderStage );
+		this.shaderStage = shaderStage;
 		
 		const slots = this.slots[ shaderStage ];
 		const uniforms = this.uniforms[ shaderStage ];
 		
 		if ( slots.length ) {
 			
-			this.addDefine( shaderStage, 'NODE', VERSION );
+			this.define( shaderStage, 'NODE', VERSION );
 			
 			for( let i = 0; i < slots.length; i++) {
 			
@@ -164,7 +160,7 @@ class NodeBuilder {
 				
 				let flowData = this.flowNode( slot.node, slot.output );
 				
-				this.addDefine( shaderStage, `NODE_${slot.name}`, flowData.result );
+				this.define( shaderStage, `NODE_${slot.name}`, flowData.result );
 				
 			}
 			
@@ -178,7 +174,7 @@ class NodeBuilder {
 				
 			}
 			
-			this.addDefine( shaderStage, 'NODE_UNIFORMS', uniformsCode );
+			this.define( shaderStage, 'NODE_UNIFORMS', uniformsCode );
 			
 		}
 		
@@ -193,8 +189,6 @@ class NodeBuilder {
 	format( code, fromType, toType ) {
 
 		const typeToType = `${fromType} -> ${toType}`;
-
-		console.log( typeToType );
 
 		switch ( typeToType ) {
 

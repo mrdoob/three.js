@@ -26,7 +26,7 @@ class InputNode extends Node {
 		
 	}
 	
-	generateConst( builder ) {
+	generateConst( /*builder*/ ) {
 		
 		console.warn("Abstract function");
 		
