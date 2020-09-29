@@ -33,7 +33,7 @@ THREE.TessellateModifier.prototype.modify = function ( geometry ) {
 
 	let edge;
 
-	while ( ! finalized && iteration < this.maxIterations && geometry.faces.length < this.maxFace ) {
+	while ( ! finalized && iteration < this.maxIterations && geometry.faces.length < this.maxFaces ) {
 
 		const faces = [];
 		const faceVertexUvs = [];

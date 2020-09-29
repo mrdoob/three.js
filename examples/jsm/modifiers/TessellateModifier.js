@@ -8,7 +8,7 @@ import {
  * Break faces with edges longer than maxEdgeLength
  */
 
-const TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6, maxFaces = 1000000 ) {
+var TessellateModifier = function ( maxEdgeLength = 0.1, maxIterations = 6, maxFaces = 1000000 ) {
 
 	this.maxEdgeLength = maxEdgeLength;
 	this.maxIterations = maxIterations;
@@ -269,7 +269,7 @@ TessellateModifier.prototype.modify = function ( geometry ) {
 
 	if ( isBufferGeometry ) {
 
-		return new BufferGeometry().fromGeometry(geometry);
+		return new BufferGeometry().fromGeometry( geometry );
 
 	} else {
 
