@@ -192,14 +192,16 @@
 						float delta = min( inc.x, min( inc.y, inc.z ) );
 						delta /= steps;
 
-						#ifdef JITTER
-							// Nice little seed from
-							// https://blog.demofox.org/2020/05/25/casual-shadertoy-path-tracing-1-basic-camera-diffuse-emissive/
-							uint seed = uint(gl_FragCoord.x) * uint(1973) + uint(gl_FragCoord.y) * uint(9277) + uint(frame) * uint(26699);
-							vec3 size = vec3(textureSize(map, 0));
-							float randNum = randomFloat(seed) * 2.0 - 1.0;
-							p += rayDir * randNum * (1.0 / size);
-						#endif
+						// Jitter
+
+						// Nice little seed from
+						// https://blog.demofox.org/2020/05/25/casual-shadertoy-path-tracing-1-basic-camera-diffuse-emissive/
+						uint seed = uint( gl_FragCoord.x ) * uint( 1973 ) + uint( gl_FragCoord.y ) * uint( 9277 ) + uint( frame ) * uint( 26699 );
+						vec3 size = vec3( textureSize( map, 0 ) );
+						float randNum = randomFloat( seed ) * 2.0 - 1.0;
+						p += rayDir * randNum * ( 1.0 / size );
+
+						//
 
 						vec4 ac = vec4( base, 0.0 );
 
@@ -230,6 +232,7 @@
 
 				const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 				const material = new THREE.RawShaderMaterial( {
+					glslVersion: THREE.GLSL3,
 					uniforms: {
 						base: { value: new THREE.Color( 0x798aa0 ) },
 						map: { value: texture },
@@ -240,15 +243,11 @@
 						steps: { value: 100 },
 						frame: { value: 0 }
 					},
-					defines: {
-						JITTER: true
-					},
 					vertexShader,
 					fragmentShader,
 					side: THREE.BackSide,
 					transparent: true
 				} );
-				material.glslVersion = '300 es';
 
 				mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
@@ -259,8 +258,7 @@
 					threshold: 0.25,
 					opacity: 0.25,
 					range: 0.1,
-					steps: 100,
-					useJittering: true
+					steps: 100
 				};
 
 				function update() {
@@ -270,18 +268,6 @@
 					material.uniforms.range.value = parameters.range;
 					material.uniforms.steps.value = parameters.steps;
 
-					if ( ! material.defines.JITTER && parameters.useJittering ) {
-
-						material.defines.JITTER = true;
-						material.needsUpdate = true;
-
-					} else if ( material.defines.JITTER && ! parameters.useJittering ) {
-
-						delete material.defines.JITTER;
-						material.needsUpdate = true;
-
-					}
-
 				}
 
 				const gui = new GUI();
@@ -289,7 +275,6 @@
 				gui.add( parameters, 'opacity', 0, 1, 0.01 ).onChange( update );
 				gui.add( parameters, 'range', 0, 1, 0.01 ).onChange( update );
 				gui.add( parameters, 'steps', 0, 200, 1 ).onChange( update );
-				gui.add( parameters, 'useJittering' ).onChange( update );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
