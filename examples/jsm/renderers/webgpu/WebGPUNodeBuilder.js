@@ -49,9 +49,15 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		
 		if ( material.isMeshBasicMaterial ) {
 			
-			if ( material.color.isNode ) {
+			if ( material.colorNode !== undefined ) {
 				
-				this.addSlot( 'fragment', new NodeSlot( material.color, 'COLOR', 'vec3' ) );
+				this.addSlot( 'fragment', new NodeSlot( material.colorNode, 'COLOR', 'vec3' ) );
+				
+			}
+			
+			if ( material.opacityNode !== undefined ) {
+				
+				this.addSlot( 'fragment', new NodeSlot( material.opacityNode, 'OPACITY', 'float' ) );
 				
 			}
 			
