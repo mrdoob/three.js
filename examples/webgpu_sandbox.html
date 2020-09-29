@@ -95,6 +95,8 @@
 				const geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
 				const materialPoints = new THREE.PointsMaterial();
 
+				materialPoints.colorNode = new Vector3Node( new THREE.Vector3( 0, .6, 1 ) );
+
 				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
 				pointCloud.position.set( 2, - 1, 0 );
 				scene.add( pointCloud );

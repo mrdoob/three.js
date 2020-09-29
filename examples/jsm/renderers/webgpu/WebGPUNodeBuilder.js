@@ -47,7 +47,7 @@ class WebGPUNodeBuilder extends NodeBuilder {
 		
 		const material = this.material;
 		
-		if ( material.isMeshBasicMaterial ) {
+		if ( material.isMeshBasicMaterial || material.isPointsMaterial ) {
 			
 			if ( material.colorNode !== undefined ) {
 				
