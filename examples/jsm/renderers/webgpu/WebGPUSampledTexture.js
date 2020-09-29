@@ -21,6 +21,34 @@ class WebGPUSampledTexture extends WebGPUBinding {
 
 }
 
+class WebGPUSampledArrayTexture extends WebGPUSampledTexture {
+
+	constructor( name ) {
+
+		super( name );
+
+		this.dimension = GPUTextureViewDimension.TwoDArray;
+
+		Object.defineProperty( this, 'isSampledArrayTexture', { value: true } );
+
+	}
+
+}
+
+class WebGPUSampled3DTexture extends WebGPUSampledTexture {
+
+	constructor( name ) {
+
+		super( name );
+
+		this.dimension = GPUTextureViewDimension.ThreeD;
+
+		Object.defineProperty( this, 'isSampled3DTexture', { value: true } );
+
+	}
+
+}
+
 class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
 
 	constructor( name ) {
@@ -35,4 +63,4 @@ class WebGPUSampledCubeTexture extends WebGPUSampledTexture {
 
 }
 
-export { WebGPUSampledTexture, WebGPUSampledCubeTexture };
+export { WebGPUSampledTexture, WebGPUSampledArrayTexture, WebGPUSampled3DTexture, WebGPUSampledCubeTexture };

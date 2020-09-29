@@ -344,7 +344,7 @@ class WebGPUTextures {
 
 		// transfer texture data
 
-		if ( texture.isDataTexture ) {
+		if ( texture.isDataTexture || texture.isDataTexture2DArray || texture.isDataTexture3D ) {
 
 			this._copyBufferToTexture( image, format, textureGPU );
 
