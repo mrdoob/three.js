@@ -31,7 +31,7 @@ import { SSRBlurShader } from "../shaders/SSRShader.js";
 import { SSRDepthShader } from "../shaders/SSRShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var SSRPass = function({ scene, camera, width, height, selects, encoding, isPerspectiveCamera = true, isBouncing = false }) {
+var SSRPass = function({ scene, camera, width, height, selects, encoding, isPerspectiveCamera = true, isBouncing = false, morphTargets = false }) {
 
   Pass.call(this);
 
@@ -153,7 +153,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
   // normal material
 
-  this.normalMaterial = new MeshNormalMaterial();
+  this.normalMaterial = new MeshNormalMaterial({ morphTargets });
   this.normalMaterial.blending = NoBlending;
 
   if (this.isSelective) {
