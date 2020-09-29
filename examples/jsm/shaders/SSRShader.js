@@ -245,7 +245,6 @@ var SSRShader = {
 				}
 
 				float sD=surfDist*clipW;
-				// float sD=surfDist;
 
 				vec3 viewRay=viewRayPoint-viewPosition;
 				float rayLen=length(viewRay);
@@ -388,7 +387,7 @@ var SSRBlurShader = {
 
     "	}",
 
-    "	gl_FragColor = vec4(  result / ( 5.0 * 5.0 ) );",
+    "	gl_FragColor = vec4(  result / ( 25.0 ) ); // 25.0 = 5.0 * 5.0",
 
     "}"
 

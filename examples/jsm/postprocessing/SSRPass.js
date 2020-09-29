@@ -44,7 +44,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.scene = scene;
 
   this.opacity = .5;
-  this.output = 6;
+  this.output = 0;
 
   this.maxDistance = 900;
   this.surfDist = 1.
@@ -55,8 +55,8 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.encoding = encoding
 
   this.isBouncing = isBouncing
-  //for bouncing
-  this.isFirstRender = true
+
+  this.isBlur = true
 
   this.isDistanceAttenuation = true
   this.attenuationDistance = 200
@@ -170,8 +170,6 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
     });
   }
 
-
-
   // blur material
 
   this.blurMaterial = new ShaderMaterial({
@@ -182,6 +180,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   });
   this.blurMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
   this.blurMaterial.uniforms['resolution'].value.set(this.width, this.height);
+
   // material for rendering the depth
 
   this.depthRenderMaterial = new ShaderMaterial({
@@ -271,12 +270,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     // render SSR
 
     if (this.isBouncing) {
-      if (this.isFirstRender) {
-        this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
-        this.isFirstRender = false
-      } else {
-        this.ssrMaterial.uniforms['tDiffuse'].value = this.prevRenderTarget.texture;
-      }
+      this.ssrMaterial.uniforms['tDiffuse'].value = this.prevRenderTarget.texture;
     } else {
       this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
     }
@@ -294,8 +288,10 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render blur
 
-    this.blurMaterial.uniforms['opacity'].value = this.opacity;
-    this.renderPass(renderer, this.blurMaterial, this.blurRenderTarget);
+    if (this.isBlur) {
+      this.blurMaterial.uniforms['opacity'].value = this.opacity;
+      this.renderPass(renderer, this.blurMaterial, this.blurRenderTarget);
+    }
 
     // output result to screen
 
@@ -303,34 +299,22 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
       case SSRPass.OUTPUT.SSR:
 
-        this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+        if (this.isBlur)
+          this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
+        else
+          this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
         this.copyMaterial.blending = NoBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
         if (this.isBouncing) {
-          this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+          if (this.isBlur)
+            this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
+          else
+            this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
           this.copyMaterial.blending = NoBlending;
           this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
 
           this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
-          this.copyMaterial.blending = AdditiveBlending;
-          this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
-        }
-
-        break;
-
-      case SSRPass.OUTPUT.Blur:
-
-        this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
-        this.copyMaterial.blending = NoBlending;
-        this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-
-        if (this.isBouncing) {
-          this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
-          this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
-
-          this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
           this.copyMaterial.blending = AdditiveBlending;
           this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
         }
@@ -374,7 +358,10 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
           this.copyMaterial.blending = NoBlending;
           this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
 
-          this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+          if (this.isBlur)
+            this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
+          else
+            this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
           this.copyMaterial.blending = AdditiveBlending;
           this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
 
@@ -386,37 +373,13 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
           this.copyMaterial.blending = NoBlending;
           this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
 
-          this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+          if (this.isBlur)
+            this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
+          else
+            this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
           this.copyMaterial.blending = AdditiveBlending;
           this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
         }
-
-        break;
-
-      case SSRPass.OUTPUT.DefaultBlur:
-
-        if (this.isBouncing) {
-          this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
-          this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
-
-          this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
-          this.copyMaterial.blending = AdditiveBlending;
-          this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
-
-          this.copyMaterial.uniforms['tDiffuse'].value = this.prevRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
-          this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-        } else {
-          this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
-          this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-
-          this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
-          this.copyMaterial.blending = AdditiveBlending;
-          this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-        }
-
 
         break;
 
@@ -554,9 +517,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
 SSRPass.OUTPUT = {
   'Default': 0,
-  'DefaultBlur': 6,
   'SSR': 1,
-  'Blur': 2,
   'Beauty': 3,
   'Depth': 4,
   'Normal': 5,

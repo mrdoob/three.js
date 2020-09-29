@@ -292,6 +292,7 @@
     // ssrPass.opacity=.2
 		// ssrPass.output=SSRPass.OUTPUT.SSR
 		gui.add(params, 'enableSSR').name( 'Enable SSR' );
+		gui.add(ssrPass, 'isBlur');
 		gui.add(params, 'darken').onChange(function(value){
 			if(value){
 				ssrPass.encoding = THREE.LinearEncoding
@@ -302,9 +303,7 @@
 		gui.add(ssrPass,'isBouncing')
 		gui.add(ssrPass, 'output', {
 			'Default': SSRPass.OUTPUT.Default,
-			'DefaultBlur': SSRPass.OUTPUT.DefaultBlur,
 			'SSR Only': SSRPass.OUTPUT.SSR,
-			'SSR Only + Blur': SSRPass.OUTPUT.Blur,
 			'Beauty': SSRPass.OUTPUT.Beauty,
 			'Depth': SSRPass.OUTPUT.Depth,
 			'Normal': SSRPass.OUTPUT.Normal,
