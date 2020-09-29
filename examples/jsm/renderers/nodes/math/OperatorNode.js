@@ -15,20 +15,29 @@ import Node from '../core/Node.js';
 
 	getType( builder ) {
 		
-		// ignore auto length for now
+		const typeA = this.a.getType( builder );
+		const typeB = this.b.getType( builder );
 		
-		return this.a.getType( builder );
+		if ( builder.getTypeLength( typeB ) > builder.getTypeLength( typeA ) ) {
+
+			// use the greater length vector
+
+			return typeB;
+
+		}
+
+		return typeA;
 		
 	}
 
 	generate( builder, output ) {
 
-		const nodeType = this.getType( builder );
+		const type = this.getType( builder );
 
-		const a = this.a.build( builder, nodeType );
-		const b = this.b.build( builder, nodeType );
+		const a = this.a.build( builder, type );
+		const b = this.b.build( builder, type );
 
-		return builder.format( '( ' + a + ' ' + this.op + ' ' + b + ' )', nodeType, output );
+		return builder.format( '( ' + a + ' ' + this.op + ' ' + b + ' )', type, output );
 
 	}
 		

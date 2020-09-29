@@ -4,7 +4,7 @@ class Node {
 		
 		this.type = type;
 		
-		this.isNode = true;
+		Object.defineProperty( this, 'isNode', { value: true } );
 		
 	}
 	

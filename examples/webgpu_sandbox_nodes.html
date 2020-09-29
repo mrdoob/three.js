@@ -19,6 +19,7 @@
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
+			import FloatNode from './jsm/renderers/nodes/inputs/FloatNode.js';
 			import Vector3Node from './jsm/renderers/nodes/inputs/Vector3Node.js';
 			import OperatorNode from './jsm/renderers/nodes/math/OperatorNode.js';
 
@@ -52,7 +53,9 @@
 				const geometryBox = new THREE.BoxBufferGeometry();
 				const materialBox = new THREE.MeshBasicMaterial( { map: texture } );
 
-				materialBox.color = new OperatorNode( '+', new Vector3Node( new THREE.Vector3( 0, .6, 0 ) ), new Vector3Node( new THREE.Vector3( 0, 0, 1 ) ) );
+				//materialBox.color = new OperatorNode( '+', new Vector3Node( new THREE.Vector3( 0, .6, 0 ) ), new Vector3Node( new THREE.Vector3( 0, 0, 1 ) ) );
+				materialBox.color = new OperatorNode( '+', new FloatNode( .5 ), new Vector3Node( new THREE.Vector3( 0, 0, 1 ) ) );
+				//materialBox.color = new Vector3Node( new THREE.Vector3( 0, 0, 1 ) );
 
 				box = new THREE.Mesh( geometryBox, materialBox );
 				box.position.set( 0, 1, 0 );
@@ -65,7 +68,7 @@
 
 				const plane = new THREE.Mesh( geometryPlane, materialPlane );
 				plane.position.set( 0, - 1, 0 );
-				scene.add( plane );
+				//scene.add( plane );
 
 				// compressed texture
 
@@ -76,7 +79,7 @@
 
 				const boxCompressed = new THREE.Mesh( geometryBox, materialCompressed );
 				boxCompressed.position.set( - 2, 1, 0 );
-				scene.add( boxCompressed );
+				//scene.add( boxCompressed );
 
 				// points
 
@@ -94,7 +97,7 @@
 
 				const pointCloud = new THREE.Points( geometryPoints, materialPoints );
 				pointCloud.position.set( 2, - 1, 0 );
-				scene.add( pointCloud );
+				//scene.add( pointCloud );
 
 				// lines
 
@@ -107,7 +110,7 @@
 				const materialLine = new THREE.LineBasicMaterial();
 				const line = new THREE.Line( geometryLine, materialLine );
 				line.position.set( 2, 1, 0 );
-				scene.add( line );
+				//scene.add( line );
 
 				//
 

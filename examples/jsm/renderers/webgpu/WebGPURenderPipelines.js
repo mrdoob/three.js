@@ -21,6 +21,8 @@ class WebGPURenderPipelines {
 		this.glslang = glslang;
 		this.sampleCount = sampleCount;
 
+		this.nodeBindings = new WeakMap();
+
 		this.pipelines = new WeakMap();
 		this.shaderAttributes = new WeakMap();
 		this.shaderModules = {
@@ -63,11 +65,11 @@ class WebGPURenderPipelines {
 
 			// parse nodes
 
-			const nodeBuilder = new WebGPUNodeBuilder();
+			const nodeBuilder = new WebGPUNodeBuilder( material, this.renderer );
 
-			nodeBuilder.setMaterial( material );
-			
 			shader = nodeBuilder.parse( shader.vertexShader, shader.fragmentShader );
+
+			this.nodeBindings.set( object, nodeBuilder.getBindings() );
 
 			// shader modules
 
@@ -207,6 +209,12 @@ class WebGPURenderPipelines {
 		}
 
 		return pipeline;
+
+	}
+
+	getNodeBindings( object ) {
+
+		return this.nodeBindings.get( object );
 
 	}
 
@@ -789,7 +797,6 @@ class WebGPURenderPipelines {
 const ShaderLib = {
 	mesh_basic: {
 		vertexShader: `#version 450
-
 		layout(location = 0) in vec3 position;
 		layout(location = 1) in vec2 uv;
 
@@ -818,7 +825,11 @@ const ShaderLib = {
 		layout(set = 0, binding = 3) uniform sampler mySampler;
 		layout(set = 0, binding = 4) uniform texture2D myTexture;
 
-		#pragma node_uniforms
+		#ifdef NODE_UNIFORMS
+		layout(set = 0, binding = 5) uniform NodeUniforms {
+			NODE_UNIFORMS
+		} nodeUniforms;
+		#endif
 
 		layout(location = 0) in vec2 vUv;
 		layout(location = 0) out vec4 outColor;

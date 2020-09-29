@@ -1,21 +1,27 @@
+import NodeUniform from './NodeUniform.js';
+
 const VERSION = '1';
 
 class NodeBuilder {
 
-	constructor() {
+	constructor( material, renderer ) {
+		
+		this.material = material;
+		this.renderer = renderer;
 		
 		this.slots = { vertex: [], fragment: [] };
 		this.defines = { vertex: {}, fragment: {} };
+		this.uniforms = { vertex: [], fragment: [] };
 		
 		this.nodesData = new WeakMap();
 		
-		this.shader = undefined;
+		this.shaderStage = null;
 		
 	}
 	
-	setMaterial( material ) {
+	setShaderStage( shaderStage ) {
 		
-		this.material = material;
+		this.shaderStage = shaderStage;
 		
 	}
 	
@@ -25,9 +31,15 @@ class NodeBuilder {
 		
 	}
 	
-	addDefine( shader, name, value ) {
+	addDefine( shader, name, value = '' ) {
 		
-		this.defines[ shader ][ name ] = value || '';
+		this.defines[ shader ][ name ] = value;
+		
+	}
+	
+	generateVec2( x, y ) {
+		
+		return `vec2( ${x}, ${y})`;
 		
 	}
 	
@@ -37,21 +49,71 @@ class NodeBuilder {
 		
 	}
 	
+	generateVec4( x, y, z, w ) {
+		
+		return `vec4( ${x}, ${y}, ${z}, ${w} )`;
+		
+	}
+	
 	generateFloat( value ) {
 		
 		return value + ( value % 1 ? '' : '.0' );
 		
 	}
-	/*
-	createDataFromNode( node ) {
+	
+	getUniformNSName( nodeUniform ) {
 		
-		return this.nodesData[ node ] = this.nodesData[ node ] || {};
+		return nodeUniform.name;
 		
 	}
-	*/
-	createUniformFromNode( node ) {
+	
+	getTypeLength( type ) {
+
+		if ( type === 'float' ) return 1;
+		else if ( type === 'vec2' ) return 2;
+		else if ( type === 'vec3' ) return 3;
+		else if ( type === 'vec4' ) return 3;
+
+		return 0;
+
+	}
+	
+	createDataFromNode( node, shaderStage = null ) {
 		
+		let nodeData = this.nodesData.get( node );
 		
+		if ( nodeData === undefined ) {
+			
+			nodeData = { vertex: {}, fragment: {} };
+			
+			this.nodesData.set( node, nodeData );
+			
+		}
+		
+		return shaderStage ? nodeData[ shaderStage ] : nodeData;
+		
+	}
+	
+	createUniformFromNode( node, shaderStage, type ) {
+		
+		const nodeData = this.createDataFromNode( node, shaderStage );
+		
+		let nodeUniform = nodeData.uniform;
+		
+		if ( nodeUniform === undefined ) {
+			
+			const uniforms = this.uniforms[shaderStage];
+			const index = uniforms.length;
+			
+			nodeUniform = new NodeUniform( 'nodeU' + index, type, node );
+			
+			uniforms.push( nodeUniform );
+			
+			nodeData.uniform = nodeUniform;
+			
+		}
+		
+		return nodeUniform;
 		
 	}
 	/*
@@ -77,7 +139,7 @@ class NodeBuilder {
 		
 		for ( let name in defines ) {
 			
-			code += `#define NODE_${name} ${defines[name]}\n`;
+			code += `#define ${name} ${defines[name]}\n`;
 			
 		}
 		
@@ -85,27 +147,42 @@ class NodeBuilder {
 		
 	}
 	
-	build( shader ) {
+	build( shaderStage ) {
 		
-		const slots = this.slots[ shader ];
+		this.setShaderStage( shaderStage );
+		
+		const slots = this.slots[ shaderStage ];
+		const uniforms = this.uniforms[ shaderStage ];
 		
 		if ( slots.length ) {
 			
-			this.addDefine( shader, 'NODE', VERSION );
+			this.addDefine( shaderStage, 'NODE', VERSION );
 			
 			for( let i = 0; i < slots.length; i++) {
 			
 				let slot = slots[i];
 				
-				let flowData = this.flowNode( slot.node );
+				let flowData = this.flowNode( slot.node, slot.output );
 				
-				this.addDefine( shader, slot.name, flowData.result );
+				this.addDefine( shaderStage, `NODE_${slot.name}`, flowData.result );
 				
 			}
 			
+			let uniformsCode = '';
+			
+			for( let i = 0; i < uniforms.length; i++) {
+				
+				let uniform = uniforms[i];
+				
+				uniformsCode += `${uniform.type} ${uniform.name}; `;
+				
+			}
+			
+			this.addDefine( shaderStage, 'NODE_UNIFORMS', uniformsCode );
+			
 		}
 		
-		let defines = this.buildDefines( shader );
+		let defines = this.buildDefines( shaderStage );
 		
 		return {
 			defines
@@ -115,45 +192,15 @@ class NodeBuilder {
 	
 	format( code, fromType, toType ) {
 
-		const typeToType = toType + ' <- ' + fromType;
+		const typeToType = `${fromType} -> ${toType}`;
+
+		console.log( typeToType );
 
 		switch ( typeToType ) {
 
-			case 'f <- v2' : return code + '.x';
-			case 'f <- v3' : return code + '.x';
-			case 'f <- v4' : return code + '.x';
-			case 'f <- i' :
-			case 'f <- b' :	return 'float( ' + code + ' )';
-
-			case 'v2 <- f' : return 'vec2( ' + code + ' )';
-			case 'v2 <- v3': return code + '.xy';
-			case 'v2 <- v4': return code + '.xy';
-			case 'v2 <- i' :
-			case 'v2 <- b' : return 'vec2( float( ' + code + ' ) )';
-
-			case 'v3 <- f' : return 'vec3( ' + code + ' )';
-			case 'v3 <- v2': return 'vec3( ' + code + ', 0.0 )';
-			case 'v3 <- v4': return code + '.xyz';
-			case 'v3 <- i' :
-			case 'v3 <- b' : return 'vec2( float( ' + code + ' ) )';
-
-			case 'v4 <- f' : return 'vec4( ' + code + ' )';
-			case 'v4 <- v2': return 'vec4( ' + code + ', 0.0, 1.0 )';
-			case 'v4 <- v3': return 'vec4( ' + code + ', 1.0 )';
-			case 'v4 <- i' :
-			case 'v4 <- b' : return 'vec4( float( ' + code + ' ) )';
-
-			case 'i <- f' :
-			case 'i <- b' : return 'int( ' + code + ' )';
-			case 'i <- v2' : return 'int( ' + code + '.x )';
-			case 'i <- v3' : return 'int( ' + code + '.x )';
-			case 'i <- v4' : return 'int( ' + code + '.x )';
-
-			case 'b <- f' : return '( ' + code + ' != 0.0 )';
-			case 'b <- v2' : return '( ' + code + ' != vec2( 0.0 ) )';
-			case 'b <- v3' : return '( ' + code + ' != vec3( 0.0 ) )';
-			case 'b <- v4' : return '( ' + code + ' != vec4( 0.0 ) )';
-			case 'b <- i' : return '( ' + code + ' != 0 )';
+			case 'float -> vec3' : return `vec3( ${code} )`;
+			
+			case 'vec3 -> float' : return `${code}.x`;
 
 		}
 

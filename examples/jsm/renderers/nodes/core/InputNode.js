@@ -5,15 +5,28 @@ class InputNode extends Node {
 	constructor( type ) {
 		
 		super( type );
+
+		this.constant = false;
 		
-		this.isInputNode = true;
-		
-		// force constant for now
-		this.constant = true;
+		Object.defineProperty( this, 'isInputNode', { value: true } );
 		
 	}
 	
-	generateConst( builder, output ) {
+	setConst( value ) {
+		
+		this.constant = value;
+		
+		return this;
+		
+	}
+	
+	getConst() {
+		
+		return this.constant;
+		
+	}
+	
+	generateConst( builder ) {
 		
 		console.warn("Abstract function");
 		
@@ -21,13 +34,18 @@ class InputNode extends Node {
 	
 	generate( builder, output ) {
 		
-		if ( this.constant ) {
+		const type = this.getType( builder );
 		
-			return builder.format( this.generateConst( builder, output ), output );
+		if ( this.constant === true ) {
+		
+			return builder.format( this.generateConst( builder ), type, output );
 			
 		} else {
 			
-			builder.createUniformFromNode( node );
+			const nodeUniform = builder.createUniformFromNode( this, builder.shaderStage, this.getType( builder ) );
+			const nsName = builder.getUniformNSName( nodeUniform );
+			
+			return builder.format( nsName, type, output );
 			
 		}
 		

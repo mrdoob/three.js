@@ -4,9 +4,9 @@ class Vector3Node extends InputNode {
 
 	constructor( value ) {
 
-		super( 'v3' );
+		super( 'vec3' );
 
-		this.value = value
+		this.value = value;
 
 	}
 
