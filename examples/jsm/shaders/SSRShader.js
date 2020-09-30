@@ -10,6 +10,12 @@ import {
 var SSRShader = {
 
   defines: {
+    MAX_STEP: 0,
+    isPerspectiveCamera: true,
+    isDistanceAttenuation: true,
+    infiniteThick: true,
+    isNoise: false,
+    isSelective: false,
   },
 
   uniforms: {
@@ -27,13 +33,8 @@ var SSRShader = {
     "maxDistance": { value: 0.05 },
     "cameraRange": { value: 0 },
     "surfDist": { value: 0 },
-    "isSelective": { value: null },
-    "isPerspectiveCamera": { value: null },
-    "isDistanceAttenuation": { value: null },
     "attenuationDistance": { value: null },
-    "infiniteThick": { value: null },
     "thickTolerance": { value: null },
-    "isNoise": { value: null },
     "noiseIntensity": { value: null },
 
   },
@@ -55,13 +56,11 @@ var SSRShader = {
   fragmentShader: `
 		precision highp float;
 		precision highp sampler2D;
-		#define MAX_STEP TO_BE_REPLACE
 		varying vec2 vUv;
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
 		uniform sampler2D tMetalness;
 		uniform sampler2D tDiffuse;
-		uniform bool isSelective;
 		uniform float cameraRange;
 		uniform vec2 resolution;
 		uniform float opacity;
@@ -71,11 +70,7 @@ var SSRShader = {
 		uniform float surfDist;
 		uniform mat4 cameraProjectionMatrix;
 		uniform mat4 cameraInverseProjectionMatrix;
-		uniform bool isPerspectiveCamera;
-		uniform bool isDistanceAttenuation;
-		uniform bool infiniteThick;
 		uniform float thickTolerance;
-		uniform bool isNoise;
 		uniform float noiseIntensity;
 		uniform float attenuationDistance;
 		#include <packing>
@@ -162,10 +157,10 @@ var SSRShader = {
 			return fract(sin(vec3(n,n+1.0,n+2.0))*vec3(43758.5453123,22578.1459123,19642.3490423));
 		}
 		void main(){
-			if(isSelective){
+			#ifdef isSelective
 				float metalness=texture2D(tMetalness,vUv).r;
 				if(metalness==0.) return;
-			}
+			#endif
 
 			float depth = getDepth( vUv );
 			float viewZ = getViewZ( depth );
@@ -179,17 +174,17 @@ var SSRShader = {
 
 			vec3 viewNormal=getViewNormal( vUv );
 
-			if(isNoise){
+			#ifdef isNoise
 				viewNormal+=(hash3(viewPosition.x+viewPosition.y+viewPosition.z)-.5)*noiseIntensity;
 				viewNormal=normalize(viewNormal);
-			}
+			#endif
 
 			vec3 viewReflectDir;
-			if(isPerspectiveCamera){
+			#ifdef isPerspectiveCamera
 				viewReflectDir=reflect(normalize(viewPosition),viewNormal);
-			}else{
+			#else
 				viewReflectDir=reflect(vec3(0,0,-1),viewNormal);
-			}
+			#endif
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
 			if(d1viewPosition.z>-cameraNear){
 				vec2 tempXY=viewPosition.xy;
@@ -238,28 +233,30 @@ var SSRShader = {
 				viewNearPlanePoint=vec3(viewNearPlanePointXY,-cameraNear);//view
 
 				vec3 viewRayPoint;
-				if(isPerspectiveCamera){
+				#ifdef isPerspectiveCamera
 					viewRayPoint=lineLineIntersection(viewPosition,d1viewPosition,vec3_0,viewNearPlanePoint);
-				}else{
+				#else
 					viewRayPoint=lineLineIntersection(viewPosition,d1viewPosition,vec3(viewNearPlanePoint.x,viewNearPlanePoint.y,0),viewNearPlanePoint);
-				}
+				#endif
 
 				float sD=surfDist*clipW;
 
 				vec3 viewRay=viewRayPoint-viewPosition;
 				float rayLen=length(viewRay);
 
-				if(infiniteThick&&viewRayPoint.z+thickTolerance*clipW<vP.z) break;
+				#ifdef infiniteThick
+					if(viewRayPoint.z+thickTolerance*clipW<vP.z) break;
+				#endif
 
 				float away=length(vP-viewRayPoint);
 
 				float op=opacity;
-				if(isDistanceAttenuation){
+				#ifdef isDistanceAttenuation
 					if(rayLen>=attenuationDistance) break;
 					float attenuation=(1.-rayLen/attenuationDistance);
 					attenuation=attenuation*attenuation;
 					op=opacity*attenuation;
-				}
+				#endif
 
 				if(away<sD){
 					vec3 vN=getViewNormal( uv );

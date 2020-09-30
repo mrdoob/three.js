@@ -58,13 +58,46 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
   this.isBlur = true
 
-  this.isDistanceAttenuation = true
+  this._isDistanceAttenuation = true
+  Object.defineProperty(this, 'isDistanceAttenuation', {
+    get() {
+      return this._isDistanceAttenuation
+    },
+    set(val) {
+      if (this._isDistanceAttenuation === val) return
+      this._isDistanceAttenuation = val
+      this.ssrMaterial.defines.isDistanceAttenuation = val
+      this.ssrMaterial.needsUpdate = true
+    }
+  })
   this.attenuationDistance = 200
 
-  this.infiniteThick = true
+  this._infiniteThick = true
+  Object.defineProperty(this, 'infiniteThick', {
+    get() {
+      return this._infiniteThick
+    },
+    set(val) {
+      if (this._infiniteThick === val) return
+      this._infiniteThick = val
+      this.ssrMaterial.defines.infiniteThick = val
+      this.ssrMaterial.needsUpdate = true
+    }
+  })
   this.thickTolerance = .03
 
-  this.isNoise = false
+  this._isNoise = false
+  Object.defineProperty(this, 'isNoise', {
+    get() {
+      return this._isNoise
+    },
+    set(val) {
+      if (this._isNoise === val) return
+      this._isNoise = val
+      this.ssrMaterial.defines.isNoise = val
+      this.ssrMaterial.needsUpdate = true
+    }
+  })
   this.noiseIntensity = .1
 
   // beauty render target with depth buffer
@@ -127,19 +160,25 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
   }
 
-  SSRShader.fragmentShader = SSRShader.fragmentShader.replace(/#define MAX_STEP .*/, `#define MAX_STEP ${Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight)}`)
   this.ssrMaterial = new ShaderMaterial({
-    defines: Object.assign({}, SSRShader.defines),
+    defines: Object.assign({
+      MAX_STEP: Math.sqrt(window.innerWidth * window.innerWidth + window.innerHeight * window.innerHeight)
+    }, SSRShader.defines),
     uniforms: UniformsUtils.clone(SSRShader.uniforms),
     vertexShader: SSRShader.vertexShader,
     fragmentShader: SSRShader.fragmentShader,
     blending: NoBlending
   });
+  if (!isPerspectiveCamera) {
+    this.ssrMaterial.defines.isPerspectiveCamera = isPerspectiveCamera
+    this.ssrMaterial.needsUpdate = true
+  }
 
   this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
   this.ssrMaterial.uniforms['tNormal'].value = this.normalRenderTarget.texture;
   if (this.isSelective) {
-    this.ssrMaterial.uniforms['isSelective'].value = true;
+    this.ssrMaterial.defines.isSelective = this.isSelective
+    this.ssrMaterial.needsUpdate = true
     this.ssrMaterial.uniforms['tMetalness'].value = this.metalnessRenderTarget.texture;
   }
   this.ssrMaterial.uniforms['tDepth'].value = this.beautyRenderTarget.depthTexture;
@@ -149,7 +188,6 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.ssrMaterial.uniforms['resolution'].value.set(this.width, this.height);
   this.ssrMaterial.uniforms['cameraProjectionMatrix'].value.copy(this.camera.projectionMatrix);
   this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.copy(this.camera.projectionMatrixInverse);
-  this.ssrMaterial.uniforms['isPerspectiveCamera'].value = isPerspectiveCamera
 
   // normal material
 
@@ -277,11 +315,8 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.ssrMaterial.uniforms['opacity'].value = this.opacity;
     this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
     this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
-    this.ssrMaterial.uniforms['isDistanceAttenuation'].value = this.isDistanceAttenuation
     this.ssrMaterial.uniforms['attenuationDistance'].value = this.attenuationDistance
-    this.ssrMaterial.uniforms['infiniteThick'].value = this.infiniteThick
     this.ssrMaterial.uniforms['thickTolerance'].value = this.thickTolerance
-    this.ssrMaterial.uniforms['isNoise'].value = this.isNoise
     this.ssrMaterial.uniforms['noiseIntensity'].value = this.noiseIntensity
     this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
 
@@ -497,7 +532,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.width = width;
     this.height = height;
 
-    this.ssrMaterial.fragmentShader = this.ssrMaterial.fragmentShader = SSRShader.fragmentShader.replace(/#define MAX_STEP .*/, `#define MAX_STEP ${Math.sqrt(width * width + height * height)}`)
+    this.ssrMaterial.defines.MAX_STEP = Math.sqrt(width * width + height * height)
     this.ssrMaterial.needsUpdate = true
     this.beautyRenderTarget.setSize(width, height);
     this.ssrRenderTarget.setSize(width, height);
