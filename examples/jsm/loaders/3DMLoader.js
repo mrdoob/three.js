@@ -446,12 +446,20 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 			case 'Mesh':
 			case 'Extrusion':
+			case 'SubD':
 
 				var geometry = loader.parse( obj.geometry );
 
 				if ( geometry.attributes.hasOwnProperty( 'color' ) ) {
 
 					mat.vertexColors = true;
+
+				}
+
+				if ( mat === null ) {
+
+					mat = this._createMaterial();
+					mat = this._compareMaterials( mat );
 
 				}
 
@@ -509,8 +517,13 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				var width = ctx.measureText( geometry.text ).width + 10;
 				var height = geometry.fontHeight + 10;
 
-				ctx.canvas.width = width;
-				ctx.canvas.height = height;
+				var r = window.devicePixelRatio;
+
+				ctx.canvas.width = width * r;
+				ctx.canvas.height = height * r;
+				ctx.canvas.style.width = width + 'px';
+				ctx.canvas.style.height = height + 'px';
+				ctx.setTransform( r, 0, 0, r, 0, 0 );
 
 				ctx.font = font;
 				ctx.textBaseline = 'middle';
@@ -548,7 +561,6 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					light.castShadow = attributes.castsShadows;
 					light.position.set( geometry.location[ 0 ], geometry.location[ 1 ], geometry.location[ 2 ] );
 					light.target.position.set( geometry.direction[ 0 ], geometry.direction[ 1 ], geometry.direction[ 2 ] );
-
 					light.shadow.normalBias = 0.1;
 
 				} else if ( geometry.isPointLight ) {
@@ -592,6 +604,9 @@ Rhino3dmLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				if ( light ) {
 
 					light.intensity = geometry.intensity;
+					var _color = geometry.diffuse;
+					var color = new Color( _color.r / 255.0, _color.g / 255.0, _color.b / 255.0 );
+					light.color = color;
 					light.userData[ 'attributes' ] = attributes;
 					light.userData[ 'objectType' ] = obj.objectType;
 
@@ -1166,10 +1181,23 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 
 				break;
 
+			case rhino.ObjectType.SubD:
+
+				// TODO: precalculate resulting vertices and faces and warn on excessive results
+				_geometry.subdivide( 3 );
+				var mesh = rhino.Mesh.createFromSubDControlNet( _geometry );
+				if ( mesh ) {
+
+					geometry = mesh.toThreejsJSON();
+					mesh.delete();
+
+				}
+
+				break;
+
 				/*
 				case rhino.ObjectType.Annotation:
 				case rhino.ObjectType.Hatch:
-				case rhino.ObjectType.SubD:
 				case rhino.ObjectType.ClipPlane:
 				*/
 

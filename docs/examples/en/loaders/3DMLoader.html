@@ -15,7 +15,7 @@
 			A loader for Rhinoceros 3d files and objects. <br /><br />
 			Rhinoceros is a 3D modeler used to create, edit, analyze, document, render, animate, and translate NURBS curves, surfaces, solids, point clouds, as well as polygon meshes and SubD objects.
 			[link:https://github.com/mcneel/rhino3dm rhino3dm.js] is compiled to WebAssembly from the open source geometry library [link:https://github.com/mcneel/opennurbs openNURBS].
-
+			Currently uses rhino3dm.js 0.13.0
 		</p>
 
 		<h2>Supported Conversions</h2>
@@ -43,7 +43,7 @@
 			</tr>
 			<tr>
 				<td>Curve</td>
-				<td>[page:Line Line]</td>
+				<td>[page:Line Line] <sup>1</sup></td>
 			</tr>
 			<tr>
 				<td>Mesh</td>
@@ -51,11 +51,15 @@
 			</tr>
 			<tr>
 				<td>Extrusion</td>
-				<td>[page:Mesh Mesh]</td>
+				<td>[page:Mesh Mesh] <sup> 2</sup></td>
 			</tr>
 			<tr>
 				<td>BREP</td>
-				<td>[page:Object3D Object3D]</td>
+				<td>[page:Object3D Object3D] <sup>2, 3</sup></td>
+			</tr>
+			<tr>
+				<td>SubD</td>
+				<td>[page:Mesh Mesh] <sup>4</sup></td>
 			</tr>
 			<tr>
 				<td>InstanceReferences</td>
@@ -78,6 +82,19 @@
 				<td>[page:SpotLight SpotLight]</td>
 			</tr>
 		</table>
+
+		<p><i>
+			<sup>1</sup> NURBS curves are discretized to a hardcoded resolution.
+		</i></p>
+		<p><i>
+			<sup>2</sup> Types which are based on BREPs and NURBS surfaces are represented with their "Render Mesh".
+		</i></p>
+		<p><i>
+			<sup>3</sup> BREPS are converted to an Object3D with it's children array populated with BREP Faces
+		</i></p>
+		<p><i>
+			<sup>4</sup> SubD objects are represented by subdividing their control net.
+		</i></p>
 
 		<h2>Code Example</h2>
 
