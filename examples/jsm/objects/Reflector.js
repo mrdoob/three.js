@@ -46,6 +46,8 @@ var Reflector = function ( geometry, options ) {
 
 	var textureMatrix = new Matrix4();
 	var virtualCamera = new PerspectiveCamera();
+	virtualCamera.layers.disable(0);
+	virtualCamera.layers.enable(1);
 
 	var parameters = {
 		minFilter: LinearFilter,
