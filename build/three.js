@@ -63,7 +63,7 @@
 		};
 	}
 
-	var REVISION = '121dev';
+	var REVISION = '121';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -25272,7 +25272,7 @@
 			if (referenceFrame === undefined) referenceFrame = 0;
 			if (referenceClip === undefined) referenceClip = targetClip;
 			if (fps === undefined || fps <= 0) fps = 30;
-			var numTracks = targetClip.tracks.length;
+			var numTracks = referenceClip.tracks.length;
 			var referenceTime = referenceFrame / fps; // Make each track's values relative to the values at the reference frame
 
 			var _loop = function _loop(i) {
