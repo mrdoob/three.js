@@ -13,7 +13,7 @@ var SSRShader = {
     MAX_STEP: 0,
     isPerspectiveCamera: true,
     isDistanceAttenuation: true,
-    infiniteThick: true,
+    isInfiniteThick: true,
     isNoise: false,
     isSelective: false,
   },
@@ -244,7 +244,7 @@ var SSRShader = {
 				vec3 viewRay=viewRayPoint-viewPosition;
 				float rayLen=length(viewRay);
 
-				#ifdef infiniteThick
+				#ifdef isInfiniteThick
 					if(viewRayPoint.z+thickTolerance*clipW<vP.z) break;
 				#endif
 

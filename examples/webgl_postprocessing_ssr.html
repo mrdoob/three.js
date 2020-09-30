@@ -287,11 +287,10 @@
 		// GUI
 
 		gui = new GUI( { width: 400 } );
-		// ssrPass.surfDist=4.2
 		ssrPass.surfDist=.007
-    // ssrPass.opacity=.2
-		// ssrPass.output=SSRPass.OUTPUT.SSR
 		gui.add(params, 'enableSSR').name( 'Enable SSR' );
+		gui.add(ssrPass, 'isDistanceAttenuation');
+		gui.add(ssrPass, 'attenuationDistance').min(0).max(2000);
 		gui.add(ssrPass, 'isBlur');
 		gui.add(params, 'darken').onChange(function(value){
 			if(value){
@@ -315,11 +314,8 @@
 		});
 		gui.add(ssrPass, 'opacity').min(0).max(1);
 		gui.add(ssrPass, 'maxDistance').min(0).max(2000);
-		// gui.add(ssrPass, 'surfDist').min(0).max(10).step(.1);
 		gui.add(ssrPass, 'surfDist').min(0).max(.02).step(.0001);
-		gui.add(ssrPass, 'isDistanceAttenuation');
-		gui.add(ssrPass, 'attenuationDistance').min(0).max(2000);
-		gui.add(ssrPass, 'infiniteThick');
+		gui.add(ssrPass, 'isInfiniteThick');
 		gui.add(ssrPass, 'thickTolerance').min(0).max(.05).step(.0001);
 		gui.add(ssrPass, 'isNoise');
 		gui.add(ssrPass, 'noiseIntensity').min(0).max(.3).step(.01);

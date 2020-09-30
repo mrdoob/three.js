@@ -1,29 +1,21 @@
 import {
   AddEquation,
   Color,
-  CustomBlending,
   AdditiveBlending,
-  DataTexture,
   DepthTexture,
   DstAlphaFactor,
   DstColorFactor,
-  FloatType,
   LinearFilter,
-  MathUtils,
   MeshNormalMaterial,
   MeshBasicMaterial,
   NearestFilter,
   NoBlending,
   RGBAFormat,
-  RepeatWrapping,
   ShaderMaterial,
   UniformsUtils,
   UnsignedShortType,
-  Vector3,
   WebGLRenderTarget,
   ZeroFactor,
-  MeshDepthMaterial,
-  DoubleSide
 } from "../../../build/three.module.js";
 import { Pass } from "../postprocessing/Pass.js";
 import { SSRShader } from "../shaders/SSRShader.js";
@@ -54,7 +46,21 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
   this.encoding = encoding
 
-  this.isBouncing = isBouncing
+  this._isBouncing = isBouncing
+  Object.defineProperty(this, 'isBouncing', {
+    get() {
+      return this._isBouncing
+    },
+    set(val) {
+      if (this._isBouncing === val) return
+      this._isBouncing = val
+      if (val) {
+        this.ssrMaterial.uniforms['tDiffuse'].value = this.prevRenderTarget.texture;
+      } else {
+        this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+      }
+    }
+  })
 
   this.isBlur = true
 
@@ -72,15 +78,15 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   })
   this.attenuationDistance = 200
 
-  this._infiniteThick = true
-  Object.defineProperty(this, 'infiniteThick', {
+  this._isInfiniteThick = true
+  Object.defineProperty(this, 'isInfiniteThick', {
     get() {
-      return this._infiniteThick
+      return this._isInfiniteThick
     },
     set(val) {
-      if (this._infiniteThick === val) return
-      this._infiniteThick = val
-      this.ssrMaterial.defines.infiniteThick = val
+      if (this._isInfiniteThick === val) return
+      this._isInfiniteThick = val
+      this.ssrMaterial.defines.isInfiniteThick = val
       this.ssrMaterial.needsUpdate = true
     }
   })
@@ -307,11 +313,6 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     // render SSR
 
-    if (this.isBouncing) {
-      this.ssrMaterial.uniforms['tDiffuse'].value = this.prevRenderTarget.texture;
-    } else {
-      this.ssrMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
-    }
     this.ssrMaterial.uniforms['opacity'].value = this.opacity;
     this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
     this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
@@ -332,6 +333,37 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
 
     switch (this.output) {
 
+      case SSRPass.OUTPUT.Default:
+
+        if (this.isBouncing) {
+          this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+          this.copyMaterial.blending = NoBlending;
+          this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
+
+          if (this.isBlur)
+            this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
+          else
+            this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+          this.copyMaterial.blending = AdditiveBlending;
+          this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
+
+          this.copyMaterial.uniforms['tDiffuse'].value = this.prevRenderTarget.texture;
+          this.copyMaterial.blending = NoBlending;
+          this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+        } else {
+          this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
+          this.copyMaterial.blending = NoBlending;
+          this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+
+          if (this.isBlur)
+            this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
+          else
+            this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
+          this.copyMaterial.blending = AdditiveBlending;
+          this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
+        }
+
+        break;
       case SSRPass.OUTPUT.SSR:
 
         if (this.isBlur)
@@ -383,38 +415,6 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
         this.copyMaterial.uniforms['tDiffuse'].value = this.metalnessRenderTarget.texture;
         this.copyMaterial.blending = NoBlending;
         this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-
-        break;
-
-      case SSRPass.OUTPUT.Default:
-
-        if (this.isBouncing) {
-          this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
-          this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
-
-          if (this.isBlur)
-            this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
-          else
-            this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
-          this.copyMaterial.blending = AdditiveBlending;
-          this.renderPass(renderer, this.copyMaterial, this.prevRenderTarget);
-
-          this.copyMaterial.uniforms['tDiffuse'].value = this.prevRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
-          this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-        } else {
-          this.copyMaterial.uniforms['tDiffuse'].value = this.beautyRenderTarget.texture;
-          this.copyMaterial.blending = NoBlending;
-          this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-
-          if (this.isBlur)
-            this.copyMaterial.uniforms['tDiffuse'].value = this.blurRenderTarget.texture;
-          else
-            this.copyMaterial.uniforms['tDiffuse'].value = this.ssrRenderTarget.texture;
-          this.copyMaterial.blending = AdditiveBlending;
-          this.renderPass(renderer, this.copyMaterial, this.renderToScreen ? null : writeBuffer);
-        }
 
         break;
 
