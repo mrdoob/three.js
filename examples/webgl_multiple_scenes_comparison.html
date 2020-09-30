@@ -87,7 +87,7 @@
 
 			function initMeshes() {
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 1, 2 );
+				var geometry = new THREE.IcosahedronBufferGeometry( 1, 3 );
 
 				var mesh = new THREE.Mesh( geometry, new THREE.MeshStandardMaterial() );
 				sceneL.add( mesh );
@@ -131,13 +131,8 @@
 
 				}
 
+				slider.style.touchAction = 'none'; // disable touch scroll
 				slider.addEventListener( 'pointerdown', onPointerDown );
-
-				slider.addEventListener( 'touchstart', function ( event ) {
-
-					event.preventDefault(); // prevent scrolling
-
-				} );
 
 			}
 
@@ -161,7 +156,5 @@
 			}
 
 		</script>
-
 	</body>
-
 </html>

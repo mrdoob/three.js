@@ -33,6 +33,12 @@
 		Default is *anonymous*.
 		</p>
 
+		<h3>[property:boolean withCredentials]</h3>
+		<p>
+			Whether the XMLHttpRequest uses credentials. See [page:.setWithCredentials].
+			Default is *false*.
+		</p>
+
 		<h3>[property:LoadingManager manager]</h3>
 		<p>
 			The [page:LoadingManager loadingManager]  the loader is using. Default is [page:DefaultLoadingManager].
@@ -82,6 +88,13 @@
 		<h3>[method:Loader setCrossOrigin]( [param:String crossOrigin] )</h3>
 		<p>
 			[page:String crossOrigin] — The crossOrigin string to implement CORS for loading the url from a different domain that allows CORS.
+		</p>
+
+		<h3>[method:Loader setWithCredentials]( [param:Boolean value] )</h3>
+		<p>
+			Whether the XMLHttpRequest uses credentials such as cookies, authorization headers or
+			TLS client certificates. See [link:https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/withCredentials XMLHttpRequest.withCredentials].<br />
+			Note that this has no effect if you are loading files locally or from the same domain.
 		</p>
 
 		<h3>[method:Loader setPath]( [param:String path] )</h3>

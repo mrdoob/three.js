@@ -2,10 +2,6 @@
 	color-scheme: light dark;
 }
 
-html {
-	touch-action: none;
-}
-
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -278,7 +274,6 @@ input.Number {
 	font-size: 12px;
 	border: 0px;
 	padding: 2px;
-	cursor: col-resize;
 }
 
 select {
@@ -303,7 +298,7 @@ select {
 	width: 5px;
 	bottom: 0px;
 	/* background-color: rgba(255,0,0,0.5); */
-	cursor: ew-resize;
+	cursor: col-resize;
 }
 
 #viewport {

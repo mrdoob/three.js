@@ -245,6 +245,7 @@ var PRWMLoader = ( function () {
 			loader.setPath( scope.path );
 			loader.setResponseType( 'arraybuffer' );
 			loader.setRequestHeader( scope.requestHeader );
+			loader.setWithCredentials( scope.withCredentials );
 
 			url = url.replace( /\*/g, isBigEndianPlatform() ? 'be' : 'le' );
 

@@ -389,6 +389,7 @@ var list = {
 			},
 
 			"Loaders": {
+				"3DMLoader": "examples/en/loaders/3DMLoader",
 				"BasisTextureLoader": "examples/en/loaders/BasisTextureLoader",
 				"DRACOLoader": "examples/en/loaders/DRACOLoader",
 				"GLTFLoader": "examples/en/loaders/GLTFLoader",
@@ -523,7 +524,13 @@ var list = {
 				"AudioContext": "api/ar/audio/AudioContext",
 				"AudioListener": "api/ar/audio/AudioListener",
 				"PositionalAudio": "api/ar/audio/PositionalAudio"
-			}
+			},
+
+			"Cameras": {
+				"ArrayCamera": "api/ar/cameras/ArrayCamera",
+				"Camera": "api/ar/cameras/Camera",
+				"CubeCamera": "api/ar/cameras/CubeCamera",
+			},
 
 		}
 

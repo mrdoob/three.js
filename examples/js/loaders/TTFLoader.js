@@ -26,6 +26,7 @@ THREE.TTFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setPath( this.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( this.requestHeader );
+		loader.setWithCredentials( this.withCredentials );
 		loader.load( url, function ( buffer ) {
 
 			try {

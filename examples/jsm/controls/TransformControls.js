@@ -637,6 +637,7 @@ var TransformControls = function ( camera, domElement ) {
 		switch ( event.pointerType ) {
 
 			case 'mouse':
+			case 'pen':
 				scope.pointerHover( getPointer( event ) );
 				break;
 

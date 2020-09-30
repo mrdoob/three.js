@@ -18,6 +18,7 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -1152,33 +1153,16 @@ THREE.VTKLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		}
 
-		function getStringFile( data ) {
-
-			var stringFile = '';
-			var charArray = new Uint8Array( data );
-			var i = 0;
-			var len = charArray.length;
-
-			while ( len -- ) {
-
-				stringFile += String.fromCharCode( charArray[ i ++ ] );
-
-			}
-
-			return stringFile;
-
-		}
-
 		// get the 5 first lines of the files to check if there is the key word binary
 		var meta = THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 250 ) ).split( '\n' );
 
 		if ( meta[ 0 ].indexOf( 'xml' ) !== - 1 ) {
 
-			return parseXML( getStringFile( data ) );
+			return parseXML( THREE.LoaderUtils.decodeText( data ) );
 
 		} else if ( meta[ 2 ].includes( 'ASCII' ) ) {
 
-			return parseASCII( getStringFile( data ) );
+			return parseASCII( THREE.LoaderUtils.decodeText( data ) );
 
 		} else {
 

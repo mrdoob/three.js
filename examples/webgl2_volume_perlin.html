@@ -81,7 +81,7 @@
 
 				// Material
 
-				const vertexShader = `#version 300 es
+				const vertexShader = `
 					in vec3 position;
 
 					uniform mat4 modelMatrix;
@@ -102,7 +102,7 @@
 					}
 				`;
 
-				const fragmentShader = `#version 300 es
+				const fragmentShader = `
 					precision highp float;
 					precision highp sampler3D;
 
@@ -191,6 +191,7 @@
 
 				const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 				const material = new THREE.RawShaderMaterial( {
+					glslVersion: THREE.GLSL3,
 					uniforms: {
 						map: { value: texture },
 						cameraPos: { value: new THREE.Vector3() },

@@ -29,7 +29,6 @@
 			import Stats from './jsm/libs/stats.module.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
-			import { DragControls } from './jsm/controls/DragControls.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { TransformControls } from './jsm/controls/TransformControls.js';
 
@@ -42,6 +41,7 @@
 					str = str.replace( '{' + i + '}', arguments[ i ] );
 
 				}
+
 				return str;
 
 			};
@@ -52,6 +52,11 @@
 			var splinePointsLength = 4;
 			var positions = [];
 			var point = new THREE.Vector3();
+
+			var raycaster = new THREE.Raycaster();
+			var pointer = new THREE.Vector2();
+			var onUpPosition = new THREE.Vector2();
+			var onDownPosition = new THREE.Vector2();
 
 			var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
 			var transformControl;
@@ -111,10 +116,6 @@
 				helper.material.transparent = true;
 				scene.add( helper );
 
-				//var axes = new AxesHelper( 1000 );
-				//axes.position.set( - 500, - 500, - 500 );
-				//scene.add( axes );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -132,7 +133,7 @@
 					splines.uniform.tension = value;
 					updateSplineOutline();
 
-	} );
+				} );
 				gui.add( params, 'centripetal' );
 				gui.add( params, 'chordal' );
 				gui.add( params, 'addPoint' );
@@ -145,45 +146,14 @@
 				controls.damping = 0.2;
 				controls.addEventListener( 'change', render );
 
-				controls.addEventListener( 'start', function () {
-
-					cancelHideTransform();
-
-				} );
-
-				controls.addEventListener( 'end', function () {
-
-					delayHideTransform();
-
-				} );
-
 				transformControl = new TransformControls( camera, renderer.domElement );
 				transformControl.addEventListener( 'change', render );
 				transformControl.addEventListener( 'dragging-changed', function ( event ) {
 
 					controls.enabled = ! event.value;
 
-	} );
+				} );
 				scene.add( transformControl );
-
-				// Hiding transform situation is a little in a mess :()
-				transformControl.addEventListener( 'change', function () {
-
-					cancelHideTransform();
-
-				} );
-
-				transformControl.addEventListener( 'mouseDown', function () {
-
-					cancelHideTransform();
-
-				} );
-
-				transformControl.addEventListener( 'mouseUp', function () {
-
-					delayHideTransform();
-
-				} );
 
 				transformControl.addEventListener( 'objectChange', function () {
 
@@ -191,45 +161,9 @@
 
 				} );
 
-				var dragcontrols = new DragControls( splineHelperObjects, camera, renderer.domElement ); //
-				dragcontrols.enabled = false;
-				dragcontrols.addEventListener( 'hoveron', function ( event ) {
-
-					transformControl.attach( event.object );
-					cancelHideTransform();
-
-				} );
-
-				dragcontrols.addEventListener( 'hoveroff', function () {
-
-					delayHideTransform();
-
-				} );
-
-				var hiding;
-
-				function delayHideTransform() {
-
-					cancelHideTransform();
-					hideTransform();
-
-				}
-
-				function hideTransform() {
-
-					hiding = setTimeout( function () {
-
-						transformControl.detach( transformControl.object );
-
-					}, 2500 );
-
-				}
-
-				function cancelHideTransform() {
-
-					if ( hiding ) clearTimeout( hiding );
-
-				}
+				document.addEventListener( 'pointerdown', onPointerDown, false );
+				document.addEventListener( 'pointerup', onPointerUp, false );
+				document.addEventListener( 'pointermove', onPointerMove, false );
 
 				/*******
 				 * Curves
@@ -335,9 +269,13 @@
 					return;
 
 				}
+
+				const point = splineHelperObjects.pop();
 				splinePointsLength --;
 				positions.pop();
-				scene.remove( splineHelperObjects.pop() );
+
+				if ( transformControl.object === point ) transformControl.detach();
+				scene.remove( point );
 
 				updateSplineOutline();
 
@@ -423,6 +361,46 @@
 				renderer.render( scene, camera );
 
 			}
+
+			function onPointerDown( event ) {
+
+				onDownPosition.x = event.clientX;
+				onDownPosition.y = event.clientY;
+
+			}
+
+			function onPointerUp() {
+
+				onUpPosition.x = event.clientX;
+				onUpPosition.y = event.clientY;
+
+				if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) transformControl.detach();
+
+			}
+
+			function onPointerMove( event ) {
+
+				pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+				pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+				raycaster.setFromCamera( pointer, camera );
+
+				var intersects = raycaster.intersectObjects( splineHelperObjects );
+
+				if ( intersects.length > 0 ) {
+
+					var object = intersects[ 0 ].object;
+
+					if ( object !== transformControl.object ) {
+
+						transformControl.attach( object );
+
+					}
+
+				}
+
+			}
+
 
 		</script>
 
