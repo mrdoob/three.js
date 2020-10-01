@@ -88,7 +88,7 @@ var SSAOShader = {
 
 		"	#else",
 
-		"		return texture2D( tDepth, coord ).x;",
+		"		return texture2D( tDepth, screenPosition ).x;",
 
 		"	#endif",
 
@@ -225,7 +225,7 @@ var SSAODepthShader = {
 
 		"	#else",
 
-		"		return texture2D( tDepth, coord ).x;",
+		"		return texture2D( tDepth, screenPosition ).x;",
 
 		"	#endif",
 
