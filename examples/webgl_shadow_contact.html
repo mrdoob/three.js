@@ -151,7 +151,7 @@
 				depthMaterial.onBeforeCompile = function ( shader ) {
 
 					shader.uniforms.darkness = depthMaterial.userData.darkness;
-					shader.fragmentShader = `
+					shader.fragmentShader = /* glsl */`
 						uniform float darkness;
 						${shader.fragmentShader.replace(
 					'gl_FragColor = vec4( vec3( 1.0 - fragCoordZ ), opacity );',
@@ -160,6 +160,7 @@
 					`;
 
 				};
+
 				depthMaterial.depthTest = false;
 				depthMaterial.depthWrite = false;
 
