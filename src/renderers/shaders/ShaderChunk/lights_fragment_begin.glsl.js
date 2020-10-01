@@ -58,7 +58,7 @@ IncidentLight directLight;
 
 	SpotLight spotLight;
 	vec4 spotColor;
-	vec3 spotShadowCoord;
+	vec3 spotLightCoord;
 	bool inSpotLightMap;
 
 	#if defined( USE_SHADOWMAP ) && NUM_SPOT_LIGHT_SHADOWS > 0
@@ -72,10 +72,19 @@ IncidentLight directLight;
 
 		getSpotDirectLightIrradiance( spotLight, geometry, directLight );
 
-		#if defined( USE_SHADOWMAP ) && ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_MAPS )
-			spotShadowCoord = vSpotShadowCoord[ i ].xyz / vSpotShadowCoord[ i ].w;
-			inSpotLightMap = all( lessThan( abs( spotShadowCoord * 2. - 1. ), vec3( 1.0 ) ) );
-			spotColor = texture2D( spotMap[ i ], spotShadowCoord.xy );
+    // spot lights are ordered [shadows with maps, shadows without maps, maps without shadows, none]
+		#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS ) // shadow and map
+		#define LIGHT_MAP_INDEX UNROLLED_LOOP_INDEX
+		#elif (  UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS ) // shadow without map
+		#define LIGHT_MAP_INDEX NUM_SPOT_LIGHT_MAPS
+		#else  // no shadow
+		#define LIGHT_MAP_INDEX (UNROLLED_LOOP_INDEX - NUM_SPOT_LIGHT_SHADOWS + NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS)
+		#endif
+
+		#if ( LIGHT_MAP_INDEX < NUM_SPOT_LIGHT_MAPS )
+			spotLightCoord = vSpotLightCoord[ LIGHT_MAP_INDEX ].xyz / vSpotLightCoord[ LIGHT_MAP_INDEX ].w;
+			inSpotLightMap = all( lessThan( abs( spotLightCoord * 2. - 1. ), vec3( 1.0 ) ) );
+			spotColor = texture2D( spotLightMap[ LIGHT_MAP_INDEX ], spotLightCoord.xy );
 			inSpotLightMap = inSpotLightMap && ( spotColor.a > 0. );
 			directLight.visible = directLight.visible || inSpotLightMap;
 			directLight.color = inSpotLightMap ? mix( directLight.color, spotLight.color * spotColor.rgb, spotColor.a ) : directLight.color;
@@ -83,7 +92,7 @@ IncidentLight directLight;
 
 		#if defined(USE_SHADOWMAP) && ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )
 			spotLightShadow = spotLightShadows[ i ];
-			directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowBias, spotLightShadow.shadowRadius, vSpotShadowCoord[ i ] ) : 1.0;
+			directLight.color *= all( bvec2( directLight.visible, receiveShadow ) ) ? getShadow( spotShadowMap[ i ], spotLightShadow.shadowMapSize, spotLightShadow.shadowBias, spotLightShadow.shadowRadius, vSpotLightCoord[ i ] ) : 1.0;
 		#endif
 
 		RE_Direct( directLight, geometry, material, reflectedLight );

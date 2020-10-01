@@ -65,14 +65,10 @@
 
 				var video = document.getElementById( 'video' );
 				textures[textureUrls[1]] = new THREE.VideoTexture( video );
-				textures[textureUrls[1]].minFilter = THREE.LinearFilter;
-				textures[textureUrls[1]].magFilter = THREE.LinearFilter;
 
 				for ( var i = 2; i < textureUrls.length; ++i ) {
 
 					textures[textureUrls[i]] = textureLoader.load( 'textures/' + textureUrls[i] );
-					textures[textureUrls[i]].minFilter = THREE.LinearFilter;
-					textures[textureUrls[i]].magFilter = THREE.LinearFilter;
 
 				}
 
@@ -90,6 +86,7 @@
 				spotLight.shadow.camera.far = 200;
 				spotLight.shadow.focus = 1;
 				scene.add( spotLight );
+
 
 				lightHelper = new THREE.SpotLightHelper( spotLight );
 				scene.add( lightHelper );
@@ -157,12 +154,20 @@
 					penumbra: spotLight.penumbra,
 					decay: spotLight.decay,
 					focus: spotLight.shadow.focus,
-					map: 'none'
+					map: 'none',
+					castShadow: spotLight.castShadow
 				};
 
 				gui.addColor( params, 'light color' ).onChange( function ( val ) {
 
 					spotLight.color.setHex( val );
+					render();
+
+				} );
+
+				gui.add( params, 'castShadow' ).onChange( function ( val ) {
+
+					spotLight.castShadow = val;
 					render();
 
 				} );

@@ -102,7 +102,7 @@ export let UniformsLib: {
 			};
 		};
 		spotShadowMap: IUniform;
-		spotShadowMatrix: IUniform;
+		spotLightMatrix: IUniform;
 		pointLights: {
 			value: any[];
 			properties: {

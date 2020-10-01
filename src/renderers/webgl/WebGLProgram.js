@@ -173,7 +173,7 @@ function filterEmptyLine( string ) {
 
 function replaceLightNums( string, parameters ) {
 
-	var numSpotLightCoords = parameters.shadowMapEnabled ? parameters.numSpotLights : parameters.numSpotLightMaps;
+	var numSpotLightCoords = parameters.numSpotLightShadows + parameters.numSpotLightMaps - parameters.numSpotLightShadowsWithMaps;
 
 	return string
 		.replace( /NUM_DIR_LIGHTS/g, parameters.numDirLights )
@@ -184,6 +184,7 @@ function replaceLightNums( string, parameters ) {
 		.replace( /NUM_POINT_LIGHTS/g, parameters.numPointLights )
 		.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights )
 		.replace( /NUM_DIR_LIGHT_SHADOWS/g, parameters.numDirLightShadows )
+		.replace( /NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS/g, parameters.numSpotLightShadowsWithMaps )
 		.replace( /NUM_SPOT_LIGHT_SHADOWS/g, parameters.numSpotLightShadows )
 		.replace( /NUM_POINT_LIGHT_SHADOWS/g, parameters.numPointLightShadows );
 

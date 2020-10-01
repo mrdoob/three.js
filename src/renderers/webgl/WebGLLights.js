@@ -144,9 +144,11 @@ function ShadowUniformsCache() {
 
 let nextVersion = 0;
 
-function shadowCastingLightsFirst( lightA, lightB ) {
+function shadowCastingAndTexturingLightsFirst( lightA, lightB ) {
 
-	return ( lightB.castShadow ? 1 : 0 ) - ( lightA.castShadow ? 1 : 0 );
+	return ( lightB.castShadow ? 2 : 0 ) - ( lightA.castShadow ? 2 : 0 )
+	+ ( lightB.map ? 1 : 0 ) - ( lightA.map ? 1 : 0 )
+	;
 
 }
 
@@ -164,13 +166,14 @@ function WebGLLights() {
 			directionalLength: - 1,
 			pointLength: - 1,
 			spotLength: - 1,
-			spotMapLength: - 1,
+			numSpotMaps: - 1,
 			rectAreaLength: - 1,
 			hemiLength: - 1,
 
 			numDirectionalShadows: - 1,
 			numPointShadows: - 1,
-			numSpotShadows: - 1
+			numSpotShadows: - 1,
+			numSpotMaps: - 1,
 		},
 
 		ambient: [ 0, 0, 0 ],
@@ -180,10 +183,10 @@ function WebGLLights() {
 		directionalShadowMap: [],
 		directionalShadowMatrix: [],
 		spot: [],
-		spotMap: [],
+		spotLightMap: [],
 		spotShadow: [],
 		spotShadowMap: [],
-		spotShadowMatrix: [],
+		spotLightMatrix: [],
 		rectArea: [],
 		rectAreaLTC1: null,
 		rectAreaLTC2: null,
@@ -191,7 +194,8 @@ function WebGLLights() {
 		pointShadow: [],
 		pointShadowMap: [],
 		pointShadowMatrix: [],
-		hemi: []
+		hemi: [],
+		numSpotLightShadowsWithMaps: 0
 
 	};
 
@@ -210,17 +214,19 @@ function WebGLLights() {
 		let directionalLength = 0;
 		let pointLength = 0;
 		let spotLength = 0;
-		let spotMapLength = 0;
 		let rectAreaLength = 0;
 		let hemiLength = 0;
 
 		let numDirectionalShadows = 0;
 		let numPointShadows = 0;
 		let numSpotShadows = 0;
+		let numSpotMaps = 0;
+		let numSpotShadowsWithMaps = 0;
 
 		const viewMatrix = camera.matrixWorldInverse;
 
-		lights.sort( shadowCastingLightsFirst );
+		// ordering : [shadow casting + map texturing, map texturing, shadow casting, none ]
+		lights.sort( shadowCastingAndTexturingLightsFirst );
 
 		for ( let i = 0, l = lights.length; i < l; i ++ ) {
 
@@ -230,7 +236,7 @@ function WebGLLights() {
 			const intensity = light.intensity;
 			const distance = light.distance;
 
-			const map = light.map || null;
+			const lightMap = light.map || null;
 			const shadowMap = ( light.shadow && light.shadow.map ) ? light.shadow.map.texture : null;
 
 			if ( light.isAmbientLight ) {
@@ -299,11 +305,25 @@ function WebGLLights() {
 				uniforms.penumbraCos = Math.cos( light.angle * ( 1 - light.penumbra ) );
 				uniforms.decay = light.decay;
 
-				let spotId = spotLength;
+				state.spot[ spotLength ] = uniforms;
+
+				const shadow = light.shadow;
+				if ( lightMap ) {
+
+					state.spotLightMap[ numSpotMaps ] = lightMap;
+					numSpotMaps ++;
+
+					// make sure the lightMatrix is up to date
+					// TODO : do it if required only
+					shadow.updateMatrices( light );
+
+					if ( light.castShadow ) numSpotShadowsWithMaps ++;
+
+				}
+
+				state.spotLightMatrix[ spotLength ] = shadow.matrix;
 
 				if ( light.castShadow ) {
-
-					const shadow = light.shadow;
 
 					const shadowUniforms = shadowCache.get( light );
 
@@ -312,27 +332,12 @@ function WebGLLights() {
 					shadowUniforms.shadowRadius = shadow.radius;
 					shadowUniforms.shadowMapSize = shadow.mapSize;
 
-					if ( map ) {
-
-						state.spotShadow[ spotLength ] = state.spotShadow[ spotMapLength ];
-						state.spotShadowMap[ spotLength ] = state.spotShadowMap[ spotMapLength ];
-						state.spotShadowMatrix[ spotLength ] = state.spotShadowMatrix[ spotMapLength ];
-						state.spot[ spotLength ] = state.spot[ spotMapLength ];
-						spotId = spotMapLength;
-						state.spotMap[ spotId ] = map;
-						spotMapLength ++;
-
-					}
-
-					state.spotShadow[ spotId ] = shadowUniforms;
-					state.spotShadowMap[ spotId ] = shadowMap;
-					state.spotShadowMatrix[ spotId ] = shadow.matrix;
+					state.spotShadow[ spotLength ] = shadowUniforms;
+					state.spotShadowMap[ spotLength ] = shadowMap;
 
 					numSpotShadows ++;
 
 				}
-
-				state.spot[ spotId ] = uniforms;
 
 				spotLength ++;
 
@@ -433,18 +438,17 @@ function WebGLLights() {
 		state.ambient[ 0 ] = r;
 		state.ambient[ 1 ] = g;
 		state.ambient[ 2 ] = b;
-
 		const hash = state.hash;
 
 		if ( hash.directionalLength !== directionalLength ||
 			hash.pointLength !== pointLength ||
 			hash.spotLength !== spotLength ||
-			hash.spotMapLength !== spotMapLength ||
 			hash.rectAreaLength !== rectAreaLength ||
 			hash.hemiLength !== hemiLength ||
 			hash.numDirectionalShadows !== numDirectionalShadows ||
 			hash.numPointShadows !== numPointShadows ||
-			hash.numSpotShadows !== numSpotShadows ) {
+			hash.numSpotShadows !== numSpotShadows ||
+			hash.numSpotMaps !== numSpotMaps ) {
 
 			state.directional.length = directionalLength;
 			state.spot.length = spotLength;
@@ -460,19 +464,20 @@ function WebGLLights() {
 			state.spotShadowMap.length = numSpotShadows;
 			state.directionalShadowMatrix.length = numDirectionalShadows;
 			state.pointShadowMatrix.length = numPointShadows;
-			state.spotShadowMatrix.length = numSpotShadows;
-			state.spotMap.length = spotMapLength;
+			state.spotLightMatrix.length = numSpotShadows + numSpotMaps - numSpotShadowsWithMaps;
+			state.spotLightMap.length = numSpotMaps;
+			state.numSpotLightShadowsWithMaps = numSpotShadowsWithMaps;
 
 			hash.directionalLength = directionalLength;
 			hash.pointLength = pointLength;
 			hash.spotLength = spotLength;
-			hash.spotMapLength = spotMapLength;
 			hash.rectAreaLength = rectAreaLength;
 			hash.hemiLength = hemiLength;
 
 			hash.numDirectionalShadows = numDirectionalShadows;
 			hash.numPointShadows = numPointShadows;
 			hash.numSpotShadows = numSpotShadows;
+			hash.numSpotMaps = numSpotMaps;
 
 			state.version = nextVersion ++;
 

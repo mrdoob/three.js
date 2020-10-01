@@ -43,7 +43,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		"maxBones", "useVertexTexture", "morphTargets", "morphNormals",
 		"maxMorphTargets", "maxMorphNormals", "premultipliedAlpha",
 		"numDirLights", "numPointLights", "numSpotLights", "numSpotLightMaps", "numHemiLights", "numRectAreaLights",
-		"numDirLightShadows", "numPointLightShadows", "numSpotLightShadows",
+		"numDirLightShadows", "numPointLightShadows", "numSpotLightShadows", "numSpotLightShadowsWithMaps",
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering",
 		"sheen", "transmissionMap"
@@ -233,13 +233,14 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 			numDirLights: lights.directional.length,
 			numPointLights: lights.point.length,
 			numSpotLights: lights.spot.length,
-			numSpotLightMaps: lights.spotMap.length,
+			numSpotLightMaps: lights.spotLightMap.length,
 			numRectAreaLights: lights.rectArea.length,
 			numHemiLights: lights.hemi.length,
 
 			numDirLightShadows: lights.directionalShadowMap.length,
 			numPointLightShadows: lights.pointShadowMap.length,
 			numSpotLightShadows: lights.spotShadowMap.length,
+			numSpotLightShadowsWithMaps: lights.numSpotLightShadowsWithMaps,
 
 			numClippingPlanes: clipping.numPlanes,
 			numClipIntersection: clipping.numIntersection,
