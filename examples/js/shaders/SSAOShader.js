@@ -85,7 +85,7 @@ THREE.SSAOShader = {
 
 		"	#else",
 
-		"		return texture2D( depthSampler, coord ).x;",
+		"		return texture2D( tDepth, coord ).x;",
 
 		"	#endif",
 
@@ -222,7 +222,7 @@ THREE.SSAODepthShader = {
 
 		"	#else",
 
-		"		return texture2D( depthSampler, coord ).x;",
+		"		return texture2D( tDepth, coord ).x;",
 
 		"	#endif",
 
