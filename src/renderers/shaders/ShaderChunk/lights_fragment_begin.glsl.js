@@ -72,12 +72,12 @@ IncidentLight directLight;
 
 		getSpotDirectLightIrradiance( spotLight, geometry, directLight );
 
-    // spot lights are ordered [shadows with maps, shadows without maps, maps without shadows, none]
-		#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS ) // shadow and map
+		// spot lights are ordered [shadows with maps, shadows without maps, maps without shadows, none]
+		#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS )
 		#define SPOT_LIGHT_MAP_INDEX UNROLLED_LOOP_INDEX
-		#elif (  UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS ) // shadow without map
+		#elif (  UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )
 		#define SPOT_LIGHT_MAP_INDEX NUM_SPOT_LIGHT_MAPS
-		#else  // no shadow
+		#else
 		#define SPOT_LIGHT_MAP_INDEX (UNROLLED_LOOP_INDEX - NUM_SPOT_LIGHT_SHADOWS + NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS)
 		#endif
 
