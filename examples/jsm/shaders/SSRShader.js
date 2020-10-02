@@ -187,17 +187,10 @@ var SSRShader = {
 			#endif
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
 			if(d1viewPosition.z>-cameraNear){
-				vec2 tempXY=viewPosition.xy;
-				viewPosition.x=0.;
-				viewPosition.y=0.;
-				d1viewPosition.xy-=tempXY;
-
-				float ratio=(viewPosition.z+cameraNear)/(viewPosition.z-d1viewPosition.z);
-				d1viewPosition.xy*=ratio;
-				d1viewPosition.z=-cameraNear;
-
-				viewPosition.xy=tempXY;
-				d1viewPosition.xy+=tempXY;
+				//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
+				vec3 n=normalize(d1viewPosition-viewPosition);
+				float t=(-cameraNear-viewPosition.z)/n.z;
+				d1viewPosition=viewPosition+n*t;
 			}
 			d1=viewPositionToXY(d1viewPosition);
 
