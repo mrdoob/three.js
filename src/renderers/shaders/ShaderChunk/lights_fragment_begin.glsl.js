@@ -74,21 +74,23 @@ IncidentLight directLight;
 
     // spot lights are ordered [shadows with maps, shadows without maps, maps without shadows, none]
 		#if ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS ) // shadow and map
-		#define LIGHT_MAP_INDEX UNROLLED_LOOP_INDEX
+		#define SPOT_LIGHT_MAP_INDEX UNROLLED_LOOP_INDEX
 		#elif (  UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS ) // shadow without map
-		#define LIGHT_MAP_INDEX NUM_SPOT_LIGHT_MAPS
+		#define SPOT_LIGHT_MAP_INDEX NUM_SPOT_LIGHT_MAPS
 		#else  // no shadow
-		#define LIGHT_MAP_INDEX (UNROLLED_LOOP_INDEX - NUM_SPOT_LIGHT_SHADOWS + NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS)
+		#define SPOT_LIGHT_MAP_INDEX (UNROLLED_LOOP_INDEX - NUM_SPOT_LIGHT_SHADOWS + NUM_SPOT_LIGHT_SHADOWS_WITH_MAPS)
 		#endif
 
-		#if ( LIGHT_MAP_INDEX < NUM_SPOT_LIGHT_MAPS )
-			spotLightCoord = vSpotLightCoord[ LIGHT_MAP_INDEX ].xyz / vSpotLightCoord[ LIGHT_MAP_INDEX ].w;
+		#if ( SPOT_LIGHT_MAP_INDEX < NUM_SPOT_LIGHT_MAPS )
+			spotLightCoord = vSpotLightCoord[ i ].xyz / vSpotLightCoord[ i ].w;
 			inSpotLightMap = all( lessThan( abs( spotLightCoord * 2. - 1. ), vec3( 1.0 ) ) );
-			spotColor = texture2D( spotLightMap[ LIGHT_MAP_INDEX ], spotLightCoord.xy );
+			spotColor = texture2D( spotLightMap[ SPOT_LIGHT_MAP_INDEX ], spotLightCoord.xy );
 			inSpotLightMap = inSpotLightMap && ( spotColor.a > 0. );
 			directLight.visible = directLight.visible || inSpotLightMap;
 			directLight.color = inSpotLightMap ? mix( directLight.color, spotLight.color * spotColor.rgb, spotColor.a ) : directLight.color;
 		#endif
+
+		#undef SPOT_LIGHT_MAP_INDEX
 
 		#if defined(USE_SHADOWMAP) && ( UNROLLED_LOOP_INDEX < NUM_SPOT_LIGHT_SHADOWS )
 			spotLightShadow = spotLightShadows[ i ];
