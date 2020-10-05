@@ -63,7 +63,7 @@
 		};
 	}
 
-	var REVISION = '121';
+	var REVISION = '122dev';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -17723,8 +17723,8 @@
 		this.compile = function (scene, camera) {
 			currentRenderState = renderStates.get(scene, camera);
 			currentRenderState.init();
-			scene.traverse(function (object) {
-				if (object.isLight) {
+			scene.traverseVisible(function (object) {
+				if (object.isLight && object.layers.test(camera.layers)) {
 					currentRenderState.pushLight(object);
 
 					if (object.castShadow) {
