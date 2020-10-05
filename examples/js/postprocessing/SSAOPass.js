@@ -1,7 +1,5 @@
 console.warn( "THREE.SSAOPass: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 
-var _cache = new Map();
-
 THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 	THREE.Pass.call( this );
@@ -22,6 +20,8 @@ THREE.SSAOPass = function ( scene, camera, width, height ) {
 
 	this.minDistance = 0.005;
 	this.maxDistance = 0.1;
+
+	this._visibilityCache = new Map();
 
 	//
 
@@ -395,10 +395,11 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 	overrideVisibility: function () {
 
 		var scene = this.scene;
+		var cache = this._visibilityCache;
 
 		scene.traverse( function ( object ) {
 
-			_cache.set( object, object.visible );
+			cache.set( object, object.visible );
 
 			if ( object.isPoints || object.isLine ) object.visible = false;
 
@@ -409,15 +410,16 @@ THREE.SSAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ),
 	restoreVisibility: function () {
 
 		var scene = this.scene;
+		var cache = this._visibilityCache;
 
 		scene.traverse( function ( object ) {
 
-			var visible = _cache.get( object );
+			var visible = cache.get( object );
 			object.visible = visible;
 
 		} );
 
-		_cache.clear();
+		cache.clear();
 
 	}
 

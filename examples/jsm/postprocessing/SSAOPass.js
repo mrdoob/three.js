@@ -28,8 +28,6 @@ import { SSAOBlurShader } from "../shaders/SSAOShader.js";
 import { SSAODepthShader } from "../shaders/SSAOShader.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 
-var _cache = new Map();
-
 var SSAOPass = function ( scene, camera, width, height ) {
 
 	Pass.call( this );
@@ -50,6 +48,8 @@ var SSAOPass = function ( scene, camera, width, height ) {
 
 	this.minDistance = 0.005;
 	this.maxDistance = 0.1;
+
+	this._visibilityCache = new Map();
 
 	//
 
@@ -423,10 +423,11 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 	overrideVisibility: function () {
 
 		var scene = this.scene;
+		var cache = this._visibilityCache;
 
 		scene.traverse( function ( object ) {
 
-			_cache.set( object, object.visible );
+			cache.set( object, object.visible );
 
 			if ( object.isPoints || object.isLine ) object.visible = false;
 
@@ -437,15 +438,16 @@ SSAOPass.prototype = Object.assign( Object.create( Pass.prototype ), {
 	restoreVisibility: function () {
 
 		var scene = this.scene;
+		var cache = this._visibilityCache;
 
 		scene.traverse( function ( object ) {
 
-			var visible = _cache.get( object );
+			var visible = cache.get( object );
 			object.visible = visible;
 
 		} );
 
-		_cache.clear();
+		cache.clear();
 
 	}
 
