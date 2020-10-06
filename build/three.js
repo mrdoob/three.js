@@ -11534,6 +11534,7 @@
 							renderer.setRenderTarget(currentRenderTarget);
 							renderer.setRenderList(currentRenderList);
 							renderer.setRenderState(currentRenderState);
+							texture.addEventListener('dispose', onTextureDispose);
 							return mapTextureMapping(renderTarget.texture, texture.mapping);
 						} else {
 							// image not yet ready. try the conversion next frame
@@ -11544,6 +11545,17 @@
 			}
 
 			return texture;
+		}
+
+		function onTextureDispose(event) {
+			var texture = event.target;
+			texture.removeEventListener('dispose', onTextureDispose);
+			var cubemap = cubemaps.get(texture);
+
+			if (cubemap !== undefined) {
+				cubemaps.delete(texture);
+				cubemap.dispose();
+			}
 		}
 
 		function dispose() {

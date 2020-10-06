@@ -14973,6 +14973,8 @@ function WebGLCubeMaps( renderer ) {
 						renderer.setRenderList( currentRenderList );
 						renderer.setRenderState( currentRenderState );
 
+						texture.addEventListener( 'dispose', onTextureDispose );
+
 						return mapTextureMapping( renderTarget.texture, texture.mapping );
 
 					} else {
@@ -14990,6 +14992,23 @@ function WebGLCubeMaps( renderer ) {
 		}
 
 		return texture;
+
+	}
+
+	function onTextureDispose( event ) {
+
+		const texture = event.target;
+
+		texture.removeEventListener( 'dispose', onTextureDispose );
+
+		const cubemap = cubemaps.get( texture );
+
+		if ( cubemap !== undefined ) {
+
+			cubemaps.delete( texture );
+			cubemap.dispose();
+
+		}
 
 	}
 
