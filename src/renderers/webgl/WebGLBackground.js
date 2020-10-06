@@ -27,7 +27,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 		if ( background && background.isTexture ) {
 
-			const isPBR = blurriness > 0; // use PBR workflow if then user wants to blur the background
+			const isPBR = blurriness > 0; // use PBR workflow if the user wants to blur the background
 			background = cubemaps.get( background, isPBR );
 
 		}
