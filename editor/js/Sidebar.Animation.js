@@ -2,6 +2,7 @@ import { UIPanel, UIDiv, UIBreak, UISelect, UIButton, UIText } from './libs/ui.j
 
 function SidebarAnimation( editor ) {
 
+	var strings = editor.strings;
 	var signals = editor.signals;
 	var mixer = editor.mixer;
 
@@ -65,7 +66,7 @@ function SidebarAnimation( editor ) {
 	var container = new UIPanel();
 	container.setDisplay( 'none' );
 
-	container.add( new UIText( 'Animations' ).setTextTransform( 'uppercase' ) );
+	container.add( new UIText( strings.getKey( 'sidebar/animations' ) ).setTextTransform( 'uppercase' ) );
 	container.add( new UIBreak() );
 	container.add( new UIBreak() );
 
@@ -74,8 +75,8 @@ function SidebarAnimation( editor ) {
 
 	var animationsSelect = new UISelect().setFontSize( '12px' );
 	div.add( animationsSelect );
-	div.add( new UIButton( 'Play' ).setMarginLeft( '4px' ).onClick( playAction ) );
-	div.add( new UIButton( 'Stop' ).setMarginLeft( '4px' ).onClick( stopAction ) );
+	div.add( new UIButton( strings.getKey( 'sidebar/animations/play' ) ).setMarginLeft( '4px' ).onClick( playAction ) );
+	div.add( new UIButton( strings.getKey( 'sidebar/animations/stop' ) ).setMarginLeft( '4px' ).onClick( stopAction ) );
 
 	return container;
 
