@@ -61,6 +61,8 @@ function WebGLCubeMaps( renderer ) {
 						renderer.setRenderList( currentRenderList );
 						renderer.setRenderState( currentRenderState );
 
+						texture.addEventListener( 'dispose', onTextureDispose );
+
 						return renderTarget.texture;
 
 					} else {
