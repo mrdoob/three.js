@@ -12,6 +12,7 @@ export class WebGLBackground {
 
 	constructor( renderer: WebGLRenderer, cubemaps: WebGLCubeMaps, state: WebGLState, objects: WebGLObjects, premultipliedAlpha: boolean );
 
+	setBlurriness( blurriness: number ): void;
 	getClearColor(): Color;
 	setClearColor( color: Color, alpha: number ): void;
 	getClearAlpha(): number;

@@ -20,6 +20,7 @@ export let UniformsLib: {
 		reflectivity: IUniform;
 		refractionRatio: IUniform;
 		maxMipLevel: IUniform;
+		envMapBlurriness: IUniform;
 	};
 	aomap: {
 		aoMap: IUniform;

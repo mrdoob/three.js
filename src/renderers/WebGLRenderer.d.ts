@@ -310,6 +310,11 @@ export class WebGLRenderer implements Renderer {
 	setClearAlpha( alpha: number ): void;
 
 	/**
+	 * Sets amount of blurriness for the background. Only affects skyboxes. Valid input is a float in the range [0,1].
+	 */
+	setBackgroundBlurriness( blurriness: number ): void;
+
+	/**
 	 * Tells the renderer to clear its color, depth or stencil drawing buffer(s).
 	 * Arguments default to true
 	 */

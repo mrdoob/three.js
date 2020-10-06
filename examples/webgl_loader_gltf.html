@@ -45,13 +45,10 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
 
-						var envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+						texture.mapping = THREE.EquirectangularReflectionMapping;
 
-						scene.background = envMap;
-						scene.environment = envMap;
-
-						texture.dispose();
-						pmremGenerator.dispose();
+						scene.background = texture;
+						scene.environment = texture;
 
 						render();
 
@@ -85,15 +82,13 @@
 					} );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setBackgroundBlurriness( 0.5 );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
-
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
-				pmremGenerator.compileEquirectangularShader();
 
 				controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render ); // use if there is no animation loop

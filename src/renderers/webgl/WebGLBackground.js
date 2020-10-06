@@ -9,6 +9,8 @@ import { cloneUniforms } from '../shaders/UniformsUtils.js';
 
 function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha ) {
 
+	let blurriness = 0;
+
 	const clearColor = new Color( 0x000000 );
 	let clearAlpha = 0;
 
@@ -25,7 +27,8 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 		if ( background && background.isTexture ) {
 
-			background = cubemaps.get( background );
+			const isPBR = blurriness > 0; // use PBR workflow if then user wants to blur the background
+			background = cubemaps.get( background, isPBR );
 
 		}
 
@@ -110,6 +113,7 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 			boxMesh.material.uniforms.envMap.value = background;
 			boxMesh.material.uniforms.flipEnvMap.value = ( background.isCubeTexture && background._needsFlipEnvMap ) ? - 1 : 1;
+			boxMesh.material.uniforms.envMapBlurriness.value = blurriness;
 
 			if ( currentBackground !== background ||
 				currentBackgroundVersion !== background.version ||
@@ -220,6 +224,11 @@ function WebGLBackground( renderer, cubemaps, state, objects, premultipliedAlpha
 
 			clearAlpha = alpha;
 			setClear( clearColor, clearAlpha );
+
+		},
+		setBlurriness: function ( value ) {
+
+			blurriness = value;
 
 		},
 		render: render

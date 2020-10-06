@@ -4,7 +4,7 @@ export class WebGLCubeMaps {
 
 	constructor( renderer: WebGLRenderer );
 
-	get( texture: any ): any;
+	get( texture: any, isPBR?: boolean ): any;
 	dispose(): void;
 
 }

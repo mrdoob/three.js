@@ -548,6 +548,12 @@ function WebGLRenderer( parameters ) {
 
 	};
 
+	this.setBackgroundBlurriness = function () {
+
+		background.setBlurriness.apply( background, arguments );
+
+	};
+
 	this.clear = function ( color, depth, stencil ) {
 
 		let bits = 0;
@@ -1330,7 +1336,7 @@ function WebGLRenderer( parameters ) {
 			// same glsl and uniform list, envMap still needs the update here to avoid a frame-late effect
 
 			const environment = material.isMeshStandardMaterial ? scene.environment : null;
-			materialProperties.envMap = cubemaps.get( material.envMap || environment );
+			materialProperties.envMap = cubemaps.get( material.envMap || environment, material.isMeshStandardMaterial );
 
 			return;
 
@@ -1369,7 +1375,7 @@ function WebGLRenderer( parameters ) {
 
 		materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null;
 		materialProperties.fog = scene.fog;
-		materialProperties.envMap = cubemaps.get( material.envMap || materialProperties.environment );
+		materialProperties.envMap = cubemaps.get( material.envMap || materialProperties.environment, material.isMeshStandardMaterial );
 
 		// store the light setup it was created for
 
@@ -1419,7 +1425,7 @@ function WebGLRenderer( parameters ) {
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 		const encoding = ( _currentRenderTarget === null ) ? _this.outputEncoding : _currentRenderTarget.texture.encoding;
-		const envMap = cubemaps.get( material.envMap || environment );
+		const envMap = cubemaps.get( material.envMap || environment, material.isMeshStandardMaterial );
 
 		const materialProperties = properties.get( material );
 		const lights = currentRenderState.state.lights;

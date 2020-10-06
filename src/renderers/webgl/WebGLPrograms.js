@@ -113,7 +113,7 @@ function WebGLPrograms( renderer, cubemaps, extensions, capabilities, bindingSta
 		const fog = scene.fog;
 		const environment = material.isMeshStandardMaterial ? scene.environment : null;
 
-		const envMap = cubemaps.get( material.envMap || environment );
+		const envMap = cubemaps.get( material.envMap || environment, material.isMeshStandardMaterial );
 
 		const shaderID = shaderIDs[ material.type ];
 
