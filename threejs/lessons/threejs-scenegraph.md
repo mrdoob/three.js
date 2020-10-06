@@ -226,7 +226,7 @@ objects.push(earthMesh);
 
 Again we added more invisible scene graph nodes. The first, an `Object3D` called `earthOrbit`
 and added both the `earthMesh` and the `moonOrbit` to it, also new. We then added the `mooMesh`
-to the `moonRobit`. The new scene graph looks like this.
+to the `moonOrbit`. The new scene graph looks like this.
 
 <img src="resources/images/scenegraph-sun-earth-moon.svg" align="center">
 
