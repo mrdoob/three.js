@@ -74,6 +74,10 @@ function Strings( config ) {
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'About',
 
+			'sidebar/animations': 'Animations',
+			'sidebar/animations/play': 'Play',
+			'sidebar/animations/stop': 'Stop',
+
 			'sidebar/scene': 'Scene',
 			'sidebar/scene/background': 'Background',
 			'sidebar/scene/environment': 'Environment',
@@ -393,6 +397,10 @@ function Strings( config ) {
 			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'A propos',
 
+			'sidebar/animations': 'Animations',
+			'sidebar/animations/play': 'Play',
+			'sidebar/animations/stop': 'Stop',
+
 			'sidebar/scene': 'Scène',
 			'sidebar/scene/background': 'Arrière Plan',
 			'sidebar/scene/environment': 'Environment',
@@ -711,6 +719,10 @@ function Strings( config ) {
 			'menubar/help/source_code': '源码',
 			'menubar/help/icons': '图标组件包',
 			'menubar/help/about': '关于',
+
+			'sidebar/animations': '动画',
+			'sidebar/animations/play': '播放',
+			'sidebar/animations/stop': '暂停',
 
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
