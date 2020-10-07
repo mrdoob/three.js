@@ -127,19 +127,21 @@ var SSRShader = {
 				viewNormal=normalize(viewNormal);
 			#endif
 
-			vec3 viewReflectDir;
 			#ifdef isPerspectiveCamera
-				viewReflectDir=reflect(normalize(viewPosition),viewNormal);
+				vec3 viewIncidenceDir=normalize(viewPosition);
+				vec3 viewReflectDir=reflect(viewIncidenceDir,viewNormal);
 			#else
-				viewReflectDir=reflect(vec3(0,0,-1),viewNormal);
+				vec3 viewIncidenceDir=vec3(0,0,-1);
+				vec3 viewReflectDir=reflect(viewIncidenceDir,viewNormal);
 			#endif
+			// float angleCompensation=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
+			// vec3 d1viewPosition=viewPosition+viewReflectDir*(maxDistance*angleCompensation);
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
 			#ifdef isPerspectiveCamera
 				if(d1viewPosition.z>-cameraNear){
 					//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
-					vec3 n=normalize(d1viewPosition-viewPosition);
-					float t=(-cameraNear-viewPosition.z)/n.z;
-					d1viewPosition=viewPosition+n*t;
+					float t=(-cameraNear-viewPosition.z)/viewReflectDir.z;
+					d1viewPosition=viewPosition+viewReflectDir*t;
 				}
 			#endif
 			d1=viewPositionToXY(d1viewPosition);
