@@ -1777,7 +1777,7 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				if ( ! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
+				if ( ! equalArray( object.matrix.elements, new THREE.Matrix4().toArray() ) ) {
 
 					gltfNode.matrix = object.matrix.elements;
 

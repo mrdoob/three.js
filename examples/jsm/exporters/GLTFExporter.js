@@ -17,7 +17,8 @@ import {
 	RGBAFormat,
 	RepeatWrapping,
 	Scene,
-	Vector3
+	Vector3,
+	Matrix4
 } from "../../../build/three.module.js";
 
 //------------------------------------------------------------------------------
@@ -1797,7 +1798,7 @@ GLTFExporter.prototype = {
 
 				}
 
-				if ( ! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
+				if ( ! equalArray( object.matrix.elements, new Matrix4().toArray() ) ) {
 
 					gltfNode.matrix = object.matrix.elements;
 
