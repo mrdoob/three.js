@@ -27,7 +27,7 @@ import {
 
 var RectAreaLightUniformsLib = {
 
-	init: function () {
+	init: function (renderer) {
 
 		// source: https://github.com/selfshadow/ltc_code/tree/master/fit/results/ltc.js
 
@@ -37,8 +37,14 @@ var RectAreaLightUniformsLib = {
 
 		// data textures
 
-		var ltc_1 = new DataTexture( new Float32Array( LTC_MAT_1 ), 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
-		var ltc_2 = new DataTexture( new Float32Array( LTC_MAT_2 ), 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
+		if ( renderer.capabilities.isWebGL2 === false && ! renderer.extensions.get( 'OES_texture_float_linear' ) ) {
+			var magFilter = NearestFilter;
+		} else {
+			var magFilter = LinearFilter;
+		}
+
+		var ltc_1 = new DataTexture( new Float32Array( LTC_MAT_1 ), 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, magFilter, NearestFilter, 1 );
+		var ltc_2 = new DataTexture( new Float32Array( LTC_MAT_2 ), 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, magFilter, NearestFilter, 1 );
 
 		UniformsLib.LTC_1 = ltc_1;
 		UniformsLib.LTC_2 = ltc_2;
