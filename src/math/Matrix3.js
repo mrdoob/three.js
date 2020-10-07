@@ -54,12 +54,16 @@ class Matrix3 {
 
 	copy( m ) {
 
-		const te = this.elements;
 		const me = m.elements;
 
-		te[ 0 ] = me[ 0 ]; te[ 1 ] = me[ 1 ]; te[ 2 ] = me[ 2 ];
-		te[ 3 ] = me[ 3 ]; te[ 4 ] = me[ 4 ]; te[ 5 ] = me[ 5 ];
-		te[ 6 ] = me[ 6 ]; te[ 7 ] = me[ 7 ]; te[ 8 ] = me[ 8 ];
+		this.set(
+
+			me[ 0 ], me[ 1 ], me[ 2 ],
+			me[ 3 ], me[ 4 ], me[ 5 ],
+			me[ 6 ], me[ 7 ], me[ 8 ]
+
+		);
+
 
 		return this;
 
