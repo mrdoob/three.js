@@ -21,6 +21,10 @@
 <script>
   var vConsole = new VConsole();
 </script> -->
+
+<!-- <script>window.THREE=true</script> -->
+<!-- <script src="/lib/vs_util/vs_util.js"></script> -->
+
 <script type="module">
 
 	import * as THREE from '../build/three.module.js';
@@ -42,6 +46,7 @@
 	var composer
 	var ssrPass
 	var gui
+	var isPerspectiveCamera=true
 
 	var container, stats;
 
@@ -76,16 +81,19 @@
 
 		// CAMERA
 
-		// var cameraNear = 1
-		// var cameraFar = 2000
-		// var aspect = window.innerWidth / window.innerHeight;
-		// camera = new THREE.OrthographicCamera(initialFrustumSize * aspect / - 2, initialFrustumSize * aspect / 2, initialFrustumSize / 2, initialFrustumSize / - 2, cameraNear, cameraFar);
-		// camera.position.set(394.8768477903498,  424.03752576248496,  815.0242032138592)
-
-		camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 2, 10000 );
-		camera.position.set( 388.5770726262176,  305.6568142796153,  647.1326965696304);
-		// camera.position.set( -612.8787517743004,  518.3480614141735,  137.45500830289768);
-		// window.camera=camera
+		if(isPerspectiveCamera){
+			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 2, 10000 );
+			camera.position.set( 388.5770726262176,  305.6568142796153,  647.1326965696304);
+			// camera.position.set( -612.8787517743004,  518.3480614141735,  137.45500830289768);
+		}else{
+			var initialFrustumSize = 1000
+			var cameraNear = 1
+			var cameraFar = 2000
+			var aspect = window.innerWidth / window.innerHeight;
+			camera = new THREE.OrthographicCamera(initialFrustumSize * aspect / - 2, initialFrustumSize * aspect / 2, initialFrustumSize / 2, initialFrustumSize / - 2, cameraNear, cameraFar);
+			camera.position.set(394.8768477903498,  424.03752576248496,  815.0242032138592)
+		}
+		// window.camera=camera///test
 
 		// SCENE
 
@@ -280,6 +288,7 @@
 			width: innerWidth, 
 			height: innerHeight,
 			// encoding: THREE.sRGBEncoding,
+			isPerspectiveCamera:isPerspectiveCamera,
 			morphTargets: true,
 		});
 		composer.addPass(ssrPass);
@@ -287,10 +296,9 @@
 		// GUI
 
 		gui = new GUI( { width: 400 } );
-		ssrPass.surfDist=.007
 		gui.add(params, 'enableSSR').name( 'Enable SSR' );
 		gui.add(ssrPass, 'isDistanceAttenuation');
-		gui.add(ssrPass, 'attenuationDistance').min(0).max(2000);
+		gui.add(ssrPass, 'maxDistance').min(0).max(2000);
 		gui.add(params, 'darken').onChange(function(value){
 			if(value){
 				ssrPass.encoding = THREE.LinearEncoding
@@ -312,8 +320,13 @@
 
 		});
 		gui.add(ssrPass, 'opacity').min(0).max(1);
-		gui.add(ssrPass, 'maxDistance').min(0).max(2000);
-		gui.add(ssrPass, 'surfDist').min(0).max(.02).step(.0001);
+		if(isPerspectiveCamera){
+		ssrPass.surfDist=.007
+			gui.add(ssrPass, 'surfDist').min(0).max(.02).step(.0001);
+		}else{
+		ssrPass.surfDist=2
+			gui.add(ssrPass, 'surfDist').min(0).max(7).step(.01);
+		}
 		gui.add(ssrPass, 'isInfiniteThick');
 		gui.add(ssrPass, 'thickTolerance').min(0).max(.05).step(.0001);
 		gui.add(ssrPass, 'isBlur');

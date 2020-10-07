@@ -35,11 +35,11 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
   this.camera = camera;
   this.scene = scene;
 
-  this.opacity = .5;
+  this.opacity = SSRShader.uniforms.opacity.value;;
   this.output = 0;
 
-  this.maxDistance = 900;
-  this.surfDist = 1.
+  this.maxDistance = SSRShader.uniforms.maxDistance.value;
+  this.surfDist = SSRShader.uniforms.maxDistance.value;
 
   this.selects = selects
   this.isSelective = Array.isArray(this.selects)
@@ -64,7 +64,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
 
   this.isBlur = true
 
-  this._isDistanceAttenuation = true
+  this._isDistanceAttenuation = SSRShader.defines.isDistanceAttenuation
   Object.defineProperty(this, 'isDistanceAttenuation', {
     get() {
       return this._isDistanceAttenuation
@@ -76,9 +76,8 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
       this.ssrMaterial.needsUpdate = true
     }
   })
-  this.attenuationDistance = 200
 
-  this._isInfiniteThick = true
+  this._isInfiniteThick = SSRShader.defines.isInfiniteThick
   Object.defineProperty(this, 'isInfiniteThick', {
     get() {
       return this._isInfiniteThick
@@ -90,9 +89,9 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
       this.ssrMaterial.needsUpdate = true
     }
   })
-  this.thickTolerance = .03
+  this.thickTolerance = SSRShader.uniforms.thickTolerance.value;
 
-  this._isNoise = false
+  this._isNoise = SSRShader.defines.isNoise
   Object.defineProperty(this, 'isNoise', {
     get() {
       return this._isNoise
@@ -104,7 +103,7 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
       this.ssrMaterial.needsUpdate = true
     }
   })
-  this.noiseIntensity = .1
+  this.noiseIntensity = SSRShader.uniforms.noiseIntensity.value;
 
   // beauty render target with depth buffer
 
@@ -316,7 +315,6 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.ssrMaterial.uniforms['opacity'].value = this.opacity;
     this.ssrMaterial.uniforms['maxDistance'].value = this.maxDistance;
     this.ssrMaterial.uniforms['surfDist'].value = this.surfDist;
-    this.ssrMaterial.uniforms['attenuationDistance'].value = this.attenuationDistance
     this.ssrMaterial.uniforms['thickTolerance'].value = this.thickTolerance
     this.ssrMaterial.uniforms['noiseIntensity'].value = this.noiseIntensity
     this.renderPass(renderer, this.ssrMaterial, this.ssrRenderTarget);
