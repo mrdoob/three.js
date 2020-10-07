@@ -31,6 +31,8 @@ var WEBGL_CONSTANTS = {
 	REPEAT: 10497
 };
 
+var identityArray = [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ];
+
 var THREE_TO_WEBGL = {};
 
 THREE_TO_WEBGL[ THREE.NearestFilter ] = WEBGL_CONSTANTS.NEAREST;
@@ -149,6 +151,18 @@ THREE.GLTFExporter.prototype = {
 				return element === array2[ index ];
 
 			} );
+
+		}
+
+		/**
+		 * Is identity matrix
+		 *
+		 * @param {THREE.Matrix4} matrix
+		 * @returns {Boolean} Returns true, if parameter is identity matrix
+		 */
+		function isIdentityMatrix( matrix ) {
+
+			return equalArray( matrix.elements, identityArray );
 
 		}
 
@@ -1777,7 +1791,7 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				if ( ! equalArray( object.matrix.elements, new THREE.Matrix4().toArray() ) ) {
+				if ( ! isIdentityMatrix( object.matrix ) ) {
 
 					gltfNode.matrix = object.matrix.elements;
 
