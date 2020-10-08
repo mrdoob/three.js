@@ -296,7 +296,7 @@ export default QUnit.module( 'Core', () => {
 
 		} );
 
-		QUnit.test( "add/remove", ( assert ) => {
+		QUnit.test( "add/remove/removeAll", ( assert ) => {
 
 			var a = new Object3D();
 			var child1 = new Object3D();
@@ -327,6 +327,13 @@ export default QUnit.module( 'Core', () => {
 			assert.strictEqual( a.children.length, 1, "The second one was added to the parent (no remove)" );
 			assert.strictEqual( a.children[ 0 ], child2, "The second one is now the parent's child again" );
 			assert.strictEqual( child1.children.length, 0, "The first one no longer has any children" );
+
+			a.add( child1 );
+			assert.strictEqual( a.children.length, 2, "The first child was added to the parent" );
+			a.removeAll();
+			assert.strictEqual( a.children.length, 0, "All childrens were removed" );
+			assert.strictEqual( child1.parent, null, "First child has no parent" );
+			assert.strictEqual( child2.parent, null, "Second child has no parent" );
 
 		} );
 
