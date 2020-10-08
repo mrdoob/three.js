@@ -772,15 +772,24 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.x = array[offset];
 			this.y = array[offset + 1];
 			return this;
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this.x;
 			array[offset + 1] = this.y;
 			return array;
@@ -1094,7 +1103,9 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
 
 			for (var i = 0; i < 9; i++) {
 				this.elements[i] = array[i + offset];
@@ -1104,8 +1115,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			var te = this.elements;
 			array[offset] = te[0];
 			array[offset + 1] = te[1];
@@ -1817,7 +1834,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.x = array[offset];
 			this.y = array[offset + 1];
 			this.z = array[offset + 2];
@@ -1826,8 +1846,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this.x;
 			array[offset + 1] = this.y;
 			array[offset + 2] = this.z;
@@ -2395,7 +2421,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this._x = array[offset];
 			this._y = array[offset + 1];
 			this._z = array[offset + 2];
@@ -2407,8 +2436,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this._x;
 			array[offset + 1] = this._y;
 			array[offset + 2] = this._z;
@@ -2981,7 +3016,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.x = array[offset];
 			this.y = array[offset + 1];
 			this.z = array[offset + 2];
@@ -2989,8 +3027,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this.x;
 			array[offset + 1] = this.y;
 			array[offset + 2] = this.z;
@@ -4648,7 +4692,9 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
 
 			for (var i = 0; i < 16; i++) {
 				this.elements[i] = array[i + offset];
@@ -4658,8 +4704,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			var te = this.elements;
 			array[offset] = te[0];
 			array[offset + 1] = te[1];
@@ -4888,8 +4940,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this._x;
 			array[offset + 1] = this._y;
 			array[offset + 2] = this._z;
@@ -5253,6 +5311,16 @@
 				object.dispatchEvent(_removedEvent);
 			}
 
+			return this;
+		},
+		removeAll: function removeAll() {
+			for (var i = 0; i < this.children.length; i++) {
+				var object = this.children[i];
+				object.parent = null;
+				object.dispatchEvent(_removedEvent);
+			}
+
+			this.children.length = 0;
 			return this;
 		},
 		attach: function attach(object) {
@@ -6542,7 +6610,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.r = array[offset];
 			this.g = array[offset + 1];
 			this.b = array[offset + 2];
@@ -6550,8 +6621,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this.r;
 			array[offset + 1] = this.g;
 			array[offset + 2] = this.b;
@@ -28982,7 +29059,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			var coefficients = this.coefficients;
 
 			for (var i = 0; i < 9; i++) {
@@ -28993,8 +29073,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			var coefficients = this.coefficients;
 
 			for (var i = 0; i < 9; i++) {
