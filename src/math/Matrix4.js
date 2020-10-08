@@ -822,7 +822,7 @@ class Matrix4 {
 
 	}
 
-	fromArray( array = [], offset = 0 ) {
+	fromArray( array, offset = 0 ) {
 
 		for ( let i = 0; i < 16; i ++ ) {
 
