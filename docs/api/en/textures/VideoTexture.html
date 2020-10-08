@@ -21,13 +21,9 @@
 		<h2>Code Example</h2>
 
 		<code>
-		//assuming you have created a HTML video element with id="video"
-		var video = document.getElementById( 'video' );
-
-		var texture = new THREE.VideoTexture( video );
-		texture.minFilter = THREE.LinearFilter;
-		texture.magFilter = THREE.LinearFilter;
-		texture.format = THREE.RGBFormat;
+		// assuming you have created a HTML video element with id="video"
+		const video = document.getElementById( 'video' );
+		const texture = new THREE.VideoTexture( video );
 		</code>
 
 		<h2>Examples</h2>
