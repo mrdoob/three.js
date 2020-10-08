@@ -1791,7 +1791,7 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				if ( ! isIdentityMatrix( object.matrix ) ) {
+				if ( isIdentityMatrix( object.matrix ) === false ) {
 
 					gltfNode.matrix = object.matrix.elements;
 
