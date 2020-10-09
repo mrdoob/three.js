@@ -88,11 +88,11 @@
 		<h2>مثال</h2>
 
 		<code>
-		var mesh;
+		let mesh;
 
 		// Create an AnimationMixer, and get the list of AnimationClip instances
-		var mixer = new THREE.AnimationMixer( mesh );
-		var clips = mesh.animations;
+		const mixer = new THREE.AnimationMixer( mesh );
+		const clips = mesh.animations;
 
 		// Update the mixer on each frame
 		function update () {
@@ -100,8 +100,8 @@
 		}
 
 		// Play a specific animation
-		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
-		var action = mixer.clipAction( clip );
+		const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		const action = mixer.clipAction( clip );
 		action.play();
 
 		// Play all animations
