@@ -18,19 +18,19 @@
 
 		<code>
 		// Create a sampler for a Mesh surface.
-		var sampler = new MeshSurfaceSampler( surfaceMesh )
+		const sampler = new MeshSurfaceSampler( surfaceMesh )
 			.setWeightAttribute( 'color' )
 			.build();
 
-		var sampleMesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
+		const sampleMesh = new THREE.InstancedMesh( sampleGeometry, sampleMaterial, 100 );
 
-		var _position = new THREE.Vector3();
-		var _normal = new THREE.Vector3();
-		var _matrix = new THREE.Matrix4();
+		const _position = new THREE.Vector3();
+		const _normal = new THREE.Vector3();
+		const _matrix = new THREE.Matrix4();
 
 		// Sample randomly from the surface, creating an instance of the sample
 		// geometry at each sample point.
-		for ( var i = 0; i < 100; i ++ ) {
+		for ( let i = 0; i < 100; i ++ ) {
 
 			sampler.sample( _position, _normal );
 

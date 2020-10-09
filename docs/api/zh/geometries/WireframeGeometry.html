@@ -17,11 +17,11 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var geometry = new THREE.SphereBufferGeometry( 100, 100, 100 );
+		const geometry = new THREE.SphereBufferGeometry( 100, 100, 100 );
 
-		var wireframe = new THREE.WireframeGeometry( geometry );
+		const wireframe = new THREE.WireframeGeometry( geometry );
 
-		var line = new THREE.LineSegments( wireframe );
+		const line = new THREE.LineSegments( wireframe );
 		line.material.depthTest = false;
 		line.material.opacity = 0.25;
 		line.material.transparent = true;

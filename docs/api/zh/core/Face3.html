@@ -18,19 +18,19 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var material = new THREE.MeshStandardMaterial( { color : 0x00cc00 } );
+		const material = new THREE.MeshStandardMaterial( { color : 0x00cc00 } );
 
 		// 创建仅有一个三角形面的几何体
-		var geometry = new THREE.Geometry();
+		const geometry = new THREE.Geometry();
 		geometry.vertices.push( new THREE.Vector3( -50, -50, 0 ) );
 		geometry.vertices.push( new THREE.Vector3(  50, -50, 0 ) );
 		geometry.vertices.push( new THREE.Vector3(  50,  50, 0 ) );
 
 		// 利用顶点 0, 1, 2 创建一个面
-		var normal = new THREE.Vector3( 0, 0, 1 ); //optional
-		var color = new THREE.Color( 0xffaa00 ); //optional
-		var materialIndex = 0; //optional
-		var face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
+		const normal = new THREE.Vector3( 0, 0, 1 ); //optional
+		const color = new THREE.Color( 0xffaa00 ); //optional
+		const materialIndex = 0; //optional
+		const face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
 
 		// 将创建的面添加到几何体的面的队列
 		geometry.faces.push( face );

@@ -18,10 +18,10 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var quaternion = new THREE.Quaternion();
+		const quaternion = new THREE.Quaternion();
 		quaternion.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), Math.PI / 2 );
 
-		var vector = new THREE.Vector3( 1, 0, 0 );
+		const vector = new THREE.Vector3( 1, 0, 0 );
 		vector.applyQuaternion( quaternion );
 		</code>
 
@@ -215,7 +215,7 @@ THREE.Quaternion.slerp( qStart, qEnd, qTarget, t );
 			作为对比，要调用“正常”或实例的 slerp 方法，则进行如下操作：
 			<code>
 //instantiate a quaternion with default values
-var q = new THREE.Quaternion();
+const q = new THREE.Quaternion();
 
 //call the instanced slerp method
 q.slerp( qb, t )
@@ -233,9 +233,9 @@ q.slerp( qb, t )
 			Unlike the normal method, the static version of slerp sets a target quaternion to the result of the slerp operation.
 			<code>
 			// Code setup
-			var startQuaternion = new THREE.Quaternion().set( 0, 0, 0, 1 ).normalize();
-			var endQuaternion = new THREE.Quaternion().set( 1, 1, 1, 1 ).normalize();
-			var t = 0;
+			const startQuaternion = new THREE.Quaternion().set( 0, 0, 0, 1 ).normalize();
+			const endQuaternion = new THREE.Quaternion().set( 1, 1, 1, 1 ).normalize();
+			const t = 0;
 
 			// Update a mesh's rotation in the loop
 			t = ( t + 0.01 ) % 1; // constant angular momentum

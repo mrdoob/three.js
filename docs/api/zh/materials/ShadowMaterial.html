@@ -19,13 +19,13 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+		const planeGeometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
 		planeGeometry.rotateX( - Math.PI / 2 );
 
-		var planeMaterial = new THREE.ShadowMaterial();
+		const planeMaterial = new THREE.ShadowMaterial();
 		planeMaterial.opacity = 0.2;
 
-		var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+		const plane = new THREE.Mesh( planeGeometry, planeMaterial );
 		plane.position.y = -200;
 		plane.receiveShadow = true;
 		scene.add( plane );

@@ -99,11 +99,11 @@
 		<h2>范例</h2>
 
 		<code>
-		var mesh;
+		const mesh;
 
 		// 新建一个AnimationMixer, 并取得AnimationClip实例列表
-		var mixer = new THREE.AnimationMixer( mesh );
-		var clips = mesh.animations;
+		const mixer = new THREE.AnimationMixer( mesh );
+		const clips = mesh.animations;
 
 		// 在每一帧中更新mixer
 		function update () {
@@ -111,8 +111,8 @@
 		}
 
 		// 播放一个特定的动画
-		var clip = THREE.AnimationClip.findByName( clips, 'dance' );
-		var action = mixer.clipAction( clip );
+		const clip = THREE.AnimationClip.findByName( clips, 'dance' );
+		const action = mixer.clipAction( clip );
 		action.play();
 
 		// 播放所有动画
