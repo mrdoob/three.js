@@ -29,7 +29,7 @@
 
 		<code>
 		// instantiate a loader
-		var loader = new THREE.ImageBitmapLoader();
+		const loader = new THREE.ImageBitmapLoader();
 
 		// set options if needed
 		loader.setOptions( { imageOrientation: 'flipY' } );
@@ -41,8 +41,8 @@
 
 			// onLoad callback
 			function ( imageBitmap ) {
-				var texture = new THREE.CanvasTexture( imageBitmap );
-				var material = new THREE.MeshBasicMaterial( { map: texture } );
+				const texture = new THREE.CanvasTexture( imageBitmap );
+				const material = new THREE.MeshBasicMaterial( { map: texture } );
 			},
 
 			// onProgress callback currently not supported

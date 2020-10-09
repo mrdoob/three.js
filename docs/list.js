@@ -1,4 +1,4 @@
-var list = {
+const list = {
 
 	"en": {
 
