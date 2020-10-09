@@ -42,4 +42,6 @@ export class CubeTexture extends Texture {
 	 */
 	flipY: boolean;
 
+	readonly isCubeTexture: true;
+
 }

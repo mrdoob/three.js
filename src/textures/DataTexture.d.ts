@@ -62,4 +62,6 @@ export class DataTexture extends Texture {
 	 */
 	format: PixelFormat;
 
+	readonly isDataTexture: true;
+
 }
