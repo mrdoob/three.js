@@ -34,7 +34,7 @@
       "@typescript-eslint"
     ],
     "rules": {
-      "@typescript-eslint/no-unused-vars": 1,
+      "@typescript-eslint/no-unused-vars": ["error"],
       "@typescript-eslint/indent": [
         "error",
         "tab",
