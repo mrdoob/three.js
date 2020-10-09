@@ -20,27 +20,23 @@
 		<code>
 		// Adding events to a custom object
 
-		var Car = function () {
+		class Car extends EventDispatcher {
 
-		    this.start = function () {
+			start() {
 
-		        this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
+				this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
 
-		    };
+			}
 
 		};
 
-		// Mixing the EventDispatcher.prototype with the custom object prototype
-
-		Object.assign( Car.prototype, EventDispatcher.prototype );
-
 		// Using events with the custom object
 
-		var car = new Car();
+		const car = new Car();
 
 		car.addEventListener( 'start', function ( event ) {
 
-		    alert( event.message );
+			alert( event.message );
 
 		} );
 
