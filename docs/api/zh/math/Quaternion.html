@@ -235,7 +235,7 @@ q.slerp( qb, t )
 			// Code setup
 			const startQuaternion = new THREE.Quaternion().set( 0, 0, 0, 1 ).normalize();
 			const endQuaternion = new THREE.Quaternion().set( 1, 1, 1, 1 ).normalize();
-			const t = 0;
+			let t = 0;
 
 			// Update a mesh's rotation in the loop
 			t = ( t + 0.01 ) % 1; // constant angular momentum

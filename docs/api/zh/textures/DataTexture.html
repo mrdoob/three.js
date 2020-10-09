@@ -37,8 +37,12 @@
 		<code>
 		// create a buffer with color data
 
+		const width = 512;
+		const height = 512;
+
 		const size = width * height;
 		const data = new Uint8Array( 3 * size );
+		const color = new THREE.Color( 0xffffff );
 
 		const r = Math.floor( color.r * 255 );
 		const g = Math.floor( color.g * 255 );

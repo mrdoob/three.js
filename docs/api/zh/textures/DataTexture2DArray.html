@@ -39,9 +39,12 @@
 		<code>
 		// create a buffer with color data
 
+		const width = 512;
+		const height = 512;
+		const depth = 100;
+
 		const size = width * height;
 		const data = new Uint8Array( 3 * size * depth );
-
 
 		for ( let i = 0; i < depth; i ++ ) {
 

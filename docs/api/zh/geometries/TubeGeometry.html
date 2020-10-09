@@ -35,26 +35,27 @@
 		<h2>代码示例</h2>
 
 		<code>
-		function CustomSinCurve( scale ) {
+		class CustomSinCurve extends THREE.Curve {
 
-			THREE.Curve.call( this );
+			constructor( scale = 1 ) {
 
-			this.scale = ( scale === undefined ) ? 1 : scale;
+				super();
+
+				this.scale = scale;
+
+			}
+
+			getPoint( t, optionalTarget = new THREE.Vector3() ) {
+
+				const tx = t * 3 - 1.5;
+				const ty = Math.sin( 2 * Math.PI * t );
+				const tz = 0;
+
+				return optionalTarget.set( tx, ty, tz ).multiplyScalar( this.scale );
+
+			}
 
 		}
-
-		CustomSinCurve.prototype = Object.create( THREE.Curve.prototype );
-		CustomSinCurve.prototype.constructor = CustomSinCurve;
-
-		CustomSinCurve.prototype.getPoint = function ( t ) {
-
-			const tx = t * 3 - 1.5;
-			const ty = Math.sin( 2 * Math.PI * t );
-			const tz = 0;
-
-			return new THREE.Vector3( tx, ty, tz ).multiplyScalar( this.scale );
-
-		};
 
 		const path = new CustomSinCurve( 10 );
 		const geometry = new THREE.TubeGeometry( path, 20, 2, 8, false );

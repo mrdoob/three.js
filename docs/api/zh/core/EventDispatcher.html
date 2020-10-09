@@ -20,19 +20,15 @@
 		<code>
 		// 为自定义对象添加事件
 
-		const Car = function () {
+		const Car extends EventDispatcher () {
 
-			this.start = function () {
+			start() {
 
 				this.dispatchEvent( { type: 'start', message: 'vroom vroom!' } );
 
 			};
 
-		};
-
-		// 将 EventDispatcher.prototype 与自定义对象 prototype 进行混合
-
-		Object.assign( Car.prototype, EventDispatcher.prototype );
+		}
 
 		// 使用自定义对象的事件
 

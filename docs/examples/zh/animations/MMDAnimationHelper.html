@@ -39,8 +39,7 @@
 					function ( buffer ) {
 
 						const listener = new THREE.AudioListener();
-						const audio = new THREE.Audio( listener )
-							.setBuffer( buffer );
+						const audio = new THREE.Audio( listener ).setBuffer( buffer );
 
 						listener.position.z = 1;
 

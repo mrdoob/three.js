@@ -20,10 +20,11 @@
 		<h2>代码示例</h2>
 
 		<code>
-const spriteMap = new THREE.TextureLoader().load( "sprite.png" );
-const spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap } );
-const sprite = new THREE.Sprite( spriteMaterial );
-scene.add( sprite );
+		const map = new THREE.TextureLoader().load( "sprite.png" );
+		const material = new THREE.SpriteMaterial( { map: map } );
+
+		const sprite = new THREE.Sprite( material );
+		scene.add( sprite );
 		</code>
 
 
