@@ -22,7 +22,7 @@
 
 		<code>
 		// 初始化一个加载器
-		var loader = new THREE.ImageLoader();
+		const loader = new THREE.ImageLoader();
 
 		// 加载一个图片资源
 		loader.load(
@@ -32,8 +32,8 @@
 			// onLoad回调
 			function ( image ) {
 				// use the image, e.g. draw part of it on a canvas
-				var canvas = document.createElement( 'canvas' );
-				var context = canvas.getContext( '2d' );
+				const canvas = document.createElement( 'canvas' );
+				const context = canvas.getContext( '2d' );
 				context.drawImage( image, 100, 100 );
 			},
 

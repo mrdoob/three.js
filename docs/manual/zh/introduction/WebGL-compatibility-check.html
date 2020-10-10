@@ -22,7 +22,7 @@ if (WEBGL.isWebGLAvailable()) {
     // Initiate function or other initializations here
     animate();
 } else {
-    var warning = WEBGL.getWebGLErrorMessage();
+    const warning = WEBGL.getWebGLErrorMessage();
     document.getElementById('container').appendChild(warning);
 }
 </code>

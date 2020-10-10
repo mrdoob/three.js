@@ -19,7 +19,7 @@
 
 		<code>
 		// Instantiate a helper
-		var helper = new MMDAnimationHelper();
+		const helper = new MMDAnimationHelper();
 
 		// Load MMD resources and add to helper
 		new MMDLoader().loadWithAnimation(
@@ -38,9 +38,8 @@
 					'audios/mmd/song.mp3',
 					function ( buffer ) {
 
-						var listener = new THREE.AudioListener();
-						var audio = new THREE.Audio( listener )
-							.setBuffer( buffer );
+						const listener = new THREE.AudioListener();
+						const audio = new THREE.Audio( listener ).setBuffer( buffer );
 
 						listener.position.z = 1;
 

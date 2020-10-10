@@ -21,7 +21,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var loader = new THREE.ObjectLoader();
+		const loader = new THREE.ObjectLoader();
 
 		loader.load(
 			// 资源的URL
@@ -47,7 +47,7 @@
 
 
 		// 或者，解析先前加载的JSON结构
-		var object = loader.parse( a_json_object );
+		const object = loader.parse( a_json_object );
 
 		scene.add( object );
 		</code>
