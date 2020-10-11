@@ -201,8 +201,8 @@ worker.postMessage({type: 'main', canvas: offscreen}, [offscreen]);
 ```css
 #noOffscreenCanvas {
     display: flex;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     align-items: center;
     justify-content: center;
     background: red;
@@ -345,8 +345,8 @@ self.onmessage = function(e) {
 ```css
 -#noOffscreenCanvas {
 -    display: flex;
--    width: 100vw;
--    height: 100vh;
+-    width: 100%;
+-    height: 100%;
 -    align-items: center;
 -    justify-content: center;
 -    background: red;

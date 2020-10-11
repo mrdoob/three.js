@@ -52,16 +52,16 @@ controls.update();
 
 ```css
 #c {
--    width: 100vw;
--    height: 100vh;
+-    width: 100%;
+-    height: 100%;
 +    width: 100%;  /* id=container가 사이즈를 결정하도록 합니다. */
 +    height: 100%;
     display: block;
 }
 +#container {
 +  position: relative;  /* 자식이 이 요소를 기준 삼도록 합니다. */
-+  width: 100vw;
-+  height: 100vh;
++  width: 100%;
++  height: 100%;
 +  overflow: hidden;
 +}
 +#labels {

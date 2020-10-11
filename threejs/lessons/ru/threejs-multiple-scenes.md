@@ -59,8 +59,8 @@ TOC: Несколько холстов, несколько сцен
   position: fixed;
   left: 0;
   top: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: block;
   z-index: -1;
 }

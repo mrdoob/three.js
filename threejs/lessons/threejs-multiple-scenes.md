@@ -57,8 +57,8 @@ Then we can setup the CSS maybe something like this
   position: fixed;
   left: 0;
   top: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: block;
   z-index: -1;
 }
@@ -562,8 +562,8 @@ then we'll change the CSS
 -  position: absolute;
 -  left: 0;
 -  top: 0;
--  width: 100vw;
--  height: 100vh;
+-  width: 100%;
+-  height: 100%;
 -  display: block;
 -  z-index: -1;
 -}

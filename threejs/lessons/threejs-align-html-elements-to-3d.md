@@ -62,16 +62,16 @@ parent container we can make them overlap with this CSS
 
 ```css
 #c {
--    width: 100vw;
--    height: 100vh;
+-    width: 100%;
+-    height: 100%;
 +    width: 100%;  /* let our container decide our size */
 +    height: 100%;
     display: block;
 }
 +#container {
 +  position: relative;  /* makes this the origin of its children */
-+  width: 100vw;
-+  height: 100vh;
++  width: 100%;
++  height: 100%;
 +  overflow: hidden;
 +}
 +#labels {

@@ -289,8 +289,8 @@ body {
     margin: 0;
 }
 #c {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     display: block;
 +    position: fixed;
 +    left: 0;
@@ -302,8 +302,8 @@ body {
 +  font-size: 7vw;
 +  font-family: sans-serif;
 +  text-align: center;
-+  width: 100vw;
-+  height: 100vh;
++  width: 100%;
++  height: 100%;
 +  display: flex;
 +  justify-content: center;
 +  align-items: center;
@@ -358,8 +358,8 @@ body {
 ```
 #background {
     position: fixed;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     left: 0;
     top: 0;
     z-index: -1;

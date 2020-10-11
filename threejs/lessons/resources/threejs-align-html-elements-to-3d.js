@@ -139,7 +139,7 @@ import {GUI} from '../../../3rdparty/dat.gui.module.js';
         };
 
         const darkMatcher = window.matchMedia('(prefers-color-scheme: dark)');
-        darkMatcher.addListener(render);
+        darkMatcher.addEventListener('change', render);
 
         function render() {
           const {rotation} = settings;

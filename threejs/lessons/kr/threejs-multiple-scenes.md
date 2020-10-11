@@ -54,8 +54,8 @@ TOC: 다중 캔버스, 다중 장면 만들기
   position: fixed;
   left: 0;
   top: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   display: block;
   z-index: -1;
 }
@@ -576,8 +576,8 @@ CSS도 바꿔줍니다.
 -  position: absolute;
 -  left: 0;
 -  top: 0;
--  width: 100vw;
--  height: 100vh;
+-  width: 100%;
+-  height: 100%;
 -  display: block;
 -  z-index: -1;
 -}

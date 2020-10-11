@@ -78,11 +78,11 @@ body {
 /* styles to apply if in an iframe */
 
 html.iframe {
-    height: 100vh;
+    height: 100%;
 }
 body.iframe {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   margin: 0;
   overflow: hidden;
 }
@@ -91,8 +91,8 @@ body.iframe {
   display: none;
 }
 .iframe .divcavnas {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 }
 .iframe>#example {
   width: 100%;
@@ -130,8 +130,8 @@ body.iframe {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     position: absolute;
     left: 0;
     top: 0;
@@ -152,11 +152,11 @@ body.iframe {
     max-width: 300px !important;
   }
   canvas {
-    width: 100vw;
+    width: 100%;
   }
   .iframe canvas {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     border: none;
   }
   #uiContainer {
