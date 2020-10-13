@@ -293,6 +293,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     // dispose render targets
 
     this.beautyRenderTarget.dispose();
+    this.prevRenderTarget.dispose();
     this.normalRenderTarget.dispose();
     if (this.isSelective) this.metalnessRenderTarget.dispose();
     this.ssrRenderTarget.dispose();
@@ -561,6 +562,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.ssrMaterial.defines.MAX_STEP = Math.sqrt(width * width + height * height)
     this.ssrMaterial.needsUpdate = true
     this.beautyRenderTarget.setSize(width, height);
+    this.prevRenderTarget.setSize(width, height);
     this.ssrRenderTarget.setSize(width, height);
     this.normalRenderTarget.setSize(width, height);
     if (this.isSelective) this.metalnessRenderTarget.setSize(width, height);
@@ -573,6 +575,7 @@ SSRPass.prototype = Object.assign(Object.create(Pass.prototype), {
     this.ssrMaterial.uniforms['cameraInverseProjectionMatrix'].value.copy(this.camera.projectionMatrixInverse);
 
     this.blurMaterial.uniforms['resolution'].value.set(width, height);
+    this.blurMaterial2.uniforms['resolution'].value.set(width, height);
 
   },
 
