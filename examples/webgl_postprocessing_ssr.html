@@ -41,7 +41,6 @@
 
 	var params = {
 		enableSSR: true,
-		darken: true,
 	}
 	var composer
 	var ssrPass
@@ -83,7 +82,7 @@
 
 		if(isPerspectiveCamera){
 			camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 2, 10000 );
-			camera.position.set( 388.5770726262176,  305.6568142796153,  647.1326965696304);
+			camera.position.set( 320.3799692585287,  340.3719443974168,  666.8602336478249);
 			// camera.position.set( -612.8787517743004,  518.3480614141735,  137.45500830289768);
 		}else{
 			var initialFrustumSize = 1000
@@ -287,7 +286,7 @@
 			camera, 
 			width: innerWidth, 
 			height: innerHeight,
-			// encoding: THREE.sRGBEncoding,
+			encoding: THREE.sRGBEncoding,
 			isPerspectiveCamera:isPerspectiveCamera,
 			morphTargets: true,
 		});
@@ -299,13 +298,6 @@
 		gui.add(params, 'enableSSR').name( 'Enable SSR' );
 		gui.add(ssrPass, 'isDistanceAttenuation');
 		gui.add(ssrPass, 'maxDistance').min(0).max(2000);
-		gui.add(params, 'darken').onChange(function(value){
-			if(value){
-				ssrPass.encoding = THREE.LinearEncoding
-			}else{
-				ssrPass.encoding = THREE.sRGBEncoding
-			}
-		});
 		gui.add(ssrPass,'isBouncing')
 		gui.add(ssrPass, 'output', {
 			'Default': SSRPass.OUTPUT.Default,
