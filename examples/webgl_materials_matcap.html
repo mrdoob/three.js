@@ -22,9 +22,9 @@
 			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
 			import { EXRLoader } from './jsm/loaders/EXRLoader.js';
 
-			var mesh, renderer, scene, camera;
+			let mesh, renderer, scene, camera;
 
-			var API = {
+			const API = {
 				color: 0xffffff, // sRGB
 				exposure: 1.0
 			};
@@ -53,24 +53,24 @@
 				camera.position.set( 0, 0, 13 );
 
 				// controls
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.enableZoom = false;
 				controls.enablePan = false;
 
 				// manager
-				var manager = new THREE.LoadingManager( render );
+				const manager = new THREE.LoadingManager( render );
 
 				// matcap
-				var loader = new EXRLoader( manager )
+				const loaderEXR = new EXRLoader( manager )
 					.setDataType( THREE.UnsignedByteType ); // default: FloatType
 
-				var matcap = loader.load( 'textures/matcaps/040full.exr' );
+				const matcap = loaderEXR.load( 'textures/matcaps/040full.exr' );
 
 				// normalmap
-				var loader = new THREE.TextureLoader( manager );
+				const loader = new THREE.TextureLoader( manager );
 
-				var normalmap = loader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
+				const normalmap = loader.load( 'models/gltf/LeePerrySmith/Infinite-Level_02_Tangent_SmoothUV.jpg' );
 
 				// model
 				new GLTFLoader( manager ).load( 'models/gltf/LeePerrySmith/LeePerrySmith.glb', function ( gltf ) {
@@ -91,7 +91,7 @@
 				} );
 
 				// gui
-				var gui = new GUI();
+				const gui = new GUI();
 
 				gui.addColor( API, 'color' )
 					.listen()
@@ -162,7 +162,7 @@
 
 				function imgCallback( event ) {
 
-					var texture = new THREE.Texture( event.target );
+					const texture = new THREE.Texture( event.target );
 
 					texture.encoding = THREE.sRGBEncoding;
 
@@ -170,7 +170,7 @@
 
 				}
 
-				var img = new Image();
+				const img = new Image();
 
 				img.onload = imgCallback;
 
@@ -180,15 +180,15 @@
 
 			function handleEXR( event ) {
 
-				var contents = event.target.result;
+				const contents = event.target.result;
 
-				var loader = new EXRLoader();
+				const loader = new EXRLoader();
 
 				loader.setDataType( THREE.UnsignedByteType ); // default: FloatType
 
-				var texData = loader.parse( contents );
+				const texData = loader.parse( contents );
 
-				var texture = new THREE.DataTexture();
+				const texture = new THREE.DataTexture();
 
 				texture.image.width = texData.width;
 				texture.image.height = texData.height;
@@ -226,12 +226,12 @@
 
 			function loadFile( file ) {
 
-				var filename = file.name;
-				var extension = filename.split( '.' ).pop().toLowerCase();
+				const filename = file.name;
+				const extension = filename.split( '.' ).pop().toLowerCase();
 
 				if ( extension === 'exr' ) {
 
-					var reader = new FileReader();
+					const reader = new FileReader();
 
 					reader.addEventListener( 'load', function ( event ) {
 
@@ -243,7 +243,7 @@
 
 				} else { // 'jpg', 'png'
 
-					var reader = new FileReader();
+					const reader = new FileReader();
 
 					reader.addEventListener( 'load', function ( event ) {
 
