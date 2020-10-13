@@ -508,7 +508,7 @@
 
 				// Get the time elapsed since the last frame, used for mixer update (if not in single step mode)
 
-				const mixerUpdateDelta = clock.getDelta();
+				let mixerUpdateDelta = clock.getDelta();
 
 				// If in single step mode, make one step and then do nothing (until the user clicks again)
 

@@ -274,7 +274,7 @@
 
 								// step 2, using x2 as cx'
 
-								const norm = Math.sqrt( ( rx * rx * ry * ry - rx * rx * y1 * y1 - ry * ry * x1 * x1 ) /
+								let norm = Math.sqrt( ( rx * rx * ry * ry - rx * rx * y1 * y1 - ry * ry * x1 * x1 ) /
 									 ( rx * rx * y1 * y1 + ry * ry * x1 * x1 ) );
 
 								if ( laf === sf ) norm = - norm;
@@ -290,7 +290,7 @@
 								const u = new THREE.Vector2( 1, 0 );
 								const v = new THREE.Vector2( ( x1 - x2 ) / rx, ( y1 - y2 ) / ry );
 
-								const startAng = Math.acos( u.dot( v ) / u.length() / v.length() );
+								let startAng = Math.acos( u.dot( v ) / u.length() / v.length() );
 
 								if ( ( ( u.x * v.y ) - ( u.y * v.x ) ) < 0 ) startAng = - startAng;
 
@@ -298,7 +298,7 @@
 								u.x = ( - x1 - x2 ) / rx;
 								u.y = ( - y1 - y2 ) / ry;
 
-								const deltaAng = Math.acos( v.dot( u ) / v.length() / u.length() );
+								let deltaAng = Math.acos( v.dot( u ) / v.length() / u.length() );
 
 								// This normalization ends up making our curves fail to triangulate...
 
