@@ -84,7 +84,7 @@ function toHalf ( val ) {
 var RectAreaLightUniformsLib = {
 
 	// renderer should be an instance of THREE.WebGLRenderer
-	init: function ( renderer ) {
+	init: function () {
 
 		// source: https://github.com/selfshadow/ltc_code/tree/master/fit/results/ltc.js
 
@@ -94,39 +94,25 @@ var RectAreaLightUniformsLib = {
 
 		// data textures
 
-		var ltc_1 = null;
-		var ltc_2 = null;
+		const ltc_float_1 = new Float32Array( LTC_MAT_1 );
+		const ltc_float_2 = new Float32Array( LTC_MAT_2 );
 
-		if ( renderer.capabilities.isWebGL2 === true || renderer.extensions.get( 'OES_texture_float_linear' ) ) {
+		UniformsLib.LTC_FLOAT_1 = new DataTexture( ltc_float_1, 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
+		UniformsLib.LTC_FLOAT_2 = new DataTexture( ltc_float_2, 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
 
-			const ltc_float_1 = new Float32Array( LTC_MAT_1 );
-			const ltc_float_2 = new Float32Array( LTC_MAT_2 );
+		const ltc_half_1 = new Uint16Array( LTC_MAT_1.length );
+		LTC_MAT_1.forEach( function ( x, index ) {
+			ltc_half_1[index] = toHalf( x );
+		});
 
-			ltc_1 = new DataTexture( ltc_float_1, 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
-			ltc_2 = new DataTexture( ltc_float_2, 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
-		
-		} else if ( renderer.extensions.get( 'OES_texture_half_float_linear' ) ) {
-			
-			const ltc_half_1 = new Uint16Array( LTC_MAT_1.length );
-			LTC_MAT_1.forEach( function ( x, index ) {
-				ltc_half_1[index] = toHalf( x );
-			});
+		const ltc_half_2 = new Uint16Array( LTC_MAT_2.length );
+		LTC_MAT_2.forEach( function ( x, index ) {
+			ltc_half_2[index] = toHalf( x );
+		});
 	
-			const ltc_half_2 = new Uint16Array( LTC_MAT_2.length );
-			LTC_MAT_2.forEach( function ( x, index ) {
-				ltc_half_2[index] = toHalf( x );
-			});
+		UniformsLib.LTC_HALF_1 = new DataTexture( ltc_half_1, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
+		UniformsLib.LTC_HALF_2 = new DataTexture( ltc_half_2, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
 		
-			ltc_1 = new DataTexture( ltc_half_1, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
-			ltc_2 = new DataTexture( ltc_half_2, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
-			
-		} else {
-			throw 'missing webgl extension';
-		}
-
-		UniformsLib.LTC_1 = ltc_1;
-		UniformsLib.LTC_2 = ltc_2;
-
 	}
 
 };
