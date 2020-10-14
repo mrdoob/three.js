@@ -339,6 +339,23 @@ var GLTFLoader = ( function () {
 							extensions[ extensionName ] = new GLTFMeshQuantizationExtension();
 							break;
 
+						case EXTENSIONS.EXT_MESHOPT_COMPRESSION:
+							if ( extensionsRequired.includes( extensionName ) ) {
+
+								if ( !this.meshoptDecoder ) {
+
+									throw new Error( 'THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files' );	
+
+								}
+
+								if ( !this.meshoptDecoder.supported ) {
+
+									throw new Error( 'THREE.GLTFLoader: MeshoptDecoder support is required to load compressed files' );	
+
+								}
+
+							}
+
 						default:
 
 							if ( extensionsRequired.indexOf( extensionName ) >= 0 && plugins[ extensionName ] === undefined ) {
