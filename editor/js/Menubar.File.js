@@ -38,21 +38,67 @@ function MenubarFile( editor ) {
 	options.setClass( 'options' );
 	container.add( options );
 
-	// New
+	// New Project
 
 	var option = new UIRow();
-	option.setClass( 'option' );
-	option.setTextContent( strings.getKey( 'menubar/file/new' ) );
-	option.onClick( function () {
-
-		if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
-
+	option.setClass("option");
+	option.setTextContent(strings.getKey("menubar/file/new"));
+	option.onClick(function() {
+		if (confirm("Any unsaved data will be lost. Are you sure?")) {
 			editor.clear();
+			config.setKey("project/title", "untitled");
+		}
+	});
+	options.add(option);
 
+	// Load Project
+
+	var openform = document.createElement("form");
+	openform.style.display = "none";
+	document.body.appendChild(openform);
+
+	var openfileInput = document.createElement("input");
+	openfileInput.multiple = false;
+	openfileInput.type = "file";
+	openfileInput.accept = ".json";
+	openfileInput.addEventListener("change", function() {
+		editor.loader.loadFiles(openfileInput.files);
+		openform.reset();
+	});
+	openform.appendChild(openfileInput);
+
+	var option = new UIRow();
+	option.setClass("option");
+	option.setTextContent(strings.getKey("menubar/file/load"));
+	option.onClick(function() {
+		if (confirm("Any unsaved data will be lost. Are you sure?")) {
+			editor.clear();
+			openfileInput.click();
+		}
+	});
+	options.add(option);
+
+	// Save Project
+
+	var option = new UIRow();
+	option.setClass("option");
+	option.setTextContent(strings.getKey("menubar/file/save"));
+	option.onClick(function() {
+		var output = editor.toJSON();
+		output.metadata.type = "App";
+
+		try {
+			output = JSON.stringify(output, parseNumber, "\t");
+			output = output.replace(/[\n\t]+([\d\.e\-\[\]]+)/g, "$1");
+		} catch (e) {
+			output = JSON.stringify(output);
 		}
 
-	} );
-	options.add( option );
+		var title = config.getKey("project/title");
+
+		saveString(output, (title !== "" ? title : "untitled") + ".json");
+	});
+	options.add(option);
 
 	//
 
