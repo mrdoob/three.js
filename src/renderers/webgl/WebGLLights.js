@@ -404,7 +404,7 @@ function WebGLLights( extensions, capabilities ) {
 			}
 
 		}
-	
+
 		if ( rectAreaLength > 0 ) {
 
 			if ( capabilities.isWebGL2 || extensions.get( 'OES_texture_float_linear' ) ) {
