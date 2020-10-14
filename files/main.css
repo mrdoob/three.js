@@ -521,11 +521,30 @@ iframe {
 	transform: translate(-50%, -50%);
 }
 
-.card .title {
+
+.card .title-container {
+	display: inline-block;
+	vertical-align: middle;
 	padding: 8px 12px 4px;
+}
+
+.card .title {
 	font-size: calc(var(--font-size) - 1px);
 	font-weight: 500;
 	line-height: calc(var(--line-height) - 6px);
+	display: inline;
+}
+
+.card .is-new {
+	content: 'NEW';
+	padding: 1px 4px;
+	display: inline-block;
+	font-size: 10px;
+	background-color: var(--color-blue);
+	color: white;
+	border-radius: 4px;
+	text-transform: uppercase;
+	display: inline;
 }
 
 /* mobile */

@@ -1,3 +1,5 @@
+var newExamples = [ 'webgl2_volume_cloud', 'webgl2_volume_instancing', 'webxr_vr_haptics' ];
+
 var files = {
 	"webgl": [
 		"webgl_animation_cloth",
