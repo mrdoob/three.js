@@ -558,7 +558,7 @@
         };
         const ctx = oldFn.apply(this, args);
         if (!ctx) {
-          if (!isWebGL2) {
+          if (isWebGL2) {
             // three tries webgl2 then webgl1
             // so wait 1/2 a second before showing the failure
             // message. If we get success on the same canvas
