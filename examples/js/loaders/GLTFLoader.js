@@ -742,9 +742,9 @@ THREE.GLTFLoader = ( function () {
 			var buffer = this.parser.getDependency( 'buffer', extensionDef.buffer );
 			var decoder = this.parser.options.meshoptDecoder;
 
-			if ( !decoder ) {
+			if ( !decoder || !decoder.supported ) {
 
-				throw new Error( 'THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files' );
+				return null; // will use the fallback buffer if present
 
 			}
 
