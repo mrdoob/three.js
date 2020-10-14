@@ -535,13 +535,20 @@
     };
   }
 
+  const canvasesToTimeoutMap = new Map();
   const isWebGLRE = /^(webgl|webgl2|experimental-webgl)$/i;
+  const isWebGL2RE = /^webgl2$/i;
   function installWebGLLessonSetup() {
     HTMLCanvasElement.prototype.getContext = (function(oldFn) {
       return function() {
+        const timeoutId = canvasesToTimeoutMap.get(this);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+        }
         const type = arguments[0];
-        const isWebGL = isWebGLRE.test(type);
-        if (isWebGL) {
+        const isWebGL1or2 = isWebGLRE.test(type);
+        const isWebGL2 = isWebGL2RE.test(type);
+        if (isWebGL1or2) {
           setupLesson(this);
         }
         const args = [].slice.apply(arguments);
@@ -550,8 +557,19 @@
           ...args[1],
         };
         const ctx = oldFn.apply(this, args);
-        if (!ctx && isWebGL) {
-          showNeedWebGL(this);
+        if (!ctx) {
+          if (!isWebGL2) {
+            // three tries webgl2 then webgl1
+            // so wait 1/2 a second before showing the failure
+            // message. If we get success on the same canvas
+            // we'll cancel this.
+            canvasesToTimeoutMap.set(this, setTimeout(() => {
+              canvasesToTimeoutMap.delete(this);
+              showNeedWebGL(this);
+            }, 500));
+          } else {
+            showNeedWebGL(this);
+          }
         }
         return ctx;
       };
