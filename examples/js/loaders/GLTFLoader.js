@@ -1465,7 +1465,7 @@ THREE.GLTFLoader = ( function () {
 
 	var INTERPOLATION = {
 		CUBICSPLINE: undefined, // We use a custom interpolant (GLTFCubicSplineInterpolation) for CUBICSPLINE tracks. Each
-								// keyframe track will be initialized with a default interpolation type, then modified.
+		                        // keyframe track will be initialized with a default interpolation type, then modified.
 		LINEAR: THREE.InterpolateLinear,
 		STEP: THREE.InterpolateDiscrete
 	};
