@@ -27,18 +27,19 @@
 
 			import * as Nodes from './jsm/nodes/Nodes.js';
 
-			var container = document.getElementById( 'container' );
+			const container = document.getElementById( 'container' );
 
-			var renderer, scene, lightGroup, camera, clock = new THREE.Clock(), fov = 50;
-			var frame = new Nodes.NodeFrame();
-			var teapot, mesh;
-			var controls;
-			var move = false;
-			var rtTexture, rtMaterial;
-			var gui;
-			var library = {};
-			var serialized = false;
-			var textures = {
+			let renderer, scene, lightGroup, camera;
+			const clock = new THREE.Clock(), fov = 50;
+			const frame = new Nodes.NodeFrame();
+			let teapot, mesh;
+			let controls;
+			let move = false;
+			let rtTexture, rtMaterial;
+			let gui;
+			const library = {};
+			let serialized = false;
+			const textures = {
 				brick: { url: 'textures/brick_diffuse.jpg' },
 				grass: { url: 'textures/terrain/grasslight-big.jpg' },
 				grassNormal: { url: 'textures/terrain/grasslight-big-nm.jpg' },
@@ -48,11 +49,11 @@
 				spherical: { url: 'textures/envmap.png' }
 			};
 
-			var param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
+			const param = { example: new URL( window.location.href ).searchParams.get( 'e' ) || 'mesh-standard' };
 
 			function getTexture( name ) {
 
-				var texture = textures[ name ].texture;
+				let texture = textures[ name ].texture;
 
 				if ( ! texture ) {
 
@@ -67,7 +68,7 @@
 
 			}
 
-			var premTexture, pmremCube;
+			let premTexture, pmremCube;
 
 			function updatePREM( textureCube ) {
 
@@ -75,11 +76,11 @@
 
 				if ( ! pmremCube || ! renderer ) return;
 
-				var minFilter = pmremCube.minFilter;
-				var magFilter = pmremCube.magFilter;
-				var generateMipmaps = pmremCube.generateMipmaps;
+				const minFilter = pmremCube.minFilter;
+				const magFilter = pmremCube.magFilter;
+				const generateMipmaps = pmremCube.generateMipmaps;
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				premTexture = pmremGenerator.fromCubemap( pmremCube ).texture;
 				pmremGenerator.dispose();
 
@@ -92,17 +93,17 @@
 
 			}
 
-			var cubemap = function () {
+			const cubemap = function () {
 
-				var path = "textures/cube/Park2/";
-				var format = '.jpg';
-				var urls = [
+				const path = "textures/cube/Park2/";
+				const format = '.jpg';
+				const urls = [
 					path + 'posx' + format, path + 'negx' + format,
 					path + 'posy' + format, path + 'negy' + format,
 					path + 'posz' + format, path + 'negz' + format
 				];
 
-				var textureCube = new THREE.CubeTextureLoader().load( urls, updatePREM );
+				const textureCube = new THREE.CubeTextureLoader().load( urls, updatePREM );
 
 				library[ textureCube.uuid ] = textureCube;
 
@@ -137,7 +138,7 @@
 				lightGroup = new THREE.Group();
 				scene.add( lightGroup );
 
-				var light;
+				let light;
 
 				lightGroup.add( new THREE.AmbientLight( 0x464646 ) );
 
@@ -236,7 +237,7 @@
 
 			function addGui( name, value, callback, isColor, min, max ) {
 
-				var node;
+				let node;
 
 				param[ name ] = value;
 
@@ -3260,7 +3261,7 @@
 
 			function onWindowResize() {
 
-				var width = window.innerWidth, height = window.innerHeight;
+				const width = window.innerWidth, height = window.innerHeight;
 
 				camera.aspect = width / height;
 				camera.updateProjectionMatrix();
@@ -3286,18 +3287,18 @@
 
 				// gui
 
-				var div = document.getElementById( 'serialize' );
+				const div = document.getElementById( 'serialize' );
 				div.textContent = "Serialize and apply";
 
 			}
 
 			function serialize() {
 
-				var json = mesh.material.toJSON();
+				const json = mesh.material.toJSON();
 
 				// replace uuid to url (facilitates the load of textures using url otherside uuid) e.g:
 
-				var cloud = getTexture( "cloud" );
+				const cloud = getTexture( "cloud" );
 
 				NodeMaterialLoaderUtils.replaceUUID( json, cloud, "cloud" );
 
@@ -3305,7 +3306,7 @@
 
 				// --
 
-				var jsonStr = JSON.stringify( json );
+				const jsonStr = JSON.stringify( json );
 
 				console.log( jsonStr );
 
@@ -3318,7 +3319,7 @@
 
 				// gui
 
-				var div = document.getElementById( 'serialize' );
+				const div = document.getElementById( 'serialize' );
 				div.textContent = "Click to reset - JSON Generate: " + ( jsonStr.length / 1024 ).toFixed( 3 ) + "kB";
 
 				if ( gui ) gui.destroy();
@@ -3329,7 +3330,7 @@
 
 			function animate() {
 
-				var delta = clock.getDelta();
+				const delta = clock.getDelta();
 
 				if ( move ) {
 
