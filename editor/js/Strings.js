@@ -7,7 +7,9 @@ function Strings( config ) {
 		en: {
 
 			'menubar/file': 'File',
-			'menubar/file/new': 'New',
+			"menubar/file/new": 'New Project',
+			"menubar/file/load": 'Load Project',
+			"menubar/file/save": 'Save Project,
 			'menubar/file/import': 'Import',
 			'menubar/file/export/geometry': 'Export Geometry',
 			'menubar/file/export/object': 'Export Object',
