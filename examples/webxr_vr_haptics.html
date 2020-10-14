@@ -19,16 +19,16 @@
 			import { VRButton } from './jsm/webxr/VRButton.js';
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 
-			var container;
-			var camera, scene, renderer;
-			var controller1, controller2;
-			var controllerGrip1, controllerGrip2;
-			var box = new THREE.Box3();
+			let container;
+			let camera, scene, renderer;
+			let controller1, controller2;
+			let controllerGrip1, controllerGrip2;
+			const box = new THREE.Box3();
 
-			var controllers = [];
-			var oscillators = [];
-			var controls, group;
-			var audioCtx = null;
+			const controllers = [];
+			const oscillators = [];
+			let controls, group;
+			let audioCtx = null;
 
 			init();
 			animate();
@@ -44,7 +44,7 @@
 				audioCtx = new ( window.AudioContext || window.webkitAudioContext )();
 				function createOscillator() {
 
-					let oscillator = audioCtx.createOscillator();
+					const oscillator = audioCtx.createOscillator();
 					const real = Array.from( { length: 8192 }, ( _, n ) => (
 						n === 0 ?
 							0 :
@@ -60,6 +60,7 @@
 				oscillators.push( createOscillator() );
 				oscillators.push( createOscillator() );
 				window.oscillators = oscillators;
+
 			}
 
 			function init() {
@@ -77,20 +78,20 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( {
+				const floorGeometry = new THREE.PlaneBufferGeometry( 4, 4 );
+				const floorMaterial = new THREE.MeshStandardMaterial( {
 					color: 0xeeeeee,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var floor = new THREE.Mesh( geometry, material );
+				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
 				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
@@ -104,20 +105,20 @@
 				group.position.z = - 0.5;
 				scene.add( group );
 
-				for ( var i = 0; i < 10; i ++ ) {
+				for ( let i = 0; i < 10; i ++ ) {
 
 					const intensity = ( i + 1 ) / 10;
 					const w = 0.1;
 					const h = 0.1;
 					const minH = 1;
-					var geometry = new THREE.BoxBufferGeometry( w, h * i + minH, w );
-					var material = new THREE.MeshStandardMaterial( {
+					const geometry = new THREE.BoxBufferGeometry( w, h * i + minH, w );
+					const material = new THREE.MeshStandardMaterial( {
 						color: new THREE.Color( intensity, 0.1, 0.1 ),
 						roughness: 0.7,
 						metalness: 0.0
 					} );
 
-					var object = new THREE.Mesh( geometry, material );
+					const object = new THREE.Mesh( geometry, material );
 					object.position.x = ( i - 5 ) * ( w + 0.05 );
 					object.castShadow = true;
 					object.receiveShadow = true;
@@ -156,7 +157,7 @@
 				controller2 = renderer.xr.getController( 1 );
 				scene.add( controller2 );
 
-				var controllerModelFactory = new XRControllerModelFactory();
+				const controllerModelFactory = new XRControllerModelFactory();
 
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
 				controllerGrip1.addEventListener( "connected", controllerConnected );
@@ -217,19 +218,19 @@
 
 			function handleCollisions() {
 
-				for ( var g = 0; g < controllers.length; g ++ ) {
+				for ( let g = 0; g < controllers.length; g ++ ) {
 
 					controllers[ g ].colliding = false;
 
 					const { grip, gamepad } = controllers[ g ];
-					var sphere = {
+					const sphere = {
 						radius: 0.03,
 						center: grip.position
 					};
 
 					if ( "hapticActuators" in gamepad && gamepad.hapticActuators != null && gamepad.hapticActuators.length > 0 ) {
 
-						for ( var i = 0; i < group.children.length; i ++ ) {
+						for ( let i = 0; i < group.children.length; i ++ ) {
 
 							const child = group.children[ i ];
 							box.setFromObject( child );

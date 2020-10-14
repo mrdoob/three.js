@@ -57,10 +57,10 @@
 
 		<code>
 		// Instantiate a loader
-		var loader = new GLTFLoader();
+		const loader = new GLTFLoader();
 
 		// Optional: Provide a DRACOLoader instance to decode compressed mesh data
-		var dracoLoader = new DRACOLoader();
+		const dracoLoader = new DRACOLoader();
 		dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
 		loader.setDRACOLoader( dracoLoader );
 
@@ -142,11 +142,11 @@
 		<code>
 		loader.load('foo.gltf', function ( gltf ) {
 
-			var scene = gltf.scene;
+			const scene = gltf.scene;
 
-			var mesh = scene.children[ 3 ];
+			const mesh = scene.children[ 3 ];
 
-			var fooExtension = mesh.userData.gltfExtensions.EXT_foo;
+			const fooExtension = mesh.userData.gltfExtensions.EXT_foo;
 
 			gltf.parser.getDependency( 'bufferView', fooExtension.bufferView )
 				.then( function ( fooBuffer ) { ... } );

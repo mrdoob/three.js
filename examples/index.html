@@ -46,20 +46,21 @@
 
 		<script>
 
-		var panel = document.getElementById( 'panel' );
-		var content = document.getElementById( 'content' );
-		var viewer = document.getElementById( 'viewer' );
-		var filterInput = document.getElementById( 'filterInput' );
-		var exitSearchButton = document.getElementById( 'exitSearchButton' );
-		var expandButton = document.getElementById( 'expandButton' );
-		var viewSrcButton = document.getElementById( 'button' );
-		var panelScrim = document.getElementById( 'panelScrim' );
+		const panel = document.getElementById( 'panel' );
+		const content = document.getElementById( 'content' );
+		const viewer = document.getElementById( 'viewer' );
+		const filterInput = document.getElementById( 'filterInput' );
+		const exitSearchButton = document.getElementById( 'exitSearchButton' );
+		const expandButton = document.getElementById( 'expandButton' );
+		const viewSrcButton = document.getElementById( 'button' );
+		const panelScrim = document.getElementById( 'panelScrim' );
 
-		var previewsToggler = document.getElementById( 'previewsToggler' );
+		const previewsToggler = document.getElementById( 'previewsToggler' );
 
-		var links = {};
-		var selected = null;
-		var container = document.createElement( 'div' );
+		const links = {};
+		const container = document.createElement( 'div' );
+
+		let selected = null;
 
 		init();
 
@@ -69,20 +70,20 @@
 
 			viewSrcButton.style.display = 'none';
 
-			for ( var key in files ) {
+			for ( const key in files ) {
 
-				var section = files[ key ];
+				const section = files[ key ];
 
-				var header = document.createElement( 'h2' );
+				const header = document.createElement( 'h2' );
 				header.textContent = key;
 				header.setAttribute( 'data-category', key );
 				container.appendChild( header );
 
-				for ( var i = 0; i < section.length; i ++ ) {
+				for ( let i = 0; i < section.length; i ++ ) {
 
-					var file = section[ i ];
+					const file = section[ i ];
 
-					var link = createLink( file );
+					const link = createLink( file );
 					container.appendChild( link );
 
 					links[ file ] = link;
@@ -175,8 +176,7 @@
 
 		function createLink( file ) {
 
-
-			var template = [
+			const template = [
 				'<div class="card">',
 				'	<a href="' + file + '.html" target="viewer">',
 				'		<div class="cover">',
@@ -187,7 +187,7 @@
 				'</div>'
 			].join( "\n" );
 
-			var link = createElementFromHTML( template );
+			const link = createElementFromHTML( template );
 
 			link.querySelector( 'a[target="viewer"]' ).addEventListener( 'click', function ( event ) {
 
@@ -230,7 +230,7 @@
 
 		function updateFilter() {
 
-			var v = filterInput.value.trim();
+			let v = filterInput.value.trim();
 			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
 
 			if ( v !== '' ) {
@@ -243,13 +243,13 @@
 
 			}
 
-			var exp = new RegExp( v, 'gi' );
+			const exp = new RegExp( v, 'gi' );
 
-			for ( var key in files ) {
+			for ( const key in files ) {
 
-				var section = files[ key ];
+				const section = files[ key ];
 
-				for ( var i = 0; i < section.length; i ++ ) {
+				for ( let i = 0; i < section.length; i ++ ) {
 
 					filterExample( section[ i ], exp );
 
@@ -263,17 +263,17 @@
 
 		function filterExample( file, exp ) {
 
-			var link = links[ file ];
-			var name = getName( file );
+			const link = links[ file ];
+			const name = getName( file );
 			if ( file in tags ) file += ' ' + tags[ file ].join( ' ' );
-			var res = file.match( exp );
-			var text;
+			const res = file.match( exp );
+			let text;
 
 			if ( res && res.length > 0 ) {
 
 				link.classList.remove( 'hidden' );
 
-				for ( var i = 0; i < res.length; i ++ ) {
+				for ( let i = 0; i < res.length; i ++ ) {
 
 					text = name.replace( res[ i ], '<b>' + res[ i ] + '</b>' );
 
@@ -292,7 +292,7 @@
 
 		function getName( file ) {
 
-			var name = file.split( '_' );
+			const name = file.split( '_' );
 			name.shift();
 			return name.join( ' / ' );
 
@@ -300,15 +300,15 @@
 
 		function layoutList() {
 
-			for ( var key in files ) {
+			for ( const key in files ) {
 
-				var collapsed = true;
+				let collapsed = true;
 
-				var section = files[ key ];
+				const section = files[ key ];
 
-				for ( var i = 0; i < section.length; i ++ ) {
+				for ( let i = 0; i < section.length; i ++ ) {
 
-					var file = section[ i ];
+					const file = section[ i ];
 
 					if ( links[ file ].classList.contains( 'hidden' ) === false ) {
 
@@ -319,7 +319,7 @@
 
 				}
 
-				var element = document.querySelector( 'h2[data-category="' + key + '"]' );
+				const element = document.querySelector( 'h2[data-category="' + key + '"]' );
 
 				if ( collapsed ) {
 
@@ -337,7 +337,7 @@
 
 		function extractQuery() {
 
-			var p = window.location.search.indexOf( '?q=' );
+			const p = window.location.search.indexOf( '?q=' );
 
 			if ( p !== - 1 ) {
 
@@ -352,7 +352,7 @@
 
 		function createElementFromHTML( htmlString ) {
 
-			var div = document.createElement( 'div' );
+			const div = document.createElement( 'div' );
 			div.innerHTML = htmlString.trim();
 			return div.firstChild;
 

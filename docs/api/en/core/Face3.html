@@ -19,19 +19,19 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var material = new THREE.MeshStandardMaterial( { color : 0x00cc00 } );
+		const material = new THREE.MeshStandardMaterial( { color : 0x00cc00 } );
 
 		//create a triangular geometry
-		var geometry = new THREE.Geometry();
+		const geometry = new THREE.Geometry();
 		geometry.vertices.push( new THREE.Vector3( -50, -50, 0 ) );
 		geometry.vertices.push( new THREE.Vector3(  50, -50, 0 ) );
 		geometry.vertices.push( new THREE.Vector3(  50,  50, 0 ) );
 
 		//create a new face using vertices 0, 1, 2
-		var normal = new THREE.Vector3( 0, 0, 1 ); //optional
-		var color = new THREE.Color( 0xffaa00 ); //optional
-		var materialIndex = 0; //optional
-		var face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
+		const normal = new THREE.Vector3( 0, 0, 1 ); //optional
+		const color = new THREE.Color( 0xffaa00 ); //optional
+		const materialIndex = 0; //optional
+		const face = new THREE.Face3( 0, 1, 2, normal, color, materialIndex );
 
 		//add the face to the geometry's faces array
 		geometry.faces.push( face );

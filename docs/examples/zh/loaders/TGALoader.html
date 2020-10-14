@@ -20,10 +20,10 @@
 
 		<code>
 		// instantiate a loader
-		var loader = new TGALoader();
+		const loader = new TGALoader();
 
 		// load a resource
-		var texture = loader.load(
+		const texture = loader.load(
 			// resource URL
 			'textures/crate_grey8.tga'
 			// called when loading is completed
@@ -46,7 +46,7 @@
 			}
 		);
 
-		var material = new THREE.MeshPhongMaterial( {
+		const material = new THREE.MeshPhongMaterial( {
 			color: 0xffffff,
 			map: texture
 		} );

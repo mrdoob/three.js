@@ -1,4 +1,4 @@
-var files = {
+const files = {
 	"webgl": [
 		"webgl_animation_cloth",
 		"webgl_animation_keyframes",
@@ -297,7 +297,6 @@ var files = {
 		"webgl_custom_attributes_points",
 		"webgl_custom_attributes_points2",
 		"webgl_custom_attributes_points3",
-		"webgl_fire",
 		"webgl_gpgpu_birds",
 		"webgl_gpgpu_birds_gltf",
 		"webgl_gpgpu_water",
@@ -405,7 +404,7 @@ var files = {
 	]
 };
 
-var tags = {
+const tags = {
 	"webgl_animation_cloth": [ "physics", "integration" ],
 	"webgl_clipping": [ "solid" ],
 	"webgl_clipping_advanced": [ "solid" ],
@@ -494,7 +493,6 @@ var tags = {
 	"webgl_postprocessing_ssao": [ "ambient occlusion" ],
 	"webgl_postprocessing_unreal_bloom": [ "glow" ],
 	"webgl_postprocessing_unreal_bloom_selective": [ "glow" ],
-	"webgl_fire": [ "smoke" ],
 	"webgl_materials_modified": [ "onBeforeCompile" ],
 	"webgl_shadowmap_csm": [ "cascade" ],
 	"webgl_shadowmap_pcss": [ "soft" ],

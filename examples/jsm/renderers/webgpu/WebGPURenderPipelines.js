@@ -41,8 +41,8 @@ class WebGPURenderPipelines {
 		// - clipping planes
 		//
 		// The renderer needs to manage multiple pipelines per object so
-		// GPUDevice.createRenderPipeline() is only called no pipeline exists for the
-		// given configuration.
+		// GPUDevice.createRenderPipeline() is only called when no pipeline exists for the
+		// current configuration.
 
 		let pipeline = this.pipelines.get( object );
 

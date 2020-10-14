@@ -20,11 +20,11 @@
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 
-			var renderer, scene, camera;
+			let renderer, scene, camera;
 
-			var spotLight, lightHelper, shadowCameraHelper;
+			let spotLight, lightHelper, shadowCameraHelper;
 
-			var gui;
+			let gui;
 
 			function init() {
 
@@ -43,13 +43,13 @@
 				camera = new THREE.PerspectiveCamera( 35, window.innerWidth / window.innerHeight, 1, 1000 );
 				camera.position.set( 160, 40, 10 );
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.addEventListener( 'change', render );
 				controls.minDistance = 20;
 				controls.maxDistance = 500;
 				controls.enablePan = false;
 
-				var ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
+				const ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
 				scene.add( ambient );
 
 				spotLight = new THREE.SpotLight( 0xffffff, 1 );
@@ -75,11 +75,11 @@
 
 				//
 
-				var material = new THREE.MeshPhongMaterial( { color: 0x808080, dithering: true } );
+				let material = new THREE.MeshPhongMaterial( { color: 0x808080, dithering: true } );
 
-				var geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
+				let geometry = new THREE.PlaneBufferGeometry( 2000, 2000 );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				let mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, - 1, 0 );
 				mesh.rotation.x = - Math.PI * 0.5;
 				mesh.receiveShadow = true;
@@ -87,11 +87,11 @@
 
 				//
 
-				var material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
+				material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
 
-				var geometry = new THREE.CylinderBufferGeometry( 5, 5, 2, 32, 1, false );
+				geometry = new THREE.CylinderBufferGeometry( 5, 5, 2, 32, 1, false );
 
-				var mesh = new THREE.Mesh( geometry, material );
+				mesh = new THREE.Mesh( geometry, material );
 				mesh.position.set( 0, 5, 0 );
 				mesh.castShadow = true;
 				scene.add( mesh );
@@ -125,7 +125,7 @@
 
 				gui = new GUI();
 
-				var params = {
+				const params = {
 					'light color': spotLight.color.getHex(),
 					intensity: spotLight.intensity,
 					distance: spotLight.distance,

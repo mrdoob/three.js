@@ -3182,8 +3182,6 @@ var GLTFLoader = ( function () {
 
 				mesh.name = parser.createUniqueName( meshDef.name || ( 'mesh_' + meshIndex ) );
 
-				if ( geometries.length > 1 ) mesh.name += '_' + i;
-
 				assignExtrasToUserData( mesh, meshDef );
 
 				parser.assignFinalMaterial( mesh );

@@ -21,10 +21,10 @@
 			import { AmmoPhysics } from './jsm/physics/AmmoPhysics.js';
 			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer, stats;
-			var physics, position;
+			let camera, scene, renderer, stats;
+			let physics, position;
 
-			var boxes, spheres;
+			let boxes, spheres;
 
 			init();
 
@@ -42,17 +42,17 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x666666 );
 
-				var light = new THREE.HemisphereLight();
-				light.intensity = 0.35;
-				scene.add( light );
+				const hemiLight = new THREE.HemisphereLight();
+				hemiLight.intensity = 0.35;
+				scene.add( hemiLight );
 
-				var light = new THREE.DirectionalLight();
-				light.position.set( 5, 5, 5 );
-				light.castShadow = true;
-				light.shadow.camera.zoom = 2;
-				scene.add( light );
+				const dirLight = new THREE.DirectionalLight();
+				dirLight.position.set( 5, 5, 5 );
+				dirLight.castShadow = true;
+				dirLight.shadow.camera.zoom = 2;
+				scene.add( dirLight );
 
-				var floor = new THREE.Mesh(
+				const floor = new THREE.Mesh(
 					new THREE.BoxBufferGeometry( 10, 5, 10 ),
 					new THREE.ShadowMaterial( { color: 0x111111 } )
 				);
@@ -63,20 +63,20 @@
 
 				//
 
-				var material = new THREE.MeshLambertMaterial();
+				const material = new THREE.MeshLambertMaterial();
 
-				var matrix = new THREE.Matrix4();
-				var color = new THREE.Color();
+				const matrix = new THREE.Matrix4();
+				const color = new THREE.Color();
 
 				// Boxes
 
-				var geometry = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
-				boxes = new THREE.InstancedMesh( geometry, material, 100 );
+				const geometryBox = new THREE.BoxBufferGeometry( 0.1, 0.1, 0.1 );
+				boxes = new THREE.InstancedMesh( geometryBox, material, 100 );
 				boxes.castShadow = true;
 				boxes.receiveShadow = true;
 				scene.add( boxes );
 
-				for ( var i = 0; i < boxes.count; i ++ ) {
+				for ( let i = 0; i < boxes.count; i ++ ) {
 
 					matrix.setPosition( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
 					boxes.setMatrixAt( i, matrix );
@@ -88,13 +88,13 @@
 
 				// Spheres
 
-				var geometry = new THREE.IcosahedronBufferGeometry( 0.075, 3 );
-				spheres = new THREE.InstancedMesh( geometry, material, 100 );
+				const geometrySphere = new THREE.IcosahedronBufferGeometry( 0.075, 3 );
+				spheres = new THREE.InstancedMesh( geometrySphere, material, 100 );
 				spheres.castShadow = true;
 				spheres.receiveShadow = true;
 				scene.add( spheres );
 
-				for ( var i = 0; i < spheres.count; i ++ ) {
+				for ( let i = 0; i < spheres.count; i ++ ) {
 
 					matrix.setPosition( Math.random() - 0.5, Math.random() * 2, Math.random() - 0.5 );
 					spheres.setMatrixAt( i, matrix );
@@ -118,7 +118,7 @@
 
 				//
 
-				var controls = new OrbitControls( camera, renderer.domElement );
+				const controls = new OrbitControls( camera, renderer.domElement );
 				controls.target.y = 0.5;
 				controls.update();
 
@@ -132,14 +132,14 @@
 
 				//
 
-				var index = Math.floor( Math.random() * boxes.count );
+				let index = Math.floor( Math.random() * boxes.count );
 
 				position.set( 0, Math.random() + 1, 0 );
 				physics.setMeshPosition( boxes, position, index );
 
 				//
 
-				var index = Math.floor( Math.random() * spheres.count );
+				index = Math.floor( Math.random() * spheres.count );
 
 				position.set( 0, Math.random() + 1, 0 );
 				physics.setMeshPosition( spheres, position, index );

@@ -46,15 +46,15 @@
 
 		<script>
 
-			var hash = window.location.hash.substring( 1 );
+			const hash = window.location.hash.substring( 1 );
 
 			// Localisation
 
-			var language = 'en';
+			let language = 'en';
 
 			if ( /^(api|manual|examples)/.test( hash ) ) {
 
-				var hashLanguage = /^(api|manual|examples)\/(en|ar|zh)\//.exec( hash );
+				const hashLanguage = /^(api|manual|examples)\/(en|ar|zh)\//.exec( hash );
 
 				if ( hashLanguage === null ) {
 
@@ -72,9 +72,9 @@
 
 			//
 
-			var languageSelect = document.getElementById( 'language' );
+			const languageSelect = document.getElementById( 'language' );
 			languageSelect.value = language;
-			languageSelect.addEventListener( 'change', function ( event ) {
+			languageSelect.addEventListener( 'change', function () {
 
 				setLanguage( this.value );
 
@@ -90,19 +90,19 @@
 
 			}
 
-			var panel = document.getElementById( 'panel' );
-			var content = document.getElementById( 'content' );
-			var expandButton = document.getElementById( 'expandButton' );
-			var exitSearchButton = document.getElementById( 'exitSearchButton' );
-			var panelScrim = document.getElementById( 'panelScrim' );
-			var filterInput = document.getElementById( 'filterInput' );
-			var iframe = document.querySelector( 'iframe' );
+			const panel = document.getElementById( 'panel' );
+			const content = document.getElementById( 'content' );
+			const expandButton = document.getElementById( 'expandButton' );
+			const exitSearchButton = document.getElementById( 'exitSearchButton' );
+			const panelScrim = document.getElementById( 'panelScrim' );
+			const filterInput = document.getElementById( 'filterInput' );
+			let iframe = document.querySelector( 'iframe' );
 
-			var pageProperties = {};
-			var titles = {};
-			var categoryElements = [];
+			const pageProperties = {};
+			const titles = {};
+			const categoryElements = [];
 
-			var navigation;
+			let navigation;
 
 			// Functionality for hamburger button (on small devices)
 
@@ -165,7 +165,7 @@
 
 			function createLink( pageName, pageURL ) {
 
-				var link = document.createElement( 'a' );
+				const link = document.createElement( 'a' );
 				link.href = pageURL + '.html';
 				link.textContent = pageName;
 				link.setAttribute( 'target', 'viewer' );
@@ -210,46 +210,46 @@
 
 				}
 
-				var localList = list[ language ];
+				const localList = list[ language ];
 
-				for ( var section in localList ) {
+				for ( const section in localList ) {
 
 					// Create sections
 
-					var categories = localList[ section ];
+					const categories = localList[ section ];
 
-					var sectionHead = document.createElement( 'h2' );
+					const sectionHead = document.createElement( 'h2' );
 					sectionHead.textContent = section;
 					navigation.appendChild( sectionHead );
 
-					for ( var category in categories ) {
+					for ( const category in categories ) {
 
 						// Create categories
 
-						var pages = categories[ category ];
+						const pages = categories[ category ];
 
-						var categoryContainer = document.createElement( 'div' );
+						const categoryContainer = document.createElement( 'div' );
 						navigation.appendChild( categoryContainer );
 
-						var categoryHead = document.createElement( 'h3' );
+						const categoryHead = document.createElement( 'h3' );
 						categoryHead.textContent = category;
 						categoryContainer.appendChild( categoryHead );
 
-						var categoryContent = document.createElement( 'ul' );
+						const categoryContent = document.createElement( 'ul' );
 						categoryContainer.appendChild( categoryContent );
 
-						for ( var pageName in pages ) {
+						for ( const pageName in pages ) {
 
 							// Create page links
 
-							var pageURL = pages[ pageName ];
+							const pageURL = pages[ pageName ];
 
 							// Localisation
 
-							var listElement = document.createElement( 'li' );
+							const listElement = document.createElement( 'li' );
 							categoryContent.appendChild( listElement );
 
-							var linkElement = createLink( pageName, pageURL );
+							const linkElement = createLink( pageName, pageURL );
 							listElement.appendChild( linkElement );
 
 							// Gather the main properties for the current subpage
@@ -281,10 +281,10 @@
 
 			function autoChangeUrlLanguage( language ) {
 
-				var hash = location.hash;
+				const hash = location.hash;
 				if ( hash === '' ) return;
-				var docType = hash.substr( 0, hash.indexOf( '/' ) + 1 );
-				var docLink = hash.substr( hash.indexOf( '/' ) + 1 );
+				const docType = hash.substr( 0, hash.indexOf( '/' ) + 1 );
+				let docLink = hash.substr( hash.indexOf( '/' ) + 1 );
 				docLink = docLink.substr( docLink.indexOf( '/' ) );
 				location.href = docType + language + docLink;
 
@@ -297,21 +297,21 @@
 				// (uncomment the following line and the "Query strings" section, if you want query strings):
 				// updateQueryString();
 
-				var regExp = new RegExp( filterInput.value, 'gi' );
+				const regExp = new RegExp( filterInput.value, 'gi' );
 
-				for ( var pageName in pageProperties ) {
+				for ( let pageName in pageProperties ) {
 
-					var linkElement = pageProperties[ pageName ].linkElement;
-					var categoryClassList = linkElement.parentElement.classList;
-					var filterResults = pageName.match( regExp );
+					const linkElement = pageProperties[ pageName ].linkElement;
+					const categoryClassList = linkElement.parentElement.classList;
+					const filterResults = pageName.match( regExp );
 
 					if ( filterResults && filterResults.length > 0 ) {
 
 						// Accentuate matching characters
 
-						for ( var i = 0; i < filterResults.length; i ++ ) {
+						for ( let i = 0; i < filterResults.length; i ++ ) {
 
-							var result = filterResults[ i ];
+							const result = filterResults[ i ];
 
 							if ( result !== '' ) {
 
@@ -345,15 +345,15 @@
 
 				categoryElements.forEach( function ( category ) {
 
-					var pages = category.children;
-					var pagesLength = pages.length;
-					var sectionClassList = category.parentElement.classList;
+					const pages = category.children;
+					const pagesLength = pages.length;
+					const sectionClassList = category.parentElement.classList;
 
-					var hideCategory = true;
+					let hideCategory = true;
 
-					for ( var i = 0; i < pagesLength; i ++ ) {
+					for ( let i = 0; i < pagesLength; i ++ ) {
 
-						var pageClassList = pages[ i ].classList;
+						const pageClassList = pages[ i ].classList;
 
 						if ( ! pageClassList.contains( 'hidden' ) ) {
 
@@ -387,9 +387,9 @@
 				// First separate the memeber (if existing) from the page name,
 				// then identify the subpage's URL and set it as URL fragment (re-adding the member)
 
-				var splitPageName = decomposePageName( pageName, '.', '.' );
+				const splitPageName = decomposePageName( pageName, '.', '.' );
 
-				var currentProperties = pageProperties[ splitPageName[ 0 ] ];
+				const currentProperties = pageProperties[ splitPageName[ 0 ] ];
 
 				if ( currentProperties ) {
 
@@ -406,8 +406,8 @@
 				// Change the content displayed in the iframe
 				// First separate the member part of the fragment (if existing)
 
-				var hash = window.location.hash.substring( 1 );
-				var splitHash = decomposePageName( hash, '.', '#' );
+				const hash = window.location.hash.substring( 1 );
+				const splitHash = decomposePageName( hash, '.', '#' );
 
 				// Creating a new Iframe instead of assigning a new src is
 				// a cross-browser solution to allow normal browser navigation;
@@ -416,10 +416,9 @@
 				// Note: iframe.contentWindow.location.replace(hash) should work, too,
 				// but it doesn't work in Edge with links from the subpages!
 
-				var oldIframe;
-				var subtitle;
+				let subtitle;
 
-				oldIframe = iframe;
+				const oldIframe = iframe;
 				iframe = oldIframe.cloneNode();
 
 				if ( hash ) {
@@ -446,9 +445,9 @@
 				// ['Geometry', '.morphTarget'] or ['Geometry', '#morphTarget']
 				// Note: According RFC 3986 no '#' allowed inside of an URL fragment!
 
-				var parts = [];
+				const parts = [];
 
-				var dotIndex = pageName.indexOf( oldDelimiter );
+				const dotIndex = pageName.indexOf( oldDelimiter );
 
 				if ( dotIndex !== - 1 ) {
 

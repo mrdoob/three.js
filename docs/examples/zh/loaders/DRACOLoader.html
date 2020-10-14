@@ -31,7 +31,7 @@
 
 		<code>
 		// Instantiate a loader
-		var loader = new DRACOLoader();
+		const loader = new DRACOLoader();
 
 		// Specify path to a folder containing WASM/JS decoding libraries.
 		loader.setDecoderPath( '/examples/js/libs/draco/' );
@@ -46,8 +46,8 @@
 			// called when the resource is loaded
 			function ( geometry ) {
 
-				var material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
-				var mesh = new THREE.Mesh( geometry, material );
+				const material = new THREE.MeshStandardMaterial( { color: 0x606060 } );
+				const mesh = new THREE.Mesh( geometry, material );
 				scene.add( mesh );
 
 			},

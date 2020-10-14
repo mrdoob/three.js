@@ -21,14 +21,14 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var lod = new THREE.LOD();
+		const lod = new THREE.LOD();
 
 		//Create spheres with 3 levels of detail and create new LOD levels for them
-		for( var i = 0; i < 3; i++ ) {
+		for( let i = 0; i < 3; i++ ) {
 
-			var geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
+			const geometry = new THREE.IcosahedronBufferGeometry( 10, 3 - i )
 
-			var mesh = new THREE.Mesh( geometry, material );
+			const mesh = new THREE.Mesh( geometry, material );
 
 			lod.addLevel( mesh, i * 75 );
 
