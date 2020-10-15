@@ -582,7 +582,7 @@ THREE.DRACOLoader.DRACOWorker = function () {
 
 	}
 
-	function getDracoDataType ( draco, attributeType ) {
+	function getDracoDataType( draco, attributeType ) {
 
 		switch ( attributeType ) {
 
