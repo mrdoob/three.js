@@ -83,7 +83,6 @@ function toHalf( val ) {
 
 var RectAreaLightUniformsLib = {
 
-	// renderer should be an instance of THREE.WebGLRenderer
 	init: function () {
 
 		// source: https://github.com/selfshadow/ltc_code/tree/master/fit/results/ltc.js
