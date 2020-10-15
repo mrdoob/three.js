@@ -38,7 +38,7 @@ var int32View = new Int32Array( floatView.buffer );
 * used, eg. in Ogre), with the additional benefit of rounding, inspired
 * by James Tursa?s half-precision code. */
 
-function toHalf ( val ) {
+function toHalf( val ) {
 
 	floatView[ 0 ] = val;
 	var x = int32View[ 0 ];
@@ -79,7 +79,7 @@ function toHalf ( val ) {
 	bits += m & 1;
 	return bits;
 
-};
+}
 
 var RectAreaLightUniformsLib = {
 
@@ -101,18 +101,24 @@ var RectAreaLightUniformsLib = {
 		UniformsLib.LTC_FLOAT_2 = new DataTexture( ltc_float_2, 64, 64, RGBAFormat, FloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
 
 		const ltc_half_1 = new Uint16Array( LTC_MAT_1.length );
+
 		LTC_MAT_1.forEach( function ( x, index ) {
-			ltc_half_1[index] = toHalf( x );
-		});
+
+			ltc_half_1[ index ] = toHalf( x );
+
+		} );
 
 		const ltc_half_2 = new Uint16Array( LTC_MAT_2.length );
+
 		LTC_MAT_2.forEach( function ( x, index ) {
-			ltc_half_2[index] = toHalf( x );
-		});
-	
+
+			ltc_half_2[ index ] = toHalf( x );
+
+		} );
+
 		UniformsLib.LTC_HALF_1 = new DataTexture( ltc_half_1, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
 		UniformsLib.LTC_HALF_2 = new DataTexture( ltc_half_2, 64, 64, RGBAFormat, HalfFloatType, UVMapping, ClampToEdgeWrapping, ClampToEdgeWrapping, LinearFilter, NearestFilter, 1 );
-		
+
 	}
 
 };
