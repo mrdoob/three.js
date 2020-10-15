@@ -34,7 +34,7 @@ Object.assign( Pass.prototype, {
 
 // Helper for passes that need to fill the viewport with a single quad.
 
-// Important: It's actually a hack to put FullScreenQuad into the Pass namesapce. This is only
+// Important: It's actually a hack to put FullScreenQuad into the Pass namespace. This is only
 // done to make examples/js code work. Normally, FullScreenQuad should be exported
 // from this module like Pass.
 
