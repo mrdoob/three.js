@@ -263,7 +263,7 @@ function makeXYZGUI(gui, vector3, name, onChangeFn) {
 그리고 조명의 위치, 목표의 위치 객체에 방금 만든 함수를 각각 적용합니다.
 
 ```js
-+function updateLight{
++function updateLight() {
 +  light.target.updateMatrixWorld();
 +  helper.update();
 +}
@@ -314,7 +314,7 @@ scene.add(helper);
 짤 수 있습니다.
 
 ```js
-function updateLight{
+function updateLight() {
 -  light.target.updateMatrixWorld();
   helper.update();
 }

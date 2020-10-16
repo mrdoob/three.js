@@ -286,7 +286,7 @@ function makeXYZGUI(gui, vector3, name, onChangeFn) {
 так и для цели, как тут
 
 ```js
-+function updateLight{
++function updateLight() {
 +  light.target.updateMatrixWorld();
 +  helper.update();
 +}
@@ -336,7 +336,7 @@ scene.add(helper);
 и поскольку нет цели, то `onChange` функция может быть проще.
 
 ```js
-function updateLight{
+function updateLight() {
 -  light.target.updateMatrixWorld();
   helper.update();
 }

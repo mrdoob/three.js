@@ -287,7 +287,7 @@ Then we can use that for both the light's position
 and the target's position like this
 
 ```js
-+function updateLight{
++function updateLight() {
 +  light.target.updateMatrixWorld();
 +  helper.update();
 +}
@@ -338,7 +338,7 @@ scene.add(helper);
 and as there is no target the `onChange` function can be simpler.
 
 ```js
-function updateLight{
+function updateLight() {
 -  light.target.updateMatrixWorld();
   helper.update();
 }
