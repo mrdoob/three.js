@@ -759,7 +759,8 @@ var GLTFLoader = ( function () {
 
 		if ( ! loader ) {
 
-			throw new Error( 'THREE.GLTFLoader: setKTX2Loader must be called before loading KTX2 textures' );
+			// Assumes that the extension is optional and that a fallback texture is present; ideally we should handle extensionsRequired better
+			return null;
 
 		}
 
