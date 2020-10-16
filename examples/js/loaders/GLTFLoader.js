@@ -276,24 +276,6 @@ THREE.GLTFLoader = ( function () {
 							extensions[ extensionName ] = new GLTFMeshQuantizationExtension();
 							break;
 
-						case EXTENSIONS.EXT_MESHOPT_COMPRESSION:
-							if ( extensionsRequired.includes( extensionName ) ) {
-
-								if ( ! this.meshoptDecoder ) {
-
-									throw new Error( 'THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files' );	
-
-								}
-
-								if ( ! this.meshoptDecoder.supported ) {
-
-									throw new Error( 'THREE.GLTFLoader: MeshoptDecoder support is required to load compressed files' );	
-
-								}
-
-							}
-							break;
-
 						default:
 
 							if ( extensionsRequired.indexOf( extensionName ) >= 0 && plugins[ extensionName ] === undefined ) {
@@ -751,7 +733,8 @@ THREE.GLTFLoader = ( function () {
 
 	GLTFMeshoptCompression.prototype.loadBufferView = function ( index ) {
 
-		var bufferView = this.parser.json.bufferViews[ index ];
+		var json = this.parser.json;
+		var bufferView = json.bufferViews[ index ];
 
 		if ( bufferView.extensions && bufferView.extensions[ this.name ] ) {
 
@@ -762,7 +745,16 @@ THREE.GLTFLoader = ( function () {
 
 			if ( ! decoder || ! decoder.supported ) {
 
-				return null; // will use the fallback buffer if present
+				if ( json.extensionsRequired && json.extensionsRequired.indexOf( this.name ) >= 0 ) {
+
+					throw new Error( 'THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files' );
+
+				} else {
+
+					// Assumes that the extension is optional and that fallback buffer data is present
+					return null;
+
+				}
 
 			}
 
