@@ -759,7 +759,7 @@ var GLTFLoader = ( function () {
 
 		if ( ! loader ) {
 
-			if ( json.extensionsRequired && json.extensionsRequired.includes( this.name ) ) {
+			if ( json.extensionsRequired && json.extensionsRequired.indexOf( this.name ) >= 0 ) {
 
 				throw new Error( 'THREE.GLTFLoader: setKTX2Loader must be called before loading KTX2 textures' );
 
