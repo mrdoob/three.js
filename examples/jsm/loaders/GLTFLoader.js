@@ -342,19 +342,20 @@ var GLTFLoader = ( function () {
 						case EXTENSIONS.EXT_MESHOPT_COMPRESSION:
 							if ( extensionsRequired.includes( extensionName ) ) {
 
-								if ( !this.meshoptDecoder ) {
+								if ( ! this.meshoptDecoder ) {
 
 									throw new Error( 'THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files' );	
 
 								}
 
-								if ( !this.meshoptDecoder.supported ) {
+								if ( ! this.meshoptDecoder.supported ) {
 
 									throw new Error( 'THREE.GLTFLoader: MeshoptDecoder support is required to load compressed files' );	
 
 								}
 
 							}
+							break;
 
 						default:
 
@@ -822,7 +823,7 @@ var GLTFLoader = ( function () {
 			var buffer = this.parser.getDependency( 'buffer', extensionDef.buffer );
 			var decoder = this.parser.options.meshoptDecoder;
 
-			if ( !decoder || !decoder.supported ) {
+			if ( ! decoder || ! decoder.supported ) {
 
 				return null; // will use the fallback buffer if present
 
