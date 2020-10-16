@@ -107,7 +107,7 @@ class KTX2Loader extends CompressedTextureLoader {
 		// initialization to return a native Promise.
 		scope.basisModulePending = new Promise( function ( resolve ) {
 
-			MSC_TRANSCODER().then( function ( basisModule ) {
+			MSC_TRANSCODER().then( function ( basisModule ) { // eslint-disable-line no-undef
 
 				scope.basisModule = basisModule;
 

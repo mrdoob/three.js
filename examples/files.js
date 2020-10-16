@@ -1,4 +1,4 @@
-var files = {
+const files = {
 	"webgl": [
 		"webgl_animation_cloth",
 		"webgl_animation_keyframes",
@@ -404,7 +404,7 @@ var files = {
 	]
 };
 
-var tags = {
+const tags = {
 	"webgl_animation_cloth": [ "physics", "integration" ],
 	"webgl_clipping": [ "solid" ],
 	"webgl_clipping_advanced": [ "solid" ],

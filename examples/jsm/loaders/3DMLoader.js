@@ -774,7 +774,7 @@ Rhino3dmLoader.Rhino3dmWorker = function () {
 					/* Like Basis Loader */
 					RhinoModule = { wasmBinary, onRuntimeInitialized: resolve };
 
-					rhino3dm( RhinoModule );
+					rhino3dm( RhinoModule ); // eslint-disable-line no-undef
 
 				 } ).then( () => {
 
