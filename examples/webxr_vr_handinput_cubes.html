@@ -21,23 +21,23 @@
 			import { XRControllerModelFactory } from './jsm/webxr/XRControllerModelFactory.js';
 			import { XRHandModelFactory } from './jsm/webxr/XRHandModelFactory.js';
 
-			var container;
-			var camera, scene, renderer;
-			var hand1, hand2;
-			var controller1, controller2;
-			var controllerGrip1, controllerGrip2;
+			let container;
+			let camera, scene, renderer;
+			let hand1, hand2;
+			let controller1, controller2;
+			let controllerGrip1, controllerGrip2;
 
-			var controls;
+			let controls;
 
-			var grabbing = false;
-			var scaling = {
+			let grabbing = false;
+			const scaling = {
 				active: false,
 				initialDistance: 0,
 				object: null,
 				initialScale: 1
 			};
 
-			var spheres = [];
+			const spheres = [];
 
 			init();
 			animate();
@@ -57,16 +57,16 @@
 				controls.target.set( 0, 1.6, 0 );
 				controls.update();
 
-				var geometry = new THREE.PlaneBufferGeometry( 4, 4 );
-				var material = new THREE.MeshStandardMaterial( { color: 0x222222 } );
-				var floor = new THREE.Mesh( geometry, material );
+				const floorGeometry = new THREE.PlaneBufferGeometry( 4, 4 );
+				const floorMaterial = new THREE.MeshStandardMaterial( { color: 0x222222 } );
+				const floor = new THREE.Mesh( floorGeometry, floorMaterial );
 				floor.rotation.x = - Math.PI / 2;
 				floor.receiveShadow = true;
 				scene.add( floor );
 
 				scene.add( new THREE.HemisphereLight( 0x808080, 0x606060 ) );
 
-				var light = new THREE.DirectionalLight( 0xffffff );
+				const light = new THREE.DirectionalLight( 0xffffff );
 				light.position.set( 0, 6, 0 );
 				light.castShadow = true;
 				light.shadow.camera.top = 2;
@@ -97,8 +97,8 @@
 				controller2 = renderer.xr.getController( 1 );
 				scene.add( controller2 );
 
-				var controllerModelFactory = new XRControllerModelFactory();
-				var handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
+				const controllerModelFactory = new XRControllerModelFactory();
+				const handModelFactory = new XRHandModelFactory().setPath( "./models/fbx/" );
 
 				// Hand 1
 				controllerGrip1 = renderer.xr.getControllerGrip( 0 );
@@ -129,9 +129,9 @@
 
 				//
 
-				var geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+				const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
 
-				var line = new THREE.Line( geometry );
+				const line = new THREE.Line( geometry );
 				line.name = 'line';
 				line.scale.z = 5;
 
@@ -156,7 +156,7 @@
 			const SphereRadius = 0.05;
 			function onPinchStartLeft( event ) {
 
-				var controller = event.target;
+				const controller = event.target;
 
 				if ( grabbing ) {
 
@@ -181,13 +181,13 @@
 
 				}
 
-				var geometry = new THREE.BoxBufferGeometry( SphereRadius, SphereRadius, SphereRadius );
-				var material = new THREE.MeshStandardMaterial( {
+				const geometry = new THREE.BoxBufferGeometry( SphereRadius, SphereRadius, SphereRadius );
+				const material = new THREE.MeshStandardMaterial( {
 					color: Math.random() * 0xffffff,
 					roughness: 1.0,
 					metalness: 0.0
 				} );
-				var spawn = new THREE.Mesh( geometry, material );
+				const spawn = new THREE.Mesh( geometry, material );
 				spawn.geometry.computeBoundingSphere();
 
 				const indexTip = controller.joints[ XRHand.INDEX_PHALANX_TIP ];
@@ -202,7 +202,7 @@
 
 			function collideObject( indexTip ) {
 
-				for ( var i = 0; i < spheres.length; i ++ ) {
+				for ( let i = 0; i < spheres.length; i ++ ) {
 
 					const sphere = spheres[ i ];
 					const distance = indexTip.getWorldPosition().distanceTo( sphere.getWorldPosition() );
@@ -221,7 +221,7 @@
 
 			function onPinchStartRight( event ) {
 
-				var controller = event.target;
+				const controller = event.target;
 				const indexTip = controller.joints[ XRHand.INDEX_PHALANX_TIP ];
 				const object = collideObject( indexTip );
 				if ( object ) {
@@ -237,11 +237,11 @@
 
 			function onPinchEndRight( event ) {
 
-				var controller = event.target;
+				const controller = event.target;
 
 				if ( controller.userData.selected !== undefined ) {
 
-					var object = controller.userData.selected;
+					const object = controller.userData.selected;
 					object.material.emissive.b = 0;
 					scene.attach( object );
 

@@ -370,7 +370,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	removeAll: function () {
+	clear: function () {
 
 		for ( let i = 0; i < this.children.length; i ++ ) {
 

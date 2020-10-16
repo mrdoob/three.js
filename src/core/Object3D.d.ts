@@ -319,7 +319,7 @@ export class Object3D extends EventDispatcher {
 	/**
 	 * Removes all child objects.
 	 */
-	removeAll(): this;
+	clear(): this;
 
 	/**
 	 * Adds object as a child of this, while maintaining the object's world transform.
