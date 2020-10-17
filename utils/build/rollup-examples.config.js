@@ -25,6 +25,7 @@ function createOutput( file, externalFiles ) {
 		treeshake: false,
 		external: p => {
 
+			// Check if this imported file is being built separately and mark it as external if true
 			const otherPath = path.resolve( dirName, p ).substring( jsmRoot.length + 1 );
 			return externalFiles.includes( otherPath );
 
