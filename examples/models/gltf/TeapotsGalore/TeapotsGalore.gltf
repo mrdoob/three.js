@@ -1,0 +1,556 @@
+{
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 2204,
+            "extras": {
+                "arrayIndex": 0
+            },
+            "max": [
+                3.433150053024292,
+                3.1500000953674316,
+                2.0
+            ],
+            "min": [
+                -3.0,
+                0.0,
+                -2.0
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 2204,
+            "extras": {
+                "arrayIndex": 1
+            },
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5125,
+            "count": 12096,
+            "extras": {
+                "arrayIndex": 2
+            },
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5126,
+            "count": 958,
+            "extras": {
+                "arrayIndex": 3
+            },
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 4,
+            "componentType": 5126,
+            "count": 958,
+            "extras": {
+                "arrayIndex": 4
+            },
+            "type": "VEC4"
+        },
+        {
+            "bufferView": 5,
+            "componentType": 5126,
+            "count": 958,
+            "extras": {
+                "arrayIndex": 5
+            },
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 6,
+            "componentType": 5126,
+            "count": 941,
+            "extras": {
+                "arrayIndex": 6
+            },
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 7,
+            "componentType": 5126,
+            "count": 941,
+            "extras": {
+                "arrayIndex": 7
+            },
+            "type": "VEC4"
+        },
+        {
+            "bufferView": 8,
+            "componentType": 5126,
+            "count": 941,
+            "extras": {
+                "arrayIndex": 8
+            },
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 9,
+            "componentType": 5126,
+            "count": 4,
+            "extras": {
+                "arrayIndex": 9
+            },
+            "max": [
+                1.0,
+                0.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                0.0,
+                -1.0
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 10,
+            "componentType": 5126,
+            "count": 4,
+            "extras": {
+                "arrayIndex": 10
+            },
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 11,
+            "componentType": 5126,
+            "count": 4,
+            "extras": {
+                "arrayIndex": 11
+            },
+            "type": "VEC2"
+        },
+        {
+            "bufferView": 12,
+            "componentType": 5125,
+            "count": 6,
+            "extras": {
+                "arrayIndex": 12
+            },
+            "type": "SCALAR"
+        }
+    ],
+    "asset": {
+        "generator": "OctaneGltfExporter Version:2.2",
+        "version": "2.0"
+    },
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteLength": 26448,
+            "extras": {
+                "arrayIndex": 0
+            }
+        },
+        {
+            "buffer": 0,
+            "byteLength": 26448,
+            "byteOffset": 26448,
+            "extras": {
+                "arrayIndex": 1
+            }
+        },
+        {
+            "buffer": 0,
+            "byteLength": 48384,
+            "byteOffset": 52896,
+            "extras": {
+                "arrayIndex": 2
+            }
+        },
+        {
+            "buffer": 1,
+            "byteLength": 11496,
+            "extras": {
+                "arrayIndex": 3
+            }
+        },
+        {
+            "buffer": 1,
+            "byteLength": 15328,
+            "byteOffset": 11496,
+            "extras": {
+                "arrayIndex": 4
+            }
+        },
+        {
+            "buffer": 1,
+            "byteLength": 11496,
+            "byteOffset": 26824,
+            "extras": {
+                "arrayIndex": 5
+            }
+        },
+        {
+            "buffer": 1,
+            "byteLength": 11292,
+            "byteOffset": 38320,
+            "extras": {
+                "arrayIndex": 6
+            }
+        },
+        {
+            "buffer": 1,
+            "byteLength": 15056,
+            "byteOffset": 49612,
+            "extras": {
+                "arrayIndex": 7
+            }
+        },
+        {
+            "buffer": 1,
+            "byteLength": 11292,
+            "byteOffset": 64668,
+            "extras": {
+                "arrayIndex": 8
+            }
+        },
+        {
+            "buffer": 2,
+            "byteLength": 48,
+            "extras": {
+                "arrayIndex": 9
+            }
+        },
+        {
+            "buffer": 2,
+            "byteLength": 48,
+            "byteOffset": 48,
+            "extras": {
+                "arrayIndex": 10
+            }
+        },
+        {
+            "buffer": 2,
+            "byteLength": 32,
+            "byteOffset": 96,
+            "extras": {
+                "arrayIndex": 11
+            }
+        },
+        {
+            "buffer": 2,
+            "byteLength": 24,
+            "byteOffset": 128,
+            "extras": {
+                "arrayIndex": 12
+            }
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 101280,
+            "extras": {
+                "arrayIndex": 0
+            },
+            "uri": "mesh.bin"
+        },
+        {
+            "byteLength": 75960,
+            "extras": {
+                "arrayIndex": 1
+            },
+            "uri": "transforms.bin"
+        },
+        {
+            "byteLength": 152,
+            "extras": {
+                "arrayIndex": 2
+            },
+            "uri": "mesh_2.bin"
+        }
+    ],
+    "cameras": [
+        {
+            "extras": {
+                "arrayIndex": 0
+            },
+            "name": "Thin lens camera",
+            "perspective": {
+                "aspectRatio": 1.3333333730697632,
+                "yfov": 0.8172757029533386,
+                "zfar": 10000000000.0,
+                "znear": 9.999999747378752e-05
+            },
+            "type": "perspective"
+        }
+    ],
+    "extensionsUsed": [
+        "EXT_mesh_gpu_instancing"
+    ],
+    "materials": [
+        {
+            "extras": {
+                "arrayIndex": 0
+            },
+            "name": "cube",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.699999988079071,
+                    0.699999988079071,
+                    0.699999988079071,
+                    1.0
+                ],
+                "metallicFactor": 0.8,
+                "roughnessFactor": 0.5
+            }
+        },
+        {
+            "extras": {
+                "arrayIndex": 1
+            },
+            "name": "cube_1",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.7000000476837158,
+                    0.0006436262046918273,
+                    0.03353740647435188,
+                    1.0
+                ],
+                "metallicFactor": 0.8,
+                "roughnessFactor": 0.5
+            }
+        },
+        {
+            "extras": {
+                "arrayIndex": 2
+            },
+            "name": "cube_2",
+            "pbrMetallicRoughness": {
+                "baseColorFactor": [
+                    0.15800000727176666,
+                    0.10700000077486038,
+                    0.09399999678134918,
+                    1.0
+                ],
+                "metallicFactor": 0.11500000208616257,
+                "roughnessFactor": 0.13469399511814117
+            }
+        }
+    ],
+    "meshes": [
+        {
+            "extras": {
+                "arrayIndex": 0
+            },
+            "name": "teapot",
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": 1,
+                        "POSITION": 0
+                    },
+                    "indices": 2,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        },
+        {
+            "extras": {
+                "arrayIndex": 1
+            },
+            "name": "plane",
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": 10,
+                        "POSITION": 9,
+                        "TEXCOORD_0": 11
+                    },
+                    "indices": 12,
+                    "material": 2,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "children": [
+                1,
+                2,
+                3,
+                4
+            ],
+            "extras": {
+                "arrayIndex": 0
+            },
+            "name": "teapots_galore"
+        },
+        {
+            "camera": 0,
+            "extras": {
+                "arrayIndex": 1
+            },
+            "matrix": [
+                1.0,
+                -0.0,
+                0.0,
+                -0.0,
+                -0.0,
+                0.9578263163566589,
+                -0.2873478829860687,
+                0.0,
+                -0.0,
+                0.2873478829860687,
+                0.9578263163566589,
+                -0.0,
+                -0.0,
+                20.000001907348633,
+                -0.0,
+                1.0
+            ],
+            "name": "Thin lens camera"
+        },
+        {
+            "children": [
+                5
+            ],
+            "extras": {
+                "arrayIndex": 2
+            },
+            "matrix": [
+                0.7071068286895752,
+                0.0,
+                -0.7071067690849304,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.7071067690849304,
+                0.0,
+                0.7071068286895752,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "name": "Placement"
+        },
+        {
+            "extensions": {
+                "EXT_mesh_gpu_instancing": {
+                    "attributes": {
+                        "ROTATION": 4,
+                        "SCALE": 5,
+                        "TRANSLATION": 3
+                    }
+                }
+            },
+            "extras": {
+                "arrayIndex": 3
+            },
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.2999999523162842,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "mesh": 0,
+            "name": "teapot"
+        },
+        {
+            "extensions": {
+                "EXT_mesh_gpu_instancing": {
+                    "attributes": {
+                        "ROTATION": 7,
+                        "SCALE": 8,
+                        "TRANSLATION": 6
+                    }
+                }
+            },
+            "extras": {
+                "arrayIndex": 4
+            },
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "mesh": 0,
+            "name": "teapot0"
+        },
+        {
+            "children": [
+                6
+            ],
+            "extras": {
+                "arrayIndex": 5
+            },
+            "matrix": [
+                240.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                240.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                240.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "name": "Placement_3"
+        },
+        {
+            "extras": {
+                "arrayIndex": 6
+            },
+            "mesh": 1,
+            "name": "plane"
+        }
+    ],
+    "scene": 0,
+    "scenes": [
+        {
+            "extras": {
+                "arrayIndex": 0
+            },
+            "name": "teapots_galore",
+            "nodes": [
+                0
+            ]
+        }
+    ]
+}
