@@ -305,10 +305,6 @@ var GLTFLoader = ( function () {
 
 					switch ( extensionName ) {
 
-						case EXTENSIONS.KHR_INSTANCING:
-							extensions[ extensionName ] = new GLTFInstancingExtension( json );
-							break;
-
 						case EXTENSIONS.KHR_LIGHTS_PUNCTUAL:
 							extensions[ extensionName ] = new GLTFLightsExtension( json );
 							break;
@@ -406,7 +402,6 @@ var GLTFLoader = ( function () {
 	var EXTENSIONS = {
 		KHR_BINARY_GLTF: 'KHR_binary_glTF',
 		KHR_DRACO_MESH_COMPRESSION: 'KHR_draco_mesh_compression',
-		KHR_INSTANCING: 'KHR_instancing',
 		KHR_LIGHTS_PUNCTUAL: 'KHR_lights_punctual',
 		KHR_MATERIALS_CLEARCOAT: 'KHR_materials_clearcoat',
 		KHR_MATERIALS_PBR_SPECULAR_GLOSSINESS: 'KHR_materials_pbrSpecularGlossiness',
@@ -1168,7 +1163,7 @@ var GLTFLoader = ( function () {
 	/**
 	 * Instancing Extension
 	 *
-	 * Specification: https://github.com/KhronosGroup/glTF/pull/1691
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_mesh_gpu_instancing
 	 */
 	function GLTFMeshGPUInstancingExtension() {
 
