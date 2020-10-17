@@ -2,6 +2,7 @@
 	color-scheme: light dark;
 
 	--background-color: #fff;
+	--secondary-background-color: #f7f7f7;
 
 	--color-blue: #049EF4;
 	--text-color: #444;
@@ -21,6 +22,7 @@
 
 	:root {
 		--background-color: #222;
+		--secondary-background-color: #2e2e2e;
 
 		--text-color: #bbb;
 		--secondary-text-color: #666;
@@ -157,7 +159,7 @@ h1 a {
 		display: none;
 	}
 
-	#panel.searchFocused #filter {
+	#panel.searchFocused #filterInput {
 		-webkit-mask-image: none;
 		mask-image: none;
 		background-color: inherit;
@@ -232,10 +234,9 @@ h1 a {
 	content: "";
 }
 
-	#panel #filter {
+	#panel #filterInput {
 		flex: 1;
 		width: 100%;
-		padding: 0 36px;
 		font-size: 1rem;
 		font-weight: 500;
 		color: var(--text-color);
@@ -255,7 +256,6 @@ h1 a {
 	#panel #language {
 		font-family: 'Roboto Mono', monospace;
 		font-size: 1rem;
-		line-height: 1rem;
 		font-weight: 500;
 		color: var(--text-color);
 		border: 0px;
@@ -269,6 +269,7 @@ h1 a {
 		-moz-appearance: none;
 		appearance: none;
 		margin-right: 10px;
+		text-align-last: right;
 	}
 
 		#panel #language:focus {
@@ -463,6 +464,40 @@ iframe {
 	}
 }
 
+
+.card {
+	border-radius: 3px;
+	overflow: hidden;
+	background-color: var(--secondary-background-color);
+	padding-bottom: 6px;
+	margin-bottom: 16px;
+}
+
+.card.selected {
+	box-shadow: 0 0 0 3px var(--color-blue);
+	text-decoration: none !important;
+}
+
+.card .cover {
+	padding-bottom: 56.25%; /* 16:9 aspect ratio */
+	position: relative;
+	overflow: hidden;
+}
+
+.card .cover img {
+	position: absolute;
+	width: 100%;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.card .title {
+	padding: 8px 12px 4px;
+	font-size: calc(var(--font-size) - 1px);
+	font-weight: 500;
+	line-height: calc(var(--line-height) - 6px);
+}
 
 /* mobile */
 

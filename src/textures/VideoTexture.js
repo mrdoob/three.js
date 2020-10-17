@@ -26,7 +26,7 @@ VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
 	update: function () {
 
-		var video = this.image;
+		const video = this.image;
 
 		if ( video.readyState >= video.HAVE_CURRENT_DATA ) {
 

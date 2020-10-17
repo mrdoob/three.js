@@ -14,8 +14,6 @@
 			<div id="description"></div>
 		</div>
 
-		<div id="container"></div>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -28,20 +26,41 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
 			var orbitControls;
-			var container, camera, scene, renderer, loader;
+			var camera, scene, renderer, loader;
 			var gltf, background, envMap, mixer, gui, extensionControls;
 
 			var clock = new THREE.Clock();
 
 			var scenes = {
-				Boombox: {
-					name: 'BoomBox (PBR)',
-					url: './models/gltf/BoomBox/%s/BoomBox.gltf',
-					author: 'Microsoft',
-					authorURL: 'https://www.microsoft.com/',
-					cameraPos: new THREE.Vector3( 0.02, 0.01, 0.03 ),
-					objectRotation: new THREE.Euler( 0, Math.PI, 0 ),
-					extensions: [ 'glTF', 'glTF-pbrSpecularGlossiness', 'glTF-Binary', 'glTF-dds' ],
+				'ParticleTest': {
+					name: 'ParticleTest',
+					url: './models/gltf/ParticleTest.gltf',
+					author: 'Don McCurdy',
+					authorURL: 'https://www.donmccurdy.com/',
+					cameraPos: new THREE.Vector3( 10, 5, 15 ),
+					objectPosition: new THREE.Vector3( 0, 0, 0 ),
+					extensions: [ 'glTF-Instancing' ],
+					addEnvMap: true,
+				},
+				'Instancing (Simple)': {
+					name: 'Instancing (Simple)',
+					url: './models/gltf/instancing_simple/instancing_simple.gltf',
+					author: 'OTOY',
+					authorURL: 'https://home.otoy.com/',
+					cameraPos: new THREE.Vector3( 20, 10, 30 ),
+					objectPosition: new THREE.Vector3( 0, 3.1, 0 ),
+					extensions: [ 'glTF-Instancing' ],
+					addEnvMap: true,
+					addLights: true,
+					addGround: true
+				},
+				'Instancing (Teapots Galore)': {
+					name: 'Instancing (Teapots Galore)',
+					url: './models/gltf/teapots_galore/teapots_galore.gltf',
+					author: 'OTOY',
+					authorURL: 'https://home.otoy.com/',
+					cameraPos: new THREE.Vector3( 20, 10, 30 ),
+					extensions: [ 'glTF-Instancing' ],
 					addEnvMap: true
 				},
 				'Bot Skinned': {
@@ -147,14 +166,14 @@
 
 			function onload() {
 
-				container = document.getElementById( 'container' );
-
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.outputEncoding = THREE.sRGBEncoding;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
 				renderer.physicallyCorrectLights = true;
-				container.appendChild( renderer.domElement );
+				document.body.appendChild( renderer.domElement );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -196,7 +215,7 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				camera = new THREE.PerspectiveCamera( 45, container.offsetWidth / container.offsetHeight, 0.001, 1000 );
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.001, 1000 );
 				scene.add( camera );
 
 				var spot1;
@@ -388,7 +407,7 @@
 
 			function onWindowResize() {
 
-				camera.aspect = container.offsetWidth / container.offsetHeight;
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );

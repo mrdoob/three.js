@@ -1,5 +1,6 @@
 import { AnimationClip } from './AnimationClip';
 import { AnimationAction } from './AnimationAction';
+import { AnimationBlendMode } from '../constants';
 import { EventDispatcher } from './../core/EventDispatcher';
 import { Object3D } from '../core/Object3D';
 import { AnimationObjectGroup } from './AnimationObjectGroup';
@@ -11,7 +12,7 @@ export class AnimationMixer extends EventDispatcher {
 	time: number;
 	timeScale: number;
 
-	clipAction( clip: AnimationClip, root?: Object3D | AnimationObjectGroup ): AnimationAction;
+	clipAction( clip: AnimationClip, root?: Object3D | AnimationObjectGroup, blendMode?: AnimationBlendMode ): AnimationAction;
 	existingAction( clip: AnimationClip, root?: Object3D | AnimationObjectGroup ): AnimationAction | null;
 	stopAllAction(): AnimationMixer;
 	update( deltaTime: number ): AnimationMixer;

@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Strings = function ( config ) {
+function Strings( config ) {
 
 	var language = config.getKey( 'language' );
 
@@ -76,10 +76,12 @@ var Strings = function ( config ) {
 
 			'menubar/help': 'Help',
 			'menubar/help/source_code': 'Source Code',
+			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'About',
 
 			'sidebar/scene': 'Scene',
 			'sidebar/scene/background': 'Background',
+			'sidebar/scene/environment': 'Environment',
 			'sidebar/scene/fog': 'Fog',
 
 			'sidebar/properties/object': 'Object',
@@ -109,6 +111,9 @@ var Strings = function ( config ) {
 			'sidebar/object/penumbra': 'Penumbra',
 			'sidebar/object/decay': 'Decay',
 			'sidebar/object/shadow': 'Shadow',
+			'sidebar/object/shadowBias': 'Shadow Bias',
+			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowRadius': 'Shadow Radius',
 			'sidebar/object/cast': 'cast',
 			'sidebar/object/receive': 'receive',
 			'sidebar/object/visible': 'Visible',
@@ -121,6 +126,7 @@ var Strings = function ( config ) {
 			'sidebar/geometry/uuid': 'UUID',
 			'sidebar/geometry/name': 'Name',
 			'sidebar/geometry/bounds': 'Bounds',
+			'sidebar/geometry/show_vertex_normals': 'Show Vertex Normals',
 
 			'sidebar/geometry/box_geometry/width': 'Width',
 			'sidebar/geometry/box_geometry/height': 'Height',
@@ -272,6 +278,8 @@ var Strings = function ( config ) {
 			'sidebar/material/opacity': 'Opacity',
 			'sidebar/material/transparent': 'Transparent',
 			'sidebar/material/alphatest': 'Alpha Test',
+			'sidebar/material/depthtest': 'Depth Test',
+			'sidebar/material/depthwrite': 'Depth Write',
 			'sidebar/material/wireframe': 'Wireframe',
 
 			'sidebar/script': 'Script',
@@ -286,11 +294,8 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': 'Renderer',
 			'sidebar/project/antialias': 'Antialias',
 			'sidebar/project/shadows': 'Shadows',
-			'sidebar/project/shadowType': 'Shadow Type',
-			'sidebar/project/physicallyCorrectLights': 'Physically correct lights',
+			'sidebar/project/physicallyCorrectLights': 'Physical lights',
 			'sidebar/project/toneMapping': 'Tone mapping',
-			'sidebar/project/toneMappingExposure': 'Exposure',
-			'sidebar/project/toneMappingWhitePoint': 'White Point',
 			'sidebar/project/materials': 'Materials',
 			'sidebar/project/Assign': 'Assign',
 
@@ -320,7 +325,9 @@ var Strings = function ( config ) {
 			'viewport/info/frametime': 'Frametime'
 
 		},
+
 		fr: {
+
 			'menubar/file': 'Fichier',
 			'menubar/file/new': 'Nouveau',
 			'menubar/file/import': 'Importer',
@@ -345,7 +352,7 @@ var Strings = function ( config ) {
 			'menubar/edit/clone': 'Cloner',
 			'menubar/edit/delete': 'Supprimer (Supp)',
 			'menubar/edit/minify_shaders': 'Minimiser les Shaders',
-			'menubar/edit/fixcolormaps': 'Correction des cartes de couleurs',
+			'menubar/edit/fixcolormaps': 'Correction des couleurs',
 
 			'menubar/add': 'Ajouter',
 			'menubar/add/group': 'Groupe',
@@ -363,11 +370,11 @@ var Strings = function ( config ) {
 			'menubar/add/tube': 'Tube',
 			'menubar/add/torusknot': 'Noeud Torus',
 			'menubar/add/lathe': 'Tour',
-			'menubar/add/sprite': 'Lutin',
+			'menubar/add/sprite': 'Sprite',
 			'menubar/add/pointlight': 'Lumière ponctuelle',
 			'menubar/add/spotlight': 'Projecteur',
-			'menubar/add/directionallight': 'Éclairage directionnel',
-			'menubar/add/hemispherelight': 'Lumière hémisphère',
+			'menubar/add/directionallight': 'Lumière directionnelle',
+			'menubar/add/hemispherelight': 'Lumière hémisphérique',
 			'menubar/add/ambientlight': 'Lumière ambiante',
 			'menubar/add/perspectivecamera': 'Caméra perspective',
 			'menubar/add/orthographiccamera': 'Caméra orthographique',
@@ -387,15 +394,17 @@ var Strings = function ( config ) {
 
 			'menubar/help': 'Aide',
 			'menubar/help/source_code': 'Code Source',
+			'menubar/help/icons': 'Icon Pack',
 			'menubar/help/about': 'A propos',
 
 			'sidebar/scene': 'Scène',
 			'sidebar/scene/background': 'Arrière Plan',
+			'sidebar/scene/environment': 'Environment',
 			'sidebar/scene/fog': 'Brouillard',
 
 			'sidebar/properties/object': 'Objet',
 			'sidebar/properties/geometry': 'Géométrie',
-			'sidebar/properties/material': 'Matériel',
+			'sidebar/properties/material': 'Matériaux',
 			'sidebar/properties/script': 'Script',
 
 			'sidebar/object/type': 'Type',
@@ -405,7 +414,7 @@ var Strings = function ( config ) {
 			'sidebar/object/position': 'Position',
 			'sidebar/object/rotation': 'Rotation',
 			'sidebar/object/scale': 'Échelle',
-			'sidebar/object/fov': 'Fov',
+			'sidebar/object/fov': 'Champ de vision',
 			'sidebar/object/left': 'Gauche',
 			'sidebar/object/right': 'Droite',
 			'sidebar/object/top': 'Haut',
@@ -418,20 +427,24 @@ var Strings = function ( config ) {
 			'sidebar/object/distance': 'Distance',
 			'sidebar/object/angle': 'Angle',
 			'sidebar/object/penumbra': 'Pénombre',
-			'sidebar/object/decay': 'Pourriture',
+			'sidebar/object/decay': 'Affaiblissement',
 			'sidebar/object/shadow': 'Ombre',
-			'sidebar/object/cast': 'cast',
-			'sidebar/object/receive': 'receive',
+			'sidebar/object/shadowBias': 'Biais directionnel des ombres',
+			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowRadius': 'Rayon de l\'ombre',
+			'sidebar/object/cast': 'Projète',
+			'sidebar/object/receive': 'Reçoit',
 			'sidebar/object/visible': 'Visible',
-			'sidebar/object/frustumcull': 'élimination des déchets',
+			'sidebar/object/frustumcull': 'Culling',
 			'sidebar/object/renderorder': 'Ordre de rendus',
-			'sidebar/object/userdata': 'donnée utilisateur',
+			'sidebar/object/userdata': 'Données utilisateur',
 
 			'sidebar/geometry/type': 'Type',
 			'sidebar/geometry/new': 'Nouveau',
 			'sidebar/geometry/uuid': 'UUID',
 			'sidebar/geometry/name': 'Nom',
 			'sidebar/geometry/bounds': 'Limites',
+			'sidebar/geometry/show_vertex_normals': 'Afficher normales',
 
 			'sidebar/geometry/box_geometry/width': 'Largeur',
 			'sidebar/geometry/box_geometry/height': 'Hauteur',
@@ -452,13 +465,13 @@ var Strings = function ( config ) {
 			'sidebar/geometry/cylinder_geometry/radiusbottom': 'Rayon inférieur',
 			'sidebar/geometry/cylinder_geometry/height': 'Hauteur',
 			'sidebar/geometry/cylinder_geometry/radialsegments': 'Segments radiaux',
-			'sidebar/geometry/cylinder_geometry/heightsegments': 'Segments de hauteur',
-			'sidebar/geometry/cylinder_geometry/openended': 'Ouvert fin',
+			'sidebar/geometry/cylinder_geometry/heightsegments': 'Segments en hauteur',
+			'sidebar/geometry/cylinder_geometry/openended': 'Extrémités ouvertes',
 
 			'sidebar/geometry/extrude_geometry/curveSegments': 'Segments de courbe',
 			'sidebar/geometry/extrude_geometry/steps': 'Pas',
 			'sidebar/geometry/extrude_geometry/depth': 'Profondeur',
-			'sidebar/geometry/extrude_geometry/bevelEnabled': 'Biseau?',
+			'sidebar/geometry/extrude_geometry/bevelEnabled': 'Biseau',
 			'sidebar/geometry/extrude_geometry/bevelThickness': 'Épaisseur',
 			'sidebar/geometry/extrude_geometry/bevelSize': 'Taille',
 			'sidebar/geometry/extrude_geometry/bevelOffset': 'Décalage',
@@ -539,51 +552,53 @@ var Strings = function ( config ) {
 			'sidebar/material/program': 'Programme',
 			'sidebar/material/info': 'Info',
 			'sidebar/material/vertex': 'Sommet',
-			'sidebar/material/fragment': 'fragment',
+			'sidebar/material/fragment': 'Fragment',
 			'sidebar/material/color': 'Couleur',
-			'sidebar/material/depthPacking': 'Emballage en profondeur',
+			'sidebar/material/depthPacking': 'Encodage profondeur de couleur',
 			'sidebar/material/roughness': 'Rugosité',
-			'sidebar/material/metalness': 'Métalosité',
+			'sidebar/material/metalness': 'Métal',
 			'sidebar/material/sheen': 'Éclat',
 			'sidebar/material/emissive': 'Émissif',
 			'sidebar/material/specular': 'Spéculaire',
 			'sidebar/material/shininess': 'Brillance',
 			'sidebar/material/clearcoat': 'Vernis',
 			'sidebar/material/clearcoatroughness': 'Rugosité du vernis',
-			'sidebar/material/vertexcolors': 'Couleurs de Sommets',
-			'sidebar/material/vertextangents': 'Sommets Tangentes',
+			'sidebar/material/vertexcolors': 'Couleurs aux Sommets',
+			'sidebar/material/vertextangents': 'Tangentes aux sommets',
 			'sidebar/material/skinning': 'Skinning',
 			'sidebar/material/matcap': 'Matcap',
-			'sidebar/material/map': 'Map',
-			'sidebar/material/alphamap': 'Alpha Map',
-			'sidebar/material/bumpmap': 'Bump Map',
-			'sidebar/material/normalmap': 'Normal Map',
-			'sidebar/material/clearcoatnormalmap': 'Clearcoat Normal Map',
-			'sidebar/material/displacemap': 'Displace Map',
-			'sidebar/material/roughmap': 'Rough. Map',
-			'sidebar/material/metalmap': 'Metal. Map',
-			'sidebar/material/specularmap': 'Specular Map',
-			'sidebar/material/envmap': 'Env Map',
-			'sidebar/material/lightmap': 'Light Map',
-			'sidebar/material/aomap': 'AO Map',
-			'sidebar/material/emissivemap': 'Emissive Map',
-			'sidebar/material/gradientmap': 'Gradient Map',
+			'sidebar/material/map': 'Texture',
+			'sidebar/material/alphamap': 'Texture de transparence',
+			'sidebar/material/bumpmap': 'Texture de relief',
+			'sidebar/material/normalmap': 'Texture de normales',
+			'sidebar/material/clearcoatnormalmap': 'Texture des normales du vernis',
+			'sidebar/material/displacemap': 'Texture de déplacement',
+			'sidebar/material/roughmap': 'Texture de rugosité',
+			'sidebar/material/metalmap': 'Texture métallique',
+			'sidebar/material/specularmap': 'Texture spéculaire',
+			'sidebar/material/envmap': 'Texture d\'environnement',
+			'sidebar/material/lightmap': 'Texture d\'éclairage',
+			'sidebar/material/aomap': 'Texture d\'occlusion ambiante',
+			'sidebar/material/emissivemap': 'Texture d\'émission',
+			'sidebar/material/gradientmap': 'Texture de gradient',
 			'sidebar/material/side': 'Côté',
-			'sidebar/material/side/front': 'Face',
-			'sidebar/material/side/back': 'Arrière',
-			'sidebar/material/side/double': 'Double',
-			'sidebar/material/flatshaded': 'Flat Shaded',
+			'sidebar/material/side/front': 'Face avant',
+			'sidebar/material/side/back': 'Face Arrière',
+			'sidebar/material/side/double': 'Double face',
+			'sidebar/material/flatshaded': 'Rendu plat',
 			'sidebar/material/blending': 'Mélange',
 			'sidebar/material/blending/no': 'Non',
 			'sidebar/material/blending/normal': 'Normal',
-			'sidebar/material/blending/additive': 'Additive',
-			'sidebar/material/blending/subtractive': 'Soustractive',
+			'sidebar/material/blending/additive': 'Ajouter',
+			'sidebar/material/blending/subtractive': 'Soustraire',
 			'sidebar/material/blending/multiply': 'Multiplier',
-			'sidebar/material/blending/custom': 'Personnalisé',
+			'sidebar/material/blending/custom': 'Personnaliser',
 			'sidebar/material/opacity': 'Opacité',
-			'sidebar/material/transparent': 'Transparent',
-			'sidebar/material/alphatest': 'Alpha Test',
-			'sidebar/material/wireframe': 'Wireframe',
+			'sidebar/material/transparent': 'Transparence',
+			'sidebar/material/alphatest': 'Test de transparence',
+			'sidebar/material/depthtest': 'Depth Test',
+			'sidebar/material/depthwrite': 'Depth Write',
+			'sidebar/material/wireframe': 'Fil de fer',
 
 			'sidebar/script': 'Script',
 			'sidebar/script/new': 'Nouveau',
@@ -595,21 +610,18 @@ var Strings = function ( config ) {
 			'sidebar/project/editable': 'Modifiable',
 			'sidebar/project/vr': 'VR',
 			'sidebar/project/renderer': 'Rendus',
-			'sidebar/project/antialias': 'Antialias',
+			'sidebar/project/antialias': 'Anticrénelage',
 			'sidebar/project/shadows': 'Ombres',
-			'sidebar/project/shadowType': 'Type d\'ombre',
-			'sidebar/project/physicallyCorrectLights': 'Correction physique de lumière',
-			'sidebar/project/toneMapping': 'Cartographie des tons',
-			'sidebar/project/toneMappingExposure': 'Exposition',
-			'sidebar/project/toneMappingWhitePoint': 'Point Blanc',
-			'sidebar/project/materials': 'Materiels',
+			'sidebar/project/physicallyCorrectLights': 'Physical lights',
+			'sidebar/project/toneMapping': 'Mappage des nuances',
+			'sidebar/project/materials': 'Matériaux',
 			'sidebar/project/Assign': 'Attribuer',
 
 			'sidebar/settings': 'Paramètres',
 			'sidebar/settings/language': 'Langue',
-			'sidebar/settings/exportPrecision': 'Précision d\'exportation',
+			'sidebar/settings/exportPrecision': 'Précision à l\'exportation',
 
-			'sidebar/settings/shortcuts/translate': 'Traduire',
+			'sidebar/settings/shortcuts/translate': 'Position',
 			'sidebar/settings/shortcuts/rotate': 'Rotation',
 			'sidebar/settings/shortcuts/scale': 'Échelle',
 			'sidebar/settings/shortcuts/undo': 'Annuler',
@@ -618,9 +630,9 @@ var Strings = function ( config ) {
 			'sidebar/settings/viewport/grid': 'Grille',
 
 			'sidebar/history': 'Historique',
-			'sidebar/history/persistent': 'persistent',
+			'sidebar/history/persistent': 'permanent',
 
-			'toolbar/translate': 'Traduire',
+			'toolbar/translate': 'Position',
 			'toolbar/rotate': 'Rotation',
 			'toolbar/scale': 'Échelle',
 			'toolbar/local': 'Local',
@@ -629,7 +641,9 @@ var Strings = function ( config ) {
 			'viewport/info/vertices': 'Sommets',
 			'viewport/info/triangles': 'Triangles',
 			'viewport/info/frametime': 'Temps de trame'
+
 		},
+
 		zh: {
 
 			'menubar/file': '文件',
@@ -698,10 +712,12 @@ var Strings = function ( config ) {
 
 			'menubar/help': '帮助',
 			'menubar/help/source_code': '源码',
+			'menubar/help/icons': '图标组件包',
 			'menubar/help/about': '关于',
 
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
+			'sidebar/scene/environment': '环境',
 			'sidebar/scene/fog': '雾',
 
 			'sidebar/properties/object': '属性',
@@ -731,6 +747,9 @@ var Strings = function ( config ) {
 			'sidebar/object/penumbra': '边缘',
 			'sidebar/object/decay': '衰减',
 			'sidebar/object/shadow': '阴影',
+			'sidebar/object/shadowBias': '阴影偏移',
+			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/cast': '产生',
 			'sidebar/object/receive': '接受',
 			'sidebar/object/visible': '可见性',
@@ -743,6 +762,7 @@ var Strings = function ( config ) {
 			'sidebar/geometry/uuid': '识别码',
 			'sidebar/geometry/name': '名称',
 			'sidebar/geometry/bounds': '界限',
+			'sidebar/geometry/show_vertex_normals': '显示顶点法线',
 
 			'sidebar/geometry/box_geometry/width': '宽度',
 			'sidebar/geometry/box_geometry/height': '高度',
@@ -838,7 +858,7 @@ var Strings = function ( config ) {
 			'sidebar/material/clearcoat': '透明图层',
 			'sidebar/material/clearcoatroughness': '透明图层粗糙度',
 			'sidebar/material/vertexcolors': '顶点颜色',
-			'sidebar/material/vertextangents': 'Vertex Tangents',
+			'sidebar/material/vertextangents': '顶点切线',
 			'sidebar/material/skinning': '皮肤',
 			'sidebar/material/map': '贴图',
 			'sidebar/material/alphamap': '透明贴图',
@@ -868,6 +888,8 @@ var Strings = function ( config ) {
 			'sidebar/material/opacity': '透明度',
 			'sidebar/material/transparent': '透明性',
 			'sidebar/material/alphatest': 'α测试',
+			'sidebar/material/depthtest': '深度测试',
+			'sidebar/material/depthwrite': '深度缓冲',
 			'sidebar/material/wireframe': '线框',
 
 			'sidebar/script': '脚本',
@@ -882,11 +904,8 @@ var Strings = function ( config ) {
 			'sidebar/project/renderer': '渲染器',
 			'sidebar/project/antialias': '抗锯齿',
 			'sidebar/project/shadows': '阴影',
-			'sidebar/project/shadowType': '阴影类型',
-			'sidebar/project/physicallyCorrectLights': '物理光照',
+			'sidebar/project/physicallyCorrectLights': '物理灯',
 			'sidebar/project/toneMapping': '色调映射',
-			'sidebar/project/toneMappingExposure': '曝光',
-			'sidebar/project/toneMappingWhitePoint': '白点',
 			'sidebar/project/materials': '材质',
 			'sidebar/project/Assign': '应用',
 
@@ -929,6 +948,6 @@ var Strings = function ( config ) {
 
 	};
 
-};
+}
 
 export { Strings };

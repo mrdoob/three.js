@@ -51,7 +51,7 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		this.updateMatrixWorld( true );
 
-		var e = this.matrixWorld.elements;
+		const e = this.matrixWorld.elements;
 
 		return target.set( - e[ 8 ], - e[ 9 ], - e[ 10 ] ).normalize();
 

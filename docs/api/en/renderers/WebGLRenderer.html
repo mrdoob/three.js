@@ -166,6 +166,7 @@
 
 		<h3>[property:number outputEncoding]</h3>
 		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<p>If a render target has been set using [page:WebGLRenderer.setRenderTarget .setRenderTarget] then renderTarget.texture.encoding will be used instead.</p>
 		<p>See the [page:Textures texture constants] page for details of other formats.</p>
 
 		<h3>[property:Object info]</h3>
@@ -266,7 +267,7 @@
 
 		<h3>[property:Constant toneMapping]</h3>
 		<p>
-		Default is [page:Renderer LinearToneMapping]. See the [page:Renderer Renderer constants] for other choices.
+		Default is [page:Renderer NoToneMapping]. See the [page:Renderer Renderer constants] for other choices.
 		</p>
 
 		<h3>[property:Number toneMappingExposure]</h3>
@@ -274,19 +275,9 @@
 		Exposure level of tone mapping. Default is *1*.
 		</p>
 
-		<h3>[property:Number toneMappingWhitePoint]</h3>
+		<h3>[property:WebXRManager xr]</h3>
 		<p>
-		Tone mapping white point. Default is *1*.
-		</p>
-
-		<h3>[property:Object xr]</h3>
-		<p>
-		Provides access to the WebXR related interface of the renderer.
-		</p>
-
-		<h3>[property:Boolean xr.enabled]</h3>
-		<p>
-		Whether the renderer should enable XR rendering or not. Default is *false*.
+		Provides access to the WebXR related [page:WebXRManager interface] of the renderer.
 		</p>
 
 		<h2>Methods</h2>
@@ -307,7 +298,7 @@
 		<h3>[method:null clearStencil]( )</h3>
 		<p>Clear the stencil buffers. Equivalent to calling [page:WebGLRenderer.clear .clear]( false, false, true ).</p>
 
-		<h3>[method:null compile]( [param:Scene scene], [param:Camera camera] )</h3>
+		<h3>[method:null compile]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>Compiles all materials in the scene with the camera. This is useful to precompile shaders before the first rendering.</p>
 
 		<h3>[method:null copyFramebufferToTexture]( [param:Vector2 position], [param:Texture texture], [param:Number level] )</h3>
@@ -413,9 +404,9 @@
 		<p>For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
 
-		<h3>[method:null render]( [param:Scene scene], [param:Camera camera] )</h3>
+		<h3>[method:null render]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>
-			Render a [page:Scene scene] using a [page:Camera camera].<br />
+			Render a [page:Scene scene] or another type of [page:Object3D object] using a [page:Camera camera].<br />
 
 			The render is done to a previously specified [page:WebGLRenderTarget renderTarget] set by calling [page:WebGLRenderer.setRenderTarget .setRenderTarget] or to the canvas as usual.<br />
 

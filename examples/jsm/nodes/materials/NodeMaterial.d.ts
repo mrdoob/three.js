@@ -27,6 +27,7 @@ export class NodeMaterial extends ShaderMaterial {
 
 	updateFrame( frame: NodeFrame ): void;
 	build( params?: NodeMaterialBuildParams ): this;
+	getHash(): string;
 	copy( source: NodeMaterial ): this;
 
 }

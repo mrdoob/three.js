@@ -4,7 +4,7 @@ import { Vector2 } from './Vector2.js';
  * @author bhouston / http://clara.io
  */
 
-var _vector = new Vector2();
+const _vector = new Vector2();
 
 function Box2( min, max ) {
 
@@ -28,7 +28,7 @@ Object.assign( Box2.prototype, {
 
 		this.makeEmpty();
 
-		for ( var i = 0, il = points.length; i < il; i ++ ) {
+		for ( let i = 0, il = points.length; i < il; i ++ ) {
 
 			this.expandByPoint( points[ i ] );
 
@@ -40,7 +40,7 @@ Object.assign( Box2.prototype, {
 
 	setFromCenterAndSize: function ( center, size ) {
 
-		var halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
+		const halfSize = _vector.copy( size ).multiplyScalar( 0.5 );
 		this.min.copy( center ).sub( halfSize );
 		this.max.copy( center ).add( halfSize );
 
@@ -190,7 +190,7 @@ Object.assign( Box2.prototype, {
 
 	distanceToPoint: function ( point ) {
 
-		var clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
+		const clampedPoint = _vector.copy( point ).clamp( this.min, this.max );
 		return clampedPoint.sub( point ).length();
 
 	},

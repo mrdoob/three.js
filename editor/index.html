@@ -8,10 +8,9 @@
 		<link rel="manifest" href="manifest.json">
 		<link rel="shortcut icon" href="../files/favicon.ico" />
 	</head>
-	<body ontouchstart="">
+	<body>
 		<link rel="stylesheet" href="css/main.css">
 
-		<script src="../examples/js/libs/jszip.min.js"></script>
 		<script src="../examples/js/libs/draco/draco_encoder.js"></script>
 
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
@@ -43,7 +42,6 @@
 		<script src="js/libs/ternjs/doc_comment.js"></script>
 		<script src="js/libs/tern-threejs/threejs.js"></script>
 		<script src="js/libs/signals.min.js"></script>
-		<script src="../examples/js/vr/HelioWebXRPolyfill.js"></script>
 
 		<script type="module">
 
@@ -240,15 +238,6 @@
 				}
 
 			}
-
-			/*
-			window.addEventListener( 'message', function ( event ) {
-
-				editor.clear();
-				editor.fromJSON( event.data );
-
-			}, false );
-			*/
 
 		</script>
 	</body>

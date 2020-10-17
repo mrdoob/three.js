@@ -314,6 +314,8 @@
 				container.appendChild( renderer.domElement );
 
 				var controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = 100;
+				controls.maxDistance = 1000;
 
 				stats = new Stats();
 				container.appendChild( stats.dom );

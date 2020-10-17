@@ -14,11 +14,6 @@
 	<body>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - screen space ambient occlusion<br/>
-
-			<div id="error" style="display: none;">
-				Your browser does not support <strong>WEBGL_depth_texture</strong>.<br/><br/>
-				This demo will not work.
-			</div>
 		</div>
 
 		<script type="module">
@@ -47,13 +42,6 @@
 				renderer = new THREE.WebGLRenderer();
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
-
-				if ( ! renderer.extensions.get( 'WEBGL_depth_texture' ) ) {
-
-					document.querySelector( '#error' ).style.display = 'block';
-					return;
-
-				}
 
 				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 );
 				camera.position.z = 500;

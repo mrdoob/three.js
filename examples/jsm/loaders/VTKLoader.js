@@ -17,7 +17,7 @@ import {
 	Loader,
 	LoaderUtils
 } from "../../../build/three.module.js";
-import { Zlib } from "../libs/inflate.module.min.js";
+import { Inflate } from "../libs/inflate.module.min.js";
 
 var VTKLoader = function ( manager ) {
 
@@ -38,7 +38,25 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 		loader.setResponseType( 'arraybuffer' );
 		loader.load( url, function ( text ) {
 
-			onLoad( scope.parse( text ) );
+			try {
+
+				onLoad( scope.parse( text ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -400,6 +418,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						pointIndex = pointIndex + 12;
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -448,6 +467,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -485,6 +505,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 						}
 
 					}
+
 					// increment our next pointer
 					state.next = state.next + count + 1;
 
@@ -783,7 +804,7 @@ VTKLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 					for ( var i = 0; i < dataOffsets.length - 1; i ++ ) {
 
-						var inflate = new Zlib.Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
+						var inflate = new Inflate( byteData.slice( dataOffsets[ i ], dataOffsets[ i + 1 ] ), { resize: true, verify: true } ); // eslint-disable-line no-undef
 						content = inflate.decompress();
 						content = content.buffer;
 

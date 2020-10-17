@@ -1,3 +1,4 @@
+console.warn( "THREE.Reflector: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
 /**
  * @author Slayvin / http://slayvin.net
  */
@@ -17,8 +18,6 @@ THREE.Reflector = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || THREE.Reflector.ReflectorShader;
-	var recursion = options.recursion !== undefined ? options.recursion : 0;
-	var encoding = options.encoding !== undefined ? options.encoding : THREE.LinearEncoding;
 
 	//
 
@@ -41,8 +40,7 @@ THREE.Reflector = function ( geometry, options ) {
 		minFilter: THREE.LinearFilter,
 		magFilter: THREE.LinearFilter,
 		format: THREE.RGBFormat,
-		stencilBuffer: false,
-		encoding: encoding
+		stencilBuffer: false
 	};
 
 	var renderTarget = new THREE.WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -66,14 +64,6 @@ THREE.Reflector = function ( geometry, options ) {
 	this.material = material;
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
-
-		if ( 'recursion' in camera.userData ) {
-
-			if ( camera.userData.recursion === recursion ) return;
-
-			camera.userData.recursion ++;
-
-		}
 
 		reflectorWorldPosition.setFromMatrixPosition( scope.matrixWorld );
 		cameraWorldPosition.setFromMatrixPosition( camera.matrixWorld );
@@ -113,8 +103,6 @@ THREE.Reflector = function ( geometry, options ) {
 		virtualCamera.updateMatrixWorld();
 		virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 
-		virtualCamera.userData.recursion = 0;
-
 		// Update the texture matrix
 		textureMatrix.set(
 			0.5, 0.0, 0.0, 0.5,
@@ -151,6 +139,8 @@ THREE.Reflector = function ( geometry, options ) {
 
 		// Render
 
+		renderTarget.texture.encoding = renderer.outputEncoding;
+
 		scope.visible = false;
 
 		var currentRenderTarget = renderer.getRenderTarget();
@@ -158,7 +148,7 @@ THREE.Reflector = function ( geometry, options ) {
 		var currentXrEnabled = renderer.xr.enabled;
 		var currentShadowAutoUpdate = renderer.shadowMap.autoUpdate;
 
-		renderer.xr.enabled = false; // Avoid camera modification and recursion
+		renderer.xr.enabled = false; // Avoid camera modification
 		renderer.shadowMap.autoUpdate = false; // Avoid re-computing shadows
 
 		renderer.setRenderTarget( renderTarget );

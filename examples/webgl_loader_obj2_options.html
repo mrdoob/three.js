@@ -40,9 +40,7 @@
 		<div id="glFullscreen">
 			<canvas id="example"></canvas>
 		</div>
-		<div id="dat">
-
-		</div>
+		<div id="dat" class="dg ac"></div>
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 usage options<br>Use module workers with Chromium based browser (80+)
 			<div id="feedback"></div>
@@ -303,7 +301,7 @@
 
 						let mesh = new THREE.Mesh( event.detail.bufferGeometry, event.detail.material );
 						mesh.name = event.detail.meshName;
-						let helper = new VertexNormalsHelper( mesh, 2, 0x00ff00, 1 );
+						let helper = new VertexNormalsHelper( mesh, 2, 0x00ff00 );
 						helper.name = 'VertexNormalsHelper';
 
 						override.addMesh( mesh );

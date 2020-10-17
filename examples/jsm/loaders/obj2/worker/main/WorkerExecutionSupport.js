@@ -127,6 +127,7 @@ const WorkerExecutionSupport = function () {
 	this._reset();
 
 };
+
 WorkerExecutionSupport.WORKER_SUPPORT_VERSION = '3.2.0';
 console.info( 'Using WorkerSupport version: ' + WorkerExecutionSupport.WORKER_SUPPORT_VERSION );
 
@@ -148,6 +149,7 @@ WorkerExecutionSupport.prototype = {
 			scope._terminate();
 
 		};
+
 		this.worker = {
 			native: null,
 			jsmWorker: false,
@@ -213,9 +215,11 @@ WorkerExecutionSupport.prototype = {
 				console.info( 'Worker is terminated immediately as it is not running!' );
 
 			}
+
 			this._terminate();
 
 		}
+
 		return this;
 
 	},
@@ -233,11 +237,13 @@ WorkerExecutionSupport.prototype = {
 			this.worker.callbacks.onAssetAvailable = onAssetAvailable;
 
 		}
+
 		if ( onLoad !== undefined && onLoad !== null ) {
 
 			this.worker.callbacks.onLoad = onLoad;
 
 		}
+
 		this._verifyCallbacks();
 
 	},
@@ -370,6 +376,7 @@ WorkerExecutionSupport.prototype = {
 			}
 
 		}
+
 		return workerAvailable;
 
 	},
@@ -385,6 +392,7 @@ WorkerExecutionSupport.prototype = {
 			scope._receiveWorkerMessage( event );
 
 		};
+
 		this.worker.native.onmessage = scopedReceiveWorkerMessage;
 		this.worker.native.onerror = scopedReceiveWorkerMessage;
 		if ( defaultGeometryType !== undefined && defaultGeometryType !== null ) {
@@ -425,6 +433,7 @@ WorkerExecutionSupport.prototype = {
 			return;
 
 		}
+
 		let payload = event.data;
 		let workerRunnerName = this.worker.workerRunner.name;
 		switch ( payload.cmd ) {
@@ -441,6 +450,7 @@ WorkerExecutionSupport.prototype = {
 					this.worker.callbacks.onLoad( payload.msg );
 
 				}
+
 				if ( this.worker.terminateWorkerOnLoad ) {
 
 					if ( this.worker.logging.enabled ) {
@@ -448,9 +458,11 @@ WorkerExecutionSupport.prototype = {
 						console.info( 'WorkerSupport [' + workerRunnerName + ']: Run is complete. Terminating application on request!' );
 
 					}
+
 					this.worker.callbacks.terminate();
 
 				}
+
 				break;
 
 			case 'error':
@@ -462,6 +474,7 @@ WorkerExecutionSupport.prototype = {
 					this.worker.callbacks.onLoad( payload.msg );
 
 				}
+
 				if ( this.worker.terminateWorkerOnLoad ) {
 
 					if ( this.worker.logging.enabled ) {
@@ -469,9 +482,11 @@ WorkerExecutionSupport.prototype = {
 						console.info( 'WorkerSupport [' + workerRunnerName + ']: Run reported error. Terminating application on request!' );
 
 					}
+
 					this.worker.callbacks.terminate();
 
 				}
+
 				break;
 
 			default:
@@ -516,6 +531,7 @@ WorkerExecutionSupport.prototype = {
 			this.worker.started = true;
 
 		}
+
 		return ready;
 
 	},
@@ -536,11 +552,13 @@ WorkerExecutionSupport.prototype = {
 					transferables.push( this.worker.queuedMessage.payload.data.input );
 
 				}
+
 				if ( this.worker.queuedMessage.transferables.length > 0 ) {
 
 					transferables = transferables.concat( this.worker.queuedMessage.transferables );
 
 				}
+
 				this.worker.native.postMessage( this.worker.queuedMessage.payload, transferables );
 
 			} else {

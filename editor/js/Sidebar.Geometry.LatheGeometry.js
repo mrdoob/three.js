@@ -9,7 +9,7 @@ import { UIPoints2 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryLatheGeometry = function ( editor, object ) {
+function SidebarGeometryLatheGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -71,6 +71,6 @@ var SidebarGeometryLatheGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryLatheGeometry };

@@ -13,15 +13,13 @@ import {
 var _v1 = new Vector3();
 var _v2 = new Vector3();
 
-function VertexTangentsHelper( object, size, hex, linewidth ) {
+function VertexTangentsHelper( object, size, hex ) {
 
 	this.object = object;
 
 	this.size = ( size !== undefined ) ? size : 1;
 
 	var color = ( hex !== undefined ) ? hex : 0x00ffff;
-
-	var width = ( linewidth !== undefined ) ? linewidth : 1;
 
 	//
 
@@ -44,7 +42,9 @@ function VertexTangentsHelper( object, size, hex, linewidth ) {
 
 	geometry.setAttribute( 'position', positions );
 
-	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, linewidth: width } ) );
+	LineSegments.call( this, geometry, new LineBasicMaterial( { color: color, toneMapped: false } ) );
+
+	this.type = 'VertexTangentsHelper';
 
 	//
 

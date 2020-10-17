@@ -6,7 +6,7 @@ import { UIDiv, UIBreak, UIText } from './libs/ui.js';
 import { UIBoolean } from './libs/ui.three.js';
 
 
-var SidebarSettingsViewport = function ( editor ) {
+function SidebarSettingsViewport( editor ) {
 
 	var signals = editor.signals;
 	var strings = editor.strings;
@@ -37,6 +37,6 @@ var SidebarSettingsViewport = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarSettingsViewport };

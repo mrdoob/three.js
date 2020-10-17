@@ -9,7 +9,7 @@ import { UIPoints3 } from './libs/ui.three.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryTubeGeometry = function ( editor, object ) {
+function SidebarGeometryTubeGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -104,6 +104,6 @@ var SidebarGeometryTubeGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryTubeGeometry };

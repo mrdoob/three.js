@@ -5,18 +5,6 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
-	<style>
-		a {
-			color: #08f;
-		}
-		#notSupported {
-			width: 50%;
-			margin: auto;
-			background-color: #f00;
-			margin-top: 20px;
-			padding: 10px;
-		}
-	</style>
 </head>
 <body>
 
@@ -145,7 +133,7 @@
 			}
 
 			var geometry = new THREE.InstancedBufferGeometry();
-			geometry.maxInstancedCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
+			geometry.instanceCount = instances; // set so its initalized for dat.GUI, will be set in first draw otherwise
 
 			geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( positions, 3 ) );
 
@@ -181,7 +169,7 @@
 			renderer.setSize( window.innerWidth, window.innerHeight );
 			container.appendChild( renderer.domElement );
 
-			if ( renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
+			if ( renderer.capabilities.isWebGL2 === false && renderer.extensions.get( 'ANGLE_instanced_arrays' ) === null ) {
 
 				document.getElementById( 'notSupported' ).style.display = '';
 				return;
@@ -191,7 +179,7 @@
 			//
 
 			var gui = new GUI( { width: 350 } );
-			gui.add( geometry, 'maxInstancedCount', 0, instances );
+			gui.add( geometry, 'instanceCount', 0, instances );
 
 			//
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
@@ -145,6 +145,7 @@
 
 		<h3>[property:number outputEncoding]</h3>
 		<p>Defines the output encoding of the renderer. Default is [page:Textures THREE.LinearEncoding].</p>
+		<p>If a render target has been set using [page:WebGLRenderer.setRenderTarget .setRenderTarget] then renderTarget.texture.encoding will be used instead.</p>
 		<p>See the [page:Textures texture constants] page for details of other formats.</p>
 
 		<h3>[property:Object info]</h3>
@@ -243,7 +244,7 @@
 
 		<h3>[property:Constant toneMapping]</h3>
 		<p>
-		默认是[page:Renderer LinearToneMapping]。查看[page:Renderer Renderer constants]以获取其它备选项
+		默认是[page:Renderer NoToneMapping]。查看[page:Renderer Renderer constants]以获取其它备选项
 		</p>
 
 		<h3>[property:Number toneMappingExposure]</h3>
@@ -251,19 +252,9 @@
 		色调映射的曝光级别。默认是*1*
 		</p>
 
-		<h3>[property:Number toneMappingWhitePoint]</h3>
+		<h3>[property:WebXRManager xr]</h3>
 		<p>
-		色调映射的白点。默认是*1*
-		</p>
-
-		<h3>[property:Object xr]</h3>
-		<p>
-		Provides access to the WebXR related interface of the renderer.
-		</p>
-
-		<h3>[property:Boolean xr.enabled]</h3>
-		<p>
-		Whether the renderer should enable XR rendering or not. Default is *false*.
+		Provides access to the WebXR related [page:WebXRManager interface] of the renderer.
 		</p>
 
 		<h2>方法</h2>
@@ -294,7 +285,7 @@
 		该方法清楚了一个rendertarget。为此它会激活此endertarget
 		</p>
 
-		<h3>[method:null compile]( [param:Scene scene], [param:Camera camera] )</h3>
+		<h3>[method:null compile]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>使用相机编译场景中的所有材质。这对于在首次渲染之前预编译着色器很有用。</p>
 
 		<h3>[method:null copyFramebufferToTexture]( [param:Vector2 position], [param:Texture texture], [param:Number level] )</h3>
@@ -370,7 +361,7 @@
 		示例：[example:webgl_interactive_cubes_gpu interactive / cubes / gpu]</p>
 		<p>For reading out a [page:WebGLCubeRenderTarget WebGLCubeRenderTarget] use the optional parameter activeCubeFaceIndex to determine which face should be read.</p>
 
-		<h3>[method:null render]( [param:Scene scene], [param:Camera camera], [param:WebGLRenderTarget renderTarget], [param:Boolean forceClear] )</h3>
+		<h3>[method:null render]( [param:Object3D scene], [param:Camera camera] )</h3>
 		<p>
 			用相机([page:Camera camera])渲染一个场景([page:Scene scene])<br />
 

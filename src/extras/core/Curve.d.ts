@@ -4,7 +4,7 @@ import { Vector } from './../../math/Vector2';
 
 /**
  * An extensible curve object which contains methods for interpolation
- * class Curve&lt;T extends Vector&gt;
+ * class Curve<T extends Vector>
  */
 export class Curve<T extends Vector> {
 
@@ -70,6 +70,11 @@ export class Curve<T extends Vector> {
 	 * getTangentAt(u: number, optionalTarget?: T): T;
 	 */
 	getTangentAt( u: number, optionalTarget?: T ): T;
+
+	clone(): Curve<T>;
+	copy( source: Curve<T> ): this;
+	toJSON(): object;
+	fromJSON( json: object ): this;
 
 	/**
 	 * @deprecated since r84.

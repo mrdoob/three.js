@@ -12,8 +12,6 @@
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> vr - paint
 		</div>
 
-		<script src="js/vr/HelioWebXRPolyfill.js"></script>
-
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
@@ -111,7 +109,7 @@
 
 				}
 
-				function onSequeezeStart() {
+				function onSqueezeStart() {
 
 					this.userData.isSqueezing = true;
 					this.userData.positionAtSqueezeStart = this.position.y;
@@ -119,7 +117,7 @@
 
 				}
 
-				function onSqueezeEned() {
+				function onSqueezeEnd() {
 
 					this.userData.isSqueezing = false;
 
@@ -128,16 +126,16 @@
 				controller1 = renderer.xr.getController( 0 );
 				controller1.addEventListener( 'selectstart', onSelectStart );
 				controller1.addEventListener( 'selectend', onSelectEnd );
-				controller1.addEventListener( 'squeezestart', onSequeezeStart );
-				controller1.addEventListener( 'squeezeend', onSqueezeEned );
+				controller1.addEventListener( 'squeezestart', onSqueezeStart );
+				controller1.addEventListener( 'squeezeend', onSqueezeEnd );
 				controller1.userData.painter = painter1;
 				scene.add( controller1 );
 
 				controller2 = renderer.xr.getController( 1 );
 				controller2.addEventListener( 'selectstart', onSelectStart );
 				controller2.addEventListener( 'selectend', onSelectEnd );
-				controller2.addEventListener( 'squeezestart', onSequeezeStart );
-				controller2.addEventListener( 'squeezeend', onSqueezeEned );
+				controller2.addEventListener( 'squeezestart', onSqueezeStart );
+				controller2.addEventListener( 'squeezeend', onSqueezeEnd );
 				controller2.userData.painter = painter2;
 				scene.add( controller2 );
 

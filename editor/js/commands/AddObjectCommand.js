@@ -11,7 +11,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param object THREE.Object3D
  * @constructor
  */
-var AddObjectCommand = function ( editor, object ) {
+function AddObjectCommand( editor, object ) {
 
 	Command.call( this, editor );
 
@@ -24,7 +24,7 @@ var AddObjectCommand = function ( editor, object ) {
 
 	}
 
-};
+}
 
 AddObjectCommand.prototype = {
 

@@ -8,7 +8,7 @@ import { UIRow, UIText, UIInteger, UICheckbox, UINumber } from './libs/ui.js';
 
 import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 
-var SidebarGeometryCylinderGeometry = function ( editor, object ) {
+function SidebarGeometryCylinderGeometry( editor, object ) {
 
 	var strings = editor.strings;
 
@@ -94,6 +94,6 @@ var SidebarGeometryCylinderGeometry = function ( editor, object ) {
 
 	return container;
 
-};
+}
 
 export { SidebarGeometryCylinderGeometry };

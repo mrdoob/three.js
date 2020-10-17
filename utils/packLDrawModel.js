@@ -222,7 +222,7 @@ function parseObject( fileName, isRoot ) {
 
 			// Embedded object was found, add to path map
 
-			var subobjectFileName = line.substring( charIndex ).trim().replace( "\\", "/" );
+			var subobjectFileName = line.substring( charIndex ).trim().replace( /\\/g, '/' );
 
 			if ( subobjectFileName ) {
 
@@ -263,7 +263,7 @@ function parseObject( fileName, isRoot ) {
 
 			}
 
-			var subobjectFileName = line.substring( charIndex ).trim().replace( "\\", "/" );
+			var subobjectFileName = line.substring( charIndex ).trim().replace( /\\/g, '/' );
 
 			if ( subobjectFileName ) {
 

@@ -10,6 +10,7 @@ export class Node {
 	userData: object;
 	readonly isNode: true;
 	frameId: number | undefined;
+	hashProperties: string[] | undefined;
 
 	analyze( builder: NodeBuilder, settings?: object ): void;
 	analyzeAndFlow( builder: NodeBuilder, output: string, settings?: object ): object;
@@ -21,6 +22,7 @@ export class Node {
 	getName( builder: NodeBuilder ): string;
 	getType( builder: NodeBuilder, output?: string ): string;
 	getJSONNode( meta?: object | string ): object | undefined;
+	getHash(): string;
 	copy( source: Node ): this;
 	createJSONNode( meta?: object | string ): object;
 	toJSON( meta?: object | string ): object;

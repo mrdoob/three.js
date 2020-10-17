@@ -44,7 +44,25 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 
 		loader.load( url, function ( buffer ) {
 
-			onLoad( scope.parse( buffer, path ) );
+			try {
+
+				onLoad( scope.parse( buffer, path ) );
+
+			} catch ( e ) {
+
+				if ( onError ) {
+
+					onError( e );
+
+				} else {
+
+					console.error( e );
+
+				}
+
+				scope.manager.itemError( url );
+
+			}
 
 		}, onProgress, onError );
 
@@ -71,6 +89,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				return n;
 
 			};
+
 			this.lerp = function ( nextKey, time ) {
 
 				time -= this.time;
@@ -114,6 +133,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				this.keys.push( key );
 
 			};
+
 			this.init = function () {
 
 				this.sortKeys();
@@ -157,6 +177,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					this.addKey( new Virtulous.KeyFrame( i / fps || track[ i ].time, track[ i ].targets[ 0 ].data ) );
 
 				}
+
 				this.init();
 
 			};
@@ -518,6 +539,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 		}
+
 		function cloneTreeToBones( root, scene ) {
 
 			var rootBone = new Bone();
@@ -675,6 +697,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					}
 
 				}
+
 				var skeleton = new Skeleton( allBones, offsetMatrix );
 
 				this.threeNode.bind( skeleton, new Matrix4() );
@@ -977,6 +1000,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			};
 
 		}
+
 		var namePropMapping = {
 
 			"?mat.name": "name",
@@ -1769,6 +1793,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 			}
+
 			// write faces. There are no floating-point calculations involved
 			// in these, so we can write a simple hash over the face data
 			// to the dump file. We generate a single 32 Bit hash for 512 faces
@@ -1834,6 +1859,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 			}
+
 			// write bones
 			if ( mesh.mNumBones ) {
 
@@ -1896,7 +1922,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryNodeAnim( stream, nd ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -1962,7 +1988,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryAnim( stream, anim ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2016,7 +2042,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryLight( stream, l ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2046,7 +2072,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 		}
-		// -----------------------------------------------------------------------------------
+
 		function ReadBinaryCamera( stream, cam ) {
 
 			var chunkID = Read_uint32_t( stream );
@@ -2093,6 +2119,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 			}
+
 			// Read materials
 			if ( scene.mNumMaterials ) {
 
@@ -2106,6 +2133,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 			}
+
 			// Read all animations
 			if ( scene.mNumAnimations ) {
 
@@ -2119,6 +2147,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 			}
+
 			// Read all textures
 			if ( scene.mNumTextures ) {
 
@@ -2132,6 +2161,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 			}
+
 			// Read lights
 			if ( scene.mNumLights ) {
 
@@ -2145,6 +2175,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				}
 
 			}
+
 			// Read cameras
 			if ( scene.mNumCameras ) {
 
@@ -2160,6 +2191,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 		}
+
 		var aiOrigin_CUR = 0;
 		var aiOrigin_BEG = 1;
 
@@ -2173,6 +2205,7 @@ AssimpLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 					stream.readOffset += off;
 
 				}
+
 				if ( ori == aiOrigin_BEG ) {
 
 					stream.readOffset = off;

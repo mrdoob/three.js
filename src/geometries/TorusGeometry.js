@@ -57,27 +57,25 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 
 	// buffers
 
-	var indices = [];
-	var vertices = [];
-	var normals = [];
-	var uvs = [];
+	const indices = [];
+	const vertices = [];
+	const normals = [];
+	const uvs = [];
 
 	// helper variables
 
-	var center = new Vector3();
-	var vertex = new Vector3();
-	var normal = new Vector3();
-
-	var j, i;
+	const center = new Vector3();
+	const vertex = new Vector3();
+	const normal = new Vector3();
 
 	// generate vertices, normals and uvs
 
-	for ( j = 0; j <= radialSegments; j ++ ) {
+	for ( let j = 0; j <= radialSegments; j ++ ) {
 
-		for ( i = 0; i <= tubularSegments; i ++ ) {
+		for ( let i = 0; i <= tubularSegments; i ++ ) {
 
-			var u = i / tubularSegments * arc;
-			var v = j / radialSegments * Math.PI * 2;
+			const u = i / tubularSegments * arc;
+			const v = j / radialSegments * Math.PI * 2;
 
 			// vertex
 
@@ -106,16 +104,16 @@ function TorusBufferGeometry( radius, tube, radialSegments, tubularSegments, arc
 
 	// generate indices
 
-	for ( j = 1; j <= radialSegments; j ++ ) {
+	for ( let j = 1; j <= radialSegments; j ++ ) {
 
-		for ( i = 1; i <= tubularSegments; i ++ ) {
+		for ( let i = 1; i <= tubularSegments; i ++ ) {
 
 			// indices
 
-			var a = ( tubularSegments + 1 ) * j + i - 1;
-			var b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
-			var c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
-			var d = ( tubularSegments + 1 ) * j + i;
+			const a = ( tubularSegments + 1 ) * j + i - 1;
+			const b = ( tubularSegments + 1 ) * ( j - 1 ) + i - 1;
+			const c = ( tubularSegments + 1 ) * ( j - 1 ) + i;
+			const d = ( tubularSegments + 1 ) * j + i;
 
 			// faces
 

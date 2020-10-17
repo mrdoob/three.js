@@ -7,17 +7,19 @@
 		<link type="text/css" rel="stylesheet" href="main.css">
 	</head>
 	<body>
+
 		<div id="info">
 			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> physics - cannon.js instancing
 		</div>
-		<script src="./js/libs/cannon.js"></script>
+
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { CannonPhysics } from './jsm/physics/CannonPhysics.js';
+			import Stats from './jsm/libs/stats.module.js';
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 			var physics, position;
 
 			init();
@@ -103,6 +105,9 @@
 				renderer.outputEncoding = THREE.sRGBEncoding;
 				document.body.appendChild( renderer.domElement );
 
+				stats = new Stats();
+				document.body.appendChild( stats.dom );
+
 				//
 
 				new OrbitControls( camera, renderer.domElement );
@@ -120,6 +125,8 @@
 				physics.setMeshPosition( mesh, position, index );
 
 				renderer.render( scene, camera );
+
+				stats.update();
 
 			}
 

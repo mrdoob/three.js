@@ -843,6 +843,7 @@ var LDrawLoader = ( function () {
 							throw 'LDrawLoader: Invalid colour while parsing material' + lineParser.getLineNumberString() + ".";
 
 						}
+
 						break;
 
 					case "EDGE":
@@ -866,6 +867,7 @@ var LDrawLoader = ( function () {
 							edgeMaterial = edgeMaterial.userData.edgeMaterial;
 
 						}
+
 						break;
 
 					case 'ALPHA':
@@ -1102,6 +1104,7 @@ var LDrawLoader = ( function () {
 					colourCode = mainColourCode;
 
 				}
+
 				if ( forEdge && colourCode === '24' ) {
 
 					colourCode = mainEdgeColourCode;
@@ -1237,6 +1240,7 @@ var LDrawLoader = ( function () {
 										console.warn( 'LDrawLoader: Error parsing material' + lp.getLineNumberString() );
 
 									}
+
 									break;
 
 								case '!CATEGORY':
@@ -1262,6 +1266,7 @@ var LDrawLoader = ( function () {
 										} );
 
 									}
+
 									break;
 
 								case 'FILE':
@@ -1714,8 +1719,8 @@ var LDrawLoader = ( function () {
 				var isRoot = ! parentParseScope.isFromParse;
 				if ( scope.separateObjects && ! isPrimitiveType( parseScope.type ) || isRoot ) {
 
-
 					const objGroup = parseScope.groupObject;
+
 					if ( parseScope.triangles.length > 0 ) {
 
 						objGroup.add( createObject( parseScope.triangles, 3 ) );
@@ -1759,12 +1764,14 @@ var LDrawLoader = ( function () {
 					for ( var i = 0, l = lineSegments.length; i < l; i ++ ) {
 
 						var ls = lineSegments[ i ];
+
 						if ( separateObjects ) {
 
 							ls.v0.applyMatrix4( parseScope.matrix );
 							ls.v1.applyMatrix4( parseScope.matrix );
 
 						}
+
 						parentLineSegments.push( ls );
 
 					}
@@ -1772,6 +1779,7 @@ var LDrawLoader = ( function () {
 					for ( var i = 0, l = conditionalSegments.length; i < l; i ++ ) {
 
 						var os = conditionalSegments[ i ];
+
 						if ( separateObjects ) {
 
 							os.v0.applyMatrix4( parseScope.matrix );
@@ -1780,6 +1788,7 @@ var LDrawLoader = ( function () {
 							os.c1.applyMatrix4( parseScope.matrix );
 
 						}
+
 						parentConditionalSegments.push( os );
 
 					}
@@ -1787,6 +1796,7 @@ var LDrawLoader = ( function () {
 					for ( var i = 0, l = triangles.length; i < l; i ++ ) {
 
 						var tri = triangles[ i ];
+
 						if ( separateObjects ) {
 
 							tri.v0 = tri.v0.clone().applyMatrix4( parseScope.matrix );
@@ -1798,6 +1808,7 @@ var LDrawLoader = ( function () {
 							tri.faceNormal.crossVectors( tempVec0, tempVec1 ).normalize();
 
 						}
+
 						parentTriangles.push( tri );
 
 					}
@@ -1890,6 +1901,7 @@ var LDrawLoader = ( function () {
 							newLocationState = LDrawLoader.FILE_LOCATION_AS_IS;
 
 						}
+
 						break;
 
 					case LDrawLoader.FILE_LOCATION_NOT_FOUND:

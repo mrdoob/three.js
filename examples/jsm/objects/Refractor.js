@@ -5,7 +5,6 @@
 
 import {
 	Color,
-	LinearEncoding,
 	LinearFilter,
 	MathUtils,
 	Matrix4,
@@ -36,7 +35,6 @@ var Refractor = function ( geometry, options ) {
 	var textureHeight = options.textureHeight || 512;
 	var clipBias = options.clipBias || 0;
 	var shader = options.shader || Refractor.RefractorShader;
-	var encoding = options.encoding !== undefined ? options.encoding : LinearEncoding;
 
 	//
 
@@ -55,8 +53,7 @@ var Refractor = function ( geometry, options ) {
 		minFilter: LinearFilter,
 		magFilter: LinearFilter,
 		format: RGBFormat,
-		stencilBuffer: false,
-		encoding: encoding
+		stencilBuffer: false
 	};
 
 	var renderTarget = new WebGLRenderTarget( textureWidth, textureHeight, parameters );
@@ -240,6 +237,10 @@ var Refractor = function ( geometry, options ) {
 	//
 
 	this.onBeforeRender = function ( renderer, scene, camera ) {
+
+		// Render
+
+		renderTarget.texture.encoding = renderer.outputEncoding;
 
 		// ensure refractors are rendered only once per frame
 

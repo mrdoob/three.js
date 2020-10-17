@@ -1,0 +1,457 @@
+{
+    "extensionsUsed": [
+        "KHR_instancing"
+    ],
+    "accessors": [
+        {
+            "bufferView": 0,
+            "componentType": 5126,
+            "count": 12096,
+            "max": [
+                3.433150053024292,
+                3.1500000953674316,
+                2.0
+            ],
+            "min": [
+                -3.0,
+                0.0,
+                -2.0
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 1,
+            "componentType": 5126,
+            "count": 12096,
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 2,
+            "componentType": 5125,
+            "count": 12096,
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 3,
+            "componentType": 5126,
+            "count": 958,
+            "type": "MAT4x3"
+        },
+        {
+            "bufferView": 4,
+            "componentType": 5126,
+            "count": 12096,
+            "max": [
+                3.433150053024292,
+                3.1500000953674316,
+                2.0
+            ],
+            "min": [
+                -3.0,
+                0.0,
+                -2.0
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 5,
+            "componentType": 5126,
+            "count": 12096,
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 6,
+            "componentType": 5125,
+            "count": 12096,
+            "type": "SCALAR"
+        },
+        {
+            "bufferView": 7,
+            "componentType": 5126,
+            "count": 941,
+            "type": "MAT4x3"
+        },
+        {
+            "bufferView": 8,
+            "componentType": 5126,
+            "count": 4,
+            "max": [
+                1.0,
+                0.0,
+                1.0
+            ],
+            "min": [
+                -1.0,
+                0.0,
+                -1.0
+            ],
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 9,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC3"
+        },
+        {
+            "bufferView": 10,
+            "componentType": 5126,
+            "count": 4,
+            "type": "VEC2"
+        },
+        {
+            "bufferView": 11,
+            "componentType": 5125,
+            "count": 6,
+            "type": "SCALAR"
+        }
+    ],
+    "asset": {
+        "generator": "OTOYFbxGltfConverters Version:0.3",
+        "version": "2.0"
+    },
+    "bufferViews": [
+        {
+            "buffer": 0,
+            "byteLength": 145152
+        },
+        {
+            "buffer": 0,
+            "byteLength": 145152,
+            "byteOffset": 145152
+        },
+        {
+            "buffer": 0,
+            "byteLength": 48384,
+            "byteOffset": 290304
+        },
+        {
+            "buffer": 1,
+            "byteLength": 45984
+        },
+        {
+            "buffer": 2,
+            "byteLength": 145152
+        },
+        {
+            "buffer": 2,
+            "byteLength": 145152,
+            "byteOffset": 145152
+        },
+        {
+            "buffer": 2,
+            "byteLength": 48384,
+            "byteOffset": 290304
+        },
+        {
+            "buffer": 1,
+            "byteLength": 45168,
+            "byteOffset": 45984
+        },
+        {
+            "buffer": 3,
+            "byteLength": 48
+        },
+        {
+            "buffer": 3,
+            "byteLength": 48,
+            "byteOffset": 48
+        },
+        {
+            "buffer": 3,
+            "byteLength": 32,
+            "byteOffset": 96
+        },
+        {
+            "buffer": 3,
+            "byteLength": 24,
+            "byteOffset": 128
+        }
+    ],
+    "buffers": [
+        {
+            "byteLength": 338688,
+            "uri": "mesh.bin"
+        },
+        {
+            "byteLength": 91152,
+            "uri": "transforms.bin"
+        },
+        {
+            "byteLength": 338688,
+            "uri": "mesh_2.bin"
+        },
+        {
+            "byteLength": 152,
+            "uri": "mesh_3.bin"
+        }
+    ],
+    "cameras": [
+        {
+            "name": "Thin lens camera",
+            "perspective": {
+                "aspectRatio": 1.3333333730697632,
+                "yfov": 0.8172757029533386,
+                "zfar": 10000000000.0,
+                "znear": 9.999999747378752e-05
+            },
+            "type": "perspective"
+        }
+    ],
+    "materials": [
+        {
+            "pbrMetallicRoughness": {
+                "pbrMetallicRoughness": {
+                    "baseColorFactor": [
+                        0.7,
+                        0.0,
+                        0.0,
+                        1
+                    ],
+                    "metallicFactor": 0
+                },
+                "emissiveFactor": [
+                    0,
+                    0,
+                    0
+                ]
+              },
+              "name": "cube"
+          },
+          {
+              "pbrMetallicRoughness": {
+                  "pbrMetallicRoughness": {
+                      "baseColorFactor": [
+                          0.7,
+                          0.7,
+                          0.7,
+                          1
+                      ],
+                      "metallicFactor": 0
+                },
+                "emissiveFactor": [
+                    0,
+                    0,
+                    0
+                ]
+            },
+            "name": "cube_1"
+          },
+          {
+              "pbrMetallicRoughness": {
+                  "pbrMetallicRoughness": {
+                      "baseColorFactor": [
+                          0.4,
+                          0.4,
+                          0.4,
+                          1
+                      ],
+                      "metallicFactor": 0
+                  },
+                  "emissiveFactor": [
+                      0,
+                      0,
+                      0
+                  ]
+              },
+              "name": "cube_2"
+        }
+    ],
+    "meshes": [
+        {
+            "name": "teapot",
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": 1,
+                        "POSITION": 0
+                    },
+                    "indices": 2,
+                    "material": 0,
+                    "mode": 4
+                }
+            ]
+        },
+        {
+            "name": "teapot0",
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": 5,
+                        "POSITION": 4
+                    },
+                    "indices": 6,
+                    "material": 1,
+                    "mode": 4
+                }
+            ]
+        },
+        {
+            "name": "plane",
+            "primitives": [
+                {
+                    "attributes": {
+                        "NORMAL": 9,
+                        "POSITION": 8,
+                        "TEXCOORD_0": 10
+                    },
+                    "indices": 11,
+                    "material": 2,
+                    "mode": 4
+                }
+            ]
+        }
+    ],
+    "nodes": [
+        {
+            "children": [
+                1,
+                2,
+                3,
+                4
+            ],
+            "name": "teapots_galore"
+        },
+        {
+            "camera": 0,
+            "matrix": [
+                1.0,
+                -0.0,
+                0.0,
+                -0.0,
+                -0.0,
+                0.9578263163566589,
+                -0.2873478829860687,
+                0.0,
+                -0.0,
+                0.2873478829860687,
+                0.9578263163566589,
+                -0.0,
+                -0.0,
+                20.000001907348633,
+                -0.0,
+                1.0
+            ],
+            "name": "Thin lens camera"
+        },
+        {
+            "children": [
+                5
+            ],
+            "matrix": [
+                0.7071068286895752,
+                0.0,
+                -0.7071067690849304,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.7071067690849304,
+                0.0,
+                0.7071068286895752,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "name": "Placement"
+        },
+        {
+            "extensions": {
+                "KHR_instancing": {
+                    "attributes": {
+                        "TRANSFORM": 3
+                    }
+                }
+            },
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.2999999523162842,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "mesh": 0,
+            "name": "teapot"
+        },
+        {
+            "extensions": {
+                "KHR_instancing": {
+                    "attributes": {
+                        "TRANSFORM": 7
+                    }
+                }
+            },
+            "matrix": [
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.2999999523162842,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "mesh": 1,
+            "name": "teapot0"
+        },
+        {
+            "children": [
+                6
+            ],
+            "matrix": [
+                240.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                240.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                240.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "name": "Placement_3"
+        },
+        {
+            "mesh": 2,
+            "name": "plane"
+        }
+    ],
+    "scene": 0,
+    "scenes": [
+        {
+            "name": "teapots_galore",
+            "nodes": [
+                0
+            ]
+        }
+    ]
+}

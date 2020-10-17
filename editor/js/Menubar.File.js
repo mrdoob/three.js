@@ -11,9 +11,11 @@ import { OBJExporter } from '../../examples/jsm/exporters/OBJExporter.js';
 import { PLYExporter } from '../../examples/jsm/exporters/PLYExporter.js';
 import { STLExporter } from '../../examples/jsm/exporters/STLExporter.js';
 
+import { JSZip } from '../../examples/jsm/libs/jszip.module.min.js';
+
 import { UIPanel, UIRow, UIHorizontalRule } from './libs/ui.js';
 
-var MenubarFile = function ( editor ) {
+function MenubarFile( editor ) {
 
 	function parseNumber( key, value ) {
 
@@ -253,10 +255,7 @@ var MenubarFile = function ( editor ) {
 
 			saveArrayBuffer( result, 'scene.glb' );
 
-			// forceIndices: true, forcePowerOfTwoTextures: true
-			// to allow compatibility with facebook
-
-		}, { binary: true, forceIndices: true, forcePowerOfTwoTextures: true } );
+		}, { binary: true } );
 
 	} );
 	options.add( option );
@@ -447,11 +446,6 @@ var MenubarFile = function ( editor ) {
 			zip.file( 'js/VRButton.js', content );
 
 		} );
-		loader.load( '../examples/js/vr/HelioWebXRPolyfill.js', function ( content ) {
-
-			zip.file( 'js/HelioWebXRPolyfill.js', content );
-
-		} );
 
 	} );
 	options.add( option );
@@ -483,6 +477,6 @@ var MenubarFile = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { MenubarFile };

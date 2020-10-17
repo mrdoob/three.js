@@ -12,7 +12,6 @@ export interface ReflectorOptions {
 	textureHeight?: number;
 	clipBias?: number;
 	shader?: object;
-	recursion?: number;
 	encoding?: TextureEncoding;
 }
 

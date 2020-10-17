@@ -76,6 +76,6 @@ export class Projector {
 
 	constructor();
 
-	projectScene( scene: Scene, camera: Camera, sortObjects: boolean, sortElements: boolean );
+	projectScene( scene: Scene, camera: Camera, sortObjects: boolean, sortElements: boolean ): any;
 
 }

@@ -4,11 +4,11 @@
 
 function WebGLExtensions( gl ) {
 
-	var extensions = {};
+	const extensions = {};
 
 	return {
 
-		get: function ( name ) {
+		has: function ( name ) {
 
 			if ( extensions[ name ] !== undefined ) {
 
@@ -16,7 +16,7 @@ function WebGLExtensions( gl ) {
 
 			}
 
-			var extension;
+			let extension;
 
 			switch ( name ) {
 
@@ -41,15 +41,21 @@ function WebGLExtensions( gl ) {
 
 			}
 
-			if ( extension === null ) {
+			extensions[ name ] = extension;
+
+			return !! extension;
+
+		},
+
+		get: function ( name ) {
+
+			if ( ! this.has( name ) ) {
 
 				console.warn( 'THREE.WebGLRenderer: ' + name + ' extension not supported.' );
 
 			}
 
-			extensions[ name ] = extension;
-
-			return extension;
+			return extensions[ name ];
 
 		}
 

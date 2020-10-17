@@ -14,7 +14,7 @@ import * as THREE from '../../../build/three.module.js';
  * @param newMap THREE.Texture
  * @constructor
  */
-var SetMaterialMapCommand = function ( editor, object, mapName, newMap, materialSlot ) {
+function SetMaterialMapCommand( editor, object, mapName, newMap, materialSlot ) {
 
 	Command.call( this, editor );
 
@@ -29,7 +29,7 @@ var SetMaterialMapCommand = function ( editor, object, mapName, newMap, material
 
 	this.mapName = mapName;
 
-};
+}
 
 SetMaterialMapCommand.prototype = {
 

@@ -13,7 +13,7 @@ import { AddObjectCommand } from './AddObjectCommand.js';
  * @param scene containing children to import
  * @constructor
  */
-var SetSceneCommand = function ( editor, scene ) {
+function SetSceneCommand( editor, scene ) {
 
 	Command.call( this, editor );
 
@@ -37,7 +37,7 @@ var SetSceneCommand = function ( editor, scene ) {
 
 	}
 
-};
+}
 
 SetSceneCommand.prototype = {
 

@@ -9,14 +9,13 @@ import { UIBoolean } from './libs/ui.three.js';
 
 import { SetMaterialCommand } from './commands/SetMaterialCommand.js';
 
-var SidebarProject = function ( editor ) {
+function SidebarProject( editor ) {
 
 	var config = editor.config;
 	var signals = editor.signals;
 	var strings = editor.strings;
 
 	var currentRenderer = null;
-	var currentPmremGenerator = null;
 
 	var container = new UISpan();
 
@@ -29,7 +28,7 @@ var SidebarProject = function ( editor ) {
 	// Title
 
 	var titleRow = new UIRow();
-	var title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).onChange( function () {
+	var title = new UIInput( config.getKey( 'project/title' ) ).setLeft( '100px' ).setWidth( '150px' ).onChange( function () {
 
 		config.setKey( 'project/title', this.getValue() );
 
@@ -82,8 +81,7 @@ var SidebarProject = function ( editor ) {
 	var antialiasRow = new UIRow();
 	var antialiasBoolean = new UIBoolean( config.getKey( 'project/renderer/antialias' ) ).onChange( function () {
 
-		config.setKey( 'project/renderer/antialias', this.getValue() );
-		updateRenderer();
+		createRenderer();
 
 	} );
 
@@ -97,44 +95,38 @@ var SidebarProject = function ( editor ) {
 	var shadowsRow = new UIRow();
 	var shadowsBoolean = new UIBoolean( config.getKey( 'project/renderer/shadows' ) ).onChange( function () {
 
-		config.setKey( 'project/renderer/shadows', this.getValue() );
-		updateRenderer();
+		currentRenderer.shadowMap.enabled = this.getValue();
+		signals.rendererUpdated.dispatch();
 
 	} );
 
 	shadowsRow.add( new UIText( strings.getKey( 'sidebar/project/shadows' ) ).setWidth( '90px' ) );
 	shadowsRow.add( shadowsBoolean );
 
-	rendererPanel.add( shadowsRow );
-
-	// Renderer / Shadow Type
-
-	var shadowTypeRow = new UIRow();
 	var shadowTypeSelect = new UISelect().setOptions( {
 		0: 'Basic',
 		1: 'PCF',
 		2: 'PCF (Soft)',
-	//	3: 'VSM'
-	} ).setWidth( '150px' ).onChange( function () {
+		//	3: 'VSM'
+	} ).setWidth( '125px' ).onChange( function () {
 
-		config.setKey( 'project/renderer/shadowType', parseFloat( this.getValue() ) );
-		updateRenderer();
+		currentRenderer.shadowMap.type = parseFloat( this.getValue() );
+		signals.rendererUpdated.dispatch();
 
 	} );
 	shadowTypeSelect.setValue( config.getKey( 'project/renderer/shadowType' ) );
 
-	shadowTypeRow.add( new UIText( strings.getKey( 'sidebar/project/shadowType' ) ).setWidth( '90px' ) );
-	shadowTypeRow.add( shadowTypeSelect );
+	shadowsRow.add( shadowTypeSelect );
 
-	rendererPanel.add( shadowTypeRow );
+	rendererPanel.add( shadowsRow );
 
 	// Renderer / Physically Correct lights
 
 	var physicallyCorrectLightsRow = new UIRow();
 	var physicallyCorrectLightsBoolean = new UIBoolean( config.getKey( 'project/renderer/physicallyCorrectLights' ) ).onChange( function () {
 
-		config.setKey( 'project/renderer/physicallyCorrectLights', this.getValue() );
-		updateRenderer();
+		currentRenderer.physicallyCorrectLights = this.getValue();
+		signals.rendererUpdated.dispatch();
 
 	} );
 
@@ -150,18 +142,13 @@ var SidebarProject = function ( editor ) {
 		0: 'None',
 		1: 'Linear',
 		2: 'Reinhard',
-		3: 'Uncharted2',
-		4: 'Cineon',
-		5: 'ACESFilmic',
-	} ).setWidth( '150px' ).onChange( function () {
+		3: 'Cineon',
+		4: 'ACESFilmic'
+	} ).setWidth( '120px' ).onChange( function () {
 
-		var toneMapping = parseFloat( this.getValue() );
-		config.setKey( 'project/renderer/toneMapping', toneMapping );
-		updateRenderer();
-
-		// WebGLRenderer.whitePoint is only relevant for Uncharted2 tonemapping
-
-		toneMappingWhitePointRow.setDisplay( ( toneMapping === 3 ) ? 'block' : 'none' );
+		currentRenderer.toneMapping = parseFloat( this.getValue() );
+		toneMappingExposure.setDisplay( currentRenderer.toneMapping === 0 ? 'none' : '' );
+		signals.rendererUpdated.dispatch();
 
 	} );
 	toneMappingSelect.setValue( config.getKey( 'project/renderer/toneMapping' ) );
@@ -169,97 +156,37 @@ var SidebarProject = function ( editor ) {
 	toneMappingRow.add( new UIText( strings.getKey( 'sidebar/project/toneMapping' ) ).setWidth( '90px' ) );
 	toneMappingRow.add( toneMappingSelect );
 
+	var toneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) );
+	toneMappingExposure.setDisplay( toneMappingSelect.getValue() === '0' ? 'none' : '' );
+	toneMappingExposure.setWidth( '30px' ).setMarginLeft( '10px' );
+	toneMappingExposure.setRange( 0, 10 );
+	toneMappingExposure.onChange( function () {
+
+		currentRenderer.toneMappingExposure = this.getValue();
+		signals.rendererUpdated.dispatch();
+
+	} );
+	toneMappingRow.add( toneMappingExposure );
+
 	rendererPanel.add( toneMappingRow );
-
-	// Tonemapping / Exposure
-
-	var toneMappingExposureRow = new UIRow();
-	var toneMappingExposure = new UINumber( config.getKey( 'project/renderer/toneMappingExposure' ) ).setRange( 0, 10 ).onChange( function () {
-
-		config.setKey( 'project/renderer/toneMappingExposure', this.getValue() );
-		updateTonemapping();
-
-	} );
-
-	toneMappingExposureRow.add( new UIText( strings.getKey( 'sidebar/project/toneMappingExposure' ) ).setWidth( '90px' ) );
-	toneMappingExposureRow.add( toneMappingExposure );
-	rendererPanel.add( toneMappingExposureRow );
-
-	// Tonemapping / White Point
-
-	var toneMappingWhitePointRow = new UIRow();
-	var toneMappingWhitePoint = new UINumber( config.getKey( 'project/renderer/toneMappingWhitePoint' ) ).setRange( 0, 10 ).onChange( function () {
-
-		config.setKey( 'project/renderer/toneMappingWhitePoint', this.getValue() );
-		updateTonemapping();
-
-	} );
-
-	toneMappingWhitePointRow.add( new UIText( strings.getKey( 'sidebar/project/toneMappingWhitePoint' ) ).setWidth( '90px' ) );
-	toneMappingWhitePointRow.add( toneMappingWhitePoint );
-	rendererPanel.add( toneMappingWhitePointRow );
-	toneMappingWhitePointRow.setDisplay( ( config.getKey( 'project/renderer/toneMapping' ) === 3 ? 'block' : 'none' ) );
 
 	//
 
-	function updateRenderer() {
+	function createRenderer() {
 
-		createRenderer(
-			antialiasBoolean.getValue(),
-			shadowsBoolean.getValue(),
-			shadowTypeSelect.getValue(),
-			toneMappingSelect.getValue(),
-			physicallyCorrectLightsBoolean.getValue()
-		);
-
-	}
-
-	function createRenderer( antialias, shadows, shadowType, toneMapping, physicallyCorrectLights ) {
-
-		var parameters = { antialias: antialias };
-
-		if ( currentRenderer !== null ) {
-
-			currentRenderer.dispose();
-			currentPmremGenerator.dispose();
-
-		}
-
-		currentRenderer = new THREE.WebGLRenderer( parameters );
-		currentPmremGenerator = new THREE.PMREMGenerator( currentRenderer );
-		currentPmremGenerator.compileCubemapShader();
-		currentPmremGenerator.compileEquirectangularShader();
-
-		if ( shadows ) {
-
-			currentRenderer.shadowMap.enabled = true;
-			currentRenderer.shadowMap.type = parseFloat( shadowType );
-
-		}
-
-		currentRenderer.toneMapping = parseFloat( toneMapping );
-		currentRenderer.physicallyCorrectLights = physicallyCorrectLights;
-
-		signals.rendererChanged.dispatch( currentRenderer, currentPmremGenerator );
-
-	}
-
-	function updateTonemapping() {
-
+		currentRenderer = new THREE.WebGLRenderer( { antialias: antialiasBoolean.getValue() } );
+		currentRenderer.outputEncoding = THREE.sRGBEncoding;
+		currentRenderer.physicallyCorrectLights = physicallyCorrectLightsBoolean.getValue();
+		currentRenderer.shadowMap.enabled = shadowsBoolean.getValue();
+		currentRenderer.shadowMap.type = parseFloat( shadowTypeSelect.getValue() );
+		currentRenderer.toneMapping = parseFloat( toneMappingSelect.getValue() );
 		currentRenderer.toneMappingExposure = toneMappingExposure.getValue();
-		currentRenderer.toneMappingWhitePoint = toneMappingWhitePoint.getValue();
 
-		signals.rendererUpdated.dispatch();
+		signals.rendererChanged.dispatch( currentRenderer );
 
 	}
 
-	createRenderer(
-		config.getKey( 'project/renderer/antialias' ),
-		config.getKey( 'project/renderer/shadows' ),
-		config.getKey( 'project/renderer/shadowType' ),
-		config.getKey( 'project/renderer/toneMapping' ),
-		config.getKey( 'project/renderer/physicallyCorrectLights' )
-	 );
+	createRenderer();
 
 	// Materials
 
@@ -319,7 +246,45 @@ var SidebarProject = function ( editor ) {
 
 	container.add( materials );
 
-	// events
+	// signals
+
+	signals.editorCleared.add( function () {
+
+		currentRenderer.physicallyCorrectLights = false;
+		currentRenderer.shadowMap.enabled = true;
+		currentRenderer.shadowMap.type = 1;
+		currentRenderer.toneMapping = 0;
+		currentRenderer.toneMappingExposure = 1;
+
+		refreshRendererUI();
+
+		signals.rendererUpdated.dispatch();
+
+	} );
+
+	function refreshRendererUI() {
+
+		physicallyCorrectLightsBoolean.setValue( currentRenderer.physicallyCorrectLights );
+		shadowsBoolean.setValue( currentRenderer.shadowMap.enabled );
+		shadowTypeSelect.setValue( currentRenderer.shadowMap.type );
+		toneMappingSelect.setValue( currentRenderer.toneMapping );
+		toneMappingExposure.setValue( currentRenderer.toneMappingExposure );
+		toneMappingExposure.setDisplay( currentRenderer.toneMapping === 0 ? 'none' : '' );
+
+	}
+
+	signals.rendererUpdated.add( function () {
+
+		config.setKey(
+			'project/renderer/antialias', antialiasBoolean.getValue(),
+			'project/renderer/physicallyCorrectLights', physicallyCorrectLightsBoolean.getValue(),
+			'project/renderer/shadows', shadowsBoolean.getValue(),
+			'project/renderer/shadowType', parseFloat( shadowTypeSelect.getValue() ),
+			'project/renderer/toneMapping', parseFloat( toneMappingSelect.getValue() ),
+			'project/renderer/toneMappingExposure', toneMappingExposure.getValue()
+		);
+
+	} );
 
 	signals.objectSelected.add( function ( object ) {
 
@@ -344,6 +309,6 @@ var SidebarProject = function ( editor ) {
 
 	return container;
 
-};
+}
 
 export { SidebarProject };

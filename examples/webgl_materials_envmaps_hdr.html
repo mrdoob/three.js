@@ -58,19 +58,22 @@
 				var lightMaterial = new THREE.MeshLambertMaterial( { color: 0x000000, emissive: 0xffffff, emissiveIntensity: 10 } );
 
 				var light1 = new THREE.Mesh( geometry, lightMaterial );
+				light1.material.color.setHex( 0xff0000 );
 				light1.position.set( - 5, 2, 0 );
 				light1.scale.set( 0.1, 1, 1 );
 				envScene.add( light1 );
 
-				var light2 = new THREE.Mesh( geometry, lightMaterial );
+				var light2 = new THREE.Mesh( geometry, lightMaterial.clone() );
+				light2.material.color.setHex( 0x00ff00 );
 				light2.position.set( 0, 5, 0 );
 				light2.scale.set( 1, 0.1, 1 );
 				envScene.add( light2 );
 
-				var light2 = new THREE.Mesh( geometry, lightMaterial );
-				light2.position.set( 2, 1, 5 );
-				light2.scale.set( 1.5, 2, 0.1 );
-				envScene.add( light2 );
+				var light3 = new THREE.Mesh( geometry, lightMaterial.clone() );
+				light3.material.color.setHex( 0x0000ff );
+				light3.position.set( 2, 1, 5 );
+				light3.scale.set( 1.5, 2, 0.1 );
+				envScene.add( light3 );
 
 				return envScene;
 
@@ -89,11 +92,12 @@
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.physicallyCorrectLights = true;
-				renderer.toneMapping = THREE.LinearToneMapping;
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 				//
 
 				var geometry = new THREE.TorusKnotBufferGeometry( 18, 8, 150, 20 );
+				//var geometry = new THREE.SphereBufferGeometry( 26, 64, 32 );
 				var material = new THREE.MeshStandardMaterial( {
 					color: 0xffffff,
 					metalness: params.metalness,

@@ -4,7 +4,7 @@
  */
 /* global QUnit */
 
-import { runStdLightTests } from '../../qunit-utils';
+import { runStdLightTests } from '../../utils/qunit-utils';
 import { AmbientLight } from '../../../../src/lights/AmbientLight';
 
 export default QUnit.module( 'Lights', () => {

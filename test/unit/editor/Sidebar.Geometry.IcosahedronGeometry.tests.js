@@ -3,7 +3,7 @@
  */
 /* global QUnit */
 
-import { NothingsIsExportedYet } from '../../../editor/js/Sidebar.Geometry.IcosahedronGeometry';
+import { } from '../../../editor/js/Sidebar.Geometry.IcosahedronGeometry';
 
 export default QUnit.module( 'Editor', () => {
 

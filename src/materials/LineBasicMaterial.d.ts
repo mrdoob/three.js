@@ -6,6 +6,7 @@ export interface LineBasicMaterialParameters extends MaterialParameters {
 	linewidth?: number;
 	linecap?: string;
 	linejoin?: string;
+	morphTargets?: boolean;
 }
 
 export class LineBasicMaterial extends Material {
@@ -16,6 +17,7 @@ export class LineBasicMaterial extends Material {
 	linewidth: number;
 	linecap: string;
 	linejoin: string;
+	morphTargets: boolean;
 
 	setValues( parameters: LineBasicMaterialParameters ): void;
 

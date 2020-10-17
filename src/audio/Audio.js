@@ -32,7 +32,7 @@ function Audio( listener ) {
 	this.sourceType = 'empty';
 
 	this._startedAt = 0;
-	this._pausedAt = 0;
+	this._progress = 0;
 
 	this.filters = [];
 
@@ -112,13 +112,13 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		this._startedAt = this.context.currentTime + delay;
 
-		var source = this.context.createBufferSource();
+		const source = this.context.createBufferSource();
 		source.buffer = this.buffer;
 		source.loop = this.loop;
 		source.loopStart = this.loopStart;
 		source.loopEnd = this.loopEnd;
 		source.onended = this.onEnded.bind( this );
-		source.start( this._startedAt, this._pausedAt + this.offset, this.duration );
+		source.start( this._startedAt, this._progress + this.offset, this.duration );
 
 		this.isPlaying = true;
 
@@ -142,7 +142,17 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		if ( this.isPlaying === true ) {
 
-			this._pausedAt += Math.max( this.context.currentTime - this._startedAt, 0 ) * this.playbackRate;
+			// update current progress
+
+			this._progress += Math.max( this.context.currentTime - this._startedAt, 0 ) * this.playbackRate;
+
+			if ( this.loop === true ) {
+
+				// ensure _progress does not exceed duration with looped audios
+
+				this._progress = this._progress % ( this.duration || this.buffer.duration );
+
+			}
 
 			this.source.stop();
 			this.source.onended = null;
@@ -164,7 +174,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		this._pausedAt = 0;
+		this._progress = 0;
 
 		this.source.stop();
 		this.source.onended = null;
@@ -180,7 +190,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			this.source.connect( this.filters[ 0 ] );
 
-			for ( var i = 1, l = this.filters.length; i < l; i ++ ) {
+			for ( let i = 1, l = this.filters.length; i < l; i ++ ) {
 
 				this.filters[ i - 1 ].connect( this.filters[ i ] );
 
@@ -204,7 +214,7 @@ Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			this.source.disconnect( this.filters[ 0 ] );
 
-			for ( var i = 1, l = this.filters.length; i < l; i ++ ) {
+			for ( let i = 1, l = this.filters.length; i < l; i ++ ) {
 
 				this.filters[ i - 1 ].disconnect( this.filters[ i ] );
 

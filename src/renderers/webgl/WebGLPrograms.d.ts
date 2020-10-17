@@ -13,7 +13,7 @@ export class WebGLPrograms {
 
 	getParameters(
 		material: Material,
-		lights: object[],
+		lights: any,
 		shadows: object[],
 		scene: Scene,
 		nClipPlanes: number,
@@ -21,6 +21,7 @@ export class WebGLPrograms {
 		object: any
 	): any;
 	getProgramCacheKey( parameters: any ): string;
+	getUniforms( material: Material ): object;
 	acquireProgram(
 		parameters: any,
 		cacheKey: string
