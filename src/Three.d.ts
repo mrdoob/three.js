@@ -25,6 +25,7 @@ export * from './objects/Points';
 export * from './objects/Group';
 export * from './textures/VideoTexture';
 export * from './textures/DataTexture';
+export * from './textures/DataTexture2DArray';
 export * from './textures/DataTexture3D';
 export * from './textures/CompressedTexture';
 export * from './textures/CubeTexture';
