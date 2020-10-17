@@ -1165,9 +1165,46 @@ THREE.GLTFLoader = ( function () {
 				// Set instance transforms.
 				for ( var i = 0; i < template.count; i ++ ) {
 
-					if ( translation ) t.fromBufferAttribute( translation, i );
-					if ( rotation ) r.fromBufferAttribute( rotation, i );
-					if ( scale ) s.fromBufferAttribute( scale, i );
+					if ( translation ) {
+
+						t.fromBufferAttribute( translation, i );
+
+						if ( translation.normalized ) {
+
+							t.multiplyScalar( getNormalizationScale( translation ) );
+
+						}
+
+					}
+
+					if ( rotation ) {
+
+						r.fromBufferAttribute( rotation, i );
+
+						if ( rotation.normalized ) {
+
+							var scale = getNormalizationScale( rotation );
+
+							r.x *= scale;
+							r.y *= scale;
+							r.z *= scale;
+							r.w *= scale;
+
+						}
+
+					}
+
+					if ( scale ) {
+
+						s.fromBufferAttribute( scale, i );
+
+						if ( scale.normalized ) {
+
+							s.multiplyScalar( getNormalizationScale( scale ) );
+
+						}
+
+					}
 
 					instancedMesh.setMatrixAt( i, matrix.compose( t, r, s ) );
 
@@ -1178,19 +1215,36 @@ THREE.GLTFLoader = ( function () {
 
 					var attributeSource = dependencies[ 4 + i ];
 
-					instancedMesh.geometry.setAttribute( customAttributeNames[ i ], new THREE.InstancedBufferAttribute(
+					if ( attributeSource.isInterleavedBufferAttribute ) {
 
-						attributeSource.array,
-						attributeSource.itemSize,
-						attributeSource.normalized
+						// TODO(donmccurdy): Reuse interleaved buffers.
+						attributeSource = attributeSource.clone( new THREE.InstancedInterleavedBuffer(
 
-					) );
+							attributeSource.data.array,
+							attributeSource.stride
+
+						) );
+
+					} else {
+
+						attributeSource = new THREE.InstancedBufferAttribute(
+
+							attributeSource.array,
+							attributeSource.itemSize,
+							attributeSource.normalized
+
+						);
+
+					}
+
+					instancedMesh.geometry.setAttribute( customAttributeNames[ i ], attributeSource );
 
 				}
 
 				// Copy mesh properties first, then node properties. These may be the same object.
 				THREE.Object3D.prototype.copy.call( instancedMesh, mesh );
 				THREE.Object3D.prototype.copy.call( instancedMesh, node );
+				instancedMesh.frustumCulled = false; // Use default of InstancedMesh, not Object3D.
 
 				parser.assignFinalMaterial( instancedMesh );
 
@@ -1617,6 +1671,36 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		return attributesKey;
+
+	}
+
+	function getNormalizationScale( attribute ) {
+
+		var ctor = attribute.isInterleavedBufferAttribute
+			? attribute.data.array.constructor
+			: attribute.array.constructor;
+
+		if ( ctor === Int8Array ) {
+
+			return 1 / 127;
+
+		} else if ( ctor === Uint8Array ) {
+
+			return 1 / 255;
+
+		} else if ( ctor === Int16Array ) {
+
+			return 1 / 32767;
+
+		} else if ( ctor === Uint16Array ) {
+
+			return 1 / 65535;
+
+		} else {
+
+			throw new Error( 'THREE.GLTFLoader: Unsupported normalized accessor component type.' );
+
+		}
 
 	}
 
@@ -3290,30 +3374,7 @@ THREE.GLTFLoader = ( function () {
 
 				if ( outputAccessor.normalized ) {
 
-					var scale;
-
-					if ( outputArray.constructor === Int8Array ) {
-
-						scale = 1 / 127;
-
-					} else if ( outputArray.constructor === Uint8Array ) {
-
-						scale = 1 / 255;
-
-					} else if ( outputArray.constructor == Int16Array ) {
-
-						scale = 1 / 32767;
-
-					} else if ( outputArray.constructor === Uint16Array ) {
-
-						scale = 1 / 65535;
-
-					} else {
-
-						throw new Error( 'THREE.GLTFLoader: Unsupported output accessor component type.' );
-
-					}
-
+					var scale = getNormalizationScale( outputArray );
 					var scaled = new Float32Array( outputArray.length );
 
 					for ( var j = 0, jl = outputArray.length; j < jl; j ++ ) {
