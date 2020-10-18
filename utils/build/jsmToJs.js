@@ -10,6 +10,7 @@ class JsmToJs {
     this.src = `${this.base}/examples/jsm`
     this.success = 0
     this.failure = 0
+    this.throttle = 20
   }
 
   init(){
@@ -20,7 +21,6 @@ class JsmToJs {
 
   getJsxFilePaths(){
     return new Promise((resolve, reject) => {
-      //glob(`C:/dev/three.js/examples/jsm/loaders/GLTFLoader.js`, {}, (err, d) => {
       glob(`${this.src}/**/*.js`, {}, (err, d) => {
         this.jsxFilePaths = d
         resolve()
@@ -49,7 +49,7 @@ class JsmToJs {
           console.log('FAILURE TOTAL:', this.failure)
           resolve()
         }
-      }, 20)
+      }, this.throttle)
     })
   }
 
@@ -62,10 +62,9 @@ class JsmToJs {
       fileContents = this.transformTranspiledFile(d)
       return this.writeFile(filePath, fileContents)
     }).catch((e) => {
-      //Write out the file anyway just to see what happens
       this.failure++
       console.log(`ERROR:`, filePath)
-      return this.writeFile(filePath, fileContents)
+      return this.writeFile(filePath, fileContents) //Write to help debug errors
     })
   }
 
