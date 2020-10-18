@@ -16,7 +16,7 @@ function LightProbeHelper( lightProbe, size ) {
 
 		uniforms: {
 
-			sh: { value: this.lightProbe.sh.coefficients }, // by reference
+			sh: { value: this.lightProbe.sh.coefficients },
 
 			intensity: { value: this.lightProbe.intensity }
 
@@ -42,28 +42,20 @@ function LightProbeHelper( lightProbe, size ) {
 
 			'vec3 inverseTransformDirection( in vec3 normal, in mat4 matrix ) {',
 
-			'	// matrix is assumed to be orthogonal',
-
 			'	return normalize( ( vec4( normal, 0.0 ) * matrix ).xyz );',
 
 			'}',
 
-			'// source: https://graphics.stanford.edu/papers/envmap/envmap.pdf',
 			'vec3 shGetIrradianceAt( in vec3 normal, in vec3 shCoefficients[ 9 ] ) {',
-
-			'	// normal is assumed to have unit length',
 
 			'	float x = normal.x, y = normal.y, z = normal.z;',
 
-			'	// band 0',
 			'	vec3 result = shCoefficients[ 0 ] * 0.886227;',
 
-			'	// band 1',
 			'	result += shCoefficients[ 1 ] * 2.0 * 0.511664 * y;',
 			'	result += shCoefficients[ 2 ] * 2.0 * 0.511664 * z;',
 			'	result += shCoefficients[ 3 ] * 2.0 * 0.511664 * x;',
 
-			'	// band 2',
 			'	result += shCoefficients[ 4 ] * 2.0 * 0.429043 * x * y;',
 			'	result += shCoefficients[ 5 ] * 2.0 * 0.429043 * y * z;',
 			'	result += shCoefficients[ 6 ] * ( 0.743125 * z * z - 0.247708 );',
@@ -74,9 +66,9 @@ function LightProbeHelper( lightProbe, size ) {
 
 			'}',
 
-			'uniform vec3 sh[ 9 ]; // sh coefficients',
+			'uniform vec3 sh[ 9 ];',
 
-			'uniform float intensity; // light probe intensity',
+			'uniform float intensity;',
 
 			'varying vec3 vNormal;',
 

@@ -3,7 +3,9 @@ import {
 	FileLoader
 } from "../../../build/three.module.js";
 
-import * as Nodes from "../nodes/Nodes.js";
+import {
+	Node
+} from "../nodes/Nodes.js";
 
 var NodeMaterialLoader = function ( manager, library ) {
 
