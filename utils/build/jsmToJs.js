@@ -3,7 +3,6 @@ var glob = require('glob')
 var fs = require('fs')
 var mkdirp = require('mkdirp')
 var babel = require('@babel/core')
-var uglify = require('uglify-js')
 
 class JsmToJs {
   constructor() {
