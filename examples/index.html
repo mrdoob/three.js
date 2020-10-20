@@ -58,6 +58,7 @@
 		const previewsToggler = document.getElementById( 'previewsToggler' );
 
 		const links = {};
+		const validRedirects = new Map();
 		const container = document.createElement( 'div' );
 
 		let selected = null;
@@ -87,14 +88,24 @@
 					container.appendChild( link );
 
 					links[ file ] = link;
+					validRedirects.set( file, file + '.html' );
 
 				}
 
 			}
 
-			if ( window.location.hash !== '' && links[ window.location.hash.substring( 1 ) ] ) {
+			if ( window.location.hash !== '' ) {
 
-				loadFile( window.location.hash.substring( 1 ) );
+				const file = window.location.hash.substring( 1 );
+
+				// use a predefined map of redirects to avoid untrusted URL redirection due to user-provided value
+
+				if ( validRedirects.has( file ) === true ) {
+
+					selectFile( file );
+					viewer.src = validRedirects.get( file );
+
+				}
 
 			}
 
