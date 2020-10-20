@@ -187,4 +187,4 @@ THREE.EdgeSplitModifier = function () {
 
 	};
 
-}
+};
