@@ -834,7 +834,7 @@ var GLTFLoader = ( function () {
 
 		return this.isSupported;
 
-	}
+	};
 
 	/* BINARY EXTENSION */
 	var BINARY_EXTENSION_HEADER_MAGIC = 'glTF';
