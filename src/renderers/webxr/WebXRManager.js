@@ -1,6 +1,7 @@
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
+import { Vector2 } from '../../math/Vector2.js';
 import { Vector3 } from '../../math/Vector3.js';
 import { Vector4 } from '../../math/Vector4.js';
 import { WebGLAnimation } from '../webgl/WebGLAnimation.js';
@@ -21,6 +22,8 @@ function WebXRManager( renderer, gl ) {
 
 	const controllers = [];
 	const inputSourcesMap = new Map();
+
+	var currentSize = new Vector2(), currentPixelRatio;
 
 	//
 
@@ -118,6 +121,7 @@ function WebXRManager( renderer, gl ) {
 
 		//
 
+		renderer.setDrawingBufferSize( currentSize.width, currentSize.height, currentPixelRatio );
 		renderer.setFramebuffer( null );
 		renderer.setRenderTarget( renderer.getRenderTarget() ); // Hack #15830
 		animation.stop();
@@ -131,6 +135,9 @@ function WebXRManager( renderer, gl ) {
 	function onRequestReferenceSpace( value ) {
 
 		referenceSpace = value;
+
+		currentPixelRatio = renderer.getPixelRatio();
+		renderer.getSize( currentSize );
 
 		animation.setContext( session );
 		animation.start();
@@ -210,7 +217,10 @@ function WebXRManager( renderer, gl ) {
 			// eslint-disable-next-line no-undef
 			const baseLayer = new XRWebGLLayer( session, gl, layerInit );
 
+			// baseLayer will only be applied to the session
+			// when the next XRFrame's callbacks are processed.
 			session.updateRenderState( { baseLayer: baseLayer } );
+			renderer.setDrawingBufferSize( baseLayer.framebufferWidth, baseLayer.framebufferHeight, 1 );
 
 			session.requestReferenceSpace( referenceSpaceType ).then( onRequestReferenceSpace );
 

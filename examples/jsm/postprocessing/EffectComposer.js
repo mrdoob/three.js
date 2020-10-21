@@ -70,6 +70,22 @@ var EffectComposer = function ( renderer, renderTarget ) {
 
 	this.clock = new Clock();
 
+	// for VR
+
+	var rendererSize = new Vector2();
+	var scope = this;
+
+	function onSessionStateChange() {
+
+		renderer.getBufferSize( rendererSize );
+		scope.setPixelRatio( renderer.getPixelRatio() );
+		scope.setSize( rendererSize.x, rendererSize.y );
+
+	}
+
+	renderer.xr.addEventListener( 'sessionstart', onSessionStateChange );
+	renderer.xr.addEventListener( 'sessionend', onSessionStateChange );
+
 };
 
 Object.assign( EffectComposer.prototype, {
@@ -126,8 +142,17 @@ Object.assign( EffectComposer.prototype, {
 
 		var maskActive = false;
 
+		var currentVREnabled = this.renderer.xr.enabled;
+
+		if ( this.renderer.xr.enabled === true ) {
+
+			this.renderer.xr.enabled = false;
+
+		}
+
 		var pass, i, il = this.passes.length;
 
+		var swapped = false;
 		for ( i = 0; i < il; i ++ ) {
 
 			pass = this.passes[ i ];
@@ -144,17 +169,14 @@ Object.assign( EffectComposer.prototype, {
 					var context = this.renderer.getContext();
 					var stencil = this.renderer.state.buffers.stencil;
 
-					//context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
 					stencil.setFunc( context.NOTEQUAL, 1, 0xffffffff );
-
 					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
-
-					//context.stencilFunc( context.EQUAL, 1, 0xffffffff );
 					stencil.setFunc( context.EQUAL, 1, 0xffffffff );
 
 				}
 
 				this.swapBuffers();
+				swapped = !swapped;
 
 			}
 
@@ -174,7 +196,10 @@ Object.assign( EffectComposer.prototype, {
 
 		}
 
+		if (swapped) this.swapBuffers();
 		this.renderer.setRenderTarget( currentRenderTarget );
+
+		this.renderer.xr.enabled = currentVREnabled;
 
 	},
 
