@@ -42,8 +42,6 @@
 
 		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
-		<script src="files.js"></script>
-
 		<script>
 
 		const panel = document.getElementById( 'panel' );
@@ -63,9 +61,16 @@
 
 		let selected = null;
 
-		init();
+		Promise.all( [
+			fetch( 'files.json' ).then( response => response.json() ),
+			fetch( 'tags.json' ).then( response => response.json() )
+		] ).then( ( json ) => {
 
-		function init() {
+			init( json[ 0 ], json[ 1 ] );
+
+		} );
+
+		function init( files, tags ) {
 
 			content.appendChild( container );
 
@@ -117,7 +122,7 @@
 
 			}
 
-			updateFilter();
+			updateFilter( files, tags );
 
 			// Events
 
@@ -140,14 +145,14 @@
 			exitSearchButton.onclick = function ( ) {
 
 				filterInput.value = '';
-				updateFilter();
+				updateFilter( files, tags );
 				panel.classList.remove( 'searchFocused' );
 
 			};
 
 			filterInput.addEventListener( 'input', function () {
 
-				updateFilter();
+				updateFilter( files, tags );
 
 			} );
 
@@ -212,13 +217,6 @@
 
 		}
 
-		function loadFile( file ) {
-
-			selectFile( file );
-			viewer.src = file + '.html';
-
-		}
-
 		function selectFile( file ) {
 
 			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
@@ -239,7 +237,7 @@
 
 		}
 
-		function updateFilter() {
+		function updateFilter( files, tags ) {
 
 			let v = filterInput.value.trim();
 			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
@@ -262,17 +260,17 @@
 
 				for ( let i = 0; i < section.length; i ++ ) {
 
-					filterExample( section[ i ], exp );
+					filterExample( section[ i ], exp, tags );
 
 				}
 
 			}
 
-			layoutList();
+			layoutList( files );
 
 		}
 
-		function filterExample( file, exp ) {
+		function filterExample( file, exp, tags ) {
 
 			const link = links[ file ];
 			const name = getName( file );
@@ -309,7 +307,7 @@
 
 		}
 
-		function layoutList() {
+		function layoutList( files ) {
 
 			for ( const key in files ) {
 
