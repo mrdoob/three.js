@@ -13,9 +13,9 @@ const S = fs.readdirSync( './examples/screenshots' )
 
 // files.js
 const F = [];
-// To expose files variable to out of eval scope, we need var statement, not const.
-eval( fs.readFileSync( './examples/files.js' )
-	.toString().replace( 'const files', 'var files' ) );
+
+const files = JSON.parse( fs.readFileSync( './examples/files.json' ) );
+
 for ( const key in files ) {
 
 	const section = files[ key ];
@@ -27,10 +27,10 @@ for ( const key in files ) {
 
 }
 
-let subES = E.filter( x => ! S.includes( x ) );
-let subSE = S.filter( x => ! E.includes( x ) );
-let subEF = E.filter( x => ! F.includes( x ) );
-let subFE = F.filter( x => ! E.includes( x ) );
+const subES = E.filter( x => ! S.includes( x ) );
+const subSE = S.filter( x => ! E.includes( x ) );
+const subEF = E.filter( x => ! F.includes( x ) );
+const subFE = F.filter( x => ! E.includes( x ) );
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
