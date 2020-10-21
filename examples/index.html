@@ -61,20 +61,16 @@
 
 		let selected = null;
 
-		Promise.all( [
-			fetch( 'files.json' ).then( response => response.json() ),
-			fetch( 'tags.json' ).then( response => response.json() )
-		] ).then( ( json ) => {
+		init();
 
-			init( json[ 0 ], json[ 1 ] );
-
-		} );
-
-		function init( files, tags ) {
+		async function init() {
 
 			content.appendChild( container );
 
 			viewSrcButton.style.display = 'none';
+
+			const files = await ( await fetch( 'files.json' ) ).json();
+			const tags = await ( await fetch( 'tags.json' ) ).json();
 
 			for ( const key in files ) {
 
