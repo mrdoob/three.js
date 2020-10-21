@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - shared skeleton</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				overflow: hidden;
+			}
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				display:block;
+			}
+			#info a {
+				color: #046;
+				font-weight: bold;
+			}
+			#explanation {
+				position: absolute;
+				bottom: 1rem;
+				width: 20rem;
+				left: 1rem;
+				padding: 0.5rem;
+				z-index: 1;
+				background: rgba(0,0,0,0.8);
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - Shared Skeleton<br />
+			Character and animation from <a href="https://www.mixamo.com/" target="_blank" rel="noopener">Mixamo</a><br /><br />
+		</div>
+
+		<div id="explanation">
+			Multiple instances of SkinnedMesh all controlled by a single Skeleton. Use the controls to compare performance with a multi skeleton approach. You may need to increase the rows before the performance gains are noticeable.
+		</div>
+
+		<script src="../build/three.js"></script>
+
+		<script src="js/libs/inflate.min.js"></script>
+		<script src="js/loaders/FBXLoader.js"></script>
+		<script src="js/utils/SkeletonUtils.js"></script>
+
+		<script src="js/controls/OrbitControls.js"></script>
+
+		<script src="js/WebGL.js"></script>
+		<script src="js/libs/stats.min.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+
+		<script>
+			if ( WEBGL.isWebGLAvailable() === false ) {
+
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() );
+
+			}
+
+			const numCols = 9;
+			const rowSize = 150;
+			const rowOffset = ( numCols - 1 ) * ( rowSize / 2 );
+
+			let container, stats, controls;
+			let camera, scene, renderer, light;
+			let danceGroup, danceAnimation;
+			let sharedDanceAction;
+
+			let loadedObject, sharedModel;
+
+			const clock = new THREE.Clock();
+
+			// Simple material to use instead of the model default
+			const normalMat = new THREE.MeshNormalMaterial({ 
+				skinning: true
+			});
+
+			// Shared objects for the shared skeleton technique
+			let sharedMixer;
+			let sharedSkeleton;
+
+			// Array of animation mixers for non-sharing technique
+			let mixers;
+
+			// Dat GUI
+			const gui = new dat.GUI();
+
+			const GuiOptions = function () {
+
+				this.numRows = 1;
+				this.isSkeletonShared = true;
+
+			};
+
+			const guiOptions = new GuiOptions();
+
+			const createDancers = ( numRows ) => {
+
+				// Clear all dancers and create new empty group
+				if ( danceGroup ) scene.remove( danceGroup );
+				danceGroup = new THREE.Group();
+				scene.add( danceGroup );
+
+				// Clear animation mixers
+				mixers = [];
+
+				if ( guiOptions.isSkeletonShared ) {
+
+					// Same number of models sharing one skeleton and animation mixer
+					for ( let z = 0; z < numRows; z ++ ) {
+
+						for ( let x = 0; x < numCols; x ++ ) {
+
+							const group = new THREE.Group();
+							const meshGroup = new THREE.Group();
+
+							const mainMesh = sharedModel.clone();
+
+							// It's important to pass in the matrixWorld for each mesh here as the skeleton is shared
+							mainMesh.bind( sharedSkeleton, meshGroup.matrixWorld );  
+
+							// Because we're sharing a skeleton that isn't sharing world space
+							// with the mesh, we need to set bindMode to detached
+							mainMesh.bindMode = 'detached';
+
+							meshGroup.add( mainMesh );
+
+							meshGroup.position.x = x * rowSize - rowOffset;
+							meshGroup.position.z = - z * rowSize;
+
+							group.add( meshGroup );
+							danceGroup.add( group );
+
+						}
+
+					}
+
+				} else {
+
+					// Multiple models with their own skeletons and animation mixers
+					for ( let z = 0; z < numRows; z ++ ) {
+
+						for ( let x = 0; x < numCols; x ++ ) {
+
+							const clonedObject = THREE.SkeletonUtils.clone( loadedObject );
+							danceGroup.add( clonedObject );
+
+							clonedObject.position.x = x * rowSize - rowOffset;
+							clonedObject.position.z = - z * rowSize;
+
+							const mixer = new THREE.AnimationMixer( clonedObject );
+							const action = mixer.clipAction( danceAnimation );
+
+							action.play();
+
+							mixers.push( mixer );
+
+						}
+
+					}
+
+				}
+
+			};
+
+			const onModelLoad = object => {
+
+				loadedObject = object;
+				danceAnimation = loadedObject.animations[ 0 ];
+				const jointsModel = loadedObject.getObjectByName('Alpha_Joints');
+				const mainModel = loadedObject.getObjectByName('Alpha_Surface')
+
+				// Setting the material for the main model to something less GPU intensive
+				// and also removing the "joints" part of the model as this just complicates the demo
+				mainModel.material = normalMat
+				loadedObject.remove(jointsModel)
+
+				// Cloning the model so it doesn't clash with the other non-shared skeleton mode
+				const sharedObject = THREE.SkeletonUtils.clone( loadedObject );
+
+				// Setting objects that are all used by the shared skeleton models
+				sharedModel = sharedObject.getObjectByName( 'Alpha_Surface' );
+				const sharedParentBone = sharedObject.getObjectByName( 'mixamorigHips' );
+				sharedMixer = new THREE.AnimationMixer( sharedObject );
+				sharedSkeleton = sharedModel.skeleton;
+				sharedDanceAction = sharedMixer.clipAction( danceAnimation );
+				sharedDanceAction.play();
+
+				// The bones need to be in the scene for the animation to work
+				scene.add( sharedParentBone );
+
+				// Once model is loded we can set the gui up
+				guiSetup();
+
+				// Initiate first set of dancers
+				createDancers( guiOptions.numRows );
+
+			};
+
+			const init = () => {
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+				camera.position.set( 0, 500, 1000 );
+
+				controls = new THREE.OrbitControls( camera, container );
+				controls.target.set( 0, 300, 0 );
+				controls.update();
+
+				scene = new THREE.Scene();
+
+				const grid = new THREE.GridHelper( 10000, 50, 0xffffff, 0xffffff );
+				scene.add( grid );
+
+				// model could be in any format (e.g. glTF)
+				const loader = new THREE.FBXLoader();
+				loader.load( 'models/fbx/Samba Dancing.fbx', onModelLoad );
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				container.appendChild( renderer.domElement );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+				// stats
+				stats = new Stats();
+				container.appendChild( stats.dom );
+
+			};
+
+			const onWindowResize = () => {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			};
+
+			const showDancers = num => {
+
+				const meshes = isSkeletonShared ? sharedSkelMeshes : multiSkelMeshes;
+				meshes.forEach( ( mesh, index ) => {
+
+					if ( index < num ) {
+
+						mesh.visible = true;
+
+					} else {
+
+						mesh.visible = false;
+
+					}
+
+				} );
+
+			};
+
+			const guiSetup = () => {
+
+				const numRowsControl = gui.add( guiOptions, 'numRows' ).min( 1 ).max( 50 ).step( 1 );
+
+				numRowsControl.onChange( numRows => {
+
+					createDancers( numRows );
+
+				} );
+
+				const skelControl = gui.add( guiOptions, 'isSkeletonShared' );
+				skelControl.onChange( () => {
+
+					createDancers( guiOptions.numRows );
+
+				} );
+
+			};
+
+			const animate = () => {
+
+				requestAnimationFrame( animate );
+
+				const delta = clock.getDelta();
+
+				if ( sharedMixer ) sharedMixer.update( delta );
+
+				if ( mixers ) {
+
+					mixers.forEach( mixer => {
+
+						mixer.update( delta );
+
+					} );
+
+				}
+
+				renderer.render( scene, camera );
+
+				stats.update();
+
+			};
+
+			init();
+			animate();
+
+		</script>
+
+	</body>
+</html>
