@@ -26,6 +26,12 @@ THREE.GLTFLoader = ( function () {
 
 		this.register( function ( parser ) {
 
+			return new GLTFTextureWebPExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
 			return new GLTFMaterialsTransmissionExtension( parser );
 
 		} );
@@ -334,6 +340,7 @@ THREE.GLTFLoader = ( function () {
 		KHR_TEXTURE_BASISU: 'KHR_texture_basisu',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 		KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
+		EXT_TEXTURE_WEBP: 'EXT_texture_webp',
 		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
 	};
 
@@ -668,7 +675,6 @@ THREE.GLTFLoader = ( function () {
 	 * BasisU Texture Extension
 	 *
 	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Khronos/KHR_texture_basisu
-	 * (draft PR https://github.com/KhronosGroup/glTF/pull/1751)
 	 */
 	function GLTFTextureBasisUExtension( parser ) {
 
@@ -703,6 +709,69 @@ THREE.GLTFLoader = ( function () {
 		return parser.loadTextureImage( textureIndex, source, loader );
 
 	};
+
+
+	/**
+	 * WebP Texture Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_texture_webp
+	 */
+	function GLTFTextureWebPExtension( parser ) {
+
+		this.parser = parser;
+		this.name = EXTENSIONS.EXT_TEXTURE_WEBP;
+		this.isSupported = null;
+
+	}
+
+	GLTFTextureWebPExtension.prototype.loadTexture = function ( textureIndex ) {
+
+		var parser = this.parser;
+		var json = parser.json;
+
+		var textureDef = json.textures[ textureIndex ];
+
+		if ( ! textureDef.extensions || ! textureDef.extensions[ this.name ] || ! this.detectSupport() ) {
+
+			return null;
+
+		}
+
+		var extension = textureDef.extensions[ this.name ];
+		var source = json.images[ extension.source ];
+		var loader = source.uri ? parser.options.manager.getHandler( source.uri ) : parser.textureLoader;
+
+		return this.detectSupport()
+			.then( function () { return parser.loadTextureImage( textureIndex, source, loader ) } )
+			.catch( function () { return parser.loadTexture( textureIndex ); } );
+
+	};
+
+	GLTFTextureWebPExtension.prototype.detectSupport = function () {
+
+		if ( ! this.isSupported ) {
+
+			this.isSupported = new Promise( function ( resolve, reject ) {
+
+				var image = new Image();
+
+				// Lossy test image. Support for lossy images doesn't guarantee support for all
+				// WebP images, unfortunately.
+				image.src = 'data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA';
+
+				image.onload = image.onerror = function () {
+
+					image.height === 1 ? resolve() : reject();
+
+				};
+
+			} );
+
+		}
+
+		return this.isSupported;
+
+	}
 
 	/* BINARY EXTENSION */
 	var BINARY_EXTENSION_HEADER_MAGIC = 'glTF';
