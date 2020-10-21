@@ -13,11 +13,13 @@ const S = fs.readdirSync( './examples/screenshots' )
 
 // files.js
 const F = [];
-eval( fs.readFileSync( './examples/files.js' ).toString() );
-for ( var key in files ) {
+// To expose files variable to out of eval scope, we need var statement, not const.
+eval( fs.readFileSync( './examples/files.js' )
+	.toString().replace( 'const files', 'var files' ) );
+for ( const key in files ) {
 
-	var section = files[ key ];
-	for ( var i = 0, len = section.length; i < len; i ++ ) {
+	const section = files[ key ];
+	for ( let i = 0, len = section.length; i < len; i ++ ) {
 
 		F.push( section[ i ] );
 
