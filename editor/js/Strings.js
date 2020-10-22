@@ -77,6 +77,7 @@ function Strings( config ) {
 			'sidebar/animations': 'Animations',
 			'sidebar/animations/play': 'Play',
 			'sidebar/animations/stop': 'Stop',
+			'sidebar/animations/timescale': 'Time Scale',
 
 			'sidebar/scene': 'Scene',
 			'sidebar/scene/background': 'Background',
@@ -400,6 +401,7 @@ function Strings( config ) {
 			'sidebar/animations': 'Animations',
 			'sidebar/animations/play': 'Play',
 			'sidebar/animations/stop': 'Stop',
+			'sidebar/animations/timescale': 'Time Scale',
 
 			'sidebar/scene': 'Scène',
 			'sidebar/scene/background': 'Arrière Plan',
@@ -723,6 +725,7 @@ function Strings( config ) {
 			'sidebar/animations': '动画',
 			'sidebar/animations/play': '播放',
 			'sidebar/animations/stop': '暂停',
+			'sidebar/animations/timescale': 'Time Scale',
 
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
