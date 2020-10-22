@@ -23,6 +23,28 @@ Three.js经常会和WebGL混淆，
 对于三维来说第一件事往往是创建一个三维的立方体。
 所以我们从"Hello Cube!"开始。
 
+在我们开始前，让我们试着让你了解一下three.js应用的结构。一个three.js应用要求你创建很多的对象，并且将他们联系在一起。这有一个图例来表示一个小的three.js的应用。
+
+<div class="threejs_center"><img src="resources/images/threejs-structure.svg" style="width: 768px;"></div>
+
+上图需要注意的事项。
+
+* 有一个`Renderer`。这可以说是three.js的主要对象。你传入了一个`Scene`和一个`Camera`到`Renderer`里面，然后他来渲染 （画）出在相机视椎体中的3D场景，作为一个2D的图片在画布上。
+
+* 有一个[scenegraph](threejs-scenegraph.html) 它是一个类似结构的树，由很多对象组成，比如一个`Scene`对象 ，多个`Mesh`对象，`Light`对象，`Group`，`Object3D`，和`Camera`对象。一个`Scene`对象定义了场景图的根，并包含背景色和雾等属性。这些对象定义了一个分层的父/子树的结构，并且展现出对象出现的地方和他们的方向。子对象的位置和方向是相对于父对象而言的。比如说汽车的轮子是汽车的子对象，这样移动和定位汽车就会自动移动轮子。你可以了解更多在 [the article on scenegraphs](threejs-scenegraph.html) 中。
+
+  注意图中`Camera`是一半在场景图中，一半在场景图外的。这表示在three.js中，不像其他的对象一样，一个`Camera`不一定要在场景图中起作用。就像其他的对象一样，一个`Camera`，作为一些其他对象的子对象，将会相对他的父对象移动和朝向。这有一个例子，放置多个`Camera`对象在一个场景图中在 [the article on scenegraphs](threejs-scenegraph.html) 的结尾部分。
+
+* `Mesh`对象代表用一个特定的`Material`绘制一个特定的`Geometry`。`Material`对象和`Geometry`对象可以被多个`Mesh`对象使用。比如在不同的位置画两个蓝色立方体，我们会需要两个`Mesh`对象来代表每一个立方体的位置和方向。我们只需要一个`Geometry`来存放立方体的顶点数据，和一个`Material`来定义蓝色就可以了。两个`Mesh`对象都涉及到相同的`Geometry`对象和`Material`对象。
+
+* `Geometry`对象代表一些几何体，比如说球体、立方体、平面、狗、猫、人、树、建筑等的顶点信息。Three.js提供了多种内置的 [基本元素](threejs-primitives.html) 。你也可以 [create custom geometry](threejs-custom-geometry.html) 并且 [load geometry from files](threejs-load-obj.html)。
+
+* `Material` objects represent
+  [the surface properties used to draw geometry](threejs-materials.html)
+  including things like the color to use and how shiny it is. A `Material` can also
+  reference one or more `Texture` objects which can be used, for example, 
+  to wrap an image onto the surface of a geometry.
+
 首先我们需要一个canvas标签。
 
 ```html
