@@ -206,6 +206,11 @@ export class WebGLRenderer implements Renderer {
 	 */
 	maxMorphNormals: number;
 
+	/**
+	 * @default false
+	 */
+	occlusionCulling: boolean;
+
 	info: WebGLInfo;
 
 	shadowMap: WebGLShadowMap;

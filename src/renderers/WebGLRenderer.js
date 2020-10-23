@@ -10,6 +10,7 @@ import { MathUtils } from '../math/MathUtils.js';
 import { DataTexture } from '../textures/DataTexture.js';
 import { Frustum } from '../math/Frustum.js';
 import { Matrix4 } from '../math/Matrix4.js';
+import { ShaderMaterial } from '../materials/ShaderMaterial.js';
 import { Vector2 } from '../math/Vector2.js';
 import { Vector3 } from '../math/Vector3.js';
 import { Vector4 } from '../math/Vector4.js';
@@ -54,6 +55,20 @@ function WebGLRenderer( parameters ) {
 		_preserveDrawingBuffer = parameters.preserveDrawingBuffer !== undefined ? parameters.preserveDrawingBuffer : false,
 		_powerPreference = parameters.powerPreference !== undefined ? parameters.powerPreference : 'default',
 		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
+
+	const _occlusionQueryMaterial = new ShaderMaterial( {
+	
+		vertexShader: " \
+		void main() { \
+			gl_Position = projectionMatrix  * modelViewMatrix * vec4(position, 1.0); \
+		}",
+	
+		fragmentShader: " \
+		void main() { \
+			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); \
+		}"
+	
+	} );
 
 	let currentRenderList = null;
 	let currentRenderState = null;
@@ -106,6 +121,9 @@ function WebGLRenderer( parameters ) {
 
 	this.maxMorphTargets = 8;
 	this.maxMorphNormals = 4;
+
+	// occlusion culling
+	this.occlusionCulling = false;
 
 	// internal properties
 
@@ -593,6 +611,7 @@ function WebGLRenderer( parameters ) {
 		bindingStates.dispose();
 
 		xr.dispose();
+		_occlusionQueryMaterial.dispose();
 
 		animation.stop();
 
@@ -1026,6 +1045,36 @@ function WebGLRenderer( parameters ) {
 
 		}
 
+
+		let opaqueObjects = currentRenderList.opaque;
+		let transparentObjects = currentRenderList.transparent;
+		// occlusion culling
+
+		if ( _this.capabilities.isWebGL2 === true && _this.occlusionCulling === true ) {
+
+			state.buffers.depth.setMask( false );
+			state.buffers.color.setMask( false );
+	
+			if ( opaqueObjects.length > 0 ) renderOcclusionQueryObjects( opaqueObjects, scene, camera );
+			if ( transparentObjects.length > 0 ) renderOcclusionQueryObjects( transparentObjects, scene, camera );
+
+			opaqueObjects = opaqueObjects.filter( function( renderItem ) {
+
+				return renderItem.object._occluded === false;
+
+			} );
+
+			transparentObjects = transparentObjects.filter( function( renderItem ) {
+
+				return renderItem.object._occluded === false;
+
+			} );
+
+			state.buffers.depth.setMask( true );
+			state.buffers.color.setMask( true );
+
+		}
+
 		//
 
 		if ( _clippingEnabled === true ) clipping.beginShadows();
@@ -1053,9 +1102,6 @@ function WebGLRenderer( parameters ) {
 		background.render( currentRenderList, scene, camera, forceClear );
 
 		// render scene
-
-		const opaqueObjects = currentRenderList.opaque;
-		const transparentObjects = currentRenderList.transparent;
 
 		if ( opaqueObjects.length > 0 ) renderObjects( opaqueObjects, scene, camera );
 		if ( transparentObjects.length > 0 ) renderObjects( transparentObjects, scene, camera );
@@ -1291,6 +1337,71 @@ function WebGLRenderer( parameters ) {
 
 		object.onAfterRender( _this, scene, camera, geometry, material, group );
 		currentRenderState = renderStates.get( scene, _currentArrayCamera || camera );
+
+	}
+
+	function renderOcclusionQueryObjects( renderList, scene, camera ) {
+
+		for ( let i = 0, l = renderList.length; i < l; i ++ ) {
+
+			const renderItem = renderList[ i ];
+
+			const object = renderItem.object;
+			const geometry = renderItem.geometry;
+			const material = _occlusionQueryMaterial;
+			const group = renderItem.group;
+
+			if ( !object._query ) {
+
+				object._query = _gl.createQuery();
+				object._queryInProgress = false;
+				object._occluded = false;
+			}
+
+			if ( object._queryInProgress && _gl.getQueryParameter( object._query, _gl.QUERY_RESULT_AVAILABLE ) ) {
+
+				object._occluded = !_gl.getQueryParameter( object._query, _gl.QUERY_RESULT);
+				object._queryInProgress = false;
+			}
+
+			if ( !object._queryInProgress ) {
+
+				_gl.beginQuery( _gl.ANY_SAMPLES_PASSED_CONSERVATIVE, object._query );
+
+				if ( camera.isArrayCamera ) {
+
+					_currentArrayCamera = camera;
+
+					const cameras = camera.cameras;
+
+					for ( let j = 0, jl = cameras.length; j < jl; j ++ ) {
+
+						const camera2 = cameras[ j ];
+
+						if ( object.layers.test( camera2.layers ) ) {
+
+							state.viewport( _currentViewport.copy( camera2.viewport ) );
+
+							renderObject( object, scene, camera2, geometry, material, group );
+
+						}
+
+					}
+
+				} else {
+
+					_currentArrayCamera = null;
+
+					renderObject( object, scene, camera, geometry, material, group );
+
+				}
+
+				_gl.endQuery( _gl.ANY_SAMPLES_PASSED_CONSERVATIVE );
+				object._queryInProgress = true;
+
+			}
+
+		}
 
 	}
 

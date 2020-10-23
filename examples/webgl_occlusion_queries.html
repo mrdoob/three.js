@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - Occlusion queries</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Occlusion queries
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { DRACOLoader } from './jsm/loaders/DRACOLoader.js';
+
+			import Stats from './jsm/libs/stats.module.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			let camera, controls, scene, dirLight, mixer, renderer;
+			var stats, gui, guiStatsEl;
+
+			const container = document.createElement( 'div' );
+			document.body.appendChild( container );
+
+			camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 1, 100 );
+			camera.position.set( 5, 2, 8 );
+
+			var clock = new THREE.Clock();
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.outputEncoding = THREE.sRGBEncoding;
+			container.appendChild( renderer.domElement );
+
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.target.set( 0, 0.5, 0 );
+			controls.update();
+			controls.enablePan = false;
+			controls.enableDamping = true;
+
+			// scene
+
+			scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xbfe3dd );
+
+			scene.add( new THREE.HemisphereLight( 0xffffff, 0x000000, 0.4 ) );
+
+			dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+			dirLight.position.set( 5, 2, 8 );
+			scene.add( dirLight );
+
+			// envmap
+			var path = 'textures/cube/Park2/';
+			var format = '.jpg';
+			var envMap = new THREE.CubeTextureLoader().load( [
+				path + 'posx' + format, path + 'negx' + format,
+				path + 'posy' + format, path + 'negy' + format,
+				path + 'posz' + format, path + 'negz' + format
+			] );
+
+			var dracoLoader = new DRACOLoader();
+			dracoLoader.setDecoderPath( 'js/libs/draco/gltf/' );
+
+			var loader = new GLTFLoader();
+			loader.setDRACOLoader( dracoLoader );
+			loader.load( 'models/gltf/LittlestTokyo.glb', function ( gltf ) {
+
+				var model = gltf.scene;
+				model.position.set( 1, 1, 0 );
+				model.scale.set( 0.01, 0.01, 0.01 );
+				model.traverse( function ( child ) {
+
+					if ( child.isMesh ) child.material.envMap = envMap;
+
+				} );
+
+				scene.add( model );
+
+				mixer = new THREE.AnimationMixer( model );
+				mixer.clipAction( gltf.animations[ 0 ] ).play();
+
+				animate();
+
+			}, undefined, function ( e ) {
+
+				console.error( e );
+
+			} );
+
+			var api = {
+				occlusionCulling: true,
+			};
+
+			stats = new Stats();
+			container.appendChild( stats.dom );
+
+			gui = new GUI();
+
+			gui.add( renderer, 'occlusionCulling' ).name( 'Enable Occlusion Culling' );
+			guiStatsEl = document.createElement( 'li' );
+			guiStatsEl.classList.add( 'gui-stats' );
+			gui.__ul.appendChild( guiStatsEl );
+
+			//
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				var delta = clock.getDelta();
+
+				mixer.update( delta );
+
+				controls.update();
+
+				stats.update();
+
+				renderer.render( scene, camera );
+
+				var renderList = renderer.renderLists.get( scene, camera );
+				var opaque = renderList.opaque;
+				var transparent = renderList.transparent;
+
+				if ( renderer.occlusionCulling ) {
+
+					opaque = opaque.filter( function( renderItem ) {
+
+						return renderItem.object._occluded === false;
+
+					} );
+
+					transparent = transparent.filter( function( renderItem ) {
+
+						return renderItem.object._occluded === false;
+
+					} );
+
+				}
+
+				guiStatsEl.innerHTML = [
+
+					'<i>Visible objects</i>: ' + ( opaque.length + transparent.length ),
+
+				].join( '<br/>' );
+
+			}
+
+		</script>
+
+	</body>
+</html>
