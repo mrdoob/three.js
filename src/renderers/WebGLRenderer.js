@@ -57,17 +57,17 @@ function WebGLRenderer( parameters ) {
 		_failIfMajorPerformanceCaveat = parameters.failIfMajorPerformanceCaveat !== undefined ? parameters.failIfMajorPerformanceCaveat : false;
 
 	const _occlusionQueryMaterial = new ShaderMaterial( {
-	
+
 		vertexShader: " \
 		void main() { \
 			gl_Position = projectionMatrix  * modelViewMatrix * vec4(position, 1.0); \
 		}",
-	
+
 		fragmentShader: " \
 		void main() { \
 			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); \
 		}"
-	
+
 	} );
 
 	let currentRenderList = null;
@@ -1054,7 +1054,7 @@ function WebGLRenderer( parameters ) {
 
 			state.buffers.depth.setMask( false );
 			state.buffers.color.setMask( false );
-	
+
 			if ( opaqueObjects.length > 0 ) renderOcclusionQueryObjects( opaqueObjects, scene, camera );
 			if ( transparentObjects.length > 0 ) renderOcclusionQueryObjects( transparentObjects, scene, camera );
 
@@ -1366,7 +1366,7 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			if ( !object._queryInProgress ) {
+			if ( ! object._queryInProgress ) {
 
 				_gl.beginQuery( _gl.ANY_SAMPLES_PASSED_CONSERVATIVE, object._query );
 
