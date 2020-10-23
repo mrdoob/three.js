@@ -1058,13 +1058,13 @@ function WebGLRenderer( parameters ) {
 			if ( opaqueObjects.length > 0 ) renderOcclusionQueryObjects( opaqueObjects, scene, camera );
 			if ( transparentObjects.length > 0 ) renderOcclusionQueryObjects( transparentObjects, scene, camera );
 
-			opaqueObjects = opaqueObjects.filter( function( renderItem ) {
+			opaqueObjects = opaqueObjects.filter( function ( renderItem ) {
 
 				return renderItem.object._occluded === false;
 
 			} );
 
-			transparentObjects = transparentObjects.filter( function( renderItem ) {
+			transparentObjects = transparentObjects.filter( function ( renderItem ) {
 
 				return renderItem.object._occluded === false;
 
@@ -1351,17 +1351,19 @@ function WebGLRenderer( parameters ) {
 			const material = _occlusionQueryMaterial;
 			const group = renderItem.group;
 
-			if ( !object._query ) {
+			if ( ! object._query ) {
 
 				object._query = _gl.createQuery();
 				object._queryInProgress = false;
 				object._occluded = false;
+
 			}
 
 			if ( object._queryInProgress && _gl.getQueryParameter( object._query, _gl.QUERY_RESULT_AVAILABLE ) ) {
 
-				object._occluded = !_gl.getQueryParameter( object._query, _gl.QUERY_RESULT);
+				object._occluded = ! _gl.getQueryParameter( object._query, _gl.QUERY_RESULT );
 				object._queryInProgress = false;
+
 			}
 
 			if ( !object._queryInProgress ) {
