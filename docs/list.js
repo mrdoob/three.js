@@ -414,9 +414,10 @@ const list = {
 			},
 
 			"Exporters": {
+				"ColladaExporter": "examples/en/exporters/ColladaExporter",
+				"EXRExporter": "examples/en/exporters/EXRExporter",
 				"GLTFExporter": "examples/en/exporters/GLTFExporter",
 				"PLYExporter": "examples/en/exporters/PLYExporter",
-				"ColladaExporter": "examples/en/exporters/ColladaExporter"
 			},
 
 			"Math": {
@@ -949,9 +950,10 @@ const list = {
 			},
 
 			"导出器": {
+				"ColladaExporter": "examples/zh/exporters/ColladaExporter",
+				"EXRExporter": "examples/zh/exporters/EXRExporter",
 				"GLTFExporter": "examples/zh/exporters/GLTFExporter",
 				"PLYExporter": "examples/zh/exporters/PLYExporter",
-				"ColladaExporter": "examples/zh/exporters/ColladaExporter"
 			},
 
 			"数学库": {
