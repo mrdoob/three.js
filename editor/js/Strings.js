@@ -725,7 +725,7 @@ function Strings( config ) {
 			'sidebar/animations': '动画',
 			'sidebar/animations/play': '播放',
 			'sidebar/animations/stop': '暂停',
-			'sidebar/animations/timescale': 'Time Scale',
+			'sidebar/animations/timescale': '时间缩放',
 
 			'sidebar/scene': '场景',
 			'sidebar/scene/background': '背景',
@@ -760,7 +760,7 @@ function Strings( config ) {
 			'sidebar/object/decay': '衰减',
 			'sidebar/object/shadow': '阴影',
 			'sidebar/object/shadowBias': '阴影偏移',
-			'sidebar/object/shadowNormalBias': 'Shadow Normal Bias',
+			'sidebar/object/shadowNormalBias': '阴影法线偏移',
 			'sidebar/object/shadowRadius': '阴影半径',
 			'sidebar/object/cast': '产生',
 			'sidebar/object/receive': '接受',
