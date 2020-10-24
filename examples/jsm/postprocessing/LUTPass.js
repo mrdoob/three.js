@@ -1,4 +1,4 @@
-import { ShaderPass } from '//unpkg.com/three@0.120.1/examples/jsm/postprocessing/ShaderPass.js';
+import { ShaderPass } from './ShaderPass.js';
 
 const LUTShader = {
 
