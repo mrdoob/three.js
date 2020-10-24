@@ -24,11 +24,15 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { LUTPass } from './jsm/postprocessing/LUTPass.js';
+			import { LUTCubeLoader } from './jsm/loaders/LUTCubeLoader.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			const params = {
 				enabled: true,
-				lut: 'Bourbon 64.CUBE'
+				lut: 'Bourbon 64.CUBE',
+				intensity: 1,
+				use2dLut: false,
 			};
 
 			const lutMap = {
@@ -82,6 +86,17 @@
 
 					} );
 
+				Object.keys( lutMap ).forEach( name => {
+
+					new LUTCubeLoader()
+						.load( 'luts/' + name, function ( result ) {
+
+							lutMap[ name ] = result;
+
+						} );
+
+				} );
+
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
@@ -95,8 +110,8 @@
 				composer.setSize( window.innerWidth, window.innerHeight );
 				composer.addPass( new RenderPass( scene, camera ) );
 
-				// lutPass = new LUTPass();
-				// composer.addPass( lutPass );
+				lutPass = new LUTPass();
+				composer.addPass( lutPass );
 
 				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
@@ -112,6 +127,8 @@
 				gui.width = 350;
 				gui.add( params, 'enabled' );
 				gui.add( params, 'lut', Object.keys( lutMap ) );
+				gui.add( params, 'intensity' ).min( 0 ).max( 1 );
+				gui.add( params, 'use2dLut' );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -132,6 +149,15 @@
 			//
 
 			function render() {
+
+				lutPass.enabled = params.enabled && Boolean( lutMap[ params.lut ] );
+				lutPass.intensity = params.intensity;
+				if ( lutMap[ params.lut ] ) {
+
+					const lut = lutMap[ params.lut ];
+					lutPass.lut = params.use2DLut ? lut.texture : lut.texture3D;
+
+				}
 
 				composer.render();
 
