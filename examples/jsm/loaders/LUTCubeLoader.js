@@ -10,7 +10,7 @@ import {
 	UnsignedByteType,
 	ClampToEdgeWrapping,
 	LinearFilter,
-} from '//unpkg.com/three@0.120.1/build/three.module.js';
+} from '../../../build/three.module.js';
 
 export class LUTCubeLoader extends Loader {
 
