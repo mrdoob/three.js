@@ -3,7 +3,6 @@
 import {
 	Loader,
 	FileLoader,
-	Vector3,
 	DataTexture,
 	DataTexture3D,
 	RGBFormat,
