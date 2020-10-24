@@ -133,7 +133,16 @@
 				gui.add( params, 'enabled' );
 				gui.add( params, 'lut', Object.keys( lutMap ) );
 				gui.add( params, 'intensity' ).min( 0 ).max( 1 );
-				gui.add( params, 'use2dLut' );
+
+				if ( renderer.capabilities.isWebGL2 ) {
+
+					gui.add( params, 'use2dLut' );
+
+				} else {
+
+					params.use2DLut = true;
+
+				}
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
