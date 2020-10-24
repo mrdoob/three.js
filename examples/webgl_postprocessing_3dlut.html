@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - 3d luts</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - 3D LUTs<br />
+			Battle Damaged Sci-fi Helmet by
+			<a href="https://sketchfab.com/theblueturtle_" target="_blank" rel="noopener">theblueturtle_</a><br />
+			<a href="https://hdrihaven.com/hdri/?h=royal_esplanade" target="_blank" rel="noopener">Royal Esplanade</a> by <a href="https://hdrihaven.com/" target="_blank" rel="noopener">HDRI Haven</a>
+		</div>
+
+		<script type="module">
+			/* eslint-disable */
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { GLTFLoader } from './jsm/loaders/GLTFLoader.js';
+			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
+			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
+			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { GUI } from './jsm/libs/dat.gui.module.js';
+
+			const params = {
+				enabled: true,
+				lut: 'Bourbon 64.CUBE'
+			};
+
+			const lutMap = {
+				'Bourbon 64.CUBE': null,
+				'Chemical 168.CUBE': null,
+				'Clayton 33.CUBE': null,
+				'Cubicle 99.CUBE': null
+			};
+
+			let gui;
+			let camera, scene, renderer;
+			let composer, lutPass;
+
+			init();
+			render();
+
+			function init() {
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.25, 20 );
+				camera.position.set( - 1.8, 0.6, 2.7 );
+
+				scene = new THREE.Scene();
+
+				new RGBELoader()
+					.setDataType( THREE.UnsignedByteType )
+					.setPath( 'textures/equirectangular/' )
+					.load( 'royal_esplanade_1k.hdr', function ( texture ) {
+
+						const envMap = pmremGenerator.fromEquirectangular( texture ).texture;
+
+						scene.background = envMap;
+						scene.environment = envMap;
+
+						texture.dispose();
+						pmremGenerator.dispose();
+
+						render();
+
+						// model
+
+						const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
+						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
+
+							scene.add( gltf.scene );
+							render();
+
+						} );
+
+					} );
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+				renderer.outputEncoding = THREE.sRGBEncoding;
+				container.appendChild( renderer.domElement );
+
+				composer = new EffectComposer( renderer );
+				composer.setPixelRatio( window.devicePixelRatio );
+				composer.setSize( window.innerWidth, window.innerHeight );
+				composer.addPass( new RenderPass( scene, camera ) );
+
+				// lutPass = new LUTPass();
+				// composer.addPass( lutPass );
+
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+				pmremGenerator.compileEquirectangularShader();
+
+				const controls = new OrbitControls( camera, renderer.domElement );
+				controls.addEventListener( 'change', render ); // use if there is no animation loop
+				controls.minDistance = 2;
+				controls.maxDistance = 10;
+				controls.target.set( 0, 0, - 0.2 );
+				controls.update();
+
+				gui = new GUI();
+				gui.width = 350;
+				gui.add( params, 'enabled' );
+				gui.add( params, 'lut', Object.keys( lutMap ) );
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				composer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			//
+
+			function render() {
+
+				composer.render();
+
+			}
+
+		</script>
+
+	</body>
+</html>
