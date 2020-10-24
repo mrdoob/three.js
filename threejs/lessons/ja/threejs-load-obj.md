@@ -1,4 +1,4 @@
-Title: Three.jsで.OBJファイルを読み込む
+Title: Three.jsでOBJファイルを読み込む
 Description: OBJファイルの読み込み
 TOC: OBJファイルの読み込み
 
