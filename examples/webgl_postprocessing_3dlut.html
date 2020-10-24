@@ -24,8 +24,10 @@
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 			import { EffectComposer } from './jsm/postprocessing/EffectComposer.js';
 			import { RenderPass } from './jsm/postprocessing/RenderPass.js';
+			import { ShaderPass } from './jsm/postprocessing/ShaderPass.js';
 			import { LUTPass } from './jsm/postprocessing/LUTPass.js';
 			import { LUTCubeLoader } from './jsm/loaders/LUTCubeLoader.js';
+			import { GammaCorrectionShader } from './jsm/shaders/GammaCorrectionShader.js';
 			import { GUI } from './jsm/libs/dat.gui.module.js';
 
 			const params = {
@@ -72,15 +74,12 @@
 						texture.dispose();
 						pmremGenerator.dispose();
 
-						render();
-
 						// model
 
 						const loader = new GLTFLoader().setPath( 'models/gltf/DamagedHelmet/glTF/' );
 						loader.load( 'DamagedHelmet.gltf', function ( gltf ) {
 
 							scene.add( gltf.scene );
-							render();
 
 						} );
 
@@ -97,18 +96,25 @@
 
 				} );
 
-				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				renderer.toneMapping = THREE.ACESFilmicToneMapping;
 				renderer.toneMappingExposure = 1;
-				renderer.outputEncoding = THREE.sRGBEncoding;
 				container.appendChild( renderer.domElement );
+				
+				const target = new THREE.WebGLRenderTarget( {
+					minFilter: THREE.LinearFilter,
+					magFilter: THREE.LinearFilter,
+					format: THREE.RGBAFormat,
+					encoding: THREE.sRGBEncoding
+				} );
 
-				composer = new EffectComposer( renderer );
+				composer = new EffectComposer( renderer, target );
 				composer.setPixelRatio( window.devicePixelRatio );
 				composer.setSize( window.innerWidth, window.innerHeight );
 				composer.addPass( new RenderPass( scene, camera ) );
+				composer.addPass( new ShaderPass( GammaCorrectionShader ) );
 
 				lutPass = new LUTPass();
 				composer.addPass( lutPass );
@@ -117,7 +123,6 @@
 				pmremGenerator.compileEquirectangularShader();
 
 				const controls = new OrbitControls( camera, renderer.domElement );
-				controls.addEventListener( 'change', render ); // use if there is no animation loop
 				controls.minDistance = 2;
 				controls.maxDistance = 10;
 				controls.target.set( 0, 0, - 0.2 );
@@ -149,6 +154,8 @@
 			//
 
 			function render() {
+
+				requestAnimationFrame( render );
 
 				lutPass.enabled = params.enabled && Boolean( lutMap[ params.lut ] );
 				lutPass.intensity = params.intensity;
