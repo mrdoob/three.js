@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -22,7 +21,7 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+		const camera = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
 		scene.add( camera );
 		</code>
 
@@ -154,10 +153,10 @@
 		</pre>
 		那对于每个显示器，你可以这样来设置、调用：<br />
 
-		<code>var w = 1920;
-var h = 1080;
-var fullWidth = w * 3;
-var fullHeight = h * 2;
+		<code>const w = 1920;
+const h = 1080;
+const fullWidth = w * 3;
+const fullHeight = h * 2;
 
 // A
 camera.setViewOffset( fullWidth, fullHeight, w * 0, h * 0, w, h );

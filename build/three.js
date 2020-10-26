@@ -63,7 +63,7 @@
 		};
 	}
 
-	var REVISION = '121dev';
+	var REVISION = '122dev';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -772,15 +772,24 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.x = array[offset];
 			this.y = array[offset + 1];
 			return this;
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this.x;
 			array[offset + 1] = this.y;
 			return array;
@@ -1094,7 +1103,9 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
 
 			for (var i = 0; i < 9; i++) {
 				this.elements[i] = array[i + offset];
@@ -1104,8 +1115,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			var te = this.elements;
 			array[offset] = te[0];
 			array[offset + 1] = te[1];
@@ -1817,7 +1834,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.x = array[offset];
 			this.y = array[offset + 1];
 			this.z = array[offset + 2];
@@ -1826,8 +1846,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this.x;
 			array[offset + 1] = this.y;
 			array[offset + 2] = this.z;
@@ -2395,7 +2421,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this._x = array[offset];
 			this._y = array[offset + 1];
 			this._z = array[offset + 2];
@@ -2407,8 +2436,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this._x;
 			array[offset + 1] = this._y;
 			array[offset + 2] = this._z;
@@ -2981,7 +3016,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.x = array[offset];
 			this.y = array[offset + 1];
 			this.z = array[offset + 2];
@@ -2989,8 +3027,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this.x;
 			array[offset + 1] = this.y;
 			array[offset + 2] = this.z;
@@ -4648,7 +4692,9 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
 
 			for (var i = 0; i < 16; i++) {
 				this.elements[i] = array[i + offset];
@@ -4658,8 +4704,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			var te = this.elements;
 			array[offset] = te[0];
 			array[offset + 1] = te[1];
@@ -4888,8 +4940,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this._x;
 			array[offset + 1] = this._y;
 			array[offset + 2] = this._z;
@@ -5253,6 +5311,16 @@
 				object.dispatchEvent(_removedEvent);
 			}
 
+			return this;
+		},
+		clear: function clear() {
+			for (var i = 0; i < this.children.length; i++) {
+				var object = this.children[i];
+				object.parent = null;
+				object.dispatchEvent(_removedEvent);
+			}
+
+			this.children.length = 0;
 			return this;
 		},
 		attach: function attach(object) {
@@ -6542,7 +6610,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.r = array[offset];
 			this.g = array[offset + 1];
 			this.b = array[offset + 2];
@@ -6550,8 +6621,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			array[offset] = this.r;
 			array[offset + 1] = this.g;
 			array[offset + 2] = this.b;
@@ -9419,7 +9496,15 @@
 		mapping = mapping !== undefined ? mapping : CubeReflectionMapping;
 		format = format !== undefined ? format : RGBFormat;
 		Texture.call(this, images, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding);
-		this.flipY = false;
+		this.flipY = false; // Why CubeTexture._needsFlipEnvMap is necessary:
+		//
+		// By convention -- likely based on the RenderMan spec from the 1990's -- cube maps are specified by WebGL (and three.js)
+		// in a coordinate system in which positive-x is to the right when looking up the positive-z axis -- in other words,
+		// in a left-handed coordinate system. By continuing this convention, preexisting cube maps continued to render correctly.
+		// three.js uses a right-handed coordinate system. So environment maps used in three.js appear to have px and nx swapped
+		// and the flag _needsFlipEnvMap controls this conversion. The flip is not required (and thus _needsFlipEnvMap is set to false)
+		// when using WebGLCubeRenderTarget.texture as a cube texture.
+
 		this._needsFlipEnvMap = true;
 	}
 
@@ -11534,6 +11619,7 @@
 							renderer.setRenderTarget(currentRenderTarget);
 							renderer.setRenderList(currentRenderList);
 							renderer.setRenderState(currentRenderState);
+							texture.addEventListener('dispose', onTextureDispose);
 							return mapTextureMapping(renderTarget.texture, texture.mapping);
 						} else {
 							// image not yet ready. try the conversion next frame
@@ -11544,6 +11630,17 @@
 			}
 
 			return texture;
+		}
+
+		function onTextureDispose(event) {
+			var texture = event.target;
+			texture.removeEventListener('dispose', onTextureDispose);
+			var cubemap = cubemaps.get(texture);
+
+			if (cubemap !== undefined) {
+				cubemaps.delete(texture);
+				cubemap.dispose();
+			}
 		}
 
 		function dispose() {
@@ -11625,7 +11722,7 @@
 				wireframeAttributes.delete(buffergeometry);
 			}
 
-			bindingStates.releaseStatesOfGeometry(geometry);
+			bindingStates.releaseStatesOfGeometry(buffergeometry);
 
 			if (geometry.isInstancedBufferGeometry === true) {
 				delete geometry._maxInstanceCount;
@@ -17723,8 +17820,8 @@
 		this.compile = function (scene, camera) {
 			currentRenderState = renderStates.get(scene, camera);
 			currentRenderState.init();
-			scene.traverse(function (object) {
-				if (object.isLight) {
+			scene.traverseVisible(function (object) {
+				if (object.isLight && object.layers.test(camera.layers)) {
 					currentRenderState.pushLight(object);
 
 					if (object.castShadow) {
@@ -25272,7 +25369,7 @@
 			if (referenceFrame === undefined) referenceFrame = 0;
 			if (referenceClip === undefined) referenceClip = targetClip;
 			if (fps === undefined || fps <= 0) fps = 30;
-			var numTracks = targetClip.tracks.length;
+			var numTracks = referenceClip.tracks.length;
 			var referenceTime = referenceFrame / fps; // Make each track's values relative to the values at the reference frame
 
 			var _loop = function _loop(i) {
@@ -28970,7 +29067,10 @@
 		};
 
 		_proto.fromArray = function fromArray(array, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			var coefficients = this.coefficients;
 
 			for (var i = 0; i < 9; i++) {
@@ -28981,8 +29081,14 @@
 		};
 
 		_proto.toArray = function toArray(array, offset) {
-			if (array === undefined) array = [];
-			if (offset === undefined) offset = 0;
+			if (array === void 0) {
+				array = [];
+			}
+
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			var coefficients = this.coefficients;
 
 			for (var i = 0; i < 9; i++) {

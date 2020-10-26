@@ -19,17 +19,17 @@
 
 			import * as THREE from '../build/three.module.js';
 
-			var camera, scene, renderer;
-			var cube, sphere, torus, material;
+			let camera, scene, renderer;
+			let cube, sphere, torus, material;
 
-			var count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
+			let count = 0, cubeCamera1, cubeCamera2, cubeRenderTarget1, cubeRenderTarget2;
 
-			var onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
+			let onPointerDownPointerX, onPointerDownPointerY, onPointerDownLon, onPointerDownLat;
 
-			var lon = 0, lat = 0;
-			var phi = 0, theta = 0;
+			let lon = 0, lat = 0;
+			let phi = 0, theta = 0;
 
-			var textureLoader = new THREE.TextureLoader();
+			const textureLoader = new THREE.TextureLoader();
 
 			textureLoader.load( 'textures/2294472375_24a3b8ef46_o.jpg', function ( texture ) {
 
@@ -82,7 +82,7 @@
 					reflectivity: 1
 				} );
 
-				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 3 ), material );
+				sphere = new THREE.Mesh( new THREE.IcosahedronBufferGeometry( 20, 8 ), material );
 				scene.add( sphere );
 
 				cube = new THREE.Mesh( new THREE.BoxBufferGeometry( 20, 20, 20 ), material );
@@ -140,7 +140,7 @@
 
 			function onDocumentMouseWheel( event ) {
 
-				var fov = camera.fov + event.deltaY * 0.05;
+				const fov = camera.fov + event.deltaY * 0.05;
 
 				camera.fov = THREE.MathUtils.clamp( fov, 10, 75 );
 
@@ -157,7 +157,7 @@
 
 			function render() {
 
-				var time = Date.now();
+				const time = Date.now();
 
 				lon += .15;
 

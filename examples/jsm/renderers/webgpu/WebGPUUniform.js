@@ -7,8 +7,10 @@ class WebGPUUniform {
 		this.name = name;
 		this.value = value;
 
-		this.byteLength = 0;
+		this.boundary = 0; // used to build the uniform buffer according to the STD140 layout
 		this.itemSize = 0;
+
+		this.offset = 0; // this property is set by WebGPUUniformsGroup and marks the start position in the uniform buffer
 
 	}
 
@@ -26,7 +28,7 @@ class FloatUniform extends WebGPUUniform {
 
 		super( name, value );
 
-		this.byteLength = 4;
+		this.boundary = 4;
 		this.itemSize = 1;
 
 		Object.defineProperty( this, 'isFloatUniform', { value: true } );
@@ -41,7 +43,7 @@ class Vector2Uniform extends WebGPUUniform {
 
 		super( name, value );
 
-		this.byteLength = 8;
+		this.boundary = 8;
 		this.itemSize = 2;
 
 		Object.defineProperty( this, 'isVector2Uniform', { value: true } );
@@ -56,7 +58,7 @@ class Vector3Uniform extends WebGPUUniform {
 
 		super( name, value );
 
-		this.byteLength = 12;
+		this.boundary = 16;
 		this.itemSize = 3;
 
 		Object.defineProperty( this, 'isVector3Uniform', { value: true } );
@@ -71,7 +73,7 @@ class Vector4Uniform extends WebGPUUniform {
 
 		super( name, value );
 
-		this.byteLength = 16;
+		this.boundary = 16;
 		this.itemSize = 4;
 
 		Object.defineProperty( this, 'isVector4Uniform', { value: true } );
@@ -86,7 +88,7 @@ class ColorUniform extends WebGPUUniform {
 
 		super( name, value );
 
-		this.byteLength = 12;
+		this.boundary = 16;
 		this.itemSize = 3;
 
 		Object.defineProperty( this, 'isColorUniform', { value: true } );
@@ -101,7 +103,7 @@ class Matrix3Uniform extends WebGPUUniform {
 
 		super( name, value );
 
-		this.byteLength = 48; // (3 * 4) * 4 bytes
+		this.boundary = 48;
 		this.itemSize = 12;
 
 		Object.defineProperty( this, 'isMatrix3Uniform', { value: true } );
@@ -116,7 +118,7 @@ class Matrix4Uniform extends WebGPUUniform {
 
 		super( name, value );
 
-		this.byteLength = 64;
+		this.boundary = 64;
 		this.itemSize = 16;
 
 		Object.defineProperty( this, 'isMatrix4Uniform', { value: true } );

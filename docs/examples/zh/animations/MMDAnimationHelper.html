@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -19,7 +18,7 @@
 
 		<code>
 		// Instantiate a helper
-		var helper = new MMDAnimationHelper();
+		const helper = new MMDAnimationHelper();
 
 		// Load MMD resources and add to helper
 		new MMDLoader().loadWithAnimation(
@@ -38,9 +37,8 @@
 					'audios/mmd/song.mp3',
 					function ( buffer ) {
 
-						var listener = new THREE.AudioListener();
-						var audio = new THREE.Audio( listener )
-							.setBuffer( buffer );
+						const listener = new THREE.AudioListener();
+						const audio = new THREE.Audio( listener ).setBuffer( buffer );
 
 						listener.position.z = 1;
 

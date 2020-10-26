@@ -30,6 +30,20 @@ class WebGPURenderPipelines {
 
 	get( object ) {
 
+		// @TODO: Avoid a 1:1 relationship between pipelines and objects. It's necessary
+		// to check various conditions in order to request an appropriate pipeline.
+		//
+		// - material's version and node configuration
+		// - environment map (material)
+		// - fog and environment (scene)
+		// - output encoding (renderer)
+		// - light state
+		// - clipping planes
+		//
+		// The renderer needs to manage multiple pipelines per object so
+		// GPUDevice.createRenderPipeline() is only called when no pipeline exists for the
+		// current configuration.
+
 		let pipeline = this.pipelines.get( object );
 
 		if ( pipeline === undefined ) {

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -56,7 +55,7 @@
 
 			This means that calling
 		<code>
-var m = new THREE.Matrix4();
+const m = new THREE.Matrix4();
 
 m.set( 11, 12, 13, 14,
        21, 22, 23, 24,
@@ -88,7 +87,7 @@ m.elements = [ 11, 21, 31, 41,
 					[page:Vector3.setFromMatrixScale]: can be used to extract the scale component.
 				</li>
 				<li>
-					[page:Quaternion.setFromRotationMatrix], [page:Euler.setFromRotationMatrix] or [page:.extractRotation extractRotation] can be used to extract the rotation component.
+					[page:Quaternion.setFromRotationMatrix], [page:Euler.setFromRotationMatrix] or [page:.extractRotation extractRotation] can be used to extract the rotation component from a pure (unscaled) matrix.
 				</li>
 				<li>
 					[page:.decompose decompose] can be used to extract position, rotation and scale all at once.

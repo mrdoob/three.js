@@ -209,6 +209,8 @@ class WebGPUTextures {
 				usage: GPUTextureUsage.OUTPUT_ATTACHMENT | GPUTextureUsage.SAMPLED
 			} );
 
+			this.info.memory.textures ++;
+
 			renderTargetProperties.colorTextureGPU = colorTextureGPU;
 			renderTargetProperties.colorTextureFormat = colorTextureFormat;
 
@@ -234,6 +236,8 @@ class WebGPUTextures {
 					format: depthTextureFormat,
 					usage: GPUTextureUsage.OUTPUT_ATTACHMENT
 				} );
+
+				this.info.memory.textures ++;
 
 				renderTargetProperties.depthTextureGPU = depthTextureGPU;
 				renderTargetProperties.depthTextureFormat = depthTextureFormat;
@@ -340,7 +344,7 @@ class WebGPUTextures {
 
 		// transfer texture data
 
-		if ( texture.isDataTexture ) {
+		if ( texture.isDataTexture || texture.isDataTexture2DArray || texture.isDataTexture3D ) {
 
 			this._copyBufferToTexture( image, format, textureGPU );
 
@@ -727,9 +731,13 @@ function onRenderTargetDispose( event ) {
 	renderTargetProperties.colorTextureGPU.destroy();
 	properties.remove( renderTarget.texture );
 
+	this.info.memory.textures --;
+
 	if ( renderTarget.depthBuffer === true ) {
 
 		renderTargetProperties.depthTextureGPU.destroy();
+
+		this.info.memory.textures --;
 
 		if ( renderTarget.depthTexture !== null ) {
 

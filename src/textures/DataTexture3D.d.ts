@@ -36,4 +36,6 @@ export class DataTexture3D extends Texture {
 	 */
 	generateMipmaps: boolean;
 
+	readonly isDataTexture3D: true;
+
 }

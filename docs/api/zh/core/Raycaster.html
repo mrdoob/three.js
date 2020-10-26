@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,8 +16,8 @@
 
 		<h2>代码示例</h2>
 		<code>
-		var raycaster = new THREE.Raycaster();
-		var mouse = new THREE.Vector2();
+		const raycaster = new THREE.Raycaster();
+		const mouse = new THREE.Vector2();
 
 		function onMouseMove( event ) {
 
@@ -35,9 +34,9 @@
 			raycaster.setFromCamera( mouse, camera );
 
 			// 计算物体和射线的焦点
-			var intersects = raycaster.intersectObjects( scene.children );
+			const intersects = raycaster.intersectObjects( scene.children );
 
-			for ( var i = 0; i < intersects.length; i++ ) {
+			for ( let i = 0; i < intersects.length; i ++ ) {
 
 				intersects[ i ].object.material.color.set( 0xff0000 );
 

@@ -100,7 +100,7 @@
 
 				// Material
 
-				const vertexShader = `#version 300 es
+				const vertexShader = /* glsl */`
 					in vec3 position;
 
 					uniform mat4 modelMatrix;
@@ -121,7 +121,7 @@
 					}
 				`;
 
-				const fragmentShader = `#version 300 es
+				const fragmentShader = /* glsl */`
 					precision highp float;
 					precision highp sampler3D;
 
@@ -140,6 +140,22 @@
 					uniform float range;
 					uniform float opacity;
 					uniform float steps;
+					uniform float frame;
+
+					uint wang_hash(uint seed)
+					{
+							seed = (seed ^ 61u) ^ (seed >> 16u);
+							seed *= 9u;
+							seed = seed ^ (seed >> 4u);
+							seed *= 0x27d4eb2du;
+							seed = seed ^ (seed >> 15u);
+							return seed;
+					}
+
+					float randomFloat(inout uint seed)
+					{
+							return float(wang_hash(seed)) / 4294967296.;
+					}
 
 					vec2 hitBox( vec3 orig, vec3 dir ) {
 						const vec3 box_min = vec3( - 0.5 );
@@ -164,7 +180,6 @@
 					}
 
 					void main(){
-
 						vec3 rayDir = normalize( vDirection );
 						vec2 bounds = hitBox( vOrigin, rayDir );
 
@@ -176,6 +191,17 @@
 						vec3 inc = 1.0 / abs( rayDir );
 						float delta = min( inc.x, min( inc.y, inc.z ) );
 						delta /= steps;
+
+						// Jitter
+
+						// Nice little seed from
+						// https://blog.demofox.org/2020/05/25/casual-shadertoy-path-tracing-1-basic-camera-diffuse-emissive/
+						uint seed = uint( gl_FragCoord.x ) * uint( 1973 ) + uint( gl_FragCoord.y ) * uint( 9277 ) + uint( frame ) * uint( 26699 );
+						vec3 size = vec3( textureSize( map, 0 ) );
+						float randNum = randomFloat( seed ) * 2.0 - 1.0;
+						p += rayDir * randNum * ( 1.0 / size );
+
+						//
 
 						vec4 ac = vec4( base, 0.0 );
 
@@ -206,6 +232,7 @@
 
 				const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 				const material = new THREE.RawShaderMaterial( {
+					glslVersion: THREE.GLSL3,
 					uniforms: {
 						base: { value: new THREE.Color( 0x798aa0 ) },
 						map: { value: texture },
@@ -213,7 +240,8 @@
 						threshold: { value: 0.25 },
 						opacity: { value: 0.25 },
 						range: { value: 0.1 },
-						steps: { value: 100 }
+						steps: { value: 100 },
+						frame: { value: 0 }
 					},
 					vertexShader,
 					fragmentShader,
@@ -226,7 +254,12 @@
 
 				//
 
-				const parameters = { threshold: 0.25, opacity: 0.25, range: 0.1, steps: 100 };
+				const parameters = {
+					threshold: 0.25,
+					opacity: 0.25,
+					range: 0.1,
+					steps: 100
+				};
 
 				function update() {
 
@@ -262,6 +295,8 @@
 
 				mesh.material.uniforms.cameraPos.value.copy( camera.position );
 				mesh.rotation.y = - performance.now() / 7500;
+
+				mesh.material.uniforms.frame.value ++;
 
 				renderer.render( scene, camera );
 

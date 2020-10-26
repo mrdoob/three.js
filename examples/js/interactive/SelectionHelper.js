@@ -16,14 +16,14 @@ THREE.SelectionHelper = ( function () {
 
 		this.isDown = false;
 
-		this.renderer.domElement.addEventListener( 'mousedown', function ( event ) {
+		this.renderer.domElement.addEventListener( 'pointerdown', function ( event ) {
 
 			this.isDown = true;
 			this.onSelectStart( event );
 
 		}.bind( this ), false );
 
-		this.renderer.domElement.addEventListener( 'mousemove', function ( event ) {
+		this.renderer.domElement.addEventListener( 'pointermove', function ( event ) {
 
 			if ( this.isDown ) {
 
@@ -33,7 +33,7 @@ THREE.SelectionHelper = ( function () {
 
 		}.bind( this ), false );
 
-		this.renderer.domElement.addEventListener( 'mouseup', function ( event ) {
+		this.renderer.domElement.addEventListener( 'pointerup', function ( event ) {
 
 			this.isDown = false;
 			this.onSelectOver( event );
