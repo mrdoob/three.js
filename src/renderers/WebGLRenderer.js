@@ -66,7 +66,10 @@ function WebGLRenderer( parameters ) {
 		fragmentShader: " \
 		void main() { \
 			gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); \
-		}"
+		}",
+
+		depthWrite: false,
+		colorWrite: false
 
 	} );
 
@@ -1052,26 +1055,20 @@ function WebGLRenderer( parameters ) {
 
 		if ( _this.capabilities.isWebGL2 === true && _this.occlusionCulling === true ) {
 
-			state.buffers.depth.setMask( false );
-			state.buffers.color.setMask( false );
-
 			if ( opaqueObjects.length > 0 ) renderOcclusionQueryObjects( opaqueObjects, scene, camera );
 			if ( transparentObjects.length > 0 ) renderOcclusionQueryObjects( transparentObjects, scene, camera );
 
 			opaqueObjects = opaqueObjects.filter( function ( renderItem ) {
 
-				return renderItem.object._occluded === false;
+				return ! renderItem.object._occluded;
 
 			} );
 
 			transparentObjects = transparentObjects.filter( function ( renderItem ) {
 
-				return renderItem.object._occluded === false;
+				return ! renderItem.object._occluded;
 
 			} );
-
-			state.buffers.depth.setMask( true );
-			state.buffers.color.setMask( true );
 
 		}
 
@@ -1346,6 +1343,8 @@ function WebGLRenderer( parameters ) {
 
 			const renderItem = renderList[ i ];
 
+			if ( renderItem.material.depthWrite === false ) continue;
+
 			const object = renderItem.object;
 			const geometry = renderItem.geometry;
 			const material = _occlusionQueryMaterial;
@@ -1355,13 +1354,13 @@ function WebGLRenderer( parameters ) {
 
 				object._query = _gl.createQuery();
 				object._queryInProgress = false;
-				object._occluded = false;
 
 			}
 
+			object._occluded = false;
 			if ( object._queryInProgress && _gl.getQueryParameter( object._query, _gl.QUERY_RESULT_AVAILABLE ) ) {
 
-				object._occluded = ! _gl.getQueryParameter( object._query, _gl.QUERY_RESULT );
+				object._occluded = _gl.getQueryParameter( object._query, _gl.QUERY_RESULT ) === 0;
 				object._queryInProgress = false;
 
 			}
