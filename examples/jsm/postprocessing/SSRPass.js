@@ -74,7 +74,21 @@ var SSRPass = function({ scene, camera, width, height, selects, encoding, isPers
       this.ssrMaterial.defines.isDistanceAttenuation = val
       this.ssrMaterial.needsUpdate = true
     }
-  })
+	})
+
+
+  this._isFresnel = SSRShader.defines.isFresnel
+  Object.defineProperty(this, 'isFresnel', {
+    get() {
+      return this._isFresnel
+    },
+    set(val) {
+      if (this._isFresnel === val) return
+      this._isFresnel = val
+      this.ssrMaterial.defines.isFresnel = val
+      this.ssrMaterial.needsUpdate = true
+    }
+	})
 
   this._isInfiniteThick = SSRShader.defines.isInfiniteThick
   Object.defineProperty(this, 'isInfiniteThick', {

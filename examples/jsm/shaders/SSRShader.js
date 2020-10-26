@@ -13,6 +13,7 @@ var SSRShader = {
     MAX_STEP: 0,
     isPerspectiveCamera: true,
     isDistanceAttenuation: true,
+    isFresnel: true,
     isInfiniteThick: false,
     isNoise: false,
     isSelective: false,
@@ -146,8 +147,6 @@ var SSRShader = {
 				vec3 viewIncidenceDir=vec3(0,0,-1);
 				vec3 viewReflectDir=reflect(viewIncidenceDir,viewNormal);
 			#endif
-			// float angleCompensation=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
-			// vec3 d1viewPosition=viewPosition+viewReflectDir*(maxDistance*angleCompensation);
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxReflectRayLen;
 			#ifdef isPerspectiveCamera
 				if(d1viewPosition.z>-cameraNear){
@@ -203,6 +202,10 @@ var SSRShader = {
 						float ratio=1.-(distance/maxDistance);
 						float attenuation=ratio*ratio;
 						op=opacity*attenuation;
+					#endif
+					#ifdef isFresnel
+						float fresnel=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
+						op*=fresnel;
 					#endif
 					vec4 reflectColor=texture2D(tDiffuse,uv);
 					gl_FragColor.xyz=reflectColor.xyz;

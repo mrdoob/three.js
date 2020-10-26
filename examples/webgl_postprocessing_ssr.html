@@ -298,6 +298,7 @@
 		gui.add(params, 'enableSSR').name( 'Enable SSR' );
 		gui.add(ssrPass, 'isDistanceAttenuation');
 		gui.add(ssrPass, 'maxDistance').min(0).max(2000);
+		gui.add(ssrPass, 'isFresnel');
 		gui.add(ssrPass,'isBouncing')
 		gui.add(ssrPass, 'output', {
 			'Default': SSRPass.OUTPUT.Default,
