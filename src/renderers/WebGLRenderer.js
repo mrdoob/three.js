@@ -874,7 +874,7 @@ function WebGLRenderer( parameters ) {
 
 	this.compile = function ( scene, camera ) {
 
-		currentRenderState = renderStates.get( scene, 0 );
+		currentRenderState = renderStates.get( scene );
 		currentRenderState.init();
 
 		scene.traverseVisible( function ( object ) {

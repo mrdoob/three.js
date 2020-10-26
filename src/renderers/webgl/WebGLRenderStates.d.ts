@@ -22,7 +22,7 @@ interface WebGLRenderState {
 export class WebGLRenderStates {
 
 	// renderCallDepth indexes start from 0.
-	get( scene: Scene, renderCallDepth: number ): WebGLRenderState;
+	get( scene: Scene, renderCallDepth?: number ): WebGLRenderState;
 	dispose(): void;
 
 }
