@@ -30,7 +30,7 @@ var SSRShader = {
     "cameraProjectionMatrix": { value: new Matrix4() },
     "cameraInverseProjectionMatrix": { value: new Matrix4() },
     "opacity": { value: .5 },
-    "maxDistance": { value: 200 },
+    "maxDistance": { value: 180 },
     "cameraRange": { value: 0 },
     "surfDist": { value: .007 },
     "thickTolerance": { value: .03 },
@@ -56,6 +56,7 @@ var SSRShader = {
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
+		#define maxReflectRayLen 2000. ///todo: temp use, need calculated from maxDistance
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
 		uniform sampler2D tMetalness;
@@ -72,6 +73,17 @@ var SSRShader = {
 		uniform float thickTolerance;
 		uniform float noiseIntensity;
 		#include <packing>
+		float pointPlaneDistance(vec3 point,vec3 planePoint,vec3 planeNormal){
+			// https://mathworld.wolfram.com/Point-PlaneDistance.html
+			//// https://en.wikipedia.org/wiki/Plane_(geometry)
+			//// http://paulbourke.net/geometry/pointlineplane/
+			float a=planeNormal.x,b=planeNormal.y,c=planeNormal.z;
+			float x0=point.x,y0=point.y,z0=point.z;
+			float x=planePoint.x,y=planePoint.y,z=planePoint.z;
+			float d=-(a*x+b*y+c*z);
+			float distance=(a*x0+b*y0+c*z0+d)/sqrt(a*a+b*b+c*c);
+			return distance;
+		}
 		float getDepth( const in vec2 uv ) {
 			return texture2D( tDepth, uv ).x;
 		}
@@ -136,7 +148,7 @@ var SSRShader = {
 			#endif
 			// float angleCompensation=(dot(viewIncidenceDir,viewReflectDir)+1.)/2.;
 			// vec3 d1viewPosition=viewPosition+viewReflectDir*(maxDistance*angleCompensation);
-			vec3 d1viewPosition=viewPosition+viewReflectDir*maxDistance;
+			vec3 d1viewPosition=viewPosition+viewReflectDir*maxReflectRayLen;
 			#ifdef isPerspectiveCamera
 				if(d1viewPosition.z>-cameraNear){
 					//https://tutorial.math.lamar.edu/Classes/CalcIII/EqnsOfLines.aspx
@@ -181,15 +193,17 @@ var SSRShader = {
 				float away=abs(viewReflectRayZ-vZ);
 
 				float op=opacity;
-				#ifdef isDistanceAttenuation
-					float one_minus_s=1.-s;
-					float attenuation=one_minus_s*one_minus_s;
-					op=opacity*attenuation;
-				#endif
 
 				if(away<sD){
 					vec3 vN=getViewNormal( uv );
 					if(dot(viewReflectDir,vN)>=0.) continue;
+					float distance=pointPlaneDistance(vP,viewPosition,viewNormal);
+					if(distance>maxDistance) break;
+					#ifdef isDistanceAttenuation
+						float ratio=1.-(distance/maxDistance);
+						float attenuation=ratio*ratio;
+						op=opacity*attenuation;
+					#endif
 					vec4 reflectColor=texture2D(tDiffuse,uv);
 					gl_FragColor.xyz=reflectColor.xyz;
 					gl_FragColor.a=op;
