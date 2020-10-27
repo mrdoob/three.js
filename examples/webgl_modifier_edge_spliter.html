@@ -13,7 +13,7 @@
 			import * as THREE from '../build/three.module.js';
 
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
-			import { STLLoader } from "./jsm/loaders/STLLoader.js";
+			import { OBJLoader } from "./jsm/loaders/OBJLoader.js";
 			import { BufferGeometryUtils } from "./jsm/utils/BufferGeometryUtils.js";
 			import { EdgeSplitModifier } from "./jsm/modifiers/EdgeSplitModifier.js";
 
@@ -25,7 +25,7 @@
 			const params = {
 				smoothShading: false,
 				edgeSplit: false,
-				cutOffAngle: 30,
+				cutOffAngle: 20,
 			};
 
 			init();
@@ -59,20 +59,25 @@
 
 				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444 ) );
 
-				new STLLoader().load(
-					'./models/stl/binary/roman_soldier.stl',
-					function ( stlGeometry ) {
+				new OBJLoader().load(
+					'./models/obj/cerberus/cerberus.obj',
+					function ( group ) {
+
+						// Retrieve Cerberus vertex positions only
+						const modelGeometry = group.children[ 0 ].geometry;
+						modelGeometry.deleteAttribute( 'normal' );
+						modelGeometry.deleteAttribute( 'uv' );
 
 						modifier = new EdgeSplitModifier();
-						baseGeometry = stlGeometry;
+						baseGeometry = modelGeometry;
 
 						console.log( "Loaded" );
 
 						mesh = new THREE.Mesh( getGeometry(), new THREE.MeshStandardMaterial() );
 						mesh.material.flatShading = ! params.smoothShading;
-						mesh.rotateX( - Math.PI / 2 );
-						mesh.scale.set( 0.1, 0.1, 0.1 );
-						mesh.translateZ( - 1.5 );
+						mesh.rotateY( - Math.PI / 2 );
+						mesh.scale.set( 3.5, 3.5, 3.5 );
+						mesh.translateZ( 1.5 );
 						scene.add( mesh );
 
 						render();
