@@ -21,7 +21,7 @@
 			import * as THREE from "../build/three.module.js";
 			import { TransformControls } from "./jsm/controls/TransformControls.js";
 			import Stats from "./jsm/libs/stats.module.js";
-			import { Flow } from "./jsm/misc/CurveModifier.js";
+			import { Flow } from "./jsm/modifiers/CurveModifier.js";
 
 			const ACTION_SELECT = 1,
 				ACTION_NONE = 0;
@@ -69,7 +69,7 @@
 					handle.position.copy( handlePos );
 					curveHandles.push( handle );
 					scene.add( handle );
-			
+
 				}
 
 				const curve = new THREE.CatmullRomCurve3(
@@ -128,9 +128,9 @@
 					flow = new Flow( objectToCurve );
 					flow.updateCurve( 0, curve );
 					scene.add( flow.object3D );
-			
+
 				} );
-			
+
 				//
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -146,7 +146,7 @@
 						action = ACTION_SELECT;
 						mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
 						mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-			
+
 					},
 					false
 				);
@@ -162,7 +162,7 @@
 						flow.updateCurve( 0, curve );
 
 					}
-			
+
 				} );
 
 				stats = new Stats();
@@ -197,7 +197,7 @@
 						const target = intersects[ 0 ].object;
 						control.attach( target );
 						scene.add( control );
-			
+
 					}
 
 				}
@@ -205,7 +205,7 @@
 				if ( flow ) {
 
 					flow.moveAlongCurve( 0.001 );
-			
+
 				}
 
 				render();
@@ -219,7 +219,7 @@
 				if ( mixer ) {
 
 					mixer.update( delta );
-			
+
 				}
 
 				renderer.render( scene, camera );
