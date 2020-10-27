@@ -9,6 +9,7 @@ import {
 	UVMapping,
 	UniformsLib
 } from "../../../build/three.module.js";
+
 /**
  * Uniforms library for RectAreaLight shared webgl shaders
  *

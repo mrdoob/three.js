@@ -1,4 +1,3 @@
-
 import { Pass } from "../postprocessing/Pass.js";
 
 var RenderPass = function ( scene, camera, overrideMaterial, clearColor, clearAlpha ) {

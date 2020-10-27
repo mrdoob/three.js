@@ -1,4 +1,3 @@
-
 /**
  * Hue and saturation adjustment
  * https://github.com/evanw/glfx.js
