@@ -45,6 +45,6 @@ export class AnimationClip {
 		animation: any,
 		bones: Bone[]
 	): AnimationClip;
-	static toJSON(): any;
+	static toJSON( json: any): any;
 
 }
