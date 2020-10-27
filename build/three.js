@@ -9220,7 +9220,7 @@
 				target = new Vector3();
 			}
 
-			this.updateMatrixWorld(true);
+			this.updateWorldMatrix(true, false);
 			var e = this.matrixWorld.elements;
 			return target.set(-e[8], -e[9], -e[10]).normalize();
 		},
@@ -13833,7 +13833,7 @@
 		return (lightB.castShadow ? 1 : 0) - (lightA.castShadow ? 1 : 0);
 	}
 
-	function WebGLLights() {
+	function WebGLLights(extensions, capabilities) {
 		var cache = new UniformsCache();
 		var shadowCache = ShadowUniformsCache();
 		var state = {
@@ -14054,8 +14054,22 @@
 			}
 
 			if (rectAreaLength > 0) {
-				state.rectAreaLTC1 = UniformsLib.LTC_1;
-				state.rectAreaLTC2 = UniformsLib.LTC_2;
+				if (capabilities.isWebGL2) {
+					// WebGL 2
+					state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
+					state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
+				} else {
+					// WebGL 1
+					if (extensions.has('OES_texture_float_linear') === true) {
+						state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
+						state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
+					} else if (extensions.has('OES_texture_half_float_linear') === true) {
+						state.rectAreaLTC1 = UniformsLib.LTC_HALF_1;
+						state.rectAreaLTC2 = UniformsLib.LTC_HALF_2;
+					} else {
+						console.error('THREE.WebGLRenderer: Unable to use RectAreaLight. Missing WebGL extensions.');
+					}
+				}
 			}
 
 			state.ambient[0] = r;
@@ -14096,8 +14110,8 @@
 		};
 	}
 
-	function WebGLRenderState() {
-		var lights = new WebGLLights();
+	function WebGLRenderState(extensions, capabilities) {
+		var lights = new WebGLLights(extensions, capabilities);
 		var lightsArray = [];
 		var shadowsArray = [];
 
@@ -14132,19 +14146,19 @@
 		};
 	}
 
-	function WebGLRenderStates() {
+	function WebGLRenderStates(extensions, capabilities) {
 		var renderStates = new WeakMap();
 
 		function get(scene, camera) {
 			var renderState;
 
 			if (renderStates.has(scene) === false) {
-				renderState = new WebGLRenderState();
+				renderState = new WebGLRenderState(extensions, capabilities);
 				renderStates.set(scene, new WeakMap());
 				renderStates.get(scene).set(camera, renderState);
 			} else {
 				if (renderStates.get(scene).has(camera) === false) {
-					renderState = new WebGLRenderState();
+					renderState = new WebGLRenderState(extensions, capabilities);
 					renderStates.get(scene).set(camera, renderState);
 				} else {
 					renderState = renderStates.get(scene).get(camera);
@@ -17431,7 +17445,7 @@
 			programCache = new WebGLPrograms(_this, cubemaps, extensions, capabilities, bindingStates, clipping);
 			materials = new WebGLMaterials(properties);
 			renderLists = new WebGLRenderLists(properties);
-			renderStates = new WebGLRenderStates();
+			renderStates = new WebGLRenderStates(extensions, capabilities);
 			background = new WebGLBackground(_this, cubemaps, state, objects, _premultipliedAlpha);
 			bufferRenderer = new WebGLBufferRenderer(_gl, extensions, info, capabilities);
 			indexedBufferRenderer = new WebGLIndexedBufferRenderer(_gl, extensions, info, capabilities);
@@ -29190,12 +29204,12 @@
 			var material = new Materials[json.type]();
 			if (json.uuid !== undefined) material.uuid = json.uuid;
 			if (json.name !== undefined) material.name = json.name;
-			if (json.color !== undefined) material.color.setHex(json.color);
+			if (json.color !== undefined && material.color !== undefined) material.color.setHex(json.color);
 			if (json.roughness !== undefined) material.roughness = json.roughness;
 			if (json.metalness !== undefined) material.metalness = json.metalness;
 			if (json.sheen !== undefined) material.sheen = new Color().setHex(json.sheen);
-			if (json.emissive !== undefined) material.emissive.setHex(json.emissive);
-			if (json.specular !== undefined) material.specular.setHex(json.specular);
+			if (json.emissive !== undefined && material.emissive !== undefined) material.emissive.setHex(json.emissive);
+			if (json.specular !== undefined && material.specular !== undefined) material.specular.setHex(json.specular);
 			if (json.shininess !== undefined) material.shininess = json.shininess;
 			if (json.clearcoat !== undefined) material.clearcoat = json.clearcoat;
 			if (json.clearcoatRoughness !== undefined) material.clearcoatRoughness = json.clearcoatRoughness;
@@ -31105,10 +31119,10 @@
 
 			if (this._connected === true) {
 				this.disconnect();
-				this.filters = value;
+				this.filters = value.slice();
 				this.connect();
 			} else {
-				this.filters = value;
+				this.filters = value.slice();
 			}
 
 			return this;
@@ -32178,7 +32192,10 @@
 						var _lastIndex = --nObjects,
 								_lastObject = objects[_lastIndex];
 
-						indicesByUUID[_lastObject.uuid] = index;
+						if (_lastIndex > 0) {
+							indicesByUUID[_lastObject.uuid] = index;
+						}
+
 						objects[index] = _lastObject;
 						objects.pop(); // accounting is done, now do the same for all bindings
 
