@@ -9475,17 +9475,6 @@
 			renderer.setRenderTarget(currentRenderTarget);
 			renderer.xr.enabled = currentXrEnabled;
 		};
-
-		this.clear = function (renderer, color, depth, stencil) {
-			var currentRenderTarget = renderer.getRenderTarget();
-
-			for (var i = 0; i < 6; i++) {
-				renderer.setRenderTarget(renderTarget, i);
-				renderer.clear(color, depth, stencil);
-			}
-
-			renderer.setRenderTarget(currentRenderTarget);
-		};
 	}
 
 	CubeCamera.prototype = Object.create(Object3D.prototype);
@@ -9577,6 +9566,17 @@
 		mesh.geometry.dispose();
 		mesh.material.dispose();
 		return this;
+	};
+
+	WebGLCubeRenderTarget.prototype.clear = function (renderer, color, depth, stencil) {
+		var currentRenderTarget = renderer.getRenderTarget();
+
+		for (var i = 0; i < 6; i++) {
+			renderer.setRenderTarget(this, i);
+			renderer.clear(color, depth, stencil);
+		}
+
+		renderer.setRenderTarget(currentRenderTarget);
 	};
 
 	function DataTexture(data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding) {
@@ -36717,6 +36717,11 @@
 	CubeCamera.prototype.updateCubeMap = function (renderer, scene) {
 		console.warn('THREE.CubeCamera: .updateCubeMap() is now .update().');
 		return this.update(renderer, scene);
+	};
+
+	CubeCamera.prototype.clear = function (renderer, color, depth, stencil) {
+		console.warn('THREE.CubeCamera: .clear() is now .renderTarget.clear().');
+		return this.renderTarget.clear(renderer, color, depth, stencil);
 	}; //
 
 
