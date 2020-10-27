@@ -1,4 +1,4 @@
-const list = {
+{
 
 	"en": {
 
@@ -109,7 +109,7 @@ const list = {
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
 				"PMREMGenerator": "api/en/extras/PMREMGenerator",
-				"ShapeUtils": "api/en/extras/ShapeUtils",
+				"ShapeUtils": "api/en/extras/ShapeUtils"
 			},
 
 			"Extras / Core": {
@@ -136,7 +136,7 @@ const list = {
 			},
 
 			"Extras / Objects": {
-				"ImmediateRenderObject": "api/en/extras/objects/ImmediateRenderObject",
+				"ImmediateRenderObject": "api/en/extras/objects/ImmediateRenderObject"
 			},
 
 			"Geometries": {
@@ -406,7 +406,7 @@ const list = {
 			},
 
 			"Objects": {
-				"Lensflare": "examples/en/objects/Lensflare",
+				"Lensflare": "examples/en/objects/Lensflare"
 			},
 
 			"Post-Processing": {
@@ -421,7 +421,7 @@ const list = {
 
 			"Math": {
 				"LookupTable": "examples/en/math/Lut",
-				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler",
+				"MeshSurfaceSampler": "examples/en/math/MeshSurfaceSampler"
 			},
 
 			"ConvexHull": {
@@ -529,8 +529,8 @@ const list = {
 			"Cameras": {
 				"ArrayCamera": "api/ar/cameras/ArrayCamera",
 				"Camera": "api/ar/cameras/Camera",
-				"CubeCamera": "api/ar/cameras/CubeCamera",
-			},
+				"CubeCamera": "api/ar/cameras/CubeCamera"
+			}
 
 		}
 
@@ -672,7 +672,7 @@ const list = {
 			},
 
 			"附件 / 物体": {
-				"ImmediateRenderObject": "api/zh/extras/objects/ImmediateRenderObject",
+				"ImmediateRenderObject": "api/zh/extras/objects/ImmediateRenderObject"
 			},
 
 			"几何体": {
@@ -941,7 +941,7 @@ const list = {
 			},
 
 			"物体": {
-				"Lensflare": "examples/zh/objects/Lensflare",
+				"Lensflare": "examples/zh/objects/Lensflare"
 			},
 
 			"后期处理": {
@@ -956,7 +956,7 @@ const list = {
 
 			"数学库": {
 				"LookupTable": "examples/zh/math/Lut",
-				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler",
+				"MeshSurfaceSampler": "examples/zh/math/MeshSurfaceSampler"
 			},
 
 			"QuickHull": {
@@ -997,4 +997,4 @@ const list = {
 
 	}
 
-};
+}

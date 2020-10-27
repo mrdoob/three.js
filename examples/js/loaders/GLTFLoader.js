@@ -1,5 +1,3 @@
-console.warn( "THREE.GLTFLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
 THREE.GLTFLoader = ( function () {
 
 	function GLTFLoader( manager ) {
@@ -22,6 +20,12 @@ THREE.GLTFLoader = ( function () {
 		this.register( function ( parser ) {
 
 			return new GLTFTextureBasisUExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
+			return new GLTFTextureWebPExtension( parser );
 
 		} );
 
@@ -349,6 +353,7 @@ THREE.GLTFLoader = ( function () {
 		KHR_TEXTURE_BASISU: 'KHR_texture_basisu',
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 		KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
+		EXT_TEXTURE_WEBP: 'EXT_texture_webp',
 		EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
 		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
 	};
@@ -711,11 +716,94 @@ THREE.GLTFLoader = ( function () {
 
 		if ( ! loader ) {
 
-			throw new Error( 'THREE.GLTFLoader: setKTX2Loader must be called before loading KTX2 textures' );
+			if ( json.extensionsRequired && json.extensionsRequired.indexOf( this.name ) >= 0 ) {
+
+				throw new Error( 'THREE.GLTFLoader: setKTX2Loader must be called before loading KTX2 textures' );
+
+			} else {
+
+				// Assumes that the extension is optional and that a fallback texture is present
+				return null;
+
+			}
 
 		}
 
 		return parser.loadTextureImage( textureIndex, source, loader );
+
+	};
+
+	/**
+	 * WebP Texture Extension
+	 *
+	 * Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_texture_webp
+	 */
+	function GLTFTextureWebPExtension( parser ) {
+
+		this.parser = parser;
+		this.name = EXTENSIONS.EXT_TEXTURE_WEBP;
+		this.isSupported = null;
+
+	}
+
+	GLTFTextureWebPExtension.prototype.loadTexture = function ( textureIndex ) {
+
+		var name = this.name;
+		var parser = this.parser;
+		var json = parser.json;
+
+		var textureDef = json.textures[ textureIndex ];
+
+		if ( ! textureDef.extensions || ! textureDef.extensions[ name ] ) {
+
+			return null;
+
+		}
+
+		var extension = textureDef.extensions[ name ];
+		var source = json.images[ extension.source ];
+		var loader = source.uri ? parser.options.manager.getHandler( source.uri ) : parser.textureLoader;
+
+		return this.detectSupport().then( function ( isSupported ) {
+
+			if ( isSupported ) return parser.loadTextureImage( textureIndex, source, loader );
+
+			if ( json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
+
+				throw new Error( 'THREE.GLTFLoader: WebP required by asset but unsupported.' );
+
+			}
+
+			// Fall back to PNG or JPEG.
+			return parser.loadTexture( textureIndex );
+
+		} );
+
+	};
+
+	GLTFTextureWebPExtension.prototype.detectSupport = function () {
+
+		if ( ! this.isSupported ) {
+
+			this.isSupported = new Promise( function ( resolve ) {
+
+				var image = new Image();
+
+				// Lossy test image. Support for lossy images doesn't guarantee support for all
+				// WebP images, unfortunately.
+				image.src = 'data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEADsD+JaQAA3AAAAAA';
+
+				image.onload = image.onerror = function () {
+
+					resolve( image.height === 1 );
+
+				};
+
+			} );
+
+		}
+
+		return this.isSupported;
 
 	};
 

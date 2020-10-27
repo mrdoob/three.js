@@ -241,10 +241,6 @@ function convert( path, exampleDependencies, ignoreList ) {
 	var classNames = [];
 	var coreDependencies = {};
 
-	// remove examples/js deprecation warning
-
-	contents = contents.replace( /^console\.warn.*(\r\n|\r|\n)/, '' );
-
 	// class name
 
 	contents = contents.replace( /THREE\.([a-zA-Z0-9]+) = /g, function ( match, p1 ) {
@@ -302,7 +298,7 @@ function convert( path, exampleDependencies, ignoreList ) {
 		.sort()
 		.toString();
 
-	var imports = '';
+	var imports = [];
 
 	// compute path prefix for imports/exports
 
@@ -311,21 +307,21 @@ function convert( path, exampleDependencies, ignoreList ) {
 
 	// core imports
 
-	if ( keys ) imports += `import {${keys}\n} from "${pathPrefix}../../build/three.module.js";`;
+	if ( keys ) imports.push( `import {${keys}\n} from "${pathPrefix}../../build/three.module.js";` );
 
 	// example imports
 
 	for ( var dependency of exampleDependencies ) {
 
-		imports += `\nimport { ${dependency.name} } from "${pathPrefix}${dependency.path}";`;
+		imports.push( `import { ${dependency.name} } from "${pathPrefix}${dependency.path}";` );
 
 	}
 
-	// exports
+	var output = '';
 
-	var exports = `export { ${classNames.join( ", " )} };\n`;
+	if ( imports.length > 0 ) output += imports.join( '\n' ) + '\n\n';
 
-	var output = imports + '\n' + contents + '\n' + exports;
+	output += contents + `\nexport { ${classNames.join( ', ' )} };\n`;
 
 	// console.log( output );
 

@@ -225,7 +225,7 @@ function SidebarObject( editor ) {
 	// color
 
 	var objectColorRow = new UIRow();
-	var objectColor = new UIColor().onChange( update );
+	var objectColor = new UIColor().onInput( update );
 
 	objectColorRow.add( new UIText( strings.getKey( 'sidebar/object/color' ) ).setWidth( '90px' ) );
 	objectColorRow.add( objectColor );
@@ -235,7 +235,7 @@ function SidebarObject( editor ) {
 	// ground color
 
 	var objectGroundColorRow = new UIRow();
-	var objectGroundColor = new UIColor().onChange( update );
+	var objectGroundColor = new UIColor().onInput( update );
 
 	objectGroundColorRow.add( new UIText( strings.getKey( 'sidebar/object/groundcolor' ) ).setWidth( '90px' ) );
 	objectGroundColorRow.add( objectGroundColor );

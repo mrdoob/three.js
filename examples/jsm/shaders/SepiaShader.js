@@ -1,4 +1,3 @@
-
 /**
  * Sepia tone shader
  * based on glfx.js sepia shader
