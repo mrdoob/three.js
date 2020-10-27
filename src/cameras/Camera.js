@@ -43,7 +43,7 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		}
 
-		this.updateMatrixWorld( true );
+		this.updateWorldMatrix( true, false );
 
 		const e = this.matrixWorld.elements;
 

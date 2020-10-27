@@ -17,7 +17,9 @@ if ( ! window.frameElement && window.location.protocol !== 'file:' ) {
 
 	}
 
-	const pathSnippet = href.slice( splitIndex, - 5 );
+	const extension = href.split( '.' ).pop();
+	const end = ( extension === 'html' ) ? - 5 : href.length;
+	const pathSnippet = href.slice( splitIndex, end );
 
 	window.location.replace( docsBaseURL + '#' + pathSnippet + hash );
 
