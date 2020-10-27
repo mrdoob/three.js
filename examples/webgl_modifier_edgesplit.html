@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<title>three.js webgl - modifier - Edge split modifier</title>
+		<title>three.js webgl - modifier - Edge Split modifier</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
@@ -23,8 +23,8 @@
 			let modifier, mesh, baseGeometry;
 
 			const params = {
-				smoothShading: false,
-				edgeSplit: false,
+				smoothShading: true,
+				edgeSplit: true,
 				cutOffAngle: 20,
 			};
 
@@ -37,7 +37,7 @@
 				info.style.top = '10px';
 				info.style.width = '100%';
 				info.style.textAlign = 'center';
-				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Indexed geometry edge splitting';
+				info.innerHTML = '<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Edge Split modifier';
 				document.body.appendChild( info );
 
 				renderer = new THREE.WebGLRenderer( { antialias: true } );
@@ -60,7 +60,7 @@
 				scene.add( new THREE.HemisphereLight( 0xffffff, 0x444444 ) );
 
 				new OBJLoader().load(
-					'./models/obj/cerberus/cerberus.obj',
+					'./models/obj/cerberus/Cerberus.obj',
 					function ( group ) {
 
 						// Retrieve Cerberus vertex positions only
@@ -70,8 +70,6 @@
 
 						modifier = new EdgeSplitModifier();
 						baseGeometry = modelGeometry;
-
-						console.log( "Loaded" );
 
 						mesh = new THREE.Mesh( getGeometry(), new THREE.MeshStandardMaterial() );
 						mesh.material.flatShading = ! params.smoothShading;
@@ -110,16 +108,21 @@
 
 			function getGeometry() {
 
-				let g;
+				let geometry;
 
-				if ( params.edgeSplit )
-					g = modifier.modify( baseGeometry, params.cutOffAngle * Math.PI / 180 );
-				else
-					g = BufferGeometryUtils.mergeVertices( baseGeometry );
+				if ( params.edgeSplit ) {
 
-				g.computeVertexNormals();
+					geometry = modifier.modify( baseGeometry, params.cutOffAngle * Math.PI / 180 );
 
-				return g;
+				} else {
+
+					geometry = BufferGeometryUtils.mergeVertices( baseGeometry );
+
+				}
+
+				geometry.computeVertexNormals();
+
+				return geometry;
 
 			}
 
@@ -128,7 +131,7 @@
 
 				mesh.geometry = getGeometry();
 
-				mesh.material.flatShading = ! params.smoothShading;
+				mesh.material.flatShading = params.smoothShading === false;
 				mesh.material.needsUpdate = true;
 
 				render();

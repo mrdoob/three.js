@@ -179,6 +179,7 @@
 		"webgl_math_obb",
 		"webgl_math_orientation_transform",
 		"webgl_mirror",
+		"webgl_modifier_edgesplit",
 		"webgl_modifier_simplifier",
 		"webgl_modifier_subdivision",
 		"webgl_modifier_tessellation",
