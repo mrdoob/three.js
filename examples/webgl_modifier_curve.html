@@ -27,11 +27,10 @@
 				ACTION_NONE = 0;
 			const curveHandles = [];
 
-			let stats, clock;
+			let stats;
 			let scene,
 				camera,
 				renderer,
-				mixer,
 				rayCaster,
 				control,
 				mouse,
@@ -168,8 +167,6 @@
 				stats = new Stats();
 				document.body.appendChild( stats.dom );
 
-				clock = new THREE.Clock();
-
 				window.addEventListener( "resize", onWindowResize, false );
 
 			}
@@ -213,14 +210,6 @@
 			}
 
 			function render() {
-
-				const delta = clock.getDelta();
-
-				if ( mixer ) {
-
-					mixer.update( delta );
-
-				}
 
 				renderer.render( scene, camera );
 
