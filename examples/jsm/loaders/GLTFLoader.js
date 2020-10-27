@@ -789,24 +789,36 @@ var GLTFLoader = ( function () {
 
 	GLTFTextureWebPExtension.prototype.loadTexture = function ( textureIndex ) {
 
+		var name = this.name;
 		var parser = this.parser;
 		var json = parser.json;
 
 		var textureDef = json.textures[ textureIndex ];
 
-		if ( ! textureDef.extensions || ! textureDef.extensions[ this.name ] || ! this.detectSupport() ) {
+		if ( ! textureDef.extensions || ! textureDef.extensions[ name ] ) {
 
 			return null;
 
 		}
 
-		var extension = textureDef.extensions[ this.name ];
+		var extension = textureDef.extensions[ name ];
 		var source = json.images[ extension.source ];
 		var loader = source.uri ? parser.options.manager.getHandler( source.uri ) : parser.textureLoader;
 
-		return this.detectSupport()
-			.then( function () { return parser.loadTextureImage( textureIndex, source, loader ) } )
-			.catch( function () { return parser.loadTexture( textureIndex ); } );
+		return this.detectSupport().then( function ( isSupported ) {
+
+			if ( isSupported ) return parser.loadTextureImage( textureIndex, source, loader );
+
+			if ( ! isSupported && json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
+
+				throw new Error( 'THREE.GLTFLoader: WebP required by asset but unsupported.' );
+
+			}
+
+			// Fall back to PNG or JPEG.
+			return parser.loadTexture( textureIndex );
+
+		} );
 
 	};
 
@@ -824,7 +836,7 @@ var GLTFLoader = ( function () {
 
 				image.onload = image.onerror = function () {
 
-					image.height === 1 ? resolve() : reject();
+					resolve( image.height === 1 );
 
 				};
 
