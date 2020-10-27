@@ -7,6 +7,7 @@ THREE.GLTFLoader = ( function () {
 		this.dracoLoader = null;
 		this.ddsLoader = null;
 		this.ktx2Loader = null;
+		this.meshoptDecoder = null;
 
 		this.pluginCallbacks = [];
 
@@ -37,6 +38,12 @@ THREE.GLTFLoader = ( function () {
 		this.register( function ( parser ) {
 
 			return new GLTFLightsExtension( parser );
+
+		} );
+
+		this.register( function ( parser ) {
+
+			return new GLTFMeshoptCompression( parser );
 
 		} );
 
@@ -138,6 +145,13 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
+		setMeshoptDecoder: function ( meshoptDecoder ) {
+
+			this.meshoptDecoder = meshoptDecoder;
+			return this;
+
+		},
+
 		register: function ( callback ) {
 
 			if ( this.pluginCallbacks.indexOf( callback ) === - 1 ) {
@@ -213,7 +227,8 @@ THREE.GLTFLoader = ( function () {
 				path: path || this.resourcePath || '',
 				crossOrigin: this.crossOrigin,
 				manager: this.manager,
-				ktx2Loader: this.ktx2Loader
+				ktx2Loader: this.ktx2Loader,
+				meshoptDecoder: this.meshoptDecoder
 
 			} );
 
@@ -339,6 +354,7 @@ THREE.GLTFLoader = ( function () {
 		KHR_TEXTURE_TRANSFORM: 'KHR_texture_transform',
 		KHR_MESH_QUANTIZATION: 'KHR_mesh_quantization',
 		EXT_TEXTURE_WEBP: 'EXT_texture_webp',
+		EXT_MESHOPT_COMPRESSION: 'EXT_meshopt_compression',
 		MSFT_TEXTURE_DDS: 'MSFT_texture_dds'
 	};
 
@@ -717,7 +733,6 @@ THREE.GLTFLoader = ( function () {
 
 	};
 
-
 	/**
 	 * WebP Texture Extension
 	 *
@@ -789,6 +804,69 @@ THREE.GLTFLoader = ( function () {
 		}
 
 		return this.isSupported;
+
+	};
+
+	/**
+	* meshopt BufferView Compression Extension
+	*
+	* Specification: https://github.com/KhronosGroup/glTF/tree/master/extensions/2.0/Vendor/EXT_meshopt_compression
+	*/
+	function GLTFMeshoptCompression( parser ) {
+
+		this.name = EXTENSIONS.EXT_MESHOPT_COMPRESSION;
+		this.parser = parser;
+
+	}
+
+	GLTFMeshoptCompression.prototype.loadBufferView = function ( index ) {
+
+		var json = this.parser.json;
+		var bufferView = json.bufferViews[ index ];
+
+		if ( bufferView.extensions && bufferView.extensions[ this.name ] ) {
+
+			var extensionDef = bufferView.extensions[ this.name ];
+
+			var buffer = this.parser.getDependency( 'buffer', extensionDef.buffer );
+			var decoder = this.parser.options.meshoptDecoder;
+
+			if ( ! decoder || ! decoder.supported ) {
+
+				if ( json.extensionsRequired && json.extensionsRequired.indexOf( this.name ) >= 0 ) {
+
+					throw new Error( 'THREE.GLTFLoader: setMeshoptDecoder must be called before loading compressed files' );
+
+				} else {
+
+					// Assumes that the extension is optional and that fallback buffer data is present
+					return null;
+
+				}
+
+			}
+
+			return Promise.all( [ buffer, decoder.ready ] ).then( function ( res ) {
+
+				var byteOffset = extensionDef.byteOffset || 0;
+				var byteLength = extensionDef.byteLength || 0;
+
+				var count = extensionDef.count;
+				var stride = extensionDef.byteStride;
+
+				var result = new ArrayBuffer( count * stride );
+				var source = new Uint8Array( res[ 0 ], byteOffset, byteLength );
+
+				decoder.decodeGltfBuffer( new Uint8Array( result ), count, stride, source, extensionDef.mode, extensionDef.filter );
+				return result;
+
+			} );
+
+		} else {
+
+			return null;
+
+		}
 
 	};
 
