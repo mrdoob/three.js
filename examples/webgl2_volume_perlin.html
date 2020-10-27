@@ -49,11 +49,11 @@
 				// Texture
 
 				const size = 128;
-				const data = new Float32Array( size * size * size );
+				const data = new Uint8Array( size * size * size );
 
 				let i = 0;
-				const scale = 0.051;
 				const perlin = new ImprovedNoise();
+				const vector = new THREE.Vector3();
 
 				for ( let z = 0; z < size; z ++ ) {
 
@@ -61,8 +61,11 @@
 
 						for ( let x = 0; x < size; x ++ ) {
 
-							data[ i ] = 0.5 + 0.5 * perlin.noise( x * scale, y * scale, z * scale );
-							i ++;
+							vector.set( x, y, z ).divideScalar( size );
+
+							const d = perlin.noise( vector.x * 6.5, vector.y * 6.5, vector.z * 6.5 );
+
+							data[ i ++ ] = d * 128 + 128;
 
 						}
 
@@ -72,14 +75,13 @@
 
 				const texture = new THREE.DataTexture3D( data, size, size, size );
 				texture.format = THREE.RedFormat;
-				texture.type = THREE.FloatType;
 				texture.minFilter = THREE.LinearFilter;
 				texture.magFilter = THREE.LinearFilter;
 				texture.unpackAlignment = 1;
 
 				// Material
 
-				const vertexShader = `#version 300 es
+				const vertexShader = /* glsl */`
 					in vec3 position;
 
 					uniform mat4 modelMatrix;
@@ -100,7 +102,7 @@
 					}
 				`;
 
-				const fragmentShader = `#version 300 es
+				const fragmentShader = /* glsl */`
 					precision highp float;
 					precision highp sampler3D;
 
@@ -189,6 +191,7 @@
 
 				const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
 				const material = new THREE.RawShaderMaterial( {
+					glslVersion: THREE.GLSL3,
 					uniforms: {
 						map: { value: texture },
 						cameraPos: { value: new THREE.Vector3() },
@@ -216,7 +219,7 @@
 
 				const gui = new GUI();
 				gui.add( parameters, 'threshold', 0, 1, 0.01 ).onChange( update );
-				gui.add( parameters, 'steps', 0, 200, 1 ).onChange( update );
+				gui.add( parameters, 'steps', 0, 300, 1 ).onChange( update );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 

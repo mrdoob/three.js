@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8" />
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		[page:Object3D] &rarr; [page:Audio] &rarr;
+
+		<h1>[name]</h1>
+
+		<p class="desc">
+			تقوم بإنشاء كائن صوتي موضعي (positional).<br /><br />
+
+			يستخدم هذا [link:https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API Web Audio API].
+		</p>
+
+		<h2>مثال التعليمة البرمجية</h2>
+
+		<code>
+		// create an AudioListener and add it to the camera
+		const listener = new THREE.AudioListener();
+		camera.add( listener );
+
+		// create the PositionalAudio object (passing in the listener)
+		const sound = new THREE.PositionalAudio( listener );
+
+		// load a sound and set it as the PositionalAudio object's buffer
+		const audioLoader = new THREE.AudioLoader();
+		audioLoader.load( 'sounds/song.ogg', function( buffer ) {
+			sound.setBuffer( buffer );
+			sound.setRefDistance( 20 );
+			sound.play();
+		});
+
+		// create an object for the sound to play from
+		const sphere = new THREE.SphereBufferGeometry( 20, 32, 16 );
+		const material = new THREE.MeshPhongMaterial( { color: 0xff2200 } );
+		const mesh = new THREE.Mesh( sphere, material );
+		scene.add( mesh );
+
+		// finally add the sound to the mesh
+		mesh.add( sound );
+		</code>
+
+		<h2>أمثلة (Examples)</h2>
+
+		<p>
+			[example:webaudio_orientation webaudio / orientation ]<br />
+			[example:webaudio_sandbox webaudio / sandbox ]<br />
+			[example:webaudio_timing webaudio / timing ]
+		</p>
+
+		<h2>المنشئ (Constructor)</h2>
+
+		<h3>[name]( [param:AudioListener listener] )</h3>
+		<p>
+		listener — (ضرورية) كائن [page:AudioListener AudioListener] .
+		</p>
+
+
+		<h2>الخصائص (Properties)</h2>
+
+		<p>
+			تراجع فئة [page:Audio Audio] من أجل الخصائص الموروثة.
+		</p>
+
+		<h3>[property:PannerNode panner]</h3>
+		<p>		خاصية [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode PannerNode] التابعة لـ*PositionalAudio*.</p>
+
+
+		<h2>الوظائف (Methods)</h2>
+
+		<p>
+			راجع فئة [page:Audio Audio] من أجل الوظائف الموروثة.
+		</p>
+
+		<h3>[method:PannerNode getOutput]()</h3>
+		<p>
+		ترجع الـ[page:PositionalAudio.panner panner].
+		</p>
+
+		<h3>[method:Float getRefDistance]()</h3>
+		<p>
+		تُرجع القيمة [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
+		</p>
+
+		<h3>[method:PositionalAudio setRefDistance]( [param:Float value] )</h3>
+		<p>
+		يضبط قيمة [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/refDistance panner.refDistance].
+		</p>
+
+		<h3>[method:Float getRolloffFactor]()</h3>
+		<p>
+		تُرجع القيمة [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
+		</p>
+
+		<h3>[method:PositionalAudio setRolloffFactor]( [param:Float value] )</h3>
+		<p>
+		يضبط قيمة [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/rolloffFactor panner.rolloffFactor].
+		</p>
+
+		<h3>[method:String getDistanceModel]()</h3>
+		<p>
+		تُرجع القيمة [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
+		</p>
+
+		<h3>[method:PositionalAudio setDistanceModel]( [param:String value] )</h3>
+		<p>
+		يضبط قيمة [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/distanceModel panner.distanceModel].
+		</p>
+
+		<h3>[method:Float getMaxDistance]()</h3>
+		<p>
+		تُرجع القيمة [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
+		</p>
+
+		<h3>[method:PositionalAudio setMaxDistance]( [param:Float value] )</h3>
+		<p>
+		يضبط قيمة [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode/maxDistance panner.maxDistance].
+		</p>
+
+		<h3>[method:PositionalAudio setDirectionalCone]( [param:Float coneInnerAngle], [param:Float coneOuterAngle], [param:Float coneOuterGain] )</h3>
+		<p>
+		يمكن استخدام هذه الطريقة لتحويل الصوت متعدد الاتجاهات إلى [link:https://developer.mozilla.org/en-US/docs/Web/API/PannerNode directional sound].
+		</p>
+
+		<h2>المصدر (Source)</h2>
+
+		<p>
+			[link:https://github.com/mrdoob/three.js/blob/master/src/[path].js src/[path].js]
+		</p>
+	</body>
+</html>

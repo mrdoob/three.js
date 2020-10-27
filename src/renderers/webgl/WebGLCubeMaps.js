@@ -1,9 +1,5 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { CubeReflectionMapping, CubeRefractionMapping, EquirectangularReflectionMapping, EquirectangularRefractionMapping } from '../../constants.js';
-import { WebGLCubeRenderTarget } from "../WebGLCubeRenderTarget.js";
+import { WebGLCubeRenderTarget } from '../WebGLCubeRenderTarget.js';
 
 function WebGLCubeMaps( renderer ) {
 
@@ -42,13 +38,29 @@ function WebGLCubeMaps( renderer ) {
 
 					const image = texture.image;
 
-					if ( image.height > 0 ) {
+					if ( image && image.height > 0 ) {
+
+						const currentRenderList = renderer.getRenderList();
+						const currentRenderTarget = renderer.getRenderTarget();
+						const currentRenderState = renderer.getRenderState();
 
 						const renderTarget = new WebGLCubeRenderTarget( image.height / 2 );
 						renderTarget.fromEquirectangularTexture( renderer, texture );
 						cubemaps.set( texture, renderTarget );
 
+						renderer.setRenderTarget( currentRenderTarget );
+						renderer.setRenderList( currentRenderList );
+						renderer.setRenderState( currentRenderState );
+
+						texture.addEventListener( 'dispose', onTextureDispose );
+
 						return mapTextureMapping( renderTarget.texture, texture.mapping );
+
+					} else {
+
+						// image not yet ready. try the conversion next frame
+
+						return null;
 
 					}
 
@@ -59,6 +71,23 @@ function WebGLCubeMaps( renderer ) {
 		}
 
 		return texture;
+
+	}
+
+	function onTextureDispose( event ) {
+
+		const texture = event.target;
+
+		texture.removeEventListener( 'dispose', onTextureDispose );
+
+		const cubemap = cubemaps.get( texture );
+
+		if ( cubemap !== undefined ) {
+
+			cubemaps.delete( texture );
+			cubemap.dispose();
+
+		}
 
 	}
 

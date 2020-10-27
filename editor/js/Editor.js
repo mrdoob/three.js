@@ -357,7 +357,7 @@ Editor.prototype = {
 
 	},
 
-	addAnimation: function ( object, animations ) {
+	addAnimations: function ( object, animations ) {
 
 		if ( animations.length > 0 ) {
 

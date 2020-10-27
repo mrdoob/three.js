@@ -48,7 +48,7 @@ function SidebarMaterial( editor ) {
 
 	var materialSlotRow = new UIRow();
 
-	materialSlotRow.add( new UIText( 'Slot' ).setWidth( '90px' ) );
+	materialSlotRow.add( new UIText( strings.getKey( 'sidebar/material/slot' ) ).setWidth( '90px' ) );
 
 	var materialSlotSelect = new UISelect().setWidth( '170px' ).setFontSize( '12px' ).onChange( update );
 	materialSlotSelect.setOptions( { 0: '' } ).setValue( 0 );
@@ -152,7 +152,7 @@ function SidebarMaterial( editor ) {
 	// color
 
 	var materialColorRow = new UIRow();
-	var materialColor = new UIColor().onChange( update );
+	var materialColor = new UIColor().onInput( update );
 
 	materialColorRow.add( new UIText( strings.getKey( 'sidebar/material/color' ) ).setWidth( '90px' ) );
 	materialColorRow.add( materialColor );
@@ -184,7 +184,7 @@ function SidebarMaterial( editor ) {
 
 	var materialSheenRow = new UIRow();
 	var materialSheenEnabled = new UICheckbox( false ).onChange( update );
-	var materialSheen = new UIColor().setHexValue( 0x000000 ).onChange( update );
+	var materialSheen = new UIColor().setHexValue( 0x000000 ).onInput( update );
 
 	materialSheenRow.add( new UIText( strings.getKey( 'sidebar/material/sheen' ) ).setWidth( '90px' ) )
 	materialSheenRow.add( materialSheenEnabled );
@@ -196,17 +196,19 @@ function SidebarMaterial( editor ) {
 	// emissive
 
 	var materialEmissiveRow = new UIRow();
-	var materialEmissive = new UIColor().setHexValue( 0x000000 ).onChange( update );
+	var materialEmissive = new UIColor().setHexValue( 0x000000 ).onInput( update );
+	var materialEmissiveIntensity = new UINumber( 1 ).setWidth( '30px' ).onChange( update );
 
 	materialEmissiveRow.add( new UIText( strings.getKey( 'sidebar/material/emissive' ) ).setWidth( '90px' ) );
 	materialEmissiveRow.add( materialEmissive );
+	materialEmissiveRow.add( materialEmissiveIntensity );
 
 	container.add( materialEmissiveRow );
 
 	// specular
 
 	var materialSpecularRow = new UIRow();
-	var materialSpecular = new UIColor().setHexValue( 0x111111 ).onChange( update );
+	var materialSpecular = new UIColor().setHexValue( 0x111111 ).onInput( update );
 
 	materialSpecularRow.add( new UIText( strings.getKey( 'sidebar/material/specular' ) ).setWidth( '90px' ) );
 	materialSpecularRow.add( materialSpecular );
@@ -690,6 +692,12 @@ function SidebarMaterial( editor ) {
 			if ( material.emissive !== undefined && material.emissive.getHex() !== materialEmissive.getHexValue() ) {
 
 				editor.execute( new SetMaterialColorCommand( editor, currentObject, 'emissive', materialEmissive.getHexValue(), currentMaterialSlot ) );
+
+			}
+
+			if ( material.emissiveIntensity !== undefined && material.emissiveIntensity !== materialEmissiveIntensity.getValue() ) {
+
+				editor.execute( new SetMaterialValueCommand( editor, currentObject, 'emissiveIntensity', materialEmissiveIntensity.getValue(), currentMaterialSlot ) );
 
 			}
 
@@ -1186,7 +1194,7 @@ function SidebarMaterial( editor ) {
 
 		if ( texture !== null ) {
 
-			if ( texture.encoding !== THREE.sRGBEncoding ) {
+			if ( texture.isDataTexture !== true && texture.encoding !== THREE.sRGBEncoding ) {
 
 				texture.encoding = THREE.sRGBEncoding;
 				var object = currentObject;
@@ -1343,6 +1351,8 @@ function SidebarMaterial( editor ) {
 		if ( material.emissive !== undefined ) {
 
 			materialEmissive.setHexValue( material.emissive.getHexString() );
+
+			materialEmissiveIntensity.setValue( material.emissiveIntensity );
 
 		}
 

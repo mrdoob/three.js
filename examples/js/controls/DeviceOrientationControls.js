@@ -7,6 +7,8 @@ console.warn( "THREE.DeviceOrientationControls: As part of the transition to ES6
 THREE.DeviceOrientationControls = function ( object ) {
 
 	var scope = this;
+	var changeEvent = { type: "change" };
+	var EPS = 0.000001;
 
 	this.object = object;
 	this.object.rotation.reorder( 'YXZ' );
@@ -99,28 +101,41 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 	};
 
-	this.update = function () {
+	this.update = ( function () {
 
-		if ( scope.enabled === false ) return;
+		var lastQuaternion = new THREE.Quaternion();
 
-		var device = scope.deviceOrientation;
+		return function () {
 
-		if ( device ) {
+			if ( scope.enabled === false ) return;
 
-			var alpha = device.alpha ? THREE.MathUtils.degToRad( device.alpha ) + scope.alphaOffset : 0; // Z
+			var device = scope.deviceOrientation;
 
-			var beta = device.beta ? THREE.MathUtils.degToRad( device.beta ) : 0; // X'
+			if ( device ) {
 
-			var gamma = device.gamma ? THREE.MathUtils.degToRad( device.gamma ) : 0; // Y''
+				var alpha = device.alpha ? THREE.MathUtils.degToRad( device.alpha ) + scope.alphaOffset : 0; // Z
 
-			var orient = scope.screenOrientation ? THREE.MathUtils.degToRad( scope.screenOrientation ) : 0; // O
+				var beta = device.beta ? THREE.MathUtils.degToRad( device.beta ) : 0; // X'
 
-			setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
+				var gamma = device.gamma ? THREE.MathUtils.degToRad( device.gamma ) : 0; // Y''
 
-		}
+				var orient = scope.screenOrientation ? THREE.MathUtils.degToRad( scope.screenOrientation ) : 0; // O
+
+				setObjectQuaternion( scope.object.quaternion, alpha, beta, gamma, orient );
+
+				if ( 8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
+
+					lastQuaternion.copy( scope.object.quaternion );
+					scope.dispatchEvent( changeEvent );
+
+				}
+
+			}
+
+		};
 
 
-	};
+	} )();
 
 	this.dispose = function () {
 
@@ -131,3 +146,6 @@ THREE.DeviceOrientationControls = function ( object ) {
 	this.connect();
 
 };
+
+THREE.DeviceOrientationControls.prototype = Object.create( THREE.EventDispatcher.prototype );
+THREE.DeviceOrientationControls.prototype.constructor = THREE.DeviceOrientationControls;

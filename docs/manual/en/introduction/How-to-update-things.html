@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8">
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -12,13 +11,13 @@
 		<div>
 			<p>All objects by default automatically update their matrices if they have been added to the scene with</p>
 			<code>
-var object = new THREE.Object3D();
+const object = new THREE.Object3D();
 scene.add( object );
 			</code>
 			or if they are the child of another object that has been added to the scene:
 			<code>
-var object1 = new THREE.Object3D();
-var object2 = new THREE.Object3D();
+const object1 = new THREE.Object3D();
+const object2 = new THREE.Object3D();
 
 object1.add( object2 );
 scene.add( object1 ); //object1 and object2 will automatically update their matrices
@@ -57,36 +56,36 @@ object.updateMatrix();
 				in the buffer for 500 vertices but draw only two at first, using [page:BufferGeometry.drawRange].
 			</p>
 			<code>
-var MAX_POINTS = 500;
+const MAX_POINTS = 500;
 
 // geometry
-var geometry = new THREE.BufferGeometry();
+const geometry = new THREE.BufferGeometry();
 
 // attributes
-var positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
+const positions = new Float32Array( MAX_POINTS * 3 ); // 3 vertices per point
 geometry.setAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
 
 // draw range
-var drawCount = 2; // draw the first 2 points, only
+const drawCount = 2; // draw the first 2 points, only
 geometry.setDrawRange( 0, drawCount );
 
 // material
-var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+const material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
 
 // line
-var line = new THREE.Line( geometry,  material );
+const line = new THREE.Line( geometry,  material );
 scene.add( line );
 			</code>
 		 	<p>
 				Next we'll randomly add points to the line using a pattern like:
 			</p>
 			<code>
-var positions = line.geometry.attributes.position.array;
+const positions = line.geometry.attributes.position.array;
 
-var x, y, z, index;
+let x, y, z, index;
 x = y = z = index = 0;
 
-for ( var i = 0, l = MAX_POINTS; i < l; i ++ ) {
+for ( let i = 0, l = MAX_POINTS; i < l; i ++ ) {
 
     positions[ index ++ ] = x;
     positions[ index ++ ] = y;
@@ -143,7 +142,7 @@ line.geometry.computeBoundingSphere();
 				and not to [page:BufferGeometry].
 			</p>
 			<code>
-var geometry = new THREE.Geometry();
+const geometry = new THREE.Geometry();
 geometry.verticesNeedUpdate = true;
 geometry.elementsNeedUpdate = true;
 geometry.morphTargetsNeedUpdate = true;

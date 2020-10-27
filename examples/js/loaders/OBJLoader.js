@@ -61,7 +61,6 @@ THREE.OBJLoader = ( function () {
 						normals: [],
 						colors: [],
 						uvs: [],
-						hasNormalIndices: false,
 						hasUVIndices: false
 					},
 					materials: [],
@@ -340,8 +339,6 @@ THREE.OBJLoader = ( function () {
 
 					this.addNormal( ia, ib, ic );
 
-					this.object.geometry.hasNormalIndices = true;
-
 				} else {
 
 					this.addFaceNormal( ia, ib, ic );
@@ -433,9 +430,10 @@ THREE.OBJLoader = ( function () {
 
 			var scope = this;
 
-			var loader = new THREE.FileLoader( scope.manager );
+			var loader = new THREE.FileLoader( this.manager );
 			loader.setPath( this.path );
 			loader.setRequestHeader( this.requestHeader );
+			loader.setWithCredentials( this.withCredentials );
 			loader.load( url, function ( text ) {
 
 				try {
@@ -728,11 +726,7 @@ THREE.OBJLoader = ( function () {
 
 				buffergeometry.setAttribute( 'position', new THREE.Float32BufferAttribute( geometry.vertices, 3 ) );
 
-				if ( geometry.hasNormalIndices === true ) {
-
-					buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
-
-				}
+				buffergeometry.setAttribute( 'normal', new THREE.Float32BufferAttribute( geometry.normals, 3 ) );
 
 				if ( geometry.colors.length > 0 ) {
 

@@ -10,6 +10,14 @@ export class Shape extends Path {
 
 	constructor( points?: Vector2[] );
 
+	/**
+	 * @default 'Shape'
+	 */
+	type: string;
+
+	/**
+	 * @default []
+	 */
 	holes: Path[];
 
 	/**

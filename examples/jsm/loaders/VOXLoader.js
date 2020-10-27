@@ -112,7 +112,7 @@ VOXLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 			}
 
 			const chunkSize = data.getInt32( i, true ); i += 4;
-			const childChunks = data.getInt32( i, true ); i += 4;
+			data.getInt32( i, true ); i += 4; // childChunks
 
 			if ( id === 'SIZE' ) {
 

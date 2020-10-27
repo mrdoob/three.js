@@ -1,9 +1,7 @@
 /* global QUnit */
 
 import { runStdGeometryTests } from '../../utils/qunit-utils';
-import {
-	TorusBufferGeometry
-} from '../../../../src/geometries/TorusGeometry';
+import { TorusBufferGeometry } from '../../../../src/geometries/TorusBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 

@@ -33,7 +33,7 @@ var SavePass = function ( renderTarget ) {
 
 	if ( this.renderTarget === undefined ) {
 
-		this.renderTarget = new WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBFormat, stencilBuffer: false } );
+		this.renderTarget = new WebGLRenderTarget( window.innerWidth, window.innerHeight, { minFilter: LinearFilter, magFilter: LinearFilter, format: RGBFormat } );
 		this.renderTarget.texture.name = "SavePass.rt";
 
 	}

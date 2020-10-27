@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,11 +15,11 @@
 
 		<h2>Code Example</h2>
 		<code>
-		var spotLight = new THREE.SpotLight( 0xffffff );
+		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 10, 10, 10 );
 		scene.add( spotLight );
 
-		var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+		const spotLightHelper = new THREE.SpotLightHelper( spotLight );
 		scene.add( spotLightHelper );
 		</code>
 

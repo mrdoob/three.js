@@ -23,11 +23,11 @@
 			import { OBJLoader } from './jsm/loaders/OBJLoader.js';
 			import { RGBELoader } from './jsm/loaders/RGBELoader.js';
 
-			var statsEnabled = true;
+			const statsEnabled = true;
 
-			var container, stats;
+			let container, stats;
 
-			var camera, scene, renderer, controls;
+			let camera, scene, renderer, controls;
 
 			init();
 			animate();
@@ -61,19 +61,19 @@
 
 				//
 
-				var material = new THREE.MeshStandardMaterial();
+				const material = new THREE.MeshStandardMaterial();
 
 				new OBJLoader()
 					.setPath( 'models/obj/cerberus/' )
 					.load( 'Cerberus.obj', function ( group ) {
 
-						var loader = new THREE.TextureLoader()
+						const loader = new THREE.TextureLoader()
 							.setPath( 'models/obj/cerberus/' );
 
 						material.roughness = 1; // attenuates roughnessMap
 						material.metalness = 1; // attenuates metalnessMap
 
-						var diffuseMap = loader.load( 'Cerberus_A.jpg' );
+						const diffuseMap = loader.load( 'Cerberus_A.jpg' );
 						diffuseMap.encoding = THREE.sRGBEncoding;
 						material.map = diffuseMap;
 						// roughness is in G channel, metalness is in B channel
@@ -106,7 +106,7 @@
 					.setPath( 'textures/equirectangular/' )
 					.load( 'venice_sunset_1k.hdr', function ( hdrEquirect ) {
 
-						var hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
+						const hdrCubeRenderTarget = pmremGenerator.fromEquirectangular( hdrEquirect );
 						hdrEquirect.dispose();
 						pmremGenerator.dispose();
 
@@ -115,7 +115,7 @@
 
 					} );
 
-				var pmremGenerator = new THREE.PMREMGenerator( renderer );
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
 				pmremGenerator.compileEquirectangularShader();
 
 				//

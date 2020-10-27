@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,24 +16,24 @@
 		<h2>代码示例</h2>
 
 		<code>
-		var vertices = [];
+		const vertices = [];
 
-		for ( var i = 0; i < 10000; i ++ ) {
+		for ( let i = 0; i < 10000; i ++ ) {
 
-			var x = THREE.MathUtils.randFloatSpread( 2000 );
-			var y = THREE.MathUtils.randFloatSpread( 2000 );
-			var z = THREE.MathUtils.randFloatSpread( 2000 );
+			const x = THREE.MathUtils.randFloatSpread( 2000 );
+			const y = THREE.MathUtils.randFloatSpread( 2000 );
+			const z = THREE.MathUtils.randFloatSpread( 2000 );
 
 			vertices.push( x, y, z );
 
 		}
 
-		var geometry = new THREE.BufferGeometry();
+		const geometry = new THREE.BufferGeometry();
 		geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
-		var material = new THREE.PointsMaterial( { color: 0x888888 } );
+		const material = new THREE.PointsMaterial( { color: 0x888888 } );
 
-		var points = new THREE.Points( geometry, material );
+		const points = new THREE.Points( geometry, material );
 
 		scene.add( points );
 		</code>
@@ -87,7 +86,8 @@
 		<p>材质是否使用morphTargets。默认值为false。</p>
 
 		<h3>[property:Number size]</h3>
-		<p>设置点的大小。默认值为1.0。</p>
+		<p>设置点的大小。默认值为1.0。<br/>
+			Will be capped if it exceeds the hardware dependent parameter [link:https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/getParameter gl.ALIASED_POINT_SIZE_RANGE].</p>
 
 		<h3>[property:Boolean sizeAttenuation]</h3>
 		<p>指定点的大小是否因相机深度而衰减。（仅限透视摄像头。）默认为true。 </p>

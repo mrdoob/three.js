@@ -23,16 +23,19 @@ export class Color {
 
 	/**
 	 * Red channel value between 0 and 1. Default is 1.
+	 * @default 1
 	 */
 	r: number;
 
 	/**
 	 * Green channel value between 0 and 1. Default is 1.
+	 * @default 1
 	 */
 	g: number;
 
 	/**
 	 * Blue channel value between 0 and 1. Default is 1.
+	 * @default 1
 	 */
 	b: number;
 

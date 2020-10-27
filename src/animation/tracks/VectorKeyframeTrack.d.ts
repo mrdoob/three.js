@@ -10,4 +10,9 @@ export class VectorKeyframeTrack extends KeyframeTrack {
 		interpolation?: InterpolationModes
 	);
 
+	/**
+	 * @default 'vector'
+	 */
+	ValueTypeName: string;
+
 }

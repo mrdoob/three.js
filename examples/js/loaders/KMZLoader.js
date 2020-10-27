@@ -18,6 +18,7 @@ THREE.KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -80,7 +81,7 @@ THREE.KMZLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 		//
 
-		var zip = new JSZip( data );
+		var zip = new JSZip( data ); // eslint-disable-line no-undef
 
 		if ( zip.files[ 'doc.kml' ] ) {
 

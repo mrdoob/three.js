@@ -35,6 +35,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 		loader.setPath( scope.path );
 		loader.setResponseType( 'arraybuffer' );
 		loader.setRequestHeader( scope.requestHeader );
+		loader.setWithCredentials( scope.withCredentials );
 		loader.load( url, function ( text ) {
 
 			try {
@@ -77,7 +78,7 @@ THREE.AMFLoader.prototype = Object.assign( Object.create( THREE.Loader.prototype
 
 				try {
 
-					zip = new JSZip( data );
+					zip = new JSZip( data ); // eslint-disable-line no-undef
 
 				} catch ( e ) {
 
