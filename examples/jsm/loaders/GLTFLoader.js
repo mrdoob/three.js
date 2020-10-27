@@ -818,7 +818,7 @@ var GLTFLoader = ( function () {
 
 			if ( isSupported ) return parser.loadTextureImage( textureIndex, source, loader );
 
-			if ( ! isSupported && json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
+			if ( json.extensionsRequired && json.extensionsRequired.indexOf( name ) >= 0 ) {
 
 				throw new Error( 'THREE.GLTFLoader: WebP required by asset but unsupported.' );
 
@@ -835,7 +835,7 @@ var GLTFLoader = ( function () {
 
 		if ( ! this.isSupported ) {
 
-			this.isSupported = new Promise( function ( resolve, reject ) {
+			this.isSupported = new Promise( function ( resolve ) {
 
 				var image = new Image();
 
