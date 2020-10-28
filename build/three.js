@@ -63,7 +63,7 @@
 		};
 	}
 
-	var REVISION = '122dev';
+	var REVISION = '122';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -20043,6 +20043,9 @@
 
 	VideoTexture.prototype = Object.assign(Object.create(Texture.prototype), {
 		constructor: VideoTexture,
+		clone: function clone() {
+			return new this.constructor(this.image).copy(this);
+		},
 		isVideoTexture: true,
 		update: function update() {
 			var video = this.image;
