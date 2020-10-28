@@ -5,6 +5,7 @@ import {
 	Loader,
 	LoaderUtils
 } from "../../../build/three.module.js";
+
 /**
  * Description: A THREE loader for PLY ASCII files (known as the Polygon
  * File Format or the Stanford Triangle Format).

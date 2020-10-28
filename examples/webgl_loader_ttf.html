@@ -18,29 +18,29 @@
 
 			import { TTFLoader } from './jsm/loaders/TTFLoader.js';
 
-			var container;
-			var camera, cameraTarget, scene, renderer;
-			var group, textMesh1, textMesh2, textGeo, material;
-			var firstLetter = true;
+			let container;
+			let camera, cameraTarget, scene, renderer;
+			let group, textMesh1, textMesh2, textGeo, material;
+			let firstLetter = true;
 
-			var text = 'three.js',
-				height = 20,
+			let text = 'three.js';
+			const height = 20,
 				size = 70,
 				hover = 30,
 				curveSegments = 4,
 				bevelThickness = 2,
 				bevelSize = 1.5;
 
-			var font = null;
-			var mirror = true;
+			let font = null;
+			const mirror = true;
 
-			var targetRotation = 0;
-			var targetRotationOnPointerDown = 0;
+			let targetRotation = 0;
+			let targetRotationOnPointerDown = 0;
 
-			var pointerX = 0;
-			var pointerXOnPointerDown = 0;
+			let pointerX = 0;
+			let pointerXOnPointerDown = 0;
 
-			var windowHalfX = window.innerWidth / 2;
+			let windowHalfX = window.innerWidth / 2;
 
 			init();
 			animate();
@@ -65,11 +65,11 @@
 
 				// LIGHTS
 
-				var dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.125 );
 				dirLight.position.set( 0, 0, 1 ).normalize();
 				scene.add( dirLight );
 
-				var pointLight = new THREE.PointLight( 0xffffff, 1.5 );
+				const pointLight = new THREE.PointLight( 0xffffff, 1.5 );
 				pointLight.position.set( 0, 100, 90 );
 				pointLight.color.setHSL( Math.random(), 1, 0.5 );
 				scene.add( pointLight );
@@ -81,7 +81,7 @@
 
 				scene.add( group );
 
-				var loader = new TTFLoader();
+				const loader = new TTFLoader();
 
 				loader.load( 'fonts/ttf/kenpixel.ttf', function ( json ) {
 
@@ -90,7 +90,7 @@
 
 				} );
 
-				var plane = new THREE.Mesh(
+				const plane = new THREE.Mesh(
 					new THREE.PlaneBufferGeometry( 10000, 10000 ),
 					new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.5, transparent: true } )
 				);
@@ -137,7 +137,7 @@
 
 				}
 
-				var keyCode = event.keyCode;
+				const keyCode = event.keyCode;
 
 				// backspace
 
@@ -156,7 +156,7 @@
 
 			function onDocumentKeyPress( event ) {
 
-				var keyCode = event.which;
+				const keyCode = event.which;
 
 				// backspace
 
@@ -166,7 +166,7 @@
 
 				} else {
 
-					var ch = String.fromCharCode( keyCode );
+					const ch = String.fromCharCode( keyCode );
 					text += ch;
 
 					refreshText();
@@ -194,7 +194,7 @@
 				textGeo.computeBoundingBox();
 				textGeo.computeVertexNormals();
 
-				var centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
+				const centerOffset = - 0.5 * ( textGeo.boundingBox.max.x - textGeo.boundingBox.min.x );
 
 				textMesh1 = new THREE.Mesh( textGeo, material );
 

@@ -1,12 +1,8 @@
-console.warn( "THREE.VRMLLoader: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-
-/* global chevrotain */
-
 THREE.VRMLLoader = ( function () {
 
 	// dependency check
 
-	if ( typeof chevrotain === 'undefined' ) {
+	if ( typeof chevrotain === 'undefined' ) { // eslint-disable-line no-undef
 
 		throw Error( 'THREE.VRMLLoader: External library chevrotain.min.js required.' );
 
@@ -101,7 +97,7 @@ THREE.VRMLLoader = ( function () {
 
 			function createTokens() {
 
-				var createToken = chevrotain.createToken;
+				var createToken = chevrotain.createToken; // eslint-disable-line no-undef
 
 				// from http://gun.teipir.gr/VRML-amgem/spec/part1/concepts.html#SyntaxBasics
 
@@ -176,7 +172,7 @@ THREE.VRMLLoader = ( function () {
 				var Comment = createToken( {
 					name: 'Comment',
 					pattern: /#.*/,
-					group: chevrotain.Lexer.SKIPPED
+					group: chevrotain.Lexer.SKIPPED // eslint-disable-line no-undef
 				} );
 
 				// commas, blanks, tabs, newlines and carriage returns are whitespace characters wherever they appear outside of string fields
@@ -184,7 +180,7 @@ THREE.VRMLLoader = ( function () {
 				var WhiteSpace = createToken( {
 					name: 'WhiteSpace',
 					pattern: /[ ,\s]/,
-					group: chevrotain.Lexer.SKIPPED
+					group: chevrotain.Lexer.SKIPPED // eslint-disable-line no-undef
 				} );
 
 				var tokens = [
@@ -3179,7 +3175,7 @@ THREE.VRMLLoader = ( function () {
 
 	function VRMLLexer( tokens ) {
 
-		this.lexer = new chevrotain.Lexer( tokens );
+		this.lexer = new chevrotain.Lexer( tokens ); // eslint-disable-line no-undef
 
 	}
 
@@ -3207,7 +3203,7 @@ THREE.VRMLLoader = ( function () {
 
 	function VRMLParser( tokenVocabulary ) {
 
-		chevrotain.Parser.call( this, tokenVocabulary );
+		chevrotain.Parser.call( this, tokenVocabulary ); // eslint-disable-line no-undef
 
 		var $ = this;
 
@@ -3434,7 +3430,7 @@ THREE.VRMLLoader = ( function () {
 
 	}
 
-	VRMLParser.prototype = Object.create( chevrotain.Parser.prototype );
+	VRMLParser.prototype = Object.create( chevrotain.Parser.prototype ); // eslint-disable-line no-undef
 	VRMLParser.prototype.constructor = VRMLParser;
 
 	function Face( a, b, c ) {

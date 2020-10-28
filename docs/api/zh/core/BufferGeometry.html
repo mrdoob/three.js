@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -23,10 +22,10 @@
 
 		<h2>代码示例</h2>
 		<code>
-		var geometry = new THREE.BufferGeometry();
+		const geometry = new THREE.BufferGeometry();
 		// 创建一个简单的矩形. 在这里我们左上和右下顶点被复制了两次。
 		// 因为在两个三角面片里，这两个顶点都需要被用到。
-		var vertices = new Float32Array( [
+		const vertices = new Float32Array( [
 			-1.0, -1.0,  1.0,
 			 1.0, -1.0,  1.0,
 			 1.0,  1.0,  1.0,
@@ -38,8 +37,8 @@
 
 		// itemSize = 3 因为每个顶点都是一个三元组。
 		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
-		var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-		var mesh = new THREE.Mesh( geometry, material );
+		const material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		const mesh = new THREE.Mesh( geometry, material );
 		</code>
 
 		<h2>例子</h2>

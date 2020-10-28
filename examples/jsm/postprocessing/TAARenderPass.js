@@ -2,6 +2,7 @@ import {
 	WebGLRenderTarget
 } from "../../../build/three.module.js";
 import { SSAARenderPass } from "../postprocessing/SSAARenderPass.js";
+
 /**
  *
  * Temporal Anti-Aliasing Render Pass

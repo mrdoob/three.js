@@ -1,4 +1,3 @@
-
 /**
  * Simple test shader
  */

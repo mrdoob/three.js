@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -100,7 +99,7 @@
 
 		<code>
 		// Instantiate a loader
-		var loader = new Rhino3dmLoader();
+		const loader = new Rhino3dmLoader();
 
 		// Specify path to a folder containing WASM/JS libraries.
 		loader.setLibraryPath( '/examples/jsm/libs/rhino3dm/' );

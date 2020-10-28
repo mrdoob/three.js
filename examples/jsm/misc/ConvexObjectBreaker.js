@@ -5,6 +5,7 @@ import {
 	Vector3
 } from "../../../build/three.module.js";
 import { ConvexBufferGeometry } from "../geometries/ConvexGeometry.js";
+
 /**
  * @fileoverview This class can be used to subdivide a convex Geometry object into pieces.
  *

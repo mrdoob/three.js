@@ -21,6 +21,7 @@ import {
 	sRGBEncoding
 } from "../../../build/three.module.js";
 import { JSZip } from "../libs/jszip.module.min.js";
+
 /**
  *
  * 3D Manufacturing Format (3MF) specification: https://3mf.io/specification/

@@ -36,13 +36,11 @@ import {
 } from "../../../build/three.module.js";
 import { chevrotain } from "../libs/chevrotain.module.min.js";
 
-/* global chevrotain */
-
 var VRMLLoader = ( function () {
 
 	// dependency check
 
-	if ( typeof chevrotain === 'undefined' ) {
+	if ( typeof chevrotain === 'undefined' ) { // eslint-disable-line no-undef
 
 		throw Error( 'THREE.VRMLLoader: External library chevrotain.min.js required.' );
 
@@ -137,7 +135,7 @@ var VRMLLoader = ( function () {
 
 			function createTokens() {
 
-				var createToken = chevrotain.createToken;
+				var createToken = chevrotain.createToken; // eslint-disable-line no-undef
 
 				// from http://gun.teipir.gr/VRML-amgem/spec/part1/concepts.html#SyntaxBasics
 
@@ -212,7 +210,7 @@ var VRMLLoader = ( function () {
 				var Comment = createToken( {
 					name: 'Comment',
 					pattern: /#.*/,
-					group: chevrotain.Lexer.SKIPPED
+					group: chevrotain.Lexer.SKIPPED // eslint-disable-line no-undef
 				} );
 
 				// commas, blanks, tabs, newlines and carriage returns are whitespace characters wherever they appear outside of string fields
@@ -220,7 +218,7 @@ var VRMLLoader = ( function () {
 				var WhiteSpace = createToken( {
 					name: 'WhiteSpace',
 					pattern: /[ ,\s]/,
-					group: chevrotain.Lexer.SKIPPED
+					group: chevrotain.Lexer.SKIPPED // eslint-disable-line no-undef
 				} );
 
 				var tokens = [
@@ -3215,7 +3213,7 @@ var VRMLLoader = ( function () {
 
 	function VRMLLexer( tokens ) {
 
-		this.lexer = new chevrotain.Lexer( tokens );
+		this.lexer = new chevrotain.Lexer( tokens ); // eslint-disable-line no-undef
 
 	}
 
@@ -3243,7 +3241,7 @@ var VRMLLoader = ( function () {
 
 	function VRMLParser( tokenVocabulary ) {
 
-		chevrotain.Parser.call( this, tokenVocabulary );
+		chevrotain.Parser.call( this, tokenVocabulary ); // eslint-disable-line no-undef
 
 		var $ = this;
 
@@ -3470,7 +3468,7 @@ var VRMLLoader = ( function () {
 
 	}
 
-	VRMLParser.prototype = Object.create( chevrotain.Parser.prototype );
+	VRMLParser.prototype = Object.create( chevrotain.Parser.prototype ); // eslint-disable-line no-undef
 	VRMLParser.prototype.constructor = VRMLParser;
 
 	function Face( a, b, c ) {

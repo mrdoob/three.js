@@ -5,6 +5,7 @@ import {
 	RGB_PVRTC_2BPPV1_Format,
 	RGB_PVRTC_4BPPV1_Format
 } from "../../../build/three.module.js";
+
 /*
  *	 PVR v2 (legacy) parser
  *   TODO : Add Support for PVR v3 format

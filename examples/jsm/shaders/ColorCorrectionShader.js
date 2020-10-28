@@ -1,6 +1,7 @@
 import {
 	Vector3
 } from "../../../build/three.module.js";
+
 /**
  * Color correction
  */
