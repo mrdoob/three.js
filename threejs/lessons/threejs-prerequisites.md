@@ -42,7 +42,7 @@ You can use `document.querySelector` to select the first element
 that matches a CSS selector. `document.querySelectorAll` returns
 all elements that match a CSS selector.
 
-## You don't need `onbody`
+## You don't need `onload`
 
 Lots of 20yr old pages use HTML like
 
