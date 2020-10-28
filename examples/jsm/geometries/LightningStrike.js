@@ -7,6 +7,7 @@ import {
 	Vector3
 } from "../../../build/three.module.js";
 import { SimplexNoise } from "../math/SimplexNoise.js";
+
 /**
  * @fileoverview LightningStrike object for creating lightning strikes and voltaic arcs.
  *

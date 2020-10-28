@@ -10,6 +10,7 @@ import {
 	TextureLoader,
 	Vector2
 } from "../../../build/three.module.js";
+
 /**
  * Loads a Wavefront .mtl file specifying materials
  */

@@ -12,6 +12,7 @@ import { Pass } from "../postprocessing/Pass.js";
 import { CopyShader } from "../shaders/CopyShader.js";
 import { LuminosityShader } from "../shaders/LuminosityShader.js";
 import { ToneMapShader } from "../shaders/ToneMapShader.js";
+
 /**
  * Generate a texture that represents the luminosity of the current scene, adapted over time
  * to simulate the optic nerve responding to the amount of light it is receiving.

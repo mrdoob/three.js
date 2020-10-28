@@ -198,11 +198,12 @@ function ViewHelper( editorCamera, container ) {
 	this.update = function ( delta ) {
 
 		var step = delta * turnRate;
+		var focusPoint = this.controls.center;
 
 		// animate position by doing a slerp and then scaling the position on the unit sphere
 
 		q1.rotateTowards( q2, step );
-		editorCamera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius );
+		editorCamera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( focusPoint );
 
 		// animate orientation
 
@@ -258,7 +259,7 @@ function ViewHelper( editorCamera, container ) {
 		//
 
 		radius = editorCamera.position.distanceTo( focusPoint );
-		targetPosition.multiplyScalar( radius );
+		targetPosition.multiplyScalar( radius ).add( focusPoint );
 
 		dummy.position.copy( focusPoint );
 
