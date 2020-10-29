@@ -87,7 +87,7 @@ THREE.SAOPass = function ( scene, camera, depthTexture, useNormals, resolution )
 	this.saoMaterial.uniforms[ 'tDepth' ].value = ( this.supportsDepthTextureExtension ) ? depthTexture : this.depthRenderTarget.texture;
 	this.saoMaterial.uniforms[ 'tNormal' ].value = this.normalRenderTarget.texture;
 	this.saoMaterial.uniforms[ 'size' ].value.set( this.resolution.x, this.resolution.y );
-	this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+	this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 	this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
 	this.saoMaterial.blending = THREE.NoBlending;
 
@@ -376,7 +376,7 @@ THREE.SAOPass.prototype = Object.assign( Object.create( THREE.Pass.prototype ), 
 		this.depthRenderTarget.setSize( width, height );
 
 		this.saoMaterial.uniforms[ 'size' ].value.set( width, height );
-		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.getInverse( this.camera.projectionMatrix );
+		this.saoMaterial.uniforms[ 'cameraInverseProjectionMatrix' ].value.copy( this.camera.projectionMatrixInverse );
 		this.saoMaterial.uniforms[ 'cameraProjectionMatrix' ].value = this.camera.projectionMatrix;
 		this.saoMaterial.needsUpdate = true;
 
