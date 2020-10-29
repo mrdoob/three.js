@@ -14,11 +14,11 @@ const DataUtils = {
 		* by James Tursa?s half-precision code. */
 
 		_floatView[ 0 ] = val;
-		var x = _int32View[ 0 ];
+		const x = _int32View[ 0 ];
 
-		var bits = ( x >> 16 ) & 0x8000; /* Get the sign */
-		var m = ( x >> 12 ) & 0x07ff; /* Keep one extra bit for rounding */
-		var e = ( x >> 23 ) & 0xff; /* Using int is faster here */
+		let bits = ( x >> 16 ) & 0x8000; /* Get the sign */
+		let m = ( x >> 12 ) & 0x07ff; /* Keep one extra bit for rounding */
+		const e = ( x >> 23 ) & 0xff; /* Using int is faster here */
 
 		/* If zero, or denormal, or exponent underflows too much for a denormal
 			* half, return signed zero. */
