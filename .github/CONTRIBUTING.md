@@ -78,6 +78,6 @@ When you’ve decided to make changes, start with the following:
 * Watch out for Closure compiler warnings when building the libs, there should not be any.
 * Once done with a patch / feature do not add more commits to a feature branch
 * Create separate branches per patch or feature.
-* If you make a PR but it is not actaully ready to be pulled into the dev branch, add `[Draft]` into the PR title and/or convert it to a draft PR
+* If you make a PR but it is not actually ready to be pulled into the dev branch, add `[Draft]` into the PR title and/or convert it to a draft PR
 
 This project is currently contributed to mostly via everyone's spare time. Please keep that in mind as it may take some time for the appropriate feedback to get to you. If you are unsure about adding a new feature, it might be better to ask first to see whether other people think it's a good idea.
