@@ -14,7 +14,6 @@ const puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const pixelmatch = require( 'pixelmatch' );
-const printImage = require( 'image-output' );
 const jimp = require( 'jimp' );
 const fs = require( 'fs' );
 
@@ -250,7 +249,6 @@ const pup = puppeteer.launch( {
 					.scale( 1 / viewScale ).quality( jpgQuality )
 					.write( `./examples/screenshots/${ file }.jpg` ).bitmap;
 
-				printImage( bitmap, console );
 				console.green( `file: ${ file } generated` );
 
 
@@ -295,7 +293,6 @@ const pup = puppeteer.launch( {
 
 					if ( ++ attemptId === maxAttemptId ) {
 
-						printImage( diff, console );
 						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
 						failedScreenshots.push( file );
 						continue;
