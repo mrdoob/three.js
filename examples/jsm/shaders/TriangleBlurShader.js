@@ -1,6 +1,7 @@
 import {
 	Vector2
 } from "../../../build/three.module.js";
+
 /**
  * Triangle blur shader
  * based on glfx.js triangle blur shader

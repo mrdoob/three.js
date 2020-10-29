@@ -2,6 +2,7 @@ import {
 	BufferGeometry,
 	Vector3
 } from "../../../build/three.module.js";
+
 /**
  * Usage:
  *  var exporter = new STLExporter();
