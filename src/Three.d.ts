@@ -152,6 +152,7 @@ export * from './extras/core/ShapePath';
 export * from './extras/core/Font';
 export * from './extras/core/CurvePath';
 export * from './extras/core/Curve';
+export * from './extras/DataUtils';
 export * from './extras/ImageUtils';
 export * from './extras/ShapeUtils';
 export * from './extras/PMREMGenerator';

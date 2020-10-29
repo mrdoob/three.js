@@ -106,6 +106,7 @@
 			},
 
 			"Extras": {
+				"DataUtils": "api/en/extras/DataUtils",
 				"Earcut": "api/en/extras/Earcut",
 				"ImageUtils": "api/en/extras/ImageUtils",
 				"PMREMGenerator": "api/en/extras/PMREMGenerator",
