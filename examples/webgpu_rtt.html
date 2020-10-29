@@ -15,11 +15,12 @@
 			import * as THREE from '../build/three.module.js';
 
 			import WebGPURenderer from './jsm/renderers/webgpu/WebGPURenderer.js';
+			import WebGPUTextureRenderer from './jsm/renderers/webgpu/WebGPUTextureRenderer.js';
 			import WebGPU from './jsm/renderers/webgpu/WebGPU.js';
 
 			let camera, scene, renderer;
 
-			let cameraFX, sceneFX, renderTarget;
+			let cameraFX, sceneFX, textureRenderer;
 
 			let box;
 
@@ -61,9 +62,8 @@
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
 
-				// @TODO Rename WebGLRenderTarget to RenderTarget? Or introduce WebGPURenderTarget?
-
-				renderTarget = new THREE.WebGLRenderTarget( window.innerWidth * dpr, window.innerHeight * dpr );
+				textureRenderer = new WebGPUTextureRenderer( renderer );
+				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
 				window.addEventListener( 'resize', onWindowResize, false );
 
@@ -76,7 +76,7 @@
 
 				// @TODO Until NodeMaterial is available just copy the beauty pass to screen
 
-				const materialFX = new THREE.MeshBasicMaterial( { map: renderTarget.texture } );
+				const materialFX = new THREE.MeshBasicMaterial( { map: textureRenderer.getTexture() } );
 
 				const quad = new THREE.Mesh( geometryFX, materialFX );
 				sceneFX.add( quad );
@@ -93,7 +93,7 @@
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );
-				renderTarget.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
+				textureRenderer.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
 			}
 
@@ -104,10 +104,7 @@
 				box.rotation.x += 0.01;
 				box.rotation.y += 0.02;
 
-				renderer.setRenderTarget( renderTarget );
-				renderer.render( scene, camera );
-
-				renderer.setRenderTarget( null );
+				textureRenderer.render( scene, camera );
 				renderer.render( sceneFX, cameraFX );
 
 			}
