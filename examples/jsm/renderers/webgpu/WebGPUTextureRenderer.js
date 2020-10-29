@@ -6,6 +6,8 @@ class WebGPUTextureRenderer {
 
 		this.renderer = renderer;
 
+		// @TODO: Consider to introduce WebGPURenderTarget or rename WebGLRenderTarget to just RenderTarget
+
 		this.renderTarget = new WebGLRenderTarget( options );
 
 	}
