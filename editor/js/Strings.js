@@ -332,7 +332,9 @@ function Strings( config ) {
 		fr: {
 
 			'menubar/file': 'Fichier',
-			'menubar/file/new': 'Nouveau',
+			'menubar/file/new': 'New Project',
+			'menubar/file/load': 'Load Project',
+			'menubar/file/save': 'Save Project',
 			'menubar/file/import': 'Importer',
 			'menubar/file/export/geometry': 'Exporter Geometrie',
 			'menubar/file/export/object': 'Exporter Objet',
@@ -655,7 +657,9 @@ function Strings( config ) {
 		zh: {
 
 			'menubar/file': '文件',
-			'menubar/file/new': '新建',
+			'menubar/file/new': 'New Project',
+			'menubar/file/load': 'Load Project',
+			'menubar/file/save': 'Save Project',
 			'menubar/file/import': '导入',
 			'menubar/file/export/geometry': '导出几何体',
 			'menubar/file/export/object': '导出物体',
