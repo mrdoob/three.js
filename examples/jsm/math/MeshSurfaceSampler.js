@@ -104,11 +104,17 @@ var MeshSurfaceSampler = ( function () {
 
 		},
 
+		getRandomNumber: function () {
+
+			return Math.random();
+
+		},
+
 		sample: function ( targetPosition, targetNormal ) {
 
 			var cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
 
-			var faceIndex = this.binarySearch( Math.random() * cumulativeTotal );
+			var faceIndex = this.binarySearch( this.getRandomNumber() * cumulativeTotal );
 
 			return this.sampleFace( faceIndex, targetPosition, targetNormal );
 
@@ -150,8 +156,8 @@ var MeshSurfaceSampler = ( function () {
 
 		sampleFace: function ( faceIndex, targetPosition, targetNormal ) {
 
-			var u = Math.random();
-			var v = Math.random();
+			var u = this.getRandomNumber();
+			var v = this.getRandomNumber();
 
 			if ( u + v > 1 ) {
 
