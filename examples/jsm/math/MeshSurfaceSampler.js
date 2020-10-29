@@ -105,7 +105,7 @@ var MeshSurfaceSampler = ( function () {
 
 		},
 
-		setRandomFunction: function ( randomFunction ) {
+		setRandomGenerator: function ( randomFunction ) {
 
 			this.randomFunction = randomFunction;
 			return this;
