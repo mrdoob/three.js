@@ -34,8 +34,6 @@
 				scene = new THREE.Scene();
 				scene.background = new THREE.Color( 0x222222 );
 
-				//
-
 				const loader = new LottieLoader();
 				loader.load( 'textures/lottie/24017-lottie-logo-animation.json', function ( texture ) {
 
@@ -47,8 +45,6 @@
 					scene.add( mesh );
 
 				} );
-
-				//
 
 				renderer = new THREE.WebGLRenderer();
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -63,6 +59,10 @@
 
 			function setupControls( animation ) {
 
+				// Lottie animation API
+				// https://airbnb.io/lottie/#/web
+
+				// There are a few undocumented properties:
 				// console.log( animation );
 
 				const scrubber = document.getElementById( 'scrubber' );
