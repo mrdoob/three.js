@@ -14,7 +14,15 @@ import {
 	NearestMipmapLinearFilter,
 	NearestMipmapNearestFilter,
 	PropertyBinding,
+	RGBAIntegerFormat,
 	RGBAFormat,
+	RGBEFormat,
+	RGBIntegerFormat,
+	RGBFormat,
+	RGIntegerFormat,
+	RGFormat,
+	RedIntegerFormat,
+	RedFormat,
 	RepeatWrapping,
 	Scene,
 	Vector3
@@ -276,13 +284,13 @@ GLTFExporter.prototype = {
 			switch ( format ) {
 
 				// No conversion needed
-				case THREE.RGBAIntegerFormat:
-				case THREE.RGBAFormat:
-				case THREE.RGBEFormat:
+				case RGBAIntegerFormat:
+				case RGBAFormat:
+				case RGBEFormat:
 					break;
 
-				case THREE.RGBIntegerFormat:
-				case THREE.RGBFormat:
+				case RGBIntegerFormat:
+				case RGBFormat:
 					pixelStride = 3;
 					convertFunction = function ( pixelData ) {
 
@@ -292,8 +300,8 @@ GLTFExporter.prototype = {
 
 					break;
 
-				case THREE.RGIntegerFormat:
-				case THREE.RGFormat:
+				case RGIntegerFormat:
+				case RGFormat:
 					pixelStride = 2;
 					convertFunction = function ( pixelData ) {
 
@@ -303,8 +311,8 @@ GLTFExporter.prototype = {
 
 					break;
 
-				case THREE.RedIntegerFormat:
-				case THREE.RedFormat:
+				case RedIntegerFormat:
+				case RedFormat:
 					pixelStride = 1;
 					convertFunction = function ( pixelData ) {
 
