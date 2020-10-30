@@ -1,6 +1,17 @@
 //------------------------------------------------------------------------------
 // Constants
 //------------------------------------------------------------------------------
+import {
+	RedFormat,
+	RedIntegerFormat,
+	RGBAFormat,
+	RGBAIntegerFormat,
+	RGBEFormat,
+	RGBFormat,
+	RGBIntegerFormat, RGFormat,
+	RGIntegerFormat
+} from "../../../build/three.module";
+
 var WEBGL_CONSTANTS = {
 	POINTS: 0x0000,
 	LINES: 0x0001,
@@ -234,6 +245,130 @@ THREE.GLTFExporter.prototype = {
 		function isPowerOfTwo( image ) {
 
 			return THREE.MathUtils.isPowerOfTwo( image.width ) && THREE.MathUtils.isPowerOfTwo( image.height );
+
+		}
+
+		/**
+		 * Creates an ImageData instance from a DataTexture image information, regardless of format
+		 *
+		 * @param {{ data: ArrayBuffer, width: number, height: number }} image
+		 * @param {number} format
+		 * @param {canvas} canvas
+		 */
+		function toImageData( image, format, canvas ) {
+
+			// Initialize RGBA array
+			let data = new Uint8ClampedArray( image.height * image.width * 4 );
+
+			let pixelStride = 4;
+			let convertFunction;
+
+			switch ( format ) {
+
+				// No conversion needed
+				case THREE.RGBAIntegerFormat:
+				case THREE.RGBAFormat:
+				case THREE.RGBEFormat:
+					break;
+
+				case THREE.RGBIntegerFormat:
+				case THREE.RGBFormat:
+					pixelStride = 3;
+					convertFunction = function ( pixelData ) {
+
+						return [ pixelData[ 0 ], pixelData[ 1 ], pixelData[ 2 ], 255 ];
+
+					};
+
+					break;
+
+				case THREE.RGIntegerFormat:
+				case THREE.RGFormat:
+					pixelStride = 2;
+					convertFunction = function ( pixelData ) {
+
+						return [ pixelData[ 0 ], pixelData[ 1 ], 0, 255 ];
+
+					};
+
+					break;
+
+				case THREE.RedIntegerFormat:
+				case THREE.RedFormat:
+					pixelStride = 1;
+					convertFunction = function ( pixelData ) {
+
+						return [ pixelData[ 0 ], pixelData[ 1 ], pixelData[ 2 ], 255 ];
+
+					};
+
+					break;
+
+				default:
+					throw "Format not supported";
+
+			}
+
+			if ( convertFunction != null ) {
+
+				const array = [ 0, 0, 0, 0 ];
+				for ( let i = 0; i < image.data.length / pixelStride; i ++ ) {
+
+					for ( let j = 0; j < pixelStride; j ++ )
+						array[ j ] = image.data[ pixelStride * i + j ];
+
+					const result = convertFunction( array );
+					for ( let j = 0; j < 4; j ++ )
+						data[ 4 * i + j ] = result[ j ];
+
+				}
+
+			}
+
+			// Downscale the image
+			if ( canvas.width !== image.width || canvas.height !== image.height ) {
+
+				const newData = new Uint8ClampedArray( 4 * canvas.width * canvas.height );
+
+				for ( let y = 0; y < canvas.height; y ++ ) {
+
+					const sY = y * image.height / canvas.height;
+					const fY = Math.floor( sY );
+					const cY = Math.ceil( sY );
+					const iY = sY - fY;
+
+					for ( let x = 0; x < canvas.width; x ++ ) {
+
+						const sX = x * image.width / canvas.width;
+						const fX = Math.floor( sX );
+						const cX = Math.ceil( sX );
+						const iX = sX - fX;
+
+						for ( let i = 0; i < 4; i ++ ) {
+
+							const p1 = data[ 4 * ( fX + image.height * sY ) + i ];
+							const p2 = data[ 4 * ( fX + image.height * cY ) + i ];
+							const p3 = data[ 4 * ( cX + image.height * sY ) + i ];
+							const p4 = data[ 4 * ( cX + image.height * cY ) + i ];
+
+							newData[ 4 * ( x + canvas.height * y ) + i ] = Math.round(
+								p1 * iX * iY +
+								p2 * iX * ( 1 - iY ) +
+								p3 * ( 1 - iX ) * iY +
+								p4 * ( 1 - iX ) * ( 1 - iY )
+							);
+
+						}
+
+					}
+
+				}
+
+				data = newData;
+
+			}
+
+			return new ImageData( data, image.width, image.height );
 
 		}
 
@@ -799,7 +934,18 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+				if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+
+					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+				} else {
+
+					const imageData = toImageData( image, format, canvas );
+					ctx.putImageData( imageData, 0, 0, 0, 0, canvas.width, canvas.height );
+
+				}
 
 				if ( options.binary === true ) {
 
