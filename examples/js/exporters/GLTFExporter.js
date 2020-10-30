@@ -1,16 +1,6 @@
 //------------------------------------------------------------------------------
 // Constants
 //------------------------------------------------------------------------------
-import {
-	RedFormat,
-	RedIntegerFormat,
-	RGBAFormat,
-	RGBAIntegerFormat,
-	RGBEFormat,
-	RGBFormat,
-	RGBIntegerFormat, RGFormat,
-	RGIntegerFormat
-} from "../../../build/three.module";
 
 var WEBGL_CONSTANTS = {
 	POINTS: 0x0000,
