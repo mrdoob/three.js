@@ -272,11 +272,12 @@ GLTFExporter.prototype = {
 		 *
 		 * @param {{ data: ArrayBuffer, width: number, height: number }} image
 		 * @param {number} format
+		 * @param {canvas} canvas
 		 */
-		function toImageData( image, format ) {
+		function toImageData( image, format, canvas ) {
 
 			// Initialize RGBA array
-			const data = new Uint8ClampedArray( image.height * image.width * 4 );
+			let data = new Uint8ClampedArray( image.height * image.width * 4 );
 
 			let pixelStride = 4;
 			let convertFunction;
@@ -340,6 +341,49 @@ GLTFExporter.prototype = {
 						data[ 4 * i + j ] = result[ j ];
 
 				}
+
+			}
+
+			// Downscale the image
+			if ( canvas.width !== image.width || canvas.height !== image.height ) {
+
+				const newData = new Uint8ClampedArray( 4 * canvas.width * canvas.height );
+
+				for ( let y = 0; y < canvas.height; y ++ ) {
+
+					const sY = y * image.height / canvas.height;
+					const fY = Math.floor( sY );
+					const cY = Math.ceil( sY );
+					const iY = sY - fY;
+
+					for ( let x = 0; x < canvas.width; x ++ ) {
+
+						const sX = x * image.width / canvas.width;
+						const fX = Math.floor( sX );
+						const cX = Math.ceil( sX );
+						const iX = sX - fX;
+
+						for ( let i = 0; i < 4; i ++ ) {
+
+							const p1 = data[ 4 * ( fX + image.height * sY ) + i ];
+							const p2 = data[ 4 * ( fX + image.height * cY ) + i ];
+							const p3 = data[ 4 * ( cX + image.height * sY ) + i ];
+							const p4 = data[ 4 * ( cX + image.height * cY ) + i ];
+
+							newData[ 4 * ( x + canvas.height * y ) + i ] = Math.round(
+								p1 * iX * iY +
+								p2 * iX * ( 1 - iY ) +
+								p3 * ( 1 - iX ) * iY +
+								p4 * ( 1 - iX ) * ( 1 - iY )
+							);
+
+						}
+
+					}
+
+				}
+
+				data = newData;
 
 			}
 
@@ -917,7 +961,7 @@ GLTFExporter.prototype = {
 
 				} else {
 
-					const imageData = toImageData( image, format );
+					const imageData = toImageData( image, format, canvas );
 					ctx.putImageData( imageData, 0, 0, 0, 0, canvas.width, canvas.height );
 
 				}
