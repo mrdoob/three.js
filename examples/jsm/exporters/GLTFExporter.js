@@ -260,6 +260,86 @@ GLTFExporter.prototype = {
 		}
 
 		/**
+		 * Creates an ImageData instance from a DataTexture image information, regardless of format
+		 *
+		 * @param {{ data: ArrayBuffer, width: number, height: number }} image
+		 * @param {number} format
+		 */
+		function toImageData( image, format ) {
+
+			// Initialize RGBA array
+			const data = new Uint8ClampedArray( image.height * image.width * 4 );
+
+			let pixelStride = 4;
+			let convertFunction;
+
+			switch ( format ) {
+
+				// No conversion needed
+				case THREE.RGBAIntegerFormat:
+				case THREE.RGBAFormat:
+				case THREE.RGBEFormat:
+					break;
+
+				case THREE.RGBIntegerFormat:
+				case THREE.RGBFormat:
+					pixelStride = 3;
+					convertFunction = function ( pixelData ) {
+
+						return [ pixelData[ 0 ], pixelData[ 1 ], pixelData[ 2 ], 255 ];
+
+					};
+
+					break;
+
+				case THREE.RGIntegerFormat:
+				case THREE.RGFormat:
+					pixelStride = 2;
+					convertFunction = function ( pixelData ) {
+
+						return [ pixelData[ 0 ], pixelData[ 1 ], 0, 255 ];
+
+					};
+
+					break;
+
+				case THREE.RedIntegerFormat:
+				case THREE.RedFormat:
+					pixelStride = 1;
+					convertFunction = function ( pixelData ) {
+
+						return [ pixelData[ 0 ], pixelData[ 1 ], pixelData[ 2 ], 255 ];
+
+					};
+
+					break;
+
+				default:
+					throw "Format not supported";
+
+			}
+
+			if ( convertFunction != null ) {
+
+				const array = [ 0, 0, 0, 0 ];
+				for ( let i = 0; i < image.data.length / pixelStride; i ++ ) {
+
+					for ( let j = 0; j < pixelStride; j ++ )
+						array[ j ] = image.data[ pixelStride * i + j ];
+
+					const result = convertFunction( array );
+					for ( let j = 0; j < 4; j ++ )
+						data[ 4 * i + j ] = result[ j ];
+
+				}
+
+			}
+
+			return new ImageData( data, image.width, image.height );
+
+		}
+
+		/**
 		 * Checks if normal attribute values are normalized.
 		 *
 		 * @param {BufferAttribute} normal
@@ -812,7 +892,7 @@ GLTFExporter.prototype = {
 
 				}
 
-				var ctx = canvas.getContext( '2d' );
+				const ctx = canvas.getContext( '2d' );
 
 				if ( flipY === true ) {
 
@@ -821,7 +901,18 @@ GLTFExporter.prototype = {
 
 				}
 
-				ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+				if ( ( typeof HTMLImageElement !== 'undefined' && image instanceof HTMLImageElement ) ||
+					( typeof HTMLCanvasElement !== 'undefined' && image instanceof HTMLCanvasElement ) ||
+					( typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap ) ) {
+
+					ctx.drawImage( image, 0, 0, canvas.width, canvas.height );
+
+				} else {
+
+					const imageData = toImageData( image, format );
+					ctx.putImageData( imageData, 0, 0, 0, 0, canvas.width, canvas.height );
+
+				}
 
 				if ( options.binary === true ) {
 
