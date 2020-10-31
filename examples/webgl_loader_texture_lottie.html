@@ -18,6 +18,8 @@
 		<script type="module">
 
 			import * as THREE from '../build/three.module.js';
+			import { RoomEnvironment } from './jsm/environments/RoomEnvironment.js';
+			import { RoundedBoxBufferGeometry } from './jsm/geometries/RoundedBoxBufferGeometry.js';
 			import { LottieLoader } from './jsm/loaders/LottieLoader.js';
 
 			let renderer, scene, camera;
@@ -29,10 +31,10 @@
 			function init() {
 
 				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.1, 10 );
-				camera.position.z = 3;
+				camera.position.z = 2.5;
 
 				scene = new THREE.Scene();
-				scene.background = new THREE.Color( 0x222222 );
+				scene.background = new THREE.Color( 0x111111 );
 
 				const loader = new LottieLoader();
 				loader.setQuality( 2 );
@@ -40,8 +42,10 @@
 
 					setupControls( texture.animation );
 
-					const geometry = new THREE.BoxBufferGeometry();
-					const material = new THREE.MeshBasicMaterial( { map: texture } );
+					// texture = new THREE.TextureLoader().load( 'textures/uv_grid_directx.jpg' );
+
+					const geometry = new RoundedBoxBufferGeometry( 1, 1, 1, 15, 0.2 );
+					const material = new THREE.MeshStandardMaterial( { roughness: 0.1, map: texture } );
 					mesh = new THREE.Mesh( geometry, material );
 					scene.add( mesh );
 
@@ -51,6 +55,11 @@
 				renderer.setPixelRatio( window.devicePixelRatio );
 				renderer.setSize( window.innerWidth, window.innerHeight );
 				document.body.appendChild( renderer.domElement );
+
+				const environment = new RoomEnvironment();
+				const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+				scene.environment = pmremGenerator.fromScene( environment ).texture;
 
 				//
 
@@ -112,8 +121,7 @@
 
 				if ( mesh ) {
 
-					mesh.rotation.x += 0.001;
-					mesh.rotation.y += 0.01;
+					mesh.rotation.y -= 0.001;
 
 				}
 
