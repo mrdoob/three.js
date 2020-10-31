@@ -25,7 +25,7 @@ ou en ligne via une balise `<script type="module">`. Voici un exemple des deux
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r119/build/three.module.js';
+import * as THREE from './resources/threejs/r122/build/three.module.js';
 
 ...
 

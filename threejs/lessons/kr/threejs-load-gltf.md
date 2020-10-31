@@ -102,10 +102,10 @@ objLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', null, (materia
 추가합니다.
 
 ```html
--import { LoaderSupport } from './resources/threejs/r119/examples/jsm/loaders/LoaderSupport.js';
--import { OBJLoader2 } from './resources/threejs/r119/examples/jsm/loaders/OBJLoader2.js';
--import { MTLLoader } from './resources/threejs/r119/examples/jsm/loaders/MTLLoader.js';
-+import { GLTFLoader } from './resources/threejs/r119/examples/jsm/loaders/GLTFLoader.js';
+-import { LoaderSupport } from './resources/threejs/r122/examples/jsm/loaders/LoaderSupport.js';
+-import { OBJLoader2 } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+-import { MTLLoader } from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
++import { GLTFLoader } from './resources/threejs/r122/examples/jsm/loaders/GLTFLoader.js';
 ```
 
 이제 실행해보죠.

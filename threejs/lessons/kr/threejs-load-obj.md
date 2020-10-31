@@ -41,7 +41,7 @@ Three.js로 프로젝트를 진행할 때, 3D 모델 파일을 불러와 사용�
 다음으로 먼저 `OBJLoader2` 모듈을 스크립트에 로드합니다.
 
 ```js
-import { OBJLoader2 } from './resources/threejs/r119/examples/jsm/loaders/OBJLoader2.js';
+import { OBJLoader2 } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
 ```
 
 `OBJLoader2`의 인스턴스를 생성한 뒤 .OBJ 파일의 경로와 콜백 함수를 넘겨
@@ -133,11 +133,11 @@ map_Ns windmill_001_base_SPEC.jpg
 `MTLLoader`와 `MTLObjBridge` 모듈을 불러옵니다.
 
 ```js
-import * as THREE from './resources/three/r119/build/three.module.js';
-import { OrbitControls } from './resources/threejs/r119/examples/jsm/controls/OrbitControls.js';
-import { OBJLoader2 } from './resources/threejs/r119/examples/jsm/loaders/OBJLoader2.js';
-+import { MTLLoader } from './resources/threejs/r119/examples/jsm/loaders/MTLLoader.js';
-+import { MtlObjBridge } from './resources/threejs/r119/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
+import * as THREE from './resources/three/r122/build/three.module.js';
+import { OrbitControls } from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import { OBJLoader2 } from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
++import { MTLLoader } from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
++import { MtlObjBridge } from './resources/threejs/r122/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 ```
 
 우선 .MTL 파일을 불러와 `MtlObjBridge`로 재질을 만듭니다. 그리고 `OBJLoader2`

@@ -96,10 +96,10 @@ objLoader.loadMtl('resources/models/windmill/windmill-fixed.mtl', null, (materia
 また `OBJLoader2` を取り除き `GLTFLoader` を含める必要があります。
 
 ```html
--import {LoaderSupport} from './resources/threejs/r119/examples/jsm/loaders/LoaderSupport.js';
--import {OBJLoader2} from './resources/threejs/r119/examples/jsm/loaders/OBJLoader2.js';
--import {MTLLoader} from './resources/threejs/r119/examples/jsm/loaders/MTLLoader.js';
-+import {GLTFLoader} from './resources/threejs/r119/examples/jsm/loaders/GLTFLoader.js';
+-import {LoaderSupport} from './resources/threejs/r122/examples/jsm/loaders/LoaderSupport.js';
+-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+-import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
++import {GLTFLoader} from './resources/threejs/r122/examples/jsm/loaders/GLTFLoader.js';
 ```
 
 実行すると以下になりました。
@@ -138,7 +138,7 @@ gltfLoader.load('resources/models/cartoon_lowpoly_small_city_free_pack/scene.glt
   console.log(dumpObject(root).join('\n'));
 ```
 
-[実行すると](./threejs-load-gltf-dump-scenegraph.html) このようなリストが得られました。
+[実行すると](../threejs-load-gltf-dump-scenegraph.html) このようなリストが得られました。
 
 ```text
 OSG_Scene [Scene]
@@ -398,7 +398,7 @@ let curveObject;
 このコードの最初の部分は曲線を作ります。
 コードの2番目の部分は曲線から250頂点を生成し、その250頂点を結んで作られた線を表示するオブジェクトを作成します。
 
-[このサンプル](./threejs-load-gltf-car-path.html)を実行してもカーブが見えませんでした。
+[このサンプル](../threejs-load-gltf-car-path.html)を実行してもカーブが見えませんでした。
 見えるようにするために、深度テストを無視して最後にレンダリングするようにしました。
 
 ```js

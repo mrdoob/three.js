@@ -259,7 +259,7 @@ function main() {
 次にHTMLファイルには既に `main` があり、`init` と `state` をエクスポートする必要があるため `main` の名前を `init` に変更します。
 
 ```js
-import * as THREE from './resources/threejs/r119/build/three.module.js';
+import * as THREE from './resources/threejs/r122/build/three.module.js';
 
 -const state = {
 +export const state = {
@@ -613,7 +613,7 @@ window.addEventListener('touchend', clearPickPosition);
 OrbitControlsは `HTMLElement` を取り、それに使用するDOMイベントのほとんどをアタッチします。
 OrbitControlsが必要とする機能をサポートする必要があります。
 
-[OrbitControlsのソースコード](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r119/examples/js/controls/OrbitControls.js)を掘り下げてみると、次のイベントを処理する必要があるように見えます。
+[OrbitControlsのソースコード](https://github.com/gfxfundamentals/threejsfundamentals/blob/master/threejs/resources/threejs/r122/examples/js/controls/OrbitControls.js)を掘り下げてみると、次のイベントを処理する必要があるように見えます。
 
 * contextmenu
 * mousedown
@@ -640,7 +640,7 @@ OrbitControlsが必要とする機能をサポートする必要があります�
 ここにWorker部分のコードがあります。
 
 ```js
-import {EventDispatcher} from './resources/threejs/r119/build/three.module.js';
+import {EventDispatcher} from './resources/threejs/r122/build/three.module.js';
 
 class ElementProxyReceiver extends EventDispatcher {
   constructor() {
@@ -721,8 +721,8 @@ self.onmessage = function(e) {
 共有のthree.jsコードでは `OrbitControls` をインポートして設定する必要があります。
 
 ```js
-import * as THREE from './resources/threejs/r119/build/three.module.js';
-+import {OrbitControls} from './resources/threejs/r119/examples/jsm/controls/OrbitControls.js';
+import * as THREE from './resources/threejs/r122/build/three.module.js';
++import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
 
 export function init(data) {
 -  const {canvas} = data;

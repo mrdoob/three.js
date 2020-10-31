@@ -53,7 +53,7 @@ Three.js经常会和WebGL混淆，
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r119/build/three.module.js';
+import * as THREE from './resources/threejs/r122/build/three.module.js';
 </script>
 ```
 
@@ -71,7 +71,7 @@ Three.js将会使用这个canvas标签所以我们要先获取它然后传给thr
 
 ```html
 <script type="module">
-import * as THREE from './resources/threejs/r119/build/three.module.js';
+import * as THREE from './resources/threejs/r122/build/three.module.js';
 
 +function main() {
 +  const canvas = document.querySelector('#c');
@@ -341,7 +341,7 @@ function render(time) {
 </p>
 <pre class=prettyprint>
 &lt;script type="module"&gt;
-import * as THREE from './resources/threejs/r119/build/three.module.js';
+import * as THREE from './resources/threejs/r122/build/three.module.js';
 
 ...
 

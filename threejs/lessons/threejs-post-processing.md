@@ -107,10 +107,10 @@ render to the next render target.
 To use these classes we need to import a bunch of scripts.
 
 ```js
-import {EffectComposer} from './resources/threejs/r119/examples/jsm/postprocessing/EffectComposer.js';
-import {RenderPass} from './resources/threejs/r119/examples/jsm/postprocessing/RenderPass.js';
-import {BloomPass} from './resources/threejs/r119/examples/jsm/postprocessing/BloomPass.js';
-import {FilmPass} from './resources/threejs/r119/examples/jsm/postprocessing/FilmPass.js';
+import {EffectComposer} from './resources/threejs/r122/examples/jsm/postprocessing/EffectComposer.js';
+import {RenderPass} from './resources/threejs/r122/examples/jsm/postprocessing/RenderPass.js';
+import {BloomPass} from './resources/threejs/r122/examples/jsm/postprocessing/BloomPass.js';
+import {FilmPass} from './resources/threejs/r122/examples/jsm/postprocessing/FilmPass.js';
 ```
 
 For pretty much any post processing `EffectComposer.js`, and `RenderPass.js`

@@ -102,10 +102,10 @@ I kept the auto framing code as before
 We also need to include the `GLTFLoader` and we can get rid of the `OBJLoader2`.
 
 ```html
--import {LoaderSupport} from './resources/threejs/r119/examples/jsm/loaders/LoaderSupport.js';
--import {OBJLoader2} from './resources/threejs/r119/examples/jsm/loaders/OBJLoader2.js';
--import {MTLLoader} from './resources/threejs/r119/examples/jsm/loaders/MTLLoader.js';
-+import {GLTFLoader} from './resources/threejs/r119/examples/jsm/loaders/GLTFLoader.js';
+-import {LoaderSupport} from './resources/threejs/r122/examples/jsm/loaders/LoaderSupport.js';
+-import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
+-import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
++import {GLTFLoader} from './resources/threejs/r122/examples/jsm/loaders/GLTFLoader.js';
 ```
 
 And running that we get

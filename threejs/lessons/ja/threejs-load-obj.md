@@ -32,7 +32,7 @@ blendファイルをダウンロードし[Blender](https://blender.org)で読み
 まず最初に `OBJLoader2` のローダーをコードに含める必要があります。
 
 ```js
-import {OBJLoader2} from './resources/threejs/r119/examples/jsm/loaders/OBJLoader2.js';
+import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
 ```
 
 次にOBJファイルをロードするために `OBJLoader2` のインスタンスを作成し、OBJファイルのURLを渡し、ロードされたモデルをシーンに追加するコールバックを渡します。
@@ -118,11 +118,11 @@ blenderで **File->External Data->Unpack All Into Files** を選択し、これ�
 `MTLLoader` と `MtlObjBridge` をimportする必要があります。
 
 ```js
-import * as THREE from './resources/three/r119/build/three.module.js';
-import {OrbitControls} from './resources/threejs/r119/examples/jsm/controls/OrbitControls.js';
-import {OBJLoader2} from './resources/threejs/r119/examples/jsm/loaders/OBJLoader2.js';
-+import {MTLLoader} from './resources/threejs/r119/examples/jsm/loaders/MTLLoader.js';
-+import {MtlObjBridge} from './resources/threejs/r119/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
+import * as THREE from './resources/three/r122/build/three.module.js';
+import {OrbitControls} from './resources/threejs/r122/examples/jsm/controls/OrbitControls.js';
+import {OBJLoader2} from './resources/threejs/r122/examples/jsm/loaders/OBJLoader2.js';
++import {MTLLoader} from './resources/threejs/r122/examples/jsm/loaders/MTLLoader.js';
++import {MtlObjBridge} from './resources/threejs/r122/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js';
 ```
 
 まず、MTLファイルをロードします。
