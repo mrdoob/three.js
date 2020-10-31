@@ -57,7 +57,6 @@ var SSRShader = {
 		// precision highp float;
 		precision highp sampler2D;
 		varying vec2 vUv;
-		#define maxReflectRayLen 2000. ///todo: temp use, need calculated from maxDistance
 		uniform sampler2D tDepth;
 		uniform sampler2D tNormal;
 		uniform sampler2D tMetalness;
@@ -147,6 +146,14 @@ var SSRShader = {
 				vec3 viewIncidenceDir=vec3(0,0,-1);
 				vec3 viewReflectDir=reflect(viewIncidenceDir,viewNormal);
 			#endif
+
+			float maxReflectRayLen=maxDistance/dot(-viewIncidenceDir,viewNormal);
+			// dot(a,b)==length(a)*length(b)*cos(theta) // https://www.mathsisfun.com/algebra/vectors-dot-product.html
+			// if(a.isNormalized&&b.isNormalized) dot(a,b)==cos(theta)
+			// maxDistance/maxReflectRayLen=cos(theta)
+			// maxDistance/maxReflectRayLen==dot(a,b)
+			// maxReflectRayLen==maxDistance/dot(a,b)
+
 			vec3 d1viewPosition=viewPosition+viewReflectDir*maxReflectRayLen;
 			#ifdef isPerspectiveCamera
 				if(d1viewPosition.z>-cameraNear){
