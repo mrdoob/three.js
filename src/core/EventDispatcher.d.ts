@@ -14,7 +14,7 @@ type Listener<E, T, U> = ( event: E & { type: T } & { target: U } ) => void;
  *
  * @source src/core/EventDispatcher.js
  */
-export class EventDispatcher<E extends Event = Event> {
+export class EventDispatcher<E extends {type: string} = Event> {
 
 	/**
 	 * Creates eventDispatcher object. It needs to be call with '.call' to add the functionality to an object.
