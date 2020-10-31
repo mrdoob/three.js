@@ -53,7 +53,7 @@
 		as long as video is playing - the [page:VideoTexture VideoTexture] class handles this automatically.
 		</p>
 
-		<h3>[property:array mipmaps]</h3>
+		<h3>[property:Array mipmaps]</h3>
 		<p>
 		Array of user-specified mipmaps (optional).
 		</p>
@@ -166,7 +166,7 @@
 		The point around which rotation occurs. A value of (0.5, 0.5) corresponds to the center of the texture. Default is (0, 0), the lower left.
 		</p>
 
-		<h3>[property:boolean matrixAutoUpdate]</h3>
+		<h3>[property:Boolean matrixAutoUpdate]</h3>
 		<p>
 		Whether to update the texture's uv-transform [page:Texture.matrix .matrix] from the texture properties [page:Texture.offset .offset], [page:Texture.repeat .repeat],
 		[page:Texture.rotation .rotation], and [page:Texture.center .center]. True by default.
@@ -181,13 +181,13 @@
 		Default is the identity matrix.
 		</p>
 
-		<h3>[property:boolean generateMipmaps]</h3>
+		<h3>[property:Boolean generateMipmaps]</h3>
 		<p>
 		Whether to generate mipmaps (if possible) for a texture. True by default. Set this to false if you are
 		creating mipmaps manually.
 		</p>
 
-		<h3>[property:boolean premultiplyAlpha]</h3>
+		<h3>[property:Boolean premultiplyAlpha]</h3>
 		<p>
 		If set to *true*, the alpha channel, if present, is multiplied into the color channels when the texture is uploaded to the GPU. Default is *false*.<br /><br />
 
@@ -195,7 +195,7 @@
 		You need to configure on bitmap creation instead. See [page:ImageBitmapLoader].
 		</p>
 
-		<h3>[property:boolean flipY]</h3>
+		<h3>[property:Boolean flipY]</h3>
 		<p>
 		If set to *true*, the texture is flipped along the vertical axis when uploaded to the GPU. Default is *true*.<br /><br />
 
