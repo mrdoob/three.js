@@ -35,6 +35,7 @@
 				scene.background = new THREE.Color( 0x222222 );
 
 				const loader = new LottieLoader();
+				loader.setQuality( 2 );
 				loader.load( 'textures/lottie/24017-lottie-logo-animation.json', function ( texture ) {
 
 					setupControls( texture.animation );
@@ -96,6 +97,7 @@
 
 			function onWindowResize() {
 
+				camera.aspect = window.innerWidth / window.innerHeight;
 				camera.updateProjectionMatrix();
 
 				renderer.setSize( window.innerWidth, window.innerHeight );

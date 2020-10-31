@@ -10,4 +10,6 @@ export class LottieLoader extends Loader {
 
 	load( url: string, onLoad: ( texture: CanvasTexture ) => void, onProgress?: ( event: ProgressEvent ) => void, onError?: ( event: ErrorEvent ) => void ) : void;
 
+	setQuality( value: Number ) : void;
+
 }
