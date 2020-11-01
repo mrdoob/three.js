@@ -43,32 +43,33 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 			normals[ i + 2 ] = normal.z;
 
 			const side = Math.floor( i / faceTris );
+			const halfRadius = radius / 2;
 
 			switch ( side ) {
 
 				case 0: // right
-					uvs[ j + 0 ] = 0.5 - ( positions[ i + 2 ] / ( depth - radius ) );
-					uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - radius ) );
+					uvs[ j + 0 ] = 0.5 - ( positions[ i + 2 ] / ( depth - halfRadius ) );
+					uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - halfRadius ) );
 					break;
 				case 1: // left
-					uvs[ j + 0 ] = 0.5 + ( positions[ i + 2 ] / ( depth - radius ) );
-					uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - radius ) );
+					uvs[ j + 0 ] = 0.5 + ( positions[ i + 2 ] / ( depth - halfRadius ) );
+					uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - halfRadius ) );
 					break;
 				case 2: // top
-					uvs[ j + 0 ] = 0.5 + ( positions[ i + 0 ] / ( width - radius ) );
-					uvs[ j + 1 ] = 0.5 - ( positions[ i + 2 ] / ( depth - radius ) );
+					uvs[ j + 0 ] = 0.5 + ( positions[ i + 0 ] / ( width - halfRadius ) );
+					uvs[ j + 1 ] = 0.5 - ( positions[ i + 2 ] / ( depth - halfRadius ) );
 					break;
 				case 3: // bottom
-					uvs[ j + 0 ] = 0.5 + ( positions[ i + 0 ] / ( width - radius ) );
-					uvs[ j + 1 ] = 0.5 + ( positions[ i + 2 ] / ( depth - radius ) );
+					uvs[ j + 0 ] = 0.5 + ( positions[ i + 0 ] / ( width - halfRadius ) );
+					uvs[ j + 1 ] = 0.5 + ( positions[ i + 2 ] / ( depth - halfRadius ) );
 					break;
 				case 4: // front
-					uvs[ j + 0 ] = 0.5 + ( positions[ i + 0 ] / ( width - radius ) );
-					uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - radius ) );
+					uvs[ j + 0 ] = 0.5 + ( positions[ i + 0 ] / ( width - halfRadius ) );
+					uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - halfRadius ) );
 					break;
 				case 5: // back
-					uvs[ j + 0 ] = 0.5 - ( positions[ i + 0 ] / ( width - radius ) );
-					uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - radius ) );
+					uvs[ j + 0 ] = 0.5 - ( positions[ i + 0 ] / ( width - halfRadius ) );
+					uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - halfRadius ) );
 					break;
 
 			}
