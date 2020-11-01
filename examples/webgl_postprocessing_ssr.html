@@ -209,6 +209,7 @@
 		loader.load( "models/gltf/SittingBox.glb", function ( gltf ) {
 
 			var mesh = gltf.scene.children[ 0 ];
+			mesh.geometry = mesh.geometry.toNonIndexed()
 			mesh.geometry.computeVertexNormals()
 
 			mixer = new THREE.AnimationMixer( mesh );
