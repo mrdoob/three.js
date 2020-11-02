@@ -63,7 +63,7 @@
 		};
 	}
 
-	var REVISION = '122dev';
+	var REVISION = '123dev';
 	var MOUSE = {
 		LEFT: 0,
 		MIDDLE: 1,
@@ -9220,7 +9220,7 @@
 				target = new Vector3();
 			}
 
-			this.updateMatrixWorld(true);
+			this.updateWorldMatrix(true, false);
 			var e = this.matrixWorld.elements;
 			return target.set(-e[8], -e[9], -e[10]).normalize();
 		},
@@ -9475,17 +9475,6 @@
 			renderer.setRenderTarget(currentRenderTarget);
 			renderer.xr.enabled = currentXrEnabled;
 		};
-
-		this.clear = function (renderer, color, depth, stencil) {
-			var currentRenderTarget = renderer.getRenderTarget();
-
-			for (var i = 0; i < 6; i++) {
-				renderer.setRenderTarget(renderTarget, i);
-				renderer.clear(color, depth, stencil);
-			}
-
-			renderer.setRenderTarget(currentRenderTarget);
-		};
 	}
 
 	CubeCamera.prototype = Object.create(Object3D.prototype);
@@ -9577,6 +9566,17 @@
 		mesh.geometry.dispose();
 		mesh.material.dispose();
 		return this;
+	};
+
+	WebGLCubeRenderTarget.prototype.clear = function (renderer, color, depth, stencil) {
+		var currentRenderTarget = renderer.getRenderTarget();
+
+		for (var i = 0; i < 6; i++) {
+			renderer.setRenderTarget(this, i);
+			renderer.clear(color, depth, stencil);
+		}
+
+		renderer.setRenderTarget(currentRenderTarget);
 	};
 
 	function DataTexture(data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding) {
@@ -13833,7 +13833,7 @@
 		return (lightB.castShadow ? 1 : 0) - (lightA.castShadow ? 1 : 0);
 	}
 
-	function WebGLLights() {
+	function WebGLLights(extensions, capabilities) {
 		var cache = new UniformsCache();
 		var shadowCache = ShadowUniformsCache();
 		var state = {
@@ -14054,8 +14054,22 @@
 			}
 
 			if (rectAreaLength > 0) {
-				state.rectAreaLTC1 = UniformsLib.LTC_1;
-				state.rectAreaLTC2 = UniformsLib.LTC_2;
+				if (capabilities.isWebGL2) {
+					// WebGL 2
+					state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
+					state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
+				} else {
+					// WebGL 1
+					if (extensions.has('OES_texture_float_linear') === true) {
+						state.rectAreaLTC1 = UniformsLib.LTC_FLOAT_1;
+						state.rectAreaLTC2 = UniformsLib.LTC_FLOAT_2;
+					} else if (extensions.has('OES_texture_half_float_linear') === true) {
+						state.rectAreaLTC1 = UniformsLib.LTC_HALF_1;
+						state.rectAreaLTC2 = UniformsLib.LTC_HALF_2;
+					} else {
+						console.error('THREE.WebGLRenderer: Unable to use RectAreaLight. Missing WebGL extensions.');
+					}
+				}
 			}
 
 			state.ambient[0] = r;
@@ -14096,8 +14110,8 @@
 		};
 	}
 
-	function WebGLRenderState() {
-		var lights = new WebGLLights();
+	function WebGLRenderState(extensions, capabilities) {
+		var lights = new WebGLLights(extensions, capabilities);
 		var lightsArray = [];
 		var shadowsArray = [];
 
@@ -14132,19 +14146,19 @@
 		};
 	}
 
-	function WebGLRenderStates() {
+	function WebGLRenderStates(extensions, capabilities) {
 		var renderStates = new WeakMap();
 
 		function get(scene, camera) {
 			var renderState;
 
 			if (renderStates.has(scene) === false) {
-				renderState = new WebGLRenderState();
+				renderState = new WebGLRenderState(extensions, capabilities);
 				renderStates.set(scene, new WeakMap());
 				renderStates.get(scene).set(camera, renderState);
 			} else {
 				if (renderStates.get(scene).has(camera) === false) {
-					renderState = new WebGLRenderState();
+					renderState = new WebGLRenderState(extensions, capabilities);
 					renderStates.get(scene).set(camera, renderState);
 				} else {
 					renderState = renderStates.get(scene).get(camera);
@@ -17431,7 +17445,7 @@
 			programCache = new WebGLPrograms(_this, cubemaps, extensions, capabilities, bindingStates, clipping);
 			materials = new WebGLMaterials(properties);
 			renderLists = new WebGLRenderLists(properties);
-			renderStates = new WebGLRenderStates();
+			renderStates = new WebGLRenderStates(extensions, capabilities);
 			background = new WebGLBackground(_this, cubemaps, state, objects, _premultipliedAlpha);
 			bufferRenderer = new WebGLBufferRenderer(_gl, extensions, info, capabilities);
 			indexedBufferRenderer = new WebGLIndexedBufferRenderer(_gl, extensions, info, capabilities);
@@ -20029,6 +20043,9 @@
 
 	VideoTexture.prototype = Object.assign(Object.create(Texture.prototype), {
 		constructor: VideoTexture,
+		clone: function clone() {
+			return new this.constructor(this.image).copy(this);
+		},
 		isVideoTexture: true,
 		update: function update() {
 			var video = this.image;
@@ -29190,12 +29207,12 @@
 			var material = new Materials[json.type]();
 			if (json.uuid !== undefined) material.uuid = json.uuid;
 			if (json.name !== undefined) material.name = json.name;
-			if (json.color !== undefined) material.color.setHex(json.color);
+			if (json.color !== undefined && material.color !== undefined) material.color.setHex(json.color);
 			if (json.roughness !== undefined) material.roughness = json.roughness;
 			if (json.metalness !== undefined) material.metalness = json.metalness;
 			if (json.sheen !== undefined) material.sheen = new Color().setHex(json.sheen);
-			if (json.emissive !== undefined) material.emissive.setHex(json.emissive);
-			if (json.specular !== undefined) material.specular.setHex(json.specular);
+			if (json.emissive !== undefined && material.emissive !== undefined) material.emissive.setHex(json.emissive);
+			if (json.specular !== undefined && material.specular !== undefined) material.specular.setHex(json.specular);
 			if (json.shininess !== undefined) material.shininess = json.shininess;
 			if (json.clearcoat !== undefined) material.clearcoat = json.clearcoat;
 			if (json.clearcoatRoughness !== undefined) material.clearcoatRoughness = json.clearcoatRoughness;
@@ -31105,10 +31122,10 @@
 
 			if (this._connected === true) {
 				this.disconnect();
-				this.filters = value;
+				this.filters = value.slice();
 				this.connect();
 			} else {
-				this.filters = value;
+				this.filters = value.slice();
 			}
 
 			return this;
@@ -32178,7 +32195,10 @@
 						var _lastIndex = --nObjects,
 								_lastObject = objects[_lastIndex];
 
-						indicesByUUID[_lastObject.uuid] = index;
+						if (_lastIndex > 0) {
+							indicesByUUID[_lastObject.uuid] = index;
+						}
+
 						objects[index] = _lastObject;
 						objects.pop(); // accounting is done, now do the same for all bindings
 
@@ -34812,6 +34832,64 @@
 		return AxesHelper;
 	}(LineSegments);
 
+	var _floatView = new Float32Array(1);
+
+	var _int32View = new Int32Array(_floatView.buffer);
+
+	var DataUtils = {
+		// Converts float32 to float16 (stored as uint16 value).
+		toHalfFloat: function toHalfFloat(val) {
+			// Source: http://gamedev.stackexchange.com/questions/17326/conversion-of-a-number-from-single-precision-floating-point-representation-to-a/17410#17410
+
+			/* This method is faster than the OpenEXR implementation (very often
+			* used, eg. in Ogre), with the additional benefit of rounding, inspired
+			* by James Tursa?s half-precision code. */
+			_floatView[0] = val;
+			var x = _int32View[0];
+			var bits = x >> 16 & 0x8000;
+			/* Get the sign */
+
+			var m = x >> 12 & 0x07ff;
+			/* Keep one extra bit for rounding */
+
+			var e = x >> 23 & 0xff;
+			/* Using int is faster here */
+
+			/* If zero, or denormal, or exponent underflows too much for a denormal
+				* half, return signed zero. */
+
+			if (e < 103) return bits;
+			/* If NaN, return NaN. If Inf or exponent overflow, return Inf. */
+
+			if (e > 142) {
+				bits |= 0x7c00;
+				/* If exponent was 0xff and one mantissa bit was set, it means NaN,
+							* not Inf, so make sure we set one mantissa bit too. */
+
+				bits |= (e == 255 ? 0 : 1) && x & 0x007fffff;
+				return bits;
+			}
+			/* If exponent underflows but not too much, return a denormal */
+
+
+			if (e < 113) {
+				m |= 0x0800;
+				/* Extra rounding may overflow and set mantissa to 0 and exponent
+					* to 1, which is OK. */
+
+				bits |= (m >> 114 - e) + (m >> 113 - e & 1);
+				return bits;
+			}
+
+			bits |= e - 112 << 10 | m >> 1;
+			/* Extra rounding. An overflow will set mantissa to 0 and increment
+				* the exponent, which is OK. */
+
+			bits += m & 1;
+			return bits;
+		}
+	};
+
 	var _ENCODINGS;
 	var LOD_MIN = 4;
 	var LOD_MAX = 8;
@@ -36700,6 +36778,11 @@
 	CubeCamera.prototype.updateCubeMap = function (renderer, scene) {
 		console.warn('THREE.CubeCamera: .updateCubeMap() is now .update().');
 		return this.update(renderer, scene);
+	};
+
+	CubeCamera.prototype.clear = function (renderer, color, depth, stencil) {
+		console.warn('THREE.CubeCamera: .clear() is now .renderTarget.clear().');
+		return this.renderTarget.clear(renderer, color, depth, stencil);
 	}; //
 
 
@@ -36877,6 +36960,7 @@
 	exports.DataTexture2DArray = DataTexture2DArray;
 	exports.DataTexture3D = DataTexture3D;
 	exports.DataTextureLoader = DataTextureLoader;
+	exports.DataUtils = DataUtils;
 	exports.DecrementStencilOp = DecrementStencilOp;
 	exports.DecrementWrapStencilOp = DecrementWrapStencilOp;
 	exports.DefaultLoadingManager = DefaultLoadingManager;

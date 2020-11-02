@@ -123,4 +123,20 @@ WebGLCubeRenderTarget.prototype.fromEquirectangularTexture = function ( renderer
 
 };
 
+WebGLCubeRenderTarget.prototype.clear = function ( renderer, color, depth, stencil ) {
+
+	const currentRenderTarget = renderer.getRenderTarget();
+
+	for ( let i = 0; i < 6; i ++ ) {
+
+		renderer.setRenderTarget( this, i );
+
+		renderer.clear( color, depth, stencil );
+
+	}
+
+	renderer.setRenderTarget( currentRenderTarget );
+
+};
+
 export { WebGLCubeRenderTarget };

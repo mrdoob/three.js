@@ -47,10 +47,6 @@
 				video.play();
 
 				const texture = new THREE.Texture( video );
-				texture.generateMipmaps = false;
-				texture.minFilter = THREE.NearestFilter;
-				texture.magFilter = THREE.NearestFilter;
-				texture.format = THREE.RGBFormat;
 
 				setInterval( function () {
 

@@ -10,6 +10,7 @@ import {
 	MeshPhongMaterial
 } from "../../../build/three.module.js";
 import { JSZip } from "../libs/jszip.module.min.js";
+
 /**
  * Description: Early release of an AMF Loader following the pattern of the
  * example loaders in the three.js project.

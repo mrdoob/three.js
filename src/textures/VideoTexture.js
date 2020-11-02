@@ -33,6 +33,12 @@ VideoTexture.prototype = Object.assign( Object.create( Texture.prototype ), {
 
 	constructor: VideoTexture,
 
+	clone: function () {
+
+		return new this.constructor( this.image ).copy( this );
+
+	},
+
 	isVideoTexture: true,
 
 	update: function () {

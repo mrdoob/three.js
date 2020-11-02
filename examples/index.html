@@ -42,8 +42,6 @@
 
 		<a id="button" target="_blank"><img src="../files/ic_code_black_24dp.svg"></a>
 
-		<script src="files.js"></script>
-
 		<script>
 
 		const panel = document.getElementById( 'panel' );
@@ -58,17 +56,21 @@
 		const previewsToggler = document.getElementById( 'previewsToggler' );
 
 		const links = {};
+		const validRedirects = new Map();
 		const container = document.createElement( 'div' );
 
 		let selected = null;
 
 		init();
 
-		function init() {
+		async function init() {
 
 			content.appendChild( container );
 
 			viewSrcButton.style.display = 'none';
+
+			const files = await ( await fetch( 'files.json' ) ).json();
+			const tags = await ( await fetch( 'tags.json' ) ).json();
 
 			for ( const key in files ) {
 
@@ -87,14 +89,24 @@
 					container.appendChild( link );
 
 					links[ file ] = link;
+					validRedirects.set( file, file + '.html' );
 
 				}
 
 			}
 
-			if ( window.location.hash !== '' && links[ window.location.hash.substring( 1 ) ] ) {
+			if ( window.location.hash !== '' ) {
 
-				loadFile( window.location.hash.substring( 1 ) );
+				const file = window.location.hash.substring( 1 );
+
+				// use a predefined map of redirects to avoid untrusted URL redirection due to user-provided value
+
+				if ( validRedirects.has( file ) === true ) {
+
+					selectFile( file );
+					viewer.src = validRedirects.get( file );
+
+				}
 
 			}
 
@@ -106,7 +118,7 @@
 
 			}
 
-			updateFilter();
+			updateFilter( files, tags );
 
 			// Events
 
@@ -129,14 +141,14 @@
 			exitSearchButton.onclick = function ( ) {
 
 				filterInput.value = '';
-				updateFilter();
+				updateFilter( files, tags );
 				panel.classList.remove( 'searchFocused' );
 
 			};
 
 			filterInput.addEventListener( 'input', function () {
 
-				updateFilter();
+				updateFilter( files, tags );
 
 			} );
 
@@ -201,13 +213,6 @@
 
 		}
 
-		function loadFile( file ) {
-
-			selectFile( file );
-			viewer.src = file + '.html';
-
-		}
-
 		function selectFile( file ) {
 
 			if ( selected !== null ) links[ selected ].classList.remove( 'selected' );
@@ -228,7 +233,7 @@
 
 		}
 
-		function updateFilter() {
+		function updateFilter( files, tags ) {
 
 			let v = filterInput.value.trim();
 			v = v.replace( /\s+/gi, ' ' ); // replace multiple whitespaces with a single one
@@ -251,17 +256,17 @@
 
 				for ( let i = 0; i < section.length; i ++ ) {
 
-					filterExample( section[ i ], exp );
+					filterExample( section[ i ], exp, tags );
 
 				}
 
 			}
 
-			layoutList();
+			layoutList( files );
 
 		}
 
-		function filterExample( file, exp ) {
+		function filterExample( file, exp, tags ) {
 
 			const link = links[ file ];
 			const name = getName( file );
@@ -298,7 +303,7 @@
 
 		}
 
-		function layoutList() {
+		function layoutList( files ) {
 
 			for ( const key in files ) {
 

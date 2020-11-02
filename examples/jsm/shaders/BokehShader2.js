@@ -1,6 +1,7 @@
 import {
 	Vector2
 } from "../../../build/three.module.js";
+
 /**
  * Depth-of-field shader with bokeh
  * ported from GLSL shader by Martins Upitis
