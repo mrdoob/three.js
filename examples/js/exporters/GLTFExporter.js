@@ -258,34 +258,11 @@ THREE.GLTFExporter.prototype = {
 				// No conversion needed
 				case THREE.RGBAIntegerFormat:
 				case THREE.RGBAFormat:
-				case THREE.RGBEFormat:
 					break;
 
 				case THREE.RGBIntegerFormat:
 				case THREE.RGBFormat:
 					pixelStride = 3;
-					convertFunction = function ( pixelData ) {
-
-						return [ pixelData[ 0 ], pixelData[ 1 ], pixelData[ 2 ], 255 ];
-
-					};
-
-					break;
-
-				case THREE.RGIntegerFormat:
-				case THREE.RGFormat:
-					pixelStride = 2;
-					convertFunction = function ( pixelData ) {
-
-						return [ pixelData[ 0 ], pixelData[ 1 ], 0, 255 ];
-
-					};
-
-					break;
-
-				case THREE.RedIntegerFormat:
-				case THREE.RedFormat:
-					pixelStride = 1;
 					convertFunction = function ( pixelData ) {
 
 						return [ pixelData[ 0 ], pixelData[ 1 ], pixelData[ 2 ], 255 ];

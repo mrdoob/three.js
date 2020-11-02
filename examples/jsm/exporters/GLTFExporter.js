@@ -16,13 +16,8 @@ import {
 	PropertyBinding,
 	RGBAIntegerFormat,
 	RGBAFormat,
-	RGBEFormat,
 	RGBIntegerFormat,
 	RGBFormat,
-	RGIntegerFormat,
-	RGFormat,
-	RedIntegerFormat,
-	RedFormat,
 	RepeatWrapping,
 	Scene,
 	Vector3
@@ -287,34 +282,11 @@ GLTFExporter.prototype = {
 				// No conversion needed
 				case RGBAIntegerFormat:
 				case RGBAFormat:
-				case RGBEFormat:
 					break;
 
 				case RGBIntegerFormat:
 				case RGBFormat:
 					pixelStride = 3;
-					convertFunction = function ( pixelData ) {
-
-						return [ pixelData[ 0 ], pixelData[ 1 ], pixelData[ 2 ], 255 ];
-
-					};
-
-					break;
-
-				case RGIntegerFormat:
-				case RGFormat:
-					pixelStride = 2;
-					convertFunction = function ( pixelData ) {
-
-						return [ pixelData[ 0 ], pixelData[ 1 ], 0, 255 ];
-
-					};
-
-					break;
-
-				case RedIntegerFormat:
-				case RedFormat:
-					pixelStride = 1;
 					convertFunction = function ( pixelData ) {
 
 						return [ pixelData[ 0 ], pixelData[ 1 ], pixelData[ 2 ], 255 ];
