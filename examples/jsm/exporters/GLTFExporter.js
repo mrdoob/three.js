@@ -14,11 +14,9 @@ import {
 	NearestMipmapLinearFilter,
 	NearestMipmapNearestFilter,
 	PropertyBinding,
-	RGBAIntegerFormat,
-	RGBAFormat,
-	RGBIntegerFormat,
-	RGBFormat,
 	RepeatWrapping,
+	RGBAFormat,
+	RGBFormat,
 	Scene,
 	Vector3
 } from "../../../build/three.module.js";
@@ -832,14 +830,14 @@ GLTFExporter.prototype = {
 
 				} else {
 
-					if ( format !== THREE.RGBAFormat && format !== THREE.RGBFormat )
+					if ( format !== RGBAFormat && format !== RGBFormat )
 						throw "Only RGB and RGBA formats are supported";
 
 					if ( image.width !== canvas.width || image.height !== canvas.height )
 						console.warn( "Image size and imposed canvas sized do not match" );
 
 					let data = image.data;
-					if ( format === THREE.RGBFormat ) {
+					if ( format === RGBFormat ) {
 
 						data = new Uint8ClampedArray( image.height * image.width * 4 );
 						data.forEach( function ( _, i ) {
