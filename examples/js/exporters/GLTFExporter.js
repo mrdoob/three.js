@@ -239,107 +239,6 @@ THREE.GLTFExporter.prototype = {
 		}
 
 		/**
-		 * Creates an ImageData instance from a DataTexture image information, regardless of format
-		 *
-		 * @param {{ data: ArrayBuffer, width: number, height: number }} image
-		 * @param {number} format
-		 * @param {canvas} canvas
-		 */
-		function toImageData( image, format, canvas ) {
-
-			// Initialize RGBA array
-			let data = new Uint8ClampedArray( image.height * image.width * 4 );
-
-			let pixelStride = 4;
-			let convertFunction;
-
-			switch ( format ) {
-
-				// No conversion needed
-				case THREE.RGBAIntegerFormat:
-				case THREE.RGBAFormat:
-					break;
-
-				case THREE.RGBIntegerFormat:
-				case THREE.RGBFormat:
-					pixelStride = 3;
-					convertFunction = function ( pixelData ) {
-
-						return [ pixelData[ 0 ], pixelData[ 1 ], pixelData[ 2 ], 255 ];
-
-					};
-
-					break;
-
-				default:
-					throw "Format not supported";
-
-			}
-
-			if ( convertFunction != null ) {
-
-				const array = [ 0, 0, 0, 0 ];
-				for ( let i = 0; i < image.data.length / pixelStride; i ++ ) {
-
-					for ( let j = 0; j < pixelStride; j ++ )
-						array[ j ] = image.data[ pixelStride * i + j ];
-
-					const result = convertFunction( array );
-					for ( let j = 0; j < 4; j ++ )
-						data[ 4 * i + j ] = result[ j ];
-
-				}
-
-			}
-
-			// Downscale the image
-			if ( canvas.width !== image.width || canvas.height !== image.height ) {
-
-				const newData = new Uint8ClampedArray( 4 * canvas.width * canvas.height );
-
-				for ( let y = 0; y < canvas.height; y ++ ) {
-
-					const sY = y * image.height / canvas.height;
-					const fY = Math.floor( sY );
-					const cY = Math.ceil( sY );
-					const iY = sY - fY;
-
-					for ( let x = 0; x < canvas.width; x ++ ) {
-
-						const sX = x * image.width / canvas.width;
-						const fX = Math.floor( sX );
-						const cX = Math.ceil( sX );
-						const iX = sX - fX;
-
-						for ( let i = 0; i < 4; i ++ ) {
-
-							const p1 = data[ 4 * ( fX + image.height * sY ) + i ];
-							const p2 = data[ 4 * ( fX + image.height * cY ) + i ];
-							const p3 = data[ 4 * ( cX + image.height * sY ) + i ];
-							const p4 = data[ 4 * ( cX + image.height * cY ) + i ];
-
-							newData[ 4 * ( x + canvas.height * y ) + i ] = Math.round(
-								p1 * iX * iY +
-								p2 * iX * ( 1 - iY ) +
-								p3 * ( 1 - iX ) * iY +
-								p4 * ( 1 - iX ) * ( 1 - iY )
-							);
-
-						}
-
-					}
-
-				}
-
-				data = newData;
-
-			}
-
-			return new ImageData( data, image.width, image.height );
-
-		}
-
-		/**
 		 * Checks if normal attribute values are normalized.
 		 *
 		 * @param {THREE.BufferAttribute} normal
@@ -909,8 +808,25 @@ THREE.GLTFExporter.prototype = {
 
 				} else {
 
-					const imageData = toImageData( image, format, canvas );
-					ctx.putImageData( imageData, 0, 0, 0, 0, canvas.width, canvas.height );
+					if ( format !== THREE.RGBAFormat && format !== THREE.RGBFormat )
+						throw "Only RGB and RGBA formats are supported";
+
+					if ( image.width !== canvas.width || image.height !== canvas.height )
+						console.warn( "Image size and imposed canvas sized do not match" );
+
+					let data = image.data;
+					if ( format === THREE.RGBFormat ) {
+
+						data = new Uint8ClampedArray( image.height * image.width * 4 );
+						data.forEach( function ( _, i ) {
+
+							data[ i ] = i % 4 === 3 ? 255 : image.data[ 3 * Math.floor( i / 4 ) + i % 4 ];
+
+						} );
+
+					}
+
+					ctx.putImageData( new ImageData( data, image.width, image.height ), 0, 0 );
 
 				}
 
