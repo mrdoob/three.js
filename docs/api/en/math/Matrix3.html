@@ -107,9 +107,9 @@ zAxis = (c, f, i)
 
 		<h3>[method:this getInverse]( [param:Matrix3 m] )</h3>
 		<p>
-		[page:Matrix3 m] - the matrix to take the inverse of.<br /><br />
+		[page:Matrix3 m] - the result will be copied into this matrix.<br /><br />
 
-		Set this matrix to the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] of the passed matrix [page:Matrix3 m],
+		Computes the [link:https://en.wikipedia.org/wiki/Invertible_matrix inverse] matrix and stores it into the given matrix,
 		using the [link:https://en.wikipedia.org/wiki/Invertible_matrix#Analytic_solution analytic method].
 
 		You can not invert a matrix with a determinant of zero. If you attempt this, the method returns a zero matrix instead.

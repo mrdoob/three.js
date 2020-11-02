@@ -65,7 +65,7 @@ class SkeletonHelper extends LineSegments {
 		const geometry = this.geometry;
 		const position = geometry.getAttribute( 'position' );
 
-		_matrixWorldInv.getInverse( this.root.matrixWorld );
+		this.root.matrixWorld.getInverse( _matrixWorldInv );
 
 		for ( let i = 0, j = 0; i < bones.length; i ++ ) {
 

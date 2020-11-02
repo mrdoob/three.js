@@ -114,7 +114,7 @@ THREE.Refractor = function ( geometry, options ) {
 		return function updateVirtualCamera( camera ) {
 
 			virtualCamera.matrixWorld.copy( camera.matrixWorld );
-			virtualCamera.matrixWorldInverse.getInverse( virtualCamera.matrixWorld );
+			virtualCamera.matrixWorld.getInverse( virtualCamera.matrixWorldInverse );
 			virtualCamera.projectionMatrix.copy( camera.projectionMatrix );
 			virtualCamera.far = camera.far; // used in WebGLBackground
 

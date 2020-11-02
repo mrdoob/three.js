@@ -125,7 +125,7 @@ var SkeletonUtils = {
 
 					} else {
 
-						relativeMatrix.getInverse( target.matrixWorld );
+						target.matrixWorld.getInverse( relativeMatrix );
 						relativeMatrix.multiply( boneTo.matrixWorld );
 
 					}
@@ -142,7 +142,7 @@ var SkeletonUtils = {
 					if ( target.isObject3D ) {
 
 						var boneIndex = bones.indexOf( bone ),
-							wBindMatrix = bindBones ? bindBones[ boneIndex ] : bindBoneMatrix.getInverse( target.skeleton.boneInverses[ boneIndex ] );
+							wBindMatrix = bindBones ? bindBones[ boneIndex ] : target.skeleton.boneInverses[ boneIndex ].getInverse( bindBoneMatrix );
 
 						globalMatrix.multiply( wBindMatrix );
 
@@ -154,7 +154,7 @@ var SkeletonUtils = {
 
 				if ( bone.parent && bone.parent.isBone ) {
 
-					bone.matrix.getInverse( bone.parent.matrixWorld );
+					bone.parent.matrixWorld.getInverse( bone.matrix );
 					bone.matrix.multiply( globalMatrix );
 
 				} else {

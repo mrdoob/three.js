@@ -332,7 +332,7 @@ THREE.CCDIKSolver = ( function () {
 					var iks = this.iks;
 					var bones = mesh.skeleton.bones;
 
-					matrix.getInverse( mesh.matrixWorld );
+					mesh.matrixWorld.getInverse( matrix );
 
 					for ( var i = 0, il = iks.length; i < il; i ++ ) {
 

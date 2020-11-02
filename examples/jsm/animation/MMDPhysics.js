@@ -1311,6 +1311,7 @@ var MMDPhysics = ( function () {
 			var position = new Vector3();
 			var quaternion = new Quaternion();
 			var scale = new Vector3();
+			var matrixWorld = new Matrix4();
 			var matrixWorldInv = new Matrix4();
 
 			return function updateMatrixWorld( force ) {
@@ -1321,11 +1322,12 @@ var MMDPhysics = ( function () {
 
 					var bodies = this.physics.bodies;
 
-					matrixWorldInv
+					matrixWorld
 						.copy( mesh.matrixWorld )
 						.decompose( position, quaternion, scale )
-						.compose( position, quaternion, scale.set( 1, 1, 1 ) )
-						.getInverse( matrixWorldInv );
+						.compose( position, quaternion, scale.set( 1, 1, 1 ) );
+
+					matrixWorld.getInverse( matrixWorldInv );
 
 					for ( var i = 0, il = bodies.length; i < il; i ++ ) {
 

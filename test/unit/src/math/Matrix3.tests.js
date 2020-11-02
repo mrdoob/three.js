@@ -260,7 +260,7 @@ export default QUnit.module( 'Maths', () => {
 			var a = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var b = new Matrix3();
 
-			b.getInverse( a );
+			a.getInverse( b );
 			assert.ok( matrixEquals3( b, zero ), "Matrix a is zero matrix" );
 
 			var testMatrices = [
@@ -279,7 +279,7 @@ export default QUnit.module( 'Maths', () => {
 				var m = testMatrices[ i ];
 
 				a.setFromMatrix4( m );
-				var mInverse3 = b.getInverse( a );
+				var mInverse3 = a.getInverse( b );
 
 				var mInverse = toMatrix4( mInverse3 );
 

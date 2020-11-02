@@ -251,7 +251,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	worldToLocal: function ( vector ) {
 
-		return vector.applyMatrix4( _m1.getInverse( this.matrixWorld ) );
+		return vector.applyMatrix4( this.matrixWorld.getInverse( _m1 ) );
 
 	},
 
@@ -395,7 +395,7 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		this.updateWorldMatrix( true, false );
 
-		_m1.getInverse( this.matrixWorld );
+		this.matrixWorld.getInverse( _m1 );
 
 		if ( object.parent !== null ) {
 
