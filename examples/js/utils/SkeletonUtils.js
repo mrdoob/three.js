@@ -112,7 +112,7 @@ THREE.SkeletonUtils = {
 
 					} else {
 
-						relativeMatrix.getInverse( target.matrixWorld );
+						relativeMatrix.copy( target.matrixWorld ).invert();
 						relativeMatrix.multiply( boneTo.matrixWorld );
 
 					}
@@ -129,7 +129,7 @@ THREE.SkeletonUtils = {
 					if ( target.isObject3D ) {
 
 						var boneIndex = bones.indexOf( bone ),
-							wBindMatrix = bindBones ? bindBones[ boneIndex ] : bindBoneMatrix.getInverse( target.skeleton.boneInverses[ boneIndex ] );
+							wBindMatrix = bindBones ? bindBones[ boneIndex ] : bindBoneMatrix.copy( target.skeleton.boneInverses[ boneIndex ] ).invert();
 
 						globalMatrix.multiply( wBindMatrix );
 
@@ -141,7 +141,7 @@ THREE.SkeletonUtils = {
 
 				if ( bone.parent && bone.parent.isBone ) {
 
-					bone.matrix.getInverse( bone.parent.matrixWorld );
+					bone.matrix.copy( bone.parent.matrixWorld ).invert();
 					bone.matrix.multiply( globalMatrix );
 
 				} else {

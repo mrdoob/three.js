@@ -347,7 +347,7 @@ var CCDIKSolver = ( function () {
 					var iks = this.iks;
 					var bones = mesh.skeleton.bones;
 
-					matrix.getInverse( mesh.matrixWorld );
+					matrix.copy( mesh.matrixWorld ).invert();
 
 					for ( var i = 0, il = iks.length; i < il; i ++ ) {
 
