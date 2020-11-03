@@ -49,7 +49,7 @@ Whether or not to swap `rtA` and `rtB` after finishing this pass
 
 ## `clear`
 
-Whether are not to clear before rendering this pass
+Whether or not to clear before rendering this pass
 
 ## `renderToScreen`
 
