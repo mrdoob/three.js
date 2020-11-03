@@ -110,7 +110,7 @@ var CCDIKSolver = ( function () {
 							// don't use getWorldPosition/Quaternion() here for the performance
 							// because they call updateMatrixWorld( true ) inside.
 							link.matrixWorld.decompose( linkPos, invLinkQ, linkScale );
-							invLinkQ.inverse();
+							invLinkQ.invert();
 							effectorPos.setFromMatrixPosition( effector.matrixWorld );
 
 							// work in link world

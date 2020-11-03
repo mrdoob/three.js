@@ -2785,7 +2785,7 @@ var FBXLoader = ( function () {
 				postRotation.push( eulerOrder );
 
 				postRotation = new Euler().fromArray( postRotation );
-				postRotation = new Quaternion().setFromEuler( postRotation ).inverse();
+				postRotation = new Quaternion().setFromEuler( postRotation ).invert();
 
 			}
 
