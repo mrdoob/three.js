@@ -81,6 +81,7 @@ class TorusBufferGeometry extends BufferGeometry {
 
 					indices.push( a, b, d );
 					indices.push( b, c, d );
+					
 				}
 
 			}
