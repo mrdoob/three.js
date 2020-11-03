@@ -56,7 +56,7 @@ Object.assign( Skeleton.prototype, {
 
 			if ( this.bones[ i ] ) {
 
-				inverse.getInverse( this.bones[ i ].matrixWorld );
+				inverse.copy( this.bones[ i ].matrixWorld ).invert();
 
 			}
 
@@ -76,7 +76,7 @@ Object.assign( Skeleton.prototype, {
 
 			if ( bone ) {
 
-				bone.matrixWorld.getInverse( this.boneInverses[ i ] );
+				bone.matrixWorld.copy( this.boneInverses[ i ] ).invert();
 
 			}
 
@@ -92,7 +92,7 @@ Object.assign( Skeleton.prototype, {
 
 				if ( bone.parent && bone.parent.isBone ) {
 
-					bone.matrix.getInverse( bone.parent.matrixWorld );
+					bone.matrix.copy( bone.parent.matrixWorld ).invert();
 					bone.matrix.multiply( bone.matrixWorld );
 
 				} else {

@@ -115,10 +115,9 @@ export class Matrix4 implements Matrix {
 	setPosition( v: Vector3 | number, y?: number, z?: number ): Matrix4;
 
 	/**
-	 * Sets this matrix to the inverse of matrix m.
-	 * Based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm.
+	 * Inverts this matrix.
 	 */
-	getInverse( m: Matrix4 ): Matrix4;
+	invert(): Matrix;
 
 	/**
 	 * Multiplies the columns of this matrix by vector v.
@@ -284,5 +283,10 @@ export class Matrix4 implements Matrix {
 	 * @deprecated Use {@link Matrix4#toArray .toArray()} instead.
 	 */
 	flattenToArrayOffset( array: number[], offset: number ): number[];
+
+	/**
+	 * @deprecated Use {@link Matrix4#invert .invert()} instead.
+	 */
+	getInverse( matrix: Matrix ): Matrix;
 
 }
