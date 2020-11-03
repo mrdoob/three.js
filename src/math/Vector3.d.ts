@@ -8,6 +8,9 @@ import { Cylindrical } from './Cylindrical';
 import { BufferAttribute } from './../core/BufferAttribute';
 import { InterleavedBufferAttribute } from './../core/InterleavedBufferAttribute';
 import { Vector } from './Vector2';
+
+type Vector3tuple = [number, number, number];
+
 /**
  * 3D vector.
  *
@@ -284,6 +287,7 @@ export class Vector3 implements Vector {
 	 * @return The created or provided array.
 	 */
 	toArray( array?: number[], offset?: number ): number[];
+	toArray( array?: Vector3tuple, offset?: 0 ): Vector3tuple;
 
 	/**
 	 * Copies x, y and z into the provided array-like.

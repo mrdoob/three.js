@@ -2,6 +2,14 @@ import { Vector3 } from './Vector3';
 import { Euler } from './Euler';
 import { Quaternion } from './Quaternion';
 import { Matrix } from './Matrix3';
+
+type Matrix4tuple = [
+	number, number, number, number,
+	number, number, number, number,
+	number, number, number, number,
+	number, number, number, number,
+];
+
 /**
  * A 4x4 Matrix.
  *
@@ -235,6 +243,7 @@ export class Matrix4 implements Matrix {
 	 * @return The created or provided array.
 	 */
 	toArray( array?: number[], offset?: number ): number[];
+	toArray( array?: Matrix4tuple, offset?: 0 ): Matrix4tuple;
 
 	/**
 	 * Copies he values of this matrix into the provided array-like.
