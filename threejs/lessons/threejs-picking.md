@@ -278,7 +278,7 @@ const pickingScene = new THREE.Scene();
 pickingScene.background = new THREE.Color(0);
 ```
 
-Then, for each cube we place in the main scene we make a corresponding "picking cube" at the same position as the original cube, put it in the `pickingScene`, and set it's material to something that will draw the object's id as its color. Also we keep a map of ids to objects so when we look up an id later we can map it back to its corresponding object.
+Then, for each cube we place in the main scene we make a corresponding "picking cube" at the same position as the original cube, put it in the `pickingScene`, and set its material to something that will draw the object's id as its color. Also we keep a map of ids to objects so when we look up an id later we can map it back to its corresponding object.
 
 ```js
 const idToObject = {};

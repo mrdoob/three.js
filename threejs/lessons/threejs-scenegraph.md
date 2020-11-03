@@ -153,7 +153,7 @@ We made the `earthMesh` a child of the `sunMesh`. The `sunMesh` has
 its scale set to 5x with `sunMesh.scale.set(5, 5, 5)`. That means the
 `sunMesh`s local space is 5 times as big. Anything put in that space
  will be multiplied by 5. That means the earth is now 5x larger and
- it's distance from the sun (`earthMesh.position.x = 10`) is also
+ its distance from the sun (`earthMesh.position.x = 10`) is also
  5x as well.
 
  Our scene graph currently looks like this
@@ -400,7 +400,7 @@ For the target, the thing the tank is aiming at, there is a `targetOrbit`
 offset from the `targetOrbit` and a base elevation. Childed to that is another
 `Object3D` called `targetBob` which just bobs up and down relative to the
 `targetElevation`. Finally there's the `targetMesh` which is just a cube we
-rotate and change it's colors
+rotate and change its colors
 
 ```js
 // move target
@@ -457,7 +457,7 @@ turretCamera.lookAt(targetPosition);
 ```
 
 There is also a `targetCameraPivot` which is a child of `targetBob` so it floats
-around with the target. We aim that back at the tank. It's purpose is to allow the
+around with the target. We aim that back at the tank. Its purpose is to allow the
 `targetCamera` to be offset from the target itself. If we instead made the camera
 a child of `targetBob` and just aimed the camera itself it would be inside the
 target.

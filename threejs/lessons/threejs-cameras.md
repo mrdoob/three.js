@@ -507,7 +507,7 @@ camera.zoom = 1;
 
 Then let's load 6 textures and make 6 planes, one for each texture.
 We'll parent each plane to a `THREE.Object3D` to make it easy to offset
-the plane so it's center appears to be at it's top left corner.
+the plane so its center appears to be at its top left corner.
 
 ```js
 const loader = new THREE.TextureLoader();

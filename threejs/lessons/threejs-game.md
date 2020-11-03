@@ -2117,7 +2117,7 @@ we'd have had to switch to a `FiniteStateMachine`.
 It also wasn't clear to me if coroutines should run independently of their
 components. We could have made a global `CoroutineRunner` and put all
 coroutines on it. That would make cleaning them up harder. As it is now
-if the gameobject is removed all of it's components are removed and
+if the gameobject is removed all of its components are removed and
 therefore the coroutine runners created are no longer called and it will
 all get garbage collected. If we had global runner then it would be
 the responsibility of each component to remove any coroutines it added

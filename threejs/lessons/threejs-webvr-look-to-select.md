@@ -381,7 +381,7 @@ otherwise the cursor won't be rendered.
 ```
 
 We then check if the thing we're picking this time is the same as it was last
-time. If so we add the elapsed time to a timer and if the timer reaches it's
+time. If so we add the elapsed time to a timer and if the timer reaches its
 limit we return the selected item.
 
 Now let's use that to pick the cubes. As a simple example
@@ -403,7 +403,7 @@ const boxDepth = 1;
 
 Then let's create 3 pairs of box and sphere meshes. We'll
 use a [`Map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map)
-so that we can associate each `Mesh` with it's partner.
+so that we can associate each `Mesh` with its partner.
 
 ```js
 -const cubes = [
