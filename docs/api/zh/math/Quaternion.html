@@ -99,7 +99,7 @@
 			设置该四元数为 identity 四元数，即表示“不旋转”的四元数。
 		</p>
 
-		<h3>[method:Quaternion inverse]()</h3>
+		<h3>[method:Quaternion invert]()</h3>
 		<p>
 			翻转该四元数 —— 计算 [page:.conjugate conjugate] 。假定该四元数具有单位长度。
 		</p>
@@ -128,7 +128,7 @@
 		<h3>[method:Quaternion multiplyQuaternions]( [param:Quaternion a], [param:Quaternion b] )</h3>
 		<p>
 		将该四元数设为 [page:Quaternion a] x [page:Quaternion b] 。<br />
-		改编自 [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here] 所概述的方法。	
+		改编自 [link:http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.htm here] 所概述的方法。
 		</p>
 
 		<h3>[method:Quaternion premultiply]( [param:Quaternion q] )</h3>
@@ -175,7 +175,7 @@
 		<h3>[method:Quaternion setFromRotationMatrix]( [param:Matrix4 m] )</h3>
 		<p>
 		从[page:Matrix4 m]的旋转分量中来设置该四元数。<br />
-		改编自 [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm here] 所概述的方法。	
+		改编自 [link:http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm here] 所概述的方法。
 		</p>
 
 		<h3>[method:Quaternion setFromUnitVectors]( [param:Vector3 vFrom], [param:Vector3 vTo] )</h3>

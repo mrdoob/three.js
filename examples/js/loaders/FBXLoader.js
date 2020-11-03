@@ -2738,7 +2738,7 @@ THREE.FBXLoader = ( function () {
 				postRotation.push( eulerOrder );
 
 				postRotation = new THREE.Euler().fromArray( postRotation );
-				postRotation = new THREE.Quaternion().setFromEuler( postRotation ).inverse();
+				postRotation = new THREE.Quaternion().setFromEuler( postRotation ).invert();
 
 			}
 
