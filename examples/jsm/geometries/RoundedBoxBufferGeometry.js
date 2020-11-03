@@ -7,7 +7,7 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 
 	constructor( width = 1, height = 1, depth = 1, segments = 1, radius = 1 ) {
 
-		super( width, height, depth, segments, segments, segments );
+		super( 1, 1, 1, segments, segments, segments );
 
 		const geometry2 = this.toNonIndexed();
 
