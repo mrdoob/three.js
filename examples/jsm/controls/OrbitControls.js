@@ -1183,14 +1183,6 @@ var OrbitControls = function ( object, domElement ) {
 
 	scope.domElement.addEventListener( 'keydown', onKeyDown, false );
 
-	// make sure element can receive keys.
-
-	if ( scope.domElement.tabIndex === - 1 ) {
-
-		scope.domElement.tabIndex = 0;
-
-	}
-
 	// force an update at start
 
 	this.update();
