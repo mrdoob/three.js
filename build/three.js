@@ -5478,7 +5478,8 @@
 					materials: {},
 					textures: {},
 					images: {},
-					shapes: {}
+					shapes: {},
+					skeletons: {}
 				};
 				output.metadata = {
 					version: 4.5,
@@ -5535,6 +5536,16 @@
 				}
 			}
 
+			if (this.isSkinnedMesh) {
+				object.bindMode = this.bindMode;
+				object.bindMatrix = this.bindMatrix.toArray();
+
+				if (this.skeleton !== undefined) {
+					serialize(meta.skeletons, this.skeleton);
+					object.skeleton = this.skeleton.uuid;
+				}
+			}
+
 			if (this.material !== undefined) {
 				if (Array.isArray(this.material)) {
 					var uuids = [];
@@ -5566,11 +5577,13 @@
 
 				var _shapes = extractFromCache(meta.shapes);
 
+				var skeletons = extractFromCache(meta.skeletons);
 				if (geometries.length > 0) output.geometries = geometries;
 				if (materials.length > 0) output.materials = materials;
 				if (textures.length > 0) output.textures = textures;
 				if (images.length > 0) output.images = images;
 				if (_shapes.length > 0) output.shapes = _shapes;
+				if (skeletons.length > 0) output.skeletons = skeletons;
 			}
 
 			output.object = object;
@@ -19372,36 +19385,58 @@
 		}()
 	});
 
+	function Bone() {
+		Object3D.call(this);
+		this.type = 'Bone';
+	}
+
+	Bone.prototype = Object.assign(Object.create(Object3D.prototype), {
+		constructor: Bone,
+		isBone: true
+	});
+
 	var _offsetMatrix = new Matrix4();
 
 	var _identityMatrix = new Matrix4();
 
 	function Skeleton(bones, boneInverses) {
-		// copy the bone array
-		bones = bones || [];
-		this.bones = bones.slice(0);
-		this.boneMatrices = new Float32Array(this.bones.length * 16);
-		this.frame = -1; // use the supplied bone inverses or calculate the inverses
-
-		if (boneInverses === undefined) {
-			this.calculateInverses();
-		} else {
-			if (this.bones.length === boneInverses.length) {
-				this.boneInverses = boneInverses.slice(0);
-			} else {
-				console.warn('THREE.Skeleton boneInverses is the wrong length.');
-				this.boneInverses = [];
-
-				for (var i = 0, il = this.bones.length; i < il; i++) {
-					this.boneInverses.push(new Matrix4());
-				}
-			}
+		if (bones === void 0) {
+			bones = [];
 		}
+
+		if (boneInverses === void 0) {
+			boneInverses = [];
+		}
+
+		this.uuid = MathUtils.generateUUID();
+		this.bones = bones.slice(0);
+		this.boneInverses = boneInverses;
+		this.frame = -1;
+		this.init();
 	}
 
 	Object.assign(Skeleton.prototype, {
+		init: function init() {
+			var bones = this.bones;
+			var boneInverses = this.boneInverses;
+			this.boneMatrices = new Float32Array(bones.length * 16); // calculate inverse bone matrices if necessary
+
+			if (boneInverses.length === 0) {
+				this.calculateInverses();
+			} else {
+				// handle special case
+				if (bones.length !== boneInverses.length) {
+					console.warn('THREE.Skeleton: Number of inverse bone matrices does not match amount of bones.');
+					this.boneInverses = [];
+
+					for (var i = 0, il = this.bones.length; i < il; i++) {
+						this.boneInverses.push(new Matrix4());
+					}
+				}
+			}
+		},
 		calculateInverses: function calculateInverses() {
-			this.boneInverses = [];
+			this.boneInverses.length = 0;
 
 			for (var i = 0, il = this.bones.length; i < il; i++) {
 				var inverse = new Matrix4();
@@ -19478,17 +19513,49 @@
 				this.boneTexture.dispose();
 				this.boneTexture = undefined;
 			}
+		},
+		fromJSON: function fromJSON(json, bones) {
+			this.uuid = json.uuid;
+
+			for (var i = 0, l = json.bones.length; i < l; i++) {
+				var uuid = json.bones[i];
+				var bone = bones[uuid];
+
+				if (bone === undefined) {
+					console.warn('THREE.Skeleton: No bone found with UUID:', uuid);
+					bone = new Bone();
+				}
+
+				this.bones.push(bone);
+				this.boneInverses.push(new Matrix4().fromArray(json.boneInverses[i]));
+			}
+
+			this.init();
+			return this;
+		},
+		toJSON: function toJSON() {
+			var data = {
+				metadata: {
+					version: 4.5,
+					type: 'Skeleton',
+					generator: 'Skeleton.toJSON'
+				},
+				bones: [],
+				boneInverses: []
+			};
+			data.uuid = this.uuid;
+			var bones = this.bones;
+			var boneInverses = this.boneInverses;
+
+			for (var i = 0, l = bones.length; i < l; i++) {
+				var bone = bones[i];
+				data.bones.push(bone.uuid);
+				var boneInverse = boneInverses[i];
+				data.boneInverses.push(boneInverse.toArray());
+			}
+
+			return data;
 		}
-	});
-
-	function Bone() {
-		Object3D.call(this);
-		this.type = 'Bone';
-	}
-
-	Bone.prototype = Object.assign(Object.create(Object3D.prototype), {
-		constructor: Bone,
-		isBone: true
 	});
 
 	var _instanceLocalMatrix = new Matrix4();
@@ -29660,7 +29727,7 @@
 		};
 
 		_proto.parse = function parse(json, onLoad) {
-			var shapes = this.parseShape(json.shapes);
+			var shapes = this.parseShapes(json.shapes);
 			var geometries = this.parseGeometries(json.geometries, shapes);
 			var images = this.parseImages(json.images, function () {
 				if (onLoad !== undefined) onLoad(object);
@@ -29668,6 +29735,8 @@
 			var textures = this.parseTextures(json.textures, images);
 			var materials = this.parseMaterials(json.materials, textures);
 			var object = this.parseObject(json.object, geometries, materials);
+			var skeletons = this.parseSkeletons(json.skeletons, object);
+			this.bindSkeletons(object, skeletons);
 
 			if (json.animations) {
 				object.animations = this.parseAnimations(json.animations);
@@ -29680,7 +29749,7 @@
 			return object;
 		};
 
-		_proto.parseShape = function parseShape(json) {
+		_proto.parseShapes = function parseShapes(json) {
 			var shapes = {};
 
 			if (json !== undefined) {
@@ -29691,6 +29760,24 @@
 			}
 
 			return shapes;
+		};
+
+		_proto.parseSkeletons = function parseSkeletons(json, object) {
+			var skeletons = {};
+			var bones = {}; // generate bone lookup table
+
+			object.traverse(function (child) {
+				if (child.isBone) bones[child.uuid] = child;
+			}); // create skeletons
+
+			if (json !== undefined) {
+				for (var i = 0, l = json.length; i < l; i++) {
+					var skeleton = new Skeleton().fromJSON(json[i], bones);
+					skeletons[skeleton.uuid] = skeleton;
+				}
+			}
+
+			return skeletons;
 		};
 
 		_proto.parseGeometries = function parseGeometries(json, shapes) {
@@ -30094,7 +30181,13 @@
 					break;
 
 				case 'SkinnedMesh':
-					console.warn('THREE.ObjectLoader.parseObject() does not support SkinnedMesh yet.');
+					geometry = getGeometry(data.geometry);
+					material = getMaterial(data.material);
+					object = new SkinnedMesh(geometry, material);
+					if (data.bindMode !== undefined) object.bindMode = data.bindMode;
+					if (data.bindMatrix !== undefined) object.bindMatrix.fromArray(data.bindMatrix);
+					if (data.skeleton !== undefined) object.skeleton = data.skeleton;
+					break;
 
 				case 'Mesh':
 					geometry = getGeometry(data.geometry);
@@ -30138,6 +30231,10 @@
 
 				case 'Group':
 					object = new Group();
+					break;
+
+				case 'Bone':
+					object = new Bone();
 					break;
 
 				default:
@@ -30198,6 +30295,21 @@
 			}
 
 			return object;
+		};
+
+		_proto.bindSkeletons = function bindSkeletons(object, skeletons) {
+			if (Object.keys(skeletons).length === 0) return;
+			object.traverse(function (child) {
+				if (child.isSkinnedMesh === true && child.skeleton !== undefined) {
+					var skeleton = skeletons[child.skeleton];
+
+					if (skeleton === undefined) {
+						console.warn('THREE.ObjectLoader: No skeleton found with UUID:', child.skeleton);
+					} else {
+						child.bind(skeleton, child.bindMatrix);
+					}
+				}
+			});
 		}
 		/* DEPRECATED */
 		;
