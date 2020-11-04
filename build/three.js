@@ -977,22 +977,17 @@
 			return a * e * i - a * f * h - b * d * i + b * f * g + c * d * h - c * e * g;
 		};
 
-		_proto.getInverse = function getInverse(matrix, throwOnDegenerate) {
-			if (throwOnDegenerate !== undefined) {
-				console.warn("THREE.Matrix3: .getInverse() can no longer be configured to throw on degenerate.");
-			}
-
-			var me = matrix.elements,
-					te = this.elements,
-					n11 = me[0],
-					n21 = me[1],
-					n31 = me[2],
-					n12 = me[3],
-					n22 = me[4],
-					n32 = me[5],
-					n13 = me[6],
-					n23 = me[7],
-					n33 = me[8],
+		_proto.invert = function invert() {
+			var te = this.elements,
+					n11 = te[0],
+					n21 = te[1],
+					n31 = te[2],
+					n12 = te[3],
+					n22 = te[4],
+					n32 = te[5],
+					n13 = te[6],
+					n23 = te[7],
+					n33 = te[8],
 					t11 = n33 * n22 - n32 * n23,
 					t12 = n32 * n13 - n33 * n12,
 					t13 = n23 * n12 - n22 * n13,
@@ -1027,7 +1022,7 @@
 		};
 
 		_proto.getNormalMatrix = function getNormalMatrix(matrix4) {
-			return this.setFromMatrix4(matrix4).getInverse(this).transpose();
+			return this.setFromMatrix4(matrix4).copy(this).invert().transpose();
 		};
 
 		_proto.transposeIntoArray = function transposeIntoArray(r) {
@@ -2278,7 +2273,7 @@
 			return this.set(0, 0, 0, 1);
 		};
 
-		_proto.inverse = function inverse() {
+		_proto.invert = function invert() {
 			// quaternion is assumed to have unit length
 			return this.conjugate();
 		};
@@ -4417,30 +4412,25 @@
 			return this;
 		};
 
-		_proto.getInverse = function getInverse(m, throwOnDegenerate) {
-			if (throwOnDegenerate !== undefined) {
-				console.warn("THREE.Matrix4: .getInverse() can no longer be configured to throw on degenerate.");
-			} // based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
-
-
+		_proto.invert = function invert() {
+			// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
 			var te = this.elements,
-					me = m.elements,
-					n11 = me[0],
-					n21 = me[1],
-					n31 = me[2],
-					n41 = me[3],
-					n12 = me[4],
-					n22 = me[5],
-					n32 = me[6],
-					n42 = me[7],
-					n13 = me[8],
-					n23 = me[9],
-					n33 = me[10],
-					n43 = me[11],
-					n14 = me[12],
-					n24 = me[13],
-					n34 = me[14],
-					n44 = me[15],
+					n11 = te[0],
+					n21 = te[1],
+					n31 = te[2],
+					n41 = te[3],
+					n12 = te[4],
+					n22 = te[5],
+					n32 = te[6],
+					n42 = te[7],
+					n13 = te[8],
+					n23 = te[9],
+					n33 = te[10],
+					n43 = te[11],
+					n14 = te[12],
+					n24 = te[13],
+					n34 = te[14],
+					n44 = te[15],
 					t11 = n23 * n34 * n42 - n24 * n33 * n42 + n24 * n32 * n43 - n22 * n34 * n43 - n23 * n32 * n44 + n22 * n33 * n44,
 					t12 = n14 * n33 * n42 - n13 * n34 * n42 - n14 * n32 * n43 + n12 * n34 * n43 + n13 * n32 * n44 - n12 * n33 * n44,
 					t13 = n13 * n24 * n42 - n14 * n23 * n42 + n14 * n22 * n43 - n12 * n24 * n43 - n13 * n22 * n44 + n12 * n23 * n44,
@@ -5235,7 +5225,7 @@
 			return vector.applyMatrix4(this.matrixWorld);
 		},
 		worldToLocal: function worldToLocal(vector) {
-			return vector.applyMatrix4(_m1$1.getInverse(this.matrixWorld));
+			return vector.applyMatrix4(_m1$1.copy(this.matrixWorld).invert());
 		},
 		lookAt: function lookAt(x, y, z) {
 			// This method does not support objects having non-uniformly-scaled parent(s)
@@ -5263,7 +5253,7 @@
 
 				_q1.setFromRotationMatrix(_m1$1);
 
-				this.quaternion.premultiply(_q1.inverse());
+				this.quaternion.premultiply(_q1.invert());
 			}
 		},
 		add: function add(object) {
@@ -5327,7 +5317,7 @@
 			// adds object as a child of this, while maintaining the object's world transform
 			this.updateWorldMatrix(true, false);
 
-			_m1$1.getInverse(this.matrixWorld);
+			_m1$1.copy(this.matrixWorld).invert();
 
 			if (object.parent !== null) {
 				object.parent.updateWorldMatrix(true, false);
@@ -7417,6 +7407,14 @@
 	Uint32BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
 	Uint32BufferAttribute.prototype.constructor = Uint32BufferAttribute;
 
+	function Float16BufferAttribute(array, itemSize, normalized) {
+		BufferAttribute.call(this, new Uint16Array(array), itemSize, normalized);
+	}
+
+	Float16BufferAttribute.prototype = Object.create(BufferAttribute.prototype);
+	Float16BufferAttribute.prototype.constructor = Float16BufferAttribute;
+	Float16BufferAttribute.prototype.isFloat16BufferAttribute = true;
+
 	function Float32BufferAttribute(array, itemSize, normalized) {
 		BufferAttribute.call(this, new Float32Array(array), itemSize, normalized);
 	}
@@ -8582,7 +8580,7 @@
 
 			if (raycaster.ray.intersectsSphere(_sphere) === false) return; //
 
-			_inverseMatrix.getInverse(matrixWorld);
+			_inverseMatrix.copy(matrixWorld).invert();
 
 			_ray.copy(raycaster.ray).applyMatrix4(_inverseMatrix); // Check boundingBox before continuing
 
@@ -9226,11 +9224,11 @@
 		},
 		updateMatrixWorld: function updateMatrixWorld(force) {
 			Object3D.prototype.updateMatrixWorld.call(this, force);
-			this.matrixWorldInverse.getInverse(this.matrixWorld);
+			this.matrixWorldInverse.copy(this.matrixWorld).invert();
 		},
 		updateWorldMatrix: function updateWorldMatrix(updateParents, updateChildren) {
 			Object3D.prototype.updateWorldMatrix.call(this, updateParents, updateChildren);
-			this.matrixWorldInverse.getInverse(this.matrixWorld);
+			this.matrixWorldInverse.copy(this.matrixWorld).invert();
 		},
 		clone: function clone() {
 			return new this.constructor().copy(this);
@@ -9391,7 +9389,7 @@
 			var skew = this.filmOffset;
 			if (skew !== 0) left += near * skew / this.getFilmWidth();
 			this.projectionMatrix.makePerspective(left, left + width, top, top - height, near, this.far);
-			this.projectionMatrixInverse.getInverse(this.projectionMatrix);
+			this.projectionMatrixInverse.copy(this.projectionMatrix).invert();
 		},
 		toJSON: function toJSON(meta) {
 			var data = Object3D.prototype.toJSON.call(this, meta);
@@ -9779,7 +9777,15 @@
 			} else if (array instanceof Float64Array) {
 				console.warn('THREE.WebGLAttributes: Unsupported data buffer format: Float64Array.');
 			} else if (array instanceof Uint16Array) {
-				type = 5123;
+				if (attribute.isFloat16BufferAttribute) {
+					if (isWebGL2) {
+						type = 5131;
+					} else {
+						console.warn('THREE.WebGLAttributes: Usage of Float16BufferAttribute requires WebGL2.');
+					}
+				} else {
+					type = 5123;
+				}
 			} else if (array instanceof Int16Array) {
 				type = 5122;
 			} else if (array instanceof Uint32Array) {
@@ -16643,7 +16649,7 @@
 			camera.translateX(xOffset);
 			camera.translateZ(zOffset);
 			camera.matrixWorld.compose(camera.position, camera.quaternion, camera.scale);
-			camera.matrixWorldInverse.getInverse(camera.matrixWorld); // Find the union of the frustum values of the cameras and scale
+			camera.matrixWorldInverse.copy(camera.matrixWorld).invert(); // Find the union of the frustum values of the cameras and scale
 			// the values so that the near plane's position does not change in world space,
 			// although must now be relative to the new union camera.
 
@@ -16663,7 +16669,7 @@
 				camera.matrixWorld.multiplyMatrices(parent.matrixWorld, camera.matrix);
 			}
 
-			camera.matrixWorldInverse.getInverse(camera.matrixWorld);
+			camera.matrixWorldInverse.copy(camera.matrixWorld).invert();
 		}
 
 		this.getCamera = function (camera) {
@@ -17238,10 +17244,16 @@
 		};
 	}
 
+	function createCanvasElement() {
+		var canvas = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+		canvas.style.display = 'block';
+		return canvas;
+	}
+
 	function WebGLRenderer(parameters) {
 		parameters = parameters || {};
 
-		var _canvas = parameters.canvas !== undefined ? parameters.canvas : document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas'),
+		var _canvas = parameters.canvas !== undefined ? parameters.canvas : createCanvasElement(),
 				_context = parameters.context !== undefined ? parameters.context : null,
 				_alpha = parameters.alpha !== undefined ? parameters.alpha : false,
 				_depth = parameters.depth !== undefined ? parameters.depth : true,
@@ -19295,7 +19307,7 @@
 			}
 
 			this.bindMatrix.copy(bindMatrix);
-			this.bindMatrixInverse.getInverse(bindMatrix);
+			this.bindMatrixInverse.copy(bindMatrix).invert();
 		},
 		pose: function pose() {
 			this.skeleton.pose();
@@ -19324,9 +19336,9 @@
 			Mesh.prototype.updateMatrixWorld.call(this, force);
 
 			if (this.bindMode === 'attached') {
-				this.bindMatrixInverse.getInverse(this.matrixWorld);
+				this.bindMatrixInverse.copy(this.matrixWorld).invert();
 			} else if (this.bindMode === 'detached') {
-				this.bindMatrixInverse.getInverse(this.bindMatrix);
+				this.bindMatrixInverse.copy(this.bindMatrix).invert();
 			} else {
 				console.warn('THREE.SkinnedMesh: Unrecognized bindMode: ' + this.bindMode);
 			}
@@ -19395,7 +19407,7 @@
 				var inverse = new Matrix4();
 
 				if (this.bones[i]) {
-					inverse.getInverse(this.bones[i].matrixWorld);
+					inverse.copy(this.bones[i].matrixWorld).invert();
 				}
 
 				this.boneInverses.push(inverse);
@@ -19407,7 +19419,7 @@
 				var bone = this.bones[i];
 
 				if (bone) {
-					bone.matrixWorld.getInverse(this.boneInverses[i]);
+					bone.matrixWorld.copy(this.boneInverses[i]).invert();
 				}
 			} // compute the local matrices, positions, rotations and scales
 
@@ -19417,7 +19429,7 @@
 
 				if (_bone) {
 					if (_bone.parent && _bone.parent.isBone) {
-						_bone.matrix.getInverse(_bone.parent.matrixWorld);
+						_bone.matrix.copy(_bone.parent.matrixWorld).invert();
 
 						_bone.matrix.multiply(_bone.matrixWorld);
 					} else {
@@ -19665,7 +19677,7 @@
 			_sphere$2.radius += threshold;
 			if (raycaster.ray.intersectsSphere(_sphere$2) === false) return; //
 
-			_inverseMatrix$1.getInverse(matrixWorld);
+			_inverseMatrix$1.copy(matrixWorld).invert();
 
 			_ray$1.copy(raycaster.ray).applyMatrix4(_inverseMatrix$1);
 
@@ -19933,7 +19945,7 @@
 			_sphere$3.radius += threshold;
 			if (raycaster.ray.intersectsSphere(_sphere$3) === false) return; //
 
-			_inverseMatrix$2.getInverse(matrixWorld);
+			_inverseMatrix$2.copy(matrixWorld).invert();
 
 			_ray$2.copy(raycaster.ray).applyMatrix4(_inverseMatrix$2);
 
@@ -28860,7 +28872,7 @@
 			}
 
 			this.projectionMatrix.makeOrthographic(left, right, top, bottom, this.near, this.far);
-			this.projectionMatrixInverse.getInverse(this.projectionMatrix);
+			this.projectionMatrixInverse.copy(this.projectionMatrix).invert();
 		},
 		toJSON: function toJSON(meta) {
 			var data = Object3D.prototype.toJSON.call(this, meta);
@@ -33986,7 +33998,7 @@
 			var geometry = this.geometry;
 			var position = geometry.getAttribute('position');
 
-			_matrixWorldInv.getInverse(this.root.matrixWorld);
+			_matrixWorldInv.copy(this.root.matrixWorld).invert();
 
 			for (var i = 0, j = 0; i < bones.length; i++) {
 				var bone = bones[i];
@@ -35798,6 +35810,10 @@
 		/* array, offset, length */
 		{
 			console.error('THREE.Matrix3: .applyToVector3Array() has been removed.');
+		},
+		getInverse: function getInverse(matrix) {
+			console.warn('THREE.Matrix3: .getInverse() has been removed. Use matrixInv.copy( matrix ).invert(); instead.');
+			return this.copy(matrix).invert();
 		}
 	});
 	Object.assign(Matrix4.prototype, {
@@ -35868,6 +35884,10 @@
 		makeFrustum: function makeFrustum(left, right, bottom, top, near, far) {
 			console.warn('THREE.Matrix4: .makeFrustum() has been removed. Use .makePerspective( left, right, top, bottom, near, far ) instead.');
 			return this.makePerspective(left, right, top, bottom, near, far);
+		},
+		getInverse: function getInverse(matrix) {
+			console.warn('THREE.Matrix4: .getInverse() has been removed. Use matrixInv.copy( matrix ).invert(); instead.');
+			return this.copy(matrix).invert();
 		}
 	});
 
@@ -35876,11 +35896,16 @@
 		return this.intersectsLine(line);
 	};
 
-	Quaternion.prototype.multiplyVector3 = function (vector) {
-		console.warn('THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.');
-		return vector.applyQuaternion(this);
-	};
-
+	Object.assign(Quaternion.prototype, {
+		multiplyVector3: function multiplyVector3(vector) {
+			console.warn('THREE.Quaternion: .multiplyVector3() has been removed. Use is now vector.applyQuaternion( quaternion ) instead.');
+			return vector.applyQuaternion(this);
+		},
+		inverse: function inverse() {
+			console.warn('THREE.Quaternion: .inverse() has been renamed to invert().');
+			return this.invert();
+		}
+	});
 	Object.assign(Ray.prototype, {
 		isIntersectionBox: function isIntersectionBox(box) {
 			console.warn('THREE.Ray: .isIntersectionBox() has been renamed to .intersectsBox().');
@@ -36995,6 +37020,7 @@
 	exports.FaceColors = FaceColors;
 	exports.FileLoader = FileLoader;
 	exports.FlatShading = FlatShading;
+	exports.Float16BufferAttribute = Float16BufferAttribute;
 	exports.Float32Attribute = Float32Attribute;
 	exports.Float32BufferAttribute = Float32BufferAttribute;
 	exports.Float64Attribute = Float64Attribute;
