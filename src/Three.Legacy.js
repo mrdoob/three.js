@@ -112,9 +112,7 @@ export function MeshFaceMaterial( materials ) {
 
 }
 
-export function MultiMaterial( materials ) {
-
-	if ( materials === undefined ) materials = [];
+export function MultiMaterial( materials = [] ) {
 
 	console.warn( 'THREE.MultiMaterial has been removed. Use an Array instead.' );
 	materials.isMultiMaterial = true;
