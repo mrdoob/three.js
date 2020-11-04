@@ -5607,7 +5607,10 @@
 			return new this.constructor().copy(this, recursive);
 		},
 		copy: function copy(source, recursive) {
-			if (recursive === undefined) recursive = true;
+			if (recursive === void 0) {
+				recursive = true;
+			}
+
 			this.name = source.name;
 			this.up.copy(source.up);
 			this.position.copy(source.position);
@@ -6429,7 +6432,10 @@
 		};
 
 		_proto.copyGammaToLinear = function copyGammaToLinear(color, gammaFactor) {
-			if (gammaFactor === undefined) gammaFactor = 2.0;
+			if (gammaFactor === void 0) {
+				gammaFactor = 2.0;
+			}
+
 			this.r = Math.pow(color.r, gammaFactor);
 			this.g = Math.pow(color.g, gammaFactor);
 			this.b = Math.pow(color.b, gammaFactor);
@@ -6437,7 +6443,10 @@
 		};
 
 		_proto.copyLinearToGamma = function copyLinearToGamma(color, gammaFactor) {
-			if (gammaFactor === undefined) gammaFactor = 2.0;
+			if (gammaFactor === void 0) {
+				gammaFactor = 2.0;
+			}
+
 			var safeInverse = gammaFactor > 0 ? 1.0 / gammaFactor : 1.0;
 			this.r = Math.pow(color.r, safeInverse);
 			this.g = Math.pow(color.g, safeInverse);
@@ -7301,7 +7310,10 @@
 			return this;
 		},
 		set: function set(value, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.array.set(value, offset);
 			return this;
 		},
@@ -18557,7 +18569,10 @@
 		};
 
 		this.copyFramebufferToTexture = function (position, texture, level) {
-			if (level === undefined) level = 0;
+			if (level === void 0) {
+				level = 0;
+			}
+
 			var levelScale = Math.pow(2, -level);
 			var width = Math.floor(texture.image.width * levelScale);
 			var height = Math.floor(texture.image.height * levelScale);
@@ -18570,7 +18585,10 @@
 		};
 
 		this.copyTextureToTexture = function (position, srcTexture, dstTexture, level) {
-			if (level === undefined) level = 0;
+			if (level === void 0) {
+				level = 0;
+			}
+
 			var width = srcTexture.image.width;
 			var height = srcTexture.image.height;
 			var glFormat = utils.convert(dstTexture.format);
@@ -18777,7 +18795,10 @@
 			return this;
 		},
 		set: function set(value, offset) {
-			if (offset === undefined) offset = 0;
+			if (offset === void 0) {
+				offset = 0;
+			}
+
 			this.array.set(value, offset);
 			return this;
 		},
@@ -19193,7 +19214,10 @@
 			return this;
 		},
 		addLevel: function addLevel(object, distance) {
-			if (distance === undefined) distance = 0;
+			if (distance === void 0) {
+				distance = 0;
+			}
+
 			distance = Math.abs(distance);
 			var levels = this.levels;
 			var l;
@@ -20412,7 +20436,10 @@
 			}
 		},
 		computeVertexNormals: function computeVertexNormals(areaWeighted) {
-			if (areaWeighted === undefined) areaWeighted = true;
+			if (areaWeighted === void 0) {
+				areaWeighted = true;
+			}
+
 			var vertices = new Array(this.vertices.length);
 
 			for (var v = 0, vl = this.vertices.length; v < vl; v++) {
@@ -20589,6 +20616,10 @@
 			this.boundingSphere.setFromPoints(this.vertices);
 		},
 		merge: function merge(geometry, matrix, materialIndexOffset) {
+			if (materialIndexOffset === void 0) {
+				materialIndexOffset = 0;
+			}
+
 			if (!(geometry && geometry.isGeometry)) {
 				console.error('THREE.Geometry.merge(): geometry not an instance of THREE.Geometry.', geometry);
 				return;
@@ -20602,7 +20633,6 @@
 					faces2 = geometry.faces,
 					colors1 = this.colors,
 					colors2 = geometry.colors;
-			if (materialIndexOffset === undefined) materialIndexOffset = 0;
 
 			if (matrix !== undefined) {
 				normalMatrix = new Matrix3().getNormalMatrix(matrix);
@@ -25462,9 +25492,19 @@
 			return clip;
 		},
 		makeClipAdditive: function makeClipAdditive(targetClip, referenceFrame, referenceClip, fps) {
-			if (referenceFrame === undefined) referenceFrame = 0;
-			if (referenceClip === undefined) referenceClip = targetClip;
-			if (fps === undefined || fps <= 0) fps = 30;
+			if (referenceFrame === void 0) {
+				referenceFrame = 0;
+			}
+
+			if (referenceClip === void 0) {
+				referenceClip = targetClip;
+			}
+
+			if (fps === void 0) {
+				fps = 30;
+			}
+
+			if (fps <= 0) fps = 30;
 			var numTracks = referenceClip.tracks.length;
 			var referenceTime = referenceFrame / fps; // Make each track's values relative to the values at the reference frame
 
@@ -27312,7 +27352,10 @@
 		},
 		// Get sequence of points using getPoint( t )
 		getPoints: function getPoints(divisions) {
-			if (divisions === undefined) divisions = 5;
+			if (divisions === void 0) {
+				divisions = 5;
+			}
+
 			var points = [];
 
 			for (var d = 0; d <= divisions; d++) {
@@ -27323,7 +27366,10 @@
 		},
 		// Get sequence of points using getPointAt( u )
 		getSpacedPoints: function getSpacedPoints(divisions) {
-			if (divisions === undefined) divisions = 5;
+			if (divisions === void 0) {
+				divisions = 5;
+			}
+
 			var points = [];
 
 			for (var d = 0; d <= divisions; d++) {
@@ -28348,7 +28394,10 @@
 			return lengths;
 		},
 		getSpacedPoints: function getSpacedPoints(divisions) {
-			if (divisions === undefined) divisions = 40;
+			if (divisions === void 0) {
+				divisions = 40;
+			}
+
 			var points = [];
 
 			for (var i = 0; i <= divisions; i++) {
@@ -28808,7 +28857,10 @@
 		constructor: PointLightShadow,
 		isPointLightShadow: true,
 		updateMatrices: function updateMatrices(light, viewportIndex) {
-			if (viewportIndex === undefined) viewportIndex = 0;
+			if (viewportIndex === void 0) {
+				viewportIndex = 0;
+			}
+
 			var camera = this.camera,
 					shadowMatrix = this.matrix,
 					lightPositionWorld = this._lightPositionWorld,
@@ -30618,7 +30670,10 @@
 	Object.assign(Font.prototype, {
 		isFont: true,
 		generateShapes: function generateShapes(text, size) {
-			if (size === undefined) size = 100;
+			if (size === void 0) {
+				size = 100;
+			}
+
 			var shapes = [];
 			var paths = createPaths(text, size, this.data);
 
@@ -31140,7 +31195,9 @@
 		};
 
 		_proto.play = function play(delay) {
-			if (delay === undefined) delay = 0;
+			if (delay === void 0) {
+				delay = 0;
+			}
 
 			if (this.isPlaying === true) {
 				console.warn('THREE.Audio: Audio is already playing.');
@@ -34786,7 +34843,15 @@
 		function PlaneHelper(plane, size, hex) {
 			var _this;
 
-			var color = hex !== undefined ? hex : 0xffff00;
+			if (size === void 0) {
+				size = 1;
+			}
+
+			if (hex === void 0) {
+				hex = 0xffff00;
+			}
+
+			var color = hex;
 			var positions = [1, -1, 1, -1, 1, 1, -1, -1, 1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0];
 			var geometry = new BufferGeometry();
 			geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
@@ -34797,7 +34862,7 @@
 			})) || this;
 			_this.type = 'PlaneHelper';
 			_this.plane = plane;
-			_this.size = size === undefined ? 1 : size;
+			_this.size = size;
 			var positions2 = [1, 1, 1, -1, 1, 1, -1, -1, 1, 1, 1, 1, -1, -1, 1, 1, -1, 1];
 			var geometry2 = new BufferGeometry();
 			geometry2.setAttribute('position', new Float32BufferAttribute(positions2, 3));
@@ -35610,7 +35675,10 @@
 		return materials;
 	}
 	function MultiMaterial(materials) {
-		if (materials === undefined) materials = [];
+		if (materials === void 0) {
+			materials = [];
+		}
+
 		console.warn('THREE.MultiMaterial has been removed. Use an Array instead.');
 		materials.isMultiMaterial = true;
 		materials.materials = materials;
