@@ -1,7 +1,7 @@
 import { Matrix4 } from './Matrix4';
 import { Vector3 } from './Vector3';
 
-type Matrix3tuple = [
+type Matrix3Tuple = [
 	number, number, number,
 	number, number, number,
 	number, number, number,
@@ -131,7 +131,7 @@ export class Matrix3 implements Matrix {
 	 * @return The created or provided array.
 	 */
 	toArray( array?: number[], offset?: number ): number[];
-	toArray( array?: Matrix3tuple, offset?: 0 ): Matrix3tuple;
+	toArray( array?: Matrix3Tuple, offset?: 0 ): Matrix3Tuple;
 
 	/**
 	 * Copies he values of this matrix into the provided array-like.
