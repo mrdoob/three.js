@@ -2,6 +2,7 @@ import { Color } from './../math/Color';
 import { Object3D } from './../core/Object3D';
 import { DirectionalLightShadow } from './DirectionalLightShadow';
 import { Light } from './Light';
+import { Vector3 } from '../math/Vector3';
 
 /**
  * @example
@@ -17,16 +18,30 @@ export class DirectionalLight extends Light {
 	constructor( color?: Color | string | number, intensity?: number );
 
 	/**
+	 * @default 'DirectionalLight'
+	 */
+	type: string;
+
+	/**
+	 * @default THREE.Object3D.DefaultUp
+	 */
+	position: Vector3;
+
+	/**
 	 * Target used for shadow camera orientation.
+	 * @default new THREE.Object3D()
 	 */
 	target: Object3D;
 
 	/**
 	 * Light's intensity.
-	 * Default — 1.0.
+	 * @default 1
 	 */
 	intensity: number;
 
+	/**
+	 * @default new THREE.DirectionalLightShadow()
+	 */
 	shadow: DirectionalLightShadow;
 	readonly isDirectionalLight: true;
 

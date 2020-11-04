@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIRow } from './libs/ui.js';
 
 function MenubarHelp( editor ) {

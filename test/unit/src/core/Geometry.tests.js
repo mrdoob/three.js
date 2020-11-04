@@ -1,12 +1,9 @@
-/**
- * @author simonThiele / https://github.com/simonThiele
- */
 /* global QUnit */
 
 import { Geometry } from '../../../../src/core/Geometry';
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
 import { BufferGeometry } from '../../../../src/core/BufferGeometry';
-import { BoxBufferGeometry } from '../../../../src/geometries/BoxGeometry';
+import { BoxBufferGeometry } from '../../../../src/geometries/BoxBufferGeometry';
 import { DodecahedronGeometry } from '../../../../src/geometries/DodecahedronGeometry';
 import { Vector3 } from '../../../../src/math/Vector3';
 import { Matrix4 } from '../../../../src/math/Matrix4';

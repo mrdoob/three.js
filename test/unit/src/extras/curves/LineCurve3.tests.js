@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { LineCurve3 } from '../../../../../src/extras/curves/LineCurve3';

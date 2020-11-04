@@ -1,7 +1,3 @@
-/**
- * @author Takahiro https://github.com/takahirox
- */
-
 import { Texture } from './Texture.js';
 import { ClampToEdgeWrapping, NearestFilter } from '../constants.js';
 

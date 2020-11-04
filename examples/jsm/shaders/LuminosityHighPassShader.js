@@ -1,13 +1,11 @@
-/**
- * @author bhouston / http://clara.io/
- *
- * Luminosity
- * http://en.wikipedia.org/wiki/Luminosity
- */
-
 import {
 	Color
 } from "../../../build/three.module.js";
+
+/**
+ * Luminosity
+ * http://en.wikipedia.org/wiki/Luminosity
+ */
 
 var LuminosityHighPassShader = {
 

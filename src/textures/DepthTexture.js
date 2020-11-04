@@ -1,8 +1,3 @@
-/**
- * @author Matt DesLauriers / @mattdesl
- * @author atix / arthursilber.de
- */
-
 import { Texture } from './Texture.js';
 import { NearestFilter, UnsignedShortType, UnsignedInt248Type, DepthFormat, DepthStencilFormat } from '../constants.js';
 

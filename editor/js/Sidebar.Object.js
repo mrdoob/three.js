@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIPanel, UIRow, UIInput, UIButton, UIColor, UICheckbox, UIInteger, UITextArea, UIText, UINumber } from './libs/ui.js';
@@ -137,13 +133,11 @@ function SidebarObject( editor ) {
 	// scale
 
 	var objectScaleRow = new UIRow();
-	var objectScaleLock = new UICheckbox( true ).setPosition( 'absolute' ).setLeft( '75px' );
-	var objectScaleX = new UINumber( 1 ).setPrecision( 3 ).setRange( 0.001, Infinity ).setWidth( '50px' ).onChange( updateScaleX );
-	var objectScaleY = new UINumber( 1 ).setPrecision( 3 ).setRange( 0.001, Infinity ).setWidth( '50px' ).onChange( updateScaleY );
-	var objectScaleZ = new UINumber( 1 ).setPrecision( 3 ).setRange( 0.001, Infinity ).setWidth( '50px' ).onChange( updateScaleZ );
+	var objectScaleX = new UINumber( 1 ).setPrecision( 3 ).setWidth( '50px' ).onChange( update );
+	var objectScaleY = new UINumber( 1 ).setPrecision( 3 ).setWidth( '50px' ).onChange( update );
+	var objectScaleZ = new UINumber( 1 ).setPrecision( 3 ).setWidth( '50px' ).onChange( update );
 
 	objectScaleRow.add( new UIText( strings.getKey( 'sidebar/object/scale' ) ).setWidth( '90px' ) );
-	objectScaleRow.add( objectScaleLock );
 	objectScaleRow.add( objectScaleX, objectScaleY, objectScaleZ );
 
 	container.add( objectScaleRow );
@@ -231,7 +225,7 @@ function SidebarObject( editor ) {
 	// color
 
 	var objectColorRow = new UIRow();
-	var objectColor = new UIColor().onChange( update );
+	var objectColor = new UIColor().onInput( update );
 
 	objectColorRow.add( new UIText( strings.getKey( 'sidebar/object/color' ) ).setWidth( '90px' ) );
 	objectColorRow.add( objectColor );
@@ -241,7 +235,7 @@ function SidebarObject( editor ) {
 	// ground color
 
 	var objectGroundColorRow = new UIRow();
-	var objectGroundColor = new UIColor().onChange( update );
+	var objectGroundColor = new UIColor().onInput( update );
 
 	objectGroundColorRow.add( new UIText( strings.getKey( 'sidebar/object/groundcolor' ) ).setWidth( '90px' ) );
 	objectGroundColorRow.add( objectGroundColor );
@@ -395,57 +389,6 @@ function SidebarObject( editor ) {
 
 	//
 
-	function updateScaleX() {
-
-		var object = editor.selected;
-
-		if ( objectScaleLock.getValue() === true ) {
-
-			var scale = objectScaleX.getValue() / object.scale.x;
-
-			objectScaleY.setValue( objectScaleY.getValue() * scale );
-			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
-
-		}
-
-		update();
-
-	}
-
-	function updateScaleY() {
-
-		var object = editor.selected;
-
-		if ( objectScaleLock.getValue() === true ) {
-
-			var scale = objectScaleY.getValue() / object.scale.y;
-
-			objectScaleX.setValue( objectScaleX.getValue() * scale );
-			objectScaleZ.setValue( objectScaleZ.getValue() * scale );
-
-		}
-
-		update();
-
-	}
-
-	function updateScaleZ() {
-
-		var object = editor.selected;
-
-		if ( objectScaleLock.getValue() === true ) {
-
-			var scale = objectScaleZ.getValue() / object.scale.z;
-
-			objectScaleX.setValue( objectScaleX.getValue() * scale );
-			objectScaleY.setValue( objectScaleY.getValue() * scale );
-
-		}
-
-		update();
-
-	}
-
 	function update() {
 
 		var object = editor.selected;
@@ -596,7 +539,7 @@ function SidebarObject( editor ) {
 
 			}
 
-			if ( object.receiveShadow !== undefined && object.receiveShadow !== objectReceiveShadow.getValue() ) {
+			if ( object.receiveShadow !== objectReceiveShadow.getValue() ) {
 
 				if ( object.material !== undefined ) object.material.needsUpdate = true;
 				editor.execute( new SetValueCommand( editor, object, 'receiveShadow', objectReceiveShadow.getValue() ) );
@@ -683,6 +626,20 @@ function SidebarObject( editor ) {
 				uiElement.setDisplay( object[ property ] !== undefined ? '' : 'none' );
 
 			}
+
+		}
+
+		//
+
+		if ( object.isLight ) {
+
+			objectReceiveShadow.setDisplay( 'none' );
+
+		}
+
+		if ( object.isAmbientLight || object.isHemisphereLight ) {
+
+			objectShadowRow.setDisplay( 'none' );
 
 		}
 

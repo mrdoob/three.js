@@ -1,10 +1,3 @@
-console.warn( "THREE.DragControls: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-/**
- * @author zz85 / https://github.com/zz85
- * @author mrdoob / http://mrdoob.com
- * Running this will allow you to drag three.js objects around the screen.
- */
-
 THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 	var _plane = new THREE.Plane();
@@ -136,7 +129,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_inverseMatrix.getInverse( _selected.parent.matrixWorld );
+				_inverseMatrix.copy( _selected.parent.matrixWorld ).invert();
 				_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
 			}
@@ -217,7 +210,7 @@ THREE.DragControls = function ( _objects, _camera, _domElement ) {
 
 			if ( _raycaster.ray.intersectPlane( _plane, _intersection ) ) {
 
-				_inverseMatrix.getInverse( _selected.parent.matrixWorld );
+				_inverseMatrix.copy( _selected.parent.matrixWorld ).invert();
 				_offset.copy( _intersection ).sub( _worldPosition.setFromMatrixPosition( _selected.matrixWorld ) );
 
 			}

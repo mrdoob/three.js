@@ -1,10 +1,3 @@
-console.warn( "THREE.GLTFExporter: As part of the transition to ES6 Modules, the files in 'examples/js' were deprecated in May 2020 (r117) and will be deleted in December 2020 (r124). You can find more information about developing using ES6 Modules in https://threejs.org/docs/#manual/en/introduction/Installation." );
-/**
- * @author fernandojsg / http://fernandojsg.com
- * @author Don McCurdy / https://www.donmccurdy.com
- * @author Takahiro / https://github.com/takahirox
- */
-
 //------------------------------------------------------------------------------
 // Constants
 //------------------------------------------------------------------------------
@@ -35,6 +28,8 @@ var WEBGL_CONSTANTS = {
 	MIRRORED_REPEAT: 33648,
 	REPEAT: 10497
 };
+
+var identityArray = [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ];
 
 var THREE_TO_WEBGL = {};
 
@@ -154,6 +149,18 @@ THREE.GLTFExporter.prototype = {
 				return element === array2[ index ];
 
 			} );
+
+		}
+
+		/**
+		 * Is identity matrix
+		 *
+		 * @param {THREE.Matrix4} matrix
+		 * @returns {Boolean} Returns true, if parameter is identity matrix
+		 */
+		function isIdentityMatrix( matrix ) {
+
+			return equalArray( matrix.elements, identityArray );
 
 		}
 
@@ -1782,7 +1789,7 @@ THREE.GLTFExporter.prototype = {
 
 				}
 
-				if ( ! equalArray( object.matrix.elements, [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] ) ) {
+				if ( isIdentityMatrix( object.matrix ) === false ) {
 
 					gltfNode.matrix = object.matrix.elements;
 

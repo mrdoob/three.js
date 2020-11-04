@@ -2,10 +2,6 @@
 	color-scheme: light dark;
 }
 
-html {
-	touch-action: none;
-}
-
 body {
 	font-family: Helvetica, Arial, sans-serif;
 	font-size: 14px;
@@ -278,7 +274,6 @@ input.Number {
 	font-size: 12px;
 	border: 0px;
 	padding: 2px;
-	cursor: col-resize;
 }
 
 select {
@@ -295,6 +290,16 @@ select {
 	}
 
 /* UI */
+
+#resizer {
+	position: absolute;
+	top: 32px;
+	right: 295px;
+	width: 5px;
+	bottom: 0px;
+	/* background-color: rgba(255,0,0,0.5); */
+	cursor: col-resize;
+}
 
 #viewport {
 	position: absolute;
@@ -518,6 +523,10 @@ select {
 /* */
 
 @media all and ( max-width: 600px ) {
+
+	#resizer {
+		display: none;
+	}
 
 	#menubar .menu .options {
 		max-height: calc(100% - 372px);

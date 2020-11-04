@@ -1,10 +1,3 @@
-/**
- * @author Mugen87 / https://github.com/Mugen87
- *
- */
-
-
-
 var WaterRefractionShader = {
 
 	uniforms: {

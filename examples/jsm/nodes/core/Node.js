@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import { MathUtils } from '../../../../build/three.module.js';
 
 function Node( type ) {
@@ -102,7 +98,7 @@ Node.prototype = {
 
 	},
 
-	getHash: function() {
+	getHash: function () {
 
 		var hash = '{';
 		var prop, obj;

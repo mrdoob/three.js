@@ -1,7 +1,3 @@
-/**
- * @author rfm1201
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { UIRow, UIText, UIInteger, UINumber } from './libs/ui.js';

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -16,11 +15,11 @@
 
 		<h2>代码示例</h2>
 		<code>
-		var spotLight = new THREE.SpotLight( 0xffffff );
+		const spotLight = new THREE.SpotLight( 0xffffff );
 		spotLight.position.set( 10, 10, 10 );
 		scene.add( spotLight );
 
-		var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+		const spotLightHelper = new THREE.SpotLightHelper( spotLight );
 		scene.add( spotLightHelper );
 		</code>
 
@@ -47,10 +46,10 @@
 		<h3>[property:SpotLight light]</h3>
 		<p>被模拟的聚光灯 [page:SpotLight] .</p>
 
-		<h3>[property:object matrix]</h3>
+		<h3>[property:Object matrix]</h3>
 		<p>请参考聚光灯的世界矩阵 [page:Object3D.matrixWorld matrixWorld].</p>
 
-		<h3>[property:object matrixAutoUpdate]</h3>
+		<h3>[property:Object matrixAutoUpdate]</h3>
 		<p>
 			请查看 [page:Object3D.matrixAutoUpdate]. 这里设置为 *false* 表示辅助对象
 			使用聚光灯的 [page:Object3D.matrixWorld matrixWorld].

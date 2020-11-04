@@ -1,8 +1,3 @@
-/**
- * @author bhouston / http://exocortex.com
- * @author tschw
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { BufferAttribute } from '../../../../src/core/BufferAttribute';
@@ -542,7 +537,7 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "inverse/conjugate", ( assert ) => {
+		QUnit.test( "invert/conjugate", ( assert ) => {
 
 			var a = new Quaternion( x, y, z, w );
 

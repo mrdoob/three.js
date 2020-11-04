@@ -1,7 +1,3 @@
-/**
- * @author sunag / http://www.sunag.com.br/
- */
-
 import {
 	FrontSide,
 	LessEqualDepth,
@@ -18,8 +14,6 @@ import { RawNode } from './nodes/RawNode.js';
 function NodeMaterial( vertex, fragment ) {
 
 	ShaderMaterial.call( this );
-
-	var scope = this;
 
 	this.vertex = vertex || new RawNode( new PositionNode( PositionNode.PROJECTION ) );
 	this.fragment = fragment || new RawNode( new ColorNode( 0xFF0000 ) );
@@ -67,17 +61,11 @@ Object.defineProperties( NodeMaterial.prototype, {
 
 NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
 
-	var materialProperties = renderer.properties.get( this );
+	this.build( { renderer: renderer } );
 
-	if ( this.version !== materialProperties.__version ) {
-
-		this.build( { renderer: renderer } );
-
-		shader.uniforms = this.uniforms;
-		shader.vertexShader = this.vertexShader;
-		shader.fragmentShader = this.fragmentShader;
-
-	}
+	shader.uniforms = this.uniforms;
+	shader.vertexShader = this.vertexShader;
+	shader.fragmentShader = this.fragmentShader;
 
 };
 

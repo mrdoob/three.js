@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { UIPanel, UIBreak, UIText, UIButton, UIRow, UIInput } from './libs/ui.js';
 
 import { AddScriptCommand } from './commands/AddScriptCommand.js';

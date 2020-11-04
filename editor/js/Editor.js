@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import * as THREE from '../../build/three.module.js';
 
 import { Config } from './Config.js';
@@ -79,6 +75,7 @@ function Editor() {
 		windowResize: new Signal(),
 
 		showGridChanged: new Signal(),
+		showHelpersChanged: new Signal(),
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
@@ -360,7 +357,7 @@ Editor.prototype = {
 
 	},
 
-	addAnimation: function ( object, animations ) {
+	addAnimations: function ( object, animations ) {
 
 		if ( animations.length > 0 ) {
 

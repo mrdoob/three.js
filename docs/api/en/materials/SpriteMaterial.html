@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -17,13 +16,11 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var spriteMap = new THREE.TextureLoader().load( 'textures/sprite.png' );
+		const map = new THREE.TextureLoader().load( 'textures/sprite.png' );
+		const material = new THREE.SpriteMaterial( { map: map, color: 0xffffff } );
 
-		var spriteMaterial = new THREE.SpriteMaterial( { map: spriteMap, color: 0xffffff } );
-
-		var sprite = new THREE.Sprite( spriteMaterial );
+		const sprite = new THREE.Sprite( material );
 		sprite.scale.set(200, 200, 1)
-
 		scene.add( sprite );
 		</code>
 
@@ -65,9 +62,6 @@
 
 		<h3>[property:Color color]</h3>
 		<p>[page:Color] of the material, by default set to white (0xffffff). The [page:.map] is mutiplied by the color.</p>
-
-		<h3>[property:boolean fog]</h3>
-		<p>Whether or not this material affected by the scene's fog. Default is false</p>
 
 		<h3>[property:Texture map]</h3>
 		<p>The texture map. Default is null.</p>

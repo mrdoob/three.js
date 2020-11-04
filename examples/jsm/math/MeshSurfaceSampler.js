@@ -1,7 +1,3 @@
-/**
- * @author donmccurdy / https://www.donmccurdy.com/
- */
-
 import {
 	Triangle
 } from "../../../build/three.module.js";
@@ -39,6 +35,7 @@ var MeshSurfaceSampler = ( function () {
 		}
 
 		this.geometry = geometry;
+		this.randomFunction = Math.random;
 
 		this.positionAttribute = this.geometry.getAttribute( 'position' );
 		this.weightAttribute = null;
@@ -108,11 +105,18 @@ var MeshSurfaceSampler = ( function () {
 
 		},
 
+		setRandomGenerator: function ( randomFunction ) {
+
+			this.randomFunction = randomFunction;
+			return this;
+
+		},
+
 		sample: function ( targetPosition, targetNormal ) {
 
 			var cumulativeTotal = this.distribution[ this.distribution.length - 1 ];
 
-			var faceIndex = this.binarySearch( Math.random() * cumulativeTotal );
+			var faceIndex = this.binarySearch( this.randomFunction() * cumulativeTotal );
 
 			return this.sampleFace( faceIndex, targetPosition, targetNormal );
 
@@ -154,8 +158,8 @@ var MeshSurfaceSampler = ( function () {
 
 		sampleFace: function ( faceIndex, targetPosition, targetNormal ) {
 
-			var u = Math.random();
-			var v = Math.random();
+			var u = this.randomFunction();
+			var v = this.randomFunction();
 
 			if ( u + v > 1 ) {
 

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="utf-8">
+		<base href="../../../" />
+		<script src="page.js"></script>
+		<link type="text/css" rel="stylesheet" href="page.css" />
+	</head>
+	<body class="rtl">
+		<h1>التثبيت ([name])</h1>
+
+		<p>
+			يمكنك تنصيب three.js بإستعمال [link:https://www.npmjs.com/ npm] و وسائل البناء الحديثة، أو قم بالبدأ فقط
+        	بإستعمال إصدار ثابت متوفر عبر خدمة CDN.
+        	بالنسبة لأغلب المستخدمين تنصيب المكتبة بإستعمال npm هو الخيار الأفضل.
+		</p>
+
+		<p>
+			بغض النظر عن إختيارك، كن حريصا على أن تقوم بإستدعاء جميع الملفات التي تنتمي لنفس الإصدار. خلط ملفات من إصدارات
+			مختلفة قد ينتج منه بعض السلوكات الغير متوقعة.
+		</p>
+
+		<p>
+			جميع طرق تنصيب three.js بناءا على ES modules (شاهد
+			[link:https://eloquentjavascript.net/10_modules.html#h_hF2FmOVxw7 Eloquent JavaScript: ECMAScript Modules])،
+			التي تمكنك من إستدعاء أجزاء معينة من المكتبة دون الحاجة لإستدعاء المصدر كله.
+		</p>
+
+		<h2>التثبيت بإستعمال npm</h2>
+
+		<p>
+			لتنصيب وحدة (npm module) [link:https://www.npmjs.com/package/three three]، قم بفتح نافذة الأوامر في المجلد الخاص
+			بمشروعك و شغل الأمر التالي:
+		</p>
+
+		<code>
+		npm install --save three
+		</code>
+
+		<p>
+			سيتم تحميل الرزمة و تثبيتها. و من ثم تصبح مستعد لإستدعائها كالأتي:
+		</p>
+
+		<code>
+		///////////////////////////////////////////////////////
+		// Option 1: Import the entire three.js core library.
+		import * as THREE from 'three';
+
+		const scene = new THREE.Scene();
+
+
+		///////////////////////////////////////////////////////
+		// Option 2: Import just the parts you need.
+		import { Scene } from 'three';
+
+		const scene = new Scene();
+		</code>
+
+		<p>
+			خلال التنصيب بإستعمال npm، لقد قمت بشكل غير مباشر بإستعمال
+			[link:https://eloquentjavascript.net/10_modules.html#h_zWTXAU93DC bundling tool] لجمع كل الرزم التي يحتاجها
+			مشروعك في ملف JavaScript واحد.
+			بينما يمكن لأي جامع رزم حديث العمل مع three.js، يبقى الخيار الأكثر شيوعا هو
+			[link:https://webpack.js.org/ webpack].
+		</p>
+
+		<p>
+			لا يمكن الوصول لكل المزايا مباشرة من خلال رزمة <em>three</em> (بإستعمال bare import). بقية الأجزاء المستعملة
+			كثيرا من المكتبة مثل
+			الضوابط (controls)،
+			المحمل (loaders)، و آثار ما بعد المعالجة (post-processing effects)، يجب إستدعائهم من مجلد
+			[link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. لمعرفة المزيد، قم
+			بزيارة قسم
+			<em>الأمثلة</em>
+			بالأسفل.
+		</p>
+
+		<p>
+			لمعرفة المزيد عن وحدات npm.
+			قم بزيارة [link:https://eloquentjavascript.net/20_node.html#h_J6hW/SmL/a Eloquent JavaScript: Installing with npm].
+		</p>
+
+		<h2>التثبيت من CDN أو استضافة ثابتة</h2>
+
+		<p>
+			يمكن إستعمال مكتبة three.js دون الحاجة إلى نظام بناء، سواءا عبر تحميل الملفات إلى خادم الويب الخاص بك أو باستخدام CDN موجود. بسبب أن المكتبة تعتمد على وحدات ES (modules) يجب على أي شفرة برمجية تشير إليها أن تستخدام <em>type="module"</em> كما هو موضح أسفله:
+		</p>
+
+		<code>
+		&lt;script type="module">
+
+		  // Find the latest version by visiting https://unpkg.com/three. The URL will
+		  // redirect to the newest stable release.
+		  import * as THREE from 'https://unpkg.com/three@&lt;VERSION>/build/three.module.js';
+
+		  const scene = new THREE.Scene();
+
+		&lt;/script>
+		</code>
+
+		<p>
+			ليست كل المزايا يمكن الوصول لها عبر وحدة <em>build/three.module.js</em>. بعض المكونات الأخرى من المكتبة - مثل الضوابط (controls) وعناصر التحميل (loaders) وتأثيرات ما بعد المعالجة (post-processing effects) - يجب إستدعائهم من الملفات الثانوية [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm].
+		</p>
+
+
+		<h2>أمثلة</h2>
+
+		<p>
+			يركز جوهر three.js على أهم المكونات المكونة لمحرك ثلاثي الأبعاد.  العديد من المكونات المفيدة الأخرى - مثل الضوابط ، عناصر التحميل ، وتأثيرات ما بعد المعالجة - هي جزء من المجلد [link:https://github.com/mrdoob/three.js/tree/dev/examples/jsm examples/jsm]. .يشار إليها باسم "أمثلة" ، لأنه بينما يمكنك استخدامها ببساطة، من المفترض أيضًا إعادة دمجها وتخصيصها. هذه المكونات تضل  متزامنة مع المكتبة الأساسية
+			بينما يتم الاحتفاظ بحزم الجهات الخارجية المماثلة على npm بواسطة أشخاص مختلفين وقد لا تكون محدثة.
+		</p>
+
+		<p>
+			لا يلزم تثبيت الأمثلة بشكل منفصل ، ولكن يجب استيرادها بشكل منفصل. إذا تم تثبيت three.js بواسطة npm ، يمكنك إستدعاء مكون OrbitControls كالأتي:
+		</p>
+
+		<code>
+		import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
+		const controls = new OrbitControls();
+		</code>
+
+		<p>
+			إذا تم تثبيت three.js من CDN ، فمن المستحسن إستخدم نفس CDN لتثبيت المكونات الأخرى:
+		</p>
+
+		<code>
+		&lt;script type="module">
+
+		  // Find the latest version by visiting https://unpkg.com/three. The URL will
+		  // redirect to the newest stable release.
+		  import { OrbitControls } from 'https://unpkg.com/three@&lt;VERSION>/examples/jsm/controls/OrbitControls.js';
+
+		  const controls = new OrbitControls();
+
+		&lt;/script>
+		</code>
+
+		<p>
+			من المهم أن تستخدم جميع الملفات نفس الإصدار. لا تستورد أمثلة مختلفة من إصدارات مختلفة، أو تستخدم أمثلة من إصدارات مختلفة عن مكتبة three.js نفسها.
+		</p>
+
+		<h2>التوافق</h2>
+
+		<h3>واردات CommonJS</h3>
+
+		<p>
+			في حين أن معظم حِزم JavaScript الحديثة تدعم الآن وحدات ES افتراضيًا ، فقد لا تدعم بعض أدوات البناء القديمة.
+			في مثل هذه الحالات بإستطاعتك تعديل المجمع لفهم وحدات ES: <br/>
+			[link:http://browserify.org/ Browserify] يحتاج فقط إلى إضافة [link:https://github.com/babel/babelify babelify] على سبيل المثال.
+		</p>
+
+		<h3>خرائط الإستيراد</h3>
+
+		<p>
+			تختلف المسارات المستوردة عند التثبيت من npm ، مقارنة بالتثبيت من استضافة ثابتة أو CDN. نحن ندرك أن هذه مشكلة مريحة لكلا مجموعتي المستخدمين.
+			يفضل المطورون الذين لديهم أدوات إنشاء وحزم محددات الحزم المجردة (على سبيل المثال "three") بدلاً من المسارات النسبية ، وتستخدم الملفات في المجلد <em>examples/</em> مراجع نسبية إلى <em> three.module.js </em > التي لا تتبع هذا التوقع.
+				أولئك الذين لا يستخدمون أدوات الإنشاء - للنماذج الأولية السريعة أو التعلم أو التفضيل الشخصي - قد يكرهون بالمثل تلك الواردات النسبية ، والتي تتطلب هياكل مجلدات معينة وتكون أقل تسامحًا من مساحة الاسم <em> THREE. * </em> العام.
+		</p>
+
+		<p>
+			نأمل في إزالة هذه المسارات النسبية عندما يصبح [link:https://github.com/WICG/import-maps import maps] متاحًا على نطاق واسع ، واستبدالها بمحددات الحزمة المجردة إلى اسم الحزمة npm ، 'three'. يتطابق هذا مع توقعات أداة الإنشاء لحزم npm بشكل وثيق ، ويسمح لمجموعتي المستخدمين بكتابة نفس الرمز تمامًا عند استيراد ملف. بالنسبة للمستخدمين الذين يفضلون تجنب أدوات الإنشاء ، يمكن أن يوجه تعيين JSON البسيط جميع الواردات إلى CDN أو مجلد ملف ثابت. من الناحية التجريبية ، يمكنك محاولة استخدام عمليات استيراد أبسط اليوم مع تعبئة خريطة الاستيراد ، كما هو موضح في [link:https://glitch.com/edit/#!/three-import-map?path=index.html import map example].
+		</p>
+
+		<h3>Node.js</h3>
+
+		<p>
+			قد يكون استخدام three.js في Node.js أمرًا صعبًا ، وذلك لسببين:
+		</p>
+
+		<p>
+			أولاً ، نظرًا لأن three.js مصممة للويب ، فإنها تعتمد على المتصفح وواجهات برمجة تطبيقات DOM التي لا تتواجد دائمًا في Node.js. يمكن حل بعض هذه المشكلات باستخدام (shims) مثل [link:https://github.com/stackgl/headless-gl headless-gl]، أو عن طريق استبدال مكونات مثل [page: TextureLoader] ببدائل مخصصة. قد تتشابك واجهات برمجة تطبيقات DOM الأخرى بعمق مع الكود الذي يستخدمها ، وسيكون من الصعب حلها. نرحب بطلبات السحب البسيطة والقابلة للصيانة لتحسين دعم Node.js ، لكننا نوصي بفتح مشكلة لمناقشة التحسينات التي أجريتها أولاً.
+		</p>
+
+		<p>
+			ثانيًا ، دعم Node.js لوحدات ES ... معقد. بدءًا من الإصدار 12 من Node.js ، يمكن استيراد المكتبة الأساسية كوحدة نمطية CommonJS ، مع <em>require('three')</em>. ومع ذلك ، فإن معظم أمثلة المكونات في <em>examples/jsm</em> لا يمكنها ذلك.
+			قد تحل الإصدارات المستقبلية من Node.js هذه المشكلة ، ولكن في هذه الأثناء قد تحتاج إلى استخدام حلول بديلة مثل [link:https://github.com/standard-things/esm esm] لتمكين تطبيق Node.js الخاص بك من التعرف على وحدات ES.
+		</p>
+
+	</body>
+</html>

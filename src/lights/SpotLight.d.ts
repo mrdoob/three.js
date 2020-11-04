@@ -1,4 +1,5 @@
 import { Color } from './../math/Color';
+import { Vector3 } from '../math/Vector3';
 import { Object3D } from './../core/Object3D';
 import { SpotLightShadow } from './SpotLightShadow';
 import { Light } from './Light';
@@ -18,33 +19,55 @@ export class SpotLight extends Light {
 	);
 
 	/**
+	 * @default 'SpotLight'
+	 */
+	type: string;
+
+	/**
+	 * @default THREE.Object3D.DefaultUp
+	 */
+	position: Vector3;
+
+	/**
 	 * Spotlight focus points at target.position.
-	 * Default position — (0,0,0).
+	 * @default new THREE.Object3D()
 	 */
 	target: Object3D;
 
 	/**
 	 * Light's intensity.
-	 * Default — 1.0.
+	 * @default 1
 	 */
 	intensity: number;
 
 	/**
 	 * If non-zero, light will attenuate linearly from maximum intensity at light position down to zero at distance.
-	 * Default — 0.0.
+	 * @default 0
 	 */
 	distance: number;
 
-	/*
+	/**
 	 * Maximum extent of the spotlight, in radians, from its direction.
-	 * Default — Math.PI/2.
+	 * @default Math.PI / 3.
 	 */
 	angle: number;
 
+	/**
+	 * @default 1
+	 */
 	decay: number;
+
+	/**
+	 * @default new THREE.SpotLightShadow()
+	 */
 	shadow: SpotLightShadow;
 	power: number;
+
+	/**
+	 * @default 0
+	 */
 	penumbra: number;
+
 	readonly isSpotLight: true;
 
 }

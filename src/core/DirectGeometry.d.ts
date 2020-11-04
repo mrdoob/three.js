@@ -18,22 +18,90 @@ export class DirectGeometry {
 	uuid: string;
 	name: string;
 	type: string;
+
+	/**
+	 * @default []
+	 */
 	indices: number[];
+
+	/**
+	 * @default []
+	 */
 	vertices: Vector3[];
+
+	/**
+	 * @default []
+	 */
 	normals: Vector3[];
+
+	/**
+	 * @default []
+	 */
 	colors: Color[];
+
+	/**
+	 * @default []
+	 */
 	uvs: Vector2[];
+
+	/**
+	 * @default []
+	 */
 	uvs2: Vector2[];
+
+	/**
+	 * @default []
+	 */
 	groups: { start: number; materialIndex: number }[];
+
+	/**
+	 * @default {}
+	 */
 	morphTargets: MorphTarget[];
+
+	/**
+	 * @default []
+	 */
 	skinWeights: Vector4[];
+
+	/**
+	 * @default []
+	 */
 	skinIndices: Vector4[];
+
+	/**
+	 * @default null
+	 */
 	boundingBox: Box3 | null;
+
+	/**
+	 * @default null
+	 */
 	boundingSphere: Sphere | null;
+
+	/**
+	 * @default false
+	 */
 	verticesNeedUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
 	normalsNeedUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
 	colorsNeedUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
 	uvsNeedUpdate: boolean;
+
+	/**
+	 * @default false
+	 */
 	groupsNeedUpdate: boolean;
 
 	computeBoundingBox(): void;

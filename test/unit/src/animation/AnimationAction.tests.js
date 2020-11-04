@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { AnimationAction } from '../../../../src/animation/AnimationAction';
@@ -82,6 +79,7 @@ export default QUnit.module( 'Animation', () => {
 				this.message = "AnimationMixer must activate AnimationAction on play.";
 
 			};
+
 			mixer._activateAction = function ( action ) {
 
 				if ( action === animationAction ) {
@@ -91,6 +89,7 @@ export default QUnit.module( 'Animation', () => {
 				}
 
 			};
+
 			assert.throws( () => {
 
 				animationAction.play();
@@ -110,6 +109,7 @@ export default QUnit.module( 'Animation', () => {
 				this.message = "AnimationMixer must deactivate AnimationAction on stop.";
 
 			};
+
 			mixer._deactivateAction = function ( action ) {
 
 				if ( action === animationAction ) {
@@ -119,6 +119,7 @@ export default QUnit.module( 'Animation', () => {
 				}
 
 			};
+
 			assert.throws( () => {
 
 				animationAction.stop();

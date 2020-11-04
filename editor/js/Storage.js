@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 function Storage() {
 
 	var indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
@@ -34,6 +30,7 @@ function Storage() {
 				}
 
 			};
+
 			request.onsuccess = function ( event ) {
 
 				database = event.target.result;
@@ -41,6 +38,7 @@ function Storage() {
 				callback();
 
 			};
+
 			request.onerror = function ( event ) {
 
 				console.error( 'IndexedDB', event );

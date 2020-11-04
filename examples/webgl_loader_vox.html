@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - loaders - vox</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+
+	<body>
+		<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - vox loader (<a href="https://ephtracy.github.io/" target="_blank" rel="noopener">Magica Voxel</a>)
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			import { VOXLoader } from './jsm/loaders/VOXLoader.js';
+
+			let camera, controls, scene, renderer;
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 10 );
+				camera.position.set( 0.175, 0.075, 0.175 );
+
+				scene = new THREE.Scene();
+				scene.add( camera );
+
+				// light
+
+				const hemiLight = new THREE.HemisphereLight( 0x888888, 0x000000, 1 );
+				scene.add( hemiLight );
+
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 0.75 );
+				dirLight.position.set( 1.5, 3, 2.5 );
+				scene.add( dirLight );
+
+				const loader = new VOXLoader();
+				loader.load( 'models/vox/monu10.vox', function ( chunks ) {
+
+					const geometry = new THREE.BoxBufferGeometry( 1, 1, 1 );
+					const material = new THREE.MeshStandardMaterial();
+
+					const color = new THREE.Color();
+					const matrix = new THREE.Matrix4();
+
+					for ( let i = 0; i < chunks.length; i ++ ) {
+
+						const chunk = chunks[ i ];
+
+						const size = chunk.size;
+						const data = chunk.data;
+						const palette = chunk.palette;
+
+						// displayPalette( palette );
+
+						const mesh = new THREE.InstancedMesh( geometry, material, data.length / 4 );
+						mesh.scale.setScalar( 0.0015 );
+						scene.add( mesh );
+
+						for ( let j = 0, k = 0; j < data.length; j += 4, k ++ ) {
+
+							const x = data[ j + 0 ] - size.x / 2;
+							const y = data[ j + 1 ] - size.y / 2;
+							const z = data[ j + 2 ] - size.z / 2;
+							const c = data[ j + 3 ];
+
+							const hex = palette[ c ];
+							const r = ( hex >> 0 & 0xff ) / 0xff;
+							const g = ( hex >> 8 & 0xff ) / 0xff;
+							const b = ( hex >> 16 & 0xff ) / 0xff;
+
+							mesh.setColorAt( k, color.setRGB( r, g, b ) );
+							mesh.setMatrixAt( k, matrix.setPosition( x, z, - y ) );
+
+						}
+
+					}
+
+				} );
+
+				// renderer
+
+				renderer = new THREE.WebGLRenderer();
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				const container = document.createElement( 'div' );
+				document.body.appendChild( container );
+				container.appendChild( renderer.domElement );
+
+				// controls
+
+				controls = new OrbitControls( camera, renderer.domElement );
+				controls.minDistance = .1;
+				controls.maxDistance = 0.5;
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			/*
+			function displayPalette( palette ) {
+
+				const canvas = document.createElement( 'canvas' );
+				canvas.width = 8;
+				canvas.height = 32;
+				canvas.style.position = 'absolute';
+				canvas.style.top = '0';
+				canvas.style.width = '100px';
+				canvas.style.imageRendering = 'pixelated';
+				document.body.appendChild( canvas );
+
+				const context = canvas.getContext( '2d' );
+
+				for ( let c = 0; c < 256; c ++ ) {
+
+					const x = c % 8;
+					const y = Math.floor( c / 8 );
+
+					const hex = palette[ c + 1 ];
+					const r = hex >> 0 & 0xff;
+					const g = hex >> 8 & 0xff;
+					const b = hex >> 16 & 0xff;
+					context.fillStyle = `rgba(${r},${g},${b},1)`;
+					context.fillRect( x, 31 - y, 1, 1 );
+
+				}
+
+			}
+			*/
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				controls.update();
+
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+
+	</body>
+</html>

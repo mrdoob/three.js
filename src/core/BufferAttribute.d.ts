@@ -9,13 +9,36 @@ export class BufferAttribute {
 
 	constructor( array: ArrayLike<number>, itemSize: number, normalized?: boolean ); // array parameter should be TypedArray.
 
+	/**
+	 * @default ''
+	 */
 	name: string;
 	array: ArrayLike<number>;
 	itemSize: number;
+
+	/**
+	 * @default THREE.StaticDrawUsage
+	 */
 	usage: Usage;
+
+	/**
+	 * @default { offset: number; count: number }
+	 */
 	updateRange: { offset: number; count: number };
+
+	/**
+	 * @default 0
+	 */
 	version: number;
+
+	/**
+	 * @default false
+	 */
 	normalized: boolean;
+
+	/**
+	 * @default 0
+	 */
 	count: number;
 
 	set needsUpdate( value: boolean );
@@ -219,6 +242,16 @@ export class Int32BufferAttribute extends BufferAttribute {
 }
 
 export class Uint32BufferAttribute extends BufferAttribute {
+
+	constructor(
+		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,
+		itemSize: number,
+		normalized?: boolean
+	);
+
+}
+
+export class Float16BufferAttribute extends BufferAttribute {
 
 	constructor(
 		array: Iterable<number> | ArrayLike<number> | ArrayBuffer | number,

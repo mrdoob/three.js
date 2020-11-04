@@ -1,6 +1,3 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
 import { WebGLRenderLists, WebGLRenderList } from '../../../../../src/renderers/webgl/WebGLRenderLists';
@@ -34,23 +31,6 @@ export default QUnit.module( 'Renderers', () => {
 				assert.ok( listAA !== listAB, "Render lists for camera A and B with same scene are different." );
 				assert.ok( listAA !== listBA, "Render lists for scene A and B with same camera are different." );
 				assert.ok( listAA === renderLists.get( sceneA, cameraA ), "The same list is returned when called with the same scene, camera." );
-
-			} );
-
-			QUnit.test( "dispose", ( assert ) => {
-
-				var properties = new WebGLProperties();
-				var renderLists = new WebGLRenderLists( properties );
-				var scene = new Scene();
-				var camera = new Camera();
-
-				var list1 = renderLists.get( scene, camera );
-
-				scene.dispose();
-
-				var list2 = renderLists.get( scene, camera );
-
-				assert.ok( list1 !== list2, "New list should be different after disposing of the scene." );
 
 			} );
 

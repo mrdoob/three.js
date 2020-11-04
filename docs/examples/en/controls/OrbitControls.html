@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -21,15 +20,15 @@
 		<h2>Code Example</h2>
 
 		<code>
-		var renderer = new THREE.WebGLRenderer();
+		const renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 
-		var scene = new THREE.Scene();
+		const scene = new THREE.Scene();
 
-		var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+		const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
 
-		var controls = new OrbitControls( camera, renderer.domElement );
+		const controls = new OrbitControls( camera, renderer.domElement );
 
 		//controls.update() must be called after any manual changes to the camera's transform
 		camera.position.set( 0, 20, 100 );
@@ -87,15 +86,15 @@
 
 		<h3>[property:Float autoRotateSpeed]</h3>
 		<p>
-			How fast to rotate around the target if [property:Boolean autoRotate] is true. Default is 2.0, which equates to 30 seconds
-			per rotation at 60fps.<br> Note that if [property:Boolean autoRotate] is enabled, you must call [page:.update]
+			How fast to rotate around the target if [page:.autoRotate] is true. Default is 2.0, which equates to 30 seconds
+			per rotation at 60fps.<br> Note that if [page:.autoRotate] is enabled, you must call [page:.update]
 			() in your animation loop.
 		</p>
 
 		<h3>
 			[property:Float dampingFactor]</h3>
 		<p>
-			The damping inertia used if [property:Boolean enableDamping] is set to true.<br> Note that for this to work, you must
+			The damping inertia used if [page:.enableDamping] is set to true.<br> Note that for this to work, you must
 			call [page:.update] () in your animation loop.
 		</p>
 
@@ -107,7 +106,7 @@
 
 		<h3>[property:Boolean enabled]</h3>
 		<p>
-			Whether or not the controls are enabled.
+			When set to *false*, the controls will not respond to user input. Default is *true*.
 		</p>
 
 		<h3>[property:Boolean enableDamping]</h3>

@@ -3,7 +3,6 @@
 	<head>
 		<meta charset="utf-8" />
 		<base href="../../../" />
-		<script src="list.js"></script>
 		<script src="page.js"></script>
 		<link type="text/css" rel="stylesheet" href="page.css" />
 	</head>
@@ -20,7 +19,7 @@
 
 		<code>
 		// instantiate a loader
-		var loader = new PDBLoader();
+		const loader = new PDBLoader();
 
 		// load a PDB resource
 		loader.load(
@@ -29,9 +28,9 @@
 			// called when the resource is loaded
 			function ( pdb ) {
 
-				var geometryAtoms = pdb.geometryAtoms;
-				var geometryBonds = pdb.geometryBonds;
-				var json = pdb.json;
+				const geometryAtoms = pdb.geometryAtoms;
+				const geometryBonds = pdb.geometryBonds;
+				const json = pdb.json;
 
 				console.log( 'This molecule has ' + json.atoms.length + ' atoms' );
 

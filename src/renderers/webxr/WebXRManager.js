@@ -1,7 +1,3 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { ArrayCamera } from '../../cameras/ArrayCamera.js';
 import { EventDispatcher } from '../../core/EventDispatcher.js';
 import { PerspectiveCamera } from '../../cameras/PerspectiveCamera.js';
@@ -81,6 +77,21 @@ function WebXRManager( renderer, gl ) {
 
 	};
 
+	this.getHand = function ( index ) {
+
+		let controller = controllers[ index ];
+
+		if ( controller === undefined ) {
+
+			controller = new WebXRController();
+			controllers[ index ] = controller;
+
+		}
+
+		return controller.getHandSpace();
+
+	};
+
 	//
 
 	function onSessionEvent( event ) {
@@ -89,7 +100,7 @@ function WebXRManager( renderer, gl ) {
 
 		if ( controller ) {
 
-			controller.dispatchEvent( { type: event.type } );
+			controller.dispatchEvent( { type: event.type, data: event.inputSource } );
 
 		}
 
@@ -262,8 +273,6 @@ function WebXRManager( renderer, gl ) {
 	const cameraRPos = new Vector3();
 
 	/**
-	 * @author jsantell / https://www.jsantell.com/
-	 *
 	 * Assumes 2 cameras that are parallel and share an X-axis, and that
 	 * the cameras' projection and world matrices have already been set.
 	 * And that near and far planes are identical for both cameras.
@@ -302,7 +311,7 @@ function WebXRManager( renderer, gl ) {
 		camera.translateX( xOffset );
 		camera.translateZ( zOffset );
 		camera.matrixWorld.compose( camera.position, camera.quaternion, camera.scale );
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+		camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
 
 		// Find the union of the frustum values of the cameras and scale
 		// the values so that the near plane's position does not change in world space,
@@ -330,7 +339,7 @@ function WebXRManager( renderer, gl ) {
 
 		}
 
-		camera.matrixWorldInverse.getInverse( camera.matrixWorld );
+		camera.matrixWorldInverse.copy( camera.matrixWorld ).invert();
 
 	}
 

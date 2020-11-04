@@ -1,11 +1,6 @@
-/**
- * @author TristanVALCKE / https://github.com/Itee
- */
 /* global QUnit */
 
-import {
-	ParametricBufferGeometry
-} from '../../../../src/geometries/ParametricGeometry';
+import { ParametricBufferGeometry } from '../../../../src/geometries/ParametricBufferGeometry';
 
 export default QUnit.module( 'Geometries', () => {
 
