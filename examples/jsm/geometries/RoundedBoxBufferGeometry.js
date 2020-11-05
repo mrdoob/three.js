@@ -4,7 +4,7 @@ import {
 } from "../../../build/three.module.js";
 
 const tempNormal = new Vector3();
-function applyUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLength ) {
+function getUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLength ) {
 
 	const totArcLength = 2 * Math.PI * radius / 4;
 
@@ -85,31 +85,49 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 
 					// generate UVs along Z then Y
 					faceDirVector.set( 1, 0, 0 );
-					uvs[ j + 0 ] = applyUv( faceDirVector, normal, 'z', 'y', radius, depth );
-					uvs[ j + 1 ] = 1.0 - applyUv( faceDirVector, normal, 'y', 'z', radius, height );
+					uvs[ j + 0 ] = getUv( faceDirVector, normal, 'z', 'y', radius, depth );
+					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'y', 'z', radius, height );
 					break;
 
+				case 1: // left
 
-				// case 1: // left
-				// 	uvs[ j + 0 ] = 0.5 + ( positions[ i + 2 ] / ( depth - radius ) );
-				// 	uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - radius ) );
-				// 	break;
-				// case 2: // top
-				// 	uvs[ j + 0 ] = 0.5 + ( positions[ i + 0 ] / ( width - radius ) );
-				// 	uvs[ j + 1 ] = 0.5 - ( positions[ i + 2 ] / ( depth - radius ) );
-				// 	break;
-				// case 3: // bottom
-				// 	uvs[ j + 0 ] = 0.5 + ( positions[ i + 0 ] / ( width - radius ) );
-				// 	uvs[ j + 1 ] = 0.5 + ( positions[ i + 2 ] / ( depth - radius ) );
-				// 	break;
-				// case 4: // front
-				// 	uvs[ j + 0 ] = 0.5 + ( positions[ i + 0 ] / ( width - radius ) );
-				// 	uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - radius ) );
-				// 	break;
-				// case 5: // back
-				// 	uvs[ j + 0 ] = 0.5 - ( positions[ i + 0 ] / ( width - radius ) );
-				// 	uvs[ j + 1 ] = 0.5 + ( positions[ i + 1 ] / ( height - radius ) );
-				// 	break;
+					// generate UVs along Z then Y
+					faceDirVector.set( - 1, 0, 0 );
+					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'z', 'y', radius, depth );
+					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'y', 'z', radius, height );
+					break;
+
+				case 2: // top
+
+					// generate UVs along X then Z
+					faceDirVector.set( 0, 1, 0 );
+					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'x', 'z', radius, width );
+					uvs[ j + 1 ] = getUv( faceDirVector, normal, 'z', 'x', radius, depth );
+					break;
+
+				case 3: // bottom
+
+					// generate UVs along X then Z
+					faceDirVector.set( 0, -1, 0 );
+					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'x', 'z', radius, width );
+					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'z', 'x', radius, depth );
+					break;
+
+				case 4: // front
+
+					// generate UVs along X then Y
+					faceDirVector.set( 0, 0, 1 );
+					uvs[ j + 0 ] = 1.0 - getUv( faceDirVector, normal, 'x', 'y', radius, width );
+					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'y', 'x', radius, height );
+					break;
+
+				case 5: // back
+
+					// generate UVs along X then Y
+					faceDirVector.set( 0, 0, - 1 );
+					uvs[ j + 0 ] = getUv( faceDirVector, normal, 'x', 'y', radius, width );
+					uvs[ j + 1 ] = 1.0 - getUv( faceDirVector, normal, 'y', 'x', radius, height );
+					break;
 
 			}
 
