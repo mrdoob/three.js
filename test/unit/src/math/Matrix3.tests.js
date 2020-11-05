@@ -253,14 +253,14 @@ export default QUnit.module( 'Maths', () => {
 
 		} );
 
-		QUnit.test( "getInverse", ( assert ) => {
+		QUnit.test( "invert", ( assert ) => {
 
 			var zero = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var identity4 = new Matrix4();
 			var a = new Matrix3().set( 0, 0, 0, 0, 0, 0, 0, 0, 0 );
 			var b = new Matrix3();
 
-			b.getInverse( a );
+			b.copy( a ).invert();
 			assert.ok( matrixEquals3( b, zero ), "Matrix a is zero matrix" );
 
 			var testMatrices = [
@@ -279,7 +279,7 @@ export default QUnit.module( 'Maths', () => {
 				var m = testMatrices[ i ];
 
 				a.setFromMatrix4( m );
-				var mInverse3 = b.getInverse( a );
+				var mInverse3 = b.copy( a ).invert();
 
 				var mInverse = toMatrix4( mInverse3 );
 

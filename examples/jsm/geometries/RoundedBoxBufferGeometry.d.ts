@@ -1,5 +1,5 @@
 import {
-	BufferGeometry
+	BoxBufferGeometry
 } from '../../../src/Three';
 
 export class RoundedBoxBufferGeometry extends BoxBufferGeometry {

@@ -459,7 +459,7 @@ TDSLoader.prototype = Object.assign( Object.create( Loader.prototype ), {
 				matrix.transpose();
 
 				var inverse = new Matrix4();
-				inverse.getInverse( matrix );
+				inverse.copy( matrix ).invert();
 				geometry.applyMatrix4( inverse );
 
 				matrix.decompose( mesh.position, mesh.quaternion, mesh.scale );

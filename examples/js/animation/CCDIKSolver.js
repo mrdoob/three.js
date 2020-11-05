@@ -95,7 +95,7 @@ THREE.CCDIKSolver = ( function () {
 							// don't use getWorldPosition/Quaternion() here for the performance
 							// because they call updateMatrixWorld( true ) inside.
 							link.matrixWorld.decompose( linkPos, invLinkQ, linkScale );
-							invLinkQ.inverse();
+							invLinkQ.invert();
 							effectorPos.setFromMatrixPosition( effector.matrixWorld );
 
 							// work in link world
@@ -332,7 +332,7 @@ THREE.CCDIKSolver = ( function () {
 					var iks = this.iks;
 					var bones = mesh.skeleton.bones;
 
-					matrix.getInverse( mesh.matrixWorld );
+					matrix.copy( mesh.matrixWorld ).invert();
 
 					for ( var i = 0, il = iks.length; i < il; i ++ ) {
 
