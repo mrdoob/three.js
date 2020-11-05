@@ -183,7 +183,7 @@ var OrbitControls = function ( object, domElement ) {
 
 				if ( max < - Math.PI ) max += twoPI; else if ( max > Math.PI ) max -= twoPI;
 
-				if ( min < max ) {
+				if ( min <= max ) {
 
 					spherical.theta = Math.max( min, Math.min( max, spherical.theta ) );
 
