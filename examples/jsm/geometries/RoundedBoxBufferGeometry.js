@@ -3,6 +3,40 @@ import {
 	Vector3
 } from "../../../build/three.module.js";
 
+const tempNormal = new Vector3();
+function applyUv( faceDirVector, normal, uvAxis, projectionAxis, radius, sideLength ) {
+
+	const totArcLength = 2 * Math.PI * radius / 4;
+
+	// length of the planes between the arcs on each axis
+	const centerLength = Math.max( sideLength - 2 * radius, 0 );
+	const halfArc = Math.PI / 4;
+
+	// Get the vector projected onto the Y plane
+	tempNormal.copy( normal );
+	tempNormal[ projectionAxis ] = 0;
+	tempNormal.normalize();
+
+	// total amount of UV space alloted to a single arc
+	const arcUvRatio = 0.5 * totArcLength / ( totArcLength + centerLength );
+
+	// the distance along one arc the point is at
+	const arcAngleRatio = 1.0 - ( tempNormal.angleTo( faceDirVector ) / halfArc );
+
+	if ( Math.sign( tempNormal[ uvAxis ] ) === 1 ) {
+
+		return arcAngleRatio * arcUvRatio;
+
+	} else {
+
+		// total amount of UV space alloted to the plane between the arcs
+		const lenUv = centerLength / ( totArcLength + centerLength );
+		return lenUv + arcUvRatio + arcUvRatio * ( 1.0 - arcAngleRatio );
+
+	}
+
+}
+
 class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 
 	constructor( width = 1, height = 1, depth = 1, segments = 1, radius = 1 ) {
@@ -28,10 +62,7 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 		const uvs = this.attributes.uv.array;
 
 		const faceTris = positions.length / 6;
-		const arcLength = 2 * Math.PI * radius / 4;
-		const widthLength = Math.max( width - 2 * radius, 0 );
-		const heightLength = Math.max( height - 2 * radius, 0 );
-		const depthLength = Math.max( depth - 2 * radius, 0 );
+		const faceDirVector = new Vector3();
 
 		for ( let i = 0, j = 0; i < positions.length; i += 3, j += 2 ) {
 
@@ -52,56 +83,10 @@ class RoundedBoxBufferGeometry extends BoxBufferGeometry {
 
 				case 0: // right
 
-					const tempNormal = new Vector3();
-					const rightVector = new Vector3( 1, 0, 0 );
-					const totArcLength = 2 * Math.PI * radius / 4;
-
-					// length of the planes between the arcs on each axis
-					const heightLength = Math.max( height - 2 * radius, 0 );
-					const depthLength = Math.max( depth - 2 * radius, 0 );
-					const halfArc = Math.PI / 4;
-
-					// Get the vector projected onto the Y plane
-					tempNormal.copy( normal );
-					tempNormal.y = 0;
-					tempNormal.normalize();
-
-					// total amount of UV space alloted to a single arc
-					const arcUvRatioZ = 0.5 * totArcLength / ( totArcLength + depthLength );
-
-					// the distance along one arc the point is at
-					const arcAngleRatioZ = 1.0 - ( tempNormal.angleTo( rightVector ) / halfArc );
-
-					if ( Math.sign( tempNormal.z ) === 1 ) {
-
-						uvs[ j + 0 ] = arcAngleRatioZ * arcUvRatioZ;
-
-					} else {
-
-						// total amount of UV space alloted to the plane between the arcs
-						const lenUv = depthLength / ( totArcLength + depthLength );
-						uvs[ j + 0 ] = lenUv + arcUvRatioZ + arcUvRatioZ * ( 1.0 - arcAngleRatioZ );
-
-					}
-
-					tempNormal.copy( normal );
-					tempNormal.z = 0;
-					tempNormal.normalize();
-
-					const arcUvRatioY = 0.5 * totArcLength / ( totArcLength + heightLength );
-					const arcAngleRatioY = 1.0 - ( tempNormal.angleTo( rightVector ) / halfArc );
-
-					if ( Math.sign( tempNormal.y ) === - 1 ) {
-
-						uvs[ j + 1 ] = arcAngleRatioY * arcUvRatioY;
-
-					} else {
-
-						const lenUv = heightLength / ( totArcLength + heightLength );
-						uvs[ j + 1 ] = lenUv + arcUvRatioY + arcUvRatioY * ( 1.0 - arcAngleRatioY );
-
-					}
-
+					// generate UVs along Z then Y
+					faceDirVector.set( 1, 0, 0 );
+					uvs[ j + 0 ] = applyUv( faceDirVector, normal, 'z', 'y', radius, depth );
+					uvs[ j + 1 ] = 1.0 - applyUv( faceDirVector, normal, 'y', 'z', radius, height );
 					break;
 
 
