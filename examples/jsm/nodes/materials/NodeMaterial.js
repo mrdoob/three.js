@@ -63,6 +63,7 @@ NodeMaterial.prototype.onBeforeCompile = function ( shader, renderer ) {
 
 	this.build( { renderer: renderer } );
 
+	shader.defines = this.defines;
 	shader.uniforms = this.uniforms;
 	shader.vertexShader = this.vertexShader;
 	shader.fragmentShader = this.fragmentShader;
